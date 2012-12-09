@@ -324,6 +324,9 @@ module Stdenv
     remove flags, /-msse4(\.\d)?/
     append flags, xarch unless xarch.empty?
     append flags, map.fetch(effective_arch, default)
+
+    # Works around a buggy system header on Tiger
+    append flags, "-faltivec" if MacOS.version == :tiger
   end
 
   # @private
