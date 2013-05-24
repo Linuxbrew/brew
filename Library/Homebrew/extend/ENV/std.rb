@@ -67,6 +67,17 @@ module Stdenv
       append_path "PATH", "#{MacOS::Xcode.prefix}/usr/bin"
       append_path "PATH", "#{MacOS::Xcode.toolchain_path}/usr/bin"
     end
+
+    # Leopard's ld needs some convincing that it's building 64-bit
+    # See: https://github.com/mistydemeo/tigerbrew/issues/59
+    if MacOS.version == :leopard && MacOS.prefer_64_bit?
+      append "LDFLAGS", "-arch #{Hardware::CPU.arch_64_bit}"
+
+      # Many, many builds are broken thanks to Leopard's buggy ld.
+      # Our ld64 fixes many of those builds, though of course we can't
+      # depend on it already being installed to build itself.
+      ld64 if Formula["ld64"].installed?
+    end
   end
 
   # @private
