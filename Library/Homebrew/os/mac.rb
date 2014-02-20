@@ -131,7 +131,9 @@ module OS
 
     def default_compiler
       case default_cc
-      when /^gcc-4.0/ then :gcc_4_0
+      # if GCC 4.2 is installed, e.g. via Tigerbrew, prefer it
+      # over the system's GCC 4.0
+      when /^gcc-4.0/ then gcc_42_build_version ? :gcc : :gcc_4_0
       when /^gcc/ then :gcc
       when /^llvm/ then :llvm
       when "clang" then :clang
