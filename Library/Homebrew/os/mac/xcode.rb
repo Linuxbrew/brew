@@ -85,6 +85,13 @@ module OS
           if File.file? path
             Utils.popen_read(path, "-version") =~ /Xcode (\d(\.\d)*)/
             return $1 if $1
+
+            # Xcode 2.x's xcodebuild has a different version string
+            Utils.popen_read(path, "-version") =~ /DevToolsCore-(\d+\.\d)/
+            case $1
+            when "515.0" then return "2.0"
+            when "798.0" then return "2.5"
+            end
           end
         end
 
