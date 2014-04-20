@@ -203,6 +203,10 @@ module OS
       end
 
       def detect_version
+        # CLT isn't a distinct entity pre-4.3, and pkgutil doesn't exist
+        # at all on Tiger, so just count it as installed if Xcode is installed
+        return MacOS::Xcode.version if MacOS::Xcode.installed? && MacOS::Xcode.version < "3.0"
+
         [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].find do |id|
           if MacOS.version >= :mavericks
             next unless File.exist?("#{MAVERICKS_PKG_PATH}/usr/bin/clang")
