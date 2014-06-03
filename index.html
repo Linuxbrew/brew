@@ -1,151 +1,180 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
+
   <head>
-    <title>Homebrew — MacPorts driving you to drink? Try Homebrew!</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="dc.creator" content="Rémi Prévost - http://exomel.com" />
-    <link rel="stylesheet" href="./css/screen.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="./css/fonts/chunkfive/chunkfive.css" type="text/css" media="screen" />
-    <script type="text/javascript">
-        function selectText() {
-            if (document.selection) {
-                var range = document.body.createTextRange();
-                range.moveToElementText(document.getElementById('selectable'));
-                range.select();
-            } else if (window.getSelection) {
-                var range = document.createRange();
-                range.selectNode(document.getElementById('selectable'));
-                window.getSelection().addRange(range);
-            }
-        }
-    </script>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Linuxbrew : A fork of Homebrew for Linux" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Linuxbrew</title>
   </head>
+
   <body>
-    <div id="wrap">
-      <div id="header">
-        <h1><a href="./">Homebrew</a></h1>
-        <p id="subtitle"><strong>The missing package manager for OS X</strong></p>
-        <p>English Version | <a href="index_fr-fr.html">Version Francaise</a> | <a href="index_zh-cn.html">简体中文版</a> | <a href="index_zh-tw.html">繁體中文版</a></p>
-      </div>
 
-      <div id="informations">
-        <ul>
-          <li>
-            <div class="group row">
-              <div class="col-1">
-                <p>Homebrew installs <a href="https://github.com/mxcl/homebrew/tree/master/Library/Formula" title="List of Homebrew packages">the stuff you need</a> that Apple didn’t.</p>
-              </div>
-              <div class="col-2">
-                <pre><code><span style="color: #e3d796;">$</span> brew install wget</code></pre>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="group row">
-              <div class="col-1">
-                <p>Homebrew installs packages to their own directory and then symlinks their files into <code>/usr/local</code>.</p>
-              </div>
-              <div class="col-2">
-                <pre><code><span style="color: #e3d796;">$</span> cd /usr/local
-<span style="color: #e3d796;">$</span> find Cellar
-Cellar/wget/1.12
-Cellar/wget/1.12/bin/wget
-Cellar/wget/1.12/share/man/man1/wget.1
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/Homebrew/linuxbrew">View on GitHub</a>
 
-<span style="color: #e3d796;">$</span> ls -l bin
-bin/wget -&gt; ../Cellar/wget/1.12/bin/wget</code></pre>
+          <h1 id="project_title">Linuxbrew</h1>
+          <h2 id="project_tagline">A fork of Homebrew for Linux</h2>
 
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="group row">
-              <div class="col-1">
-                <p>Homebrew won’t install files outside its prefix, and you can place a Homebrew installation wherever you like.</p>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="group row">
-              <div class="col-1">
-                <p>Trivially create your own Homebrew packages.</p>
-              </div>
-              <div class="col-2">
-                <pre><code><span style="color: #e3d796;">$</span> brew create http://foo.com/bar-1.0.tgz
-Created /usr/local/Library/Formula/bar.rb
-</code></pre>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="group row">
-              <div class="col-1">
-                <p>It's all git and ruby underneath, so hack away with the knowledge that you can easily revert your modifications and merge upstream updates.</p>
-              </div>
-              <div class="col-2">
-                <pre><code><span style="color: #e3d796;">$</span> brew edit wget <span style="color: #666;"># opens in $EDITOR!</span></code></pre>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="group row">
-              <div class="col-1">
-                <p>Homebrew formula are simple Ruby scripts:</p>
-              </div>
-              <div class="col-2">
-                <pre class="overflow"><code><span style="color: #8a9597;">require</span> <span style="color: #c2c98f;">'</span><span style="color: #a2a96f;">formula</span><span style="color: #c2c98f;">'</span>
-
-<span style="color: #8a9597;">class</span> <span style="color: #e3d796;"><em>Wget</em></span> &lt; Formula
-  homepage <span style="color: #c2c98f;">'</span><span style="color: #a2a96f;">http://www.gnu.org/wget/</span><span style="color: #c2c98f;">'</span>
-  url <span style="color: #c2c98f;">'</span><span style="color: #a2a96f;">http://ftp.gnu.org/wget-1.12.tar.gz</span><span style="color: #c2c98f;">'</span>
-  md5 <span style="color: #c2c98f;">'</span><span style="color: #a2a96f;">308a5476fc096a8a525d07279a6f6aa3</span><span style="color: #c2c98f;">'</span>
-
-  <span style="color: #8a9597;">def</span> <span style="color: #a999ac;">install</span>
-    system <span style="color: #c2c98f;">"</span><span style="color: #a2a96f;">./configure</span><span style="color: #c2c98f;"> </span><span style="color: #a2a96f;">--prefix=</span><span style="color: #c2c98f;">#{</span>prefix<span style="color: #c2c98f;">}</span><span style="color: #c2c98f;">"</span>
-    system <span style="color: #c2c98f;">'</span><span style="color: #a2a96f;">make install</span><span style="color: #c2c98f;">'</span>
-  <span style="color: #8a9597;">end</span>
-<span style="color: #8a9597;">end</span></code></pre>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="group row">
-              <div class="col-1">
-                <p>Homebrew complements OS X. Install your gems with <code>gem</code>, and their dependencies with <code>brew</code>.</p>
-              </div>
-            </div>
-          </li>
-
-          <li>
-            <div class="group row">
-              <h2>Install Homebrew</h2>
-              <pre style='clear:both;text-align:center;margin:0 -3em;margin-bottom:0.9em'><code id='selectable' onclick="selectText()">ruby -e &quot;$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)&quot;</code></pre>
-              <div class="col-1">
-                <p>Paste that at a Terminal prompt.</p>
-              </div>
-              <div class="col-2">
-                <p>The script explains what it will do and then pauses before it does it. There are more installation options <a href='https://github.com/mxcl/homebrew/wiki/Installation'>here</a> (needed on 10.5).
-              </div>
-            </div>
-          </li>
-
-          <li>
-            <div class="group row">
-              <h2>Further Documentation</h2>
-              <div class="button">
-                <p><a href="https://github.com/mxcl/homebrew/wiki">Homebrew Wiki</a></p>
-              </div>
-            </div>
-          </li>
-
-          <li>
-            <div class="group row credits">
-              <p>Original code by <a href="http://methylblue.com/">Max Howell</a>. Website by <a href="http://exomel.com">Rémi Prévost</a>.</p>
-            </div>
-          </li>
-        </ul>
-      </div>
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/Homebrew/linuxbrew/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/Homebrew/linuxbrew/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
     </div>
-    <a href="http://github.com/mxcl/homebrew"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a name="install-linuxbrew-tldr" class="anchor" href="#install-linuxbrew-tldr"><span class="octicon octicon-link"></span></a>Install Linuxbrew (tl;dr)</h2>
+
+<p>Paste at a Terminal prompt:</p>
+
+<div class="highlight highlight-sh"><pre>ruby -e <span class="s2">"$(wget -O- https://raw.github.com/Homebrew/linuxbrew/go/install)"</span>
+</pre></div>
+
+<p>See <a href="#dependencies">Dependencies</a> and <a href="#installation">Installation</a> below for more details.</p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Can install software to a home directory and so does not require sudo</li>
+<li>Install software not packaged by the native distribution</li>
+<li>Install up-to-date versions of software when the native distribution is old</li>
+<li>Use the same package manager to manage both your Mac and Linux machines</li>
+</ul><h2>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<ul>
+<li>
+<strong>Ruby</strong> 1.8.6 or newer</li>
+<li>
+<strong>GCC</strong> 4.2 or newer</li>
+</ul><p>Paste at a Terminal prompt:</p>
+
+<h3>
+<a name="debian-or-ubuntu" class="anchor" href="#debian-or-ubuntu"><span class="octicon octicon-link"></span></a>Debian or Ubuntu</h3>
+
+<div class="highlight highlight-sh"><pre>sudo apt-get install build-essential curl git ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev
+</pre></div>
+
+<h3>
+<a name="fedora" class="anchor" href="#fedora"><span class="octicon octicon-link"></span></a>Fedora</h3>
+
+<div class="highlight highlight-sh"><pre>sudo yum groupinstall <span class="s1">'Development Tools'</span> <span class="o">&amp;&amp;</span> sudo yum install curl git ruby texinfo bzip2-devel curl-devel expat-devel ncurses-devel zlib-devel
+</pre></div>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Paste at a Terminal prompt:</p>
+
+<div class="highlight highlight-sh"><pre>ruby -e <span class="s2">"$(wget -O- https://raw.github.com/Homebrew/linuxbrew/go/install)"</span>
+</pre></div>
+
+<p>Or if you prefer:</p>
+
+<div class="highlight highlight-sh"><pre>git clone https://github.com/Homebrew/linuxbrew.git ~/.linuxbrew
+</pre></div>
+
+<p>Add to your <code>.bashrc</code> or <code>.zshrc</code>:</p>
+
+<div class="highlight highlight-sh"><pre><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"$HOME/.linuxbrew/bin:$PATH"</span>
+<span class="nb">export </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="s2">"$HOME/.linuxbrew/lib:$LD_LIBRARY_PATH"</span>
+</pre></div>
+
+<p>You're done!</p>
+
+<div class="highlight highlight-sh"><pre>brew install <span class="nv">$WHATEVER_YOU_WANT</span>
+</pre></div>
+
+<h2>
+<a name="what-packages-are-available" class="anchor" href="#what-packages-are-available"><span class="octicon octicon-link"></span></a>What Packages Are Available?</h2>
+
+<ol>
+<li>You can <a href="https://github.com/Homebrew/homebrew/tree/master/Library/Formula/">browse the Formula directory on GitHub</a>.</li>
+<li>Or type <code>brew search</code> for a list.</li>
+<li>Or visit <a href="http://braumeister.org">braumeister.org</a> to browse packages online.</li>
+<li>Or visit <a href="https://github.com/telemachus/homebrew-desc"><code>brew desc</code></a> to browse and search packages from the
+command line.</li>
+</ol><h2>
+<a name="more-documentation" class="anchor" href="#more-documentation"><span class="octicon octicon-link"></span></a>More Documentation</h2>
+
+<p><code>brew help</code> or <code>man brew</code> or check our <a href="https://github.com/Homebrew/homebrew/wiki">wiki</a>.</p>
+
+<h2>
+<a name="troubleshooting" class="anchor" href="#troubleshooting"><span class="octicon octicon-link"></span></a>Troubleshooting</h2>
+
+<p>First, please run <code>brew update</code> and <code>brew doctor</code>.</p>
+
+<p>Second, read the <a href="https://github.com/Homebrew/homebrew/wiki/troubleshooting">Troubleshooting Checklist</a>.</p>
+
+<p><strong>If you don't read these it will take us far longer to help you with your problem.</strong></p>
+
+<h2>
+<a name="something-broke" class="anchor" href="#something-broke"><span class="octicon octicon-link"></span></a>Something broke!</h2>
+
+<p>Many of the Homebrew formulae work on either Mac or Linux without changes, but
+some formulae will need to be adapted for Linux. If a formula doesn't work,
+<a href="https://github.com/Homebrew/linuxbrew/issues">open an issue on GitHub</a> or, even better, submit a pull request.</p>
+
+<h2>
+<a name="who-are-you" class="anchor" href="#who-are-you"><span class="octicon octicon-link"></span></a>Who Are You?</h2>
+
+<p>Linuxbrew is maintained by <a href="https://github.com/sjackman">Shaun Jackman</a>.</p>
+
+<p>Homebrew's current maintainers are <a href="https://github.com/mistydemeo">Misty De Meo</a>, <a href="https://github.com/adamv">Adam Vandenberg</a>, <a href="https://github.com/jacknagel">Jack Nagel</a>, <a href="https://github.com/mikemcquaid">Mike McQuaid</a> and <a href="https://github.com/asparagui">Brett Koonce</a>.</p>
+
+<p>Homebrew was originally created by <a href="https://github.com/mxcl">Max Howell</a>.</p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Code is under the <a href="https://github.com/Homebrew/homebrew/tree/master/LICENSE.txt">BSD 2 Clause (NetBSD) license</a>.</p>
+
+<h2>
+<a name="donations" class="anchor" href="#donations"><span class="octicon octicon-link"></span></a>Donations</h2>
+
+<p>We accept tips through <a href="https://www.gittip.com/Homebrew/">Gittip</a>.</p>
+
+<h3>
+<a name="shaun-jackman" class="anchor" href="#shaun-jackman"><span class="octicon octicon-link"></span></a>Shaun Jackman</h3>
+
+<p><a href="https://www.gittip.com/sjackman/"><img src="http://img.shields.io/gittip/sjackman.svg" alt="Gittip"></a></p>
+
+<h3>
+<a name="homebrew" class="anchor" href="#homebrew"><span class="octicon octicon-link"></span></a>Homebrew</h3>
+
+<p><a href="https://www.gittip.com/Homebrew/"><img src="http://img.shields.io/gittip/Homebrew.svg" alt="Gittip"></a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Linuxbrew maintained by <a href="https://github.com/Homebrew">Homebrew</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-2437900-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
   </body>
 </html>
