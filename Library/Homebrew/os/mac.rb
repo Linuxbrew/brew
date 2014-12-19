@@ -48,7 +48,8 @@ module OS
         # Homebrew GCCs most frequently; much faster to check this before xcrun
         elsif (path = HOMEBREW_PREFIX/"bin/#{tool}").executable?
           path
-        else
+        # xcrun was introduced in Xcode 3 on Leopard
+        elsif MacOS.version > :tiger
           path = Utils.popen_read("/usr/bin/xcrun", "-no-cache", "-find", tool).chomp
           Pathname.new(path) if File.executable?(path)
         end
