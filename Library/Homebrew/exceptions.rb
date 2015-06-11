@@ -457,11 +457,23 @@ end
 # the compilers available on the user's system
 class CompilerSelectionError < RuntimeError
   def initialize(formula)
-    super <<-EOS.undent
-      #{formula.full_name} cannot be built with any available compilers.
-      To install this formula, you may need to:
-        brew install gcc
-      EOS
+    if MacOS.version > :tiger
+      super <<-EOS.undent
+        #{formula.full_name} cannot be built with any available compilers.
+        To install this formula, you may need to:
+          brew install gcc
+        EOS
+    # Tiger doesn't ship with apple-gcc42, and this is required to build
+    # some software that doesn't build properly with FSF GCC.
+    else
+      super <<-EOS.undent
+        #{formula.full_name} cannot be built with any available compilers.
+        To install this formula, you may need to either:
+          brew install apple-gcc42
+        or:
+          brew install gcc
+        EOS
+    end
   end
 end
 
