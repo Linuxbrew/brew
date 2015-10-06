@@ -29,7 +29,7 @@ module LinuxCPUs
   def type
     @type ||= if cpuinfo =~ /Intel|AMD/
       :intel
-    elsif cpuinfo =~ /ARM/
+    elsif cpuinfo =~ /ARM|Marvell/
       :arm
     else
       :dunno
