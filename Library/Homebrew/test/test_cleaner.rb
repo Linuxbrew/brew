@@ -22,10 +22,11 @@ class CleanerTests < Homebrew::TestCase
 
     Cleaner.new(@f).clean
 
+    dylib_perm = OS.mac? ? 0100444 : 0100555
     assert_equal 0100555, (@f.bin/"a.out").stat.mode
-    assert_equal 0100444, (@f.lib/"fat.dylib").stat.mode
-    assert_equal 0100444, (@f.lib/"x86_64.dylib").stat.mode
-    assert_equal 0100444, (@f.lib/"i386.dylib").stat.mode
+    assert_equal dylib_perm, (@f.lib/"fat.dylib").stat.mode
+    assert_equal dylib_perm, (@f.lib/"x86_64.dylib").stat.mode
+    assert_equal dylib_perm, (@f.lib/"i386.dylib").stat.mode
   end
 
   def test_prunes_prefix_if_empty
