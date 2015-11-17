@@ -4,7 +4,7 @@ module OS
   end
 
   def self.linux?
-    /linux/i === RUBY_PLATFORM
+    /linux/i === RUBY_PLATFORM || /linux/i === RbConfig::CONFIG["host_os"]
   end
 
   require "os/mac"
