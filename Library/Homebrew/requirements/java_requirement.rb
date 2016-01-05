@@ -6,7 +6,7 @@ class JavaRequirement < Requirement
   download "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
   satisfy :build_env => false do
-    return quiet_system "java", "-version" unless OS.mac?
+    next quiet_system "java", "-version" unless OS.mac?
     args = %w[--failfast]
     args << "--version" << "#{@version}" if @version
     @java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp
