@@ -7,8 +7,8 @@ module OS
     /linux/i === RUBY_PLATFORM
   end
 
+  require "os/mac"
   if OS.mac?
-    require "os/mac"
     GITHUB_REPOSITORY = "homebrew"
     ISSUES_URL = "https://git.io/brew-troubleshooting"
     PATH_OPEN = "/usr/bin/open"
@@ -23,7 +23,8 @@ module OS
     PATH_OPEN = "xdg-open"
     PATH_PATCH = "patch"
     # compatibility
-    ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0"
+    ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s
+    ::MACOS_VERSION = OS::Mac.version.to_s
     ::OS_VERSION = RUBY_PLATFORM
   else
     raise "Unknown operating system"

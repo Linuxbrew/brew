@@ -14,12 +14,14 @@ module OS
     # This can be compared to numerics, strings, or symbols
     # using the standard Ruby Comparable methods.
     def version
+      return @version ||= Version.new("0") unless OS.mac?
       @version ||= Version.new(full_version.to_s[/10\.\d+/])
     end
 
     # This can be compared to numerics, strings, or symbols
     # using the standard Ruby Comparable methods.
     def full_version
+      return @full_version ||= Version.new("0") unless OS.mac?
       @full_version ||= Version.new(`/usr/bin/sw_vers -productVersion`.chomp)
     end
 
