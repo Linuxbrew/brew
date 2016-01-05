@@ -5,7 +5,13 @@ class JavaRequirement < Requirement
   cask "java"
   download "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
-  satisfy(:build_env => false) { java_version }
+  satisfy :build_env => false do
+    return quiet_system "java", "-version" unless OS.mac?
+    args = %w[--failfast]
+    args << "--version" << "#{@version}" if @version
+    @java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp
+    $?.success?
+  end
 
   env do
     java_home = Pathname.new(@java_home)
@@ -22,14 +28,6 @@ class JavaRequirement < Requirement
   def initialize(tags)
     @version = tags.shift if /(\d\.)+\d/ === tags.first
     super
-  end
-
-  def java_version
-    return quiet_system "java", "-version" unless OS.mac?
-    args = %w[--failfast]
-    args << "--version" << "#{@version}" if @version
-    @java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp
-    $?.success?
   end
 
   def message

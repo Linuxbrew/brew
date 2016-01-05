@@ -60,7 +60,11 @@ module Homebrew
   def describe_path(path)
     return "N/A" if path.nil?
     realpath = path.realpath
-    if realpath == path then path else "#{path} => #{realpath}" end
+    if realpath == path
+      path
+    else
+      "#{path} => #{realpath}"
+    end
   end
 
   def describe_x11
@@ -150,7 +154,7 @@ module Homebrew
     f.puts "HOMEBREW_CELLAR: #{HOMEBREW_CELLAR}"
     f.puts "HOMEBREW_BOTTLE_DOMAIN: #{BottleSpecification::DEFAULT_DOMAIN}"
     f.puts hardware
-    f.puts "OS X: #{MACOS_FULL_VERSION}-#{kernel}"
+    f.puts "OS X: #{MacOS.full_version}-#{kernel}"
     f.puts "Xcode: #{xcode ? xcode : "N/A"}"
     f.puts "CLT: #{clt ? clt : "N/A"}"
     f.puts "GCC-4.0: build #{gcc_40}" if gcc_40

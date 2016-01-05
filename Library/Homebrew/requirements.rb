@@ -123,5 +123,5 @@ end
 class GitRequirement < Requirement
   fatal true
   default_formula "git"
-  satisfy { !!which("git") }
+  satisfy { Utils.git_available? }
 end
