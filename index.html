@@ -1,37 +1,25 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Linuxbrew : A fork of Homebrew for Linux">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Linuxbrew</title>
+    <meta charset="UTF-8">
+    <title>Linuxbrew by Homebrew</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">Linuxbrew</h1>
+      <h2 class="project-tagline">A fork of Homebrew for Linux</h2>
+      <a href="https://github.com/Homebrew/linuxbrew" class="btn">View on GitHub</a>
+      <a href="https://github.com/Homebrew/linuxbrew/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Homebrew/linuxbrew/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/Homebrew/linuxbrew">View on GitHub</a>
-
-          <h1 id="project_title">Linuxbrew</h1>
-          <h2 id="project_tagline">A fork of Homebrew for Linux</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/Homebrew/linuxbrew/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/Homebrew/linuxbrew/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <p>Linuxbrew is a fork of <a href="http://brew.sh">Homebrew</a>, the Mac OS package manager, for Linux.</p>
+    <section class="main-content">
+      <p>Linuxbrew is a fork of <a href="http://brew.sh">Homebrew</a>, the Mac OS package manager, for Linux.</p>
 
 <p>Features, usage and installation instructions are <a href="http://brew.sh/linuxbrew/">summarised on the homepage</a>.</p>
 
@@ -40,7 +28,7 @@
 
 <p>Paste at a Terminal prompt:</p>
 
-<div class="highlight highlight-sh"><pre>ruby -e <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-s1"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
 
 <p>See <a href="#dependencies">Dependencies</a> and <a href="#installation">Installation</a> below for more details.</p>
 
@@ -62,6 +50,12 @@
 <strong>Ruby</strong> 1.8.6 or newer</li>
 <li>
 <strong>GCC</strong> 4.2 or newer</li>
+<li>
+<strong>Git</strong> 1.7.12.4 or newer</li>
+<li>
+<strong>Linux</strong> 2.6.16 or newer</li>
+<li>
+<strong>64-bit x86</strong> or <strong>32-bit ARM</strong> platform</li>
 </ul>
 
 <p>Paste at a Terminal prompt:</p>
@@ -69,33 +63,38 @@
 <h3>
 <a id="debian-or-ubuntu" class="anchor" href="#debian-or-ubuntu" aria-hidden="true"><span class="octicon octicon-link"></span></a>Debian or Ubuntu</h3>
 
-<div class="highlight highlight-sh"><pre>sudo apt-get install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev</pre></div>
+<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev</pre></div>
 
 <h3>
-<a id="fedora" class="anchor" href="#fedora" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fedora</h3>
+<a id="fedora-centos-or-red-hat" class="anchor" href="#fedora-centos-or-red-hat" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fedora, CentOS or Red Hat</h3>
 
-<div class="highlight highlight-sh"><pre>sudo yum groupinstall <span class="pl-s1"><span class="pl-pds">'</span>Development Tools<span class="pl-pds">'</span></span> <span class="pl-k">&amp;&amp;</span> sudo yum install curl git m4 ruby texinfo bzip2-devel curl-devel expat-devel ncurses-devel zlib-devel</pre></div>
+<div class="highlight highlight-source-shell"><pre>sudo yum groupinstall <span class="pl-s"><span class="pl-pds">'</span>Development Tools<span class="pl-pds">'</span></span> <span class="pl-k">&amp;&amp;</span> sudo yum install curl git irb m4 ruby texinfo bzip2-devel curl-devel expat-devel ncurses-devel zlib-devel</pre></div>
+
+<h3>
+<a id="32-bit-x86-platforms" class="anchor" href="#32-bit-x86-platforms" aria-hidden="true"><span class="octicon octicon-link"></span></a>32-bit x86 platforms</h3>
+
+<p>Linuxbrew does not currently support 32-bit x86 platforms. It would be possible for Linuxbrew to work on 32-bit x86 platforms with some effort. Pull requests would be welcome if someone were to volunteer to maintain the 32-bit x86 support.</p>
 
 <h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Paste at a Terminal prompt:</p>
 
-<div class="highlight highlight-sh"><pre>ruby -e <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-s1"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
 
 <p>Or if you prefer:</p>
 
-<div class="highlight highlight-sh"><pre>git clone https://github.com/Homebrew/linuxbrew.git <span class="pl-k">~</span>/.linuxbrew</pre></div>
+<div class="highlight highlight-source-shell"><pre>git clone https://github.com/Homebrew/linuxbrew.git <span class="pl-k">~</span>/.linuxbrew</pre></div>
 
 <p>Add to your <code>.bashrc</code> or <code>.zshrc</code>:</p>
 
-<div class="highlight highlight-sh"><pre><span class="pl-s">export</span> PATH=<span class="pl-s1"><span class="pl-pds">"</span><span class="pl-vo">$HOME</span>/.linuxbrew/bin:<span class="pl-vo">$PATH</span><span class="pl-pds">"</span></span>
-<span class="pl-s">export</span> MANPATH=<span class="pl-s1"><span class="pl-pds">"</span><span class="pl-vo">$HOME</span>/.linuxbrew/share/man:<span class="pl-vo">$MANPATH</span><span class="pl-pds">"</span></span>
-<span class="pl-s">export</span> INFOPATH=<span class="pl-s1"><span class="pl-pds">"</span><span class="pl-vo">$HOME</span>/.linuxbrew/share/info:<span class="pl-vo">$INFOPATH</span><span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">export</span> PATH=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$HOME</span>/.linuxbrew/bin:<span class="pl-smi">$PATH</span><span class="pl-pds">"</span></span>
+<span class="pl-k">export</span> MANPATH=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$HOME</span>/.linuxbrew/share/man:<span class="pl-smi">$MANPATH</span><span class="pl-pds">"</span></span>
+<span class="pl-k">export</span> INFOPATH=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$HOME</span>/.linuxbrew/share/info:<span class="pl-smi">$INFOPATH</span><span class="pl-pds">"</span></span></pre></div>
 
 <p>You're done!</p>
 
-<div class="highlight highlight-sh"><pre>brew install <span class="pl-vo">$WHATEVER_YOU_WANT</span></pre></div>
+<div class="highlight highlight-source-shell"><pre>brew install <span class="pl-smi">$WHATEVER_YOU_WANT</span></pre></div>
 
 <h2>
 <a id="what-packages-are-available" class="anchor" href="#what-packages-are-available" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Packages Are Available?</h2>
@@ -103,13 +102,13 @@
 <ol>
 <li>Type <code>brew search</code> for a list.</li>
 <li>Or visit <a href="http://braumeister.org">braumeister.org</a> to browse packages online.</li>
-<li>Or use <a href="https://github.com/telemachus/homebrew-desc"><code>brew desc</code></a> to browse packages from the command line.</li>
+<li>Or use <code>brew search --desc</code> to browse packages from the command line.</li>
 </ol>
 
 <h2>
 <a id="more-documentation" class="anchor" href="#more-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>More Documentation</h2>
 
-<p><code>brew help</code> or <code>man brew</code> or check our <a href="https://github.com/Homebrew/linuxbrew/tree/master/share/doc/homebrew#readme">documentation</a>.</p>
+<p><code>brew help</code>, <code>man brew</code> or check <a href="https://github.com/Homebrew/linuxbrew/tree/master/share/doc/homebrew#readme">our documentation</a>.</p>
 
 <h2>
 <a id="troubleshooting" class="anchor" href="#troubleshooting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Troubleshooting</h2>
@@ -130,46 +129,52 @@
 
 <p>Please report security issues to <a href="mailto:security@brew.sh">security@brew.sh</a>.</p>
 
+<p>This is our PGP key which is valid until June 17, 2016.</p>
+
+<ul>
+<li>Key ID: <code>0xE33A3D3CCE59E297</code>
+</li>
+<li>Fingerprint: <code>C657 8F76 2E23 441E C879  EC5C E33A 3D3C CE59 E297</code>
+</li>
+<li>Full key: <a href="https://keybase.io/homebrew/key.asc">https://keybase.io/homebrew/key.asc</a>
+</li>
+</ul>
+
 <h2>
 <a id="who-are-you" class="anchor" href="#who-are-you" aria-hidden="true"><span class="octicon octicon-link"></span></a>Who Are You?</h2>
 
 <p>Linuxbrew is maintained by <a href="https://github.com/sjackman">Shaun Jackman</a>.</p>
 
-<p>Homebrew's current maintainers are <a href="https://github.com/mistydemeo">Misty De Meo</a>, <a href="https://github.com/adamv">Adam Vandenberg</a>, <a href="https://github.com/jacknagel">Jack Nagel</a>, <a href="https://github.com/mikemcquaid">Mike McQuaid</a>, <a href="https://github.com/asparagui">Brett Koonce</a> and <a href="https://github.com/tdsmith">Tim Smith</a>.</p>
+<p>Homebrew's current maintainers are <a href="https://github.com/mistydemeo">Misty De Meo</a>, <a href="https://github.com/apjanke">Andrew Janke</a>, <a href="https://github.com/xu-cheng">Xu Cheng</a>, <a href="https://github.com/mikemcquaid">Mike McQuaid</a>, <a href="https://github.com/bfontaine">Baptiste Fontaine</a>, <a href="https://github.com/asparagui">Brett Koonce</a>, <a href="https://github.com/UniqMartin">Martin Afanasjew</a>, <a href="https://github.com/DomT4">Dominyk Tiller</a>, <a href="https://github.com/tdsmith">Tim Smith</a> and <a href="https://github.com/dunn">Alex Dunn</a>.</p>
 
-<p>Homebrew was originally created by <a href="https://github.com/mxcl">Max Howell</a>.</p>
+<p>Former maintainers with significant contributions include <a href="https://github.com/jacknagel">Jack Nagel</a>, <a href="https://github.com/adamv">Adam Vandenberg</a> and Homebrew's creator: <a href="https://github.com/mxcl">Max Howell</a>.</p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
-<p>Code is under the <a href="https://github.com/Homebrew/homebrew/tree/master/LICENSE.txt">BSD 2 Clause (NetBSD) license</a>.</p>
+<p>Code is under the <a href="https://github.com/Homebrew/homebrew/tree/master/LICENSE.txt">BSD 2 Clause (NetBSD) license</a>.
+Documentation is under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a>.</p>
 
 <h2>
-<a id="donations" class="anchor" href="#donations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Donations</h2>
+<a id="sponsors" class="anchor" href="#sponsors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sponsors</h2>
 
-<p>We accept tips through Gratipay.</p>
+<p>Our CI infrastructure was paid for by <a href="https://github.com/Homebrew/homebrew/blob/master/SUPPORTERS.md">our Kickstarter supporters</a>.</p>
 
-<h3>
-<a id="shaun-jackman-for-linuxbrew" class="anchor" href="#shaun-jackman-for-linuxbrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>Shaun Jackman for Linuxbrew</h3>
+<p>Our CI infrastructure is hosted by <a href="http://www.positive-internet.com">The Positive Internet Company</a>.</p>
 
-<p><a href="https://gratipay.com/sjackman/"><img src="https://img.shields.io/gratipay/sjackman.svg?style=flat" alt="Gittip"></a></p>
+<p>Our bottles (binary packages) are hosted by Bintray.</p>
 
-<h3>
-<a id="homebrew" class="anchor" href="#homebrew" aria-hidden="true"><span class="octicon octicon-link"></span></a>Homebrew</h3>
+<p><a href="https://bintray.com/homebrew"><img src="https://bintray.com/docs/images/downloads_by_bintray_96.png" alt="Downloads by Bintray"></a></p>
 
-<p><a href="https://gratipay.com/Homebrew/"><img src="https://img.shields.io/gratipay/Homebrew.svg?style=flat" alt="Gratipay"></a></p>
-      </section>
-    </div>
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/Homebrew/linuxbrew">Linuxbrew</a> is maintained by <a href="https://github.com/Homebrew">Homebrew</a>.</span>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Linuxbrew maintained by <a href="https://github.com/Homebrew">Homebrew</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
 
-              <script type="text/javascript">
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -179,7 +184,6 @@
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
 
   </body>
 </html>
