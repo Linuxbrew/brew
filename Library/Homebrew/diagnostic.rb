@@ -386,6 +386,7 @@ module Homebrew
         end
       else
         def check_for_installed_developer_tools
+          return unless OS.mac?
           unless MacOS::Xcode.installed? then <<-EOS.undent
           Xcode is not installed. Most formulae need Xcode to build.
           It can be installed from
