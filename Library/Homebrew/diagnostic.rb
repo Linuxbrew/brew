@@ -620,6 +620,7 @@ module Homebrew
       end
 
       def check_ruby_version
+        return unless OS.mac?
         ruby_version = MacOS.version >= "10.9" ? "2.0" : "1.8"
         if RUBY_VERSION[/\d\.\d/] != ruby_version then <<-EOS.undent
         Ruby version #{RUBY_VERSION} is unsupported on #{MacOS.version}. Homebrew
@@ -631,6 +632,7 @@ module Homebrew
       end
 
       def check_homebrew_prefix
+        return unless OS.mac?
         unless HOMEBREW_PREFIX.to_s == "/usr/local"
           <<-EOS.undent
           Your Homebrew is not installed to /usr/local
@@ -741,6 +743,7 @@ module Homebrew
       end
 
       def check_for_bad_curl
+        return unless OS.mac?
         if MacOS.version <= "10.8" && !Formula["curl"].installed? then <<-EOS.undent
           The system curl on 10.8 and below is often incapable of supporting
           modern secure connections & will fail on fetching formulae.
@@ -943,6 +946,7 @@ module Homebrew
       end
 
       def check_filesystem_case_sensitive
+        return unless OS.mac?
         volumes = Volumes.new
         case_sensitive_vols = [HOMEBREW_PREFIX, HOMEBREW_REPOSITORY, HOMEBREW_CELLAR, HOMEBREW_TEMP].select do |dir|
           # We select the dir as being case-sensitive if either the UPCASED or the
