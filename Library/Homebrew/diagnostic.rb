@@ -802,6 +802,7 @@ module Homebrew
       end
 
       def check_for_gettext
+        return unless OS.mac?
         find_relative_paths("lib/libgettextlib.dylib",
                             "lib/libintl.dylib",
                             "include/libintl.h")
@@ -823,6 +824,7 @@ module Homebrew
       end
 
       def check_for_iconv
+        return unless OS.mac?
         unless find_relative_paths("lib/libiconv.dylib", "include/iconv.h").empty?
           if (f = Formulary.factory("libiconv") rescue nil) && f.linked_keg.directory?
             unless f.keg_only? then <<-EOS.undent
@@ -920,6 +922,7 @@ module Homebrew
       end
 
       def check_for_multiple_volumes
+        return unless OS.mac?
         return unless HOMEBREW_CELLAR.exist?
         volumes = Volumes.new
 
