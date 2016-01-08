@@ -83,13 +83,6 @@ class FormulaInstaller
     return false if ARGV.cc
     return false unless options.empty?
     return false if formula.bottle_disabled?
-
-    if OS.linux?
-      return true if formula.name == "linux-headers"
-      return true if formula.name == "patchelf" && Formula["glibc"].installed?
-      return false unless Formula["glibc"].installed? && Formula["patchelf"].installed?
-    end
-
     return true  if formula.local_bottle_path
     return false unless bottle && formula.pour_bottle?
 
@@ -98,6 +91,12 @@ class FormulaInstaller
         opoo "Building source; cellar of #{formula.full_name}'s bottle is #{bottle.cellar}"
       end
       return false
+    end
+
+    if OS.linux?
+      return true if formula.name == "linux-headers"
+      return true if formula.name == "patchelf" && Formula["glibc"].installed?
+      return false unless Formula["glibc"].installed? && Formula["patchelf"].installed?
     end
 
     true
