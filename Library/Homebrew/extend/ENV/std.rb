@@ -58,8 +58,8 @@ module Stdenv
 
     if OS.linux? && !["glibc", "glibc25"].include?(formula && formula.name)
       # Set the dynamic linker
-      glibc = Formula["glibc"]
-      if glibc.installed?
+      glibc = Formula["glibc"] rescue nil
+      if glibc && glibc.installed?
         ldso = glibc.opt_lib/"ld-linux-x86-64.so.2"
         if ldso.readable?
           append "LDFLAGS", "-Wl,--dynamic-linker=#{ldso}"
