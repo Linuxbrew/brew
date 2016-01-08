@@ -11,7 +11,8 @@ module OS
         :lion          => "10.7",
         :snow_leopard  => "10.6",
         :leopard       => "10.5",
-        :tiger         => "10.4"
+        :tiger         => "10.4",
+        :linux         => "0"
       }
 
       def self.from_symbol(sym)

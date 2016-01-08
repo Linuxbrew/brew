@@ -22,7 +22,7 @@ def bottle_native_regex
 end
 
 def bottle_tag
-  if OS.linux?
+  if MacOS.version == :linux
     :"#{RUBY_PLATFORM.tr("-.", "_")}"
   elsif MacOS.version >= :lion
     MacOS.cat
