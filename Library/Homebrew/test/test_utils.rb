@@ -71,7 +71,7 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_popen_write_with_block
-    Utils.popen_write("/usr/bin/grep", "-q", "success") do |pipe|
+    Utils.popen_write("grep", "-q", "success") do |pipe|
       pipe.write("success\n")
     end
     assert_predicate $?, :success?
