@@ -96,7 +96,12 @@ class FormulaInstaller
     if OS.linux?
       return true if formula.name == "linux-headers"
       return true if formula.name == "patchelf" && Formula["glibc"].installed?
-      return false unless Formula["glibc"].installed? && Formula["patchelf"].installed?
+      begin
+        return false unless Formula["glibc"].installed? && Formula["patchelf"].installed?
+      rescue FormulaUnavailableError
+        # Fix for brew tests, which uses NullLoader.
+        true
+      end
     end
 
     true
