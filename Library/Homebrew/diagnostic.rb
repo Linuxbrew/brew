@@ -304,6 +304,7 @@ module Homebrew
       end
 
       def check_for_unsupported_osx
+        return unless OS.mac?
         return if ARGV.homebrew_developer?
         if OS::Mac.prerelease?
           <<-EOS.undent
