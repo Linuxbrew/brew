@@ -135,7 +135,7 @@ class Tab < OpenStruct
       "time" => nil,
       "HEAD" => nil,
       "stdlib" => nil,
-      "compiler" => "clang",
+      "compiler" => OS.mac? ? "clang" : "gcc",
       "source" => {
         "path" => nil,
         "tap" => nil,
