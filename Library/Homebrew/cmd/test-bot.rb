@@ -651,7 +651,7 @@ module Homebrew
     def homebrew
       @category = __method__
       return if @skip_homebrew
-      test "brew", "tests" unless OS.linux?
+      test "brew", "tests"
       if @tap
         test "brew", "readall", @tap.name
       else
@@ -660,7 +660,7 @@ module Homebrew
           tests_args << "--coverage" if ENV["TRAVIS"]
           readall_args << "--syntax"
         end
-        test "brew", "tests", *tests_args unless OS.linux?
+        test "brew", "tests", *tests_args
         test "brew", "readall", *readall_args
         test "brew", "update-test"
       end
