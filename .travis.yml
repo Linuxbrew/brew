@@ -1,4 +1,7 @@
 language: ruby
+before_install:
+ # Fix brew tests: `require': cannot load such file -- mkmf (LoadError)
+ - sudo apt-get install ruby-dev
 install:
  - unset DYLD_LIBRARY_PATH
  # Warning: You have a non-Homebrew 'pkg-config' in your PATH
