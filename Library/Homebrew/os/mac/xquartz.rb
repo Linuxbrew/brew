@@ -30,6 +30,7 @@ module OS
       # The X11.app distributed by Apple is also XQuartz, and therefore covered
       # by this method.
       def version
+        @version ||= latest_version if OS.linux?
         @version ||= detect_version
       end
 
@@ -94,6 +95,7 @@ module OS
       # remain public. New code should use MacOS::X11.bin, MacOS::X11.lib and
       # MacOS::X11.include instead, as that accounts for Xcode-only systems.
       def prefix
+        @prefix ||= Pathname.new("/usr") if OS.linux?
         @prefix ||= if Pathname.new("/opt/X11/lib/libpng.dylib").exist?
           Pathname.new("/opt/X11")
         elsif Pathname.new("/usr/X11/lib/libpng.dylib").exist?
