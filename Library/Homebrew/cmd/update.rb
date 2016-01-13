@@ -306,7 +306,7 @@ class Updater
   def reset_on_interrupt
     ignore_interrupts { yield }
   ensure
-    if $?.signaled? && $?.termsig == 2 # SIGINT
+    if $? != nil && $?.signaled? && $?.termsig == 2 # SIGINT
       safe_system "git", "checkout", @initial_branch unless @initial_branch.empty?
       safe_system "git", "reset", "--hard", @initial_revision, *@quiet_args
       if @initial_branch
