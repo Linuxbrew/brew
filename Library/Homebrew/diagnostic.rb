@@ -530,7 +530,7 @@ module Homebrew
       def check_tmpdir_sticky_bit
         # Repair Disk Permissions was removed(?) in El Capitan.
         # https://support.apple.com/en-us/HT201560
-        if MacOS.version < "10.11"
+        if OS.mac? && MacOS.version < "10.11"
           fix_message = "Please run \"Repair Disk Permissions\" in Disk Utility."
         else
           fix_message = "Please execute `sudo chmod +t #{HOMEBREW_TEMP}` in your Terminal"
