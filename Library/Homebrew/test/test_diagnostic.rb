@@ -51,6 +51,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   end
 
   def test_check_for_unsupported_osx
+    skip "Only for Mac OS" unless OS.mac?
     ARGV.stubs(:homebrew_developer?).returns false
     OS::Mac.stubs(:prerelease?).returns true
     assert_match "We do not provide support for this pre-release version.",
@@ -108,6 +109,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   end
 
   def test_check_homebrew_prefix
+    skip "Only for Mac OS" unless OS.mac?
     # the integration tests are run in a special prefix
     assert_match "Your Homebrew is not installed to /usr/local",
       @checks.check_homebrew_prefix
