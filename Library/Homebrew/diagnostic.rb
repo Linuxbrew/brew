@@ -1029,7 +1029,7 @@ module Homebrew
         return if !Utils.git_available? || !(HOMEBREW_REPOSITORY/".git").exist?
 
         origin = Homebrew.git_origin
-        remote = "https://github.com/Homebrew/#{OS::GITHUB_REPOSITORY}.git"
+        remote = "https://github.com/#{OS::GITHUB_REPOSITORY}.git"
 
         if origin.nil? then <<-EOS.undent
           Missing git origin remote.
