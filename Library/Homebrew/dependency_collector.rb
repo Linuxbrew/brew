@@ -116,7 +116,7 @@ class DependencyCollector
     when :apr        then AprRequirement.new(tags)
     when :emacs      then EmacsRequirement.new(tags)
     # Tiger's ld is too old to properly link some software
-    when :ld64       then LD64Dependency.new if MacOS.version < :leopard
+    when :ld64       then LD64Dependency.new if OS.mac? && MacOS.version < :leopard
     when :python2
       PythonRequirement.new(tags)
     else
