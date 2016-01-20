@@ -4,6 +4,8 @@ rvm:
   - 1.8.7
 
 before_install:
+  # Fix error: Incorrect file permissions (664)
+  - chmod 644 Library/Formula/*.rb
   - if [ -f ".git/shallow" ]; then
       travis_retry git fetch --unshallow;
     fi
