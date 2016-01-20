@@ -77,6 +77,7 @@ class DependencyCollectorTests < Homebrew::TestCase
   end
 
   def test_ld64_dep_pre_leopard
+    skip "Only for Mac OS" unless OS.mac?
     MacOS.stubs(:version).returns(MacOS::Version.new("10.4"))
     assert_equal LD64Dependency.new, @d.build(:ld64)
   end
