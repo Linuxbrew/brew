@@ -84,7 +84,7 @@ module Homebrew
   end
 
   SEARCHABLE_TAPS = OFFICIAL_TAPS.map { |tap| ["Homebrew", tap] } + [
-    (%w[Caskroom cask] if OS.mac?)
+    (%w[Caskroom cask] if OS.mac?),
     (%w[Caskroom versions] if OS.mac?)
   ].compact
 
