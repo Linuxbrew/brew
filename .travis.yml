@@ -1,5 +1,10 @@
 language: ruby
 
+before_install:
+  - if [ -f ".git/shallow" ]; then
+      travis_retry git fetch --unshallow;
+    fi
+
 install:
   - PATH=$PWD/bin:$PATH
   - export HOMEBREW_DEVELOPER="1"
