@@ -85,6 +85,7 @@ module Homebrew
 
   SEARCHABLE_TAPS = OFFICIAL_TAPS.map { |tap| ["Homebrew", tap] } + [
     (%w[Caskroom cask] if OS.mac?)
+    (%w[Caskroom versions] if OS.mac?)
   ].compact
 
   def query_regexp(query)
@@ -104,7 +105,7 @@ module Homebrew
 
   def search_tap(user, repo, rx)
     if (HOMEBREW_LIBRARY/"Taps/#{user.downcase}/homebrew-#{repo.downcase}").directory? && \
-       "#{user}/#{repo}" != "Caskroom/cask"
+       user != "Caskroom"
       return []
     end
 

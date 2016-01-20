@@ -1,4 +1,5 @@
 require "formula"
+require "formula_versions"
 require "utils"
 require "extend/ENV"
 require "formula_cellar_checks"
@@ -201,6 +202,13 @@ class FormulaAuditor
       end
     end
     present.map!(&:last)
+    if present.include?("stable block")
+      %w[url checksum mirror].each do |component|
+        if present.include?(component)
+          problem "`#{component}` should be put inside `stable block`"
+        end
+      end
+    end
     if present.include?("head") && present.include?("head block")
       problem "Should not have both `head` and `head do`"
     end
@@ -572,6 +580,25 @@ class FormulaAuditor
     end
   end
 
+  def audit_revision
+    return unless formula.tap # skip formula not from core or any taps
+    return unless formula.tap.git? # git log is required
+
+    fv = FormulaVersions.new(formula, :max_depth => 10)
+    revision_map = fv.revision_map("origin/master")
+    if (revisions = revision_map[formula.version]).any?
+      problem "revision should not decrease" if formula.revision < revisions.max
+    elsif formula.revision != 0
+      if formula.stable
+        if revision_map[formula.stable.version].empty? # check stable spec
+          problem "revision should be removed"
+        end
+      else # head/devel-only formula
+        problem "revision should be removed"
+      end
+    end
+  end
+
   def audit_legacy_patches
     return unless formula.respond_to?(:patches)
     legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
@@ -925,6 +952,7 @@ class FormulaAuditor
     audit_formula_name
     audit_class
     audit_specs
+    audit_revision
     audit_desc
     audit_homepage
     audit_bottle_spec

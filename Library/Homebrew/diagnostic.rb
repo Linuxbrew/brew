@@ -516,9 +516,10 @@ module Homebrew
         unless HOMEBREW_PREFIX.writable_real? then <<-EOS.undent
         The /usr/local directory is not writable.
         Even if this directory was writable when you installed Homebrew, other
-        software may change permissions on this directory. Some versions of the
+        software may change permissions on this directory. For example, upgrading
+        to OS X El Capitan has been known to do this. Some versions of the
         "InstantOn" component of Airfoil or running Cocktail cleanup/optimizations
-        are known to do this.
+        are known to do this as well.
 
         You should probably change the ownership and permissions of /usr/local
         back to your user account.
@@ -1214,8 +1215,9 @@ module Homebrew
       end
 
       def check_for_non_prefixed_findutils
+        gnubin = "#{Formulary.factory("findutils").prefix}/libexec/gnubin"
         default_names = Tab.for_name("findutils").with? "default-names"
-        if default_names then <<-EOS.undent
+        if paths.include?(gnubin) || default_names then <<-EOS.undent
           Putting non-prefixed findutils in your path can cause python builds to fail.
           EOS
         end
