@@ -30,7 +30,8 @@ class Tap
     user = "Homebrew" if user == "homebrew"
     repo = repo.strip_prefix "homebrew-"
 
-    if user == "Homebrew" && repo == "homebrew"
+    if user == "Homebrew" && repo == "homebrew" ||
+        user == "Linuxbrew" && repo == "linuxbrew"
       require "core_formula_repository"
       return CoreFormulaRepository.instance
     end
