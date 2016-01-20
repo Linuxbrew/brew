@@ -1039,7 +1039,7 @@ module Homebrew
             cd #{HOMEBREW_REPOSITORY}
             git remote add origin #{remote}
           EOS
-        elsif origin !~ /(mxcl|Homebrew)\/(homebrew|linuxbrew)(\.git)?$/ then <<-EOS.undent
+        elsif origin !~ /(mxcl|Homebrew|Linuxbrew)\/(homebrew|linuxbrew)(\.git)?$/ then <<-EOS.undent
           Suspicious git origin remote found.
 
           With a non-standard origin, Homebrew won't pull updates from
