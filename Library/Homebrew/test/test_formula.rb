@@ -1,6 +1,6 @@
 require "testing_env"
-require "testball"
 require "formula"
+require "testball"
 
 class FormulaTests < Homebrew::TestCase
   def test_formula_instantiation
