@@ -72,6 +72,20 @@ class FormulaInstaller
     !!@build_bottle && !formula.bottle_disabled?
   end
 
+  # Installing bottles on Linux requires glibc and patchelf.
+  def bottle_requirements_satisfied?(f)
+    return true unless OS.linux?
+    return true if f.name == "linux-headers"
+    return true if f.name == "patchelf" && Formula["glibc"].installed?
+    begin
+      return false unless Formula["glibc"].installed? && Formula["patchelf"].installed?
+    rescue FormulaUnavailableError
+      # Fix for brew tests, which uses NullLoader.
+      true
+    end
+    true
+  end
+
   def pour_bottle?(install_bottle_options = { :warn=>false })
     return true if Homebrew::Hooks::Bottles.formula_has_bottle?(formula)
 
@@ -93,17 +107,7 @@ class FormulaInstaller
       return false
     end
 
-    if OS.linux?
-      return true if formula.name == "linux-headers"
-      return true if formula.name == "patchelf" && Formula["glibc"].installed?
-      begin
-        return false unless Formula["glibc"].installed? && Formula["patchelf"].installed?
-      rescue FormulaUnavailableError
-        # Fix for brew tests, which uses NullLoader.
-        true
-      end
-    end
-
+    return false unless bottle_requirements_satisfied?(formula)
     true
   end
 
@@ -111,6 +115,7 @@ class FormulaInstaller
     return pour_bottle? if dep == formula
     return false if build_from_source?
     return false unless dep.bottle && dep.pour_bottle?
+    return false unless bottle_requirements_satisfied?(dep)
     return false unless build.used_options.empty?
     return false unless dep.bottle.compatible_cellar?
     true
