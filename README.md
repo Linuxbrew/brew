@@ -1,8 +1,8 @@
 # Linuxbrew
 
-Linuxbrew is a fork of [Homebrew](http://brew.sh), the Mac OS package manager, for Linux.
+[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the Mac OS package manager, for Linux.
 
-Features, usage and installation instructions are [summarised on the homepage](http://brew.sh/linuxbrew/).
+Features, usage and installation instructions are [summarised on the homepage](http://linuxbrew.sh).
 
 Install Linuxbrew (tl;dr)
 -------------------------
@@ -10,7 +10,7 @@ Install Linuxbrew (tl;dr)
 Paste at a Terminal prompt:
 
 ``` sh
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/linuxbrew/go/install)"
 ```
 
 See [Dependencies](#dependencies) and [Installation](#installation) below for more details.
@@ -56,13 +56,13 @@ Installation
 Paste at a Terminal prompt:
 
 ``` sh
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/linuxbrew/go/install)"
 ```
 
 Or if you prefer:
 
 ```sh
-git clone https://github.com/Homebrew/linuxbrew.git ~/.linuxbrew
+git clone https://github.com/Linuxbrew/linuxbrew.git ~/.linuxbrew
 ```
 
 Add to your `.bashrc` or `.zshrc`:
@@ -85,18 +85,18 @@ brew install $WHATEVER_YOU_WANT
 3. Or use `brew search --desc` to browse packages from the command line.
 
 ## More Documentation
-`brew help`, `man brew` or check [our documentation](https://github.com/Homebrew/linuxbrew/tree/master/share/doc/homebrew#readme).
+`brew help`, `man brew` or check [our documentation](https://github.com/Linuxbrew/linuxbrew/tree/master/share/doc/homebrew#readme).
 
 ## Troubleshooting
 First, please run `brew update` and `brew doctor`.
 
-Second, read the [Troubleshooting Checklist](https://github.com/Homebrew/linuxbrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting).
+Second, read the [Troubleshooting Checklist](https://github.com/Linuxbrew/linuxbrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting).
 
 **If you don't read these it will take us far longer to help you with your problem.**
 
 ## Something broke!
 
-Many of the Homebrew formulae work on either Mac or Linux without changes, but some formulae will need to be adapted for Linux. If a formula doesn't work, [open an issue on GitHub](https://github.com/Homebrew/linuxbrew/issues) or, even better, submit a pull request.
+Many of the Homebrew formulae work on either Mac or Linux without changes, but some formulae will need to be adapted for Linux. If a formula doesn't work, [open an issue on GitHub](https://github.com/Linuxbrew/linuxbrew/issues) or, even better, submit a pull request.
 
 ## Security
 Please report security issues to security@brew.sh.
@@ -107,7 +107,7 @@ This is our PGP key which is valid until June 17, 2016.
 * Full key: https://keybase.io/homebrew/key.asc
 
 ## Who Are You?
-Linuxbrew is maintained by [Shaun Jackman](https://github.com/sjackman).
+Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca).
 
 Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Mike McQuaid](https://github.com/mikemcquaid), [Baptiste Fontaine](https://github.com/bfontaine), [Brett Koonce](https://github.com/asparagui), [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
 
