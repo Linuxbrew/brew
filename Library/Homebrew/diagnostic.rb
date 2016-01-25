@@ -787,6 +787,7 @@ module Homebrew
       end
 
       def check_which_pkg_config
+        return unless OS.mac? || Formula["pkg-config"].installed?
         binary = which "pkg-config"
         return if binary.nil?
 
