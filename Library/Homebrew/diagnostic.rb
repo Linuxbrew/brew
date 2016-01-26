@@ -1055,6 +1055,7 @@ module Homebrew
       end
 
       def check_for_autoconf
+        return unless MacOS::Xcode.installed?
         return unless MacOS::Xcode.provides_autotools?
 
         autoconf = which("autoconf")
