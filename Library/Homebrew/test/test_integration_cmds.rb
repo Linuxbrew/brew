@@ -296,7 +296,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_sh
     assert_match "Your shell has been configured",
-                 cmd("sh", {"SHELL" => "/usr/bin/true"})
+                 cmd("sh", {"SHELL" => OS.mac? ? "/usr/bin/true" : "true"})
   end
 
   def test_info
