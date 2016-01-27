@@ -294,6 +294,7 @@ module Stdenv
   end
 
   def universal_binary
+    return unless OS.mac?
     check_for_compiler_universal_support
 
     append_to_cflags Hardware::CPU.universal_archs.as_arch_flags
