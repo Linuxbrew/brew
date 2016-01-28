@@ -158,6 +158,8 @@ class IntegrationCommandTests < Homebrew::TestCase
   def test_cleanup
     (HOMEBREW_CACHE/"test").write "test"
     assert_match "#{HOMEBREW_CACHE}/test", cmd("cleanup", "--prune=all")
+  ensure
+    FileUtils.rm_f HOMEBREW_CACHE/"test"
   end
 
   def test_readall

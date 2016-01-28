@@ -1,46 +1,67 @@
-#!/bin/bash
-
-if [[ -z "$HOMEBREW_BREW_FILE" ]]
-then
-  # we don't use odie here, because it's only available when this script is called from brew.
-  echo "Error: $(basename "$0") must be called from brew!" >&2
-  exit 1
-fi
-
 brew() {
   "$HOMEBREW_BREW_FILE" "$@"
 }
 
+git() {
+  [[ -n "$HOMEBREW_GIT" ]] || odie "HOMEBREW_GIT is unset!"
+  "$HOMEBREW_GIT" "$@"
+}
+
 which_git() {
-  local which_git
+  local git_path
   local active_developer_dir
 
-  which_git="$(which git 2>/dev/null)"
-  if [[ -n "$which_git" && "/usr/bin/git" = "$which_git" ]]
+  if [[ -n "$HOMEBREW_GIT" ]]
+  then
+    git_path="$HOMEBREW_GIT"
+  elif [[ -n "$GIT" ]]
+  then
+    git_path="$GIT"
+  else
+    git_path="git"
+  fi
+
+  git_path="$(which "$git_path" 2>/dev/null)"
+
+  if [[ -n "$git_path" ]]
+  then
+    git_path="$(chdir "${git_path%/*}" && pwd -P)/${git_path##*/}"
+  fi
+
+  if [[ -n "$HOMEBREW_OSX" && "$git_path" = "/usr/bin/git" ]]
   then
     active_developer_dir="$('/usr/bin/xcode-select' -print-path 2>/dev/null)"
     if [[ -n "$active_developer_dir" && -x "$active_developer_dir/usr/bin/git" ]]
     then
-      which_git="$active_developer_dir/usr/bin/git"
+      git_path="$active_developer_dir/usr/bin/git"
     else
-      which_git=""
+      git_path=""
     fi
   fi
-  echo "$which_git"
+  echo "$git_path"
 }
 
 git_init_if_necessary() {
+  set -e
+  trap '{ rm -rf .git; exit 1; }' EXIT
+
   if [[ ! -d ".git" ]]
   then
-    git init -q
+    git init
     git config --bool core.autocrlf false
     git config remote.origin.url https://github.com/Homebrew/homebrew.git
     git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+    git fetch origin
+    git reset --hard origin/master
+    SKIP_FETCH_HOMEBREW_REPOSITORY=1
   fi
+
+  set +e
+  trap - EXIT
 
   if [[ "$(git remote show origin -n)" = *"mxcl/homebrew"* ]]
   then
-    git remote set-url origin https://github.com/Homebrew/homebrew.git
+    git remote set-url origin https://github.com/Homebrew/homebrew.git &&
     git remote set-url --delete origin ".*mxcl\/homebrew.*"
   fi
 }
@@ -229,7 +250,7 @@ pull() {
   trap - SIGINT
 }
 
-update-bash() {
+homebrew-update-bash() {
   local option
   local DIR
   local UPSTREAM_BRANCH
@@ -237,7 +258,6 @@ update-bash() {
   for option in "$@"
   do
     case "$option" in
-      update|update-bash) shift ;;
       --help) brew update --help; exit $? ;;
       --verbose) HOMEBREW_VERBOSE=1 ;;
       --debug) HOMEBREW_DEBUG=1;;
@@ -273,10 +293,12 @@ EOS
     odie "$HOMEBREW_REPOSITORY must be writable!"
   fi
 
-  if [[ -z "$(which_git)" ]]
+  HOMEBREW_GIT="$(which_git)"
+  if [[ -z "$HOMEBREW_GIT" ]]
   then
     brew install git
-    if [[ -z "$(which_git)" ]]
+    HOMEBREW_GIT="$(which_git)"
+    if [[ -z "$HOMEBREW_GIT" ]]
     then
       odie "Git must be installed and in your PATH!"
     fi
@@ -304,6 +326,7 @@ EOS
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
+    [[ -n "$SKIP_FETCH_HOMEBREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
     cd "$DIR" || continue
     UPSTREAM_BRANCH="$(upstream_branch)"
     # the refspec ensures that the default upstream branch gets updated

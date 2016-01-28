@@ -201,6 +201,7 @@ module Homebrew
 
         keg.delete_pyc_files!
 
+        Tab.clear_cache
         tab = Tab.for_keg(keg)
         original_tab = tab.dup
         tab.poured_from_bottle = false
@@ -247,6 +248,8 @@ module Homebrew
         ignore_interrupts do
           original_tab.write
           keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, prefix,
+            Keg::CELLAR_PLACEHOLDER, cellar
+          keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
             Keg::CELLAR_PLACEHOLDER, cellar
         end
       end

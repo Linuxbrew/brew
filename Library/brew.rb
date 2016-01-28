@@ -2,8 +2,6 @@
 
 std_trap = trap("INT") { exit! 130 } # no backtrace thanks
 
-HOMEBREW_BREW_FILE = ENV["HOMEBREW_BREW_FILE"]
-
 require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent.join("Homebrew")
 $:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
@@ -84,7 +82,7 @@ begin
   if internal_cmd
     Homebrew.send cmd.to_s.tr("-", "_").downcase
   elsif which "brew-#{cmd}"
-    %w[CACHE CELLAR LIBRARY_PATH PREFIX REPOSITORY].each do |e|
+    %w[CACHE LIBRARY_PATH].each do |e|
       ENV["HOMEBREW_#{e}"] = Object.const_get("HOMEBREW_#{e}").to_s
     end
     exec "brew-#{cmd}", *ARGV
