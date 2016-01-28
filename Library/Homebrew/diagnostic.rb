@@ -1122,6 +1122,16 @@ module Homebrew
         "TMPDIR #{tmpdir.inspect} doesn't exist." unless tmpdir.nil? || File.directory?(tmpdir)
       end
 
+      def check_tmpdir_executable
+        file = HOMEBREW_TEMP/"homebrew_check_tmpdir_executable"
+        unless system "echo '#!/bin/sh' >#{file} && chmod +x #{file} && #{file}" then <<-EOS.undent
+        The directory #{HOMEBREW_TEMP} does not permit executing programs.
+        It is likely mounted \"noexec\". Please add the following to your ~/.bashrc:
+          export HOMEBREW_TEMP=~/tmp
+        EOS
+        end
+      end
+
       def check_missing_deps
         return unless HOMEBREW_CELLAR.exist?
         missing = Set.new
