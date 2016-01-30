@@ -12,6 +12,8 @@ install:
   - export HOMEBREW_DEVELOPER="1"
 
 script:
+  # Fix error: Incorrect file permissions (664)
+  - umask 022
   - brew test-bot
 
 notifications:
