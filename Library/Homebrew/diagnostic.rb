@@ -1123,12 +1123,18 @@ module Homebrew
       end
 
       def check_tmpdir_executable
-        file = HOMEBREW_TEMP/"homebrew_check_tmpdir_executable"
-        unless system "echo '#!/bin/sh' >#{file} && chmod +x #{file} && #{file}" then <<-EOS.undent
-        The directory #{HOMEBREW_TEMP} does not permit executing programs.
-        It is likely mounted \"noexec\". Please add the following to your ~/.bashrc:
-          export HOMEBREW_TEMP=~/tmp
-        EOS
+        Tempfile.open("homebrew_check_tmpdir_executable", HOMEBREW_TEMP) do |f|
+          f.write "#!/bin/sh\necho hi\n"
+          f.chmod 0700
+          unless system f.path
+            <<-EOS.undent
+              The directory #{HOMEBREW_TEMP} does not permit executing
+              programs. It is likely mounted "noexec". Please set HOMEBREW_TEMP
+              in your #{shell_profile} to a different directory.
+                export HOMEBREW_TEMP=~/tmp
+                echo 'export HOMEBREW_TEMP=~/tmp' >> #{shell_profile}
+            EOS
+          end
         end
       end
 
