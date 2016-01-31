@@ -2,6 +2,7 @@ language: ruby
 
 before_install:
   # Fix error: Incorrect file permissions (664)
+  - chmod 644 Library/Formula/*.rb
   - umask 022
   - if [ -f ".git/shallow" ]; then
       travis_retry git fetch --unshallow;
