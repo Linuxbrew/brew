@@ -148,6 +148,9 @@ module Homebrew
   end
 
   def describe_java
+    # java_home doesn't exist on all OS Xs; it might be missing on older versions.
+    return "N/A" unless File.executable? "/usr/libexec/java_home"
+
     java_xml = Utils.popen_read("/usr/libexec/java_home", "--xml", "--failfast")
     return "N/A" unless $?.success?
     javas = []
