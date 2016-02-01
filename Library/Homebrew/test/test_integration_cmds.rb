@@ -2,6 +2,7 @@ require "bundler"
 require "testing_env"
 require "core_formula_repository"
 require "fileutils"
+require "pathname"
 
 class IntegrationCommandTests < Homebrew::TestCase
   def setup
@@ -52,6 +53,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def cmd(*args)
     output = cmd_output(*args)
+    $stderr.write output unless $?.success?
     assert_equal 0, $?.exitstatus
     output
   end
@@ -324,6 +326,243 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert readme.exist?, "The README should be created"
   ensure
     (HOMEBREW_LIBRARY/"Taps").rmtree
+  end
+
+  def test_unpack
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+      end
+    EOS
+    formula_file.write content
+
+    mktmpdir do |path|
+      cmd "unpack", "testball", "--destdir=#{path}"
+      assert File.directory?("#{path}/testball-0.1"),
+        "The tarball should be unpacked"
+    end
+  ensure
+    FileUtils.rm_f (HOMEBREW_CACHE/"testball-0.1.tbz")
+    formula_file.unlink
+  end
+
+  def test_options
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+        option "with-foo", "foobar"
+        depends_on "bar" => :recommended
+      end
+    EOS
+    formula_file.write content
+
+    assert_equal "--with-foo\n\tfoobar\n--without-bar\n\tBuild without bar support",
+      cmd_output("options", "testball").chomp
+  ensure
+    formula_file.unlink
+  end
+
+  def test_outdated
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+      end
+    EOS
+    formula_file.write content
+
+    (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
+
+    assert_equal "testball", cmd("outdated")
+  ensure
+    formula_file.unlink
+    FileUtils.rm_rf HOMEBREW_CELLAR/"testball"
+  end
+
+  def test_upgrade
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+        sha256 "#{TESTBALL_SHA256}"
+
+        def install
+          prefix.install Dir["*"]
+        end
+      end
+    EOS
+    formula_file.write content
+
+    (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
+
+    cmd("upgrade")
+    assert (HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should be created"
+  ensure
+    formula_file.unlink
+    cmd("uninstall", "--force", testball)
+    cmd("cleanup", "--force", "--prune=all")
+  end
+
+  def test_linkapps
+    home = mktmpdir
+    apps_dir = Pathname.new(home).join("Applications")
+    apps_dir.mkpath
+
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "https://example.com/testball-0.1.tar.gz"
+      end
+    EOS
+    formula_file.write content
+
+    source_dir = HOMEBREW_CELLAR/"testball/0.1/TestBall.app"
+    source_dir.mkpath
+    assert_match "Linking #{source_dir} to",
+      cmd("linkapps", "--local", {"HOME" => home})
+  ensure
+    formula_file.unlink
+    FileUtils.rm_rf apps_dir
+    (HOMEBREW_CELLAR/"testball").rmtree
+  end
+
+  def test_unlinkapps
+    home = mktmpdir
+    apps_dir = Pathname.new(home).join("Applications")
+    apps_dir.mkpath
+
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "https://example.com/testball-0.1.tar.gz"
+      end
+    EOS
+    formula_file.write content
+
+    source_app = (HOMEBREW_CELLAR/"testball/0.1/TestBall.app")
+    source_app.mkpath
+
+    FileUtils.ln_s source_app, "#{apps_dir}/TestBall.app"
+
+    assert_match "Unlinking #{apps_dir}/TestBall.app",
+      cmd("unlinkapps", "--local", {"HOME" => home})
+  ensure
+    formula_file.unlink
+    apps_dir.rmtree
+    (HOMEBREW_CELLAR/"testball").rmtree
+  end
+
+  def test_pin_unpin
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+        sha256 "#{TESTBALL_SHA256}"
+
+        def install
+          prefix.install Dir["*"]
+        end
+      end
+    EOS
+    formula_file.write content
+
+    (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
+
+    cmd("pin", "testball")
+    cmd("upgrade")
+    refute (HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should NOT be created"
+
+    cmd("unpin", "testball")
+    cmd("upgrade")
+    assert (HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should be created"
+  ensure
+    formula_file.unlink
+    cmd("uninstall", "--force", testball)
+    cmd("cleanup", "--force", "--prune=all")
+  end
+
+  def test_reinstall
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+        sha256 "#{TESTBALL_SHA256}"
+
+        option "with-foo", "build with foo"
+
+        def install
+          (prefix/"foo"/"test").write("test") if build.with? "foo"
+          prefix.install Dir["*"]
+        end
+      end
+    EOS
+    formula_file.write content
+
+    cmd("install", "testball", "--with-foo")
+    foo_dir = HOMEBREW_CELLAR/"testball/0.1/foo"
+    assert foo_dir.exist?
+    foo_dir.rmtree
+    assert_match "Reinstalling testball with --with-foo",
+      cmd("reinstall", "testball")
+    assert foo_dir.exist?
+  ensure
+    formula_file.unlink
+    cmd("uninstall", "--force", "testball")
+    cmd("cleanup", "--force", "--prune=all")
+  end
+
+  def test_home
+    assert_equal HOMEBREW_WWW,
+                 cmd("home", {"HOMEBREW_BROWSER" => "echo"})
+  end
+
+  def test_list
+    formulae = %w[bar foo qux]
+    formulae.each do |f|
+      (HOMEBREW_CELLAR/"#{f}/1.0/somedir").mkpath
+    end
+
+    assert_equal formulae.join("\n"),
+                 cmd("list")
+  ensure
+    formulae.each do |f|
+      (HOMEBREW_CELLAR/"#{f}").rmtree
+    end
+  end
+
+  def test_create
+    url = "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+    cmd("create", url, {"HOMEBREW_EDITOR" => "/bin/cat"})
+
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    assert formula_file.exist?, "The formula source should have been created"
+    assert_match %(sha256 "#{TESTBALL_SHA256}"), formula_file.read
+  ensure
+    formula_file.unlink
+    cmd("cleanup", "--force", "--prune=all")
+  end
+
+  def test_fetch
+    formula_file = CoreFormulaRepository.new.formula_dir/"testball.rb"
+    content = <<-EOS.undent
+      class Testball < Formula
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+        sha256 "#{TESTBALL_SHA256}"
+      end
+    EOS
+    formula_file.write content
+
+    cmd("fetch", "testball")
+    assert (HOMEBREW_CACHE/"testball-0.1.tbz").exist?,
+      "The tarball should have been cached"
+  ensure
+    formula_file.unlink
+    cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_custom_command
