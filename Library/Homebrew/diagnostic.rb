@@ -1125,8 +1125,9 @@ module Homebrew
 
       def check_tmpdir_executable
         Tempfile.open("homebrew_check_tmpdir_executable", HOMEBREW_TEMP) do |f|
-          f.write "#!/bin/sh\necho hi\n"
+          f.write "#!/bin/sh\n"
           f.chmod 0700
+          f.close
           unless system f.path
             <<-EOS.undent
               The directory #{HOMEBREW_TEMP} does not permit executing
