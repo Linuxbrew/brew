@@ -1,6 +1,7 @@
 require "keg"
 require "language/python"
 require "formula"
+require "tempfile"
 require "version"
 
 module Homebrew
