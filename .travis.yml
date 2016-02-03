@@ -19,3 +19,7 @@ notifications:
   email:
     on_success: never
     on_failure: always
+
+addons:
+  artifacts: true
+  s3_region: "us-west-2"
