@@ -76,9 +76,8 @@ class FormulaInstaller
   def bottle_requirements_satisfied?(f)
     return true unless OS.linux?
     return true if f.name == "linux-headers"
-    return true if f.name == "patchelf" && Formula["glibc"].installed?
     begin
-      return false unless Formula["glibc"].installed? && Formula["patchelf"].installed?
+      return false unless Formula["glibc"].installed?
     rescue FormulaUnavailableError
       # Fix for brew tests, which uses NullLoader.
       true
@@ -393,7 +392,7 @@ class FormulaInstaller
   # developer tools. Invoked unless the formula explicitly sets
   # :any_skip_relocation in its bottle DSL.
   def install_relocation_tools
-    cctools = CctoolsRequirement.new
+    cctools = OS.mac? ? CctoolsRequirement.new : PatchelfRequirement.new
     dependency = cctools.to_dependency
     formula = dependency.to_formula
     return if cctools.satisfied? || @@attempted.include?(formula)

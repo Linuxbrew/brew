@@ -132,3 +132,12 @@ class GitRequirement < Requirement
   default_formula "git"
   satisfy { Utils.git_available? }
 end
+
+# patchelf is used to modify ELF executables and shared libraries on Linux.
+# It is useful in particular for setting the RPATH and dynamic linker
+# of executables and shared libraries after installing a bottle.
+class PatchelfRequirement < Requirement
+  fatal true
+  default_formula "patchelf"
+  satisfy { to_dependency.installed? }
+end
