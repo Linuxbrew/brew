@@ -3,6 +3,14 @@
 require "formula"
 
 module Homebrew
+  def self.ensure_patchelf_installed!
+    return if Formula["patchelf"].installed?
+    require "cmd/install"
+    oh1 "Installing patchelf"
+    Homebrew.perform_preinstall_checks
+    Homebrew.install_formula(Formula["patchelf"])
+  end
+
   def patchelf_formula f
     unless f.installed?
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
@@ -19,9 +27,7 @@ module Homebrew
   def patchelf
     raise FormulaUnspecifiedError if ARGV.named.empty?
 
-    unless Formula["patchelf"].installed?
-      return ofail "patchelf is not installed. Run `brew install patchelf`"
-    end
+    ensure_patchelf_installed!
 
     ARGV.resolved_formulae.each do |f|
       patchelf_formula f
