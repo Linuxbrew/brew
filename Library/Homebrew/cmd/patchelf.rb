@@ -26,13 +26,17 @@ module Homebrew
     end
   end
 
-  def patchelf
-    raise FormulaUnspecifiedError if ARGV.named.empty?
-
+  def patchelf_formulae formulae
     ensure_patchelf_installed!
+    formulae.each { |f| patchelf_formula f }
+  end
 
-    ARGV.resolved_formulae.each do |f|
-      patchelf_formula f
+  def patchelf
+    if ARGV.include?("--all") || ARGV.include?("--installed")
+      patchelf_formulae Formula.installed
+    else
+      raise FormulaUnspecifiedError if ARGV.named.empty?
+      patchelf_formulae ARGV.resolved_formulae
     end
   end
 end
