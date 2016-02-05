@@ -20,7 +20,7 @@ module Homebrew
     raise FormulaUnspecifiedError if ARGV.named.empty?
 
     unless Formula["patchelf"].installed?
-      return ofail "patchelf is not installed"
+      return ofail "patchelf is not installed. Run `brew install patchelf`"
     end
 
     ARGV.resolved_formulae.each do |f|
