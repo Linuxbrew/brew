@@ -12,6 +12,8 @@ module Homebrew
   end
 
   def patchelf_formula f
+    return if f.name == "glibc"
+
     unless f.installed?
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
