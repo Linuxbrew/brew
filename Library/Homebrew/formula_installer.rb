@@ -13,6 +13,7 @@ require "hooks/bottles"
 require "debrew"
 require "sandbox"
 require "requirements/cctools_requirement"
+require "requirements/glibc_requirement"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -337,8 +338,20 @@ class FormulaInstaller
     [unsatisfied_reqs, deps]
   end
 
+  def bottle_dependencies(inherited_options)
+    # Installing bottles on Linux require a recent version of glibc.
+    glibc = GlibcRequirement.new
+    return [] if glibc.satisfied?
+    glibc_dep = glibc.to_dependency
+    (Dependency.expand(glibc_dep.to_formula) << glibc_dep).select do |dep|
+      options = inherited_options[dep.name] = inherited_options_for(dep)
+      !dep.satisfied?(options)
+    end
+  end
+
   def expand_dependencies(deps)
     inherited_options = {}
+    poured_bottle = pour_bottle?
 
     expanded_deps = Dependency.expand(formula, deps) do |dependent, dep|
       options = inherited_options[dep.name] = inherited_options_for(dep)
@@ -346,6 +359,7 @@ class FormulaInstaller
         dependent,
         inherited_options.fetch(dependent.name, [])
       )
+      poured_bottle = true if install_bottle_for?(dependent, build)
 
       if (dep.optional? || dep.recommended?) && build.without?(dep)
         Dependency.prune
@@ -356,6 +370,7 @@ class FormulaInstaller
       end
     end
 
+    expanded_deps.unshift(*bottle_dependencies(inherited_options)) if poured_bottle
     expanded_deps.map { |dep| [dep, inherited_options[dep.name]] }
   end
 
