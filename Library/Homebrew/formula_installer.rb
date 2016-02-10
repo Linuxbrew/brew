@@ -328,7 +328,13 @@ class FormulaInstaller
     glibc = GlibcRequirement.new
     return [] if glibc.satisfied?
     glibc_dep = glibc.to_dependency
-    (Dependency.expand(glibc_dep.to_formula) << glibc_dep).select do |dep|
+    begin
+      glibc_f = glibc_dep.to_formula
+    rescue FormulaUnavailableError
+      # Fix for brew tests, which uses NullLoader.
+      return []
+    end
+    (Dependency.expand(glibc_f) << glibc_dep).select do |dep|
       options = inherited_options[dep.name] = inherited_options_for(dep)
       !dep.satisfied?(options)
     end
