@@ -324,17 +324,27 @@ class FormulaInstaller
   end
 
   def bottle_dependencies(inherited_options)
+    return [] unless OS.linux?
+    deps = []
+
     # Installing bottles on Linux require a recent version of glibc.
     glibc = GlibcRequirement.new
-    return [] if glibc.satisfied?
-    glibc_dep = glibc.to_dependency
-    begin
-      glibc_f = glibc_dep.to_formula
-    rescue FormulaUnavailableError
-      # Fix for brew tests, which uses NullLoader.
-      return []
+    unless glibc.satisfied?
+      glibc_dep = glibc.to_dependency
+      begin
+        glibc_f = glibc_dep.to_formula
+      rescue FormulaUnavailableError
+        # Fix for brew tests, which uses NullLoader.
+        return []
+      end
+      deps += Dependency.expand(glibc_f) << glibc_dep
     end
-    (Dependency.expand(glibc_f) << glibc_dep).select do |dep|
+
+    # patchelf is used to set the RPATH and dynamic linker of
+    # executables and shared libraries on Linux.
+    deps << Dependency.new("patchelf")
+
+    deps.select do |dep|
       options = inherited_options[dep.name] = inherited_options_for(dep)
       !dep.satisfied?(options)
     end
@@ -398,7 +408,7 @@ class FormulaInstaller
   # developer tools. Invoked unless the formula explicitly sets
   # :any_skip_relocation in its bottle DSL.
   def install_relocation_tools
-    cctools = OS.mac? ? CctoolsRequirement.new : PatchelfRequirement.new
+    cctools = CctoolsRequirement.new
     dependency = cctools.to_dependency
     formula = dependency.to_formula
     return if cctools.satisfied? || @@attempted.include?(formula)
