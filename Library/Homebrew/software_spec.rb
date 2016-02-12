@@ -165,6 +165,7 @@ class SoftwareSpec
   end
 
   def patch(strip = :p1, src = nil, &block)
+    dependency_collector.add("gpatch" => :build) unless OS.mac?
     patches << Patch.create(strip, src, &block)
   end
 
