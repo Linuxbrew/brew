@@ -1,5 +1,5 @@
 # Contributing to Linuxbrew
-[Linuxbrew](https://github.com/Homebrew/linuxbrew) is a fork of [Homebrew](https://github.com/Homebrew/homebrew). Homebrew is merged into Linuxbrew roughly once per week. If you wish to contribute a new formula, a new version of an existing formula, or any other change that is not specific to Linux, please send your pull request to Homebrew rather than to Linuxbrew.
+[Linuxbrew](https://github.com/Linuxbrew/linuxbrew) is a fork of [Homebrew](https://github.com/Homebrew/homebrew). Homebrew is merged into Linuxbrew roughly once per week. If you wish to contribute a new formula, a new version of an existing formula, or any other change that is not specific to Linux, please send your pull request to Homebrew rather than to Linuxbrew. Patches to fix build issues that affect both Mac and Linux should be sent to Homebrew. Patches to fix build issues that affect only Linux should be sent to Linuxbrew.
 
 Patches to fix issues particular to Linux should not affect the behaviour of the formula on Mac. Use `if OS.mac?` and `if OS.linux?` as necessary to preserve the existing behaviour on Mac.
 
