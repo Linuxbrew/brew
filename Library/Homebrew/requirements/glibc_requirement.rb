@@ -10,7 +10,7 @@ class GlibcRequirement < Requirement
     super
   end
 
-  satisfy {
+  satisfy(:build_env => false) {
     next true unless OS.linux?
     begin
       next true if to_dependency.installed?
