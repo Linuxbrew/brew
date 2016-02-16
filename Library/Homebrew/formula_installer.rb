@@ -345,10 +345,11 @@ class FormulaInstaller
     # executables and shared libraries on Linux.
     deps << Dependency.new("patchelf")
 
-    deps.select do |dep|
+    deps = deps.select do |dep|
       options = inherited_options[dep.name] = inherited_options_for(dep)
       !dep.satisfied?(options)
     end
+    Dependency.merge_repeats(deps)
   end
 
   def expand_dependencies(deps)
