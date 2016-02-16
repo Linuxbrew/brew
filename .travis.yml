@@ -24,8 +24,8 @@ notifications:
 
 addons:
   artifacts:
+    s3_region: "us-west-2"
     debug: true
     paths:
       - $(echo *.bottle.rb *.tar.gz)
       - $(git ls-files -m Library/Formula | tr "\n" ":")
-  s3_region: "us-west-2"
