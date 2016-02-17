@@ -27,6 +27,19 @@ module Homebrew
     @clang_build ||= MacOS.clang_build_version if MacOS.has_apple_developer_tools?
   end
 
+  def gcc_system_version
+    @gcc_system_version ||= begin
+      gcc = Pathname.new "/usr/bin/gcc"
+      `#{gcc} --version 2>/dev/null`[/ (\d+\.\d+\.\d+)/, 1] if gcc.exist?
+    end
+  end
+
+  def formula_version formula
+    require "formula"
+    f = Formula[formula]
+    "#{f.name}: #{f.installed? ? f.version : "N/A"}"
+  end
+
   def xcode
     if instance_variable_defined?(:@xcode)
       @xcode
@@ -154,9 +167,24 @@ module Homebrew
     f.puts "HOMEBREW_CELLAR: #{HOMEBREW_CELLAR}"
     f.puts "HOMEBREW_BOTTLE_DOMAIN: #{BottleSpecification::DEFAULT_DOMAIN}"
     f.puts hardware
-    f.puts "OS X: #{MacOS.full_version}-#{kernel}"
-    f.puts "Xcode: #{xcode ? xcode : "N/A"}"
-    f.puts "CLT: #{clt ? clt : "N/A"}"
+    if OS.mac?
+      f.puts "OS X: #{MacOS.full_version}-#{kernel}"
+      f.puts "Xcode: #{xcode ? xcode : "N/A"}"
+      f.puts "CLT: #{clt ? clt : "N/A"}"
+    elsif OS.linux?
+      f.puts "Kernel: #{`uname -mors`.chomp}"
+      if which("lsb_release")
+        f.puts `lsb_release -d`.chomp.sub("Description:\t", "OS: ")
+        f.puts `lsb_release -c`.chomp.sub("\t", " ")
+      else
+        redhat_release = Pathname.new "/etc/redhat-release"
+        f.puts "OS: #{redhat_release.read.chomp}" if redhat_release.readable?
+      end
+      f.puts "OS glibc: #{GlibcRequirement.system_version}"
+      f.puts "OS gcc: #{gcc_system_version}"
+      f.puts "Linuxbrew #{formula_version "glibc"}"
+      f.puts "Linuxbrew #{formula_version "gcc"}"
+    end
     f.puts "GCC-4.0: build #{gcc_40}" if gcc_40
     f.puts "GCC-4.2: build #{gcc_42}" if gcc_42
     f.puts "LLVM-GCC: build #{llvm}"  if llvm
