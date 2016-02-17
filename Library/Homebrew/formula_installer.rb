@@ -410,6 +410,7 @@ class FormulaInstaller
   # developer tools. Invoked unless the formula explicitly sets
   # :any_skip_relocation in its bottle DSL.
   def install_relocation_tools
+    return unless OS.mac?
     cctools = CctoolsRequirement.new
     dependency = cctools.to_dependency
     formula = dependency.to_formula
