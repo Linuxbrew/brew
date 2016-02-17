@@ -36,8 +36,13 @@ module Homebrew
 
   def formula_version formula
     require "formula"
-    f = Formula[formula]
-    "#{f.name}: #{f.installed? ? f.version : "N/A"}"
+    begin
+      f = Formula[formula]
+      "#{f.name}: #{f.installed? ? f.version : "N/A"}"
+    rescue FormulaUnavailableError
+      # Fix for brew tests, which uses NullLoader.
+      return "N/A"
+    end
   end
 
   def xcode
