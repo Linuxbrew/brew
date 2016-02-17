@@ -76,7 +76,12 @@ class Keg
 
   def change_rpath(file, new_prefix)
     return unless OS.linux?
-    patchelf = Formula["patchelf"]
+    begin
+      patchelf = Formula["patchelf"]
+    rescue FormulaUnavailableError
+      # Fix for brew tests, which uses NullLoader.
+      return
+    end
     return unless patchelf.installed?
     glibc = Formula["glibc"]
     cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_prefix}/lib"
