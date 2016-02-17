@@ -30,6 +30,6 @@ class GlibcRequirement < Requirement
       # Fix for brew tests, which uses NullLoader.
       true
     end
-    Version.new(system_version.to_s) >= Version.new(@version)
+    Version.new(self.class.system_version.to_s) >= Version.new(@version)
   }
 end
