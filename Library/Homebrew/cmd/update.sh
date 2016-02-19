@@ -49,7 +49,10 @@ git_init_if_necessary() {
   then
     git init
     git config --bool core.autocrlf false
-    git config remote.origin.url https://github.com/Homebrew/homebrew.git
+    case $(uname -s) in
+      Darwin) git config remote.origin.url https://github.com/Homebrew/homebrew.git ;;
+      Linux) git config remote.origin.url https://github.com/Linuxbrew/linuxbrew.git ;;
+    esac
     git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
     git fetch origin
     git reset --hard origin/master
