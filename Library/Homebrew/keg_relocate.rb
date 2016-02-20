@@ -29,6 +29,7 @@ class Keg
   end
 
   def relocate_install_names(old_prefix, new_prefix, old_cellar, new_cellar)
+    return if name == "glibc"
     mach_o_files.each do |file|
       file.ensure_writable do
         change_rpath(file, new_prefix)
