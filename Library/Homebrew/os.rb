@@ -9,6 +9,7 @@ module OS
 
   require "os/mac"
   if OS.mac?
+    NAME = "darwin"
     GITHUB_REPOSITORY = "Homebrew/homebrew"
     ISSUES_URL = "https://git.io/brew-troubleshooting"
     PATH_OPEN = "/usr/bin/open"
@@ -18,6 +19,7 @@ module OS
     ::MACOS_VERSION = OS::Mac.version.to_s
     ::OS_VERSION = "OS X #{MACOS_FULL_VERSION}"
   elsif OS.linux?
+    NAME = "linux"
     GITHUB_REPOSITORY = "Linuxbrew/linuxbrew"
     ISSUES_URL = "https://github.com/#{GITHUB_REPOSITORY}/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting"
     PATH_OPEN = "xdg-open"
