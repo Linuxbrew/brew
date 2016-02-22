@@ -213,6 +213,6 @@ class Caveats
 
       s << "" << "WARNING: launchctl will fail when run under tmux." if ENV["TMUX"]
     end
-    s.join("\n") unless s.empty?
+    s.join("\n") + "\n" unless s.empty?
   end
 end
