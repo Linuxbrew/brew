@@ -199,6 +199,8 @@ module Homebrew
       : "/lib64/ld-linux-x86-64.so.2"
     mkdir_p HOMEBREW_PREFIX/"lib"
     FileUtils.ln_sf interpreter, ld_so
+  rescue FormulaUnavailableError
+    # Fix for brew tests, which uses NullLoader.
   end
 
   def perform_preinstall_checks
