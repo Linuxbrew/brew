@@ -87,11 +87,7 @@ class Keg
     glibc = Formula["glibc"]
     cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_prefix}/lib"
     if file.mach_o_executable?
-      interpreter = if new_prefix == PREFIX_PLACEHOLDER || !glibc.installed? then
-        "/lib64/ld-linux-x86-64.so.2"
-      else
-        "#{glibc.opt_lib}/ld-linux-x86-64.so.2"
-      end
+      interpreter = HOMEBREW_PREFIX/"lib/ld.so"
       cmd << " --set-interpreter #{interpreter}"
 
       # Patch patchelf using patchelf, even when its interpreter is invalid.

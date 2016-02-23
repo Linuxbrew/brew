@@ -189,11 +189,24 @@ module Homebrew
     EOS
   end
 
+  # Create a symlink for the dynamic linker/loader ld.so
+  def check_ld_so_symlink
+    return unless OS.linux?
+    ld_so = HOMEBREW_PREFIX/"lib/ld.so"
+    return if ld_so.readable?
+    glibc = Formula["glibc"]
+    interpreter = glibc && glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2"
+      : "/lib64/ld-linux-x86-64.so.2"
+    mkdir_p HOMEBREW_PREFIX/"lib"
+    FileUtils.ln_sf interpreter, ld_so
+  end
+
   def perform_preinstall_checks
     check_ppc
     check_writable_install_location
     check_xcode if MacOS.has_apple_developer_tools?
     check_cellar
+    check_ld_so_symlink
   end
 
   def install_formula(f)
