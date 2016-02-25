@@ -57,8 +57,14 @@ module Stdenv
     append "LDFLAGS", "-Wl,-headerpad_max_install_names" if OS.mac?
 
     if OS.linux? && !["glibc", "glibc25"].include?(formula && formula.name)
-      # Add this formula's library directory to the shared library search path.
-      prepend "LD_LIBRARY_PATH", formula.lib, File::PATH_SEPARATOR if formula
+      if formula
+        # Work around a bug in glibc 2.19 fixed in 2.20:
+        # segfault when LD_LIBRARY_PATH is set to non-existent directory.
+        # See https://github.com/Linuxbrew/linuxbrew/issues/841
+        FileUtils.mkdir_p formula.lib
+        # Add this formula's library directory to the shared library search path.
+        prepend "LD_LIBRARY_PATH", formula.lib, File::PATH_SEPARATOR
+      end
 
       # Set the dynamic linker and library search path.
       append "LDFLAGS", "-Wl,--dynamic-linker=#{HOMEBREW_PREFIX}/lib/ld.so -Wl,-rpath,#{HOMEBREW_PREFIX}/lib"
