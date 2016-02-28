@@ -49,6 +49,13 @@ sudo yum groupinstall 'Development Tools' && sudo yum install curl git irb m4 py
 
 Linuxbrew does not currently support 32-bit x86 platforms. It would be possible for Linuxbrew to work on 32-bit x86 platforms with some effort. Pull requests would be welcome if someone were to volunteer to maintain the 32-bit x86 support.
 
+Bottles
+-------
+
+Bottles are Linuxbrew's precompiled binary packages. Linuxbrew bottles work on any Linux system. They do however require `glibc` 2.19 or better. On systems with an older version of `glibc`, Linuxbrew will install `glibc` the first time that you install a bottled formula. If you prefer to use the `glibc` provided by your system and build all formulas from source, add to your `.bashrc` or `.zshrc`:
+
+`export HOMEBREW_BUILD_FROM_SOURCE=1`
+
 Installation
 ------------
 
