@@ -2,7 +2,7 @@
 <html lang="en-us">
   <head>
     <meta charset="UTF-8">
-    <title>Linuxbrew by Homebrew</title>
+    <title>Linuxbrew by Linuxbrew</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
@@ -12,28 +12,28 @@
   <body>
     <section class="page-header">
       <h1 class="project-name">Linuxbrew</h1>
-      <h2 class="project-tagline">A fork of Homebrew for Linux</h2>
-      <a href="https://github.com/Homebrew/linuxbrew" class="btn">View on GitHub</a>
-      <a href="https://github.com/Homebrew/linuxbrew/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/Homebrew/linuxbrew/tarball/master" class="btn">Download .tar.gz</a>
+      <h2 class="project-tagline">The Homebrew package manager for Linux</h2>
+      <a href="https://github.com/Linuxbrew/linuxbrew" class="btn">View on GitHub</a>
+      <a href="https://github.com/Linuxbrew/linuxbrew/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Linuxbrew/linuxbrew/tarball/master" class="btn">Download .tar.gz</a>
     </section>
 
     <section class="main-content">
-      <p>Linuxbrew is a fork of <a href="http://brew.sh">Homebrew</a>, the Mac OS package manager, for Linux.</p>
+      <p><a href="http://linuxbrew.sh">Linuxbrew</a> is a fork of <a href="http://brew.sh">Homebrew</a>, the Mac OS package manager, for Linux.</p>
 
-<p>Features, usage and installation instructions are <a href="http://brew.sh/linuxbrew/">summarised on the homepage</a>.</p>
+<p>Features, usage and installation instructions are <a href="http://linuxbrew.sh">summarised on the homepage</a>.</p>
 
 <h2>
-<a id="install-linuxbrew-tldr" class="anchor" href="#install-linuxbrew-tldr" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install Linuxbrew (tl;dr)</h2>
+<a id="install-linuxbrew-tldr" class="anchor" href="#install-linuxbrew-tldr" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install Linuxbrew (tl;dr)</h2>
 
 <p>Paste at a Terminal prompt:</p>
 
-<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Linuxbrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
 
 <p>See <a href="#dependencies">Dependencies</a> and <a href="#installation">Installation</a> below for more details.</p>
 
 <h2>
-<a id="features" class="anchor" href="#features" aria-hidden="true"><span class="octicon octicon-link"></span></a>Features</h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
 <li>Can install software to a home directory and so does not require sudo</li>
@@ -43,15 +43,13 @@
 </ul>
 
 <h2>
-<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h2>
 
 <ul>
 <li>
 <strong>Ruby</strong> 1.8.6 or newer</li>
 <li>
 <strong>GCC</strong> 4.2 or newer</li>
-<li>
-<strong>Git</strong> 1.7.12.4 or newer</li>
 <li>
 <strong>Linux</strong> 2.6.16 or newer</li>
 <li>
@@ -61,30 +59,37 @@
 <p>Paste at a Terminal prompt:</p>
 
 <h3>
-<a id="debian-or-ubuntu" class="anchor" href="#debian-or-ubuntu" aria-hidden="true"><span class="octicon octicon-link"></span></a>Debian or Ubuntu</h3>
+<a id="debian-or-ubuntu" class="anchor" href="#debian-or-ubuntu" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Debian or Ubuntu</h3>
 
-<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential curl git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev</pre></div>
-
-<h3>
-<a id="fedora-centos-or-red-hat" class="anchor" href="#fedora-centos-or-red-hat" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fedora, CentOS or Red Hat</h3>
-
-<div class="highlight highlight-source-shell"><pre>sudo yum groupinstall <span class="pl-s"><span class="pl-pds">'</span>Development Tools<span class="pl-pds">'</span></span> <span class="pl-k">&amp;&amp;</span> sudo yum install curl git irb m4 ruby texinfo bzip2-devel curl-devel expat-devel ncurses-devel zlib-devel</pre></div>
+<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential curl git m4 python-setuptools ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev</pre></div>
 
 <h3>
-<a id="32-bit-x86-platforms" class="anchor" href="#32-bit-x86-platforms" aria-hidden="true"><span class="octicon octicon-link"></span></a>32-bit x86 platforms</h3>
+<a id="fedora-centos-or-red-hat" class="anchor" href="#fedora-centos-or-red-hat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fedora, CentOS or Red Hat</h3>
+
+<div class="highlight highlight-source-shell"><pre>sudo yum groupinstall <span class="pl-s"><span class="pl-pds">'</span>Development Tools<span class="pl-pds">'</span></span> <span class="pl-k">&amp;&amp;</span> sudo yum install curl git irb m4 python-setuptools ruby texinfo bzip2-devel curl-devel expat-devel ncurses-devel zlib-devel</pre></div>
+
+<h3>
+<a id="32-bit-x86-platforms" class="anchor" href="#32-bit-x86-platforms" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>32-bit x86 platforms</h3>
 
 <p>Linuxbrew does not currently support 32-bit x86 platforms. It would be possible for Linuxbrew to work on 32-bit x86 platforms with some effort. Pull requests would be welcome if someone were to volunteer to maintain the 32-bit x86 support.</p>
 
 <h2>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+<a id="bottles" class="anchor" href="#bottles" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Bottles</h2>
+
+<p>Bottles are Linuxbrew's precompiled binary packages. Linuxbrew bottles work on any Linux system. They do however require <code>glibc</code> 2.19 or better. On systems with an older version of <code>glibc</code>, Linuxbrew will install <code>glibc</code> the first time that you install a bottled formula. If you prefer to use the <code>glibc</code> provided by your system and build all formulas from source, add to your <code>.bashrc</code> or <code>.zshrc</code>:</p>
+
+<p><code>export HOMEBREW_BUILD_FROM_SOURCE=1</code></p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Paste at a Terminal prompt:</p>
 
-<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Linuxbrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
 
 <p>Or if you prefer:</p>
 
-<div class="highlight highlight-source-shell"><pre>git clone https://github.com/Homebrew/linuxbrew.git <span class="pl-k">~</span>/.linuxbrew</pre></div>
+<div class="highlight highlight-source-shell"><pre>git clone https://github.com/Linuxbrew/linuxbrew.git <span class="pl-k">~</span>/.linuxbrew</pre></div>
 
 <p>Add to your <code>.bashrc</code> or <code>.zshrc</code>:</p>
 
@@ -97,7 +102,7 @@
 <div class="highlight highlight-source-shell"><pre>brew install <span class="pl-smi">$WHATEVER_YOU_WANT</span></pre></div>
 
 <h2>
-<a id="what-packages-are-available" class="anchor" href="#what-packages-are-available" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Packages Are Available?</h2>
+<a id="what-packages-are-available" class="anchor" href="#what-packages-are-available" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What Packages Are Available?</h2>
 
 <ol>
 <li>Type <code>brew search</code> for a list.</li>
@@ -106,26 +111,26 @@
 </ol>
 
 <h2>
-<a id="more-documentation" class="anchor" href="#more-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>More Documentation</h2>
+<a id="more-documentation" class="anchor" href="#more-documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>More Documentation</h2>
 
-<p><code>brew help</code>, <code>man brew</code> or check <a href="https://github.com/Homebrew/linuxbrew/tree/master/share/doc/homebrew#readme">our documentation</a>.</p>
+<p><code>brew help</code>, <code>man brew</code> or check <a href="https://github.com/Linuxbrew/linuxbrew/tree/master/share/doc/homebrew#readme">our documentation</a>.</p>
 
 <h2>
-<a id="troubleshooting" class="anchor" href="#troubleshooting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Troubleshooting</h2>
+<a id="troubleshooting" class="anchor" href="#troubleshooting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Troubleshooting</h2>
 
 <p>First, please run <code>brew update</code> and <code>brew doctor</code>.</p>
 
-<p>Second, read the <a href="https://github.com/Homebrew/linuxbrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting">Troubleshooting Checklist</a>.</p>
+<p>Second, read the <a href="https://github.com/Linuxbrew/linuxbrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting">Troubleshooting Checklist</a>.</p>
 
 <p><strong>If you don't read these it will take us far longer to help you with your problem.</strong></p>
 
 <h2>
-<a id="something-broke" class="anchor" href="#something-broke" aria-hidden="true"><span class="octicon octicon-link"></span></a>Something broke!</h2>
+<a id="something-broke" class="anchor" href="#something-broke" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Something broke!</h2>
 
-<p>Many of the Homebrew formulae work on either Mac or Linux without changes, but some formulae will need to be adapted for Linux. If a formula doesn't work, <a href="https://github.com/Homebrew/linuxbrew/issues">open an issue on GitHub</a> or, even better, submit a pull request.</p>
+<p>Many of the Homebrew formulae work on either Mac or Linux without changes, but some formulae will need to be adapted for Linux. If a formula doesn't work, <a href="https://github.com/Linuxbrew/linuxbrew/issues">open an issue on GitHub</a> or, even better, submit a pull request.</p>
 
 <h2>
-<a id="security" class="anchor" href="#security" aria-hidden="true"><span class="octicon octicon-link"></span></a>Security</h2>
+<a id="security" class="anchor" href="#security" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Security</h2>
 
 <p>Please report security issues to <a href="mailto:security@brew.sh">security@brew.sh</a>.</p>
 
@@ -141,24 +146,51 @@
 </ul>
 
 <h2>
-<a id="who-are-you" class="anchor" href="#who-are-you" aria-hidden="true"><span class="octicon octicon-link"></span></a>Who Are You?</h2>
+<a id="who-are-you" class="anchor" href="#who-are-you" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Who Are You?</h2>
 
-<p>Linuxbrew is maintained by <a href="https://github.com/sjackman">Shaun Jackman</a>.</p>
+<p>Linuxbrew is maintained by <a href="http://sjackman.ca">Shaun Jackman</a>.</p>
 
 <p>Homebrew's current maintainers are <a href="https://github.com/mistydemeo">Misty De Meo</a>, <a href="https://github.com/apjanke">Andrew Janke</a>, <a href="https://github.com/xu-cheng">Xu Cheng</a>, <a href="https://github.com/mikemcquaid">Mike McQuaid</a>, <a href="https://github.com/bfontaine">Baptiste Fontaine</a>, <a href="https://github.com/asparagui">Brett Koonce</a>, <a href="https://github.com/UniqMartin">Martin Afanasjew</a>, <a href="https://github.com/DomT4">Dominyk Tiller</a>, <a href="https://github.com/tdsmith">Tim Smith</a> and <a href="https://github.com/dunn">Alex Dunn</a>.</p>
 
 <p>Former maintainers with significant contributions include <a href="https://github.com/jacknagel">Jack Nagel</a>, <a href="https://github.com/adamv">Adam Vandenberg</a> and Homebrew's creator: <a href="https://github.com/mxcl">Max Howell</a>.</p>
 
 <h2>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
 <p>Code is under the <a href="https://github.com/Homebrew/homebrew/tree/master/LICENSE.txt">BSD 2 Clause (NetBSD) license</a>.
 Documentation is under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a>.</p>
 
 <h2>
-<a id="sponsors" class="anchor" href="#sponsors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sponsors</h2>
+<a id="donations" class="anchor" href="#donations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Donations</h2>
 
-<p>Our CI infrastructure was paid for by <a href="https://github.com/Homebrew/homebrew/blob/master/SUPPORTERS.md">our Kickstarter supporters</a>.</p>
+<p>Homebrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for software, hardware and hosting around continuous integration and future improvements to the project. Every donation will be spent on making Homebrew better for our users.</p>
+
+<p>Homebrew, the upstream project of Linuxbrew, is a member of the <a href="http://sfconservancy.org">Software Freedom Conservancy</a> which provides Homebrew with an ability to receive tax-deductible, Homebrew earmarked donations (and <a href="http://sfconservancy.org/members/services/">many other services</a>). Software Freedom Conservancy, Inc. is a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law.</p>
+
+<ul>
+<li><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=V6ZE57MJRYC8L">Donate with PayPal</a></li>
+<li>Donate by USA $ check from a USA bank:
+
+<ul>
+<li>Make check payable to "Software Freedom Conservancy, Inc." and place "Directed donation: Homebrew" in the memo field.  Checks should then be mailed to:
+
+<ul>
+<li>Software Freedom Conservancy, Inc.<br>
+137 Montague ST  STE 380<br>
+BROOKLYN, NY 11201             USA<br>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Donate by wire transfer: contact <a href="mailto:accounting@sfconservancy.org">accounting@sfconservancy.org</a> for wire transfer details.</li>
+<li>Donate with Flattr or PayPal Giving Fund: coming soon.</li>
+</ul>
+
+<h2>
+<a id="sponsors" class="anchor" href="#sponsors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sponsors</h2>
+
+<p>Our CI infrastructure was paid for by <a href="https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Kickstarter-Supporters.md">our Kickstarter supporters</a>.</p>
 
 <p>Our CI infrastructure is hosted by <a href="http://www.positive-internet.com">The Positive Internet Company</a>.</p>
 
@@ -166,8 +198,12 @@ Documentation is under the <a href="https://creativecommons.org/licenses/by/4.0/
 
 <p><a href="https://bintray.com/homebrew"><img src="https://bintray.com/docs/images/downloads_by_bintray_96.png" alt="Downloads by Bintray"></a></p>
 
+<p>Homebrew is a member of the <a href="https://sfconservancy.org">Software Freedom Conservancy</a></p>
+
+<p><a href="https://sfconservancy.org"><img src="https://sfconservancy.org/img/conservancy_64x64.png" alt="Software Freedom Conservancy"></a></p>
+
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/Homebrew/linuxbrew">Linuxbrew</a> is maintained by <a href="https://github.com/Homebrew">Homebrew</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/Linuxbrew/linuxbrew">Linuxbrew</a> is maintained by <a href="https://github.com/Linuxbrew">Linuxbrew</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
