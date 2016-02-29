@@ -11,7 +11,6 @@ require "install_renamed"
 require "pkg_version"
 require "tap"
 require "core_formula_repository"
-require "formula_renames"
 require "keg"
 require "migrator"
 
@@ -975,7 +974,7 @@ class Formula
       end
 
       if older_or_same_tap_versions.all? { |v| pkg_version > v }
-        all_versions
+        all_versions.sort!
       else
         []
       end
