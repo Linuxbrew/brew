@@ -1241,6 +1241,7 @@ module Homebrew
       end
 
       def check_for_non_prefixed_findutils
+        return unless OS.mac?
         findutils = Formula["findutils"]
         return unless findutils.any_version_installed?
 
