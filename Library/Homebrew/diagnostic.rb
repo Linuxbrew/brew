@@ -899,10 +899,11 @@ module Homebrew
       end
 
       def check_DYLD_vars
-        found = ENV.keys.grep(/^DYLD_/)
+        dyld = OS.mac? ? "DYLD" : "LD"
+        found = ENV.keys.grep(/^#{dyld}_/)
         return if found.empty?
         s = inject_file_list found.map { |e| "#{e}: #{ENV.fetch(e)}" }, <<-EOS.undent
-          Setting DYLD_* vars can break dynamic linking.
+          Setting #{dyld}_* vars can break dynamic linking.
           Set variables:
         EOS
         if found.include? "DYLD_INSERT_LIBRARIES"
