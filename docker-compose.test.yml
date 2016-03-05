@@ -1,6 +1,6 @@
 sut:
   build: .
-  command: brew tests
+  command: sh -c 'brew doctor && brew tests'
   environment:
     - GIT_BRANCH
     - GIT_SHA1
