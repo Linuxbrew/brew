@@ -338,18 +338,21 @@ class FormulaInstaller
 
   def bottle_dependencies(inherited_options)
     return [] unless OS.linux?
+
+    # Fix for brew tests, which uses NullLoader.
+    begin
+      Formula["patchelf"]
+    rescue FormulaUnavailableError
+      return []
+    end
+
     deps = []
 
     # Installing bottles on Linux require a recent version of glibc.
     glibc = GlibcRequirement.new
     unless glibc.satisfied?
       glibc_dep = glibc.to_dependency
-      begin
-        glibc_f = glibc_dep.to_formula
-      rescue FormulaUnavailableError
-        # Fix for brew tests, which uses NullLoader.
-        return []
-      end
+      glibc_f = glibc_dep.to_formula
       deps += Dependency.expand(glibc_f) << glibc_dep
     end
 
