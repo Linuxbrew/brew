@@ -23,7 +23,7 @@ end
 
 def bottle_tag
   if MacOS.version == :linux
-    :"#{RUBY_PLATFORM.tr("-.", "_")}"
+    :"#{RUBY_PLATFORM.sub("-gnu", "").tr("-.", "_")}"
   elsif MacOS.version >= :lion
     MacOS.cat
   elsif MacOS.version == :snow_leopard
