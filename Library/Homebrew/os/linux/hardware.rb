@@ -45,7 +45,7 @@ module LinuxCPUs
       case cpu_family
       when 0x06
         case cpu_model
-        when 0x3a
+        when 0x3a, 0x3e
           :ivybridge
         when 0x2a, 0x2d
           :sandybridge
