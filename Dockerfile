@@ -3,8 +3,8 @@ MAINTAINER Shaun Jackman <sjackman@gmail.com>
 
 RUN apt-get update \
 	&& apt-get install -y curl g++ git make ruby2.0 ruby2.0-dev \
-	&& ln -s /usr/bin/ruby2.0 /usr/local/bin/ruby \
-	&& ln -s /usr/bin/gem2.0 /usr/local/bin/gem
+	&& ln -sf ruby2.0 /usr/bin/ruby \
+	&& ln -sf gem2.0 /usr/bin/gem
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8 \
 	&& useradd -m -s /bin/bash linuxbrew \
