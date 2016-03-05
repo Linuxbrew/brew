@@ -1,0 +1,7 @@
+sut:
+  build: .
+  command: brew tests
+  environment:
+    - GIT_BRANCH
+    - GIT_SHA1
+    - GIT_TAG
