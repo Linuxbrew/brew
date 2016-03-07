@@ -626,7 +626,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       end
     EOS
 
-    assert_equal "testball1\ntestball2", cmd("uses", "--recursive", "testball3")
+    assert_equal "testball1\ntestball2", cmd("uses", "--recursive", "testball3").split.sort.join("\n")
     assert_equal "testball2", cmd("uses", "testball3")
     assert_equal "", cmd("uses", "testball1")
   ensure
