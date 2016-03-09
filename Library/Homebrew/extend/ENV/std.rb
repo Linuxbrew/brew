@@ -68,6 +68,7 @@ module Stdenv
 
       # Set the dynamic linker and library search path.
       append "LDFLAGS", "-Wl,--dynamic-linker=#{HOMEBREW_PREFIX}/lib/ld.so -Wl,-rpath,#{HOMEBREW_PREFIX}/lib"
+      prepend_path "LD_RUN_PATH", HOMEBREW_PREFIX/"lib"
     end
 
     if inherit?
