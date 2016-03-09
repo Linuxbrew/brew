@@ -287,7 +287,7 @@ module Homebrew
       elsif travis_pr
         @url = "https://github.com/#{ENV["TRAVIS_REPO_SLUG"]}/pull/#{ENV["TRAVIS_PULL_REQUEST"]}"
         @hash = nil
-      elsif ENV["GIT_BRANCH"].include? ":"
+      elsif ENV["GIT_BRANCH"] && ENV["GIT_BRANCH"].include?(":")
         # Docker automated build of a pull request
         user, branch = ENV["GIT_BRANCH"].split(":")
         @url = "https://github.com/#{user}/linuxbrew/commit/#{ENV["GIT_SHA1"]}"
