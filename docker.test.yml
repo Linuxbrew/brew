@@ -5,3 +5,4 @@ sut:
     - GIT_BRANCH
     - GIT_SHA1
     - GIT_TAG
+    - IMAGE_NAME
