@@ -86,7 +86,6 @@ class Keg
       return
     end
     return unless patchelf.installed?
-    glibc = Formula["glibc"]
     cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_prefix}/lib"
     if file.mach_o_executable?
       interpreter = new_prefix == PREFIX_PLACEHOLDER ?
