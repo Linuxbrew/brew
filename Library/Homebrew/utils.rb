@@ -569,7 +569,7 @@ module GitHub
 
   def build_search_qualifier_string(qualifiers)
     {
-      :repo => "Homebrew/homebrew",
+      :repo => OS::GITHUB_REPOSITORY,
       :in => "title"
     }.update(qualifiers).map do |qualifier, value|
       "#{qualifier}:#{value}"
