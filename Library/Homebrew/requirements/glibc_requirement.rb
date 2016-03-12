@@ -13,7 +13,7 @@ class GlibcRequirement < Requirement
 
   def self.system_version
     return @@system_version if @@system_version
-    libc = ["/lib/x86_64-linux-gnu/libc.so.6", "/lib64/libc.so.6", "/lib/libc.so.6"].find do |s|
+    libc = ["/lib/x86_64-linux-gnu/libc.so.6", "/lib64/libc.so.6", "/lib/libc.so.6", "/lib/arm-linux-gnueabihf/libc.so.6"].find do |s|
       Pathname.new(s).executable?
     end
     raise "Unable to locate the system's glibc" unless libc
