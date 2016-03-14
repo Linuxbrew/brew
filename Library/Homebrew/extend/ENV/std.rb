@@ -66,8 +66,11 @@ module Stdenv
         prepend "LD_LIBRARY_PATH", formula.lib, File::PATH_SEPARATOR
       end
 
+      # Set the search path for header files.
+      prepend_path "CPATH" HOMEBREW_PREFIX/"include"
       # Set the dynamic linker and library search path.
       append "LDFLAGS", "-Wl,--dynamic-linker=#{HOMEBREW_PREFIX}/lib/ld.so -Wl,-rpath,#{HOMEBREW_PREFIX}/lib"
+      prepend_path "LIBRARY_PATH", HOMEBREW_PREFIX/"lib"
       prepend_path "LD_RUN_PATH", HOMEBREW_PREFIX/"lib"
     end
 
