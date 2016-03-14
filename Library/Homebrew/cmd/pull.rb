@@ -197,7 +197,8 @@ module Homebrew
             version = f.pkg_version
             curl "-w", '\n', "--silent", "--fail",
               "-u#{bintray_user}:#{bintray_key}", "-X", "POST",
-              "-d", '{"publish_wait_for_secs": -1}',
+              "-H", "Content-Type: application/json",
+              "-d", '{"publish_wait_for_secs": 0}',
               "https://api.bintray.com/content/homebrew/#{repo}/#{package}/#{version}/publish"
             bintray_fetch_formulae << f
           end
@@ -323,6 +324,7 @@ module Homebrew
   def current_versions_from_info_external(formula_name)
     versions = {}
     json = Utils.popen_read(HOMEBREW_BREW_FILE, "info", "--json=v1", formula_name)
+    json.force_encoding("UTF-8") if json.respond_to?(:force_encoding)
     if $?.success?
       info = Utils::JSON.load(json)
       [:stable, :devel, :head].each do |vertype|
