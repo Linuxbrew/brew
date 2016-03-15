@@ -348,6 +348,10 @@ class FormulaInstaller
 
     deps = []
 
+    # patchelf is used to set the RPATH and dynamic linker of
+    # executables and shared libraries on Linux.
+    deps << Dependency.new("patchelf")
+
     # Installing bottles on Linux require a recent version of glibc.
     glibc = GlibcRequirement.new
     unless glibc.satisfied?
@@ -355,10 +359,6 @@ class FormulaInstaller
       glibc_f = glibc_dep.to_formula
       deps += Dependency.expand(glibc_f) << glibc_dep
     end
-
-    # patchelf is used to set the RPATH and dynamic linker of
-    # executables and shared libraries on Linux.
-    deps << Dependency.new("patchelf")
 
     deps = deps.select do |dep|
       options = inherited_options[dep.name] = inherited_options_for(dep)
