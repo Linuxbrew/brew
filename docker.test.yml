@@ -3,7 +3,9 @@ sut:
   command: sh -c 'cd ~/.linuxbrew
     && git config user.name LinuxbrewTestBot
     && git config user.email testbot@linuxbrew.sh
-    && git remote set-url origin https://github.com/Linuxbrew/linuxbrew.git
+    && git remote rename origin testbot
+    && git remote set-url testbot `git remote -v |sed "s/^testbot[[:space:]]//;s~@.*~@github.com/LinuxbrewTestBot/linuxbrew.git~;q"`
+    && git remote add origin https://github.com/Linuxbrew/linuxbrew.git
     && git fetch origin
     && (test "$GIT_BRANCH" = master || git checkout origin/master)
     && brew style hello

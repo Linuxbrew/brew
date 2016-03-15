@@ -737,10 +737,6 @@ module Homebrew
     end
   end
 
-  def skip_system(*args)
-    puts "#{Tty.blue}==>#{Tty.white} Skipping: #{args.join(" ")}#{Tty.reset}"
-  end
-
   def test_ci_upload(tap)
     if ENV["GIT_BRANCH"]
       if ENV["GIT_BRANCH"].include?(":")
@@ -823,14 +819,9 @@ module Homebrew
 
     project = OS.mac? ? "homebrew" : "linuxbrew"
     remote_repo = tap.core_tap? ? project : "homebrew-#{tap.repo}"
-    remote = "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/#{remote_repo}.git"
+    remote = docker_branch ? "testbot" : "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/#{remote_repo}.git"
     tag = docker_branch ? "#{docker_user}-#{docker_branch}" : pr ? "pr-#{pr}" : "testing-#{number}"
-    args = ["git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"]
-    if jenkins
-      safe_system *args
-    else
-      skip_system *args
-    end
+    safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
 
     bintray_org = project
     bintray_repo = Bintray.repository(tap)
@@ -877,12 +868,7 @@ module Homebrew
     end
 
     safe_system "git", "tag", "--force", tag
-    args = ["git", "push", "--force", remote, "refs/tags/#{tag}"]
-    if jenkins
-      safe_system *args
-    else
-      skip_system *args
-    end
+    safe_system "git", "push", "--force", remote, "refs/tags/#{tag}"
   end
 
   def sanitize_ARGV_and_ENV
