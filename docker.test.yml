@@ -1,6 +1,10 @@
 sut:
   build: .
-  command: sh -c "env && brew test-bot"
+  command: sh -c "env
+    && git config user.name LinuxbrewTestBot
+    && git config user.email testbot@linuxbrew.sh
+    && git remote set-url origin https://github.com/Linuxbrew/linuxbrew.git
+    && brew test-bot"
   environment:
     - GIT_BRANCH
     - GIT_SHA1
