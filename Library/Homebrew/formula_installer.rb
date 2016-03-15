@@ -352,12 +352,11 @@ class FormulaInstaller
     # executables and shared libraries on Linux.
     deps << Dependency.new("patchelf")
 
-    # Installing bottles on Linux require a recent version of glibc.
-    glibc = GlibcRequirement.new
-    unless glibc.satisfied?
-      glibc_dep = glibc.to_dependency
-      glibc_f = glibc_dep.to_formula
-      deps += Dependency.expand(glibc_f) << glibc_dep
+    # Installing bottles on Linux require a recent version of glibc and gcc.
+    # GCC is required for libgcc_s.so and libstdc++.so. It depends on glibc.
+    unless GlibcRequirement.new.satisfied?
+      gcc_dep = Dependency.new("gcc")
+      deps += Dependency.expand(gcc_dep.to_formula) << gcc_dep
     end
 
     deps = deps.select do |dep|
