@@ -402,7 +402,12 @@ module Homebrew
     def formula(formula_name)
       @category = "#{__method__}.#{formula_name}"
 
-      test "brew", "uses", "--recursive", formula_name
+      if OS.linux?
+        # --recursive is very slow. See https://github.com/Linuxbrew/linuxbrew/issues/939
+        test "brew", "uses", formula_name
+      else
+        test "brew", "uses", "--recursive", formula_name
+      end
 
       formula = Formulary.factory(formula_name)
 
