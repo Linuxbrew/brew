@@ -742,7 +742,18 @@ module Homebrew
   end
 
   def test_ci_upload(tap)
-    docker_branch = ENV["GIT_BRANCH"].sub(":", "-")
+    if ENV["GIT_BRANCH"]
+      if ENV["GIT_BRANCH"].include?(":")
+        # Docker automated build of a pull request.
+        docker_user, docker_branch = ENV["GIT_BRANCH"].split(":")
+      else
+        # Docker automated build of master.
+        docker_user = nil
+        docker_branch = ENV["GIT_BRANCH"]
+      end
+      docker_sha1 = ENV["GIT_SHA1"]
+    end
+
     jenkins = ENV["JENKINS_HOME"]
     job = ENV["UPSTREAM_JOB_NAME"]
     id = ENV["UPSTREAM_BUILD_ID"]
@@ -797,6 +808,13 @@ module Homebrew
         "https://github.com/#{tap.user}/homebrew-#{tap.repo}/pull/#{pr}"
       end
       safe_system "brew", "pull", "--clean", pull_pr
+    elsif docker_sha1
+      url = if tap.core_tap?
+        "https://github.com/#{docker_user}/linuxbrew/commit/#{docker_sha1}"
+      else
+        "https://github.com/#{docker_user}/homebrew-#{tap.repo}/commit/#{docker_sha1}"
+      end
+      safe_system "brew", "pull", "--clean", url
     end
 
     bottle_args = ["--merge", "--write", *Dir["*.bottle.rb"]]
@@ -806,7 +824,7 @@ module Homebrew
     project = OS.mac? ? "homebrew" : "linuxbrew"
     remote_repo = tap.core_tap? ? project : "homebrew-#{tap.repo}"
     remote = "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/#{remote_repo}.git"
-    tag = docker_branch || (pr ? "pr-#{pr}" : "testing-#{number}")
+    tag = docker_branch ? "#{docker_user}-#{docker_branch}" : pr ? "pr-#{pr}" : "testing-#{number}"
     args = ["git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"]
     if jenkins
       safe_system *args
