@@ -6,7 +6,8 @@ sut:
     && git remote set-url origin https://github.com/Linuxbrew/linuxbrew.git
     && git fetch origin
     && (test "$GIT_BRANCH" = master || git checkout origin/master)
-    && brew test-bot --verbose
+    && brew style hello
+    && brew test-bot
     && brew test-bot --ci-upload'
   environment:
     - BINTRAY_USER
