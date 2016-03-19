@@ -49,6 +49,10 @@ module Homebrew
       elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/(?:pull/(\d+)|commit/[0-9a-fA-F]{4,40})])
         url, user, issue = *url_match
         tap = CoreTap.instance
+      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/releases/tag/([0-9a-zA-Z-]+)])
+        _, user, tag = *url_match
+        url = "https://github.com/Linuxbrew/linuxbrew/compare/master...#{user}:#{tag}"
+        tap = CoreTap.instance
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/homebrew#{repo}/pull/#{issue}"
