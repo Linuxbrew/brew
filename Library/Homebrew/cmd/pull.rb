@@ -34,6 +34,7 @@ module Homebrew
     end
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
+    bintray_project = "homebrew"
     bintray_fetch_formulae = []
 
     ARGV.named.each do |arg|
@@ -49,10 +50,13 @@ module Homebrew
       elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/(?:pull/(\d+)|commit/[0-9a-fA-F]{4,40})])
         url, user, issue = *url_match
         tap = CoreTap.instance
-      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/releases/tag/([0-9a-zA-Z-]+)])
-        _, user, tag = *url_match
-        url = "https://github.com/Linuxbrew/linuxbrew/compare/master...#{user}:#{tag}"
+        bintray_project = "linuxbrew"
+      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/tree/([0-9a-zA-Z-]+)])
+        _, user, rev = *url_match
+        issue = "#{user}-#{rev}"
+        url = "https://github.com/Linuxbrew/linuxbrew/compare/master...#{user}:#{rev}"
         tap = CoreTap.instance
+        bintray_project = "linuxbrew"
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/homebrew#{repo}/pull/#{issue}"
@@ -174,7 +178,11 @@ module Homebrew
         else
           bottle_branch = "pull-bottle-#{issue}"
           if tap.core_tap?
-            "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
+            if rev
+              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...#{user}-#{rev}"
+            else
+              "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
+            end
           else
             "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
           end
@@ -203,7 +211,7 @@ module Homebrew
               "-u#{bintray_user}:#{bintray_key}", "-X", "POST",
               "-H", "Content-Type: application/json",
               "-d", '{"publish_wait_for_secs": 0}',
-              "https://api.bintray.com/content/homebrew/#{repo}/#{package}/#{version}/publish"
+              "https://api.bintray.com/content/#{bintray_project}/#{repo}/#{package}/#{version}/publish"
             bintray_fetch_formulae << f
           end
         else
