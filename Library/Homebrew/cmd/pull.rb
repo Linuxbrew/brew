@@ -179,7 +179,7 @@ module Homebrew
           bottle_branch = "pull-bottle-#{issue}"
           if tap.core_tap?
             if rev
-              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...#{user}-#{rev}"
+              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{issue}"
             else
               "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
             end

@@ -820,7 +820,7 @@ module Homebrew
     project = OS.mac? ? "homebrew" : "linuxbrew"
     remote_repo = tap.core_tap? ? project : "homebrew-#{tap.repo}"
     remote = docker_branch ? "testbot" : "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/#{remote_repo}.git"
-    tag = docker_branch ? "#{docker_user}-#{docker_branch}" : pr ? "pr-#{pr}" : "testing-#{number}"
+    tag = docker_branch ? "pr-#{docker_user}-#{docker_branch}" : pr ? "pr-#{pr}" : "testing-#{number}"
     safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
 
     bintray_org = project
