@@ -52,6 +52,7 @@ module Homebrew
         url, user, issue = *url_match
         tap = CoreTap.instance
         bintray_project = "linuxbrew"
+        github_repo = "Linuxbrew/linuxbrew"
       elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/tree/([0-9a-zA-Z-]+)\?([0-9]+)])
         _, user, rev, issue = *url_match
         url = "https://github.com/Linuxbrew/linuxbrew/compare/master...#{user}:#{rev}"
