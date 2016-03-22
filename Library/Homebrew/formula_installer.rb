@@ -378,7 +378,7 @@ class FormulaInstaller
         dependent,
         inherited_options.fetch(dependent.name, [])
       )
-      poured_bottle = true if install_bottle_for?(dependent, build)
+      poured_bottle = true if install_bottle_for?(dep.to_formula, build)
 
       if (dep.optional? || dep.recommended?) && build.without?(dep)
         Dependency.prune
