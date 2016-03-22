@@ -290,8 +290,14 @@ module Homebrew
       end
       bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       if bad_fields.any?
-        bottle_path.unlink if bottle_path.exist?
-        odie "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
+        if bottle.prefix == "/home/linuxbrew/.linuxbrew" && bottle.cellar == "/home/linuxbrew/.linuxbrew/Cellar"
+          bottle.cellar old_spec.cellar
+          bottle.prefix old_spec.prefix
+          opoo "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
+        else
+          bottle_path.unlink if bottle_path.exist?
+          odie "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
+        end
       end
     end
 
