@@ -8,8 +8,8 @@ sut:
     && git remote add origin https://github.com/Linuxbrew/linuxbrew.git
     && git fetch origin
     && (test "$GIT_BRANCH" = master || git checkout origin/master)
-    && brew test-bot
-    && brew test-bot --ci-upload'
+    && brew test-bot --keep-old
+    && brew test-bot --keep-old --ci-upload'
   environment:
     - BINTRAY_USER
     - BINTRAY_KEY
