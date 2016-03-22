@@ -34,6 +34,7 @@ module Homebrew
     end
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
+    github_repo = ""
     bintray_project = "homebrew"
     bintray_fetch_formulae = []
 
@@ -51,12 +52,12 @@ module Homebrew
         url, user, issue = *url_match
         tap = CoreTap.instance
         bintray_project = "linuxbrew"
-      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/tree/([0-9a-zA-Z-]+)])
-        _, user, rev = *url_match
-        issue = "#{user}-#{rev}"
+      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/tree/([0-9a-zA-Z-]+)\?([0-9]+)])
+        _, user, rev, issue = *url_match
         url = "https://github.com/Linuxbrew/linuxbrew/compare/master...#{user}:#{rev}"
         tap = CoreTap.instance
         bintray_project = "linuxbrew"
+        github_repo = "Linuxbrew/linuxbrew"
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/homebrew#{repo}/pull/#{issue}"
@@ -137,8 +138,9 @@ module Homebrew
       if issue && !ARGV.include?("--clean")
         ohai "Patch closes issue ##{issue}"
         # If this is a pull request, append a close message.
-        unless message.include? "Closes ##{issue}."
-          message += "\nCloses ##{issue}."
+        closes = "Closes #{github_repo}##{issue}."
+        unless message.include? closes
+          message += "\n#{closes}"
         end
       end
 
@@ -178,8 +180,8 @@ module Homebrew
         else
           bottle_branch = "pull-bottle-#{issue}"
           if tap.core_tap?
-            if rev
-              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{issue}"
+            if user && rev
+              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{user}-#{rev}"
             else
               "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
             end
