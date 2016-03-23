@@ -48,14 +48,14 @@ module Homebrew
         url = "https://github.com/Homebrew/homebrew/compare/master...BrewTestBot:testing-#{testing_job}"
         tap = CoreTap.instance
         odie "Testing URLs require `--bottle`!" unless ARGV.include?("--bottle")
-      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/(?:pull/(\d+)|commit/[0-9a-fA-F]{4,40})])
-        url, user, issue = *url_match
+      elsif (url_match = arg.match %r[https://github\.com/Linuxbrew/linuxbrew/pull/(\d+)\?([\w-]+):([\w-]+)])
+        url, issue, user, rev = *url_match
+        url = url.sub(/\?.*/, "")
         tap = CoreTap.instance
         bintray_project = "linuxbrew"
         github_repo = "Linuxbrew/linuxbrew"
-      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/tree/([0-9a-zA-Z-]+)\?([0-9]+)])
-        _, user, rev, issue = *url_match
-        url = "https://github.com/Linuxbrew/linuxbrew/compare/master...#{user}:#{rev}"
+      elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/(?:pull/(\d+)|commit/[0-9a-fA-F]{4,40})])
+        url, user, issue = *url_match
         tap = CoreTap.instance
         bintray_project = "linuxbrew"
         github_repo = "Linuxbrew/linuxbrew"
