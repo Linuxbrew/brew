@@ -7,9 +7,11 @@ sut:
     && git remote set-url testbot `git remote -v |sed "s/^testbot[[:space:]]//;s~@.*~@github.com/LinuxbrewTestBot/linuxbrew.git~;q"`
     && git remote add origin https://github.com/Linuxbrew/linuxbrew.git
     && git fetch origin
-    && (test "$GIT_BRANCH" = master || git checkout origin/master)
-    && brew test-bot --keep-old
-    && brew test-bot --keep-old --ci-upload'
+    && (test "$GIT_BRANCH" = master || git checkout origin/master);
+    exit_status=0;
+    brew test-bot --keep-old || exit_status=1;
+    brew test-bot --keep-old --ci-upload || exit_status=1;
+    exit $exit_status'
   environment:
     - BINTRAY_USER
     - BINTRAY_KEY
