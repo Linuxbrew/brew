@@ -11,7 +11,7 @@ sut:
     exit_status=0;
     brew test-bot --keep-old || exit_status=1;
     brew test-bot --keep-old --ci-upload || exit_status=1;
-    exit $exit_status'
+    exit $$exit_status'
   environment:
     - BINTRAY_USER
     - BINTRAY_KEY
