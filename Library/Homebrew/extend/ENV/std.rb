@@ -62,7 +62,7 @@ module Stdenv
         # add both lib and prefix to LD_LIBRARY_PATH.
         # segfault when LD_LIBRARY_PATH is set to non-existent directory.
         # See https://github.com/Linuxbrew/linuxbrew/issues/841
-        prepend "LD_LIBRARY_PATH", formula.prefix, File::PATH_SEPARATOR
+        prepend_create_path "LD_LIBRARY_PATH", formula.prefix
         prepend "LD_LIBRARY_PATH", formula.lib, File::PATH_SEPARATOR
       end
 
