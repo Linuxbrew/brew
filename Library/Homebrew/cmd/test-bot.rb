@@ -287,7 +287,7 @@ module Homebrew
       elsif travis_pr
         @url = "https://github.com/#{ENV["TRAVIS_REPO_SLUG"]}/pull/#{ENV["TRAVIS_PULL_REQUEST"]}"
         @hash = nil
-      elsif ENV["CI_PULL_REQUEST"]
+      elsif ENV["CI_PULL_REQUEST"] && !ENV["CI_PULL_REQUEST"].empty?
         # Circle CI build of a pull request.
         @url = ENV["CI_PULL_REQUEST"]
         @hash = nil
@@ -757,7 +757,7 @@ module Homebrew
     jenkins = ENV["JENKINS_HOME"]
     job = ENV["UPSTREAM_JOB_NAME"]
     id = ENV["UPSTREAM_BUILD_ID"]
-    raise "Missing Jenkins, Circle or Docker variables!" if (!jenkins || !job || !id) && !ENV["CIRCLE_PR_NUMBER"] && !docker_branch
+    raise "Missing Jenkins, Circle or Docker variables!" if (!jenkins || !job || !id) && !ENV["CIRCLE_BUILD_NUM"] && !docker_branch
 
     bintray_user = ENV["BINTRAY_USER"]
     bintray_key = ENV["BINTRAY_KEY"]
