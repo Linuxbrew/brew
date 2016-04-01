@@ -189,7 +189,9 @@ module Homebrew
           if tap.core_tap?
             if user && rev
               "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{user}-#{rev}"
-            else
+            elsif OS.linux?
+              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{issue}"
+            elsif OS.mac?
               "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
             end
           else
