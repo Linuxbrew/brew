@@ -287,6 +287,10 @@ module Homebrew
       elsif travis_pr
         @url = "https://github.com/#{ENV["TRAVIS_REPO_SLUG"]}/pull/#{ENV["TRAVIS_PULL_REQUEST"]}"
         @hash = nil
+      elsif ENV["CI_PULL_REQUEST"]
+        # Circle CI build of a pull request.
+        @url = ENV["CI_PULL_REQUEST"]
+        @hash = nil
       elsif ENV["GIT_BRANCH"] && ENV["GIT_BRANCH"].include?(":")
         # Docker automated build of a pull request
         user, branch = ENV["GIT_BRANCH"].split(":")
@@ -753,7 +757,7 @@ module Homebrew
     jenkins = ENV["JENKINS_HOME"]
     job = ENV["UPSTREAM_JOB_NAME"]
     id = ENV["UPSTREAM_BUILD_ID"]
-    raise "Missing Jenkins or Docker variables!" if (!jenkins || !job || !id) && !docker_branch
+    raise "Missing Jenkins, Circle or Docker variables!" if (!jenkins || !job || !id) && !ENV["CIRCLE_PR_NUMBER"] && !docker_branch
 
     bintray_user = ENV["BINTRAY_USER"]
     bintray_key = ENV["BINTRAY_KEY"]
@@ -788,8 +792,8 @@ module Homebrew
     ENV["GIT_WORK_TREE"] = tap.path
     ENV["GIT_DIR"] = "#{ENV["GIT_WORK_TREE"]}/.git"
 
-    pr = ENV["UPSTREAM_PULL_REQUEST"]
-    number = ENV["UPSTREAM_BUILD_NUMBER"]
+    pr = ENV["UPSTREAM_PULL_REQUEST"] || ENV["CIRCLE_PR_NUMBER"]
+    number = ENV["UPSTREAM_BUILD_NUMBER"] || ENV["CIRCLE_BUILD_NUM"]
 
     quiet_system "git", "am", "--abort"
     quiet_system "git", "rebase", "--abort"
