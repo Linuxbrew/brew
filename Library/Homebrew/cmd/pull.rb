@@ -41,7 +41,13 @@ module Homebrew
     ARGV.named.each do |arg|
       if arg.to_i > 0
         issue = arg
-        url = "https://github.com/Homebrew/homebrew/pull/#{arg}"
+        if OS.mac?
+          url = "https://github.com/Homebrew/homebrew/pull/#{arg}"
+        elsif OS.linux?
+          url = "https://github.com/Linuxbrew/linuxbrew/pull/#{arg}"
+          bintray_project = "linuxbrew"
+          github_repo = "Linuxbrew/linuxbrew"
+        end
         tap = CoreTap.instance
       elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
