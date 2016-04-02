@@ -1,21 +1,6 @@
 sut:
   build: .
-  command: sh -c 'cd ~/.linuxbrew
-    && git config user.name LinuxbrewTestBot
-    && git config user.email testbot@linuxbrew.sh
-    && git remote rename origin testbot
-    && git remote set-url testbot `git remote -v |sed "s/^testbot[[:space:]]//;s~@.*~@github.com/LinuxbrewTestBot/linuxbrew.git~;q"`
-    && git remote add origin https://github.com/Linuxbrew/linuxbrew.git
-    && git fetch origin
-    && (test "$GIT_BRANCH" = master || git checkout origin/master);
-    exit_status=0;
-    brew test-bot --keep-old || exit_status=1;
-    brew test-bot --keep-old --ci-upload || exit_status=1;
-    exit $$exit_status'
+  command: brew test-bot
   environment:
-    - BINTRAY_USER
-    - BINTRAY_KEY
     - GIT_BRANCH
     - GIT_SHA1
-    - GIT_TAG
-    - IMAGE_NAME
