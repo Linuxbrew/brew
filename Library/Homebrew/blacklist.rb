@@ -86,6 +86,8 @@ def blacklisted?(name)
 
     A binary installer is available:
       https://www.haskell.org/platform/mac.html
+    Or via the cask:
+      brew cask install haskell-platform
     EOS
   when "mysqldump-secure" then <<-EOS.undent
     The creator of mysqldump-secure tried to game our popularity metrics.
