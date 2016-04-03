@@ -1,4 +1,4 @@
-HOMEBREW_VERSION="0.9.8"
+HOMEBREW_VERSION="0.9.9"
 
 odie() {
   if [[ -t 2 ]] # check whether stderr is a tty.
