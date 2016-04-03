@@ -37,6 +37,7 @@ class Descriptions
   # repos were updated more recently than it was.
   def self.cache_fresh?
     return false unless CACHE_FILE.exist?
+    cache_mtime = File.mtime(CACHE_FILE)
 
     Tap.each do |tap|
       next unless tap.git?
