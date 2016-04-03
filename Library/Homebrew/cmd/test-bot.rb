@@ -624,7 +624,6 @@ module Homebrew
         end
         test "brew", "tests", *tests_args
         test "brew", "readall", *readall_args
-        test "brew", "update-test"
       else
         test "brew", "readall", @tap.name
       end
