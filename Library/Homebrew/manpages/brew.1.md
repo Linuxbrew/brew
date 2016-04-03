@@ -88,7 +88,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     and version, but if it fails, you'll have to make your own template. The `wget`
     formula serves as a simple example. For the complete API have a look at
 
-    <http://www.rubydoc.info/github/Homebrew/homebrew/master/Formula>
+    <http://www.rubydoc.info/github/Homebrew/brew/master/Formula>
 
     If `--autotools` is passed, create a basic template for an Autotools-style build.
     If `--cmake` is passed, create a basic template for a CMake-style build.
@@ -194,7 +194,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     information on all installed formulae.
 
     See the docs for examples of using the JSON:
-    <https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Querying-Brew.md>
+    <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md>
 
   * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] <formula>:
     Install <formula>.
@@ -415,7 +415,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Pass `--installed` to get information on installed taps.
 
     See the docs for examples of using the JSON:
-    <https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Querying-Brew.md>
+    <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md>
 
   * `tap-pin` <tap>:
     Pin <tap>, prioritizing its formulae over core when formula names are supplied
@@ -543,7 +543,7 @@ scripts that reside somewhere in the `PATH`, named `brew-`<cmdname> or
 to create your own commands without modifying Homebrew's internals.
 
 Instructions for creating your own commands can be found in the docs:
-<https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/External-Commands.md>
+<https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/External-Commands.md>
 
 ## SPECIFYING FORMULAE
 
@@ -714,7 +714,7 @@ If your proxy requires authentication:
 
 ## SEE ALSO
 
-Homebrew Documentation: <https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/>
+Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/>
 
 `git`(1), `git-log`(1)
 
@@ -728,6 +728,6 @@ Former maintainers with significant contributions include Jack Nagel, Adam Vande
 
 See our issues on GitHub:
 
- * Homebrew <https://github.com/Homebrew/homebrew/issues>
+ * Homebrew/brew <https://github.com/Homebrew/brew/issues>
 
  * Homebrew/homebrew-core <https://github.com/Homebrew/homebrew-core/issues>

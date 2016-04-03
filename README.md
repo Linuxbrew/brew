@@ -7,12 +7,12 @@ Features, usage and installation instructions are [summarised on the homepage](h
 3. Or use `brew search --desc` to browse packages from the command line.
 
 ## More Documentation
-`brew help`, `man brew` or check [our documentation](https://github.com/Homebrew/homebrew/tree/master/share/doc/homebrew#readme).
+`brew help`, `man brew` or check [our documentation](https://github.com/Homebrew/brew/tree/master/share/doc/homebrew#readme).
 
 ## Troubleshooting
 First, please run `brew update` and `brew doctor`.
 
-Second, read the [Troubleshooting Checklist](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting).
+Second, read the [Troubleshooting Checklist](https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting).
 
 **If you don't read these it will take us far longer to help you with your problem.**
 
@@ -30,7 +30,7 @@ Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo)
 Former maintainers with significant contributions include [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
 ## License
-Code is under the [BSD 2 Clause (NetBSD) license](https://github.com/Homebrew/homebrew/tree/master/LICENSE.txt).
+Code is under the [BSD 2 Clause (NetBSD) license](https://github.com/Homebrew/brew/tree/master/LICENSE.txt).
 Documentation is under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/).
 
 ## Donations
@@ -41,14 +41,14 @@ Homebrew is a member of the [Software Freedom Conservancy](http://sfconservancy.
 - [Donate with PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=V6ZE57MJRYC8L)
 - Donate by USA $ check from a USA bank:
   - Make check payable to "Software Freedom Conservancy, Inc." and place "Directed donation: Homebrew" in the memo field.  Checks should then be mailed to:
-    - Software Freedom Conservancy, Inc.  
-      137 Montague ST  STE 380  
-      BROOKLYN, NY 11201             USA  
+    - Software Freedom Conservancy, Inc.
+      137 Montague ST  STE 380
+      BROOKLYN, NY 11201             USA
 - Donate by wire transfer: contact accounting@sfconservancy.org for wire transfer details.
 - Donate with Flattr or PayPal Giving Fund: coming soon.
 
 ## Sponsors
-Our CI infrastructure was paid for by [our Kickstarter supporters](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Kickstarter-Supporters.md).
+Our CI infrastructure was paid for by [our Kickstarter supporters](https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Kickstarter-Supporters.md).
 
 Our CI infrastructure is hosted by [The Positive Internet Company](http://www.positive-internet.com).
 

@@ -4,10 +4,10 @@ require "formula"
 
 class InfoCommandTests < Homebrew::TestCase
   def test_github_remote_path
-    remote = "https://github.com/Homebrew/homebrew"
-    assert_equal "https://github.com/Homebrew/homebrew/blob/master/Formula/git.rb",
+    remote = "https://github.com/Homebrew/homebrew-core"
+    assert_equal "https://github.com/Homebrew/homebrew-core/blob/master/Formula/git.rb",
       Homebrew.github_remote_path(remote, "Formula/git.rb")
-    assert_equal "https://github.com/Homebrew/homebrew/blob/master/Formula/git.rb",
+    assert_equal "https://github.com/Homebrew/homebrew-core/blob/master/Formula/git.rb",
       Homebrew.github_remote_path("#{remote}.git", "Formula/git.rb")
 
     assert_equal "https://github.com/user/repo/blob/master/foo.rb",

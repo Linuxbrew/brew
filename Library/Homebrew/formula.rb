@@ -1697,7 +1697,7 @@ class Formula
     # and you haven't passed or previously used any options on this formula.
     #
     # If you maintain your own repository, you can add your own bottle links.
-    # https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Bottles.md
+    # https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Bottles.md
     # You can ignore this block entirely if submitting to Homebrew/Homebrew, It'll be
     # handled for you by the Brew Test Bot.
     #

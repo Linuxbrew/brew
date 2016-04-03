@@ -6,11 +6,11 @@ The preferred and supported method of installing specific versions of
 formulae is to use the
 [homebrew/versions](https://github.com/Homebrew/homebrew-versions)
 tap.  If the version you’re looking for isn’t available, consider [opening a
-pull request](https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md)!
+pull request](https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md)!
 
 ### Installing directly from pull-requests
 
-You can browse pull requests https://github.com/Homebrew/homebrew/pulls
+You can browse pull requests https://github.com/Homebrew/homebrew-core/pulls
 and install through the direct link. For example Python 3.3.0 pull request https://github.com/Homebrew/homebrew/pull/15199
 
 ```sh

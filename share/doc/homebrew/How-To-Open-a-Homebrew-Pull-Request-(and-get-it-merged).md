@@ -1,15 +1,15 @@
 # How To Open a Homebrew Pull Request (and get it merged)
 The following commands are used by Homebrew's contributors to setup a fork of Homebrew's Git repository on GitHub, create a new branch and create a GitHub pull request of the changes in that branch.
 
-Depending on the change you want to make, you need to send the pull request to the corresponding repository. If you want to submit a change in Homebrew core code, you should open the pull request at [Homebrew/homebrew](https://github.com/Homebrew/homebrew). If you want to apply any change on formula, you could open the pull request at [Homebrew core tap](https://github.com/Homebrew/homebrew-core) or any other [official taps](https://github.com/Homebrew) based on the nature of related formuale.
+Depending on the change you want to make, you need to send the pull request to the corresponding repository. If you want to submit a change in Homebrew core code, you should open the pull request at [Homebrew/brew](https://github.com/Homebrew/brew). If you want to submit a change for a formula, you could open the pull request at [Homebrew core tap](https://github.com/Homebrew/homebrew-core) or any other [official taps](https://github.com/Homebrew) based the formula type.
 
 ## Set up your own fork of the Homebrew repository
 
 ### Core code related pull request
 
 1. Change to the directory containing your Homebrew installation with `cd $(brew --repository)`
-2. [Fork the Homebrew/homebrew repository](https://github.com/Homebrew/homebrew/fork) on GitHub. This creates a pushable, personal remote repository. This is needed as only Homebrew maintainers have push access to the main repository.
-3. Add the pushable forked repository with `git remote add YOUR_USERNAME https://github.com/YOUR_USERNAME/homebrew.git`
+2. [Fork the Homebrew/brew repository](https://github.com/Homebrew/brew/fork) on GitHub. This creates a pushable, personal remote repository. This is needed as only Homebrew maintainers have push access to the main repository.
+3. Add the pushable forked repository with `git remote add YOUR_USERNAME https://github.com/YOUR_USERNAME/brew.git`
 
 ### Formulae related pull request
 

@@ -96,7 +96,7 @@ Show Homebrew and system configuration useful for debugging\. If you file a bug 
 Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at
 .
 .IP
-\fIhttp://www\.rubydoc\.info/github/Homebrew/homebrew/master/Formula\fR
+\fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR
 .
 .IP
 If \fB\-\-autotools\fR is passed, create a basic template for an Autotools\-style build\. If \fB\-\-cmake\fR is passed, create a basic template for a CMake\-style build\.
@@ -211,7 +211,7 @@ Print a JSON representation of \fIformulae\fR\. Currently the only accepted valu
 Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to get information on all installed formulae\.
 .
 .IP
-See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Querying\-Brew\.md\fR
+See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying\-Brew\.md\fR
 .
 .TP
 \fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR\fIstd\fR|\fIsuper\fR] [\fB\-\-ignore\-dependencies\fR] [\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] \fIformula\fR
@@ -442,7 +442,7 @@ Print a JSON representation of \fItaps\fR\. Currently the only accepted value fo
 Pass \fB\-\-installed\fR to get information on installed taps\.
 .
 .IP
-See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Querying\-Brew\.md\fR
+See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying\-Brew\.md\fR
 .
 .TP
 \fBtap\-pin\fR \fItap\fR
@@ -577,7 +577,7 @@ Print the version number of brew to standard error and exit\.
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
 .
 .P
-Instructions for creating your own commands can be found in the docs: \fIhttps://github\.com/Homebrew/homebrew/blob/master/share/doc/homebrew/External\-Commands\.md\fR
+Instructions for creating your own commands can be found in the docs: \fIhttps://github\.com/Homebrew/brew/blob/master/share/doc/homebrew/External\-Commands\.md\fR
 .
 .SH "SPECIFYING FORMULAE"
 Many Homebrew commands accept one or more \fIformula\fR arguments\. These arguments can take several different forms:
@@ -756,7 +756,7 @@ http_proxy=http://<user>:<password>@<host>:<port> brew install foo
 .IP "" 0
 .
 .SH "SEE ALSO"
-Homebrew Documentation: \fIhttps://github\.com/Homebrew/homebrew/blob/master/share/doc/homebrew/\fR
+Homebrew Documentation: \fIhttps://github\.com/Homebrew/brew/blob/master/share/doc/homebrew/\fR
 .
 .P
 \fBgit\fR(1), \fBgit\-log\fR(1)
@@ -771,9 +771,10 @@ Former maintainers with significant contributions include Jack Nagel, Adam Vande
 See our issues on GitHub:
 .
 .IP "\(bu" 4
-Homebrew \fIhttps://github\.com/Homebrew/homebrew/issues\fR
+Homebrew/brew \fIhttps://github\.com/Homebrew/brew/issues\fR
 .
 .IP "\(bu" 4
 Homebrew/homebrew\-core \fIhttps://github\.com/Homebrew/homebrew\-core/issues\fR
 .
 .IP "" 0
+
