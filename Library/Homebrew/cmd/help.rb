@@ -39,4 +39,23 @@ module Homebrew
   def help_s
     HOMEBREW_HELP
   end
+
+  def help_for_command(cmd)
+    cmd_path = if File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh")
+      HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh"
+    elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh")
+      HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh"
+    elsif File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.rb")
+      HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.rb"
+    elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb")
+      HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb"
+    end
+    return if cmd_path.nil?
+
+    cmd_path.read.
+      split("\n").
+      grep(/^#:/).
+      map { |line| line.slice(2..-1).delete("`").sub(/^  \* /, "brew ") }.
+      join("\n")
+  end
 end

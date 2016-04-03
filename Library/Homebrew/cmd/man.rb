@@ -25,21 +25,35 @@ module Homebrew
       puts "Writing HTML fragments to #{DOC_PATH}"
       puts "Writing manpages to #{TARGET_PATH}"
 
-      Dir["#{SOURCE_PATH}/*.md"].each do |source_file|
-        args = %W[
-          --pipe
-          --organization=Homebrew
-          --manual=brew
-          #{source_file}
-        ]
-        page = File.basename(source_file, ".md")
+      header = (SOURCE_PATH/"header.1.md").read
+      footer = (SOURCE_PATH/"footer.1.md").read
+      sub_commands = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
+        sort_by { |source_file| source_file.basename.sub(/\.(rb|sh)$/, "") }.
+        map { |source_file|
+          source_file.read.
+            split("\n").
+            grep(/^#:/).
+            map { |line| line.slice(2..-1) }.
+            join("\n")
+        }.
+        reject { |s| s.strip.empty? }.
+        join("\n\n")
 
-        target_html = DOC_PATH/"#{page}.html"
-        target_html.atomic_write Utils.popen_read("ronn", "--fragment", *args)
+      target_md = SOURCE_PATH/"brew.1.md"
+      target_md.atomic_write(header + sub_commands + footer)
 
-        target_man = TARGET_PATH/page
-        target_man.atomic_write Utils.popen_read("ronn", "--roff", *args)
-      end
+      args = %W[
+        --pipe
+        --organization=Homebrew
+        --manual=brew
+        #{SOURCE_PATH}/brew.1.md
+      ]
+
+      target_html = DOC_PATH/"brew.1.html"
+      target_html.atomic_write Utils.popen_read("ronn", "--fragment", *args)
+
+      target_man = TARGET_PATH/"brew.1"
+      target_man.atomic_write Utils.popen_read("ronn", "--roff", *args)
     end
   end
 end
