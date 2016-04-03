@@ -18,7 +18,7 @@ matrix:
 before_install:
   - export TRAVIS_COMMIT=$(git rev-parse --verify -q HEAD)
   - cd /usr/local
-  - sudo rm -rf /usr/local/.git/refs /usr/local/.git/packed-refs
+  - sudo rm -rf /usr/local/.git/refs /usr/local/.git/packed-refs /usr/local/Library
   - sudo rsync -az "$TRAVIS_BUILD_DIR/" /usr/local/
   - sudo chown -R $USER /usr/local
   - export TRAVIS_BUILD_DIR="/usr/local"
