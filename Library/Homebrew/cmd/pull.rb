@@ -56,20 +56,18 @@ module Homebrew
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/#{repo}/pull/#{issue}"
-        tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-") || ARGV.include?("--legacy")
+        tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
+        tap = CoreTap.instance if ARGV.include?("--legacy")
       elsif (url_match = arg.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
         url, user, repo, issue = *url_match
-        tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-") || ARGV.include?("--legacy")
+        tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
+        tap = CoreTap.instance if ARGV.include?("--legacy")
       else
         odie "Not a GitHub pull request or commit: #{arg}"
       end
 
       if !testing_job && ARGV.include?("--bottle") && issue.nil?
         odie "No pull request detected!"
-      end
-
-      if ARGV.include?("--legacy") && !tap.core_tap?
-        odie "--legacy can only be used for CoreTap!"
       end
 
       if tap
