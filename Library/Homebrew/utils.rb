@@ -663,7 +663,7 @@ module GitHub
 
   def build_search_qualifier_string(qualifiers)
     {
-      :repo => "Homebrew/homebrew",
+      :repo => "Homebrew/homebrew-core",
       :in => "title"
     }.update(qualifiers).map do |qualifier, value|
       "#{qualifier}:#{value}"
@@ -679,8 +679,9 @@ module GitHub
     end
   end
 
-  def issues_for_formula(name)
-    issues_matching(name, :state => "open")
+  def issues_for_formula(name, options = {})
+    tap = options[:tap] || CoreTap.instance
+    issues_matching(name, :state => "open", :repo => "#{tap.user}/homebrew-#{tap.repo}")
   end
 
   def print_pull_requests_matching(query)
