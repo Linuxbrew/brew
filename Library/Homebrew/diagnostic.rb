@@ -1031,9 +1031,9 @@ module Homebrew
           Without a correctly configured origin, Homebrew won't update
           properly. You can solve this by adding the Homebrew remote:
             cd #{HOMEBREW_REPOSITORY}
-            git remote add origin https://github.com/Homebrew/homebrew.git
+            git remote add origin https://github.com/Homebrew/brew.git
           EOS
-        elsif origin !~ /(mxcl|Homebrew)\/homebrew(\.git)?$/ then <<-EOS.undent
+        elsif origin !~ /Homebrew\/brew(\.git)?$/ then <<-EOS.undent
           Suspicious git origin remote found.
 
           With a non-standard origin, Homebrew won't pull updates from
@@ -1042,7 +1042,7 @@ module Homebrew
 
           Unless you have compelling reasons, consider setting the
           origin remote to point at the main repository, located at:
-            https://github.com/Homebrew/homebrew.git
+            https://github.com/Homebrew/brew.git
           EOS
         end
       end
