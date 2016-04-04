@@ -1,6 +1,0 @@
-sut:
-  build: .
-  command: brew test-bot
-  environment:
-    - GIT_BRANCH
-    - GIT_SHA1
