@@ -39,7 +39,7 @@ end
 
 def report_analytics_exception(exception, options={})
   if exception.is_a? BuildError
-    report_analytics_event("BuildError", e.formula.full_name)
+    report_analytics_event("BuildError", exception.formula.full_name)
   end
 
   fatal = options.fetch(:fatal, true) ? "1" : "0"
