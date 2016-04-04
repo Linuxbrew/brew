@@ -9,16 +9,17 @@
 # --skip-setup:    Don't check the local system is setup correctly.
 # --skip-homebrew: Don't check Homebrew's files and tests are all valid.
 # --junit:         Generate a JUnit XML test results file.
-# --no-bottle:     Run brew install without --build-bottle
+# --no-bottle:     Run brew install without --build-bottle.
 # --keep-old:      Run brew bottle --keep-old to build new bottles for a single platform.
-# --legacy         Bulid formula from legacy Homebrew/homebrew repo.
+# --legacy         Build formula from legacy Homebrew/homebrew repo.
 #                  (TODO remove it when it's not longer necessary)
 # --HEAD:          Run brew install with --HEAD
-# --local:         Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/
-# --tap=<tap>:     Use the git repository of the given tap
+# --local:         Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
+# --tap=<tap>:     Use the git repository of the given tap.
 # --dry-run:       Just print commands, don't run them.
 # --fail-fast:     Immediately exit on a failing step.
-# --verbose:       Print out all logs in realtime
+# --verbose:       Print test step output in realtime. Has the side effect of passing output
+#                  as raw bytes instead of re-encoding in UTF-8.
 # --fast:          Don't install any packages but run e.g. audit anyway.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
@@ -37,6 +38,10 @@ require "tap"
 module Homebrew
   BYTES_IN_1_MEGABYTE = 1024*1024
   HOMEBREW_TAP_REGEX = %r{^([\w-]+)/homebrew-([\w-]+)$}
+
+  def ruby_has_encoding?
+    String.method_defined?(:force_encoding)
+  end
 
   def resolve_test_tap
     if tap = ARGV.value("tap")
@@ -142,7 +147,9 @@ module Homebrew
       end
 
       verbose = ARGV.verbose?
-      @output = ""
+      # Step may produce arbitrary output and we read it bytewise, so must
+      # buffer it as binary and convert to UTF-8 once complete
+      output = Homebrew.ruby_has_encoding? ? "".encode!("BINARY") : ""
       working_dir = Pathname.new(@command.first == "git" ? @repository : Dir.pwd)
       read, write = IO.pipe
 
@@ -155,13 +162,14 @@ module Homebrew
           working_dir.cd { exec(*@command) }
         end
         write.close
-        while buf = read.read(1)
+        while buf = read.readpartial(4096)
           if verbose
             print buf
             $stdout.flush
           end
-          @output << buf
+          output << buf
         end
+      rescue EOFError
       ensure
         read.close
       end
@@ -171,8 +179,9 @@ module Homebrew
       @status = $?.success? ? :passed : :failed
       puts_result
 
-      if has_output?
-        @output = fix_encoding(@output)
+
+      unless output.empty?
+        @output = fix_encoding(output)
         puts @output if (failed? || @puts_output_on_success) && !verbose
         File.write(log_file_path, @output) if ARGV.include? "--keep-logs"
       end
@@ -182,11 +191,11 @@ module Homebrew
 
     private
 
-    if String.method_defined?(:force_encoding)
+    if Homebrew.ruby_has_encoding?
       def fix_encoding(str)
-        return str if str.valid_encoding?
         # Assume we are starting from a "mostly" UTF-8 string
         str.force_encoding(Encoding::UTF_8)
+        return str if str.valid_encoding?
         str.encode!(Encoding::UTF_16, :invalid => :replace)
         str.encode!(Encoding::UTF_8)
       end
@@ -944,11 +953,13 @@ module Homebrew
 
           if step.has_output?
             # Remove invalid XML CData characters from step output.
-            output = step.output.delete("\000\a\b\e\f\x2\x1f")
+            valid_xml_chars = "\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}"
+            output = step.output.gsub(/[^#{valid_xml_chars}]/, "\uFFFD")
 
             if output.bytesize > BYTES_IN_1_MEGABYTE
-              output = "truncated output to 1MB:\n" \
-                + output.slice(-BYTES_IN_1_MEGABYTE, BYTES_IN_1_MEGABYTE)
+              slice_start = [0, -BYTES_IN_1_MEGABYTE].max
+              output = "truncated output to ~1MB:\n" \
+                + output.slice(slice_start, output.length - slice_start)
             end
 
             cdata = REXML::CData.new output
