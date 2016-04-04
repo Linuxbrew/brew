@@ -638,6 +638,10 @@ class FormulaAuditor
       problem "\"Formula.factory(name)\" is deprecated in favor of \"Formula[name]\""
     end
 
+    if text =~ /def plist/ && text !~ /plist_options/
+      problem "Please set plist_options when using a formula-defined plist."
+    end
+
     if text =~ /system "npm", "install"/ && text !~ %r[opt_libexec\}/npm/bin] && formula.name !~ /^kibana(\d{2})?$/
       need_npm = "\#{Formula[\"node\"].opt_libexec\}/npm/bin"
       problem <<-EOS.undent
