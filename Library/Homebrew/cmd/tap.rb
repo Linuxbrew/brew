@@ -17,8 +17,10 @@ module Homebrew
         tap.install :clone_target => ARGV.named[1],
                     :full_clone   => ARGV.include?("--full"),
                     :quiet        => ARGV.quieter?
-      rescue TapAlreadyTappedError => e
-        opoo e
+      rescue TapRemoteMismatchError => e
+        odie e
+      rescue TapAlreadyTappedError, TapAlreadyUnshallowError
+        # Do nothing.
       end
     end
   end

@@ -164,7 +164,32 @@ class TapTest < Homebrew::TestCase
   end
 
   def test_install_tap_already_tapped_error
-    assert_raises(TapAlreadyTappedError) { @tap.install }
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    assert_equal true, already_tapped_tap.installed?
+    assert_raises(TapAlreadyTappedError) { already_tapped_tap.install }
+  end
+
+  def test_install_tap_remote_match_already_tapped_error
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    assert_equal true, already_tapped_tap.installed?
+    right_remote = "#{@tap.remote}"
+    assert_raises(TapAlreadyTappedError) { already_tapped_tap.install :clone_target => right_remote }
+  end
+
+  def test_install_tap_remote_mismatch_error
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    assert_equal true, already_tapped_tap.installed?
+    wrong_remote = "#{@tap.remote}-oops"
+    assert_raises(TapRemoteMismatchError) { already_tapped_tap.install :clone_target => wrong_remote }
+  end
+
+  def test_install_tap_already_unshallow_error
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    assert_raises(TapAlreadyUnshallowError) { already_tapped_tap.install :full_clone => true }
   end
 
   def test_uninstall_tap_unavailable_error

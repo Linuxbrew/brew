@@ -394,7 +394,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     using protocols other than HTTPS, e.g., SSH, GIT, HTTP, FTP(S), RSYNC.
 
     By default, the repository is cloned as a shallow copy (`--depth=1`), but
-    if `--full` is passed, a full clone will be used.
+    if `--full` is passed, a full clone will be used. To convert a shallow copy
+    to a full copy, you can retap passing `--full` without first untapping.
+
+    `tap` is re-runnable and exits successfully if there's nothing to do.
+    However, retapping with a different <URL> will cause an exception, so first
+    `untap` if you need to modify the <URL>.
 
   * `tap` `--repair`:
     Migrate tapped formulae from symlink-based to directory-based structure.

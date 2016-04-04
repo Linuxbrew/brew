@@ -158,6 +158,11 @@ class Tap
     path.directory?
   end
 
+  # True if this {Tap} is not a full clone.
+  def shallow?
+    (path/".git/shallow").exist?
+  end
+
   # @private
   def core_tap?
     false
@@ -171,17 +176,33 @@ class Tap
   # @option options [Boolean] :quiet If set, suppress all output.
   def install(options = {})
     require "descriptions"
-    raise TapAlreadyTappedError, name if installed?
-    clear_cache
 
+    full_clone = options.fetch(:full_clone, false)
     quiet = options.fetch(:quiet, false)
+    requested_remote = options[:clone_target] || "https://github.com/#{user}/homebrew-#{repo}"
+
+    if installed?
+      raise TapRemoteMismatchError.new(name, @remote, requested_remote) unless remote == requested_remote
+      raise TapAlreadyTappedError, name unless full_clone
+      raise TapAlreadyUnshallowError, name unless shallow?
+    end
 
     # ensure git is installed
     Utils.ensure_git_installed!
+
+    if installed?
+      ohai "Unshallowing #{name}" unless quiet
+      args = %W[fetch --unshallow]
+      args << "-q" if quiet
+      path.cd { safe_system "git", *args }
+      return
+    end
+
+    clear_cache
+
     ohai "Tapping #{name}" unless quiet
-    remote = options[:clone_target] || "https://github.com/#{user}/homebrew-#{repo}"
-    args = %W[clone #{remote} #{path} --config core.autocrlf=false]
-    args << "--depth=1" unless options.fetch(:full_clone, false)
+    args =  %W[clone #{requested_remote} #{path} --config core.autocrlf=false]
+    args << "--depth=1" unless full_clone
     args << "-q" if quiet
 
     begin

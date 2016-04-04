@@ -416,7 +416,10 @@ With \fIURL\fR unspecified, taps a formula repository from GitHub using HTTPS\. 
 With \fIURL\fR specified, taps a formula repository from anywhere, using any transport protocol that \fBgit\fR handles\. The one\-argument form of \fBtap\fR simplifies but also limits\. This two\-argument command makes no assumptions, so taps can be cloned from places other than GitHub and using protocols other than HTTPS, e\.g\., SSH, GIT, HTTP, FTP(S), RSYNC\.
 .
 .IP
-By default, the repository is cloned as a shallow copy (\fB\-\-depth=1\fR), but if \fB\-\-full\fR is passed, a full clone will be used\.
+By default, the repository is cloned as a shallow copy (\fB\-\-depth=1\fR), but if \fB\-\-full\fR is passed, a full clone will be used\. To convert a shallow copy to a full copy, you can retap passing \fB\-\-full\fR without first untapping\.
+.
+.IP
+\fBtap\fR is re\-runnable and exits successfully if there\'s nothing to do\. However, retapping with a different \fIURL\fR will cause an exception, so first \fBuntap\fR if you need to modify the \fIURL\fR\.
 .
 .TP
 \fBtap\fR \fB\-\-repair\fR

@@ -119,6 +119,23 @@ class TapUnavailableError < RuntimeError
   end
 end
 
+class TapRemoteMismatchError < RuntimeError
+  attr_reader :name
+  attr_reader :expected_remote
+  attr_reader :actual_remote
+
+  def initialize(name, expected_remote, actual_remote)
+    @name = name
+    @expected_remote = expected_remote
+    @actual_remote = actual_remote
+
+    super <<-EOS.undent
+      Tap #{name} remote mismatch.
+      #{expected_remote} != #{actual_remote}
+    EOS
+  end
+end
+
 class TapAlreadyTappedError < RuntimeError
   attr_reader :name
 
@@ -127,6 +144,18 @@ class TapAlreadyTappedError < RuntimeError
 
     super <<-EOS.undent
       Tap #{name} already tapped.
+    EOS
+  end
+end
+
+class TapAlreadyUnshallowError < RuntimeError
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+
+    super <<-EOS.undent
+      Tap #{name} already a full clone.
     EOS
   end
 end

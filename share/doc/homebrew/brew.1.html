@@ -303,7 +303,12 @@ assumptions, so taps can be cloned from places other than GitHub and
 using protocols other than HTTPS, e.g., SSH, GIT, HTTP, FTP(S), RSYNC.</p>
 
 <p>By default, the repository is cloned as a shallow copy (<code>--depth=1</code>), but
-if <code>--full</code> is passed, a full clone will be used.</p></dd>
+if <code>--full</code> is passed, a full clone will be used. To convert a shallow copy
+to a full copy, you can retap passing <code>--full</code> without first untapping.</p>
+
+<p><code>tap</code> is re-runnable and exits successfully if there's nothing to do.
+However, retapping with a different <var>URL</var> will cause an exception, so first
+<code>untap</code> if you need to modify the <var>URL</var>.</p></dd>
 <dt><code>tap</code> <code>--repair</code></dt><dd><p>Migrate tapped formulae from symlink-based to directory-based structure.</p></dd>
 <dt><code>tap</code> <code>--list-official</code></dt><dd><p>List all official taps.</p></dd>
 <dt><code>tap</code> <code>--list-pinned</code></dt><dd><p>List all pinned taps.</p></dd>
