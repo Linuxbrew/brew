@@ -213,6 +213,7 @@ class Cmd
     elsif path.start_with?(prefix)
       true
     else
+      # ignore MacPorts, Boxen's Homebrew, X11, fink
       !path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
     end
   end
