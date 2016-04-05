@@ -58,13 +58,10 @@ then
 fi
 
 HOMEBREW_SYSTEM="$(uname -s)"
-if [[ "$HOMEBREW_SYSTEM" = "Darwin" ]]
-then
-  HOMEBREW_OSX="1"
-elif [[ "$HOMEBREW_SYSTEM" = "Linux" ]]
-then
-  HOMEBREW_LINUX="1"
-fi
+case "$HOMEBREW_SYSTEM" in
+  Darwin) HOMEBREW_OSX="1";;
+  Linux) HOMEBREW_LINUX="1";;
+esac
 
 if [[ -z "$HOMEBREW_RUBY_PATH" ]]
 then
