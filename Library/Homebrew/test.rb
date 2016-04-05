@@ -15,11 +15,15 @@ begin
   error_pipe.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
 
   ENV.extend(Stdenv)
-  ENV.setup_build_environment
+  formula = ARGV.formulae.first
+  if OS.linux?
+    ENV.setup_build_environment(formula)
+  else
+    ENV.setup_build_environment
+  end
 
   trap("INT", old_trap)
 
-  formula = ARGV.formulae.first
   formula.extend(Homebrew::Assertions)
   formula.extend(Debrew::Formula) if ARGV.debug?
 
