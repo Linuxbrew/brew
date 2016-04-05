@@ -218,7 +218,7 @@ then
   # information.
   # https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#screenView
   # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
-  curl https://www.google-analytics.com/collect -d v=1 \
+  "$HOMEBREW_CURL" https://www.google-analytics.com/collect -d v=1 \
     --silent --max-time 3 --output /dev/null \
     --user-agent "$HOMEBREW_USER_AGENT_CURL" \
     -d tid="$HOMEBREW_ANALYTICS_ID" \

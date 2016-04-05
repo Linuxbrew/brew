@@ -304,7 +304,7 @@ EOS
         UPSTREAM_BRANCH_LOCAL_SHA="$(git rev-parse "refs/remotes/origin/$UPSTREAM_BRANCH")"
         # Only try to `git fetch` when the upstream branch is at a different SHA
         # (so the API does not return 304: unmodified).
-        UPSTREAM_SHA_HTTP_CODE="$(curl --silent '--max-time' 3 \
+        UPSTREAM_SHA_HTTP_CODE="$("$HOMEBREW_CURL" --silent '--max-time' 3 \
            --output /dev/null --write-out "%{http_code}" \
            --user-agent "$HOMEBREW_USER_AGENT_CURL" \
            --header "Accept: application/vnd.github.chitauri-preview+sha" \
