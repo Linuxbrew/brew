@@ -213,13 +213,13 @@ class Cmd
     elsif path.start_with?(prefix)
       true
     else
-      !path.start_with?("/opt", "/sw", "/usr/X11")
+      !path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
     end
   end
 
   # The original less-smart version of keep_orig; will eventually be removed
   def keep_orig?(path)
-    path.start_with?(prefix, cellar, tmpdir) || !path.start_with?("/opt", "/sw", "/usr/X11")
+    path.start_with?(prefix, cellar, tmpdir) || !path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
   end
 
   def cflags
