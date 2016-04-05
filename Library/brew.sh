@@ -228,7 +228,8 @@ then
     -d av="$HOMEBREW_VERSION" \
     -d t=screenview \
     -d cd="$HOMEBREW_COMMAND" \
-    &
+    &> /dev/null \
+    & disown
 fi
 
 if [[ -n "$HOMEBREW_BASH_COMMAND" ]]
