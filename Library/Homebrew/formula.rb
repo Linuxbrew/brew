@@ -64,7 +64,7 @@ class Formula
   attr_reader :full_name
 
   # The full path to this {Formula}.
-  # e.g. `/usr/local/Library/Formula/this-formula.rb`
+  # e.g. `/usr/local/Library/Taps/homebrew/homebrew-core/Formula/this-formula.rb`
   attr_reader :path
 
   # The {Tap} instance associated with this {Formula}.
