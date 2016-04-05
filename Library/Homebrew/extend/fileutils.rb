@@ -133,3 +133,14 @@ module FileUtils
     ENV.update(removed)
   end
 end
+
+# Shim File.write for Ruby 1.8.7, where it's absent
+unless File.respond_to?(:write)
+  class File
+    def self.write(filename, contents)
+      File.open(filename, 'w') do |file|
+        file.write contents
+      end
+    end
+  end
+end
