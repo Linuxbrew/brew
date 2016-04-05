@@ -84,7 +84,7 @@ then
   HOMEBREW_OSX_VERSION="$(/usr/bin/sw_vers -productVersion)"
   HOMEBREW_OS_VERSION="Mac OS X $HOMEBREW_OSX_VERSION"
 
-  HOMEBREW_OSX_VERSION_NUMERIC="$(printf "%02d%02d%02d" $(echo "${HOMEBREW_OSX_VERSION//./ }"))"
+  printf -v HOMEBREW_OSX_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_OSX_VERSION//./ }
   if [[ "$HOMEBREW_OSX_VERSION_NUMERIC" -lt "100900" &&
         -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
   then
