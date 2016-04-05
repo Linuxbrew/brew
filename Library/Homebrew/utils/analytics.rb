@@ -18,7 +18,7 @@ def report_analytics(type, metadata={})
   # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
   system ENV["HOMEBREW_CURL"], "https://www.google-analytics.com/collect",
     "-d", "v=1", "--silent", "--max-time", "3", "--output", "/dev/null",
-    "--user-agent", "#{HOMEBREW_USER_AGENT_CURL}",
+    "--user-agent", HOMEBREW_USER_AGENT_CURL,
     "-d", "tid=#{ENV["HOMEBREW_ANALYTICS_ID"]}",
     "-d", "cid=#{ENV["HOMEBREW_ANALYTICS_USER_UUID"]}",
     "-d", "aip=1",
