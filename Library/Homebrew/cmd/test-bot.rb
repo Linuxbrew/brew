@@ -37,6 +37,8 @@ require "tap"
 
 module Homebrew
   BYTES_IN_1_MEGABYTE = 1024*1024
+  MAX_STEP_OUTPUT_SIZE = BYTES_IN_1_MEGABYTE - (200*1024) # margin of safety
+
   HOMEBREW_TAP_REGEX = %r{^([\w-]+)/homebrew-([\w-]+)$}
 
   def ruby_has_encoding?
@@ -997,14 +999,14 @@ module Homebrew
         output = output.delete("\000\a\b\e\f\x2\x1f")
       end
 
-      # Truncate to 1MB
-      if output.bytesize > BYTES_IN_1_MEGABYTE
+      # Truncate to 1MB to avoid hitting CI limits
+      if output.bytesize > MAX_STEP_OUTPUT_SIZE
         if ruby_has_encoding?
           binary_output = output.force_encoding("BINARY")
-          output = binary_output.slice(-BYTES_IN_1_MEGABYTE, BYTES_IN_1_MEGABYTE)
+          output = binary_output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
           fix_encoding!(output)
         else
-          output = output.slice(-BYTES_IN_1_MEGABYTE, BYTES_IN_1_MEGABYTE)
+          output = output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
         end
         output = "truncated output to 1MB:\n" + output
       end
