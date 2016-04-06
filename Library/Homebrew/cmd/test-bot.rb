@@ -43,6 +43,24 @@ module Homebrew
     String.method_defined?(:force_encoding)
   end
 
+  if ruby_has_encoding?
+    def fix_encoding!(str)
+      # Assume we are starting from a "mostly" UTF-8 string
+      str.force_encoding(Encoding::UTF_8)
+      return str if str.valid_encoding?
+      str.encode!(Encoding::UTF_16, :invalid => :replace)
+      str.encode!(Encoding::UTF_8)
+    end
+  elsif require "iconv"
+    def fix_encoding!(str)
+      Iconv.conv("UTF-8//IGNORE", "UTF-8", str)
+    end
+  else
+    def fix_encoding!(str)
+      str
+    end
+  end
+
   def resolve_test_tap
     if tap = ARGV.value("tap")
       return Tap.fetch(tap)
@@ -187,26 +205,6 @@ module Homebrew
       end
 
       exit 1 if ARGV.include?("--fail-fast") && failed?
-    end
-
-    private
-
-    if Homebrew.ruby_has_encoding?
-      def fix_encoding!(str)
-        # Assume we are starting from a "mostly" UTF-8 string
-        str.force_encoding(Encoding::UTF_8)
-        return str if str.valid_encoding?
-        str.encode!(Encoding::UTF_16, :invalid => :replace)
-        str.encode!(Encoding::UTF_8)
-      end
-    elsif require "iconv"
-      def fix_encoding!(str)
-        Iconv.conv("UTF-8//IGNORE", "UTF-8", str)
-      end
-    else
-      def fix_encoding!(str)
-        str
-      end
     end
   end
 
