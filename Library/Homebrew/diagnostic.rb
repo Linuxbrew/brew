@@ -470,15 +470,15 @@ module Homebrew
 
         # otool may not work, for example if the Xcode license hasn't been accepted yet
         return if libs.empty?
+        return if libs.include? "/usr/lib/libxcselect.dylib"
 
-        unless libs.include? "/usr/lib/libxcselect.dylib" then <<-EOS.undent
-        You have an outdated version of /usr/bin/install_name_tool installed.
-        This will cause binary package installations to fail.
-        This can happen if you install osx-gcc-installer or RailsInstaller.
-        To restore it, you must reinstall OS X or restore the binary from
-        the OS packages.
+        <<-EOS.undent
+          You have an outdated version of /usr/bin/install_name_tool installed.
+          This will cause binary package installations to fail.
+          This can happen if you install osx-gcc-installer or RailsInstaller.
+          To restore it, you must reinstall OS X or restore the binary from
+          the OS packages.
         EOS
-        end
       end
 
       def __check_subdir_access(base)
