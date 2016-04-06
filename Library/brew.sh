@@ -74,9 +74,9 @@ then
 fi
 
 HOMEBREW_CURL="/usr/bin/curl"
-HOMEBREW_PROCESSOR="$(uname -p)"
 if [[ -n "$HOMEBREW_OSX" ]]
 then
+  HOMEBREW_PROCESSOR="$(uname -p)"
   HOMEBREW_PRODUCT="Homebrew"
   HOMEBREW_SYSTEM="Macintosh"
   # This is i386 even on x86_64 machines
@@ -91,6 +91,7 @@ then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
   fi
 else
+  HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
