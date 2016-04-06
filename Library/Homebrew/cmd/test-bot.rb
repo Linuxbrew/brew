@@ -199,7 +199,7 @@ module Homebrew
 
 
       unless output.empty?
-        @output = fix_encoding!(output)
+        @output = Homebrew.fix_encoding!(output)
         puts @output if (failed? || @puts_output_on_success) && !verbose
         File.write(log_file_path, @output) if ARGV.include? "--keep-logs"
       end
