@@ -311,6 +311,7 @@ end
 
 def curl(*args)
   curl = Pathname.new ENV["HOMEBREW_CURL"]
+  curl = Pathname.new "/usr/bin/curl" unless curl.exist?
   raise "#{curl} is not executable" unless curl.exist? && curl.executable?
 
   flags = HOMEBREW_CURL_ARGS
