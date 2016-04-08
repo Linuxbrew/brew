@@ -1,3 +1,36 @@
+#:  * `tap`:
+#:    List all installed taps.
+#:
+#:  * `tap` [`--full`] <user>`/`<repo> [<URL>]:
+#:    Tap a formula repository.
+#:
+#:    With <URL> unspecified, taps a formula repository from GitHub using HTTPS.
+#:    Since so many taps are hosted on GitHub, this command is a shortcut for
+#:    `tap <user>/<repo> https://github.com/<user>/homebrew-<repo>`.
+#:
+#:    With <URL> specified, taps a formula repository from anywhere, using
+#:    any transport protocol that `git` handles. The one-argument form of `tap`
+#:    simplifies but also limits. This two-argument command makes no
+#:    assumptions, so taps can be cloned from places other than GitHub and
+#:    using protocols other than HTTPS, e.g., SSH, GIT, HTTP, FTP(S), RSYNC.
+#:
+#:    By default, the repository is cloned as a shallow copy (`--depth=1`), but
+#:    if `--full` is passed, a full clone will be used. To convert a shallow copy
+#:    to a full copy, you can retap passing `--full` without first untapping.
+#:
+#:    `tap` is re-runnable and exits successfully if there's nothing to do.
+#:    However, retapping with a different <URL> will cause an exception, so first
+#:    `untap` if you need to modify the <URL>.
+#:
+#:  * `tap` `--repair`:
+#:    Migrate tapped formulae from symlink-based to directory-based structure.
+#:
+#:  * `tap` `--list-official`:
+#:    List all official taps.
+#:
+#:  * `tap` `--list-pinned`:
+#:    List all pinned taps.
+
 require "tap"
 
 module Homebrew

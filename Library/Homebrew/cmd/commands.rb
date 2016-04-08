@@ -1,3 +1,9 @@
+#:  * `commands` [`--quiet` [`--include-aliases`]]:
+#:    Show a list of built-in and external commands.
+#:
+#:    If `--quiet` is passed, list only the names of commands without the header.
+#:    With `--include-aliases`, the aliases of internal commands will be included.
+
 module Homebrew
   def commands
     if ARGV.include? "--quiet"

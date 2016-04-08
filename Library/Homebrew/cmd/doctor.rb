@@ -1,3 +1,7 @@
+#:  * `doctor`:
+#:    Check your system for potential problems. Doctor exits with a non-zero status
+#:    if any problems are found.
+
 require "diagnostic"
 
 module Homebrew

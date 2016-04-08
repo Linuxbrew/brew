@@ -1,3 +1,12 @@
+#:  * `linkapps` [`--local`] [<formulae>]:
+#:    Find installed formulae that provide `.app`-style OS X apps and symlink them
+#:    into `/Applications`, allowing for easier access.
+#:
+#:    If no <formulae> are provided, all of them will have their apps symlinked.
+#:
+#:    If provided, `--local` will symlink them into the user's `~/Applications`
+#:    directory instead of the system directory.
+
 require "keg"
 require "formula"
 

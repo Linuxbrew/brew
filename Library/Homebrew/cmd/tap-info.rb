@@ -1,3 +1,15 @@
+#:  * `tap-info` <tap>:
+#:    Display information about <tap>.
+#:
+#:  * `tap-info` `--json=`<version> (`--installed`|<taps>):
+#:    Print a JSON representation of <taps>. Currently the only accepted value
+#:    for <version> is `v1`.
+#:
+#:    Pass `--installed` to get information on installed taps.
+#:
+#:    See the docs for examples of using the JSON:
+#:    <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md>
+
 require "tap"
 
 module Homebrew

@@ -1,3 +1,51 @@
+#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] <formula>:
+#:    Install <formula>.
+#:
+#:    <formula> is usually the name of the formula to install, but it can be specified
+#:    several different ways. See [SPECIFYING FORMULAE][].
+#:
+#:    If `--debug` is passed and brewing fails, open an interactive debugging
+#:    session with access to IRB or a shell inside the temporary build directory.
+#:
+#:    If `--env=std` is passed, use the standard build environment instead of superenv.
+#:
+#:    If `--env=super` is passed, use superenv even if the formula specifies the
+#:    standard build environment.
+#:
+#:    If `--ignore-dependencies` is passed, skip installing any dependencies of
+#:    any kind. If they are not already present, the formula will probably fail
+#:    to install.
+#:
+#:    If `--only-dependencies` is passed, install the dependencies with specified
+#:    options but do not install the specified formula.
+#:
+#:    If `--cc=`<compiler> is passed, attempt to compile using <compiler>.
+#:    <compiler> should be the name of the compiler's executable, for instance
+#:    `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
+#:    4.9.
+#:
+#:    If `--build-from-source` is passed, compile from source even if a bottle
+#:    is provided for <formula>.
+#:
+#:    If `--force-bottle` is passed, install from a bottle if it exists
+#:    for the current version of OS X, even if custom options are given.
+#:
+#:    If `--devel` is passed, and <formula> defines it, install the development version.
+#:
+#:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
+#:    aka master, trunk, unstable.
+#:
+#:    To install a newer version of HEAD use
+#:    `brew rm <foo> && brew install --HEAD <foo>`.
+#:
+#:  * `install` `--interactive` [`--git`] <formula>:
+#:    Download and patch <formula>, then open a shell. This allows the user to
+#:    run `./configure --help` and otherwise determine how to turn the software
+#:    package into a Homebrew formula.
+#:
+#:    If `--git` is passed, Homebrew will create a Git repository, useful for
+#:    creating patches to the software.
+
 require "blacklist"
 require "diagnostic"
 require "cmd/search"

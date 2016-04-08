@@ -1,3 +1,9 @@
+#:  * `update` [`--rebase`]:
+#:    Fetch the newest version of Homebrew and all formulae from GitHub using
+#:     `git`(1).
+#:
+#:    If `--rebase` is specified then `git pull --rebase` is used.
+
 brew() {
   "$HOMEBREW_BREW_FILE" "$@"
 }

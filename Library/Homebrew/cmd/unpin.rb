@@ -1,3 +1,7 @@
+#:  * `unpin` <formulae>:
+#:    Unpin <formulae>, allowing them to be upgraded by `brew upgrade`. See also
+#:    `pin`.
+
 require "formula"
 
 module Homebrew

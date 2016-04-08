@@ -1,3 +1,6 @@
+#:  * `reinstall` <formula>:
+#:    Uninstall then install <formula>
+
 require "formula_installer"
 
 module Homebrew

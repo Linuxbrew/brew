@@ -1,3 +1,9 @@
+#:  * `edit`:
+#:    Open all of Homebrew for editing.
+#:
+#:  * `edit` <formula>:
+#:    Open <formula> in the editor.
+
 require "formula"
 
 module Homebrew

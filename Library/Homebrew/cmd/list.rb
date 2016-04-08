@@ -1,3 +1,22 @@
+#:  * `list`, `ls` [`--full-name`]:
+#:    List all installed formulae. If `--full-name` is passed, print formulae with
+#:    full-qualified names.
+#:
+#:  * `list`, `ls` `--unbrewed`:
+#:    List all files in the Homebrew prefix not installed by Homebrew.
+#:
+#:  * `list`, `ls` [`--versions` [`--multiple`]] [`--pinned`] [<formulae>]:
+#:    List the installed files for <formulae>. Combined with `--verbose`, recursively
+#:    list the contents of all subdirectories in each <formula>'s keg.
+#:
+#:    If `--versions` is passed, show the version number for installed formulae,
+#:    or only the specified formulae if <formulae> are given. With `--multiple`,
+#:    only show formulae with multiple versions installed.
+#:
+#:    If `--pinned` is passed, show the versions of pinned formulae, or only the
+#:    specified (pinned) formulae if <formulae> are given.
+#:    See also `pin`, `unpin`.
+
 require "metafiles"
 require "formula"
 

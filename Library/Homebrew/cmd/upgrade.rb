@@ -1,3 +1,13 @@
+#:  * `upgrade` [<install-options>] [`--cleanup`] [<formulae>]:
+#:    Upgrade outdated, unpinned brews.
+#:
+#:    Options for the `install` command are also valid here.
+#:
+#:    If `--cleanup` is specified then remove previously installed <formula> version(s).
+#:
+#:    If <formulae> are given, upgrade only the specified brews (but do so even
+#:    if they are pinned; see `pin`, `unpin`).
+
 require "cmd/install"
 require "cleanup"
 

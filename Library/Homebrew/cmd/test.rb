@@ -1,3 +1,17 @@
+#:  * `test` [`--devel`|`--HEAD`] [`--debug`] <formula>:
+#:    A few formulae provide a test method. `brew test` <formula> runs this
+#:    test method. There is no standard output or return code, but it should
+#:    generally indicate to the user if something is wrong with the installed
+#:    formula.
+#:
+#:    To test the development or head version of a formula, use `--devel` or
+#:    `--HEAD`.
+#:
+#:    If `--debug` is passed and the test fails, an interactive debugger will be
+#:    launched with access to IRB or a shell inside the temporary test directory.
+#:
+#:    Example: `brew install jruby && brew test jruby`
+
 require "extend/ENV"
 require "formula_assertions"
 require "sandbox"

@@ -1,3 +1,20 @@
+#:  * `uses` [`--installed`] [`--recursive`] [`--skip-build`] [`--skip-optional`] [`--devel`|`--HEAD`] <formulae>:
+#:    Show the formulae that specify <formulae> as a dependency. When given
+#:    multiple formula arguments, show the intersection of formulae that use
+#:    <formulae>.
+#:
+#:    Use `--recursive` to resolve more than one level of dependencies.
+#:
+#:    If `--installed` is passed, only list installed formulae.
+#:
+#:    By default, `uses` shows all formulae that specify <formulae> as a dependency.
+#:    To skip the `:build` type dependencies, pass `--skip-build`. Similarly, pass
+#:    `--skip-optional` to skip `:optional` dependencies.
+#:
+#:    By default, `uses` shows usages of `formula` by stable builds. To find
+#:    cases where `formula` is used by development or HEAD build, pass
+#:    `--devel` or `--HEAD`.
+
 require "formula"
 
 # `brew uses foo bar` returns formulae that use both foo and bar

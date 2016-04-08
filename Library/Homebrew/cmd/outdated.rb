@@ -1,3 +1,17 @@
+#:  * `outdated` [`--quiet`|`--verbose`|`--json=v1`]:
+#:    Show formulae that have an updated version available.
+#:
+#:    By default, version information is displayed in interactive shells, and
+#:    suppressed otherwise.
+#:
+#:    If `--quiet` is passed, list only the names of outdated brews (takes
+#:    precedence over `--verbose`).
+#:
+#:    If `--verbose` is passed, display detailed version information.
+#:
+#:    If `--json=`<version> is passed, the output will be in JSON format. The only
+#:    valid version is `v1`.
+
 require "formula"
 require "keg"
 

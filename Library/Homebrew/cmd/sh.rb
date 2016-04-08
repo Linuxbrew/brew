@@ -1,3 +1,10 @@
+#:  * `sh` [`--env=std`]:
+#:    Instantiate a Homebrew build environment. Uses our years-battle-hardened
+#:    Homebrew build logic to help your `./configure && make && make install`
+#:    or even your `gem install` succeed. Especially handy if you run Homebrew
+#:    in an Xcode-only configuration since it adds tools like `make` to your `PATH`
+#:    which otherwise build-systems would not find.
+
 require "extend/ENV"
 require "formula"
 

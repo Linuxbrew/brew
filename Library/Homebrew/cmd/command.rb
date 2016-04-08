@@ -1,3 +1,6 @@
+#:  * `command` <cmd>:
+#:    Display the path to the file which is used when invoking `brew` <cmd>.
+
 module Homebrew
   def command
     abort "This command requires a command argument" if ARGV.empty?

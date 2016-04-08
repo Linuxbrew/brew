@@ -1,3 +1,21 @@
+#:  * `info` <formula>:
+#:    Display information about <formula>.
+#:
+#:  * `info` `--github` <formula>:
+#:    Open a browser to the GitHub History page for formula <formula>.
+#:
+#:    To view formula history locally: `brew log -p <formula>`.
+#:
+#:  * `info` `--json=`<version> (`--all`|`--installed`|<formulae>):
+#:    Print a JSON representation of <formulae>. Currently the only accepted value
+#:    for <version> is `v1`.
+#:
+#:    Pass `--all` to get information on all formulae, or `--installed` to get
+#:    information on all installed formulae.
+#:
+#:    See the docs for examples of using the JSON:
+#:    <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md>
+
 require "blacklist"
 require "caveats"
 require "options"

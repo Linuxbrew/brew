@@ -1,3 +1,9 @@
+#:  * `home`:
+#:    Open Homebrew's own homepage in a browser.
+#:
+#:  * `home` <formula>:
+#:    Open <formula>'s homepage in a browser.
+
 module Homebrew
   def home
     if ARGV.named.empty?

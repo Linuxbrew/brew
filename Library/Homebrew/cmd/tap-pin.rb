@@ -1,3 +1,7 @@
+#:  * `tap-pin` <tap>:
+#:    Pin <tap>, prioritizing its formulae over core when formula names are supplied
+#:    by the user. See also `tap-unpin`.
+
 require "tap"
 
 module Homebrew

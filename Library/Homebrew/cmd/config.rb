@@ -1,3 +1,8 @@
+#:  * `config`:
+#:    Show Homebrew and system configuration useful for debugging. If you file
+#:    a bug report, you will likely be asked for this information if you do not
+#:    provide it.
+
 require "hardware"
 require "software_spec"
 require "rexml/document"

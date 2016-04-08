@@ -1,3 +1,23 @@
+#:  * `fetch` [`--force`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] <formulae>:
+#:    Download the source packages for the given <formulae>.
+#:    For tarballs, also print SHA-1 and SHA-256 checksums.
+#:
+#:    If `--HEAD` or `--devel` is passed, fetch that version instead of the
+#:    stable version.
+#:
+#:    If `-v` is passed, do a verbose VCS checkout, if the URL represents a CVS.
+#:    This is useful for seeing if an existing VCS cache has been updated.
+#:
+#:    If `--force` is passed, remove a previously cached version and re-fetch.
+#:
+#:    If `--deps` is passed, also download dependencies for any listed <formulae>.
+#:
+#:    If `--build-from-source` is passed, download the source rather than a
+#:    bottle.
+#:
+#:    If `--force-bottle` is passed, download a bottle if it exists for the current
+#:    version of OS X, even if it would not be used during installation.
+
 require "formula"
 
 module Homebrew

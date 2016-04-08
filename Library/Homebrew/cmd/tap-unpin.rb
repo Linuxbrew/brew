@@ -1,3 +1,6 @@
+#:  * `tap-unpin` <tap>:
+#:    Unpin <tap> so its formulae are no longer prioritized. See also `tap-pin`.
+
 require "tap"
 
 module Homebrew

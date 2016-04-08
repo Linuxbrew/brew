@@ -1,3 +1,14 @@
+#:  * `unlinkapps` [`--local`] [`--dry-run`] [<formulae>]:
+#:    Remove symlinks created by `brew linkapps` from `/Applications`.
+#:
+#:    If no <formulae> are provided, all linked apps will be removed.
+#:
+#:    If provided, `--local` will remove symlinks from the user's `~/Applications`
+#:    directory instead of the system directory.
+#:
+#:    If `--dry-run` or `-n` is passed, Homebrew will list all symlinks which
+#:    would be removed, but will not actually delete any files.
+
 require "cmd/linkapps"
 
 module Homebrew
