@@ -221,10 +221,10 @@ into <code>/Applications</code>, allowing for easier access.</p>
 
 <p>If provided, <code>--local</code> will symlink them into the user's <code>~/Applications</code>
 directory instead of the system directory.</p></dd>
-<dt><code>ls</code>, <code>list</code> [<code>--full-name</code>]</dt><dd><p>List all installed formulae. If <code>--full-name</code> is passed, print formulae with
+<dt><code>list</code>, <code>ls</code> [<code>--full-name</code>]</dt><dd><p>List all installed formulae. If <code>--full-name</code> is passed, print formulae with
 full-qualified names.</p></dd>
-<dt><code>ls</code>, <code>list</code> <code>--unbrewed</code></dt><dd><p>List all files in the Homebrew prefix not installed by Homebrew.</p></dd>
-<dt><code>ls</code>, <code>list</code> [<code>--versions</code> [<code>--multiple</code>]] [<code>--pinned</code>] [<var>formulae</var>]</dt><dd><p>List the installed files for <var>formulae</var>. Combined with <code>--verbose</code>, recursively
+<dt><code>list</code>, <code>ls</code> <code>--unbrewed</code></dt><dd><p>List all files in the Homebrew prefix not installed by Homebrew.</p></dd>
+<dt><code>list</code>, <code>ls</code> [<code>--versions</code> [<code>--multiple</code>]] [<code>--pinned</code>] [<var>formulae</var>]</dt><dd><p>List the installed files for <var>formulae</var>. Combined with <code>--verbose</code>, recursively
 list the contents of all subdirectories in each <var>formula</var>'s keg.</p>
 
 <p>If <code>--versions</code> is passed, show the version number for installed formulae,
@@ -236,14 +236,14 @@ specified (pinned) formulae if <var>formulae</var> are given.
 See also <code>pin</code>, <code>unpin</code>.</p></dd>
 <dt><code>log</code> [<code>git-log-options</code>] <var>formula</var> ...</dt><dd><p>Show the git log for the given formulae. Options that <code>git-log</code>(1)
 recognizes can be passed before the formula list.</p></dd>
-<dt><code>missing</code> [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies.</p>
-
-<p>If no <var>formulae</var> are given, check all installed brews.</p></dd>
 <dt><code>migrate</code> [<code>--force</code>] <var>formulae</var></dt><dd><p>Migrate renamed packages to new name, where <var>formulae</var> are old names of
 packages.</p>
 
 <p>If <code>--force</code> is passed, then treat installed <var>formulae</var> and passed <var>formulae</var>
 like if they are from same taps and migrate them anyway.</p></dd>
+<dt><code>missing</code> [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies.</p>
+
+<p>If no <var>formulae</var> are given, check all installed brews.</p></dd>
 <dt><code>options</code> [<code>--compact</code>] (<code>--all</code>|<code>--installed</code>|<var>formulae</var>)</dt><dd><p>Display install options specific to <var>formulae</var>.</p>
 
 <p>If <code>--compact</code> is passed, show all options on a single line separated by
@@ -274,10 +274,6 @@ created by <code>brew linkapps</code>.</p>
 <p>If <code>--dry-run</code> or <code>-n</code> is passed, show what would be removed, but do not
 actually remove anything.</p></dd>
 <dt><code>reinstall</code> <var>formula</var></dt><dd><p>Uninstall then install <var>formula</var></p></dd>
-<dt><code>rm</code>, <code>remove</code>, <code>uninstall</code> [<code>--force</code>] <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p>
-
-<p>If <code>--force</code> is passed, and there are multiple versions of <var>formula</var>
-installed, delete all installed versions.</p></dd>
 <dt><code>search</code>, <code>-S</code></dt><dd><p>Display all locally available formulae for brewing (including tapped ones).
 No online search is performed if called without arguments.</p></dd>
 <dt><code>search</code>, <code>-S</code> <var>text</var>|<code>/</code><var>text</var><code>/</code></dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
@@ -336,6 +332,10 @@ formula.</p>
 launched with access to IRB or a shell inside the temporary test directory.</p>
 
 <p>Example: <code>brew install jruby &amp;&amp; brew test jruby</code></p></dd>
+<dt><code>uninstall</code>, <code>rm</code>, <code>remove</code> [<code>--force</code>] <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p>
+
+<p>If <code>--force</code> is passed, and there are multiple versions of <var>formula</var>
+installed, delete all installed versions.</p></dd>
 <dt><code>unlink</code> [<code>--dry-run</code>] <var>formula</var></dt><dd><p>Remove symlinks for <var>formula</var> from the Homebrew prefix. This can be useful
 for temporarily disabling a formula:
 <code>brew unlink foo &amp;&amp; commands &amp;&amp; brew link foo</code>.</p>

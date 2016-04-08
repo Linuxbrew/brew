@@ -275,14 +275,14 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If provided, `--local` will symlink them into the user's `~/Applications`
     directory instead of the system directory.
 
-  * `ls`, `list` [`--full-name`]:
+  * `list`, `ls` [`--full-name`]:
     List all installed formulae. If `--full-name` is passed, print formulae with
     full-qualified names.
 
-  * `ls`, `list` `--unbrewed`:
+  * `list`, `ls` `--unbrewed`:
     List all files in the Homebrew prefix not installed by Homebrew.
 
-  * `ls`, `list` [`--versions` [`--multiple`]] [`--pinned`] [<formulae>]:
+  * `list`, `ls` [`--versions` [`--multiple`]] [`--pinned`] [<formulae>]:
     List the installed files for <formulae>. Combined with `--verbose`, recursively
     list the contents of all subdirectories in each <formula>'s keg.
 
@@ -298,17 +298,17 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Show the git log for the given formulae. Options that `git-log`(1)
     recognizes can be passed before the formula list.
 
-  * `missing` [<formulae>]:
-    Check the given <formulae> for missing dependencies.
-
-    If no <formulae> are given, check all installed brews.
-
   * `migrate` [`--force`] <formulae>:
     Migrate renamed packages to new name, where <formulae> are old names of
     packages.
 
     If `--force` is passed, then treat installed <formulae> and passed <formulae>
     like if they are from same taps and migrate them anyway.
+
+  * `missing` [<formulae>]:
+    Check the given <formulae> for missing dependencies.
+
+    If no <formulae> are given, check all installed brews.
 
   * `options` [`--compact`] (`--all`|`--installed`|<formulae>):
     Display install options specific to <formulae>.
@@ -349,12 +349,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `reinstall` <formula>:
     Uninstall then install <formula>
-
-  * `rm`, `remove`, `uninstall` [`--force`] <formula>:
-    Uninstall <formula>.
-
-    If `--force` is passed, and there are multiple versions of <formula>
-    installed, delete all installed versions.
 
   * `search`, `-S`:
     Display all locally available formulae for brewing (including tapped ones).
@@ -443,6 +437,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     launched with access to IRB or a shell inside the temporary test directory.
 
     Example: `brew install jruby && brew test jruby`
+
+  * `uninstall`, `rm`, `remove` [`--force`] <formula>:
+    Uninstall <formula>.
+
+    If `--force` is passed, and there are multiple versions of <formula>
+    installed, delete all installed versions.
 
   * `unlink` [`--dry-run`] <formula>:
     Remove symlinks for <formula> from the Homebrew prefix. This can be useful
