@@ -6,7 +6,7 @@ It can be installed in your home directory and does not require root access. The
 
 Features, usage and installation instructions are [summarised on the homepage](http://linuxbrew.sh).
 
-To receive updates of major changes to Linuxbrew subscribe to the [Linuxbrew Updates](https://github.com/Linuxbrew/linuxbrew/issues/864) issue on GitHub.
+To receive updates of major changes to Linuxbrew subscribe to the [Linuxbrew Updates](https://github.com/Linuxbrew/linuxbrew/issues/1000) issue on GitHub.
 
 Install Linuxbrew (tl;dr)
 -------------------------
