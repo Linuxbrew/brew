@@ -154,7 +154,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `fetch` [`--force`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] <formulae>:
     Download the source packages for the given <formulae>.
-    For tarballs, also print SHA-1 and SHA-256 checksums.
+    For tarballs, also print SHA-256 checksums.
 
     If `--HEAD` or `--devel` is passed, fetch that version instead of the
     stable version.
