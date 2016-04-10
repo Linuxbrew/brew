@@ -83,8 +83,9 @@ begin
       if help_text.nil?
         # External command, let it handle help by itself
       elsif help_text.empty?
-        puts "No help available for #{cmd}"
-        exit 1
+        opoo "No help available for '#{cmd}' command."
+        puts ARGV.usage
+        exit 0
       else
         puts help_text
         exit 0
