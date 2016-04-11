@@ -1,3 +1,4 @@
+require "set"
 require "formula"
 require "formula_versions"
 
@@ -123,9 +124,22 @@ class Descriptions
   # print them.
   def print
     blank = "#{Tty.yellow}[no description]#{Tty.reset}"
-    @descriptions.keys.sort.each do |name|
-      description = @descriptions[name] || blank
-      puts "#{Tty.white}#{name}:#{Tty.reset} #{description}"
+    @descriptions.keys.sort.each do |full_name|
+      short_name = short_names[full_name]
+      printed_name = short_name_counts[short_name] == 1 ? short_name : full_name
+      description = @descriptions[full_name] || blank
+      puts "#{Tty.white}#{printed_name}:#{Tty.reset} #{description}"
     end
+  end
+
+  private
+
+  def short_names
+    @short_names ||= Hash[@descriptions.keys.map { |k| [k, k.split("/").last] }]
+  end
+
+  def short_name_counts
+    @short_name_counts ||=
+      short_names.values.reduce(Hash.new(0)) { |counts, name| counts[name] += 1; counts }
   end
 end
