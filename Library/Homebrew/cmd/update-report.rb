@@ -4,6 +4,13 @@ require "formulary"
 require "descriptions"
 
 module Homebrew
+  def update_preinstall_header
+    @header_already_printed ||= begin
+      ohai "Auto-updated Homebrew!" if ARGV.include?("--preinstall")
+      true
+    end
+  end
+
   def update_report
     install_core_tap_if_necessary
 
@@ -17,6 +24,7 @@ module Homebrew
     end
 
     if initial_revision != current_revision
+      update_preinstall_header
       puts "Updated Homebrew from #{shorten_revision(initial_revision)} to #{shorten_revision(current_revision)}."
       updated = true
     end
@@ -37,13 +45,14 @@ module Homebrew
     end
 
     unless updated_taps.empty?
+      update_preinstall_header
       puts "Updated #{updated_taps.size} tap#{plural(updated_taps.size)} " \
            "(#{updated_taps.join(", ")})."
       updated = true
     end
 
     if !updated
-      puts "Already up-to-date."
+      puts "Already up-to-date." unless ARGV.include?("--preinstall")
     elsif hub.empty?
       puts "No changes to formulae."
     else

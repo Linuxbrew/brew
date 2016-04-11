@@ -213,7 +213,14 @@ pull() {
 
   trap '' SIGINT
 
-  pop_stash_message
+  if [[ -n "$HOMEBREW_DEVELOPER" ]] &&
+     [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+  then
+    git checkout "${QUIET_ARGS[@]}" "$INITIAL_BRANCH"
+    pop_stash
+  else
+    pop_stash_message
+  fi
 
   trap - SIGINT
 }
@@ -231,6 +238,7 @@ homebrew-update() {
       --debug) HOMEBREW_DEBUG=1;;
       --rebase) HOMEBREW_REBASE=1 ;;
       --simulate-from-current-branch) HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH=1 ;;
+      --preinstall) HOMEBREW_UPDATE_PREINSTALL=1 ;;
       --*) ;;
       -*)
         [[ "$option" = *v* ]] && HOMEBREW_VERBOSE=1;
@@ -316,11 +324,21 @@ EOS
            --header "If-None-Match: \"$UPSTREAM_BRANCH_LOCAL_SHA\"" \
            "https://api.github.com/repos/$UPSTREAM_REPOSITORY/commits/$UPSTREAM_BRANCH")"
         [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
+      elif [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
+      then
+        # Don't try to do a `git fetch` that may take longer than expected.
+        exit
       fi
 
-      git fetch --force "${QUIET_ARGS[@]}" origin \
-        "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH" || \
-          odie "Fetching $DIR failed!"
+      if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
+      then
+        git fetch --force "${QUIET_ARGS[@]}" origin \
+          "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH" 2>/dev/null
+      else
+        git fetch --force "${QUIET_ARGS[@]}" origin \
+          "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH" || \
+            odie "Fetching $DIR failed!"
+      fi
     ) &
   done
 

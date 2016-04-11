@@ -230,6 +230,19 @@ then
     & disown
 fi
 
+update-preinstall() {
+  [[ -n "$HOMEBREW_AUTO_UPDATE" ]] || return
+  [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
+
+  if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" ]]
+  then
+    # Hide shellcheck complaint:
+    # shellcheck source=/dev/null
+    source "$HOMEBREW_LIBRARY/Homebrew/cmd/update.sh"
+    homebrew-update --preinstall
+  fi
+}
+
 if [[ -n "$HOMEBREW_BASH_COMMAND" ]]
 then
   # source rather than executing directly to ensure the entire file is read into
@@ -240,9 +253,9 @@ then
   # Hide shellcheck complaint:
   # shellcheck source=/dev/null
   source "$HOMEBREW_BASH_COMMAND"
-  { "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
+  { update-preinstall; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
 else
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
-  exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/brew.rb" "$@"
+  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/brew.rb" "$@"; }
 fi
