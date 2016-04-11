@@ -523,6 +523,7 @@ class FormulaInstaller
     args << "--debug" if debug?
     args << "--cc=#{ARGV.cc}" if ARGV.cc
     args << "--default-fortran-flags" if ARGV.include? "--default-fortran-flags"
+    args << "--keep-tmp" if ARGV.keep_tmp?
 
     if ARGV.env
       args << "--env=#{ARGV.env}"
@@ -567,18 +568,14 @@ class FormulaInstaller
     ].concat(build_argv)
 
     if Sandbox.available? && ARGV.sandbox?
-      if Sandbox.auto_disable?
-        Sandbox.print_autodisable_warning
-      else
-        Sandbox.print_sandbox_message
-      end
+      Sandbox.print_sandbox_message
     end
 
     Utils.safe_fork do
       # Invalidate the current sudo timestamp in case a build script calls sudo
       system "/usr/bin/sudo", "-k"
 
-      if Sandbox.available? && ARGV.sandbox? && !Sandbox.auto_disable?
+      if Sandbox.available? && ARGV.sandbox?
         sandbox = Sandbox.new
         formula.logs.mkpath
         sandbox.record_log(formula.logs/"sandbox.build.log")

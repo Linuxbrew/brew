@@ -21,6 +21,7 @@
 # --verbose:       Print test step output in realtime. Has the side effect of passing output
 #                  as raw bytes instead of re-encoding in UTF-8.
 # --fast:          Don't install any packages, but run e.g. audit anyway.
+# --keep-tmp:      Keep temporary files written by main installs and tests that are run.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -532,7 +533,12 @@ module Homebrew
       end
       test "brew", "fetch", "--retry", *fetch_args
       test "brew", "uninstall", "--force", formula_name if formula.installed?
-      install_args = ["--verbose"]
+
+      # shared_*_args are applied to both the main and --devel spec
+      shared_install_args = ["--verbose"]
+      shared_install_args << "--keep-tmp" if ARGV.keep_tmp?
+      # install_args is just for the main (stable, or devel if in a devel-only tap) spec
+      install_args = []
       install_args << "--build-bottle" if !ARGV.include?("--fast") && !ARGV.include?("--no-bottle") && !formula.bottle_disabled?
       install_args << "--HEAD" if ARGV.include? "--HEAD"
 
@@ -548,6 +554,7 @@ module Homebrew
         formula_bottled = formula.bottled?
       end
 
+      install_args.concat(shared_install_args)
       install_args << formula_name
       # Don't care about e.g. bottle failures for dependencies.
       install_passed = false
@@ -582,7 +589,9 @@ module Homebrew
             test "brew", "install", bottle_filename
           end
         end
-        test "brew", "test", "--verbose", formula_name if formula.test_defined?
+        shared_test_args = ["--verbose"]
+        shared_test_args << "--keep-tmp" if ARGV.keep_tmp?
+        test "brew", "test", formula_name, *shared_test_args if formula.test_defined?
         testable_dependents.each do |dependent|
           unless dependent.installed?
             test "brew", "fetch", "--retry", dependent.name
@@ -607,11 +616,13 @@ module Homebrew
          && !ARGV.include?("--HEAD") && !ARGV.include?("--fast") \
          && satisfied_requirements?(formula, :devel)
         test "brew", "fetch", "--retry", "--devel", *fetch_args
-        run_as_not_developer { test "brew", "install", "--devel", "--verbose", formula_name }
+        run_as_not_developer do
+          test "brew", "install", "--devel", formula_name, *shared_install_args
+        end
         devel_install_passed = steps.last.passed?
         test "brew", "audit", "--devel", *audit_args
         if devel_install_passed
-          test "brew", "test", "--devel", "--verbose", formula_name if formula.test_defined?
+          test "brew", "test", "--devel", formula_name, *shared_test_args if formula.test_defined?
           test "brew", "uninstall", "--devel", "--force", formula_name
         end
       end

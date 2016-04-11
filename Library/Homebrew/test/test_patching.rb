@@ -122,7 +122,7 @@ class PatchingTests < Homebrew::TestCase
             url PATCH_URL_A
             sha256 PATCH_A_SHA256
           end
-        end.brew(&:patch)
+        end.brew { |f, _staging| f.patch }
       end
     end
   end
@@ -136,7 +136,7 @@ class PatchingTests < Homebrew::TestCase
             sha256 TESTBALL_PATCHES_SHA256
             apply APPLY_A
           end
-        end.brew(&:patch)
+        end.brew { |f, _staging| f.patch }
       end
     end
   end
@@ -234,7 +234,7 @@ class PatchingTests < Homebrew::TestCase
             sha256 TESTBALL_PATCHES_SHA256
             apply "patches/#{APPLY_A}"
           end
-        end.brew(&:patch)
+        end.brew { |f, _staging| f.patch }
       end
     end
   end

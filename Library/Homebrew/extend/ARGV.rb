@@ -120,6 +120,10 @@ module HomebrewArgvExtension
     include?("--dry-run") || switch?("n")
   end
 
+  def keep_tmp?
+    include? "--keep-tmp"
+  end
+
   def git?
     flag? "--git"
   end

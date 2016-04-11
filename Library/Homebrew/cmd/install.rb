@@ -1,4 +1,4 @@
-#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] <formula>:
+#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] <formula>:
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -34,6 +34,9 @@
 #:
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
 #:    aka master, trunk, unstable.
+#:
+#:    If `--keep-tmp` is passed, the temporary files created for the test are
+#:    not deleted.
 #:
 #:    To install a newer version of HEAD use
 #:    `brew rm <foo> && brew install --HEAD <foo>`.

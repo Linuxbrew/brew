@@ -920,14 +920,19 @@ class Formula
     end
   end
 
-  # yields self with current working directory set to the uncompressed tarball
+  # yields |self,staging| with current working directory set to the uncompressed tarball
+  # where staging is a Mktemp staging context
   # @private
   def brew
-    stage do
+    stage do |staging|
+      staging.retain! if ARGV.keep_tmp?
       prepare_patches
 
       begin
-        yield self
+        yield self, staging
+      rescue StandardError
+        staging.retain! if ARGV.interactive? || ARGV.debug?
+        raise
       ensure
         cp Dir["config.log", "CMakeCache.txt"], logs
       end
@@ -1320,11 +1325,17 @@ class Formula
   def run_test
     old_home = ENV["HOME"]
     build, self.build = self.build, Tab.for_formula(self)
-    mktemp do
-      @testpath = Pathname.pwd
+    mktemp("#{name}-test") do |staging|
+      staging.retain! if ARGV.keep_tmp?
+      @testpath = staging.tmpdir
       ENV["HOME"] = @testpath
       setup_home @testpath
-      test
+      begin
+        test
+      rescue Exception
+        staging.retain! if ARGV.debug?
+        raise
+      end
     end
   ensure
     @testpath = nil
@@ -1537,7 +1548,7 @@ class Formula
   end
 
   def stage
-    active_spec.stage do
+    active_spec.stage do |_resource, staging|
       @source_modified_time = active_spec.source_modified_time
       @buildpath = Pathname.pwd
       env_home = buildpath/".brew_home"
@@ -1547,7 +1558,7 @@ class Formula
       setup_home env_home
 
       begin
-        yield
+        yield staging
       ensure
         @buildpath = nil
         ENV["HOME"] = old_home

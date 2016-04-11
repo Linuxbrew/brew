@@ -1,4 +1,4 @@
-#:  * `test` [`--devel`|`--HEAD`] [`--debug`] <formula>:
+#:  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] <formula>:
 #:    A few formulae provide a test method. `brew test` <formula> runs this
 #:    test method. There is no standard output or return code, but it should
 #:    generally indicate to the user if something is wrong with the installed
@@ -9,6 +9,9 @@
 #:
 #:    If `--debug` is passed and the test fails, an interactive debugger will be
 #:    launched with access to IRB or a shell inside the temporary test directory.
+#:
+#:    If `--keep-tmp` is passed, the temporary files created for the test are
+#:    not deleted.
 #:
 #:    Example: `brew install jruby && brew test jruby`
 
@@ -55,15 +58,11 @@ module Homebrew
         end
 
         if Sandbox.available? && !ARGV.no_sandbox?
-          if Sandbox.auto_disable?
-            Sandbox.print_autodisable_warning
-          else
-            Sandbox.print_sandbox_message
-          end
+          Sandbox.print_sandbox_message
         end
 
         Utils.safe_fork do
-          if Sandbox.available? && !ARGV.no_sandbox? && !Sandbox.auto_disable?
+          if Sandbox.available? && !ARGV.no_sandbox?
             sandbox = Sandbox.new
             f.logs.mkpath
             sandbox.record_log(f.logs/"sandbox.test.log")

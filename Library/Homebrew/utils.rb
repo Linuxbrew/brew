@@ -172,8 +172,7 @@ def interactive_shell(f = nil)
   if $?.success?
     return
   elsif $?.exited?
-    puts "Aborting due to non-zero exit status"
-    exit $?.exitstatus
+    raise "Aborted due to non-zero exit status (#{$?.exitstatus})"
   else
     raise $?.inspect
   end
