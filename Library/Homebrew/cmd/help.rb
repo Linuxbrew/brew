@@ -41,6 +41,7 @@ module Homebrew
   end
 
   def help_for_command(cmd)
+    cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
     cmd_path = if File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh")
       HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh"
     elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh")
