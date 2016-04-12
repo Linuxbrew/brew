@@ -145,32 +145,13 @@ class Tap
     user == "Homebrew"
   end
 
-  # @private
-  def read_and_set_private_config
-    case config["private"]
-    when "true" then true
-    when "false" then false
-    else
-      config["private"] = begin
-        if custom_remote?
-          true
-        else
-          GitHub.private_repo?(user, "homebrew-#{repo}")
-        end
-      rescue GitHub::HTTPNotFoundError
-        true
-      rescue GitHub::Error
-        false
-      end
-    end
-  end
-
   # True if the remote of this {Tap} is a private repository.
   def private?
     return @private if instance_variable_defined?(:@private)
-    @private = read_and_set_private_config
+    @private = read_or_set_private_config
   end
 
+  # {TapConfig} of this {Tap}
   def config
     @config ||= begin
       raise TapUnavailableError, name unless installed?
@@ -489,6 +470,28 @@ class Tap
   def alias_file_to_name(file)
     "#{name}/#{file.basename}"
   end
+
+  private
+
+  def read_or_set_private_config
+    case config["private"]
+    when "true" then true
+    when "false" then false
+    else
+      config["private"] = begin
+        if custom_remote?
+          true
+        else
+          GitHub.private_repo?(user, "homebrew-#{repo}")
+        end
+      rescue GitHub::HTTPNotFoundError
+        true
+      rescue GitHub::Error
+        false
+      end
+    end
+  end
+
 end
 
 # A specialized {Tap} class for the core formulae
@@ -593,6 +596,7 @@ class CoreTap < Tap
   end
 end
 
+# Permanent configuration per {Tap} using `git-config(1)`
 class TapConfig
   attr_reader :tap
 

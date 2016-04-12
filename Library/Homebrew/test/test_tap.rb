@@ -231,6 +231,16 @@ class TapTest < Homebrew::TestCase
     @tap.unpin
     refute_predicate @tap, :pinned?
   end
+
+  def test_config
+    setup_git_repo
+
+    assert_nil @tap.config["foo"]
+    @tap.config["foo"] = "bar"
+    assert_equal "bar", @tap.config["foo"]
+    @tap.config["foo"] = nil
+    assert_nil @tap.config["foo"]
+  end
 end
 
 class CoreTapTest < Homebrew::TestCase
