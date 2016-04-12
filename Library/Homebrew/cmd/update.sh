@@ -320,7 +320,7 @@ EOS
         UPSTREAM_SHA_HTTP_CODE="$("$HOMEBREW_CURL" --silent '--max-time' 3 \
            --output /dev/null --write-out "%{http_code}" \
            --user-agent "$HOMEBREW_USER_AGENT_CURL" \
-           --header "Accept: application/vnd.github.chitauri-preview+sha" \
+           --header "Accept: application/vnd.github.v3.sha" \
            --header "If-None-Match: \"$UPSTREAM_BRANCH_LOCAL_SHA\"" \
            "https://api.github.com/repos/$UPSTREAM_REPOSITORY/commits/$UPSTREAM_BRANCH")"
         [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
