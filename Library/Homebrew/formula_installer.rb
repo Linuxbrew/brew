@@ -202,7 +202,10 @@ class FormulaInstaller
 
     oh1 "Installing #{Tty.green}#{formula.full_name}#{Tty.reset}" if show_header?
 
-    report_analytics_event("install", formula.full_name)
+    if formula.tap && !formula.tap.private?
+      options = effective_build_options_for(formula).used_options.to_a.join(" ")
+      report_analytics_event("install", "#{formula.full_name} #{options}".strip)
+    end
 
     @@attempted << formula
 
