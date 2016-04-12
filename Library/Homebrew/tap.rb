@@ -77,6 +77,8 @@ class Tap
     @command_files = nil
     @formula_renames = nil
     @tap_migrations = nil
+    @config = nil
+    remove_instance_variable(:@private) if instance_variable_defined?(:@private)
   end
 
   # The remote path to this {Tap}.
@@ -143,14 +145,37 @@ class Tap
     user == "Homebrew"
   end
 
+  # @private
+  def read_and_set_private_config
+    case config["private"]
+    when "true" then true
+    when "false" then false
+    else
+      config["private"] = begin
+        if custom_remote?
+          true
+        else
+          GitHub.private_repo?(user, "homebrew-#{repo}")
+        end
+      rescue GitHub::HTTPNotFoundError
+        true
+      rescue GitHub::Error
+        false
+      end
+    end
+  end
+
   # True if the remote of this {Tap} is a private repository.
   def private?
-    return true if custom_remote?
-    GitHub.private_repo?(user, "homebrew-#{repo}")
-  rescue GitHub::HTTPNotFoundError
-    true
-  rescue GitHub::Error
-    false
+    return @private if instance_variable_defined?(:@private)
+    @private = read_and_set_private_config
+  end
+
+  def config
+    @config ||= begin
+      raise TapUnavailableError, name unless installed?
+      TapConfig.new(self)
+    end
   end
 
   # True if this {Tap} has been installed.
@@ -565,5 +590,32 @@ class CoreTap < Tap
   # @private
   def alias_file_to_name(file)
     file.basename.to_s
+  end
+end
+
+class TapConfig
+  attr_reader :tap
+
+  def initialize(tap)
+    @tap = tap
+  end
+
+  def [](key)
+    return unless tap.git?
+    return unless Utils.git_available?
+
+    tap.path.cd do
+      Utils.popen_read("git", "config", "--local", "--get", "homebrew.#{key}").chuzzle
+    end
+  end
+
+  def []=(key, value)
+    return unless tap.git?
+    return unless Utils.git_available?
+
+    tap.path.cd do
+      safe_system "git", "config", "--local", "--replace-all", "homebrew.#{key}", value.to_s
+    end
+    value
   end
 end
