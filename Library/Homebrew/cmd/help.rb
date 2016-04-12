@@ -56,7 +56,10 @@ module Homebrew
     cmd_path.read.
       split("\n").
       grep(/^#:/).
-      map { |line| line.slice(2..-1).delete("`").sub(/^  \* /, "brew ") }.
-      join("\n")
+      map do |line|
+        line.slice(2..-1).sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ").
+        gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}").
+        gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}")
+      end.join("\n")
   end
 end
