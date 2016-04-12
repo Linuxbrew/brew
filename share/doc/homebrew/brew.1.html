@@ -472,7 +472,7 @@ developers (active or budding).</p></dd>
 <dt><code>HOMEBREW_EDITOR</code></dt><dd><p>If set, Homebrew will use this editor when editing a single formula, or
 several formulae in the same directory.</p>
 
-<p><em>NOTE</em>: <code>brew edit</code> will open all of Homebrew as discontinuous files and
+<p><em>Note:</em> <code>brew edit</code> will open all of Homebrew as discontinuous files and
 directories. TextMate can handle this correctly in project mode, but many
 editors will do strange things in this case.</p></dd>
 <dt><code>HOMEBREW_GITHUB_API_TOKEN</code></dt><dd><p>A personal access token for the GitHub API, which you can create at
@@ -481,12 +481,15 @@ greater number of API requests. See
 <a href="https://developer.github.com/v3/#rate-limiting" data-bare-link="true">https://developer.github.com/v3/#rate-limiting</a> for more information.
 Homebrew uses the GitHub API for features such as <code>brew search</code>.</p>
 
-<p><em>NOTE</em>: Homebrew doesn't require permissions for any of the scopes.</p></dd>
+<p><em>Note:</em> Homebrew doesn't require permissions for any of the scopes.</p></dd>
 <dt><code>HOMEBREW_LOGS</code></dt><dd><p>If set, Homebrew will use the given directory to store log files.</p></dd>
 <dt><code>HOMEBREW_MAKE_JOBS</code></dt><dd><p>If set, instructs Homebrew to use the value of <code>HOMEBREW_MAKE_JOBS</code> as
 the number of parallel jobs to run when building with <code>make</code>(1).</p>
 
 <p><em>Default:</em> the number of available CPU cores.</p></dd>
+<dt><code>HOMEBREW_NO_ANALYTICS</code></dt><dd><p>If set, Homebrew will not send analytics. See: <a href="https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics</a></p>
+
+<p><em>Note:</em> Homebrew currently disables analytics by default.</p></dd>
 <dt><code>HOMEBREW_NO_EMOJI</code></dt><dd><p>If set, Homebrew will not print the <code>HOMEBREW_INSTALL_BADGE</code> on a
 successful build.</p>
 

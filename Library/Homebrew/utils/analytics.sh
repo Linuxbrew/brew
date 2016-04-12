@@ -17,10 +17,8 @@ setup-analytics() {
 }
 
 report-analytics-screenview-command() {
-  if [[ -z "$HOMEBREW_ANALYTICS" || -n "$HOMEBREW_NO_ANALYTICS" ]]
-  then
-    return
-  fi
+  [[ -z "$HOMEBREW_ANALYTICS" ]] && return
+  [[ -n "$HOMEBREW_NO_ANALYTICS" ]] && return
 
   # Don't report non-official commands.
   if ! [[ "$HOMEBREW_COMMAND" = "bundle"   ||

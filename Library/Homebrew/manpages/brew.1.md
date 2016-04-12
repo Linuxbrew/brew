@@ -36,7 +36,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If no search term is given, all locally available formulae are listed.
 
 ## COMMANDS
-
   * `audit` [`--strict`] [`--online`] [<formulae>]:
     Check <formulae> for Homebrew coding style violations. This should be
     run before submitting a new formula.
@@ -641,7 +640,7 @@ can take several different forms:
     If set, Homebrew will use this editor when editing a single formula, or
     several formulae in the same directory.
 
-    *NOTE*: `brew edit` will open all of Homebrew as discontinuous files and
+    *Note:* `brew edit` will open all of Homebrew as discontinuous files and
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
 
@@ -652,7 +651,7 @@ can take several different forms:
     <https://developer.github.com/v3/#rate-limiting> for more information.
     Homebrew uses the GitHub API for features such as `brew search`.
 
-    *NOTE*: Homebrew doesn't require permissions for any of the scopes.
+    *Note:* Homebrew doesn't require permissions for any of the scopes.
 
   * `HOMEBREW_LOGS`:
     If set, Homebrew will use the given directory to store log files.
@@ -662,6 +661,11 @@ can take several different forms:
     the number of parallel jobs to run when building with `make`(1).
 
     *Default:* the number of available CPU cores.
+
+  * `HOMEBREW_NO_ANALYTICS`:
+    If set, Homebrew will not send analytics. See: <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics>
+
+    *Note:* Homebrew currently disables analytics by default.
 
   * `HOMEBREW_NO_EMOJI`:
     If set, Homebrew will not print the `HOMEBREW_INSTALL_BADGE` on a
