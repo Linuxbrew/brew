@@ -15,7 +15,7 @@ require "set"
 
 class Cmd
   attr_reader :config, :prefix, :cellar, :opt, :tmpdir, :sysroot, :deps
-  attr_reader :archflags, :optflags, :keg_regex, :formula, :formula_version
+  attr_reader :archflags, :optflags, :keg_regex, :formula_prefix
 
   def initialize(arg0, args)
     @arg0 = arg0
@@ -29,8 +29,7 @@ class Cmd
     @archflags = ENV.fetch("HOMEBREW_ARCHFLAGS") { "" }.split(" ")
     @optflags = ENV.fetch("HOMEBREW_OPTFLAGS") { "" }.split(" ")
     @deps = Set.new(ENV.fetch("HOMEBREW_DEPENDENCIES") { "" }.split(","))
-    @formula = ENV["HOMEBREW_FORMULA"]
-    @formula_version = ENV["HOMEBREW_FORMULA_VERSION"]
+    @formula_prefix = ENV["HOMEBREW_FORMULA_PREFIX"]
     # matches opt or cellar prefix and formula name
     @keg_regex = %r[(#{Regexp.escape(opt)}|#{Regexp.escape(cellar)})/([\w\-_\+]+)]
   end
@@ -208,7 +207,7 @@ class Cmd
     return keep_orig?(path) unless ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"]
 
     # Allow references to self
-    if keg_path && path.start_with?(keg_path)
+    if formula_prefix && path.start_with?("#{formula_prefix}/")
       true
     # first two paths: reject references to Cellar or opt paths
     # for unspecified dependencies
@@ -279,11 +278,6 @@ class Cmd
 
   def system_library_paths
     %W[#{sysroot}/usr/lib /usr/local/lib]
-  end
-
-  def keg_path
-    return nil if formula.nil?
-    "#{cellar}/#{formula}/#{formula_version}"
   end
 
   def configure?

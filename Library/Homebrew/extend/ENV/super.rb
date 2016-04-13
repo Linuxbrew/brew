@@ -69,8 +69,7 @@ module Superenv
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
     unless formula.nil?
-      self["HOMEBREW_FORMULA"] = formula.name
-      self["HOMEBREW_FORMULA_VERSION"] = formula.version
+      self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix
     end
 
     if MacOS::Xcode.without_clt? || (MacOS::Xcode.installed? && MacOS::Xcode.version.to_i >= 7)
