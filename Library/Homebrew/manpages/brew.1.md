@@ -98,7 +98,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     The options `--set-name` and `--set-version` each take an argument and allow
     you to explicitly set the name and version of the package you are creating.
 
-  * `deps` [`--1`] [`-n`] [`--union`] [`--tree`] [`--all`] [`--installed`] [`--skip-build`] [`--skip-optional`] <formulae>:
+  * `deps` [`--1`] [`-n`] [`--union`] [`--tree`] [`--all`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] <formulae>:
     Show dependencies for <formulae>. When given multiple formula arguments,
     show the intersection of dependencies for <formulae>, except when passed
     `--tree`, `--all`, or `--installed`.
@@ -117,9 +117,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--installed` is passed, show dependencies for all installed formulae.
 
-    By default, `deps` shows dependencies for <formulae>. To skip the `:build`
-    type dependencies, pass `--skip-build`. Similarly, pass `--skip-optional`
-    to skip `:optional` dependencies.
+    By default, `deps` shows required and recommended dependencies for
+    <formulae>. To include the `:build` type dependencies, pass `--include-build`.
+    Similarly, pass `--include-optional` to include `:optional` dependencies.
+    To skip `:recommended` type dependencies, pass `--skip-recommended`.
 
   * `desc` <formula>:
     Display <formula>'s name and one-line description.
@@ -496,7 +497,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If <formulae> are given, upgrade only the specified brews (but do so even
     if they are pinned; see `pin`, `unpin`).
 
-  * `uses` [`--installed`] [`--recursive`] [`--skip-build`] [`--skip-optional`] [`--devel`|`--HEAD`] <formulae>:
+  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] <formulae>:
     Show the formulae that specify <formulae> as a dependency. When given
     multiple formula arguments, show the intersection of formulae that use
     <formulae>.
@@ -505,9 +506,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--installed` is passed, only list installed formulae.
 
-    By default, `uses` shows all formulae that specify <formulae> as a dependency.
-    To skip the `:build` type dependencies, pass `--skip-build`. Similarly, pass
-    `--skip-optional` to skip `:optional` dependencies.
+    By default, `uses` shows all formulae that specify <formulae> as a required
+    or recommended dependency. To include the `:build` type dependencies, pass
+    `--include-build`. Similarly, pass `--include-optional` to include `:optional`
+    dependencies. To skip `:recommended` type dependencies, pass `--skip-recommended`.
 
     By default, `uses` shows usages of `formula` by stable builds. To find
     cases where `formula` is used by development or HEAD build, pass
