@@ -489,7 +489,7 @@ module Homebrew
       end
 
       installed = Utils.popen_read("brew", "list").split("\n")
-      dependencies = Utils.popen_read("brew", "deps", "--skip-optional", formula_name).split("\n")
+      dependencies = Utils.popen_read("brew", "deps", "--include-build", formula_name).split("\n")
 
       (installed & dependencies).each do |installed_dependency|
         installed_dependency_formula = Formulary.factory(installed_dependency)
@@ -504,13 +504,11 @@ module Homebrew
       unchanged_dependencies = dependencies - @formulae
       changed_dependences = dependencies - unchanged_dependencies
 
-      runtime_dependencies = Utils.popen_read("brew", "deps",
-                                              "--skip-build", "--skip-optional",
-                                              formula_name).split("\n")
+      runtime_dependencies = Utils.popen_read("brew", "deps", formula_name).split("\n")
       build_dependencies = dependencies - runtime_dependencies
       unchanged_build_dependencies = build_dependencies - @formulae
 
-      dependents = Utils.popen_read("brew", "uses", "--skip-build", "--skip-optional", formula_name).split("\n")
+      dependents = Utils.popen_read("brew", "uses", formula_name).split("\n")
       dependents -= @formulae
       dependents = dependents.map { |d| Formulary.factory(d) }
 
@@ -711,7 +709,7 @@ module Homebrew
       changed_formulae_dependents = {}
 
       @formulae.each do |formula|
-        formula_dependencies = Utils.popen_read("brew", "deps", "--skip-optional", formula).split("\n")
+        formula_dependencies = Utils.popen_read("brew", "deps", "--include-build", formula).split("\n")
         unchanged_dependencies = formula_dependencies - @formulae
         changed_dependences = formula_dependencies - unchanged_dependencies
         changed_dependences.each do |changed_formula|
