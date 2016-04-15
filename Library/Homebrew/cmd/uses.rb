@@ -1,4 +1,4 @@
-#:  * `uses` [`--installed`] [`--recursive`] [`--skip-build`] [`--skip-optional`] [`--devel`|`--HEAD`] <formulae>:
+#:  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] <formulae>:
 #:    Show the formulae that specify <formulae> as a dependency. When given
 #:    multiple formula arguments, show the intersection of formulae that use
 #:    <formulae>.
@@ -7,9 +7,10 @@
 #:
 #:    If `--installed` is passed, only list installed formulae.
 #:
-#:    By default, `uses` shows all formulae that specify <formulae> as a dependency.
-#:    To skip the `:build` type dependencies, pass `--skip-build`. Similarly, pass
-#:    `--skip-optional` to skip `:optional` dependencies.
+#:    By default, `uses` shows all formulae that specify <formulae> as a required
+#:    or recommended dependency. To include the `:build` type dependencies, pass
+#:    `--include-build`. Similarly, pass `--include-optional` to include `:optional`
+#:    dependencies. To skip `:recommended` type dependencies, pass `--skip-recommended`.
 #:
 #:    By default, `uses` shows usages of `formula` by stable builds. To find
 #:    cases where `formula` is used by development or HEAD build, pass
@@ -28,28 +29,38 @@ module Homebrew
     used_formulae = ARGV.formulae
     formulae = (ARGV.include? "--installed") ? Formula.installed : Formula
     recursive = ARGV.flag? "--recursive"
+    includes = []
     ignores = []
-    ignores << "build?" if ARGV.include? "--skip-build"
-    ignores << "optional?" if ARGV.include? "--skip-optional"
+    if ARGV.include? "--include-build"
+      includes << "build?"
+    else
+      ignores << "build?"
+    end
+    if ARGV.include? "--include-optional"
+      includes << "optional?"
+    else
+      ignores << "optional?"
+    end
+    ignores << "recommended?" if ARGV.include? "--skip-recommended"
 
     uses = formulae.select do |f|
       used_formulae.all? do |ff|
         begin
           if recursive
             deps = f.recursive_dependencies do |dependent, dep|
-              Dependency.prune if ignores.any? { |ignore| dep.send(ignore) } && !dependent.build.with?(dep)
+              Dependency.prune if ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) } && !dependent.build.with?(dep)
             end
             reqs = f.recursive_requirements do |dependent, req|
-              Requirement.prune if ignores.any? { |ignore| req.send(ignore) } && !dependent.build.with?(req)
+              Requirement.prune if ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) } && !dependent.build.with?(req)
             end
             deps.any? { |dep| dep.to_formula.full_name == ff.full_name rescue dep.name == ff.name } ||
             reqs.any? { |req| req.name == ff.name || [ff.name, ff.full_name].include?(req.default_formula) }
           else
             deps = f.deps.reject do |dep|
-              ignores.any? { |ignore| dep.send(ignore) }
+              ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
             end
             reqs = f.requirements.reject do |req|
-              ignores.any? { |ignore| req.send(ignore) }
+              ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
             end
             deps.any? { |dep| dep.to_formula.full_name == ff.full_name rescue dep.name == ff.name } ||
             reqs.any? { |req| req.name == ff.name || [ff.name, ff.full_name].include?(req.default_formula) }
