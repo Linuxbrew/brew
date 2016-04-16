@@ -23,8 +23,12 @@ class Formulary
 
     begin
       mod.const_get(class_name)
-    rescue NameError => e
-      raise FormulaUnavailableError, name, e.backtrace
+    rescue NameError => original_exception
+      class_list = mod.constants.
+        map { |const_name| mod.const_get(const_name) }.
+        select { |const| const.is_a?(Class) }
+      e = FormulaClassUnavailableError.new(name, path, class_name, class_list)
+      raise e, "", original_exception.backtrace
     end
   end
 
