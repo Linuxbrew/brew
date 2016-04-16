@@ -68,6 +68,43 @@ class TapFormulaUnavailableError < FormulaUnavailableError
   end
 end
 
+class FormulaClassUnavailableError < FormulaUnavailableError
+  attr_reader :path
+  attr_reader :class_name
+  attr_reader :class_list
+
+  def initialize(name, path, class_name, class_list)
+    @path = path
+    @class_name = class_name
+    @class_list = class_list
+    super name
+  end
+
+  def to_s
+    s = super
+    s += "\nIn formula file: #{path}"
+    s += "\nExpected to find class #{class_name}, but #{class_list_s}."
+    s
+  end
+
+  private
+
+  def class_list_s
+    formula_class_list = class_list.select { |klass| klass < Formula }
+    if class_list.empty?
+      "found no classes"
+    elsif formula_class_list.empty?
+      "only found: #{format_list(class_list)} (not derived from Formula!)"
+    else
+      "only found: #{format_list(formula_class_list)}"
+    end
+  end
+
+  def format_list(class_list)
+    class_list.map { |klass| klass.name.split("::")[-1] }.join(", ")
+  end
+end
+
 class TapFormulaAmbiguityError < RuntimeError
   attr_reader :name, :paths, :formulae
 
