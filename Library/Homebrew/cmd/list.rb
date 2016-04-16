@@ -78,6 +78,7 @@ module Homebrew
     share/info/dir
     share/man/man1/brew.1
     share/man/whatis
+    share/zsh/site-functions/_brew
   ]
 
   def list_unbrewed
