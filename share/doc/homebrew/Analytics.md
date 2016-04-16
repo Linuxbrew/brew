@@ -1,8 +1,11 @@
-# Analytics
+# Homebrew's Anonymous Aggregate User Behaviour Analytics
 Homebrew will shortly begin gathering anonymous aggregate user behaviour analytics and reporting these to Google Analytics.
 
 ## Why?
-Homebrew is provided free of charge and run entirely by volunteers in their spare time. As a result, we do not have the resources to do detailed user studies of Homebrew users to decide on how best to design future features and prioritise current work. Anonymous aggregate user analytics allow us to prioritise fixes and features based on how, where and when people use Homebrew. For example, if a formulae is widely used and is failing often it will enable us to prioritise fixing that formula over others.
+Homebrew is provided free of charge and run entirely by volunteers in their spare time. As a result, we do not have the resources to do detailed user studies of Homebrew users to decide on how best to design future features and prioritise current work. Anonymous aggregate user analytics allow us to prioritise fixes and features based on how, where and when people use Homebrew. For example:
+
+- if a formulae is widely used and is failing often it will enable us to prioritise fixing that formula over others.
+- collecting the OS version allows us to decide what versions of OS X to prioritise and support and identify build failures that occur only on single versions.
 
 ## What?
 Homebrew's analytics record some shared information for every event:
@@ -19,7 +22,7 @@ Homebrew's analytics record some shared information for every event:
 Homebrew's analytics records the following different events:
 
 - a `screenview` hit type with the official Homebrew command you have run (with arguments stripped) e.g. `brew list` (not `brew list foo` or any external commands except `bundle`, `cask` and `services`)
-- an `event` hit type with the `install` event category, the Homebrew formula from a non-private GitHub tap you have requested to install and any used options e.g. `wget --with-pcre` as the action and an event label e.g. `Mac OS X 10.11, non-/usr/local, CI` to indicate the OS version, non-standard installation location and invocation as part of CI
+- an `event` hit type with the `install` event category, the Homebrew formula from a non-private GitHub tap you have requested to install and any used options e.g. `wget --with-pcre` as the action and an event label e.g. `Mac OS X 10.11, non-/usr/local, CI` to indicate the OS version, non-standard installation location and invocation as part of CI. This allows us to identify formulae that need fixed and where more easily.
 - an `event` hit type with the `BuildError` event category, the Homebrew formula that failed to install e.g. `wget` as the action and an event label e.g. `Mac OS X 10.11`
 - an `exception` hit type with the `exception` event category, exception description of the exception name e.g. `FormulaUnavailableError` and whether the exception was fatal e.g. `1`
 
@@ -29,10 +32,13 @@ It is impossible for the Homebrew developers to match any particular event to an
 
 ![Aggregate user analytics](images/analytics.png)
 
-It is impossible for Google to match a Homebrew analytics user ID to any other Google Analytics user ID. If Google turned evil the only thing they could do would be to lie about anonymising IP addresses and attempt to match users based on IP addresses.
+As far as we can tell it would be impossible Google to match the randomly generated Homebrew-only analytics user ID to any other Google Analytics user ID. If Google turned evil the only thing they could do would be to lie about anonymising IP addresses and attempt to match users based on IP addresses.
 
-## When?
-Homebrew's analytics are sent throughout Homebrew's execution to Google Analytics.
+## When/Where?
+Homebrew's analytics are sent throughout Homebrew's execution to Google Analytics over HTTPS.
+
+## Who?
+Homebrew's analytics are accessible to Homebrew's current maintainers. Contact @mikemcquaid if you are a maintainer and need access.
 
 ## How?
 The code is viewable in https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.rb and https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.sh. They are done in a separate background process and fail fast to avoid delaying any execution. They will fail immediately and silently if you have no network connection.

@@ -12,7 +12,17 @@ setup-analytics() {
     HOMEBREW_ANALYTICS_USER_UUID="$(uuidgen)"
     echo "$HOMEBREW_ANALYTICS_USER_UUID" > "$HOMEBREW_ANALYTICS_USER_UUID_FILE"
   fi
-  export HOMEBREW_ANALYTICS_ID="UA-75654628-1"
+
+  if [[ -n "$HOMEBREW_LINUX" ]]
+  then
+    # For Linuxbrew's analytics.
+    HOMEBREW_ANALYTICS_ID="UA-76492262-1"
+  else
+    # Otherwise, fall back to Homebrew's analytics.
+    HOMEBREW_ANALYTICS_ID="UA-75654628-1"
+  fi
+
+  export HOMEBREW_ANALYTICS_ID
   export HOMEBREW_ANALYTICS_USER_UUID
 }
 
