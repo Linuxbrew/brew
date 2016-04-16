@@ -42,22 +42,6 @@ Use `brew info $FORMULA` to check what versions are installed but not currently 
 ./configure --prefix=/usr/local/Cellar/foo/1.2 && make && make install && brew link foo
 ```
 
-## Command tab-completion
-
-### Bash
-Add to your `~/.bashrc` or `~/.bash_profile` (whichever you have configured to run on shell startup):
-
-```bash
-source $(brew --repository)/Library/Contributions/brew_bash_completion.sh
-```
-
-### Zsh
-Run in terminal (may require `sudo`):
-
-```zsh
-ln -s "$(brew --prefix)/Library/Contributions/brew_zsh_completion.zsh" /usr/local/share/zsh/site-functions/_brew
-```
-
 ## Pre-downloading a file for a formula
 
 Sometimes it's faster to download a file via means other than those
