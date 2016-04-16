@@ -139,6 +139,11 @@ module Homebrew
       perform_preinstall_checks
 
       formulae.each { |f| install_formula(f) }
+    rescue FormulaClassUnavailableError => e
+      # Need to rescue before `FormulaUnavailableError` (superclass of this)
+      # is handled, as searching for a formula doesn't make sense here (the
+      # formula was found, but there's a problem with its implementation).
+      ofail e.message
     rescue FormulaUnavailableError => e
       if (blacklist = blacklisted?(e.name))
         ofail "#{e.message}\n#{blacklist}"
