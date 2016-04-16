@@ -2,6 +2,7 @@ require "language/java"
 
 class JavaRequirement < Requirement
   fatal true
+  default_formula "jdk" if OS.linux?
   cask "java"
   download "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
