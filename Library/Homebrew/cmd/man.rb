@@ -1,59 +1,87 @@
 require "formula"
 
 module Homebrew
-  SOURCE_PATH=HOMEBREW_REPOSITORY/"Library/Homebrew/manpages"
-  TARGET_PATH=HOMEBREW_REPOSITORY/"share/man/man1"
-  DOC_PATH=HOMEBREW_REPOSITORY/"share/doc/homebrew"
-  LINKED_PATH=HOMEBREW_PREFIX/"share/man/man1"
+  SOURCE_PATH = HOMEBREW_LIBRARY_PATH/"manpages"
+  TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"share/man/man1"
+  TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"share/doc/homebrew"
 
   def man
-    abort <<-EOS.undent unless ARGV.named.empty?
-      This command updates the brew manpage and does not take formula names.
-    EOS
+    raise UsageError unless ARGV.named.empty?
 
     if ARGV.flag? "--link"
-      abort <<-EOS.undent if TARGET_PATH == LINKED_PATH
-        The target path is the same as the linked one, aborting.
-      EOS
-      Dir["#{TARGET_PATH}/*.1"].each do |page|
-        FileUtils.ln_s page, LINKED_PATH
-        return
-      end
+      link_man_pages
     else
-      Homebrew.install_gem_setup_path! "ronn"
+      regenerate_man_pages
+    end
+  end
 
-      puts "Writing HTML fragments to #{DOC_PATH}"
-      puts "Writing manpages to #{TARGET_PATH}"
+  private
 
-      header = (SOURCE_PATH/"header.1.md").read
-      footer = (SOURCE_PATH/"footer.1.md").read
-      sub_commands = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
-        sort_by { |source_file| source_file.basename.sub(/\.(rb|sh)$/, "") }.
-        map { |source_file|
-          source_file.read.
-            split("\n").
-            grep(/^#:/).
-            map { |line| line.slice(2..-1) }.
-            join("\n")
-        }.
-        reject { |s| s.strip.empty? }.
-        join("\n\n")
+  def link_man_pages
+    linked_path = HOMEBREW_PREFIX/"share/man/man1"
 
-      target_md = SOURCE_PATH/"brew.1.md"
-      target_md.atomic_write(header + sub_commands + footer)
+    if TARGET_MAN_PATH == linked_path
+      odie "The target path is the same as the linked one."
+    end
 
-      args = %W[
-        --pipe
-        --organization=Homebrew
-        --manual=brew
-        #{SOURCE_PATH}/brew.1.md
-      ]
+    Dir["#{TARGET_MAN_PATH}/*.1"].each do |page|
+      FileUtils.ln_s page, linked_path
+    end
+  end
 
-      target_html = DOC_PATH/"brew.1.html"
-      target_html.atomic_write Utils.popen_read("ronn", "--fragment", *args)
+  def regenerate_man_pages
+    Homebrew.install_gem_setup_path! "ronn"
 
-      target_man = TARGET_PATH/"brew.1"
-      target_man.atomic_write Utils.popen_read("ronn", "--roff", *args)
+    convert_man_page("brew.1", build_man_page)
+  end
+
+  def build_man_page
+    header = (SOURCE_PATH/"header.1.md").read
+    footer = (SOURCE_PATH/"footer.1.md").read
+
+    commands = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
+      sort_by { |source_file| source_file.basename.sub(/\.(rb|sh)$/, "") }.
+      map { |source_file|
+        source_file.read.
+          split("\n").
+          grep(/^#:/).
+          map { |line| line.slice(2..-1) }.
+          join("\n")
+      }.
+      reject { |s| s.strip.empty? }.
+      join("\n\n")
+
+    header + commands + footer
+  end
+
+  def convert_man_page(page, contents)
+    source = SOURCE_PATH/"#{page}.md"
+    source.atomic_write(contents)
+
+    convert_with_ronn(source, TARGET_DOC_PATH/"#{page}.html")
+    convert_with_ronn(source, TARGET_MAN_PATH/page)
+  end
+
+  def convert_with_ronn(source, target)
+    shared_args = %W[
+      --pipe
+      --organization=Homebrew
+      --manual=brew
+      #{source}
+    ]
+
+    format_flag, format_desc = target_path_to_format(target)
+
+    puts "Writing #{format_desc} to #{target}"
+    target.atomic_write Utils.popen_read("ronn", format_flag, *shared_args)
+  end
+
+  def target_path_to_format(target)
+    case target.basename
+    when /\.html?$/ then ["--fragment", "HTML fragment"]
+    when /\.\d$/    then ["--roff", "man page"]
+    else
+      odie "Failed to infer output format from '#{target.basename}'."
     end
   end
 end
