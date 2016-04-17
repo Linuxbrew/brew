@@ -32,13 +32,37 @@ EOS
 # NOTE The reason the string is at the top is so 25 lines is easy to measure!
 
 module Homebrew
-  def help
-    puts HOMEBREW_HELP
+  def help(cmd = nil, empty_argv = false)
+    # Handle `brew` (no arguments).
+    if empty_argv
+      $stderr.puts HOMEBREW_HELP
+      exit 1
+    end
+
+    # Handle `brew (-h|--help|--usage|-?|help)` (no other arguments).
+    if cmd.nil?
+      puts HOMEBREW_HELP
+      exit 0
+    end
+
+    # Get help text and if `nil` (external commands), resume in `brew.rb`.
+    help_text = help_for_command(cmd)
+    return if help_text.nil?
+
+    # Display help for internal command (or generic help if undocumented).
+    if help_text.empty?
+      opoo "No help available for '#{cmd}' command."
+      help_text = HOMEBREW_HELP
+    end
+    puts help_text
+    exit 0
   end
 
   def help_s
     HOMEBREW_HELP
   end
+
+  private
 
   def help_for_command(cmd)
     cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)

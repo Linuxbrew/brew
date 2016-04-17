@@ -68,29 +68,9 @@ begin
   #
   # It should never affect external commands so they can handle usage
   # arguments themselves.
-
-  if empty_argv
-    $stderr.puts ARGV.usage
-    exit 1
-  elsif help_flag
-    if cmd.nil?
-      puts ARGV.usage
-      exit 0
-    else
-      # Handle both internal ruby and shell commands
-      require "cmd/help"
-      help_text = Homebrew.help_for_command(cmd)
-      if help_text.nil?
-        # External command, let it handle help by itself
-      elsif help_text.empty?
-        opoo "No help available for '#{cmd}' command."
-        puts ARGV.usage
-        exit 0
-      else
-        puts help_text
-        exit 0
-      end
-    end
+  if empty_argv || help_flag
+    require "cmd/help"
+    Homebrew.help cmd, empty_argv # Never returns, except for external command.
   end
 
   if internal_cmd
