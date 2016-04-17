@@ -198,11 +198,6 @@ module HomebrewArgvExtension
     options_only.any? { |arg| arg.scan("-").size == 1 && arg.include?(char) }
   end
 
-  def usage
-    require "cmd/help"
-    Homebrew.help_s
-  end
-
   def cc
     value "cc"
   end

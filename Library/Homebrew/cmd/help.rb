@@ -58,10 +58,6 @@ module Homebrew
     exit 0
   end
 
-  def help_s
-    HOMEBREW_HELP
-  end
-
   private
 
   def help_for_command(cmd)
