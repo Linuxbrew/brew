@@ -1,4 +1,5 @@
 require "formula"
+require "erb"
 
 module Homebrew
   SOURCE_PATH = HOMEBREW_LIBRARY_PATH/"manpages"
@@ -38,22 +39,19 @@ module Homebrew
   end
 
   def build_man_page
-    header = (SOURCE_PATH/"header.1.md").read
-    footer = (SOURCE_PATH/"footer.1.md").read
+    template = (SOURCE_PATH/"brew.1.md.erb").read
 
     commands = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
       sort_by { |source_file| source_file.basename.sub(/\.(rb|sh)$/, "") }.
       map { |source_file|
-        source_file.read.
-          split("\n").
+        source_file.read.lines.
           grep(/^#:/).
           map { |line| line.slice(2..-1) }.
-          join("\n")
+          join
       }.
-      reject { |s| s.strip.empty? }.
-      join("\n\n")
+      reject { |s| s.strip.empty? }
 
-    header + commands + footer
+    ERB.new(template, nil, ">").result(binding)
   end
 
   def convert_man_page(markup, target)
