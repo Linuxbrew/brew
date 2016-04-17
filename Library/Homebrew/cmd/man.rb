@@ -32,7 +32,9 @@ module Homebrew
   def regenerate_man_pages
     Homebrew.install_gem_setup_path! "ronn"
 
-    convert_man_page("brew.1", build_man_page)
+    markup = build_man_page
+    convert_man_page(markup, TARGET_DOC_PATH/"brew.1.html")
+    convert_man_page(markup, TARGET_MAN_PATH/"brew.1")
   end
 
   def build_man_page
@@ -54,26 +56,21 @@ module Homebrew
     header + commands + footer
   end
 
-  def convert_man_page(page, contents)
-    source = SOURCE_PATH/"#{page}.md"
-    source.atomic_write(contents)
-
-    convert_with_ronn(source, TARGET_DOC_PATH/"#{page}.html")
-    convert_with_ronn(source, TARGET_MAN_PATH/page)
-  end
-
-  def convert_with_ronn(source, target)
+  def convert_man_page(markup, target)
     shared_args = %W[
       --pipe
       --organization=Homebrew
       --manual=brew
-      #{source}
     ]
 
     format_flag, format_desc = target_path_to_format(target)
 
     puts "Writing #{format_desc} to #{target}"
-    target.atomic_write Utils.popen_read("ronn", format_flag, *shared_args)
+    Utils.popen(["ronn", format_flag] + shared_args, "rb+") do |ronn|
+      ronn.write markup
+      ronn.close_write
+      target.atomic_write ronn.read
+    end
   end
 
   def target_path_to_format(target)
