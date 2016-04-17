@@ -1,3 +1,6 @@
+#:  * `--env`:
+#:    Show a summary of the Homebrew build environment.
+
 require "extend/ENV"
 require "build_environment"
 
