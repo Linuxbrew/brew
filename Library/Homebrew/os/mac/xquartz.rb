@@ -36,7 +36,7 @@ module OS
       def detect_version
         if (path = bundle_path) && path.exist? && (version = version_from_mdls(path))
           version
-        elsif prefix.to_s == "/usr/X11"
+        elsif prefix.to_s == "/usr/X11" || prefix.to_s == "/usr/X11R6"
           guess_system_version
         else
           version_from_pkgutil
