@@ -30,7 +30,7 @@ begin
   trap("INT", std_trap) # restore default CTRL-C handler
 
   empty_argv = ARGV.empty?
-  help_flag_list = %w[-h --help --usage -? help]
+  help_flag_list = %w[-h --help --usage -?]
   help_flag = false
   internal_cmd = true
   cmd = nil
@@ -38,7 +38,11 @@ begin
   ARGV.dup.each_with_index do |arg, i|
     if help_flag && cmd
       break
-    elsif help_flag_list.include? arg
+    elsif help_flag_list.include?(arg)
+      # Option-style help: Both `--help <cmd>` and `<cmd> --help` are fine.
+      help_flag = true
+    elsif arg == "help" && !cmd
+      # Command-style help: `help <cmd>` is fine, but `<cmd> help` is not.
       help_flag = true
     elsif !cmd
       cmd = ARGV.delete_at(i)
