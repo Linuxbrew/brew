@@ -44,7 +44,7 @@ module Homebrew
     variables = OpenStruct.new
 
     variables[:commands] = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
-      sort_by { |source_file| source_file.basename.sub(/\.(rb|sh)$/, "") }.
+      sort_by { |source_file| sort_key_for_path(source_file) }.
       map { |source_file|
         source_file.read.lines.
           grep(/^#:/).
@@ -54,6 +54,11 @@ module Homebrew
       reject { |s| s.strip.empty? }
 
     ERB.new(template, nil, ">").result(variables.instance_eval{ binding })
+  end
+
+  def sort_key_for_path(path)
+    # Options after regular commands (`~` comes after `z` in ASCII table).
+    path.basename.to_s.sub(/\.(rb|sh)$/, "").sub(/^--/, "~~")
   end
 
   def convert_man_page(markup, target)
