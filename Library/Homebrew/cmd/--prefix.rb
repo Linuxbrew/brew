@@ -1,3 +1,9 @@
+#:  * `--prefix`:
+#:    Display Homebrew's install path. *Default:* `/usr/local`
+#:
+#:  * `--prefix` <formula>:
+#:    Display the location in the cellar where <formula> is or would be installed.
+
 module Homebrew
   def __prefix
     if ARGV.named.empty?
