@@ -513,7 +513,8 @@ module Homebrew
       dependents -= @formulae
       dependents = dependents.map { |d| Formulary.factory(d) }
 
-      testable_dependents = dependents.select { |d| d.test_defined? && d.bottled? }
+      bottled_dependents = dependents.select { |d| d.bottled? }
+      testable_dependents = dependents.select { |d| d.bottled? && d.test_defined? }
 
       if (deps | reqs).any? { |d| d.name == "mercurial" && d.build? }
         run_as_not_developer { test "brew", "install", "mercurial" }
@@ -592,7 +593,7 @@ module Homebrew
         shared_test_args = ["--verbose"]
         shared_test_args << "--keep-tmp" if ARGV.keep_tmp?
         test "brew", "test", formula_name, *shared_test_args if formula.test_defined?
-        testable_dependents.each do |dependent|
+        bottled_dependents.each do |dependent|
           unless dependent.installed?
             test "brew", "fetch", "--retry", dependent.name
             next if steps.last.failed?
@@ -606,7 +607,10 @@ module Homebrew
             end
           end
           if dependent.installed?
-            test "brew", "test", "--verbose", dependent.name
+            test "brew", "linkage", "--test", dependent.name
+            if testable_dependents.include? dependent
+              test "brew", "test", "--verbose", dependent.name
+            end
           end
         end
         test "brew", "uninstall", "--force", formula_name
