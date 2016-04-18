@@ -70,6 +70,10 @@ then
     HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
   else
     HOMEBREW_RUBY_PATH="$(which ruby)"
+    if [[ -z "$HOMEBREW_RUBY_PATH" ]]
+    then
+      odie "No Ruby found, cannot proceed."
+    fi
   fi
 fi
 
