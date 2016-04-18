@@ -85,21 +85,6 @@ module Homebrew
       end
       ############# END HELPERS
 
-      def inject_dump_stats!
-        self.extend Module.new {
-          def send(method, *)
-            time = Time.now
-            super
-          ensure
-            $times[method] = Time.now - time
-          end
-        }
-        $times = {}
-        at_exit do
-          puts $times.sort_by { |_k, v| v }.map { |k, v| "#{k}: #{v}" }
-        end
-      end
-
       # See https://github.com/Homebrew/homebrew/pull/9986
       def check_path_for_trailing_slashes
         all_paths = ENV["PATH"].split(File::PATH_SEPARATOR)

@@ -35,16 +35,19 @@ If no search term is given, all locally available formulae are listed.</p></dd>
 <h2 id="COMMANDS">COMMANDS</h2>
 
 <dl>
-<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
+<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<code>--display-cop-names</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
 run before submitting a new formula.</p>
 
 <p>If no <var>formulae</var> are provided, all of them are checked.</p>
 
-<p>If <code>--strict</code> is passed, additional checks are run. This should be used
-when creating for new formulae.</p>
+<p>If <code>--strict</code> is passed, additional checks are run, including RuboCop
+style checks. This should be used when creating new formulae.</p>
 
 <p>If <code>--online</code> is passed, additional slower checks that require a network
 connection are run. This should be used when creating for new formulae.</p>
+
+<p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
+is included in the output.</p>
 
 <p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
 for instance, for implementing pre-commit hooks.</p></dd>
@@ -289,6 +292,23 @@ Homebrew build logic to help your <code>./configure &amp;&amp; make &amp;&amp; m
 or even your <code>gem install</code> succeed. Especially handy if you run Homebrew
 in an Xcode-only configuration since it adds tools like <code>make</code> to your <code>PATH</code>
 which otherwise build-systems would not find.</p></dd>
+<dt><code>style</code> [<code>--fix</code>] [<code>--display-cop-names</code>] [<var>formulae</var>|<var>files</var>]</dt><dd><p>Check formulae or files for conformance to Homebrew style guidelines.</p>
+
+<p><var>formulae</var> is a list of formula names.</p>
+
+<p><var>files</var> is a list of file names.</p>
+
+<p><var>formulae</var> and <var>files</var> may not be combined. If both are omitted, style will run
+style checks on the whole Homebrew <code>Library</code>, including core code and all
+formulae.</p>
+
+<p>If <code>--fix</code> is passed and <code>HOMEBREW_DEVELOPER</code> is set, style violations
+will be automatically fixed using RuboCop's <code>--auto-correct</code> feature.</p>
+
+<p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
+is included in the output.</p>
+
+<p>Exits with a non-zero status if any style violations are found.</p></dd>
 <dt><code>switch</code> <var>name</var> <var>version</var></dt><dd><p>Symlink all of the specific <var>version</var> of <var>name</var>'s install to Homebrew prefix.</p></dd>
 <dt class="flush"><code>tap</code></dt><dd><p>List all installed taps.</p></dd>
 <dt><code>tap</code> [<code>--full</code>] <var>user</var><code>/</code><var>repo</var> [<var>URL</var>]</dt><dd><p>Tap a formula repository.</p>

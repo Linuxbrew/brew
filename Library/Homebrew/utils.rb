@@ -276,6 +276,39 @@ module Homebrew
       EOS
     end
   end
+
+  # Hash of Module => Set(method_names)
+  @@injected_dump_stat_modules = {}
+
+  def inject_dump_stats!(the_module, pattern)
+    @@injected_dump_stat_modules[the_module] ||= []
+    injected_methods = @@injected_dump_stat_modules[the_module]
+    the_module.module_eval do
+      instance_methods.grep(pattern).each do |name|
+        next if injected_methods.include? name
+        method = instance_method(name)
+        define_method(name) do |*args, &block|
+          begin
+            time = Time.now
+            method.bind(self).call(*args, &block)
+          ensure
+            $times[name] ||= 0
+            $times[name] += Time.now - time
+          end
+        end
+      end
+    end
+
+    if $times.nil?
+      $times = {}
+      at_exit do
+        col_width = [$times.keys.map(&:size).max + 2, 15].max
+        $times.sort_by { |_k, v| v }.each do |method, time|
+          puts format("%-*s %0.4f sec", col_width, "#{method}:", time)
+        end
+      end
+    end
+  end
 end
 
 def with_system_path

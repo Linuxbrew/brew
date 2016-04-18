@@ -44,17 +44,20 @@ Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is su
 .SH "COMMANDS"
 .
 .TP
-\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-online\fR] [\fIformulae\fR]
+\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-online\fR] [\fB\-\-display\-cop\-names\fR] [\fIformulae\fR]
 Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\.
 .
 .IP
 If no \fIformulae\fR are provided, all of them are checked\.
 .
 .IP
-If \fB\-\-strict\fR is passed, additional checks are run\. This should be used when creating for new formulae\.
+If \fB\-\-strict\fR is passed, additional checks are run, including RuboCop style checks\. This should be used when creating new formulae\.
 .
 .IP
 If \fB\-\-online\fR is passed, additional slower checks that require a network connection are run\. This should be used when creating for new formulae\.
+.
+.IP
+If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
 .
 .IP
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
@@ -392,6 +395,28 @@ Search for \fItext\fR in the given package manager\'s list\.
 .TP
 \fBsh\fR [\fB\-\-env=std\fR]
 Instantiate a Homebrew build environment\. Uses our years\-battle\-hardened Homebrew build logic to help your \fB\./configure && make && make install\fR or even your \fBgem install\fR succeed\. Especially handy if you run Homebrew in an Xcode\-only configuration since it adds tools like \fBmake\fR to your \fBPATH\fR which otherwise build\-systems would not find\.
+.
+.TP
+\fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fIformulae\fR|\fIfiles\fR]
+Check formulae or files for conformance to Homebrew style guidelines\.
+.
+.IP
+\fIformulae\fR is a list of formula names\.
+.
+.IP
+\fIfiles\fR is a list of file names\.
+.
+.IP
+\fIformulae\fR and \fIfiles\fR may not be combined\. If both are omitted, style will run style checks on the whole Homebrew \fBLibrary\fR, including core code and all formulae\.
+.
+.IP
+If \fB\-\-fix\fR is passed and \fBHOMEBREW_DEVELOPER\fR is set, style violations will be automatically fixed using RuboCop\'s \fB\-\-auto\-correct\fR feature\.
+.
+.IP
+If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
+.
+.IP
+Exits with a non\-zero status if any style violations are found\.
 .
 .TP
 \fBswitch\fR \fIname\fR \fIversion\fR

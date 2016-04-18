@@ -1,17 +1,23 @@
-#:  * `audit` [`--strict`] [`--online`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--online`] [`--display-cop-names`] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
 #:    If no <formulae> are provided, all of them are checked.
 #:
-#:    If `--strict` is passed, additional checks are run. This should be used
-#:    when creating for new formulae.
+#:    If `--strict` is passed, additional checks are run, including RuboCop
+#:    style checks. This should be used when creating new formulae.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
 #:    connection are run. This should be used when creating for new formulae.
 #:
+#:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
+#:    is included in the output.
+#:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
+
+# Undocumented options:
+#     -D activates debugging and profiling of the audit methods (not the same as --debug)
 
 require "formula"
 require "formula_versions"
@@ -20,68 +26,51 @@ require "extend/ENV"
 require "formula_cellar_checks"
 require "official_taps"
 require "cmd/search"
+require "cmd/style"
 require "date"
 
 module Homebrew
+  RUBY_2_OR_LATER = RUBY_VERSION.split(".").first.to_i >= 2
+
   def audit
+    if ARGV.switch? "D"
+      Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/)
+    end
+
     formula_count = 0
     problem_count = 0
 
     strict = ARGV.include? "--strict"
-    if strict && ARGV.resolved_formulae.any? && RUBY_VERSION.split(".").first.to_i >= 2
-      require "cmd/style"
-      ohai "brew style #{ARGV.resolved_formulae.join " "}"
-      style
-    end
-
+    style = strict && RUBY_2_OR_LATER
     online = ARGV.include? "--online"
 
     ENV.activate_extensions!
     ENV.setup_build_environment
 
-    if ARGV.switch? "D"
-      FormulaAuditor.module_eval do
-        instance_methods.grep(/audit_/).map do |name|
-          method = instance_method(name)
-          define_method(name) do |*args, &block|
-            begin
-              time = Time.now
-              method.bind(self).call(*args, &block)
-            ensure
-              $times[name] ||= 0
-              $times[name] += Time.now - time
-            end
-          end
-        end
-      end
-
-      $times = {}
-      at_exit { puts $times.sort_by { |_k, v| v }.map { |k, v| "#{k}: #{v}" } }
-    end
-
-    ff = if ARGV.named.empty?
-      Formula
+    if ARGV.named.empty?
+      ff = Formula
+      files = Tap.map(&:formula_dir)
     else
-      ARGV.resolved_formulae
+      ff = ARGV.resolved_formulae
+      files = ARGV.resolved_formulae.map(&:path)
     end
-
-    output_header = !strict
+    if style
+      # Check style in a single batch run up front for performance
+      style_results = check_style_json(files, :realpath => true)
+    end
 
     ff.each do |f|
-      fa = FormulaAuditor.new(f, :strict => strict, :online => online)
+      options = { :strict => strict, :online => online }
+      options[:style_offenses] = style_results.file_offenses(f.path) if style
+      fa = FormulaAuditor.new(f, options)
       fa.audit
 
-      unless fa.problems.empty?
-        unless output_header
-          puts
-          ohai "audit problems"
-          output_header = true
-        end
+      next if fa.problems.empty?
 
-        formula_count += 1
-        problem_count += fa.problems.size
-        puts "#{f.full_name}:", fa.problems.map { |p| " * #{p}" }, ""
-      end
+      formula_count += 1
+      problem_count += fa.problems.size
+      problem_lines = fa.problems.map { |p| "  * #{p.chomp.gsub("\n", "\n    ")}" }
+      puts "#{f.full_name}:", problem_lines
     end
 
     unless problem_count.zero?
@@ -152,9 +141,19 @@ class FormulaAuditor
     @formula = formula
     @strict = !!options[:strict]
     @online = !!options[:online]
+    # Accept precomputed style offense results, for efficiency
+    @style_offenses = options[:style_offenses]
     @problems = []
     @text = FormulaText.new(formula.path)
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
+  end
+
+  def audit_style
+    return unless @style_offenses
+    display_cop_names = ARGV.include?("--display-cop-names")
+    @style_offenses.each do |offense|
+      problem offense.to_s(:display_cop_name => display_cop_names)
+    end
   end
 
   def audit_file
@@ -983,6 +982,7 @@ class FormulaAuditor
     audit_installed
     audit_prefix_has_contents
     audit_reverse_migration
+    audit_style
   end
 
   private

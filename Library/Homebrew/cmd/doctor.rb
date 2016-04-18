@@ -2,10 +2,15 @@
 #:    Check your system for potential problems. Doctor exits with a non-zero status
 #:    if any problems are found.
 
+# Undocumented options:
+#     -D activates debugging and profiling of the audit methods (not the same as --debug)
+
 require "diagnostic"
 
 module Homebrew
   def doctor
+    inject_dump_stats!(Diagnostic::Checks, /^check_*/) if ARGV.switch? "D"
+
     checks = Diagnostic::Checks.new
 
     if ARGV.include? "--list-checks"
@@ -13,7 +18,6 @@ module Homebrew
       exit
     end
 
-    checks.inject_dump_stats! if ARGV.switch? "D"
 
     if ARGV.named.empty?
       slow_checks = %w[
