@@ -130,8 +130,21 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_help
-    assert_match "Example usage:",
-                 cmd("help")
+    assert_match "Example usage:\n",
+                 cmd_fail # Generic help (empty argument list).
+    assert_match "Unknown command: command-that-does-not-exist",
+                 cmd_fail("help", "command-that-does-not-exist")
+    assert_match(/^brew cat /,
+                 cmd_fail("cat")) # Missing formula argument triggers help.
+
+    assert_match "Example usage:\n",
+                 cmd("help") # Generic help.
+    assert_match(/^brew cat /,
+                 cmd("help", "cat")) # Internal command (documented, Ruby).
+    assert_match(/^brew update /,
+                 cmd("help", "update")) # Internal command (documented, Shell).
+    assert_match "Example usage:\n",
+                 cmd("help", "test-bot") # Internal command (undocumented).
   end
 
   def test_config
