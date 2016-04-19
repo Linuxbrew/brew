@@ -74,7 +74,8 @@ begin
   # arguments themselves.
   if empty_argv || help_flag
     require "cmd/help"
-    Homebrew.help cmd, empty_argv # Never returns, except for external command.
+    Homebrew.help cmd, :empty_argv => empty_argv
+    # `Homebrew.help` never returns, except for external/unknown commands.
   end
 
   if internal_cmd

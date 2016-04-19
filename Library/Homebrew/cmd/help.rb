@@ -33,9 +33,15 @@ EOS
 # NOTE The reason the string is at the top is so 25 lines is easy to measure!
 
 module Homebrew
-  def help(cmd = nil, empty_argv = false)
+  def help(cmd = nil, flags = {})
+    # Resolve command aliases and find file containing the implementation.
+    if cmd
+      cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
+      path = command_path(cmd)
+    end
+
     # Handle `brew` (no arguments).
-    if empty_argv
+    if flags[:empty_argv]
       $stderr.puts HOMEBREW_HELP
       exit 1
     end
@@ -46,24 +52,18 @@ module Homebrew
       exit 0
     end
 
-    # Get help text and if `nil` (external commands), resume in `brew.rb`.
-    help_text = help_for_command(cmd)
-    return if help_text.nil?
+    # Resume execution in `brew.rb` for external/unknown commands.
+    return if path.nil?
 
     # Display help for internal command (or generic help if undocumented).
-    if help_text.empty?
-      opoo "No help available for '#{cmd}' command."
-      help_text = HOMEBREW_HELP
-    end
-    puts help_text
+    puts command_help(path)
     exit 0
   end
 
   private
 
-  def help_for_command(cmd)
-    cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
-    cmd_path = if File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh")
+  def command_path(cmd)
+    if File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh")
       HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh"
     elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh")
       HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh"
@@ -72,15 +72,20 @@ module Homebrew
     elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb")
       HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb"
     end
-    return if cmd_path.nil?
+  end
 
-    cmd_path.read.
-      split("\n").
-      grep(/^#:/).
-      map do |line|
-        line.slice(2..-1).sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ").
-        gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}").
-        gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}")
-      end.join("\n")
+  def command_help(path)
+    help_lines = path.read.lines.grep(/^#:/)
+    if help_lines.empty?
+      opoo "No help text in: #{path}" if ARGV.homebrew_developer?
+      HOMEBREW_HELP
+    else
+      help_lines.map do |line|
+        line.slice(2..-1).
+          sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ").
+          gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}").
+          gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}")
+      end.join
+    end
   end
 end
