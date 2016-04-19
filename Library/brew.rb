@@ -118,8 +118,8 @@ rescue FormulaUnspecifiedError
 rescue KegUnspecifiedError
   abort "This command requires a keg argument"
 rescue UsageError
-  onoe "Invalid usage"
-  abort ARGV.usage
+  require "cmd/help"
+  Homebrew.help cmd, :usage_error => "Invalid usage"
 rescue SystemExit => e
   onoe "Kernel.exit" if ARGV.verbose? && !e.success?
   $stderr.puts e.backtrace if ARGV.debug?

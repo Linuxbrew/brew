@@ -40,6 +40,14 @@ module Homebrew
       path = command_path(cmd)
     end
 
+    # Display command-specific (or generic) help in response to `UsageError`.
+    if (error_message = flags[:usage_error])
+      $stderr.puts path ? command_help(path) : HOMEBREW_HELP
+      $stderr.puts
+      onoe error_message
+      exit 1
+    end
+
     # Handle `brew` (no arguments).
     if flags[:empty_argv]
       $stderr.puts HOMEBREW_HELP
