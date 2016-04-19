@@ -1,5 +1,6 @@
 require "formula"
 require "erb"
+require "ostruct"
 
 module Homebrew
   SOURCE_PATH = HOMEBREW_LIBRARY_PATH/"manpages"
@@ -40,8 +41,9 @@ module Homebrew
 
   def build_man_page
     template = (SOURCE_PATH/"brew.1.md.erb").read
+    variables = OpenStruct.new
 
-    commands = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
+    variables[:commands] = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
       sort_by { |source_file| source_file.basename.sub(/\.(rb|sh)$/, "") }.
       map { |source_file|
         source_file.read.lines.
@@ -51,7 +53,7 @@ module Homebrew
       }.
       reject { |s| s.strip.empty? }
 
-    ERB.new(template, nil, ">").result(binding)
+    ERB.new(template, nil, ">").result(variables.instance_eval{ binding })
   end
 
   def convert_man_page(markup, target)
