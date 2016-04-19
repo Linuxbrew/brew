@@ -110,9 +110,9 @@ module Homebrew
     def display_items(label, things)
       puts "#{label}:"
       if things.is_a? Hash
-        things.sort.each do |label, list|
+        things.sort.each do |list_label, list|
           list.sort.each do |item|
-            puts "  #{item} (#{label})"
+            puts "  #{item} (#{list_label})"
           end
         end
       else
