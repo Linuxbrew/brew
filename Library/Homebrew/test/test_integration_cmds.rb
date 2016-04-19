@@ -412,8 +412,8 @@ class IntegrationCommandTests < Homebrew::TestCase
     (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
 
     cmd("upgrade")
-    assert (HOMEBREW_CELLAR/"testball/0.1").directory?,
-      "The latest version directory should be created"
+    assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should be created")
   ensure
     formula_file.unlink
     cmd("uninstall", "--force", testball)
@@ -483,13 +483,13 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     cmd("pin", "testball")
     cmd("upgrade")
-    refute (HOMEBREW_CELLAR/"testball/0.1").directory?,
-      "The latest version directory should NOT be created"
+    refute((HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should NOT be created")
 
     cmd("unpin", "testball")
     cmd("upgrade")
-    assert (HOMEBREW_CELLAR/"testball/0.1").directory?,
-      "The latest version directory should be created"
+    assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should be created")
   ensure
     formula_file.unlink
     cmd("uninstall", "--force", testball)
@@ -566,8 +566,8 @@ class IntegrationCommandTests < Homebrew::TestCase
     EOS
 
     cmd("fetch", "testball")
-    assert (HOMEBREW_CACHE/"testball-0.1.tbz").exist?,
-      "The tarball should have been cached"
+    assert((HOMEBREW_CACHE/"testball-0.1.tbz").exist?,
+      "The tarball should have been cached")
   ensure
     formula_file.unlink
     cmd("cleanup", "--force", "--prune=all")
@@ -690,9 +690,9 @@ class IntegrationCommandTests < Homebrew::TestCase
       cmd("prune", "--dry-run")
     assert_match "Pruned 1 symbolic links and 3 directories",
       cmd("prune")
-    refute (share/"pruneable").directory?
-    assert (share/"notpruneable").directory?
-    refute (share/"pruneable_symlink").symlink?
+    refute((share/"pruneable").directory?)
+    assert((share/"notpruneable").directory?)
+    refute((share/"pruneable_symlink").symlink?)
 
     # Inexact match because only if ~/Applications exists, will this output one
     # more line with contents `No apps unlinked from /Users/<user/Applications`.
