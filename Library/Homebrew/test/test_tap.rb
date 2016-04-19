@@ -181,9 +181,10 @@ class TapTest < Homebrew::TestCase
   def test_install_tap_remote_mismatch_error
     setup_git_repo
     already_tapped_tap = Tap.new("Homebrew", "foo")
+    touch @tap.path/".git/shallow"
     assert_equal true, already_tapped_tap.installed?
     wrong_remote = "#{@tap.remote}-oops"
-    assert_raises(TapRemoteMismatchError) { already_tapped_tap.install :clone_target => wrong_remote }
+    assert_raises(TapRemoteMismatchError) { already_tapped_tap.install :clone_target => wrong_remote, :full_clone => true }
   end
 
   def test_install_tap_already_unshallow_error

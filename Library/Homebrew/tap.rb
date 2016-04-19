@@ -188,7 +188,6 @@ class Tap
     requested_remote = options[:clone_target] || "https://github.com/#{user}/homebrew-#{repo}"
 
     if installed?
-      raise TapRemoteMismatchError.new(name, @remote, requested_remote) unless remote == requested_remote
       raise TapAlreadyTappedError, name unless full_clone
       raise TapAlreadyUnshallowError, name unless shallow?
     end
@@ -197,6 +196,10 @@ class Tap
     Utils.ensure_git_installed!
 
     if installed?
+      if options[:clone_target] && requested_remote != remote
+        raise TapRemoteMismatchError.new(name, @remote, requested_remote)
+      end
+
       ohai "Unshallowing #{name}" unless quiet
       args = %W[fetch --unshallow]
       args << "-q" if quiet
