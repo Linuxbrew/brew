@@ -1,18 +1,18 @@
 HOMEBREW_HELP = <<-EOS
 Example usage:
-  brew [info | home | options ] [FORMULA...]
+  brew (info|home|options) [FORMULA...]
   brew install FORMULA...
   brew uninstall FORMULA...
-  brew search [foo]
+  brew search [TEXT|/PATTERN/]
   brew list [FORMULA...]
   brew update
   brew upgrade [FORMULA...]
-  brew pin/unpin [FORMULA...]
+  brew (pin|unpin) [FORMULA...]
 
 Troubleshooting:
   brew doctor
   brew install -vd FORMULA
-  brew [--env | config]
+  brew (--env|config)
 
 Brewing:
   brew create [URL [--no-fetch]]
@@ -21,6 +21,7 @@ Brewing:
 
 Further help:
   man brew
+  brew help [COMMAND]
   brew home
 EOS
 
