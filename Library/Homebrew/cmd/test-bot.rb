@@ -906,20 +906,13 @@ module Homebrew
 
   def test_bot
     sanitize_ARGV_and_ENV
-    p ARGV
 
     tap = resolve_test_tap
-    if tap.installed?
-      # make sure Tap is not a shallow clone.
-      # bottle revision and bottle upload rely on full clone.
-      if (tap.path/".git/shallow").exist?
-        safe_system "git", "-C", tap.path, "fetch", "--unshallow"
-      end
-    else
-      # Tap repository if required, this is done before everything else
-      # because Formula parsing and/or git commit hash lookup depends on it.
-      safe_system "brew", "tap", tap.name, "--full"
-    end
+    # Tap repository if required, this is done before everything else
+    # because Formula parsing and/or git commit hash lookup depends on it.
+    # At the same time, make sure Tap is not a shallow clone.
+    # bottle revision and bottle upload rely on full clone.
+    safe_system "brew", "tap", tap.name, "--full"
 
     if ARGV.include? "--ci-upload"
       return test_ci_upload(tap)
