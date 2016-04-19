@@ -11,7 +11,11 @@ module Homebrew
   def readall
     if ARGV.delete("--syntax")
       ruby_files = Queue.new
-      Dir.glob("#{HOMEBREW_LIBRARY}/Homebrew/**/*.rb").each do |rb|
+      scan_files = %W[
+        #{HOMEBREW_LIBRARY}/*.rb
+        #{HOMEBREW_LIBRARY}/Homebrew/**/*.rb
+      ]
+      Dir.glob(scan_files).each do |rb|
         next if rb.include?("/vendor/")
         ruby_files << rb
       end
