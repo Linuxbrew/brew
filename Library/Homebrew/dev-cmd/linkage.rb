@@ -67,7 +67,7 @@ module Homebrew
       end
 
       begin
-        f = Formula[keg.name]
+        f = Formulary.from_rack(keg.rack)
         @undeclared_deps = @brewed_dylibs.keys - f.deps.map(&:name)
         @undeclared_deps -= [f.name]
       rescue FormulaUnavailableError
