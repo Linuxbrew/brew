@@ -113,13 +113,9 @@ begin
     end
   end
 
-rescue FormulaUnspecifiedError
-  abort "This command requires a formula argument"
-rescue KegUnspecifiedError
-  abort "This command requires a keg argument"
-rescue UsageError
+rescue UsageError => e
   require "cmd/help"
-  Homebrew.help cmd, :usage_error => "Invalid usage"
+  Homebrew.help cmd, :usage_error => e.message
 rescue SystemExit => e
   onoe "Kernel.exit" if ARGV.verbose? && !e.success?
   $stderr.puts e.backtrace if ARGV.debug?

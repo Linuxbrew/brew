@@ -1,6 +1,28 @@
-class UsageError < RuntimeError; end
-class FormulaUnspecifiedError < UsageError; end
-class KegUnspecifiedError < UsageError; end
+class UsageError < RuntimeError
+  attr_reader :reason
+
+  def initialize(reason = nil)
+    @reason = reason
+  end
+
+  def to_s
+    s = "Invalid usage"
+    s += ": #{reason}" if reason
+    s
+  end
+end
+
+class FormulaUnspecifiedError < UsageError
+  def initialize
+    super "This command requires a formula argument"
+  end
+end
+
+class KegUnspecifiedError < UsageError
+  def initialize
+    super "This command requires a keg argument"
+  end
+end
 
 class MultipleVersionsInstalledError < RuntimeError
   attr_reader :name
