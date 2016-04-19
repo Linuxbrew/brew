@@ -41,7 +41,7 @@ module Homebrew
   def build_man_page
     template = (SOURCE_PATH/"brew.1.md.erb").read
 
-    Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
+    commands = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
       sort_by { |source_file| source_file.basename.sub(/\.(rb|sh)$/, "") }.
       map { |source_file|
         source_file.read.lines.
