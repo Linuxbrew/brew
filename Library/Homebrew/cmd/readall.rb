@@ -17,20 +17,18 @@ module Homebrew
       end
 
       failed = false
-      nostdout do
-        workers = (0...Hardware::CPU.cores).map do
-          Thread.new do
-            begin
-              while rb = ruby_files.pop(true)
-                # As a side effect, print syntax errors/warnings to `$stderr`.
-                failed = true if syntax_errors_or_warnings?(rb)
-              end
-            rescue ThreadError # ignore empty queue error
+      workers = (0...Hardware::CPU.cores).map do
+        Thread.new do
+          begin
+            while rb = ruby_files.pop(true)
+              # As a side effect, print syntax errors/warnings to `$stderr`.
+              failed = true if syntax_errors_or_warnings?(rb)
             end
+          rescue ThreadError # ignore empty queue error
           end
         end
-        workers.map(&:join)
       end
+      workers.each(&:join)
       Homebrew.failed = failed
     end
 
