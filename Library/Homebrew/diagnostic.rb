@@ -1100,22 +1100,6 @@ module Homebrew
         end
       end
 
-      def check_for_autoconf
-        return unless MacOS::Xcode.installed?
-        return unless MacOS::Xcode.provides_autotools?
-
-        autoconf = which("autoconf")
-        safe_autoconfs = %w[/usr/bin/autoconf /Developer/usr/bin/autoconf]
-        return if autoconf.nil? || safe_autoconfs.include?(autoconf.to_s)
-
-        <<-EOS.undent
-          An "autoconf" in your path blocks the Xcode-provided version at:
-            #{autoconf}
-
-          This custom autoconf may cause some Homebrew formulae to fail to compile.
-        EOS
-      end
-
       def __check_linked_brew(f)
         f.installed_prefixes.each do |prefix|
           prefix.find do |src|

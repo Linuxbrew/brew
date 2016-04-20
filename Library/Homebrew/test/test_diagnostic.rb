@@ -204,20 +204,6 @@ class DiagnosticChecksTest < Homebrew::TestCase
     HOMEBREW_CELLAR.mkpath
   end
 
-  def test_check_for_autoconf
-    MacOS::Xcode.stubs(:installed?).returns true
-    MacOS::Xcode.stubs(:provides_autotools?).returns true
-    mktmpdir do |path|
-      file = "#{path}/autoconf"
-      FileUtils.touch file
-      FileUtils.chmod 0755, file
-      ENV["PATH"] = [path, ENV["PATH"]].join File::PATH_SEPARATOR
-
-      assert_match "This custom autoconf",
-        @checks.check_for_autoconf
-    end
-  end
-
   def test_check_tmpdir
     ENV["TMPDIR"] = "/i/don/t/exis/t"
     assert_match "doesn't exist",
