@@ -6,6 +6,8 @@ class JavaRequirement < Requirement
   download "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
   satisfy :build_env => false do
+    return false unless File.executable? "/usr/libexec/java_home"
+
     args = %w[--failfast]
     args << "--version" << "#{@version}" if @version
     @java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp
