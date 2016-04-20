@@ -138,10 +138,6 @@ module OS
         end
       end
 
-      def provides_autotools?
-        version < "4.3"
-      end
-
       def provides_gcc?
         version < "4.3"
       end
