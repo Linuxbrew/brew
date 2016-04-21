@@ -19,7 +19,7 @@ setup-analytics() {
     HOMEBREW_ANALYTICS_ID="UA-76492262-1"
   else
     # Otherwise, fall back to Homebrew's analytics.
-    HOMEBREW_ANALYTICS_ID="UA-75654628-1"
+    HOMEBREW_ANALYTICS_ID="UA-76679469-1"
   fi
 
   export HOMEBREW_ANALYTICS_ID
