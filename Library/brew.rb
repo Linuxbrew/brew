@@ -78,6 +78,11 @@ begin
     # `Homebrew.help` never returns, except for external/unknown commands.
   end
 
+  # Uninstall old brew-cask if it's still around; we just use the tap now.
+  if cmd == "cask" && (HOMEBREW_CELLAR/"brew-cask").exist?
+    system(HOMEBREW_BREW_FILE, "uninstall", "--force", "brew-cask")
+  end
+
   if internal_cmd
     Homebrew.send cmd.to_s.tr("-", "_").downcase
   elsif which "brew-#{cmd}"
