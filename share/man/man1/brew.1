@@ -538,11 +538,11 @@ Unpin \fIformulae\fR, allowing them to be upgraded by \fBbrew upgrade\fR\. See a
 Remove a tapped repository\.
 .
 .TP
-\fBupdate\fR [\fB\-\-rebase\fR]
+\fBupdate\fR [\fB\-\-merge\fR]
 Fetch the newest version of Homebrew and all formulae from GitHub using \fBgit\fR(1)\.
 .
 .IP
-If \fB\-\-rebase\fR is specified then \fBgit pull \-\-rebase\fR is used\.
+If \fB\-\-merge\fR is specified then \fBgit merge\fR is used to include updates (rather than \fBgit rebase\fR)\.
 .
 .TP
 \fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fIformulae\fR]

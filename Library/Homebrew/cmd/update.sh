@@ -1,8 +1,9 @@
-#:  * `update` [`--rebase`]:
+#:  * `update` [`--merge`]:
 #:    Fetch the newest version of Homebrew and all formulae from GitHub using
 #:     `git`(1).
 #:
-#:    If `--rebase` is specified then `git pull --rebase` is used.
+#:    If `--merge` is specified then `git merge` is used to include updates
+#:      (rather than `git rebase`).
 
 brew() {
   "$HOMEBREW_BREW_FILE" "$@"
@@ -199,7 +200,7 @@ pull() {
   # ensure we don't munge line endings on checkout
   git config core.autocrlf false
 
-  if [[ -n "$HOMEBREW_REBASE" ]]
+  if [[ -z "$HOMEBREW_MERGE" ]]
   then
     git rebase "${QUIET_ARGS[@]}" "origin/$UPSTREAM_BRANCH"
   else
@@ -236,7 +237,7 @@ homebrew-update() {
       --help) brew help update; exit $? ;;
       --verbose) HOMEBREW_VERBOSE=1 ;;
       --debug) HOMEBREW_DEBUG=1;;
-      --rebase) HOMEBREW_REBASE=1 ;;
+      --merge) HOMEBREW_MERGE=1 ;;
       --simulate-from-current-branch) HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH=1 ;;
       --preinstall) HOMEBREW_UPDATE_PREINSTALL=1 ;;
       --*) ;;

@@ -390,10 +390,11 @@ source. This is useful for creating patches for the software.</p></dd>
 <dt><code>unpin</code> <var>formulae</var></dt><dd><p>Unpin <var>formulae</var>, allowing them to be upgraded by <code>brew upgrade</code>. See also
 <code>pin</code>.</p></dd>
 <dt><code>untap</code> <var>tap</var></dt><dd><p>Remove a tapped repository.</p></dd>
-<dt><code>update</code> [<code>--rebase</code>]</dt><dd><p>Fetch the newest version of Homebrew and all formulae from GitHub using
+<dt><code>update</code> [<code>--merge</code>]</dt><dd><p>Fetch the newest version of Homebrew and all formulae from GitHub using
  <code>git</code>(1).</p>
 
-<p>If <code>--rebase</code> is specified then <code>git pull --rebase</code> is used.</p></dd>
+<p>If <code>--merge</code> is specified then <code>git merge</code> is used to include updates
+  (rather than <code>git rebase</code>).</p></dd>
 <dt><code>upgrade</code> [<var>install-options</var>] [<code>--cleanup</code>] [<var>formulae</var>]</dt><dd><p>Upgrade outdated, unpinned brews.</p>
 
 <p>Options for the <code>install</code> command are also valid here.</p>
