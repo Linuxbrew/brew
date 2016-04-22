@@ -1,6 +1,7 @@
 require "download_strategy"
 require "checksum"
 require "version"
+require "forwardable"
 
 # Resource is the fundamental representation of an external resource. The
 # primary formula download, along with other declared resources, are instances
@@ -86,15 +87,15 @@ class Resource
   end
 
   # If a target is given, unpack there; else unpack to a temp folder.
-  # If block is given, yield to that block with |self, staging|, where staging
-  # is a staging context that responds to retain!().
+  # If block is given, yield to that block with |stage|, where stage
+  # is a ResourceStagingContext.
   # A target or a block must be given, but not both.
   def unpack(target = nil)
     mktemp(download_name) do |staging|
       downloader.stage
       @source_modified_time = downloader.source_modified_time
       if block_given?
-        yield self, staging
+        yield ResourceStageContext.new(self, staging)
       elsif target
         target = Pathname.new(target) unless target.is_a? Pathname
         target.install Dir["*"]
@@ -184,5 +185,29 @@ class Resource
       @patch_files.concat(paths)
       @patch_files.uniq!
     end
+  end
+end
+
+# The context in which a Resource.stage() occurs. Supports access to both
+# the Resource and associated Mktemp in a single block argument. The interface
+# is back-compatible with Resource itself as used in that context.
+class ResourceStageContext
+  extend Forwardable
+
+  # The Resource that is being staged
+  attr_reader :resource
+  # The Mktemp in which @resource is staged
+  attr_reader :staging
+
+  def_delegators :@resource, :version, :url, :mirrors, :specs, :using, :source_modified_time
+  def_delegators :@staging, :retain!
+
+  def initialize(resource, staging)
+    @resource = resource
+    @staging = staging
+  end
+
+  def to_s
+    "<#{self.class}: resource=#{resource} staging=#{staging}>"
   end
 end

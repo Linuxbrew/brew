@@ -179,7 +179,7 @@ end
 unless File.respond_to?(:write)
   class File
     def self.write(filename, contents)
-      File.open(filename, 'w') do |file|
+      File.open(filename, "w") do |file|
         file.write contents
       end
     end
