@@ -373,11 +373,12 @@ A convenience function that can edit files in-place. For example:
 
 `inreplace "path", before, after`
 
-`before` and `after` can be strings or regular expressions. You can also use the block form:
+`before` and `after` can be strings or regular expressions. You should use the block form if you need to make multiple replacements in a file:
 
 ```ruby
 inreplace "path" do |s|
   s.gsub! /foo/, "bar"
+  s.gsub! "123", "456"
 end
 ```
 
