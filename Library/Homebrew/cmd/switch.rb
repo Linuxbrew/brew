@@ -1,3 +1,6 @@
+#:  * `switch` <name> <version>:
+#:    Symlink all of the specific <version> of <name>'s install to Homebrew prefix.
+
 require "formula"
 require "keg"
 require "cmd/link"

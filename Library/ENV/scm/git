@@ -13,13 +13,16 @@ exec "$HOMEBREW_RUBY_PATH" -x "$0" "$@"
 # This script because we support $GIT, $HOMEBREW_SVN, etc., Xcode-only and
 # no Xcode/CLT configurations. Order is careful to be what the user would want.
 
+require "pathname"
+
+SELF_REAL = Pathname.new(__FILE__).realpath
 F = File.basename(__FILE__).freeze
 D = File.expand_path(File.dirname(__FILE__)).freeze
 
 def exec(*args)
   # prevent fork-bombs
   arg0 = args.first
-  return if arg0 =~ /^#{F}/i || File.expand_path(arg0) == File.expand_path(__FILE__)
+  return if arg0 =~ /^#{F}/i || Pathname.new(arg0).realpath == SELF_REAL
   super
 end
 

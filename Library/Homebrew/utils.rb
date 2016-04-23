@@ -5,6 +5,7 @@ require "utils/inreplace"
 require "utils/popen"
 require "utils/fork"
 require "utils/git"
+require "utils/analytics"
 require "open-uri"
 
 class Tty
@@ -171,8 +172,7 @@ def interactive_shell(f = nil)
   if $?.success?
     return
   elsif $?.exited?
-    puts "Aborting due to non-zero exit status"
-    exit $?.exitstatus
+    raise "Aborted due to non-zero exit status (#{$?.exitstatus})"
   else
     raise $?.inspect
   end
@@ -229,6 +229,18 @@ module Homebrew
     end
   end
 
+  def self.core_tap_version_string
+    require "tap"
+    tap = CoreTap.instance
+    return "N/A" unless tap.installed?
+    if pretty_revision = tap.git_short_head
+      last_commit = tap.git_last_commit_date
+      "(git revision #{pretty_revision}; last commit #{last_commit})"
+    else
+      "(no git repository)"
+    end
+  end
+
   def self.install_gem_setup_path!(gem, version = nil, executable = gem)
     require "rubygems"
 
@@ -262,6 +274,39 @@ module Homebrew
         The '#{gem}' gem is installed but couldn't find '#{executable}' in the PATH:
         #{ENV["PATH"]}
       EOS
+    end
+  end
+
+  # Hash of Module => Set(method_names)
+  @@injected_dump_stat_modules = {}
+
+  def inject_dump_stats!(the_module, pattern)
+    @@injected_dump_stat_modules[the_module] ||= []
+    injected_methods = @@injected_dump_stat_modules[the_module]
+    the_module.module_eval do
+      instance_methods.grep(pattern).each do |name|
+        next if injected_methods.include? name
+        method = instance_method(name)
+        define_method(name) do |*args, &block|
+          begin
+            time = Time.now
+            method.bind(self).call(*args, &block)
+          ensure
+            $times[name] ||= 0
+            $times[name] += Time.now - time
+          end
+        end
+      end
+    end
+
+    if $times.nil?
+      $times = {}
+      at_exit do
+        col_width = [$times.keys.map(&:size).max + 2, 15].max
+        $times.sort_by { |_k, v| v }.each do |method, time|
+          puts format("%-*s %0.4f sec", col_width, "#{method}:", time)
+        end
+      end
     end
   end
 end
@@ -298,20 +343,15 @@ def quiet_system(cmd, *args)
 end
 
 def curl(*args)
-  brewed_curl = HOMEBREW_PREFIX/"opt/curl/bin/curl"
-  curl = if MacOS.version <= "10.8" && brewed_curl.exist?
-    brewed_curl
-  elsif OS.mac?
-    Pathname.new "/usr/bin/curl"
-  else
-    which("curl") || Pathname.new("/usr/bin/curl")
-  end
+  curl = Pathname.new ENV["HOMEBREW_CURL"]
+  curl = which("curl") unless curl.exist? || OS.mac?
+  curl = Pathname.new "/usr/bin/curl" unless curl.exist?
   raise "#{curl} is not executable" unless curl.exist? && curl.executable?
 
   flags = HOMEBREW_CURL_ARGS
   flags = flags.delete("#") if ARGV.verbose?
 
-  args = [flags, HOMEBREW_USER_AGENT, *args]
+  args = [flags, HOMEBREW_USER_AGENT_CURL, *args]
   args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
   args << "--silent" if !$stdout.tty? || ENV["TRAVIS"]
 
@@ -585,7 +625,7 @@ module GitHub
 
   def api_headers
     {
-      "User-Agent" => HOMEBREW_USER_AGENT,
+      "User-Agent" => HOMEBREW_USER_AGENT_RUBY,
       "Accept"     => "application/vnd.github.v3+json"
     }
   end
@@ -654,7 +694,7 @@ module GitHub
 
   def build_search_qualifier_string(qualifiers)
     {
-      :repo => OS::GITHUB_REPOSITORY,
+      :repo => "#{OS::GITHUB_USER}/homebrew-core",
       :in => "title"
     }.update(qualifiers).map do |qualifier, value|
       "#{qualifier}:#{value}"
@@ -670,8 +710,9 @@ module GitHub
     end
   end
 
-  def issues_for_formula(name)
-    issues_matching(name, :state => "open")
+  def issues_for_formula(name, options = {})
+    tap = options[:tap] || CoreTap.instance
+    issues_matching(name, :state => "open", :repo => "#{tap.user}/homebrew-#{tap.repo}")
   end
 
   def print_pull_requests_matching(query)

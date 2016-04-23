@@ -22,15 +22,11 @@ module Homebrew
     end
 
     if Sandbox.available? && ARGV.sandbox?
-      if Sandbox.auto_disable?
-        Sandbox.print_autodisable_warning
-      else
-        Sandbox.print_sandbox_message
-      end
+      Sandbox.print_sandbox_message
     end
 
     Utils.safe_fork do
-      if Sandbox.available? && ARGV.sandbox? && !Sandbox.auto_disable?
+      if Sandbox.available? && ARGV.sandbox?
         sandbox = Sandbox.new
         formula.logs.mkpath
         sandbox.record_log(formula.logs/"sandbox.postinstall.log")

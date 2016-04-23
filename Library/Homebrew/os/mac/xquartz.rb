@@ -37,7 +37,7 @@ module OS
       def detect_version
         if (path = bundle_path) && path.exist? && (version = version_from_mdls(path))
           version
-        elsif prefix.to_s == "/usr/X11"
+        elsif prefix.to_s == "/usr/X11" || prefix.to_s == "/usr/X11R6"
           guess_system_version
         else
           version_from_pkgutil
@@ -71,6 +71,7 @@ module OS
       # educated guess as to what version is installed.
       def guess_system_version
         case MacOS.version
+        when "10.4" then "1.1.3"
         when "10.5" then "2.1.6"
         when "10.6" then "2.3.6"
         when "10.7" then "2.6.3"
@@ -100,6 +101,9 @@ module OS
           Pathname.new("/opt/X11")
         elsif Pathname.new("/usr/X11/lib/libpng.dylib").exist?
           Pathname.new("/usr/X11")
+        # X11 doesn't include libpng on Tiger
+        elsif Pathname.new("/usr/X11R6/lib/libX11.dylib").exist?
+          Pathname.new("/usr/X11R6")
         end
       end
 

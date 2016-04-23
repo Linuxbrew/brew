@@ -55,7 +55,7 @@ class TapTest < Homebrew::TestCase
   end
 
   def teardown
-    Tap::TAP_DIRECTORY.rmtree
+    @path.rmtree
   end
 
   def test_fetch
@@ -68,7 +68,7 @@ class TapTest < Homebrew::TestCase
   end
 
   def test_names
-    assert_equal ["homebrew/foo"], Tap.names
+    assert_equal ["homebrew/core", "homebrew/foo"], Tap.names
   end
 
   def test_attributes
@@ -95,6 +95,8 @@ class TapTest < Homebrew::TestCase
 
     (Tap::TAP_DIRECTORY/"someone/homebrew-no-git").mkpath
     assert_nil Tap.new("someone", "no-git").issues_url
+  ensure
+    path.parent.rmtree
   end
 
   def test_files
@@ -132,6 +134,8 @@ class TapTest < Homebrew::TestCase
       end
     end
     refute_predicate version_tap, :private?
+  ensure
+    version_tap.path.rmtree
   end
 
   def test_remote_not_git_repo
@@ -160,7 +164,33 @@ class TapTest < Homebrew::TestCase
   end
 
   def test_install_tap_already_tapped_error
-    assert_raises(TapAlreadyTappedError) { @tap.install }
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    assert_equal true, already_tapped_tap.installed?
+    assert_raises(TapAlreadyTappedError) { already_tapped_tap.install }
+  end
+
+  def test_install_tap_remote_match_already_tapped_error
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    assert_equal true, already_tapped_tap.installed?
+    right_remote = "#{@tap.remote}"
+    assert_raises(TapAlreadyTappedError) { already_tapped_tap.install :clone_target => right_remote }
+  end
+
+  def test_install_tap_remote_mismatch_error
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    touch @tap.path/".git/shallow"
+    assert_equal true, already_tapped_tap.installed?
+    wrong_remote = "#{@tap.remote}-oops"
+    assert_raises(TapRemoteMismatchError) { already_tapped_tap.install :clone_target => wrong_remote, :full_clone => true }
+  end
+
+  def test_install_tap_already_unshallow_error
+    setup_git_repo
+    already_tapped_tap = Tap.new("Homebrew", "foo")
+    assert_raises(TapAlreadyUnshallowError) { already_tapped_tap.install :full_clone => true }
   end
 
   def test_uninstall_tap_unavailable_error
@@ -202,6 +232,16 @@ class TapTest < Homebrew::TestCase
     @tap.unpin
     refute_predicate @tap, :pinned?
   end
+
+  def test_config
+    setup_git_repo
+
+    assert_nil @tap.config["foo"]
+    @tap.config["foo"] = "bar"
+    assert_equal "bar", @tap.config["foo"]
+    @tap.config["foo"] = nil
+    assert_nil @tap.config["foo"]
+  end
 end
 
 class CoreTapTest < Homebrew::TestCase
@@ -213,8 +253,8 @@ class CoreTapTest < Homebrew::TestCase
 
   def test_attributes
     assert_equal "Homebrew", @repo.user
-    assert_equal "homebrew", @repo.repo
-    assert_equal "Homebrew/homebrew", @repo.name
+    assert_equal "core", @repo.repo
+    assert_equal "homebrew/core", @repo.name
     assert_equal [], @repo.command_files
     assert_predicate @repo, :installed?
     refute_predicate @repo, :pinned?

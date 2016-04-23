@@ -120,6 +120,10 @@ module HomebrewArgvExtension
     include?("--dry-run") || switch?("n")
   end
 
+  def keep_tmp?
+    include? "--keep-tmp"
+  end
+
   def git?
     flag? "--git"
   end
@@ -196,11 +200,6 @@ module HomebrewArgvExtension
   def switch?(char)
     return false if char.length > 1
     options_only.any? { |arg| arg.scan("-").size == 1 && arg.include?(char) }
-  end
-
-  def usage
-    require "cmd/help"
-    Homebrew.help_s
   end
 
   def cc

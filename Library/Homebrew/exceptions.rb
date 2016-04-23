@@ -1,6 +1,28 @@
-class UsageError < RuntimeError; end
-class FormulaUnspecifiedError < UsageError; end
-class KegUnspecifiedError < UsageError; end
+class UsageError < RuntimeError
+  attr_reader :reason
+
+  def initialize(reason = nil)
+    @reason = reason
+  end
+
+  def to_s
+    s = "Invalid usage"
+    s += ": #{reason}" if reason
+    s
+  end
+end
+
+class FormulaUnspecifiedError < UsageError
+  def initialize
+    super "This command requires a formula argument"
+  end
+end
+
+class KegUnspecifiedError < UsageError
+  def initialize
+    super "This command requires a keg argument"
+  end
+end
 
 class MultipleVersionsInstalledError < RuntimeError
   attr_reader :name
@@ -68,6 +90,43 @@ class TapFormulaUnavailableError < FormulaUnavailableError
   end
 end
 
+class FormulaClassUnavailableError < FormulaUnavailableError
+  attr_reader :path
+  attr_reader :class_name
+  attr_reader :class_list
+
+  def initialize(name, path, class_name, class_list)
+    @path = path
+    @class_name = class_name
+    @class_list = class_list
+    super name
+  end
+
+  def to_s
+    s = super
+    s += "\nIn formula file: #{path}"
+    s += "\nExpected to find class #{class_name}, but #{class_list_s}."
+    s
+  end
+
+  private
+
+  def class_list_s
+    formula_class_list = class_list.select { |klass| klass < Formula }
+    if class_list.empty?
+      "found no classes"
+    elsif formula_class_list.empty?
+      "only found: #{format_list(class_list)} (not derived from Formula!)"
+    else
+      "only found: #{format_list(formula_class_list)}"
+    end
+  end
+
+  def format_list(class_list)
+    class_list.map { |klass| klass.name.split("::")[-1] }.join(", ")
+  end
+end
+
 class TapFormulaAmbiguityError < RuntimeError
   attr_reader :name, :paths, :formulae
 
@@ -119,6 +178,23 @@ class TapUnavailableError < RuntimeError
   end
 end
 
+class TapRemoteMismatchError < RuntimeError
+  attr_reader :name
+  attr_reader :expected_remote
+  attr_reader :actual_remote
+
+  def initialize(name, expected_remote, actual_remote)
+    @name = name
+    @expected_remote = expected_remote
+    @actual_remote = actual_remote
+
+    super <<-EOS.undent
+      Tap #{name} remote mismatch.
+      #{expected_remote} != #{actual_remote}
+    EOS
+  end
+end
+
 class TapAlreadyTappedError < RuntimeError
   attr_reader :name
 
@@ -127,6 +203,18 @@ class TapAlreadyTappedError < RuntimeError
 
     super <<-EOS.undent
       Tap #{name} already tapped.
+    EOS
+  end
+end
+
+class TapAlreadyUnshallowError < RuntimeError
+  attr_reader :name
+
+  def initialize(name)
+    @name = name
+
+    super <<-EOS.undent
+      Tap #{name} already a full clone.
     EOS
   end
 end
@@ -219,7 +307,7 @@ class BuildError < RuntimeError
   end
 
   def fetch_issues
-    GitHub.issues_for_formula(formula.name)
+    GitHub.issues_for_formula(formula.name, :tap => formula.tap)
   rescue GitHub::RateLimitExceededError => e
     opoo e.message
     []
@@ -229,14 +317,14 @@ class BuildError < RuntimeError
     if !ARGV.verbose?
       puts
       puts "#{Tty.red}READ THIS#{Tty.reset}: #{Tty.em}#{OS::ISSUES_URL}#{Tty.reset}"
-      if formula.tap?
+      if formula.tap
         case formula.tap.name
         when "homebrew/boneyard"
           puts "#{formula} was moved to homebrew-boneyard because it has unfixable issues."
           puts "Please do not file any issues about this. Sorry!"
         else
           if issues_url = formula.tap.issues_url
-            puts "If reporting this issue please do so at (not Homebrew/homebrew):"
+            puts "If reporting this issue please do so at (not Homebrew/brew):"
             puts "  #{issues_url}"
           end
         end

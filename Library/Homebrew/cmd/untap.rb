@@ -1,3 +1,6 @@
+#:  * `untap` <tap>:
+#:    Remove a tapped repository.
+
 require "tap"
 
 module Homebrew
@@ -6,7 +9,7 @@ module Homebrew
 
     ARGV.named.each do |tapname|
       tap = Tap.fetch(tapname)
-      raise "#{tap} is not allowed" if tap.core_tap?
+      raise "untapping #{tap} is not allowed" if tap.core_tap?
       tap.uninstall
     end
   end

@@ -17,7 +17,9 @@ class AbstractDownloadStrategy
   def fetch
   end
 
-  # Unpack {#cached_location} into the current working directory.
+  # Unpack {#cached_location} into the current working directory, and possibly
+  # chdir into the newly-unpacked directory.
+  # Unlike {Resource#stage}, this does not take a block.
   def stage
   end
 

@@ -1,3 +1,13 @@
+#:  * `diy` [`--name=`<name>] [`--version=`<version>]:
+#:    Automatically determine the installation prefix for non-Homebrew software.
+#:
+#:    Using the output from this command, you can install your own software into
+#:    the Cellar and then link it into Homebrew's prefix with `brew link`.
+#:
+#:    The options `--name=`<name> and `--version=`<version> each take an argument
+#:    and allow you to explicitly set the name and version of the package you are
+#:    installing.
+
 require "formula"
 
 module Homebrew

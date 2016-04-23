@@ -105,7 +105,8 @@ class Build
 
     formula.extend(Debrew::Formula) if ARGV.debug?
 
-    formula.brew do
+    formula.brew do |_formula, staging|
+      staging.retain! if ARGV.keep_tmp?
       formula.patch
 
       if ARGV.git?

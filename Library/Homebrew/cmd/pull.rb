@@ -18,6 +18,8 @@
 #   --resolve:   When a patch fails to apply, leave in progress and allow user to
 #                 resolve, instead of aborting
 #   --branch-okay: Do not warn if pulling to a branch besides master (useful for testing)
+#   --legacy:    Pull legacy formula PR from Homebrew/homebrew
+#                (TODO remove it when it's not longer necessary)
 
 require "utils"
 require "utils/json"
@@ -37,21 +39,26 @@ module Homebrew
     github_repo = ""
     bintray_project = "homebrew"
     bintray_fetch_formulae = []
+    tap = nil
 
     ARGV.named.each do |arg|
       if arg.to_i > 0
         issue = arg
         if OS.mac?
-          url = "https://github.com/Homebrew/homebrew/pull/#{arg}"
+          if ARGV.include? "--legacy"
+            url = "https://github.com/Homebrew/homebrew/pull/#{arg}"
+          else
+            url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
+          end
         elsif OS.linux?
-          url = "https://github.com/Linuxbrew/linuxbrew/pull/#{arg}"
+          url = "https://github.com/Linuxbrew/homebrew-core/pull/#{arg}"
           bintray_project = "linuxbrew"
-          github_repo = "Linuxbrew/linuxbrew"
+          github_repo = "Linuxbrew/homebrew-core"
         end
         tap = CoreTap.instance
       elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
-        url = "https://github.com/Homebrew/homebrew/compare/master...BrewTestBot:testing-#{testing_job}"
+        url = "https://github.com/Homebrew/homebrew-core/compare/master...BrewTestBot:testing-#{testing_job}"
         tap = CoreTap.instance
         odie "Testing URLs require `--bottle`!" unless ARGV.include?("--bottle")
       elsif (url_match = arg.match %r[https://github\.com/Linuxbrew/linuxbrew/pull/(\d+)\?([\w-]+):([\w-]+)])
@@ -67,21 +74,27 @@ module Homebrew
         github_repo = "Linuxbrew/linuxbrew"
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
-        url = "https://github.com/#{user}/homebrew#{repo}/pull/#{issue}"
-        tap = Tap.fetch(user, "homebrew#{repo}")
+        url = "https://github.com/#{user}/#{repo}/pull/#{issue}"
+        tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
+        tap = CoreTap.instance if ARGV.include?("--legacy")
       elsif (url_match = arg.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
         url, user, repo, issue = *url_match
-        tap = Tap.fetch(user, "homebrew#{repo}")
+        tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
+        tap = CoreTap.instance if ARGV.include?("--legacy")
       else
         odie "Not a GitHub pull request or commit: #{arg}"
       end
 
       if !testing_job && ARGV.include?("--bottle") && issue.nil?
-        raise "No pull request detected!"
+        odie "No pull request detected!"
       end
 
-      tap.install unless tap.installed?
-      Dir.chdir tap.path
+      if tap
+        tap.install unless tap.installed?
+        Dir.chdir tap.path
+      else
+        Dir.chdir HOMEBREW_REPOSITORY
+      end
 
       # The cache directory seems like a good place to put patches.
       HOMEBREW_CACHE.mkpath
@@ -97,6 +110,11 @@ module Homebrew
       patch_puller = PatchPuller.new(url)
       patch_puller.fetch_patch
       patch_changes = files_changed_in_patch(patch_puller.patchpath, tap)
+
+      if ARGV.include?("--legacy") && patch_changes[:others].reject { |f| f.start_with? "Library/Aliases" }.any?
+        odie "Cannot merge legacy PR!"
+      end
+
       is_bumpable = patch_changes[:formulae].length == 1 && patch_changes[:others].empty?
       if do_bump
         odie "No changed formulae found to bump" if patch_changes[:formulae].empty?
@@ -112,16 +130,18 @@ module Homebrew
 
       changed_formulae = []
 
-      Utils.popen_read(
-        "git", "diff-tree", "-r", "--name-only",
-        "--diff-filter=AM", revision, "HEAD", "--", tap.formula_dir.to_s
-      ).each_line do |line|
-        name = "#{tap.name}/#{File.basename(line.chomp, ".rb")}"
-        begin
-          changed_formulae << Formula[name]
-        # Make sure we catch syntax errors.
-        rescue Exception
-          next
+      if tap
+        Utils.popen_read(
+          "git", "diff-tree", "-r", "--name-only",
+          "--diff-filter=AM", revision, "HEAD", "--", tap.formula_dir.to_s
+        ).each_line do |line|
+          name = "#{tap.name}/#{File.basename(line.chomp, ".rb")}"
+          begin
+            changed_formulae << Formula[name]
+          # Make sure we catch syntax errors.
+          rescue Exception
+            next
+          end
         end
       end
 
@@ -143,12 +163,14 @@ module Homebrew
 
       orig_message = message = `git log HEAD^.. --format=%B`
       if issue && !ARGV.include?("--clean")
-        ohai "Patch closes issue ##{issue}"
-        # If this is a pull request, append a close message.
-        closes = "Closes #{github_repo}##{issue}."
-        unless message.include? closes
-          message += "\n#{closes}"
+        ohai "Patch closes issue #{github_repo}##{issue}"
+        if ARGV.include?("--legacy")
+          close_message = "Closes Homebrew/homebrew##{issue}."
+        else
+          close_message = "Closes #{github_repo}##{issue}."
         end
+        # If this is a pull request, append a close message.
+        message += "\n#{close_message}" unless message.include? close_message
       end
 
       if changed_formulae.empty?
@@ -186,6 +208,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
+<<<<<<< HEAD
           if tap.core_tap?
             if user && rev
               "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{user}-#{rev}"
@@ -197,8 +220,20 @@ module Homebrew
           else
             "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
           end
+=======
+          "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
         end
-        curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
+
+        bottle_commit_fallbacked = false
+        begin
+          curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
+        rescue ErrorDuringExecution
+          raise if !ARGV.include?("--legacy") || bottle_commit_fallbacked
+          bottle_commit_url = "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
+          bottle_commit_fallbacked = true
+          retry
+>>>>>>> homebrew/master
+        end
 
         safe_system "git", "checkout", "-B", bottle_branch, revision
         pull_patch bottle_commit_url
@@ -303,10 +338,18 @@ module Homebrew
 
       # Fall back to three-way merge if patch does not apply cleanly
       patch_args << "-3"
+      patch_args << "-p2" if ARGV.include?("--legacy") && !base_url.include?("BrewTestBot/homebrew-core")
       patch_args << patchpath
+
+      start_revision = `git rev-parse HEAD`.strip
 
       begin
         safe_system "git", "am", *patch_args
+        if ARGV.include?("--legacy")
+          safe_system "git", "filter-branch", "-f", "--msg-filter",
+                             "sed -E -e \"s/ (#[0-9]+)/ Homebrew\\/homebrew\\1/g\"",
+                             "#{start_revision}..HEAD"
+        end
       rescue ErrorDuringExecution
         if ARGV.include? "--resolve"
           odie "Patch failed to apply: try to resolve it."
@@ -331,7 +374,7 @@ module Homebrew
       files << $1 if line =~ %r{^\+\+\+ b/(.*)}
     end
     files.each do |file|
-      if tap.formula_file?(file)
+      if (tap && tap.formula_file?(file)) || (ARGV.include?("--legacy") && file.start_with?("Library/Formula/"))
         formula_name = File.basename(file, ".rb")
         formulae << formula_name unless formulae.include?(formula_name)
       else

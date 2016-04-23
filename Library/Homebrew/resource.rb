@@ -72,6 +72,10 @@ class Resource
     downloader.clear_cache
   end
 
+  # Verifies download and unpacks it
+  # The block may call `|resource,staging| staging.retain!` to retain the staging
+  # directory. Subclasses that override stage should implement the tmp
+  # dir using FileUtils.mktemp so that works with all subtypes.
   def stage(target = nil, &block)
     unless target || block
       raise ArgumentError, "target directory or block is required"
@@ -81,15 +85,16 @@ class Resource
     unpack(target, &block)
   end
 
-  # If a target is given, unpack there; else unpack to a temp folder
-  # If block is given, yield to that block
-  # A target or a block must be given, but not both
+  # If a target is given, unpack there; else unpack to a temp folder.
+  # If block is given, yield to that block with |self, staging|, where staging
+  # is a staging context that responds to retain!().
+  # A target or a block must be given, but not both.
   def unpack(target = nil)
-    mktemp(download_name) do
+    mktemp(download_name) do |staging|
       downloader.stage
       @source_modified_time = downloader.source_modified_time
       if block_given?
-        yield self
+        yield self, staging
       elsif target
         target = Pathname.new(target) unless target.is_a? Pathname
         target.install Dir["*"]

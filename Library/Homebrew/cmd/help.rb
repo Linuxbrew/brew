@@ -1,26 +1,27 @@
 HOMEBREW_HELP = <<-EOS
 Example usage:
-  brew [info | home | options ] [FORMULA...]
+  brew (info|home|options) [FORMULA...]
   brew install FORMULA...
   brew uninstall FORMULA...
-  brew search [foo]
+  brew search [TEXT|/PATTERN/]
   brew list [FORMULA...]
   brew update
   brew upgrade [FORMULA...]
-  brew pin/unpin [FORMULA...]
+  brew (pin|unpin) [FORMULA...]
 
 Troubleshooting:
   brew doctor
   brew install -vd FORMULA
-  brew [--env | config]
+  brew (--env|config)
 
 Brewing:
   brew create [URL [--no-fetch]]
   brew edit [FORMULA...]
-  https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Formula-Cookbook.md
+  https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Formula-Cookbook.md
 
 Further help:
   man brew
+  brew help [COMMAND]
   brew home
 EOS
 
@@ -32,11 +33,67 @@ EOS
 # NOTE The reason the string is at the top is so 25 lines is easy to measure!
 
 module Homebrew
-  def help
-    puts HOMEBREW_HELP
+  def help(cmd = nil, flags = {})
+    # Resolve command aliases and find file containing the implementation.
+    if cmd
+      cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
+      path = command_path(cmd)
+    end
+
+    # Display command-specific (or generic) help in response to `UsageError`.
+    if (error_message = flags[:usage_error])
+      $stderr.puts path ? command_help(path) : HOMEBREW_HELP
+      $stderr.puts
+      onoe error_message
+      exit 1
+    end
+
+    # Handle `brew` (no arguments).
+    if flags[:empty_argv]
+      $stderr.puts HOMEBREW_HELP
+      exit 1
+    end
+
+    # Handle `brew (-h|--help|--usage|-?|help)` (no other arguments).
+    if cmd.nil?
+      puts HOMEBREW_HELP
+      exit 0
+    end
+
+    # Resume execution in `brew.rb` for external/unknown commands.
+    return if path.nil?
+
+    # Display help for internal command (or generic help if undocumented).
+    puts command_help(path)
+    exit 0
   end
 
-  def help_s
-    HOMEBREW_HELP
+  private
+
+  def command_path(cmd)
+    if File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh")
+      HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh"
+    elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh")
+      HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh"
+    elsif File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.rb")
+      HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.rb"
+    elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb")
+      HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb"
+    end
+  end
+
+  def command_help(path)
+    help_lines = path.read.lines.grep(/^#:/)
+    if help_lines.empty?
+      opoo "No help text in: #{path}" if ARGV.homebrew_developer?
+      HOMEBREW_HELP
+    else
+      help_lines.map do |line|
+        line.slice(2..-1).
+          sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ").
+          gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}").
+          gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}")
+      end.join
+    end
   end
 end

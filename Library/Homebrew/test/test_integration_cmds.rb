@@ -130,8 +130,21 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_help
-    assert_match "Example usage:",
-                 cmd("help")
+    assert_match "Example usage:\n",
+                 cmd_fail # Generic help (empty argument list).
+    assert_match "Unknown command: command-that-does-not-exist",
+                 cmd_fail("help", "command-that-does-not-exist")
+    assert_match(/^brew cat /,
+                 cmd_fail("cat")) # Missing formula argument triggers help.
+
+    assert_match "Example usage:\n",
+                 cmd("help") # Generic help.
+    assert_match(/^brew cat /,
+                 cmd("help", "cat")) # Internal command (documented, Ruby).
+    assert_match(/^brew update /,
+                 cmd("help", "update")) # Internal command (documented, Shell).
+    assert_match "Example usage:\n",
+                 cmd("help", "test-bot") # Internal command (undocumented).
   end
 
   def test_config
@@ -217,7 +230,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     assert_match "homebrew/foo", cmd("tap")
     assert_match "homebrew/versions", cmd("tap", "--list-official")
-    assert_match "1 tap", cmd("tap-info")
+    assert_match "2 taps", cmd("tap-info")
     assert_match "https://github.com/Homebrew/homebrew-foo", cmd("tap-info", "homebrew/foo")
     assert_match "https://github.com/Homebrew/homebrew-foo", cmd("tap-info", "--json=v1", "--installed")
     assert_match "Pinned homebrew/foo", cmd("tap-pin", "homebrew/foo")
@@ -228,7 +241,7 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_equal "", cmd("tap", "homebrew/bar", path/".git", "-q", "--full")
     assert_match "Untapped", cmd("untap", "homebrew/bar")
   ensure
-    Tap::TAP_DIRECTORY.rmtree
+    path.rmtree
   end
 
   def test_missing
@@ -339,13 +352,12 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_tap_readme
-    (HOMEBREW_LIBRARY/"Taps").mkpath
     assert_match "brew install homebrew/foo/<formula>",
                  cmd("tap-readme", "foo", "--verbose")
     readme = HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo/README.md"
     assert readme.exist?, "The README should be created"
   ensure
-    (HOMEBREW_LIBRARY/"Taps").rmtree
+    (HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo").rmtree
   end
 
   def test_unpack
@@ -413,8 +425,8 @@ class IntegrationCommandTests < Homebrew::TestCase
     (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
 
     cmd("upgrade")
-    assert (HOMEBREW_CELLAR/"testball/0.1").directory?,
-      "The latest version directory should be created"
+    assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should be created")
   ensure
     formula_file.unlink
     cmd("uninstall", "--force", testball)
@@ -435,7 +447,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     source_dir = HOMEBREW_CELLAR/"testball/0.1/TestBall.app"
     source_dir.mkpath
-    assert_match "Linking #{source_dir} to",
+    assert_match "Linking: #{source_dir}",
       cmd("linkapps", "--local", {"HOME" => home})
   ensure
     formula_file.unlink
@@ -460,7 +472,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     FileUtils.ln_s source_app, "#{apps_dir}/TestBall.app"
 
-    assert_match "Unlinking #{apps_dir}/TestBall.app",
+    assert_match "Unlinking: #{apps_dir}/TestBall.app",
       cmd("unlinkapps", "--local", {"HOME" => home})
   ensure
     formula_file.unlink
@@ -484,13 +496,13 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     cmd("pin", "testball")
     cmd("upgrade")
-    refute (HOMEBREW_CELLAR/"testball/0.1").directory?,
-      "The latest version directory should NOT be created"
+    refute((HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should NOT be created")
 
     cmd("unpin", "testball")
     cmd("upgrade")
-    assert (HOMEBREW_CELLAR/"testball/0.1").directory?,
-      "The latest version directory should be created"
+    assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
+      "The latest version directory should be created")
   ensure
     formula_file.unlink
     cmd("uninstall", "--force", testball)
@@ -567,8 +579,8 @@ class IntegrationCommandTests < Homebrew::TestCase
     EOS
 
     cmd("fetch", "testball")
-    assert (HOMEBREW_CACHE/"testball-0.1.tbz").exist?,
-      "The tarball should have been cached"
+    assert((HOMEBREW_CACHE/"testball-0.1.tbz").exist?,
+      "The tarball should have been cached")
   ensure
     formula_file.unlink
     cmd("cleanup", "--force", "--prune=all")
@@ -691,11 +703,13 @@ class IntegrationCommandTests < Homebrew::TestCase
       cmd("prune", "--dry-run")
     assert_match "Pruned 1 symbolic links and 3 directories",
       cmd("prune")
-    refute (share/"pruneable").directory?
-    assert (share/"notpruneable").directory?
-    refute (share/"pruneable_symlink").symlink?
+    refute((share/"pruneable").directory?)
+    assert((share/"notpruneable").directory?)
+    refute((share/"pruneable_symlink").symlink?)
 
-    assert_equal "Nothing pruned",
+    # Inexact match because only if ~/Applications exists, will this output one
+    # more line with contents `No apps unlinked from /Users/<user/Applications`.
+    assert_match "Nothing pruned\nNo apps unlinked from /Applications",
       cmd("prune", "--verbose")
   ensure
     share.rmtree

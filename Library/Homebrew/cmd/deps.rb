@@ -1,3 +1,27 @@
+#:  * `deps` [`--1`] [`-n`] [`--union`] [`--tree`] [`--all`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] <formulae>:
+#:    Show dependencies for <formulae>. When given multiple formula arguments,
+#:    show the intersection of dependencies for <formulae>, except when passed
+#:    `--tree`, `--all`, or `--installed`.
+#:
+#:    If `--1` is passed, only show dependencies one level down, instead of
+#:    recursing.
+#:
+#:    If `-n` is passed, show dependencies in topological order.
+#:
+#:    If `--union` is passed, show the union of dependencies for <formulae>,
+#:    instead of the intersection.
+#:
+#:    If `--tree` is passed, show dependencies as a tree.
+#:
+#:    If `--all` is passed, show dependencies for all formulae.
+#:
+#:    If `--installed` is passed, show dependencies for all installed formulae.
+#:
+#:    By default, `deps` shows required and recommended dependencies for
+#:    <formulae>. To include the `:build` type dependencies, pass `--include-build`.
+#:    Similarly, pass `--include-optional` to include `:optional` dependencies.
+#:    To skip `:recommended` type dependencies, pass `--skip-recommended`.
+
 # encoding: UTF-8
 require "formula"
 require "ostruct"
@@ -32,23 +56,33 @@ module Homebrew
   end
 
   def deps_for_formula(f, recursive = false)
+    includes = []
     ignores = []
-    ignores << "build?" if ARGV.include? "--skip-build"
-    ignores << "optional?" if ARGV.include? "--skip-optional"
+    if ARGV.include? "--include-build"
+      includes << "build?"
+    else
+      ignores << "build?"
+    end
+    if ARGV.include? "--include-optional"
+      includes << "optional?"
+    else
+      ignores << "optional?"
+    end
+    ignores << "recommended?" if ARGV.include? "--skip-recommended"
 
     if recursive
       deps = f.recursive_dependencies do |dependent, dep|
-        Dependency.prune if ignores.any? { |ignore| dep.send(ignore) } && !dependent.build.with?(dep)
+        Dependency.prune if ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) } && !dependent.build.with?(dep)
       end
       reqs = f.recursive_requirements do |dependent, req|
-        Requirement.prune if ignores.any? { |ignore| req.send(ignore) } && !dependent.build.with?(req)
+        Requirement.prune if ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) } && !dependent.build.with?(req)
       end
     else
       deps = f.deps.reject do |dep|
-        ignores.any? { |ignore| dep.send(ignore) }
+        ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
       end
       reqs = f.requirements.reject do |req|
-        ignores.any? { |ignore| req.send(ignore) }
+        ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
       end
     end
 

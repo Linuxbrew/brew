@@ -1,3 +1,10 @@
+#:  * `migrate` [`--force`] <formulae>:
+#:    Migrate renamed packages to new name, where <formulae> are old names of
+#:    packages.
+#:
+#:    If `--force` is passed, then treat installed <formulae> and passed <formulae>
+#:    like if they are from same taps and migrate them anyway.
+
 require "migrator"
 
 module Homebrew

@@ -64,7 +64,7 @@ class Formula
   attr_reader :full_name
 
   # The full path to this {Formula}.
-  # e.g. `/usr/local/Library/Formula/this-formula.rb`
+  # e.g. `/usr/local/Library/Taps/homebrew/homebrew-core/Formula/this-formula.rb`
   attr_reader :path
 
   # The {Tap} instance associated with this {Formula}.
@@ -920,14 +920,19 @@ class Formula
     end
   end
 
-  # yields self with current working directory set to the uncompressed tarball
+  # yields |self,staging| with current working directory set to the uncompressed tarball
+  # where staging is a Mktemp staging context
   # @private
   def brew
-    stage do
+    stage do |staging|
+      staging.retain! if ARGV.keep_tmp?
       prepare_patches
 
       begin
-        yield self
+        yield self, staging
+      rescue StandardError
+        staging.retain! if ARGV.interactive? || ARGV.debug?
+        raise
       ensure
         cp Dir["config.log", "CMakeCache.txt"], logs
       end
@@ -1076,13 +1081,13 @@ class Formula
   # an array of all tap {Formula} names
   # @private
   def self.tap_names
-    @tap_names ||= Tap.flat_map(&:formula_names).sort
+    @tap_names ||= Tap.reject(&:core_tap?).flat_map(&:formula_names).sort
   end
 
   # an array of all tap {Formula} files
   # @private
   def self.tap_files
-    @tap_files ||= Tap.flat_map(&:formula_files)
+    @tap_files ||= Tap.reject(&:core_tap?).flat_map(&:formula_files)
   end
 
   # an array of all {Formula} names
@@ -1155,7 +1160,7 @@ class Formula
   # an array of all tap aliases
   # @private
   def self.tap_aliases
-    @tap_aliases ||= Tap.flat_map(&:aliases).sort
+    @tap_aliases ||= Tap.reject(&:core_tap?).flat_map(&:aliases).sort
   end
 
   # an array of all aliases
@@ -1323,11 +1328,17 @@ class Formula
   def run_test
     old_home = ENV["HOME"]
     build, self.build = self.build, Tab.for_formula(self)
-    mktemp do
-      @testpath = Pathname.pwd
+    mktemp("#{name}-test") do |staging|
+      staging.retain! if ARGV.keep_tmp?
+      @testpath = staging.tmpdir
       ENV["HOME"] = @testpath
       setup_home @testpath
-      test
+      begin
+        test
+      rescue Exception
+        staging.retain! if ARGV.debug?
+        raise
+      end
     end
   ensure
     @testpath = nil
@@ -1540,7 +1551,7 @@ class Formula
   end
 
   def stage
-    active_spec.stage do
+    active_spec.stage do |_resource, staging|
       @source_modified_time = active_spec.source_modified_time
       @buildpath = Pathname.pwd
       env_home = buildpath/".brew_home"
@@ -1550,7 +1561,7 @@ class Formula
       setup_home env_home
 
       begin
-        yield
+        yield staging
       ensure
         @buildpath = nil
         ENV["HOME"] = old_home
@@ -1700,7 +1711,7 @@ class Formula
     # and you haven't passed or previously used any options on this formula.
     #
     # If you maintain your own repository, you can add your own bottle links.
-    # https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Bottles.md
+    # https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Bottles.md
     # You can ignore this block entirely if submitting to Homebrew/Homebrew, It'll be
     # handled for you by the Brew Test Bot.
     #

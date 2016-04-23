@@ -1,3 +1,4 @@
+require "set"
 require "formula"
 require "formula_versions"
 
@@ -33,25 +34,15 @@ class Descriptions
     self.save_cache
   end
 
-  # Return true if the cache exists, and neither Homebrew nor any of the Taps
+  # Return true if the cache exists, and none of the Taps
   # repos were updated more recently than it was.
   def self.cache_fresh?
     return false unless CACHE_FILE.exist?
     cache_mtime = File.mtime(CACHE_FILE)
-    ref_master = ".git/refs/heads/master"
-
-    master = HOMEBREW_REPOSITORY/ref_master
-
-    # If ref_master doesn't exist, it means brew update is never run.
-    # Since cache is found, we can assume it's fresh.
-    if master.exist?
-      core_mtime = File.mtime(master)
-      return false if core_mtime > cache_mtime
-    end
 
     Tap.each do |tap|
       next unless tap.git?
-      repo_mtime = File.mtime(tap.path/ref_master)
+      repo_mtime = File.mtime(tap.path/".git/refs/heads/master")
       return false if repo_mtime > cache_mtime
     end
 
@@ -133,9 +124,22 @@ class Descriptions
   # print them.
   def print
     blank = "#{Tty.yellow}[no description]#{Tty.reset}"
-    @descriptions.keys.sort.each do |name|
-      description = @descriptions[name] || blank
-      puts "#{Tty.white}#{name}:#{Tty.reset} #{description}"
+    @descriptions.keys.sort.each do |full_name|
+      short_name = short_names[full_name]
+      printed_name = short_name_counts[short_name] == 1 ? short_name : full_name
+      description = @descriptions[full_name] || blank
+      puts "#{Tty.white}#{printed_name}:#{Tty.reset} #{description}"
     end
+  end
+
+  private
+
+  def short_names
+    @short_names ||= Hash[@descriptions.keys.map { |k| [k, k.split("/").last] }]
+  end
+
+  def short_name_counts
+    @short_name_counts ||=
+      short_names.values.reduce(Hash.new(0)) { |counts, name| counts[name] += 1; counts }
   end
 end

@@ -1,3 +1,9 @@
+#:  * `uninstall`, `rm`, `remove` [`--force`] <formula>:
+#:    Uninstall <formula>.
+#:
+#:    If `--force` is passed, and there are multiple versions of <formula>
+#:    installed, delete all installed versions.
+
 require "keg"
 require "formula"
 require "migrator"

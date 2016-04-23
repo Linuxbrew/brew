@@ -1,3 +1,13 @@
+#:  * `options` [`--compact`] (`--all`|`--installed`|<formulae>):
+#:    Display install options specific to <formulae>.
+#:
+#:    If `--compact` is passed, show all options on a single line separated by
+#:    spaces.
+#:
+#:    If `--all` is passed, show options for all formulae.
+#:
+#:    If `--installed` is passed, show options for all installed formulae.
+
 require "formula"
 require "options"
 

@@ -1,28 +1,32 @@
-require "cmd/tap"
 require "formula_versions"
 require "migrator"
 require "formulary"
 require "descriptions"
 
 module Homebrew
+  def update_preinstall_header
+    @header_already_printed ||= begin
+      ohai "Auto-updated Homebrew!" if ARGV.include?("--preinstall")
+      true
+    end
+  end
+
   def update_report
-    # migrate to new directories based tap structure
-    migrate_taps
+    install_core_tap_if_necessary
 
     hub = ReporterHub.new
+    updated = false
 
-    begin
-      master_reporter = Reporter.new(CoreTap.instance)
-    rescue Reporter::ReporterRevisionUnsetError => e
-      raise e if ARGV.homebrew_developer?
+    initial_revision = ENV["HOMEBREW_UPDATE_BEFORE"].to_s
+    current_revision = ENV["HOMEBREW_UPDATE_AFTER"].to_s
+    if initial_revision.empty? || current_revision.empty?
       odie "update-report should not be called directly!"
     end
 
-    if master_reporter.updated?
-      initial_short = shorten_revision(master_reporter.initial_revision)
-      current_short = shorten_revision(master_reporter.current_revision)
-      puts "Updated Homebrew from #{initial_short} to #{current_short}."
-      hub.add(master_reporter)
+    if initial_revision != current_revision
+      update_preinstall_header
+      puts "Updated Homebrew from #{shorten_revision(initial_revision)} to #{shorten_revision(current_revision)}."
+      updated = true
     end
 
     updated_taps = []
@@ -39,13 +43,16 @@ module Homebrew
         hub.add(reporter)
       end
     end
+
     unless updated_taps.empty?
+      update_preinstall_header
       puts "Updated #{updated_taps.size} tap#{plural(updated_taps.size)} " \
            "(#{updated_taps.join(", ")})."
+      updated = true
     end
 
-    if hub.reporters.empty?
-      puts "Already up-to-date."
+    if !updated
+      puts "Already up-to-date." unless ARGV.include?("--preinstall")
     elsif hub.empty?
       puts "No changes to formulae."
     else
@@ -62,6 +69,15 @@ module Homebrew
 
   def shorten_revision(revision)
     Utils.popen_read("git", "-C", HOMEBREW_REPOSITORY, "rev-parse", "--short", revision).chomp
+  end
+
+  def install_core_tap_if_necessary
+    core_tap = CoreTap.instance
+    return if core_tap.installed?
+    CoreTap.ensure_installed! :quiet => false
+    revision = core_tap.git_head
+    ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
+    ENV["HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE"] = revision
   end
 end
 
@@ -187,14 +203,10 @@ class Reporter
   private
 
   def repo_var
-    @repo_var ||= if tap.path == HOMEBREW_REPOSITORY
-      ""
-    else
-      tap.path.to_s.
+    @repo_var ||= tap.path.to_s.
         strip_prefix(Tap::TAP_DIRECTORY.to_s).
         tr("^A-Za-z0-9", "_").
         upcase
-    end
   end
 
   def diff

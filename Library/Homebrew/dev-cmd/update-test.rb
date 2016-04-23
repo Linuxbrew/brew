@@ -1,5 +1,3 @@
-require "extend/ENV"
-
 module Homebrew
   #
   # Usage:
@@ -7,6 +5,8 @@ module Homebrew
   #    brew update-test --commit=<sha1> # using <sha1> as start commit
   #    brew update-test --before=<date> # using commit at <date> as start commit
   #
+  # Options:
+  #   --keep-tmp      Retain temporary directory containing the new clone
   def update_test
     cd HOMEBREW_REPOSITORY
     start_sha1 = if commit = ARGV.value("commit")
@@ -21,7 +21,8 @@ module Homebrew
     puts "Start commit: #{start_sha1}"
     puts "End   commit: #{end_sha1}"
 
-    mktemp do
+    mktemp("update-test") do |staging|
+      staging.retain! if ARGV.keep_tmp?
       curdir = Pathname.new(Dir.pwd)
 
       oh1 "Setup test environment..."
@@ -41,8 +42,7 @@ module Homebrew
       safe_system "git", "reset", "--hard", start_sha1
 
       # update ENV["PATH"]
-      ENV.extend(Stdenv)
-      ENV.prepend_path "PATH", "#{curdir}/bin"
+      ENV["PATH"] = "#{curdir}/bin:/usr/local/bin:/usr/bin:/bin"
 
       # run brew update
       oh1 "Running brew update..."

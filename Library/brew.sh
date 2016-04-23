@@ -1,4 +1,4 @@
-HOMEBREW_VERSION="0.9.5"
+HOMEBREW_VERSION="0.9.9"
 
 odie() {
   if [[ -t 2 ]] # check whether stderr is a tty.
@@ -57,10 +57,11 @@ then
   unset HOMEBREW_RUBY_PATH
 fi
 
-if [[ "$(uname -s)" = "Darwin" ]]
-then
-  HOMEBREW_OSX="1"
-fi
+HOMEBREW_SYSTEM="$(uname -s)"
+case "$HOMEBREW_SYSTEM" in
+  Darwin) HOMEBREW_OSX="1";;
+  Linux) HOMEBREW_LINUX="1";;
+esac
 
 if [[ -z "$HOMEBREW_RUBY_PATH" ]]
 then
@@ -69,16 +70,56 @@ then
     HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
   else
     HOMEBREW_RUBY_PATH="$(which ruby)"
+    if [[ -z "$HOMEBREW_RUBY_PATH" ]]
+    then
+      odie "No Ruby found, cannot proceed."
+    fi
   fi
 fi
 
-export HOMEBREW_VERSION
+HOMEBREW_CURL="/usr/bin/curl"
+if [[ -n "$HOMEBREW_OSX" ]]
+then
+  HOMEBREW_PROCESSOR="$(uname -p)"
+  HOMEBREW_PRODUCT="Homebrew"
+  HOMEBREW_SYSTEM="Macintosh"
+  # This is i386 even on x86_64 machines
+  [[ "$HOMEBREW_PROCESSOR" = "i386" ]] && HOMEBREW_PROCESSOR="Intel"
+  HOMEBREW_OSX_VERSION="$(/usr/bin/sw_vers -productVersion)"
+  HOMEBREW_OS_VERSION="Mac OS X $HOMEBREW_OSX_VERSION"
+
+  printf -v HOMEBREW_OSX_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_OSX_VERSION//./ }
+  if [[ "$HOMEBREW_OSX_VERSION_NUMERIC" -lt "100900" &&
+        -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
+  then
+    HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
+  fi
+else
+  HOMEBREW_PROCESSOR="$(uname -m)"
+  HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
+  [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
+  : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
+fi
+HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_VERSION)"
+HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | /usr/bin/awk '{print $1"/"$2}')"
+HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
+
+# Declared in bin/brew
 export HOMEBREW_BREW_FILE
-export HOMEBREW_RUBY_PATH
 export HOMEBREW_PREFIX
 export HOMEBREW_REPOSITORY
 export HOMEBREW_LIBRARY
+
+# Declared in brew.sh
+export HOMEBREW_VERSION
 export HOMEBREW_CELLAR
+export HOMEBREW_RUBY_PATH
+export HOMEBREW_CURL
+export HOMEBREW_PRODUCT
+export HOMEBREW_OS_VERSION
+export HOMEBREW_OSX_VERSION
+export HOMEBREW_USER_AGENT
+export HOMEBREW_USER_AGENT_CURL
 
 if [[ -n "$HOMEBREW_OSX" ]]
 then
@@ -140,9 +181,9 @@ case "$HOMEBREW_COMMAND" in
   --config)    HOMEBREW_COMMAND="config";;
 esac
 
-if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]] ; then
+if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]; then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh"
-elif [[ -n "$HOMEBREW_DEVELOPER" && -f "$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh" ]] ; then
+elif [[ -n "$HOMEBREW_DEVELOPER" && -f "$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh" ]]; then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"
 fi
 
@@ -160,6 +201,23 @@ EOS
   esac
 fi
 
+source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
+setup-analytics
+report-analytics-screenview-command
+
+update-preinstall() {
+  [[ -n "$HOMEBREW_AUTO_UPDATE" ]] || return
+  [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
+
+  if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" ]]
+  then
+    # Hide shellcheck complaint:
+    # shellcheck source=/dev/null
+    source "$HOMEBREW_LIBRARY/Homebrew/cmd/update.sh"
+    homebrew-update --preinstall
+  fi
+}
+
 if [[ -n "$HOMEBREW_BASH_COMMAND" ]]
 then
   # source rather than executing directly to ensure the entire file is read into
@@ -170,9 +228,9 @@ then
   # Hide shellcheck complaint:
   # shellcheck source=/dev/null
   source "$HOMEBREW_BASH_COMMAND"
-  { "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
+  { update-preinstall; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
 else
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
-  exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/brew.rb" "$@"
+  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/brew.rb" "$@"; }
 fi

@@ -1,3 +1,7 @@
+#:  * `pin` <formulae>:
+#:    Pin the specified <formulae>, preventing them from being upgraded when
+#:    issuing the `brew upgrade` command. See also `unpin`.
+
 require "formula"
 
 module Homebrew

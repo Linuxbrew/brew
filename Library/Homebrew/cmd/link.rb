@@ -1,3 +1,17 @@
+#:  * `ln`, `link` [`--overwrite`] [`--dry-run`] [`--force`] <formula>:
+#:    Symlink all of <formula>'s installed files into the Homebrew prefix. This
+#:    is done automatically when you install formulae but can be useful for DIY
+#:    installations.
+#:
+#:    If `--overwrite` is passed, Homebrew will delete files which already exist in
+#:    the prefix while linking.
+#:
+#:    If `--dry-run` or `-n` is passed, Homebrew will list all files which would
+#:    be linked or which would be deleted by `brew link --overwrite`, but will not
+#:    actually link or delete any files.
+#:
+#:    If `--force` is passed, Homebrew will allow keg-only formulae to be linked.
+
 require "ostruct"
 
 module Homebrew

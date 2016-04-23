@@ -1,5 +1,15 @@
+#:  * `prune` [`--dry-run`]:
+#:    Remove dead symlinks from the Homebrew prefix. This is generally not
+#:    needed, but can be useful when doing DIY installations. Also remove broken
+#:    app symlinks from `/Applications` and `~/Applications` that were previously
+#:    created by `brew linkapps`.
+#:
+#:    If `--dry-run` or `-n` is passed, show what would be removed, but do not
+#:    actually remove anything.
+
 require "keg"
 require "cmd/tap"
+require "cmd/unlinkapps"
 
 module Homebrew
   def prune
@@ -37,8 +47,6 @@ module Homebrew
       end
     end
 
-    migrate_taps :force => true unless ARGV.dry_run?
-
     if ObserverPathnameExtension.total.zero?
       puts "Nothing pruned" if ARGV.verbose?
     else
@@ -47,5 +55,7 @@ module Homebrew
       print "and #{d} directories " if d > 0
       puts "from #{HOMEBREW_PREFIX}"
     end unless ARGV.dry_run?
+
+    unlinkapps_prune(:dry_run => ARGV.dry_run?, :quiet => true)
   end
 end

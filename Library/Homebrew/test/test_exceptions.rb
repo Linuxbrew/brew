@@ -37,6 +37,25 @@ class ExceptionsTest < Homebrew::TestCase
       TapFormulaUnavailableError.new(t, "foo").to_s
   end
 
+  def test_formula_class_unavailable_error
+    mod = Module.new
+    mod.module_eval <<-EOS.undent
+      class Bar < Requirement; end
+      class Baz < Formula; end
+    EOS
+
+    assert_match "Expected to find class Foo, but found no classes.",
+      FormulaClassUnavailableError.new("foo", "foo.rb", "Foo", []).to_s
+
+    list = [mod.const_get(:Bar)]
+    assert_match "Expected to find class Foo, but only found: Bar (not derived from Formula!).",
+      FormulaClassUnavailableError.new("foo", "foo.rb", "Foo", list).to_s
+
+    list = [mod.const_get(:Baz)]
+    assert_match "Expected to find class Foo, but only found: Baz.",
+      FormulaClassUnavailableError.new("foo", "foo.rb", "Foo", list).to_s
+  end
+
   def test_tap_unavailable_error
     assert_equal "No available tap foo.\n", TapUnavailableError.new("foo").to_s
   end

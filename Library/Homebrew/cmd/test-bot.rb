@@ -3,21 +3,25 @@
 # Usage: brew test-bot [options...] <pull-request|formula>
 #
 # Options:
-# --keep-logs:     Write and keep log files under ./brewbot/
+# --keep-logs:     Write and keep log files under ./brewbot/.
 # --cleanup:       Clean the Homebrew directory. Very dangerous. Use with care.
 # --clean-cache:   Remove all cached downloads. Use with care.
 # --skip-setup:    Don't check the local system is setup correctly.
 # --skip-homebrew: Don't check Homebrew's files and tests are all valid.
 # --junit:         Generate a JUnit XML test results file.
-# --no-bottle:     Run brew install without --build-bottle
+# --no-bottle:     Run brew install without --build-bottle.
 # --keep-old:      Run brew bottle --keep-old to build new bottles for a single platform.
-# --HEAD:          Run brew install with --HEAD
-# --local:         Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/
-# --tap=<tap>:     Use the git repository of the given tap
+# --legacy         Build formula from legacy Homebrew/homebrew repo.
+#                  (TODO remove it when it's not longer necessary)
+# --HEAD:          Run brew install with --HEAD.
+# --local:         Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
+# --tap=<tap>:     Use the git repository of the given tap.
 # --dry-run:       Just print commands, don't run them.
 # --fail-fast:     Immediately exit on a failing step.
-# --verbose:       Print out all logs in realtime
-# --fast:          Don't install any packages but run e.g. audit anyway.
+# --verbose:       Print test step output in realtime. Has the side effect of passing output
+#                  as raw bytes instead of re-encoding in UTF-8.
+# --fast:          Don't install any packages, but run e.g. audit anyway.
+# --keep-tmp:      Keep temporary files written by main installs and tests that are run.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -34,7 +38,31 @@ require "tap"
 
 module Homebrew
   BYTES_IN_1_MEGABYTE = 1024*1024
+  MAX_STEP_OUTPUT_SIZE = BYTES_IN_1_MEGABYTE - (200*1024) # margin of safety
+
   HOMEBREW_TAP_REGEX = %r{^([\w-]+)/homebrew-([\w-]+)$}
+
+  def ruby_has_encoding?
+    String.method_defined?(:force_encoding)
+  end
+
+  if ruby_has_encoding?
+    def fix_encoding!(str)
+      # Assume we are starting from a "mostly" UTF-8 string
+      str.force_encoding(Encoding::UTF_8)
+      return str if str.valid_encoding?
+      str.encode!(Encoding::UTF_16, :invalid => :replace)
+      str.encode!(Encoding::UTF_8)
+    end
+  elsif require "iconv"
+    def fix_encoding!(str)
+      Iconv.conv("UTF-8//IGNORE", "UTF-8", str)
+    end
+  else
+    def fix_encoding!(str)
+      str
+    end
+  end
 
   def resolve_test_tap
     if tap = ARGV.value("tap")
@@ -140,7 +168,9 @@ module Homebrew
       end
 
       verbose = ARGV.verbose?
-      @output = ""
+      # Step may produce arbitrary output and we read it bytewise, so must
+      # buffer it as binary and convert to UTF-8 once complete
+      output = Homebrew.ruby_has_encoding? ? "".encode!("BINARY") : ""
       working_dir = Pathname.new(@command.first == "git" ? @repository : Dir.pwd)
       read, write = IO.pipe
 
@@ -153,13 +183,14 @@ module Homebrew
           working_dir.cd { exec(*@command) }
         end
         write.close
-        while buf = read.read(1)
+        while buf = read.readpartial(4096)
           if verbose
             print buf
             $stdout.flush
           end
-          @output << buf
+          output << buf
         end
+      rescue EOFError
       ensure
         read.close
       end
@@ -169,33 +200,14 @@ module Homebrew
       @status = $?.success? ? :passed : :failed
       puts_result
 
-      if has_output?
-        @output = fix_encoding(@output)
+
+      unless output.empty?
+        @output = Homebrew.fix_encoding!(output)
         puts @output if (failed? || @puts_output_on_success) && !verbose
         File.write(log_file_path, @output) if ARGV.include? "--keep-logs"
       end
 
       exit 1 if ARGV.include?("--fail-fast") && failed?
-    end
-
-    private
-
-    if String.method_defined?(:force_encoding)
-      def fix_encoding(str)
-        return str if str.valid_encoding?
-        # Assume we are starting from a "mostly" UTF-8 string
-        str.force_encoding(Encoding::UTF_8)
-        str.encode!(Encoding::UTF_16, :invalid => :replace)
-        str.encode!(Encoding::UTF_8)
-      end
-    elsif require "iconv"
-      def fix_encoding(str)
-        Iconv.conv("UTF-8//IGNORE", "UTF-8", str)
-      end
-    else
-      def fix_encoding(str)
-        str
-      end
     end
   end
 
@@ -235,6 +247,7 @@ module Homebrew
     def safe_formula_canonical_name(formula_name)
       Formulary.factory(formula_name).full_name
     rescue TapFormulaUnavailableError => e
+      raise if e.tap.installed?
       test "brew", "tap", e.tap.name
       retry unless steps.last.failed?
     rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
@@ -338,7 +351,11 @@ module Homebrew
         # the right commit to BrewTestBot.
         unless travis_pr
           diff_start_sha1 = current_sha1
-          test "brew", "pull", "--clean", @url
+          if ARGV.include?("--legacy")
+            test "brew", "pull", "--clean", "--legacy", @url
+          else
+            test "brew", "pull", "--clean", @url
+          end
           diff_end_sha1 = current_sha1
         end
         @short_url = @url.gsub("https://github.com/", "")
@@ -406,12 +423,7 @@ module Homebrew
     def formula(formula_name)
       @category = "#{__method__}.#{formula_name}"
 
-      if OS.linux?
-        # --recursive is very slow. See https://github.com/Linuxbrew/linuxbrew/issues/939
-        test "brew", "uses", formula_name
-      else
-        test "brew", "uses", "--recursive", formula_name
-      end
+      test "brew", "uses", formula_name
 
       formula = Formulary.factory(formula_name)
 
@@ -488,7 +500,7 @@ module Homebrew
       end
 
       installed = Utils.popen_read("brew", "list").split("\n")
-      dependencies = Utils.popen_read("brew", "deps", "--skip-optional", formula_name).split("\n")
+      dependencies = Utils.popen_read("brew", "deps", "--include-build", formula_name).split("\n")
 
       (installed & dependencies).each do |installed_dependency|
         installed_dependency_formula = Formulary.factory(installed_dependency)
@@ -503,17 +515,16 @@ module Homebrew
       unchanged_dependencies = dependencies - @formulae
       changed_dependences = dependencies - unchanged_dependencies
 
-      runtime_dependencies = Utils.popen_read("brew", "deps",
-                                              "--skip-build", "--skip-optional",
-                                              formula_name).split("\n")
+      runtime_dependencies = Utils.popen_read("brew", "deps", formula_name).split("\n")
       build_dependencies = dependencies - runtime_dependencies
       unchanged_build_dependencies = build_dependencies - @formulae
 
-      dependents = Utils.popen_read("brew", "uses", "--recursive", "--skip-build", "--skip-optional", formula_name).split("\n")
+      dependents = Utils.popen_read("brew", "uses", formula_name).split("\n")
       dependents -= @formulae
       dependents = dependents.map { |d| Formulary.factory(d) }
 
-      testable_dependents = dependents.select { |d| d.test_defined? && d.bottled? }
+      bottled_dependents = dependents.select { |d| d.bottled? }
+      testable_dependents = dependents.select { |d| d.bottled? && d.test_defined? }
 
       if (deps | reqs).any? { |d| d.name == "mercurial" && d.build? }
         run_as_not_developer { test "brew", "install", "mercurial" }
@@ -533,7 +544,12 @@ module Homebrew
       end
       test "brew", "fetch", "--retry", *fetch_args
       test "brew", "uninstall", "--force", formula_name if formula.installed?
-      install_args = ["--verbose"]
+
+      # shared_*_args are applied to both the main and --devel spec
+      shared_install_args = ["--verbose"]
+      shared_install_args << "--keep-tmp" if ARGV.keep_tmp?
+      # install_args is just for the main (stable, or devel if in a devel-only tap) spec
+      install_args = []
       install_args << "--build-bottle" if !ARGV.include?("--fast") && !ARGV.include?("--no-bottle") && !formula.bottle_disabled?
       install_args << "--HEAD" if ARGV.include? "--HEAD"
 
@@ -549,6 +565,7 @@ module Homebrew
         formula_bottled = formula.bottled?
       end
 
+      install_args.concat(shared_install_args)
       install_args << formula_name
       # Don't care about e.g. bottle failures for dependencies.
       install_passed = false
@@ -583,8 +600,10 @@ module Homebrew
             test "brew", "install", bottle_filename
           end
         end
-        test "brew", "test", "--verbose", formula_name if formula.test_defined?
-        testable_dependents.each do |dependent|
+        shared_test_args = ["--verbose"]
+        shared_test_args << "--keep-tmp" if ARGV.keep_tmp?
+        test "brew", "test", formula_name, *shared_test_args if formula.test_defined?
+        bottled_dependents.each do |dependent|
           unless dependent.installed?
             test "brew", "fetch", "--retry", dependent.name
             next if steps.last.failed?
@@ -598,7 +617,10 @@ module Homebrew
             end
           end
           if dependent.installed?
-            test "brew", "test", "--verbose", dependent.name
+            test "brew", "linkage", "--test", dependent.name
+            if testable_dependents.include? dependent
+              test "brew", "test", "--verbose", dependent.name
+            end
           end
         end
         test "brew", "uninstall", "--force", formula_name
@@ -608,11 +630,13 @@ module Homebrew
          && !ARGV.include?("--HEAD") && !ARGV.include?("--fast") \
          && satisfied_requirements?(formula, :devel)
         test "brew", "fetch", "--retry", "--devel", *fetch_args
-        run_as_not_developer { test "brew", "install", "--devel", "--verbose", formula_name }
+        run_as_not_developer do
+          test "brew", "install", "--devel", formula_name, *shared_install_args
+        end
         devel_install_passed = steps.last.passed?
         test "brew", "audit", "--devel", *audit_args
         if devel_install_passed
-          test "brew", "test", "--devel", "--verbose", formula_name if formula.test_defined?
+          test "brew", "test", "--devel", formula_name, *shared_test_args if formula.test_defined?
           test "brew", "uninstall", "--devel", "--force", formula_name
         end
       end
@@ -632,7 +656,6 @@ module Homebrew
         end
         test "brew", "tests", *tests_args
         test "brew", "readall", *readall_args
-        test "brew", "update-test"
       else
         test "brew", "readall", @tap.name
       end
@@ -647,8 +670,15 @@ module Homebrew
       git "rebase", "--abort"
       git "reset", "--hard"
       git "checkout", "-f", "master"
-      git "clean", "-ffdx" unless ENV["HOMEBREW_RUBY"] == "1.8.7"
-      pr_locks = "#{HOMEBREW_REPOSITORY}/.git/refs/remotes/*/pr/*/*.lock"
+      git "clean", "-ffdx"
+      HOMEBREW_REPOSITORY.cd do
+        safe_system "git", "reset", "--hard"
+        safe_system "git", "checkout", "-f", "master"
+        # This will uninstall all formulae, as long as
+        # HOMEBREW_REPOSITORY == HOMEBREW_PREFIX, which is true on the test bots
+        safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/" unless ENV["HOMEBREW_RUBY"] == "1.8.7"
+      end
+      pr_locks = "#{@repository}/.git/refs/remotes/*/pr/*/*.lock"
       Dir.glob(pr_locks) { |lock| FileUtils.rm_rf lock }
     end
 
@@ -668,6 +698,11 @@ module Homebrew
         test "brew", "cleanup", "--prune=7"
         git "gc", "--auto"
         test "git", "clean", "-ffdx"
+        HOMEBREW_REPOSITORY.cd do
+          safe_system "git", "reset", "--hard"
+          Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
+          safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+        end
         if ARGV.include? "--local"
           FileUtils.rm_rf ENV["HOMEBREW_HOME"]
           FileUtils.rm_rf ENV["HOMEBREW_LOGS"]
@@ -700,7 +735,7 @@ module Homebrew
       changed_formulae_dependents = {}
 
       @formulae.each do |formula|
-        formula_dependencies = Utils.popen_read("brew", "deps", "--skip-optional", formula).split("\n")
+        formula_dependencies = Utils.popen_read("brew", "deps", "--include-build", formula).split("\n")
         unchanged_dependencies = formula_dependencies - @formulae
         changed_dependences = formula_dependencies - unchanged_dependencies
         changed_dependences.each do |changed_formula|
@@ -773,6 +808,7 @@ module Homebrew
 
     ARGV << "--verbose"
     ARGV << "--keep-old" if ENV["UPSTREAM_BOTTLE_KEEP_OLD"]
+    ARGV << "--legacy" if ENV["UPSTREAM_BOTTLE_LEGACY"]
 
     if jenkins
       bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
@@ -802,18 +838,15 @@ module Homebrew
     safe_system "brew", "update"
 
     if pr
-      pull_pr = if tap.core_tap?
-        pr
+      if ARGV.include?("--legacy")
+        pull_pr = "https://github.com/Homebrew/homebrew/pull/#{pr}"
+        safe_system "brew", "pull", "--clean", "--legacy", pull_pr
       else
-        "https://github.com/#{tap.user}/homebrew-#{tap.repo}/pull/#{pr}"
+        pull_pr = "https://github.com/#{tap.user}/homebrew-#{tap.repo}/pull/#{pr}"
+        safe_system "brew", "pull", "--clean", pull_pr
       end
-      safe_system "brew", "pull", "--clean", pull_pr
     elsif docker_sha1
-      url = if tap.core_tap?
-        "https://github.com/#{docker_user}/linuxbrew/commit/#{docker_sha1}"
-      else
-        "https://github.com/#{docker_user}/homebrew-#{tap.repo}/commit/#{docker_sha1}"
-      end
+      url = "https://github.com/#{docker_user}/homebrew-#{tap.repo}/commit/#{docker_sha1}"
       safe_system "brew", "pull", "--clean", url
     end
 
@@ -823,7 +856,7 @@ module Homebrew
 
     project = OS.mac? ? "homebrew" : "linuxbrew"
     remote_repo = tap.core_tap? ? project : "homebrew-#{tap.repo}"
-    remote = docker_branch ? "testbot" : "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/#{remote_repo}.git"
+    remote = "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/homebrew-#{tap.repo}.git"
     tag = docker_branch ? "pr-#{docker_user}-#{docker_branch}" : pr ? "pr-#{pr}" : "testing-#{number}"
     safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
 
@@ -884,6 +917,7 @@ module Homebrew
     ENV["HOMEBREW_SANDBOX"] = "1"
     ENV["HOMEBREW_NO_EMOJI"] = "1"
     ENV["HOMEBREW_FAIL_LOG_LINES"] = "150"
+    ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"] = "1"
 
     if ENV["TRAVIS"]
       ARGV << "--verbose"
@@ -909,12 +943,13 @@ module Homebrew
 
   def test_bot
     sanitize_ARGV_and_ENV
-    p ARGV
 
     tap = resolve_test_tap
     # Tap repository if required, this is done before everything else
     # because Formula parsing and/or git commit hash lookup depends on it.
-    safe_system "brew", "tap", tap.name unless tap.installed?
+    # At the same time, make sure Tap is not a shallow clone.
+    # bottle revision and bottle upload rely on full clone.
+    safe_system "brew", "tap", tap.name, "--full"
 
     if ARGV.include? "--ci-upload"
       return test_ci_upload(tap)
@@ -962,14 +997,7 @@ module Homebrew
           testcase.add_attribute "time", step.time
 
           if step.has_output?
-            # Remove invalid XML CData characters from step output.
-            output = step.output.delete("\000\a\b\e\f\x2\x1f")
-
-            if output.bytesize > BYTES_IN_1_MEGABYTE
-              output = "truncated output to 1MB:\n" \
-                + output.slice(-BYTES_IN_1_MEGABYTE, BYTES_IN_1_MEGABYTE)
-            end
-
+            output = sanitize_output_for_xml(step.output)
             cdata = REXML::CData.new output
 
             if step.passed?
@@ -1000,4 +1028,35 @@ module Homebrew
 
     Homebrew.failed = any_errors
   end
+
+  def sanitize_output_for_xml(output)
+    unless output.empty?
+      # Remove invalid XML CData characters from step output.
+      if ruby_has_encoding?
+        # This is the regex for valid XML chars, but only works in Ruby 2.0+
+        # /[\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/
+        # For 1.9 compatibility, use the inverse of that, which stays under \u10000
+        # invalid_xml_pat = /[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF\uFFFE\uFFFF]/
+        # But Ruby won't allow you to reference surrogates, so we have:
+        invalid_xml_pat = /[\x00-\x08\x0B\x0C\x0E-\x1F\uFFFE\uFFFF]/
+        output = output.gsub(invalid_xml_pat, "\uFFFD")
+      else
+        output = output.delete("\000\a\b\e\f\x2\x1f")
+      end
+
+      # Truncate to 1MB to avoid hitting CI limits
+      if output.bytesize > MAX_STEP_OUTPUT_SIZE
+        if ruby_has_encoding?
+          binary_output = output.force_encoding("BINARY")
+          output = binary_output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
+          fix_encoding!(output)
+        else
+          output = output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
+        end
+        output = "truncated output to 1MB:\n" + output
+      end
+    end
+    output
+  end
 end
+

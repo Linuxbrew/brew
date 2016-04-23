@@ -23,8 +23,12 @@ class Formulary
 
     begin
       mod.const_get(class_name)
-    rescue NameError => e
-      raise FormulaUnavailableError, name, e.backtrace
+    rescue NameError => original_exception
+      class_list = mod.constants.
+        map { |const_name| mod.const_get(const_name) }.
+        select { |const| const.is_a?(Class) }
+      e = FormulaClassUnavailableError.new(name, path, class_name, class_list)
+      raise e, "", original_exception.backtrace
     end
   end
 
@@ -344,7 +348,7 @@ class Formulary
       if core_path(ref).file?
         opoo <<-EOS.undent
           #{ref} is provided by core, but is now shadowed by #{selected_formula.full_name}.
-          To refer to the core formula, use Homebrew/homebrew/#{ref} instead.
+          To refer to the core formula, use Homebrew/core/#{ref} instead.
         EOS
       end
       selected_formula

@@ -22,8 +22,7 @@ module OS
     # This can be compared to numerics, strings, or symbols
     # using the standard Ruby Comparable methods.
     def full_version
-      return @full_version ||= Version.new("0") unless OS.mac?
-      @full_version ||= Version.new(`/usr/bin/sw_vers -productVersion`.chomp)
+      @full_version ||= Version.new(ENV["HOMEBREW_OSX_VERSION"].chomp)
     end
 
     def prerelease?
@@ -292,6 +291,7 @@ module OS
       "7.1.1" => { :clang => "7.0", :clang_build => 700 },
       "7.2"   => { :clang => "7.0", :clang_build => 700 },
       "7.2.1" => { :clang => "7.0", :clang_build => 700 },
+      "7.3"   => { :clang => "7.3", :clang_build => 703 },
     }
 
     def compilers_standard?

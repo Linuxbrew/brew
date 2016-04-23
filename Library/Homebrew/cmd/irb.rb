@@ -1,3 +1,8 @@
+#:  * `irb` [`--examples`]:
+#:    Enter the interactive Homebrew Ruby shell.
+#:
+#:    If `--examples` is passed, several examples will be shown.
+
 require "formula"
 require "keg"
 require "irb"

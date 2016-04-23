@@ -25,8 +25,8 @@ A few requests:
 - still create your branches on your fork rather than in the main repository
 - if still in doubt please ask for help and we'll help you out - these are
   probably worth a read:
-    - https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Brew-Test-Bot-For-Core-Contributors.md
-    - https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Maintainer-Guidelines.md
+    - https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Brew-Test-Bot-For-Core-Contributors.md
+    - https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Maintainer-Guidelines.md
     - possibly everything else in the documentation
 
 How does that sound?
@@ -42,7 +42,7 @@ If they accept, follow a few steps to get them set up:
 - [x] Add them to the [Jenkins' GitHub Pull Request Builder admin list](http://bot.brew.sh/configure) to enable `@BrewTestBot test this please` for them
 - [x] Invite them to the [`homebrew-dev` private maintainers mailing list](https://groups.google.com/forum/#!managemembers/homebrew-dev/invite)
 - [x] Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites)
-- [x] Add them to [Homebrew's README](https://github.com/Homebrew/homebrew/edit/master/README.md)
+- [x] Add them to [Homebrew's README](https://github.com/Homebrew/brew/edit/master/README.md)
 - [x] Encourage them to enable [GitHub's Two Factor Authentication](https://help.github.com/articles/about-two-factor-authentication/)
 
 After a few weeks/months with no problems consider making them [owners on the Homebrew GitHub organisation](https://github.com/orgs/Homebrew/people) and [administrators on Bintray](https://bintray.com/homebrew/organization/edit/members).
