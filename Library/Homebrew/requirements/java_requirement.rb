@@ -8,6 +8,8 @@ class JavaRequirement < Requirement
 
   satisfy :build_env => false do
     next quiet_system "java", "-version" unless OS.mac?
+    return false unless File.executable? "/usr/libexec/java_home"
+
     args = %w[--failfast]
     args << "--version" << "#{@version}" if @version
     @java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp

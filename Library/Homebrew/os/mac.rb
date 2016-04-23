@@ -49,7 +49,8 @@ module OS
         # Homebrew GCCs most frequently; much faster to check this before xcrun
         elsif (path = HOMEBREW_PREFIX/"bin/#{tool}").executable?
           path
-        elsif OS.mac?
+        # xcrun was introduced in Xcode 3 on Leopard
+        elsif MacOS.version > :tiger
           path = Utils.popen_read("/usr/bin/xcrun", "-no-cache", "-find", tool).chomp
           Pathname.new(path) if File.executable?(path)
         end
@@ -133,7 +134,9 @@ module OS
 
     def default_compiler
       case default_cc
-      when /^gcc-4.0/ then :gcc_4_0
+      # if GCC 4.2 is installed, e.g. via Tigerbrew, prefer it
+      # over the system's GCC 4.0
+      when /^gcc-4.0/ then gcc_42_build_version ? :gcc : :gcc_4_0
       when /^gcc/ then :gcc
       when /^llvm/ then :llvm
       when "clang" then :clang
@@ -239,7 +242,13 @@ module OS
     end
 
     def prefer_64_bit?
-      Hardware::CPU.is_64_bit? && (version > :leopard || OS.linux?)
+      if OS.linux?
+        Hardware::CPU.is_64_bit?
+      elsif ENV["HOMEBREW_PREFER_64_BIT"] && version == :leopard
+        Hardware::CPU.is_64_bit?
+      else
+        Hardware::CPU.is_64_bit? && version > :leopard
+      end
     end
 
     def preferred_arch
@@ -251,6 +260,7 @@ module OS
     end
 
     STANDARD_COMPILERS = {
+      "2.0"   => { :gcc_40_build => 4061 },
       "2.5"   => { :gcc_40_build => 5370 },
       "3.1.4" => { :gcc_40_build => 5493, :gcc_42_build => 5577 },
       "3.2.6" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :llvm_build => 2335, :clang => "1.7", :clang_build => 77 },

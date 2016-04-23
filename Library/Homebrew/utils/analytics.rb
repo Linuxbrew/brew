@@ -8,7 +8,6 @@ def analytics_label
 end
 
 def report_analytics(type, metadata = {})
-  return unless ENV["HOMEBREW_ANALYTICS"]
   return if ENV["HOMEBREW_NO_ANALYTICS"]
 
   args = %W[

@@ -1551,7 +1551,7 @@ class Formula
   end
 
   def stage
-    active_spec.stage do |_resource, staging|
+    active_spec.stage do |staging|
       @source_modified_time = active_spec.source_modified_time
       @buildpath = Pathname.pwd
       env_home = buildpath/".brew_home"

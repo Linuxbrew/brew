@@ -4,7 +4,8 @@ class AprRequirement < Requirement
   fatal true
   default_formula "apr-util"
 
-  satisfy(:build_env => false) { MacOS::CLT.installed? }
+  # APR shipped in Tiger is too old, but Leopard+ is usable
+  satisfy(:build_env => false) { MacOS.version > :leopard && MacOS::CLT.installed? }
 
   env do
     unless MacOS::CLT.installed?
