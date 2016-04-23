@@ -306,7 +306,7 @@ module Homebrew
         @hash = nil
       elsif ENV["GIT_BRANCH"] && ENV["GIT_BRANCH"].include?(":")
         # Docker automated build of a pull request
-        user, branch = ENV["GIT_BRANCH"].split(":")
+        user = ENV["GIT_BRANCH"].split(":")[0]
         @url = "https://github.com/#{user}/linuxbrew/commit/#{ENV["GIT_SHA1"]}"
         @hash = nil
       end
@@ -855,7 +855,6 @@ module Homebrew
     system "brew", "bottle", *bottle_args
 
     project = OS.mac? ? "homebrew" : "linuxbrew"
-    remote_repo = tap.core_tap? ? project : "homebrew-#{tap.repo}"
     remote = "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/homebrew-#{tap.repo}.git"
     tag = docker_branch ? "pr-#{docker_user}-#{docker_branch}" : pr ? "pr-#{pr}" : "testing-#{number}"
     safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
