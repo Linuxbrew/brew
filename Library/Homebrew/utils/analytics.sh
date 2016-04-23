@@ -1,5 +1,4 @@
 setup-analytics() {
-  [[ -z "$HOMEBREW_ANALYTICS" ]] && return
   [[ -n "$HOMEBREW_NO_ANALYTICS" ]] && return
 
   # User UUID file. Used for Homebrew user counting. Can be deleted and
@@ -27,7 +26,6 @@ setup-analytics() {
 }
 
 report-analytics-screenview-command() {
-  [[ -z "$HOMEBREW_ANALYTICS" ]] && return
   [[ -n "$HOMEBREW_NO_ANALYTICS" ]] && return
 
   # Don't report non-official commands.
