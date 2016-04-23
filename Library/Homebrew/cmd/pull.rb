@@ -208,20 +208,13 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-<<<<<<< HEAD
-          if tap.core_tap?
-            if user && rev
-              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{user}-#{rev}"
-            elsif github_repo == "Linuxbrew/linuxbrew"
-              "https://github.com/LinuxbrewTestBot/linuxbrew/compare/linuxbrew:master...pr-#{issue}"
-            else
-              "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
-            end
+          if user && rev
+            "https://github.com/LinuxbrewTestBot/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{user}-#{rev}"
+          elsif github_repo == "Linuxbrew/linuxbrew"
+            "https://github.com/LinuxbrewTestBot/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{issue}"
           else
             "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
           end
-=======
-          "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
         end
 
         bottle_commit_fallbacked = false
@@ -232,7 +225,6 @@ module Homebrew
           bottle_commit_url = "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
           bottle_commit_fallbacked = true
           retry
->>>>>>> homebrew/master
         end
 
         safe_system "git", "checkout", "-B", bottle_branch, revision
