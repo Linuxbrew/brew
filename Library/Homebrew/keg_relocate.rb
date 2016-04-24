@@ -183,11 +183,10 @@ class Keg
   def libtool_files
     libtool_files = []
 
-    # find .la files, which are stored in lib/
-    lib.find do |pn|
+    path.find do |pn|
       next if pn.symlink? || pn.directory? || pn.extname != ".la"
       libtool_files << pn
-    end if lib.directory?
+    end
     libtool_files
   end
 
