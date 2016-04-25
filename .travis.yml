@@ -1,6 +1,5 @@
 language: ruby
-rvm:
-  - 2.0.0
+rvm: 2.0.0
 
 before_install:
   # Fix error: Incorrect file permissions (664)
