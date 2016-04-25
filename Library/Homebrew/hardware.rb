@@ -55,8 +55,6 @@ class Hardware
   elsif OS.linux?
     require "os/linux/hardware"
     CPU.extend LinuxCPUs
-  else
-    raise "The system `#{`uname`.chomp}' is not supported."
   end
 
   def self.cores_as_words

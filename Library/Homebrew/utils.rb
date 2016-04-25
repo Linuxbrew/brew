@@ -448,7 +448,9 @@ def exec_editor(*args)
 end
 
 def exec_browser(*args)
-  browser = ENV["HOMEBREW_BROWSER"] || ENV["BROWSER"] || OS::PATH_OPEN
+  browser = ENV["HOMEBREW_BROWSER"] || ENV["BROWSER"]
+  browser ||= OS::PATH_OPEN if defined?(OS::PATH_OPEN)
+  return unless browser
   safe_exec(browser, *args)
 end
 

@@ -141,7 +141,7 @@ rescue RuntimeError, SystemCallError => e
 rescue Exception => e
   Utils::Analytics.report_exception(e)
   onoe e
-  if internal_cmd
+  if internal_cmd && defined?(ISSUES_URL)
     $stderr.puts "#{Tty.white}Please report this bug:"
     $stderr.puts "    #{Tty.em}#{OS::ISSUES_URL}#{Tty.reset}"
   end
