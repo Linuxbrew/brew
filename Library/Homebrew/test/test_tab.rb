@@ -32,7 +32,7 @@ class TabTests < Homebrew::TestCase
     assert_nil tab.tap
     assert_nil tab.time
     assert_nil tab.HEAD
-    assert_equal MacOS.default_compiler, tab.cxxstdlib.compiler
+    assert_equal DevelopmentTools.default_compiler, tab.cxxstdlib.compiler
     assert_nil tab.cxxstdlib.type
   end
 

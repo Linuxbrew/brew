@@ -89,11 +89,11 @@ class CompilerSelector
   }
 
   def self.select_for(formula, compilers = self.compilers)
-    new(formula, MacOS, compilers).compiler
+    new(formula, DevelopmentTools, compilers).compiler
   end
 
   def self.compilers
-    COMPILER_PRIORITY.fetch(MacOS.default_compiler)
+    COMPILER_PRIORITY.fetch(DevelopmentTools.default_compiler)
   end
 
   attr_reader :formula, :failures, :versions, :compilers

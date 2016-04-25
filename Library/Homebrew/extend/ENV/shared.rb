@@ -164,7 +164,7 @@ module SharedEnvExtension
     elsif @formula
       CompilerSelector.select_for(@formula)
     else
-      MacOS.default_compiler
+      DevelopmentTools.default_compiler
     end
   end
 

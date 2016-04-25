@@ -121,7 +121,7 @@ module Stdenv
   # @private
   def determine_cc
     s = super
-    MacOS.locate(s) || Pathname.new(s)
+    DevelopmentTools.locate(s) || Pathname.new(s)
   end
 
   # @private
