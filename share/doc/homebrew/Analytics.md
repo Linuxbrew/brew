@@ -1,5 +1,5 @@
 # Homebrew's Anonymous Aggregate User Behaviour Analytics
-Homebrew has begun gathering anonymous aggregate user behaviour analytics and reporting these to Google Analytics.
+Homebrew has begun gathering anonymous aggregate user behaviour analytics and reporting these to Google Analytics. You will be notified the first time you run `brew update` or install Homebrew.
 
 ## Why?
 Homebrew is provided free of charge and run entirely by volunteers in their spare time. As a result, we do not have the resources to do detailed user studies of Homebrew users to decide on how best to design future features and prioritise current work. Anonymous aggregate user analytics allow us to prioritise fixes and features based on how, where and when people use Homebrew. For example:
