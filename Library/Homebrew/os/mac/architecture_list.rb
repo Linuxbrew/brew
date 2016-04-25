@@ -1,3 +1,5 @@
+require "extend/os/hardware"
+
 module ArchitectureListExtension
   # @private
   def fat?
