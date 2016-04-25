@@ -32,7 +32,6 @@ require "utils/json"
 require "formula"
 require "formulary"
 require "tap"
-require "bottles"
 require "version"
 require "pkg_version"
 
@@ -402,8 +401,8 @@ module Homebrew
 
   # Publishes the current bottle files for a given formula to Bintray
   def publish_bottle_file_on_bintray(f, creds)
-    repo = Bintray.repository(f.tap)
-    package = Bintray.package(f.name)
+    repo = Utils::Bottles::Bintray.repository(f.tap)
+    package = Utils::Bottles::Bintray.package(f.name)
     info = FormulaInfoFromJson.lookup(f.name)
     if info.nil?
       raise "Failed publishing bottle: failed reading formula info for #{f.full_name}"

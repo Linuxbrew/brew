@@ -1,5 +1,5 @@
 require "formula"
-require "bottles"
+require "utils/bottles"
 require "tab"
 require "keg"
 require "formula_versions"
@@ -155,7 +155,7 @@ module Homebrew
       return
     end
 
-    unless built_as_bottle? f
+    unless Utils::Bottles::built_as? f
       return ofail "Formula not installed with '--build-bottle': #{f.full_name}"
     end
 
@@ -175,7 +175,7 @@ module Homebrew
       bottle_revision = bottle_revisions.any? ? bottle_revisions.max.to_i + 1 : 0
     end
 
-    filename = Bottle::Filename.create(f, bottle_tag, bottle_revision)
+    filename = Bottle::Filename.create(f, Utils::Bottles.tag, bottle_revision)
     bottle_path = Pathname.pwd/filename
 
     tar_filename = filename.to_s.sub(/.gz$/, "")
@@ -281,7 +281,7 @@ module Homebrew
       bottle.prefix prefix
     end
     bottle.revision bottle_revision
-    bottle.sha256 bottle_path.sha256 => bottle_tag
+    bottle.sha256 bottle_path.sha256 => Utils::Bottles.tag
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?

@@ -576,7 +576,7 @@ module Homebrew
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.has_output?
             bottle_filename =
-              bottle_step.output.gsub(/.*(\.\/\S+#{bottle_native_regex}).*/m, '\1')
+              bottle_step.output.gsub(/.*(\.\/\S+#{Utils::Bottles::native_regex}).*/m, '\1')
             bottle_rb_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".rb")
             bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_rb_filename]
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
@@ -824,15 +824,15 @@ module Homebrew
     remote = "git@github.com:BrewTestBot/homebrew-#{tap.repo}.git"
     tag = pr ? "pr-#{pr}" : "testing-#{number}"
 
-    bintray_repo = Bintray.repository(tap)
+    bintray_repo = Utils::Bottles::Bintray.repository(tap)
     bintray_repo_url = "https://api.bintray.com/packages/homebrew/#{bintray_repo}"
     formula_packaged = {}
 
     Dir.glob("*.bottle*.tar.gz") do |filename|
-      formula_name, canonical_formula_name = bottle_resolve_formula_names filename
+      formula_name, canonical_formula_name = Utils::Bottles.resolve_formula_names filename
       formula = Formulary.factory canonical_formula_name
       version = formula.pkg_version
-      bintray_package = Bintray.package formula_name
+      bintray_package = Utils::Bottles::Bintray.package formula_name
 
       if system "curl", "-I", "--silent", "--fail", "--output", "/dev/null",
                 "#{BottleSpecification::DEFAULT_DOMAIN}/#{bintray_repo}/#{filename}"

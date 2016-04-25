@@ -92,7 +92,7 @@ class Formulary
   class BottleLoader < FormulaLoader
     def initialize(bottle_name)
       @bottle_filename = Pathname(bottle_name).realpath
-      name, full_name = bottle_resolve_formula_names @bottle_filename
+      name, full_name = Utils::Bottles.resolve_formula_names @bottle_filename
       super name, Formulary.path(full_name)
     end
 
@@ -100,7 +100,7 @@ class Formulary
       formula = super
       formula.local_bottle_path = @bottle_filename
       formula_version = formula.pkg_version
-      bottle_version =  bottle_resolve_version(@bottle_filename)
+      bottle_version =  Utils::Bottles.resolve_version(@bottle_filename)
       unless formula_version == bottle_version
         raise BottleVersionMismatchError.new(@bottle_filename, bottle_version, formula, formula_version)
       end
