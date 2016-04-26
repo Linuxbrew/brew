@@ -3,20 +3,11 @@ setup-analytics() {
   # recreated with no adverse effect (beyond our user counts being inflated).
   HOMEBREW_ANALYTICS_USER_UUID_FILE="$HOME/.homebrew_analytics_user_uuid"
 
-  if [[ -n "$HOMEBREW_NO_ANALYTICS" ]]
+  if [[ -n "$HOMEBREW_NO_ANALYTICS" ||
+        "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsmessage)" != "true" ||
+        "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsdisabled)" = "true" ]]
   then
-    rm -f "$HOMEBREW_ANALYTICS_USER_UUID_FILE"
-    git config --file="$HOMEBREW_REPOSITORY/.git/config" --replace-all homebrew.analyticsdisabled true
-  fi
-
-  if [[ "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsmessage)" != "true" ]]
-  then
-    export HOMEBREW_NO_ANALYTICS="1"
-    return
-  fi
-
-  if [[ "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsdisabled)" = "true" ]]
-  then
+    [[ -f "$HOMEBREW_ANALYTICS_USER_UUID_FILE" ]] && rm -f "$HOMEBREW_ANALYTICS_USER_UUID_FILE"
     export HOMEBREW_NO_ANALYTICS="1"
     return
   fi
