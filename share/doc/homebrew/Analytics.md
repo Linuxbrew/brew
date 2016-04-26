@@ -44,4 +44,4 @@ Homebrew's analytics are accessible to Homebrew's current maintainers. Contact @
 The code is viewable in https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.rb and https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.sh. They are done in a separate background process and fail fast to avoid delaying any execution. They will fail immediately and silently if you have no network connection.
 
 ## Opting-out
-If after everything you've read you still wish to opt-out of Homebrew's analytics you may set `HOMEBREW_NO_ANALYTICS=1` in your environment or run `git config --file="$(brew --repository)/.git/config" --replace-all homebrew.analyticsdisabled true` which will prevent analytics from ever being sent when either or them have been set.
+If after everything you've read you still wish to opt-out of Homebrew's analytics you may set `HOMEBREW_NO_ANALYTICS=1` in your environment or run `git config --file="$(brew --repository)/.git/config" --replace-all homebrew.analyticsdisabled true` which will prevent analytics from ever being sent when either of them have been set.
