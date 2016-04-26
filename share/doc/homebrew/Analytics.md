@@ -4,7 +4,7 @@ Homebrew has begun gathering anonymous aggregate user behaviour analytics and re
 ## Why?
 Homebrew is provided free of charge and run entirely by volunteers in their spare time. As a result, we do not have the resources to do detailed user studies of Homebrew users to decide on how best to design future features and prioritise current work. Anonymous aggregate user analytics allow us to prioritise fixes and features based on how, where and when people use Homebrew. For example:
 
-- if a formulae is widely used and is failing often it will enable us to prioritise fixing that formula over others.
+- if a formula is widely used and is failing often it will enable us to prioritise fixing that formula over others.
 - collecting the OS version allows us to decide what versions of OS X to prioritise and support and identify build failures that occur only on single versions.
 
 ## What?
