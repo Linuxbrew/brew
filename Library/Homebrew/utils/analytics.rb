@@ -8,7 +8,7 @@ def analytics_label
 end
 
 def report_analytics(type, metadata = {})
-  return if ENV["HOMEBREW_NO_ANALYTICS"]
+  return if ENV["HOMEBREW_NO_ANALYTICS"] || ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"]
 
   args = %W[
     --max-time 3
