@@ -14,7 +14,7 @@ Install Linuxbrew (tl;dr)
 Paste at a Terminal prompt:
 
 ``` sh
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/linuxbrew/go/install)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
 ```
 
 See [Dependencies](#dependencies) and [Installation](#installation) below for more details.
