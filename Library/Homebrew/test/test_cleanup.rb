@@ -73,4 +73,11 @@ class CleanupTests < Homebrew::TestCase
     shutup { Homebrew::Cleanup.cleanup_cache }
     refute_predicate java_cache, :exist?
   end
+
+  def test_cleanup_cache_npm_cache
+    npm_cache = (HOMEBREW_CACHE/"npm_cache")
+    npm_cache.mkpath
+    shutup { Homebrew::Cleanup.cleanup_cache }
+    refute_predicate npm_cache, :exist?
+  end
 end

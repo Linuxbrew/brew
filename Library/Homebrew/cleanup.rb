@@ -50,7 +50,7 @@ module Homebrew
           cleanup_path(path) { path.unlink }
           next
         end
-        if path.basename.to_s == "java_cache" && path.directory?
+        if %w[java_cache npm_cache].include?(path.basename.to_s) && path.directory?
           cleanup_path(path) { FileUtils.rm_rf path }
           next
         end
