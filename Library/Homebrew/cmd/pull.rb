@@ -37,7 +37,6 @@ module Homebrew
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
     github_repo = ""
-    bintray_project = "homebrew"
     bintray_fetch_formulae = []
     tap = nil
 
@@ -52,7 +51,6 @@ module Homebrew
           end
         elsif OS.linux?
           url = "https://github.com/Linuxbrew/homebrew-core/pull/#{arg}"
-          bintray_project = "linuxbrew"
           github_repo = "Linuxbrew/homebrew-core"
         end
         tap = CoreTap.instance
@@ -65,12 +63,10 @@ module Homebrew
         url, issue, user, rev = *url_match
         url = url.sub(/\?.*/, "")
         tap = CoreTap.instance
-        bintray_project = "linuxbrew"
         github_repo = "Linuxbrew/linuxbrew"
       elsif (url_match = arg.match %r[https://github\.com/([\w-]+)/linuxbrew/(?:pull/(\d+)|commit/[0-9a-fA-F]{4,40})])
         url, user, issue = *url_match
         tap = CoreTap.instance
-        bintray_project = "linuxbrew"
         github_repo = "Linuxbrew/linuxbrew"
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
@@ -210,7 +206,7 @@ module Homebrew
           bottle_branch = "pull-bottle-#{issue}"
           if user && rev
             "https://github.com/LinuxbrewTestBot/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{user}-#{rev}"
-          elsif github_repo == "Linuxbrew/linuxbrew"
+          elsif tap.remote.include? "Linuxbrew"
             "https://github.com/LinuxbrewTestBot/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{issue}"
           else
             "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
@@ -239,6 +235,7 @@ module Homebrew
         bintray_key = ENV["BINTRAY_KEY"]
 
         if bintray_user && bintray_key
+          bintray_project = tap.remote.include?("Linuxbrew") ? "linuxbrew" : "homebrew"
           repo = Bintray.repository(tap)
           changed_formulae.each do |f|
             next if f.bottle_unneeded? || f.bottle_disabled?
