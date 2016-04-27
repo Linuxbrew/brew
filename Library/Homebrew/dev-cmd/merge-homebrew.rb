@@ -9,15 +9,15 @@ module Homebrew
   #   --core  merge Homebrew/homebrew-core into Linuxbrew/homebrew-core
   #
   def git_merge
-    safe_system *%w[git fetch homebrew]
+    safe_system "git", "fetch", "homebrew"
     start_sha1 = Utils.popen_read("git", "rev-parse", "origin/master").chomp
     end_sha1 = Utils.popen_read("git", "rev-parse", "homebrew/master").chomp
 
     puts "Start commit: #{start_sha1}"
     puts "End   commit: #{end_sha1}"
 
-    safe_system *%w[git checkout master]
-    safe_system *%w[git merge homebrew/master -m], "Merge branch homebrew/master into linuxbrew/master"
+    safe_system "git", "checkout", "master"
+    safe_system "git", "merge", "homebrew/master", "-m", "Merge branch homebrew/master into linuxbrew/master"
   end
 
   def merge_brew
