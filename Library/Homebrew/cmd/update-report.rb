@@ -12,6 +12,24 @@ module Homebrew
   end
 
   def update_report
+    HOMEBREW_REPOSITORY.cd do
+      analytics_message_displayed = \
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
+      analytics_disabled = \
+        Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
+      if analytics_message_displayed != "true" && analytics_disabled != "true"
+        ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
+        ohai "Homebrew has enabled anonymous aggregate user behaviour analytics"
+        puts "Read the analytics documentation (and how to opt-out) here:"
+        puts "  https://git.io/brew-analytics"
+
+        # Consider the message possibly missed if not a TTY.
+        if $stdout.tty?
+          safe_system "git", "config", "--local", "--replace-all", "homebrew.analyticsmessage", "true"
+        end
+      end
+    end
+
     install_core_tap_if_necessary
 
     hub = ReporterHub.new

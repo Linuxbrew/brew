@@ -1,10 +1,10 @@
 # Homebrew's Anonymous Aggregate User Behaviour Analytics
-Homebrew has begun gathering anonymous aggregate user behaviour analytics and reporting these to Google Analytics.
+Homebrew has begun gathering anonymous aggregate user behaviour analytics and reporting these to Google Analytics. You will be notified the first time you run `brew update` or install Homebrew.
 
 ## Why?
 Homebrew is provided free of charge and run entirely by volunteers in their spare time. As a result, we do not have the resources to do detailed user studies of Homebrew users to decide on how best to design future features and prioritise current work. Anonymous aggregate user analytics allow us to prioritise fixes and features based on how, where and when people use Homebrew. For example:
 
-- if a formulae is widely used and is failing often it will enable us to prioritise fixing that formula over others.
+- if a formula is widely used and is failing often it will enable us to prioritise fixing that formula over others.
 - collecting the OS version allows us to decide what versions of OS X to prioritise and support and identify build failures that occur only on single versions.
 
 ## What?
@@ -44,4 +44,4 @@ Homebrew's analytics are accessible to Homebrew's current maintainers. Contact @
 The code is viewable in https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.rb and https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.sh. They are done in a separate background process and fail fast to avoid delaying any execution. They will fail immediately and silently if you have no network connection.
 
 ## Opting-out
-If after everything you've read you still wish to opt-out of Homebrew's analytics you may set `HOMEBREW_NO_ANALYTICS=1` in your environment which will prevent analytics from ever being sent when it is set.
+If after everything you've read you still wish to opt-out of Homebrew's analytics you may set `HOMEBREW_NO_ANALYTICS=1` in your environment or run `git config --file="$(brew --repository)/.git/config" --replace-all homebrew.analyticsdisabled true` which will prevent analytics from ever being sent when either of them have been set.

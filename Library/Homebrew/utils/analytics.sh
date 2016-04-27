@@ -1,9 +1,24 @@
 setup-analytics() {
-  [[ -n "$HOMEBREW_NO_ANALYTICS" ]] && return
-
   # User UUID file. Used for Homebrew user counting. Can be deleted and
   # recreated with no adverse effect (beyond our user counts being inflated).
   HOMEBREW_ANALYTICS_USER_UUID_FILE="$HOME/.homebrew_analytics_user_uuid"
+
+  # Make disabling anlytics sticky
+  if [[ -n "$HOMEBREW_NO_ANALYTICS" ]]
+  then
+    git config --file="$HOMEBREW_REPOSITORY/.git/config" --replace-all homebrew.analyticsdisabled true
+    # Internal variable for brew's use, to differentiate from user-supplied setting
+    export HOMEBREW_NO_ANALYTICS_THIS_RUN="1"
+  fi
+
+  if [[ "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsmessage)" != "true" ||
+        "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsdisabled)" = "true" ]]
+  then
+    [[ -f "$HOMEBREW_ANALYTICS_USER_UUID_FILE" ]] && rm -f "$HOMEBREW_ANALYTICS_USER_UUID_FILE"
+    export HOMEBREW_NO_ANALYTICS_THIS_RUN="1"
+    return
+  fi
+
   if [[ -r "$HOMEBREW_ANALYTICS_USER_UUID_FILE" ]]
   then
     HOMEBREW_ANALYTICS_USER_UUID="$(<"$HOMEBREW_ANALYTICS_USER_UUID_FILE")"
@@ -26,7 +41,7 @@ setup-analytics() {
 }
 
 report-analytics-screenview-command() {
-  [[ -n "$HOMEBREW_NO_ANALYTICS" ]] && return
+  [[ -n "$HOMEBREW_NO_ANALYTICS" || -n "$HOMEBREW_NO_ANALYTICS_THIS_RUN" ]] && return
 
   # Don't report non-official commands.
   if ! [[ "$HOMEBREW_COMMAND" = "bundle"   ||

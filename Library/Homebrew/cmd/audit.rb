@@ -656,13 +656,6 @@ class FormulaAuditor
     if text =~ /def plist/ && text !~ /plist_options/
       problem "Please set plist_options when using a formula-defined plist."
     end
-
-    if text =~ /system "npm", "install"/ && text !~ %r[opt_libexec\}/npm/bin] && formula.name !~ /^kibana(\d{2})?$/
-      need_npm = "\#{Formula[\"node\"].opt_libexec\}/npm/bin"
-      problem <<-EOS.undent
-       Please add ENV.prepend_path \"PATH\", \"#{need_npm}"\ to def install
-      EOS
-    end
   end
 
   def audit_line(line, lineno)
@@ -883,6 +876,10 @@ class FormulaAuditor
 
     if line =~ /assert [^!]+\.include?/
       problem "Use `assert_match` instead of `assert ...include?`"
+    end
+
+    if line =~ /system "npm", "install"/ && line !~ /Language::Node/
+      problem "Use Language::Node for npm install args"
     end
 
     if @strict
