@@ -8,7 +8,7 @@ module Homebrew
   def build_bottle formula
     remote = ARGV.value("remote") || ENV["USER"]
     tag = (ARGV.value("tag") || "x86_64_linux").to_sym
-    return oh1 "#{formula}: Skipping because it has a bottle" if formula.bottle_specification.tag?(tag)
+    return ohai"#{formula}: Skipping because it has a bottle" if formula.bottle_specification.tag?(tag)
     message = "#{formula}: Build a bottle for Linuxbrew"
     oh1 message
     return if ARGV.dry_run?
@@ -23,7 +23,7 @@ module Homebrew
     safe_system "git", "checkout", "-b", branch, "master"
     safe_system "git", "commit", formula.path, "-m", message
     safe_system "git", "push", remote, branch
-    safe_system "hub", "pull-request", "-m", message
+    safe_system "hub", "pull-request", "--browse", "-m", message
     safe_system "git", "checkout", "master"
     safe_system "git", "branch", "-D", branch
   end
