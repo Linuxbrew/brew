@@ -1,7 +1,7 @@
 def analytics_label
   @analytics_anonymous_prefix_and_os ||= begin
     os = OS_VERSION
-    prefix = ", non-/usr/local" if HOMEBREW_PREFIX.to_s != "/usr/local"
+    prefix = (OS.mac? ? ", non-/usr/local" : ", custom-prefix") if HOMEBREW_PREFIX.to_s != BottleSpecification::DEFAULT_PREFIX
     ci = ", CI" if ENV["CI"]
     "#{os}#{prefix}#{ci}"
   end
