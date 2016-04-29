@@ -494,6 +494,10 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     quiet_safe_system "svn", "export", "--force", cached_location, Dir.pwd
   end
 
+  def source_modified_time
+    Time.parse Utils.popen_read("svn", "info", cached_location.to_s).strip[/^Last Changed Date: (.+)$/, 1]
+  end
+
   private
 
   def repo_url
