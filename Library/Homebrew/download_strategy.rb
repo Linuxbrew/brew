@@ -838,6 +838,10 @@ class FossilDownloadStrategy < VCSDownloadStrategy
     safe_system(*args)
   end
 
+  def source_modified_time
+    Time.parse Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
+  end
+
   private
 
   def cache_tag
