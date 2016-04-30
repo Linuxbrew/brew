@@ -196,7 +196,9 @@ class Caveats
         s << "  #{f.plist_manual}"
       end
 
-      s << "" << "WARNING: brew services will fail when run under tmux." if ENV["TMUX"]
+      if ENV["TMUX"] && !quiet_system("/usr/bin/pbpaste")
+        s << "" << "WARNING: brew services will fail when run under tmux."
+      end
     end
     s.join("\n") + "\n" unless s.empty?
   end
