@@ -801,6 +801,10 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
     rm_r ".bzr"
   end
 
+  def source_modified_time
+    Time.parse Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+  end
+
   private
 
   def cache_tag
