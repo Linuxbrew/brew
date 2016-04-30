@@ -765,6 +765,10 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
     end
   end
 
+  def source_modified_time
+    Time.parse Utils.popen_read("hg", "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
+  end
+
   private
 
   def cache_tag
