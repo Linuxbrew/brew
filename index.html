@@ -13,9 +13,9 @@
     <section class="page-header">
       <h1 class="project-name">Linuxbrew</h1>
       <h2 class="project-tagline">The Homebrew package manager for Linux</h2>
-      <a href="https://github.com/Linuxbrew/linuxbrew" class="btn">View on GitHub</a>
-      <a href="https://github.com/Linuxbrew/linuxbrew/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/Linuxbrew/linuxbrew/tarball/master" class="btn">Download .tar.gz</a>
+      <a href="https://github.com/Linuxbrew/brew" class="btn">View on GitHub</a>
+      <a href="https://github.com/Linuxbrew/brew/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Linuxbrew/brew/tarball/master" class="btn">Download .tar.gz</a>
     </section>
 
     <section class="main-content">
@@ -23,14 +23,16 @@
 
 <p>It can be installed in your home directory and does not require root access. The same package manager can be used on both your Linux server and your Mac laptop. Installing a modern version of <em>glibc</em> and <em>gcc</em> in your home directory on an old distribution of Linux takes five minutes.</p>
 
-<p>To receive updates of major changes to Linuxbrew subscribe to the <a href="https://github.com/Linuxbrew/linuxbrew/issues/864">Linuxbrew Updates</a> issue on GitHub.</p>
+<p>Features, usage and installation instructions are <a href="http://linuxbrew.sh">summarised on the homepage</a>.</p>
+
+<p>To receive updates of major changes to Linuxbrew subscribe to the <a href="https://github.com/Linuxbrew/linuxbrew/issues/1000">Linuxbrew Updates</a> issue on GitHub.</p>
 
 <h2>
 <a id="install-linuxbrew-tldr" class="anchor" href="#install-linuxbrew-tldr" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install Linuxbrew (tl;dr)</h2>
 
 <p>Paste at a Terminal prompt:</p>
 
-<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Linuxbrew/linuxbrew/go/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
 
 <p>See <a href="#dependencies">Dependencies</a> and <a href="#installation">Installation</a> below for more details.</p>
 
@@ -51,11 +53,11 @@
 <li>
 <strong>Ruby</strong> 1.8.6 or newer</li>
 <li>
-<strong>GCC</strong> 4.2 or newer</li>
+<strong>GCC</strong> 4.4 or newer</li>
 <li>
 <strong>Linux</strong> 2.6.16 or newer</li>
 <li>
-<strong>64-bit x86</strong> or <strong>32-bit ARM</strong> platform</li>
+<strong>64-bit x86</strong> or <strong>32-bit ARM</strong> (Raspberry Pi)</li>
 </ul>
 
 <p>Paste at a Terminal prompt:</p>
@@ -63,12 +65,12 @@
 <h3>
 <a id="debian-or-ubuntu" class="anchor" href="#debian-or-ubuntu" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Debian or Ubuntu</h3>
 
-<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential curl git m4 python-setuptools ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev</pre></div>
+<div class="highlight highlight-source-shell"><pre>sudo apt-get install build-essential curl git python-setuptools ruby</pre></div>
 
 <h3>
 <a id="fedora-centos-or-red-hat" class="anchor" href="#fedora-centos-or-red-hat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fedora, CentOS or Red Hat</h3>
 
-<div class="highlight highlight-source-shell"><pre>sudo yum groupinstall <span class="pl-s"><span class="pl-pds">'</span>Development Tools<span class="pl-pds">'</span></span> <span class="pl-k">&amp;&amp;</span> sudo yum install curl git irb m4 python-setuptools ruby texinfo bzip2-devel curl-devel expat-devel ncurses-devel zlib-devel</pre></div>
+<div class="highlight highlight-source-shell"><pre>sudo yum groupinstall <span class="pl-s"><span class="pl-pds">'</span>Development Tools<span class="pl-pds">'</span></span> <span class="pl-k">&amp;&amp;</span> sudo yum install curl git irb python-setuptools ruby</pre></div>
 
 <h3>
 <a id="32-bit-x86-platforms" class="anchor" href="#32-bit-x86-platforms" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>32-bit x86 platforms</h3>
@@ -115,14 +117,14 @@
 <h2>
 <a id="more-documentation" class="anchor" href="#more-documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>More Documentation</h2>
 
-<p><code>brew help</code>, <code>man brew</code> or check <a href="https://github.com/Linuxbrew/linuxbrew/tree/master/share/doc/homebrew#readme">our documentation</a>.</p>
+<p><code>brew help</code>, <code>man brew</code> or check <a href="https://github.com/Linuxbrew/brew/tree/master/share/doc/homebrew#readme">our documentation</a>.</p>
 
 <h2>
 <a id="troubleshooting" class="anchor" href="#troubleshooting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Troubleshooting</h2>
 
 <p>First, please run <code>brew update</code> and <code>brew doctor</code>.</p>
 
-<p>Second, read the <a href="https://github.com/Linuxbrew/linuxbrew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting">Troubleshooting Checklist</a>.</p>
+<p>Second, read the <a href="https://github.com/Linuxbrew/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting">Troubleshooting Checklist</a>.</p>
 
 <p><strong>If you don't read these it will take us far longer to help you with your problem.</strong></p>
 
@@ -159,7 +161,7 @@
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
-<p>Code is under the <a href="https://github.com/Homebrew/homebrew/tree/master/LICENSE.txt">BSD 2 Clause (NetBSD) license</a>.
+<p>Code is under the <a href="https://github.com/Homebrew/brew/tree/master/LICENSE.txt">BSD 2 Clause (NetBSD) license</a>.
 Documentation is under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a>.</p>
 
 <h2>
@@ -177,10 +179,9 @@ Documentation is under the <a href="https://creativecommons.org/licenses/by/4.0/
 <li>Make check payable to "Software Freedom Conservancy, Inc." and place "Directed donation: Homebrew" in the memo field.  Checks should then be mailed to:
 
 <ul>
-<li>Software Freedom Conservancy, Inc.<br>
-137 Montague ST  STE 380<br>
-BROOKLYN, NY 11201             USA<br>
-</li>
+<li>Software Freedom Conservancy, Inc.
+137 Montague ST  STE 380
+BROOKLYN, NY 11201             USA</li>
 </ul>
 </li>
 </ul>
@@ -192,7 +193,7 @@ BROOKLYN, NY 11201             USA<br>
 <h2>
 <a id="sponsors" class="anchor" href="#sponsors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sponsors</h2>
 
-<p>Our CI infrastructure was paid for by <a href="https://github.com/Homebrew/homebrew/blob/master/share/doc/homebrew/Kickstarter-Supporters.md">our Kickstarter supporters</a>.</p>
+<p>Our CI infrastructure was paid for by <a href="https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Kickstarter-Supporters.md">our Kickstarter supporters</a>.</p>
 
 <p>Our CI infrastructure is hosted by <a href="http://www.positive-internet.com">The Positive Internet Company</a>.</p>
 
@@ -205,7 +206,7 @@ BROOKLYN, NY 11201             USA<br>
 <p><a href="https://sfconservancy.org"><img src="https://sfconservancy.org/img/conservancy_64x64.png" alt="Software Freedom Conservancy"></a></p>
 
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/Linuxbrew/linuxbrew">Linuxbrew</a> is maintained by <a href="https://github.com/Linuxbrew">Linuxbrew</a>.</span>
+        <span class="site-footer-owner"><a href="https://github.com/Linuxbrew/brew">Linuxbrew</a> is maintained by <a href="https://github.com/Linuxbrew">Linuxbrew</a>.</span>
 
         <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
