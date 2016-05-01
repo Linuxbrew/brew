@@ -30,7 +30,7 @@ class MigratorErrorsTests < Homebrew::TestCase
     keg.mkpath
     tab = Tab.empty
     tab.tabfile = HOMEBREW_CELLAR/"oldname/0.1/INSTALL_RECEIPT.json"
-    tab.source["tap"] = "Homebrew/homebrew"
+    tab.source["tap"] = "homebrew/core"
     tab.write
     assert_raises(Migrator::MigratorDifferentTapsError) { Migrator.new(@new_f) }
   ensure

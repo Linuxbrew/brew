@@ -920,9 +920,9 @@ class FormulaAuditor
 
     if formula.tap.tap_migrations.key?(formula.name)
       problem <<-EOS.undent
-       #{formula.name} seems to be listed in tap_migrations.json!
-       Please remove #{formula.name} from present tap & tap_migrations.json
-       before submitting it to Homebrew/homebrew.
+        #{formula.name} seems to be listed in tap_migrations.json!
+        Please remove #{formula.name} from present tap & tap_migrations.json
+        before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
       EOS
     end
   end

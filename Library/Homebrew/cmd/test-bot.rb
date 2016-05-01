@@ -809,7 +809,7 @@ module Homebrew
 
     if pr
       if ARGV.include?("--legacy")
-        pull_pr = "https://github.com/Homebrew/homebrew/pull/#{pr}"
+        pull_pr = "https://github.com/Homebrew/legacy-homebrew/pull/#{pr}"
         safe_system "brew", "pull", "--clean", "--legacy", pull_pr
       else
         pull_pr = "https://github.com/#{tap.user}/homebrew-#{tap.repo}/pull/#{pr}"

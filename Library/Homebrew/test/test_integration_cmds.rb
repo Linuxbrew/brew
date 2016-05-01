@@ -209,7 +209,7 @@ class IntegrationCommandTests < Homebrew::TestCase
     alias_file.parent.mkpath
     FileUtils.ln_s formula_file, alias_file
     cmd("readall", "--aliases", "--syntax")
-    cmd("readall", "Homebrew/homebrew")
+    cmd("readall", "homebrew/core")
   ensure
     formula_file.unlink unless formula_file.nil?
     repo.alias_dir.rmtree

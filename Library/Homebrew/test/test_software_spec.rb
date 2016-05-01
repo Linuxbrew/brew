@@ -29,7 +29,7 @@ class SoftwareSpecTests < Homebrew::TestCase
       end
 
       def tap
-        "Homebrew/homebrew"
+        "homebrew/core"
       end
     end.new
     assert_raises(ResourceMissingError) { @spec.resource("foo") }
@@ -38,7 +38,7 @@ class SoftwareSpecTests < Homebrew::TestCase
   def test_set_owner
     owner = stub :name => "some_name",
                  :full_name => "some_name",
-                 :tap => "Homebrew/homebrew"
+                 :tap => "homebrew/core"
     @spec.owner = owner
     assert_equal owner, @spec.owner
   end
@@ -47,7 +47,7 @@ class SoftwareSpecTests < Homebrew::TestCase
     @spec.resource("foo") { url "foo-1.0" }
     @spec.owner = stub :name => "some_name",
                        :full_name => "some_name",
-                       :tap => "Homebrew/homebrew"
+                       :tap => "homebrew/core"
     assert_equal "some_name", @spec.name
     @spec.resources.each_value { |r| assert_equal @spec, r.owner }
   end
@@ -57,7 +57,7 @@ class SoftwareSpecTests < Homebrew::TestCase
     @spec.resource("bar") { url "bar" }
     @spec.owner = stub :name => "some_name",
                        :full_name => "some_name",
-                       :tap => "Homebrew/homebrew"
+                       :tap => "homebrew/core"
     assert_version_equal "42", @spec.resource("bar").version
   end
 

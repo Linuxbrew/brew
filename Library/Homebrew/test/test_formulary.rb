@@ -47,7 +47,7 @@ class FormularyFactoryTest < Homebrew::TestCase
   end
 
   def test_factory_with_fully_qualified_name
-    assert_kind_of Formula, Formulary.factory("homebrew/homebrew/#{@name}")
+    assert_kind_of Formula, Formulary.factory("homebrew/core/#{@name}")
   end
 
   def test_formula_unavailable_error

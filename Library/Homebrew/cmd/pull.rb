@@ -43,7 +43,7 @@ module Homebrew
       if arg.to_i > 0
         issue = arg
         if ARGV.include? "--legacy"
-          url = "https://github.com/Homebrew/homebrew/pull/#{arg}"
+          url = "https://github.com/Homebrew/legacy-homebrew/pull/#{arg}"
         else
           url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
         end
@@ -146,7 +146,7 @@ module Homebrew
       if issue && !ARGV.include?("--clean")
         ohai "Patch closes issue ##{issue}"
         if ARGV.include?("--legacy")
-          close_message = "Closes Homebrew/homebrew##{issue}."
+          close_message = "Closes Homebrew/legacy-homebrew##{issue}."
         else
           close_message = "Closes ##{issue}."
         end
