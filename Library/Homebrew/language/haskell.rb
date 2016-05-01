@@ -46,7 +46,7 @@ module Language
 
       def cabal_install(*args)
         # cabal hardcodes 64 as the maximum number of parallel jobs
-        # https://github.com/Homebrew/homebrew/issues/49509
+        # https://github.com/Homebrew/legacy-homebrew/issues/49509
         make_jobs = ENV.make_jobs > 64 ? 64 : ENV.make_jobs
 
         # cabal-install's dependency-resolution backtracking strategy can easily

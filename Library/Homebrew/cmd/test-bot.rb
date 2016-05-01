@@ -11,7 +11,7 @@
 # --junit:         Generate a JUnit XML test results file.
 # --no-bottle:     Run brew install without --build-bottle.
 # --keep-old:      Run brew bottle --keep-old to build new bottles for a single platform.
-# --legacy         Build formula from legacy Homebrew/homebrew repo.
+# --legacy         Build formula from legacy Homebrew/legacy-homebrew repo.
 #                  (TODO remove it when it's not longer necessary)
 # --HEAD:          Run brew install with --HEAD.
 # --local:         Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
@@ -336,7 +336,7 @@ module Homebrew
         @name = @hash
       # Handle a URL being passed on the command-line or through Jenkins/Travis
       # environment variables e.g.
-      # `brew test-bot https://github.com/Homebrew/homebrew/pull/44293`.
+      # `brew test-bot https://github.com/Homebrew/homebrew-core/pull/678`.
       elsif @url
         # TODO: in future Travis CI may need to also use `brew pull` to e.g. push
         # the right commit to BrewTestBot.

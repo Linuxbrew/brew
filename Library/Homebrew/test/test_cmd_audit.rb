@@ -318,7 +318,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     assert_equal [], fa.problems
   end
 
-  # Regression test for https://github.com/Homebrew/homebrew/pull/48744
+  # Regression test for https://github.com/Homebrew/legacy-homebrew/pull/48744
   # Formulae with "++" in their name would break various audit regexps:
   #   Error: nested *?+ in regexp: /^libxml++3\s/
   def test_audit_plus_plus_name

@@ -18,7 +18,7 @@
 #   --resolve:   When a patch fails to apply, leave in progress and allow user to
 #                 resolve, instead of aborting
 #   --branch-okay: Do not warn if pulling to a branch besides master (useful for testing)
-#   --legacy:    Pull legacy formula PR from Homebrew/homebrew
+#   --legacy:    Pull legacy formula PR from Homebrew/legacy-homebrew
 #                (TODO remove it when it's not longer necessary)
 
 require "utils"

@@ -85,7 +85,7 @@ module Homebrew
       end
       ############# END HELPERS
 
-      # See https://github.com/Homebrew/homebrew/pull/9986
+      # See https://github.com/Homebrew/legacy-homebrew/pull/9986
       def check_path_for_trailing_slashes
         all_paths = ENV["PATH"].split(File::PATH_SEPARATOR)
         bad_paths = all_paths.select { |p| p[-1..-1] == "/" }

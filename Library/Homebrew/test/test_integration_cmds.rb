@@ -170,7 +170,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       end
     EOS
     # `brew bottle` should not fail with dead symlink
-    # https://github.com/Homebrew/homebrew/issues/49007
+    # https://github.com/Homebrew/legacy-homebrew/issues/49007
     (HOMEBREW_CELLAR/"testball/0.1").cd do
       FileUtils.ln_s "not-exist", "symlink"
     end
