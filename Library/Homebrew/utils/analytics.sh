@@ -18,11 +18,9 @@ setup-analytics() {
 
   migrate-legacy-uuid-file
 
-  # Make disabling anlytics sticky
   if [[ -n "$HOMEBREW_NO_ANALYTICS" ]]
   then
-    git config --file="$git_config_file" --replace-all homebrew.analyticsdisabled true
-    git config --file="$git_config_file" --unset-all homebrew.analyticsuuid
+    return
   fi
 
   local message_seen="$(git config --file="$git_config_file" --get homebrew.analyticsmessage)"
@@ -72,10 +70,11 @@ report-analytics-screenview-command() {
   # Don't report commands used mostly by our scripts and not users.
   # TODO: list more e.g. shell completion things here perhaps using a single
   # script as a shell-completion entry point.
-  if [[ "$HOMEBREW_COMMAND" = "commands" ]]
-  then
-    return
-  fi
+  case "$HOMEBREW_COMMAND" in
+    --prefix|analytics|command|commands)
+      return
+      ;;
+  esac
 
   local args=(
     --max-time 3 \

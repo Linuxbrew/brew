@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "April 2016" "Homebrew" "brew"
+.TH "BREW" "1" "May 2016" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for OS X
@@ -42,6 +42,18 @@ List all installed formulae\.
 Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is surrounded with slashes, then it is interpreted as a regular expression\. The search for \fItext\fR is extended online to some popular taps\. If no search term is given, all locally available formulae are listed\.
 .
 .SH "COMMANDS"
+.
+.TP
+\fBanalytics\fR [\fBstate\fR]
+Display anonymous user behaviour analytics state\. Read more at \fIhttps://git\.io/brew\-analytics\fR\.
+.
+.TP
+\fBanalytics\fR (\fBon\fR|\fBoff\fR)
+Turn on/off Homebrew\'s analytics\.
+.
+.TP
+\fBanalytics\fR \fBregenerate\-uuid\fR
+Regenerate UUID used in Homebrew\'s analytics\.
 .
 .TP
 \fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-online\fR] [\fB\-\-display\-cop\-names\fR] [\fIformulae\fR]

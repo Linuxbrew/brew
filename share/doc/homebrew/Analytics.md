@@ -53,5 +53,5 @@ export HOMEBREW_NO_ANALYTICS=1
 Alternatively, this will prevent analytics from ever being sent:
 
 ```sh
-git config --file="$(brew --repository)/.git/config" --replace-all homebrew.analyticsdisabled true
+brew analytics off
 ```
