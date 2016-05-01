@@ -1,7 +1,6 @@
-#:  * `deps` [`--1`] [`-n`] [`--union`] [`--tree`] [`--all`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] <formulae>:
+#:  * `deps` [`--1`] [`-n`] [`--union`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] <formulae>:
 #:    Show dependencies for <formulae>. When given multiple formula arguments,
-#:    show the intersection of dependencies for <formulae>, except when passed
-#:    `--tree`, `--all`, or `--installed`.
+#:    show the intersection of dependencies for <formulae>.
 #:
 #:    If `--1` is passed, only show dependencies one level down, instead of
 #:    recursing.
@@ -11,16 +10,30 @@
 #:    If `--union` is passed, show the union of dependencies for <formulae>,
 #:    instead of the intersection.
 #:
-#:    If `--tree` is passed, show dependencies as a tree.
-#:
-#:    If `--all` is passed, show dependencies for all formulae.
-#:
-#:    If `--installed` is passed, show dependencies for all installed formulae.
+#:    If `--installed` is passed, only list those dependencies that are
+#:    currently installed.
 #:
 #:    By default, `deps` shows required and recommended dependencies for
 #:    <formulae>. To include the `:build` type dependencies, pass `--include-build`.
 #:    Similarly, pass `--include-optional` to include `:optional` dependencies.
 #:    To skip `:recommended` type dependencies, pass `--skip-recommended`.
+#:
+#:  * `deps` `--tree` [<filters>] (<formulae>|`--installed`):
+#:    Show dependencies as a tree. When given multiple formula arguments, output
+#:    individual trees for every formula.
+#:
+#:    If `--installed` is passed, output a tree for every installed formula.
+#:
+#:    The <filters> placeholder is any combination of options `--include-build`,
+#:    `--include-optional`, and `--skip-recommended` as documented above.
+#:
+#:  * `deps` [<filters>] (`--installed`|`--all`):
+#:    Show dependencies for installed or all available formulae. Every line of
+#:    output starts with the formula name, followed by a colon and all direct
+#:    dependencies of that formula.
+#:
+#:    The <filters> placeholder is any combination of options `--include-build`,
+#:    `--include-optional`, and `--skip-recommended` as documented above.
 
 # encoding: UTF-8
 require "formula"

@@ -90,9 +90,8 @@ will thus not add the SHA256 to the formula for you.</p>
 
 <p>The options <code>--set-name</code> and <code>--set-version</code> each take an argument and allow
 you to explicitly set the name and version of the package you are creating.</p></dd>
-<dt><code>deps</code> [<code>--1</code>] [<code>-n</code>] [<code>--union</code>] [<code>--tree</code>] [<code>--all</code>] [<code>--installed</code>] [<code>--include-build</code>] [<code>--include-optional</code>] [<code>--skip-recommended</code>] <var>formulae</var></dt><dd><p>Show dependencies for <var>formulae</var>. When given multiple formula arguments,
-show the intersection of dependencies for <var>formulae</var>, except when passed
-<code>--tree</code>, <code>--all</code>, or <code>--installed</code>.</p>
+<dt><code>deps</code> [<code>--1</code>] [<code>-n</code>] [<code>--union</code>] [<code>--installed</code>] [<code>--include-build</code>] [<code>--include-optional</code>] [<code>--skip-recommended</code>] <var>formulae</var></dt><dd><p>Show dependencies for <var>formulae</var>. When given multiple formula arguments,
+show the intersection of dependencies for <var>formulae</var>.</p>
 
 <p>If <code>--1</code> is passed, only show dependencies one level down, instead of
 recursing.</p>
@@ -102,16 +101,26 @@ recursing.</p>
 <p>If <code>--union</code> is passed, show the union of dependencies for <var>formulae</var>,
 instead of the intersection.</p>
 
-<p>If <code>--tree</code> is passed, show dependencies as a tree.</p>
-
-<p>If <code>--all</code> is passed, show dependencies for all formulae.</p>
-
-<p>If <code>--installed</code> is passed, show dependencies for all installed formulae.</p>
+<p>If <code>--installed</code> is passed, only list those dependencies that are
+currently installed.</p>
 
 <p>By default, <code>deps</code> shows required and recommended dependencies for
 <var>formulae</var>. To include the <code>:build</code> type dependencies, pass <code>--include-build</code>.
 Similarly, pass <code>--include-optional</code> to include <code>:optional</code> dependencies.
 To skip <code>:recommended</code> type dependencies, pass <code>--skip-recommended</code>.</p></dd>
+<dt><code>deps</code> <code>--tree</code> [<var>filters</var>] (<var>formulae</var>|<code>--installed</code>)</dt><dd><p>Show dependencies as a tree. When given multiple formula arguments, output
+individual trees for every formula.</p>
+
+<p>If <code>--installed</code> is passed, output a tree for every installed formula.</p>
+
+<p>The <var>filters</var> placeholder is any combination of options <code>--include-build</code>,
+<code>--include-optional</code>, and <code>--skip-recommended</code> as documented above.</p></dd>
+<dt><code>deps</code> [<var>filters</var>] (<code>--installed</code>|<code>--all</code>)</dt><dd><p>Show dependencies for installed or all available formulae. Every line of
+output starts with the formula name, followed by a colon and all direct
+dependencies of that formula.</p>
+
+<p>The <var>filters</var> placeholder is any combination of options <code>--include-build</code>,
+<code>--include-optional</code>, and <code>--skip-recommended</code> as documented above.</p></dd>
 <dt><code>desc</code> <var>formula</var></dt><dd><p>Display <var>formula</var>'s name and one-line description.</p></dd>
 <dt><code>desc</code> [<code>-s</code>|<code>-n</code>|<code>-d</code>] <var>pattern</var></dt><dd><p>Search both name and description (<code>-s</code>), just the names (<code>-n</code>), or just  the
 descriptions (<code>-d</code>) for <code>&lt;pattern></code>. <code>&lt;pattern></code> is by default interpreted
