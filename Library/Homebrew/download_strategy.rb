@@ -1,4 +1,5 @@
 require "utils/json"
+require "rexml/document"
 
 class AbstractDownloadStrategy
   include FileUtils
@@ -495,7 +496,8 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    Time.parse Utils.popen_read("svn", "info", cached_location.to_s).strip[/^Last Changed Date: (.+)$/, 1]
+    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", cached_location.to_s))
+    Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
   private
