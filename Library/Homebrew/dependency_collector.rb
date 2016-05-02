@@ -111,6 +111,7 @@ class DependencyCollector
     when :rbenv      then RbenvRequirement.new(tags)
     when :ruby       then RubyRequirement.new(tags)
     when :osxfuse    then OsxfuseRequirement.new(tags)
+    when :perl       then PerlRequirement.new(tags)
     when :tuntap     then TuntapRequirement.new(tags)
     when :ant        then ant_dep(spec, tags)
     when :apr        then AprRequirement.new(tags)
