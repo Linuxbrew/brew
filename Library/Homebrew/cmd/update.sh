@@ -234,7 +234,7 @@ homebrew-update() {
   for option in "$@"
   do
     case "$option" in
-      -?|-h|--help|--usage) brew help update; exit $? ;;
+      -\?|-h|--help|--usage) brew help update; exit $? ;;
       --verbose) HOMEBREW_VERBOSE=1 ;;
       --debug) HOMEBREW_DEBUG=1;;
       --merge) HOMEBREW_MERGE=1 ;;
