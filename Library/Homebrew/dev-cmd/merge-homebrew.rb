@@ -7,6 +7,7 @@ module Homebrew
   # Options:
   #   --brew  merge Homebrew/brew into Linuxbrew/brew
   #   --core  merge Homebrew/homebrew-core into Linuxbrew/homebrew-core
+  #   --dupes merge Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes
   #
   def git_merge
     safe_system "git", "fetch", "homebrew"
@@ -30,9 +31,16 @@ module Homebrew
     cd(CoreTap.instance.path) { git_merge }
   end
 
+  def merge_dupes
+    oh1 "Merging Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes"
+    cd(Tap.fetch("linuxbrew/dupes").path) { git_merge }
+  end
+
   def merge_homebrew
-    ARGV << "--brew" << "--core" unless ARGV.include?("--brew") || ARGV.include?("--core")
-    merge_brew if ARGV.include? "--brew"
-    merge_core if ARGV.include? "--core"
+    repos = %w[--brew --core --dupes]
+    args = (ARGV & repos).empty? ? repos : ARGV
+    merge_brew if args.include? "--brew"
+    merge_core if args.include? "--core"
+    merge_dupes if args.include? "--dupes"
   end
 end
