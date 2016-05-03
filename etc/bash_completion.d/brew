@@ -119,6 +119,13 @@ _brew_complete_tap ()
     __brewcomp "$(brew tap --list-official)"
 }
 
+_brew_analytics ()
+{
+    case "$COMP_CWORD" in
+    2)  __brewcomp "off on regenerate-uuid state" ;;
+    esac
+}
+
 _brew_bottle ()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -586,6 +593,7 @@ _brew ()
     # subcommands have their own completion functions
     case "$cmd" in
     --cache|--cellar|--prefix)  __brew_complete_formulae ;;
+    analytics)                  _brew_analytics ;;
     audit|cat|edit|home)        __brew_complete_formulae ;;
     test|unlink)                __brew_complete_installed ;;
     bottle)                     _brew_bottle ;;

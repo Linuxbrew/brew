@@ -9,9 +9,13 @@ class TtyTests < Homebrew::TestCase
   end
 
   def test_truncate
-    Tty.stubs(:width).returns 10
-    assert_equal "foobar", Tty.truncate("foobar something very long")
-    assert_equal "trunca", Tty.truncate("truncate")
+    Tty.stubs(:width).returns 15
+    assert_equal "foobar some", Tty.truncate("foobar something very long")
+    assert_equal "truncate", Tty.truncate("truncate")
+
+    # When the terminal is unsupported, we report 0 width
+    Tty.stubs(:width).returns 0
+    assert_equal "foobar something very long", Tty.truncate("foobar something very long")
   end
 
   def test_no_tty_formatting
@@ -103,7 +107,7 @@ class UtilTests < Homebrew::TestCase
 
   def test_which_skip_malformed_path
     # 'which' should not fail if a path is malformed
-    # see https://github.com/Homebrew/homebrew/issues/32789 for an example
+    # see https://github.com/Homebrew/legacy-homebrew/issues/32789 for an example
     cmd = @dir/"foo"
     FileUtils.touch cmd
     cmd.chmod 0744

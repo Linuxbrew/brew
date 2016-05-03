@@ -183,7 +183,7 @@ class Version
     if val.respond_to?(:to_str)
       @version = val.to_str
     else
-      raise TypeError, "Version value must be a string"
+      raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
     end
   end
 

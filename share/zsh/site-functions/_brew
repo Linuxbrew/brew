@@ -96,6 +96,7 @@ if (( CURRENT == 1 )); then
 fi
 
 case "$words[1]" in
+  analytics) compadd on off state regenerate-uuid ;;
   install|reinstall|audit|home|homepage|log|info|abv|uses|cat|deps|desc|edit|options|switch)
     _brew_all_formulae
     _wanted formulae expl 'all formulae' compadd -a formulae ;;

@@ -1,4 +1,5 @@
 require "utils/json"
+require "rexml/document"
 
 class AbstractDownloadStrategy
   include FileUtils
@@ -494,6 +495,11 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     quiet_safe_system "svn", "export", "--force", cached_location, Dir.pwd
   end
 
+  def source_modified_time
+    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", cached_location.to_s))
+    Time.parse REXML::XPath.first(xml, "//date/text()").to_s
+  end
+
   private
 
   def repo_url
@@ -761,6 +767,10 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
     end
   end
 
+  def source_modified_time
+    Time.parse Utils.popen_read("hg", "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
+  end
+
   private
 
   def cache_tag
@@ -791,6 +801,10 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
     # See https://bugs.launchpad.net/bzr/+bug/897511
     cp_r File.join(cached_location, "."), Dir.pwd
     rm_r ".bzr"
+  end
+
+  def source_modified_time
+    Time.parse Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
   end
 
   private
@@ -824,6 +838,10 @@ class FossilDownloadStrategy < VCSDownloadStrategy
     args = [fossilpath, "open", cached_location]
     args << @ref if @ref_type && @ref
     safe_system(*args)
+  end
+
+  def source_modified_time
+    Time.parse Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
   end
 
   private

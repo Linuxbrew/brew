@@ -391,7 +391,9 @@ class FormulaAuditor
       end
 
       if o.name =~ /^with(out)?-(?:checks?|tests)$/
-        problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
+        unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
+          problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
+        end
       end
     end
   end
@@ -878,7 +880,7 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
-    if line =~ /system "npm", "install"/ && line !~ /Language::Node/
+    if line =~ /system "npm", "install"/ && line !~ /Language::Node/ && formula.name !~ /^kibana(\d{2})?$/
       problem "Use Language::Node for npm install args"
     end
 
@@ -920,9 +922,9 @@ class FormulaAuditor
 
     if formula.tap.tap_migrations.key?(formula.name)
       problem <<-EOS.undent
-       #{formula.name} seems to be listed in tap_migrations.json!
-       Please remove #{formula.name} from present tap & tap_migrations.json
-       before submitting it to Homebrew/homebrew.
+        #{formula.name} seems to be listed in tap_migrations.json!
+        Please remove #{formula.name} from present tap & tap_migrations.json
+        before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
       EOS
     end
   end

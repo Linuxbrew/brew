@@ -99,7 +99,7 @@ module OS
     #      named after a newer OS version than the running OS. The
     #      MACOSX_DEPLOYMENT_TARGET must be set to the OS for which you're
     #      actually building (usually the running OS version).
-    #      https://github.com/Homebrew/homebrew/pull/50355
+    #      https://github.com/Homebrew/legacy-homebrew/pull/50355
     #      https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/WhatsNewXcode/Articles/Introduction.html#//apple_ref/doc/uid/TP40004626
     #      Section "About SDKs and Simulator"
     #   b) For Xcode < 7, proceed as if the SDK for the running OS version had
@@ -209,9 +209,9 @@ module OS
     end
 
     # See these issues for some history:
-    # https://github.com/Homebrew/homebrew/issues/13
-    # https://github.com/Homebrew/homebrew/issues/41
-    # https://github.com/Homebrew/homebrew/issues/48
+    # https://github.com/Homebrew/legacy-homebrew/issues/13
+    # https://github.com/Homebrew/legacy-homebrew/issues/41
+    # https://github.com/Homebrew/legacy-homebrew/issues/48
     def macports_or_fink
       paths = []
 
@@ -312,9 +312,9 @@ module OS
     rescue IndexError
       onoe <<-EOS.undent
         Homebrew doesn't know what compiler versions ship with your version
-        of Xcode (#{Xcode.version}). Please `brew update` and if that doesn't help, file
-        an issue with the output of `brew --config`:
-          https://github.com/Homebrew/homebrew/issues
+        of Xcode (#{Xcode.version}). Please `brew update` and if that doesn't
+        help, file an issue with the output of `brew --config`:
+          https://github.com/Homebrew/brew/issues
 
         Note that we only track stable, released versions of Xcode.
 

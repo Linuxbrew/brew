@@ -1,30 +1,42 @@
-setup-analytics() {
-  # User UUID file. Used for Homebrew user counting. Can be deleted and
-  # recreated with no adverse effect (beyond our user counts being inflated).
-  HOMEBREW_ANALYTICS_USER_UUID_FILE="$HOME/.homebrew_analytics_user_uuid"
+# Migrate analytics UUID to its new home in Homebrew repo's git config and
+# remove the legacy UUID file if detected.
+migrate-legacy-uuid-file() {
+  local legacy_uuid_file="$HOME/.homebrew_analytics_user_uuid"
+  if [[ -f "$legacy_uuid_file" ]]
+  then
+    local analytics_uuid="$(<"$legacy_uuid_file")"
+    if [[ -n "$analytics_uuid" ]]
+    then
+      git config --file="$HOMEBREW_REPOSITORY/.git/config" --replace-all homebrew.analyticsuuid "$analytics_uuid"
+    fi
+    rm -f "$legacy_uuid_file"
+  fi
+}
 
-  # Make disabling anlytics sticky
+setup-analytics() {
+  local git_config_file="$HOMEBREW_REPOSITORY/.git/config"
+
+  migrate-legacy-uuid-file
+
   if [[ -n "$HOMEBREW_NO_ANALYTICS" ]]
   then
-    git config --file="$HOMEBREW_REPOSITORY/.git/config" --replace-all homebrew.analyticsdisabled true
-    # Internal variable for brew's use, to differentiate from user-supplied setting
-    export HOMEBREW_NO_ANALYTICS_THIS_RUN="1"
+    return
   fi
 
-  if [[ "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsmessage)" != "true" ||
-        "$(git config --file="$HOMEBREW_REPOSITORY/.git/config" --get homebrew.analyticsdisabled)" = "true" ]]
+  local message_seen="$(git config --file="$git_config_file" --get homebrew.analyticsmessage)"
+  local analytics_disabled="$(git config --file="$git_config_file" --get homebrew.analyticsdisabled)"
+  if [[ "$message_seen" != "true" || "$analytics_disabled" = "true" ]]
   then
-    [[ -f "$HOMEBREW_ANALYTICS_USER_UUID_FILE" ]] && rm -f "$HOMEBREW_ANALYTICS_USER_UUID_FILE"
+    # Internal variable for brew's use, to differentiate from user-supplied setting
     export HOMEBREW_NO_ANALYTICS_THIS_RUN="1"
     return
   fi
 
-  if [[ -r "$HOMEBREW_ANALYTICS_USER_UUID_FILE" ]]
+  HOMEBREW_ANALYTICS_USER_UUID="$(git config --file="$git_config_file" --get homebrew.analyticsuuid)"
+  if [[ -z "$HOMEBREW_ANALYTICS_USER_UUID" ]]
   then
-    HOMEBREW_ANALYTICS_USER_UUID="$(<"$HOMEBREW_ANALYTICS_USER_UUID_FILE")"
-  else
     HOMEBREW_ANALYTICS_USER_UUID="$(uuidgen)"
-    echo "$HOMEBREW_ANALYTICS_USER_UUID" > "$HOMEBREW_ANALYTICS_USER_UUID_FILE"
+    git config --file="$git_config_file" --replace-all homebrew.analyticsuuid "$HOMEBREW_ANALYTICS_USER_UUID"
   fi
 
   if [[ -n "$HOMEBREW_LINUX" ]]
@@ -58,10 +70,11 @@ report-analytics-screenview-command() {
   # Don't report commands used mostly by our scripts and not users.
   # TODO: list more e.g. shell completion things here perhaps using a single
   # script as a shell-completion entry point.
-  if [[ "$HOMEBREW_COMMAND" = "commands" ]]
-  then
-    return
-  fi
+  case "$HOMEBREW_COMMAND" in
+    --prefix|analytics|command|commands)
+      return
+      ;;
+  esac
 
   local args=(
     --max-time 3 \

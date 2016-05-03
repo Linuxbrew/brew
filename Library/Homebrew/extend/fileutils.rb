@@ -68,7 +68,7 @@ module FileUtils
         # group_id.to_s makes OS X 10.6.7 (ruby-1.8.7-p174) and earlier happy.
         chown(nil, group_id.to_s, tmpdir)
       rescue Errno::EPERM
-        opoo "Failed setting group \"#{Etc.getgrgid(group_id).name}\" on #{tmp}"
+        opoo "Failed setting group \"#{Etc.getgrgid(group_id).name}\" on #{tmpdir}"
       end
 
       begin

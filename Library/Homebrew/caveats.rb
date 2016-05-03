@@ -170,7 +170,7 @@ class Caveats
       # we readlink because this path probably doesn't exist since caveats
       # occurs before the link step of installation
       # Yosemite security measures mildly tighter rules:
-      # https://github.com/Homebrew/homebrew/issues/33815
+      # https://github.com/Homebrew/legacy-homebrew/issues/33815
       if !plist_path.file? || !plist_path.symlink?
         if f.plist_startup
           s << "To have launchd start #{f.full_name} now and restart at startup:"
@@ -197,7 +197,9 @@ class Caveats
         s << "  #{f.plist_manual}"
       end
 
-      s << "" << "WARNING: brew services will fail when run under tmux." if ENV["TMUX"]
+      if ENV["TMUX"] && !quiet_system("/usr/bin/pbpaste")
+        s << "" << "WARNING: brew services will fail when run under tmux."
+      end
     end
     s.join("\n") + "\n" unless s.empty?
   end
