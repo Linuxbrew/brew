@@ -22,10 +22,12 @@ module Homebrew
       f.write "# #{message}\n#{s}"
     end
     branch = "bottle-#{formula}"
+    base = "linuxbrew:master"
+    head = "#{remote}:#{branch}"
     safe_system "git", "checkout", "-b", branch, "master"
     safe_system "git", "commit", formula.path, "-m", message
     safe_system "git", "push", remote, branch
-    safe_system "hub", "pull-request", "--browse", "-m", message
+    safe_system "hub", "pull-request", "-b", base, "-h", head, "--browse", "-m", message
     safe_system "git", "checkout", "master"
     safe_system "git", "branch", "-D", branch
   end
