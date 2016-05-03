@@ -204,7 +204,7 @@ class FormulaInstaller
 
     if formula.tap && !formula.tap.private?
       options = effective_build_options_for(formula).used_options.to_a.join(" ")
-      report_analytics_event("install", "#{formula.full_name} #{options}".strip)
+      Utils::Analytics.report_event("install", "#{formula.full_name} #{options}".strip)
     end
 
     @@attempted << formula
