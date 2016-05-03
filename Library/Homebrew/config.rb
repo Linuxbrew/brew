@@ -1,9 +1,3 @@
-# Where downloads (bottles, source tarballs, etc.) are cached
-HOMEBREW_CACHE = Pathname.new(ENV["HOMEBREW_CACHE"] || "~/Library/Caches/Homebrew").expand_path
-
-# Where brews installed via URL are cached
-HOMEBREW_CACHE_FORMULA = HOMEBREW_CACHE/"Formula"
-
 if ENV["HOMEBREW_BREW_FILE"]
   # Path to `bin/brew` main executable in {HOMEBREW_PREFIX}
   HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
@@ -28,6 +22,12 @@ HOMEBREW_LOCK_DIR = HOMEBREW_LIBRARY/"Locks"
 
 # Where we store built products
 HOMEBREW_CELLAR = Pathname.new(ENV["HOMEBREW_CELLAR"])
+
+# Where downloads (bottles, source tarballs, etc.) are cached
+HOMEBREW_CACHE = Pathname.new(ENV["HOMEBREW_CACHE"])
+
+# Where brews installed via URL are cached
+HOMEBREW_CACHE_FORMULA = HOMEBREW_CACHE/"Formula"
 
 # Where build, postinstall, and test logs of formulae are written to
 HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"] || "~/Library/Logs/Homebrew/").expand_path
