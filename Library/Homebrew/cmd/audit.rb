@@ -391,7 +391,9 @@ class FormulaAuditor
       end
 
       if o.name =~ /^with(out)?-(?:checks?|tests)$/
-        problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
+        unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
+          problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
+        end
       end
     end
   end
