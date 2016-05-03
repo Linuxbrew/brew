@@ -518,9 +518,11 @@ module Homebrew
         # 401 error is normal while file is still in async publishing process
         url = URI(bottle_info.url)
         puts "Verifying bottle: #{File.basename(url.path)}"
-        Net::HTTP.start(url.host, url.port, :use_ssl => true) do |http|
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true
+        http.start do
           while true do
-            req = Net::HTTP::Head.new url
+            req = Net::HTTP::Head.new bottle_info.url
             res = http.request req
             retry_count += 1
             if res.is_a?(Net::HTTPSuccess)
