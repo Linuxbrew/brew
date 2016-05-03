@@ -246,12 +246,15 @@ class Tab < OpenStruct
 
   def to_s
     s = []
-    case poured_from_bottle
-    when true  then s << "Poured from bottle"
-    when false then s << "Built from source"
+    if poured_from_bottle
+      s << "Poured from bottle"
+    else
+      s << "Built from source"
+    end
+    if time
+      s << Time.at(time).strftime("on %Y-%m-%d at %H:%M:%S")
     end
     unless used_options.empty?
-      s << "Installed" if s.empty?
       s << "with:"
       s << used_options.to_a.join(" ")
     end
