@@ -70,7 +70,9 @@ module Homebrew
     end
 
     if !updated
-      puts "Already up-to-date." unless ARGV.include?("--preinstall")
+      if !ARGV.include?("--preinstall") && !ENV["HOMEBREW_UPDATE_FAILED"]
+        puts "Already up-to-date."
+      end
     elsif hub.empty?
       puts "No changes to formulae."
     else
@@ -81,6 +83,8 @@ module Homebrew
     end
 
     Tap.each(&:link_manpages)
+
+    Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
   end
 
   private

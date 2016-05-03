@@ -158,6 +158,10 @@ pull() {
     CURRENT_REVISION="$(read_current_revision)"
     export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$INITIAL_REVISION"
     export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
+    if [[ "$INITIAL_REVISION" != "$CURRENT_REVISION" ]]
+    then
+      HOMEBREW_UPDATED="1"
+    fi
     if ! git merge-base --is-ancestor "$INITIAL_REVISION" "$CURRENT_REVISION"
     then
       odie "Your $DIR HEAD is not a descendant of $UPSTREAM_BRANCH!"
@@ -210,7 +214,13 @@ pull() {
       --strategy-option=ignore-all-space
   fi
 
-  export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$(read_current_revision)"
+  CURRENT_REVISION="$(read_current_revision)"
+  export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
+
+  if [[ "$INITIAL_REVISION" != "$CURRENT_REVISION" ]]
+  then
+    HOMEBREW_UPDATED="1"
+  fi
 
   trap '' SIGINT
 
@@ -301,6 +311,9 @@ EOS
   # kill all of subprocess on interrupt
   trap '{ pkill -P $$; wait; exit 130; }' SIGINT
 
+  local update_failed_file="$HOMEBREW_REPOSITORY/.git/UPDATE_FAILED"
+  rm -f "$update_failed_file"
+
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
@@ -335,15 +348,24 @@ EOS
         git fetch --force "${QUIET_ARGS[@]}" origin \
           "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH" 2>/dev/null
       else
-        git fetch --force "${QUIET_ARGS[@]}" origin \
-          "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH" || \
-            odie "Fetching $DIR failed!"
+        if ! git fetch --force "${QUIET_ARGS[@]}" origin \
+          "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH"
+        then
+          echo "Fetching $DIR failed!" >> "$update_failed_file"
+        fi
       fi
     ) &
   done
 
   wait
   trap - SIGINT
+
+  if [[ -f "$update_failed_file" ]]
+  then
+    onoe < "$update_failed_file"
+    rm -f "$update_failed_file"
+    export HOMEBREW_UPDATE_FAILED="1"
+  fi
 
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
@@ -352,6 +374,13 @@ EOS
   done
 
   chdir "$HOMEBREW_REPOSITORY"
-  brew update-report "$@"
-  return $?
+
+  if [[ -n "$HOMEBREW_UPDATED" || -n "$HOMEBREW_UPDATE_FAILED" ]]
+  then
+    brew update-report "$@"
+    return $?
+  elif [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]]
+  then
+    echo "Already up-to-date."
+  fi
 }

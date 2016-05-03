@@ -1,6 +1,6 @@
 HOMEBREW_VERSION="0.9.9"
 
-odie() {
+onoe() {
   if [[ -t 2 ]] # check whether stderr is a tty.
   then
     echo -ne "\033[4;31mError\033[0m: " >&2 # highlight Error with underline and red color
@@ -13,6 +13,10 @@ odie() {
   else
     echo "$*" >&2
   fi
+}
+
+odie() {
+  onoe "$@"
   exit 1
 }
 
