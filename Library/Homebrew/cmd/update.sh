@@ -7,10 +7,6 @@
 
 source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
-brew() {
-  "$HOMEBREW_BREW_FILE" "$@"
-}
-
 git() {
   "$HOMEBREW_LIBRARY/ENV/scm/git" "$@"
 }

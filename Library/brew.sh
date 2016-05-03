@@ -24,6 +24,10 @@ chdir() {
   cd "$@" >/dev/null || odie "Error: failed to cd to $*!"
 }
 
+brew() {
+  "$HOMEBREW_BREW_FILE" "$@"
+}
+
 # Force UTF-8 to avoid encoding issues for users with broken locale settings.
 if [[ "$(locale charmap 2> /dev/null)" != "UTF-8" ]]
 then
