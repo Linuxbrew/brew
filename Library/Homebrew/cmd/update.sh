@@ -121,6 +121,8 @@ reset_on_interrupt() {
 
   if [[ -n "$INITIAL_REVISION" ]]
   then
+    git rebase --abort &>/dev/null
+    git merge --abort &>/dev/null
     git reset --hard "$INITIAL_REVISION" "${QUIET_ARGS[@]}"
   fi
 
@@ -179,6 +181,7 @@ pull() {
       git status --short --untracked-files=all
     fi
     git merge --abort &>/dev/null
+    git rebase --abort &>/dev/null
     git -c "user.email=brew-update@localhost" \
         -c "user.name=brew update" \
         stash save --include-untracked "${QUIET_ARGS[@]}"
