@@ -280,7 +280,6 @@ EOS
     fi
   fi
   export GIT_TERMINAL_PROMPT="0"
-  export GIT_ASKPASS="false"
   export GIT_SSH_COMMAND="ssh -oBatchMode=yes"
 
   if [[ -z "$HOMEBREW_VERBOSE" ]]
