@@ -96,6 +96,13 @@ class Tap
     end
   end
 
+  # The GitHub slug of the {Tap}.
+  # Not simply "#{user}/homebrew-#{repo}", because the slug of homebrew/core
+  # may be either Homebrew/homebrew-core or Linuxbrew/homebrew-core.
+  def slug
+    remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1].capitalize
+  end
+
   # The default remote path to this {Tap}.
   def default_remote
     "https://github.com/#{user}/homebrew-#{repo}"
@@ -149,6 +156,13 @@ class Tap
   # True if this {Tap} is an official Homebrew tap.
   def official?
     user == "Homebrew"
+  end
+
+  # Whether this tap is for Linux.
+  # Not simply user == "Linuxbrew", because the user of the core repo
+  # homebrew/core is Homebrew and not Linuxbrew.
+  def linux?
+    slug.start_with? "Linuxbrew/"
   end
 
   # True if the remote of this {Tap} is a private repository.

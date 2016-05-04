@@ -53,13 +53,10 @@ module Homebrew
     ARGV.named.each do |arg|
       if arg.to_i > 0
         issue = arg
-        tap = CoreTap.instance
-        if tap.remote.include? "Linuxbrew"
-          url = "https://github.com/Linuxbrew/homebrew-core/pull/#{arg}"
-        elsif ARGV.include? "--legacy"
+        if ARGV.include? "--legacy"
           url = "https://github.com/Homebrew/legacy-homebrew/pull/#{arg}"
         else
-          url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
+          url = "https://github.com/#{CoreTap.instance.slug}/pull/#{arg}"
         end
       elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
@@ -204,7 +201,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          testbot = url.include?("Linuxbrew") ? "LinuxbrewTestBot" : "BrewTestBot"
+          testbot = tap.linux? ? "LinuxbrewTestBot" : "BrewTestBot"
           "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{issue}"
         end
 
@@ -409,7 +406,7 @@ module Homebrew
 
   # Publishes the current bottle files for a given formula to Bintray
   def publish_bottle_file_on_bintray(f, creds)
-    bintray_project = f.tap.remote.include?("Linuxbrew") ? "linuxbrew" : "homebrew"
+    bintray_project = f.tap.linux? ? "linuxbrew" : "homebrew"
     repo = Bintray.repository(f.tap)
     package = Bintray.package(f.name)
     info = FormulaInfoFromJson.lookup(f.name)
@@ -516,11 +513,12 @@ module Homebrew
           opoo "Cannot publish bottle: Failed reading info for formula #{f.full_name}"
           next
         end
-        if f.tap.remote.include?("Linuxbrew") && jinfo.bottle_tags.include?("x86_64_linux")
-          bottle_info = jinfo.bottle_info("x86_64_linux")
-        else
-          bottle_info = jinfo.bottle_info(jinfo.bottle_tags.first)
-        end
+        bottle_info = jinfo.bottle_info(
+          if f.tap.linux? && jinfo.bottle_tags.include?("x86_64_linux")
+            "x86_64_linux"
+          else
+            jinfo.bottle_tags.first
+          end)
         unless bottle_info
           opoo "No bottle defined in formula #{f.full_name}"
           next
