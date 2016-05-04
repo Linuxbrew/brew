@@ -56,7 +56,22 @@ module Homebrew
     safe_system "git", "branch", "-D", branch
   end
 
+  def shell(cmd)
+      output = `#{cmd}`
+      raise ErrorDuringExecution.new(cmd) unless $?.success?
+      output
+  end
+
+  def brew(args)
+    shell "#{HOMEBREW_PREFIX}/bin/brew #{args}"
+  end
+
   def build_bottle_pr
-    ARGV.resolved_formulae.each { |f| build_bottle f }
+    formulae = ARGV.formulae
+    unless ARGV.one?
+      deps = brew("deps -n --union #{formulae.join ' '}").split
+      formulae = deps.map { |f| Formula[f] } + formulae
+    end
+    formulae.each { |f| build_bottle f }
   end
 end
