@@ -53,10 +53,11 @@ module Homebrew
     ARGV.named.each do |arg|
       if arg.to_i > 0
         issue = arg
+        tap = CoreTap.instance
         if ARGV.include? "--legacy"
           url = "https://github.com/Homebrew/legacy-homebrew/pull/#{arg}"
         else
-          url = "https://github.com/#{CoreTap.instance.slug}/pull/#{arg}"
+          url = "https://github.com/#{tap.slug}/pull/#{arg}"
         end
       elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
