@@ -5,12 +5,26 @@ module Homebrew
   # Options:
   #    --remote=$USER      Specify the GitHub remote
   #    --tag=x86_64_linux  Specify the bottle tag
+
+  def open_pull_request?(formula)
+    prs = GitHub.issues_matching(formula,
+      :type => "pr", :state => "open", :repo => formula.tap.slug)
+    prs = prs.select { |pr| pr["title"].start_with? "#{formula}: " }
+    if prs.any?
+      ohai "#{formula}: Skipping because a PR is open"
+      prs.each { |pr| puts "#{pr["title"]} (#{pr["html_url"]})" }
+    end
+    prs.any?
+  end
+
   def build_bottle(formula)
     remote = ARGV.value("remote") || ENV["GITHUB_USER"] || ENV["USER"]
     tag = (ARGV.value("tag") || "x86_64_linux").to_sym
     return ohai "#{formula}: Skipping because a bottle is not needed" if formula.bottle_unneeded?
     return ohai "#{formula}: Skipping because bottles are disabled" if formula.bottle_disabled?
     return ohai "#{formula}: Skipping because it has a bottle" if formula.bottle_specification.tag?(tag)
+    return if open_pull_request? formula
+
     message = "#{formula}: Build a bottle for Linuxbrew"
     oh1 message
     return if ARGV.dry_run?
