@@ -307,7 +307,8 @@ class BottleSpecification
 
   def root_url(var = nil)
     if var.nil?
-      domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || ("https://#{tap.linux? ? "linuxbrew" : "homebrew"}.bintray.com")
+      project = (tap.nil? ? OS.linux? : tap.linux?) ? "linuxbrew" : "homebrew"
+      domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || ("https://#{project}.bintray.com")
       @root_url ||= "#{domain}/#{Bintray.repository(tap)}"
     else
       @root_url = var
