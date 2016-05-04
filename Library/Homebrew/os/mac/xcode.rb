@@ -103,7 +103,7 @@ module OS
         case MacOS.llvm_build_version.to_i
         when 1..2063 then "3.1.0"
         when 2064..2065 then "3.1.4"
-        when 2366..2325
+        when 2066..2325
           # we have no data for this range so we are guessing
           "3.2.0"
         when 2326
