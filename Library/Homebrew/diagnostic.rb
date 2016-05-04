@@ -416,7 +416,7 @@ module Homebrew
       end
 
       def check_for_osx_gcc_installer
-        return unless MacOS.version < "10.7" || MacOS::Xcode.version > "4.1"
+        return unless MacOS.version < "10.7" || ((MacOS::Xcode.version || "0") > "4.1")
         return unless MacOS.clang_version == "2.1"
 
         fix_advice = if MacOS.version >= :mavericks
@@ -439,7 +439,7 @@ module Homebrew
         # if the uninstaller script isn't there, it's a good guess neither are
         # any troublesome leftover Xcode files
         uninstaller = Pathname.new("/Developer/Library/uninstall-developer-folder")
-        return unless MacOS::Xcode.version >= "4.3" && uninstaller.exist?
+        return unless ((MacOS::Xcode.version || "0") >= "4.3") && uninstaller.exist?
 
         <<-EOS.undent
           You have leftover files from an older version of Xcode.
