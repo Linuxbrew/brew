@@ -516,7 +516,11 @@ module Homebrew
           opoo "Cannot publish bottle: Failed reading info for formula #{f.full_name}"
           next
         end
-        bottle_info = jinfo.bottle_info(jinfo.bottle_tags.first)
+        if f.tap.remote.include?("Linuxbrew") && jinfo.bottle_tags.include?("x86_64_linux")
+          bottle_info = jinfo.bottle_info("x86_64_linux")
+        else
+          bottle_info = jinfo.bottle_info(jinfo.bottle_tags.first)
+        end
         unless bottle_info
           opoo "No bottle defined in formula #{f.full_name}"
           next
