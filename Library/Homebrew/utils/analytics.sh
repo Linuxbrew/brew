@@ -57,7 +57,6 @@ report-analytics-screenview-command() {
 
   # Don't report non-official commands.
   if ! [[ "$HOMEBREW_COMMAND" = "bundle"   ||
-          "$HOMEBREW_COMMAND" = "cask"     ||
           "$HOMEBREW_COMMAND" = "services" ||
           -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.rb"     ||
           -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh"     ||
