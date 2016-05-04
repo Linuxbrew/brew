@@ -175,10 +175,10 @@ module Homebrew
         orig_subject = message.empty? ? "" : message.lines.first.chomp
         bump_subject = subject_for_bump(formula, old_versions, new_versions)
         if do_bump
-          odie "No version changes found for #{formula.name}" if subject.nil?
+          odie "No version changes found for #{formula.name}" if bump_subject.nil?
           unless orig_subject == bump_subject
-            ohai "New bump commit subject: #{subject}"
-            pbcopy subject unless ARGV.include? "--no-pbcopy"
+            ohai "New bump commit subject: #{bump_subject}"
+            pbcopy bump_subject unless ARGV.include? "--no-pbcopy"
             message = "#{bump_subject}\n\n#{message}"
           end
         elsif bump_subject != orig_subject && !bump_subject.nil?
