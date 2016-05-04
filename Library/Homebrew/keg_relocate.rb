@@ -87,15 +87,21 @@ class Keg
     end
     return unless patchelf.installed?
     cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_prefix}/lib"
+    (old_i, old_p) = `#{patchelf.bin}/patchelf --print-rpath --print-interpreter #{file}`.split("\n")
+    raise ErrorDuringExecution.new(cmd) unless $?.success?
     if file.mach_o_executable?
       interpreter = new_prefix == PREFIX_PLACEHOLDER ?
         "/lib64/ld-linux-x86-64.so.2" :
         HOMEBREW_PREFIX/"lib/ld.so"
-      cmd << " --set-interpreter #{interpreter}"
+      cmd << " --set-interpreter #{interpreter}" unless old_i == interpreter
     end
     cmd << " #{file}"
-    puts "Setting RPATH of #{file}" if ARGV.debug?
-    safe_system cmd
+    if old_p == "#{new_prefix}/lib" && old_i == interpreter
+      puts "Skipping relocation of #{file} (RPATH already set)" if ARGV.debug?
+    else
+      puts "Setting RPATH of #{file}" if ARGV.debug?
+      safe_system cmd
+    end
   end
 
   # Detects the C++ dynamic libraries in place, scanning the dynamic links
