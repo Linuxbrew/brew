@@ -81,14 +81,19 @@ module OS
 
         return nil if !MacOS::Xcode.installed? && !MacOS::CLT.installed?
 
-        %W[#{prefix}/usr/bin/xcodebuild #{which("xcodebuild")}].uniq.each do |path|
-          if File.file? path
-            Utils.popen_read(path, "-version") =~ /Xcode (\d(\.\d)*)/
-            return $1 if $1
+        %W[
+          #{prefix}/usr/bin/xcodebuild
+          #{which("xcodebuild")}
+        ].uniq.each do |xcodebuild_path|
+          if File.executable? xcodebuild_path
+            xcodebuild_output = Utils.popen_read(xcodebuild_path, "-version")
+            next unless $?.success?
+
+            xcode_version = xcodebuild_output[/Xcode (\d(\.\d)*)/, 1]
+            return xcode_version if xcode_version
 
             # Xcode 2.x's xcodebuild has a different version string
-            Utils.popen_read(path, "-version") =~ /DevToolsCore-(\d+\.\d)/
-            case $1
+            case xcodebuild_output[/DevToolsCore-(\d+\.\d)/, 1]
             when "515.0" then return "2.0"
             when "798.0" then return "2.5"
             end
