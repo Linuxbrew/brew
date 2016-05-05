@@ -292,7 +292,9 @@ class BottleSpecification
   DEFAULT_PREFIX_LINUX = "/home/linuxbrew/.linuxbrew".freeze
   DEFAULT_PREFIX = (OS.linux? ? DEFAULT_PREFIX_LINUX : DEFAULT_PREFIX_MAC).freeze
   DEFAULT_CELLAR = "#{DEFAULT_PREFIX}/Cellar".freeze
-  DEFAULT_DOMAIN = (ENV["HOMEBREW_BOTTLE_DOMAIN"] || "https://homebrew.bintray.com").freeze
+  DEFAULT_DOMAIN_LINUX = "https://linuxbrew.bintray.com".freeze
+  DEFAULT_DOMAIN_MAC = "https://homebrew.bintray.com".freeze
+  DEFAULT_DOMAIN = ENV["HOMEBREW_BOTTLE_DOMAIN"].freeze || (OS.mac? ? DEFAULT_DOMAIN_MAC : DEFAULT_DOMAIN_LINUX)
 
   attr_rw :prefix, :cellar, :revision
   attr_accessor :tap
@@ -307,8 +309,8 @@ class BottleSpecification
 
   def root_url(var = nil)
     if var.nil?
-      project = (tap.nil? ? OS.linux? : tap.linux?) ? "linuxbrew" : "homebrew"
-      domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || ("https://#{project}.bintray.com")
+      default_domain = !OS.mac? || (tap && tap.linux?) ? DEFAULT_DOMAIN_LINUX : DEFAULT_DOMAIN_MAC
+      domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || default_domain
       @root_url ||= "#{domain}/#{Bintray.repository(tap)}"
     else
       @root_url = var
