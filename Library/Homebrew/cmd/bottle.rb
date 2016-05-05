@@ -289,7 +289,7 @@ module Homebrew
         old_spec.send(field) != bottle.send(field)
       end
       bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
-      bottle.cellar = :any if OS.linux? && old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
+      bottle.cellar :any if OS.linux? && old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       if bad_fields.any?
         if bottle.prefix == "/home/linuxbrew/.linuxbrew"
           bottle.cellar old_spec.cellar
