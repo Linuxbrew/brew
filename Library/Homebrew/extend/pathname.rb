@@ -508,7 +508,7 @@ module ObserverPathnameExtension
     MAXIMUM_VERBOSE_OUTPUT = 100
 
     def verbose?
-      return ARGV.verbose? unless ENV["TRAVIS"]
+      return ARGV.verbose? unless ENV["CIRCLECI"] || ENV["TRAVIS"]
       return false unless ARGV.verbose?
 
       if total < MAXIMUM_VERBOSE_OUTPUT
