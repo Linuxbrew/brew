@@ -823,7 +823,6 @@ module Homebrew
 
     remote = "git@github.com:BrewTestBot/homebrew-#{tap.repo}.git"
     tag = pr ? "pr-#{pr}" : "testing-#{number}"
-    safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
 
     bintray_repo = Bintray.repository(tap)
     bintray_repo_url = "https://api.bintray.com/packages/homebrew/#{bintray_repo}"
@@ -868,7 +867,7 @@ module Homebrew
     end
 
     safe_system "git", "tag", "--force", tag
-    safe_system "git", "push", "--force", remote, "refs/tags/#{tag}"
+    safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{tag}"
   end
 
   def sanitize_ARGV_and_ENV
