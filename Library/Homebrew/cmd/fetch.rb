@@ -5,7 +5,7 @@
 #:    If `--HEAD` or `--devel` is passed, fetch that version instead of the
 #:    stable version.
 #:
-#:    If `-v` is passed, do a verbose VCS checkout, if the URL represents a CVS.
+#:    If `-v` is passed, do a verbose VCS checkout, if the URL represents a VCS.
 #:    This is useful for seeing if an existing VCS cache has been updated.
 #:
 #:    If `--force` is passed, remove a previously cached version and re-fetch.
