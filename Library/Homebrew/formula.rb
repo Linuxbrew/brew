@@ -794,6 +794,8 @@ class Formula
     opt_prefix+"Frameworks"
   end
 
+  # Indicates that this formula supports bottles. (Not necessarily that one
+  # should be used in the current installation run.)
   # Can be overridden to selectively disable bottles from formulae.
   # Defaults to true so overridden version does not have to check if bottles
   # are supported.

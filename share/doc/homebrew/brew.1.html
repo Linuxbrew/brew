@@ -145,7 +145,7 @@ For tarballs, also print SHA-256 checksums.</p>
 <p>If <code>--HEAD</code> or <code>--devel</code> is passed, fetch that version instead of the
 stable version.</p>
 
-<p>If <code>-v</code> is passed, do a verbose VCS checkout, if the URL represents a CVS.
+<p>If <code>-v</code> is passed, do a verbose VCS checkout, if the URL represents a VCS.
 This is useful for seeing if an existing VCS cache has been updated.</p>
 
 <p>If <code>--force</code> is passed, remove a previously cached version and re-fetch.</p>
@@ -196,8 +196,13 @@ options but do not install the specified formula.</p>
 <code>gcc-4.2</code> for Apple's GCC 4.2, or <code>gcc-4.9</code> for a Homebrew-provided GCC
 4.9.</p>
 
-<p>If <code>--build-from-source</code> is passed, compile from source even if a bottle
-is provided for <var>formula</var>.</p>
+<p>If <code>--build-from-source</code> or <code>-s</code> is passed, compile the specified <var>formula</var> from
+source even if a bottle is provided. Dependencies will still be installed
+from bottles if they are available.</p>
+
+<p>If HOMEBREW_BUILD_FROM_SOURCE is set, regardless of whether <code>--build-from-source</code> was
+passed, then both <var>formula</var> and the dependencies installed as part of this process
+are built from source even if bottles are available.</p>
 
 <p>If <code>--force-bottle</code> is passed, install from a bottle if it exists
 for the current version of OS X, even if custom options are given.</p>
