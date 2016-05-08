@@ -25,7 +25,7 @@ module Utils
       end
 
       def native_regex
-        /(\.#{Regexp.escape(tag)}\.bottle\.(\d+\.)?tar\.gz)$/o
+        /(\.#{Regexp.escape(tag.to_s)}\.bottle\.(\d+\.)?tar\.gz)$/o
       end
 
       def receipt_path(bottle_file)
