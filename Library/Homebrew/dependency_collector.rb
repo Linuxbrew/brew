@@ -110,6 +110,7 @@ class DependencyCollector
     when :java       then JavaRequirement.new(tags)
     when :rbenv      then RbenvRequirement.new(tags)
     when :ruby       then RubyRequirement.new(tags)
+    when :gawk       then GawkRequirement.new(tags)
     when :osxfuse    then OsxfuseRequirement.new(tags)
     when :perl       then PerlRequirement.new(tags)
     when :tuntap     then TuntapRequirement.new(tags)
