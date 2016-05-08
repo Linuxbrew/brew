@@ -58,37 +58,37 @@ module OS
     end
 
     def locate(tool)
-       DeveloperTools.locate(tool)
+      DevelopmentTools.locate(tool)
     end
 
     def default_cc
-      DeveloperTools.default_cc
+      DevelopmentTools.default_cc
     end
 
     def default_compiler
-      DeveloperTools.default_compiler
+      DevelopmentTools.default_compiler
     end
 
     def gcc_40_build_version
-      DeveloperTools.gcc_40_build_version
+      DevelopmentTools.gcc_40_build_version
     end
     alias_method :gcc_4_0_build_version, :gcc_40_build_version
 
     def gcc_42_build_version
-      DeveloperTools.gcc_42_build_version
+      DevelopmentTools.gcc_42_build_version
     end
     alias_method :gcc_build_version, :gcc_42_build_version
 
     def llvm_build_version
-      DeveloperTools.llvm_build_version
+      DevelopmentTools.llvm_build_version
     end
 
     def clang_version
-      DeveloperTools.llvm_build_version
+      DevelopmentTools.clang_version
     end
 
     def clang_build_version
-      DeveloperTools.clang_build_version
+      DevelopmentTools.clang_build_version
     end
   end
 end
