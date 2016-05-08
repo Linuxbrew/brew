@@ -234,9 +234,13 @@ class Tap
     clear_cache
 
     ohai "Tapping #{name}" unless quiet
-    args =  %W[clone #{requested_remote} #{path} --config core.autocrlf=false]
+    args =  %W[clone #{requested_remote} #{path}]
     args << "--depth=1" unless full_clone
     args << "-q" if quiet
+
+    git_version = Version.new(`git --version`[/git version (\d\.\d+\.\d+)/, 1])
+    raise ErrorDuringExecution.new(cmd) unless $?.success?
+    args << "--config" << "core.autocrlf=false" if git_version >= Version.new("1.7.10")
 
     begin
       safe_system "git", *args
@@ -630,7 +634,7 @@ class TapConfig
     return unless Utils.git_available?
 
     tap.path.cd do
-      Utils.popen_read("git", "config", "--local", "--get", "homebrew.#{key}").chuzzle
+      Utils.popen_read("git", "config", "--get", "homebrew.#{key}").chuzzle
     end
   end
 
@@ -639,7 +643,7 @@ class TapConfig
     return unless Utils.git_available?
 
     tap.path.cd do
-      safe_system "git", "config", "--local", "--replace-all", "homebrew.#{key}", value.to_s
+      safe_system "git", "config", "--replace-all", "homebrew.#{key}", value.to_s
     end
     value
   end
