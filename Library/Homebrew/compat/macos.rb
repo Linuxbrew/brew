@@ -54,5 +54,39 @@ module OS
     def macports_or_fink_installed?
       !macports_or_fink.empty?
     end
+
+    def locate(tool)
+       DeveloperTools.locate(tool)
+    end
+
+    def default_cc
+      DeveloperTools.default_cc
+    end
+
+    def default_compiler
+      DeveloperTools.default_compiler
+    end
+
+    def gcc_40_build_version
+      DeveloperTools.gcc_40_build_version
+    end
+    alias_method :gcc_4_0_build_version, :gcc_40_build_version
+
+    def gcc_42_build_version
+      DeveloperTools.gcc_42_build_version
+    end
+    alias_method :gcc_build_version, :gcc_42_build_version
+
+    def llvm_build_version
+      DeveloperTools.llvm_build_version
+    end
+
+    def clang_version
+      DeveloperTools.llvm_build_version
+    end
+
+    def clang_build_version
+      DeveloperTools.clang_build_version
+    end
   end
 end
