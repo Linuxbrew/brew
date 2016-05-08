@@ -1,3 +1,5 @@
+require "development_tools"
+
 module OS
   module Mac
     def xcode_folder
