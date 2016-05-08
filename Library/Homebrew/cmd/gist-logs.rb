@@ -1,5 +1,5 @@
 require "formula"
-require "cmd/config"
+require "system_config"
 require "net/http"
 require "net/https"
 require "stringio"
@@ -12,7 +12,7 @@ module Homebrew
     timestamp = build_time.strftime("%Y-%m-%d_%H-%M-%S")
 
     s = StringIO.new
-    Homebrew.dump_verbose_config(s)
+    SystemConfig.dump_verbose_config s
     # Dummy summary file, asciibetically first, to control display title of gist
     files["# #{f.name} - #{timestamp}.txt"] = { :content => brief_build_info(f) }
     files["00.config.out"] = { :content => s.string }
