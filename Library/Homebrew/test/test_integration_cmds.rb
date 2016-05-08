@@ -65,13 +65,17 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def cmd(*args)
     output = cmd_output(*args)
-    assert_equal 0, $?.exitstatus
+    status = $?.exitstatus
+    puts "\n#{output}" if status != 0
+    assert_equal 0, status
     output
   end
 
   def cmd_fail(*args)
     output = cmd_output(*args)
-    assert_equal 1, $?.exitstatus
+    status = $?.exitstatus
+    $stderr.puts "\n#{output}" if status != 1
+    assert_equal 1, status
     output
   end
 
