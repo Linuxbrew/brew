@@ -105,7 +105,7 @@ module OS
         # Xcode.version would always be non-nil. This is deprecated, and will
         # be removed in a future version. To remain compatible, guard usage of
         # Xcode.version with an Xcode.installed? check.
-        case MacOS.llvm_build_version.to_i
+        case DevelopmentTools.llvm_build_version.to_i
         when 1..2063 then "3.1.0"
         when 2064..2065 then "3.1.4"
         when 2066..2325
