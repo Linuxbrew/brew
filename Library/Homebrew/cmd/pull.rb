@@ -440,7 +440,7 @@ module Homebrew
       info["bottle"]["stable"]["files"].keys
     end
 
-    def bottle_info(my_bottle_tag = bottle_tag)
+    def bottle_info(my_bottle_tag = Utils::Bottles.tag)
       tag_s = my_bottle_tag.to_s
       return nil unless info["bottle"]["stable"]
       btl_info = info["bottle"]["stable"]["files"][tag_s]
@@ -453,8 +453,9 @@ module Homebrew
     end
 
     def any_bottle_tag
+      tag = Utils::Bottles.tag
       # Prefer native bottles as a convenience for download caching
-      bottle_tags.include?(bottle_tag) ? bottle_tag : bottle_tags.first
+      bottle_tags.include?(tag) ? tag : bottle_tags.first
     end
 
     def version(spec_type)
