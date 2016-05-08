@@ -187,7 +187,7 @@ class Tab < OpenStruct
   end
 
   def compiler
-    super || MacOS.default_compiler
+    super || DevelopmentTools.default_compiler
   end
 
   def cxxstdlib
