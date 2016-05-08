@@ -88,7 +88,7 @@ module Homebrew
           f.version > version
         end
 
-        if file_is_stale || ARGV.switch?("s") && !f.installed? || bottle_file_outdated?(f, file)
+        if file_is_stale || ARGV.switch?("s") && !f.installed? || Utils::Bottles::file_outdated?(f, file)
           cleanup_path(file) { file.unlink }
         end
       end
