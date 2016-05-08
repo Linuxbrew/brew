@@ -330,14 +330,14 @@ class BuildError < RuntimeError
         end
       end
     else
-      require "cmd/config"
+      require "system_config"
       require "build_environment"
 
       ohai "Formula"
       puts "Tap: #{formula.tap}" if formula.tap?
       puts "Path: #{formula.path}"
       ohai "Configuration"
-      Homebrew.dump_verbose_config
+      SystemConfig.dump_verbose_config
       ohai "ENV"
       Homebrew.dump_build_env(env)
       puts

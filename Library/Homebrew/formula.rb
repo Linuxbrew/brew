@@ -1482,12 +1482,12 @@ class Formula
         end
         log.puts
 
-        require "cmd/config"
+        require "system_config"
         require "build_environment"
 
         env = ENV.to_hash
 
-        Homebrew.dump_verbose_config(log)
+        SystemConfig.dump_verbose_config(log)
         log.puts
         Homebrew.dump_build_env(env, log)
 
