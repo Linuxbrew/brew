@@ -32,7 +32,7 @@ class Keg
     return if name == "glibc"
     mach_o_files.each do |file|
       file.ensure_writable do
-        change_rpath(file, new_prefix)
+        change_rpath(file, old_prefix, new_prefix)
         next unless OS.mac?
 
         if file.dylib?
@@ -75,7 +75,7 @@ class Keg
     end
   end
 
-  def change_rpath(file, new_prefix)
+  def change_rpath(file, old_prefix, new_prefix)
     return unless OS.linux?
     # Patching patchelf using itself fails with "Text file busy" or SIGBUS.
     return if name == "patchelf"
@@ -89,6 +89,11 @@ class Keg
     cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_prefix}/lib"
     old_rpath = `#{patchelf.bin}/patchelf --print-rpath #{file}`.strip
     raise ErrorDuringExecution.new(cmd) unless $?.success?
+    lib_path = "#{new_prefix}/lib"
+    rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select { |x| x.start_with?(new_prefix) }
+    rpath << lib_path unless rpath.include? lib_path
+    new_rpath = rpath.join(":")
+    cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_rpath}"
     if file.mach_o_executable?
       old_interpreter = `#{patchelf.bin}/patchelf --print-interpreter #{file}`.strip
       raise ErrorDuringExecution.new(cmd) unless $?.success?
