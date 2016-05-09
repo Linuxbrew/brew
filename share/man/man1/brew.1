@@ -211,6 +211,19 @@ If \fB\-\-build\-from\-source\fR is passed, download the source rather than a bo
 If \fB\-\-force\-bottle\fR is passed, download a bottle if it exists for the current version of OS X, even if it would not be used during installation\.
 .
 .TP
+\fBgist\-logs\fR [\fB\-\-new\-issue\fR|\fB\-n\fR] \fIformula\fR
+Upload logs for a failed build of \fIformula\fR to a new Gist\.
+.
+.IP
+\fIformula\fR is usually the name of the formula to install, but it can be specified in several different ways\. See \fISPECIFYING FORMULAE\fR\.
+.
+.IP
+If \fB\-\-new\-issue\fR is passed, automatically create a new issue in the appropriate GitHub repository as well as creating the Gist\.
+.
+.IP
+If no logs are found, an error message is presented\.
+.
+.TP
 \fBhome\fR
 Open Homebrew\'s own homepage in a browser\.
 .
@@ -244,7 +257,7 @@ See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/bre
 Install \fIformula\fR\.
 .
 .IP
-\fIformula\fR is usually the name of the formula to install, but it can be specified several different ways\. See \fISPECIFYING FORMULAE\fR\.
+\fIformula\fR is usually the name of the formula to install, but it can be specified in several different ways\. See \fISPECIFYING FORMULAE\fR\.
 .
 .IP
 If \fB\-\-debug\fR is passed and brewing fails, open an interactive debugging session with access to IRB or a shell inside the temporary build directory\.

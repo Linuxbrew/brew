@@ -1,3 +1,14 @@
+#:  * `gist-logs` [`--new-issue`|`-n`] <formula>:
+#:     Upload logs for a failed build of <formula> to a new Gist.
+#:
+#:     <formula> is usually the name of the formula to install, but it can be specified
+#:     in several different ways. See [SPECIFYING FORMULAE][].
+#:
+#:     If `--new-issue` is passed, automatically create a new issue in the appropriate
+#:     GitHub repository as well as creating the Gist.
+#:
+#:     If no logs are found, an error message is presented.      
+
 require "formula"
 require "system_config"
 require "net/http"
@@ -161,11 +172,7 @@ module Homebrew
   end
 
   def gist_logs
-    if ARGV.resolved_formulae.length != 1
-      puts "usage: brew gist-logs [--new-issue|-n] <formula>"
-      Homebrew.failed = true
-      return
-    end
+    raise FormulaUnspecifiedError if ARGV.resolved_formulae.length != 1
 
     gistify_logs(ARGV.resolved_formulae[0])
   end

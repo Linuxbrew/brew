@@ -2,7 +2,7 @@
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
-#:    several different ways. See [SPECIFYING FORMULAE][].
+#:    in several different ways. See [SPECIFYING FORMULAE][].
 #:
 #:    If `--debug` is passed and brewing fails, open an interactive debugging
 #:    session with access to IRB or a shell inside the temporary build directory.
