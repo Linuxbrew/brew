@@ -189,7 +189,7 @@ Open all of Homebrew for editing\.
 Open \fIformula\fR in the editor\.
 .
 .TP
-\fBfetch\fR [\fB\-\-force\fR] [\fB\-v\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-deps\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] \fIformulae\fR
+\fBfetch\fR [\fB\-\-force\fR] [\fB\-\-retry\fR] [\fB\-v\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-deps\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] \fIformulae\fR
 Download the source packages for the given \fIformulae\fR\. For tarballs, also print SHA\-256 checksums\.
 .
 .IP
@@ -200,6 +200,9 @@ If \fB\-v\fR is passed, do a verbose VCS checkout, if the URL represents a VCS\.
 .
 .IP
 If \fB\-\-force\fR is passed, remove a previously cached version and re\-fetch\.
+.
+.IP
+If \fB\-\-retry\fR is passed, retry if a download fails or re\-download if the checksum of a previously cached version no longer matches\.
 .
 .IP
 If \fB\-\-deps\fR is passed, also download dependencies for any listed \fIformulae\fR\.

@@ -139,7 +139,7 @@ installing.</p></dd>
 if any problems are found.</p></dd>
 <dt class="flush"><code>edit</code></dt><dd><p>Open all of Homebrew for editing.</p></dd>
 <dt><code>edit</code> <var>formula</var></dt><dd><p>Open <var>formula</var> in the editor.</p></dd>
-<dt><code>fetch</code> [<code>--force</code>] [<code>-v</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--deps</code>] [<code>--build-from-source</code>|<code>--force-bottle</code>] <var>formulae</var></dt><dd><p>Download the source packages for the given <var>formulae</var>.
+<dt><code>fetch</code> [<code>--force</code>] [<code>--retry</code>] [<code>-v</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--deps</code>] [<code>--build-from-source</code>|<code>--force-bottle</code>] <var>formulae</var></dt><dd><p>Download the source packages for the given <var>formulae</var>.
 For tarballs, also print SHA-256 checksums.</p>
 
 <p>If <code>--HEAD</code> or <code>--devel</code> is passed, fetch that version instead of the
@@ -149,6 +149,9 @@ stable version.</p>
 This is useful for seeing if an existing VCS cache has been updated.</p>
 
 <p>If <code>--force</code> is passed, remove a previously cached version and re-fetch.</p>
+
+<p>If <code>--retry</code> is passed, retry if a download fails or re-download if the
+checksum of a previously cached version no longer matches.</p>
 
 <p>If <code>--deps</code> is passed, also download dependencies for any listed <var>formulae</var>.</p>
 
