@@ -5,6 +5,8 @@
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:      (rather than `git rebase`).
 
+source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
+
 brew() {
   "$HOMEBREW_BREW_FILE" "$@"
 }
@@ -306,6 +308,9 @@ EOS
 
   # ensure GIT_CONFIG is unset as we need to operate on .git/config
   unset GIT_CONFIG
+
+  # only allow one instance of brew update
+  lock update
 
   chdir "$HOMEBREW_REPOSITORY"
   git_init_if_necessary
