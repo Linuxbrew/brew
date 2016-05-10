@@ -74,6 +74,21 @@ class DevelopmentTools
           `#{path} --version`[/clang-(\d{2,})/, 1].to_i
         end
     end
+
+    def non_apple_gcc_version(cc)
+      (@non_apple_gcc_version ||= {}).fetch(cc) do
+        path = HOMEBREW_PREFIX.join("opt", "gcc", "bin", cc)
+        path = locate(cc) unless path.exist?
+        version = `#{path} --version`[/gcc(?:-\d(?:\.\d)? \(.+\))? (\d\.\d\.\d)/, 1] if path
+        @non_apple_gcc_version[cc] = version
+      end
+    end
+
+    def clear_version_cache
+      @gcc_40_build_version = @gcc_42_build_version = @llvm_build_version = nil
+      @clang_version = @clang_build_version = nil
+      @non_apple_gcc_version = {}
+    end
   end
 end
 

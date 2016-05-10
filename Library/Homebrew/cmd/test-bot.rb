@@ -469,7 +469,7 @@ module Homebrew
         unless installed_gcc
           run_as_not_developer { test "brew", "install", "gcc" }
           installed_gcc = true
-          OS::Mac.clear_version_cache
+          DevelopmentTools.clear_version_cache
           retry
         end
         skip formula_name
