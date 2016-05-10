@@ -495,7 +495,7 @@ module Homebrew
     return if formulae_names.empty?
     ohai "Verifying bottles published on Bintray"
     formulae = formulae_names.map { |n| Formula[n] }
-    max_retries = 32  # shared among all bottles
+    max_retries = 300 # shared among all bottles
     poll_retry_delay_seconds = 2
 
     HOMEBREW_CACHE.cd do
