@@ -87,16 +87,18 @@ class Keg
     end
     return unless patchelf.installed?
     cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_prefix}/lib"
-    (old_i, old_p) = `#{patchelf.bin}/patchelf --print-rpath --print-interpreter #{file}`.split("\n")
+    old_rpath = `#{patchelf.bin}/patchelf --print-rpath #{file}`.strip
     raise ErrorDuringExecution.new(cmd) unless $?.success?
     if file.mach_o_executable?
+      old_interpreter = `#{patchelf.bin}/patchelf --print-interpreter #{file}`.split("\n")
+      raise ErrorDuringExecution.new(cmd) unless $?.success?
       interpreter = new_prefix == PREFIX_PLACEHOLDER ?
         "/lib64/ld-linux-x86-64.so.2" :
-        HOMEBREW_PREFIX/"lib/ld.so"
+        "#{HOMEBREW_PREFIX}/lib/ld.so"
       cmd << " --set-interpreter #{interpreter}" unless old_i == interpreter
     end
     cmd << " #{file}"
-    if old_p == "#{new_prefix}/lib" && old_i == interpreter
+    if old_rpath == "#{new_prefix}/lib" && old_interpreter == interpreter
       puts "Skipping relocation of #{file} (RPATH already set)" if ARGV.debug?
     else
       puts "Setting RPATH of #{file}" if ARGV.debug?
