@@ -90,7 +90,9 @@ class Keg
     old_rpath = `#{patchelf.bin}/patchelf --print-rpath #{file}`.strip
     raise ErrorDuringExecution.new(cmd) unless $?.success?
     lib_path = "#{new_prefix}/lib"
-    rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select { |x| x.start_with?(new_prefix) }
+    rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select do
+      |x| x.start_with?(new_prefix) || x.start_with?("$ORIGIN")
+    end
     rpath << lib_path unless rpath.include? lib_path
     new_rpath = rpath.join(":")
     cmd = ["#{patchelf.bin}/patchelf", "--set-rpath", new_rpath]
