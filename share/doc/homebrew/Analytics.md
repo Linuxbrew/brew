@@ -21,7 +21,7 @@ Homebrew's analytics record some shared information for every event:
 
 Homebrew's analytics records the following different events:
 
-- a `screenview` hit type with the official Homebrew command you have run (with arguments stripped) e.g. `brew list` (not `brew list foo` or any external commands except `bundle`, `cask` and `services`)
+- a `screenview` hit type with the official Homebrew command you have run (with arguments stripped) e.g. `brew list` (not `brew list foo` or any external commands except `bundle` and `services`)
 - an `event` hit type with the `install` event category, the Homebrew formula from a non-private GitHub tap you have requested to install and any used options e.g. `wget --with-pcre` as the action and an event label e.g. `Mac OS X 10.11, non-/usr/local, CI` to indicate the OS version, non-standard installation location and invocation as part of CI. This allows us to identify formulae that need fixed and where more easily.
 - an `event` hit type with the `BuildError` event category, the Homebrew formula that failed to install e.g. `wget` as the action and an event label e.g. `Mac OS X 10.11`
 - an `exception` hit type with the `exception` event category, exception description of the exception name e.g. `FormulaUnavailableError` and whether the exception was fatal e.g. `1`

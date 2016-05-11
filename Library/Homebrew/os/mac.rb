@@ -12,6 +12,8 @@ module OS
 
     ::MacOS = self # compatibility
 
+    raise "Loaded OS::Mac on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
+
     # This can be compared to numerics, strings, or symbols
     # using the standard Ruby Comparable methods.
     def version
@@ -302,6 +304,7 @@ module OS
       "7.2"   => { :clang => "7.0", :clang_build => 700 },
       "7.2.1" => { :clang => "7.0", :clang_build => 700 },
       "7.3"   => { :clang => "7.3", :clang_build => 703 },
+      "7.3.1" => { :clang => "7.3", :clang_build => 703 },
     }
 
     def compilers_standard?

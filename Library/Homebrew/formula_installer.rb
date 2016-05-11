@@ -467,7 +467,7 @@ class FormulaInstaller
     fi.options           |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
     fi.options           |= inherited_options
     fi.build_bottle       = build_bottle? && ENV["HOMEBREW_BUILD_BOTTLE"] == "dependencies"
-    fi.build_from_source  = build_from_source?
+    fi.build_from_source  = ARGV.build_formula_from_source?(df)
     fi.verbose            = verbose? && !quieter?
     fi.debug              = debug?
     fi.prelude

@@ -1,6 +1,6 @@
 module OS
   def self.mac?
-    /darwin/i === RUBY_PLATFORM
+    /darwin/i === RUBY_PLATFORM && !ENV["HOMEBREW_TEST_GENERIC_OS"]
   end
 
   def self.linux?
@@ -27,7 +27,5 @@ module OS
     PATH_PATCH = "patch"
     # compatibility
     ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0"
-  else
-    raise "Unknown operating system"
   end
 end

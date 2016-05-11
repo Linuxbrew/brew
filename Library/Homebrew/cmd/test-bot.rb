@@ -857,7 +857,6 @@ module Homebrew
     project = OS.mac? ? "homebrew" : "linuxbrew"
     remote = "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/homebrew-#{tap.repo}.git"
     tag = docker_branch ? "pr-#{docker_user}-#{docker_branch}" : pr ? "pr-#{pr}" : "testing-#{number}"
-    safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{tag}"
 
     bintray_org = project
     bintray_repo = Bintray.repository(tap)
@@ -904,7 +903,7 @@ module Homebrew
     end
 
     safe_system "git", "tag", "--force", tag
-    safe_system "git", "push", "--force", remote, "refs/tags/#{tag}"
+    safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{tag}"
   end
 
   def sanitize_ARGV_and_ENV
