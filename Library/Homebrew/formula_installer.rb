@@ -538,9 +538,9 @@ class FormulaInstaller
     end
 
     formula.options.each do |opt|
-      name  = opt.name[/\A(.+)=\z$/, 1]
-      value = ARGV.value(name)
-      args << "--#{name}=#{value}" if name && value
+      name = opt.name[/^([^=])+=$/, 1]
+      value = ARGV.value(name) if name
+      args << "--#{name}=#{value}" if value
     end
 
     args
