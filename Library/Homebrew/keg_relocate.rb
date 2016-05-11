@@ -95,7 +95,7 @@ class Keg
       interpreter = new_prefix == PREFIX_PLACEHOLDER ?
         "/lib64/ld-linux-x86-64.so.2" :
         "#{HOMEBREW_PREFIX}/lib/ld.so"
-      cmd << " --set-interpreter #{interpreter}" unless old_i == interpreter
+      cmd << " --set-interpreter #{interpreter}" unless old_interpreter == interpreter
     end
     cmd << " #{file}"
     if old_rpath == "#{new_prefix}/lib" && old_interpreter == interpreter
