@@ -10,7 +10,7 @@ class PerlRequirement < Requirement
 
   satisfy(build_env: false) do
     which_all("perl").detect do |perl|
-      perl_version = Utils.popen_read(perl, "--version")[/\(v(\d+\.\d+)(?:\.\d+)?\)/, 1]
+      perl_version = Utils.popen_read(perl, "--version")[/v(\d+\.\d+)(?:\.\d+)?/, 1]
       next unless perl_version
       Version.create(perl_version.to_s) >= Version.create(@version)
     end
