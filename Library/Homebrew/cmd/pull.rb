@@ -552,7 +552,7 @@ module Homebrew
         # We're in the cache; make sure to force re-download
         while true do
           begin
-            retry_count
+            retry_count = retry_count
             curl url, "-o", filename
             break
           rescue
