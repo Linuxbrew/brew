@@ -90,7 +90,7 @@ class Keg
     old_rpath = `#{patchelf.bin}/patchelf --print-rpath #{file}`.strip
     raise ErrorDuringExecution.new(cmd) unless $?.success?
     if file.mach_o_executable?
-      old_interpreter = `#{patchelf.bin}/patchelf --print-interpreter #{file}`.split("\n")
+      old_interpreter = `#{patchelf.bin}/patchelf --print-interpreter #{file}`.strip
       raise ErrorDuringExecution.new(cmd) unless $?.success?
       interpreter = new_prefix == PREFIX_PLACEHOLDER ?
         "/lib64/ld-linux-x86-64.so.2" :
