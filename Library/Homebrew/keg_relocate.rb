@@ -109,7 +109,7 @@ class Keg
       puts "Skipping relocation of #{file} (RPATH already set)" if ARGV.debug?
     else
       puts "Setting RPATH of #{file}" if ARGV.debug?
-      safe_system *cmd
+      safe_system(*cmd)
     end
   end
 
