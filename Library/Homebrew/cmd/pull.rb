@@ -514,37 +514,57 @@ module Homebrew
           next
         end
 
-        # Poll for publication completion using a quick HEAD, to avoid spurious error messages
+        # Poll for publication completion using a quick partial HEAD, to avoid spurious error messages
         # 401 error is normal while file is still in async publishing process
         url = URI(bottle_info.url)
         puts "Verifying bottle: #{File.basename(url.path)}"
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true
+        retry_count = 0
         http.start do
           while true do
             req = Net::HTTP::Head.new bottle_info.url
             res = http.request req
-            retry_count += 1
             if res.is_a?(Net::HTTPSuccess)
               break
             elsif res.is_a?(Net::HTTPClientError)
               if retry_count >= max_retries
-                raise "Failed to download #{f} bottle from #{url}!"
+                raise "Failed to find published #{f} bottle at #{url}!"
               end
               print(wrote_dots ? "." : "Waiting on Bintray.")
               wrote_dots = true
               sleep poll_retry_delay_seconds
+              retry_count += 1
             else
-              raise "Failed to download #{f} bottle from #{url} (#{res.code} #{res.message})!"
+              raise "Failed to find published #{f} bottle at #{url} (#{res.code} #{res.message})!"
             end
           end
         end
 
         # Actual download and verification
+        # We do a retry on this, too, because sometimes the external curl will fail even
+        # when the prior HEAD has succeeded.
         puts "\n" if wrote_dots
         filename = File.basename(url.path)
+        curl_retry_delay_seconds = 4
+        max_curl_retries = 1
+        retry_count = 0
         # We're in the cache; make sure to force re-download
-        curl url, "-o", filename
+        while true do
+          begin
+            retry_count
+            curl url, "-o", filename
+            break
+          rescue
+            if retry_count >= max_curl_retries
+              raise "Failed to download #{f} bottle from #{url}!"
+            end
+            puts "curl download failed; retrying in #{curl_retry_delay_seconds} sec"
+            sleep curl_retry_delay_seconds
+            curl_retry_delay_seconds *= 2
+            retry_count += 1
+          end
+        end
         checksum = Checksum.new(:sha256, bottle_info.sha256)
         Pathname.new(filename).verify_checksum(checksum)
       end
