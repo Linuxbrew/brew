@@ -1,4 +1,4 @@
-#:  * `audit` [`--strict`] [`--online`] [`--display-cop-names`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--online`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
@@ -12,6 +12,9 @@
 #:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
+#:
+#:    If `--display-filename` is passed, every line of output is prefixed with the
+#:    name of the file or formula being audited, to make the output easy to grep.
 #:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
@@ -69,8 +72,12 @@ module Homebrew
 
       formula_count += 1
       problem_count += fa.problems.size
-      problem_lines = fa.problems.map { |p| "  * #{p.chomp.gsub("\n", "\n    ")}" }
-      puts "#{f.full_name}:", problem_lines
+      problem_lines = fa.problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
+      if ARGV.include? "--display-filename"
+        puts problem_lines.map { |s| "#{f.path}: #{s}"}
+      else
+        puts "#{f.full_name}:", problem_lines.map { |s| "  #{s}"}
+      end
     end
 
     unless problem_count.zero?

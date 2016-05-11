@@ -39,7 +39,7 @@ If no search term is given, all locally available formulae are listed.</p></dd>
 Read more at <a href="https://git.io/brew-analytics" data-bare-link="true">https://git.io/brew-analytics</a>.</p></dd>
 <dt><code>analytics</code> (<code>on</code>|<code>off</code>)</dt><dd><p>Turn on/off Homebrew's analytics.</p></dd>
 <dt><code>analytics</code> <code>regenerate-uuid</code></dt><dd><p>Regenerate UUID used in Homebrew's analytics.</p></dd>
-<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<code>--display-cop-names</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
+<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<code>--display-cop-names</code>] [<code>--display-filename</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
 run before submitting a new formula.</p>
 
 <p>If no <var>formulae</var> are provided, all of them are checked.</p>
@@ -52,6 +52,9 @@ connection are run. This should be used when creating for new formulae.</p>
 
 <p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
 is included in the output.</p>
+
+<p>If <code>--display-filename</code> is passed, every line of output is prefixed with the
+name of the file or formula being audited, to make the output easy to grep.</p>
 
 <p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
 for instance, for implementing pre-commit hooks.</p></dd>
