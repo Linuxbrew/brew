@@ -93,21 +93,21 @@ class Keg
     rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select { |x| x.start_with?(new_prefix) }
     rpath << lib_path unless rpath.include? lib_path
     new_rpath = rpath.join(":")
-    cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_rpath}"
+    cmd = ["#{patchelf.bin}/patchelf", "--set-rpath", new_rpath]
     if file.mach_o_executable?
       old_interpreter = `#{patchelf.bin}/patchelf --print-interpreter #{file}`.strip
       raise ErrorDuringExecution.new(cmd) unless $?.success?
       interpreter = new_prefix == PREFIX_PLACEHOLDER ?
         "/lib64/ld-linux-x86-64.so.2" :
         "#{HOMEBREW_PREFIX}/lib/ld.so"
-      cmd << " --set-interpreter #{interpreter}" unless old_interpreter == interpreter
+      cmd << "--set-interpreter" << interpreter unless old_interpreter == interpreter
     end
-    cmd << " #{file}"
+    cmd << file
     if old_rpath == "#{new_prefix}/lib" && old_interpreter == interpreter
       puts "Skipping relocation of #{file} (RPATH already set)" if ARGV.debug?
     else
       puts "Setting RPATH of #{file}" if ARGV.debug?
-      safe_system cmd
+      safe_system *cmd
     end
   end
 
