@@ -603,6 +603,8 @@ module Homebrew
         shared_test_args = ["--verbose"]
         shared_test_args << "--keep-tmp" if ARGV.keep_tmp?
         test "brew", "test", formula_name, *shared_test_args if formula.test_defined?
+
+        before_linkage = Utils.popen_read("brew", "list").split("\n")
         bottled_dependents.each do |dependent|
           unless dependent.installed?
             test "brew", "fetch", "--retry", dependent.name
@@ -622,8 +624,10 @@ module Homebrew
               test "brew", "test", "--verbose", dependent.name
             end
           end
-          test "brew", "uninstall", "--force", dependent.name unless OS.mac?
         end
+        after_linkage = Utils.popen_read("brew", "list").split("\n")
+        installed_by_linkage = after_linkage - before_linkage
+        test "brew", "uninstall", "--force", *installed_by_linkage unless installed_by_linkage.empty? || OS.mac?
         test "brew", "uninstall", "--force", formula_name
       end
 
