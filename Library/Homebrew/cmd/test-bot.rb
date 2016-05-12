@@ -622,6 +622,7 @@ module Homebrew
               test "brew", "test", "--verbose", dependent.name
             end
           end
+          test "brew", "uninstall", "--force", dependent.name unless OS.mac?
         end
         test "brew", "uninstall", "--force", formula_name
       end
