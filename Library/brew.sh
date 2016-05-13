@@ -224,7 +224,7 @@ update-preinstall() {
     # Hide shellcheck complaint:
     # shellcheck source=/dev/null
     source "$HOMEBREW_LIBRARY/Homebrew/cmd/update.sh"
-    homebrew-update --preinstall
+    brew update --preinstall
   fi
 }
 
