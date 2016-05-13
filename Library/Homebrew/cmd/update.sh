@@ -7,10 +7,6 @@
 
 source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
-git() {
-  "$HOMEBREW_LIBRARY/ENV/scm/git" "$@"
-}
-
 git_init_if_necessary() {
   if [[ -n "$HOMEBREW_OSX" ]]
   then

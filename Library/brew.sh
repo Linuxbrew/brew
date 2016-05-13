@@ -28,6 +28,10 @@ brew() {
   "$HOMEBREW_BREW_FILE" "$@"
 }
 
+git() {
+  "$HOMEBREW_LIBRARY/ENV/scm/git" "$@"
+}
+
 # Force UTF-8 to avoid encoding issues for users with broken locale settings.
 if [[ "$(locale charmap 2> /dev/null)" != "UTF-8" ]]
 then
