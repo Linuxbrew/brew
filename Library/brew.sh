@@ -215,6 +215,8 @@ EOS
   esac
 fi
 
+# Hide shellcheck complaint:
+# shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
 setup-analytics
 report-analytics-screenview-command
