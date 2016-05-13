@@ -238,7 +238,7 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_env_csh
-    assert_match %r{setenv CMAKE_PREFIX_PATH},
+    assert_match %r{setenv CMAKE_PREFIX_PATH #{Regexp.quote(HOMEBREW_PREFIX.to_s)}},
                  cmd("--env", "--shell=tcsh")
   end
 

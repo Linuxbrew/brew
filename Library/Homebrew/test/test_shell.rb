@@ -30,7 +30,7 @@ class ShellSmokeTest < Homebrew::TestCase
   def test_csh_quote()
     assert_equal "''", Utils::Shell.csh_quote("")
     assert_equal "\\\\", Utils::Shell.csh_quote("\\")
-    # note this test is different
+    # note this test is different than for sh
     assert_equal "'\\\n'", Utils::Shell.csh_quote("\n")
     assert_equal "\\$", Utils::Shell.csh_quote("$")
     assert_equal "word", Utils::Shell.csh_quote("word")
