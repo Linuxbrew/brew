@@ -55,10 +55,14 @@ class Formula
   end
 
   def python(_options = {}, &block)
-    opoo "Formula#python is deprecated and will go away shortly."
+    opoo "Formula#python is deprecated."
     block.call if block_given?
     PythonRequirement.new
   end
   alias_method :python2, :python
   alias_method :python3, :python
+
+  def startup_plist
+    opoo "startup_plist is deprecated: use plist instead."
+  end
 end

@@ -725,7 +725,6 @@ class Formula
   def plist
     nil
   end
-  alias_method :startup_plist, :plist
 
   # The generated launchd {.plist} service name.
   def plist_name
