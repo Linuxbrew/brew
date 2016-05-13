@@ -12,6 +12,6 @@ Please replace this line with a brief summary of your issue.
 
 ### Feature Requests:
 
-**Please note by far the quickest way to get a new feature into Linuxbrew is to file a [Pull Request](https://github.com/Linuxbrew/brew/blob/master/.github/CONTRIBUTING.md).**
+**Please note by far the quickest way to get a new feature into Cadfaelbrew is to file a [Pull Request](https://github.com/SuperNEMO-DBD/brew/blob/master/.github/CONTRIBUTING.md).**
 
 We will consider your request but it may be closed if it's something we're not actively planning to work on.
