@@ -9,10 +9,11 @@ module OS
 
   require "os/mac"
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
+  
+  GITHUB_USER = "SuperNEMO-DBD"
 
   if OS.mac?
     NAME = "darwin"
-    GITHUB_USER = "Homebrew"
     ISSUES_URL = "https://git.io/brew-troubleshooting"
     PATH_OPEN = "/usr/bin/open"
     PATH_PATCH = "/usr/bin/patch"
@@ -21,7 +22,6 @@ module OS
     ::MACOS_VERSION = OS::Mac.version.to_s
   elsif OS.linux?
     NAME = "linux"
-    GITHUB_USER = "Linuxbrew"
     ISSUES_URL = "https://github.com/#{GITHUB_USER}/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting"
     PATH_OPEN = "xdg-open"
     PATH_PATCH = "patch"

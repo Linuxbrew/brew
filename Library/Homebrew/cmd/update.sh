@@ -16,9 +16,9 @@ git() {
 git_init_if_necessary() {
   if [[ -n "$HOMEBREW_OSX" ]]
   then
-    OFFICIAL_REMOTE="https://github.com/Homebrew/brew.git"
+    OFFICIAL_REMOTE="https://github.com/SuperNEMO-DBD/brew.git"
   else
-    OFFICIAL_REMOTE="https://github.com/Linuxbrew/brew.git"
+    OFFICIAL_REMOTE="https://github.com/SuperNEMO-DBD/brew.git"
   fi
 
   if [[ ! -d ".git" ]]
@@ -310,6 +310,16 @@ EOS
   # rename Taps directories
   # this procedure will be removed in the future if it seems unnecessary
   rename_taps_dir_if_necessary
+
+  # Always tap and pin cadfael
+  if [[ ! -d "$HOMEBREW_LIBRARY/Taps/supernemo-dbd/homebrew-cadfael" ]]
+  then
+    brew tap --full supernemo-dbd/cadfael || odie "Could not Tap supernemo-dbd/cadfael"
+  fi
+  if [[ ! -d "$HOMEBREW_LIBRARY/PinnedTaps/supernemo-dbd/cadfael" ]]
+  then
+    brew tap-pin supernemo-dbd/cadfael || odie "Could not Pin supernemo-dbd/cadfael Tap"
+  fi
 
   # kill all of subprocess on interrupt
   trap '{ pkill -P $$; wait; exit 130; }' SIGINT

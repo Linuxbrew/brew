@@ -159,6 +159,12 @@ then
   odie "The current working directory doesn't exist, cannot proceed."
 fi
 
+# At present, we always want to build from source on Linux
+if [[ -n "$HOMEBREW_LINUX" ]]
+then
+  export HOMEBREW_BUILD_FROM_SOURCE=1
+fi
+
 if [[ "$1" = -v ]]
 then
   # Shift the -v to the end of the parameter list
@@ -206,6 +212,8 @@ EOS
   esac
 fi
 
+# Disable analytics
+export HOMEBREW_NO_ANALYTICS=1
 source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
 setup-analytics
 report-analytics-screenview-command
