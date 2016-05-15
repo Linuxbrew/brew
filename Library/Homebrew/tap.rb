@@ -151,7 +151,7 @@ class Tap
   # e.g. `https://github.com/user/homebrew-repo/issues`
   def issues_url
     if official? || !custom_remote?
-      "https://github.com/#{user}/homebrew-#{repo}/issues"
+      "https://github.com/#{slug}/issues"
     end
   end
 
@@ -161,7 +161,7 @@ class Tap
 
   # True if this {Tap} is an official Homebrew tap.
   def official?
-    user == "Homebrew"
+    user == "Homebrew" || user == "Linuxbrew"
   end
 
   # Whether this tap is for Linux.
