@@ -28,6 +28,7 @@ class Tap
 
     # we special case homebrew so users don't have to shift in a terminal
     user = "Homebrew" if user == "homebrew"
+    user = "Linuxbrew" if user == "linuxbrew"
     repo = repo.strip_prefix "homebrew-"
 
     if user == "Homebrew" && (repo == "homebrew" || repo == "core") ||
@@ -103,7 +104,8 @@ class Tap
     if remote.nil?
       "#{user}/homebrew-#{repo}"
     else
-      remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1].capitalize
+      x = remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1]
+      official? ? x.capitalize : x
     end
   end
 
