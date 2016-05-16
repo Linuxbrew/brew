@@ -427,7 +427,7 @@ doCheckSUSELINUX-11 () {
 # Ubuntu Checks
 #-----------------------------------------------------------------------
 # - Ubuntu 16.04 (Xenial)
-doCheckUbuntu-14.04 () {
+doCheckUbuntu-16.04 () {
   _echo_warning "Support for Ubuntu 16.04 is preliminary"
   _echo_info "Checking system software for Ubuntu 16.04"
 
@@ -439,7 +439,7 @@ doCheckUbuntu-14.04 () {
                  "libcurl4-openssl-dev" \
                  "libexpat-dev" \
                  "libncurses-dev" \
-                 "ruby2.0" \
+                 "ruby" \
                  "texinfo" \
                  "zlib1g-dev" \
                  "libx11-dev" \
