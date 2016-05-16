@@ -74,9 +74,9 @@ module Homebrew
       problem_count += fa.problems.size
       problem_lines = fa.problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
       if ARGV.include? "--display-filename"
-        puts problem_lines.map { |s| "#{f.path}: #{s}"}
+        puts problem_lines.map { |s| "#{f.path}: #{s}" }
       else
-        puts "#{f.full_name}:", problem_lines.map { |s| "  #{s}"}
+        puts "#{f.full_name}:", problem_lines.map { |s| "  #{s}" }
       end
     end
 
