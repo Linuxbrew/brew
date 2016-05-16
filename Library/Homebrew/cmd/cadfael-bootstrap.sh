@@ -428,7 +428,6 @@ doCheckSUSELINUX-11 () {
 #-----------------------------------------------------------------------
 # - Ubuntu 16.04 (Xenial)
 doCheckUbuntu-16.04 () {
-  _echo_warning "Support for Ubuntu 16.04 is preliminary"
   _echo_info "Checking system software for Ubuntu 16.04"
 
   local debList=("build-essential" \
