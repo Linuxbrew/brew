@@ -8,7 +8,8 @@ module Stdenv
 
   # @private
   SAFE_CFLAGS_FLAGS = "-w -pipe"
-  DEFAULT_FLAGS = OS.mac? ? "-march=core2 -msse4" : "-march=native"
+  HOMEBREW_ARCH = (ENV["HOMEBREW_ARCH"] || "native").freeze
+  DEFAULT_FLAGS = (OS.mac? ? "-march=core2 -msse4" : "-march=#{HOMEBREW_ARCH}").freeze
 
   def self.extended(base)
     unless ORIGINAL_PATHS.include? HOMEBREW_PREFIX/"bin"
