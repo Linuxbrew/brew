@@ -227,9 +227,6 @@ update-preinstall() {
 
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" ]]
   then
-    # Hide shellcheck complaint:
-    # shellcheck source=/dev/null
-    source "$HOMEBREW_LIBRARY/Homebrew/cmd/update.sh"
     brew update --preinstall
   fi
 }
