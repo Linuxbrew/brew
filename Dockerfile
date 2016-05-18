@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:trusty
 MAINTAINER Shaun Jackman <sjackman@gmail.com>
 
 RUN apt-get update \
