@@ -12,7 +12,7 @@ RUN localedef -i en_US -f UTF-8 en_US.UTF-8 \
 ADD . /home/linuxbrew/.linuxbrew
 RUN chown -R linuxbrew: /home/linuxbrew/.linuxbrew \
 	&& cd /home/linuxbrew/.linuxbrew \
-	&& git remote set-url origin https://github.com/Linuxbrew/linuxbrew.git
+	&& git remote set-url origin https://github.com/Linuxbrew/brew.git
 
 USER linuxbrew
 WORKDIR /home/linuxbrew
