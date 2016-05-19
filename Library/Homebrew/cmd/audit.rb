@@ -636,6 +636,13 @@ class FormulaAuditor
       unless patch.url =~ /[a-fA-F0-9]{40}/
         problem "GitHub/Gist patches should specify a revision:\n#{patch.url}"
       end
+    when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
+      problem <<-EOS.undent
+        use GitHub pull request URLs:
+          https://github.com/#{$1}/#{$2}/pulls/#{$3}.patch
+        Rather than patch-diff:
+          #{patch.url}
+      EOS
     when %r{macports/trunk}
       problem "MacPorts patches should specify a revision instead of trunk:\n#{patch.url}"
     when %r{^http://trac\.macports\.org}
@@ -1234,6 +1241,17 @@ class ResourceAuditor
     urls.each do |u|
       next unless u =~ %r{https://.*github.*/(archive|releases)/.*\.zip$} && u !~ %r{releases/download}
       problem "Use GitHub tarballs rather than zipballs (url is #{u})."
+    end
+
+    # Don't use GitHub codeload URLs
+    urls.each do |u|
+      next unless u =~ %r{https?://codeload\.github\.com/(.+)/(.+)/(?:tar\.gz|zip)/(.+)}
+      problem <<-EOS.undent
+        use GitHub archive URLs:
+          https://github.com/#{$1}/#{$2}/archive/#{$3}.tar.gz
+        Rather than codeload:
+          #{u}
+      EOS
     end
   end
 
