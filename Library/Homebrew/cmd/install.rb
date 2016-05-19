@@ -40,8 +40,8 @@
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
 #:    aka master, trunk, unstable.
 #:
-#:    If `--keep-tmp` is passed, the temporary files created for the test are
-#:    not deleted.
+#:    If `--keep-tmp` is passed, the temporary files created during installation
+#:    are not deleted.
 #:
 #:    To install a newer version of HEAD use
 #:    `brew rm <foo> && brew install --HEAD <foo>`.
