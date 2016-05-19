@@ -10,8 +10,6 @@ _You can erase any parts of this template not applicable to your Issue._
 
 Please replace this line with a brief summary of your issue.
 
-### Feature Requests:
+### Propose a feature:
 
-**Please note by far the quickest way to get a new feature into Homebrew is to file a [Pull Request](https://github.com/Homebrew/brew/blob/master/.github/CONTRIBUTING.md).**
-
-We will consider your request but it may be closed if it's something we're not actively planning to work on.
+Instead of creating an issue here, please create a pull request with your change proposal in the [Homebrew Evolution](https://github.com/Homebrew/brew-evolution) repository using the [proposal template](https://github.com/Homebrew/brew-evolution/blob/master/proposal_template.md).
