@@ -182,6 +182,10 @@ class FormulaAuditor
       problem "'__END__' was found, but 'DATA' is not used"
     end
 
+    if text =~ /inreplace [^\n]* do [^\n]*\n[^\n]*\.gsub![^\n]*\n\ *end/m
+      problem "'inreplace ... do' was used for a single substitution (use the non-block form instead)."
+    end
+
     unless text.has_trailing_newline?
       problem "File should end with a newline"
     end
