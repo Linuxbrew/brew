@@ -105,7 +105,7 @@ class Tap
       "#{user}/homebrew-#{repo}"
     else
       x = remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1]
-      official? ? x.capitalize : x
+      (official? && !x.nil?) ? x.capitalize : x
     end
   end
 
