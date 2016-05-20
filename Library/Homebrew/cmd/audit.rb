@@ -1164,7 +1164,8 @@ class ResourceAuditor
            %r{^http://launchpad\.net/},
            %r{^http://bitbucket\.org/},
            %r{^http://hackage\.haskell\.org/},
-           %r{^http://(?:[^/]*\.)?archive\.org}
+           %r{^http://(?:[^/]*\.)?archive\.org},
+           %r{^http://(?:[^/]*\.)?freedesktop\.org}
         problem "Please use https:// for #{p}"
       when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
         problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"
