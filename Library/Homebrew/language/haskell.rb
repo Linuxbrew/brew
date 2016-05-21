@@ -81,7 +81,7 @@ module Language
           # dependencies, and call cabal configure afterwards to set the flags again for compile
           flags = ""
           if options[:flags]
-            flags = "--flags='#{options[:flags].join(" ")}'"
+            flags = "--flags=#{options[:flags].join(" ")}"
           end
 
           args_and_flags = args
