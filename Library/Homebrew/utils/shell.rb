@@ -69,5 +69,16 @@ module Utils
     def self.shell_profile
       SHELL_PROFILE_MAP.fetch(preferred_shell, "~/.bash_profile")
     end
+
+    def self.prepend_path_in_shell_profile(path)
+      case preferred_shell 
+      when :bash, :ksh, :sh, :zsh
+        "echo 'export PATH=\"#{sh_quote(path)}:$PATH >> #{shell_profile}"
+      when :csh, :tcsh
+        "echo 'setenv PATH #{csh_quote(path)}:$PATH' >> #{shell_profile}"
+      when :fish
+        "echo 'set -g fish_user_paths $fish_user_paths >> #{sh_quote(path)}' >> #{shell_profile}"
+      end
+    end
   end
 end
