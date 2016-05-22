@@ -6,10 +6,6 @@ require "development_tools"
 
 class SystemConfig
   class << self
-    def llvm
-      @llvm ||= DevelopmentTools.llvm_build_version if DevelopmentTools.installed?
-    end
-
     def gcc_42
       @gcc_42 ||= DevelopmentTools.gcc_42_build_version if DevelopmentTools.installed?
     end
@@ -130,7 +126,6 @@ class SystemConfig
       f.puts hardware if hardware
       f.puts "GCC-4.0: build #{gcc_40}" if gcc_40
       f.puts "GCC-4.2: build #{gcc_42}" if gcc_42
-      f.puts "LLVM-GCC: build #{llvm}"  if llvm
       f.puts "Clang: #{clang ? "#{clang} build #{clang_build}" : "N/A"}"
       f.puts "Perl: #{describe_perl}"
       f.puts "Python: #{describe_python}"

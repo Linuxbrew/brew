@@ -30,7 +30,6 @@ class DevelopmentTools
       # over the system's GCC 4.0
       when /^gcc-4.0/ then gcc_42_build_version ? :gcc : :gcc_4_0
       when /^gcc/ then :gcc
-      when /^llvm/ then :llvm
       else :clang
       end
     end
@@ -53,13 +52,6 @@ class DevelopmentTools
         end
     end
     alias_method :gcc_build_version, :gcc_42_build_version
-
-    def llvm_build_version
-      @llvm_build_version ||=
-        if (path = locate("llvm-gcc")) && !path.realpath.basename.to_s.start_with?("clang")
-          `#{path} --version`[/LLVM build (\d{4,})/, 1].to_i
-        end
-    end
 
     def clang_version
       @clang_version ||=
@@ -85,7 +77,7 @@ class DevelopmentTools
     end
 
     def clear_version_cache
-      @gcc_40_build_version = @gcc_42_build_version = @llvm_build_version = nil
+      @gcc_40_build_version = @gcc_42_build_version = nil
       @clang_version = @clang_build_version = nil
       @non_apple_gcc_version = {}
     end

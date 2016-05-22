@@ -149,11 +149,6 @@ module Stdenv
     end
   end
 
-  def llvm
-    super
-    set_cpu_cflags
-  end
-
   def clang
     super
     replace_in_cflags(/-Xarch_#{Hardware::CPU.arch_32_bit} (-march=\S*)/, '\1')

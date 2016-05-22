@@ -81,12 +81,12 @@ class InstallTests < Homebrew::TestCase
   def test_not_poured_from_bottle_when_compiler_specified
     assert_nil ARGV.cc
 
-    cc_arg = "--cc=llvm-gcc"
+    cc_arg = "--cc=clang"
     ARGV << cc_arg
     begin
       temporary_install(TestballBottle.new) do |f|
         tab = Tab.for_formula(f)
-        assert_equal "llvm", tab.compiler
+        assert_equal "clang", tab.compiler
       end
     ensure
       ARGV.delete_if { |x| x == cc_arg }

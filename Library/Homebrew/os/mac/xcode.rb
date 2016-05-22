@@ -105,22 +105,7 @@ module OS
         # Xcode.version would always be non-nil. This is deprecated, and will
         # be removed in a future version. To remain compatible, guard usage of
         # Xcode.version with an Xcode.installed? check.
-        case DevelopmentTools.llvm_build_version.to_i
-        when 1..2063 then "3.1.0"
-        when 2064..2065 then "3.1.4"
-        when 2066..2325
-          # we have no data for this range so we are guessing
-          "3.2.0"
-        when 2326
-          # also applies to "3.2.3"
-          "3.2.4"
-        when 2327..2333 then "3.2.5"
-        when 2335
-          # this build number applies to 3.2.6, 4.0 and 4.1
-          # https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Xcode.md
-          "4.0"
-        else
-          case (DevelopmentTools.clang_version.to_f * 10).to_i
+        case (DevelopmentTools.clang_version.to_f * 10).to_i
           when 0       then "dunno"
           when 1..14   then "3.2.2"
           when 15      then "3.2.4"
@@ -139,7 +124,6 @@ module OS
           when 70      then "7.0"
           when 73      then "7.3"
           else "7.3"
-          end
         end
       end
 

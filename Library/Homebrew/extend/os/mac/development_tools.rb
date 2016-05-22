@@ -19,14 +19,11 @@ class DevelopmentTools
       # over the system's GCC 4.0
       when /^gcc-4.0/ then gcc_42_build_version ? :gcc : :gcc_4_0
       when /^gcc/ then :gcc
-      when /^llvm/ then :llvm
       when "clang" then :clang
       else
         # guess :(
         if Xcode.version >= "4.3"
           :clang
-        elsif Xcode.version >= "4.2"
-          :llvm
         else
           :gcc
         end

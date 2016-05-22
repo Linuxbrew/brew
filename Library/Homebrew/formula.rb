@@ -1988,12 +1988,7 @@ class Formula
 
     # Marks the {Formula} as failing with a particular compiler so it will fall back to others.
     # For Apple compilers, this should be in the format:
-    # <pre>fails_with :llvm do # :llvm is really llvm-gcc
-    #   build 2334
-    #   cause "Segmentation fault during linking."
-    # end
-    #
-    # fails_with :clang do
+    # <pre>fails_with :clang do
     #   build 600
     #   cause "multiple configure and compile errors"
     # end</pre>

@@ -80,7 +80,7 @@ module OS
     alias_method :gcc_build_version, :gcc_42_build_version
 
     def llvm_build_version
-      DevelopmentTools.llvm_build_version
+      # no-op. DSL supported, compiler is not.
     end
 
     def clang_version
