@@ -26,9 +26,12 @@ EOS
 
 _create_lock() {
   local lock_fd="$1"
-  if [[ -n "$(which ruby)" ]]
+  local ruby="/usr/bin/ruby"
+  [[ -x "$ruby" ]] || local ruby="$(which ruby 2>/dev/null)"
+
+  if [[ -n "$ruby" ]]
   then
-    ruby -e "File.new($lock_fd).flock(File::LOCK_EX | File::LOCK_NB) || exit(1)"
+    "$ruby" -e "File.new($lock_fd).flock(File::LOCK_EX | File::LOCK_NB) || exit(1)"
   elif [[ -n "$(which flock)" ]]
   then
     flock -n "$lock_fd"
