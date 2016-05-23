@@ -35,4 +35,25 @@ class ShellSmokeTest < Homebrew::TestCase
     assert_equal "\\$", Utils::Shell.csh_quote("$")
     assert_equal "word", Utils::Shell.csh_quote("word")
   end
+
+  def prepend_path_shell(shell, path, fragment)
+    original_shell = ENV["SHELL"]
+    ENV["SHELL"] = shell
+
+    prepend_message = Utils::Shell.prepend_path_in_shell_profile(path)
+    assert(
+      prepend_message.start_with?(fragment),
+      "#{shell}: expected #{prepend_message} to match #{fragment}"
+    )
+
+    ENV["SHELL"] = original_shell
+  end
+
+  def test_prepend_path_in_shell_profile()
+    prepend_path_shell "/bin/tcsh", "/path", "echo 'setenv PATH /path"
+
+    prepend_path_shell "/bin/bash", "/path", "echo 'export PATH=\"/path"
+
+    prepend_path_shell "/usr/local/bin/fish", "/path", "echo 'set -g fish_user_paths \"/path\" $fish_user_paths' >>"
+  end
 end

@@ -13,9 +13,8 @@ module Homebrew
     ENV.universal_binary if ARGV.build_universal?
 
     shell_value = ARGV.value("shell")
-    has_plain = ARGV.include?("--plain")
 
-    if has_plain
+    if ARGV.include?("--plain")
       shell = nil
     elsif shell_value.nil?
       # legacy behavior

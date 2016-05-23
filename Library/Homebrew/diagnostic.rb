@@ -496,7 +496,7 @@ module Homebrew
         <<-EOS.undent
           Homebrew's bin was not found in your PATH.
           Consider setting the PATH for example like so
-            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin:$PATH")}
+            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin")}
         EOS
       end
 
@@ -511,7 +511,7 @@ module Homebrew
           Homebrew's sbin was not found in your PATH but you have installed
           formulae that put executables in #{HOMEBREW_PREFIX}/sbin.
           Consider setting the PATH for example like so
-            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/sbin:$PATH")}
+            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/sbin")}
         EOS
       end
 

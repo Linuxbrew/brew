@@ -10,8 +10,10 @@ module Utils
   }.freeze
 
   module Shell
+    UNSAFE_SHELL_CHAR = /([^A-Za-z0-9_\-.,:\/@\n])/
+
     # take a path and heuristically convert it
-    # to a shell, return nil if there's no match
+    # to a shell name, return nil if there's no match
     def self.path_to_shell(path)
       # we only care about the basename
       shell_name = File.basename(path)
@@ -34,7 +36,8 @@ module Utils
       return "''" if str.empty?
       str = str.dup
       # anything that isn't a known safe character is padded
-      str.gsub!(/([^A-Za-z0-9_\-.,:\/@\n])/, "\\\\" + "\\1")
+      str.gsub!(UNSAFE_SHELL_CHAR, "\\\\" + "\\1")
+      # newlines have to be specially quoted in csh
       str.gsub!(/\n/, "'\\\n'")
       str
     end
@@ -45,7 +48,7 @@ module Utils
       return "''" if str.empty?
       str = str.dup
       # anything that isn't a known safe character is padded
-      str.gsub!(/([^A-Za-z0-9_\-.,:\/@\n])/, "\\\\" + "\\1")
+      str.gsub!(UNSAFE_SHELL_CHAR, "\\\\" + "\\1")
       str.gsub!(/\n/, "'\n'")
       str
     end
@@ -61,7 +64,7 @@ module Utils
         # and a literal \ can be included via \\
         "set -gx #{key} \"#{sh_quote(value)}\""
       when :csh, :tcsh
-        "setenv #{key} #{csh_quote(value)}"
+        "setenv #{key} #{csh_quote(value)};"
       end
     end
 
@@ -72,12 +75,12 @@ module Utils
 
     def self.prepend_path_in_shell_profile(path)
       case preferred_shell 
-      when :bash, :ksh, :sh, :zsh
-        "echo 'export PATH=\"#{sh_quote(path)}:$PATH >> #{shell_profile}"
+      when :bash, :ksh, :sh, :zsh, nil
+        "echo 'export PATH=\"#{sh_quote(path)}:$PATH'\" >> #{shell_profile}"
       when :csh, :tcsh
         "echo 'setenv PATH #{csh_quote(path)}:$PATH' >> #{shell_profile}"
       when :fish
-        "echo 'set -g fish_user_paths $fish_user_paths >> #{sh_quote(path)}' >> #{shell_profile}"
+        "echo 'set -g fish_user_paths \"#{sh_quote(path)}\" $fish_user_paths' >> #{shell_profile}"
       end
     end
   end
