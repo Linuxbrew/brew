@@ -81,7 +81,7 @@ then
   fi
 fi
 
-HOMEBREW_CURL="/usr/bin/curl"
+[[ -z "$HOMEBREW_CURL" ]] && HOMEBREW_CURL="/usr/bin/curl"
 if [[ -n "$HOMEBREW_OSX" ]]
 then
   HOMEBREW_PROCESSOR="$(uname -p)"
