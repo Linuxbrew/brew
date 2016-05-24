@@ -713,6 +713,21 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     end
   end
 
+  def source_modified_time
+    # Look for the file timestamps under {#cached_location} because
+    # newly-unpacked directory can have timestamps of the moment of copying.
+    # Filter CVS's files because the timestamp for each of them is the moment
+    # of clone.
+    max_mtime = Time.at(0)
+    cached_location.find do |f|
+      Find.prune if f.directory? && f.basename.to_s == "CVS"
+      next unless f.file?
+      mtime = f.mtime
+      max_mtime = mtime if mtime > max_mtime
+    end
+    max_mtime
+  end
+
   def stage
     cp_r File.join(cached_location, "."), Dir.pwd
   end
