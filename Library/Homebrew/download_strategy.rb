@@ -153,6 +153,12 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     version.head?
   end
 
+  # Return last commit's unique identifier for the repository.
+  # Return most recent modified timestamp unless overridden.
+  def last_commit
+    source_modified_time.to_i.to_s
+  end
+
   private
 
   def cache_tag
@@ -501,6 +507,10 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
+  def last_commit
+    Utils.popen_read("svn", "info", "--show-item", "revision", cached_location.to_s).strip
+  end
+
   private
 
   def repo_url
@@ -579,6 +589,10 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def source_modified_time
     Time.parse Utils.popen_read("git", "--git-dir", git_dir, "show", "-s", "--format=%cD")
+  end
+
+  def last_commit
+    Utils.popen_read("git", "--git-dir", git_dir ,"rev-parse", "HEAD").chomp
   end
 
   private
@@ -818,6 +832,10 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
     Time.parse Utils.popen_read("hg", "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
   end
 
+  def last_commit
+    Utils.popen_read("hg", "parent", "--template", "{node}", "-R", cached_location.to_s)
+  end
+
   private
 
   def cache_tag
@@ -852,6 +870,10 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
 
   def source_modified_time
     Time.parse Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+  end
+
+  def last_commit
+    Utils.popen_read("bzr", "revno", cached_location.to_s).chomp
   end
 
   private
@@ -889,6 +911,10 @@ class FossilDownloadStrategy < VCSDownloadStrategy
 
   def source_modified_time
     Time.parse Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
+  end
+
+  def last_commit
+    Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
   end
 
   private
