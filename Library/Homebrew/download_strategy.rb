@@ -592,7 +592,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def last_commit
-    Utils.popen_read("git", "--git-dir", git_dir ,"rev-parse", "HEAD").chomp
+    Utils.popen_read("git", "--git-dir", git_dir ,"rev-parse", "--short", "HEAD").chomp
   end
 
   private
