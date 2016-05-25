@@ -111,7 +111,16 @@ class Tap
 
   # The default remote path to this {Tap}.
   def default_remote
-    "https://github.com/#{user}/homebrew-#{repo}"
+    if OS.mac?
+      "https://github.com/#{user}/homebrew-#{repo}"
+    else
+      case "#{user}/#{repo}"
+      when "Homebrew/dupes"
+        "https://github.com/Linuxbrew/homebrew-#{repo}"
+      else
+        "https://github.com/#{user}/homebrew-#{repo}"
+      end
+    end
   end
 
   # True if this {Tap} is a git repository.
