@@ -28,6 +28,7 @@ class Tap
 
     # we special case homebrew so users don't have to shift in a terminal
     user = "Homebrew" if user == "homebrew"
+    user = "Linuxbrew" if user == "linuxbrew"
     repo = repo.strip_prefix "homebrew-"
 
     if user == "Homebrew" && (repo == "homebrew" || repo == "core") ||
@@ -103,13 +104,23 @@ class Tap
     if remote.nil?
       "#{user}/homebrew-#{repo}"
     else
-      remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1].capitalize
+      x = remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1]
+      (official? && !x.nil?) ? x.capitalize : x
     end
   end
 
   # The default remote path to this {Tap}.
   def default_remote
-    "https://github.com/#{user}/homebrew-#{repo}"
+    if OS.mac?
+      "https://github.com/#{user}/homebrew-#{repo}"
+    else
+      case "#{user}/#{repo}"
+      when "Homebrew/dupes"
+        "https://github.com/Linuxbrew/homebrew-#{repo}"
+      else
+        "https://github.com/#{user}/homebrew-#{repo}"
+      end
+    end
   end
 
   # True if this {Tap} is a git repository.
@@ -149,7 +160,7 @@ class Tap
   # e.g. `https://github.com/user/homebrew-repo/issues`
   def issues_url
     if official? || !custom_remote?
-      "https://github.com/#{user}/homebrew-#{repo}/issues"
+      "https://github.com/#{slug}/issues"
     end
   end
 
@@ -159,7 +170,7 @@ class Tap
 
   # True if this {Tap} is an official Homebrew tap.
   def official?
-    user == "Homebrew"
+    user == "Homebrew" || user == "Linuxbrew"
   end
 
   # Whether this tap is for Linux.
