@@ -22,7 +22,7 @@ class DevelopmentTools
       when "clang" then :clang
       else
         # guess :(
-        if Xcode.version >= "4.3"
+        if MacOS::Xcode.version >= "4.3"
           :clang
         else
           :gcc
