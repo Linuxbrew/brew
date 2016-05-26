@@ -426,12 +426,15 @@ If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do
 Uninstall then install \fIformula\fR
 .
 .TP
-\fBsearch\fR, \fB\-S\fR
+\fBsearch\fR
 Display all locally available formulae for brewing (including tapped ones)\. No online search is performed if called without arguments\.
 .
 .TP
-\fBsearch\fR, \fB\-S\fR \fItext\fR|\fB/\fR\fItext\fR\fB/\fR
+\fBsearch\fR [\fB\-\-desc\fR] \fItext\fR|\fB/\fR\fItext\fR\fB/\fR
 Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is surrounded with slashes, then it is interpreted as a regular expression\. The search for \fItext\fR is extended online to some popular taps\.
+.
+.IP
+If \fB\-\-desc\fR is passed, browse available packages matching \fItext\fR including a description for each\.
 .
 .TP
 \fBsearch\fR (\fB\-\-debian\fR|\fB\-\-fedora\fR|\fB\-\-fink\fR|\fB\-\-macports\fR|\fB\-\-opensuse\fR|\fB\-\-ubuntu\fR) \fItext\fR

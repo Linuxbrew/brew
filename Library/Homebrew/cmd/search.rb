@@ -1,11 +1,14 @@
-#:  * `search`, `-S`:
+#:  * `search`:
 #:    Display all locally available formulae for brewing (including tapped ones).
 #:    No online search is performed if called without arguments.
 #:
-#:  * `search`, `-S` <text>|`/`<text>`/`:
+#:  * `search` [`--desc`] <text>|`/`<text>`/`:
 #:    Perform a substring search of formula names for <text>. If <text> is
 #:    surrounded with slashes, then it is interpreted as a regular expression.
 #:    The search for <text> is extended online to some popular taps.
+#:
+#:    If `--desc` is passed, browse available packages matching <text> including a
+#:    description for each.
 #:
 #:  * `search` (`--debian`|`--fedora`|`--fink`|`--macports`|`--opensuse`|`--ubuntu`) <text>:
 #:    Search for <text> in the given package manager's list.
