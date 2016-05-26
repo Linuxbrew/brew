@@ -218,7 +218,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     when :p7zip
       safe_system "7zr", "x", cached_location
     else
-      cp cached_location, basename_without_params
+      cp cached_location, basename_without_params, :preserve => true
     end
   end
 
@@ -416,7 +416,7 @@ end
 # Useful for installing jars.
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
-    cp cached_location, basename_without_params
+    cp cached_location, basename_without_params, :preserve => true
   end
 end
 
@@ -573,7 +573,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def stage
     super
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
   end
 
   def source_modified_time
@@ -714,8 +714,6 @@ class CVSDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    # Look for the file timestamps under {#cached_location} because
-    # newly-unpacked directory can have timestamps of the moment of copying.
     # Filter CVS's files because the timestamp for each of them is the moment
     # of clone.
     max_mtime = Time.at(0)
@@ -729,7 +727,7 @@ class CVSDownloadStrategy < VCSDownloadStrategy
   end
 
   def stage
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
   end
 
   private
@@ -814,7 +812,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   def stage
     # The export command doesn't work on checkouts
     # See https://bugs.launchpad.net/bzr/+bug/897511
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
     rm_r ".bzr"
   end
 
