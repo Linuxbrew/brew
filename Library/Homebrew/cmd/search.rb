@@ -1,4 +1,4 @@
-#:  * `search`:
+#:  * `search`, `-S`:
 #:    Display all locally available formulae for brewing (including tapped ones).
 #:    No online search is performed if called without arguments.
 #:
