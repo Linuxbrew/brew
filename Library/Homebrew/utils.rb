@@ -242,7 +242,7 @@ module Homebrew
     end
   end
 
-  def self.install_gem_setup_path!(gem, version = nil, executable = gem)
+  def self.install_gem_setup_path!(name, version = nil, executable = name)
     require "rubygems"
 
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
@@ -251,9 +251,9 @@ module Homebrew
     path.unshift("#{Gem.user_dir}/bin")
     ENV["PATH"] = path.join(File::PATH_SEPARATOR)
 
-    if Gem::Specification.find_all_by_name(gem, version).empty?
-      ohai "Installing or updating '#{gem}' gem"
-      install_args = %W[--no-ri --no-rdoc --user-install #{gem}]
+    if Gem::Specification.find_all_by_name(name, version).empty?
+      ohai "Installing or updating '#{name}' gem"
+      install_args = %W[--no-ri --no-rdoc --user-install #{name}]
       install_args << "--version" << version if version
 
       # Do `gem install [...]` without having to spawn a separate process or
@@ -267,12 +267,12 @@ module Homebrew
       rescue Gem::SystemExitException => e
         exit_code = e.exit_code
       end
-      odie "Failed to install/update the '#{gem}' gem." if exit_code != 0
+      odie "Failed to install/update the '#{name}' gem." if exit_code != 0
     end
 
     unless which executable
       odie <<-EOS.undent
-        The '#{gem}' gem is installed but couldn't find '#{executable}' in the PATH:
+        The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
         #{ENV["PATH"]}
       EOS
     end
