@@ -284,17 +284,6 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     ohai "Downloading #{@url}"
 
     unless cached_location.exist?
-      urls = actual_urls
-      unless urls.empty?
-        ohai "Downloading from #{urls.last}"
-        if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && @url.start_with?("https://") &&
-           urls.any? { |u| !u.start_with? "https://" }
-          puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
-          raise CurlDownloadStrategyError.new(@url)
-        end
-        @url = urls.last
-      end
-
       had_incomplete_download = temporary_path.exist?
       begin
         _fetch
@@ -334,6 +323,17 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   # Private method, can be overridden if needed.
   def _fetch
+    urls = actual_urls
+    unless urls.empty?
+      ohai "Downloading from #{urls.last}"
+      if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && @url.start_with?("https://") &&
+         urls.any? { |u| !u.start_with? "https://" }
+        puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
+        raise CurlDownloadStrategyError.new(@url)
+      end
+      @url = urls.last
+    end
+
     curl @url, "-C", downloaded_size, "-o", temporary_path
   end
 
