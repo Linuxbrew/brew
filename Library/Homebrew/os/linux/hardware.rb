@@ -70,8 +70,10 @@ module LinuxCPUs
         end
       when 0x0f
         case cpu_model
-        when 0x06, 0x03, 0x04
-          :core # Presler and Prescott
+        when 0x06
+          :presler
+        when 0x03, 0x04
+          :core # Prescott
         else
           cpu_family_model
         end
