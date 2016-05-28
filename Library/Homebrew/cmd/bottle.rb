@@ -366,12 +366,14 @@ module Homebrew
             update_or_add = "update"
             if ARGV.include? "--keep-old"
               mismatches = []
-              s =~ /  bottle do(.+?)end\n/m
-              bottle_block_contents = $1
+              bottle_block_contents = s[/  bottle do(.+?)end\n/m, 1]
               bottle_block_contents.lines.each do |line|
                 line = line.strip
                 next if line.empty?
                 key, value, _, tag = line.split " ", 4
+                valid_key = %w[root_url prefix cellar revision sha1 sha256].include? key
+                next unless valid_key
+
                 value = value.to_s.delete ":'\""
                 tag = tag.to_s.delete ":"
 
@@ -397,7 +399,9 @@ module Homebrew
             string = s.sub!(/  bottle do.+?end\n/m, output)
             odie "Bottle block update failed!" unless string
           else
-            odie "--keep-old was passed but there was no existing bottle block!"
+            if ARGV.include? "--keep-old"
+              odie "--keep-old was passed but there was no existing bottle block!"
+            end
             puts output
             update_or_add = "add"
             if s.include? "stable do"
