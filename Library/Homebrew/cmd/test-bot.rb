@@ -821,7 +821,7 @@ module Homebrew
     formula_packaged = {}
 
     bottles_hash = json_files.reduce({}) do |hash, json_file|
-      hash.merge! Utils::JSON.load(IO.read(json_file))
+      deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
     end
 
     bottles_hash.each do |formula_name, bottle_hash|
