@@ -633,11 +633,11 @@ module Homebrew
       return if @skip_homebrew
 
       ruby_two = RUBY_VERSION.split(".").first.to_i >= 2
-      tests_args = []
-      tests_args << "--coverage" if ruby_two && ENV["TRAVIS"]
-      test "brew", "tests", *tests_args
 
       if @tap.nil?
+        tests_args = []
+        tests_args << "--coverage" if ruby_two && ENV["TRAVIS"]
+        test "brew", "tests", *tests_args
         test "brew", "tests", "--no-compat"
       elsif @tap.core_tap?
         readall_args = []
