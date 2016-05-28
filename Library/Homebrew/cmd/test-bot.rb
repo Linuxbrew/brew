@@ -114,7 +114,7 @@ module Homebrew
     end
 
     def command_short
-      (@command - %w[brew --force --retry --verbose --build-bottle --rb]).join(" ")
+      (@command - %w[brew --force --retry --verbose --build-bottle --json]).join(" ")
     end
 
     def passed?
@@ -570,15 +570,15 @@ module Homebrew
       test "brew", "audit", *audit_args
       if install_passed
         if formula.stable? && !ARGV.include?("--fast") && !ARGV.include?("--no-bottle") && !formula.bottle_disabled?
-          bottle_args = ["--verbose", "--rb", formula_name]
+          bottle_args = ["--verbose", "--json", formula_name]
           bottle_args << "--keep-old" if ARGV.include? "--keep-old"
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.has_output?
             bottle_filename =
               bottle_step.output.gsub(/.*(\.\/\S+#{Utils::Bottles::native_regex}).*/m, '\1')
-            bottle_rb_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".rb")
-            bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_rb_filename]
+            bottle_json_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".json")
+            bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_json_filename]
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
             test "brew", "bottle", *bottle_merge_args
             test "brew", "uninstall", "--force", formula_name
@@ -768,6 +768,9 @@ module Homebrew
   end
 
   def test_ci_upload(tap)
+    # Don't trust formulae we're uploading
+    ENV["HOMEBREW_DISABLE_LOAD_FORMULA"] = "1"
+
     jenkins = ENV["JENKINS_HOME"]
     job = ENV["UPSTREAM_JOB_NAME"]
     id = ENV["UPSTREAM_BUILD_ID"]
@@ -779,14 +782,13 @@ module Homebrew
       raise "Missing BINTRAY_USER or BINTRAY_KEY variables!"
     end
 
-    # Don't pass keys/cookies to subprocesses..
+    # Don't pass keys/cookies to subprocesses
     ENV["BINTRAY_KEY"] = nil
     ENV["HUDSON_SERVER_COOKIE"] = nil
     ENV["JENKINS_SERVER_COOKIE"] = nil
     ENV["HUDSON_COOKIE"] = nil
 
     ARGV << "--verbose"
-    ARGV << "--keep-old" if ENV["UPSTREAM_BOTTLE_KEEP_OLD"]
     ARGV << "--legacy" if ENV["UPSTREAM_BOTTLE_LEGACY"]
 
     bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
@@ -817,53 +819,58 @@ module Homebrew
       end
     end
 
-    bottle_args = ["--merge", "--write", *Dir["*.bottle.rb"]]
-    bottle_args << "--keep-old" if ARGV.include? "--keep-old"
-    system "brew", "bottle", *bottle_args
+    json_files = Dir.glob("*.bottle.json")
+    system "brew", "bottle", "--merge", "--write", *json_files
 
     remote = "git@github.com:BrewTestBot/homebrew-#{tap.repo}.git"
-    tag = pr ? "pr-#{pr}" : "testing-#{number}"
+    git_tag = pr ? "pr-#{pr}" : "testing-#{number}"
+    safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{git_tag}"
 
-    bintray_repo = Utils::Bottles::Bintray.repository(tap)
-    bintray_repo_url = "https://api.bintray.com/packages/homebrew/#{bintray_repo}"
     formula_packaged = {}
 
-    Dir.glob("*.bottle*.tar.gz") do |filename|
-      formula_name, canonical_formula_name = Utils::Bottles.resolve_formula_names filename
-      formula = Formulary.factory canonical_formula_name
-      version = formula.pkg_version
-      bintray_package = Utils::Bottles::Bintray.package formula_name
+    bottles_hash = json_files.reduce({}) do |hash, json_file|
+      hash.merge! Utils::JSON.load(IO.read(json_file))
+    end
 
-      if system "curl", "-I", "--silent", "--fail", "--output", "/dev/null",
-                "#{BottleSpecification::DEFAULT_DOMAIN}/#{bintray_repo}/#{filename}"
-        raise <<-EOS.undent
-          #{filename} is already published. Please remove it manually from
-          https://bintray.com/homebrew/#{bintray_repo}/#{bintray_package}/view#files
-        EOS
-      end
+    bottles_hash.each do |formula_name, bottle_hash|
+      version = bottle_hash["formula"]["pkg_version"]
+      bintray_package = bottle_hash["bintray"]["package"]
+      bintray_repo = bottle_hash["bintray"]["repository"]
+      bintray_repo_url = "https://api.bintray.com/packages/homebrew/#{bintray_repo}"
 
-      unless formula_packaged[formula_name]
-        package_url = "#{bintray_repo_url}/#{bintray_package}"
-        unless system "curl", "--silent", "--fail", "--output", "/dev/null", package_url
-          package_blob = <<-EOS.undent
-            {"name": "#{bintray_package}",
-             "public_download_numbers": true,
-             "public_stats": true}
+      bottle_hash["bottle"]["tags"].each do |tag, tag_hash|
+        filename = tag_hash["filename"]
+        if system "curl", "-I", "--silent", "--fail", "--output", "/dev/null",
+                  "#{BottleSpecification::DEFAULT_DOMAIN}/#{bintray_repo}/#{filename}"
+          raise <<-EOS.undent
+            #{filename} is already published. Please remove it manually from
+            https://bintray.com/homebrew/#{bintray_repo}/#{bintray_package}/view#files
           EOS
-          curl "--silent", "--fail", "-u#{bintray_user}:#{bintray_key}",
-               "-H", "Content-Type: application/json",
-               "-d", package_blob, bintray_repo_url
-          puts
         end
-        formula_packaged[formula_name] = true
-      end
 
-      content_url = "https://api.bintray.com/content/homebrew"
-      content_url += "/#{bintray_repo}/#{bintray_package}/#{version}/#{filename}"
-      content_url += "?override=1"
-      curl "--silent", "--fail", "-u#{bintray_user}:#{bintray_key}",
-           "-T", filename, content_url
-      puts
+        unless formula_packaged[formula_name]
+          package_url = "#{bintray_repo_url}/#{bintray_package}"
+          unless system "curl", "--silent", "--fail", "--output", "/dev/null", package_url
+            package_blob = <<-EOS.undent
+              {"name": "#{bintray_package}",
+               "public_download_numbers": true,
+               "public_stats": true}
+            EOS
+            curl "--silent", "--fail", "-u#{bintray_user}:#{bintray_key}",
+                 "-H", "Content-Type: application/json",
+                 "-d", package_blob, bintray_repo_url
+            puts
+          end
+          formula_packaged[formula_name] = true
+        end
+
+        content_url = "https://api.bintray.com/content/homebrew"
+        content_url += "/#{bintray_repo}/#{bintray_package}/#{version}/#{filename}"
+        content_url += "?override=1"
+        curl "--silent", "--fail", "-u#{bintray_user}:#{bintray_key}",
+             "-T", filename, content_url
+        puts
+      end
     end
 
     safe_system "git", "tag", "--force", tag

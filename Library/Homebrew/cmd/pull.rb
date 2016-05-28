@@ -119,7 +119,7 @@ module Homebrew
       end
       patch_puller.apply_patch
 
-      changed_formulae = []
+      changed_formulae_names = []
 
       if tap
         Utils.popen_read(
@@ -128,7 +128,7 @@ module Homebrew
         ).each_line do |line|
           name = "#{tap.name}/#{File.basename(line.chomp, ".rb")}"
           begin
-            changed_formulae << Formula[name]
+            changed_formulae_names << name
           # Make sure we catch syntax errors.
           rescue Exception
             next
@@ -137,7 +137,10 @@ module Homebrew
       end
 
       fetch_bottles = false
-      changed_formulae.each do |f|
+      changed_formulae_names.each do |name|
+        next if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+
+        f = Formula[name]
         if ARGV.include? "--bottle"
           if f.bottle_unneeded?
             ohai "#{f}: skipping unneeded bottle."
@@ -164,12 +167,16 @@ module Homebrew
         message += "\n#{close_message}" unless message.include? close_message
       end
 
-      if changed_formulae.empty?
+      if changed_formulae_names.empty?
         odie "cannot bump: no changed formulae found after applying patch" if do_bump
         is_bumpable = false
       end
-      if is_bumpable && !ARGV.include?("--clean")
-        formula = changed_formulae.first
+
+      is_bumpable = false if ARGV.include?("--clean")
+      is_bumpable = false if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+
+      if is_bumpable
+        formula = Formula[changed_formulae_names.first]
         new_versions = current_versions_from_info_external(patch_changes[:formulae].first)
         orig_subject = message.empty? ? "" : message.lines.first.chomp
         bump_subject = subject_for_bump(formula, old_versions, new_versions)
@@ -219,7 +226,7 @@ module Homebrew
 
         # Publish bottles on Bintray
         unless ARGV.include? "--no-publish"
-          published = publish_changed_formula_bottles(tap, changed_formulae)
+          published = publish_changed_formula_bottles(tap, changed_formulae_names)
           bintray_published_formulae.concat(published)
         end
       end
@@ -239,11 +246,16 @@ module Homebrew
 
   private
 
-  def publish_changed_formula_bottles(tap, changed_formulae)
+  def publish_changed_formula_bottles(tap, changed_formulae_names)
+    if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+      raise "Need to load formulae to publish them!"
+    end
+
     published = []
     bintray_creds = { :user => ENV["BINTRAY_USER"], :key => ENV["BINTRAY_KEY"] }
     if bintray_creds[:user] && bintray_creds[:key]
-      changed_formulae.each do |f|
+      changed_formulae_names.each do |name|
+        f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
         ohai "Publishing on Bintray: #{f.name} #{f.pkg_version}"
         publish_bottle_file_on_bintray(f, bintray_creds)
@@ -493,6 +505,11 @@ module Homebrew
   # version of a formula.
   def verify_bintray_published(formulae_names)
     return if formulae_names.empty?
+
+    if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+      raise "Need to load formulae to verify their publication!"
+    end
+
     ohai "Verifying bottles published on Bintray"
     formulae = formulae_names.map { |n| Formula[n] }
     max_retries = 300 # shared among all bottles
