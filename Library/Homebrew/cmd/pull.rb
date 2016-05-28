@@ -190,15 +190,7 @@ module Homebrew
           "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
         end
 
-        bottle_commit_fallbacked = false
-        begin
-          curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
-        rescue ErrorDuringExecution
-          raise if bottle_commit_fallbacked
-          bottle_commit_url = "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
-          bottle_commit_fallbacked = true
-          retry
-        end
+        curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
 
         safe_system "git", "checkout", "--quiet", "-B", bottle_branch, orig_revision
         pull_patch bottle_commit_url, "bottle commit"
