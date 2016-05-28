@@ -87,8 +87,6 @@ module Homebrew
       rescue
       end
     end
-
-    CoreTap.instance
   end
 
   class Step
@@ -219,8 +217,8 @@ module Homebrew
       @added_formulae = []
       @modified_formula = []
       @steps = []
-      @tap = options.fetch(:tap, CoreTap.instance)
-      @repository = @tap.path
+      @tap = options[:tap]
+      @repository = @tap ? @tap.path : HOMEBREW_REPOSITORY
       @skip_homebrew = options.fetch(:skip_homebrew, false)
 
       if quiet_system "git", "-C", @repository.to_s, "rev-parse", "--verify", "-q", argument
@@ -273,6 +271,7 @@ module Homebrew
       end
 
       def diff_formulae(start_revision, end_revision, path, filter)
+        return unless @tap
         git(
           "diff-tree", "-r", "--name-only", "--diff-filter=#{filter}",
           start_revision, end_revision, "--", path
@@ -360,6 +359,7 @@ module Homebrew
 
       return unless diff_start_sha1 != diff_end_sha1
       return if @url && steps.last && !steps.last.passed?
+      return unless @tap
 
       formula_path = @tap.formula_dir.to_s
       @added_formulae += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "A")
@@ -631,16 +631,18 @@ module Homebrew
     def homebrew
       @category = __method__
       return if @skip_homebrew
-      test "brew", "tests"
-      if @tap.core_tap?
-        tests_args = ["--no-compat"]
-        readall_args = ["--aliases"]
-        if RUBY_VERSION.split(".").first.to_i >= 2
-          tests_args << "--coverage" if ENV["TRAVIS"]
-          readall_args << "--syntax"
-        end
-        test "brew", "tests", *tests_args
-        test "brew", "readall", *readall_args
+
+      ruby_two = RUBY_VERSION.split(".").first.to_i >= 2
+      tests_args = []
+      tests_args << "--coverage" if ruby_two && ENV["TRAVIS"]
+      test "brew", "tests", *tests_args
+
+      if @tap.nil?
+        test "brew", "tests", "--no-compat"
+      elsif @tap.core_tap?
+        readall_args = []
+        readall_args << "--syntax" if ruby_two
+        test "brew", "readall", "--aliases", *readall_args
       else
         test "brew", "readall", @tap.name
       end
@@ -762,6 +764,8 @@ module Homebrew
   end
 
   def test_ci_upload(tap)
+    raise "Need a tap to upload!" unless tap
+
     # Don't trust formulae we're uploading
     ENV["HOMEBREW_DISABLE_LOAD_FORMULA"] = "1"
 
@@ -906,7 +910,7 @@ module Homebrew
     # because Formula parsing and/or git commit hash lookup depends on it.
     # At the same time, make sure Tap is not a shallow clone.
     # bottle revision and bottle upload rely on full clone.
-    safe_system "brew", "tap", tap.name, "--full"
+    safe_system "brew", "tap", tap.name, "--full" if tap
 
     if ARGV.include? "--ci-upload"
       return test_ci_upload(tap)
