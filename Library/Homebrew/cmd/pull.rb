@@ -4,8 +4,7 @@
 # Usage: brew pull [options...] <patch-source> [<patch-source> ...]
 #
 # Each <patch-source> may be one of:
-#   * The ID number of a PR (Pull Request) in the homebrew/core or legacy-homebrew
-#       GitHub repo
+#   * The ID number of a PR (Pull Request) in the homebrew/core GitHub repo
 #   * The URL of a PR on GitHub, using either the web page or API URL
 #       formats. In this form, the PR may be on homebrew/brew, homebrew/core, or
 #       any tap.
@@ -20,8 +19,6 @@
 #   --resolve:     When a patch fails to apply, leave in progress and allow user to
 #                  resolve, instead of aborting
 #   --branch-okay: Do not warn if pulling to a branch besides master (useful for testing)
-#   --legacy:      Pull legacy formula PR from Homebrew/legacy-homebrew
-#                  (TODO remove it when it's no longer necessary)
 #   --no-pbcopy:   Do not copy anything to the system clipboard
 #   --no-publish:  Do not publish bottles to Bintray
 
@@ -52,11 +49,7 @@ module Homebrew
     ARGV.named.each do |arg|
       if arg.to_i > 0
         issue = arg
-        if ARGV.include? "--legacy"
-          url = "https://github.com/Homebrew/legacy-homebrew/pull/#{arg}"
-        else
-          url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
-        end
+        url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
         tap = CoreTap.instance
       elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
@@ -67,11 +60,9 @@ module Homebrew
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/#{repo}/pull/#{issue}"
         tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
-        tap = CoreTap.instance if ARGV.include?("--legacy")
       elsif (url_match = arg.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
         url, user, repo, issue = *url_match
         tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
-        tap = CoreTap.instance if ARGV.include?("--legacy")
       else
         odie "Not a GitHub pull request or commit: #{arg}"
       end
@@ -101,10 +92,6 @@ module Homebrew
       patch_puller = PatchPuller.new(url)
       patch_puller.fetch_patch
       patch_changes = files_changed_in_patch(patch_puller.patchpath, tap)
-
-      if ARGV.include?("--legacy") && patch_changes[:others].reject { |f| f.start_with? "Library/Aliases" }.any?
-        odie "Cannot merge legacy PR!"
-      end
 
       is_bumpable = patch_changes[:formulae].length == 1 && patch_changes[:others].empty?
       if do_bump
@@ -158,11 +145,7 @@ module Homebrew
       orig_message = message = `git log HEAD^.. --format=%B`
       if issue && !ARGV.include?("--clean")
         ohai "Patch closes issue ##{issue}"
-        if ARGV.include?("--legacy")
-          close_message = "Closes Homebrew/legacy-homebrew##{issue}."
-        else
-          close_message = "Closes ##{issue}."
-        end
+        close_message = "Closes ##{issue}."
         # If this is a pull request, append a close message.
         message += "\n#{close_message}" unless message.include? close_message
       end
@@ -211,7 +194,7 @@ module Homebrew
         begin
           curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
         rescue ErrorDuringExecution
-          raise if !ARGV.include?("--legacy") || bottle_commit_fallbacked
+          raise if bottle_commit_fallbacked
           bottle_commit_url = "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
           bottle_commit_fallbacked = true
           retry
@@ -312,18 +295,10 @@ module Homebrew
 
       # Fall back to three-way merge if patch does not apply cleanly
       patch_args << "-3"
-      patch_args << "-p2" if ARGV.include?("--legacy") && !base_url.include?("BrewTestBot/homebrew-core")
       patch_args << patchpath
-
-      start_revision = `git rev-parse HEAD`.strip
 
       begin
         safe_system "git", "am", *patch_args
-        if ARGV.include?("--legacy")
-          safe_system "git", "filter-branch", "-f", "--msg-filter",
-                             "sed -E -e \"s/ (#[0-9]+)/ Homebrew\\/homebrew\\1/g\"",
-                             "#{start_revision}..HEAD"
-        end
       rescue ErrorDuringExecution
         if ARGV.include? "--resolve"
           odie "Patch failed to apply: try to resolve it."
@@ -348,7 +323,7 @@ module Homebrew
       files << $1 if line =~ %r{^\+\+\+ b/(.*)}
     end
     files.each do |file|
-      if (tap && tap.formula_file?(file)) || (ARGV.include?("--legacy") && file.start_with?("Library/Formula/"))
+      if tap && tap.formula_file?(file)
         formula_name = File.basename(file, ".rb")
         formulae << formula_name unless formulae.include?(formula_name)
       else
