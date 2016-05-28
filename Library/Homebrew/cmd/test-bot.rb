@@ -873,8 +873,8 @@ module Homebrew
       end
     end
 
-    safe_system "git", "tag", "--force", tag
-    safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{tag}"
+    safe_system "git", "tag", "--force", git_tag
+    safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
   end
 
   def sanitize_ARGV_and_ENV
