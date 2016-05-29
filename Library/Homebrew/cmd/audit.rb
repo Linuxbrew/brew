@@ -1168,7 +1168,7 @@ class ResourceAuditor
            %r{^http://(?:[^/]*\.)?freedesktop\.org}
         problem "Please use https:// for #{p}"
       when %r{^http://search\.(mcpan|cpan)\.org/CPAN/(.*)}i
-        problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"
+        problem "#{p} should be `https://cpan.metacpan.org/#{$2}`"
       when %r{^(http|ftp)://ftp\.gnome\.org/pub/gnome/(.*)}i
         problem "#{p} should be `https://download.gnome.org/#{$2}`"
       end
