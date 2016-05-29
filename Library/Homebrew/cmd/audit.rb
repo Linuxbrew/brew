@@ -903,7 +903,7 @@ class FormulaAuditor
     end
 
     if @strict
-      if line =~ /system (["'][^"' ]*(?:\s[^"' ]*)+["'])/
+      if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
         bad_system = $1
         unless %w[| < > & ; *].any? { |c| bad_system.include? c }
           good_system = bad_system.gsub(" ", "\", \"")
