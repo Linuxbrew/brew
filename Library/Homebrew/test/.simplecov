@@ -3,7 +3,7 @@
 SimpleCov.start do
   tests_path = File.dirname(__FILE__)
 
-  minimum_coverage 40
+  minimum_coverage 40 unless ENV["HOMEBREW_TESTS_ONLY"]
   coverage_dir File.expand_path("#{tests_path}/coverage")
   root File.expand_path("#{tests_path}/../../")
 

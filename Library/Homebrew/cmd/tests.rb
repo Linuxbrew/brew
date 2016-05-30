@@ -30,6 +30,7 @@ module Homebrew
       args = []
       args << "--trace" if ARGV.include? "--trace"
       if ARGV.value("only")
+        ENV["HOMEBREW_TESTS_ONLY"] = "1"
         test_name, test_method = ARGV.value("only").split("/", 2)
         args << "TEST=test_#{test_name}.rb"
         args << "TESTOPTS=--name=test_#{test_method}" if test_method
