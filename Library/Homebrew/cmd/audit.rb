@@ -1175,6 +1175,16 @@ class ResourceAuditor
       end
     end
 
+    # Prefer HTTP/S when possible over FTP protocol due to possible firewalls.
+    urls.each do |p|
+      case p
+      when %r{^ftp://ftp\.mirrorservice\.org}
+        problem "Please use https:// for #{p}"
+      when %r{^ftp://ftp\.cpan\.org/pub/CPAN(.*)}i
+        problem "#{p} should be `http://search.cpan.org/CPAN#{$1}`"
+      end
+    end
+
     # Check SourceForge urls
     urls.each do |p|
       # Skip if the URL looks like a SVN repo
