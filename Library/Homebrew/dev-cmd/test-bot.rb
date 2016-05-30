@@ -639,12 +639,9 @@ module Homebrew
         tests_args << "--coverage" if ruby_two && ENV["TRAVIS"]
         test "brew", "tests", *tests_args
         test "brew", "tests", "--no-compat"
-      elsif @tap.core_tap?
-        readall_args = []
-        readall_args << "--syntax" if ruby_two
-        test "brew", "readall", "--aliases", *readall_args
+        test "brew", "readall", "--syntax"
       else
-        test "brew", "readall", @tap.name
+        test "brew", "readall", "--aliases", @tap.name
       end
     end
 
