@@ -303,7 +303,7 @@ class FormulaAuditor
 
     same_name_tap_formulae.delete(full_name)
 
-    if same_name_tap_formulae.size > 0
+    unless same_name_tap_formulae.empty?
       problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
     end
   end
@@ -415,7 +415,7 @@ class FormulaAuditor
 
     desc = formula.desc
 
-    unless desc && desc.length > 0
+    unless desc && !desc.empty?
       problem "Formula should have a desc (Description)."
       return
     end
@@ -1198,7 +1198,7 @@ class ResourceAuditor
         problem "Don't use #{$1}use_mirror in SourceForge urls (url is #{p})."
       end
 
-      if p =~ /\/download$/
+      if p.end_with?("/download")
         problem "Don't use /download in SourceForge urls (url is #{p})."
       end
 
