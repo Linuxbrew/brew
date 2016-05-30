@@ -6,9 +6,6 @@ If a bottle is available and usable it will be downloaded and poured automatical
 
 Bottles will not be used if the user requests it (see above), if the formula requests it (with `pour_bottle?`), if any options are specified on installation (bottles are all compiled with default options), if the bottle is not up to date (e.g. lacking a checksum) or the bottle's `cellar` is not `:any` or equal to the current `HOMEBREW_CELLAR`.
 
-### Local Bottle Usage
-Bottles can also be cached locally and installed by path e.g. `brew install /Library/Caches/Homebrew/qt-4.8.4.mountain_lion.bottle.1.tar.gz`.
-
 ## Bottle Creation
 Bottles are currently created using the [Brew Test Bot](Brew-Test-Bot.md). We will be slowly adding them to all formulae.
 
