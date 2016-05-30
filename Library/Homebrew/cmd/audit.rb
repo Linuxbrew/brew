@@ -1163,6 +1163,7 @@ class ResourceAuditor
            %r{^http://www\.mirrorservice\.org/},
            %r{^http://launchpad\.net/},
            %r{^http://bitbucket\.org/},
+           %r{^http://cpan\.metacpan\.org/},
            %r{^http://hackage\.haskell\.org/},
            %r{^http://(?:[^/]*\.)?archive\.org},
            %r{^http://(?:[^/]*\.)?freedesktop\.org}
