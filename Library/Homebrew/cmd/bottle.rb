@@ -321,7 +321,7 @@ module Homebrew
             }
           },
           "bintray" => {
-            "package" => Utils::Bottles::Bintray.package(f.full_name),
+            "package" => Utils::Bottles::Bintray.package(f.name),
             "repository" => Utils::Bottles::Bintray.repository(f.tap),
           },
         },
