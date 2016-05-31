@@ -696,6 +696,39 @@ class GitDownloadStrategy < VCSDownloadStrategy
   def update_submodules
     quiet_safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
     quiet_safe_system "git", "submodule", "update", "--init", "--recursive"
+    fix_absolute_submodule_gitdir_references!
+  end
+
+  def fix_absolute_submodule_gitdir_references!
+    # When checking out Git repositories with recursive submodules, some Git
+    # versions create `.git` files with absolute instead of relative `gitdir:`
+    # pointers. This works for the cached location, but breaks various Git
+    # operations once the affected Git resource is staged, i.e. recursively
+    # copied to a new location. (This bug was introduced in Git 2.7.0 and fixed
+    # in 2.8.3. Clones created with affected version remain broken.)
+    # See https://github.com/Homebrew/homebrew-core/pull/1520 for an example.
+    submodule_dirs = Utils.popen_read(
+      "git", "submodule", "--quiet", "foreach", "--recursive", "pwd")
+    submodule_dirs.lines.map(&:chomp).each do |submodule_dir|
+      work_dir = Pathname.new(submodule_dir)
+
+      # Only check and fix if `.git` is a regular file, not a directory.
+      dot_git = work_dir/".git"
+      next unless dot_git.file?
+
+      git_dir = dot_git.read.chomp[/^gitdir: (.*)$/, 1]
+      if git_dir.nil?
+        onoe "Failed to parse '#{dot_git}'." if ARGV.homebrew_developer?
+        next
+      end
+
+      # Only attempt to fix absolute paths.
+      next unless git_dir.start_with?("/")
+
+      # Make the `gitdir:` reference relative to the working directory.
+      relative_git_dir = Pathname.new(git_dir).relative_path_from(work_dir)
+      dot_git.atomic_write("gitdir: #{relative_git_dir}\n")
+    end
   end
 end
 
