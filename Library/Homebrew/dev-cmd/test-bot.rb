@@ -893,6 +893,8 @@ module Homebrew
     end
 
     if ARGV.include? "--local"
+      ENV["HOMEBREW_CACHE"] = "#{ENV["HOME"]}/Library/Caches/Homebrew"
+      mkdir_p ENV["HOMEBREW_CACHE"]
       ENV["HOMEBREW_HOME"] = ENV["HOME"] = "#{Dir.pwd}/home"
       mkdir_p ENV["HOME"]
       ENV["HOMEBREW_LOGS"] = "#{Dir.pwd}/logs"
