@@ -552,6 +552,20 @@ class IntegrationCommandTests < Homebrew::TestCase
   def test_home
     assert_equal HOMEBREW_WWW,
                  cmd("home", {"HOMEBREW_BROWSER" => "echo"})
+
+    formula_file = CoreTap.new.formula_dir/"testball.rb"
+    formula_file.write <<-EOS.undent
+      class Testball < Formula
+        desc "Some test"
+        homepage "https://example.com/testball"
+        url "https://example.com/testball-0.1.tar.gz"
+      end
+    EOS
+
+    assert_equal Formula["testball"].homepage,
+                 cmd("home", "testball", {"HOMEBREW_BROWSER" => "echo"})
+  ensure
+    formula_file.unlink
   end
 
   def test_list
