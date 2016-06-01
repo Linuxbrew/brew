@@ -149,7 +149,13 @@ module Homebrew
     else
       ohai "Deleting #{legacy_cache}..."
       FileUtils.rm_rf legacy_cache
-      FileUtils.touch migration_attempted_file if legacy_cache.exist?
+      if legacy_cache.exist?
+        FileUtils.touch migration_attempted_file
+        opoo <<-EOS.undent
+          Failed to delete #{legacy_cache}.
+          Please do so manually.
+        EOS
+      end
     end
   end
 end
