@@ -23,7 +23,8 @@ module OS
         "2.7.54" => "2.7.5",
         "2.7.61" => "2.7.6",
         "2.7.73" => "2.7.7",
-        "2.7.86" => "2.7.8"
+        "2.7.86" => "2.7.8",
+        "2.7.94" => "2.7.9",
       }.freeze
 
       # This returns the version number of XQuartz, not of the upstream X.org.
@@ -50,7 +51,7 @@ module OS
         when "10.5"
           "2.6.3"
         else
-          "2.7.8"
+          "2.7.9"
         end
       end
 
