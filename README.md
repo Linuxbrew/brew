@@ -66,13 +66,13 @@ Installation
 Paste at a Terminal prompt:
 
 ``` sh
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/linuxbrew/go/install)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
 ```
 
 Or if you prefer:
 
 ```sh
-git clone https://github.com/Linuxbrew/linuxbrew.git ~/.linuxbrew
+git clone https://github.com/Linuxbrew/brew.git ~/.linuxbrew
 ```
 
 Add to your `.bashrc` or `.zshrc`:
