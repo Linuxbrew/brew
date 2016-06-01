@@ -149,6 +149,7 @@ module Homebrew
     else
       ohai "Deleting #{legacy_cache}..."
       FileUtils.rm_rf legacy_cache
+      FileUtils.touch migration_attempted_file if legacy_cache.exist?
     end
   end
 end
