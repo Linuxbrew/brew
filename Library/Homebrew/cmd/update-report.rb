@@ -123,7 +123,8 @@ module Homebrew
 
     # This directory could have been compromised if it's world-writable/
     # a symlink/owned by another user so don't copy files in those cases.
-    return if legacy_cache.world_writable?
+    world_writable = legacy_cache.stat.mode & 0777 == 0777
+    return if world_writable
     return if legacy_cache.symlink?
     return if !legacy_cache.owned? && legacy_cache.lstat.uid != 0
 
