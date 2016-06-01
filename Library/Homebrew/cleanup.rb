@@ -43,9 +43,9 @@ module Homebrew
       end
     end
 
-    def self.cleanup_cache
-      return unless HOMEBREW_CACHE.directory?
-      HOMEBREW_CACHE.children.each do |path|
+    def self.cleanup_cache(cache=HOMEBREW_CACHE)
+      return unless cache.directory?
+      cache.children.each do |path|
         if path.to_s.end_with? ".incomplete"
           cleanup_path(path) { path.unlink }
           next

@@ -1,27 +1,4 @@
-def cache
-  if ENV["HOMEBREW_CACHE"]
-    Pathname.new(ENV["HOMEBREW_CACHE"]).expand_path
-  else
-    # we do this for historic reasons, however the cache *should* be the same
-    # directory whichever user is used and whatever instance of brew is executed
-    home_cache = Pathname.new("~/Library/Caches/Homebrew").expand_path
-    if home_cache.directory? && home_cache.writable_real?
-      home_cache
-    else
-      Pathname.new("/Library/Caches/Homebrew").extend Module.new {
-        def mkpath
-          unless exist?
-            super
-            chmod 0775
-          end
-        end
-      }
-    end
-  end
-end
-
-HOMEBREW_CACHE = cache
-undef cache
+HOMEBREW_CACHE = Pathname.new(ENV["HOMEBREW_CACHE"] || "~/Library/Caches/Homebrew").expand_path
 
 # Where brews installed via URL are cached
 HOMEBREW_CACHE_FORMULA = HOMEBREW_CACHE+"Formula"
