@@ -341,10 +341,10 @@ class FormulaInstaller
   end
 
   def expand_dependencies(deps)
-    inherited_options = {}
+    inherited_options = Hash.new { |hash, key| hash[key] = Options.new }
 
     expanded_deps = Dependency.expand(formula, deps) do |dependent, dep|
-      options = inherited_options[dep.name] = inherited_options_for(dep)
+      inherited_options[dep.name] |= inherited_options_for(dep)
       build = effective_build_options_for(
         dependent,
         inherited_options.fetch(dependent.name, [])
@@ -354,7 +354,7 @@ class FormulaInstaller
         Dependency.prune
       elsif dep.build? && install_bottle_for?(dependent, build)
         Dependency.prune
-      elsif dep.satisfied?(options)
+      elsif dep.satisfied?(inherited_options[dep.name])
         Dependency.skip
       end
     end
