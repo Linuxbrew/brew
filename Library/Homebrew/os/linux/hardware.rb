@@ -1,9 +1,7 @@
 module LinuxCPUs
   OPTIMIZATION_FLAGS = {
-    :penryn => "-march=core2 -msse4.1",
     :core2 => "-march=core2",
     :core => "-march=prescott",
-    :arm => "",
   }.freeze
   def optimization_flags
     OPTIMIZATION_FLAGS
@@ -50,13 +48,13 @@ module LinuxCPUs
         when 0x2a, 0x2d
           :sandybridge
         when 0x25, 0x2c, 0x2f
-          :arrandale # Westmere
+          :westmere
         when 0x1e, 0x1a, 0x2e
           :nehalem
         when 0x17, 0x1d
           :penryn
         when 0x0f, 0x16
-          :core2 # Merom
+          :merom
         when 0x0d
           :dothan
         when 0x36, 0x26, 0x1c
@@ -70,8 +68,10 @@ module LinuxCPUs
         end
       when 0x0f
         case cpu_model
-        when 0x06, 0x03, 0x04
-          :core # Presler and Prescott
+        when 0x06
+          :presler
+        when 0x03, 0x04
+          :prescott
         else
           cpu_family_model
         end

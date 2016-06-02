@@ -166,7 +166,7 @@ This is our PGP key which is valid until June 17, 2016.
 * Full key: https://keybase.io/homebrew/key.asc
 
 ## Who Are You?
-SuperNEMO-DBD's for of brew is maintained by [Ben Morgan](https://github.com/drbenmorgan).
+SuperNEMO-DBD's fork of brew is maintained by [Ben Morgan](https://github.com/drbenmorgan).
 
 Linuxbrew is maintained by [Shaun Jackman](https://github.com/sjackman).
 
