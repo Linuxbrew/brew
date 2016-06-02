@@ -1269,6 +1269,12 @@ class ResourceAuditor
           #{u}
       EOS
     end
+
+    # Check for Maven Central urls, prefer HTTPS redirector over specific host
+    urls.each do |u|
+      next unless u =~ %r{https?://(?:central|repo\d+)\.maven\.org/maven2/(.+)$}
+      problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
+    end
   end
 
   def problem(text)
