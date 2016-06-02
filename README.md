@@ -56,6 +56,10 @@ Our bottles (binary packages) are hosted by Bintray.
 
 [![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/homebrew)
 
+Secure password storage and syncing provided by [1Password for Teams](https://1password.com/teams/) by AgileBits
+
+[![AgileBits](https://da36klfizjv29.cloudfront.net/assets/branding/agilebits-fcca96e9b8e815c5c48c6b3e98156cb5.png)](https://agilebits.com)
+
 Homebrew is a member of the [Software Freedom Conservancy](https://sfconservancy.org)
 
 [![Software Freedom Conservancy](https://sfconservancy.org/img/conservancy_64x64.png)](https://sfconservancy.org)
