@@ -2,6 +2,7 @@ require "bundler"
 require "testing_env"
 require "fileutils"
 require "pathname"
+require "formula"
 
 class IntegrationCommandTests < Homebrew::TestCase
   def setup
