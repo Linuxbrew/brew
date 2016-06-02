@@ -427,11 +427,12 @@ module Homebrew
         end
 
         unless ARGV.include? "--no-commit"
+          short_name = formula_name.split("/", -1).last
           pkg_version = bottle_hash["formula"]["pkg_version"]
 
           path.parent.cd do
             safe_system "git", "commit", "--no-edit", "--verbose",
-              "--message=#{formula_name}: #{update_or_add} #{pkg_version} bottle.",
+              "--message=#{short_name}: #{update_or_add} #{pkg_version} bottle.",
               "--", path
           end
         end
