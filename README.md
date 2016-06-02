@@ -43,6 +43,11 @@ Paste at a Terminal prompt:
 sudo apt-get install build-essential curl git python-setuptools ruby
 ```
 
+If you are Debian testing/sid or Ubuntu-devel user you can install only a single package
+```sh
+sudo apt install linuxbrew-wrapper
+```
+
 ### Fedora, CentOS or Red Hat
 
 ```sh
