@@ -1,5 +1,6 @@
 require "utils/json"
 require "rexml/document"
+require "time"
 
 class AbstractDownloadStrategy
   include FileUtils
