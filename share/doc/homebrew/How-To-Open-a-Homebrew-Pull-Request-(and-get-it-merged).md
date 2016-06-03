@@ -35,7 +35,7 @@ To make a new branch and submit it for review, create a GitHub pull request with
  * If there's a `bottle do` block in the formula: don't remove or change it; we'll update it when we pull your PR.
 5. Test your changes on each changed formula by doing the following, and ensure they all pass without issue. (Make sure you do the `brew audit` step while your changed formula is installed.)
  1. `brew tests`
- 2. `brew install <CHANGED_FORMULA>`
+ 2. `brew install --build-from-source <CHANGED_FORMULA>`
  3. `brew test <CHANGED_FORMULA>`
  4. `brew audit --strict <CHANGED_FORMULA>`
 6. Make a separate commit for each changed formula with `git add` and `git commit`.
