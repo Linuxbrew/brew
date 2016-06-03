@@ -124,7 +124,7 @@ reset_on_interrupt() {
     git reset --hard "$INITIAL_REVISION" "${QUIET_ARGS[@]}"
   fi
 
-  if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+  if [[ -n "$HOMEBREW_DEVELOPER" ]]
   then
     pop_stash
   else
@@ -225,10 +225,13 @@ pull() {
 
   trap '' SIGINT
 
-  if [[ -n "$HOMEBREW_DEVELOPER" ]] &&
-     [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+  if [[ -n "$HOMEBREW_DEVELOPER" ]]
   then
-    git checkout "${QUIET_ARGS[@]}" "$INITIAL_BRANCH"
+    if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+    then
+      git checkout "$INITIAL_BRANCH"
+    fi
+
     pop_stash
   else
     pop_stash_message
