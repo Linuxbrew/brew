@@ -503,6 +503,7 @@ module Homebrew
         url = URI(bottle_info.url)
         puts "Verifying bottle: #{File.basename(url.path)}"
         http = Net::HTTP.new(url.host, url.port)
+        http.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
         http.use_ssl = true
         retry_count = 0
         http.start do

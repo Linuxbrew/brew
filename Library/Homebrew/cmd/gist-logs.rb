@@ -7,12 +7,10 @@
 #:     If `--new-issue` is passed, automatically create a new issue in the appropriate
 #:     GitHub repository as well as creating the Gist.
 #:
-#:     If no logs are found, an error message is presented.      
+#:     If no logs are found, an error message is presented.
 
 require "formula"
 require "system_config"
-require "net/http"
-require "net/https"
 require "stringio"
 require "socket"
 
@@ -46,17 +44,14 @@ module Homebrew
     url = create_gist(files, descr)
 
     if ARGV.include?("--new-issue") || ARGV.switch?("n")
-      auth = :AUTH_TOKEN
-
       if GitHub.api_credentials_type == :none
         puts "You can create a personal access token: https://github.com/settings/tokens"
         puts "and then set HOMEBREW_GITHUB_API_TOKEN as authentication method."
         puts
-
-        auth = :AUTH_USER_LOGIN
+        login!
       end
 
-      url = new_issue(f.tap, "#{f.name} failed to build on #{MacOS.full_version}", url, auth)
+      url = new_issue(f.tap, "#{f.name} failed to build on #{MacOS.full_version}", url)
     end
 
     puts url if url
@@ -84,13 +79,12 @@ module Homebrew
     result
   end
 
-  def login(request)
+  def login!
     print "GitHub User: "
-    user = $stdin.gets.chomp
+    ENV["HOMEBREW_GITHUB_API_USERNAME"] = $stdin.gets.chomp
     print "Password: "
-    password = noecho_gets.chomp
+    ENV["HOMEBREW_GITHUB_API_PASSWORD"] = noecho_gets.chomp
     puts
-    request.basic_auth(user, password)
   end
 
   def load_logs(dir)
@@ -103,77 +97,19 @@ module Homebrew
     logs
   end
 
-  def create_gist(files, descr)
-    post("/gists", { "public" => true, "files" => files, "description" => descr })["html_url"]
+  def create_gist(files, description)
+    data = { "public" => true, "files" => files, "description" => description }
+    GitHub.open("https://api.github.com/gists", data)["html_url"]
   end
 
-  def new_issue(repo, title, body, auth)
-    post("/repos/#{repo}/issues", { "title" => title, "body" => body }, auth)["html_url"]
-  end
-
-  def http
-    @http ||= begin
-      uri = URI.parse("https://api.github.com")
-      p = ENV["http_proxy"] ? URI.parse(ENV["http_proxy"]) : nil
-      if p.class == URI::HTTP || p.class == URI::HTTPS
-        @http = Net::HTTP.new(uri.host, uri.port, p.host, p.port, p.user, p.password)
-      else
-        @http = Net::HTTP.new(uri.host, uri.port)
-      end
-      @http.use_ssl = true
-      @http
-    end
-  end
-
-  def make_request(path, data, auth)
-    headers = GitHub.api_headers
-    headers["Content-Type"] = "application/json"
-
-    basic_auth_credentials = nil
-    if auth != :AUTH_USER_LOGIN
-      token, username = GitHub.api_credentials
-      case GitHub.api_credentials_type
-      when :keychain
-        basic_auth_credentials = [username, token]
-      when :environment
-        headers["Authorization"] = "token #{token}"
-      end
-    end
-
-    request = Net::HTTP::Post.new(path, headers)
-    request.basic_auth(*basic_auth_credentials) if basic_auth_credentials
-
-    login(request) if auth == :AUTH_USER_LOGIN
-
-    request.body = Utils::JSON.dump(data)
-    request
-  end
-
-  def post(path, data, auth = nil)
-    request = make_request(path, data, auth)
-
-    case response = http.request(request)
-    when Net::HTTPCreated
-      Utils::JSON.load get_body(response)
-    else
-      GitHub.api_credentials_error_message(response)
-      raise "HTTP #{response.code} #{response.message} (expected 201)"
-    end
-  end
-
-  def get_body(response)
-    if !response.body.respond_to?(:force_encoding)
-      response.body
-    elsif response["Content-Type"].downcase == "application/json; charset=utf-8"
-      response.body.dup.force_encoding(Encoding::UTF_8)
-    else
-      response.body.encode(Encoding::UTF_8, :undef => :replace)
-    end
+  def new_issue(repo, title, body)
+    data = { "title" => title, "body" => body }
+    GitHub.open("https://api.github.com/repos/MikeMcQuaid/test/issues", data)["html_url"]
   end
 
   def gist_logs
     raise FormulaUnspecifiedError if ARGV.resolved_formulae.length != 1
 
-    gistify_logs(ARGV.resolved_formulae[0])
+    gistify_logs(ARGV.resolved_formulae.first)
   end
 end

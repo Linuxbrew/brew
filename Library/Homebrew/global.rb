@@ -30,7 +30,13 @@ RUBY_BIN = RUBY_PATH.dirname
 HOMEBREW_USER_AGENT_CURL = ENV["HOMEBREW_USER_AGENT_CURL"]
 HOMEBREW_USER_AGENT_RUBY = "#{ENV["HOMEBREW_USER_AGENT"]} ruby/#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
 
-HOMEBREW_CURL_ARGS = "-f#RLA"
+HOMEBREW_CURL_ARGS = [
+  "--fail",
+  "--progress-bar",
+  "--remote-time",
+  "--location",
+  "--user-agent", HOMEBREW_USER_AGENT_CURL
+].freeze
 
 require "tap_constants"
 
