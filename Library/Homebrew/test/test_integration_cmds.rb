@@ -323,6 +323,17 @@ class IntegrationCommandTests < Homebrew::TestCase
     EOS
 
     assert_equal "testball: Some test", cmd("desc", "testball")
+    assert_match "Pick one, and only one", cmd_fail("desc", "--search", "--name")
+    assert_match "You must provide a search term", cmd_fail("desc", "--search")
+
+    refute_predicate HOMEBREW_CACHE.join("desc_cache.json"),
+                     :exist?, "Cached file should not exist"
+
+    cmd("desc", "--description", "testball")
+    assert_predicate HOMEBREW_CACHE.join("desc_cache.json"),
+                     :exist?, "Cached file should exist"
+
+    FileUtils.rm HOMEBREW_CACHE.join("desc_cache.json")
   ensure
     formula_file.unlink
   end
