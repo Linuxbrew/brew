@@ -15,6 +15,7 @@ migrate-legacy-uuid-file() {
 
 setup-analytics() {
   local git_config_file="$HOMEBREW_REPOSITORY/.git/config"
+  test -r $git_config_file || return
 
   migrate-legacy-uuid-file
 
