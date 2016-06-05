@@ -104,7 +104,7 @@ module Homebrew
 
   def new_issue(repo, title, body)
     data = { "title" => title, "body" => body }
-    GitHub.open("https://api.github.com/repos/MikeMcQuaid/test/issues", data)["html_url"]
+    GitHub.open("https://api.github.com/repos/#{repo}/issues", data)["html_url"]
   end
 
   def gist_logs
