@@ -18,9 +18,9 @@ class KegOnlyReason
     when :provided_pre_el_capitan
       MacOS.version < :el_capitan
     when :provided_until_xcode43
-      MacOS::Xcode.version < "4.3"
+      MacOS::Xcode.installed? && MacOS::Xcode.version < "4.3"
     when :provided_until_xcode5
-      MacOS::Xcode.version < "5.0"
+      MacOS::Xcode.installed? && MacOS::Xcode.version < "5.0"
     else
       true
     end
