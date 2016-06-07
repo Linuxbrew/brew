@@ -919,8 +919,8 @@ class FormulaAuditor
         problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
       end
 
-      if line =~ %r{share/"#{Regexp.escape(formula.name)}[/'"]}
-        problem "Use pkgshare instead of (share/\"#{formula.name}\")"
+      if line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
+        problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
       end
     end
   end
