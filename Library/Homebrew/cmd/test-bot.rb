@@ -354,7 +354,7 @@ module Homebrew
           if ARGV.include?("--legacy")
             test "brew", "pull", "--clean", "--legacy", @url
           else
-            test "brew", "pull", "--clean", @url
+            test "brew", "pull", "--clean", "--tap=#{@tap}", @url
           end
           diff_end_sha1 = current_sha1
         end
