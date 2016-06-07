@@ -22,6 +22,7 @@
 #   --branch-okay: Do not warn if pulling to a branch besides master (useful for testing)
 #   --legacy:      Pull legacy formula PR from Homebrew/legacy-homebrew
 #                  (TODO remove it when it's no longer necessary)
+#   --tap=<tap>:   Use the git repository of the given tap
 #   --no-pbcopy:   Do not copy anything to the system clipboard
 #   --no-publish:  Do not publish bottles to Bintray
 
@@ -81,6 +82,7 @@ module Homebrew
         odie "No pull request detected!"
       end
 
+      tap = Tap.fetch(ARGV.value("tap")) if ARGV.value("tap")
       if tap
         tap.install unless tap.installed?
         Dir.chdir tap.path
