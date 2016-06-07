@@ -847,7 +847,7 @@ module Homebrew
         pull_pr = "https://github.com/Homebrew/legacy-homebrew/pull/#{pr}"
         safe_system "brew", "pull", "--clean", "--legacy", pull_pr
       else
-        pull_pr = "#{tap.default_remote}/pull/#{pr}"
+        pull_pr = "#{tap.remote}/pull/#{pr}"
         safe_system "brew", "pull", "--clean", pull_pr
       end
     elsif docker_sha1
