@@ -47,9 +47,9 @@ to see what would be cleaned up:
 To uninstall Homebrew, paste the command below in a terminal prompt.
 
 ```bash
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
 ```
-Download the [uninstall script](https://raw.githubusercontent.com/Homebrew/install/master/uninstall)
+Download the [uninstall script](https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)
 and run `./uninstall --help` to view more uninstall options.
 
 <a name="uninstall-package"></a>
