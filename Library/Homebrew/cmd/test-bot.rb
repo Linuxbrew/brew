@@ -848,7 +848,7 @@ module Homebrew
         safe_system "brew", "pull", "--clean", "--legacy", pull_pr
       else
         pull_pr = "#{tap.remote}/pull/#{pr}"
-        safe_system "brew", "pull", "--clean", "--tap", tap, pull_pr
+        safe_system "brew", "pull", "--clean", "--tap=#{tap}", pull_pr
       end
     elsif docker_sha1
       url = "https://github.com/#{docker_user}/homebrew-#{tap.repo}/commit/#{docker_sha1}"
