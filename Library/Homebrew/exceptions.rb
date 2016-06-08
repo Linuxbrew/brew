@@ -400,7 +400,7 @@ class BuildToolsError < RuntimeError
     super <<-EOS.undent
       The following #{formula_text}:
         #{formulae.join(", ")}
-      cannot be installed as a #{package_text} and must be built from source.
+      cannot be installed as #{package_text} and must be built from source.
       #{xcode_text}
     EOS
   end
