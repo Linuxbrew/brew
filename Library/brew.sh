@@ -137,7 +137,8 @@ export HOMEBREW_USER_AGENT_CURL
 
 if [[ -n "$HOMEBREW_OSX" ]]
 then
-  if [[ "$('/usr/bin/xcode-select' --print-path)" = "/" ]]
+  XCODE_SELECT_PATH=$('/usr/bin/xcode-select' --print-path 2>/dev/null)
+  if [[ "$XCODE_SELECT_PATH" = "/" ]]
   then
     odie <<EOS
 Your xcode-select path is currently set to '/'.
@@ -149,15 +150,20 @@ Otherwise, you should:
 EOS
   fi
 
-  XCRUN_OUTPUT="$(/usr/bin/xcrun clang 2>&1)"
-  XCRUN_STATUS="$?"
-
-  if [[ "$XCRUN_STATUS" -ne 0 && "$XCRUN_OUTPUT" = *license* ]]
+  # Don't check xcrun if Xcode and the CLT aren't installed, as that opens
+  # a popup window asking the user to install the CLT
+  if [[ -n "$XCODE_SELECT_PATH" ]]
   then
-    odie <<EOS
+    XCRUN_OUTPUT="$(/usr/bin/xcrun clang 2>&1)"
+    XCRUN_STATUS="$?"
+
+    if [[ "$XCRUN_STATUS" -ne 0 && "$XCRUN_OUTPUT" = *license* ]]
+    then
+      odie <<EOS
 You have not agreed to the Xcode license. Please resolve this by running:
   sudo xcodebuild -license
 EOS
+    fi
   fi
 fi
 
