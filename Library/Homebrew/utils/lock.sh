@@ -3,7 +3,9 @@
 # Noted due to the fixed FD, a shell process can only create one lock.
 lock() {
   local name="$1"
-  local lock_file="/tmp/homebrew${HOMEBREW_REPOSITORY//\//-}-${name}.lock"
+  local lock_dir="$HOMEBREW_LIBRARY/Locks"
+  local lock_file="$lock_dir/$name"
+  [[ -d "$lock_dir" ]] || mkdir -p "$lock_dir"
   # 200 is the file descriptor used in the lock.
   # This FD should be used exclusively for lock purpose.
   # Any value except 0(stdin), 1(stdout) and 2(stderr) can do the job.

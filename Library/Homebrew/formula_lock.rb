@@ -1,7 +1,7 @@
 require "fcntl"
 
 class FormulaLock
-  LOCKDIR = HOMEBREW_CACHE_FORMULA
+  LOCKDIR = HOMEBREW_LOCK_DIR
 
   def initialize(name)
     @name = name
