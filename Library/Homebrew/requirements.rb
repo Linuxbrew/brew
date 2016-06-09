@@ -135,3 +135,9 @@ class GitRequirement < Requirement
   default_formula "git"
   satisfy { Utils.git_available? }
 end
+
+class SubversionRequirement < Requirement
+  fatal true
+  default_formula "subversion"
+  satisfy { which "svn" }
+end
