@@ -1256,6 +1256,7 @@ class Formula
       "dependencies" => deps.map(&:name).uniq,
       "recommended_dependencies" => deps.select(&:recommended?).map(&:name).uniq,
       "optional_dependencies" => deps.select(&:optional?).map(&:name).uniq,
+      "build_dependencies" => deps.select(&:build?).map(&:name).uniq,
       "conflicts_with" => conflicts.map(&:name),
       "caveats" => caveats
     }
