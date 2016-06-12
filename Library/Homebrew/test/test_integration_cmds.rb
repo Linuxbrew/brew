@@ -700,6 +700,38 @@ class IntegrationCommandTests < Homebrew::TestCase
     (HOMEBREW_REPOSITORY/".git").rmtree
   end
 
+  def test_log_formula
+    core_tap = CoreTap.new
+    formula_file = core_tap.formula_dir/"testball.rb"
+    formula_file.write <<-EOS.undent
+      class Testball < Formula
+        url "https://example.com/testball-0.1.tar.gz"
+      end
+    EOS
+
+    core_tap.path.cd do
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "This is a test commit for Testball"
+      end
+    end
+
+    homebrew_core_clone = Pathname.new core_tap.path.dirname/"homebrew-core-clone"
+    shallow = Pathname.new homebrew_core_clone/".git/shallow"
+
+    (core_tap.path.dirname).cd do
+      system "git", "clone", "--depth=1", "file://#{core_tap.path}", "homebrew-core-clone"
+
+      assert_match "This is a test commit for Testball", cmd("log", "testball")
+      assert_predicate shallow, :exist?, "A shallow clone should have been created."
+    end
+  ensure
+    formula_file.unlink
+    (core_tap.path/".git").rmtree
+    (core_tap.path.dirname/"homebrew-core-clone").rmtree
+  end
+
   def test_leaves
     formula_dir = CoreTap.new.formula_dir
     formula_file1 = formula_dir/"testball1.rb"
