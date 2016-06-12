@@ -384,7 +384,9 @@ EOS
 
   chdir "$HOMEBREW_REPOSITORY"
 
-  if [[ -n "$HOMEBREW_UPDATED" || -n "$HOMEBREW_UPDATE_FAILED" ]]
+  if [[ -n "$HOMEBREW_UPDATED" ||
+        -n "$HOMEBREW_UPDATE_FAILED" ||
+        -n "$HOMEBREW_DEVELOPER" ]]
   then
     brew update-report "$@"
     return $?
