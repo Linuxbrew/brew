@@ -107,6 +107,11 @@ class SystemConfig
       javas.uniq.join(", ")
     end
 
+    def describe_git
+      return "N/A" unless Utils.git_available?
+      "#{Utils.git_version} => #{Utils.git_path}"
+    end
+
     def dump_verbose_config(f = $stdout)
       f.puts "HOMEBREW_VERSION: #{HOMEBREW_VERSION}"
       f.puts "ORIGIN: #{origin}"
@@ -127,6 +132,7 @@ class SystemConfig
       f.puts "GCC-4.0: build #{gcc_40}" if gcc_40
       f.puts "GCC-4.2: build #{gcc_42}" if gcc_42
       f.puts "Clang: #{clang ? "#{clang} build #{clang_build}" : "N/A"}"
+      f.puts "Git: #{describe_git}"
       f.puts "Perl: #{describe_perl}"
       f.puts "Python: #{describe_python}"
       f.puts "Ruby: #{describe_ruby}"
