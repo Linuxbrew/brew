@@ -23,6 +23,10 @@ def exec(*args)
   # prevent fork-bombs
   arg0 = args.first
   return if arg0 =~ /^#{F}/i || Pathname.new(arg0).realpath == SELF_REAL
+  if ARGV == %w[--homebrew=print-path]
+    puts arg0
+    exit
+  end
   super
 end
 
