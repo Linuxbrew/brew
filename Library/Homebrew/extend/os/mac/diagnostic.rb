@@ -18,6 +18,7 @@ module Homebrew
           You are using OS X #{MacOS.version}.
           #{who} do not provide support for this #{what}.
           You may encounter build failures or other breakages.
+          Please create pull-requests instead of filing issues.
         EOS
       end
 
