@@ -55,6 +55,8 @@ module Hardware
     when 1 then "single"
     when 2 then "dual"
     when 4 then "quad"
+    when 6 then "hexa"
+    when 8 then "octa"
     else
       Hardware::CPU.cores
     end
