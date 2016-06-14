@@ -53,6 +53,10 @@ module Homebrew
       }.
       reject { |s| s.strip.empty? }
 
+    variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md").
+      read[/Homebrew's current maintainers are (.*)\./, 1].
+      scan(/\[([^\]]*)\]/).flatten
+
     ERB.new(template, nil, ">").result(variables.instance_eval{ binding })
   end
 
