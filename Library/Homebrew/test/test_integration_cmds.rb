@@ -717,19 +717,20 @@ class IntegrationCommandTests < Homebrew::TestCase
       end
     end
 
-    homebrew_core_clone = Pathname.new core_tap.path.dirname/"homebrew-core-clone"
-    shallow = Pathname.new homebrew_core_clone/".git/shallow"
-
-    (core_tap.path.dirname).cd do
-      system "git", "clone", "--depth=1", "file://#{core_tap.path}", "homebrew-core-clone"
-
-      assert_match "This is a test commit for Testball", cmd("log", "testball")
-      assert_predicate shallow, :exist?, "A shallow clone should have been created."
+    core_tap_url = "file://#{core_tap.path}"
+    shallow_tap = Tap.fetch("homebrew", "shallow")
+    shutup do
+      system "git", "clone", "--depth=1", core_tap_url, shallow_tap.path
     end
+
+    assert_match "This is a test commit for Testball",
+                 cmd("log", "#{shallow_tap}/testball")
+    assert_predicate shallow_tap.path/".git/shallow", :exist?,
+                     "A shallow clone should have been created."
   ensure
     formula_file.unlink
     (core_tap.path/".git").rmtree
-    (core_tap.path.dirname/"homebrew-core-clone").rmtree
+    shallow_tap.path.rmtree
   end
 
   def test_leaves
