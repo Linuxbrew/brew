@@ -1,6 +1,5 @@
 require "testing_env"
 require "formula"
-require "compat/formula_specialties"
 require "formula_installer"
 require "keg"
 require "tab"
