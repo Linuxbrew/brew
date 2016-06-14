@@ -1,6 +1,6 @@
 require "requirement"
 
-class OsxfuseRequirement < Requirement
+class MacOsxfuseRequirement < Requirement
   fatal true
   default_formula "osxfuse"
   cask "osxfuse"
@@ -16,6 +16,17 @@ class OsxfuseRequirement < Requirement
     ENV.append_path "PKG_CONFIG_PATH", HOMEBREW_PREFIX/"Library/ENV/pkgconfig/fuse"
   end
 end
+
+class LibfuseRequirement < Requirement
+  fatal true
+  default_formula "libfuse"
+  satisfy(:build_env => false) { Formula["libfuse"].installed? }
+  def self.binary_osxfuse_installed?
+    false
+  end
+end
+
+OsxfuseRequirement = OS.mac? ? MacOsxfuseRequirement : LibfuseRequirement
 
 class NonBinaryOsxfuseRequirement < Requirement
   fatal true
