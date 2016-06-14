@@ -320,7 +320,7 @@ module Stdenv
   def cxx11
     if compiler == :clang
       append "CXX", "-std=c++11"
-      append "CXX", "-stdlib=libc++"
+      append "CXX", "-stdlib=libc++" if OS.mac?
     elsif compiler =~ /gcc-(4\.(8|9)|5)/
       append "CXX", "-std=c++11"
     else
