@@ -76,7 +76,7 @@ module Utils
     def self.prepend_path_in_shell_profile(path)
       case preferred_shell 
       when :bash, :ksh, :sh, :zsh, nil
-        "echo 'export PATH=\"#{sh_quote(path)}:$PATH'\" >> #{shell_profile}"
+        "echo 'export PATH=\"#{sh_quote(path)}:$PATH\"' >> #{shell_profile}"
       when :csh, :tcsh
         "echo 'setenv PATH #{csh_quote(path)}:$PATH' >> #{shell_profile}"
       when :fish
