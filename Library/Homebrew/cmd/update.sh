@@ -116,7 +116,7 @@ pop_stash_message() {
 reset_on_interrupt() {
   if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
-    git checkout "$INITIAL_BRANCH"
+    git checkout "$INITIAL_BRANCH" "${QUIET_ARGS[@]}"
   fi
 
   if [[ -n "$INITIAL_REVISION" ]]
@@ -231,7 +231,7 @@ pull() {
   then
     if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
     then
-      git checkout "$INITIAL_BRANCH"
+      git checkout "$INITIAL_BRANCH" "${QUIET_ARGS[@]}"
     fi
 
     pop_stash
