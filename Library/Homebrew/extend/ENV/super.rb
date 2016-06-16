@@ -303,11 +303,10 @@ module Superenv
   end
 
   def cxx11
-    case homebrew_cc
-    when "clang"
+    if homebrew_cc == "clang"
       append "HOMEBREW_CCCFG", "x", ""
       append "HOMEBREW_CCCFG", "g", ""
-    when /gcc-(4\.(8|9)|5)/
+    elsif gcc_with_cxx11_support?(homebrew_cc)
       append "HOMEBREW_CCCFG", "x", ""
     else
       raise "The selected compiler doesn't support C++11: #{homebrew_cc}"

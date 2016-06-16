@@ -141,4 +141,33 @@ class SuperenvTests < Homebrew::TestCase
     assert_equal [], @env.deps
     assert_equal [], @env.keg_only_deps
   end
+
+  def test_unsupported_cxx11
+    %w[gcc gcc-4.7].each do |compiler|
+      @env["HOMEBREW_CC"] = compiler
+      assert_raises do
+        @env.cxx11
+      end
+      refute_match "x", @env["HOMEBREW_CCCFG"]
+    end
+  end
+
+  def test_supported_cxx11_gcc_5
+    @env["HOMEBREW_CC"] = "gcc-5"
+    @env.cxx11
+    assert_match "x", @env["HOMEBREW_CCCFG"]
+  end
+
+  def test_supported_cxx11_gcc_6
+    @env["HOMEBREW_CC"] = "gcc-6"
+    @env.cxx11
+    assert_match "x", @env["HOMEBREW_CCCFG"]
+  end
+
+  def test_supported_cxx11_clang
+    @env["HOMEBREW_CC"] = "clang"
+    @env.cxx11
+    assert_match "x", @env["HOMEBREW_CCCFG"]
+    assert_match "g", @env["HOMEBREW_CCCFG"]
+  end
 end
