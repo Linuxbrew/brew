@@ -1,5 +1,5 @@
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] `--url=`<url> `--sha256=`<sha-256> <formula>:
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] `--tag=`<tag> `--revision=`<revision> <formula>:
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] `--url=`<url> `--sha256=`<sha-256> <formula>:
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] `--tag=`<tag> `--revision=`<revision> <formula>:
 #:    Creates a pull request to update the formula with a new url or a new tag.
 #:
 #:    If a <url> is specified, the <sha-256> checksum of the new download must
@@ -12,6 +12,10 @@
 #:    The development spec must already exist.
 #:
 #:    If `--dry-run` is passed, print what would be done rather than doing it.
+#:
+#:    If `--audit` is passed, run `brew audit` before opening the PR.
+#:
+#:    If `--strict` is passed, run `brew audit --strict` before opening the PR.
 #:
 #:    Note that this command cannot be used to transition a formula from a
 #:    url-and-sha256 style specification into a tag-and-revision style
@@ -113,20 +117,45 @@ module Homebrew
       ]
     end
 
+    backup_file = File.read(formula.path) unless ARGV.dry_run?
+
     new_contents = inreplace_pairs(formula.path, replacement_pairs)
 
     new_formula_version = formula_version(formula, requested_spec, new_contents)
 
     if new_formula_version < old_formula_version
+      formula.path.atomic_write(backup_file) unless ARGV.dry_run?
       odie <<-EOS.undent
         You probably need to bump this formula manually since changing the
         version from #{old_formula_version} to #{new_formula_version} would be a downgrade.
       EOS
     elsif new_formula_version == old_formula_version
+      formula.path.atomic_write(backup_file) unless ARGV.dry_run?
       odie <<-EOS.undent
         You probably need to bump this formula manually since the new version
         and old version are both #{new_formula_version}.
       EOS
+    end
+
+    if ARGV.dry_run?
+      if ARGV.include? "--strict"
+        ohai "brew audit --strict #{formula.path.basename}"
+      elsif ARGV.include? "--audit"
+        ohai "brew audit #{formula.path.basename}"
+      end
+    else
+      failed_audit = false
+      if ARGV.include? "--strict"
+        system HOMEBREW_BREW_FILE, "audit", "--strict", formula.path
+        failed_audit = !$?.success?
+      elsif ARGV.include? "--audit"
+        system HOMEBREW_BREW_FILE, "audit", formula.path
+        failed_audit = !$?.success?
+      end
+      if failed_audit
+        formula.path.atomic_write(backup_file)
+        odie "brew audit failed!"
+      end
     end
 
     unless Formula["hub"].any_version_installed?
