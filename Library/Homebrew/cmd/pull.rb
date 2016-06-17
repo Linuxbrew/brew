@@ -113,13 +113,9 @@ module Homebrew
           "git", "diff-tree", "-r", "--name-only",
           "--diff-filter=AM", orig_revision, "HEAD", "--", tap.formula_dir.to_s
         ).each_line do |line|
+          next unless line.end_with? ".rb\n"
           name = "#{tap.name}/#{File.basename(line.chomp, ".rb")}"
-          begin
-            changed_formulae_names << name
-          # Make sure we catch syntax errors.
-          rescue Exception
-            next
-          end
+          changed_formulae_names << name
         end
       end
 
@@ -127,7 +123,13 @@ module Homebrew
       changed_formulae_names.each do |name|
         next if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
 
-        f = Formula[name]
+        begin
+          f = Formula[name]
+        # Make sure we catch syntax errors.
+        rescue Exception
+          next
+        end
+
         if ARGV.include? "--bottle"
           if f.bottle_unneeded?
             ohai "#{f}: skipping unneeded bottle."
