@@ -20,7 +20,9 @@ module Homebrew
       contents = path.open("r") { |f| Formulary.set_encoding(f).read }
       contents.extend(StringInreplaceExtension)
       replacement_pairs.each do |old, new|
-        ohai "replace \"#{old}\" with \"#{new}\"" unless ARGV.flag?("--quiet")
+        unless ARGV.flag?("--quiet")
+          ohai "replace #{old.inspect} with #{new.inspect}"
+        end
         contents.gsub!(old, new)
       end
       if contents.errors.any?
@@ -30,7 +32,9 @@ module Homebrew
     else
       Utils::Inreplace.inreplace(path) do |s|
         replacement_pairs.each do |old, new|
-          ohai "replace \"#{old}\" with \"#{new}\"" unless ARGV.flag?("--quiet")
+          unless ARGV.flag?("--quiet")
+            ohai "replace #{old.inspect} with #{new.inspect}"
+          end
           s.gsub!(old, new)
         end
       end
@@ -86,7 +90,12 @@ module Homebrew
 
     old_formula_version = formula_version(formula, requested_spec)
 
-    replacement_pairs = if new_url_hash
+    replacement_pairs = []
+    if requested_spec == :stable && formula.revision != 0
+      replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
+    end
+
+    replacement_pairs += if new_url_hash
       [
         [formula_spec.url, new_url],
         [old_hash, new_hash],
