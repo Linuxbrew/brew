@@ -179,6 +179,18 @@ class Version
     end
   end
 
+  def self.create(val)
+    unless val.respond_to?(:to_str)
+      raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
+    end
+
+    if val.to_str.start_with?("HEAD")
+      HeadVersion.new(val)
+    else
+      Version.new(val)
+    end
+  end
+
   def initialize(val)
     if val.respond_to?(:to_str)
       @version = val.to_str
@@ -192,7 +204,7 @@ class Version
   end
 
   def head?
-    version == "HEAD"
+    false
   end
 
   def <=>(other)
@@ -200,6 +212,7 @@ class Version
     return 0 if version == other.version
     return 1 if head? && !other.head?
     return -1 if !head? && other.head?
+    return 0 if head? && other.head?
 
     ltokens = tokens
     rtokens = other.tokens
@@ -377,5 +390,27 @@ class Version
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)
     return m.captures.first unless m.nil?
+  end
+end
+
+class HeadVersion < Version
+  attr_reader :commit
+
+  def initialize(val)
+    super
+    @commit = @version[/^HEAD-(.+)$/, 1]
+  end
+
+  def update_commit(commit)
+    @commit = commit
+    @version = if commit
+      "HEAD-#{commit}"
+    else
+      "HEAD"
+    end
+  end
+
+  def head?
+    true
   end
 end
