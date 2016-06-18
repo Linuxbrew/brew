@@ -46,7 +46,7 @@ module MachO
     :S_ATTR_SOME_INSTRUCTIONS => 0x00000400,
     :S_ATTR_EXT_RELOC => 0x00000200,
     :S_ATTR_LOC_RELOC => 0x00000100
-  }
+  }.freeze
 
   # association of section name symbols to names
   # @api private
@@ -63,7 +63,7 @@ module MachO
     :SECT_OBJC_REFS => "__selector_refs",
     :SECT_ICON_HEADER => "__header",
     :SECT_ICON_TIFF => "__tiff"
-  }
+  }.freeze
 
   # Represents a section of a segment for 32-bit architectures.
   class Section < MachOStructure
@@ -100,7 +100,7 @@ module MachO
     # @return [void] reserved (for count or sizeof)
     attr_reader :reserved2
 
-    FORMAT = "a16a16VVVVVVVVV"
+    FORMAT = "a16a16L=9"
     SIZEOF = 68
 
     # @api private
@@ -145,7 +145,7 @@ module MachO
     # @return [void] reserved
     attr_reader :reserved3
 
-    FORMAT = "a16a16QQVVVVVVVV"
+    FORMAT = "a16a16Q=2L=8"
     SIZEOF = 80
 
     # @api private

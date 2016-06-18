@@ -3,6 +3,8 @@ module MachO
   FAT_MAGIC = 0xcafebabe
 
   # little-endian fat magic
+  # this is defined, but should never appear in ruby-macho code because
+  # fat headers are always big-endian and therefore always unpacked as such.
   FAT_CIGAM = 0xbebafeca
 
   # 32-bit big-endian magic
@@ -20,7 +22,6 @@ module MachO
   # association of magic numbers to string representations
   MH_MAGICS = {
     FAT_MAGIC => "FAT_MAGIC",
-    FAT_CIGAM => "FAT_CIGAM",
     MH_MAGIC => "MH_MAGIC",
     MH_CIGAM => "MH_CIGAM",
     MH_MAGIC_64 => "MH_MAGIC_64",
@@ -33,25 +34,39 @@ module MachO
   # any CPU (unused?)
   CPU_TYPE_ANY = -1
 
+  # m68k compatible CPUs
+  CPU_TYPE_MC680X0 = 0x06
+
   # i386 and later compatible CPUs
   CPU_TYPE_I386 = 0x07
 
   # x86_64 (AMD64) compatible CPUs
   CPU_TYPE_X86_64 = (CPU_TYPE_I386 | CPU_ARCH_ABI64)
 
-  # PowerPC compatible CPUs (7400 series?)
+  # 32-bit ARM compatible CPUs
+  CPU_TYPE_ARM = 0x0c
+
+  # m88k compatible CPUs
+  CPU_TYPE_MC88000 = 0xd
+
+  # 64-bit ARM compatible CPUs
+  CPU_TYPE_ARM64 = (CPU_TYPE_ARM | CPU_ARCH_ABI64)
+
+  # PowerPC compatible CPUs
   CPU_TYPE_POWERPC = 0x12
 
-  # PowerPC64 compatible CPUs (970 series?)
+  # PowerPC64 compatible CPUs
   CPU_TYPE_POWERPC64 = (CPU_TYPE_POWERPC | CPU_ARCH_ABI64)
 
-  # association of cpu types to string representations
+  # association of cpu types to symbol representations
   CPU_TYPES = {
-    CPU_TYPE_ANY => "CPU_TYPE_ANY",
-    CPU_TYPE_I386 => "CPU_TYPE_I386",
-    CPU_TYPE_X86_64 => "CPU_TYPE_X86_64",
-    CPU_TYPE_POWERPC => "CPU_TYPE_POWERPC",
-    CPU_TYPE_POWERPC64 => "CPU_TYPE_POWERPC64"
+    CPU_TYPE_ANY => :any,
+    CPU_TYPE_I386 => :i386,
+    CPU_TYPE_X86_64 => :x86_64,
+    CPU_TYPE_ARM => :arm,
+    CPU_TYPE_ARM64 => :arm64,
+    CPU_TYPE_POWERPC => :ppc,
+    CPU_TYPE_POWERPC64 => :ppc64,
   }
 
   # mask for CPU subtype capabilities
@@ -61,17 +76,208 @@ module MachO
   # @see http://llvm.org/docs/doxygen/html/Support_2MachO_8h_source.html
   CPU_SUBTYPE_LIB64 = 0x80000000
 
-  # all x86-type CPUs
-  CPU_SUBTYPE_X86_ALL = 3
+  # the lowest common sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_I386 = 3
 
-  # all x86-type CPUs (what makes this different from CPU_SUBTYPE_X86_ALL?)
-  CPU_SUBTYPE_X86_ARCH1 = 4
+  # the i486 sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_486 = 4
 
-  # association of cpu subtypes to string representations
+  # the i486SX sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_486SX = 132
+
+  # the i586 (P5, Pentium) sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_586 = 5
+  CPU_SUBTYPE_PENT  = CPU_SUBTYPE_586
+
+  # the Pentium Pro (P6) sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_PENTPRO = 22
+
+  # the Pentium II (P6, M3?) sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_PENTII_M3 = 54
+
+  # the Pentium II (P6, M5?) sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_PENTII_M5 = 86
+
+  # the Pentium 4 (Netburst) sub-type for `CPU_TYPE_I386`
+  CPU_SUBTYPE_PENTIUM_4 = 10
+
+  # the lowest common sub-type for `CPU_TYPE_MC680X0`
+  CPU_SUBTYPE_MC680X0_ALL = 1
+  CPU_SUBTYPE_MC68030 = CPU_SUBTYPE_MC680X0_ALL
+
+  # the 040 subtype for `CPU_TYPE_MC680X0`
+  CPU_SUBTYPE_MC68040 = 2
+
+  # the 030 subtype for `CPU_TYPE_MC680X0`
+  CPU_SUBTYPE_MC68030_ONLY = 3
+
+  # the lowest common sub-type for `CPU_TYPE_X86_64`
+  CPU_SUBTYPE_X86_64_ALL = CPU_SUBTYPE_I386
+
+  # the Haskell sub-type for `CPU_TYPE_X86_64`
+  CPU_SUBTYPE_X86_64_H = 8
+
+  # the lowest common sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_ALL = 0
+
+  # the v4t sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V4T = 5
+
+  # the v6 sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V6 = 6
+
+  # the v5 sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V5TEJ = 7
+
+  # the xscale (v5 family) sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_XSCALE = 8
+
+  # the v7 sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V7 = 9
+
+  # the v7f (Cortex A9) sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V7F = 10
+
+  # the v7s ("Swift") sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V7S = 11
+
+  # the v7k ("Kirkwood40") sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V7K = 12
+
+  # the v6m sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V6M = 14
+
+  # the v7m sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V7M = 15
+
+  # the v7em sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V7EM = 16
+
+  # the v8 sub-type for `CPU_TYPE_ARM`
+  CPU_SUBTYPE_ARM_V8 = 13
+
+  # the lowest common sub-type for `CPU_TYPE_ARM64`
+  CPU_SUBTYPE_ARM64_ALL = 0
+
+  # the v8 sub-type for `CPU_TYPE_ARM64`
+  CPU_SUBTYPE_ARM64_V8 = 1
+
+  # the lowest common sub-type for `CPU_TYPE_MC88000`
+  CPU_SUBTYPE_MC88000_ALL = 0
+  CPU_SUBTYPE_MMAX_JPC = CPU_SUBTYPE_MC88000_ALL
+
+  # the 100 sub-type for `CPU_TYPE_MC88000`
+  CPU_SUBTYPE_MC88100 = 1
+
+  # the 110 sub-type for `CPU_TYPE_MC88000`
+  CPU_SUBTYPE_MC88110 = 2
+
+  # the lowest common sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_ALL = 0
+
+  # the 601 sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_601 = 1
+
+  # the 602 sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_602 = 2
+
+  # the 603 sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_603 = 3
+
+  # the 603e (G2) sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_603E = 4
+
+  # the 603ev sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_603EV = 5
+
+  # the 604 sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_604 = 6
+
+  # the 604e sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_604E = 7
+
+  # the 620 sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_620 = 8
+
+  # the 750 (G3) sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_750 = 9
+
+  # the 7400 (G4) sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_7400 = 10
+
+  # the 7450 (G4 "Voyager") sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_7450 = 11
+
+  # the 970 (G5) sub-type for `CPU_TYPE_POWERPC`
+  CPU_SUBTYPE_POWERPC_970 = 100
+
+  # any CPU sub-type for CPU type `CPU_TYPE_POWERPC64`
+  CPU_SUBTYPE_POWERPC64_ALL = CPU_SUBTYPE_POWERPC_ALL
+
+  # association of CPU types/subtype pairs to symbol representations in
+  # (very) roughly descending order of commonness
+  # @see https://opensource.apple.com/source/cctools/cctools-877.8/libstuff/arch.c
   CPU_SUBTYPES = {
-    CPU_SUBTYPE_X86_ALL => "CPU_SUBTYPE_X86_ALL",
-    CPU_SUBTYPE_X86_ARCH1 => "CPU_SUBTYPE_X86_ARCH1"
-  }
+    CPU_TYPE_I386 => {
+      CPU_SUBTYPE_I386 => :i386,
+      CPU_SUBTYPE_486 => :i486,
+      CPU_SUBTYPE_486SX => :i486SX,
+      CPU_SUBTYPE_586 => :i586, # also "pentium" in arch(3)
+      CPU_SUBTYPE_PENTPRO => :i686, # also "pentpro" in arch(3)
+      CPU_SUBTYPE_PENTII_M3 => :pentIIm3,
+      CPU_SUBTYPE_PENTII_M5 => :pentIIm5,
+      CPU_SUBTYPE_PENTIUM_4 => :pentium4,
+    }.freeze,
+    CPU_TYPE_X86_64 => {
+      CPU_SUBTYPE_X86_64_ALL => :x86_64,
+      CPU_SUBTYPE_X86_64_H => :x86_64h,
+    }.freeze,
+    CPU_TYPE_ARM => {
+      CPU_SUBTYPE_ARM_ALL => :arm,
+      CPU_SUBTYPE_ARM_V4T => :armv4t,
+      CPU_SUBTYPE_ARM_V6 => :armv6,
+      CPU_SUBTYPE_ARM_V5TEJ => :armv5,
+      CPU_SUBTYPE_ARM_XSCALE => :xscale,
+      CPU_SUBTYPE_ARM_V7 => :armv7,
+      CPU_SUBTYPE_ARM_V7F => :armv7f,
+      CPU_SUBTYPE_ARM_V7S => :armv7s,
+      CPU_SUBTYPE_ARM_V7K => :armv7k,
+      CPU_SUBTYPE_ARM_V6M => :armv6m,
+      CPU_SUBTYPE_ARM_V7M => :armv7m,
+      CPU_SUBTYPE_ARM_V7EM => :armv7em,
+      CPU_SUBTYPE_ARM_V8 => :armv8,
+    }.freeze,
+    CPU_TYPE_ARM64 => {
+      CPU_SUBTYPE_ARM64_ALL => :arm64,
+      CPU_SUBTYPE_ARM64_V8 => :arm64v8,
+    }.freeze,
+    CPU_TYPE_POWERPC => {
+      CPU_SUBTYPE_POWERPC_ALL => :ppc,
+      CPU_SUBTYPE_POWERPC_601 => :ppc601,
+      CPU_SUBTYPE_POWERPC_603 => :ppc603,
+      CPU_SUBTYPE_POWERPC_603E => :ppc603e,
+      CPU_SUBTYPE_POWERPC_603EV => :ppc603ev,
+      CPU_SUBTYPE_POWERPC_604 => :ppc604,
+      CPU_SUBTYPE_POWERPC_604E => :ppc604e,
+      CPU_SUBTYPE_POWERPC_750 => :ppc750,
+      CPU_SUBTYPE_POWERPC_7400 => :ppc7400,
+      CPU_SUBTYPE_POWERPC_7450 => :ppc7450,
+      CPU_SUBTYPE_POWERPC_970 => :ppc970,
+    }.freeze,
+    CPU_TYPE_POWERPC64 => {
+      CPU_SUBTYPE_POWERPC64_ALL => :ppc64,
+      # apparently the only exception to the naming scheme
+      CPU_SUBTYPE_POWERPC_970 => :ppc970_64,
+    }.freeze,
+    CPU_TYPE_MC680X0 => {
+      CPU_SUBTYPE_MC680X0_ALL => :m68k,
+      CPU_SUBTYPE_MC68030 => :mc68030,
+      CPU_SUBTYPE_MC68040 => :mc68040,
+    },
+    CPU_TYPE_MC88000 => {
+      CPU_SUBTYPE_MC88000_ALL => :m88k,
+    },
+  }.freeze
 
   # relocatable object file
   MH_OBJECT = 0x1
@@ -162,7 +368,8 @@ module MachO
     # @return [Fixnum] the number of fat architecture structures following the header
     attr_reader :nfat_arch
 
-    FORMAT = "N2" # always big-endian
+    # always big-endian
+    FORMAT = "N2"
     SIZEOF = 8
 
     # @api private
@@ -191,7 +398,8 @@ module MachO
     # @return [Fixnum] the alignment, as a power of 2
     attr_reader :align
 
-    FORMAT = "N5" # always big-endian
+    # always big-endian
+    FORMAT = "N5"
     SIZEOF = 20
 
     # @api private
@@ -227,7 +435,7 @@ module MachO
     # @return [Fixnum] the header flags associated with the Mach-O
     attr_reader :flags
 
-    FORMAT = "VVVVVVV"
+    FORMAT = "L=7"
     SIZEOF = 28
 
     # @api private
@@ -260,7 +468,7 @@ module MachO
     # @return [void]
     attr_reader :reserved
 
-    FORMAT = "VVVVVVVV"
+    FORMAT = "L=8"
     SIZEOF = 32
 
     # @api private

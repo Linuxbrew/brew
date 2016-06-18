@@ -4,6 +4,9 @@ module MachO
   # @see https://en.wikipedia.org/wiki/Mach-O#Multi-architecture_binaries
   # @see MachO::MachOFile
   class FatFile
+    # @return [String] the filename loaded from, or nil if loaded from a binary string
+    attr_accessor :filename
+
     # @return [MachO::FatHeader] the file's header
     attr_reader :header
 
@@ -25,12 +28,12 @@ module MachO
 
     # Creates a new FatFile from the given filename.
     # @param filename [String] the fat file to load from
-    # @raise [ArgumentError] if the given filename does not exist
+    # @raise [ArgumentError] if the given file does not exist
     def initialize(filename)
-      raise ArgumentError.new("#{filetype}: no such file") unless File.exist?(filename)
+      raise ArgumentError.new("#{filename}: no such file") unless File.file?(filename)
 
       @filename = filename
-      @raw_data = open(@filename, "rb") { |f| f.read }
+      @raw_data = File.open(@filename, "rb") { |f| f.read }
       @header = get_fat_header
       @fat_archs = get_fat_archs
       @machos = get_machos
@@ -175,8 +178,8 @@ module MachO
 
     # Extract a Mach-O with the given CPU type from the file.
     # @example
-    #  file.extract("CPU_TYPE_I386") # => MachO::MachOFile
-    # @param cputype [String] the CPU type of the Mach-O being extracted
+    #  file.extract(:i386) # => MachO::MachOFile
+    # @param cputype [Symbol] the CPU type of the Mach-O being extracted
     # @return [MachO::MachOFile, nil] the extracted Mach-O or nil if no Mach-O has the given CPU type
     def extract(cputype)
       machos.select { |macho| macho.cputype == cputype }.first
@@ -213,7 +216,7 @@ module MachO
       # the smallest fat Mach-O header is 8 bytes
       raise TruncatedFileError.new if @raw_data.size < 8
 
-      fh = FatHeader.new_from_bin(@raw_data[0, FatHeader.bytesize])
+      fh = FatHeader.new_from_bin(:big, @raw_data[0, FatHeader.bytesize])
 
       raise MagicError.new(fh.magic) unless MachO.magic?(fh.magic)
       raise MachOBinaryError.new unless MachO.fat_magic?(fh.magic)
@@ -239,7 +242,7 @@ module MachO
       fa_off = FatHeader.bytesize
       fa_len = FatArch.bytesize
       header.nfat_arch.times do |i|
-        archs << FatArch.new_from_bin(@raw_data[fa_off + (fa_len * i), fa_len])
+        archs << FatArch.new_from_bin(:big, @raw_data[fa_off + (fa_len * i), fa_len])
       end
 
       archs

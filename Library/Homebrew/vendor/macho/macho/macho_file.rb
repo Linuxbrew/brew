@@ -5,6 +5,12 @@ module MachO
   # @see https://en.wikipedia.org/wiki/Mach-O
   # @see MachO::FatFile
   class MachOFile
+    # @return [String] the filename loaded from, or nil if loaded from a binary string
+    attr_accessor :filename
+
+    # @return [Symbol] the endianness of the file, :big or :little
+    attr_reader :endianness
+
     # @return [MachO::MachHeader] if the Mach-O is 32-bit
     # @return [MachO::MachHeader64] if the Mach-O is 64-bit
     attr_reader :header
@@ -24,12 +30,12 @@ module MachO
 
     # Creates a new FatFile from the given filename.
     # @param filename [String] the Mach-O file to load from
-    # @raise [ArgumentError] if the given filename does not exist
+    # @raise [ArgumentError] if the given file does not exist
     def initialize(filename)
-      raise ArgumentError.new("#{filetype}: no such file") unless File.exist?(filename)
+      raise ArgumentError.new("#{filename}: no such file") unless File.file?(filename)
 
       @filename = filename
-      @raw_data = open(@filename, "rb") { |f| f.read }
+      @raw_data = File.open(@filename, "rb") { |f| f.read }
       @header = get_mach_header
       @load_commands = get_load_commands
     end
@@ -123,14 +129,14 @@ module MachO
       MH_FILETYPES[header.filetype]
     end
 
-    # @return [String] a string representation of the Mach-O's CPU type
+    # @return [Symbol] a symbol representation of the Mach-O's CPU type
     def cputype
       CPU_TYPES[header.cputype]
     end
 
-    # @return [String] a string representation of the Mach-O's CPU subtype
+    # @return [Symbol] a symbol representation of the Mach-O's CPU subtype
     def cpusubtype
-      CPU_SUBTYPES[header.cpusubtype]
+      CPU_SUBTYPES[header.cputype][header.cpusubtype]
     end
 
     # @return [Fixnum] the number of load commands in the Mach-O's header
@@ -278,10 +284,10 @@ module MachO
 
       segment.nsects.times do
         if segment.is_a? SegmentCommand
-          sections << Section.new_from_bin(@raw_data.slice(offset, Section.bytesize))
+          sections << Section.new_from_bin(endianness, @raw_data.slice(offset, Section.bytesize))
           offset += Section.bytesize
         else
-          sections << Section64.new_from_bin(@raw_data.slice(offset, Section64.bytesize))
+          sections << Section64.new_from_bin(endianness, @raw_data.slice(offset, Section64.bytesize))
           offset += Section64.bytesize
         end
       end
@@ -321,10 +327,10 @@ module MachO
 
       magic = get_and_check_magic
       mh_klass = MachO.magic32?(magic) ? MachHeader : MachHeader64
-      mh = mh_klass.new_from_bin(@raw_data[0, mh_klass.bytesize])
+      mh = mh_klass.new_from_bin(endianness, @raw_data[0, mh_klass.bytesize])
 
       check_cputype(mh.cputype)
-      check_cpusubtype(mh.cpusubtype)
+      check_cpusubtype(mh.cputype, mh.cpusubtype)
       check_filetype(mh.filetype)
 
       mh
@@ -341,6 +347,8 @@ module MachO
       raise MagicError.new(magic) unless MachO.magic?(magic)
       raise FatBinaryError.new if MachO.fat_magic?(magic)
 
+      @endianness = MachO.little_magic?(magic) ? :little : :big
+
       magic
     end
 
@@ -352,13 +360,13 @@ module MachO
       raise CPUTypeError.new(cputype) unless CPU_TYPES.key?(cputype)
     end
 
-    # Check the file's CPU sub-type.
+    # Check the file's CPU type/subtype pair.
     # @param cpusubtype [Fixnum] the CPU subtype
     # @raise [MachO::CPUSubtypeError] if the CPU sub-type is unknown
     # @private
-    def check_cpusubtype(cpusubtype)
+    def check_cpusubtype(cputype, cpusubtype)
       # Only check sub-type w/o capability bits (see `get_mach_header`).
-      raise CPUSubtypeError.new(cpusubtype) unless CPU_SUBTYPES.key?(cpusubtype)
+      raise CPUSubtypeError.new(cputype, cpusubtype) unless CPU_SUBTYPES[cputype].key?(cpusubtype)
     end
 
     # Check the file's type.
@@ -378,7 +386,8 @@ module MachO
       load_commands = []
 
       header.ncmds.times do
-        cmd = @raw_data.slice(offset, 4).unpack("V").first
+        fmt = (endianness == :little) ? "L<" : "L>"
+        cmd = @raw_data.slice(offset, 4).unpack(fmt).first
         cmd_sym = LOAD_COMMANDS[cmd]
 
         raise LoadCommandError.new(cmd) if cmd_sym.nil?
@@ -386,7 +395,7 @@ module MachO
         # why do I do this? i don't like declaring constants below
         # classes, and i need them to resolve...
         klass = MachO.const_get "#{LC_STRUCTURES[cmd_sym]}"
-        command = klass.new_from_bin(@raw_data, offset, @raw_data.slice(offset, klass.bytesize))
+        command = klass.new_from_bin(@raw_data, endianness, offset, @raw_data.slice(offset, klass.bytesize))
 
         load_commands << command
         offset += command.cmdsize
@@ -400,7 +409,8 @@ module MachO
     # @return [void]
     # @private
     def set_sizeofcmds(size)
-      new_size = [size].pack("V")
+      fmt = (endianness == :little) ? "L<" : "L>"
+      new_size = [size].pack(fmt)
       @raw_data[20..23] = new_size
     end
 
@@ -475,7 +485,8 @@ module MachO
       set_sizeofcmds(new_sizeofcmds)
 
       # update cmdsize in the cmd
-      @raw_data[cmd.offset + 4, 4] = [new_size].pack("V")
+      fmt = (endianness == :little) ? "L<" : "L>"
+      @raw_data[cmd.offset + 4, 4] = [new_size].pack(fmt)
 
       # delete the old str
       @raw_data.slice!(cmd.offset + lc_str.to_i...cmd.offset + cmd.class.bytesize + old_str.size)

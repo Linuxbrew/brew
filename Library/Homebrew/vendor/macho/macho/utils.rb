@@ -19,7 +19,7 @@ module MachO
   # @param num [Fixnum] the number being checked
   # @return [Boolean] true if `num` is a valid Fat magic number, false otherwise
   def self.fat_magic?(num)
-    num == FAT_MAGIC || num == FAT_CIGAM
+    num == FAT_MAGIC
   end
 
   # @param num [Fixnum] the number being checked
@@ -32,5 +32,17 @@ module MachO
   # @return [Boolean] true if `num` is a valid 64-bit magic number, false otherwise
   def self.magic64?(num)
     num == MH_MAGIC_64 || num == MH_CIGAM_64
+  end
+
+  # @param num [Fixnum] the number being checked
+  # @return [Boolean] true if `num` is a valid little-endian magic number, false otherwise
+  def self.little_magic?(num)
+    num == MH_CIGAM || num == MH_CIGAM_64
+  end
+
+  # @param num [Fixnum] the number being checked
+  # @return [Boolean] true if `num` is a valid big-endian magic number, false otherwise
+  def self.big_magic?(num)
+    num == MH_CIGAM || num == MH_CIGAM_64
   end
 end

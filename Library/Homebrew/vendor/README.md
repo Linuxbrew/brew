@@ -3,7 +3,7 @@ Vendored Dependencies
 
 * [okjson](https://github.com/kr/okjson), version 43.
 
-* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 0.2.2-39-ge2fbedc9.
+* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 0.2.4
 
 ## Licenses:
 
@@ -32,7 +32,7 @@ Vendored Dependencies
 ### ruby-macho
 
 > The MIT License
-> Copyright (c) 2015 William Woodruff <william @ tuffbizz.com>
+> Copyright (c) 2015, 2016 William Woodruff <william @ tuffbizz.com>
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
