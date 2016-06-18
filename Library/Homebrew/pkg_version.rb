@@ -7,13 +7,13 @@ class PkgVersion
 
   def self.parse(path)
     _, version, revision = *path.match(RX)
-    version = Version.new(version)
+    version = Version.create(version)
     new(version, revision.to_i)
   end
 
   def initialize(version, revision)
     @version = version
-    @revision = version.head? ? 0 : revision
+    @revision = revision
   end
 
   def head?
