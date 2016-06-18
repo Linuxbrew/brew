@@ -159,7 +159,7 @@ class Resource
 
     case val
     when nil     then Version.detect(url, specs)
-    when String  then Version.new(val)
+    when String  then Version.create(val)
     when Version then val
     else
       raise TypeError, "version '#{val.inspect}' should be a string"
