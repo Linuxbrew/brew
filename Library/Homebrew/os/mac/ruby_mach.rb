@@ -22,10 +22,8 @@ module RubyMachO
 
       machos.each do |m|
         arch = case m.cputype
-        when "CPU_TYPE_I386" then :i386
-        when "CPU_TYPE_X86_64" then :x86_64
-        when "CPU_TYPE_POWERPC" then :ppc7400
-        when "CPU_TYPE_POWERPC64" then :ppc64
+        when :x86_64, :i386, :ppc64 then m.cputype
+        when :ppc then :ppc7400
         else :dunno
         end
 
