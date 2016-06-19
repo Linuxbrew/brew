@@ -15,7 +15,6 @@ require "keg"
 require "formula"
 
 module Homebrew
-
   def linkage
     found_broken_dylibs = false
     ARGV.kegs.each do |keg|
@@ -26,7 +25,7 @@ module Homebrew
       else
         result.display_normal_output
       end
-      found_broken_dylibs = true if !result.broken_dylibs.empty?
+      found_broken_dylibs = true unless result.broken_dylibs.empty?
     end
     if ARGV.include?("--test") && found_broken_dylibs
       exit 1
@@ -75,7 +74,6 @@ module Homebrew
         opoo "Formula unavailable: #{keg.name}"
         @undeclared_deps = []
       end
-
     end
 
     def display_normal_output
