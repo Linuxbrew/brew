@@ -48,6 +48,7 @@ module Homebrew
 
     def check_dylibs
       @keg.find do |file|
+        next if file.symlink? || file.directory?
         next unless file.dylib? || file.mach_o_executable? || file.mach_o_bundle?
         file.dynamically_linked_libraries.each do |dylib|
           if dylib.start_with? "@"
