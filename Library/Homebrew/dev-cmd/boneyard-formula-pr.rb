@@ -4,6 +4,7 @@
 #
 # Options:
 #   --dry-run:  Print what would be done rather than doing it.
+#   --local:    Perform only local operations (don't push and don't create PR).
 
 require "formula"
 require "utils/json"
@@ -19,6 +20,7 @@ end
 
 module Homebrew
   def boneyard_formula_pr
+    local_only = ARGV.include?("--local")
     formula = ARGV.formulae.first
     odie "No formula found!" unless formula
 
@@ -58,7 +60,7 @@ module Homebrew
       tap_migrations = tap_migrations.sort.inject({}) { |a, e| a.merge!(e[0] => e[1]) }
       tap_migrations_path.atomic_write(JSON.pretty_generate(tap_migrations) + "\n")
     end
-    unless Formula["hub"].any_version_installed?
+    unless Formula["hub"].any_version_installed? || local_only
       if ARGV.dry_run?
         puts "brew install hub"
       else
@@ -70,28 +72,34 @@ module Homebrew
       puts "cd #{formula.tap.path}"
       puts "git checkout -b #{branch} origin/master"
       puts "git commit --no-edit --verbose --message=\"#{formula.name}: migrate to boneyard\" -- #{formula_relpath} #{tap_migrations_path.basename}"
-      puts "hub fork --no-remote"
-      puts "hub fork"
-      puts "hub fork (to read $HUB_REMOTE)"
-      puts "git push $HUB_REMOTE #{branch}:#{branch}"
-      puts "hub pull-request -m $'#{formula.name}: migrate to boneyard\\n\\nCreated with `brew boneyard-formula-pr`.'"
+
+      unless local_only
+        puts "hub fork --no-remote"
+        puts "hub fork"
+        puts "hub fork (to read $HUB_REMOTE)"
+        puts "git push $HUB_REMOTE #{branch}:#{branch}"
+        puts "hub pull-request -m $'#{formula.name}: migrate to boneyard\\n\\nCreated with `brew boneyard-formula-pr`.'"
+      end
     else
       cd formula.tap.path
       safe_system "git", "checkout", "-b", branch, "origin/master"
       safe_system "git", "commit", "--no-edit", "--verbose",
         "--message=#{formula.name}: migrate to boneyard",
         "--", formula_relpath, tap_migrations_path.basename
-      safe_system "hub", "fork", "--no-remote"
-      quiet_system "hub", "fork"
-      remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists./, 1]
-      odie "cannot get remote from 'hub'!" unless remote
-      safe_system "git", "push", remote, "#{branch}:#{branch}"
-      pr_message = <<-EOS.undent
-        #{formula.name}: migrate to boneyard
 
-        Created with `brew boneyard-formula-pr`.
-      EOS
-      pr_url = Utils.popen_read("hub", "pull-request", "-m", pr_message).chomp
+      unless local_only
+        safe_system "hub", "fork", "--no-remote"
+        quiet_system "hub", "fork"
+        remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists./, 1]
+        odie "cannot get remote from 'hub'!" unless remote
+        safe_system "git", "push", remote, "#{branch}:#{branch}"
+        pr_message = <<-EOS.undent
+          #{formula.name}: migrate to boneyard
+
+          Created with `brew boneyard-formula-pr`.
+        EOS
+        pr_url = Utils.popen_read("hub", "pull-request", "-m", pr_message).chomp
+      end
     end
 
     if ARGV.dry_run?
@@ -104,11 +112,14 @@ module Homebrew
       end
       puts "git add #{formula_file}"
       puts "git commit --no-edit --verbose --message=\"#{formula.name}: migrate from #{formula.tap.repo}\" -- #{formula_file}"
-      puts "hub fork --no-remote"
-      puts "hub fork"
-      puts "hub fork (to read $HUB_REMOTE)"
-      puts "git push $HUB_REMOTE #{branch}:#{branch}"
-      puts "hub pull-request --browse -m $'#{formula.name}: migrate from #{formula.tap.repo}\\n\\nGoes together with $PR_URL\\n\\nCreated with `brew boneyard-formula-pr`.'"
+
+      unless local_only
+        puts "hub fork --no-remote"
+        puts "hub fork"
+        puts "hub fork (to read $HUB_REMOTE)"
+        puts "git push $HUB_REMOTE #{branch}:#{branch}"
+        puts "hub pull-request --browse -m $'#{formula.name}: migrate from #{formula.tap.repo}\\n\\nGoes together with $PR_URL\\n\\nCreated with `brew boneyard-formula-pr`.'"
+      end
     else
       cd boneyard_tap.formula_dir
       safe_system "git", "checkout", "-b", branch, "origin/master"
@@ -119,18 +130,21 @@ module Homebrew
       safe_system "git", "commit", "--no-edit", "--verbose",
         "--message=#{formula.name}: migrate from #{formula.tap.repo}",
         "--", formula_file
-      safe_system "hub", "fork", "--no-remote"
-      quiet_system "hub", "fork"
-      remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists./, 1]
-      odie "cannot get remote from 'hub'!" unless remote
-      safe_system "git", "push", remote, "#{branch}:#{branch}"
-      safe_system "hub", "pull-request", "--browse", "-m", <<-EOS.undent
-        #{formula.name}: migrate from #{formula.tap.repo}
 
-        Goes together with #{pr_url}.
+      unless local_only
+        safe_system "hub", "fork", "--no-remote"
+        quiet_system "hub", "fork"
+        remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists./, 1]
+        odie "cannot get remote from 'hub'!" unless remote
+        safe_system "git", "push", remote, "#{branch}:#{branch}"
+        safe_system "hub", "pull-request", "--browse", "-m", <<-EOS.undent
+          #{formula.name}: migrate from #{formula.tap.repo}
 
-        Created with `brew boneyard-formula-pr`.
-      EOS
+          Goes together with #{pr_url}.
+
+          Created with `brew boneyard-formula-pr`.
+        EOS
+      end
     end
   end
 end
