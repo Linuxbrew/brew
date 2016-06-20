@@ -70,7 +70,7 @@ module Homebrew
     branch = "#{formula.name}-boneyard"
     if ARGV.dry_run?
       puts "cd #{formula.tap.path}"
-      puts "git checkout -b #{branch} origin/master"
+      puts "git checkout --no-track -b #{branch} origin/master"
       puts "git commit --no-edit --verbose --message=\"#{formula.name}: migrate to boneyard\" -- #{formula_relpath} #{tap_migrations_path.basename}"
 
       unless local_only
@@ -82,7 +82,7 @@ module Homebrew
       end
     else
       cd formula.tap.path
-      safe_system "git", "checkout", "-b", branch, "origin/master"
+      safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
       safe_system "git", "commit", "--no-edit", "--verbose",
         "--message=#{formula.name}: migrate to boneyard",
         "--", formula_relpath, tap_migrations_path.basename
@@ -104,7 +104,7 @@ module Homebrew
 
     if ARGV.dry_run?
       puts "cd #{boneyard_tap.path}"
-      puts "git checkout -b #{branch} origin/master"
+      puts "git checkout --no-track -b #{branch} origin/master"
       if bottle_block
         puts "Removing bottle block"
       else
@@ -122,7 +122,7 @@ module Homebrew
       end
     else
       cd boneyard_tap.formula_dir
-      safe_system "git", "checkout", "-b", branch, "origin/master"
+      safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
       if bottle_block
         Utils::Inreplace.inreplace formula_file, /  bottle do.+?end\n\n/m, ""
       end
