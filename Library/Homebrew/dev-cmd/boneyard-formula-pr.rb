@@ -60,7 +60,7 @@ module Homebrew
       tap_migrations = tap_migrations.sort.inject({}) { |a, e| a.merge!(e[0] => e[1]) }
       tap_migrations_path.atomic_write(JSON.pretty_generate(tap_migrations) + "\n")
     end
-    unless Formula["hub"].any_version_installed? || local_only
+    unless which("hub") || local_only
       if ARGV.dry_run?
         puts "brew install hub"
       else
