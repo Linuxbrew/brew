@@ -272,14 +272,14 @@ class FormulaTests < Homebrew::TestCase
     assert_equal PkgVersion.parse("1.0_1"), f.pkg_version
   end
 
-  def test_head_ignores_revisions
+  def test_head_uses_revisions
     f = formula("test", Pathname.new(__FILE__).expand_path, :head) do
       url "foo-1.0.bar"
       revision 1
       head "foo"
     end
 
-    assert_equal PkgVersion.parse("HEAD"), f.pkg_version
+    assert_equal PkgVersion.parse("HEAD_1"), f.pkg_version
   end
 
   def test_legacy_options

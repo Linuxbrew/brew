@@ -35,7 +35,8 @@ class PkgVersionTests < Homebrew::TestCase
     assert_equal "1.0_1", PkgVersion.new(Version.new("1.0"), 1).to_s
     assert_equal "1.0", PkgVersion.new(Version.new("1.0"), 0).to_s
     assert_equal "1.0", PkgVersion.new(Version.new("1.0"), 0).to_s
-    assert_equal "HEAD", PkgVersion.new(Version.new("HEAD"), 1).to_s
+    assert_equal "HEAD_1", PkgVersion.new(Version.create("HEAD"), 1).to_s
+    assert_equal "HEAD-ffffff_1", PkgVersion.new(Version.create("HEAD-ffffff"), 1).to_s
   end
 
   def test_hash
