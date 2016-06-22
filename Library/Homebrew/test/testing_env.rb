@@ -23,7 +23,7 @@ end
 module Homebrew
   module VersionAssertions
     def version(v)
-      Version.new(v)
+      Version.create(v)
     end
 
     def assert_version_equal(expected, actual)

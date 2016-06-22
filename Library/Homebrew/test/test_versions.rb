@@ -55,7 +55,11 @@ class VersionComparisonTests < Homebrew::TestCase
 
   def test_HEAD
     assert_operator version("HEAD"), :>, version("1.2.3")
+    assert_operator version("HEAD-abcdef"), :>, version("1.2.3")
     assert_operator version("1.2.3"), :<, version("HEAD")
+    assert_operator version("1.2.3"), :<, version("HEAD-fedcba")
+    assert_operator version("HEAD-abcdef"), :==, version("HEAD-fedcba")
+    assert_operator version("HEAD"), :==, version("HEAD-fedcba")
   end
 
   def test_comparing_alpha_versions
@@ -154,6 +158,12 @@ class VersionParsingTests < Homebrew::TestCase
   def test_no_version
     assert_version_nil "http://example.com/blah.tar"
     assert_version_nil "foo"
+  end
+
+  def test_create
+    v = Version.create("1.20")
+    refute_predicate v, :head?
+    assert_equal "1.20", v.to_str
   end
 
   def test_version_all_dots
@@ -439,5 +449,40 @@ class VersionParsingTests < Homebrew::TestCase
   def test_from_url
     assert_version_detected "1.2.3",
       "http://github.com/foo/bar.git", {:tag => "v1.2.3"}
+  end
+end
+
+class HeadVersionTests < Homebrew::TestCase
+  def test_create_head
+    v1 = Version.create("HEAD-abcdef")
+    v2 = Version.create("HEAD")
+
+    assert_predicate v1, :head?
+    assert_predicate v2, :head?
+  end
+
+  def test_commit_assigned
+    v = HeadVersion.new("HEAD-abcdef")
+    assert_equal "abcdef", v.commit
+    assert_equal "HEAD-abcdef", v.to_str
+  end
+
+  def test_no_commit
+    v = HeadVersion.new("HEAD")
+    assert_nil v.commit
+    assert_equal "HEAD", v.to_str
+  end
+
+  def test_update_commit
+    v1 = HeadVersion.new("HEAD-abcdef")
+    v2 = HeadVersion.new("HEAD")
+
+    v1.update_commit("ffffff")
+    assert_equal "ffffff", v1.commit
+    assert_equal "HEAD-ffffff", v1.to_str
+
+    v2.update_commit("ffffff")
+    assert_equal "ffffff", v2.commit
+    assert_equal "HEAD-ffffff", v2.to_str
   end
 end
