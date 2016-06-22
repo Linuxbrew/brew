@@ -6,6 +6,7 @@ require "formula"
 
 class IntegrationCommandTests < Homebrew::TestCase
   def setup
+    @formula_files = []
     @cmd_id_index = 0 # Assign unique IDs to invocations of `cmd_output`.
     (HOMEBREW_PREFIX/"bin").mkpath
     FileUtils.touch HOMEBREW_PREFIX/"bin/brew"
@@ -13,6 +14,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def teardown
     (HOMEBREW_PREFIX/"bin").rmtree
+    @formula_files.each(&:unlink)
   end
 
   def cmd_id_from_args(args)
@@ -44,7 +46,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       ENV["HOMEBREW_BREW_FILE"] = HOMEBREW_PREFIX/"bin/brew"
       ENV["HOMEBREW_INTEGRATION_TEST"] = cmd_id_from_args(args)
       ENV["HOMEBREW_TEST_TMPDIR"] = TEST_TMPDIR
-      env.each_pair { |k,v| ENV[k] = v }
+      env.each_pair { |k, v| ENV[k] = v }
 
       read, write = IO.pipe
       begin
@@ -78,6 +80,48 @@ class IntegrationCommandTests < Homebrew::TestCase
     $stderr.puts "\n#{output}" if status != 1
     assert_equal 1, status
     output
+  end
+
+  def setup_test_formula(name, content = nil)
+    formula_path = CoreTap.new.formula_dir/"#{name}.rb"
+    @formula_files << formula_path
+
+    case name
+    when "testball"
+      content = <<-EOS.undent
+        desc "Some test"
+        homepage "https://example.com/#{name}"
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/#{name}-0.1.tbz"
+        sha256 "#{TESTBALL_SHA256}"
+
+        option "with-foo", "Build with foo"
+        #{content}
+
+        def install
+          (prefix/"foo"/"test").write("test") if build.with? "foo"
+          prefix.install Dir["*"]
+        end
+
+        # something here
+      EOS
+    when "foo"
+      content = <<-EOS.undent
+        url "https://example.com/#{name}-1.0"
+      EOS
+    when "bar"
+      content = <<-EOS.undent
+        url "https://example.com/#{name}-1.0"
+        depends_on "foo"
+      EOS
+    end
+
+    formula_path.write <<-EOS.undent
+      class #{Formulary.class_s(name)} < Formula
+        #{content}
+      end
+    EOS
+
+    formula_path
   end
 
   def testball
@@ -175,12 +219,9 @@ class IntegrationCommandTests < Homebrew::TestCase
     cmd("install", "--build-bottle", testball)
     assert_match "Formula not from core or any taps",
                  cmd_fail("bottle", "--no-revision", testball)
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
+
+    setup_test_formula "testball"
+
     # `brew bottle` should not fail with dead symlink
     # https://github.com/Homebrew/legacy-homebrew/issues/49007
     (HOMEBREW_CELLAR/"testball/0.1").cd do
@@ -191,7 +232,6 @@ class IntegrationCommandTests < Homebrew::TestCase
   ensure
     cmd("uninstall", "--force", "testball")
     cmd("cleanup", "--force", "--prune=all")
-    formula_file.unlink unless formula_file.nil?
     FileUtils.rm_f Dir["testball-0.1*.bottle.tar.gz"]
   end
 
@@ -210,21 +250,14 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_readall
-    repo = CoreTap.new
-    formula_file = repo.formula_dir/"foo.rb"
-    formula_file.write <<-EOS.undent
-      class Foo < Formula
-        url "https://example.com/foo-1.0.tar.gz"
-      end
-    EOS
-    alias_file = repo.alias_dir/"bar"
+    formula_file = setup_test_formula "testball"
+    alias_file = CoreTap.new.alias_dir/"foobar"
     alias_file.parent.mkpath
     FileUtils.ln_s formula_file, alias_file
     cmd("readall", "--aliases", "--syntax")
     cmd("readall", "homebrew/core")
   ensure
-    formula_file.unlink unless formula_file.nil?
-    repo.alias_dir.rmtree
+    alias_file.parent.rmtree
   end
 
   def test_tap
@@ -257,28 +290,13 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_missing
-    repo = CoreTap.new
-    foo_file = repo.formula_dir/"foo.rb"
-    foo_file.write <<-EOS.undent
-      class Foo < Formula
-        url "https://example.com/foo-1.0"
-      end
-    EOS
-
-    bar_file = repo.formula_dir/"bar.rb"
-    bar_file.write <<-EOS.undent
-      class Bar < Formula
-        url "https://example.com/bar-1.0"
-        depends_on "foo"
-      end
-    EOS
+    setup_test_formula "foo"
+    setup_test_formula "bar"
 
     (HOMEBREW_CELLAR/"bar/1.0").mkpath
     assert_match "foo", cmd("missing")
   ensure
     (HOMEBREW_CELLAR/"bar").rmtree
-    foo_file.unlink
-    bar_file.unlink
   end
 
   def test_doctor
@@ -300,78 +318,46 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_cat
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    content = <<-EOS.undent
-      class Testball < Formula
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
-    formula_file.write content
-
-    assert_equal content.chomp, cmd("cat", "testball")
-  ensure
-    formula_file.unlink
+    formula_file = setup_test_formula "testball"
+    assert_equal formula_file.read.chomp, cmd("cat", "testball")
   end
 
   def test_desc
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        desc "Some test"
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
+    setup_test_formula "testball"
 
     assert_equal "testball: Some test", cmd("desc", "testball")
     assert_match "Pick one, and only one", cmd_fail("desc", "--search", "--name")
     assert_match "You must provide a search term", cmd_fail("desc", "--search")
 
-    refute_predicate HOMEBREW_CACHE.join("desc_cache.json"),
-                     :exist?, "Cached file should not exist"
+    desc_cache = HOMEBREW_CACHE/"desc_cache.json"
+    refute_predicate desc_cache, :exist?, "Cached file should not exist"
 
     cmd("desc", "--description", "testball")
-    assert_predicate HOMEBREW_CACHE.join("desc_cache.json"),
-                     :exist?, "Cached file should exist"
-
-    FileUtils.rm HOMEBREW_CACHE.join("desc_cache.json")
+    assert_predicate desc_cache, :exist?, "Cached file should not exist"
   ensure
-    formula_file.unlink
+    desc_cache.unlink
   end
 
   def test_edit
     (HOMEBREW_REPOSITORY/".git").mkpath
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "https://example.com/testball-0.1.tar.gz"
-        # something here
-      end
-    EOS
+    setup_test_formula "testball"
 
     assert_match "# something here",
-                 cmd("edit", "testball", {"HOMEBREW_EDITOR" => "/bin/cat"})
+                 cmd("edit", "testball", "HOMEBREW_EDITOR" => "/bin/cat")
   ensure
-    formula_file.unlink
     (HOMEBREW_REPOSITORY/".git").unlink
   end
 
   def test_sh
     assert_match "Your shell has been configured",
-                 cmd("sh", {"SHELL" => "/usr/bin/true"})
+                 cmd("sh", "SHELL" => "/usr/bin/true")
   end
 
   def test_info
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
+    setup_test_formula "testball"
 
     assert_match "testball: stable 0.1",
                  cmd("info", "testball")
-  ensure
-    formula_file.unlink
   end
 
   def test_tap_readme
@@ -384,12 +370,7 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_unpack
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-      end
-    EOS
+    setup_test_formula "testball"
 
     mktmpdir do |path|
       cmd "unpack", "testball", "--destdir=#{path}"
@@ -398,60 +379,34 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
   ensure
     FileUtils.rm_f HOMEBREW_CACHE/"testball-0.1.tbz"
-    formula_file.unlink
   end
 
   def test_options
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-        option "with-foo", "foobar"
-        depends_on "bar" => :recommended
-      end
+    setup_test_formula "testball", <<-EOS.undent
+      depends_on "bar" => :recommended
     EOS
 
-    assert_equal "--with-foo\n\tfoobar\n--without-bar\n\tBuild without bar support",
+    assert_equal "--with-foo\n\tBuild with foo\n--without-bar\n\tBuild without bar support",
       cmd_output("options", "testball").chomp
-  ensure
-    formula_file.unlink
   end
 
   def test_outdated
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-      end
-    EOS
+    setup_test_formula "testball"
     (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
 
     assert_equal "testball", cmd("outdated")
   ensure
-    formula_file.unlink
     FileUtils.rm_rf HOMEBREW_CELLAR/"testball"
   end
 
   def test_upgrade
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-        sha256 "#{TESTBALL_SHA256}"
-
-        def install
-          prefix.install Dir["*"]
-        end
-      end
-    EOS
-
+    setup_test_formula "testball"
     (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
 
     cmd("upgrade")
     assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
       "The latest version directory should be created")
   ensure
-    formula_file.unlink
     cmd("uninstall", "--force", testball)
     cmd("cleanup", "--force", "--prune=all")
   end
@@ -461,19 +416,13 @@ class IntegrationCommandTests < Homebrew::TestCase
     apps_dir = Pathname.new(home).join("Applications")
     apps_dir.mkpath
 
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
+    setup_test_formula "testball"
 
     source_dir = HOMEBREW_CELLAR/"testball/0.1/TestBall.app"
     source_dir.mkpath
     assert_match "Linking: #{source_dir}",
-      cmd("linkapps", "--local", {"HOME" => home})
+      cmd("linkapps", "--local", "HOME" => home)
   ensure
-    formula_file.unlink
     FileUtils.rm_rf apps_dir
     (HOMEBREW_CELLAR/"testball").rmtree
   end
@@ -483,12 +432,7 @@ class IntegrationCommandTests < Homebrew::TestCase
     apps_dir = Pathname.new(home).join("Applications")
     apps_dir.mkpath
 
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
+    setup_test_formula "testball"
 
     source_app = (HOMEBREW_CELLAR/"testball/0.1/TestBall.app")
     source_app.mkpath
@@ -496,25 +440,14 @@ class IntegrationCommandTests < Homebrew::TestCase
     FileUtils.ln_s source_app, "#{apps_dir}/TestBall.app"
 
     assert_match "Unlinking: #{apps_dir}/TestBall.app",
-      cmd("unlinkapps", "--local", {"HOME" => home})
+      cmd("unlinkapps", "--local", "HOME" => home)
   ensure
-    formula_file.unlink
     apps_dir.rmtree
     (HOMEBREW_CELLAR/"testball").rmtree
   end
 
   def test_pin_unpin
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-        sha256 "#{TESTBALL_SHA256}"
-
-        def install
-          prefix.install Dir["*"]
-        end
-      end
-    EOS
+    setup_test_formula "testball"
     (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
 
     cmd("pin", "testball")
@@ -527,26 +460,12 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
       "The latest version directory should be created")
   ensure
-    formula_file.unlink
     cmd("uninstall", "--force", testball)
     cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_reinstall
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-        sha256 "#{TESTBALL_SHA256}"
-
-        option "with-foo", "build with foo"
-
-        def install
-          (prefix/"foo"/"test").write("test") if build.with? "foo"
-          prefix.install Dir["*"]
-        end
-      end
-    EOS
+    setup_test_formula "testball"
 
     cmd("install", "testball", "--with-foo")
     foo_dir = HOMEBREW_CELLAR/"testball/0.1/foo"
@@ -556,28 +475,17 @@ class IntegrationCommandTests < Homebrew::TestCase
       cmd("reinstall", "testball")
     assert foo_dir.exist?
   ensure
-    formula_file.unlink
     cmd("uninstall", "--force", "testball")
     cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_home
+    setup_test_formula "testball"
+
     assert_equal HOMEBREW_WWW,
-                 cmd("home", {"HOMEBREW_BROWSER" => "echo"})
-
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        desc "Some test"
-        homepage "https://example.com/testball"
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
-
+                 cmd("home", "HOMEBREW_BROWSER" => "echo")
     assert_equal Formula["testball"].homepage,
-                 cmd("home", "testball", {"HOMEBREW_BROWSER" => "echo"})
-  ensure
-    formula_file.unlink
+                 cmd("home", "testball", "HOMEBREW_BROWSER" => "echo")
   end
 
   def test_list
@@ -596,7 +504,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_create
     url = "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-    cmd("create", url, {"HOMEBREW_EDITOR" => "/bin/cat"})
+    cmd("create", url, "HOMEBREW_EDITOR" => "/bin/cat")
 
     formula_file = CoreTap.new.formula_dir/"testball.rb"
     assert formula_file.exist?, "The formula source should have been created"
@@ -607,85 +515,39 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_fetch
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
-        sha256 "#{TESTBALL_SHA256}"
-      end
-    EOS
+    setup_test_formula "testball"
 
     cmd("fetch", "testball")
     assert((HOMEBREW_CACHE/"testball-0.1.tbz").exist?,
       "The tarball should have been cached")
   ensure
-    formula_file.unlink
     cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_deps
-    formula_dir = CoreTap.new.formula_dir
-    formula_file1 = formula_dir/"testball1.rb"
-    formula_file2 = formula_dir/"testball2.rb"
-    formula_file3 = formula_dir/"testball3.rb"
-    formula_file1.write <<-EOS.undent
-      class Testball1 < Formula
-        url "https://example.com/testball1-0.1.tar.gz"
-        depends_on "testball2"
-      end
-    EOS
-    formula_file2.write <<-EOS.undent
-      class Testball2 < Formula
-        url "https://example.com/testball2-0.1.tar.gz"
-        depends_on "testball3"
-      end
-    EOS
-    formula_file3.write <<-EOS.undent
-      class Testball3 < Formula
-        url "https://example.com/testball3-0.1.tar.gz"
-      end
+    setup_test_formula "foo"
+    setup_test_formula "bar"
+    setup_test_formula "baz", <<-EOS.undent
+      url "https://example.com/baz-1.0"
+      depends_on "bar"
     EOS
 
-    assert_equal "testball2\ntestball3", cmd("deps", "testball1")
-    assert_equal "testball3", cmd("deps", "testball2")
-    assert_equal "", cmd("deps", "testball3")
-
-  ensure
-    formula_file1.unlink
-    formula_file2.unlink
-    formula_file3.unlink
+    assert_equal "", cmd("deps", "foo")
+    assert_equal "foo", cmd("deps", "bar")
+    assert_equal "bar\nfoo", cmd("deps", "baz")
   end
 
   def test_uses
-    formula_dir = CoreTap.new.formula_dir
-    formula_file1 = formula_dir/"testball1.rb"
-    formula_file2 = formula_dir/"testball2.rb"
-    formula_file3 = formula_dir/"testball3.rb"
-    formula_file1.write <<-EOS.undent
-      class Testball1 < Formula
-        url "https://example.com/testball1-0.1.tar.gz"
-        depends_on "testball2"
-      end
-    EOS
-    formula_file2.write <<-EOS.undent
-      class Testball2 < Formula
-        url "https://example.com/testball2-0.1.tar.gz"
-        depends_on "testball3"
-      end
-    EOS
-    formula_file3.write <<-EOS.undent
-      class Testball3 < Formula
-        url "https://example.com/testball3-0.1.tar.gz"
-      end
+    setup_test_formula "foo"
+    setup_test_formula "bar"
+    setup_test_formula "baz", <<-EOS.undent
+      url "https://example.com/baz-1.0"
+      depends_on "bar"
     EOS
 
-    assert_equal "testball1\ntestball2", cmd("uses", "--recursive", "testball3")
-    assert_equal "testball2", cmd("uses", "testball3")
-    assert_equal "", cmd("uses", "testball1")
-  ensure
-    formula_file1.unlink
-    formula_file2.unlink
-    formula_file3.unlink
+    assert_equal "", cmd("uses", "baz")
+    assert_equal "baz", cmd("uses", "bar")
+    assert_equal "bar\nbaz", cmd("uses", "--recursive", "foo")
   end
 
   def test_log
@@ -702,12 +564,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_log_formula
     core_tap = CoreTap.new
-    formula_file = core_tap.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
+    setup_test_formula "testball"
 
     core_tap.path.cd do
       shutup do
@@ -728,38 +585,23 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_predicate shallow_tap.path/".git/shallow", :exist?,
                      "A shallow clone should have been created."
   ensure
-    formula_file.unlink
     (core_tap.path/".git").rmtree
     shallow_tap.path.rmtree
   end
 
   def test_leaves
-    formula_dir = CoreTap.new.formula_dir
-    formula_file1 = formula_dir/"testball1.rb"
-    formula_file2 = formula_dir/"testball2.rb"
-    formula_file1.write <<-EOS.undent
-      class Testball1 < Formula
-        url "https://example.com/testball1-0.1.tar.gz"
-      end
-    EOS
-    formula_file2.write <<-EOS.undent
-      class Testball2 < Formula
-        url "https://example.com/testball2-0.1.tar.gz"
-        depends_on "testball1"
-      end
-    EOS
+    setup_test_formula "foo"
+    setup_test_formula "bar"
     assert_equal "", cmd("leaves")
 
-    (HOMEBREW_CELLAR/"testball1/0.1/somedir").mkpath
-    assert_equal "testball1", cmd("leaves")
+    (HOMEBREW_CELLAR/"foo/0.1/somedir").mkpath
+    assert_equal "foo", cmd("leaves")
 
-    (HOMEBREW_CELLAR/"testball2/0.1/somedir").mkpath
-    assert_equal "testball2", cmd("leaves")
+    (HOMEBREW_CELLAR/"bar/0.1/somedir").mkpath
+    assert_equal "bar", cmd("leaves")
   ensure
-    (HOMEBREW_CELLAR/"testball1").rmtree
-    (HOMEBREW_CELLAR/"testball2").rmtree
-    formula_file1.unlink
-    formula_file2.unlink
+    (HOMEBREW_CELLAR/"foo").rmtree
+    (HOMEBREW_CELLAR/"bar").rmtree
   end
 
   def test_prune
@@ -794,19 +636,12 @@ class IntegrationCommandTests < Homebrew::TestCase
       FileUtils.chmod 0777, file
 
       assert_match "I am #{cmd}",
-        cmd(cmd, {"PATH" => "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"})
+        cmd(cmd, "PATH" => "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}")
     end
   end
 
   def test_search
-    formula_file = CoreTap.new.formula_dir/"testball.rb"
-    formula_file.write <<-EOS.undent
-      class Testball < Formula
-        desc "Some test"
-        url "https://example.com/testball-0.1.tar.gz"
-      end
-    EOS
-
+    setup_test_formula "testball"
     desc_cache = HOMEBREW_CACHE/"desc_cache.json"
     refute_predicate desc_cache, :exist?, "Cached file should not exist"
 
@@ -832,6 +667,5 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_predicate desc_cache, :exist?, "Cached file should exist"
   ensure
     desc_cache.unlink
-    formula_file.unlink
   end
 end
