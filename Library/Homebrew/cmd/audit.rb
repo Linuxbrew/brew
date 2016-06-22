@@ -1135,12 +1135,7 @@ class ResourceAuditor
   def audit_urls
     # Check GNU urls; doesn't apply to mirrors
     if url =~ %r{^(?:https?|ftp)://(?!alpha).+/gnu/}
-      problem "Please use \"http://ftpmirror.gnu.org\" instead of #{url}."
-    end
-
-    # GNU's ftpmirror does NOT support SSL/TLS.
-    if url =~ %r{^https://ftpmirror\.gnu\.org/}
-      problem "Please use http:// for #{url}"
+      problem "Please use \"https://ftpmirror.gnu.org\" instead of #{url}."
     end
 
     if mirrors.include?(url)
@@ -1154,6 +1149,7 @@ class ResourceAuditor
     urls.each do |p|
       case p
       when %r{^http://ftp\.gnu\.org/},
+           %r{^http://ftpmirror\.gnu\.org/},
            %r{^http://[^/]*\.apache\.org/},
            %r{^http://code\.google\.com/},
            %r{^http://fossies\.org/},
