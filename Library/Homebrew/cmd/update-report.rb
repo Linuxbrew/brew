@@ -250,10 +250,26 @@ class Reporter
       tabs = dir.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
       next unless tabs.first.tap == tap # skip if installed formula is not from this tap.
       new_tap = Tap.fetch(new_tap_name)
-      new_tap.install unless new_tap.installed?
-      # update tap for each Tab
-      tabs.each { |tab| tab.tap = new_tap }
-      tabs.each(&:write)
+      # For formulae migrated to cask: Auto-install cask or provide install instructions.
+      if new_tap_name == "caskroom/cask"
+        system HOMEBREW_BREW_FILE, "uninstall", name
+        if new_tap.installed? && (HOMEBREW_REPOSITORY/"Caskroom").directory?
+          ohai "#{name} has been moved to Homebrew Cask. Installing #{name}..."
+          system HOMEBREW_BREW_FILE, "uninstall", "--force", name
+          system HOMEBREW_BREW_FILE, "cask", "install", name
+        else
+          ohai "#{name} has been moved to Homebrew Cask.", <<-EOS.undent
+            To uninstall the formula and install the cask run:
+              brew uninstall --force #{name}
+              brew cask install #{name} 
+          EOS
+        end
+      else
+        new_tap.install unless new_tap.installed?
+        # update tap for each Tab
+        tabs.each { |tab| tab.tap = new_tap }
+        tabs.each(&:write)
+      end
     end
   end
 
