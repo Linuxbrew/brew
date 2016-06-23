@@ -273,7 +273,7 @@ module Homebrew
       def diff_formulae(start_revision, end_revision, path, filter)
         return unless @tap
         git(
-          "diff-tree", "-r", "--name-only", "--diff-filter=#{filter}",
+          "diff-tree", "--name-only", "--diff-filter=#{filter}",
           start_revision, end_revision, "--", path
         ).lines.map do |line|
           file = Pathname.new line.chomp
