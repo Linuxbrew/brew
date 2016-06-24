@@ -255,7 +255,7 @@ module Homebrew
         raise
       ensure
         ignore_interrupts do
-          original_tab.write
+          original_tab.write if original_tab
           keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, prefix,
             Keg::CELLAR_PLACEHOLDER, cellar
           keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
