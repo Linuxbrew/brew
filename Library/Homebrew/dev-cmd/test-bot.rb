@@ -795,8 +795,13 @@ module Homebrew
       deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
     end
 
-    user, repo = bottles_hash.keys.first.split("/", 3)
-    tap = Tap.new user, repo
+    first_formula_name = bottles_hash.keys.first
+    tap = if first_formula_name.include? "/"
+      user, repo = bottles_hash.keys.first.split("/", 3)
+      Tap.new user, repo
+    else
+      CoreTap.instance
+    end
 
     ENV["GIT_AUTHOR_NAME"] = ENV["GIT_COMMITTER_NAME"] = "BrewTestBot"
     ENV["GIT_AUTHOR_EMAIL"] = ENV["GIT_COMMITTER_EMAIL"] = "brew-test-bot@googlegroups.com"
