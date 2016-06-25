@@ -764,8 +764,6 @@ module Homebrew
   end
 
   def test_ci_upload(tap)
-    raise "Need a tap to upload!" unless tap
-
     # Don't trust formulae we're uploading
     ENV["HOMEBREW_DISABLE_LOAD_FORMULA"] = "1"
 
@@ -792,6 +790,14 @@ module Homebrew
     return if bottles.empty?
     FileUtils.cp bottles, Dir.pwd, :verbose => true
 
+    json_files = Dir.glob("*.bottle.json")
+    bottles_hash = json_files.reduce({}) do |hash, json_file|
+      deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
+    end
+
+    user, repo = bottles_hash.keys.first.split("/", 3)
+    tap = Tap.new user, repo
+
     ENV["GIT_AUTHOR_NAME"] = ENV["GIT_COMMITTER_NAME"] = "BrewTestBot"
     ENV["GIT_AUTHOR_EMAIL"] = ENV["GIT_COMMITTER_EMAIL"] = "brew-test-bot@googlegroups.com"
     ENV["GIT_WORK_TREE"] = tap.path
@@ -811,7 +817,6 @@ module Homebrew
       safe_system "brew", "pull", "--clean", pull_pr
     end
 
-    json_files = Dir.glob("*.bottle.json")
     system "brew", "bottle", "--merge", "--write", *json_files
 
     remote = "git@github.com:BrewTestBot/homebrew-#{tap.repo}.git"
@@ -819,10 +824,6 @@ module Homebrew
     safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{git_tag}"
 
     formula_packaged = {}
-
-    bottles_hash = json_files.reduce({}) do |hash, json_file|
-      deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
-    end
 
     bottles_hash.each do |formula_name, bottle_hash|
       version = bottle_hash["formula"]["pkg_version"]
