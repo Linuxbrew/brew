@@ -40,6 +40,28 @@ class FormulaTests < Homebrew::TestCase
     f.rack.rmtree
   end
 
+  def test_migration_needed
+    f = Testball.new("newname")
+    f.instance_variable_set(:@oldname, "oldname")
+    f.instance_variable_set(:@tap, CoreTap.instance)
+
+    oldname_prefix = HOMEBREW_CELLAR/"oldname/2.20"
+    oldname_prefix.mkpath
+    oldname_tab = Tab.empty
+    oldname_tab.tabfile = oldname_prefix.join("INSTALL_RECEIPT.json")
+    oldname_tab.write
+
+    refute_predicate f, :migration_needed?
+
+    oldname_tab.tabfile.unlink
+    oldname_tab.source["tap"] = "homebrew/core"
+    oldname_tab.write
+
+    assert_predicate f, :migration_needed?
+  ensure
+    oldname_prefix.parent.rmtree
+  end
+
   def test_installed?
     f = Testball.new
     f.stubs(:installed_prefix).returns(stub(:directory? => false))
