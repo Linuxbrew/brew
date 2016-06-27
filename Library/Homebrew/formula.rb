@@ -956,33 +956,25 @@ class Formula
     @oldname_lock.unlock unless @oldname_lock.nil?
   end
 
+  def migration_needed?
+    oldname && !rack.exist? && (dir = HOMEBREW_CELLAR/oldname).directory? &&
+      !dir.subdirs.empty? && tap == Tab.for_keg(dir.subdirs.first).tap
+  end
+
   # @private
   def outdated_versions
     @outdated_versions ||= begin
       all_versions = []
-      older_or_same_tap_versions = []
 
-      if oldname && !rack.exist? && (dir = HOMEBREW_CELLAR/oldname).directory? &&
-        !dir.subdirs.empty? && tap == Tab.for_keg(dir.subdirs.first).tap
-        raise Migrator::MigrationNeededError.new(self)
-      end
+      raise Migrator::MigrationNeededError.new(self) if migration_needed?
 
       installed_kegs.each do |keg|
         version = keg.version
         all_versions << version
-        older_version = pkg_version <= version
-
-        tab_tap = Tab.for_keg(keg).tap
-        if tab_tap.nil? || tab_tap == tap || older_version
-          older_or_same_tap_versions << version
-        end
+        return [] if pkg_version <= version
       end
 
-      if older_or_same_tap_versions.all? { |v| pkg_version > v }
-        all_versions.sort!
-      else
-        []
-      end
+      all_versions.sort!
     end
   end
 
