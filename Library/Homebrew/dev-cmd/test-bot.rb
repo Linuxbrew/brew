@@ -25,6 +25,10 @@
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
 # --ci-testing:          Shortcut for Homebrew testing CI options.
 # --ci-upload:           Homebrew CI bottle upload.
+#
+# Influential environment variables include:
+# TRAVIS_REPO_SLUG: same as --tap
+# GIT_URL: if set to URL of a tap remote, same as --tap
 
 require "formula"
 require "utils"
@@ -1026,4 +1030,3 @@ module Homebrew
     output
   end
 end
-
