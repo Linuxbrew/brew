@@ -112,5 +112,13 @@ module Homebrew
       }
       refute exp.eql?(act), msg
     end
+
+    def dylib_path(name)
+      Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.dylib")
+    end
+
+    def bundle_path(name)
+      Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.bundle")
+    end
   end
 end
