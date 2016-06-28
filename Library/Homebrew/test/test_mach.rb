@@ -1,6 +1,14 @@
 require "testing_env"
 
 class MachOPathnameTests < Homebrew::TestCase
+  def dylib_path(name)
+    Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.dylib")
+  end
+
+  def bundle_path(name)
+    Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.bundle")
+  end
+
   def test_fat_dylib
     pn = dylib_path("fat")
     assert_predicate pn, :universal?

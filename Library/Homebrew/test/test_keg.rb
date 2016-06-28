@@ -304,19 +304,4 @@ class LinkTests < Homebrew::TestCase
     keg.unlink
     keg.uninstall
   end
-
-  def test_mach_o_files_skips_hardlinks
-    a = HOMEBREW_CELLAR.join("a", "1.0")
-    a.join("lib").mkpath
-    FileUtils.cp dylib_path("i386"), a.join("lib", "i386.dylib")
-    FileUtils.ln a.join("lib", "i386.dylib"), a.join("lib", "i386_link.dylib")
-
-    keg = Keg.new(a)
-    keg.link
-
-    assert_equal 1, keg.mach_o_files.size
-  ensure
-    keg.unlink
-    keg.uninstall
-  end
 end
