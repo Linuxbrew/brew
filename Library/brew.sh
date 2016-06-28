@@ -64,30 +64,11 @@ fi
 unset GEM_HOME
 unset GEM_PATH
 
-if [[ -z "$HOMEBREW_DEVELOPER" ]]
-then
-  unset HOMEBREW_RUBY_PATH
-fi
-
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_OSX="1";;
   Linux) HOMEBREW_LINUX="1";;
 esac
-
-if [[ -z "$HOMEBREW_RUBY_PATH" ]]
-then
-  if [[ -n "$HOMEBREW_OSX" ]]
-  then
-    HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
-  else
-    HOMEBREW_RUBY_PATH="$(which ruby)"
-    if [[ -z "$HOMEBREW_RUBY_PATH" ]]
-    then
-      odie "No Ruby found, cannot proceed."
-    fi
-  fi
-fi
 
 HOMEBREW_CURL="/usr/bin/curl"
 if [[ -n "$HOMEBREW_OSX" ]]
@@ -131,7 +112,6 @@ export HOMEBREW_LIBRARY
 export HOMEBREW_VERSION
 export HOMEBREW_CACHE
 export HOMEBREW_CELLAR
-export HOMEBREW_RUBY_PATH
 export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
 export HOMEBREW_PROCESSOR
@@ -228,6 +208,11 @@ EOS
       ;;
   esac
 fi
+
+# Hide shellcheck complaint:
+# shellcheck source=/dev/null
+source "$HOMEBREW_LIBRARY/Homebrew/utils/ruby.sh"
+setup-ruby-path
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
