@@ -311,7 +311,7 @@ EOS
   # only allow one instance of brew update
   lock update
 
-  chdir "$HOMEBREW_REPOSITORY"
+  safe_cd "$HOMEBREW_REPOSITORY"
   git_init_if_necessary
   # rename Taps directories
   # this procedure will be removed in the future if it seems unnecessary
@@ -382,7 +382,7 @@ EOS
     pull "$DIR"
   done
 
-  chdir "$HOMEBREW_REPOSITORY"
+  safe_cd "$HOMEBREW_REPOSITORY"
 
   if [[ -n "$HOMEBREW_UPDATED" ||
         -n "$HOMEBREW_UPDATE_FAILED" ||
