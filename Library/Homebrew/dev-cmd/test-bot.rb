@@ -93,9 +93,17 @@ module Homebrew
     end
   end
 
+  # Wraps command invocations. Instantiated by Test#test.
+  # Handles logging and pretty-printing.
   class Step
     attr_reader :command, :name, :status, :output, :time
 
+    # Instantiates a Step object.
+    # @param test [Test] The parent Test object
+    # @param command [Array<String>] Command to execute and arguments
+    # @param options [Hash] Recognized options are:
+    #   :puts_output_on_success
+    #   :repository
     def initialize(test, command, options = {})
       @test = test
       @category = test.category
@@ -152,6 +160,9 @@ module Homebrew
       @output && !@output.empty?
     end
 
+    # The execution time of the task.
+    # Precondition: Step#run has been called.
+    # @return [Float] execution time in seconds
     def time
       @end_time - @start_time
     end
