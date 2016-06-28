@@ -51,7 +51,7 @@ module Homebrew
           map { |line| line.slice(2..-1) }.
           join
       }.
-      reject { |s| s.strip.empty? }
+      reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
 
     variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md").
       read[/Homebrew's current maintainers are (.*)\./, 1].
