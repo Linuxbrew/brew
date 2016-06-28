@@ -96,7 +96,7 @@ module Homebrew
   # Wraps command invocations. Instantiated by Test#test.
   # Handles logging and pretty-printing.
   class Step
-    attr_reader :command, :name, :status, :output, :time
+    attr_reader :command, :name, :status, :output
 
     # Instantiates a Step object.
     # @param test [Test] The parent Test object
@@ -112,7 +112,6 @@ module Homebrew
       @name = command[1].delete("-")
       @status = :running
       @repository = options[:repository] || HOMEBREW_REPOSITORY
-      @time = 0
     end
 
     def log_file_path
