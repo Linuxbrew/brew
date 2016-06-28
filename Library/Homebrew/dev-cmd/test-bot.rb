@@ -3,23 +3,24 @@
 # Usage: brew test-bot [options...] <pull-request|formula>
 #
 # Options:
-# --keep-logs:     Write and keep log files under ./brewbot/.
-# --cleanup:       Clean the Homebrew directory. Very dangerous. Use with care.
-# --clean-cache:   Remove all cached downloads. Use with care.
-# --skip-setup:    Don't check the local system is setup correctly.
-# --skip-homebrew: Don't check Homebrew's files and tests are all valid.
-# --junit:         Generate a JUnit XML test results file.
-# --no-bottle:     Run brew install without --build-bottle.
-# --keep-old:      Run brew bottle --keep-old to build new bottles for a single platform.
-# --HEAD:          Run brew install with --HEAD.
-# --local:         Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
-# --tap=<tap>:     Use the git repository of the given tap.
-# --dry-run:       Just print commands, don't run them.
-# --fail-fast:     Immediately exit on a failing step.
-# --verbose:       Print test step output in realtime. Has the side effect of passing output
-#                  as raw bytes instead of re-encoding in UTF-8.
-# --fast:          Don't install any packages, but run e.g. audit anyway.
-# --keep-tmp:      Keep temporary files written by main installs and tests that are run.
+# --keep-logs:           Write and keep log files under ./brewbot/.
+# --cleanup:             Clean the Homebrew directory. Very dangerous. Use with care.
+# --clean-cache:         Remove all cached downloads. Use with care.
+# --skip-setup:          Don't check the local system is setup correctly.
+# --skip-homebrew:       Don't check Homebrew's files and tests are all valid.
+# --junit:               Generate a JUnit XML test results file.
+# --no-bottle:           Run brew install without --build-bottle.
+# --keep-old:            Run brew bottle --keep-old to build new bottles for a single platform.
+# --skip-relocation:     Run brew bottle --skip-relocation to build new bottles for homebrew/portable.
+# --HEAD:                Run brew install with --HEAD.
+# --local:               Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
+# --tap=<tap>:           Use the git repository of the given tap.
+# --dry-run:             Just print commands, don't run them.
+# --fail-fast:           Immediately exit on a failing step.
+# --verbose:             Print test step output in realtime. Has the side effect of passing output
+#                        as raw bytes instead of re-encoding in UTF-8.
+# --fast:                Don't install any packages, but run e.g. audit anyway.
+# --keep-tmp:            Keep temporary files written by main installs and tests that are run.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -580,6 +581,7 @@ module Homebrew
         if formula.stable? && !ARGV.include?("--fast") && !ARGV.include?("--no-bottle") && !formula.bottle_disabled?
           bottle_args = ["--verbose", "--json", formula_name]
           bottle_args << "--keep-old" if ARGV.include? "--keep-old"
+          bottle_args << "--skip-relocation" if ARGV.include? "--skip-relocation"
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.has_output?
