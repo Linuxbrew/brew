@@ -2,16 +2,6 @@ require "testing_env"
 require "dev-cmd/test-bot"
 
 class TestbotCommandTests < Homebrew::TestCase
-  def with_environment(partial_env)
-    old = ENV.to_hash
-    ENV.update partial_env
-    begin
-      yield
-    ensure
-      ENV.replace old
-    end
-  end
-
   def test_resolve_test_tap
     tap = Homebrew.resolve_test_tap
     assert_nil tap, "Should return nil if no tap slug provided"
