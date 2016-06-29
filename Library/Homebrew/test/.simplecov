@@ -3,7 +3,7 @@
 SimpleCov.start do
   tests_path = File.dirname(__FILE__)
 
-  minimum_coverage 40
+  minimum_coverage 40 unless ENV["HOMEBREW_TESTS_ONLY"]
   coverage_dir File.expand_path("#{tests_path}/coverage")
   root File.expand_path("#{tests_path}/../../")
 
@@ -13,9 +13,17 @@ SimpleCov.start do
   add_filter "Homebrew/vendor/"
   add_filter "Taps/"
 
-  # Not using this during integration tests makes the tests 4x times faster
-  # without changing the coverage.
-  unless ENV["HOMEBREW_INTEGRATION_TEST"]
+  if ENV["HOMEBREW_INTEGRATION_TEST"]
+    command_name ENV["HOMEBREW_INTEGRATION_TEST"]
+    at_exit do
+      exit_code = $!.nil? ? 0 : $!.status
+      $stdout.reopen("/dev/null")
+      SimpleCov.result # Just save result, but don't write formatted output.
+      exit! exit_code
+    end
+  else
+    # Not using this during integration tests makes the tests 4x times faster
+    # without changing the coverage.
     track_files "#{SimpleCov.root}/**/*.rb"
   end
 
@@ -31,16 +39,6 @@ SimpleCov.start do
     /Homebrew/postinstall.rb
     /Homebrew/test.rb
   ]
-end
-
-if ENV["HOMEBREW_INTEGRATION_TEST"]
-  SimpleCov.command_name ENV["HOMEBREW_INTEGRATION_TEST"]
-  SimpleCov.at_exit do
-    exit_code = $!.nil? ? 0 : $!.status
-    $stdout.reopen("/dev/null")
-    SimpleCov.result # Just save result, but don't write formatted output.
-    exit! exit_code
-  end
 end
 
 # Don't use Coveralls outside of CI, as it will override SimpleCov's default

@@ -118,8 +118,7 @@ can take several different forms:
   * `HOMEBREW_CACHE`:
     If set, instructs Homebrew to use the given directory as the download cache.
 
-    *Default:* `~/Library/Caches/Homebrew` if it exists; otherwise,
-    `/Library/Caches/Homebrew`.
+    *Default:* `~/Library/Caches/Homebrew`.
 
   * `HOMEBREW_CURL_VERBOSE`:
     If set, Homebrew will pass `--verbose` when invoking `curl`(1).
@@ -181,11 +180,8 @@ can take several different forms:
     to insecure HTTP.
 
     While ensuring your downloads are fully secure, this is likely
-    to cause from-source Sourceforge & GNOME based formulae
-    to fail to download.
-
-    Apache formulae are currently unaffected by this variable and
-    can redirect to plaintext.
+    to cause from-source Sourceforge, some GNU & GNOME based
+    formulae to fail to download.
 
   * `HOMEBREW_NO_GITHUB_API`:
     If set, Homebrew will not use the GitHub API for e.g searches or
@@ -239,7 +235,7 @@ Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/share/doc/
 
 ## AUTHORS
 
-Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Mike McQuaid, Baptiste Fontaine, Brett Koonce, Martin Afanasjew, Dominyk Tiller, Tim Smith and Alex Dunn.
+Homebrew's current maintainers are <%= maintainers[0...-1].join(", ") %> and <%= maintainers[-1] %>.
 
 Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.
 

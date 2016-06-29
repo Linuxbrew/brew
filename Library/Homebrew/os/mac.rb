@@ -1,4 +1,5 @@
 require "hardware"
+require "development_tools"
 require "os/mac/version"
 require "os/mac/xcode"
 require "os/mac/xquartz"
@@ -41,31 +42,13 @@ module OS
       version.to_sym
     end
 
-    def locate(tool)
-      # Don't call tools (cc, make, strip, etc.) directly!
-      # Give the name of the binary you look for as a string to this method
-      # in order to get the full path back as a Pathname.
-      (@locate ||= {}).fetch(tool) do |key|
-        @locate[key] = if File.executable?(path = "/usr/bin/#{tool}")
-          Pathname.new path
-        # Homebrew GCCs most frequently; much faster to check this before xcrun
-        elsif (path = HOMEBREW_PREFIX/"bin/#{tool}").executable?
-          path
-        # xcrun was introduced in Xcode 3 on Leopard
-        elsif MacOS.version > :tiger
-          path = Utils.popen_read("/usr/bin/xcrun", "-no-cache", "-find", tool).chomp
-          Pathname.new(path) if File.executable?(path)
-        end
-      end
-    end
-
     # Locates a (working) copy of install_name_tool, guaranteed to function
     # whether the user has developer tools installed or not.
     def install_name_tool
       if (path = HOMEBREW_PREFIX/"opt/cctools/bin/install_name_tool").executable?
         path
       else
-        locate("install_name_tool")
+        DevelopmentTools.locate("install_name_tool")
       end
     end
 
@@ -75,7 +58,7 @@ module OS
       if (path = HOMEBREW_PREFIX/"opt/cctools/bin/otool").executable?
         path
       else
-        locate("otool")
+        DevelopmentTools.locate("otool")
       end
     end
 
@@ -127,87 +110,6 @@ module OS
     def sdk_path(v = nil)
       s = sdk(v)
       s.path unless s.nil?
-    end
-
-    def default_cc
-      cc = locate "cc"
-      cc.realpath.basename.to_s rescue nil
-    end
-
-    def default_compiler
-      case default_cc
-      # if GCC 4.2 is installed, e.g. via Tigerbrew, prefer it
-      # over the system's GCC 4.0
-      when /^gcc-4.0/ then gcc_42_build_version ? :gcc : :gcc_4_0
-      when /^gcc/ then :gcc
-      when /^llvm/ then :llvm
-      when "clang" then :clang
-      else
-        # guess :(
-        if Xcode.version >= "4.3"
-          :clang
-        elsif Xcode.version >= "4.2"
-          :llvm
-        else
-          :gcc
-        end
-      end
-    end
-
-    def gcc_40_build_version
-      @gcc_40_build_version ||=
-        if (path = locate("gcc-4.0"))
-          `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
-        end
-    end
-    alias_method :gcc_4_0_build_version, :gcc_40_build_version
-
-    def gcc_42_build_version
-      @gcc_42_build_version ||=
-        begin
-          gcc = MacOS.locate("gcc-4.2") || HOMEBREW_PREFIX.join("opt/apple-gcc42/bin/gcc-4.2")
-          if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm")
-            `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
-          end
-        end
-    end
-    alias_method :gcc_build_version, :gcc_42_build_version
-
-    def llvm_build_version
-      @llvm_build_version ||=
-        if (path = locate("llvm-gcc")) && !path.realpath.basename.to_s.start_with?("clang")
-          `#{path} --version`[/LLVM build (\d{4,})/, 1].to_i
-        end
-    end
-
-    def clang_version
-      @clang_version ||=
-        if (path = locate("clang"))
-          `#{path} --version`[/(?:clang|LLVM) version (\d\.\d)/, 1]
-        end
-    end
-
-    def clang_build_version
-      @clang_build_version ||=
-        if (path = locate("clang"))
-          `#{path} --version`[/clang-(\d{2,})/, 1].to_i
-        end
-    end
-
-    def non_apple_gcc_version(cc)
-      (@non_apple_gcc_version ||= {}).fetch(cc) do
-        path = HOMEBREW_PREFIX.join("opt", "gcc", "bin", cc)
-        path = locate(cc) unless path.exist?
-        path = locate(cc.delete("-.")) if OS.linux? && !path
-        version = `#{path} --version`[/gcc(?:-\d(?:\.\d)?)? \(.+\) (\d\.\d\.\d)/, 1] if path
-        @non_apple_gcc_version[cc] = version
-      end
-    end
-
-    def clear_version_cache
-      @gcc_40_build_version = @gcc_42_build_version = @llvm_build_version = nil
-      @clang_version = @clang_build_version = nil
-      @non_apple_gcc_version = {}
     end
 
     # See these issues for some history:
@@ -265,24 +167,24 @@ module OS
       "2.0"   => { :gcc_40_build => 4061 },
       "2.5"   => { :gcc_40_build => 5370 },
       "3.1.4" => { :gcc_40_build => 5493, :gcc_42_build => 5577 },
-      "3.2.6" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :llvm_build => 2335, :clang => "1.7", :clang_build => 77 },
-      "4.0"   => { :gcc_40_build => 5494, :gcc_42_build => 5666, :llvm_build => 2335, :clang => "2.0", :clang_build => 137 },
-      "4.0.1" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :llvm_build => 2335, :clang => "2.0", :clang_build => 137 },
-      "4.0.2" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :llvm_build => 2335, :clang => "2.0", :clang_build => 137 },
-      "4.2"   => { :llvm_build => 2336, :clang => "3.0", :clang_build => 211 },
-      "4.3"   => { :llvm_build => 2336, :clang => "3.1", :clang_build => 318 },
-      "4.3.1" => { :llvm_build => 2336, :clang => "3.1", :clang_build => 318 },
-      "4.3.2" => { :llvm_build => 2336, :clang => "3.1", :clang_build => 318 },
-      "4.3.3" => { :llvm_build => 2336, :clang => "3.1", :clang_build => 318 },
-      "4.4"   => { :llvm_build => 2336, :clang => "4.0", :clang_build => 421 },
-      "4.4.1" => { :llvm_build => 2336, :clang => "4.0", :clang_build => 421 },
-      "4.5"   => { :llvm_build => 2336, :clang => "4.1", :clang_build => 421 },
-      "4.5.1" => { :llvm_build => 2336, :clang => "4.1", :clang_build => 421 },
-      "4.5.2" => { :llvm_build => 2336, :clang => "4.1", :clang_build => 421 },
-      "4.6"   => { :llvm_build => 2336, :clang => "4.2", :clang_build => 425 },
-      "4.6.1" => { :llvm_build => 2336, :clang => "4.2", :clang_build => 425 },
-      "4.6.2" => { :llvm_build => 2336, :clang => "4.2", :clang_build => 425 },
-      "4.6.3" => { :llvm_build => 2336, :clang => "4.2", :clang_build => 425 },
+      "3.2.6" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "1.7", :clang_build => 77 },
+      "4.0"   => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "2.0", :clang_build => 137 },
+      "4.0.1" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "2.0", :clang_build => 137 },
+      "4.0.2" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "2.0", :clang_build => 137 },
+      "4.2"   => { :clang => "3.0", :clang_build => 211 },
+      "4.3"   => { :clang => "3.1", :clang_build => 318 },
+      "4.3.1" => { :clang => "3.1", :clang_build => 318 },
+      "4.3.2" => { :clang => "3.1", :clang_build => 318 },
+      "4.3.3" => { :clang => "3.1", :clang_build => 318 },
+      "4.4"   => { :clang => "4.0", :clang_build => 421 },
+      "4.4.1" => { :clang => "4.0", :clang_build => 421 },
+      "4.5"   => { :clang => "4.1", :clang_build => 421 },
+      "4.5.1" => { :clang => "4.1", :clang_build => 421 },
+      "4.5.2" => { :clang => "4.1", :clang_build => 421 },
+      "4.6"   => { :clang => "4.2", :clang_build => 425 },
+      "4.6.1" => { :clang => "4.2", :clang_build => 425 },
+      "4.6.2" => { :clang => "4.2", :clang_build => 425 },
+      "4.6.3" => { :clang => "4.2", :clang_build => 425 },
       "5.0"   => { :clang => "5.0", :clang_build => 500 },
       "5.0.1" => { :clang => "5.0", :clang_build => 500 },
       "5.0.2" => { :clang => "5.0", :clang_build => 500 },
@@ -305,6 +207,7 @@ module OS
       "7.2.1" => { :clang => "7.0", :clang_build => 700 },
       "7.3"   => { :clang => "7.3", :clang_build => 703 },
       "7.3.1" => { :clang => "7.3", :clang_build => 703 },
+      "8.0"   => { :clang => "8.0", :clang_build => 800 },
     }
 
     def compilers_standard?

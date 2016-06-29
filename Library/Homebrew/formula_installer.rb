@@ -3,7 +3,7 @@ require "exceptions"
 require "formula"
 require "keg"
 require "tab"
-require "bottles"
+require "utils/bottles"
 require "caveats"
 require "cleaner"
 require "formula_cellar_checks"
@@ -374,11 +374,11 @@ class FormulaInstaller
   end
 
   def expand_dependencies(deps)
-    inherited_options = {}
+    inherited_options = Hash.new { |hash, key| hash[key] = Options.new }
     poured_bottle = pour_bottle?
 
     expanded_deps = Dependency.expand(formula, deps) do |dependent, dep|
-      options = inherited_options[dep.name] = inherited_options_for(dep)
+      inherited_options[dep.name] |= inherited_options_for(dep)
       build = effective_build_options_for(
         dependent,
         inherited_options.fetch(dependent.name, [])
@@ -389,7 +389,7 @@ class FormulaInstaller
         Dependency.prune
       elsif dep.build? && install_bottle_for?(dependent, build)
         Dependency.prune
-      elsif dep.satisfied?(options)
+      elsif dep.satisfied?(inherited_options[dep.name])
         Dependency.skip
       end
     end
@@ -577,9 +577,9 @@ class FormulaInstaller
     end
 
     formula.options.each do |opt|
-      name  = opt.name[/\A(.+)=\z$/, 1]
-      value = ARGV.value(name)
-      args << "--#{name}=#{value}" if name && value
+      name = opt.name[/^([^=])+=$/, 1]
+      value = ARGV.value(name) if name
+      args << "--#{name}=#{value}" if value
     end
 
     args

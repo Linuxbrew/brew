@@ -529,6 +529,11 @@ module ObserverPathnameExtension
     ObserverPathnameExtension.n += 1
   end
 
+  def mkpath
+    super
+    puts "mkdir -p #{self}" if ObserverPathnameExtension.verbose?
+  end
+
   def rmdir
     super
     puts "rmdir #{self}" if ObserverPathnameExtension.verbose?

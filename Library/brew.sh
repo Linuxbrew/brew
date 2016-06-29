@@ -24,6 +24,14 @@ chdir() {
   cd "$@" >/dev/null || odie "Error: failed to cd to $*!"
 }
 
+brew() {
+  "$HOMEBREW_BREW_FILE" "$@"
+}
+
+git() {
+  "$HOMEBREW_LIBRARY/ENV/scm/git" "$@"
+}
+
 # Force UTF-8 to avoid encoding issues for users with broken locale settings.
 if [[ "$(locale charmap 2> /dev/null)" != "UTF-8" ]]
 then
@@ -119,7 +127,9 @@ export HOMEBREW_LIBRARY
 export HOMEBREW_VERSION
 export HOMEBREW_CELLAR
 export HOMEBREW_RUBY_PATH
+export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
+export HOMEBREW_PROCESSOR
 export HOMEBREW_PRODUCT
 export HOMEBREW_OS_VERSION
 export HOMEBREW_OSX_VERSION
@@ -128,7 +138,8 @@ export HOMEBREW_USER_AGENT_CURL
 
 if [[ -n "$HOMEBREW_OSX" ]]
 then
-  if [[ "$('/usr/bin/xcode-select' --print-path)" = "/" ]]
+  XCODE_SELECT_PATH=$('/usr/bin/xcode-select' --print-path 2>/dev/null)
+  if [[ "$XCODE_SELECT_PATH" = "/" ]]
   then
     odie <<EOS
 Your xcode-select path is currently set to '/'.
@@ -140,15 +151,20 @@ Otherwise, you should:
 EOS
   fi
 
-  XCRUN_OUTPUT="$(/usr/bin/xcrun clang 2>&1)"
-  XCRUN_STATUS="$?"
-
-  if [[ "$XCRUN_STATUS" -ne 0 && "$XCRUN_OUTPUT" = *license* ]]
+  # Don't check xcrun if Xcode and the CLT aren't installed, as that opens
+  # a popup window asking the user to install the CLT
+  if [[ -n "$XCODE_SELECT_PATH" ]]
   then
-    odie <<EOS
+    XCRUN_OUTPUT="$(/usr/bin/xcrun clang 2>&1)"
+    XCRUN_STATUS="$?"
+
+    if [[ "$XCRUN_STATUS" -ne 0 && "$XCRUN_OUTPUT" = *license* ]]
+    then
+      odie <<EOS
 You have not agreed to the Xcode license. Please resolve this by running:
   sudo xcodebuild -license
 EOS
+    fi
   fi
 fi
 
@@ -186,9 +202,11 @@ case "$HOMEBREW_COMMAND" in
   --config)    HOMEBREW_COMMAND="config";;
 esac
 
-if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]; then
+if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]
+then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh"
-elif [[ -n "$HOMEBREW_DEVELOPER" && -f "$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh" ]]; then
+elif [[ -n "$HOMEBREW_DEVELOPER" && -f "$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh" ]]
+then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"
 fi
 
@@ -206,6 +224,8 @@ EOS
   esac
 fi
 
+# Hide shellcheck complaint:
+# shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
 setup-analytics
 report-analytics-screenview-command
@@ -216,10 +236,7 @@ update-preinstall() {
 
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" ]]
   then
-    # Hide shellcheck complaint:
-    # shellcheck source=/dev/null
-    source "$HOMEBREW_LIBRARY/Homebrew/cmd/update.sh"
-    homebrew-update --preinstall
+    brew update --preinstall
   fi
 }
 

@@ -6,6 +6,7 @@ module Homebrew
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["TESTOPTS"] = "-v" if ARGV.verbose?
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
+      ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
       if ARGV.include? "--coverage"
         ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
         FileUtils.rm_f "coverage/.resultset.json"
@@ -29,6 +30,7 @@ module Homebrew
       args = []
       args << "--trace" if ARGV.include? "--trace"
       if ARGV.value("only")
+        ENV["HOMEBREW_TESTS_ONLY"] = "1"
         test_name, test_method = ARGV.value("only").split("/", 2)
         args << "TEST=test_#{test_name}.rb"
         args << "TESTOPTS=--name=test_#{test_method}" if test_method

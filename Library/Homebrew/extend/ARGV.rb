@@ -87,9 +87,10 @@ module HomebrewArgvExtension
     at(@n+1) || raise(UsageError)
   end
 
-  def value(arg)
-    arg = find { |o| o =~ /--#{arg}=(.+)/ }
-    $1 if arg
+  def value(name)
+    arg_prefix = "--#{name}="
+    flag_with_value = find { |arg| arg.start_with?(arg_prefix) }
+    flag_with_value.strip_prefix(arg_prefix) if flag_with_value
   end
 
   def force?

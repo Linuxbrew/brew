@@ -2,7 +2,7 @@
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
-#:    several different ways. See [SPECIFYING FORMULAE][].
+#:    in several different ways. See [SPECIFYING FORMULAE][].
 #:
 #:    If `--debug` is passed and brewing fails, open an interactive debugging
 #:    session with access to IRB or a shell inside the temporary build directory.
@@ -40,8 +40,8 @@
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
 #:    aka master, trunk, unstable.
 #:
-#:    If `--keep-tmp` is passed, the temporary files created for the test are
-#:    not deleted.
+#:    If `--keep-tmp` is passed, the temporary files created during installation
+#:    are not deleted.
 #:
 #:    To install a newer version of HEAD use
 #:    `brew rm <foo> && brew install --HEAD <foo>`.
@@ -219,6 +219,7 @@ module Homebrew
   end
 
   def check_xcode
+    return unless OS.mac?
     checks = Diagnostic::Checks.new
     %w[
       check_for_unsupported_osx

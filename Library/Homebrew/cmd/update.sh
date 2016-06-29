@@ -5,13 +5,9 @@
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:      (rather than `git rebase`).
 
-brew() {
-  "$HOMEBREW_BREW_FILE" "$@"
-}
-
-git() {
-  "$HOMEBREW_LIBRARY/ENV/scm/git" "$@"
-}
+# Hide shellcheck complaint:
+# shellcheck source=/dev/null
+source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
 git_init_if_necessary() {
   if [[ -n "$HOMEBREW_OSX" ]]
@@ -40,6 +36,7 @@ git_init_if_necessary() {
 rename_taps_dir_if_necessary() {
   local tap_dir
   local tap_dir_basename
+  local tap_dir_hyphens
   local user
   local repo
 
@@ -53,9 +50,10 @@ rename_taps_dir_if_necessary() {
       user="$(echo "${tap_dir_basename%-*}" | tr "[:upper:]" "[:lower:]")"
       repo="$(echo "${tap_dir_basename:${#user}+1}" | tr "[:upper:]" "[:lower:]")"
       mkdir -p "$HOMEBREW_LIBRARY/Taps/$user"
-      mv "$tap_dir", "$HOMEBREW_LIBRARY/Taps/$user/homebrew-$repo"
+      mv "$tap_dir" "$HOMEBREW_LIBRARY/Taps/$user/homebrew-$repo"
 
-      if [[ ${#${tap_dir_basename//[^\-]}} -gt 1 ]]
+      tap_dir_hyphens="${tap_dir_basename//[^\-]}"
+      if [[ ${#tap_dir_hyphens} -gt 1 ]]
       then
         echo "Homebrew changed the structure of Taps like <someuser>/<sometap>." >&2
         echo "So you may need to rename $HOMEBREW_LIBRARY/Taps/$user/homebrew-$repo manually." >&2
@@ -97,11 +95,13 @@ read_current_revision() {
 
 pop_stash() {
   [[ -z "$STASHED" ]] && return
-  git stash pop "${QUIET_ARGS[@]}"
   if [[ -n "$HOMEBREW_VERBOSE" ]]
   then
+    git stash pop
     echo "Restoring your stashed changes to $DIR:"
     git status --short --untracked-files
+  else
+    git stash pop "${QUIET_ARGS[@]}" 1>/dev/null
   fi
   unset STASHED
 }
@@ -116,7 +116,7 @@ pop_stash_message() {
 reset_on_interrupt() {
   if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
-    git checkout "$INITIAL_BRANCH"
+    git checkout "$INITIAL_BRANCH" "${QUIET_ARGS[@]}"
   fi
 
   if [[ -n "$INITIAL_REVISION" ]]
@@ -126,7 +126,7 @@ reset_on_interrupt() {
     git reset --hard "$INITIAL_REVISION" "${QUIET_ARGS[@]}"
   fi
 
-  if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+  if [[ -n "$HOMEBREW_DEVELOPER" ]]
   then
     pop_stash
   else
@@ -227,10 +227,13 @@ pull() {
 
   trap '' SIGINT
 
-  if [[ -n "$HOMEBREW_DEVELOPER" ]] &&
-     [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+  if [[ -n "$HOMEBREW_DEVELOPER" ]]
   then
-    git checkout "${QUIET_ARGS[@]}" "$INITIAL_BRANCH"
+    if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+    then
+      git checkout "$INITIAL_BRANCH" "${QUIET_ARGS[@]}"
+    fi
+
     pop_stash
   else
     pop_stash_message
@@ -305,6 +308,9 @@ EOS
   # ensure GIT_CONFIG is unset as we need to operate on .git/config
   unset GIT_CONFIG
 
+  # only allow one instance of brew update
+  lock update
+
   chdir "$HOMEBREW_REPOSITORY"
   git_init_if_necessary
   # rename Taps directories
@@ -378,7 +384,9 @@ EOS
 
   chdir "$HOMEBREW_REPOSITORY"
 
-  if [[ -n "$HOMEBREW_UPDATED" || -n "$HOMEBREW_UPDATE_FAILED" ]]
+  if [[ -n "$HOMEBREW_UPDATED" ||
+        -n "$HOMEBREW_UPDATE_FAILED" ||
+        -n "$HOMEBREW_DEVELOPER" ]]
   then
     brew update-report "$@"
     return $?

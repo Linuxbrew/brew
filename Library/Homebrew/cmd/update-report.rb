@@ -2,6 +2,7 @@ require "formula_versions"
 require "migrator"
 require "formulary"
 require "descriptions"
+require "cleanup"
 
 module Homebrew
   def update_preinstall_header
@@ -69,6 +70,8 @@ module Homebrew
       updated = true
     end
 
+    migrate_legacy_cache_if_necessary
+
     if !updated
       if !ARGV.include?("--preinstall") && !ENV["HOMEBREW_UPDATE_FAILED"]
         puts "Already up-to-date."
@@ -100,6 +103,60 @@ module Homebrew
     revision = core_tap.git_head
     ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
     ENV["HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE"] = revision
+  end
+
+  def migrate_legacy_cache_if_necessary
+    legacy_cache = Pathname.new "/Library/Caches/Homebrew"
+    return if HOMEBREW_CACHE.to_s == legacy_cache.to_s
+    return unless legacy_cache.directory?
+    return unless legacy_cache.readable_real?
+
+    migration_attempted_file = legacy_cache/".migration_attempted"
+    return if migration_attempted_file.exist?
+
+    return unless legacy_cache.writable_real?
+    FileUtils.touch migration_attempted_file
+
+    # Cleanup to avoid copying files unnecessarily
+    ohai "Cleaning up #{legacy_cache}..."
+    Cleanup.cleanup_cache legacy_cache
+
+    # This directory could have been compromised if it's world-writable/
+    # a symlink/owned by another user so don't copy files in those cases.
+    world_writable = legacy_cache.stat.mode & 0777 == 0777
+    return if world_writable
+    return if legacy_cache.symlink?
+    return if !legacy_cache.owned? && legacy_cache.lstat.uid != 0
+
+    ohai "Migrating #{legacy_cache} to #{HOMEBREW_CACHE}..."
+    HOMEBREW_CACHE.mkpath
+    legacy_cache.cd do
+      legacy_cache.entries.each do |f|
+        next if [".", "..", ".migration_attempted"].include? "#{f}"
+        begin
+          FileUtils.cp_r f, HOMEBREW_CACHE
+        rescue
+          @migration_failed ||= true
+        end
+      end
+    end
+
+    if @migration_failed
+      opoo <<-EOS.undent
+        Failed to migrate #{legacy_cache} to
+        #{HOMEBREW_CACHE}. Please do so manually.
+      EOS
+    else
+      ohai "Deleting #{legacy_cache}..."
+      FileUtils.rm_rf legacy_cache
+      if legacy_cache.exist?
+        FileUtils.touch migration_attempted_file
+        opoo <<-EOS.undent
+          Failed to delete #{legacy_cache}.
+          Please do so manually.
+        EOS
+      end
+    end
   end
 end
 
@@ -193,10 +250,25 @@ class Reporter
       tabs = dir.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
       next unless tabs.first.tap == tap # skip if installed formula is not from this tap.
       new_tap = Tap.fetch(new_tap_name)
-      new_tap.install unless new_tap.installed?
-      # update tap for each Tab
-      tabs.each { |tab| tab.tap = new_tap }
-      tabs.each(&:write)
+      # For formulae migrated to cask: Auto-install cask or provide install instructions.
+      if new_tap_name == "caskroom/cask"
+        if new_tap.installed? && (HOMEBREW_REPOSITORY/"Caskroom").directory?
+          ohai "#{name} has been moved to Homebrew Cask. Installing #{name}..."
+          system HOMEBREW_BREW_FILE, "uninstall", "--force", name
+          system HOMEBREW_BREW_FILE, "cask", "install", name
+        else
+          ohai "#{name} has been moved to Homebrew Cask.", <<-EOS.undent
+            To uninstall the formula and install the cask run:
+              brew uninstall --force #{name}
+              brew cask install #{name}
+          EOS
+        end
+      else
+        new_tap.install unless new_tap.installed?
+        # update tap for each Tab
+        tabs.each { |tab| tab.tap = new_tap }
+        tabs.each(&:write)
+      end
     end
   end
 

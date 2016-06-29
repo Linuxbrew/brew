@@ -4,8 +4,7 @@
 # Usage: brew pull [options...] <patch-source> [<patch-source> ...]
 #
 # Each <patch-source> may be one of:
-#   * The ID number of a PR (Pull Request) in the homebrew/core or legacy-homebrew
-#       GitHub repo
+#   * The ID number of a PR (Pull Request) in the homebrew/core GitHub repo
 #   * The URL of a PR on GitHub, using either the web page or API URL
 #       formats. In this form, the PR may be on homebrew/brew, homebrew/core, or
 #       any tap.
@@ -20,8 +19,6 @@
 #   --resolve:     When a patch fails to apply, leave in progress and allow user to
 #                  resolve, instead of aborting
 #   --branch-okay: Do not warn if pulling to a branch besides master (useful for testing)
-#   --legacy:      Pull legacy formula PR from Homebrew/legacy-homebrew
-#                  (TODO remove it when it's no longer necessary)
 #   --tap=<tap>:   Use the git repository of the given tap
 #   --no-pbcopy:   Do not copy anything to the system clipboard
 #   --no-publish:  Do not publish bottles to Bintray
@@ -33,7 +30,6 @@ require "utils/json"
 require "formula"
 require "formulary"
 require "tap"
-require "bottles"
 require "version"
 require "pkg_version"
 
@@ -55,11 +51,7 @@ module Homebrew
       if arg.to_i > 0
         issue = arg
         tap = CoreTap.instance
-        if ARGV.include? "--legacy"
-          url = "https://github.com/Homebrew/legacy-homebrew/pull/#{arg}"
-        else
-          url = "https://github.com/#{tap.slug}/pull/#{arg}"
-        end
+        url = "https://github.com/#{tap.slug}/pull/#{arg}"
       elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
         url = "https://github.com/Homebrew/homebrew-core/compare/master...BrewTestBot:testing-#{testing_job}"
@@ -69,11 +61,9 @@ module Homebrew
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/#{repo}/pull/#{issue}"
         tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
-        tap = CoreTap.instance if ARGV.include?("--legacy")
       elsif (url_match = arg.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
         url, user, repo, issue = *url_match
         tap = Tap.fetch(user, repo) if repo.start_with?("homebrew-")
-        tap = CoreTap.instance if ARGV.include?("--legacy")
       else
         odie "Not a GitHub pull request or commit: #{arg}"
       end
@@ -105,10 +95,6 @@ module Homebrew
       patch_puller.fetch_patch
       patch_changes = files_changed_in_patch(patch_puller.patchpath, tap)
 
-      if ARGV.include?("--legacy") && patch_changes[:others].reject { |f| f.start_with? "Library/Aliases" }.any?
-        odie "Cannot merge legacy PR!"
-      end
-
       is_bumpable = patch_changes[:formulae].length == 1 && patch_changes[:others].empty?
       if do_bump
         odie "No changed formulae found to bump" if patch_changes[:formulae].empty?
@@ -122,25 +108,30 @@ module Homebrew
       end
       patch_puller.apply_patch
 
-      changed_formulae = []
+      changed_formulae_names = []
 
       if tap
         Utils.popen_read(
           "git", "diff-tree", "-r", "--name-only",
           "--diff-filter=AM", orig_revision, "HEAD", "--", tap.formula_dir.to_s
         ).each_line do |line|
+          next unless line.end_with? ".rb\n"
           name = "#{tap.name}/#{File.basename(line.chomp, ".rb")}"
-          begin
-            changed_formulae << Formula[name]
-          # Make sure we catch syntax errors.
-          rescue Exception
-            next
-          end
+          changed_formulae_names << name
         end
       end
 
       fetch_bottles = false
-      changed_formulae.each do |f|
+      changed_formulae_names.each do |name|
+        next if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+
+        begin
+          f = Formula[name]
+        # Make sure we catch syntax errors.
+        rescue Exception
+          next
+        end
+
         if ARGV.include? "--bottle"
           if f.bottle_unneeded?
             ohai "#{f}: skipping unneeded bottle."
@@ -161,22 +152,22 @@ module Homebrew
           _, user, repo = *url_match
           "#{user}/#{repo}"
         end
-        ohai "Patch closes issue #{slug}##{issue}"
-        if ARGV.include?("--legacy")
-          close_message = "Closes Homebrew/legacy-homebrew##{issue}."
-        else
-          close_message = "Closes #{slug}##{issue}."
-        end
+        ohai "Patch closes issue ##{issue}"
+        close_message = "Closes #{slug}##{issue}."
         # If this is a pull request, append a close message.
         message += "\n#{close_message}" unless message.include? close_message
       end
 
-      if changed_formulae.empty?
+      if changed_formulae_names.empty?
         odie "cannot bump: no changed formulae found after applying patch" if do_bump
         is_bumpable = false
       end
-      if is_bumpable && !ARGV.include?("--clean")
-        formula = changed_formulae.first
+
+      is_bumpable = false if ARGV.include?("--clean")
+      is_bumpable = false if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+
+      if is_bumpable
+        formula = Formula[changed_formulae_names.first]
         new_versions = current_versions_from_info_external(patch_changes[:formulae].first)
         orig_subject = message.empty? ? "" : message.lines.first.chomp
         bump_subject = subject_for_bump(formula, old_versions, new_versions)
@@ -208,15 +199,7 @@ module Homebrew
           "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{issue}"
         end
 
-        bottle_commit_fallbacked = false
-        begin
-          curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
-        rescue ErrorDuringExecution
-          raise if !ARGV.include?("--legacy") || bottle_commit_fallbacked
-          bottle_commit_url = "https://github.com/BrewTestBot/homebrew/compare/homebrew:master...pr-#{issue}"
-          bottle_commit_fallbacked = true
-          retry
-        end
+        curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
 
         safe_system "git", "checkout", "--quiet", "-B", bottle_branch, orig_revision
         pull_patch bottle_commit_url, "bottle commit"
@@ -227,7 +210,7 @@ module Homebrew
 
         # Publish bottles on Bintray
         unless ARGV.include? "--no-publish"
-          published = publish_changed_formula_bottles(tap, changed_formulae)
+          published = publish_changed_formula_bottles(tap, changed_formulae_names)
           bintray_published_formulae.concat(published)
         end
       end
@@ -247,11 +230,16 @@ module Homebrew
 
   private
 
-  def publish_changed_formula_bottles(tap, changed_formulae)
+  def publish_changed_formula_bottles(tap, changed_formulae_names)
+    if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+      raise "Need to load formulae to publish them!"
+    end
+
     published = []
     bintray_creds = { :user => ENV["BINTRAY_USER"], :key => ENV["BINTRAY_KEY"] }
     if bintray_creds[:user] && bintray_creds[:key]
-      changed_formulae.each do |f|
+      changed_formulae_names.each do |name|
+        f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
         ohai "Publishing on Bintray: #{f.name} #{f.pkg_version}"
         publish_bottle_file_on_bintray(f, bintray_creds)
@@ -308,18 +296,10 @@ module Homebrew
 
       # Fall back to three-way merge if patch does not apply cleanly
       patch_args << "-3"
-      patch_args << "-p2" if ARGV.include?("--legacy") && !base_url.include?("BrewTestBot/homebrew-core")
       patch_args << patchpath
-
-      start_revision = `git rev-parse HEAD`.strip
 
       begin
         safe_system "git", "am", *patch_args
-        if ARGV.include?("--legacy")
-          safe_system "git", "filter-branch", "-f", "--msg-filter",
-                             "sed -E -e \"s/ (#[0-9]+)/ Homebrew\\/homebrew\\1/g\"",
-                             "#{start_revision}..HEAD"
-        end
       rescue ErrorDuringExecution
         if ARGV.include? "--resolve"
           odie "Patch failed to apply: try to resolve it."
@@ -344,7 +324,7 @@ module Homebrew
       files << $1 if line =~ %r{^\+\+\+ b/(.*)}
     end
     files.each do |file|
-      if (tap && tap.formula_file?(file)) || (ARGV.include?("--legacy") && file.start_with?("Library/Formula/"))
+      if tap && tap.formula_file?(file)
         formula_name = File.basename(file, ".rb")
         formulae << formula_name unless formulae.include?(formula_name)
       else
@@ -410,8 +390,8 @@ module Homebrew
   # Publishes the current bottle files for a given formula to Bintray
   def publish_bottle_file_on_bintray(f, creds)
     bintray_project = f.tap.linux? ? "linuxbrew" : "homebrew"
-    repo = Bintray.repository(f.tap)
-    package = Bintray.package(f.name)
+    repo = Utils::Bottles::Bintray.repository(f.tap)
+    package = Utils::Bottles::Bintray.package(f.name)
     info = FormulaInfoFromJson.lookup(f.name)
     if info.nil?
       raise "Failed publishing bottle: failed reading formula info for #{f.full_name}"
@@ -449,7 +429,7 @@ module Homebrew
       info["bottle"]["stable"]["files"].keys
     end
 
-    def bottle_info(my_bottle_tag = bottle_tag)
+    def bottle_info(my_bottle_tag = Utils::Bottles.tag)
       tag_s = my_bottle_tag.to_s
       return nil unless info["bottle"]["stable"]
       btl_info = info["bottle"]["stable"]["files"][tag_s]
@@ -462,8 +442,9 @@ module Homebrew
     end
 
     def any_bottle_tag
+      tag = Utils::Bottles.tag
       # Prefer native bottles as a convenience for download caching
-      bottle_tags.include?(bottle_tag) ? bottle_tag : bottle_tags.first
+      bottle_tags.include?(tag) ? tag : bottle_tags.first
     end
 
     def version(spec_type)
@@ -501,9 +482,14 @@ module Homebrew
   # version of a formula.
   def verify_bintray_published(formulae_names)
     return if formulae_names.empty?
+
+    if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+      raise "Need to load formulae to verify their publication!"
+    end
+
     ohai "Verifying bottles published on Bintray"
     formulae = formulae_names.map { |n| Formula[n] }
-    max_retries = 32  # shared among all bottles
+    max_retries = 300 # shared among all bottles
     poll_retry_delay_seconds = 2
 
     HOMEBREW_CACHE.cd do
@@ -527,37 +513,57 @@ module Homebrew
           next
         end
 
-        # Poll for publication completion using a quick HEAD, to avoid spurious error messages
+        # Poll for publication completion using a quick partial HEAD, to avoid spurious error messages
         # 401 error is normal while file is still in async publishing process
         url = URI(bottle_info.url)
         puts "Verifying bottle: #{File.basename(url.path)}"
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true
+        retry_count = 0
         http.start do
           while true do
             req = Net::HTTP::Head.new bottle_info.url
+            req.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
             res = http.request req
-            retry_count += 1
             if res.is_a?(Net::HTTPSuccess)
               break
             elsif res.is_a?(Net::HTTPClientError)
               if retry_count >= max_retries
-                raise "Failed to download #{f} bottle from #{url}!"
+                raise "Failed to find published #{f} bottle at #{url}!"
               end
               print(wrote_dots ? "." : "Waiting on Bintray.")
               wrote_dots = true
               sleep poll_retry_delay_seconds
+              retry_count += 1
             else
-              raise "Failed to download #{f} bottle from #{url} (#{res.code} #{res.message})!"
+              raise "Failed to find published #{f} bottle at #{url} (#{res.code} #{res.message})!"
             end
           end
         end
 
         # Actual download and verification
+        # We do a retry on this, too, because sometimes the external curl will fail even
+        # when the prior HEAD has succeeded.
         puts "\n" if wrote_dots
         filename = File.basename(url.path)
+        curl_retry_delay_seconds = 4
+        max_curl_retries = 1
+        retry_count = 0
         # We're in the cache; make sure to force re-download
-        curl url, "-o", filename
+        while true do
+          begin
+            curl url, "-o", filename
+            break
+          rescue
+            if retry_count >= max_curl_retries
+              raise "Failed to download #{f} bottle from #{url}!"
+            end
+            puts "curl download failed; retrying in #{curl_retry_delay_seconds} sec"
+            sleep curl_retry_delay_seconds
+            curl_retry_delay_seconds *= 2
+            retry_count += 1
+          end
+        end
         checksum = Checksum.new(:sha256, bottle_info.sha256)
         Pathname.new(filename).verify_checksum(checksum)
       end

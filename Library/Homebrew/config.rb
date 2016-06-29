@@ -1,32 +1,8 @@
-def cache
-  if ENV["HOMEBREW_CACHE"]
-    Pathname.new(ENV["HOMEBREW_CACHE"]).expand_path
-  else
-    # we do this for historic reasons, however the cache *should* be the same
-    # directory whichever user is used and whatever instance of brew is executed
-    home_cache = Pathname.new(if OS.mac? then "~/Library/Caches/Homebrew"
-        else "~/.cache/Homebrew" end).expand_path
-    if home_cache.directory? && home_cache.writable_real? \
-        or not Pathname.new("/Library/Caches").writable_real?
-      home_cache
-    else
-      Pathname.new("/Library/Caches/Homebrew").extend Module.new {
-        def mkpath
-          unless exist?
-            super
-            chmod 0775
-          end
-        end
-      }
-    end
-  end
-end
-
-HOMEBREW_CACHE = cache
-undef cache
+HOMEBREW_CACHE_DEFAULT = OS.mac? ? "~/Library/Caches/Homebrew" : "~/.cache/Homebrew"
+HOMEBREW_CACHE = Pathname.new(ENV["HOMEBREW_CACHE"] || HOMEBREW_CACHE_DEFAULT).expand_path
 
 # Where brews installed via URL are cached
-HOMEBREW_CACHE_FORMULA = HOMEBREW_CACHE+"Formula"
+HOMEBREW_CACHE_FORMULA = HOMEBREW_CACHE/"Formula"
 
 if ENV["HOMEBREW_BREW_FILE"]
   HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
@@ -43,6 +19,9 @@ HOMEBREW_REPOSITORY = Pathname.new(ENV["HOMEBREW_REPOSITORY"])
 HOMEBREW_LIBRARY = Pathname.new(ENV["HOMEBREW_LIBRARY"])
 HOMEBREW_ENV_PATH = HOMEBREW_LIBRARY/"ENV"
 HOMEBREW_CONTRIB = HOMEBREW_REPOSITORY/"Library/Contributions"
+
+# Where we store lock files
+HOMEBREW_LOCK_DIR = HOMEBREW_LIBRARY/"Locks"
 
 # Where we store built products
 HOMEBREW_CELLAR = Pathname.new(ENV["HOMEBREW_CELLAR"])

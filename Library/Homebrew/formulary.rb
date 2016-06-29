@@ -2,7 +2,7 @@ require "digest/md5"
 require "tap"
 
 # The Formulary is responsible for creating instances of Formula.
-# It is not meant to be used directy from formulae.
+# It is not meant to be used directly from formulae.
 
 class Formulary
   FORMULAE = {}
@@ -16,6 +16,10 @@ class Formulary
   end
 
   def self.load_formula(name, path, contents, namespace)
+    if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
+      raise "Formula loading disabled by HOMEBREW_DISABLE_LOAD_FORMULA!"
+    end
+
     mod = Module.new
     const_set(namespace, mod)
     mod.module_eval(contents, path)
@@ -82,7 +86,7 @@ class Formulary
     private
 
     def load_file
-      STDERR.puts "#{$0} (#{self.class.name}): loading #{path}" if ARGV.debug?
+      $stderr.puts "#{$0} (#{self.class.name}): loading #{path}" if ARGV.debug?
       raise FormulaUnavailableError.new(name) unless path.file?
       Formulary.load_formula_from_path(name, path)
     end
@@ -92,7 +96,7 @@ class Formulary
   class BottleLoader < FormulaLoader
     def initialize(bottle_name)
       @bottle_filename = Pathname(bottle_name).realpath
-      name, full_name = bottle_resolve_formula_names @bottle_filename
+      name, full_name = Utils::Bottles.resolve_formula_names @bottle_filename
       super name, Formulary.path(full_name)
     end
 
@@ -100,7 +104,7 @@ class Formulary
       formula = super
       formula.local_bottle_path = @bottle_filename
       formula_version = formula.pkg_version
-      bottle_version =  bottle_resolve_version(@bottle_filename)
+      bottle_version =  Utils::Bottles.resolve_version(@bottle_filename)
       unless formula_version == bottle_version
         raise BottleVersionMismatchError.new(@bottle_filename, bottle_version, formula, formula_version)
       end
@@ -195,7 +199,7 @@ class Formulary
     end
 
     def klass
-      STDERR.puts "#{$0} (#{self.class.name}): loading #{path}" if ARGV.debug?
+      $stderr.puts "#{$0} (#{self.class.name}): loading #{path}" if ARGV.debug?
       namespace = "FormulaNamespace#{Digest::MD5.hexdigest(contents)}"
       Formulary.load_formula(name, path, contents, namespace)
     end

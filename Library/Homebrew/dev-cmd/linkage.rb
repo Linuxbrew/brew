@@ -15,7 +15,6 @@ require "keg"
 require "formula"
 
 module Homebrew
-
   def linkage
     found_broken_dylibs = false
     ARGV.kegs.each do |keg|
@@ -26,7 +25,7 @@ module Homebrew
       else
         result.display_normal_output
       end
-      found_broken_dylibs = true if !result.broken_dylibs.empty?
+      found_broken_dylibs = true unless result.broken_dylibs.empty?
     end
     if ARGV.include?("--test") && found_broken_dylibs
       exit 1
@@ -48,6 +47,7 @@ module Homebrew
 
     def check_dylibs
       @keg.find do |file|
+        next if file.symlink? || file.directory?
         next unless file.dylib? || file.mach_o_executable? || file.mach_o_bundle?
         file.dynamically_linked_libraries.each do |dylib|
           if dylib.start_with? "@"
@@ -74,33 +74,19 @@ module Homebrew
         opoo "Formula unavailable: #{keg.name}"
         @undeclared_deps = []
       end
-
     end
 
     def display_normal_output
-      unless @system_dylibs.empty?
-        display_items "System libraries", @system_dylibs
-      end
-      unless @brewed_dylibs.empty?
-        display_items "Homebrew libraries", @brewed_dylibs
-      end
-      unless @variable_dylibs.empty?
-        display_items "Variable-referenced libraries", @variable_dylibs
-      end
-      unless @broken_dylibs.empty?
-        display_items "Missing libraries", @broken_dylibs
-      end
-      unless @undeclared_deps.empty?
-        display_items "Possible undeclared dependencies", @undeclared_deps
-      end
+      display_items "System libraries", @system_dylibs
+      display_items "Homebrew libraries", @brewed_dylibs
+      display_items "Variable-referenced libraries", @variable_dylibs
+      display_items "Missing libraries", @broken_dylibs
+      display_items "Possible undeclared dependencies", @undeclared_deps
     end
 
     def display_test_output
-      if @broken_dylibs.empty?
-        puts "No broken dylib links"
-      else
-        display_items "Missing libraries", @broken_dylibs
-      end
+      display_items "Missing libraries", @broken_dylibs
+      puts "No broken dylib links" if @broken_dylibs.empty?
     end
 
     private
@@ -108,6 +94,7 @@ module Homebrew
     # Display a list of things.
     # Things may either be an array, or a hash of (label -> array)
     def display_items(label, things)
+      return if things.empty?
       puts "#{label}:"
       if things.is_a? Hash
         things.sort.each do |list_label, list|

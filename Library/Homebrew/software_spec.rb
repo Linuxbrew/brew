@@ -5,7 +5,7 @@ require "version"
 require "options"
 require "build_options"
 require "dependency_collector"
-require "bottles"
+require "utils/bottles"
 require "patch"
 require "compilers"
 
@@ -80,7 +80,7 @@ class SoftwareSpec
   end
 
   def bottled?
-    bottle_specification.tag?(bottle_tag) && \
+    bottle_specification.tag?(Utils::Bottles.tag) && \
       (bottle_specification.compatible_cellar? || ARGV.force_bottle?)
   end
 
@@ -255,7 +255,7 @@ class Bottle
     @resource.owner = formula
     @spec = spec
 
-    checksum, tag = spec.checksum_for(bottle_tag)
+    checksum, tag = spec.checksum_for(Utils::Bottles.tag)
 
     filename = Filename.create(formula, tag, spec.revision)
     @resource.url(build_url(spec.root_url, filename))
@@ -304,14 +304,14 @@ class BottleSpecification
     @revision = 0
     @prefix = DEFAULT_PREFIX
     @cellar = DEFAULT_CELLAR
-    @collector = BottleCollector.new
+    @collector = Utils::Bottles::Collector.new
   end
 
   def root_url(var = nil)
     if var.nil?
       default_domain = !OS.mac? || (tap && tap.linux?) ? DEFAULT_DOMAIN_LINUX : DEFAULT_DOMAIN_MAC
       domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || default_domain
-      @root_url ||= "#{domain}/#{Bintray.repository(tap)}"
+      @root_url ||= "#{domain}/#{Utils::Bottles::Bintray.repository(tap)}"
     else
       @root_url = var
     end

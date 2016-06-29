@@ -1,5 +1,5 @@
 require "formula"
-require "bottles"
+require "utils/bottles"
 require "tab"
 require "keg"
 require "formula_versions"
@@ -155,7 +155,7 @@ module Homebrew
       return
     end
 
-    unless built_as_bottle? f
+    unless Utils::Bottles::built_as? f
       return ofail "Formula not installed with '--build-bottle': #{f.full_name}"
     end
 
@@ -175,7 +175,7 @@ module Homebrew
       bottle_revision = bottle_revisions.any? ? bottle_revisions.max.to_i + 1 : 0
     end
 
-    filename = Bottle::Filename.create(f, bottle_tag, bottle_revision)
+    filename = Bottle::Filename.create(f, Utils::Bottles.tag, bottle_revision)
     bottle_path = Pathname.pwd/filename
 
     tar_filename = filename.to_s.sub(/.gz$/, "")
@@ -255,7 +255,7 @@ module Homebrew
         raise
       ensure
         ignore_interrupts do
-          original_tab.write
+          original_tab.write if original_tab
           keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, prefix,
             Keg::CELLAR_PLACEHOLDER, cellar
           keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
@@ -281,7 +281,8 @@ module Homebrew
       bottle.prefix prefix
     end
     bottle.revision bottle_revision
-    bottle.sha256 bottle_path.sha256 => bottle_tag
+    sha256 = bottle_path.sha256
+    bottle.sha256 sha256 => Utils::Bottles.tag
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
@@ -308,74 +309,108 @@ module Homebrew
     puts "./#{filename}"
     puts output
 
-    if ARGV.include? "--rb"
-      File.open("#{filename.prefix}.bottle.rb", "w") do |file|
-        file.write("\# #{f.full_name}\n")
-        file.write(output)
+    if ARGV.include? "--json"
+      json = {
+        f.full_name => {
+          "formula" => {
+            "pkg_version" => f.pkg_version.to_s,
+            "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
+          },
+          "bottle" => {
+            "root_url" => bottle.root_url,
+            "prefix" => bottle.prefix,
+            "cellar" => bottle.cellar.to_s,
+            "revision" => bottle.revision,
+            "tags" => {
+              Utils::Bottles.tag.to_s => {
+                "filename" => filename.to_s,
+                "sha256" => sha256,
+              },
+            }
+          },
+          "bintray" => {
+            "package" => Utils::Bottles::Bintray.package(f.name),
+            "repository" => Utils::Bottles::Bintray.repository(f.tap),
+          },
+        },
+      }
+      File.open("#{filename.prefix}.bottle.json", "w") do |file|
+        file.write Utils::JSON.dump json
       end
-    end
-  end
-
-  module BottleMerger
-    def bottle(&block)
-      instance_eval(&block)
     end
   end
 
   def merge
     write = ARGV.include? "--write"
-    keep_old = ARGV.include? "--keep-old"
 
-    merge_hash = {}
-    ARGV.named.each do |argument|
-      bottle_block = IO.read(argument)
-      formula_name = bottle_block.lines.first.sub(/^# /, "").chomp
-      merge_hash[formula_name] ||= []
-      merge_hash[formula_name] << bottle_block
+    bottles_hash = ARGV.named.reduce({}) do |hash, json_file|
+      deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
     end
 
-    merge_hash.each do |formula_name, bottle_blocks|
+    bottles_hash.each do |formula_name, bottle_hash|
       ohai formula_name
-      f = Formulary.factory(formula_name)
 
-      if f.bottle_disabled?
-        ofail "Formula #{f.full_name} has disabled bottle"
-        puts f.bottle_disable_reason
-        next
+      bottle = BottleSpecification.new
+      bottle.root_url bottle_hash["bottle"]["root_url"]
+      cellar = bottle_hash["bottle"]["cellar"]
+      if cellar == "any" || cellar == "any_skip_relocation"
+        cellar = cellar.to_sym
       end
-
-      bottle = if keep_old
-        f.bottle_specification.dup
-      else
-        BottleSpecification.new
-      end
-      bottle.extend(BottleMerger)
-      bottle_blocks.each { |block| bottle.instance_eval(block) }
-
-      old_spec = f.bottle_specification
-      if keep_old && !old_spec.checksums.empty?
-         bad_fields = [:root_url, :prefix, :cellar, :revision].select do |field|
-           old_spec.send(field) != bottle.send(field)
-         end
-         bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
-         if bad_fields.any?
-           ofail "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
-           next
-         end
+      bottle.cellar cellar
+      bottle.prefix bottle_hash["bottle"]["prefix"]
+      bottle.revision bottle_hash["bottle"]["revision"]
+      bottle_hash["bottle"]["tags"].each do |tag, tag_hash|
+        bottle.sha256 tag_hash["sha256"] => tag.to_sym
       end
 
       output = bottle_output bottle
-      puts output
 
       if write
+        path = Pathname.new("#{HOMEBREW_REPOSITORY/bottle_hash["formula"]["path"]}")
         update_or_add = nil
 
-        Utils::Inreplace.inreplace(f.path) do |s|
+        Utils::Inreplace.inreplace(path) do |s|
           if s.include? "bottle do"
             update_or_add = "update"
+            if ARGV.include? "--keep-old"
+              mismatches = []
+              bottle_block_contents = s[/  bottle do(.+?)end\n/m, 1]
+              bottle_block_contents.lines.each do |line|
+                line = line.strip
+                next if line.empty?
+                key, value, _, tag = line.split " ", 4
+                valid_key = %w[root_url prefix cellar revision sha1 sha256].include? key
+                next unless valid_key
+
+                value = value.to_s.delete ":'\""
+                tag = tag.to_s.delete ":"
+
+                if !tag.empty?
+                  if !bottle_hash["bottle"]["tags"][tag].to_s.empty?
+                    mismatches << "#{key} => #{tag}"
+                  else
+                    bottle.send(key, value => tag.to_sym)
+                  end
+                  next
+                end
+
+                old_value = bottle_hash["bottle"][key].to_s
+                next if key == "cellar" && old_value == "any" && value == "any_skip_relocation"
+                mismatches << key if old_value.empty? || value != old_value
+              end
+              if mismatches.any?
+                odie "--keep-old was passed but there were changes in #{mismatches.join(", ")}!"
+              end
+              output = bottle_output bottle
+            end
+            puts output
             string = s.sub!(/  bottle do.+?end\n/m, output)
             odie "Bottle block update failed!" unless string
           else
+            if ARGV.include? "--keep-old"
+              odie "--keep-old was passed but there was no existing bottle block!"
+            end
+            puts output
             update_or_add = "add"
             if s.include? "stable do"
               indent = s.slice(/^ +stable do/).length - "stable do".length
@@ -400,12 +435,17 @@ module Homebrew
         end
 
         unless ARGV.include? "--no-commit"
-          f.path.parent.cd do
+          short_name = formula_name.split("/", -1).last
+          pkg_version = bottle_hash["formula"]["pkg_version"]
+
+          path.parent.cd do
             safe_system "git", "commit", "--no-edit", "--verbose",
-              "--message=#{f.name}: #{update_or_add} #{f.pkg_version} bottle#{" for Linuxbrew" if OS.linux?}.",
-              "--", f.path
+              "--message=#{short_name}: #{update_or_add} #{pkg_version} bottle#{" for Linuxbrew" if OS.linux?}.",
+              "--", path
           end
         end
+      else
+        puts output
       end
     end
   end

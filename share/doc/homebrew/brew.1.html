@@ -39,7 +39,7 @@ If no search term is given, all locally available formulae are listed.</p></dd>
 Read more at <a href="https://git.io/brew-analytics" data-bare-link="true">https://git.io/brew-analytics</a>.</p></dd>
 <dt><code>analytics</code> (<code>on</code>|<code>off</code>)</dt><dd><p>Turn on/off Homebrew's analytics.</p></dd>
 <dt><code>analytics</code> <code>regenerate-uuid</code></dt><dd><p>Regenerate UUID used in Homebrew's analytics.</p></dd>
-<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<code>--display-cop-names</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
+<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<code>--display-cop-names</code>] [<code>--display-filename</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
 run before submitting a new formula.</p>
 
 <p>If no <var>formulae</var> are provided, all of them are checked.</p>
@@ -52,6 +52,9 @@ connection are run. This should be used when creating for new formulae.</p>
 
 <p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
 is included in the output.</p>
+
+<p>If <code>--display-filename</code> is passed, every line of output is prefixed with the
+name of the file or formula being audited, to make the output easy to grep.</p>
 
 <p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
 for instance, for implementing pre-commit hooks.</p></dd>
@@ -75,7 +78,7 @@ With <code>--include-aliases</code>, the aliases of internal commands will be in
 <dt class="flush"><code>config</code></dt><dd><p>Show Homebrew and system configuration useful for debugging. If you file
 a bug report, you will likely be asked for this information if you do not
 provide it.</p></dd>
-<dt><code>create</code> <var>URL</var> [<code>--autotools</code>|<code>--cmake</code>] [<code>--no-fetch</code>] [<code>--set-name</code> <var>name</var>] [<code>--set-version</code> <var>version</var>]</dt><dd><p>Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
+<dt><code>create</code> <var>URL</var> [<code>--autotools</code>|<code>--cmake</code>] [<code>--no-fetch</code>] [<code>--set-name</code> <var>name</var>] [<code>--set-version</code> <var>version</var>] [<code>--tap</code> <var>user</var><code>/</code><var>repo</var>]</dt><dd><p>Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
 Homebrew will attempt to automatically derive the formula name
 and version, but if it fails, you'll have to make your own template. The <code>wget</code>
 formula serves as a simple example. For the complete API have a look at</p>
@@ -89,7 +92,10 @@ If <code>--cmake</code> is passed, create a basic template for a CMake-style bui
 will thus not add the SHA256 to the formula for you.</p>
 
 <p>The options <code>--set-name</code> and <code>--set-version</code> each take an argument and allow
-you to explicitly set the name and version of the package you are creating.</p></dd>
+you to explicitly set the name and version of the package you are creating.</p>
+
+<p>The option <code>--tap</code> takes a tap as its argument and generates the formula in
+the specified tap.</p></dd>
 <dt><code>deps</code> [<code>--1</code>] [<code>-n</code>] [<code>--union</code>] [<code>--installed</code>] [<code>--include-build</code>] [<code>--include-optional</code>] [<code>--skip-recommended</code>] <var>formulae</var></dt><dd><p>Show dependencies for <var>formulae</var>. When given multiple formula arguments,
 show the intersection of dependencies for <var>formulae</var>.</p>
 
@@ -139,7 +145,7 @@ installing.</p></dd>
 if any problems are found.</p></dd>
 <dt class="flush"><code>edit</code></dt><dd><p>Open all of Homebrew for editing.</p></dd>
 <dt><code>edit</code> <var>formula</var></dt><dd><p>Open <var>formula</var> in the editor.</p></dd>
-<dt><code>fetch</code> [<code>--force</code>] [<code>-v</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--deps</code>] [<code>--build-from-source</code>|<code>--force-bottle</code>] <var>formulae</var></dt><dd><p>Download the source packages for the given <var>formulae</var>.
+<dt><code>fetch</code> [<code>--force</code>] [<code>--retry</code>] [<code>-v</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--deps</code>] [<code>--build-from-source</code>|<code>--force-bottle</code>] <var>formulae</var></dt><dd><p>Download the source packages for the given <var>formulae</var>.
 For tarballs, also print SHA-256 checksums.</p>
 
 <p>If <code>--HEAD</code> or <code>--devel</code> is passed, fetch that version instead of the
@@ -150,6 +156,9 @@ This is useful for seeing if an existing VCS cache has been updated.</p>
 
 <p>If <code>--force</code> is passed, remove a previously cached version and re-fetch.</p>
 
+<p>If <code>--retry</code> is passed, retry if a download fails or re-download if the
+checksum of a previously cached version no longer matches.</p>
+
 <p>If <code>--deps</code> is passed, also download dependencies for any listed <var>formulae</var>.</p>
 
 <p>If <code>--build-from-source</code> is passed, download the source rather than a
@@ -157,6 +166,15 @@ bottle.</p>
 
 <p>If <code>--force-bottle</code> is passed, download a bottle if it exists for the current
 version of OS X, even if it would not be used during installation.</p></dd>
+<dt><code>gist-logs</code> [<code>--new-issue</code>|<code>-n</code>] <var>formula</var></dt><dd><p> Upload logs for a failed build of <var>formula</var> to a new Gist.</p>
+
+<p> <var>formula</var> is usually the name of the formula to install, but it can be specified
+ in several different ways. See <a href="#SPECIFYING-FORMULAE" title="SPECIFYING FORMULAE" data-bare-link="true">SPECIFYING FORMULAE</a>.</p>
+
+<p> If <code>--new-issue</code> is passed, automatically create a new issue in the appropriate
+ GitHub repository as well as creating the Gist.</p>
+
+<p> If no logs are found, an error message is presented.</p></dd>
 <dt class="flush"><code>home</code></dt><dd><p>Open Homebrew's own homepage in a browser.</p></dd>
 <dt><code>home</code> <var>formula</var></dt><dd><p>Open <var>formula</var>'s homepage in a browser.</p></dd>
 <dt><code>info</code> <var>formula</var></dt><dd><p>Display information about <var>formula</var>.</p></dd>
@@ -174,7 +192,7 @@ information on all installed formulae.</p>
 <dt><code>install</code> [<code>--debug</code>] [<code>--env=</code><var>std</var>|<var>super</var>] [<code>--ignore-dependencies</code>] [<code>--only-dependencies</code>] [<code>--cc=</code><var>compiler</var>] [<code>--build-from-source</code>|<code>--force-bottle</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Install <var>formula</var>.</p>
 
 <p><var>formula</var> is usually the name of the formula to install, but it can be specified
-several different ways. See <a href="#SPECIFYING-FORMULAE" title="SPECIFYING FORMULAE" data-bare-link="true">SPECIFYING FORMULAE</a>.</p>
+in several different ways. See <a href="#SPECIFYING-FORMULAE" title="SPECIFYING FORMULAE" data-bare-link="true">SPECIFYING FORMULAE</a>.</p>
 
 <p>If <code>--debug</code> is passed and brewing fails, open an interactive debugging
 session with access to IRB or a shell inside the temporary build directory.</p>
@@ -200,7 +218,7 @@ options but do not install the specified formula.</p>
 source even if a bottle is provided. Dependencies will still be installed
 from bottles if they are available.</p>
 
-<p>If HOMEBREW_BUILD_FROM_SOURCE is set, regardless of whether <code>--build-from-source</code> was
+<p>If <code>HOMEBREW_BUILD_FROM_SOURCE</code> is set, regardless of whether <code>--build-from-source</code> was
 passed, then both <var>formula</var> and the dependencies installed as part of this process
 are built from source even if bottles are available.</p>
 
@@ -212,8 +230,8 @@ for the current version of OS X, even if custom options are given.</p>
 <p>If <code>--HEAD</code> is passed, and <var>formula</var> defines it, install the HEAD version,
 aka master, trunk, unstable.</p>
 
-<p>If <code>--keep-tmp</code> is passed, the temporary files created for the test are
-not deleted.</p>
+<p>If <code>--keep-tmp</code> is passed, the temporary files created during installation
+are not deleted.</p>
 
 <p>To install a newer version of HEAD use
 <code>brew rm &lt;foo> &amp;&amp; brew install --HEAD &lt;foo></code>.</p></dd>
@@ -301,9 +319,12 @@ actually remove anything.</p></dd>
 <dt><code>reinstall</code> <var>formula</var></dt><dd><p>Uninstall then install <var>formula</var></p></dd>
 <dt><code>search</code>, <code>-S</code></dt><dd><p>Display all locally available formulae for brewing (including tapped ones).
 No online search is performed if called without arguments.</p></dd>
-<dt><code>search</code>, <code>-S</code> <var>text</var>|<code>/</code><var>text</var><code>/</code></dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
+<dt><code>search</code> [<code>--desc</code>] <var>text</var>|<code>/</code><var>text</var><code>/</code></dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
 surrounded with slashes, then it is interpreted as a regular expression.
-The search for <var>text</var> is extended online to some popular taps.</p></dd>
+The search for <var>text</var> is extended online to some popular taps.</p>
+
+<p>If <code>--desc</code> is passed, browse available packages matching <var>text</var> including a
+description for each.</p></dd>
 <dt><code>search</code> (<code>--debian</code>|<code>--fedora</code>|<code>--fink</code>|<code>--macports</code>|<code>--opensuse</code>|<code>--ubuntu</code>) <var>text</var></dt><dd><p>Search for <var>text</var> in the given package manager's list.</p></dd>
 <dt><code>sh</code> [<code>--env=std</code>]</dt><dd><p>Instantiate a Homebrew build environment. Uses our years-battle-hardened
 Homebrew build logic to help your <code>./configure &amp;&amp; make &amp;&amp; make install</code>
@@ -505,8 +526,7 @@ Homebrew developers. Please do not file issues if you encounter errors when
 using this environment variable.</p></dd>
 <dt><code>HOMEBREW_CACHE</code></dt><dd><p>If set, instructs Homebrew to use the given directory as the download cache.</p>
 
-<p><em>Default:</em> <code>~/Library/Caches/Homebrew</code> if it exists; otherwise,
-<code>/Library/Caches/Homebrew</code>.</p></dd>
+<p><em>Default:</em> <code>~/Library/Caches/Homebrew</code>.</p></dd>
 <dt><code>HOMEBREW_CURL_VERBOSE</code></dt><dd><p>If set, Homebrew will pass <code>--verbose</code> when invoking <code>curl</code>(1).</p></dd>
 <dt><code>HOMEBREW_DEBUG</code></dt><dd><p>If set, any commands that can emit debugging information will do so.</p></dd>
 <dt><code>HOMEBREW_DEBUG_INSTALL</code></dt><dd><p>When <code>brew install -d</code> or <code>brew install -i</code> drops into a shell,
@@ -544,11 +564,8 @@ successful build.</p>
 to insecure HTTP.</p>
 
 <p>While ensuring your downloads are fully secure, this is likely
-to cause from-source Sourceforge &amp; GNOME based formulae
-to fail to download.</p>
-
-<p>Apache formulae are currently unaffected by this variable and
-can redirect to plaintext.</p></dd>
+to cause from-source Sourceforge, some GNU &amp; GNOME based formulae
+to fail to download.</p></dd>
 <dt><code>HOMEBREW_NO_GITHUB_API</code></dt><dd><p>If set, Homebrew will not use the GitHub API for e.g searches or
 fetching relevant issues on a failed install.</p></dd>
 <dt><code>HOMEBREW_INSTALL_BADGE</code></dt><dd><p>Text printed before the installation summary of each successful build.
@@ -594,7 +611,7 @@ your shell profile, or you can use it before a brew command:</p>
 
 <h2 id="AUTHORS">AUTHORS</h2>
 
-<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Mike McQuaid, Baptiste Fontaine, Brett Koonce, Martin Afanasjew, Dominyk Tiller, Tim Smith and Alex Dunn.</p>
+<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Mike McQuaid, Baptiste Fontaine, Brett Koonce, ilovezfs, Martin Afanasjew, Dominyk Tiller, Tim Smith and Alex Dunn.</p>
 
 <p>Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.</p>
 

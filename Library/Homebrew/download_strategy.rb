@@ -1,5 +1,6 @@
 require "utils/json"
 require "rexml/document"
+require "time"
 
 class AbstractDownloadStrategy
   include FileUtils
@@ -218,7 +219,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     when :p7zip
       safe_system "7zr", "x", cached_location
     else
-      cp cached_location, basename_without_params
+      cp cached_location, basename_without_params, :preserve => true
     end
   end
 
@@ -284,17 +285,6 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     ohai "Downloading #{@url}"
 
     unless cached_location.exist?
-      urls = actual_urls
-      unless urls.empty?
-        ohai "Downloading from #{urls.last}"
-        if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && @url.start_with?("https://") &&
-           urls.any? { |u| !u.start_with? "https://" }
-          puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
-          raise CurlDownloadStrategyError.new(@url)
-        end
-        @url = urls.last
-      end
-
       had_incomplete_download = temporary_path.exist?
       begin
         _fetch
@@ -334,6 +324,17 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   # Private method, can be overridden if needed.
   def _fetch
+    urls = actual_urls
+    unless urls.empty?
+      ohai "Downloading from #{urls.last}"
+      if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && @url.start_with?("https://") &&
+         urls.any? { |u| !u.start_with? "https://" }
+        puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
+        raise CurlDownloadStrategyError.new(@url)
+      end
+      @url = urls.last
+    end
+
     curl @url, "-C", downloaded_size, "-o", temporary_path
   end
 
@@ -416,7 +417,7 @@ end
 # Useful for installing jars.
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
-    cp cached_location, basename_without_params
+    cp cached_location, basename_without_params, :preserve => true
   end
 end
 
@@ -573,7 +574,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def stage
     super
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
   end
 
   def source_modified_time
@@ -696,6 +697,39 @@ class GitDownloadStrategy < VCSDownloadStrategy
   def update_submodules
     quiet_safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
     quiet_safe_system "git", "submodule", "update", "--init", "--recursive"
+    fix_absolute_submodule_gitdir_references!
+  end
+
+  def fix_absolute_submodule_gitdir_references!
+    # When checking out Git repositories with recursive submodules, some Git
+    # versions create `.git` files with absolute instead of relative `gitdir:`
+    # pointers. This works for the cached location, but breaks various Git
+    # operations once the affected Git resource is staged, i.e. recursively
+    # copied to a new location. (This bug was introduced in Git 2.7.0 and fixed
+    # in 2.8.3. Clones created with affected version remain broken.)
+    # See https://github.com/Homebrew/homebrew-core/pull/1520 for an example.
+    submodule_dirs = Utils.popen_read(
+      "git", "submodule", "--quiet", "foreach", "--recursive", "pwd")
+    submodule_dirs.lines.map(&:chomp).each do |submodule_dir|
+      work_dir = Pathname.new(submodule_dir)
+
+      # Only check and fix if `.git` is a regular file, not a directory.
+      dot_git = work_dir/".git"
+      next unless dot_git.file?
+
+      git_dir = dot_git.read.chomp[/^gitdir: (.*)$/, 1]
+      if git_dir.nil?
+        onoe "Failed to parse '#{dot_git}'." if ARGV.homebrew_developer?
+        next
+      end
+
+      # Only attempt to fix absolute paths.
+      next unless git_dir.start_with?("/")
+
+      # Make the `gitdir:` reference relative to the working directory.
+      relative_git_dir = Pathname.new(git_dir).relative_path_from(work_dir)
+      dot_git.atomic_write("gitdir: #{relative_git_dir}\n")
+    end
   end
 end
 
@@ -713,8 +747,21 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     end
   end
 
+  def source_modified_time
+    # Filter CVS's files because the timestamp for each of them is the moment
+    # of clone.
+    max_mtime = Time.at(0)
+    cached_location.find do |f|
+      Find.prune if f.directory? && f.basename.to_s == "CVS"
+      next unless f.file?
+      mtime = f.mtime
+      max_mtime = mtime if mtime > max_mtime
+    end
+    max_mtime
+  end
+
   def stage
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
   end
 
   private
@@ -799,7 +846,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   def stage
     # The export command doesn't work on checkouts
     # See https://bugs.launchpad.net/bzr/+bug/897511
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
     rm_r ".bzr"
   end
 

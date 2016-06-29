@@ -49,17 +49,18 @@ module MachO
 
   # Raised when the CPU type is unknown.
   class CPUTypeError < MachOError
-    # @param num [Fixnum] the unknown number
-    def initialize(num)
-      super "Unrecognized CPU type: 0x#{"%02x" % num}"
+    # @param cputype [Fixnum] the unknown CPU type
+    def initialize(cputype)
+      super "Unrecognized CPU type: 0x#{"%08x" % cputype}"
     end
   end
 
-  # Raised when the CPU subtype is unknown.
+  # Raised when the CPU type/sub-type pair is unknown.
   class CPUSubtypeError < MachOError
-    # @param num [Fixnum] the unknown number
-    def initialize(num)
-      super "Unrecognized CPU sub-type: 0x#{"%02x" % num}"
+    # @param cputype [Fixnum] the CPU type of the unknown pair
+    # @param cpusubtype [Fixnum] the CPU sub-type of the unknown pair
+    def initialize(cputype, cpusubtype)
+      super "Unrecognized CPU sub-type: 0x#{"%08x" % cpusubtype} (for CPU type: 0x#{"%08x" % cputype})"
     end
   end
 

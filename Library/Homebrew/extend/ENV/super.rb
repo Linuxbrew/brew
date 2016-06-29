@@ -63,7 +63,7 @@ module Superenv
     self["CMAKE_INCLUDE_PATH"] = determine_cmake_include_path
     self["CMAKE_LIBRARY_PATH"] = determine_cmake_library_path
     self["ACLOCAL_PATH"] = determine_aclocal_path
-    self["M4"] = MacOS.locate("m4") if deps.any? { |d| d.name == "autoconf" }
+    self["M4"] = DevelopmentTools.locate("m4") if deps.any? { |d| d.name == "autoconf" }
     self["HOMEBREW_ISYSTEM_PATHS"] = determine_isystem_paths
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
@@ -303,11 +303,10 @@ module Superenv
   end
 
   def cxx11
-    case homebrew_cc
-    when "clang"
+    if homebrew_cc == "clang"
       append "HOMEBREW_CCCFG", "x", ""
       append "HOMEBREW_CCCFG", "g", ""
-    when /gcc-(4\.(8|9)|5)/
+    elsif gcc_with_cxx11_support?(homebrew_cc)
       append "HOMEBREW_CCCFG", "x", ""
     else
       raise "The selected compiler doesn't support C++11: #{homebrew_cc}"

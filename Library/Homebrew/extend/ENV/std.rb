@@ -148,7 +148,7 @@ module Stdenv
   # @private
   def determine_cc
     s = super
-    MacOS.locate(s) || Pathname.new(s)
+    DevelopmentTools.locate(s) || Pathname.new(s)
   end
 
   # @private
@@ -174,11 +174,6 @@ module Stdenv
       super()
       set_cpu_cflags
     end
-  end
-
-  def llvm
-    super
-    set_cpu_cflags
   end
 
   def clang
@@ -321,7 +316,7 @@ module Stdenv
     if compiler == :clang
       append "CXX", "-std=c++11"
       append "CXX", "-stdlib=libc++" if OS.mac?
-    elsif compiler =~ /gcc-(4\.(8|9)|5)/
+    elsif gcc_with_cxx11_support?(compiler)
       append "CXX", "-std=c++11"
     else
       raise "The selected compiler doesn't support C++11: #{compiler}"

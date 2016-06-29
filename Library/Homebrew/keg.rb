@@ -234,7 +234,7 @@ class Keg
       dirs.reverse_each(&:rmdir_if_possible)
     end
 
-    ObserverPathnameExtension.total
+    ObserverPathnameExtension.n
   end
 
   def lock
@@ -374,7 +374,7 @@ class Keg
     unlink
     raise
   else
-    ObserverPathnameExtension.total
+    ObserverPathnameExtension.n
   end
 
   def remove_oldname_opt_record
@@ -396,7 +396,7 @@ class Keg
   end
 
   def delete_pyc_files!
-    find { |pn| pn.delete if pn.extname == ".pyc" }
+    find { |pn| pn.delete if %w[.pyc .pyo].include?(pn.extname) }
   end
 
   private
@@ -483,9 +483,10 @@ class Keg
       if src.symlink? || src.file?
         Find.prune if File.basename(src) == ".DS_Store"
         Find.prune if src.realpath == dst
-        # Don't link pyc files because Python overwrites these cached object
-        # files and next time brew wants to link, the pyc file is in the way.
-        if src.extname == ".pyc" && src.to_s =~ /site-packages/
+        # Don't link pyc or pyo files because Python overwrites these
+        # cached object files and next time brew wants to link, the
+        # file is in the way.
+        if %w[.pyc .pyo].include?(src.extname) && src.to_s.include?("/site-packages/")
           Find.prune
         end
 

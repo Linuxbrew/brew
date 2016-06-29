@@ -1,4 +1,4 @@
-class Hardware
+module Hardware
   class << self
     # We won't change the name because of backward compatibility.
     # So disable rubocop here.

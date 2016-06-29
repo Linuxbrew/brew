@@ -1,7 +1,7 @@
 require "testing_env"
 require "formula"
 require "formula_installer"
-require "bottles"
+require "utils/bottles"
 
 class FormularyTest < Homebrew::TestCase
   def test_class_naming
@@ -18,7 +18,7 @@ class FormularyFactoryTest < Homebrew::TestCase
     @name = "testball_bottle"
     @path = CoreTap.new.formula_dir/"#{@name}.rb"
     @bottle_dir = Pathname.new("#{File.expand_path("..", __FILE__)}/bottles")
-    @bottle = @bottle_dir/"testball_bottle-0.1.#{bottle_tag}.bottle.tar.gz"
+    @bottle = @bottle_dir/"testball_bottle-0.1.#{Utils::Bottles.tag}.bottle.tar.gz"
     @path.write <<-EOS.undent
       class #{Formulary.class_s(@name)} < Formula
         url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
@@ -27,7 +27,7 @@ class FormularyFactoryTest < Homebrew::TestCase
         bottle do
           cellar :any_skip_relocation
           root_url "file://#{@bottle_dir}"
-          sha256 "9abc8ce779067e26556002c4ca6b9427b9874d25f0cafa7028e05b5c5c410cb4" => :#{bottle_tag}
+          sha256 "9abc8ce779067e26556002c4ca6b9427b9874d25f0cafa7028e05b5c5c410cb4" => :#{Utils::Bottles.tag}
         end
 
         def install

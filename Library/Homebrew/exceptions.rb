@@ -330,14 +330,14 @@ class BuildError < RuntimeError
         end
       end
     else
-      require "cmd/config"
+      require "system_config"
       require "build_environment"
 
       ohai "Formula"
       puts "Tap: #{formula.tap}" if formula.tap?
       puts "Path: #{formula.path}"
       ohai "Configuration"
-      Homebrew.dump_verbose_config
+      SystemConfig.dump_verbose_config
       ohai "ENV"
       Homebrew.dump_build_env(env)
       puts
@@ -400,7 +400,7 @@ class BuildToolsError < RuntimeError
     super <<-EOS.undent
       The following #{formula_text}:
         #{formulae.join(", ")}
-      cannot be installed as a #{package_text} and must be built from source.
+      cannot be installed as #{package_text} and must be built from source.
       #{xcode_text}
     EOS
   end

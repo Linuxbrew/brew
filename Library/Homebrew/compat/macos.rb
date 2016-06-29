@@ -1,3 +1,5 @@
+require "development_tools"
+
 module OS
   module Mac
     def xcode_folder
@@ -53,6 +55,40 @@ module OS
 
     def macports_or_fink_installed?
       !macports_or_fink.empty?
+    end
+
+    def locate(tool)
+      DevelopmentTools.locate(tool)
+    end
+
+    def default_cc
+      DevelopmentTools.default_cc
+    end
+
+    def default_compiler
+      DevelopmentTools.default_compiler
+    end
+
+    def gcc_40_build_version
+      DevelopmentTools.gcc_40_build_version
+    end
+    alias_method :gcc_4_0_build_version, :gcc_40_build_version
+
+    def gcc_42_build_version
+      DevelopmentTools.gcc_42_build_version
+    end
+    alias_method :gcc_build_version, :gcc_42_build_version
+
+    def llvm_build_version
+      # no-op. DSL supported, compiler is not.
+    end
+
+    def clang_version
+      DevelopmentTools.clang_version
+    end
+
+    def clang_build_version
+      DevelopmentTools.clang_build_version
     end
   end
 end

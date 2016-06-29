@@ -1,9 +1,9 @@
 require "testing_env"
-require "bottles"
+require "utils/bottles"
 
 class BottleCollectorTests < Homebrew::TestCase
   def setup
-    @collector = BottleCollector.new
+    @collector = Utils::Bottles::Collector.new
   end
 
   def checksum_for(tag)

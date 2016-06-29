@@ -4,6 +4,20 @@ module Utils
     @git = quiet_system HOMEBREW_ENV_PATH/"scm/git", "--version"
   end
 
+  def self.git_path
+    return unless git_available?
+    @git_path ||= Utils.popen_read(
+      HOMEBREW_ENV_PATH/"scm/git", "--homebrew=print-path"
+    ).chuzzle
+  end
+
+  def self.git_version
+    return unless git_available?
+    @git_version ||= Utils.popen_read(
+      HOMEBREW_ENV_PATH/"scm/git", "--version"
+    ).chomp[/git version (\d+(?:\.\d+)*)/, 1]
+  end
+
   def self.ensure_git_installed!
     return if git_available?
 
@@ -25,5 +39,7 @@ module Utils
 
   def self.clear_git_available_cache
     remove_instance_variable(:@git) if instance_variable_defined?(:@git)
+    @git_path = nil
+    @git_version = nil
   end
 end

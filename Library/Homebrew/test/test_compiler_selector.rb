@@ -12,12 +12,11 @@ class CompilerSelectorTests < Homebrew::TestCase
 
   class CompilerVersions
     attr_accessor :gcc_4_0_build_version, :gcc_build_version,
-      :llvm_build_version, :clang_build_version
+      :clang_build_version
 
     def initialize
       @gcc_4_0_build_version = nil
       @gcc_build_version = 5666
-      @llvm_build_version = 2336
       @clang_build_version = 425
     end
 
@@ -73,7 +72,7 @@ class CompilerSelectorTests < Homebrew::TestCase
 
   def test_mixed_failures_1
     @f << :clang << :gcc
-    assert_equal :llvm, actual_cc
+    assert_equal "gcc-4.8", actual_cc
   end
 
   def test_mixed_failures_2
@@ -96,9 +95,9 @@ class CompilerSelectorTests < Homebrew::TestCase
     assert_equal "gcc-4.7", actual_cc
   end
 
-  def test_llvm_precedence
+  def test_gcc_precedence
     @f << :clang << :gcc
-    assert_equal :llvm, actual_cc
+    assert_equal "gcc-4.8", actual_cc
   end
 
   def test_missing_gcc
@@ -108,7 +107,7 @@ class CompilerSelectorTests < Homebrew::TestCase
   end
 
   def test_missing_llvm_and_gcc
-    @versions.gcc_build_version = @versions.llvm_build_version = nil
+    @versions.gcc_build_version = nil
     @f << :clang << { :gcc => "4.8" } << { :gcc => "4.7" }
     assert_raises(CompilerSelectionError) { actual_cc }
   end

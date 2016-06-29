@@ -168,7 +168,7 @@ module SharedEnvExtension
     elsif @formula && !inherit?
       CompilerSelector.select_for(@formula)
     else
-      MacOS.default_compiler
+      DevelopmentTools.default_compiler
     end
   end
 
@@ -336,5 +336,10 @@ module SharedEnvExtension
     if homebrew_cc =~ GNU_GCC_REGEXP
       raise "Non-Apple GCC can't build universal binaries"
     end
+  end
+
+  def gcc_with_cxx11_support?(cc)
+    version = cc[/^gcc-(\d+(?:\.\d+)?)$/, 1]
+    version && Version.new(version) >= Version.new("4.8")
   end
 end

@@ -92,7 +92,7 @@ brew install $WHATEVER_YOU_WANT
 ## What Packages Are Available?
 1. Type `brew search` for a list.
 2. Or visit [braumeister.org](http://braumeister.org) to browse packages online.
-3. Or use `brew search --desc` to browse packages from the command line.
+3. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
 `brew help`, `man brew` or check [our documentation](https://github.com/Linuxbrew/brew/tree/master/share/doc/homebrew#readme).
@@ -111,7 +111,7 @@ Many of the Homebrew formulae work on either Mac or Linux without changes, but s
 ## Security
 Please report security issues to security@brew.sh.
 
-This is our PGP key which is valid until June 17, 2016.
+This is our PGP key which is valid until May 24, 2017.
 * Key ID: `0xE33A3D3CCE59E297`
 * Fingerprint: `C657 8F76 2E23 441E C879  EC5C E33A 3D3C CE59 E297`
 * Full key: https://keybase.io/homebrew/key.asc
@@ -119,7 +119,7 @@ This is our PGP key which is valid until June 17, 2016.
 ## Who Are You?
 Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca).
 
-Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Mike McQuaid](https://github.com/mikemcquaid), [Baptiste Fontaine](https://github.com/bfontaine), [Brett Koonce](https://github.com/asparagui), [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
+Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Tomasz Pajor](https://github.com/nijikon), [Mike McQuaid](https://github.com/mikemcquaid), [Baptiste Fontaine](https://github.com/bfontaine), [Brett Koonce](https://github.com/asparagui), [ilovezfs](https://github.com/ilovezfs), [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
 
 Former maintainers with significant contributions include [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
@@ -149,6 +149,10 @@ Our CI infrastructure is hosted by [The Positive Internet Company](http://www.po
 Our bottles (binary packages) are hosted by Bintray.
 
 [![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/homebrew)
+
+Secure password storage and syncing provided by [1Password for Teams](https://1password.com/teams/) by AgileBits
+
+[![AgileBits](https://da36klfizjv29.cloudfront.net/assets/branding/agilebits-fcca96e9b8e815c5c48c6b3e98156cb5.png)](https://agilebits.com)
 
 Homebrew is a member of the [Software Freedom Conservancy](https://sfconservancy.org)
 

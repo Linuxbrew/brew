@@ -19,7 +19,7 @@ class CommandsTests < Homebrew::TestCase
   end
 
   def teardown
-    @cmds.each { |f| f.unlink }
+    @cmds.each(&:unlink)
   end
 
   def test_internal_commands
@@ -43,12 +43,12 @@ class CommandsTests < Homebrew::TestCase
       %w[brew-t1 brew-t2.rb brew-t3.py].each do |file|
         path = "#{dir}/#{file}"
         FileUtils.touch path
-        FileUtils.chmod 0744, path
+        FileUtils.chmod 0755, path
       end
 
-      FileUtils.touch "#{dir}/t4"
+      FileUtils.touch "#{dir}/brew-t4"
 
-      ENV["PATH"] = "#{ENV["PATH"]}#{File::PATH_SEPARATOR}#{dir}"
+      ENV["PATH"] += "#{File::PATH_SEPARATOR}#{dir}"
       cmds = Homebrew.external_commands
 
       assert cmds.include?("t1"), "Executable files should be included"

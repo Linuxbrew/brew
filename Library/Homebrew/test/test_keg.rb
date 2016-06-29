@@ -56,7 +56,7 @@ class LinkTests < Homebrew::TestCase
   def test_unlinking_keg
     @keg.link
     assert_predicate @dst, :symlink?
-    assert_equal 4, @keg.unlink
+    assert_equal 3, @keg.unlink
     refute_predicate @dst, :symlink?
   end
 
@@ -239,7 +239,7 @@ class LinkTests < Homebrew::TestCase
   def test_unlink_ignores_nonexistent_file
     @keg.link
     @dst.delete
-    assert_equal 3, @keg.unlink
+    assert_equal 2, @keg.unlink
   end
 
   def test_pkgconfig_is_mkpathed
