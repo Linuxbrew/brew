@@ -36,6 +36,13 @@ setup-analytics() {
   if [[ -z "$HOMEBREW_ANALYTICS_USER_UUID" ]]
   then
     HOMEBREW_ANALYTICS_USER_UUID="$(uuidgen)"
+
+    if [[ -z "$HOMEBREW_ANALYTICS_USER_UUID" ]]
+    then
+      # Avoid sending bogus analytics if no UUID could be generated.
+      export HOMEBREW_NO_ANALYTICS_THIS_RUN="1"
+      return
+    fi
     git config --file="$git_config_file" --replace-all homebrew.analyticsuuid "$HOMEBREW_ANALYTICS_USER_UUID"
   fi
 
