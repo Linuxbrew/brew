@@ -29,7 +29,7 @@ EOS
 _create_lock() {
   local lock_fd="$1"
   local ruby="/usr/bin/ruby"
-  [[ -x "$ruby" ]] || local ruby="$(which ruby 2>/dev/null)"
+  [[ -x "$ruby" ]] || ruby="$(which ruby 2>/dev/null)"
 
   if [[ -n "$ruby" ]]
   then
