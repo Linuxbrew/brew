@@ -5,10 +5,13 @@ quiet_cd() {
   cd "$@" >/dev/null
 }
 
-BREW_FILE_DIRECTORY="$(quiet_cd "${0%/*}" && pwd -P)"
-HOMEBREW_BREW_FILE="$BREW_FILE_DIRECTORY/${0##*/}"
+BREW_FILE_DIRECTORY="$(quiet_cd "${0%/*}/" && pwd -P)"
+HOMEBREW_BREW_FILE="${BREW_FILE_DIRECTORY%/}/${0##*/}"
 
 HOMEBREW_PREFIX="${HOMEBREW_BREW_FILE%/*/*}"
+[[ -n "$HOMEBREW_PREFIX" && "$HOMEBREW_PREFIX" != "$HOMEBREW_BREW_FILE" ]] \
+  || HOMEBREW_PREFIX="/"
+
 HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX"
 
 if [[ -L "$HOMEBREW_BREW_FILE" ]]
