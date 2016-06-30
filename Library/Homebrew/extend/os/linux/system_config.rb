@@ -11,7 +11,7 @@ class SystemConfig
       require "formula"
       begin
         f = Formula[formula]
-        "#{f.name}: #{f.installed? ? f.version : "N/A"}"
+        f.installed? ? f.version : "N/A"
       rescue FormulaUnavailableError
         # Fix for brew tests, which uses NullLoader.
         return "N/A"
@@ -30,9 +30,9 @@ class SystemConfig
       end
       f.puts "OS glibc: #{GlibcRequirement.system_version}"
       f.puts "OS gcc: #{describe_system_gcc_version}"
-      f.puts "Linuxbrew #{formula_version "glibc"}"
-      f.puts "Linuxbrew #{formula_version "gcc"}"
-      f.puts "Linuxbrew #{formula_version "linuxbrew/xorg/xorg"}"
+      f.puts "Linuxbrew glibc: #{formula_version "glibc"}"
+      f.puts "Linuxbrew gcc: #{formula_version "gcc"}"
+      f.puts "Linuxbrew xorg: #{formula_version "linuxbrew/xorg/xorg"}"
     end
   end
 end
