@@ -33,10 +33,10 @@ class Requirement
   def message
     s = ""
     if cask
-      s +=  <<-EOS.undent
+      s += <<-EOS.undent
 
         You can install with Homebrew Cask:
-          brew install Caskroom/cask/#{cask}
+          brew cask install #{cask}
       EOS
     end
 
