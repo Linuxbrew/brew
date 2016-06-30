@@ -666,6 +666,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     assert_predicate desc_cache, :exist?, "Cached file should exist"
   ensure
-    desc_cache.unlink
+    desc_cache.unlink if desc_cache.exist?
   end
 end
