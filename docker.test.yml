@@ -4,3 +4,4 @@ sut:
   environment:
     - GIT_BRANCH
     - GIT_SHA1
+    - HOMEBREW_DEVELOPER=1
