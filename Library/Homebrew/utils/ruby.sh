@@ -1,4 +1,33 @@
+origin-setup-ruby-path() {
+  if [[ -z "$HOMEBREW_DEVELOPER" ]]
+  then
+    unset HOMEBREW_RUBY_PATH
+  fi
+
+  if [[ -z "$HOMEBREW_RUBY_PATH" ]]
+  then
+    if [[ -n "$HOMEBREW_OSX" ]]
+    then
+      HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
+    else
+      HOMEBREW_RUBY_PATH="$(which ruby)"
+      if [[ -z "$HOMEBREW_RUBY_PATH" ]]
+      then
+        odie "No Ruby found, cannot proceed."
+      fi
+    fi
+  fi
+
+  export HOMEBREW_RUBY_PATH
+}
+
 setup-ruby-path() {
+  if [[ -z "$HOMEBREW_USE_VENDOR_RUBY" ]]
+  then
+    origin-setup-ruby-path
+    return
+  fi
+
   local vendor_dir
   local vendor_ruby_current_version
   local vendor_ruby_path
