@@ -17,15 +17,15 @@ def blacklisted?(name)
     Homebrew provides pip via: `brew install python`. However you will then
     have two Pythons installed on your Mac, so alternatively you can install
     pip via the instructions at:
-
-      https://pip.readthedocs.org/en/stable/installing/#install-pip
+      https://pip.readthedocs.io/en/stable/installing/
     EOS
   when "pil" then <<-EOS.undent
     Instead of PIL, consider `pip install pillow` or `brew install Homebrew/python/pillow`.
     EOS
   when "macruby" then <<-EOS.undent
-    MacRuby works better when you install their package:
-      http://www.macruby.org/
+    MacRuby is not packaged and is on an indefinite development hiatus.
+    You can read more about it at:
+      https://github.com/MacRuby/MacRuby
     EOS
   when /(lib)?lzma/
     "lzma is now part of the xz formula."
