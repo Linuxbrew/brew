@@ -338,7 +338,7 @@ class FormulaTests < Homebrew::TestCase
 
       bottle do
         cellar :any
-        sha256 TEST_SHA256 => :el_capitan
+        sha256 TEST_SHA256 => OS.mac? ? :el_capitan : :x86_64_linux
       end
     end
 

@@ -31,6 +31,7 @@ class BottleCollectorTests < Homebrew::TestCase
   end
 
   def test_collector_finds_or_later_tags
+    skip "Only for Mac OS" unless OS.mac?
     @collector[:lion_or_later] = "foo"
     assert_equal ["foo", :lion_or_later], checksum_for(:mountain_lion)
     assert_nil checksum_for(:snow_leopard)
@@ -43,6 +44,7 @@ class BottleCollectorTests < Homebrew::TestCase
   end
 
   def test_collector_finds_altivec_tags
+    skip "Only for Mac OS" unless OS.mac?
     @collector[:tiger_altivec] = "foo"
     assert_equal ["foo", :tiger_altivec], checksum_for(:tiger_g4)
     assert_equal ["foo", :tiger_altivec], checksum_for(:tiger_g4e)

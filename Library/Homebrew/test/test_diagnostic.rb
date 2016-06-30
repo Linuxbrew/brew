@@ -45,6 +45,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   end
 
   def test_check_for_other_package_managers
+    skip "Only for Mac OS" unless OS.mac?
     MacOS.stubs(:macports_or_fink).returns ["fink"]
     assert_match "You have MacPorts or Fink installed:",
       @checks.check_for_other_package_managers
@@ -166,6 +167,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   end
 
   def test_check_for_unsupported_curl_vars
+    skip "Only for Mac OS" unless OS.mac?
     MacOS.stubs(:version).returns OS::Mac::Version.new("10.10")
     ENV["SSL_CERT_DIR"] = "/some/path"
 
