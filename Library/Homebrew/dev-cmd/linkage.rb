@@ -72,7 +72,13 @@ module Homebrew
 
       begin
         f = Formulary.from_rack(keg.rack)
-        @undeclared_deps = @brewed_dylibs.keys - f.deps.map(&:name)
+        f.build = Tab.for_keg(keg)
+        filter_out = proc do |dep|
+          dep.build? || (dep.optional? && !dep.option_names.any? { |n| f.build.with?(n) })
+        end
+        declared_deps = f.deps.reject { |dep| filter_out.call(dep) }.map(&:name) +
+                        f.requirements.reject { |req| filter_out.call(req) }.map(&:default_formula).compact
+        @undeclared_deps = @brewed_dylibs.keys - declared_deps.map { |dep| dep.split("/").last }
         @undeclared_deps -= [f.name]
       rescue FormulaUnavailableError
         opoo "Formula unavailable: #{keg.name}"
