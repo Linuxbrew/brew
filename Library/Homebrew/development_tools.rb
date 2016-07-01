@@ -25,6 +25,7 @@ class DevelopmentTools
     end
 
     def default_compiler
+      return :gcc unless OS.mac?
       case default_cc
       # if GCC 4.2 is installed, e.g. via Tigerbrew, prefer it
       # over the system's GCC 4.0
