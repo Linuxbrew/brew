@@ -22,6 +22,8 @@ module Homebrew
       result = LinkageChecker.new(keg)
       if ARGV.include?("--test")
         result.display_test_output
+      elsif ARGV.include?("--reverse")
+        result.display_reverse_output
       else
         result.display_normal_output
       end
@@ -42,6 +44,7 @@ module Homebrew
       @system_dylibs = Set.new
       @broken_dylibs = Set.new
       @variable_dylibs = Set.new
+      @reverse_links = Hash.new { |h, k| h[k] = Set.new }
       check_dylibs
     end
 
@@ -50,6 +53,7 @@ module Homebrew
         next if file.symlink? || file.directory?
         next unless file.dylib? || file.mach_o_executable? || file.mach_o_bundle?
         file.dynamically_linked_libraries.each do |dylib|
+          @reverse_links[dylib] << file
           if dylib.start_with? "@"
             @variable_dylibs << dylib
           else
@@ -82,6 +86,19 @@ module Homebrew
       display_items "Variable-referenced libraries", @variable_dylibs
       display_items "Missing libraries", @broken_dylibs
       display_items "Possible undeclared dependencies", @undeclared_deps
+    end
+
+    def display_reverse_output
+      return if @reverse_links.empty?
+      sorted = @reverse_links.sort
+      sorted.each do |dylib, files|
+        puts dylib
+        files.each do |f|
+          unprefixed = f.to_s.strip_prefix "#{@keg.to_s}/"
+          puts "  #{unprefixed}"
+        end
+        puts unless dylib == sorted.last[0]
+      end
     end
 
     def display_test_output
