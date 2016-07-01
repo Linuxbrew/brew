@@ -46,6 +46,7 @@ class FormulaTests < Homebrew::TestCase
     f.instance_variable_set(:@tap, CoreTap.instance)
 
     oldname_prefix = HOMEBREW_CELLAR/"oldname/2.20"
+    newname_prefix = HOMEBREW_CELLAR/"newname/2.10"
     oldname_prefix.mkpath
     oldname_tab = Tab.empty
     oldname_tab.tabfile = oldname_prefix.join("INSTALL_RECEIPT.json")
@@ -58,8 +59,13 @@ class FormulaTests < Homebrew::TestCase
     oldname_tab.write
 
     assert_predicate f, :migration_needed?
+
+    newname_prefix.mkpath
+
+    refute_predicate f, :migration_needed?
   ensure
     oldname_prefix.parent.rmtree
+    newname_prefix.parent.rmtree
   end
 
   def test_installed?
