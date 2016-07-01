@@ -957,8 +957,14 @@ class Formula
   end
 
   def migration_needed?
-    oldname && !rack.exist? && (dir = HOMEBREW_CELLAR/oldname).directory? &&
-      !dir.subdirs.empty? && tap == Tab.for_keg(dir.subdirs.first).tap
+    return false unless oldname
+    return false if rack.exist?
+
+    old_rack = HOMEBREW_CELLAR/oldname
+    return false unless old_rack.directory?
+    return false if old_rack.subdirs.empty?
+
+    tap == Tab.for_keg(old_rack.subdirs.first).tap
   end
 
   # @private
