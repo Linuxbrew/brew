@@ -62,6 +62,7 @@ class Tap
     @repo = repo
     @name = "#{@user}/#{@repo}".downcase
     @path = TAP_DIRECTORY/"#{@user}/homebrew-#{@repo}".downcase
+    @path.extend(GitRepositoryExtension)
   end
 
   # clear internal cache
@@ -84,15 +85,8 @@ class Tap
   # The remote path to this {Tap}.
   # e.g. `https://github.com/user/homebrew-repo`
   def remote
-    @remote ||= if installed?
-      if git? && Utils.git_available?
-        path.cd do
-          Utils.popen_read("git", "config", "--get", "remote.origin.url").chomp
-        end
-      end
-    else
-      raise TapUnavailableError, name
-    end
+    raise TapUnavailableError, name unless installed?
+    @remote ||= path.git_origin
   end
 
   # The default remote path to this {Tap}.
@@ -102,35 +96,31 @@ class Tap
 
   # True if this {Tap} is a git repository.
   def git?
-    (path/".git").exist?
+    path.git?
   end
 
   # git HEAD for this {Tap}.
   def git_head
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "rev-parse", "--verify", "-q", "HEAD").chuzzle }
+    path.git_head
   end
 
   # git HEAD in short format for this {Tap}.
   def git_short_head
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "rev-parse", "--short=4", "--verify", "-q", "HEAD").chuzzle }
+    path.git_short_head
   end
 
   # time since git last commit for this {Tap}.
   def git_last_commit
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "show", "-s", "--format=%cr", "HEAD").chuzzle }
+    path.git_last_commit
   end
 
   # git last commit date for this {Tap}.
   def git_last_commit_date
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "show", "-s", "--format=%cd", "--date=short", "HEAD").chuzzle }
+    path.git_last_commit_date
   end
 
   # The issues URL of this {Tap}.
