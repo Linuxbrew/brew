@@ -1,6 +1,7 @@
 require "extend/module"
 require "extend/fileutils"
 require "extend/pathname"
+require "extend/git_repository"
 require "extend/ARGV"
 require "extend/string"
 require "extend/enumerable"
