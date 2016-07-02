@@ -24,7 +24,7 @@ class Tab < OpenStruct
       "poured_from_bottle" => false,
       "time" => Time.now.to_i,
       "source_modified_time" => source_modified_time.to_i,
-      "HEAD" => Homebrew.git_head,
+      "HEAD" => HOMEBREW_REPOSITORY.git_head,
       "compiler" => compiler,
       "stdlib" => stdlib,
       "source" => {

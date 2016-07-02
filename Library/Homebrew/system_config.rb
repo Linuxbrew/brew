@@ -23,15 +23,15 @@ class SystemConfig
     end
 
     def head
-      Homebrew.git_head || "(none)"
+      HOMEBREW_REPOSITORY.git_head || "(none)"
     end
 
     def last_commit
-      Homebrew.git_last_commit || "never"
+      HOMEBREW_REPOSITORY.git_last_commit || "never"
     end
 
     def origin
-      Homebrew.git_origin || "(none)"
+      HOMEBREW_REPOSITORY.git_origin || "(none)"
     end
 
     def core_tap_head

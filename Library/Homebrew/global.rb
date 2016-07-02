@@ -20,6 +20,8 @@ HOMEBREW_WWW = "http://brew.sh"
 
 require "config"
 
+HOMEBREW_REPOSITORY.extend(GitRepositoryExtension)
+
 if RbConfig.respond_to?(:ruby)
   RUBY_PATH = Pathname.new(RbConfig.ruby)
 else

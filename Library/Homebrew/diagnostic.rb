@@ -805,7 +805,7 @@ module Homebrew
       def check_git_origin
         return if !Utils.git_available? || !(HOMEBREW_REPOSITORY/".git").exist?
 
-        origin = Homebrew.git_origin
+        origin = HOMEBREW_REPOSITORY.git_origin
 
         if origin.nil?
           <<-EOS.undent

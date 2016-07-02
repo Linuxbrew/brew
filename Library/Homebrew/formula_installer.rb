@@ -761,7 +761,7 @@ class FormulaInstaller
     tab.tap = formula.tap
     tab.poured_from_bottle = true
     tab.time = Time.now.to_i
-    tab.head = Homebrew.git_head
+    tab.head = HOMEBREW_REPOSITORY.git_head
     tab.write
   end
 
