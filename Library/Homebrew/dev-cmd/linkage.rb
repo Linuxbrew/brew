@@ -9,6 +9,8 @@
 # Options:
 #  --test      - testing version: only display broken libs; exit non-zero if any
 #                breakage was found.
+#  --reverse   - For each dylib the keg references, print the dylib followed by the
+#                binaries which link to it.
 
 require "set"
 require "keg"
