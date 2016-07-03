@@ -255,6 +255,7 @@ class Reporter
         if new_tap.installed? && (HOMEBREW_REPOSITORY/"Caskroom").directory?
           ohai "#{name} has been moved to Homebrew Cask. Installing #{name}..."
           system HOMEBREW_BREW_FILE, "uninstall", "--force", name
+          system HOMEBREW_BREW_FILE, "prune"
           system HOMEBREW_BREW_FILE, "cask", "install", name
         else
           ohai "#{name} has been moved to Homebrew Cask.", <<-EOS.undent
