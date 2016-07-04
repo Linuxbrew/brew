@@ -656,9 +656,6 @@ module Homebrew
       if @tap.nil?
         tests_args = []
         if ruby_two
-          test "brew", "tap", "caskroom/cask"
-          test "brew", "tap", "homebrew/bundle"
-          test "brew", "tap", "homebrew/services"
           tests_args << "--official-cmd-taps"
           tests_args << "--coverage" if ENV["TRAVIS"]
         end

@@ -130,6 +130,12 @@ class IntegrationCommandTests < Homebrew::TestCase
     formula_path
   end
 
+  def setup_remote_tap(name)
+    tap = Tap.fetch name
+    tap.install(:full_clone => false, :quiet => true) unless tap.installed?
+    tap
+  end
+
   def testball
     "#{File.expand_path("..", __FILE__)}/testball.rb"
   end
@@ -677,6 +683,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_bundle
     needs_test_cmd_taps
+    setup_remote_tap("homebrew/bundle")
     HOMEBREW_REPOSITORY.cd do
       shutup do
         system "git", "init"
@@ -693,16 +700,24 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
   ensure
     FileUtils.rm_rf HOMEBREW_REPOSITORY/".git"
+    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle"
   end
 
   def test_cask
     needs_test_cmd_taps
+    setup_remote_tap("caskroom/cask")
     cmd("cask", "list")
+  ensure
+    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/caskroom"
+    FileUtils.rm_rf HOMEBREW_PREFIX/"share"
   end
 
   def test_services
     needs_test_cmd_taps
+    setup_remote_tap("homebrew/services")
     assert_equal "Warning: No services available to control with `brew services`",
       cmd("services", "list")
+  ensure
+    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services"
   end
 end

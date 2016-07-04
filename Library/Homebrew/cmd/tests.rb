@@ -7,21 +7,16 @@ require "tap"
 
 module Homebrew
   def tests
-    ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
-
-    if ARGV.include? "--official-cmd-taps"
-      ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"] = "1"
-      OFFICIAL_CMD_TAPS.each do |tap, _|
-        tap = Tap.fetch tap
-        tap.install unless tap.installed?
-      end
-    end
-
     (HOMEBREW_LIBRARY/"Homebrew/test").cd do
+      ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["TESTOPTS"] = "-v" if ARGV.verbose?
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
       ENV["HOMEBREW_NO_GITHUB_API"] = "1" unless ARGV.include? "--online"
+      if ARGV.include? "--official-cmd-taps"
+        ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"] = "1"
+      end
+
       if ARGV.include? "--coverage"
         ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
         FileUtils.rm_f "coverage/.resultset.json"
