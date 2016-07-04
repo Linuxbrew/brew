@@ -659,6 +659,7 @@ module Homebrew
         test "brew", "tests", *tests_args
         test "brew", "tests", "--no-compat"
         test "brew", "readall", "--syntax"
+        test "brew", "tests", "--official-cmd-taps"
       else
         test "brew", "readall", "--aliases", @tap.name
       end
