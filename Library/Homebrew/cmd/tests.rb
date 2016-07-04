@@ -1,5 +1,5 @@
 #: @hide_from_man_page
-#:  * `tests` [`-v`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<test_script/test_method>] [`--seed` <seed>] [`--trace`]:
+#:  * `tests` [`-v`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<test_script/test_method>] [`--seed` <seed>] [`--trace`] [`--online`]:
 #:    Run Homebrew's unit and integration tests.
 
 require "fileutils"
@@ -11,6 +11,7 @@ module Homebrew
       ENV["TESTOPTS"] = "-v" if ARGV.verbose?
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
+      ENV["HOMEBREW_NO_GITHUB_API"] = "1" unless ARGV.include? "--online"
       if ARGV.include? "--coverage"
         ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
         FileUtils.rm_f "coverage/.resultset.json"
