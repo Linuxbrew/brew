@@ -66,6 +66,10 @@ class Cleaner
     end
   end
 
+  def executable_path?(path)
+    path.text_executable?
+  end
+
   # Clean a top-level (bin, sbin, lib) directory, recursively, by fixing file
   # permissions and removing .la files, unless the files (or parent
   # directories) are protected by skip_clean.
@@ -87,7 +91,7 @@ class Cleaner
         path.unlink
       else
         # Set permissions for executables and non-executables
-        perms = if path.mach_o_executable? || path.text_executable?
+        perms = if executable_path?(path)
           0555
         else
           0444
@@ -103,3 +107,5 @@ class Cleaner
     end
   end
 end
+
+require "extend/os/cleaner"
