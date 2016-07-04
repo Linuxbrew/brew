@@ -1,4 +1,4 @@
-#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] <formula>:
+#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`] [`--devel`|`--HEAD`] [`--keep-tmp`] <formula>:
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -32,9 +32,10 @@
 #:    passed, then both <formula> and the dependencies installed as part of this process
 #:    are built from source even if bottles are available.
 #:
-#:    If `--force-bottle` is passed, install from a bottle if it exists
-#:    for the current version of OS X, even if custom options are given.
-#:
+#     Hidden developer option:
+#     If `--force-bottle` is passed, install from a bottle if it exists
+#    for the current version of OS X, even if custom options are given.
+#
 #:    If `--devel` is passed, and <formula> defines it, install the development version.
 #:
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
