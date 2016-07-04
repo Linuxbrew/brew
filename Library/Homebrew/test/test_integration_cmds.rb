@@ -697,7 +697,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_cask
     needs_test_cmd_taps
-    assert_equal "Warning: nothing to list", cmd("cask", "list")
+    cmd("cask", "list")
   end
 
   def test_services
