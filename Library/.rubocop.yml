@@ -66,6 +66,10 @@ Style/EmptyLineBetweenDefs:
 Style/NumericLiterals:
   Enabled: false
 
+# zero-prefixed octal literals are just too widely used (and mostly understood)
+Style/NumericLiteralPrefix:
+  EnforcedOctalStyle: zero_only
+
 # consistency and readability when faced with string interpolation
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
