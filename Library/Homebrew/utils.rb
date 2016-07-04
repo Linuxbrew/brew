@@ -431,6 +431,7 @@ def which_editor
 end
 
 def exec_editor(*args)
+  puts "Editing #{args.join "\n"}"
   safe_exec(which_editor, *args)
 end
 
