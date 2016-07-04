@@ -15,10 +15,4 @@ OFFICIAL_TAPS = %w[
   tex
   versions
   x11
-].freeze
-
-OFFICIAL_CMD_TAPS = {
-  "caskroom/cask" => ["cask"],
-  "homebrew/bundle" => ["bundle"],
-  "homebrew/services" => ["services"],
-}.freeze
+]
