@@ -654,12 +654,14 @@ module Homebrew
       ruby_two = RUBY_VERSION.split(".").first.to_i >= 2
 
       if @tap.nil?
-        tests_args = []
+        test "brew", "tap", "caskroom/cask"
+        test "brew", "tap", "homebrew/bundle"
+        test "brew", "tap", "homebrew/services"
+        tests_args = ["--official-cmd-taps"]
         tests_args << "--coverage" if ruby_two && ENV["TRAVIS"]
         test "brew", "tests", *tests_args
         test "brew", "tests", "--no-compat"
         test "brew", "readall", "--syntax"
-        test "brew", "tests", "--official-cmd-taps"
       else
         test "brew", "readall", "--aliases", @tap.name
       end
