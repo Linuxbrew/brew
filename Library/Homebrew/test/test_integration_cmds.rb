@@ -17,6 +17,12 @@ class IntegrationCommandTests < Homebrew::TestCase
     @formula_files.each(&:unlink)
   end
 
+  def needs_test_cmd_taps
+    unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
+      skip "HOMEBREW_TEST_OFFICIAL_CMD_TAPS is not set"
+    end
+  end
+
   def cmd_id_from_args(args)
     args_pretty = args.join(" ").gsub(TEST_TMPDIR, "@TMPDIR@")
     test_pretty = "#{self.class.name}\##{name}.#{@cmd_id_index += 1}"
@@ -667,5 +673,36 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_predicate desc_cache, :exist?, "Cached file should exist"
   ensure
     desc_cache.unlink
+  end
+
+  def test_bundle
+    needs_test_cmd_taps
+    HOMEBREW_REPOSITORY.cd do
+      shutup do
+        system "git", "init"
+        system "git", "commit", "--allow-empty", "-m", "This is a test commit"
+      end
+    end
+
+    mktmpdir do |path|
+      FileUtils.touch "#{path}/Brewfile"
+      Dir.chdir path do
+        assert_equal "The Brewfile's dependencies are satisfied.",
+          cmd("bundle", "check")
+      end
+    end
+  ensure
+    FileUtils.rm_rf HOMEBREW_REPOSITORY/".git"
+  end
+
+  def test_cask
+    needs_test_cmd_taps
+    assert_equal "Warning: nothing to list", cmd("cask", "list")
+  end
+
+  def test_services
+    needs_test_cmd_taps
+    assert_equal "Warning: No services available to control with `brew services`",
+      cmd("services", "list")
   end
 end
