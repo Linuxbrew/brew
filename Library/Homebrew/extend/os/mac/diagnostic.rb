@@ -1,6 +1,16 @@
 module Homebrew
   module Diagnostic
     class Checks
+      def all_development_tools_checks
+        %w[
+          check_for_unsupported_osx
+          check_for_bad_install_name_tool
+          check_for_installed_developer_tools
+          check_xcode_license_approved
+          check_for_osx_gcc_installer
+        ]
+      end
+
       def check_for_unsupported_osx
         return if ARGV.homebrew_developer?
 
