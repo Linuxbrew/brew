@@ -177,7 +177,7 @@ module Homebrew
       verbose = ARGV.verbose?
       # Step may produce arbitrary output and we read it bytewise, so must
       # buffer it as binary and convert to UTF-8 once complete
-      output = Homebrew.ruby_has_encoding? ? "".encode!("BINARY") : ""
+      output = ruby_has_encoding? ? "".encode!("BINARY") : ""
       working_dir = Pathname.new(@command.first == "git" ? @repository : Dir.pwd)
       read, write = IO.pipe
 
