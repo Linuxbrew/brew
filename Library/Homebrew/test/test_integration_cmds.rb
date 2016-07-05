@@ -424,24 +424,23 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_linkapps
-    home = mktmpdir
-    apps_dir = Pathname.new(home).join("Applications")
-    apps_dir.mkpath
+    home_dir = Pathname.new(mktmpdir)
+    (home_dir/"Applications").mkpath
 
     setup_test_formula "testball"
 
     source_dir = HOMEBREW_CELLAR/"testball/0.1/TestBall.app"
     source_dir.mkpath
     assert_match "Linking: #{source_dir}",
-      cmd("linkapps", "--local", "HOME" => home)
+      cmd("linkapps", "--local", "HOME" => home_dir)
   ensure
-    FileUtils.rm_rf apps_dir
+    home_dir.rmtree
     (HOMEBREW_CELLAR/"testball").rmtree
   end
 
   def test_unlinkapps
-    home = mktmpdir
-    apps_dir = Pathname.new(home).join("Applications")
+    home_dir = Pathname.new(mktmpdir)
+    apps_dir = home_dir/"Applications"
     apps_dir.mkpath
 
     setup_test_formula "testball"
@@ -452,9 +451,9 @@ class IntegrationCommandTests < Homebrew::TestCase
     FileUtils.ln_s source_app, "#{apps_dir}/TestBall.app"
 
     assert_match "Unlinking: #{apps_dir}/TestBall.app",
-      cmd("unlinkapps", "--local", "HOME" => home)
+      cmd("unlinkapps", "--local", "HOME" => home_dir)
   ensure
-    apps_dir.rmtree
+    home_dir.rmtree
     (HOMEBREW_CELLAR/"testball").rmtree
   end
 
