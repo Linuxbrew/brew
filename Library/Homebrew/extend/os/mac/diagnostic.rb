@@ -312,6 +312,18 @@ module Homebrew
             https://xquartz.macosforge.org
         EOS
       end
+
+      def check_for_beta_xquartz
+        return unless MacOS::XQuartz.version.include? "beta"
+
+        <<-EOS.undent
+        The following beta release of XQuartz is installed: #{MacOS::XQuartz.version}
+
+        XQuartz beta releases include address sanitization, and do not work with
+        all software; notably, wine will not work with beta releases of XQuartz.
+        We recommend only installing stable releases of XQuartz.
+        EOS
+      end
     end
   end
 end

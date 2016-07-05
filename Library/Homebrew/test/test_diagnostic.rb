@@ -226,4 +226,9 @@ class DiagnosticChecksTest < Homebrew::TestCase
       end
     end
   end
+
+  def test_check_for_beta_xquartz
+    MacOS::XQuartz.stubs(:version).returns("2.7.10_beta2")
+    assert_match "The following beta release of XQuartz is installed: 2.7.10_beta2", @checks.check_for_beta_xquartz
+  end
 end
