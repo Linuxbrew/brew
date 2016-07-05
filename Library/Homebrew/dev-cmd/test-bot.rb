@@ -45,10 +45,6 @@ module Homebrew
 
   HOMEBREW_TAP_REGEX = %r{^([\w-]+)/homebrew-([\w-]+)$}
 
-  def ruby_has_encoding?
-    String.method_defined?(:force_encoding)
-  end
-
   if ruby_has_encoding?
     def fix_encoding!(str)
       # Assume we are starting from a "mostly" UTF-8 string
@@ -1032,13 +1028,7 @@ module Homebrew
 
       # Truncate to 1MB to avoid hitting CI limits
       if output.bytesize > MAX_STEP_OUTPUT_SIZE
-        if ruby_has_encoding?
-          binary_output = output.force_encoding("BINARY")
-          output = binary_output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
-          fix_encoding!(output)
-        else
-          output = output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
-        end
+        output = truncate_text_to_approximate_size(output, MAX_STEP_OUTPUT_SIZE, :front_weight => 0.0)
         output = "truncated output to 1MB:\n" + output
       end
     end

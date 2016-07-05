@@ -210,4 +210,17 @@ class UtilTests < Homebrew::TestCase
     assert_equal "1,000", number_readable(1_000)
     assert_equal "1,000,000", number_readable(1_000_000)
   end
+
+  def test_truncate_text_to_approximate_size
+    glue = "\n[...snip...]\n" # hard-coded copy from truncate_text_to_approximate_size
+    n = 20
+    long_s = "x" * 40
+    s = truncate_text_to_approximate_size(long_s, n)
+    assert_equal n, s.length
+    assert_match(/^x+#{Regexp.escape(glue)}x+$/, s)
+    s = truncate_text_to_approximate_size(long_s, n, :front_weight => 0.0)
+    assert_equal glue + ("x" * (n - glue.length)), s
+    s = truncate_text_to_approximate_size(long_s, n, :front_weight => 1.0)
+    assert_equal(("x" * (n - glue.length)) + glue, s)
+  end
 end
