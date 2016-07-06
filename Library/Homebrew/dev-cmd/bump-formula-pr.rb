@@ -101,6 +101,7 @@ module Homebrew
     new_tag = ARGV.value("tag")
     new_revision = ARGV.value("revision")
     new_mirror = ARGV.value("mirror")
+    forced_version = ARGV.value("version")
     new_url_hash = if new_url && new_hash
       true
     elsif new_tag && new_revision
@@ -155,6 +156,11 @@ module Homebrew
       replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
     end
 
+    if forced_version && forced_version != "0"
+      replacement_pairs << [old_formula_version, forced_version]
+    elsif forced_version && forced_version == "0"
+      replacement_pairs << [/^  version \"[a-z\d+\.]+\"\n/m, ""]
+    end
     new_contents = inreplace_pairs(formula.path, replacement_pairs)
 
     new_formula_version = formula_version(formula, requested_spec, new_contents)
