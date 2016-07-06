@@ -271,21 +271,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_other_package_managers
-        ponk = MacOS.macports_or_fink
-        return if ponk.empty?
-
-        <<-EOS.undent
-          You have MacPorts or Fink installed:
-            #{ponk.join(", ")}
-
-          This can cause trouble. You don't have to uninstall them, but you may want to
-          temporarily move them out of the way, e.g.
-
-            sudo mv /opt/local ~/macports
-        EOS
-      end
-
       def check_xcode_license_approved
         # If the user installs Xcode-only, they have to approve the
         # license or no "xc*" tool will work.
