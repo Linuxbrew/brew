@@ -3,19 +3,15 @@ require "os/mac/pathname"
 module Hardware
   class CPU
     class << self
-
-      OPTIMIZATION_FLAGS = {
-        :penryn => "-march=core2 -msse4.1",
-        :core2 => "-march=core2",
-        :core => "-march=prescott",
+      PPC_OPTIMIZATION_FLAGS = {
         :g3 => "-mcpu=750",
         :g4 => "-mcpu=7400",
         :g4e => "-mcpu=7450",
         :g5 => "-mcpu=970",
-        :g5_64 => "-mcpu=970 -arch ppc64"
+        :g5_64 => "-mcpu=970 -arch ppc64",
       }.freeze
       def optimization_flags
-        OPTIMIZATION_FLAGS
+        OPTIMIZATION_FLAGS.merge(PPC_OPTIMIZATION_FLAGS)
       end
 
       # These methods use info spewed out by sysctl.
