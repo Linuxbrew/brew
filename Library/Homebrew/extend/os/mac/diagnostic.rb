@@ -314,6 +314,7 @@ module Homebrew
       end
 
       def check_for_beta_xquartz
+        return unless MacOS::XQuartz.version
         return unless MacOS::XQuartz.version.include? "beta"
 
         <<-EOS.undent
