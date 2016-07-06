@@ -1,4 +1,5 @@
 require "extend/ENV/shared"
+require "development_tools"
 
 # ### Why `superenv`?
 #
@@ -26,7 +27,7 @@ module Superenv
 
   # @private
   def self.bin
-    return unless MacOS.has_apple_developer_tools?
+    return unless DevelopmentTools.installed?
 
     bin = HOMEBREW_ENV_PATH.subdirs.reject { |d| d.basename.to_s > MacOS::Xcode.version }.max
     bin.realpath unless bin.nil?

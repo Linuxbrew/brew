@@ -90,5 +90,9 @@ module OS
     def clang_build_version
       DevelopmentTools.clang_build_version
     end
+
+    def has_apple_developer_tools?
+      DevelopmentTools.installed?
+    end
   end
 end

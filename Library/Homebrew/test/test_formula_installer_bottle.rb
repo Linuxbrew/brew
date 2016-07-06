@@ -36,7 +36,7 @@ class InstallBottleTests < Homebrew::TestCase
   end
 
   def test_a_basic_bottle_install
-    MacOS.stubs(:has_apple_developer_tools?).returns(false)
+    DevelopmentTools.stubs(:installed?).returns(false)
 
     temporary_bottle_install(TestballBottle.new) do |f|
       # Copied directly from test_formula_installer.rb as we expect
@@ -59,7 +59,7 @@ class InstallBottleTests < Homebrew::TestCase
   end
 
   def test_build_tools_error
-    MacOS.stubs(:has_apple_developer_tools?).returns(false)
+    DevelopmentTools.stubs(:installed?).returns(false)
 
     # Testball doesn't have a bottle block, so use it to test this behavior
     formula = Testball.new

@@ -61,13 +61,6 @@ module OS
       end
     end
 
-    # Checks if the user has any developer tools installed, either via Xcode
-    # or the CLT. Convenient for guarding against formula builds when building
-    # is impossible.
-    def has_apple_developer_tools?
-      Xcode.installed? || CLT.installed?
-    end
-
     def active_developer_dir
       @active_developer_dir ||= Utils.popen_read("/usr/bin/xcode-select", "-print-path").strip
     end
