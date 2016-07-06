@@ -4,7 +4,7 @@ require "extend/ENV/std"
 require "extend/ENV/super"
 
 def superenv?
-  Superenv.bin && ARGV.env != "std"
+  ARGV.env != "std" && Superenv.bin
 end
 
 module EnvActivation
