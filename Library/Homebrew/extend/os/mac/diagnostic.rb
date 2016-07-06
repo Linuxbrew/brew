@@ -318,11 +318,11 @@ module Homebrew
         return unless MacOS::XQuartz.version.include? "beta"
 
         <<-EOS.undent
-        The following beta release of XQuartz is installed: #{MacOS::XQuartz.version}
+          The following beta release of XQuartz is installed: #{MacOS::XQuartz.version}
 
-        XQuartz beta releases include address sanitization, and do not work with
-        all software; notably, wine will not work with beta releases of XQuartz.
-        We recommend only installing stable releases of XQuartz.
+          XQuartz beta releases include address sanitization, and do not work with
+          all software; notably, wine will not work with beta releases of XQuartz.
+          We recommend only installing stable releases of XQuartz.
         EOS
       end
     end
