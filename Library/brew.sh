@@ -232,6 +232,7 @@ report-analytics-screenview-command
 update-preinstall() {
   [[ -n "$HOMEBREW_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
+  [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" ]]
   then

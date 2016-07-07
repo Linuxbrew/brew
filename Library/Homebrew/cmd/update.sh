@@ -9,6 +9,16 @@
 # shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
+# Replaces the function in Library/brew.sh to cache the Git executable to
+# provide speedup when using Git repeatedly (as update.sh does).
+git() {
+  if [[ -z "$GIT_EXECUTABLE" ]]
+  then
+    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/ENV/scm/git" --homebrew=print-path)"
+  fi
+  "$GIT_EXECUTABLE" "$@"
+}
+
 git_init_if_necessary() {
   if [[ -n "$HOMEBREW_OSX" ]]
   then
@@ -255,7 +265,7 @@ homebrew-update() {
       --debug) HOMEBREW_DEBUG=1;;
       --merge) HOMEBREW_MERGE=1 ;;
       --simulate-from-current-branch) HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH=1 ;;
-      --preinstall) HOMEBREW_UPDATE_PREINSTALL=1 ;;
+      --preinstall) export HOMEBREW_UPDATE_PREINSTALL=1 ;;
       --*) ;;
       -*)
         [[ "$option" = *v* ]] && HOMEBREW_VERBOSE=1;
@@ -286,10 +296,16 @@ EOS
     odie "$HOMEBREW_REPOSITORY must be writable!"
   fi
 
+  if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
+  then
+    echo "Checking for Homebrew updates..."
+  fi
+
   if ! git --version >/dev/null 2>&1
   then
     # we cannot install brewed git if homebrew/core is unavailable.
     [[ -d "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && brew install git
+    unset GIT_EXECUTABLE
     if ! git --version >/dev/null 2>&1
     then
       odie "Git must be installed and in your PATH!"
@@ -331,6 +347,13 @@ EOS
     UPSTREAM_BRANCH="$(upstream_branch)"
     # the refspec ensures that the default upstream branch gets updated
     (
+      if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
+      then
+        # Skip taps without formulae.
+        FORMULAE="$(find "$DIR" -maxdepth 1 \( -name '*.rb' -or -name 'Formula' -or -name 'HomebrewFormula' \) -print -quit)"
+        [[ -z "$FORMULAE" ]] && exit
+      fi
+
       UPSTREAM_REPOSITORY_URL="$(git config remote.origin.url)"
       if [[ "$UPSTREAM_REPOSITORY_URL" = "https://github.com/"* ]]
       then
@@ -350,6 +373,11 @@ EOS
       then
         # Don't try to do a `git fetch` that may take longer than expected.
         exit
+      fi
+
+      if [[ -n "$HOMEBREW_VERBOSE" ]]
+      then
+        echo "Fetching $DIR..."
       fi
 
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
@@ -386,7 +414,7 @@ EOS
 
   if [[ -n "$HOMEBREW_UPDATED" ||
         -n "$HOMEBREW_UPDATE_FAILED" ||
-        -n "$HOMEBREW_DEVELOPER" ]]
+        (-n "$HOMEBREW_DEVELOPER" && -z "$HOMEBREW_UPDATE_PREINSTALL") ]]
   then
     brew update-report "$@"
     return $?
