@@ -15,7 +15,8 @@ class Tab < OpenStruct
     CACHE.clear
   end
 
-  def self.create(formula, compiler, stdlib, build, source_modified_time)
+  def self.create(formula, compiler, stdlib)
+    build = formula.build
     attributes = {
       "used_options" => build.used_options.as_flags,
       "unused_options" => build.unused_options.as_flags,
@@ -23,7 +24,7 @@ class Tab < OpenStruct
       "built_as_bottle" => build.bottle?,
       "poured_from_bottle" => false,
       "time" => Time.now.to_i,
-      "source_modified_time" => source_modified_time.to_i,
+      "source_modified_time" => formula.source_modified_time.to_i,
       "HEAD" => HOMEBREW_REPOSITORY.git_head,
       "compiler" => compiler,
       "stdlib" => stdlib,
