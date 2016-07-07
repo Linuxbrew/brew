@@ -7,9 +7,8 @@
 # formulae.
 #
 # Options:
-#  --test      - testing version: only display broken libraries and possibly
-#                undeclared dependencies; exit non-zero if any breakage was
-#                found (i.e. any of these yield a nonempty result).
+#  --test      - testing version: only display broken libs; exit non-zero if any
+#                breakage was found.
 #  --reverse   - For each dylib the keg references, print the dylib followed by the
 #                binaries which link to it.
 
