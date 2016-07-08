@@ -7,9 +7,8 @@
 # formulae.
 #
 # Options:
-#  --test      - testing version: only display broken libraries and possibly
-#                undeclared dependencies; exit non-zero if any breakage was
-#                found (i.e. any of these yield a nonempty result).
+#  --test      - testing version: only display broken libs; exit non-zero if any
+#                breakage was found.
 #  --reverse   - For each dylib the keg references, print the dylib followed by the
 #                binaries which link to it.
 
@@ -19,26 +18,27 @@ require "formula"
 
 module Homebrew
   def linkage
+    found_broken_dylibs = false
     ARGV.kegs.each do |keg|
       ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
       result = LinkageChecker.new(keg)
       if ARGV.include?("--test")
         result.display_test_output
-        if result.broken_dylibs? || result.undeclared_deps?
-          Homebrew.failed = true
-        end
       elsif ARGV.include?("--reverse")
         result.display_reverse_output
       else
         result.display_normal_output
       end
+      found_broken_dylibs = true unless result.broken_dylibs.empty?
+    end
+    if ARGV.include?("--test") && found_broken_dylibs
+      exit 1
     end
   end
 
   class LinkageChecker
     attr_reader :keg
-    attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :variable_dylibs
-    attr_reader :undeclared_deps, :reverse_links
+    attr_reader :broken_dylibs
 
     def initialize(keg)
       @keg = keg
@@ -46,7 +46,6 @@ module Homebrew
       @system_dylibs = Set.new
       @broken_dylibs = Set.new
       @variable_dylibs = Set.new
-      @undeclared_deps = []
       @reverse_links = Hash.new { |h, k| h[k] = Set.new }
       check_dylibs
     end
@@ -85,6 +84,7 @@ module Homebrew
         @undeclared_deps -= [f.name]
       rescue FormulaUnavailableError
         opoo "Formula unavailable: #{keg.name}"
+        @undeclared_deps = []
       end
     end
 
@@ -112,16 +112,6 @@ module Homebrew
     def display_test_output
       display_items "Missing libraries", @broken_dylibs
       puts "No broken dylib links" if @broken_dylibs.empty?
-      display_items "Possible undeclared dependencies", @undeclared_deps
-      puts "No undeclared dependencies" if @undeclared_deps.empty?
-    end
-
-    def broken_dylibs?
-      !@broken_dylibs.empty?
-    end
-
-    def undeclared_deps?
-      !@undeclared_deps.empty?
     end
 
     private
