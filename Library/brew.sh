@@ -230,7 +230,7 @@ setup-analytics
 report-analytics-screenview-command
 
 update-preinstall() {
-  [[ -n "$HOMEBREW_AUTO_UPDATE" ]] || return
+  [[ -n "$HOMEBREW_DEVELOPER" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
