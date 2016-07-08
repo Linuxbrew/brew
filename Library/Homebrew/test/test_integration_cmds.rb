@@ -6,15 +6,33 @@ require "formula"
 
 class IntegrationCommandTests < Homebrew::TestCase
   def setup
-    @formula_files = []
     @cmd_id_index = 0 # Assign unique IDs to invocations of `cmd_output`.
     (HOMEBREW_PREFIX/"bin").mkpath
     FileUtils.touch HOMEBREW_PREFIX/"bin/brew"
   end
 
   def teardown
-    (HOMEBREW_PREFIX/"bin").rmtree
-    @formula_files.each(&:unlink)
+    coretap = CoreTap.new
+    paths_to_delete = [
+      HOMEBREW_CELLAR.children,
+      HOMEBREW_CACHE.children,
+      HOMEBREW_LOCK_DIR.children,
+      HOMEBREW_LOGS.children,
+      HOMEBREW_PREFIX/"bin",
+      HOMEBREW_PREFIX/"share",
+      HOMEBREW_PREFIX/"opt",
+      HOMEBREW_LIBRARY/"LinkedKegs",
+      HOMEBREW_LIBRARY/"Taps/caskroom",
+      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle",
+      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo",
+      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services",
+      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-shallow",
+      HOMEBREW_REPOSITORY/".git",
+      coretap.path/".git",
+      coretap.alias_dir,
+      coretap.formula_dir.children,
+    ].flatten
+    FileUtils.rm_rf paths_to_delete
   end
 
   def needs_test_cmd_taps
@@ -90,7 +108,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def setup_test_formula(name, content = nil)
     formula_path = CoreTap.new.formula_dir/"#{name}.rb"
-    @formula_files << formula_path
 
     case name
     when "testball"
@@ -241,24 +258,16 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
     assert_match(/testball-0\.1.*\.bottle\.tar\.gz/,
                   cmd_output("bottle", "--no-revision", "testball"))
-  ensure
-    cmd("uninstall", "--force", "testball")
-    cmd("cleanup", "--force", "--prune=all")
-    FileUtils.rm_f Dir["testball-0.1*.bottle.tar.gz"]
   end
 
   def test_uninstall
     cmd("install", testball)
     assert_match "Uninstalling testball", cmd("uninstall", "--force", testball)
-  ensure
-    cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_cleanup
     (HOMEBREW_CACHE/"test").write "test"
     assert_match "#{HOMEBREW_CACHE}/test", cmd("cleanup", "--prune=all")
-  ensure
-    FileUtils.rm_f HOMEBREW_CACHE/"test"
   end
 
   def test_readall
@@ -268,8 +277,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     FileUtils.ln_s formula_file, alias_file
     cmd("readall", "--aliases", "--syntax")
     cmd("readall", "homebrew/core")
-  ensure
-    alias_file.parent.rmtree
   end
 
   def test_tap
@@ -297,8 +304,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_match "Untapped", cmd("untap", "homebrew/bar")
     assert_equal "", cmd("tap", "homebrew/bar", path/".git", "-q", "--full")
     assert_match "Untapped", cmd("untap", "homebrew/bar")
-  ensure
-    path.rmtree
   end
 
   def test_missing
@@ -307,8 +312,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     (HOMEBREW_CELLAR/"bar/1.0").mkpath
     assert_match "foo", cmd("missing")
-  ensure
-    (HOMEBREW_CELLAR/"bar").rmtree
   end
 
   def test_doctor
@@ -346,8 +349,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     cmd("desc", "--description", "testball")
     assert_predicate desc_cache, :exist?, "Cached file should not exist"
-  ensure
-    desc_cache.unlink
   end
 
   def test_edit
@@ -356,8 +357,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     assert_match "# something here",
                  cmd("edit", "testball", "HOMEBREW_EDITOR" => "/bin/cat")
-  ensure
-    (HOMEBREW_REPOSITORY/".git").unlink
   end
 
   def test_sh
@@ -377,8 +376,6 @@ class IntegrationCommandTests < Homebrew::TestCase
                  cmd("tap-readme", "foo", "--verbose")
     readme = HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo/README.md"
     assert readme.exist?, "The README should be created"
-  ensure
-    (HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo").rmtree
   end
 
   def test_unpack
@@ -389,8 +386,6 @@ class IntegrationCommandTests < Homebrew::TestCase
       assert File.directory?("#{path}/testball-0.1"),
         "The tarball should be unpacked"
     end
-  ensure
-    FileUtils.rm_f HOMEBREW_CACHE/"testball-0.1.tbz"
   end
 
   def test_options
@@ -407,8 +402,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
 
     assert_equal "testball", cmd("outdated")
-  ensure
-    FileUtils.rm_rf HOMEBREW_CELLAR/"testball"
   end
 
   def test_upgrade
@@ -418,9 +411,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     cmd("upgrade")
     assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
       "The latest version directory should be created")
-  ensure
-    cmd("uninstall", "--force", testball)
-    cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_linkapps
@@ -433,9 +423,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     source_dir.mkpath
     assert_match "Linking: #{source_dir}",
       cmd("linkapps", "--local", "HOME" => home_dir)
-  ensure
-    home_dir.rmtree
-    (HOMEBREW_CELLAR/"testball").rmtree
   end
 
   def test_unlinkapps
@@ -452,9 +439,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     assert_match "Unlinking: #{apps_dir}/TestBall.app",
       cmd("unlinkapps", "--local", "HOME" => home_dir)
-  ensure
-    home_dir.rmtree
-    (HOMEBREW_CELLAR/"testball").rmtree
   end
 
   def test_pin_unpin
@@ -470,9 +454,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     cmd("upgrade")
     assert((HOMEBREW_CELLAR/"testball/0.1").directory?,
       "The latest version directory should be created")
-  ensure
-    cmd("uninstall", "--force", testball)
-    cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_reinstall
@@ -485,9 +466,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_match "Reinstalling testball with --with-foo",
       cmd("reinstall", "testball")
     assert foo_dir.exist?
-  ensure
-    cmd("uninstall", "--force", "testball")
-    cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_home
@@ -507,10 +485,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     assert_equal formulae.join("\n"),
                  cmd("list")
-  ensure
-    formulae.each do |f|
-      (HOMEBREW_CELLAR/"#{f}").rmtree
-    end
   end
 
   def test_create
@@ -520,9 +494,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     formula_file = CoreTap.new.formula_dir/"testball.rb"
     assert formula_file.exist?, "The formula source should have been created"
     assert_match %(sha256 "#{TESTBALL_SHA256}"), formula_file.read
-  ensure
-    formula_file.unlink
-    cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_fetch
@@ -531,8 +502,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     cmd("fetch", "testball")
     assert((HOMEBREW_CACHE/"testball-0.1.tbz").exist?,
       "The tarball should have been cached")
-  ensure
-    cmd("cleanup", "--force", "--prune=all")
   end
 
   def test_deps
@@ -569,8 +538,6 @@ class IntegrationCommandTests < Homebrew::TestCase
       end
     end
     assert_match "This is a test commit", cmd("log")
-  ensure
-    (HOMEBREW_REPOSITORY/".git").rmtree
   end
 
   def test_log_formula
@@ -595,9 +562,6 @@ class IntegrationCommandTests < Homebrew::TestCase
                  cmd("log", "#{shallow_tap}/testball")
     assert_predicate shallow_tap.path/".git/shallow", :exist?,
                      "A shallow clone should have been created."
-  ensure
-    (core_tap.path/".git").rmtree
-    shallow_tap.path.rmtree
   end
 
   def test_leaves
@@ -610,9 +574,6 @@ class IntegrationCommandTests < Homebrew::TestCase
 
     (HOMEBREW_CELLAR/"bar/0.1/somedir").mkpath
     assert_equal "bar", cmd("leaves")
-  ensure
-    (HOMEBREW_CELLAR/"foo").rmtree
-    (HOMEBREW_CELLAR/"bar").rmtree
   end
 
   def test_prune
@@ -634,8 +595,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     # more line with contents `No apps unlinked from /Users/<user/Applications`.
     assert_match "Nothing pruned\nNo apps unlinked from /Applications",
       cmd("prune", "--verbose")
-  ensure
-    share.rmtree
   end
 
   def test_custom_command
@@ -676,8 +635,6 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
 
     assert_predicate desc_cache, :exist?, "Cached file should exist"
-  ensure
-    desc_cache.unlink
   end
 
   def test_bundle
@@ -697,18 +654,12 @@ class IntegrationCommandTests < Homebrew::TestCase
           cmd("bundle", "check")
       end
     end
-  ensure
-    FileUtils.rm_rf HOMEBREW_REPOSITORY/".git"
-    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle"
   end
 
   def test_cask
     needs_test_cmd_taps
     setup_remote_tap("caskroom/cask")
     cmd("cask", "list")
-  ensure
-    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/caskroom"
-    FileUtils.rm_rf HOMEBREW_PREFIX/"share"
   end
 
   def test_services
@@ -716,7 +667,5 @@ class IntegrationCommandTests < Homebrew::TestCase
     setup_remote_tap("homebrew/services")
     assert_equal "Warning: No services available to control with `brew services`",
       cmd("services", "list")
-  ensure
-    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services"
   end
 end
