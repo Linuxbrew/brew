@@ -17,6 +17,12 @@ class IntegrationCommandTests < Homebrew::TestCase
     @formula_files.each(&:unlink)
   end
 
+  def needs_test_cmd_taps
+    unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
+      skip "HOMEBREW_TEST_OFFICIAL_CMD_TAPS is not set"
+    end
+  end
+
   def cmd_id_from_args(args)
     args_pretty = args.join(" ").gsub(TEST_TMPDIR, "@TMPDIR@")
     test_pretty = "#{self.class.name}\##{name}.#{@cmd_id_index += 1}"
@@ -122,6 +128,12 @@ class IntegrationCommandTests < Homebrew::TestCase
     EOS
 
     formula_path
+  end
+
+  def setup_remote_tap(name)
+    tap = Tap.fetch name
+    tap.install(:full_clone => false, :quiet => true) unless tap.installed?
+    tap
   end
 
   def testball
@@ -412,24 +424,23 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_linkapps
-    home = mktmpdir
-    apps_dir = Pathname.new(home).join("Applications")
-    apps_dir.mkpath
+    home_dir = Pathname.new(mktmpdir)
+    (home_dir/"Applications").mkpath
 
     setup_test_formula "testball"
 
     source_dir = HOMEBREW_CELLAR/"testball/0.1/TestBall.app"
     source_dir.mkpath
     assert_match "Linking: #{source_dir}",
-      cmd("linkapps", "--local", "HOME" => home)
+      cmd("linkapps", "--local", "HOME" => home_dir)
   ensure
-    FileUtils.rm_rf apps_dir
+    home_dir.rmtree
     (HOMEBREW_CELLAR/"testball").rmtree
   end
 
   def test_unlinkapps
-    home = mktmpdir
-    apps_dir = Pathname.new(home).join("Applications")
+    home_dir = Pathname.new(mktmpdir)
+    apps_dir = home_dir/"Applications"
     apps_dir.mkpath
 
     setup_test_formula "testball"
@@ -440,9 +451,9 @@ class IntegrationCommandTests < Homebrew::TestCase
     FileUtils.ln_s source_app, "#{apps_dir}/TestBall.app"
 
     assert_match "Unlinking: #{apps_dir}/TestBall.app",
-      cmd("unlinkapps", "--local", "HOME" => home)
+      cmd("unlinkapps", "--local", "HOME" => home_dir)
   ensure
-    apps_dir.rmtree
+    home_dir.rmtree
     (HOMEBREW_CELLAR/"testball").rmtree
   end
 
@@ -667,5 +678,45 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_predicate desc_cache, :exist?, "Cached file should exist"
   ensure
     desc_cache.unlink if desc_cache.exist?
+  end
+
+  def test_bundle
+    needs_test_cmd_taps
+    setup_remote_tap("homebrew/bundle")
+    HOMEBREW_REPOSITORY.cd do
+      shutup do
+        system "git", "init"
+        system "git", "commit", "--allow-empty", "-m", "This is a test commit"
+      end
+    end
+
+    mktmpdir do |path|
+      FileUtils.touch "#{path}/Brewfile"
+      Dir.chdir path do
+        assert_equal "The Brewfile's dependencies are satisfied.",
+          cmd("bundle", "check")
+      end
+    end
+  ensure
+    FileUtils.rm_rf HOMEBREW_REPOSITORY/".git"
+    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle"
+  end
+
+  def test_cask
+    needs_test_cmd_taps
+    setup_remote_tap("caskroom/cask")
+    cmd("cask", "list")
+  ensure
+    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/caskroom"
+    FileUtils.rm_rf HOMEBREW_PREFIX/"share"
+  end
+
+  def test_services
+    needs_test_cmd_taps
+    setup_remote_tap("homebrew/services")
+    assert_equal "Warning: No services available to control with `brew services`",
+      cmd("services", "list")
+  ensure
+    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services"
   end
 end

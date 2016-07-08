@@ -86,6 +86,21 @@ module Homebrew
       end
       ############# END HELPERS
 
+      def all_development_tools_checks
+        %w[
+          check_for_installed_developer_tools
+        ]
+      end
+
+      def check_for_installed_developer_tools
+        return if DevelopmentTools.installed?
+
+        <<-EOS.undent
+          No developer tools installed.
+          Install clang or gcc.
+        EOS
+      end
+
       # See https://github.com/Homebrew/legacy-homebrew/pull/9986
       def check_path_for_trailing_slashes
         all_paths = ENV["PATH"].split(File::PATH_SEPARATOR)
@@ -798,7 +813,7 @@ module Homebrew
       def check_git_origin
         return if !Utils.git_available? || !(HOMEBREW_REPOSITORY/".git").exist?
 
-        origin = Homebrew.git_origin
+        origin = HOMEBREW_REPOSITORY.git_origin
         remote = "https://github.com/#{OS::GITHUB_USER}/brew.git"
 
         if origin.nil?

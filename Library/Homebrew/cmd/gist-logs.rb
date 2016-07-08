@@ -91,6 +91,9 @@ module Homebrew
     logs = {}
     dir.children.sort.each do |file|
       contents = file.size? ? file.read : "empty log"
+      # small enough to avoid GitHub "unicorn" page-load-timeout errors
+      max_file_size = 1_000_000
+      contents = truncate_text_to_approximate_size(contents, max_file_size, :front_weight => 0.2)
       logs[file.basename.to_s] = { :content => contents }
     end if dir.exist?
     raise "No logs." if logs.empty?

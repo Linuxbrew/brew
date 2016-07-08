@@ -179,13 +179,13 @@ class FormulaInstaller
 
     check_conflicts
 
-    if !pour_bottle? && !formula.bottle_unneeded? && !MacOS.has_apple_developer_tools?
+    if !pour_bottle? && !formula.bottle_unneeded? && !DevelopmentTools.installed?
       raise BuildToolsError.new([formula])
     end
 
     unless skip_deps_check?
       deps = compute_dependencies
-      check_dependencies_bottled(deps) if pour_bottle? && !MacOS.has_apple_developer_tools?
+      check_dependencies_bottled(deps) if pour_bottle? && !DevelopmentTools.installed?
       install_dependencies(deps)
     end
 
@@ -224,7 +224,7 @@ class FormulaInstaller
         @pour_failed = true
         onoe e.message
         opoo "Bottle installation failed: building from source."
-        raise BuildToolsError.new([formula]) unless MacOS.has_apple_developer_tools?
+        raise BuildToolsError.new([formula]) unless DevelopmentTools.installed?
       else
         @poured_bottle = true
       end
@@ -800,7 +800,7 @@ class FormulaInstaller
     tab.tap = formula.tap
     tab.poured_from_bottle = true
     tab.time = Time.now.to_i
-    tab.head = Homebrew.git_head
+    tab.head = HOMEBREW_REPOSITORY.git_head
     tab.write
   end
 

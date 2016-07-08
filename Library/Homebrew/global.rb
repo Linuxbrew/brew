@@ -1,6 +1,7 @@
 require "extend/module"
 require "extend/fileutils"
 require "extend/pathname"
+require "extend/git_repository"
 require "extend/ARGV"
 require "extend/string"
 require "extend/enumerable"
@@ -9,6 +10,7 @@ require "utils"
 require "exceptions"
 require "set"
 require "rbconfig"
+require "official_taps"
 
 ARGV.extend(HomebrewArgvExtension)
 
@@ -17,6 +19,8 @@ HOMEBREW_VERSION = ENV["HOMEBREW_VERSION"]
 HOMEBREW_WWW = "http://brew.sh"
 
 require "config"
+
+HOMEBREW_REPOSITORY.extend(GitRepositoryExtension)
 
 if RbConfig.respond_to?(:ruby)
   RUBY_PATH = Pathname.new(RbConfig.ruby)

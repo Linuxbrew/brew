@@ -3,28 +3,33 @@
 # Usage: brew test-bot [options...] <pull-request|formula>
 #
 # Options:
-# --keep-logs:     Write and keep log files under ./brewbot/.
-# --cleanup:       Clean the Homebrew directory. Very dangerous. Use with care.
-# --clean-cache:   Remove all cached downloads. Use with care.
-# --skip-setup:    Don't check the local system is setup correctly.
-# --skip-homebrew: Don't check Homebrew's files and tests are all valid.
-# --junit:         Generate a JUnit XML test results file.
-# --no-bottle:     Run brew install without --build-bottle.
-# --keep-old:      Run brew bottle --keep-old to build new bottles for a single platform.
-# --HEAD:          Run brew install with --HEAD.
-# --local:         Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
-# --tap=<tap>:     Use the git repository of the given tap.
-# --dry-run:       Just print commands, don't run them.
-# --fail-fast:     Immediately exit on a failing step.
-# --verbose:       Print test step output in realtime. Has the side effect of passing output
-#                  as raw bytes instead of re-encoding in UTF-8.
-# --fast:          Don't install any packages, but run e.g. audit anyway.
-# --keep-tmp:      Keep temporary files written by main installs and tests that are run.
+# --keep-logs:           Write and keep log files under ./brewbot/.
+# --cleanup:             Clean the Homebrew directory. Very dangerous. Use with care.
+# --clean-cache:         Remove all cached downloads. Use with care.
+# --skip-setup:          Don't check the local system is setup correctly.
+# --skip-homebrew:       Don't check Homebrew's files and tests are all valid.
+# --junit:               Generate a JUnit XML test results file.
+# --no-bottle:           Run brew install without --build-bottle.
+# --keep-old:            Run brew bottle --keep-old to build new bottles for a single platform.
+# --skip-relocation:     Run brew bottle --skip-relocation to build new bottles for homebrew/portable.
+# --HEAD:                Run brew install with --HEAD.
+# --local:               Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
+# --tap=<tap>:           Use the git repository of the given tap.
+# --dry-run:             Just print commands, don't run them.
+# --fail-fast:           Immediately exit on a failing step.
+# --verbose:             Print test step output in realtime. Has the side effect of passing output
+#                        as raw bytes instead of re-encoding in UTF-8.
+# --fast:                Don't install any packages, but run e.g. audit anyway.
+# --keep-tmp:            Keep temporary files written by main installs and tests that are run.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
 # --ci-testing:          Shortcut for Homebrew testing CI options.
 # --ci-upload:           Homebrew CI bottle upload.
+#
+# Influential environment variables include:
+# TRAVIS_REPO_SLUG: same as --tap
+# GIT_URL: if set to URL of a tap remote, same as --tap
 
 require "formula"
 require "utils"
@@ -39,10 +44,6 @@ module Homebrew
   MAX_STEP_OUTPUT_SIZE = BYTES_IN_1_MEGABYTE - (200*1024) # margin of safety
 
   HOMEBREW_TAP_REGEX = %r{^([\w-]+)/homebrew-([\w-]+)$}
-
-  def ruby_has_encoding?
-    String.method_defined?(:force_encoding)
-  end
 
   if ruby_has_encoding?
     def fix_encoding!(str)
@@ -89,9 +90,17 @@ module Homebrew
     end
   end
 
+  # Wraps command invocations. Instantiated by Test#test.
+  # Handles logging and pretty-printing.
   class Step
-    attr_reader :command, :name, :status, :output, :time
+    attr_reader :command, :name, :status, :output
 
+    # Instantiates a Step object.
+    # @param test [Test] The parent Test object
+    # @param command [Array<String>] Command to execute and arguments
+    # @param options [Hash] Recognized options are:
+    #   :puts_output_on_success
+    #   :repository
     def initialize(test, command, options = {})
       @test = test
       @category = test.category
@@ -100,7 +109,6 @@ module Homebrew
       @name = command[1].delete("-")
       @status = :running
       @repository = options[:repository] || HOMEBREW_REPOSITORY
-      @time = 0
     end
 
     def log_file_path
@@ -148,6 +156,9 @@ module Homebrew
       @output && !@output.empty?
     end
 
+    # The execution time of the task.
+    # Precondition: Step#run has been called.
+    # @return [Float] execution time in seconds
     def time
       @end_time - @start_time
     end
@@ -166,7 +177,7 @@ module Homebrew
       verbose = ARGV.verbose?
       # Step may produce arbitrary output and we read it bytewise, so must
       # buffer it as binary and convert to UTF-8 once complete
-      output = Homebrew.ruby_has_encoding? ? "".encode!("BINARY") : ""
+      output = ruby_has_encoding? ? "".encode!("BINARY") : ""
       working_dir = Pathname.new(@command.first == "git" ? @repository : Dir.pwd)
       read, write = IO.pipe
 
@@ -575,6 +586,7 @@ module Homebrew
         if formula.stable? && !ARGV.include?("--fast") && !ARGV.include?("--no-bottle") && !formula.bottle_disabled?
           bottle_args = ["--verbose", "--json", formula_name]
           bottle_args << "--keep-old" if ARGV.include? "--keep-old"
+          bottle_args << "--skip-relocation" if ARGV.include? "--skip-relocation"
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.has_output?
@@ -653,7 +665,10 @@ module Homebrew
 
       if @tap.nil?
         tests_args = []
-        tests_args << "--coverage" if ruby_two && ENV["TRAVIS"]
+        if ruby_two
+          tests_args << "--official-cmd-taps"
+          tests_args << "--coverage" if ENV["TRAVIS"]
+        end
         test "brew", "tests", *tests_args
         test "brew", "tests", "--no-compat"
         test "brew", "readall", "--syntax"
@@ -778,8 +793,6 @@ module Homebrew
   end
 
   def test_ci_upload(tap)
-    raise "Need a tap to upload!" unless tap
-
     # Don't trust formulae we're uploading
     ENV["HOMEBREW_DISABLE_LOAD_FORMULA"] = "1"
 
@@ -822,6 +835,14 @@ module Homebrew
       return if Dir["*.bottle*.*"].empty?
     end
 
+    json_files = Dir.glob("*.bottle.json")
+    bottles_hash = json_files.reduce({}) do |hash, json_file|
+      deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
+    end
+
+    first_formula_name = bottles_hash.keys.first
+    tap = Tap.fetch(first_formula_name.rpartition("/").first.chuzzle || "homebrew/core")
+
     if OS.mac?
       ENV["GIT_AUTHOR_NAME"] = ENV["GIT_COMMITTER_NAME"] = "BrewTestBot"
       ENV["GIT_AUTHOR_EMAIL"] = ENV["GIT_COMMITTER_EMAIL"] = "brew-test-bot@googlegroups.com"
@@ -849,7 +870,6 @@ module Homebrew
       safe_system "brew", "pull", "--clean", url
     end
 
-    json_files = Dir.glob("*.bottle.json")
     system "brew", "bottle", "--merge", "--write", *json_files
 
     project = OS.mac? ? "homebrew" : "linuxbrew"
@@ -858,10 +878,6 @@ module Homebrew
     safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{git_tag}"
 
     formula_packaged = {}
-
-    bottles_hash = json_files.reduce({}) do |hash, json_file|
-      deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
-    end
 
     bottles_hash.each do |formula_name, bottle_hash|
       version = bottle_hash["formula"]["pkg_version"]
@@ -1053,17 +1069,10 @@ module Homebrew
 
       # Truncate to 1MB to avoid hitting CI limits
       if output.bytesize > MAX_STEP_OUTPUT_SIZE
-        if ruby_has_encoding?
-          binary_output = output.force_encoding("BINARY")
-          output = binary_output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
-          fix_encoding!(output)
-        else
-          output = output.slice(-MAX_STEP_OUTPUT_SIZE, MAX_STEP_OUTPUT_SIZE)
-        end
+        output = truncate_text_to_approximate_size(output, MAX_STEP_OUTPUT_SIZE, :front_weight => 0.0)
         output = "truncated output to 1MB:\n" + output
       end
     end
     output
   end
 end
-

@@ -8,6 +8,25 @@ module Hardware
     PPC_64BIT_ARCHS   = [:ppc64].freeze
 
     class << self
+      OPTIMIZATION_FLAGS = {
+        :penryn => "-march=core2 -msse4.1",
+        :core2 => "-march=core2",
+        :core => "-march=prescott",
+        :dunno => "",
+      }.freeze
+
+      def optimization_flags
+        OPTIMIZATION_FLAGS
+      end
+
+      def arch_32_bit
+        :i386
+      end
+
+      def arch_64_bit
+        :x86_64
+      end
+
       def type
         :dunno
       end

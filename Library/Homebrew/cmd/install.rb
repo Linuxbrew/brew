@@ -1,4 +1,4 @@
-#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] <formula>:
+#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`] [`--devel`|`--HEAD`] [`--keep-tmp`] <formula>:
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -32,9 +32,10 @@
 #:    passed, then both <formula> and the dependencies installed as part of this process
 #:    are built from source even if bottles are available.
 #:
-#:    If `--force-bottle` is passed, install from a bottle if it exists
-#:    for the current version of OS X, even if custom options are given.
-#:
+#     Hidden developer option:
+#     If `--force-bottle` is passed, install from a bottle if it exists
+#    for the current version of OS X, even if custom options are given.
+#
 #:    If `--devel` is passed, and <formula> defines it, install the development version.
 #:
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
@@ -95,7 +96,7 @@ module Homebrew
 
       # if the user's flags will prevent bottle only-installations when no
       # developer tools are available, we need to stop them early on
-      FormulaInstaller.prevent_build_flags unless MacOS.has_apple_developer_tools?
+      FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
       ARGV.formulae.each do |f|
         # head-only without --HEAD is an error
@@ -132,8 +133,7 @@ module Homebrew
           msg = "#{f.full_name}-#{f.installed_version} already installed"
           msg << ", it's just not linked" unless f.linked_keg.symlink? || f.keg_only?
           opoo msg
-        elsif f.oldname && (dir = HOMEBREW_CELLAR/f.oldname).directory? && !dir.subdirs.empty? \
-            && f.tap == Tab.for_keg(dir.subdirs.first).tap && !ARGV.force?
+        elsif f.migration_needed? && !ARGV.force?
           # Check if the formula we try to install is the same as installed
           # but not migrated one. If --force passed then install anyway.
           opoo "#{f.oldname} already installed, it's just not migrated"
@@ -218,16 +218,10 @@ module Homebrew
     raise "Cannot write to #{HOMEBREW_PREFIX}" unless HOMEBREW_PREFIX.writable_real? || HOMEBREW_PREFIX.to_s == "/usr/local"
   end
 
-  def check_xcode
+  def check_development_tools
     return unless OS.mac?
     checks = Diagnostic::Checks.new
-    %w[
-      check_for_unsupported_osx
-      check_for_bad_install_name_tool
-      check_for_installed_developer_tools
-      check_xcode_license_approved
-      check_for_osx_gcc_installer
-    ].each do |check|
+    checks.all_development_tools_checks.each do |check|
       out = checks.send(check)
       opoo out unless out.nil?
     end
@@ -270,7 +264,7 @@ module Homebrew
   def perform_preinstall_checks
     check_ppc
     check_writable_install_location
-    check_xcode if MacOS.has_apple_developer_tools?
+    check_development_tools if DevelopmentTools.installed?
     check_cellar
     check_ld_so_symlink
   end

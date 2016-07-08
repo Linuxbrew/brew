@@ -194,10 +194,12 @@ module Homebrew
       original_tab = nil
 
       begin
-        keg.relocate_install_names prefix, Keg::PREFIX_PLACEHOLDER,
-          cellar, Keg::CELLAR_PLACEHOLDER
-        keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
-          cellar, Keg::CELLAR_PLACEHOLDER
+        unless ARGV.include? "--skip-relocation"
+          keg.relocate_install_names prefix, Keg::PREFIX_PLACEHOLDER,
+            cellar, Keg::CELLAR_PLACEHOLDER
+          keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
+            cellar, Keg::CELLAR_PLACEHOLDER
+        end
 
         keg.delete_pyc_files!
 
@@ -246,9 +248,14 @@ module Homebrew
           ignores << %r{#{HOMEBREW_CELLAR}/go/[\d\.]+/libexec}
         end
 
-        relocatable = !keg_contains(prefix_check, keg, ignores)
-        relocatable = !keg_contains(cellar, keg, ignores) && relocatable
-        skip_relocation = relocatable && !keg.require_install_name_tool?
+        if ARGV.include? "--skip-relocation"
+          relocatable = true
+          skip_relocation = true
+        else
+          relocatable = !keg_contains(prefix_check, keg, ignores)
+          relocatable = !keg_contains(cellar, keg, ignores) && relocatable
+          skip_relocation = relocatable && !keg.require_install_name_tool?
+        end
         puts if !relocatable && ARGV.verbose?
       rescue Interrupt
         ignore_interrupts { bottle_path.unlink if bottle_path.exist? }
@@ -256,10 +263,12 @@ module Homebrew
       ensure
         ignore_interrupts do
           original_tab.write if original_tab
-          keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, prefix,
-            Keg::CELLAR_PLACEHOLDER, cellar
-          keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
-            Keg::CELLAR_PLACEHOLDER, cellar
+          unless ARGV.include? "--skip-relocation"
+            keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, prefix,
+              Keg::CELLAR_PLACEHOLDER, cellar
+            keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
+              Keg::CELLAR_PLACEHOLDER, cellar
+          end
         end
       end
     end

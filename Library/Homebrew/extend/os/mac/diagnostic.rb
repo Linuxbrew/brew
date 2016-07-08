@@ -1,6 +1,16 @@
 module Homebrew
   module Diagnostic
     class Checks
+      def all_development_tools_checks
+        %w[
+          check_for_unsupported_osx
+          check_for_bad_install_name_tool
+          check_for_installed_developer_tools
+          check_xcode_license_approved
+          check_for_osx_gcc_installer
+        ]
+      end
+
       def check_for_unsupported_osx
         return if ARGV.homebrew_developer?
 
@@ -261,21 +271,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_other_package_managers
-        ponk = MacOS.macports_or_fink
-        return if ponk.empty?
-
-        <<-EOS.undent
-          You have MacPorts or Fink installed:
-            #{ponk.join(", ")}
-
-          This can cause trouble. You don't have to uninstall them, but you may want to
-          temporarily move them out of the way, e.g.
-
-            sudo mv /opt/local ~/macports
-        EOS
-      end
-
       def check_xcode_license_approved
         # If the user installs Xcode-only, they have to approve the
         # license or no "xc*" tool will work.
@@ -300,6 +295,19 @@ module Homebrew
           Your XQuartz (#{installed_version}) is outdated
           Please install XQuartz #{latest_version}:
             https://xquartz.macosforge.org
+        EOS
+      end
+
+      def check_for_beta_xquartz
+        return unless MacOS::XQuartz.version
+        return unless MacOS::XQuartz.version.include? "beta"
+
+        <<-EOS.undent
+          The following beta release of XQuartz is installed: #{MacOS::XQuartz.version}
+
+          XQuartz beta releases include address sanitization, and do not work with
+          all software; notably, wine will not work with beta releases of XQuartz.
+          We recommend only installing stable releases of XQuartz.
         EOS
       end
     end

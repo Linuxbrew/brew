@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "June 2016" "Homebrew" "brew"
+.TH "BREW" "1" "July 2016" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for OS X
@@ -262,7 +262,7 @@ Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to
 See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying\-Brew\.md\fR
 .
 .TP
-\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR\fIstd\fR|\fIsuper\fR] [\fB\-\-ignore\-dependencies\fR] [\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
+\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR\fIstd\fR|\fIsuper\fR] [\fB\-\-ignore\-dependencies\fR] [\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
 Install \fIformula\fR\.
 .
 .IP
@@ -291,9 +291,6 @@ If \fB\-\-build\-from\-source\fR or \fB\-s\fR is passed, compile the specified \
 .
 .IP
 If \fBHOMEBREW_BUILD_FROM_SOURCE\fR is set, regardless of whether \fB\-\-build\-from\-source\fR was passed, then both \fIformula\fR and the dependencies installed as part of this process are built from source even if bottles are available\.
-.
-.IP
-If \fB\-\-force\-bottle\fR is passed, install from a bottle if it exists for the current version of OS X, even if custom options are given\.
 .
 .IP
 If \fB\-\-devel\fR is passed, and \fIformula\fR defines it, install the development version\.

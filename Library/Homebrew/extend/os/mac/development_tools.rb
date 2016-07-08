@@ -1,3 +1,5 @@
+require "os/mac/xcode"
+
 # @private
 class DevelopmentTools
   class << self
@@ -11,6 +13,13 @@ class DevelopmentTools
           Pathname.new(path) if File.executable?(path)
         end
       end
+    end
+
+    # Checks if the user has any developer tools installed, either via Xcode
+    # or the CLT. Convenient for guarding against formula builds when building
+    # is impossible.
+    def installed?
+      MacOS::Xcode.installed? || MacOS::CLT.installed?
     end
 
     def default_compiler

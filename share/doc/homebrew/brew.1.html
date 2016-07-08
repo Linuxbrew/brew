@@ -189,7 +189,7 @@ information on all installed formulae.</p>
 
 <p>See the docs for examples of using the JSON:
 <a href="https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md</a></p></dd>
-<dt><code>install</code> [<code>--debug</code>] [<code>--env=</code><var>std</var>|<var>super</var>] [<code>--ignore-dependencies</code>] [<code>--only-dependencies</code>] [<code>--cc=</code><var>compiler</var>] [<code>--build-from-source</code>|<code>--force-bottle</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Install <var>formula</var>.</p>
+<dt><code>install</code> [<code>--debug</code>] [<code>--env=</code><var>std</var>|<var>super</var>] [<code>--ignore-dependencies</code>] [<code>--only-dependencies</code>] [<code>--cc=</code><var>compiler</var>] [<code>--build-from-source</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Install <var>formula</var>.</p>
 
 <p><var>formula</var> is usually the name of the formula to install, but it can be specified
 in several different ways. See <a href="#SPECIFYING-FORMULAE" title="SPECIFYING FORMULAE" data-bare-link="true">SPECIFYING FORMULAE</a>.</p>
@@ -221,9 +221,6 @@ from bottles if they are available.</p>
 <p>If <code>HOMEBREW_BUILD_FROM_SOURCE</code> is set, regardless of whether <code>--build-from-source</code> was
 passed, then both <var>formula</var> and the dependencies installed as part of this process
 are built from source even if bottles are available.</p>
-
-<p>If <code>--force-bottle</code> is passed, install from a bottle if it exists
-for the current version of OS X, even if custom options are given.</p>
 
 <p>If <code>--devel</code> is passed, and <var>formula</var> defines it, install the development version.</p>
 
@@ -564,8 +561,8 @@ successful build.</p>
 to insecure HTTP.</p>
 
 <p>While ensuring your downloads are fully secure, this is likely
-to cause from-source Sourceforge, some GNU &amp; GNOME based formulae
-to fail to download.</p></dd>
+to cause from-source Sourceforge, some GNU &amp; GNOME based
+formulae to fail to download.</p></dd>
 <dt><code>HOMEBREW_NO_GITHUB_API</code></dt><dd><p>If set, Homebrew will not use the GitHub API for e.g searches or
 fetching relevant issues on a failed install.</p></dd>
 <dt><code>HOMEBREW_INSTALL_BADGE</code></dt><dd><p>Text printed before the installation summary of each successful build.

@@ -13,7 +13,7 @@ require "cleanup"
 
 module Homebrew
   def upgrade
-    FormulaInstaller.prevent_build_flags unless MacOS.has_apple_developer_tools?
+    FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
     Homebrew.perform_preinstall_checks
 

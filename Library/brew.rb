@@ -94,14 +94,8 @@ begin
     exit Homebrew.failed? ? 1 : 0
   else
     require "tap"
-    possible_tap = case cmd
-    when "brewdle", "brewdler", "bundle", "bundler"
-      Tap.fetch("Homebrew", "bundle")
-    when "cask"
-      Tap.fetch("caskroom", "cask")
-    when "services"
-      Tap.fetch("Homebrew", "services")
-    end
+    possible_tap = OFFICIAL_CMD_TAPS.find { |_, cmds| cmds.include?(cmd) }
+    possible_tap = Tap.fetch(possible_tap.first) if possible_tap
 
     if possible_tap && !possible_tap.installed?
       brew_uid = HOMEBREW_BREW_FILE.stat.uid

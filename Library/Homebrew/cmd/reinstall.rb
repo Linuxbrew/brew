@@ -5,7 +5,7 @@ require "formula_installer"
 
 module Homebrew
   def reinstall
-    FormulaInstaller.prevent_build_flags unless MacOS.has_apple_developer_tools?
+    FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
     ARGV.resolved_formulae.each { |f| reinstall_formula(f) }
   end

@@ -40,6 +40,34 @@ class FormulaTests < Homebrew::TestCase
     f.rack.rmtree
   end
 
+  def test_migration_needed
+    f = Testball.new("newname")
+    f.instance_variable_set(:@oldname, "oldname")
+    f.instance_variable_set(:@tap, CoreTap.instance)
+
+    oldname_prefix = HOMEBREW_CELLAR/"oldname/2.20"
+    newname_prefix = HOMEBREW_CELLAR/"newname/2.10"
+    oldname_prefix.mkpath
+    oldname_tab = Tab.empty
+    oldname_tab.tabfile = oldname_prefix.join("INSTALL_RECEIPT.json")
+    oldname_tab.write
+
+    refute_predicate f, :migration_needed?
+
+    oldname_tab.tabfile.unlink
+    oldname_tab.source["tap"] = "homebrew/core"
+    oldname_tab.write
+
+    assert_predicate f, :migration_needed?
+
+    newname_prefix.mkpath
+
+    refute_predicate f, :migration_needed?
+  ensure
+    oldname_prefix.parent.rmtree
+    newname_prefix.parent.rmtree
+  end
+
   def test_installed?
     f = Testball.new
     f.stubs(:installed_prefix).returns(stub(:directory? => false))
@@ -405,5 +433,103 @@ class FormulaTests < Homebrew::TestCase
       end
     end
     assert f_true.pour_bottle?
+  end
+end
+
+class OutdatedVersionsTests < Homebrew::TestCase
+  attr_reader :outdated_prefix, :same_prefix, :greater_prefix, :head_prefix
+  attr_reader :f
+
+  def setup
+    @f = formula { url "foo"; version "1.20" }
+    @outdated_prefix = HOMEBREW_CELLAR/"#{f.name}/1.11"
+    @same_prefix = HOMEBREW_CELLAR/"#{f.name}/1.20"
+    @greater_prefix = HOMEBREW_CELLAR/"#{f.name}/1.21"
+    @head_prefix = HOMEBREW_CELLAR/"#{f.name}/HEAD"
+  end
+
+  def teardown
+    @f.rack.rmtree
+  end
+
+  def setup_tab_for_prefix(prefix, tap_string=nil)
+    prefix.mkpath
+    tab = Tab.empty
+    tab.tabfile = prefix.join("INSTALL_RECEIPT.json")
+    tab.source["tap"] = tap_string if tap_string
+    tab.write
+    tab
+  end
+
+  def test_greater_different_tap_installed
+    setup_tab_for_prefix(greater_prefix, "user/repo")
+    assert_predicate f.outdated_versions, :empty?
+  end
+
+  def test_greater_same_tap_installed
+    f.instance_variable_set(:@tap, CoreTap.instance)
+    setup_tab_for_prefix(greater_prefix, "homebrew/core")
+    assert_predicate f.outdated_versions, :empty?
+  end
+
+  def test_outdated_different_tap_installed
+    setup_tab_for_prefix(outdated_prefix, "user/repo")
+    refute_predicate f.outdated_versions, :empty?
+  end
+
+  def test_outdated_same_tap_installed
+    f.instance_variable_set(:@tap, CoreTap.instance)
+    setup_tab_for_prefix(outdated_prefix, "homebrew/core")
+    refute_predicate f.outdated_versions, :empty?
+  end
+
+  def test_same_head_installed
+    f.instance_variable_set(:@tap, CoreTap.instance)
+    setup_tab_for_prefix(head_prefix, "homebrew/core")
+    assert_predicate f.outdated_versions, :empty?
+  end
+
+  def test_different_head_installed
+    f.instance_variable_set(:@tap, CoreTap.instance)
+    setup_tab_for_prefix(head_prefix, "user/repo")
+    assert_predicate f.outdated_versions, :empty?
+  end
+
+  def test_mixed_taps_greater_version_installed
+    f.instance_variable_set(:@tap, CoreTap.instance)
+    setup_tab_for_prefix(outdated_prefix, "homebrew/core")
+    setup_tab_for_prefix(greater_prefix, "user/repo")
+
+    assert_predicate f.outdated_versions, :empty?
+
+    setup_tab_for_prefix(greater_prefix, "homebrew/core")
+
+    assert_predicate f.outdated_versions, :empty?
+  end
+
+  def test_mixed_taps_outdated_version_installed
+    f.instance_variable_set(:@tap, CoreTap.instance)
+
+    extra_outdated_prefix = HOMEBREW_CELLAR/"#{f.name}/1.0"
+
+    setup_tab_for_prefix(outdated_prefix)
+    setup_tab_for_prefix(extra_outdated_prefix, "homebrew/core")
+
+    refute_predicate f.outdated_versions, :empty?
+
+    setup_tab_for_prefix(outdated_prefix, "user/repo")
+
+    refute_predicate f.outdated_versions, :empty?
+  end
+
+  def test_same_version_tap_installed
+    f.instance_variable_set(:@tap, CoreTap.instance)
+    setup_tab_for_prefix(same_prefix, "homebrew/core")
+
+    assert_predicate f.outdated_versions, :empty?
+
+    setup_tab_for_prefix(same_prefix, "user/repo")
+
+    assert_predicate f.outdated_versions, :empty?
   end
 end

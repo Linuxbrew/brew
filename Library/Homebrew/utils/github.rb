@@ -140,6 +140,7 @@ module GitHub
     begin
       if data
         data_tmpfile.write data
+        data_tmpfile.close
         args += ["--data", "@#{data_tmpfile.path}"]
       end
 

@@ -62,7 +62,7 @@ class InstallTests < Homebrew::TestCase
   end
 
   def test_bottle_unneeded_formula_install
-    MacOS.stubs(:has_apple_developer_tools?).returns(false)
+    DevelopmentTools.stubs(:installed?).returns(false)
 
     formula = Testball.new
     formula.stubs(:bottle_unneeded?).returns(true)
