@@ -13,6 +13,7 @@ require "hooks/bottles"
 require "debrew"
 require "sandbox"
 require "requirements/cctools_requirement"
+require "emoji"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -492,13 +493,9 @@ class FormulaInstaller
     unlock
   end
 
-  def emoji
-    ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba"
-  end
-
   def summary
     s = ""
-    s << "#{emoji}  " if MacOS.version >= :lion && !ENV["HOMEBREW_NO_EMOJI"]
+    s << "#{Emoji.install_badge}  " if Emoji.enabled?
     s << "#{formula.prefix}: #{formula.prefix.abv}"
     s << ", built in #{pretty_duration build_time}" if build_time
     s
