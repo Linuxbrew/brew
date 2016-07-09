@@ -57,15 +57,8 @@ module Homebrew
       # skip document file.
       next if Metafiles::EXTENSIONS.include? file.extname
 
-      # Check dynamic library linkage. Importantly, do not run otool on static
-      # libraries, which will falsely report "linkage" to themselves.
-      if file.mach_o_executable? || file.dylib? || file.mach_o_bundle?
-        linked_libraries = file.dynamically_linked_libraries
-        linked_libraries = linked_libraries.select { |lib| lib.include? string }
-        result ||= linked_libraries.any?
-      else
-        linked_libraries = []
-      end
+      linked_libraries = Keg.file_linked_libraries(file, string)
+      result ||= linked_libraries.any?
 
       if ARGV.verbose?
         print_filename(string, file) if linked_libraries.any?
@@ -195,9 +188,9 @@ module Homebrew
 
       begin
         unless ARGV.include? "--skip-relocation"
-          keg.relocate_install_names prefix, Keg::PREFIX_PLACEHOLDER,
+          keg.relocate_dynamic_linkage prefix, Keg::PREFIX_PLACEHOLDER,
             cellar, Keg::CELLAR_PLACEHOLDER
-          keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
+          keg.relocate_dynamic_files prefix, Keg::PREFIX_PLACEHOLDER,
             cellar, Keg::CELLAR_PLACEHOLDER
         end
 
@@ -264,7 +257,7 @@ module Homebrew
         ignore_interrupts do
           original_tab.write if original_tab
           unless ARGV.include? "--skip-relocation"
-            keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, prefix,
+            keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, prefix,
               Keg::CELLAR_PLACEHOLDER, cellar
             keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
               Keg::CELLAR_PLACEHOLDER, cellar

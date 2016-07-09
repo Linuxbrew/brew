@@ -470,7 +470,7 @@ class FormulaInstaller
     link(keg)
 
     unless @poured_bottle && formula.bottle_specification.skip_relocation?
-      fix_install_names(keg)
+      fix_dynamic_linkage(keg)
     end
 
     if formula.post_install_defined?
@@ -687,10 +687,10 @@ class FormulaInstaller
     Homebrew.failed = true
   end
 
-  def fix_install_names(keg)
-    keg.fix_install_names
+  def fix_dynamic_linkage(keg)
+    keg.fix_dynamic_linkage
   rescue Exception => e
-    onoe "Failed to fix install names"
+    onoe "Failed to fix install linkage"
     puts "The formula built, but you may encounter issues using it or linking other"
     puts "formula against it."
     ohai e, e.backtrace if debug?
@@ -736,7 +736,7 @@ class FormulaInstaller
 
     keg = Keg.new(formula.prefix)
     unless formula.bottle_specification.skip_relocation?
-      keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
+      keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
         Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
     end
     keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
