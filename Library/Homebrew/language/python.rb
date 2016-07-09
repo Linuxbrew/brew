@@ -1,4 +1,4 @@
-require "utils.rb"
+require "utils"
 
 module Language
   module Python
