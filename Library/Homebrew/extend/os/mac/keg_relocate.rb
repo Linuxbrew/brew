@@ -126,7 +126,7 @@ class Keg
   def self.file_linked_libraries(file, string)
     # Check dynamic library linkage. Importantly, do not run otool on static
     # libraries, which will falsely report "linkage" to themselves.
-    if file.mach_o_executable? || file.dylib? || file.mach_o_bund
+    if file.mach_o_executable? || file.dylib? || file.mach_o_bundle?
       file.dynamically_linked_libraries.select { |lib| lib.include? string }
     else
       []
