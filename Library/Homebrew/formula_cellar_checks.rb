@@ -2,7 +2,7 @@ module FormulaCellarChecks
   def check_PATH(bin)
     # warn the user if stuff was installed outside of their PATH
     return unless bin.directory?
-    return unless bin.children.length > 0
+    return if bin.children.empty?
 
     prefix_bin = (HOMEBREW_PREFIX/bin.basename)
     return unless prefix_bin.directory?
@@ -103,29 +103,6 @@ module FormulaCellarChecks
     EOS
   end
 
-  def check_shadowed_headers
-    ["libtool", "subversion", "berkeley-db"].each do |formula_name|
-      return if formula.name.start_with?(formula_name)
-    end
-
-    return if MacOS.version < :mavericks && formula.name.start_with?("postgresql")
-    return if MacOS.version < :yosemite  && formula.name.start_with?("memcached")
-
-    return if formula.keg_only? || !formula.include.directory?
-
-    files  = relative_glob(formula.include, "**/*.h")
-    files &= relative_glob("#{MacOS.sdk_path}/usr/include", "**/*.h")
-    files.map! { |p| File.join(formula.include, p) }
-
-    return if files.empty?
-
-    <<-EOS.undent
-      Header files that shadow system header files were installed to "#{formula.include}"
-      The offending files are:
-        #{files * "\n        "}
-    EOS
-  end
-
   def check_easy_install_pth(lib)
     pth_found = Dir["#{lib}/python{2.7,3}*/site-packages/easy-install.pth"].map { |f| File.dirname(f) }
     return if pth_found.empty?
@@ -136,40 +113,6 @@ module FormulaCellarChecks
       setup.py using Language::Python.setup_install_args.
       The offending files are
         #{pth_found * "\n        "}
-    EOS
-  end
-
-  def check_openssl_links
-    return unless formula.prefix.directory?
-    keg = Keg.new(formula.prefix)
-    system_openssl = keg.mach_o_files.select do |obj|
-      dlls = obj.dynamically_linked_libraries
-      dlls.any? { |dll| /\/usr\/lib\/lib(crypto|ssl).(\d\.)*dylib/.match dll }
-    end
-    return if system_openssl.empty?
-
-    <<-EOS.undent
-      object files were linked against system openssl
-      These object files were linked against the deprecated system OpenSSL.
-      Adding `depends_on "openssl"` to the formula may help.
-        #{system_openssl * "\n        "}
-    EOS
-  end
-
-  def check_python_framework_links(lib)
-    python_modules = Pathname.glob lib/"python*/site-packages/**/*.so"
-    framework_links = python_modules.select do |obj|
-      dlls = obj.dynamically_linked_libraries
-      dlls.any? { |dll| /Python\.framework/.match dll }
-    end
-    return if framework_links.empty?
-
-    <<-EOS.undent
-      python modules have explicit framework links
-      These python extension modules were linked directly to a Python
-      framework binary. They should be linked with -undefined dynamic_lookup
-      instead of -lpython or -framework Python.
-        #{framework_links * "\n        "}
     EOS
   end
 
@@ -217,13 +160,11 @@ module FormulaCellarChecks
     audit_check_output(check_generic_executables(formula.bin))
     audit_check_output(check_non_executables(formula.sbin))
     audit_check_output(check_generic_executables(formula.sbin))
-    audit_check_output(check_shadowed_headers)
     audit_check_output(check_easy_install_pth(formula.lib))
-    audit_check_output(check_openssl_links)
-    audit_check_output(check_python_framework_links(formula.lib))
     audit_check_output(check_elisp_dirname(formula.share, formula.name))
     audit_check_output(check_elisp_root(formula.share, formula.name))
   end
+  alias generic_audit_installed audit_installed
 
   private
 
@@ -231,3 +172,5 @@ module FormulaCellarChecks
     File.directory?(dir) ? Dir.chdir(dir) { Dir[pattern] } : []
   end
 end
+
+require "extend/os/formula_cellar_checks"
