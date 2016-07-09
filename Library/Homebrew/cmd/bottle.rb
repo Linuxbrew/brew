@@ -190,7 +190,7 @@ module Homebrew
         unless ARGV.include? "--skip-relocation"
           keg.relocate_dynamic_linkage prefix, Keg::PREFIX_PLACEHOLDER,
             cellar, Keg::CELLAR_PLACEHOLDER
-          keg.relocate_dynamic_files prefix, Keg::PREFIX_PLACEHOLDER,
+          keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
             cellar, Keg::CELLAR_PLACEHOLDER
         end
 
