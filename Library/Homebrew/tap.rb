@@ -1,4 +1,5 @@
 require "extend/string"
+require "readall"
 
 # a {Tap} is used to extend the formulae provided by Homebrew core.
 # Usually, it's synced with a remote git repository. And it's likely
@@ -211,9 +212,14 @@ class Tap
 
     begin
       safe_system "git", *args
-    rescue Interrupt, ErrorDuringExecution
+      unless Readall.valid_tap?(self, :aliases => true)
+        raise "Cannot tap #{name}: invalid syntax in tap!"
+      end
+    rescue Interrupt, ErrorDuringExecution, RuntimeError
       ignore_interrupts do
-        sleep 0.1 # wait for git to cleanup the top directory when interrupt happens.
+        # wait for git to possibly cleanup the top directory when interrupt happens.
+        sleep 0.1
+        FileUtils.rm_rf path
         path.parent.rmdir_if_possible
       end
       raise
