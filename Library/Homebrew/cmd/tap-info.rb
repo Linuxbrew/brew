@@ -42,14 +42,17 @@ module Homebrew
       formula_count = 0
       command_count = 0
       pinned_count = 0
+      private_count = 0
       Tap.each do |tap|
         tap_count += 1
         formula_count += tap.formula_files.size
         command_count += tap.command_files.size
         pinned_count += 1 if tap.pinned?
+        private_count += 1 if tap.private?
       end
       info = "#{tap_count} tap#{plural(tap_count)}"
       info += ", #{pinned_count} pinned"
+      info += ", #{private_count} private"
       info += ", #{formula_count} formula#{plural(formula_count, "e")}"
       info += ", #{command_count} command#{plural(command_count)}"
       info += ", #{Tap::TAP_DIRECTORY.abv}" if Tap::TAP_DIRECTORY.directory?
@@ -60,6 +63,7 @@ module Homebrew
         info = "#{tap}: "
         if tap.installed?
           info += tap.pinned? ? "pinned" : "unpinned"
+          info += ", private" if tap.private?
           if (formula_count = tap.formula_files.size) > 0
             info += ", #{formula_count} formula#{plural(formula_count, "e")}"
           end

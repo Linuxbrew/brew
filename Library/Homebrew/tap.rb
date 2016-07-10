@@ -418,6 +418,7 @@ class Tap
     if installed?
       hash["remote"] = remote
       hash["custom_remote"] = custom_remote?
+      hash["private"] = private?
     end
 
     hash
