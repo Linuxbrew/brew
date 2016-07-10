@@ -288,12 +288,21 @@ EOS
   # check permissions
   if [[ "$HOMEBREW_PREFIX" = "/usr/local" && ! -w /usr/local ]]
   then
-    odie "/usr/local must be writable!"
+    odie <<-EOS
+/usr/local is not writable. You should change the ownership
+and permissions of /usr/local back to your user account:
+  sudo chown -R \$(whoami) /usr/local
+EOS
   fi
 
   if [[ ! -w "$HOMEBREW_REPOSITORY" ]]
   then
-    odie "$HOMEBREW_REPOSITORY must be writable!"
+    odie <<-EOS
+$HOMEBREW_REPOSITORY is not writable. You should change the
+ownership and permissions of $HOMEBREW_REPOSITORY back to your
+user account:
+  sudo chown -R \$(whoami) $HOMEBREW_REPOSITORY
+EOS
   fi
 
   if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
