@@ -200,9 +200,6 @@ class IntegrationCommandTests < Homebrew::TestCase
   def test_repository
     assert_match HOMEBREW_REPOSITORY.to_s,
                  cmd("--repository")
-  end
-
-  def test_repository
     assert_match "#{HOMEBREW_LIBRARY}/Taps/foo/homebrew-bar",
                  cmd("--repository", "foo/bar")
   end
