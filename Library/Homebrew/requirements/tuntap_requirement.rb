@@ -7,8 +7,11 @@ class TuntapRequirement < Requirement
   satisfy(:build_env => false) { self.class.binary_tuntap_installed? || Formula["tuntap"].installed? }
 
   def self.binary_tuntap_installed?
-    File.exist?("/Library/Extensions/tun.kext") && File.exist?("/Library/Extensions/tap.kext")
-    File.exist?("/Library/LaunchDaemons/net.sf.tuntaposx.tun.plist")
-    File.exist?("/Library/LaunchDaemons/net.sf.tuntaposx.tap.plist")
+    %w[
+      /Library/Extensions/tun.kext
+      /Library/Extensions/tap.kext
+      /Library/LaunchDaemons/net.sf.tuntaposx.tun.plist
+      /Library/LaunchDaemons/net.sf.tuntaposx.tap.plist
+    ].all? { |file| File.exist?(file) }
   end
 end
