@@ -76,7 +76,7 @@ class Keg
   end
 
   def change_rpath(file, old_prefix, new_prefix)
-    return unless OS.linux?
+    return unless OS.linux? && file.elf? && file.dynamic?
     # Patching patchelf using itself fails with "Text file busy" or SIGBUS.
     return if name == "patchelf"
     begin
