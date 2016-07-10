@@ -250,6 +250,8 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
     assert_match(/testball-0\.1.*\.bottle\.tar\.gz/,
                   cmd_output("bottle", "--no-revision", "testball"))
+  ensure
+    FileUtils.rm_f Dir["testball-0.1*.bottle.tar.gz"]
   end
 
   def test_uninstall
