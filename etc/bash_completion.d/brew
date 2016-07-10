@@ -460,6 +460,18 @@ _brew_style ()
     __brew_complete_formulae
 }
 
+_brew_tap_info ()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    case "$cur" in
+    --*)
+        __brewcomp "--installed --json=v1"
+        return
+        ;;
+    esac
+    __brew_complete_tapped
+}
+
 _brew_tap_readme ()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -625,6 +637,7 @@ _brew ()
     style)                      _brew_style ;;
     switch)                     _brew_switch ;;
     tap)                        _brew_complete_tap ;;
+    tap-info)                   _brew_tap_info ;;
     tap-readme)                 _brew_tap_readme ;;
     tap-unpin)                  _brew_tap_unpin ;;
     tests)                      _brew_tests ;;
@@ -632,7 +645,7 @@ _brew ()
     unlinkapps)                 _brew_unlinkapps ;;
     unpack)                     _brew_unpack ;;
     unpin)                      __brew_complete_formulae ;;
-    untap|tap-info|tap-pin)     __brew_complete_tapped ;;
+    untap|tap-pin)              __brew_complete_tapped ;;
     update)                     _brew_update ;;
     upgrade)                    _brew_upgrade ;;
     uses)                       _brew_uses ;;
