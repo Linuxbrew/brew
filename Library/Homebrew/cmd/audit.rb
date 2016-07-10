@@ -1150,6 +1150,8 @@ class ResourceAuditor
       case p
       when %r{^http://ftp\.gnu\.org/},
            %r{^http://ftpmirror\.gnu\.org/},
+           %r{^http://download\.savannah\.gnu\.org/},
+           %r{^http://download-mirror\.savannah\.gnu\.org/},
            %r{^http://[^/]*\.apache\.org/},
            %r{^http://code\.google\.com/},
            %r{^http://fossies\.org/},
