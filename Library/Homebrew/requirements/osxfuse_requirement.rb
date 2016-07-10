@@ -9,7 +9,8 @@ class OsxfuseRequirement < Requirement
   satisfy(:build_env => false) { Formula["osxfuse"].installed? || self.class.binary_osxfuse_installed? }
 
   def self.binary_osxfuse_installed?
-    File.exist?("/usr/local/include/osxfuse/fuse.h") && !File.symlink?("/usr/local/include/osxfuse")
+    File.exist?("/usr/local/include/osxfuse/fuse.h") &&
+      !File.symlink?("/usr/local/include/osxfuse")
   end
 
   env do
