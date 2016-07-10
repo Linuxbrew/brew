@@ -187,11 +187,6 @@ class IntegrationCommandTests < Homebrew::TestCase
                  cmd("--cellar", testball)
   end
 
-  def test_cleanup
-    assert_equal HOMEBREW_CACHE.to_s,
-                 cmd("cleanup")
-  end
-
   def test_env
     assert_match %r{CMAKE_PREFIX_PATH="#{HOMEBREW_PREFIX}[:"]},
                  cmd("--env")
