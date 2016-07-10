@@ -1,5 +1,10 @@
-#:  * `tap-info` <tap>:
-#:    Display information about <tap>.
+#:  * `tap-info`:
+#:    Display a brief summary of all installed taps.
+#:
+#:  * `tap-info` (`--installed`|<taps>):
+#:    Display detailed information about one or more <taps>.
+#:
+#:    Pass `--installed` to display information on all installed taps.
 #:
 #:  * `tap-info` `--json=`<version> (`--installed`|<taps>):
 #:    Print a JSON representation of <taps>. Currently the only accepted value

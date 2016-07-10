@@ -369,7 +369,10 @@ However, retapping with a different <var>URL</var> will cause an exception, so f
 <dt><code>tap</code> <code>--repair</code></dt><dd><p>Migrate tapped formulae from symlink-based to directory-based structure.</p></dd>
 <dt><code>tap</code> <code>--list-official</code></dt><dd><p>List all official taps.</p></dd>
 <dt><code>tap</code> <code>--list-pinned</code></dt><dd><p>List all pinned taps.</p></dd>
-<dt><code>tap-info</code> <var>tap</var></dt><dd><p>Display information about <var>tap</var>.</p></dd>
+<dt><code>tap-info</code></dt><dd><p>Display a brief summary of all installed taps.</p></dd>
+<dt><code>tap-info</code> (<code>--installed</code>|<var>taps</var>)</dt><dd><p>Display detailed information about one or more <var>taps</var>.</p>
+
+<p>Pass <code>--installed</code> to display information on all installed taps.</p></dd>
 <dt><code>tap-info</code> <code>--json=</code><var>version</var> (<code>--installed</code>|<var>taps</var>)</dt><dd><p>Print a JSON representation of <var>taps</var>. Currently the only accepted value
 for <var>version</var> is <code>v1</code>.</p>
 
