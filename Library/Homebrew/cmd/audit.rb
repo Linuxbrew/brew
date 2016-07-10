@@ -676,6 +676,10 @@ class FormulaAuditor
     if text =~ /def plist/ && text !~ /plist_options/
       problem "Please set plist_options when using a formula-defined plist."
     end
+
+    if text =~ %r{require "language/go"} && text !~ /go_resource/
+      problem "require \"language/go\" is unnecessary unless using `go_resource`s"
+    end
   end
 
   def audit_line(line, lineno)
