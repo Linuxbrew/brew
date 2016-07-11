@@ -22,7 +22,7 @@ original-setup-ruby-path() {
 }
 
 setup-ruby-path() {
-  if [[ -z "$HOMEBREW_USE_VENDOR_RUBY" ]]
+  if [[ -z "$HOMEBREW_USE_VENDOR_RUBY" && -z "$HOMEBREW_FORCE_VENDOR_RUBY" ]]
   then
     original-setup-ruby-path
     return
@@ -70,7 +70,7 @@ setup-ruby-path() {
         ruby_version_major="${ruby_version_major%%.*}"
       fi
 
-      if [[ "$ruby_version_major" != "2" ]]
+      if [[ "$ruby_version_major" != "2" || -n "$HOMEBREW_FORCE_VENDOR_RUBY" ]]
       then
         brew vendor-install ruby --quiet
         if [[ ! -x "$vendor_ruby_path" ]]
