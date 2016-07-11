@@ -85,6 +85,19 @@ class SystemConfig
       end
     end
 
+    def describe_homebrew_ruby_version
+      case RUBY_VERSION
+      when /^1\.[89]/, /^2\.0/
+        "#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
+      else
+        RUBY_VERSION
+      end
+    end
+
+    def describe_homebrew_ruby
+      "#{describe_homebrew_ruby_version} => #{RUBY_PATH}"
+    end
+
     def hardware
       return if Hardware::CPU.type == :dunno
       "CPU: #{Hardware.cores_as_words}-core #{Hardware::CPU.bits}-bit #{Hardware::CPU.family}"
@@ -129,6 +142,7 @@ class SystemConfig
       f.puts "HOMEBREW_CELLAR: #{HOMEBREW_CELLAR}"
       f.puts "HOMEBREW_BOTTLE_DOMAIN: #{BottleSpecification::DEFAULT_DOMAIN}"
       f.puts hardware if hardware
+      f.puts "Homebrew Ruby: #{describe_homebrew_ruby}"
       f.puts "GCC-4.0: build #{gcc_40}" if gcc_40
       f.puts "GCC-4.2: build #{gcc_42}" if gcc_42
       f.puts "Clang: #{clang ? "#{clang} build #{clang_build}" : "N/A"}"

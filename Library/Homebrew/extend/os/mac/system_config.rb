@@ -28,14 +28,8 @@ class SystemConfig
       "#{MacOS::XQuartz.version} => #{describe_path(MacOS::XQuartz.prefix)}"
     end
 
-    def describe_system_ruby
-      s = ""
-      case RUBY_VERSION
-      when /^1\.[89]/, /^2\.0/
-        s << "#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
-      else
-        s << RUBY_VERSION
-      end
+    def describe_homebrew_ruby
+      s = describe_homebrew_ruby_version
 
       if RUBY_PATH.to_s !~ %r{^/System/Library/Frameworks/Ruby.framework/Versions/[12]\.[089]/usr/bin/ruby}
         s << " => #{RUBY_PATH}"
@@ -45,7 +39,6 @@ class SystemConfig
 
     def dump_verbose_config(f = $stdout)
       dump_generic_verbose_config(f)
-      f.puts "System Ruby: #{describe_system_ruby}"
       f.puts "OS X: #{MacOS.full_version}-#{kernel}"
       f.puts "Xcode: #{xcode ? xcode : "N/A"}"
       f.puts "CLT: #{clt ? clt : "N/A"}"
