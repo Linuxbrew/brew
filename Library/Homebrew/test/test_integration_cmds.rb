@@ -123,6 +123,10 @@ class IntegrationCommandTests < Homebrew::TestCase
         def install
           (prefix/"foo"/"test").write("test") if build.with? "foo"
           prefix.install Dir["*"]
+          (buildpath/"test.c").write \
+            "#include <stdio.h>\\nint main(){return printf(\\"test\\");}"
+          bin.mkpath
+          system ENV.cc, "test.c", "-o", bin/"test"
         end
 
         # something here
@@ -230,10 +234,9 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_install
-    assert_match "#{HOMEBREW_CELLAR}/testball/0.1", cmd("install", testball)
-  ensure
-    cmd("uninstall", "--force", testball)
-    cmd("cleanup", "--force", "--prune=all")
+    setup_test_formula "testball"
+
+    assert_match "#{HOMEBREW_CELLAR}/testball/0.1", cmd("install", "testball")
   end
 
   def test_bottle
