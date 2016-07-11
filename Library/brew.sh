@@ -64,30 +64,11 @@ fi
 unset GEM_HOME
 unset GEM_PATH
 
-if [[ -z "$HOMEBREW_DEVELOPER" ]]
-then
-  unset HOMEBREW_RUBY_PATH
-fi
-
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_OSX="1";;
   Linux) HOMEBREW_LINUX="1";;
 esac
-
-if [[ -z "$HOMEBREW_RUBY_PATH" ]]
-then
-  if [[ -n "$HOMEBREW_OSX" ]]
-  then
-    HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
-  else
-    HOMEBREW_RUBY_PATH="$(which ruby)"
-    if [[ -z "$HOMEBREW_RUBY_PATH" ]]
-    then
-      odie "No Ruby found, cannot proceed."
-    fi
-  fi
-fi
 
 HOMEBREW_CURL="/usr/bin/curl"
 if [[ -n "$HOMEBREW_OSX" ]]
@@ -116,6 +97,11 @@ HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_VERSION ($HOMEBREW_SYSTEM; $HOM
 HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | /usr/bin/awk '{print $1"/"$2}')"
 HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
 
+if [[ -z "$HOMEBREW_CACHE" ]]
+then
+  HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
+fi
+
 # Declared in bin/brew
 export HOMEBREW_BREW_FILE
 export HOMEBREW_PREFIX
@@ -124,8 +110,8 @@ export HOMEBREW_LIBRARY
 
 # Declared in brew.sh
 export HOMEBREW_VERSION
+export HOMEBREW_CACHE
 export HOMEBREW_CELLAR
-export HOMEBREW_RUBY_PATH
 export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
 export HOMEBREW_PROCESSOR
@@ -212,7 +198,7 @@ fi
 if [[ "$(id -u)" = "0" && "$(/usr/bin/stat -f%u "$HOMEBREW_BREW_FILE")" != "0" ]]
 then
   case "$HOMEBREW_COMMAND" in
-    analytics|install|reinstall|postinstall|link|pin|update|upgrade|create|migrate|tap|tap-pin|switch)
+    analytics|install|reinstall|postinstall|link|pin|update|upgrade|vendor-install|create|migrate|tap|tap-pin|switch)
       odie <<EOS
 Cowardly refusing to 'sudo brew $HOMEBREW_COMMAND'
 You can use brew with sudo, but only if the brew executable is owned by root.
@@ -222,6 +208,11 @@ EOS
       ;;
   esac
 fi
+
+# Hide shellcheck complaint:
+# shellcheck source=/dev/null
+source "$HOMEBREW_LIBRARY/Homebrew/utils/ruby.sh"
+setup-ruby-path
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
