@@ -19,6 +19,10 @@ SELF_REAL = Pathname.new(__FILE__).realpath
 F = File.basename(__FILE__).freeze
 D = File.expand_path(File.dirname(__FILE__)).freeze
 
+def executable?(file)
+  File.file?(file) && File.executable?(file)
+end
+
 def exec(*args)
   # prevent fork-bombs
   arg0 = args.first
@@ -35,18 +39,18 @@ when "git" then %W[HOMEBREW_GIT GIT]
 when "svn" then %W[HOMEBREW_SVN]
 else []
 end.each do |key|
-  exec ENV[key], *ARGV if ENV[key] && File.executable?(ENV[key])
+  exec ENV[key], *ARGV if ENV[key] && executable?(ENV[key])
 end
 
 brew_version = File.expand_path("#{D}/../../../bin/#{F}")
-exec brew_version, *ARGV if File.executable? brew_version
+exec brew_version, *ARGV if executable? brew_version
 
 `/usr/bin/which -a #{F} 2>/dev/null`.split("\n").each do |path|
   exec path, *ARGV unless path == "/usr/bin/#{F}"
 end
 
 popup_stub = false
-if File.executable? "/usr/bin/xcode-select"
+if executable? "/usr/bin/xcode-select"
   # xcode-select will return empty on no Xcode/CLT configuration.
   #   /usr/bin/<tool> will be a popup stub under such configuration.
   # xcrun hangs if xcode-select is set to "/"
@@ -54,14 +58,14 @@ if File.executable? "/usr/bin/xcode-select"
   popup_stub = path.empty?
   if !popup_stub && path != "/"
     path = `/usr/bin/xcrun -find #{F} 2>/dev/null`.chomp
-    exec path, *ARGV if File.executable? path
+    exec path, *ARGV if executable? path
   end
 end
 
 path = "/Applications/Xcode.app/Contents/Developer/usr/bin/#{F}"
-exec path, *ARGV if File.executable? path
+exec path, *ARGV if executable? path
 
 path = "/usr/bin/#{F}"
-exec path, *ARGV if !popup_stub && File.executable?(path)
+exec path, *ARGV if !popup_stub && executable?(path)
 
 abort "You must: brew install #{F}"
