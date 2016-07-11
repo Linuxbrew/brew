@@ -31,7 +31,8 @@ class Requirement
 
   # The message to show when the requirement is not met.
   def message
-    s = ""
+    _, _, class_name = self.class.to_s.rpartition "::"
+    s = "#{class_name} unsatisfied!\n"
     if cask
       s += <<-EOS.undent
 
