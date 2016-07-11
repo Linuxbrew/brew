@@ -158,6 +158,29 @@ class FormulaTests < Homebrew::TestCase
     assert_equal prefix, f.installed_prefix
   end
 
+  def test_latest_head_prefix
+    f = Testball.new
+
+    stamps_with_revisions = [[111111, 1], [222222, 1], [222222, 2], [222222, 0]]
+
+    stamps_with_revisions.each do |stamp, revision|
+      version = "HEAD-#{stamp}"
+      version += "_#{revision}" if revision > 0
+      prefix = f.rack.join(version)
+      prefix.mkpath
+
+      tab = Tab.empty
+      tab.tabfile = prefix.join("INSTALL_RECEIPT.json")
+      tab.source_modified_time = stamp
+      tab.write
+    end
+
+    prefix = HOMEBREW_CELLAR/"#{f.name}/HEAD-222222_2"
+    assert_equal prefix, f.latest_head_prefix
+  ensure
+    f.rack.rmtree
+  end
+
   def test_equality
     x = Testball.new
     y = Testball.new
@@ -280,6 +303,38 @@ class FormulaTests < Homebrew::TestCase
     end
 
     assert_equal PkgVersion.parse("HEAD_1"), f.pkg_version
+  end
+
+  def test_update_head_version
+    initial_env = ENV.to_hash
+
+    f = formula do
+      head "foo", :using => :git
+    end
+
+    cached_location = f.head.downloader.cached_location
+    cached_location.mkpath
+
+    %w[AUTHOR COMMITTER].each do |role|
+      ENV["GIT_#{role}_NAME"] = "brew tests"
+      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
+      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
+    end
+
+    cached_location.cd do
+      FileUtils.touch "LICENSE"
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "Initial commit"
+      end
+    end
+
+    f.update_head_version
+    assert_equal Version.create("HEAD-5658946"), f.head.version
+  ensure
+    ENV.replace(initial_env)
+    cached_location.rmtree
   end
 
   def test_legacy_options
