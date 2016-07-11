@@ -1,4 +1,4 @@
-origin-setup-ruby-path() {
+original-setup-ruby-path() {
   if [[ -z "$HOMEBREW_DEVELOPER" ]]
   then
     unset HOMEBREW_RUBY_PATH
@@ -24,7 +24,7 @@ origin-setup-ruby-path() {
 setup-ruby-path() {
   if [[ -z "$HOMEBREW_USE_VENDOR_RUBY" ]]
   then
-    origin-setup-ruby-path
+    original-setup-ruby-path
     return
   fi
 
