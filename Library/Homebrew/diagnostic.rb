@@ -761,7 +761,7 @@ module Homebrew
       def check_git_version
         # https://help.github.com/articles/https-cloning-errors
         return unless Utils.git_available?
-        return unless Version.new(Utils.git_version) < Version.new("1.7.10")
+        return unless Version.create(Utils.git_version) < Version.create("1.7.10")
 
         git = Formula["git"]
         git_upgrade_cmd = git.any_version_installed? ? "upgrade" : "install"

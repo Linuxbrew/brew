@@ -325,6 +325,6 @@ module SharedEnvExtension
 
   def gcc_with_cxx11_support?(cc)
     version = cc[/^gcc-(\d+(?:\.\d+)?)$/, 1]
-    version && Version.new(version) >= Version.new("4.8")
+    version && Version.create(version) >= Version.create("4.8")
   end
 end

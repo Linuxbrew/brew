@@ -116,7 +116,7 @@ class FormulaCreator
     end
     update_path
     if @version
-      @version = Version.new(@version)
+      @version = Version.create(@version)
     else
       @version = Pathname.new(url).version
     end

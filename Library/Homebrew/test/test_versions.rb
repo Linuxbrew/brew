@@ -4,17 +4,17 @@ require "version"
 class VersionTests < Homebrew::TestCase
   def test_accepts_objects_responding_to_to_str
     value = stub(:to_str => "0.1")
-    assert_equal "0.1", Version.new(value).to_s
+    assert_equal "0.1", Version.create(value).to_s
   end
 
   def test_raises_for_non_string_objects
-    assert_raises(TypeError) { Version.new(1.1) }
-    assert_raises(TypeError) { Version.new(1) }
-    assert_raises(TypeError) { Version.new(:symbol) }
+    assert_raises(TypeError) { Version.create(1.1) }
+    assert_raises(TypeError) { Version.create(1) }
+    assert_raises(TypeError) { Version.create(:symbol) }
   end
 
   def test_detected_from_url?
-    refute Version.new("1.0").detected_from_url?
+    refute Version.create("1.0").detected_from_url?
     assert Version::FromURL.new("1.0").detected_from_url?
   end
 end
@@ -462,20 +462,20 @@ class HeadVersionTests < Homebrew::TestCase
   end
 
   def test_commit_assigned
-    v = HeadVersion.new("HEAD-abcdef")
+    v = Version.create("HEAD-abcdef")
     assert_equal "abcdef", v.commit
     assert_equal "HEAD-abcdef", v.to_str
   end
 
   def test_no_commit
-    v = HeadVersion.new("HEAD")
+    v = Version.create("HEAD")
     assert_nil v.commit
     assert_equal "HEAD", v.to_str
   end
 
   def test_update_commit
-    v1 = HeadVersion.new("HEAD-abcdef")
-    v2 = HeadVersion.new("HEAD")
+    v1 = Version.create("HEAD-abcdef")
+    v2 = Version.create("HEAD")
 
     v1.update_commit("ffffff")
     assert_equal "ffffff", v1.commit

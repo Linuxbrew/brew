@@ -12,7 +12,7 @@ class RubyRequirement < Requirement
     which_all("ruby").detect do |ruby|
       version = /\d\.\d/.match Utils.popen_read(ruby, "--version")
       next unless version
-      Version.new(version.to_s) >= Version.new(@version)
+      Version.create(version.to_s) >= Version.create(@version)
     end
   end
 

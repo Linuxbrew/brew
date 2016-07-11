@@ -27,7 +27,7 @@ module Homebrew
     end
 
     def assert_version_equal(expected, actual)
-      assert_equal Version.new(expected), actual
+      assert_equal Version.create(expected), actual
     end
 
     def assert_version_detected(expected, url, specs={})

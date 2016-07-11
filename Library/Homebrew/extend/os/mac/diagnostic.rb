@@ -287,8 +287,8 @@ module Homebrew
         return unless MacOS::XQuartz.version
         return if MacOS::XQuartz.provided_by_apple?
 
-        installed_version = Version.new(MacOS::XQuartz.version)
-        latest_version = Version.new(MacOS::XQuartz.latest_version)
+        installed_version = Version.create(MacOS::XQuartz.version)
+        latest_version = Version.create(MacOS::XQuartz.latest_version)
         return if installed_version >= latest_version
 
         <<-EOS.undent

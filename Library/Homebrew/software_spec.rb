@@ -204,7 +204,7 @@ end
 class HeadSoftwareSpec < SoftwareSpec
   def initialize
     super
-    @resource.version = HeadVersion.new("HEAD")
+    @resource.version = Version.create("HEAD")
   end
 
   def verify_download_integrity(_fn)

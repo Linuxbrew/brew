@@ -606,7 +606,7 @@ class FormulaAuditor
     case stable && stable.url
     when %r{download\.gnome\.org/sources}, %r{ftp\.gnome\.org/pub/GNOME/sources}i
       version = Version.parse(stable.url)
-      if version >= Version.new("1.0")
+      if version >= Version.create("1.0")
         minor_version = version.to_s.split(".", 3)[1].to_i
         if minor_version.odd?
           problem "#{stable.version} is a development release"
