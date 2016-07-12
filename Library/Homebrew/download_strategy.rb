@@ -6,6 +6,7 @@ class AbstractDownloadStrategy
   include FileUtils
 
   attr_reader :meta, :name, :version, :resource
+  attr_reader :shutup
 
   def initialize(name, resource)
     @name = name
@@ -17,6 +18,19 @@ class AbstractDownloadStrategy
 
   # Download and cache the resource as {#cached_location}.
   def fetch
+  end
+
+  # Supress output
+  def shutup!
+    @shutup = true
+  end
+
+  def puts(*args)
+    super(*args) unless shutup
+  end
+
+  def ohai(*args)
+    super(*args) unless shutup
   end
 
   # Unpack {#cached_location} into the current working directory, and possibly
@@ -57,6 +71,14 @@ class AbstractDownloadStrategy
     # 2 as default because commands are eg. svn up, git pull
     args.insert(2, "-q") unless ARGV.verbose?
     args
+  end
+
+  def safe_system(*args)
+    if @shutup
+      quiet_system(*args) || raise(ErrorDuringExecution.new(args.shift, *args))
+    else
+      super(*args)
+    end
   end
 
   def quiet_safe_system(*args)
