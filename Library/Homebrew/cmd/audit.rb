@@ -363,10 +363,16 @@ class FormulaAuditor
           problem "Don't use git as a dependency"
         when "mercurial"
           problem "Use `depends_on :hg` instead of `depends_on 'mercurial'`"
-        when "ruby"
-          problem "Don't use ruby as a dependency. We allow non-Homebrew ruby installations."
         when "gfortran"
           problem "Use `depends_on :fortran` instead of `depends_on 'gfortran'`"
+        when "ruby"
+          problem <<-EOS.undent
+            Don't use "ruby" as a dependency. If this formula requires a
+            minimum Ruby version not provided by the system you should
+            use the RubyRequirement:
+              depends_on :ruby => "1.8"
+            where "1.8" is the minimum version of Ruby required.
+          EOS
         when "open-mpi", "mpich"
           problem <<-EOS.undent
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
