@@ -107,9 +107,8 @@ pop_stash() {
   [[ -z "$STASHED" ]] && return
   if [[ -n "$HOMEBREW_VERBOSE" ]]
   then
+    echo "Restoring your stashed changes to $DIR..."
     git stash pop
-    echo "Restoring your stashed changes to $DIR:"
-    git status --short --untracked-files
   else
     git stash pop "${QUIET_ARGS[@]}" 1>/dev/null
   fi
@@ -147,6 +146,11 @@ reset_on_interrupt() {
 }
 
 pull() {
+  if [[ -n "$HOMEBREW_VERBOSE" ]]
+  then
+    echo "Updating $DIR..."
+  fi
+
   local DIR
   local TAP_VAR
 
@@ -187,8 +191,7 @@ pull() {
   then
     if [[ -n "$HOMEBREW_VERBOSE" ]]
     then
-      echo "Stashing uncommitted changes to $DIR."
-      git status --short --untracked-files=all
+      echo "Stashing uncommitted changes to $DIR..."
     fi
     git merge --abort &>/dev/null
     git rebase --abort &>/dev/null
@@ -417,6 +420,7 @@ EOS
   do
     [[ -d "$DIR/.git" ]] || continue
     pull "$DIR"
+    [[ -n "$HOMEBREW_VERBOSE" ]] && echo
   done
 
   safe_cd "$HOMEBREW_REPOSITORY"
