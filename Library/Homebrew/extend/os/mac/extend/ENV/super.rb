@@ -1,0 +1,105 @@
+module Superenv
+  # @private
+  def self.bin
+    return unless DevelopmentTools.installed?
+
+    bin = HOMEBREW_ENV_PATH.subdirs.reject { |d| d.basename.to_s > MacOS::Xcode.version }.max
+    bin.realpath unless bin.nil?
+  end
+
+  def homebrew_extra_paths
+    paths = []
+    # On 10.9, there are shims for all tools in /usr/bin.
+    # On 10.7 and 10.8 we need to add these directories ourselves.
+    if MacOS::Xcode.without_clt? && MacOS.version <= "10.8"
+      paths << "#{MacOS::Xcode.prefix}/usr/bin"
+      paths << "#{MacOS::Xcode.toolchain_path}/usr/bin"
+    end
+
+    paths << MacOS::X11.bin.to_s if x11?
+    paths
+  end
+
+  # @private
+  def homebrew_extra_pkg_config_paths
+    paths = ["#{HOMEBREW_ENV_PATH}/pkgconfig/#{MacOS.version}"]
+    paths << "#{MacOS::X11.lib}/pkgconfig" << "#{MacOS::X11.share}/pkgconfig" if x11?
+    paths
+  end
+
+  def homebrew_extra_aclocal_paths
+    paths = []
+    paths << "#{MacOS::X11.share}/aclocal" if x11?
+    paths
+  end
+
+  def homebrew_extra_isystem_paths
+    paths = []
+    paths << "#{effective_sysroot}/usr/include/libxml2" unless deps.any? { |d| d.name == "libxml2" }
+    paths << "#{effective_sysroot}/usr/include/apache2" if MacOS::Xcode.without_clt?
+    paths << MacOS::X11.include.to_s << "#{MacOS::X11.include}/freetype2" if x11?
+    paths << "#{effective_sysroot}/System/Library/Frameworks/OpenGL.framework/Versions/Current/Headers"
+    paths
+  end
+
+  def homebrew_extra_library_paths
+    paths = []
+    paths << MacOS::X11.lib.to_s if x11?
+    paths << "#{effective_sysroot}/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries"
+    paths
+  end
+
+  def homebrew_extra_cmake_include_paths
+    paths = []
+    paths << "#{effective_sysroot}/usr/include/apache2" if MacOS::Xcode.without_clt?
+    paths << MacOS::X11.include.to_s << "#{MacOS::X11.include}/freetype2" if x11?
+    paths << "#{effective_sysroot}/System/Library/Frameworks/OpenGL.framework/Versions/Current/Headers"
+    paths
+  end
+
+  def homebrew_extra_cmake_library_paths
+    paths = []
+    paths << MacOS::X11.lib.to_s if x11?
+    paths << "#{effective_sysroot}/System/Library/Frameworks/OpenGL.framework/Versions/Current/Libraries"
+    paths
+  end
+
+  def homebrew_extra_cmake_frameworks_paths
+    paths = []
+    paths << "#{effective_sysroot}/System/Library/Frameworks" if MacOS::Xcode.without_clt?
+    paths
+  end
+
+  def determine_cccfg
+    s = ""
+    # Fix issue with sed barfing on unicode characters on Mountain Lion
+    s << "s" if MacOS.version >= :mountain_lion
+    # Fix issue with >= 10.8 apr-1-config having broken paths
+    s << "a" if MacOS.version >= :mountain_lion
+    s
+  end
+
+  # @private
+  def setup_build_environment(formula = nil)
+    generic_setup_build_environment(formula)
+    self["HOMEBREW_SDKROOT"] = effective_sysroot
+
+    if MacOS::Xcode.without_clt? || (MacOS::Xcode.installed? && MacOS::Xcode.version.to_i >= 7)
+      self["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s
+      self["SDKROOT"] = MacOS.sdk_path
+    end
+
+    # On 10.9, the tools in /usr/bin proxy to the active developer directory.
+    # This means we can use them for any combination of CLT and Xcode.
+    self["HOMEBREW_PREFER_CLT_PROXIES"] = "1" if MacOS.version >= "10.9"
+  end
+
+  def set_x11_env_if_installed
+    ENV.x11 = MacOS::X11.installed?
+  end
+
+  # These methods are no longer necessary under superenv, but are needed to
+  # maintain an interface compatible with stdenv.
+  alias_method :macosxsdk, :noop
+  alias_method :remove_macosxsdk, :noop
+end
