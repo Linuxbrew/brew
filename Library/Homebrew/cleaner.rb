@@ -67,7 +67,7 @@ class Cleaner
   end
 
   def executable_path?(path)
-    path.text_executable?
+    path.text_executable? || path.executable?
   end
 
   # Clean a top-level (bin, sbin, lib) directory, recursively, by fixing file
