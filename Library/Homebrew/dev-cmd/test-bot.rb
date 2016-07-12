@@ -647,11 +647,9 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
 
-      ruby_two = RUBY_VERSION.split(".").first.to_i >= 2
-
       if @tap.nil?
         tests_args = []
-        if ruby_two
+        if RUBY_TWO
           tests_args << "--official-cmd-taps"
           tests_args << "--coverage" if ENV["TRAVIS"]
         end
@@ -892,7 +890,7 @@ module Homebrew
 
     ENV["HOMEBREW_DEVELOPER"] = "1"
     ENV["HOMEBREW_SANDBOX"] = "1"
-    ENV["HOMEBREW_RUBY_MACHO"] = "1" if RUBY_VERSION.split(".").first.to_i >= 2
+    ENV["HOMEBREW_RUBY_MACHO"] = "1" if RUBY_TWO
     ENV["HOMEBREW_NO_EMOJI"] = "1"
     ENV["HOMEBREW_FAIL_LOG_LINES"] = "150"
     ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"] = "1"
