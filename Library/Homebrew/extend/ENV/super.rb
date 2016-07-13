@@ -179,6 +179,7 @@ module Superenv
 
   def determine_library_paths
     paths = keg_only_deps.map { |d| d.opt_lib.to_s }
+    paths << "#{HOMEBREW_PREFIX}/lib"
     paths += homebrew_extra_library_paths
     paths.to_path_s
   end
