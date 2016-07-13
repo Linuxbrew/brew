@@ -5,6 +5,8 @@ class PkgVersion
 
   RX = /\A(.+?)(?:_(\d+))?\z/
 
+  attr_reader :version, :revision
+
   def self.parse(path)
     _, version, revision = *path.match(RX)
     version = Version.create(version)
@@ -38,8 +40,4 @@ class PkgVersion
   def hash
     version.hash ^ revision.hash
   end
-
-  protected
-
-  attr_reader :version, :revision
 end

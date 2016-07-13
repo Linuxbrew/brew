@@ -135,6 +135,8 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
       clone_repo
     end
 
+    version.update_commit(last_commit) if head?
+
     if @ref_type == :tag && @revision && current_revision
       unless current_revision == @revision
         raise <<-EOS.undent

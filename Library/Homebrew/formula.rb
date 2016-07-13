@@ -287,6 +287,14 @@ class Formula
     active_spec.version
   end
 
+  def update_head_version
+    return unless head?
+    return unless head.downloader.is_a?(VCSDownloadStrategy)
+    return unless head.downloader.cached_location.exist?
+
+    head.version.update_commit(head.downloader.last_commit)
+  end
+
   # The {PkgVersion} for this formula with {version} and {#revision} information.
   def pkg_version
     PkgVersion.new(version, revision)
@@ -405,11 +413,23 @@ class Formula
     Pathname.new("#{HOMEBREW_LIBRARY}/LinkedKegs/#{name}")
   end
 
+  def latest_head_prefix
+    head_versions = installed_prefixes.map do |pn|
+      pn_pkgversion = PkgVersion.parse(pn.basename.to_s)
+      pn_pkgversion if pn_pkgversion.head?
+    end.compact
+
+    latest_head_version = head_versions.max_by do |pn_pkgversion|
+      [Tab.for_keg(prefix(pn_pkgversion)).source_modified_time, pn_pkgversion.revision]
+    end
+    prefix(latest_head_version) if latest_head_version
+  end
+
   # The latest prefix for this formula. Checks for {#head}, then {#devel}
   # and then {#stable}'s {#prefix}
   # @private
   def installed_prefix
-    if head && (head_prefix = prefix(PkgVersion.new(head.version, revision))).directory?
+    if head && (head_prefix = latest_head_prefix) && head_prefix.directory?
       head_prefix
     elsif devel && (devel_prefix = prefix(PkgVersion.new(devel.version, revision))).directory?
       devel_prefix

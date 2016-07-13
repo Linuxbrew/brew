@@ -586,6 +586,8 @@ class FormulaInstaller
       end
     end
 
+    formula.update_head_version
+
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
@@ -593,6 +595,7 @@ class FormulaInstaller
   rescue Exception
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
+      formula.update_head_version
       formula.prefix.rmtree if formula.prefix.directory?
       formula.rack.rmdir_if_possible
     end
