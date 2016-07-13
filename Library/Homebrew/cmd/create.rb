@@ -110,7 +110,7 @@ class FormulaCreator
       when %r{github\.com/\S+/(\S+)/archive/}
         @name = $1
       else
-        /(.*?)[-_.]?#{path.version}/.match path.basename
+        /(.*?)[-_.]?#{Regexp.escape(path.version)}/.match path.basename
         @name = $1
       end
     end

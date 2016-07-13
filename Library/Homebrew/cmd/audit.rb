@@ -142,7 +142,7 @@ class FormulaAuditor
     swig
   ]
 
-  FILEUTILS_METHODS = FileUtils.singleton_methods(false).join "|"
+  FILEUTILS_METHODS = FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
 
   def initialize(formula, options = {})
     @formula = formula

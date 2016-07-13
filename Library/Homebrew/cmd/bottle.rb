@@ -238,7 +238,7 @@ module Homebrew
 
         ignores = []
         if f.deps.any? { |dep| dep.name == "go" }
-          ignores << %r{#{HOMEBREW_CELLAR}/go/[\d\.]+/libexec}
+          ignores << %r{#{Regexp.escape(HOMEBREW_CELLAR)}/go/[\d\.]+/libexec}
         end
 
         if ARGV.include? "--skip-relocation"
