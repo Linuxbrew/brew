@@ -330,23 +330,25 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   # Private method, can be overridden if needed.
   def _fetch
+    url = @url
+
     if ENV["HOMEBREW_ARTIFACT_DOMAIN"]
-      @url.sub!(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
-      ohai "Downloading from #{@url}"
+      url.sub!(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
+      ohai "Downloading from #{url}"
     end
 
-    urls = actual_urls
+    urls = actual_urls(url)
     unless urls.empty?
       ohai "Downloading from #{urls.last}"
-      if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && @url.start_with?("https://") &&
+      if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && url.start_with?("https://") &&
          urls.any? { |u| !u.start_with? "https://" }
         puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
-        raise CurlDownloadStrategyError.new(@url)
+        raise CurlDownloadStrategyError.new(url)
       end
-      @url = urls.last
+      url = urls.last
     end
 
-    curl @url, "-C", downloaded_size, "-o", temporary_path
+    curl url, "-C", downloaded_size, "-o", temporary_path
   end
 
   # Curl options to be always passed to curl,
@@ -357,11 +359,11 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     copts
   end
 
-  def actual_urls
+  def actual_urls(url)
     urls = []
-    curl_args = _curl_opts << "-I" << "-L" << @url
+    curl_args = _curl_opts << "-I" << "-L" << url
     Utils.popen_read("curl", *curl_args).scan(/^Location: (.+)$/).map do |m|
-      urls << URI.join(urls.last || @url, m.first.chomp).to_s
+      urls << URI.join(urls.last || url, m.first.chomp).to_s
     end
     urls
   end
