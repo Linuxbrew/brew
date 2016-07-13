@@ -330,6 +330,11 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   # Private method, can be overridden if needed.
   def _fetch
+    if ENV["HOMEBREW_ARTIFACT_DOMAIN"]
+      @url.sub!(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
+      ohai "Downloading from #{@url}"
+    end
+
     urls = actual_urls
     unless urls.empty?
       ohai "Downloading from #{urls.last}"
