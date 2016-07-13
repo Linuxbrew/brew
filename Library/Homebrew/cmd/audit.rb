@@ -114,6 +114,10 @@ class FormulaText
     regex =~ @text
   end
 
+  def include?(s)
+    @text.include? s
+  end
+
   def line_number(regex)
     index = @lines.index { |line| line =~ regex }
     index ? index + 1 : nil
@@ -458,13 +462,13 @@ class FormulaAuditor
 
     # Check for http:// GitHub homepage urls, https:// is preferred.
     # Note: only check homepages that are repo pages, not *.github.com hosts
-    if homepage =~ %r{^http://github\.com/}
+    if homepage.start_with? "http://github.com/"
       problem "Please use https:// for #{homepage}"
     end
 
     # Savannah has full SSL/TLS support but no auto-redirect.
     # Doesn't apply to the download URLs, only the homepage.
-    if homepage =~ %r{^http://savannah\.nongnu\.org/}
+    if homepage.start_with? "http://savannah.nongnu.org/"
       problem "Please use https:// for #{homepage}"
     end
 
@@ -671,19 +675,19 @@ class FormulaAuditor
       problem %(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
     end
 
-    if text =~ /xcodebuild[ (]["'*]/ && text !~ /SYMROOT=/
+    if text =~ /xcodebuild[ (]["'*]/ && !text.include?("SYMROOT=")
       problem %(xcodebuild should be passed an explicit "SYMROOT")
     end
 
-    if text =~ /Formula\.factory\(/
+    if text.include? "Formula.factory("
       problem "\"Formula.factory(name)\" is deprecated in favor of \"Formula[name]\""
     end
 
-    if text =~ /def plist/ && text !~ /plist_options/
+    if text.include?("def plist") && !text.include?("plist_options")
       problem "Please set plist_options when using a formula-defined plist."
     end
 
-    if text =~ %r{require "language/go"} && text !~ /go_resource/
+    if text.include?('require "language/go"') && !text.include?("go_resource")
       problem "require \"language/go\" is unnecessary unless using `go_resource`s"
     end
   end
@@ -694,7 +698,7 @@ class FormulaAuditor
     end
 
     # Commented-out cmake support from default template
-    if line =~ /# system "cmake/
+    if line.include?('# system "cmake')
       problem "Commented cmake call found"
     end
 
@@ -779,7 +783,7 @@ class FormulaAuditor
       problem "Use \"if build.#{$1.downcase}?\" instead"
     end
 
-    if line =~ /make && make/
+    if line.include?("make && make")
       problem "Use separate make calls"
     end
 
@@ -787,7 +791,7 @@ class FormulaAuditor
       problem "Use spaces instead of tabs for indentation"
     end
 
-    if line =~ /ENV\.x11/
+    if line.include?("ENV.x11")
       problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
     end
 
@@ -844,19 +848,19 @@ class FormulaAuditor
       problem "Use build instead of ARGV to check options"
     end
 
-    if line =~ /def options/
+    if line.include?("def options")
       problem "Use new-style option definitions"
     end
 
-    if line =~ /def test$/
+    if line.end_with?("def test")
       problem "Use new-style test definitions (test do)"
     end
 
-    if line =~ /MACOS_VERSION/
+    if line.include?("MACOS_VERSION")
       problem "Use MacOS.version instead of MACOS_VERSION"
     end
 
-    if line =~ /MACOS_FULL_VERSION/
+    if line.include?("MACOS_FULL_VERSION")
       problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
     end
 
@@ -878,7 +882,7 @@ class FormulaAuditor
       problem "Define method #{$1.inspect} in the class body, not at the top-level"
     end
 
-    if line =~ /ENV.fortran/ && !formula.requirements.map(&:class).include?(FortranRequirement)
+    if line.include?("ENV.fortran") && !formula.requirements.map(&:class).include?(FortranRequirement)
       problem "Use `depends_on :fortran` instead of `ENV.fortran`"
     end
 
@@ -908,7 +912,7 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
-    if line =~ /system "npm", "install"/ && line !~ /Language::Node/ && formula.name !~ /^kibana(\d{2})?$/
+    if line.include?('system "npm", "install"') && !line.include?("Language::Node") && formula.name !~ /^kibana(\d{2})?$/
       problem "Use Language::Node for npm install args"
     end
 
@@ -936,9 +940,9 @@ class FormulaAuditor
   end
 
   def audit_caveats
-    caveats = formula.caveats
+    caveats = formula.caveats.to_s
 
-    if caveats =~ /setuid/
+    if caveats.include?("setuid")
       problem "Don't recommend setuid in the caveats, suggest sudo instead."
     end
   end
@@ -1063,7 +1067,7 @@ class ResourceAuditor
       end
     end
 
-    if version.to_s =~ /^v/
+    if version.to_s.start_with?("v")
       problem "version #{version} should not have a leading 'v'"
     end
 
@@ -1196,8 +1200,8 @@ class ResourceAuditor
     # Check SourceForge urls
     urls.each do |p|
       # Skip if the URL looks like a SVN repo
-      next if p =~ %r{/svnroot/}
-      next if p =~ /svn\.sourceforge/
+      next if p.include? "/svnroot/"
+      next if p.include? "svn.sourceforge"
 
       # Is it a sourceforge http(s) URL?
       next unless p =~ %r{^https?://.*\b(sourceforge|sf)\.(com|net)}
