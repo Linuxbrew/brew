@@ -32,7 +32,7 @@ class SystemConfig
       s = describe_homebrew_ruby_version
 
       if RUBY_PATH.to_s !~ %r{^/System/Library/Frameworks/Ruby.framework/Versions/[12]\.[089]/usr/bin/ruby}
-        s << " => #{RUBY_PATH}"
+        s = "#{s} => #{RUBY_PATH}"
       end
       s
     end
