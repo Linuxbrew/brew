@@ -31,10 +31,11 @@ class SystemConfig
     def describe_homebrew_ruby
       s = describe_homebrew_ruby_version
 
-      if RUBY_PATH.to_s !~ %r{^/System/Library/Frameworks/Ruby.framework/Versions/[12]\.[089]/usr/bin/ruby}
-        s = "#{s} => #{RUBY_PATH}"
+      if RUBY_PATH.to_s !~ %r{^/System/Library/Frameworks/Ruby\.framework/Versions/[12]\.[089]/usr/bin/ruby}
+        "#{s} => #{RUBY_PATH}"
+      else
+        s
       end
-      s
     end
 
     def dump_verbose_config(f = $stdout)
