@@ -279,7 +279,7 @@ class Version
 
     stem = if spec.directory?
       spec.basename.to_s
-    elsif %r{((?:sourceforge.net|sf.net)/.*)/download$}.match(spec_s)
+    elsif %r{((?:sourceforge\.net|sf\.net)/.*)/download$}.match(spec_s)
       Pathname.new(spec.dirname).stem
     else
       spec.stem
@@ -290,7 +290,7 @@ class Version
     # e.g. https://github.com/sam-github/libnet/tarball/libnet-1.1.4
     # e.g. https://github.com/isaacs/npm/tarball/v0.2.5-1
     # e.g. https://github.com/petdance/ack/tarball/1.93_02
-    m = %r{github.com/.+/(?:zip|tar)ball/(?:v|\w+-)?((?:\d+[-._])+\d*)$}.match(spec_s)
+    m = %r{github\.com/.+/(?:zip|tar)ball/(?:v|\w+-)?((?:\d+[-._])+\d*)$}.match(spec_s)
     return m.captures.first unless m.nil?
 
     # e.g. https://github.com/erlang/otp/tarball/OTP_R15B01 (erlang style)

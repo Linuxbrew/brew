@@ -503,7 +503,7 @@ class FormulaAuditor
     when %r{^http://[^/]*\.apache\.org},
          %r{^http://packages\.debian\.org},
          %r{^http://wiki\.freedesktop\.org/},
-         %r{^http://((?:www)\.)?gnupg.org/},
+         %r{^http://((?:www)\.)?gnupg\.org/},
          %r{^http://ietf\.org},
          %r{^http://[^/.]+\.ietf\.org},
          %r{^http://[^/.]+\.tools\.ietf\.org},
@@ -531,7 +531,7 @@ class FormulaAuditor
   def audit_github_repository
     return unless @online
 
-    regex = %r{https?://github.com/([^/]+)/([^/]+)/?.*}
+    regex = %r{https?://github\.com/([^/]+)/([^/]+)/?.*}
     _, user, repo = *regex.match(formula.stable.url) if formula.stable
     _, user, repo = *regex.match(formula.homepage) unless user
     return if !user || !repo

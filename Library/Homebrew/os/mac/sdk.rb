@@ -46,7 +46,7 @@ module OS
             paths = {}
 
             Dir[File.join(sdk_prefix, "MacOSX*.sdk")].each do |sdk_path|
-              version = sdk_path[/MacOSX(\d+\.\d+)u?.sdk$/, 1]
+              version = sdk_path[/MacOSX(\d+\.\d+)u?\.sdk$/, 1]
               paths[version] = sdk_path unless version.nil?
             end
 

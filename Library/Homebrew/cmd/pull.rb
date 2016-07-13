@@ -51,7 +51,7 @@ module Homebrew
         issue = arg
         url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
         tap = CoreTap.instance
-      elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
+      elsif (testing_match = arg.match %r{brew\.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
         url = "https://github.com/Homebrew/homebrew-core/compare/master...BrewTestBot:testing-#{testing_job}"
         tap = CoreTap.instance

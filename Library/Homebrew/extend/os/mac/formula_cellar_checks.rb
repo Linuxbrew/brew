@@ -27,7 +27,7 @@ module FormulaCellarChecks
     keg = Keg.new(formula.prefix)
     system_openssl = keg.mach_o_files.select do |obj|
       dlls = obj.dynamically_linked_libraries
-      dlls.any? { |dll| %r{/usr/lib/lib(crypto|ssl).(\d\.)*dylib}.match dll }
+      dlls.any? { |dll| %r{/usr/lib/lib(crypto|ssl)\.(\d\.)*dylib}.match dll }
     end
     return if system_openssl.empty?
 
