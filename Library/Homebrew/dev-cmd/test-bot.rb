@@ -366,7 +366,7 @@ module Homebrew
         # the right commit to BrewTestBot.
         if !travis_pr && !ARGV.include?("--no-pull")
           diff_start_sha1 = current_sha1
-          test "brew", "pull", "--clean", "--tap=#{@tap}", @url
+          test "brew", "pull", "--clean", *[@tap ? "--tap=#{@tap}" : nil, @url].compact
           diff_end_sha1 = current_sha1
         end
         @short_url = @url.gsub("https://github.com/", "")
@@ -887,7 +887,7 @@ module Homebrew
 
     if pr
       pull_pr = "#{tap.remote}/pull/#{pr}"
-      safe_system "brew", "pull", "--clean", "--tap=#{tap}", pull_pr
+      safe_system "brew", "pull", "--clean", *[tap ? "--tap=#{tap}" : nil, pull_pr].compact
     elsif docker_sha1
       url = "https://github.com/#{docker_user}/homebrew-#{tap.repo}/commit/#{docker_sha1}"
       safe_system "brew", "pull", "--clean", url
