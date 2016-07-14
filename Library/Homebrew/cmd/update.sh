@@ -24,7 +24,8 @@ git_init_if_necessary() {
   then
     BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
-  else
+  elif [[ -n "$HOMEBREW_LINUX" ]]
+  then
     BREW_OFFICIAL_REMOTE="https://github.com/Linuxbrew/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Linuxbrew/homebrew-core"
   fi

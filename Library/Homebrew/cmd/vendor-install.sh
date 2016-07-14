@@ -18,7 +18,8 @@ then
     ruby_URL=""
     ruby_SHA=""
   fi
-else
+elif [[ -n "$HOMEBREW_LINUX" ]]
+then
   ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.0.0-p648.x86_64_linux.bottle.tar.gz"
   ruby_SHA="dbb5118a22a6a75cc77e62544a3d8786d383fab1bdaf8c154951268807357bf0"
 fi
