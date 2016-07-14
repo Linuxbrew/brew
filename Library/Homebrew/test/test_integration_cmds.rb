@@ -358,7 +358,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_sh
     assert_match "Your shell has been configured",
-                 cmd("sh", "SHELL" => "/usr/bin/true")
+                 cmd("sh", "SHELL" => which("true"))
   end
 
   def test_info
@@ -588,10 +588,7 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert((share/"notpruneable").directory?)
     refute((share/"pruneable_symlink").symlink?)
 
-    # Inexact match because only if ~/Applications exists, will this output one
-    # more line with contents `No apps unlinked from /Users/<user/Applications`.
-    assert_match "Nothing pruned\nNo apps unlinked from /Applications",
-      cmd("prune", "--verbose")
+    assert_match "Nothing pruned", cmd("prune", "--verbose")
   end
 
   def test_custom_command

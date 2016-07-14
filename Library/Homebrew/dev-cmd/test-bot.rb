@@ -664,6 +664,8 @@ module Homebrew
           tests_args << "--coverage" if ENV["TRAVIS"]
         end
         test "brew", "tests", *tests_args
+        test "brew", "tests", "--generic", "--only=integration_cmds",
+                              *tests_args
         test "brew", "tests", "--no-compat"
         test "brew", "readall", "--syntax"
       else
