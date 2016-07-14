@@ -21,6 +21,7 @@
 #                        as raw bytes instead of re-encoding in UTF-8.
 # --fast:                Don't install any packages, but run e.g. audit anyway.
 # --keep-tmp:            Keep temporary files written by main installs and tests that are run.
+# --no-pull              Don't use `brew pull` when possible.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -354,7 +355,7 @@ module Homebrew
       elsif @url
         # TODO: in future Travis CI may need to also use `brew pull` to e.g. push
         # the right commit to BrewTestBot.
-        if !travis_pr || `git rev-parse #{ENV["sha1"]}` != `git rev-parse HEAD`
+        if !travis_pr || !ARGV.include?("--no-pull")
           diff_start_sha1 = current_sha1
           test "brew", "pull", "--clean", @url
           diff_end_sha1 = current_sha1
