@@ -354,7 +354,7 @@ module Homebrew
       elsif @url
         # TODO: in future Travis CI may need to also use `brew pull` to e.g. push
         # the right commit to BrewTestBot.
-        unless travis_pr
+        if !travis_pr || ENV["ghprbActualCommit"].chomp != `git rev-parse HEAD`
           diff_start_sha1 = current_sha1
           test "brew", "pull", "--clean", @url
           diff_end_sha1 = current_sha1
