@@ -304,10 +304,11 @@ module Homebrew
         @url = ENV["ghprbPullLink"]
         @hash = nil
         test "git", "checkout", "origin/master"
-      elsif ENV["GIT_BRANCH"] && ENV["GIT_URL"]
+      elsif ENV["GIT_URL"] && ENV["GIT_BRANCH"]
+        git_url = ENV["GIT_URL"].chomp("/").chomp(".git")
         %r{origin/pr/(\d+)/(merge|head)} =~ ENV["GIT_BRANCH"]
         pr = $1
-        @url = "#{ENV["GIT_URL"].chomp("/")}/pull/#{pr}"
+        @url = "#{git_url}/pull/#{pr}"
         @hash = nil
       # Use Travis CI pull-request variables for pull request jobs.
       elsif travis_pr
