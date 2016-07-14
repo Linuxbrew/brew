@@ -307,7 +307,7 @@ module Homebrew
       elsif ENV["GIT_BRANCH"] && ENV["GIT_URL"]
         %r{origin/pr/(\d+)/(merge|head)} =~ ENV["GIT_BRANCH"]
         pr = $1
-        @url = "#{ENV["GIT_URL"]}/pull/#{pr}"
+        @url = "#{ENV["GIT_URL"].chomp("/")}/pull/#{pr}"
         @hash = nil
       # Use Travis CI pull-request variables for pull request jobs.
       elsif travis_pr
