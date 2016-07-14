@@ -333,7 +333,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     url = @url
 
     if ENV["HOMEBREW_ARTIFACT_DOMAIN"]
-      url.sub!(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
+      url = url.sub(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
       ohai "Downloading from #{url}"
     end
 
