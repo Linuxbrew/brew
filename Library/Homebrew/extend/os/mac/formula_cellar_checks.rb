@@ -1,3 +1,5 @@
+require "os/mac/linkage_checker"
+
 module FormulaCellarChecks
   def check_shadowed_headers
     return if ["libtool", "subversion", "berkeley-db"].any? do |formula_name|
@@ -56,10 +58,33 @@ module FormulaCellarChecks
     EOS
   end
 
+  def check_linkage
+    return unless formula.prefix.directory?
+    keg = Keg.new(formula.prefix)
+    checker = LinkageChecker.new(keg, formula)
+
+    if checker.broken_dylibs?
+      audit_check_output <<-EOS.undent
+        The installation was broken.
+        Broken dylib links found:
+          #{checker.broken_dylibs.to_a * "\n          "}
+      EOS
+    end
+
+    if checker.undeclared_deps?
+      audit_check_output <<-EOS.undent
+        Formulae are required to declare all linked dependencies.
+        Please add all linked dependencies to the formula with:
+          #{checker.undeclared_deps.map { |d| "depends_on \"#{d}\" => :linked"} * "\n          "}
+      EOS
+    end
+  end
+
   def audit_installed
     generic_audit_installed
     audit_check_output(check_shadowed_headers)
     audit_check_output(check_openssl_links)
     audit_check_output(check_python_framework_links(formula.lib))
+    check_linkage
   end
 end

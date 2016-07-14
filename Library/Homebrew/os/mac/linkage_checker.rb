@@ -3,12 +3,13 @@ require "keg"
 require "formula"
 
 class LinkageChecker
-  attr_reader :keg
+  attr_reader :keg, :formula
   attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :variable_dylibs
   attr_reader :undeclared_deps, :reverse_links
 
-  def initialize(keg)
+  def initialize(keg, formula = nil)
     @keg = keg
+    @formula = formula || resolve_formula(keg)
     @brewed_dylibs = Hash.new { |h, k| h[k] = Set.new }
     @system_dylibs = Set.new
     @broken_dylibs = Set.new
@@ -34,25 +35,43 @@ class LinkageChecker
           rescue Errno::ENOENT
             @broken_dylibs << dylib
           else
-            @brewed_dylibs[owner.name] << dylib
+            tap = Tab.for_keg(owner).tap
+            f = if tap.nil? || tap.core_tap?
+              owner.name
+            else
+              "#{tap}/#{owner.name}"
+            end
+            @brewed_dylibs[f] << dylib
           end
         end
       end
     end
 
-    begin
-      f = Formulary.from_rack(keg.rack)
-      f.build = Tab.for_keg(keg)
+    @undeclared_deps = check_undeclared_deps if formula
+  end
+
+  def check_undeclared_deps
       filter_out = proc do |dep|
-        dep.build? || (dep.optional? && !dep.option_names.any? { |n| f.build.with?(n) })
+        next true if dep.build?
+        dep.optional? && !dep.option_names.any? { |n| formula.build.with?(n) }
       end
-      declared_deps = f.deps.reject { |dep| filter_out.call(dep) }.map(&:name) +
-                      f.requirements.reject { |req| filter_out.call(req) }.map(&:default_formula).compact
-      @undeclared_deps = @brewed_dylibs.keys - declared_deps.map { |dep| dep.split("/").last }
-      @undeclared_deps -= [f.name]
-    rescue FormulaUnavailableError
-      opoo "Formula unavailable: #{keg.name}"
-    end
+      declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
+      declared_requirement_deps = formula.requirements.reject { |req| filter_out.call(req) }.map(&:default_formula).compact
+      declared_dep_names = (declared_deps + declared_requirement_deps).map { |dep| dep.split("/").last }
+      undeclared_deps = @brewed_dylibs.keys.select do |full_name|
+        name = full_name.split("/").last
+        next false if name == formula.name
+        !declared_dep_names.include?(name)
+      end
+      undeclared_deps.sort do |a,b|
+        if a.include?("/") && !b.include?("/")
+          1
+        elsif !a.include?("/") && b.include?("/")
+          -1
+        else
+          a <=> b
+        end
+      end
   end
 
   def display_normal_output
@@ -79,8 +98,6 @@ class LinkageChecker
   def display_test_output
     display_items "Missing libraries", @broken_dylibs
     puts "No broken dylib links" if @broken_dylibs.empty?
-    display_items "Possible undeclared dependencies", @undeclared_deps
-    puts "No undeclared dependencies" if @undeclared_deps.empty?
   end
 
   def broken_dylibs?
@@ -109,5 +126,13 @@ class LinkageChecker
         puts "  #{item}"
       end
     end
+  end
+
+  def resolve_formula(keg)
+    f = Formulary.from_rack(keg.rack)
+    f.build = Tab.for_keg(keg)
+    f
+  rescue FormulaUnavailableError
+    opoo "Formula unavailable: #{keg.name}"
   end
 end
