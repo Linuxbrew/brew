@@ -419,7 +419,8 @@ module Homebrew
       return if ARGV.include? "--skip-setup"
       if !ENV["TRAVIS"] && ENV["HOMEBREW_RUBY"] != "1.8.7" &&
           HOMEBREW_PREFIX.to_s == "/usr/local"
-      test "brew", "doctor"
+        test "brew", "doctor"
+      end
       test "brew", "--env"
       test "brew", "config"
     end
