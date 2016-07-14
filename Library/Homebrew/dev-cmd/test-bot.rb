@@ -417,7 +417,9 @@ module Homebrew
     def setup
       @category = __method__
       return if ARGV.include? "--skip-setup"
-      test "brew", "doctor" if !ENV["TRAVIS"] && ENV["HOMEBREW_RUBY"] != "1.8.7"
+      if !ENV["TRAVIS"] && ENV["HOMEBREW_RUBY"] != "1.8.7" &&
+          HOMEBREW_PREFIX.to_s == "/usr/local"
+      test "brew", "doctor"
       test "brew", "--env"
       test "brew", "config"
     end
