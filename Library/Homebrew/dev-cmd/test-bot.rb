@@ -262,6 +262,7 @@ module Homebrew
     end
 
     def git(*args)
+      puts "#{@repository}: git #{args.join " "}" if ENV["JENKINS_HOME"]
       @repository.cd { Utils.popen_read("git", *args) }
     end
 
