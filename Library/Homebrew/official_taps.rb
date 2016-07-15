@@ -1,6 +1,5 @@
 OFFICIAL_TAPS = %w[
   apache
-  binary
   completions
   devel-only
   dupes

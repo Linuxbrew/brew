@@ -6,9 +6,7 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 
 *   [homebrew/apache](https://github.com/Homebrew/homebrew-apache): A tap for Apache modules, extending OS X's built-in Apache. These brews may require unconventional additional setup, as explained in the caveats.
 
-*   [homebrew/binary](https://github.com/Homebrew/homebrew-binary): Precompiled binary formulae.
-
-*   [homebrew/boneyard](https://github.com/Homebrew/homebrew-boneyard): Formula are not deleted, they are moved here.
+*   [homebrew/boneyard](https://github.com/Homebrew/homebrew-boneyard): Formulae from other official taps, primarily (homebrew/core) are not deleted, they are moved here.
 
 *   [homebrew/bundle](https://github.com/Homebrew/homebrew-bundle): Bundler for non-Ruby dependencies from Homebrew.
 
@@ -31,6 +29,8 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 *   [homebrew/python](https://github.com/Homebrew/homebrew-python): A few Python formulae that do not build well with `pip` alone.
 
 *   [homebrew/science](https://github.com/Homebrew/homebrew-science): A collection of scientific libraries and tools.
+
+*   [homebrew/services](https://github.com/Homebrew/homebrew-services): A tool to start Homebrew formulae's plists with `launchctl`.
 
 *   [homebrew/versions](https://github.com/Homebrew/homebrew-versions): Need e.g. older or newer versions of Postgresql? Older versions of GCC?
 
@@ -56,9 +56,7 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 *   [mistydemeo/tigerbrew](https://github.com/mistydemeo/tigerbrew): Experimental Tiger PowerPC version
 
-*   [homebrew/linuxbrew](https://github.com/Homebrew/linuxbrew): Experimental Linux version
-
-*   [nddrylliog/homebrew-mingw](https://github.com/nddrylliog/homebrew-mingw): An experimental port of Homebrew for Windows (with an MSYS/MinGW environment).
+*   [Linuxbrew/brew](https://github.com/Linuxbrew/brew): Experimental Linux version
 
 ## Technical Details
 

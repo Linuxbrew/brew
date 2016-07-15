@@ -5,13 +5,12 @@ def blacklisted?(name)
     EOS
   when "tex", "tex-live", "texlive", "latex" then <<-EOS.undent
     Installing TeX from source is weird and gross, requires a lot of patches,
-    and only builds 32-bit (and thus can't use Homebrew deps on Snow Leopard.)
+    and only builds 32-bit (and thus can't use Homebrew dependencies)
 
     We recommend using a MacTeX distribution: https://www.tug.org/mactex/
 
-    You can install it using Cask:
-
-    brew cask install mactex
+    You can install it with Homebrew Cask:
+      brew cask install mactex
     EOS
   when "pip" then <<-EOS.undent
     Homebrew provides pip via: `brew install python`. However you will then
@@ -84,9 +83,7 @@ def blacklisted?(name)
     and cabal-install instead:
       brew install ghc cabal-install
 
-    A binary installer is available:
-      https://www.haskell.org/platform/mac.html
-    Or via the cask:
+    You can install with Homebrew Cask:
       brew cask install haskell-platform
     EOS
   when "mysqldump-secure" then <<-EOS.undent
@@ -95,11 +92,7 @@ def blacklisted?(name)
   when "ngrok" then <<-EOS.undent
     Upstream sunsetted 1.x in March 2016 and 2.x is not open-source.
 
-    If you wish to use the 2.x release you can install it
-    either via Homebrew:
-      brew install homebrew/binary/ngrok2
-
-    Or via the Cask:
+    If you wish to use the 2.x release you can install with Homebrew Cask:
       brew cask install ngrok
     EOS
   end

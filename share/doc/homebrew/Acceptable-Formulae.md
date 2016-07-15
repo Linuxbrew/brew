@@ -57,9 +57,10 @@ point it to the downloaded archive in order to avoid loading.
 
 ### We don’t like binary formulae
 Our policy is that formulae in the core repository
-([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be built
-from source (or produce cross-platform binaries like e.g. Java). Binary-only
-formulae should go to [homebrew/binary](https://github.com/Homebrew/homebrew-binary) or [homebrew-cask](https://github.com/caskroom/homebrew-cask).
+([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be open-source
+and either built from source or produce cross-platform binaries like e.g. Java).
+Binary-only formulae should go to
+[Homebrew Cask](https://github.com/caskroom/homebrew-cask).
 
 ### Stable versions
 Formulae in the core repository must have a stable version tagged by
@@ -102,14 +103,11 @@ include things that don't meet these criteria or reject things that do.
 Please trust that we need to use our discretion based on our experience
 running a package manager.
 
-### Stuff that builds a .app
+### Stuff that builds an .app
 Don’t make your formula build an `.app` (native OS X Application); we
-don’t want those things in Homebrew. Make it build a command line tool
-or a library. However, we have a few exceptions to that, e.g. when the
-App is just additional to CLI or if the GUI-application is non-native
-for OS X and/or hard to get in binary elsewhere (example: fontforge).
-Check out the [homebrew-cask](https://github.com/caskroom/homebrew-cask)
-project if you’d like to brew native OS X Applications.
+don’t want those things in Homebrew (but
+[Homebrew Cask](https://github.com/caskroom/homebrew-cask) does).
+Make it build a command-line tool or a library.
 
 ### Sometimes there are exceptions
 Even if all criteria are met we may not accept the formula.
