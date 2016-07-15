@@ -200,7 +200,6 @@ module Superenv
 
   def determine_cmake_include_path
     paths = []
-    paths << "#{effective_sysroot}/usr/include/libxml2" unless deps.any? { |d| d.name == "libxml2" }
     paths += homebrew_extra_cmake_include_paths
     paths.to_path_s
   end
