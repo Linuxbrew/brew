@@ -7,6 +7,10 @@ module Superenv
     bin.realpath unless bin.nil?
   end
 
+  def effective_sysroot
+    MacOS::Xcode.without_clt? ? MacOS.sdk_path.to_s : nil
+  end
+
   def homebrew_extra_paths
     paths = []
     # On 10.9, there are shims for all tools in /usr/bin.
