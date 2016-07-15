@@ -227,7 +227,7 @@ class Formulary
     tap = tab.tap
     spec ||= tab.spec
 
-    if tap.nil?
+    f = if tap.nil?
       factory(rack.basename.to_s, spec)
     else
       begin
@@ -237,6 +237,8 @@ class Formulary
         factory(rack.basename.to_s, spec)
       end
     end
+    f.build = tab
+    f
   end
 
   # Return a Formula instance directly from contents
