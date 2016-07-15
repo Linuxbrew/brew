@@ -1,20 +1,20 @@
 module Utils
   def self.git_available?
     return @git if instance_variable_defined?(:@git)
-    @git = quiet_system HOMEBREW_ENV_PATH/"scm/git", "--version"
+    @git = quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
   end
 
   def self.git_path
     return unless git_available?
     @git_path ||= Utils.popen_read(
-      HOMEBREW_ENV_PATH/"scm/git", "--homebrew=print-path"
+      HOMEBREW_SHIMS_PATH/"scm/git", "--homebrew=print-path"
     ).chuzzle
   end
 
   def self.git_version
     return unless git_available?
     @git_version ||= Utils.popen_read(
-      HOMEBREW_ENV_PATH/"scm/git", "--version"
+      HOMEBREW_SHIMS_PATH/"scm/git", "--version"
     ).chomp[/git version (\d+(?:\.\d+)*)/, 1]
   end
 

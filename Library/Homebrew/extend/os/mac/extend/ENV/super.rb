@@ -3,8 +3,7 @@ module Superenv
   def self.bin
     return unless DevelopmentTools.installed?
 
-    bin = HOMEBREW_ENV_PATH.subdirs.reject { |d| d.basename.to_s > MacOS::Xcode.version }.max
-    bin.realpath unless bin.nil?
+    (HOMEBREW_SHIMS_PATH/"super").realpath
   end
 
   def effective_sysroot
@@ -26,7 +25,8 @@ module Superenv
 
   # @private
   def homebrew_extra_pkg_config_paths
-    paths = ["#{HOMEBREW_ENV_PATH}/pkgconfig/#{MacOS.version}"]
+    paths = \
+      ["#{HOMEBREW_LIBRARY_PATH}/Homebrew/os/mac/pkgconfig/#{MacOS.version}"]
     paths << "#{MacOS::X11.lib}/pkgconfig" << "#{MacOS::X11.share}/pkgconfig" if x11?
     paths
   end

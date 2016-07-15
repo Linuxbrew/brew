@@ -14,7 +14,7 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 git() {
   if [[ -z "$GIT_EXECUTABLE" ]]
   then
-    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/ENV/scm/git" --homebrew=print-path)"
+    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/Homebrew/scm/git" --homebrew=print-path)"
   fi
   "$GIT_EXECUTABLE" "$@"
 }

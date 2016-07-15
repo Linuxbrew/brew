@@ -12,7 +12,7 @@ TEST_TMPDIR = ENV.fetch("HOMEBREW_TEST_TMPDIR") { |k|
 
 # Paths pointing into the Homebrew code base that persist across test runs
 HOMEBREW_LIBRARY_PATH  = Pathname.new(File.expand_path("../../..", __FILE__))
-HOMEBREW_ENV_PATH      = HOMEBREW_LIBRARY_PATH.parent+"ENV"
+HOMEBREW_SHIMS_PATH    = HOMEBREW_LIBRARY_PATH.parent+"Homebrew/shims"
 HOMEBREW_LOAD_PATH     = [File.expand_path("..", __FILE__), HOMEBREW_LIBRARY_PATH].join(":")
 
 # Paths redirected to a temporary directory and wiped at the end of the test run

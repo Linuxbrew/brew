@@ -14,8 +14,8 @@ HOMEBREW_REPOSITORY = Pathname.new(ENV["HOMEBREW_REPOSITORY"])
 # Where we store most of Homebrew, taps, and various metadata
 HOMEBREW_LIBRARY = Pathname.new(ENV["HOMEBREW_LIBRARY"])
 
-# Where wrapper scripts for Git, Subversion, and various build tools are stored
-HOMEBREW_ENV_PATH = HOMEBREW_LIBRARY/"ENV"
+# Where shim scripts for various build and SCM tools are stored
+HOMEBREW_SHIMS_PATH = HOMEBREW_LIBRARY/"Homebrew/shims"
 
 # Where we store lock files
 HOMEBREW_LOCK_DIR = HOMEBREW_LIBRARY/"Locks"

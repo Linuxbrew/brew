@@ -29,7 +29,7 @@ brew() {
 }
 
 git() {
-  "$HOMEBREW_LIBRARY/ENV/scm/git" "$@"
+  "$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" "$@"
 }
 
 # Force UTF-8 to avoid encoding issues for users with broken locale settings.

@@ -31,7 +31,7 @@ module Stdenv
   end
 
   def homebrew_extra_pkg_config_paths
-    ["#{HOMEBREW_ENV_PATH}/pkgconfig/#{MacOS.version}"]
+    ["#{HOMEBREW_LIBRARY_PATH}/Homebrew/os/mac/pkgconfig/#{MacOS.version}"]
   end
 
   # Sets architecture-specific flags for every environment variable

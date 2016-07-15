@@ -65,8 +65,8 @@ safe_exec() {
 }
 
 SCM_FILE="${0##*/}"
-SCM_DIR="$(quiet_safe_cd "${0%/*}/" && pwd -P)"
 SCM_REAL="$(realpath "$0")"
+SCM_DIR="$(quiet_safe_cd "${SCM_REAL%/*}/" && pwd -P)"
 
 if [[ "$1" = --homebrew=* ]]
 then
@@ -84,7 +84,7 @@ case "$(lowercase "$SCM_FILE")" in
     ;;
 esac
 
-brew_version="$(quiet_safe_cd "$SCM_DIR/../../../bin" && pwd -P)/$SCM_FILE"
+brew_version="$(quiet_safe_cd "$SCM_DIR/../../../../bin" && pwd -P)/$SCM_FILE"
 safe_exec "$brew_version" "$@"
 
 IFS=$'\n'
