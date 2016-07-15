@@ -681,13 +681,13 @@ module Homebrew
       git "stash"
       git "am", "--abort"
       git "rebase", "--abort"
-      git "reset", "--hard"
       git "checkout", "-f", "master"
+      git "reset", "--hard", "origin/master"
       git "clean", "-ffdx"
       unless @repository == HOMEBREW_REPOSITORY
         HOMEBREW_REPOSITORY.cd do
-          safe_system "git", "reset", "--hard"
           safe_system "git", "checkout", "-f", "master"
+          safe_system "git", "reset", "--hard", "origin/master"
           # This will uninstall all formulae, as long as
           # HOMEBREW_REPOSITORY == HOMEBREW_PREFIX, which is true on the test bots
           unless ENV["HOMEBREW_RUBY"] == "1.8.7"
@@ -710,16 +710,19 @@ module Homebrew
       end
 
       if ARGV.include? "--cleanup"
-        test "git", "reset", "--hard"
+        git "reset", "--hard", "origin/master"
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
         git "gc", "--auto"
         test "git", "clean", "-ffdx"
-        HOMEBREW_REPOSITORY.cd do
-          safe_system "git", "reset", "--hard"
-          Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
-          safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+        unless @repository == HOMEBREW_REPOSITORY
+          HOMEBREW_REPOSITORY.cd do
+            safe_system "git", "reset", "--hard"
+            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+          end
         end
+        Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
+
         if ARGV.include? "--local"
           FileUtils.rm_rf ENV["HOMEBREW_HOME"]
           FileUtils.rm_rf ENV["HOMEBREW_LOGS"]
