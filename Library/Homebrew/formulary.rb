@@ -219,10 +219,18 @@ class Formulary
   # It will auto resolve formula's spec when requested spec is nil
   def self.from_rack(rack, spec = nil)
     kegs = rack.directory? ? rack.subdirs.map { |d| Keg.new(d) } : []
-
     keg = kegs.detect(&:linked?) || kegs.detect(&:optlinked?) || kegs.max_by(&:version)
-    return factory(rack.basename.to_s, spec || :stable) unless keg
 
+    if keg
+      from_keg(keg, spec)
+    else
+      factory(rack.basename.to_s, spec || :stable)
+    end
+  end
+
+  # Return a Formula instance for the given keg.
+  # It will auto resolve formula's spec when requested spec is nil
+  def self.from_keg(keg, spec = nil)
     tab = Tab.for_keg(keg)
     tap = tab.tap
     spec ||= tab.spec
@@ -231,10 +239,10 @@ class Formulary
       factory(rack.basename.to_s, spec)
     else
       begin
-        factory("#{tap}/#{rack.basename}", spec)
+        factory("#{tap}/#{keg.rack.basename}", spec)
       rescue FormulaUnavailableError
         # formula may be migrated to different tap. Try to search in core and all taps.
-        factory(rack.basename.to_s, spec)
+        factory(keg.rack.basename.to_s, spec)
       end
     end
     f.build = tab

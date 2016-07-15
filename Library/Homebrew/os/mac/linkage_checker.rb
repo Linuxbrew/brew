@@ -129,9 +129,7 @@ class LinkageChecker
   end
 
   def resolve_formula(keg)
-    f = Formulary.from_rack(keg.rack)
-    f.build = Tab.for_keg(keg)
-    f
+    Formulary.from_keg(keg)
   rescue FormulaUnavailableError
     opoo "Formula unavailable: #{keg.name}"
   end
