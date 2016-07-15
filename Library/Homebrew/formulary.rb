@@ -236,7 +236,7 @@ class Formulary
     spec ||= tab.spec
 
     f = if tap.nil?
-      factory(rack.basename.to_s, spec)
+      factory(keg.rack.basename.to_s, spec)
     else
       begin
         factory("#{tap}/#{keg.rack.basename}", spec)
