@@ -1324,6 +1324,8 @@ class Formula
   # @private
   def run_test
     old_home = ENV["HOME"]
+    old_curl_home = ENV["CURL_HOME"]
+    ENV["CURL_HOME"] = old_curl_home || old_home
     build, self.build = self.build, Tab.for_formula(self)
     mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
@@ -1341,6 +1343,7 @@ class Formula
     @testpath = nil
     self.build = build
     ENV["HOME"] = old_home
+    ENV["CURL_HOME"] = old_curl_home
   end
 
   # @private
@@ -1555,6 +1558,8 @@ class Formula
       mkdir_p env_home
 
       old_home, ENV["HOME"] = ENV["HOME"], env_home
+      old_curl_home = ENV["CURL_HOME"]
+      ENV["CURL_HOME"] = old_curl_home || old_home
       setup_home env_home
 
       begin
@@ -1562,6 +1567,7 @@ class Formula
       ensure
         @buildpath = nil
         ENV["HOME"] = old_home
+        ENV["CURL_HOME"] = old_curl_home
       end
     end
   end
