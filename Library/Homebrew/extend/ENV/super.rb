@@ -95,9 +95,6 @@ module Superenv
     self["HOMEBREW_CXX"] = super
   end
 
-  def effective_sysroot
-  end
-
   def determine_cxx
     determine_cc.to_s.gsub("gcc", "g++").gsub("clang", "clang++")
   end
