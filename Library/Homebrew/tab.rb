@@ -179,6 +179,18 @@ class Tab < OpenStruct
     include?("32-bit")
   end
 
+  def head?
+    spec == :head
+  end
+
+  def devel?
+    spec == :devel
+  end
+
+  def stable?
+    spec == :stable
+  end
+
   def used_options
     Options.create(super)
   end
