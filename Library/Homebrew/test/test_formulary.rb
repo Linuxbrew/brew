@@ -90,12 +90,17 @@ class FormularyFactoryTest < Homebrew::TestCase
     alias_dir.rmtree
   end
 
-  def test_factory_from_rack
+  def test_factory_from_rack_and_from_keg
     formula = Formulary.factory(@path)
     installer = FormulaInstaller.new(formula)
     shutup { installer.install }
     keg = Keg.new(formula.prefix)
-    assert_kind_of Formula, Formulary.from_rack(formula.rack)
+    f = Formulary.from_rack(formula.rack)
+    assert_kind_of Formula, f
+    assert_kind_of Tab, f.build
+    f = Formulary.from_keg(keg)
+    assert_kind_of Formula, f
+    assert_kind_of Tab, f.build
   ensure
     keg.unlink
     keg.uninstall
