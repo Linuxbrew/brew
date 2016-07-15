@@ -64,7 +64,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       cmd_args << "-rsimplecov"
     end
     cmd_args << "-rintegration_mocks"
-    cmd_args << (HOMEBREW_LIBRARY_PATH/"../brew.rb").resolved_path.to_s
+    cmd_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
     cmd_args += args
     Bundler.with_original_env do
       ENV["HOMEBREW_BREW_FILE"] = HOMEBREW_PREFIX/"bin/brew"

@@ -9,7 +9,7 @@
 # shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
-# Replaces the function in Library/brew.sh to cache the Git executable to
+# Replaces the function in Library/Homebrew/brew.sh to cache the Git executable to
 # provide speedup when using Git repeatedly (as update.sh does).
 git() {
   if [[ -z "$GIT_EXECUTABLE" ]]

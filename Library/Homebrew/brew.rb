@@ -1,7 +1,7 @@
 std_trap = trap("INT") { exit! 130 } # no backtrace thanks
 
 require "pathname"
-HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent.join("Homebrew")
+HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
 $:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
 

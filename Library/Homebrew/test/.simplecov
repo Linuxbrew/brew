@@ -34,7 +34,7 @@ SimpleCov.start do
   add_group "OS", "/Homebrew/os/"
   add_group "Requirements", "/Homebrew/requirements/"
   add_group "Scripts", %w[
-    /brew.rb
+    /Homebrew/brew.rb
     /Homebrew/build.rb
     /Homebrew/postinstall.rb
     /Homebrew/test.rb
