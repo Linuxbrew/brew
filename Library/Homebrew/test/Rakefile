@@ -1,8 +1,15 @@
 require "rake"
 require "rake/testtask"
 
+def mac?
+  return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
+  RUBY_PLATFORM.to_s.downcase.include? "darwin"
+end
+
 TEST_DIRECTORY = File.dirname(File.expand_path(__FILE__))
-TEST_FILES = Dir["#{TEST_DIRECTORY}/test_*.rb"]
+TEST_FILES = Dir["#{TEST_DIRECTORY}/test_*.rb"].reject do |f|
+  f.include?("/test_os_mac_") && !mac?
+end
 
 task :default => :test
 
