@@ -130,11 +130,11 @@ module OS
       end
 
       def provides_gcc?
-        version < "4.3"
+        installed? && version < "4.3"
       end
 
       def provides_cvs?
-        version < "5.0"
+        installed? && version < "5.0"
       end
 
       def default_prefix?
