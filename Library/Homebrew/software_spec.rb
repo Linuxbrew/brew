@@ -53,7 +53,7 @@ class SoftwareSpec
     @resource.owner = self
     resources.each_value do |r|
       r.owner     = self
-      r.version ||= version
+      r.version ||= (version.head? ? Version.create("HEAD") : version.dup)
     end
     patches.each { |p| p.owner = self }
   end
