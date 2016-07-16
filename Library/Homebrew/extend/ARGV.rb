@@ -25,7 +25,7 @@ module HomebrewArgvExtension
   def resolved_formulae
     require "formula"
     @resolved_formulae ||= (downcased_unique_named - casks).map do |name|
-      if name.include?("/")
+      if name.include?("/") || File.exist?(name)
         f = Formulary.factory(name, spec)
         if f.any_version_installed?
           tab = Tab.for_formula(f)
@@ -254,7 +254,7 @@ module HomebrewArgvExtension
   def downcased_unique_named
     # Only lowercase names, not paths, bottle filenames or URLs
     @downcased_unique_named ||= named.map do |arg|
-      if arg.include?("/") || arg.end_with?(".tar.gz")
+      if arg.include?("/") || arg.end_with?(".tar.gz") || File.exist?(arg)
         arg
       else
         arg.downcase
