@@ -96,7 +96,7 @@ module Homebrew
 
         <<-EOS.undent
           No developer tools installed.
-          Install clang or gcc.
+          #{DevelopmentTools.installation_instructions}
         EOS
       end
 

@@ -48,104 +48,23 @@ module Homebrew
         EOS
       end
 
-      # TODO: distill down into single method definition a la BuildToolsError
-      if MacOS.version >= "10.9"
-        def check_for_installed_developer_tools
-          return if MacOS::Xcode.installed? || MacOS::CLT.installed?
+      def check_xcode_up_to_date
+        return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
 
-          <<-EOS.undent
-            No developer tools installed.
-            Install the Command Line Tools:
-              xcode-select --install
-          EOS
-        end
+        <<-EOS.undent
+          Your Xcode (#{MacOS::Xcode.version}) is outdated
+          Please update to Xcode #{MacOS::Xcode.latest_version}.
+          #{MacOS::Xcode.update_instructions}
+        EOS
+      end
 
-        if OS::Mac.prerelease?
-          def check_xcode_up_to_date
-            return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
+      def check_clt_up_to_date
+        return unless MacOS::CLT.installed? && MacOS::CLT.outdated?
 
-            <<-EOS.undent
-              Your Xcode (#{MacOS::Xcode.version}) is outdated
-              Please update to Xcode #{MacOS::Xcode.latest_version}.
-              Xcode can be updated from
-                https://developer.apple.com/xcode/downloads/
-            EOS
-          end
-        else
-          def check_xcode_up_to_date
-            return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
-
-            <<-EOS.undent
-              Your Xcode (#{MacOS::Xcode.version}) is outdated
-              Please update to Xcode #{MacOS::Xcode.latest_version}.
-              Xcode can be updated from the App Store.
-            EOS
-          end
-        end
-
-        def check_clt_up_to_date
-          return unless MacOS::CLT.installed? && MacOS::CLT.outdated?
-
-          <<-EOS.undent
-            A newer Command Line Tools release is available.
-            Update them from Software Update in the App Store.
-          EOS
-        end
-      elsif MacOS.version == "10.8" || MacOS.version == "10.7"
-        def check_for_installed_developer_tools
-          return if MacOS::Xcode.installed? || MacOS::CLT.installed?
-
-          <<-EOS.undent
-            No developer tools installed.
-            You should install the Command Line Tools.
-            The standalone package can be obtained from
-              https://developer.apple.com/downloads
-            or it can be installed via Xcode's preferences.
-          EOS
-        end
-
-        def check_xcode_up_to_date
-          return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
-
-          <<-EOS.undent
-            Your Xcode (#{MacOS::Xcode.version}) is outdated
-            Please update to Xcode #{MacOS::Xcode.latest_version}.
-            Xcode can be updated from
-              https://developer.apple.com/xcode/downloads/
-          EOS
-        end
-
-        def check_clt_up_to_date
-          return unless MacOS::CLT.installed? && MacOS::CLT.outdated?
-
-          <<-EOS.undent
-            A newer Command Line Tools release is available.
-            The standalone package can be obtained from
-              https://developer.apple.com/downloads
-            or it can be installed via Xcode's preferences.
-          EOS
-        end
-      else
-        def check_for_installed_developer_tools
-          return if MacOS::Xcode.installed?
-
-          <<-EOS.undent
-            Xcode is not installed. Most formulae need Xcode to build.
-            It can be installed from
-              https://developer.apple.com/xcode/downloads/
-          EOS
-        end
-
-        def check_xcode_up_to_date
-          return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
-
-          <<-EOS.undent
-            Your Xcode (#{MacOS::Xcode.version}) is outdated
-            Please update to Xcode #{MacOS::Xcode.latest_version}.
-            Xcode can be updated from
-              https://developer.apple.com/xcode/downloads/
-          EOS
-        end
+        <<-EOS.undent
+          A newer Command Line Tools release is available.
+          #{MacOS::CLT.update_instructions}
+        EOS
       end
 
       def check_for_osx_gcc_installer
