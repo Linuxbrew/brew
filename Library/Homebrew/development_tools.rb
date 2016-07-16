@@ -19,6 +19,12 @@ class DevelopmentTools
       which("clang") || which("gcc")
     end
 
+    def installation_instructions
+      "Install Clang or brew install gcc"
+    end
+    alias_method :custom_installation_instructions,
+                 :installation_instructions
+
     def default_cc
       cc = DevelopmentTools.locate "cc"
       cc.realpath.basename.to_s rescue nil
