@@ -109,7 +109,7 @@ class Tab < OpenStruct
       paths << dirs.first
     end
 
-    paths << f.prefix
+    paths << f.installed_prefix
 
     path = paths.map { |pn| pn.join(FILENAME) }.find(&:file?)
 
