@@ -372,36 +372,11 @@ class BuildToolsError < RuntimeError
       package_text = "a binary package"
     end
 
-    if MacOS.version >= "10.10"
-      xcode_text = <<-EOS.undent
-        To continue, you must install Xcode from the App Store,
-        or the CLT by running:
-          xcode-select --install
-      EOS
-    elsif MacOS.version == "10.9"
-      xcode_text = <<-EOS.undent
-        To continue, you must install Xcode from:
-          https://developer.apple.com/downloads/
-        or the CLT by running:
-          xcode-select --install
-      EOS
-    elsif MacOS.version >= "10.7"
-      xcode_text = <<-EOS.undent
-        To continue, you must install Xcode or the CLT from:
-          https://developer.apple.com/downloads/
-      EOS
-    else
-      xcode_text = <<-EOS.undent
-        To continue, you must install Xcode from:
-          https://developer.apple.com/xcode/downloads/
-      EOS
-    end
-
     super <<-EOS.undent
       The following #{formula_text}:
         #{formulae.join(", ")}
       cannot be installed as #{package_text} and must be built from source.
-      #{xcode_text}
+      #{DevelopmentTools.installation_instructions}
     EOS
   end
 end
@@ -419,36 +394,12 @@ class BuildFlagsError < RuntimeError
       require_text = "requires"
     end
 
-    if MacOS.version >= "10.10"
-      xcode_text = <<-EOS.undent
-        or install Xcode from the App Store, or the CLT by running:
-          xcode-select --install
-      EOS
-    elsif MacOS.version == "10.9"
-      xcode_text = <<-EOS.undent
-        or install Xcode from:
-          https://developer.apple.com/downloads/
-        or the CLT by running:
-          xcode-select --install
-      EOS
-    elsif MacOS.version >= "10.7"
-      xcode_text = <<-EOS.undent
-        or install Xcode or the CLT from:
-          https://developer.apple.com/downloads/
-      EOS
-    else
-      xcode_text = <<-EOS.undent
-        or install Xcode from:
-          https://developer.apple.com/xcode/downloads/
-      EOS
-    end
-
     super <<-EOS.undent
       The following #{flag_text}:
         #{flags.join(", ")}
       #{require_text} building tools, but none are installed.
-      Either remove the #{flag_text} to attempt bottle installation,
-      #{xcode_text}
+      #{DevelopmentTools.installation_instructions}
+      Alternatively, remove the #{flag_text} to attempt bottle installation.
     EOS
   end
 end
@@ -457,23 +408,10 @@ end
 # the compilers available on the user's system
 class CompilerSelectionError < RuntimeError
   def initialize(formula)
-    if MacOS.version > :tiger
-      super <<-EOS.undent
-        #{formula.full_name} cannot be built with any available compilers.
-        To install this formula, you may need to:
-          brew install gcc
-        EOS
-    # Tiger doesn't ship with apple-gcc42, and this is required to build
-    # some software that doesn't build properly with FSF GCC.
-    else
-      super <<-EOS.undent
-        #{formula.full_name} cannot be built with any available compilers.
-        To install this formula, you may need to either:
-          brew install apple-gcc42
-        or:
-          brew install gcc
-        EOS
-    end
+    super <<-EOS.undent
+      #{formula.full_name} cannot be built with any available compilers.
+      #{DevelopmentTools.custom_installation_instructions}
+    EOS
   end
 end
 
