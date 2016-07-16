@@ -195,19 +195,30 @@ then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"
 fi
 
-if [[ "$(id -u)" = "0" && "$(/usr/bin/stat -f%u "$HOMEBREW_BREW_FILE")" != "0" ]]
-then
+check-run-command-as-root() {
   case "$HOMEBREW_COMMAND" in
-    analytics|install|reinstall|postinstall|link|pin|update|upgrade|vendor-install|create|migrate|tap|tap-pin|switch)
+      analytics|create|install|link|migrate|pin|postinstall|reinstall|switch|tap|tap-pin|\
+      update|upgrade|vendor-install)
+      ;;
+    *)
+      return
+      ;;
+  esac
+
+  [[ "$(id -u)" = 0 ]] || return
+
+  local brew_file_ls_info=($(ls -nd "$HOMEBREW_BREW_FILE"))
+  if [[ "${brew_file_ls_info[2]}" != 0 ]]
+  then
       odie <<EOS
 Cowardly refusing to 'sudo brew $HOMEBREW_COMMAND'
 You can use brew with sudo, but only if the brew executable is owned by root.
 However, this is both not recommended and completely unsupported so do so at
 your own risk.
 EOS
-      ;;
-  esac
-fi
+  fi
+}
+check-run-command-as-root
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
