@@ -63,8 +63,10 @@ module Homebrew
       !$?.success?
     when :json
       json = Utils.popen_read_text("rubocop", "--format", "json", *args)
-      # exit status of 1 just means violations were found; others are errors
-      raise "Error while running rubocop" if $?.exitstatus > 1
+      # exit status of 1 just means violations were found; other numbers mean execution errors
+      # exitstatus can also be nil if RuboCop process crashes, e.g. due to
+      # native extension problems
+      raise "Error while running RuboCop" if $?.exitstatus.nil? || $?.exitstatus > 1
       RubocopResults.new(Utils::JSON.load(json))
     else
       raise "Invalid output_type for check_style_impl: #{output_type}"
