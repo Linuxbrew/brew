@@ -26,7 +26,7 @@ module Superenv
   # @private
   def homebrew_extra_pkg_config_paths
     paths = \
-      ["#{HOMEBREW_LIBRARY_PATH}/Homebrew/os/mac/pkgconfig/#{MacOS.version}"]
+      ["#{HOMEBREW_LIBRARY}/Homebrew/os/mac/pkgconfig/#{MacOS.version}"]
     paths << "#{MacOS::X11.lib}/pkgconfig" << "#{MacOS::X11.share}/pkgconfig" if x11?
     paths
   end
