@@ -30,10 +30,6 @@ class BlacklistTests < Homebrew::TestCase
     %w[lzma liblzma].each { |s| assert_blacklisted s }
   end
 
-  def test_xcode
-    %w[xcode Xcode].each { |s| assert_blacklisted s }
-  end
-
   def test_gtest
     %w[gtest googletest google-test].each { |s| assert_blacklisted s }
   end
