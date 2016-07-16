@@ -1521,7 +1521,12 @@ class Formula
   def eligible_kegs_for_cleanup
     eligible_for_cleanup = []
     if installed?
-      eligible_kegs = installed_kegs.select { |k| pkg_version > k.version }
+      eligible_kegs = if head? && (head_prefix = latest_head_prefix)
+        installed_kegs - [Keg.new(head_prefix)]
+      else
+        installed_kegs.select { |k| pkg_version > k.version }
+      end
+
       if eligible_kegs.any?
         eligible_kegs.each do |keg|
           if keg.linked?

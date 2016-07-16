@@ -451,6 +451,30 @@ class FormulaTests < Homebrew::TestCase
     f3.rack.rmtree
   end
 
+  def test_eligible_kegs_for_cleanup_head_installed
+    f = formula do
+      version "0.1"
+      head "foo"
+    end
+
+    stable_prefix = f.installed_prefix
+    stable_prefix.mkpath
+
+    [["000000_1", 1], ["111111", 2], ["111111_1", 2]].each do |pkg_version_suffix, stamp|
+      prefix = f.prefix("HEAD-#{pkg_version_suffix}")
+      prefix.mkpath
+      tab = Tab.empty
+      tab.tabfile = prefix.join("INSTALL_RECEIPT.json")
+      tab.source_modified_time = stamp
+      tab.write
+    end
+
+    eligible_kegs = f.installed_kegs - [Keg.new(f.prefix("HEAD-111111_1"))]
+    assert_equal eligible_kegs, f.eligible_kegs_for_cleanup
+  ensure
+    f.rack.rmtree
+  end
+
   def test_pour_bottle
     f_false = formula("foo") do
       url "foo-1.0"
