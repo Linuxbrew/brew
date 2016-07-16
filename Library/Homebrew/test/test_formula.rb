@@ -414,14 +414,12 @@ class FormulaTests < Homebrew::TestCase
   end
 
   def test_to_hash_bottle
-    MacOS.stubs(:version).returns(MacOS::Version.new("10.11"))
-
     f1 = formula("foo") do
       url "foo-1.0"
 
       bottle do
         cellar :any
-        sha256 TEST_SHA256 => :el_capitan
+        sha256 TEST_SHA256 => Utils::Bottles.tag
       end
     end
 
