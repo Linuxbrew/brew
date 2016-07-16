@@ -2,7 +2,7 @@ require "testing_env"
 require "version"
 require "os/mac/version"
 
-class MacOSVersionTests < Homebrew::TestCase
+class OSMacVersionTests < Homebrew::TestCase
   def setup
     @v = MacOS::Version.new("10.7")
   end
