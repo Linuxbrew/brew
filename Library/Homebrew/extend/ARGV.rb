@@ -49,7 +49,7 @@ module HomebrewArgvExtension
     require "keg"
     require "formula"
     @kegs ||= downcased_unique_named.collect do |name|
-      rack = Formulary.to_rack(name)
+      rack = Formulary.to_rack(name.downcase)
 
       dirs = rack.directory? ? rack.subdirs : []
 
@@ -65,10 +65,18 @@ module HomebrewArgvExtension
           Keg.new(linked_keg_ref.resolved_path)
         elsif dirs.length == 1
           Keg.new(dirs.first)
-        elsif (prefix = (name.include?("/") ? Formulary.factory(name) : Formulary.from_rack(rack)).prefix).directory?
-          Keg.new(prefix)
         else
-          raise MultipleVersionsInstalledError.new(rack.basename)
+          f = if name.include?("/") || File.exist?(name)
+            Formulary.factory(name)
+          else
+            Formulary.from_rack(rack)
+          end
+
+          if (prefix = f.installed_prefix).directory?
+            Keg.new(prefix)
+          else
+            raise MultipleVersionsInstalledError.new(rack.basename)
+          end
         end
       rescue FormulaUnavailableError
         raise <<-EOS.undent
