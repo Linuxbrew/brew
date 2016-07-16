@@ -28,7 +28,11 @@ module Hardware
       end
 
       def type
-        :dunno
+        case RUBY_PLATFORM
+        when /x86_64/, /i\d86/ then :intel
+        when /ppc\d+/ then :ppc
+        else :dunno
+        end
       end
 
       def family
@@ -40,7 +44,14 @@ module Hardware
       end
 
       def bits
-        64
+        case RUBY_PLATFORM
+        when /x86_64/, /ppc64/ then 64
+        when /i\d86/, /ppc/ then 32
+        end
+      end
+
+      def sse4?
+        RUBY_PLATFORM.to_s.include?("x86_64")
       end
 
       def is_32_bit?
