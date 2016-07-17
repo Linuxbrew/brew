@@ -29,14 +29,14 @@ module HomebrewArgvExtension
         f = Formulary.factory(name, spec)
         if f.any_version_installed?
           tab = Tab.for_formula(f)
-          resolved_spec = spec(default=nil) || tab.spec
+          resolved_spec = spec(nil) || tab.spec
           f.set_active_spec(resolved_spec) if f.send(resolved_spec)
           f.build = tab
         end
         f
       else
         rack = Formulary.to_rack(name)
-        Formulary.from_rack(rack, spec(default=nil))
+        Formulary.from_rack(rack, spec(nil))
       end
     end
   end
