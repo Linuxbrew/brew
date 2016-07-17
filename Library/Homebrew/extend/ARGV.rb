@@ -32,6 +32,10 @@ module HomebrewArgvExtension
           resolved_spec = spec(nil) || tab.spec
           f.set_active_spec(resolved_spec) if f.send(resolved_spec)
           f.build = tab
+          if f.head? && tab.tabfile
+            k = Keg.new(tab.tabfile.parent)
+            f.version.update_commit(k.version.version.commit)
+          end
         end
         f
       else
