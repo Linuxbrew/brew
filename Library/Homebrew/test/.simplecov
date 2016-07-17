@@ -5,13 +5,11 @@ SimpleCov.start do
 
   minimum_coverage 40 unless ENV["HOMEBREW_TESTS_ONLY"]
   coverage_dir File.expand_path("#{tests_path}/coverage")
-  root File.expand_path("#{tests_path}/../../")
+  root File.expand_path("#{tests_path}/..")
 
-  add_filter "Formula/"
-  add_filter "Homebrew/compat/"
-  add_filter "Homebrew/test/"
-  add_filter "Homebrew/vendor/"
-  add_filter "Taps/"
+  add_filter "/Homebrew/compat/"
+  add_filter "/Homebrew/test/"
+  add_filter "/Homebrew/vendor/"
 
   if ENV["HOMEBREW_INTEGRATION_TEST"]
     command_name ENV["HOMEBREW_INTEGRATION_TEST"]
@@ -31,7 +29,7 @@ SimpleCov.start do
   project_name "Homebrew"
   add_group "Commands", %w[/Homebrew/cmd/ /Homebrew/dev-cmd/]
   add_group "Extensions", "/Homebrew/extend/"
-  add_group "OS", "/Homebrew/os/"
+  add_group "OS", %w[/Homebrew/extend/os/ /Homebrew/os/]
   add_group "Requirements", "/Homebrew/requirements/"
   add_group "Scripts", %w[
     /Homebrew/brew.rb
