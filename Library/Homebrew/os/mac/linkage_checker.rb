@@ -53,7 +53,8 @@ class LinkageChecker
   def check_undeclared_deps
       filter_out = proc do |dep|
         next true if dep.build?
-        dep.optional? && !dep.option_names.any? { |n| formula.build.with?(n) }
+        next false unless dep.optional? || dep.recommended?
+        formula.build.without?(dep)
       end
       declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
       declared_requirement_deps = formula.requirements.reject { |req| filter_out.call(req) }.map(&:default_formula).compact
