@@ -18,6 +18,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       HOMEBREW_CACHE.children,
       HOMEBREW_LOCK_DIR.children,
       HOMEBREW_LOGS.children,
+      HOMEBREW_TEMP.children,
       HOMEBREW_PREFIX/"bin",
       HOMEBREW_PREFIX/"share",
       HOMEBREW_PREFIX/"opt",
