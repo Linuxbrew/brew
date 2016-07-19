@@ -7,7 +7,7 @@ require "formulary"
 
 # Test environment setup
 (HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-core/Formula").mkpath
-%w[cache formula_cache locks cellar logs].each { |d| HOMEBREW_PREFIX.parent.join(d).mkpath }
+%w[cache formula_cache locks cellar logs temp].each { |d| HOMEBREW_PREFIX.parent.join(d).mkpath }
 
 # Test fixtures and files can be found relative to this path
 TEST_DIRECTORY = File.dirname(File.expand_path(__FILE__))
@@ -23,11 +23,11 @@ end
 module Homebrew
   module VersionAssertions
     def version(v)
-      Version.new(v)
+      Version.create(v)
     end
 
     def assert_version_equal(expected, actual)
-      assert_equal Version.new(expected), actual
+      assert_equal Version.create(expected), actual
     end
 
     def assert_version_detected(expected, url, specs={})

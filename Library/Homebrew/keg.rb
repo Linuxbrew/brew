@@ -304,6 +304,8 @@ class Keg
 
     ObserverPathnameExtension.reset_counts!
 
+    optlink(mode) unless mode.dry_run
+
     # yeah indeed, you have to force anything you need in the main tree into
     # these dirs REMEMBER that *NOT* everything needs to be in the main tree
     link_dir("etc", mode) { :mkpath }
@@ -366,10 +368,7 @@ class Keg
       end
     end
 
-    unless mode.dry_run
-      make_relative_symlink(linked_keg_record, path, mode)
-      optlink(mode)
-    end
+    make_relative_symlink(linked_keg_record, path, mode) unless mode.dry_run
   rescue LinkError
     unlink
     raise

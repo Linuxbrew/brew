@@ -85,8 +85,23 @@ class ReportTests < Homebrew::TestCase
     tap.path.join("Formula").mkpath
 
     perform_update("update_git_diff_output_with_restructured_tap")
-    assert_equal %w[foo/bar/git foo/bar/lua], @hub.select_formula(:A)
+    assert_empty @hub.select_formula(:A)
     assert_empty @hub.select_formula(:D)
+    assert_empty @hub.select_formula(:R)
+  ensure
+    tap.path.parent.rmtree
+  end
+
+  def test_update_homebrew_with_formula_rename_and_restructuring
+    tap = Tap.new("foo", "bar")
+    @reporter = ReporterMock.new(tap)
+    tap.path.join("Formula").mkpath
+    tap.stubs(:formula_renames).returns("xchat" => "xchat2")
+
+    perform_update("update_git_diff_output_with_formula_rename_and_restructuring")
+    assert_empty @hub.select_formula(:A)
+    assert_empty @hub.select_formula(:D)
+    assert_equal [%w[foo/bar/xchat foo/bar/xchat2]], @hub.select_formula(:R)
   ensure
     tap.path.parent.rmtree
   end
@@ -98,7 +113,8 @@ class ReportTests < Homebrew::TestCase
 
     perform_update("update_git_diff_simulate_homebrew_php_restructuring")
     assert_empty @hub.select_formula(:A)
-    assert_equal %w[foo/bar/git foo/bar/lua], @hub.select_formula(:D)
+    assert_empty @hub.select_formula(:D)
+    assert_empty @hub.select_formula(:R)
   ensure
     tap.path.parent.rmtree
   end

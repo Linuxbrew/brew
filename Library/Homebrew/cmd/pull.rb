@@ -52,7 +52,7 @@ module Homebrew
         issue = arg
         tap = CoreTap.instance
         url = "https://github.com/#{tap.slug}/pull/#{arg}"
-      elsif (testing_match = arg.match %r{brew.sh/job/Homebrew.*Testing/(\d+)/})
+      elsif (testing_match = arg.match %r{brew\.sh/job/Homebrew.*Testing/(\d+)/})
         _, testing_job = *testing_match
         url = "https://github.com/Homebrew/homebrew-core/compare/master...BrewTestBot:testing-#{testing_job}"
         tap = CoreTap.instance
@@ -449,7 +449,7 @@ module Homebrew
 
     def version(spec_type)
       version_str = info["versions"][spec_type.to_s]
-      version_str && Version.new(version_str)
+      version_str && Version.create(version_str)
     end
 
     def pkg_version(spec_type = :stable)

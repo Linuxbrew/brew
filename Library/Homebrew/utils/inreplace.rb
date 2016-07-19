@@ -15,7 +15,7 @@ module Utils
     # HOMEBREW_PREFIX is available in the embedded patch.
     # inreplace supports regular expressions.
     # <pre>inreplace "somefile.cfg", /look[for]what?/, "replace by #{bin}/tool"</pre>
-    def inreplace(paths, before = nil, after = nil)
+    def inreplace(paths, before = nil, after = nil, audit_result = true)
       errors = {}
 
       Array(paths).each do |path|
@@ -25,7 +25,7 @@ module Utils
           yield s
         else
           after = after.to_s if Symbol === after
-          s.gsub!(before, after)
+          s.gsub!(before, after, audit_result)
         end
 
         errors[path] = s.errors if s.errors.any?

@@ -24,6 +24,7 @@ begin
 
   trap("INT", old_trap)
 
+  formula = ARGV.resolved_formulae.first
   formula.extend(Homebrew::Assertions)
   formula.extend(Debrew::Formula) if ARGV.debug?
 

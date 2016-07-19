@@ -90,7 +90,7 @@ module Homebrew
       unless local_only
         safe_system "hub", "fork", "--no-remote"
         quiet_system "hub", "fork"
-        remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists./, 1]
+        remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists\./, 1]
         odie "cannot get remote from 'hub'!" unless remote
         safe_system "git", "push", remote, "#{branch}:#{branch}"
         pr_message = <<-EOS.undent
@@ -134,7 +134,7 @@ module Homebrew
       unless local_only
         safe_system "hub", "fork", "--no-remote"
         quiet_system "hub", "fork"
-        remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists./, 1]
+        remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists\./, 1]
         odie "cannot get remote from 'hub'!" unless remote
         safe_system "git", "push", remote, "#{branch}:#{branch}"
         safe_system "hub", "pull-request", "--browse", "-m", <<-EOS.undent

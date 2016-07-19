@@ -25,16 +25,22 @@ module HomebrewArgvExtension
   def resolved_formulae
     require "formula"
     @resolved_formulae ||= (downcased_unique_named - casks).map do |name|
-      if name.include?("/")
+      if name.include?("/") || File.exist?(name)
         f = Formulary.factory(name, spec)
-        if spec(default=nil).nil? && f.any_version_installed?
-          installed_spec = Tab.for_formula(f).spec
-          f.set_active_spec(installed_spec) if f.send(installed_spec)
+        if f.any_version_installed?
+          tab = Tab.for_formula(f)
+          resolved_spec = spec(nil) || tab.spec
+          f.set_active_spec(resolved_spec) if f.send(resolved_spec)
+          f.build = tab
+          if f.head? && tab.tabfile
+            k = Keg.new(tab.tabfile.parent)
+            f.version.update_commit(k.version.version.commit)
+          end
         end
         f
       else
         rack = Formulary.to_rack(name)
-        Formulary.from_rack(rack, spec(default=nil))
+        Formulary.from_rack(rack, spec(nil))
       end
     end
   end
@@ -47,7 +53,7 @@ module HomebrewArgvExtension
     require "keg"
     require "formula"
     @kegs ||= downcased_unique_named.collect do |name|
-      rack = Formulary.to_rack(name)
+      rack = Formulary.to_rack(name.downcase)
 
       dirs = rack.directory? ? rack.subdirs : []
 
@@ -63,10 +69,18 @@ module HomebrewArgvExtension
           Keg.new(linked_keg_ref.resolved_path)
         elsif dirs.length == 1
           Keg.new(dirs.first)
-        elsif (prefix = (name.include?("/") ? Formulary.factory(name) : Formulary.from_rack(rack)).prefix).directory?
-          Keg.new(prefix)
         else
-          raise MultipleVersionsInstalledError.new(rack.basename)
+          f = if name.include?("/") || File.exist?(name)
+            Formulary.factory(name)
+          else
+            Formulary.from_rack(rack)
+          end
+
+          if (prefix = f.installed_prefix).directory?
+            Keg.new(prefix)
+          else
+            raise MultipleVersionsInstalledError.new(rack.basename)
+          end
         end
       rescue FormulaUnavailableError
         raise <<-EOS.undent
@@ -252,7 +266,7 @@ module HomebrewArgvExtension
   def downcased_unique_named
     # Only lowercase names, not paths, bottle filenames or URLs
     @downcased_unique_named ||= named.map do |arg|
-      if arg.include?("/") || arg.end_with?(".tar.gz")
+      if arg.include?("/") || arg.end_with?(".tar.gz") || File.exist?(arg)
         arg
       else
         arg.downcase

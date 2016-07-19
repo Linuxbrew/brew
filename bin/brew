@@ -25,4 +25,4 @@ fi
 
 HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 
-source "$HOMEBREW_LIBRARY/brew.sh"
+source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"

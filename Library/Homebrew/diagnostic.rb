@@ -313,7 +313,7 @@ module Homebrew
           by Homebrew. If a brew tries to add locale information to one of these
           directories, then the install will fail during the link step.
 
-          You should probably `sudo chown -R $(whoami)` them:
+          You should `sudo chown -R $(whoami)` them:
         EOS
       end
 
@@ -331,7 +331,7 @@ module Homebrew
         <<-EOS.undent
           #{HOMEBREW_REPOSITORY} is not writable.
 
-          You should probably change the ownership and permissions of #{HOMEBREW_REPOSITORY}
+          You should change the ownership and permissions of #{HOMEBREW_REPOSITORY}
           back to your user account.
             sudo chown -R $(whoami) #{HOMEBREW_REPOSITORY}
         EOS
@@ -349,8 +349,8 @@ module Homebrew
           "InstantOn" component of Airfoil or running Cocktail cleanup/optimizations
           are known to do this as well.
 
-          You should probably change the ownership and permissions of /usr/local
-          back to your user account.
+          You should change the ownership and permissions of /usr/local back to
+          your user account.
             sudo chown -R $(whoami) /usr/local
         EOS
       end
@@ -378,8 +378,8 @@ module Homebrew
             by Homebrew. If a formula tries to write a file to this directory, the
             install will fail during the link step.
 
-            You should probably change the ownership and permissions of #{dir}
-            back to your user account.
+            You should change the ownership and permissions of #{dir} back to
+            your user account.
               sudo chown -R $(whoami) #{dir}
           EOS
         end
@@ -395,7 +395,7 @@ module Homebrew
           by Homebrew. If you install a formula with Python modules, the install
           will fail during the link step.
 
-          You should probably change the ownership and permissions of #{Language::Python.homebrew_site_packages}
+          You should change the ownership and permissions of #{Language::Python.homebrew_site_packages}
           back to your user account.
             sudo chown -R $(whoami) #{Language::Python.homebrew_site_packages}
         EOS
@@ -409,7 +409,7 @@ module Homebrew
           #{HOMEBREW_LOGS} isn't writable.
           Homebrew writes debugging logs to this location.
 
-          You should probably change the ownership and permissions of #{HOMEBREW_LOGS}
+          You should change the ownership and permissions of #{HOMEBREW_LOGS}
           back to your user account.
             sudo chown -R $(whoami) #{HOMEBREW_LOGS}
         EOS
@@ -424,7 +424,7 @@ module Homebrew
           This can happen if you run `brew install` or `brew fetch` as another user.
           Homebrew caches downloaded files to this location.
 
-          You should probably change the ownership and permissions of #{HOMEBREW_CACHE}
+          You should change the ownership and permissions of #{HOMEBREW_CACHE}
           back to your user account.
             sudo chown -R $(whoami) #{HOMEBREW_CACHE}
         EOS
@@ -437,7 +437,7 @@ module Homebrew
         <<-EOS.undent
           #{HOMEBREW_CELLAR} isn't writable.
 
-          You should probably change the ownership and permissions of #{HOMEBREW_CELLAR}
+          You should change the ownership and permissions of #{HOMEBREW_CELLAR}
           back to your user account.
             sudo chown -R $(whoami) #{HOMEBREW_CELLAR}
         EOS
@@ -451,7 +451,7 @@ module Homebrew
         <<-EOS.undent
           #{opt} isn't writable.
 
-          You should probably change the ownership and permissions of #{opt}
+          You should change the ownership and permissions of #{opt}
           back to your user account.
             sudo chown -R $(whoami) #{opt}
         EOS
@@ -769,7 +769,7 @@ module Homebrew
       def check_git_version
         # https://help.github.com/articles/https-cloning-errors
         return unless Utils.git_available?
-        return unless Version.new(Utils.git_version) < Version.new("1.7.10")
+        return unless Version.create(Utils.git_version) < Version.create("1.7.10")
 
         git = Formula["git"]
         git_upgrade_cmd = git.any_version_installed? ? "upgrade" : "install"

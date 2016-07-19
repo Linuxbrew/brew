@@ -29,6 +29,7 @@ class SoftwareSpec
   def_delegators :@resource, :cached_download, :clear_cache
   def_delegators :@resource, :checksum, :mirrors, :specs, :using
   def_delegators :@resource, :version, :mirror, *Checksum::TYPES
+  def_delegators :@resource, :downloader
 
   def initialize
     @resource = Resource.new
@@ -52,7 +53,7 @@ class SoftwareSpec
     @resource.owner = self
     resources.each_value do |r|
       r.owner     = self
-      r.version ||= version
+      r.version ||= (version.head? ? Version.create("HEAD") : version.dup)
     end
     patches.each { |p| p.owner = self }
   end
@@ -204,7 +205,7 @@ end
 class HeadSoftwareSpec < SoftwareSpec
   def initialize
     super
-    @resource.version = Version.new("HEAD")
+    @resource.version = Version.create("HEAD")
   end
 
   def verify_download_integrity(_fn)

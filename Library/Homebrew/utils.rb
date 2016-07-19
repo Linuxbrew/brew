@@ -1,4 +1,5 @@
 require "pathname"
+require "emoji"
 require "exceptions"
 require "utils/hash"
 require "utils/json"
@@ -12,16 +13,6 @@ require "utils/curl"
 
 class Tty
   class << self
-    def tick
-      # necessary for 1.8.7 unicode handling since many installs are on 1.8.7
-      @tick ||= ["2714".hex].pack("U*")
-    end
-
-    def cross
-      # necessary for 1.8.7 unicode handling since many installs are on 1.8.7
-      @cross ||= ["2718".hex].pack("U*")
-    end
-
     def strip_ansi(string)
       string.gsub(/\033\[\d+(;\d+)*m/, "")
     end
@@ -124,20 +115,20 @@ end
 def pretty_installed(f)
   if !$stdout.tty?
     "#{f}"
-  elsif ENV["HOMEBREW_NO_EMOJI"]
-    "#{Tty.highlight}#{Tty.green}#{f} (installed)#{Tty.reset}"
+  elsif Emoji.enabled?
+    "#{Tty.highlight}#{f} #{Tty.green}#{Emoji.tick}#{Tty.reset}"
   else
-    "#{Tty.highlight}#{f} #{Tty.green}#{Tty.tick}#{Tty.reset}"
+    "#{Tty.highlight}#{Tty.green}#{f} (installed)#{Tty.reset}"
   end
 end
 
 def pretty_uninstalled(f)
   if !$stdout.tty?
     "#{f}"
-  elsif ENV["HOMEBREW_NO_EMOJI"]
-    "#{Tty.red}#{f} (uninstalled)#{Tty.reset}"
+  elsif Emoji.enabled?
+    "#{f} #{Tty.red}#{Emoji.cross}#{Tty.reset}"
   else
-    "#{f} #{Tty.red}#{Tty.cross}#{Tty.reset}"
+    "#{Tty.red}#{f} (uninstalled)#{Tty.reset}"
   end
 end
 

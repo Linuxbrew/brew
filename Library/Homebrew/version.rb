@@ -179,6 +179,18 @@ class Version
     end
   end
 
+  def self.create(val)
+    unless val.respond_to?(:to_str)
+      raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
+    end
+
+    if val.to_str.start_with?("HEAD")
+      HeadVersion.new(val)
+    else
+      Version.new(val)
+    end
+  end
+
   def initialize(val)
     if val.respond_to?(:to_str)
       @version = val.to_str
@@ -192,7 +204,7 @@ class Version
   end
 
   def head?
-    version == "HEAD"
+    false
   end
 
   def <=>(other)
@@ -200,6 +212,7 @@ class Version
     return 0 if version == other.version
     return 1 if head? && !other.head?
     return -1 if !head? && other.head?
+    return 0 if head? && other.head?
 
     ltokens = tokens
     rtokens = other.tokens
@@ -279,7 +292,7 @@ class Version
 
     stem = if spec.directory?
       spec.basename.to_s
-    elsif %r{((?:sourceforge.net|sf.net)/.*)/download$}.match(spec_s)
+    elsif %r{((?:sourceforge\.net|sf\.net)/.*)/download$}.match(spec_s)
       Pathname.new(spec.dirname).stem
     else
       spec.stem
@@ -290,7 +303,7 @@ class Version
     # e.g. https://github.com/sam-github/libnet/tarball/libnet-1.1.4
     # e.g. https://github.com/isaacs/npm/tarball/v0.2.5-1
     # e.g. https://github.com/petdance/ack/tarball/1.93_02
-    m = %r{github.com/.+/(?:zip|tar)ball/(?:v|\w+-)?((?:\d+[-._])+\d*)$}.match(spec_s)
+    m = %r{github\.com/.+/(?:zip|tar)ball/(?:v|\w+-)?((?:\d+[-._])+\d*)$}.match(spec_s)
     return m.captures.first unless m.nil?
 
     # e.g. https://github.com/erlang/otp/tarball/OTP_R15B01 (erlang style)
@@ -377,5 +390,27 @@ class Version
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)
     return m.captures.first unless m.nil?
+  end
+end
+
+class HeadVersion < Version
+  attr_reader :commit
+
+  def initialize(val)
+    super
+    @commit = @version[/^HEAD-(.+)$/, 1]
+  end
+
+  def update_commit(commit)
+    @commit = commit
+    @version = if commit
+      "HEAD-#{commit}"
+    else
+      "HEAD"
+    end
+  end
+
+  def head?
+    true
   end
 end

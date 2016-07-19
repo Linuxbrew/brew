@@ -14,6 +14,7 @@ require "debrew"
 require "sandbox"
 require "requirements/cctools_requirement"
 require "requirements/glibc_requirement"
+require "emoji"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -508,7 +509,7 @@ class FormulaInstaller
     link(keg)
 
     unless @poured_bottle && formula.bottle_specification.skip_relocation?
-      fix_install_names(keg)
+      fix_dynamic_linkage(keg)
     end
 
     if formula.post_install_defined?
@@ -531,13 +532,9 @@ class FormulaInstaller
     unlock
   end
 
-  def emoji
-    ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba"
-  end
-
   def summary
     s = ""
-    s << "#{emoji}  " if MacOS.version >= :lion && !ENV["HOMEBREW_NO_EMOJI"]
+    s << "#{Emoji.install_badge}  " if Emoji.enabled?
     s << "#{formula.prefix}: #{formula.prefix.abv}"
     s << ", built in #{pretty_duration build_time}" if build_time
     s
@@ -628,6 +625,8 @@ class FormulaInstaller
       end
     end
 
+    formula.update_head_version
+
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
@@ -635,6 +634,7 @@ class FormulaInstaller
   rescue Exception
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
+      formula.update_head_version
       formula.prefix.rmtree if formula.prefix.directory?
       formula.rack.rmdir_if_possible
     end
@@ -729,10 +729,10 @@ class FormulaInstaller
     Homebrew.failed = true
   end
 
-  def fix_install_names(keg)
-    keg.fix_install_names
+  def fix_dynamic_linkage(keg)
+    keg.fix_dynamic_linkage
   rescue Exception => e
-    onoe "Failed to fix install names"
+    onoe "Failed to fix install linkage"
     puts "The formula built, but you may encounter issues using it or linking other"
     puts "formula against it."
     ohai e, e.backtrace if debug?
@@ -778,7 +778,7 @@ class FormulaInstaller
 
     keg = Keg.new(formula.prefix)
     unless formula.bottle_specification.skip_relocation?
-      keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
+      keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
         Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
     end
     keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,

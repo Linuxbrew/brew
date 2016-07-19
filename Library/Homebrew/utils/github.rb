@@ -146,7 +146,8 @@ module GitHub
 
       args += ["--dump-header", "#{headers_tmpfile.path}"]
 
-      output, _, http_code = curl_output(url.to_s, *args).rpartition("\n")
+      output, errors, status = curl_output(url.to_s, *args)
+      output, _, http_code = output.rpartition("\n")
       output, _, http_code = output.rpartition("\n") if http_code == "000"
       headers = headers_tmpfile.read
     ensure
@@ -159,8 +160,8 @@ module GitHub
     end
 
     begin
-      if !http_code.start_with?("2") && !$?.success?
-        raise_api_error(output, http_code, headers)
+      if !http_code.start_with?("2") && !status.success?
+        raise_api_error(output, errors, http_code, headers)
       end
       json = Utils::JSON.load output
       if block_given?
@@ -173,7 +174,7 @@ module GitHub
     end
   end
 
-  def raise_api_error(output, http_code, headers)
+  def raise_api_error(output, errors, http_code, headers)
     meta = {}
     headers.lines.each do |l|
       key, _, value = l.delete(":").partition(" ")
@@ -197,7 +198,7 @@ module GitHub
       raise HTTPNotFoundError, output
     else
       error = Utils::JSON.load(output)["message"] rescue nil
-      error ||= output
+      error ||= "curl failed! #{errors}"
       raise Error, error
     end
   end

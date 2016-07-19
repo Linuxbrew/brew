@@ -1,7 +1,7 @@
 std_trap = trap("INT") { exit! 130 } # no backtrace thanks
 
 require "pathname"
-HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent.join("Homebrew")
+HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
 $:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
 
@@ -55,7 +55,7 @@ begin
   end
 
   # Add SCM wrappers.
-  ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_ENV_PATH}/scm"
+  ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_SHIMS_PATH}/scm"
 
   if cmd
     internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("cmd", cmd)

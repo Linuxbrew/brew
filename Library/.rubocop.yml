@@ -3,9 +3,13 @@ AllCops:
     - 'Homebrew/vendor/**/*'
     - 'Homebrew/test/vendor/**/*'
 
-# 1.8-style hash keys
+# Ruby 1.8 compatibility
+Style/DotPosition:
+  EnforcedStyle: trailing
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: no_comma
 
 # ruby style guide favorite
 Style/StringLiterals:
@@ -22,6 +26,10 @@ Style/CommandLiteral:
 # paths abound, easy escape
 Style/RegexpLiteral:
   EnforcedStyle: slashes
+
+# too prevalent to change this now, but might be discussed/changed later
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
 
 # our current conditional style is established, clear and
 # requiring users to change that now would be confusing.
@@ -115,10 +123,6 @@ Style/WordArray:
 Style/UnneededCapitalW:
   Enabled: false
 
-# we use raise, not fail
-Style/SignalException:
-  EnforcedStyle: only_raise
-
 # we prefer compact if-else-end/case-when-end alignment
 Lint/EndAlignment:
   AlignWith: variable
@@ -129,12 +133,6 @@ Style/CaseIndentation:
 Style/PerlBackrefs:
   Enabled: false
 
-# this is required for Ruby 1.8
-Style/DotPosition:
-  EnforcedStyle: trailing
-
 # makes diffs nicer
-Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: no_comma
 Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma

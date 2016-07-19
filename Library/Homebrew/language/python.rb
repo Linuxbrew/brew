@@ -1,11 +1,11 @@
-require "utils.rb"
+require "utils"
 
 module Language
   module Python
     def self.major_minor_version(python)
       version = /\d\.\d/.match `#{python} --version 2>&1`
       return unless version
-      Version.new(version.to_s)
+      Version.create(version.to_s)
     end
 
     def self.homebrew_site_packages(version = "2.7")

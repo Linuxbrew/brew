@@ -9,12 +9,12 @@
 # shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
-# Replaces the function in Library/brew.sh to cache the Git executable to
+# Replaces the function in Library/Homebrew/brew.sh to cache the Git executable to
 # provide speedup when using Git repeatedly (as update.sh does).
 git() {
   if [[ -z "$GIT_EXECUTABLE" ]]
   then
-    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/ENV/scm/git" --homebrew=print-path)"
+    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
   fi
   "$GIT_EXECUTABLE" "$@"
 }
@@ -22,22 +22,43 @@ git() {
 git_init_if_necessary() {
   if [[ -n "$HOMEBREW_OSX" ]]
   then
-    OFFICIAL_REMOTE="https://github.com/Homebrew/brew.git"
-  else
-    OFFICIAL_REMOTE="https://github.com/Linuxbrew/brew.git"
+    BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
+    CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
+  elif [[ -n "$HOMEBREW_LINUX" ]]
+  then
+    BREW_OFFICIAL_REMOTE="https://github.com/Linuxbrew/brew"
+    CORE_OFFICIAL_REMOTE="https://github.com/Linuxbrew/homebrew-core"
   fi
 
+  safe_cd "$HOMEBREW_REPOSITORY"
   if [[ ! -d ".git" ]]
   then
     set -e
     trap '{ rm -rf .git; exit 1; }' EXIT
     git init
     git config --bool core.autocrlf false
-    git config remote.origin.url "$OFFICIAL_REMOTE"
+    git config remote.origin.url "$BREW_OFFICIAL_REMOTE"
     git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
     git fetch --force --depth=1 origin refs/heads/master:refs/remotes/origin/master
     git reset --hard origin/master
-    SKIP_FETCH_HOMEBREW_REPOSITORY=1
+    SKIP_FETCH_BREW_REPOSITORY=1
+    set +e
+    trap - EXIT
+  fi
+
+  [[ -d "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] || return
+  safe_cd "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core"
+  if [[ ! -d ".git" ]]
+  then
+    set -e
+    trap '{ rm -rf .git; exit 1; }' EXIT
+    git init
+    git config --bool core.autocrlf false
+    git config remote.origin.url "$CORE_OFFICIAL_REMOTE"
+    git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+    git fetch --force --depth=1 origin refs/heads/master:refs/remotes/origin/master
+    git reset --hard origin/master
+    SKIP_FETCH_CORE_REPOSITORY=1
     set +e
     trap - EXIT
   fi
@@ -107,9 +128,8 @@ pop_stash() {
   [[ -z "$STASHED" ]] && return
   if [[ -n "$HOMEBREW_VERBOSE" ]]
   then
+    echo "Restoring your stashed changes to $DIR..."
     git stash pop
-    echo "Restoring your stashed changes to $DIR:"
-    git status --short --untracked-files
   else
     git stash pop "${QUIET_ARGS[@]}" 1>/dev/null
   fi
@@ -147,6 +167,11 @@ reset_on_interrupt() {
 }
 
 pull() {
+  if [[ -n "$HOMEBREW_VERBOSE" ]]
+  then
+    echo "Updating $DIR..."
+  fi
+
   local DIR
   local TAP_VAR
 
@@ -187,8 +212,7 @@ pull() {
   then
     if [[ -n "$HOMEBREW_VERBOSE" ]]
     then
-      echo "Stashing uncommitted changes to $DIR."
-      git status --short --untracked-files=all
+      echo "Stashing uncommitted changes to $DIR..."
     fi
     git merge --abort &>/dev/null
     git rebase --abort &>/dev/null
@@ -288,12 +312,21 @@ EOS
   # check permissions
   if [[ "$HOMEBREW_PREFIX" = "/usr/local" && ! -w /usr/local ]]
   then
-    odie "/usr/local must be writable!"
+    odie <<-EOS
+/usr/local is not writable. You should change the ownership
+and permissions of /usr/local back to your user account:
+  sudo chown -R \$(whoami) /usr/local
+EOS
   fi
 
   if [[ ! -w "$HOMEBREW_REPOSITORY" ]]
   then
-    odie "$HOMEBREW_REPOSITORY must be writable!"
+    odie <<-EOS
+$HOMEBREW_REPOSITORY is not writable. You should change the
+ownership and permissions of $HOMEBREW_REPOSITORY back to your
+user account:
+  sudo chown -R \$(whoami) $HOMEBREW_REPOSITORY
+EOS
   fi
 
   if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
@@ -327,11 +360,12 @@ EOS
   # only allow one instance of brew update
   lock update
 
-  safe_cd "$HOMEBREW_REPOSITORY"
   git_init_if_necessary
   # rename Taps directories
   # this procedure will be removed in the future if it seems unnecessary
   rename_taps_dir_if_necessary
+
+  safe_cd "$HOMEBREW_REPOSITORY"
 
   # kill all of subprocess on interrupt
   trap '{ pkill -P $$; wait; exit 130; }' SIGINT
@@ -342,7 +376,8 @@ EOS
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
-    [[ -n "$SKIP_FETCH_HOMEBREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
+    [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
+    [[ -n "$SKIP_FETCH_CORE_REPOSITORY" && "$DIR" = "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && continue
     cd "$DIR" || continue
     UPSTREAM_BRANCH="$(upstream_branch)"
     # the refspec ensures that the default upstream branch gets updated
@@ -408,6 +443,7 @@ EOS
   do
     [[ -d "$DIR/.git" ]] || continue
     pull "$DIR"
+    [[ -n "$HOMEBREW_VERBOSE" ]] && echo
   done
 
   safe_cd "$HOMEBREW_REPOSITORY"

@@ -503,8 +503,15 @@ List all official taps\.
 List all pinned taps\.
 .
 .TP
-\fBtap\-info\fR \fItap\fR
-Display information about \fItap\fR\.
+\fBtap\-info\fR
+Display a brief summary of all installed taps\.
+.
+.TP
+\fBtap\-info\fR (\fB\-\-installed\fR|\fItaps\fR)
+Display detailed information about one or more \fItaps\fR\.
+.
+.IP
+Pass \fB\-\-installed\fR to display information on all installed taps\.
 .
 .TP
 \fBtap\-info\fR \fB\-\-json=\fR\fIversion\fR (\fB\-\-installed\fR|\fItaps\fR)
@@ -706,6 +713,10 @@ Set this to force Homebrew to use a particular git binary\.
 .TP
 \fBHOMEBREW_BOTTLE_DOMAIN\fR
 If set, instructs Homebrew to use the given URL as a download mirror for bottles\.
+.
+.TP
+\fBHOMEBREW_ARTIFACT_DOMAIN\fR
+If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries\.
 .
 .TP
 \fBHOMEBREW_BROWSER\fR

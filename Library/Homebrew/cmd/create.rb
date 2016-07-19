@@ -110,13 +110,12 @@ class FormulaCreator
       when %r{github\.com/\S+/(\S+)/archive/}
         @name = $1
       else
-        /(.*?)[-_.]?#{path.version}/.match path.basename
-        @name = $1
+        @name = path.basename.to_s[/(.*?)[-_.]?#{Regexp.escape(path.version.to_s)}/, 1]
       end
     end
     update_path
     if @version
-      @version = Version.new(@version)
+      @version = Version.create(@version)
     else
       @version = Pathname.new(url).version
     end

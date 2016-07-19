@@ -29,6 +29,9 @@ class TabTests < Homebrew::TestCase
     assert_empty tab.used_options
     refute_predicate tab, :built_as_bottle
     refute_predicate tab, :poured_from_bottle
+    assert_predicate tab, :stable?
+    refute_predicate tab, :devel?
+    refute_predicate tab, :head?
     assert_nil tab.tap
     assert_nil tab.time
     assert_nil tab.HEAD
@@ -74,6 +77,9 @@ class TabTests < Homebrew::TestCase
     assert_equal @unused.sort, tab.unused_options.sort
     refute_predicate tab, :built_as_bottle
     assert_predicate tab, :poured_from_bottle
+    assert_predicate tab, :stable?
+    refute_predicate tab, :devel?
+    refute_predicate tab, :head?
     assert_equal "homebrew/core", tab.tap.name
     assert_equal :stable, tab.spec
     refute_nil tab.time
@@ -90,6 +96,9 @@ class TabTests < Homebrew::TestCase
     assert_equal @unused.sort, tab.unused_options.sort
     refute_predicate tab, :built_as_bottle
     assert_predicate tab, :poured_from_bottle
+    assert_predicate tab, :stable?
+    refute_predicate tab, :devel?
+    refute_predicate tab, :head?
     assert_equal "homebrew/core", tab.tap.name
     assert_equal :stable, tab.spec
     refute_nil tab.time

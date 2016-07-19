@@ -21,6 +21,7 @@
 #                        as raw bytes instead of re-encoding in UTF-8.
 # --fast:                Don't install any packages, but run e.g. audit anyway.
 # --keep-tmp:            Keep temporary files written by main installs and tests that are run.
+# --no-pull              Don't use `brew pull` when possible.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -304,6 +305,12 @@ module Homebrew
         @url = ENV["ghprbPullLink"]
         @hash = nil
         test "git", "checkout", "origin/master"
+      elsif ENV["GIT_URL"] && ENV["GIT_BRANCH"]
+        git_url = ENV["GIT_URL"].chomp("/").chomp(".git")
+        %r{origin/pr/(\d+)/(merge|head)} =~ ENV["GIT_BRANCH"]
+        pr = $1
+        @url = "#{git_url}/pull/#{pr}"
+        @hash = nil
       # Use Travis CI pull-request variables for pull request jobs.
       elsif travis_pr
         @url = "https://github.com/#{ENV["TRAVIS_REPO_SLUG"]}/pull/#{ENV["TRAVIS_PULL_REQUEST"]}"
@@ -357,7 +364,7 @@ module Homebrew
       elsif @url
         # TODO: in future Travis CI may need to also use `brew pull` to e.g. push
         # the right commit to BrewTestBot.
-        unless travis_pr
+        if !travis_pr && !ARGV.include?("--no-pull")
           diff_start_sha1 = current_sha1
           test "brew", "pull", "--clean", "--tap=#{@tap}", @url
           diff_end_sha1 = current_sha1
@@ -420,7 +427,10 @@ module Homebrew
     def setup
       @category = __method__
       return if ARGV.include? "--skip-setup"
-      test "brew", "doctor" if !ENV["TRAVIS"] && ENV["HOMEBREW_RUBY"] != "1.8.7"
+      if !ENV["TRAVIS"] && ENV["HOMEBREW_RUBY"] != "1.8.7" &&
+          HOMEBREW_PREFIX.to_s == "/usr/local"
+        test "brew", "doctor"
+      end
       test "brew", "--env"
       test "brew", "config"
     end
@@ -661,17 +671,22 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
 
-      ruby_two = RUBY_VERSION.split(".").first.to_i >= 2
-
       if @tap.nil?
         tests_args = []
-        if ruby_two
+        tests_args_coverage = []
+        if RUBY_TWO
           tests_args << "--official-cmd-taps"
-          tests_args << "--coverage" if ENV["TRAVIS"]
+          tests_args_coverage << "--coverage" if ENV["TRAVIS"]
         end
         test "brew", "tests", *tests_args
-        test "brew", "tests", "--no-compat"
+        test "brew", "tests", "--generic", "--only=integration_cmds",
+                              *tests_args
+        test "brew", "tests", "--no-compat", *tests_args_coverage
         test "brew", "readall", "--syntax"
+        # test update from origin/master to current commit.
+        test "brew", "update-test"
+        # test no-op update from current commit (to current commit, a no-op).
+        test "brew", "update-test", "--commit=HEAD"
       else
         test "brew", "readall", "--aliases", @tap.name
       end
@@ -684,15 +699,19 @@ module Homebrew
       git "stash"
       git "am", "--abort"
       git "rebase", "--abort"
-      git "reset", "--hard"
       git "checkout", "-f", "master"
+      git "reset", "--hard", "origin/master"
       git "clean", "-ffdx"
-      HOMEBREW_REPOSITORY.cd do
-        safe_system "git", "reset", "--hard"
-        safe_system "git", "checkout", "-f", "master"
-        # This will uninstall all formulae, as long as
-        # HOMEBREW_REPOSITORY == HOMEBREW_PREFIX, which is true on the test bots
-        safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/" unless ENV["HOMEBREW_RUBY"] == "1.8.7"
+      unless @repository == HOMEBREW_REPOSITORY
+        HOMEBREW_REPOSITORY.cd do
+          safe_system "git", "checkout", "-f", "master"
+          safe_system "git", "reset", "--hard", "origin/master"
+          # This will uninstall all formulae, as long as
+          # HOMEBREW_REPOSITORY == HOMEBREW_PREFIX, which is true on the test bots
+          unless ENV["HOMEBREW_RUBY"] == "1.8.7"
+            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+          end
+        end
       end
       pr_locks = "#{@repository}/.git/refs/remotes/*/pr/*/*.lock"
       Dir.glob(pr_locks) { |lock| FileUtils.rm_rf lock }
@@ -709,16 +728,19 @@ module Homebrew
       end
 
       if ARGV.include? "--cleanup"
-        test "git", "reset", "--hard"
+        git "reset", "--hard", "origin/master"
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
         git "gc", "--auto"
         test "git", "clean", "-ffdx"
-        HOMEBREW_REPOSITORY.cd do
-          safe_system "git", "reset", "--hard"
-          Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
-          safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+        unless @repository == HOMEBREW_REPOSITORY
+          HOMEBREW_REPOSITORY.cd do
+            safe_system "git", "reset", "--hard"
+            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+          end
         end
+        Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
+
         if ARGV.include? "--local"
           FileUtils.rm_rf ENV["HOMEBREW_HOME"]
           FileUtils.rm_rf ENV["HOMEBREW_LOGS"]
@@ -933,7 +955,7 @@ module Homebrew
 
     ENV["HOMEBREW_DEVELOPER"] = "1"
     ENV["HOMEBREW_SANDBOX"] = "1"
-    ENV["HOMEBREW_RUBY_MACHO"] = "1" if OS.mac? && RUBY_VERSION.split(".").first.to_i >= 2
+    ENV["HOMEBREW_RUBY_MACHO"] = "1" if OS.mac? && RUBY_TWO
     ENV["HOMEBREW_NO_EMOJI"] = "1"
     ENV["HOMEBREW_FAIL_LOG_LINES"] = "150"
     ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"] = "1"

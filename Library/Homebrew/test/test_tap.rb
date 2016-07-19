@@ -135,7 +135,7 @@ class TapTest < Homebrew::TestCase
     end
     refute_predicate version_tap, :private?
   ensure
-    version_tap.path.rmtree
+    version_tap.path.rmtree if version_tap
   end
 
   def test_remote_not_git_repo
@@ -220,7 +220,7 @@ class TapTest < Homebrew::TestCase
     refute_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :exist?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1", :exist?
   ensure
-    (HOMEBREW_PREFIX/"share").rmtree
+    (HOMEBREW_PREFIX/"share").rmtree if (HOMEBREW_PREFIX/"share").exist?
   end
 
   def test_pin_and_unpin

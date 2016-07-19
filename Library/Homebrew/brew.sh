@@ -29,7 +29,7 @@ brew() {
 }
 
 git() {
-  "$HOMEBREW_LIBRARY/ENV/scm/git" "$@"
+  "$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" "$@"
 }
 
 # Force UTF-8 to avoid encoding issues for users with broken locale settings.
@@ -64,30 +64,11 @@ fi
 unset GEM_HOME
 unset GEM_PATH
 
-if [[ -z "$HOMEBREW_DEVELOPER" ]]
-then
-  unset HOMEBREW_RUBY_PATH
-fi
-
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_OSX="1";;
   Linux) HOMEBREW_LINUX="1";;
 esac
-
-if [[ -z "$HOMEBREW_RUBY_PATH" ]]
-then
-  if [[ -n "$HOMEBREW_OSX" ]]
-  then
-    HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
-  else
-    HOMEBREW_RUBY_PATH="$(which ruby)"
-    if [[ -z "$HOMEBREW_RUBY_PATH" ]]
-    then
-      odie "No Ruby found, cannot proceed."
-    fi
-  fi
-fi
 
 HOMEBREW_CURL="/usr/bin/curl"
 if [[ -n "$HOMEBREW_OSX" ]]
@@ -117,6 +98,16 @@ HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_VERSION ($HOMEBREW_SYSTEM; $HOM
 HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | /usr/bin/awk '{print $1"/"$2}')"
 HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
 
+if [[ -z "$HOMEBREW_CACHE" ]]
+then
+  if [[ -n "$HOMEBREW_OSX" ]]
+  then
+    HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
+  else
+    HOMEBREW_CACHE="$HOME/.cache/Homebrew"
+  fi
+fi
+
 # Declared in bin/brew
 export HOMEBREW_BREW_FILE
 export HOMEBREW_PREFIX
@@ -125,8 +116,8 @@ export HOMEBREW_LIBRARY
 
 # Declared in brew.sh
 export HOMEBREW_VERSION
+export HOMEBREW_CACHE
 export HOMEBREW_CELLAR
-export HOMEBREW_RUBY_PATH
 export HOMEBREW_SYSTEM
 export HOMEBREW_CURL
 export HOMEBREW_PROCESSOR
@@ -210,19 +201,30 @@ then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"
 fi
 
-if [[ "$(id -u)" = "0" && "$(ls -nd "$HOMEBREW_BREW_FILE" | awk '{print $3}')" != "0" ]]
-then
+check-run-command-as-root() {
   case "$HOMEBREW_COMMAND" in
-    analytics|install|reinstall|postinstall|link|pin|update|upgrade|create|migrate|tap|tap-pin|switch)
+      analytics|create|install|link|migrate|pin|postinstall|reinstall|switch|tap|tap-pin|\
+      update|upgrade|vendor-install)
+      ;;
+    *)
+      return
+      ;;
+  esac
+
+  [[ "$(id -u)" = 0 ]] || return
+
+  local brew_file_ls_info=($(ls -nd "$HOMEBREW_BREW_FILE"))
+  if [[ "${brew_file_ls_info[2]}" != 0 ]]
+  then
       odie <<EOS
 Cowardly refusing to 'sudo brew $HOMEBREW_COMMAND'
 You can use brew with sudo, but only if the brew executable is owned by root.
 However, this is both not recommended and completely unsupported so do so at
 your own risk.
 EOS
-      ;;
-  esac
-fi
+  fi
+}
+check-run-command-as-root
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
@@ -231,7 +233,7 @@ setup-analytics
 report-analytics-screenview-command
 
 update-preinstall() {
-  [[ -n "$HOMEBREW_AUTO_UPDATE" ]] || return
+  [[ -n "$HOMEBREW_DEVELOPER" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
@@ -253,7 +255,12 @@ then
   source "$HOMEBREW_BASH_COMMAND"
   { update-preinstall; "homebrew-$HOMEBREW_COMMAND" "$@"; exit $?; }
 else
+  # Hide shellcheck complaint:
+  # shellcheck source=/dev/null
+  source "$HOMEBREW_LIBRARY/Homebrew/utils/ruby.sh"
+  setup-ruby-path
+
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
-  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/brew.rb" "$@"; }
+  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
 fi

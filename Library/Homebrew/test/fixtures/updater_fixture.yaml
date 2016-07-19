@@ -45,6 +45,8 @@ update_git_diff_output_with_formula_rename: |
 update_git_diff_output_with_restructured_tap: |
   R100	git.rb	Formula/git.rb
   R100	lua.rb	Formula/lua.rb
+update_git_diff_output_with_formula_rename_and_restructuring: |
+  R100	xchat.rb	Formula/xchat2.rb
 update_git_diff_simulate_homebrew_php_restructuring: |
   R100	Formula/git.rb	Abstract/git.rb
   R100	Formula/lua.rb	Abstract/lua.rb

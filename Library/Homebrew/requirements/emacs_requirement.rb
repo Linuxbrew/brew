@@ -11,7 +11,7 @@ class EmacsRequirement < Requirement
     next false unless which "emacs"
     next true unless @version
     emacs_version = Utils.popen_read("emacs", "--batch", "--eval", "(princ emacs-version)")
-    Version.new(emacs_version) >= Version.new(@version)
+    Version.create(emacs_version) >= Version.create(@version)
   end
 
   env do

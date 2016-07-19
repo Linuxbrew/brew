@@ -12,11 +12,10 @@ module Homebrew
 
     installed.each do |f|
       deps = []
-      tab = Tab.for_formula(f)
 
       f.deps.each do |dep|
         if dep.optional? || dep.recommended?
-          deps << dep.to_formula.full_name if tab.with?(dep)
+          deps << dep.to_formula.full_name if f.build.with?(dep)
         else
           deps << dep.to_formula.full_name
         end
