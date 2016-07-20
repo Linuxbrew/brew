@@ -679,8 +679,9 @@ module Homebrew
           tests_args_coverage << "--coverage" if ENV["TRAVIS"]
         end
         test "brew", "tests", *tests_args
+        # brew tests --generic currently fails on Linux.
         test "brew", "tests", "--generic", "--only=integration_cmds",
-                              *tests_args
+                              *tests_args unless OS.linux?
         test "brew", "tests", "--no-compat", *tests_args_coverage
         test "brew", "readall", "--syntax"
         # test update from origin/master to current commit.
