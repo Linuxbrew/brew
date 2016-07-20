@@ -302,7 +302,7 @@ class Pathname
   # @private
   def dynamic?
     @which_file ||= which("file")
-    !@which_file.nil? && `#{@which_file} -b #{self}` =~ /dynamically linked/
+    !@which_file.nil? && `#{@which_file} -b #{self}` =~ / shared /
   end
 
   # @private
