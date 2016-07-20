@@ -163,6 +163,31 @@ class IntegrationCommandTests < Homebrew::TestCase
     tap
   end
 
+  def install_and_rename_coretap_formula(old_name, new_name)
+    core_tap = CoreTap.new
+    core_tap.path.cd do
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m",
+          "#{old_name.capitalize} has not yet been renamed"
+      end
+    end
+
+    cmd("install", old_name)
+    (core_tap.path/"Formula/#{old_name}.rb").unlink
+    formula_renames = core_tap.path/"formula_renames.json"
+    formula_renames.write Utils::JSON.dump(old_name => new_name)
+
+    core_tap.path.cd do
+      shutup do
+        system "git", "add", "--all"
+        system "git", "commit", "-m",
+          "#{old_name.capitalize} has been renamed to #{new_name.capitalize}"
+      end
+    end
+  end
+
   def testball
     "#{File.expand_path("..", __FILE__)}/testball.rb"
   end
@@ -777,31 +802,7 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_match "testball1 doesn't replace any formula",
       cmd_fail("migrate", "testball1")
 
-    core_tap = CoreTap.new
-    core_tap.path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "Testball1 has not yet been renamed"
-      end
-    end
-
-    cmd("install", "testball1")
-    (core_tap.path/"Formula/testball1.rb").unlink
-    formula_renames = core_tap.path/"formula_renames.json"
-    formula_renames.write <<-EOS.undent
-    {
-      "testball1": "testball2"
-    }
-    EOS
-
-    core_tap.path.cd do
-      shutup do
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "Testball1 has been renamed to Testball2"
-      end
-    end
-
+    install_and_rename_coretap_formula "testball1", "testball2"
     assert_match "Migrating testball1 to testball2", cmd("migrate", "testball1")
     (HOMEBREW_CELLAR/"testball1").unlink
     assert_match "Error: No such keg", cmd_fail("migrate", "testball1")
