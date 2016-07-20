@@ -32,6 +32,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       coretap.path/".git",
       coretap.alias_dir,
       coretap.formula_dir.children,
+      coretap.path/"formula_renames.json",
     ].flatten
     FileUtils.rm_rf paths_to_delete
   end
@@ -759,6 +760,45 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_match "Invalid usage", cmd_fail("analytics", "on", "off")
     assert_match "Invalid usage", cmd_fail("analytics", "testball")
     cmd("analytics", "regenerate-uuid")
+  end
+
+  def test_migrate
+    setup_test_formula "testball1"
+    setup_test_formula "testball2"
+    assert_match "Invalid usage", cmd_fail("migrate")
+    assert_match "No available formula with the name \"testball\"",
+      cmd_fail("migrate", "testball")
+    assert_match "testball1 doesn't replace any formula",
+      cmd_fail("migrate", "testball1")
+
+    core_tap = CoreTap.new
+    core_tap.path.cd do
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "Testball1 has not yet been renamed"
+      end
+    end
+
+    cmd("install", "testball1")
+    (core_tap.path/"Formula/testball1.rb").unlink
+    formula_renames = core_tap.path/"formula_renames.json"
+    formula_renames.write <<-EOS.undent
+    {
+      "testball1": "testball2"
+    }
+    EOS
+
+    core_tap.path.cd do
+      shutup do
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "Testball1 has been renamed to Testball2"
+      end
+    end
+
+    assert_match "Migrating testball1 to testball2", cmd("migrate", "testball1")
+    (HOMEBREW_CELLAR/"testball1").unlink
+    assert_match "Error: No such keg", cmd_fail("migrate", "testball1")
   end
 
   def test_switch
