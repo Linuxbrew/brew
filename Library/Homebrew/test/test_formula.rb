@@ -134,6 +134,47 @@ class FormulaTests < Homebrew::TestCase
     f.rack.rmtree
   end
 
+  def test_installed_prefix_outdated_stable_head_installed
+    f = formula do
+      url "foo"
+      version "1.9"
+      head "foo"
+    end
+
+    head_prefix = HOMEBREW_CELLAR/"#{f.name}/HEAD"
+    head_prefix.mkpath
+    tab = Tab.empty
+    tab.tabfile = head_prefix.join("INSTALL_RECEIPT.json")
+    tab.source["versions"] = { "stable" => "1.0" }
+    tab.write
+
+    assert_equal HOMEBREW_CELLAR/"#{f.name}/#{f.version}", f.installed_prefix
+  ensure
+    f.rack.rmtree
+  end
+
+  def test_installed_prefix_outdated_devel_head_installed
+    f = formula do
+      url "foo"
+      version "1.9"
+      devel do
+        url "foo"
+        version "2.1"
+      end
+    end
+
+    head_prefix = HOMEBREW_CELLAR/"#{f.name}/HEAD"
+    head_prefix.mkpath
+    tab = Tab.empty
+    tab.tabfile = head_prefix.join("INSTALL_RECEIPT.json")
+    tab.source["versions"] = { "stable" => "1.9", "devel" => "2.0" }
+    tab.write
+
+    assert_equal HOMEBREW_CELLAR/"#{f.name}/#{f.version}", f.installed_prefix
+  ensure
+    f.rack.rmtree
+  end
+
   def test_installed_prefix_head
     f = formula("test", Pathname.new(__FILE__).expand_path, :head) do
       head "foo"
@@ -526,60 +567,67 @@ class OutdatedVersionsTests < Homebrew::TestCase
   end
 
   def teardown
-    @f.rack.rmtree
+    @f.rack.rmtree if @f.rack.exist?
   end
 
-  def setup_tab_for_prefix(prefix, tap_string = nil)
+  def setup_tab_for_prefix(prefix, options = {})
     prefix.mkpath
     tab = Tab.empty
     tab.tabfile = prefix.join("INSTALL_RECEIPT.json")
-    tab.source["tap"] = tap_string if tap_string
-    tab.write
+    tab.source["tap"] = options[:tap] if options[:tap]
+    tab.source["versions"] = options[:versions] if options[:versions]
+    tab.source_modified_time = options[:source_modified_time].to_i
+    tab.write unless options[:no_write]
     tab
   end
 
+  def reset_outdated_versions
+    f.instance_variable_set(:@outdated_versions, nil)
+  end
+
   def test_greater_different_tap_installed
-    setup_tab_for_prefix(greater_prefix, "user/repo")
+    setup_tab_for_prefix(greater_prefix, :tap => "user/repo")
     assert_predicate f.outdated_versions, :empty?
   end
 
   def test_greater_same_tap_installed
     f.instance_variable_set(:@tap, CoreTap.instance)
-    setup_tab_for_prefix(greater_prefix, "homebrew/core")
+    setup_tab_for_prefix(greater_prefix, :tap => "homebrew/core")
     assert_predicate f.outdated_versions, :empty?
   end
 
   def test_outdated_different_tap_installed
-    setup_tab_for_prefix(outdated_prefix, "user/repo")
+    setup_tab_for_prefix(outdated_prefix, :tap => "user/repo")
     refute_predicate f.outdated_versions, :empty?
   end
 
   def test_outdated_same_tap_installed
     f.instance_variable_set(:@tap, CoreTap.instance)
-    setup_tab_for_prefix(outdated_prefix, "homebrew/core")
+    setup_tab_for_prefix(outdated_prefix, :tap => "homebrew/core")
     refute_predicate f.outdated_versions, :empty?
   end
 
   def test_same_head_installed
     f.instance_variable_set(:@tap, CoreTap.instance)
-    setup_tab_for_prefix(head_prefix, "homebrew/core")
+    setup_tab_for_prefix(head_prefix, :tap => "homebrew/core")
     assert_predicate f.outdated_versions, :empty?
   end
 
   def test_different_head_installed
     f.instance_variable_set(:@tap, CoreTap.instance)
-    setup_tab_for_prefix(head_prefix, "user/repo")
+    setup_tab_for_prefix(head_prefix, :tap => "user/repo")
     assert_predicate f.outdated_versions, :empty?
   end
 
   def test_mixed_taps_greater_version_installed
     f.instance_variable_set(:@tap, CoreTap.instance)
-    setup_tab_for_prefix(outdated_prefix, "homebrew/core")
-    setup_tab_for_prefix(greater_prefix, "user/repo")
+    setup_tab_for_prefix(outdated_prefix, :tap => "homebrew/core")
+    setup_tab_for_prefix(greater_prefix, :tap => "user/repo")
 
     assert_predicate f.outdated_versions, :empty?
 
-    setup_tab_for_prefix(greater_prefix, "homebrew/core")
+    setup_tab_for_prefix(greater_prefix, :tap => "homebrew/core")
+    reset_outdated_versions
 
     assert_predicate f.outdated_versions, :empty?
   end
@@ -590,23 +638,97 @@ class OutdatedVersionsTests < Homebrew::TestCase
     extra_outdated_prefix = HOMEBREW_CELLAR/"#{f.name}/1.0"
 
     setup_tab_for_prefix(outdated_prefix)
-    setup_tab_for_prefix(extra_outdated_prefix, "homebrew/core")
+    setup_tab_for_prefix(extra_outdated_prefix, :tap => "homebrew/core")
+    reset_outdated_versions
 
     refute_predicate f.outdated_versions, :empty?
 
-    setup_tab_for_prefix(outdated_prefix, "user/repo")
+    setup_tab_for_prefix(outdated_prefix, :tap => "user/repo")
+    reset_outdated_versions
 
     refute_predicate f.outdated_versions, :empty?
   end
 
   def test_same_version_tap_installed
     f.instance_variable_set(:@tap, CoreTap.instance)
-    setup_tab_for_prefix(same_prefix, "homebrew/core")
+    setup_tab_for_prefix(same_prefix, :tap => "homebrew/core")
 
     assert_predicate f.outdated_versions, :empty?
 
-    setup_tab_for_prefix(same_prefix, "user/repo")
+    setup_tab_for_prefix(same_prefix, :tap => "user/repo")
+    reset_outdated_versions
 
     assert_predicate f.outdated_versions, :empty?
+  end
+
+  def test_outdated_installed_head_less_than_stable
+    tab = setup_tab_for_prefix(head_prefix, :versions => { "stable" => "1.0" })
+    refute_predicate f.outdated_versions, :empty?
+
+    # Tab.for_keg(head_prefix) will be fetched from CACHE but we write it anyway
+    tab.source["versions"] = { "stable" => f.version.to_s }
+    tab.write
+    reset_outdated_versions
+
+    assert_predicate f.outdated_versions, :empty?
+  end
+
+  def test_outdated_fetch_head
+    outdated_stable_prefix = HOMEBREW_CELLAR.join("testball/1.0")
+    head_prefix_a = HOMEBREW_CELLAR.join("testball/HEAD")
+    head_prefix_b = HOMEBREW_CELLAR.join("testball/HEAD-aaaaaaa_1")
+    head_prefix_c = HOMEBREW_CELLAR.join("testball/HEAD-5658946")
+
+    setup_tab_for_prefix(outdated_stable_prefix)
+    tab_a = setup_tab_for_prefix(head_prefix_a, :versions => { "stable" => "1.0" })
+    setup_tab_for_prefix(head_prefix_b)
+
+    initial_env = ENV.to_hash
+    testball_repo = HOMEBREW_PREFIX.join("testball_repo")
+    testball_repo.mkdir
+
+    @f = formula("testball") do
+      url "foo"
+      version "2.10"
+      head "file://#{testball_repo}", :using => :git
+    end
+
+    %w[AUTHOR COMMITTER].each do |role|
+      ENV["GIT_#{role}_NAME"] = "brew tests"
+      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
+      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
+    end
+
+    testball_repo.cd do
+      FileUtils.touch "LICENSE"
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "Initial commit"
+      end
+    end
+
+    refute_predicate f.outdated_versions(:fetch_head => true), :empty?
+
+    tab_a.source["versions"] = { "stable" => f.version.to_s }
+    tab_a.write
+    reset_outdated_versions
+    refute_predicate f.outdated_versions(:fetch_head => true), :empty?
+
+    head_prefix_a.rmtree
+    reset_outdated_versions
+    refute_predicate f.outdated_versions(:fetch_head => true), :empty?
+
+    setup_tab_for_prefix(head_prefix_c, :source_modified_time => 1)
+    reset_outdated_versions
+    assert_predicate f.outdated_versions(:fetch_head => true), :empty?
+  ensure
+    ENV.replace(initial_env)
+    testball_repo.rmtree if testball_repo.exist?
+    outdated_stable_prefix.rmtree if outdated_stable_prefix.exist?
+    head_prefix_b.rmtree if head_prefix.exist?
+    head_prefix_c.rmtree if head_prefix_c.exist?
+    FileUtils.rm_rf HOMEBREW_CACHE/"testball--git"
+    FileUtils.rm_rf HOMEBREW_CELLAR/"testball"
   end
 end
