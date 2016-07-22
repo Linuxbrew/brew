@@ -223,6 +223,10 @@ module HomebrewArgvExtension
     include? "--force-bottle"
   end
 
+  def fetch_head?
+    include? "--fetch-HEAD"
+  end
+
   # eg. `foo -ns -i --bar` has three switches, n, s and i
   def switch?(char)
     return false if char.length > 1
