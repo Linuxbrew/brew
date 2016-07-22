@@ -449,8 +449,8 @@ class Formula
   # and then {#stable}'s {#prefix}
   # @private
   def installed_prefix
-    if head && (head_prefix = latest_head_prefix) && head_prefix.directory?
-      head_prefix
+    if head && (head_version = latest_head_version) && !head_version_outdated?(head_version)
+      latest_head_prefix
     elsif devel && (devel_prefix = prefix(PkgVersion.new(devel.version, revision))).directory?
       devel_prefix
     elsif stable && (stable_prefix = prefix(PkgVersion.new(stable.version, revision))).directory?
