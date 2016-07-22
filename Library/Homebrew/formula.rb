@@ -413,16 +413,36 @@ class Formula
     Pathname.new("#{HOMEBREW_LIBRARY}/LinkedKegs/#{name}")
   end
 
-  def latest_head_prefix
+  def latest_head_version
     head_versions = installed_prefixes.map do |pn|
       pn_pkgversion = PkgVersion.parse(pn.basename.to_s)
       pn_pkgversion if pn_pkgversion.head?
     end.compact
 
-    latest_head_version = head_versions.max_by do |pn_pkgversion|
+    head_versions.max_by do |pn_pkgversion|
       [Tab.for_keg(prefix(pn_pkgversion)).source_modified_time, pn_pkgversion.revision]
     end
-    prefix(latest_head_version) if latest_head_version
+  end
+
+  def latest_head_prefix
+    head_version = latest_head_version
+    prefix(head_version) if head_version
+  end
+
+  def head_version_outdated?(version, options={})
+    tab = Tab.for_keg(prefix(version))
+
+    return true if stable && tab.stable_version && tab.stable_version < stable.version
+    return true if devel && tab.devel_version && tab.devel_version < devel.version
+
+    if options[:fetch_head]
+      return false unless head && head.downloader.is_a?(VCSDownloadStrategy)
+      downloader = head.downloader
+      downloader.shutup! unless ARGV.verbose?
+      downloader.commit_outdated?(version.version.commit)
+    else
+      false
+    end
   end
 
   # The latest prefix for this formula. Checks for {#head}, then {#devel}
