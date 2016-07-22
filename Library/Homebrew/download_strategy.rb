@@ -147,6 +147,16 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     end
   end
 
+  def fetch_last_commit
+    fetch
+    last_commit
+  end
+
+  def commit_outdated?(commit)
+    @last_commit ||= fetch_last_commit
+    commit != @last_commit
+  end
+
   def cached_location
     @clone
   end
@@ -756,6 +766,45 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 end
 
+class GitHubGitDownloadStrategy < GitDownloadStrategy
+  def initialize(name, resource)
+    super
+    if @url =~ %r{^https?://github\.com/([^/]+)/([^/]+)\.git$}
+      @user = $1
+      @repo = $2
+    end
+  end
+
+  def github_last_commit
+    return if ENV["HOMEBREW_NO_GITHUB_API"]
+
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{@ref}"
+
+    commit = output[/^ETag: \"(\h+)\"/, 1] if status.success?
+    version.update_commit(commit) if commit
+    commit
+  end
+
+  def multiple_short_commits_exist?(commit)
+    return if ENV["HOMEBREW_NO_GITHUB_API"]
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{commit}"
+
+    !(status.success? && output && output[/^Status: (200)/, 1] == "200")
+  end
+
+  def commit_outdated?(commit)
+    @last_commit ||= github_last_commit
+    if !@last_commit
+      super
+    else
+      return true unless @last_commit.start_with?(commit)
+      multiple_short_commits_exist?(commit)
+    end
+  end
+end
+
 class CVSDownloadStrategy < VCSDownloadStrategy
   def initialize(name, resource)
     super
@@ -957,6 +1006,8 @@ class DownloadStrategyDetector
 
   def self.detect_from_url(url)
     case url
+    when %r{^https?://github\.com/[^/]+/[^/]+\.git$}
+      GitHubGitDownloadStrategy
     when %r{^https?://.+\.git$}, %r{^git://}
       GitDownloadStrategy
     when %r{^https?://www\.apache\.org/dyn/closer\.cgi}, %r{^https?://www\.apache\.org/dyn/closer\.lua}
