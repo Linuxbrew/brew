@@ -107,8 +107,7 @@ begin
       safe_system(*tap_commands)
       exec HOMEBREW_BREW_FILE, cmd, *ARGV
     else
-      onoe "Unknown command: #{cmd}"
-      exit 1
+      odie "Unknown command: #{cmd}"
     end
   end
 
