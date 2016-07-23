@@ -54,40 +54,57 @@ Formulæ for apps that require Python 3 **should** declare an unconditional depe
 
 ## Installing
 
-Applications should be installed to `libexec`. This prevents the app's Python modules from contaminating the system site-packages, which is important so that pip doesn't try to manage Homebrew-installed packages and because applications' Python dependencies should not be installed to an importable prefix (see below) so `import` won't work anyway.
+Applications should be installed into a Python [virtualenv](https://virtualenv.pypa.io/en/stable/) environment rooted in `libexec`. This prevents the app's Python modules from contaminating the system site-packages and vice versa.
 
-In your formula's `install` method, first set the `PYTHONPATH` environment variable to your package's libexec site-packages directory with:
-```ruby
-ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python2.7/site-packages"
+All of the Python module dependencies of the application (and their dependencies, recursively) should be declared as `resource`s in the formula and installed into the virtualenv, as well. Each dependency should be explicitly specified; please do not rely on `setup.py` or `pip` to perform automatic dependency resolution, for the [reasons described here](Acceptable-Formulae.md#we-dont-like-install-scripts-that-download-things).
+
+You can use [homebrew-pypi-poet](https://pypi.python.org/pypi/homebrew-pypi-poet) to help you write resource stanzas. To use it, set up a virtualenv and install your package and all its dependencies. Then, `pip install homebrew-pypi-poet` into the same virtualenv. Running `poet some_package` will generate the necessary resource stanzas. You can do this like:
+
+```bash
+# Install virtualenvwrapper
+$ brew install python
+$ python -m pip install virtualenvwrapper
+$ source $(brew --prefix)/bin/virtualenvwrapper.sh
+
+# Set up a temporary virtual environment
+$ mktmpenv
+
+# Install the package of interest as well as homebrew-pypi-poet
+$ pip install some_package homebrew-pypi-poet
+$ poet some_package
+
+# Destroy the temporary virtualenv you just created
+$ deactivate
 ```
-Then, use `system` with `Language::Python.setup_install_args` to invoke `setup.py` like:
+
+Homebrew provides helper methods for instantiating and populating virtualenvs. You can use them by putting `include Language::Python::Virtualenv` on the `Formula` class definition, above `def install`.
+
+For most applications, all you will need to write is:
+
 ```ruby
-system "python", *Language::Python.setup_install_args(libexec)
+def install
+  virtualenv_install_with_resources
+end
 ```
 
-This will have placed the scripts your Python package installs in `libexec/"bin"`, which is not symlinked into Homebrew's prefix. We need to make sure these are installed and we also need to make sure that, when they are invoked, `PYTHONPATH` includes the path where we just installed your package. Do this with:
+This is exactly the same as writing:
 
 ```ruby
-bin.install Dir[libexec/"bin/*"]
-bin.env_script_all_files(libexec/"bin", :PYTHONPATH => ENV["PYTHONPATH"])
-```
-The first line copies all of the executables to bin. The second line writes stubs to bin that set `PYTHONPATH` and moves the original files back to `libexec/"bin"`.
-
-## Dependencies
-
-All Python dependencies of applications that are not packaged by Homebrew (and those dependencies' Python dependencies, recursively) **should** be unconditionally downloaded as `Resource`s and installed into the application keg's `libexec/"vendor"` path. This prevents the state of the system Python packages from being affected by installing an app with Homebrew and guarantees that apps use versions of their dependencies that are known to work together. `libexec/"vendor"` is preferred to `libexec` so that formulæ don't accidentally install executables belonging to their dependencies, which can cause linking conflicts.
-
-Each dependency **should** be explicitly installed; please do not rely on setup.py or pip to perform automatic dependency resolution, for the [reasons described here](Acceptable-Formulae.md#we-dont-like-install-scripts-that-download-things).
-
-You can use [homebrew-pypi-poet](https://pypi.python.org/pypi/homebrew-pypi-poet) to help you write resource stanzas. To use it, set up a virtualenv and install your package and all its dependencies. Then, `pip install homebrew-pypi-poet` into the same virtualenv. `poet -f foo` will draft a complete formula for you, or `poet foo` will just generate the resource stanzas.
-
-Set `PYTHONPATH` to include the `libexec/"vendor"` site-packages path with:
-```ruby
-ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
-```
-before staging and installing each resourced dependency with:
-```ruby
-system "python", *Language::Python.setup_install_args(libexec/"vendor")
+def install
+  # Create a virtualenv in `libexec`. If your app needs Python 3, make sure that
+  # `depends_on :python3` is declared, and use `virtualenv_create(libexec, "python3")`.
+  venv = virtualenv_create(libexec)
+  # Install all of the resources declared on the formula into the virtualenv.
+  venv.pip_install resources
+  # `link_scripts` takes a look at the virtualenv's bin directory before and
+  # after executing the block which is passed into it. If the block caused any
+  # new scripts to be written to the virtualenv's bin directory, link_scripts
+  # will symlink those scripts into the path given as its argument (here, the
+  # formula's `bin` directory in the Cellar.)
+  # `pip_install buildpath` will install the package that the formula points to,
+  # because buildpath is the location where the formula's tarball was unpacked.
+  venv.link_scripts(bin) { venv.pip_install buildpath }
+end
 ```
 
 ## Example
@@ -108,22 +125,26 @@ class Foo < Formula
     sha256 "09bfcd8f3c239c75e77b3ff05d782ab2c1aed0892f250ce2adf948d4308fe9dc"
   end
 
+  include Language::Python::Virtualenv
+
   def install
-    ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python2.7/site-packages"
-    %w[six parsedatetime].each do |r|
-      resource(r).stage do
-        system "python", *Language::Python.setup_install_args(libexec/"vendor")
-      end
-    end
-
-    ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python2.7/site-packages"
-    system "python", *Language::Python.setup_install_args(libexec)
-
-    bin.install Dir[libexec/"bin/*"]
-    bin.env_script_all_files(libexec/"bin", :PYTHONPATH => ENV["PYTHONPATH"])
+    virtualenv_install_with_resources
   end
 end
 ```
+
+You can also use the more verbose form and request that specific resources are installed:
+
+```ruby
+def install
+  venv = virtualenv_create(libexec)
+  %w[six parsedatetime].each do |r|
+    venv.pip_install resource(r)
+  end
+  venv.link_scripts(bin) { venv.pip_install buildpath }
+end
+```
+in case you need to do different things for different resources.
 
 # Bindings
 
