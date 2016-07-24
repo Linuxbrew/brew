@@ -71,6 +71,9 @@ module FormulaCellarChecks
       EOS
     end
 
+    # only check undeclared deps for standard installations.
+    return unless formula.build.used_options.empty?
+
     if checker.undeclared_deps?
       audit_check_output <<-EOS.undent
         Formulae are required to declare all linked dependencies.
