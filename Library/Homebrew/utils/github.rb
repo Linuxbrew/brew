@@ -50,7 +50,7 @@ module GitHub
       if ENV["HOMEBREW_GITHUB_API_TOKEN"]
         ENV["HOMEBREW_GITHUB_API_TOKEN"]
       elsif ENV["HOMEBREW_GITHUB_API_USERNAME"] && ENV["HOMEBREW_GITHUB_API_PASSWORD"]
-        [ENV["HOMEBREW_GITHUB_API_USERNAME"], ENV["HOMEBREW_GITHUB_API_PASSWORD"]]
+        [ENV["HOMEBREW_GITHUB_API_PASSWORD"], ENV["HOMEBREW_GITHUB_API_USERNAME"]]
       else
         github_credentials = api_credentials_from_keychain
         github_username = github_credentials[/username=(.+)/, 1]
