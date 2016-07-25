@@ -9,7 +9,7 @@ Bottles will not be used if the user requests it (see above), if the formula req
 ## Bottle Creation
 Bottles are currently created using the [Brew Test Bot](Brew-Test-Bot.md). We will be slowly adding them to all formulae.
 
-By default, bottles will be built for the oldest CPU supported by the OS/architecture you're building for. (That's Core 2 for 64-bit OSs, Core for 32-bit.) This ensures that bottles are compatible with all computers you might distribute them to. If you *really* want your bottles to be optimized for something else, you can pass the `--bottle-arch=` option to build for another architecture - for example, `brew install foo --bottle-arch=penyrn`. Just remember that if you build for a newer architecture some of your users might get binaries they can't run and that would be sad!
+By default, bottles will be built for the oldest CPU supported by the OS/architecture you're building for. (That's Core 2 for 64-bit OSs, Core for 32-bit.) This ensures that bottles are compatible with all computers you might distribute them to. If you *really* want your bottles to be optimized for something else, you can pass the `--bottle-arch=` option to build for another architecture - for example, `brew install foo --bottle-arch=penryn`. Just remember that if you build for a newer architecture some of your users might get binaries they can't run and that would be sad!
 
 ## Bottle Format
 Bottles are simple gzipped tarballs of compiled binaries. Any metadata is stored in a formula's bottle DSL and in the bottle filename (i.e. MacOS version, revision).
