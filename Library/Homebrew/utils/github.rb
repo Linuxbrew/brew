@@ -52,11 +52,7 @@ module GitHub
       elsif ENV["HOMEBREW_GITHUB_API_USERNAME"] && ENV["HOMEBREW_GITHUB_API_PASSWORD"]
         [ENV["HOMEBREW_GITHUB_API_USERNAME"], ENV["HOMEBREW_GITHUB_API_PASSWORD"]]
       else
-        github_credentials = Utils.popen("git credential-osxkeychain get", "w+") do |io|
-          io.puts "protocol=https\nhost=github.com"
-          io.close_write
-          io.read
-        end
+        github_credentials = api_credentials_from_keychain
         github_username = github_credentials[/username=(.+)/, 1]
         github_password = github_credentials[/password=(.+)/, 1]
         if github_username && github_password
@@ -66,6 +62,20 @@ module GitHub
         end
       end
     end
+  end
+
+  def api_credentials_from_keychain
+    Utils.popen(["git", "credential-osxkeychain", "get"], "w+") do |pipe|
+      pipe.write "protocol=https\nhost=github.com\n"
+      pipe.close_write
+      pipe.read
+    end
+  rescue Errno::EPIPE
+    # The above invocation via `Utils.popen` can fail, causing the pipe to be
+    # prematurely closed (before we can write to it) and thus resulting in a
+    # broken pipe error. The root cause is usually a missing or malfunctioning
+    # `git-credential-osxkeychain` helper.
+    ""
   end
 
   def api_credentials_type
