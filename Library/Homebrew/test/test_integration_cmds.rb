@@ -737,4 +737,23 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_match "Patch failed to apply",
       cmd_fail("pull", "https://github.com/Homebrew/homebrew-core/pull/1")
   end
+
+  def test_analytics
+    HOMEBREW_REPOSITORY.cd do
+      shutup do
+        system "git", "init"
+      end
+    end
+
+    assert_match "Invalid usage", cmd_fail("analytics", "on", "off")
+    assert_match "Invalid usage", cmd_fail("analytics", "testball")
+    assert_match "Analytics is enabled", cmd("analytics")
+    assert_match "Analytics is disabled",
+      cmd("analytics", "HOMEBREW_NO_ANALYTICS" => "1")
+
+    cmd("analytics", "regenerate-uuid")
+    cmd("analytics", "on")
+    cmd("analytics", "off")
+    assert_match "Analytics is disabled", cmd("analytics")
+  end
 end
