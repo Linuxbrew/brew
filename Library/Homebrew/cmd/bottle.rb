@@ -95,6 +95,10 @@ module Homebrew
       end
     end
 
+    keg_contains_absolute_symlink_starting_with?(string, keg) || result
+  end
+
+  def keg_contains_absolute_symlink_starting_with?(string, keg)
     absolute_symlinks_start_with_string = []
     absolute_symlinks_rest = []
     keg.find do |pn|
@@ -110,14 +114,14 @@ module Homebrew
     end
 
     if ARGV.verbose?
-      if absolute_symlinks_start_with_string.any?
+      unless absolute_symlinks_start_with_string.empty?
         opoo "Absolute symlink starting with #{string}:"
         absolute_symlinks_start_with_string.each do |pn|
           puts "  #{pn} -> #{pn.resolved_path}"
         end
       end
 
-      if absolute_symlinks_rest.any?
+      unless absolute_symlinks_rest.empty?
         opoo "Absolute symlink:"
         absolute_symlinks_rest.each do |pn|
           puts "  #{pn} -> #{pn.resolved_path}"
