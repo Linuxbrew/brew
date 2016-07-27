@@ -1,23 +1,24 @@
 module OS
   def self.mac?
-    /darwin/i === RUBY_PLATFORM && !ENV["HOMEBREW_TEST_GENERIC_OS"]
+    return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
+    RUBY_PLATFORM.to_s.downcase.include? "darwin"
   end
 
   def self.linux?
-    /linux/i === RUBY_PLATFORM
+    RUBY_PLATFORM.to_s.downcase.include? "linux"
   end
 
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
 
   if OS.mac?
     require "os/mac"
-    ISSUES_URL = "https://git.io/brew-troubleshooting"
-    PATH_OPEN = "/usr/bin/open"
+    ISSUES_URL = "https://git.io/brew-troubleshooting".freeze
+    PATH_OPEN = "/usr/bin/open".freeze
     # compatibility
-    ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s
-    ::MACOS_VERSION = OS::Mac.version.to_s
+    ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
+    ::MACOS_VERSION = OS::Mac.version.to_s.freeze
   elsif OS.linux?
-    ISSUES_URL = "https://github.com/Homebrew/linuxbrew/wiki/troubleshooting"
-    PATH_OPEN = "xdg-open"
+    ISSUES_URL = "https://github.com/Homebrew/linuxbrew/wiki/troubleshooting".freeze
+    PATH_OPEN = "xdg-open".freeze
   end
 end
