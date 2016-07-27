@@ -35,7 +35,7 @@ EOS
 MAXIMUM_STRING_MATCHES = 100
 
 module Homebrew
-  def keg_contains(string, keg, ignores)
+  def keg_contain?(string, keg, ignores)
     @put_string_exists_header, @put_filenames = nil
 
     def print_filename(string, filename)
@@ -95,10 +95,10 @@ module Homebrew
       end
     end
 
-    keg_contains_absolute_symlink_starting_with?(string, keg) || result
+    keg_contain_absolute_symlink_starting_with?(string, keg) || result
   end
 
-  def keg_contains_absolute_symlink_starting_with?(string, keg)
+  def keg_contain_absolute_symlink_starting_with?(string, keg)
     absolute_symlinks_start_with_string = []
     keg.find do |pn|
       if pn.symlink? && (link = pn.readlink).absolute?
@@ -237,10 +237,10 @@ module Homebrew
         if ARGV.include? "--skip-relocation"
           skip_relocation = true
         else
-          relocatable = false if keg_contains(prefix_check, keg, ignores)
-          relocatable = false if keg_contains(cellar, keg, ignores)
+          relocatable = false if keg_contain?(prefix_check, keg, ignores)
+          relocatable = false if keg_contain?(cellar, keg, ignores)
           if prefix != prefix_check
-            relocatable = false if keg_contains_absolute_symlink_starting_with?(prefix, keg)
+            relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
           end
           skip_relocation = relocatable && !keg.require_install_name_tool?
         end
