@@ -100,16 +100,11 @@ module Homebrew
 
   def keg_contains_absolute_symlink_starting_with?(string, keg)
     absolute_symlinks_start_with_string = []
-    absolute_symlinks_rest = []
     keg.find do |pn|
       if pn.symlink? && (link = pn.readlink).absolute?
         if link.to_s.start_with?(string)
           absolute_symlinks_start_with_string << pn
-        else
-          absolute_symlinks_rest << pn
         end
-
-        result = true
       end
     end
 
@@ -120,16 +115,9 @@ module Homebrew
           puts "  #{pn} -> #{pn.resolved_path}"
         end
       end
-
-      unless absolute_symlinks_rest.empty?
-        opoo "Absolute symlink:"
-        absolute_symlinks_rest.each do |pn|
-          puts "  #{pn} -> #{pn.resolved_path}"
-        end
-      end
     end
 
-    result
+    !absolute_symlinks_start_with_string.empty?
   end
 
   def bottle_output(bottle)
@@ -245,12 +233,15 @@ module Homebrew
           ignores << %r{#{Regexp.escape(HOMEBREW_CELLAR)}/go/[\d\.]+/libexec}
         end
 
+        relocatable = true
         if ARGV.include? "--skip-relocation"
-          relocatable = true
           skip_relocation = true
         else
-          relocatable = !keg_contains(prefix_check, keg, ignores)
-          relocatable = !keg_contains(cellar, keg, ignores) && relocatable
+          relocatable = false if keg_contains(prefix_check, keg, ignores)
+          relocatable = false if keg_contains(cellar, keg, ignores)
+          if prefix != prefix_check
+            relocatable = false if keg_contains_absolute_symlink_starting_with?(prefix, keg)
+          end
           skip_relocation = relocatable && !keg.require_install_name_tool?
         end
         puts if !relocatable && ARGV.verbose?
