@@ -112,6 +112,40 @@ def odie(error)
   exit 1
 end
 
+def odeprecated(method, replacement = nil, options = {})
+  verb = if options[:die]
+    "disabled"
+  else
+    "deprecated"
+  end
+
+  replacement_message = if replacement
+    "Use #{replacement} instead."
+  else
+    "There is no replacement."
+  end
+
+  # Show the first location that's not in compat.
+  backtrace = options[:caller] || caller
+  caller_message = backtrace[1]
+
+  message = <<-EOS.undent
+    Calling #{method} is #{verb}!
+    #{replacement_message}
+    #{caller_message}
+  EOS
+
+  if ARGV.homebrew_developer? || options[:die]
+    raise FormulaMethodDeprecatedError.new message
+  else
+    opoo "#{message}\n"
+  end
+end
+
+def odisabled(method, replacement = nil, options = {})
+  odeprecated(method, replacement, :die => true, :caller => caller)
+end
+
 def pretty_installed(f)
   if !$stdout.tty?
     "#{f}"
