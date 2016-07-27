@@ -108,6 +108,15 @@ Second, read the [Troubleshooting Checklist](https://github.com/Linuxbrew/brew/b
 
 Many of the Homebrew formulae work on either Mac or Linux without changes, but some formulae will need to be adapted for Linux. If a formula doesn't work, [open an issue on GitHub](https://github.com/Linuxbrew/linuxbrew/issues) or, even better, submit a pull request.
 
+## Contributing
+We'd love you to contribute to Linuxbrew or its upstream, Homebrew. First, please read our [Contribution Guide](https://github.com/Linuxbrew/brew/blob/master/.github/CONTRIBUTING.md) and [Code of Conduct](https://github.com/Linuxbrew/brew/blob/master/CODEOFCONDUCT.md#code-of-conduct).
+
+We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
+
+Please note that contributions of new formulae or version updates should usually go upstream to Homebrew first.
+
+A good starting point for contributing is running `brew audit` (or `brew audit --strict`) with some of the packages you use (e.g. `brew audit wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit` shows no results and [submit a pull request](https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md). If no formulae you use have warnings you can run `brew audit` without arguments to have it run on all packages and pick one. Good luck!
+
 ## Security
 Please report security issues to security@brew.sh.
 

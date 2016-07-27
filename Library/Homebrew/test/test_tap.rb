@@ -63,6 +63,13 @@ class TapTest < Homebrew::TestCase
     tap = Tap.fetch("Homebrew", "foo")
     assert_kind_of Tap, tap
     assert_equal "homebrew/foo", tap.name
+
+    assert_match "Invalid tap name",
+                 assert_raises { Tap.fetch("foo") }.message
+    assert_match "Invalid tap name",
+                 assert_raises { Tap.fetch("homebrew/homebrew/bar") }.message
+    assert_match "Invalid tap name",
+                 assert_raises { Tap.fetch("homebrew", "homebrew/baz") }.message
   ensure
     Tap.clear_cache
   end

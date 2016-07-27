@@ -25,7 +25,9 @@ class Tap
       repo = args[1]
     end
 
-    raise "Invalid tap name" unless user && repo
+    if [user, repo].any? { |part| part.nil? || part.include?("/") }
+      raise "Invalid tap name '#{args.join("/")}'"
+    end
 
     # we special case homebrew so users don't have to shift in a terminal
     user = "Homebrew" if user == "homebrew"
