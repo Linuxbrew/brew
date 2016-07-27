@@ -685,8 +685,10 @@ module Homebrew
       git "stash"
       git "am", "--abort"
       git "rebase", "--abort"
-      git "checkout", "-f", "master"
-      git "reset", "--hard", "origin/master"
+      unless ARGV.include? "--no-pull"
+        git "checkout", "-f", "master"
+        git "reset", "--hard", "origin/master"
+      end
       git "clean", "-ffdx"
       unless @repository == HOMEBREW_REPOSITORY
         HOMEBREW_REPOSITORY.cd do
