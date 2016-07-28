@@ -1,7 +1,7 @@
 require "testing_env"
 require "blacklist"
 
-class BlacklistTests < Homebrew::TestCase
+class OSMacBlacklistTests < Homebrew::TestCase
   def assert_blacklisted(s)
     assert blacklisted?(s), "'#{s}' should be blacklisted"
   end
