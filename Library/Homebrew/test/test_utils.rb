@@ -161,13 +161,13 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_popen_read
-    out = Utils.popen_read("/bin/sh", "-c", "echo success").chomp
+    out = Utils.popen_read("sh", "-c", "echo success").chomp
     assert_equal "success", out
     assert_predicate $?, :success?
   end
 
   def test_popen_read_with_block
-    out = Utils.popen_read("/bin/sh", "-c", "echo success") do |pipe|
+    out = Utils.popen_read("sh", "-c", "echo success") do |pipe|
       pipe.read.chomp
     end
     assert_equal "success", out
@@ -175,7 +175,7 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_popen_write_with_block
-    Utils.popen_write("/usr/bin/grep", "-q", "success") do |pipe|
+    Utils.popen_write("grep", "-q", "success") do |pipe|
       pipe.write("success\n")
     end
     assert_predicate $?, :success?
