@@ -1,30 +1,18 @@
 language: ruby
-os: osx
-env: OSX=10.11
-osx_image: xcode7.3
-rvm: system
+rvm: 2.0.0
+os: linux
+
+matrix:
+  include:
+    - os: osx
+      env: OSX=10.11
+      osx_image: xcode7.3
+      rvm: system
 
 before_install:
-  - export TRAVIS_COMMIT=$(git rev-parse --verify -q HEAD)
-  - cd /usr/local
-  - sudo rm -rf /usr/local/.git/refs /usr/local/.git/packed-refs /usr/local/Library
-  - sudo rsync -az "$TRAVIS_BUILD_DIR/" /usr/local/
-  - sudo chown -R $USER /usr/local
-  - export TRAVIS_BUILD_DIR="/usr/local"
-  - if [ -f ".git/shallow" ]; then
-      travis_retry git fetch --unshallow;
-    fi
-  - git reset --hard $TRAVIS_COMMIT
-  - git clean -qxdff
-  - export HOMEBREW_DEVELOPER="1"
-  - ulimit -n 1024
+  - export HOMEBREW_DEVELOPER=1
+  - export PATH="bin:$PATH"
+  - umask 022
 
 script:
   - brew test-bot
-
-notifications:
-  slack:
-    secure: Y5ZL6OcprSzAYQ3yVpvrhiQn1UQGd7reKNz3o7+7Bcy2k7DMr66xKBadTv1gK1Qrg9LugsmZ4CqOqKBwy7t5smktan/wsUo5y5HX3WUOG1nk0jQ4HOOZNT8bhUZc/Eu7ilH5UMqvIVsjrX9BjEZMeT4TxTIUD8zj5xUwgiAsD5k=
-  email:
-    on_success: never
-    on_failure: always
