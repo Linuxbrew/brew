@@ -5,6 +5,7 @@ module OS
   end
 
   def self.linux?
+    return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
     RUBY_PLATFORM.to_s.downcase.include? "linux"
   end
 
