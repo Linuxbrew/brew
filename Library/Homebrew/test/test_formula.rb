@@ -443,7 +443,8 @@ class FormulaTests < Homebrew::TestCase
     assert_predicate f2, :installed?
     assert_predicate f3, :installed?
 
-    assert_equal f3.installed_kegs[0..1], f3.eligible_kegs_for_cleanup
+    assert_equal f3.installed_kegs.sort_by(&:version)[0..1],
+                 f3.eligible_kegs_for_cleanup.sort_by(&:version)
   ensure
     [f1, f2, f3].each(&:clear_cache)
     f3.rack.rmtree
