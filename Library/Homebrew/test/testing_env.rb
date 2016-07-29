@@ -97,6 +97,10 @@ module Homebrew
       skip "Requires compat/ code" if ENV["HOMEBREW_NO_COMPAT"]
     end
 
+    def needs_python
+      skip "Requires Python" unless which("python")
+    end
+
     def assert_nothing_raised
       yield
     end
