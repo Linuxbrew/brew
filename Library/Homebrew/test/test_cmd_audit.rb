@@ -254,11 +254,14 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    fa = formula_auditor "foo", <<-EOS.undent
-      class Foo < GithubGistFormula
-        url "http://example.com/foo-1.0.tgz"
-      end
-    EOS
+    ARGV.stubs(:homebrew_developer?).returns false
+    fa = shutup do
+      formula_auditor "foo", <<-EOS.undent
+        class Foo < GithubGistFormula
+          url "http://example.com/foo-1.0.tgz"
+        end
+      EOS
+    end
     fa.audit_class
     assert_equal ["GithubGistFormula is deprecated, use Formula instead"],
       fa.problems
@@ -268,6 +271,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
+    ARGV.stubs(:homebrew_developer?).returns false
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < ScriptFileFormula
         url "http://example.com/foo-1.0.tgz"
@@ -282,6 +286,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
+    ARGV.stubs(:homebrew_developer?).returns false
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < AmazonWebServicesFormula
         url "http://example.com/foo-1.0.tgz"
