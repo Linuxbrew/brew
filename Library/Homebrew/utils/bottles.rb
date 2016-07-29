@@ -29,7 +29,9 @@ module Utils
       end
 
       def receipt_path(bottle_file)
-        Utils.popen_read("/usr/bin/tar", "-tzf", bottle_file, "*/*/INSTALL_RECEIPT.json").chomp
+        Utils.popen_read("tar", "-tzf", bottle_file).lines.map(&:chomp).find do |line|
+          line =~ %r{.+/.+/INSTALL_RECEIPT.json}
+        end
       end
 
       def resolve_formula_names(bottle_file)
