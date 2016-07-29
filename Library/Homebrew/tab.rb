@@ -140,7 +140,7 @@ class Tab < OpenStruct
       "source_modified_time" => 0,
       "HEAD" => nil,
       "stdlib" => nil,
-      "compiler" => "clang",
+      "compiler" => DevelopmentTools.default_compiler,
       "source" => {
         "path" => nil,
         "tap" => nil,
