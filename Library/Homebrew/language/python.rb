@@ -119,6 +119,7 @@ module Language
       # @param formula [Formula] the active Formula
       # @return [Virtualenv] a {Virtualenv} instance
       def virtualenv_create(venv_root, python = "python", formula = self)
+        ENV.refurbish_args
         venv = Virtualenv.new formula, venv_root, python
         venv.create
         venv
