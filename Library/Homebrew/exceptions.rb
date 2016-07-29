@@ -56,6 +56,8 @@ end
 
 class FormulaSpecificationError < StandardError; end
 
+class FormulaMethodDeprecatedError < StandardError; end
+
 class FormulaUnavailableError < RuntimeError
   attr_reader :name
   attr_accessor :dependent
