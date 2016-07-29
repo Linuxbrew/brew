@@ -62,6 +62,8 @@ class Keg
 
   def text_files
     text_files = []
+    return text_files unless File.exist?("/usr/bin/file")
+
     path.find do |pn|
       next if pn.symlink? || pn.directory?
       next if Metafiles::EXTENSIONS.include? pn.extname
