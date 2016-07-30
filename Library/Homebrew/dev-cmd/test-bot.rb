@@ -40,6 +40,7 @@ require "rexml/xmldecl"
 require "rexml/cdata"
 require "tap"
 require "development_tools"
+require "utils/bottles"
 
 module Homebrew
   BYTES_IN_1_MEGABYTE = 1024*1024
@@ -994,7 +995,7 @@ module Homebrew
 
       tests.each do |test|
         testsuite = testsuites.add_element "testsuite"
-        testsuite.add_attribute "name", "brew-test-bot.#{MacOS.cat}"
+        testsuite.add_attribute "name", "brew-test-bot.#{Utils::Bottles.tag}"
         testsuite.add_attribute "tests", test.steps.count
 
         test.steps.each do |step|
