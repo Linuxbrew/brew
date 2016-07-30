@@ -61,6 +61,7 @@ require "cmd/search"
 require "formula_installer"
 require "tap"
 require "hardware"
+require "development_tools"
 
 module Homebrew
   def install

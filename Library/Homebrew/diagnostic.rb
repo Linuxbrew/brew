@@ -2,6 +2,7 @@ require "keg"
 require "language/python"
 require "formula"
 require "version"
+require "development_tools"
 
 module Homebrew
   module Diagnostic

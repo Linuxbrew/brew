@@ -2,6 +2,7 @@
 #:    Uninstall then install <formula>
 
 require "formula_installer"
+require "development_tools"
 
 module Homebrew
   def reinstall
