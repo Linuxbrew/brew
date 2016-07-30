@@ -125,9 +125,18 @@ def odeprecated(method, replacement = nil, options = {})
     "There is no replacement."
   end
 
-  # Show the first location that's not in compat.
-  backtrace = options[:caller] || caller
-  caller_message = backtrace[1]
+  # Try to show the most relevant location in message, i.e. (if applicable):
+  # - Location in a formula.
+  # - Location outside of 'compat/'.
+  # - Location of caller of deprecated method (if all else fails).
+  backtrace = options.fetch(:caller, caller)
+  caller_message = backtrace.detect do |line|
+    line.start_with?("#{HOMEBREW_LIBRARY}/Taps/")
+  end
+  caller_message ||= backtrace.detect do |line|
+    !line.start_with?("#{HOMEBREW_LIBRARY_PATH}/compat/")
+  end
+  caller_message ||= backtrace[1]
 
   message = <<-EOS.undent
     Calling #{method} is #{verb}!
@@ -136,7 +145,7 @@ def odeprecated(method, replacement = nil, options = {})
   EOS
 
   if ARGV.homebrew_developer? || options[:die]
-    raise FormulaMethodDeprecatedError.new message
+    raise FormulaMethodDeprecatedError, message
   else
     opoo "#{message}\n"
   end
