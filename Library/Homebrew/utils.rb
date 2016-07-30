@@ -152,7 +152,8 @@ def odeprecated(method, replacement = nil, options = {})
 end
 
 def odisabled(method, replacement = nil, options = {})
-  odeprecated(method, replacement, :die => true, :caller => caller)
+  options = { :die => true, :caller => caller }.merge(options)
+  odeprecated(method, replacement, options)
 end
 
 def pretty_installed(f)
