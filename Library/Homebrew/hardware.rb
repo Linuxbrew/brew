@@ -70,6 +70,10 @@ module Hardware
         type == :ppc
       end
 
+      def arm?
+        type == :arm
+      end
+
       def features
         []
       end
