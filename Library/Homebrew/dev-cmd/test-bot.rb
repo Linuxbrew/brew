@@ -668,10 +668,13 @@ module Homebrew
         test "brew", "tests", "--generic", *tests_args
         test "brew", "tests", "--no-compat", *tests_args_coverage
         test "brew", "readall", "--syntax"
-        # test update from origin/master to current commit.
-        test "brew", "update-test"
-        # test no-op update from current commit (to current commit, a no-op).
-        test "brew", "update-test", "--commit=HEAD"
+        # TODO: try to fix this on Linux at some stage.
+        if OS.mac?
+          # test update from origin/master to current commit.
+          test "brew", "update-test"
+          # test no-op update from current commit (to current commit, a no-op).
+          test "brew", "update-test", "--commit=HEAD"
+        end
       else
         test "brew", "readall", "--aliases", @tap.name
       end
