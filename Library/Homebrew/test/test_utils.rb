@@ -223,4 +223,17 @@ class UtilTests < Homebrew::TestCase
     s = truncate_text_to_approximate_size(long_s, n, :front_weight => 1.0)
     assert_equal(("x" * (n - glue.length)) + glue, s)
   end
+
+  def test_odeprecated
+    ARGV.stubs(:homebrew_developer?).returns false
+    e = assert_raises(FormulaMethodDeprecatedError) do
+      odeprecated("method", "replacement",
+        :caller => ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
+        :die => true)
+    end
+    assert_match "method", e.message
+    assert_match "replacement", e.message
+    assert_match "homebrew/homebrew-core", e.message
+    assert_match "homebrew/core", e.message
+  end
 end

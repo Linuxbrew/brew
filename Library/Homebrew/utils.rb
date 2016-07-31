@@ -130,8 +130,13 @@ def odeprecated(method, replacement = nil, options = {})
   # - Location outside of 'compat/'.
   # - Location of caller of deprecated method (if all else fails).
   backtrace = options.fetch(:caller, caller)
+  tap_message = nil
   caller_message = backtrace.detect do |line|
-    line.start_with?("#{HOMEBREW_LIBRARY}/Taps/")
+    if line =~ %r{^#{Regexp.escape HOMEBREW_LIBRARY}/Taps/([^/]+/[^/]+)/}
+      tap = Tap.fetch $1
+      tap_message = "\nPlease report this to the #{tap} tap!"
+      true
+    end
   end
   caller_message ||= backtrace.detect do |line|
     !line.start_with?("#{HOMEBREW_LIBRARY_PATH}/compat/")
@@ -141,7 +146,7 @@ def odeprecated(method, replacement = nil, options = {})
   message = <<-EOS.undent
     Calling #{method} is #{verb}!
     #{replacement_message}
-    #{caller_message}
+    #{caller_message}#{tap_message}
   EOS
 
   if ARGV.homebrew_developer? || options[:die]
