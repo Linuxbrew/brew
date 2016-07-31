@@ -122,6 +122,20 @@ module Language
         ENV.refurbish_args
         venv = Virtualenv.new formula, venv_root, python
         venv.create
+
+        # Find any Python bindings provided by recursive dependencies
+        formula_deps = formula.recursive_dependencies
+        xy = Language::Python.major_minor_version python
+        pth_contents = formula_deps.map do |d|
+          next if d.build?
+          dep_site_packages = Formula[d.name].opt_lib/"python#{xy}/site-packages"
+          next unless dep_site_packages.exist?
+          "import site; site.addsitedir('#{dep_site_packages}')\n"
+        end
+        if pth_contents.any?
+          (venv_root/"lib/python#{xy}/site-packages/homebrew_deps.pth").write pth_contents.join
+        end
+
         venv
       end
 
@@ -223,8 +237,8 @@ module Language
         def do_install(targets)
           targets = [targets] unless targets.is_a? Array
           @formula.system @venv_root/"bin/pip", "install",
-                 "-v", "--no-deps", "--no-binary", ":all:",
-                 *targets
+                          "-v", "--no-deps", "--no-binary", ":all:",
+                          "--ignore-installed", *targets
         end
       end # class Virtualenv
     end # module Virtualenv
