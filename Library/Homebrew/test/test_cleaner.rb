@@ -151,6 +151,28 @@ class CleanerTests < Homebrew::TestCase
     refute_predicate file, :exist?
   end
 
+  def test_removes_perllocal_files
+    file = @f.lib/"perl5/darwin-thread-multi-2level/perllocal.pod"
+
+    (@f.lib/"perl5/darwin-thread-multi-2level").mkpath
+    touch file
+
+    Cleaner.new(@f).clean
+
+    refute_predicate file, :exist?
+  end
+
+  def test_removes_packlist_files
+    file = @f.lib/"perl5/darwin-thread-multi-2level/auto/test/.packlist"
+
+    (@f.lib/"perl5/darwin-thread-multi-2level/auto/test").mkpath
+    touch file
+
+    Cleaner.new(@f).clean
+
+    refute_predicate file, :exist?
+  end
+
   def test_skip_clean_la
     file = @f.lib/"foo.la"
 
