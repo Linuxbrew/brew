@@ -337,6 +337,14 @@ ensure
   ENV["PATH"] = old_path
 end
 
+def with_custom_locale(locale)
+  old_locale = ENV["LC_ALL"]
+  ENV["LC_ALL"] = locale
+  yield
+ensure
+  ENV["LC_ALL"] = old_locale
+end
+
 def run_as_not_developer(&_block)
   old = ENV.delete "HOMEBREW_DEVELOPER"
   yield
