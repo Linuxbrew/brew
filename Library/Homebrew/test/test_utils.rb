@@ -78,6 +78,14 @@ class UtilTests < Homebrew::TestCase
     end
   end
 
+  def test_with_custom_locale
+    ENV["LC_ALL"] = "en_US.UTF-8"
+    with_custom_locale("C") do
+      assert_equal "C", ENV["LC_ALL"]
+    end
+    assert_equal "en_US.UTF-8", ENV["LC_ALL"]
+  end
+
   def test_run_as_not_developer
     ENV["HOMEBREW_DEVELOPER"] = "foo"
     run_as_not_developer do
