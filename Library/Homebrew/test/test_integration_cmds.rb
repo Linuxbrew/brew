@@ -745,16 +745,20 @@ class IntegrationCommandTests < Homebrew::TestCase
       end
     end
 
-    assert_match "Invalid usage", cmd_fail("analytics", "on", "off")
-    assert_match "Invalid usage", cmd_fail("analytics", "testball")
-    assert_match "Analytics is enabled", cmd("analytics")
-    assert_match "Analytics is disabled",
+    assert_match "Analytics is disabled (by HOMEBREW_NO_ANALYTICS)",
       cmd("analytics", "HOMEBREW_NO_ANALYTICS" => "1")
 
-    cmd("analytics", "regenerate-uuid")
-    cmd("analytics", "on")
     cmd("analytics", "off")
-    assert_match "Analytics is disabled", cmd("analytics")
+    assert_match "Analytics is disabled",
+      cmd("analytics", "HOMEBREW_NO_ANALYTICS" => nil)
+
+    cmd("analytics", "on")
+    assert_match "Analytics is enabled", cmd("analytics",
+      "HOMEBREW_NO_ANALYTICS" => nil)
+
+    assert_match "Invalid usage", cmd_fail("analytics", "on", "off")
+    assert_match "Invalid usage", cmd_fail("analytics", "testball")
+    cmd("analytics", "regenerate-uuid")
   end
 
   def test_switch
