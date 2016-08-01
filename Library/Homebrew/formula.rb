@@ -1001,24 +1001,28 @@ class Formula
 
   # @private
   def outdated_versions(options = {})
-    @outdated_versions ||= begin
-      all_versions = []
-
+    @outdated_versions ||= Hash.new do |cache, key|
       raise Migrator::MigrationNeededError.new(self) if migration_needed?
+      cache[key] = _outdated_versions(key)
+    end
+    @outdated_versions[options]
+  end
 
-      installed_kegs.each do |keg|
-        version = keg.version
-        all_versions << version
+  def _outdated_versions(options = {})
+    all_versions = []
 
-        return [] if pkg_version <= version && !version.head?
-      end
+    installed_kegs.each do |keg|
+      version = keg.version
+      all_versions << version
 
-      head_version = latest_head_version
-      if head_version
-        head_version_outdated?(head_version, options) ? all_versions.sort! : []
-      else
-        all_versions.sort!
-      end
+      return [] if pkg_version <= version && !version.head?
+    end
+
+    head_version = latest_head_version
+    if head_version && !head_version_outdated?(head_version, options)
+      []
+    else
+      all_versions.sort
     end
   end
 

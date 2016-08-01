@@ -583,6 +583,7 @@ class OutdatedVersionsTests < Homebrew::TestCase
 
   def reset_outdated_versions
     f.instance_variable_set(:@outdated_versions, nil)
+    f.instance_variable_set(:@outdated_versions_head_fetched, nil)
   end
 
   def test_greater_different_tap_installed
