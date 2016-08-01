@@ -913,7 +913,7 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   end
 
   def last_commit
-    Utils.popen_read("hg", "parent", "--template", "{node}", "-R", cached_location.to_s)
+    Utils.popen_read("hg", "parent", "--template", "{node|short}", "-R", cached_location.to_s)
   end
 
   private
