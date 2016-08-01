@@ -67,9 +67,13 @@ class Keg
     path.find do |pn|
       next if pn.symlink? || pn.directory?
       next if Metafiles::EXTENSIONS.include? pn.extname
-      if Utils.popen_read("/usr/bin/file", "--brief", pn).include?("text") ||
-         pn.text_executable?
-        text_files << pn
+      # File has known issues with reading files on other locales.
+      # http://bugs.gw.com/view.php?id=292
+      with_custom_locale("C") do
+        if Utils.popen_read("/usr/bin/file", "--brief", pn).include?("text") ||
+           pn.text_executable?
+          text_files << pn
+        end
       end
     end
 
