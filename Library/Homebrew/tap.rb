@@ -72,7 +72,6 @@ class Tap
   def clear_cache
     @remote = nil
     @formula_dir = nil
-    @cask_dir = nil
     @formula_files = nil
     @alias_dir = nil
     @alias_files = nil
@@ -305,11 +304,6 @@ class Tap
     @formula_dir ||= [path/"Formula", path/"HomebrewFormula", path].detect(&:directory?)
   end
 
-  # path to the directory of all casks for caskroom/cask {Tap}.
-  def cask_dir
-    @cask_dir ||= [path/"Casks", path].detect(&:directory?)
-  end
-
   # an array of all {Formula} files of this {Tap}.
   def formula_files
     @formula_files ||= if formula_dir
@@ -325,7 +319,7 @@ class Tap
   def formula_file?(file)
     file = Pathname.new(file) unless file.is_a? Pathname
     file = file.expand_path(path)
-    file.extname == ".rb" && (file.parent == formula_dir || file.parent == cask_dir)
+    file.extname == ".rb" && file.parent == formula_dir
   end
 
   # an array of all {Formula} names of this {Tap}.
@@ -563,14 +557,6 @@ class CoreTap < Tap
   # @private
   def formula_dir
     @formula_dir ||= begin
-      self.class.ensure_installed!
-      super
-    end
-  end
-
-  # @private
-  def cask_dir
-    @cask_dir ||= begin
       self.class.ensure_installed!
       super
     end
