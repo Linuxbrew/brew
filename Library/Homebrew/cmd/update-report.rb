@@ -266,7 +266,7 @@ class Reporter
         system HOMEBREW_BREW_FILE, "install", new_full_name
         begin
           unless Formulary.factory(new_full_name).keg_only?
-            system HOMEBREW_BREW_FILE, "link", new_full_name, "--force"
+            system HOMEBREW_BREW_FILE, "link", new_full_name, "--overwrite"
           end
         rescue Exception => e
           onoe e if ARGV.homebrew_developer?
