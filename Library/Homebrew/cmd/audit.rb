@@ -1,15 +1,19 @@
-#:  * `audit` [`--strict`] [`--online`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
 #:    If no <formulae> are provided, all of them are checked.
 #:
 #:    If `--strict` is passed, additional checks are run, including RuboCop
-#:    style checks. This should be used when creating new formulae.
+#:    style checks.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
-#:    connection are run. This should be used when creating for new formulae.
-#:
+#:    connection are run.
+#
+#:    If `--new-formula` is passed, various additional checks are run that check
+#:    if a new formula is eligable for Homebrew. This should be used when creating
+#:    new formulae and implies `--strict` and `--online`.
+#
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
 #:
@@ -43,9 +47,10 @@ module Homebrew
     formula_count = 0
     problem_count = 0
 
-    strict = ARGV.include? "--strict"
+    new_formula = ARGV.include? "--new-formula"
+    strict = new_formula || ARGV.include?("--strict")
     style = strict && RUBY_2_OR_LATER
-    online = ARGV.include? "--online"
+    online = new_formula || ARGV.include?("--online")
 
     ENV.activate_extensions!
     ENV.setup_build_environment
@@ -63,7 +68,7 @@ module Homebrew
     end
 
     ff.each do |f|
-      options = { :strict => strict, :online => online }
+      options = { :new_formula => new_formula, :strict => strict, :online => online }
       options[:style_offenses] = style_results.file_offenses(f.path) if style
       fa = FormulaAuditor.new(f, options)
       fa.audit
@@ -150,6 +155,7 @@ class FormulaAuditor
 
   def initialize(formula, options = {})
     @formula = formula
+    @new_formula = !!options[:new_formula]
     @strict = !!options[:strict]
     @online = !!options[:online]
     # Accept precomputed style offense results, for efficiency
@@ -534,6 +540,7 @@ class FormulaAuditor
 
   def audit_github_repository
     return unless @online
+    return unless @new_formula
 
     regex = %r{https?://github\.com/([^/]+)/([^/]+)/?.*}
     _, user, repo = *regex.match(formula.stable.url) if formula.stable
