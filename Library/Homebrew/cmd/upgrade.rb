@@ -10,6 +10,7 @@
 
 require "cmd/install"
 require "cleanup"
+require "development_tools"
 
 module Homebrew
   def upgrade

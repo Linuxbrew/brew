@@ -1,6 +1,6 @@
 class Version
   def slice(*args)
-    opoo "Calling slice on versions is deprecated, use: to_s.slice"
+    odeprecated "Version#slice", "Version#to_s.slice"
     to_s.slice(*args)
   end
 end

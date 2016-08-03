@@ -15,6 +15,7 @@ require "sandbox"
 require "requirements/cctools_requirement"
 require "requirements/glibc_requirement"
 require "emoji"
+require "development_tools"
 
 class FormulaInstaller
   include FormulaCellarChecks

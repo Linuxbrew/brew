@@ -62,12 +62,21 @@ class Keg
 
   def text_files
     text_files = []
-    path.find do |pn|
-      next if pn.symlink? || pn.directory?
-      next if Metafiles::EXTENSIONS.include? pn.extname
-      if Utils.popen_read("file", "--brief", pn).include?("text") ||
-         pn.text_executable?
-        text_files << pn
+    which_file = OS.mac? ? "/usr/bin/file" : which("file")
+    return text_files unless File.exist?(which_file)
+
+    # file has known issues with reading files on other locales. Has
+    # been fixed upstream for some time, but a sufficiently new enough
+    # file with that fix is only available in macOS Sierra.
+    # http://bugs.gw.com/view.php?id=292
+    with_custom_locale("C") do
+      path.find do |pn|
+        next if pn.symlink? || pn.directory?
+        next if Metafiles::EXTENSIONS.include? pn.extname
+        if Utils.popen_read(which_file, "--brief", pn).include?("text") ||
+           pn.text_executable?
+          text_files << pn
+        end
       end
     end
 

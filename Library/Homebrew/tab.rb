@@ -2,6 +2,7 @@ require "cxxstdlib"
 require "ostruct"
 require "options"
 require "utils/json"
+require "development_tools"
 
 # Inherit from OpenStruct to gain a generic initialization method that takes a
 # hash and creates an attribute for each key and value. `Tab.new` probably
@@ -147,7 +148,7 @@ class Tab < OpenStruct
       "source_modified_time" => 0,
       "HEAD" => nil,
       "stdlib" => nil,
-      "compiler" => OS.mac? ? "clang" : "gcc",
+      "compiler" => DevelopmentTools.default_compiler,
       "source" => {
         "path" => nil,
         "tap" => nil,

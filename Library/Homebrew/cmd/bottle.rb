@@ -35,7 +35,7 @@ EOS
 MAXIMUM_STRING_MATCHES = 100
 
 module Homebrew
-  def keg_contains(string, keg, ignores)
+  def keg_contain?(string, keg, ignores)
     @put_string_exists_header, @put_filenames = nil
 
     def print_filename(string, filename)
@@ -95,37 +95,29 @@ module Homebrew
       end
     end
 
+    keg_contain_absolute_symlink_starting_with?(string, keg) || result
+  end
+
+  def keg_contain_absolute_symlink_starting_with?(string, keg)
     absolute_symlinks_start_with_string = []
-    absolute_symlinks_rest = []
     keg.find do |pn|
       if pn.symlink? && (link = pn.readlink).absolute?
         if link.to_s.start_with?(string)
           absolute_symlinks_start_with_string << pn
-        else
-          absolute_symlinks_rest << pn
         end
-
-        result = true
       end
     end
 
     if ARGV.verbose?
-      if absolute_symlinks_start_with_string.any?
+      unless absolute_symlinks_start_with_string.empty?
         opoo "Absolute symlink starting with #{string}:"
         absolute_symlinks_start_with_string.each do |pn|
           puts "  #{pn} -> #{pn.resolved_path}"
         end
       end
-
-      if absolute_symlinks_rest.any?
-        opoo "Absolute symlink:"
-        absolute_symlinks_rest.each do |pn|
-          puts "  #{pn} -> #{pn.resolved_path}"
-        end
-      end
     end
 
-    result
+    !absolute_symlinks_start_with_string.empty?
   end
 
   def bottle_output(bottle)
@@ -241,12 +233,15 @@ module Homebrew
           ignores << %r{#{Regexp.escape(HOMEBREW_CELLAR)}/go/[\d\.]+/libexec}
         end
 
+        relocatable = true
         if ARGV.include? "--skip-relocation"
-          relocatable = true
           skip_relocation = true
         else
-          relocatable = !keg_contains(prefix_check, keg, ignores)
-          relocatable = !keg_contains(cellar, keg, ignores) && relocatable
+          relocatable = false if keg_contain?(prefix_check, keg, ignores)
+          relocatable = false if keg_contain?(cellar, keg, ignores)
+          if prefix != prefix_check
+            relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
+          end
           skip_relocation = relocatable && !keg.require_install_name_tool?
         end
         puts if !relocatable && ARGV.verbose?

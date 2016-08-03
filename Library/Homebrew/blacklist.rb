@@ -28,16 +28,6 @@ def blacklisted?(name)
     EOS
   when /(lib)?lzma/
     "lzma is now part of the xz formula."
-  when "xcode"
-    if MacOS.version >= :lion
-      <<-EOS.undent
-      Xcode can be installed from the App Store.
-      EOS
-    else
-      <<-EOS.undent
-      Xcode can be installed from https://developer.apple.com/xcode/downloads/
-      EOS
-    end
   when "gtest", "googletest", "google-test" then <<-EOS.undent
     Installing gtest system-wide is not recommended; it should be vendored
     in your projects that use it.
@@ -97,3 +87,6 @@ def blacklisted?(name)
     EOS
   end
 end
+alias generic_blacklisted? blacklisted?
+
+require "extend/os/blacklist"

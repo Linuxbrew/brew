@@ -19,6 +19,12 @@ class DevelopmentTools
       which("clang") || which("gcc")
     end
 
+    def installation_instructions
+      "Install Clang or brew install gcc"
+    end
+    alias_method :custom_installation_instructions,
+                 :installation_instructions
+
     def default_cc
       cc = DevelopmentTools.locate "cc"
       cc.realpath.basename.to_s rescue nil
@@ -26,12 +32,10 @@ class DevelopmentTools
 
     def default_compiler
       return :gcc unless OS.mac?
-      case default_cc
-      # if GCC 4.2 is installed, e.g. via Tigerbrew, prefer it
-      # over the system's GCC 4.0
-      when /^gcc-4.0/ then gcc_42_build_version ? :gcc : :gcc_4_0
-      when /^gcc/ then :gcc
-      else :clang
+      if default_cc =~ /^gcc/
+        :gcc
+      else
+        :clang
       end
     end
 

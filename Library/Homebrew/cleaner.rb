@@ -1,6 +1,8 @@
 # Cleans a newly installed keg.
 # By default:
 # * removes .la files
+# * removes perllocal.pod files
+# * removes .packlist files
 # * removes empty directories
 # * sets permissions on executables
 # * removes unresolved symlinks
@@ -88,6 +90,14 @@ class Cleaner
       if path.symlink? || path.directory?
         next
       elsif path.extname == ".la"
+        path.unlink
+      elsif path.basename.to_s == "perllocal.pod"
+        # Both this file & the .packlist one below are completely unnecessary
+        # to package & causes pointless conflict with other formulae. They are
+        # removed by Debian, Arch & MacPorts amongst other packagers as well.
+        # The files are created as part of installing any Perl module.
+        path.unlink
+      elsif path.basename.to_s == ".packlist" # Hidden file, not file extension!
         path.unlink
       else
         # Set permissions for executables and non-executables

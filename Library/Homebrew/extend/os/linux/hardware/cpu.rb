@@ -65,7 +65,6 @@ module Hardware
           cpu_family_model
         end
       end
-      alias_method :intel_family, :family
 
       def cores
         cpuinfo.scan(/^processor/).size

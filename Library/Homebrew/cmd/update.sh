@@ -359,6 +359,8 @@ EOS
 
   # only allow one instance of brew update
   lock update
+  # prevent recursive updates
+  export HOMEBREW_NO_AUTO_UPDATE="1"
 
   git_init_if_necessary
   # rename Taps directories

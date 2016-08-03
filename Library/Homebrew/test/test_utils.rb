@@ -78,6 +78,14 @@ class UtilTests < Homebrew::TestCase
     end
   end
 
+  def test_with_custom_locale
+    ENV["LC_ALL"] = "en_US.UTF-8"
+    with_custom_locale("C") do
+      assert_equal "C", ENV["LC_ALL"]
+    end
+    assert_equal "en_US.UTF-8", ENV["LC_ALL"]
+  end
+
   def test_run_as_not_developer
     ENV["HOMEBREW_DEVELOPER"] = "foo"
     run_as_not_developer do
@@ -161,13 +169,13 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_popen_read
-    out = Utils.popen_read("/bin/sh", "-c", "echo success").chomp
+    out = Utils.popen_read("sh", "-c", "echo success").chomp
     assert_equal "success", out
     assert_predicate $?, :success?
   end
 
   def test_popen_read_with_block
-    out = Utils.popen_read("/bin/sh", "-c", "echo success") do |pipe|
+    out = Utils.popen_read("sh", "-c", "echo success") do |pipe|
       pipe.read.chomp
     end
     assert_equal "success", out
@@ -222,5 +230,18 @@ class UtilTests < Homebrew::TestCase
     assert_equal glue + ("x" * (n - glue.length)), s
     s = truncate_text_to_approximate_size(long_s, n, :front_weight => 1.0)
     assert_equal(("x" * (n - glue.length)) + glue, s)
+  end
+
+  def test_odeprecated
+    ARGV.stubs(:homebrew_developer?).returns false
+    e = assert_raises(FormulaMethodDeprecatedError) do
+      odeprecated("method", "replacement",
+        :caller => ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
+        :die => true)
+    end
+    assert_match "method", e.message
+    assert_match "replacement", e.message
+    assert_match "homebrew/homebrew-core", e.message
+    assert_match "homebrew/core", e.message
   end
 end

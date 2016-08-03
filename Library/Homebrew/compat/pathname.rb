@@ -1,6 +1,6 @@
 class Pathname
   def cp(dst)
-    opoo "Pathname#cp is deprecated, use FileUtils.cp"
+    odeprecated "Pathname#cp", "FileUtils.cp"
     if file?
       FileUtils.cp to_s, dst
     else
@@ -10,7 +10,7 @@ class Pathname
   end
 
   def chmod_R(perms)
-    opoo "Pathname#chmod_R is deprecated, use FileUtils.chmod_R"
+    odeprecated "Pathname#chmod_R", "FileUtils.chmod_R"
     require "fileutils"
     FileUtils.chmod_R perms, to_s
   end

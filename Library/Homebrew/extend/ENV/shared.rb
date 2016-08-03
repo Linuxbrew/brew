@@ -1,5 +1,6 @@
 require "formula"
 require "compilers"
+require "development_tools"
 
 # Homebrew extends Ruby's `ENV` to make our code more readable.
 # Implemented in {SharedEnvExtension} and either {Superenv} or

@@ -70,17 +70,6 @@ module FormulaCellarChecks
           #{checker.broken_dylibs.to_a * "\n          "}
       EOS
     end
-
-    # only check undeclared deps for standard installations.
-    return unless formula.build.used_options.empty?
-
-    if checker.undeclared_deps?
-      audit_check_output <<-EOS.undent
-        Formulae are required to declare all linked dependencies.
-        Please add all linked dependencies to the formula with:
-          #{checker.undeclared_deps.map { |d| "depends_on \"#{d}\" => :linked"} * "\n          "}
-      EOS
-    end
   end
 
   def audit_installed

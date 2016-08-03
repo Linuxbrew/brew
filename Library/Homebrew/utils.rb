@@ -112,6 +112,55 @@ def odie(error)
   exit 1
 end
 
+def odeprecated(method, replacement = nil, options = {})
+  verb = if options[:die]
+    "disabled"
+  else
+    "deprecated"
+  end
+
+  replacement_message = if replacement
+    "Use #{replacement} instead."
+  else
+    "There is no replacement."
+  end
+
+  # Try to show the most relevant location in message, i.e. (if applicable):
+  # - Location in a formula.
+  # - Location outside of 'compat/'.
+  # - Location of caller of deprecated method (if all else fails).
+  backtrace = options.fetch(:caller, caller)
+  tap_message = nil
+  caller_message = backtrace.detect do |line|
+    if line =~ %r{^#{Regexp.escape HOMEBREW_LIBRARY}/Taps/([^/]+/[^/]+)/}
+      tap = Tap.fetch $1
+      tap_message = "\nPlease report this to the #{tap} tap!"
+      true
+    end
+  end
+  caller_message ||= backtrace.detect do |line|
+    !line.start_with?("#{HOMEBREW_LIBRARY_PATH}/compat/")
+  end
+  caller_message ||= backtrace[1]
+
+  message = <<-EOS.undent
+    Calling #{method} is #{verb}!
+    #{replacement_message}
+    #{caller_message}#{tap_message}
+  EOS
+
+  if ARGV.homebrew_developer? || options[:die]
+    raise FormulaMethodDeprecatedError, message
+  else
+    opoo "#{message}\n"
+  end
+end
+
+def odisabled(method, replacement = nil, options = {})
+  options = { :die => true, :caller => caller }.merge(options)
+  odeprecated(method, replacement, options)
+end
+
 def pretty_installed(f)
   if !$stdout.tty?
     "#{f}"
@@ -287,6 +336,14 @@ def with_system_path
   yield
 ensure
   ENV["PATH"] = old_path
+end
+
+def with_custom_locale(locale)
+  old_locale = ENV["LC_ALL"]
+  ENV["LC_ALL"] = locale
+  yield
+ensure
+  ENV["LC_ALL"] = old_locale
 end
 
 def run_as_not_developer(&_block)

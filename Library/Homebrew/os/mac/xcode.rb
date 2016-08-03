@@ -72,6 +72,19 @@ module OS
         !prefix.nil?
       end
 
+      def update_instructions
+        if MacOS.version >= "10.9" && !OS::Mac.prerelease?
+          <<-EOS.undent
+            Xcode can be updated from the App Store.
+          EOS
+        else
+          <<-EOS.undent
+            Xcode can be updated from
+              https://developer.apple.com/xcode/downloads/
+          EOS
+        end
+      end
+
       def version
         # may return a version string
         # that is guessed based on the compiler, so do not
@@ -167,9 +180,23 @@ module OS
         !!detect_version
       end
 
+      def update_instructions
+        if MacOS.version >= "10.9"
+          <<-EOS.undent
+            Update them from Software Update in the App Store.
+          EOS
+        elsif MacOS.version == "10.8" || MacOS.version == "10.7"
+          <<-EOS.undent
+            The standalone package can be obtained from
+              https://developer.apple.com/downloads
+            or it can be installed via Xcode's preferences.
+          EOS
+        end
+      end
+
       def latest_version
         case MacOS.version
-        when "10.12" then "800.0.33.1"
+        when "10.12" then "800.0.35"
         when "10.11" then "703.0.31"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"

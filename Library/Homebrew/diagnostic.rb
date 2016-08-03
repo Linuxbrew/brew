@@ -3,6 +3,7 @@ require "language/python"
 require "formula"
 require "tempfile"
 require "version"
+require "development_tools"
 
 module Homebrew
   module Diagnostic
@@ -97,7 +98,7 @@ module Homebrew
 
         <<-EOS.undent
           No developer tools installed.
-          Install clang or gcc.
+          #{DevelopmentTools.installation_instructions}
         EOS
       end
 

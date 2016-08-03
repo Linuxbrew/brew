@@ -745,15 +745,36 @@ class IntegrationCommandTests < Homebrew::TestCase
       end
     end
 
-    assert_match "Invalid usage", cmd_fail("analytics", "on", "off")
-    assert_match "Invalid usage", cmd_fail("analytics", "testball")
-    assert_match "Analytics is enabled", cmd("analytics")
-    assert_match "Analytics is disabled",
+    assert_match "Analytics is disabled (by HOMEBREW_NO_ANALYTICS)",
       cmd("analytics", "HOMEBREW_NO_ANALYTICS" => "1")
 
-    cmd("analytics", "regenerate-uuid")
-    cmd("analytics", "on")
     cmd("analytics", "off")
-    assert_match "Analytics is disabled", cmd("analytics")
+    assert_match "Analytics is disabled",
+      cmd("analytics", "HOMEBREW_NO_ANALYTICS" => nil)
+
+    cmd("analytics", "on")
+    assert_match "Analytics is enabled", cmd("analytics",
+      "HOMEBREW_NO_ANALYTICS" => nil)
+
+    assert_match "Invalid usage", cmd_fail("analytics", "on", "off")
+    assert_match "Invalid usage", cmd_fail("analytics", "testball")
+    cmd("analytics", "regenerate-uuid")
+  end
+
+  def test_switch
+    assert_match "Usage: brew switch <name> <version>", cmd_fail("switch")
+    assert_match "testball not found", cmd_fail("switch", "testball", "0.1")
+
+    setup_test_formula "testball", <<-EOS.undent
+      keg_only "just because"
+    EOS
+
+    cmd("install", "testball")
+    testball_rack = HOMEBREW_CELLAR/"testball"
+    FileUtils.cp_r testball_rack/"0.1", testball_rack/"0.2"
+
+    cmd("switch", "testball", "0.2")
+    assert_match "testball does not have a version \"0.3\"",
+      cmd_fail("switch", "testball", "0.3")
   end
 end

@@ -119,8 +119,23 @@ module Language
       # @param formula [Formula] the active Formula
       # @return [Virtualenv] a {Virtualenv} instance
       def virtualenv_create(venv_root, python = "python", formula = self)
+        ENV.refurbish_args
         venv = Virtualenv.new formula, venv_root, python
         venv.create
+
+        # Find any Python bindings provided by recursive dependencies
+        formula_deps = formula.recursive_dependencies
+        xy = Language::Python.major_minor_version python
+        pth_contents = formula_deps.map do |d|
+          next if d.build?
+          dep_site_packages = Formula[d.name].opt_lib/"python#{xy}/site-packages"
+          next unless dep_site_packages.exist?
+          "import site; site.addsitedir('#{dep_site_packages}')\n"
+        end
+        if pth_contents.any?
+          (venv_root/"lib/python#{xy}/site-packages/homebrew_deps.pth").write pth_contents.join
+        end
+
         venv
       end
 
@@ -130,7 +145,7 @@ module Language
       def virtualenv_install_with_resources
         venv = virtualenv_create(libexec)
         venv.pip_install resources
-        venv.link_scripts(bin) { venv.pip_install buildpath }
+        venv.pip_install_and_link buildpath
         venv
       end
 
@@ -203,18 +218,18 @@ module Language
           end
         end
 
-        # Compares the venv bin directory before and after executing a block,
-        # and symlinks any new scripts into `destination`.
-        # Use like: venv.link_scripts(bin) { venv.pip_install my_package }
-        # @param destination [Pathname, String] Destination into which new
-        #   scripts should be linked.
-        # @return [void]
-        def link_scripts(destination)
+        # Installs packages represented by `targets` into the virtualenv, but
+        #   unlike {#pip_install} also links new scripts to {Formula#bin}.
+        # @param (see #pip_install)
+        # @return (see #pip_install)
+        def pip_install_and_link(targets)
           bin_before = Dir[@venv_root/"bin/*"].to_set
-          yield
+
+          pip_install(targets)
+
           bin_after = Dir[@venv_root/"bin/*"].to_set
-          destination = Pathname.new(destination)
-          destination.install_symlink((bin_after - bin_before).to_a)
+          bin_to_link = (bin_after - bin_before).to_a
+          @formula.bin.install_symlink(bin_to_link)
         end
 
         private
@@ -222,8 +237,8 @@ module Language
         def do_install(targets)
           targets = [targets] unless targets.is_a? Array
           @formula.system @venv_root/"bin/pip", "install",
-                 "-v", "--no-deps", "--no-binary", ":all:",
-                 *targets
+                          "-v", "--no-deps", "--no-binary", ":all:",
+                          "--ignore-installed", *targets
         end
       end # class Virtualenv
     end # module Virtualenv

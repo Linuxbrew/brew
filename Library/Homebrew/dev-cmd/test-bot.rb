@@ -39,6 +39,8 @@ require "rexml/document"
 require "rexml/xmldecl"
 require "rexml/cdata"
 require "tap"
+require "development_tools"
+require "utils/bottles"
 
 module Homebrew
   BYTES_IN_1_MEGABYTE = 1024*1024
@@ -452,7 +454,7 @@ module Homebrew
       fetch_args << "--force" if ARGV.include? "--cleanup"
 
       audit_args = [formula_name]
-      audit_args << "--strict" << "--online" if @added_formulae.include? formula_name
+      audit_args << "--new-formula" if @added_formulae.include? formula_name
 
       if formula.stable
         unless satisfied_requirements?(formula, :stable)
@@ -680,14 +682,16 @@ module Homebrew
         end
         test "brew", "tests", *tests_args
         # brew tests --generic currently fails on Linux.
-        test "brew", "tests", "--generic", "--only=integration_cmds",
-                              *tests_args unless OS.linux?
+        test "brew", "tests", "--generic", *tests_args unless OS.linux?
         test "brew", "tests", "--no-compat", *tests_args_coverage
         test "brew", "readall", "--syntax"
-        # test update from origin/master to current commit.
-        test "brew", "update-test"
-        # test no-op update from current commit (to current commit, a no-op).
-        test "brew", "update-test", "--commit=HEAD"
+        # TODO: try to fix this on Linux at some stage.
+        if OS.mac?
+          # test update from origin/master to current commit.
+          test "brew", "update-test"
+          # test no-op update from current commit (to current commit, a no-op).
+          test "brew", "update-test", "--commit=HEAD"
+        end
       else
         test "brew", "readall", "--aliases", @tap.name
       end
@@ -1033,7 +1037,7 @@ module Homebrew
 
       tests.each do |test|
         testsuite = testsuites.add_element "testsuite"
-        testsuite.add_attribute "name", "brew-test-bot.#{MacOS.cat}"
+        testsuite.add_attribute "name", "brew-test-bot.#{Utils::Bottles.tag}"
         testsuite.add_attribute "tests", test.steps.count
 
         test.steps.each do |step|

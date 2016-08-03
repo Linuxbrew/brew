@@ -6,8 +6,10 @@ class LanguagePythonTests < Homebrew::TestCase
   def setup
     @dir = Pathname.new(mktmpdir)
     resource = stub("resource", :stage => true)
+    formula_bin = @dir/"formula_bin"
     @formula = mock("formula") do
       stubs(:resource).returns(resource)
+      stubs(:bin).returns(formula_bin)
     end
     @venv = Language::Python::Virtualenv::Virtualenv.new(@formula, @dir, "python")
   end
@@ -71,18 +73,27 @@ class LanguagePythonTests < Homebrew::TestCase
     @venv.pip_install res
   end
 
-  def test_link_scripts_links_scripts
-    bin = (@dir/"bin")
-    dest = (@dir/"dest")
+  def test_pip_install_and_link_links_scripts
+    bin = @dir/"bin"
     bin.mkpath
-    refute((bin/"kilroy").exist?)
-    refute((dest/"kilroy").exist?)
+    dest = @formula.bin
+
+    refute_predicate bin/"kilroy", :exist?
+    refute_predicate dest/"kilroy", :exist?
+
     FileUtils.touch bin/"irrelevant"
-    @venv.link_scripts(dest) { FileUtils.touch bin/"kilroy" }
-    assert((bin/"kilroy").exist?)
-    assert((dest/"kilroy").exist?)
-    assert((dest/"kilroy").symlink?)
+    bin_before = Dir[bin/"*"]
+    FileUtils.touch bin/"kilroy"
+    bin_after = Dir[bin/"*"]
+    @venv.expects(:pip_install).with("foo")
+    Dir.expects(:[]).twice.returns(bin_before, bin_after)
+
+    @venv.pip_install_and_link "foo"
+
+    assert_predicate bin/"kilroy", :exist?
+    assert_predicate dest/"kilroy", :exist?
+    assert_predicate dest/"kilroy", :symlink?
     assert_equal((bin/"kilroy").realpath, (dest/"kilroy").realpath)
-    refute((dest/"irrelevant").exist?)
+    refute_predicate dest/"irrelevant", :exist?
   end
 end

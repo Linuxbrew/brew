@@ -28,13 +28,4 @@ class X11RequirementTests < Homebrew::TestCase
     ENV.expects(:x11)
     x.modify_build_environment
   end
-
-  def test_satisfied
-    MacOS::XQuartz.stubs(:version).returns("2.7.5")
-    MacOS::XQuartz.stubs(:installed?).returns(true)
-    assert_predicate X11Requirement.new, :satisfied?
-
-    MacOS::XQuartz.stubs(:installed?).returns(false)
-    refute_predicate X11Requirement.new, :satisfied?
-  end
 end
