@@ -193,7 +193,7 @@ class Reporter
       dst = Pathname.new paths.last
 
       next unless dst.extname == ".rb"
-      next unless paths.any? { |p| tap.formula_file?(p)}
+      next unless paths.any? { |p| tap.formula_file?(p) || tap.cask_file?(p)}
 
       case status
       when "A", "D"
