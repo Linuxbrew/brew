@@ -139,11 +139,33 @@ module Language
         venv
       end
 
+      # Returns true if a formula option for the specified python is currently
+      # active or if the specified python is required by the formula. Valid
+      # inputs are "python", "python3", :python, and :python3. Note that
+      # "with-python", "without-python", "with-python3", and "without-python3"
+      # formula options are handled correctly even if not associated with any
+      # corresponding depends_on statement.
+      # @api private
+      def needs_python?(python)
+        return true if build.with?(python)
+        (requirements.to_a | deps).any? { |r| r.name == python && r.required? }
+      end
+
       # Helper method for the common case of installing a Python application.
       # Creates a virtualenv in `libexec`, installs all `resource`s defined
-      # on the formula, and then installs the formula.
-      def virtualenv_install_with_resources
-        venv = virtualenv_create(libexec)
+      # on the formula, and then installs the formula. An options hash may be
+      # passed (e.g., :using => "python3") to override the default, guessed
+      # formula preference for python or python3, or to resolve an ambiguous
+      # case where it's not clear whether python or python3 should be the
+      # default guess.
+      def virtualenv_install_with_resources(options = {})
+        python = options[:using]
+        if python.nil?
+          wanted = %w[python python3].select { |py| needs_python?(py) }
+          raise FormulaAmbiguousPythonError, self if wanted.size > 1
+          python = wanted.first || "python"
+        end
+        venv = virtualenv_create(libexec, python)
         venv.pip_install resources
         venv.pip_install_and_link buildpath
         venv
