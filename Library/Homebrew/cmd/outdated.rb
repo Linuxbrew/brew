@@ -17,13 +17,17 @@ require "keg"
 
 module Homebrew
   def outdated
-    formulae = ARGV.resolved_formulae.any? ? ARGV.resolved_formulae : Formula.installed
+    formulae = if ARGV.resolved_formulae.empty?
+      Formula.installed
+    else
+      ARGV.resolved_formulae
+    end
     if ARGV.json == "v1"
       outdated = print_outdated_json(formulae)
     else
       outdated = print_outdated(formulae)
     end
-    Homebrew.failed = ARGV.resolved_formulae.any? && outdated.any?
+    Homebrew.failed = !ARGV.resolved_formulae.empty? && !outdated.empty?
   end
 
   def print_outdated(formulae)

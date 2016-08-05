@@ -31,7 +31,7 @@ class FormulaPin
   end
 
   def pinnable?
-    @f.installed_prefixes.any?
+    !@f.installed_prefixes.empty?
   end
 
   def pinned_version

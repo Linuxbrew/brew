@@ -77,7 +77,7 @@ class SoftwareSpec
   end
 
   def bottle_defined?
-    bottle_specification.collector.keys.any?
+    !bottle_specification.collector.keys.empty?
   end
 
   def bottled?

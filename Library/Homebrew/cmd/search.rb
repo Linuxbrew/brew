@@ -89,7 +89,7 @@ module Homebrew
           arg.include?(char) && !arg.start_with?("/")
         end
       end
-      if ARGV.any? && bad_regex
+      if !ARGV.empty? && bad_regex
         ohai "Did you mean to perform a regular expression search?"
         ohai "Surround your query with /slashes/ to search by regex."
       end

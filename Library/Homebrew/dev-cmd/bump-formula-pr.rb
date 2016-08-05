@@ -25,7 +25,7 @@ module Homebrew
         end
         contents.gsub!(old, new)
       end
-      if contents.errors.any?
+      unless contents.errors.empty?
         raise Utils::InreplaceError, path => contents.errors
       end
       contents

@@ -21,16 +21,16 @@ module Homebrew
     if ARGV.named.empty?
       outdated = Formula.installed.select(&:outdated?)
       exit 0 if outdated.empty?
-    elsif ARGV.named.any?
+    else
       outdated = ARGV.resolved_formulae.select(&:outdated?)
 
       (ARGV.resolved_formulae - outdated).each do |f|
         versions = f.installed_kegs.map { |keg| keg.version }
-        if versions.any?
+        if versions.empty?
+          onoe "#{f.full_name} not installed"
+        else
           version = versions.max
           onoe "#{f.full_name} #{version} already installed"
-        else
-          onoe "#{f.full_name} not installed"
         end
       end
       exit 1 if outdated.empty?

@@ -131,8 +131,8 @@ module Language
           dep_site_packages = Formula[d.name].opt_lib/"python#{xy}/site-packages"
           next unless dep_site_packages.exist?
           "import site; site.addsitedir('#{dep_site_packages}')\n"
-        end
-        if pth_contents.any?
+        end.compact
+        unless pth_contents.empty?
           (venv_root/"lib/python#{xy}/site-packages/homebrew_deps.pth").write pth_contents.join
         end
 

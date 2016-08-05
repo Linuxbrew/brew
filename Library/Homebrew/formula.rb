@@ -998,7 +998,7 @@ class Formula
 
   # @private
   def outdated?
-    outdated_versions.any?
+    !outdated_versions.empty?
   rescue Migrator::MigrationNeededError
     true
   end
@@ -1517,7 +1517,7 @@ class Formula
         installed_kegs.select { |k| pkg_version > k.version }
       end
 
-      if eligible_kegs.any?
+      unless eligible_kegs.empty?
         eligible_kegs.each do |keg|
           if keg.linked?
             opoo "Skipping (old) #{keg} due to it being linked"
@@ -1526,7 +1526,7 @@ class Formula
           end
         end
       end
-    elsif installed_prefixes.any? && !pinned?
+    elsif !installed_prefixes.empty? && !pinned?
       # If the cellar only has one version installed, don't complain
       # that we can't tell which one to keep. Don't complain at all if the
       # only installed version is a pinned formula.

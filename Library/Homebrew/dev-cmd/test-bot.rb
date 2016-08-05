@@ -342,7 +342,7 @@ module Homebrew
           @name = "#{diff_start_sha1}-#{diff_end_sha1}"
         end
       # Handle formulae arguments being passed on the command-line e.g. `brew test-bot wget fish`.
-      elsif @formulae && @formulae.any?
+      elsif @formulae && !@formulae.empty?
         @name = "#{@formulae.first}-#{diff_end_sha1}"
         diff_start_sha1 = diff_end_sha1
       # Handle a hash being passed on the command-line e.g. `brew test-bot 1a2b3c`.
@@ -602,7 +602,7 @@ module Homebrew
             test "brew", "uninstall", "--force", formula_name
             FileUtils.ln bottle_filename, HOMEBREW_CACHE/bottle_filename, :force => true
             @formulae.delete(formula_name)
-            if unchanged_build_dependencies.any?
+            unless unchanged_build_dependencies.empty?
               test "brew", "uninstall", "--force", *unchanged_build_dependencies
               unchanged_dependencies -= unchanged_build_dependencies
             end
@@ -652,7 +652,7 @@ module Homebrew
           test "brew", "uninstall", "--devel", "--force", formula_name
         end
       end
-      test "brew", "uninstall", "--force", *unchanged_dependencies if unchanged_dependencies.any?
+      test "brew", "uninstall", "--force", *unchanged_dependencies unless unchanged_dependencies.empty?
     end
 
     def homebrew

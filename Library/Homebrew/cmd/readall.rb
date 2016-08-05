@@ -22,10 +22,10 @@ module Homebrew
     end
 
     options = { :aliases => ARGV.include?("--aliases") }
-    taps = if ARGV.named.any?
-      [Tap.fetch(ARGV.named.first)]
-    else
+    taps = if ARGV.named.empty?
       Tap
+    else
+      [Tap.fetch(ARGV.named.first)]
     end
     taps.each do |tap|
       Homebrew.failed = true unless Readall.valid_tap?(tap, options)

@@ -82,7 +82,7 @@ module Homebrew
     begin
       formulae = []
 
-      if ARGV.casks.any?
+      unless ARGV.casks.empty?
         args = []
         args << "--force" if ARGV.force?
         args << "--debug" if ARGV.debug?
