@@ -54,7 +54,7 @@ module Homebrew
       begin
         reporter = Reporter.new(tap)
       rescue Reporter::ReporterRevisionUnsetError => e
-        onoe e if ARGV.homebrew_developer?
+        onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         next
       end
       if reporter.updated?
@@ -205,7 +205,7 @@ class Reporter
           old_version = FormulaVersions.new(formula).formula_at_revision(@initial_revision, &:pkg_version)
           next if new_version == old_version
         rescue Exception => e
-          onoe e if ARGV.homebrew_developer?
+          onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         end
         @report[:M] << tap.formula_file_to_name(src)
       when /^R\d{0,3}/
@@ -269,7 +269,7 @@ class Reporter
             system HOMEBREW_BREW_FILE, "link", new_full_name, "--overwrite"
           end
         rescue Exception => e
-          onoe e if ARGV.homebrew_developer?
+          onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         end
         next
       end
@@ -312,7 +312,7 @@ class Reporter
       begin
         f = Formulary.factory(new_full_name)
       rescue Exception => e
-        onoe e if ARGV.homebrew_developer?
+        onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         next
       end
 
