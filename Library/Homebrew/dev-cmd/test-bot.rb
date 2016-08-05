@@ -21,7 +21,8 @@
 #                        as raw bytes instead of re-encoding in UTF-8.
 # --fast:                Don't install any packages, but run e.g. audit anyway.
 # --keep-tmp:            Keep temporary files written by main installs and tests that are run.
-# --no-pull              Don't use `brew pull` when possible.
+# --no-pull:             Don't use `brew pull` when possible.
+# --coverage:            Generate coverage report and send it to Coveralls.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -661,14 +662,14 @@ module Homebrew
 
       if @tap.nil?
         tests_args = []
-        tests_args_coverage = []
+        tests_args_no_compat = []
         if RUBY_TWO
           tests_args << "--official-cmd-taps"
-          tests_args_coverage << "--coverage" if ENV["TRAVIS"]
+          tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
         end
         test "brew", "tests", *tests_args
         test "brew", "tests", "--generic", *tests_args
-        test "brew", "tests", "--no-compat", *tests_args_coverage
+        test "brew", "tests", "--no-compat", *tests_args_no_compat
         test "brew", "readall", "--syntax"
         # TODO: try to fix this on Linux at some stage.
         if OS.mac?
@@ -929,6 +930,13 @@ module Homebrew
       ARGV << "--verbose"
       ARGV << "--ci-master" if ENV["TRAVIS_PULL_REQUEST"] == "false"
       ENV["HOMEBREW_VERBOSE_USING_DOTS"] = "1"
+
+      # Only report coverage if build runs on macOS and this is indeed Homebrew,
+      # as we don't want this to be averaged with inferior Linux test coverage.
+      repo = ENV["TRAVIS_REPO_SLUG"]
+      if repo && repo.start_with?("Homebrew/") && ENV["OSX"]
+        ARGV << "--coverage"
+      end
     end
 
     if ARGV.include?("--ci-master") || ARGV.include?("--ci-pr") \
