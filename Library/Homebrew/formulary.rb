@@ -246,7 +246,7 @@ class Formulary
       end
     end
     f.build = tab
-    f.version.update_commit(keg.version.version.commit) if f.head?
+    f.version.update_commit(keg.version.version.commit) if f.head? && keg.version.head?
     f
   end
 
