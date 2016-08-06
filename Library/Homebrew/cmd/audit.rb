@@ -203,6 +203,7 @@ class FormulaAuditor
     return unless @strict
 
     component_list = [
+      [/^  include Language::/,            "include directive"],
       [/^  desc ["'][\S\ ]+["']/,          "desc"],
       [/^  homepage ["'][\S\ ]+["']/,      "homepage"],
       [/^  url ["'][\S\ ]+["']/,           "url"],
