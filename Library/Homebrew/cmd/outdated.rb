@@ -1,4 +1,4 @@
-#:  * `outdated` [`--quiet`|`--verbose`|`--json=v1`]:
+#:  * `outdated` [`--quiet`|`--verbose`|`--json=v1`] [`--fetch-HEAD`]:
 #:    Show formulae that have an updated version available.
 #:
 #:    By default, version information is displayed in interactive shells, and
@@ -11,6 +11,10 @@
 #:
 #:    If `--json=`<version> is passed, the output will be in JSON format. The only
 #:    valid version is `v1`.
+#:
+#:    If `--fetch-HEAD` is passed, fetch upstream repository to detect that HEAD
+#:    formula is outdated. Otherwise HEAD-installation is considered outdated if
+#:    new stable or devel version is bumped after that installation.
 
 require "formula"
 require "keg"

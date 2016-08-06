@@ -392,7 +392,7 @@ If \fB\-\-all\fR is passed, show options for all formulae\.
 If \fB\-\-installed\fR is passed, show options for all installed formulae\.
 .
 .TP
-\fBoutdated\fR [\fB\-\-quiet\fR|\fB\-\-verbose\fR|\fB\-\-json=v1\fR]
+\fBoutdated\fR [\fB\-\-quiet\fR|\fB\-\-verbose\fR|\fB\-\-json=v1\fR] [\fB\-\-fetch\-HEAD\fR]
 Show formulae that have an updated version available\.
 .
 .IP
@@ -406,6 +406,9 @@ If \fB\-\-verbose\fR is passed, display detailed version information\.
 .
 .IP
 If \fB\-\-json=\fR\fIversion\fR is passed, the output will be in JSON format\. The only valid version is \fBv1\fR\.
+.
+.IP
+If \fB\-\-fetch\-HEAD\fR is passed, fetch upstream repository to detect that HEAD formula is outdated\. Otherwise HEAD\-installation is considered outdated if new stable or devel version is bumped after that installation\.
 .
 .TP
 \fBpin\fR \fIformulae\fR
@@ -597,7 +600,7 @@ Fetch the newest version of Homebrew and all formulae from GitHub using \fBgit\f
 If \fB\-\-merge\fR is specified then \fBgit merge\fR is used to include updates (rather than \fBgit rebase\fR)\.
 .
 .TP
-\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fIformulae\fR]
+\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fIformulae\fR]
 Upgrade outdated, unpinned brews\.
 .
 .IP
@@ -605,6 +608,9 @@ Options for the \fBinstall\fR command are also valid here\.
 .
 .IP
 If \fB\-\-cleanup\fR is specified then remove previously installed \fIformula\fR version(s)\.
+.
+.IP
+If \fB\-\-fetch\-HEAD\fR is passed, fetch upstream repository to detect that HEAD formula is outdated\. Otherwise HEAD\-installation is considered outdated if new stable or devel version is bumped after that installation\.
 .
 .IP
 If \fIformulae\fR are given, upgrade only the specified brews (but do so even if they are pinned; see \fBpin\fR, \fBunpin\fR)\.

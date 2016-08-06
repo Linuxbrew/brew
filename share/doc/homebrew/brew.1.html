@@ -294,7 +294,7 @@ spaces.</p>
 <p>If <code>--all</code> is passed, show options for all formulae.</p>
 
 <p>If <code>--installed</code> is passed, show options for all installed formulae.</p></dd>
-<dt><code>outdated</code> [<code>--quiet</code>|<code>--verbose</code>|<code>--json=v1</code>]</dt><dd><p>Show formulae that have an updated version available.</p>
+<dt><code>outdated</code> [<code>--quiet</code>|<code>--verbose</code>|<code>--json=v1</code>] [<code>--fetch-HEAD</code>]</dt><dd><p>Show formulae that have an updated version available.</p>
 
 <p>By default, version information is displayed in interactive shells, and
 suppressed otherwise.</p>
@@ -305,7 +305,11 @@ precedence over <code>--verbose</code>).</p>
 <p>If <code>--verbose</code> is passed, display detailed version information.</p>
 
 <p>If <code>--json=</code><var>version</var> is passed, the output will be in JSON format. The only
-valid version is <code>v1</code>.</p></dd>
+valid version is <code>v1</code>.</p>
+
+<p>If <code>--fetch-HEAD</code> is passed, fetch upstream repository to detect that HEAD
+formula is outdated. Otherwise HEAD-installation is considered outdated if
+new stable or devel version is bumped after that installation.</p></dd>
 <dt><code>pin</code> <var>formulae</var></dt><dd><p>Pin the specified <var>formulae</var>, preventing them from being upgraded when
 issuing the <code>brew upgrade</code> command. See also <code>unpin</code>.</p></dd>
 <dt><code>prune</code> [<code>--dry-run</code>]</dt><dd><p>Remove dead symlinks from the Homebrew prefix. This is generally not
@@ -436,11 +440,15 @@ source. This is useful for creating patches for the software.</p></dd>
 
 <p>If <code>--merge</code> is specified then <code>git merge</code> is used to include updates
   (rather than <code>git rebase</code>).</p></dd>
-<dt><code>upgrade</code> [<var>install-options</var>] [<code>--cleanup</code>] [<var>formulae</var>]</dt><dd><p>Upgrade outdated, unpinned brews.</p>
+<dt><code>upgrade</code> [<var>install-options</var>] [<code>--cleanup</code>] [<code>--fetch-HEAD</code>] [<var>formulae</var>]</dt><dd><p>Upgrade outdated, unpinned brews.</p>
 
 <p>Options for the <code>install</code> command are also valid here.</p>
 
 <p>If <code>--cleanup</code> is specified then remove previously installed <var>formula</var> version(s).</p>
+
+<p>If <code>--fetch-HEAD</code> is passed, fetch upstream repository to detect that HEAD
+formula is outdated. Otherwise HEAD-installation is considered outdated if
+new stable or devel version is bumped after that installation.</p>
 
 <p>If <var>formulae</var> are given, upgrade only the specified brews (but do so even
 if they are pinned; see <code>pin</code>, <code>unpin</code>).</p></dd>
