@@ -131,7 +131,7 @@ class FormularyTapFactoryTest < Homebrew::TestCase
   end
 
   def test_factory_tap_formula
-    assert_kind_of Formula, Formulary.factory("#{@name}")
+    assert_kind_of Formula, Formulary.factory(@name)
   end
 
   def test_factory_tap_alias

@@ -87,10 +87,13 @@ class DependencyExpansionTests < Homebrew::TestCase
   end
 
   def test_skip_skips_parent_but_yields_children
-    f = stub(:name => "f", :deps => [
-      build_dep(:foo, [], [@bar, @baz]),
-      build_dep(:foo, [], [@baz])
-    ])
+    f = stub(
+      :name => "f",
+      :deps => [
+        build_dep(:foo, [], [@bar, @baz]),
+        build_dep(:foo, [], [@baz]),
+      ]
+    )
 
     deps = Dependency.expand(f) do |_dependent, dep|
       Dependency.skip if %w[foo qux].include? dep.name

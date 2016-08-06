@@ -194,8 +194,8 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_env
-    assert_match %r{CMAKE_PREFIX_PATH="#{HOMEBREW_PREFIX}[:"]},
-                 cmd("--env")
+    assert_match(/CMAKE_PREFIX_PATH="#{Regexp.escape(HOMEBREW_PREFIX)}[:"]/,
+                 cmd("--env"))
   end
 
   def test_prefix_formula

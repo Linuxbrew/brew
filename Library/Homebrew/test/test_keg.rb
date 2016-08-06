@@ -154,7 +154,7 @@ class LinkTests < Homebrew::TestCase
     refute_predicate HOMEBREW_PREFIX/"lib/foo", :directory?
   end
 
-  def test_unlink_ignores_DS_Store_when_pruning_empty_dirs
+  def test_unlink_ignores_ds_store_when_pruning_empty_dirs
     mkpath HOMEBREW_PREFIX/"lib/foo/bar"
     touch HOMEBREW_PREFIX/"lib/foo/.DS_Store"
     mkpath @keg/"lib/foo/bar"

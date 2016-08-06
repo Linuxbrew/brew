@@ -105,11 +105,11 @@ class DiagnosticChecksTest < Homebrew::TestCase
     sep = File::PATH_SEPARATOR
     # ensure /usr/bin is before HOMEBREW_PREFIX/bin in the PATH
     ENV["PATH"] = "/usr/bin#{sep}#{bin}#{sep}" +
-      ENV["PATH"].gsub(%r{(?:^|#{sep})(?:/usr/bin|#{bin})}, "")
+                  ENV["PATH"].gsub(%r{(?:^|#{sep})(?:/usr/bin|#{bin})}, "")
 
     # ensure there's at least one file with the same name in both /usr/bin/ and
     # HOMEBREW_PREFIX/bin/
-    (bin/"#{File.basename Dir["/usr/bin/*"].first}").mkpath
+    (bin/File.basename(Dir["/usr/bin/*"].first)).mkpath
 
     assert_match "/usr/bin occurs before #{HOMEBREW_PREFIX}/bin",
       @checks.check_user_path_1
@@ -129,7 +129,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   def test_check_user_path_sbin
     sbin = HOMEBREW_PREFIX/"sbin"
     ENV["PATH"] = "#{HOMEBREW_PREFIX}/bin#{File::PATH_SEPARATOR}" +
-      ENV["PATH"].gsub(%r{(?:^|#{File::PATH_SEPARATOR})#{sbin}}, "")
+                  ENV["PATH"].gsub(/(?:^|#{Regexp.escape(File::PATH_SEPARATOR)})#{Regexp.escape(sbin)}/, "")
     (sbin/"something").mkpath
 
     assert_nil @checks.check_user_path_1
@@ -162,7 +162,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
     end
   end
 
-  def test_check_DYLD_vars
+  def test_check_dyld_vars
     ENV["DYLD_INSERT_LIBRARIES"] = "foo"
     assert_match "Setting DYLD_INSERT_LIBRARIES",
       @checks.check_DYLD_vars

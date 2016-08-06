@@ -19,7 +19,7 @@ class TabTests < Homebrew::TestCase
                    "source"               => {
                      "tap" => "homebrew/core",
                      "path" => nil,
-                     "spec" => "stable"
+                     "spec" => "stable",
                    })
   end
 

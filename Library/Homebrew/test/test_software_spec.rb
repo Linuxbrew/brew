@@ -158,7 +158,7 @@ class BottleSpecificationTests < Homebrew::TestCase
       :snow_leopard_32 => "deadbeef"*8,
       :snow_leopard    => "faceb00c"*8,
       :lion            => "baadf00d"*8,
-      :mountain_lion   => "8badf00d"*8
+      :mountain_lion   => "8badf00d"*8,
     }
 
     checksums.each_pair do |cat, digest|

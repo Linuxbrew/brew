@@ -5,15 +5,13 @@ require "tab"
 require "keg"
 
 class Formula
-  def set_oldname(oldname)
-    @oldname = oldname
-  end
+  attr_writer :oldname
 end
 
 class MigratorErrorsTests < Homebrew::TestCase
   def setup
     @new_f = Testball.new("newname")
-    @new_f.set_oldname "oldname"
+    @new_f.oldname = "oldname"
     @old_f = Testball.new("oldname")
   end
 
@@ -43,7 +41,7 @@ class MigratorTests < Homebrew::TestCase
 
   def setup
     @new_f = Testball.new("newname")
-    @new_f.set_oldname "oldname"
+    @new_f.oldname = "oldname"
 
     @old_f = Testball.new("oldname")
 

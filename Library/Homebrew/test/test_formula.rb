@@ -529,7 +529,7 @@ class OutdatedVersionsTests < Homebrew::TestCase
     @f.rack.rmtree
   end
 
-  def setup_tab_for_prefix(prefix, tap_string=nil)
+  def setup_tab_for_prefix(prefix, tap_string = nil)
     prefix.mkpath
     tab = Tab.empty
     tab.tabfile = prefix.join("INSTALL_RECEIPT.json")
