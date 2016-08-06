@@ -1000,7 +1000,7 @@ class Formula
   end
 
   # @private
-  def outdated_versions
+  def outdated_versions(options = {})
     @outdated_versions ||= begin
       all_versions = []
 
@@ -1009,16 +1009,22 @@ class Formula
       installed_kegs.each do |keg|
         version = keg.version
         all_versions << version
-        return [] if pkg_version <= version
+
+        return [] if pkg_version <= version && !version.head?
       end
 
-      all_versions.sort!
+      head_version = latest_head_version
+      if head_version
+        head_version_outdated?(head_version, options) ? all_versions.sort! : []
+      else
+        all_versions.sort!
+      end
     end
   end
 
   # @private
-  def outdated?
-    !outdated_versions.empty?
+  def outdated?(options = {})
+    !outdated_versions(options).empty?
   rescue Migrator::MigrationNeededError
     true
   end
