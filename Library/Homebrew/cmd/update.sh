@@ -284,19 +284,19 @@ homebrew-update() {
   for option in "$@"
   do
     case "$option" in
-      -\?|-h|--help|--usage) brew help update; exit $? ;;
-      --verbose) HOMEBREW_VERBOSE=1 ;;
-      --debug) HOMEBREW_DEBUG=1;;
-      --merge) HOMEBREW_MERGE=1 ;;
+      -\?|-h|--help|--usage)          brew help update; exit $? ;;
+      --verbose)                      HOMEBREW_VERBOSE=1 ;;
+      --debug)                        HOMEBREW_DEBUG=1 ;;
+      --merge)                        HOMEBREW_MERGE=1 ;;
       --simulate-from-current-branch) HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH=1 ;;
-      --preinstall) export HOMEBREW_UPDATE_PREINSTALL=1 ;;
-      --*) ;;
+      --preinstall)                   export HOMEBREW_UPDATE_PREINSTALL=1 ;;
+      --*)                            ;;
       -*)
-        [[ "$option" = *v* ]] && HOMEBREW_VERBOSE=1;
-        [[ "$option" = *d* ]] && HOMEBREW_DEBUG=1;
+        [[ "$option" = *v* ]] && HOMEBREW_VERBOSE=1
+        [[ "$option" = *d* ]] && HOMEBREW_DEBUG=1
         ;;
       *)
-        odie <<-EOS
+        odie <<EOS
 This command updates brew itself, and does not take formula names.
 Use 'brew upgrade <formula>'.
 EOS
@@ -312,7 +312,7 @@ EOS
   # check permissions
   if [[ "$HOMEBREW_PREFIX" = "/usr/local" && ! -w /usr/local ]]
   then
-    odie <<-EOS
+    odie <<EOS
 /usr/local is not writable. You should change the ownership
 and permissions of /usr/local back to your user account:
   sudo chown -R \$(whoami) /usr/local
@@ -321,7 +321,7 @@ EOS
 
   if [[ ! -w "$HOMEBREW_REPOSITORY" ]]
   then
-    odie <<-EOS
+    odie <<EOS
 $HOMEBREW_REPOSITORY is not writable. You should change the
 ownership and permissions of $HOMEBREW_REPOSITORY back to your
 user account:
@@ -387,7 +387,7 @@ EOS
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
         # Skip taps without formulae.
-        FORMULAE="$(find "$DIR" -maxdepth 1 \( -name '*.rb' -or -name 'Formula' -or -name 'HomebrewFormula' \) -print -quit)"
+        FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
         [[ -z "$FORMULAE" ]] && exit
       fi
 
@@ -399,7 +399,7 @@ EOS
         UPSTREAM_BRANCH_LOCAL_SHA="$(git rev-parse "refs/remotes/origin/$UPSTREAM_BRANCH")"
         # Only try to `git fetch` when the upstream branch is at a different SHA
         # (so the API does not return 304: unmodified).
-        UPSTREAM_SHA_HTTP_CODE="$("$HOMEBREW_CURL" --silent '--max-time' 3 \
+        UPSTREAM_SHA_HTTP_CODE="$("$HOMEBREW_CURL" --silent --max-time 3 \
            --output /dev/null --write-out "%{http_code}" \
            --user-agent "$HOMEBREW_USER_AGENT_CURL" \
            --header "Accept: application/vnd.github.v3.sha" \
@@ -425,7 +425,7 @@ EOS
         if ! git fetch --force "${QUIET_ARGS[@]}" origin \
           "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH"
         then
-          echo "Fetching $DIR failed!" >> "$update_failed_file"
+          echo "Fetching $DIR failed!" >>"$update_failed_file"
         fi
       fi
     ) &
@@ -436,7 +436,7 @@ EOS
 
   if [[ -f "$update_failed_file" ]]
   then
-    onoe < "$update_failed_file"
+    onoe <"$update_failed_file"
     rm -f "$update_failed_file"
     export HOMEBREW_UPDATE_FAILED="1"
   fi
