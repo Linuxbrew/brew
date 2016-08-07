@@ -42,7 +42,7 @@ executable() {
 }
 
 lowercase() {
-  echo "$1" | tr '[:upper:]' '[:lower:]'
+  echo "$1" | tr "[:upper:]" "[:lower:]"
 }
 
 safe_exec() {
