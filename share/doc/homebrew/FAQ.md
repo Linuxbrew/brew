@@ -68,7 +68,7 @@ Be careful as this is a destructive operation.
 
     brew --cache
 
-Which is usually: `/Library/Caches/Homebrew`
+Which is usually: `~/Library/Caches/Homebrew`
 
 ### My Mac `.app`s don’t find `/usr/local/bin` utilities!
 GUI apps on OS X don’t have `/usr/local/bin` in their `PATH` by default.
