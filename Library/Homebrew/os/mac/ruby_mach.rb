@@ -14,7 +14,7 @@ module RubyMachO
       machos = []
       mach_data = []
 
-      if MachO.fat_magic?(macho.magic)
+      if MachO::Utils.fat_magic?(macho.magic)
         machos = macho.machos
       else
         machos << macho
@@ -28,9 +28,8 @@ module RubyMachO
         end
 
         type = case m.filetype
-        when "MH_EXECUTE" then :executable
-        when "MH_DYLIB" then :dylib
-        when "MH_BUNDLE" then :bundle
+        when :dylib, :bundle then m.filetype
+        when :execute then :executable
         else :dunno
         end
 
