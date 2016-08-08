@@ -31,9 +31,9 @@ module Utils
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         if ENV["HOMEBREW_ANALYTICS_DEBUG"]
-          puts Utils.popen_read ENV["HOMEBREW_CURL"],
-            "https://www.google-analytics.com/debug/collect",
-            *args
+          url = "https://www.google-analytics.com/debug/collect"
+          puts "#{ENV["HOMEBREW_CURL"]} #{url} #{args.join(" ")}"
+          puts Utils.popen_read ENV["HOMEBREW_CURL"], url, *args
         else
           pid = fork do
             exec ENV["HOMEBREW_CURL"],
