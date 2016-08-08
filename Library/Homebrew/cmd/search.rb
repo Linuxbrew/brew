@@ -143,7 +143,8 @@ module Homebrew
         end
       end
 
-      paths = tree["Formula"] || tree["HomebrewFormula"] || tree["Casks"] || tree["."] || []
+      paths = tree["Formula"] || tree["HomebrewFormula"] || tree["."] || []
+      paths += tree["Casks"] || []
       cache[key] = paths.map { |path| File.basename(path, ".rb") }
     end
 
