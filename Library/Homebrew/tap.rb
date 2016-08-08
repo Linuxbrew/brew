@@ -216,7 +216,9 @@ class Tap
     begin
       safe_system "git", *args
       unless Readall.valid_tap?(self, :aliases => true)
-        raise "Cannot tap #{name}: invalid syntax in tap!"
+        unless ARGV.homebrew_developer?
+          raise "Cannot tap #{name}: invalid syntax in tap!"
+        end
       end
     rescue Interrupt, ErrorDuringExecution, RuntimeError
       ignore_interrupts do
