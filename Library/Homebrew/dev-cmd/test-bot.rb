@@ -662,13 +662,14 @@ module Homebrew
 
       if @tap.nil?
         tests_args = []
+        tests_args_generic = []
         tests_args_no_compat = []
         if RUBY_TWO
           tests_args << "--official-cmd-taps"
           tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
         end
         test "brew", "tests", *tests_args
-        test "brew", "tests", "--generic", *tests_args
+        test "brew", "tests", "--generic", *tests_args_generic
         test "brew", "tests", "--no-compat", *tests_args_no_compat
         test "brew", "readall", "--syntax"
         # TODO: try to fix this on Linux at some stage.
