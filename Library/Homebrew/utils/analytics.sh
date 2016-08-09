@@ -113,9 +113,8 @@ report-analytics-screenview-command() {
       "${args[@]}" \
       --silent --output /dev/null &>/dev/null & disown
   else
-    echo "$HOMEBREW_CURL https://www.google-analytics.com/debug/collect" \
-      "${args[@]}"
-    "$HOMEBREW_CURL" https://www.google-analytics.com/debug/collect \
-      "${args[@]}"
+    local url="https://www.google-analytics.com/debug/collect"
+    echo "$HOMEBREW_CURL $url ${args[*]}"
+    "$HOMEBREW_CURL" "$url" "${args[@]}"
   fi
 }
