@@ -1,3 +1,5 @@
+require "erb"
+
 module Utils
   module Analytics
     class << self
@@ -24,7 +26,13 @@ module Utils
           --data an=#{HOMEBREW_PRODUCT}
           --data av=#{HOMEBREW_VERSION}
         ]
-        metadata.each { |k, v| args << "-d" << "#{k}=#{v}" if k && v }
+        metadata.each do |key, value|
+          next unless key
+          next unless value
+          key = ERB::Util.url_encode key
+          value = ERB::Util.url_encode value
+          args << "--data" << "#{key}=#{value}"
+        end
 
         # Send analytics. Don't send or store any personally identifiable information.
         # https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md
