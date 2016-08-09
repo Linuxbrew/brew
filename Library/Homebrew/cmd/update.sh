@@ -386,6 +386,8 @@ EOS
     (
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
+        # Skip taps checked/fetched recently
+        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mmin -1)" ]] && exit
         # Skip taps without formulae.
         FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
         [[ -z "$FORMULAE" ]] && exit
@@ -405,6 +407,8 @@ EOS
            --header "Accept: application/vnd.github.v3.sha" \
            --header "If-None-Match: \"$UPSTREAM_BRANCH_LOCAL_SHA\"" \
            "https://api.github.com/repos/$UPSTREAM_REPOSITORY/commits/$UPSTREAM_BRANCH")"
+        # Touch FETCH_HEAD to confirm we've checked for an update.
+        [[ -f "$DIR/.git/FETCH_HEAD" ]] && touch "$DIR/.git/FETCH_HEAD"
         [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
       elif [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
