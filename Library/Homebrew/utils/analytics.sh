@@ -93,14 +93,14 @@ report-analytics-screenview-command() {
   local args=(
     --max-time 3
     --user-agent "$HOMEBREW_USER_AGENT_CURL"
-    -d v=1
-    -d tid="$HOMEBREW_ANALYTICS_ID"
-    -d cid="$HOMEBREW_ANALYTICS_USER_UUID"
-    -d aip=1
-    -d an="$HOMEBREW_PRODUCT"
-    -d av="$HOMEBREW_VERSION"
-    -d t=screenview
-    -d cd="$HOMEBREW_COMMAND"
+    --data v=1
+    --data aip=1
+    --data t=screenview
+    --data tid="$HOMEBREW_ANALYTICS_ID"
+    --data cid="$HOMEBREW_ANALYTICS_USER_UUID"
+    --data an="$HOMEBREW_PRODUCT"
+    --data av="$HOMEBREW_VERSION"
+    --data cd="$HOMEBREW_COMMAND"
   )
 
   # Send analytics. Don't send or store any personally identifiable information.
