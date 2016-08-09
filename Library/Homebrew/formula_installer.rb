@@ -307,8 +307,8 @@ class FormulaInstaller
     fatals = []
 
     req_map.each_pair do |dependent, reqs|
+      next if dependent.installed?
       reqs.each do |req|
-        next if dependent.installed? && req.name == "maximummacos"
         puts "#{dependent}: #{req.message}"
         fatals << req if req.fatal?
       end
