@@ -387,7 +387,7 @@ EOS
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
         # Skip taps checked/fetched recently
-        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mmin -1)" ]] && exit
+        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mmin -1 2>/dev/null)" ]] && exit
         # Skip taps without formulae.
         FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
         [[ -z "$FORMULAE" ]] && exit
