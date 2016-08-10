@@ -88,8 +88,10 @@ def ohai(title, *sput)
   puts sput
 end
 
-def oh1(title)
-  title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
+def oh1(title, options = {})
+  if $stdout.tty? && !ARGV.verbose? && options.fetch(:truncate, :auto) == :auto
+    title = Tty.truncate(title)
+  end
   puts "#{Tty.green}==>#{Tty.white} #{title}#{Tty.reset}"
 end
 
