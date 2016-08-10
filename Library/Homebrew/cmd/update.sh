@@ -314,6 +314,11 @@ EOS
     set -x
   fi
 
+  if [[ -z "$HOMEBREW_AUTO_UPDATE_SECS" ]]
+  then
+    HOMEBREW_AUTO_UPDATE_SECS="60"
+  fi
+
   # check permissions
   if [[ "$HOMEBREW_PREFIX" = "/usr/local" && ! -w /usr/local ]]
   then
@@ -395,7 +400,7 @@ EOS
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
         # Skip taps checked/fetched recently
-        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mtime -60s 2>/dev/null)" ]] && exit
+        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mtime -"${HOMEBREW_AUTO_UPDATE_SECS}"s 2>/dev/null)" ]] && exit
 
         # Skip taps without formulae (but always update Homebrew/brew and Homebrew/homebrew-core)
         if [[ "$DIR" != "$HOMEBREW_REPOSITORY" &&
