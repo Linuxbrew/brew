@@ -722,6 +722,13 @@ If set, instructs Homebrew to use the given URL as a download mirror for bottles
 If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries\.
 .
 .TP
+\fBHOMEBREW_AUTO_UPDATE_SECS\fR
+If set, Homebrew will only check for autoupdates once per this seconds interval\.
+.
+.IP
+\fIDefault:\fR \fB60\fR\.
+.
+.TP
 \fBHOMEBREW_BROWSER\fR
 If set, uses this setting as the browser when opening project homepages, instead of the OS default browser\.
 .
@@ -784,6 +791,10 @@ If set, instructs Homebrew to use the value of \fBHOMEBREW_MAKE_JOBS\fR as the n
 .TP
 \fBHOMEBREW_NO_ANALYTICS\fR
 If set, Homebrew will not send analytics\. See: \fIhttps://github\.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics\.md#analytics\fR
+.
+.TP
+\fBHOMEBREW_NO_AUTO_UPDATE\fR
+If set, Homebrew will not auto\-update before running \fBbrew install\fR and \fBbrew upgrade\fR\.
 .
 .TP
 \fBHOMEBREW_NO_EMOJI\fR

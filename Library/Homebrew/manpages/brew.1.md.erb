@@ -108,6 +108,11 @@ can take several different forms:
   * `HOMEBREW_ARTIFACT_DOMAIN`:
     If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
 
+  * `HOMEBREW_AUTO_UPDATE_SECS`:
+    If set, Homebrew will only check for autoupdates once per this seconds interval.
+
+    *Default:* `60`.
+
   * `HOMEBREW_BROWSER`:
     If set, uses this setting as the browser when opening project homepages,
     instead of the OS default browser.
@@ -171,6 +176,10 @@ can take several different forms:
 
   * `HOMEBREW_NO_ANALYTICS`:
     If set, Homebrew will not send analytics. See: <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics>
+
+  * `HOMEBREW_NO_AUTO_UPDATE`:
+    If set, Homebrew will not auto-update before running `brew install` and
+    `brew upgrade`.
 
   * `HOMEBREW_NO_EMOJI`:
     If set, Homebrew will not print the `HOMEBREW_INSTALL_BADGE` on a
