@@ -114,25 +114,6 @@ module Homebrew
         EOS
       end
 
-      # Installing MacGPG2 interferes with Homebrew in a big way
-      # https://github.com/GPGTools/MacGPG2
-      def check_for_macgpg2
-        return if File.exist? "/usr/local/MacGPG2/share/gnupg/VERSION"
-
-        suspects = %w[
-          /Applications/start-gpg-agent.app
-          /Library/Receipts/libiconv1.pkg
-          /usr/local/MacGPG2
-        ]
-        return unless suspects.any? { |f| File.exist? f }
-
-        <<-EOS.undent
-          You may have installed MacGPG2 via the package installer.
-          Several other checks in this script will turn up problems, such as stray
-          dylibs in /usr/local and permissions issues with share and man in /usr/local/.
-        EOS
-      end
-
       # Anaconda installs multiple system & brew dupes, including OpenSSL, Python,
       # sqlite, libpng, Qt, etc. Regularly breaks compile on Vim, MacVim and others.
       # Is flagged as part of the *-config script checks below, but people seem
