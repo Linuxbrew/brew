@@ -235,6 +235,9 @@ update-preinstall() {
   then
     brew update --preinstall
   fi
+
+  # If we've checked for updates, we don't need to check again.
+  export HOMEBREW_NO_AUTO_UPDATE="1"
 }
 
 if [[ -n "$HOMEBREW_BASH_COMMAND" ]]
