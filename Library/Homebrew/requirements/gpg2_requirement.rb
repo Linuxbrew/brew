@@ -1,7 +1,7 @@
 require "requirement"
 require "gpg"
 
-class GPGRequirement < Requirement
+class GPG2Requirement < Requirement
   fatal true
   default_formula "gnupg2"
 
