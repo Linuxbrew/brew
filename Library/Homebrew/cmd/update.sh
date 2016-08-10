@@ -166,7 +166,35 @@ reset_on_interrupt() {
   exit 130
 }
 
-pull() {
+# Used for testing purposes, e.g., for testing formula migration after
+# renaming it in the currently checked-out branch. To test run
+# "brew update --simulate-from-current-branch"
+simulate_from_current_branch() {
+  local DIR
+  local TAP_VAR
+  local UPSTREAM_BRANCH
+  local CURRENT_REVISION
+
+  DIR="$1"
+  cd "$DIR" || return
+  TAP_VAR="$2"
+  UPSTREAM_BRANCH="$3"
+  CURRENT_REVISION="$4"
+
+  INITIAL_REVISION="$(git rev-parse -q --verify "$UPSTREAM_BRANCH")"
+  export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$INITIAL_REVISION"
+  export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
+  if [[ "$INITIAL_REVISION" != "$CURRENT_REVISION" ]]
+  then
+    HOMEBREW_UPDATED="1"
+  fi
+  if ! git merge-base --is-ancestor "$INITIAL_REVISION" "$CURRENT_REVISION"
+  then
+    odie "Your $DIR HEAD is not a descendant of $UPSTREAM_BRANCH!"
+  fi
+}
+
+merge_or_rebase() {
   if [[ -n "$HOMEBREW_VERBOSE" ]]
   then
     echo "Updating $DIR..."
@@ -174,37 +202,13 @@ pull() {
 
   local DIR
   local TAP_VAR
+  local UPSTREAM_BRANCH
 
   DIR="$1"
   cd "$DIR" || return
-  TAP_VAR=$(repo_var "$DIR")
+  TAP_VAR="$2"
+  UPSTREAM_BRANCH="$3"
   unset STASHED
-
-  # The upstream repository's default branch may not be master;
-  # check refs/remotes/origin/HEAD to see what the default
-  # origin branch name is, and use that. If not set, fall back to "master".
-  INITIAL_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
-  UPSTREAM_BRANCH="$(upstream_branch)"
-
-  # Used for testing purposes, e.g., for testing formula migration after
-  # renaming it in the currently checked-out branch. To test run
-  # "brew update --simulate-from-current-branch"
-  if [[ -n "$HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH" ]]
-  then
-    INITIAL_REVISION="$(git rev-parse -q --verify "$UPSTREAM_BRANCH")"
-    CURRENT_REVISION="$(read_current_revision)"
-    export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$INITIAL_REVISION"
-    export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
-    if [[ "$INITIAL_REVISION" != "$CURRENT_REVISION" ]]
-    then
-      HOMEBREW_UPDATED="1"
-    fi
-    if ! git merge-base --is-ancestor "$INITIAL_REVISION" "$CURRENT_REVISION"
-    then
-      odie "Your $DIR HEAD is not a descendant of $UPSTREAM_BRANCH!"
-    fi
-    return
-  fi
 
   trap reset_on_interrupt SIGINT
 
@@ -223,6 +227,7 @@ pull() {
     STASHED="1"
   fi
 
+  INITIAL_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
   if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
@@ -329,11 +334,6 @@ user account:
 EOS
   fi
 
-  if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
-  then
-    echo "Checking for Homebrew updates..."
-  fi
-
   if ! git --version >/dev/null 2>&1
   then
     # we cannot install brewed git if homebrew/core is unavailable.
@@ -378,19 +378,34 @@ EOS
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
+    cd "$DIR" || continue
+
+    TAP_VAR="$(repo_var "$DIR")"
+    declare PREFETCH_REVISION"$TAP_VAR"="$(read_current_revision)"
+
     [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
     [[ -n "$SKIP_FETCH_CORE_REPOSITORY" && "$DIR" = "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && continue
-    cd "$DIR" || continue
+
+    # The upstream repository's default branch may not be master;
+    # check refs/remotes/origin/HEAD to see what the default
+    # origin branch name is, and use that. If not set, fall back to "master".
     UPSTREAM_BRANCH="$(upstream_branch)"
+    declare UPSTREAM_BRANCH"$TAP_VAR"="$UPSTREAM_BRANCH"
+
     # the refspec ensures that the default upstream branch gets updated
     (
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
         # Skip taps checked/fetched recently
-        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mmin -1 2>/dev/null)" ]] && exit
-        # Skip taps without formulae.
-        FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
-        [[ -z "$FORMULAE" ]] && exit
+        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mtime -60s 2>/dev/null)" ]] && exit
+
+        # Skip taps without formulae (but always update Homebrew/brew and Homebrew/homebrew-core)
+        if [[ "$DIR" != "$HOMEBREW_REPOSITORY" &&
+              "$DIR" != "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]]
+        then
+          FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
+          [[ -z "$FORMULAE" ]] && exit
+        fi
       fi
 
       UPSTREAM_REPOSITORY_URL="$(git config remote.origin.url)"
@@ -448,7 +463,27 @@ EOS
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
-    pull "$DIR"
+    cd "$DIR" || continue
+
+    TAP_VAR="$(repo_var "$DIR")"
+    UPSTREAM_BRANCH_VAR="UPSTREAM_BRANCH$TAP_VAR"
+    UPSTREAM_BRANCH="${!UPSTREAM_BRANCH_VAR}"
+    CURRENT_REVISION="$(read_current_revision)"
+
+    PREFETCH_REVISION_VAR="PREFETCH_REVISION$TAP_VAR"
+    PREFETCH_REVISION="${!PREFETCH_REVISION_VAR}"
+
+    if [[ -n "$HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH" ]]
+    then
+      simulate_from_current_branch "$DIR" "$TAP_VAR" "$UPSTREAM_BRANCH" "$CURRENT_REVISION"
+    elif [[ "$PREFETCH_REVISION" = "$CURRENT_REVISION" ]]
+    then
+      export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$CURRENT_REVISION"
+      export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
+    else
+      merge_or_rebase "$DIR" "$TAP_VAR" "$UPSTREAM_BRANCH"
+    fi
+
     [[ -n "$HOMEBREW_VERBOSE" ]] && echo
   done
 
