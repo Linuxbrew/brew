@@ -74,13 +74,6 @@ class RbenvRequirement < Requirement
   satisfy { which "rbenv" }
 end
 
-class GPGRequirement < Requirement
-  fatal true
-  default_formula "gpg"
-
-  satisfy { which("gpg") || which("gpg2") }
-end
-
 class TeXRequirement < Requirement
   fatal true
   cask "mactex"
