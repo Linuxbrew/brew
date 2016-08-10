@@ -1,6 +1,7 @@
 require "requirement"
 require "requirements/apr_requirement"
 require "requirements/fortran_requirement"
+require "requirements/gpg_requirement"
 require "requirements/language_module_requirement"
 require "requirements/minimum_macos_requirement"
 require "requirements/maximum_macos_requirement"
