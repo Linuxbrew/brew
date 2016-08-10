@@ -20,7 +20,7 @@ class Gpg
   GPG_EXECUTABLE = gpg2 || gpg
 
   def self.available?
-    File.exist?(GPG_EXECUTABLE.to_s) && File.executable?(GPG_EXECUTABLE.to_s)
+    File.executable?(GPG_EXECUTABLE.to_s)
   end
 
   def self.create_test_key(path)
