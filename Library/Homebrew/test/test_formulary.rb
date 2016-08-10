@@ -111,6 +111,15 @@ class FormularyFactoryTest < Homebrew::TestCase
   def test_load_from_contents
     assert_kind_of Formula, Formulary.from_contents(@name, @path, @path.read)
   end
+
+  def test_to_rack
+    assert_equal HOMEBREW_CELLAR/@name, Formulary.to_rack(@name)
+    (HOMEBREW_CELLAR/@name).mkpath
+    assert_equal HOMEBREW_CELLAR/@name, Formulary.to_rack(@name)
+    assert_raises(TapFormulaUnavailableError) { Formulary.to_rack("a/b/#{@name}") }
+  ensure
+    FileUtils.rm_rf HOMEBREW_CELLAR/@name
+  end
 end
 
 class FormularyTapFactoryTest < Homebrew::TestCase

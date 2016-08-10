@@ -256,12 +256,15 @@ class Formulary
   end
 
   def self.to_rack(ref)
-    # First, check whether the rack with the given name exists.
+    # If using a fully-scoped reference, check if the formula can be resolved.
+    factory(ref) if ref.include? "/"
+
+    # Check whether the rack with the given name exists.
     if (rack = HOMEBREW_CELLAR/File.basename(ref, ".rb")).directory?
       return rack.resolved_path
     end
 
-    # Second, use canonical name to locate rack.
+    # Use canonical name to locate rack.
     (HOMEBREW_CELLAR/canonical_name(ref)).resolved_path
   end
 
