@@ -34,7 +34,7 @@ class FormulaVersions
     contents = file_contents_at_revision(rev)
 
     begin
-      nostdout { yield Formulary.from_contents(name, path, contents) }
+      shutup { yield Formulary.from_contents(name, path, contents) }
     rescue *IGNORED_EXCEPTIONS => e
       # We rescue these so that we can skip bad versions and
       # continue walking the history
