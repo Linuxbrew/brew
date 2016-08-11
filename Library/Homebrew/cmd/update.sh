@@ -383,8 +383,15 @@ EOS
     [[ -d "$DIR/.git" ]] || continue
     cd "$DIR" || continue
 
+    if [[ -n "$HOMEBREW_VERBOSE" ]]
+    then
+      echo "Checking if we need to fetch $DIR..."
+    fi
+
     TAP_VAR="$(repo_var "$DIR")"
-    declare PREFETCH_REVISION"$TAP_VAR"="$(read_current_revision)"
+    UPSTREAM_BRANCH="$(upstream_branch)"
+    declare UPSTREAM_BRANCH"$TAP_VAR"="$UPSTREAM_BRANCH"
+    declare PREFETCH_REVISION"$TAP_VAR"="$(git rev-parse -q --verify refs/remotes/origin/"$UPSTREAM_BRANCH")"
 
     [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
     [[ -n "$SKIP_FETCH_CORE_REPOSITORY" && "$DIR" = "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && continue
@@ -392,9 +399,6 @@ EOS
     # The upstream repository's default branch may not be master;
     # check refs/remotes/origin/HEAD to see what the default
     # origin branch name is, and use that. If not set, fall back to "master".
-    UPSTREAM_BRANCH="$(upstream_branch)"
-    declare UPSTREAM_BRANCH"$TAP_VAR"="$UPSTREAM_BRANCH"
-
     # the refspec ensures that the default upstream branch gets updated
     (
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
@@ -485,9 +489,8 @@ EOS
       export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
     else
       merge_or_rebase "$DIR" "$TAP_VAR" "$UPSTREAM_BRANCH"
+      [[ -n "$HOMEBREW_VERBOSE" ]] && echo
     fi
-
-    [[ -n "$HOMEBREW_VERBOSE" ]] && echo
   done
 
   safe_cd "$HOMEBREW_REPOSITORY"
