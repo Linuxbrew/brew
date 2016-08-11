@@ -7,7 +7,7 @@ class HardwareTests < Homebrew::TestCase
   end
 
   def test_hardware_intel_family
-    families = [:core, :core2, :penryn, :nehalem, :arrandale, :sandybridge, :ivybridge, :haswell, :broadwell, :skylake, :dunno]
+    families = [:core, :core2, :merom, :penryn, :nehalem, :arrandale, :sandybridge, :ivybridge, :haswell, :broadwell, :skylake, :dunno]
     assert_includes families, Hardware::CPU.family
   end
 end
