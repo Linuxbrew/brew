@@ -141,6 +141,19 @@ class DiagnosticChecksTest < Homebrew::TestCase
     sbin.rmtree
   end
 
+  def test_check_xdg_data_dirs
+    xdg_data_dirs = "XDG_DATA_DIRS"
+    ENV.delete xdg_data_dirs
+    assert_nil @checks.check_xdg_data_dirs
+    ENV[xdg_data_dirs] = ""
+    assert_nil @checks.check_xdg_data_dirs
+    ENV[xdg_data_dirs] = "/usr/share"
+    assert_match "Homebrew's share was not found in your XDG_DATA_DIRS",
+      @checks.check_xdg_data_dirs
+    ENV[xdg_data_dirs] = "#{HOMEBREW_PREFIX}/share"
+    assert_nil @checks.check_xdg_data_dirs
+  end
+
   def test_check_user_curlrc
     mktmpdir do |path|
       FileUtils.touch "#{path}/.curlrc"
