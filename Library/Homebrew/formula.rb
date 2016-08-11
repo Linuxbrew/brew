@@ -114,6 +114,9 @@ class Formula
   # @see .revision
   attr_reader :revision
 
+  # Used to change version schemes for packages
+  attr_reader :version_scheme
+
   # The current working directory during builds.
   # Will only be non-`nil` inside {#install}.
   attr_reader :buildpath
@@ -139,6 +142,7 @@ class Formula
     @name = name
     @path = path
     @revision = self.class.revision || 0
+    @version_scheme = self.class.version_scheme || 0
 
     if path == Formulary.core_path(name)
       @tap = CoreTap.instance
@@ -1014,8 +1018,12 @@ class Formula
     installed_kegs.each do |keg|
       version = keg.version
       all_versions << version
+      next if version.head?
 
-      return [] if pkg_version <= version && !version.head?
+      tab = Tab.for_keg(keg)
+      next if version_scheme > tab.version_scheme
+      next if version_scheme == tab.version_scheme && pkg_version > version
+      return []
     end
 
     head_version = latest_head_version
@@ -1288,6 +1296,7 @@ class Formula
         "head" => (head.version.to_s if head)
       },
       "revision" => revision,
+      "version_scheme" => version_scheme,
       "installed" => [],
       "linked_keg" => (linked_keg.resolved_path.basename.to_s if linked_keg.exist?),
       "pinned" => pinned?,
@@ -1694,6 +1703,15 @@ class Formula
     #
     # <pre>revision 1</pre>
     attr_rw :revision
+
+    # @!attribute [w] version_scheme
+    # Used for creating new Homebrew versions schemes. For example, if we want
+    # to change version scheme from one to another, then we may need to update
+    # `version_scheme` of this {Formula} to be able to use new version scheme.
+    # `0` if unset.
+    #
+    # <pre>version_scheme 1</pre>
+    attr_rw :version_scheme
 
     # A list of the {.stable}, {.devel} and {.head} {SoftwareSpec}s.
     # @private
