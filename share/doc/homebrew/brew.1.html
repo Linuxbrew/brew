@@ -307,9 +307,10 @@ precedence over <code>--verbose</code>).</p>
 <p>If <code>--json=</code><var>version</var> is passed, the output will be in JSON format. The only
 valid version is <code>v1</code>.</p>
 
-<p>If <code>--fetch-HEAD</code> is passed, fetch upstream repository to detect that HEAD
-formula is outdated. Otherwise HEAD-installation is considered outdated if
-new stable or devel version is bumped after that installation.</p></dd>
+<p>If <code>--fetch-HEAD</code> is passed, fetch the upstream repository to detect if
+the HEAD installation of the formula is outdated. Otherwise, the
+repository's HEAD will be checked for updates when a new stable or devel
+version has been released.</p></dd>
 <dt><code>pin</code> <var>formulae</var></dt><dd><p>Pin the specified <var>formulae</var>, preventing them from being upgraded when
 issuing the <code>brew upgrade</code> command. See also <code>unpin</code>.</p></dd>
 <dt><code>prune</code> [<code>--dry-run</code>]</dt><dd><p>Remove dead symlinks from the Homebrew prefix. This is generally not
@@ -446,9 +447,10 @@ source. This is useful for creating patches for the software.</p></dd>
 
 <p>If <code>--cleanup</code> is specified then remove previously installed <var>formula</var> version(s).</p>
 
-<p>If <code>--fetch-HEAD</code> is passed, fetch upstream repository to detect that HEAD
-formula is outdated. Otherwise HEAD-installation is considered outdated if
-new stable or devel version is bumped after that installation.</p>
+<p>If <code>--fetch-HEAD</code> is passed, fetch the upstream repository to detect if
+the HEAD installation of the formula is outdated. Otherwise, the
+repository's HEAD will be checked for updates when a new stable or devel
+version has been released.</p>
 
 <p>If <var>formulae</var> are given, upgrade only the specified brews (but do so even
 if they are pinned; see <code>pin</code>, <code>unpin</code>).</p></dd>

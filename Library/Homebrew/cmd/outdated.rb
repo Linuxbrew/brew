@@ -12,9 +12,10 @@
 #:    If `--json=`<version> is passed, the output will be in JSON format. The only
 #:    valid version is `v1`.
 #:
-#:    If `--fetch-HEAD` is passed, fetch upstream repository to detect that HEAD
-#:    formula is outdated. Otherwise HEAD-installation is considered outdated if
-#:    new stable or devel version is bumped after that installation.
+#:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
+#:    the HEAD installation of the formula is outdated. Otherwise, the
+#:    repository's HEAD will be checked for updates when a new stable or devel
+#:    version has been released.
 
 require "formula"
 require "keg"
