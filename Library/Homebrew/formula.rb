@@ -436,6 +436,7 @@ class Formula
   def head_version_outdated?(version, options={})
     tab = Tab.for_keg(prefix(version))
 
+    return true if tab.version_scheme < version_scheme
     return true if stable && tab.stable_version && tab.stable_version < stable.version
     return true if devel && tab.devel_version && tab.devel_version < devel.version
 
@@ -1708,6 +1709,9 @@ class Formula
     # Used for creating new Homebrew versions schemes. For example, if we want
     # to change version scheme from one to another, then we may need to update
     # `version_scheme` of this {Formula} to be able to use new version scheme.
+    # E.g. to move from 20151020 scheme to 1.0.0 we need to increment
+    # `version_scheme`. Without this, the prior scheme will always equate to a
+    # higher version.
     # `0` if unset.
     #
     # <pre>version_scheme 1</pre>
