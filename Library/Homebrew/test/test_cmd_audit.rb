@@ -13,53 +13,45 @@ class FormulaTextTests < Homebrew::TestCase
     FileUtils.rm_rf @dir
   end
 
-  def formula_text(name, text)
+  def formula_text(name, body = nil, options = {})
     path = Pathname.new "#{@dir}/#{name}.rb"
-    path.open("w") { |f| f.write text }
+    path.open("w") do |f|
+      f.write <<-EOS.undent
+        class #{Formulary.class_s(name)} < Formula
+          #{body}
+        end
+        #{options[:patch]}
+      EOS
+    end
     FormulaText.new path
   end
 
   def test_simple_valid_formula
-    ft = formula_text "valid", <<-EOS.undent
-      class Valid < Formula
-        url "http://www.example.com/valid-1.0.tar.gz"
-      end
-    EOS
+    ft = formula_text "valid", 'url "http://www.example.com/valid-1.0.tar.gz"'
 
-    refute ft.has_DATA?, "The formula doesn't have DATA"
-    refute ft.has_END?, "The formula doesn't have __END__"
-    assert ft.has_trailing_newline?, "The formula have a trailing newline"
+    refute ft.has_DATA?, "The formula should not have DATA"
+    refute ft.has_END?, "The formula should not have __END__"
+    assert ft.has_trailing_newline?, "The formula should have a trailing newline"
 
-    assert ft =~ /\burl\b/, "The formula match 'url'"
-    assert_nil ft.line_number(/desc/), "The formula doesn't match 'desc'"
+    assert ft =~ /\burl\b/, "The formula should match 'url'"
+    assert_nil ft.line_number(/desc/), "The formula should not match 'desc'"
     assert_equal 2, ft.line_number(/\burl\b/)
   end
 
   def test_trailing_newline
-    ft = formula_text "newline", "class Newline < Formula; end"
-    refute ft.has_trailing_newline?, "The formula doesn't have a trailing newline"
+    ft = formula_text "newline"
+    assert ft.has_trailing_newline?, "The formula must have a trailing newline"
   end
 
   def test_has_data
-    ft = formula_text "data", <<-EOS.undent
-      class Data < Formula
-        patch :DATA
-      end
-    EOS
-
-    assert ft.has_DATA?, "The formula has DATA"
+    ft = formula_text "data", "patch :DATA"
+    assert ft.has_DATA?, "The formula must have DATA"
   end
 
   def test_has_end
-    ft = formula_text "end", <<-EOS.undent
-      class End < Formula
-      end
-      __END__
-      a patch here
-    EOS
-
-    assert ft.has_END?, "The formula has __END__"
-    assert_equal "class End < Formula\nend", ft.without_patch
+    ft = formula_text "end", "", :patch => "__END__\na patch here"
+    assert ft.has_END?, "The formula must have __END__"
+    assert_equal "class End < Formula\n  \nend", ft.without_patch
   end
 end
 
