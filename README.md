@@ -13,9 +13,24 @@ Install Linuxbrew (tl;dr)
 
 Paste at a Terminal prompt:
 
-``` sh
+```sh
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
+PATH="$HOME/.linuxbrew/bin:$PATH"
 ```
+
+Edit your `~/.bash_profile` to add `~/.linuxbrew/bin` to your `PATH`:
+
+```sh
+echo 'export PATH="$HOME/.linuxbrew/bin:$PATH"' >>~/.bash_profile
+```
+
+You're done! Try installing a package:
+
+```sh
+brew install hello
+```
+
+Use `brew doctor` to troubleshoot common issues.
 
 See [Dependencies](#dependencies) and [Installation](#installation) below for more details.
 
@@ -65,7 +80,7 @@ Installation
 
 Paste at a Terminal prompt:
 
-``` sh
+```sh
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
 ```
 
@@ -83,11 +98,13 @@ export MANPATH="$HOME/.linuxbrew/share/man:$MANPATH"
 export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
 ```
 
-You're done!
+You're done! Try installing a package:
 
 ```sh
-brew install $WHATEVER_YOU_WANT
+brew install hello
 ```
+
+If you're using an older distribution of Linux, installing your first package will also install a recent version of `gcc`.
 
 ## What Packages Are Available?
 1. Type `brew search` for a list.
