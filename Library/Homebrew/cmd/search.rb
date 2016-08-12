@@ -126,7 +126,7 @@ module Homebrew
       return []
     end
 
-    @@remote_tap_formulae ||= Hash.new do |cache, key|
+    remote_tap_formulae = Hash.new do |cache, key|
       user, repo = key.split("/", 2)
       tree = {}
 
@@ -148,7 +148,7 @@ module Homebrew
       cache[key] = paths.map { |path| File.basename(path, ".rb") }
     end
 
-    names = @@remote_tap_formulae["#{user}/#{repo}"]
+    names = remote_tap_formulae["#{user}/#{repo}"]
     user = user.downcase if user == "Homebrew" # special handling for the Homebrew organization
     names.select { |name| rx === name }.map { |name| "#{user}/#{repo}/#{name}" }
   rescue GitHub::HTTPNotFoundError => e
