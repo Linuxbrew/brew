@@ -32,7 +32,18 @@
 
 <p>Paste at a Terminal prompt:</p>
 
-<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span></pre></div>
+<div class="highlight highlight-source-shell"><pre>ruby -e <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span>
+PATH=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$HOME</span>/.linuxbrew/bin:<span class="pl-smi">$PATH</span><span class="pl-pds">"</span></span></pre></div>
+
+<p>Edit your <code>~/.bash_profile</code> to add <code>~/.linuxbrew/bin</code> to your <code>PATH</code>:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">'</span>export PATH="$HOME/.linuxbrew/bin:$PATH"<span class="pl-pds">'</span></span> <span class="pl-k">&gt;&gt;</span>~/.bash_profile</pre></div>
+
+<p>You're done! Try installing a package:</p>
+
+<div class="highlight highlight-source-shell"><pre>brew install hello</pre></div>
+
+<p>Use <code>brew doctor</code> to troubleshoot common issues.</p>
 
 <p>See <a href="#dependencies">Dependencies</a> and <a href="#installation">Installation</a> below for more details.</p>
 
@@ -101,9 +112,11 @@
 <span class="pl-k">export</span> MANPATH=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$HOME</span>/.linuxbrew/share/man:<span class="pl-smi">$MANPATH</span><span class="pl-pds">"</span></span>
 <span class="pl-k">export</span> INFOPATH=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$HOME</span>/.linuxbrew/share/info:<span class="pl-smi">$INFOPATH</span><span class="pl-pds">"</span></span></pre></div>
 
-<p>You're done!</p>
+<p>You're done! Try installing a package:</p>
 
-<div class="highlight highlight-source-shell"><pre>brew install <span class="pl-smi">$WHATEVER_YOU_WANT</span></pre></div>
+<div class="highlight highlight-source-shell"><pre>brew install hello</pre></div>
+
+<p>If you're using an older distribution of Linux, installing your first package will also install a recent version of <code>gcc</code>.</p>
 
 <h2>
 <a id="what-packages-are-available" class="anchor" href="#what-packages-are-available" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What Packages Are Available?</h2>
@@ -134,6 +147,17 @@
 <p>Many of the Homebrew formulae work on either Mac or Linux without changes, but some formulae will need to be adapted for Linux. If a formula doesn't work, <a href="https://github.com/Linuxbrew/linuxbrew/issues">open an issue on GitHub</a> or, even better, submit a pull request.</p>
 
 <h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>We'd love you to contribute to Linuxbrew or its upstream, Homebrew. First, please read our <a href="https://github.com/Linuxbrew/brew/blob/master/.github/CONTRIBUTING.md">Contribution Guide</a> and <a href="https://github.com/Linuxbrew/brew/blob/master/CODEOFCONDUCT.md#code-of-conduct">Code of Conduct</a>.</p>
+
+<p>We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.</p>
+
+<p>Please see our <a href="https://github.com/Linuxbrew/brew/blob/master/.github/CONTRIBUTING.md#contributing-to-linuxbrew">guidelines</a> on whether to send pull requests to Linuxbrew or Homebrew.</p>
+
+<p>A good starting point for contributing is running <code>brew audit</code> (or <code>brew audit --strict</code>) with some of the packages you use (e.g. <code>brew audit wget</code> if you use <code>wget</code>) and then read through the warnings, try to fix them until <code>brew audit</code> shows no results and <a href="https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md">submit a pull request</a>. If no formulae you use have warnings you can run <code>brew audit</code> without arguments to have it run on all packages and pick one. Good luck!</p>
+
+<h2>
 <a id="security" class="anchor" href="#security" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Security</h2>
 
 <p>Please report security issues to <a href="mailto:security@brew.sh">security@brew.sh</a>.</p>
@@ -152,7 +176,7 @@
 <h2>
 <a id="who-are-you" class="anchor" href="#who-are-you" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Who Are You?</h2>
 
-<p>Linuxbrew is maintained by <a href="http://sjackman.ca">Shaun Jackman</a>.</p>
+<p>Linuxbrew is maintained by <a href="http://sjackman.ca">Shaun Jackman</a>, <a href="https://github.com/rwhogg">Bob W. Hogg</a>, <a href="https://github.com/DoomHammer">Piotr Gaczkowski</a> and <a href="https://github.com/maxim-belkin">Maxim Belkin</a>.</p>
 
 <p>Homebrew's current maintainers are <a href="https://github.com/mistydemeo">Misty De Meo</a>, <a href="https://github.com/apjanke">Andrew Janke</a>, <a href="https://github.com/xu-cheng">Xu Cheng</a>, <a href="https://github.com/nijikon">Tomasz Pajor</a>, <a href="https://github.com/mikemcquaid">Mike McQuaid</a>, <a href="https://github.com/bfontaine">Baptiste Fontaine</a>, <a href="https://github.com/asparagui">Brett Koonce</a>, <a href="https://github.com/ilovezfs">ilovezfs</a>, <a href="https://github.com/UniqMartin">Martin Afanasjew</a>, <a href="https://github.com/DomT4">Dominyk Tiller</a>, <a href="https://github.com/tdsmith">Tim Smith</a> and <a href="https://github.com/dunn">Alex Dunn</a>.</p>
 
