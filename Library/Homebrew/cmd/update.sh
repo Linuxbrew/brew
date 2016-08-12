@@ -4,6 +4,8 @@
 #:
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:      (rather than `git rebase`).
+#:    If `--force` is specified then always do a slower, full update check even
+#:      if unnecessary.
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
@@ -293,6 +295,7 @@ homebrew-update() {
       --verbose)                      HOMEBREW_VERBOSE=1 ;;
       --debug)                        HOMEBREW_DEBUG=1 ;;
       --merge)                        HOMEBREW_MERGE=1 ;;
+      --force)                        HOMEBREW_UPDATE_FORCE=1 ;;
       --simulate-from-current-branch) HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH=1 ;;
       --preinstall)                   export HOMEBREW_UPDATE_PREINSTALL=1 ;;
       --*)                            ;;
@@ -393,8 +396,11 @@ EOS
     declare UPSTREAM_BRANCH"$TAP_VAR"="$UPSTREAM_BRANCH"
     declare PREFETCH_REVISION"$TAP_VAR"="$(git rev-parse -q --verify refs/remotes/origin/"$UPSTREAM_BRANCH")"
 
-    [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
-    [[ -n "$SKIP_FETCH_CORE_REPOSITORY" && "$DIR" = "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && continue
+    if [[ -z "$HOMEBREW_UPDATE_FORCE" ]]
+    then
+      [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
+      [[ -n "$SKIP_FETCH_CORE_REPOSITORY" && "$DIR" = "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && continue
+    fi
 
     # The upstream repository's default branch may not be master;
     # check refs/remotes/origin/HEAD to see what the default
@@ -431,7 +437,7 @@ EOS
            "https://api.github.com/repos/$UPSTREAM_REPOSITORY/commits/$UPSTREAM_BRANCH")"
         # Touch FETCH_HEAD to confirm we've checked for an update.
         [[ -f "$DIR/.git/FETCH_HEAD" ]] && touch "$DIR/.git/FETCH_HEAD"
-        [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
+        [[ -z "$HOMEBREW_UPDATE_FORCE" ]] && [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
       elif [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
         # Don't try to do a `git fetch` that may take longer than expected.
@@ -484,7 +490,8 @@ EOS
     if [[ -n "$HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH" ]]
     then
       simulate_from_current_branch "$DIR" "$TAP_VAR" "$UPSTREAM_BRANCH" "$CURRENT_REVISION"
-    elif [[ "$PREFETCH_REVISION" = "$POSTFETCH_REVISION" ]] &&
+    elif [[ -z "$HOMEBREW_UPDATE_FORCE" ]] &&
+         [[ "$PREFETCH_REVISION" = "$POSTFETCH_REVISION" ]] &&
          [[ "$CURRENT_REVISION" = "$POSTFETCH_REVISION" ]]
     then
       export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$CURRENT_REVISION"
@@ -499,6 +506,7 @@ EOS
 
   if [[ -n "$HOMEBREW_UPDATED" ||
         -n "$HOMEBREW_UPDATE_FAILED" ||
+        -n "$HOMEBREW_UPDATE_FORCE" ||
         (-n "$HOMEBREW_DEVELOPER" && -z "$HOMEBREW_UPDATE_PREINSTALL") ]]
   then
     brew update-report "$@"
