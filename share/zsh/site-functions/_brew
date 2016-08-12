@@ -139,6 +139,7 @@ case "$words[1]" in
   upgrade)
     _arguments \
       '(--cleanup)--cleanup[remove previously installed formula version(s)]' \
+      '(--fetch-HEAD)--fetch-HEAD[detect outdated installation by fetching the repo]' \
       '1: :->forms' && return 0
 
     if [[ "$state" == forms ]]; then
