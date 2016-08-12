@@ -36,6 +36,7 @@ class FormulaTextTests < Homebrew::TestCase
     assert ft =~ /\burl\b/, "The formula should match 'url'"
     assert_nil ft.line_number(/desc/), "The formula should not match 'desc'"
     assert_equal 2, ft.line_number(/\burl\b/)
+    assert ft.include?("Valid"), "The formula should include \"Valid\""
   end
 
   def test_trailing_newline
