@@ -373,4 +373,98 @@ class FormulaAuditorTests < Homebrew::TestCase
   ensure
     ENV["HOMEBREW_NO_GITHUB_API"] = original_value
   end
+
+  def test_audit_caveats
+    fa = formula_auditor "foo", <<-EOS.undent
+      class Foo < Formula
+        homepage "http://example.com/foo"
+        url "http://example.com/foo-1.0.tgz"
+
+        def caveats
+          "setuid"
+        end
+      end
+    EOS
+
+    fa.audit_caveats
+    assert_equal ["Don't recommend setuid in the caveats, suggest sudo instead."],
+      fa.problems
+  end
+
+  def test_audit_desc
+    formula_descriptions = [
+      { :name => "foo", :desc => nil,
+        :problem => "Formula should have a desc" },
+      { :name => "bar", :desc => "bar" * 30,
+        :problem => "Description is too long" },
+      { :name => "baz", :desc => "Baz commandline tool",
+        :problem => "Description should use \"command-line\"" },
+      { :name => "qux", :desc => "A tool called Qux",
+        :problem => "Description shouldn't start with an indefinite article" },
+    ]
+
+    formula_descriptions.each do |formula|
+      content = <<-EOS.undent
+        class #{Formulary.class_s(formula[:name])} < Formula
+          url "http://example.com/#{formula[:name]}-1.0.tgz"
+          desc "#{formula[:desc]}"
+        end
+      EOS
+
+      fa = formula_auditor formula[:name], content, :strict => true
+      fa.audit_desc
+      assert_match formula[:problem], fa.problems.first
+    end
+  end
+
+  def test_audit_homepage
+    fa = formula_auditor "foo", <<-EOS.undent, :online => true
+      class Foo < Formula
+        homepage "ftp://example.com/foo"
+        url "http://example.com/foo-1.0.tgz"
+      end
+    EOS
+
+    fa.audit_homepage
+    assert_equal ["The homepage should start with http or https " \
+      "(URL is #{fa.formula.homepage}).", "The homepage is not reachable " \
+      "(curl exit code #{$?.exitstatus})"], fa.problems
+
+    formula_homepages = {
+      "bar" => "http://www.freedesktop.org/wiki/bar",
+      "baz" => "http://www.freedesktop.org/wiki/Software/baz",
+      "qux" => "https://code.google.com/p/qux",
+      "quux" => "http://github.com/quux",
+      "corge" => "http://savannah.nongnu.org/corge",
+      "grault" => "http://grault.github.io/",
+      "garply" => "http://www.gnome.org/garply",
+      "waldo" => "http://www.gnu.org/waldo",
+    }
+
+    formula_homepages.each do |name, homepage|
+      fa = formula_auditor name, <<-EOS.undent
+        class #{Formulary.class_s(name)} < Formula
+          homepage "#{homepage}"
+          url "http://example.com/#{name}-1.0.tgz"
+        end
+      EOS
+
+      fa.audit_homepage
+      if homepage =~ %r{http:\/\/www\.freedesktop\.org}
+        if homepage =~ /Software/
+          assert_match "#{homepage} should be styled " \
+            "`https://wiki.freedesktop.org/www/Software/project_name`",
+            fa.problems.first
+        else
+          assert_match "#{homepage} should be styled " \
+            "`https://wiki.freedesktop.org/project_name`",
+            fa.problems.first
+        end
+      elsif homepage =~ %r{https:\/\/code\.google\.com}
+        assert_match "#{homepage} should end with a slash", fa.problems.first
+      else
+        assert_match "Please use https:// for #{homepage}", fa.problems.first
+      end
+    end
+  end
 end
