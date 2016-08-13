@@ -138,6 +138,11 @@ class Tab < OpenStruct
         "path" => f.path.to_s,
         "tap" => f.tap ? f.tap.name : f.tap,
         "spec" => f.active_spec_sym.to_s,
+        "versions" => {
+          "stable" => f.stable ? f.stable.version.to_s : nil,
+          "devel" => f.devel ? f.devel.version.to_s : nil,
+          "head" => f.head ? f.head.version.to_s : nil,
+        }
       }
     end
 
