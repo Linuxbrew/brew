@@ -1,6 +1,12 @@
 # Homebrew
 Features, usage and installation instructions are [summarised on the homepage](http://brew.sh).
 
+## Update Bug
+If Homebrew was updated on Aug 10-11th 2016 and `brew update` always says `Already up-to-date.` you need to run:
+```bash
+cd $(brew --repo); git fetch; git reset --hard origin/master; brew update
+```
+
 ## What Packages Are Available?
 1. Type `brew search` for a list.
 2. Or visit [braumeister.org](http://braumeister.org) to browse packages online.
