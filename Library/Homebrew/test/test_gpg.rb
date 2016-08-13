@@ -7,10 +7,6 @@ class GpgTest < Homebrew::TestCase
     @dir = Pathname.new(mktmpdir)
   end
 
-  def teardown
-    @dir.rmtree
-  end
-
   def test_create_test_key
     Dir.chdir(@dir) do
       with_environment("HOME" => @dir) do
@@ -18,5 +14,7 @@ class GpgTest < Homebrew::TestCase
         assert_predicate @dir/".gnupg/secring.gpg", :exist?
       end
     end
+  ensure
+    @dir.rmtree
   end
 end
