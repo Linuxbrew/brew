@@ -51,6 +51,9 @@ module Homebrew
 
   attr_accessor :failed
   alias_method :failed?, :failed
+
+  attr_accessor :raise_deprecation_exceptions
+  alias_method :raise_deprecation_exceptions?, :raise_deprecation_exceptions
 end
 
 HOMEBREW_PULL_API_REGEX = %r{https://api\.github\.com/repos/([\w-]+)/([\w-]+)?/pulls/(\d+)}

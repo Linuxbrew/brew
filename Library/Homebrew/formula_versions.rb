@@ -34,6 +34,7 @@ class FormulaVersions
     contents = file_contents_at_revision(rev)
 
     begin
+      Homebrew.raise_deprecation_exceptions = true
       nostdout { yield Formulary.from_contents(name, path, contents) }
     rescue *IGNORED_EXCEPTIONS => e
       # We rescue these so that we can skip bad versions and
@@ -41,6 +42,8 @@ class FormulaVersions
       ohai "#{e} in #{name} at revision #{rev}", e.backtrace if ARGV.debug?
     rescue FormulaUnavailableError
       # Suppress this error
+    ensure
+      Homebrew.raise_deprecation_exceptions = false
     end
   end
 

@@ -151,7 +151,8 @@ def odeprecated(method, replacement = nil, options = {})
     #{caller_message}#{tap_message}
   EOS
 
-  if ARGV.homebrew_developer? || options[:die]
+  if ARGV.homebrew_developer? || options[:die] ||
+     Homebrew.raise_deprecation_exceptions?
     raise FormulaMethodDeprecatedError, message
   else
     opoo "#{message}\n"
