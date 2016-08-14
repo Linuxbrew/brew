@@ -588,15 +588,13 @@ class FormulaInstaller
       #{formula.path}
     ].concat(build_argv)
 
-    if Sandbox.available? && ARGV.sandbox?
-      Sandbox.print_sandbox_message
-    end
+    Sandbox.print_sandbox_message if Sandbox.formula?(formula)
 
     Utils.safe_fork do
       # Invalidate the current sudo timestamp in case a build script calls sudo
       system "/usr/bin/sudo", "-k"
 
-      if Sandbox.available? && ARGV.sandbox?
+      if Sandbox.formula?(formula)
         sandbox = Sandbox.new
         formula.logs.mkpath
         sandbox.record_log(formula.logs/"sandbox.build.log")
