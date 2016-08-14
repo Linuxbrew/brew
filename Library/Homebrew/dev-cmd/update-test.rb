@@ -15,7 +15,7 @@ module Homebrew
       Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
     else
       Utils.popen_read("git", "rev-parse", "origin/master").chomp
-     end
+    end
     start_sha1 = Utils.popen_read("git", "rev-parse", start_sha1).chomp
     end_sha1 = Utils.popen_read("git", "rev-parse", "HEAD").chomp
 
@@ -49,7 +49,7 @@ module Homebrew
       oh1 "Running brew update..."
       safe_system "brew", "update", "--verbose"
       actual_end_sha1 = Utils.popen_read("git", "rev-parse", "master").chomp
-      if actual_end_sha1 != end_sha1
+      if start_sha1 != end_sha1 && start_sha1 == actual_end_sha1
         raise <<-EOS.undent
           brew update didn't update master!
           Start commit:        #{start_sha1}
