@@ -51,7 +51,7 @@ module Homebrew
         issue = arg
         url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
         tap = CoreTap.instance
-      elsif (testing_match = arg.match %r{brew\.sh/job/Homebrew.*Testing/(\d+)/})
+      elsif (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = ARGV.value("tap")
         tap = if tap && tap.start_with?("homebrew/")
           Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
