@@ -13,6 +13,12 @@ class SandboxTest < Homebrew::TestCase
     @dir.rmtree
   end
 
+  def test_test?
+    ARGV.stubs(:no_sandbox?).returns false
+    assert Sandbox.test?,
+      "Tests should be sandboxed unless --no-sandbox was passed."
+  end
+
   def test_allow_write
     @sandbox.allow_write @file
     @sandbox.exec "touch", @file

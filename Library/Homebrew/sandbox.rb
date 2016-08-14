@@ -8,6 +8,11 @@ class Sandbox
     OS.mac? && File.executable?(SANDBOX_EXEC)
   end
 
+  def self.test?
+    return false unless available?
+    !ARGV.no_sandbox?
+  end
+
   def self.print_sandbox_message
     unless @printed_sandbox_message
       ohai "Using the sandbox"
