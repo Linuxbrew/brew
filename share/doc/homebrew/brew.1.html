@@ -440,7 +440,9 @@ source. This is useful for creating patches for the software.</p></dd>
  <code>git</code>(1).</p>
 
 <p>If <code>--merge</code> is specified then <code>git merge</code> is used to include updates
-  (rather than <code>git rebase</code>).</p></dd>
+  (rather than <code>git rebase</code>).
+If <code>--force</code> is specified then always do a slower, full update check even
+  if unnecessary.</p></dd>
 <dt><code>upgrade</code> [<var>install-options</var>] [<code>--cleanup</code>] [<code>--fetch-HEAD</code>] [<var>formulae</var>]</dt><dd><p>Upgrade outdated, unpinned brews.</p>
 
 <p>Options for the <code>install</code> command are also valid here.</p>
