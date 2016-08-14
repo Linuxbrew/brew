@@ -3,9 +3,17 @@ require "tempfile"
 
 class Sandbox
   SANDBOX_EXEC = "/usr/bin/sandbox-exec".freeze
+  SANDBOXED_TAPS = [
+    "homebrew/core",
+  ].freeze
 
   def self.available?
     OS.mac? && File.executable?(SANDBOX_EXEC)
+  end
+
+  def self.formula?(formula)
+    return false unless available?
+    ARGV.sandbox? || SANDBOXED_TAPS.include?(formula.tap.to_s)
   end
 
   def self.test?
