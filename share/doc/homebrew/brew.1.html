@@ -533,6 +533,9 @@ a Homebrew-built Git if installed, or the system-provided binary.</p>
 <p>Set this to force Homebrew to use a particular git binary.</p></dd>
 <dt><code>HOMEBREW_BOTTLE_DOMAIN</code></dt><dd><p>If set, instructs Homebrew to use the given URL as a download mirror for bottles.</p></dd>
 <dt><code>HOMEBREW_ARTIFACT_DOMAIN</code></dt><dd><p>If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.</p></dd>
+<dt><code>HOMEBREW_AUTO_UPDATE_SECS</code></dt><dd><p>If set, Homebrew will only check for autoupdates once per this seconds interval.</p>
+
+<p><em>Default:</em> <code>60</code>.</p></dd>
 <dt><code>HOMEBREW_BROWSER</code></dt><dd><p>If set, uses this setting as the browser when opening project homepages,
 instead of the OS default browser.</p></dd>
 <dt><code>HOMEBREW_BUILD_FROM_SOURCE</code></dt><dd><p>If set, instructs Homebrew to compile from source even when a formula
@@ -571,6 +574,8 @@ the number of parallel jobs to run when building with <code>make</code>(1).</p>
 
 <p><em>Default:</em> the number of available CPU cores.</p></dd>
 <dt><code>HOMEBREW_NO_ANALYTICS</code></dt><dd><p>If set, Homebrew will not send analytics. See: <a href="https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics</a></p></dd>
+<dt><code>HOMEBREW_NO_AUTO_UPDATE</code></dt><dd><p>If set, Homebrew will not auto-update before running <code>brew install</code> and
+<code>brew upgrade</code>.</p></dd>
 <dt><code>HOMEBREW_NO_EMOJI</code></dt><dd><p>If set, Homebrew will not print the <code>HOMEBREW_INSTALL_BADGE</code> on a
 successful build.</p>
 
