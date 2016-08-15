@@ -64,6 +64,10 @@ fi
 unset GEM_HOME
 unset GEM_PATH
 
+# Users may have this set, injecting arbitrary environment changes into
+# bash processes inside builds
+unset BASH_ENV
+
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_OSX="1" ;;
