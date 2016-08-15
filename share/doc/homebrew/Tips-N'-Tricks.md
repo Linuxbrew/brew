@@ -136,3 +136,9 @@ inline patches in Vim.
 [homebrew-mode](https://github.com/dunn/homebrew-mode) provides syntax
 highlighting for inline patches as well as a number of helper functions
 for editing formula files.
+
+### Atom
+
+[language-homebrew-formula](https://atom.io/packages/language-homebrew-formula)
+adds highlighting and diff support (with the
+[language-diff](https://atom.io/packages/language-diff) plugin).
