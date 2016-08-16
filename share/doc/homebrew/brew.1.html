@@ -264,7 +264,9 @@ into <code>/Applications</code>, allowing for easier access.</p>
 <p>If provided, <code>--local</code> will symlink them into the user's <code>~/Applications</code>
 directory instead of the system directory.</p></dd>
 <dt><code>list</code>, <code>ls</code> [<code>--full-name</code>]</dt><dd><p>List all installed formulae. If <code>--full-name</code> is passed, print formulae with
-full-qualified names.</p></dd>
+fully-qualified names.
+If <code>--full-name</code> is not passed any other options (e.g. <code>-t</code>) are passed to
+<code>ls</code> which produces the actual output.</p></dd>
 <dt><code>list</code>, <code>ls</code> <code>--unbrewed</code></dt><dd><p>List all files in the Homebrew prefix not installed by Homebrew.</p></dd>
 <dt><code>list</code>, <code>ls</code> [<code>--versions</code> [<code>--multiple</code>]] [<code>--pinned</code>] [<var>formulae</var>]</dt><dd><p>List the installed files for <var>formulae</var>. Combined with <code>--verbose</code>, recursively
 list the contents of all subdirectories in each <var>formula</var>'s keg.</p>
