@@ -1,8 +1,7 @@
 #:  * `list`, `ls` [`--full-name`]:
-#:    List all installed formulae. If `--full-name` is passed, print formulae with
-#:    fully-qualified names.
-#:    If `--full-name` is not passed any other options (e.g. `-t`) are passed to
-#:    `ls` which produces the actual output.
+#:    List all installed formulae. If `--full-name` is passed, print formulae
+#:    with fully-qualified names. If `--full-name` is not passed, any other
+#:    options (e.g. `-t`) are passed to `ls` which produces the actual output.
 #:
 #:  * `list`, `ls` `--unbrewed`:
 #:    List all files in the Homebrew prefix not installed by Homebrew.

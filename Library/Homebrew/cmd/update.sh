@@ -1,11 +1,12 @@
-#:  * `update` [`--merge`]:
+#:  * `update` [`--merge`] [`--force`]:
 #:    Fetch the newest version of Homebrew and all formulae from GitHub using
-#:     `git`(1).
+#:    `git`(1).
 #:
 #:    If `--merge` is specified then `git merge` is used to include updates
-#:      (rather than `git rebase`).
+#:    (rather than `git rebase`).
+#:
 #:    If `--force` is specified then always do a slower, full update check even
-#:      if unnecessary.
+#:    if unnecessary.
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null

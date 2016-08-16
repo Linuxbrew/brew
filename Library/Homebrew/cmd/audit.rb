@@ -9,11 +9,11 @@
 #:
 #:    If `--online` is passed, additional slower checks that require a network
 #:    connection are run.
-#
+#:
 #:    If `--new-formula` is passed, various additional checks are run that check
 #:    if a new formula is eligable for Homebrew. This should be used when creating
 #:    new formulae and implies `--strict` and `--online`.
-#
+#:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
 #:

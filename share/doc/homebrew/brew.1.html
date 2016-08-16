@@ -48,11 +48,13 @@ run before submitting a new formula.</p>
 style checks.</p>
 
 <p>If <code>--online</code> is passed, additional slower checks that require a network
-connection are run.
-If <code>--new-formula</code> is passed, various additional checks are run that check
+connection are run.</p>
+
+<p>If <code>--new-formula</code> is passed, various additional checks are run that check
 if a new formula is eligable for Homebrew. This should be used when creating
-new formulae and implies <code>--strict</code> and <code>--online</code>.
-If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
+new formulae and implies <code>--strict</code> and <code>--online</code>.</p>
+
+<p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
 is included in the output.</p>
 
 <p>If <code>--display-filename</code> is passed, every line of output is prefixed with the
@@ -168,15 +170,15 @@ bottle.</p>
 
 <p>If <code>--force-bottle</code> is passed, download a bottle if it exists for the current
 version of OS X, even if it would not be used during installation.</p></dd>
-<dt><code>gist-logs</code> [<code>--new-issue</code>|<code>-n</code>] <var>formula</var></dt><dd><p> Upload logs for a failed build of <var>formula</var> to a new Gist.</p>
+<dt><code>gist-logs</code> [<code>--new-issue</code>|<code>-n</code>] <var>formula</var></dt><dd><p>Upload logs for a failed build of <var>formula</var> to a new Gist.</p>
 
-<p> <var>formula</var> is usually the name of the formula to install, but it can be specified
- in several different ways. See <a href="#SPECIFYING-FORMULAE" title="SPECIFYING FORMULAE" data-bare-link="true">SPECIFYING FORMULAE</a>.</p>
+<p><var>formula</var> is usually the name of the formula to install, but it can be specified
+in several different ways. See <a href="#SPECIFYING-FORMULAE" title="SPECIFYING FORMULAE" data-bare-link="true">SPECIFYING FORMULAE</a>.</p>
 
-<p> If <code>--new-issue</code> is passed, automatically create a new issue in the appropriate
- GitHub repository as well as creating the Gist.</p>
+<p>If <code>--new-issue</code> is passed, automatically create a new issue in the appropriate
+GitHub repository as well as creating the Gist.</p>
 
-<p> If no logs are found, an error message is presented.</p></dd>
+<p>If no logs are found, an error message is presented.</p></dd>
 <dt class="flush"><code>home</code></dt><dd><p>Open Homebrew's own homepage in a browser.</p></dd>
 <dt><code>home</code> <var>formula</var></dt><dd><p>Open <var>formula</var>'s homepage in a browser.</p></dd>
 <dt><code>info</code> <var>formula</var></dt><dd><p>Display information about <var>formula</var>.</p></dd>
@@ -263,10 +265,9 @@ into <code>/Applications</code>, allowing for easier access.</p>
 
 <p>If provided, <code>--local</code> will symlink them into the user's <code>~/Applications</code>
 directory instead of the system directory.</p></dd>
-<dt><code>list</code>, <code>ls</code> [<code>--full-name</code>]</dt><dd><p>List all installed formulae. If <code>--full-name</code> is passed, print formulae with
-fully-qualified names.
-If <code>--full-name</code> is not passed any other options (e.g. <code>-t</code>) are passed to
-<code>ls</code> which produces the actual output.</p></dd>
+<dt><code>list</code>, <code>ls</code> [<code>--full-name</code>]</dt><dd><p>List all installed formulae. If <code>--full-name</code> is passed, print formulae
+with fully-qualified names. If <code>--full-name</code> is not passed, any other
+options (e.g. <code>-t</code>) are passed to <code>ls</code> which produces the actual output.</p></dd>
 <dt><code>list</code>, <code>ls</code> <code>--unbrewed</code></dt><dd><p>List all files in the Homebrew prefix not installed by Homebrew.</p></dd>
 <dt><code>list</code>, <code>ls</code> [<code>--versions</code> [<code>--multiple</code>]] [<code>--pinned</code>] [<var>formulae</var>]</dt><dd><p>List the installed files for <var>formulae</var>. Combined with <code>--verbose</code>, recursively
 list the contents of all subdirectories in each <var>formula</var>'s keg.</p>
@@ -278,16 +279,15 @@ only show formulae with multiple versions installed.</p>
 <p>If <code>--pinned</code> is passed, show the versions of pinned formulae, or only the
 specified (pinned) formulae if <var>formulae</var> are given.
 See also <code>pin</code>, <code>unpin</code>.</p></dd>
-<dt><code>log</code> [<code>git-log-options</code>] <var>formula</var> ...</dt><dd><p>Show the git log for the given formulae. Options that <code>git-log</code>(1)
+<dt><code>log</code> [<var>git-log-options</var>] <var>formula</var> ...</dt><dd><p>Show the git log for the given formulae. Options that <code>git-log</code>(1)
 recognizes can be passed before the formula list.</p></dd>
 <dt><code>migrate</code> [<code>--force</code>] <var>formulae</var></dt><dd><p>Migrate renamed packages to new name, where <var>formulae</var> are old names of
 packages.</p>
 
 <p>If <code>--force</code> is passed, then treat installed <var>formulae</var> and passed <var>formulae</var>
 like if they are from same taps and migrate them anyway.</p></dd>
-<dt><code>missing</code> [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies.</p>
-
-<p>If no <var>formulae</var> are given, check all installed brews.</p></dd>
+<dt><code>missing</code> [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies. If no <var>formulae</var> are
+given, check all installed brews.</p></dd>
 <dt><code>options</code> [<code>--compact</code>] (<code>--all</code>|<code>--installed</code>|<var>formulae</var>)</dt><dd><p>Display install options specific to <var>formulae</var>.</p>
 
 <p>If <code>--compact</code> is passed, show all options on a single line separated by
@@ -322,7 +322,7 @@ created by <code>brew linkapps</code>.</p>
 
 <p>If <code>--dry-run</code> or <code>-n</code> is passed, show what would be removed, but do not
 actually remove anything.</p></dd>
-<dt><code>reinstall</code> <var>formula</var></dt><dd><p>Uninstall then install <var>formula</var></p></dd>
+<dt><code>reinstall</code> <var>formula</var></dt><dd><p>Uninstall and then install <var>formula</var>.</p></dd>
 <dt><code>search</code>, <code>-S</code></dt><dd><p>Display all locally available formulae for brewing (including tapped ones).
 No online search is performed if called without arguments.</p></dd>
 <dt><code>search</code> [<code>--desc</code>] <var>text</var>|<code>/</code><var>text</var><code>/</code></dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
@@ -438,13 +438,14 @@ source. This is useful for creating patches for the software.</p></dd>
 <dt><code>unpin</code> <var>formulae</var></dt><dd><p>Unpin <var>formulae</var>, allowing them to be upgraded by <code>brew upgrade</code>. See also
 <code>pin</code>.</p></dd>
 <dt><code>untap</code> <var>tap</var></dt><dd><p>Remove a tapped repository.</p></dd>
-<dt><code>update</code> [<code>--merge</code>]</dt><dd><p>Fetch the newest version of Homebrew and all formulae from GitHub using
- <code>git</code>(1).</p>
+<dt><code>update</code> [<code>--merge</code>] [<code>--force</code>]</dt><dd><p>Fetch the newest version of Homebrew and all formulae from GitHub using
+<code>git</code>(1).</p>
 
 <p>If <code>--merge</code> is specified then <code>git merge</code> is used to include updates
-  (rather than <code>git rebase</code>).
-If <code>--force</code> is specified then always do a slower, full update check even
-  if unnecessary.</p></dd>
+(rather than <code>git rebase</code>).</p>
+
+<p>If <code>--force</code> is specified then always do a slower, full update check even
+if unnecessary.</p></dd>
 <dt><code>upgrade</code> [<var>install-options</var>] [<code>--cleanup</code>] [<code>--fetch-HEAD</code>] [<var>formulae</var>]</dt><dd><p>Upgrade outdated, unpinned brews.</p>
 
 <p>Options for the <code>install</code> command are also valid here.</p>

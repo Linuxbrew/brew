@@ -66,7 +66,13 @@ If no \fIformulae\fR are provided, all of them are checked\.
 If \fB\-\-strict\fR is passed, additional checks are run, including RuboCop style checks\.
 .
 .IP
-If \fB\-\-online\fR is passed, additional slower checks that require a network connection are run\. If \fB\-\-new\-formula\fR is passed, various additional checks are run that check if a new formula is eligable for Homebrew\. This should be used when creating new formulae and implies \fB\-\-strict\fR and \fB\-\-online\fR\. If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
+If \fB\-\-online\fR is passed, additional slower checks that require a network connection are run\.
+.
+.IP
+If \fB\-\-new\-formula\fR is passed, various additional checks are run that check if a new formula is eligable for Homebrew\. This should be used when creating new formulae and implies \fB\-\-strict\fR and \fB\-\-online\fR\.
+.
+.IP
+If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
 .
 .IP
 If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with the name of the file or formula being audited, to make the output easy to grep\.
@@ -344,7 +350,7 @@ If provided, \fB\-\-local\fR will symlink them into the user\'s \fB~/Application
 .
 .TP
 \fBlist\fR, \fBls\fR [\fB\-\-full\-name\fR]
-List all installed formulae\. If \fB\-\-full\-name\fR is passed, print formulae with fully\-qualified names\. If \fB\-\-full\-name\fR is not passed any other options (e\.g\. \fB\-t\fR) are passed to \fBls\fR which produces the actual output\.
+List all installed formulae\. If \fB\-\-full\-name\fR is passed, print formulae with fully\-qualified names\. If \fB\-\-full\-name\fR is not passed, any other options (e\.g\. \fB\-t\fR) are passed to \fBls\fR which produces the actual output\.
 .
 .TP
 \fBlist\fR, \fBls\fR \fB\-\-unbrewed\fR
@@ -361,7 +367,7 @@ If \fB\-\-versions\fR is passed, show the version number for installed formulae,
 If \fB\-\-pinned\fR is passed, show the versions of pinned formulae, or only the specified (pinned) formulae if \fIformulae\fR are given\. See also \fBpin\fR, \fBunpin\fR\.
 .
 .TP
-\fBlog\fR [\fBgit\-log\-options\fR] \fIformula\fR \.\.\.
+\fBlog\fR [\fIgit\-log\-options\fR] \fIformula\fR \.\.\.
 Show the git log for the given formulae\. Options that \fBgit\-log\fR(1) recognizes can be passed before the formula list\.
 .
 .TP
@@ -373,10 +379,7 @@ If \fB\-\-force\fR is passed, then treat installed \fIformulae\fR and passed \fI
 .
 .TP
 \fBmissing\fR [\fIformulae\fR]
-Check the given \fIformulae\fR for missing dependencies\.
-.
-.IP
-If no \fIformulae\fR are given, check all installed brews\.
+Check the given \fIformulae\fR for missing dependencies\. If no \fIformulae\fR are given, check all installed brews\.
 .
 .TP
 \fBoptions\fR [\fB\-\-compact\fR] (\fB\-\-all\fR|\fB\-\-installed\fR|\fIformulae\fR)
@@ -423,7 +426,7 @@ If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do
 .
 .TP
 \fBreinstall\fR \fIformula\fR
-Uninstall then install \fIformula\fR
+Uninstall and then install \fIformula\fR\.
 .
 .TP
 \fBsearch\fR, \fB\-S\fR
@@ -593,11 +596,14 @@ Unpin \fIformulae\fR, allowing them to be upgraded by \fBbrew upgrade\fR\. See a
 Remove a tapped repository\.
 .
 .TP
-\fBupdate\fR [\fB\-\-merge\fR]
+\fBupdate\fR [\fB\-\-merge\fR] [\fB\-\-force\fR]
 Fetch the newest version of Homebrew and all formulae from GitHub using \fBgit\fR(1)\.
 .
 .IP
-If \fB\-\-merge\fR is specified then \fBgit merge\fR is used to include updates (rather than \fBgit rebase\fR)\. If \fB\-\-force\fR is specified then always do a slower, full update check even if unnecessary\.
+If \fB\-\-merge\fR is specified then \fBgit merge\fR is used to include updates (rather than \fBgit rebase\fR)\.
+.
+.IP
+If \fB\-\-force\fR is specified then always do a slower, full update check even if unnecessary\.
 .
 .TP
 \fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fIformulae\fR]
