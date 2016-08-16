@@ -37,8 +37,6 @@ require "cmd/style"
 require "date"
 
 module Homebrew
-  RUBY_2_OR_LATER = RUBY_VERSION.split(".").first.to_i >= 2
-
   def audit
     if ARGV.switch? "D"
       Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/)
@@ -49,7 +47,6 @@ module Homebrew
 
     new_formula = ARGV.include? "--new-formula"
     strict = new_formula || ARGV.include?("--strict")
-    style = strict && RUBY_2_OR_LATER
     online = new_formula || ARGV.include?("--online")
 
     ENV.activate_extensions!
@@ -62,14 +59,15 @@ module Homebrew
       ff = ARGV.resolved_formulae
       files = ARGV.resolved_formulae.map(&:path)
     end
-    if style
+
+    if strict
       # Check style in a single batch run up front for performance
       style_results = check_style_json(files, :realpath => true)
     end
 
     ff.each do |f|
       options = { :new_formula => new_formula, :strict => strict, :online => online }
-      options[:style_offenses] = style_results.file_offenses(f.path) if style
+      options[:style_offenses] = style_results.file_offenses(f.path) if strict
       fa = FormulaAuditor.new(f, options)
       fa.audit
 
