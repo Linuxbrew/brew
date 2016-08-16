@@ -21,14 +21,8 @@ end
 
 def curl_output(*args)
   curl_args = curl_args(args)
-  curl_args -= ["--fail"]
-  if RUBY_TWO
-    curl_args -= ["--silent"]
-    Open3.popen3(*curl_args) do |_, stdout, stderr, wait_thread|
-      [stdout.read, stderr.read, wait_thread.value]
-    end
-  else
-    output = Utils.popen_read_text(*curl_args)
-    [output, nil, $?]
+  curl_args -= ["--fail", "--silent"]
+  Open3.popen3(*curl_args) do |_, stdout, stderr, wait_thread|
+    [stdout.read, stderr.read, wait_thread.value]
   end
 end
