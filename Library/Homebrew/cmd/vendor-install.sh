@@ -8,6 +8,7 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
 VENDOR_DIR="$HOMEBREW_LIBRARY/Homebrew/vendor"
 
+# Built from https://github.com/Homebrew/homebrew-portable.
 if [[ -n "$HOMEBREW_OSX" ]]
 then
   if [[ "$HOMEBREW_PROCESSOR" = "Intel" ]]
@@ -185,7 +186,10 @@ homebrew-vendor-install() {
 
   if [[ -z "$VENDOR_URL" || -z "$VENDOR_SHA" ]]
   then
-    odie "Cannot find a vendored version of $VENDOR_NAME."
+    odie <<-EOS
+Cannot find a vendored version of $VENDOR_NAME for your $HOMEBREW_PROCESSOR
+processor on $HOMEBREW_PRODUCT!
+EOS
   fi
 
   VENDOR_VERSION="$(<"$VENDOR_DIR/portable-$VENDOR_NAME-version")"

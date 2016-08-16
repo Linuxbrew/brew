@@ -38,7 +38,7 @@ invalid multibyte escape: /^\037\235/
 
 In the past, Homebrew assumed that `/usr/bin/ruby` was Ruby 1.8. On OS X 10.9, it is now Ruby 2.0. There are various incompatibilities between the two versions, so if you upgrade to OS X 10.9 while using a sufficiently old version of Homebrew, you will encounter errors.
 
-The incompatibilities have been addressed in more recent versions of Homebrew, and it does not make assumptions about `/usr/bin/ruby`, instead it uses the executable inside OS X's Ruby 1.8 framework.
+The incompatibilities have been addressed in more recent versions of Homebrew, and it does not make assumptions about `/usr/bin/ruby`, instead it uses the executable inside OS X's Ruby framework or a vendored Ruby.
 
 To recover from this situation, do the following:
 

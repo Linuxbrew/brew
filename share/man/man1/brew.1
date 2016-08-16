@@ -771,6 +771,10 @@ If set, Homebrew will use this editor when editing a single formula, or several 
 \fINote:\fR \fBbrew edit\fR will open all of Homebrew as discontinuous files and directories\. TextMate can handle this correctly in project mode, but many editors will do strange things in this case\.
 .
 .TP
+\fBHOMEBREW_FORCE_VENDOR_RUBY\fR
+If set, Homebrew will always use its vendored, relocatable Ruby 2\.0 version even if the system version of Ruby is >=2\.0\.
+.
+.TP
 \fBHOMEBREW_GITHUB_API_TOKEN\fR
 A personal access token for the GitHub API, which you can create at \fIhttps://github\.com/settings/tokens\fR\. If set, GitHub will allow you a greater number of API requests\. See \fIhttps://developer\.github\.com/v3/#rate\-limiting\fR for more information\. Homebrew uses the GitHub API for features such as \fBbrew search\fR\.
 .
