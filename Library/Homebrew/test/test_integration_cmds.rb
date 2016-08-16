@@ -32,6 +32,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       coretap.path/".git",
       coretap.alias_dir,
       coretap.formula_dir.children,
+      coretap.path/"formula_renames.json",
     ].flatten
     FileUtils.rm_rf paths_to_delete
   end
@@ -40,6 +41,10 @@ class IntegrationCommandTests < Homebrew::TestCase
     unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
       skip "HOMEBREW_TEST_OFFICIAL_CMD_TAPS is not set"
     end
+  end
+
+  def needs_osx
+    skip "Not on OS X" unless OS.mac?
   end
 
   def cmd_id_from_args(args)
@@ -158,6 +163,31 @@ class IntegrationCommandTests < Homebrew::TestCase
     tap
   end
 
+  def install_and_rename_coretap_formula(old_name, new_name)
+    core_tap = CoreTap.new
+    core_tap.path.cd do
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m",
+          "#{old_name.capitalize} has not yet been renamed"
+      end
+    end
+
+    cmd("install", old_name)
+    (core_tap.path/"Formula/#{old_name}.rb").unlink
+    formula_renames = core_tap.path/"formula_renames.json"
+    formula_renames.write Utils::JSON.dump(old_name => new_name)
+
+    core_tap.path.cd do
+      shutup do
+        system "git", "add", "--all"
+        system "git", "commit", "-m",
+          "#{old_name.capitalize} has been renamed to #{new_name.capitalize}"
+      end
+    end
+  end
+
   def testball
     "#{File.expand_path("..", __FILE__)}/testball.rb"
   end
@@ -193,8 +223,8 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_env
-    assert_match %r{CMAKE_PREFIX_PATH="#{HOMEBREW_PREFIX}[:"]},
-                 cmd("--env")
+    assert_match(/CMAKE_PREFIX_PATH="#{Regexp.escape(HOMEBREW_PREFIX)}[:"]/,
+                 cmd("--env"))
   end
 
   def test_prefix_formula
@@ -235,9 +265,24 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_install
-    setup_test_formula "testball"
+    setup_test_formula "testball1"
+    assert_match "Specify `--HEAD`", cmd_fail("install", "testball1", "--head")
+    assert_match "No head is defined", cmd_fail("install", "testball1", "--HEAD")
+    assert_match "No devel block", cmd_fail("install", "testball1", "--devel")
+    assert_match "#{HOMEBREW_CELLAR}/testball1/0.1", cmd("install", "testball1")
+    assert_match "testball1-0.1 already installed", cmd("install", "testball1")
+    assert_match "MacRuby is not packaged", cmd_fail("install", "macruby")
+    assert_match "No available formula", cmd_fail("install", "formula")
+    assert_match "This similarly named formula was found",
+      cmd_fail("install", "testball")
 
-    assert_match "#{HOMEBREW_CELLAR}/testball/0.1", cmd("install", "testball")
+    setup_test_formula "testball2"
+    assert_match "These similarly named formulae were found",
+      cmd_fail("install", "testball")
+
+    install_and_rename_coretap_formula "testball1", "testball2"
+    assert_match "testball1 already installed, it's just not migrated",
+      cmd("install", "testball2")
   end
 
   def test_bottle
@@ -653,12 +698,14 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_cask
     needs_test_cmd_taps
+    needs_osx
     setup_remote_tap("caskroom/cask")
     cmd("cask", "list")
   end
 
   def test_services
     needs_test_cmd_taps
+    needs_osx
     setup_remote_tap("homebrew/services")
     assert_equal "Warning: No services available to control with `brew services`",
       cmd("services", "list")
@@ -761,6 +808,21 @@ class IntegrationCommandTests < Homebrew::TestCase
     cmd("analytics", "regenerate-uuid")
   end
 
+  def test_migrate
+    setup_test_formula "testball1"
+    setup_test_formula "testball2"
+    assert_match "Invalid usage", cmd_fail("migrate")
+    assert_match "No available formula with the name \"testball\"",
+      cmd_fail("migrate", "testball")
+    assert_match "testball1 doesn't replace any formula",
+      cmd_fail("migrate", "testball1")
+
+    install_and_rename_coretap_formula "testball1", "testball2"
+    assert_match "Migrating testball1 to testball2", cmd("migrate", "testball1")
+    (HOMEBREW_CELLAR/"testball1").unlink
+    assert_match "Error: No such keg", cmd_fail("migrate", "testball1")
+  end
+
   def test_switch
     assert_match "Usage: brew switch <name> <version>", cmd_fail("switch")
     assert_match "testball not found", cmd_fail("switch", "testball", "0.1")
@@ -776,5 +838,32 @@ class IntegrationCommandTests < Homebrew::TestCase
     cmd("switch", "testball", "0.2")
     assert_match "testball does not have a version \"0.3\"",
       cmd_fail("switch", "testball", "0.3")
+  end
+
+  def test_test_formula
+    assert_match "This command requires a formula argument", cmd_fail("test")
+    assert_match "Testing requires the latest version of testball",
+      cmd_fail("test", testball)
+
+    cmd("install", testball)
+    assert_match "testball defines no test", cmd_fail("test", testball)
+
+    setup_test_formula "testball_copy", <<-EOS.undent
+      head "https://github.com/example/testball2.git"
+
+      devel do
+        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+        sha256 "#{TESTBALL_SHA256}"
+      end
+
+      keg_only "just because"
+
+      test do
+      end
+    EOS
+
+    cmd("install", "testball_copy")
+    assert_match "Testing testball_copy", cmd("test", "--HEAD", "testball_copy")
+    assert_match "Testing testball_copy", cmd("test", "--devel", "testball_copy")
   end
 end

@@ -21,13 +21,13 @@ class PatchTests < Homebrew::TestCase
     assert_equal :p1, patch.strip
   end
 
-  def test_create_DATA
+  def test_create_data
     patch = Patch.create(:p0, :DATA)
     assert_kind_of DATAPatch, patch
     assert_equal :p0, patch.strip
   end
 
-  def test_create_DATA_without_strip
+  def test_create_data_without_strip
     patch = Patch.create(:DATA, nil)
     assert_kind_of DATAPatch, patch
     assert_equal :p1, patch.strip
@@ -112,7 +112,6 @@ end
 class ExternalPatchTests < Homebrew::TestCase
   def setup
     @p = ExternalPatch.new(:p1) { url "file:///my.patch" }
-
   end
 
   def test_url

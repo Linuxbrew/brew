@@ -6,6 +6,7 @@ class AbstractDownloadStrategy
   include FileUtils
 
   attr_reader :meta, :name, :version, :resource
+  attr_reader :shutup
 
   def initialize(name, resource)
     @name = name
@@ -17,6 +18,19 @@ class AbstractDownloadStrategy
 
   # Download and cache the resource as {#cached_location}.
   def fetch
+  end
+
+  # Supress output
+  def shutup!
+    @shutup = true
+  end
+
+  def puts(*args)
+    super(*args) unless shutup
+  end
+
+  def ohai(*args)
+    super(*args) unless shutup
   end
 
   # Unpack {#cached_location} into the current working directory, and possibly
@@ -57,6 +71,14 @@ class AbstractDownloadStrategy
     # 2 as default because commands are eg. svn up, git pull
     args.insert(2, "-q") unless ARGV.verbose?
     args
+  end
+
+  def safe_system(*args)
+    if @shutup
+      quiet_system(*args) || raise(ErrorDuringExecution.new(args.shift, *args))
+    else
+      super(*args)
+    end
   end
 
   def quiet_safe_system(*args)
@@ -145,6 +167,16 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
         EOS
       end
     end
+  end
+
+  def fetch_last_commit
+    fetch
+    last_commit
+  end
+
+  def commit_outdated?(commit)
+    @last_commit ||= fetch_last_commit
+    commit != @last_commit
   end
 
   def cached_location
@@ -756,6 +788,45 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 end
 
+class GitHubGitDownloadStrategy < GitDownloadStrategy
+  def initialize(name, resource)
+    super
+    if @url =~ %r{^https?://github\.com/([^/]+)/([^/]+)\.git$}
+      @user = $1
+      @repo = $2
+    end
+  end
+
+  def github_last_commit
+    return if ENV["HOMEBREW_NO_GITHUB_API"]
+
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{@ref}"
+
+    commit = output[/^ETag: \"(\h+)\"/, 1] if status.success?
+    version.update_commit(commit) if commit
+    commit
+  end
+
+  def multiple_short_commits_exist?(commit)
+    return if ENV["HOMEBREW_NO_GITHUB_API"]
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{commit}"
+
+    !(status.success? && output && output[/^Status: (200)/, 1] == "200")
+  end
+
+  def commit_outdated?(commit)
+    @last_commit ||= github_last_commit
+    if !@last_commit
+      super
+    else
+      return true unless @last_commit.start_with?(commit)
+      multiple_short_commits_exist?(commit)
+    end
+  end
+end
+
 class CVSDownloadStrategy < VCSDownloadStrategy
   def initialize(name, resource)
     super
@@ -842,7 +913,7 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   end
 
   def last_commit
-    Utils.popen_read("hg", "parent", "--template", "{node}", "-R", cached_location.to_s)
+    Utils.popen_read("hg", "parent", "--template", "{node|short}", "-R", cached_location.to_s)
   end
 
   private
@@ -957,6 +1028,8 @@ class DownloadStrategyDetector
 
   def self.detect_from_url(url)
     case url
+    when %r{^https?://github\.com/[^/]+/[^/]+\.git$}
+      GitHubGitDownloadStrategy
     when %r{^https?://.+\.git$}, %r{^git://}
       GitDownloadStrategy
     when %r{^https?://www\.apache\.org/dyn/closer\.cgi}, %r{^https?://www\.apache\.org/dyn/closer\.lua}

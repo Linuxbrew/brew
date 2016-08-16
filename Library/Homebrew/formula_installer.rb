@@ -206,8 +206,16 @@ class FormulaInstaller
     oh1 "Installing #{Tty.green}#{formula.full_name}#{Tty.reset}" if show_header?
 
     if formula.tap && !formula.tap.private?
-      options = effective_build_options_for(formula).used_options.to_a.join(" ")
-      Utils::Analytics.report_event("install", "#{formula.full_name} #{options}".strip)
+      options = []
+      if formula.head?
+        options << "--HEAD"
+      elsif formula.devel?
+        options << "--devel"
+      end
+      options += effective_build_options_for(formula).used_options.to_a
+      category = "install"
+      action = ([formula.full_name] + options).join(" ")
+      Utils::Analytics.report_event(category, action)
     end
 
     @@attempted << formula
@@ -252,9 +260,22 @@ class FormulaInstaller
       begin
         f = Formulary.factory(c.name)
       rescue TapFormulaUnavailableError
-        # If the formula name is in full-qualified name. Let's silently
+        # If the formula name is a fully-qualified name let's silently
         # ignore it as we don't care about things used in taps that aren't
         # currently tapped.
+        false
+      rescue FormulaUnavailableError => e
+        # If the formula name doesn't exist any more then complain but don't
+        # stop installation from continuing.
+        opoo <<-EOS.undent
+          #{formula}: #{e.message}
+          'conflicts_with \"#{c.name}\"' should be removed from #{formula.path.basename}.
+        EOS
+        if ARGV.homebrew_developer?
+          raise
+        else
+          $stderr.puts "Please report this to the #{formula.tap} tap!"
+        end
         false
       else
         f.linked_keg.exist? && f.opt_prefix.exist?
@@ -295,6 +316,7 @@ class FormulaInstaller
     fatals = []
 
     req_map.each_pair do |dependent, reqs|
+      next if dependent.installed?
       reqs.each do |req|
         puts "#{dependent}: #{req.message}"
         fatals << req if req.fatal?
@@ -421,8 +443,9 @@ class FormulaInstaller
   def install_dependencies(deps)
     if deps.empty? && only_deps?
       puts "All dependencies for #{formula.full_name} are satisfied."
-    else
-      oh1 "Installing dependencies for #{formula.full_name}: #{Tty.green}#{deps.map(&:first)*", "}#{Tty.reset}" unless deps.empty?
+    elsif !deps.empty?
+      oh1 "Installing dependencies for #{formula.full_name}: #{Tty.green}#{deps.map(&:first)*", "}#{Tty.reset}",
+        :truncate => false
       deps.each { |dep, options| install_dependency(dep, options) }
     end
 

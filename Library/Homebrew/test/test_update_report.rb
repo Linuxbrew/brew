@@ -37,7 +37,7 @@ class ReportTests < Homebrew::TestCase
   end
 
   def test_update_report_without_revision_var
-    ENV.delete_if { |k,v| k.start_with? "HOMEBREW_UPDATE" }
+    ENV.delete_if { |k, _v| k.start_with? "HOMEBREW_UPDATE" }
     assert_raises(Reporter::ReporterRevisionUnsetError) { Reporter.new(@tap) }
   end
 

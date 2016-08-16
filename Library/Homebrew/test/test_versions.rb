@@ -53,7 +53,7 @@ class VersionComparisonTests < Homebrew::TestCase
     assert_operator version("1.2.3"), :<, version("1.2.3-p34")
   end
 
-  def test_HEAD
+  def test_head
     assert_operator version("HEAD"), :>, version("1.2.3")
     assert_operator version("HEAD-abcdef"), :>, version("1.2.3")
     assert_operator version("1.2.3"), :<, version("HEAD")
@@ -448,7 +448,7 @@ class VersionParsingTests < Homebrew::TestCase
 
   def test_from_url
     assert_version_detected "1.2.3",
-      "http://github.com/foo/bar.git", {:tag => "v1.2.3"}
+      "http://github.com/foo/bar.git", :tag => "v1.2.3"
   end
 end
 

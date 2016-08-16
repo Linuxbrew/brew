@@ -32,7 +32,12 @@ class Tab < OpenStruct
       "source" => {
         "path" => formula.path.to_s,
         "tap" => formula.tap ? formula.tap.name : nil,
-        "spec" => formula.active_spec_sym.to_s
+        "spec" => formula.active_spec_sym.to_s,
+        "versions" => {
+          "stable" => formula.stable ? formula.stable.version.to_s : nil,
+          "devel" => formula.devel ? formula.devel.version.to_s : nil,
+          "head" => formula.head ? formula.head.version.to_s : nil,
+        }
       }
     }
 
@@ -73,6 +78,14 @@ class Tab < OpenStruct
       else
         attributes["source"]["spec"] = "stable"
       end
+    end
+
+    if attributes["source"]["versions"].nil?
+      attributes["source"]["versions"] = {
+        "stable" => nil,
+        "devel" => nil,
+        "head" => nil,
+      }
     end
 
     new(attributes)
@@ -132,6 +145,11 @@ class Tab < OpenStruct
         "path" => f.path.to_s,
         "tap" => f.tap ? f.tap.name : f.tap,
         "spec" => f.active_spec_sym.to_s,
+        "versions" => {
+          "stable" => f.stable ? f.stable.version.to_s : nil,
+          "devel" => f.devel ? f.devel.version.to_s : nil,
+          "head" => f.head ? f.head.version.to_s : nil,
+        }
       }
     end
 
@@ -152,7 +170,12 @@ class Tab < OpenStruct
       "source" => {
         "path" => nil,
         "tap" => nil,
-        "spec" => "stable"
+        "spec" => "stable",
+        "versions" => {
+          "stable" => nil,
+          "devel" => nil,
+          "head" => nil,
+        }
       }
     }
 
@@ -238,6 +261,22 @@ class Tab < OpenStruct
 
   def spec
     source["spec"].to_sym
+  end
+
+  def versions
+    source["versions"]
+  end
+
+  def stable_version
+    Version.create(versions["stable"]) if versions["stable"]
+  end
+
+  def devel_version
+    Version.create(versions["devel"]) if versions["devel"]
+  end
+
+  def head_version
+    Version.create(versions["head"]) if versions["head"]
   end
 
   def source_modified_time

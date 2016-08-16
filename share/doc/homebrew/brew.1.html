@@ -264,7 +264,9 @@ into <code>/Applications</code>, allowing for easier access.</p>
 <p>If provided, <code>--local</code> will symlink them into the user's <code>~/Applications</code>
 directory instead of the system directory.</p></dd>
 <dt><code>list</code>, <code>ls</code> [<code>--full-name</code>]</dt><dd><p>List all installed formulae. If <code>--full-name</code> is passed, print formulae with
-full-qualified names.</p></dd>
+fully-qualified names.
+If <code>--full-name</code> is not passed any other options (e.g. <code>-t</code>) are passed to
+<code>ls</code> which produces the actual output.</p></dd>
 <dt><code>list</code>, <code>ls</code> <code>--unbrewed</code></dt><dd><p>List all files in the Homebrew prefix not installed by Homebrew.</p></dd>
 <dt><code>list</code>, <code>ls</code> [<code>--versions</code> [<code>--multiple</code>]] [<code>--pinned</code>] [<var>formulae</var>]</dt><dd><p>List the installed files for <var>formulae</var>. Combined with <code>--verbose</code>, recursively
 list the contents of all subdirectories in each <var>formula</var>'s keg.</p>
@@ -294,7 +296,7 @@ spaces.</p>
 <p>If <code>--all</code> is passed, show options for all formulae.</p>
 
 <p>If <code>--installed</code> is passed, show options for all installed formulae.</p></dd>
-<dt><code>outdated</code> [<code>--quiet</code>|<code>--verbose</code>|<code>--json=v1</code>]</dt><dd><p>Show formulae that have an updated version available.</p>
+<dt><code>outdated</code> [<code>--quiet</code>|<code>--verbose</code>|<code>--json=v1</code>] [<code>--fetch-HEAD</code>]</dt><dd><p>Show formulae that have an updated version available.</p>
 
 <p>By default, version information is displayed in interactive shells, and
 suppressed otherwise.</p>
@@ -305,7 +307,12 @@ precedence over <code>--verbose</code>).</p>
 <p>If <code>--verbose</code> is passed, display detailed version information.</p>
 
 <p>If <code>--json=</code><var>version</var> is passed, the output will be in JSON format. The only
-valid version is <code>v1</code>.</p></dd>
+valid version is <code>v1</code>.</p>
+
+<p>If <code>--fetch-HEAD</code> is passed, fetch the upstream repository to detect if
+the HEAD installation of the formula is outdated. Otherwise, the
+repository's HEAD will be checked for updates when a new stable or devel
+version has been released.</p></dd>
 <dt><code>pin</code> <var>formulae</var></dt><dd><p>Pin the specified <var>formulae</var>, preventing them from being upgraded when
 issuing the <code>brew upgrade</code> command. See also <code>unpin</code>.</p></dd>
 <dt><code>prune</code> [<code>--dry-run</code>]</dt><dd><p>Remove dead symlinks from the Homebrew prefix. This is generally not
@@ -435,12 +442,19 @@ source. This is useful for creating patches for the software.</p></dd>
  <code>git</code>(1).</p>
 
 <p>If <code>--merge</code> is specified then <code>git merge</code> is used to include updates
-  (rather than <code>git rebase</code>).</p></dd>
-<dt><code>upgrade</code> [<var>install-options</var>] [<code>--cleanup</code>] [<var>formulae</var>]</dt><dd><p>Upgrade outdated, unpinned brews.</p>
+  (rather than <code>git rebase</code>).
+If <code>--force</code> is specified then always do a slower, full update check even
+  if unnecessary.</p></dd>
+<dt><code>upgrade</code> [<var>install-options</var>] [<code>--cleanup</code>] [<code>--fetch-HEAD</code>] [<var>formulae</var>]</dt><dd><p>Upgrade outdated, unpinned brews.</p>
 
 <p>Options for the <code>install</code> command are also valid here.</p>
 
 <p>If <code>--cleanup</code> is specified then remove previously installed <var>formula</var> version(s).</p>
+
+<p>If <code>--fetch-HEAD</code> is passed, fetch the upstream repository to detect if
+the HEAD installation of the formula is outdated. Otherwise, the
+repository's HEAD will be checked for updates when a new stable or devel
+version has been released.</p>
 
 <p>If <var>formulae</var> are given, upgrade only the specified brews (but do so even
 if they are pinned; see <code>pin</code>, <code>unpin</code>).</p></dd>
@@ -521,6 +535,9 @@ a Homebrew-built Git if installed, or the system-provided binary.</p>
 <p>Set this to force Homebrew to use a particular git binary.</p></dd>
 <dt><code>HOMEBREW_BOTTLE_DOMAIN</code></dt><dd><p>If set, instructs Homebrew to use the given URL as a download mirror for bottles.</p></dd>
 <dt><code>HOMEBREW_ARTIFACT_DOMAIN</code></dt><dd><p>If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.</p></dd>
+<dt><code>HOMEBREW_AUTO_UPDATE_SECS</code></dt><dd><p>If set, Homebrew will only check for autoupdates once per this seconds interval.</p>
+
+<p><em>Default:</em> <code>60</code>.</p></dd>
 <dt><code>HOMEBREW_BROWSER</code></dt><dd><p>If set, uses this setting as the browser when opening project homepages,
 instead of the OS default browser.</p></dd>
 <dt><code>HOMEBREW_BUILD_FROM_SOURCE</code></dt><dd><p>If set, instructs Homebrew to compile from source even when a formula
@@ -546,6 +563,8 @@ several formulae in the same directory.</p>
 <p><em>Note:</em> <code>brew edit</code> will open all of Homebrew as discontinuous files and
 directories. TextMate can handle this correctly in project mode, but many
 editors will do strange things in this case.</p></dd>
+<dt><code>HOMEBREW_FORCE_VENDOR_RUBY</code></dt><dd><p>If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
+even if the system version of Ruby is >=2.0.</p></dd>
 <dt><code>HOMEBREW_GITHUB_API_TOKEN</code></dt><dd><p>A personal access token for the GitHub API, which you can create at
 <a href="https://github.com/settings/tokens" data-bare-link="true">https://github.com/settings/tokens</a>. If set, GitHub will allow you a
 greater number of API requests. See
@@ -559,6 +578,8 @@ the number of parallel jobs to run when building with <code>make</code>(1).</p>
 
 <p><em>Default:</em> the number of available CPU cores.</p></dd>
 <dt><code>HOMEBREW_NO_ANALYTICS</code></dt><dd><p>If set, Homebrew will not send analytics. See: <a href="https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics</a></p></dd>
+<dt><code>HOMEBREW_NO_AUTO_UPDATE</code></dt><dd><p>If set, Homebrew will not auto-update before running <code>brew install</code> and
+<code>brew upgrade</code>.</p></dd>
 <dt><code>HOMEBREW_NO_EMOJI</code></dt><dd><p>If set, Homebrew will not print the <code>HOMEBREW_INSTALL_BADGE</code> on a
 successful build.</p>
 

@@ -89,7 +89,7 @@ module Homebrew
           arg.include?(char) && !arg.start_with?("/")
         end
       end
-      if ARGV.any? && bad_regex
+      if !ARGV.empty? && bad_regex
         ohai "Did you mean to perform a regular expression search?"
         ohai "Surround your query with /slashes/ to search by regex."
       end
@@ -126,7 +126,7 @@ module Homebrew
       return []
     end
 
-    @@remote_tap_formulae ||= Hash.new do |cache, key|
+    remote_tap_formulae = Hash.new do |cache, key|
       user, repo = key.split("/", 2)
       tree = {}
 
@@ -143,11 +143,12 @@ module Homebrew
         end
       end
 
-      paths = tree["Formula"] || tree["HomebrewFormula"] || tree["Casks"] || tree["."] || []
+      paths = tree["Formula"] || tree["HomebrewFormula"] || tree["."] || []
+      paths += tree["Casks"] || []
       cache[key] = paths.map { |path| File.basename(path, ".rb") }
     end
 
-    names = @@remote_tap_formulae["#{user}/#{repo}"]
+    names = remote_tap_formulae["#{user}/#{repo}"]
     user = user.downcase if user == "Homebrew" # special handling for the Homebrew organization
     names.select { |name| rx === name }.map { |name| "#{user}/#{repo}/#{name}" }
   rescue GitHub::HTTPNotFoundError => e

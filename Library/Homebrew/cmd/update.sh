@@ -4,6 +4,8 @@
 #:
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:      (rather than `git rebase`).
+#:    If `--force` is specified then always do a slower, full update check even
+#:      if unnecessary.
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
@@ -166,7 +168,35 @@ reset_on_interrupt() {
   exit 130
 }
 
-pull() {
+# Used for testing purposes, e.g., for testing formula migration after
+# renaming it in the currently checked-out branch. To test run
+# "brew update --simulate-from-current-branch"
+simulate_from_current_branch() {
+  local DIR
+  local TAP_VAR
+  local UPSTREAM_BRANCH
+  local CURRENT_REVISION
+
+  DIR="$1"
+  cd "$DIR" || return
+  TAP_VAR="$2"
+  UPSTREAM_BRANCH="$3"
+  CURRENT_REVISION="$4"
+
+  INITIAL_REVISION="$(git rev-parse -q --verify "$UPSTREAM_BRANCH")"
+  export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$INITIAL_REVISION"
+  export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
+  if [[ "$INITIAL_REVISION" != "$CURRENT_REVISION" ]]
+  then
+    HOMEBREW_UPDATED="1"
+  fi
+  if ! git merge-base --is-ancestor "$INITIAL_REVISION" "$CURRENT_REVISION"
+  then
+    odie "Your $DIR HEAD is not a descendant of $UPSTREAM_BRANCH!"
+  fi
+}
+
+merge_or_rebase() {
   if [[ -n "$HOMEBREW_VERBOSE" ]]
   then
     echo "Updating $DIR..."
@@ -174,37 +204,13 @@ pull() {
 
   local DIR
   local TAP_VAR
+  local UPSTREAM_BRANCH
 
   DIR="$1"
   cd "$DIR" || return
-  TAP_VAR=$(repo_var "$DIR")
+  TAP_VAR="$2"
+  UPSTREAM_BRANCH="$3"
   unset STASHED
-
-  # The upstream repository's default branch may not be master;
-  # check refs/remotes/origin/HEAD to see what the default
-  # origin branch name is, and use that. If not set, fall back to "master".
-  INITIAL_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
-  UPSTREAM_BRANCH="$(upstream_branch)"
-
-  # Used for testing purposes, e.g., for testing formula migration after
-  # renaming it in the currently checked-out branch. To test run
-  # "brew update --simulate-from-current-branch"
-  if [[ -n "$HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH" ]]
-  then
-    INITIAL_REVISION="$(git rev-parse -q --verify "$UPSTREAM_BRANCH")"
-    CURRENT_REVISION="$(read_current_revision)"
-    export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$INITIAL_REVISION"
-    export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
-    if [[ "$INITIAL_REVISION" != "$CURRENT_REVISION" ]]
-    then
-      HOMEBREW_UPDATED="1"
-    fi
-    if ! git merge-base --is-ancestor "$INITIAL_REVISION" "$CURRENT_REVISION"
-    then
-      odie "Your $DIR HEAD is not a descendant of $UPSTREAM_BRANCH!"
-    fi
-    return
-  fi
 
   trap reset_on_interrupt SIGINT
 
@@ -223,6 +229,7 @@ pull() {
     STASHED="1"
   fi
 
+  INITIAL_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
   if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
@@ -284,19 +291,20 @@ homebrew-update() {
   for option in "$@"
   do
     case "$option" in
-      -\?|-h|--help|--usage) brew help update; exit $? ;;
-      --verbose) HOMEBREW_VERBOSE=1 ;;
-      --debug) HOMEBREW_DEBUG=1;;
-      --merge) HOMEBREW_MERGE=1 ;;
+      -\?|-h|--help|--usage)          brew help update; exit $? ;;
+      --verbose)                      HOMEBREW_VERBOSE=1 ;;
+      --debug)                        HOMEBREW_DEBUG=1 ;;
+      --merge)                        HOMEBREW_MERGE=1 ;;
+      --force)                        HOMEBREW_UPDATE_FORCE=1 ;;
       --simulate-from-current-branch) HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH=1 ;;
-      --preinstall) export HOMEBREW_UPDATE_PREINSTALL=1 ;;
-      --*) ;;
+      --preinstall)                   export HOMEBREW_UPDATE_PREINSTALL=1 ;;
+      --*)                            ;;
       -*)
-        [[ "$option" = *v* ]] && HOMEBREW_VERBOSE=1;
-        [[ "$option" = *d* ]] && HOMEBREW_DEBUG=1;
+        [[ "$option" = *v* ]] && HOMEBREW_VERBOSE=1
+        [[ "$option" = *d* ]] && HOMEBREW_DEBUG=1
         ;;
       *)
-        odie <<-EOS
+        odie <<EOS
 This command updates brew itself, and does not take formula names.
 Use 'brew upgrade <formula>'.
 EOS
@@ -309,10 +317,15 @@ EOS
     set -x
   fi
 
+  if [[ -z "$HOMEBREW_AUTO_UPDATE_SECS" ]]
+  then
+    HOMEBREW_AUTO_UPDATE_SECS="60"
+  fi
+
   # check permissions
   if [[ "$HOMEBREW_PREFIX" = "/usr/local" && ! -w /usr/local ]]
   then
-    odie <<-EOS
+    odie <<EOS
 /usr/local is not writable. You should change the ownership
 and permissions of /usr/local back to your user account:
   sudo chown -R \$(whoami) /usr/local
@@ -321,17 +334,12 @@ EOS
 
   if [[ ! -w "$HOMEBREW_REPOSITORY" ]]
   then
-    odie <<-EOS
+    odie <<EOS
 $HOMEBREW_REPOSITORY is not writable. You should change the
 ownership and permissions of $HOMEBREW_REPOSITORY back to your
 user account:
   sudo chown -R \$(whoami) $HOMEBREW_REPOSITORY
 EOS
-  fi
-
-  if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
-  then
-    echo "Checking for Homebrew updates..."
   fi
 
   if ! git --version >/dev/null 2>&1
@@ -359,8 +367,6 @@ EOS
 
   # only allow one instance of brew update
   lock update
-  # prevent recursive updates
-  export HOMEBREW_NO_AUTO_UPDATE="1"
 
   git_init_if_necessary
   # rename Taps directories
@@ -378,17 +384,41 @@ EOS
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
-    [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
-    [[ -n "$SKIP_FETCH_CORE_REPOSITORY" && "$DIR" = "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && continue
     cd "$DIR" || continue
-    UPSTREAM_BRANCH="$(upstream_branch)"
+
+    if [[ -n "$HOMEBREW_VERBOSE" ]]
+    then
+      echo "Checking if we need to fetch $DIR..."
+    fi
+
+    TAP_VAR="$(repo_var "$DIR")"
+    UPSTREAM_BRANCH_DIR="$(upstream_branch)"
+    declare UPSTREAM_BRANCH"$TAP_VAR"="$UPSTREAM_BRANCH_DIR"
+    declare PREFETCH_REVISION"$TAP_VAR"="$(git rev-parse -q --verify refs/remotes/origin/"$UPSTREAM_BRANCH_DIR")"
+
+    if [[ -z "$HOMEBREW_UPDATE_FORCE" ]]
+    then
+      [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
+      [[ -n "$SKIP_FETCH_CORE_REPOSITORY" && "$DIR" = "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && continue
+    fi
+
+    # The upstream repository's default branch may not be master;
+    # check refs/remotes/origin/HEAD to see what the default
+    # origin branch name is, and use that. If not set, fall back to "master".
     # the refspec ensures that the default upstream branch gets updated
     (
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
-        # Skip taps without formulae.
-        FORMULAE="$(find "$DIR" -maxdepth 1 \( -name '*.rb' -or -name 'Formula' -or -name 'HomebrewFormula' \) -print -quit)"
-        [[ -z "$FORMULAE" ]] && exit
+        # Skip taps checked/fetched recently
+        [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mtime -"${HOMEBREW_AUTO_UPDATE_SECS}"s 2>/dev/null)" ]] && exit
+
+        # Skip taps without formulae (but always update Homebrew/brew and Homebrew/homebrew-core)
+        if [[ "$DIR" != "$HOMEBREW_REPOSITORY" &&
+              "$DIR" != "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]]
+        then
+          FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
+          [[ -z "$FORMULAE" ]] && exit
+        fi
       fi
 
       UPSTREAM_REPOSITORY_URL="$(git config remote.origin.url)"
@@ -396,16 +426,18 @@ EOS
       then
         UPSTREAM_REPOSITORY="${UPSTREAM_REPOSITORY_URL#https://github.com/}"
         UPSTREAM_REPOSITORY="${UPSTREAM_REPOSITORY%.git}"
-        UPSTREAM_BRANCH_LOCAL_SHA="$(git rev-parse "refs/remotes/origin/$UPSTREAM_BRANCH")"
+        UPSTREAM_BRANCH_LOCAL_SHA="$(git rev-parse "refs/remotes/origin/$UPSTREAM_BRANCH_DIR")"
         # Only try to `git fetch` when the upstream branch is at a different SHA
         # (so the API does not return 304: unmodified).
-        UPSTREAM_SHA_HTTP_CODE="$("$HOMEBREW_CURL" --silent '--max-time' 3 \
+        UPSTREAM_SHA_HTTP_CODE="$("$HOMEBREW_CURL" --silent --max-time 3 \
            --output /dev/null --write-out "%{http_code}" \
            --user-agent "$HOMEBREW_USER_AGENT_CURL" \
            --header "Accept: application/vnd.github.v3.sha" \
            --header "If-None-Match: \"$UPSTREAM_BRANCH_LOCAL_SHA\"" \
-           "https://api.github.com/repos/$UPSTREAM_REPOSITORY/commits/$UPSTREAM_BRANCH")"
-        [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
+           "https://api.github.com/repos/$UPSTREAM_REPOSITORY/commits/$UPSTREAM_BRANCH_DIR")"
+        # Touch FETCH_HEAD to confirm we've checked for an update.
+        [[ -f "$DIR/.git/FETCH_HEAD" ]] && touch "$DIR/.git/FETCH_HEAD"
+        [[ -z "$HOMEBREW_UPDATE_FORCE" ]] && [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
       elif [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
         # Don't try to do a `git fetch` that may take longer than expected.
@@ -420,12 +452,12 @@ EOS
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
         git fetch --force "${QUIET_ARGS[@]}" origin \
-          "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH" 2>/dev/null
+          "refs/heads/$UPSTREAM_BRANCH_DIR:refs/remotes/origin/$UPSTREAM_BRANCH_DIR" 2>/dev/null
       else
         if ! git fetch --force "${QUIET_ARGS[@]}" origin \
-          "refs/heads/$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH"
+          "refs/heads/$UPSTREAM_BRANCH_DIR:refs/remotes/origin/$UPSTREAM_BRANCH_DIR"
         then
-          echo "Fetching $DIR failed!" >> "$update_failed_file"
+          echo "Fetching $DIR failed!" >>"$update_failed_file"
         fi
       fi
     ) &
@@ -436,7 +468,7 @@ EOS
 
   if [[ -f "$update_failed_file" ]]
   then
-    onoe < "$update_failed_file"
+    onoe <"$update_failed_file"
     rm -f "$update_failed_file"
     export HOMEBREW_UPDATE_FAILED="1"
   fi
@@ -444,14 +476,37 @@ EOS
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
-    pull "$DIR"
-    [[ -n "$HOMEBREW_VERBOSE" ]] && echo
+    cd "$DIR" || continue
+
+    TAP_VAR="$(repo_var "$DIR")"
+    UPSTREAM_BRANCH_VAR="UPSTREAM_BRANCH$TAP_VAR"
+    UPSTREAM_BRANCH="${!UPSTREAM_BRANCH_VAR}"
+    CURRENT_REVISION="$(read_current_revision)"
+
+    PREFETCH_REVISION_VAR="PREFETCH_REVISION$TAP_VAR"
+    PREFETCH_REVISION="${!PREFETCH_REVISION_VAR}"
+    POSTFETCH_REVISION="$(git rev-parse -q --verify refs/remotes/origin/"$UPSTREAM_BRANCH")"
+
+    if [[ -n "$HOMEBREW_SIMULATE_FROM_CURRENT_BRANCH" ]]
+    then
+      simulate_from_current_branch "$DIR" "$TAP_VAR" "$UPSTREAM_BRANCH" "$CURRENT_REVISION"
+    elif [[ -z "$HOMEBREW_UPDATE_FORCE" ]] &&
+         [[ "$PREFETCH_REVISION" = "$POSTFETCH_REVISION" ]] &&
+         [[ "$CURRENT_REVISION" = "$POSTFETCH_REVISION" ]]
+    then
+      export HOMEBREW_UPDATE_BEFORE"$TAP_VAR"="$CURRENT_REVISION"
+      export HOMEBREW_UPDATE_AFTER"$TAP_VAR"="$CURRENT_REVISION"
+    else
+      merge_or_rebase "$DIR" "$TAP_VAR" "$UPSTREAM_BRANCH"
+      [[ -n "$HOMEBREW_VERBOSE" ]] && echo
+    fi
   done
 
   safe_cd "$HOMEBREW_REPOSITORY"
 
   if [[ -n "$HOMEBREW_UPDATED" ||
         -n "$HOMEBREW_UPDATE_FAILED" ||
+        -n "$HOMEBREW_UPDATE_FORCE" ||
         (-n "$HOMEBREW_DEVELOPER" && -z "$HOMEBREW_UPDATE_PREINSTALL") ]]
   then
     brew update-report "$@"

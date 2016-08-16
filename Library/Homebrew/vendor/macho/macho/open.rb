@@ -7,17 +7,17 @@ module MachO
   # @raise [MachO::TruncatedFileError] if the file is too small to have a valid header
   # @raise [MachO::MagicError] if the file's magic is not valid Mach-O magic
   def self.open(filename)
-    raise ArgumentError.new("#{filename}: no such file") unless File.file?(filename)
-    raise TruncatedFileError.new unless File.stat(filename).size >= 4
+    raise ArgumentError, "#{filename}: no such file" unless File.file?(filename)
+    raise TruncatedFileError unless File.stat(filename).size >= 4
 
     magic = File.open(filename, "rb") { |f| f.read(4) }.unpack("N").first
 
-    if MachO.fat_magic?(magic)
+    if Utils.fat_magic?(magic)
       file = FatFile.new(filename)
-    elsif MachO.magic?(magic)
+    elsif Utils.magic?(magic)
       file = MachOFile.new(filename)
     else
-      raise MagicError.new(magic)
+      raise MagicError, magic
     end
 
     file

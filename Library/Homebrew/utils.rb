@@ -88,8 +88,10 @@ def ohai(title, *sput)
   puts sput
 end
 
-def oh1(title)
-  title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
+def oh1(title, options = {})
+  if $stdout.tty? && !ARGV.verbose? && options.fetch(:truncate, :auto) == :auto
+    title = Tty.truncate(title)
+  end
   puts "#{Tty.green}==>#{Tty.white} #{title}#{Tty.reset}"
 end
 
@@ -149,7 +151,8 @@ def odeprecated(method, replacement = nil, options = {})
     #{caller_message}#{tap_message}
   EOS
 
-  if ARGV.homebrew_developer? || options[:die]
+  if ARGV.homebrew_developer? || options[:die] ||
+     Homebrew.raise_deprecation_exceptions?
     raise FormulaMethodDeprecatedError, message
   else
     opoo "#{message}\n"

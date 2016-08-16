@@ -74,6 +74,7 @@ class Tap
   def clear_cache
     @remote = nil
     @formula_dir = nil
+    @cask_dir = nil
     @formula_files = nil
     @alias_dir = nil
     @alias_files = nil
@@ -249,7 +250,9 @@ class Tap
     begin
       safe_system "git", *args
       unless Readall.valid_tap?(self, :aliases => true)
-        raise "Cannot tap #{name}: invalid syntax in tap!"
+        unless ARGV.homebrew_developer?
+          raise "Cannot tap #{name}: invalid syntax in tap!"
+        end
       end
     rescue Interrupt, ErrorDuringExecution, RuntimeError
       ignore_interrupts do
@@ -338,6 +341,11 @@ class Tap
     @formula_dir ||= [path/"Formula", path/"HomebrewFormula", path].detect(&:directory?)
   end
 
+  # path to the directory of all casks for caskroom/cask {Tap}.
+  def cask_dir
+    @cask_dir ||= path/"Casks"
+  end
+
   # an array of all {Formula} files of this {Tap}.
   def formula_files
     @formula_files ||= if formula_dir
@@ -354,6 +362,15 @@ class Tap
     file = Pathname.new(file) unless file.is_a? Pathname
     file = file.expand_path(path)
     file.extname == ".rb" && file.parent == formula_dir
+  end
+
+  # return true if given path would present a cask file in this {Tap}.
+  # accepts both absolute path and relative path (relative to this {Tap}'s path)
+  # @private
+  def cask_file?(file)
+    file = Pathname.new(file) unless file.is_a? Pathname
+    file = file.expand_path(path)
+    file.extname == ".rb" && file.parent == cask_dir
   end
 
   # an array of all {Formula} names of this {Tap}.

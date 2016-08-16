@@ -30,7 +30,7 @@ module Homebrew
       assert_equal Version.create(expected), actual
     end
 
-    def assert_version_detected(expected, url, specs={})
+    def assert_version_detected(expected, url, specs = {})
       assert_equal expected, Version.detect(url, specs).to_s
     end
 
@@ -111,9 +111,9 @@ module Homebrew
     end
 
     def refute_eql(exp, act, msg = nil)
-      msg = message(msg) {
+      msg = message(msg) do
         "Expected #{mu_pp(act)} to not be eql to #{mu_pp(exp)}"
-      }
+      end
       refute exp.eql?(act), msg
     end
 

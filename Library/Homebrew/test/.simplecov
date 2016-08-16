@@ -7,6 +7,11 @@ SimpleCov.start do
   coverage_dir File.expand_path("#{tests_path}/coverage")
   root File.expand_path("#{tests_path}/..")
 
+  # We manage the result cache ourselves and the default of 10 minutes can be
+  # too low (particularly on Travis CI), causing results from some integration
+  # tests to be dropped. This causes random fluctuations in test coverage.
+  merge_timeout 86400
+
   add_filter "/Homebrew/compat/"
   add_filter "/Homebrew/test/"
   add_filter "/Homebrew/vendor/"

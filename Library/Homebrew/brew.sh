@@ -33,7 +33,7 @@ git() {
 }
 
 # Force UTF-8 to avoid encoding issues for users with broken locale settings.
-if [[ "$(locale charmap 2> /dev/null)" != "UTF-8" ]]
+if [[ "$(locale charmap 2>/dev/null)" != "UTF-8" ]]
 then
   export LC_ALL="en_US.UTF-8"
 fi
@@ -48,8 +48,8 @@ else
 fi
 
 case "$*" in
-  --prefix) echo "$HOMEBREW_PREFIX"; exit 0 ;;
-  --cellar) echo "$HOMEBREW_CELLAR"; exit 0 ;;
+  --prefix)            echo "$HOMEBREW_PREFIX"; exit 0 ;;
+  --cellar)            echo "$HOMEBREW_CELLAR"; exit 0 ;;
   --repository|--repo) echo "$HOMEBREW_REPOSITORY"; exit 0 ;;
 esac
 
@@ -64,10 +64,14 @@ fi
 unset GEM_HOME
 unset GEM_PATH
 
+# Users may have this set, injecting arbitrary environment changes into
+# bash processes inside builds
+unset BASH_ENV
+
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
-  Darwin) HOMEBREW_OSX="1";;
-  Linux) HOMEBREW_LINUX="1";;
+  Darwin) HOMEBREW_OSX="1" ;;
+  Linux)  HOMEBREW_LINUX="1" ;;
 esac
 
 HOMEBREW_CURL="/usr/bin/curl"
@@ -177,20 +181,20 @@ HOMEBREW_ARG_COUNT="$#"
 HOMEBREW_COMMAND="$1"
 shift
 case "$HOMEBREW_COMMAND" in
-  ls)          HOMEBREW_COMMAND="list";;
-  homepage)    HOMEBREW_COMMAND="home";;
-  -S)          HOMEBREW_COMMAND="search";;
-  up)          HOMEBREW_COMMAND="update";;
-  ln)          HOMEBREW_COMMAND="link";;
-  instal)      HOMEBREW_COMMAND="install";; # gem does the same
-  rm)          HOMEBREW_COMMAND="uninstall";;
-  remove)      HOMEBREW_COMMAND="uninstall";;
-  configure)   HOMEBREW_COMMAND="diy";;
-  abv)         HOMEBREW_COMMAND="info";;
-  dr)          HOMEBREW_COMMAND="doctor";;
-  --repo)      HOMEBREW_COMMAND="--repository";;
-  environment) HOMEBREW_COMMAND="--env";;
-  --config)    HOMEBREW_COMMAND="config";;
+  ls)          HOMEBREW_COMMAND="list" ;;
+  homepage)    HOMEBREW_COMMAND="home" ;;
+  -S)          HOMEBREW_COMMAND="search" ;;
+  up)          HOMEBREW_COMMAND="update" ;;
+  ln)          HOMEBREW_COMMAND="link" ;;
+  instal)      HOMEBREW_COMMAND="install" ;; # gem does the same
+  rm)          HOMEBREW_COMMAND="uninstall" ;;
+  remove)      HOMEBREW_COMMAND="uninstall" ;;
+  configure)   HOMEBREW_COMMAND="diy" ;;
+  abv)         HOMEBREW_COMMAND="info" ;;
+  dr)          HOMEBREW_COMMAND="doctor" ;;
+  --repo)      HOMEBREW_COMMAND="--repository" ;;
+  environment) HOMEBREW_COMMAND="--env" ;;
+  --config)    HOMEBREW_COMMAND="config" ;;
 esac
 
 if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]
@@ -203,8 +207,8 @@ fi
 
 check-run-command-as-root() {
   case "$HOMEBREW_COMMAND" in
-      analytics|create|install|link|migrate|pin|postinstall|reinstall|switch|tap|tap-pin|\
-      update|upgrade|vendor-install)
+    analytics|create|install|link|migrate|pin|postinstall|reinstall|switch|tap|\
+    tap-pin|update|upgrade|vendor-install)
       ;;
     *)
       return
@@ -216,7 +220,7 @@ check-run-command-as-root() {
   local brew_file_ls_info=($(ls -nd "$HOMEBREW_BREW_FILE"))
   if [[ "${brew_file_ls_info[2]}" != 0 ]]
   then
-      odie <<EOS
+    odie <<EOS
 Cowardly refusing to 'sudo brew $HOMEBREW_COMMAND'
 You can use brew with sudo, but only if the brew executable is owned by root.
 However, this is both not recommended and completely unsupported so do so at
@@ -233,7 +237,6 @@ setup-analytics
 report-analytics-screenview-command
 
 update-preinstall() {
-  [[ -n "$HOMEBREW_DEVELOPER" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
@@ -241,6 +244,9 @@ update-preinstall() {
   then
     brew update --preinstall
   fi
+
+  # If we've checked for updates, we don't need to check again.
+  export HOMEBREW_NO_AUTO_UPDATE="1"
 }
 
 if [[ -n "$HOMEBREW_BASH_COMMAND" ]]

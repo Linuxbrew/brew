@@ -413,24 +413,44 @@ class Formula
     Pathname.new("#{HOMEBREW_LIBRARY}/LinkedKegs/#{name}")
   end
 
-  def latest_head_prefix
+  def latest_head_version
     head_versions = installed_prefixes.map do |pn|
       pn_pkgversion = PkgVersion.parse(pn.basename.to_s)
       pn_pkgversion if pn_pkgversion.head?
     end.compact
 
-    latest_head_version = head_versions.max_by do |pn_pkgversion|
+    head_versions.max_by do |pn_pkgversion|
       [Tab.for_keg(prefix(pn_pkgversion)).source_modified_time, pn_pkgversion.revision]
     end
-    prefix(latest_head_version) if latest_head_version
+  end
+
+  def latest_head_prefix
+    head_version = latest_head_version
+    prefix(head_version) if head_version
+  end
+
+  def head_version_outdated?(version, options={})
+    tab = Tab.for_keg(prefix(version))
+
+    return true if stable && tab.stable_version && tab.stable_version < stable.version
+    return true if devel && tab.devel_version && tab.devel_version < devel.version
+
+    if options[:fetch_head]
+      return false unless head && head.downloader.is_a?(VCSDownloadStrategy)
+      downloader = head.downloader
+      downloader.shutup! unless ARGV.verbose?
+      downloader.commit_outdated?(version.version.commit)
+    else
+      false
+    end
   end
 
   # The latest prefix for this formula. Checks for {#head}, then {#devel}
   # and then {#stable}'s {#prefix}
   # @private
   def installed_prefix
-    if head && (head_prefix = latest_head_prefix) && head_prefix.directory?
-      head_prefix
+    if head && (head_version = latest_head_version) && !head_version_outdated?(head_version)
+      latest_head_prefix
     elsif devel && (devel_prefix = prefix(PkgVersion.new(devel.version, revision))).directory?
       devel_prefix
     elsif stable && (stable_prefix = prefix(PkgVersion.new(stable.version, revision))).directory?
@@ -980,25 +1000,35 @@ class Formula
   end
 
   # @private
-  def outdated_versions
-    @outdated_versions ||= begin
-      all_versions = []
-
+  def outdated_versions(options = {})
+    @outdated_versions ||= Hash.new do |cache, key|
       raise Migrator::MigrationNeededError.new(self) if migration_needed?
+      cache[key] = _outdated_versions(key)
+    end
+    @outdated_versions[options]
+  end
 
-      installed_kegs.each do |keg|
-        version = keg.version
-        all_versions << version
-        return [] if pkg_version <= version
-      end
+  def _outdated_versions(options = {})
+    all_versions = []
 
-      all_versions.sort!
+    installed_kegs.each do |keg|
+      version = keg.version
+      all_versions << version
+
+      return [] if pkg_version <= version && !version.head?
+    end
+
+    head_version = latest_head_version
+    if head_version && !head_version_outdated?(head_version, options)
+      []
+    else
+      all_versions.sort
     end
   end
 
   # @private
-  def outdated?
-    outdated_versions.any?
+  def outdated?(options = {})
+    !outdated_versions(options).empty?
   rescue Migrator::MigrationNeededError
     true
   end
@@ -1520,7 +1550,7 @@ class Formula
         installed_kegs.select { |k| pkg_version > k.version }
       end
 
-      if eligible_kegs.any?
+      unless eligible_kegs.empty?
         eligible_kegs.each do |keg|
           if keg.linked?
             opoo "Skipping (old) #{keg} due to it being linked"
@@ -1529,7 +1559,7 @@ class Formula
           end
         end
       end
-    elsif installed_prefixes.any? && !pinned?
+    elsif !installed_prefixes.empty? && !pinned?
       # If the cellar only has one version installed, don't complain
       # that we can't tell which one to keep. Don't complain at all if the
       # only installed version is a pinned formula.

@@ -203,6 +203,7 @@ class FormulaAuditor
     return unless @strict
 
     component_list = [
+      [/^  include Language::/,            "include directive"],
       [/^  desc ["'][\S\ ]+["']/,          "desc"],
       [/^  homepage ["'][\S\ ]+["']/,      "homepage"],
       [/^  url ["'][\S\ ]+["']/,           "url"],
@@ -219,6 +220,7 @@ class FormulaAuditor
       [/^  keg_only/,                      "keg_only"],
       [/^  option/,                        "option"],
       [/^  depends_on/,                    "depends_on"],
+      [/^  conflicts_with/,                "conflicts_with"],
       [/^  (go_)?resource/,                "resource"],
       [/^  def install/,                   "install method"],
       [/^  def caveats/,                   "caveats method"],
@@ -628,7 +630,8 @@ class FormulaAuditor
 
     fv = FormulaVersions.new(formula, :max_depth => 10)
     revision_map = fv.revision_map("origin/master")
-    if (revisions = revision_map[formula.version]).any?
+    revisions = revision_map[formula.version]
+    if !revisions.empty?
       problem "revision should not decrease" if formula.revision < revisions.max
     elsif formula.revision != 0
       if formula.stable
@@ -644,7 +647,7 @@ class FormulaAuditor
   def audit_legacy_patches
     return unless formula.respond_to?(:patches)
     legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
-    if legacy_patches.any?
+    unless legacy_patches.empty?
       problem "Use the patch DSL instead of defining a 'patches' method"
       legacy_patches.each { |p| audit_patch(p) }
     end

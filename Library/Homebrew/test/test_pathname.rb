@@ -46,7 +46,7 @@ class PathnameTests < Homebrew::TestCase
     refute_predicate @dir, :exist?
   end
 
-  def test_rmdir_if_possible_ignore_DS_Store
+  def test_rmdir_if_possible_ignore_ds_store
     mkdir_p @dir
     touch @dir/".DS_Store"
     assert @dir.rmdir_if_possible

@@ -58,10 +58,10 @@ module Homebrew
       next if Metafiles::EXTENSIONS.include? file.extname
 
       linked_libraries = Keg.file_linked_libraries(file, string)
-      result ||= linked_libraries.any?
+      result ||= !linked_libraries.empty?
 
       if ARGV.verbose?
-        print_filename(string, file) if linked_libraries.any?
+        print_filename(string, file) unless linked_libraries.empty?
         linked_libraries.each do |lib|
           puts " #{Tty.gray}-->#{Tty.reset} links to #{lib}"
         end
@@ -83,7 +83,7 @@ module Homebrew
         end
       end
 
-      if ARGV.verbose? && text_matches.any?
+      if ARGV.verbose? && !text_matches.empty?
         print_filename string, file
         text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
           puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.em}0x#{offset}#{Tty.reset}"
@@ -157,7 +157,7 @@ module Homebrew
       versions = FormulaVersions.new(f)
       bottle_revisions = versions.bottle_version_map("origin/master")[f.pkg_version]
       bottle_revisions.pop if bottle_revisions.last.to_i > 0
-      bottle_revision = bottle_revisions.any? ? bottle_revisions.max.to_i + 1 : 0
+      bottle_revision = bottle_revisions.empty? ? 0 : bottle_revisions.max.to_i + 1
     end
 
     filename = Bottle::Filename.create(f, Utils::Bottles.tag, bottle_revision)
@@ -288,7 +288,7 @@ module Homebrew
       end
       bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       bottle.cellar :any if OS.linux? && old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
-      if bad_fields.any?
+      unless bad_fields.empty?
         if bottle.prefix == "/home/linuxbrew/.linuxbrew"
           bottle.cellar old_spec.cellar
           bottle.prefix old_spec.prefix
@@ -395,7 +395,7 @@ module Homebrew
                 next if key == "cellar" && old_value == "any" && value == "any_skip_relocation"
                 mismatches << key if old_value.empty? || value != old_value
               end
-              if mismatches.any?
+              unless mismatches.empty?
                 odie "--keep-old was passed but there were changes in #{mismatches.join(", ")}!"
               end
               output = bottle_output bottle

@@ -82,7 +82,7 @@ module Homebrew
     begin
       formulae = []
 
-      if OS.mac? && ARGV.casks.any?
+      if OS.mac? && !ARGV.casks.empty?
         args = []
         args << "--force" if ARGV.force?
         args << "--debug" if ARGV.debug?
@@ -156,6 +156,8 @@ module Homebrew
     rescue FormulaUnavailableError => e
       if (blacklist = blacklisted?(e.name))
         ofail "#{e.message}\n#{blacklist}"
+      elsif e.name == "updog"
+        ofail "What's updog?"
       else
         ofail e.message
         query = query_regexp(e.name)

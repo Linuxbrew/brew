@@ -21,7 +21,8 @@
 #                        as raw bytes instead of re-encoding in UTF-8.
 # --fast:                Don't install any packages, but run e.g. audit anyway.
 # --keep-tmp:            Keep temporary files written by main installs and tests that are run.
-# --no-pull              Don't use `brew pull` when possible.
+# --no-pull:             Don't use `brew pull` when possible.
+# --coverage:            Generate coverage report and send it to Coveralls.
 #
 # --ci-master:           Shortcut for Homebrew master branch CI options.
 # --ci-pr:               Shortcut for Homebrew pull request CI options.
@@ -351,7 +352,7 @@ module Homebrew
           @name = "#{diff_start_sha1}-#{diff_end_sha1}"
         end
       # Handle formulae arguments being passed on the command-line e.g. `brew test-bot wget fish`.
-      elsif @formulae && @formulae.any?
+      elsif @formulae && !@formulae.empty?
         @name = "#{@formulae.first}-#{diff_end_sha1}"
         diff_start_sha1 = diff_end_sha1
       # Handle a hash being passed on the command-line e.g. `brew test-bot 1a2b3c`.
@@ -611,7 +612,7 @@ module Homebrew
             test "brew", "uninstall", "--force", formula_name
             FileUtils.ln bottle_filename, HOMEBREW_CACHE/bottle_filename, :force => true
             @formulae.delete(formula_name)
-            if unchanged_build_dependencies.any?
+            unless unchanged_build_dependencies.empty?
               test "brew", "uninstall", "--force", *unchanged_build_dependencies
               unchanged_dependencies -= unchanged_build_dependencies
             end
@@ -666,7 +667,7 @@ module Homebrew
           test "brew", "uninstall", "--devel", "--force", formula_name
         end
       end
-      test "brew", "uninstall", "--force", *unchanged_dependencies if unchanged_dependencies.any?
+      test "brew", "uninstall", "--force", *unchanged_dependencies unless unchanged_dependencies.empty?
     end
 
     def homebrew
@@ -675,15 +676,15 @@ module Homebrew
 
       if @tap.nil?
         tests_args = []
-        tests_args_coverage = []
+        tests_args_no_compat = []
         if RUBY_TWO
           tests_args << "--official-cmd-taps"
-          tests_args_coverage << "--coverage" if ENV["TRAVIS"]
+          tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
         end
         test "brew", "tests", *tests_args
         # brew tests --generic currently fails on Linux.
         test "brew", "tests", "--generic", *tests_args unless OS.linux?
-        test "brew", "tests", "--no-compat", *tests_args_coverage
+        test "brew", "tests", "--no-compat", *tests_args_no_compat
         test "brew", "readall", "--syntax"
         # TODO: try to fix this on Linux at some stage.
         if OS.mac?
@@ -971,6 +972,13 @@ module Homebrew
       ARGV << "--verbose"
       ARGV << "--ci-master" if ENV["TRAVIS_PULL_REQUEST"] == "false"
       ENV["HOMEBREW_VERBOSE_USING_DOTS"] = "1"
+
+      # Only report coverage if build runs on macOS and this is indeed Homebrew,
+      # as we don't want this to be averaged with inferior Linux test coverage.
+      repo = ENV["TRAVIS_REPO_SLUG"]
+      if repo && repo.start_with?("Homebrew/") && ENV["OSX"]
+        ARGV << "--coverage"
+      end
     end
 
     if ARGV.include?("--ci-master") || ARGV.include?("--ci-pr") \

@@ -54,7 +54,7 @@ module Homebrew
       begin
         reporter = Reporter.new(tap)
       rescue Reporter::ReporterRevisionUnsetError => e
-        onoe e if ARGV.homebrew_developer?
+        onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         next
       end
       if reporter.updated?
@@ -193,7 +193,16 @@ class Reporter
       dst = Pathname.new paths.last
 
       next unless dst.extname == ".rb"
-      next unless paths.any? { |p| tap.formula_file?(p)}
+
+      if paths.any? { |p| tap.cask_file?(p) }
+        # Currently only need to handle Cask deletion/migration.
+        if status == "D"
+          # Have a dedicated report array for deleted casks.
+          @report[:DC] << tap.formula_file_to_name(src)
+        end
+      end
+
+      next unless paths.any? { |p| tap.formula_file?(p) }
 
       case status
       when "A", "D"
@@ -205,7 +214,7 @@ class Reporter
           old_version = FormulaVersions.new(formula).formula_at_revision(@initial_revision, &:pkg_version)
           next if new_version == old_version
         rescue Exception => e
-          onoe e if ARGV.homebrew_developer?
+          onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         end
         @report[:M] << tap.formula_file_to_name(src)
       when /^R\d{0,3}/
@@ -247,12 +256,13 @@ class Reporter
   end
 
   def migrate_tap_migration
-    report[:D].each do |full_name|
+    (report[:D] + report[:DC]).each do |full_name|
       name = full_name.split("/").last
       new_tap_name = tap.tap_migrations[name]
       next if new_tap_name.nil? # skip if not in tap_migrations list.
 
-      if tap == "caskroom/cask"
+      # This means it is a Cask
+      if report[:DC].include? full_name
         next unless (HOMEBREW_REPOSITORY/"Caskroom"/name).exist?
         new_tap = Tap.fetch(new_tap_name)
         new_tap.install unless new_tap.installed?
@@ -269,7 +279,7 @@ class Reporter
             system HOMEBREW_BREW_FILE, "link", new_full_name, "--overwrite"
           end
         rescue Exception => e
-          onoe e if ARGV.homebrew_developer?
+          onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         end
         next
       end
@@ -312,7 +322,7 @@ class Reporter
       begin
         f = Formulary.factory(new_full_name)
       rescue Exception => e
-        onoe e if ARGV.homebrew_developer?
+        onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         next
       end
 

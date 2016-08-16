@@ -1,9 +1,14 @@
-#:  * `upgrade` [<install-options>] [`--cleanup`] [<formulae>]:
+#:  * `upgrade` [<install-options>] [`--cleanup`] [`--fetch-HEAD`] [<formulae>]:
 #:    Upgrade outdated, unpinned brews.
 #:
 #:    Options for the `install` command are also valid here.
 #:
 #:    If `--cleanup` is specified then remove previously installed <formula> version(s).
+#:
+#:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
+#:    the HEAD installation of the formula is outdated. Otherwise, the
+#:    repository's HEAD will be checked for updates when a new stable or devel
+#:    version has been released.
 #:
 #:    If <formulae> are given, upgrade only the specified brews (but do so even
 #:    if they are pinned; see `pin`, `unpin`).
@@ -19,18 +24,23 @@ module Homebrew
     Homebrew.perform_preinstall_checks
 
     if ARGV.named.empty?
-      outdated = Formula.installed.select(&:outdated?)
+      outdated = Formula.installed.select do |f|
+        f.outdated?(:fetch_head => ARGV.fetch_head?)
+      end
+
       exit 0 if outdated.empty?
-    elsif ARGV.named.any?
-      outdated = ARGV.resolved_formulae.select(&:outdated?)
+    else
+      outdated = ARGV.resolved_formulae.select do |f|
+        f.outdated?(:fetch_head => ARGV.fetch_head?)
+      end
 
       (ARGV.resolved_formulae - outdated).each do |f|
         versions = f.installed_kegs.map { |keg| keg.version }
-        if versions.any?
+        if versions.empty?
+          onoe "#{f.full_name} not installed"
+        else
           version = versions.max
           onoe "#{f.full_name} #{version} already installed"
-        else
-          onoe "#{f.full_name} not installed"
         end
       end
       exit 1 if outdated.empty?

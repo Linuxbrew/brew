@@ -3,7 +3,7 @@ Vendored Dependencies
 
 * [okjson](https://github.com/kr/okjson), version 43.
 
-* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 0.2.4
+* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 0.2.5
 
 ## Licenses:
 

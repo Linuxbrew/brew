@@ -259,10 +259,10 @@ module GitHub
     open_or_closed_prs = issues_matching(query, :type => "pr")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
-    if open_prs.any?
+    if !open_prs.empty?
       puts "Open pull requests:"
       prs = open_prs
-    elsif open_or_closed_prs.any?
+    elsif !open_or_closed_prs.empty?
       puts "Closed pull requests:"
       prs = open_or_closed_prs
     else

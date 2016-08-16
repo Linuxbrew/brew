@@ -21,7 +21,7 @@
 /Library/Taps
 
 # Ignore vendored files within `Library`
-/Library/Homebrew/vendor/portable-ruby/*
+/Library/Homebrew/vendor/portable-ruby
 
 # Ignore `bin` contents (again).
 /bin

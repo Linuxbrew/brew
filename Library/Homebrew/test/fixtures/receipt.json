@@ -16,6 +16,11 @@
   "source": {
       "path": "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb",
       "tap": "homebrew/core",
-      "spec": "stable"
+      "spec": "stable",
+      "versions": {
+        "stable": "2.14",
+        "devel": "2.15",
+        "head": "HEAD-0000000"
+      }
   }
 }

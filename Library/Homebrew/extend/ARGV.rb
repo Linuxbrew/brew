@@ -34,7 +34,7 @@ module HomebrewArgvExtension
           f.build = tab
           if f.head? && tab.tabfile
             k = Keg.new(tab.tabfile.parent)
-            f.version.update_commit(k.version.version.commit)
+            f.version.update_commit(k.version.version.commit) if k.version.head?
           end
         end
         f
@@ -221,6 +221,10 @@ module HomebrewArgvExtension
 
   def force_bottle?
     include? "--force-bottle"
+  end
+
+  def fetch_head?
+    include? "--fetch-HEAD"
   end
 
   # eg. `foo -ns -i --bar` has three switches, n, s and i

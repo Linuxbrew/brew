@@ -52,10 +52,17 @@ module Homebrew
         issue = arg
         tap = CoreTap.instance
         url = "https://github.com/#{tap.slug}/pull/#{arg}"
-      elsif (testing_match = arg.match %r{brew\.sh/job/Homebrew.*Testing/(\d+)/})
+      elsif (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
+        tap = ARGV.value("tap")
+        tap = if tap && tap.start_with?("homebrew/")
+          Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
+        elsif tap
+          odie "Tap option did not start with \"homebrew/\": #{tap}"
+        else
+          CoreTap.instance
+        end
         _, testing_job = *testing_match
-        url = "https://github.com/Homebrew/homebrew-core/compare/master...BrewTestBot:testing-#{testing_job}"
-        tap = CoreTap.instance
+        url = "https://github.com/Homebrew/homebrew-#{tap.repo}/compare/master...BrewTestBot:testing-#{testing_job}"
         odie "Testing URLs require `--bottle`!" unless ARGV.include?("--bottle")
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
@@ -72,7 +79,6 @@ module Homebrew
         odie "No pull request detected!"
       end
 
-      tap = Tap.fetch(ARGV.value("tap")) if ARGV.value("tap")
       if tap
         tap.install unless tap.installed?
         Dir.chdir tap.path
@@ -148,10 +154,10 @@ module Homebrew
 
       orig_message = message = `git log HEAD^.. --format=%B`
       if issue && !ARGV.include?("--clean")
-        slug = if (url_match = url.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
-          _, user, repo = *url_match
-          "#{user}/#{repo}"
-        end
+          slug = if (url_match = url.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
+            _, user, repo = *url_match
+            "#{user}/#{repo}"
+          end
         ohai "Patch closes issue ##{issue}"
         close_message = "Closes #{slug}##{issue}."
         # If this is a pull request, append a close message.

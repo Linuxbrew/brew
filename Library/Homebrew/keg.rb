@@ -253,11 +253,11 @@ class Keg
           when :zsh  then path.join("share", "zsh", "site-functions")
           when :fish then path.join("share", "fish", "vendor_completions.d")
           end
-    dir && dir.directory? && dir.children.any?
+    dir && dir.directory? && !dir.children.empty?
   end
 
   def plist_installed?
-    Dir["#{path}/*.plist"].any?
+    !Dir["#{path}/*.plist"].empty?
   end
 
   def python_site_packages_installed?
@@ -265,7 +265,7 @@ class Keg
   end
 
   def python_pth_files_installed?
-    Dir["#{path}/lib/python2.7/site-packages/*.pth"].any?
+    !Dir["#{path}/lib/python2.7/site-packages/*.pth"].empty?
   end
 
   def apps

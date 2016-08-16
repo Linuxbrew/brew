@@ -161,7 +161,7 @@ class TapTest < Homebrew::TestCase
 
     assert_equal "e1893a6bd191ba895c71b652ff8376a6114c7fa7", @tap.git_head
     assert_equal "e189", @tap.git_short_head
-    assert_match %r{years ago}, @tap.git_last_commit
+    assert_match "years ago", @tap.git_last_commit
     assert_equal "2009-05-21", @tap.git_last_commit_date
   end
 
@@ -181,7 +181,7 @@ class TapTest < Homebrew::TestCase
     setup_git_repo
     already_tapped_tap = Tap.new("Homebrew", "foo")
     assert_equal true, already_tapped_tap.installed?
-    right_remote = "#{@tap.remote}"
+    right_remote = @tap.remote
     assert_raises(TapAlreadyTappedError) { already_tapped_tap.install :clone_target => right_remote }
   end
 

@@ -28,12 +28,12 @@ module Utils
           s.gsub!(before, after, audit_result)
         end
 
-        errors[path] = s.errors if s.errors.any?
+        errors[path] = s.errors unless s.errors.empty?
 
         Pathname(path).atomic_write(s)
       end
 
-      raise InreplaceError.new(errors) if errors.any?
+      raise InreplaceError.new(errors) unless errors.empty?
     end
     module_function :inreplace
   end

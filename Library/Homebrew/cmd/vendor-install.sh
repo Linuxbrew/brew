@@ -8,6 +8,7 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 
 VENDOR_DIR="$HOMEBREW_LIBRARY/Homebrew/vendor"
 
+# Built from https://github.com/Homebrew/homebrew-portable.
 if [[ -n "$HOMEBREW_OSX" ]]
 then
   if [[ "$HOMEBREW_PROCESSOR" = "Intel" ]]
@@ -30,10 +31,10 @@ fetch() {
   local temporary_path
 
   curl_args=(
-    --fail \
-    --remote-time \
-    --location \
-    --user-agent "$HOMEBREW_USER_AGENT_CURL" \
+    --fail
+    --remote-time
+    --location
+    --user-agent "$HOMEBREW_USER_AGENT_CURL"
   )
 
   if [[ -n "$HOMEBREW_QUIET" ]]
@@ -44,7 +45,7 @@ fetch() {
     curl_args+=(--progress-bar)
   fi
 
-  temporary_path="${CACHED_LOCATION}.incomplete"
+  temporary_path="$CACHED_LOCATION.incomplete"
 
   mkdir -p "$HOMEBREW_CACHE"
   [[ -n "$HOMEBREW_QUIET" ]] || echo "==> Downloading $VENDOR_URL"
@@ -67,7 +68,7 @@ fetch() {
 
     if [[ ! -f "$temporary_path" ]]
     then
-      odie "Download failed: ${VENDOR_URL}"
+      odie "Download failed: $VENDOR_URL"
     fi
 
     trap '' SIGINT
@@ -159,10 +160,10 @@ homebrew-vendor-install() {
   do
     case "$option" in
       -\?|-h|--help|--usage) brew help vendor-install; exit $? ;;
-      --verbose) HOMEBREW_VERBOSE=1 ;;
-      --quiet) HOMEBREW_QUIET=1 ;;
-      --debug) HOMEBREW_DEBUG=1 ;;
-      --*) ;;
+      --verbose)             HOMEBREW_VERBOSE=1 ;;
+      --quiet)               HOMEBREW_QUIET=1 ;;
+      --debug)               HOMEBREW_DEBUG=1 ;;
+      --*)                   ;;
       -*)
         [[ "$option" = *v* ]] && HOMEBREW_VERBOSE=1
         [[ "$option" = *q* ]] && HOMEBREW_QUIET=1
@@ -185,10 +186,13 @@ homebrew-vendor-install() {
 
   if [[ -z "$VENDOR_URL" || -z "$VENDOR_SHA" ]]
   then
-    odie "Cannot find a vendored version of $VENDOR_NAME."
+    odie <<-EOS
+Cannot find a vendored version of $VENDOR_NAME for your $HOMEBREW_PROCESSOR
+processor on $HOMEBREW_PRODUCT!
+EOS
   fi
 
-  VENDOR_VERSION="$(<"$VENDOR_DIR/portable-${VENDOR_NAME}-version")"
+  VENDOR_VERSION="$(<"$VENDOR_DIR/portable-$VENDOR_NAME-version")"
   CACHED_LOCATION="$HOMEBREW_CACHE/$(basename "$VENDOR_URL")"
 
   lock "vendor-install-$VENDOR_NAME"
