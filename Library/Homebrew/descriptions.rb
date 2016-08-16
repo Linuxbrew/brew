@@ -110,8 +110,6 @@ class Descriptions
       @cache.select { |name, desc| (name =~ regex) || (desc =~ regex) }
     end
 
-    results = Hash[results] if RUBY_VERSION <= "1.8.7"
-
     new(results)
   end
 
