@@ -329,3 +329,5 @@ module SharedEnvExtension
     version && Version.create(version) >= Version.create("4.8")
   end
 end
+
+require "extend/os/extend/ENV/shared"
