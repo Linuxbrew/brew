@@ -28,6 +28,11 @@ module Stdenv
       # depend on it already being installed to build itself.
       ld64 if Formula["ld64"].installed?
     end
+
+    # Xcode 8 should be told to fail to link against weak links
+    # Issue from Apple engineer:
+    # https://github.com/Homebrew/homebrew-core/issues/3727
+    append "LDFLAGS", "-Wl,-no_weak_imports" if no_weak_imports?
   end
 
   def homebrew_extra_pkg_config_paths
