@@ -14,8 +14,4 @@ group :coverage do
     :branch => "master", # commit 257e26394c464c4ab388631b4eff1aa98c37d3f1
     :require => false
   gem "coveralls", "0.8.14", :require => false
-
-  # We need to pin the version of this Coveralls dependency because it is the
-  # last one to support Ruby 1.8. Remove as soon as we stop using Ruby 1.8.
-  gem "json", "~> 1.8", :require => false
 end
