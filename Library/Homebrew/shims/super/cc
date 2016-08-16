@@ -359,6 +359,6 @@ if __FILE__ == $PROGRAM_NAME
 
   log(basename, ARGV, tool, args)
 
-  args << { :close_others => false } if RUBY_VERSION >= "2.0"
+  args << { :close_others => false }
   exec "#{dirname}/xcrun", tool, *args
 end
