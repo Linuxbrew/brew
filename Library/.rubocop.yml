@@ -3,14 +3,6 @@ AllCops:
     - 'Homebrew/vendor/**/*'
     - 'Homebrew/test/vendor/**/*'
 
-# Ruby 1.8 compatibility
-Style/DotPosition:
-  EnforcedStyle: trailing
-Style/HashSyntax:
-  EnforcedStyle: hash_rockets
-Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: no_comma
-
 # ruby style guide favorite
 Style/StringLiterals:
   EnforcedStyle: double_quotes

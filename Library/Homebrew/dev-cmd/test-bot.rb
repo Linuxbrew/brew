@@ -421,8 +421,7 @@ module Homebrew
     def setup
       @category = __method__
       return if ARGV.include? "--skip-setup"
-      if !ENV["TRAVIS"] && ENV["HOMEBREW_RUBY"] != "1.8.7" &&
-          HOMEBREW_PREFIX.to_s == "/usr/local"
+      if !ENV["TRAVIS"] && HOMEBREW_PREFIX.to_s == "/usr/local"
         test "brew", "doctor"
       end
       test "brew", "--env"
@@ -661,12 +660,9 @@ module Homebrew
       return if @skip_homebrew
 
       if @tap.nil?
-        tests_args = []
+        tests_args = ["--official-cmd-taps"]
         tests_args_no_compat = []
-        if RUBY_TWO
-          tests_args << "--official-cmd-taps"
-          tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
-        end
+        tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
         test "brew", "tests", *tests_args
         test "brew", "tests", "--generic", *tests_args
         test "brew", "tests", "--no-compat", *tests_args_no_compat
@@ -704,11 +700,7 @@ module Homebrew
         HOMEBREW_REPOSITORY.cd do
           safe_system "git", "checkout", "-f", "master"
           safe_system "git", "reset", "--hard", "origin/master"
-          # This will uninstall all formulae, as long as
-          # HOMEBREW_REPOSITORY == HOMEBREW_PREFIX, which is true on the test bots
-          unless ENV["HOMEBREW_RUBY"] == "1.8.7"
-            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
-          end
+          safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
         end
       end
       pr_locks = "#{@repository}/.git/refs/remotes/*/pr/*/*.lock"
@@ -926,7 +918,7 @@ module Homebrew
 
     ENV["HOMEBREW_DEVELOPER"] = "1"
     ENV["HOMEBREW_SANDBOX"] = "1"
-    ENV["HOMEBREW_RUBY_MACHO"] = "1" if RUBY_TWO
+    ENV["HOMEBREW_RUBY_MACHO"] = "1"
     ENV["HOMEBREW_NO_EMOJI"] = "1"
     ENV["HOMEBREW_FAIL_LOG_LINES"] = "150"
     ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"] = "1"
