@@ -8,7 +8,7 @@ class Sandbox
   ].freeze
 
   def self.available?
-    OS.mac? && File.executable?(SANDBOX_EXEC)
+    OS.mac? && OS::Mac.version >= "10.6" && File.executable?(SANDBOX_EXEC)
   end
 
   def self.formula?(formula)
