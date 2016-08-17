@@ -13,6 +13,7 @@ class Sandbox
 
   def self.formula?(formula)
     return false unless available?
+    return false if ARGV.no_sandbox?
     ARGV.sandbox? || SANDBOXED_TAPS.include?(formula.tap.to_s)
   end
 
