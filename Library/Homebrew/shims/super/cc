@@ -258,8 +258,10 @@ class Cmd
     case mode
     when :ld
       args << "-headerpad_max_install_names"
+      args << "-no_weak_imports" if no_weak_imports?
     when :ccld, :cxxld
       args << "-Wl,-headerpad_max_install_names"
+      args << "-Wl,-no_weak_imports" if no_weak_imports?
     end
     args
   end
@@ -303,6 +305,10 @@ class Cmd
 
   def permit_arch_flags?
     config.include?("K")
+  end
+
+  def no_weak_imports?
+    config.include?("w")
   end
 
   def canonical_path(path)
