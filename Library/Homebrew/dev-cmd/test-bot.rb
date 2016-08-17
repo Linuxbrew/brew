@@ -671,6 +671,11 @@ module Homebrew
         test "brew", "tests", "--generic", *tests_args
         test "brew", "tests", "--no-compat", *tests_args_no_compat
         test "brew", "readall", "--syntax"
+        if OS.mac? &&
+           (HOMEBREW_REPOSITORY/"Library/Homebrew/cask/cmd/brew-cask-tests.rb").exist?
+          test "brew", "cask-tests"
+        end
+
         # TODO: try to fix this on Linux at some stage.
         if OS.mac?
           # test update from origin/master to current commit.
