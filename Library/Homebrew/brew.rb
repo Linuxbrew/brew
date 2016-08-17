@@ -11,13 +11,6 @@ if ARGV == %w[--version] || ARGV == %w[-v]
   exit 0
 end
 
-if OS.mac? && MacOS.version < "10.6"
-  abort <<-EOABORT.undent
-    Homebrew requires Snow Leopard or higher. For Tiger and Leopard support, see:
-    https://github.com/mistydemeo/tigerbrew
-  EOABORT
-end
-
 def require?(path)
   require path
 rescue LoadError => e
