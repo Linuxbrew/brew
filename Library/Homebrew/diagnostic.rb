@@ -1010,7 +1010,7 @@ module Homebrew
         return unless Utils.git_available?
 
         timestamp = if File.directory?("#{HOMEBREW_REPOSITORY}/.git")
-          HOMEBREW_REPOSITORY.cd { `git log -1 --format="%ct" HEAD`.to_i }
+          HOMEBREW_REPOSITORY.cd { `git log -1 --format="%ct" HEAD --`.to_i }
         else
           HOMEBREW_LIBRARY.mtime.to_i
         end
