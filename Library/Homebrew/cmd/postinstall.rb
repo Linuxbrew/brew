@@ -21,12 +21,10 @@ module Homebrew
       args << "--devel"
     end
 
-    if Sandbox.available? && ARGV.sandbox?
-      Sandbox.print_sandbox_message
-    end
+    Sandbox.print_sandbox_message if Sandbox.formula?(formula)
 
     Utils.safe_fork do
-      if Sandbox.available? && ARGV.sandbox?
+      if Sandbox.formula?(formula)
         sandbox = Sandbox.new
         formula.logs.mkpath
         sandbox.record_log(formula.logs/"sandbox.postinstall.log")
