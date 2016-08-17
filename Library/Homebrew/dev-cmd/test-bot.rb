@@ -669,6 +669,7 @@ module Homebrew
         test "brew", "readall", "--syntax"
         if OS.mac? &&
            (HOMEBREW_REPOSITORY/"Library/Homebrew/cask/cmd/brew-cask-tests.rb").exist?
+          run_as_not_developer { test "brew", "tap", "caskroom/cask" }
           test "brew", "cask-tests"
         end
 
