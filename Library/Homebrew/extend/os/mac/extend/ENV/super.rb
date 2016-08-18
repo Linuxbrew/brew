@@ -107,6 +107,10 @@ module Superenv
     ENV.x11 = MacOS::X11.installed?
   end
 
+  def permit_weak_imports
+    remove "HOMEBREW_CCCFG", "w"
+  end
+
   # These methods are no longer necessary under superenv, but are needed to
   # maintain an interface compatible with stdenv.
   alias_method :macosxsdk, :noop

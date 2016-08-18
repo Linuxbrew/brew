@@ -293,6 +293,8 @@ module SharedEnvExtension
 
   def permit_arch_flags; end
 
+  def permit_weak_imports; end
+
   private
 
   def cc=(val)
