@@ -209,6 +209,7 @@ class FormulaAuditor
       [/^  version ["'][\S\ ]+["']/,       "version"],
       [/^  (sha1|sha256) ["'][\S\ ]+["']/, "checksum"],
       [/^  revision/,                      "revision"],
+      [/^  version_scheme/,                "version_scheme"],
       [/^  head ["'][\S\ ]+["']/,          "head"],
       [/^  stable do/,                     "stable block"],
       [/^  bottle do/,                     "bottle block"],
@@ -622,22 +623,31 @@ class FormulaAuditor
     end
   end
 
-  def audit_revision
+  def audit_revision_and_version_scheme
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
 
     fv = FormulaVersions.new(formula, :max_depth => 10)
-    revision_map = fv.revision_map("origin/master")
-    revisions = revision_map[formula.version]
-    if !revisions.empty?
-      problem "revision should not decrease" if formula.revision < revisions.max
-    elsif formula.revision != 0
+    attributes = [:revision, :version_scheme]
+    attributes_map = fv.version_attributes_map(attributes, "origin/master")
+
+    attributes.each do |attribute|
+      attributes_for_version = attributes_map[attribute][formula.version]
+      if !attributes_for_version.empty?
+        if formula.send(attribute) < attributes_for_version.max
+          problem "#{attribute} should not decrease"
+        end
+      end
+    end
+
+    revision_map = attributes_map[:revision]
+    if formula.revision != 0
       if formula.stable
         if revision_map[formula.stable.version].empty? # check stable spec
-          problem "revision should be removed"
+          problem "'revision #{formula.revision}' should be removed"
         end
       else # head/devel-only formula
-        problem "revision should be removed"
+        problem "'revision #{formula.revision}' should be removed"
       end
     end
   end
@@ -1006,7 +1016,7 @@ class FormulaAuditor
     audit_formula_name
     audit_class
     audit_specs
-    audit_revision
+    audit_revision_and_version_scheme
     audit_desc
     audit_homepage
     audit_bottle_spec
