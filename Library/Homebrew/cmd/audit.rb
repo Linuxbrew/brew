@@ -671,7 +671,7 @@ class FormulaAuditor
     when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
       problem <<-EOS.undent
         use GitHub pull request URLs:
-          https://github.com/#{$1}/#{$2}/pulls/#{$3}.patch
+          https://github.com/#{$1}/#{$2}/pull/#{$3}.patch
         Rather than patch-diff:
           #{patch.url}
       EOS
