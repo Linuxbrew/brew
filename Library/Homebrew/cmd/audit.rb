@@ -644,10 +644,10 @@ class FormulaAuditor
     if formula.revision != 0
       if formula.stable
         if revision_map[formula.stable.version].empty? # check stable spec
-          problem "revision should be removed"
+          problem "'revision #{formula.revision}' should be removed"
         end
       else # head/devel-only formula
-        problem "revision should be removed"
+        problem "'revision #{formula.revision}' should be removed"
       end
     end
   end
