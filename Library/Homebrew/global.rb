@@ -22,16 +22,8 @@ require "config"
 
 HOMEBREW_REPOSITORY.extend(GitRepositoryExtension)
 
-if RbConfig.respond_to?(:ruby)
-  RUBY_PATH = Pathname.new(RbConfig.ruby)
-else
-  RUBY_PATH = Pathname.new(RbConfig::CONFIG["bindir"]).join(
-    RbConfig::CONFIG["ruby_install_name"] + RbConfig::CONFIG["EXEEXT"]
-  )
-end
+RUBY_PATH = Pathname.new(RbConfig.ruby)
 RUBY_BIN = RUBY_PATH.dirname
-RUBY_TWO = RUBY_VERSION.split(".").first.to_i >= 2
-raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
 
 HOMEBREW_USER_AGENT_CURL = ENV["HOMEBREW_USER_AGENT_CURL"]
 HOMEBREW_USER_AGENT_RUBY = "#{ENV["HOMEBREW_USER_AGENT"]} ruby/#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
