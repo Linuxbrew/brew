@@ -53,7 +53,7 @@ class FormulaVersions
       formula_at_revision(rev) do |f|
         bottle = f.bottle_specification
         unless bottle.checksums.empty?
-          map[f.pkg_version] << bottle.revision
+          map[f.pkg_version] << bottle.rebuild
         end
       end
     end
