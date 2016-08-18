@@ -114,6 +114,9 @@ class Formula
   # @see .revision
   attr_reader :revision
 
+  # Used to change version schemes for packages
+  attr_reader :version_scheme
+
   # The current working directory during builds.
   # Will only be non-`nil` inside {#install}.
   attr_reader :buildpath
@@ -139,6 +142,7 @@ class Formula
     @name = name
     @path = path
     @revision = self.class.revision || 0
+    @version_scheme = self.class.version_scheme || 0
 
     if path == Formulary.core_path(name)
       @tap = CoreTap.instance
@@ -432,6 +436,7 @@ class Formula
   def head_version_outdated?(version, options={})
     tab = Tab.for_keg(prefix(version))
 
+    return true if tab.version_scheme < version_scheme
     return true if stable && tab.stable_version && tab.stable_version < stable.version
     return true if devel && tab.devel_version && tab.devel_version < devel.version
 
@@ -1014,8 +1019,12 @@ class Formula
     installed_kegs.each do |keg|
       version = keg.version
       all_versions << version
+      next if version.head?
 
-      return [] if pkg_version <= version && !version.head?
+      tab = Tab.for_keg(keg)
+      next if version_scheme > tab.version_scheme
+      next if version_scheme == tab.version_scheme && pkg_version > version
+      return []
     end
 
     head_version = latest_head_version
@@ -1288,6 +1297,7 @@ class Formula
         "head" => (head.version.to_s if head)
       },
       "revision" => revision,
+      "version_scheme" => version_scheme,
       "installed" => [],
       "linked_keg" => (linked_keg.resolved_path.basename.to_s if linked_keg.exist?),
       "pinned" => pinned?,
@@ -1694,6 +1704,18 @@ class Formula
     #
     # <pre>revision 1</pre>
     attr_rw :revision
+
+    # @!attribute [w] version_scheme
+    # Used for creating new Homebrew versions schemes. For example, if we want
+    # to change version scheme from one to another, then we may need to update
+    # `version_scheme` of this {Formula} to be able to use new version scheme.
+    # E.g. to move from 20151020 scheme to 1.0.0 we need to increment
+    # `version_scheme`. Without this, the prior scheme will always equate to a
+    # higher version.
+    # `0` if unset.
+    #
+    # <pre>version_scheme 1</pre>
+    attr_rw :version_scheme
 
     # A list of the {.stable}, {.devel} and {.head} {SoftwareSpec}s.
     # @private
