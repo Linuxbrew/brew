@@ -628,11 +628,20 @@ class FormulaAuditor
     return unless formula.tap.git? # git log is required
 
     fv = FormulaVersions.new(formula, :max_depth => 10)
-    revision_map = fv.version_attributes_map([:revision], "origin/master")
-    revisions = revision_map[formula.version]
-    if !revisions.empty?
-      problem "revision should not decrease" if formula.revision < revisions.max
-    elsif formula.revision != 0
+    attributes = [:revision]
+    attributes_map = fv.version_attributes_map(attributes, "origin/master")
+
+    attributes.each do |attribute|
+      attributes_for_version = attributes_map[attribute][formula.version]
+      if !attributes_for_version.empty?
+        if formula.send(attribute) < attributes_for_version.max
+          problem "#{attribute} should not decrease"
+        end
+      end
+    end
+
+    revision_map = attributes_map[:revision]
+    if formula.revision != 0
       if formula.stable
         if revision_map[formula.stable.version].empty? # check stable spec
           problem "revision should be removed"
