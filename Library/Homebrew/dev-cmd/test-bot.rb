@@ -49,22 +49,12 @@ module Homebrew
 
   HOMEBREW_TAP_REGEX = %r{^([\w-]+)/homebrew-([\w-]+)$}
 
-  if ruby_has_encoding?
-    def fix_encoding!(str)
-      # Assume we are starting from a "mostly" UTF-8 string
-      str.force_encoding(Encoding::UTF_8)
-      return str if str.valid_encoding?
-      str.encode!(Encoding::UTF_16, :invalid => :replace)
-      str.encode!(Encoding::UTF_8)
-    end
-  elsif require "iconv"
-    def fix_encoding!(str)
-      Iconv.conv("UTF-8//IGNORE", "UTF-8", str)
-    end
-  else
-    def fix_encoding!(str)
-      str
-    end
+  def fix_encoding!(str)
+    # Assume we are starting from a "mostly" UTF-8 string
+    str.force_encoding(Encoding::UTF_8)
+    return str if str.valid_encoding?
+    str.encode!(Encoding::UTF_16, :invalid => :replace)
+    str.encode!(Encoding::UTF_8)
   end
 
   def resolve_test_tap
@@ -181,7 +171,7 @@ module Homebrew
       verbose = ARGV.verbose?
       # Step may produce arbitrary output and we read it bytewise, so must
       # buffer it as binary and convert to UTF-8 once complete
-      output = ruby_has_encoding? ? "".encode!("BINARY") : ""
+      output = "".encode!("BINARY")
       working_dir = Pathname.new(@command.first == "git" ? @repository : Dir.pwd)
       read, write = IO.pipe
 
@@ -1046,19 +1036,8 @@ module Homebrew
   def sanitize_output_for_xml(output)
     unless output.empty?
       # Remove invalid XML CData characters from step output.
-      if ruby_has_encoding?
-        # This is the regex for valid XML chars, but only works in Ruby 2.0+
-        # /[\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/
-        # For 1.9 compatibility, use the inverse of that, which stays under \u10000
-        # invalid_xml_pat = /[\x00-\x08\x0B\x0C\x0E-\x1F\uD800-\uDFFF\uFFFE\uFFFF]/
-        # But Ruby won't allow you to reference surrogates, so we have:
-        invalid_xml_pat = /[\x00-\x08\x0B\x0C\x0E-\x1F\uFFFE\uFFFF]/
-        output = output.gsub(invalid_xml_pat, "\uFFFD")
-      else
-        # Invalid XML chars, as far as single-byte chars go
-        output = output.delete("\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0b\x0c\x0e\x0f" \
-          "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f")
-      end
+      invalid_xml_pat = /[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/
+      output = output.gsub(invalid_xml_pat, "\uFFFD")
 
       # Truncate to 1MB to avoid hitting CI limits
       if output.bytesize > MAX_STEP_OUTPUT_SIZE
