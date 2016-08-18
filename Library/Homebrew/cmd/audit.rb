@@ -209,6 +209,7 @@ class FormulaAuditor
       [/^  version ["'][\S\ ]+["']/,       "version"],
       [/^  (sha1|sha256) ["'][\S\ ]+["']/, "checksum"],
       [/^  revision/,                      "revision"],
+      [/^  version_scheme/,                "version_scheme"],
       [/^  head ["'][\S\ ]+["']/,          "head"],
       [/^  stable do/,                     "stable block"],
       [/^  bottle do/,                     "bottle block"],
