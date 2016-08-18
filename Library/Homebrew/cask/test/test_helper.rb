@@ -8,6 +8,7 @@ if ENV["COVERAGE"]
 end
 
 project_root = Pathname.new(File.expand_path("../..", __FILE__))
+tap_root = Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask")
 
 # add Homebrew to load path
 $LOAD_PATH.unshift(File.expand_path("#{ENV['HOMEBREW_REPOSITORY']}/Library/Homebrew"))
@@ -78,7 +79,7 @@ Hbc.default_tap = Tap.fetch("caskroom", "testcasks")
 FileUtils.ln_s project_root.join("test", "support"), Tap::TAP_DIRECTORY.join("caskroom").tap(&:mkpath).join("homebrew-testcasks")
 
 # pretend that the caskroom/cask Tap is installed
-FileUtils.ln_s project_root, Tap::TAP_DIRECTORY.join("caskroom").tap(&:mkpath).join("homebrew-cask")
+FileUtils.ln_s tap_root, Tap::TAP_DIRECTORY.join("caskroom").tap(&:mkpath).join("homebrew-cask")
 
 # create cache directory
 Hbc.homebrew_cache = Pathname.new(TEST_TMPDIR).join("cache")

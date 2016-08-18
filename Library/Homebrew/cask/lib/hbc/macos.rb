@@ -361,17 +361,17 @@ module OS::Mac
                        "~/Library/Widgets",
                        "~/Library/Workflows",
                      ]
-                     .map { |x| Pathname(x).expand_path }
+                     .map { |x| Pathname(x.sub(%r{^~(?=(/|$))}, Dir.home)).expand_path }
                      .to_set
                      .union(SYSTEM_DIRS)
                      .freeze
 
   def system_dir?(dir)
-    SYSTEM_DIRS.any? { |u| File.identical?(u, dir) }
+    SYSTEM_DIRS.include?(Pathname.new(dir).expand_path)
   end
 
   def undeletable?(dir)
-    UNDELETABLE_DIRS.any? { |u| File.identical?(u, dir) }
+    UNDELETABLE_DIRS.include?(Pathname.new(dir).expand_path)
   end
 
   alias release version

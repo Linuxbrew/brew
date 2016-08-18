@@ -133,7 +133,7 @@ describe Hbc::SystemCommand do
     }
 
     it "returns without deadlocking" do
-      wait(10).for {
+      wait(15).for {
         shutup { described_class.run(command, options) }
       }.to be_a_success
     end

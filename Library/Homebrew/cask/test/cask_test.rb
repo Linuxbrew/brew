@@ -1,6 +1,7 @@
 require "test_helper"
 
 describe "Cask" do
+  hbc_relative_tap_path = "../../Taps/caskroom/homebrew-cask"
   describe "load" do
     it "returns an instance of the Cask for the given token" do
       c = Hbc.load("adium")
@@ -9,14 +10,14 @@ describe "Cask" do
     end
 
     it "returns an instance of the Cask from a specific file location" do
-      location = File.expand_path("./Casks/dia.rb")
+      location = File.expand_path(hbc_relative_tap_path + "/Casks/dia.rb")
       c = Hbc.load(location)
       c.must_be_kind_of(Hbc::Cask)
       c.token.must_equal("dia")
     end
 
     it "returns an instance of the Cask from a url" do
-      url = "file://" + File.expand_path("./Casks/dia.rb")
+      url = "file://" + File.expand_path(hbc_relative_tap_path + "/Casks/dia.rb")
       c = shutup do
         Hbc.load(url)
       end
@@ -26,7 +27,7 @@ describe "Cask" do
 
     it "raises an error when failing to download a Cask from a url" do
       lambda {
-        url = "file://" + File.expand_path("./Casks/notacask.rb")
+        url = "file://" + File.expand_path(hbc_relative_tap_path + "/Casks/notacask.rb")
         shutup do
           Hbc.load(url)
         end
@@ -34,7 +35,7 @@ describe "Cask" do
     end
 
     it "returns an instance of the Cask from a relative file location" do
-      c = Hbc.load("./Casks/bbedit.rb")
+      c = Hbc.load(hbc_relative_tap_path + "/Casks/bbedit.rb")
       c.must_be_kind_of(Hbc::Cask)
       c.token.must_equal("bbedit")
     end

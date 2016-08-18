@@ -166,7 +166,7 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
   # where "doctor" is needed is precisely the situation where such
   # things are less dependable.
   def self.render_install_location
-    locations = Dir.glob(homebrew_cellar.join("brew-cask", "*")).reverse
+    locations = Dir.glob(Pathname.new(homebrew_cellar).join("brew-cask", "*")).reverse
     if locations.empty?
       none_string
     else
