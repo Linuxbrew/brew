@@ -438,8 +438,12 @@ class VersionParsingTests < Homebrew::TestCase
       "https://opam.ocaml.org/archives/easy-format.1.0.2+opam.tar.gz"
   end
 
-  def test_waf_version
+  def test_no_extension_version
     assert_version_detected "1.8.12", "https://waf.io/waf-1.8.12"
+    assert_version_detected "0.7.1", "https://codeload.github.com/gsamokovarov/jump/tar.gz/v0.7.1"
+    assert_version_detected "0.9.1234", "https://my.datomic.com/downloads/free/0.9.1234"
+    assert_version_detected "0.9", "https://my.datomic.com/downloads/free/0.9.1t34"
+    assert_version_detected "1.2.3", "https://my.datomic.com/downloads/free/1.2.3"
   end
 
   def test_dash_separated_version
