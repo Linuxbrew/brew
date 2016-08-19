@@ -78,6 +78,7 @@ module Superenv
     # g - Enable "-stdlib=libc++" for clang.
     # h - Enable "-stdlib=libstdc++" for clang.
     # K - Don't strip -arch <arch>, -m32, or -m64
+    # w - Pass -no_weak_imports to the linker
     #
     # On 10.8 and newer, these flags will also be present:
     # s - apply fix for sed's Unicode support
