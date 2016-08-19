@@ -63,7 +63,7 @@ module Homebrew
           if Sandbox.test?
             sandbox = Sandbox.new
             f.logs.mkpath
-            sandbox.record_log(f.logs/"sandbox.test.log")
+            sandbox.record_log(f.logs/"test.sandbox.log")
             sandbox.allow_write_temp_and_cache
             sandbox.allow_write_log(f)
             sandbox.allow_write_xcode

@@ -130,6 +130,11 @@ class Formula
   # @private
   attr_accessor :local_bottle_path
 
+  # When performing a build, test, or other loggable action, indicates which
+  # log file location to use.
+  # @private
+  attr_reader :active_log_type
+
   # The {BuildOptions} for this {Formula}. Lists the arguments passed and any
   # {#options} in the {Formula}. Note that these may differ at different times
   # during the installation of a {Formula}. This is annoying but the result of
@@ -735,10 +740,28 @@ class Formula
     prefix+".bottle"
   end
 
-  # The directory where the formula's installation logs will be written.
+  # The directory where the formula's installation or test logs will be written.
   # @private
   def logs
     HOMEBREW_LOGS+name
+  end
+
+  # The prefix, if any, to use in filenames for logging current activity
+  def active_log_prefix
+    if active_log_type
+      "#{active_log_type}."
+    else
+      ""
+    end
+  end
+
+  # Runs a block with the given log type in effect for its duration
+  def with_logging(log_type)
+    old_log_type = @active_log_type
+    @active_log_type = log_type
+    yield
+  ensure
+    @active_log_type = old_log_type
   end
 
   # This method can be overridden to provide a plist.
@@ -859,6 +882,17 @@ class Formula
   # @private
   def post_install_defined?
     method(:post_install).owner == self.class
+  end
+
+  # @private
+  def run_post_install
+    build = self.build
+    self.build = Tab.for_formula(self)
+    with_logging("post_install") do
+      post_install
+    end
+  ensure
+    self.build = build
   end
 
   # Tell the user about any caveats regarding this package.
@@ -1384,7 +1418,9 @@ class Formula
       ENV["HOME"] = @testpath
       setup_home @testpath
       begin
-        test
+        with_logging("test") do
+          test
+        end
       rescue Exception
         staging.retain! if ARGV.debug?
         raise
@@ -1476,7 +1512,7 @@ class Formula
 
     @exec_count ||= 0
     @exec_count += 1
-    logfn = "#{logs}/%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
+    logfn = "#{logs}/#{active_log_prefix}%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
     logs.mkpath
 
     File.open(logfn, "w") do |log|

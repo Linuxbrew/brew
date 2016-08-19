@@ -27,7 +27,7 @@ module Homebrew
       if Sandbox.formula?(formula)
         sandbox = Sandbox.new
         formula.logs.mkpath
-        sandbox.record_log(formula.logs/"sandbox.postinstall.log")
+        sandbox.record_log(formula.logs/"postinstall.sandbox.log")
         sandbox.allow_write_temp_and_cache
         sandbox.allow_write_log(formula)
         sandbox.allow_write_cellar(formula)
