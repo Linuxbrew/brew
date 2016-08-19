@@ -1,11 +1,9 @@
 #compdef brew-cask
 #autoload
 
-# Autocompletion for homebrew-cask (https://github.com/caskroom/homebrew-cask/).
-#
-# Originally sourced from the oh-my-zsh
-# https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/brew-cask/brew-cask.plugin.zsh
-#
+# Zsh Autocompletion script for Homebrew Cask
+# https://github.com/homebrew/brew
+
 # The MIT License (MIT)
 #
 # Copyright (c) 2009-2016 Robby Russell and contributors
