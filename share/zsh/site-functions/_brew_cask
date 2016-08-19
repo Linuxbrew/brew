@@ -30,11 +30,17 @@
 # SOFTWARE.
 
 __brew_all_casks() {
-  brew cask search
+  local -a list
+  local expl
+  list=( $(brew cask search) )
+  _wanted list expl 'all casks' compadd -a list
 }
 
 __brew_installed_casks() {
-  brew cask list|sed 's/(!)//'
+  local -a list
+  local expl
+  list=( $(brew cask list|sed 's/(!)//') )
+  _wanted list expl 'installed casks' compadd -a list
 }
 
 _brew_cask()
@@ -69,15 +75,11 @@ _brew_cask()
     )
     _describe -t commands "brew cask subcommand" subcommands ;;
   (options)
-    local -a casks installed_casks
-    local expl
     case "$line[1]" in
       list|uninstall)
-        installed_casks=($(__brew_installed_casks))
-        _wanted installed_casks expl 'installed casks' compadd -a installed_casks ;;
+        __brew_installed_casks ;;
       audit|cat|edit|fetch|home|info|install|zap)
-        casks=($(__brew_all_casks))
-        _wanted casks expl 'all casks' compadd -a casks ;;
+        __brew_all_casks ;;
     esac ;;
   esac
 }
