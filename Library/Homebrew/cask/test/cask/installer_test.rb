@@ -16,45 +16,45 @@ describe Hbc::Installer do
     end
 
     it "works with dmg-based Casks" do
-      transmission = Hbc.load("local-transmission")
+      asset = Hbc.load("container-dmg")
 
       shutup do
-        Hbc::Installer.new(transmission).install
+        Hbc::Installer.new(asset).install
       end
 
-      dest_path = Hbc.caskroom.join("local-transmission", transmission.version)
+      dest_path = Hbc.caskroom.join("container-dmg", asset.version)
       dest_path.must_be :directory?
-      application = Hbc.appdir.join("Transmission.app")
-      application.must_be :directory?
+      file = Hbc.appdir.join("container")
+      file.must_be :file?
     end
 
-    it "works with tar-based Casks" do
-      tarball = Hbc.load("tarball")
+    it "works with tar-gz-based Casks" do
+      asset = Hbc.load("container-tar-gz")
 
       shutup do
-        Hbc::Installer.new(tarball).install
+        Hbc::Installer.new(asset).install
       end
 
-      dest_path = Hbc.caskroom.join("tarball", tarball.version)
+      dest_path = Hbc.caskroom.join("container-tar-gz", asset.version)
       dest_path.must_be :directory?
-      application = Hbc.appdir.join("Tarball.app")
-      application.must_be :directory?
+      application = Hbc.appdir.join("container")
+      application.must_be :file?
     end
 
     it "works with cab-based Casks" do
       skip("cabextract not installed") unless Hbc.homebrew_prefix.join("bin", "cabextract").exist?
-      cab_container = Hbc.load("cab-container")
+      asset = Hbc.load("cab-container")
       empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      cab_container.stubs(:depends_on).returns(empty)
+      asset.stubs(:depends_on).returns(empty)
 
       shutup do
-        Hbc::Installer.new(cab_container).install
+        Hbc::Installer.new(asset).install
       end
 
-      dest_path = Hbc.caskroom.join("cab-container", cab_container.version)
+      dest_path = Hbc.caskroom.join("cab-container", asset.version)
       dest_path.must_be :directory?
-      application = Hbc.appdir.join("Application.app")
-      application.must_be :directory?
+      application = Hbc.appdir.join("container")
+      application.must_be :file?
     end
 
     it "works with Adobe AIR-based Casks" do
@@ -73,94 +73,7 @@ describe Hbc::Installer do
 
     it "works with 7z-based Casks" do
       skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
-      sevenzip_container = Hbc.load("sevenzip-container")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      sevenzip_container.stubs(:depends_on).returns(empty)
-
-      shutup do
-        Hbc::Installer.new(sevenzip_container).install
-      end
-
-      dest_path = Hbc.caskroom.join("sevenzip-container", sevenzip_container.version)
-      dest_path.must_be :directory?
-      application = Hbc.appdir.join("Application.app")
-      application.must_be :directory?
-    end
-
-    it "works with xar-based Casks" do
-      xar_container = Hbc.load("xar-container")
-
-      shutup do
-        Hbc::Installer.new(xar_container).install
-      end
-
-      dest_path = Hbc.caskroom.join("xar-container", xar_container.version)
-      dest_path.must_be :directory?
-      application = Hbc.appdir.join("Application.app")
-      application.must_be :directory?
-    end
-
-    it "works with Stuffit-based Casks" do
-      skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
-      stuffit_container = Hbc.load("stuffit-container")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      stuffit_container.stubs(:depends_on).returns(empty)
-
-      shutup do
-        Hbc::Installer.new(stuffit_container).install
-      end
-
-      dest_path = Hbc.caskroom.join("stuffit-container", stuffit_container.version)
-      dest_path.must_be :directory?
-      application = Hbc.appdir.join("sheldonmac", "v1.0")
-      application.must_be :directory?
-    end
-
-    it "works with RAR-based Casks" do
-      skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
-      rar_container = Hbc.load("rar-container")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      rar_container.stubs(:depends_on).returns(empty)
-
-      shutup do
-        Hbc::Installer.new(rar_container).install
-      end
-
-      dest_path = Hbc.caskroom.join("rar-container", rar_container.version)
-      dest_path.must_be :directory?
-      application = Hbc.appdir.join("Application.app")
-      application.must_be :directory?
-    end
-
-    it "works with bz2-based Casks" do
-      asset = Hbc.load("bzipped-asset")
-
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      dest_path = Hbc.caskroom.join("bzipped-asset", asset.version)
-      dest_path.must_be :directory?
-      file = Hbc.appdir.join("bzipped-asset--#{asset.version}")
-      file.must_be :file?
-    end
-
-    it "works with pure gz-based Casks" do
-      asset = Hbc.load("gzipped-asset")
-
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      dest_path = Hbc.caskroom.join("gzipped-asset", asset.version)
-      dest_path.must_be :directory?
-      file = Hbc.appdir.join("gzipped-asset--#{asset.version}")
-      file.must_be :file?
-    end
-
-    it "works with xz-based Casks" do
-      skip("unxz not installed") unless Hbc.homebrew_prefix.join("bin", "unxz").exist?
-      asset = Hbc.load("xzipped-asset")
+      asset = Hbc.load("container-7z")
       empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
       asset.stubs(:depends_on).returns(empty)
 
@@ -168,15 +81,102 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      dest_path = Hbc.caskroom.join("xzipped-asset", asset.version)
+      dest_path = Hbc.caskroom.join("container-7z", asset.version)
       dest_path.must_be :directory?
-      file = Hbc.appdir.join("xzipped-asset--#{asset.version}")
+      file = Hbc.appdir.join("container")
+      file.must_be :file?
+    end
+
+    it "works with xar-based Casks" do
+      asset = Hbc.load("container-xar")
+
+      shutup do
+        Hbc::Installer.new(asset).install
+      end
+
+      dest_path = Hbc.caskroom.join("container-xar", asset.version)
+      dest_path.must_be :directory?
+      file = Hbc.appdir.join("container")
+      file.must_be :file?
+    end
+
+    it "works with Stuffit-based Casks" do
+      skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
+      asset = Hbc.load("container-sit")
+      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
+      asset.stubs(:depends_on).returns(empty)
+
+      shutup do
+        Hbc::Installer.new(asset).install
+      end
+
+      dest_path = Hbc.caskroom.join("container-sit", asset.version)
+      dest_path.must_be :directory?
+      application = Hbc.appdir.join("container")
+      application.must_be :file?
+    end
+
+    it "works with RAR-based Casks" do
+      skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
+      asset = Hbc.load("container-rar")
+      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
+      asset.stubs(:depends_on).returns(empty)
+
+      shutup do
+        Hbc::Installer.new(asset).install
+      end
+
+      dest_path = Hbc.caskroom.join("container-rar", asset.version)
+      dest_path.must_be :directory?
+      application = Hbc.appdir.join("container")
+      application.must_be :file?
+    end
+
+    it "works with pure bzip2-based Casks" do
+      asset = Hbc.load("container-bzip2")
+
+      shutup do
+        Hbc::Installer.new(asset).install
+      end
+
+      dest_path = Hbc.caskroom.join("container-bzip2", asset.version)
+      dest_path.must_be :directory?
+      file = Hbc.appdir.join("container-bzip2--#{asset.version}")
+      file.must_be :file?
+    end
+
+    it "works with pure gzip-based Casks" do
+      asset = Hbc.load("container-gzip")
+
+      shutup do
+        Hbc::Installer.new(asset).install
+      end
+
+      dest_path = Hbc.caskroom.join("container-gzip", asset.version)
+      dest_path.must_be :directory?
+      file = Hbc.appdir.join("container-gzip--#{asset.version}")
+      file.must_be :file?
+    end
+
+    it "works with pure xz-based Casks" do
+      skip("unxz not installed") unless Hbc.homebrew_prefix.join("bin", "unxz").exist?
+      asset = Hbc.load("container-xz")
+      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
+      asset.stubs(:depends_on).returns(empty)
+
+      shutup do
+        Hbc::Installer.new(asset).install
+      end
+
+      dest_path = Hbc.caskroom.join("container-xz", asset.version)
+      dest_path.must_be :directory?
+      file = Hbc.appdir.join("container-xz--#{asset.version}")
       file.must_be :file?
     end
 
     it "works with lzma-based Casks" do
       skip("unlzma not installed") unless Hbc.homebrew_prefix.join("bin", "unlzma").exist?
-      asset = Hbc.load("lzma-asset")
+      asset = Hbc.load("container-lzma")
       empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
       asset.stubs(:depends_on).returns(empty)
 
@@ -184,9 +184,9 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      dest_path = Hbc.caskroom.join("lzma-asset", asset.version)
+      dest_path = Hbc.caskroom.join("container-lzma", asset.version)
       dest_path.must_be :directory?
-      file = Hbc.appdir.join("lzma-asset--#{asset.version}")
+      file = Hbc.appdir.join("container-lzma--#{asset.version}")
       file.must_be :file?
     end
 
@@ -316,15 +316,15 @@ describe Hbc::Installer do
       end # wont_raise
     end
 
-    it "works properly with a direct URL to a pkg" do
-      naked_pkg = Hbc.load("naked-pkg")
+    it "works naked-pkg-based Casks" do
+      naked_pkg = Hbc.load("container-pkg")
 
       shutup do
         Hbc::Installer.new(naked_pkg).install
       end
 
-      dest_path = Hbc.caskroom.join("naked-pkg", naked_pkg.version)
-      pkg = dest_path.join("Naked.pkg")
+      dest_path = Hbc.caskroom.join("container-pkg", naked_pkg.version)
+      pkg = dest_path.join("container.pkg")
       pkg.must_be :file?
     end
 
