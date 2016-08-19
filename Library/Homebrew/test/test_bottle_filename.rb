@@ -3,8 +3,8 @@ require "formula"
 require "software_spec"
 
 class BottleFilenameTests < Homebrew::TestCase
-  def fn(revision)
-    Bottle::Filename.new("foo", "1.0", :tag, revision)
+  def fn(rebuild)
+    Bottle::Filename.new("foo", "1.0", :tag, rebuild)
   end
 
   def test_prefix_suffix

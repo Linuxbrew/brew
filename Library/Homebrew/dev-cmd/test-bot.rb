@@ -952,7 +952,7 @@ module Homebrew
     # Tap repository if required, this is done before everything else
     # because Formula parsing and/or git commit hash lookup depends on it.
     # At the same time, make sure Tap is not a shallow clone.
-    # bottle revision and bottle upload rely on full clone.
+    # bottle rebuild and bottle upload rely on full clone.
     safe_system "brew", "tap", tap.name, "--full" if tap
 
     if ARGV.include? "--ci-upload"

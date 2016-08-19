@@ -1330,7 +1330,7 @@ class Formula
       next unless spec.bottle_defined?
       bottle_spec = spec.bottle_specification
       bottle_info = {
-        "revision" => bottle_spec.revision,
+        "rebuild" => bottle_spec.rebuild,
         "cellar" => (cellar = bottle_spec.cellar).is_a?(Symbol) ? \
                     cellar.inspect : cellar,
         "prefix" => bottle_spec.prefix,
@@ -1340,7 +1340,7 @@ class Formula
       bottle_spec.collector.keys.each do |os|
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
-          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.revision)}",
+          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",
           checksum.hash_type.to_s => checksum.hexdigest,
         }
       end
@@ -1789,7 +1789,7 @@ class Formula
     #   root_url "https://example.com" # Optional root to calculate bottle URLs
     #   prefix "/opt/homebrew" # Optional HOMEBREW_PREFIX in which the bottles were built.
     #   cellar "/opt/homebrew/Cellar" # Optional HOMEBREW_CELLAR in which the bottles were built.
-    #   revision 1 # Making the old bottle outdated without bumping the version/revision of the formula.
+    #   rebuild 1 # Making the old bottle outdated without bumping the version/revision of the formula.
     #   sha256 "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865" => :el_capitan
     #   sha256 "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3" => :yosemite
     #   sha256 "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2" => :mavericks

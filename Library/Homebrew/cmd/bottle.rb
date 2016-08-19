@@ -20,8 +20,8 @@ BOTTLE_ERB = <<-EOS
     <% elsif cellar != BottleSpecification::DEFAULT_CELLAR %>
     cellar "<%= cellar %>"
     <% end %>
-    <% if revision > 0 %>
-    revision <%= revision %>
+    <% if rebuild > 0 %>
+    rebuild <%= rebuild %>
     <% end %>
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
@@ -148,19 +148,19 @@ module Homebrew
       return ofail "Formula has no stable version: #{f.full_name}"
     end
 
-    if ARGV.include? "--no-revision"
-      bottle_revision = 0
+    if ARGV.include? "--no-rebuild"
+      rebuild = 0
     elsif ARGV.include? "--keep-old"
-      bottle_revision = f.bottle_specification.revision
+      rebuild = f.bottle_specification.rebuild
     else
-      ohai "Determining #{f.full_name} bottle revision..."
+      ohai "Determining #{f.full_name} bottle rebuild..."
       versions = FormulaVersions.new(f)
-      bottle_revisions = versions.bottle_version_map("origin/master")[f.pkg_version]
-      bottle_revisions.pop if bottle_revisions.last.to_i > 0
-      bottle_revision = bottle_revisions.empty? ? 0 : bottle_revisions.max.to_i + 1
+      rebuilds = versions.bottle_version_map("origin/master")[f.pkg_version]
+      rebuilds.pop if rebuilds.last.to_i > 0
+      rebuild = rebuilds.empty? ? 0 : rebuilds.max.to_i + 1
     end
 
-    filename = Bottle::Filename.create(f, Utils::Bottles.tag, bottle_revision)
+    filename = Bottle::Filename.create(f, Utils::Bottles.tag, rebuild)
     bottle_path = Pathname.pwd/filename
 
     tar_filename = filename.to_s.sub(/.gz$/, "")
@@ -277,13 +277,13 @@ module Homebrew
       bottle.cellar cellar
       bottle.prefix prefix
     end
-    bottle.revision bottle_revision
+    bottle.rebuild rebuild
     sha256 = bottle_path.sha256
     bottle.sha256 sha256 => Utils::Bottles.tag
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
-      bad_fields = [:root_url, :prefix, :cellar, :revision].select do |field|
+      bad_fields = [:root_url, :prefix, :cellar, :rebuild].select do |field|
         old_spec.send(field) != bottle.send(field)
       end
       bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
@@ -309,7 +309,7 @@ module Homebrew
             "root_url" => bottle.root_url,
             "prefix" => bottle.prefix,
             "cellar" => bottle.cellar.to_s,
-            "revision" => bottle.revision,
+            "rebuild" => bottle.rebuild,
             "tags" => {
               Utils::Bottles.tag.to_s => {
                 "filename" => filename.to_s,
@@ -347,7 +347,7 @@ module Homebrew
       end
       bottle.cellar cellar
       bottle.prefix bottle_hash["bottle"]["prefix"]
-      bottle.revision bottle_hash["bottle"]["revision"]
+      bottle.rebuild bottle_hash["bottle"]["rebuild"]
       bottle_hash["bottle"]["tags"].each do |tag, tag_hash|
         bottle.sha256 tag_hash["sha256"] => tag.to_sym
       end
@@ -368,7 +368,7 @@ module Homebrew
                 line = line.strip
                 next if line.empty?
                 key, value, _, tag = line.split " ", 4
-                valid_key = %w[root_url prefix cellar revision sha1 sha256].include? key
+                valid_key = %w[root_url prefix cellar rebuild sha1 sha256].include? key
                 next unless valid_key
 
                 value = value.to_s.delete ":'\""
@@ -414,7 +414,7 @@ module Homebrew
                       (\n^\ {3}[\S\ ]+$)*                                        # options can be in multiple lines
                     )?|
                     (homepage|desc|sha1|sha256|version|mirror)\ ['"][\S\ ]+['"]| # specs with a string
-                    revision\ \d+                                                # revision with a number
+                    rebuild\ \d+                                                 # rebuild with a number
                   )\n+                                                           # multiple empty lines
                  )+
                /mx, '\0' + output + "\n")
