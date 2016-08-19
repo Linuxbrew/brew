@@ -108,7 +108,7 @@ _brew_cask_cat() {
 }
 
 _brew_cask_cleanup() {
-  _arguments '--outdated'
+  _arguments '--outdated:only clean up cached downloads older than 10 days old'
 }
 
 _brew_cask_create() {
@@ -121,7 +121,7 @@ _brew_cask_edit() {
 
 _brew_cask_fetch() {
   _arguments : \
-    '--force' \
+    '--force:force re-download even if the files are already cached' \
     '*::token:__brew_all_casks'
 }
 
@@ -139,9 +139,9 @@ _brew_cask_info() {
 
 _brew_cask_install() {
   _arguments : \
-    '--force' \
-    '--skip-cask-deps' \
-    '--require-sha' \
+    '--force:re-install even if the Cask appears to be already present' \
+    '--skip-cask-deps:skip any Cask dependencies' \
+    '--require-sha:abort installation if the Cask does not have a checksum defined' \
     '*::token:__brew_all_casks'
 }
 
@@ -166,13 +166,13 @@ _brew_cask_rm() {
 
 _brew_cask_style() {
   _arguments : \
-    '--fix' \
+    '--fix:auto-correct any style errors if possible' \
     '*::token:__brew_all_casks'
 }
 
 _brew_cask_uninstall() {
   _arguments : \
-    '--force' \
+    '--force:uninstall even if the Cask does not appear to be present' \
     '*::token:__brew_installed_casks'
 }
 
