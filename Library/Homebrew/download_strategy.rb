@@ -821,6 +821,7 @@ class GitHubGitDownloadStrategy < GitDownloadStrategy
     if !@last_commit
       super
     else
+      return true unless commit
       return true unless @last_commit.start_with?(commit)
       multiple_short_commits_exist?(commit)
     end
