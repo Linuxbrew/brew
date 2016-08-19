@@ -10,6 +10,7 @@
 #
 # Copyright (c) 2009-2016 Robby Russell and contributors
 # See the full list at https://github.com/robbyrussell/oh-my-zsh/contributors
+# Copyright (c) 2016 Joshua McKinney
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +30,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# only display the main commands (but enable completing aliases like 'ls')
+zstyle -T ':completion:*:*:*:brew-cask:*' tag-order && \
+	zstyle ':completion:*:*:*:brew-cask:*' tag-order 'commands'
+
 __brew_all_casks() {
   local -a list
   local expl
@@ -43,43 +48,168 @@ __brew_installed_casks() {
   _wanted list expl 'installed casks' compadd -a list
 }
 
+__brew_cask_commands() {
+  local -a commands
+  commands=(
+    'audit:verifies installability of Casks'
+    'cat:dump raw source of the given Cask to the standard output'
+    'cleanup:cleans up cached downloads and tracker symlinks'
+    'create:creates the given Cask and opens it in an editor'
+    'doctor:checks for configuration issues'
+    'edit:edits the given Cask'
+    'fetch:downloads remote application files to local cache'
+    'home:opens the homepage of the given Cask'
+    'info:displays information about the given Cask'
+    'install:installs the given Cask'
+    'list:with no args, lists installed Casks; given installed Casks, lists staged files'
+    'search:searches all known Casks'
+    'style:checks Cask style using RuboCop'
+    'uninstall:uninstalls the given Cask'
+    "update:a synonym for 'brew update'"
+    'zap:zaps all files associated with the given Cask'
+  )
+  _describe -t commands "brew cask command" commands
+}
+
+__brew_cask_aliases() {
+  local -a aliases
+  aliases=(
+    'dr'
+    'homepage'
+    'abv'
+    'ls'
+    '-S'
+    'rm'
+    'remove'
+  )
+  _describe -t commands "brew cask command aliases" aliases
+}
+
+__brew_cask_command() {
+  local command="$1"
+  local completion_func="_brew_cask_${command//-/_}"
+  declare -f "$completion_func" >/dev/null && "$completion_func" && return
+}
+
+_brew_cask_abv() {
+  _brew_cask_info
+}
+
+_brew_cask_audit() {
+  __brew_all_casks
+}
+
+_brew_cask_cat() {
+  __brew_all_casks
+}
+
+_brew_cask_cat() {
+  __brew_all_casks
+}
+
+_brew_cask_cleanup() {
+  _arguments '--outdated'
+}
+
+_brew_cask_create() {
+  _arguments '*::token:'
+}
+
+_brew_cask_edit() {
+  __brew_all_casks
+}
+
+_brew_cask_fetch() {
+  _arguments : \
+    '--force' \
+    '*::token:__brew_all_casks'
+}
+
+_brew_cask_home() {
+  __brew_all_casks
+}
+
+_brew_cask_homepage() {
+  __brew_cask_home
+}
+
+_brew_cask_info() {
+  __brew_all_casks
+}
+
+_brew_cask_install() {
+  _arguments : \
+    '--force' \
+    '--skip-cask-deps' \
+    '--require-sha' \
+    '*::token:__brew_all_casks'
+}
+
+_brew_cask_list() {
+  _arguments : \
+    '-1[format output in a single column]' \
+    '-l[format as detailed list]' \
+    '*::token:__brew_installed_casks'
+}
+
+_brew_cask_ls() {
+  _brew_cask_list
+}
+
+_brew_cask_remove() {
+  _brew_cask_uninstall
+}
+
+_brew_cask_rm() {
+  _brew_cask_uninstall
+}
+
+_brew_cask_style() {
+  _arguments : \
+    '--fix' \
+    '*::token:__brew_all_casks'
+}
+
+_brew_cask_uninstall() {
+  _arguments : \
+    '--force' \
+    '*::token:__brew_installed_casks'
+}
+
+_brew_cask_zap() {
+  __brew_all_casks
+}
+
 _brew_cask()
 {
   local curcontext="$curcontext" state state_descr line
   typeset -A opt_args
 
-  _arguments -C \
-    ':subcmd:->subcmd' \
+  _arguments -C : \
+    '--verbose:Give additional feedback during installation.' \
+    '--appdir=-:Target location for Applications. The default value is /Applications:' \
+    '--colorpickerdir=-:Target location for Color Pickers. The default value is ~/Library/ColorPickers.' \
+    '--prefpanedir=-:Target location for Preference Panes. The default value is ~/Library/PreferencePanes.' \
+    '--qlplugindir=-:Target location for QuickLook Plugins. The default value is ~/Library/QuickLook.' \
+    '--fontdir=-:Target location for Fonts. The default value is ~/Library/Fonts.' \
+    '--servicedir=-:Target location for Services. The default value is ~/Library/Services.' \
+    '--input_methoddir=-:Target location for Input Methods. The default value is ~/Library/Input Methods.' \
+    '--internet_plugindir=-:Target location for Internet Plugins. The default value is ~/Library/Internet Plug-Ins.' \
+    '--audio_unit_plugindir=-:Target location for Audio Unit Plugins. The default value is ~/Library/Audio/Plug-Ins/Components.' \
+    '--vst_plugindir=-:Target location for VST Plugins. The default value is ~/Library/Audio/Plug-Ins/VST.' \
+    '--vst3_plugindir=-:Target location for VST3 Plugins. The default value is ~/Library/Audio/Plug-Ins/VST3.' \
+    '--screen_saverdir=-:Target location for Screen Savers. The default value is ~/Library/Screen Savers.' \
+    '--no-binaries:Do not link "helper" executables to /usr/local/bin.' \
+    '--debug:Output debugging information of use to Cask authors and developers.' \
+    ':command:->command' \
     '*::options:->options'
 
-  case $state in
-  (subcmd)
-    local -a subcommands
-    subcommands=(
-      'audit:verifies installability of Casks'
-      'cat:dump raw source of the given Cask to the standard output'
-      'cleanup:cleans up cached downloads and tracker symlinks'
-      'create:creates the given Cask and opens it in an editor'
-      'doctor:checks for configuration issues'
-      'edit:edits the given Cask'
-      'fetch:downloads remote application files to local cache'
-      'home:opens the homepage of the given Cask'
-      'info:displays information about the given Cask'
-      'install:installs the given Cask'
-      'list:with no args, lists installed Casks; given installed Casks, lists staged files'
-      'search:searches all known Casks'
-      'style:checks Cask style using RuboCop'
-      'uninstall:uninstalls the given Cask'
-      "update:a synonym for 'brew update'"
-      'zap:zaps all files associated with the given Cask'
-    )
-    _describe -t commands "brew cask subcommand" subcommands ;;
+  case "$state" in
+  (command)
+    _alternative -C 'brew-cask' \
+      'aliases:alias:__brew_cask_aliases' \
+      'commands:command:__brew_cask_commands' ;;
   (options)
-    case "$line[1]" in
-      list|uninstall)
-        __brew_installed_casks ;;
-      audit|cat|edit|fetch|home|info|install|zap)
-        __brew_all_casks ;;
-    esac ;;
+    __brew_cask_command "$line[1]" ;;
   esac
 }
