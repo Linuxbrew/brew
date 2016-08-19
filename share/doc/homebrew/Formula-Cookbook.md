@@ -524,7 +524,7 @@ To use a specific commit, tag, or branch from a repository, specify [`head`](htt
 ```ruby
 class Foo < Formula
   head "https://github.com/some/package.git", :revision => "090930930295adslfknsdfsdaffnasd13"
-                                         # or :branch => "develop"
+                                         # or :branch => "develop" (the default is "master")
                                          # or :tag => "1_0_release",
                                          #    :revision => "090930930295adslfknsdfsdaffnasd13"
 end
