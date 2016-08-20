@@ -188,12 +188,8 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
   end
 
   def self.render_load_path(paths)
-    return "#{none_string} #{error_string}" if paths.nil? || paths.empty?
-    copy = Array.new(paths)
-    unless Hbc::Utils.file_is_descendant(copy[0], homebrew_taps)
-      copy[0] = "#{copy[0]} #{error_string 'error: should be descendant of Homebrew taps directory'}"
-    end
-    copy
+    return "#{none_string} #{error_string}" if [*paths].empty?
+    paths
   end
 
   def self.render_cached_downloads
