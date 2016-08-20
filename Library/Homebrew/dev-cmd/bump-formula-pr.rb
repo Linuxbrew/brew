@@ -147,6 +147,7 @@ module Homebrew
         ohai "hub fork (to read $HUB_REMOTE)"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
         ohai "hub pull-request --browse -m '#{formula.name} #{new_formula_version}#{devel_message}'"
+        ohai "git checkout -"
       else
         safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
         safe_system "git", "commit", "--no-edit", "--verbose",
@@ -159,6 +160,7 @@ module Homebrew
         safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
         safe_system "hub", "pull-request", "--browse", "-m",
           "#{formula.name} #{new_formula_version}#{devel_message}\n\nCreated with `brew bump-formula-pr`."
+        safe_system "git", "checkout", "-"
       end
     end
   end
