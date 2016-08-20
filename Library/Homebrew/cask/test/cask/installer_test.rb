@@ -59,15 +59,15 @@ describe Hbc::Installer do
 
     it "works with Adobe AIR-based Casks" do
       skip("Adobe AIR not installed") unless Hbc::Container::Air.installer_exist?
-      air_container = Hbc.load("adobe-air-container")
+      asset = Hbc.load("container-air")
 
       shutup do
-        Hbc::Installer.new(air_container).install
+        Hbc::Installer.new(asset).install
       end
 
-      dest_path = Hbc.caskroom.join("adobe-air-container", air_container.version)
+      dest_path = Hbc.caskroom.join("container-air", asset.version)
       dest_path.must_be :directory?
-      application = Hbc.appdir.join("GMDesk.app")
+      application = Hbc.appdir.join("container.app")
       application.must_be :directory?
     end
 
