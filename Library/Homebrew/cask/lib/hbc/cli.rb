@@ -142,6 +142,7 @@ class Hbc::CLI
     command_string, *rest = *arguments
     rest = process_options(rest)
     command = Hbc.help ? "help" : lookup_command(command_string)
+    Hbc.default_tap.install unless Hbc.default_tap.installed?
     Hbc.init if should_init?(command)
     run_command(command, *rest)
   rescue Hbc::CaskError, Hbc::CaskSha256MismatchError => e

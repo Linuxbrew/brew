@@ -126,7 +126,7 @@ module Hbc::Locations
     attr_writer :default_tap
 
     def default_tap
-      @default_tap ||= Tap.fetch("caskroom/homebrew-cask")
+      @default_tap ||= Tap.fetch("caskroom", "homebrew-cask")
     end
 
     def path(query)
