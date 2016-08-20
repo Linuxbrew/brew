@@ -307,7 +307,7 @@ class Tap
     @formula_dir ||= [path/"Formula", path/"HomebrewFormula", path].detect(&:directory?)
   end
 
-  # path to the directory of all casks for caskroom/cask {Tap}.
+  # path to the directory of all {Cask} files for this {Tap}.
   def cask_dir
     @cask_dir ||= path/"Casks"
   end
