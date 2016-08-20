@@ -1,10 +1,10 @@
 test_cask 'invalid-appcast-url' do
   version '1.2.3'
-  sha256 '9203c30951f9aab41ac294bbeb1dcef7bed401ff0b353dcb34d68af32ea51853'
+  sha256 '67cdb8a02803ef37fdbf7e0be205863172e41a561ca446cd84f0d7ab35a99d94'
 
   url TestHelper.local_binary_url('caffeine.zip')
   appcast 1,
-          checkpoint: '9203c30951f9aab41ac294bbeb1dcef7bed401ff0b353dcb34d68af32ea51853'
+          checkpoint: '67cdb8a02803ef37fdbf7e0be205863172e41a561ca446cd84f0d7ab35a99d94'
   homepage 'http://example.com/invalid-appcast-url'
 
   app 'Caffeine.app'
