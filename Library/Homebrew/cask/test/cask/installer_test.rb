@@ -43,7 +43,7 @@ describe Hbc::Installer do
 
     it "works with cab-based Casks" do
       skip("cabextract not installed") unless Hbc.homebrew_prefix.join("bin", "cabextract").exist?
-      asset = Hbc.load("cab-container")
+      asset = Hbc.load("container-cab")
       empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
       asset.stubs(:depends_on).returns(empty)
 
@@ -51,7 +51,7 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      dest_path = Hbc.caskroom.join("cab-container", asset.version)
+      dest_path = Hbc.caskroom.join("container-cab", asset.version)
       dest_path.must_be :directory?
       application = Hbc.appdir.join("container")
       application.must_be :file?

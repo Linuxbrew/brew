@@ -7,5 +7,5 @@ test_cask 'container-cab' do
 
   depends_on formula: 'cabextract'
 
-  app 'cabcontainer/Application.app'
+  app 'container'
 end
