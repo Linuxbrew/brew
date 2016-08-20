@@ -79,6 +79,11 @@ class Build
 
     ENV.activate_extensions!
 
+    # Go makes extensive use of weak imports.
+    if formula_deps.any? { |f| f.name == "go" }
+      ENV.permit_weak_imports
+    end
+
     if superenv?
       ENV.keg_only_deps = keg_only_deps
       ENV.deps = formula_deps
