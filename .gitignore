@@ -39,6 +39,7 @@
 !/.github
 !/share/doc/homebrew
 !/share/man/man1/brew.1
+!/share/man/man1/brew-cask.1
 
 # Ignore `etc` contents (again)
 /etc

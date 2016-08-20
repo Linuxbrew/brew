@@ -37,6 +37,9 @@ module Homebrew
     markup = build_man_page
     convert_man_page(markup, TARGET_DOC_PATH/"brew.1.html")
     convert_man_page(markup, TARGET_MAN_PATH/"brew.1")
+
+    cask_markup = (HOMEBREW_LIBRARY/"Homebrew/cask/doc/man_page/brew-cask.1.md").read
+    convert_man_page(cask_markup, TARGET_MAN_PATH/"brew-cask.1")
   end
 
   def build_man_page
@@ -69,7 +72,7 @@ module Homebrew
     shared_args = %W[
       --pipe
       --organization=Homebrew
-      --manual=brew
+      --manual=#{target.basename(".1")}
     ]
 
     format_flag, format_desc = target_path_to_format(target)
