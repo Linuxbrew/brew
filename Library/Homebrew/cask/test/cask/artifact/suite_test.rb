@@ -7,9 +7,9 @@ describe Hbc::Artifact::Suite do
     end
   }
   let(:expected_path) {
-    Hbc.appdir.join("caffeine_suite")
+    Hbc.appdir.join("Caffeine")
   }
-  let(:source_path) { cask.staged_path.join("caffeine_suite") }
+  let(:source_path) { cask.staged_path.join("Caffeine") }
 
   it "moves the suite to the proper directory" do
     shutup do

@@ -24,7 +24,7 @@ describe Hbc::Artifact::App do
         url TestHelper.local_binary_url("caffeine.zip")
         homepage "http://example.com/local-caffeine"
         version "1.2.3"
-        sha256 "9203c30951f9aab41ac294bbeb1dcef7bed401ff0b353dcb34d68af32ea51853"
+        sha256 "67cdb8a02803ef37fdbf7e0be205863172e41a561ca446cd84f0d7ab35a99d94"
         app "subdir/Caffeine.app"
       end
 
@@ -53,7 +53,7 @@ describe Hbc::Artifact::App do
       cask = local_caffeine
 
       staged_app_path = cask.staged_path.join("Caffeine.app")
-      staged_app_copy = staged_app_path.sub("Caffeine.app", "CaffeineAgain.app")
+      staged_app_copy = staged_app_path.sub("Caffeine.app", "Caffeine Deluxe.app")
       FileUtils.cp_r staged_app_path, staged_app_copy
 
       shutup do
@@ -63,8 +63,8 @@ describe Hbc::Artifact::App do
       File.ftype(Hbc.appdir.join("Caffeine.app")).must_equal "directory"
       File.exist?(staged_app_path).must_equal false
 
-      File.exist?(Hbc.appdir.join("CaffeineAgain.app")).must_equal false
-      File.exist?(cask.staged_path.join("CaffeineAgain.app")).must_equal true
+      File.exist?(Hbc.appdir.join("Caffeine Deluxe.app")).must_equal false
+      File.exist?(cask.staged_path.join("Caffeine Deluxe.app")).must_equal true
     end
 
     describe "when the target already exists" do
