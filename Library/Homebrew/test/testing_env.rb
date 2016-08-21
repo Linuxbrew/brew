@@ -63,6 +63,9 @@ module Homebrew
   end
 
   class TestCase < ::Minitest::Test
+    require "test/helper/shutup"
+    include Test::Helper::Shutup
+
     include VersionAssertions
     include FSLeakLogger
 
@@ -71,22 +74,6 @@ module Homebrew
 
     def formula(name = "formula_name", path = Formulary.core_path(name), spec = :stable, &block)
       @_f = Class.new(Formula, &block).new(name, path, spec)
-    end
-
-    def shutup
-      err = $stderr.dup
-      out = $stdout.dup
-
-      begin
-        $stderr.reopen("/dev/null")
-        $stdout.reopen("/dev/null")
-        yield
-      ensure
-        $stderr.reopen(err)
-        $stdout.reopen(out)
-        err.close
-        out.close
-      end
     end
 
     def mktmpdir(prefix_suffix = nil, &block)

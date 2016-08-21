@@ -23,23 +23,8 @@ $LOAD_PATH.push(project_root.join("lib").to_s)
 ENV["HOMEBREW_NO_EMOJI"] = "1"
 ENV["HOMEBREW_CASK_OPTS"] = nil
 
-# TODO: temporary, copied from old Homebrew, this method is now moved inside a class
-def shutup
-  if ENV.key?("VERBOSE_TESTS")
-    yield
-  else
-    begin
-      tmperr = $stderr.clone
-      tmpout = $stdout.clone
-      $stderr.reopen "/dev/null", "w"
-      $stdout.reopen "/dev/null", "w"
-      yield
-    ensure
-      $stderr.reopen tmperr
-      $stdout.reopen tmpout
-    end
-  end
-end
+require "test/helper/shutup"
+include Test::Helper::Shutup
 
 def sudo(*args)
   %w[/usr/bin/sudo -E --] + Array(args).flatten
