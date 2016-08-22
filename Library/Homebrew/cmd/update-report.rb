@@ -85,6 +85,7 @@ module Homebrew
       Descriptions.update_cache(hub)
     end
 
+    link_manpages
     Tap.each(&:link_manpages)
 
     Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
@@ -157,6 +158,11 @@ module Homebrew
         EOS
       end
     end
+  end
+
+  def link_manpages
+    return if HOMEBREW_PREFIX.to_s == HOMEBREW_REPOSITORY.to_s
+    link_path_manpages(HOMEBREW_REPOSITORY/"share", "brew update")
   end
 end
 
