@@ -44,8 +44,3 @@ task :console do
   ARGV.clear
   Hbc.pry
 end
-
-desc "Generate man page from Markdown source"
-task :man do
-  sh "brew man"
-end
