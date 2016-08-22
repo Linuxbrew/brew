@@ -17,7 +17,10 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 git() {
   if [[ -z "$GIT_EXECUTABLE" ]]
   then
-    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
+    GIT_EXECUTABLE_RELATIVE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
+    GIT_EXECUTABLE_BASE="$(basename "$GIT_EXECUTABLE_RELATIVE")"
+    GIT_EXECUTABLE_DIR="$(cd "$(dirname "$GIT_EXECUTABLE_RELATIVE")" && pwd)"
+    GIT_EXECUTABLE="$GIT_EXECUTABLE_DIR/$GIT_EXECUTABLE_BASE"
   fi
   "$GIT_EXECUTABLE" "$@"
 }
