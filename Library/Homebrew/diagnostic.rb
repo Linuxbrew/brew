@@ -1090,8 +1090,6 @@ module Homebrew
           cmd_map[cmd_name] << cmd
         end
         cmd_map.reject! { |_cmd_name, cmd_paths| cmd_paths.size == 1 }
-        # TODO: remove when Cask migration is complete.
-        cmd_map.reject! { |cmd_name, _cmd_paths| cmd_name.include? "brew-cask" }
         return if cmd_map.empty?
 
         message = "You have external commands with conflicting names.\n"
