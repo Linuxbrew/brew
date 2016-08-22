@@ -1,5 +1,5 @@
 module SharedEnvExtension
-  def no_weak_imports?
+  def no_weak_import_support?
     return false unless compiler == :clang
 
     if MacOS::Xcode.version && MacOS::Xcode.version < "8.0"

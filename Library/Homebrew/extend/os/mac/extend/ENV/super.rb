@@ -81,10 +81,6 @@ module Superenv
     s << "s" if MacOS.version >= :mountain_lion
     # Fix issue with >= 10.8 apr-1-config having broken paths
     s << "a" if MacOS.version >= :mountain_lion
-    # Xcode 8 should be told to fail to link against weak links
-    # Issue from Apple engineer:
-    # https://github.com/Homebrew/homebrew-core/issues/3727
-    s << "w" if no_weak_imports?
     s
   end
 
@@ -107,8 +103,8 @@ module Superenv
     ENV.x11 = MacOS::X11.installed?
   end
 
-  def permit_weak_imports
-    remove "HOMEBREW_CCCFG", "w"
+  def no_weak_imports
+    add "HOMEBREW_CCCFG", "w"
   end
 
   # These methods are no longer necessary under superenv, but are needed to
