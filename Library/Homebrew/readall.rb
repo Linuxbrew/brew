@@ -11,12 +11,13 @@ module Readall
       failed = false
       workers = (0...Hardware::CPU.cores).map do
         Thread.new do
-          begin
-            while rb = ruby_files_queue.pop(true)
+          Kernel.loop do
+            begin
               # As a side effect, print syntax errors/warnings to `$stderr`.
-              failed = true if syntax_errors_or_warnings?(rb)
+              failed = true if syntax_errors_or_warnings?(ruby_files_queue.deq(true))
+            rescue ThreadError
+              break
             end
-          rescue ThreadError # ignore empty queue error
           end
         end
       end
