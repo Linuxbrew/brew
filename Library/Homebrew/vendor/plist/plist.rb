@@ -13,8 +13,8 @@ require 'base64'
 require 'cgi'
 require 'stringio'
 
-require 'plist/generator'
-require 'plist/parser'
+require_relative 'plist/generator'
+require_relative 'plist/parser'
 
 module Plist
   VERSION = '3.1.0'
