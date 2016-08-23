@@ -124,11 +124,11 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
   end
 
   def self.notfound_string
-    "#{Hbc::Utils::Tty.red.underline}Not Found - Unknown Error#{Hbc::Utils::Tty.reset}"
+    "#{Tty.red}Not Found - Unknown Error#{Tty.reset}"
   end
 
   def self.error_string(string = "Error")
-    "#{Hbc::Utils::Tty.red.underline}(#{string})#{Hbc::Utils::Tty.reset}"
+    "#{Tty.red}(#{string})#{Tty.reset}"
   end
 
   def self.render_with_none(string)

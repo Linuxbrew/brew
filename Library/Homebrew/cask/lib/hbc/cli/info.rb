@@ -25,7 +25,7 @@ class Hbc::CLI::Info < Hbc::CLI::Base
   end
 
   def self.formatted_url(url)
-    "#{Hbc::Utils::Tty.underline}#{url}#{Hbc::Utils::Tty.reset}"
+    "#{Tty.em}#{url}#{Tty.reset}"
   end
 
   def self.installation_info(cask)
@@ -35,7 +35,7 @@ class Hbc::CLI::Info < Hbc::CLI::Base
 
         puts versioned_staged_path.to_s
           .concat(" (")
-          .concat(versioned_staged_path.exist? ? versioned_staged_path.abv : "#{Hbc::Utils::Tty.red}does not exist#{Hbc::Utils::Tty.reset}")
+          .concat(versioned_staged_path.exist? ? versioned_staged_path.abv : "#{Tty.red}does not exist#{Tty.reset}")
           .concat(")")
       end
     else
@@ -45,7 +45,7 @@ class Hbc::CLI::Info < Hbc::CLI::Base
 
   def self.name_info(cask)
     ohai cask.name.size > 1 ? "Names" : "Name"
-    puts cask.name.empty? ? "#{Hbc::Utils::Tty.red}None#{Hbc::Utils::Tty.reset}" : cask.name
+    puts cask.name.empty? ? "#{Tty.red}None#{Tty.reset}" : cask.name
   end
 
   def self.github_info(cask)

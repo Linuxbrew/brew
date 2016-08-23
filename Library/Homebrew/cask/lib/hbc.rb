@@ -35,6 +35,7 @@ require "hbc/url_checker"
 require "hbc/utils"
 require "hbc/verify"
 require "hbc/version"
+require "utils"
 
 require "vendor/plist"
 

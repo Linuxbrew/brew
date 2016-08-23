@@ -27,11 +27,11 @@ module Hbc::Checkable
 
   def result
     if errors?
-      "#{Hbc::Utils::Tty.red.underline}failed#{Hbc::Utils::Tty.reset}"
+      "#{Tty.red}failed#{Tty.reset}"
     elsif warnings?
-      "#{Hbc::Utils::Tty.yellow.underline}warning#{Hbc::Utils::Tty.reset}"
+      "#{Tty.yellow}warning#{Tty.reset}"
     else
-      "#{Hbc::Utils::Tty.green}passed#{Hbc::Utils::Tty.reset}"
+      "#{Tty.green}passed#{Tty.reset}"
     end
   end
 
@@ -39,11 +39,11 @@ module Hbc::Checkable
     summary = ["#{summary_header}: #{result}"]
 
     errors.each do |error|
-      summary << " #{Hbc::Utils::Tty.red}-#{Hbc::Utils::Tty.reset} #{error}"
+      summary << " #{Tty.red}-#{Tty.reset} #{error}"
     end
 
     warnings.each do |warning|
-      summary << " #{Hbc::Utils::Tty.yellow}-#{Hbc::Utils::Tty.reset} #{warning}"
+      summary << " #{Tty.yellow}-#{Tty.reset} #{warning}"
     end
 
     summary.join("\n")
