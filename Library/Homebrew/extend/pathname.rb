@@ -216,10 +216,10 @@ class Pathname
 
   # extended to support common double extensions
   def extname(path = to_s)
-    BOTTLE_EXTNAME_RX.match(path)
-    return $1 if $1
-    /(\.(tar|cpio|pax)\.(gz|bz2|lz|xz|Z))$/.match(path)
-    return $1 if $1
+    bottle_ext = path[BOTTLE_EXTNAME_RX, 1]
+    return bottle_ext if bottle_ext
+    archive_ext = path[/(\.(tar|cpio|pax)\.(gz|bz2|lz|xz|Z))$/, 1]
+    return archive_ext if archive_ext
     File.extname(path)
   end
 
@@ -445,8 +445,8 @@ class Pathname
     end
   end
 
+  # https://bugs.ruby-lang.org/issues/9915
   if RUBY_VERSION == "2.0.0"
-    # https://bugs.ruby-lang.org/issues/9915
     prepend Module.new {
       def inspect
         super.force_encoding(@path.encoding)
