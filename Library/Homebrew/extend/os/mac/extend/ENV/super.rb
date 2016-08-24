@@ -104,7 +104,7 @@ module Superenv
   end
 
   def no_weak_imports
-    add "HOMEBREW_CCCFG", "w"
+    append "HOMEBREW_CCCFG", "w"
   end
 
   # These methods are no longer necessary under superenv, but are needed to
