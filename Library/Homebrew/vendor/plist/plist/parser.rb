@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 #
 # = plist
 #
@@ -5,7 +6,7 @@
 # Distributed under the MIT License
 #
 
-# Plist parses macOS xml property list files into ruby data structures.
+# Plist parses Mac OS X xml property list files into ruby data structures.
 #
 # === Load a plist file
 # This is the main point of the library:
@@ -62,20 +63,13 @@ module Plist
     def initialize( plist_data_or_file, listener )
       if plist_data_or_file.respond_to? :read
         @xml = plist_data_or_file.read
-      elsif File.exists? plist_data_or_file
+      elsif File.exist? plist_data_or_file
         @xml = File.read( plist_data_or_file )
       else
         @xml = plist_data_or_file
       end
 
-      trim_to_xml_start!
-
       @listener = listener
-    end
-
-    def trim_to_xml_start!
-      _, xml_tag, rest = @xml.partition(/^<\?xml/)
-      @xml = [xml_tag, rest].join
     end
 
     TEXT       = /([^<]+)/
@@ -108,7 +102,7 @@ module Plist
         elsif @scanner.scan(end_tag)
           @listener.tag_end(@scanner[1])
         else
-          raise ParseError.new("Unimplemented element #{@xml}")
+          raise "Unimplemented element"
         end
       end
     end
@@ -134,7 +128,7 @@ module Plist
     end
 
     def to_ruby
-      raise ParseError.new("Unimplemented: " + self.class.to_s + "#to_ruby on #{self.inspect}")
+      raise "Unimplemented: " + self.class.to_s + "#to_ruby on #{self.inspect}"
     end
   end
 
@@ -162,7 +156,6 @@ module Plist
     end
   end
 
-  require 'cgi'
   class PKey < PTag
     def to_ruby
       CGI::unescapeHTML(text || '')
@@ -217,8 +210,7 @@ module Plist
   require 'base64'
   class PData < PTag
     def to_ruby
-      data = Base64.decode64(text.gsub(/\s+/, ''))
-
+      data = Base64.decode64(text.gsub(/\s+/, '')) unless text.nil?
       begin
         return Marshal.load(data)
       rescue Exception => e
@@ -229,6 +221,4 @@ module Plist
       end
     end
   end
-
-  class ParseError < RuntimeError; end
 end
