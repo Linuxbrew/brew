@@ -38,13 +38,13 @@ then
   export LC_ALL="en_US.UTF-8"
 fi
 
-# Where we store built products; /usr/local/Cellar if it exists,
-# otherwise a Cellar relative to the Repository.
-if [[ -d "$HOMEBREW_PREFIX/Cellar" ]]
+# Where we store built products; a Cellar in HOMEBREW_PREFIX (often /usr/local
+# for bottles) unless there's already a Cellar in HOMEBREW_REPOSITORY.
+if [[ -d "$HOMEBREW_REPOSITORY/Cellar" ]]
 then
-  HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
-else
   HOMEBREW_CELLAR="$HOMEBREW_REPOSITORY/Cellar"
+else
+  HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
 fi
 
 case "$*" in
