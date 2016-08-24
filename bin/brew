@@ -5,22 +5,41 @@ quiet_cd() {
   cd "$@" >/dev/null
 }
 
+symlink_target_directory() {
+  local target="$(readlink "$1")"
+  local target_dirname="$(dirname "$target")"
+  local directory="$2"
+  quiet_cd "$directory" && quiet_cd "$target_dirname" && pwd -P
+}
+
 BREW_FILE_DIRECTORY="$(quiet_cd "${0%/*}/" && pwd -P)"
 HOMEBREW_BREW_FILE="${BREW_FILE_DIRECTORY%/}/${0##*/}"
-
 HOMEBREW_PREFIX="${HOMEBREW_BREW_FILE%/*/*}"
-[[ -n "$HOMEBREW_PREFIX" && "$HOMEBREW_PREFIX" != "$HOMEBREW_BREW_FILE" ]] \
-  || HOMEBREW_PREFIX="/"
+
+# Default to / prefix if unset or the bin/brew file.
+if [[ -z "$HOMEBREW_PREFIX" || "$HOMEBREW_PREFIX" = "$HOMEBREW_BREW_FILE" ]]
+then
+  HOMEBREW_PREFIX="/"
+fi
 
 HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX"
 
+# Resolve the bin/brew symlink to find Homebrew's repository
 if [[ -L "$HOMEBREW_BREW_FILE" ]]
 then
-  BREW_SYMLINK="$(readlink "$HOMEBREW_BREW_FILE")"
-  BREW_SYMLINK_DIRECTORY="$(dirname "$BREW_SYMLINK")"
-  BREW_FILE_DIRECTORY="$(quiet_cd "$BREW_FILE_DIRECTORY" &&
-                         quiet_cd "$BREW_SYMLINK_DIRECTORY" && pwd -P)"
+  BREW_FILE_DIRECTORY="$(symlink_target_directory "$HOMEBREW_BREW_FILE" "$BREW_FILE_DIRECTORY")"
   HOMEBREW_REPOSITORY="${BREW_FILE_DIRECTORY%/*}"
+fi
+
+# Try to find a /usr/local HOMEBREW_PREFIX where possible (for bottles)
+if [[ -L "/usr/local/bin/brew" ]]
+then
+  USR_LOCAL_BREW_FILE_DIRECTORY="$(symlink_target_directory "/usr/local/bin/brew" "/usr/local/bin")"
+  USR_LOCAL_HOMEBREW_REPOSITORY="${USR_LOCAL_BREW_FILE_DIRECTORY%/*}"
+  if [[ "$HOMEBREW_REPOSITORY" = "$USR_LOCAL_HOMEBREW_REPOSITORY" ]]
+  then
+    HOMEBREW_PREFIX="/usr/local"
+  fi
 fi
 
 HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
