@@ -4,11 +4,11 @@ describe Hbc::CLI::Search do
   it "lists the available Casks that match the search term" do
     lambda {
       Hbc::CLI::Search.run("photoshop")
-    }.must_output <<-OUTPUT.gsub(%r{^ *}, "")
+    }.must_output <<-EOS.undent
       ==> Partial matches
       adobe-photoshop-cc
       adobe-photoshop-lightroom
-    OUTPUT
+    EOS
   end
 
   it "shows that there are no Casks matching a search term that did not result in anything" do

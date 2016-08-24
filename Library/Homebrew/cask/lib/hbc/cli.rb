@@ -187,10 +187,10 @@ class Hbc::CLI
       end
 
       opts.on("--binarydir=PATH") do
-        opoo <<-EOF.undent
+        opoo <<-EOS.undent
           Option --binarydir is obsolete!
           Homebrew-Cask now uses the same location as your Homebrew installation for executable links.
-        EOF
+        EOS
       end
 
       FLAGS.each do |flag, method|
@@ -246,11 +246,11 @@ class Hbc::CLI
     end
 
     def purpose
-      puts <<-PURPOSE.undent
+      puts <<-EOS.undent
         brew-cask provides a friendly homebrew-style CLI workflow for the
         administration of macOS applications distributed as binaries.
 
-      PURPOSE
+      EOS
     end
 
     def usage
