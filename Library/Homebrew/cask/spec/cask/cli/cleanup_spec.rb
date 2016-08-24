@@ -10,6 +10,32 @@ describe Hbc::CLI::Cleanup do
     cache_location.rmtree
   end
 
+  describe "cleanup" do
+    it "removes cached downloads of given casks" do
+      cleaned_up_cached_download = 'caffeine'
+
+      cached_downloads = [
+                           cache_location.join("#{cleaned_up_cached_download}--latest.zip"),
+                           cache_location.join("transmission--2.61.dmg"),
+                         ]
+
+      cached_downloads.each(&FileUtils.method(:touch))
+
+      cleanup_size = Hbc::Utils.size_in_bytes(cached_downloads[0])
+
+      expect {
+        subject.cleanup(cleaned_up_cached_download)
+      }.to output(<<-EOS.undent).to_stdout
+        ==> Removing cached downloads for #{cleaned_up_cached_download}
+        #{cached_downloads[0]}
+        ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
+      EOS
+
+      expect(cached_downloads[0].exist?).to eq(false)
+      expect(cached_downloads[1].exist?).to eq(true)
+    end
+  end
+
   describe "cleanup!" do
     it "removes cached downloads" do
       cached_download = cache_location.join("SomeDownload.dmg")
@@ -18,11 +44,11 @@ describe Hbc::CLI::Cleanup do
 
       expect {
         subject.cleanup!
-      }.to output(<<-OUTPUT.undent).to_stdout
+      }.to output(<<-EOS.undent).to_stdout
         ==> Removing cached downloads
         #{cached_download}
         ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
-      OUTPUT
+      EOS
 
       expect(cached_download.exist?).to eq(false)
     end
@@ -38,11 +64,11 @@ describe Hbc::CLI::Cleanup do
 
       expect {
         subject.cleanup!
-      }.to output(<<-OUTPUT.undent).to_stdout
+      }.to output(<<-EOS.undent).to_stdout
         ==> Removing cached downloads
         skipping: #{cached_download} is locked
         ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
-      OUTPUT
+      EOS
 
       expect(cached_download.exist?).to eq(true)
     end
@@ -56,10 +82,10 @@ describe Hbc::CLI::Cleanup do
 
         expect {
           subject.cleanup!
-        }.to output(<<-OUTPUT.undent).to_stdout
+        }.to output(<<-EOS.undent).to_stdout
           ==> Removing cached downloads older than 10 days old
           Nothing to do
-        OUTPUT
+        EOS
 
         expect(cached_download.exist?).to eq(true)
       end

@@ -10,8 +10,12 @@ class Hbc::CLI::Cleanup < Hbc::CLI::Base
     true
   end
 
-  def self.run(*_ignored)
-    default.cleanup!
+  def self.run(*args)
+    if args.empty?
+      default.cleanup!
+    else
+      default.cleanup(args)
+    end
   end
 
   def self.default
@@ -25,7 +29,11 @@ class Hbc::CLI::Cleanup < Hbc::CLI::Base
   end
 
   def cleanup!
-    remove_all_cache_files
+    remove_cache_files
+  end
+
+  def cleanup(tokens)
+    remove_cache_files(*tokens)
   end
 
   def cache_files
@@ -55,11 +63,23 @@ class Hbc::CLI::Cleanup < Hbc::CLI::Base
     Hbc::Utils.size_in_bytes(cache_files)
   end
 
-  def remove_all_cache_files
+  def remove_cache_files(*tokens)
     message = "Removing cached downloads"
+    message.concat " for #{tokens.join(', ')}" unless tokens.empty?
     message.concat " older than #{OUTDATED_DAYS} days old" if outdated_only
     ohai message
-    delete_paths(cache_files)
+
+    deletable_cache_files = if tokens.empty?
+                              cache_files
+                            else
+                              start_withs = tokens.map { |token| "#{token}--" }
+
+                              cache_files.select { |path|
+                                path.basename.to_s.start_with?(*start_withs)
+                              }
+                            end
+
+    delete_paths(deletable_cache_files)
   end
 
   def delete_paths(paths)
