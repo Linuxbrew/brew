@@ -31,6 +31,17 @@ then
   HOMEBREW_REPOSITORY="${BREW_FILE_DIRECTORY%/*}"
 fi
 
+# Try to find a /usr/local HOMEBREW_PREFIX where possible (for bottles)
+if [[ -L "/usr/local/bin/brew" ]]
+then
+  USR_LOCAL_BREW_FILE_DIRECTORY="$(symlink_target_directory "/usr/local/bin/brew" "/usr/local/bin")"
+  USR_LOCAL_HOMEBREW_REPOSITORY="${USR_LOCAL_BREW_FILE_DIRECTORY%/*}"
+  if [[ "$HOMEBREW_REPOSITORY" = "$USR_LOCAL_HOMEBREW_REPOSITORY" ]]
+  then
+    HOMEBREW_PREFIX="/usr/local"
+  fi
+fi
+
 HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 
 source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
