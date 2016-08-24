@@ -11,25 +11,13 @@ module Homebrew
     raise UsageError unless ARGV.named.empty?
 
     if ARGV.flag? "--link"
-      link_man_pages
+      odie "`brew man --link` is now done automatically by `brew update`."
     else
       regenerate_man_pages
     end
   end
 
   private
-
-  def link_man_pages
-    linked_path = HOMEBREW_PREFIX/"share/man/man1"
-
-    if TARGET_MAN_PATH == linked_path
-      odie "The target path is the same as the linked one."
-    end
-
-    Dir["#{TARGET_MAN_PATH}/*.1"].each do |page|
-      FileUtils.ln_s page, linked_path
-    end
-  end
 
   def regenerate_man_pages
     Homebrew.install_gem_setup_path! "ronn"
