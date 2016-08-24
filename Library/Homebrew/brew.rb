@@ -1,3 +1,7 @@
+unless ENV["HOMEBREW_BREW_FILE"]
+  raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
+end
+
 std_trap = trap("INT") { exit! 130 } # no backtrace thanks
 
 # check ruby version before requiring any modules.
