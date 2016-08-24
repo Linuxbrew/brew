@@ -10,7 +10,7 @@ class Hbc::Container::Gzip < Hbc::Container::Base
   def extract
     Dir.mktmpdir do |unpack_dir|
       @command.run!("/usr/bin/ditto",  args: ["--", @path, unpack_dir])
-      @command.run!("/usr/bin/gunzip", args: ["--quiet", "--", Pathname.new(unpack_dir).join(@path.basename)])
+      @command.run!("/usr/bin/gunzip", args: ["--quiet", "--name", "--", Pathname.new(unpack_dir).join(@path.basename)])
 
       extract_nested_inside(unpack_dir)
     end

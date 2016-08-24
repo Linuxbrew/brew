@@ -2,5 +2,5 @@
 require "hbc/extend/hash"
 require "hbc/extend/io"
 require "hbc/extend/optparse"
-require "hbc/extend/pathname"
+require "extend/pathname"
 require "hbc/extend/string"

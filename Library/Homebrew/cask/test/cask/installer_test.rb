@@ -154,7 +154,7 @@ describe Hbc::Installer do
 
       dest_path = Hbc.caskroom.join("container-gzip", asset.version)
       dest_path.must_be :directory?
-      file = Hbc.appdir.join("container-gzip--#{asset.version}")
+      file = Hbc.appdir.join("container")
       file.must_be :file?
     end
 

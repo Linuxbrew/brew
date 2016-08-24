@@ -5,5 +5,5 @@ test_cask 'container-gzip' do
   url TestHelper.local_binary_url('container.gz')
   homepage 'https://example.com/container-gzip'
 
-  app 'container-gzip--1.2.3'
+  app 'container'
 end

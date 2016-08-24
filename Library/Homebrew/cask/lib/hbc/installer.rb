@@ -1,6 +1,5 @@
 require "rubygems"
 
-require "extend/pathname"
 require "hbc/cask_dependencies"
 require "hbc/staged"
 require "hbc/verify"
