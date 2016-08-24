@@ -9,15 +9,23 @@ quiet_safe_cd() {
   cd "$1" >/dev/null || { echo "Error: failed to cd to $1" >&2; exit 1; }
 }
 
+absdir() {
+  quiet_safe_cd "${1%/*}/" && pwd -P
+}
+
+dirbasepath() {
+  local dir="$1"
+  local base="${2##*/}"
+  echo "$dir/$base"
+}
+
 realpath() {
   local path="$1"
   local dir
-  local base
   local dest
 
-  dir="$(quiet_safe_cd "${path%/*}/" && pwd -P)"
-  base="${path##*/}"
-  path="$dir/$base"
+  dir="$(absdir "$path")"
+  path="$(dirbasepath "$dir" "$path")"
 
   while [[ -L "$path" ]]
   do
@@ -28,9 +36,8 @@ realpath() {
     else
       path="$dir/$dest"
     fi
-    dir="$(quiet_safe_cd "${path%/*}/" && pwd -P)"
-    base="${path##*/}"
-    path="$dir/$base"
+    dir="$(absdir "$path")"
+    path="$(dirbasepath "$dir" "$path")"
   done
 
   echo "$path"
@@ -58,7 +65,9 @@ safe_exec() {
   fi
   if [[ "$HOMEBREW" = "print-path" ]]
   then
-    echo "$arg0"
+    local dir="$(quiet_safe_cd "${arg0%/*}/" && pwd)"
+    local path="$(dirbasepath "$dir" "$arg0")"
+    echo "$path"
     exit
   fi
   exec "$@"
