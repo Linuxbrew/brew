@@ -42,7 +42,7 @@ describe Hbc::Artifact::Uninstall do
       let(:launchctl_remove_cmd) { %w[/bin/launchctl remove my.fancy.package.service] }
       let(:unknown_response) { "launchctl list returned unknown response\n" }
       let(:service_info) {
-        <<-PLIST.undent
+        <<-EOS.undent
           {
                   "LimitLoadToSessionType" = "Aqua";
                   "Label" = "my.fancy.package.service";
@@ -53,7 +53,7 @@ describe Hbc::Artifact::Uninstall do
                           "argument";
                   );
           };
-        PLIST
+        EOS
       }
 
       describe "when launchctl job is owned by user" do
@@ -124,7 +124,7 @@ describe Hbc::Artifact::Uninstall do
         ]
       }
       let(:pkg_info_plist) {
-        <<-PLIST.undent
+        <<-EOS.undent
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -135,7 +135,7 @@ describe Hbc::Artifact::Uninstall do
                   <string>/</string>
           </dict>
           </plist>
-        PLIST
+        EOS
       }
 
       it "can uninstall" do

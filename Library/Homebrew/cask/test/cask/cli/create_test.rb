@@ -37,7 +37,7 @@ describe Hbc::CLI::Create do
   it "drops a template down for the specified Cask" do
     Hbc::CLI::Create.run("new-cask")
     template = File.read(Hbc.path("new-cask"))
-    template.must_equal <<-TEMPLATE.undent
+    template.must_equal <<-EOS.undent
       cask 'new-cask' do
         version ''
         sha256 ''
@@ -49,7 +49,7 @@ describe Hbc::CLI::Create do
 
         app ''
       end
-    TEMPLATE
+    EOS
   end
 
   it "throws away additional Cask arguments and uses the first" do

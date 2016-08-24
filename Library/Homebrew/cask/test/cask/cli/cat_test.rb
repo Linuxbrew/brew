@@ -3,7 +3,7 @@ require "test_helper"
 describe Hbc::CLI::Cat do
   describe "given a basic Cask" do
     before do
-      @expected_output = <<-CLIOUTPUT.undent
+      @expected_output = <<-EOS.undent
         test_cask 'basic-cask' do
           version '1.2.3'
           sha256 '8c62a2b791cf5f0da6066a0a4b6e85f62949cd60975da062df44adf887f4370b'
@@ -13,7 +13,7 @@ describe Hbc::CLI::Cat do
 
           app 'TestCask.app'
         end
-      CLIOUTPUT
+      EOS
     end
 
     it "displays the Cask file content about the specified Cask" do

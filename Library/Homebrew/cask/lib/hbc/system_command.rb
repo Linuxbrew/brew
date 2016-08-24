@@ -150,17 +150,17 @@ class Hbc::SystemCommand::Result
     _warn_plist_garbage(command, Regexp.last_match[2])
     xml = Plist.parse_xml(output)
     unless xml.respond_to?(:keys) && !xml.keys.empty?
-      raise Hbc::CaskError, <<-ERRMSG
+      raise Hbc::CaskError, <<-EOS
 Empty result parsing plist output from command.
   command was:
   #{command.utf8_inspect}
   output we attempted to parse:
   #{output}
-      ERRMSG
+      EOS
     end
     xml
   rescue Plist::ParseError => e
-    raise Hbc::CaskError, <<-ERRMSG
+    raise Hbc::CaskError, <<-EOS
 Error parsing plist output from command.
   command was:
   #{command.utf8_inspect}
@@ -168,6 +168,6 @@ Error parsing plist output from command.
   #{e}
   output we attempted to parse:
   #{output}
-    ERRMSG
+    EOS
   end
 end

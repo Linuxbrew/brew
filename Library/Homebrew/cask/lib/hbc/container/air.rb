@@ -11,12 +11,12 @@ class Hbc::Container::Air < Hbc::Container::Base
 
   def self.installer_cmd
     return @installer_cmd ||= INSTALLER_PATHNAME if installer_exist?
-    raise Hbc::CaskError, <<-ERRMSG.undent
+    raise Hbc::CaskError, <<-EOS.undent
       Adobe AIR runtime not present, try installing it via
 
           brew cask install adobe-air
 
-    ERRMSG
+    EOS
   end
 
   def self.installer_exist?

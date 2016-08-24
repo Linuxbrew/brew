@@ -20,7 +20,7 @@ describe Hbc::DSL do
     end
 
     it "prints a warning that it has encountered an unexpected method" do
-      expected = Regexp.compile(<<-EOREGEX.undent.lines.map(&:chomp).join(""))
+      expected = Regexp.compile(<<-EOS.undent.lines.map(&:chomp).join(""))
         (?m)
         Warning:
         .*
@@ -29,7 +29,7 @@ describe Hbc::DSL do
         brew update; brew cleanup; brew cask cleanup
         .*
         https://github.com/caskroom/homebrew-cask#reporting-bugs
-      EOREGEX
+      EOS
 
       TestHelper.must_output(self, attempt_unknown_method, expected)
     end
