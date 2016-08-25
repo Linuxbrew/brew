@@ -72,7 +72,7 @@ module Homebrew
       fa.audit
 
       next if fa.problems.empty?
-
+      fa.problems
       formula_count += 1
       problem_count += fa.problems.size
       problem_lines = fa.problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
@@ -121,9 +121,14 @@ class FormulaText
     @text.include? s
   end
 
-  def line_number(regex)
-    index = @lines.index { |line| line =~ regex }
+  def line_number(regex, skip = 0)
+    index = @lines.drop(skip).index { |line| line =~ regex }
     index ? index + 1 : nil
+  end
+
+  def reverse_line_number(regex)
+    index = @lines.reverse.index { |line| line =~ regex }
+    index ? @lines.count - index : nil
   end
 end
 
@@ -171,6 +176,70 @@ class FormulaAuditor
     end
   end
 
+  def component_problem(before, after, offset = 0)
+    problem "`#{before[1]}` (line #{before[0] + offset}) should be put before `#{after[1]}` (line #{after[0] + offset})"
+  end
+
+  # scan in the reverse direction for remaining problems but report problems
+  # in the forward direction so that contributors don't reverse the order of
+  # lines in the file simply by following instructions
+  def audit_components(reverse = true, previous_pair = nil)
+    component_list = [
+      [/^  include Language::/,            "include directive"],
+      [/^  desc ["'][\S\ ]+["']/,          "desc"],
+      [/^  homepage ["'][\S\ ]+["']/,      "homepage"],
+      [/^  url ["'][\S\ ]+["']/,           "url"],
+      [/^  mirror ["'][\S\ ]+["']/,        "mirror"],
+      [/^  version ["'][\S\ ]+["']/,       "version"],
+      [/^  (sha1|sha256) ["'][\S\ ]+["']/, "checksum"],
+      [/^  revision/,                      "revision"],
+      [/^  version_scheme/,                "version_scheme"],
+      [/^  head ["'][\S\ ]+["']/,          "head"],
+      [/^  stable do/,                     "stable block"],
+      [/^  bottle do/,                     "bottle block"],
+      [/^  devel do/,                      "devel block"],
+      [/^  head do/,                       "head block"],
+      [/^  bottle (:unneeded|:disable)/,   "bottle modifier"],
+      [/^  keg_only/,                      "keg_only"],
+      [/^  option/,                        "option"],
+      [/^  depends_on/,                    "depends_on"],
+      [/^  conflicts_with/,                "conflicts_with"],
+      [/^  (go_)?resource/,                "resource"],
+      [/^  def install/,                   "install method"],
+      [/^  def caveats/,                   "caveats method"],
+      [/^  (plist_options|def plist)/,     "plist block"],
+      [/^  test do/,                       "test block"],
+    ]
+    if previous_pair
+      previous_before = previous_pair[0]
+      previous_after = previous_pair[1]
+    end
+    offset = (previous_after && previous_after[0] && previous_after[0] >= 1) ? previous_after[0] - 1 : 0
+    present = component_list.map do |regex, name|
+      lineno = if reverse
+        text.reverse_line_number regex
+      else
+        text.line_number regex, offset
+      end
+      next unless lineno
+      [lineno, name]
+    end.compact
+    no_problem = true
+    present.each_cons(2) do |c1, c2|
+      if reverse
+        # scan in the forward direction from the offset
+        audit_components(false, [c1, c2]) if c1[0] > c2[0] # at least one more offense
+      elsif c1[0] > c2[0] && (offset == 0 || previous_pair.nil? || (c1[0] + offset) != previous_before[0] || (c2[0] + offset) != previous_after[0])
+        component_problem c1, c2, offset
+        no_problem = false
+      end
+    end
+    if no_problem && previous_pair
+      component_problem previous_before, previous_after
+    end
+    present
+  end
+
   def audit_file
     # Under normal circumstances (umask 0022), we expect a file mode of 644. If
     # the user's umask is more restrictive, respect that by masking out the
@@ -200,43 +269,8 @@ class FormulaAuditor
 
     return unless @strict
 
-    component_list = [
-      [/^  include Language::/,            "include directive"],
-      [/^  desc ["'][\S\ ]+["']/,          "desc"],
-      [/^  homepage ["'][\S\ ]+["']/,      "homepage"],
-      [/^  url ["'][\S\ ]+["']/,           "url"],
-      [/^  mirror ["'][\S\ ]+["']/,        "mirror"],
-      [/^  version ["'][\S\ ]+["']/,       "version"],
-      [/^  (sha1|sha256) ["'][\S\ ]+["']/, "checksum"],
-      [/^  revision/,                      "revision"],
-      [/^  version_scheme/,                "version_scheme"],
-      [/^  head ["'][\S\ ]+["']/,          "head"],
-      [/^  stable do/,                     "stable block"],
-      [/^  bottle do/,                     "bottle block"],
-      [/^  devel do/,                      "devel block"],
-      [/^  head do/,                       "head block"],
-      [/^  bottle (:unneeded|:disable)/,   "bottle modifier"],
-      [/^  keg_only/,                      "keg_only"],
-      [/^  option/,                        "option"],
-      [/^  depends_on/,                    "depends_on"],
-      [/^  conflicts_with/,                "conflicts_with"],
-      [/^  (go_)?resource/,                "resource"],
-      [/^  def install/,                   "install method"],
-      [/^  def caveats/,                   "caveats method"],
-      [/^  (plist_options|def plist)/,     "plist block"],
-      [/^  test do/,                       "test block"],
-    ]
+    present = audit_components
 
-    present = component_list.map do |regex, name|
-      lineno = text.line_number regex
-      next unless lineno
-      [lineno, name]
-    end.compact
-    present.each_cons(2) do |c1, c2|
-      unless c1[0] < c2[0]
-        problem "`#{c1[1]}` (line #{c1[0]}) should be put before `#{c2[1]}` (line #{c2[0]})"
-      end
-    end
     present.map!(&:last)
     if present.include?("stable block")
       %w[url checksum mirror].each do |component|
