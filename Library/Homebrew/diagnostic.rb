@@ -443,8 +443,9 @@ module Homebrew
 
         <<-EOS.undent
           Your Homebrew is not installed to /usr/local
-          You can install Homebrew anywhere you want, but some brews may only build
-          correctly if you install in /usr/local. Sorry!
+          You can install Homebrew anywhere you want but some bottles (binary
+          packages) can only be used in /usr/local and some formulae (packages)
+          may not build correctly unless you install in /usr/local. Sorry!
         EOS
       end
 
