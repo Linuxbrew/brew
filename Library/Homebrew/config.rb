@@ -1,9 +1,9 @@
-if ENV["HOMEBREW_BREW_FILE"]
-  # Path to `bin/brew` main executable in {HOMEBREW_PREFIX}
-  HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
-else
-  odie "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
+unless ENV["HOMEBREW_BREW_FILE"]
+  raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
+
+# Path to `bin/brew` main executable in HOMEBREW_PREFIX
+HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
 
 # Where we link under
 HOMEBREW_PREFIX = Pathname.new(ENV["HOMEBREW_PREFIX"])
