@@ -10,6 +10,7 @@ class FormularyTest < Homebrew::TestCase
     assert_equal "SLang", Formulary.class_s("s-lang")
     assert_equal "PkgConfig", Formulary.class_s("pkg-config")
     assert_equal "FooBar", Formulary.class_s("foo_bar")
+    assert_equal "OpensslAT11", Formulary.class_s("openssl@1.1")
   end
 end
 
