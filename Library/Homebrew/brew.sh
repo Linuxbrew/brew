@@ -200,6 +200,21 @@ then
 fi
 
 check-run-command-as-root() {
+  [[ "$(id -u)" = 0 ]] || return
+  export HOMEBREW_NO_SANDBOX="1"
+
+  [[ "$HOMEBREW_COMMAND" = "services" ]] && return
+
+  onoe <<EOS
+Running Homebrew as root is extremely dangerous. As Homebrew does not
+drop privileges on installation you are giving all build scripts full access
+to your system. As a result of the OS X sandbox not handling the root user
+correctly HOMEBREW_NO_SANDBOX has been set so the sandbox will not be used. If
+we have not merged a pull request to add privilege dropping by November 1st
+2016 running Homebrew as root will be disabled. No Homebrew maintainers plan
+to work on this functionality.
+EOS
+
   case "$HOMEBREW_COMMAND" in
     analytics|create|install|link|migrate|pin|postinstall|reinstall|switch|tap|\
     tap-pin|update|upgrade|vendor-install)
@@ -208,8 +223,6 @@ check-run-command-as-root() {
       return
       ;;
   esac
-
-  [[ "$(id -u)" = 0 ]] || return
 
   local brew_file_ls_info=($(ls -nd "$HOMEBREW_BREW_FILE"))
   if [[ "${brew_file_ls_info[2]}" != 0 ]]
