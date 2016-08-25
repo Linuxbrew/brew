@@ -226,9 +226,18 @@ merge_or_rebase() {
     fi
     git merge --abort &>/dev/null
     git rebase --abort &>/dev/null
-    git -c "user.email=brew-update@localhost" \
-        -c "user.name=brew update" \
-        stash save --include-untracked "${QUIET_ARGS[@]}"
+    git reset --mixed "${QUIET_ARGS[@]}"
+    if ! git -c "user.email=brew-update@localhost" \
+             -c "user.name=brew update" \
+             stash save --include-untracked "${QUIET_ARGS[@]}"
+    then
+      odie <<EOS
+Could not `git stash` in $DIR!
+Please stash/commit manually if you need to keep your changes or, if not, run:
+  cd $DIR
+  git reset --hard origin/master
+EOS
+    fi
     git reset --hard "${QUIET_ARGS[@]}"
     STASHED="1"
   fi
