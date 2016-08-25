@@ -290,13 +290,22 @@ class Tap
 
   # path to the directory of all {Cask} files for this {Tap}.
   def cask_dir
-    @cask_dir ||= path/"Casks"
+    @cask_dir ||= [path/"Casks"].detect(&:directory?)
   end
 
   # an array of all {Formula} files of this {Tap}.
   def formula_files
     @formula_files ||= if formula_dir
-      formula_dir.children.select { |p| p.extname == ".rb" }
+      formula_dir.children.select(&method(:formula_file?))
+    else
+      []
+    end
+  end
+
+  # an array of all {Cask} files of this {Tap}.
+  def cask_files
+    @cask_files ||= if cask_dir
+      cask_dir.children.select(&method(:cask_file?))
     else
       []
     end
@@ -311,7 +320,7 @@ class Tap
     file.extname == ".rb" && file.parent == formula_dir
   end
 
-  # return true if given path would present a cask file in this {Tap}.
+  # return true if given path would present a {Cask} file in this {Tap}.
   # accepts both absolute path and relative path (relative to this {Tap}'s path)
   # @private
   def cask_file?(file)
