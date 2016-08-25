@@ -173,7 +173,7 @@ class BottleSpecificationTests < Homebrew::TestCase
 
   def test_other_setters
     double = Object.new
-    %w[root_url prefix cellar revision].each do |method|
+    %w[root_url prefix cellar rebuild].each do |method|
       @spec.send(method, double)
       assert_equal double, @spec.send(method)
     end

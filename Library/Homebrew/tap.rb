@@ -282,26 +282,7 @@ class Tap
   end
 
   def link_manpages
-    return unless (path/"man").exist?
-    conflicts = []
-    (path/"man").find do |src|
-      next if src.directory?
-      dst = HOMEBREW_PREFIX/"share"/src.relative_path_from(path)
-      next if dst.symlink? && src == dst.resolved_path
-      if dst.exist?
-        conflicts << dst
-        next
-      end
-      dst.make_relative_symlink(src)
-    end
-    unless conflicts.empty?
-      onoe <<-EOS.undent
-        Could not link #{name} manpages to:
-          #{conflicts.join("\n")}
-
-        Please delete these files and run `brew tap --repair`.
-      EOS
-    end
+    link_path_manpages(path, "brew tap --repair")
   end
 
   # uninstall this {Tap}.
@@ -341,7 +322,7 @@ class Tap
     @formula_dir ||= [path/"Formula", path/"HomebrewFormula", path].detect(&:directory?)
   end
 
-  # path to the directory of all casks for caskroom/cask {Tap}.
+  # path to the directory of all {Cask} files for this {Tap}.
   def cask_dir
     @cask_dir ||= path/"Casks"
   end

@@ -78,6 +78,7 @@ module Superenv
     # g - Enable "-stdlib=libc++" for clang.
     # h - Enable "-stdlib=libstdc++" for clang.
     # K - Don't strip -arch <arch>, -m32, or -m64
+    # w - Pass -no_weak_imports to the linker
     #
     # On 10.8 and newer, these flags will also be present:
     # s - apply fix for sed's Unicode support
@@ -277,7 +278,7 @@ module Superenv
     self["HOMEBREW_ARCHFLAGS"] = Hardware::CPU.universal_archs.as_arch_flags
 
     # GCC doesn't accept "-march" for a 32-bit CPU with "-arch x86_64"
-    if compiler != :clang && Hardware.is_32_bit?
+    if compiler != :clang && Hardware::CPU.is_32_bit?
       self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
         /-march=\S*/,
         "-Xarch_#{Hardware::CPU.arch_32_bit} \\0"

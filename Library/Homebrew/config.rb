@@ -1,9 +1,9 @@
-if ENV["HOMEBREW_BREW_FILE"]
-  # Path to `bin/brew` main executable in {HOMEBREW_PREFIX}
-  HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
-else
-  odie "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
+unless ENV["HOMEBREW_BREW_FILE"]
+  raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
+
+# Path to `bin/brew` main executable in HOMEBREW_PREFIX
+HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
 
 # Where we link under
 HOMEBREW_PREFIX = Pathname.new(ENV["HOMEBREW_PREFIX"])
@@ -35,6 +35,11 @@ HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"] ||
 
 # Must use /tmp instead of $TMPDIR because long paths break Unix domain sockets
 HOMEBREW_TEMP = Pathname.new(ENV.fetch("HOMEBREW_TEMP", "/tmp"))
+
+# Set common tmpdir environment variables to HOMEBREW_TEMP
+ENV["TMPDIR"] = HOMEBREW_TEMP
+ENV["TEMP"] = HOMEBREW_TEMP
+ENV["TMP"] = HOMEBREW_TEMP
 
 unless defined? HOMEBREW_LIBRARY_PATH
   # Root of the Homebrew code base

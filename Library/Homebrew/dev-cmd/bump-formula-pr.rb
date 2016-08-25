@@ -1,6 +1,5 @@
 #:  * `bump-formula-pr` [`--devel`] [`--dry-run`] `--url=`<url> `--sha256=`<sha-256> <formula>:
 #:  * `bump-formula-pr` [`--devel`] [`--dry-run`] `--tag=`<tag> `--revision=`<revision> <formula>:
-#:
 #:    Creates a pull request to update the formula with a new url or a new tag.
 #:
 #:    If a <url> is specified, the <sha-256> checksum of the new download must
@@ -141,15 +140,16 @@ module Homebrew
     formula.path.parent.cd do
       branch = "#{formula.name}-#{new_formula_version}"
       if ARGV.dry_run?
-        ohai "git checkout -b #{branch} origin/master"
+        ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
         ohai "hub fork --no-remote"
         ohai "hub fork"
         ohai "hub fork (to read $HUB_REMOTE)"
-        ohai "git push $HUB_REMOTE #{branch}:#{branch}"
+        ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
         ohai "hub pull-request --browse -m '#{formula.name} #{new_formula_version}#{devel_message}'"
+        ohai "git checkout -"
       else
-        safe_system "git", "checkout", "-b", branch, "origin/master"
+        safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
         safe_system "git", "commit", "--no-edit", "--verbose",
           "--message=#{formula.name} #{new_formula_version}#{devel_message}",
           "--", formula.path
@@ -157,9 +157,10 @@ module Homebrew
         quiet_system "hub", "fork"
         remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists\./, 1]
         odie "cannot get remote from 'hub'!" if remote.to_s.empty?
-        safe_system "git", "push", remote, "#{branch}:#{branch}"
+        safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
         safe_system "hub", "pull-request", "--browse", "-m",
           "#{formula.name} #{new_formula_version}#{devel_message}\n\nCreated with `brew bump-formula-pr`."
+        safe_system "git", "checkout", "-"
       end
     end
   end

@@ -53,21 +53,29 @@ class FormulaVersions
       formula_at_revision(rev) do |f|
         bottle = f.bottle_specification
         unless bottle.checksums.empty?
-          map[f.pkg_version] << bottle.revision
+          map[f.pkg_version] << bottle.rebuild
         end
       end
     end
     map
   end
 
-  def revision_map(branch)
-    map = Hash.new { |h, k| h[k] = [] }
+  def version_attributes_map(attributes, branch)
+    attributes_map = {}
+    return attributes_map if attributes.empty?
+    attributes.each do |attribute|
+      attributes_map[attribute] = Hash.new { |h, k| h[k] = [] }
+    end
+
     rev_list(branch) do |rev|
       formula_at_revision(rev) do |f|
-        map[f.stable.version] << f.revision if f.stable
-        map[f.devel.version] << f.revision if f.devel
+        attributes.each do |attribute|
+          map = attributes_map[attribute]
+          map[f.stable.version] << f.send(attribute) if f.stable
+          map[f.devel.version] << f.send(attribute) if f.devel
+        end
       end
     end
-    map
+    attributes_map
   end
 end

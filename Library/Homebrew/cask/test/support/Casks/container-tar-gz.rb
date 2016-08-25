@@ -1,0 +1,9 @@
+test_cask 'container-tar-gz' do
+  version '1.2.3'
+  sha256 'fab685fabf73d5a9382581ce8698fce9408f5feaa49fa10d9bc6c510493300f5'
+
+  url TestHelper.local_binary_url('container.tar.gz')
+  homepage 'https://example.com/container-tar-gz'
+
+  app 'container'
+end

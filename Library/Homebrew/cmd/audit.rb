@@ -9,11 +9,11 @@
 #:
 #:    If `--online` is passed, additional slower checks that require a network
 #:    connection are run.
-#
+#:
 #:    If `--new-formula` is passed, various additional checks are run that check
 #:    if a new formula is eligable for Homebrew. This should be used when creating
 #:    new formulae and implies `--strict` and `--online`.
-#
+#:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
 #:
@@ -37,8 +37,6 @@ require "cmd/style"
 require "date"
 
 module Homebrew
-  RUBY_2_OR_LATER = RUBY_VERSION.split(".").first.to_i >= 2
-
   def audit
     if ARGV.switch? "D"
       Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/)
@@ -49,7 +47,6 @@ module Homebrew
 
     new_formula = ARGV.include? "--new-formula"
     strict = new_formula || ARGV.include?("--strict")
-    style = strict && RUBY_2_OR_LATER
     online = new_formula || ARGV.include?("--online")
 
     ENV.activate_extensions!
@@ -62,14 +59,15 @@ module Homebrew
       ff = ARGV.resolved_formulae
       files = ARGV.resolved_formulae.map(&:path)
     end
-    if style
+
+    if strict
       # Check style in a single batch run up front for performance
       style_results = check_style_json(files, :realpath => true)
     end
 
     ff.each do |f|
       options = { :new_formula => new_formula, :strict => strict, :online => online }
-      options[:style_offenses] = style_results.file_offenses(f.path) if style
+      options[:style_offenses] = style_results.file_offenses(f.path) if strict
       fa = FormulaAuditor.new(f, options)
       fa.audit
 
@@ -211,6 +209,7 @@ class FormulaAuditor
       [/^  version ["'][\S\ ]+["']/,       "version"],
       [/^  (sha1|sha256) ["'][\S\ ]+["']/, "checksum"],
       [/^  revision/,                      "revision"],
+      [/^  version_scheme/,                "version_scheme"],
       [/^  head ["'][\S\ ]+["']/,          "head"],
       [/^  stable do/,                     "stable block"],
       [/^  bottle do/,                     "bottle block"],
@@ -624,22 +623,31 @@ class FormulaAuditor
     end
   end
 
-  def audit_revision
+  def audit_revision_and_version_scheme
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
 
     fv = FormulaVersions.new(formula, :max_depth => 10)
-    revision_map = fv.revision_map("origin/master")
-    revisions = revision_map[formula.version]
-    if !revisions.empty?
-      problem "revision should not decrease" if formula.revision < revisions.max
-    elsif formula.revision != 0
+    attributes = [:revision, :version_scheme]
+    attributes_map = fv.version_attributes_map(attributes, "origin/master")
+
+    attributes.each do |attribute|
+      attributes_for_version = attributes_map[attribute][formula.version]
+      if !attributes_for_version.empty?
+        if formula.send(attribute) < attributes_for_version.max
+          problem "#{attribute} should not decrease"
+        end
+      end
+    end
+
+    revision_map = attributes_map[:revision]
+    if formula.revision != 0
       if formula.stable
         if revision_map[formula.stable.version].empty? # check stable spec
-          problem "revision should be removed"
+          problem "'revision #{formula.revision}' should be removed"
         end
       else # head/devel-only formula
-        problem "revision should be removed"
+        problem "'revision #{formula.revision}' should be removed"
       end
     end
   end
@@ -663,7 +671,7 @@ class FormulaAuditor
     when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
       problem <<-EOS.undent
         use GitHub pull request URLs:
-          https://github.com/#{$1}/#{$2}/pulls/#{$3}.patch
+          https://github.com/#{$1}/#{$2}/pull/#{$3}.patch
         Rather than patch-diff:
           #{patch.url}
       EOS
@@ -1008,7 +1016,7 @@ class FormulaAuditor
     audit_formula_name
     audit_class
     audit_specs
-    audit_revision
+    audit_revision_and_version_scheme
     audit_desc
     audit_homepage
     audit_bottle_spec

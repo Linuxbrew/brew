@@ -1,7 +1,6 @@
 #:  * `missing` [<formulae>]:
-#:    Check the given <formulae> for missing dependencies.
-#:
-#:    If no <formulae> are given, check all installed brews.
+#:    Check the given <formulae> for missing dependencies. If no <formulae> are
+#:    given, check all installed brews.
 
 require "formula"
 require "tab"

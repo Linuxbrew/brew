@@ -562,11 +562,6 @@ def number_readable(number)
   numstr
 end
 
-# True if this version of Ruby supports text encodings in its strings
-def ruby_has_encoding?
-  String.method_defined?(:force_encoding)
-end
-
 # Truncates a text string to fit within a byte size constraint,
 # preserving character encoding validity. The returned string will
 # be not much longer than the specified max_bytes, though the exact
@@ -580,13 +575,8 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
 
   glue = "\n[...snip...]\n"
   max_bytes_in = [max_bytes - glue.bytesize, 1].max
-  if ruby_has_encoding?
-    bytes = s.dup.force_encoding("BINARY")
-    glue_bytes = glue.encode("BINARY")
-  else
-    bytes = s
-    glue_bytes = glue
-  end
+  bytes = s.dup.force_encoding("BINARY")
+  glue_bytes = glue.encode("BINARY")
   n_front_bytes = (max_bytes_in * front_weight).floor
   n_back_bytes = max_bytes_in - n_front_bytes
   if n_front_bytes == 0
@@ -600,10 +590,31 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
     back = bytes[-n_back_bytes..-1]
   end
   out = front + glue_bytes + back
-  if ruby_has_encoding?
-    out.force_encoding("UTF-8")
-    out.encode!("UTF-16", :invalid => :replace)
-    out.encode!("UTF-8")
-  end
+  out.force_encoding("UTF-8")
+  out.encode!("UTF-16", :invalid => :replace)
+  out.encode!("UTF-8")
   out
+end
+
+def link_path_manpages(path, command)
+  return unless (path/"man").exist?
+  conflicts = []
+  (path/"man").find do |src|
+    next if src.directory?
+    dst = HOMEBREW_PREFIX/"share"/src.relative_path_from(path)
+    next if dst.symlink? && src == dst.resolved_path
+    if dst.exist?
+      conflicts << dst
+      next
+    end
+    dst.make_relative_symlink(src)
+  end
+  unless conflicts.empty?
+    onoe <<-EOS.undent
+      Could not link #{name} manpages to:
+        #{conflicts.join("\n")}
+
+      Please delete these files and run `#{command}`.
+    EOS
+  end
 end

@@ -141,4 +141,8 @@ module Stdenv
 
     append "CFLAGS", "-I#{MacOS::X11.include}" unless MacOS::CLT.installed?
   end
+
+  def no_weak_imports
+    append "LDFLAGS", "-Wl,-no_weak_imports"
+  end
 end

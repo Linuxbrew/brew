@@ -13,7 +13,7 @@ begin
 
   formula = ARGV.resolved_formulae.first
   formula.extend(Debrew::Formula) if ARGV.debug?
-  formula.post_install
+  formula.run_post_install
 rescue Exception => e
   Marshal.dump(e, error_pipe)
   error_pipe.close

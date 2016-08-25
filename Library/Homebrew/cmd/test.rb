@@ -57,15 +57,13 @@ module Homebrew
           args << "--devel"
         end
 
-        if Sandbox.available? && !ARGV.no_sandbox?
-          Sandbox.print_sandbox_message
-        end
+        Sandbox.print_sandbox_message if Sandbox.test?
 
         Utils.safe_fork do
-          if Sandbox.available? && !ARGV.no_sandbox?
+          if Sandbox.test?
             sandbox = Sandbox.new
             f.logs.mkpath
-            sandbox.record_log(f.logs/"sandbox.test.log")
+            sandbox.record_log(f.logs/"test.sandbox.log")
             sandbox.allow_write_temp_and_cache
             sandbox.allow_write_log(f)
             sandbox.allow_write_xcode

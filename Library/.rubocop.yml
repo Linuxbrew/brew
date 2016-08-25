@@ -3,13 +3,11 @@ AllCops:
     - 'Homebrew/vendor/**/*'
     - 'Homebrew/test/vendor/**/*'
 
-# Ruby 1.8 compatibility
-Style/DotPosition:
-  EnforcedStyle: trailing
+# Whilst we now can handle the newer hash syntax of 1.9+ the
+# hash rockets are everywhere & it'd be good to change this more
+# consistently than piecemeal.
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
-Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: no_comma
 
 # ruby style guide favorite
 Style/StringLiterals:

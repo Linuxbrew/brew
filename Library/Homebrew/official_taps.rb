@@ -17,7 +17,6 @@ OFFICIAL_TAPS = %w[
 ].freeze
 
 OFFICIAL_CMD_TAPS = {
-  "caskroom/cask" => ["cask"],
   "homebrew/bundle" => ["bundle"],
   "homebrew/services" => ["services"],
 }.freeze

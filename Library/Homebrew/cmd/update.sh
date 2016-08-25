@@ -1,11 +1,12 @@
-#:  * `update` [`--merge`]:
+#:  * `update` [`--merge`] [`--force`]:
 #:    Fetch the newest version of Homebrew and all formulae from GitHub using
-#:     `git`(1).
+#:    `git`(1).
 #:
 #:    If `--merge` is specified then `git merge` is used to include updates
-#:      (rather than `git rebase`).
+#:    (rather than `git rebase`).
+#:
 #:    If `--force` is specified then always do a slower, full update check even
-#:      if unnecessary.
+#:    if unnecessary.
 
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
@@ -16,7 +17,10 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 git() {
   if [[ -z "$GIT_EXECUTABLE" ]]
   then
-    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
+    GIT_EXECUTABLE_RELATIVE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
+    GIT_EXECUTABLE_BASE="$(basename "$GIT_EXECUTABLE_RELATIVE")"
+    GIT_EXECUTABLE_DIR="$(cd "$(dirname "$GIT_EXECUTABLE_RELATIVE")" && pwd)"
+    GIT_EXECUTABLE="$GIT_EXECUTABLE_DIR/$GIT_EXECUTABLE_BASE"
   fi
   "$GIT_EXECUTABLE" "$@"
 }

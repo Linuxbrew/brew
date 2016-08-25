@@ -37,6 +37,7 @@ class Tab < OpenStruct
           "stable" => formula.stable ? formula.stable.version.to_s : nil,
           "devel" => formula.devel ? formula.devel.version.to_s : nil,
           "head" => formula.head ? formula.head.version.to_s : nil,
+          "version_scheme" => formula.version_scheme,
         }
       }
     }
@@ -85,6 +86,7 @@ class Tab < OpenStruct
         "stable" => nil,
         "devel" => nil,
         "head" => nil,
+        "version_scheme" => 0,
       }
     end
 
@@ -149,6 +151,7 @@ class Tab < OpenStruct
           "stable" => f.stable ? f.stable.version.to_s : nil,
           "devel" => f.devel ? f.devel.version.to_s : nil,
           "head" => f.head ? f.head.version.to_s : nil,
+          "version_scheme" => f.version_scheme,
         }
       }
     end
@@ -175,6 +178,7 @@ class Tab < OpenStruct
           "stable" => nil,
           "devel" => nil,
           "head" => nil,
+          "version_scheme" => 0,
         }
       }
     }
@@ -277,6 +281,10 @@ class Tab < OpenStruct
 
   def head_version
     Version.create(versions["head"]) if versions["head"]
+  end
+
+  def version_scheme
+    versions["version_scheme"] || 0
   end
 
   def source_modified_time

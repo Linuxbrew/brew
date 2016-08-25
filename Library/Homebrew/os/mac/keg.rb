@@ -1,5 +1,5 @@
 class Keg
-  if ENV["HOMEBREW_RUBY_MACHO"]
+  if !ENV["HOMEBREW_NO_RUBY_MACHO"]
     require "os/mac/ruby_keg"
     include RubyKeg
   else

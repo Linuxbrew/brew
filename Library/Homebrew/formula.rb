@@ -114,6 +114,9 @@ class Formula
   # @see .revision
   attr_reader :revision
 
+  # Used to change version schemes for packages
+  attr_reader :version_scheme
+
   # The current working directory during builds.
   # Will only be non-`nil` inside {#install}.
   attr_reader :buildpath
@@ -127,6 +130,11 @@ class Formula
   # @private
   attr_accessor :local_bottle_path
 
+  # When performing a build, test, or other loggable action, indicates which
+  # log file location to use.
+  # @private
+  attr_reader :active_log_type
+
   # The {BuildOptions} for this {Formula}. Lists the arguments passed and any
   # {#options} in the {Formula}. Note that these may differ at different times
   # during the installation of a {Formula}. This is annoying but the result of
@@ -139,6 +147,7 @@ class Formula
     @name = name
     @path = path
     @revision = self.class.revision || 0
+    @version_scheme = self.class.version_scheme || 0
 
     if path == Formulary.core_path(name)
       @tap = CoreTap.instance
@@ -432,6 +441,7 @@ class Formula
   def head_version_outdated?(version, options={})
     tab = Tab.for_keg(prefix(version))
 
+    return true if tab.version_scheme < version_scheme
     return true if stable && tab.stable_version && tab.stable_version < stable.version
     return true if devel && tab.devel_version && tab.devel_version < devel.version
 
@@ -730,10 +740,28 @@ class Formula
     prefix+".bottle"
   end
 
-  # The directory where the formula's installation logs will be written.
+  # The directory where the formula's installation or test logs will be written.
   # @private
   def logs
     HOMEBREW_LOGS+name
+  end
+
+  # The prefix, if any, to use in filenames for logging current activity
+  def active_log_prefix
+    if active_log_type
+      "#{active_log_type}."
+    else
+      ""
+    end
+  end
+
+  # Runs a block with the given log type in effect for its duration
+  def with_logging(log_type)
+    old_log_type = @active_log_type
+    @active_log_type = log_type
+    yield
+  ensure
+    @active_log_type = old_log_type
   end
 
   # This method can be overridden to provide a plist.
@@ -854,6 +882,17 @@ class Formula
   # @private
   def post_install_defined?
     method(:post_install).owner == self.class
+  end
+
+  # @private
+  def run_post_install
+    build = self.build
+    self.build = Tab.for_formula(self)
+    with_logging("post_install") do
+      post_install
+    end
+  ensure
+    self.build = build
   end
 
   # Tell the user about any caveats regarding this package.
@@ -1014,8 +1053,12 @@ class Formula
     installed_kegs.each do |keg|
       version = keg.version
       all_versions << version
+      next if version.head?
 
-      return [] if pkg_version <= version && !version.head?
+      tab = Tab.for_keg(keg)
+      next if version_scheme > tab.version_scheme
+      next if version_scheme == tab.version_scheme && pkg_version > version
+      return []
     end
 
     head_version = latest_head_version
@@ -1291,6 +1334,7 @@ class Formula
         "head" => (head.version.to_s if head)
       },
       "revision" => revision,
+      "version_scheme" => version_scheme,
       "installed" => [],
       "linked_keg" => (linked_keg.resolved_path.basename.to_s if linked_keg.exist?),
       "pinned" => pinned?,
@@ -1323,7 +1367,7 @@ class Formula
       next unless spec.bottle_defined?
       bottle_spec = spec.bottle_specification
       bottle_info = {
-        "revision" => bottle_spec.revision,
+        "rebuild" => bottle_spec.rebuild,
         "cellar" => (cellar = bottle_spec.cellar).is_a?(Symbol) ? \
                     cellar.inspect : cellar,
         "prefix" => bottle_spec.prefix,
@@ -1333,7 +1377,7 @@ class Formula
       bottle_spec.collector.keys.each do |os|
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
-          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.revision)}",
+          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",
           checksum.hash_type.to_s => checksum.hexdigest,
         }
       end
@@ -1377,7 +1421,9 @@ class Formula
       ENV["HOME"] = @testpath
       setup_home @testpath
       begin
-        test
+        with_logging("test") do
+          test
+        end
       rescue Exception
         staging.retain! if ARGV.debug?
         raise
@@ -1469,7 +1515,7 @@ class Formula
 
     @exec_count ||= 0
     @exec_count += 1
-    logfn = "#{logs}/%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
+    logfn = "#{logs}/#{active_log_prefix}%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
     logs.mkpath
 
     File.open(logfn, "w") do |log|
@@ -1698,6 +1744,18 @@ class Formula
     # <pre>revision 1</pre>
     attr_rw :revision
 
+    # @!attribute [w] version_scheme
+    # Used for creating new Homebrew versions schemes. For example, if we want
+    # to change version scheme from one to another, then we may need to update
+    # `version_scheme` of this {Formula} to be able to use new version scheme.
+    # E.g. to move from 20151020 scheme to 1.0.0 we need to increment
+    # `version_scheme`. Without this, the prior scheme will always equate to a
+    # higher version.
+    # `0` if unset.
+    #
+    # <pre>version_scheme 1</pre>
+    attr_rw :version_scheme
+
     # A list of the {.stable}, {.devel} and {.head} {SoftwareSpec}s.
     # @private
     def specs
@@ -1770,7 +1828,7 @@ class Formula
     #   root_url "https://example.com" # Optional root to calculate bottle URLs
     #   prefix "/opt/homebrew" # Optional HOMEBREW_PREFIX in which the bottles were built.
     #   cellar "/opt/homebrew/Cellar" # Optional HOMEBREW_CELLAR in which the bottles were built.
-    #   revision 1 # Making the old bottle outdated without bumping the version/revision of the formula.
+    #   rebuild 1 # Making the old bottle outdated without bumping the version/revision of the formula.
     #   sha256 "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865" => :el_capitan
     #   sha256 "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3" => :yosemite
     #   sha256 "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2" => :mavericks

@@ -1,4 +1,12 @@
+unless ENV["HOMEBREW_BREW_FILE"]
+  raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
+end
+
 std_trap = trap("INT") { exit! 130 } # no backtrace thanks
+
+# check ruby version before requiring any modules.
+RUBY_TWO = RUBY_VERSION.split(".").first.to_i >= 2
+raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
 
 require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
@@ -9,13 +17,6 @@ if ARGV == %w[--version] || ARGV == %w[-v]
   puts "Homebrew #{Homebrew.homebrew_version_string}"
   puts "Homebrew/homebrew-core #{Homebrew.core_tap_version_string}"
   exit 0
-end
-
-if OS.mac? && MacOS.version < "10.6"
-  abort <<-EOABORT.undent
-    Homebrew requires Snow Leopard or higher. For Tiger and Leopard support, see:
-    https://github.com/mistydemeo/tigerbrew
-  EOABORT
 end
 
 def require?(path)
@@ -53,6 +54,9 @@ begin
   Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/cmd"].each do |tap_cmd_dir|
     ENV["PATH"] += "#{File::PATH_SEPARATOR}#{tap_cmd_dir}"
   end
+
+  # Add cask commands to PATH.
+  ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_LIBRARY}/Homebrew/cask/cmd"
 
   # Add SCM wrappers.
   ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_SHIMS_PATH}/scm"

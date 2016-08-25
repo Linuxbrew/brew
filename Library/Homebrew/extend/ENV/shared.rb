@@ -308,6 +308,9 @@ module SharedEnvExtension
 
   def permit_arch_flags; end
 
+  # A no-op until we enable this by default again (which we may never do).
+  def permit_weak_imports; end
+
   private
 
   def cc=(val)
@@ -344,3 +347,5 @@ module SharedEnvExtension
     version && Version.create(version) >= Version.create("4.8")
   end
 end
+
+require "extend/os/extend/ENV/shared"

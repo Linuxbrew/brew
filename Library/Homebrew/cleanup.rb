@@ -121,11 +121,12 @@ module Homebrew
         map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }
       workers = (0...Hardware::CPU.cores).map do
         Thread.new do
-          begin
-            while p = paths.pop(true)
-              quiet_system "find", p, "-name", ".DS_Store", "-delete"
+          Kernel.loop do
+            begin
+              quiet_system "find", paths.deq(true), "-name", ".DS_Store", "-delete"
+            rescue ThreadError
+              break # if queue is empty
             end
-          rescue ThreadError # ignore empty queue error
           end
         end
       end

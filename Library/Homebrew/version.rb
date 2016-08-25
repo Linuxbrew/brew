@@ -294,6 +294,8 @@ class Version
       spec.basename.to_s
     elsif %r{((?:sourceforge\.net|sf\.net)/.*)/download$}.match(spec_s)
       Pathname.new(spec.dirname).stem
+    elsif %r{\.[^a-zA-Z]+$}.match(spec_s)
+      Pathname.new(spec_s).basename
     else
       spec.stem
     end

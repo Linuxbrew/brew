@@ -445,8 +445,9 @@ module Homebrew
 
         <<-EOS.undent
           Your Homebrew is not installed to /usr/local
-          You can install Homebrew anywhere you want, but some brews may only build
-          correctly if you install in /usr/local. Sorry!
+          You can install Homebrew anywhere you want but some bottles (binary
+          packages) can only be used in /usr/local and some formulae (packages)
+          may not build correctly unless you install in /usr/local. Sorry!
         EOS
       end
 
@@ -1037,7 +1038,7 @@ module Homebrew
         return unless Utils.git_available?
 
         timestamp = if File.directory?("#{HOMEBREW_REPOSITORY}/.git")
-          HOMEBREW_REPOSITORY.cd { `git log -1 --format="%ct" HEAD`.to_i }
+          HOMEBREW_REPOSITORY.cd { `git log -1 --format="%ct" HEAD --`.to_i }
         else
           HOMEBREW_LIBRARY.mtime.to_i
         end

@@ -15,6 +15,7 @@ module Homebrew
       ]
       Dir.glob(scan_files).each do |rb|
         next if rb.include?("/vendor/")
+        next if rb.include?("/cask/")
         ruby_files << rb
       end
 
