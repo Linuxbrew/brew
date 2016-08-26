@@ -37,7 +37,7 @@ def odebug(title, *sput)
     if $stdout.tty? && title.to_s.length > width
       title = title.to_s[0, width - 3] + "..."
     end
-    puts "#{Tty.magenta}==> #{title}#{Tty.reset}"
+    puts "#{Tty.magenta}==>#{Tty.reset} #{Tty.white}#{title}#{Tty.reset}"
     puts sput unless sput.empty?
   end
 end

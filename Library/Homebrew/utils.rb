@@ -25,6 +25,10 @@ class Tty
       bold 39
     end
 
+    def magenta
+      bold 35
+    end
+
     def red
       underline 31
     end
