@@ -132,7 +132,7 @@ The options \fB\-\-set\-name\fR and \fB\-\-set\-version\fR each take an argument
 The option \fB\-\-tap\fR takes a tap as its argument and generates the formula in the specified tap\.
 .
 .TP
-\fBdeps\fR [\fB\-\-1\fR] [\fB\-n\fR] [\fB\-\-union\fR] [\fB\-\-installed\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] \fIformulae\fR
+\fBdeps\fR [\fB\-\-1\fR] [\fB\-n\fR] [\fB\-\-union\fR] [\fB\-\-full\-name\fR] [\fB\-\-installed\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] \fIformulae\fR
 Show dependencies for \fIformulae\fR\. When given multiple formula arguments, show the intersection of dependencies for \fIformulae\fR\.
 .
 .IP
@@ -143,6 +143,9 @@ If \fB\-n\fR is passed, show dependencies in topological order\.
 .
 .IP
 If \fB\-\-union\fR is passed, show the union of dependencies for \fIformulae\fR, instead of the intersection\.
+.
+.IP
+If \fB\-\-full\-name\fR is passed, list dependencies by their full name\.
 .
 .IP
 If \fB\-\-installed\fR is passed, only list those dependencies that are currently installed\.

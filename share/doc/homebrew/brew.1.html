@@ -100,7 +100,7 @@ you to explicitly set the name and version of the package you are creating.</p>
 
 <p>The option <code>--tap</code> takes a tap as its argument and generates the formula in
 the specified tap.</p></dd>
-<dt><code>deps</code> [<code>--1</code>] [<code>-n</code>] [<code>--union</code>] [<code>--installed</code>] [<code>--include-build</code>] [<code>--include-optional</code>] [<code>--skip-recommended</code>] <var>formulae</var></dt><dd><p>Show dependencies for <var>formulae</var>. When given multiple formula arguments,
+<dt><code>deps</code> [<code>--1</code>] [<code>-n</code>] [<code>--union</code>] [<code>--full-name</code>] [<code>--installed</code>] [<code>--include-build</code>] [<code>--include-optional</code>] [<code>--skip-recommended</code>] <var>formulae</var></dt><dd><p>Show dependencies for <var>formulae</var>. When given multiple formula arguments,
 show the intersection of dependencies for <var>formulae</var>.</p>
 
 <p>If <code>--1</code> is passed, only show dependencies one level down, instead of
@@ -110,6 +110,8 @@ recursing.</p>
 
 <p>If <code>--union</code> is passed, show the union of dependencies for <var>formulae</var>,
 instead of the intersection.</p>
+
+<p>If <code>--full-name</code> is passed, list dependencies by their full name.</p>
 
 <p>If <code>--installed</code> is passed, only list those dependencies that are
 currently installed.</p>
