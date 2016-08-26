@@ -33,15 +33,6 @@ Similarly, Pip can be used to upgrade itself via:
 
 The normal `pip install --user` is disabled for brewed Python. This is because of a bug in distutils, because Homebrew writes a `distutils.cfg` which sets the package `prefix`.
 
-A possible workaround (which puts executable scripts in `~/Library/Python/<X>.<Y>/bin`) is:
-
-    pip install --user --install-option="--prefix=" <package-name>
-
-You can make this "empty prefix" the default by adding a `~/.pydistutils.cfg` file with the following contents:
-
-    [install]
-    prefix=
-
 ## `site-packages` and the `PYTHONPATH`
 
 The `site-packages` is a directory that contains Python modules (especially bindings installed by other formulae). Homebrew creates it here:
