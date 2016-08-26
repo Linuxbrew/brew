@@ -888,11 +888,18 @@ class Formula
   def run_post_install
     build = self.build
     self.build = Tab.for_formula(self)
+    old_tmpdir = ENV["TMPDIR"]
+    old_temp = ENV["TEMP"]
+    old_tmp = ENV["TMP"]
+    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
     with_logging("post_install") do
       post_install
     end
   ensure
     self.build = build
+    ENV["TMPDIR"] = old_tmpdir
+    ENV["TEMP"] = old_temp
+    ENV["TMP"] = old_tmp
   end
 
   # Tell the user about any caveats regarding this package.
@@ -1411,7 +1418,11 @@ class Formula
   def run_test
     old_home = ENV["HOME"]
     old_curl_home = ENV["CURL_HOME"]
+    old_tmpdir = ENV["TMPDIR"]
+    old_temp = ENV["TEMP"]
+    old_tmp = ENV["TMP"]
     ENV["CURL_HOME"] = old_curl_home || old_home
+    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
     mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
@@ -1430,6 +1441,9 @@ class Formula
     @testpath = nil
     ENV["HOME"] = old_home
     ENV["CURL_HOME"] = old_curl_home
+    ENV["TMPDIR"] = old_tmpdir
+    ENV["TEMP"] = old_temp
+    ENV["TMP"] = old_tmp
   end
 
   # @private
