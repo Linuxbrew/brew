@@ -38,8 +38,8 @@ If they accept, follow a few steps to get them set up:
 
 - [x] Invite them to the [**@Homebrew/maintainers** team](https://github.com/orgs/Homebrew/teams/maintainers) to give them write access to all repositories (but don't make them owners yet)
 - [x] Ask them to sign up for a [Bintray](https://bintray.com) account and invite them to [Bintray's Homebrew organisation](https://bintray.com/homebrew/organization/edit/members) as a member (but not administrator access yet) so they can publish new bottles
-- [x] Add them to the [Jenkins' GitHub Authorization Settings admin user names](http://bot.brew.sh/configureSecurity/) so they can adjust settings and restart jobs
-- [x] Add them to the [Jenkins' GitHub Pull Request Builder admin list](http://bot.brew.sh/configure) to enable `@BrewTestBot test this please` for them
+- [x] Add them to the [Jenkins' GitHub Authorization Settings admin user names](https://bot.brew.sh/configureSecurity/) so they can adjust settings and restart jobs
+- [x] Add them to the [Jenkins' GitHub Pull Request Builder admin list](https://bot.brew.sh/configure) to enable `@BrewTestBot test this please` for them
 - [x] Invite them to the [`homebrew-dev` private maintainers mailing list](https://groups.google.com/forum/#!managemembers/homebrew-dev/invite)
 - [x] Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites)
 - [x] Add them to [Homebrew's README](https://github.com/Homebrew/brew/edit/master/README.md)
