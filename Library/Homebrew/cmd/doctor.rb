@@ -42,7 +42,7 @@ module Homebrew
       next if out.nil? || out.empty?
       if first_warning
         $stderr.puts <<-EOS.undent
-            #{Tty.white}Please note that these warnings are just used to help the Homebrew maintainers
+            #{Tty.bold}Please note that these warnings are just used to help the Homebrew maintainers
             with debugging if you file an issue. If everything you use Homebrew for is
             working fine: please don't worry and just ignore them. Thanks!#{Tty.reset}
         EOS

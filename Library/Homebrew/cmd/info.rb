@@ -117,7 +117,7 @@ module Homebrew
 
     puts "#{f.full_name}: #{specs * ", "}#{" [#{attrs * ", "}]" unless attrs.empty?}"
     puts f.desc if f.desc
-    puts "#{Tty.em}#{f.homepage}#{Tty.reset}" if f.homepage
+    puts "#{Tty.underline}#{f.homepage}#{Tty.reset}" if f.homepage
 
     conflicts = f.conflicts.map(&:name).sort!
     puts "Conflicts with: #{conflicts*", "}" unless conflicts.empty?
@@ -133,7 +133,7 @@ module Homebrew
       end
     end
 
-    puts "From: #{Tty.em}#{github_info(f)}#{Tty.reset}"
+    puts "From: #{Tty.underline}#{github_info(f)}#{Tty.reset}"
 
     unless f.deps.empty?
       ohai "Dependencies"

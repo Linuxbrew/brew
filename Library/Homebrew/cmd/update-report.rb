@@ -282,7 +282,7 @@ module Homebrew
     EOS
   rescue => e
     ofail <<-EOS.undent
-      #{Tty.white}Failed to migrate HOMEBREW_REPOSITORY to #{new_homebrew_repository}!
+      #{Tty.bold}Failed to migrate HOMEBREW_REPOSITORY to #{new_homebrew_repository}!#{Tty.reset}
       The error was:
         #{e}
       Please try to resolve this error yourself and then run `brew update` again to

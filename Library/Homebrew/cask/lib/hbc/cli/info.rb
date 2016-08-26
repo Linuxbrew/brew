@@ -27,7 +27,7 @@ module Hbc
       end
 
       def self.formatted_url(url)
-        "#{Tty.em}#{url}#{Tty.reset}"
+        "#{Tty.underline}#{url}#{Tty.reset}"
       end
 
       def self.installation_info(cask)

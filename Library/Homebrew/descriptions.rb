@@ -124,7 +124,7 @@ class Descriptions
       short_name = short_names[full_name]
       printed_name = short_name_counts[short_name] == 1 ? short_name : full_name
       description = @descriptions[full_name] || blank
-      puts "#{Tty.white}#{printed_name}:#{Tty.reset} #{description}"
+      puts "#{Tty.bold}#{printed_name}:#{Tty.reset} #{description}"
     end
   end
 

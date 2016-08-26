@@ -153,7 +153,7 @@ class Migrator
     end
 
     begin
-      oh1 "Migrating #{Tty.green}#{oldname}#{Tty.white} to #{Tty.green}#{newname}#{Tty.reset}"
+      oh1 "Migrating #{Tty.green}#{oldname}#{Tty.reset} to #{Tty.green.bold}#{newname}#{Tty.reset}"
       lock
       unlink_oldname
       move_to_new_directory

@@ -30,7 +30,7 @@ module Hbc
           begin
             Homebrew.install_gem_setup_path! "rubocop-cask", RUBOCOP_CASK_VERSION, "rubocop"
           rescue SystemExit
-            raise CaskError, $stderr.string.chomp.sub("#{Tty.red}Error#{Tty.reset}: ", "")
+            raise CaskError, Tty.strip_ansi($stderr.string).chomp.sub(/\AError: /, "")
           end
         end
       end

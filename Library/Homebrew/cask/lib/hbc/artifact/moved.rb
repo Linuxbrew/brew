@@ -81,11 +81,10 @@ module Hbc
         if target.exist?
           target_abv = " (#{target.abv})"
         else
-          warning = "Missing #{self.class.artifact_english_name}"
-          warning = "#{Tty.red}#{warning}#{Tty.reset}: "
+          error = "#{Tty.red}Missing #{self.class.artifact_english_name}:#{Tty.reset} "
         end
 
-        "#{warning}#{printable_target}#{target_abv}"
+        "#{error}#{printable_target}#{target_abv}"
       end
     end
   end
