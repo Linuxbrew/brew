@@ -35,11 +35,6 @@ HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"] || "~/Library/Logs/Homebrew/")
 # Must use /tmp instead of $TMPDIR because long paths break Unix domain sockets
 HOMEBREW_TEMP = Pathname.new(ENV.fetch("HOMEBREW_TEMP", "/tmp"))
 
-# Set common tmpdir environment variables to HOMEBREW_TEMP
-ENV["TMPDIR"] = HOMEBREW_TEMP
-ENV["TEMP"] = HOMEBREW_TEMP
-ENV["TMP"] = HOMEBREW_TEMP
-
 unless defined? HOMEBREW_LIBRARY_PATH
   # Root of the Homebrew code base
   HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent

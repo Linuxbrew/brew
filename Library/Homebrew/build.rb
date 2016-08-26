@@ -103,6 +103,11 @@ class Build
       end
     end
 
+    old_tmpdir = ENV["TMPDIR"]
+    old_temp = ENV["TEMP"]
+    old_tmp = ENV["TMP"]
+    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
+
     formula.extend(Debrew::Formula) if ARGV.debug?
 
     formula.brew do |_formula, staging|
@@ -139,6 +144,10 @@ class Build
         formula.prefix.install_metafiles formula.libexec if formula.libexec.exist?
       end
     end
+  ensure
+    ENV["TMPDIR"] = old_tmpdir
+    ENV["TEMP"] = old_temp
+    ENV["TMP"] = old_tmp
   end
 
   def detect_stdlibs(compiler)
