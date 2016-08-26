@@ -773,7 +773,7 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
 
     assert_match "Testing URLs require `--bottle`!",
-      cmd_fail("pull", "http://bot.brew.sh/job/Homebrew\%20Testing/1028/")
+      cmd_fail("pull", "https://bot.brew.sh/job/Homebrew\%20Testing/1028/")
     assert_match "Current branch is new-branch",
       cmd_fail("pull", "1")
     assert_match "No changed formulae found to bump",
