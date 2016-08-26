@@ -3,7 +3,7 @@
 by [our Kickstarter in 2013](https://www.kickstarter.com/projects/homebrew/brew-test-bot).
 
 It comprises of four Mac Minis running in a data centre in England which host
-[a Jenkins instance at http://bot.brew.sh](http://bot.brew.sh) and run the
+[a Jenkins instance at https://bot.brew.sh](https://bot.brew.sh) and run the
 [`brew test-bot.rb`](https://github.com/Homebrew/brew/blob/master/Library/Homebrew/dev-cmd/test-bot.rb)
 Ruby script to perform automated testing of commits to the master branch, pull
 requests and custom builds requested by maintainers.
@@ -55,7 +55,7 @@ A failed build looks like this:
 ---
 
 You can click the test results link
-(e.g. `brew-test-bot.Homebrew/homebrew/pull/22183-3c17deb.install embree`) to
+(e.g. `brew-test-bot.el_capitan.install openssl`) to
 view the failed test output:
 
 ![Failed Test](images/brew-test-bot-failed-test.png)
