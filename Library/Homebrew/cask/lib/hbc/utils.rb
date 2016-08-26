@@ -5,7 +5,6 @@ require "open3"
 require "stringio"
 
 require "hbc/utils/file"
-require "hbc/utils/tty"
 
 UPDATE_CMD = "brew uninstall --force brew-cask; brew untap phinze/cask; brew untap caskroom/cask; brew update; brew cleanup; brew cask cleanup".freeze
 ISSUES_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
@@ -34,11 +33,11 @@ end
 
 def odebug(title, *sput)
   if Hbc.respond_to?(:debug) && Hbc.debug
-    width = Hbc::Utils::Tty.width * 4 - 6
+    width = Tty.width * 4 - 6
     if $stdout.tty? && title.to_s.length > width
       title = title.to_s[0, width - 3] + "..."
     end
-    puts "#{Hbc::Utils::Tty.magenta.bold}==>#{Hbc::Utils::Tty.reset.bold} #{title}#{Hbc::Utils::Tty.reset}"
+    puts "#{Tty.magenta}==> #{title}#{Tty.reset}"
     puts sput unless sput.empty?
   end
 end
@@ -151,14 +150,13 @@ module Hbc::Utils
 
   def self.error_message_with_suggestions
     <<-EOS.undent
-    #{Hbc::Utils::Tty.reset.bold}
       Most likely, this means you have an outdated version of Homebrew-Cask. Please run:
 
-          #{Hbc::Utils::Tty.green.normal}#{UPDATE_CMD}
+          #{Tty.green}#{UPDATE_CMD}
 
-      #{Hbc::Utils::Tty.reset.bold}If this doesn’t fix the problem, please report this bug:
+      #{Tty.reset}If this doesn’t fix the problem, please report this bug:
 
-          #{Hbc::Utils::Tty.underline}#{ISSUES_URL}#{Hbc::Utils::Tty.reset}
+          #{Tty.em}#{ISSUES_URL}#{Tty.reset}
 
     EOS
   end

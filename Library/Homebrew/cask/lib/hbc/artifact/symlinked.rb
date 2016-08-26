@@ -57,7 +57,7 @@ class Hbc::Artifact::Symlinked < Hbc::Artifact::Relocated
 
     return unless self.class.islink?(target)
 
-    link_description = "#{Hbc::Utils::Tty.red.underline}Broken Link#{Hbc::Utils::Tty.reset}: " unless target.exist?
+    link_description = "#{Tty.red}Broken Link#{Tty.reset}: " unless target.exist?
     target_readlink_abv = " (#{target.readlink.abv})" if target.readlink.exist?
 
     "#{link_description}#{printable_target} -> #{target.readlink}#{target_readlink_abv}"
