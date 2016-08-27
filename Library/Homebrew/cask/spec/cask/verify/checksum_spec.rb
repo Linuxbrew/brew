@@ -21,25 +21,25 @@ describe Hbc::Verify::Checksum do
     context "sha256 is :no_check" do
       let(:sha256) { :no_check }
 
-      it { should == false }
+      it { is_expected.to be false }
     end
 
     context "sha256 is nil" do
       let(:sha256) { nil }
 
-      it { should == true }
+      it { is_expected.to be true }
     end
 
     context "sha256 is empty" do
       let(:sha256) { "" }
 
-      it { should == true }
+      it { is_expected.to be true }
     end
 
     context "sha256 is a valid shasum" do
       let(:sha256) { random_sha256 }
 
-      it { should == true }
+      it { is_expected.to be true }
     end
   end
 
@@ -56,7 +56,7 @@ describe Hbc::Verify::Checksum do
       let(:sha256) { computed }
 
       it "does not raise an error" do
-        expect { subject }.to_not raise_error
+        expect { subject }.not_to raise_error
       end
     end
 
@@ -64,7 +64,7 @@ describe Hbc::Verify::Checksum do
       let(:sha256) { :no_check }
 
       it "does not raise an error" do
-        expect { subject }.to_not raise_error
+        expect { subject }.not_to raise_error
       end
     end
 

@@ -38,7 +38,7 @@ describe Hbc::Verify do
     end
 
     it "excludes inapplicable verifications" do
-      expect(subject).to_not include(inapplicable_verification_class)
+      expect(subject).not_to include(inapplicable_verification_class)
     end
   end
 
@@ -58,7 +58,7 @@ describe Hbc::Verify do
 
     it "runs only applicable verifications" do
       expect(applicable_verification).to receive(:verify)
-      expect(inapplicable_verification).to_not receive(:verify)
+      expect(inapplicable_verification).not_to receive(:verify)
       subject
     end
   end
