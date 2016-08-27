@@ -65,7 +65,7 @@ describe Hbc::CLI::Style do
       end
 
       it "exits successfully" do
-        expect { subject }.to_not raise_error
+        expect { subject }.not_to raise_error
       end
     end
 
@@ -198,27 +198,27 @@ describe Hbc::CLI::Style do
 
     context "when --fix is passed as an argument" do
       let(:args) { ["adium", "--fix"] }
-      it { should be_truthy }
+      it { is_expected.to be_truthy }
     end
 
     context "when --correct is passed as an argument" do
       let(:args) { ["adium", "--correct"] }
-      it { should be_truthy }
+      it { is_expected.to be_truthy }
     end
 
     context "when --auto-correct is passed as an argument" do
       let(:args) { ["adium", "--auto-correct"] }
-      it { should be_truthy }
+      it { is_expected.to be_truthy }
     end
 
     context "when --auto-correct is misspelled as --autocorrect" do
       let(:args) { ["adium", "--autocorrect"] }
-      it { should be_truthy }
+      it { is_expected.to be_truthy }
     end
 
     context "when no flag equivalent to --fix is passed as an argument" do
       let(:args) { ["adium"] }
-      it { should be_falsey }
+      it { is_expected.to be_falsey }
     end
   end
 end
