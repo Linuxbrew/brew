@@ -154,10 +154,10 @@ module Homebrew
 
       orig_message = message = `git log HEAD^.. --format=%B`
       if issue && !ARGV.include?("--clean")
-          slug = if (url_match = url.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
-            _, user, repo = *url_match
-            "#{user}/#{repo}"
-          end
+        slug = if (url_match = url.match HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
+          _, user, repo = *url_match
+          "#{user}/#{repo}"
+        end
         ohai "Patch closes issue ##{issue}"
         close_message = "Closes #{slug}##{issue}."
         # If this is a pull request, append a close message.
