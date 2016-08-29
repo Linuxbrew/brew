@@ -79,6 +79,7 @@ module Homebrew
         odie "No pull request detected!"
       end
 
+      tap = Tap.fetch(ARGV.value("tap")) if ARGV.value("tap")
       if tap
         tap.install unless tap.installed?
         Dir.chdir tap.path
