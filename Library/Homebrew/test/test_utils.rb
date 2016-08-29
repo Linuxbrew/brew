@@ -244,4 +244,13 @@ class UtilTests < Homebrew::TestCase
     assert_match "homebrew/homebrew-core", e.message
     assert_match "homebrew/core", e.message
   end
+
+  def test_bottles_bintray
+    assert_equal "openssl:1.1", Utils::Bottles::Bintray.package("openssl@1.1")
+    assert_equal "gtkx", Utils::Bottles::Bintray.package("gtk+")
+    assert_equal "llvm", Utils::Bottles::Bintray.package("llvm")
+
+    tap = Tap.new("homebrew", "bintray-test")
+    assert_equal "bottles-bintray-test", Utils::Bottles::Bintray.repository(tap)
+  end
 end
