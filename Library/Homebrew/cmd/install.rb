@@ -227,6 +227,12 @@ module Homebrew
       out = checks.send(check)
       opoo out unless out.nil?
     end
+    if OS.mac? && MacOS.prerelease?
+      checks.strict_development_tools_checks.each do |strict_check|
+        out = checks.send(strict_check)
+        odie out unless out.nil?
+      end
+    end
   end
 
   def check_macports
