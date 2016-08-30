@@ -57,7 +57,7 @@ class Formulary
     class_name = name.capitalize
     class_name.gsub!(/[-_.\s]([a-zA-Z0-9])/) { $1.upcase }
     class_name.tr!("+", "x")
-    class_name.gsub!(/\b@\b/, "AT")
+    class_name.sub!(/(.)@(\d)/, "\\1AT\\2")
     class_name
   end
 
