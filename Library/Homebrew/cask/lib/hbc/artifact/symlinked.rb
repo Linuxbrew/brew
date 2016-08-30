@@ -57,12 +57,17 @@ module Hbc
       def summarize_artifact(artifact_spec)
         load_specification artifact_spec
 
-        return unless self.class.islink?(target)
+        if self.class.islink?(target) && target.exist? && target.readlink.exist?
+          "#{printable_target} -> #{target.readlink} (#{target.readlink.abv})"
+        else
+          string = if self.class.islink?(target)
+                     "#{printable_target} -> #{target.readlink}"
+                   else
+                     printable_target
+                   end
 
-        link_description = "#{Tty.red}Broken Link#{Tty.reset}: " unless target.exist?
-        target_readlink_abv = " (#{target.readlink.abv})" if target.readlink.exist?
-
-        "#{link_description}#{printable_target} -> #{target.readlink}#{target_readlink_abv}"
+          Formatter.error(string, label: "Broken Link")
+        end
       end
     end
   end

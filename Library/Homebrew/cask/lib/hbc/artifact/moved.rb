@@ -79,12 +79,10 @@ module Hbc
         load_specification artifact_spec
 
         if target.exist?
-          target_abv = " (#{target.abv})"
+          "#{printable_target} (#{target.abv})"
         else
-          error = "#{Tty.red}Missing #{self.class.artifact_english_name}:#{Tty.reset} "
+          Formatter.error(printable_target, label: "Missing #{self.class.artifact_english_name}")
         end
-
-        "#{error}#{printable_target}#{target_abv}"
       end
     end
   end

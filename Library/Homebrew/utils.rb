@@ -1,6 +1,7 @@
 require "pathname"
 require "emoji"
 require "exceptions"
+require "utils/formatter"
 require "utils/hash"
 require "utils/json"
 require "utils/inreplace"
@@ -14,7 +15,7 @@ require "utils/tty"
 
 def ohai(title, *sput)
   title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
-  puts "#{Tty.blue}==>#{Tty.reset} #{Tty.bold}#{title}#{Tty.reset}"
+  puts Formatter.headline(title, color: :blue)
   puts sput
 end
 
@@ -22,16 +23,16 @@ def oh1(title, options = {})
   if $stdout.tty? && !ARGV.verbose? && options.fetch(:truncate, :auto) == :auto
     title = Tty.truncate(title)
   end
-  puts "#{Tty.green}==>#{Tty.reset} #{Tty.bold}#{title}#{Tty.reset}"
+  puts Formatter.headline(title, color: :green)
 end
 
 # Print a warning (do this rarely)
-def opoo(warning)
-  $stderr.puts "#{Tty.yellow.underline}Warnin#{Tty.reset.yellow}g:#{Tty.reset} #{warning}"
+def opoo(message)
+  $stderr.puts Formatter.warning(message, label: "Warning")
 end
 
-def onoe(error)
-  $stderr.puts "#{Tty.red.underline}Error#{Tty.reset.red}:#{Tty.reset} #{error}"
+def onoe(message)
+  $stderr.puts Formatter.error(message, label: "Error")
 end
 
 def ofail(error)
@@ -97,9 +98,9 @@ def pretty_installed(f)
   if !$stdout.tty?
     f.to_s
   elsif Emoji.enabled?
-    "#{Tty.bold}#{f} #{Tty.green}#{Emoji.tick}#{Tty.reset}"
+    "#{Tty.bold}#{f} #{Formatter.success(Emoji.tick)}#{Tty.reset}"
   else
-    "#{Tty.green.bold}#{f} (installed)#{Tty.reset}"
+    Formatter.success("#{Tty.bold}#{f} (installed)#{Tty.reset}")
   end
 end
 
@@ -107,9 +108,9 @@ def pretty_uninstalled(f)
   if !$stdout.tty?
     f.to_s
   elsif Emoji.enabled?
-    "#{Tty.bold}#{f} #{Tty.red}#{Emoji.cross}#{Tty.reset}"
+    "#{Tty.bold}#{f} #{Formatter.error(Emoji.cross)}#{Tty.reset}"
   else
-    "#{Tty.red.bold}#{f} (uninstalled)#{Tty.reset}"
+    Formatter.error("#{Tty.bold}#{f} (uninstalled)#{Tty.reset}")
   end
 end
 

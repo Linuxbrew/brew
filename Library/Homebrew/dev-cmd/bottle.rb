@@ -54,7 +54,7 @@ module Homebrew
 
       return if @put_filenames.include? filename
 
-      puts "#{Tty.red}#{filename}#{Tty.reset}"
+      puts Formatter.error(filename.to_s)
       @put_filenames << filename
     end
 

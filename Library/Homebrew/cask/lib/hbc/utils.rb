@@ -32,7 +32,7 @@ end
 def odebug(title, *sput)
   return unless Hbc.respond_to?(:debug)
   return unless Hbc.debug
-  puts "#{Tty.magenta}==>#{Tty.reset} #{Tty.white}#{title}#{Tty.reset}"
+  puts Formatter.headline(title, color: :magenta)
   puts sput unless sput.empty?
 end
 
@@ -146,12 +146,10 @@ module Hbc
     def self.error_message_with_suggestions
       <<-EOS.undent
         Most likely, this means you have an outdated version of Homebrew-Cask. Please run:
-
-          #{Tty.green}#{UPDATE_CMD}#{Tty.reset}
+          #{UPDATE_CMD}
 
         If this doesn’t fix the problem, please report this bug:
-
-          #{Tty.underline}#{ISSUES_URL}#{Tty.reset}
+          #{Formatter.url(ISSUES_URL)}
 
       EOS
     end

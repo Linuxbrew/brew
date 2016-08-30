@@ -147,8 +147,8 @@ rescue Exception => e
   Utils::Analytics.report_exception(e)
   onoe e
   if internal_cmd && defined?(OS::ISSUES_URL)
-    $stderr.puts "Please report this bug:"
-    $stderr.puts "    #{Tty.underline}#{OS::ISSUES_URL}#{Tty.reset}"
+    $stderr.puts "#{Tty.bold}Please report this bug:#{Tty.reset}"
+    $stderr.puts "  #{Formatter.url(OS::ISSUES_URL)}"
   end
   $stderr.puts e.backtrace
   exit 1

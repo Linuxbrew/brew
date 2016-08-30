@@ -318,7 +318,7 @@ class BuildError < RuntimeError
   def dump
     if !ARGV.verbose?
       puts
-      puts "#{Tty.red.underline}READ THIS#{Tty.reset.red}:#{Tty.reset} #{Tty.underline}#{OS::ISSUES_URL}#{Tty.reset}"
+      puts Formatter.error("READ THIS: #{Formatter.url(OS::ISSUES_URL)}")
       if formula.tap
         case formula.tap.name
         when "homebrew/boneyard"

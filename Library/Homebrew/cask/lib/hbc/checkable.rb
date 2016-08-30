@@ -28,11 +28,11 @@ module Hbc
 
     def result
       if errors?
-        "#{Tty.red}failed#{Tty.reset}"
+        Formatter.error("failed")
       elsif warnings?
-        "#{Tty.yellow}warning#{Tty.reset}"
+        Formatter.warning("warning")
       else
-        "#{Tty.green}passed#{Tty.reset}"
+        Formatter.success("passed")
       end
     end
 
@@ -40,11 +40,11 @@ module Hbc
       summary = ["#{summary_header}: #{result}"]
 
       errors.each do |error|
-        summary << " #{Tty.red}-#{Tty.reset} #{error}"
+        summary << " #{Formatter.error("-")} #{error}"
       end
 
       warnings.each do |warning|
-        summary << " #{Tty.yellow}-#{Tty.reset} #{warning}"
+        summary << " #{Formatter.warning("-")} #{warning}"
       end
 
       summary.join("\n")
