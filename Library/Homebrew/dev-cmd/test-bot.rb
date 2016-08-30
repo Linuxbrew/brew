@@ -888,7 +888,10 @@ module Homebrew
       safe_system "brew", "pull", "--clean", url
     end
 
-    system "brew", "bottle", "--merge", "--write", *json_files
+    bottle_merge_args = ["--merge", "--write"]
+    bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
+    bottle_merge_args += json_files
+    system "brew", "bottle", *bottle_merge_args
 
     project = OS.mac? ? "homebrew" : "linuxbrew"
     remote = "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/homebrew-#{tap.repo}.git"
