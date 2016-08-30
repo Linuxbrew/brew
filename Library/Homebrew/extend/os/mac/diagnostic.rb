@@ -12,6 +12,13 @@ module Homebrew
         ]
       end
 
+      def strict_development_tools_checks
+        %w[
+          check_xcode_up_to_date
+          check_clt_up_to_date
+        ]
+      end
+
       def check_for_unsupported_osx
         return if ARGV.homebrew_developer?
 
@@ -51,10 +58,17 @@ module Homebrew
       def check_xcode_up_to_date
         return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
 
+        if OS::Mac.prerelease?
+          xcode_select_nudge = <<-EOS.undent
+            If #{MacOS::Xcode.latest_version} is installed, you may need to:
+              sudo xcode-select --switch /path/to/Xcode-beta.app
+          EOS
+        end
+
         <<-EOS.undent
           Your Xcode (#{MacOS::Xcode.version}) is outdated
           Please update to Xcode #{MacOS::Xcode.latest_version}.
-          #{MacOS::Xcode.update_instructions}
+          #{MacOS::Xcode.update_instructions}#{xcode_select_nudge}
         EOS
       end
 
