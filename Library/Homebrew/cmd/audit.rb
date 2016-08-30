@@ -1253,6 +1253,17 @@ class ResourceAuditor
       end
     end
 
+    # Debian has an abundance of secure mirrors. Let's not pluck the insecure
+    # one out of the grab bag.
+    urls.each do |u|
+      next unless u =~ %r{^http://http\.debian\.net/debian/(.*)}i
+      problem <<-EOS.undent
+        Please use a secure mirror for Debian URLs.
+        We recommend:
+          https://mirrors.ocf.berkeley.edu/debian/#{$1}
+      EOS
+    end
+
     # Check for Google Code download urls, https:// is preferred
     # Intentionally not extending this to SVN repositories due to certificate
     # issues.
