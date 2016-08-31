@@ -99,7 +99,7 @@ class DependencyCollector
     when :macos      then MinimumMacOSRequirement.new(tags)
     when :mysql      then MysqlRequirement.new(tags)
     when :postgresql then PostgresqlRequirement.new(tags)
-    when :gpg        then GPGRequirement.new(tags)
+    when :gpg        then GPG2Requirement.new(tags)
     when :fortran    then FortranRequirement.new(tags)
     when :mpi        then MPIRequirement.new(*tags)
     when :tex        then TeXRequirement.new(tags)
@@ -158,6 +158,8 @@ class DependencyCollector
       Dependency.new("bazaar", tags)
     when strategy <= CVSDownloadStrategy
       Dependency.new("cvs", tags) if MacOS.version >= :mavericks || !MacOS::Xcode.provides_cvs?
+    when strategy <= SubversionDownloadStrategy
+      SubversionRequirement.new(tags)
     when strategy < AbstractDownloadStrategy
       # allow unknown strategies to pass through
     else

@@ -13,53 +13,46 @@ class FormulaTextTests < Homebrew::TestCase
     FileUtils.rm_rf @dir
   end
 
-  def formula_text(name, text)
+  def formula_text(name, body = nil, options = {})
     path = Pathname.new "#{@dir}/#{name}.rb"
-    path.open("w") { |f| f.write text }
+    path.open("w") do |f|
+      f.write <<-EOS.undent
+        class #{Formulary.class_s(name)} < Formula
+          #{body}
+        end
+        #{options[:patch]}
+      EOS
+    end
     FormulaText.new path
   end
 
   def test_simple_valid_formula
-    ft = formula_text "valid", <<-EOS.undent
-      class Valid < Formula
-        url "http://www.example.com/valid-1.0.tar.gz"
-      end
-    EOS
+    ft = formula_text "valid", 'url "http://www.example.com/valid-1.0.tar.gz"'
 
-    refute ft.has_DATA?, "The formula doesn't have DATA"
-    refute ft.has_END?, "The formula doesn't have __END__"
-    assert ft.has_trailing_newline?, "The formula have a trailing newline"
+    refute ft.has_DATA?, "The formula should not have DATA"
+    refute ft.has_END?, "The formula should not have __END__"
+    assert ft.has_trailing_newline?, "The formula should have a trailing newline"
 
-    assert ft =~ /\burl\b/, "The formula match 'url'"
-    assert_nil ft.line_number(/desc/), "The formula doesn't match 'desc'"
+    assert ft =~ /\burl\b/, "The formula should match 'url'"
+    assert_nil ft.line_number(/desc/), "The formula should not match 'desc'"
     assert_equal 2, ft.line_number(/\burl\b/)
+    assert ft.include?("Valid"), "The formula should include \"Valid\""
   end
 
   def test_trailing_newline
-    ft = formula_text "newline", "class Newline < Formula; end"
-    refute ft.has_trailing_newline?, "The formula doesn't have a trailing newline"
+    ft = formula_text "newline"
+    assert ft.has_trailing_newline?, "The formula must have a trailing newline"
   end
 
   def test_has_data
-    ft = formula_text "data", <<-EOS.undent
-      class Data < Formula
-        patch :DATA
-      end
-    EOS
-
-    assert ft.has_DATA?, "The formula has DATA"
+    ft = formula_text "data", "patch :DATA"
+    assert ft.has_DATA?, "The formula must have DATA"
   end
 
   def test_has_end
-    ft = formula_text "end", <<-EOS.undent
-      class End < Formula
-      end
-      __END__
-      a patch here
-    EOS
-
-    assert ft.has_END?, "The formula has __END__"
-    assert_equal "class End < Formula\nend", ft.without_patch
+    ft = formula_text "end", "", :patch => "__END__\na patch here"
+    assert ft.has_END?, "The formula must have __END__"
+    assert_equal "class End < Formula\n  \nend", ft.without_patch
   end
 end
 
@@ -254,11 +247,14 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    fa = formula_auditor "foo", <<-EOS.undent
-      class Foo < GithubGistFormula
-        url "http://example.com/foo-1.0.tgz"
-      end
-    EOS
+    ARGV.stubs(:homebrew_developer?).returns false
+    fa = shutup do
+      formula_auditor "foo", <<-EOS.undent
+        class Foo < GithubGistFormula
+          url "http://example.com/foo-1.0.tgz"
+        end
+      EOS
+    end
     fa.audit_class
     assert_equal ["GithubGistFormula is deprecated, use Formula instead"],
       fa.problems
@@ -268,6 +264,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
+    ARGV.stubs(:homebrew_developer?).returns false
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < ScriptFileFormula
         url "http://example.com/foo-1.0.tgz"
@@ -282,6 +279,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
+    ARGV.stubs(:homebrew_developer?).returns false
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < AmazonWebServicesFormula
         url "http://example.com/foo-1.0.tgz"
@@ -374,5 +372,99 @@ class FormulaAuditorTests < Homebrew::TestCase
     assert_equal [], fa.problems
   ensure
     ENV["HOMEBREW_NO_GITHUB_API"] = original_value
+  end
+
+  def test_audit_caveats
+    fa = formula_auditor "foo", <<-EOS.undent
+      class Foo < Formula
+        homepage "http://example.com/foo"
+        url "http://example.com/foo-1.0.tgz"
+
+        def caveats
+          "setuid"
+        end
+      end
+    EOS
+
+    fa.audit_caveats
+    assert_equal ["Don't recommend setuid in the caveats, suggest sudo instead."],
+      fa.problems
+  end
+
+  def test_audit_desc
+    formula_descriptions = [
+      { :name => "foo", :desc => nil,
+        :problem => "Formula should have a desc" },
+      { :name => "bar", :desc => "bar" * 30,
+        :problem => "Description is too long" },
+      { :name => "baz", :desc => "Baz commandline tool",
+        :problem => "Description should use \"command-line\"" },
+      { :name => "qux", :desc => "A tool called Qux",
+        :problem => "Description shouldn't start with an indefinite article" },
+    ]
+
+    formula_descriptions.each do |formula|
+      content = <<-EOS.undent
+        class #{Formulary.class_s(formula[:name])} < Formula
+          url "http://example.com/#{formula[:name]}-1.0.tgz"
+          desc "#{formula[:desc]}"
+        end
+      EOS
+
+      fa = formula_auditor formula[:name], content, :strict => true
+      fa.audit_desc
+      assert_match formula[:problem], fa.problems.first
+    end
+  end
+
+  def test_audit_homepage
+    fa = formula_auditor "foo", <<-EOS.undent, :online => true
+      class Foo < Formula
+        homepage "ftp://example.com/foo"
+        url "http://example.com/foo-1.0.tgz"
+      end
+    EOS
+
+    fa.audit_homepage
+    assert_equal ["The homepage should start with http or https " \
+      "(URL is #{fa.formula.homepage}).", "The homepage is not reachable " \
+      "(curl exit code #{$?.exitstatus})"], fa.problems
+
+    formula_homepages = {
+      "bar" => "http://www.freedesktop.org/wiki/bar",
+      "baz" => "http://www.freedesktop.org/wiki/Software/baz",
+      "qux" => "https://code.google.com/p/qux",
+      "quux" => "http://github.com/quux",
+      "corge" => "http://savannah.nongnu.org/corge",
+      "grault" => "http://grault.github.io/",
+      "garply" => "http://www.gnome.org/garply",
+      "waldo" => "http://www.gnu.org/waldo",
+    }
+
+    formula_homepages.each do |name, homepage|
+      fa = formula_auditor name, <<-EOS.undent
+        class #{Formulary.class_s(name)} < Formula
+          homepage "#{homepage}"
+          url "http://example.com/#{name}-1.0.tgz"
+        end
+      EOS
+
+      fa.audit_homepage
+      if homepage =~ %r{http:\/\/www\.freedesktop\.org}
+        if homepage =~ /Software/
+          assert_match "#{homepage} should be styled " \
+            "`https://wiki.freedesktop.org/www/Software/project_name`",
+            fa.problems.first
+        else
+          assert_match "#{homepage} should be styled " \
+            "`https://wiki.freedesktop.org/project_name`",
+            fa.problems.first
+        end
+      elsif homepage =~ %r{https:\/\/code\.google\.com}
+        assert_match "#{homepage} should end with a slash", fa.problems.first
+      else
+        assert_match "Please use https:// for #{homepage}", fa.problems.first
+      end
+    end
   end
 end

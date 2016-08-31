@@ -1,6 +1,7 @@
 require "requirement"
 require "requirements/apr_requirement"
 require "requirements/fortran_requirement"
+require "requirements/gpg2_requirement"
 require "requirements/language_module_requirement"
 require "requirements/minimum_macos_requirement"
 require "requirements/maximum_macos_requirement"
@@ -77,13 +78,6 @@ class RbenvRequirement < Requirement
   satisfy { which "rbenv" }
 end
 
-class GPGRequirement < Requirement
-  fatal true
-  default_formula "gpg"
-
-  satisfy { which("gpg") || which("gpg2") }
-end
-
 class TeXRequirement < Requirement
   fatal true
   cask "mactex"
@@ -134,4 +128,10 @@ class GitRequirement < Requirement
   fatal true
   default_formula "git"
   satisfy { Utils.git_available? }
+end
+
+class SubversionRequirement < Requirement
+  fatal true
+  default_formula "subversion"
+  satisfy { which "svn" }
 end

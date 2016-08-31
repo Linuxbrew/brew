@@ -21,7 +21,7 @@ module Homebrew
     ohai "Fixing up #{f.full_name}..."
     keg = Keg.new(f.prefix)
     keg.lock do
-      keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX,
+      keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX,
         Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR
     end
   end

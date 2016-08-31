@@ -5,7 +5,6 @@ module CompilerConstants
   COMPILER_SYMBOL_MAP = {
     "gcc-4.0"  => :gcc_4_0,
     (OS.mac? ? "gcc-4.2" : "gcc") => :gcc,
-    "llvm-gcc" => :llvm,
     "clang"    => :clang,
   }
 
@@ -62,7 +61,6 @@ class CompilerFailure
     :cxx11 => [
       create(:gcc_4_0),
       create(:gcc),
-      create(:llvm),
       create(:clang) { build 425 },
       create(:gcc => "4.3"),
       create(:gcc => "4.4"),
@@ -71,7 +69,6 @@ class CompilerFailure
     ],
     :openmp => [
       create(:clang),
-      create(:llvm),
     ],
   }
 end
@@ -82,18 +79,17 @@ class CompilerSelector
   Compiler = Struct.new(:name, :version)
 
   COMPILER_PRIORITY = {
-    :clang   => [:clang, :gcc, :llvm, :gnu, :gcc_4_0],
-    :gcc     => [:gcc, :llvm, :gnu, :clang, :gcc_4_0],
-    :llvm    => [:llvm, :gcc, :gnu, :clang, :gcc_4_0],
-    :gcc_4_0 => [:gcc_4_0, :gcc, :llvm, :gnu, :clang],
+    :clang   => [:clang, :gcc, :gnu, :gcc_4_0],
+    :gcc     => [:gcc, :gnu, :clang, :gcc_4_0],
+    :gcc_4_0 => [:gcc_4_0, :gcc, :gnu, :clang],
   }
 
   def self.select_for(formula, compilers = self.compilers)
-    new(formula, MacOS, compilers).compiler
+    new(formula, DevelopmentTools, compilers).compiler
   end
 
   def self.compilers
-    COMPILER_PRIORITY.fetch(MacOS.default_compiler)
+    COMPILER_PRIORITY.fetch(DevelopmentTools.default_compiler)
   end
 
   attr_reader :formula, :failures, :versions, :compilers
@@ -125,6 +121,8 @@ class CompilerSelector
           version = versions.non_apple_gcc_version("gcc")
           yield Compiler.new("gcc", version) if version
         end
+      when :llvm
+        # no-op. DSL supported, compiler is not.
       else
         version = compiler_version(compiler)
         yield Compiler.new(compiler, version) if version

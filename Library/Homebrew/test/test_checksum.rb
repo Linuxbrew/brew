@@ -20,4 +20,3 @@ class ChecksumTests < Homebrew::TestCase
     refute_equal a, b
   end
 end
-

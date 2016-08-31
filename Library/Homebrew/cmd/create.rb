@@ -1,4 +1,4 @@
-#:  * `create` <URL> [`--autotools`|`--cmake`] [`--no-fetch`] [`--set-name` <name>] [`--set-version` <version>]:
+#:  * `create` <URL> [`--autotools`|`--cmake`] [`--no-fetch`] [`--set-name` <name>] [`--set-version` <version>] [`--tap` <user>`/`<repo>]:
 #:    Generate a formula for the downloadable file at <URL> and open it in the editor.
 #:    Homebrew will attempt to automatically derive the formula name
 #:    and version, but if it fails, you'll have to make your own template. The `wget`
@@ -14,6 +14,9 @@
 #:
 #:    The options `--set-name` and `--set-version` each take an argument and allow
 #:    you to explicitly set the name and version of the package you are creating.
+#:
+#:    The option `--tap` takes a tap as its argument and generates the formula in
+#:    the specified tap.
 
 require "formula"
 require "blacklist"
@@ -41,10 +44,13 @@ module Homebrew
 
     version = ARGV.next if ARGV.include? "--set-version"
     name = ARGV.next if ARGV.include? "--set-name"
+    tap = ARGV.next if ARGV.include? "--tap"
 
     fc = FormulaCreator.new
     fc.name = name
     fc.version = version
+    fc.tap = Tap.fetch(tap || "homebrew/core")
+    raise TapUnavailableError, tap unless fc.tap.installed?
     fc.url = url
 
     fc.mode = if ARGV.include? "--cmake"
@@ -57,7 +63,7 @@ module Homebrew
       stem = Pathname.new(url).stem
       print "Formula name [#{stem}]: "
       fc.name = __gets || stem
-      fc.path = Formulary.path(fc.name)
+      fc.update_path
     end
 
     # Don't allow blacklisted formula, or names that shadow aliases,
@@ -79,7 +85,7 @@ module Homebrew
 
     fc.generate!
 
-    puts "Please `brew audit --strict #{fc.name}` before submitting, thanks."
+    puts "Please `brew audit --new-formula #{fc.name}` before submitting, thanks."
     exec_editor fc.path
   end
 
@@ -91,7 +97,7 @@ end
 
 class FormulaCreator
   attr_reader :url, :sha256
-  attr_accessor :name, :version, :path, :mode
+  attr_accessor :name, :version, :tap, :path, :mode
 
   def url=(url)
     @url = url
@@ -104,18 +110,20 @@ class FormulaCreator
       when %r{github\.com/\S+/(\S+)/archive/}
         @name = $1
       else
-        /(.*?)[-_.]?#{path.version}/.match path.basename
-        @name = $1
+        @name = path.basename.to_s[/(.*?)[-_.]?#{Regexp.escape(path.version.to_s)}/, 1]
       end
-      @path = Formulary.path @name unless @name.nil?
-    else
-      @path = Formulary.path name
     end
+    update_path
     if @version
-      @version = Version.new(@version)
+      @version = Version.create(@version)
     else
       @version = Pathname.new(url).version
     end
+  end
+
+  def update_path
+    return if @name.nil? || @tap.nil?
+    @path = Formulary.path "#{@tap}/#{@name}"
   end
 
   def fetch?

@@ -1,4 +1,4 @@
-require "bottles"
+require "utils/bottles"
 require "formula"
 require "thread"
 
@@ -43,9 +43,9 @@ module Homebrew
       end
     end
 
-    def self.cleanup_cache
-      return unless HOMEBREW_CACHE.directory?
-      HOMEBREW_CACHE.children.each do |path|
+    def self.cleanup_cache(cache=HOMEBREW_CACHE)
+      return unless cache.directory?
+      cache.children.each do |path|
         if path.to_s.end_with? ".incomplete"
           cleanup_path(path) { path.unlink }
           next
@@ -67,7 +67,7 @@ module Homebrew
         file = path
 
         if Pathname::BOTTLE_EXTNAME_RX === file.to_s
-          version = bottle_resolve_version(file) rescue file.version
+          version = Utils::Bottles.resolve_version(file) rescue file.version
         else
           version = file.version
         end
@@ -88,7 +88,7 @@ module Homebrew
           f.version > version
         end
 
-        if file_is_stale || ARGV.switch?("s") && !f.installed? || bottle_file_outdated?(f, file)
+        if file_is_stale || ARGV.switch?("s") && !f.installed? || Utils::Bottles::file_outdated?(f, file)
           cleanup_path(file) { file.unlink }
         end
       end
@@ -106,9 +106,9 @@ module Homebrew
     end
 
     def self.cleanup_lockfiles
-      return unless HOMEBREW_CACHE_FORMULA.directory?
-      candidates = HOMEBREW_CACHE_FORMULA.children
-      lockfiles  = candidates.select { |f| f.file? && f.extname == ".brewing" }
+      return unless HOMEBREW_LOCK_DIR.directory?
+      candidates = HOMEBREW_LOCK_DIR.children
+      lockfiles  = candidates.select(&:file?)
       lockfiles.each do |file|
         next unless file.readable?
         file.open.flock(File::LOCK_EX | File::LOCK_NB) && file.unlink
@@ -121,11 +121,12 @@ module Homebrew
         map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }
       workers = (0...Hardware::CPU.cores).map do
         Thread.new do
-          begin
-            while p = paths.pop(true)
-              quiet_system "find", p, "-name", ".DS_Store", "-delete"
+          Kernel.loop do
+            begin
+              quiet_system "find", paths.deq(true), "-name", ".DS_Store", "-delete"
+            rescue ThreadError
+              break # if queue is empty
             end
-          rescue ThreadError # ignore empty queue error
           end
         end
       end

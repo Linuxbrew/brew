@@ -105,6 +105,14 @@ can take several different forms:
   * `HOMEBREW_BOTTLE_DOMAIN`:
     If set, instructs Homebrew to use the given URL as a download mirror for bottles.
 
+  * `HOMEBREW_ARTIFACT_DOMAIN`:
+    If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
+
+  * `HOMEBREW_AUTO_UPDATE_SECS`:
+    If set, Homebrew will only check for autoupdates once per this seconds interval.
+
+    *Default:* `60`.
+
   * `HOMEBREW_BROWSER`:
     If set, uses this setting as the browser when opening project homepages,
     instead of the OS default browser.
@@ -118,8 +126,7 @@ can take several different forms:
   * `HOMEBREW_CACHE`:
     If set, instructs Homebrew to use the given directory as the download cache.
 
-    *Default:* `~/Library/Caches/Homebrew` if it exists; otherwise,
-    `/Library/Caches/Homebrew`.
+    *Default:* `~/Library/Caches/Homebrew`.
 
   * `HOMEBREW_CURL_VERBOSE`:
     If set, Homebrew will pass `--verbose` when invoking `curl`(1).
@@ -138,8 +145,8 @@ can take several different forms:
     of the formula being brewed.
 
   * `HOMEBREW_DEVELOPER`:
-    If set, Homebrew will print warnings that are only relevant to Homebrew
-    developers (active or budding).
+    If set, Homebrew will tweak behaviour to be more relevant for Homebrew
+    developers (active or budding) e.g. turning warnings into errors.
 
   * `HOMEBREW_EDITOR`:
     If set, Homebrew will use this editor when editing a single formula, or
@@ -148,6 +155,10 @@ can take several different forms:
     *Note:* `brew edit` will open all of Homebrew as discontinuous files and
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
+
+  * `HOMEBREW_FORCE_VENDOR_RUBY`:
+    If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
+    even if the system version of Ruby is >=2.0.
 
   * `HOMEBREW_GITHUB_API_TOKEN`:
     A personal access token for the GitHub API, which you can create at
@@ -170,6 +181,10 @@ can take several different forms:
   * `HOMEBREW_NO_ANALYTICS`:
     If set, Homebrew will not send analytics. See: <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics>
 
+  * `HOMEBREW_NO_AUTO_UPDATE`:
+    If set, Homebrew will not auto-update before running `brew install` and
+    `brew upgrade`.
+
   * `HOMEBREW_NO_EMOJI`:
     If set, Homebrew will not print the `HOMEBREW_INSTALL_BADGE` on a
     successful build.
@@ -181,11 +196,8 @@ can take several different forms:
     to insecure HTTP.
 
     While ensuring your downloads are fully secure, this is likely
-    to cause from-source Sourceforge & GNOME based formulae
-    to fail to download.
-
-    Apache formulae are currently unaffected by this variable and
-    can redirect to plaintext.
+    to cause from-source Sourceforge, some GNU & GNOME based
+    formulae to fail to download.
 
   * `HOMEBREW_NO_GITHUB_API`:
     If set, Homebrew will not use the GitHub API for e.g searches or
@@ -239,7 +251,7 @@ Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/share/doc/
 
 ## AUTHORS
 
-Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Mike McQuaid, Baptiste Fontaine, Brett Koonce, Martin Afanasjew, Dominyk Tiller, Tim Smith and Alex Dunn.
+Homebrew's current maintainers are <%= maintainers[0...-1].join(", ") %> and <%= maintainers[-1] %>.
 
 Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.
 

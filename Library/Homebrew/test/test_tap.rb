@@ -63,6 +63,13 @@ class TapTest < Homebrew::TestCase
     tap = Tap.fetch("Homebrew", "foo")
     assert_kind_of Tap, tap
     assert_equal "homebrew/foo", tap.name
+
+    assert_match "Invalid tap name",
+                 assert_raises { Tap.fetch("foo") }.message
+    assert_match "Invalid tap name",
+                 assert_raises { Tap.fetch("homebrew/homebrew/bar") }.message
+    assert_match "Invalid tap name",
+                 assert_raises { Tap.fetch("homebrew", "homebrew/baz") }.message
   ensure
     Tap.clear_cache
   end
@@ -135,7 +142,7 @@ class TapTest < Homebrew::TestCase
     end
     refute_predicate version_tap, :private?
   ensure
-    version_tap.path.rmtree
+    version_tap.path.rmtree if version_tap
   end
 
   def test_remote_not_git_repo
@@ -154,7 +161,7 @@ class TapTest < Homebrew::TestCase
 
     assert_equal "e1893a6bd191ba895c71b652ff8376a6114c7fa7", @tap.git_head
     assert_equal "e189", @tap.git_short_head
-    assert_match %r{years ago}, @tap.git_last_commit
+    assert_match "years ago", @tap.git_last_commit
     assert_equal "2009-05-21", @tap.git_last_commit_date
   end
 
@@ -174,7 +181,7 @@ class TapTest < Homebrew::TestCase
     setup_git_repo
     already_tapped_tap = Tap.new("Homebrew", "foo")
     assert_equal true, already_tapped_tap.installed?
-    right_remote = "#{@tap.remote}"
+    right_remote = @tap.remote
     assert_raises(TapAlreadyTappedError) { already_tapped_tap.install :clone_target => right_remote }
   end
 
@@ -220,7 +227,7 @@ class TapTest < Homebrew::TestCase
     refute_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :exist?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1", :exist?
   ensure
-    (HOMEBREW_PREFIX/"share").rmtree
+    (HOMEBREW_PREFIX/"share").rmtree if (HOMEBREW_PREFIX/"share").exist?
   end
 
   def test_pin_and_unpin

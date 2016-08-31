@@ -1,25 +1,18 @@
 require "pathname"
+require "emoji"
 require "exceptions"
+require "utils/hash"
 require "utils/json"
 require "utils/inreplace"
 require "utils/popen"
 require "utils/fork"
 require "utils/git"
 require "utils/analytics"
-require "open-uri"
+require "utils/github"
+require "utils/curl"
 
 class Tty
   class << self
-    def tick
-      # necessary for 1.8.7 unicode handling since many installs are on 1.8.7
-      @tick ||= ["2714".hex].pack("U*")
-    end
-
-    def cross
-      # necessary for 1.8.7 unicode handling since many installs are on 1.8.7
-      @cross ||= ["2718".hex].pack("U*")
-    end
-
     def strip_ansi(string)
       string.gsub(/\033\[\d+(;\d+)*m/, "")
     end
@@ -95,8 +88,10 @@ def ohai(title, *sput)
   puts sput
 end
 
-def oh1(title)
-  title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
+def oh1(title, options = {})
+  if $stdout.tty? && !ARGV.verbose? && options.fetch(:truncate, :auto) == :auto
+    title = Tty.truncate(title)
+  end
   puts "#{Tty.green}==>#{Tty.white} #{title}#{Tty.reset}"
 end
 
@@ -119,23 +114,73 @@ def odie(error)
   exit 1
 end
 
+def odeprecated(method, replacement = nil, options = {})
+  verb = if options[:die]
+    "disabled"
+  else
+    "deprecated"
+  end
+
+  replacement_message = if replacement
+    "Use #{replacement} instead."
+  else
+    "There is no replacement."
+  end
+
+  # Try to show the most relevant location in message, i.e. (if applicable):
+  # - Location in a formula.
+  # - Location outside of 'compat/'.
+  # - Location of caller of deprecated method (if all else fails).
+  backtrace = options.fetch(:caller, caller)
+  tap_message = nil
+  caller_message = backtrace.detect do |line|
+    if line =~ %r{^#{Regexp.escape HOMEBREW_LIBRARY}/Taps/([^/]+/[^/]+)/}
+      tap = Tap.fetch $1
+      tap_message = "\nPlease report this to the #{tap} tap!"
+      true
+    end
+  end
+  caller_message ||= backtrace.detect do |line|
+    !line.start_with?("#{HOMEBREW_LIBRARY_PATH}/compat/")
+  end
+  caller_message ||= backtrace[1]
+
+  message = <<-EOS.undent
+    Calling #{method} is #{verb}!
+    #{replacement_message}
+    #{caller_message}#{tap_message}
+  EOS
+
+  if ARGV.homebrew_developer? || options[:die] ||
+     Homebrew.raise_deprecation_exceptions?
+    raise FormulaMethodDeprecatedError, message
+  else
+    opoo "#{message}\n"
+  end
+end
+
+def odisabled(method, replacement = nil, options = {})
+  options = { :die => true, :caller => caller }.merge(options)
+  odeprecated(method, replacement, options)
+end
+
 def pretty_installed(f)
   if !$stdout.tty?
     "#{f}"
-  elsif ENV["HOMEBREW_NO_EMOJI"]
-    "#{Tty.highlight}#{Tty.green}#{f} (installed)#{Tty.reset}"
+  elsif Emoji.enabled?
+    "#{Tty.highlight}#{f} #{Tty.green}#{Emoji.tick}#{Tty.reset}"
   else
-    "#{Tty.highlight}#{f} #{Tty.green}#{Tty.tick}#{Tty.reset}"
+    "#{Tty.highlight}#{Tty.green}#{f} (installed)#{Tty.reset}"
   end
 end
 
 def pretty_uninstalled(f)
   if !$stdout.tty?
     "#{f}"
-  elsif ENV["HOMEBREW_NO_EMOJI"]
-    "#{Tty.red}#{f} (uninstalled)#{Tty.reset}"
+  elsif Emoji.enabled?
+    "#{f} #{Tty.red}#{Emoji.cross}#{Tty.reset}"
   else
-    "#{f} #{Tty.red}#{Tty.cross}#{Tty.reset}"
+    "#{Tty.red}#{f} (uninstalled)#{Tty.reset}"
   end
 end
 
@@ -196,34 +241,9 @@ module Homebrew
     _system(cmd, *args)
   end
 
-  def self.git_origin
-    return unless Utils.git_available?
-    HOMEBREW_REPOSITORY.cd { `git config --get remote.origin.url 2>/dev/null`.chuzzle }
-  end
-
-  def self.git_head
-    return unless Utils.git_available?
-    HOMEBREW_REPOSITORY.cd { `git rev-parse --verify -q HEAD 2>/dev/null`.chuzzle }
-  end
-
-  def self.git_short_head
-    return unless Utils.git_available?
-    HOMEBREW_REPOSITORY.cd { `git rev-parse --short=4 --verify -q HEAD 2>/dev/null`.chuzzle }
-  end
-
-  def self.git_last_commit
-    return unless Utils.git_available?
-    HOMEBREW_REPOSITORY.cd { `git show -s --format="%cr" HEAD 2>/dev/null`.chuzzle }
-  end
-
-  def self.git_last_commit_date
-    return unless Utils.git_available?
-    HOMEBREW_REPOSITORY.cd { `git show -s --format="%cd" --date=short HEAD 2>/dev/null`.chuzzle }
-  end
-
   def self.homebrew_version_string
-    if pretty_revision = git_short_head
-      last_commit = git_last_commit_date
+    if pretty_revision = HOMEBREW_REPOSITORY.git_short_head
+      last_commit = HOMEBREW_REPOSITORY.git_last_commit_date
       "#{HOMEBREW_VERSION} (git revision #{pretty_revision}; last commit #{last_commit})"
     else
       "#{HOMEBREW_VERSION} (no git repository)"
@@ -242,7 +262,7 @@ module Homebrew
     end
   end
 
-  def self.install_gem_setup_path!(gem, version = nil, executable = gem)
+  def self.install_gem_setup_path!(name, version = nil, executable = name)
     require "rubygems"
 
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
@@ -251,9 +271,9 @@ module Homebrew
     path.unshift("#{Gem.user_dir}/bin")
     ENV["PATH"] = path.join(File::PATH_SEPARATOR)
 
-    if Gem::Specification.find_all_by_name(gem, version).empty?
-      ohai "Installing or updating '#{gem}' gem"
-      install_args = %W[--no-ri --no-rdoc --user-install #{gem}]
+    if Gem::Specification.find_all_by_name(name, version).empty?
+      ohai "Installing or updating '#{name}' gem"
+      install_args = %W[--no-ri --no-rdoc --user-install #{name}]
       install_args << "--version" << version if version
 
       # Do `gem install [...]` without having to spawn a separate process or
@@ -267,12 +287,12 @@ module Homebrew
       rescue Gem::SystemExitException => e
         exit_code = e.exit_code
       end
-      odie "Failed to install/update the '#{gem}' gem." if exit_code != 0
+      odie "Failed to install/update the '#{name}' gem." if exit_code != 0
     end
 
     unless which executable
       odie <<-EOS.undent
-        The '#{gem}' gem is installed but couldn't find '#{executable}' in the PATH:
+        The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
         #{ENV["PATH"]}
       EOS
     end
@@ -321,6 +341,14 @@ ensure
   ENV["PATH"] = old_path
 end
 
+def with_custom_locale(locale)
+  old_locale = ENV["LC_ALL"]
+  ENV["LC_ALL"] = locale
+  yield
+ensure
+  ENV["LC_ALL"] = old_locale
+end
+
 def run_as_not_developer(&_block)
   old = ENV.delete "HOMEBREW_DEVELOPER"
   yield
@@ -341,22 +369,6 @@ def quiet_system(cmd, *args)
     $stdout.reopen("/dev/null")
     $stderr.reopen("/dev/null")
   end
-end
-
-def curl(*args)
-  curl = Pathname.new ENV["HOMEBREW_CURL"]
-  curl = which("curl") unless curl.exist? || OS.mac?
-  curl = Pathname.new "/usr/bin/curl" unless curl.exist?
-  raise "#{curl} is not executable" unless curl.exist? && curl.executable?
-
-  flags = HOMEBREW_CURL_ARGS
-  flags = flags.delete("#") if ARGV.verbose?
-
-  args = [flags, HOMEBREW_USER_AGENT_CURL, *args]
-  args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
-  args << "--silent" if !$stdout.tty? || ENV["TRAVIS"]
-
-  safe_system curl, *args
 end
 
 def puts_columns(items)
@@ -446,6 +458,7 @@ def which_editor
 end
 
 def exec_editor(*args)
+  puts "Editing #{args.join "\n"}"
   safe_exec(which_editor, *args)
 end
 
@@ -520,230 +533,6 @@ def shell_profile
   end
 end
 
-module GitHub
-  extend self
-  ISSUES_URI = URI.parse("https://api.github.com/search/issues")
-
-  Error = Class.new(RuntimeError)
-  HTTPNotFoundError = Class.new(Error)
-
-  class RateLimitExceededError < Error
-    def initialize(reset, error)
-      super <<-EOS.undent
-        GitHub API Error: #{error}
-        Try again in #{pretty_ratelimit_reset(reset)}, or create a personal access token:
-          #{Tty.em}https://github.com/settings/tokens/new?scopes=&description=Homebrew#{Tty.reset}
-        and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
-      EOS
-    end
-
-    def pretty_ratelimit_reset(reset)
-      pretty_duration(Time.at(reset) - Time.now)
-    end
-  end
-
-  class AuthenticationFailedError < Error
-    def initialize(error)
-      message = "GitHub #{error}\n"
-      if ENV["HOMEBREW_GITHUB_API_TOKEN"]
-        message << <<-EOS.undent
-          HOMEBREW_GITHUB_API_TOKEN may be invalid or expired; check:
-          #{Tty.em}https://github.com/settings/tokens#{Tty.reset}
-        EOS
-      else
-        message << <<-EOS.undent
-          The GitHub credentials in the OS X keychain may be invalid.
-          Clear them with:
-            printf "protocol=https\\nhost=github.com\\n" | git credential-osxkeychain erase
-          Or create a personal access token:
-            #{Tty.em}https://github.com/settings/tokens/new?scopes=&description=Homebrew#{Tty.reset}
-          and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
-        EOS
-      end
-      super message
-    end
-  end
-
-  def api_credentials
-    @api_credentials ||= begin
-      if ENV["HOMEBREW_GITHUB_API_TOKEN"]
-        ENV["HOMEBREW_GITHUB_API_TOKEN"]
-      else
-        github_credentials = Utils.popen("git credential-osxkeychain get", "w+") do |io|
-          io.puts "protocol=https\nhost=github.com"
-          io.close_write
-          io.read
-        end
-        github_username = github_credentials[/username=(.+)/, 1]
-        github_password = github_credentials[/password=(.+)/, 1]
-        if github_username && github_password
-          [github_password, github_username]
-        else
-          []
-        end
-      end
-    end
-  end
-
-  def api_credentials_type
-    token, username = api_credentials
-    if token && !token.empty?
-      if username && !username.empty?
-        :keychain
-      else
-        :environment
-      end
-    else
-      :none
-    end
-  end
-
-  def api_credentials_error_message(response_headers)
-    @api_credentials_error_message_printed ||= begin
-      unauthorized = (response_headers["status"] == "401 Unauthorized")
-      scopes = response_headers["x-accepted-oauth-scopes"].to_s.split(", ")
-      if !unauthorized && scopes.empty?
-        credentials_scopes = response_headers["x-oauth-scopes"].to_s.split(", ")
-
-        case GitHub.api_credentials_type
-        when :keychain
-          onoe <<-EOS.undent
-            Your OS X keychain GitHub credentials do not have sufficient scope!
-            Scopes they have: #{credentials_scopes}
-            Create a personal access token: https://github.com/settings/tokens
-            and then set HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
-          EOS
-        when :environment
-          onoe <<-EOS.undent
-            Your HOMEBREW_GITHUB_API_TOKEN does not have sufficient scope!
-            Scopes it has: #{credentials_scopes}
-            Create a new personal access token: https://github.com/settings/tokens
-            and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
-          EOS
-        end
-      end
-      true
-    end
-  end
-
-  def api_headers
-    {
-      "User-Agent" => HOMEBREW_USER_AGENT_RUBY,
-      "Accept"     => "application/vnd.github.v3+json"
-    }
-  end
-
-  def open(url, &_block)
-    # This is a no-op if the user is opting out of using the GitHub API.
-    return if ENV["HOMEBREW_NO_GITHUB_API"]
-
-    require "net/https"
-
-    headers = api_headers
-    token, username = api_credentials
-    case api_credentials_type
-    when :keychain
-      headers[:http_basic_authentication] = [username, token]
-    when :environment
-      headers["Authorization"] = "token #{token}"
-    end
-
-    begin
-      Kernel.open(url, headers) { |f| yield Utils::JSON.load(f.read) }
-    rescue OpenURI::HTTPError => e
-      handle_api_error(e)
-    rescue EOFError, SocketError, OpenSSL::SSL::SSLError => e
-      raise Error, "Failed to connect to: #{url}\n#{e.message}", e.backtrace
-    rescue Utils::JSON::Error => e
-      raise Error, "Failed to parse JSON response\n#{e.message}", e.backtrace
-    end
-  end
-
-  def handle_api_error(e)
-    if e.io.meta.fetch("x-ratelimit-remaining", 1).to_i <= 0
-      reset = e.io.meta.fetch("x-ratelimit-reset").to_i
-      error = Utils::JSON.load(e.io.read)["message"]
-      raise RateLimitExceededError.new(reset, error)
-    end
-
-    GitHub.api_credentials_error_message(e.io.meta)
-
-    case e.io.status.first
-    when "401", "403"
-      raise AuthenticationFailedError.new(e.message)
-    when "404"
-      raise HTTPNotFoundError, e.message, e.backtrace
-    else
-      error = Utils::JSON.load(e.io.read)["message"] rescue nil
-      raise Error, [e.message, error].compact.join("\n"), e.backtrace
-    end
-  end
-
-  def issues_matching(query, qualifiers = {})
-    uri = ISSUES_URI.dup
-    uri.query = build_query_string(query, qualifiers)
-    open(uri) { |json| json["items"] }
-  end
-
-  def repository(user, repo)
-    open(URI.parse("https://api.github.com/repos/#{user}/#{repo}")) { |j| j }
-  end
-
-  def build_query_string(query, qualifiers)
-    s = "q=#{uri_escape(query)}+"
-    s << build_search_qualifier_string(qualifiers)
-    s << "&per_page=100"
-  end
-
-  def build_search_qualifier_string(qualifiers)
-    {
-      :repo => "#{OS::GITHUB_USER}/homebrew-core",
-      :in => "title"
-    }.update(qualifiers).map do |qualifier, value|
-      "#{qualifier}:#{value}"
-    end.join("+")
-  end
-
-  def uri_escape(query)
-    if URI.respond_to?(:encode_www_form_component)
-      URI.encode_www_form_component(query)
-    else
-      require "erb"
-      ERB::Util.url_encode(query)
-    end
-  end
-
-  def issues_for_formula(name, options = {})
-    tap = options[:tap] || CoreTap.instance
-    issues_matching(name, :state => "open", :repo => "#{tap.user}/homebrew-#{tap.repo}")
-  end
-
-  def print_pull_requests_matching(query)
-    return [] if ENV["HOMEBREW_NO_GITHUB_API"]
-    ohai "Searching pull requests..."
-
-    open_or_closed_prs = issues_matching(query, :type => "pr")
-
-    open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
-    if open_prs.any?
-      puts "Open pull requests:"
-      prs = open_prs
-    elsif open_or_closed_prs.any?
-      puts "Closed pull requests:"
-      prs = open_or_closed_prs
-    else
-      return
-    end
-
-    prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
-  end
-
-  def private_repo?(user, repo)
-    uri = URI.parse("https://api.github.com/repos/#{user}/#{repo}")
-    open(uri) { |json| json["private"] }
-  end
-end
-
 def disk_usage_readable(size_in_bytes)
   if size_in_bytes >= 1_073_741_824
     size = size_in_bytes.to_f / 1_073_741_824
@@ -771,4 +560,61 @@ def number_readable(number)
   numstr = number.to_i.to_s
   (numstr.size - 3).step(1, -3) { |i| numstr.insert(i, ",") }
   numstr
+end
+
+# Truncates a text string to fit within a byte size constraint,
+# preserving character encoding validity. The returned string will
+# be not much longer than the specified max_bytes, though the exact
+# shortfall or overrun may vary.
+def truncate_text_to_approximate_size(s, max_bytes, options = {})
+  front_weight = options.fetch(:front_weight, 0.5)
+  if front_weight < 0.0 || front_weight > 1.0
+    raise "opts[:front_weight] must be between 0.0 and 1.0"
+  end
+  return s if s.bytesize <= max_bytes
+
+  glue = "\n[...snip...]\n"
+  max_bytes_in = [max_bytes - glue.bytesize, 1].max
+  bytes = s.dup.force_encoding("BINARY")
+  glue_bytes = glue.encode("BINARY")
+  n_front_bytes = (max_bytes_in * front_weight).floor
+  n_back_bytes = max_bytes_in - n_front_bytes
+  if n_front_bytes == 0
+    front = bytes[1..0]
+    back = bytes[-max_bytes_in..-1]
+  elsif n_back_bytes == 0
+    front = bytes[0..(max_bytes_in - 1)]
+    back = bytes[1..0]
+  else
+    front = bytes[0..(n_front_bytes - 1)]
+    back = bytes[-n_back_bytes..-1]
+  end
+  out = front + glue_bytes + back
+  out.force_encoding("UTF-8")
+  out.encode!("UTF-16", :invalid => :replace)
+  out.encode!("UTF-8")
+  out
+end
+
+def link_path_manpages(path, command)
+  return unless (path/"man").exist?
+  conflicts = []
+  (path/"man").find do |src|
+    next if src.directory?
+    dst = HOMEBREW_PREFIX/"share"/src.relative_path_from(path)
+    next if dst.symlink? && src == dst.resolved_path
+    if dst.exist?
+      conflicts << dst
+      next
+    end
+    dst.make_relative_symlink(src)
+  end
+  unless conflicts.empty?
+    onoe <<-EOS.undent
+      Could not link #{name} manpages to:
+        #{conflicts.join("\n")}
+
+      Please delete these files and run `#{command}`.
+    EOS
+  end
 end

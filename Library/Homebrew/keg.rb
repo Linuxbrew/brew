@@ -234,7 +234,7 @@ class Keg
       dirs.reverse_each(&:rmdir_if_possible)
     end
 
-    ObserverPathnameExtension.total
+    ObserverPathnameExtension.n
   end
 
   def lock
@@ -253,11 +253,11 @@ class Keg
           when :zsh  then path.join("share", "zsh", "site-functions")
           when :fish then path.join("share", "fish", "vendor_completions.d")
           end
-    dir && dir.directory? && dir.children.any?
+    dir && dir.directory? && !dir.children.empty?
   end
 
   def plist_installed?
-    Dir["#{path}/*.plist"].any?
+    !Dir["#{path}/*.plist"].empty?
   end
 
   def python_site_packages_installed?
@@ -265,7 +265,7 @@ class Keg
   end
 
   def python_pth_files_installed?
-    Dir["#{path}/lib/python2.7/site-packages/*.pth"].any?
+    !Dir["#{path}/lib/python2.7/site-packages/*.pth"].empty?
   end
 
   def apps
@@ -303,6 +303,8 @@ class Keg
     raise AlreadyLinkedError.new(self) if linked_keg_record.directory?
 
     ObserverPathnameExtension.reset_counts!
+
+    optlink(mode) unless mode.dry_run
 
     # yeah indeed, you have to force anything you need in the main tree into
     # these dirs REMEMBER that *NOT* everything needs to be in the main tree
@@ -366,15 +368,12 @@ class Keg
       end
     end
 
-    unless mode.dry_run
-      make_relative_symlink(linked_keg_record, path, mode)
-      optlink(mode)
-    end
+    make_relative_symlink(linked_keg_record, path, mode) unless mode.dry_run
   rescue LinkError
     unlink
     raise
   else
-    ObserverPathnameExtension.total
+    ObserverPathnameExtension.n
   end
 
   def remove_oldname_opt_record
@@ -396,7 +395,7 @@ class Keg
   end
 
   def delete_pyc_files!
-    find { |pn| pn.delete if pn.extname == ".pyc" }
+    find { |pn| pn.delete if %w[.pyc .pyo].include?(pn.extname) }
   end
 
   private
@@ -483,9 +482,10 @@ class Keg
       if src.symlink? || src.file?
         Find.prune if File.basename(src) == ".DS_Store"
         Find.prune if src.realpath == dst
-        # Don't link pyc files because Python overwrites these cached object
-        # files and next time brew wants to link, the pyc file is in the way.
-        if src.extname == ".pyc" && src.to_s =~ /site-packages/
+        # Don't link pyc or pyo files because Python overwrites these
+        # cached object files and next time brew wants to link, the
+        # file is in the way.
+        if %w[.pyc .pyo].include?(src.extname) && src.to_s.include?("/site-packages/")
           Find.prune
         end
 

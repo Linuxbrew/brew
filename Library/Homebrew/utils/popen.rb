@@ -20,7 +20,7 @@ module Utils
           return pipe.read
         end
       else
-        STDERR.reopen("/dev/null", "w")
+        $stderr.reopen("/dev/null", "w")
         exec(*args)
       end
     end

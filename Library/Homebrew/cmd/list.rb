@@ -1,6 +1,7 @@
 #:  * `list`, `ls` [`--full-name`]:
-#:    List all installed formulae. If `--full-name` is passed, print formulae with
-#:    full-qualified names.
+#:    List all installed formulae. If `--full-name` is passed, print formulae
+#:    with fully-qualified names. If `--full-name` is not passed, any other
+#:    options (e.g. `-t`) are passed to `ls` which produces the actual output.
 #:
 #:  * `list`, `ls` `--unbrewed`:
 #:    List all files in the Homebrew prefix not installed by Homebrew.
@@ -28,7 +29,7 @@ module Homebrew
     # Unbrewed uses the PREFIX, which will exist
     # Things below use the CELLAR, which doesn't until the first formula is installed.
     unless HOMEBREW_CELLAR.exist?
-      raise NoSuchKegError.new(ARGV.named.first) if ARGV.named.any?
+      raise NoSuchKegError.new(ARGV.named.first) unless ARGV.named.empty?
       return
     end
 

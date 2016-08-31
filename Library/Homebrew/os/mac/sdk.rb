@@ -37,7 +37,7 @@ module OS
           # Xcode < 4.3 style
           sdk_prefix = "/Developer/SDKs" unless File.directory? sdk_prefix
           # Finally query Xcode itself (this is slow, so check it last)
-          sdk_prefix = File.join(Utils.popen_read(OS::Mac.locate("xcrun"), "--show-sdk-platform-path").chomp, "Developer", "SDKs") unless File.directory? sdk_prefix
+          sdk_prefix = File.join(Utils.popen_read(DevelopmentTools.locate("xcrun"), "--show-sdk-platform-path").chomp, "Developer", "SDKs") unless File.directory? sdk_prefix
 
           # Bail out if there is no SDK prefix at all
           if !File.directory? sdk_prefix
@@ -46,7 +46,7 @@ module OS
             paths = {}
 
             Dir[File.join(sdk_prefix, "MacOSX*.sdk")].each do |sdk_path|
-              version = sdk_path[/MacOSX(\d+\.\d+)u?.sdk$/, 1]
+              version = sdk_path[/MacOSX(\d+\.\d+)u?\.sdk$/, 1]
               paths[version] = sdk_path unless version.nil?
             end
 

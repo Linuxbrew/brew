@@ -15,9 +15,13 @@
 /Library/Homebrew/test/coverage
 /Library/Homebrew/test/fs_leak_log
 /Library/LinkedKegs
+/Library/Locks
 /Library/PinnedKegs
 /Library/PinnedTaps
 /Library/Taps
+
+# Ignore vendored files within `Library`
+/Library/Homebrew/vendor/portable-ruby
 
 # Ignore `bin` contents (again).
 /bin
@@ -35,6 +39,7 @@
 !/.github
 !/share/doc/homebrew
 !/share/man/man1/brew.1
+!/share/man/man1/brew-cask.1
 
 # Ignore `etc` contents (again)
 /etc

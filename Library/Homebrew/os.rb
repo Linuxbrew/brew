@@ -1,30 +1,32 @@
 module OS
   def self.mac?
-    /darwin/i === RUBY_PLATFORM && !ENV["HOMEBREW_TEST_GENERIC_OS"]
+    return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
+    RUBY_PLATFORM.to_s.downcase.include? "darwin"
   end
 
   def self.linux?
-    /linux/i === RUBY_PLATFORM || /linux/i === RbConfig::CONFIG["host_os"]
+    return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
+    RUBY_PLATFORM.to_s.downcase.include?("linux") || RbConfig::CONFIG["host_os"].downcase.include?("linux")
   end
 
   require "os/mac"
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
   
-  GITHUB_USER = "SuperNEMO-DBD"
+  GITHUB_USER = "SuperNEMO-DBD".freeze
+  ISSUES_URL = "https://github.com/#{GITHUB_USER}/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting".freeze
 
   if OS.mac?
-    NAME = "darwin"
-    ISSUES_URL = "https://git.io/brew-troubleshooting"
-    PATH_OPEN = "/usr/bin/open"
-    PATH_PATCH = "/usr/bin/patch"
+    require "os/mac"
+    NAME = "darwin".freeze
+    PATH_OPEN = "/usr/bin/open".freeze
+    PATH_PATCH = "/usr/bin/patch".freeze
     # compatibility
-    ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s
-    ::MACOS_VERSION = OS::Mac.version.to_s
+    ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
+    ::MACOS_VERSION = OS::Mac.version.to_s.freeze
   elsif OS.linux?
-    NAME = "linux"
-    ISSUES_URL = "https://github.com/#{GITHUB_USER}/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting"
-    PATH_OPEN = "xdg-open"
-    PATH_PATCH = "patch"
+    NAME = "linux".freeze
+    PATH_OPEN = "xdg-open".freeze
+    PATH_PATCH = "patch".freeze
     # compatibility
     ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0"
   end

@@ -3,9 +3,23 @@ require "tempfile"
 
 class Sandbox
   SANDBOX_EXEC = "/usr/bin/sandbox-exec".freeze
+  SANDBOXED_TAPS = [
+    "homebrew/core",
+  ].freeze
 
   def self.available?
-    OS.mac? && File.executable?(SANDBOX_EXEC)
+    OS.mac? && OS::Mac.version >= "10.6" && File.executable?(SANDBOX_EXEC)
+  end
+
+  def self.formula?(formula)
+    return false unless available?
+    return false if ARGV.no_sandbox?
+    ARGV.sandbox? || SANDBOXED_TAPS.include?(formula.tap.to_s)
+  end
+
+  def self.test?
+    return false unless available?
+    !ARGV.no_sandbox?
   end
 
   def self.print_sandbox_message
@@ -95,6 +109,10 @@ class Sandbox
       -k Sender sandboxd
     ]
     logs = Utils.popen_read("syslog", *syslog_args)
+
+    # These messages are confusing and non-fatal, so don't report them.
+    logs = logs.lines.reject{ |l| l.match(/^.*Python\(\d+\) deny file-write.*pyc$/) }.join
+
     unless logs.empty?
       if @logfile
         log = open(@logfile, "w")

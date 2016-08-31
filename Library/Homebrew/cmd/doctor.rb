@@ -18,7 +18,6 @@ module Homebrew
       exit
     end
 
-
     if ARGV.named.empty?
       slow_checks = %w[
         check_for_broken_symlinks
@@ -33,6 +32,7 @@ module Homebrew
 
     first_warning = true
     methods.each do |method|
+      $stderr.puts "Checking #{method}" if ARGV.debug?
       unless checks.respond_to?(method)
         Homebrew.failed = true
         puts "No check available by the name: #{method}"

@@ -13,17 +13,17 @@ class X11Requirement < Requirement
   def initialize(name = "x11", tags = [])
     @name = name
     if /(\d\.)+\d/ === tags.first
-      @min_version = Version.new(tags.shift)
+      @min_version = Version.create(tags.shift)
       @min_version_string = " #{@min_version}"
     else
-      @min_version = Version.new("0.0.0")
+      @min_version = Version.create("0.0.0")
       @min_version_string = ""
     end
     super(tags)
   end
 
   satisfy :build_env => false do
-    MacOS::XQuartz.installed? && min_version <= Version.new(MacOS::XQuartz.version)
+    MacOS::XQuartz.installed? && min_version <= Version.create(MacOS::XQuartz.version)
   end
 
   def message

@@ -2,7 +2,7 @@ module Language
   module Haskell
     module Cabal
       def cabal_clean_lib
-        # avoid installing any Haskell libraries, as a matter of policy
+        odeprecated "Language::Haskell::Cabal#cabal_clean_lib"
         rm_rf lib
       end
     end

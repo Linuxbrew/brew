@@ -118,7 +118,7 @@ module Homebrew
     attrs << "pinned at #{f.pinned_version}" if f.pinned?
     attrs << "keg-only" if f.keg_only?
 
-    puts "#{f.full_name}: #{specs * ", "}#{" [#{attrs * ", "}]" if attrs.any?}"
+    puts "#{f.full_name}: #{specs * ", "}#{" [#{attrs * ", "}]" unless attrs.empty?}"
     puts f.desc if f.desc
     puts "#{Tty.em}#{f.homepage}#{Tty.reset}" if f.homepage
 
@@ -126,14 +126,14 @@ module Homebrew
     puts "Conflicts with: #{conflicts*", "}" unless conflicts.empty?
 
     kegs = f.installed_kegs.sort_by(&:version)
-    if kegs.any?
+    if kegs.empty?
+      puts "Not installed"
+    else
       kegs.each do |keg|
         puts "#{keg} (#{keg.abv})#{" *" if keg.linked?}"
         tab = Tab.for_keg(keg).to_s
         puts "  #{tab}" unless tab.empty?
       end
-    else
-      puts "Not installed"
     end
 
     puts "From: #{Tty.em}#{github_info(f)}#{Tty.reset}"

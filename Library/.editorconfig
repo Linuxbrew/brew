@@ -1,0 +1,17 @@
+# http://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+
+[{Homebrew/**.rb,.simplecov}]
+trim_trailing_whitespace = true
+
+[Taps/homebrew/**.rb]
+# trailing whitespace is crucial for patches
+trim_trailing_whitespace = false

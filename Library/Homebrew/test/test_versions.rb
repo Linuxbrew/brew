@@ -4,17 +4,17 @@ require "version"
 class VersionTests < Homebrew::TestCase
   def test_accepts_objects_responding_to_to_str
     value = stub(:to_str => "0.1")
-    assert_equal "0.1", Version.new(value).to_s
+    assert_equal "0.1", Version.create(value).to_s
   end
 
   def test_raises_for_non_string_objects
-    assert_raises(TypeError) { Version.new(1.1) }
-    assert_raises(TypeError) { Version.new(1) }
-    assert_raises(TypeError) { Version.new(:symbol) }
+    assert_raises(TypeError) { Version.create(1.1) }
+    assert_raises(TypeError) { Version.create(1) }
+    assert_raises(TypeError) { Version.create(:symbol) }
   end
 
   def test_detected_from_url?
-    refute Version.new("1.0").detected_from_url?
+    refute Version.create("1.0").detected_from_url?
     assert Version::FromURL.new("1.0").detected_from_url?
   end
 end
@@ -53,9 +53,13 @@ class VersionComparisonTests < Homebrew::TestCase
     assert_operator version("1.2.3"), :<, version("1.2.3-p34")
   end
 
-  def test_HEAD
+  def test_head
     assert_operator version("HEAD"), :>, version("1.2.3")
+    assert_operator version("HEAD-abcdef"), :>, version("1.2.3")
     assert_operator version("1.2.3"), :<, version("HEAD")
+    assert_operator version("1.2.3"), :<, version("HEAD-fedcba")
+    assert_operator version("HEAD-abcdef"), :==, version("HEAD-fedcba")
+    assert_operator version("HEAD"), :==, version("HEAD-fedcba")
   end
 
   def test_comparing_alpha_versions
@@ -154,6 +158,12 @@ class VersionParsingTests < Homebrew::TestCase
   def test_no_version
     assert_version_nil "http://example.com/blah.tar"
     assert_version_nil "foo"
+  end
+
+  def test_create
+    v = Version.create("1.20")
+    refute_predicate v, :head?
+    assert_equal "1.20", v.to_str
   end
 
   def test_version_all_dots
@@ -428,8 +438,12 @@ class VersionParsingTests < Homebrew::TestCase
       "https://opam.ocaml.org/archives/easy-format.1.0.2+opam.tar.gz"
   end
 
-  def test_waf_version
+  def test_no_extension_version
     assert_version_detected "1.8.12", "https://waf.io/waf-1.8.12"
+    assert_version_detected "0.7.1", "https://codeload.github.com/gsamokovarov/jump/tar.gz/v0.7.1"
+    assert_version_detected "0.9.1234", "https://my.datomic.com/downloads/free/0.9.1234"
+    assert_version_detected "0.9", "https://my.datomic.com/downloads/free/0.9.1t34"
+    assert_version_detected "1.2.3", "https://my.datomic.com/downloads/free/1.2.3"
   end
 
   def test_dash_separated_version
@@ -438,6 +452,41 @@ class VersionParsingTests < Homebrew::TestCase
 
   def test_from_url
     assert_version_detected "1.2.3",
-      "http://github.com/foo/bar.git", {:tag => "v1.2.3"}
+      "http://github.com/foo/bar.git", :tag => "v1.2.3"
+  end
+end
+
+class HeadVersionTests < Homebrew::TestCase
+  def test_create_head
+    v1 = Version.create("HEAD-abcdef")
+    v2 = Version.create("HEAD")
+
+    assert_predicate v1, :head?
+    assert_predicate v2, :head?
+  end
+
+  def test_commit_assigned
+    v = Version.create("HEAD-abcdef")
+    assert_equal "abcdef", v.commit
+    assert_equal "HEAD-abcdef", v.to_str
+  end
+
+  def test_no_commit
+    v = Version.create("HEAD")
+    assert_nil v.commit
+    assert_equal "HEAD", v.to_str
+  end
+
+  def test_update_commit
+    v1 = Version.create("HEAD-abcdef")
+    v2 = Version.create("HEAD")
+
+    v1.update_commit("ffffff")
+    assert_equal "ffffff", v1.commit
+    assert_equal "HEAD-ffffff", v1.to_str
+
+    v2.update_commit("ffffff")
+    assert_equal "ffffff", v2.commit
+    assert_equal "HEAD-ffffff", v2.to_str
   end
 end

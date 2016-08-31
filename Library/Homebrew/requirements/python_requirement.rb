@@ -11,16 +11,16 @@ class PythonRequirement < Requirement
     version = python_short_version
     next unless version
     # Always use Python 2.7 for consistency on older versions of OSX.
-    version == Version.new("2.7")
+    version == Version.create("2.7")
   end
 
   env do
     short_version = python_short_version
 
-    if !system_python? && short_version == Version.new("2.7")
+    if !system_python? && short_version == Version.create("2.7")
       ENV.prepend_path "PATH", which_python.dirname
     # Homebrew Python should take precedence over older Pythons in the PATH
-    elsif short_version != Version.new("2.7")
+    elsif short_version != Version.create("2.7")
       ENV.prepend_path "PATH", Formula["python"].opt_bin
     end
 

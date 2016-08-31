@@ -1,6 +1,6 @@
 # Cadfaelbrew
 
-Cadfaelbrew is a fork of [Linuxbrew](http://linuxbrew.sh), the Mac OS/Linux package manager, for the SuperNEMO-DBD 
+Cadfaelbrew is a fork of [Linuxbrew](http://linuxbrew.sh), the Mac OS/Linux package manager, for the SuperNEMO-DBD
 experiment.
 
 It can be installed in your home directory and does not require root access. The same package manager can be used on both your Linux server and your Mac laptop. Installing a modern version of *glibc* and *gcc* in your home directory on an old distribution of Linux takes five minutes.
@@ -8,7 +8,7 @@ It can be installed in your home directory and does not require root access. The
 Features, usage and installation instructions are summarised below.
 
 Cadfaelbrew follows upstream linuxbrew/brew with some lag depending on production requirements.
-Merges typically happen on 1 month cycles. To receive updates of major changes to Linuxbrew subscribe 
+Merges typically happen on 1 month cycles. To receive updates of major changes to Linuxbrew subscribe
 to the [Linuxbrew Updates](https://github.com/linuxbrew/brew/issues/1) issue on GitHub.
 
 If you require an update that's in linuxbrew and not yet merged into Cadfaelbrew, please raise an issue.
@@ -40,7 +40,7 @@ $ brew cadfael-bootstrap
 $ brew install falaise
 ```
 The second command installs the main SuperNEMO software package, Falaise, which is provided in
-a [dedicated `tap` for SuperNEMO](https://github.com/SuperNEMO-DBD/homebrew-cadfael). 
+a [dedicated `tap` for SuperNEMO](https://github.com/SuperNEMO-DBD/homebrew-cadfael).
 
 You're done! Unless you saw errors, in which case review [Dependencies](#dependencies) and [Installation](#installation)
 below for more details. If these do not solve the issue, please read the [Troubleshooting Checklist](https://github.com/SuperNEMO-DBD/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting) and submit an Issue following the instructions there if required.
@@ -48,8 +48,8 @@ below for more details. If these do not solve the issue, please read the [Troubl
 Dependencies
 ------------
 + **Mac OS X**
-  + **OS X** 10.9 or newer 
-  + **Xcode** 6 or newer 
+  + **OS X** 10.9 or newer
+  + **Xcode** 6 or newer
 + **Linux**:
   * **Ruby** 1.8.6 or newer
   + **GCC** 4.2 or newer
@@ -57,7 +57,7 @@ Dependencies
   + **Linux** 2.6.16 or newer
   + **64-bit x86** or **32-bit ARM** platform
 
-A dedicated brew command `cadfael-bootstrap` is provided to check system dependencies and will 
+A dedicated brew command `cadfael-bootstrap` is provided to check system dependencies and will
 check everything for you and report any missing items with some instructions on how to install them.
 The actual packages required and checked for on Linux systems are listed below including the command(s)
 needed to install them.
@@ -89,7 +89,7 @@ sudo apt-get install \
 ### CentOS or Red Hat
 
 ```sh
-sudo yum groupinstall 'Development Tools' 
+sudo yum groupinstall 'Development Tools'
 sudo yum install \
   curl \
   git \
@@ -108,7 +108,7 @@ these distros:
 
 ### 32-bit x86 platforms
 
-Cadfaelbrew does not currently support 32-bit x86 platforms. 
+Cadfaelbrew does not currently support 32-bit x86 platforms.
 
 Bottles
 -------
@@ -132,16 +132,24 @@ export MANPATH="$HOME/CadfaelBrew/share/man:$MANPATH"
 export INFOPATH="$HOME/CadfaelBrew/share/info:$INFOPATH"
 ```
 
-You're done!
+You're done! Try installing a package:
 
 ```sh
-brew install $WHATEVER_YOU_WANT
+brew install hello
+```
+
+If you're using an older distribution of Linux, installing your first package will also install a recent version of `gcc`.
+
+## Update Bug
+If Homebrew was updated on Aug 10-11th 2016 and `brew update` always says `Already up-to-date.` you need to run:
+```bash
+cd $(brew --repo); git fetch; git reset --hard origin/master; brew update
 ```
 
 ## What Packages Are Available?
 1. Type `brew search` for a list.
 2. Or visit [braumeister.org](http://braumeister.org) to browse packages online.
-3. Or use `brew search --desc` to browse packages from the command line.
+3. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
 `brew help`, `man brew` or check [our documentation](https://github.com/SuperNEMO-DBD/brew/tree/master/share/doc/homebrew#readme).
@@ -157,10 +165,19 @@ Second, read the [Troubleshooting Checklist](https://github.com/SuperNEMO-DBD/br
 
 Many of the Homebrew formulae work on either Mac or Linux without changes, but some formulae will need to be adapted for Linux. If a formula doesn't work, [open an issue on GitHub](https://github.com/SuperNEMO-DBD/brew/issues) or, even better, submit a pull request.
 
+## Contributing
+We'd love you to contribute to Linuxbrew or its upstream, Homebrew. First, please read our [Contribution Guide](https://github.com/SuperNEMO-DBD/brew/blob/master/.github/CONTRIBUTING.md) and [Code of Conduct](https://github.com/SuperNEMO-DBD/brew/blob/master/CODEOFCONDUCT.md#code-of-conduct).
+
+We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
+
+Please see our [guidelines](https://github.com/SuperNEMO-DBD/brew/blob/master/.github/CONTRIBUTING.md#contributing-to-linuxbrew) on whether to send pull requests to Linuxbrew or Homebrew.
+
+A good starting point for contributing is running `brew audit` (or `brew audit --strict`) with some of the packages you use (e.g. `brew audit wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit` shows no results and [submit a pull request](https://github.com/SuperNEMO-DBD/brew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md). If no formulae you use have warnings you can run `brew audit` without arguments to have it run on all packages and pick one. Good luck!
+
 ## Security
 Please report security issues directly to the main homebrew security team: security@brew.sh.
 
-This is our PGP key which is valid until June 17, 2016.
+This is our PGP key which is valid until May 24, 2017.
 * Key ID: `0xE33A3D3CCE59E297`
 * Fingerprint: `C657 8F76 2E23 441E C879  EC5C E33A 3D3C CE59 E297`
 * Full key: https://keybase.io/homebrew/key.asc
@@ -168,9 +185,9 @@ This is our PGP key which is valid until June 17, 2016.
 ## Who Are You?
 SuperNEMO-DBD's fork of brew is maintained by [Ben Morgan](https://github.com/drbenmorgan).
 
-Linuxbrew is maintained by [Shaun Jackman](https://github.com/sjackman).
+Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer) and [Maxim Belkin](https://github.com/maxim-belkin).
 
-Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Mike McQuaid](https://github.com/mikemcquaid), [Baptiste Fontaine](https://github.com/bfontaine), [Brett Koonce](https://github.com/asparagui), [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
+Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Tomasz Pajor](https://github.com/nijikon), [Mike McQuaid](https://github.com/mikemcquaid), [Baptiste Fontaine](https://github.com/bfontaine), [Brett Koonce](https://github.com/asparagui), [ilovezfs](https://github.com/ilovezfs), [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
 
 Former maintainers with significant contributions include [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
@@ -186,9 +203,9 @@ Homebrew, the upstream project of Linuxbrew, is a member of the [Software Freedo
 - [Donate with PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=V6ZE57MJRYC8L)
 - Donate by USA $ check from a USA bank:
   - Make check payable to "Software Freedom Conservancy, Inc." and place "Directed donation: Homebrew" in the memo field.  Checks should then be mailed to:
-    - Software Freedom Conservancy, Inc.  
-      137 Montague ST  STE 380  
-      BROOKLYN, NY 11201             USA  
+    - Software Freedom Conservancy, Inc.
+      137 Montague ST  STE 380
+      BROOKLYN, NY 11201             USA
 - Donate by wire transfer: contact accounting@sfconservancy.org for wire transfer details.
 - Donate with Flattr or PayPal Giving Fund: coming soon.
 
@@ -200,6 +217,10 @@ Our CI infrastructure is hosted by [The Positive Internet Company](http://www.po
 Our bottles (binary packages) are hosted by Bintray.
 
 [![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/homebrew)
+
+Secure password storage and syncing provided by [1Password for Teams](https://1password.com/teams/) by AgileBits
+
+[![AgileBits](https://da36klfizjv29.cloudfront.net/assets/branding/agilebits-fcca96e9b8e815c5c48c6b3e98156cb5.png)](https://agilebits.com)
 
 Homebrew is a member of the [Software Freedom Conservancy](https://sfconservancy.org)
 

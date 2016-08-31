@@ -31,12 +31,13 @@ class Requirement
 
   # The message to show when the requirement is not met.
   def message
-    s = ""
+    _, _, class_name = self.class.to_s.rpartition "::"
+    s = "#{class_name} unsatisfied!\n"
     if OS.mac? && cask
-      s +=  <<-EOS.undent
+      s += <<-EOS.undent
 
         You can install with Homebrew Cask:
-          brew install Caskroom/cask/#{cask}
+          brew cask install #{cask}
       EOS
     end
 

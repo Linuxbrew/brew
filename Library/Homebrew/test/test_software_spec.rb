@@ -158,7 +158,7 @@ class BottleSpecificationTests < Homebrew::TestCase
       :snow_leopard_32 => "deadbeef"*8,
       :snow_leopard    => "faceb00c"*8,
       :lion            => "baadf00d"*8,
-      :mountain_lion   => "8badf00d"*8
+      :mountain_lion   => "8badf00d"*8,
     }
 
     checksums.each_pair do |cat, digest|
@@ -173,7 +173,7 @@ class BottleSpecificationTests < Homebrew::TestCase
 
   def test_other_setters
     double = Object.new
-    %w[root_url prefix cellar revision].each do |method|
+    %w[root_url prefix cellar rebuild].each do |method|
       @spec.send(method, double)
       assert_equal double, @spec.send(method)
     end

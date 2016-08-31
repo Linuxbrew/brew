@@ -1,6 +1,6 @@
 class Keg
   def fname
-    opoo "Keg#fname is a deprecated alias for Keg#name and will be removed soon"
+    odeprecated "Keg#fname", "Keg#name"
     name
   end
 end

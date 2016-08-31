@@ -1,4 +1,4 @@
-#:  * `log` [`git-log-options`] <formula> ...:
+#:  * `log` [<git-log-options>] <formula> ...:
 #:    Show the git log for the given formulae. Options that `git-log`(1)
 #:    recognizes can be passed before the formula list.
 

@@ -1,4 +1,4 @@
-#:  * `fetch` [`--force`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] <formulae>:
+#:  * `fetch` [`--force`] [`--retry`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] <formulae>:
 #:    Download the source packages for the given <formulae>.
 #:    For tarballs, also print SHA-256 checksums.
 #:
@@ -9,6 +9,9 @@
 #:    This is useful for seeing if an existing VCS cache has been updated.
 #:
 #:    If `--force` is passed, remove a previously cached version and re-fetch.
+#:
+#:    If `--retry` is passed, retry if a download fails or re-download if the
+#:    checksum of a previously cached version no longer matches.
 #:
 #:    If `--deps` is passed, also download dependencies for any listed <formulae>.
 #:

@@ -1,6 +1,5 @@
 OFFICIAL_TAPS = %w[
   apache
-  binary
   completions
   devel-only
   dupes
@@ -15,4 +14,9 @@ OFFICIAL_TAPS = %w[
   tex
   versions
   x11
-]
+].freeze
+
+OFFICIAL_CMD_TAPS = {
+  "homebrew/bundle" => ["bundle"],
+  "homebrew/services" => ["services"],
+}.freeze

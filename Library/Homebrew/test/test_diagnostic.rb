@@ -44,20 +44,6 @@ class DiagnosticChecksTest < Homebrew::TestCase
     end
   end
 
-  def test_check_for_other_package_managers
-    MacOS.stubs(:macports_or_fink).returns ["fink"]
-    assert_match "You have MacPorts or Fink installed:",
-      @checks.check_for_other_package_managers
-  end
-
-  def test_check_for_unsupported_osx
-    skip "Only for Mac OS" unless OS.mac?
-    ARGV.stubs(:homebrew_developer?).returns false
-    OS::Mac.stubs(:prerelease?).returns true
-    assert_match "We do not provide support for this pre-release version.",
-      @checks.check_for_unsupported_osx
-  end
-
   def test_check_access_homebrew_repository
     mod = HOMEBREW_REPOSITORY.stat.mode & 0777
     HOMEBREW_REPOSITORY.chmod 0555
@@ -120,11 +106,11 @@ class DiagnosticChecksTest < Homebrew::TestCase
     sep = File::PATH_SEPARATOR
     # ensure /usr/bin is before HOMEBREW_PREFIX/bin in the PATH
     ENV["PATH"] = "/usr/bin#{sep}#{bin}#{sep}" +
-      ENV["PATH"].gsub(%r{(?:^|#{sep})(?:/usr/bin|#{bin})}, "")
+                  ENV["PATH"].gsub(%r{(?:^|#{sep})(?:/usr/bin|#{bin})}, "")
 
     # ensure there's at least one file with the same name in both /usr/bin/ and
     # HOMEBREW_PREFIX/bin/
-    (bin/"#{File.basename Dir["/usr/bin/*"].first}").mkpath
+    (bin/File.basename(Dir["/usr/bin/*"].first)).mkpath
 
     assert_match "/usr/bin occurs before #{HOMEBREW_PREFIX}/bin",
       @checks.check_user_path_1
@@ -144,7 +130,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   def test_check_user_path_sbin
     sbin = HOMEBREW_PREFIX/"sbin"
     ENV["PATH"] = "#{HOMEBREW_PREFIX}/bin#{File::PATH_SEPARATOR}" +
-      ENV["PATH"].gsub(%r{(?:^|#{File::PATH_SEPARATOR})#{sbin}}, "")
+                  ENV["PATH"].gsub(/(?:^|#{Regexp.escape(File::PATH_SEPARATOR)})#{Regexp.escape(sbin)}/, "")
     (sbin/"something").mkpath
 
     assert_nil @checks.check_user_path_1
@@ -155,6 +141,19 @@ class DiagnosticChecksTest < Homebrew::TestCase
     sbin.rmtree
   end
 
+  def test_check_xdg_data_dirs
+    xdg_data_dirs = "XDG_DATA_DIRS"
+    ENV.delete xdg_data_dirs
+    assert_nil @checks.check_xdg_data_dirs
+    ENV[xdg_data_dirs] = ""
+    assert_nil @checks.check_xdg_data_dirs
+    ENV[xdg_data_dirs] = "/usr/share"
+    assert_match "Homebrew's share was not found in your XDG_DATA_DIRS",
+      @checks.check_xdg_data_dirs
+    ENV[xdg_data_dirs] = "#{HOMEBREW_PREFIX}/share"
+    assert_nil @checks.check_xdg_data_dirs
+  end
+
   def test_check_user_curlrc
     mktmpdir do |path|
       FileUtils.touch "#{path}/.curlrc"
@@ -163,14 +162,6 @@ class DiagnosticChecksTest < Homebrew::TestCase
       assert_match "You have a curlrc file",
         @checks.check_user_curlrc
     end
-  end
-
-  def test_check_for_unsupported_curl_vars
-    MacOS.stubs(:version).returns OS::Mac::Version.new("10.10")
-    ENV["SSL_CERT_DIR"] = "/some/path"
-
-    assert_match "SSL_CERT_DIR support was removed from Apple's curl.",
-      @checks.check_for_unsupported_curl_vars
   end
 
   def test_check_for_config_scripts
@@ -185,7 +176,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
     end
   end
 
-  def test_check_DYLD_vars
+  def test_check_dyld_vars
     if OS.mac?
       ENV["DYLD_INSERT_LIBRARIES"] = "foo"
       assert_match "Setting DYLD_INSERT_LIBRARIES",

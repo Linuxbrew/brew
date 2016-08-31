@@ -16,14 +16,20 @@ module OS
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
         when "10.11" then "7.3.1"
+        when "10.12" then "8.0"
         else
           # Default to newest known version of Xcode for unreleased OSX versions.
           if OS::Mac.prerelease?
-            "7.3.1"
+            "8.0"
           else
             raise "OS X '#{MacOS.version}' is invalid"
           end
         end
+      end
+
+      def prerelease?
+        # TODO: bump to version >= "8.1" after Xcode 8.0 is stable.
+        version > "7.3.1"
       end
 
       def outdated?
@@ -66,6 +72,19 @@ module OS
         !prefix.nil?
       end
 
+      def update_instructions
+        if MacOS.version >= "10.9" && !OS::Mac.prerelease?
+          <<-EOS.undent
+            Xcode can be updated from the App Store.
+          EOS
+        else
+          <<-EOS.undent
+            Xcode can be updated from
+              https://developer.apple.com/xcode/downloads/
+          EOS
+        end
+      end
+
       def version
         # may return a version string
         # that is guessed based on the compiler, so do not
@@ -105,22 +124,7 @@ module OS
         # Xcode.version would always be non-nil. This is deprecated, and will
         # be removed in a future version. To remain compatible, guard usage of
         # Xcode.version with an Xcode.installed? check.
-        case MacOS.llvm_build_version.to_i
-        when 1..2063 then "3.1.0"
-        when 2064..2065 then "3.1.4"
-        when 2066..2325
-          # we have no data for this range so we are guessing
-          "3.2.0"
-        when 2326
-          # also applies to "3.2.3"
-          "3.2.4"
-        when 2327..2333 then "3.2.5"
-        when 2335
-          # this build number applies to 3.2.6, 4.0 and 4.1
-          # https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Xcode.md
-          "4.0"
-        else
-          case (MacOS.clang_version.to_f * 10).to_i
+        case (DevelopmentTools.clang_version.to_f * 10).to_i
           when 0       then "dunno"
           when 1..14   then "3.2.2"
           when 15      then "3.2.4"
@@ -138,17 +142,17 @@ module OS
           when 61      then "6.1"
           when 70      then "7.0"
           when 73      then "7.3"
-          else "7.3"
-          end
+          when 80      then "8.0"
+          else "8.0"
         end
       end
 
       def provides_gcc?
-        version < "4.3"
+        installed? && version < "4.3"
       end
 
       def provides_cvs?
-        version < "5.0"
+        installed? && version < "5.0"
       end
 
       def default_prefix?
@@ -176,8 +180,23 @@ module OS
         !!detect_version
       end
 
+      def update_instructions
+        if MacOS.version >= "10.9"
+          <<-EOS.undent
+            Update them from Software Update in the App Store.
+          EOS
+        elsif MacOS.version == "10.8" || MacOS.version == "10.7"
+          <<-EOS.undent
+            The standalone package can be obtained from
+              https://developer.apple.com/downloads
+            or it can be installed via Xcode's preferences.
+          EOS
+        end
+      end
+
       def latest_version
         case MacOS.version
+        when "10.12" then "800.0.38"
         when "10.11" then "703.0.31"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"

@@ -1,6 +1,8 @@
 # Cleans a newly installed keg.
 # By default:
 # * removes .la files
+# * removes perllocal.pod files
+# * removes .packlist files
 # * removes empty directories
 # * sets permissions on executables
 # * removes unresolved symlinks
@@ -66,6 +68,10 @@ class Cleaner
     end
   end
 
+  def executable_path?(path)
+    path.text_executable? || path.executable?
+  end
+
   # Clean a top-level (bin, sbin, lib) directory, recursively, by fixing file
   # permissions and removing .la files, unless the files (or parent
   # directories) are protected by skip_clean.
@@ -85,9 +91,17 @@ class Cleaner
         next
       elsif path.extname == ".la"
         path.unlink
+      elsif path.basename.to_s == "perllocal.pod"
+        # Both this file & the .packlist one below are completely unnecessary
+        # to package & causes pointless conflict with other formulae. They are
+        # removed by Debian, Arch & MacPorts amongst other packagers as well.
+        # The files are created as part of installing any Perl module.
+        path.unlink
+      elsif path.basename.to_s == ".packlist" # Hidden file, not file extension!
+        path.unlink
       else
         # Set permissions for executables and non-executables
-        perms = if path.mach_o_executable? || path.text_executable? || (path.dylib? && !OS.mac?)
+        perms = if executable_path?(path)
           0555
         else
           0444
@@ -103,3 +117,5 @@ class Cleaner
     end
   end
 end
+
+require "extend/os/cleaner"

@@ -36,11 +36,12 @@ class LanguageModuleRequirementTests < Homebrew::TestCase
   end
 
   def test_bad_python_deps
+    needs_python
     assert_deps_fail "notapackage" => :python
   end
 
   def test_good_python_deps
-    return unless which "python"
+    needs_python
     assert_deps_pass "datetime" => :python
   end
 

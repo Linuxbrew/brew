@@ -5,7 +5,7 @@ require "version"
 require "options"
 require "build_options"
 require "dependency_collector"
-require "bottles"
+require "utils/bottles"
 require "patch"
 require "compilers"
 
@@ -29,6 +29,7 @@ class SoftwareSpec
   def_delegators :@resource, :cached_download, :clear_cache
   def_delegators :@resource, :checksum, :mirrors, :specs, :using
   def_delegators :@resource, :version, :mirror, *Checksum::TYPES
+  def_delegators :@resource, :downloader
 
   def initialize
     @resource = Resource.new
@@ -52,7 +53,7 @@ class SoftwareSpec
     @resource.owner = self
     resources.each_value do |r|
       r.owner     = self
-      r.version ||= version
+      r.version ||= (version.head? ? Version.create("HEAD") : version.dup)
     end
     patches.each { |p| p.owner = self }
   end
@@ -76,11 +77,11 @@ class SoftwareSpec
   end
 
   def bottle_defined?
-    bottle_specification.collector.keys.any?
+    !bottle_specification.collector.keys.empty?
   end
 
   def bottled?
-    bottle_specification.tag?(bottle_tag) && \
+    bottle_specification.tag?(Utils::Bottles.tag) && \
       (bottle_specification.compatible_cellar? || ARGV.force_bottle?)
   end
 
@@ -204,7 +205,7 @@ end
 class HeadSoftwareSpec < SoftwareSpec
   def initialize
     super
-    @resource.version = Version.new("HEAD")
+    @resource.version = Version.create("HEAD")
   end
 
   def verify_download_integrity(_fn)
@@ -214,17 +215,17 @@ end
 
 class Bottle
   class Filename
-    attr_reader :name, :version, :tag, :revision
+    attr_reader :name, :version, :tag, :rebuild
 
-    def self.create(formula, tag, revision)
-      new(formula.name, formula.pkg_version, tag, revision)
+    def self.create(formula, tag, rebuild)
+      new(formula.name, formula.pkg_version, tag, rebuild)
     end
 
-    def initialize(name, version, tag, revision)
+    def initialize(name, version, tag, rebuild)
       @name = name
       @version = version
       @tag = tag
-      @revision = revision
+      @rebuild = rebuild
     end
 
     def to_s
@@ -237,14 +238,14 @@ class Bottle
     end
 
     def suffix
-      s = revision > 0 ? ".#{revision}" : ""
+      s = rebuild > 0 ? ".#{rebuild}" : ""
       ".bottle#{s}.tar.gz"
     end
   end
 
   extend Forwardable
 
-  attr_reader :name, :resource, :prefix, :cellar, :revision
+  attr_reader :name, :resource, :prefix, :cellar, :rebuild
 
   def_delegators :resource, :url, :fetch, :verify_download_integrity
   def_delegators :resource, :cached_download, :clear_cache
@@ -255,16 +256,16 @@ class Bottle
     @resource.owner = formula
     @spec = spec
 
-    checksum, tag = spec.checksum_for(bottle_tag)
+    checksum, tag = spec.checksum_for(Utils::Bottles.tag)
 
-    filename = Filename.create(formula, tag, spec.revision)
+    filename = Filename.create(formula, tag, spec.rebuild)
     @resource.url(build_url(spec.root_url, filename))
     @resource.download_strategy = CurlBottleDownloadStrategy
     @resource.version = formula.pkg_version
     @resource.checksum = checksum
     @prefix = spec.prefix
     @cellar = spec.cellar
-    @revision = spec.revision
+    @rebuild = spec.rebuild
   end
 
   def compatible_cellar?
@@ -296,22 +297,22 @@ class BottleSpecification
   DEFAULT_DOMAIN_MAC = "https://homebrew.bintray.com".freeze
   DEFAULT_DOMAIN = ENV["HOMEBREW_BOTTLE_DOMAIN"].freeze || (OS.mac? ? DEFAULT_DOMAIN_MAC : DEFAULT_DOMAIN_LINUX)
 
-  attr_rw :prefix, :cellar, :revision
+  attr_rw :prefix, :cellar, :rebuild
   attr_accessor :tap
   attr_reader :checksum, :collector
 
   def initialize
-    @revision = 0
+    @rebuild = 0
     @prefix = DEFAULT_PREFIX
     @cellar = DEFAULT_CELLAR
-    @collector = BottleCollector.new
+    @collector = Utils::Bottles::Collector.new
   end
 
   def root_url(var = nil)
     if var.nil?
       default_domain = !OS.mac? || (tap && tap.linux?) ? DEFAULT_DOMAIN_LINUX : DEFAULT_DOMAIN_MAC
       domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || default_domain
-      @root_url ||= "#{domain}/#{Bintray.repository(tap)}"
+      @root_url ||= "#{domain}/#{Utils::Bottles::Bintray.repository(tap)}"
     else
       @root_url = var
     end

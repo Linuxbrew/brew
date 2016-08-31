@@ -2,6 +2,7 @@ require "cxxstdlib"
 require "ostruct"
 require "options"
 require "utils/json"
+require "development_tools"
 
 # Inherit from OpenStruct to gain a generic initialization method that takes a
 # hash and creates an attribute for each key and value. `Tab.new` probably
@@ -15,7 +16,8 @@ class Tab < OpenStruct
     CACHE.clear
   end
 
-  def self.create(formula, compiler, stdlib, build, source_modified_time)
+  def self.create(formula, compiler, stdlib)
+    build = formula.build
     attributes = {
       "used_options" => build.used_options.as_flags,
       "unused_options" => build.unused_options.as_flags,
@@ -23,14 +25,20 @@ class Tab < OpenStruct
       "built_as_bottle" => build.bottle?,
       "poured_from_bottle" => false,
       "time" => Time.now.to_i,
-      "source_modified_time" => source_modified_time.to_i,
-      "HEAD" => Homebrew.git_head,
+      "source_modified_time" => formula.source_modified_time.to_i,
+      "HEAD" => HOMEBREW_REPOSITORY.git_head,
       "compiler" => compiler,
       "stdlib" => stdlib,
       "source" => {
         "path" => formula.path.to_s,
         "tap" => formula.tap ? formula.tap.name : nil,
-        "spec" => formula.active_spec_sym.to_s
+        "spec" => formula.active_spec_sym.to_s,
+        "versions" => {
+          "stable" => formula.stable ? formula.stable.version.to_s : nil,
+          "devel" => formula.devel ? formula.devel.version.to_s : nil,
+          "head" => formula.head ? formula.head.version.to_s : nil,
+          "version_scheme" => formula.version_scheme,
+        }
       }
     }
 
@@ -57,6 +65,13 @@ class Tab < OpenStruct
       attributes["source"]["tap"] = "homebrew/core"
     end
 
+    case attributes["source"]["tap"]
+    when "linuxbrew/dupes"
+      attributes["source"]["tap"] = "homebrew/dupes"
+    when "linuxbrew/science"
+      attributes["source"]["tap"] = "homebrew/science"
+    end
+
     if attributes["source"]["spec"].nil?
       version = PkgVersion.parse path.to_s.split("/")[-2]
       if version.head?
@@ -64,6 +79,15 @@ class Tab < OpenStruct
       else
         attributes["source"]["spec"] = "stable"
       end
+    end
+
+    if attributes["source"]["versions"].nil?
+      attributes["source"]["versions"] = {
+        "stable" => nil,
+        "devel" => nil,
+        "head" => nil,
+        "version_scheme" => 0,
+      }
     end
 
     new(attributes)
@@ -108,7 +132,7 @@ class Tab < OpenStruct
       paths << dirs.first
     end
 
-    paths << f.prefix
+    paths << f.installed_prefix
 
     path = paths.map { |pn| pn.join(FILENAME) }.find(&:file?)
 
@@ -123,6 +147,12 @@ class Tab < OpenStruct
         "path" => f.path.to_s,
         "tap" => f.tap ? f.tap.name : f.tap,
         "spec" => f.active_spec_sym.to_s,
+        "versions" => {
+          "stable" => f.stable ? f.stable.version.to_s : nil,
+          "devel" => f.devel ? f.devel.version.to_s : nil,
+          "head" => f.head ? f.head.version.to_s : nil,
+          "version_scheme" => f.version_scheme,
+        }
       }
     end
 
@@ -139,11 +169,17 @@ class Tab < OpenStruct
       "source_modified_time" => 0,
       "HEAD" => nil,
       "stdlib" => nil,
-      "compiler" => OS.mac? ? "clang" : "gcc",
+      "compiler" => DevelopmentTools.default_compiler,
       "source" => {
         "path" => nil,
         "tap" => nil,
-        "spec" => "stable"
+        "spec" => "stable",
+        "versions" => {
+          "stable" => nil,
+          "devel" => nil,
+          "head" => nil,
+          "version_scheme" => 0,
+        }
       }
     }
 
@@ -179,6 +215,18 @@ class Tab < OpenStruct
     include?("32-bit")
   end
 
+  def head?
+    spec == :head
+  end
+
+  def devel?
+    spec == :devel
+  end
+
+  def stable?
+    spec == :stable
+  end
+
   def used_options
     Options.create(super)
   end
@@ -188,7 +236,7 @@ class Tab < OpenStruct
   end
 
   def compiler
-    super || MacOS.default_compiler
+    super || DevelopmentTools.default_compiler
   end
 
   def cxxstdlib
@@ -217,6 +265,26 @@ class Tab < OpenStruct
 
   def spec
     source["spec"].to_sym
+  end
+
+  def versions
+    source["versions"]
+  end
+
+  def stable_version
+    Version.create(versions["stable"]) if versions["stable"]
+  end
+
+  def devel_version
+    Version.create(versions["devel"]) if versions["devel"]
+  end
+
+  def head_version
+    Version.create(versions["head"]) if versions["head"]
+  end
+
+  def version_scheme
+    versions["version_scheme"] || 0
   end
 
   def source_modified_time

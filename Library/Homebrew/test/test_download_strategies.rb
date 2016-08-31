@@ -60,6 +60,106 @@ class VCSDownloadStrategyTests < Homebrew::TestCase
   end
 end
 
+class GitDownloadStrategyTests < Homebrew::TestCase
+  include FileUtils
+
+  def setup
+    resource = ResourceDouble.new("https://github.com/homebrew/foo")
+    @commit_id = 1
+    @strategy = GitDownloadStrategy.new("baz", resource)
+    @cached_location = @strategy.cached_location
+    mkpath @cached_location
+  end
+
+  def teardown
+    rmtree @cached_location
+  end
+
+  def git_commit_all
+    shutup do
+      system "git", "add", "--all"
+      system "git", "commit", "-m", "commit number #{@commit_id}"
+      @commit_id += 1
+    end
+  end
+
+  def using_git_env
+    initial_env = ENV.to_hash
+    %w[AUTHOR COMMITTER].each do |role|
+      ENV["GIT_#{role}_NAME"] = "brew tests"
+      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
+      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
+    end
+    yield
+  ensure
+    ENV.replace(initial_env)
+  end
+
+  def setup_git_repo
+    using_git_env do
+      @cached_location.cd do
+        shutup do
+          system "git", "init"
+          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+        end
+        touch "README"
+        git_commit_all
+      end
+    end
+  end
+
+  def test_github_git_download_strategy_user_repo
+    resource = ResourceDouble.new("https://github.com/homebrew/brew.git")
+    strategy = GitHubGitDownloadStrategy.new("brew", resource)
+
+    assert_equal strategy.instance_variable_get(:@user), "homebrew"
+    assert_equal strategy.instance_variable_get(:@repo), "brew"
+  end
+
+  def test_source_modified_time
+    setup_git_repo
+    assert_equal 1242860651, @strategy.source_modified_time.to_i
+  end
+
+  def test_last_commit
+    setup_git_repo
+    using_git_env do
+      @cached_location.cd do
+        touch "LICENSE"
+        git_commit_all
+      end
+    end
+    assert_equal "c50c79b", @strategy.last_commit
+  end
+
+  def test_fetch_last_commit
+    remote_repo = HOMEBREW_PREFIX.join("remote_repo")
+    remote_repo.mkdir
+
+    resource = ResourceDouble.new("file://#{remote_repo}")
+    resource.instance_variable_set(:@version, Version.create("HEAD"))
+    @strategy = GitDownloadStrategy.new("baz", resource)
+
+    using_git_env do
+      remote_repo.cd do
+        shutup do
+          system "git", "init"
+          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+        end
+        touch "README"
+        git_commit_all
+        touch "LICENSE"
+        git_commit_all
+      end
+    end
+
+    @strategy.shutup!
+    assert_equal "c50c79b", @strategy.fetch_last_commit
+  ensure
+    remote_repo.rmtree if remote_repo.directory?
+  end
+end
+
 class DownloadStrategyDetectorTests < Homebrew::TestCase
   def setup
     @d = DownloadStrategyDetector.new
@@ -68,6 +168,11 @@ class DownloadStrategyDetectorTests < Homebrew::TestCase
   def test_detect_git_download_startegy
     @d = DownloadStrategyDetector.detect("git://example.com/foo.git")
     assert_equal GitDownloadStrategy, @d
+  end
+
+  def test_detect_github_git_download_strategy
+    @d = DownloadStrategyDetector.detect("https://github.com/homebrew/brew.git")
+    assert_equal GitHubGitDownloadStrategy, @d
   end
 
   def test_default_to_curl_strategy

@@ -1,4 +1,5 @@
 require "extend/string"
+require "readall"
 
 # a {Tap} is used to extend the formulae provided by Homebrew core.
 # Usually, it's synced with a remote git repository. And it's likely
@@ -24,7 +25,9 @@ class Tap
       repo = args[1]
     end
 
-    raise "Invalid tap name" unless user && repo
+    if [user, repo].any? { |part| part.nil? || part.include?("/") }
+      raise "Invalid tap name '#{args.join("/")}'"
+    end
 
     # we special case homebrew so users don't have to shift in a terminal
     user = "Homebrew" if user == "homebrew"
@@ -64,12 +67,14 @@ class Tap
     @repo = repo
     @name = "#{@user}/#{@repo}".downcase
     @path = TAP_DIRECTORY/"#{@user}/homebrew-#{@repo}".downcase
+    @path.extend(GitRepositoryExtension)
   end
 
   # clear internal cache
   def clear_cache
     @remote = nil
     @formula_dir = nil
+    @cask_dir = nil
     @formula_files = nil
     @alias_dir = nil
     @alias_files = nil
@@ -86,15 +91,8 @@ class Tap
   # The remote path to this {Tap}.
   # e.g. `https://github.com/user/homebrew-repo`
   def remote
-    @remote ||= if installed?
-      if git? && Utils.git_available?
-        path.cd do
-          Utils.popen_read("git", "config", "--get", "remote.origin.url").chomp
-        end
-      end
-    else
-      raise TapUnavailableError, name
-    end
+    raise TapUnavailableError, name unless installed?
+    @remote ||= path.git_origin
   end
 
   # The GitHub slug of the {Tap}.
@@ -125,35 +123,31 @@ class Tap
 
   # True if this {Tap} is a git repository.
   def git?
-    (path/".git").exist?
+    path.git?
   end
 
   # git HEAD for this {Tap}.
   def git_head
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "rev-parse", "--verify", "-q", "HEAD").chuzzle }
+    path.git_head
   end
 
   # git HEAD in short format for this {Tap}.
   def git_short_head
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "rev-parse", "--short=4", "--verify", "-q", "HEAD").chuzzle }
+    path.git_short_head
   end
 
   # time since git last commit for this {Tap}.
   def git_last_commit
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "show", "-s", "--format=%cr", "HEAD").chuzzle }
+    path.git_last_commit
   end
 
   # git last commit date for this {Tap}.
   def git_last_commit_date
     raise TapUnavailableError, name unless installed?
-    return unless git? && Utils.git_available?
-    path.cd { Utils.popen_read("git", "show", "-s", "--format=%cd", "--date=short", "HEAD").chuzzle }
+    path.git_last_commit_date
   end
 
   # The issues URL of this {Tap}.
@@ -255,9 +249,16 @@ class Tap
 
     begin
       safe_system "git", *args
-    rescue Interrupt, ErrorDuringExecution
+      unless Readall.valid_tap?(self, :aliases => true)
+        unless ARGV.homebrew_developer?
+          raise "Cannot tap #{name}: invalid syntax in tap!"
+        end
+      end
+    rescue Interrupt, ErrorDuringExecution, RuntimeError
       ignore_interrupts do
-        sleep 0.1 # wait for git to cleanup the top directory when interrupt happens.
+        # wait for git to possibly cleanup the top directory when interrupt happens.
+        sleep 0.1
+        FileUtils.rm_rf path
         path.parent.rmdir_if_possible
       end
       raise
@@ -281,26 +282,7 @@ class Tap
   end
 
   def link_manpages
-    return unless (path/"man").exist?
-    conflicts = []
-    (path/"man").find do |src|
-      next if src.directory?
-      dst = HOMEBREW_PREFIX/"share"/src.relative_path_from(path)
-      next if dst.symlink? && src == dst.resolved_path
-      if dst.exist?
-        conflicts << dst
-        next
-      end
-      dst.make_relative_symlink(src)
-    end
-    unless conflicts.empty?
-      onoe <<-EOS.undent
-        Could not link #{name} manpages to:
-          #{conflicts.join("\n")}
-
-        Please delete these files and run `brew tap --repair`.
-      EOS
-    end
+    link_path_manpages(path, "brew tap --repair")
   end
 
   # uninstall this {Tap}.
@@ -340,6 +322,11 @@ class Tap
     @formula_dir ||= [path/"Formula", path/"HomebrewFormula", path].detect(&:directory?)
   end
 
+  # path to the directory of all {Cask} files for this {Tap}.
+  def cask_dir
+    @cask_dir ||= path/"Casks"
+  end
+
   # an array of all {Formula} files of this {Tap}.
   def formula_files
     @formula_files ||= if formula_dir
@@ -356,6 +343,15 @@ class Tap
     file = Pathname.new(file) unless file.is_a? Pathname
     file = file.expand_path(path)
     file.extname == ".rb" && file.parent == formula_dir
+  end
+
+  # return true if given path would present a cask file in this {Tap}.
+  # accepts both absolute path and relative path (relative to this {Tap}'s path)
+  # @private
+  def cask_file?(file)
+    file = Pathname.new(file) unless file.is_a? Pathname
+    file = file.expand_path(path)
+    file.extname == ".rb" && file.parent == cask_dir
   end
 
   # an array of all {Formula} names of this {Tap}.
@@ -456,6 +452,7 @@ class Tap
     if installed?
       hash["remote"] = remote
       hash["custom_remote"] = custom_remote?
+      hash["private"] = private?
     end
 
     hash

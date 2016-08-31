@@ -3,7 +3,7 @@ require "exceptions"
 require "formula"
 require "keg"
 require "tab"
-require "bottles"
+require "utils/bottles"
 require "caveats"
 require "cleaner"
 require "formula_cellar_checks"
@@ -14,6 +14,8 @@ require "debrew"
 require "sandbox"
 require "requirements/cctools_requirement"
 require "requirements/glibc_requirement"
+require "emoji"
+require "development_tools"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -179,13 +181,13 @@ class FormulaInstaller
 
     check_conflicts
 
-    if !pour_bottle? && !formula.bottle_unneeded? && !MacOS.has_apple_developer_tools?
+    if !pour_bottle? && !formula.bottle_unneeded? && !DevelopmentTools.installed?
       raise BuildToolsError.new([formula])
     end
 
     unless skip_deps_check?
       deps = compute_dependencies
-      check_dependencies_bottled(deps) if pour_bottle? && !MacOS.has_apple_developer_tools?
+      check_dependencies_bottled(deps) if pour_bottle? && !DevelopmentTools.installed?
       install_dependencies(deps)
     end
 
@@ -204,8 +206,16 @@ class FormulaInstaller
     oh1 "Installing #{Tty.green}#{formula.full_name}#{Tty.reset}" if show_header?
 
     if formula.tap && !formula.tap.private?
-      options = effective_build_options_for(formula).used_options.to_a.join(" ")
-      Utils::Analytics.report_event("install", "#{formula.full_name} #{options}".strip)
+      options = []
+      if formula.head?
+        options << "--HEAD"
+      elsif formula.devel?
+        options << "--devel"
+      end
+      options += effective_build_options_for(formula).used_options.to_a
+      category = "install"
+      action = ([formula.full_name] + options).join(" ")
+      Utils::Analytics.report_event(category, action)
     end
 
     @@attempted << formula
@@ -224,7 +234,7 @@ class FormulaInstaller
         @pour_failed = true
         onoe e.message
         opoo "Bottle installation failed: building from source."
-        raise BuildToolsError.new([formula]) unless MacOS.has_apple_developer_tools?
+        raise BuildToolsError.new([formula]) unless DevelopmentTools.installed?
       else
         @poured_bottle = true
       end
@@ -250,9 +260,22 @@ class FormulaInstaller
       begin
         f = Formulary.factory(c.name)
       rescue TapFormulaUnavailableError
-        # If the formula name is in full-qualified name. Let's silently
+        # If the formula name is a fully-qualified name let's silently
         # ignore it as we don't care about things used in taps that aren't
         # currently tapped.
+        false
+      rescue FormulaUnavailableError => e
+        # If the formula name doesn't exist any more then complain but don't
+        # stop installation from continuing.
+        opoo <<-EOS.undent
+          #{formula}: #{e.message}
+          'conflicts_with \"#{c.name}\"' should be removed from #{formula.path.basename}.
+        EOS
+        if ARGV.homebrew_developer?
+          raise
+        else
+          $stderr.puts "Please report this to the #{formula.tap} tap!"
+        end
         false
       else
         f.linked_keg.exist? && f.opt_prefix.exist?
@@ -293,6 +316,7 @@ class FormulaInstaller
     fatals = []
 
     req_map.each_pair do |dependent, reqs|
+      next if dependent.installed?
       reqs.each do |req|
         puts "#{dependent}: #{req.message}"
         fatals << req if req.fatal?
@@ -374,11 +398,11 @@ class FormulaInstaller
   end
 
   def expand_dependencies(deps)
-    inherited_options = {}
+    inherited_options = Hash.new { |hash, key| hash[key] = Options.new }
     poured_bottle = pour_bottle?
 
     expanded_deps = Dependency.expand(formula, deps) do |dependent, dep|
-      options = inherited_options[dep.name] = inherited_options_for(dep)
+      inherited_options[dep.name] |= inherited_options_for(dep)
       build = effective_build_options_for(
         dependent,
         inherited_options.fetch(dependent.name, [])
@@ -389,7 +413,7 @@ class FormulaInstaller
         Dependency.prune
       elsif dep.build? && install_bottle_for?(dependent, build)
         Dependency.prune
-      elsif dep.satisfied?(options)
+      elsif dep.satisfied?(inherited_options[dep.name])
         Dependency.skip
       end
     end
@@ -419,8 +443,9 @@ class FormulaInstaller
   def install_dependencies(deps)
     if deps.empty? && only_deps?
       puts "All dependencies for #{formula.full_name} are satisfied."
-    else
-      oh1 "Installing dependencies for #{formula.full_name}: #{Tty.green}#{deps.map(&:first)*", "}#{Tty.reset}" unless deps.empty?
+    elsif !deps.empty?
+      oh1 "Installing dependencies for #{formula.full_name}: #{Tty.green}#{deps.map(&:first)*", "}#{Tty.reset}",
+        :truncate => false
       deps.each { |dep, options| install_dependency(dep, options) }
     end
 
@@ -508,7 +533,7 @@ class FormulaInstaller
     link(keg)
 
     unless @poured_bottle && formula.bottle_specification.skip_relocation?
-      fix_install_names(keg)
+      fix_dynamic_linkage(keg)
     end
 
     if formula.post_install_defined?
@@ -531,13 +556,9 @@ class FormulaInstaller
     unlock
   end
 
-  def emoji
-    ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba"
-  end
-
   def summary
     s = ""
-    s << "#{emoji}  " if MacOS.version >= :lion && !ENV["HOMEBREW_NO_EMOJI"]
+    s << "#{Emoji.install_badge}  " if Emoji.enabled?
     s << "#{formula.prefix}: #{formula.prefix.abv}"
     s << ", built in #{pretty_duration build_time}" if build_time
     s
@@ -577,9 +598,9 @@ class FormulaInstaller
     end
 
     formula.options.each do |opt|
-      name  = opt.name[/\A(.+)=\z$/, 1]
-      value = ARGV.value(name)
-      args << "--#{name}=#{value}" if name && value
+      name = opt.name[/^([^=]+)=$/, 1]
+      value = ARGV.value(name) if name
+      args << "--#{name}=#{value}" if value
     end
 
     args
@@ -606,18 +627,16 @@ class FormulaInstaller
       #{formula.path}
     ].concat(build_argv)
 
-    if Sandbox.available? && ARGV.sandbox?
-      Sandbox.print_sandbox_message
-    end
+    Sandbox.print_sandbox_message if Sandbox.formula?(formula)
 
     Utils.safe_fork do
       # Invalidate the current sudo timestamp in case a build script calls sudo
       system "/usr/bin/sudo", "-k"
 
-      if Sandbox.available? && ARGV.sandbox?
+      if Sandbox.formula?(formula)
         sandbox = Sandbox.new
         formula.logs.mkpath
-        sandbox.record_log(formula.logs/"sandbox.build.log")
+        sandbox.record_log(formula.logs/"build.sandbox.log")
         sandbox.allow_write_temp_and_cache
         sandbox.allow_write_log(formula)
         sandbox.allow_write_xcode
@@ -628,6 +647,8 @@ class FormulaInstaller
       end
     end
 
+    formula.update_head_version
+
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
@@ -635,6 +656,7 @@ class FormulaInstaller
   rescue Exception
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
+      formula.update_head_version
       formula.prefix.rmtree if formula.prefix.directory?
       formula.rack.rmdir_if_possible
     end
@@ -729,10 +751,10 @@ class FormulaInstaller
     Homebrew.failed = true
   end
 
-  def fix_install_names(keg)
-    keg.fix_install_names
+  def fix_dynamic_linkage(keg)
+    keg.fix_dynamic_linkage
   rescue Exception => e
-    onoe "Failed to fix install names"
+    onoe "Failed to fix install linkage"
     puts "The formula built, but you may encounter issues using it or linking other"
     puts "formula against it."
     ohai e, e.backtrace if debug?
@@ -778,7 +800,7 @@ class FormulaInstaller
 
     keg = Keg.new(formula.prefix)
     unless formula.bottle_specification.skip_relocation?
-      keg.relocate_install_names Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
+      keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
         Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
     end
     keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
@@ -800,7 +822,7 @@ class FormulaInstaller
     tab.tap = formula.tap
     tab.poured_from_bottle = true
     tab.time = Time.now.to_i
-    tab.head = Homebrew.git_head
+    tab.head = HOMEBREW_REPOSITORY.git_head
     tab.write
   end
 

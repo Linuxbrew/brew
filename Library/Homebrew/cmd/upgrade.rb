@@ -1,35 +1,46 @@
-#:  * `upgrade` [<install-options>] [`--cleanup`] [<formulae>]:
+#:  * `upgrade` [<install-options>] [`--cleanup`] [`--fetch-HEAD`] [<formulae>]:
 #:    Upgrade outdated, unpinned brews.
 #:
 #:    Options for the `install` command are also valid here.
 #:
 #:    If `--cleanup` is specified then remove previously installed <formula> version(s).
 #:
+#:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
+#:    the HEAD installation of the formula is outdated. Otherwise, the
+#:    repository's HEAD will be checked for updates when a new stable or devel
+#:    version has been released.
+#:
 #:    If <formulae> are given, upgrade only the specified brews (but do so even
 #:    if they are pinned; see `pin`, `unpin`).
 
 require "cmd/install"
 require "cleanup"
+require "development_tools"
 
 module Homebrew
   def upgrade
-    FormulaInstaller.prevent_build_flags unless MacOS.has_apple_developer_tools?
+    FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
     Homebrew.perform_preinstall_checks
 
     if ARGV.named.empty?
-      outdated = Formula.installed.select(&:outdated?)
+      outdated = Formula.installed.select do |f|
+        f.outdated?(:fetch_head => ARGV.fetch_head?)
+      end
+
       exit 0 if outdated.empty?
-    elsif ARGV.named.any?
-      outdated = ARGV.resolved_formulae.select(&:outdated?)
+    else
+      outdated = ARGV.resolved_formulae.select do |f|
+        f.outdated?(:fetch_head => ARGV.fetch_head?)
+      end
 
       (ARGV.resolved_formulae - outdated).each do |f|
         versions = f.installed_kegs.map { |keg| keg.version }
-        if versions.any?
+        if versions.empty?
+          onoe "#{f.full_name} not installed"
+        else
           version = versions.max
           onoe "#{f.full_name} #{version} already installed"
-        else
-          onoe "#{f.full_name} not installed"
         end
       end
       exit 1 if outdated.empty?
@@ -66,11 +77,10 @@ module Homebrew
 
   def upgrade_formula(f)
     outdated_keg = Keg.new(f.linked_keg.resolved_path) if f.linked_keg.directory?
-    tab = Tab.for_formula(f)
 
     fi = FormulaInstaller.new(f)
-    fi.options             = tab.used_options
-    fi.build_bottle        = ARGV.build_bottle? || (!f.bottled? && tab.build_bottle?)
+    fi.options             = f.build.used_options
+    fi.build_bottle        = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
     fi.build_from_source   = ARGV.build_from_source? || ARGV.build_all_from_source?
     fi.verbose             = ARGV.verbose?
     fi.quieter             = ARGV.quieter?

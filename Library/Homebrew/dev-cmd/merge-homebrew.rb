@@ -33,7 +33,7 @@ module Homebrew
 
   def merge_dupes
     oh1 "Merging Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes"
-    cd(Tap.fetch("linuxbrew/dupes").path) { git_merge }
+    cd(Tap.fetch("homebrew/dupes").path) { git_merge }
   end
 
   def merge_homebrew

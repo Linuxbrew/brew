@@ -47,12 +47,12 @@ class DependencyTests < Homebrew::TestCase
     assert_equal 2, merged.length
     assert_equal Dependency, merged.first.class
 
-    foo_named_dep = merged.find {|d| d.name == "foo"}
+    foo_named_dep = merged.find { |d| d.name == "foo" }
     assert_equal ["bar"], foo_named_dep.tags
     assert_includes foo_named_dep.option_names, "foo"
     assert_includes foo_named_dep.option_names, "foo2"
 
-    xyz_named_dep = merged.find {|d| d.name == "xyz"}
+    xyz_named_dep = merged.find { |d| d.name == "xyz" }
     assert_equal ["abc"], xyz_named_dep.tags
     assert_includes xyz_named_dep.option_names, "foo"
     refute_includes xyz_named_dep.option_names, "foo2"

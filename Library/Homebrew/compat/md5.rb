@@ -1,26 +1,23 @@
 class Formula
-  def self.md5(val)
-    stable.md5(val)
+  def self.md5(_val)
+    odisabled "Formula.md5", "Formula.sha256"
   end
 end
 
 class SoftwareSpec
-  def md5(val)
-    @resource.md5(val)
+  def md5(_val)
+    odisabled "SoftwareSpec#md5", "SoftwareSpec#sha256"
   end
 end
 
 class Resource
-  def md5(val)
-    @checksum = Checksum.new(:md5, val)
+  def md5(_val)
+    odisabled "Resource#md5", "Resource#sha256"
   end
 end
 
 class Pathname
   def md5
-    odie <<-EOS.undent
-      MD5 support has been dropped for security reasons.
-      Please switch this formula to SHA256.
-    EOS
+    odisabled "Pathname#md5", "Pathname#sha256"
   end
 end

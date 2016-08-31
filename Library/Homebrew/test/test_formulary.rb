@@ -1,7 +1,7 @@
 require "testing_env"
 require "formula"
 require "formula_installer"
-require "bottles"
+require "utils/bottles"
 
 class FormularyTest < Homebrew::TestCase
   def test_class_naming
@@ -18,7 +18,7 @@ class FormularyFactoryTest < Homebrew::TestCase
     @name = "testball_bottle"
     @path = CoreTap.new.formula_dir/"#{@name}.rb"
     @bottle_dir = Pathname.new("#{File.expand_path("..", __FILE__)}/bottles")
-    @bottle = @bottle_dir/"testball_bottle-0.1.#{bottle_tag}.bottle.tar.gz"
+    @bottle = @bottle_dir/"testball_bottle-0.1.#{Utils::Bottles.tag}.bottle.tar.gz"
     @path.write <<-EOS.undent
       class #{Formulary.class_s(@name)} < Formula
         url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
@@ -27,7 +27,7 @@ class FormularyFactoryTest < Homebrew::TestCase
         bottle do
           cellar :any_skip_relocation
           root_url "file://#{@bottle_dir}"
-          sha256 "9abc8ce779067e26556002c4ca6b9427b9874d25f0cafa7028e05b5c5c410cb4" => :#{bottle_tag}
+          sha256 "9abc8ce779067e26556002c4ca6b9427b9874d25f0cafa7028e05b5c5c410cb4" => :#{Utils::Bottles.tag}
         end
 
         def install
@@ -90,12 +90,17 @@ class FormularyFactoryTest < Homebrew::TestCase
     alias_dir.rmtree
   end
 
-  def test_factory_from_rack
+  def test_factory_from_rack_and_from_keg
     formula = Formulary.factory(@path)
     installer = FormulaInstaller.new(formula)
     shutup { installer.install }
     keg = Keg.new(formula.prefix)
-    assert_kind_of Formula, Formulary.from_rack(formula.rack)
+    f = Formulary.from_rack(formula.rack)
+    assert_kind_of Formula, f
+    assert_kind_of Tab, f.build
+    f = Formulary.from_keg(keg)
+    assert_kind_of Formula, f
+    assert_kind_of Tab, f.build
   ensure
     keg.unlink
     keg.uninstall
@@ -105,6 +110,15 @@ class FormularyFactoryTest < Homebrew::TestCase
 
   def test_load_from_contents
     assert_kind_of Formula, Formulary.from_contents(@name, @path, @path.read)
+  end
+
+  def test_to_rack
+    assert_equal HOMEBREW_CELLAR/@name, Formulary.to_rack(@name)
+    (HOMEBREW_CELLAR/@name).mkpath
+    assert_equal HOMEBREW_CELLAR/@name, Formulary.to_rack(@name)
+    assert_raises(TapFormulaUnavailableError) { Formulary.to_rack("a/b/#{@name}") }
+  ensure
+    FileUtils.rm_rf HOMEBREW_CELLAR/@name
   end
 end
 
@@ -126,7 +140,7 @@ class FormularyTapFactoryTest < Homebrew::TestCase
   end
 
   def test_factory_tap_formula
-    assert_kind_of Formula, Formulary.factory("#{@name}")
+    assert_kind_of Formula, Formulary.factory(@name)
   end
 
   def test_factory_tap_alias

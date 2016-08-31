@@ -19,7 +19,12 @@ class TabTests < Homebrew::TestCase
                    "source"               => {
                      "tap" => "homebrew/core",
                      "path" => nil,
-                     "spec" => "stable"
+                     "spec" => "stable",
+                     "versions" => {
+                       "stable" => "0.10",
+                       "devel" => "0.14",
+                       "head" => "HEAD-1111111",
+                     }
                    })
   end
 
@@ -29,10 +34,16 @@ class TabTests < Homebrew::TestCase
     assert_empty tab.used_options
     refute_predicate tab, :built_as_bottle
     refute_predicate tab, :poured_from_bottle
+    assert_predicate tab, :stable?
+    refute_predicate tab, :devel?
+    refute_predicate tab, :head?
     assert_nil tab.tap
     assert_nil tab.time
     assert_nil tab.HEAD
-    assert_equal MacOS.default_compiler, tab.cxxstdlib.compiler
+    assert_nil tab.stable_version
+    assert_nil tab.devel_version
+    assert_nil tab.head_version
+    assert_equal DevelopmentTools.default_compiler, tab.cxxstdlib.compiler
     assert_nil tab.cxxstdlib.type
   end
 
@@ -74,6 +85,9 @@ class TabTests < Homebrew::TestCase
     assert_equal @unused.sort, tab.unused_options.sort
     refute_predicate tab, :built_as_bottle
     assert_predicate tab, :poured_from_bottle
+    assert_predicate tab, :stable?
+    refute_predicate tab, :devel?
+    refute_predicate tab, :head?
     assert_equal "homebrew/core", tab.tap.name
     assert_equal :stable, tab.spec
     refute_nil tab.time
@@ -90,12 +104,18 @@ class TabTests < Homebrew::TestCase
     assert_equal @unused.sort, tab.unused_options.sort
     refute_predicate tab, :built_as_bottle
     assert_predicate tab, :poured_from_bottle
+    assert_predicate tab, :stable?
+    refute_predicate tab, :devel?
+    refute_predicate tab, :head?
     assert_equal "homebrew/core", tab.tap.name
     assert_equal :stable, tab.spec
     refute_nil tab.time
     assert_equal TEST_SHA1, tab.HEAD
     assert_equal :clang, tab.cxxstdlib.compiler
     assert_equal :libcxx, tab.cxxstdlib.type
+    assert_equal "2.14", tab.stable_version.to_s
+    assert_equal "2.15", tab.devel_version.to_s
+    assert_equal "HEAD-0000000", tab.head_version.to_s
   end
 
   def test_to_json
@@ -110,6 +130,9 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.HEAD, tab.HEAD
     assert_equal @tab.compiler, tab.compiler
     assert_equal @tab.stdlib, tab.stdlib
+    assert_equal @tab.stable_version, tab.stable_version
+    assert_equal @tab.devel_version, tab.devel_version
+    assert_equal @tab.head_version, tab.head_version
   end
 
   def test_remap_deprecated_options

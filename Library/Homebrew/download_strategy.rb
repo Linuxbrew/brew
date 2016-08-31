@@ -1,10 +1,12 @@
 require "utils/json"
 require "rexml/document"
+require "time"
 
 class AbstractDownloadStrategy
   include FileUtils
 
   attr_reader :meta, :name, :version, :resource
+  attr_reader :shutup
 
   def initialize(name, resource)
     @name = name
@@ -16,6 +18,19 @@ class AbstractDownloadStrategy
 
   # Download and cache the resource as {#cached_location}.
   def fetch
+  end
+
+  # Supress output
+  def shutup!
+    @shutup = true
+  end
+
+  def puts(*args)
+    super(*args) unless shutup
+  end
+
+  def ohai(*args)
+    super(*args) unless shutup
   end
 
   # Unpack {#cached_location} into the current working directory, and possibly
@@ -56,6 +71,14 @@ class AbstractDownloadStrategy
     # 2 as default because commands are eg. svn up, git pull
     args.insert(2, "-q") unless ARGV.verbose?
     args
+  end
+
+  def safe_system(*args)
+    if @shutup
+      quiet_system(*args) || raise(ErrorDuringExecution.new(args.shift, *args))
+    else
+      super(*args)
+    end
   end
 
   def quiet_safe_system(*args)
@@ -134,6 +157,8 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
       clone_repo
     end
 
+    version.update_commit(last_commit) if head?
+
     if @ref_type == :tag && @revision && current_revision
       unless current_revision == @revision
         raise <<-EOS.undent
@@ -144,12 +169,28 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     end
   end
 
+  def fetch_last_commit
+    fetch
+    last_commit
+  end
+
+  def commit_outdated?(commit)
+    @last_commit ||= fetch_last_commit
+    commit != @last_commit
+  end
+
   def cached_location
     @clone
   end
 
   def head?
     version.head?
+  end
+
+  # Return last commit's unique identifier for the repository.
+  # Return most recent modified timestamp unless overridden.
+  def last_commit
+    source_modified_time.to_i.to_s
   end
 
   private
@@ -218,7 +259,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     when :p7zip
       safe_system "7zr", "x", cached_location
     else
-      cp cached_location, basename_without_params
+      cp cached_location, basename_without_params, :preserve => true
     end
   end
 
@@ -284,17 +325,6 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     ohai "Downloading #{@url}"
 
     unless cached_location.exist?
-      urls = actual_urls
-      unless urls.empty?
-        ohai "Downloading from #{urls.last}"
-        if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && @url.start_with?("https://") &&
-           urls.any? { |u| !u.start_with? "https://" }
-          puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
-          raise CurlDownloadStrategyError.new(@url)
-        end
-        @url = urls.last
-      end
-
       had_incomplete_download = temporary_path.exist?
       begin
         _fetch
@@ -334,7 +364,25 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   # Private method, can be overridden if needed.
   def _fetch
-    curl @url, "-C", downloaded_size, "-o", temporary_path
+    url = @url
+
+    if ENV["HOMEBREW_ARTIFACT_DOMAIN"]
+      url = url.sub(%r{^((ht|f)tps?://)?}, ENV["HOMEBREW_ARTIFACT_DOMAIN"].chomp("/") + "/")
+      ohai "Downloading from #{url}"
+    end
+
+    urls = actual_urls(url)
+    unless urls.empty?
+      ohai "Downloading from #{urls.last}"
+      if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && url.start_with?("https://") &&
+         urls.any? { |u| !u.start_with? "https://" }
+        puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
+        raise CurlDownloadStrategyError.new(url)
+      end
+      url = urls.last
+    end
+
+    curl url, "-C", downloaded_size, "-o", temporary_path
   end
 
   # Curl options to be always passed to curl,
@@ -345,11 +393,11 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     copts
   end
 
-  def actual_urls
+  def actual_urls(url)
     urls = []
-    curl_args = _curl_opts << "-I" << "-L" << @url
+    curl_args = _curl_opts << "-I" << "-L" << url
     Utils.popen_read("curl", *curl_args).scan(/^Location: (.+)$/).map do |m|
-      urls << URI.join(urls.last || @url, m.first.chomp).to_s
+      urls << URI.join(urls.last || url, m.first.chomp).to_s
     end
     urls
   end
@@ -416,7 +464,7 @@ end
 # Useful for installing jars.
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
-    cp cached_location, basename_without_params
+    cp cached_location, basename_without_params, :preserve => true
   end
 end
 
@@ -500,6 +548,10 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
+  def last_commit
+    Utils.popen_read("svn", "info", "--show-item", "revision", cached_location.to_s).strip
+  end
+
   private
 
   def repo_url
@@ -573,11 +625,15 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def stage
     super
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
   end
 
   def source_modified_time
     Time.parse Utils.popen_read("git", "--git-dir", git_dir, "show", "-s", "--format=%cD")
+  end
+
+  def last_commit
+    Utils.popen_read("git", "--git-dir", git_dir, "rev-parse", "--short=7", "HEAD").chomp
   end
 
   private
@@ -696,6 +752,79 @@ class GitDownloadStrategy < VCSDownloadStrategy
   def update_submodules
     quiet_safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
     quiet_safe_system "git", "submodule", "update", "--init", "--recursive"
+    fix_absolute_submodule_gitdir_references!
+  end
+
+  def fix_absolute_submodule_gitdir_references!
+    # When checking out Git repositories with recursive submodules, some Git
+    # versions create `.git` files with absolute instead of relative `gitdir:`
+    # pointers. This works for the cached location, but breaks various Git
+    # operations once the affected Git resource is staged, i.e. recursively
+    # copied to a new location. (This bug was introduced in Git 2.7.0 and fixed
+    # in 2.8.3. Clones created with affected version remain broken.)
+    # See https://github.com/Homebrew/homebrew-core/pull/1520 for an example.
+    submodule_dirs = Utils.popen_read(
+      "git", "submodule", "--quiet", "foreach", "--recursive", "pwd")
+    submodule_dirs.lines.map(&:chomp).each do |submodule_dir|
+      work_dir = Pathname.new(submodule_dir)
+
+      # Only check and fix if `.git` is a regular file, not a directory.
+      dot_git = work_dir/".git"
+      next unless dot_git.file?
+
+      git_dir = dot_git.read.chomp[/^gitdir: (.*)$/, 1]
+      if git_dir.nil?
+        onoe "Failed to parse '#{dot_git}'." if ARGV.homebrew_developer?
+        next
+      end
+
+      # Only attempt to fix absolute paths.
+      next unless git_dir.start_with?("/")
+
+      # Make the `gitdir:` reference relative to the working directory.
+      relative_git_dir = Pathname.new(git_dir).relative_path_from(work_dir)
+      dot_git.atomic_write("gitdir: #{relative_git_dir}\n")
+    end
+  end
+end
+
+class GitHubGitDownloadStrategy < GitDownloadStrategy
+  def initialize(name, resource)
+    super
+    if @url =~ %r{^https?://github\.com/([^/]+)/([^/]+)\.git$}
+      @user = $1
+      @repo = $2
+    end
+  end
+
+  def github_last_commit
+    return if ENV["HOMEBREW_NO_GITHUB_API"]
+
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{@ref}"
+
+    commit = output[/^ETag: \"(\h+)\"/, 1] if status.success?
+    version.update_commit(commit) if commit
+    commit
+  end
+
+  def multiple_short_commits_exist?(commit)
+    return if ENV["HOMEBREW_NO_GITHUB_API"]
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{commit}"
+
+    !(status.success? && output && output[/^Status: (200)/, 1] == "200")
+  end
+
+  def commit_outdated?(commit)
+    @last_commit ||= github_last_commit
+    if !@last_commit
+      super
+    else
+      return true unless commit
+      return true unless @last_commit.start_with?(commit)
+      multiple_short_commits_exist?(commit)
+    end
   end
 end
 
@@ -713,8 +842,21 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     end
   end
 
+  def source_modified_time
+    # Filter CVS's files because the timestamp for each of them is the moment
+    # of clone.
+    max_mtime = Time.at(0)
+    cached_location.find do |f|
+      Find.prune if f.directory? && f.basename.to_s == "CVS"
+      next unless f.file?
+      mtime = f.mtime
+      max_mtime = mtime if mtime > max_mtime
+    end
+    max_mtime
+  end
+
   def stage
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
   end
 
   private
@@ -771,6 +913,10 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
     Time.parse Utils.popen_read("hg", "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
   end
 
+  def last_commit
+    Utils.popen_read("hg", "parent", "--template", "{node|short}", "-R", cached_location.to_s)
+  end
+
   private
 
   def cache_tag
@@ -799,12 +945,16 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   def stage
     # The export command doesn't work on checkouts
     # See https://bugs.launchpad.net/bzr/+bug/897511
-    cp_r File.join(cached_location, "."), Dir.pwd
+    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
     rm_r ".bzr"
   end
 
   def source_modified_time
     Time.parse Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+  end
+
+  def last_commit
+    Utils.popen_read("bzr", "revno", cached_location.to_s).chomp
   end
 
   private
@@ -844,6 +994,10 @@ class FossilDownloadStrategy < VCSDownloadStrategy
     Time.parse Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
   end
 
+  def last_commit
+    Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
+  end
+
   private
 
   def cache_tag
@@ -875,6 +1029,8 @@ class DownloadStrategyDetector
 
   def self.detect_from_url(url)
     case url
+    when %r{^https?://github\.com/[^/]+/[^/]+\.git$}
+      GitHubGitDownloadStrategy
     when %r{^https?://.+\.git$}, %r{^git://}
       GitDownloadStrategy
     when %r{^https?://www\.apache\.org/dyn/closer\.cgi}, %r{^https?://www\.apache\.org/dyn/closer\.lua}
@@ -913,7 +1069,7 @@ class DownloadStrategyDetector
     when :post    then CurlPostDownloadStrategy
     when :fossil  then FossilDownloadStrategy
     else
-      raise "Unknown download strategy #{strategy} was requested."
+      raise "Unknown download strategy #{symbol} was requested."
     end
   end
 end

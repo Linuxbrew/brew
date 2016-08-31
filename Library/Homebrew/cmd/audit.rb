@@ -1,17 +1,24 @@
-#:  * `audit` [`--strict`] [`--online`] [`--display-cop-names`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
 #:    If no <formulae> are provided, all of them are checked.
 #:
 #:    If `--strict` is passed, additional checks are run, including RuboCop
-#:    style checks. This should be used when creating new formulae.
+#:    style checks.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
-#:    connection are run. This should be used when creating for new formulae.
+#:    connection are run.
+#:
+#:    If `--new-formula` is passed, various additional checks are run that check
+#:    if a new formula is eligable for Homebrew. This should be used when creating
+#:    new formulae and implies `--strict` and `--online`.
 #:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
+#:
+#:    If `--display-filename` is passed, every line of output is prefixed with the
+#:    name of the file or formula being audited, to make the output easy to grep.
 #:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
@@ -30,8 +37,6 @@ require "cmd/style"
 require "date"
 
 module Homebrew
-  RUBY_2_OR_LATER = RUBY_VERSION.split(".").first.to_i >= 2
-
   def audit
     if ARGV.switch? "D"
       Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/)
@@ -40,9 +45,9 @@ module Homebrew
     formula_count = 0
     problem_count = 0
 
-    strict = ARGV.include? "--strict"
-    style = strict && RUBY_2_OR_LATER
-    online = ARGV.include? "--online"
+    new_formula = ARGV.include? "--new-formula"
+    strict = new_formula || ARGV.include?("--strict")
+    online = new_formula || ARGV.include?("--online")
 
     ENV.activate_extensions!
     ENV.setup_build_environment
@@ -54,14 +59,15 @@ module Homebrew
       ff = ARGV.resolved_formulae
       files = ARGV.resolved_formulae.map(&:path)
     end
-    if style
+
+    if strict
       # Check style in a single batch run up front for performance
       style_results = check_style_json(files, :realpath => true)
     end
 
     ff.each do |f|
-      options = { :strict => strict, :online => online }
-      options[:style_offenses] = style_results.file_offenses(f.path) if style
+      options = { :new_formula => new_formula, :strict => strict, :online => online }
+      options[:style_offenses] = style_results.file_offenses(f.path) if strict
       fa = FormulaAuditor.new(f, options)
       fa.audit
 
@@ -69,8 +75,12 @@ module Homebrew
 
       formula_count += 1
       problem_count += fa.problems.size
-      problem_lines = fa.problems.map { |p| "  * #{p.chomp.gsub("\n", "\n    ")}" }
-      puts "#{f.full_name}:", problem_lines
+      problem_lines = fa.problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
+      if ARGV.include? "--display-filename"
+        puts problem_lines.map { |s| "#{f.path}: #{s}" }
+      else
+        puts "#{f.full_name}:", problem_lines.map { |s| "  #{s}" }
+      end
     end
 
     unless problem_count.zero?
@@ -107,6 +117,10 @@ class FormulaText
     regex =~ @text
   end
 
+  def include?(s)
+    @text.include? s
+  end
+
   def line_number(regex)
     index = @lines.index { |line| line =~ regex }
     index ? index + 1 : nil
@@ -135,10 +149,11 @@ class FormulaAuditor
     swig
   ]
 
-  FILEUTILS_METHODS = FileUtils.singleton_methods(false).join "|"
+  FILEUTILS_METHODS = FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
 
   def initialize(formula, options = {})
     @formula = formula
+    @new_formula = !!options[:new_formula]
     @strict = !!options[:strict]
     @online = !!options[:online]
     # Accept precomputed style offense results, for efficiency
@@ -175,6 +190,10 @@ class FormulaAuditor
       problem "'__END__' was found, but 'DATA' is not used"
     end
 
+    if text =~ /inreplace [^\n]* do [^\n]*\n[^\n]*\.gsub![^\n]*\n\ *end/m
+      problem "'inreplace ... do' was used for a single substitution (use the non-block form instead)."
+    end
+
     unless text.has_trailing_newline?
       problem "File should end with a newline"
     end
@@ -182,6 +201,7 @@ class FormulaAuditor
     return unless @strict
 
     component_list = [
+      [/^  include Language::/,            "include directive"],
       [/^  desc ["'][\S\ ]+["']/,          "desc"],
       [/^  homepage ["'][\S\ ]+["']/,      "homepage"],
       [/^  url ["'][\S\ ]+["']/,           "url"],
@@ -189,6 +209,7 @@ class FormulaAuditor
       [/^  version ["'][\S\ ]+["']/,       "version"],
       [/^  (sha1|sha256) ["'][\S\ ]+["']/, "checksum"],
       [/^  revision/,                      "revision"],
+      [/^  version_scheme/,                "version_scheme"],
       [/^  head ["'][\S\ ]+["']/,          "head"],
       [/^  stable do/,                     "stable block"],
       [/^  bottle do/,                     "bottle block"],
@@ -198,6 +219,7 @@ class FormulaAuditor
       [/^  keg_only/,                      "keg_only"],
       [/^  option/,                        "option"],
       [/^  depends_on/,                    "depends_on"],
+      [/^  conflicts_with/,                "conflicts_with"],
       [/^  (go_)?resource/,                "resource"],
       [/^  def install/,                   "install method"],
       [/^  def caveats/,                   "caveats method"],
@@ -292,7 +314,7 @@ class FormulaAuditor
 
     same_name_tap_formulae.delete(full_name)
 
-    if same_name_tap_formulae.size > 0
+    unless same_name_tap_formulae.empty?
       problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
     end
   end
@@ -352,10 +374,16 @@ class FormulaAuditor
           problem "Don't use git as a dependency"
         when "mercurial"
           problem "Use `depends_on :hg` instead of `depends_on 'mercurial'`"
-        when "ruby"
-          problem "Don't use ruby as a dependency. We allow non-Homebrew ruby installations."
         when "gfortran"
           problem "Use `depends_on :fortran` instead of `depends_on 'gfortran'`"
+        when "ruby"
+          problem <<-EOS.undent
+            Don't use "ruby" as a dependency. If this formula requires a
+            minimum Ruby version not provided by the system you should
+            use the RubyRequirement:
+              depends_on :ruby => "1.8"
+            where "1.8" is the minimum version of Ruby required.
+          EOS
         when "open-mpi", "mpich"
           problem <<-EOS.undent
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
@@ -404,7 +432,7 @@ class FormulaAuditor
 
     desc = formula.desc
 
-    unless desc && desc.length > 0
+    unless desc && !desc.empty?
       problem "Formula should have a desc (Description)."
       return
     end
@@ -441,13 +469,13 @@ class FormulaAuditor
 
     # Check for http:// GitHub homepage urls, https:// is preferred.
     # Note: only check homepages that are repo pages, not *.github.com hosts
-    if homepage =~ %r{^http://github\.com/}
+    if homepage.start_with? "http://github.com/"
       problem "Please use https:// for #{homepage}"
     end
 
     # Savannah has full SSL/TLS support but no auto-redirect.
     # Doesn't apply to the download URLs, only the homepage.
-    if homepage =~ %r{^http://savannah\.nongnu\.org/}
+    if homepage.start_with? "http://savannah.nongnu.org/"
       problem "Please use https:// for #{homepage}"
     end
 
@@ -486,7 +514,7 @@ class FormulaAuditor
     when %r{^http://[^/]*\.apache\.org},
          %r{^http://packages\.debian\.org},
          %r{^http://wiki\.freedesktop\.org/},
-         %r{^http://((?:www)\.)?gnupg.org/},
+         %r{^http://((?:www)\.)?gnupg\.org/},
          %r{^http://ietf\.org},
          %r{^http://[^/.]+\.ietf\.org},
          %r{^http://[^/.]+\.tools\.ietf\.org},
@@ -513,8 +541,9 @@ class FormulaAuditor
 
   def audit_github_repository
     return unless @online
+    return unless @new_formula
 
-    regex = %r{https?://github.com/([^/]+)/([^/]+)/?.*}
+    regex = %r{https?://github\.com/([^/]+)/([^/]+)/?.*}
     _, user, repo = *regex.match(formula.stable.url) if formula.stable
     _, user, repo = *regex.match(formula.homepage) unless user
     return if !user || !repo
@@ -541,11 +570,11 @@ class FormulaAuditor
   end
 
   def audit_specs
-    if head_only?(formula) && formula.tap.to_s.downcase !~ /-head-only$/
+    if head_only?(formula) && formula.tap.to_s.downcase !~ %r{[-/]head-only$}
       problem "Head-only (no stable download)"
     end
 
-    if devel_only?(formula) && formula.tap.to_s.downcase !~ /-devel-only$/
+    if devel_only?(formula) && formula.tap.to_s.downcase !~ %r{[-/]devel-only$}
       problem "Devel-only (no stable download)"
     end
 
@@ -585,7 +614,7 @@ class FormulaAuditor
     case stable && stable.url
     when %r{download\.gnome\.org/sources}, %r{ftp\.gnome\.org/pub/GNOME/sources}i
       version = Version.parse(stable.url)
-      if version >= Version.new("1.0")
+      if version >= Version.create("1.0")
         minor_version = version.to_s.split(".", 3)[1].to_i
         if minor_version.odd?
           problem "#{stable.version} is a development release"
@@ -594,21 +623,31 @@ class FormulaAuditor
     end
   end
 
-  def audit_revision
+  def audit_revision_and_version_scheme
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
 
     fv = FormulaVersions.new(formula, :max_depth => 10)
-    revision_map = fv.revision_map("origin/master")
-    if (revisions = revision_map[formula.version]).any?
-      problem "revision should not decrease" if formula.revision < revisions.max
-    elsif formula.revision != 0
+    attributes = [:revision, :version_scheme]
+    attributes_map = fv.version_attributes_map(attributes, "origin/master")
+
+    attributes.each do |attribute|
+      attributes_for_version = attributes_map[attribute][formula.version]
+      if !attributes_for_version.empty?
+        if formula.send(attribute) < attributes_for_version.max
+          problem "#{attribute} should not decrease"
+        end
+      end
+    end
+
+    revision_map = attributes_map[:revision]
+    if formula.revision != 0
       if formula.stable
         if revision_map[formula.stable.version].empty? # check stable spec
-          problem "revision should be removed"
+          problem "'revision #{formula.revision}' should be removed"
         end
       else # head/devel-only formula
-        problem "revision should be removed"
+        problem "'revision #{formula.revision}' should be removed"
       end
     end
   end
@@ -616,7 +655,7 @@ class FormulaAuditor
   def audit_legacy_patches
     return unless formula.respond_to?(:patches)
     legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
-    if legacy_patches.any?
+    unless legacy_patches.empty?
       problem "Use the patch DSL instead of defining a 'patches' method"
       legacy_patches.each { |p| audit_patch(p) }
     end
@@ -629,6 +668,13 @@ class FormulaAuditor
       unless patch.url =~ /[a-fA-F0-9]{40}/
         problem "GitHub/Gist patches should specify a revision:\n#{patch.url}"
       end
+    when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
+      problem <<-EOS.undent
+        use GitHub pull request URLs:
+          https://github.com/#{$1}/#{$2}/pull/#{$3}.patch
+        Rather than patch-diff:
+          #{patch.url}
+      EOS
     when %r{macports/trunk}
       problem "MacPorts patches should specify a revision instead of trunk:\n#{patch.url}"
     when %r{^http://trac\.macports\.org}
@@ -647,16 +693,20 @@ class FormulaAuditor
       problem %(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
     end
 
-    if text =~ /xcodebuild[ (]["'*]/ && text !~ /SYMROOT=/
+    if text =~ /xcodebuild[ (]["'*]/ && !text.include?("SYMROOT=")
       problem %(xcodebuild should be passed an explicit "SYMROOT")
     end
 
-    if text =~ /Formula\.factory\(/
+    if text.include? "Formula.factory("
       problem "\"Formula.factory(name)\" is deprecated in favor of \"Formula[name]\""
     end
 
-    if text =~ /def plist/ && text !~ /plist_options/
+    if text.include?("def plist") && !text.include?("plist_options")
       problem "Please set plist_options when using a formula-defined plist."
+    end
+
+    if text.include?('require "language/go"') && !text.include?("go_resource")
+      problem "require \"language/go\" is unnecessary unless using `go_resource`s"
     end
   end
 
@@ -666,7 +716,7 @@ class FormulaAuditor
     end
 
     # Commented-out cmake support from default template
-    if line =~ /# system "cmake/
+    if line.include?('# system "cmake')
       problem "Commented cmake call found"
     end
 
@@ -751,7 +801,7 @@ class FormulaAuditor
       problem "Use \"if build.#{$1.downcase}?\" instead"
     end
 
-    if line =~ /make && make/
+    if line.include?("make && make")
       problem "Use separate make calls"
     end
 
@@ -759,7 +809,7 @@ class FormulaAuditor
       problem "Use spaces instead of tabs for indentation"
     end
 
-    if line =~ /ENV\.x11/
+    if line.include?("ENV.x11")
       problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
     end
 
@@ -816,19 +866,19 @@ class FormulaAuditor
       problem "Use build instead of ARGV to check options"
     end
 
-    if line =~ /def options/
+    if line.include?("def options")
       problem "Use new-style option definitions"
     end
 
-    if line =~ /def test$/
+    if line.end_with?("def test")
       problem "Use new-style test definitions (test do)"
     end
 
-    if line =~ /MACOS_VERSION/
+    if line.include?("MACOS_VERSION")
       problem "Use MacOS.version instead of MACOS_VERSION"
     end
 
-    if line =~ /MACOS_FULL_VERSION/
+    if line.include?("MACOS_FULL_VERSION")
       problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
     end
 
@@ -850,7 +900,7 @@ class FormulaAuditor
       problem "Define method #{$1.inspect} in the class body, not at the top-level"
     end
 
-    if line =~ /ENV.fortran/ && !formula.requirements.map(&:class).include?(FortranRequirement)
+    if line.include?("ENV.fortran") && !formula.requirements.map(&:class).include?(FortranRequirement)
       problem "Use `depends_on :fortran` instead of `ENV.fortran`"
     end
 
@@ -880,12 +930,12 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
-    if line =~ /system "npm", "install"/ && line !~ /Language::Node/ && formula.name !~ /^kibana(\d{2})?$/
+    if line.include?('system "npm", "install"') && !line.include?("Language::Node") && formula.name !~ /^kibana(\d{2})?$/
       problem "Use Language::Node for npm install args"
     end
 
     if @strict
-      if line =~ /system (["'][^"' ]*(?:\s[^"' ]*)+["'])/
+      if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
         bad_system = $1
         unless %w[| < > & ; *].any? { |c| bad_system.include? c }
           good_system = bad_system.gsub(" ", "\", \"")
@@ -901,16 +951,16 @@ class FormulaAuditor
         problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
       end
 
-      if line =~ %r{share/"#{Regexp.escape(formula.name)}[/'"]}
-        problem "Use pkgshare instead of (share/\"#{formula.name}\")"
+      if line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
+        problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
       end
     end
   end
 
   def audit_caveats
-    caveats = formula.caveats
+    caveats = formula.caveats.to_s
 
-    if caveats =~ /setuid/
+    if caveats.include?("setuid")
       problem "Don't recommend setuid in the caveats, suggest sudo instead."
     end
   end
@@ -966,7 +1016,7 @@ class FormulaAuditor
     audit_formula_name
     audit_class
     audit_specs
-    audit_revision
+    audit_revision_and_version_scheme
     audit_desc
     audit_homepage
     audit_bottle_spec
@@ -1035,7 +1085,7 @@ class ResourceAuditor
       end
     end
 
-    if version.to_s =~ /^v/
+    if version.to_s.start_with?("v")
       problem "version #{version} should not have a leading 'v'"
     end
 
@@ -1117,12 +1167,7 @@ class ResourceAuditor
   def audit_urls
     # Check GNU urls; doesn't apply to mirrors
     if url =~ %r{^(?:https?|ftp)://(?!alpha).+/gnu/}
-      problem "Please use \"http://ftpmirror.gnu.org\" instead of #{url}."
-    end
-
-    # GNU's ftpmirror does NOT support SSL/TLS.
-    if url =~ %r{^https://ftpmirror\.gnu\.org/}
-      problem "Please use http:// for #{url}"
+      problem "Please use \"https://ftpmirror.gnu.org\" instead of #{url}."
     end
 
     if mirrors.include?(url)
@@ -1136,17 +1181,22 @@ class ResourceAuditor
     urls.each do |p|
       case p
       when %r{^http://ftp\.gnu\.org/},
+           %r{^http://ftpmirror\.gnu\.org/},
+           %r{^http://download\.savannah\.gnu\.org/},
+           %r{^http://download-mirror\.savannah\.gnu\.org/},
            %r{^http://[^/]*\.apache\.org/},
            %r{^http://code\.google\.com/},
            %r{^http://fossies\.org/},
            %r{^http://mirrors\.kernel\.org/},
            %r{^http://(?:[^/]*\.)?bintray\.com/},
            %r{^http://tools\.ietf\.org/},
-           %r{^http://www\.mirrorservice\.org/},
            %r{^http://launchpad\.net/},
            %r{^http://bitbucket\.org/},
+           %r{^http://cpan\.metacpan\.org/},
            %r{^http://hackage\.haskell\.org/},
-           %r{^http://(?:[^/]*\.)?archive\.org}
+           %r{^http://(?:[^/]*\.)?archive\.org},
+           %r{^http://(?:[^/]*\.)?freedesktop\.org},
+           %r{^http://(?:[^/]*\.)?mirrorservice\.org/}
         problem "Please use https:// for #{p}"
       when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
         problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"
@@ -1155,11 +1205,21 @@ class ResourceAuditor
       end
     end
 
+    # Prefer HTTP/S when possible over FTP protocol due to possible firewalls.
+    urls.each do |p|
+      case p
+      when %r{^ftp://ftp\.mirrorservice\.org}
+        problem "Please use https:// for #{p}"
+      when %r{^ftp://ftp\.cpan\.org/pub/CPAN(.*)}i
+        problem "#{p} should be `http://search.cpan.org/CPAN#{$1}`"
+      end
+    end
+
     # Check SourceForge urls
     urls.each do |p|
       # Skip if the URL looks like a SVN repo
-      next if p =~ %r{/svnroot/}
-      next if p =~ /svn\.sourceforge/
+      next if p.include? "/svnroot/"
+      next if p.include? "svn.sourceforge"
 
       # Is it a sourceforge http(s) URL?
       next unless p =~ %r{^https?://.*\b(sourceforge|sf)\.(com|net)}
@@ -1168,7 +1228,7 @@ class ResourceAuditor
         problem "Don't use #{$1}use_mirror in SourceForge urls (url is #{p})."
       end
 
-      if p =~ /\/download$/
+      if p.end_with?("/download")
         problem "Don't use /download in SourceForge urls (url is #{p})."
       end
 
@@ -1227,6 +1287,23 @@ class ResourceAuditor
     urls.each do |u|
       next unless u =~ %r{https://.*github.*/(archive|releases)/.*\.zip$} && u !~ %r{releases/download}
       problem "Use GitHub tarballs rather than zipballs (url is #{u})."
+    end
+
+    # Don't use GitHub codeload URLs
+    urls.each do |u|
+      next unless u =~ %r{https?://codeload\.github\.com/(.+)/(.+)/(?:tar\.gz|zip)/(.+)}
+      problem <<-EOS.undent
+        use GitHub archive URLs:
+          https://github.com/#{$1}/#{$2}/archive/#{$3}.tar.gz
+        Rather than codeload:
+          #{u}
+      EOS
+    end
+
+    # Check for Maven Central urls, prefer HTTPS redirector over specific host
+    urls.each do |u|
+      next unless u =~ %r{https?://(?:central|repo\d+)\.maven\.org/maven2/(.+)$}
+      problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
     end
   end
 

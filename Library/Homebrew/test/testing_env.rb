@@ -7,7 +7,7 @@ require "formulary"
 
 # Test environment setup
 (HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-core/Formula").mkpath
-%w[cache formula_cache cellar logs].each { |d| HOMEBREW_PREFIX.parent.join(d).mkpath }
+%w[cache formula_cache locks cellar logs temp].each { |d| HOMEBREW_PREFIX.parent.join(d).mkpath }
 
 # Test fixtures and files can be found relative to this path
 TEST_DIRECTORY = File.dirname(File.expand_path(__FILE__))
@@ -23,14 +23,14 @@ end
 module Homebrew
   module VersionAssertions
     def version(v)
-      Version.new(v)
+      Version.create(v)
     end
 
     def assert_version_equal(expected, actual)
-      assert_equal Version.new(expected), actual
+      assert_equal Version.create(expected), actual
     end
 
-    def assert_version_detected(expected, url, specs={})
+    def assert_version_detected(expected, url, specs = {})
       assert_equal expected, Version.detect(url, specs).to_s
     end
 
@@ -63,6 +63,9 @@ module Homebrew
   end
 
   class TestCase < ::Minitest::Test
+    require "test/helper/shutup"
+    include Test::Helper::Shutup
+
     include VersionAssertions
     include FSLeakLogger
 
@@ -73,28 +76,16 @@ module Homebrew
       @_f = Class.new(Formula, &block).new(name, path, spec)
     end
 
-    def shutup
-      err = $stderr.dup
-      out = $stdout.dup
-
-      begin
-        $stderr.reopen("/dev/null")
-        $stdout.reopen("/dev/null")
-        yield
-      ensure
-        $stderr.reopen(err)
-        $stdout.reopen(out)
-        err.close
-        out.close
-      end
-    end
-
     def mktmpdir(prefix_suffix = nil, &block)
       Dir.mktmpdir(prefix_suffix, HOMEBREW_TEMP, &block)
     end
 
     def needs_compat
       skip "Requires compat/ code" if ENV["HOMEBREW_NO_COMPAT"]
+    end
+
+    def needs_python
+      skip "Requires Python" unless which("python")
     end
 
     def assert_nothing_raised
@@ -107,10 +98,28 @@ module Homebrew
     end
 
     def refute_eql(exp, act, msg = nil)
-      msg = message(msg) {
+      msg = message(msg) do
         "Expected #{mu_pp(act)} to not be eql to #{mu_pp(exp)}"
-      }
+      end
       refute exp.eql?(act), msg
+    end
+
+    def dylib_path(name)
+      Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.dylib")
+    end
+
+    def bundle_path(name)
+      Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.bundle")
+    end
+
+    def with_environment(partial_env)
+      old = ENV.to_hash
+      ENV.update partial_env
+      begin
+        yield
+      ensure
+        ENV.replace old
+      end
     end
   end
 end

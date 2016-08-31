@@ -2,7 +2,7 @@ require "formula_support"
 require "formula_lock"
 require "formula_pin"
 require "hardware"
-require "bottles"
+require "utils/bottles"
 require "build_environment"
 require "build_options"
 require "formulary"
@@ -26,7 +26,7 @@ require "migrator"
 # @see FileUtils
 # @see Pathname
 # @see http://www.rubydoc.info/github/Homebrew/brew/file/share/doc/homebrew/Formula-Cookbook.md Formula Cookbook
-# @see https://github.com/bbatsov/ruby-style-guide Ruby Style Guide
+# @see https://github.com/styleguide/ruby Ruby Style Guide
 #
 # <pre>class Wget < Formula
 #   homepage "https://www.gnu.org/software/wget/"
@@ -114,6 +114,9 @@ class Formula
   # @see .revision
   attr_reader :revision
 
+  # Used to change version schemes for packages
+  attr_reader :version_scheme
+
   # The current working directory during builds.
   # Will only be non-`nil` inside {#install}.
   attr_reader :buildpath
@@ -127,6 +130,11 @@ class Formula
   # @private
   attr_accessor :local_bottle_path
 
+  # When performing a build, test, or other loggable action, indicates which
+  # log file location to use.
+  # @private
+  attr_reader :active_log_type
+
   # The {BuildOptions} for this {Formula}. Lists the arguments passed and any
   # {#options} in the {Formula}. Note that these may differ at different times
   # during the installation of a {Formula}. This is annoying but the result of
@@ -139,6 +147,7 @@ class Formula
     @name = name
     @path = path
     @revision = self.class.revision || 0
+    @version_scheme = self.class.version_scheme || 0
 
     if path == Formulary.core_path(name)
       @tap = CoreTap.instance
@@ -287,6 +296,14 @@ class Formula
     active_spec.version
   end
 
+  def update_head_version
+    return unless head?
+    return unless head.downloader.is_a?(VCSDownloadStrategy)
+    return unless head.downloader.cached_location.exist?
+
+    head.version.update_commit(head.downloader.last_commit)
+  end
+
   # The {PkgVersion} for this formula with {version} and {#revision} information.
   def pkg_version
     PkgVersion.new(version, revision)
@@ -405,12 +422,45 @@ class Formula
     Pathname.new("#{HOMEBREW_LIBRARY}/LinkedKegs/#{name}")
   end
 
+  def latest_head_version
+    head_versions = installed_prefixes.map do |pn|
+      pn_pkgversion = PkgVersion.parse(pn.basename.to_s)
+      pn_pkgversion if pn_pkgversion.head?
+    end.compact
+
+    head_versions.max_by do |pn_pkgversion|
+      [Tab.for_keg(prefix(pn_pkgversion)).source_modified_time, pn_pkgversion.revision]
+    end
+  end
+
+  def latest_head_prefix
+    head_version = latest_head_version
+    prefix(head_version) if head_version
+  end
+
+  def head_version_outdated?(version, options={})
+    tab = Tab.for_keg(prefix(version))
+
+    return true if tab.version_scheme < version_scheme
+    return true if stable && tab.stable_version && tab.stable_version < stable.version
+    return true if devel && tab.devel_version && tab.devel_version < devel.version
+
+    if options[:fetch_head]
+      return false unless head && head.downloader.is_a?(VCSDownloadStrategy)
+      downloader = head.downloader
+      downloader.shutup! unless ARGV.verbose?
+      downloader.commit_outdated?(version.version.commit)
+    else
+      false
+    end
+  end
+
   # The latest prefix for this formula. Checks for {#head}, then {#devel}
   # and then {#stable}'s {#prefix}
   # @private
   def installed_prefix
-    if head && (head_prefix = prefix(PkgVersion.new(head.version, revision))).directory?
-      head_prefix
+    if head && (head_version = latest_head_version) && !head_version_outdated?(head_version)
+      latest_head_prefix
     elsif devel && (devel_prefix = prefix(PkgVersion.new(devel.version, revision))).directory?
       devel_prefix
     elsif stable && (stable_prefix = prefix(PkgVersion.new(stable.version, revision))).directory?
@@ -690,10 +740,28 @@ class Formula
     prefix+".bottle"
   end
 
-  # The directory where the formula's installation logs will be written.
+  # The directory where the formula's installation or test logs will be written.
   # @private
   def logs
     HOMEBREW_LOGS+name
+  end
+
+  # The prefix, if any, to use in filenames for logging current activity
+  def active_log_prefix
+    if active_log_type
+      "#{active_log_type}."
+    else
+      ""
+    end
+  end
+
+  # Runs a block with the given log type in effect for its duration
+  def with_logging(log_type)
+    old_log_type = @active_log_type
+    @active_log_type = log_type
+    yield
+  ensure
+    @active_log_type = old_log_type
   end
 
   # This method can be overridden to provide a plist.
@@ -725,7 +793,6 @@ class Formula
   def plist
     nil
   end
-  alias_method :startup_plist, :plist
 
   # The generated launchd {.plist} service name.
   def plist_name
@@ -819,8 +886,11 @@ class Formula
 
   # @private
   def run_post_install
-    build, self.build = self.build, Tab.for_formula(self)
-    post_install
+    build = self.build
+    self.build = Tab.for_formula(self)
+    with_logging("post_install") do
+      post_install
+    end
   ensure
     self.build = build
   end
@@ -957,39 +1027,51 @@ class Formula
     @oldname_lock.unlock unless @oldname_lock.nil?
   end
 
+  def migration_needed?
+    return false unless oldname
+    return false if rack.exist?
+
+    old_rack = HOMEBREW_CELLAR/oldname
+    return false unless old_rack.directory?
+    return false if old_rack.subdirs.empty?
+
+    tap == Tab.for_keg(old_rack.subdirs.first).tap
+  end
+
   # @private
-  def outdated_versions
-    @outdated_versions ||= begin
-      all_versions = []
-      older_or_same_tap_versions = []
+  def outdated_versions(options = {})
+    @outdated_versions ||= Hash.new do |cache, key|
+      raise Migrator::MigrationNeededError.new(self) if migration_needed?
+      cache[key] = _outdated_versions(key)
+    end
+    @outdated_versions[options]
+  end
 
-      if oldname && !rack.exist? && (dir = HOMEBREW_CELLAR/oldname).directory? &&
-        !dir.subdirs.empty? && tap == Tab.for_keg(dir.subdirs.first).tap
-        raise Migrator::MigrationNeededError.new(self)
-      end
+  def _outdated_versions(options = {})
+    all_versions = []
 
-      installed_kegs.each do |keg|
-        version = keg.version
-        all_versions << version
-        older_version = pkg_version <= version
+    installed_kegs.each do |keg|
+      version = keg.version
+      all_versions << version
+      next if version.head?
 
-        tab_tap = Tab.for_keg(keg).tap
-        if tab_tap.nil? || tab_tap == tap || older_version
-          older_or_same_tap_versions << version
-        end
-      end
+      tab = Tab.for_keg(keg)
+      next if version_scheme > tab.version_scheme
+      next if version_scheme == tab.version_scheme && pkg_version > version
+      return []
+    end
 
-      if older_or_same_tap_versions.all? { |v| pkg_version > v }
-        all_versions.sort!
-      else
-        []
-      end
+    head_version = latest_head_version
+    if head_version && !head_version_outdated?(head_version, options)
+      []
+    else
+      all_versions.sort
     end
   end
 
   # @private
-  def outdated?
-    outdated_versions.any?
+  def outdated?(options = {})
+    !outdated_versions(options).empty?
   rescue Migrator::MigrationNeededError
     true
   end
@@ -1252,6 +1334,7 @@ class Formula
         "head" => (head.version.to_s if head)
       },
       "revision" => revision,
+      "version_scheme" => version_scheme,
       "installed" => [],
       "linked_keg" => (linked_keg.resolved_path.basename.to_s if linked_keg.exist?),
       "pinned" => pinned?,
@@ -1260,6 +1343,7 @@ class Formula
       "dependencies" => deps.map(&:name).uniq,
       "recommended_dependencies" => deps.select(&:recommended?).map(&:name).uniq,
       "optional_dependencies" => deps.select(&:optional?).map(&:name).uniq,
+      "build_dependencies" => deps.select(&:build?).map(&:name).uniq,
       "conflicts_with" => conflicts.map(&:name),
       "caveats" => caveats
     }
@@ -1283,7 +1367,7 @@ class Formula
       next unless spec.bottle_defined?
       bottle_spec = spec.bottle_specification
       bottle_info = {
-        "revision" => bottle_spec.revision,
+        "rebuild" => bottle_spec.rebuild,
         "cellar" => (cellar = bottle_spec.cellar).is_a?(Symbol) ? \
                     cellar.inspect : cellar,
         "prefix" => bottle_spec.prefix,
@@ -1293,7 +1377,7 @@ class Formula
       bottle_spec.collector.keys.each do |os|
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
-          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.revision)}",
+          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",
           checksum.hash_type.to_s => checksum.hexdigest,
         }
       end
@@ -1311,7 +1395,7 @@ class Formula
       }
     end
 
-    hsh["installed"] = hsh["installed"].sort_by { |i| Version.new(i["version"]) }
+    hsh["installed"] = hsh["installed"].sort_by { |i| Version.create(i["version"]) }
 
     hsh
   end
@@ -1329,14 +1413,17 @@ class Formula
   # @private
   def run_test
     old_home = ENV["HOME"]
-    build, self.build = self.build, Tab.for_formula(self)
+    old_curl_home = ENV["CURL_HOME"]
+    ENV["CURL_HOME"] = old_curl_home || old_home
     mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
       ENV["HOME"] = @testpath
       setup_home @testpath
       begin
-        test
+        with_logging("test") do
+          test
+        end
       rescue Exception
         staging.retain! if ARGV.debug?
         raise
@@ -1344,8 +1431,8 @@ class Formula
     end
   ensure
     @testpath = nil
-    self.build = build
     ENV["HOME"] = old_home
+    ENV["CURL_HOME"] = old_curl_home
   end
 
   # @private
@@ -1428,7 +1515,7 @@ class Formula
 
     @exec_count ||= 0
     @exec_count += 1
-    logfn = "#{logs}/%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
+    logfn = "#{logs}/#{active_log_prefix}%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
     logs.mkpath
 
     File.open(logfn, "w") do |log|
@@ -1485,12 +1572,12 @@ class Formula
         end
         log.puts
 
-        require "cmd/config"
+        require "system_config"
         require "build_environment"
 
         env = ENV.to_hash
 
-        Homebrew.dump_verbose_config(log)
+        SystemConfig.dump_verbose_config(log)
         log.puts
         Homebrew.dump_build_env(env, log)
 
@@ -1503,8 +1590,13 @@ class Formula
   def eligible_kegs_for_cleanup
     eligible_for_cleanup = []
     if installed?
-      eligible_kegs = installed_kegs.select { |k| pkg_version > k.version }
-      if eligible_kegs.any?
+      eligible_kegs = if head? && (head_prefix = latest_head_prefix)
+        installed_kegs - [Keg.new(head_prefix)]
+      else
+        installed_kegs.select { |k| pkg_version > k.version }
+      end
+
+      unless eligible_kegs.empty?
         eligible_kegs.each do |keg|
           if keg.linked?
             opoo "Skipping (old) #{keg} due to it being linked"
@@ -1513,7 +1605,7 @@ class Formula
           end
         end
       end
-    elsif installed_prefixes.any? && !pinned?
+    elsif !installed_prefixes.empty? && !pinned?
       # If the cellar only has one version installed, don't complain
       # that we can't tell which one to keep. Don't complain at all if the
       # only installed version is a pinned formula.
@@ -1560,6 +1652,8 @@ class Formula
       mkdir_p env_home
 
       old_home, ENV["HOME"] = ENV["HOME"], env_home
+      old_curl_home = ENV["CURL_HOME"]
+      ENV["CURL_HOME"] = old_curl_home || old_home
       setup_home env_home
 
       begin
@@ -1567,6 +1661,7 @@ class Formula
       ensure
         @buildpath = nil
         ENV["HOME"] = old_home
+        ENV["CURL_HOME"] = old_curl_home
       end
     end
   end
@@ -1649,6 +1744,18 @@ class Formula
     # <pre>revision 1</pre>
     attr_rw :revision
 
+    # @!attribute [w] version_scheme
+    # Used for creating new Homebrew versions schemes. For example, if we want
+    # to change version scheme from one to another, then we may need to update
+    # `version_scheme` of this {Formula} to be able to use new version scheme.
+    # E.g. to move from 20151020 scheme to 1.0.0 we need to increment
+    # `version_scheme`. Without this, the prior scheme will always equate to a
+    # higher version.
+    # `0` if unset.
+    #
+    # <pre>version_scheme 1</pre>
+    attr_rw :version_scheme
+
     # A list of the {.stable}, {.devel} and {.head} {SoftwareSpec}s.
     # @private
     def specs
@@ -1721,7 +1828,7 @@ class Formula
     #   root_url "https://example.com" # Optional root to calculate bottle URLs
     #   prefix "/opt/homebrew" # Optional HOMEBREW_PREFIX in which the bottles were built.
     #   cellar "/opt/homebrew/Cellar" # Optional HOMEBREW_CELLAR in which the bottles were built.
-    #   revision 1 # Making the old bottle outdated without bumping the version/revision of the formula.
+    #   rebuild 1 # Making the old bottle outdated without bumping the version/revision of the formula.
     #   sha256 "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865" => :el_capitan
     #   sha256 "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3" => :yosemite
     #   sha256 "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2" => :mavericks
@@ -1992,12 +2099,7 @@ class Formula
 
     # Marks the {Formula} as failing with a particular compiler so it will fall back to others.
     # For Apple compilers, this should be in the format:
-    # <pre>fails_with :llvm do # :llvm is really llvm-gcc
-    #   build 2334
-    #   cause "Segmentation fault during linking."
-    # end
-    #
-    # fails_with :clang do
+    # <pre>fails_with :clang do
     #   build 600
     #   cause "multiple configure and compile errors"
     # end</pre>

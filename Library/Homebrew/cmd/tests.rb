@@ -1,4 +1,9 @@
+#: @hide_from_man_page
+#:  * `tests` [`-v`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<test_script/test_method>] [`--seed` <seed>] [`--trace`] [`--online`] [`--official-cmd-taps`]:
+#:    Run Homebrew's unit and integration tests.
+
 require "fileutils"
+require "tap"
 
 module Homebrew
   def tests
@@ -6,6 +11,12 @@ module Homebrew
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["TESTOPTS"] = "-v" if ARGV.verbose?
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
+      ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
+      ENV["HOMEBREW_NO_GITHUB_API"] = "1" unless ARGV.include? "--online"
+      if ARGV.include? "--official-cmd-taps"
+        ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"] = "1"
+      end
+
       if ARGV.include? "--coverage"
         ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
         FileUtils.rm_f "coverage/.resultset.json"
@@ -29,6 +40,7 @@ module Homebrew
       args = []
       args << "--trace" if ARGV.include? "--trace"
       if ARGV.value("only")
+        ENV["HOMEBREW_TESTS_ONLY"] = "1"
         test_name, test_method = ARGV.value("only").split("/", 2)
         args << "TEST=test_#{test_name}.rb"
         args << "TESTOPTS=--name=test_#{test_method}" if test_method

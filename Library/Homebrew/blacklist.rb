@@ -5,40 +5,29 @@ def blacklisted?(name)
     EOS
   when "tex", "tex-live", "texlive", "latex" then <<-EOS.undent
     Installing TeX from source is weird and gross, requires a lot of patches,
-    and only builds 32-bit (and thus can't use Homebrew deps on Snow Leopard.)
+    and only builds 32-bit (and thus can't use Homebrew dependencies)
 
     We recommend using a MacTeX distribution: https://www.tug.org/mactex/
 
-    You can install it using Cask:
-
-    brew cask install mactex
+    You can install it with Homebrew Cask:
+      brew cask install mactex
     EOS
   when "pip" then <<-EOS.undent
     Homebrew provides pip via: `brew install python`. However you will then
     have two Pythons installed on your Mac, so alternatively you can install
     pip via the instructions at:
-
-      https://pip.readthedocs.org/en/stable/installing/#install-pip
+      https://pip.readthedocs.io/en/stable/installing/
     EOS
   when "pil" then <<-EOS.undent
     Instead of PIL, consider `pip install pillow` or `brew install Homebrew/python/pillow`.
     EOS
   when "macruby" then <<-EOS.undent
-    MacRuby works better when you install their package:
-      http://www.macruby.org/
+    MacRuby is not packaged and is on an indefinite development hiatus.
+    You can read more about it at:
+      https://github.com/MacRuby/MacRuby
     EOS
   when /(lib)?lzma/
     "lzma is now part of the xz formula."
-  when "xcode"
-    if MacOS.version >= :lion
-      <<-EOS.undent
-      Xcode can be installed from the App Store.
-      EOS
-    else
-      <<-EOS.undent
-      Xcode can be installed from https://developer.apple.com/xcode/downloads/
-      EOS
-    end
   when "gtest", "googletest", "google-test" then <<-EOS.undent
     Installing gtest system-wide is not recommended; it should be vendored
     in your projects that use it.
@@ -84,9 +73,7 @@ def blacklisted?(name)
     and cabal-install instead:
       brew install ghc cabal-install
 
-    A binary installer is available:
-      https://www.haskell.org/platform/mac.html
-    Or via the cask:
+    You can install with Homebrew Cask:
       brew cask install haskell-platform
     EOS
   when "mysqldump-secure" then <<-EOS.undent
@@ -95,12 +82,11 @@ def blacklisted?(name)
   when "ngrok" then <<-EOS.undent
     Upstream sunsetted 1.x in March 2016 and 2.x is not open-source.
 
-    If you wish to use the 2.x release you can install it
-    either via Homebrew:
-      brew install homebrew/binary/ngrok2
-
-    Or via the Cask:
+    If you wish to use the 2.x release you can install with Homebrew Cask:
       brew cask install ngrok
     EOS
   end
 end
+alias generic_blacklisted? blacklisted?
+
+require "extend/os/blacklist"

@@ -98,7 +98,7 @@ class Resource
         yield ResourceStageContext.new(self, staging)
       elsif target
         target = Pathname.new(target) unless target.is_a? Pathname
-        target.install Dir["*"]
+        target.install Pathname.pwd.children
       end
     end
   end
@@ -159,7 +159,7 @@ class Resource
 
     case val
     when nil     then Version.detect(url, specs)
-    when String  then Version.new(val)
+    when String  then Version.create(val)
     when Version then val
     else
       raise TypeError, "version '#{val.inspect}' should be a string"

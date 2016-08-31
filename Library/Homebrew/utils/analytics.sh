@@ -15,6 +15,7 @@ migrate-legacy-uuid-file() {
 
 setup-analytics() {
   local git_config_file="$HOMEBREW_REPOSITORY/.git/config"
+  test -r $git_config_file || return
 
   migrate-legacy-uuid-file
 
@@ -35,7 +36,22 @@ setup-analytics() {
   HOMEBREW_ANALYTICS_USER_UUID="$(git config --file="$git_config_file" --get homebrew.analyticsuuid)"
   if [[ -z "$HOMEBREW_ANALYTICS_USER_UUID" ]]
   then
-    HOMEBREW_ANALYTICS_USER_UUID="$(uuidgen)"
+    if [[ -n "$HOMEBREW_LINUX" ]]
+    then
+      HOMEBREW_ANALYTICS_USER_UUID="$(tr a-f A-F </proc/sys/kernel/random/uuid)"
+    elif [[ -n "$HOMEBREW_OSX" ]]
+    then
+      HOMEBREW_ANALYTICS_USER_UUID="$(/usr/bin/uuidgen)"
+    else
+      HOMEBREW_ANALYTICS_USER_UUID="$(uuidgen)"
+    fi
+
+    if [[ -z "$HOMEBREW_ANALYTICS_USER_UUID" ]]
+    then
+      # Avoid sending bogus analytics if no UUID could be generated.
+      export HOMEBREW_NO_ANALYTICS_THIS_RUN="1"
+      return
+    fi
     git config --file="$git_config_file" --replace-all homebrew.analyticsuuid "$HOMEBREW_ANALYTICS_USER_UUID"
   fi
 
@@ -76,16 +92,16 @@ report-analytics-screenview-command() {
   esac
 
   local args=(
-    --max-time 3 \
-    --user-agent "$HOMEBREW_USER_AGENT_CURL" \
-    -d v=1 \
-    -d tid="$HOMEBREW_ANALYTICS_ID" \
-    -d cid="$HOMEBREW_ANALYTICS_USER_UUID" \
-    -d aip=1 \
-    -d an="$HOMEBREW_PRODUCT" \
-    -d av="$HOMEBREW_VERSION" \
-    -d t=screenview \
-    -d cd="$HOMEBREW_COMMAND" \
+    --max-time 3
+    --user-agent "$HOMEBREW_USER_AGENT_CURL"
+    --data v=1
+    --data aip=1
+    --data t=screenview
+    --data tid="$HOMEBREW_ANALYTICS_ID"
+    --data cid="$HOMEBREW_ANALYTICS_USER_UUID"
+    --data an="$HOMEBREW_PRODUCT"
+    --data av="$HOMEBREW_VERSION"
+    --data cd="$HOMEBREW_COMMAND"
   )
 
   # Send analytics. Don't send or store any personally identifiable information.
@@ -98,7 +114,8 @@ report-analytics-screenview-command() {
       "${args[@]}" \
       --silent --output /dev/null &>/dev/null & disown
   else
-    "$HOMEBREW_CURL" https://www.google-analytics.com/debug/collect \
-      "${args[@]}"
+    local url="https://www.google-analytics.com/debug/collect"
+    echo "$HOMEBREW_CURL $url ${args[*]}"
+    "$HOMEBREW_CURL" "$url" "${args[@]}"
   fi
 }
