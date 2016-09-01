@@ -659,7 +659,9 @@ module Homebrew
         test "brew", "readall", "--syntax"
         if OS.mac?
           run_as_not_developer { test "brew", "tap", "caskroom/cask" }
-          test "brew", "cask-tests"
+          tests_args_cask = []
+          tests_args_cask << "--coverage" if ARGV.include?("--coverage")
+          test "brew", "cask-tests", *tests_args_cask
         end
 
         # TODO: try to fix this on Linux at some stage.
