@@ -615,7 +615,7 @@ def link_path_manpages(path, command)
   unless conflicts.empty?
     onoe <<-EOS.undent
       Could not link #{name} manpages to:
-        #{conflicts.join("\n")}
+      #{conflicts.join("\n")}
 
       Please delete these files and run `#{command}`.
     EOS
