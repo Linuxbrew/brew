@@ -219,7 +219,8 @@ class FormulaInstaller
 
     @@attempted << formula
 
-    if pour_bottle?(:warn => true)
+    pour_bottle = pour_bottle?(:warn => true)
+    if pour_bottle
       begin
         install_relocation_tools unless formula.bottle_specification.skip_relocation?
         pour
@@ -242,7 +243,10 @@ class FormulaInstaller
     build_bottle_preinstall if build_bottle?
 
     unless @poured_bottle
-      compute_and_install_dependencies if @pour_failed && !ignore_deps?
+      not_pouring = !pour_bottle || @pour_failed
+      if not_pouring && !ignore_deps?
+        compute_and_install_dependencies
+      end
       build
       clean
     end
