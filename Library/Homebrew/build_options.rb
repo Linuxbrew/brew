@@ -38,7 +38,7 @@ class BuildOptions
   end
 
   # True if a {Formula} is being built without a specific option.
-  # <pre>args << "--no-spam-plz" if build.without? "spam"
+  # <pre>args << "--no-spam-plz" if build.without? "spam"</pre>
   def without?(val)
     !with?(val)
   end
