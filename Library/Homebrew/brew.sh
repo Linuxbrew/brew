@@ -203,6 +203,7 @@ check-run-command-as-root() {
   [[ "$(id -u)" = 0 ]] || return
   export HOMEBREW_NO_SANDBOX="1"
 
+  [[ "$HOMEBREW_COMMAND" = "cask" ]] && return
   [[ "$HOMEBREW_COMMAND" = "services" ]] && return
 
   onoe <<EOS
