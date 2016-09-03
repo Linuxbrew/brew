@@ -491,6 +491,31 @@ class FormulaTests < Homebrew::TestCase
     f3.rack.rmtree
   end
 
+  def test_eligible_kegs_for_cleanup_keg_pinned
+    f1 = Class.new(Testball) { version "0.1" }.new
+    f2 = Class.new(Testball) { version "0.2" }.new
+    f3 = Class.new(Testball) { version "0.3" }.new
+
+    shutup do
+      f1.brew { f1.install }
+      f1.pin
+      f2.brew { f2.install }
+      f3.brew { f3.install }
+    end
+
+    assert_equal HOMEBREW_LIBRARY.join("PinnedKegs/#{f1.name}").resolved_path, f1.prefix
+
+    assert_predicate f1, :installed?
+    assert_predicate f2, :installed?
+    assert_predicate f3, :installed?
+
+    assert_equal [Keg.new(f2.prefix)], shutup { f3.eligible_kegs_for_cleanup }
+  ensure
+    f1.unpin
+    [f1, f2, f3].each(&:clear_cache)
+    f3.rack.rmtree
+  end
+
   def test_eligible_kegs_for_cleanup_head_installed
     f = formula do
       version "0.1"
