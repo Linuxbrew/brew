@@ -58,6 +58,11 @@ class Formula
   # e.g. `this-formula`
   attr_reader :name
 
+  # The name specified when installing this {Formula}.
+  # Could be the name of the {Formula}, or an alias.
+  # e.g. `another-name-for-this-formula`
+  attr_reader :install_name
+
   # The fully-qualified name of this {Formula}.
   # For core formula it's the same as {#name}.
   # e.g. `homebrew/tap-name/this-formula`
@@ -143,9 +148,10 @@ class Formula
   attr_accessor :build
 
   # @private
-  def initialize(name, path, spec)
+  def initialize(name, path, spec, install_name: name)
     @name = name
     @path = path
+    @install_name = install_name
     @revision = self.class.revision || 0
     @version_scheme = self.class.version_scheme || 0
 
@@ -500,6 +506,21 @@ class Formula
   # @private
   def installed_kegs
     installed_prefixes.map { |dir| Keg.new(dir) }
+  end
+
+  # Formula reference to use to get an identical installation of the formula.
+  #
+  # Usually, the formula's path is a good canonical identifier for the formula.
+  # Just using whatever was passed to `brew install` isn't a good idea, because
+  # if it was e.g. a URL, it could end up being downloaded twice.
+  #
+  # However, if the formula was installed with an alias (i.e. `install_name` is
+  # different from `name`), that should be used instead so that information is
+  # preserved. Aliases are looked up in repositories that have already been
+  # tapped, so we don't have to worry about doing extra HTTP requests, or other
+  # expensive operations, when looking them up again.
+  def install_ref
+    install_name == name ? path : install_name
   end
 
   # The directory where the formula's binaries should be installed.

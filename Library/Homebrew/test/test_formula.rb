@@ -8,11 +8,28 @@ class FormulaTests < Homebrew::TestCase
     name = "formula_name"
     path = Formulary.core_path(name)
     spec = :stable
+    install_name = "formula_alias"
 
-    f = klass.new(name, path, spec)
+    f = klass.new(name, path, spec, install_name: install_name)
     assert_equal name, f.name
     assert_equal path, f.path
+    assert_equal install_name, f.install_name
     assert_raises(ArgumentError) { klass.new }
+  end
+
+  def test_install_ref_with_alias
+    name = "formula_name"
+    path = Formulary.core_path(name)
+    spec = :stable
+    install_name = "formula_alias"
+
+    f = Testball.new(name, path, spec, install_name: install_name)
+    assert_equal f.install_name, f.install_ref
+  end
+
+  def test_install_ref_with_non_alias
+    f = Testball.new
+    assert_equal f.path, f.install_ref
   end
 
   def test_prefix

@@ -43,6 +43,7 @@ class TabTests < Homebrew::TestCase
     assert_nil tab.stable_version
     assert_nil tab.devel_version
     assert_nil tab.head_version
+    assert_nil tab.install_name
     assert_equal DevelopmentTools.default_compiler, tab.cxxstdlib.compiler
     assert_nil tab.cxxstdlib.type
   end
@@ -116,6 +117,7 @@ class TabTests < Homebrew::TestCase
     assert_equal "2.14", tab.stable_version.to_s
     assert_equal "2.15", tab.devel_version.to_s
     assert_equal "HEAD-0000000", tab.head_version.to_s
+    assert_equal "test-formula", tab.install_name
   end
 
   def test_to_json
@@ -133,6 +135,7 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.stable_version, tab.stable_version
     assert_equal @tab.devel_version, tab.devel_version
     assert_equal @tab.head_version, tab.head_version
+    assert_equal @tab.install_name, tab.install_name
   end
 
   def test_remap_deprecated_options
