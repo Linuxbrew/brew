@@ -146,11 +146,21 @@ class FormulaInstaller
     raise FormulaInstallationAlreadyAttemptedError, formula if @@attempted.include?(formula)
 
     unless skip_deps_check?
-      unlinked_deps = formula.recursive_dependencies.map(&:to_formula).select do |dep|
+      recursive_deps = formula.recursive_dependencies
+      unlinked_deps = recursive_deps.map(&:to_formula).select do |dep|
         dep.installed? && !dep.keg_only? && !dep.linked_keg.directory?
       end
       raise CannotInstallFormulaError,
         "You must `brew link #{unlinked_deps*" "}` before #{formula.full_name} can be installed" unless unlinked_deps.empty?
+
+      pinned_unsatisfied_deps = recursive_deps.select do |dep|
+        dep.to_formula.pinned? && !dep.satisfied?(inherited_options_for(dep))
+      end
+
+      unless pinned_unsatisfied_deps.empty?
+        raise CannotInstallFormulaError,
+          "You must `brew unpin #{pinned_unsatisfied_deps*" "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
+      end
     end
   end
 
