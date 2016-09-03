@@ -76,13 +76,16 @@ module Homebrew
       if !ARGV.include?("--preinstall") && !ENV["HOMEBREW_UPDATE_FAILED"]
         puts "Already up-to-date."
       end
-    elsif hub.empty?
-      puts "No changes to formulae."
     else
-      hub.dump
-      hub.reporters.each(&:migrate_tap_migration)
-      hub.reporters.each(&:migrate_formula_rename)
-      Descriptions.update_cache(hub)
+      if hub.empty?
+        puts "No changes to formulae."
+      else
+        hub.dump
+        hub.reporters.each(&:migrate_tap_migration)
+        hub.reporters.each(&:migrate_formula_rename)
+        Descriptions.update_cache(hub)
+      end
+      puts if ARGV.include?("--preinstall")
     end
 
     link_manpages
