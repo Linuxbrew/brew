@@ -1,6 +1,7 @@
 require "testing_env"
 require "utils"
 require "tempfile"
+require "utils/shell"
 
 class TtyTests < Homebrew::TestCase
   def test_strip_ansi
@@ -157,15 +158,15 @@ class UtilTests < Homebrew::TestCase
 
   def test_shell_profile
     ENV["SHELL"] = "/bin/sh"
-    assert_equal "~/.bash_profile", shell_profile
+    assert_equal "~/.bash_profile", Utils::Shell.shell_profile
     ENV["SHELL"] = "/bin/bash"
-    assert_equal "~/.bash_profile", shell_profile
+    assert_equal "~/.bash_profile", Utils::Shell.shell_profile
     ENV["SHELL"] = "/bin/another_shell"
-    assert_equal "~/.bash_profile", shell_profile
+    assert_equal "~/.bash_profile", Utils::Shell.shell_profile
     ENV["SHELL"] = "/bin/zsh"
-    assert_equal "~/.zshrc", shell_profile
+    assert_equal "~/.zshrc", Utils::Shell.shell_profile
     ENV["SHELL"] = "/bin/ksh"
-    assert_equal "~/.kshrc", shell_profile
+    assert_equal "~/.kshrc", Utils::Shell.shell_profile
   end
 
   def test_popen_read

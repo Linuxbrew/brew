@@ -202,7 +202,7 @@ module Homebrew
           SSL_CERT_DIR support was removed from Apple's curl.
           If fetching formulae fails you should:
             unset SSL_CERT_DIR
-          and remove it from #{shell_profile} if present.
+          and remove it from #{Utils::Shell.shell_profile} if present.
         EOS
       end
 

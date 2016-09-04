@@ -227,6 +227,26 @@ class IntegrationCommandTests < Homebrew::TestCase
                  cmd("--env"))
   end
 
+  def test_env_bash
+    assert_match %r{export CMAKE_PREFIX_PATH="#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"},
+                 cmd("--env", "--shell=bash")
+  end
+
+  def test_env_fish
+    assert_match %r{set [-]gx CMAKE_PREFIX_PATH "#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"},
+                 cmd("--env", "--shell=fish")
+  end
+
+  def test_env_csh
+    assert_match %r{setenv CMAKE_PREFIX_PATH #{Regexp.quote(HOMEBREW_PREFIX.to_s)};},
+                 cmd("--env", "--shell=tcsh")
+  end
+
+  def test_env_plain
+    assert_match %r{CMAKE_PREFIX_PATH: #{Regexp.quote(HOMEBREW_PREFIX)}},
+                 cmd("--env", "--plain")
+  end
+
   def test_prefix_formula
     assert_match "#{HOMEBREW_CELLAR}/testball",
                  cmd("--prefix", testball)

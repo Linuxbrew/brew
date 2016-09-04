@@ -526,16 +526,6 @@ def paths
   end.uniq.compact
 end
 
-# return the shell profile file based on users' preference shell
-def shell_profile
-  case ENV["SHELL"]
-  when %r{/(ba)?sh} then "~/.bash_profile"
-  when %r{/zsh} then "~/.zshrc"
-  when %r{/ksh} then "~/.kshrc"
-  else "~/.bash_profile"
-  end
-end
-
 def disk_usage_readable(size_in_bytes)
   if size_in_bytes >= 1_073_741_824
     size = size_in_bytes.to_f / 1_073_741_824
