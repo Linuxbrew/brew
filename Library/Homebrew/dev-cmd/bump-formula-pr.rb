@@ -89,7 +89,16 @@ module Homebrew
     elsif !hash_type
       odie "#{formula}: no tag/revision specified!"
     else
-      odie "#{formula}: no url/#{hash_type} specified!"
+      rsrc = Resource.new { @url = new_url }
+      rsrc.download_strategy = CurlDownloadStrategy
+      rsrc.owner = Resource.new(formula.name)
+      rsrc_path = rsrc.fetch
+      if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ /\/.*\./
+        new_hash = rsrc_path.sha256
+      else
+        odie "#{formula}: no url/#{hash_type} specified!" if new_url.include?(".tar")
+        new_hash = rsrc_path.sha256
+      end
     end
 
     if ARGV.dry_run?
