@@ -64,6 +64,25 @@ module Homebrew
 
   def bump_formula_pr
     formula = ARGV.formulae.first
+    new_url = ARGV.value("url")
+    if new_url && !formula
+      is_devel = ARGV.include?("--devel")
+      base_url = new_url.split("/")[0..4].join("/")
+      base_url = /#{Regexp.escape(base_url)}/
+      guesses = []
+      Formula.each do |f|
+        if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
+          guesses << f
+        elsif f.stable && f.stable.url && f.stable.url.match(base_url)
+          guesses << f
+        end
+      end
+      if guesses.count == 1
+        formula = guesses.shift
+      elsif guesses.count > 1
+        odie "Couldn't guess formula for sure: could be one of these:\n#{guesses}"
+      end
+    end
     odie "No formula found!" unless formula
 
     requested_spec, formula_spec = if ARGV.include?("--devel")
@@ -78,7 +97,6 @@ module Homebrew
       [checksum.hash_type.to_s, checksum.hexdigest]
     end
 
-    new_url = ARGV.value("url")
     new_hash = ARGV.value(hash_type)
     new_tag = ARGV.value("tag")
     new_revision = ARGV.value("revision")
