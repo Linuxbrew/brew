@@ -109,7 +109,13 @@ module Homebrew
     elsif !hash_type
       odie "#{formula}: no tag/revision specified!"
     else
-      rsrc = Resource.new { @url = new_url }
+      rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
+        new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
+        new_mirror
+      else
+        new_url
+      end
+      rsrc = Resource.new { @url = rsrc_url }
       rsrc.download_strategy = CurlDownloadStrategy
       rsrc.owner = Resource.new(formula.name)
       rsrc_path = rsrc.fetch
@@ -157,7 +163,15 @@ module Homebrew
     end
 
     if forced_version && forced_version != "0"
-      replacement_pairs << [old_formula_version, forced_version]
+      if File.read(formula.path).include?("version \"#{old_formula_version}\"")
+        replacement_pairs << [old_formula_version.to_s, forced_version]
+      else
+        if new_mirror
+          replacement_pairs << [/^( +)(mirror \"#{new_mirror}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+        else
+          replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+        end
+      end
     elsif forced_version && forced_version == "0"
       replacement_pairs << [/^  version \"[a-z\d+\.]+\"\n/m, ""]
     end
