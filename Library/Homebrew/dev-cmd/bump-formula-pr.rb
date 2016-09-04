@@ -38,6 +38,7 @@ module Homebrew
       unless contents.errors.empty?
         raise Utils::InreplaceError, path => contents.errors
       end
+      path.atomic_write(contents) if ARGV.include?("--write")
       contents
     else
       Utils::Inreplace.inreplace(path) do |s|
