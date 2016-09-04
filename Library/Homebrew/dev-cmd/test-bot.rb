@@ -671,7 +671,7 @@ module Homebrew
           # test no-op update from current commit (to current commit, a no-op).
           test "brew", "update-test", "--commit=HEAD"
         end
-      else
+      elsif @tap
         test "brew", "readall", "--aliases", @tap.name
       end
     end
