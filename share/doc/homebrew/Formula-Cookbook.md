@@ -31,7 +31,7 @@ Before submitting a new formula make sure your package:
 *   isn't in another official [Homebrew tap](https://github.com/Homebrew)
 *   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
 *   is still supported by upstream (i.e. doesn't require extensive patching)
-*   has a stable, tagged version (i.e. not just a GitHub repository with no versions). See [Interesting-Taps-&-Branches](Interesting-Taps-&-Branches.md) for where pre-release versions belong.
+*   has a stable, tagged version (i.e. not just a GitHub repository with no versions). See [Interesting-Taps-&-Forks](Interesting-Taps-&-Forks.md) for where pre-release versions belong.
 *   passes all `brew audit --strict --online $FORMULA` tests.
 
 Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/.github/CONTRIBUTING.md).

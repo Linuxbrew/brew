@@ -40,7 +40,7 @@ Uninstallation is documented in the [FAQ](FAQ.md).
 <a name="1"><sup>1</sup></a> Not all formulae have CPU or OS requirements, but
 you can assume you will have trouble if you don’t conform. Also, you can find
 PowerPC and Tiger branches from other users in the fork network. See
-[Interesting Taps & Branches](Interesting-Taps-&-Branches.md).
+[Interesting Taps & Forks](Interesting-Taps-&-Forks.md).
 
 <a name="2"><sup>2</sup></a> 10.9 or higher is recommended. 10.5 - 10.8 are
 supported on a best-effort basis. For 10.4 and 10.5, see
