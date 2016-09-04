@@ -279,9 +279,10 @@ module Homebrew
     end
     bottle.rebuild rebuild
     sha256 = bottle_path.sha256
+    bottle.sha256 sha256 => Utils::Bottles.tag
 
-    if ARGV.include?("--keep-old") && !f.bottle_specification.checksums.empty?
-      old_spec = f.bottle_specification
+    old_spec = f.bottle_specification
+    if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
       bad_fields = [:root_url, :prefix, :cellar, :rebuild].select do |field|
         old_spec.send(field) != bottle.send(field)
       end
@@ -290,10 +291,7 @@ module Homebrew
         bottle_path.unlink if bottle_path.exist?
         odie "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
       end
-      bottle = old_spec
     end
-
-    bottle.sha256 sha256 => Utils::Bottles.tag
 
     output = bottle_output bottle
 
@@ -325,19 +323,6 @@ module Homebrew
           },
         },
       }
-      if ARGV.include?("--keep-old")
-        bottle.checksums.each do |hash_type, checksums|
-          checksums.each do |checksum_hash|
-            checksum_hash.each do |checksum, tag|
-              tag_hash = {}
-              tag_hash["filename"] ||= Bottle::Filename.create(f, tag, rebuild).to_s
-              tag_hash[hash_type.to_s] ||= checksum.hexdigest
-              json[f.full_name]["bottle"]["tags"][tag.to_s] ||= tag_hash
-            end
-          end
-        end
-      end
-
       File.open("#{filename.prefix}.bottle.json", "w") do |file|
         file.write Utils::JSON.dump json
       end
@@ -391,14 +376,10 @@ module Homebrew
 
                 if !tag.empty?
                   if !bottle_hash["bottle"]["tags"][tag].to_s.empty?
-                    old_value = bottle_hash["bottle"]["tags"][tag][key].to_s
-                    if value != old_value
-                      mismatches << "#{key} => #{tag}"
-                    end
-                    next
+                    mismatches << "#{key} => #{tag}"
+                  else
+                    bottle.send(key, value => tag.to_sym)
                   end
-
-                  bottle.send(key, value => tag.to_sym)
                   next
                 end
 
