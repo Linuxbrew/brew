@@ -857,7 +857,11 @@ module Homebrew
       safe_system "brew", "pull", "--clean", pull_pr
     end
 
-    system "brew", "bottle", "--merge", "--write", *json_files
+    if ENV["UPSTREAM_BOTTLE_KEEP_OLD"]
+      system "brew", "bottle", "--merge", "--write", "--keep-old", *json_files
+    else
+      system "brew", "bottle", "--merge", "--write", *json_files
+    end
 
     remote = "git@github.com:BrewTestBot/homebrew-#{tap.repo}.git"
     git_tag = pr ? "pr-#{pr}" : "testing-#{number}"
