@@ -391,10 +391,14 @@ module Homebrew
 
                 if !tag.empty?
                   if !bottle_hash["bottle"]["tags"][tag].to_s.empty?
-                    mismatches << "#{key} => #{tag}"
-                  else
-                    bottle.send(key, value => tag.to_sym)
+                    old_value = bottle_hash["bottle"]["tags"][tag][key].to_s
+                    if value != old_value
+                      mismatches << "#{key} => #{tag}"
+                    end
+                    next
                   end
+
+                  bottle.send(key, value => tag.to_sym)
                   next
                 end
 
