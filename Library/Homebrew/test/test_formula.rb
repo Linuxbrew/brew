@@ -10,7 +10,7 @@ class FormulaTests < Homebrew::TestCase
     spec = :stable
     install_name = "formula_alias"
 
-    f = klass.new(name, path, spec, install_name: install_name)
+    f = klass.new(name, path, spec, :install_name => install_name)
     assert_equal name, f.name
     assert_equal path, f.path
     assert_equal install_name, f.install_name
@@ -23,7 +23,7 @@ class FormulaTests < Homebrew::TestCase
     spec = :stable
     install_name = "formula_alias"
 
-    f = Testball.new(name, path, spec, install_name: install_name)
+    f = Testball.new(name, path, spec, :install_name => install_name)
     assert_equal f.install_name, f.install_ref
   end
 

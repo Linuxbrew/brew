@@ -79,7 +79,7 @@ class Formulary
 
     # Gets the formula instance.
     def get_formula(spec)
-      klass.new(name, path, spec, install_name: install_name)
+      klass.new(name, path, spec, :install_name => install_name)
     end
 
     def klass
