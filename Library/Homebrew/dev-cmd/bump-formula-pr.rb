@@ -100,6 +100,7 @@ module Homebrew
     new_hash = ARGV.value(hash_type)
     new_tag = ARGV.value("tag")
     new_revision = ARGV.value("revision")
+    new_mirror = ARGV.value("mirror")
     new_url_hash = if new_url && new_hash
       true
     elsif new_tag && new_revision
@@ -132,6 +133,10 @@ module Homebrew
       replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
     end
 
+    if requested_spec == :stable
+      replacement_pairs << [/(^  mirror .*\n)?/, ""]
+    end
+
     replacement_pairs += if new_url_hash
       [
         [formula_spec.url, new_url],
@@ -145,6 +150,10 @@ module Homebrew
     end
 
     backup_file = File.read(formula.path) unless ARGV.dry_run?
+
+    if new_mirror
+      replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
+    end
 
     new_contents = inreplace_pairs(formula.path, replacement_pairs)
 
