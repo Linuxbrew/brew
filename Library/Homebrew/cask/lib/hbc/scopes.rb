@@ -10,29 +10,15 @@ module Hbc::Scopes
     end
 
     def all_tapped_cask_dirs
-      @all_tapped_cask_dirs ||= Tap.names.map(&Tap.method(:fetch)).map(&:cask_dir)
-                                   .unshift(default_tap.cask_dir) # optimization: place the default Tap first
-                                   .uniq
-    end
-
-    def reset_all_tapped_cask_dirs
-      # The memoized value should be reset when a Tap is added/removed
-      # (which is a rare event in our codebase).
-      @all_tapped_cask_dirs = nil
+      Tap.map(&:cask_dir).compact
     end
 
     def all_tokens
-      cask_tokens = all_tapped_cask_dirs.map { |d| Dir.glob d.join("*.rb") }.flatten
-      cask_tokens.map { |c|
-        # => "/usr/local/Library/Taps/caskroom/example-tap/Casks/example.rb"
-        c.sub!(%r{\.rb$}, "")
-        # => ".../example"
-        c = c.split("/").last 4
-        # => ["caskroom", "example-tap", "Casks", "example"]
-        c.delete_at(-2)
-        # => ["caskroom", "example-tap", "example"]
-        c.join "/"
-      }
+      Tap.map { |t|
+        t.cask_files.map { |p|
+          "#{t.name}/#{File.basename(p, ".rb")}"
+        }
+      }.flatten
     end
 
     def installed
