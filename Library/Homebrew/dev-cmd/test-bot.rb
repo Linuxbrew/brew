@@ -687,7 +687,7 @@ module Homebrew
         git "checkout", "-f", "master"
         git "reset", "--hard", "origin/master"
       end
-      git "clean", "-ffdx"
+      git "clean", "-ffdx", "--exclude=/Library/Taps/"
 
       Pathname.glob("{#{HOMEBREW_REPOSITORY},#{HOMEBREW_LIBRARY}/Taps/*/*}").each do |git_repo|
         next if @repository == git_repo
@@ -717,16 +717,14 @@ module Homebrew
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
         git "gc", "--auto"
-        test "git", "clean", "-ffdx"
-
-        Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
+        test "git", "clean", "-ffdx", "--exclude=/Library/Taps/homebrew/homebrew-core"
 
         Pathname.glob("{#{HOMEBREW_REPOSITORY},#{HOMEBREW_LIBRARY}/Taps/*/*}").each do |git_repo|
           next if @repository == git_repo
           git_repo.cd do
             safe_system "git", "checkout", "-f", "master"
             safe_system "git", "reset", "--hard", "origin/master"
-            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/homebrew/homebrew-core"
           end
         end
 
