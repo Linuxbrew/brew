@@ -226,6 +226,11 @@ class Formula
 
   public
 
+  # The path that was specified to find/install this formula.
+  def specified_path
+    alias_path || path
+  end
+
   # Is the currently active {SoftwareSpec} a {#stable} build?
   # @private
   def stable?
