@@ -531,6 +531,18 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert foo_dir.exist?
   end
 
+  def test_reinstall_pinned
+    setup_test_formula "testball"
+
+    HOMEBREW_CELLAR.join("testball/0.1").mkpath
+    HOMEBREW_LIBRARY.join("PinnedKegs").mkpath
+    FileUtils.ln_s HOMEBREW_CELLAR.join("testball/0.1"), HOMEBREW_LIBRARY.join("PinnedKegs/testball")
+
+    assert_match "testball is pinned. You must unpin it to reinstall.", cmd("reinstall", "testball")
+
+    HOMEBREW_LIBRARY.join("PinnedKegs").rmtree
+  end
+
   def test_home
     setup_test_formula "testball"
 
