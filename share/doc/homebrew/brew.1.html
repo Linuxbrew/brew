@@ -39,29 +39,6 @@ If no search term is given, all locally available formulae are listed.</p></dd>
 Read more at <a href="https://git.io/brew-analytics" data-bare-link="true">https://git.io/brew-analytics</a>.</p></dd>
 <dt><code>analytics</code> (<code>on</code>|<code>off</code>)</dt><dd><p>Turn on/off Homebrew's analytics.</p></dd>
 <dt><code>analytics</code> <code>regenerate-uuid</code></dt><dd><p>Regenerate UUID used in Homebrew's analytics.</p></dd>
-<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<code>--new-formula</code>] [<code>--display-cop-names</code>] [<code>--display-filename</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
-run before submitting a new formula.</p>
-
-<p>If no <var>formulae</var> are provided, all of them are checked.</p>
-
-<p>If <code>--strict</code> is passed, additional checks are run, including RuboCop
-style checks.</p>
-
-<p>If <code>--online</code> is passed, additional slower checks that require a network
-connection are run.</p>
-
-<p>If <code>--new-formula</code> is passed, various additional checks are run that check
-if a new formula is eligable for Homebrew. This should be used when creating
-new formulae and implies <code>--strict</code> and <code>--online</code>.</p>
-
-<p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
-is included in the output.</p>
-
-<p>If <code>--display-filename</code> is passed, every line of output is prefixed with the
-name of the file or formula being audited, to make the output easy to grep.</p>
-
-<p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
-for instance, for implementing pre-commit hooks.</p></dd>
 <dt><code>cat</code> <var>formula</var></dt><dd><p>Display the source to <var>formula</var>.</p></dd>
 <dt><code>cleanup</code> [<code>--prune=</code><var>days</var>] [<code>--dry-run</code>] [<code>-s</code>] [<var>formulae</var>]</dt><dd><p>For all installed or specific formulae, remove any older versions from the
 cellar. In addition, old downloads from the Homebrew download-cache are deleted.</p>
@@ -82,24 +59,6 @@ With <code>--include-aliases</code>, the aliases of internal commands will be in
 <dt class="flush"><code>config</code></dt><dd><p>Show Homebrew and system configuration useful for debugging. If you file
 a bug report, you will likely be asked for this information if you do not
 provide it.</p></dd>
-<dt><code>create</code> <var>URL</var> [<code>--autotools</code>|<code>--cmake</code>] [<code>--no-fetch</code>] [<code>--set-name</code> <var>name</var>] [<code>--set-version</code> <var>version</var>] [<code>--tap</code> <var>user</var><code>/</code><var>repo</var>]</dt><dd><p>Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
-Homebrew will attempt to automatically derive the formula name
-and version, but if it fails, you'll have to make your own template. The <code>wget</code>
-formula serves as a simple example. For the complete API have a look at</p>
-
-<p><a href="http://www.rubydoc.info/github/Homebrew/brew/master/Formula" data-bare-link="true">http://www.rubydoc.info/github/Homebrew/brew/master/Formula</a></p>
-
-<p>If <code>--autotools</code> is passed, create a basic template for an Autotools-style build.
-If <code>--cmake</code> is passed, create a basic template for a CMake-style build.</p>
-
-<p>If <code>--no-fetch</code> is passed, Homebrew will not download <var>URL</var> to the cache and
-will thus not add the SHA256 to the formula for you.</p>
-
-<p>The options <code>--set-name</code> and <code>--set-version</code> each take an argument and allow
-you to explicitly set the name and version of the package you are creating.</p>
-
-<p>The option <code>--tap</code> takes a tap as its argument and generates the formula in
-the specified tap.</p></dd>
 <dt><code>deps</code> [<code>--1</code>] [<code>-n</code>] [<code>--union</code>] [<code>--full-name</code>] [<code>--installed</code>] [<code>--include-build</code>] [<code>--include-optional</code>] [<code>--skip-recommended</code>] <var>formulae</var></dt><dd><p>Show dependencies for <var>formulae</var>. When given multiple formula arguments,
 show the intersection of dependencies for <var>formulae</var>.</p>
 
@@ -149,8 +108,6 @@ and allow you to explicitly set the name and version of the package you are
 installing.</p></dd>
 <dt class="flush"><code>doctor</code></dt><dd><p>Check your system for potential problems. Doctor exits with a non-zero status
 if any problems are found.</p></dd>
-<dt class="flush"><code>edit</code></dt><dd><p>Open all of Homebrew for editing.</p></dd>
-<dt><code>edit</code> <var>formula</var></dt><dd><p>Open <var>formula</var> in the editor.</p></dd>
 <dt><code>fetch</code> [<code>--force</code>] [<code>--retry</code>] [<code>-v</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--deps</code>] [<code>--build-from-source</code>|<code>--force-bottle</code>] <var>formulae</var></dt><dd><p>Download the source packages for the given <var>formulae</var>.
 For tarballs, also print SHA-256 checksums.</p>
 
@@ -395,21 +352,6 @@ for <var>version</var> is <code>v1</code>.</p>
 <dt><code>tap-pin</code> <var>tap</var></dt><dd><p>Pin <var>tap</var>, prioritizing its formulae over core when formula names are supplied
 by the user. See also <code>tap-unpin</code>.</p></dd>
 <dt><code>tap-unpin</code> <var>tap</var></dt><dd><p>Unpin <var>tap</var> so its formulae are no longer prioritized. See also <code>tap-pin</code>.</p></dd>
-<dt><code>test</code> [<code>--devel</code>|<code>--HEAD</code>] [<code>--debug</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>A few formulae provide a test method. <code>brew test</code> <var>formula</var> runs this
-test method. There is no standard output or return code, but it should
-generally indicate to the user if something is wrong with the installed
-formula.</p>
-
-<p>To test the development or head version of a formula, use <code>--devel</code> or
-<code>--HEAD</code>.</p>
-
-<p>If <code>--debug</code> is passed and the test fails, an interactive debugger will be
-launched with access to IRB or a shell inside the temporary test directory.</p>
-
-<p>If <code>--keep-tmp</code> is passed, the temporary files created for the test are
-not deleted.</p>
-
-<p>Example: <code>brew install jruby &amp;&amp; brew test jruby</code></p></dd>
 <dt><code>uninstall</code>, <code>rm</code>, <code>remove</code> [<code>--force</code>] <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p>
 
 <p>If <code>--force</code> is passed, and there are multiple versions of <var>formula</var>
@@ -491,6 +433,156 @@ without any sort of versioned directory as the last path.</p></dd>
 the <code>prefix</code> and <code>repository</code> are the same directory.</p></dd>
 <dt><code>--repository</code> <var>user</var><code>/</code><var>repo</var></dt><dd><p>Display where tap <var>user</var><code>/</code><var>repo</var>'s directory is located.</p></dd>
 <dt><code>--version</code></dt><dd><p>Print the version number of Homebrew to standard output and exit.</p></dd>
+</dl>
+
+
+<h2 id="DEVELOPER-COMMANDS">DEVELOPER COMMANDS</h2>
+
+<dl>
+<dt><code>audit</code> [<code>--strict</code>] [<code>--online</code>] [<code>--new-formula</code>] [<code>--display-cop-names</code>] [<code>--display-filename</code>] [<var>formulae</var>]</dt><dd><p>Check <var>formulae</var> for Homebrew coding style violations. This should be
+run before submitting a new formula.</p>
+
+<p>If no <var>formulae</var> are provided, all of them are checked.</p>
+
+<p>If <code>--strict</code> is passed, additional checks are run, including RuboCop
+style checks.</p>
+
+<p>If <code>--online</code> is passed, additional slower checks that require a network
+connection are run.</p>
+
+<p>If <code>--new-formula</code> is passed, various additional checks are run that check
+if a new formula is eligable for Homebrew. This should be used when creating
+new formulae and implies <code>--strict</code> and <code>--online</code>.</p>
+
+<p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
+is included in the output.</p>
+
+<p>If <code>--display-filename</code> is passed, every line of output is prefixed with the
+name of the file or formula being audited, to make the output easy to grep.</p>
+
+<p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
+for instance, for implementing pre-commit hooks.</p></dd>
+<dt><code>bottle</code> [<code>--verbose</code>] [<code>--no-rebuild</code>] [<code>--keep-old</code>] [<code>--skip-relocation</code>] [<code>--root-url=&lt;root_url></code>]:</dt><dd><p></p></dd>
+<dt><code>bottle</code> <code>--merge</code> [<code>--no-commit</code>] [<code>--keep-old</code>] [<code>--write</code>]:</dt><dd><p></p>
+
+<p>Generate a bottle (binary package) from a formula installed with
+<code>--build-bottle</code>.</p></dd>
+<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] <code>--url=</code><var>url</var> <code>--sha256=</code><var>sha-256</var> <var>formula</var>:</dt><dd><p></p></dd>
+<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] <code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var> <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new url or a new tag.</p>
+
+<p>If a <var>url</var> is specified, the <var>sha-256</var> checksum of the new download must
+also be specified.</p>
+
+<p>If a <var>tag</var> is specified, the git commit <var>revision</var> corresponding to that
+tag must also be specified.</p>
+
+<p>If <code>--devel</code> is passed, bump the development rather than stable version.
+The development spec must already exist.</p>
+
+<p>If <code>--dry-run</code> is passed, print what would be done rather than doing it.</p>
+
+<p>If <code>--audit</code> is passed, run <code>brew audit</code> before opening the PR.</p>
+
+<p>If <code>--strict</code> is passed, run <code>brew audit --strict</code> before opening the PR.</p>
+
+<p>Note that this command cannot be used to transition a formula from a
+url-and-sha256 style specification into a tag-and-revision style
+specification, nor vice versa. It must use whichever style specification
+the preexisting formula already uses.</p></dd>
+<dt><code>create</code> <var>URL</var> [<code>--autotools</code>|<code>--cmake</code>] [<code>--no-fetch</code>] [<code>--set-name</code> <var>name</var>] [<code>--set-version</code> <var>version</var>] [<code>--tap</code> <var>user</var><code>/</code><var>repo</var>]</dt><dd><p>Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
+Homebrew will attempt to automatically derive the formula name
+and version, but if it fails, you'll have to make your own template. The <code>wget</code>
+formula serves as a simple example. For the complete API have a look at</p>
+
+<p><a href="http://www.rubydoc.info/github/Homebrew/brew/master/Formula" data-bare-link="true">http://www.rubydoc.info/github/Homebrew/brew/master/Formula</a></p>
+
+<p>If <code>--autotools</code> is passed, create a basic template for an Autotools-style build.
+If <code>--cmake</code> is passed, create a basic template for a CMake-style build.</p>
+
+<p>If <code>--no-fetch</code> is passed, Homebrew will not download <var>URL</var> to the cache and
+will thus not add the SHA256 to the formula for you.</p>
+
+<p>The options <code>--set-name</code> and <code>--set-version</code> each take an argument and allow
+you to explicitly set the name and version of the package you are creating.</p>
+
+<p>The option <code>--tap</code> takes a tap as its argument and generates the formula in
+the specified tap.</p></dd>
+<dt class="flush"><code>edit</code></dt><dd><p>Open all of Homebrew for editing.</p></dd>
+<dt><code>edit</code> <var>formula</var></dt><dd><p>Open <var>formula</var> in the editor.</p></dd>
+<dt><code>linkage</code> [<code>--test</code>] [<code>--reverse</code>]  <var>formula-name</var></dt><dd><p>Checks the library links of an installed formula.</p>
+
+<p>Only works on installed formulae. An error is raised if it is run on
+uninstalled formulae.</p>
+
+<p>If <code>--test</code> is passed, only display missing libraries and exit with a
+non-zero exit code if any missing libraries were found.</p>
+
+<p>If <code>--reverse</code> is passed, print the dylib followed by the binaries
+which link to it for each library the keg references.</p></dd>
+<dt class="flush"><code>man</code></dt><dd><p>Generate Homebrew's manpages.</p></dd>
+</dl>
+
+
+<p> <code>pull</code> [<code>--bottle</code>] [<code>--bump</code>] [<code>--clean</code>] [<code>--ignore-whitespace</code>] [<code>--resolve</code>] [<code>--branch-okay</code>] [<code>--no-pbcopy</code>] [<code>--no-publish</code>] <var>patch-source</var> [<var>patch-source</var>]</p>
+
+<pre><code>Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
+Optionally, installs the formulae changed by the patch.
+
+Each &lt;patch-source> may be one of:
+  * The ID number of a PR (Pull Request) in the homebrew/core GitHub
+    repository
+  * The URL of a PR on GitHub, using either the web page or API URL
+    formats. In this form, the PR may be on Homebrew/brew,
+    Homebrew/homebrew-core or any tap.
+  * The URL of a commit on GitHub
+  * A "http://bot.brew.sh/job/..." string specifying a testing job ID
+</code></pre>
+
+<p>   If <code>--bottle</code> was passed, handle bottles, pulling the bottle-update
+   commit and publishing files on Bintray.
+   If <code>--bump</code> was passed, for one-formula PRs, automatically reword
+   commit message to our preferred format.
+   If <code>--clean</code> was passed, do not rewrite or otherwise modify the
+   commits found in the pulled PR.
+   If <code>--ignore-whitespace</code> was passed, silently ignore whitespace
+   discrepancies when applying diffs.
+   If <code>--resolve</code> was passed, when a patch fails to apply, leave in
+   progress and allow user to
+                  resolve, instead of aborting.
+   If <code>--branch-okay</code> was passed, do not warn if pulling to a branch
+   besides master (useful for testing).
+   If <code>--no-pbcopy</code> was passed, do not copy anything to the system
+   If <code>--no-publish</code> was passed, do not publish bottles to Bintray.</p>
+
+<dl>
+<dt><code>tap_readme</code> [<code>-v</code>] <var>name</var></dt><dd><p>Generate the README.md file for a new tap.</p></dd>
+<dt><code>test</code> [<code>--devel</code>|<code>--HEAD</code>] [<code>--debug</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>A few formulae provide a test method. <code>brew test</code> <var>formula</var> runs this
+test method. There is no standard output or return code, but it should
+generally indicate to the user if something is wrong with the installed
+formula.</p>
+
+<p>To test the development or head version of a formula, use <code>--devel</code> or
+<code>--HEAD</code>.</p>
+
+<p>If <code>--debug</code> is passed and the test fails, an interactive debugger will be
+launched with access to IRB or a shell inside the temporary test directory.</p>
+
+<p>If <code>--keep-tmp</code> is passed, the temporary files created for the test are
+not deleted.</p>
+
+<p>Example: <code>brew install jruby &amp;&amp; brew test jruby</code></p></dd>
+<dt><code>tests</code> [<code>-v</code>] [<code>--coverage</code>] [<code>--generic</code>] [<code>--no-compat</code>] [<code>--only=</code><test_script/test_method>] [<code>--seed</code> <var>seed</var>] [<code>--trace</code>] [<code>--online</code>] [<code>--official-cmd-taps</code>]</dt><dd><p>Run Homebrew's unit and integration tests.</p></dd>
+<dt><code>update-test</code> [<code>--commit=&lt;sha1></code>] [<code>--before=&lt;date></code>] [<code>--keep-tmp</code>]</dt><dd><p>Runs a test of <code>brew update</code> with a new repository clone.</p>
+
+<p>If no arguments are passed, use <code>origin/master</code> as the start commit.</p>
+
+<p>If <code>--commit=&lt;sha1></code> is passed, use <code>&lt;sha1></code> as the start commit.</p>
+
+<p>If <code>--before=&lt;date></code> is passed, use the commit at <code>&lt;date></code> as the
+start commit.</p>
+
+<p>If <code>--keep-tmp</code> is passed, retain the temporary directory containing
+the new repository clone.</p></dd>
 </dl>
 
 
