@@ -3,6 +3,7 @@ require "formula_lock"
 require "formula_pin"
 require "hardware"
 require "utils/bottles"
+require "utils/shell"
 require "build_environment"
 require "build_options"
 require "formulary"
@@ -41,6 +42,7 @@ require "migrator"
 class Formula
   include FileUtils
   include Utils::Inreplace
+  include Utils::Shell
   extend Enumerable
 
   # @!method inreplace(paths, before = nil, after = nil)
