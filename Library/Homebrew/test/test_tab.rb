@@ -100,6 +100,7 @@ class TabTests < Homebrew::TestCase
   def test_from_file
     path = Pathname.new(TEST_DIRECTORY).join("fixtures", "receipt.json")
     tab = Tab.from_file(path)
+    alias_path = Pathname.new("/usr/local/Library/Taps/homebrew/homebrew-core/Aliases/test-formula")
 
     assert_equal @used.sort, tab.used_options.sort
     assert_equal @unused.sort, tab.unused_options.sort
@@ -117,7 +118,7 @@ class TabTests < Homebrew::TestCase
     assert_equal "2.14", tab.stable_version.to_s
     assert_equal "2.15", tab.devel_version.to_s
     assert_equal "HEAD-0000000", tab.head_version.to_s
-    assert_equal "test-formula", tab.alias_path
+    assert_equal alias_path, tab.alias_path
   end
 
   def test_to_json

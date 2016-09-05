@@ -56,6 +56,10 @@ class Tab < OpenStruct
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}
 
+    if alias_path = attributes["alias_path"]
+      attributes["alias_path"] = Pathname.new(alias_path)
+    end
+
     tapped_from = attributes["tapped_from"]
     unless tapped_from.nil? || tapped_from == "path or URL"
       attributes["source"]["tap"] = attributes.delete("tapped_from")
@@ -294,7 +298,7 @@ class Tab < OpenStruct
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,
-      "alias_path" => alias_path,
+      "alias_path" => alias_path && alias_path.to_s,
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
       "source" => source
