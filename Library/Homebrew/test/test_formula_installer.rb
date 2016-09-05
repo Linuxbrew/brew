@@ -92,3 +92,45 @@ class InstallTests < Homebrew::TestCase
     end
   end
 end
+
+class FormulaInstallerTests < Homebrew::TestCase
+  def test_check_install_sanity_pinned_dep
+    dep_name = "dependency"
+    dep_path = CoreTap.new.formula_dir/"#{dep_name}.rb"
+    dep_path.write <<-EOS.undent
+      class #{Formulary.class_s(dep_name)} < Formula
+        url "foo"
+        version "0.2"
+      end
+    EOS
+
+    Formulary::FORMULAE.delete(dep_path)
+    dependency = Formulary.factory(dep_name)
+
+    dependent = formula do
+      url "foo"
+      version "0.5"
+      depends_on "#{dependency.name}"
+    end
+
+    dependency.prefix("0.1").join("bin/a").mkpath
+    HOMEBREW_LIBRARY.join("PinnedKegs").mkpath
+    FileUtils.ln_s dependency.prefix("0.1"), HOMEBREW_LIBRARY.join("PinnedKegs/#{dep_name}")
+
+    dependency_keg = Keg.new(dependency.prefix("0.1"))
+    dependency_keg.link
+
+    assert_predicate dependency_keg, :linked?
+    assert_predicate dependency, :pinned?
+
+    fi = FormulaInstaller.new(dependent)
+    assert_raises(CannotInstallFormulaError) { fi.check_install_sanity }
+  ensure
+    dependency.unpin
+    dependency_keg.unlink
+    dependency_keg.uninstall
+    dependency.clear_cache
+    dep_path.unlink
+    Formulary::FORMULAE.delete(dep_path)
+  end
+end
