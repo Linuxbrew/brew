@@ -245,10 +245,9 @@ EOS
 
     if [[ -z "$HOMEBREW_DEVELOPER" ]]
     then
-      opoo <<EOS
-Checking out $UPSTREAM_BRANCH.
-Set HOMEBREW_DEVELOPER=1 to preserve branch when updating Homebrew.
-EOS
+      echo "Checking out $UPSTREAM_BRANCH in $DIR..."
+      echo "To checkout $INITIAL_BRANCH in $DIR run:"
+      echo "  'cd $DIR && git checkout $INITIAL_BRANCH"
     fi
 
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
