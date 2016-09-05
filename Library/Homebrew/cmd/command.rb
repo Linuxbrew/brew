@@ -21,11 +21,7 @@ module Homebrew
   def internal_command_path(cmd)
     extensions = %w[rb sh]
     paths = extensions.map { |ext| HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.#{ext}" }
-
-    if ARGV.homebrew_developer?
-      paths += extensions.map { |ext| HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.#{ext}" }
-    end
-
+    paths += extensions.map { |ext| HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.#{ext}" }
     paths.find { |p| p.file? }
   end
 end

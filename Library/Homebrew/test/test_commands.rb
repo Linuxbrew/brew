@@ -70,10 +70,6 @@ class CommandsTests < Homebrew::TestCase
   end
 
   def test_internal_dev_command_path
-    ARGV.stubs(:homebrew_developer?).returns false
-    assert_nil Homebrew.send(:internal_command_path, "rbdevcmd")
-
-    ARGV.stubs(:homebrew_developer?).returns true
     assert_equal HOMEBREW_LIBRARY_PATH/"dev-cmd/rbdevcmd.rb",
                  Homebrew.send(:internal_command_path, "rbdevcmd")
     assert_equal HOMEBREW_LIBRARY_PATH/"dev-cmd/shdevcmd.sh",

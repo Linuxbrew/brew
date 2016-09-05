@@ -8,7 +8,7 @@ module Homebrew
   def commands
     if ARGV.include? "--quiet"
       cmds = internal_commands + external_commands
-      cmds += internal_development_commands if ARGV.homebrew_developer?
+      cmds += internal_development_commands
       cmds += HOMEBREW_INTERNAL_COMMAND_ALIASES.keys if ARGV.include? "--include-aliases"
       puts_columns cmds.sort
     else
