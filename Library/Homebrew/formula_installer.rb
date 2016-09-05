@@ -589,7 +589,7 @@ class FormulaInstaller
       -I #{HOMEBREW_LOAD_PATH}
       --
       #{HOMEBREW_LIBRARY_PATH}/build.rb
-      #{formula.install_ref}
+      #{formula.alias_path || formula.path}
     ].concat(build_argv)
 
     Sandbox.print_sandbox_message if Sandbox.formula?(formula)

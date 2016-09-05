@@ -11,7 +11,7 @@
   "poured_from_bottle": true,
   "time": 1403827774,
   "HEAD": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
-  "install_name": "test-formula",
+  "alias_path": "test-formula",
   "stdlib": "libcxx",
   "compiler": "clang",
   "source": {

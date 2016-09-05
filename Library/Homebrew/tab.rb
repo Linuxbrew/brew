@@ -27,7 +27,7 @@ class Tab < OpenStruct
       "time" => Time.now.to_i,
       "source_modified_time" => formula.source_modified_time.to_i,
       "HEAD" => HOMEBREW_REPOSITORY.git_head,
-      "install_name" => formula.install_name,
+      "alias_path" => formula.alias_path.to_s,
       "compiler" => compiler,
       "stdlib" => stdlib,
       "source" => {
@@ -162,7 +162,7 @@ class Tab < OpenStruct
       "time" => nil,
       "source_modified_time" => 0,
       "HEAD" => nil,
-      "install_name" => nil,
+      "alias_path" => nil,
       "stdlib" => nil,
       "compiler" => DevelopmentTools.default_compiler,
       "source" => {
@@ -294,7 +294,7 @@ class Tab < OpenStruct
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,
-      "install_name" => install_name,
+      "alias_path" => alias_path,
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
       "source" => source

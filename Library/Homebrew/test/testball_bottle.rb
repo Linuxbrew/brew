@@ -1,5 +1,5 @@
 class TestballBottle < Formula
-  def initialize(name = "testball_bottle", path = Pathname.new(__FILE__).expand_path, spec = :stable, install_name: name)
+  def initialize(name = "testball_bottle", path = Pathname.new(__FILE__).expand_path, spec = :stable, alias_path: nil)
     self.class.instance_eval do
       stable.url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
       stable.sha256 TESTBALL_SHA256
