@@ -298,7 +298,7 @@ class Tab < OpenStruct
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,
-      "alias_path" => alias_path && alias_path.to_s,
+      "alias_path" => (alias_path.to_s if alias_path),
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
       "source" => source
