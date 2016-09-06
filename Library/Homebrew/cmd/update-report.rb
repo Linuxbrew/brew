@@ -88,7 +88,7 @@ module Homebrew
       puts if ARGV.include?("--preinstall")
     end
 
-    link_manpages
+    link_completions_and_docs
     Tap.each(&:link_manpages)
 
     Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
@@ -163,9 +163,16 @@ module Homebrew
     end
   end
 
-  def link_manpages
+  def link_completions_and_docs
     return if HOMEBREW_PREFIX.to_s == HOMEBREW_REPOSITORY.to_s
-    link_path_manpages(HOMEBREW_REPOSITORY/"share", "brew update")
+    command = "brew update"
+    link_src_dst_dirs(HOMEBREW_REPOSITORY/"etc/bash_completion.d",
+                      HOMEBREW_PREFIX/"etc/bash_completion.d", command)
+    link_src_dst_dirs(HOMEBREW_REPOSITORY/"share/doc/homebrew",
+                      HOMEBREW_PREFIX/"share/doc/homebrew", command, link_dir: true)
+    link_src_dst_dirs(HOMEBREW_REPOSITORY/"share/zsh/site-functions",
+                      HOMEBREW_PREFIX/"share/zsh/site-functions", command)
+    link_path_manpages(HOMEBREW_REPOSITORY/"share", command)
   end
 end
 

@@ -589,18 +589,19 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
   out
 end
 
-def link_src_dst_dirs(src_dir, dst_dir, command)
+def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
   return unless src_dir.exist?
   conflicts = []
-  src_dir.find do |src|
-    next if src.directory?
-    dst = dst_dir/src.relative_path_from(src_dir.parent)
+  src_paths = link_dir ? [src_dir] : src_dir.find
+  src_paths.each do |src|
+    next if src.directory? && !link_dir
+    dst = dst_dir.parent/src.relative_path_from(src_dir.parent)
     next if dst.symlink? && src == dst.resolved_path
     if dst.exist?
       conflicts << dst
       next
     end
-    dst_dir.mkpath
+    dst_dir.parent.mkpath
     dst.make_relative_symlink(src)
   end
   unless conflicts.empty?
@@ -614,5 +615,5 @@ def link_src_dst_dirs(src_dir, dst_dir, command)
 end
 
 def link_path_manpages(path, command)
-  link_src_dst_dirs(path/"man", HOMEBREW_PREFIX/"share", command)
+  link_src_dst_dirs(path/"man", HOMEBREW_PREFIX/"share/man", command)
 end
