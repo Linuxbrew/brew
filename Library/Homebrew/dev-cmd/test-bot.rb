@@ -251,7 +251,9 @@ module Homebrew
       raise if e.tap.installed?
       test "brew", "tap", e.tap.name
       retry unless steps.last.failed?
-    rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
+    rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError => e
+      onoe e
+      puts e.backtrace
     end
 
     def git(*args)
@@ -689,7 +691,15 @@ module Homebrew
       end
       git "clean", "-ffdx"
 
-      Pathname.glob("{#{HOMEBREW_REPOSITORY},#{HOMEBREW_LIBRARY}/Taps/*/*}").each do |git_repo|
+      unless @repository == HOMEBREW_REPOSITORY
+        HOMEBREW_REPOSITORY.cd do
+          safe_system "git", "checkout", "-f", "master"
+          safe_system "git", "reset", "--hard", "origin/master"
+          safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+        end
+      end
+
+      Pathname.glob("#{HOMEBREW_LIBRARY}/Taps/*/*").each do |git_repo|
         next if @repository == git_repo
         git_repo.cd do
           safe_system "git", "checkout", "-f", "master"
@@ -720,7 +730,15 @@ module Homebrew
 
         Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
 
-        Pathname.glob("{#{HOMEBREW_REPOSITORY},#{HOMEBREW_LIBRARY}/Taps/*/*}").each do |git_repo|
+        unless @repository == HOMEBREW_REPOSITORY
+          HOMEBREW_REPOSITORY.cd do
+            safe_system "git", "checkout", "-f", "master"
+            safe_system "git", "reset", "--hard", "origin/master"
+            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+          end
+        end
+
+        Pathname.glob("#{HOMEBREW_LIBRARY}/Taps/*/*").each do |git_repo|
           next if @repository == git_repo
           git_repo.cd do
             safe_system "git", "checkout", "-f", "master"
