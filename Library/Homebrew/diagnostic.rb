@@ -87,9 +87,14 @@ module Homebrew
       end
       ############# END HELPERS
 
-      def all_development_tools_checks
+      def development_tools_checks
         %w[
           check_for_installed_developer_tools
+        ]
+      end
+
+      def fatal_development_tools_checks
+        %w[
         ]
       end
 

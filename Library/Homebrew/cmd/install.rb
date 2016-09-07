@@ -223,9 +223,16 @@ module Homebrew
 
   def check_development_tools
     checks = Diagnostic::Checks.new
-    checks.all_development_tools_checks.each do |check|
+    all_development_tools_checks = checks.development_tools_checks +
+                                   checks.fatal_development_tools_checks
+    all_development_tools_checks.each do |check|
       out = checks.send(check)
-      opoo out unless out.nil?
+      next if out.nil?
+      if checks.fatal_development_tools_checks.include?(check)
+        odie out
+      else
+        opoo out
+      end
     end
   end
 
