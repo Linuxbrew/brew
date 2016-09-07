@@ -248,8 +248,9 @@ module Homebrew
     def safe_formula_canonical_name(formula_name)
       Formulary.factory(formula_name).full_name
     rescue TapFormulaUnavailableError, FormulaUnavailableError => e
-      raise if e.tap.installed?
-      test "brew", "tap", e.tap.name
+      exception_tap = e.tap || CoreTap.instance
+      raise if exception_tap.installed?
+      test "brew", "tap", exception_tap.name
       retry unless steps.last.failed?
       onoe e
       puts e.backtrace
