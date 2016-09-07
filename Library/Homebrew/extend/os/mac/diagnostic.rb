@@ -1,7 +1,7 @@
 module Homebrew
   module Diagnostic
     class Checks
-      def all_development_tools_checks
+      def development_tools_checks
         %w[
           check_for_unsupported_osx
           check_for_prerelease_xcode
@@ -12,11 +12,16 @@ module Homebrew
         ]
       end
 
-      def strict_development_tools_checks
-        %w[
-          check_xcode_up_to_date
-          check_clt_up_to_date
-        ]
+      def fatal_development_tools_checks
+        if MacOS.prerelease?
+          %w[
+            check_xcode_up_to_date
+            check_clt_up_to_date
+          ]
+        else
+          %w[
+          ]
+        end
       end
 
       def check_for_unsupported_osx
