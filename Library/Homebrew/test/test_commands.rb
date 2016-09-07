@@ -63,16 +63,16 @@ class CommandsTests < Homebrew::TestCase
 
   def test_internal_command_path
     assert_equal HOMEBREW_LIBRARY_PATH/"cmd/rbcmd.rb",
-                 Homebrew.send(:internal_command_path, "rbcmd")
+                 Commands.path("rbcmd")
     assert_equal HOMEBREW_LIBRARY_PATH/"cmd/shcmd.sh",
-                 Homebrew.send(:internal_command_path, "shcmd")
-    assert_nil Homebrew.send(:internal_command_path, "idontexist1234")
+                 Commands.path("shcmd")
+    assert_nil Commands.path("idontexist1234")
   end
 
   def test_internal_dev_command_path
     assert_equal HOMEBREW_LIBRARY_PATH/"dev-cmd/rbdevcmd.rb",
-                 Homebrew.send(:internal_command_path, "rbdevcmd")
+                 Commands.path("rbdevcmd")
     assert_equal HOMEBREW_LIBRARY_PATH/"dev-cmd/shdevcmd.sh",
-                 Homebrew.send(:internal_command_path, "shdevcmd")
+                 Commands.path("shdevcmd")
   end
 end
