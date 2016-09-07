@@ -247,11 +247,13 @@ module Homebrew
 
     def safe_formula_canonical_name(formula_name)
       Formulary.factory(formula_name).full_name
-    rescue TapFormulaUnavailableError => e
+    rescue TapFormulaUnavailableError, FormulaUnavailableError => e
       raise if e.tap.installed?
       test "brew", "tap", e.tap.name
       retry unless steps.last.failed?
-    rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError => e
+      onoe e
+      puts e.backtrace
+    rescue TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError => e
       onoe e
       puts e.backtrace
     end
