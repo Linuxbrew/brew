@@ -8,7 +8,7 @@ class FormulaTests < Homebrew::TestCase
     name = "formula_name"
     path = Formulary.core_path(name)
     spec = :stable
-    alias_path = "formula_alias"
+    alias_path = CoreTap.instance.alias_dir/"formula_alias"
 
     f = klass.new(name, path, spec, :alias_path => alias_path)
     assert_equal name, f.name
