@@ -46,10 +46,13 @@ class Tab < OpenStruct
     new(attributes)
   end
 
+  # Returns the Tab for an install receipt at `path`.
+  # Results are cached.
   def self.from_file(path)
     CACHE.fetch(path) { |p| CACHE[p] = from_file_content(File.read(p), p) }
   end
 
+  # Like Tab.from_file, but bypass the cache.
   def self.from_file_content(content, path)
     attributes = Utils::JSON.load(content)
     attributes["tabfile"] = path
@@ -97,6 +100,8 @@ class Tab < OpenStruct
     end
   end
 
+  # Returns a tab for the named formula's installation,
+  # or a fake one if the formula is not installed.
   def self.for_name(name)
     for_formula(Formulary.factory(name))
   end
