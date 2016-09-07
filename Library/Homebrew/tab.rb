@@ -27,11 +27,10 @@ class Tab < OpenStruct
       "time" => Time.now.to_i,
       "source_modified_time" => formula.source_modified_time.to_i,
       "HEAD" => HOMEBREW_REPOSITORY.git_head,
-      "alias_path" => formula.alias_path.to_s,
       "compiler" => compiler,
       "stdlib" => stdlib,
       "source" => {
-        "path" => formula.path.to_s,
+        "path" => formula.specified_path.to_s,
         "tap" => formula.tap ? formula.tap.name : nil,
         "spec" => formula.active_spec_sym.to_s,
         "versions" => {
@@ -55,10 +54,6 @@ class Tab < OpenStruct
     attributes["tabfile"] = path
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}
-
-    if alias_path = attributes["alias_path"]
-      attributes["alias_path"] = Pathname.new(alias_path)
-    end
 
     tapped_from = attributes["tapped_from"]
     unless tapped_from.nil? || tapped_from == "path or URL"
@@ -142,7 +137,7 @@ class Tab < OpenStruct
       tab = empty
       tab.unused_options = f.options.as_flags
       tab.source = {
-        "path" => f.path.to_s,
+        "path" => f.specified_path.to_s,
         "tap" => f.tap ? f.tap.name : f.tap,
         "spec" => f.active_spec_sym.to_s,
         "versions" => {
@@ -166,7 +161,6 @@ class Tab < OpenStruct
       "time" => nil,
       "source_modified_time" => 0,
       "HEAD" => nil,
-      "alias_path" => nil,
       "stdlib" => nil,
       "compiler" => DevelopmentTools.default_compiler,
       "source" => {
@@ -298,7 +292,6 @@ class Tab < OpenStruct
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,
-      "alias_path" => (alias_path.to_s if alias_path),
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
       "source" => source

@@ -43,9 +43,9 @@ class TabTests < Homebrew::TestCase
     assert_nil tab.stable_version
     assert_nil tab.devel_version
     assert_nil tab.head_version
-    assert_nil tab.alias_path
     assert_equal DevelopmentTools.default_compiler, tab.cxxstdlib.compiler
     assert_nil tab.cxxstdlib.type
+    assert_nil tab.source["path"]
   end
 
   def test_include?
@@ -100,7 +100,7 @@ class TabTests < Homebrew::TestCase
   def test_from_file
     path = Pathname.new(TEST_DIRECTORY).join("fixtures", "receipt.json")
     tab = Tab.from_file(path)
-    alias_path = Pathname.new("/usr/local/Library/Taps/homebrew/homebrew-core/Aliases/test-formula")
+    source_path = "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb"
 
     assert_equal @used.sort, tab.used_options.sort
     assert_equal @unused.sort, tab.unused_options.sort
@@ -118,7 +118,7 @@ class TabTests < Homebrew::TestCase
     assert_equal "2.14", tab.stable_version.to_s
     assert_equal "2.15", tab.devel_version.to_s
     assert_equal "HEAD-0000000", tab.head_version.to_s
-    assert_equal alias_path, tab.alias_path
+    assert_equal source_path, tab.source["path"]
   end
 
   def test_to_json
@@ -136,7 +136,7 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.stable_version, tab.stable_version
     assert_equal @tab.devel_version, tab.devel_version
     assert_equal @tab.head_version, tab.head_version
-    assert_equal @tab.alias_path, tab.alias_path
+    assert_equal @tab.source["path"], tab.source["path"]
   end
 
   def test_remap_deprecated_options
