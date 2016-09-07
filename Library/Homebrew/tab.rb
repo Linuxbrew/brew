@@ -16,6 +16,7 @@ class Tab < OpenStruct
     CACHE.clear
   end
 
+  # Instantiates a Tab for a new installation of a formula.
   def self.create(formula, compiler, stdlib)
     build = formula.build
     attributes = {
@@ -110,6 +111,8 @@ class Tab < OpenStruct
     options
   end
 
+  # Returns a Tab for an already installed formula,
+  # or a fake one if the formula is not installed.
   def self.for_formula(f)
     paths = []
 
@@ -134,6 +137,7 @@ class Tab < OpenStruct
       used_options = remap_deprecated_options(f.deprecated_options, tab.used_options)
       tab.used_options = used_options.as_flags
     else
+      # Formula is not installed. Return a fake tab.
       tab = empty
       tab.unused_options = f.options.as_flags
       tab.source = {
