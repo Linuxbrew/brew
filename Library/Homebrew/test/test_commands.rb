@@ -29,8 +29,8 @@ class CommandsTests < Homebrew::TestCase
     refute cmds.include?("rbdevcmd"), "Dev commands shouldn't be included"
   end
 
-  def test_internal_development_commands
-    cmds = Homebrew.internal_development_commands
+  def test_internal_developer_commands
+    cmds = Homebrew.internal_developer_commands
     assert cmds.include?("rbdevcmd"), "Ruby commands files should be recognized"
     assert cmds.include?("shdevcmd"), "Shell commands files should be recognized"
     refute cmds.include?("rbcmd"), "Non-dev commands shouldn't be included"
