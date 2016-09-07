@@ -121,6 +121,40 @@ class TabTests < Homebrew::TestCase
     assert_equal source_path, tab.source["path"]
   end
 
+  def test_create
+    f = formula { url "foo-1.0" }
+    compiler = DevelopmentTools.default_compiler
+    stdlib = :libcxx
+    tab = Tab.create(f, compiler, stdlib)
+
+    assert_equal f.path.to_s, tab.source["path"]
+  end
+
+  def test_create_from_alias
+    alias_path = CoreTap.instance.alias_dir/"bar"
+    f = formula(:alias_path => alias_path) { url "foo-1.0" }
+    compiler = DevelopmentTools.default_compiler
+    stdlib = :libcxx
+    tab = Tab.create(f, compiler, stdlib)
+
+    assert_equal f.alias_path.to_s, tab.source["path"]
+  end
+
+  def test_for_formula
+    f = formula { url "foo-1.0" }
+    tab = Tab.for_formula(f)
+
+    assert_equal f.path.to_s, tab.source["path"]
+  end
+
+  def test_for_formula_from_alias
+    alias_path = CoreTap.instance.alias_dir/"bar"
+    f = formula(:alias_path => alias_path) { url "foo-1.0" }
+    tab = Tab.for_formula(f)
+
+    assert_equal alias_path.to_s, tab.source["path"]
+  end
+
   def test_to_json
     tab = Tab.new(Utils::JSON.load(@tab.to_json))
     assert_equal @tab.used_options.sort, tab.used_options.sort
