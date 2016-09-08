@@ -242,6 +242,14 @@ EOS
   INITIAL_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
   if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
+
+    if [[ -z "$HOMEBREW_DEVELOPER" ]]
+    then
+      echo "Checking out $UPSTREAM_BRANCH in $DIR..."
+      echo "To checkout $INITIAL_BRANCH in $DIR run:"
+      echo "  'cd $DIR && git checkout $INITIAL_BRANCH"
+    fi
+
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
     # it to `origin/#{@upstream_branch}`. Otherwise, just check it out.
     if git merge-base --is-ancestor "$UPSTREAM_BRANCH" "origin/$UPSTREAM_BRANCH" &>/dev/null
