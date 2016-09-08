@@ -1,3 +1,7 @@
+#: @hide_from_man_page
+#:  * `aspell_dictionaries`:
+#:    Generates the new dictionaries for the `aspell` formula.
+
 require "open-uri"
 require "resource"
 require "formula"

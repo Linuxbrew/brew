@@ -1,26 +1,35 @@
-# Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
-# Optionally, installs the formulae changed by the patch.
-#
-# Usage: brew pull [options...] <patch-source> [<patch-source> ...]
-#
-# Each <patch-source> may be one of:
-#   * The ID number of a PR (Pull Request) in the homebrew/core GitHub repo
-#   * The URL of a PR on GitHub, using either the web page or API URL
-#       formats. In this form, the PR may be on homebrew/brew, homebrew/core, or
-#       any tap.
-#   * The URL of a commit on GitHub
-#   * A "brew.sh/job/..." string specifying a testing job ID
-#
-# Options:
-#   --bottle:      Handle bottles, pulling the bottle-update commit and publishing files on Bintray
-#   --bump:        For one-formula PRs, automatically reword commit message to our preferred format
-#   --clean:       Do not rewrite or otherwise modify the commits found in the pulled PR
-#   --ignore-whitespace: Silently ignore whitespace discrepancies when applying diffs
-#   --resolve:     When a patch fails to apply, leave in progress and allow user to
-#                  resolve, instead of aborting
-#   --branch-okay: Do not warn if pulling to a branch besides master (useful for testing)
-#   --no-pbcopy:   Do not copy anything to the system clipboard
-#   --no-publish:  Do not publish bottles to Bintray
+#: @hide_from_man_page
+#: `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] <patch-source> [<patch-source>]
+#:
+#:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
+#:    Optionally, installs the formulae changed by the patch.
+#:
+#:
+#:    Each <patch-source> may be one of:
+#:      * The ID number of a PR (Pull Request) in the homebrew/core GitHub
+#:        repository
+#:      * The URL of a PR on GitHub, using either the web page or API URL
+#:        formats. In this form, the PR may be on Homebrew/brew,
+#:        Homebrew/homebrew-core or any tap.
+#:      * The URL of a commit on GitHub
+#:      * A "http://bot.brew.sh/job/..." string specifying a testing job ID
+#:
+#:   If `--bottle` was passed, handle bottles, pulling the bottle-update
+#:   commit and publishing files on Bintray.
+#:   If `--bump` was passed, for one-formula PRs, automatically reword
+#:   commit message to our preferred format.
+#:   If `--clean` was passed, do not rewrite or otherwise modify the
+#:   commits found in the pulled PR.
+#:   If `--ignore-whitespace` was passed, silently ignore whitespace
+#:   discrepancies when applying diffs.
+#:   If `--resolve` was passed, when a patch fails to apply, leave in
+#:   progress and allow user to
+#:                  resolve, instead of aborting.
+#:   If `--branch-okay` was passed, do not warn if pulling to a branch
+#:   besides master (useful for testing).
+#:   If `--no-pbcopy` was passed, do not copy anything to the system
+#    clipboard.
+#:   If `--no-publish` was passed, do not publish bottles to Bintray.
 
 require "net/http"
 require "net/https"

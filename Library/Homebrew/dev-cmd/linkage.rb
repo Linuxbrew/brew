@@ -1,16 +1,14 @@
-#
-# Description: check linkage of installed keg
-# Usage:
-#   brew linkage <formulae>
-#
-# Only works on installed formulae. An error is raised if it is run on uninstalled
-# formulae.
-#
-# Options:
-#  --test      - testing version: only display broken libs; exit non-zero if any
-#                breakage was found.
-#  --reverse   - For each dylib the keg references, print the dylib followed by the
-#                binaries which link to it.
+#:  * `linkage` [`--test`] [`--reverse`]  <formula-name>:
+#:    Checks the library links of an installed formula.
+#:
+#:    Only works on installed formulae. An error is raised if it is run on
+#:    uninstalled formulae.
+#:
+#:    If `--test` is passed, only display missing libraries and exit with a
+#:    non-zero exit code if any missing libraries were found.
+#:
+#:    If `--reverse` is passed, print the dylib followed by the binaries
+#:    which link to it for each library the keg references.
 
 require "os/mac/linkage_checker"
 

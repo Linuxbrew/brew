@@ -1,3 +1,7 @@
+#: @hide_from_man_page
+#:  * `man`:
+#:    Generate Homebrew's manpages.
+
 require "formula"
 require "erb"
 require "ostruct"
