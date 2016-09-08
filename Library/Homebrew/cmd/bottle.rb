@@ -1,3 +1,10 @@
+#: @hide_from_man_page
+#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`]:
+#:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
+#:
+#:    Generate a bottle (binary package) from a formula installed with
+#:    `--build-bottle`.
+
 require "formula"
 require "utils/bottles"
 require "tab"

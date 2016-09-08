@@ -317,6 +317,7 @@ repository's HEAD will be checked for updates when a new stable or devel
 version has been released.</p></dd>
 <dt><code>pin</code> <var>formulae</var></dt><dd><p>Pin the specified <var>formulae</var>, preventing them from being upgraded when
 issuing the <code>brew upgrade</code> command. See also <code>unpin</code>.</p></dd>
+<dt><code>postinstall</code> <var>formula</var></dt><dd><p>Rerun the post-install steps for <var>formula</var>.</p></dd>
 <dt><code>prune</code> [<code>--dry-run</code>]</dt><dd><p>Remove dead symlinks from the Homebrew prefix. This is generally not
 needed, but can be useful when doing DIY installations. Also remove broken
 app symlinks from <code>/Applications</code> and <code>~/Applications</code> that were previously

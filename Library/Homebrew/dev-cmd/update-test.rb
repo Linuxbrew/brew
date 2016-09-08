@@ -1,12 +1,18 @@
+#: @hide_from_man_page
+#:  * `update-test` [`--commit=<sha1>`] [`--before=<date>`] [`--keep-tmp`]:
+#:    Runs a test of `brew update` with a new repository clone.
+#:
+#:    If no arguments are passed, use `origin/master` as the start commit.
+#:
+#:    If `--commit=<sha1>` is passed, use `<sha1>` as the start commit.
+#:
+#:    If `--before=<date>` is passed, use the commit at `<date>` as the
+#:    start commit.
+#:
+#:    If `--keep-tmp` is passed, retain the temporary directory containing
+#:    the new repository clone.
+
 module Homebrew
-  #
-  # Usage:
-  #    brew update-test                 # using origin/master as start commit
-  #    brew update-test --commit=<sha1> # using <sha1> as start commit
-  #    brew update-test --before=<date> # using commit at <date> as start commit
-  #
-  # Options:
-  #   --keep-tmp      Retain temporary directory containing the new clone
   def update_test
     cd HOMEBREW_REPOSITORY
     start_sha1 = if commit = ARGV.value("commit")

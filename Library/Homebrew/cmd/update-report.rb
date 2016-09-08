@@ -1,3 +1,7 @@
+#: @hide_from_man_page
+#:  * `update_report`:
+#:    The Ruby implementation of `brew update`. Never called manually.
+
 require "formula_versions"
 require "migrator"
 require "formulary"
