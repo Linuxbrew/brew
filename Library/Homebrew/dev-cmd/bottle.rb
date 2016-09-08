@@ -1,4 +1,3 @@
-#: @hide_from_man_page
 #:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`]:
 #:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
 #:

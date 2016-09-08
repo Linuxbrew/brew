@@ -1,9 +1,7 @@
-#: @hide_from_man_page
 #: `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] <patch-source> [<patch-source>]
 #:
 #:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 #:    Optionally, installs the formulae changed by the patch.
-#:
 #:
 #:    Each <patch-source> may be one of:
 #:      * The ID number of a PR (Pull Request) in the homebrew/core GitHub
