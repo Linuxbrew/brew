@@ -13,7 +13,7 @@ Troubleshooting:
   brew doctor
   brew install -vd FORMULA
 
-Brewing:
+Developers:
   brew create [URL [--no-fetch]]
   brew edit [FORMULA...]
   https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Formula-Cookbook.md
