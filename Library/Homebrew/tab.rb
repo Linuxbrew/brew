@@ -16,6 +16,7 @@ class Tab < OpenStruct
     CACHE.clear
   end
 
+  # Instantiates a Tab for a new installation of a formula.
   def self.create(formula, compiler, stdlib)
     build = formula.build
     attributes = {
@@ -45,10 +46,13 @@ class Tab < OpenStruct
     new(attributes)
   end
 
+  # Returns the Tab for an install receipt at `path`.
+  # Results are cached.
   def self.from_file(path)
     CACHE.fetch(path) { |p| CACHE[p] = from_file_content(File.read(p), p) }
   end
 
+  # Like Tab.from_file, but bypass the cache.
   def self.from_file_content(content, path)
     attributes = Utils::JSON.load(content)
     attributes["tabfile"] = path
@@ -96,6 +100,8 @@ class Tab < OpenStruct
     end
   end
 
+  # Returns a tab for the named formula's installation,
+  # or a fake one if the formula is not installed.
   def self.for_name(name)
     for_formula(Formulary.factory(name))
   end
@@ -110,6 +116,8 @@ class Tab < OpenStruct
     options
   end
 
+  # Returns a Tab for an already installed formula,
+  # or a fake one if the formula is not installed.
   def self.for_formula(f)
     paths = []
 
@@ -134,6 +142,7 @@ class Tab < OpenStruct
       used_options = remap_deprecated_options(f.deprecated_options, tab.used_options)
       tab.used_options = used_options.as_flags
     else
+      # Formula is not installed. Return a fake tab.
       tab = empty
       tab.unused_options = f.options.as_flags
       tab.source = {
