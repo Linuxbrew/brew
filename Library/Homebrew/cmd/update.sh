@@ -341,12 +341,13 @@ EOS
   fi
 
   # check permissions
-  if [[ "$HOMEBREW_PREFIX" = "/usr/local" && ! -w /usr/local ]]
+  if [[ -e "$HOMEBREW_CELLAR" && ! -w "$HOMEBREW_CELLAR" ]]
   then
     odie <<EOS
-/usr/local is not writable. You should change the ownership
-and permissions of /usr/local back to your user account:
-  sudo chown -R \$(whoami) /usr/local
+$HOMEBREW_CELLAR is not writable. You should change the
+ownership and permissions of $HOMEBREW_CELLAR back to your
+user account:
+  sudo chown -R \$(whoami) $HOMEBREW_CELLAR
 EOS
   fi
 
