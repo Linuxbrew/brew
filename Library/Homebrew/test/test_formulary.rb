@@ -85,8 +85,11 @@ class FormularyFactoryTest < Homebrew::TestCase
   def test_factory_from_alias
     alias_dir = CoreTap.instance.alias_dir
     alias_dir.mkpath
-    FileUtils.ln_s @path, alias_dir/"foo"
-    assert_kind_of Formula, Formulary.factory("foo")
+    alias_path = alias_dir/"foo"
+    FileUtils.ln_s @path, alias_path
+    result = Formulary.factory("foo")
+    assert_kind_of Formula, result
+    assert_equal alias_path, result.alias_path
   ensure
     alias_dir.rmtree
   end

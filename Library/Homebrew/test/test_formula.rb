@@ -8,10 +8,12 @@ class FormulaTests < Homebrew::TestCase
     name = "formula_name"
     path = Formulary.core_path(name)
     spec = :stable
+    alias_path = CoreTap.instance.alias_dir/"formula_alias"
 
-    f = klass.new(name, path, spec)
+    f = klass.new(name, path, spec, :alias_path => alias_path)
     assert_equal name, f.name
     assert_equal path, f.path
+    assert_equal alias_path, f.alias_path
     assert_raises(ArgumentError) { klass.new }
   end
 

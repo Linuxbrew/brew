@@ -45,6 +45,7 @@ class TabTests < Homebrew::TestCase
     assert_nil tab.head_version
     assert_equal DevelopmentTools.default_compiler, tab.cxxstdlib.compiler
     assert_nil tab.cxxstdlib.type
+    assert_nil tab.source["path"]
   end
 
   def test_include?
@@ -99,6 +100,7 @@ class TabTests < Homebrew::TestCase
   def test_from_file
     path = Pathname.new(TEST_DIRECTORY).join("fixtures", "receipt.json")
     tab = Tab.from_file(path)
+    source_path = "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb"
 
     assert_equal @used.sort, tab.used_options.sort
     assert_equal @unused.sort, tab.unused_options.sort
@@ -116,6 +118,41 @@ class TabTests < Homebrew::TestCase
     assert_equal "2.14", tab.stable_version.to_s
     assert_equal "2.15", tab.devel_version.to_s
     assert_equal "HEAD-0000000", tab.head_version.to_s
+    assert_equal source_path, tab.source["path"]
+  end
+
+  def test_create
+    f = formula { url "foo-1.0" }
+    compiler = DevelopmentTools.default_compiler
+    stdlib = :libcxx
+    tab = Tab.create(f, compiler, stdlib)
+
+    assert_equal f.path.to_s, tab.source["path"]
+  end
+
+  def test_create_from_alias
+    alias_path = CoreTap.instance.alias_dir/"bar"
+    f = formula(:alias_path => alias_path) { url "foo-1.0" }
+    compiler = DevelopmentTools.default_compiler
+    stdlib = :libcxx
+    tab = Tab.create(f, compiler, stdlib)
+
+    assert_equal f.alias_path.to_s, tab.source["path"]
+  end
+
+  def test_for_formula
+    f = formula { url "foo-1.0" }
+    tab = Tab.for_formula(f)
+
+    assert_equal f.path.to_s, tab.source["path"]
+  end
+
+  def test_for_formula_from_alias
+    alias_path = CoreTap.instance.alias_dir/"bar"
+    f = formula(:alias_path => alias_path) { url "foo-1.0" }
+    tab = Tab.for_formula(f)
+
+    assert_equal alias_path.to_s, tab.source["path"]
   end
 
   def test_to_json
@@ -133,6 +170,7 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.stable_version, tab.stable_version
     assert_equal @tab.devel_version, tab.devel_version
     assert_equal @tab.head_version, tab.head_version
+    assert_equal @tab.source["path"], tab.source["path"]
   end
 
   def test_remap_deprecated_options

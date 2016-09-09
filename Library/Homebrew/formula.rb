@@ -60,6 +60,11 @@ class Formula
   # e.g. `this-formula`
   attr_reader :name
 
+  # The name specified when installing this {Formula}.
+  # Could be the name of the {Formula}, or an alias.
+  # e.g. `another-name-for-this-formula`
+  attr_reader :alias_path
+
   # The fully-qualified name of this {Formula}.
   # For core formula it's the same as {#name}.
   # e.g. `homebrew/tap-name/this-formula`
@@ -145,9 +150,10 @@ class Formula
   attr_accessor :build
 
   # @private
-  def initialize(name, path, spec)
+  def initialize(name, path, spec, alias_path: nil)
     @name = name
     @path = path
+    @alias_path = alias_path
     @revision = self.class.revision || 0
     @version_scheme = self.class.version_scheme || 0
 
@@ -221,6 +227,11 @@ class Formula
   end
 
   public
+
+  # The path that was specified to find/install this formula.
+  def specified_path
+    alias_path || path
+  end
 
   # Is the currently active {SoftwareSpec} a {#stable} build?
   # @private

@@ -68,6 +68,8 @@ class Formulary
     attr_reader :name
     # The formula's ruby file's path or filename
     attr_reader :path
+    # The name used to install the formula
+    attr_reader :alias_path
 
     def initialize(name, path)
       @name = name
@@ -76,7 +78,7 @@ class Formulary
 
     # Gets the formula instance.
     def get_formula(spec)
-      klass.new(name, path, spec)
+      klass.new(name, path, spec, :alias_path => alias_path)
     end
 
     def klass
@@ -118,6 +120,7 @@ class Formulary
       path = alias_path.resolved_path
       name = path.basename(".rb").to_s
       super name, path
+      @alias_path = alias_path
     end
   end
 
