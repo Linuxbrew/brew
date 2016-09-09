@@ -159,7 +159,7 @@ reset_on_interrupt() {
     git reset --hard "$INITIAL_REVISION" "${QUIET_ARGS[@]}"
   fi
 
-  if [[ -n "$HOMEBREW_DEVELOPER" ]]
+  if [[ -n "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
   then
     pop_stash
   else
@@ -243,7 +243,7 @@ EOS
   if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
 
-    if [[ -z "$HOMEBREW_DEVELOPER" ]]
+    if [[ -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
     then
       echo "Checking out $UPSTREAM_BRANCH in $DIR..."
       echo "To checkout $INITIAL_BRANCH in $DIR run:"
@@ -286,7 +286,7 @@ EOS
 
   trap '' SIGINT
 
-  if [[ -n "$HOMEBREW_DEVELOPER" ]]
+  if [[ -n "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
   then
     if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
     then
@@ -333,6 +333,14 @@ EOS
   if [[ -n "$HOMEBREW_DEBUG" ]]
   then
     set -x
+  fi
+
+  if [[ -z "$HOMEBREW_UPDATE_CLEANUP" ]]
+  then
+    if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
+    then
+      export HOMEBREW_NO_UPDATE_CLEANUP="1"
+    fi
   fi
 
   if [[ -z "$HOMEBREW_AUTO_UPDATE_SECS" ]]

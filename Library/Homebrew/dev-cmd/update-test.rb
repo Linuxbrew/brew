@@ -1,4 +1,3 @@
-#: @hide_from_man_page
 #:  * `update-test` [`--commit=<sha1>`] [`--before=<date>`] [`--keep-tmp`]:
 #:    Runs a test of `brew update` with a new repository clone.
 #:

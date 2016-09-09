@@ -2,7 +2,7 @@ require "testing_env"
 require "fileutils"
 require "pathname"
 require "formulary"
-require "cmd/audit"
+require "dev-cmd/audit"
 
 class FormulaTextTests < Homebrew::TestCase
   def setup

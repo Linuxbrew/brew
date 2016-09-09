@@ -56,31 +56,6 @@ Turn on/off Homebrew\'s analytics\.
 Regenerate UUID used in Homebrew\'s analytics\.
 .
 .TP
-\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fIformulae\fR]
-Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\.
-.
-.IP
-If no \fIformulae\fR are provided, all of them are checked\.
-.
-.IP
-If \fB\-\-strict\fR is passed, additional checks are run, including RuboCop style checks\.
-.
-.IP
-If \fB\-\-online\fR is passed, additional slower checks that require a network connection are run\.
-.
-.IP
-If \fB\-\-new\-formula\fR is passed, various additional checks are run that check if a new formula is eligable for Homebrew\. This should be used when creating new formulae and implies \fB\-\-strict\fR and \fB\-\-online\fR\.
-.
-.IP
-If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
-.
-.IP
-If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with the name of the file or formula being audited, to make the output easy to grep\.
-.
-.IP
-\fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
-.
-.TP
 \fBcat\fR \fIformula\fR
 Display the source to \fIformula\fR\.
 .
@@ -111,25 +86,6 @@ If \fB\-\-quiet\fR is passed, list only the names of commands without the header
 .TP
 \fBconfig\fR
 Show Homebrew and system configuration useful for debugging\. If you file a bug report, you will likely be asked for this information if you do not provide it\.
-.
-.TP
-\fBcreate\fR \fIURL\fR [\fB\-\-autotools\fR|\fB\-\-cmake\fR] [\fB\-\-no\-fetch\fR] [\fB\-\-set\-name\fR \fIname\fR] [\fB\-\-set\-version\fR \fIversion\fR] [\fB\-\-tap\fR \fIuser\fR\fB/\fR\fIrepo\fR]
-Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at
-.
-.IP
-\fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR
-.
-.IP
-If \fB\-\-autotools\fR is passed, create a basic template for an Autotools\-style build\. If \fB\-\-cmake\fR is passed, create a basic template for a CMake\-style build\.
-.
-.IP
-If \fB\-\-no\-fetch\fR is passed, Homebrew will not download \fIURL\fR to the cache and will thus not add the SHA256 to the formula for you\.
-.
-.IP
-The options \fB\-\-set\-name\fR and \fB\-\-set\-version\fR each take an argument and allow you to explicitly set the name and version of the package you are creating\.
-.
-.IP
-The option \fB\-\-tap\fR takes a tap as its argument and generates the formula in the specified tap\.
 .
 .TP
 \fBdeps\fR [\fB\-\-1\fR] [\fB\-n\fR] [\fB\-\-union\fR] [\fB\-\-full\-name\fR] [\fB\-\-installed\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] \fIformulae\fR
@@ -191,14 +147,6 @@ The options \fB\-\-name=\fR\fIname\fR and \fB\-\-version=\fR\fIversion\fR each t
 .TP
 \fBdoctor\fR
 Check your system for potential problems\. Doctor exits with a non\-zero status if any problems are found\.
-.
-.TP
-\fBedit\fR
-Open all of Homebrew for editing\.
-.
-.TP
-\fBedit\fR \fIformula\fR
-Open \fIformula\fR in the editor\.
 .
 .TP
 \fBfetch\fR [\fB\-\-force\fR] [\fB\-\-retry\fR] [\fB\-v\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-deps\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] \fIformulae\fR
@@ -542,22 +490,6 @@ Pin \fItap\fR, prioritizing its formulae over core when formula names are suppli
 Unpin \fItap\fR so its formulae are no longer prioritized\. See also \fBtap\-pin\fR\.
 .
 .TP
-\fBtest\fR [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-debug\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
-A few formulae provide a test method\. \fBbrew test\fR \fIformula\fR runs this test method\. There is no standard output or return code, but it should generally indicate to the user if something is wrong with the installed formula\.
-.
-.IP
-To test the development or head version of a formula, use \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
-.
-.IP
-If \fB\-\-debug\fR is passed and the test fails, an interactive debugger will be launched with access to IRB or a shell inside the temporary test directory\.
-.
-.IP
-If \fB\-\-keep\-tmp\fR is passed, the temporary files created for the test are not deleted\.
-.
-.IP
-Example: \fBbrew install jruby && brew test jruby\fR
-.
-.TP
 \fBuninstall\fR, \fBrm\fR, \fBremove\fR [\fB\-\-force\fR] \fIformula\fR
 Uninstall \fIformula\fR\.
 .
@@ -683,6 +615,182 @@ Display where tap \fIuser\fR\fB/\fR\fIrepo\fR\'s directory is located\.
 .TP
 \fB\-\-version\fR
 Print the version number of Homebrew to standard output and exit\.
+.
+.SH "DEVELOPER COMMANDS"
+.
+.TP
+\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fIformulae\fR]
+Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\.
+.
+.IP
+If no \fIformulae\fR are provided, all of them are checked\.
+.
+.IP
+If \fB\-\-strict\fR is passed, additional checks are run, including RuboCop style checks\.
+.
+.IP
+If \fB\-\-online\fR is passed, additional slower checks that require a network connection are run\.
+.
+.IP
+If \fB\-\-new\-formula\fR is passed, various additional checks are run that check if a new formula is eligable for Homebrew\. This should be used when creating new formulae and implies \fB\-\-strict\fR and \fB\-\-online\fR\.
+.
+.IP
+If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
+.
+.IP
+If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with the name of the file or formula being audited, to make the output easy to grep\.
+.
+.IP
+\fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
+.
+.TP
+\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR] [\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=<root_url>\fR]:
+
+.
+.TP
+\fBbottle\fR \fB\-\-merge\fR [\fB\-\-no\-commit\fR] [\fB\-\-keep\-old\fR] [\fB\-\-write\fR]:
+.
+.IP
+Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\.
+.
+.TP
+\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] \fB\-\-url=\fR\fIurl\fR \fB\-\-sha256=\fR\fIsha\-256\fR \fIformula\fR:
+
+.
+.TP
+\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] \fB\-\-tag=\fR\fItag\fR \fB\-\-revision=\fR\fIrevision\fR \fIformula\fR
+Creates a pull request to update the formula with a new url or a new tag\.
+.
+.IP
+If a \fIurl\fR is specified, the \fIsha\-256\fR checksum of the new download must also be specified\.
+.
+.IP
+If a \fItag\fR is specified, the git commit \fIrevision\fR corresponding to that tag must also be specified\.
+.
+.IP
+If \fB\-\-devel\fR is passed, bump the development rather than stable version\. The development spec must already exist\.
+.
+.IP
+If \fB\-\-dry\-run\fR is passed, print what would be done rather than doing it\.
+.
+.IP
+If \fB\-\-audit\fR is passed, run \fBbrew audit\fR before opening the PR\.
+.
+.IP
+If \fB\-\-strict\fR is passed, run \fBbrew audit \-\-strict\fR before opening the PR\.
+.
+.IP
+Note that this command cannot be used to transition a formula from a url\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.
+.
+.TP
+\fBcreate\fR \fIURL\fR [\fB\-\-autotools\fR|\fB\-\-cmake\fR] [\fB\-\-no\-fetch\fR] [\fB\-\-set\-name\fR \fIname\fR] [\fB\-\-set\-version\fR \fIversion\fR] [\fB\-\-tap\fR \fIuser\fR\fB/\fR\fIrepo\fR]
+Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at
+.
+.IP
+\fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR
+.
+.IP
+If \fB\-\-autotools\fR is passed, create a basic template for an Autotools\-style build\. If \fB\-\-cmake\fR is passed, create a basic template for a CMake\-style build\.
+.
+.IP
+If \fB\-\-no\-fetch\fR is passed, Homebrew will not download \fIURL\fR to the cache and will thus not add the SHA256 to the formula for you\.
+.
+.IP
+The options \fB\-\-set\-name\fR and \fB\-\-set\-version\fR each take an argument and allow you to explicitly set the name and version of the package you are creating\.
+.
+.IP
+The option \fB\-\-tap\fR takes a tap as its argument and generates the formula in the specified tap\.
+.
+.TP
+\fBedit\fR
+Open all of Homebrew for editing\.
+.
+.TP
+\fBedit\fR \fIformula\fR
+Open \fIformula\fR in the editor\.
+.
+.TP
+\fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] \fIformula\-name\fR
+Checks the library links of an installed formula\.
+.
+.IP
+Only works on installed formulae\. An error is raised if it is run on uninstalled formulae\.
+.
+.IP
+If \fB\-\-test\fR is passed, only display missing libraries and exit with a non\-zero exit code if any missing libraries were found\.
+.
+.IP
+If \fB\-\-reverse\fR is passed, print the dylib followed by the binaries which link to it for each library the keg references\.
+.
+.TP
+\fBman\fR
+Generate Homebrew\'s manpages\.
+.
+.P
+\fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]
+.
+.IP "" 4
+.
+.nf
+
+Gets a patch from a GitHub commit or pull request and applies it to Homebrew\.
+Optionally, installs the formulae changed by the patch\.
+
+Each <patch\-source> may be one of:
+  * The ID number of a PR (Pull Request) in the homebrew/core GitHub
+    repository
+  * The URL of a PR on GitHub, using either the web page or API URL
+    formats\. In this form, the PR may be on Homebrew/brew,
+    Homebrew/homebrew\-core or any tap\.
+  * The URL of a commit on GitHub
+  * A "http://bot\.brew\.sh/job/\.\.\." string specifying a testing job ID
+.
+.fi
+.
+.IP "" 0
+.
+.P
+If \fB\-\-bottle\fR was passed, handle bottles, pulling the bottle\-update commit and publishing files on Bintray\. If \fB\-\-bump\fR was passed, for one\-formula PRs, automatically reword commit message to our preferred format\. If \fB\-\-clean\fR was passed, do not rewrite or otherwise modify the commits found in the pulled PR\. If \fB\-\-ignore\-whitespace\fR was passed, silently ignore whitespace discrepancies when applying diffs\. If \fB\-\-resolve\fR was passed, when a patch fails to apply, leave in progress and allow user to resolve, instead of aborting\. If \fB\-\-branch\-okay\fR was passed, do not warn if pulling to a branch besides master (useful for testing)\. If \fB\-\-no\-pbcopy\fR was passed, do not copy anything to the system If \fB\-\-no\-publish\fR was passed, do not publish bottles to Bintray\.
+.
+.TP
+\fBtap_readme\fR [\fB\-v\fR] \fIname\fR
+Generate the README\.md file for a new tap\.
+.
+.TP
+\fBtest\fR [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-debug\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
+A few formulae provide a test method\. \fBbrew test\fR \fIformula\fR runs this test method\. There is no standard output or return code, but it should generally indicate to the user if something is wrong with the installed formula\.
+.
+.IP
+To test the development or head version of a formula, use \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
+.
+.IP
+If \fB\-\-debug\fR is passed and the test fails, an interactive debugger will be launched with access to IRB or a shell inside the temporary test directory\.
+.
+.IP
+If \fB\-\-keep\-tmp\fR is passed, the temporary files created for the test are not deleted\.
+.
+.IP
+Example: \fBbrew install jruby && brew test jruby\fR
+.
+.TP
+\fBtests\fR [\fB\-v\fR] [\fB\-\-coverage\fR] [\fB\-\-generic\fR] [\fB\-\-no\-compat\fR] [\fB\-\-only=\fR<test_script/test_method>] [\fB\-\-seed\fR \fIseed\fR] [\fB\-\-trace\fR] [\fB\-\-online\fR] [\fB\-\-official\-cmd\-taps\fR]
+Run Homebrew\'s unit and integration tests\.
+.
+.TP
+\fBupdate\-test\fR [\fB\-\-commit=<sha1>\fR] [\fB\-\-before=<date>\fR] [\fB\-\-keep\-tmp\fR]
+Runs a test of \fBbrew update\fR with a new repository clone\.
+.
+.IP
+If no arguments are passed, use \fBorigin/master\fR as the start commit\.
+.
+.IP
+If \fB\-\-commit=<sha1>\fR is passed, use \fB<sha1>\fR as the start commit\.
+.
+.IP
+If \fB\-\-before=<date>\fR is passed, use the commit at \fB<date>\fR as the start commit\.
+.
+.IP
+If \fB\-\-keep\-tmp\fR is passed, retain the temporary directory containing the new repository clone\.
 .
 .SH "EXTERNAL COMMANDS"
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
