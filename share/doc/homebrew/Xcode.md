@@ -11,6 +11,7 @@ Tools available for your platform:
  10.9  | 6.2   | 6.2
  10.10 | 7.2.1 | 7.2
  10.11 | 7.3.1 | 7.3
+ 10.12 | 8.0   | 8.0
 
 
 ## Compiler Version Database
@@ -64,6 +65,7 @@ Tools available for your platform:
  7.2.1     | —           | —           | —                | —           | 7.0 (700.1.81)  | -
  7.3       | —           | —           | —                | —           | 7.3 (703.0.29)  | -
  7.3.1     | —           | —           | —                | —           | 7.3 (703.0.31)  | -
+ 8.0       | —           | —           | —                | —           | 8.0 (800.0.38)  | -
 
 ## References to Xcode and compiler versions in code
 When a new Xcode release is made, the following things need to be
