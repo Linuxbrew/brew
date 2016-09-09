@@ -283,33 +283,14 @@ module Homebrew
         EOS
       end
 
-      def __check_subdir_access(base)
-        target = HOMEBREW_PREFIX+base
-        return unless target.exist?
+      def check_tmpdir_sticky_bit
+        world_writable = HOMEBREW_TEMP.stat.mode & 0777 == 0777
+        return if !world_writable || HOMEBREW_TEMP.sticky?
 
-        cant_read = []
-        target.find do |d|
-          next unless d.directory?
-          cant_read << d unless d.writable_real?
-        end
-        return if cant_read.empty?
-
-        inject_file_list cant_read.sort, <<-EOS.undent
-          Some directories in #{target} aren't writable.
-          This can happen if you "sudo make install" software that isn't managed
-          by Homebrew. If a brew tries to add locale information to one of these
-          directories, then the install will fail during the link step.
-
-          You should `sudo chown -R $(whoami)` them:
+        <<-EOS.undent
+          #{HOMEBREW_TEMP} is world-writable but does not have the sticky bit set.
+          Please execute `sudo chmod +t #{HOMEBREW_TEMP}` in your Terminal.
         EOS
-      end
-
-      def check_access_share_locale
-        __check_subdir_access "share/locale"
-      end
-
-      def check_access_share_man
-        __check_subdir_access "share/man"
       end
 
       def check_access_homebrew_repository
@@ -324,22 +305,11 @@ module Homebrew
         EOS
       end
 
-      def check_access_homebrew_cellar
-        return if HOMEBREW_CELLAR.writable_real?
-
-        <<-EOS.undent
-          #{HOMEBREW_CELLAR} is not writable.
-
-          You should change the ownership and permissions of #{HOMEBREW_CELLAR}
-          back to your user account.
-            sudo chown -R $(whoami) #{HOMEBREW_CELLAR}
-        EOS
-      end
-
-      def check_access_top_level_directories
+      def check_access_prefix_directories
         not_writable_dirs = []
 
-        (Keg::TOP_LEVEL_DIRECTORIES + ["opt"]).each do |dir|
+        extra_dirs = ["lib/pkgconfig", "share/locale", "share/man", "opt"]
+        (Keg::TOP_LEVEL_DIRECTORIES + extra_dirs).each do |dir|
           path = HOMEBREW_PREFIX/dir
           next unless path.exist?
           next if path.writable_real?
@@ -352,40 +322,14 @@ module Homebrew
           The following directories are not writable:
           #{not_writable_dirs.join("\n")}
 
+          This can happen if you "sudo make install" software that isn't managed
+          by Homebrew. If a formula tries to write a file to this directory, the
+          install will fail during the link step.
+
           You should change the ownership and permissions of these directories.
           back to your user account.
             sudo chown -R $(whoami) #{not_writable_dirs.join(" ")}
         EOS
-      end
-
-      def check_tmpdir_sticky_bit
-        world_writable = HOMEBREW_TEMP.stat.mode & 0777 == 0777
-        return if !world_writable || HOMEBREW_TEMP.sticky?
-
-        <<-EOS.undent
-          #{HOMEBREW_TEMP} is world-writable but does not have the sticky bit set.
-          Please execute `sudo chmod +t #{HOMEBREW_TEMP}` in your Terminal.
-        EOS
-      end
-
-      (Keg::TOP_LEVEL_DIRECTORIES + ["lib/pkgconfig"]).each do |d|
-        define_method("check_access_#{d.sub("/", "_")}") do
-          dir = HOMEBREW_PREFIX.join(d)
-          return unless dir.exist?
-          return if dir.writable_real?
-
-          <<-EOS.undent
-            #{dir} isn't writable.
-
-            This can happen if you "sudo make install" software that isn't managed
-            by Homebrew. If a formula tries to write a file to this directory, the
-            install will fail during the link step.
-
-            You should change the ownership and permissions of #{dir} back to
-            your user account.
-              sudo chown -R $(whoami) #{dir}
-          EOS
-        end
       end
 
       def check_access_site_packages
@@ -443,20 +387,6 @@ module Homebrew
           You should change the ownership and permissions of #{HOMEBREW_CELLAR}
           back to your user account.
             sudo chown -R $(whoami) #{HOMEBREW_CELLAR}
-        EOS
-      end
-
-      def check_access_prefix_opt
-        opt = HOMEBREW_PREFIX.join("opt")
-        return unless opt.exist?
-        return if opt.writable_real?
-
-        <<-EOS.undent
-          #{opt} isn't writable.
-
-          You should change the ownership and permissions of #{opt}
-          back to your user account.
-            sudo chown -R $(whoami) #{opt}
         EOS
       end
 
