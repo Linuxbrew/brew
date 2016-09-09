@@ -41,6 +41,10 @@ module OS
       version.to_sym
     end
 
+    def language
+      @language ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").delete(" \n\"()").sub(/,.*/, "")
+    end
+
     # Locates a (working) copy of install_name_tool, guaranteed to function
     # whether the user has developer tools installed or not.
     def install_name_tool
