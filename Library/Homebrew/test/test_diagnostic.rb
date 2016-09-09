@@ -83,17 +83,6 @@ class DiagnosticChecksTest < Homebrew::TestCase
     HOMEBREW_CELLAR.chmod mod
   end
 
-  def test_check_access_prefix_opt
-    opt = HOMEBREW_PREFIX.join("opt")
-    opt.mkpath
-    opt.chmod 0555
-
-    assert_match "#{opt} isn't writable.",
-      @checks.check_access_prefix_opt
-  ensure
-    opt.unlink
-  end
-
   def test_check_homebrew_prefix
     # the integration tests are run in a special prefix
     assert_match "Your Homebrew is not installed to /usr/local",
