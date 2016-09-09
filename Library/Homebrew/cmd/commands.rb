@@ -17,11 +17,9 @@ module Homebrew
       puts_columns internal_commands
 
       # Find commands in Homebrew/dev-cmd
-      if ARGV.homebrew_developer?
-        puts
-        puts "Built-in developer commands"
-        puts_columns internal_developer_commands
-      end
+      puts
+      puts "Built-in developer commands"
+      puts_columns internal_developer_commands
 
       # Find commands in the path
       unless (exts = external_commands).empty?
