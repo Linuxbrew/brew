@@ -324,21 +324,37 @@ module Homebrew
         EOS
       end
 
-      def check_access_usr_local
-        return unless HOMEBREW_PREFIX.to_s == "/usr/local"
-        return if HOMEBREW_PREFIX.writable_real?
+      def check_access_homebrew_cellar
+        return if HOMEBREW_CELLAR.writable_real?
 
         <<-EOS.undent
-          /usr/local is not writable.
-          Even if this directory was writable when you installed Homebrew, other
-          software may change permissions on this directory. For example, upgrading
-          to OS X El Capitan has been known to do this. Some versions of the
-          "InstantOn" component of Airfoil or running Cocktail cleanup/optimizations
-          are known to do this as well.
+          #{HOMEBREW_CELLAR} is not writable.
 
-          You should change the ownership and permissions of /usr/local back to
-          your user account.
-            sudo chown -R $(whoami) /usr/local
+          You should change the ownership and permissions of #{HOMEBREW_CELLAR}
+          back to your user account.
+            sudo chown -R $(whoami) #{HOMEBREW_CELLAR}
+        EOS
+      end
+
+      def check_access_top_level_directories
+        not_writable_dirs = []
+
+        (Keg::TOP_LEVEL_DIRECTORIES + ["opt"]).each do |dir|
+          path = HOMEBREW_PREFIX/dir
+          next unless path.exist?
+          next if path.writable_real?
+          not_writable_dirs << path
+        end
+
+        return if not_writable_dirs.empty?
+
+        <<-EOS.undent
+          The following directories are not writable:
+          #{not_writable_dirs.join("\n")}
+
+          You should change the ownership and permissions of these directories.
+          back to your user account.
+            sudo chown -R $(whoami) #{not_writable_dirs.join(" ")}
         EOS
       end
 
