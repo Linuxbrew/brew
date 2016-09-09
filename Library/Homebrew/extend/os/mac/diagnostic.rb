@@ -63,18 +63,22 @@ module Homebrew
       def check_xcode_up_to_date
         return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
 
-        if OS::Mac.prerelease?
-          xcode_select_nudge = <<-EOS.undent
-            If #{MacOS::Xcode.latest_version} is installed, you may need to:
-              sudo xcode-select --switch /path/to/Xcode-beta.app
-          EOS
-        end
-
-        <<-EOS.undent
+        message = <<-EOS.undent
           Your Xcode (#{MacOS::Xcode.version}) is outdated
           Please update to Xcode #{MacOS::Xcode.latest_version}.
-          #{MacOS::Xcode.update_instructions}#{xcode_select_nudge}
+          #{MacOS::Xcode.update_instructions}
         EOS
+
+        if OS::Mac.prerelease?
+          current_path = Utils.popen_read("/usr/bin/xcode-select", "-p")
+          message += <<-EOS.undent
+            If #{MacOS::Xcode.latest_version} is installed, you may need to:
+              sudo xcode-select --switch /Applications/Xcode.app
+            Current developer directory is:
+              #{current_path}
+          EOS
+        end
+        message
       end
 
       def check_clt_up_to_date
