@@ -13,5 +13,5 @@ group :coverage do
     :git => "https://github.com/colszowka/simplecov.git",
     :branch => "master", # commit 257e26394c464c4ab388631b4eff1aa98c37d3f1
     :require => false
-  gem "coveralls", "0.8.14", :require => false
+  gem "codecov", require: false
 end

@@ -59,8 +59,7 @@
 #:
 #:    If `--no-pull` is passed, don't use `brew pull` when possible.
 #:
-#:    If `--coverage` is passed, generate coverage report and send it to
-#:    Coveralls.
+#:    If `--coverage` is passed, generate and uplaod a coverage report.
 #:
 #:    If `--test-default-formula` is passed, use a default testing formula
 #:    when not building a tap and no other formulae are specified.
@@ -71,6 +70,9 @@
 #:    If `--ci-pr` is passed, use the Homebrew pull request CI options.
 #:
 #:    If `--ci-testing` is passed, use the Homebrew testing CI options.
+#:
+#:    If `--ci-auto` is passed, automatically pick one of the Homebrew CI
+#:    options based on the environment.
 #:
 #:    If `--ci-upload` is passed, use the Homebrew CI bottle upload
 #:    options.
@@ -709,18 +711,24 @@ module Homebrew
       return if @skip_homebrew
 
       if !@tap && (@formulae.empty? || @test_default_formula)
-        tests_args = ["--official-cmd-taps"]
-        tests_args_no_compat = []
-        tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
-        test "brew", "tests", *tests_args
-        test "brew", "tests", "--generic", *tests_args
-        test "brew", "tests", "--no-compat", *tests_args_no_compat
+        coverage_args = []
+        if ARGV.include?("--coverage")
+          if ENV["JENKINS_HOME"]
+            if OS.mac? && MacOS.version == :el_capitan
+              coverage_args << "--coverage"
+            end
+          else
+            coverage_args << "--coverage"
+          end
+        end
+
+        test "brew", "tests", "--no-compat"
+        test "brew", "tests", "--generic"
+        test "brew", "tests", "--official-cmd-taps", *coverage_args
         test "brew", "readall", "--syntax"
         if OS.mac?
           run_as_not_developer { test "brew", "tap", "caskroom/cask" }
-          tests_args_cask = []
-          tests_args_cask << "--coverage" if ARGV.include?("--coverage")
-          test "brew", "cask-tests", *tests_args_cask
+          test "brew", "cask-tests", *coverage_args
         end
 
         # TODO: try to fix this on Linux at some stage.
@@ -1003,16 +1011,29 @@ module Homebrew
     ENV["HOMEBREW_FAIL_LOG_LINES"] = "150"
     ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"] = "1"
 
-    if ENV["TRAVIS"]
+    travis = !ENV["TRAVIS"].nil?
+    if travis
       ARGV << "--verbose"
-      ARGV << "--ci-master" if ENV["TRAVIS_PULL_REQUEST"] == "false"
       ENV["HOMEBREW_VERBOSE_USING_DOTS"] = "1"
+    end
 
-      # Only report coverage if build runs on macOS and this is indeed Homebrew,
-      # as we don't want this to be averaged with inferior Linux test coverage.
-      repo = ENV["TRAVIS_REPO_SLUG"]
-      if repo && repo.start_with?("Homebrew/") && ENV["OSX"]
-        ARGV << "--coverage"
+    # Only report coverage if build runs on macOS and this is indeed Homebrew,
+    # as we don't want this to be averaged with inferior Linux test coverage.
+    if OS.mac? && (ENV["COVERALLS_REPO_TOKEN"] || ENV["CODECOV_TOKEN"])
+      ARGV << "--coverage"
+    end
+
+    travis_pr = ENV["TRAVIS_PULL_REQUEST"] && ENV["TRAVIS_PULL_REQUEST"] != "false"
+    jenkins_pr = !ENV["ghprbPullLink"].nil?
+    jenkins_branch = !ENV["GIT_COMMIT"].nil?
+
+    if ARGV.include?("--ci-auto")
+      if travis_pr || jenkins_pr
+        ARGV << "--ci-pr"
+      elsif travis || jenkins_branch
+        ARGV << "--ci-master"
+      else
+        ARGV << "--ci-testing"
       end
     end
 
