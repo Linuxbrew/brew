@@ -35,7 +35,7 @@ module Homebrew
       end
 
       (ARGV.resolved_formulae - outdated).each do |f|
-        versions = f.installed_kegs.map { |keg| keg.version }
+        versions = f.installed_kegs.map(&:version)
         if versions.empty?
           onoe "#{f.full_name} not installed"
         else
@@ -51,11 +51,11 @@ module Homebrew
       outdated -= pinned
     end
 
-    unless outdated.empty?
+    if outdated.empty?
+      oh1 "No packages to upgrade"
+    else
       oh1 "Upgrading #{outdated.length} outdated package#{plural(outdated.length)}, with result:"
       puts outdated.map { |f| "#{f.full_name} #{f.pkg_version}" } * ", "
-    else
-      oh1 "No packages to upgrade"
     end
 
     unless upgrade_pinned? || pinned.empty?
@@ -116,6 +116,10 @@ module Homebrew
     ofail e
   ensure
     # restore previous installation state if build failed
-    outdated_keg.link if outdated_keg && !f.installed? rescue nil
+    begin
+      outdated_keg.link if outdated_keg && !f.installed?
+    rescue
+      nil
+    end
   end
 end
