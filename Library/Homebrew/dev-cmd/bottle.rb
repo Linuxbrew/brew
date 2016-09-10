@@ -289,22 +289,22 @@ module Homebrew
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
-      bad_fields = [:root_url, :prefix, :cellar, :rebuild].select do |field|
+      mismatches = [:root_url, :prefix, :cellar, :rebuild].select do |field|
         old_spec.send(field) != bottle.send(field)
       end
-      bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
-      unless bad_fields.empty?
+      mismatches.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
+      unless mismatches.empty?
         bottle_path.unlink if bottle_path.exist?
 
-        bad_changes = bad_fields.map do |field|
+        mismatches.map! do |field|
           old_value = old_spec.send(field).inspect
-          bottle_value = bottle.send(field).inspect
-          "#{field}: old: #{old_value}, new: #{bottle_value}"
+          value = bottle.send(field).inspect
+          "#{field}: old: #{old_value}, new: #{value}"
         end
 
         odie <<-EOS.undent
           --keep-old was passed but there are changes in:
-          #{bad_changes.join("\n")}
+          #{mismatches.join("\n")}
         EOS
       end
     end
@@ -383,11 +383,11 @@ module Homebrew
               bottle_block_contents.lines.each do |line|
                 line = line.strip
                 next if line.empty?
-                key, value, _, tag = line.split " ", 4
+                key, value_original, _, tag = line.split " ", 4
                 valid_key = %w[root_url prefix cellar rebuild sha1 sha256].include? key
                 next unless valid_key
 
-                value = value.to_s.delete ":'\""
+                value = value_original.to_s.delete ":'\""
                 tag = tag.to_s.delete ":"
 
                 if !tag.empty?
@@ -399,11 +399,21 @@ module Homebrew
                   next
                 end
 
-                old_value = bottle_hash["bottle"][key].to_s
+                old_value_original = bottle_hash["bottle"][key]
+                old_value = old_value_original.to_s
                 next if key == "cellar" && old_value == "any" && value == "any_skip_relocation"
-                mismatches << key if old_value.empty? || value != old_value
+                if old_value.empty? || value != old_value
+                  old_value = old_value_original.inspect
+                  value = value_original.inspect
+                  mismatches << "#{field}: old: #{old_value}, new: #{value}"
+                end
               end
+
               unless mismatches.empty?
+                odie <<-EOS.undent
+                  --keep-old was passed but there are changes in:
+                  #{mismatches.join("\n")}
+                EOS
                 odie "--keep-old was passed but there were changes in #{mismatches.join(", ")}!"
               end
               output = bottle_output bottle
