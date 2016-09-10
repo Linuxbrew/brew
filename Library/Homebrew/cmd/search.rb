@@ -71,7 +71,7 @@ module Homebrew
             puts
           end
           puts msg
-        elsif count == 0
+        elsif count.zero?
           puts "No formula found for #{query.inspect}."
           begin
             GitHub.print_pull_requests_matching(query)
@@ -100,7 +100,7 @@ module Homebrew
 
   SEARCHABLE_TAPS = OFFICIAL_TAPS.map { |tap| ["Homebrew", tap] } + [
     %w[Caskroom cask],
-    %w[Caskroom versions]
+    %w[Caskroom versions],
   ]
 
   def query_regexp(query)
@@ -151,7 +151,7 @@ module Homebrew
     names = remote_tap_formulae["#{user}/#{repo}"]
     user = user.downcase if user == "Homebrew" # special handling for the Homebrew organization
     names.select { |name| rx === name }.map { |name| "#{user}/#{repo}/#{name}" }
-  rescue GitHub::HTTPNotFoundError => e
+  rescue GitHub::HTTPNotFoundError
     opoo "Failed to search tap: #{user}/#{repo}. Please run `brew update`"
     []
   rescue GitHub::Error => e
