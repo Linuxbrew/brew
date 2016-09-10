@@ -9,6 +9,10 @@
 
 # Ignore generated files within `Library` (again).
 /Library/Homebrew/doc
+/Library/Homebrew/cask/.bundle
+/Library/Homebrew/cask/bin
+/Library/Homebrew/cask/vendor
+/Library/Homebrew/cask/coverage
 /Library/Homebrew/test/.bundle
 /Library/Homebrew/test/bin
 /Library/Homebrew/test/vendor
