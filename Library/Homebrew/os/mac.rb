@@ -41,8 +41,12 @@ module OS
       version.to_sym
     end
 
+    def languages
+      @languages ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+    end
+
     def language
-      @language ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").delete(" \n\"()").sub(/,.*/, "")
+      languages.first
     end
 
     def active_developer_dir
