@@ -383,24 +383,24 @@ module Homebrew
               bottle_block_contents.lines.each do |line|
                 line = line.strip
                 next if line.empty?
-                key, value_original, _, tag = line.split " ", 4
+                key, old_value_original, _, tag = line.split " ", 4
                 valid_key = %w[root_url prefix cellar rebuild sha1 sha256].include? key
                 next unless valid_key
 
-                value = value_original.to_s.delete ":'\""
+                old_value = old_value_original.to_s.delete ":'\""
                 tag = tag.to_s.delete ":"
 
                 if !tag.empty?
                   if !bottle_hash["bottle"]["tags"][tag].to_s.empty?
                     mismatches << "#{key} => #{tag}"
                   else
-                    bottle.send(key, value => tag.to_sym)
+                    bottle.send(key, old_value => tag.to_sym)
                   end
                   next
                 end
 
-                old_value_original = bottle_hash["bottle"][key]
-                old_value = old_value_original.to_s
+                value_original = bottle_hash["bottle"][key]
+                value = value_original.to_s
                 next if key == "cellar" && old_value == "any" && value == "any_skip_relocation"
                 if old_value.empty? || value != old_value
                   old_value = old_value_original.inspect
