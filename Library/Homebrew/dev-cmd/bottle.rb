@@ -289,17 +289,17 @@ module Homebrew
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
-      mismatches = [:root_url, :prefix, :cellar, :rebuild].select do |field|
-        old_spec.send(field) != bottle.send(field)
+      mismatches = [:root_url, :prefix, :cellar, :rebuild].select do |key|
+        old_spec.send(key) != bottle.send(key)
       end
       mismatches.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       unless mismatches.empty?
         bottle_path.unlink if bottle_path.exist?
 
-        mismatches.map! do |field|
-          old_value = old_spec.send(field).inspect
-          value = bottle.send(field).inspect
-          "#{field}: old: #{old_value}, new: #{value}"
+        mismatches.map! do |key|
+          old_value = old_spec.send(key).inspect
+          value = bottle.send(key).inspect
+          "#{key}: old: #{old_value}, new: #{value}"
         end
 
         odie <<-EOS.undent
@@ -405,7 +405,7 @@ module Homebrew
                 if old_value.empty? || value != old_value
                   old_value = old_value_original.inspect
                   value = value_original.inspect
-                  mismatches << "#{field}: old: #{old_value}, new: #{value}"
+                  mismatches << "#{key}: old: #{old_value}, new: #{value}"
                 end
               end
 
