@@ -8,6 +8,7 @@ module Homebrew
   def tests
     (HOMEBREW_LIBRARY/"Homebrew/test").cd do
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
+      ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["TESTOPTS"] = "-v" if ARGV.verbose?
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
