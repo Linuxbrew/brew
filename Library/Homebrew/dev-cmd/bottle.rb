@@ -295,7 +295,17 @@ module Homebrew
       bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       unless bad_fields.empty?
         bottle_path.unlink if bottle_path.exist?
-        odie "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
+
+        bad_changes = bad_fields.map do |field|
+          old_value = old_spec.send(field).inspect
+          bottle_value = bottle.send(field).inspect
+          "#{field}: old: #{old_value}, new: #{bottle_value}"
+        end
+
+        odie <<-EOS.undent
+          --keep-old was passed but there are changes in:
+          #{bad_changes.join("\n")}
+        EOS
       end
     end
 
