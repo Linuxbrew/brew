@@ -91,7 +91,7 @@ module Homebrew
 
   def __gets
     gots = $stdin.gets.chomp
-    if gots.empty? then nil else gots end
+    gots.empty? ? nil : gots
   end
 end
 
