@@ -3,7 +3,7 @@ class EmacsRequirement < Requirement
   default_formula "emacs"
 
   def initialize(tags)
-    @version = tags.shift if /\d+\.*\d*/ === tags.first
+    @version = tags.shift if /\d+\.*\d*/ =~ tags.first
     super
   end
 
