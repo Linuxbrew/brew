@@ -28,7 +28,7 @@ module ArchitectureListExtension
   end
 
   def ppc?
-    (Hardware::CPU::PPC_32BIT_ARCHS+Hardware::CPU::PPC_64BIT_ARCHS).any? { |a| self.include? a }
+    (Hardware::CPU::PPC_32BIT_ARCHS+Hardware::CPU::PPC_64BIT_ARCHS).any? { |a| include? a }
   end
 
   # @private
@@ -48,7 +48,7 @@ module ArchitectureListExtension
 
   def intersects_all?(*set)
     set.all? do |archset|
-      archset.any? { |a| self.include? a }
+      archset.any? { |a| include? a }
     end
   end
 end
