@@ -10,7 +10,7 @@ module Utils
   }.freeze
 
   module Shell
-    UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:\/@\n])}
+    UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:/@\n])}
 
     # take a path and heuristically convert it
     # to a shell name, return nil if there's no match
