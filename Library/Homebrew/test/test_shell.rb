@@ -2,7 +2,7 @@ require "testing_env"
 require "utils/shell"
 
 class ShellSmokeTest < Homebrew::TestCase
-  def test_path_to_shell()
+  def test_path_to_shell
     # raw command name
     assert_equal :bash, Utils::Shell.path_to_shell("bash")
     # full path
@@ -13,13 +13,13 @@ class ShellSmokeTest < Homebrew::TestCase
     assert_equal :zsh, Utils::Shell.path_to_shell("zsh-5.2\n")
   end
 
-  def test_path_to_shell_failure()
+  def test_path_to_shell_failure
     assert_equal nil, Utils::Shell.path_to_shell("")
     assert_equal nil, Utils::Shell.path_to_shell("@@@@@@")
     assert_equal nil, Utils::Shell.path_to_shell("invalid_shell-4.2")
   end
 
-  def test_sh_quote()
+  def test_sh_quote
     assert_equal "''", Utils::Shell.sh_quote("")
     assert_equal "\\\\", Utils::Shell.sh_quote("\\")
     assert_equal "'\n'", Utils::Shell.sh_quote("\n")
@@ -27,7 +27,7 @@ class ShellSmokeTest < Homebrew::TestCase
     assert_equal "word", Utils::Shell.sh_quote("word")
   end
 
-  def test_csh_quote()
+  def test_csh_quote
     assert_equal "''", Utils::Shell.csh_quote("")
     assert_equal "\\\\", Utils::Shell.csh_quote("\\")
     # note this test is different than for sh
@@ -49,7 +49,7 @@ class ShellSmokeTest < Homebrew::TestCase
     ENV["SHELL"] = original_shell
   end
 
-  def test_prepend_path_in_shell_profile()
+  def test_prepend_path_in_shell_profile
     prepend_path_shell "/bin/tcsh", "/path", "echo 'setenv PATH /path"
 
     prepend_path_shell "/bin/bash", "/path", "echo 'export PATH=\"/path"
