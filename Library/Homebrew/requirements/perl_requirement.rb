@@ -3,7 +3,7 @@ class PerlRequirement < Requirement
   default_formula "perl"
 
   def initialize(tags)
-    @version = tags.shift if /^\d+\.\d+$/ === tags.first
+    @version = tags.shift if /^\d+\.\d+$/ =~ tags.first
     raise "PerlRequirement requires a version!" unless @version
     super
   end
