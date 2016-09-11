@@ -110,7 +110,7 @@ class FormulaInstallerTests < Homebrew::TestCase
     dependent = formula do
       url "foo"
       version "0.5"
-      depends_on "#{dependency.name}"
+      depends_on dependency.name.to_s
     end
 
     dependency.prefix("0.1").join("bin/a").mkpath
