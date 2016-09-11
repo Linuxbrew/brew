@@ -187,12 +187,11 @@ module Language
           # Robustify symlinks to survive python3 patch upgrades
           @venv_root.find do |f|
             next unless f.symlink?
-            if (rp = f.realpath.to_s).start_with? HOMEBREW_CELLAR
-              python = rp.include?("python3") ? "python3" : "python"
-              new_target = rp.sub %r{#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
-              f.unlink
-              f.make_symlink new_target
-            end
+            next unless (rp = f.realpath.to_s).start_with? HOMEBREW_CELLAR
+            python = rp.include?("python3") ? "python3" : "python"
+            new_target = rp.sub %r{#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
+            f.unlink
+            f.make_symlink new_target
           end
         end
 

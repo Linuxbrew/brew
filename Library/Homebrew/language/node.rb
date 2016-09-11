@@ -21,7 +21,7 @@ module Language
       setup_npm_environment
       # tell npm to not install .brew_home by adding it to the .npmignore file
       # (or creating a new one if no .npmignore file already exists)
-      open(".npmignore", "a") { |f| f.write( "\n.brew_home\n") }
+      open(".npmignore", "a") { |f| f.write("\n.brew_home\n") }
       # npm install args for global style module format installed into libexec
       ["--verbose", "--global", "--prefix=#{libexec}", "."]
     end
