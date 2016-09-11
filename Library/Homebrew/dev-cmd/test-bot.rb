@@ -296,16 +296,10 @@ module Homebrew
       test "brew", "tap", e.tap.name
       retry unless steps.last.failed?
       onoe e
-      puts e.backtrace
-    rescue FormulaUnavailableError => e
-      raise if CoreTap.instance.installed?
-      test "brew", "tap", CoreTap.instance.name
-      retry unless steps.last.failed?
+      puts e.backtrace if ARGV.debug?
+    rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError => e
       onoe e
-      puts e.backtrace
-    rescue TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError => e
-      onoe e
-      puts e.backtrace
+      puts e.backtrace if ARGV.debug?
     end
 
     def git(*args)
@@ -741,13 +735,13 @@ module Homebrew
         git "checkout", "-f", "master"
         git "reset", "--hard", "origin/master"
       end
-      git "clean", "-ffdx"
+      git "clean", "-ffdx", "--exclude=Library/Taps/homebrew/homebrew-core"
 
       unless @repository == HOMEBREW_REPOSITORY
         HOMEBREW_REPOSITORY.cd do
           safe_system "git", "checkout", "-f", "master"
           safe_system "git", "reset", "--hard", "origin/master"
-          safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+          safe_system "git", "clean", "-ffdx", "--exclude=Library/Taps"
         end
       end
 
@@ -778,7 +772,7 @@ module Homebrew
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
         git "gc", "--auto"
-        test "git", "clean", "-ffdx"
+        test "git", "clean", "-ffdx", "--exclude=Library/Taps/homebrew/homebrew-core"
 
         Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
 
@@ -786,7 +780,7 @@ module Homebrew
           HOMEBREW_REPOSITORY.cd do
             safe_system "git", "checkout", "-f", "master"
             safe_system "git", "reset", "--hard", "origin/master"
-            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
+            safe_system "git", "clean", "-ffdx", "--exclude=Library/Taps"
           end
         end
 
