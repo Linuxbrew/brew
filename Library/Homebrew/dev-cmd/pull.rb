@@ -237,7 +237,7 @@ module Homebrew
 
   private
 
-  def publish_changed_formula_bottles(tap, changed_formulae_names)
+  def publish_changed_formula_bottles(_tap, changed_formulae_names)
     if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
       raise "Need to load formulae to publish them!"
     end
@@ -360,7 +360,13 @@ module Homebrew
   def subject_for_bump(formula, old, new)
     if old[:nonexistent]
       # New formula
-      headline_ver = new[:stable] ? new[:stable] : new[:devel] ? new[:devel] : new[:head]
+      headline_ver = if new[:stable]
+        new[:stable]
+      elsif new[:devel]
+        new[:devel]
+      else
+        new[:head]
+      end
       subject = "#{formula.name} #{headline_ver} (new formula)"
     else
       # Update to existing formula
@@ -430,7 +436,7 @@ module Homebrew
       FormulaInfoFromJson.new(Utils::JSON.load(json)[0])
     end
 
-    def bottle_tags()
+    def bottle_tags
       return [] unless info["bottle"]["stable"]
       info["bottle"]["stable"]["files"].keys
     end
@@ -466,7 +472,6 @@ module Homebrew
       info["revision"]
     end
   end
-
 
   # Bottle info as used internally by pull, with alternate platform support
   class BottleInfo
@@ -522,7 +527,7 @@ module Homebrew
         http.use_ssl = true
         retry_count = 0
         http.start do
-          while true do
+          loop do
             req = Net::HTTP::Head.new bottle_info.url
             req.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
             res = http.request req
@@ -551,7 +556,7 @@ module Homebrew
         max_curl_retries = 1
         retry_count = 0
         # We're in the cache; make sure to force re-download
-        while true do
+        loop do
           begin
             curl url, "-o", filename
             break
