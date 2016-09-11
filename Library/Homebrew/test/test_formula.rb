@@ -574,7 +574,7 @@ class FormulaTests < Homebrew::TestCase
       url "foo-1.0"
       pour_bottle? do
         reason "true reason"
-        satisfy { var == var }
+        satisfy { true }
       end
     end
     assert f_true.pour_bottle?
@@ -586,7 +586,10 @@ class OutdatedVersionsTests < Homebrew::TestCase
   attr_reader :f
 
   def setup
-    @f = formula { url "foo"; version "1.20" }
+    @f = formula do
+      url "foo"
+      version "1.20"
+    end
     @outdated_prefix = HOMEBREW_CELLAR/"#{f.name}/1.11"
     @same_prefix = HOMEBREW_CELLAR/"#{f.name}/1.20"
     @greater_prefix = HOMEBREW_CELLAR/"#{f.name}/1.21"
