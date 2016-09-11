@@ -12,7 +12,7 @@ class X11Requirement < Requirement
 
   def initialize(name = "x11", tags = [])
     @name = name
-    if /(\d\.)+\d/ === tags.first
+    if /(\d\.)+\d/ =~ tags.first
       @min_version = Version.create(tags.shift)
       @min_version_string = " #{@min_version}"
     else
@@ -33,7 +33,7 @@ class X11Requirement < Requirement
   end
 
   def <=>(other)
-    return unless X11Requirement === other
+    return unless other.is_a? X11Requirement
     min_version <=> other.min_version
   end
 
