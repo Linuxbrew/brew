@@ -43,13 +43,12 @@ module Homebrew
       end
       ENV["VERBOSE"] = nil
 
-      if ARGV.git?
-        ohai "Setting up git repository"
-        cd stage_dir
-        system "git", "init", "-q"
-        system "git", "add", "-A"
-        system "git", "commit", "-q", "-m", "brew-unpack"
-      end
+      next unless ARGV.git?
+      ohai "Setting up git repository"
+      cd stage_dir
+      system "git", "init", "-q"
+      system "git", "add", "-A"
+      system "git", "commit", "-q", "-m", "brew-unpack"
     end
   end
 end

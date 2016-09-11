@@ -56,11 +56,10 @@ module Homebrew
         end
       end
 
-      unless fetched_bottle
-        fetch_formula(f)
-        f.resources.each { |r| fetch_resource(r) }
-        f.patchlist.each { |p| fetch_patch(p) if p.external? }
-      end
+      next if fetched_bottle
+      fetch_formula(f)
+      f.resources.each { |r| fetch_resource(r) }
+      f.patchlist.each { |p| fetch_patch(p) if p.external? }
     end
   end
 

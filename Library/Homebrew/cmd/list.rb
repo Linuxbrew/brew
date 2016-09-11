@@ -29,7 +29,7 @@ module Homebrew
     # Unbrewed uses the PREFIX, which will exist
     # Things below use the CELLAR, which doesn't until the first formula is installed.
     unless HOMEBREW_CELLAR.exist?
-      raise NoSuchKegError.new(ARGV.named.first) unless ARGV.named.empty?
+      raise NoSuchKegError, ARGV.named.first unless ARGV.named.empty?
       return
     end
 
@@ -60,7 +60,7 @@ module Homebrew
 
   private
 
-  UNBREWED_EXCLUDE_FILES = %w[.DS_Store]
+  UNBREWED_EXCLUDE_FILES = %w[.DS_Store].freeze
   UNBREWED_EXCLUDE_PATHS = %w[
     .github/*
     bin/brew
@@ -80,7 +80,7 @@ module Homebrew
     share/man/man1/brew.1
     share/man/whatis
     share/zsh/site-functions/_brew
-  ]
+  ].freeze
 
   def list_unbrewed
     dirs  = HOMEBREW_PREFIX.subdirs.map { |dir| dir.basename.to_s }
@@ -117,7 +117,7 @@ module Homebrew
         end
       end
       pinned_versions.each do |d, version|
-        puts "#{d.basename}".concat(ARGV.include?("--versions") ? " #{version}" : "")
+        puts d.basename.to_s.concat(ARGV.include?("--versions") ? " #{version}" : "")
       end
     else # --versions without --pinned
       names.each do |d|

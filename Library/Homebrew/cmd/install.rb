@@ -71,13 +71,16 @@ module Homebrew
       raise "Specify `--HEAD` in uppercase to build from trunk."
     end
 
-    ARGV.named.each do |name|
-      if !File.exist?(name) &&
-         (name =~ HOMEBREW_TAP_FORMULA_REGEX || name =~ HOMEBREW_CASK_TAP_FORMULA_REGEX)
+    unless ARGV.force?
+      ARGV.named.each do |name|
+        next if File.exist?(name)
+        if name !~ HOMEBREW_TAP_FORMULA_REGEX && name !~ HOMEBREW_CASK_TAP_FORMULA_REGEX
+          next
+        end
         tap = Tap.fetch($1, $2)
         tap.install unless tap.installed?
       end
-    end unless ARGV.force?
+    end
 
     begin
       formulae = []
