@@ -272,6 +272,7 @@ module Homebrew
     root_url ||= ARGV.value("root_url")
 
     bottle = BottleSpecification.new
+    bottle.tap = f.tap
     bottle.root_url(root_url) if root_url
     if relocatable
       if skip_relocation
