@@ -14,8 +14,8 @@ module Homebrew
 
     open("#{dict_url}/0index.html") do |content|
       content.each_line do |line|
-        break if %r{^</table} === line
-        next unless /^<tr><td><a/ === line
+        break if %r{^</table} =~ line
+        next unless /^<tr><td><a/ =~ line
 
         fields = line.split('"')
         lang = fields[1]
