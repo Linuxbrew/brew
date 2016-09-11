@@ -724,18 +724,15 @@ module Homebrew
       end
     end
 
-    def cleanup_before
-      @category = __method__
-      return unless ARGV.include? "--cleanup"
+    def cleanup_git
       git "gc", "--auto"
-      git "stash"
-      git "am", "--abort"
-      git "rebase", "--abort"
-      unless ARGV.include? "--no-pull"
-        git "checkout", "-f", "master"
-        git "reset", "--hard", "origin/master"
+      test "git", "clean", "-ffdx", "--exclude=Library/Taps"
+
+      Tap.names.each do |tap|
+        next if tap == "homebrew/core"
+        next if tap == @tap.to_s
+        safe_system "brew", "untap", tap
       end
-      git "clean", "-ffdx", "--exclude=Library/Taps/homebrew/homebrew-core"
 
       unless @repository == HOMEBREW_REPOSITORY
         HOMEBREW_REPOSITORY.cd do
@@ -752,6 +749,20 @@ module Homebrew
           safe_system "git", "reset", "--hard", "origin/master"
         end
       end
+    end
+
+    def cleanup_before
+      @category = __method__
+      return unless ARGV.include? "--cleanup"
+      git "stash"
+      git "am", "--abort"
+      git "rebase", "--abort"
+      unless ARGV.include? "--no-pull"
+        git "checkout", "-f", "master"
+        git "reset", "--hard", "origin/master"
+      end
+
+      cleanup_git
 
       pr_locks = "#{@repository}/.git/refs/remotes/*/pr/*/*.lock"
       Dir.glob(pr_locks) { |lock| FileUtils.rm_rf lock }
@@ -771,26 +782,8 @@ module Homebrew
         git "reset", "--hard", "origin/master"
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
-        git "gc", "--auto"
-        test "git", "clean", "-ffdx", "--exclude=Library/Taps/homebrew/homebrew-core"
 
-        Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
-
-        unless @repository == HOMEBREW_REPOSITORY
-          HOMEBREW_REPOSITORY.cd do
-            safe_system "git", "checkout", "-f", "master"
-            safe_system "git", "reset", "--hard", "origin/master"
-            safe_system "git", "clean", "-ffdx", "--exclude=Library/Taps"
-          end
-        end
-
-        Pathname.glob("#{HOMEBREW_LIBRARY}/Taps/*/*").each do |git_repo|
-          next if @repository == git_repo
-          git_repo.cd do
-            safe_system "git", "checkout", "-f", "master"
-            safe_system "git", "reset", "--hard", "origin/master"
-          end
-        end
+        cleanup_git
 
         if ARGV.include? "--local"
           FileUtils.rm_rf ENV["HOMEBREW_HOME"]
