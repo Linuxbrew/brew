@@ -326,6 +326,7 @@ class Keg
       when /^fish/ then :mkpath
       # Lua, Lua51, Lua53 all need the same handling.
       when /^lua\// then :mkpath
+      when %r{^guile/} then :mkpath
       else :link
       end
     end
