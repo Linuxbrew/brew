@@ -101,7 +101,7 @@ module Homebrew
     old_formula_version = formula_version(formula, requested_spec)
 
     replacement_pairs = []
-    if requested_spec == :stable && formula.revision != 0
+    if requested_spec == :stable && formula.revision.nonzero?
       replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
     end
 
