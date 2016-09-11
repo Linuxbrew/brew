@@ -875,11 +875,6 @@ module Homebrew
     # Don't trust formulae we're uploading
     ENV["HOMEBREW_DISABLE_LOAD_FORMULA"] = "1"
 
-    jenkins = ENV["JENKINS_HOME"]
-    job = ENV["UPSTREAM_JOB_NAME"]
-    id = ENV["UPSTREAM_BUILD_ID"]
-    raise "Missing Jenkins variables!" if !jenkins || !job || !id
-
     bintray_user = ENV["BINTRAY_USER"]
     bintray_key = ENV["BINTRAY_KEY"]
     if !bintray_user || !bintray_key
@@ -891,11 +886,20 @@ module Homebrew
     ENV["HUDSON_SERVER_COOKIE"] = nil
     ENV["JENKINS_SERVER_COOKIE"] = nil
     ENV["HUDSON_COOKIE"] = nil
+    ENV["COVERALLS_REPO_TOKEN"] = nil
 
     ARGV << "--verbose"
 
-    bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
-    return if bottles.empty?
+    bottles = Dir["*.bottle*.*"]
+    if bottles.empty?
+      jenkins = ENV["JENKINS_HOME"]
+      job = ENV["UPSTREAM_JOB_NAME"]
+      id = ENV["UPSTREAM_BUILD_ID"]
+      raise "Missing Jenkins variables!" if !jenkins || !job || !id
+      bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
+      return if bottles.empty?
+    end
+
     FileUtils.cp bottles, Dir.pwd, :verbose => true
 
     json_files = Dir.glob("*.bottle.json")
