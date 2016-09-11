@@ -20,7 +20,7 @@ module DiskUsageExtension
     out = ""
     compute_disk_usage
     out << "#{number_readable(@file_count)} files, " if @file_count > 1
-    out << "#{disk_usage_readable(@disk_usage)}"
+    out << disk_usage_readable(@disk_usage).to_s
   end
 
   private
@@ -153,7 +153,7 @@ class Pathname
   end unless method_defined?(:binwrite)
 
   def binread(*open_args)
-    open("rb", *open_args) { |f| f.read }
+    open("rb", *open_args, &:read)
   end unless method_defined?(:binread)
 
   # NOTE always overwrites
@@ -196,7 +196,7 @@ class Pathname
 
   # @private
   def cp_path_sub(pattern, replacement)
-    raise "#{self} does not exist" unless self.exist?
+    raise "#{self} does not exist" unless exist?
 
     dst = sub(pattern, replacement)
 
@@ -295,7 +295,7 @@ class Pathname
 
   # @private
   def text_executable?
-    /^#!\s*\S+/ === open("r") { |f| f.read(1024) }
+    /^#!\s*\S+/ =~ open("r") { |f| f.read(1024) }
   end
 
   # @private
@@ -334,7 +334,7 @@ class Pathname
 
   # @private
   def resolved_path
-    self.symlink? ? dirname+readlink : self
+    symlink? ? dirname+readlink : self
   end
 
   # @private
