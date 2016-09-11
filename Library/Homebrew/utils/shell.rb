@@ -10,7 +10,7 @@ module Utils
   }.freeze
 
   module Shell
-    UNSAFE_SHELL_CHAR = /([^A-Za-z0-9_\-.,:\/@\n])/
+    UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:\/@\n])}
 
     # take a path and heuristically convert it
     # to a shell name, return nil if there's no match
@@ -45,7 +45,7 @@ module Utils
       str
     end
     module_function :csh_quote
-    
+
     def sh_quote(str)
       # ruby's implementation of shell_escape
       str = str.to_s
@@ -81,7 +81,7 @@ module Utils
     module_function :shell_profile
 
     def prepend_path_in_shell_profile(path)
-      case preferred_shell 
+      case preferred_shell
       when :bash, :ksh, :sh, :zsh, nil
         "echo 'export PATH=\"#{sh_quote(path)}:$PATH\"' >> #{shell_profile}"
       when :csh, :tcsh
