@@ -2,8 +2,6 @@
 #autoload
 
 # Brew ZSH completion function
-#
-# altered from _fink
 
 _brew_all_formulae() {
   formulae=(`brew search`)
@@ -27,6 +25,12 @@ _brew_pinned_taps() {
 
 _brew_outdated_formulae() {
   outdated_formulae=(`brew outdated`)
+}
+
+__brew_command() {
+  local command="$1"
+  local completion_func="_brew_${command//-/_}"
+  declare -f "$completion_func" >/dev/null && "$completion_func" && return
 }
 
 local -a _1st_arguments
@@ -95,7 +99,8 @@ if (( CURRENT == 1 )); then
   return
 fi
 
-case "$words[1]" in
+local command="$words[1]"
+case "$command" in
   analytics) compadd on off state regenerate-uuid ;;
   install|reinstall|audit|home|homepage|log|info|abv|uses|cat|deps|desc|edit|options|switch)
     _brew_all_formulae
@@ -146,4 +151,6 @@ case "$words[1]" in
       _brew_outdated_formulae
       _wanted outdated_formulae expl 'outdated formulae' compadd -a outdated_formulae
     fi ;;
+  *)
+    __brew_command "$command" ;;
 esac
