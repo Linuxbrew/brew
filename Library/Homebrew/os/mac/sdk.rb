@@ -24,7 +24,7 @@ module OS
       def latest_sdk
         return if sdk_paths.empty?
 
-        v, path = sdk_paths.max {|a, b| OS::Mac::Version.new(a[0]) <=> OS::Mac::Version.new(b[0])}
+        v, path = sdk_paths.max { |a, b| OS::Mac::Version.new(a[0]) <=> OS::Mac::Version.new(b[0]) }
         SDK.new v, path
       end
 
