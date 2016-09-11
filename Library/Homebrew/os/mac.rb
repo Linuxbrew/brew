@@ -200,7 +200,7 @@ module OS
       "7.3"   => { :clang => "7.3", :clang_build => 703 },
       "7.3.1" => { :clang => "7.3", :clang_build => 703 },
       "8.0"   => { :clang => "8.0", :clang_build => 800 },
-    }
+    }.freeze
 
     def compilers_standard?
       STANDARD_COMPILERS.fetch(Xcode.version.to_s).all? do |method, build|

@@ -12,8 +12,8 @@ module OS
         :lion          => "10.7",
         :snow_leopard  => "10.6",
         :leopard       => "10.5",
-        :tiger         => "10.4"
-      }
+        :tiger         => "10.4",
+      }.freeze
 
       def self.from_symbol(sym)
         str = SYMBOLS.fetch(sym) do
