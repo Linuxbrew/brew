@@ -24,7 +24,7 @@ class TabTests < Homebrew::TestCase
                        "stable" => "0.10",
                        "devel" => "0.14",
                        "head" => "HEAD-1111111",
-                     }
+                     },
                    })
   end
 

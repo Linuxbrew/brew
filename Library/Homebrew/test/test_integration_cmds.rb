@@ -99,7 +99,7 @@ class IntegrationCommandTests < Homebrew::TestCase
   def cmd(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    puts "\n#{output}" if status != 0
+    puts "\n#{output}" if status.nonzero?
     assert_equal 0, status
     output
   end
@@ -107,7 +107,7 @@ class IntegrationCommandTests < Homebrew::TestCase
   def cmd_fail(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    $stderr.puts "\n#{output}" if status == 0
+    $stderr.puts "\n#{output}" if status.zero?
     refute_equal 0, status
     output
   end
@@ -228,23 +228,23 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def test_env_bash
-    assert_match %r{export CMAKE_PREFIX_PATH="#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"},
-                 cmd("--env", "--shell=bash")
+    assert_match(/export CMAKE_PREFIX_PATH="#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"/,
+                 cmd("--env", "--shell=bash"))
   end
 
   def test_env_fish
-    assert_match %r{set [-]gx CMAKE_PREFIX_PATH "#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"},
-                 cmd("--env", "--shell=fish")
+    assert_match(/set [-]gx CMAKE_PREFIX_PATH "#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"/,
+                 cmd("--env", "--shell=fish"))
   end
 
   def test_env_csh
-    assert_match %r{setenv CMAKE_PREFIX_PATH #{Regexp.quote(HOMEBREW_PREFIX.to_s)};},
-                 cmd("--env", "--shell=tcsh")
+    assert_match(/setenv CMAKE_PREFIX_PATH #{Regexp.quote(HOMEBREW_PREFIX.to_s)};/,
+                 cmd("--env", "--shell=tcsh"))
   end
 
   def test_env_plain
-    assert_match %r{CMAKE_PREFIX_PATH: #{Regexp.quote(HOMEBREW_PREFIX)}},
-                 cmd("--env", "--plain")
+    assert_match(/CMAKE_PREFIX_PATH: #{Regexp.quote(HOMEBREW_PREFIX)}/,
+                 cmd("--env", "--plain"))
   end
 
   def test_prefix_formula

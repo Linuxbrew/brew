@@ -7,7 +7,7 @@ class DependencyCollectorTests < Homebrew::TestCase
   end
 
   def find_requirement(klass)
-    @d.requirements.find { |req| klass === req }
+    @d.requirements.find { |req| req.is_a? klass }
   end
 
   def setup
