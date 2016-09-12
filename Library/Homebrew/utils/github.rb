@@ -121,7 +121,7 @@ module GitHub
     end
   end
 
-  def open(url, data=nil)
+  def open(url, data = nil)
     # This is a no-op if the user is opting out of using the GitHub API.
     return if ENV["HOMEBREW_NO_GITHUB_API"]
 
@@ -154,7 +154,7 @@ module GitHub
         args += ["--data", "@#{data_tmpfile.path}"]
       end
 
-      args += ["--dump-header", "#{headers_tmpfile.path}"]
+      args += ["--dump-header", headers_tmpfile.path.to_s]
 
       output, errors, status = curl_output(url.to_s, *args)
       output, _, http_code = output.rpartition("\n")
@@ -203,11 +203,15 @@ module GitHub
 
     case http_code
     when "401", "403"
-      raise AuthenticationFailedError.new(output)
+      raise AuthenticationFailedError, output
     when "404"
       raise HTTPNotFoundError, output
     else
-      error = Utils::JSON.load(output)["message"] rescue nil
+      error = begin
+        Utils::JSON.load(output)["message"]
+      rescue
+        nil
+      end
       error ||= "curl failed! #{errors}"
       raise Error, error
     end
@@ -232,7 +236,7 @@ module GitHub
   def build_search_qualifier_string(qualifiers)
     {
       :repo => "Homebrew/homebrew-core",
-      :in => "title"
+      :in => "title",
     }.update(qualifiers).map do |qualifier, value|
       "#{qualifier}:#{value}"
     end.join("+")
