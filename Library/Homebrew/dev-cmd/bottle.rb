@@ -287,9 +287,6 @@ module Homebrew
     bottle.sha256 sha256 => Utils::Bottles.tag
 
     old_spec = f.bottle_specification
-    p root_url
-    p old_spec.root_url(root_url)
-    p bottle.root_url(root_url)
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
       mismatches = [:root_url, :prefix, :cellar, :rebuild].select do |key|
         old_spec.send(key) != bottle.send(key)
