@@ -631,7 +631,7 @@ module Homebrew
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.output?
             bottle_filename =
-              bottle_step.output.gsub(%r{.*(\./\S+#{Utils::Bottles.native_regex}).*/m}, '\1')
+              bottle_step.output.gsub(%r{.*(\./\S+#{Utils::Bottles.native_regex}).*}m, '\1')
             bottle_json_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".json")
             bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_json_filename]
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
