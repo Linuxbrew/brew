@@ -912,7 +912,7 @@ module Homebrew
       safe_system "brew", "pull", "--clean", pull_pr
     end
 
-    if ENV["UPSTREAM_BOTTLE_KEEP_OLD"] || ENV["BOT_PARAMS"].include?("--keep-old")
+    if ENV["UPSTREAM_BOTTLE_KEEP_OLD"] || ENV["BOT_PARAMS"].to_s.include?("--keep-old")
       system "brew", "bottle", "--merge", "--write", "--keep-old", *json_files
     else
       system "brew", "bottle", "--merge", "--write", *json_files
