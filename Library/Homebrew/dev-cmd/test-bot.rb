@@ -1,6 +1,6 @@
 #: @hide_from_man_page
 #:  * `test-bot` [options]  <url|formula>:
-#:    Creates a pull request to boneyard a formula.
+#:    Tests the full lifecycle of a formula or Homebrew/brew change.
 #:
 #:    If `--dry-run` is passed, print what would be done rather than doing
 #:    it.
