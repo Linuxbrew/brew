@@ -881,11 +881,12 @@ module Homebrew
       job = ENV["UPSTREAM_JOB_NAME"]
       id = ENV["UPSTREAM_BUILD_ID"]
       raise "Missing Jenkins variables!" if !jenkins || !job || !id
+
       bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
       return if bottles.empty?
-    end
 
-    FileUtils.cp bottles, Dir.pwd, :verbose => true
+      FileUtils.cp bottles, Dir.pwd, :verbose => true
+    end
 
     json_files = Dir.glob("*.bottle.json")
     bottles_hash = json_files.reduce({}) do |hash, json_file|
@@ -900,29 +901,34 @@ module Homebrew
     ENV["GIT_WORK_TREE"] = tap.path
     ENV["GIT_DIR"] = "#{ENV["GIT_WORK_TREE"]}/.git"
 
-    pr = ENV["UPSTREAM_PULL_REQUEST"]
-    number = ENV["UPSTREAM_BUILD_NUMBER"]
-
     quiet_system "git", "am", "--abort"
     quiet_system "git", "rebase", "--abort"
     safe_system "git", "checkout", "-f", "master"
     safe_system "git", "reset", "--hard", "origin/master"
     safe_system "brew", "update"
 
-    if pr
+    if (pr = ENV["UPSTREAM_PULL_REQUEST"])
       pull_pr = "https://github.com/#{tap.user}/homebrew-#{tap.repo}/pull/#{pr}"
       safe_system "brew", "pull", "--clean", pull_pr
     end
 
-    if ENV["UPSTREAM_BOTTLE_KEEP_OLD"]
+    if ENV["UPSTREAM_BOTTLE_KEEP_OLD"] || ENV["BOT_PARAMS"].include?("--keep-old")
       system "brew", "bottle", "--merge", "--write", "--keep-old", *json_files
     else
       system "brew", "bottle", "--merge", "--write", *json_files
     end
 
     remote = "git@github.com:BrewTestBot/homebrew-#{tap.repo}.git"
-    git_tag = pr ? "pr-#{pr}" : "testing-#{number}"
-    safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{git_tag}"
+    git_tag = if pr
+      "pr-#{pr}"
+    elsif (upstream_number = ENV["UPSTREAM_BUILD_NUMBER"])
+      "testing-#{upstream_number}"
+    elsif (number = ENV["BUILD_NUMBER"])
+      "other-#{number}"
+    end
+    if git_tag
+      safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{git_tag}"
+    end
 
     formula_packaged = {}
 
@@ -967,8 +973,10 @@ module Homebrew
       end
     end
 
-    safe_system "git", "tag", "--force", git_tag
-    safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
+    if git_tag
+      safe_system "git", "tag", "--force", git_tag
+      safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
+    end
   end
 
   def sanitize_argv_and_env
