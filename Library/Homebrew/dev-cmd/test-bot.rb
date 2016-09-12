@@ -120,7 +120,7 @@ module Homebrew
 
     if git_url = ENV["UPSTREAM_GIT_URL"] || ENV["GIT_URL"]
       # Also can get tap from Jenkins GIT_URL.
-      url_path = git_url.sub(%r{^https?://github\.com/}, "").chomp("/").sub(%r{\.git$}, "")
+      url_path = git_url.sub(%r{^https?://github\.com/}, "").chomp("/").sub(/\.git$/, "")
       begin
         return Tap.fetch(url_path) if url_path =~ HOMEBREW_TAP_REGEX
       rescue
@@ -190,7 +190,7 @@ module Homebrew
       puts "#{Tty.white}==>#{Tty.red} FAILED#{Tty.reset}" if failed?
     end
 
-    def has_output?
+    def output?
       @output && !@output.empty?
     end
 
@@ -245,7 +245,6 @@ module Homebrew
       @status = $?.success? ? :passed : :failed
       puts_result
 
-
       unless output.empty?
         @output = Homebrew.fix_encoding!(output)
         puts @output if (failed? || @puts_output_on_success) && !verbose
@@ -259,7 +258,7 @@ module Homebrew
   class Test
     attr_reader :log_root, :category, :name, :steps
 
-    def initialize(argument, options={})
+    def initialize(argument, options = {})
       @hash = nil
       @url = nil
       @formulae = []
@@ -277,7 +276,7 @@ module Homebrew
       elsif canonical_formula_name = safe_formula_canonical_name(argument)
         @formulae = [canonical_formula_name]
       else
-        raise ArgumentError.new("#{argument} is not a pull request URL, commit URL or formula name.")
+        raise ArgumentError, "#{argument} is not a pull request URL, commit URL or formula name."
       end
 
       @category = __method__
@@ -404,7 +403,7 @@ module Homebrew
         @short_url = @url.gsub("https://github.com/", "")
         if @short_url.include? "/commit/"
           # 7 characters should be enough for a commit (not 40).
-          @short_url.gsub!(/(commit\/\w{7}).*/, '\1')
+          @short_url.gsub!(%r{(commit/\w{7}).*/, '\1'})
           @name = @short_url
         else
           @name = "#{@short_url}-#{diff_end_sha1}"
@@ -569,7 +568,7 @@ module Homebrew
       dependents -= @formulae
       dependents = dependents.map { |d| Formulary.factory(d) }
 
-      bottled_dependents = dependents.select { |d| d.bottled? }
+      bottled_dependents = dependents.select(&:bottled?)
       testable_dependents = dependents.select { |d| d.bottled? && d.test_defined? }
 
       if (deps | reqs).any? { |d| d.name == "mercurial" && d.build? }
@@ -630,9 +629,9 @@ module Homebrew
           bottle_args << "--skip-relocation" if ARGV.include? "--skip-relocation"
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
-          if bottle_step.passed? && bottle_step.has_output?
+          if bottle_step.passed? && bottle_step.output?
             bottle_filename =
-              bottle_step.output.gsub(/.*(\.\/\S+#{Utils::Bottles::native_regex}).*/m, '\1')
+              bottle_step.output.gsub(%r{.*(\./\S+#{Utils::Bottles.native_regex}).*/m, '\1'})
             bottle_json_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".json")
             bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_json_filename]
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
@@ -666,11 +665,10 @@ module Homebrew
               next if steps.last.failed?
             end
           end
-          if dependent.installed?
-            test "brew", "linkage", "--test", dependent.name
-            if testable_dependents.include? dependent
-              test "brew", "test", "--verbose", dependent.name
-            end
+          next unless dependent.installed?
+          test "brew", "linkage", "--test", dependent.name
+          if testable_dependents.include? dependent
+            test "brew", "test", "--verbose", dependent.name
           end
         end
         test "brew", "uninstall", "--force", formula_name
@@ -795,7 +793,7 @@ module Homebrew
     end
 
     def test(*args)
-      options = Hash === args.last ? args.pop : {}
+      options = args.last.is_a?(Hash) ? args.pop : {}
       options[:repository] = @repository
       step = Step.new self, args, options
       step.run
@@ -934,7 +932,7 @@ module Homebrew
       bintray_repo = bottle_hash["bintray"]["repository"]
       bintray_repo_url = "https://api.bintray.com/packages/homebrew/#{bintray_repo}"
 
-      bottle_hash["bottle"]["tags"].each do |tag, tag_hash|
+      bottle_hash["bottle"]["tags"].each do |_tag, tag_hash|
         filename = tag_hash["filename"]
         if system "curl", "-I", "--silent", "--fail", "--output", "/dev/null",
                   "#{BottleSpecification::DEFAULT_DOMAIN}/#{bintray_repo}/#{filename}"
@@ -973,7 +971,7 @@ module Homebrew
     safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
   end
 
-  def sanitize_ARGV_and_ENV
+  def sanitize_argv_and_env
     if Pathname.pwd == HOMEBREW_PREFIX && ARGV.include?("--cleanup")
       odie "cannot use --cleanup from HOMEBREW_PREFIX as it will delete all output."
     end
@@ -1016,7 +1014,7 @@ module Homebrew
   end
 
   def test_bot
-    sanitize_ARGV_and_ENV
+    sanitize_argv_and_env
 
     tap = resolve_test_tap
     # Tap repository if required, this is done before everything else
@@ -1070,19 +1068,18 @@ module Homebrew
           testcase.add_attribute "status", step.status
           testcase.add_attribute "time", step.time
 
-          if step.has_output?
-            output = sanitize_output_for_xml(step.output)
-            cdata = REXML::CData.new output
+          next unless step.output?
+          output = sanitize_output_for_xml(step.output)
+          cdata = REXML::CData.new output
 
-            if step.passed?
-              elem = testcase.add_element "system-out"
-            else
-              elem = testcase.add_element "failure"
-              elem.add_attribute "message", "#{step.status}: #{step.command.join(" ")}"
-            end
-
-            elem << cdata
+          if step.passed?
+            elem = testcase.add_element "system-out"
+          else
+            elem = testcase.add_element "failure"
+            elem.add_attribute "message", "#{step.status}: #{step.command.join(" ")}"
           end
+
+          elem << cdata
         end
       end
 

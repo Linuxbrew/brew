@@ -34,15 +34,15 @@ module Homebrew
   end
 
   def path_glob_commands(glob)
-    Pathname.glob(glob).
-      sort_by { |source_file| sort_key_for_path(source_file) }.
-      map { |source_file|
-        source_file.read.lines.
-          grep(/^#:/).
-          map { |line| line.slice(2..-1) }.
-          join
-      }.
-      reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
+    Pathname.glob(glob)
+            .sort_by { |source_file| sort_key_for_path(source_file) }
+            .map do |source_file|
+      source_file.read.lines
+                 .grep(/^#:/)
+                 .map { |line| line.slice(2..-1) }
+                 .join
+    end
+            .reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
   end
 
   def build_man_page
@@ -51,11 +51,11 @@ module Homebrew
 
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
     variables[:developer_commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
-    variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md").
-      read[/Homebrew's current maintainers are (.*)\./, 1].
-      scan(/\[([^\]]*)\]/).flatten
+    variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md")
+                              .read[/Homebrew's current maintainers are (.*)\./, 1]
+                              .scan(/\[([^\]]*)\]/).flatten
 
-    ERB.new(template, nil, ">").result(variables.instance_eval{ binding })
+    ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end
 
   def sort_key_for_path(path)

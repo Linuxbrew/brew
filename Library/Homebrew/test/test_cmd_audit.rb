@@ -29,9 +29,9 @@ class FormulaTextTests < Homebrew::TestCase
   def test_simple_valid_formula
     ft = formula_text "valid", 'url "http://www.example.com/valid-1.0.tar.gz"'
 
-    refute ft.has_DATA?, "The formula should not have DATA"
-    refute ft.has_END?, "The formula should not have __END__"
-    assert ft.has_trailing_newline?, "The formula should have a trailing newline"
+    refute ft.data?, "The formula should not have DATA"
+    refute ft.end?, "The formula should not have __END__"
+    assert ft.trailing_newline?, "The formula should have a trailing newline"
 
     assert ft =~ /\burl\b/, "The formula should match 'url'"
     assert_nil ft.line_number(/desc/), "The formula should not match 'desc'"
@@ -41,17 +41,17 @@ class FormulaTextTests < Homebrew::TestCase
 
   def test_trailing_newline
     ft = formula_text "newline"
-    assert ft.has_trailing_newline?, "The formula must have a trailing newline"
+    assert ft.trailing_newline?, "The formula must have a trailing newline"
   end
 
   def test_has_data
     ft = formula_text "data", "patch :DATA"
-    assert ft.has_DATA?, "The formula must have DATA"
+    assert ft.data?, "The formula must have DATA"
   end
 
   def test_has_end
     ft = formula_text "end", "", :patch => "__END__\na patch here"
-    assert ft.has_END?, "The formula must have __END__"
+    assert ft.end?, "The formula must have __END__"
     assert_equal "class End < Formula\n  \nend", ft.without_patch
   end
 end

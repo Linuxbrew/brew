@@ -101,20 +101,20 @@ class FormulaText
     @text.split("\n__END__").first
   end
 
-  def has_DATA?
+  def data?
     /^[^#]*\bDATA\b/ =~ @text
   end
 
-  def has_END?
+  def end?
     /^__END__$/ =~ @text
   end
 
-  def has_trailing_newline?
+  def trailing_newline?
     /\Z\n/ =~ @text
   end
 
-  def =~(regex)
-    regex =~ @text
+  def =~(other)
+    other =~ @text
   end
 
   def include?(s)
@@ -152,15 +152,15 @@ class FormulaAuditor
     smake
     sphinx-doc
     swig
-  ]
+  ].freeze
 
   FILEUTILS_METHODS = FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
 
   def initialize(formula, options = {})
     @formula = formula
-    @new_formula = !!options[:new_formula]
-    @strict = !!options[:strict]
-    @online = !!options[:online]
+    @new_formula = options[:new_formula]
+    @strict = options[:strict]
+    @online = options[:online]
     # Accept precomputed style offense results, for efficiency
     @style_offenses = options[:style_offenses]
     @problems = []
@@ -214,7 +214,7 @@ class FormulaAuditor
       previous_before = previous_pair[0]
       previous_after = previous_pair[1]
     end
-    offset = (previous_after && previous_after[0] && previous_after[0] >= 1) ? previous_after[0] - 1 : 0
+    offset = previous_after && previous_after[0] && previous_after[0] >= 1 ? previous_after[0] - 1 : 0
     present = component_list.map do |regex, name|
       lineno = if reverse
         text.reverse_line_number regex
@@ -229,7 +229,7 @@ class FormulaAuditor
       if reverse
         # scan in the forward direction from the offset
         audit_components(false, [c1, c2]) if c1[0] > c2[0] # at least one more offense
-      elsif c1[0] > c2[0] && (offset == 0 || previous_pair.nil? || (c1[0] + offset) != previous_before[0] || (c2[0] + offset) != previous_after[0])
+      elsif c1[0] > c2[0] && (offset.zero? || previous_pair.nil? || (c1[0] + offset) != previous_before[0] || (c2[0] + offset) != previous_after[0])
         component_problem c1, c2, offset
         no_problem = false
       end
@@ -251,11 +251,11 @@ class FormulaAuditor
                      actual_mode & 0777, wanted_mode & 0777, formula.path)
     end
 
-    if text.has_DATA? && !text.has_END?
+    if text.data? && !text.end?
       problem "'DATA' was found, but no '__END__'"
     end
 
-    if text.has_END? && !text.has_DATA?
+    if text.end? && !text.data?
       problem "'__END__' was found, but 'DATA' is not used"
     end
 
@@ -263,7 +263,7 @@ class FormulaAuditor
       problem "'inreplace ... do' was used for a single substitution (use the non-block form instead)."
     end
 
-    unless text.has_trailing_newline?
+    unless text.trailing_newline?
       problem "File should end with a newline"
     end
 
@@ -328,13 +328,13 @@ class FormulaAuditor
       return
     end
 
-    @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names).
-      reduce(Hash.new) do |name_map, tap_formula_full_name|
-        tap_formula_name = tap_formula_full_name.split("/").last
-        name_map[tap_formula_name] ||= []
-        name_map[tap_formula_name] << tap_formula_full_name
-        name_map
-      end
+    @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names)
+                                          .each_with_object({}) do |tap_formula_full_name, name_map|
+      tap_formula_name = tap_formula_full_name.split("/").last
+      name_map[tap_formula_name] ||= []
+      name_map[tap_formula_name] << tap_formula_full_name
+      name_map
+    end
 
     same_name_tap_formulae = @@local_official_taps_name_map[name] || []
 
@@ -396,14 +396,6 @@ class FormulaAuditor
         end
 
         case dep.name
-        when *BUILD_TIME_DEPS
-          next if dep.build? || dep.run?
-          problem <<-EOS.undent
-            #{dep} dependency should be
-              depends_on "#{dep}" => :build
-            Or if it is indeed a runtime dependency
-              depends_on "#{dep}" => :run
-          EOS
         when "git"
           problem "Don't use git as a dependency"
         when "mercurial"
@@ -419,6 +411,9 @@ class FormulaAuditor
             where "1.8" is the minimum version of Ruby required.
           EOS
         when "open-mpi", "mpich"
+          problem <<-EOS.undent
+        when *BUILD_TIME_DEPS
+          next if dep.build? || dep.run?
           problem <<-EOS.undent
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
               depends_on :mpi => [<lang list>]
@@ -452,10 +447,9 @@ class FormulaAuditor
         problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
       end
 
-      if o.name =~ /^with(out)?-(?:checks?|tests)$/
-        unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
-          problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
-        end
+      next unless o.name =~ /^with(out)?-(?:checks?|tests)$/
+      unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
+        problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
       end
     end
   end
@@ -667,15 +661,14 @@ class FormulaAuditor
 
     attributes.each do |attribute|
       attributes_for_version = attributes_map[attribute][formula.version]
-      if !attributes_for_version.empty?
-        if formula.send(attribute) < attributes_for_version.max
-          problem "#{attribute} should not decrease"
-        end
+      next if attributes_for_version.empty?
+      if formula.send(attribute) < attributes_for_version.max
+        problem "#{attribute} should not decrease"
       end
     end
 
     revision_map = attributes_map[:revision]
-    if formula.revision != 0
+    if formula.revision.nonzero?
       if formula.stable
         if revision_map[formula.stable.version].empty? # check stable spec
           problem "'revision #{formula.revision}' should be removed"
@@ -772,7 +765,7 @@ class FormulaAuditor
 
     # FileUtils is included in Formula
     # encfs modifies a file with this name, so check for some leading characters
-    if line =~ /[^'"\/]FileUtils\.(\w+)/
+    if line =~ %r{[^'"/]FileUtils\.(\w+)}
       problem "Don't need 'FileUtils.' before #{$1}."
     end
 
@@ -1038,7 +1031,7 @@ class FormulaAuditor
   end
 
   def quote_dep(dep)
-    Symbol === dep ? dep.inspect : "'#{dep}'"
+    dep.is_a?(Symbol) ? dep.inspect : "'#{dep}'"
   end
 
   def audit_check_output(output)
