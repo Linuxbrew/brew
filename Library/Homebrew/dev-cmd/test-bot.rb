@@ -403,7 +403,7 @@ module Homebrew
         @short_url = @url.gsub("https://github.com/", "")
         if @short_url.include? "/commit/"
           # 7 characters should be enough for a commit (not 40).
-          @short_url.gsub!(%r{(commit/\w{7}).*/, '\1'})
+          @short_url.gsub!(%r{(commit/\w{7}).*/}, '\1')
           @name = @short_url
         else
           @name = "#{@short_url}-#{diff_end_sha1}"
@@ -631,7 +631,7 @@ module Homebrew
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.output?
             bottle_filename =
-              bottle_step.output.gsub(%r{.*(\./\S+#{Utils::Bottles.native_regex}).*/m, '\1'})
+              bottle_step.output.gsub(%r{.*(\./\S+#{Utils::Bottles.native_regex}).*/m}, '\1')
             bottle_json_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".json")
             bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_json_filename]
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
