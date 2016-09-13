@@ -1,3 +1,6 @@
+#:  * `postinstall` <formula>:
+#:    Rerun the post-install steps for <formula>.
+
 require "sandbox"
 
 module Homebrew

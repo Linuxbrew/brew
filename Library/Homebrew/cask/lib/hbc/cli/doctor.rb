@@ -33,18 +33,14 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
   end
 
   def self.alt_taps
-    Tap.select { |t| t.cask_dir.directory? && t != Hbc.default_tap }
+    Tap.select { |t| t.cask_dir && t != Hbc.default_tap }
        .map(&:path)
   end
 
   def self.default_cask_count
-    default_cask_count = notfound_string
-    begin
-      default_cask_count = Hbc.default_tap.cask_dir.children.count(&:file?)
-    rescue StandardError
-      default_cask_count = "0 #{error_string "Error reading #{Hbc.default_tap.path}"}"
-    end
-    default_cask_count
+    Hbc.default_tap.cask_files.count
+  rescue StandardError
+    "0 #{error_string "Error reading #{Hbc.default_tap.path}"}"
   end
 
   def self.homebrew_origin
@@ -124,11 +120,11 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
   end
 
   def self.notfound_string
-    "#{Hbc::Utils::Tty.red.underline}Not Found - Unknown Error#{Hbc::Utils::Tty.reset}"
+    "#{Tty.red}Not Found - Unknown Error#{Tty.reset}"
   end
 
   def self.error_string(string = "Error")
-    "#{Hbc::Utils::Tty.red.underline}(#{string})#{Hbc::Utils::Tty.reset}"
+    "#{Tty.red}(#{string})#{Tty.reset}"
   end
 
   def self.render_with_none(string)

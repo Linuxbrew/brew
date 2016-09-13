@@ -1,3 +1,7 @@
+#: @hide_from_man_page
+#:  * `update_report`:
+#:    The Ruby implementation of `brew update`. Never called manually.
+
 require "formula_versions"
 require "migrator"
 require "formulary"
@@ -76,16 +80,19 @@ module Homebrew
       if !ARGV.include?("--preinstall") && !ENV["HOMEBREW_UPDATE_FAILED"]
         puts "Already up-to-date."
       end
-    elsif hub.empty?
-      puts "No changes to formulae."
     else
-      hub.dump
-      hub.reporters.each(&:migrate_tap_migration)
-      hub.reporters.each(&:migrate_formula_rename)
-      Descriptions.update_cache(hub)
+      if hub.empty?
+        puts "No changes to formulae."
+      else
+        hub.dump
+        hub.reporters.each(&:migrate_tap_migration)
+        hub.reporters.each(&:migrate_formula_rename)
+        Descriptions.update_cache(hub)
+      end
+      puts if ARGV.include?("--preinstall")
     end
 
-    link_manpages
+    link_completions_and_docs
     Tap.each(&:link_manpages)
 
     Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
@@ -127,13 +134,13 @@ module Homebrew
     world_writable = legacy_cache.stat.mode & 0777 == 0777
     return if world_writable
     return if legacy_cache.symlink?
-    return if !legacy_cache.owned? && legacy_cache.lstat.uid != 0
+    return if !legacy_cache.owned? && legacy_cache.lstat.uid.nonzero?
 
     ohai "Migrating #{legacy_cache} to #{HOMEBREW_CACHE}..."
     HOMEBREW_CACHE.mkpath
     legacy_cache.cd do
       legacy_cache.entries.each do |f|
-        next if [".", "..", ".migration_attempted"].include? "#{f}"
+        next if [".", "..", ".migration_attempted"].include? f.to_s
         begin
           FileUtils.cp_r f, HOMEBREW_CACHE
         rescue
@@ -160,9 +167,16 @@ module Homebrew
     end
   end
 
-  def link_manpages
+  def link_completions_and_docs
     return if HOMEBREW_PREFIX.to_s == HOMEBREW_REPOSITORY.to_s
-    link_path_manpages(HOMEBREW_REPOSITORY/"share", "brew update")
+    command = "brew update"
+    link_src_dst_dirs(HOMEBREW_REPOSITORY/"etc/bash_completion.d",
+                      HOMEBREW_PREFIX/"etc/bash_completion.d", command)
+    link_src_dst_dirs(HOMEBREW_REPOSITORY/"share/doc/homebrew",
+                      HOMEBREW_PREFIX/"share/doc/homebrew", command, :link_dir => true)
+    link_src_dst_dirs(HOMEBREW_REPOSITORY/"share/zsh/site-functions",
+                      HOMEBREW_PREFIX/"share/zsh/site-functions", command)
+    link_path_manpages(HOMEBREW_REPOSITORY/"share", command)
   end
 end
 
@@ -345,10 +359,10 @@ class Reporter
   private
 
   def repo_var
-    @repo_var ||= tap.path.to_s.
-        strip_prefix(Tap::TAP_DIRECTORY.to_s).
-        tr("^A-Za-z0-9", "_").
-        upcase
+    @repo_var ||= tap.path.to_s
+                     .strip_prefix(Tap::TAP_DIRECTORY.to_s)
+                     .tr("^A-Za-z0-9", "_")
+                     .upcase
   end
 
   def diff
@@ -373,7 +387,7 @@ class ReporterHub
 
   def add(reporter)
     @reporters << reporter
-    report = reporter.report.delete_if { |k,v| v.empty? }
+    report = reporter.report.delete_if { |_k, v| v.empty? }
     @hash.update(report) { |_key, oldval, newval| oldval.concat(newval) }
   end
 

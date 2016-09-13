@@ -8,10 +8,12 @@ class FormulaTests < Homebrew::TestCase
     name = "formula_name"
     path = Formulary.core_path(name)
     spec = :stable
+    alias_path = CoreTap.instance.alias_dir/"formula_alias"
 
-    f = klass.new(name, path, spec)
+    f = klass.new(name, path, spec, :alias_path => alias_path)
     assert_equal name, f.name
     assert_equal path, f.path
+    assert_equal alias_path, f.alias_path
     assert_raises(ArgumentError) { klass.new }
   end
 
@@ -491,6 +493,31 @@ class FormulaTests < Homebrew::TestCase
     f3.rack.rmtree
   end
 
+  def test_eligible_kegs_for_cleanup_keg_pinned
+    f1 = Class.new(Testball) { version "0.1" }.new
+    f2 = Class.new(Testball) { version "0.2" }.new
+    f3 = Class.new(Testball) { version "0.3" }.new
+
+    shutup do
+      f1.brew { f1.install }
+      f1.pin
+      f2.brew { f2.install }
+      f3.brew { f3.install }
+    end
+
+    assert_equal HOMEBREW_LIBRARY.join("PinnedKegs/#{f1.name}").resolved_path, f1.prefix
+
+    assert_predicate f1, :installed?
+    assert_predicate f2, :installed?
+    assert_predicate f3, :installed?
+
+    assert_equal [Keg.new(f2.prefix)], shutup { f3.eligible_kegs_for_cleanup }
+  ensure
+    f1.unpin
+    [f1, f2, f3].each(&:clear_cache)
+    f3.rack.rmtree
+  end
+
   def test_eligible_kegs_for_cleanup_head_installed
     f = formula do
       version "0.1"
@@ -547,7 +574,7 @@ class FormulaTests < Homebrew::TestCase
       url "foo-1.0"
       pour_bottle? do
         reason "true reason"
-        satisfy { var == var }
+        satisfy { true }
       end
     end
     assert f_true.pour_bottle?
@@ -559,7 +586,10 @@ class OutdatedVersionsTests < Homebrew::TestCase
   attr_reader :f
 
   def setup
-    @f = formula { url "foo"; version "1.20" }
+    @f = formula do
+      url "foo"
+      version "1.20"
+    end
     @outdated_prefix = HOMEBREW_CELLAR/"#{f.name}/1.11"
     @same_prefix = HOMEBREW_CELLAR/"#{f.name}/1.20"
     @greater_prefix = HOMEBREW_CELLAR/"#{f.name}/1.21"

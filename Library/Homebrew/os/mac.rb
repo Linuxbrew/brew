@@ -42,6 +42,10 @@ module OS
       version.to_sym
     end
 
+    def language
+      @language ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").delete(" \n\"()").sub(/,.*/, "")
+    end
+
     # Locates a (working) copy of install_name_tool, guaranteed to function
     # whether the user has developer tools installed or not.
     def install_name_tool
@@ -201,7 +205,7 @@ module OS
       "7.3"   => { :clang => "7.3", :clang_build => 703 },
       "7.3.1" => { :clang => "7.3", :clang_build => 703 },
       "8.0"   => { :clang => "8.0", :clang_build => 800 },
-    }
+    }.freeze
 
     def compilers_standard?
       return true unless OS.mac?

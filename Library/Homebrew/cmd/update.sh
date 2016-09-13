@@ -17,10 +17,7 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 git() {
   if [[ -z "$GIT_EXECUTABLE" ]]
   then
-    GIT_EXECUTABLE_RELATIVE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
-    GIT_EXECUTABLE_BASE="$(basename "$GIT_EXECUTABLE_RELATIVE")"
-    GIT_EXECUTABLE_DIR="$(cd "$(dirname "$GIT_EXECUTABLE_RELATIVE")" && pwd)"
-    GIT_EXECUTABLE="$GIT_EXECUTABLE_DIR/$GIT_EXECUTABLE_BASE"
+    GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
   fi
   "$GIT_EXECUTABLE" "$@"
 }
@@ -162,7 +159,7 @@ reset_on_interrupt() {
     git reset --hard "$INITIAL_REVISION" "${QUIET_ARGS[@]}"
   fi
 
-  if [[ -n "$HOMEBREW_DEVELOPER" ]]
+  if [[ -n "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
   then
     pop_stash
   else
@@ -226,9 +223,18 @@ merge_or_rebase() {
     fi
     git merge --abort &>/dev/null
     git rebase --abort &>/dev/null
-    git -c "user.email=brew-update@localhost" \
-        -c "user.name=brew update" \
-        stash save --include-untracked "${QUIET_ARGS[@]}"
+    git reset --mixed "${QUIET_ARGS[@]}"
+    if ! git -c "user.email=brew-update@localhost" \
+             -c "user.name=brew update" \
+             stash save --include-untracked "${QUIET_ARGS[@]}"
+    then
+      odie <<EOS
+Could not `git stash` in $DIR!
+Please stash/commit manually if you need to keep your changes or, if not, run:
+  cd $DIR
+  git reset --hard origin/master
+EOS
+    fi
     git reset --hard "${QUIET_ARGS[@]}"
     STASHED="1"
   fi
@@ -236,6 +242,14 @@ merge_or_rebase() {
   INITIAL_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
   if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
+
+    if [[ -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
+    then
+      echo "Checking out $UPSTREAM_BRANCH in $DIR..."
+      echo "To checkout $INITIAL_BRANCH in $DIR run:"
+      echo "  'cd $DIR && git checkout $INITIAL_BRANCH"
+    fi
+
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
     # it to `origin/#{@upstream_branch}`. Otherwise, just check it out.
     if git merge-base --is-ancestor "$UPSTREAM_BRANCH" "origin/$UPSTREAM_BRANCH" &>/dev/null
@@ -272,7 +286,7 @@ merge_or_rebase() {
 
   trap '' SIGINT
 
-  if [[ -n "$HOMEBREW_DEVELOPER" ]]
+  if [[ -n "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
   then
     if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
     then
@@ -321,18 +335,27 @@ EOS
     set -x
   fi
 
+  if [[ -z "$HOMEBREW_UPDATE_CLEANUP" ]]
+  then
+    if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
+    then
+      export HOMEBREW_NO_UPDATE_CLEANUP="1"
+    fi
+  fi
+
   if [[ -z "$HOMEBREW_AUTO_UPDATE_SECS" ]]
   then
     HOMEBREW_AUTO_UPDATE_SECS="60"
   fi
 
   # check permissions
-  if [[ "$HOMEBREW_PREFIX" = "/usr/local" && ! -w /usr/local ]]
+  if [[ -e "$HOMEBREW_CELLAR" && ! -w "$HOMEBREW_CELLAR" ]]
   then
     odie <<EOS
-/usr/local is not writable. You should change the ownership
-and permissions of /usr/local back to your user account:
-  sudo chown -R \$(whoami) /usr/local
+$HOMEBREW_CELLAR is not writable. You should change the
+ownership and permissions of $HOMEBREW_CELLAR back to your
+user account:
+  sudo chown -R \$(whoami) $HOMEBREW_CELLAR
 EOS
   fi
 

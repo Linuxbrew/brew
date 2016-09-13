@@ -32,7 +32,7 @@ It is impossible for the Homebrew developers to match any particular event to an
 
 ![Aggregate user analytics](images/analytics.png)
 
-As far as we can tell it would be impossible Google to match the randomly generated Homebrew-only analytics user ID to any other Google Analytics user ID. If Google turned evil the only thing they could do would be to lie about anonymising IP addresses and attempt to match users based on IP addresses.
+As far as we can tell it would be impossible for Google to match the randomly generated Homebrew-only analytics user ID to any other Google Analytics user ID. If Google turned evil the only thing they could do would be to lie about anonymising IP addresses and attempt to match users based on IP addresses.
 
 ## When/Where?
 Homebrew's analytics are sent throughout Homebrew's execution to Google Analytics over HTTPS.

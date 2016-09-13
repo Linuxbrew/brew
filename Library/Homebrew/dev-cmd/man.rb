@@ -1,3 +1,6 @@
+#:  * `man`:
+#:    Generate Homebrew's manpages.
+
 require "formula"
 require "erb"
 require "ostruct"
@@ -30,25 +33,29 @@ module Homebrew
     convert_man_page(cask_markup, TARGET_MAN_PATH/"brew-cask.1")
   end
 
+  def path_glob_commands(glob)
+    Pathname.glob(glob)
+            .sort_by { |source_file| sort_key_for_path(source_file) }
+            .map do |source_file|
+      source_file.read.lines
+                 .grep(/^#:/)
+                 .map { |line| line.slice(2..-1) }
+                 .join
+    end
+            .reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
+  end
+
   def build_man_page
     template = (SOURCE_PATH/"brew.1.md.erb").read
     variables = OpenStruct.new
 
-    variables[:commands] = Pathname.glob("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}").
-      sort_by { |source_file| sort_key_for_path(source_file) }.
-      map { |source_file|
-        source_file.read.lines.
-          grep(/^#:/).
-          map { |line| line.slice(2..-1) }.
-          join
-      }.
-      reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
+    variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
+    variables[:developer_commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
+    variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md")
+                              .read[/Homebrew's current maintainers are (.*)\./, 1]
+                              .scan(/\[([^\]]*)\]/).flatten
 
-    variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md").
-      read[/Homebrew's current maintainers are (.*)\./, 1].
-      scan(/\[([^\]]*)\]/).flatten
-
-    ERB.new(template, nil, ">").result(variables.instance_eval{ binding })
+    ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end
 
   def sort_key_for_path(path)

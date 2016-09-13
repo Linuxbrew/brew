@@ -99,7 +99,7 @@ class IntegrationCommandTests < Homebrew::TestCase
   def cmd(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    puts "\n#{output}" if status != 0
+    puts "\n#{output}" if status.nonzero?
     assert_equal 0, status
     output
   end
@@ -107,7 +107,7 @@ class IntegrationCommandTests < Homebrew::TestCase
   def cmd_fail(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    $stderr.puts "\n#{output}" if status == 0
+    $stderr.puts "\n#{output}" if status.zero?
     refute_equal 0, status
     output
   end
@@ -227,6 +227,26 @@ class IntegrationCommandTests < Homebrew::TestCase
                  cmd("--env"))
   end
 
+  def test_env_bash
+    assert_match(/export CMAKE_PREFIX_PATH="#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"/,
+                 cmd("--env", "--shell=bash"))
+  end
+
+  def test_env_fish
+    assert_match(/set [-]gx CMAKE_PREFIX_PATH "#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"/,
+                 cmd("--env", "--shell=fish"))
+  end
+
+  def test_env_csh
+    assert_match(/setenv CMAKE_PREFIX_PATH #{Regexp.quote(HOMEBREW_PREFIX.to_s)};/,
+                 cmd("--env", "--shell=tcsh"))
+  end
+
+  def test_env_plain
+    assert_match(/CMAKE_PREFIX_PATH: #{Regexp.quote(HOMEBREW_PREFIX)}/,
+                 cmd("--env", "--plain"))
+  end
+
   def test_prefix_formula
     assert_match "#{HOMEBREW_CELLAR}/testball",
                  cmd("--prefix", testball)
@@ -253,10 +273,8 @@ class IntegrationCommandTests < Homebrew::TestCase
                  cmd("help", "cat")) # Internal command (documented, Ruby).
     assert_match(/^brew update /,
                  cmd("help", "update")) # Internal command (documented, Shell).
-    if ARGV.homebrew_developer?
-      assert_match "Example usage:\n",
-                   cmd("help", "test-bot") # Internal developer command (undocumented).
-    end
+    assert_match(/^brew test-bot /,
+                 cmd("help", "test-bot")) # Internal developer command (documented, Ruby).
   end
 
   def test_config
@@ -509,6 +527,18 @@ class IntegrationCommandTests < Homebrew::TestCase
     assert_match "Reinstalling testball with --with-foo",
       cmd("reinstall", "testball")
     assert foo_dir.exist?
+  end
+
+  def test_reinstall_pinned
+    setup_test_formula "testball"
+
+    HOMEBREW_CELLAR.join("testball/0.1").mkpath
+    HOMEBREW_LIBRARY.join("PinnedKegs").mkpath
+    FileUtils.ln_s HOMEBREW_CELLAR.join("testball/0.1"), HOMEBREW_LIBRARY.join("PinnedKegs/testball")
+
+    assert_match "testball is pinned. You must unpin it to reinstall.", cmd("reinstall", "testball")
+
+    HOMEBREW_LIBRARY.join("PinnedKegs").rmtree
   end
 
   def test_home
@@ -773,7 +803,7 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
 
     assert_match "Testing URLs require `--bottle`!",
-      cmd_fail("pull", "http://bot.brew.sh/job/Homebrew\%20Testing/1028/")
+      cmd_fail("pull", "https://bot.brew.sh/job/Homebrew\%20Testing/1028/")
     assert_match "Current branch is new-branch",
       cmd_fail("pull", "1")
     assert_match "No changed formulae found to bump",

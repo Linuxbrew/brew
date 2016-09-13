@@ -1,4 +1,4 @@
-HOMEBREW_HELP = <<-EOS
+HOMEBREW_HELP = <<-EOS.freeze
 Example usage:
   brew search [TEXT|/REGEX/]
   brew (info|home|options) [FORMULA...]
@@ -13,7 +13,7 @@ Troubleshooting:
   brew doctor
   brew install -vd FORMULA
 
-Brewing:
+Developers:
   brew create [URL [--no-fetch]]
   brew edit [FORMULA...]
   https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Formula-Cookbook.md
@@ -31,12 +31,14 @@ EOS
 # NOTE Keep lines less than 80 characters! Wrapping is just not cricket.
 # NOTE The reason the string is at the top is so 25 lines is easy to measure!
 
+require "commands"
+
 module Homebrew
   def help(cmd = nil, flags = {})
     # Resolve command aliases and find file containing the implementation.
     if cmd
       cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
-      path = command_path(cmd)
+      path = Commands.path(cmd)
     end
 
     # Display command-specific (or generic) help in response to `UsageError`.
@@ -69,18 +71,6 @@ module Homebrew
 
   private
 
-  def command_path(cmd)
-    if File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh")
-      HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.sh"
-    elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh")
-      HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.sh"
-    elsif File.exist?(HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.rb")
-      HOMEBREW_LIBRARY_PATH/"cmd/#{cmd}.rb"
-    elsif ARGV.homebrew_developer? && File.exist?(HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb")
-      HOMEBREW_LIBRARY_PATH/"dev-cmd/#{cmd}.rb"
-    end
-  end
-
   def command_help(path)
     help_lines = path.read.lines.grep(/^#:/)
     if help_lines.empty?
@@ -88,11 +78,11 @@ module Homebrew
       HOMEBREW_HELP
     else
       help_lines.map do |line|
-        line.slice(2..-1).
-          sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ").
-          gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}").
-          gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}").
-          gsub("@hide_from_man_page", "")
+        line.slice(2..-1)
+            .sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ")
+            .gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}")
+            .gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}")
+            .gsub("@hide_from_man_page", "")
       end.join.strip
     end
   end

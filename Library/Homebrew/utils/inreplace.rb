@@ -1,9 +1,9 @@
 module Utils
   class InreplaceError < RuntimeError
     def initialize(errors)
-      super errors.inject("inreplace failed\n") { |s, (path, errs)|
+      super errors.inject("inreplace failed\n") do |s, (path, errs)|
         s << "#{path}:\n" << errs.map { |e| "  #{e}\n" }.join
-      }
+      end
     end
   end
 
@@ -24,7 +24,7 @@ module Utils
         if before.nil? && after.nil?
           yield s
         else
-          after = after.to_s if Symbol === after
+          after = after.to_s if after.is_a? Symbol
           s.gsub!(before, after, audit_result)
         end
 
@@ -33,7 +33,7 @@ module Utils
         Pathname(path).atomic_write(s)
       end
 
-      raise InreplaceError.new(errors) unless errors.empty?
+      raise InreplaceError, errors unless errors.empty?
     end
     module_function :inreplace
   end

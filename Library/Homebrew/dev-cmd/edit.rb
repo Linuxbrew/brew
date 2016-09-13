@@ -44,7 +44,9 @@ module Homebrew
 
   def library_folders
     Dir["#{HOMEBREW_LIBRARY}/*"].reject do |d|
-      case File.basename(d) when "LinkedKegs", "Aliases" then true end
+      case File.basename(d)
+      when "LinkedKegs", "Aliases" then true
+      end
     end
   end
 end

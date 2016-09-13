@@ -72,7 +72,7 @@ module Homebrew
       fa.audit
 
       next if fa.problems.empty?
-
+      fa.problems
       formula_count += 1
       problem_count += fa.problems.size
       problem_lines = fa.problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
@@ -101,29 +101,34 @@ class FormulaText
     @text.split("\n__END__").first
   end
 
-  def has_DATA?
+  def data?
     /^[^#]*\bDATA\b/ =~ @text
   end
 
-  def has_END?
+  def end?
     /^__END__$/ =~ @text
   end
 
-  def has_trailing_newline?
+  def trailing_newline?
     /\Z\n/ =~ @text
   end
 
-  def =~(regex)
-    regex =~ @text
+  def =~(other)
+    other =~ @text
   end
 
   def include?(s)
     @text.include? s
   end
 
-  def line_number(regex)
-    index = @lines.index { |line| line =~ regex }
+  def line_number(regex, skip = 0)
+    index = @lines.drop(skip).index { |line| line =~ regex }
     index ? index + 1 : nil
+  end
+
+  def reverse_line_number(regex)
+    index = @lines.reverse.index { |line| line =~ regex }
+    index ? @lines.count - index : nil
   end
 end
 
@@ -147,15 +152,15 @@ class FormulaAuditor
     smake
     sphinx-doc
     swig
-  ]
+  ].freeze
 
   FILEUTILS_METHODS = FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
 
   def initialize(formula, options = {})
     @formula = formula
-    @new_formula = !!options[:new_formula]
-    @strict = !!options[:strict]
-    @online = !!options[:online]
+    @new_formula = options[:new_formula]
+    @strict = options[:strict]
+    @online = options[:online]
     # Accept precomputed style offense results, for efficiency
     @style_offenses = options[:style_offenses]
     @problems = []
@@ -171,35 +176,14 @@ class FormulaAuditor
     end
   end
 
-  def audit_file
-    # Under normal circumstances (umask 0022), we expect a file mode of 644. If
-    # the user's umask is more restrictive, respect that by masking out the
-    # corresponding bits. (The also included 0100000 flag means regular file.)
-    wanted_mode = 0100644 & ~File.umask
-    actual_mode = formula.path.stat.mode
-    unless actual_mode == wanted_mode
-      problem format("Incorrect file permissions (%03o): chmod %03o %s",
-                     actual_mode & 0777, wanted_mode & 0777, formula.path)
-    end
+  def component_problem(before, after, offset = 0)
+    problem "`#{before[1]}` (line #{before[0] + offset}) should be put before `#{after[1]}` (line #{after[0] + offset})"
+  end
 
-    if text.has_DATA? && !text.has_END?
-      problem "'DATA' was found, but no '__END__'"
-    end
-
-    if text.has_END? && !text.has_DATA?
-      problem "'__END__' was found, but 'DATA' is not used"
-    end
-
-    if text =~ /inreplace [^\n]* do [^\n]*\n[^\n]*\.gsub![^\n]*\n\ *end/m
-      problem "'inreplace ... do' was used for a single substitution (use the non-block form instead)."
-    end
-
-    unless text.has_trailing_newline?
-      problem "File should end with a newline"
-    end
-
-    return unless @strict
-
+  # scan in the reverse direction for remaining problems but report problems
+  # in the forward direction so that contributors don't reverse the order of
+  # lines in the file simply by following instructions
+  def audit_components(reverse = true, previous_pair = nil)
     component_list = [
       [/^  include Language::/,            "include directive"],
       [/^  desc ["'][\S\ ]+["']/,          "desc"],
@@ -226,17 +210,67 @@ class FormulaAuditor
       [/^  (plist_options|def plist)/,     "plist block"],
       [/^  test do/,                       "test block"],
     ]
-
+    if previous_pair
+      previous_before = previous_pair[0]
+      previous_after = previous_pair[1]
+    end
+    offset = previous_after && previous_after[0] && previous_after[0] >= 1 ? previous_after[0] - 1 : 0
     present = component_list.map do |regex, name|
-      lineno = text.line_number regex
+      lineno = if reverse
+        text.reverse_line_number regex
+      else
+        text.line_number regex, offset
+      end
       next unless lineno
       [lineno, name]
     end.compact
+    no_problem = true
     present.each_cons(2) do |c1, c2|
-      unless c1[0] < c2[0]
-        problem "`#{c1[1]}` (line #{c1[0]}) should be put before `#{c2[1]}` (line #{c2[0]})"
+      if reverse
+        # scan in the forward direction from the offset
+        audit_components(false, [c1, c2]) if c1[0] > c2[0] # at least one more offense
+      elsif c1[0] > c2[0] && (offset.zero? || previous_pair.nil? || (c1[0] + offset) != previous_before[0] || (c2[0] + offset) != previous_after[0])
+        component_problem c1, c2, offset
+        no_problem = false
       end
     end
+    if no_problem && previous_pair
+      component_problem previous_before, previous_after
+    end
+    present
+  end
+
+  def audit_file
+    # Under normal circumstances (umask 0022), we expect a file mode of 644. If
+    # the user's umask is more restrictive, respect that by masking out the
+    # corresponding bits. (The also included 0100000 flag means regular file.)
+    wanted_mode = 0100644 & ~File.umask
+    actual_mode = formula.path.stat.mode
+    unless actual_mode == wanted_mode
+      problem format("Incorrect file permissions (%03o): chmod %03o %s",
+                     actual_mode & 0777, wanted_mode & 0777, formula.path)
+    end
+
+    if text.data? && !text.end?
+      problem "'DATA' was found, but no '__END__'"
+    end
+
+    if text.end? && !text.data?
+      problem "'__END__' was found, but 'DATA' is not used"
+    end
+
+    if text =~ /inreplace [^\n]* do [^\n]*\n[^\n]*\.gsub![^\n]*\n\ *end/m
+      problem "'inreplace ... do' was used for a single substitution (use the non-block form instead)."
+    end
+
+    unless text.trailing_newline?
+      problem "File should end with a newline"
+    end
+
+    return unless @strict
+
+    present = audit_components
+
     present.map!(&:last)
     if present.include?("stable block")
       %w[url checksum mirror].each do |component|
@@ -294,13 +328,13 @@ class FormulaAuditor
       return
     end
 
-    @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names).
-      reduce(Hash.new) do |name_map, tap_formula_full_name|
-        tap_formula_name = tap_formula_full_name.split("/").last
-        name_map[tap_formula_name] ||= []
-        name_map[tap_formula_name] << tap_formula_full_name
-        name_map
-      end
+    @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names)
+                                          .each_with_object({}) do |tap_formula_full_name, name_map|
+      tap_formula_name = tap_formula_full_name.split("/").last
+      name_map[tap_formula_name] ||= []
+      name_map[tap_formula_name] << tap_formula_full_name
+      name_map
+    end
 
     same_name_tap_formulae = @@local_official_taps_name_map[name] || []
 
@@ -362,14 +396,6 @@ class FormulaAuditor
         end
 
         case dep.name
-        when *BUILD_TIME_DEPS
-          next if dep.build? || dep.run?
-          problem <<-EOS.undent
-            #{dep} dependency should be
-              depends_on "#{dep}" => :build
-            Or if it is indeed a runtime dependency
-              depends_on "#{dep}" => :run
-          EOS
         when "git"
           problem "Don't use git as a dependency"
         when "mercurial"
@@ -385,6 +411,9 @@ class FormulaAuditor
             where "1.8" is the minimum version of Ruby required.
           EOS
         when "open-mpi", "mpich"
+          problem <<-EOS.undent
+        when *BUILD_TIME_DEPS
+          next if dep.build? || dep.run?
           problem <<-EOS.undent
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
               depends_on :mpi => [<lang list>]
@@ -418,10 +447,9 @@ class FormulaAuditor
         problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
       end
 
-      if o.name =~ /^with(out)?-(?:checks?|tests)$/
-        unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
-          problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
-        end
+      next unless o.name =~ /^with(out)?-(?:checks?|tests)$/
+      unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
+        problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
       end
     end
   end
@@ -633,15 +661,14 @@ class FormulaAuditor
 
     attributes.each do |attribute|
       attributes_for_version = attributes_map[attribute][formula.version]
-      if !attributes_for_version.empty?
-        if formula.send(attribute) < attributes_for_version.max
-          problem "#{attribute} should not decrease"
-        end
+      next if attributes_for_version.empty?
+      if formula.send(attribute) < attributes_for_version.max
+        problem "#{attribute} should not decrease"
       end
     end
 
     revision_map = attributes_map[:revision]
-    if formula.revision != 0
+    if formula.revision.nonzero?
       if formula.stable
         if revision_map[formula.stable.version].empty? # check stable spec
           problem "'revision #{formula.revision}' should be removed"
@@ -738,7 +765,7 @@ class FormulaAuditor
 
     # FileUtils is included in Formula
     # encfs modifies a file with this name, so check for some leading characters
-    if line =~ /[^'"\/]FileUtils\.(\w+)/
+    if line =~ %r{[^'"/]FileUtils\.(\w+)}
       problem "Don't need 'FileUtils.' before #{$1}."
     end
 
@@ -1004,7 +1031,7 @@ class FormulaAuditor
   end
 
   def quote_dep(dep)
-    Symbol === dep ? dep.inspect : "'#{dep}'"
+    dep.is_a?(Symbol) ? dep.inspect : "'#{dep}'"
   end
 
   def audit_check_output(output)
@@ -1192,6 +1219,7 @@ class ResourceAuditor
            %r{^http://tools\.ietf\.org/},
            %r{^http://launchpad\.net/},
            %r{^http://bitbucket\.org/},
+           %r{^http://anonscm\.debian\.org/},
            %r{^http://cpan\.metacpan\.org/},
            %r{^http://hackage\.haskell\.org/},
            %r{^http://(?:[^/]*\.)?archive\.org},
@@ -1202,6 +1230,8 @@ class ResourceAuditor
         problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"
       when %r{^(http|ftp)://ftp\.gnome\.org/pub/gnome/(.*)}i
         problem "#{p} should be `https://download.gnome.org/#{$2}`"
+      when %r{^git://anonscm\.debian\.org/users/(.*)}i
+        problem "#{p} should be `https://anonscm.debian.org/git/users/#{$1}`"
       end
     end
 
@@ -1248,6 +1278,17 @@ class ResourceAuditor
       if p.start_with? "http://downloads"
         problem "Please use https:// for #{p}"
       end
+    end
+
+    # Debian has an abundance of secure mirrors. Let's not pluck the insecure
+    # one out of the grab bag.
+    urls.each do |u|
+      next unless u =~ %r{^http://http\.debian\.net/debian/(.*)}i
+      problem <<-EOS.undent
+        Please use a secure mirror for Debian URLs.
+        We recommend:
+          https://mirrors.ocf.berkeley.edu/debian/#{$1}
+      EOS
     end
 
     # Check for Google Code download urls, https:// is preferred

@@ -3,7 +3,7 @@ class RubyRequirement < Requirement
   default_formula "ruby"
 
   def initialize(tags)
-    @version = tags.shift if /(\d\.)+\d/ === tags.first
+    @version = tags.shift if /(\d\.)+\d/ =~ tags.first
     raise "RubyRequirement requires a version!" unless @version
     super
   end

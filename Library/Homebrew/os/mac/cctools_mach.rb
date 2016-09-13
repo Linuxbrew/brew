@@ -86,7 +86,7 @@ module CctoolsMachO
       id = libs.shift[OTOOL_RX, 1] if path.dylib?
       libs.map! { |lib| lib[OTOOL_RX, 1] }.compact!
 
-      return id, libs
+      [id, libs]
     end
   end
 

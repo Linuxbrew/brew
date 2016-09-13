@@ -1,3 +1,6 @@
+#:  * `tap_readme` [`-v`] <name>:
+#:    Generate the README.md file for a new tap.
+
 module Homebrew
   def tap_readme
     name = ARGV.first

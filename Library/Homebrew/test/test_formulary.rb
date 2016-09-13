@@ -10,6 +10,7 @@ class FormularyTest < Homebrew::TestCase
     assert_equal "SLang", Formulary.class_s("s-lang")
     assert_equal "PkgConfig", Formulary.class_s("pkg-config")
     assert_equal "FooBar", Formulary.class_s("foo_bar")
+    assert_equal "OpensslAT11", Formulary.class_s("openssl@1.1")
   end
 end
 
@@ -84,8 +85,11 @@ class FormularyFactoryTest < Homebrew::TestCase
   def test_factory_from_alias
     alias_dir = CoreTap.instance.alias_dir
     alias_dir.mkpath
-    FileUtils.ln_s @path, alias_dir/"foo"
-    assert_kind_of Formula, Formulary.factory("foo")
+    alias_path = alias_dir/"foo"
+    FileUtils.ln_s @path, alias_path
+    result = Formulary.factory("foo")
+    assert_kind_of Formula, result
+    assert_equal alias_path, result.alias_path
   ensure
     alias_dir.rmtree
   end

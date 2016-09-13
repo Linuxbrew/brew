@@ -54,6 +54,11 @@ class Caveats
         EOS
       s << "    LDFLAGS:  -L#{f.opt_lib}\n" if f.lib.directory?
       s << "    CPPFLAGS: -I#{f.opt_include}\n" if f.include.directory?
+
+      if which("pkg-config")
+        s << "    PKG_CONFIG_PATH: #{f.opt_lib}/pkgconfig\n" if (f.lib/"pkgconfig").directory?
+        s << "    PKG_CONFIG_PATH: #{f.opt_share}/pkgconfig\n" if (f.share/"pkgconfig").directory?
+      end
     end
     s << "\n"
   end

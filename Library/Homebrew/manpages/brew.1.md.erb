@@ -50,6 +50,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 <%= commands.join("\n") %>
 
+## DEVELOPER COMMANDS
+
+<%= developer_commands.join("\n") %>
+
 ## EXTERNAL COMMANDS
 
 Homebrew, like `git`(1), supports external commands. These are executable
@@ -182,8 +186,8 @@ can take several different forms:
     If set, Homebrew will not send analytics. See: <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics>
 
   * `HOMEBREW_NO_AUTO_UPDATE`:
-    If set, Homebrew will not auto-update before running `brew install` and
-    `brew upgrade`.
+    If set, Homebrew will not auto-update before running `brew install`,
+    `brew upgrade` or `brew tap`.
 
   * `HOMEBREW_NO_EMOJI`:
     If set, Homebrew will not print the `HOMEBREW_INSTALL_BADGE` on a

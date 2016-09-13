@@ -147,11 +147,21 @@ class FormulaInstaller
     raise FormulaInstallationAlreadyAttemptedError, formula if @@attempted.include?(formula)
 
     unless skip_deps_check?
-      unlinked_deps = formula.recursive_dependencies.map(&:to_formula).select do |dep|
+      recursive_deps = formula.recursive_dependencies
+      unlinked_deps = recursive_deps.map(&:to_formula).select do |dep|
         dep.installed? && !dep.keg_only? && !dep.linked_keg.directory?
       end
       raise CannotInstallFormulaError,
         "You must `brew link #{unlinked_deps*" "}` before #{formula.full_name} can be installed" unless unlinked_deps.empty?
+
+      pinned_unsatisfied_deps = recursive_deps.select do |dep|
+        dep.to_formula.pinned? && !dep.satisfied?(inherited_options_for(dep))
+      end
+
+      unless pinned_unsatisfied_deps.empty?
+        raise CannotInstallFormulaError,
+          "You must `brew unpin #{pinned_unsatisfied_deps*" "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
+      end
     end
   end
 
@@ -220,7 +230,8 @@ class FormulaInstaller
 
     @@attempted << formula
 
-    if pour_bottle?(:warn => true)
+    pour_bottle = pour_bottle?(:warn => true)
+    if pour_bottle
       begin
         install_relocation_tools unless formula.bottle_specification.skip_relocation?
         pour
@@ -243,7 +254,10 @@ class FormulaInstaller
     build_bottle_preinstall if build_bottle?
 
     unless @poured_bottle
-      compute_and_install_dependencies if @pour_failed && !ignore_deps?
+      not_pouring = !pour_bottle || @pour_failed
+      if not_pouring && !ignore_deps?
+        compute_and_install_dependencies
+      end
       build
       clean
     end
@@ -624,7 +638,7 @@ class FormulaInstaller
       -I #{HOMEBREW_LOAD_PATH}
       --
       #{HOMEBREW_LIBRARY_PATH}/build.rb
-      #{formula.path}
+      #{formula.specified_path}
     ].concat(build_argv)
 
     Sandbox.print_sandbox_message if Sandbox.formula?(formula)

@@ -1,4 +1,4 @@
-#:  * `deps` [`--1`] [`-n`] [`--union`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] <formulae>:
+#:  * `deps` [`--1`] [`-n`] [`--union`] [`--full-name`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] <formulae>:
 #:    Show dependencies for <formulae>. When given multiple formula arguments,
 #:    show the intersection of dependencies for <formulae>.
 #:
@@ -9,6 +9,8 @@
 #:
 #:    If `--union` is passed, show the union of dependencies for <formulae>,
 #:    instead of the intersection.
+#:
+#:    If `--full-name` is passed, list dependencies by their full name.
 #:
 #:    If `--installed` is passed, only list those dependencies that are
 #:    currently installed.
@@ -62,7 +64,11 @@ module Homebrew
     else
       all_deps = deps_for_formulae(ARGV.formulae, !ARGV.one?, &(mode.union? ? :| : :&))
       all_deps = all_deps.select(&:installed?) if mode.installed?
-      all_deps = all_deps.map(&:name).uniq
+      all_deps = if ARGV.include? "--full-name"
+        all_deps.map(&:to_formula).map(&:full_name)
+      else
+        all_deps.map(&:name)
+      end.uniq
       all_deps.sort! unless mode.topo_order?
       puts all_deps
     end

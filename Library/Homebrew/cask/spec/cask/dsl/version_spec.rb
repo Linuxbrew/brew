@@ -10,30 +10,30 @@ describe Hbc::DSL::Version do
 
     context "when other is nil" do
       let(:other) { nil }
-      it { should == false }
+      it { is_expected.to be false }
     end
 
     context "when other is a String" do
       context "when other == self.raw_version" do
         let(:other) { "1.2.3" }
-        it { should == true }
+        it { is_expected.to be true }
       end
 
       context "when other != self.raw_version" do
         let(:other) { "1.2.3.4" }
-        it { should == false }
+        it { is_expected.to be false }
       end
     end
 
     context "when other is a #{described_class}" do
       context "when other.raw_version == self.raw_version" do
         let(:other) { described_class.new("1.2.3") }
-        it { should == true }
+        it { is_expected.to be true }
       end
 
       context "when other.raw_version != self.raw_version" do
         let(:other) { described_class.new("1.2.3.4") }
-        it { should == false }
+        it { is_expected.to be false }
       end
     end
   end

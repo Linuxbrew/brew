@@ -11,6 +11,7 @@
   "poured_from_bottle": true,
   "time": 1403827774,
   "HEAD": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+  "alias_path": "/usr/local/Library/Taps/homebrew/homebrew-core/Aliases/test-formula",
   "stdlib": "libcxx",
   "compiler": "clang",
   "source": {

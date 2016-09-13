@@ -3,7 +3,7 @@ module ExpectationsHashHelper
     expectations.each do |input_value, expected_output|
       context "when #{input_name} is #{input_value.inspect}" do
         let(input_name.to_sym) { input_value }
-        it { should == expected_output }
+        it { is_expected.to eq expected_output }
       end
     end
   end

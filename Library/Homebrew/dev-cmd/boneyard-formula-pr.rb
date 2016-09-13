@@ -1,10 +1,10 @@
-# Creates a pull request to boneyard a formula.
-#
-# Usage: brew boneyard-formula-pr [options...] <formula-name>
-#
-# Options:
-#   --dry-run:  Print what would be done rather than doing it.
-#   --local:    Perform only local operations (don't push and don't create PR).
+#: @hide_from_man_page
+#:  * `boneyard-formula-pr` [`--dry-run`] [`--local`]  <formula-name>:
+#:    Creates a pull request to boneyard a formula.
+#:
+#:    If `--dry-run` is passed, print what would be done rather than doing it.
+#:
+#:    If `--local` is passed, perform only local operations (i.e. don't push or create PR).
 
 require "formula"
 require "utils/json"

@@ -1,3 +1,9 @@
+#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`]:
+#:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
+#:
+#:    Generate a bottle (binary package) from a formula installed with
+#:    `--build-bottle`.
+
 require "formula"
 require "utils/bottles"
 require "tab"
@@ -7,7 +13,7 @@ require "utils/inreplace"
 require "erb"
 require "extend/pathname"
 
-BOTTLE_ERB = <<-EOS
+BOTTLE_ERB = <<-EOS.freeze
   bottle do
     <% if !root_url.start_with?(BottleSpecification::DEFAULT_DOMAIN) %>
     root_url "<%= root_url %>"
@@ -83,15 +89,14 @@ module Homebrew
         end
       end
 
-      if ARGV.verbose? && !text_matches.empty?
-        print_filename string, file
-        text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
-          puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.em}0x#{offset}#{Tty.reset}"
-        end
+      next unless ARGV.verbose? && !text_matches.empty?
+      print_filename string, file
+      text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
+        puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.em}0x#{offset}#{Tty.reset}"
+      end
 
-        if text_matches.size > MAXIMUM_STRING_MATCHES
-          puts "Only the first #{MAXIMUM_STRING_MATCHES} matches were output"
-        end
+      if text_matches.size > MAXIMUM_STRING_MATCHES
+        puts "Only the first #{MAXIMUM_STRING_MATCHES} matches were output"
       end
     end
 
@@ -101,10 +106,9 @@ module Homebrew
   def keg_contain_absolute_symlink_starting_with?(string, keg)
     absolute_symlinks_start_with_string = []
     keg.find do |pn|
-      if pn.symlink? && (link = pn.readlink).absolute?
-        if link.to_s.start_with?(string)
-          absolute_symlinks_start_with_string << pn
-        end
+      next unless pn.symlink? && (link = pn.readlink).absolute?
+      if link.to_s.start_with?(string)
+        absolute_symlinks_start_with_string << pn
       end
     end
 
@@ -140,7 +144,7 @@ module Homebrew
       return
     end
 
-    unless Utils::Bottles::built_as? f
+    unless Utils::Bottles.built_as? f
       return ofail "Formula not installed with '--build-bottle': #{f.full_name}"
     end
 
@@ -266,6 +270,7 @@ module Homebrew
     root_url ||= ARGV.value("root_url")
 
     bottle = BottleSpecification.new
+    bottle.tap = f.tap
     bottle.root_url(root_url) if root_url
     if relocatable
       if skip_relocation
@@ -283,21 +288,29 @@ module Homebrew
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
-      bad_fields = [:root_url, :prefix, :cellar, :rebuild].select do |field|
-        old_spec.send(field) != bottle.send(field)
+      mismatches = [:root_url, :prefix, :cellar, :rebuild].select do |key|
+        old_spec.send(key) != bottle.send(key)
       end
-      bad_fields.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
+      mismatches.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       bottle.cellar :any if OS.linux? && old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
-      unless bad_fields.empty?
+      unless mismatches.empty?
         if bottle.prefix == "/home/linuxbrew/.linuxbrew"
           bottle.cellar old_spec.cellar
           bottle.prefix old_spec.prefix
-          opoo "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
+          opoo "--keep-old is passed but there are changes in: #{mismatches.join ", "}"
         else
           bottle_path.unlink if bottle_path.exist?
-          p bottle.prefix, bottle.cellar
-          odie "--keep-old is passed but there are changes in: #{bad_fields.join ", "}"
+
+        mismatches.map! do |key|
+          old_value = old_spec.send(key).inspect
+          value = bottle.send(key).inspect
+          "#{key}: old: #{old_value}, new: #{value}"
         end
+
+        odie <<-EOS.undent
+          --keep-old was passed but there are changes in:
+          #{mismatches.join("\n")}
+        EOS
       end
     end
 
@@ -323,7 +336,7 @@ module Homebrew
                 "filename" => filename.to_s,
                 "sha256" => sha256,
               },
-            }
+            },
           },
           "bintray" => {
             "package" => Utils::Bottles::Bintray.package(f.name),
@@ -363,7 +376,7 @@ module Homebrew
       output = bottle_output bottle
 
       if write
-        path = Pathname.new("#{HOMEBREW_REPOSITORY/bottle_hash["formula"]["path"]}")
+        path = Pathname.new((HOMEBREW_REPOSITORY/bottle_hash["formula"]["path"]).to_s)
         update_or_add = nil
 
         Utils::Inreplace.inreplace(path) do |s|
@@ -375,27 +388,36 @@ module Homebrew
               bottle_block_contents.lines.each do |line|
                 line = line.strip
                 next if line.empty?
-                key, value, _, tag = line.split " ", 4
+                key, old_value_original, _, tag = line.split " ", 4
                 valid_key = %w[root_url prefix cellar rebuild sha1 sha256].include? key
                 next unless valid_key
 
-                value = value.to_s.delete ":'\""
+                old_value = old_value_original.to_s.delete ":'\""
                 tag = tag.to_s.delete ":"
 
-                if !tag.empty?
+                unless tag.empty?
                   if !bottle_hash["bottle"]["tags"][tag].to_s.empty?
                     mismatches << "#{key} => #{tag}"
                   else
-                    bottle.send(key, value => tag.to_sym)
+                    bottle.send(key, old_value => tag.to_sym)
                   end
                   next
                 end
 
-                old_value = bottle_hash["bottle"][key].to_s
+                value_original = bottle_hash["bottle"][key]
+                value = value_original.to_s
                 next if key == "cellar" && old_value == "any" && value == "any_skip_relocation"
-                mismatches << key if old_value.empty? || value != old_value
+                next unless old_value.empty? || value != old_value
+                old_value = old_value_original.inspect
+                value = value_original.inspect
+                mismatches << "#{key}: old: #{old_value}, new: #{value}"
               end
+
               unless mismatches.empty?
+                odie <<-EOS.undent
+                  --keep-old was passed but there are changes in:
+                  #{mismatches.join("\n")}
+                EOS
                 odie "--keep-old was passed but there were changes in #{mismatches.join(", ")}!"
               end
               output = bottle_output bottle
@@ -425,7 +447,8 @@ module Homebrew
                     rebuild\ \d+                                                 # rebuild with a number
                   )\n+                                                           # multiple empty lines
                  )+
-               /mx, '\0' + output + "\n")
+               /mx, '\0' + output + "\n"
+              )
             end
             odie "Bottle block addition failed!" unless string
           end

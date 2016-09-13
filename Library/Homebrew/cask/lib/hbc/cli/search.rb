@@ -16,12 +16,11 @@ class Hbc::CLI::Search < Hbc::CLI::Base
     partial_matches = []
     search_term = arguments.join(" ")
     search_regexp = extract_regexp arguments.first
+    all_tokens = Hbc::CLI.nice_listing(Hbc.all_tokens)
     if search_regexp
       search_term = arguments.first
-      partial_matches = Hbc::CLI.nice_listing(Hbc.all_tokens).grep(%r{#{search_regexp}}i)
+      partial_matches = all_tokens.grep(%r{#{search_regexp}}i)
     else
-      # suppressing search of the font Tap is a quick hack until behavior can be made configurable
-      all_tokens = Hbc::CLI.nice_listing Hbc.all_tokens.reject { |t| %r{^caskroom/homebrew-fonts/}.match(t) }
       simplified_tokens = all_tokens.map { |t| t.sub(%r{^.*\/}, "").gsub(%r{[^a-z0-9]+}i, "") }
       simplified_search_term = search_term.sub(%r{\.rb$}i, "").gsub(%r{[^a-z0-9]+}i, "")
       exact_match = simplified_tokens.grep(%r{^#{simplified_search_term}$}i) { |t| all_tokens[simplified_tokens.index(t)] }.first

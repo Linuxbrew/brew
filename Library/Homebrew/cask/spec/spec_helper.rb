@@ -2,9 +2,9 @@ require "pathname"
 require "rspec/its"
 require "rspec/wait"
 
-if ENV["COVERAGE"]
-  require "coveralls"
-  Coveralls.wear_merged!
+if ENV["HOMEBREW_TESTS_COVERAGE"]
+  require "simplecov"
+  SimpleCov.command_name "test:cask:rspec"
 end
 
 project_root = Pathname.new(File.expand_path("../..", __FILE__))

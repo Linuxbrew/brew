@@ -13,8 +13,8 @@ module OS
         :snow_leopard  => "10.6",
         :leopard       => "10.5",
         :tiger         => "10.4",
-        :x86_64_linux  => "0"
-      }
+        :x86_64_linux  => "0",
+      }.freeze
 
       def self.from_symbol(sym)
         str = SYMBOLS.fetch(sym) do

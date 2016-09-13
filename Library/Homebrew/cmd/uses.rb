@@ -27,7 +27,7 @@ module Homebrew
     raise FormulaUnspecifiedError if ARGV.named.empty?
 
     used_formulae = ARGV.formulae
-    formulae = (ARGV.include? "--installed") ? Formula.installed : Formula
+    formulae = ARGV.include?("--installed") ? Formula.installed : Formula
     recursive = ARGV.flag? "--recursive"
     includes = []
     ignores = []
@@ -65,8 +65,6 @@ module Homebrew
                 Requirement.prune unless includes.include?("build?")
               end
             end
-            deps.any? { |dep| dep.to_formula.full_name == ff.full_name rescue dep.name == ff.name } ||
-            reqs.any? { |req| req.name == ff.name || [ff.name, ff.full_name].include?(req.default_formula) }
           else
             deps = f.deps.reject do |dep|
               ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
@@ -74,8 +72,17 @@ module Homebrew
             reqs = f.requirements.reject do |req|
               ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
             end
-            deps.any? { |dep| dep.to_formula.full_name == ff.full_name rescue dep.name == ff.name } ||
-            reqs.any? { |req| req.name == ff.name || [ff.name, ff.full_name].include?(req.default_formula) }
+          end
+          next true if deps.any? do |dep|
+            begin
+              dep.to_formula.full_name == ff.full_name
+            rescue
+              dep.name == ff.name
+            end
+          end
+
+          reqs.any? do |req|
+            req.name == ff.name || [ff.name, ff.full_name].include?(req.default_formula)
           end
         rescue FormulaUnavailableError
           # Silently ignore this case as we don't care about things used in
