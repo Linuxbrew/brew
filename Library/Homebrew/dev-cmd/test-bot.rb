@@ -62,8 +62,8 @@
 #:    If `--coverage` is passed, generate coverage report and send it to
 #:    Coveralls.
 #:
-#:    If `--test-default-formula` is passed, use a default testing formula if
-#:    no formulae are otherwise found.
+#:    If `--test-default-formula` is passed, use a default testing formula
+#:    when not building a tap and no other formulae are specified.
 #:
 #:    If `--ci-master` is passed, use the Homebrew master branch CI
 #:    options.
@@ -271,14 +271,11 @@ module Homebrew
       @tap = options[:tap]
       @repository = @tap ? @tap.path : HOMEBREW_REPOSITORY
       @skip_homebrew = options.fetch(:skip_homebrew, false)
-      @test_default_formula = options.fetch(:test_default_formula, false)
 
       if quiet_system "git", "-C", @repository.to_s, "rev-parse", "--verify", "-q", argument
         @hash = argument
       elsif url_match = argument.match(HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
         @url = url_match[0]
-      elsif @test_default_formula
-        @formulae = [argument]
       elsif canonical_formula_name = safe_formula_canonical_name(argument)
         @formulae = [canonical_formula_name]
       else
@@ -386,7 +383,7 @@ module Homebrew
           @name = "#{diff_start_sha1}-#{diff_end_sha1}"
         end
       # Handle formulae arguments being passed on the command-line e.g. `brew test-bot wget fish`.
-      elsif @formulae && !@formulae.empty?
+      elsif !@formulae.empty?
         @name = "#{@formulae.first}-#{diff_end_sha1}"
         diff_start_sha1 = diff_end_sha1
       # Handle a hash being passed on the command-line e.g. `brew test-bot 1a2b3c`.
@@ -423,11 +420,20 @@ module Homebrew
 
       return unless diff_start_sha1 != diff_end_sha1
       return if @url && steps.last && !steps.last.passed?
-      return unless @tap
 
-      formula_path = @tap.formula_dir.to_s
-      @added_formulae += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "A")
-      @modified_formula += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "M")
+      if @tap
+        formula_path = @tap.formula_dir.to_s
+        @added_formulae += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "A")
+        @modified_formula += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "M")\
+      elsif @formulae.empty? && ARGV.include?("--test-default-formula")
+        # Build the default test formula.
+        HOMEBREW_CACHE_FORMULA.mkpath
+        testbottest = "#{HOMEBREW_LIBRARY}/Homebrew/test/testbottest.rb"
+        FileUtils.cp testbottest, HOMEBREW_CACHE_FORMULA
+        @test_default_formula = true
+        @added_formulae = [testbottest]
+      end
+
       @formulae += @added_formulae + @modified_formula
     end
 
@@ -702,7 +708,7 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
 
-      if @tap.nil? && (@repository == HOMEBREW_REPOSITORY || Array(@formulae).empty?)
+      if !@tap && (@formulae.empty? || @test_default_formula)
         tests_args = ["--official-cmd-taps"]
         tests_args_no_compat = []
         tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
@@ -1047,16 +1053,8 @@ module Homebrew
     any_errors = false
     skip_homebrew = ARGV.include?("--skip-homebrew")
     if ARGV.named.empty?
-      current_test = if ARGV.include?("--test-default-formula")
-        # Build the default test formula.
-        HOMEBREW_CACHE_FORMULA.mkpath
-        FileUtils.cp "#{HOMEBREW_LIBRARY}/Homebrew/test/testbottest.rb", HOMEBREW_CACHE_FORMULA
-        Test.new("#{HOMEBREW_LIBRARY}/Homebrew/test/testbottest.rb",
-                 :test_default_formula => true, :skip_homebrew => skip_homebrew)
-      else
-        # Otherwise just build the most recent commit.
-        Test.new("HEAD", :tap => tap, :skip_homebrew => skip_homebrew)
-      end
+      # With no arguments just build the most recent commit.
+      current_test = Test.new("HEAD", :tap => tap, :skip_homebrew => skip_homebrew)
       any_errors = !current_test.run
       tests << current_test
     else
