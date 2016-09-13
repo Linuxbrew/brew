@@ -702,7 +702,7 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
 
-      if @tap.nil? && (@test_default_formula || Array(@formulae).empty?)
+      if @tap.nil? && (@repository == HOMEBREW_REPOSITORY || Array(@formulae).empty?)
         tests_args = ["--official-cmd-taps"]
         tests_args_no_compat = []
         tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
