@@ -1,11 +1,10 @@
 require "hbc/source/tapped_qualified"
 
 class Hbc::Source::UntappedQualified < Hbc::Source::TappedQualified
-  def self.path_for_query(query)
-    user, repo, token = Hbc::QualifiedToken.parse(query)
+  def self.me?(query)
+    return if (tap = tap_for_query(query)).nil?
 
-    tap = Tap.fetch(user, repo)
-    tap.install unless tap.installed?
-    tap.cask_dir.join(token.sub(%r{(\.rb)?$}i, ".rb"))
+    tap.install
+    tap.installed? && path_for_query(query).exist?
   end
 end
