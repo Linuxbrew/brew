@@ -301,16 +301,17 @@ module Homebrew
         else
           bottle_path.unlink if bottle_path.exist?
 
-        mismatches.map! do |key|
-          old_value = old_spec.send(key).inspect
-          value = bottle.send(key).inspect
-          "#{key}: old: #{old_value}, new: #{value}"
-        end
+          mismatches.map! do |key|
+            old_value = old_spec.send(key).inspect
+            value = bottle.send(key).inspect
+            "#{key}: old: #{old_value}, new: #{value}"
+          end
 
-        odie <<-EOS.undent
-          --keep-old was passed but there are changes in:
-          #{mismatches.join("\n")}
-        EOS
+          odie <<-EOS.undent
+            --keep-old was passed but there are changes in:
+            #{mismatches.join("\n")}
+          EOS
+        end
       end
     end
 
