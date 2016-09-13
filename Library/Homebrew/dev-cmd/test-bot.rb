@@ -62,6 +62,9 @@
 #:    If `--coverage` is passed, generate coverage report and send it to
 #:    Coveralls.
 #:
+#:    If `--test-default-formula` is passed, use a default testing formula if
+#:    no formulae are otherwise found.
+#:
 #:    If `--ci-master` is passed, use the Homebrew master branch CI
 #:    options.
 #:
@@ -268,11 +271,14 @@ module Homebrew
       @tap = options[:tap]
       @repository = @tap ? @tap.path : HOMEBREW_REPOSITORY
       @skip_homebrew = options.fetch(:skip_homebrew, false)
+      @test_default_formula = options.fetch(:test_default_formula, false)
 
       if quiet_system "git", "-C", @repository.to_s, "rev-parse", "--verify", "-q", argument
         @hash = argument
       elsif url_match = argument.match(HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
         @url = url_match[0]
+      elsif @test_default_formula
+        @formulae = [argument]
       elsif canonical_formula_name = safe_formula_canonical_name(argument)
         @formulae = [canonical_formula_name]
       else
@@ -695,7 +701,7 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
 
-      if @tap.nil? && Array(@formulae).empty?
+      if @tap.nil? && (@test_default_formula || Array(@formulae).empty?)
         tests_args = ["--official-cmd-taps"]
         tests_args_no_compat = []
         tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
@@ -1006,10 +1012,16 @@ module Homebrew
     if ARGV.include?("--ci-master") || ARGV.include?("--ci-pr") \
        || ARGV.include?("--ci-testing")
       ARGV << "--cleanup" if ENV["JENKINS_HOME"]
-      ARGV << "--junit" << "--local"
+      ARGV << "--junit" << "--local" << "--test-default-formula"
     end
+
     if ARGV.include? "--ci-master"
       ARGV << "--fast"
+    end
+
+    # TODO: refactor bottle code so this isn't needed.
+    if ARGV.include? "--test-default-formula"
+      ARGV << "--no-bottle"
     end
 
     if ARGV.include? "--local"
@@ -1039,22 +1051,28 @@ module Homebrew
     any_errors = false
     skip_homebrew = ARGV.include?("--skip-homebrew")
     if ARGV.named.empty?
-      # With no arguments just build the most recent commit.
-      head_test = Test.new("HEAD", :tap => tap, :skip_homebrew => skip_homebrew)
-      any_errors = !head_test.run
-      tests << head_test
+      current_test = if ARGV.include?("--test-default-formula")
+        # Build the default test formula.
+        Test.new("#{HOMEBREW_LIBRARY}/Homebrew/test/testbottest.rb",
+                 :test_default_formula => true, :skip_homebrew => skip_homebrew)
+      else
+        # Otherwise just build the most recent commit.
+        Test.new("HEAD", :tap => tap, :skip_homebrew => skip_homebrew)
+      end
+      any_errors = !current_test.run
+      tests << current_test
     else
       ARGV.named.each do |argument|
         test_error = false
         begin
-          test = Test.new(argument, :tap => tap, :skip_homebrew => skip_homebrew)
+          current_test = Test.new(argument, :tap => tap, :skip_homebrew => skip_homebrew)
           skip_homebrew = true
         rescue ArgumentError => e
           test_error = true
           ofail e.message
         else
-          test_error = !test.run
-          tests << test
+          test_error = !current_test.run
+          tests << current_test
         end
         any_errors ||= test_error
       end
