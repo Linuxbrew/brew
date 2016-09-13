@@ -1,4 +1,4 @@
-#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`]:
+#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`] [`--force-core-tap`]:
 #:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
 #:
 #:    Generate a bottle (binary package) from a formula installed with
@@ -134,8 +134,14 @@ module Homebrew
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
 
-    unless f.tap
-      return ofail "Formula not from core or any taps: #{f.full_name}"
+    tap = f.tap
+
+    unless tap
+      if ARGV.include?("--force-core-tap")
+        tap = CoreTap.instance
+      else
+        return ofail "Formula not from core or any taps: #{f.full_name}"
+      end
     end
 
     if f.bottle_disabled?
@@ -152,7 +158,7 @@ module Homebrew
       return ofail "Formula has no stable version: #{f.full_name}"
     end
 
-    if ARGV.include? "--no-rebuild"
+    if ARGV.include?("--no-rebuild") || !f.tap
       rebuild = 0
     elsif ARGV.include? "--keep-old"
       rebuild = f.bottle_specification.rebuild
@@ -270,7 +276,7 @@ module Homebrew
     root_url ||= ARGV.value("root_url")
 
     bottle = BottleSpecification.new
-    bottle.tap = f.tap
+    bottle.tap = tap
     bottle.root_url(root_url) if root_url
     if relocatable
       if skip_relocation
@@ -334,7 +340,7 @@ module Homebrew
           },
           "bintray" => {
             "package" => Utils::Bottles::Bintray.package(f.name),
-            "repository" => Utils::Bottles::Bintray.repository(f.tap),
+            "repository" => Utils::Bottles::Bintray.repository(tap),
           },
         },
       }
