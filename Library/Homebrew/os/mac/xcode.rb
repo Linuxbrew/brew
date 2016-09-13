@@ -15,7 +15,7 @@ module OS
         when "10.8"  then "5.1.1"
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
-        when "10.11" then "7.3.1"
+        when "10.11" then "8.0"
         when "10.12" then "8.0"
         else
           # Default to newest known version of Xcode for unreleased macOS versions.
@@ -195,7 +195,7 @@ module OS
       def latest_version
         case MacOS.version
         when "10.12" then "800.0.38"
-        when "10.11" then "703.0.31"
+        when "10.11" then "800.0.38"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"
         when "10.8"  then "503.0.40"
