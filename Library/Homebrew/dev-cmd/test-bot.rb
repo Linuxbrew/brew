@@ -633,6 +633,7 @@ module Homebrew
           bottle_args = ["--verbose", "--json", formula_name]
           bottle_args << "--keep-old" if ARGV.include? "--keep-old"
           bottle_args << "--skip-relocation" if ARGV.include? "--skip-relocation"
+          bottle_args << "--force-core-tap" if @test_default_formula
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.output?
@@ -1019,11 +1020,6 @@ module Homebrew
       ARGV << "--fast"
     end
 
-    # TODO: refactor bottle code so this isn't needed.
-    if ARGV.include? "--test-default-formula"
-      ARGV << "--no-bottle"
-    end
-
     if ARGV.include? "--local"
       ENV["HOMEBREW_CACHE"] = "#{ENV["HOME"]}/Library/Caches/Homebrew"
       mkdir_p ENV["HOMEBREW_CACHE"]
@@ -1053,6 +1049,8 @@ module Homebrew
     if ARGV.named.empty?
       current_test = if ARGV.include?("--test-default-formula")
         # Build the default test formula.
+        HOMEBREW_CACHE_FORMULA.mkpath
+        FileUtils.cp "#{HOMEBREW_LIBRARY}/Homebrew/test/testbottest.rb", HOMEBREW_CACHE_FORMULA
         Test.new("#{HOMEBREW_LIBRARY}/Homebrew/test/testbottest.rb",
                  :test_default_formula => true, :skip_homebrew => skip_homebrew)
       else
