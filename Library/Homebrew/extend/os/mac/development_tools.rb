@@ -24,10 +24,10 @@ class DevelopmentTools
 
     def installation_instructions
       if MacOS.version >= "10.9"
-      <<-EOS.undent
-        Install the Command Line Tools:
-          xcode-select --install
-      EOS
+        <<-EOS.undent
+          Install the Command Line Tools:
+            xcode-select --install
+        EOS
       elsif MacOS.version == "10.8" || MacOS.version == "10.7"
         <<-EOS.undent
           Install the Command Line Tools from

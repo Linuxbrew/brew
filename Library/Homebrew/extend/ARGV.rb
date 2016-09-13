@@ -57,7 +57,7 @@ module HomebrewArgvExtension
 
       dirs = rack.directory? ? rack.subdirs : []
 
-      raise NoSuchKegError.new(rack.basename) if dirs.empty?
+      raise NoSuchKegError, rack.basename if dirs.empty?
 
       linked_keg_ref = HOMEBREW_LIBRARY.join("LinkedKegs", rack.basename)
       opt_prefix = HOMEBREW_PREFIX.join("opt", rack.basename)
@@ -79,7 +79,7 @@ module HomebrewArgvExtension
           if (prefix = f.installed_prefix).directory?
             Keg.new(prefix)
           else
-            raise MultipleVersionsInstalledError.new(rack.basename)
+            raise MultipleVersionsInstalledError, rack.basename
           end
         end
       rescue FormulaUnavailableError
@@ -211,7 +211,7 @@ module HomebrewArgvExtension
   # installation run.
   def build_formula_from_source?(f)
     return true if build_all_from_source?
-    return false unless (build_from_source? || build_bottle?)
+    return false unless build_from_source? || build_bottle?
     formulae.any? { |argv_f| argv_f.full_name == f.full_name }
   end
 

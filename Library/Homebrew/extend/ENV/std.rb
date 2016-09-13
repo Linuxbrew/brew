@@ -7,8 +7,8 @@ module Stdenv
   include SharedEnvExtension
 
   # @private
-  SAFE_CFLAGS_FLAGS = "-w -pipe"
-  DEFAULT_FLAGS = "-march=core2 -msse4"
+  SAFE_CFLAGS_FLAGS = "-w -pipe".freeze
+  DEFAULT_FLAGS = "-march=core2 -msse4".freeze
 
   def self.extended(base)
     unless ORIGINAL_PATHS.include? HOMEBREW_PREFIX/"bin"
