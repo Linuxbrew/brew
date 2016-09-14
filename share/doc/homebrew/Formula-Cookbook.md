@@ -300,7 +300,7 @@ When importing classes, Homebrew will require the formula and then create an ins
 
 Thus, if you change the name of the class, you must also rename the file. Filenames should be all lowercase, and class names should be the strict CamelCase equivalent, e.g. formulae `gnu-go` and `sdl_mixer` become classes `GnuGo` and `SdlMixer`, even if part of their name is an acronym.
 
-Add aliases by creating symlinks in `Library/Aliases`.
+Add aliases by creating symlinks in an `Aliases` directory in the tap root.
 
 ## Audit the formula
 
