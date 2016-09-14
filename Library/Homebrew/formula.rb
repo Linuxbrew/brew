@@ -60,7 +60,7 @@ class Formula
   # e.g. `this-formula`
   attr_reader :name
 
-  # The name specified when installing this {Formula}.
+  # The name that was used to identify this {Formula}.
   # Could be the name of the {Formula}, or an alias.
   # e.g. `another-name-for-this-formula`
   attr_reader :alias_path
@@ -228,7 +228,15 @@ class Formula
 
   public
 
-  # The path that was specified to find/install this formula.
+  # The alias path that was used to install this formula, if present.
+  # Can differ from alias_path, which is the alias used to find the formula,
+  # and is specified to this instance.
+  def installed_alias_path
+    path = build.source["path"] if build.is_a?(Tab)
+    path if path =~ %r{#{HOMEBREW_TAP_DIR_REGEX}/Aliases}
+  end
+
+  # The path that was specified to find this formula.
   def specified_path
     alias_path || path
   end
@@ -503,13 +511,13 @@ class Formula
     prefix.parent
   end
 
-  # All of current installed prefix directories.
+  # All currently installed prefix directories.
   # @private
   def installed_prefixes
     rack.directory? ? rack.subdirs : []
   end
 
-  # All of current installed kegs.
+  # All currently installed kegs.
   # @private
   def installed_kegs
     installed_prefixes.map { |dir| Keg.new(dir) }
