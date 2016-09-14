@@ -102,7 +102,7 @@ There are plenty of others; check `/usr/lib` for them.
 
 We generally try to not duplicate system libraries and complicated tools in core Homebrew but we do duplicate some commonly used tools.
 
-One very special exception is OpenSSL. Anything that uses OpenSSL *should* be built using Homebrew’s shipped OpenSSL and our test bot's post-install `audit` will warn if it detects you haven't done this.
+Special exceptions are OpenSSL and LibreSSL. Things that use either *should* be built using Homebrew’s shipped equivalent and our test bot's post-install `audit` will warn if it detects you haven't done this.
 
 Homebrew’s OpenSSL is
 [`keg_only`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#keg_only-class_method)
