@@ -9,17 +9,17 @@ Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
 ## Quick Checklist
 
 This is all that really matters:
-- Ensure the name is correct. This cannot be changed later, so it must
-  be right the first time!
-- Add aliases
-- Ensure it is not a dupe of anything that comes with OS X
+- Ensure the name seems reasonable.
+- Add aliases.
+- Ensure it is not an unreasonable dupe of anything that comes with OS X.
 - Ensure it is not a library that can be installed with
   [gem](https://en.wikipedia.org/wiki/RubyGems),
   [cpan](https://en.wikipedia.org/wiki/Cpan) or
   [pip](https://pip.pypa.io/en/stable/).
 - Ensure that any dependencies are accurate and minimal. We don't need to
   support every possible optional feature for the software.
-- Use `brew pull` when possible to add messages to auto-close pull requests (which may take ~5m, be patient) and pull bottles built by BrewTestBot.
+- Use the GitHub squash & merge workflow where bottles aren't required.
+- Use `brew pull` otherwise, which adds messages to auto-close pull requests and pull bottles built by BrewTestBot.
 - Thank people for contributing.
 
 Checking dependencies is important, because they will probably stick around
@@ -27,35 +27,35 @@ forever. Nobody really checks if they are necessary or not. Use the
 `:optional` and `:recommended` modifiers as appropriate.
 
 Depend on as little stuff as possible. Disable X11 functionality by default.
-For example, we build Wireshark, but not the monolithic GUI. If users want
-that, they should just grab the DMG that Wireshark themselves provide.
+For example, we build Wireshark, but not the heavy GTK/Qt GUI by default.
 
 Homebrew is about Unix software. Stuff that builds to an `.app` should
 probably be in Homebrew Cask instead.
 
 ### Naming
-The name is the strictest item, because we can’t change it afterwards.
+The name is the strictest item, because avoiding a later name change is
+desirable.
 
 Choose a name that’s the most common name for the project.
-For example, we chose `objective-caml`, but we should have chosen `ocaml`.
+For example, we initially chose `objective-caml` but we should have chosen `ocaml`.
 Choose what people say to each other when talking about the project.
 
-Add other names as aliases as symlinks in `Library/Aliases`. Ensure the name
-referenced on the homepage is one of these, as it may be different and have
+Add other names as aliases as symlinks in `Aliases` in the tap root. Ensure the
+name referenced on the homepage is one of these, as it may be different and have
 underscores and hyphens and so on.
 
-We don’t allow versions in formula names (e.g. `bash4.rb`); these should be in
-the `homebrew/versions` tap. This is sometimes frustrating, but we’re trying to
-solve this properly. (`python3.rb` is a rare exception, because it’s basically
-a “new” language and installs no conflicting executables.)
+We mostly don’t allow versions in formula names (e.g. `bash4.rb`); these should
+be in the `homebrew/versions` tap. (`python3.rb` is a rare exception, because it’s
+basically a “new” language and installs no conflicting executables.)
 
 For now, if someone submits a formula like this, we’ll leave them in
 their own tree.
 
 ### Merging, rebasing, cherry-picking
-Merging is mainly useful when new work is being done. Please use `brew pull`
-(or `rebase`/`cherry-pick` contributions) rather than fill Homebrew's Git
-history up with noisy merge commits.
+Merging should be done in the brew repo to preserve history & GPG commit signing,
+and squash/merge via GitHub should be used for formulae where those formulae
+don't need bottles or the change does not require new bottles to be pulled.
+Otherwise, you should use `brew pull` (or `rebase`/`cherry-pick` contributions).
 
 Don’t `rebase` until you finally `push`. Once `master` is pushed, you can’t
 `rebase` : **you’re a maintainer now!**
