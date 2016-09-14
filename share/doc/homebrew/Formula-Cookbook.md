@@ -110,9 +110,8 @@ to avoid conflicting with the system so sometimes formulae need to
 have environment variables set or special configuration flags passed
 to locate our OpenSSL. You can see this mechanism in the
 [clamav](https://github.com/Homebrew/homebrew-core/blob/ae2206f3e5bb2a7c0065ae1b164d2d011b85858b/Formula/clamav.rb#L38)
-formula. Usually this is unnecessary because when OpenSSL is specified
-as a dependency Homebrew temporarily prepends the `$PATH` with that
-prefix.
+formula. Usually this is unnecessary because Homebrew sets up our [build environment](https://github.com/Homebrew/brew/blob/fb3bec8d70d375a97554d4c3fed82ad2332b2191/Library/Homebrew/extend/ENV/super.rb)
+to favour finding `keg_only` formulae first.
 
 Homebrew maintains a special [tap that provides other useful system duplicates](https://github.com/Homebrew/homebrew-dupes).
 
