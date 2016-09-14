@@ -211,3 +211,5 @@ _brew_cask()
     __brew_cask_command "$line[1]" ;;
   esac
 }
+
+_brew_cask "$@"
