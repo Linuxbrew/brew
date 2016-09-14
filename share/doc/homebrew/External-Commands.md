@@ -83,9 +83,6 @@ These commands have been contributed by Homebrew users but are not included in t
 ### brew-growl
 >Get Growl notifications for Homebrew https://github.com/secondplanet/brew-growl
 
-### brew-more
->Scrapes a formula's homepage to get more information: [https://gist.github.com/475200](https://gist.github.com/475200)
-
 ### brew-services
 >Simple support to start formulae using launchctl, has out of the box support for any formula which defines `startup_plist` (e.g. mysql, postgres, redis u.v.m.): [https://github.com/Homebrew/homebrew-services](https://github.com/Homebrew/homebrew-services)
 
