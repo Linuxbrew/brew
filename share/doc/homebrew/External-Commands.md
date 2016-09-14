@@ -64,17 +64,6 @@ These commands have been contributed by Homebrew users but are not included in t
 > $ brew tap youtux/livecheck
 > ```
 
-### brew-cask
-
->Install .app and other "Drag to install" packages from Homebrew.
->
-> https://github.com/caskroom/homebrew-cask
->
-> Install using:
-> ```
-  $ brew tap caskroom/cask
-> ```
-
 ### brew-gem
 >Install any gem package into a self-contained Homebrew cellar location: <https://github.com/sportngin/brew-gem>
 >
