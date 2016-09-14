@@ -29,7 +29,8 @@ edavis/emacs
   fine.
 
 * Add `--full` to either the one- or two-argument invocations above, and git
-  will make a complete clone rather than a shallow one.
+  will make a complete clone rather than a shallow one. Full is the default for
+  Homebrew developers.
 
 * `brew tap --repair` migrates tapped formulae from symlink-based to
   directory-based structure. (This should only need to be run once.)
