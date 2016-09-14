@@ -143,9 +143,9 @@ A Hash (e.g. `=>`) specifies a formula dependency with some additional informati
     - `:optional` generates an implicit `with-foo` option for the formula.
       This means that, given `depends_on "foo" => :optional`, the user must pass `--with-foo` in order to use the dependency.
     - `:run` can mean the dependency is only required at run, or it can be used
-      to declare build dependencies such as `pkg-config` are needed during
-      runtime as well, which will silence the audit warning. `:run` currently
-      implies `:build` as well.
+      to declare build dependencies such as `pkg-config` are needed at
+      runtime as well, which will silence the audit warning. `:run` dependencies
+      are currently available at build-time.
     - `:recommended` generates an implicit `without-foo` option, meaning that
       the dependency is enabled by default and the user must pass
       `--without-foo` to disable this dependency. The default
