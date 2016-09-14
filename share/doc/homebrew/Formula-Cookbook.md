@@ -121,10 +121,11 @@ Homebrew maintains a special [tap that provides other useful system duplicates](
 
 ```ruby
 class Foo < Formula
+  depends_on "pkg-config" => :run
   depends_on "jpeg"
-  depends_on "gtk+" => :optional
-  depends_on "readline" => :recommended
   depends_on "boost" => "with-icu"
+  depends_on "readline" => :recommended
+  depends_on "gtk+" => :optional
   depends_on :x11 => :optional
 end
 ```
@@ -135,12 +136,16 @@ A Symbol (e.g. `:x11`) specifies a [`Requirement`](http://www.rubydoc.info/githu
 
 A Hash (e.g. `=>`) specifies a formula dependency with some additional information. Given a single string key, the value can take several forms:
 
-*   a Symbol (currently one of `:build`, `:optional`, `:recommended`).
+*   a Symbol (currently one of `:build`, `:optional`, `:run` or `:recommended`).
     - `:build` means that dependency is a build-time only dependency so it can
       be skipped when installing from a bottle or when listing missing
       dependencies using `brew missing`.
     - `:optional` generates an implicit `with-foo` option for the formula.
       This means that, given `depends_on "foo" => :optional`, the user must pass `--with-foo` in order to use the dependency.
+    - `:run` can mean the dependency is only required at run, or it can be used
+      to declare build dependencies such as `pkg-config` are needed during
+      runtime as well, which will silence the audit warning. `:run` currently
+      implies `:build` as well.
     - `:recommended` generates an implicit `without-foo` option, meaning that
       the dependency is enabled by default and the user must pass
       `--without-foo` to disable this dependency. The default
