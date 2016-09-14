@@ -193,9 +193,9 @@ In Homebrew we sometimes accept formulae updates that don’t include a version 
 
 Occasionally, these updates require a forced-recompile of the formula itself or its dependents to either ensure formulae continue to function as expected or to close a security issue. This forced-recompile is known as a [`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method) and inserted underneath the `homepage`/`url`/`sha` block.
 
-Where a dependent of a formula fails against a new version of that dependency it must receive a [`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method). An example of such failure can be seen [here](https://github.com/Homebrew/homebrew/issues/31195) and the fix [here](https://github.com/Homebrew/homebrew/pull/31207).
+Where a dependent of a formula fails against a new version of that dependency it must receive a [`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method). An example of such failure can be seen [here](https://github.com/Homebrew/legacy-homebrew/issues/31195) and the fix [here](https://github.com/Homebrew/legacy-homebrew/pull/31207).
 
-[`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method)s are also used for formulae that move from the system OpenSSL to the Homebrew-shipped OpenSSL without any other changes to that formula. This ensures users aren’t left exposed to the potential security issues of the outdated OpenSSL. An example of this can be seen in [this commit](https://github.com/Homebrew/homebrew/commit/6b9d60d474d72b1848304297d91adc6120ea6f96).
+[`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method)s are also used for formulae that move from the system OpenSSL to the Homebrew-shipped OpenSSL without any other changes to that formula. This ensures users aren’t left exposed to the potential security issues of the outdated OpenSSL. An example of this can be seen in [this commit](https://github.com/Homebrew/legacy-homebrew/commit/6b9d60d474d72b1848304297d91adc6120ea6f96).
 
 ## Version Scheme Changes
 
@@ -231,8 +231,8 @@ If you're installing an application then please use [`resource`](http://www.ruby
 ```ruby
 class Foo < Formula
   resource "pycrypto" do
-    url "https://pypi.python.org/packages/source/p/pycrypto/pycrypto-2.6.tar.gz"
-    sha256 "85cc828a96735bdafcf29eb6291ca91bac846579bcef7308536e0c875d6c81d7"
+    url "https://files.pythonhosted.org/packages/60/db/645aa9af249f059cc3a368b118de33889219e0362141e75d4eaf6f80f163/pycrypto-2.6.1.tar.gz"
+    sha256 "f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c"
   end
 
   def install
