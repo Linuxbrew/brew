@@ -562,7 +562,7 @@ class FormulaInstaller
 
     if ARGV.env
       args << "--env=#{ARGV.env}"
-    elsif formula.env.std? || formula.recursive_dependencies.any? { |d| d.name == "scons" }
+    elsif formula.env.std? || formula.deps.select(&:build?).any? { |d| d.name == "scons" }
       args << "--env=std"
     end
 
