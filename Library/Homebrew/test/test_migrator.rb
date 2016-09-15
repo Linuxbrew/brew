@@ -60,7 +60,7 @@ class MigratorTests < Homebrew::TestCase
     @keg.link
     @keg.optlink
 
-    @old_pin = HOMEBREW_LIBRARY/"PinnedKegs/oldname"
+    @old_pin = HOMEBREW_PINNED_KEGS/"oldname"
     @old_pin.make_relative_symlink @old_keg_record
 
     @migrator = Migrator.new(@new_f)
@@ -92,7 +92,7 @@ class MigratorTests < Homebrew::TestCase
     # What to do with pin?
     @new_f.unpin
 
-    FormulaLock::LOCKDIR.children.each(&:unlink)
+    HOMEBREW_LOCK_DIR.children.each(&:unlink)
   end
 
   def test_move_cellar
@@ -117,7 +117,7 @@ class MigratorTests < Homebrew::TestCase
 
   def test_repin
     @new_keg_record.join("bin").mkpath
-    expected_relative = @new_keg_record.relative_path_from HOMEBREW_LIBRARY/"PinnedKegs"
+    expected_relative = @new_keg_record.relative_path_from HOMEBREW_PINNED_KEGS
 
     @migrator.repin
 
@@ -127,13 +127,13 @@ class MigratorTests < Homebrew::TestCase
   end
 
   def test_unlink_oldname
-    assert_equal 1, HOMEBREW_LIBRARY.join("LinkedKegs").children.size
-    assert_equal 1, HOMEBREW_PREFIX.join("opt").children.size
+    assert_equal 1, HOMEBREW_LINKED_KEGS.children.size
+    assert_equal 1, (HOMEBREW_PREFIX/"opt").children.size
 
     shutup { @migrator.unlink_oldname }
 
-    refute_predicate HOMEBREW_LIBRARY/"LinkedKegs", :exist?
-    refute_predicate HOMEBREW_LIBRARY.join("bin"), :exist?
+    refute_predicate HOMEBREW_LINKED_KEGS, :exist?
+    refute_predicate HOMEBREW_LIBRARY/"bin", :exist?
   end
 
   def test_link_newname
@@ -144,8 +144,8 @@ class MigratorTests < Homebrew::TestCase
 
     shutup { @migrator.link_newname }
 
-    assert_equal 1, HOMEBREW_LIBRARY.join("LinkedKegs").children.size
-    assert_equal 1, HOMEBREW_PREFIX.join("opt").children.size
+    assert_equal 1, HOMEBREW_LINKED_KEGS.children.size
+    assert_equal 1, (HOMEBREW_PREFIX/"opt").children.size
   end
 
   def test_link_oldname_opt
@@ -182,12 +182,12 @@ class MigratorTests < Homebrew::TestCase
 
     assert_predicate @new_keg_record, :exist?
     assert_predicate @old_keg_record.parent, :symlink?
-    refute_predicate HOMEBREW_LIBRARY/"LinkedKegs/oldname", :exist?
-    assert_equal @new_keg_record.realpath, (HOMEBREW_LIBRARY/"LinkedKegs/newname").realpath
+    refute_predicate HOMEBREW_LINKED_KEGS/"oldname", :exist?
+    assert_equal @new_keg_record.realpath, (HOMEBREW_LINKED_KEGS/"newname").realpath
     assert_equal @new_keg_record.realpath, @old_keg_record.realpath
     assert_equal @new_keg_record.realpath, (HOMEBREW_PREFIX/"opt/oldname").realpath
     assert_equal @new_keg_record.parent.realpath, (HOMEBREW_CELLAR/"oldname").realpath
-    assert_equal @new_keg_record.realpath, (HOMEBREW_LIBRARY/"PinnedKegs/newname").realpath
+    assert_equal @new_keg_record.realpath, (HOMEBREW_PINNED_KEGS/"newname").realpath
     assert_equal @new_f.path.to_s, Tab.for_keg(@new_keg_record).source["path"]
   end
 
@@ -234,9 +234,9 @@ class MigratorTests < Homebrew::TestCase
   def check_after_backup
     assert_predicate @old_keg_record.parent, :directory?
     refute_predicate @old_keg_record.parent.subdirs, :empty?
-    assert_predicate HOMEBREW_LIBRARY/"LinkedKegs/oldname", :exist?
+    assert_predicate HOMEBREW_LINKED_KEGS/"oldname", :exist?
     assert_predicate HOMEBREW_PREFIX/"opt/oldname", :exist?
-    assert_predicate HOMEBREW_LIBRARY/"PinnedKegs/oldname", :symlink?
+    assert_predicate HOMEBREW_PINNED_KEGS/"oldname", :symlink?
     assert_predicate @keg, :linked?
   end
 

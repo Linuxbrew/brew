@@ -22,6 +22,9 @@ require "config"
 
 HOMEBREW_REPOSITORY.extend(GitRepositoryExtension)
 
+HOMEBREW_LINKED_KEGS = HOMEBREW_LIBRARY/"LinkedKegs"
+HOMEBREW_PINNED_KEGS = HOMEBREW_LIBRARY/"PinnedKegs"
+
 RUBY_PATH = Pathname.new(RbConfig.ruby)
 RUBY_BIN = RUBY_PATH.dirname
 

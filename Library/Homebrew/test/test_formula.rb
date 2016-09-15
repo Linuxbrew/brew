@@ -505,7 +505,7 @@ class FormulaTests < Homebrew::TestCase
       f3.brew { f3.install }
     end
 
-    assert_equal HOMEBREW_LIBRARY.join("PinnedKegs/#{f1.name}").resolved_path, f1.prefix
+    assert_equal (HOMEBREW_PINNED_KEGS/f1.name).resolved_path, f1.prefix
 
     assert_predicate f1, :installed?
     assert_predicate f2, :installed?

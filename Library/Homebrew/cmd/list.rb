@@ -111,7 +111,7 @@ module Homebrew
     if ARGV.include? "--pinned"
       pinned_versions = {}
       names.each do |d|
-        keg_pin = (HOMEBREW_LIBRARY/"PinnedKegs"/d.basename.to_s)
+        keg_pin = (HOMEBREW_PINNED_KEGS/d.basename.to_s)
         if keg_pin.exist? || keg_pin.symlink?
           pinned_versions[d] = keg_pin.readlink.basename.to_s
         end

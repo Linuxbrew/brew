@@ -8,7 +8,7 @@ class FormulaPinTests < Homebrew::TestCase
     end
 
     def rack
-      Pathname.new("#{HOMEBREW_CELLAR}/#{name}")
+      HOMEBREW_CELLAR/name
     end
 
     def installed_prefixes
@@ -31,21 +31,21 @@ class FormulaPinTests < Homebrew::TestCase
   end
 
   def test_pinnable_if_kegs_exist
-    (@f.rack+"0.1").mkpath
+    (@f.rack/"0.1").mkpath
     assert_predicate @pin, :pinnable?
   end
 
   def test_unpin
-    (@f.rack+"0.1").mkpath
+    (@f.rack/"0.1").mkpath
     @pin.pin
 
     assert_predicate @pin, :pinned?
-    assert_equal 1, FormulaPin::PINDIR.children.length
+    assert_equal 1, HOMEBREW_PINNED_KEGS.children.length
 
     @pin.unpin
 
     refute_predicate @pin, :pinned?
-    refute_predicate FormulaPin::PINDIR, :directory?
+    refute_predicate HOMEBREW_PINNED_KEGS, :directory?
   end
 
   def teardown

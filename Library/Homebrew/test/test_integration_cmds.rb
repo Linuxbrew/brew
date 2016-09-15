@@ -22,7 +22,7 @@ class IntegrationCommandTests < Homebrew::TestCase
       HOMEBREW_PREFIX/"bin",
       HOMEBREW_PREFIX/"share",
       HOMEBREW_PREFIX/"opt",
-      HOMEBREW_LIBRARY/"LinkedKegs",
+      HOMEBREW_LINKED_KEGS,
       HOMEBREW_LIBRARY/"Taps/caskroom",
       HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle",
       HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo",
@@ -533,12 +533,12 @@ class IntegrationCommandTests < Homebrew::TestCase
     setup_test_formula "testball"
 
     HOMEBREW_CELLAR.join("testball/0.1").mkpath
-    HOMEBREW_LIBRARY.join("PinnedKegs").mkpath
-    FileUtils.ln_s HOMEBREW_CELLAR.join("testball/0.1"), HOMEBREW_LIBRARY.join("PinnedKegs/testball")
+    HOMEBREW_PINNED_KEGS.mkpath
+    FileUtils.ln_s HOMEBREW_CELLAR.join("testball/0.1"), HOMEBREW_PINNED_KEGS/"testball"
 
     assert_match "testball is pinned. You must unpin it to reinstall.", cmd("reinstall", "testball")
 
-    HOMEBREW_LIBRARY.join("PinnedKegs").rmtree
+    HOMEBREW_PINNED_KEGS.rmtree
   end
 
   def test_home
