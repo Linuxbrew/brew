@@ -64,17 +64,6 @@ These commands have been contributed by Homebrew users but are not included in t
 > $ brew tap youtux/livecheck
 > ```
 
-### brew-cask
-
->Install .app and other "Drag to install" packages from Homebrew.
->
-> https://github.com/caskroom/homebrew-cask
->
-> Install using:
-> ```
-  $ brew tap caskroom/cask
-> ```
-
 ### brew-gem
 >Install any gem package into a self-contained Homebrew cellar location: <https://github.com/sportngin/brew-gem>
 >
@@ -83,15 +72,12 @@ These commands have been contributed by Homebrew users but are not included in t
 ### brew-growl
 >Get Growl notifications for Homebrew https://github.com/secondplanet/brew-growl
 
-### brew-more
->Scrapes a formula's homepage to get more information: [https://gist.github.com/475200](https://gist.github.com/475200)
-
 ### brew-services
->Simple support to start formulae using launchctl, has out of the box support for any formula which defines `startup_plist` (e.g. mysql, postgres, redis u.v.m.): [https://github.com/gapple/homebrew-services](https://github.com/gapple/homebrew-services)
+>Simple support to start formulae using launchctl, has out of the box support for any formula which defines `startup_plist` (e.g. mysql, postgres, redis u.v.m.): [https://github.com/Homebrew/homebrew-services](https://github.com/Homebrew/homebrew-services)
 
 > Install using:
 > ```
-  $ brew tap gapple/services
+  $ brew tap homebrew/services
 > ```
 
 ## SEE ALSO

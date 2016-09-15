@@ -32,7 +32,7 @@ Before submitting a new formula make sure your package:
 *   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
 *   is still supported by upstream (i.e. doesn't require extensive patching)
 *   has a stable, tagged version (i.e. not just a GitHub repository with no versions). See [Interesting-Taps-&-Forks](Interesting-Taps-&-Forks.md) for where pre-release versions belong.
-*   passes all `brew audit --strict --online $FORMULA` tests.
+*   passes all `brew audit --new-formula $FORMULA` tests.
 
 Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/.github/CONTRIBUTING.md).
 
@@ -102,7 +102,7 @@ There are plenty of others; check `/usr/lib` for them.
 
 We generally try to not duplicate system libraries and complicated tools in core Homebrew but we do duplicate some commonly used tools.
 
-One very special exception is OpenSSL. Anything that uses OpenSSL *should* be built using Homebrew’s shipped OpenSSL and our test bot's post-install `audit` will warn if it detects you haven't done this.
+Special exceptions are OpenSSL and LibreSSL. Things that use either *should* be built using Homebrew’s shipped equivalent and our test bot's post-install `audit` will warn if it detects you haven't done this.
 
 Homebrew’s OpenSSL is
 [`keg_only`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#keg_only-class_method)
@@ -110,9 +110,8 @@ to avoid conflicting with the system so sometimes formulae need to
 have environment variables set or special configuration flags passed
 to locate our OpenSSL. You can see this mechanism in the
 [clamav](https://github.com/Homebrew/homebrew-core/blob/ae2206f3e5bb2a7c0065ae1b164d2d011b85858b/Formula/clamav.rb#L38)
-formula. Usually this is unnecessary because when OpenSSL is specified
-as a dependency Homebrew temporarily prepends the `$PATH` with that
-prefix.
+formula. Usually this is unnecessary because Homebrew sets up our [build environment](https://github.com/Homebrew/brew/blob/fb3bec8d70d375a97554d4c3fed82ad2332b2191/Library/Homebrew/extend/ENV/super.rb)
+to favour finding `keg_only` formulae first.
 
 Homebrew maintains a special [tap that provides other useful system duplicates](https://github.com/Homebrew/homebrew-dupes).
 
@@ -122,10 +121,11 @@ Homebrew maintains a special [tap that provides other useful system duplicates](
 
 ```ruby
 class Foo < Formula
+  depends_on "pkg-config" => :run
   depends_on "jpeg"
-  depends_on "gtk+" => :optional
-  depends_on "readline" => :recommended
   depends_on "boost" => "with-icu"
+  depends_on "readline" => :recommended
+  depends_on "gtk+" => :optional
   depends_on :x11 => :optional
 end
 ```
@@ -136,12 +136,16 @@ A Symbol (e.g. `:x11`) specifies a [`Requirement`](http://www.rubydoc.info/githu
 
 A Hash (e.g. `=>`) specifies a formula dependency with some additional information. Given a single string key, the value can take several forms:
 
-*   a Symbol (currently one of `:build`, `:optional`, `:recommended`).
+*   a Symbol (currently one of `:build`, `:optional`, `:run` or `:recommended`).
     - `:build` means that dependency is a build-time only dependency so it can
       be skipped when installing from a bottle or when listing missing
       dependencies using `brew missing`.
     - `:optional` generates an implicit `with-foo` option for the formula.
       This means that, given `depends_on "foo" => :optional`, the user must pass `--with-foo` in order to use the dependency.
+    - `:run` can mean the dependency is only required at run, or it can be used
+      to declare build dependencies such as `pkg-config` are needed at
+      runtime as well, which will silence the audit warning. `:run` dependencies
+      are currently available at build-time.
     - `:recommended` generates an implicit `without-foo` option, meaning that
       the dependency is enabled by default and the user must pass
       `--without-foo` to disable this dependency. The default
@@ -189,9 +193,9 @@ In Homebrew we sometimes accept formulae updates that don’t include a version 
 
 Occasionally, these updates require a forced-recompile of the formula itself or its dependents to either ensure formulae continue to function as expected or to close a security issue. This forced-recompile is known as a [`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method) and inserted underneath the `homepage`/`url`/`sha` block.
 
-Where a dependent of a formula fails against a new version of that dependency it must receive a [`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method). An example of such failure can be seen [here](https://github.com/Homebrew/homebrew/issues/31195) and the fix [here](https://github.com/Homebrew/homebrew/pull/31207).
+Where a dependent of a formula fails against a new version of that dependency it must receive a [`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method). An example of such failure can be seen [here](https://github.com/Homebrew/legacy-homebrew/issues/31195) and the fix [here](https://github.com/Homebrew/legacy-homebrew/pull/31207).
 
-[`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method)s are also used for formulae that move from the system OpenSSL to the Homebrew-shipped OpenSSL without any other changes to that formula. This ensures users aren’t left exposed to the potential security issues of the outdated OpenSSL. An example of this can be seen in [this commit](https://github.com/Homebrew/homebrew/commit/6b9d60d474d72b1848304297d91adc6120ea6f96).
+[`revision`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#revision%3D-class_method)s are also used for formulae that move from the system OpenSSL to the Homebrew-shipped OpenSSL without any other changes to that formula. This ensures users aren’t left exposed to the potential security issues of the outdated OpenSSL. An example of this can be seen in [this commit](https://github.com/Homebrew/legacy-homebrew/commit/6b9d60d474d72b1848304297d91adc6120ea6f96).
 
 ## Version Scheme Changes
 
@@ -227,8 +231,8 @@ If you're installing an application then please use [`resource`](http://www.ruby
 ```ruby
 class Foo < Formula
   resource "pycrypto" do
-    url "https://pypi.python.org/packages/source/p/pycrypto/pycrypto-2.6.tar.gz"
-    sha256 "85cc828a96735bdafcf29eb6291ca91bac846579bcef7308536e0c875d6c81d7"
+    url "https://files.pythonhosted.org/packages/60/db/645aa9af249f059cc3a368b118de33889219e0362141e75d4eaf6f80f163/pycrypto-2.6.1.tar.gz"
+    sha256 "f2ce1e989b272cfcb677616763e0a2e7ec659effa67a88aa92b3a65528f60a3c"
   end
 
   def install
@@ -296,13 +300,13 @@ When importing classes, Homebrew will require the formula and then create an ins
 
 Thus, if you change the name of the class, you must also rename the file. Filenames should be all lowercase, and class names should be the strict CamelCase equivalent, e.g. formulae `gnu-go` and `sdl_mixer` become classes `GnuGo` and `SdlMixer`, even if part of their name is an acronym.
 
-Add aliases by creating symlinks in `Library/Aliases`.
+Add aliases by creating symlinks in an `Aliases` directory in the tap root.
 
 ## Audit the formula
 
 You can run `brew audit --strict --online` to test formulae for adherence to Homebrew house style. The `audit` command includes warnings for trailing whitespace, preferred URLs for certain source hosts, and a lot of other style issues. Fixing these warnings before committing will make the process a lot quicker for everyone.
 
-New formulae being submitted to Homebrew should run `brew audit --strict --online foo`. This command is performed by the Brew Test Bot on new submissions as part of the automated build and test process, and highlights more potential issues than the standard audit.
+New formulae being submitted to Homebrew should run `brew audit --new-formula foo`. This command is performed by the Brew Test Bot on new submissions as part of the automated build and test process, and highlights more potential issues than the standard audit.
 
 Use `brew info` and check if the version guessed by Homebrew from the URL is
 correct. Add an explicit [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method) if not.

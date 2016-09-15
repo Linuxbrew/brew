@@ -10,7 +10,5 @@ This is a page for maintainers to diagnose certain build errors.
 
 The exact atom may be different.
 
-This can be caused by passing the obsolete `-s` flag to the linker.
-
-See:
-https://github.com/Homebrew/homebrew/commit/7c9a9334631dc84d59131ca57419e8c828b1574b
+This can be caused by passing the obsolete `-s` flag to the linker and can be
+fixed like [this](https://github.com/Homebrew/legacy-homebrew/commit/7c9a9334631dc84d59131ca57419e8c828b1574b).
