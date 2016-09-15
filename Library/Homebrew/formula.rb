@@ -60,15 +60,23 @@ class Formula
   # e.g. `this-formula`
   attr_reader :name
 
-  # The name that was used to identify this {Formula}.
-  # Could be the name of the {Formula}, or an alias.
-  # e.g. `another-name-for-this-formula`
+  # The path to the alias that was used to identify this {Formula}.
+  # e.g. `/usr/local/Library/Taps/homebrew/homebrew-core/Aliases/another-name-for-this-formula`
   attr_reader :alias_path
+
+  # The name of the alias that was used to identify this {Formula}.
+  # e.g. `another-name-for-this-formula`
+  attr_reader :alias_name
 
   # The fully-qualified name of this {Formula}.
   # For core formula it's the same as {#name}.
   # e.g. `homebrew/tap-name/this-formula`
   attr_reader :full_name
+
+  # The fully-qualified alias referring to this {Formula}.
+  # For core formula it's the same as {#alias_name}.
+  # e.g. `homebrew/tap-name/another-name-for-this-formula`
+  attr_reader :full_alias_name
 
   # The full path to this {Formula}.
   # e.g. `/usr/local/Library/Taps/homebrew/homebrew-core/Formula/this-formula.rb`
@@ -149,24 +157,30 @@ class Formula
   # @return [BuildOptions]
   attr_accessor :build
 
+  # A {Boolean} indicating whether this formula should be considered outdated
+  # if the target of the alias it was installed with has since changed.
+  # Defaults to true.
+  # @return [Boolean]
+  attr_accessor :follow_installed_alias
+  alias follow_installed_alias? follow_installed_alias
+
   # @private
   def initialize(name, path, spec, alias_path: nil)
     @name = name
     @path = path
     @alias_path = alias_path
+    @alias_name = File.basename(alias_path) if alias_path
     @revision = self.class.revision || 0
     @version_scheme = self.class.version_scheme || 0
 
-    if path == Formulary.core_path(name)
-      @tap = CoreTap.instance
-      @full_name = name
+    @tap = if path == Formulary.core_path(name)
+      CoreTap.instance
     elsif path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-      @tap = Tap.fetch($1, $2)
-      @full_name = "#{@tap}/#{name}"
-    else
-      @tap = nil
-      @full_name = name
+      Tap.fetch($1, $2)
     end
+
+    @full_name = get_full_name(name)
+    @full_alias_name = get_full_name(@alias_name)
 
     set_spec :stable
     set_spec :devel
@@ -183,6 +197,7 @@ class Formula
     validate_attributes!
     @build = active_spec.build
     @pin = FormulaPin.new(self)
+    @follow_installed_alias = true
   end
 
   # @private
@@ -196,6 +211,16 @@ class Formula
   end
 
   private
+
+  # Allow full name logic to be re-used between names, aliases,
+  # and installed aliases.
+  def get_full_name(name)
+    if name.nil? || @tap.nil? || @tap.core_tap?
+      name
+    else
+      "#{@tap}/#{name}"
+    end
+  end
 
   def set_spec(name)
     spec = self.class.send(name)
@@ -236,9 +261,37 @@ class Formula
     path if path =~ %r{#{HOMEBREW_TAP_DIR_REGEX}/Aliases}
   end
 
+  def installed_alias_name
+    File.basename(installed_alias_path) if installed_alias_path
+  end
+
+  def full_installed_alias_name
+    get_full_name(installed_alias_name)
+  end
+
   # The path that was specified to find this formula.
   def specified_path
     alias_path || path
+  end
+
+  # The name specified to find this formula.
+  def specified_name
+    alias_name || name
+  end
+
+  # The name (including tap) specified to find this formula.
+  def full_specified_name
+    full_alias_name || full_name
+  end
+
+  # The name specified to install this formula.
+  def installed_specified_name
+    installed_alias_name || name
+  end
+
+  # The name (including tap) specified to install this formula.
+  def full_installed_specified_name
+    full_installed_alias_name || full_name
   end
 
   # Is the currently active {SoftwareSpec} a {#stable} build?
@@ -1067,39 +1120,77 @@ class Formula
   end
 
   # @private
-  def outdated_versions(options = {})
-    @outdated_versions ||= Hash.new do |cache, key|
+  def outdated_kegs(options = {})
+    @outdated_kegs ||= Hash.new do |cache, key|
       raise Migrator::MigrationNeededError, self if migration_needed?
-      cache[key] = _outdated_versions(key)
+      cache[key] = _outdated_kegs(key)
     end
-    @outdated_versions[options]
+    @outdated_kegs[options]
   end
 
-  def _outdated_versions(options = {})
-    all_versions = []
+  def _outdated_kegs(options = {})
+    all_kegs = []
 
     installed_kegs.each do |keg|
+      all_kegs << keg
       version = keg.version
-      all_versions << version
       next if version.head?
 
       tab = Tab.for_keg(keg)
       next if version_scheme > tab.version_scheme
       next if version_scheme == tab.version_scheme && pkg_version > version
-      return []
+      next if follow_installed_alias? && installed_alias_target_changed?
+
+      return [] # this keg is the current version of the formula, so it's not outdated
     end
+
+    # Even if this formula hasn't been installed, there may be installations
+    # of other formulae which used to be targets of the alias currently
+    # targetting this formula. These should be counted as outdated versions.
+    all_kegs.concat old_installed_formulae.flat_map(&:installed_kegs)
 
     head_version = latest_head_version
     if head_version && !head_version_outdated?(head_version, options)
       []
     else
-      all_versions.sort
+      all_kegs.sort_by(&:version)
     end
+  end
+
+  def current_installed_alias_target
+    Formulary.factory(installed_alias_path) if installed_alias_path
+  end
+
+  # Has the target of the alias used to install this formula changed?
+  # Returns false if the formula wasn't installed with an alias.
+  def installed_alias_target_changed?
+    ![self, nil].include?(current_installed_alias_target)
+  end
+
+  # Is this formula the target of an alias used to install an old formula?
+  def supersedes_an_installed_formula?
+    old_installed_formulae.any?
+  end
+
+  # Has the alias used to install the formula changed, or are different
+  # formulae already installed with this alias?
+  def alias_changed?
+    installed_alias_target_changed? || supersedes_an_installed_formula?
+  end
+
+  # If the alias has changed value, return the new formula.
+  # Otherwise, return self.
+  def latest_formula
+    installed_alias_target_changed? ? current_installed_alias_target : self
+  end
+
+  def old_installed_formulae
+    alias_path ? self.class.installed_with_alias_path(alias_path) : []
   end
 
   # @private
   def outdated?(options = {})
-    !outdated_versions(options).empty?
+    !outdated_kegs(options).empty?
   rescue Migrator::MigrationNeededError
     true
   end
@@ -1252,6 +1343,11 @@ class Formula
       rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
       end
     end.compact
+  end
+
+  def self.installed_with_alias_path(alias_path)
+    return [] if alias_path.nil?
+    installed.select { |f| f.installed_alias_path == alias_path }
   end
 
   # an array of all alias files of core {Formula}

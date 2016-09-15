@@ -37,11 +37,23 @@ module HomebrewArgvExtension
             f.version.update_commit(k.version.version.commit) if k.version.head?
           end
         end
-        f
       else
         rack = Formulary.to_rack(name)
-        Formulary.from_rack(rack, spec(nil))
+        alias_path = Formulary.factory(name).alias_path
+        f = Formulary.from_rack(rack, spec(nil), alias_path: alias_path)
       end
+
+      # If this formula was installed with an alias that has since changed,
+      # then it was specified explicitly in ARGV. (Using the alias would
+      # instead have found the new formula.)
+      #
+      # Because of this, the user is referring to this specific formula,
+      # not any formula targetted by the same alias, so in this context
+      # the formula shouldn't be considered outdated if the alias used to
+      # install it has changed.
+      f.follow_installed_alias = false
+
+      f
     end
   end
 

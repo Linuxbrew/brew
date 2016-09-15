@@ -43,15 +43,26 @@ module Homebrew
 
     outdated_formulae.each do |f|
       if verbose
-        outdated_versions = f.outdated_versions(fetch_head: fetch_head)
-        current_version = if f.head? && outdated_versions.any? { |v| v.to_s == f.pkg_version.to_s }
+        outdated_kegs = f.outdated_kegs(fetch_head: fetch_head)
+
+        current_version = if f.alias_changed?
+          latest = f.latest_formula
+          "#{latest.name} (#{latest.pkg_version})"
+        elsif f.head? && outdated_kegs.any? { |k| k.version.to_s == f.pkg_version.to_s }
+          # There is a newer HEAD but the version number has not changed.
           "latest HEAD"
         else
           f.pkg_version.to_s
         end
-        puts "#{f.full_name} (#{outdated_versions.join(", ")}) < #{current_version}"
+
+        outdated_versions = outdated_kegs.
+          group_by(&:name).
+          sort_by(&:first).
+          map { |name, kegs| "#{name} (#{kegs.map(&:version) * ", "})" } * ", "
+
+        puts "#{outdated_versions} < #{current_version}"
       else
-        puts f.full_name
+        puts f.full_installed_specified_name
       end
     end
   end
@@ -62,7 +73,7 @@ module Homebrew
     outdated_formulae = formulae.select { |f| f.outdated?(fetch_head: fetch_head) }
 
     outdated = outdated_formulae.each do |f|
-      outdated_versions = f.outdated_versions(fetch_head: fetch_head)
+      outdated_versions = f.outdated_kegs(fetch_head: fetch_head).map(&:version)
       current_version = if f.head? && outdated_versions.any? { |v| v.to_s == f.pkg_version.to_s }
         "HEAD"
       else
