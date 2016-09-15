@@ -986,7 +986,7 @@ module Homebrew
 
       def check_for_unlinked_but_not_keg_only
         unlinked = Formula.racks.reject do |rack|
-          if !(HOMEBREW_REPOSITORY/"Library/LinkedKegs"/rack.basename).directory?
+          if !(HOMEBREW_LINKED_KEGS/rack.basename).directory?
             begin
               Formulary.from_rack(rack).keg_only?
             rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError

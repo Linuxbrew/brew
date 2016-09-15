@@ -99,8 +99,8 @@ class Keg
     raise "#{path} is not a directory" unless path.directory?
     @path = path
     @name = path.parent.basename.to_s
-    @linked_keg_record = HOMEBREW_LIBRARY.join("LinkedKegs", name)
-    @opt_record = HOMEBREW_PREFIX.join("opt", name)
+    @linked_keg_record = HOMEBREW_LINKED_KEGS/name
+    @opt_record = HOMEBREW_PREFIX/"opt/#{name}"
   end
 
   def to_s

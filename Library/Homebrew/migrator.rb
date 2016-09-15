@@ -107,8 +107,8 @@ class Migrator
       @new_linked_keg_record = HOMEBREW_CELLAR/"#{newname}/#{File.basename(old_linked_keg)}"
     end
 
-    @old_pin_record = HOMEBREW_LIBRARY/"PinnedKegs"/oldname
-    @new_pin_record = HOMEBREW_LIBRARY/"PinnedKegs"/newname
+    @old_pin_record = HOMEBREW_PINNED_KEGS/oldname
+    @new_pin_record = HOMEBREW_PINNED_KEGS/newname
     @pinned = old_pin_record.symlink?
     @old_pin_link_record = old_pin_record.readlink if @pinned
   end

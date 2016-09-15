@@ -114,8 +114,8 @@ class FormulaInstallerTests < Homebrew::TestCase
     end
 
     dependency.prefix("0.1").join("bin/a").mkpath
-    HOMEBREW_LIBRARY.join("PinnedKegs").mkpath
-    FileUtils.ln_s dependency.prefix("0.1"), HOMEBREW_LIBRARY.join("PinnedKegs/#{dep_name}")
+    HOMEBREW_PINNED_KEGS.mkpath
+    FileUtils.ln_s dependency.prefix("0.1"), HOMEBREW_PINNED_KEGS/dep_name
 
     dependency_keg = Keg.new(dependency.prefix("0.1"))
     dependency_keg.link

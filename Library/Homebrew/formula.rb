@@ -429,10 +429,10 @@ class Formula
   end
 
   # @private
-  # The `LinkedKegs` directory for this {Formula}.
+  # The link status symlink directory for this {Formula}.
   # You probably want {#opt_prefix} instead.
   def linked_keg
-    Pathname.new("#{HOMEBREW_LIBRARY}/LinkedKegs/#{name}")
+    HOMEBREW_LINKED_KEGS/name
   end
 
   def latest_head_version
