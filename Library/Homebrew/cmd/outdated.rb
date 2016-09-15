@@ -56,9 +56,11 @@ module Homebrew
         end
 
         outdated_versions = outdated_kegs.
-          group_by(&:name).
-          sort_by(&:first).
-          map { |name, kegs| "#{name} (#{kegs.map(&:version) * ", "})" } * ", "
+          group_by { |keg| Formulary.from_keg(keg) }.
+          sort_by { |formula, kegs| formula.full_name }.
+          map do |formula, kegs|
+            "#{formula.full_name} (#{kegs.map(&:version) * ", "})"
+          end * ", "
 
         puts "#{outdated_versions} < #{current_version}"
       else
