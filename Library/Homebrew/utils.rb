@@ -612,7 +612,7 @@ def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
       Could not link:
       #{conflicts.join("\n")}
 
-      Please delete these files and run `#{command}`.
+      Please delete these paths and run `#{command}`.
     EOS
   end
 end
