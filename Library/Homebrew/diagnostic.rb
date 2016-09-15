@@ -308,8 +308,7 @@ module Homebrew
       def check_access_prefix_directories
         not_writable_dirs = []
 
-        extra_dirs = ["lib/pkgconfig", "share/locale", "share/man", "opt"]
-        (Keg::TOP_LEVEL_DIRECTORIES + extra_dirs).each do |dir|
+        Keg::ALL_TOP_LEVEL_DIRECTORIES.each do |dir|
           path = HOMEBREW_PREFIX/dir
           next unless path.exist?
           next if path.writable_real?
