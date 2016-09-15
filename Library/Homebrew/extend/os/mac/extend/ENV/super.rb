@@ -94,6 +94,15 @@ module Superenv
       self["SDKROOT"] = MacOS.sdk_path
     end
 
+    # Filter out symbols known not to be defined on 10.11 since GNU Autotools
+    # can't reliably figure this out with Xcode 8 on its own yet.
+    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+      %w[basename_r clock_getres clock_gettime clock_settime dirname_r
+         getentropy mkostemp mkostemps].each do |s|
+        ENV["ac_cv_func_#{s}"] = "no"
+      end
+    end
+
     # On 10.9, the tools in /usr/bin proxy to the active developer directory.
     # This means we can use them for any combination of CLT and Xcode.
     self["HOMEBREW_PREFER_CLT_PROXIES"] = "1" if MacOS.version >= "10.9"
