@@ -38,4 +38,12 @@ class OSMacDiagnosticChecksTest < Homebrew::TestCase
     MacOS::XQuartz.stubs(:version).returns("2.7.10_beta2")
     assert_match "The following beta release of XQuartz is installed: 2.7.10_beta2", @checks.check_for_beta_xquartz
   end
+
+  def test_check_xcode_8_without_clt_on_el_capitan
+    MacOS.stubs(:version).returns OS::Mac::Version.new("10.11")
+    MacOS::Xcode.stubs(:installed?).returns true
+    MacOS::Xcode.stubs(:version).returns "8.0"
+    MacOS::Xcode.stubs(:without_clt?).returns true
+    assert_match "You have Xcode 8 installed without the CLT", @checks.check_xcode_8_without_clt_on_el_capitan
+  end
 end
