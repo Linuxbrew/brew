@@ -1,1 +1,4 @@
 comment: false
+coverage:
+  fixes:
+    - "::Library/Homebrew/"
