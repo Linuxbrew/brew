@@ -711,6 +711,16 @@ module Homebrew
       return if @skip_homebrew
 
       if !@tap && (@formulae.empty? || @test_default_formula)
+        # TODO: try to fix this on Linux at some stage.
+        if OS.mac?
+          # test update from origin/master to current commit.
+          test "brew", "update-test"
+          # test no-op update from current commit (to current commit, a no-op).
+          test "brew", "update-test", "--commit=HEAD"
+        end
+
+        test "brew", "readall", "--syntax"
+
         coverage_args = []
         if ARGV.include?("--coverage")
           if ENV["JENKINS_HOME"]
@@ -725,18 +735,10 @@ module Homebrew
         test "brew", "tests", "--no-compat"
         test "brew", "tests", "--generic"
         test "brew", "tests", "--official-cmd-taps", *coverage_args
-        test "brew", "readall", "--syntax"
+
         if OS.mac?
           run_as_not_developer { test "brew", "tap", "caskroom/cask" }
           test "brew", "cask-tests", *coverage_args
-        end
-
-        # TODO: try to fix this on Linux at some stage.
-        if OS.mac?
-          # test update from origin/master to current commit.
-          test "brew", "update-test"
-          # test no-op update from current commit (to current commit, a no-op).
-          test "brew", "update-test", "--commit=HEAD"
         end
       elsif @tap
         test "brew", "readall", "--aliases", @tap.name
