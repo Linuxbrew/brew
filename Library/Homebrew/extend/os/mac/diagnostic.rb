@@ -9,6 +9,7 @@ module Homebrew
           check_for_installed_developer_tools
           check_xcode_license_approved
           check_for_osx_gcc_installer
+          check_xcode_8_without_clt_on_el_capitan
         ]
       end
 
@@ -87,6 +88,19 @@ module Homebrew
         <<-EOS.undent
           A newer Command Line Tools release is available.
           #{MacOS::CLT.update_instructions}
+        EOS
+      end
+
+      def check_xcode_8_without_clt_on_el_capitan
+        return unless MacOS::Xcode.without_clt?
+        # Scope this to Xcode 8 on El Cap for now
+        return unless MacOS.version == :el_capitan && MacOS::Xcode.version >= "8"
+
+        <<-EOS.undent
+          You have Xcode 8 installed without the CLT;
+          this causes certain builds to fail on OS X 10.11.
+          Please install the CLT via:
+            sudo xcode-select --install
         EOS
       end
 
