@@ -17,8 +17,14 @@ HOMEBREW_LIBRARY = Pathname.new(ENV["HOMEBREW_LIBRARY"])
 # Where shim scripts for various build and SCM tools are stored
 HOMEBREW_SHIMS_PATH = HOMEBREW_LIBRARY/"Homebrew/shims"
 
+# Where we store symlinks to currently linked kegs
+HOMEBREW_LINKED_KEGS = HOMEBREW_PREFIX/"var/homebrew/linked"
+
+# Wehere we store symlinks to currently version-pinned kegs
+HOMEBREW_PINNED_KEGS = HOMEBREW_PREFIX/"var/homebrew/pinned"
+
 # Where we store lock files
-HOMEBREW_LOCK_DIR = HOMEBREW_LIBRARY/"Locks"
+HOMEBREW_LOCK_DIR = HOMEBREW_PREFIX/"var/homebrew/locks"
 
 # Where we store built products
 HOMEBREW_CELLAR = Pathname.new(ENV["HOMEBREW_CELLAR"])

@@ -75,6 +75,7 @@ module Homebrew
     end
 
     migrate_legacy_cache_if_necessary
+    migrate_legacy_keg_symlinks_if_necessary
 
     if !updated
       if !ARGV.include?("--preinstall") && !ENV["HOMEBREW_UPDATE_FAILED"]
@@ -165,6 +166,24 @@ module Homebrew
         EOS
       end
     end
+  end
+
+  def migrate_legacy_keg_symlinks_if_necessary
+    legacy_linked_kegs = HOMEBREW_LIBRARY/"LinkedKegs"
+    return unless legacy_linked_kegs.directory?
+
+    legacy_linked_kegs.children.each {|f| Keg.new(f.realpath).link }
+    FileUtils.rm_rf legacy_linked_kegs
+
+    legacy_pinned_kegs = HOMEBREW_LIBRARY/"PinnedKegs"
+    return unless legacy_pinned_kegs.directory?
+
+    legacy_pinned_kegs.children.each do |f|
+      pin_version = Keg.new(f.realpath).version
+      formula = Formulary.factory(f.basename.to_s)
+      FormulaPin.new(formula).pin_at(pin_version)
+    end
+    FileUtils.rm_rf legacy_pinned_kegs
   end
 
   def link_completions_and_docs
