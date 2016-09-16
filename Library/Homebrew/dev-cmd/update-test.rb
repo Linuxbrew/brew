@@ -40,8 +40,7 @@ module Homebrew
       safe_system "git", "config", "remote.origin.url", "#{curdir}/remote.git"
 
       # force push origin to end_sha1
-      safe_system "git", "checkout", "--force", "master"
-      safe_system "git", "reset", "--hard", end_sha1
+      safe_system "git", "checkout", "-B", "master", end_sha1
       safe_system "git", "push", "--force", "origin", "master"
 
       # set test copy to start_sha1
