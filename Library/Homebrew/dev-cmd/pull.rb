@@ -243,7 +243,7 @@ module Homebrew
     end
 
     published = []
-    bintray_creds = { :user => ENV["BINTRAY_USER"], :key => ENV["BINTRAY_KEY"] }
+    bintray_creds = { user: ENV["BINTRAY_USER"], key: ENV["BINTRAY_KEY"] }
     if bintray_creds[:user] && bintray_creds[:key]
       changed_formulae_names.each do |name|
         f = Formula[name]
@@ -338,7 +338,7 @@ module Homebrew
         others << file
       end
     end
-    { :files => files, :formulae => formulae, :others => others }
+    { files: files, formulae: formulae, others: others }
   end
 
   # Get current formula versions without loading formula definition in this process

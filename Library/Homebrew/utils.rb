@@ -163,7 +163,7 @@ def odeprecated(method, replacement = nil, options = {})
 end
 
 def odisabled(method, replacement = nil, options = {})
-  options = { :die => true, :caller => caller }.merge(options)
+  options = { die: true, caller: caller }.merge(options)
   odeprecated(method, replacement, options)
 end
 
@@ -587,7 +587,7 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
   end
   out = front + glue_bytes + back
   out.force_encoding("UTF-8")
-  out.encode!("UTF-16", :invalid => :replace)
+  out.encode!("UTF-16", invalid: :replace)
   out.encode!("UTF-8")
   out
 end

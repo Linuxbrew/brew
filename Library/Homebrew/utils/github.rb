@@ -235,8 +235,8 @@ module GitHub
 
   def build_search_qualifier_string(qualifiers)
     {
-      :repo => "Homebrew/homebrew-core",
-      :in => "title",
+      repo: "Homebrew/homebrew-core",
+      in: "title",
     }.update(qualifiers).map do |qualifier, value|
       "#{qualifier}:#{value}"
     end.join("+")
@@ -253,14 +253,14 @@ module GitHub
 
   def issues_for_formula(name, options = {})
     tap = options[:tap] || CoreTap.instance
-    issues_matching(name, :state => "open", :repo => "#{tap.user}/homebrew-#{tap.repo}")
+    issues_matching(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
   end
 
   def print_pull_requests_matching(query)
     return [] if ENV["HOMEBREW_NO_GITHUB_API"]
     ohai "Searching pull requests..."
 
-    open_or_closed_prs = issues_matching(query, :type => "pr")
+    open_or_closed_prs = issues_matching(query, type: "pr")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
     if !open_prs.empty?

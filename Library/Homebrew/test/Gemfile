@@ -10,8 +10,8 @@ group :coverage do
   # back to stable as soon as v0.12.1 or v0.13.0 is released. See pull request
   # <https://github.com/Homebrew/legacy-homebrew/pull/48250> for full details.
   gem "simplecov", "0.12.0",
-    :git => "https://github.com/colszowka/simplecov.git",
-    :branch => "master", # commit 257e26394c464c4ab388631b4eff1aa98c37d3f1
-    :require => false
+    git: "https://github.com/colszowka/simplecov.git",
+    branch: "master", # commit 257e26394c464c4ab388631b4eff1aa98c37d3f1
+    require: false
   gem "codecov", require: false
 end

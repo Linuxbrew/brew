@@ -33,7 +33,7 @@ module Homebrew
     def self.cleanup_logs
       return unless HOMEBREW_LOGS.directory?
       HOMEBREW_LOGS.subdirs.each do |dir|
-        cleanup_path(dir) { dir.rmtree } if prune?(dir, :days_default => 14)
+        cleanup_path(dir) { dir.rmtree } if prune?(dir, days_default: 14)
       end
     end
 

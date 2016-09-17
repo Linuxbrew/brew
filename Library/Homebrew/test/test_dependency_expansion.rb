@@ -4,7 +4,7 @@ require "dependency"
 class DependencyExpansionTests < Homebrew::TestCase
   def build_dep(name, tags = [], deps = [])
     dep = Dependency.new(name.to_s, tags)
-    dep.stubs(:to_formula).returns(stub(:deps => deps, :name => name))
+    dep.stubs(:to_formula).returns(stub(deps: deps, name: name))
     dep
   end
 
@@ -14,7 +14,7 @@ class DependencyExpansionTests < Homebrew::TestCase
     @baz = build_dep(:baz)
     @qux = build_dep(:qux)
     @deps = [@foo, @bar, @baz, @qux]
-    @f    = stub(:deps => @deps, :name => "f")
+    @f    = stub(deps: @deps, name: "f")
   end
 
   def test_expand_yields_dependent_and_dep_pairs
@@ -43,19 +43,19 @@ class DependencyExpansionTests < Homebrew::TestCase
   end
 
   def test_expand_preserves_dependency_order
-    @foo.stubs(:to_formula).returns(stub(:name => "f", :deps => [@qux, @baz]))
+    @foo.stubs(:to_formula).returns(stub(name: "f", deps: [@qux, @baz]))
     assert_equal [@qux, @baz, @foo, @bar], Dependency.expand(@f)
   end
 
   def test_expand_skips_optionals_by_default
     deps = [build_dep(:foo, [:optional]), @bar, @baz, @qux]
-    f = stub(:deps => deps, :build => stub(:with? => false), :name => "f")
+    f = stub(deps: deps, build: stub(with?: false), name: "f")
     assert_equal [@bar, @baz, @qux], Dependency.expand(f)
   end
 
   def test_expand_keeps_recommendeds_by_default
     deps = [build_dep(:foo, [:recommended]), @bar, @baz, @qux]
-    f = stub(:deps => deps, :build => stub(:with? => true), :name => "f")
+    f = stub(deps: deps, build: stub(with?: true), name: "f")
     assert_equal deps, Dependency.expand(f)
   end
 
@@ -73,7 +73,7 @@ class DependencyExpansionTests < Homebrew::TestCase
   def test_merger_preserves_env_proc
     env_proc = stub
     dep = Dependency.new("foo", [], env_proc)
-    dep.stubs(:to_formula).returns(stub(:deps => [], :name => "foo"))
+    dep.stubs(:to_formula).returns(stub(deps: [], name: "foo"))
     @deps.replace [dep]
     assert_equal env_proc, Dependency.expand(@f).first.env_proc
   end
@@ -88,8 +88,8 @@ class DependencyExpansionTests < Homebrew::TestCase
 
   def test_skip_skips_parent_but_yields_children
     f = stub(
-      :name => "f",
-      :deps => [
+      name: "f",
+      deps: [
         build_dep(:foo, [], [@bar, @baz]),
         build_dep(:foo, [], [@baz]),
       ]
@@ -105,7 +105,7 @@ class DependencyExpansionTests < Homebrew::TestCase
   def test_keep_dep_but_prune_recursive_deps
     foo = build_dep(:foo, [:build], @bar)
     baz = build_dep(:baz, [:build])
-    f = stub(:name => "f", :deps => [foo, baz])
+    f = stub(name: "f", deps: [foo, baz])
 
     deps = Dependency.expand(f) do |_dependent, dep|
       Dependency.keep_but_prune_recursive_deps if dep.build?
@@ -122,15 +122,15 @@ class DependencyExpansionTests < Homebrew::TestCase
   def test_cyclic_dependency
     foo = build_dep(:foo)
     bar = build_dep(:bar, [], [foo])
-    foo.stubs(:to_formula).returns(stub(:deps => [bar], :name => "foo"))
-    f = stub(:name => "f", :deps => [foo, bar])
+    foo.stubs(:to_formula).returns(stub(deps: [bar], name: "foo"))
+    f = stub(name: "f", deps: [foo, bar])
     assert_nothing_raised { Dependency.expand(f) }
   end
 
   def test_clean_expand_stack
     foo = build_dep(:foo)
     foo.stubs(:to_formula).raises(FormulaUnavailableError, "foo")
-    f = stub(:name => "f", :deps => [foo])
+    f = stub(name: "f", deps: [foo])
     assert_raises(FormulaUnavailableError) { Dependency.expand(f) }
     assert_empty Dependency.instance_variable_get(:@expand_stack)
   end

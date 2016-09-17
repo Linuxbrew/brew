@@ -66,7 +66,7 @@ class Descriptions
         renamings = report.select_formula(:R)
         alterations = report.select_formula(:A) + report.select_formula(:M) +
                       renamings.map(&:last)
-        cache_formulae(alterations, :save => false)
+        cache_formulae(alterations, save: false)
         uncache_formulae(report.select_formula(:D) +
                               renamings.map(&:first))
       end
@@ -75,7 +75,7 @@ class Descriptions
 
   # Given an array of formula names, add them and their descriptions to the
   # cache. Save the updated cache to disk, unless explicitly told not to.
-  def self.cache_formulae(formula_names, options = { :save => true })
+  def self.cache_formulae(formula_names, options = { save: true })
     if cache
       formula_names.each do |name|
         begin
@@ -90,7 +90,7 @@ class Descriptions
 
   # Given an array of formula names, remove them and their descriptions from
   # the cache. Save the updated cache to disk, unless explicitly told not to.
-  def self.uncache_formulae(formula_names, options = { :save => true })
+  def self.uncache_formulae(formula_names, options = { save: true })
     if cache
       formula_names.each { |name| @cache.delete(name) }
       save_cache if options[:save]

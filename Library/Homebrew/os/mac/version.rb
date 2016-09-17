@@ -4,15 +4,15 @@ module OS
   module Mac
     class Version < ::Version
       SYMBOLS = {
-        :sierra        => "10.12",
-        :el_capitan    => "10.11",
-        :yosemite      => "10.10",
-        :mavericks     => "10.9",
-        :mountain_lion => "10.8",
-        :lion          => "10.7",
-        :snow_leopard  => "10.6",
-        :leopard       => "10.5",
-        :tiger         => "10.4",
+        sierra: "10.12",
+        el_capitan: "10.11",
+        yosemite: "10.10",
+        mavericks: "10.9",
+        mountain_lion: "10.8",
+        lion: "10.7",
+        snow_leopard: "10.6",
+        leopard: "10.5",
+        tiger: "10.4",
       }.freeze
 
       def self.from_symbol(sym)

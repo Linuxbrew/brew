@@ -74,7 +74,7 @@ class FormulaInstaller
     !!@build_bottle && !formula.bottle_disabled?
   end
 
-  def pour_bottle?(install_bottle_options = { :warn=>false })
+  def pour_bottle?(install_bottle_options = { warn: false })
     return true if Homebrew::Hooks::Bottles.formula_has_bottle?(formula)
 
     return false if @pour_failed
@@ -229,7 +229,7 @@ class FormulaInstaller
 
     @@attempted << formula
 
-    pour_bottle = pour_bottle?(:warn => true)
+    pour_bottle = pour_bottle?(warn: true)
     if pour_bottle
       begin
         install_relocation_tools unless formula.bottle_specification.skip_relocation?
@@ -422,7 +422,7 @@ class FormulaInstaller
       puts "All dependencies for #{formula.full_name} are satisfied."
     elsif !deps.empty?
       oh1 "Installing dependencies for #{formula.full_name}: #{Tty.green}#{deps.map(&:first)*", "}#{Tty.reset}",
-        :truncate => false
+        truncate: false
       deps.each { |dep, options| install_dependency(dep, options) }
     end
 
@@ -675,7 +675,7 @@ class FormulaInstaller
       puts e
       puts
       puts "Possible conflicting files are:"
-      mode = OpenStruct.new(:dry_run => true, :overwrite => true)
+      mode = OpenStruct.new(dry_run: true, overwrite: true)
       keg.link(mode)
       @show_summary_heading = true
       Homebrew.failed = true

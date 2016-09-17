@@ -61,7 +61,7 @@ class TabTests < Homebrew::TestCase
   end
 
   def test_universal?
-    tab = Tab.new(:used_options => %w[--universal])
+    tab = Tab.new(used_options: %w[--universal])
     assert_predicate tab, :universal?
   end
 
@@ -132,7 +132,7 @@ class TabTests < Homebrew::TestCase
 
   def test_create_from_alias
     alias_path = CoreTap.instance.alias_dir/"bar"
-    f = formula(:alias_path => alias_path) { url "foo-1.0" }
+    f = formula(alias_path: alias_path) { url "foo-1.0" }
     compiler = DevelopmentTools.default_compiler
     stdlib = :libcxx
     tab = Tab.create(f, compiler, stdlib)
@@ -149,7 +149,7 @@ class TabTests < Homebrew::TestCase
 
   def test_for_formula_from_alias
     alias_path = CoreTap.instance.alias_dir/"bar"
-    f = formula(:alias_path => alias_path) { url "foo-1.0" }
+    f = formula(alias_path: alias_path) { url "foo-1.0" }
     tab = Tab.for_formula(f)
 
     assert_equal alias_path.to_s, tab.source["path"]

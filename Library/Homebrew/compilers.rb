@@ -58,16 +58,16 @@ class CompilerFailure
   end
 
   COLLECTIONS = {
-    :cxx11 => [
+    cxx11: [
       create(:gcc_4_0),
       create(:gcc),
       create(:clang) { build 425 },
-      create(:gcc => "4.3"),
-      create(:gcc => "4.4"),
-      create(:gcc => "4.5"),
-      create(:gcc => "4.6"),
+      create(gcc: "4.3"),
+      create(gcc: "4.4"),
+      create(gcc: "4.5"),
+      create(gcc: "4.6"),
     ],
-    :openmp => [
+    openmp: [
       create(:clang),
     ],
   }.freeze
@@ -79,9 +79,9 @@ class CompilerSelector
   Compiler = Struct.new(:name, :version)
 
   COMPILER_PRIORITY = {
-    :clang   => [:clang, :gcc, :gnu, :gcc_4_0],
-    :gcc     => [:gcc, :gnu, :clang, :gcc_4_0],
-    :gcc_4_0 => [:gcc_4_0, :gcc, :gnu, :clang],
+    clang: [:clang, :gcc, :gnu, :gcc_4_0],
+    gcc: [:gcc, :gnu, :clang, :gcc_4_0],
+    gcc_4_0: [:gcc_4_0, :gcc, :gnu, :clang],
   }.freeze
 
   def self.select_for(formula, compilers = self.compilers)

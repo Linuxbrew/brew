@@ -83,7 +83,7 @@ begin
   # arguments themselves.
   if empty_argv || help_flag
     require "cmd/help"
-    Homebrew.help cmd, :empty_argv => empty_argv
+    Homebrew.help cmd, empty_argv: empty_argv
     # `Homebrew.help` never returns, except for external/unknown commands.
   end
 
@@ -125,7 +125,7 @@ begin
 
 rescue UsageError => e
   require "cmd/help"
-  Homebrew.help cmd, :usage_error => e.message
+  Homebrew.help cmd, usage_error: e.message
 rescue SystemExit => e
   onoe "Kernel.exit" if ARGV.verbose? && !e.success?
   $stderr.puts e.backtrace if ARGV.debug?

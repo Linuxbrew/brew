@@ -29,7 +29,7 @@ module Patch
     when Hash
       list
     when Array, String, :DATA
-      { :p1 => list }
+      { p1: list }
     else
       {}
     end.each_pair do |strip, urls|

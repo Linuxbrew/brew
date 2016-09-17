@@ -225,7 +225,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
     case cached_location.compression_type
     when :zip
-      with_system_path { quiet_safe_system "unzip", { :quiet_flag => "-qq" }, cached_location }
+      with_system_path { quiet_safe_system "unzip", { quiet_flag: "-qq" }, cached_location }
       chdir
     when :gzip_only
       with_system_path { buffered_write("gunzip") }
@@ -254,11 +254,11 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     when :xar
       safe_system "/usr/bin/xar", "-xf", cached_location
     when :rar
-      quiet_safe_system "unrar", "x", { :quiet_flag => "-inul" }, cached_location
+      quiet_safe_system "unrar", "x", { quiet_flag: "-inul" }, cached_location
     when :p7zip
       safe_system "7zr", "x", cached_location
     else
-      cp cached_location, basename_without_params, :preserve => true
+      cp cached_location, basename_without_params, preserve: true
     end
   end
 
@@ -467,7 +467,7 @@ end
 # Useful for installing jars.
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
-    cp cached_location, basename_without_params, :preserve => true
+    cp cached_location, basename_without_params, preserve: true
   end
 end
 
@@ -628,7 +628,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def stage
     super
-    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
+    cp_r File.join(cached_location, "."), Dir.pwd, preserve: true
   end
 
   def source_modified_time
@@ -860,7 +860,7 @@ class CVSDownloadStrategy < VCSDownloadStrategy
   end
 
   def stage
-    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
+    cp_r File.join(cached_location, "."), Dir.pwd, preserve: true
   end
 
   private
@@ -876,13 +876,13 @@ class CVSDownloadStrategy < VCSDownloadStrategy
   def clone_repo
     HOMEBREW_CACHE.cd do
       # Login is only needed (and allowed) with pserver; skip for anoncvs.
-      quiet_safe_system cvspath, { :quiet_flag => "-Q" }, "-d", @url, "login" if @url.include? "pserver"
-      quiet_safe_system cvspath, { :quiet_flag => "-Q" }, "-d", @url, "checkout", "-d", cache_filename, @module
+      quiet_safe_system cvspath, { quiet_flag: "-Q" }, "-d", @url, "login" if @url.include? "pserver"
+      quiet_safe_system cvspath, { quiet_flag: "-Q" }, "-d", @url, "checkout", "-d", cache_filename, @module
     end
   end
 
   def update
-    cached_location.cd { quiet_safe_system cvspath, { :quiet_flag => "-Q" }, "up" }
+    cached_location.cd { quiet_safe_system cvspath, { quiet_flag: "-Q" }, "up" }
   end
 
   def split_url(in_url)
@@ -949,7 +949,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   def stage
     # The export command doesn't work on checkouts
     # See https://bugs.launchpad.net/bzr/+bug/897511
-    cp_r File.join(cached_location, "."), Dir.pwd, :preserve => true
+    cp_r File.join(cached_location, "."), Dir.pwd, preserve: true
     rm_r ".bzr"
   end
 

@@ -4,7 +4,7 @@ module RubyKeg
   def change_dylib_id(id, file)
     @require_install_name_tool = true
     puts "Changing dylib ID of #{file}\n  from #{file.dylib_id}\n    to #{id}" if ARGV.debug?
-    MachO::Tools.change_dylib_id(file, id, :strict => false)
+    MachO::Tools.change_dylib_id(file, id, strict: false)
   rescue MachO::MachOError
     onoe <<-EOS.undent
       Failed changing dylib ID of #{file}
@@ -17,7 +17,7 @@ module RubyKeg
   def change_install_name(old, new, file)
     @require_install_name_tool = true
     puts "Changing install name in #{file}\n  from #{old}\n    to #{new}" if ARGV.debug?
-    MachO::Tools.change_install_name(file, old, new, :strict => false)
+    MachO::Tools.change_install_name(file, old, new, strict: false)
   rescue MachO::MachOError
     onoe <<-EOS.undent
       Failed changing install name in #{file}

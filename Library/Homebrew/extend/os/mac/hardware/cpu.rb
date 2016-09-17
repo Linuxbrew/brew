@@ -4,11 +4,11 @@ module Hardware
   class CPU
     class << self
       PPC_OPTIMIZATION_FLAGS = {
-        :g3 => "-mcpu=750",
-        :g4 => "-mcpu=7400",
-        :g4e => "-mcpu=7450",
-        :g5 => "-mcpu=970",
-        :g5_64 => "-mcpu=970 -arch ppc64",
+        g3: "-mcpu=750",
+        g4: "-mcpu=7400",
+        g4e: "-mcpu=7450",
+        g5: "-mcpu=970",
+        g5_64: "-mcpu=970 -arch ppc64",
       }.freeze
       def optimization_flags
         OPTIMIZATION_FLAGS.merge(PPC_OPTIMIZATION_FLAGS)

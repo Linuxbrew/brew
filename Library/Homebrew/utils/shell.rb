@@ -1,12 +1,12 @@
 module Utils
   SHELL_PROFILE_MAP = {
-    :bash => "~/.bash_profile",
-    :csh => "~/.cshrc",
-    :fish => "~/.config/fish/config.fish",
-    :ksh => "~/.kshrc",
-    :sh => "~/.bash_profile",
-    :tcsh => "~/.tcshrc",
-    :zsh => "~/.zshrc",
+    bash: "~/.bash_profile",
+    csh: "~/.cshrc",
+    fish: "~/.config/fish/config.fish",
+    ksh: "~/.kshrc",
+    sh: "~/.bash_profile",
+    tcsh: "~/.tcshrc",
+    zsh: "~/.zshrc",
   }.freeze
 
   module Shell

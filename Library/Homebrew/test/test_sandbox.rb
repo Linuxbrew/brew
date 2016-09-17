@@ -49,8 +49,8 @@ class SandboxTest < Homebrew::TestCase
   end
 
   def test_complains_on_failure
-    Utils.expects(:popen_read => "foo")
-    ARGV.stubs(:verbose? => true)
+    Utils.expects(popen_read: "foo")
+    ARGV.stubs(verbose?: true)
     out, _err = capture_io do
       assert_raises(ErrorDuringExecution) { @sandbox.exec "false" }
     end
@@ -63,8 +63,8 @@ class SandboxTest < Homebrew::TestCase
       Mar 17 02:55:06 sandboxd[342]: Python(49765) deny file-write-unlink /System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/distutils/errors.pyc
       bar
     EOS
-    Utils.expects(:popen_read => with_bogus_error)
-    ARGV.stubs(:verbose? => true)
+    Utils.expects(popen_read: with_bogus_error)
+    ARGV.stubs(verbose?: true)
     out, _err = capture_io do
       assert_raises(ErrorDuringExecution) { @sandbox.exec "false" }
     end

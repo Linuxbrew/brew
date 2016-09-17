@@ -36,18 +36,18 @@ class SoftwareSpecTests < Homebrew::TestCase
   end
 
   def test_set_owner
-    owner = stub :name => "some_name",
-                 :full_name => "some_name",
-                 :tap => "homebrew/core"
+    owner = stub name: "some_name",
+                 full_name: "some_name",
+                 tap: "homebrew/core"
     @spec.owner = owner
     assert_equal owner, @spec.owner
   end
 
   def test_resource_owner
     @spec.resource("foo") { url "foo-1.0" }
-    @spec.owner = stub :name => "some_name",
-                       :full_name => "some_name",
-                       :tap => "homebrew/core"
+    @spec.owner = stub name: "some_name",
+                       full_name: "some_name",
+                       tap: "homebrew/core"
     assert_equal "some_name", @spec.name
     @spec.resources.each_value { |r| assert_equal @spec, r.owner }
   end
@@ -55,9 +55,9 @@ class SoftwareSpecTests < Homebrew::TestCase
   def test_resource_without_version_receives_owners_version
     @spec.url("foo-42")
     @spec.resource("bar") { url "bar" }
-    @spec.owner = stub :name => "some_name",
-                       :full_name => "some_name",
-                       :tap => "homebrew/core"
+    @spec.owner = stub name: "some_name",
+                       full_name: "some_name",
+                       tap: "homebrew/core"
     assert_version_equal "42", @spec.resource("bar").version
   end
 
@@ -155,10 +155,10 @@ class BottleSpecificationTests < Homebrew::TestCase
 
   def test_checksum_setters
     checksums = {
-      :snow_leopard_32 => "deadbeef"*8,
-      :snow_leopard    => "faceb00c"*8,
-      :lion            => "baadf00d"*8,
-      :mountain_lion   => "8badf00d"*8,
+      snow_leopard_32: "deadbeef"*8,
+      snow_leopard: "faceb00c"*8,
+      lion: "baadf00d"*8,
+      mountain_lion: "8badf00d"*8,
     }
 
     checksums.each_pair do |cat, digest|

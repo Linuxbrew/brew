@@ -35,7 +35,7 @@ class Keg
           first.open("wb") { |f| f.write(s) }
         end
       else
-        rest.each { |file| FileUtils.ln(first, file, :force => true) }
+        rest.each { |file| FileUtils.ln(first, file, force: true) }
       end
     end
   end

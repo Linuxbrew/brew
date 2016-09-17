@@ -62,11 +62,11 @@ module Homebrew
 
     if strict
       # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, :realpath => true)
+      style_results = check_style_json(files, realpath: true)
     end
 
     ff.each do |f|
-      options = { :new_formula => new_formula, :strict => strict, :online => online }
+      options = { new_formula: new_formula, strict: strict, online: online }
       options[:style_offenses] = style_results.file_offenses(f.path) if strict
       fa = FormulaAuditor.new(f, options)
       fa.audit
@@ -172,7 +172,7 @@ class FormulaAuditor
     return unless @style_offenses
     display_cop_names = ARGV.include?("--display-cop-names")
     @style_offenses.each do |offense|
-      problem offense.to_s(:display_cop_name => display_cop_names)
+      problem offense.to_s(display_cop_name: display_cop_names)
     end
   end
 
@@ -655,7 +655,7 @@ class FormulaAuditor
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
 
-    fv = FormulaVersions.new(formula, :max_depth => 10)
+    fv = FormulaVersions.new(formula, max_depth: 10)
     attributes = [:revision, :version_scheme]
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 

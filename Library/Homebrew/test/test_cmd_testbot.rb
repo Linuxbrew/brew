@@ -52,8 +52,8 @@ class TestbotStepTests < Homebrew::TestCase
 
   def stub_test_instance
     stub(
-      :category => "stub",
-      :log_root => Pathname.pwd
+      category: "stub",
+      log_root: Pathname.pwd
     )
   end
 

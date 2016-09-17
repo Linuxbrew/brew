@@ -7,7 +7,7 @@ class FortranRequirement < Requirement
 
   env { ENV.fortran }
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     which(ENV["FC"] || "gfortran")
   end
 end

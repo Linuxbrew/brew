@@ -234,7 +234,7 @@ class Migrator
       puts e
       puts
       puts "Possible conflicting files are:"
-      mode = OpenStruct.new(:dry_run => true, :overwrite => true)
+      mode = OpenStruct.new(dry_run: true, overwrite: true)
       new_keg.link(mode)
       raise
     rescue Keg::LinkError => e

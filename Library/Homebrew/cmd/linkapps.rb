@@ -12,7 +12,7 @@ require "formula"
 
 module Homebrew
   def linkapps
-    target_dir = linkapps_target(:local => ARGV.include?("--local"))
+    target_dir = linkapps_target(local: ARGV.include?("--local"))
 
     unless target_dir.directory?
       opoo "#{target_dir} does not exist, stopping."

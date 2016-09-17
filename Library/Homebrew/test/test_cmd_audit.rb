@@ -50,7 +50,7 @@ class FormulaTextTests < Homebrew::TestCase
   end
 
   def test_has_end
-    ft = formula_text "end", "", :patch => "__END__\na patch here"
+    ft = formula_text "end", "", patch: "__END__\na patch here"
     assert ft.end?, "The formula must have __END__"
     assert_equal "class End < Formula\n  \nend", ft.without_patch
   end
@@ -138,7 +138,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_file_strict_ordering_issue
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         url "http://example.com/foo-1.0.tgz"
         homepage "http://example.com"
@@ -150,7 +150,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_file_strict_resource_placement
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         url "https://example.com/foo-1.0.tgz"
 
@@ -167,7 +167,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_file_strict_plist_placement
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         url "https://example.com/foo-1.0.tgz"
 
@@ -185,7 +185,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_file_strict_url_outside_of_stable_block
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         url "http://example.com/foo-1.0.tgz"
         stable do
@@ -198,7 +198,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_file_strict_head_and_head_do
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         head "http://example.com/foo.git"
         head do
@@ -211,7 +211,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_file_strict_bottle_and_bottle_do
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         url "http://example.com/foo-1.0.tgz"
         bottle do
@@ -234,7 +234,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     fa.audit_class
     assert_equal [], fa.problems
 
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         url "http://example.com/foo-1.0.tgz"
       end
@@ -291,7 +291,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_line_pkgshare
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true
       class Foo < Formula
         url "http://example.com/foo-1.0.tgz"
       end
@@ -320,7 +320,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   # Formulae with "++" in their name would break various audit regexps:
   #   Error: nested *?+ in regexp: /^libxml++3\s/
   def test_audit_plus_plus_name
-    fa = formula_auditor "foolibc++", <<-EOS.undent, :strict => true
+    fa = formula_auditor "foolibc++", <<-EOS.undent, strict: true
       class Foolibcxx < Formula
         desc "foolibc++ is a test"
         url "http://example.com/foo-1.0.tgz"
@@ -358,7 +358,7 @@ class FormulaAuditorTests < Homebrew::TestCase
   end
 
   def test_audit_github_repository_no_api
-    fa = formula_auditor "foo", <<-EOS.undent, :strict => true, :online => true
+    fa = formula_auditor "foo", <<-EOS.undent, strict: true, online: true
       class Foo < Formula
         homepage "https://github.com/example/example"
         url "http://example.com/foo-1.0.tgz"
@@ -393,14 +393,14 @@ class FormulaAuditorTests < Homebrew::TestCase
 
   def test_audit_desc
     formula_descriptions = [
-      { :name => "foo", :desc => nil,
-        :problem => "Formula should have a desc" },
-      { :name => "bar", :desc => "bar" * 30,
-        :problem => "Description is too long" },
-      { :name => "baz", :desc => "Baz commandline tool",
-        :problem => "Description should use \"command-line\"" },
-      { :name => "qux", :desc => "A tool called Qux",
-        :problem => "Description shouldn't start with an indefinite article" },
+      { name: "foo", desc: nil,
+        problem: "Formula should have a desc" },
+      { name: "bar", desc: "bar" * 30,
+        problem: "Description is too long" },
+      { name: "baz", desc: "Baz commandline tool",
+        problem: "Description should use \"command-line\"" },
+      { name: "qux", desc: "A tool called Qux",
+        problem: "Description shouldn't start with an indefinite article" },
     ]
 
     formula_descriptions.each do |formula|
@@ -411,14 +411,14 @@ class FormulaAuditorTests < Homebrew::TestCase
         end
       EOS
 
-      fa = formula_auditor formula[:name], content, :strict => true
+      fa = formula_auditor formula[:name], content, strict: true
       fa.audit_desc
       assert_match formula[:problem], fa.problems.first
     end
   end
 
   def test_audit_homepage
-    fa = formula_auditor "foo", <<-EOS.undent, :online => true
+    fa = formula_auditor "foo", <<-EOS.undent, online: true
       class Foo < Formula
         homepage "ftp://example.com/foo"
         url "http://example.com/foo-1.0.tgz"

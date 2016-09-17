@@ -5,7 +5,7 @@ class PythonRequirement < Requirement
   default_formula "python"
   cask "python"
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     python = which_python
     next unless python
     version = python_short_version
@@ -58,7 +58,7 @@ class Python3Requirement < PythonRequirement
   default_formula "python3"
   cask "python3"
 
-  satisfy(:build_env => false) { which_python }
+  satisfy(build_env: false) { which_python }
 
   def python_binary
     "python3"

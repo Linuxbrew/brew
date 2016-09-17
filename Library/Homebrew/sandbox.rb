@@ -42,25 +42,25 @@ class Sandbox
   end
 
   def allow_write(path, options = {})
-    add_rule :allow => true, :operation => "file-write*", :filter => path_filter(path, options[:type])
+    add_rule allow: true, operation: "file-write*", filter: path_filter(path, options[:type])
   end
 
   def deny_write(path, options = {})
-    add_rule :allow => false, :operation => "file-write*", :filter => path_filter(path, options[:type])
+    add_rule allow: false, operation: "file-write*", filter: path_filter(path, options[:type])
   end
 
   def allow_write_path(path)
-    allow_write path, :type => :subpath
+    allow_write path, type: :subpath
   end
 
   def deny_write_path(path)
-    deny_write path, :type => :subpath
+    deny_write path, type: :subpath
   end
 
   def allow_write_temp_and_cache
     allow_write_path "/private/tmp"
     allow_write_path "/private/var/tmp"
-    allow_write "^/private/var/folders/[^/]+/[^/]+/[C,T]/", :type => :regex
+    allow_write "^/private/var/folders/[^/]+/[^/]+/[C,T]/", type: :regex
     allow_write_path HOMEBREW_TEMP
     allow_write_path HOMEBREW_CACHE
   end

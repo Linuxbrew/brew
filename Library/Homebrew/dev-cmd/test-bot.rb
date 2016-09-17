@@ -102,7 +102,7 @@ module Homebrew
     # Assume we are starting from a "mostly" UTF-8 string
     str.force_encoding(Encoding::UTF_8)
     return str if str.valid_encoding?
-    str.encode!(Encoding::UTF_16, :invalid => :replace)
+    str.encode!(Encoding::UTF_16, invalid: :replace)
     str.encode!(Encoding::UTF_8)
   end
 
@@ -652,7 +652,7 @@ module Homebrew
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
             test "brew", "bottle", *bottle_merge_args
             test "brew", "uninstall", "--force", formula_name
-            FileUtils.ln bottle_filename, HOMEBREW_CACHE/bottle_filename, :force => true
+            FileUtils.ln bottle_filename, HOMEBREW_CACHE/bottle_filename, force: true
             @formulae.delete(formula_name)
             unless unchanged_build_dependencies.empty?
               test "brew", "uninstall", "--force", *unchanged_build_dependencies
@@ -908,7 +908,7 @@ module Homebrew
       bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
       return if bottles.empty?
 
-      FileUtils.cp bottles, Dir.pwd, :verbose => true
+      FileUtils.cp bottles, Dir.pwd, verbose: true
     end
 
     json_files = Dir.glob("*.bottle.json")
@@ -1077,14 +1077,14 @@ module Homebrew
     skip_homebrew = ARGV.include?("--skip-homebrew")
     if ARGV.named.empty?
       # With no arguments just build the most recent commit.
-      current_test = Test.new("HEAD", :tap => tap, :skip_homebrew => skip_homebrew)
+      current_test = Test.new("HEAD", tap: tap, skip_homebrew: skip_homebrew)
       any_errors = !current_test.run
       tests << current_test
     else
       ARGV.named.each do |argument|
         test_error = false
         begin
-          current_test = Test.new(argument, :tap => tap, :skip_homebrew => skip_homebrew)
+          current_test = Test.new(argument, tap: tap, skip_homebrew: skip_homebrew)
           skip_homebrew = true
         rescue ArgumentError => e
           test_error = true
@@ -1153,7 +1153,7 @@ module Homebrew
 
       # Truncate to 1MB to avoid hitting CI limits
       if output.bytesize > MAX_STEP_OUTPUT_SIZE
-        output = truncate_text_to_approximate_size(output, MAX_STEP_OUTPUT_SIZE, :front_weight => 0.0)
+        output = truncate_text_to_approximate_size(output, MAX_STEP_OUTPUT_SIZE, front_weight: 0.0)
         output = "truncated output to 1MB:\n" + output
       end
     end
