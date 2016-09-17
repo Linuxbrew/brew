@@ -59,8 +59,8 @@ module Homebrew
           group_by { |keg| Formulary.from_keg(keg) }.
           sort_by { |formula, kegs| formula.full_name }.
           map do |formula, kegs|
-            "#{formula.full_name} (#{kegs.map(&:version) * ", "})"
-          end * ", "
+            "#{formula.full_name} (#{kegs.map(&:version).join(", ")})"
+          end.join(", ")
 
         puts "#{outdated_versions} < #{current_version}"
       else
