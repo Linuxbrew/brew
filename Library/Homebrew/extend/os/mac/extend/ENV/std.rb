@@ -143,6 +143,6 @@ module Stdenv
   end
 
   def no_weak_imports
-    append "LDFLAGS", "-Wl,-no_weak_imports"
+    append "LDFLAGS", "-Wl,-no_weak_imports" if no_weak_imports_support?
   end
 end
