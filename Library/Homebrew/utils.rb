@@ -620,3 +620,27 @@ end
 def link_path_manpages(path, command)
   link_src_dst_dirs(path/"man", HOMEBREW_PREFIX/"share/man", command)
 end
+
+def migrate_legacy_keg_symlinks_if_necessary
+  legacy_linked_kegs = HOMEBREW_LIBRARY/"LinkedKegs"
+  return unless legacy_linked_kegs.directory?
+
+  legacy_linked_kegs.children.each do |f|
+    keg = Keg.new(f.realpath)
+    keg.unlink
+    keg.link
+  end
+  FileUtils.rm_rf legacy_linked_kegs
+
+  legacy_pinned_kegs = HOMEBREW_LIBRARY/"PinnedKegs"
+  return unless legacy_pinned_kegs.directory?
+
+  legacy_pinned_kegs.children.each do |f|
+    pin_version = Keg.new(f.realpath).version
+    formula = Formulary.factory(f.basename.to_s)
+    pin = FormulaPin.new(formula)
+    pin.unpin
+    pin.pin_at(pin_version)
+  end
+  FileUtils.rm_rf legacy_pinned_kegs
+end

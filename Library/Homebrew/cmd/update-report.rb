@@ -7,6 +7,7 @@ require "migrator"
 require "formulary"
 require "descriptions"
 require "cleanup"
+require "utils"
 
 module Homebrew
   def update_preinstall_header
@@ -166,30 +167,6 @@ module Homebrew
         EOS
       end
     end
-  end
-
-  def migrate_legacy_keg_symlinks_if_necessary
-    legacy_linked_kegs = HOMEBREW_LIBRARY/"LinkedKegs"
-    return unless legacy_linked_kegs.directory?
-
-    legacy_linked_kegs.children.each do |f|
-      keg = Keg.new(f.realpath)
-      keg.unlink
-      keg.link
-    end
-    FileUtils.rm_rf legacy_linked_kegs
-
-    legacy_pinned_kegs = HOMEBREW_LIBRARY/"PinnedKegs"
-    return unless legacy_pinned_kegs.directory?
-
-    legacy_pinned_kegs.children.each do |f|
-      pin_version = Keg.new(f.realpath).version
-      formula = Formulary.factory(f.basename.to_s)
-      pin = FormulaPin.new(formula)
-      pin.unpin
-      pin.pin_at(pin_version)
-    end
-    FileUtils.rm_rf legacy_pinned_kegs
   end
 
   def link_completions_and_docs

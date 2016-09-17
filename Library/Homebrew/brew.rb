@@ -87,6 +87,9 @@ begin
     # `Homebrew.help` never returns, except for external/unknown commands.
   end
 
+  # Migrate LinkedKegs/PinnedKegs if update didn't already do so
+  migrate_legacy_keg_symlinks_if_necessary
+
   # Uninstall old brew-cask if it's still around; we just use the tap now.
   if cmd == "cask" && (HOMEBREW_CELLAR/"brew-cask").exist?
     system(HOMEBREW_BREW_FILE, "uninstall", "--force", "brew-cask")
