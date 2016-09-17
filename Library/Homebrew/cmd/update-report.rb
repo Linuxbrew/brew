@@ -288,7 +288,7 @@ module Homebrew
       Please try to resolve this error yourself and then run `brew update` again to
       complete the migration. If you need help please +1 an existing error or comment
       with your new error in issue:
-        #{Tty.em}https://github.com/Homebrew/brew/issues/987#{Tty.reset}
+        #{Formatter.url("https://github.com/Homebrew/brew/issues/987")}
     EOS
     $stderr.puts e.backtrace
   end

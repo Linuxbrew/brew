@@ -106,14 +106,14 @@ module GitHub
           onoe <<-EOS.undent
             Your macOS keychain GitHub credentials do not have sufficient scope!
             Scopes they have: #{credentials_scopes}
-            Create a personal access token: https://github.com/settings/tokens
+            Create a personal access token: #{Formatter.url("https://github.com/settings/tokens")}
             and then set HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         when :environment
           onoe <<-EOS.undent
             Your HOMEBREW_GITHUB_API_TOKEN does not have sufficient scope!
             Scopes it has: #{credentials_scopes}
-            Create a new personal access token: https://github.com/settings/tokens
+            Create a new personal access token: #{Formatter.url("https://github.com/settings/tokens")}
             and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         end

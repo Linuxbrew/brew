@@ -102,12 +102,12 @@ module Hbc
 
         A report has been made to Apple about this app. Their certificate will hopefully be revoked.
         See the public report at
-          https://openradar.appspot.com/#{radar_number}
+          #{Formatter.url("https://openradar.appspot.com/#{radar_number}")}
 
         If this report is accurate, please duplicate it at
-          https://bugreport.apple.com/
+          #{Formatter.url("https://bugreport.apple.com/")}
         If this report is a mistake, please let us know by opening an issue at
-          https://github.com/caskroom/homebrew-cask/issues/new
+          #{Formatter.url("https://github.com/caskroom/homebrew-cask/issues/new")}
 
         EOS
       end
