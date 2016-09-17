@@ -29,7 +29,7 @@ module OS
 
     def prerelease?
       # TODO: bump version when new OS is released
-      version >= "10.12"
+      version >= "10.13"
     end
 
     def outdated_release?
