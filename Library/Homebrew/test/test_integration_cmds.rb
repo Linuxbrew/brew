@@ -14,6 +14,8 @@ class IntegrationCommandTests < Homebrew::TestCase
   def teardown
     coretap = CoreTap.new
     paths_to_delete = [
+      HOMEBREW_LINKED_KEGS,
+      HOMEBREW_PINNED_KEGS,
       HOMEBREW_CELLAR.children,
       HOMEBREW_CACHE.children,
       HOMEBREW_LOCK_DIR.children,
@@ -22,7 +24,6 @@ class IntegrationCommandTests < Homebrew::TestCase
       HOMEBREW_PREFIX/"bin",
       HOMEBREW_PREFIX/"share",
       HOMEBREW_PREFIX/"opt",
-      HOMEBREW_LINKED_KEGS,
       HOMEBREW_LIBRARY/"Taps/caskroom",
       HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle",
       HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo",
