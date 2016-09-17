@@ -215,7 +215,18 @@ merge_or_rebase() {
 
   trap reset_on_interrupt SIGINT
 
-  REMOTE_REF="origin/$UPSTREAM_BRANCH"
+  if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
+  then
+    UPSTREAM_TAG="$(git tag --list --sort=-version:refname | head -n1)"
+  fi
+
+  if [ -n "$UPSTREAM_TAG" ]
+  then
+    REMOTE_REF="refs/tags/$UPSTREAM_TAG"
+    UPSTREAM_BRANCH="v$UPSTREAM_TAG"
+  else
+    REMOTE_REF="origin/$UPSTREAM_BRANCH"
+  fi
 
   if [[ -n "$(git status --untracked-files=all --porcelain 2>/dev/null)" ]]
   then
