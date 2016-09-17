@@ -637,6 +637,7 @@ def migrate_legacy_keg_symlinks_if_necessary
       end
     end
     dst = HOMEBREW_LINKED_KEGS/name
+    dst.unlink if dst.exist?
     FileUtils.ln_sf(src.relative_path_from(dst.parent), dst)
   end
   FileUtils.rm_rf legacy_linked_kegs
