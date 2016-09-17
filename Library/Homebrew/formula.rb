@@ -1434,8 +1434,10 @@ class Formula
     old_tmpdir = ENV["TMPDIR"]
     old_temp = ENV["TEMP"]
     old_tmp = ENV["TMP"]
+    old_term = ENV["TERM"]
     ENV["CURL_HOME"] = old_curl_home || old_home
     ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
+    ENV["TERM"] = "dumb"
     mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
@@ -1457,6 +1459,7 @@ class Formula
     ENV["TMPDIR"] = old_tmpdir
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
+    ENV["TERM"] = old_term
   end
 
   # @private
