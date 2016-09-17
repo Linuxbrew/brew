@@ -215,6 +215,8 @@ merge_or_rebase() {
 
   trap reset_on_interrupt SIGINT
 
+  REMOTE_REF="origin/$UPSTREAM_BRANCH"
+
   if [[ -n "$(git status --untracked-files=all --porcelain 2>/dev/null)" ]]
   then
     if [[ -n "$HOMEBREW_VERBOSE" ]]
@@ -252,11 +254,11 @@ EOS
 
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
     # it to `origin/#{@upstream_branch}`. Otherwise, just check it out.
-    if git merge-base --is-ancestor "$UPSTREAM_BRANCH" "origin/$UPSTREAM_BRANCH" &>/dev/null
+    if git merge-base --is-ancestor "$UPSTREAM_BRANCH" "$REMOTE_REF" &>/dev/null
     then
       git checkout --force "$UPSTREAM_BRANCH" "${QUIET_ARGS[@]}"
     else
-      git checkout --force -B "$UPSTREAM_BRANCH" "origin/$UPSTREAM_BRANCH" "${QUIET_ARGS[@]}"
+      git checkout --force -B "$UPSTREAM_BRANCH" "$REMOTE_REF" "${QUIET_ARGS[@]}"
     fi
   fi
 
@@ -268,9 +270,9 @@ EOS
 
   if [[ -z "$HOMEBREW_MERGE" ]]
   then
-    git rebase "${QUIET_ARGS[@]}" "origin/$UPSTREAM_BRANCH"
+    git rebase "${QUIET_ARGS[@]}" "$REMOTE_REF"
   else
-    git merge --no-edit --ff "${QUIET_ARGS[@]}" "origin/$UPSTREAM_BRANCH" \
+    git merge --no-edit --ff "${QUIET_ARGS[@]}" "$REMOTE_REF" \
       --strategy=recursive \
       --strategy-option=ours \
       --strategy-option=ignore-all-space
