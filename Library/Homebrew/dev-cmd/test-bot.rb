@@ -724,7 +724,7 @@ module Homebrew
         coverage_args = []
         if ARGV.include?("--coverage")
           if ENV["JENKINS_HOME"]
-            if OS.mac? && MacOS.version == :el_capitan
+            if OS.mac? && MacOS.version == :sierra
               coverage_args << "--coverage"
             end
           else
