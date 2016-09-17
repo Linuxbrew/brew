@@ -18,18 +18,10 @@ HOMEBREW_LIBRARY = Pathname.new(ENV["HOMEBREW_LIBRARY"])
 HOMEBREW_SHIMS_PATH = HOMEBREW_LIBRARY/"Homebrew/shims"
 
 # Where we store symlinks to currently linked kegs
-HOMEBREW_LINKED_KEGS = if (HOMEBREW_LIBRARY/"LinkedKegs").exist?
-  HOMEBREW_LIBRARY/"LinkedKegs"
-else
-  HOMEBREW_PREFIX/"var/homebrew/linked"
-end
+HOMEBREW_LINKED_KEGS = HOMEBREW_PREFIX/"var/homebrew/linked"
 
 # Where we store symlinks to currently version-pinned kegs
-HOMEBREW_PINNED_KEGS = if (HOMEBREW_LIBRARY/"PinnedKegs").exist?
-  HOMEBREW_LIBRARY/"PinnedKegs"
-else
-  HOMEBREW_PREFIX/"var/homebrew/pinned"
-end
+HOMEBREW_PINNED_KEGS = HOMEBREW_PREFIX/"var/homebrew/pinned"
 
 # Where we store lock files
 HOMEBREW_LOCK_DIR = HOMEBREW_PREFIX/"var/homebrew/locks"
