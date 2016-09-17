@@ -516,10 +516,10 @@ module Homebrew
 
         # Our gettext formula will be caught by check_linked_keg_only_brews
         gettext = begin
-                    Formulary.factory("gettext")
-                  rescue
-                    nil
-                  end
+          Formulary.factory("gettext")
+        rescue
+          nil
+        end
         homebrew_owned = @found.all? do |path|
           Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
         end
@@ -537,10 +537,10 @@ module Homebrew
         return if @found.empty?
 
         libiconv = begin
-                     Formulary.factory("libiconv")
-                   rescue
-                     nil
-                   end
+          Formulary.factory("libiconv")
+        rescue
+          nil
+        end
         if libiconv && libiconv.linked_keg.directory?
           unless libiconv.keg_only?
             <<-EOS.undent

@@ -269,10 +269,10 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     case entries.length
     when 0 then raise "Empty archive"
     when 1 then begin
-                  Dir.chdir entries.first
-                rescue
-                  nil
-                end
+        Dir.chdir entries.first
+      rescue
+        nil
+      end
     end
   end
 

@@ -339,10 +339,10 @@ class BottleSpecification
     os_versions = collector.keys
     os_versions.map! do |osx|
       begin
-                               MacOS::Version.from_symbol osx
-                             rescue
-                               nil
-                             end
+        MacOS::Version.from_symbol osx
+      rescue
+        nil
+      end
     end.compact!
     os_versions.sort.reverse_each do |os_version|
       osx = os_version.to_sym

@@ -56,10 +56,10 @@ require "compat" unless ARGV.include?("--no-compat") || ENV["HOMEBREW_NO_COMPAT"
 
 ORIGINAL_PATHS = ENV["PATH"].split(File::PATH_SEPARATOR).map do |p|
   begin
-                                                    Pathname.new(p).expand_path
-                                                  rescue
-                                                    nil
-                                                  end
+    Pathname.new(p).expand_path
+  rescue
+    nil
+  end
 end.compact.freeze
 
 # TODO: remove this as soon as it's removed from commands.rb.
