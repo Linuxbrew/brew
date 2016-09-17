@@ -625,6 +625,7 @@ def migrate_legacy_keg_symlinks_if_necessary
   legacy_linked_kegs = HOMEBREW_LIBRARY/"LinkedKegs"
   return unless legacy_linked_kegs.directory?
 
+  HOMEBREW_LINKED_KEGS.mkpath unless legacy_linked_kegs.children.empty?
   legacy_linked_kegs.children.each do |link|
     name = link.basename
     src = begin
@@ -645,6 +646,7 @@ def migrate_legacy_keg_symlinks_if_necessary
   legacy_pinned_kegs = HOMEBREW_LIBRARY/"PinnedKegs"
   return unless legacy_pinned_kegs.directory?
 
+  HOMEBREW_PINNED_KEGS.mkpath unless legacy_pinned_kegs.children.empty?
   legacy_pinned_kegs.children.each do |link|
     name = link.basename
     src = link.realpath
