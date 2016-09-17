@@ -67,7 +67,7 @@ class FormulaInstaller
   def self.prevent_build_flags
     build_flags = ARGV.collect_build_flags
 
-    raise BuildFlagsError.new(build_flags) unless build_flags.empty?
+    raise BuildFlagsError, build_flags unless build_flags.empty?
   end
 
   def build_bottle?
@@ -191,7 +191,7 @@ class FormulaInstaller
     check_conflicts
 
     if !pour_bottle? && !formula.bottle_unneeded? && !DevelopmentTools.installed?
-      raise BuildToolsError.new([formula])
+      raise BuildToolsError, [formula]
     end
 
     unless skip_deps_check?
@@ -244,7 +244,7 @@ class FormulaInstaller
         @pour_failed = true
         onoe e.message
         opoo "Bottle installation failed: building from source."
-        raise BuildToolsError.new([formula]) unless DevelopmentTools.installed?
+        raise BuildToolsError, [formula] unless DevelopmentTools.installed?
       else
         @poured_bottle = true
       end
@@ -317,7 +317,7 @@ class FormulaInstaller
       dep_f.pour_bottle? || dep_f.bottle_unneeded?
     end
 
-    raise BuildToolsError.new(unbottled) unless unbottled.empty?
+    raise BuildToolsError, unbottled unless unbottled.empty?
   end
 
   def compute_and_install_dependencies
@@ -336,7 +336,7 @@ class FormulaInstaller
       end
     end
 
-    raise UnsatisfiedRequirements.new(fatals) unless fatals.empty?
+    raise UnsatisfiedRequirements, fatals unless fatals.empty?
   end
 
   def install_requirement_default_formula?(req, dependent, build)

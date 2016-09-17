@@ -86,11 +86,11 @@ class Migrator
   def initialize(formula)
     @oldname = formula.oldname
     @newname = formula.name
-    raise MigratorNoOldnameError.new(formula) unless oldname
+    raise MigratorNoOldnameError, formula unless oldname
 
     @formula = formula
     @old_cellar = HOMEBREW_CELLAR/formula.oldname
-    raise MigratorNoOldpathError.new(formula) unless old_cellar.exist?
+    raise MigratorNoOldpathError, formula unless old_cellar.exist?
 
     @old_tabs = old_cellar.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
     @old_tap = old_tabs.first.tap

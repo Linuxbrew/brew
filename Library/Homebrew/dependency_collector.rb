@@ -145,20 +145,19 @@ class DependencyCollector
     tags << :build
     strategy = spec.download_strategy
 
-    case
-    when strategy <= CurlDownloadStrategy
+    if strategy <= CurlDownloadStrategy
       parse_url_spec(spec.url, tags)
-    when strategy <= GitDownloadStrategy
+    elsif strategy <= GitDownloadStrategy
       GitRequirement.new(tags)
-    when strategy <= MercurialDownloadStrategy
+    elsif strategy <= MercurialDownloadStrategy
       MercurialRequirement.new(tags)
-    when strategy <= FossilDownloadStrategy
+    elsif strategy <= FossilDownloadStrategy
       Dependency.new("fossil", tags)
-    when strategy <= BazaarDownloadStrategy
+    elsif strategy <= BazaarDownloadStrategy
       Dependency.new("bazaar", tags)
-    when strategy <= CVSDownloadStrategy
+    elsif strategy <= CVSDownloadStrategy
       Dependency.new("cvs", tags) if MacOS.version >= :mavericks || !MacOS::Xcode.provides_cvs?
-    when strategy < AbstractDownloadStrategy
+    elsif strategy < AbstractDownloadStrategy
       # allow unknown strategies to pass through
     else
       raise TypeError,

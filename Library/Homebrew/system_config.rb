@@ -57,7 +57,7 @@ class SystemConfig
     end
 
     def describe_perl
-      describe_path(which "perl")
+      describe_path(which("perl"))
     end
 
     def describe_python

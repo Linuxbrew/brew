@@ -16,7 +16,7 @@ class FormulaPin
   end
 
   def pin
-    pin_at(@f.installed_kegs.map { |keg| keg.version }.max)
+    pin_at(@f.installed_kegs.map(&:version).max)
   end
 
   def unpin

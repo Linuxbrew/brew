@@ -16,7 +16,7 @@ ARGV.extend(HomebrewArgvExtension)
 
 HOMEBREW_PRODUCT = ENV["HOMEBREW_PRODUCT"]
 HOMEBREW_VERSION = ENV["HOMEBREW_VERSION"]
-HOMEBREW_WWW = "http://brew.sh"
+HOMEBREW_WWW = "http://brew.sh".freeze
 
 require "config"
 
@@ -26,7 +26,7 @@ RUBY_PATH = Pathname.new(RbConfig.ruby)
 RUBY_BIN = RUBY_PATH.dirname
 
 HOMEBREW_USER_AGENT_CURL = ENV["HOMEBREW_USER_AGENT_CURL"]
-HOMEBREW_USER_AGENT_RUBY = "#{ENV["HOMEBREW_USER_AGENT"]} ruby/#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}"
+HOMEBREW_USER_AGENT_RUBY = "#{ENV["HOMEBREW_USER_AGENT"]} ruby/#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}".freeze
 
 HOMEBREW_CURL_ARGS = [
   "--fail",
@@ -54,7 +54,13 @@ HOMEBREW_PULL_OR_COMMIT_URL_REGEX = %r[https://github\.com/([\w-]+)/([\w-]+)?/(?
 
 require "compat" unless ARGV.include?("--no-compat") || ENV["HOMEBREW_NO_COMPAT"]
 
-ORIGINAL_PATHS = ENV["PATH"].split(File::PATH_SEPARATOR).map { |p| Pathname.new(p).expand_path rescue nil }.compact.freeze
+ORIGINAL_PATHS = ENV["PATH"].split(File::PATH_SEPARATOR).map do |p|
+  begin
+                                                    Pathname.new(p).expand_path
+                                                  rescue
+                                                    nil
+                                                  end
+end.compact.freeze
 
 # TODO: remove this as soon as it's removed from commands.rb.
 HOMEBREW_INTERNAL_COMMAND_ALIASES = {
@@ -71,5 +77,5 @@ HOMEBREW_INTERNAL_COMMAND_ALIASES = {
   "dr" => "doctor",
   "--repo" => "--repository",
   "environment" => "--env",
-  "--config" => "config"
-}
+  "--config" => "config",
+}.freeze
