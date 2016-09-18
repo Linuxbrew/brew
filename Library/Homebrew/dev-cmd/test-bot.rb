@@ -755,6 +755,10 @@ module Homebrew
         safe_system "brew", "untap", tap
       end
 
+      Formula.installed.each do |formula|
+        safe_system "brew", "uninstall", "--force", formula
+      end
+
       unless @repository == HOMEBREW_REPOSITORY
         HOMEBREW_REPOSITORY.cd do
           safe_system "git", "checkout", "-f", "master"
