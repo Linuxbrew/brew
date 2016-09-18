@@ -42,4 +42,19 @@ class JavaRequirement < Requirement
   def inspect
     "#<#{self.class.name}: #{name.inspect} #{tags.inspect} version=#{@version.inspect}>"
   end
+
+  def display_s
+    if @version
+      if @version[-1] == "+"
+        op = ">="
+        version = @version[0, @version.length-1]
+      else
+        op = "="
+        version = @version
+      end
+      "#{name} #{op} #{version}"
+    else
+      name
+    end
+  end
 end

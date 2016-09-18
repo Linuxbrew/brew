@@ -45,7 +45,7 @@ module Homebrew
       end
     else
       ARGV.named.each_with_index do |f, i|
-        puts unless i == 0
+        puts unless i.zero?
         begin
           if f.include?("/") || File.exist?(f)
             info_formula Formulary.factory(f)
@@ -150,7 +150,8 @@ module Homebrew
       ohai "Requirements"
       %w[build required recommended optional].map do |type|
         reqs = f.requirements.select(&:"#{type}?")
-        puts "#{type.capitalize}: #{decorate_requirements(reqs)}" unless reqs.to_a.empty?
+        next if reqs.to_a.empty?
+        puts "#{type.capitalize}: #{decorate_requirements(reqs)}"
       end
     end
 
@@ -172,8 +173,9 @@ module Homebrew
 
   def decorate_requirements(requirements)
     req_status = requirements.collect do |req|
-      req.satisfied? ? pretty_installed(req.name) : pretty_uninstalled(req.name)
+      req_s = req.display_s
+      req.satisfied? ? pretty_installed(req_s) : pretty_uninstalled(req_s)
     end
-    req_status * ", "
+    req_status.join(", ")
   end
 end
