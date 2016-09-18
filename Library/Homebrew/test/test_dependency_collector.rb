@@ -76,20 +76,6 @@ class DependencyCollectorTests < Homebrew::TestCase
     assert_predicate dep, :optional?
   end
 
-  def test_ant_dep_mavericks_or_newer
-    skip "Only for Mac OS" unless OS.mac?
-    MacOS.stubs(:version).returns(MacOS::Version.new("10.9"))
-    @d.add :ant => :build
-    assert_equal find_dependency("ant"), Dependency.new("ant", [:build])
-  end
-
-  def test_ant_dep_pre_mavericks
-    skip "Only for Mac OS" unless OS.mac?
-    MacOS.stubs(:version).returns(MacOS::Version.new("10.7"))
-    @d.add :ant => :build
-    assert_nil find_dependency("ant")
-  end
-
   def test_raises_typeerror_for_unknown_classes
     assert_raises(TypeError) { @d.add(Class.new) }
   end
