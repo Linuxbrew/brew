@@ -191,10 +191,6 @@ module Homebrew
       return
     end
 
-    Keg::ALL_TOP_LEVEL_DIRECTORIES.each do |dir|
-      FileUtils.mkdir_p "#{HOMEBREW_PREFIX}/#{dir}"
-    end
-
     new_homebrew_repository = Pathname.new "/usr/local/Homebrew"
     if new_homebrew_repository.exist?
       ofail <<-EOS.undent
@@ -252,6 +248,10 @@ module Homebrew
         Please do this manually with:
           sudo rm -rf #{unremovable_paths.join " "}
       EOS
+    end
+
+    Keg::ALL_TOP_LEVEL_DIRECTORIES.each do |dir|
+      FileUtils.mkdir_p "#{HOMEBREW_PREFIX}/#{dir}"
     end
 
     src = Pathname.new("#{new_homebrew_repository}/bin/brew")
