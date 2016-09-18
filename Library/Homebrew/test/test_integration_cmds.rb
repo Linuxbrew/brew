@@ -160,7 +160,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def setup_remote_tap(name)
     tap = Tap.fetch name
-    tap.install(:full_clone => false, :quiet => true) unless tap.installed?
+    tap.install(full_clone: false, quiet: true) unless tap.installed?
     tap
   end
 

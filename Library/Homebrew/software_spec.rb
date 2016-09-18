@@ -15,8 +15,8 @@ class SoftwareSpec
   PREDEFINED_OPTIONS = {
     :universal => Option.new("universal", "Build a universal binary"),
     :cxx11     => Option.new("c++11", "Build using C++11 mode"),
-    "32-bit"   => Option.new("32-bit", "Build 32-bit only")
-  }
+    "32-bit"   => Option.new("32-bit", "Build 32-bit only"),
+  }.freeze
 
   attr_reader :name, :full_name, :owner
   attr_reader :build, :resources, :patches, :options
@@ -72,9 +72,7 @@ class SoftwareSpec
     !!@bottle_disable_reason
   end
 
-  def bottle_disable_reason
-    @bottle_disable_reason
-  end
+  attr_reader :bottle_disable_reason
 
   def bottle_defined?
     !bottle_specification.collector.keys.empty?
@@ -85,7 +83,7 @@ class SoftwareSpec
       (bottle_specification.compatible_cellar? || ARGV.force_bottle?)
   end
 
-  def bottle(disable_type = nil, disable_reason = nil,  &block)
+  def bottle(disable_type = nil, disable_reason = nil, &block)
     if disable_type
       @bottle_disable_reason = BottleDisableReason.new(disable_type, disable_reason)
     else
@@ -99,7 +97,7 @@ class SoftwareSpec
 
   def resource(name, klass = Resource, &block)
     if block_given?
-      raise DuplicateResourceError.new(name) if resource_defined?(name)
+      raise DuplicateResourceError, name if resource_defined?(name)
       res = klass.new(name, &block)
       resources[name] = res
       dependency_collector.add(res)
@@ -144,11 +142,10 @@ class SoftwareSpec
 
           old_flag = deprecated_option.old_flag
           new_flag = deprecated_option.current_flag
-          if @flags.include? old_flag
-            @flags -= [old_flag]
-            @flags |= [new_flag]
-            @deprecated_flags << deprecated_option
-          end
+          next unless @flags.include? old_flag
+          @flags -= [old_flag]
+          @flags |= [new_flag]
+          @deprecated_flags << deprecated_option
         end
       end
     end
@@ -340,7 +337,13 @@ class BottleSpecification
   def checksums
     checksums = {}
     os_versions = collector.keys
-    os_versions.map! { |osx| MacOS::Version.from_symbol osx rescue nil }.compact!
+    os_versions.map! do |osx|
+      begin
+        MacOS::Version.from_symbol osx
+      rescue
+        nil
+      end
+    end.compact!
     os_versions.sort.reverse_each do |os_version|
       osx = os_version.to_sym
       checksum = collector[osx]

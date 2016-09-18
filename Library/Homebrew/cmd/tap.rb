@@ -47,9 +47,9 @@ module Homebrew
     else
       tap = Tap.fetch(ARGV.named[0])
       begin
-        tap.install :clone_target => ARGV.named[1],
-                    :full_clone   => full_clone?,
-                    :quiet        => ARGV.quieter?
+        tap.install clone_target: ARGV.named[1],
+                    full_clone: full_clone?,
+                    quiet: ARGV.quieter?
       rescue TapRemoteMismatchError => e
         odie e
       rescue TapAlreadyTappedError, TapAlreadyUnshallowError
@@ -67,7 +67,7 @@ module Homebrew
     opoo "Homebrew.install_tap is deprecated, use Tap#install."
     tap = Tap.fetch(user, repo)
     begin
-      tap.install(:clone_target => clone_target, :full_clone => full_clone?)
+      tap.install(clone_target: clone_target, full_clone: full_clone?)
     rescue TapAlreadyTappedError
       false
     else

@@ -8,7 +8,7 @@ class RubyRequirement < Requirement
     super
   end
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     which_all("ruby").detect do |ruby|
       version = /\d\.\d/.match Utils.popen_read(ruby, "--version")
       next unless version

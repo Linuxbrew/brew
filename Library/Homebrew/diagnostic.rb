@@ -412,11 +412,11 @@ module Homebrew
             unless $seen_prefix_bin
               # only show the doctor message if there are any conflicts
               # rationale: a default install should not trigger any brew doctor messages
-              conflicts = Dir["#{HOMEBREW_PREFIX}/bin/*"].
-                          map { |fn| File.basename fn }.
-                          select { |bn| File.exist? "/usr/bin/#{bn}" }
+              conflicts = Dir["#{HOMEBREW_PREFIX}/bin/*"]
+                          .map { |fn| File.basename fn }
+                          .select { |bn| File.exist? "/usr/bin/#{bn}" }
 
-              if conflicts.size > 0
+              unless conflicts.empty?
                 message = inject_file_list conflicts, <<-EOS.undent
                   /usr/bin occurs before #{HOMEBREW_PREFIX}/bin
                   This means that system-provided programs will be used instead of those
@@ -456,7 +456,7 @@ module Homebrew
 
         # Don't complain about sbin not being in the path if it doesn't exist
         sbin = (HOMEBREW_PREFIX+"sbin")
-        return unless sbin.directory? && sbin.children.length > 0
+        return unless sbin.directory? && !sbin.children.empty?
 
         <<-EOS.undent
           Homebrew's sbin was not found in your PATH but you have installed
@@ -515,7 +515,11 @@ module Homebrew
         return if @found.empty?
 
         # Our gettext formula will be caught by check_linked_keg_only_brews
-        gettext = Formulary.factory("gettext") rescue nil
+        gettext = begin
+          Formulary.factory("gettext")
+        rescue
+          nil
+        end
         homebrew_owned = @found.all? do |path|
           Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
         end
@@ -532,7 +536,11 @@ module Homebrew
         find_relative_paths("lib/libiconv.dylib", "include/iconv.h")
         return if @found.empty?
 
-        libiconv = Formulary.factory("libiconv") rescue nil
+        libiconv = begin
+          Formulary.factory("libiconv")
+        rescue
+          nil
+        end
         if libiconv && libiconv.linked_keg.directory?
           unless libiconv.keg_only?
             <<-EOS.undent
@@ -806,9 +814,9 @@ module Homebrew
           libexpat.framework
           libcurl.framework
         ]
-        frameworks_found = frameworks_to_check.
-          map { |framework| "/Library/Frameworks/#{framework}" }.
-          select { |framework| File.exist? framework }
+        frameworks_found = frameworks_to_check
+                           .map { |framework| "/Library/Frameworks/#{framework}" }
+                           .select { |framework| File.exist? framework }
         return if frameworks_found.empty?
 
         inject_file_list frameworks_found, <<-EOS.undent
@@ -885,11 +893,10 @@ module Homebrew
       def check_for_old_homebrew_share_python_in_path
         message = ""
         ["", "3"].map do |suffix|
-          if paths.include?((HOMEBREW_PREFIX/"share/python#{suffix}").to_s)
-            message += <<-EOS.undent
+          next unless paths.include?((HOMEBREW_PREFIX/"share/python#{suffix}").to_s)
+          message += <<-EOS.undent
               #{HOMEBREW_PREFIX}/share/python#{suffix} is not needed in PATH.
-            EOS
-          end
+          EOS
         end
         unless message.empty?
           message += <<-EOS.undent

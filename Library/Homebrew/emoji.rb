@@ -17,7 +17,7 @@ module Emoji
     def enabled?
       !ENV["HOMEBREW_NO_EMOJI"]
     end
-    alias generic_enabled? enabled?
+    alias_method :generic_enabled?, :enabled?
   end
 end
 

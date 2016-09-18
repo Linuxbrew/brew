@@ -157,7 +157,7 @@ class Build
     # The stdlib recorded in the install receipt is used during dependency
     # compatibility checks, so we only care about the stdlib that libraries
     # link against.
-    keg.detect_cxx_stdlibs(:skip_executables => true)
+    keg.detect_cxx_stdlibs(skip_executables: true)
   end
 
   def fixopt(f)

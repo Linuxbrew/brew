@@ -29,7 +29,7 @@ module Patch
     when Hash
       list
     when Array, String, :DATA
-      { :p1 => list }
+      { p1: list }
     else
       {}
     end.each_pair do |strip, urls|
@@ -130,7 +130,7 @@ class ExternalPatch
       patch_dir = Pathname.pwd
       if patch_files.empty?
         children = patch_dir.children
-        if (children.length == 1 && children.first.file?)
+        if children.length == 1 && children.first.file?
           patch_files << children.first.basename
         else
           raise MissingApplyError, <<-EOS.undent

@@ -5,7 +5,7 @@ class FormulaVersions
     ArgumentError, NameError, SyntaxError, TypeError,
     FormulaSpecificationError, FormulaValidationError,
     ErrorDuringExecution, LoadError, FormulaMethodDeprecatedError
-  ]
+  ].freeze
 
   attr_reader :name, :path, :repository, :entry_name
 

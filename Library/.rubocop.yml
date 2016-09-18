@@ -1,13 +1,11 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
+  TargetRubyVersion: 2.0
   Exclude:
+    - 'Homebrew/cask/**/*'
     - 'Homebrew/vendor/**/*'
     - 'Homebrew/test/vendor/**/*'
-
-# Whilst we now can handle the newer hash syntax of 1.9+ the
-# hash rockets are everywhere & it'd be good to change this more
-# consistently than piecemeal.
-Style/HashSyntax:
-  EnforcedStyle: hash_rockets
 
 # ruby style guide favorite
 Style/StringLiterals:

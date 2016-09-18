@@ -25,13 +25,13 @@ module Homebrew
 
     if ARGV.named.empty?
       outdated = Formula.installed.select do |f|
-        f.outdated?(:fetch_head => ARGV.fetch_head?)
+        f.outdated?(fetch_head: ARGV.fetch_head?)
       end
 
       exit 0 if outdated.empty?
     else
       outdated = ARGV.resolved_formulae.select do |f|
-        f.outdated?(:fetch_head => ARGV.fetch_head?)
+        f.outdated?(fetch_head: ARGV.fetch_head?)
       end
 
       (ARGV.resolved_formulae - outdated).each do |f|

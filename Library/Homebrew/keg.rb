@@ -64,7 +64,7 @@ class Keg
   # locale-specific directories have the form language[_territory][.codeset][@modifier]
   LOCALEDIR_RX = /(locale|man)\/([a-z]{2}|C|POSIX)(_[A-Z]{2})?(\.[a-zA-Z\-0-9]+(@.+)?)?/
   INFOFILE_RX = %r{info/([^.].*?\.info|dir)$}
-  TOP_LEVEL_DIRECTORIES = %w[bin etc include lib sbin share var Frameworks]
+  TOP_LEVEL_DIRECTORIES = %w[bin etc include lib sbin share var Frameworks].freeze
   ALL_TOP_LEVEL_DIRECTORIES = (TOP_LEVEL_DIRECTORIES + %w[lib/pkgconfig share/locale share/man opt]).freeze
   PRUNEABLE_DIRECTORIES = %w[bin etc include lib sbin share Frameworks LinkedKegs var/homebrew].map do |d|
     case d when "LinkedKegs" then HOMEBREW_LIBRARY/d else HOMEBREW_PREFIX/d end
@@ -80,7 +80,7 @@ class Keg
     man/cat5 man/cat6 man/cat7 man/cat8
     applications gnome gnome/help icons
     mime-info pixmaps sounds postgresql
-  ]
+  ].freeze
 
   # if path is a file in a keg then this will return the containing Keg object
   def self.for(path)
@@ -216,17 +216,16 @@ class Keg
         dirs << dst if dst.directory? && !dst.symlink?
 
         # check whether the file to be unlinked is from the current keg first
-        if dst.symlink? && src == dst.resolved_path
-          if mode.dry_run
-            puts dst
-            Find.prune if src.directory?
-            next
-          end
-
-          dst.uninstall_info if dst.to_s =~ INFOFILE_RX
-          dst.unlink
+        next unless dst.symlink? && src == dst.resolved_path
+        if mode.dry_run
+          puts dst
           Find.prune if src.directory?
+          next
         end
+
+        dst.uninstall_info if dst.to_s =~ INFOFILE_RX
+        dst.unlink
+        Find.prune if src.directory?
       end
     end
 
@@ -301,7 +300,7 @@ class Keg
   end
 
   def link(mode = OpenStruct.new)
-    raise AlreadyLinkedError.new(self) if linked_keg_record.directory?
+    raise AlreadyLinkedError, self if linked_keg_record.directory?
 
     ObserverPathnameExtension.reset_counts!
 
@@ -319,7 +318,6 @@ class Keg
       when "locale/locale.alias" then :skip_file
       when INFOFILE_RX then :info
       when LOCALEDIR_RX then :mkpath
-      when *SHARE_PATHS then :mkpath
       when /^icons\/.*\/icon-theme\.cache$/ then :skip_file
       # all icons subfolders should also mkpath
       when /^icons\// then :mkpath
@@ -328,6 +326,7 @@ class Keg
       # Lua, Lua51, Lua53 all need the same handling.
       when /^lua\// then :mkpath
       when %r{^guile/} then :mkpath
+      when *SHARE_PATHS then :mkpath
       else :link
       end
     end

@@ -9,7 +9,7 @@ require "development_tools"
 # should not be called directly, instead use one of the class methods like
 # `Tab.create`.
 class Tab < OpenStruct
-  FILENAME = "INSTALL_RECEIPT.json"
+  FILENAME = "INSTALL_RECEIPT.json".freeze
   CACHE = {}
 
   def self.clear_cache
@@ -39,8 +39,8 @@ class Tab < OpenStruct
           "devel" => formula.devel ? formula.devel.version.to_s : nil,
           "head" => formula.head ? formula.head.version.to_s : nil,
           "version_scheme" => formula.version_scheme,
-        }
-      }
+        },
+      },
     }
 
     new(attributes)
@@ -65,7 +65,7 @@ class Tab < OpenStruct
     end
 
     if attributes["source"]["tap"] == "mxcl/master" ||
-      attributes["source"]["tap"] == "Homebrew/homebrew"
+       attributes["source"]["tap"] == "Homebrew/homebrew"
       attributes["source"]["tap"] = "homebrew/core"
     end
 
@@ -154,7 +154,7 @@ class Tab < OpenStruct
           "devel" => f.devel ? f.devel.version.to_s : nil,
           "head" => f.head ? f.head.version.to_s : nil,
           "version_scheme" => f.version_scheme,
-        }
+        },
       }
     end
 
@@ -181,8 +181,8 @@ class Tab < OpenStruct
           "devel" => nil,
           "head" => nil,
           "version_scheme" => 0,
-        }
-      }
+        },
+      },
     }
 
     new(attributes)
@@ -303,7 +303,7 @@ class Tab < OpenStruct
       "HEAD" => self.HEAD,
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
-      "source" => source
+      "source" => source,
     }
 
     Utils::JSON.dump(attributes)

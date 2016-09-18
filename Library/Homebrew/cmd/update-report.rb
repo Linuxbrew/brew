@@ -109,7 +109,7 @@ module Homebrew
   def install_core_tap_if_necessary
     core_tap = CoreTap.instance
     return if core_tap.installed?
-    CoreTap.ensure_installed! :quiet => false
+    CoreTap.ensure_installed! quiet: false
     revision = core_tap.git_head
     ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
     ENV["HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE"] = revision
@@ -175,7 +175,7 @@ module Homebrew
     link_src_dst_dirs(HOMEBREW_REPOSITORY/"etc/bash_completion.d",
                       HOMEBREW_PREFIX/"etc/bash_completion.d", command)
     link_src_dst_dirs(HOMEBREW_REPOSITORY/"share/doc/homebrew",
-                      HOMEBREW_PREFIX/"share/doc/homebrew", command, :link_dir => true)
+                      HOMEBREW_PREFIX/"share/doc/homebrew", command, link_dir: true)
     link_src_dst_dirs(HOMEBREW_REPOSITORY/"share/zsh/site-functions",
                       HOMEBREW_PREFIX/"share/zsh/site-functions", command)
     link_path_manpages(HOMEBREW_REPOSITORY/"share", command)

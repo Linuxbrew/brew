@@ -165,7 +165,7 @@ class Requirement
     def initialize(options, &block)
       case options
       when Hash
-        @options = { :build_env => true }
+        @options = { build_env: true }
         @options.merge!(options)
       else
         @satisfied = options

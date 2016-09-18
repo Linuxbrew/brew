@@ -55,10 +55,10 @@ module Utils
 
       def report_event(category, action, label = os_prefix_ci, value = nil)
         report(:event,
-          :ec => category,
-          :ea => action,
-          :el => label,
-          :ev => value)
+          ec: category,
+          ea: action,
+          el: label,
+          ev: value)
       end
 
       def report_exception(exception, options = {})
@@ -69,12 +69,12 @@ module Utils
 
         fatal = options.fetch(:fatal, true) ? "1" : "0"
         report(:exception,
-          :exd => exception.class.name,
-          :exf => fatal)
+          exd: exception.class.name,
+          exf: fatal)
       end
 
       def report_screenview(screen_name)
-        report(:screenview, :cd => screen_name)
+        report(:screenview, cd: screen_name)
       end
     end
   end

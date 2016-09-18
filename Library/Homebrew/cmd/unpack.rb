@@ -39,7 +39,7 @@ module Homebrew
       ENV["VERBOSE"] = "1" # show messages about tar
       f.brew do
         f.patch if ARGV.flag?("--patch")
-        cp_r getwd, stage_dir, :preserve => true
+        cp_r getwd, stage_dir, preserve: true
       end
       ENV["VERBOSE"] = nil
 

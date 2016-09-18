@@ -3,7 +3,7 @@ require "requirement"
 class UnsignedKextRequirement < Requirement
   fatal true
 
-  satisfy(:build_env => false) { MacOS.version < :yosemite }
+  satisfy(build_env: false) { MacOS.version < :yosemite }
 
   def message
     s = <<-EOS.undent

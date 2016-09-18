@@ -67,14 +67,14 @@ class FormulaInstaller
   def self.prevent_build_flags
     build_flags = ARGV.collect_build_flags
 
-    raise BuildFlagsError.new(build_flags) unless build_flags.empty?
+    raise BuildFlagsError, build_flags unless build_flags.empty?
   end
 
   def build_bottle?
     !!@build_bottle && !formula.bottle_disabled?
   end
 
-  def pour_bottle?(install_bottle_options = { :warn=>false })
+  def pour_bottle?(install_bottle_options = { warn: false })
     return true if Homebrew::Hooks::Bottles.formula_has_bottle?(formula)
 
     return false if @pour_failed
@@ -191,7 +191,7 @@ class FormulaInstaller
     check_conflicts
 
     if !pour_bottle? && !formula.bottle_unneeded? && !DevelopmentTools.installed?
-      raise BuildToolsError.new([formula])
+      raise BuildToolsError, [formula]
     end
 
     unless skip_deps_check?
@@ -229,7 +229,7 @@ class FormulaInstaller
 
     @@attempted << formula
 
-    pour_bottle = pour_bottle?(:warn => true)
+    pour_bottle = pour_bottle?(warn: true)
     if pour_bottle
       begin
         install_relocation_tools unless formula.bottle_specification.skip_relocation?
@@ -244,7 +244,7 @@ class FormulaInstaller
         @pour_failed = true
         onoe e.message
         opoo "Bottle installation failed: building from source."
-        raise BuildToolsError.new([formula]) unless DevelopmentTools.installed?
+        raise BuildToolsError, [formula] unless DevelopmentTools.installed?
       else
         @poured_bottle = true
       end
@@ -317,7 +317,7 @@ class FormulaInstaller
       dep_f.pour_bottle? || dep_f.bottle_unneeded?
     end
 
-    raise BuildToolsError.new(unbottled) unless unbottled.empty?
+    raise BuildToolsError, unbottled unless unbottled.empty?
   end
 
   def compute_and_install_dependencies
@@ -336,7 +336,7 @@ class FormulaInstaller
       end
     end
 
-    raise UnsatisfiedRequirements.new(fatals) unless fatals.empty?
+    raise UnsatisfiedRequirements, fatals unless fatals.empty?
   end
 
   def install_requirement_default_formula?(req, dependent, build)
@@ -422,7 +422,7 @@ class FormulaInstaller
       puts "All dependencies for #{formula.full_name} are satisfied."
     elsif !deps.empty?
       oh1 "Installing dependencies for #{formula.full_name}: #{Tty.green}#{deps.map(&:first)*", "}#{Tty.reset}",
-        :truncate => false
+        truncate: false
       deps.each { |dep, options| install_dependency(dep, options) }
     end
 
@@ -675,7 +675,7 @@ class FormulaInstaller
       puts e
       puts
       puts "Possible conflicting files are:"
-      mode = OpenStruct.new(:dry_run => true, :overwrite => true)
+      mode = OpenStruct.new(dry_run: true, overwrite: true)
       keg.link(mode)
       @show_summary_heading = true
       Homebrew.failed = true

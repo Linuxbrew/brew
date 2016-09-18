@@ -418,7 +418,7 @@ class Formula
   # exists and is not empty.
   # @private
   def installed?
-    (dir = installed_prefix).directory? && dir.children.length > 0
+    (dir = installed_prefix).directory? && !dir.children.empty?
   end
 
   # If at least one version of {Formula} is installed.
@@ -451,7 +451,7 @@ class Formula
     prefix(head_version) if head_version
   end
 
-  def head_version_outdated?(version, options={})
+  def head_version_outdated?(version, options = {})
     tab = Tab.for_keg(prefix(version))
 
     return true if tab.version_scheme < version_scheme
@@ -802,7 +802,7 @@ class Formula
   #    <string>/dev/null</string>
   #  </plist>
   #  EOS
-  #end</pre>
+  # end</pre>
   def plist
     nil
   end
@@ -1061,7 +1061,7 @@ class Formula
   # @private
   def outdated_versions(options = {})
     @outdated_versions ||= Hash.new do |cache, key|
-      raise Migrator::MigrationNeededError.new(self) if migration_needed?
+      raise Migrator::MigrationNeededError, self if migration_needed?
       cache[key] = _outdated_versions(key)
     end
     @outdated_versions[options]
@@ -1348,7 +1348,7 @@ class Formula
         "stable" => (stable.version.to_s if stable),
         "bottle" => bottle ? true : false,
         "devel" => (devel.version.to_s if devel),
-        "head" => (head.version.to_s if head)
+        "head" => (head.version.to_s if head),
       },
       "revision" => revision,
       "version_scheme" => version_scheme,
@@ -1362,7 +1362,7 @@ class Formula
       "optional_dependencies" => deps.select(&:optional?).map(&:name).uniq,
       "build_dependencies" => deps.select(&:build?).map(&:name).uniq,
       "conflicts_with" => conflicts.map(&:name),
-      "caveats" => caveats
+      "caveats" => caveats,
     }
 
     hsh["requirements"] = requirements.map do |req|
@@ -1370,7 +1370,7 @@ class Formula
         "name" => req.name,
         "default_formula" => req.default_formula,
         "cask" => req.cask,
-        "download" => req.download
+        "download" => req.download,
       }
     end
 
@@ -1385,8 +1385,7 @@ class Formula
       bottle_spec = spec.bottle_specification
       bottle_info = {
         "rebuild" => bottle_spec.rebuild,
-        "cellar" => (cellar = bottle_spec.cellar).is_a?(Symbol) ? \
-                    cellar.inspect : cellar,
+        "cellar" => (cellar = bottle_spec.cellar).is_a?(Symbol) ? cellar.inspect : cellar,
         "prefix" => bottle_spec.prefix,
         "root_url" => bottle_spec.root_url,
       }
@@ -1408,7 +1407,7 @@ class Formula
         "version" => keg.version.to_s,
         "used_options" => tab.used_options.as_flags,
         "built_as_bottle" => tab.built_as_bottle,
-        "poured_from_bottle" => tab.poured_from_bottle
+        "poured_from_bottle" => tab.poured_from_bottle,
       }
     end
 
@@ -1564,11 +1563,10 @@ class Formula
             while buf = rd.gets
               log.puts buf
               # make sure dots printed with interval of at least 1 min.
-              if (Time.now - last_dot) > 60
-                print "."
-                $stdout.flush
-                last_dot = Time.now
-              end
+              next unless (Time.now - last_dot) > 60
+              print "."
+              $stdout.flush
+              last_dot = Time.now
             end
             puts
           else
@@ -1668,7 +1666,11 @@ class Formula
     $stderr.reopen(out)
     out.close
     args.collect!(&:to_s)
-    exec(cmd, *args) rescue nil
+    begin
+      exec(cmd, *args)
+    rescue
+      nil
+    end
     puts "Failed to execute: #{cmd}"
     exit! 1 # never gets here unless exec threw or failed
   end
@@ -1680,7 +1682,8 @@ class Formula
       env_home = buildpath/".brew_home"
       mkdir_p env_home
 
-      old_home, ENV["HOME"] = ENV["HOME"], env_home
+      old_home = ENV["HOME"]
+      ENV["HOME"] = env_home
       old_curl_home = ENV["CURL_HOME"]
       ENV["CURL_HOME"] = old_curl_home || old_home
       setup_home env_home

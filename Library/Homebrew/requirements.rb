@@ -19,7 +19,7 @@ require "requirements/emacs_requirement"
 class XcodeRequirement < Requirement
   fatal true
 
-  satisfy(:build_env => false) { xcode_installed_version }
+  satisfy(build_env: false) { xcode_installed_version }
 
   def initialize(tags)
     @version = tags.find { |t| tags.delete(t) if /(\d\.)+\d/ === t }
@@ -102,7 +102,7 @@ class ArchRequirement < Requirement
     super
   end
 
-  satisfy(:build_env => false) do
+  satisfy(build_env: false) do
     case @arch
     when :x86_64 then MacOS.prefer_64_bit?
     when :intel, :ppc then Hardware::CPU.type == @arch

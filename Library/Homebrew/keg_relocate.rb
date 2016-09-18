@@ -12,9 +12,9 @@ class Keg
       end
     end
   end
-  alias generic_fix_dynamic_linkage fix_dynamic_linkage
+  alias_method :generic_fix_dynamic_linkage, :fix_dynamic_linkage
 
-  def relocate_dynamic_linkage(old_prefix, new_prefix, old_cellar, new_cellar)
+  def relocate_dynamic_linkage(_old_prefix, _new_prefix, _old_cellar, _new_cellar)
     []
   end
 
@@ -35,12 +35,12 @@ class Keg
           first.open("wb") { |f| f.write(s) }
         end
       else
-        rest.each { |file| FileUtils.ln(first, file, :force => true) }
+        rest.each { |file| FileUtils.ln(first, file, force: true) }
       end
     end
   end
 
-  def detect_cxx_stdlibs(options = {})
+  def detect_cxx_stdlibs(_options = {})
     []
   end
 
@@ -101,7 +101,7 @@ class Keg
     symlink_files
   end
 
-  def self.file_linked_libraries(file, string)
+  def self.file_linked_libraries(_file, _string)
     []
   end
 end

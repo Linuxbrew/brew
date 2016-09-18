@@ -23,16 +23,16 @@ module Homebrew
     s = StringIO.new
     SystemConfig.dump_verbose_config s
     # Dummy summary file, asciibetically first, to control display title of gist
-    files["# #{f.name} - #{timestamp}.txt"] = { :content => brief_build_info(f) }
-    files["00.config.out"] = { :content => s.string }
-    files["00.doctor.out"] = { :content => `brew doctor 2>&1` }
+    files["# #{f.name} - #{timestamp}.txt"] = { content: brief_build_info(f) }
+    files["00.config.out"] = { content: s.string }
+    files["00.doctor.out"] = { content: `brew doctor 2>&1` }
     unless f.core_formula?
       tap = <<-EOS.undent
         Formula: #{f.name}
         Tap: #{f.tap}
         Path: #{f.path}
       EOS
-      files["00.tap.out"] = { :content => tap }
+      files["00.tap.out"] = { content: tap }
     end
 
     # Description formatted to work well as page title when viewing gist
@@ -93,8 +93,8 @@ module Homebrew
       contents = file.size? ? file.read : "empty log"
       # small enough to avoid GitHub "unicorn" page-load-timeout errors
       max_file_size = 1_000_000
-      contents = truncate_text_to_approximate_size(contents, max_file_size, :front_weight => 0.2)
-      logs[file.basename.to_s] = { :content => contents }
+      contents = truncate_text_to_approximate_size(contents, max_file_size, front_weight: 0.2)
+      logs[file.basename.to_s] = { content: contents }
     end if dir.exist?
     raise "No logs." if logs.empty?
     logs

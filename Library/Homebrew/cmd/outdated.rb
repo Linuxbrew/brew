@@ -39,11 +39,11 @@ module Homebrew
     verbose = ($stdout.tty? || ARGV.verbose?) && !ARGV.flag?("--quiet")
     fetch_head = ARGV.fetch_head?
 
-    outdated_formulae = formulae.select { |f| f.outdated?(:fetch_head => fetch_head) }
+    outdated_formulae = formulae.select { |f| f.outdated?(fetch_head: fetch_head) }
 
     outdated_formulae.each do |f|
       if verbose
-        outdated_versions = f.outdated_versions(:fetch_head => fetch_head)
+        outdated_versions = f.outdated_versions(fetch_head: fetch_head)
         current_version = if f.head? && outdated_versions.any? { |v| v.to_s == f.pkg_version.to_s }
           "latest HEAD"
         else
@@ -59,19 +59,19 @@ module Homebrew
   def print_outdated_json(formulae)
     json = []
     fetch_head = ARGV.fetch_head?
-    outdated_formulae = formulae.select { |f| f.outdated?(:fetch_head => fetch_head) }
+    outdated_formulae = formulae.select { |f| f.outdated?(fetch_head: fetch_head) }
 
     outdated = outdated_formulae.each do |f|
-      outdated_versions = f.outdated_versions(:fetch_head => fetch_head)
+      outdated_versions = f.outdated_versions(fetch_head: fetch_head)
       current_version = if f.head? && outdated_versions.any? { |v| v.to_s == f.pkg_version.to_s }
         "HEAD"
       else
         f.pkg_version.to_s
       end
 
-      json << { :name => f.full_name,
-                :installed_versions => outdated_versions.collect(&:to_s),
-                :current_version => current_version }
+      json << { name: f.full_name,
+                installed_versions: outdated_versions.collect(&:to_s),
+                current_version: current_version }
     end
     puts Utils::JSON.dump(json)
 

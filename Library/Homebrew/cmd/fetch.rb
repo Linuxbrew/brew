@@ -40,7 +40,7 @@ module Homebrew
 
     puts "Fetching: #{bucket * ", "}" if bucket.size > 1
     bucket.each do |f|
-      f.print_tap_action :verb => "Fetching"
+      f.print_tap_action verb: "Fetching"
 
       fetched_bottle = false
       if fetch_bottle?(f)

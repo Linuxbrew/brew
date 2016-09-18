@@ -227,9 +227,9 @@ class UtilTests < Homebrew::TestCase
     s = truncate_text_to_approximate_size(long_s, n)
     assert_equal n, s.length
     assert_match(/^x+#{Regexp.escape(glue)}x+$/, s)
-    s = truncate_text_to_approximate_size(long_s, n, :front_weight => 0.0)
+    s = truncate_text_to_approximate_size(long_s, n, front_weight: 0.0)
     assert_equal glue + ("x" * (n - glue.length)), s
-    s = truncate_text_to_approximate_size(long_s, n, :front_weight => 1.0)
+    s = truncate_text_to_approximate_size(long_s, n, front_weight: 1.0)
     assert_equal(("x" * (n - glue.length)) + glue, s)
   end
 
@@ -237,8 +237,8 @@ class UtilTests < Homebrew::TestCase
     ARGV.stubs(:homebrew_developer?).returns false
     e = assert_raises(FormulaMethodDeprecatedError) do
       odeprecated("method", "replacement",
-        :caller => ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
-        :die => true)
+        caller: ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
+        die: true)
     end
     assert_match "method", e.message
     assert_match "replacement", e.message

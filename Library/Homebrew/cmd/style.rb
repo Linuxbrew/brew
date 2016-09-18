@@ -30,7 +30,7 @@ module Homebrew
       ARGV.formulae.map(&:path)
     end
 
-    Homebrew.failed = check_style_and_print(target, :fix => ARGV.flag?("--fix"))
+    Homebrew.failed = check_style_and_print(target, fix: ARGV.flag?("--fix"))
   end
 
   # Checks style for a list of files, printing simple RuboCop output.

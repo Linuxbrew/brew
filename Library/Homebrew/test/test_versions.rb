@@ -3,7 +3,7 @@ require "version"
 
 class VersionTests < Homebrew::TestCase
   def test_accepts_objects_responding_to_to_str
-    value = stub(:to_str => "0.1")
+    value = stub(to_str: "0.1")
     assert_equal "0.1", Version.create(value).to_s
   end
 
@@ -452,7 +452,7 @@ class VersionParsingTests < Homebrew::TestCase
 
   def test_from_url
     assert_version_detected "1.2.3",
-      "http://github.com/foo/bar.git", :tag => "v1.2.3"
+      "http://github.com/foo/bar.git", tag: "v1.2.3"
   end
 end
 

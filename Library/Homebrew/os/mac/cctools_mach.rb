@@ -44,7 +44,7 @@ module CctoolsMachO
           else :dunno
           end
 
-        mach_data << { :arch => arch, :type => type }
+        mach_data << { arch: arch, type: type }
       end
       mach_data
     rescue
