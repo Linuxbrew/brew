@@ -258,7 +258,7 @@ module Homebrew
     dst = Pathname.new("#{HOMEBREW_PREFIX}/bin/brew")
     begin
       FileUtils.ln_s(src.relative_path_from(dst.parent), dst)
-    rescue Errno::EACCES
+    rescue Errno::EACCES, Errno::ENOENT
       ofail <<-EOS.undent
         Could not create symlink at #{dst}!
         Please do this manually with:
