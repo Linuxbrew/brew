@@ -19,7 +19,7 @@ require "utils/json"
 module Homebrew
   def style
     target = if ARGV.named.empty?
-      [HOMEBREW_LIBRARY]
+      [HOMEBREW_LIBRARY_PATH]
     elsif ARGV.named.any? { |file| File.exist? file }
       ARGV.named
     elsif ARGV.named.any? { |tap| tap.count("/") == 1 }
