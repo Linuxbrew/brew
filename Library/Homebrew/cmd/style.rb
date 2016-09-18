@@ -1,9 +1,5 @@
-#:  * `style` [`--fix`] [`--display-cop-names`] [<formulae>|<files>]:
+#:  * `style` [`--fix`] [`--display-cop-names`] [<files>|<taps>|<formulae>]:
 #:    Check formulae or files for conformance to Homebrew style guidelines.
-#:
-#:    <formulae> is a list of formula names.
-#:
-#:    <files> is a list of file names.
 #:
 #:    <formulae> and <files> may not be combined. If both are omitted, style will run
 #:    style checks on the whole Homebrew `Library`, including core code and all
@@ -26,6 +22,8 @@ module Homebrew
       [HOMEBREW_LIBRARY]
     elsif ARGV.named.any? { |file| File.exist? file }
       ARGV.named
+    elsif ARGV.named.any? { |tap| tap.count("/") == 1 }
+      ARGV.named.map { |tap| Tap.fetch(tap).path }
     else
       ARGV.formulae.map(&:path)
     end
