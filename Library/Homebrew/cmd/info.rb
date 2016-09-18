@@ -45,7 +45,7 @@ module Homebrew
       end
     else
       ARGV.named.each_with_index do |f, i|
-        puts unless i.zero?
+        puts unless i == 0
         begin
           if f.include?("/") || File.exist?(f)
             info_formula Formulary.factory(f)
@@ -146,6 +146,14 @@ module Homebrew
       end
     end
 
+    unless f.requirements.to_a.empty?
+      ohai "Requirements"
+      %w[build required recommended optional].map do |type|
+        reqs = f.requirements.select(&:"#{type}?")
+        puts "#{type.capitalize}: #{decorate_requirements(reqs)}" unless reqs.to_a.empty?
+      end
+    end
+
     unless f.options.empty?
       ohai "Options"
       Homebrew.dump_options_for_formula f
@@ -160,5 +168,12 @@ module Homebrew
       dep.installed? ? pretty_installed(dep) : pretty_uninstalled(dep)
     end
     deps_status * ", "
+  end
+
+  def decorate_requirements(requirements)
+    req_status = requirements.collect do |req|
+      req.satisfied? ? pretty_installed(req.name) : pretty_uninstalled(req.name)
+    end
+    req_status * ", "
   end
 end
