@@ -5,8 +5,8 @@
 #:    style checks on the whole Homebrew `Library`, including core code and all
 #:    formulae.
 #:
-#:    If `--fix` is passed and `HOMEBREW_DEVELOPER` is set, style violations
-#:    will be automatically fixed using RuboCop's `--auto-correct` feature.
+#:    If `--fix` is passed, style violations will be automatically fixed using
+#:    RuboCop's `--auto-correct` feature.
 #:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
@@ -51,7 +51,7 @@ module Homebrew
       --force-exclusion
       --config #{HOMEBREW_LIBRARY}/.rubocop.yml
     ]
-    args << "--auto-correct" if ARGV.homebrew_developer? && fix
+    args << "--auto-correct" if fix
     args += files
 
     case output_type
