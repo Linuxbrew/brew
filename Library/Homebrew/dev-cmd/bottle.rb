@@ -177,6 +177,7 @@ module Homebrew
     tar_path = Pathname.pwd/tar_filename
 
     prefix = HOMEBREW_PREFIX.to_s
+    repository = HOMEBREW_REPOSITORY.to_s
     cellar = HOMEBREW_CELLAR.to_s
 
     ohai "Bottling #{filename}..."
@@ -193,7 +194,8 @@ module Homebrew
           keg.relocate_dynamic_linkage prefix, Keg::PREFIX_PLACEHOLDER,
             cellar, Keg::CELLAR_PLACEHOLDER
           keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
-            cellar, Keg::CELLAR_PLACEHOLDER
+            cellar, Keg::CELLAR_PLACEHOLDER,
+            repository, Keg::REPOSITORY_PLACEHOLDER
         end
 
         keg.delete_pyc_files!
@@ -248,6 +250,7 @@ module Homebrew
           skip_relocation = true
         else
           relocatable = false if keg_contain?(prefix_check, keg, ignores)
+          relocatable = false if keg_contain?(repository, keg, ignores)
           relocatable = false if keg_contain?(cellar, keg, ignores)
           if prefix != prefix_check
             relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
@@ -265,7 +268,8 @@ module Homebrew
             keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, prefix,
               Keg::CELLAR_PLACEHOLDER, cellar
             keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
-              Keg::CELLAR_PLACEHOLDER, cellar
+              Keg::CELLAR_PLACEHOLDER, cellar,
+              Keg::REPOSITORY_PLACEHOLDER, repository
           end
         end
       end
