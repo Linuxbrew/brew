@@ -19,7 +19,7 @@ module OS
     ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
     ::MACOS_VERSION = OS::Mac.version.to_s.freeze
   elsif OS.linux?
-    ISSUES_URL = "https://github.com/Homebrew/linuxbrew/wiki/troubleshooting".freeze
+    ISSUES_URL = "https://github.com/Linuxbrew/brew/wiki/troubleshooting".freeze
     PATH_OPEN = "xdg-open".freeze
   end
 end
