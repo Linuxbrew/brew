@@ -100,27 +100,28 @@ module Hbc
     end
 
     def language(*args, &block)
-      @language ||= {}
-
       if !args.empty? && block_given?
         args.each do |arg|
           MacOS.languages.each_with_index do |l, index|
             string_or_regex = arg == :default ? %r{^en} : arg
             next unless l.match(string_or_regex)
-            next unless @language[:level].nil? || @language[:level] > index
+            next unless @language.nil? || @language[:level].nil? || @language[:level] > index
             @language = {
                           block: block,
                           level: index,
                         }
           end
         end
-
-        if args.include?(:default)
-          # :default has to be the last language block in order to assign return value of the selected `language` block to `@language`
-          @language = @language[:block].call
-        end
       else
+        language_eval
         @language
+      end
+    end
+
+
+    def language_eval
+      if @language.is_a?(Hash) && @language.key?(:block)
+        @language = @language[:block].call
       end
     end
 
