@@ -1,3 +1,5 @@
+require "dependency_collector"
+
 if OS.mac?
   require "extend/os/mac/dependency_collector"
 elsif OS.linux?
