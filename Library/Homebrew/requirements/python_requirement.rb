@@ -10,7 +10,7 @@ class PythonRequirement < Requirement
     next unless python
     version = python_short_version
     next unless version
-    # Always use Python 2.7 for consistency on older versions of OSX.
+    # Always use Python 2.7 for consistency on older versions of Mac OS X.
     version == Version.create("2.7")
   end
 

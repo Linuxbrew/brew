@@ -11,7 +11,7 @@ Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
 This is all that really matters:
 - Ensure the name seems reasonable.
 - Add aliases.
-- Ensure it is not an unreasonable dupe of anything that comes with OS X.
+- Ensure it is not an unreasonable dupe of anything that comes with macOS.
 - Ensure it is not a library that can be installed with
   [gem](https://en.wikipedia.org/wiki/RubyGems),
   [cpan](https://en.wikipedia.org/wiki/Cpan) or
@@ -92,8 +92,8 @@ implemented!).
 
 ### Duplicates
 The main repository avoids duplicates as much as possible. The exception is
-libraries that OS X provides but have bugs, and the bugs are fixed in a
-newer version. Or libraries that OS X provides, but they are too old for
+libraries that macOS provides but have bugs, and the bugs are fixed in a
+newer version. Or libraries that macOS provides, but they are too old for
 some other formula. The rest should be in the `homebrew/dupes` tap.
 
 Still determine if it possible to avoid the duplicate. Be thorough. Duped
@@ -104,7 +104,7 @@ If it duplicates anything ask another maintainer first. Some dupes are okay,
 some can cause subtle issues we don’t want to have to deal with in the future.
 
 Dupes we have allowed:
--   `libxml` \<— OS X version is old and buggy
+-   `libxml` \<— macOS version is old and buggy
 -   `libpng` \<— Ditto
 
 #### Add comments

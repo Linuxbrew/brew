@@ -5,19 +5,19 @@ additional [Interesting Taps & Forks](Interesting-Taps-&-Forks.md) and anyone ca
 own!
 
 ### We try hard to avoid dupes in Homebrew/homebrew
-Stuff that comes with OS X or libraries that are provided by
+Stuff that comes with macOS or libraries that are provided by
 [RubyGems, CPAN or PyPi](Gems,-Eggs-and-Perl-Modules.md)
 should not be duplicated. There are good reasons for this:
 
 * Duplicate libraries regularly break builds
 * Subtle bugs emerge with duplicate libraries, and to a lesser extent,
   duplicate tools
-* We want our formulae to work with what comes with OS X
+* We want our formulae to work with what comes with macOS
 
 There are exceptions:
 
-* OpenSSL - Apple has formally deprecated OpenSSL on OS X in favour of their own Security Framework
-  & consequently the OS X OpenSSL is rarely updated and frequently falls behind important security updates.
+* OpenSSL - Apple has formally deprecated OpenSSL on macOS in favour of their own Security Framework
+  & consequently the macOS OpenSSL is rarely updated and frequently falls behind important security updates.
   Homebrew endeavours to use our shipped OpenSSL as much
    as possible.
 * Programs that a user will regularly interact with directly, like editors and
@@ -32,13 +32,13 @@ There are exceptions:
   Formula         | Reason
   ---             | ---
   ruby, python, perl    | People want newer versions
-  bash            | OS X's bash is stuck at 3.2 because newer versions are licensed under GPLv3
+  bash            | macOS's bash is stuck at 3.2 because newer versions are licensed under GPLv3
   zsh             | This was a mistake, but it’s too late to remove it
   emacs, vim      | [Too popular to move to dupes](https://github.com/Homebrew/homebrew/pull/21594#issuecomment-21968819)
   subversion      | Originally added for 10.5, but people want the latest version
-  libcurl         | Some formulae require a newer version than OS X provides
-  openssl         | OS X's openssl is deprecated & outdated.
-  libxml2         | Historically, OS X's libxml2 has been buggy
+  libcurl         | Some formulae require a newer version than macOS provides
+  openssl         | macOS's openssl is deprecated & outdated.
+  libxml2         | Historically, macOS's libxml2 has been buggy
 
 We also maintain [a tap](https://github.com/Homebrew/homebrew-dupes) that
 contains many duplicates not otherwise found in Homebrew.
@@ -104,7 +104,7 @@ Please trust that we need to use our discretion based on our experience
 running a package manager.
 
 ### Stuff that builds an .app
-Don’t make your formula build an `.app` (native OS X Application); we
+Don’t make your formula build an `.app` (native macOS Application); we
 don’t want those things in Homebrew (but
 [Homebrew Cask](https://github.com/caskroom/homebrew-cask) does).
 Make it build a command-line tool or a library.

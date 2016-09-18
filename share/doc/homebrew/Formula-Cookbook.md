@@ -88,7 +88,7 @@ Check the package’s `README`. Does the package install with `./configure`, `cm
 
 ## Check for dependencies
 
-The `README` probably tells you about dependencies and Homebrew or OS X probably already has them. You can check for Homebrew dependencies with `brew search`. Some common dependencies that OS X comes with:
+The `README` probably tells you about dependencies and Homebrew or macOS probably already has them. You can check for Homebrew dependencies with `brew search`. Some common dependencies that macOS comes with:
 
 * `libexpat`
 * `libGL`
@@ -394,7 +394,7 @@ end
 
 Make sure you modify `s`! This block ignores the returned value.
 
-`inreplace` should be used instead of patches when it is patching something that will never be accepted upstream e.g. make the software’s build system respect Homebrew’s installation hierarchy. If it's something that affects both Homebrew and MacPorts (i.e. OS X specific) it should be turned into an upstream submitted patch instead.
+`inreplace` should be used instead of patches when it is patching something that will never be accepted upstream e.g. make the software’s build system respect Homebrew’s installation hierarchy. If it's something that affects both Homebrew and MacPorts (i.e. macOS specific) it should be turned into an upstream submitted patch instead.
 
 If you need modify variables in a `Makefile`, rather than using `inreplace`, pass them as arguments to `make`:
 

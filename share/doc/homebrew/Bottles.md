@@ -56,7 +56,7 @@ Optionally contains the rebuild version of the bottle.
 Sometimes bottles may need be updated without bumping the version of the formula e.g. a new patch was applied. In that case the rebuild will have a value of 1 or more.
 
 ### `sha256`
-Contains the SHA-256 of bottle for a particular version of OS X.
+Contains the SHA-256 of bottle for a particular version of macOS.
 
 ## Formula DSL
 Additionally there is a method available in the formula DSL.

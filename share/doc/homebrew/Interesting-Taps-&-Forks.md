@@ -4,7 +4,7 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 
 ## Main Taps
 
-*   [homebrew/apache](https://github.com/Homebrew/homebrew-apache): A tap for Apache modules, extending OS X's built-in Apache. These brews may require unconventional additional setup, as explained in the caveats.
+*   [homebrew/apache](https://github.com/Homebrew/homebrew-apache): A tap for Apache modules, extending macOS's built-in Apache. These brews may require unconventional additional setup, as explained in the caveats.
 
 *   [homebrew/boneyard](https://github.com/Homebrew/homebrew-boneyard): Formulae from other official taps, primarily (homebrew/core) are not deleted, they are moved here.
 
@@ -50,7 +50,7 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 *   [petere/postgresql](https://github.com/petere/homebrew-postgresql): Allows installing multiple PostgreSQL versions in parallel.
 
-*   [titanous/gnuradio](https://github.com/titanous/homebrew-gnuradio):  GNU Radio and friends running on OS X.
+*   [titanous/gnuradio](https://github.com/titanous/homebrew-gnuradio):  GNU Radio and friends running on macOS.
 
 ## Interesting Forks
 

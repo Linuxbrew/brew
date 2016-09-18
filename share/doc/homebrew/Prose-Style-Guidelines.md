@@ -75,7 +75,7 @@ We prefer:
  * When abbreviating, introduce the abbreviation with the first usage in any document
 * Some abbreviations (near-universally understood among our user base) are fine, though.
  * "Mac" is fine; "Macintosh" isn't necessary
-* "OS X", not "OSX" or "MacOS"
+* "macOS" for all versions, "OS X" or "Mac OS X" when describing specific older versions
 * "RuboCop", not "Rubocop"
 * A pull request is made "on" a repository; that repository is "at" a URL
 

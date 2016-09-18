@@ -1,7 +1,7 @@
 # Used to track formulae that cannot be installed at the same time
 FormulaConflict = Struct.new(:name, :reason)
 
-# Used to annotate formulae that duplicate OS X provided software
+# Used to annotate formulae that duplicate macOS provided software
 # or cause conflicts when linked in.
 class KegOnlyReason
   def initialize(reason, explanation)
@@ -29,22 +29,22 @@ class KegOnlyReason
   def to_s
     return @explanation unless @explanation.empty?
     case @reason
-    when :provided_by_osx then <<-EOS
-OS X already provides this software and installing another version in
+    when :provided_by_macos, :provided_by_osx then <<-EOS
+macOS already provides this software and installing another version in
 parallel can cause all kinds of trouble.
 EOS
-    when :shadowed_by_osx then <<-EOS
-OS X provides similar software and installing this software in
+    when :shadowed_by_macos, :shadowed_by_osx then <<-EOS
+macOS provides similar software and installing this software in
 parallel can cause all kinds of trouble.
 EOS
     when :provided_pre_mountain_lion then <<-EOS
-OS X already provides this software in versions before Mountain Lion.
+macOS already provides this software in versions before Mountain Lion.
 EOS
     when :provided_pre_mavericks then <<-EOS
-OS X already provides this software in versions before Mavericks.
+macOS already provides this software in versions before Mavericks.
 EOS
     when :provided_pre_el_capitan then <<-EOS
-OS X already provides this software in versions before El Capitan.
+macOS already provides this software in versions before El Capitan.
 EOS
     when :provided_until_xcode43
       "Xcode provides this software prior to version 4.3."

@@ -31,8 +31,8 @@ BOTTLE_ERB = <<-EOS.freeze
     <% end %>
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
-    <% checksum, osx = checksum_value.shift %>
-    <%= checksum_type %> "<%= checksum %>" => :<%= osx %>
+    <% checksum, macos = checksum_value.shift %>
+    <%= checksum_type %> "<%= checksum %>" => :<%= macos %>
     <% end %>
     <% end %>
   end

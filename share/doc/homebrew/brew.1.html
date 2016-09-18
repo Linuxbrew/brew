@@ -1,7 +1,7 @@
 <div class='mp'>
 <h2 id="NAME">NAME</h2>
 <p class="man-name">
-  <code>brew</code> - <span class="man-whatis">The missing package manager for OS X</span>
+  <code>brew</code> - <span class="man-whatis">The missing package manager for macOS</span>
 </p>
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
@@ -12,7 +12,7 @@
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
 <p>Homebrew is the easiest and most flexible way to install the UNIX tools Apple
-didn't include with OS X.</p>
+didn't include with macOS.</p>
 
 <h2 id="ESSENTIAL-COMMANDS">ESSENTIAL COMMANDS</h2>
 
@@ -128,7 +128,7 @@ checksum of a previously cached version no longer matches.</p>
 bottle.</p>
 
 <p>If <code>--force-bottle</code> is passed, download a bottle if it exists for the current
-version of OS X, even if it would not be used during installation.</p></dd>
+version of macOS, even if it would not be used during installation.</p></dd>
 <dt><code>gist-logs</code> [<code>--new-issue</code>|<code>-n</code>] <var>formula</var></dt><dd><p>Upload logs for a failed build of <var>formula</var> to a new Gist.</p>
 
 <p><var>formula</var> is usually the name of the formula to install, but it can be specified
@@ -217,7 +217,7 @@ be linked or which would be deleted by <code>brew link --overwrite</code>, but w
 actually link or delete any files.</p>
 
 <p>If <code>--force</code> is passed, Homebrew will allow keg-only formulae to be linked.</p></dd>
-<dt><code>linkapps</code> [<code>--local</code>] [<var>formulae</var>]</dt><dd><p>Find installed formulae that provide <code>.app</code>-style OS X apps and symlink them
+<dt><code>linkapps</code> [<code>--local</code>] [<var>formulae</var>]</dt><dd><p>Find installed formulae that provide <code>.app</code>-style macOS apps and symlink them
 into <code>/Applications</code>, allowing for easier access.</p>
 
 <p>If no <var>formulae</var> are provided, all of them will have their apps symlinked.</p>
@@ -462,7 +462,7 @@ name of the file or formula being audited, to make the output easy to grep.</p>
 
 <p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
 for instance, for implementing pre-commit hooks.</p></dd>
-<dt><code>bottle</code> [<code>--verbose</code>] [<code>--no-rebuild</code>] [<code>--keep-old</code>] [<code>--skip-relocation</code>] [<code>--root-url=&lt;root_url></code>]:</dt><dd><p></p></dd>
+<dt><code>bottle</code> [<code>--verbose</code>] [<code>--no-rebuild</code>] [<code>--keep-old</code>] [<code>--skip-relocation</code>] [<code>--root-url=&lt;root_url></code>] [<code>--force-core-tap</code>]:</dt><dd><p></p></dd>
 <dt><code>bottle</code> <code>--merge</code> [<code>--no-commit</code>] [<code>--keep-old</code>] [<code>--write</code>]:</dt><dd><p></p>
 
 <p>Generate a bottle (binary package) from a formula installed with
@@ -696,7 +696,7 @@ a Homebrew-built Subversion if installed, or the system-provided binary.</p>
 <p>Set this to force Homebrew to use a particular <code>svn</code> binary.</p></dd>
 <dt><code>HOMEBREW_TEMP</code></dt><dd><p>If set, instructs Homebrew to use <code>HOMEBREW_TEMP</code> as the temporary directory
 for building packages. This may be needed if your system temp directory and
-Homebrew Prefix are on different volumes, as OS X has trouble moving
+Homebrew Prefix are on different volumes, as macOS has trouble moving
 symlinks across volumes when the target does not yet exist.</p>
 
 <p>This issue typically occurs when using FileVault or custom SSD

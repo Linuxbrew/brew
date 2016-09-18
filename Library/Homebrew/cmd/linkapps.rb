@@ -1,5 +1,5 @@
 #:  * `linkapps` [`--local`] [<formulae>]:
-#:    Find installed formulae that provide `.app`-style OS X apps and symlink them
+#:    Find installed formulae that provide `.app`-style macOS apps and symlink them
 #:    into `/Applications`, allowing for easier access.
 #:
 #:    If no <formulae> are provided, all of them will have their apps symlinked.
