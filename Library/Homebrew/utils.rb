@@ -627,7 +627,7 @@ def migrate_legacy_keg_symlinks_if_necessary
 
   HOMEBREW_LINKED_KEGS.mkpath unless legacy_linked_kegs.children.empty?
   legacy_linked_kegs.children.each do |link|
-    name = link.basename
+    name = link.basename.to_s
     src = begin
       link.realpath
     rescue Errno::ENOENT
@@ -648,7 +648,7 @@ def migrate_legacy_keg_symlinks_if_necessary
 
   HOMEBREW_PINNED_KEGS.mkpath unless legacy_pinned_kegs.children.empty?
   legacy_pinned_kegs.children.each do |link|
-    name = link.basename
+    name = link.basename.to_s
     src = link.realpath
     dst = HOMEBREW_PINNED_KEGS/name
     FileUtils.ln_sf(src.relative_path_from(dst.parent), dst)
