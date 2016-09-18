@@ -5,12 +5,6 @@ require "requirement"
 require "requirements"
 require "set"
 
-if OS.mac?
-  require "extend/os/mac/dependency_collector"
-elsif OS.linux?
-  require "extend/os/linux/dependency_collector"
-end
-
 ## A dependency is a formula that another formula needs to install.
 ## A requirement is something other than a formula that another formula
 ## needs to be present. This includes external language modules,
@@ -175,3 +169,5 @@ class DependencyCollector
     end
   end
 end
+
+require "extend/os/dependency_collector"
