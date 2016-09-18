@@ -208,6 +208,9 @@ module Homebrew
 
     unless Utils.popen_read("git status --untracked-files=all --porcelain").empty?
       HOMEBREW_REPOSITORY.cd do
+        quiet_system "git", "merge", "--abort"
+        quiet_system "git", "rebase", "--abort"
+        quiet_system "git", "reset", "--mixed"
         safe_system "git", "-c", "user.email=brew-update@localhost",
                            "-c", "user.name=brew update",
                            "stash", "save", "--include-untracked"
