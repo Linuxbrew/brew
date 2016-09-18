@@ -348,7 +348,7 @@ EOS
     set -x
   fi
 
-  if [[ -z "$HOMEBREW_UPDATE_CLEANUP" ]]
+  if [[ -z "$HOMEBREW_UPDATE_CLEANUP" && -z "$HOMEBREW_UPDATE_TO_TAG" ]]
   then
     if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
     then

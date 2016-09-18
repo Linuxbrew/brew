@@ -1,4 +1,4 @@
-HOMEBREW_VERSION="0.9.9"
+HOMEBREW_VERSION="1.0.0"
 
 onoe() {
   if [[ -t 2 ]] # check whether stderr is a tty.
