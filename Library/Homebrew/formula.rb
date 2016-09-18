@@ -1164,7 +1164,8 @@ class Formula
   # Has the target of the alias used to install this formula changed?
   # Returns false if the formula wasn't installed with an alias.
   def installed_alias_target_changed?
-    ![self, nil].include?(current_installed_alias_target)
+    target = current_installed_alias_target
+    target && target != self
   end
 
   # Is this formula the target of an alias used to install an old formula?
