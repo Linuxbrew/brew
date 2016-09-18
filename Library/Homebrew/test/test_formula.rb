@@ -8,13 +8,152 @@ class FormulaTests < Homebrew::TestCase
     name = "formula_name"
     path = Formulary.core_path(name)
     spec = :stable
-    alias_path = CoreTap.instance.alias_dir/"formula_alias"
+
+    f = klass.new(name, path, spec)
+    assert_equal name, f.name
+    assert_equal name, f.specified_name
+    assert_equal name, f.full_name
+    assert_equal name, f.full_specified_name
+    assert_equal path, f.path
+    assert_nil f.alias_path
+    assert_nil f.alias_name
+    assert_nil f.full_alias_name
+    assert_raises(ArgumentError) { klass.new }
+  end
+
+  def test_formula_instantiation_with_alias
+    klass = Class.new(Formula) { url "http://example.com/foo-1.0.tar.gz" }
+    name = "formula_name"
+    path = Formulary.core_path(name)
+    spec = :stable
+    alias_name = "baz@1"
+    alias_path = CoreTap.instance.alias_dir/alias_name
 
     f = klass.new(name, path, spec, alias_path: alias_path)
     assert_equal name, f.name
+    assert_equal name, f.full_name
     assert_equal path, f.path
     assert_equal alias_path, f.alias_path
+    assert_equal alias_name, f.alias_name
+    assert_equal alias_name, f.specified_name
+    assert_equal alias_name, f.full_alias_name
+    assert_equal alias_name, f.full_specified_name
     assert_raises(ArgumentError) { klass.new }
+  end
+
+  def test_tap_formula_instantiation
+    tap = Tap.new("foo", "bar")
+    klass = Class.new(Formula) { url "baz-1.0" }
+    name = "baz"
+    full_name = "#{tap.user}/#{tap.repo}/#{name}"
+    path = tap.path/"Formula/#{name}.rb"
+    spec = :stable
+
+    f = klass.new(name, path, spec)
+    assert_equal name, f.name
+    assert_equal name, f.specified_name
+    assert_equal full_name, f.full_name
+    assert_equal full_name, f.full_specified_name
+    assert_equal path, f.path
+    assert_nil f.alias_path
+    assert_nil f.alias_name
+    assert_nil f.full_alias_name
+    assert_raises(ArgumentError) { klass.new }
+  end
+
+  def test_tap_formula_instantiation_with_alias
+    tap = Tap.new("foo", "bar")
+    klass = Class.new(Formula) { url "baz-1.0" }
+    name = "baz"
+    full_name = "#{tap.user}/#{tap.repo}/#{name}"
+    path = tap.path/"Formula/#{name}.rb"
+    spec = :stable
+    alias_name = "baz@1"
+    full_alias_name = "#{tap.user}/#{tap.repo}/#{alias_name}"
+    alias_path = CoreTap.instance.alias_dir/alias_name
+
+    f = klass.new(name, path, spec, alias_path: alias_path)
+    assert_equal name, f.name
+    assert_equal full_name, f.full_name
+    assert_equal path, f.path
+    assert_equal alias_path, f.alias_path
+    assert_equal alias_name, f.alias_name
+    assert_equal alias_name, f.specified_name
+    assert_equal full_alias_name, f.full_alias_name
+    assert_equal full_alias_name, f.full_specified_name
+    assert_raises(ArgumentError) { klass.new }
+  end
+
+  def test_follow_installed_alias
+    f = formula { url "foo-1.0" }
+    assert_predicate f, :follow_installed_alias?
+
+    f.follow_installed_alias = true
+    assert_predicate f, :follow_installed_alias?
+
+    f.follow_installed_alias = false
+    refute_predicate f, :follow_installed_alias?
+  end
+
+  def test_installed_alias_with_core
+    f = formula { url "foo-1.0" }
+
+    build_values_with_no_installed_alias = [
+      nil,
+      BuildOptions.new({}, {}),
+      Tab.new(source: { "path" => f.path.to_s }),
+    ]
+
+    build_values_with_no_installed_alias.each do |build|
+      f.build = build
+      assert_nil f.installed_alias_path
+      assert_nil f.installed_alias_name
+      assert_nil f.full_installed_alias_name
+      assert_equal f.name, f.installed_specified_name
+      assert_equal f.name, f.full_installed_specified_name
+    end
+
+    alias_name = "bar"
+    alias_path = "#{CoreTap.instance.alias_dir}/#{alias_name}"
+    f.build = Tab.new(source: { "path" => alias_path })
+    assert_equal alias_path, f.installed_alias_path
+    assert_equal alias_name, f.installed_alias_name
+    assert_equal alias_name, f.full_installed_alias_name
+    assert_equal alias_name, f.installed_specified_name
+    assert_equal alias_name, f.full_installed_specified_name
+  end
+
+  def test_installed_alias_with_tap
+    tap = Tap.new("user", "repo")
+    name = "foo"
+    full_name = "#{tap.user}/#{tap.repo}/#{name}"
+    path = "#{tap.path}/Formula/#{name}.rb"
+    f = formula(name, path) { url "foo-1.0" }
+
+    build_values_with_no_installed_alias = [
+      nil,
+      BuildOptions.new({}, {}),
+      Tab.new(source: { "path" => f.path }),
+    ]
+
+    build_values_with_no_installed_alias.each do |build|
+      f.build = build
+      assert_nil f.installed_alias_path
+      assert_nil f.installed_alias_name
+      assert_nil f.full_installed_alias_name
+      assert_equal f.name, f.installed_specified_name
+      assert_equal f.full_name, f.full_installed_specified_name
+    end
+
+    alias_name = "bar"
+    full_alias_name = "#{tap.user}/#{tap.repo}/#{alias_name}"
+    alias_path = "#{tap.alias_dir}/#{alias_name}"
+    f.build = Tab.new(source: { "path" => alias_path })
+    assert_equal alias_path, f.installed_alias_path
+    assert_equal alias_name, f.installed_alias_name
+    assert_equal full_alias_name, f.full_installed_alias_name
+    assert_equal alias_name, f.installed_specified_name
+    assert_equal full_alias_name, f.full_installed_specified_name
   end
 
   def test_prefix
@@ -272,6 +411,36 @@ class FormulaTests < Homebrew::TestCase
     f.build = Tab.new(:source => { "path" => source_path.to_s })
     assert_equal alias_path, f.alias_path
     assert_equal source_path.to_s, f.installed_alias_path
+  end
+
+  def test_installed_with_alias_path_with_nil
+    assert_predicate Formula.installed_with_alias_path(nil), :empty?
+  end
+
+  def test_installed_with_alias_path_with_a_path
+    alias_path = "#{CoreTap.instance.alias_dir}/alias"
+    different_alias_path = "#{CoreTap.instance.alias_dir}/another_alias"
+
+    formula_with_alias = formula("foo") { url "foo-1.0" }
+    formula_with_alias.build = Tab.empty
+    formula_with_alias.build.source["path"] = alias_path
+
+    formula_without_alias = formula("bar") { url "bar-1.0" }
+    formula_without_alias.build = Tab.empty
+    formula_without_alias.build.source["path"] = formula_without_alias.path.to_s
+
+    formula_with_different_alias = formula("baz") { url "baz-1.0" }
+    formula_with_different_alias.build = Tab.empty
+    formula_with_different_alias.build.source["path"] = different_alias_path
+
+    formulae = [
+      formula_with_alias,
+      formula_without_alias,
+      formula_with_different_alias,
+    ]
+
+    Formula.stubs(:installed).returns(formulae)
+    assert_equal [formula_with_alias], Formula.installed_with_alias_path(alias_path)
   end
 
   def test_formula_spec_integration
@@ -607,29 +776,111 @@ class FormulaTests < Homebrew::TestCase
   end
 end
 
+class AliasChangeTests < Homebrew::TestCase
+  attr_reader :f, :new_formula, :tab, :alias_path
+
+  def make_formula(version)
+    f = formula(alias_path: alias_path) { url "foo-#{version}" }
+    f.build = tab
+    f
+  end
+
+  def setup
+    alias_name = "bar"
+    @alias_path = "#{CoreTap.instance.alias_dir}/#{alias_name}"
+
+    @tab = Tab.empty
+
+    @f = make_formula("1.0")
+    @new_formula = make_formula("1.1")
+
+    Formula.stubs(:installed).returns([f])
+  end
+
+  def test_alias_changes_when_not_installed_with_alias
+    tab.source["path"] = Formulary.core_path(f.name).to_s
+
+    assert_nil f.current_installed_alias_target
+    assert_equal f, f.latest_formula
+    refute_predicate f, :installed_alias_target_changed?
+    refute_predicate f, :supersedes_an_installed_formula?
+    refute_predicate f, :alias_changed?
+    assert_predicate f.old_installed_formulae, :empty?
+  end
+
+  def test_alias_changes_when_not_changed
+    tab.source["path"] = alias_path
+    stub_formula_loader(f, alias_path)
+
+    assert_equal f, f.current_installed_alias_target
+    assert_equal f, f.latest_formula
+    refute_predicate f, :installed_alias_target_changed?
+    refute_predicate f, :supersedes_an_installed_formula?
+    refute_predicate f, :alias_changed?
+    assert_predicate f.old_installed_formulae, :empty?
+  end
+
+  def test_alias_changes_when_new_alias_target
+    tab.source["path"] = alias_path
+    stub_formula_loader(new_formula, alias_path)
+
+    assert_equal new_formula, f.current_installed_alias_target
+    assert_equal new_formula, f.latest_formula
+    assert_predicate f, :installed_alias_target_changed?
+    refute_predicate f, :supersedes_an_installed_formula?
+    assert_predicate f, :alias_changed?
+    assert_predicate f.old_installed_formulae, :empty?
+  end
+
+  def test_alias_changes_when_old_formulae_installed
+    tab.source["path"] = alias_path
+    stub_formula_loader(new_formula, alias_path)
+
+    assert_equal new_formula, new_formula.current_installed_alias_target
+    assert_equal new_formula, new_formula.latest_formula
+    refute_predicate new_formula, :installed_alias_target_changed?
+    assert_predicate new_formula, :supersedes_an_installed_formula?
+    assert_predicate new_formula, :alias_changed?
+    assert_equal [f], new_formula.old_installed_formulae
+  end
+end
+
 class OutdatedVersionsTests < Homebrew::TestCase
-  attr_reader :outdated_prefix, :same_prefix, :greater_prefix, :head_prefix
-  attr_reader :f
+  attr_reader :outdated_prefix,
+              :same_prefix,
+              :greater_prefix,
+              :head_prefix,
+              :old_alias_target_prefix
+  attr_reader :f, :old_formula
 
   def setup
     @f = formula do
       url "foo"
       version "1.20"
     end
+
+    @old_formula = formula("foo@1") { url "foo-1.0" }
+
     @outdated_prefix = HOMEBREW_CELLAR/"#{f.name}/1.11"
     @same_prefix = HOMEBREW_CELLAR/"#{f.name}/1.20"
     @greater_prefix = HOMEBREW_CELLAR/"#{f.name}/1.21"
     @head_prefix = HOMEBREW_CELLAR/"#{f.name}/HEAD"
+    @old_alias_target_prefix = HOMEBREW_CELLAR/"#{old_formula.name}/1.0"
   end
 
   def teardown
-    @f.rack.rmtree if @f.rack.exist?
+    [@f.rack, @old_formula.rack].select(&:exist?).each(&:rmtree)
+  end
+
+  def alias_path
+    "#{@f.tap.alias_dir}/bar"
   end
 
   def setup_tab_for_prefix(prefix, options = {})
     prefix.mkpath
     tab = Tab.empty
     tab.tabfile = prefix.join("INSTALL_RECEIPT.json")
+    tab.source["path"] = options[:path].to_s if options[:path]
     tab.source["tap"] = options[:tap] if options[:tap]
     tab.source["versions"] = options[:versions] if options[:versions]
     tab.source_modified_time = options[:source_modified_time].to_i
@@ -661,6 +912,50 @@ class OutdatedVersionsTests < Homebrew::TestCase
     f.instance_variable_set(:@tap, CoreTap.instance)
     setup_tab_for_prefix(outdated_prefix, tap: "homebrew/core")
     refute_predicate f.outdated_kegs, :empty?
+  end
+
+  def test_outdated_follow_alias_and_alias_unchanged
+    f.follow_installed_alias = true
+    f.build = setup_tab_for_prefix(same_prefix, path: alias_path)
+    stub_formula_loader(f, alias_path)
+    assert_predicate f.outdated_kegs, :empty?
+  end
+
+  def test_outdated_follow_alias_and_alias_changed
+    f.follow_installed_alias = true
+    f.build = setup_tab_for_prefix(same_prefix, path: alias_path)
+    stub_formula_loader(formula("foo@2") { url "foo-2.0" }, alias_path)
+    refute_predicate f.outdated_kegs, :empty?
+  end
+
+  def test_outdated_no_follow_alias_and_alias_unchanged
+    f.follow_installed_alias = false
+    f.build = setup_tab_for_prefix(same_prefix, path: alias_path)
+    stub_formula_loader(f, alias_path)
+    assert_predicate f.outdated_kegs, :empty?
+  end
+
+  def test_outdated_no_follow_alias_and_alias_changed
+    f.follow_installed_alias = false
+    f.build = setup_tab_for_prefix(same_prefix, path: alias_path)
+    stub_formula_loader(formula("foo@2") { url "foo-2.0" }, alias_path)
+    assert_predicate f.outdated_kegs, :empty?
+  end
+
+  def test_outdated_old_alias_targets_installed
+    @f = formula(alias_path: alias_path) { url "foo-1.0" }
+    tab = setup_tab_for_prefix(old_alias_target_prefix, path: alias_path)
+    old_formula.build = tab
+    Formula.stubs(:installed).returns([old_formula])
+    refute_predicate f.outdated_kegs, :empty?
+  end
+
+  def test_outdated_old_alias_targets_not_installed
+    @f = formula(alias_path: alias_path) { url "foo-1.0" }
+    tab = setup_tab_for_prefix(old_alias_target_prefix, path: old_formula.path)
+    old_formula.build = tab
+    Formula.stubs(:installed).returns([old_formula])
+    assert_predicate f.outdated_kegs, :empty?
   end
 
   def test_outdated_same_head_installed
