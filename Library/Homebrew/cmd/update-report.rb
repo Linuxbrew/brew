@@ -250,7 +250,7 @@ module Homebrew
       EOS
     end
 
-    Keg::ALL_TOP_LEVEL_DIRECTORIES.each do |dir|
+    (Keg::ALL_TOP_LEVEL_DIRECTORIES + ["Cellar"]).each do |dir|
       FileUtils.mkdir_p "#{HOMEBREW_PREFIX}/#{dir}"
     end
 
