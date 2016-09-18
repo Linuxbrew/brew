@@ -6,9 +6,9 @@ require "requirements"
 require "set"
 
 if OS.mac?
-  require "extend/os/mac/ant_dep"
+  require "extend/os/mac/dependency_collector"
 elsif OS.linux?
-  require "extend/os/linux/ant_dep"
+  require "extend/os/linux/dependency_collector"
 end
 
 ## A dependency is a formula that another formula needs to install.
