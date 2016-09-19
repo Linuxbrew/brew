@@ -30,6 +30,10 @@ class Tab < OpenStruct
       "HEAD" => HOMEBREW_REPOSITORY.git_head,
       "compiler" => compiler,
       "stdlib" => stdlib,
+      "runtime_dependencies" => formula.runtime_dependencies.map do |dep|
+        f = dep.to_formula
+        { "full_name" => f.full_name, "version" => f.version.to_s }
+      end,
       "source" => {
         "path" => formula.specified_path.to_s,
         "tap" => formula.tap ? formula.tap.name : nil,
@@ -56,6 +60,7 @@ class Tab < OpenStruct
   def self.from_file_content(content, path)
     attributes = Utils::JSON.load(content)
     attributes["tabfile"] = path
+    attributes["runtime_dependencies"] ||= []
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}
 
@@ -172,6 +177,7 @@ class Tab < OpenStruct
       "HEAD" => nil,
       "stdlib" => nil,
       "compiler" => DevelopmentTools.default_compiler,
+      "runtime_dependencies" => [],
       "source" => {
         "path" => nil,
         "tap" => nil,
@@ -303,6 +309,7 @@ class Tab < OpenStruct
       "HEAD" => self.HEAD,
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
+      "runtime_dependencies" => runtime_dependencies,
       "source" => source,
     }
 
