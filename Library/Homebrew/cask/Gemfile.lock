@@ -23,6 +23,9 @@ GEM
       ruby-progressbar
     mocha (1.1.0)
       metaclass (~> 0.0.1)
+    parallel (1.9.0)
+    parallel_tests (2.9.0)
+      parallel
     parser (2.3.1.2)
       ast (~> 2.2)
     powerpack (0.1.1)
@@ -80,6 +83,7 @@ DEPENDENCIES
   minitest (= 5.4.1)
   minitest-reporters
   mocha (= 1.1.0)
+  parallel_tests
   pry
   pry-byebug
   rake
