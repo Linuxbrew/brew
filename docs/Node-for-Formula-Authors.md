@@ -82,7 +82,7 @@ In your formula's `install` method, do any installation steps which need to be d
 system "npm", "install", *Language::Node.local_npm_install_args
 ```
 
-This will install all of your Node modules dependencies to your local build path. You can now continue with your build steps and take care of the installation into the Homebrew `prefix` by your own, following the [general Homebrew formula instructions](https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Formula-Cookbook.md).
+This will install all of your Node modules dependencies to your local build path. You can now continue with your build steps and take care of the installation into the Homebrew `prefix` by your own, following the [general Homebrew formula instructions](https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md).
 
 # Example
 

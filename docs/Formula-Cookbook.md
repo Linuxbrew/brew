@@ -350,7 +350,7 @@ If you have already forked Homebrew on GitHub, then you can manually push (just 
 git push https://github.com/myname/homebrew-core/ <what-you-called-your-branch>
 ```
 
-Now, please [open a pull request](https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md#how-to-open-a-homebrew-pull-request-and-get-it-merged) for your changes.
+Now, please [open a pull request](https://github.com/Homebrew/brew/blob/master/docs/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md#how-to-open-a-homebrew-pull-request-and-get-it-merged) for your changes.
 
 *   One formula per commit; one commit per formula
 *   Keep merge commits out of the pull request

@@ -76,7 +76,7 @@ When running `brew upgrade`, you see something like this:
 $ brew upgrade
 Error: undefined method `include?' for nil:NilClass
 Please report this bug:
-    https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Troubleshooting.md
+    https://github.com/Homebrew/brew/blob/master/docs/Troubleshooting.md
 /usr/local/Library/Homebrew/formula.rb:393:in `canonical_name'
 /usr/local/Library/Homebrew/formula.rb:425:in `factory'
 /usr/local/Library/Contributions/examples/brew-upgrade.rb:7
