@@ -634,7 +634,11 @@ def migrate_legacy_keg_symlinks_if_necessary
       begin
         (HOMEBREW_PREFIX/"opt/#{name}").realpath
       rescue Errno::ENOENT
-        Formulary.factory(name).installed_prefix
+        begin
+          Formulary.factory(name).installed_prefix
+        rescue
+          next
+        end
       end
     end
     dst = HOMEBREW_LINKED_KEGS/name
