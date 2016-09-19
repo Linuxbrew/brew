@@ -9,7 +9,7 @@ module Hbc::Locations
     end
 
     def default_caskroom
-      @default_caskroom ||= homebrew_repository.join("Caskroom")
+      @default_caskroom ||= homebrew_prefix.join("Caskroom")
     end
 
     def caskroom

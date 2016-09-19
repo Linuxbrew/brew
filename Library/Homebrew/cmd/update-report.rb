@@ -231,12 +231,8 @@ module Homebrew
       FileUtils.cp_r "#{HOMEBREW_REPOSITORY}/Library/Taps", "#{new_homebrew_repository}/Library/Taps"
     end
 
-    if (HOMEBREW_REPOSITORY/"Caskroom").exist?
-      FileUtils.cp_r "#{HOMEBREW_REPOSITORY}/Caskroom", "#{new_homebrew_repository}/Caskroom"
-    end
-
     unremovable_paths = []
-    extra_remove_paths = [".git", "Library/Locks", "Library/Taps", "Caskroom",
+    extra_remove_paths = [".git", "Library/Locks", "Library/Taps",
                           "Library/Homebrew/cask", "Library/Homebrew/test"]
     (repo_files + extra_remove_paths).each do |file|
       path = Pathname.new "#{HOMEBREW_REPOSITORY}/#{file}"

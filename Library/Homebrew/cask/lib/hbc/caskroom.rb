@@ -1,6 +1,14 @@
 module Hbc::Caskroom
   module_function
 
+  def migrate_caskroom_from_repo_to_prefix
+    repo_caskroom = Hbc.homebrew_repository.join("Caskroom")
+    if !Hbc.caskroom.exist? && repo_caskroom.directory?
+      ohai "Moving Caskroom from HOMEBREW_REPOSITORY to HOMEBREW_PREFIX"
+      FileUtils.mv repo_caskroom, Hbc.caskroom
+    end
+  end
+
   def ensure_caskroom_exists
     unless Hbc.caskroom.exist?
       ohai "Creating Caskroom at #{Hbc.caskroom}"
