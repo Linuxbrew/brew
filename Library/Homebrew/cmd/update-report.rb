@@ -272,12 +272,16 @@ module Homebrew
     link_completions_and_docs(new_homebrew_repository)
 
     ohai "Migrated HOMEBREW_REPOSITORY to #{new_homebrew_repository}!"
-    puts "You may now chown #{HOMEBREW_PREFIX} back to root:wheel."
+    puts <<-EOS.undent
+      Homebrew no longer needs to have ownership of /usr/local. If you wish you can
+      return /usr/local to its default ownership with:
+        sudo chown root:wheel #{HOMEBREW_PREFIX}
+    EOS
   rescue => e
     ofail <<-EOS.undent
       #{e}
       #{Tty.white}Failed to migrate HOMEBREW_REPOSITORY to #{new_homebrew_repository}!
-      Please comment with your (new) error in issue:
+      Please comment with your new error in issue or +1 an existing error:
         #{Tty.em}https://github.com/Homebrew/brew/issues/987#{Tty.reset}
     EOS
     $stderr.puts e.backtrace
