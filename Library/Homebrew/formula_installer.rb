@@ -779,7 +779,8 @@ class FormulaInstaller
         Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
     end
     keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
-      Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
+      Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s,
+      Keg::REPOSITORY_PLACEHOLDER, HOMEBREW_REPOSITORY.to_s
 
     Pathname.glob("#{formula.bottle_prefix}/{etc,var}/**/*") do |path|
       path.extend(InstallRenamed)
