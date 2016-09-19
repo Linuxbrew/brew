@@ -762,6 +762,7 @@ module Homebrew
       Formula.installed.each do |formula|
         safe_system "brew", "uninstall", "--force", formula
       end
+      safe_system "brew", "prune"
 
       unless @repository == HOMEBREW_REPOSITORY
         HOMEBREW_REPOSITORY.cd do
