@@ -225,7 +225,12 @@ class Hbc::Installer
   def enable_accessibility_access
     return unless @cask.accessibility_access
     ohai "Enabling accessibility access"
-    if MacOS.version <= :mountain_lion
+    if MacOS.version >= :sierra
+      opoo <<-EOS.undent
+        Access denied to accessibility DB (TCC.db) by SIP on this version of macOS.
+        If needed, enable manually via the app or System Preferences.
+      EOS
+    elsif MacOS.version <= :mountain_lion
       @command.run!("/usr/bin/touch",
                     args: [Hbc.pre_mavericks_accessibility_dotfile],
                     sudo: true)
@@ -248,7 +253,12 @@ class Hbc::Installer
 
   def disable_accessibility_access
     return unless @cask.accessibility_access
-    if MacOS.version >= :mavericks
+    if MacOS.version >= :sierra
+      opoo <<-EOS.undent
+        Access denied to accessibility DB (TCC.db) by SIP on this version of macOS.
+        If needed, disable manually via the app or System Preferences.
+      EOS
+    elsif MacOS.version >= :mavericks
       ohai "Disabling accessibility access"
       @command.run!("/usr/bin/sqlite3",
                     args: [
