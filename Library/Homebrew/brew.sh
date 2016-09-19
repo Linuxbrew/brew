@@ -268,6 +268,17 @@ update-preinstall() {
     brew update --preinstall
   fi
 
+  # If brew update --preinstall did a migration then export the new locations.
+  if [[ "$HOMEBREW_REPOSITORY" = "/usr/local" &&
+        ! -d "$HOMEBREW_REPOSITORY/.git" &&
+        -d "/usr/local/Homebrew/.git" ]]
+  then
+    HOMEBREW_REPOSITORY="/usr/local/Homebrew"
+    HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
+    export HOMEBREW_REPOSITORY
+    export HOMEBREW_LIBRARY
+  fi
+
   # If we've checked for updates, we don't need to check again.
   export HOMEBREW_NO_AUTO_UPDATE="1"
 }
