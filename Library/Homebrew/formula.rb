@@ -1139,7 +1139,9 @@ class Formula
       tab = Tab.for_keg(keg)
       next if version_scheme > tab.version_scheme
       next if version_scheme == tab.version_scheme && pkg_version > version
-      next if follow_installed_alias? && installed_alias_target_changed?
+
+      # don't consider this keg current if there's a newer formula available
+      next if follow_installed_alias? && new_formula_available?
 
       return [] # this keg is the current version of the formula, so it's not outdated
     end
@@ -1155,6 +1157,10 @@ class Formula
     else
       all_kegs.sort_by(&:version)
     end
+  end
+
+  def new_formula_available?
+    installed_alias_target_changed? && !latest_formula.installed?
   end
 
   def current_installed_alias_target

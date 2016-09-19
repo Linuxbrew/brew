@@ -851,7 +851,7 @@ class OutdatedVersionsTests < Homebrew::TestCase
               :greater_prefix,
               :head_prefix,
               :old_alias_target_prefix
-  attr_reader :f, :old_formula
+  attr_reader :f, :old_formula, :new_formula
 
   def setup
     @f = formula do
@@ -860,6 +860,7 @@ class OutdatedVersionsTests < Homebrew::TestCase
     end
 
     @old_formula = formula("foo@1") { url "foo-1.0" }
+    @new_formula = formula("foo@2") { url "foo-2.0" }
 
     @outdated_prefix = HOMEBREW_CELLAR/"#{f.name}/1.11"
     @same_prefix = HOMEBREW_CELLAR/"#{f.name}/1.20"
@@ -869,7 +870,8 @@ class OutdatedVersionsTests < Homebrew::TestCase
   end
 
   def teardown
-    [@f.rack, @old_formula.rack].select(&:exist?).each(&:rmtree)
+    formulae = [@f, @old_formula, @new_formula]
+    formulae.map(&:rack).select(&:exist?).each(&:rmtree)
   end
 
   def alias_path
@@ -921,11 +923,19 @@ class OutdatedVersionsTests < Homebrew::TestCase
     assert_predicate f.outdated_kegs, :empty?
   end
 
-  def test_outdated_follow_alias_and_alias_changed
+  def test_outdated_follow_alias_and_alias_changed_and_new_target_not_installed
     f.follow_installed_alias = true
     f.build = setup_tab_for_prefix(same_prefix, path: alias_path)
-    stub_formula_loader(formula("foo@2") { url "foo-2.0" }, alias_path)
+    stub_formula_loader(new_formula, alias_path)
     refute_predicate f.outdated_kegs, :empty?
+  end
+
+  def test_outdated_follow_alias_and_alias_changed_and_new_target_installed
+    f.follow_installed_alias = true
+    f.build = setup_tab_for_prefix(same_prefix, path: alias_path)
+    stub_formula_loader(new_formula, alias_path)
+    setup_tab_for_prefix(new_formula.prefix) # install new_formula
+    assert_predicate f.outdated_kegs, :empty?
   end
 
   def test_outdated_no_follow_alias_and_alias_unchanged
