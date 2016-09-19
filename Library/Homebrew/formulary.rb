@@ -190,7 +190,7 @@ class Formulary
       super name, Formulary.core_path(name)
     end
 
-    def get_formula(_spec, alias_path: nil)
+    def get_formula(*)
       raise FormulaUnavailableError, name
     end
   end
