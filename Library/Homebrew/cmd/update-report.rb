@@ -294,15 +294,15 @@ module Homebrew
   end
 
   def link_completions_and_docs(repository = HOMEBREW_REPOSITORY)
-    return if HOMEBREW_PREFIX.to_s == repository.to_s
     command = "brew update"
-    link_src_dst_dirs(repository/"etc/bash_completion.d",
+    link_src_dst_dirs(repository/"completions/bash",
                       HOMEBREW_PREFIX/"etc/bash_completion.d", command)
-    link_src_dst_dirs(repository/"share/doc/homebrew",
+    link_src_dst_dirs(repository/"docs",
                       HOMEBREW_PREFIX/"share/doc/homebrew", command, link_dir: true)
-    link_src_dst_dirs(repository/"share/zsh/site-functions",
+    link_src_dst_dirs(repository/"completions/zsh",
                       HOMEBREW_PREFIX/"share/zsh/site-functions", command)
-    link_path_manpages(repository/"share", command)
+    link_src_dst_dirs(repository/"manpages",
+                      HOMEBREW_PREFIX/"share/man/man1", command)
   rescue => e
     ofail <<-EOS.undent
       Failed to link all completions, docs and manpages:
