@@ -130,8 +130,15 @@ class TabTests < Homebrew::TestCase
     f = formula do
       url "foo-1.0"
       depends_on "bar"
+      depends_on "user/repo/from_tap"
       depends_on "baz" => :build
     end
+
+    tap = Tap.new("user", "repo")
+    from_tap = formula("from_tap", tap.path/"Formula/from_tap.rb") do
+      url "from_tap-1.0"
+    end
+    stub_formula_loader from_tap
 
     stub_formula_loader formula("bar") { url "bar-2.0" }
     stub_formula_loader formula("baz") { url "baz-3.0" }
@@ -140,7 +147,10 @@ class TabTests < Homebrew::TestCase
     stdlib = :libcxx
     tab = Tab.create(f, compiler, stdlib)
 
-    runtime_dependencies = [{ "full_name" => "bar", "version" => "2.0" }]
+    runtime_dependencies = [
+      { "full_name" => "bar", "version" => "2.0" },
+      { "full_name" => "user/repo/from_tap", "version" => "1.0" },
+    ]
 
     assert_equal runtime_dependencies, tab.runtime_dependencies
     assert_equal f.path.to_s, tab.source["path"]
