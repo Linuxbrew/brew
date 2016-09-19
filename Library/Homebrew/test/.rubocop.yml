@@ -1,5 +1,0 @@
-inherit_from: ../../.rubocop.yml
-
-# `formula do` uses nested method definitions
-Lint/NestedMethodDefinition:
-  Enabled: false

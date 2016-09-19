@@ -719,6 +719,7 @@ module Homebrew
           test "brew", "update-test", "--commit=HEAD"
         end
 
+        test "brew", "style"
         test "brew", "readall", "--syntax"
 
         coverage_args = []
@@ -741,6 +742,9 @@ module Homebrew
           test "brew", "cask-tests", *coverage_args
         end
       elsif @tap
+        if @tap.name == "homebrew/core"
+          test "brew", "style", @tap.name
+        end
         test "brew", "readall", "--aliases", @tap.name
       end
     end
