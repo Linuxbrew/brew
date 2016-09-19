@@ -388,7 +388,7 @@ class FormulaTests < Homebrew::TestCase
 
   def test_alias_paths_with_build_options
     alias_path = CoreTap.instance.alias_dir/"another_name"
-    f = formula(:alias_path => alias_path) { url "foo-1.0" }
+    f = formula(alias_path: alias_path) { url "foo-1.0" }
     f.build = BuildOptions.new({}, {})
     assert_equal alias_path, f.alias_path
     assert_nil f.installed_alias_path
@@ -397,8 +397,8 @@ class FormulaTests < Homebrew::TestCase
   def test_alias_paths_with_tab_with_non_alias_source_path
     alias_path = CoreTap.instance.alias_dir/"another_name"
     source_path = CoreTap.instance.formula_dir/"another_other_name"
-    f = formula(:alias_path => alias_path) { url "foo-1.0" }
-    f.build = Tab.new(:source => { "path" => source_path.to_s })
+    f = formula(alias_path: alias_path) { url "foo-1.0" }
+    f.build = Tab.new(source: { "path" => source_path.to_s })
     assert_equal alias_path, f.alias_path
     assert_nil f.installed_alias_path
   end
@@ -406,8 +406,8 @@ class FormulaTests < Homebrew::TestCase
   def test_alias_paths_with_tab_with_alias_source_path
     alias_path = CoreTap.instance.alias_dir/"another_name"
     source_path = CoreTap.instance.alias_dir/"another_other_name"
-    f = formula(:alias_path => alias_path) { url "foo-1.0" }
-    f.build = Tab.new(:source => { "path" => source_path.to_s })
+    f = formula(alias_path: alias_path) { url "foo-1.0" }
+    f.build = Tab.new(source: { "path" => source_path.to_s })
     assert_equal alias_path, f.alias_path
     assert_equal source_path.to_s, f.installed_alias_path
   end

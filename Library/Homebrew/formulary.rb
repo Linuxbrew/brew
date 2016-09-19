@@ -233,9 +233,9 @@ class Formulary
     keg = kegs.detect(&:linked?) || kegs.detect(&:optlinked?) || kegs.max_by(&:version)
 
     if keg
-      from_keg(keg, spec, :alias_path => alias_path)
+      from_keg(keg, spec, alias_path: alias_path)
     else
-      factory(rack.basename.to_s, spec || :stable, :alias_path => alias_path)
+      factory(rack.basename.to_s, spec || :stable, alias_path: alias_path)
     end
   end
 
@@ -247,13 +247,13 @@ class Formulary
     spec ||= tab.spec
 
     f = if tap.nil?
-      factory(keg.rack.basename.to_s, spec, :alias_path => alias_path)
+      factory(keg.rack.basename.to_s, spec, alias_path: alias_path)
     else
       begin
-        factory("#{tap}/#{keg.rack.basename}", spec, :alias_path => alias_path)
+        factory("#{tap}/#{keg.rack.basename}", spec, alias_path: alias_path)
       rescue FormulaUnavailableError
         # formula may be migrated to different tap. Try to search in core and all taps.
-        factory(keg.rack.basename.to_s, spec, :alias_path => alias_path)
+        factory(keg.rack.basename.to_s, spec, alias_path: alias_path)
       end
     end
     f.build = tab

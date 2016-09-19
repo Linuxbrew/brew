@@ -55,12 +55,12 @@ module Homebrew
           f.pkg_version.to_s
         end
 
-        outdated_versions = outdated_kegs.
-          group_by { |keg| Formulary.from_keg(keg) }.
-          sort_by { |formula, kegs| formula.full_name }.
-          map do |formula, kegs|
-            "#{formula.full_name} (#{kegs.map(&:version).join(", ")})"
-          end.join(", ")
+        outdated_versions = outdated_kegs
+                            .group_by { |keg| Formulary.from_keg(keg) }
+                            .sort_by { |formula, _kegs| formula.full_name }
+                            .map do |formula, kegs|
+          "#{formula.full_name} (#{kegs.map(&:version).join(", ")})"
+        end.join(", ")
 
         puts "#{outdated_versions} < #{current_version}"
       else

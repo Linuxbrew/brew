@@ -162,7 +162,7 @@ class Formula
   # Defaults to true.
   # @return [Boolean]
   attr_accessor :follow_installed_alias
-  alias follow_installed_alias? follow_installed_alias
+  alias_method :follow_installed_alias?, :follow_installed_alias
 
   # @private
   def initialize(name, path, spec, alias_path: nil)

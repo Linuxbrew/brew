@@ -79,10 +79,10 @@ module Homebrew
 
   def upgrade_formula(f)
     formulae_maybe_with_kegs = [f] + f.old_installed_formulae
-    outdated_kegs = formulae_maybe_with_kegs.
-      map(&:linked_keg).
-      select(&:directory?).
-      map { |k| Keg.new(k.resolved_path) }
+    outdated_kegs = formulae_maybe_with_kegs
+                    .map(&:linked_keg)
+                    .select(&:directory?)
+                    .map { |k| Keg.new(k.resolved_path) }
 
     fi = FormulaInstaller.new(f)
     fi.options             = f.build.used_options
@@ -123,7 +123,7 @@ module Homebrew
   ensure
     # restore previous installation state if build failed
     begin
-      outdated_kegs.each(&:link) if !f.installed?
+      outdated_kegs.each(&:link) unless f.installed?
     rescue
       nil
     end
