@@ -3,7 +3,7 @@
 Homebrew supports and recommends the latest Xcode and/or Command Line
 Tools available for your platform:
 
- OS X  | Xcode | Command Line Tools
+ macOS  | Xcode | Command Line Tools
  ----- | ----- | ----------------------------
  10.6  | 3.2.6 | N/A
  10.7  | 4.6.3 | April 2013

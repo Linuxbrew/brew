@@ -4,7 +4,7 @@
 .TH "BREW" "1" "September 2016" "Homebrew" "brew"
 .
 .SH "NAME"
-\fBbrew\fR \- The missing package manager for OS X
+\fBbrew\fR \- The missing package manager for macOS
 .
 .SH "SYNOPSIS"
 \fBbrew\fR \fB\-\-version\fR
@@ -13,7 +13,7 @@
 \fBbrew\fR \fIcommand\fR [\fB\-\-verbose\fR|\fB\-v\fR] [\fIoptions\fR] [\fIformula\fR] \.\.\.
 .
 .SH "DESCRIPTION"
-Homebrew is the easiest and most flexible way to install the UNIX tools Apple didn\'t include with OS X\.
+Homebrew is the easiest and most flexible way to install the UNIX tools Apple didn\'t include with macOS\.
 .
 .SH "ESSENTIAL COMMANDS"
 For the full command list, see the \fICOMMANDS\fR section\.
@@ -171,7 +171,7 @@ If \fB\-\-deps\fR is passed, also download dependencies for any listed \fIformul
 If \fB\-\-build\-from\-source\fR is passed, download the source rather than a bottle\.
 .
 .IP
-If \fB\-\-force\-bottle\fR is passed, download a bottle if it exists for the current version of OS X, even if it would not be used during installation\.
+If \fB\-\-force\-bottle\fR is passed, download a bottle if it exists for the current version of macOS, even if it would not be used during installation\.
 .
 .TP
 \fBgist\-logs\fR [\fB\-\-new\-issue\fR|\fB\-n\fR] \fIformula\fR
@@ -291,7 +291,7 @@ If \fB\-\-force\fR is passed, Homebrew will allow keg\-only formulae to be linke
 .
 .TP
 \fBlinkapps\fR [\fB\-\-local\fR] [\fIformulae\fR]
-Find installed formulae that provide \fB\.app\fR\-style OS X apps and symlink them into \fB/Applications\fR, allowing for easier access\.
+Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access\.
 .
 .IP
 If no \fIformulae\fR are provided, all of them will have their apps symlinked\.
@@ -644,7 +644,7 @@ If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with 
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
 .
 .TP
-\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR] [\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=<root_url>\fR]:
+\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR] [\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=<root_url>\fR] [\fB\-\-force\-core\-tap\fR]:
 
 .
 .TP
@@ -952,7 +952,7 @@ Set this to force Homebrew to use a particular \fBsvn\fR binary\.
 .
 .TP
 \fBHOMEBREW_TEMP\fR
-If set, instructs Homebrew to use \fBHOMEBREW_TEMP\fR as the temporary directory for building packages\. This may be needed if your system temp directory and Homebrew Prefix are on different volumes, as OS X has trouble moving symlinks across volumes when the target does not yet exist\.
+If set, instructs Homebrew to use \fBHOMEBREW_TEMP\fR as the temporary directory for building packages\. This may be needed if your system temp directory and Homebrew Prefix are on different volumes, as macOS has trouble moving symlinks across volumes when the target does not yet exist\.
 .
 .IP
 This issue typically occurs when using FileVault or custom SSD configurations\.

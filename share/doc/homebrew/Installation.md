@@ -49,7 +49,7 @@ supported on a best-effort basis. For 10.4 and 10.5, see
 <a name="3"><sup>3</sup></a> Most formulae require a compiler. A handful
 require a full Xcode installation. You can install Xcode, the CLT, or both;
 Homebrew supports all three configurations. Downloading Xcode may require an
-Apple Developer account on older versions of OS X. Sign up for free
+Apple Developer account on older versions of Mac OS X. Sign up for free
 [here](https://developer.apple.com/register/index.action).
 
 <a name="4"><sup>4</sup></a> The one-liner installation method found on

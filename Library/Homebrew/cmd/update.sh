@@ -23,7 +23,7 @@ git() {
 }
 
 git_init_if_necessary() {
-  if [[ -n "$HOMEBREW_OSX" ]]
+  if [[ -n "$HOMEBREW_MACOS" ]]
   then
     BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"

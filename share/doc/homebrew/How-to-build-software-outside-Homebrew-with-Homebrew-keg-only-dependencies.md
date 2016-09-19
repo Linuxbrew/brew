@@ -14,7 +14,7 @@ This is because Homebrew keeps it locked inside its individual prefix, rather th
 
 A number of people in this situation are either forcefully linking `keg_only` tools with `brew link --force` or moving default system utilities out of the `$PATH` and replacing them with manually-created symlinks to the Homebrew-provided tool.
 
-*Please* do not remove OS X native tools and forcefully replace them with symlinks back to the Homebrew-provided tool. Doing so can and likely will cause significant breakage when attempting to build software.
+*Please* do not remove macOS native tools and forcefully replace them with symlinks back to the Homebrew-provided tool. Doing so can and likely will cause significant breakage when attempting to build software.
 
 `brew link --force` creates a warning in `brew doctor` to let both you and maintainers know that link exists and could be causing issues. If you’ve linked something and there’s no problems at all? Feel free to ignore the `brew doctor` error.
 

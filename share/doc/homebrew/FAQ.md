@@ -71,7 +71,7 @@ Be careful as this is a destructive operation.
 Which is usually: `~/Library/Caches/Homebrew`
 
 ### My Mac `.app`s don’t find `/usr/local/bin` utilities!
-GUI apps on OS X don’t have `/usr/local/bin` in their `PATH` by default.
+GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by default.
 If you’re on Mountain Lion, you can fix this by running
 `launchctl setenv PATH "/usr/local/bin:$PATH"`. [More details
 here](https://stackoverflow.com/questions/135688/setting-environment-variables-in-os-x/5444960#5444960),

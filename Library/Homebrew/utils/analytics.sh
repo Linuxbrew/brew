@@ -38,7 +38,7 @@ setup-analytics() {
     if [[ -n "$HOMEBREW_LINUX" ]]
     then
       HOMEBREW_ANALYTICS_USER_UUID="$(tr a-f A-F </proc/sys/kernel/random/uuid)"
-    elif [[ -n "$HOMEBREW_OSX" ]]
+    elif [[ -n "$HOMEBREW_MACOS" ]]
     then
       HOMEBREW_ANALYTICS_USER_UUID="$(/usr/bin/uuidgen)"
     else

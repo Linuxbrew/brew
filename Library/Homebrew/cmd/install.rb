@@ -34,7 +34,7 @@
 #:
 #     Hidden developer option:
 #     If `--force-bottle` is passed, install from a bottle if it exists
-#    for the current version of OS X, even if custom options are given.
+#    for the current version of macOS, even if custom options are given.
 #
 #:    If `--devel` is passed, and <formula> defines it, install the development version.
 #:

@@ -8,7 +8,7 @@ class UnsignedKextRequirement < Requirement
   def message
     s = <<-EOS.undent
       Building this formula from source isn't possible due to OS X
-      Yosemite and above's strict unsigned kext ban.
+      Yosemite (10.10) and above's strict unsigned kext ban.
     EOS
     s += super
     s

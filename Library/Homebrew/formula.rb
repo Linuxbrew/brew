@@ -1988,7 +1988,7 @@ class Formula
     # depends_on :fortran # Checks that `gfortran` is available or `FC` is set.
     # depends_on :mpi => :cc # Needs MPI with `cc`
     # depends_on :mpi => [:cc, :cxx, :optional] # Is optional. MPI with `cc` and `cxx`.
-    # depends_on :macos => :lion # Needs at least Mac OS X "Lion" aka. 10.7.
+    # depends_on :macos => :lion # Needs at least OS X Lion (10.7).
     # depends_on :apr # If a formula requires the CLT-provided apr library to exist.
     # depends_on :arch => :intel # If this formula only builds on Intel architecture.
     # depends_on :arch => :x86_64 # If this formula only builds on Intel x86 64-bit.
@@ -2004,7 +2004,7 @@ class Formula
     # depends_on :postgresql if build.without? "sqlite"
     # depends_on :hg # Mercurial (external or brewed) is needed</pre>
     #
-    # <pre># If any Python >= 2.7 < 3.x is okay (either from OS X or brewed):
+    # <pre># If any Python >= 2.7 < 3.x is okay (either from macOS or brewed):
     # depends_on :python</pre>
     # <pre># to depend on Python >= 2.7 but use system Python where possible
     # depends_on :python if MacOS.version <= :snow_leopard</pre>
@@ -2117,8 +2117,8 @@ class Formula
     # add the necessary includes and libs (etc.) during the brewing of that
     # other formula. But generally, keg_only formulae are not in your PATH
     # and not seen by compilers if you build your own software outside of
-    # Homebrew. This way, we don't shadow software provided by OS X.
-    # <pre>keg_only :provided_by_osx</pre>
+    # Homebrew. This way, we don't shadow software provided by macOS.
+    # <pre>keg_only :provided_by_macos</pre>
     # <pre>keg_only "because I want it so"</pre>
     def keg_only(reason, explanation = "")
       @keg_only_reason = KegOnlyReason.new(reason, explanation)

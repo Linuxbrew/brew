@@ -44,8 +44,8 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
   end
 
-  def needs_osx
-    skip "Not on OS X" unless OS.mac?
+  def needs_macos
+    skip "Not on MacOS" unless OS.mac?
   end
 
   def cmd_id_from_args(args)
@@ -729,14 +729,14 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_cask
     needs_test_cmd_taps
-    needs_osx
+    needs_macos
     setup_remote_tap("caskroom/cask")
     cmd("cask", "list")
   end
 
   def test_services
     needs_test_cmd_taps
-    needs_osx
+    needs_macos
     setup_remote_tap("homebrew/services")
     assert_equal "Warning: No services available to control with `brew services`",
       cmd("services", "list")

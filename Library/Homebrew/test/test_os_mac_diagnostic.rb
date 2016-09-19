@@ -19,11 +19,11 @@ class OSMacDiagnosticChecksTest < Homebrew::TestCase
       @checks.check_for_other_package_managers
   end
 
-  def test_check_for_unsupported_osx
+  def test_check_for_unsupported_macos
     ARGV.stubs(:homebrew_developer?).returns false
     OS::Mac.stubs(:prerelease?).returns true
     assert_match "We do not provide support for this pre-release version.",
-      @checks.check_for_unsupported_osx
+      @checks.check_for_unsupported_macos
   end
 
   def test_check_for_unsupported_curl_vars

@@ -10,7 +10,7 @@ You cloned with git, and your git configuration is set to use Windows line endin
 
 
 ### Ruby `bad interpreter: /usr/bin/ruby`
-You don't have a `/usr/bin/ruby` or it is not executable. It's not recommended to let this persist, you'd be surprised how many .apps, tools and scripts expect your OS X provided files and directories to be *unmodified* since OS X was installed.
+You don't have a `/usr/bin/ruby` or it is not executable. It's not recommended to let this persist, you'd be surprised how many .apps, tools and scripts expect your macOS provided files and directories to be *unmodified* since macOS was installed.
 
 ### `brew update` complains about untracked working tree files
 After running `brew update`, you receive a git error warning about untracked files or local changes that would be overwritten by a checkout or merge, followed by a list of files inside your Homebrew installation.
@@ -38,7 +38,7 @@ invalid multibyte escape: /^\037\235/
 
 In the past, Homebrew assumed that `/usr/bin/ruby` was Ruby 1.8. On OS X 10.9, it is now Ruby 2.0. There are various incompatibilities between the two versions, so if you upgrade to OS X 10.9 while using a sufficiently old version of Homebrew, you will encounter errors.
 
-The incompatibilities have been addressed in more recent versions of Homebrew, and it does not make assumptions about `/usr/bin/ruby`, instead it uses the executable inside OS X's Ruby framework or a vendored Ruby.
+The incompatibilities have been addressed in more recent versions of Homebrew, and it does not make assumptions about `/usr/bin/ruby`, instead it uses the executable inside MacOS's Ruby framework or a vendored Ruby.
 
 To recover from this situation, do the following:
 
@@ -118,14 +118,14 @@ Don't follow the advice here but fix by using
 `Language::Python.setup_install_args` in the formula as described in
 [Python for Formula Authors](Python-for-Formula-Authors.md).
 
-### Upgrading OS X
+### Upgrading macOS
 
-Upgrading OS X can cause errors like the following:
+Upgrading macOS can cause errors like the following:
 
 - `dyld: Library not loaded: /usr/local/opt/icu4c/lib/libicui18n.54.dylib`
 - `configure: error: Cannot find libz`
 
-Following an OS X upgrade it may be necessary to reinstall the Xcode Command Line Tools and `brew upgrade` all installed formula:
+Following an macOS upgrade it may be necessary to reinstall the Xcode Command Line Tools and `brew upgrade` all installed formula:
 
 ```bash
 xcode-select --install

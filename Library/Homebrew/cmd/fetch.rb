@@ -19,7 +19,7 @@
 #:    bottle.
 #:
 #:    If `--force-bottle` is passed, download a bottle if it exists for the current
-#:    version of OS X, even if it would not be used during installation.
+#:    version of macOS, even if it would not be used during installation.
 
 require "formula"
 

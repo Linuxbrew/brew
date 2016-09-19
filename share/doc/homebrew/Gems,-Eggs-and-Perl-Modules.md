@@ -1,5 +1,5 @@
 # Gems, Eggs and Perl Modules
-On a fresh OS X installation there are three empty directories for
+On a fresh macOS installation there are three empty directories for
 add-ons available to all users:
 
     /Library/Ruby
@@ -42,7 +42,7 @@ about the paths. Note, a brewed Python still searches for modules in
 ### With system’s Python
 _This is only recommended if you **don't** use a brewed Python._
 
-On OS X, any [Python version X.Y also searches in
+On macOS, any [Python version X.Y also searches in
 `~/Library/Python/X.Y/lib/python/site-packages` for
 modules](https://docs.python.org/2/install/index.html#inst-alt-install-user).
 That dir might not yet exist, but you can create it:
