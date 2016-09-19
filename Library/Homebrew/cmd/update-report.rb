@@ -234,7 +234,7 @@ module Homebrew
 
     unremovable_paths = []
     extra_remove_paths = [".git", "Library/Locks", "Library/Taps",
-                          "Library/Homebrew/test"]
+                          "Library/Homebrew/cask", "Library/Homebrew/test"]
     (repo_files + extra_remove_paths).each do |file|
       path = Pathname.new "#{HOMEBREW_REPOSITORY}/#{file}"
       begin
