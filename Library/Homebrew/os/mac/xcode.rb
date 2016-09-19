@@ -3,8 +3,8 @@ module OS
     module Xcode
       extend self
 
-      V4_BUNDLE_ID = "com.apple.dt.Xcode"
-      V3_BUNDLE_ID = "com.apple.Xcode"
+      V4_BUNDLE_ID = "com.apple.dt.Xcode".freeze
+      V3_BUNDLE_ID = "com.apple.Xcode".freeze
 
       def latest_version
         case MacOS.version
@@ -104,18 +104,17 @@ module OS
           #{prefix}/usr/bin/xcodebuild
           #{which("xcodebuild")}
         ].uniq.each do |xcodebuild_path|
-          if File.executable? xcodebuild_path
-            xcodebuild_output = Utils.popen_read(xcodebuild_path, "-version")
-            next unless $?.success?
+          next unless File.executable? xcodebuild_path
+          xcodebuild_output = Utils.popen_read(xcodebuild_path, "-version")
+          next unless $?.success?
 
-            xcode_version = xcodebuild_output[/Xcode (\d(\.\d)*)/, 1]
-            return xcode_version if xcode_version
+          xcode_version = xcodebuild_output[/Xcode (\d(\.\d)*)/, 1]
+          return xcode_version if xcode_version
 
-            # Xcode 2.x's xcodebuild has a different version string
-            case xcodebuild_output[/DevToolsCore-(\d+\.\d)/, 1]
-            when "515.0" then return "2.0"
-            when "798.0" then return "2.5"
-            end
+          # Xcode 2.x's xcodebuild has a different version string
+          case xcodebuild_output[/DevToolsCore-(\d+\.\d)/, 1]
+          when "515.0" then return "2.0"
+          when "798.0" then return "2.5"
           end
         end
 
@@ -125,25 +124,25 @@ module OS
         # be removed in a future version. To remain compatible, guard usage of
         # Xcode.version with an Xcode.installed? check.
         case (DevelopmentTools.clang_version.to_f * 10).to_i
-          when 0       then "dunno"
-          when 1..14   then "3.2.2"
-          when 15      then "3.2.4"
-          when 16      then "3.2.5"
-          when 17..20  then "4.0"
-          when 21      then "4.1"
-          when 22..30  then "4.2"
-          when 31      then "4.3"
-          when 40      then "4.4"
-          when 41      then "4.5"
-          when 42      then "4.6"
-          when 50      then "5.0"
-          when 51      then "5.1"
-          when 60      then "6.0"
-          when 61      then "6.1"
-          when 70      then "7.0"
-          when 73      then "7.3"
-          when 80      then "8.0"
-          else "8.0"
+        when 0       then "dunno"
+        when 1..14   then "3.2.2"
+        when 15      then "3.2.4"
+        when 16      then "3.2.5"
+        when 17..20  then "4.0"
+        when 21      then "4.1"
+        when 22..30  then "4.2"
+        when 31      then "4.3"
+        when 40      then "4.4"
+        when 41      then "4.5"
+        when 42      then "4.6"
+        when 50      then "5.0"
+        when 51      then "5.1"
+        when 60      then "6.0"
+        when 61      then "6.1"
+        when 70      then "7.0"
+        when 73      then "7.3"
+        when 80      then "8.0"
+        else "8.0"
         end
       end
 
@@ -167,11 +166,11 @@ module OS
     module CLT
       extend self
 
-      STANDALONE_PKG_ID = "com.apple.pkg.DeveloperToolsCLILeo"
-      FROM_XCODE_PKG_ID = "com.apple.pkg.DeveloperToolsCLI"
-      MAVERICKS_PKG_ID = "com.apple.pkg.CLTools_Executables"
-      MAVERICKS_NEW_PKG_ID = "com.apple.pkg.CLTools_Base" # obsolete
-      MAVERICKS_PKG_PATH = "/Library/Developer/CommandLineTools"
+      STANDALONE_PKG_ID = "com.apple.pkg.DeveloperToolsCLILeo".freeze
+      FROM_XCODE_PKG_ID = "com.apple.pkg.DeveloperToolsCLI".freeze
+      MAVERICKS_PKG_ID = "com.apple.pkg.CLTools_Executables".freeze
+      MAVERICKS_NEW_PKG_ID = "com.apple.pkg.CLTools_Base".freeze # obsolete
+      MAVERICKS_PKG_PATH = "/Library/Developer/CommandLineTools".freeze
 
       # Returns true even if outdated tools are installed, e.g.
       # tools from Xcode 4.x on 10.9

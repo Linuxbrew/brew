@@ -25,6 +25,10 @@ class Tty
       bold 39
     end
 
+    def magenta
+      bold 35
+    end
+
     def red
       underline 31
     end
@@ -134,11 +138,10 @@ def odeprecated(method, replacement = nil, options = {})
   backtrace = options.fetch(:caller, caller)
   tap_message = nil
   caller_message = backtrace.detect do |line|
-    if line =~ %r{^#{Regexp.escape HOMEBREW_LIBRARY}/Taps/([^/]+/[^/]+)/}
-      tap = Tap.fetch $1
-      tap_message = "\nPlease report this to the #{tap} tap!"
-      true
-    end
+    next unless line =~ %r{^#{Regexp.escape HOMEBREW_LIBRARY}/Taps/([^/]+/[^/]+)/}
+    tap = Tap.fetch $1
+    tap_message = "\nPlease report this to the #{tap} tap!"
+    true
   end
   caller_message ||= backtrace.detect do |line|
     !line.start_with?("#{HOMEBREW_LIBRARY_PATH}/compat/")
@@ -166,7 +169,7 @@ end
 
 def pretty_installed(f)
   if !$stdout.tty?
-    "#{f}"
+    f.to_s
   elsif Emoji.enabled?
     "#{Tty.highlight}#{f} #{Tty.green}#{Emoji.tick}#{Tty.reset}"
   else
@@ -176,7 +179,7 @@ end
 
 def pretty_uninstalled(f)
   if !$stdout.tty?
-    "#{f}"
+    f.to_s
   elsif Emoji.enabled?
     "#{f} #{Tty.red}#{Emoji.cross}#{Tty.reset}"
   else
@@ -192,7 +195,7 @@ def pretty_duration(s)
     m = s / 60
     s %= 60
     res = "#{m} minute#{plural m}"
-    return res if s == 0
+    return res if s.zero?
     res << " "
   end
 
@@ -200,7 +203,7 @@ def pretty_duration(s)
 end
 
 def plural(n, s = "s")
-  (n == 1) ? "" : s
+  n == 1 ? "" : s
 end
 
 def interactive_shell(f = nil)
@@ -229,7 +232,11 @@ module Homebrew
     pid = fork do
       yield if block_given?
       args.collect!(&:to_s)
-      exec(cmd, *args) rescue nil
+      begin
+        exec(cmd, *args)
+      rescue
+        nil
+      end
       exit! 1 # never gets here unless exec failed
     end
     Process.wait(pid)
@@ -287,7 +294,7 @@ module Homebrew
       rescue Gem::SystemExitException => e
         exit_code = e.exit_code
       end
-      odie "Failed to install/update the '#{name}' gem." if exit_code != 0
+      odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
     end
 
     unless which executable
@@ -523,16 +530,6 @@ def paths
   end.uniq.compact
 end
 
-# return the shell profile file based on users' preference shell
-def shell_profile
-  case ENV["SHELL"]
-  when %r{/(ba)?sh} then "~/.bash_profile"
-  when %r{/zsh} then "~/.zshrc"
-  when %r{/ksh} then "~/.kshrc"
-  else "~/.bash_profile"
-  end
-end
-
 def disk_usage_readable(size_in_bytes)
   if size_in_bytes >= 1_073_741_824
     size = size_in_bytes.to_f / 1_073_741_824
@@ -549,10 +546,10 @@ def disk_usage_readable(size_in_bytes)
   end
 
   # avoid trailing zero after decimal point
-  if (size * 10).to_i % 10 == 0
+  if ((size * 10).to_i % 10).zero?
     "#{size.to_i}#{unit}"
   else
-    "#{"%.1f" % size}#{unit}"
+    "#{format("%.1f", size)}#{unit}"
   end
 end
 
@@ -579,10 +576,10 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
   glue_bytes = glue.encode("BINARY")
   n_front_bytes = (max_bytes_in * front_weight).floor
   n_back_bytes = max_bytes_in - n_front_bytes
-  if n_front_bytes == 0
+  if n_front_bytes.zero?
     front = bytes[1..0]
     back = bytes[-max_bytes_in..-1]
-  elsif n_back_bytes == 0
+  elsif n_back_bytes.zero?
     front = bytes[0..(max_bytes_in - 1)]
     back = bytes[1..0]
   else
@@ -596,25 +593,31 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
   out
 end
 
-def link_path_manpages(path, command)
-  return unless (path/"man").exist?
+def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
+  return unless src_dir.exist?
   conflicts = []
-  (path/"man").find do |src|
-    next if src.directory?
-    dst = HOMEBREW_PREFIX/"share"/src.relative_path_from(path)
+  src_paths = link_dir ? [src_dir] : src_dir.find
+  src_paths.each do |src|
+    next if src.directory? && !link_dir
+    dst = dst_dir.parent/src.relative_path_from(src_dir.parent)
     next if dst.symlink? && src == dst.resolved_path
     if dst.exist?
       conflicts << dst
       next
     end
+    dst_dir.parent.mkpath
     dst.make_relative_symlink(src)
   end
   unless conflicts.empty?
     onoe <<-EOS.undent
-      Could not link #{name} manpages to:
-        #{conflicts.join("\n")}
+      Could not link:
+      #{conflicts.join("\n")}
 
       Please delete these files and run `#{command}`.
     EOS
   end
+end
+
+def link_path_manpages(path, command)
+  link_src_dst_dirs(path/"man", HOMEBREW_PREFIX/"share/man", command)
 end

@@ -1,7 +1,7 @@
 require "pathname"
 require "open3"
 
-def curl_args(extra_args=[])
+def curl_args(extra_args = [])
   curl = Pathname.new ENV["HOMEBREW_CURL"]
   curl = which("curl") unless curl.exist? || OS.mac?
   curl = Pathname.new "/usr/bin/curl" unless curl.exist?
@@ -10,7 +10,7 @@ def curl_args(extra_args=[])
   flags = HOMEBREW_CURL_ARGS
   flags -= ["--progress-bar"] if ARGV.verbose?
 
-  args = ["#{curl}"] + flags + extra_args
+  args = [curl.to_s] + flags + extra_args
   args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
   args << "--silent" if !$stdout.tty? || ENV["TRAVIS"]
   args

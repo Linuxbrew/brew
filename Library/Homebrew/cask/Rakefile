@@ -1,4 +1,3 @@
-require "coveralls/rake/task"
 require "rake/testtask"
 require "rspec/core/rake_task"
 require "rubocop/rake_task"
@@ -20,15 +19,20 @@ namespace :test do
 
   desc "Run tests for minitest and RSpec with coverage"
   task :coverage do
-    ENV["COVERAGE"] = "1"
+    ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
+
     Rake::Task[:test].invoke
+
+    if ENV["TRAVIS"]
+      require "coveralls/rake/task"
+      Coveralls::RakeTask.new
+      Rake::Task['coveralls:push'].invoke
+    end
   end
 end
 
 desc "Run tests for minitest and RSpec"
 task test: ["test:minitest", "test:rspec"]
-
-Coveralls::RakeTask.new
 
 RuboCop::RakeTask.new(:rubocop) do |t|
   t.options = ["--force-exclusion"]

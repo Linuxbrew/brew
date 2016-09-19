@@ -100,8 +100,8 @@ class ResourceTests < Homebrew::TestCase
 
   def test_download_strategy
     strategy = Object.new
-    DownloadStrategyDetector.
-      expects(:detect).with("foo", nil).returns(strategy)
+    DownloadStrategyDetector
+      .expects(:detect).with("foo", nil).returns(strategy)
     @resource.url("foo")
     assert_equal strategy, @resource.download_strategy
   end
@@ -120,8 +120,8 @@ class ResourceTests < Homebrew::TestCase
     fn = stub(:file? => true)
     checksum = @resource.sha256(TEST_SHA256)
 
-    fn.expects(:verify_checksum).with(checksum).
-      raises(ChecksumMismatchError.new(fn, checksum, Object.new))
+    fn.expects(:verify_checksum).with(checksum)
+      .raises(ChecksumMismatchError.new(fn, checksum, Object.new))
 
     shutup do
       assert_raises(ChecksumMismatchError) do

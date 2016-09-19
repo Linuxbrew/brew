@@ -55,6 +55,10 @@ class Hbc::Source::PathBase
   end
 
   def build_cask(cask_class, header_token, &block)
+    if header_token.is_a?(Hash)
+      # Cask file is using old `cask :v1 => 'token'` syntax
+      header_token = header_token.values.first
+    end
     raise Hbc::CaskTokenDoesNotMatchError.new(cask_token, header_token) unless cask_token == header_token
     cask_class.new(cask_token, sourcefile_path: path, &block)
   end

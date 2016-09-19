@@ -26,14 +26,12 @@ module Homebrew
       results.print
     elsif search_type.size > 1
       odie "Pick one, and only one, of -s/--search, -n/--name, or -d/--description."
+    elsif arg = ARGV.named.first
+      regex = Homebrew.query_regexp(arg)
+      results = Descriptions.search(regex, search_type.first)
+      results.print
     else
-      if arg = ARGV.named.first
-        regex = Homebrew::query_regexp(arg)
-        results = Descriptions.search(regex, search_type.first)
-        results.print
-      else
-        odie "You must provide a search term."
-      end
+      odie "You must provide a search term."
     end
   end
 end

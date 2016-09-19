@@ -45,7 +45,7 @@ module Homebrew
       end
     else
       ARGV.named.each_with_index do |f, i|
-        puts unless i == 0
+        puts unless i.zero?
         begin
           if f.include?("/") || File.exist?(f)
             info_formula Formulary.factory(f)

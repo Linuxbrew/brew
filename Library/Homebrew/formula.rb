@@ -3,6 +3,7 @@ require "formula_lock"
 require "formula_pin"
 require "hardware"
 require "utils/bottles"
+require "utils/shell"
 require "build_environment"
 require "build_options"
 require "formulary"
@@ -41,6 +42,7 @@ require "migrator"
 class Formula
   include FileUtils
   include Utils::Inreplace
+  include Utils::Shell
   extend Enumerable
 
   # @!method inreplace(paths, before = nil, after = nil)
@@ -57,6 +59,11 @@ class Formula
   # The name of this {Formula}.
   # e.g. `this-formula`
   attr_reader :name
+
+  # The name specified when installing this {Formula}.
+  # Could be the name of the {Formula}, or an alias.
+  # e.g. `another-name-for-this-formula`
+  attr_reader :alias_path
 
   # The fully-qualified name of this {Formula}.
   # For core formula it's the same as {#name}.
@@ -143,9 +150,10 @@ class Formula
   attr_accessor :build
 
   # @private
-  def initialize(name, path, spec)
+  def initialize(name, path, spec, alias_path: nil)
     @name = name
     @path = path
+    @alias_path = alias_path
     @revision = self.class.revision || 0
     @version_scheme = self.class.version_scheme || 0
 
@@ -219,6 +227,11 @@ class Formula
   end
 
   public
+
+  # The path that was specified to find/install this formula.
+  def specified_path
+    alias_path || path
+  end
 
   # Is the currently active {SoftwareSpec} a {#stable} build?
   # @private
@@ -888,11 +901,18 @@ class Formula
   def run_post_install
     build = self.build
     self.build = Tab.for_formula(self)
+    old_tmpdir = ENV["TMPDIR"]
+    old_temp = ENV["TEMP"]
+    old_tmp = ENV["TMP"]
+    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
     with_logging("post_install") do
       post_install
     end
   ensure
     self.build = build
+    ENV["TMPDIR"] = old_tmpdir
+    ENV["TEMP"] = old_temp
+    ENV["TMP"] = old_tmp
   end
 
   # Tell the user about any caveats regarding this package.
@@ -1414,7 +1434,11 @@ class Formula
   def run_test
     old_home = ENV["HOME"]
     old_curl_home = ENV["CURL_HOME"]
+    old_tmpdir = ENV["TMPDIR"]
+    old_temp = ENV["TEMP"]
+    old_tmp = ENV["TMP"]
     ENV["CURL_HOME"] = old_curl_home || old_home
+    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
     mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
@@ -1433,6 +1457,9 @@ class Formula
     @testpath = nil
     ENV["HOME"] = old_home
     ENV["CURL_HOME"] = old_curl_home
+    ENV["TMPDIR"] = old_tmpdir
+    ENV["TEMP"] = old_temp
+    ENV["TMP"] = old_tmp
   end
 
   # @private
@@ -1600,6 +1627,8 @@ class Formula
         eligible_kegs.each do |keg|
           if keg.linked?
             opoo "Skipping (old) #{keg} due to it being linked"
+          elsif pinned? && keg == Keg.new(@pin.path.resolved_path)
+            opoo "Skipping (old) #{keg} due to it being pinned"
           else
             eligible_for_cleanup << keg
           end
@@ -2051,7 +2080,7 @@ class Formula
     # <pre>plist_options :manual => "foo"</pre>
     #
     # Or perhaps you'd like to give the user a choice? Ooh fancy.
-    # <pre>plist_options :startup => "true", :manual => "foo start"</pre>
+    # <pre>plist_options :startup => true, :manual => "foo start"</pre>
     def plist_options(options)
       @plist_startup = options[:startup]
       @plist_manual = options[:manual]

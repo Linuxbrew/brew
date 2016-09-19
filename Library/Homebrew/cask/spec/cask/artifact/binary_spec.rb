@@ -32,7 +32,7 @@ describe Hbc::Artifact::Binary do
       Hbc::Artifact::Binary.new(cask).install_phase
     end
 
-    expect(expected_path).to_not be :symlink?
+    expect(expected_path).not_to be :symlink?
   end
 
   it "clobbers an existing symlink" do

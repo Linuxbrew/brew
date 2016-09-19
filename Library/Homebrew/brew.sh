@@ -203,11 +203,26 @@ case "$HOMEBREW_COMMAND" in
   --config)    HOMEBREW_COMMAND="config" ;;
 esac
 
+if [[ -z "$HOMEBREW_DEVELOPER" ]]
+then
+  export HOMEBREW_GIT_CONFIG_FILE="$HOMEBREW_REPOSITORY/.git/config"
+  HOMEBREW_GIT_CONFIG_DEVELOPERMODE="$(git config --file="$HOMEBREW_GIT_CONFIG_FILE" --get homebrew.devcmdrun)"
+  if [[ "$HOMEBREW_GIT_CONFIG_DEVELOPERMODE" = "true" ]]
+  then
+    export HOMEBREW_DEV_CMD_RUN="1"
+  fi
+fi
+
 if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]
 then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh"
-elif [[ -n "$HOMEBREW_DEVELOPER" && -f "$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh" ]]
+elif [[ -f "$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh" ]]
 then
+  if [[ -z "$HOMEBREW_DEVELOPER" ]]
+  then
+    git config --file="$HOMEBREW_GIT_CONFIG_FILE" --replace-all homebrew.devcmdrun true
+    export HOMEBREW_DEV_CMD_RUN="1"
+  fi
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"
 fi
 
@@ -215,6 +230,7 @@ check-run-command-as-root() {
   [[ "$(id -u)" = 0 ]] || return
   export HOMEBREW_NO_SANDBOX="1"
 
+  [[ "$HOMEBREW_COMMAND" = "cask" ]] && return
   [[ "$HOMEBREW_COMMAND" = "services" ]] && return
 
   onoe <<EOS
@@ -261,7 +277,7 @@ update-preinstall() {
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
-  if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" ]]
+  if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ]]
   then
     brew update --preinstall
   fi

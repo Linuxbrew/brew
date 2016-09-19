@@ -56,7 +56,10 @@ module Utils
 
     class Bintray
       def self.package(formula_name)
-        formula_name.to_s.tr("+", "x")
+        package_name = formula_name.to_s.dup
+        package_name.tr!("+", "x")
+        package_name.sub!(/(.)@(\d)/, "\\1:\\2") # Handle foo@1.2 style formulae.
+        package_name
       end
 
       def self.repository(tap = nil)

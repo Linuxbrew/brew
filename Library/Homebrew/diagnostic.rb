@@ -4,6 +4,7 @@ require "formula"
 require "tempfile"
 require "version"
 require "development_tools"
+require "utils/shell"
 
 module Homebrew
   module Diagnostic
@@ -87,9 +88,14 @@ module Homebrew
       end
       ############# END HELPERS
 
-      def all_development_tools_checks
+      def development_tools_checks
         %w[
           check_for_installed_developer_tools
+        ]
+      end
+
+      def fatal_development_tools_checks
+        %w[
         ]
       end
 
@@ -278,33 +284,14 @@ module Homebrew
         EOS
       end
 
-      def __check_subdir_access(base)
-        target = HOMEBREW_PREFIX+base
-        return unless target.exist?
+      def check_tmpdir_sticky_bit
+        world_writable = HOMEBREW_TEMP.stat.mode & 0777 == 0777
+        return if !world_writable || HOMEBREW_TEMP.sticky?
 
-        cant_read = []
-        target.find do |d|
-          next unless d.directory?
-          cant_read << d unless d.writable_real?
-        end
-        return if cant_read.empty?
-
-        inject_file_list cant_read.sort, <<-EOS.undent
-          Some directories in #{target} aren't writable.
-          This can happen if you "sudo make install" software that isn't managed
-          by Homebrew. If a brew tries to add locale information to one of these
-          directories, then the install will fail during the link step.
-
-          You should `sudo chown -R $(whoami)` them:
+        <<-EOS.undent
+          #{HOMEBREW_TEMP} is world-writable but does not have the sticky bit set.
+          Please execute `sudo chmod +t #{HOMEBREW_TEMP}` in your Terminal.
         EOS
-      end
-
-      def check_access_share_locale
-        __check_subdir_access "share/locale"
-      end
-
-      def check_access_share_man
-        __check_subdir_access "share/man"
       end
 
       def check_access_homebrew_repository
@@ -319,52 +306,31 @@ module Homebrew
         EOS
       end
 
-      def check_access_usr_local
-        return unless HOMEBREW_PREFIX.to_s == "/usr/local"
-        return if HOMEBREW_PREFIX.writable_real?
+      def check_access_prefix_directories
+        not_writable_dirs = []
 
-        <<-EOS.undent
-          /usr/local is not writable.
-          Even if this directory was writable when you installed Homebrew, other
-          software may change permissions on this directory. For example, upgrading
-          to OS X El Capitan has been known to do this. Some versions of the
-          "InstantOn" component of Airfoil or running Cocktail cleanup/optimizations
-          are known to do this as well.
-
-          You should change the ownership and permissions of /usr/local back to
-          your user account.
-            sudo chown -R $(whoami) /usr/local
-        EOS
-      end
-
-      def check_tmpdir_sticky_bit
-        world_writable = HOMEBREW_TEMP.stat.mode & 0777 == 0777
-        return if !world_writable || HOMEBREW_TEMP.sticky?
-
-        <<-EOS.undent
-          #{HOMEBREW_TEMP} is world-writable but does not have the sticky bit set.
-          Please execute `sudo chmod +t #{HOMEBREW_TEMP}` in your Terminal.
-        EOS
-      end
-
-      (Keg::TOP_LEVEL_DIRECTORIES + ["lib/pkgconfig"]).each do |d|
-        define_method("check_access_#{d.sub("/", "_")}") do
-          dir = HOMEBREW_PREFIX.join(d)
-          return unless dir.exist?
-          return if dir.writable_real?
-
-          <<-EOS.undent
-            #{dir} isn't writable.
-
-            This can happen if you "sudo make install" software that isn't managed
-            by Homebrew. If a formula tries to write a file to this directory, the
-            install will fail during the link step.
-
-            You should change the ownership and permissions of #{dir} back to
-            your user account.
-              sudo chown -R $(whoami) #{dir}
-          EOS
+        extra_dirs = ["lib/pkgconfig", "share/locale", "share/man", "opt"]
+        (Keg::TOP_LEVEL_DIRECTORIES + extra_dirs).each do |dir|
+          path = HOMEBREW_PREFIX/dir
+          next unless path.exist?
+          next if path.writable_real?
+          not_writable_dirs << path
         end
+
+        return if not_writable_dirs.empty?
+
+        <<-EOS.undent
+          The following directories are not writable:
+          #{not_writable_dirs.join("\n")}
+
+          This can happen if you "sudo make install" software that isn't managed
+          by Homebrew. If a formula tries to write a file to this directory, the
+          install will fail during the link step.
+
+          You should change the ownership and permissions of these directories.
+          back to your user account.
+            sudo chown -R $(whoami) #{not_writable_dirs.join(" ")}
+        EOS
       end
 
       def check_access_site_packages
@@ -425,20 +391,6 @@ module Homebrew
         EOS
       end
 
-      def check_access_prefix_opt
-        opt = HOMEBREW_PREFIX.join("opt")
-        return unless opt.exist?
-        return if opt.writable_real?
-
-        <<-EOS.undent
-          #{opt} isn't writable.
-
-          You should change the ownership and permissions of #{opt}
-          back to your user account.
-            sudo chown -R $(whoami) #{opt}
-        EOS
-      end
-
       def check_homebrew_prefix
         return unless OS.mac?
         return if HOMEBREW_PREFIX.to_s == "/usr/local"
@@ -478,7 +430,7 @@ module Homebrew
 
                   Consider setting your PATH so that #{HOMEBREW_PREFIX}/bin
                   occurs before /usr/bin. Here is a one-liner:
-                    echo 'export PATH="#{HOMEBREW_PREFIX}/bin:$PATH"' >> #{shell_profile}
+                    #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin")}
                 EOS
               end
             end
@@ -498,7 +450,7 @@ module Homebrew
         <<-EOS.undent
           Homebrew's bin was not found in your PATH.
           Consider setting the PATH for example like so
-            echo 'export PATH="#{HOMEBREW_PREFIX}/bin:$PATH"' >> #{shell_profile}
+            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin")}
         EOS
       end
 
@@ -513,7 +465,7 @@ module Homebrew
           Homebrew's sbin was not found in your PATH but you have installed
           formulae that put executables in #{HOMEBREW_PREFIX}/sbin.
           Consider setting the PATH for example like so
-            echo 'export PATH="#{HOMEBREW_PREFIX}/sbin:$PATH"' >> #{shell_profile}
+            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/sbin")}
         EOS
       end
 
@@ -527,7 +479,7 @@ module Homebrew
           this variable set to include other locations.
           Some programs like `vapigen` may not work correctly.
           Consider setting the XDG_DATA_DIRS for example like so
-              echo 'export XDG_DATA_DIRS="#{share}:$XDG_DATA_DIRS"' >> #{shell_profile}
+              echo 'export XDG_DATA_DIRS="#{share}:$XDG_DATA_DIRS"' >> #{Utils::Shell.shell_profile}
         EOS
         end
       end

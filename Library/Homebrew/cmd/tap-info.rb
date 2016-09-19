@@ -59,7 +59,7 @@ module Homebrew
       puts info
     else
       taps.each_with_index do |tap, i|
-        puts unless i == 0
+        puts unless i.zero?
         info = "#{tap}: "
         if tap.installed?
           info += tap.pinned? ? "pinned" : "unpinned"
@@ -70,7 +70,7 @@ module Homebrew
           if (command_count = tap.command_files.size) > 0
             info += ", #{command_count} command#{plural(command_count)}"
           end
-          info += ", no formulae/commands" if formula_count + command_count == 0
+          info += ", no formulae/commands" if (formula_count + command_count).zero?
           info += "\n#{tap.path} (#{tap.path.abv})"
           info += "\nFrom: #{tap.remote.nil? ? "N/A" : tap.remote}"
         else

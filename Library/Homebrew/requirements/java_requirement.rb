@@ -10,7 +10,7 @@ class JavaRequirement < Requirement
     next quiet_system "java", "-version" unless File.executable? "/usr/libexec/java_home"
 
     args = %w[--failfast]
-    args << "--version" << "#{@version}" if @version
+    args << "--version" << @version.to_s if @version
     @java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp
     $?.success?
   end
@@ -28,7 +28,7 @@ class JavaRequirement < Requirement
   end if OS.mac?
 
   def initialize(tags)
-    @version = tags.shift if /(\d\.)+\d/ === tags.first
+    @version = tags.shift if /(\d\.)+\d/ =~ tags.first
     super
   end
 

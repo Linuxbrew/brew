@@ -1,37 +1,81 @@
-# Comprehensively test a formula or pull request.
+#: @hide_from_man_page
+#:  * `test-bot` [options]  <url|formula>:
+#:    Tests the full lifecycle of a formula or Homebrew/brew change.
+#:
+#:    If `--dry-run` is passed, print what would be done rather than doing
+#:    it.
+#:
+#:    If `--local` is passed, perform only local operations (i.e. don't
+#:    push or create PR).
+#:
+#:    If `--keep-logs` is passed, write and keep log files under
+#:    `./brewbot/`.
+#:
+#:    If `--cleanup` is passed, clean all state from the Homebrew
+#:    directory. Use with care!
+#:
+#:    If `--clean-cache` is passed, remove all cached downloads. Use with
+#:    care!
+#:
+#:    If `--skip-setup` is passed, don't check the local system is setup
+#:    correctly.
+#:
+#:    If `--skip-homebrew` is passed, don't check Homebrew's files and
+#:    tests are all valid.
+#:
+#:    If `--junit` is passed, generate a JUnit XML test results file.
+#:
+#:    If `--no-bottle` is passed, run `brew install` without
+#:    `--build-bottle`.
+#:
+#:    If `--keep-old` is passed, run `brew bottle --keep-old` to build new
+#:    bottles for a single platform.
+#:
+#:    If `--skip-relocation` is passed, run
+#:   `brew bottle --skip-relocation` to build new bottles that don't
+#:    require relocation.
+#:
+#:    If `--HEAD` is passed, run `brew install` with `--HEAD`.
+#:
+#:    If `--local` is passed, ask Homebrew to write verbose logs under
+#:    `./logs/` and set `$HOME` to `./home/`.
+#:
+#:    If `--tap=<tap>` is passed, use the `git` repository of the given
+#:    tap.
+#:
+#:    If `--dry-run` is passed, just print commands, don't run them.
+#:
+#:    If `--fail-fast` is passed, immediately exit on a failing step.
+#:
+#:    If `--verbose` is passed, print test step output in real time. Has
+#:    the side effect of passing output as raw bytes instead of
+#:    re-encoding in UTF-8.
+#:
+#:    If `--fast` is passed, don't install any packages, but run e.g.
+#:    `brew audit` anyway.
+#:
+#:    If `--keep-tmp` is passed, keep temporary files written by main
+#:    installs and tests that are run.
+#:
+#:    If `--no-pull` is passed, don't use `brew pull` when possible.
+#:
+#:    If `--coverage` is passed, generate coverage report and send it to
+#:    Coveralls.
+#:
+#:    If `--ci-master` is passed, use the Homebrew master branch CI
+#:    options.
+#:
+#:    If `--ci-pr` is passed, use the Homebrew pull request CI options.
+#:
+#:    If `--ci-testing` is passed, use the Homebrew testing CI options.
+#:
+#:    If `--ci-upload` is passed, use the Homebrew CI bottle upload
+#:    options.
+#:
 #
-# Usage: brew test-bot [options...] <pull-request|formula>
-#
-# Options:
-# --keep-logs:           Write and keep log files under ./brewbot/.
-# --cleanup:             Clean the Homebrew directory. Very dangerous. Use with care.
-# --clean-cache:         Remove all cached downloads. Use with care.
-# --skip-setup:          Don't check the local system is setup correctly.
-# --skip-homebrew:       Don't check Homebrew's files and tests are all valid.
-# --junit:               Generate a JUnit XML test results file.
-# --no-bottle:           Run brew install without --build-bottle.
-# --keep-old:            Run brew bottle --keep-old to build new bottles for a single platform.
-# --skip-relocation:     Run brew bottle --skip-relocation to build new bottles for homebrew/portable.
-# --HEAD:                Run brew install with --HEAD.
-# --local:               Ask Homebrew to write verbose logs under ./logs/ and set HOME to ./home/.
-# --tap=<tap>:           Use the git repository of the given tap.
-# --dry-run:             Just print commands, don't run them.
-# --fail-fast:           Immediately exit on a failing step.
-# --verbose:             Print test step output in realtime. Has the side effect of passing output
-#                        as raw bytes instead of re-encoding in UTF-8.
-# --fast:                Don't install any packages, but run e.g. audit anyway.
-# --keep-tmp:            Keep temporary files written by main installs and tests that are run.
-# --no-pull:             Don't use `brew pull` when possible.
-# --coverage:            Generate coverage report and send it to Coveralls.
-#
-# --ci-master:           Shortcut for Homebrew master branch CI options.
-# --ci-pr:               Shortcut for Homebrew pull request CI options.
-# --ci-testing:          Shortcut for Homebrew testing CI options.
-# --ci-upload:           Homebrew CI bottle upload.
-#
-# Influential environment variables include:
-# TRAVIS_REPO_SLUG: same as --tap
-# GIT_URL: if set to URL of a tap remote, same as --tap
+#:    Influential environment variables include:
+#:    `TRAVIS_REPO_SLUG`: same as `--tap`
+#:    `GIT_URL`: if set to URL of a tap remote, same as `--tap`
 
 require "formula"
 require "utils"
@@ -76,7 +120,7 @@ module Homebrew
 
     if git_url = ENV["UPSTREAM_GIT_URL"] || ENV["GIT_URL"]
       # Also can get tap from Jenkins GIT_URL.
-      url_path = git_url.sub(%r{^https?://github\.com/}, "").chomp("/").sub(%r{\.git$}, "")
+      url_path = git_url.sub(%r{^https?://github\.com/}, "").chomp("/").sub(/\.git$/, "")
       begin
         return Tap.fetch(url_path) if url_path =~ HOMEBREW_TAP_REGEX
       rescue
@@ -146,7 +190,7 @@ module Homebrew
       puts "#{Tty.white}==>#{Tty.red} FAILED#{Tty.reset}" if failed?
     end
 
-    def has_output?
+    def output?
       @output && !@output.empty?
     end
 
@@ -201,7 +245,6 @@ module Homebrew
       @status = $?.success? ? :passed : :failed
       puts_result
 
-
       unless output.empty?
         @output = Homebrew.fix_encoding!(output)
         puts @output if (failed? || @puts_output_on_success) && !verbose
@@ -215,7 +258,7 @@ module Homebrew
   class Test
     attr_reader :log_root, :category, :name, :steps
 
-    def initialize(argument, options={})
+    def initialize(argument, options = {})
       @hash = nil
       @url = nil
       @formulae = []
@@ -233,7 +276,7 @@ module Homebrew
       elsif canonical_formula_name = safe_formula_canonical_name(argument)
         @formulae = [canonical_formula_name]
       else
-        raise ArgumentError.new("#{argument} is not a pull request URL, commit URL or formula name.")
+        raise ArgumentError, "#{argument} is not a pull request URL, commit URL or formula name."
       end
 
       @category = __method__
@@ -251,7 +294,11 @@ module Homebrew
       raise if e.tap.installed?
       test "brew", "tap", e.tap.name
       retry unless steps.last.failed?
-    rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
+      onoe e
+      puts e.backtrace if ARGV.debug?
+    rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError => e
+      onoe e
+      puts e.backtrace if ARGV.debug?
     end
 
     def git(*args)
@@ -365,7 +412,7 @@ module Homebrew
         @short_url = @url.gsub("https://github.com/", "")
         if @short_url.include? "/commit/"
           # 7 characters should be enough for a commit (not 40).
-          @short_url.gsub!(/(commit\/\w{7}).*/, '\1')
+          @short_url.gsub!(%r{(commit/\w{7}).*/}, '\1')
           @name = @short_url
         else
           @name = "#{@short_url}-#{diff_end_sha1}"
@@ -530,7 +577,7 @@ module Homebrew
       dependents -= @formulae
       dependents = dependents.map { |d| Formulary.factory(d) }
 
-      bottled_dependents = dependents.select { |d| d.bottled? }
+      bottled_dependents = dependents.select(&:bottled?)
       testable_dependents = dependents.select { |d| d.bottled? && d.test_defined? }
 
       if (deps | reqs).any? { |d| d.name == "mercurial" && d.build? }
@@ -591,9 +638,9 @@ module Homebrew
           bottle_args << "--skip-relocation" if ARGV.include? "--skip-relocation"
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
-          if bottle_step.passed? && bottle_step.has_output?
+          if bottle_step.passed? && bottle_step.output?
             bottle_filename =
-              bottle_step.output.gsub(/.*(\.\/\S+#{Utils::Bottles::native_regex}).*/m, '\1')
+              bottle_step.output.gsub(%r{.*(\./\S+#{Utils::Bottles.native_regex}).*}m, '\1')
             bottle_json_filename = bottle_filename.gsub(/\.(\d+\.)?tar\.gz$/, ".json")
             bottle_merge_args = ["--merge", "--write", "--no-commit", bottle_json_filename]
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
@@ -629,11 +676,10 @@ module Homebrew
               next if steps.last.failed?
             end
           end
-          if dependent.installed?
-            test "brew", "linkage", "--test", dependent.name
-            if testable_dependents.include? dependent
-              test "brew", "test", "--verbose", dependent.name
-            end
+          next unless dependent.installed?
+          test "brew", "linkage", "--test", dependent.name
+          if testable_dependents.include? dependent
+            test "brew", "test", "--verbose", dependent.name
           end
         end
         after_linkage = Utils.popen_read("brew", "list").split("\n")
@@ -663,7 +709,7 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
 
-      if @tap.nil?
+      if @tap.nil? && Array(@formulae).empty?
         tests_args = ["--official-cmd-taps"]
         tests_args_no_compat = []
         tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
@@ -675,7 +721,9 @@ module Homebrew
         if OS.mac? &&
            (HOMEBREW_REPOSITORY/"Library/Homebrew/cask/cmd/brew-cask-tests.rb").exist?
           run_as_not_developer { test "brew", "tap", "caskroom/cask" }
-          test "brew", "cask-tests"
+          tests_args_cask = []
+          tests_args_cask << "--coverage" if ARGV.include?("--coverage")
+          test "brew", "cask-tests", *tests_args_cask
         end
 
         # TODO: try to fix this on Linux at some stage.
@@ -685,15 +733,41 @@ module Homebrew
           # test no-op update from current commit (to current commit, a no-op).
           test "brew", "update-test", "--commit=HEAD"
         end
-      else
+      elsif @tap
         test "brew", "readall", "--aliases", @tap.name
+      end
+    end
+
+    def cleanup_git
+      git "gc", "--auto"
+      test "git", "clean", "-ffdx", "--exclude=Library/Taps"
+
+      Tap.names.each do |tap|
+        next if tap == "homebrew/core"
+        next if tap == @tap.to_s
+        safe_system "brew", "untap", tap
+      end
+
+      unless @repository == HOMEBREW_REPOSITORY
+        HOMEBREW_REPOSITORY.cd do
+          safe_system "git", "checkout", "-f", "master"
+          safe_system "git", "reset", "--hard", "origin/master"
+          safe_system "git", "clean", "-ffdx", "--exclude=Library/Taps"
+        end
+      end
+
+      Pathname.glob("#{HOMEBREW_LIBRARY}/Taps/*/*").each do |git_repo|
+        next if @repository == git_repo
+        git_repo.cd do
+          safe_system "git", "checkout", "-f", "master"
+          safe_system "git", "reset", "--hard", "origin/master"
+        end
       end
     end
 
     def cleanup_before
       @category = __method__
       return unless ARGV.include? "--cleanup"
-      git "gc", "--auto"
       git "stash"
       git "am", "--abort"
       git "rebase", "--abort"
@@ -701,14 +775,9 @@ module Homebrew
         git "checkout", "-f", "master"
         git "reset", "--hard", "origin/master"
       end
-      git "clean", "-ffdx"
-      unless @repository == HOMEBREW_REPOSITORY
-        HOMEBREW_REPOSITORY.cd do
-          safe_system "git", "checkout", "-f", "master"
-          safe_system "git", "reset", "--hard", "origin/master"
-          safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
-        end
-      end
+
+      cleanup_git
+
       pr_locks = "#{@repository}/.git/refs/remotes/*/pr/*/*.lock"
       Dir.glob(pr_locks) { |lock| FileUtils.rm_rf lock }
     end
@@ -727,15 +796,8 @@ module Homebrew
         git "reset", "--hard", "origin/master"
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
-        git "gc", "--auto"
-        test "git", "clean", "-ffdx"
-        unless @repository == HOMEBREW_REPOSITORY
-          HOMEBREW_REPOSITORY.cd do
-            safe_system "git", "reset", "--hard"
-            safe_system "git", "clean", "-ffdx", "--exclude=/Library/Taps/"
-          end
-        end
-        Tap.names.each { |s| safe_system "brew", "untap", s if s != "homebrew/core" }
+
+        cleanup_git
 
         if ARGV.include? "--local"
           FileUtils.rm_rf ENV["HOMEBREW_HOME"]
@@ -747,7 +809,7 @@ module Homebrew
     end
 
     def test(*args)
-      options = Hash === args.last ? args.pop : {}
+      options = args.last.is_a?(Hash) ? args.pop : {}
       options[:repository] = @repository
       step = Step.new self, args, options
       step.run
@@ -769,7 +831,7 @@ module Homebrew
       changed_formulae_dependents = {}
 
       @formulae.each do |formula|
-        formula_dependencies = Utils.popen_read("brew", "deps", "--include-build", formula).split("\n")
+        formula_dependencies = Utils.popen_read("brew", "deps", "--full-name", "--include-build", formula).split("\n")
         unchanged_dependencies = formula_dependencies - @formulae
         changed_dependences = formula_dependencies - unchanged_dependencies
         changed_dependences.each do |changed_formula|
@@ -842,12 +904,15 @@ module Homebrew
     ENV["HUDSON_SERVER_COOKIE"] = nil
     ENV["JENKINS_SERVER_COOKIE"] = nil
     ENV["HUDSON_COOKIE"] = nil
+    ENV["COVERALLS_REPO_TOKEN"] = nil
 
     ARGV << "--verbose"
 
-    if jenkins
+    bottles = Dir["*.bottle*.*"]
+    if bottles.empty? && jenkins
       bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
       return if bottles.empty?
+
       FileUtils.cp bottles, Dir.pwd, :verbose => true
     else
       return if Dir["*.bottle*.*"].empty?
@@ -889,14 +954,22 @@ module Homebrew
     end
 
     bottle_merge_args = ["--merge", "--write"]
-    bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
+    bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old" || ENV["UPSTREAM_BOTTLE_KEEP_OLD"] || ENV["BOT_PARAMS"].to_s.include?("--keep-old")
     bottle_merge_args += json_files
     system "brew", "bottle", *bottle_merge_args
 
     project = OS.mac? ? "homebrew" : "linuxbrew"
     remote = "git@github.com:#{ENV["GIT_AUTHOR_NAME"]}/homebrew-#{tap.repo}.git"
-    git_tag = pr ? "pr-#{pr}" : "testing-#{number}"
-    safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{git_tag}"
+    git_tag = if pr
+      "pr-#{pr}"
+    elsif (upstream_number = ENV["UPSTREAM_BUILD_NUMBER"])
+      "testing-#{upstream_number}"
+    elsif (number = ENV["BUILD_NUMBER"])
+      "other-#{number}"
+    end
+    if git_tag
+      safe_system "git", "push", "--force", remote, "master:master", ":refs/tags/#{git_tag}"
+    end
 
     formula_packaged = {}
 
@@ -907,7 +980,7 @@ module Homebrew
       bintray_repo = bottle_hash["bintray"]["repository"]
       bintray_repo_url = "https://api.bintray.com/packages/#{bintray_org}/#{bintray_repo}"
 
-      bottle_hash["bottle"]["tags"].each do |tag, tag_hash|
+      bottle_hash["bottle"]["tags"].each do |_tag, tag_hash|
         filename = tag_hash["filename"]
         if system "curl", "-I", "--silent", "--fail", "--output", "/dev/null",
                   "#{BottleSpecification::DEFAULT_DOMAIN}/#{bintray_repo}/#{filename}"
@@ -943,11 +1016,13 @@ module Homebrew
       end
     end
 
-    safe_system "git", "tag", "--force", git_tag
-    safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
+    if git_tag
+      safe_system "git", "tag", "--force", git_tag
+      safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
+    end
   end
 
-  def sanitize_ARGV_and_ENV
+  def sanitize_argv_and_env
     if Pathname.pwd == HOMEBREW_PREFIX && ARGV.include?("--cleanup")
       odie "cannot use --cleanup from HOMEBREW_PREFIX as it will delete all output."
     end
@@ -991,7 +1066,7 @@ module Homebrew
   end
 
   def test_bot
-    sanitize_ARGV_and_ENV
+    sanitize_argv_and_env
 
     tap = resolve_test_tap
     # Tap repository if required, this is done before everything else
@@ -1045,19 +1120,18 @@ module Homebrew
           testcase.add_attribute "status", step.status
           testcase.add_attribute "time", step.time
 
-          if step.has_output?
-            output = sanitize_output_for_xml(step.output)
-            cdata = REXML::CData.new output
+          next unless step.output?
+          output = sanitize_output_for_xml(step.output)
+          cdata = REXML::CData.new output
 
-            if step.passed?
-              elem = testcase.add_element "system-out"
-            else
-              elem = testcase.add_element "failure"
-              elem.add_attribute "message", "#{step.status}: #{step.command.join(" ")}"
-            end
-
-            elem << cdata
+          if step.passed?
+            elem = testcase.add_element "system-out"
+          else
+            elem = testcase.add_element "failure"
+            elem.add_attribute "message", "#{step.status}: #{step.command.join(" ")}"
           end
+
+          elem << cdata
         end
       end
 

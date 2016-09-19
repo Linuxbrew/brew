@@ -60,6 +60,8 @@ module Homebrew
   end
 
   def rm_pin(rack)
-    Formulary.from_rack(rack).unpin rescue nil
+    Formulary.from_rack(rack).unpin
+  rescue
+    nil
   end
 end

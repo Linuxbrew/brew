@@ -72,7 +72,7 @@ module Language
       end
 
       def install_cabal_package(*args)
-        options = if args[-1].kind_of?(Hash) then args.pop else {} end
+        options = args[-1].is_a?(Hash) ? args.pop : {}
 
         cabal_sandbox do
           cabal_install_tools(*options[:using]) if options[:using]
