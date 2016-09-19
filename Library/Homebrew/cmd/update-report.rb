@@ -175,7 +175,6 @@ module Homebrew
   def migrate_legacy_repository_if_necessary
     return unless HOMEBREW_PREFIX.to_s == "/usr/local"
     return unless HOMEBREW_REPOSITORY.to_s == "/usr/local"
-    return unless ARGV.homebrew_developer?
 
     ohai "Migrating HOMEBREW_REPOSITORY (please wait)..."
 
