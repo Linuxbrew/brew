@@ -89,7 +89,7 @@ class FormularyFactoryTest < Homebrew::TestCase
     FileUtils.ln_s @path, alias_path
     result = Formulary.factory("foo")
     assert_kind_of Formula, result
-    assert_equal alias_path, result.alias_path
+    assert_equal alias_path.to_s, result.alias_path
   ensure
     alias_dir.rmtree
   end

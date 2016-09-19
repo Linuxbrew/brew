@@ -121,5 +121,13 @@ module Homebrew
         ENV.replace old
       end
     end
+
+    # Use a stubbed {Formulary::FormulaLoader} to make a given formula be found
+    # when loading from {Formulary} with `ref`.
+    def stub_formula_loader(formula, ref = formula.name)
+      loader = mock
+      loader.stubs(:get_formula).returns(formula)
+      Formulary.stubs(:loader_for).with(ref).returns(loader)
+    end
   end
 end

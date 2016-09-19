@@ -77,8 +77,11 @@ class Formulary
     end
 
     # Gets the formula instance.
-    def get_formula(spec)
-      klass.new(name, path, spec, alias_path: alias_path)
+    #
+    # `alias_path` can be overridden here in case an alias was used to refer to
+    # a formula that was loaded in another way.
+    def get_formula(spec, alias_path: nil)
+      klass.new(name, path, spec, alias_path: alias_path || self.alias_path)
     end
 
     def klass
@@ -103,7 +106,7 @@ class Formulary
       super name, Formulary.path(full_name)
     end
 
-    def get_formula(spec)
+    def get_formula(spec, alias_path: nil)
       formula = super
       formula.local_bottle_path = @bottle_filename
       formula_version = formula.pkg_version
@@ -120,7 +123,7 @@ class Formulary
       path = alias_path.resolved_path
       name = path.basename(".rb").to_s
       super name, path
-      @alias_path = alias_path
+      @alias_path = alias_path.to_s
     end
   end
 
@@ -175,7 +178,7 @@ class Formulary
       super name, path
     end
 
-    def get_formula(spec)
+    def get_formula(spec, alias_path: nil)
       super
     rescue FormulaUnavailableError => e
       raise TapFormulaUnavailableError.new(tap, name), "", e.backtrace
@@ -187,7 +190,7 @@ class Formulary
       super name, Formulary.core_path(name)
     end
 
-    def get_formula(_spec)
+    def get_formula(_spec, alias_path: nil)
       raise FormulaUnavailableError, name
     end
   end
@@ -215,38 +218,42 @@ class Formulary
   # * a formula pathname
   # * a formula URL
   # * a local bottle reference
-  def self.factory(ref, spec = :stable)
-    loader_for(ref).get_formula(spec)
+  def self.factory(ref, spec = :stable, alias_path: nil)
+    loader_for(ref).get_formula(spec, alias_path: alias_path)
   end
 
   # Return a Formula instance for the given rack.
   # It will auto resolve formula's spec when requested spec is nil
-  def self.from_rack(rack, spec = nil)
+  #
+  # The :alias_path option will be used if the formula is found not to be
+  # installed, and discarded if it is installed because the alias_path used
+  # to install the formula will be set instead.
+  def self.from_rack(rack, spec = nil, alias_path: nil)
     kegs = rack.directory? ? rack.subdirs.map { |d| Keg.new(d) } : []
     keg = kegs.detect(&:linked?) || kegs.detect(&:optlinked?) || kegs.max_by(&:version)
 
     if keg
-      from_keg(keg, spec)
+      from_keg(keg, spec, :alias_path => alias_path)
     else
-      factory(rack.basename.to_s, spec || :stable)
+      factory(rack.basename.to_s, spec || :stable, :alias_path => alias_path)
     end
   end
 
   # Return a Formula instance for the given keg.
   # It will auto resolve formula's spec when requested spec is nil
-  def self.from_keg(keg, spec = nil)
+  def self.from_keg(keg, spec = nil, alias_path: nil)
     tab = Tab.for_keg(keg)
     tap = tab.tap
     spec ||= tab.spec
 
     f = if tap.nil?
-      factory(keg.rack.basename.to_s, spec)
+      factory(keg.rack.basename.to_s, spec, :alias_path => alias_path)
     else
       begin
-        factory("#{tap}/#{keg.rack.basename}", spec)
+        factory("#{tap}/#{keg.rack.basename}", spec, :alias_path => alias_path)
       rescue FormulaUnavailableError
         # formula may be migrated to different tap. Try to search in core and all taps.
-        factory(keg.rack.basename.to_s, spec)
+        factory(keg.rack.basename.to_s, spec, :alias_path => alias_path)
       end
     end
     f.build = tab
@@ -346,7 +353,7 @@ class Formulary
   end
 
   def self.core_path(name)
-    CoreTap.instance.formula_dir/"#{name.downcase}.rb"
+    CoreTap.instance.formula_dir/"#{name.to_s.downcase}.rb"
   end
 
   def self.tap_paths(name, taps = Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/"])
