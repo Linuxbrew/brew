@@ -126,7 +126,6 @@ class FormulaTests < Homebrew::TestCase
   def test_installed_alias_with_tap
     tap = Tap.new("user", "repo")
     name = "foo"
-    full_name = "#{tap.user}/#{tap.repo}/#{name}"
     path = "#{tap.path}/Formula/#{name}.rb"
     f = formula(name, path) { url "foo-1.0" }
 
