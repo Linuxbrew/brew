@@ -99,8 +99,10 @@ module Homebrew
 
     Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
 
-    # This should always be the last thing to run
-    migrate_legacy_repository_if_necessary
+    # This should always be the last thing to run (but skip on auto-update).
+    unless ARGV.include?("--preinstall")
+      migrate_legacy_repository_if_necessary
+    end
   end
 
   private
