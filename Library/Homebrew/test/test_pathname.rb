@@ -257,4 +257,11 @@ class PathnameInstallTests < Homebrew::TestCase
     @dst.install_symlink "foo" => "bar"
     assert_equal Pathname.new("foo"), (@dst/"bar").readlink
   end
+
+  def test_mkdir_creates_intermediate_directories
+    mkdir @dst/"foo/bar/baz" do
+      assert_predicate @dst/"foo/bar/baz", :exist?, "foo/bar/baz was not created"
+      assert_predicate @dst/"foo/bar/baz", :directory?, "foo/bar/baz was not a directory structure"
+    end
+  end
 end
