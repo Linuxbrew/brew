@@ -91,7 +91,7 @@ Style/Documentation:
   Enabled: false
 
 Style/FileName:
-  Enabled: false
+  Regex: !ruby/regexp /^((([\dA-Z]+|[\da-z]+)(_([\dA-Z]+|[\da-z]+))*|(\-\-)?([\dA-Z]+|[\da-z]+)(-([\dA-Z]+|[\da-z]+))*))(\.rb)?$/
 
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
