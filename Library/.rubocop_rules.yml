@@ -93,7 +93,8 @@ Style/AlignParameters:
 
 # counterproductive in formulas, notably within the install method
 Style/GuardClause:
-  Enabled: false
+  Exclude:
+    - 'Taps/**/*'
 Style/IfUnlessModifier:
   Enabled: false
 
