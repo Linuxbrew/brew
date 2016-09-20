@@ -297,18 +297,14 @@ Homebrew build logic to help your <code>./configure &amp;&amp; make &amp;&amp; m
 or even your <code>gem install</code> succeed. Especially handy if you run Homebrew
 in an Xcode-only configuration since it adds tools like <code>make</code> to your <code>PATH</code>
 which otherwise build-systems would not find.</p></dd>
-<dt><code>style</code> [<code>--fix</code>] [<code>--display-cop-names</code>] [<var>formulae</var>|<var>files</var>]</dt><dd><p>Check formulae or files for conformance to Homebrew style guidelines.</p>
-
-<p><var>formulae</var> is a list of formula names.</p>
-
-<p><var>files</var> is a list of file names.</p>
+<dt><code>style</code> [<code>--fix</code>] [<code>--display-cop-names</code>] [<var>files</var>|<var>taps</var>|<var>formulae</var>]</dt><dd><p>Check formulae or files for conformance to Homebrew style guidelines.</p>
 
 <p><var>formulae</var> and <var>files</var> may not be combined. If both are omitted, style will run
 style checks on the whole Homebrew <code>Library</code>, including core code and all
 formulae.</p>
 
-<p>If <code>--fix</code> is passed and <code>HOMEBREW_DEVELOPER</code> is set, style violations
-will be automatically fixed using RuboCop's <code>--auto-correct</code> feature.</p>
+<p>If <code>--fix</code> is passed, style violations will be automatically fixed using
+RuboCop's <code>--auto-correct</code> feature.</p>
 
 <p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
 is included in the output.</p>
@@ -731,9 +727,11 @@ your shell profile, or you can use it before a brew command:</p>
 
 <h2 id="AUTHORS">AUTHORS</h2>
 
-<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Mike McQuaid, Baptiste Fontaine, Brett Koonce, ilovezfs, Martin Afanasjew, Dominyk Tiller, Tim Smith and Alex Dunn.</p>
+<p>Homebrew's lead maintainer is Mike McQuaid.</p>
 
-<p>Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.</p>
+<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Baptiste Fontaine, Zhiming Wang, Brett Koonce, ilovezfs, Martin Afanasjew, Uladzislau Shablinski, Dominyk Tiller, Tim Smith and Alex Dunn.</p>
+
+<p>Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg, Max Howell and Homebrew's creator: Max Howell.</p>
 
 <h2 id="BUGS">BUGS</h2>
 

@@ -403,20 +403,14 @@ Search for \fItext\fR in the given package manager\'s list\.
 Instantiate a Homebrew build environment\. Uses our years\-battle\-hardened Homebrew build logic to help your \fB\./configure && make && make install\fR or even your \fBgem install\fR succeed\. Especially handy if you run Homebrew in an Xcode\-only configuration since it adds tools like \fBmake\fR to your \fBPATH\fR which otherwise build\-systems would not find\.
 .
 .TP
-\fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fIformulae\fR|\fIfiles\fR]
+\fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]
 Check formulae or files for conformance to Homebrew style guidelines\.
-.
-.IP
-\fIformulae\fR is a list of formula names\.
-.
-.IP
-\fIfiles\fR is a list of file names\.
 .
 .IP
 \fIformulae\fR and \fIfiles\fR may not be combined\. If both are omitted, style will run style checks on the whole Homebrew \fBLibrary\fR, including core code and all formulae\.
 .
 .IP
-If \fB\-\-fix\fR is passed and \fBHOMEBREW_DEVELOPER\fR is set, style violations will be automatically fixed using RuboCop\'s \fB\-\-auto\-correct\fR feature\.
+If \fB\-\-fix\fR is passed, style violations will be automatically fixed using RuboCop\'s \fB\-\-auto\-correct\fR feature\.
 .
 .IP
 If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
@@ -1001,10 +995,13 @@ Homebrew Documentation: \fIhttps://github\.com/Homebrew/brew/blob/master/share/d
 \fBgit\fR(1), \fBgit\-log\fR(1)
 .
 .SH "AUTHORS"
-Homebrew\'s current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Mike McQuaid, Baptiste Fontaine, Brett Koonce, ilovezfs, Martin Afanasjew, Dominyk Tiller, Tim Smith and Alex Dunn\.
+Homebrew\'s lead maintainer is Mike McQuaid\.
 .
 .P
-Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew\'s creator: Max Howell\.
+Homebrew\'s current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Baptiste Fontaine, Zhiming Wang, Brett Koonce, ilovezfs, Martin Afanasjew, Uladzislau Shablinski, Dominyk Tiller, Tim Smith and Alex Dunn\.
+.
+.P
+Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg, Max Howell and Homebrew\'s creator: Max Howell\.
 .
 .SH "BUGS"
 See our issues on GitHub:
