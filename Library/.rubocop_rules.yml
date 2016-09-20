@@ -96,7 +96,8 @@ Style/GuardClause:
   Exclude:
     - 'Taps/**/*'
 Style/IfUnlessModifier:
-  Enabled: false
+  Exclude:
+    - 'Taps/**/*'
 
 # dashes in filenames are typical
 Style/FileName:
