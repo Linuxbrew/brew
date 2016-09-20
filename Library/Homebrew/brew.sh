@@ -267,6 +267,9 @@ update-preinstall() {
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
+  # Allow auto-update migration now we have a fix in place (below in this function).
+  export HOMEBREW_ENABLE_AUTO_UPDATE_MIGRATION="1"
+
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ]]
   then
     brew update --preinstall
