@@ -151,13 +151,9 @@ Style/ConstantName:
 # Offense count: 10
 Style/DoubleNegation:
   Exclude:
-    - 'Homebrew/extend/ARGV.rb'
-    - 'Homebrew/formula_installer.rb'
     - 'Homebrew/os/mac/cctools_keg.rb'
     - 'Homebrew/os/mac/ruby_keg.rb'
     - 'Homebrew/os/mac/xcode.rb'
-    - 'Homebrew/requirement.rb'
-    - 'Homebrew/software_spec.rb'
 
 # Offense count: 1
 # Configuration parameters: EnforcedStyle, SupportedStyles.

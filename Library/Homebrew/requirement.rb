@@ -56,7 +56,7 @@ class Requirement
   def satisfied?
     result = self.class.satisfy.yielder { |p| instance_eval(&p) }
     @satisfied_result = result
-    !!result
+    result ? true : false
   end
 
   # Overriding #fatal? is deprecated.

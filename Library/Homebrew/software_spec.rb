@@ -65,11 +65,12 @@ class SoftwareSpec
   end
 
   def bottle_unneeded?
-    !!@bottle_disable_reason && @bottle_disable_reason.unneeded?
+    return false unless @bottle_disable_reason
+    @bottle_disable_reason.unneeded?
   end
 
   def bottle_disabled?
-    !!@bottle_disable_reason
+    @bottle_disable_reason ? true : false
   end
 
   attr_reader :bottle_disable_reason
@@ -318,7 +319,7 @@ class BottleSpecification
   end
 
   def tag?(tag)
-    !!checksum_for(tag)
+    checksum_for(tag) ? true : false
   end
 
   # Checksum methods in the DSL's bottle block optionally take
