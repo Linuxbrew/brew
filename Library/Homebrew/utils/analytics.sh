@@ -104,7 +104,7 @@ report-analytics-screenview-command() {
   )
 
   # Send analytics. Don't send or store any personally identifiable information.
-  # https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md
+  # https://github.com/Homebrew/brew/blob/master/docs/Analytics.md
   # https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#screenView
   # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
   if [[ -z "$HOMEBREW_ANALYTICS_DEBUG" ]]

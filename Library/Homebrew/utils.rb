@@ -605,8 +605,11 @@ def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
   src_paths = link_dir ? [src_dir] : src_dir.find
   src_paths.each do |src|
     next if src.directory? && !link_dir
-    dst = dst_dir.parent/src.relative_path_from(src_dir.parent)
-    next if dst.symlink? && src == dst.resolved_path
+    dst = dst_dir/src.relative_path_from(src_dir)
+    if dst.symlink?
+      next if src == dst.resolved_path
+      dst.unlink
+    end
     if dst.exist?
       conflicts << dst
       next

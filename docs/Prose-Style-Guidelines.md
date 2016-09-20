@@ -1,6 +1,6 @@
 # Prose Style Guidelines
 
-This is a set of style and usage guidelines for Homebrew's prose documentation aimed at users, contributors, and maintainers (as opposed to executable computer code). It applies to documents like those in `share/doc/homebrew` in the `Homebrew/brew` repo, announcement emails, and other communications with the Homebrew community.
+This is a set of style and usage guidelines for Homebrew's prose documentation aimed at users, contributors, and maintainers (as opposed to executable computer code). It applies to documents like those in `docs` in the `Homebrew/brew` repo, announcement emails, and other communications with the Homebrew community.
 
 This does not apply to any Ruby or other computer code. You can use it to inform technical documentation extracted from computer code, like embedded man pages, but it's just a suggestion there.
 

@@ -25,8 +25,8 @@ A few requests:
 - still create your branches on your fork rather than in the main repository
 - if still in doubt please ask for help and we'll help you out - these are
   probably worth a read:
-    - https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Brew-Test-Bot-For-Core-Contributors.md
-    - https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Maintainer-Guidelines.md
+    - https://github.com/Homebrew/brew/blob/master/docs/Brew-Test-Bot-For-Core-Contributors.md
+    - https://github.com/Homebrew/brew/blob/master/docs/Maintainer-Guidelines.md
     - possibly everything else in the documentation
 
 How does that sound?

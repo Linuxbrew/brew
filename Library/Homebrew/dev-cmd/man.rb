@@ -7,8 +7,8 @@ require "ostruct"
 
 module Homebrew
   SOURCE_PATH = HOMEBREW_LIBRARY_PATH/"manpages"
-  TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"share/man/man1"
-  TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"share/doc/homebrew"
+  TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"manpages"
+  TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
 
   def man
     raise UsageError unless ARGV.named.empty?

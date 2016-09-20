@@ -16,7 +16,7 @@ Troubleshooting:
 Developers:
   brew create [URL [--no-fetch]]
   brew edit [FORMULA...]
-  https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Formula-Cookbook.md
+  https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md
 
 Further help:
   man brew

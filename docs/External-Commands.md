@@ -81,4 +81,4 @@ These commands have been contributed by Homebrew users but are not included in t
 > ```
 
 ## SEE ALSO
-Homebrew Docs: <https://github.com/Homebrew/brew/tree/master/share/doc/homebrew>
+Homebrew Docs: <https://github.com/Homebrew/brew/tree/master/docs>

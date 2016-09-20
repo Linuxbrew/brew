@@ -35,7 +35,7 @@ module Utils
         end
 
         # Send analytics. Don't send or store any personally identifiable information.
-        # https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md
+        # https://github.com/Homebrew/brew/blob/master/docs/Analytics.md
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         if ENV["HOMEBREW_ANALYTICS_DEBUG"]

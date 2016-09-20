@@ -33,30 +33,19 @@
 # Unignore our `brew` script.
 !/bin/brew
 
-# Ignore `share` contents (again).
-/share
-/share/doc
-/share/zsh
-/share/zsh/site-functions
-
 # Unignore our documentation.
 !/.github
-!/share/doc/homebrew
-!/share/man/man1/brew.1
-!/share/man/man1/brew-cask.1
-
-# Ignore `etc` contents (again)
-/etc
-/etc/bash_completion.d
+!/docs
+!/manpages
 
 # Unignore our shell completion
-!/etc/bash_completion.d/brew
-!/share/zsh/site-functions/_brew
+!/completions
 
 # Unignore our root-level metadata files.
 !/.gitignore
 !/.travis.yml
 !/.yardopts
 !/CODEOFCONDUCT.md
+!/CONTRIBUTING.md
 !/LICENSE.txt
 !/README.md
