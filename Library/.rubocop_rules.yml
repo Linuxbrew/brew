@@ -7,6 +7,10 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
+# only for numbers >= 1_000_000
+Style/NumericLiterals:
+  MinDigits: 7
+
 # percent-x is allowed for multiline
 Style/CommandLiteral:
   EnforcedStyle: mixed
