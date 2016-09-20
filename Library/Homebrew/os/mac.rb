@@ -34,7 +34,7 @@ module OS
 
     def outdated_release?
       # TODO: bump version when new OS is released
-      version < "10.9"
+      version < "10.10"
     end
 
     def cat
