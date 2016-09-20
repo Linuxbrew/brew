@@ -58,6 +58,7 @@ class InstallTests < Homebrew::TestCase
       bin = HOMEBREW_PREFIX+"bin"
       assert_predicate bin, :directory?
       assert_equal 3, bin.children.length
+      assert_predicate f.prefix/".brew/testball.rb", :readable?
     end
   end
 

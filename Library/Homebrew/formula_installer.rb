@@ -260,6 +260,12 @@ class FormulaInstaller
       compute_and_install_dependencies if not_pouring && !ignore_deps?
       build
       clean
+
+      # Store the formula used to build the keg in the keg.
+      s = formula.path.read.gsub(/  bottle do.+?end\n\n?/m, "")
+      brew_prefix = formula.prefix/".brew"
+      brew_prefix.mkdir
+      Pathname(brew_prefix/"#{formula.name}.rb").atomic_write(s)
     end
 
     build_bottle_postinstall if build_bottle?

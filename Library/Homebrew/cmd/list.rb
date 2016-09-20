@@ -140,6 +140,8 @@ class PrettyListing
           # dylibs have multiple symlinks and we don't care about them
           (pnn.extname == ".dylib" || pnn.extname == ".pc") && !pnn.symlink?
         end
+      when ".brew"
+        # Ignore .brew
       else
         if pn.directory?
           if pn.symlink?
