@@ -19,7 +19,7 @@ class BashTests < Homebrew::TestCase
   end
 
   def test_bash_completion
-    script = HOMEBREW_LIBRARY_PATH.parent.parent/"etc/bash_completion.d/brew"
+    script = HOMEBREW_LIBRARY_PATH.parent.parent/"completions/bash/brew"
     assert_valid_bash_syntax script
   end
 
