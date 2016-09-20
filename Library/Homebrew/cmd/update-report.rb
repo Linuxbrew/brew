@@ -99,8 +99,10 @@ module Homebrew
 
     Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
 
-    # This should always be the last thing to run
-    migrate_legacy_repository_if_necessary
+    # This should always be the last thing to run (but skip on auto-update).
+    unless ARGV.include?("--preinstall")
+      migrate_legacy_repository_if_necessary
+    end
   end
 
   private
@@ -300,6 +302,11 @@ module Homebrew
     link_src_dst_dirs(repository/"share/zsh/site-functions",
                       HOMEBREW_PREFIX/"share/zsh/site-functions", command)
     link_path_manpages(repository/"share", command)
+  rescue => e
+    ofail <<-EOS.undent
+      Failed to link all completions, docs and manpages:
+        #{e}
+    EOS
   end
 end
 
