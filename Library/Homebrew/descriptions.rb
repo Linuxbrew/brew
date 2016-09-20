@@ -12,9 +12,7 @@ class Descriptions
   # If the cache file exists, load it into, and return, a hash; otherwise,
   # return nil.
   def self.load_cache
-    if CACHE_FILE.exist?
-      @cache = Utils::JSON.load(CACHE_FILE.read)
-    end
+    @cache = Utils::JSON.load(CACHE_FILE.read) if CACHE_FILE.exist?
   end
 
   # Write the cache to disk after ensuring the existence of the containing

@@ -39,15 +39,11 @@ module Homebrew
         vols = get_mounts path
 
         # no volume found
-        if vols.empty?
-          return -1
-        end
+        return -1 if vols.empty?
 
         vol_index = @volumes.index(vols[0])
         # volume not found in volume list
-        if vol_index.nil?
-          return -1
-        end
+        return -1 if vol_index.nil?
         vol_index
       end
 
