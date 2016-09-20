@@ -7,10 +7,6 @@ group :debug do
   gem "pry-byebug", platforms: :mri
 end
 
-group :development do
-  gem "rubocop-cask", "~> 0.8.3"
-end
-
 group :test do
   # This is SimpleCov v0.12.0 with two fixes merged on top, that finally resolve
   # all issues with parallel tests, uncovered files, and tracked files. Switch
