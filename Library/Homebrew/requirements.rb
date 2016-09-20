@@ -39,11 +39,11 @@ class XcodeRequirement < Requirement
       Installing just the Command Line Tools is not sufficient.
     EOS
     if MacOS.version >= :lion
-      message += <<-EOS.undent
+      message + <<-EOS.undent
         Xcode can be installed from the App Store.
       EOS
     else
-      message += <<-EOS.undent
+      message + <<-EOS.undent
         Xcode can be installed from https://developer.apple.com/xcode/downloads/
       EOS
     end
