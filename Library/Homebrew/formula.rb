@@ -1450,6 +1450,12 @@ class Formula
     Requirement.expand(self, &block)
   end
 
+  # Returns a list of Dependency objects that are required at runtime.
+  # @private
+  def runtime_dependencies
+    recursive_dependencies.reject(&:build?)
+  end
+
   # @private
   def to_hash
     hsh = {

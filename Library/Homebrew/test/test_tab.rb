@@ -16,6 +16,7 @@ class TabTests < Homebrew::TestCase
                    "HEAD"                 => TEST_SHA1,
                    "compiler"             => "clang",
                    "stdlib"               => "libcxx",
+                   "runtime_dependencies" => [],
                    "source"               => {
                      "tap" => "homebrew/core",
                      "path" => nil,
@@ -40,6 +41,7 @@ class TabTests < Homebrew::TestCase
     assert_nil tab.tap
     assert_nil tab.time
     assert_nil tab.HEAD
+    assert_empty tab.runtime_dependencies
     assert_nil tab.stable_version
     assert_nil tab.devel_version
     assert_nil tab.head_version
@@ -95,12 +97,14 @@ class TabTests < Homebrew::TestCase
     assert_equal TEST_SHA1, tab.HEAD
     assert_equal :clang, tab.cxxstdlib.compiler
     assert_equal :libcxx, tab.cxxstdlib.type
+    assert_empty tab.runtime_dependencies
   end
 
   def test_from_file
     path = Pathname.new(TEST_DIRECTORY).join("fixtures", "receipt.json")
     tab = Tab.from_file(path)
     source_path = "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb"
+    runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
 
     assert_equal @used.sort, tab.used_options.sort
     assert_equal @unused.sort, tab.unused_options.sort
@@ -115,6 +119,7 @@ class TabTests < Homebrew::TestCase
     assert_equal TEST_SHA1, tab.HEAD
     assert_equal :clang, tab.cxxstdlib.compiler
     assert_equal :libcxx, tab.cxxstdlib.type
+    assert_equal runtime_dependencies, tab.runtime_dependencies
     assert_equal "2.14", tab.stable_version.to_s
     assert_equal "2.15", tab.devel_version.to_s
     assert_equal "HEAD-0000000", tab.head_version.to_s
@@ -122,11 +127,32 @@ class TabTests < Homebrew::TestCase
   end
 
   def test_create
-    f = formula { url "foo-1.0" }
+    f = formula do
+      url "foo-1.0"
+      depends_on "bar"
+      depends_on "user/repo/from_tap"
+      depends_on "baz" => :build
+    end
+
+    tap = Tap.new("user", "repo")
+    from_tap = formula("from_tap", tap.path/"Formula/from_tap.rb") do
+      url "from_tap-1.0"
+    end
+    stub_formula_loader from_tap
+
+    stub_formula_loader formula("bar") { url "bar-2.0" }
+    stub_formula_loader formula("baz") { url "baz-3.0" }
+
     compiler = DevelopmentTools.default_compiler
     stdlib = :libcxx
     tab = Tab.create(f, compiler, stdlib)
 
+    runtime_dependencies = [
+      { "full_name" => "bar", "version" => "2.0" },
+      { "full_name" => "user/repo/from_tap", "version" => "1.0" },
+    ]
+
+    assert_equal runtime_dependencies, tab.runtime_dependencies
     assert_equal f.path.to_s, tab.source["path"]
   end
 
@@ -167,6 +193,7 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.HEAD, tab.HEAD
     assert_equal @tab.compiler, tab.compiler
     assert_equal @tab.stdlib, tab.stdlib
+    assert_equal @tab.runtime_dependencies, tab.runtime_dependencies
     assert_equal @tab.stable_version, tab.stable_version
     assert_equal @tab.devel_version, tab.devel_version
     assert_equal @tab.head_version, tab.head_version
