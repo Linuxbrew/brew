@@ -139,15 +139,15 @@ class Hbc::Installer
   #       dependencies should also apply for "brew cask stage"
   #       override dependencies with --force or perhaps --force-deps
   def satisfy_dependencies
-    if @cask.depends_on
-      ohai "Satisfying dependencies"
-      macos_dependencies
-      arch_dependencies
-      x11_dependencies
-      formula_dependencies
-      cask_dependencies unless skip_cask_deps
-      puts "complete"
-    end
+    return unless @cask.depends_on
+
+    ohai "Satisfying dependencies"
+    macos_dependencies
+    arch_dependencies
+    x11_dependencies
+    formula_dependencies
+    cask_dependencies unless skip_cask_deps
+    puts "complete"
   end
 
   def macos_dependencies
@@ -159,7 +159,7 @@ class Hbc::Installer
       end
     elsif @cask.depends_on.macos.length > 1
       unless @cask.depends_on.macos.include?(Gem::Version.new(MacOS.version.to_s))
-        raise Hbc::CaskError, "Cask #{@cask} depends on macOS release being one of [#{@cask.depends_on.macos.map(&:to_s).join(', ')}], but you are running release #{MacOS.version}."
+        raise Hbc::CaskError, "Cask #{@cask} depends on macOS release being one of [#{@cask.depends_on.macos.map(&:to_s).join(", ")}], but you are running release #{MacOS.version}."
       end
     else
       unless MacOS.version == @cask.depends_on.macos.first
@@ -175,7 +175,7 @@ class Hbc::Installer
       arch[:type] == @current_arch[:type] &&
       Array(arch[:bits]).include?(@current_arch[:bits])
     }
-    raise Hbc::CaskError, "Cask #{@cask} depends on hardware architecture being one of [#{@cask.depends_on.arch.map(&:to_s).join(', ')}], but you are running #{@current_arch}"
+    raise Hbc::CaskError, "Cask #{@cask} depends on hardware architecture being one of [#{@cask.depends_on.arch.map(&:to_s).join(", ")}], but you are running #{@current_arch}"
   end
 
   def x11_dependencies
@@ -203,7 +203,7 @@ class Hbc::Installer
 
   def cask_dependencies
     return unless @cask.depends_on.cask && !@cask.depends_on.cask.empty?
-    ohai "Installing Cask dependencies: #{@cask.depends_on.cask.join(', ')}"
+    ohai "Installing Cask dependencies: #{@cask.depends_on.cask.join(", ")}"
     deps = Hbc::CaskDependencies.new(@cask)
     deps.sorted.each do |dep_token|
       puts "#{dep_token} ..."

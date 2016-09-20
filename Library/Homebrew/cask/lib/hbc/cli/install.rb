@@ -36,7 +36,7 @@ class Hbc::CLI::Install < Hbc::CLI::Base
         count += 1
       end
     end
-    count == 0 ? nil : count == cask_tokens.length
+    count.zero? ? nil : count == cask_tokens.length
   end
 
   def self.warn_unavailable_with_suggestion(cask_token, e)

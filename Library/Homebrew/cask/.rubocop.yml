@@ -31,9 +31,6 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Enabled: false
 
-Performance/StringReplacement:
-  Enabled: false
-
 Style/AlignHash:
   EnforcedHashRocketStyle: table
   EnforcedColonStyle: table
@@ -129,6 +126,8 @@ Style/RegexpLiteral:
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
 Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma
-

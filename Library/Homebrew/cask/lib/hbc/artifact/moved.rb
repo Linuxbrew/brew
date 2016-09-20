@@ -64,9 +64,9 @@ class Hbc::Artifact::Moved < Hbc::Artifact::Relocated
 
   def delete
     ohai "Removing #{self.class.artifact_english_name}: '#{target}'"
-    if MacOS.undeletable?(target)
-      raise Hbc::CaskError, "Cannot remove undeletable #{self.class.artifact_english_name}"
-    elsif force
+    raise Hbc::CaskError, "Cannot remove undeletable #{self.class.artifact_english_name}" if MacOS.undeletable?(target)
+
+    if force
       Hbc::Utils.gain_permissions_remove(target, command: @command)
     else
       target.rmtree

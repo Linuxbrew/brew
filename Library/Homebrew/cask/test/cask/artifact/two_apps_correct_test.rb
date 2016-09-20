@@ -60,7 +60,6 @@ describe Hbc::Artifact::App do
       File.exist?(cask.staged_path.join("Caffeine Deluxe.app")).must_equal true
     end
 
-
     describe "avoids clobbering an existing app" do
       let(:cask) { local_two_apps_caffeine }
 
@@ -70,8 +69,8 @@ describe Hbc::Artifact::App do
         TestHelper.must_output(self, lambda {
           Hbc::Artifact::App.new(cask).install_phase
         }, <<-EOS.undent.chomp)
-             ==> It seems there is already an App at '#{Hbc.appdir.join('Caffeine Mini.app')}'; not moving.
-             ==> Moving App 'Caffeine Pro.app' to '#{Hbc.appdir.join('Caffeine Pro.app')}'
+             ==> It seems there is already an App at '#{Hbc.appdir.join("Caffeine Mini.app")}'; not moving.
+             ==> Moving App 'Caffeine Pro.app' to '#{Hbc.appdir.join("Caffeine Pro.app")}'
            EOS
 
         source_path = cask.staged_path.join("Caffeine Mini.app")
@@ -85,8 +84,8 @@ describe Hbc::Artifact::App do
         TestHelper.must_output(self, lambda {
           Hbc::Artifact::App.new(cask).install_phase
         }, <<-EOS.undent.chomp)
-             ==> Moving App 'Caffeine Mini.app' to '#{Hbc.appdir.join('Caffeine Mini.app')}'
-             ==> It seems there is already an App at '#{Hbc.appdir.join('Caffeine Pro.app')}'; not moving.
+             ==> Moving App 'Caffeine Mini.app' to '#{Hbc.appdir.join("Caffeine Mini.app")}'
+             ==> It seems there is already an App at '#{Hbc.appdir.join("Caffeine Pro.app")}'; not moving.
            EOS
 
         source_path = cask.staged_path.join("Caffeine Pro.app")

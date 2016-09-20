@@ -32,14 +32,15 @@ end
 # global methods
 
 def odebug(title, *sput)
-  if Hbc.respond_to?(:debug) && Hbc.debug
-    width = Tty.width * 4 - 6
-    if $stdout.tty? && title.to_s.length > width
-      title = title.to_s[0, width - 3] + "..."
-    end
-    puts "#{Tty.magenta}==>#{Tty.reset} #{Tty.white}#{title}#{Tty.reset}"
-    puts sput unless sput.empty?
+  return unless Hbc.respond_to?(:debug)
+  return unless Hbc.debug
+
+  width = Tty.width * 4 - 6
+  if $stdout.tty? && title.to_s.length > width
+    title = title.to_s[0, width - 3] + "..."
   end
+  puts "#{Tty.magenta}==>#{Tty.reset} #{Tty.white}#{title}#{Tty.reset}"
+  puts sput unless sput.empty?
 end
 
 module Hbc::Utils

@@ -21,7 +21,7 @@ class Hbc::CLI::InternalDump < Hbc::CLI::InternalUseBase
         opoo "#{cask_token} was not found or would not load: #{e}"
       end
     end
-    count == 0 ? nil : count == cask_tokens.length
+    count.zero? ? nil : count == cask_tokens.length
   end
 
   def self.help

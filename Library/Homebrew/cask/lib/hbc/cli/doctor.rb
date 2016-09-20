@@ -54,7 +54,7 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
       if homebrew_origin !~ %r{\S}
         homebrew_origin = "#{none_string} #{error_string}"
       elsif homebrew_origin !~ %r{(mxcl|Homebrew)/(home)?brew(\.git)?\Z}
-        homebrew_origin.concat " #{error_string 'warning: nonstandard origin'}"
+        homebrew_origin.concat " #{error_string "warning: nonstandard origin"}"
       end
     rescue StandardError
       homebrew_origin = error_string "Not Found - Error running git"
@@ -106,7 +106,7 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
   end
 
   def self.privileged_uid
-    Process.euid == 0 ? "Yes #{error_string 'warning: not recommended'}" : "No"
+    Process.euid.zero? ? "Yes #{error_string "warning: not recommended"}" : "No"
   rescue StandardError
     notfound_string
   end
@@ -143,7 +143,7 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
       if dir.nil? || dir.to_s.empty?
         none_string
       elsif dir.to_s.match(legacy_tap_pattern)
-        dir.to_s.concat(" #{error_string 'Warning: legacy tap path'}")
+        dir.to_s.concat(" #{error_string "Warning: legacy tap path"}")
       else
         dir.to_s
       end
@@ -175,9 +175,9 @@ class Hbc::CLI::Doctor < Hbc::CLI::Base
   def self.render_staging_location(path)
     path = Pathname.new(path)
     if !path.exist?
-      "#{path} #{error_string 'error: path does not exist'}}"
+      "#{path} #{error_string "error: path does not exist"}}"
     elsif !path.writable?
-      "#{path} #{error_string 'error: not writable by current user'}"
+      "#{path} #{error_string "error: not writable by current user"}"
     else
       path
     end

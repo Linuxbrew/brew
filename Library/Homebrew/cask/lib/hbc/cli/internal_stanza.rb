@@ -118,7 +118,7 @@ class Hbc::CLI::InternalStanza < Hbc::CLI::InternalUseBase
 
       count += 1
     end
-    count == 0 ? nil : count == cask_tokens.length
+    count.zero? ? nil : count == cask_tokens.length
   end
 
   def self.help
