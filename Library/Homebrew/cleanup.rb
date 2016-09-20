@@ -66,7 +66,7 @@ module Homebrew
         next unless path.file?
         file = path
 
-        if Pathname::BOTTLE_EXTNAME_RX === file.to_s
+        if file.to_s =~ Pathname::BOTTLE_EXTNAME_RX
           version = begin
                       Utils::Bottles.resolve_version(file)
                     rescue
@@ -86,7 +86,7 @@ module Homebrew
           next
         end
 
-        file_is_stale = if PkgVersion === version
+        file_is_stale = if version.is_a?(PkgVersion)
           f.pkg_version > version
         else
           f.version > version

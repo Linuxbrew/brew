@@ -49,7 +49,7 @@ class DependencyCollector
   end
 
   def cache_key(spec)
-    if Resource === spec && spec.download_strategy == CurlDownloadStrategy
+    if spec.is_a?(Resource) && spec.download_strategy == CurlDownloadStrategy
       File.extname(spec.url)
     else
       spec
@@ -57,7 +57,7 @@ class DependencyCollector
   end
 
   def build(spec)
-    spec, tags = Hash === spec ? spec.first : spec
+    spec, tags = spec.is_a?(Hash) ? spec.first : spec
     parse_spec(spec, Array(tags))
   end
 
@@ -81,7 +81,7 @@ class DependencyCollector
   end
 
   def parse_string_spec(spec, tags)
-    if HOMEBREW_TAP_FORMULA_REGEX === spec
+    if spec =~ HOMEBREW_TAP_FORMULA_REGEX
       TapDependency.new(spec, tags)
     elsif tags.empty?
       Dependency.new(spec, tags)

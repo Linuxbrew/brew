@@ -1052,7 +1052,7 @@ class Formula
     self.class.link_overwrite_paths.any? do |p|
       p == to_check ||
         to_check.start_with?(p.chomp("/") + "/") ||
-        /^#{Regexp.escape(p).gsub('\*', ".*?")}$/ === to_check
+        to_check =~ /^#{Regexp.escape(p).gsub('\*', ".*?")}$/
     end
   end
 
@@ -1246,7 +1246,7 @@ class Formula
 
   # @private
   def <=>(other)
-    return unless Formula === other
+    return unless other.is_a?(Formula)
     name <=> other.name
   end
 
@@ -2226,7 +2226,7 @@ class Formula
     # If this formula conflicts with another one.
     # <pre>conflicts_with "imagemagick", :because => "because this is just a stupid example"</pre>
     def conflicts_with(*names)
-      opts = Hash === names.last ? names.pop : {}
+      opts = names.last.is_a?(Hash) ? names.pop : {}
       names.each { |name| conflicts << FormulaConflict.new(name, opts[:because]) }
     end
 

@@ -150,7 +150,7 @@ module Homebrew
 
     names = remote_tap_formulae["#{user}/#{repo}"]
     user = user.downcase if user == "Homebrew" # special handling for the Homebrew organization
-    names.select { |name| rx === name }.map { |name| "#{user}/#{repo}/#{name}" }
+    names.select { |name| name =~ rx }.map { |name| "#{user}/#{repo}/#{name}" }
   rescue GitHub::HTTPNotFoundError
     opoo "Failed to search tap: #{user}/#{repo}. Please run `brew update`"
     []

@@ -668,7 +668,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def support_depth?
-    @ref_type != :revision && SHALLOW_CLONE_WHITELIST.any? { |rx| rx === @url }
+    @ref_type != :revision && SHALLOW_CLONE_WHITELIST.any? { |regex| @url =~ regex }
   end
 
   def git_dir
@@ -1021,9 +1021,9 @@ class DownloadStrategyDetector
   def self.detect(url, strategy = nil)
     if strategy.nil?
       detect_from_url(url)
-    elsif Class === strategy && strategy < AbstractDownloadStrategy
+    elsif strategy.is_a?(Class) && strategy < AbstractDownloadStrategy
       strategy
-    elsif Symbol === strategy
+    elsif strategy.is_a?(Symbol)
       detect_from_symbol(strategy)
     else
       raise TypeError,

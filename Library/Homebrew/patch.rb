@@ -89,7 +89,7 @@ class DATAPatch < EmbeddedPatch
     path.open("rb") do |f|
       begin
         line = f.gets
-      end until line.nil? || /^__END__$/ === line
+      end until line.nil? || line =~ /^__END__$/
       data << line while line = f.gets
     end
     data

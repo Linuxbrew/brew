@@ -14,7 +14,7 @@ class Option
   end
 
   def <=>(other)
-    return unless Option === other
+    return unless other.is_a?(Option)
     name <=> other.name
   end
 

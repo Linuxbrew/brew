@@ -118,20 +118,22 @@ module Debrew
           menu.prompt = "Choose an action: "
 
           menu.choice(:raise) { original_raise(e) }
-          menu.choice(:ignore) { return :ignore } if Ignorable === e
+          menu.choice(:ignore) { return :ignore } if e.is_a?(Ignorable)
           menu.choice(:backtrace) { puts e.backtrace }
 
-          menu.choice(:irb) do
-            puts "When you exit this IRB session, execution will continue."
-            set_trace_func proc { |event, _, _, id, binding, klass|
-              if klass == Raise && id == :raise && event == "return"
-                set_trace_func(nil)
-                synchronize { IRB.start_within(binding) }
-              end
-            }
+          if e.is_a?(Ignorable)
+            menu.choice(:irb) do
+              puts "When you exit this IRB session, execution will continue."
+              set_trace_func proc { |event, _, _, id, binding, klass|
+                if klass == Raise && id == :raise && event == "return"
+                  set_trace_func(nil)
+                  synchronize { IRB.start_within(binding) }
+                end
+              }
 
-            return :ignore
-          end if Ignorable === e
+              return :ignore
+            end
+          end
 
           menu.choice(:shell) do
             puts "When you exit this shell, you will return to the menu."

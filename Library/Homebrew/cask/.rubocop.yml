@@ -1,6 +1,7 @@
 AllCops:
   TargetRubyVersion: 2.0
   Exclude:
+    - '**/.simplecov'
     - '**/Casks/**/*'
     - '**/vendor/**/*'
 

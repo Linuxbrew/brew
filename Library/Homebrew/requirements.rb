@@ -22,7 +22,7 @@ class XcodeRequirement < Requirement
   satisfy(build_env: false) { xcode_installed_version }
 
   def initialize(tags)
-    @version = tags.find { |t| tags.delete(t) if /(\d\.)+\d/ === t }
+    @version = tags.find { |tag| tags.delete(tag) if tag =~ /(\d\.)+\d/ }
     super
   end
 
