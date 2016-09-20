@@ -41,16 +41,24 @@ module Homebrew
 
       files = Dir["test/test_*.rb"]
       files -= Dir["test/test_os_mac_*.rb"] unless OS.mac?
+
+      opts = []
+      opts << "--serialize-stdout" if ENV["CI"]
+
       args = []
       args << "--trace" if ARGV.include? "--trace"
+
       if ARGV.value("only")
         ENV["HOMEBREW_TESTS_ONLY"] = "1"
         test_name, test_method = ARGV.value("only").split("/", 2)
         files = ["test/test_#{test_name}.rb"]
         args << "--name=test_#{test_method}" if test_method
       end
+
       args += ARGV.named.select { |v| v[/^TEST(OPTS)?=/] }
-      system "bundle", "exec", "parallel_test", "--", *args, "--", *files
+
+      system "bundle", "exec", "parallel_test", *opts,
+        "--", *args, "--", *files
 
       Homebrew.failed = !$?.success?
 

@@ -1,7 +1,10 @@
 require "English"
 
 def run_tests(executable, files, args = [])
-  system "bundle", "exec", executable, "--", *args, "--", *files
+  opts = []
+  opts << "--serialize-stdout" if ENV["CI"]
+
+  system "bundle", "exec", executable, *opts, "--", *args, "--", *files
 end
 
 repo_root = Pathname(__FILE__).realpath.parent.parent
