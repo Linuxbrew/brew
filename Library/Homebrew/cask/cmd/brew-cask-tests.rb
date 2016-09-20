@@ -38,10 +38,7 @@ repo_root.cd do
   end
 
   if ENV["CODECOV_TOKEN"]
-    require "simplecov"
-    require "codecov"
-    formatter = SimpleCov::Formatter::Codecov.new
-    formatter.format(SimpleCov::ResultMerger.merged_result)
+    system "bundle", "exec", "rake", "test:coverage:upload"
   end
 
   Homebrew.failed = !$CHILD_STATUS.success?

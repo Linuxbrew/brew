@@ -6,6 +6,18 @@ homebrew_repo = `brew --repository`.chomp
 $LOAD_PATH.unshift(File.expand_path("#{homebrew_repo}/Library/Homebrew"))
 $LOAD_PATH.unshift(File.expand_path("../lib", __FILE__))
 
+namespace :test do
+  namespace :coverage do
+    desc "Upload coverage to Codecov"
+    task :upload do
+      require "simplecov"
+      require "codecov"
+      formatter = SimpleCov::Formatter::Codecov.new
+      formatter.format(SimpleCov::ResultMerger.merged_result)
+    end
+  end
+end
+
 RuboCop::RakeTask.new(:rubocop) do |t|
   t.options = ["--force-exclusion"]
 end
