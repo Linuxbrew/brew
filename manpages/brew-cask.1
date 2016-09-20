@@ -18,11 +18,11 @@ Homebrew\-Cask works robustly enough that we welcome new users, but the project 
 .SH "FREQUENTLY USED COMMANDS"
 .
 .TP
-\fBinstall [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha]\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] \fItoken\fR [ \fItoken\fR \.\.\. ]
 Install Cask identified by \fItoken\fR\.
 .
 .TP
-\fBuninstall [\-\-force]\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+\fBuninstall\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]
 Uninstall Cask identified by \fItoken\fR\.
 .
 .TP
@@ -74,40 +74,30 @@ With no arguments, display the project page \fIhttp://caskroom\.io\fR\.
 Display information about the given Cask\.
 .
 .TP
-\fBinstall [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha]\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] \fItoken\fR [ \fItoken\fR \.\.\. ]
 Install the given Cask\. With \fB\-\-force\fR, re\-install even if the Cask appears to be already present\. With \fB\-\-skip\-cask\-deps\fR, skip any Cask dependencies\. \fB\-\-require\-sha\fR will abort installation if the Cask does not have a checksum defined\.
 .
 .IP
 \fItoken\fR is usually the ID of a Cask as returned by \fBbrew cask search\fR, but see \fIOTHER WAYS TO SPECIFY A CASK\fR for variations\.
 .
 .TP
-\fBlist\fR or \fBls\fR [\-1 | \-l] [ \fItoken\fR \.\.\. ]
-Without any arguments, list all installed Casks\. With \fB\-1\fR, always format the output in a single column\. With \fB\-l\fR, give a more detailed listing\.
+\fBlist\fR or \fBls\fR [\-1] [\-\-versions] [ \fItoken\fR \.\.\. ]
+Without any arguments, list all installed Casks\. With \fB\-1\fR, always format the output in a single column\. With \fB\-\-versions\fR, show all installed versions\.
 .
 .IP
 If \fItoken\fR is given, summarize the staged files associated with the given Cask\.
 .
 .TP
-\fBsearch\fR or \fB\-S\fR
-Display all Casks available for install\.
-.
-.TP
-\fBsearch\fR or \fB\-S\fR \fItext\fR | /\fIregexp\fR/
-Perform a substring search of known Cask tokens for \fItext\fR\. If the text is delimited by slashes, it is interpreted as a Ruby regular expression\.
+\fBsearch\fR or \fB\-S\fR [\fItext\fR | /\fIregexp\fR/]
+Without argument, display all Casks available for install, otherwise perform a substring search of known Cask tokens for \fItext\fR or, if the text is delimited by slashes (/\fIregexp\fR/), it is interpreted as a Ruby regular expression\.
 .
 .TP
 \fBstyle\fR [\-\-fix] [ \fItoken\fR \.\.\. ]
 Check the given Casks for correct style using RuboCop Cask \fIhttps://github\.com/caskroom/rubocop\-cask\fR\. If no tokens are given on the command line, all Casks are checked\. With \fB\-\-fix\fR, auto\-correct any style errors if possible\.
 .
 .TP
-\fBuninstall [\-\-force]\fR or \fBrm\fR or \fBremove\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+\fBuninstall\fR or \fBrm\fR or \fBremove\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]
 Uninstall the given Cask\. With \fB\-\-force\fR, uninstall even if the Cask does not appear to be present\.
-.
-.IP
-Note that \fBuninstall \-\-force\fR is currently imperfect\. It will follow the \fBuninstall\fR instructions from \fInewest\fR Cask definition, even if the given Cask has changed since you installed it\. The result is that \fBuninstall \-\-force\fR will always succeed in removing relevant files under \fB<Caskroom_path>\fR, but will sometimes fail to remove relevant installed files outside of it\. This issue is being addressed\.
-.
-.IP
-\fBuninstall\fR without \fB\-\-force\fR is also imperfect\. It may be unable to perform an \fBuninstall\fR operation if the given Cask has changed since you installed it\. This issue is being addressed\.
 .
 .TP
 \fBupdate\fR
