@@ -270,17 +270,24 @@ module Homebrew
   end
 
   def self.install_gem_setup_path!(name, version = nil, executable = name)
-    require "rubygems"
+    # Respect user's preferences for where gems should be installed.
+    ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
+    ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
+    ENV["GEM_PATH"] = ENV["GEM_OLD_PATH"] unless ENV["GEM_OLD_PATH"].to_s.empty?
+
+    # Make rubygems notice env changes.
+    Gem.clear_paths
+    Gem::Specification.reset
 
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
     path = ENV["PATH"].split(File::PATH_SEPARATOR)
     path.unshift(RUBY_BIN) if which("ruby") != RUBY_PATH
-    path.unshift("#{Gem.user_dir}/bin")
+    path.unshift("#{Gem.dir}/bin")
     ENV["PATH"] = path.join(File::PATH_SEPARATOR)
 
     if Gem::Specification.find_all_by_name(name, version).empty?
       ohai "Installing or updating '#{name}' gem"
-      install_args = %W[--no-ri --no-rdoc --user-install #{name}]
+      install_args = %W[--no-ri --no-rdoc #{name}]
       install_args << "--version" << version if version
 
       # Do `gem install [...]` without having to spawn a separate process or
