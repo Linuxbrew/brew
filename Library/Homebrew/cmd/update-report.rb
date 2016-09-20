@@ -302,6 +302,11 @@ module Homebrew
     link_src_dst_dirs(repository/"share/zsh/site-functions",
                       HOMEBREW_PREFIX/"share/zsh/site-functions", command)
     link_path_manpages(repository/"share", command)
+  rescue => e
+    ofail <<-EOS.undent
+      Failed to link all completions, docs and manpages:
+        #{e}
+    EOS
   end
 end
 
