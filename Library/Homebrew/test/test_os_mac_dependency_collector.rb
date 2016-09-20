@@ -2,6 +2,10 @@ require "testing_env"
 require "dependency_collector"
 
 class OSMacDependencyCollectorTests < Homebrew::TestCase
+  def find_dependency(name)
+    @d.deps.find { |dep| dep.name == name }
+  end
+
   def setup
     @d = DependencyCollector.new
   end
