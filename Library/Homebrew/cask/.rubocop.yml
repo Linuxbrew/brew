@@ -93,9 +93,6 @@ Style/ClassAndModuleChildren:
 Style/Documentation:
   Enabled: false
 
-Style/EmptyElse:
-  Enabled: false
-
 Style/FileName:
   Enabled: false
 
