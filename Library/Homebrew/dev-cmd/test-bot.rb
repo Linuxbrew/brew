@@ -1076,7 +1076,10 @@ module Homebrew
     # because Formula parsing and/or git commit hash lookup depends on it.
     # At the same time, make sure Tap is not a shallow clone.
     # bottle rebuild and bottle upload rely on full clone.
-    safe_system "brew", "tap", tap.name, "--full" if tap
+    if tap
+      ENV["HOMEBREW_UPDATE_TO_TAG"] = "1"
+      safe_system "brew", "tap", tap.name, "--full"
+    end
 
     if ARGV.include? "--ci-upload"
       return test_ci_upload(tap)
