@@ -57,9 +57,9 @@ module Homebrew
   end
 
   def shell(cmd)
-      output = `#{cmd}`
-      raise ErrorDuringExecution.new(cmd) unless $?.success?
-      output
+    output = `#{cmd}`
+    raise ErrorDuringExecution, cmd unless $?.success?
+    output
   end
 
   def brew(args)
@@ -69,7 +69,7 @@ module Homebrew
   def build_bottle_pr
     formulae = ARGV.formulae
     unless ARGV.one?
-      deps = brew("deps -n --union #{formulae.join ' '}").split
+      deps = brew("deps -n --union #{formulae.join " "}").split
       formulae = deps.map { |f| Formula[f] } + formulae
     end
     formulae.each { |f| build_bottle f }
