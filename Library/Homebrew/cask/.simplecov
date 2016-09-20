@@ -1,1 +1,1 @@
-../test/.simplecov
+../.simplecov
