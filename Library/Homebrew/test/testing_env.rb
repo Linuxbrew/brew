@@ -15,6 +15,7 @@ TEST_DIRECTORY = File.dirname(File.expand_path(__FILE__))
 begin
   require "rubygems"
   require "minitest/autorun"
+  require "parallel_tests/test/runtime_logger"
   require "mocha/setup"
 rescue LoadError
   abort "Run `bundle install` or install the mocha and minitest gems before running the tests"

@@ -39,6 +39,8 @@ require "minitest/autorun"
 require "minitest/reporters"
 Minitest::Reporters.use! Minitest::Reporters::DefaultReporter.new(color: true)
 
+require "parallel_tests/test/runtime_logger"
+
 # Force mocha to patch MiniTest since we have both loaded thanks to homebrew's testing_env
 require "mocha/api"
 require "mocha/integration/mini_test"

@@ -19,8 +19,17 @@ repo_root.cd do
   ENV["TESTOPTS"] = "--seed=14830" if ENV["TRAVIS"]
   ENV["HOMEBREW_TESTS_COVERAGE"] = "1" if ARGV.flag?("--coverage")
 
-  run_tests "parallel_rspec", Dir["spec/**/*_spec.rb"] if rspec
-  run_tests "parallel_test", Dir["test/**/*_test.rb"] if minitest
+  if rspec
+    run_tests "parallel_rspec", Dir["spec/**/*_spec.rb"], %w[
+      --format progress
+      --format ParallelTests::RSpec::RuntimeLogger
+      --out tmp/parallel_runtime_rspec.log
+    ]
+  end
+
+  if minitest
+    run_tests "parallel_test", Dir["test/**/*_test.rb"]
+  end
 
   if ENV["CODECOV_TOKEN"]
     require "simplecov"
