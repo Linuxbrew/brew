@@ -99,6 +99,11 @@ Style/IfUnlessModifier:
   Exclude:
     - 'Taps/**/*'
 
+# TODO: enforce when rubocop has fixed this
+# https://github.com/bbatsov/rubocop/issues/3516
+Style/VariableNumber:
+  Enabled: false
+
 # dashes in filenames are typical
 Style/FileName:
   # matches:
