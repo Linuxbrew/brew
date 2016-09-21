@@ -253,12 +253,7 @@ class Hbc::Installer
 
   def disable_accessibility_access
     return unless @cask.accessibility_access
-    if MacOS.version <= :mountain_lion
-      opoo <<-EOS.undent
-        Accessibility access was enabled for #{@cask}, but it is not safe to disable
-        automatically on this version of macOS.  See System Preferences.
-      EOS
-    elsif MacOS.version <= :el_capitan
+    if MacOS.version >= :mavericks && MacOS.version <= :el_capitan
       ohai "Disabling accessibility access"
       @command.run!("/usr/bin/sqlite3",
                     args: [
