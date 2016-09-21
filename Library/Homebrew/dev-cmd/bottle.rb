@@ -436,7 +436,7 @@ module Homebrew
             puts output
             update_or_add = "add"
             if s.include? "stable do"
-              indent = s.slice(/^ +stable do/).length - "stable do".length
+              indent = s.slice(/^( +)stable do/, 1).length
               string = s.sub!(/^ {#{indent}}stable do(.|\n)+?^ {#{indent}}end\n/m, '\0' + output + "\n")
             else
               string = s.sub!(

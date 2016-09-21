@@ -467,7 +467,7 @@ class FormulaAuditor
 
     # Make sure the formula name plus description is no longer than 80 characters
     # Note full_name includes the name of the tap, while name does not
-    linelength = formula.name.length + ": ".length + desc.length
+    linelength = "#{formula.name}: #{desc}".length
     if linelength > 80
       problem <<-EOS.undent
         Description is too long. \"name: desc\" should be less than 80 characters.

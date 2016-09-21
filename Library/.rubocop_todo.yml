@@ -86,12 +86,6 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   Max: 6
 
-# Offense count: 2
-Performance/FixedSize:
-  Exclude:
-    - 'Homebrew/dev-cmd/audit.rb'
-    - 'Homebrew/dev-cmd/bottle.rb'
-
 # Offense count: 8
 Style/AccessorMethodName:
   Exclude:
