@@ -288,13 +288,6 @@ Style/Semicolon:
   Exclude:
     - 'Homebrew/descriptions.rb'
 
-# Offense count: 1
-# Configuration parameters: Methods.
-# Methods: {"reduce"=>["a", "e"]}, {"inject"=>["a", "e"]}
-Style/SingleLineBlockParams:
-  Exclude:
-    - 'Homebrew/diagnostic.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles.
