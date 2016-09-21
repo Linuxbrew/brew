@@ -3,8 +3,9 @@ require "tempfile"
 
 class Sandbox
   SANDBOX_EXEC = "/usr/bin/sandbox-exec".freeze
-  SANDBOXED_TAPS = [
-    "homebrew/core",
+  SANDBOXED_TAPS = %w[
+    homebrew/core
+    homebrew/dupes
   ].freeze
 
   def self.available?
