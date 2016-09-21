@@ -123,10 +123,6 @@ describe Hbc::DSL do
   end
 
   describe "language stanza" do
-    after(:each) do
-      ENV["HOMEBREW_LANGUAGES"] = nil
-    end
-
     it "allows multilingual casks" do
       cask = lambda {
         Hbc::Cask.new("cask-with-apps") do
@@ -144,13 +140,13 @@ describe Hbc::DSL do
         end
       }
 
-      ENV["HOMEBREW_LANGUAGES"] = "FIRST_LANGUAGE"
+      MacOS.stubs(languages: ["FIRST_LANGUAGE"])
       cask.call.language.must_equal :first
 
-      ENV["HOMEBREW_LANGUAGES"] = "SECOND_LANGUAGE"
+      MacOS.stubs(languages: ["SECOND_LANGUAGE"])
       cask.call.language.must_equal :second
 
-      ENV["HOMEBREW_LANGUAGES"] = "THIRD_LANGUAGE"
+      MacOS.stubs(languages: ["THIRD_LANGUAGE"])
       cask.call.language.must_equal :default
     end
   end
