@@ -104,6 +104,11 @@ Style/IfUnlessModifier:
 Style/VariableNumber:
   Enabled: false
 
+# TODO: enforce when rubocop has shipped this
+# https://github.com/bbatsov/rubocop/pull/3513
+Style/TernaryParentheses:
+  Enabled: false
+
 # dashes in filenames are typical
 Style/FileName:
   # matches:
