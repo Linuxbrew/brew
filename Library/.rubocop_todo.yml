@@ -281,13 +281,6 @@ Style/RegexpLiteral:
     - 'Homebrew/keg.rb'
     - 'Homebrew/version.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAsExpressionSeparator.
-Style/Semicolon:
-  Exclude:
-    - 'Homebrew/descriptions.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles.

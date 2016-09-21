@@ -136,6 +136,6 @@ class Descriptions
 
   def short_name_counts
     @short_name_counts ||=
-      short_names.values.each_with_object(Hash.new(0)) { |name, counts| counts[name] += 1; counts }
+      short_names.values.each_with_object(Hash.new(0)) { |name, counts| counts[name] += 1 }
   end
 end
