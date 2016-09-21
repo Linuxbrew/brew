@@ -225,12 +225,7 @@ class Hbc::Installer
   def enable_accessibility_access
     return unless @cask.accessibility_access
     ohai "Enabling accessibility access"
-    if MacOS.version >= :sierra
-      opoo <<-EOS.undent
-        Accessibility access cannot be enabled automatically on this version of macOS.
-        See System Preferences to enable it manually.
-      EOS
-    elsif MacOS.version <= :mountain_lion
+    if MacOS.version <= :mountain_lion
       @command.run!("/usr/bin/touch",
                     args: [Hbc.pre_mavericks_accessibility_dotfile],
                     sudo: true)
@@ -241,24 +236,29 @@ class Hbc::Installer
                             "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
                           ],
                     sudo: true)
-    else
+    elsif MacOS.version <= :el_capitan
       @command.run!("/usr/bin/sqlite3",
                     args: [
                             Hbc.tcc_db,
                             "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
                           ],
                     sudo: true)
+    else
+      opoo <<-EOS.undent
+        Accessibility access cannot be enabled automatically on this version of macOS.
+        See System Preferences to enable it manually.
+      EOS
     end
   end
 
   def disable_accessibility_access
     return unless @cask.accessibility_access
-    if MacOS.version >= :sierra
+    if MacOS.version <= :mountain_lion
       opoo <<-EOS.undent
-        Accessibility access cannot be disabled automatically on this version of macOS.
-        See System Preferences to disable it manually.
+        Accessibility access was enabled for #{@cask}, but it is not safe to disable
+        automatically on this version of macOS.  See System Preferences.
       EOS
-    elsif MacOS.version >= :mavericks
+    elsif MacOS.version <= :el_capitan
       ohai "Disabling accessibility access"
       @command.run!("/usr/bin/sqlite3",
                     args: [
@@ -268,8 +268,8 @@ class Hbc::Installer
                     sudo: true)
     else
       opoo <<-EOS.undent
-        Accessibility access was enabled for #{@cask}, but it is not safe to disable
-        automatically on this version of macOS.  See System Preferences.
+        Accessibility access cannot be disabled automatically on this version of macOS.
+        See System Preferences to disable it manually.
       EOS
     end
   end
