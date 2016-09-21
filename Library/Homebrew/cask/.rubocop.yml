@@ -115,9 +115,6 @@ Style/PercentLiteralDelimiters:
     '%W': '[]'
     '%x': '()'
 
-Style/PredicateName:
-  NameWhitelist: is_32_bit?, is_64_bit?
-
 Style/RaiseArgs:
   EnforcedStyle: exploded
 

@@ -145,6 +145,7 @@ Style/MethodName:
 Style/PredicateName:
   Exclude:
     - 'Homebrew/compat/**/*'
+  NameWhitelist: is_32_bit?, is_64_bit?
 
 # `formula do` uses nested method definitions
 Lint/NestedMethodDefinition:

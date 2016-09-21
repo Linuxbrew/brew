@@ -663,7 +663,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
     @shallow && support_depth?
   end
 
-  def is_shallow_clone?
+  def shallow_dir?
     git_dir.join("shallow").exist?
   end
 
@@ -675,7 +675,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
     cached_location.join(".git")
   end
 
-  def has_ref?
+  def ref?
     quiet_system "git", "--git-dir", git_dir, "rev-parse", "-q", "--verify", "#{@ref}^{commit}"
   end
 
@@ -717,8 +717,8 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def update_repo
-    if @ref_type == :branch || !has_ref?
-      if !shallow_clone? && is_shallow_clone?
+    if @ref_type == :branch || !ref?
+      if !shallow_clone? && shallow_dir?
         quiet_safe_system "git", "fetch", "origin", "--unshallow"
       else
         quiet_safe_system "git", "fetch", "origin"
