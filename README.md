@@ -1,3 +1,5 @@
+![Linuxbrew logo](share/doc/homebrew/images/linuxbrew-256x256.png)
+
 # Linuxbrew
 
 [Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the Mac OS package manager, for Linux.
