@@ -185,8 +185,8 @@ module Homebrew
 
     def puts_result
       if ENV["TRAVIS"]
-        travis_start_time = @start_time.to_i*1000000000
-        travis_end_time = @end_time.to_i*1000000000
+        travis_start_time = @start_time.to_i * 1_000_000_000
+        travis_end_time = @end_time.to_i * 1_000_000_000
         travis_duration = travis_end_time - travis_start_time
         puts "#{Tty.white}==>#{Tty.green} PASSED#{Tty.reset}" if passed?
         puts "travis_time:end:#{@travis_timer_id},start=#{travis_start_time},finish=#{travis_end_time},duration=#{travis_duration}"

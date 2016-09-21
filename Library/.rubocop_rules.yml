@@ -11,6 +11,10 @@ Style/StringLiteralsInInterpolation:
 Style/NumericLiterals:
   MinDigits: 7
 
+# zero-prefixed octal literals are just too widely used (and mostly understood)
+Style/NumericLiteralPrefix:
+  EnforcedOctalStyle: zero_only
+
 # percent-x is allowed for multiline
 Style/CommandLiteral:
   EnforcedStyle: mixed
@@ -61,14 +65,6 @@ Lint/ParenthesesAsGroupedExpression:
 # compact style
 Style/EmptyLineBetweenDefs:
   AllowAdjacentOneLineDefs: true
-
-# port numbers and such tech stuff
-Style/NumericLiterals:
-  Enabled: false
-
-# zero-prefixed octal literals are just too widely used (and mostly understood)
-Style/NumericLiteralPrefix:
-  EnforcedOctalStyle: zero_only
 
 # consistency and readability when faced with string interpolation
 Style/PercentLiteralDelimiters:
