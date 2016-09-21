@@ -188,11 +188,6 @@ Style/GuardClause:
     - 'Homebrew/utils/popen.rb'
     - 'Homebrew/version.rb'
 
-# Offense count: 2
-Style/IdenticalConditionalBranches:
-  Exclude:
-    - 'Homebrew/formula_lock.rb'
-
 # Offense count: 52
 # Cop supports --auto-correct.
 # Configuration parameters: MaxLineLength.

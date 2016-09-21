@@ -35,9 +35,8 @@ class FormulaLock
     if @lockfile.nil? || @lockfile.closed?
       @lockfile = @path.open(File::RDWR | File::CREAT)
       @lockfile.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
-      @lockfile
-    else
-      @lockfile
     end
+
+    @lockfile
   end
 end
