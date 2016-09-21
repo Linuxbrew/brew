@@ -563,11 +563,10 @@ module Homebrew
 
       (installed & dependencies).each do |installed_dependency|
         installed_dependency_formula = Formulary.factory(installed_dependency)
-        if installed_dependency_formula.installed? &&
-           !installed_dependency_formula.keg_only? &&
-           !installed_dependency_formula.linked_keg.exist?
-          test "brew", "link", installed_dependency
-        end
+        next unless installed_dependency_formula.installed?
+        next if installed_dependency_formula.keg_only?
+        next if installed_dependency_formula.linked_keg.exist?
+        test "brew", "link", installed_dependency
       end
 
       dependencies -= installed
