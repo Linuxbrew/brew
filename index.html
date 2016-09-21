@@ -19,7 +19,9 @@
     </section>
 
     <section class="main-content">
-      <p><a href="http://linuxbrew.sh">Linuxbrew</a> is a fork of <a href="http://brew.sh">Homebrew</a>, the Mac OS package manager, for Linux.</p>
+      <p><img src="http://linuxbrew.sh/images/linuxbrew-256x256.png" alt="Linuxbrew logo"></p>
+
+<p><a href="http://linuxbrew.sh">Linuxbrew</a> is a fork of <a href="http://brew.sh">Homebrew</a>, the Mac OS package manager, for Linux.</p>
 
 <p>It can be installed in your home directory and does not require root access. The same package manager can be used on both your Linux server and your Mac laptop. Installing a modern version of <em>glibc</em> and <em>gcc</em> in your home directory on an old distribution of Linux takes five minutes.</p>
 
@@ -117,6 +119,13 @@ PATH=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$HOME<
 <div class="highlight highlight-source-shell"><pre>brew install hello</pre></div>
 
 <p>If you're using an older distribution of Linux, installing your first package will also install a recent version of <code>gcc</code>.</p>
+
+<h2>
+<a id="update-bug" class="anchor" href="#update-bug" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update Bug</h2>
+
+<p>If Homebrew was updated on Aug 10-11th 2016 and <code>brew update</code> always says <code>Already up-to-date.</code> you need to run:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-c1">cd</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s"><span class="pl-pds">$(</span>brew --repo<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span> <span class="pl-k">&amp;&amp;</span> git fetch <span class="pl-k">&amp;&amp;</span> git reset --hard origin/master <span class="pl-k">&amp;&amp;</span> brew update</pre></div>
 
 <h2>
 <a id="what-packages-are-available" class="anchor" href="#what-packages-are-available" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What Packages Are Available?</h2>
