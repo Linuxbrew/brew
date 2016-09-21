@@ -45,7 +45,7 @@ module Homebrew
 
   def check_style_impl(files, output_type, options = {})
     fix = options[:fix]
-    Homebrew.install_gem_setup_path! "rubocop", "0.41.2"
+    Homebrew.install_gem_setup_path! "rubocop", "0.43.0"
 
     args = %W[
       --force-exclusion
