@@ -6,6 +6,7 @@ class Sandbox
   SANDBOXED_TAPS = %w[
     homebrew/core
     homebrew/dupes
+    homebrew/fuse
   ].freeze
 
   def self.available?
