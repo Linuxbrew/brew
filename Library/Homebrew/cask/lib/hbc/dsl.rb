@@ -103,8 +103,7 @@ module Hbc
       if !args.empty? && block_given?
         args.each do |arg|
           MacOS.languages.each_with_index do |l, index|
-            string_or_regex = arg == :default ? %r{^en} : arg
-            next unless l.match(string_or_regex)
+            next unless arg == :default || l.match(arg)
             next unless @language.nil? || @language[:level].nil? || @language[:level] > index
             @language = {
                           block: block,
