@@ -42,7 +42,11 @@ module OS
     end
 
     def languages
-      @languages ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+      if ENV["HOMEBREW_LANGUAGES"]
+        ENV["HOMEBREW_LANGUAGES"].split(",")
+      else
+        @languages ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+      end
     end
 
     def language

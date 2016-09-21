@@ -122,6 +122,39 @@ describe Hbc::DSL do
     end
   end
 
+  describe "language stanza" do
+    after(:each) do
+      ENV["HOMEBREW_LANGUAGES"] = nil
+    end
+
+    it "allows multilingual casks" do
+      cask = lambda {
+        Hbc::Cask.new("cask-with-apps") do
+          language "FIRST_LANGUAGE" do
+            :first
+          end
+
+          language %r{SECOND_LANGUAGE} do
+            :second
+          end
+
+          language :default do
+            :default
+          end
+        end
+      }
+
+      ENV["HOMEBREW_LANGUAGES"] = "FIRST_LANGUAGE"
+      cask.call.language.must_equal :first
+
+      ENV["HOMEBREW_LANGUAGES"] = "SECOND_LANGUAGE"
+      cask.call.language.must_equal :second
+
+      ENV["HOMEBREW_LANGUAGES"] = "THIRD_LANGUAGE"
+      cask.call.language.must_equal :default
+    end
+  end
+
   describe "app stanza" do
     it "allows you to specify app stanzas" do
       cask = Hbc::Cask.new("cask-with-apps") do
