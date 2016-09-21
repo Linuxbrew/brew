@@ -754,7 +754,7 @@ module Homebrew
               cd #{HOMEBREW_REPOSITORY}
               git remote add origin https://github.com/Homebrew/brew.git
           EOS
-        elsif origin !~ /Homebrew\/brew(\.git)?$/
+        elsif origin !~ %r{Homebrew/brew(\.git)?$}
           <<-EOS.undent
             Suspicious git origin remote found.
 

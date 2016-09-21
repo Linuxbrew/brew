@@ -62,7 +62,7 @@ class Keg
   end
 
   # locale-specific directories have the form language[_territory][.codeset][@modifier]
-  LOCALEDIR_RX = /(locale|man)\/([a-z]{2}|C|POSIX)(_[A-Z]{2})?(\.[a-zA-Z\-0-9]+(@.+)?)?/
+  LOCALEDIR_RX = %r{(locale|man)/([a-z]{2}|C|POSIX)(_[A-Z]{2})?(\.[a-zA-Z\-0-9]+(@.+)?)?}
   INFOFILE_RX = %r{info/([^.].*?\.info|dir)$}
   TOP_LEVEL_DIRECTORIES = %w[bin etc include lib sbin share var Frameworks].freeze
   ALL_TOP_LEVEL_DIRECTORIES = (TOP_LEVEL_DIRECTORIES + %w[lib/pkgconfig share/locale share/man opt]).freeze
@@ -323,13 +323,13 @@ class Keg
       when "locale/locale.alias" then :skip_file
       when INFOFILE_RX then :info
       when LOCALEDIR_RX then :mkpath
-      when /^icons\/.*\/icon-theme\.cache$/ then :skip_file
+      when %r{^icons/.*/icon-theme\.cache$} then :skip_file
       # all icons subfolders should also mkpath
-      when /^icons\// then :mkpath
+      when %r{^icons/} then :mkpath
       when /^zsh/ then :mkpath
       when /^fish/ then :mkpath
       # Lua, Lua51, Lua53 all need the same handling.
-      when /^lua\// then :mkpath
+      when %r{^lua/} then :mkpath
       when %r{^guile/} then :mkpath
       when *SHARE_PATHS then :mkpath
       else :link
@@ -367,7 +367,7 @@ class Keg
       # the :link strategy. However, for Foo.framework and
       # Foo.framework/Versions we have to use :mkpath so that multiple formulae
       # can link their versions into it and `brew [un]link` works.
-      if relative_path.to_s =~ /[^\/]*\.framework(\/Versions)?$/
+      if relative_path.to_s =~ %r{[^/]*\.framework(/Versions)?$}
         :mkpath
       else
         :link

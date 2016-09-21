@@ -271,16 +271,6 @@ Style/OpMethod:
     - 'Homebrew/install_renamed.rb'
     - 'Homebrew/options.rb'
 
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, AllowInnerSlashes.
-# SupportedStyles: slashes, percent_r, mixed
-Style/RegexpLiteral:
-  Exclude:
-    - 'Homebrew/diagnostic.rb'
-    - 'Homebrew/keg.rb'
-    - 'Homebrew/version.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: SupportedStyles.
