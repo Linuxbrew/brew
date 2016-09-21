@@ -696,7 +696,8 @@ class GitDownloadStrategy < VCSDownloadStrategy
     args << "--depth" << "1" if shallow_clone?
 
     case @ref_type
-    when :branch, :tag then args << "--branch" << @ref
+    when :branch, :tag
+      args << "--branch" << @ref
     end
 
     args << @url << cached_location
@@ -741,9 +742,11 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def reset_args
     ref = case @ref_type
-          when :branch then "origin/#{@ref}"
-          when :revision, :tag then @ref
-          end
+    when :branch
+      "origin/#{@ref}"
+    when :revision, :tag
+      @ref
+    end
 
     %W[reset --hard #{ref}]
   end

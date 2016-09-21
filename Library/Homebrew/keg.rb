@@ -249,10 +249,10 @@ class Keg
 
   def completion_installed?(shell)
     dir = case shell
-          when :bash then path.join("etc", "bash_completion.d")
-          when :zsh  then path.join("share", "zsh", "site-functions")
-          when :fish then path.join("share", "fish", "vendor_completions.d")
-          end
+    when :bash then path.join("etc", "bash_completion.d")
+    when :zsh  then path.join("share", "zsh", "site-functions")
+    when :fish then path.join("share", "fish", "vendor_completions.d")
+    end
     dir && dir.directory? && !dir.children.empty?
   end
 

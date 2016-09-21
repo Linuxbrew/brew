@@ -6,16 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: AlignWith, SupportedStyles, AutoCorrect.
-# SupportedStyles: keyword, variable, start_of_line
-Lint/EndAlignment:
-  Exclude:
-    - 'Homebrew/download_strategy.rb'
-    - 'Homebrew/keg.rb'
-    - 'Homebrew/os/mac/cctools_mach.rb'
-
 # Offense count: 18
 Lint/HandleExceptions:
   Exclude:
