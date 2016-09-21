@@ -42,11 +42,6 @@ Lint/NestedMethodDefinition:
     - 'Homebrew/dev-cmd/bottle.rb'
     - 'Homebrew/dev-cmd/test-bot.rb'
 
-# Offense count: 2
-Lint/NonLocalExitFromIterator:
-  Exclude:
-    - 'Homebrew/extend/pathname.rb'
-
 # Offense count: 28
 Lint/RescueException:
   Exclude:
