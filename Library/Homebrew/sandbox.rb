@@ -7,6 +7,7 @@ class Sandbox
     homebrew/core
     homebrew/dupes
     homebrew/fuse
+    homebrew/devel-only
   ].freeze
 
   def self.available?
