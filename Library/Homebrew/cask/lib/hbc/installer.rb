@@ -227,8 +227,8 @@ class Hbc::Installer
     ohai "Enabling accessibility access"
     if MacOS.version >= :sierra
       opoo <<-EOS.undent
-        Access denied to accessibility DB (TCC.db) by SIP on this version of macOS.
-        If needed, enable manually via the app or System Preferences.
+        Accessibility access cannot be enabled automatically on this version of macOS.
+        See System Preferences to enable it manually.
       EOS
     elsif MacOS.version <= :mountain_lion
       @command.run!("/usr/bin/touch",
@@ -255,8 +255,8 @@ class Hbc::Installer
     return unless @cask.accessibility_access
     if MacOS.version >= :sierra
       opoo <<-EOS.undent
-        Access denied to accessibility DB (TCC.db) by SIP on this version of macOS.
-        If needed, disable manually via the app or System Preferences.
+        Accessibility access cannot be disabled automatically on this version of macOS.
+        See System Preferences to disable it manually.
       EOS
     elsif MacOS.version >= :mavericks
       ohai "Disabling accessibility access"
