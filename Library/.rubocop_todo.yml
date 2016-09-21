@@ -242,18 +242,6 @@ Style/IfUnlessModifier:
 Style/IndentArray:
   EnforcedStyle: special_inside_parentheses
 
-# Offense count: 5
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: snake_case, camelCase
-Style/MethodName:
-  Exclude:
-    - 'Homebrew/compat/**/*'
-    - 'Homebrew/cleanup.rb'
-    - 'Homebrew/diagnostic.rb'
-    - 'Homebrew/formula_cellar_checks.rb'
-    - 'Homebrew/formula_installer.rb'
-    - 'Homebrew/os/mac/cctools_mach.rb'
-
 # Offense count: 7
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: module_function, extend_self

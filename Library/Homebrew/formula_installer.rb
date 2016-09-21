@@ -546,7 +546,7 @@ class FormulaInstaller
     @build_time ||= Time.now - @start_time if @start_time && !interactive?
   end
 
-  def sanitized_ARGV_options
+  def sanitized_argv_options
     args = []
     args << "--ignore-dependencies" if ignore_deps?
 
@@ -585,7 +585,7 @@ class FormulaInstaller
   end
 
   def build_argv
-    sanitized_ARGV_options + options.as_flags
+    sanitized_argv_options + options.as_flags
   end
 
   def build
@@ -813,8 +813,8 @@ class FormulaInstaller
   end
 
   def audit_installed
-    audit_check_output(check_PATH(formula.bin))
-    audit_check_output(check_PATH(formula.sbin))
+    audit_check_output(check_env_path(formula.bin))
+    audit_check_output(check_env_path(formula.sbin))
     super
   end
 

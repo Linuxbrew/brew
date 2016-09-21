@@ -595,7 +595,7 @@ module Homebrew
         EOS
       end
 
-      def check_DYLD_vars
+      def check_dyld_vars
         dyld_vars = ENV.keys.grep(/^DYLD_/)
         return if dyld_vars.empty?
 

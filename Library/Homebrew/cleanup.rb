@@ -12,7 +12,7 @@ module Homebrew
       cleanup_logs
       unless ARGV.dry_run?
         cleanup_lockfiles
-        rm_DS_Store
+        rm_ds_store
       end
     end
 
@@ -119,7 +119,7 @@ module Homebrew
       end
     end
 
-    def self.rm_DS_Store
+    def self.rm_ds_store
       paths = Queue.new
       %w[Cellar Frameworks Library bin etc include lib opt sbin share var]
         .map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }

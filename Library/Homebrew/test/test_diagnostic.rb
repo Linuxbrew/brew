@@ -154,7 +154,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   def test_check_dyld_vars
     ENV["DYLD_INSERT_LIBRARIES"] = "foo"
     assert_match "Setting DYLD_INSERT_LIBRARIES",
-      @checks.check_DYLD_vars
+      @checks.check_dyld_vars
   end
 
   def test_check_for_symlinked_cellar
