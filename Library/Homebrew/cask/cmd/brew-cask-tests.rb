@@ -19,10 +19,6 @@ repo_root.cd do
   rspec = ARGV.flag?("--rspec") || !ARGV.flag?("--minitest")
   minitest = ARGV.flag?("--minitest") || !ARGV.flag?("--rspec")
 
-  # TODO: setting the --seed here is an ugly temporary hack, to remain only
-  #       until test-suite glitches are fixed.
-  ENV["TESTOPTS"] = "--seed=14830" if ENV["TRAVIS"]
-
   ENV["HOMEBREW_TESTS_COVERAGE"] = "1" if ARGV.flag?("--coverage")
 
   if rspec
