@@ -6,12 +6,12 @@ module Hbc::Caskroom
     if !Hbc.caskroom.exist? && repo_caskroom.directory?
       ohai "Moving Caskroom from HOMEBREW_REPOSITORY to HOMEBREW_PREFIX"
 
-      unless Hbc.caskroom.parent.writable?
-        opoo "#{Hbc.caskroom.parent} is not writable, changing owner to current user."
-        system "/usr/bin/sudo", "--", "/usr/sbin/chown", "--", "#{Hbc::Utils.current_user}:staff", Hbc.caskroom.parent.to_s
+      if Hbc.caskroom.parent.writable?
+        FileUtils.mv repo_caskroom, Hbc.caskroom
+      else
+        opoo "#{Hbc.caskroom.parent} is not writable, sudo is needed to move the Caskroom."
+        system "/usr/bin/sudo", "--", "/bin/mv", "--", repo_caskroom.to_s, Hbc.caskroom.parent.to_s
       end
-
-      FileUtils.mv repo_caskroom, Hbc.caskroom
     end
   end
 
