@@ -67,6 +67,8 @@ Style/BlockDelimiters:
     - chdir
     - context
     - create
+    - define_method
+    - define_singleton_method
     - each_with_object
     - fork
     - measure
