@@ -109,14 +109,6 @@ Style/CaseEquality:
   Exclude:
     - 'Homebrew/compilers.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: IndentWhenRelativeTo, SupportedStyles, IndentOneStep, IndentationWidth.
-# SupportedStyles: case, end
-Style/CaseIndentation:
-  Exclude:
-    - 'Homebrew/keg.rb'
-
 # Offense count: 11
 Style/ClassVars:
   Exclude:

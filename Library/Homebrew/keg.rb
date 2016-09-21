@@ -66,8 +66,13 @@ class Keg
   INFOFILE_RX = %r{info/([^.].*?\.info|dir)$}
   TOP_LEVEL_DIRECTORIES = %w[bin etc include lib sbin share var Frameworks].freeze
   ALL_TOP_LEVEL_DIRECTORIES = (TOP_LEVEL_DIRECTORIES + %w[lib/pkgconfig share/locale share/man opt]).freeze
-  PRUNEABLE_DIRECTORIES = %w[bin etc include lib sbin share Frameworks LinkedKegs var/homebrew/linked].map do |d|
-    case d when "LinkedKegs" then HOMEBREW_LIBRARY/d else HOMEBREW_PREFIX/d end
+  PRUNEABLE_DIRECTORIES = %w[bin etc include lib sbin share Frameworks LinkedKegs var/homebrew/linked].map do |dir|
+    case dir
+    when "LinkedKegs"
+      HOMEBREW_LIBRARY/dir
+    else
+      HOMEBREW_PREFIX/dir
+    end
   end
 
   # These paths relative to the keg's share directory should always be real
