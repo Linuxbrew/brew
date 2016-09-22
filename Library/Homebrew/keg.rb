@@ -292,6 +292,21 @@ class Keg
     PkgVersion.parse(path.basename.to_s)
   end
 
+  def formula
+    Formulary.from_keg(self)
+  end
+
+  def installed_dependants
+    Formula.installed.flat_map(&:installed_kegs).select do |keg|
+      Tab.for_keg(keg).runtime_dependencies.any? do |dep|
+        # Resolve formula rather than directly comparing names
+        # in case of conflicts between formulae from different taps.
+        dep_formula = Formulary.factory(dep["full_name"])
+        dep_formula == formula && dep["version"] == version.to_s
+      end
+    end
+  end
+
   def find(*args, &block)
     path.find(*args, &block)
   end

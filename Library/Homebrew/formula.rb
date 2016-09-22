@@ -1337,6 +1337,13 @@ class Formula
     end
   end
 
+  # Clear caches of .racks and .installed.
+  # @private
+  def self.clear_cache
+    @racks = nil
+    @installed = nil
+  end
+
   # An array of all racks currently installed.
   # @private
   def self.racks
