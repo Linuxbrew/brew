@@ -14,13 +14,13 @@ module Homebrew
       end
 
       def fatal_development_tools_checks
-        if MacOS.prerelease?
+        if ENV["TRAVIS"] || ARGV.homebrew_developer?
           %w[
-            check_xcode_up_to_date
-            check_clt_up_to_date
           ]
         else
           %w[
+            check_xcode_up_to_date
+            check_clt_up_to_date
           ]
         end
       end
