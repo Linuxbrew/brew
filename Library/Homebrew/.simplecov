@@ -20,7 +20,13 @@ SimpleCov.start do
     at_exit do
       exit_code = $!.nil? ? 0 : $!.status
       $stdout.reopen("/dev/null")
-      SimpleCov.result # Just save result, but don't write formatted output.
+
+      # Just save result, but don't write formatted output.
+      coverage_result = Coverage.result
+      SimpleCov.add_not_loaded_files(coverage_result)
+      simplecov_result = SimpleCov::Result.new(coverage_result)
+      SimpleCov::ResultMerger.store_result(simplecov_result)
+
       exit! exit_code
     end
   else
