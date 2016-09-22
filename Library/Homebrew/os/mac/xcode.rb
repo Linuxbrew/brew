@@ -209,9 +209,9 @@ module OS
 
       def outdated?
         if MacOS.version >= :mavericks
-          version = `#{MAVERICKS_PKG_PATH}/usr/bin/clang --version`
+          version = Utils.popen_read("#{MAVERICKS_PKG_PATH}/usr/bin/clang --version")
         else
-          version = `/usr/bin/clang --version`
+          version = Utils.popen_read("/usr/bin/clang --version")
         end
         version = version[/clang-(\d+\.\d+\.\d+(\.\d+)?)/, 1] || "0"
         version < latest_version
