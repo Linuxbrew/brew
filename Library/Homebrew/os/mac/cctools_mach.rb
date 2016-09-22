@@ -1,6 +1,7 @@
 module CctoolsMachO
   # @private
   OTOOL_RX = /\t(.*) \(compatibility version (?:\d+\.)*\d+, current version (?:\d+\.)*\d+\)/
+  LDD_RX = /\t.* => (.*) \(.*\)/
 
   # Mach-O binary methods, see:
   # /usr/include/mach-o/loader.h
@@ -70,11 +71,16 @@ module CctoolsMachO
 
     def initialize(path)
       @path = path
-      @dylib_id, @dylibs = parse_otool_L_output
+      @dylib_id, @dylibs = if OS.mac?
+        parse_otool_L_output
+      elsif OS.linux?
+        parse_ldd_output
+      else
+        [nil, []]
+      end
     end
 
     def parse_otool_L_output
-      return nil, [] unless OS.mac?
       args = ["-L", path.expand_path.to_s]
       libs = Utils.popen_read(OS::Mac.otool, *args).split("\n")
       unless $?.success?
@@ -85,6 +91,26 @@ module CctoolsMachO
 
       id = libs.shift[OTOOL_RX, 1] if path.dylib?
       libs.map! { |lib| lib[OTOOL_RX, 1] }.compact!
+
+      [id, libs]
+    end
+
+    def parse_ldd_output
+      id = nil
+      if path.dylib?
+        args = ["patchelf", "--print-soname", path.expand_path.to_s]
+        id = Utils.popen_read(*args).split("\n")
+        unless $?.success?
+          raise ErrorDuringExecution.new(args)
+        end
+      end
+
+      args = ["ldd", path.expand_path.to_s]
+      libs = Utils.popen_read(*args).split("\n")
+      unless $?.success?
+        raise ErrorDuringExecution.new(args)
+      end
+      libs.map! { |lib| lib[LDD_RX, 1] }.compact!
 
       [id, libs]
     end
