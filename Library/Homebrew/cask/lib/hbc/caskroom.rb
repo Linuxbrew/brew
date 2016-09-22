@@ -5,7 +5,13 @@ module Hbc::Caskroom
     repo_caskroom = Hbc.homebrew_repository.join("Caskroom")
     if !Hbc.caskroom.exist? && repo_caskroom.directory?
       ohai "Moving Caskroom from HOMEBREW_REPOSITORY to HOMEBREW_PREFIX"
-      FileUtils.mv repo_caskroom, Hbc.caskroom
+
+      if Hbc.caskroom.parent.writable?
+        FileUtils.mv repo_caskroom, Hbc.caskroom
+      else
+        opoo "#{Hbc.caskroom.parent} is not writable, sudo is needed to move the Caskroom."
+        system "/usr/bin/sudo", "--", "/bin/mv", "--", repo_caskroom.to_s, Hbc.caskroom.parent.to_s
+      end
     end
   end
 
