@@ -36,11 +36,17 @@ module Homebrew
     @@n += 1
     return ohai "#{@@n}. #{formula}: Skipping because GitHub rate limits pull requests" if @@n > limit
 
+    tap_dir = formula.tap.formula_dir
+    cd tap_dir
+
+    unless `git status --untracked-files=all --porcelain 2>/dev/null`.chomp.empty?
+      return ohai "#{formula}: Skipping because you have uncommitted changes to #{tap_dir}"
+    end
+
     message = "#{formula}: Build a bottle for Linuxbrew"
     oh1 "#{@@n}. #{message}"
     return if ARGV.dry_run?
 
-    cd formula.tap.formula_dir
     File.open(formula.path, "r+") do |f|
       s = f.read
       f.rewind
