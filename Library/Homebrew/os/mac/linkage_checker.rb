@@ -48,6 +48,7 @@ class LinkageChecker
     end
 
     @undeclared_deps = check_undeclared_deps if formula
+    @undeclared_deps = @undeclared_deps - ["gcc", "glibc"] if OS.linux?
   end
 
   def check_undeclared_deps
