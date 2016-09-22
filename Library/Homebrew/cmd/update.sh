@@ -258,14 +258,6 @@ EOS
   if [[ -n "$UPSTREAM_TAG" ]] ||
      [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
-
-    if [[ -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
-    then
-      echo "Checking out $UPSTREAM_BRANCH in $DIR..."
-      echo "To checkout $INITIAL_BRANCH in $DIR run:"
-      echo "  'cd $DIR && git checkout $INITIAL_BRANCH"
-    fi
-
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
     # it to `origin/#{@upstream_branch}`. Otherwise, just check it out.
     if [[ -z "$UPSTREAM_TAG" ]] &&
