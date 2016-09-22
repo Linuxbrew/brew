@@ -15,7 +15,7 @@ module OS
         when "10.8"  then "5.1.1"
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
-        when "10.11" then "7.3.1"
+        when "10.11" then "8.0"
         when "10.12" then "8.0"
         else
           # Default to newest known version of Xcode for unreleased macOS versions.
@@ -193,6 +193,9 @@ module OS
       end
 
       def latest_version
+        # As of Xcode 8 CLT releases are no longer in sync with Xcode releases
+        # on the older supported platform for that Xcode release, i.e there's no
+        # CLT package for 10.11 that contains the Clang version from Xcode 8.
         case MacOS.version
         when "10.12" then "800.0.38"
         when "10.11" then "703.0.31"
@@ -206,9 +209,9 @@ module OS
 
       def outdated?
         if MacOS.version >= :mavericks
-          version = `#{MAVERICKS_PKG_PATH}/usr/bin/clang --version`
+          version = Utils.popen_read("#{MAVERICKS_PKG_PATH}/usr/bin/clang --version")
         else
-          version = `/usr/bin/clang --version`
+          version = Utils.popen_read("/usr/bin/clang --version")
         end
         version = version[/clang-(\d+\.\d+\.\d+(\.\d+)?)/, 1] || "0"
         version < latest_version
