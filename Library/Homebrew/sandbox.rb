@@ -77,7 +77,7 @@ class Sandbox
 
   # Xcode projects expect access to certain cache/archive dirs.
   def allow_write_xcode
-    allow_write_path "/Users/#{ENV["USER"]}/Library/Developer/Xcode/DerivedData/"
+    allow_write_path "/Users/#{ENV["USER"]}/Library/Developer"
   end
 
   def allow_write_log(formula)
