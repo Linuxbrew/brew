@@ -14,15 +14,10 @@ module Homebrew
       end
 
       def fatal_development_tools_checks
-        if MacOS.prerelease?
-          %w[
-            check_xcode_up_to_date
-            check_clt_up_to_date
-          ]
-        else
-          %w[
-          ]
-        end
+        %w[
+          check_xcode_up_to_date
+          check_clt_up_to_date
+        ]
       end
 
       def check_for_unsupported_macos
