@@ -193,9 +193,12 @@ module OS
       end
 
       def latest_version
+        # As of Xcode 8 CLT releases are no longer in sync with Xcode releases
+        # on the older supported platform for that Xcode release, i.e there's no
+        # CLT package for 10.11 that contains the Clang version from Xcode 8.
         case MacOS.version
         when "10.12" then "800.0.38"
-        when "10.11" then "800.0.38"
+        when "10.11" then "703.0.31"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"
         when "10.8"  then "503.0.40"
