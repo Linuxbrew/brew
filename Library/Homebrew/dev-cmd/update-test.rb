@@ -1,9 +1,9 @@
-#:  * `update-test` [`--commit=<sha1>`] [`--before=<date>`] [`--keep-tmp`]:
+#:  * `update-test` [`--commit=<commit>`] [`--before=<date>`] [`--keep-tmp`]:
 #:    Runs a test of `brew update` with a new repository clone.
 #:
 #:    If no arguments are passed, use `origin/master` as the start commit.
 #:
-#:    If `--commit=<sha1>` is passed, use `<sha1>` as the start commit.
+#:    If `--commit=<commit>` is passed, use `<commit>` as the start commit.
 #:
 #:    If `--before=<date>` is passed, use the commit at `<date>` as the
 #:    start commit.
