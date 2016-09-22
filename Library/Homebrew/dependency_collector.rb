@@ -135,6 +135,10 @@ class DependencyCollector
     end
   end
 
+  def ant_dep(spec, tags)
+    Dependency.new(spec.to_s, tags)
+  end
+
   def resource_dep(spec, tags)
     tags << :build
     strategy = spec.download_strategy
