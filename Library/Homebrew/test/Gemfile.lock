@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/colszowka/simplecov.git
-  revision: 257e26394c464c4ab388631b4eff1aa98c37d3f1
+  revision: 83d8031ddde0927f87ef9327200a98583ca18d77
   branch: master
   specs:
     simplecov (0.12.0)
