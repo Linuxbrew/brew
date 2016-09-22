@@ -17,7 +17,7 @@ class GlibcRequirement < Requirement
       Pathname.new(s).executable?
     end
     raise "Unable to locate the system's glibc" unless libc
-    version = Utils.popen_read(libc)[/version (\d\.\d+)/, 1]
+    version = Utils.popen_read("#{libc} 2>&1")[/[Vv]ersion (\d\.\d+)/, 1]
     raise "Unable to determine the system's glibc version" unless version
     @@system_version = version
   end
