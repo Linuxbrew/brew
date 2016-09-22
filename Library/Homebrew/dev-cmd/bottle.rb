@@ -51,10 +51,11 @@ module Homebrew
       end
 
       @put_filenames ||= []
-      unless @put_filenames.include? filename
-        puts "#{Tty.red}#{filename}#{Tty.reset}"
-        @put_filenames << filename
-      end
+
+      return if @put_filenames.include? filename
+
+      puts "#{Tty.red}#{filename}#{Tty.reset}"
+      @put_filenames << filename
     end
 
     result = false
@@ -137,11 +138,11 @@ module Homebrew
     tap = f.tap
 
     unless tap
-      if ARGV.include?("--force-core-tap")
-        tap = CoreTap.instance
-      else
+      unless ARGV.include?("--force-core-tap")
         return ofail "Formula not from core or any taps: #{f.full_name}"
       end
+
+      tap = CoreTap.instance
     end
 
     if f.bottle_disabled?
@@ -323,34 +324,33 @@ module Homebrew
     puts "./#{filename}"
     puts output
 
-    if ARGV.include? "--json"
-      json = {
-        f.full_name => {
-          "formula" => {
-            "pkg_version" => f.pkg_version.to_s,
-            "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
-          },
-          "bottle" => {
-            "root_url" => bottle.root_url,
-            "prefix" => bottle.prefix,
-            "cellar" => bottle.cellar.to_s,
-            "rebuild" => bottle.rebuild,
-            "tags" => {
-              Utils::Bottles.tag.to_s => {
-                "filename" => filename.to_s,
-                "sha256" => sha256,
-              },
+    return unless ARGV.include? "--json"
+    json = {
+      f.full_name => {
+        "formula" => {
+          "pkg_version" => f.pkg_version.to_s,
+          "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
+        },
+        "bottle" => {
+          "root_url" => bottle.root_url,
+          "prefix" => bottle.prefix,
+          "cellar" => bottle.cellar.to_s,
+          "rebuild" => bottle.rebuild,
+          "tags" => {
+            Utils::Bottles.tag.to_s => {
+              "filename" => filename.to_s,
+              "sha256" => sha256,
             },
           },
-          "bintray" => {
-            "package" => Utils::Bottles::Bintray.package(f.name),
-            "repository" => Utils::Bottles::Bintray.repository(tap),
-          },
         },
-      }
-      File.open("#{filename.prefix}.bottle.json", "w") do |file|
-        file.write Utils::JSON.dump json
-      end
+        "bintray" => {
+          "package" => Utils::Bottles::Bintray.package(f.name),
+          "repository" => Utils::Bottles::Bintray.repository(tap),
+        },
+      },
+    }
+    File.open("#{filename.prefix}.bottle.json", "w") do |file|
+      file.write Utils::JSON.dump json
     end
   end
 

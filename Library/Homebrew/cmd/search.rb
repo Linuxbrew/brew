@@ -171,10 +171,11 @@ module Homebrew
       rescue
         canonical_name = canonical_full_name = name
       end
+
       # Ignore aliases from results when the full name was also found
-      if aliases.include?(name) && results.include?(canonical_full_name)
-        next
-      elsif (HOMEBREW_CELLAR/canonical_name).directory?
+      next if aliases.include?(name) && results.include?(canonical_full_name)
+
+      if (HOMEBREW_CELLAR/canonical_name).directory?
         pretty_installed(name)
       else
         name

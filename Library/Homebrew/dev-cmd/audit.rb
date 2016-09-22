@@ -83,11 +83,11 @@ module Homebrew
       end
     end
 
-    unless problem_count.zero?
-      problems = "problem" + plural(problem_count)
-      formulae = "formula" + plural(formula_count, "e")
-      ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
-    end
+    return if problem_count.zero?
+
+    problems = "problem" + plural(problem_count)
+    formulae = "formula" + plural(formula_count, "e")
+    ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
   end
 end
 
@@ -279,9 +279,11 @@ class FormulaAuditor
         end
       end
     end
+
     if present.include?("head") && present.include?("head block")
       problem "Should not have both `head` and `head do`"
     end
+
     if present.include?("bottle modifier") && present.include?("bottle block")
       problem "Should not have `bottle :unneeded/:disable` and `bottle do`"
     end
@@ -668,24 +670,26 @@ class FormulaAuditor
     end
 
     revision_map = attributes_map[:revision]
-    if formula.revision.nonzero?
-      if formula.stable
-        if revision_map[formula.stable.version].empty? # check stable spec
-          problem "'revision #{formula.revision}' should be removed"
-        end
-      else # head/devel-only formula
+
+    return if formula.revision.zero?
+
+    if formula.stable
+      if revision_map[formula.stable.version].empty? # check stable spec
         problem "'revision #{formula.revision}' should be removed"
       end
+    else # head/devel-only formula
+      problem "'revision #{formula.revision}' should be removed"
     end
   end
 
   def audit_legacy_patches
     return unless formula.respond_to?(:patches)
     legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
-    unless legacy_patches.empty?
-      problem "Use the patch DSL instead of defining a 'patches' method"
-      legacy_patches.each { |p| audit_patch(p) }
-    end
+
+    return if legacy_patches.empty?
+
+    problem "Use the patch DSL instead of defining a 'patches' method"
+    legacy_patches.each { |p| audit_patch(p) }
   end
 
   def audit_patch(patch)
@@ -961,61 +965,56 @@ class FormulaAuditor
       problem "Use Language::Node for npm install args"
     end
 
-    if @strict
-      if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
-        bad_system = $1
-        unless %w[| < > & ; *].any? { |c| bad_system.include? c }
-          good_system = bad_system.gsub(" ", "\", \"")
-          problem "Use `system #{good_system}` instead of `system #{bad_system}` "
-        end
-      end
+    return unless @strict
 
-      if line =~ /(require ["']formula["'])/
-        problem "`#{$1}` is now unnecessary"
+    if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
+      bad_system = $1
+      unless %w[| < > & ; *].any? { |c| bad_system.include? c }
+        good_system = bad_system.gsub(" ", "\", \"")
+        problem "Use `system #{good_system}` instead of `system #{bad_system}` "
       end
+    end
 
-      if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
-        problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
-      end
+    if line =~ /(require ["']formula["'])/
+      problem "`#{$1}` is now unnecessary"
+    end
 
-      if line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
-        problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
-      end
+    if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
+      problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
+    end
+
+    if line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
+      problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
     end
   end
 
   def audit_caveats
-    caveats = formula.caveats.to_s
-
-    if caveats.include?("setuid")
-      problem "Don't recommend setuid in the caveats, suggest sudo instead."
-    end
+    return unless formula.caveats.to_s.include?("setuid")
+    problem "Don't recommend setuid in the caveats, suggest sudo instead."
   end
 
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
     return unless formula.tap && formula.tap.official?
+    return unless formula.tap.tap_migrations.key?(formula.name)
 
-    if formula.tap.tap_migrations.key?(formula.name)
-      problem <<-EOS.undent
-        #{formula.name} seems to be listed in tap_migrations.json!
-        Please remove #{formula.name} from present tap & tap_migrations.json
-        before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
-      EOS
-    end
+    problem <<-EOS.undent
+      #{formula.name} seems to be listed in tap_migrations.json!
+      Please remove #{formula.name} from present tap & tap_migrations.json
+      before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
+    EOS
   end
 
   def audit_prefix_has_contents
     return unless formula.prefix.directory?
+    return unless Keg.new(formula.prefix).empty_installation?
 
-    if Keg.new(formula.prefix).empty_installation?
-      problem <<-EOS.undent
-        The installation seems to be empty. Please ensure the prefix
-        is set correctly and expected files are installed.
-        The prefix configure/make argument may be case-sensitive.
-      EOS
-    end
+    problem <<-EOS.undent
+      The installation seems to be empty. Please ensure the prefix
+      is set correctly and expected files are installed.
+      The prefix configure/make argument may be case-sensitive.
+    EOS
   end
 
   def audit_conditional_dep(dep, condition, line)
@@ -1184,9 +1183,7 @@ class ResourceAuditor
       end
     end
 
-    using_strategy = DownloadStrategyDetector.detect("", using)
-
-    if url_strategy == using_strategy
+    if url_strategy == DownloadStrategyDetector.detect("", using)
       problem "Redundant :using value in URL"
     end
   end
