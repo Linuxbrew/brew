@@ -1,6 +1,6 @@
 class Keg
   def change_dylib_id(id, file)
-    @require_install_name_tool = true
+    @require_relocation = true
     puts "Changing dylib ID of #{file}\n  from #{file.dylib_id}\n    to #{id}" if ARGV.debug?
     MachO::Tools.change_dylib_id(file, id, strict: false)
   rescue MachO::MachOError
@@ -13,7 +13,7 @@ class Keg
   end
 
   def change_install_name(old, new, file)
-    @require_install_name_tool = true
+    @require_relocation = true
     puts "Changing install name in #{file}\n  from #{old}\n    to #{new}" if ARGV.debug?
     MachO::Tools.change_install_name(file, old, new, strict: false)
   rescue MachO::MachOError
@@ -25,7 +25,7 @@ class Keg
     raise
   end
 
-  def require_install_name_tool?
-    @require_install_name_tool
+  def require_relocation?
+    @require_relocation
   end
 end
