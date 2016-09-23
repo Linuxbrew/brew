@@ -14,13 +14,13 @@ module Homebrew
       end
 
       def fatal_development_tools_checks
-        if ENV["TRAVIS"] || ARGV.homebrew_developer?
-          %w[
-          ]
-        else
+        if MacOS.version >= :sierra && ENV["CI"].nil?
           %w[
             check_xcode_up_to_date
             check_clt_up_to_date
+          ]
+        else
+          %w[
           ]
         end
       end
