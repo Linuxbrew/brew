@@ -119,13 +119,6 @@ Style/ConstantName:
   Exclude:
     - 'Homebrew/os/mac.rb'
 
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: format, sprintf, percent
-Style/FormatString:
-  Exclude:
-    - 'Homebrew/formula.rb'
-
 # Offense count: 13
 # Configuration parameters: AllowedVariables.
 Style/GlobalVars:
