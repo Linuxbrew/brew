@@ -45,9 +45,8 @@ class TestbotStepTests < Homebrew::TestCase
   end
 
   def teardown
-    unless passed?
-      raise "INFO: Previous test failed with ENV['TRAVIS'] = #{ENV["TRAVIS"].inspect}"
-    end
+    return if passed?
+    raise "INFO: Previous test failed with ENV['TRAVIS'] = #{ENV["TRAVIS"].inspect}"
   end
 
   def stub_test_instance

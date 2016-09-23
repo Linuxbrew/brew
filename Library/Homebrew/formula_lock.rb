@@ -10,16 +10,14 @@ class FormulaLock
   def lock
     HOMEBREW_LOCK_DIR.mkpath
     @lockfile = get_or_create_lockfile
-    unless @lockfile.flock(File::LOCK_EX | File::LOCK_NB)
-      raise OperationInProgressError, @name
-    end
+    return if @lockfile.flock(File::LOCK_EX | File::LOCK_NB)
+    raise OperationInProgressError, @name
   end
 
   def unlock
-    unless @lockfile.nil? || @lockfile.closed?
-      @lockfile.flock(File::LOCK_UN)
-      @lockfile.close
-    end
+    return if @lockfile.nil? || @lockfile.closed?
+    @lockfile.flock(File::LOCK_UN)
+    @lockfile.close
   end
 
   def with_lock

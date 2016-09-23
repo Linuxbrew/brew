@@ -549,11 +549,10 @@ class ReporterHub
       end
     end
 
-    unless formulae.empty?
-      # Dump formula list.
-      ohai title
-      puts_columns(formulae)
-    end
+    return if formulae.empty?
+    # Dump formula list.
+    ohai title
+    puts_columns(formulae)
   end
 
   def installed?(formula)

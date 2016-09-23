@@ -14,11 +14,8 @@ module Utils
   def self.popen(args, mode)
     IO.popen("-", mode) do |pipe|
       if pipe
-        if block_given?
-          yield pipe
-        else
-          return pipe.read
-        end
+        return pipe.read unless block_given?
+        yield pipe
       else
         $stderr.reopen("/dev/null", "w")
         exec(*args)

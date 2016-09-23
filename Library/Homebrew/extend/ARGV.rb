@@ -88,11 +88,11 @@ module HomebrewArgvExtension
             Formulary.from_rack(rack)
           end
 
-          if (prefix = f.installed_prefix).directory?
-            Keg.new(prefix)
-          else
+          unless (prefix = f.installed_prefix).directory?
             raise MultipleVersionsInstalledError, rack.basename
           end
+
+          Keg.new(prefix)
         end
       rescue FormulaUnavailableError
         raise <<-EOS.undent

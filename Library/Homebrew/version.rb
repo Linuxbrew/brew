@@ -192,11 +192,10 @@ class Version
   end
 
   def initialize(val)
-    if val.respond_to?(:to_str)
-      @version = val.to_str
-    else
+    unless val.respond_to?(:to_str)
       raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
     end
+    @version = val.to_str
   end
 
   def detected_from_url?

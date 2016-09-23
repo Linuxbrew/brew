@@ -531,19 +531,19 @@ module Homebrew
             req = Net::HTTP::Head.new bottle_info.url
             req.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
             res = http.request req
-            if res.is_a?(Net::HTTPSuccess)
-              break
-            elsif res.is_a?(Net::HTTPClientError)
-              if retry_count >= max_retries
-                raise "Failed to find published #{f} bottle at #{url}!"
-              end
-              print(wrote_dots ? "." : "Waiting on Bintray.")
-              wrote_dots = true
-              sleep poll_retry_delay_seconds
-              retry_count += 1
-            else
+            break if res.is_a?(Net::HTTPSuccess)
+
+            unless res.is_a?(Net::HTTPClientError)
               raise "Failed to find published #{f} bottle at #{url} (#{res.code} #{res.message})!"
             end
+
+            if retry_count >= max_retries
+              raise "Failed to find published #{f} bottle at #{url}!"
+            end
+            print(wrote_dots ? "." : "Waiting on Bintray.")
+            wrote_dots = true
+            sleep poll_retry_delay_seconds
+            retry_count += 1
           end
         end
 

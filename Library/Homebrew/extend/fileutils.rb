@@ -89,10 +89,9 @@ module FileUtils
   # A version of mkdir that also changes to that folder in a block.
   def mkdir(name, &_block)
     old_mkdir(name)
-    if block_given?
-      chdir name do
-        yield
-      end
+    return unless block_given?
+    chdir name do
+      yield
     end
   end
   module_function :mkdir
