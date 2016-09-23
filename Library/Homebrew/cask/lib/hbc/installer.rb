@@ -236,19 +236,24 @@ class Hbc::Installer
                             "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
                           ],
                     sudo: true)
-    else
+    elsif MacOS.version <= :el_capitan
       @command.run!("/usr/bin/sqlite3",
                     args: [
                             Hbc.tcc_db,
                             "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
                           ],
                     sudo: true)
+    else
+      opoo <<-EOS.undent
+        Accessibility access cannot be enabled automatically on this version of macOS.
+        See System Preferences to enable it manually.
+      EOS
     end
   end
 
   def disable_accessibility_access
     return unless @cask.accessibility_access
-    if MacOS.version >= :mavericks
+    if MacOS.version >= :mavericks && MacOS.version <= :el_capitan
       ohai "Disabling accessibility access"
       @command.run!("/usr/bin/sqlite3",
                     args: [
@@ -258,8 +263,8 @@ class Hbc::Installer
                     sudo: true)
     else
       opoo <<-EOS.undent
-        Accessibility access was enabled for #{@cask}, but it is not safe to disable
-        automatically on this version of macOS.  See System Preferences.
+        Accessibility access cannot be disabled automatically on this version of macOS.
+        See System Preferences to disable it manually.
       EOS
     end
   end
