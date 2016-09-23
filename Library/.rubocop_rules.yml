@@ -110,13 +110,7 @@ Style/TernaryParentheses:
 
 # dashes in filenames are typical
 Style/FileName:
-  # matches:
-  #   file_name.rb (default)
-  #   file-name.rb, --filename.rb (command names)
-  #   FILENAME.rb (ARGV and ENV)
-  # does not match:
-  #   dashes-and_underscores.rb
-  Regex: !ruby/regexp /^((([\dA-Z]+|[\da-z\+]+)(_([\dA-Z]+|[\da-z\+]+))*|(\-\-)?([\dA-Z]+|[\da-z\+\.]+)([-@]([\dA-Z]+|[\da-z\+\.]+))*))(\.rb)?$/
+  Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
 
 # no percent word array, being friendly to non-ruby users
 # TODO: enforce when rubocop has fixed this
