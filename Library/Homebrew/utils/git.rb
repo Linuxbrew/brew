@@ -22,9 +22,7 @@ module Utils
     return if git_available?
 
     # we cannot install brewed git if homebrew/core is unavailable.
-    unless CoreTap.instance.installed?
-      raise "Git is unavailable"
-    end
+    raise "Git is unavailable" unless CoreTap.instance.installed?
 
     begin
       oh1 "Installing git"

@@ -49,7 +49,7 @@ class DependencyCollector
   end
 
   def cache_key(spec)
-    if Resource === spec && spec.download_strategy == CurlDownloadStrategy
+    if spec.is_a?(Resource) && spec.download_strategy == CurlDownloadStrategy
       File.extname(spec.url)
     else
       spec
@@ -57,7 +57,7 @@ class DependencyCollector
   end
 
   def build(spec)
-    spec, tags = Hash === spec ? spec.first : spec
+    spec, tags = spec.is_a?(Hash) ? spec.first : spec
     parse_spec(spec, Array(tags))
   end
 
@@ -81,7 +81,7 @@ class DependencyCollector
   end
 
   def parse_string_spec(spec, tags)
-    if HOMEBREW_TAP_FORMULA_REGEX === spec
+    if spec =~ HOMEBREW_TAP_FORMULA_REGEX
       TapDependency.new(spec, tags)
     elsif tags.empty?
       Dependency.new(spec, tags)
@@ -165,11 +165,11 @@ class DependencyCollector
 
   def parse_url_spec(url, tags)
     case File.extname(url)
-    when ".xz"  then Dependency.new("xz", tags)
+    when ".xz"          then Dependency.new("xz", tags)
     when ".lha", ".lzh" then Dependency.new("lha", tags)
-    when ".lz"  then Dependency.new("lzip", tags)
-    when ".rar" then Dependency.new("unrar", tags)
-    when ".7z"  then Dependency.new("p7zip", tags)
+    when ".lz"          then Dependency.new("lzip", tags)
+    when ".rar"         then Dependency.new("unrar", tags)
+    when ".7z"          then Dependency.new("p7zip", tags)
     end
   end
 end

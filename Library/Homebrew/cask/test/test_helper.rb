@@ -10,7 +10,7 @@ project_root = Pathname.new(File.expand_path("../..", __FILE__))
 tap_root = Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask")
 
 # add Homebrew to load path
-$LOAD_PATH.unshift(File.expand_path("#{ENV['HOMEBREW_REPOSITORY']}/Library/Homebrew"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew"))
 
 require "global"
 

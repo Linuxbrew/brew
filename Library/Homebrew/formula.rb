@@ -395,9 +395,7 @@ class Formula
   def oldname
     @oldname ||= if tap
       formula_renames = tap.formula_renames
-      if formula_renames.value?(name)
-        formula_renames.to_a.rassoc(name).first
-      end
+      formula_renames.to_a.rassoc(name).first if formula_renames.value?(name)
     end
   end
 
@@ -1052,7 +1050,7 @@ class Formula
     self.class.link_overwrite_paths.any? do |p|
       p == to_check ||
         to_check.start_with?(p.chomp("/") + "/") ||
-        /^#{Regexp.escape(p).gsub('\*', ".*?")}$/ === to_check
+        to_check =~ /^#{Regexp.escape(p).gsub('\*', ".*?")}$/
     end
   end
 
@@ -1246,7 +1244,7 @@ class Formula
 
   # @private
   def <=>(other)
-    return unless Formula === other
+    return unless other.is_a?(Formula)
     name <=> other.name
   end
 
@@ -1776,9 +1774,7 @@ class Formula
     ENV["HOMEBREW_CC_LOG_PATH"] = logfn
 
     # TODO: system "xcodebuild" is deprecated, this should be removed soon.
-    if cmd.to_s.start_with? "xcodebuild"
-      ENV.remove_cc_etc
-    end
+    ENV.remove_cc_etc if cmd.to_s.start_with? "xcodebuild"
 
     # Turn on argument filtering in the superenv compiler wrapper.
     # We should probably have a better mechanism for this than adding
@@ -1786,9 +1782,7 @@ class Formula
     if cmd == "python"
       setup_py_in_args = %w[setup.py build.py].include?(args.first)
       setuptools_shim_in_args = args.any? { |a| a.to_s.start_with? "import setuptools" }
-      if setup_py_in_args || setuptools_shim_in_args
-        ENV.refurbish_args
-      end
+      ENV.refurbish_args if setup_py_in_args || setuptools_shim_in_args
     end
 
     $stdout.reopen(out)
@@ -2226,7 +2220,7 @@ class Formula
     # If this formula conflicts with another one.
     # <pre>conflicts_with "imagemagick", :because => "because this is just a stupid example"</pre>
     def conflicts_with(*names)
-      opts = Hash === names.last ? names.pop : {}
+      opts = names.last.is_a?(Hash) ? names.pop : {}
       names.each { |name| conflicts << FormulaConflict.new(name, opts[:because]) }
     end
 

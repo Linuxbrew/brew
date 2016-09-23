@@ -192,15 +192,11 @@ module Stdenv
   end
 
   def libcxx
-    if compiler == :clang
-      append "CXX", "-stdlib=libc++"
-    end
+    append "CXX", "-stdlib=libc++" if compiler == :clang
   end
 
   def libstdcxx
-    if compiler == :clang
-      append "CXX", "-stdlib=libstdc++"
-    end
+    append "CXX", "-stdlib=libstdc++" if compiler == :clang
   end
 
   # @private

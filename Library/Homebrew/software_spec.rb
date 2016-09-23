@@ -65,11 +65,12 @@ class SoftwareSpec
   end
 
   def bottle_unneeded?
-    !!@bottle_disable_reason && @bottle_disable_reason.unneeded?
+    return false unless @bottle_disable_reason
+    @bottle_disable_reason.unneeded?
   end
 
   def bottle_disabled?
-    !!@bottle_disable_reason
+    @bottle_disable_reason ? true : false
   end
 
   attr_reader :bottle_disable_reason
@@ -116,12 +117,12 @@ class SoftwareSpec
 
   def option(name, description = "")
     opt = PREDEFINED_OPTIONS.fetch(name) do
-      if Symbol === name
+      if name.is_a?(Symbol)
         opoo "Passing arbitrary symbols to `option` is deprecated: #{name.inspect}"
         puts "Symbols are reserved for future use, please pass a string instead"
         name = name.to_s
       end
-      unless String === name
+      unless name.is_a?(String)
         raise ArgumentError, "option name must be string or symbol; got a #{name.class}: #{name}"
       end
       raise ArgumentError, "option name is required" if name.empty?
@@ -318,7 +319,7 @@ class BottleSpecification
   end
 
   def tag?(tag)
-    !!checksum_for(tag)
+    checksum_for(tag) ? true : false
   end
 
   # Checksum methods in the DSL's bottle block optionally take

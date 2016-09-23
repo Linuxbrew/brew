@@ -24,7 +24,9 @@ class FormulaInstaller
     private(*names)
     names.each do |name|
       predicate = "#{name}?"
-      define_method(predicate) { !!send(name) }
+      define_method(predicate) do
+        send(name) ? true : false
+      end
       private(predicate)
     end
   end
@@ -71,7 +73,8 @@ class FormulaInstaller
   end
 
   def build_bottle?
-    !!@build_bottle && !formula.bottle_disabled?
+    return false unless @build_bottle
+    !formula.bottle_disabled?
   end
 
   def pour_bottle?(install_bottle_options = { warn: false })
@@ -254,9 +257,7 @@ class FormulaInstaller
 
     unless @poured_bottle
       not_pouring = !pour_bottle || @pour_failed
-      if not_pouring && !ignore_deps?
-        compute_and_install_dependencies
-      end
+      compute_and_install_dependencies if not_pouring && !ignore_deps?
       build
       clean
     end
@@ -543,7 +544,7 @@ class FormulaInstaller
     @build_time ||= Time.now - @start_time if @start_time && !interactive?
   end
 
-  def sanitized_ARGV_options
+  def sanitized_argv_options
     args = []
     args << "--ignore-dependencies" if ignore_deps?
 
@@ -582,7 +583,7 @@ class FormulaInstaller
   end
 
   def build_argv
-    sanitized_ARGV_options + options.as_flags
+    sanitized_argv_options + options.as_flags
   end
 
   def build
@@ -810,8 +811,8 @@ class FormulaInstaller
   end
 
   def audit_installed
-    audit_check_output(check_PATH(formula.bin))
-    audit_check_output(check_PATH(formula.sbin))
+    audit_check_output(check_env_path(formula.bin))
+    audit_check_output(check_env_path(formula.sbin))
     super
   end
 

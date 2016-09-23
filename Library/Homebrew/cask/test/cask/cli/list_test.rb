@@ -79,9 +79,9 @@ describe Hbc::CLI::List do
         Hbc::CLI::List.run("local-transmission", "local-caffeine")
       }.must_output <<-EOS.undent
       ==> Apps
-      #{Hbc.appdir.join('Transmission.app')} (#{Hbc.appdir.join('Transmission.app').abv})
+      #{Hbc.appdir.join("Transmission.app")} (#{Hbc.appdir.join("Transmission.app").abv})
       ==> Apps
-      Missing App: #{Hbc.appdir.join('Caffeine.app')}
+      Missing App: #{Hbc.appdir.join("Caffeine.app")}
     EOS
     end
   end

@@ -663,19 +663,19 @@ class GitDownloadStrategy < VCSDownloadStrategy
     @shallow && support_depth?
   end
 
-  def is_shallow_clone?
+  def shallow_dir?
     git_dir.join("shallow").exist?
   end
 
   def support_depth?
-    @ref_type != :revision && SHALLOW_CLONE_WHITELIST.any? { |rx| rx === @url }
+    @ref_type != :revision && SHALLOW_CLONE_WHITELIST.any? { |regex| @url =~ regex }
   end
 
   def git_dir
     cached_location.join(".git")
   end
 
-  def has_ref?
+  def ref?
     quiet_system "git", "--git-dir", git_dir, "rev-parse", "-q", "--verify", "#{@ref}^{commit}"
   end
 
@@ -696,7 +696,8 @@ class GitDownloadStrategy < VCSDownloadStrategy
     args << "--depth" << "1" if shallow_clone?
 
     case @ref_type
-    when :branch, :tag then args << "--branch" << @ref
+    when :branch, :tag
+      args << "--branch" << @ref
     end
 
     args << @url << cached_location
@@ -716,8 +717,8 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def update_repo
-    if @ref_type == :branch || !has_ref?
-      if !shallow_clone? && is_shallow_clone?
+    if @ref_type == :branch || !ref?
+      if !shallow_clone? && shallow_dir?
         quiet_safe_system "git", "fetch", "origin", "--unshallow"
       else
         quiet_safe_system "git", "fetch", "origin"
@@ -741,9 +742,11 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def reset_args
     ref = case @ref_type
-          when :branch then "origin/#{@ref}"
-          when :revision, :tag then @ref
-          end
+    when :branch
+      "origin/#{@ref}"
+    when :revision, :tag
+      @ref
+    end
 
     %W[reset --hard #{ref}]
   end
@@ -1021,9 +1024,9 @@ class DownloadStrategyDetector
   def self.detect(url, strategy = nil)
     if strategy.nil?
       detect_from_url(url)
-    elsif Class === strategy && strategy < AbstractDownloadStrategy
+    elsif strategy.is_a?(Class) && strategy < AbstractDownloadStrategy
       strategy
-    elsif Symbol === strategy
+    elsif strategy.is_a?(Symbol)
       detect_from_symbol(strategy)
     else
       raise TypeError,

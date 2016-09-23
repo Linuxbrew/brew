@@ -51,10 +51,11 @@ module Homebrew
       end
 
       @put_filenames ||= []
-      unless @put_filenames.include? filename
-        puts "#{Tty.red}#{filename}#{Tty.reset}"
-        @put_filenames << filename
-      end
+
+      return if @put_filenames.include? filename
+
+      puts "#{Tty.red}#{filename}#{Tty.reset}"
+      @put_filenames << filename
     end
 
     result = false
@@ -107,9 +108,7 @@ module Homebrew
     absolute_symlinks_start_with_string = []
     keg.find do |pn|
       next unless pn.symlink? && (link = pn.readlink).absolute?
-      if link.to_s.start_with?(string)
-        absolute_symlinks_start_with_string << pn
-      end
+      absolute_symlinks_start_with_string << pn if link.to_s.start_with?(string)
     end
 
     if ARGV.verbose?
@@ -137,11 +136,11 @@ module Homebrew
     tap = f.tap
 
     unless tap
-      if ARGV.include?("--force-core-tap")
-        tap = CoreTap.instance
-      else
+      unless ARGV.include?("--force-core-tap")
         return ofail "Formula not from core or any taps: #{f.full_name}"
       end
+
+      tap = CoreTap.instance
     end
 
     if f.bottle_disabled?
@@ -154,9 +153,7 @@ module Homebrew
       return ofail "Formula not installed with '--build-bottle': #{f.full_name}"
     end
 
-    unless f.stable
-      return ofail "Formula has no stable version: #{f.full_name}"
-    end
+    return ofail "Formula has no stable version: #{f.full_name}" unless f.stable
 
     if ARGV.include?("--no-rebuild") || !f.tap
       rebuild = 0
@@ -323,34 +320,33 @@ module Homebrew
     puts "./#{filename}"
     puts output
 
-    if ARGV.include? "--json"
-      json = {
-        f.full_name => {
-          "formula" => {
-            "pkg_version" => f.pkg_version.to_s,
-            "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
-          },
-          "bottle" => {
-            "root_url" => bottle.root_url,
-            "prefix" => bottle.prefix,
-            "cellar" => bottle.cellar.to_s,
-            "rebuild" => bottle.rebuild,
-            "tags" => {
-              Utils::Bottles.tag.to_s => {
-                "filename" => filename.to_s,
-                "sha256" => sha256,
-              },
+    return unless ARGV.include? "--json"
+    json = {
+      f.full_name => {
+        "formula" => {
+          "pkg_version" => f.pkg_version.to_s,
+          "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
+        },
+        "bottle" => {
+          "root_url" => bottle.root_url,
+          "prefix" => bottle.prefix,
+          "cellar" => bottle.cellar.to_s,
+          "rebuild" => bottle.rebuild,
+          "tags" => {
+            Utils::Bottles.tag.to_s => {
+              "filename" => filename.to_s,
+              "sha256" => sha256,
             },
           },
-          "bintray" => {
-            "package" => Utils::Bottles::Bintray.package(f.name),
-            "repository" => Utils::Bottles::Bintray.repository(tap),
-          },
         },
-      }
-      File.open("#{filename.prefix}.bottle.json", "w") do |file|
-        file.write Utils::JSON.dump json
-      end
+        "bintray" => {
+          "package" => Utils::Bottles::Bintray.package(f.name),
+          "repository" => Utils::Bottles::Bintray.repository(tap),
+        },
+      },
+    }
+    File.open("#{filename.prefix}.bottle.json", "w") do |file|
+      file.write Utils::JSON.dump json
     end
   end
 
@@ -436,7 +432,7 @@ module Homebrew
             puts output
             update_or_add = "add"
             if s.include? "stable do"
-              indent = s.slice(/^ +stable do/).length - "stable do".length
+              indent = s.slice(/^( +)stable do/, 1).length
               string = s.sub!(/^ {#{indent}}stable do(.|\n)+?^ {#{indent}}end\n/m, '\0' + output + "\n")
             else
               string = s.sub!(

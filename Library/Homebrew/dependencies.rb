@@ -69,7 +69,7 @@ class Requirements
   end
 
   def <<(other)
-    if Comparable === other
+    if other.is_a?(Comparable)
       @reqs.grep(other.class) do |req|
         return self if req > other
         @reqs.delete(req)

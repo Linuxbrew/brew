@@ -1,10 +1,8 @@
-require: 'rubocop-cask'
-
 AllCops:
   TargetRubyVersion: 2.0
   Exclude:
+    - '**/.simplecov'
     - '**/Casks/**/*'
-    - 'developer/**/*'
     - '**/vendor/**/*'
 
 Metrics/AbcSize:
@@ -16,10 +14,10 @@ Metrics/ClassLength:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Metrics/MethodLength:
+Metrics/LineLength:
   Enabled: false
 
-Metrics/PerceivedComplexity:
+Metrics/MethodLength:
   Enabled: false
 
 Metrics/ModuleLength:
@@ -28,6 +26,16 @@ Metrics/ModuleLength:
     - 'lib/hbc/locations.rb'
     - 'lib/hbc/macos.rb'
     - 'lib/hbc/utils.rb'
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Style/AlignHash:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+Style/BarePercentLiterals:
+  EnforcedStyle: percent_q
 
 Style/BlockDelimiters:
   EnforcedStyle: semantic
@@ -59,6 +67,8 @@ Style/BlockDelimiters:
     - chdir
     - context
     - create
+    - define_method
+    - define_singleton_method
     - each_with_object
     - fork
     - measure
@@ -75,15 +85,47 @@ Style/BlockDelimiters:
     - lambda
     - proc
 
-
 Style/ClassAndModuleChildren:
   EnforcedStyle: compact
 
-Style/PredicateName:
-  NameWhitelist: is_32_bit?, is_64_bit?
+Style/Documentation:
+  Enabled: false
+
+Style/FileName:
+  Regex: !ruby/regexp /^((([\dA-Z]+|[\da-z]+)(_([\dA-Z]+|[\da-z]+))*|(\-\-)?([\dA-Z]+|[\da-z]+)(-([\dA-Z]+|[\da-z]+))*))(\.rb)?$/
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+Style/IndentArray:
+  EnforcedStyle: align_brackets
+
+Style/IndentHash:
+  EnforcedStyle: align_braces
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    '%':  '{}'
+    '%i': '{}'
+    '%q': '{}'
+    '%Q': '{}'
+    '%r': '{}'
+    '%s': '()'
+    '%w': '[]'
+    '%W': '[]'
+    '%x': '()'
 
 Style/RaiseArgs:
   EnforcedStyle: exploded
 
+Style/RegexpLiteral:
+  EnforcedStyle: percent_r
+
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma

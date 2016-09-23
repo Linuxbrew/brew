@@ -62,7 +62,7 @@ class Hbc::CLI::InternalAuditModifiedCasks < Hbc::CLI::InternalUseBase
   end
 
   def git_root
-    @git_root ||= git(*%w[rev-parse --show-toplevel])
+    @git_root ||= git("rev-parse", "--show-toplevel")
   end
 
   def modified_cask_files
@@ -83,8 +83,8 @@ class Hbc::CLI::InternalAuditModifiedCasks < Hbc::CLI::InternalUseBase
     @modified_casks = modified_cask_files.map { |f| Hbc.load(f) }
     if @modified_casks.any?
       num_modified = @modified_casks.size
-      ohai "#{num_modified} modified #{pluralize('cask', num_modified)}: " \
-        "#{@modified_casks.join(' ')}"
+      ohai "#{num_modified} modified #{pluralize("cask", num_modified)}: " \
+        "#{@modified_casks.join(" ")}"
     end
     @modified_casks
   end
@@ -122,7 +122,7 @@ class Hbc::CLI::InternalAuditModifiedCasks < Hbc::CLI::InternalUseBase
     num_failed = failed_casks.size
     cask_pluralized = pluralize("cask", num_failed)
     odie "audit failed for #{num_failed} #{cask_pluralized}: " \
-      "#{failed_casks.join(' ')}"
+      "#{failed_casks.join(" ")}"
   end
 
   def pluralize(str, num)

@@ -22,7 +22,7 @@ class XcodeRequirement < Requirement
   satisfy(build_env: false) { xcode_installed_version }
 
   def initialize(tags)
-    @version = tags.find { |t| tags.delete(t) if /(\d\.)+\d/ === t }
+    @version = tags.find { |tag| tags.delete(tag) if tag =~ /(\d\.)+\d/ }
     super
   end
 
@@ -39,11 +39,11 @@ class XcodeRequirement < Requirement
       Installing just the Command Line Tools is not sufficient.
     EOS
     if MacOS.version >= :lion
-      message += <<-EOS.undent
+      message + <<-EOS.undent
         Xcode can be installed from the App Store.
       EOS
     else
-      message += <<-EOS.undent
+      message + <<-EOS.undent
         Xcode can be installed from https://developer.apple.com/xcode/downloads/
       EOS
     end

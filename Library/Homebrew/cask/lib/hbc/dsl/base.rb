@@ -13,9 +13,17 @@ class Hbc::DSL::Base
   end
 
   def method_missing(method, *)
-    underscored_class = self.class.name.gsub(%r{([[:lower:]])([[:upper:]][[:lower:]])}, '\1_\2').downcase
-    section = underscored_class.downcase.split("::").last
-    Hbc::Utils.method_missing_message(method, @cask.to_s, section)
-    nil
+    if method
+      underscored_class = self.class.name.gsub(%r{([[:lower:]])([[:upper:]][[:lower:]])}, '\1_\2').downcase
+      section = underscored_class.downcase.split("::").last
+      Hbc::Utils.method_missing_message(method, @cask.to_s, section)
+      nil
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(*)
+    true
   end
 end

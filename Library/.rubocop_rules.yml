@@ -7,6 +7,14 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
+# only for numbers >= 1_000_000
+Style/NumericLiterals:
+  MinDigits: 7
+
+# zero-prefixed octal literals are just too widely used (and mostly understood)
+Style/NumericLiteralPrefix:
+  EnforcedOctalStyle: zero_only
+
 # percent-x is allowed for multiline
 Style/CommandLiteral:
   EnforcedStyle: mixed
@@ -58,14 +66,6 @@ Lint/ParenthesesAsGroupedExpression:
 Style/EmptyLineBetweenDefs:
   AllowAdjacentOneLineDefs: true
 
-# port numbers and such tech stuff
-Style/NumericLiterals:
-  Enabled: false
-
-# zero-prefixed octal literals are just too widely used (and mostly understood)
-Style/NumericLiteralPrefix:
-  EnforcedOctalStyle: zero_only
-
 # consistency and readability when faced with string interpolation
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
@@ -93,15 +93,31 @@ Style/AlignParameters:
 
 # counterproductive in formulas, notably within the install method
 Style/GuardClause:
-  Enabled: false
+  Exclude:
+    - 'Taps/**/*'
 Style/IfUnlessModifier:
+  Exclude:
+    - 'Taps/**/*'
+
+# TODO: enforce when rubocop has fixed this
+# https://github.com/bbatsov/rubocop/issues/3516
+Style/VariableNumber:
+  Enabled: false
+
+# TODO: enforce when rubocop has shipped this
+# https://github.com/bbatsov/rubocop/pull/3513
+Style/TernaryParentheses:
   Enabled: false
 
 # dashes in filenames are typical
-# TODO: enforce when rubocop has fixed this
-# https://github.com/bbatsov/rubocop/issues/1545
 Style/FileName:
-  Enabled: false
+  # matches:
+  #   file_name.rb (default)
+  #   file-name.rb, --filename.rb (command names)
+  #   FILENAME.rb (ARGV and ENV)
+  # does not match:
+  #   dashes-and_underscores.rb
+  Regex: !ruby/regexp /^((([\dA-Z]+|[\da-z]+)(_([\dA-Z]+|[\da-z]+))*|(\-\-)?([\dA-Z]+|[\da-z]+)(-([\dA-Z]+|[\da-z]+))*))(\.rb)?$/
 
 # no percent word array, being friendly to non-ruby users
 # TODO: enforce when rubocop has fixed this
@@ -134,6 +150,7 @@ Style/MethodName:
 Style/PredicateName:
   Exclude:
     - 'Homebrew/compat/**/*'
+  NameWhitelist: is_32_bit?, is_64_bit?
 
 # `formula do` uses nested method definitions
 Lint/NestedMethodDefinition:
