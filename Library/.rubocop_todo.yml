@@ -92,14 +92,6 @@ Style/AccessorMethodName:
     - 'Homebrew/migrator.rb'
 
 # Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: prefer_alias, prefer_alias_method
-Style/Alias:
-  Exclude:
-    - 'Homebrew/blacklist.rb'
-
-# Offense count: 1
 Style/CaseEquality:
   Exclude:
     - 'Homebrew/compilers.rb'
@@ -118,13 +110,6 @@ Style/ClassVars:
 Style/ConstantName:
   Exclude:
     - 'Homebrew/os/mac.rb'
-
-# Offense count: 1
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: format, sprintf, percent
-Style/FormatString:
-  Exclude:
-    - 'Homebrew/formula.rb'
 
 # Offense count: 13
 # Configuration parameters: AllowedVariables.
@@ -194,8 +179,6 @@ Style/ModuleFunction:
     - 'Homebrew/os/mac.rb'
     - 'Homebrew/os/mac/xcode.rb'
     - 'Homebrew/os/mac/xquartz.rb'
-    - 'Homebrew/utils/github.rb'
-    - 'Homebrew/utils/json.rb'
 
 # Offense count: 8
 Style/MultilineBlockChain:

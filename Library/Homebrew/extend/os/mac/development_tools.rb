@@ -3,7 +3,7 @@ require "os/mac/xcode"
 # @private
 class DevelopmentTools
   class << self
-    alias_method :original_locate, :locate
+    alias original_locate locate
     def locate(tool)
       (@locate ||= {}).fetch(tool) do |key|
         @locate[key] = if (located_tool = original_locate(tool))

@@ -118,9 +118,9 @@ class Keg
   end
 
   if Pathname.method_defined?(:to_path)
-    alias_method :to_path, :to_s
+    alias to_path to_s
   else
-    alias_method :to_str, :to_s
+    alias to_str to_s
   end
 
   def inspect
@@ -130,7 +130,7 @@ class Keg
   def ==(other)
     instance_of?(other.class) && path == other.path
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def hash
     path.hash

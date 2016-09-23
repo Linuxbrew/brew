@@ -25,7 +25,7 @@ class AmazonWebServicesFormula < Formula
     libexec.install Dir["*"]
     bin.install_symlink Dir["#{libexec}/bin/*"] - ["#{libexec}/bin/service"]
   end
-  alias_method :standard_install, :install
+  alias standard_install install
 
   # Use this method to generate standard caveats.
   def standard_instructions(home_name, home_value = libexec)

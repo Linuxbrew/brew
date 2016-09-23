@@ -84,7 +84,7 @@ module FileUtils
   end
 
   # @private
-  alias_method :old_mkdir, :mkdir
+  alias old_mkdir mkdir
 
   # A version of mkdir that also changes to that folder in a block.
   def mkdir(name, &_block)
@@ -122,7 +122,7 @@ module FileUtils
 
   if method_defined?(:ruby)
     # @private
-    alias_method :old_ruby, :ruby
+    alias old_ruby ruby
   end
 
   # Run the `ruby` Homebrew is using rather than whatever is in the `PATH`.

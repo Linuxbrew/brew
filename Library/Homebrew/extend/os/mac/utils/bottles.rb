@@ -21,7 +21,7 @@ module Utils
     class Collector
       private
 
-      alias_method :original_find_matching_tag, :find_matching_tag
+      alias original_find_matching_tag find_matching_tag
       def find_matching_tag(tag)
         original_find_matching_tag(tag) || find_altivec_tag(tag) || find_or_later_tag(tag)
       end

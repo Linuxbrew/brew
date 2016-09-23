@@ -1,7 +1,7 @@
 require "dependency_collector"
 
 class DependencyCollector
-  alias_method :_parse_symbol_spec, :parse_symbol_spec
+  alias _parse_symbol_spec parse_symbol_spec
 
   def parse_symbol_spec(spec, tags)
     case spec

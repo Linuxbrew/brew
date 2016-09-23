@@ -118,6 +118,6 @@ module Superenv
 
   # These methods are no longer necessary under superenv, but are needed to
   # maintain an interface compatible with stdenv.
-  alias_method :macosxsdk, :noop
-  alias_method :remove_macosxsdk, :noop
+  alias macosxsdk noop
+  alias remove_macosxsdk noop
 end

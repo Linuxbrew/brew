@@ -13,7 +13,7 @@ class String
   #               sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
   #               mollit anim id est laborum.
   #               EOS
-  alias_method :undent_________________________________________________________72, :undent
+  alias undent_________________________________________________________72 undent
 
   # String.chomp, but if result is empty: returns nil instead.
   # Allows `chuzzle || foo` short-circuits.

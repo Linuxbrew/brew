@@ -14,7 +14,7 @@ module Debrew
       super(e) unless Debrew.debug(e) == :ignore
     end
 
-    alias_method :fail, :raise
+    alias fail raise
   end
 
   module Formula
@@ -75,7 +75,7 @@ module Debrew
   end
 
   class << self
-    alias_method :original_raise, :raise
+    alias original_raise raise
   end
 
   @active = false
