@@ -1,9 +1,9 @@
-#:  * `update-test` [`--commit=<sha1>`] [`--before=<date>`] [`--keep-tmp`]:
+#:  * `update-test` [`--commit=<commit>`] [`--before=<date>`] [`--keep-tmp`]:
 #:    Runs a test of `brew update` with a new repository clone.
 #:
 #:    If no arguments are passed, use `origin/master` as the start commit.
 #:
-#:    If `--commit=<sha1>` is passed, use `<sha1>` as the start commit.
+#:    If `--commit=<commit>` is passed, use `<commit>` as the start commit.
 #:
 #:    If `--before=<date>` is passed, use the commit at `<date>` as the
 #:    start commit.
@@ -14,18 +14,18 @@
 module Homebrew
   def update_test
     cd HOMEBREW_REPOSITORY
-    start_sha1 = if commit = ARGV.value("commit")
+    start_commit = if commit = ARGV.value("commit")
       commit
     elsif date = ARGV.value("before")
       Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
     else
       Utils.popen_read("git", "rev-parse", "origin/master").chomp
     end
-    start_sha1 = Utils.popen_read("git", "rev-parse", start_sha1).chomp
-    end_sha1 = Utils.popen_read("git", "rev-parse", "HEAD").chomp
+    start_commit = Utils.popen_read("git", "rev-parse", start_commit).chomp
+    end_commit = Utils.popen_read("git", "rev-parse", "HEAD").chomp
 
-    puts "Start commit: #{start_sha1}"
-    puts "End   commit: #{end_sha1}"
+    puts "Start commit: #{start_commit}"
+    puts "End   commit: #{end_commit}"
 
     mktemp("update-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
@@ -39,12 +39,12 @@ module Homebrew
       safe_system "git", "clone", "--local", "--bare", "#{HOMEBREW_REPOSITORY}/.git", "remote.git"
       safe_system "git", "config", "remote.origin.url", "#{curdir}/remote.git"
 
-      # force push origin to end_sha1
-      safe_system "git", "checkout", "-B", "master", end_sha1
+      # force push origin to end_commit
+      safe_system "git", "checkout", "-B", "master", end_commit
       safe_system "git", "push", "--force", "origin", "master"
 
-      # set test copy to start_sha1
-      safe_system "git", "reset", "--hard", start_sha1
+      # set test copy to start_commit
+      safe_system "git", "reset", "--hard", start_commit
 
       # update ENV["PATH"]
       ENV["PATH"] = "#{curdir}/bin:/usr/local/bin:/usr/bin:/bin"
@@ -52,13 +52,13 @@ module Homebrew
       # run brew update
       oh1 "Running brew update..."
       safe_system "brew", "update", "--verbose"
-      actual_end_sha1 = Utils.popen_read("git", "rev-parse", "master").chomp
-      if start_sha1 != end_sha1 && start_sha1 == actual_end_sha1
+      actual_end_commit = Utils.popen_read("git", "rev-parse", "master").chomp
+      if start_commit != end_commit && start_commit == actual_end_commit
         raise <<-EOS.undent
           brew update didn't update master!
-          Start commit:        #{start_sha1}
-          Expected end commit: #{end_sha1}
-          Actual end commit:   #{actual_end_sha1}
+          Start commit:        #{start_commit}
+          Expected end commit: #{end_commit}
+          Actual end commit:   #{actual_end_commit}
         EOS
       end
     end
