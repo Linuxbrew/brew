@@ -749,7 +749,7 @@ module Homebrew
       end
     end
 
-    def cleanup_git
+    def cleanup_shared
       git "gc", "--auto"
       test "git", "clean", "-ffdx", "--exclude=Library/Taps"
 
@@ -759,8 +759,8 @@ module Homebrew
         safe_system "brew", "untap", tap
       end
 
-      Formula.installed.each do |formula|
-        safe_system "brew", "uninstall", "--force", formula
+      Dir.glob("#{HOMEBREW_PREFIX}/{Cellar,etc,var}/**/*").each do |file|
+        FileUtils.rm_rf file
       end
       safe_system "brew", "prune"
 
@@ -792,7 +792,7 @@ module Homebrew
         git "reset", "--hard", "origin/master"
       end
 
-      cleanup_git
+      cleanup_shared
 
       pr_locks = "#{@repository}/.git/refs/remotes/*/pr/*/*.lock"
       Dir.glob(pr_locks) { |lock| FileUtils.rm_rf lock }
@@ -813,7 +813,7 @@ module Homebrew
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
 
-        cleanup_git
+        cleanup_shared
 
         if ARGV.include? "--local"
           FileUtils.rm_rf ENV["HOMEBREW_HOME"]
