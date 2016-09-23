@@ -187,8 +187,6 @@ Style/ModuleFunction:
     - 'Homebrew/os/mac.rb'
     - 'Homebrew/os/mac/xcode.rb'
     - 'Homebrew/os/mac/xquartz.rb'
-    - 'Homebrew/utils/github.rb'
-    - 'Homebrew/utils/json.rb'
 
 # Offense count: 8
 Style/MultilineBlockChain:

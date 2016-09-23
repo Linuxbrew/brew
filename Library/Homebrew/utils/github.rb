@@ -2,7 +2,8 @@ require "uri"
 require "tempfile"
 
 module GitHub
-  extend self
+  module_function
+
   ISSUES_URI = URI.parse("https://api.github.com/search/issues")
 
   Error = Class.new(RuntimeError)
