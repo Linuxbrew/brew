@@ -1,5 +1,5 @@
 #:  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] <formula>:
-#:    A few formulae provide a test method. `brew test` <formula> runs this
+#:    Most formulae provide a test method. `brew test` <formula> runs this
 #:    test method. There is no standard output or return code, but it should
 #:    generally indicate to the user if something is wrong with the installed
 #:    formula.
