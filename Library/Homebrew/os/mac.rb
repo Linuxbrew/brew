@@ -45,26 +45,6 @@ module OS
       @language ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").delete(" \n\"()").sub(/,.*/, "")
     end
 
-    # Locates a (working) copy of install_name_tool, guaranteed to function
-    # whether the user has developer tools installed or not.
-    def install_name_tool
-      if (path = HOMEBREW_PREFIX/"opt/cctools/bin/install_name_tool").executable?
-        path
-      else
-        DevelopmentTools.locate("install_name_tool")
-      end
-    end
-
-    # Locates a (working) copy of otool, guaranteed to function whether the user
-    # has developer tools installed or not.
-    def otool
-      if (path = HOMEBREW_PREFIX/"opt/cctools/bin/otool").executable?
-        path
-      else
-        DevelopmentTools.locate("otool")
-      end
-    end
-
     def active_developer_dir
       @active_developer_dir ||= Utils.popen_read("/usr/bin/xcode-select", "-print-path").strip
     end

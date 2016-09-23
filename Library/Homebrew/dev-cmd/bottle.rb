@@ -255,7 +255,7 @@ module Homebrew
           if prefix != prefix_check
             relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
           end
-          skip_relocation = relocatable && !keg.require_install_name_tool?
+          skip_relocation = relocatable && !keg.require_relocation?
         end
         puts if !relocatable && ARGV.verbose?
       rescue Interrupt
