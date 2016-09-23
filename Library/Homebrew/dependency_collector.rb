@@ -136,9 +136,7 @@ class DependencyCollector
   end
 
   def ant_dep(spec, tags)
-    if MacOS.version >= :mavericks
-      Dependency.new(spec.to_s, tags)
-    end
+    Dependency.new(spec.to_s, tags)
   end
 
   def resource_dep(spec, tags)
@@ -175,3 +173,5 @@ class DependencyCollector
     end
   end
 end
+
+require "extend/os/dependency_collector"
