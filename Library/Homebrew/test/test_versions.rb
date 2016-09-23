@@ -203,6 +203,10 @@ class VersionParsingTests < Homebrew::TestCase
     assert_version_detected "0.7.1", "https://codeload.github.com/gsamokovarov/jump/tar.gz/v0.7.1"
   end
 
+  def test_elasticsearch_alpha_style
+    assert_version_detected "5.0.0-alpha5", "https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/5.0.0-alpha5/elasticsearch-5.0.0-alpha5.tar.gz"
+  end
+
   def test_gloox_beta_style
     assert_version_detected "1.0-beta7", "http://camaya.net/download/gloox-1.0-beta7.tar.bz2"
   end
