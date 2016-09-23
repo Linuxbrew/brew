@@ -22,8 +22,7 @@ describe "Accessibility Access" do
         @installer.enable_accessibility_access
       end
     end
-
-    it "can enable accessibility access in OS X releases prior to Mavericks" do
+    it "can enable accessibility access in macOS releases prior to Mavericks" do
       MacOS.stubs(version: MacOS::Version.new("10.8"))
 
       Hbc::FakeSystemCommand.expects_command(
@@ -32,6 +31,14 @@ describe "Accessibility Access" do
       shutup do
         @installer.enable_accessibility_access
       end
+    end
+    it "warns about enabling accessibility access on new macOS releases" do
+      MacOS.stubs(version: MacOS::Version.new("10.12"))
+
+      @installer.stubs(bundle_identifier: "com.example.BasicCask")
+
+      capture_io { @installer.enable_accessibility_access }[1]
+        .must_match("Warning: Accessibility access cannot be enabled automatically on this version of macOS.")
     end
   end
 
@@ -48,13 +55,21 @@ describe "Accessibility Access" do
         @installer.disable_accessibility_access
       end
     end
-    it "warns about disabling accessibility access on old OS X releases" do
+    it "warns about disabling accessibility access on old macOS releases" do
       MacOS.stubs(version: MacOS::Version.new("10.8"))
 
       @installer.stubs(bundle_identifier: "com.example.BasicCask")
 
       capture_io { @installer.disable_accessibility_access }[1]
         .must_match("Warning: Accessibility access was enabled for with-accessibility-access, but it is not safe to disable")
+    end
+    it "warns about disabling accessibility access on new macOS releases" do
+      MacOS.stubs(version: MacOS::Version.new("10.12"))
+
+      @installer.stubs(bundle_identifier: "com.example.BasicCask")
+
+      capture_io { @installer.disable_accessibility_access }[1]
+        .must_match("Warning: Accessibility access cannot be disabled automatically on this version of macOS.")
     end
   end
 end
