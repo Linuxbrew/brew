@@ -4,7 +4,6 @@ require "pathname"
 
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
-  SimpleCov.command_name "test:cask:minitest"
 end
 
 project_root = Pathname.new(File.expand_path("../..", __FILE__))

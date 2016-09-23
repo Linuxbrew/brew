@@ -16,7 +16,7 @@ SimpleCov.start do
   add_filter "/Homebrew/vendor/"
 
   if ENV["HOMEBREW_INTEGRATION_TEST"]
-    command_name ENV["HOMEBREW_INTEGRATION_TEST"]
+    command_name "#{ENV["HOMEBREW_INTEGRATION_TEST"]} (#{$$})"
     at_exit do
       exit_code = $!.nil? ? 0 : $!.status
       $stdout.reopen("/dev/null")
@@ -24,6 +24,7 @@ SimpleCov.start do
       exit! exit_code
     end
   else
+    command_name "#{command_name} (#{$$})"
     # Not using this during integration tests makes the tests 4x times faster
     # without changing the coverage.
     track_files "#{SimpleCov.root}/**/*.rb"
