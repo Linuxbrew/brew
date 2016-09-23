@@ -257,9 +257,7 @@ class FormulaInstaller
 
     unless @poured_bottle
       not_pouring = !pour_bottle || @pour_failed
-      if not_pouring && !ignore_deps?
-        compute_and_install_dependencies
-      end
+      compute_and_install_dependencies if not_pouring && !ignore_deps?
       build
       clean
     end

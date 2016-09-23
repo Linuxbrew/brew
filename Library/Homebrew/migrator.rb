@@ -337,9 +337,7 @@ class Migrator
   end
 
   def backup_oldname_cellar
-    unless old_cellar.exist?
-      FileUtils.mv(new_cellar, old_cellar)
-    end
+    FileUtils.mv(new_cellar, old_cellar) unless old_cellar.exist?
   end
 
   def backup_old_tabs

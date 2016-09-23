@@ -724,9 +724,7 @@ module Homebrew
         coverage_args = []
         if ARGV.include?("--coverage")
           if ENV["JENKINS_HOME"]
-            if OS.mac? && MacOS.version == :sierra
-              coverage_args << "--coverage"
-            end
+            coverage_args << "--coverage" if OS.mac? && MacOS.version == :sierra
           else
             coverage_args << "--coverage"
           end
@@ -741,9 +739,7 @@ module Homebrew
           test "brew", "cask-tests", *coverage_args
         end
       elsif @tap
-        if @tap.name == "homebrew/core"
-          test "brew", "style", @tap.name
-        end
+        test "brew", "style", @tap.name if @tap.name == "homebrew/core"
         test "brew", "readall", "--aliases", @tap.name
       end
     end
@@ -1054,9 +1050,7 @@ module Homebrew
       ARGV << "--junit" << "--local" << "--test-default-formula"
     end
 
-    if ARGV.include? "--ci-master"
-      ARGV << "--fast"
-    end
+    ARGV << "--fast" if ARGV.include?("--ci-master")
 
     if ARGV.include? "--local"
       ENV["HOMEBREW_CACHE"] = "#{ENV["HOME"]}/Library/Caches/Homebrew"
@@ -1080,9 +1074,7 @@ module Homebrew
       safe_system "brew", "tap", tap.name, "--full"
     end
 
-    if ARGV.include? "--ci-upload"
-      return test_ci_upload(tap)
-    end
+    return test_ci_upload(tap) if ARGV.include?("--ci-upload")
 
     tests = []
     any_errors = false

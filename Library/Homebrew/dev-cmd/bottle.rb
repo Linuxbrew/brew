@@ -108,9 +108,7 @@ module Homebrew
     absolute_symlinks_start_with_string = []
     keg.find do |pn|
       next unless pn.symlink? && (link = pn.readlink).absolute?
-      if link.to_s.start_with?(string)
-        absolute_symlinks_start_with_string << pn
-      end
+      absolute_symlinks_start_with_string << pn if link.to_s.start_with?(string)
     end
 
     if ARGV.verbose?
@@ -155,9 +153,7 @@ module Homebrew
       return ofail "Formula not installed with '--build-bottle': #{f.full_name}"
     end
 
-    unless f.stable
-      return ofail "Formula has no stable version: #{f.full_name}"
-    end
+    return ofail "Formula has no stable version: #{f.full_name}" unless f.stable
 
     if ARGV.include?("--no-rebuild") || !f.tap
       rebuild = 0

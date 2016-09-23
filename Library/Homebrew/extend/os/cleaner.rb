@@ -1,5 +1,2 @@
 require "cleaner"
-
-if OS.mac?
-  require "extend/os/mac/cleaner"
-end
+require "extend/os/mac/cleaner" if OS.mac?
