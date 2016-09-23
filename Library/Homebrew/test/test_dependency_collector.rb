@@ -77,7 +77,7 @@ class DependencyCollectorTests < Homebrew::TestCase
   end
 
   def test_ant_dep
-    @d.add :ant => :build
+    @d.add ant: :build
     assert_equal find_dependency("ant"), Dependency.new("ant", [:build])
   end
 
