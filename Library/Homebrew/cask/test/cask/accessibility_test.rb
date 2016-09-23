@@ -61,7 +61,7 @@ describe "Accessibility Access" do
       @installer.stubs(bundle_identifier: "com.example.BasicCask")
 
       capture_io { @installer.disable_accessibility_access }[1]
-        .must_match("Warning: Accessibility access was enabled for with-accessibility-access, but it is not safe to disable")
+        .must_match("Warning: Accessibility access cannot be disabled automatically on this version of macOS.")
     end
     it "warns about disabling accessibility access on new macOS releases" do
       MacOS.stubs(version: MacOS::Version.new("10.12"))
