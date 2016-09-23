@@ -13,11 +13,13 @@
 /Library/Homebrew/cask/bin
 /Library/Homebrew/cask/vendor
 /Library/Homebrew/cask/coverage
+/Library/Homebrew/cask/tmp
 /Library/Homebrew/test/.bundle
 /Library/Homebrew/test/bin
 /Library/Homebrew/test/vendor
 /Library/Homebrew/test/coverage
 /Library/Homebrew/test/fs_leak_log
+/Library/Homebrew/tmp
 /Library/LinkedKegs
 /Library/Locks
 /Library/PinnedKegs
