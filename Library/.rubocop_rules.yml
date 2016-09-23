@@ -23,9 +23,8 @@ Style/CommandLiteral:
 Style/RegexpLiteral:
   EnforcedStyle: slashes
 
-# too prevalent to change this now, but might be discussed/changed later
 Style/Alias:
-  EnforcedStyle: prefer_alias_method
+  EnforcedStyle: prefer_alias
 
 # our current conditional style is established, clear and
 # requiring users to change that now would be confusing.

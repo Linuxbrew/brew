@@ -102,7 +102,7 @@ class Requirement
   def ==(other)
     instance_of?(other.class) && name == other.name && tags == other.tags
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def hash
     name.hash ^ tags.hash

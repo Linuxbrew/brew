@@ -92,14 +92,6 @@ Style/AccessorMethodName:
     - 'Homebrew/migrator.rb'
 
 # Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: prefer_alias, prefer_alias_method
-Style/Alias:
-  Exclude:
-    - 'Homebrew/blacklist.rb'
-
-# Offense count: 1
 Style/CaseEquality:
   Exclude:
     - 'Homebrew/compilers.rb'

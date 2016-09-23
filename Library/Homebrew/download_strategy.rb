@@ -608,7 +608,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
       fetch_repo cached_location, @url
     end
   end
-  alias_method :update, :clone_repo
+  alias update clone_repo
 end
 
 class GitDownloadStrategy < VCSDownloadStrategy

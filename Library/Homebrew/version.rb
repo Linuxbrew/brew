@@ -242,7 +242,7 @@ class Version
 
     0
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def hash
     version.hash
@@ -251,7 +251,7 @@ class Version
   def to_s
     version.dup
   end
-  alias_method :to_str, :to_s
+  alias to_str to_s
 
   protected
 

@@ -50,7 +50,7 @@ class PythonRequirement < Requirement
   end
 
   # Deprecated
-  alias_method :to_s, :python_binary
+  alias to_s python_binary
 end
 
 class Python3Requirement < PythonRequirement

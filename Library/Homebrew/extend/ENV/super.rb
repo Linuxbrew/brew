@@ -18,7 +18,7 @@ module Superenv
   attr_accessor :keg_only_deps, :deps
 
   attr_accessor :x11
-  alias_method :x11?, :x11
+  alias x11? x11
 
   def self.extended(base)
     base.keg_only_deps = []
@@ -82,7 +82,7 @@ module Superenv
     # s - apply fix for sed's Unicode support
     # a - apply fix for apr-1-config path
   end
-  alias_method :generic_setup_build_environment, :setup_build_environment
+  alias generic_setup_build_environment setup_build_environment
 
   private
 
@@ -263,7 +263,7 @@ module Superenv
 
     old
   end
-  alias_method :j1, :deparallelize
+  alias j1 deparallelize
 
   def make_jobs
     self["MAKEFLAGS"] =~ /-\w*j(\d+)/
@@ -334,18 +334,18 @@ module Superenv
 
   # These methods are no longer necessary under superenv, but are needed to
   # maintain an interface compatible with stdenv.
-  alias_method :fast, :noop
-  alias_method :O4, :noop
-  alias_method :Og, :noop
-  alias_method :libxml2, :noop
-  alias_method :set_cpu_flags, :noop
+  alias fast noop
+  alias O4 noop
+  alias Og noop
+  alias libxml2 noop
+  alias set_cpu_flags noop
 
   # These methods provide functionality that has not yet been ported to
   # superenv.
-  alias_method :gcc_4_0_1, :noop
-  alias_method :minimal_optimization, :noop
-  alias_method :no_optimization, :noop
-  alias_method :enable_warnings, :noop
+  alias gcc_4_0_1 noop
+  alias minimal_optimization noop
+  alias no_optimization noop
+  alias enable_warnings noop
 end
 
 class Array
