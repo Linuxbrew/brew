@@ -63,6 +63,8 @@ class VersionComparisonTests < Homebrew::TestCase
   end
 
   def test_comparing_alpha_versions
+    assert_operator version("1.2.3alpha"), :<, version("1.2.3")
+    assert_operator version("1.2.3"), :<, version("1.2.3a")
     assert_operator version("1.2.3alpha4"), :==, version("1.2.3a4")
     assert_operator version("1.2.3alpha4"), :==, version("1.2.3A4")
     assert_operator version("1.2.3alpha4"), :>, version("1.2.3alpha3")

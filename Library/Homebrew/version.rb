@@ -95,7 +95,7 @@ class Version
   end
 
   class AlphaToken < CompositeToken
-    PATTERN = /a(?:lpha)?[0-9]*/i
+    PATTERN = /alpha[0-9]*|a[0-9]+/i
 
     def <=>(other)
       case other
@@ -108,7 +108,7 @@ class Version
   end
 
   class BetaToken < CompositeToken
-    PATTERN = /b(?:eta)?[0-9]*/i
+    PATTERN = /beta[0-9]*|b[0-9]+/i
 
     def <=>(other)
       case other
