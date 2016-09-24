@@ -340,8 +340,8 @@ class Version
     m = /-((?:\d+\.)*\d+(?:[abc]|rc|RC)\d*)$/.match(stem)
     return m.captures.first unless m.nil?
 
-    # e.g. foobar-4.5.0-beta1, or foobar-4.50-beta
-    m = /-((?:\d+\.)*\d+-beta\d*)$/.match(stem)
+    # e.g. foobar-4.5.0-alpha5, foobar-4.5.0-beta1, or foobar-4.50-beta
+    m = /-((?:\d+\.)*\d+-(?:alpha|beta|rc)\d*)$/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. http://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip
