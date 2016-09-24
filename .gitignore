@@ -60,3 +60,5 @@
 !/CODEOFCONDUCT.md
 !/LICENSE.txt
 !/README.md
+!/Dockerfile
+!/docker.test.yml
