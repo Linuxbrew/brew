@@ -83,12 +83,11 @@ class Requirement
     # PATH.
     # This is undocumented magic and it should be removed, but we need to add
     # a way to declare path-based requirements that work with superenv first.
-    if @satisfied_result.is_a?(Pathname)
-      parent = @satisfied_result.parent
-      unless ENV["PATH"].split(File::PATH_SEPARATOR).include?(parent.to_s)
-        ENV.append_path("PATH", parent)
-      end
-    end
+    return unless @satisfied_result.is_a?(Pathname)
+    parent = @satisfied_result.parent
+
+    return if ENV["PATH"].split(File::PATH_SEPARATOR).include?(parent.to_s)
+    ENV.append_path("PATH", parent)
   end
 
   def env
@@ -199,11 +198,8 @@ class Requirement
 
       formulae.each do |f|
         f.requirements.each do |req|
-          if prune?(f, req, &block)
-            next
-          else
-            reqs << req
-          end
+          next if prune?(f, req, &block)
+          reqs << req
         end
       end
 

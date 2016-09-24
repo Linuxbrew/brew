@@ -123,13 +123,12 @@ module Homebrew
       end
     end
 
-    if git_url = ENV["UPSTREAM_GIT_URL"] || ENV["GIT_URL"]
-      # Also can get tap from Jenkins GIT_URL.
-      url_path = git_url.sub(%r{^https?://github\.com/}, "").chomp("/").sub(/\.git$/, "")
-      begin
-        return Tap.fetch(url_path) if url_path =~ HOMEBREW_TAP_REGEX
-      rescue
-      end
+    return unless git_url = ENV["UPSTREAM_GIT_URL"] || ENV["GIT_URL"]
+    # Also can get tap from Jenkins GIT_URL.
+    url_path = git_url.sub(%r{^https?://github\.com/}, "").chomp("/").sub(/\.git$/, "")
+    begin
+      return Tap.fetch(url_path) if url_path =~ HOMEBREW_TAP_REGEX
+    rescue
     end
   end
 
@@ -1001,10 +1000,9 @@ module Homebrew
       end
     end
 
-    if git_tag
-      safe_system "git", "tag", "--force", git_tag
-      safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
-    end
+    return unless git_tag
+    safe_system "git", "tag", "--force", git_tag
+    safe_system "git", "push", "--force", remote, "master:master", "refs/tags/#{git_tag}"
   end
 
   def sanitize_argv_and_env
@@ -1053,13 +1051,12 @@ module Homebrew
 
     ARGV << "--fast" if ARGV.include?("--ci-master")
 
-    if ARGV.include? "--local"
-      ENV["HOMEBREW_CACHE"] = "#{ENV["HOME"]}/Library/Caches/Homebrew"
-      mkdir_p ENV["HOMEBREW_CACHE"]
-      ENV["HOMEBREW_HOME"] = ENV["HOME"] = "#{Dir.pwd}/home"
-      mkdir_p ENV["HOME"]
-      ENV["HOMEBREW_LOGS"] = "#{Dir.pwd}/logs"
-    end
+    return unless ARGV.include?("--local")
+    ENV["HOMEBREW_CACHE"] = "#{ENV["HOME"]}/Library/Caches/Homebrew"
+    mkdir_p ENV["HOMEBREW_CACHE"]
+    ENV["HOMEBREW_HOME"] = ENV["HOME"] = "#{Dir.pwd}/home"
+    mkdir_p ENV["HOME"]
+    ENV["HOMEBREW_LOGS"] = "#{Dir.pwd}/logs"
   end
 
   def test_bot

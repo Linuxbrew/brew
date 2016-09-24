@@ -394,10 +394,9 @@ class Keg
     opt_record.delete if opt_record.symlink? || opt_record.exist?
     make_relative_symlink(opt_record, path, mode)
 
-    if oldname_opt_record
-      oldname_opt_record.delete
-      make_relative_symlink(oldname_opt_record, path, mode)
-    end
+    return unless oldname_opt_record
+    oldname_opt_record.delete
+    make_relative_symlink(oldname_opt_record, path, mode)
   end
 
   def delete_pyc_files!
@@ -423,18 +422,19 @@ class Keg
       return
     end
 
-    if stat.directory?
-      begin
-        keg = Keg.for(src)
-      rescue NotAKegError
-        puts "Won't resolve conflicts for symlink #{dst} as it doesn't resolve into the Cellar" if ARGV.verbose?
-        return
+    return unless stat.directory?
+    begin
+      keg = Keg.for(src)
+    rescue NotAKegError
+      if ARGV.verbose?
+        puts "Won't resolve conflicts for symlink #{dst} as it doesn't resolve into the Cellar"
       end
-
-      dst.unlink unless mode.dry_run
-      keg.link_dir(src, mode) { :mkpath }
-      return true
+      return
     end
+
+    dst.unlink unless mode.dry_run
+    keg.link_dir(src, mode) { :mkpath }
+    true
   end
 
   def make_relative_symlink(dst, src, mode)
@@ -462,9 +462,8 @@ class Keg
     dst.delete if mode.overwrite && (dst.exist? || dst.symlink?)
     dst.make_relative_symlink(src)
   rescue Errno::EEXIST => e
-    if dst.exist?
-      raise ConflictError.new(self, src.relative_path_from(path), dst, e)
-    elsif dst.symlink?
+    raise ConflictError.new(self, src.relative_path_from(path), dst, e) if dst.exist?
+    if dst.symlink?
       dst.unlink
       retry
     end

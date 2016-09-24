@@ -314,7 +314,9 @@ class Formulary
     possible_tap_formulae = tap_paths(ref)
     if possible_tap_formulae.size > 1
       raise TapFormulaAmbiguityError.new(ref, possible_tap_formulae)
-    elsif possible_tap_formulae.size == 1
+    end
+
+    if possible_tap_formulae.size == 1
       path = possible_tap_formulae.first.resolved_path
       name = path.basename(".rb").to_s
       return FormulaLoader.new(name, path)
@@ -336,7 +338,9 @@ class Formulary
 
     if possible_tap_newname_formulae.size > 1
       raise TapFormulaWithOldnameAmbiguityError.new(ref, possible_tap_newname_formulae)
-    elsif !possible_tap_newname_formulae.empty?
+    end
+
+    unless possible_tap_newname_formulae.empty?
       return TapLoader.new(possible_tap_newname_formulae.first)
     end
 
@@ -368,7 +372,9 @@ class Formulary
     possible_pinned_tap_formulae = tap_paths(ref, Dir["#{HOMEBREW_LIBRARY}/PinnedTaps/*/*/"]).map(&:realpath)
     if possible_pinned_tap_formulae.size > 1
       raise TapFormulaAmbiguityError.new(ref, possible_pinned_tap_formulae)
-    elsif possible_pinned_tap_formulae.size == 1
+    end
+
+    if possible_pinned_tap_formulae.size == 1
       selected_formula = factory(possible_pinned_tap_formulae.first, spec)
       if core_path(ref).file?
         opoo <<-EOS.undent

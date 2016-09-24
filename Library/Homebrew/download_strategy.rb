@@ -158,14 +158,13 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
 
     version.update_commit(last_commit) if head?
 
-    if @ref_type == :tag && @revision && current_revision
-      unless current_revision == @revision
-        raise <<-EOS.undent
-          #{@ref} tag should be #{@revision}
-          but is actually #{current_revision}
-        EOS
-      end
-    end
+    return unless @ref_type == :tag
+    return unless @revision && current_revision
+    return if current_revision == @revision
+    raise <<-EOS.undent
+      #{@ref} tag should be #{@revision}
+      but is actually #{current_revision}
+    EOS
   end
 
   def fetch_last_commit
@@ -336,14 +335,14 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       rescue ErrorDuringExecution
         # 33 == range not supported
         # try wiping the incomplete download and retrying once
-        if $?.exitstatus == 33 && had_incomplete_download
-          ohai "Trying a full download"
-          temporary_path.unlink
-          had_incomplete_download = false
-          retry
-        else
+        unless $?.exitstatus == 33 && had_incomplete_download
           raise CurlDownloadStrategyError, @url
         end
+
+        ohai "Trying a full download"
+        temporary_path.unlink
+        had_incomplete_download = false
+        retry
       end
       ignore_interrupts { temporary_path.rename(cached_location) }
     end
@@ -717,12 +716,12 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def update_repo
-    if @ref_type == :branch || !ref?
-      if !shallow_clone? && shallow_dir?
-        quiet_safe_system "git", "fetch", "origin", "--unshallow"
-      else
-        quiet_safe_system "git", "fetch", "origin"
-      end
+    return unless @ref_type == :branch || !ref?
+
+    if !shallow_clone? && shallow_dir?
+      quiet_safe_system "git", "fetch", "origin", "--unshallow"
+    else
+      quiet_safe_system "git", "fetch", "origin"
     end
   end
 
@@ -798,10 +797,10 @@ end
 class GitHubGitDownloadStrategy < GitDownloadStrategy
   def initialize(name, resource)
     super
-    if @url =~ %r{^https?://github\.com/([^/]+)/([^/]+)\.git$}
-      @user = $1
-      @repo = $2
-    end
+
+    return unless %r{^https?://github\.com/(?<user>[^/]+)/(?<repo>[^/]+)\.git$} =~ @url
+    @user = user
+    @repo = repo
   end
 
   def github_last_commit

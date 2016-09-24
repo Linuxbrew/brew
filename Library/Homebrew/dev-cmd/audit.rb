@@ -284,9 +284,8 @@ class FormulaAuditor
       problem "Should not have both `head` and `head do`"
     end
 
-    if present.include?("bottle modifier") && present.include?("bottle block")
-      problem "Should not have `bottle :unneeded/:disable` and `bottle do`"
-    end
+    return unless present.include?("bottle modifier") && present.include?("bottle block")
+    problem "Should not have `bottle :unneeded/:disable` and `bottle do`"
   end
 
   def audit_class
@@ -350,9 +349,8 @@ class FormulaAuditor
 
     same_name_tap_formulae.delete(full_name)
 
-    unless same_name_tap_formulae.empty?
-      problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
-    end
+    return if same_name_tap_formulae.empty?
+    problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
   end
 
   def audit_deps
@@ -485,9 +483,8 @@ class FormulaAuditor
       problem "Description shouldn't start with an indefinite article (#{$1})"
     end
 
-    if desc.downcase.start_with? "#{formula.name} "
-      problem "Description shouldn't include the formula name"
-    end
+    return unless desc.downcase.start_with? "#{formula.name} "
+    problem "Description shouldn't include the formula name"
   end
 
   def audit_homepage
@@ -564,9 +561,9 @@ class FormulaAuditor
   end
 
   def audit_bottle_spec
-    if formula.bottle_disabled? && !formula.bottle_disable_reason.valid?
-      problem "Unrecognized bottle modifier"
-    end
+    return unless formula.bottle_disabled?
+    return if formula.bottle_disable_reason.valid?
+    problem "Unrecognized bottle modifier"
   end
 
   def audit_github_repository
@@ -594,9 +591,8 @@ class FormulaAuditor
       problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
     end
 
-    if Date.parse(metadata["created_at"]) > (Date.today - 30)
-      problem "GitHub repository too new (<30 days old)"
-    end
+    return if Date.parse(metadata["created_at"]) <= (Date.today - 30)
+    problem "GitHub repository too new (<30 days old)"
   end
 
   def audit_specs
@@ -736,9 +732,8 @@ class FormulaAuditor
       problem "Please set plist_options when using a formula-defined plist."
     end
 
-    if text.include?('require "language/go"') && !text.include?("go_resource")
-      problem "require \"language/go\" is unnecessary unless using `go_resource`s"
-    end
+    return unless text.include?('require "language/go"') && !text.include?("go_resource")
+    problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
   def audit_line(line, lineno)
@@ -983,9 +978,8 @@ class FormulaAuditor
       problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
     end
 
-    if line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
-      problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
-    end
+    return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
+    problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
   end
 
   def audit_caveats
@@ -1115,9 +1109,8 @@ class ResourceAuditor
       problem "version #{version} should not have a leading 'v'"
     end
 
-    if version.to_s =~ /_\d+$/
-      problem "version #{version} should not end with an underline and a number"
-    end
+    return unless version.to_s =~ /_\d+$/
+    problem "version #{version} should not end with an underline and a number"
   end
 
   def audit_checksum
@@ -1183,9 +1176,8 @@ class ResourceAuditor
       end
     end
 
-    if url_strategy == DownloadStrategyDetector.detect("", using)
-      problem "Redundant :using value in URL"
-    end
+    return unless url_strategy == DownloadStrategyDetector.detect("", using)
+    problem "Redundant :using value in URL"
   end
 
   def audit_urls

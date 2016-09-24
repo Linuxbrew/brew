@@ -118,43 +118,6 @@ Style/GlobalVars:
     - 'Homebrew/diagnostic.rb'
     - 'Homebrew/utils.rb'
 
-# Offense count: 70
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'Taps/**/*'
-    - 'Homebrew/cmd/update-report.rb'
-    - 'Homebrew/dependency_collector.rb'
-    - 'Homebrew/dev-cmd/audit.rb'
-    - 'Homebrew/dev-cmd/pull.rb'
-    - 'Homebrew/dev-cmd/test-bot.rb'
-    - 'Homebrew/download_strategy.rb'
-    - 'Homebrew/extend/ARGV.rb'
-    - 'Homebrew/extend/ENV/shared.rb'
-    - 'Homebrew/extend/ENV/std.rb'
-    - 'Homebrew/extend/ENV/super.rb'
-    - 'Homebrew/extend/fileutils.rb'
-    - 'Homebrew/extend/os/mac/extend/ENV/std.rb'
-    - 'Homebrew/extend/os/mac/formula_cellar_checks.rb'
-    - 'Homebrew/extend/os/mac/utils/bottles.rb'
-    - 'Homebrew/extend/string.rb'
-    - 'Homebrew/formula.rb'
-    - 'Homebrew/formula_installer.rb'
-    - 'Homebrew/formula_lock.rb'
-    - 'Homebrew/formulary.rb'
-    - 'Homebrew/keg.rb'
-    - 'Homebrew/migrator.rb'
-    - 'Homebrew/os/mac/xcode.rb'
-    - 'Homebrew/patch.rb'
-    - 'Homebrew/requirement.rb'
-    - 'Homebrew/tap.rb'
-    - 'Homebrew/test/test_cmd_testbot.rb'
-    - 'Homebrew/test/test_integration_cmds.rb'
-    - 'Homebrew/test/testing_env.rb'
-    - 'Homebrew/utils.rb'
-    - 'Homebrew/utils/popen.rb'
-    - 'Homebrew/version.rb'
-
 # Offense count: 51
 # Cop supports --auto-correct.
 # Configuration parameters: MaxLineLength.

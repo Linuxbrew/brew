@@ -39,9 +39,8 @@ class IntegrationCommandTests < Homebrew::TestCase
   end
 
   def needs_test_cmd_taps
-    unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
-      skip "HOMEBREW_TEST_OFFICIAL_CMD_TAPS is not set"
-    end
+    return if ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
+    skip "HOMEBREW_TEST_OFFICIAL_CMD_TAPS is not set"
   end
 
   def needs_macos

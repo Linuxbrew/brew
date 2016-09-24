@@ -57,9 +57,8 @@ module Homebrew
       super
       files_after_test = []
       Find.find(TEST_TMPDIR) { |f| files_after_test << f.sub(TEST_TMPDIR, "") }
-      if @__files_before_test != files_after_test
-        @@log.puts location, diff(@__files_before_test, files_after_test)
-      end
+      return if @__files_before_test == files_after_test
+      @@log.puts location, diff(@__files_before_test, files_after_test)
     end
   end
 

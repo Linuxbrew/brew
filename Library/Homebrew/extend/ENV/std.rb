@@ -48,10 +48,9 @@ module Stdenv
 
     send(compiler)
 
-    if cc =~ GNU_GCC_REGEXP
-      gcc_formula = gcc_version_formula($&)
-      append_path "PATH", gcc_formula.opt_bin.to_s
-    end
+    return unless cc =~ GNU_GCC_REGEXP
+    gcc_formula = gcc_version_formula($&)
+    append_path "PATH", gcc_formula.opt_bin.to_s
   end
   alias generic_setup_build_environment setup_build_environment
 
@@ -174,10 +173,10 @@ module Stdenv
     append_to_cflags Hardware::CPU.universal_archs.as_arch_flags
     append "LDFLAGS", Hardware::CPU.universal_archs.as_arch_flags
 
-    if compiler != :clang && Hardware.is_32_bit?
-      # Can't mix "-march" for a 32-bit CPU  with "-arch x86_64"
-      replace_in_cflags(/-march=\S*/, "-Xarch_#{Hardware::CPU.arch_32_bit} \\0")
-    end
+    return if compiler == :clang
+    return unless Hardware.is_32_bit?
+    # Can't mix "-march" for a 32-bit CPU  with "-arch x86_64"
+    replace_in_cflags(/-march=\S*/, "-Xarch_#{Hardware::CPU.arch_32_bit} \\0")
   end
 
   def cxx11
