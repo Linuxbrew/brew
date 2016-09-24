@@ -1,5 +1,9 @@
 require "hbc/staged"
 
-class Hbc::DSL::UninstallPreflight < Hbc::DSL::Base
-  include Hbc::Staged
+module Hbc
+  class DSL
+    class UninstallPreflight < Base
+      include Staged
+    end
+  end
 end

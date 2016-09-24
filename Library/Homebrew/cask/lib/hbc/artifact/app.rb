@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::App < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class App < Moved
+    end
+  end
 end

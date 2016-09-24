@@ -255,11 +255,11 @@ Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/docs/>
 
 ## AUTHORS
 
-Homebrew's lead maintainer is <%= lead_maintainer %>.
+<%= lead_maintainer.concat("\n") %>
 
-Homebrew's current maintainers are <%= maintainers[0...-1].join(", ") %> and <%= maintainers[-1] %>.
+<%= maintainers.concat("\n") %>
 
-Former maintainers with significant contributions include <%= former_maintainers.join(", ") %> and Homebrew's creator: <%= creator %>.
+<%= former_maintainers.concat("\n") %>
 
 ## BUGS
 

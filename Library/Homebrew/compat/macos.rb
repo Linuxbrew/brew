@@ -136,6 +136,11 @@ module OS
         odeprecated "MacOS.has_apple_developer_tools?", "DevelopmentTools.installed?"
         DevelopmentTools.installed?
       end
+
+      def release
+        odeprecated "MacOS.release", "MacOS.version"
+        version
+      end
     end
   end
 end

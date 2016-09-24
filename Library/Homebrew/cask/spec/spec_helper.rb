@@ -4,13 +4,12 @@ require "rspec/wait"
 
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
-  SimpleCov.command_name "test:cask:rspec"
 end
 
 project_root = Pathname.new(File.expand_path("../..", __FILE__))
 
 # add Homebrew to load path
-$LOAD_PATH.unshift(File.expand_path("#{ENV['HOMEBREW_REPOSITORY']}/Library/Homebrew"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew"))
 
 require "global"
 
@@ -30,7 +29,9 @@ require "mocha/api"
 
 require "hbc"
 
-class Hbc::TestCask < Hbc::Cask; end
+module Hbc
+  class TestCask < Cask; end
+end
 
 TEST_TMPDIR = Dir.mktmpdir("homebrew_cask_tests")
 at_exit do

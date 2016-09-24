@@ -76,6 +76,11 @@ class DependencyCollectorTests < Homebrew::TestCase
     assert_predicate dep, :optional?
   end
 
+  def test_ant_dep
+    @d.add ant: :build
+    assert_equal find_dependency("ant"), Dependency.new("ant", [:build])
+  end
+
   def test_raises_typeerror_for_unknown_classes
     assert_raises(TypeError) { @d.add(Class.new) }
   end

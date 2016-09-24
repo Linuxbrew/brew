@@ -162,7 +162,7 @@ class Formula
   # Defaults to true.
   # @return [Boolean]
   attr_accessor :follow_installed_alias
-  alias_method :follow_installed_alias?, :follow_installed_alias
+  alias follow_installed_alias? follow_installed_alias
 
   # @private
   def initialize(name, path, spec, alias_path: nil)
@@ -179,12 +179,12 @@ class Formula
       Tap.fetch($1, $2)
     end
 
-    @full_name = get_full_name(name)
-    @full_alias_name = get_full_name(@alias_name)
+    @full_name = full_name_with_optional_tap(name)
+    @full_alias_name = full_name_with_optional_tap(@alias_name)
 
-    set_spec :stable
-    set_spec :devel
-    set_spec :head
+    spec_eval :stable
+    spec_eval :devel
+    spec_eval :head
 
     @active_spec = determine_active_spec(spec)
     @active_spec_sym = if head?
@@ -201,7 +201,7 @@ class Formula
   end
 
   # @private
-  def set_active_spec(spec_sym)
+  def active_spec=(spec_sym)
     spec = send(spec_sym)
     raise FormulaSpecificationError, "#{spec_sym} spec is not available for #{full_name}" unless spec
     @active_spec = spec
@@ -214,7 +214,7 @@ class Formula
 
   # Allow full name logic to be re-used between names, aliases,
   # and installed aliases.
-  def get_full_name(name)
+  def full_name_with_optional_tap(name)
     if name.nil? || @tap.nil? || @tap.core_tap?
       name
     else
@@ -222,12 +222,11 @@ class Formula
     end
   end
 
-  def set_spec(name)
+  def spec_eval(name)
     spec = self.class.send(name)
-    if spec.url
-      spec.owner = self
-      instance_variable_set("@#{name}", spec)
-    end
+    return unless spec.url
+    spec.owner = self
+    instance_variable_set("@#{name}", spec)
   end
 
   def determine_active_spec(requested)
@@ -246,9 +245,8 @@ class Formula
     end
 
     val = version.respond_to?(:to_str) ? version.to_str : version
-    if val.nil? || val.empty? || val =~ /\s/
-      raise FormulaValidationError.new(full_name, :version, val)
-    end
+    return unless val.nil? || val.empty? || val =~ /\s/
+    raise FormulaValidationError.new(full_name, :version, val)
   end
 
   public
@@ -266,7 +264,7 @@ class Formula
   end
 
   def full_installed_alias_name
-    get_full_name(installed_alias_name)
+    full_name_with_optional_tap(installed_alias_name)
   end
 
   # The path that was specified to find this formula.
@@ -395,9 +393,7 @@ class Formula
   def oldname
     @oldname ||= if tap
       formula_renames = tap.formula_renames
-      if formula_renames.value?(name)
-        formula_renames.to_a.rassoc(name).first
-      end
+      formula_renames.to_a.rassoc(name).first if formula_renames.value?(name)
     end
   end
 
@@ -1052,7 +1048,7 @@ class Formula
     self.class.link_overwrite_paths.any? do |p|
       p == to_check ||
         to_check.start_with?(p.chomp("/") + "/") ||
-        /^#{Regexp.escape(p).gsub('\*', ".*?")}$/ === to_check
+        to_check =~ /^#{Regexp.escape(p).gsub('\*', ".*?")}$/
     end
   end
 
@@ -1067,10 +1063,9 @@ class Formula
 
   # @private
   def patch
-    unless patchlist.empty?
-      ohai "Patching"
-      patchlist.each(&:apply)
-    end
+    return if patchlist.empty?
+    ohai "Patching"
+    patchlist.each(&:apply)
   end
 
   # yields |self,staging| with current working directory set to the uncompressed tarball
@@ -1096,10 +1091,11 @@ class Formula
   def lock
     @lock = FormulaLock.new(name)
     @lock.lock
-    if oldname && (oldname_rack = HOMEBREW_CELLAR/oldname).exist? && oldname_rack.resolved_path == rack
-      @oldname_lock = FormulaLock.new(oldname)
-      @oldname_lock.lock
-    end
+    return unless oldname
+    return unless (oldname_rack = HOMEBREW_CELLAR/oldname).exist?
+    return unless oldname_rack.resolved_path == rack
+    @oldname_lock = FormulaLock.new(oldname)
+    @oldname_lock.lock
   end
 
   # @private
@@ -1237,7 +1233,7 @@ class Formula
       name == other.name &&
       active_spec == other.active_spec
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   # @private
   def hash
@@ -1246,7 +1242,7 @@ class Formula
 
   # @private
   def <=>(other)
-    return unless Formula === other
+    return unless other.is_a?(Formula)
     name <=> other.name
   end
 
@@ -1266,7 +1262,7 @@ class Formula
   # Note: there isn't a std_autotools variant because autotools is a lot
   # less consistent and the standard parameters are more memorable.
   def std_cmake_args
-    %W[
+    args = %W[
       -DCMAKE_C_FLAGS_RELEASE=-DNDEBUG
       -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG
       -DCMAKE_INSTALL_PREFIX=#{prefix}
@@ -1275,6 +1271,14 @@ class Formula
       -DCMAKE_VERBOSE_MAKEFILE=ON
       -Wno-dev
     ]
+
+    # Avoid false positives for clock_gettime support on 10.11.
+    # CMake cache entries for other weak symbols may be added here as needed.
+    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+      args << "-DHAVE_CLOCK_GETTIME:INTERNAL=0"
+    end
+
+    args
   end
 
   # an array of all core {Formula} names
@@ -1421,10 +1425,9 @@ class Formula
 
   # @private
   def print_tap_action(options = {})
-    if tap?
-      verb = options[:verb] || "Installing"
-      ohai "#{verb} #{name} from #{tap}"
-    end
+    return unless tap?
+    verb = options[:verb] || "Installing"
+    ohai "#{verb} #{name} from #{tap}"
   end
 
   # @private
@@ -1662,7 +1665,7 @@ class Formula
 
     @exec_count ||= 0
     @exec_count += 1
-    logfn = "#{logs}/#{active_log_prefix}%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
+    logfn = format("#{logs}/#{active_log_prefix}%02d.%s", @exec_count, File.basename(cmd).split(" ").first)
     logs.mkpath
 
     File.open(logfn, "w") do |log|
@@ -1768,9 +1771,7 @@ class Formula
     ENV["HOMEBREW_CC_LOG_PATH"] = logfn
 
     # TODO: system "xcodebuild" is deprecated, this should be removed soon.
-    if cmd.to_s.start_with? "xcodebuild"
-      ENV.remove_cc_etc
-    end
+    ENV.remove_cc_etc if cmd.to_s.start_with? "xcodebuild"
 
     # Turn on argument filtering in the superenv compiler wrapper.
     # We should probably have a better mechanism for this than adding
@@ -1778,9 +1779,7 @@ class Formula
     if cmd == "python"
       setup_py_in_args = %w[setup.py build.py].include?(args.first)
       setuptools_shim_in_args = args.any? { |a| a.to_s.start_with? "import setuptools" }
-      if setup_py_in_args || setuptools_shim_in_args
-        ENV.refurbish_args
-      end
+      ENV.refurbish_args if setup_py_in_args || setuptools_shim_in_args
     end
 
     $stdout.reopen(out)
@@ -2218,7 +2217,7 @@ class Formula
     # If this formula conflicts with another one.
     # <pre>conflicts_with "imagemagick", :because => "because this is just a stupid example"</pre>
     def conflicts_with(*names)
-      opts = Hash === names.last ? names.pop : {}
+      opts = names.last.is_a?(Hash) ? names.pop : {}
       names.each { |name| conflicts << FormulaConflict.new(name, opts[:because]) }
     end
 

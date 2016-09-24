@@ -4,14 +4,13 @@ require "pathname"
 
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
-  SimpleCov.command_name "test:cask:minitest"
 end
 
 project_root = Pathname.new(File.expand_path("../..", __FILE__))
 tap_root = Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask")
 
 # add Homebrew to load path
-$LOAD_PATH.unshift(File.expand_path("#{ENV['HOMEBREW_REPOSITORY']}/Library/Homebrew"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew"))
 
 require "global"
 
@@ -38,6 +37,8 @@ end
 require "minitest/autorun"
 require "minitest/reporters"
 Minitest::Reporters.use! Minitest::Reporters::DefaultReporter.new(color: true)
+
+require "parallel_tests/test/runtime_logger"
 
 # Force mocha to patch MiniTest since we have both loaded thanks to homebrew's testing_env
 require "mocha/api"
@@ -158,7 +159,9 @@ require "tempfile"
 FileUtils.mkdir_p Hbc.homebrew_prefix.join("bin")
 
 # Common superclass for test Casks for when we need to filter them out
-class Hbc::TestCask < Hbc::Cask; end
+module Hbc
+  class TestCask < Cask; end
+end
 
 # jack in some optional utilities
 FileUtils.ln_s "/usr/local/bin/cabextract", Hbc.homebrew_prefix.join("bin/cabextract")

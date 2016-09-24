@@ -552,7 +552,7 @@ Each &lt;patch-source> may be one of:
 
 <dl>
 <dt><code>tap_readme</code> [<code>-v</code>] <var>name</var></dt><dd><p>Generate the README.md file for a new tap.</p></dd>
-<dt><code>test</code> [<code>--devel</code>|<code>--HEAD</code>] [<code>--debug</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>A few formulae provide a test method. <code>brew test</code> <var>formula</var> runs this
+<dt><code>test</code> [<code>--devel</code>|<code>--HEAD</code>] [<code>--debug</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Most formulae provide a test method. <code>brew test</code> <var>formula</var> runs this
 test method. There is no standard output or return code, but it should
 generally indicate to the user if something is wrong with the installed
 formula.</p>
@@ -568,11 +568,11 @@ not deleted.</p>
 
 <p>Example: <code>brew install jruby &amp;&amp; brew test jruby</code></p></dd>
 <dt><code>tests</code> [<code>-v</code>] [<code>--coverage</code>] [<code>--generic</code>] [<code>--no-compat</code>] [<code>--only=</code><test_script/test_method>] [<code>--seed</code> <var>seed</var>] [<code>--trace</code>] [<code>--online</code>] [<code>--official-cmd-taps</code>]</dt><dd><p>Run Homebrew's unit and integration tests.</p></dd>
-<dt><code>update-test</code> [<code>--commit=&lt;sha1></code>] [<code>--before=&lt;date></code>] [<code>--keep-tmp</code>]</dt><dd><p>Runs a test of <code>brew update</code> with a new repository clone.</p>
+<dt><code>update-test</code> [<code>--commit=&lt;commit></code>] [<code>--before=&lt;date></code>] [<code>--keep-tmp</code>]</dt><dd><p>Runs a test of <code>brew update</code> with a new repository clone.</p>
 
 <p>If no arguments are passed, use <code>origin/master</code> as the start commit.</p>
 
-<p>If <code>--commit=&lt;sha1></code> is passed, use <code>&lt;sha1></code> as the start commit.</p>
+<p>If <code>--commit=&lt;commit></code> is passed, use <code>&lt;commit></code> as the start commit.</p>
 
 <p>If <code>--before=&lt;date></code> is passed, use the commit at <code>&lt;date></code> as the
 start commit.</p>
@@ -731,7 +731,7 @@ your shell profile, or you can use it before a brew command:</p>
 
 <p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Baptiste Fontaine, Zhiming Wang, Brett Koonce, ilovezfs, Martin Afanasjew, Uladzislau Shablinski, Dominyk Tiller, Tim Smith and Alex Dunn.</p>
 
-<p>Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg, Max Howell and Homebrew's creator: Max Howell.</p>
+<p>Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.</p>
 
 <h2 id="BUGS">BUGS</h2>
 

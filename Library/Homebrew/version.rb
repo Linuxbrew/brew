@@ -95,7 +95,7 @@ class Version
   end
 
   class AlphaToken < CompositeToken
-    PATTERN = /a(?:lpha)?[0-9]*/i
+    PATTERN = /alpha[0-9]*|a[0-9]+/i
 
     def <=>(other)
       case other
@@ -108,7 +108,7 @@ class Version
   end
 
   class BetaToken < CompositeToken
-    PATTERN = /b(?:eta)?[0-9]*/i
+    PATTERN = /beta[0-9]*|b[0-9]+/i
 
     def <=>(other)
       case other
@@ -192,11 +192,10 @@ class Version
   end
 
   def initialize(val)
-    if val.respond_to?(:to_str)
-      @version = val.to_str
-    else
+    unless val.respond_to?(:to_str)
       raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
     end
+    @version = val.to_str
   end
 
   def detected_from_url?
@@ -208,7 +207,7 @@ class Version
   end
 
   def <=>(other)
-    return unless Version === other
+    return unless other.is_a?(Version)
     return 0 if version == other.version
     return 1 if head? && !other.head?
     return -1 if !head? && other.head?
@@ -242,7 +241,7 @@ class Version
 
     0
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def hash
     version.hash
@@ -251,7 +250,7 @@ class Version
   def to_s
     version.dup
   end
-  alias_method :to_str, :to_s
+  alias to_str to_s
 
   protected
 
@@ -340,8 +339,8 @@ class Version
     m = /-((?:\d+\.)*\d+(?:[abc]|rc|RC)\d*)$/.match(stem)
     return m.captures.first unless m.nil?
 
-    # e.g. foobar-4.5.0-beta1, or foobar-4.50-beta
-    m = /-((?:\d+\.)*\d+-beta\d*)$/.match(stem)
+    # e.g. foobar-4.5.0-alpha5, foobar-4.5.0-beta1, or foobar-4.50-beta
+    m = /-((?:\d+\.)*\d+-(?:alpha|beta|rc)\d*)$/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. http://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip
@@ -386,7 +385,7 @@ class Version
 
     # e.g. http://mirrors.jenkins-ci.org/war/1.486/jenkins.war
     # e.g. https://github.com/foo/bar/releases/download/0.10.11/bar.phar
-    m = /\/(\d\.\d+(\.\d+)?)\//.match(spec_s)
+    m = %r{/(\d\.\d+(\.\d+)?)}.match(spec_s)
     return m.captures.first unless m.nil?
 
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz

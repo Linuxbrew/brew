@@ -20,14 +20,13 @@ module Stdenv
 
     # Leopard's ld needs some convincing that it's building 64-bit
     # See: https://github.com/mistydemeo/tigerbrew/issues/59
-    if MacOS.version == :leopard && MacOS.prefer_64_bit?
-      append "LDFLAGS", "-arch #{Hardware::CPU.arch_64_bit}"
+    return unless MacOS.version == :leopard && MacOS.prefer_64_bit?
+    append "LDFLAGS", "-arch #{Hardware::CPU.arch_64_bit}"
 
-      # Many, many builds are broken thanks to Leopard's buggy ld.
-      # Our ld64 fixes many of those builds, though of course we can't
-      # depend on it already being installed to build itself.
-      ld64 if Formula["ld64"].installed?
-    end
+    # Many, many builds are broken thanks to Leopard's buggy ld.
+    # Our ld64 fixes many of those builds, though of course we can't
+    # depend on it already being installed to build itself.
+    ld64 if Formula["ld64"].installed?
   end
 
   def homebrew_extra_pkg_config_paths
@@ -65,19 +64,18 @@ module Stdenv
     delete("CPATH")
     remove "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
-    if (sdk = MacOS.sdk_path(version)) && !MacOS::CLT.installed?
-      delete("SDKROOT")
-      remove_from_cflags "-isysroot #{sdk}"
-      remove "CPPFLAGS", "-isysroot #{sdk}"
-      remove "LDFLAGS", "-isysroot #{sdk}"
-      if HOMEBREW_PREFIX.to_s == "/usr/local"
-        delete("CMAKE_PREFIX_PATH")
-      else
-        # It was set in setup_build_environment, so we have to restore it here.
-        self["CMAKE_PREFIX_PATH"] = HOMEBREW_PREFIX.to_s
-      end
-      remove "CMAKE_FRAMEWORK_PATH", "#{sdk}/System/Library/Frameworks"
+    return unless (sdk = MacOS.sdk_path(version)) && !MacOS::CLT.installed?
+    delete("SDKROOT")
+    remove_from_cflags "-isysroot #{sdk}"
+    remove "CPPFLAGS", "-isysroot #{sdk}"
+    remove "LDFLAGS", "-isysroot #{sdk}"
+    if HOMEBREW_PREFIX.to_s == "/usr/local"
+      delete("CMAKE_PREFIX_PATH")
+    else
+      # It was set in setup_build_environment, so we have to restore it here.
+      self["CMAKE_PREFIX_PATH"] = HOMEBREW_PREFIX.to_s
     end
+    remove "CMAKE_FRAMEWORK_PATH", "#{sdk}/System/Library/Frameworks"
   end
 
   def macosxsdk(version = MacOS.version)
@@ -89,20 +87,19 @@ module Stdenv
     self["CPATH"] = "#{HOMEBREW_PREFIX}/include"
     prepend "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
-    if (sdk = MacOS.sdk_path(version)) && !MacOS::CLT.installed?
-      # Extra setup to support Xcode 4.3+ without CLT.
-      self["SDKROOT"] = sdk
-      # Tell clang/gcc where system include's are:
-      append_path "CPATH", "#{sdk}/usr/include"
-      # The -isysroot is needed, too, because of the Frameworks
-      append_to_cflags "-isysroot #{sdk}"
-      append "CPPFLAGS", "-isysroot #{sdk}"
-      # And the linker needs to find sdk/usr/lib
-      append "LDFLAGS", "-isysroot #{sdk}"
-      # Needed to build cmake itself and perhaps some cmake projects:
-      append_path "CMAKE_PREFIX_PATH", "#{sdk}/usr"
-      append_path "CMAKE_FRAMEWORK_PATH", "#{sdk}/System/Library/Frameworks"
-    end
+    return unless (sdk = MacOS.sdk_path(version)) && !MacOS::CLT.installed?
+    # Extra setup to support Xcode 4.3+ without CLT.
+    self["SDKROOT"] = sdk
+    # Tell clang/gcc where system include's are:
+    append_path "CPATH", "#{sdk}/usr/include"
+    # The -isysroot is needed, too, because of the Frameworks
+    append_to_cflags "-isysroot #{sdk}"
+    append "CPPFLAGS", "-isysroot #{sdk}"
+    # And the linker needs to find sdk/usr/lib
+    append "LDFLAGS", "-isysroot #{sdk}"
+    # Needed to build cmake itself and perhaps some cmake projects:
+    append_path "CMAKE_PREFIX_PATH", "#{sdk}/usr"
+    append_path "CMAKE_FRAMEWORK_PATH", "#{sdk}/System/Library/Frameworks"
   end
 
   # Some configure scripts won't find libxml2 without help

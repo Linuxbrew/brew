@@ -71,13 +71,13 @@ class Pathname
       when Array
         if src.empty?
           opoo "tried to install empty array to #{self}"
-          return
+          break
         end
         src.each { |s| install_p(s, File.basename(s)) }
       when Hash
         if src.empty?
           opoo "tried to install empty hash to #{self}"
-          return
+          break
         end
         src.each { |s, new_basename| install_p(s, new_basename) }
       else
@@ -132,7 +132,7 @@ class Pathname
 
   if method_defined?(:write)
     # @private
-    alias_method :old_write, :write
+    alias old_write write
   end
 
   # we assume this pathname object is a file obviously
@@ -212,7 +212,7 @@ class Pathname
   end
 
   # @private
-  alias_method :extname_old, :extname
+  alias extname_old extname
 
   # extended to support common double extensions
   def extname(path = to_s)
@@ -322,7 +322,7 @@ class Pathname
   end
 
   # FIXME: eliminate the places where we rely on this method
-  alias_method :to_str, :to_s unless method_defined?(:to_str)
+  alias to_str to_s unless method_defined?(:to_str)
 
   def cd
     Dir.chdir(self) { yield }

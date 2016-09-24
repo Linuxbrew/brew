@@ -56,7 +56,7 @@ class Requirement
   def satisfied?
     result = self.class.satisfy.yielder { |p| instance_eval(&p) }
     @satisfied_result = result
-    !!result
+    result ? true : false
   end
 
   # Overriding #fatal? is deprecated.
@@ -83,12 +83,11 @@ class Requirement
     # PATH.
     # This is undocumented magic and it should be removed, but we need to add
     # a way to declare path-based requirements that work with superenv first.
-    if Pathname === @satisfied_result
-      parent = @satisfied_result.parent
-      unless ENV["PATH"].split(File::PATH_SEPARATOR).include?(parent.to_s)
-        ENV.append_path("PATH", parent)
-      end
-    end
+    return unless @satisfied_result.is_a?(Pathname)
+    parent = @satisfied_result.parent
+
+    return if ENV["PATH"].split(File::PATH_SEPARATOR).include?(parent.to_s)
+    ENV.append_path("PATH", parent)
   end
 
   def env
@@ -102,7 +101,7 @@ class Requirement
   def ==(other)
     instance_of?(other.class) && name == other.name && tags == other.tags
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def hash
     name.hash ^ tags.hash
@@ -115,7 +114,7 @@ class Requirement
   def to_dependency
     f = self.class.default_formula
     raise "No default formula defined for #{inspect}" if f.nil?
-    if HOMEBREW_TAP_FORMULA_REGEX === f
+    if f =~ HOMEBREW_TAP_FORMULA_REGEX
       TapDependency.new(f, tags, method(:modify_build_environment), name)
     else
       Dependency.new(f, tags, method(:modify_build_environment), name)
@@ -199,11 +198,8 @@ class Requirement
 
       formulae.each do |f|
         f.requirements.each do |req|
-          if prune?(f, req, &block)
-            next
-          else
-            reqs << req
-          end
+          next if prune?(f, req, &block)
+          reqs << req
         end
       end
 

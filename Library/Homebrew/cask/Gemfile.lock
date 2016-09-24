@@ -1,8 +1,17 @@
+GIT
+  remote: https://github.com/colszowka/simplecov.git
+  revision: 83d8031ddde0927f87ef9327200a98583ca18d77
+  branch: master
+  specs:
+    simplecov (0.12.0)
+      docile (~> 1.1.0)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
     ansi (1.5.0)
-    ast (2.3.0)
     builder (3.2.2)
     byebug (9.0.5)
     codecov (0.1.5)
@@ -23,9 +32,9 @@ GEM
       ruby-progressbar
     mocha (1.1.0)
       metaclass (~> 0.0.1)
-    parser (2.3.1.2)
-      ast (~> 2.2)
-    powerpack (0.1.1)
+    parallel (1.9.0)
+    parallel_tests (2.9.0)
+      parallel
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -33,8 +42,6 @@ GEM
     pry-byebug (3.4.0)
       byebug (~> 9.0)
       pry (~> 0.10)
-    public_suffix (2.0.2)
-    rainbow (2.1.0)
     rake (10.4.2)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
@@ -53,23 +60,9 @@ GEM
     rspec-support (3.0.4)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
-    rubocop (0.41.2)
-      parser (>= 2.3.1.1, < 3.0)
-      powerpack (~> 0.1)
-      rainbow (>= 1.99.1, < 3.0)
-      ruby-progressbar (~> 1.7)
-      unicode-display_width (~> 1.0, >= 1.0.1)
-    rubocop-cask (0.8.3)
-      public_suffix (~> 2.0)
-      rubocop (~> 0.41.1)
     ruby-progressbar (1.8.1)
-    simplecov (0.12.0)
-      docile (~> 1.1.0)
-      json (>= 1.8, < 3)
-      simplecov-html (~> 0.10.0)
     simplecov-html (0.10.0)
     slop (3.6.0)
-    unicode-display_width (1.1.0)
     url (0.3.2)
 
 PLATFORMS
@@ -80,13 +73,14 @@ DEPENDENCIES
   minitest (= 5.4.1)
   minitest-reporters
   mocha (= 1.1.0)
+  parallel_tests
   pry
   pry-byebug
   rake
   rspec (~> 3.0.0)
   rspec-its
   rspec-wait
-  rubocop-cask (~> 0.8.3)
+  simplecov (= 0.12.0)!
 
 BUNDLED WITH
-   1.12.5
+   1.13.1

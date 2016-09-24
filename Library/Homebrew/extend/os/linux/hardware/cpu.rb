@@ -81,7 +81,7 @@ module Hardware
       %w[aes altivec avx avx2 lm sse3 ssse3 sse4 sse4_2].each do |flag|
         define_method(flag + "?") { flags.include? flag }
       end
-      alias_method :is_64_bit?, :lm?
+      alias is_64_bit? lm?
 
       def bits
         is_64_bit? ? 64 : 32

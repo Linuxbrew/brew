@@ -79,19 +79,16 @@ module Language
 
           # if we have build flags, we have to pass them to cabal install to resolve the necessary
           # dependencies, and call cabal configure afterwards to set the flags again for compile
-          flags = ""
-          if options[:flags]
-            flags = "--flags=#{options[:flags].join(" ")}"
-          end
+          flags = "--flags=#{options[:flags].join(" ")}" if options[:flags]
 
           args_and_flags = args
-          args_and_flags << flags unless flags.empty?
+          args_and_flags << flags unless flags.nil?
 
           # install dependencies in the sandbox
           cabal_install "--only-dependencies", *args_and_flags
 
           # call configure if build flags are set
-          cabal_configure flags unless flags.empty?
+          cabal_configure flags unless flags.nil?
 
           # install the main package in the destination dir
           cabal_install "--prefix=#{prefix}", *args

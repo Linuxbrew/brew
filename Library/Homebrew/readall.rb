@@ -1,7 +1,6 @@
 require "formula"
 require "tap"
 require "thread"
-require "readall"
 
 module Readall
   class << self

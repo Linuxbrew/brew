@@ -158,14 +158,13 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
 
     version.update_commit(last_commit) if head?
 
-    if @ref_type == :tag && @revision && current_revision
-      unless current_revision == @revision
-        raise <<-EOS.undent
-          #{@ref} tag should be #{@revision}
-          but is actually #{current_revision}
-        EOS
-      end
-    end
+    return unless @ref_type == :tag
+    return unless @revision && current_revision
+    return if current_revision == @revision
+    raise <<-EOS.undent
+      #{@ref} tag should be #{@revision}
+      but is actually #{current_revision}
+    EOS
   end
 
   def fetch_last_commit
@@ -336,14 +335,14 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       rescue ErrorDuringExecution
         # 33 == range not supported
         # try wiping the incomplete download and retrying once
-        if $?.exitstatus == 33 && had_incomplete_download
-          ohai "Trying a full download"
-          temporary_path.unlink
-          had_incomplete_download = false
-          retry
-        else
+        unless $?.exitstatus == 33 && had_incomplete_download
           raise CurlDownloadStrategyError, @url
         end
+
+        ohai "Trying a full download"
+        temporary_path.unlink
+        had_incomplete_download = false
+        retry
       end
       ignore_interrupts { temporary_path.rename(cached_location) }
     end
@@ -561,7 +560,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     Utils.popen_read("svn", "info", cached_location.to_s).strip[/^URL: (.+)$/, 1]
   end
 
-  def get_externals
+  def externals
     Utils.popen_read("svn", "propget", "svn:externals", @url).chomp.each_line do |line|
       name, url = line.split(/\s+/)
       yield name, url
@@ -601,14 +600,14 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
       main_revision = @ref[:trunk]
       fetch_repo cached_location, @url, main_revision, true
 
-      get_externals do |external_name, external_url|
+      externals do |external_name, external_url|
         fetch_repo cached_location+external_name, external_url, @ref[external_name], true
       end
     else
       fetch_repo cached_location, @url
     end
   end
-  alias_method :update, :clone_repo
+  alias update clone_repo
 end
 
 class GitDownloadStrategy < VCSDownloadStrategy
@@ -663,19 +662,19 @@ class GitDownloadStrategy < VCSDownloadStrategy
     @shallow && support_depth?
   end
 
-  def is_shallow_clone?
+  def shallow_dir?
     git_dir.join("shallow").exist?
   end
 
   def support_depth?
-    @ref_type != :revision && SHALLOW_CLONE_WHITELIST.any? { |rx| rx === @url }
+    @ref_type != :revision && SHALLOW_CLONE_WHITELIST.any? { |regex| @url =~ regex }
   end
 
   def git_dir
     cached_location.join(".git")
   end
 
-  def has_ref?
+  def ref?
     quiet_system "git", "--git-dir", git_dir, "rev-parse", "-q", "--verify", "#{@ref}^{commit}"
   end
 
@@ -696,7 +695,8 @@ class GitDownloadStrategy < VCSDownloadStrategy
     args << "--depth" << "1" if shallow_clone?
 
     case @ref_type
-    when :branch, :tag then args << "--branch" << @ref
+    when :branch, :tag
+      args << "--branch" << @ref
     end
 
     args << @url << cached_location
@@ -716,12 +716,12 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def update_repo
-    if @ref_type == :branch || !has_ref?
-      if !shallow_clone? && is_shallow_clone?
-        quiet_safe_system "git", "fetch", "origin", "--unshallow"
-      else
-        quiet_safe_system "git", "fetch", "origin"
-      end
+    return unless @ref_type == :branch || !ref?
+
+    if !shallow_clone? && shallow_dir?
+      quiet_safe_system "git", "fetch", "origin", "--unshallow"
+    else
+      quiet_safe_system "git", "fetch", "origin"
     end
   end
 
@@ -741,9 +741,11 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def reset_args
     ref = case @ref_type
-          when :branch then "origin/#{@ref}"
-          when :revision, :tag then @ref
-          end
+    when :branch
+      "origin/#{@ref}"
+    when :revision, :tag
+      @ref
+    end
 
     %W[reset --hard #{ref}]
   end
@@ -795,10 +797,10 @@ end
 class GitHubGitDownloadStrategy < GitDownloadStrategy
   def initialize(name, resource)
     super
-    if @url =~ %r{^https?://github\.com/([^/]+)/([^/]+)\.git$}
-      @user = $1
-      @repo = $2
-    end
+
+    return unless %r{^https?://github\.com/(?<user>[^/]+)/(?<repo>[^/]+)\.git$} =~ @url
+    @user = user
+    @repo = repo
   end
 
   def github_last_commit
@@ -1021,9 +1023,9 @@ class DownloadStrategyDetector
   def self.detect(url, strategy = nil)
     if strategy.nil?
       detect_from_url(url)
-    elsif Class === strategy && strategy < AbstractDownloadStrategy
+    elsif strategy.is_a?(Class) && strategy < AbstractDownloadStrategy
       strategy
-    elsif Symbol === strategy
+    elsif strategy.is_a?(Symbol)
       detect_from_symbol(strategy)
     else
       raise TypeError,

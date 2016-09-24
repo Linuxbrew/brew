@@ -3,8 +3,12 @@ require "tempfile"
 
 class Sandbox
   SANDBOX_EXEC = "/usr/bin/sandbox-exec".freeze
-  SANDBOXED_TAPS = [
-    "homebrew/core",
+  SANDBOXED_TAPS = %w[
+    homebrew/core
+    homebrew/dupes
+    homebrew/fuse
+    homebrew/devel-only
+    homebrew/tex
   ].freeze
 
   def self.available?
@@ -73,17 +77,21 @@ class Sandbox
 
   # Xcode projects expect access to certain cache/archive dirs.
   def allow_write_xcode
-    allow_write_path "/Users/#{ENV["USER"]}/Library/Developer/Xcode/DerivedData/"
+    allow_write_path "/Users/#{ENV["USER"]}/Library/Developer"
   end
 
   def allow_write_log(formula)
     allow_write_path formula.logs
   end
 
-  def deny_write_homebrew_library
-    deny_write_path HOMEBREW_LIBRARY
-    deny_write_path HOMEBREW_REPOSITORY/".git"
+  def deny_write_homebrew_repository
     deny_write HOMEBREW_BREW_FILE
+    if HOMEBREW_PREFIX.to_s != HOMEBREW_REPOSITORY.to_s
+      deny_write_path HOMEBREW_REPOSITORY
+    else
+      deny_write_path HOMEBREW_LIBRARY
+      deny_write_path HOMEBREW_REPOSITORY/".git"
+    end
   end
 
   def exec(*args)

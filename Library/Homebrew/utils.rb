@@ -218,13 +218,9 @@ def interactive_shell(f = nil)
 
   Process.wait fork { exec ENV["SHELL"] }
 
-  if $?.success?
-    return
-  elsif $?.exited?
-    raise "Aborted due to non-zero exit status (#{$?.exitstatus})"
-  else
-    raise $?.inspect
-  end
+  return if $?.success?
+  raise "Aborted due to non-zero exit status (#{$?.exitstatus})" if $?.exited?
+  raise $?.inspect
 end
 
 module Homebrew
@@ -246,15 +242,6 @@ module Homebrew
   def self.system(cmd, *args)
     puts "#{cmd} #{args*" "}" if ARGV.verbose?
     _system(cmd, *args)
-  end
-
-  def self.homebrew_version_string
-    if pretty_revision = HOMEBREW_REPOSITORY.git_short_head
-      last_commit = HOMEBREW_REPOSITORY.git_last_commit_date
-      "#{HOMEBREW_VERSION} (git revision #{pretty_revision}; last commit #{last_commit})"
-    else
-      "#{HOMEBREW_VERSION} (no git repository)"
-    end
   end
 
   def self.core_tap_version_string
@@ -334,13 +321,12 @@ module Homebrew
       end
     end
 
-    if $times.nil?
-      $times = {}
-      at_exit do
-        col_width = [$times.keys.map(&:size).max + 2, 15].max
-        $times.sort_by { |_k, v| v }.each do |method, time|
-          puts format("%-*s %0.4f sec", col_width, "#{method}:", time)
-        end
+    return unless $times.nil?
+    $times = {}
+    at_exit do
+      col_width = [$times.keys.map(&:size).max + 2, 15].max
+      $times.sort_by { |_k, v| v }.each do |method, time|
+        puts format("%-*s %0.4f sec", col_width, "#{method}:", time)
       end
     end
   end
@@ -617,14 +603,14 @@ def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
     dst_dir.parent.mkpath
     dst.make_relative_symlink(src)
   end
-  unless conflicts.empty?
-    onoe <<-EOS.undent
-      Could not link:
-      #{conflicts.join("\n")}
 
-      Please delete these paths and run `#{command}`.
-    EOS
-  end
+  return if conflicts.empty?
+  onoe <<-EOS.undent
+    Could not link:
+    #{conflicts.join("\n")}
+
+    Please delete these paths and run `#{command}`.
+  EOS
 end
 
 def link_path_manpages(path, command)

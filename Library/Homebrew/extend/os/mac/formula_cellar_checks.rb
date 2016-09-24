@@ -64,13 +64,12 @@ module FormulaCellarChecks
     keg = Keg.new(formula.prefix)
     checker = LinkageChecker.new(keg, formula)
 
-    if checker.broken_dylibs?
-      audit_check_output <<-EOS.undent
-        The installation was broken.
-        Broken dylib links found:
-          #{checker.broken_dylibs.to_a * "\n          "}
-      EOS
-    end
+    return unless checker.broken_dylibs?
+    audit_check_output <<-EOS.undent
+      The installation was broken.
+      Broken dylib links found:
+        #{checker.broken_dylibs.to_a * "\n          "}
+    EOS
   end
 
   def audit_installed

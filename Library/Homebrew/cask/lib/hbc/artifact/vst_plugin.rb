@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::VstPlugin < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class VstPlugin < Moved
+    end
+  end
 end

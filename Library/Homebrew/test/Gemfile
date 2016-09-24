@@ -3,15 +3,17 @@ source "https://rubygems.org"
 gem "mocha", "~> 1.1"
 gem "minitest", "~> 5.3"
 gem "rake", "~> 10.3"
+gem "parallel_tests", "~> 2.9"
 
 group :coverage do
-  # This is SimpleCov v0.12.0 with one PR merged on top, that finally resolves
+  # This is SimpleCov v0.12.0 with two fixes merged on top, that finally resolve
   # all issues with parallel tests, uncovered files, and tracked files. Switch
-  # back to stable as soon as v0.12.1 or v0.13.0 is released. See pull request
-  # <https://github.com/Homebrew/legacy-homebrew/pull/48250> for full details.
+  # back to stable as soon as v0.12.1 or v0.13.0 is released. For details, see:
+  #  - https://github.com/colszowka/simplecov/pull/513
+  #  - https://github.com/colszowka/simplecov/pull/520
   gem "simplecov", "0.12.0",
     git: "https://github.com/colszowka/simplecov.git",
-    branch: "master", # commit 257e26394c464c4ab388631b4eff1aa98c37d3f1
+    branch: "master", # commit 83d8031ddde0927f87ef9327200a98583ca18d77
     require: false
   gem "codecov", require: false
 end

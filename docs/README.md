@@ -7,8 +7,9 @@ Homebrew installs the stuff you need that Apple didn’t.
 - [Gems, Eggs and Perl Modules](Gems,-Eggs-and-Perl-Modules.md)
 - [Homebrew and Python](Homebrew-and-Python.md)
 
-Please note: Homebrew is not 1.0 yet. Generally it works well, but when
-it doesn’t we’d hope you report the bug.
+Please note: Homebrew generally works well, but when it doesn’t we’d hope you
+report the bug.
+
 ## Troubleshooting
 First, please run `brew update` (twice) and `brew doctor`.
 

@@ -18,7 +18,7 @@ module Superenv
   attr_accessor :keg_only_deps, :deps
 
   attr_accessor :x11
-  alias_method :x11?, :x11
+  alias x11? x11
 
   def self.extended(base)
     base.keg_only_deps = []
@@ -64,9 +64,7 @@ module Superenv
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
-    unless formula.nil?
-      self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix
-    end
+    self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix unless formula.nil?
 
     # The HOMEBREW_CCCFG ENV variable is used by the ENV/cc tool to control
     # compiler flag stripping. It consists of a string of characters which act
@@ -84,7 +82,7 @@ module Superenv
     # s - apply fix for sed's Unicode support
     # a - apply fix for apr-1-config path
   end
-  alias_method :generic_setup_build_environment, :setup_build_environment
+  alias generic_setup_build_environment setup_build_environment
 
   private
 
@@ -265,7 +263,7 @@ module Superenv
 
     old
   end
-  alias_method :j1, :deparallelize
+  alias j1 deparallelize
 
   def make_jobs
     self["MAKEFLAGS"] =~ /-\w*j(\d+)/
@@ -278,12 +276,12 @@ module Superenv
     self["HOMEBREW_ARCHFLAGS"] = Hardware::CPU.universal_archs.as_arch_flags
 
     # GCC doesn't accept "-march" for a 32-bit CPU with "-arch x86_64"
-    if compiler != :clang && Hardware::CPU.is_32_bit?
-      self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
-        /-march=\S*/,
-        "-Xarch_#{Hardware::CPU.arch_32_bit} \\0"
-      )
-    end
+    return if compiler == :clang
+    return unless Hardware::CPU.is_32_bit?
+    self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
+      /-march=\S*/,
+      "-Xarch_#{Hardware::CPU.arch_32_bit} \\0"
+    )
   end
 
   def permit_arch_flags
@@ -336,18 +334,18 @@ module Superenv
 
   # These methods are no longer necessary under superenv, but are needed to
   # maintain an interface compatible with stdenv.
-  alias_method :fast, :noop
-  alias_method :O4, :noop
-  alias_method :Og, :noop
-  alias_method :libxml2, :noop
-  alias_method :set_cpu_flags, :noop
+  alias fast noop
+  alias O4 noop
+  alias Og noop
+  alias libxml2 noop
+  alias set_cpu_flags noop
 
   # These methods provide functionality that has not yet been ported to
   # superenv.
-  alias_method :gcc_4_0_1, :noop
-  alias_method :minimal_optimization, :noop
-  alias_method :no_optimization, :noop
-  alias_method :enable_warnings, :noop
+  alias gcc_4_0_1 noop
+  alias minimal_optimization noop
+  alias no_optimization noop
+  alias enable_warnings noop
 end
 
 class Array

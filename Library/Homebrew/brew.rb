@@ -14,7 +14,7 @@ $:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
 
 if ARGV == %w[--version] || ARGV == %w[-v]
-  puts "Homebrew #{Homebrew.homebrew_version_string}"
+  puts "Homebrew #{HOMEBREW_VERSION}"
   puts "Homebrew/homebrew-core #{Homebrew.core_tap_version_string}"
   exit 0
 end
@@ -37,9 +37,9 @@ begin
   cmd = nil
 
   ARGV.dup.each_with_index do |arg, i|
-    if help_flag && cmd
-      break
-    elsif help_flag_list.include?(arg)
+    break if help_flag && cmd
+
+    if help_flag_list.include?(arg)
       # Option-style help: Both `--help <cmd>` and `<cmd> --help` are fine.
       help_flag = true
     elsif arg == "help" && !cmd

@@ -24,7 +24,9 @@ class FormulaInstaller
     private(*names)
     names.each do |name|
       predicate = "#{name}?"
-      define_method(predicate) { !!send(name) }
+      define_method(predicate) do
+        send(name) ? true : false
+      end
       private(predicate)
     end
   end
@@ -71,7 +73,8 @@ class FormulaInstaller
   end
 
   def build_bottle?
-    !!@build_bottle && !formula.bottle_disabled?
+    return false unless @build_bottle
+    !formula.bottle_disabled?
   end
 
   def pour_bottle?(install_bottle_options = { warn: false })
@@ -130,12 +133,10 @@ class FormulaInstaller
     begin
       compute_dependencies
     rescue TapFormulaUnavailableError => e
-      if e.tap.installed?
-        raise
-      else
-        e.tap.install
-        retry
-      end
+      raise if e.tap.installed?
+
+      e.tap.install
+      retry
     end
   rescue FormulaUnavailableError => e
     e.dependent = formula.full_name
@@ -145,23 +146,24 @@ class FormulaInstaller
   def check_install_sanity
     raise FormulaInstallationAlreadyAttemptedError, formula if @@attempted.include?(formula)
 
-    unless skip_deps_check?
-      recursive_deps = formula.recursive_dependencies
-      unlinked_deps = recursive_deps.map(&:to_formula).select do |dep|
-        dep.installed? && !dep.keg_only? && !dep.linked_keg.directory?
-      end
-      raise CannotInstallFormulaError,
-        "You must `brew link #{unlinked_deps*" "}` before #{formula.full_name} can be installed" unless unlinked_deps.empty?
+    return if skip_deps_check?
 
-      pinned_unsatisfied_deps = recursive_deps.select do |dep|
-        dep.to_formula.pinned? && !dep.satisfied?(inherited_options_for(dep))
-      end
-
-      unless pinned_unsatisfied_deps.empty?
-        raise CannotInstallFormulaError,
-          "You must `brew unpin #{pinned_unsatisfied_deps*" "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
-      end
+    recursive_deps = formula.recursive_dependencies
+    unlinked_deps = recursive_deps.map(&:to_formula).select do |dep|
+      dep.installed? && !dep.keg_only? && !dep.linked_keg.directory?
     end
+
+    unless unlinked_deps.empty?
+      raise CannotInstallFormulaError, "You must `brew link #{unlinked_deps*" "}` before #{formula.full_name} can be installed"
+    end
+
+    pinned_unsatisfied_deps = recursive_deps.select do |dep|
+      dep.to_formula.pinned? && !dep.satisfied?(inherited_options_for(dep))
+    end
+
+    return if pinned_unsatisfied_deps.empty?
+    raise CannotInstallFormulaError,
+      "You must `brew unpin #{pinned_unsatisfied_deps*" "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
   end
 
   def build_bottle_preinstall
@@ -254,9 +256,7 @@ class FormulaInstaller
 
     unless @poured_bottle
       not_pouring = !pour_bottle || @pour_failed
-      if not_pouring && !ignore_deps?
-        compute_and_install_dependencies
-      end
+      compute_and_install_dependencies if not_pouring && !ignore_deps?
       build
       clean
     end
@@ -284,11 +284,10 @@ class FormulaInstaller
           #{formula}: #{e.message}
           'conflicts_with \"#{c.name}\"' should be removed from #{formula.path.basename}.
         EOS
-        if ARGV.homebrew_developer?
-          raise
-        else
-          $stderr.puts "Please report this to the #{formula.tap} tap!"
-        end
+
+        raise if ARGV.homebrew_developer?
+
+        $stderr.puts "Please report this to the #{formula.tap} tap!"
         false
       else
         f.linked_keg.exist? && f.opt_prefix.exist?
@@ -491,10 +490,9 @@ class FormulaInstaller
 
     c = Caveats.new(formula)
 
-    unless c.empty?
-      @show_summary_heading = true
-      ohai "Caveats", c.caveats
-    end
+    return if c.empty?
+    @show_summary_heading = true
+    ohai "Caveats", c.caveats
   end
 
   def finish
@@ -543,7 +541,7 @@ class FormulaInstaller
     @build_time ||= Time.now - @start_time if @start_time && !interactive?
   end
 
-  def sanitized_ARGV_options
+  def sanitized_argv_options
     args = []
     args << "--ignore-dependencies" if ignore_deps?
 
@@ -582,7 +580,7 @@ class FormulaInstaller
   end
 
   def build_argv
-    sanitized_ARGV_options + options.as_flags
+    sanitized_argv_options + options.as_flags
   end
 
   def build
@@ -705,13 +703,12 @@ class FormulaInstaller
       raise
     end
 
-    unless link_overwrite_backup.empty?
-      opoo "These files were overwritten during `brew link` step:"
-      puts link_overwrite_backup.keys
-      puts
-      puts "They have been backed up in #{backup_dir}"
-      @show_summary_heading = true
-    end
+    return if link_overwrite_backup.empty?
+    opoo "These files were overwritten during `brew link` step:"
+    puts link_overwrite_backup.keys
+    puts
+    puts "They have been backed up in #{backup_dir}"
+    @show_summary_heading = true
   end
 
   def install_plist
@@ -803,15 +800,14 @@ class FormulaInstaller
   end
 
   def audit_check_output(output)
-    if output
-      opoo output
-      @show_summary_heading = true
-    end
+    return unless output
+    opoo output
+    @show_summary_heading = true
   end
 
   def audit_installed
-    audit_check_output(check_PATH(formula.bin))
-    audit_check_output(check_PATH(formula.sbin))
+    audit_check_output(check_env_path(formula.bin))
+    audit_check_output(check_env_path(formula.sbin))
     super
   end
 
@@ -822,22 +818,20 @@ class FormulaInstaller
   end
 
   def lock
-    if (@@locked ||= []).empty?
-      formula.recursive_dependencies.each do |dep|
-        @@locked << dep.to_formula
-      end unless ignore_deps?
-      @@locked.unshift(formula)
-      @@locked.uniq!
-      @@locked.each(&:lock)
-      @hold_locks = true
-    end
+    return unless (@@locked ||= []).empty?
+    formula.recursive_dependencies.each do |dep|
+      @@locked << dep.to_formula
+    end unless ignore_deps?
+    @@locked.unshift(formula)
+    @@locked.uniq!
+    @@locked.each(&:lock)
+    @hold_locks = true
   end
 
   def unlock
-    if hold_locks?
-      @@locked.each(&:unlock)
-      @@locked.clear
-      @hold_locks = false
-    end
+    return unless hold_locks?
+    @@locked.each(&:unlock)
+    @@locked.clear
+    @hold_locks = false
   end
 end

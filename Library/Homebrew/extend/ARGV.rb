@@ -30,7 +30,7 @@ module HomebrewArgvExtension
         if f.any_version_installed?
           tab = Tab.for_formula(f)
           resolved_spec = spec(nil) || tab.spec
-          f.set_active_spec(resolved_spec) if f.send(resolved_spec)
+          f.active_spec = resolved_spec if f.send(resolved_spec)
           f.build = tab
           if f.head? && tab.tabfile
             k = Keg.new(tab.tabfile.parent)
@@ -88,11 +88,11 @@ module HomebrewArgvExtension
             Formulary.from_rack(rack)
           end
 
-          if (prefix = f.installed_prefix).directory?
-            Keg.new(prefix)
-          else
+          unless (prefix = f.installed_prefix).directory?
             raise MultipleVersionsInstalledError, rack.basename
           end
+
+          Keg.new(prefix)
         end
       rescue FormulaUnavailableError
         raise <<-EOS.undent
@@ -216,7 +216,7 @@ module HomebrewArgvExtension
   end
 
   def build_all_from_source?
-    !!ENV["HOMEBREW_BUILD_FROM_SOURCE"]
+    !ENV["HOMEBREW_BUILD_FROM_SOURCE"].nil?
   end
 
   # Whether a given formula should be built from source during the current

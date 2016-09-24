@@ -1,7 +1,7 @@
 require "utils/shell"
 
 module FormulaCellarChecks
-  def check_PATH(bin)
+  def check_env_path(bin)
     # warn the user if stuff was installed outside of their PATH
     return unless bin.directory?
     return if bin.children.empty?
@@ -166,7 +166,7 @@ module FormulaCellarChecks
     audit_check_output(check_elisp_dirname(formula.share, formula.name))
     audit_check_output(check_elisp_root(formula.share, formula.name))
   end
-  alias_method :generic_audit_installed, :audit_installed
+  alias generic_audit_installed audit_installed
 
   private
 

@@ -29,13 +29,13 @@ class PkgVersion
       version.to_s
     end
   end
-  alias_method :to_str, :to_s
+  alias to_str to_s
 
   def <=>(other)
-    return unless PkgVersion === other
+    return unless other.is_a?(PkgVersion)
     (version <=> other.version).nonzero? || revision <=> other.revision
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def hash
     version.hash ^ revision.hash

@@ -152,7 +152,7 @@ class SystemConfig
       f.puts "Ruby: #{describe_ruby}"
       f.puts "Java: #{describe_java}"
     end
-    alias_method :dump_generic_verbose_config, :dump_verbose_config
+    alias dump_generic_verbose_config dump_verbose_config
   end
 end
 

@@ -83,11 +83,11 @@ module Homebrew
       end
     end
 
-    unless problem_count.zero?
-      problems = "problem" + plural(problem_count)
-      formulae = "formula" + plural(formula_count, "e")
-      ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
-    end
+    return if problem_count.zero?
+
+    problems = "problem" + plural(problem_count)
+    formulae = "formula" + plural(formula_count, "e")
+    ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
   end
 end
 
@@ -279,12 +279,13 @@ class FormulaAuditor
         end
       end
     end
+
     if present.include?("head") && present.include?("head block")
       problem "Should not have both `head` and `head do`"
     end
-    if present.include?("bottle modifier") && present.include?("bottle block")
-      problem "Should not have `bottle :unneeded/:disable` and `bottle do`"
-    end
+
+    return unless present.include?("bottle modifier") && present.include?("bottle block")
+    problem "Should not have `bottle :unneeded/:disable` and `bottle do`"
   end
 
   def audit_class
@@ -348,9 +349,8 @@ class FormulaAuditor
 
     same_name_tap_formulae.delete(full_name)
 
-    unless same_name_tap_formulae.empty?
-      problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
-    end
+    return if same_name_tap_formulae.empty?
+    problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
   end
 
   def audit_deps
@@ -467,7 +467,7 @@ class FormulaAuditor
 
     # Make sure the formula name plus description is no longer than 80 characters
     # Note full_name includes the name of the tap, while name does not
-    linelength = formula.name.length + ": ".length + desc.length
+    linelength = "#{formula.name}: #{desc}".length
     if linelength > 80
       problem <<-EOS.undent
         Description is too long. \"name: desc\" should be less than 80 characters.
@@ -483,9 +483,8 @@ class FormulaAuditor
       problem "Description shouldn't start with an indefinite article (#{$1})"
     end
 
-    if desc.downcase.start_with? "#{formula.name} "
-      problem "Description shouldn't include the formula name"
-    end
+    return unless desc.downcase.start_with? "#{formula.name} "
+    problem "Description shouldn't include the formula name"
   end
 
   def audit_homepage
@@ -562,9 +561,9 @@ class FormulaAuditor
   end
 
   def audit_bottle_spec
-    if formula.bottle_disabled? && !formula.bottle_disable_reason.valid?
-      problem "Unrecognized bottle modifier"
-    end
+    return unless formula.bottle_disabled?
+    return if formula.bottle_disable_reason.valid?
+    problem "Unrecognized bottle modifier"
   end
 
   def audit_github_repository
@@ -592,9 +591,8 @@ class FormulaAuditor
       problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
     end
 
-    if Date.parse(metadata["created_at"]) > (Date.today - 30)
-      problem "GitHub repository too new (<30 days old)"
-    end
+    return if Date.parse(metadata["created_at"]) <= (Date.today - 30)
+    problem "GitHub repository too new (<30 days old)"
   end
 
   def audit_specs
@@ -668,24 +666,26 @@ class FormulaAuditor
     end
 
     revision_map = attributes_map[:revision]
-    if formula.revision.nonzero?
-      if formula.stable
-        if revision_map[formula.stable.version].empty? # check stable spec
-          problem "'revision #{formula.revision}' should be removed"
-        end
-      else # head/devel-only formula
+
+    return if formula.revision.zero?
+
+    if formula.stable
+      if revision_map[formula.stable.version].empty? # check stable spec
         problem "'revision #{formula.revision}' should be removed"
       end
+    else # head/devel-only formula
+      problem "'revision #{formula.revision}' should be removed"
     end
   end
 
   def audit_legacy_patches
     return unless formula.respond_to?(:patches)
     legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
-    unless legacy_patches.empty?
-      problem "Use the patch DSL instead of defining a 'patches' method"
-      legacy_patches.each { |p| audit_patch(p) }
-    end
+
+    return if legacy_patches.empty?
+
+    problem "Use the patch DSL instead of defining a 'patches' method"
+    legacy_patches.each { |p| audit_patch(p) }
   end
 
   def audit_patch(patch)
@@ -732,9 +732,8 @@ class FormulaAuditor
       problem "Please set plist_options when using a formula-defined plist."
     end
 
-    if text.include?('require "language/go"') && !text.include?("go_resource")
-      problem "require \"language/go\" is unnecessary unless using `go_resource`s"
-    end
+    return unless text.include?('require "language/go"') && !text.include?("go_resource")
+    problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
   def audit_line(line, lineno)
@@ -961,61 +960,55 @@ class FormulaAuditor
       problem "Use Language::Node for npm install args"
     end
 
-    if @strict
-      if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
-        bad_system = $1
-        unless %w[| < > & ; *].any? { |c| bad_system.include? c }
-          good_system = bad_system.gsub(" ", "\", \"")
-          problem "Use `system #{good_system}` instead of `system #{bad_system}` "
-        end
-      end
+    return unless @strict
 
-      if line =~ /(require ["']formula["'])/
-        problem "`#{$1}` is now unnecessary"
-      end
-
-      if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
-        problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
-      end
-
-      if line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
-        problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
+    if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
+      bad_system = $1
+      unless %w[| < > & ; *].any? { |c| bad_system.include? c }
+        good_system = bad_system.gsub(" ", "\", \"")
+        problem "Use `system #{good_system}` instead of `system #{bad_system}` "
       end
     end
+
+    if line =~ /(require ["']formula["'])/
+      problem "`#{$1}` is now unnecessary"
+    end
+
+    if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
+      problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
+    end
+
+    return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
+    problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
   end
 
   def audit_caveats
-    caveats = formula.caveats.to_s
-
-    if caveats.include?("setuid")
-      problem "Don't recommend setuid in the caveats, suggest sudo instead."
-    end
+    return unless formula.caveats.to_s.include?("setuid")
+    problem "Don't recommend setuid in the caveats, suggest sudo instead."
   end
 
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
     return unless formula.tap && formula.tap.official?
+    return unless formula.tap.tap_migrations.key?(formula.name)
 
-    if formula.tap.tap_migrations.key?(formula.name)
-      problem <<-EOS.undent
-        #{formula.name} seems to be listed in tap_migrations.json!
-        Please remove #{formula.name} from present tap & tap_migrations.json
-        before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
-      EOS
-    end
+    problem <<-EOS.undent
+      #{formula.name} seems to be listed in tap_migrations.json!
+      Please remove #{formula.name} from present tap & tap_migrations.json
+      before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
+    EOS
   end
 
   def audit_prefix_has_contents
     return unless formula.prefix.directory?
+    return unless Keg.new(formula.prefix).empty_installation?
 
-    if Keg.new(formula.prefix).empty_installation?
-      problem <<-EOS.undent
-        The installation seems to be empty. Please ensure the prefix
-        is set correctly and expected files are installed.
-        The prefix configure/make argument may be case-sensitive.
-      EOS
-    end
+    problem <<-EOS.undent
+      The installation seems to be empty. Please ensure the prefix
+      is set correctly and expected files are installed.
+      The prefix configure/make argument may be case-sensitive.
+    EOS
   end
 
   def audit_conditional_dep(dep, condition, line)
@@ -1116,9 +1109,8 @@ class ResourceAuditor
       problem "version #{version} should not have a leading 'v'"
     end
 
-    if version.to_s =~ /_\d+$/
-      problem "version #{version} should not end with an underline and a number"
-    end
+    return unless version.to_s =~ /_\d+$/
+    problem "version #{version} should not end with an underline and a number"
   end
 
   def audit_checksum
@@ -1184,11 +1176,8 @@ class ResourceAuditor
       end
     end
 
-    using_strategy = DownloadStrategyDetector.detect("", using)
-
-    if url_strategy == using_strategy
-      problem "Redundant :using value in URL"
-    end
+    return unless url_strategy == DownloadStrategyDetector.detect("", using)
+    problem "Redundant :using value in URL"
   end
 
   def audit_urls

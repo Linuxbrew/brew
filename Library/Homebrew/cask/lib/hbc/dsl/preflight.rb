@@ -1,3 +1,7 @@
-class Hbc::DSL::Preflight < Hbc::DSL::Base
-  include Hbc::Staged
+module Hbc
+  class DSL
+    class Preflight < Base
+      include Staged
+    end
+  end
 end

@@ -1,4 +1,8 @@
-HOMEBREW_VERSION="0.9.9"
+HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty 2>/dev/null)"
+if [[ -z "$HOMEBREW_VERSION" ]]
+then
+  HOMEBREW_VERSION=">1.0.0 (no git repository)"
+fi
 
 onoe() {
   if [[ -t 2 ]] # check whether stderr is a tty.

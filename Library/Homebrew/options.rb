@@ -14,14 +14,14 @@ class Option
   end
 
   def <=>(other)
-    return unless Option === other
+    return unless other.is_a?(Option)
     name <=> other.name
   end
 
   def ==(other)
     instance_of?(other.class) && name == other.name
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def hash
     name.hash
@@ -51,7 +51,7 @@ class DeprecatedOption
   def ==(other)
     instance_of?(other.class) && old == other.old && current == other.current
   end
-  alias_method :eql?, :==
+  alias eql? ==
 end
 
 class Options
@@ -106,7 +106,7 @@ class Options
     any? { |opt| opt == o || opt.name == o || opt.flag == o }
   end
 
-  alias_method :to_ary, :to_a
+  alias to_ary to_a
 
   def inspect
     "#<#{self.class.name}: #{to_a.inspect}>"

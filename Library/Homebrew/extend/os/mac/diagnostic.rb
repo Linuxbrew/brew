@@ -14,7 +14,7 @@ module Homebrew
       end
 
       def fatal_development_tools_checks
-        if MacOS.prerelease?
+        if MacOS.version >= :sierra && ENV["CI"].nil?
           %w[
             check_xcode_up_to_date
             check_clt_up_to_date

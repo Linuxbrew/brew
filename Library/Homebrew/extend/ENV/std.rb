@@ -42,18 +42,17 @@ module Stdenv
     end
 
     # Os is the default Apple uses for all its stuff so let's trust them
-    set_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
+    define_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
 
     append "LDFLAGS", "-Wl,-headerpad_max_install_names"
 
     send(compiler)
 
-    if cc =~ GNU_GCC_REGEXP
-      gcc_formula = gcc_version_formula($&)
-      append_path "PATH", gcc_formula.opt_bin.to_s
-    end
+    return unless cc =~ GNU_GCC_REGEXP
+    gcc_formula = gcc_version_formula($&)
+    append_path "PATH", gcc_formula.opt_bin.to_s
   end
-  alias_method :generic_setup_build_environment, :setup_build_environment
+  alias generic_setup_build_environment setup_build_environment
 
   def homebrew_extra_pkg_config_paths
     []
@@ -84,7 +83,7 @@ module Stdenv
 
     old
   end
-  alias_method :j1, :deparallelize
+  alias j1 deparallelize
 
   # These methods are no-ops for compatibility.
   %w[fast O4 Og].each { |opt| define_method(opt) {} }
@@ -112,13 +111,13 @@ module Stdenv
     super
     set_cpu_cflags "-march=nocona -mssse3"
   end
-  alias_method :gcc_4_0_1, :gcc_4_0
+  alias gcc_4_0_1 gcc_4_0
 
   def gcc
     super
     set_cpu_cflags
   end
-  alias_method :gcc_4_2, :gcc
+  alias gcc_4_2 gcc
 
   GNU_GCC_VERSIONS.each do |n|
     define_method(:"gcc-#{n}") do
@@ -137,21 +136,21 @@ module Stdenv
   end
 
   def minimal_optimization
-    set_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
+    define_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
   end
-  alias_method :generic_minimal_optimization, :minimal_optimization
+  alias generic_minimal_optimization minimal_optimization
 
   def no_optimization
-    set_cflags SAFE_CFLAGS_FLAGS
+    define_cflags SAFE_CFLAGS_FLAGS
   end
-  alias_method :generic_no_optimization, :no_optimization
+  alias generic_no_optimization no_optimization
 
   def libxml2
   end
 
   def x11
   end
-  alias_method :libpng, :x11
+  alias libpng x11
 
   # we've seen some packages fail to build when warnings are disabled!
   def enable_warnings
@@ -174,10 +173,10 @@ module Stdenv
     append_to_cflags Hardware::CPU.universal_archs.as_arch_flags
     append "LDFLAGS", Hardware::CPU.universal_archs.as_arch_flags
 
-    if compiler != :clang && Hardware.is_32_bit?
-      # Can't mix "-march" for a 32-bit CPU  with "-arch x86_64"
-      replace_in_cflags(/-march=\S*/, "-Xarch_#{Hardware::CPU.arch_32_bit} \\0")
-    end
+    return if compiler == :clang
+    return unless Hardware.is_32_bit?
+    # Can't mix "-march" for a 32-bit CPU  with "-arch x86_64"
+    replace_in_cflags(/-march=\S*/, "-Xarch_#{Hardware::CPU.arch_32_bit} \\0")
   end
 
   def cxx11
@@ -192,15 +191,11 @@ module Stdenv
   end
 
   def libcxx
-    if compiler == :clang
-      append "CXX", "-stdlib=libc++"
-    end
+    append "CXX", "-stdlib=libc++" if compiler == :clang
   end
 
   def libstdcxx
-    if compiler == :clang
-      append "CXX", "-stdlib=libstdc++"
-    end
+    append "CXX", "-stdlib=libstdc++" if compiler == :clang
   end
 
   # @private
@@ -211,7 +206,7 @@ module Stdenv
   end
 
   # Convenience method to set all C compiler flags in one shot.
-  def set_cflags(val)
+  def define_cflags(val)
     CC_FLAG_VARS.each { |key| self[key] = val }
   end
 
@@ -228,7 +223,7 @@ module Stdenv
     append flags, xarch unless xarch.empty?
     append flags, map.fetch(effective_arch, default)
   end
-  alias_method :generic_set_cpu_flags, :set_cpu_flags
+  alias generic_set_cpu_flags set_cpu_flags
 
   # @private
   def effective_arch

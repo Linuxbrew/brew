@@ -8,18 +8,16 @@ class FormulaLock
   end
 
   def lock
-    HOMEBREW_LOCK_DIR.mkpath
-    @lockfile = get_or_create_lockfile
-    unless @lockfile.flock(File::LOCK_EX | File::LOCK_NB)
-      raise OperationInProgressError, @name
-    end
+    @path.parent.mkpath
+    create_lockfile
+    return if @lockfile.flock(File::LOCK_EX | File::LOCK_NB)
+    raise OperationInProgressError, @name
   end
 
   def unlock
-    unless @lockfile.nil? || @lockfile.closed?
-      @lockfile.flock(File::LOCK_UN)
-      @lockfile.close
-    end
+    return if @lockfile.nil? || @lockfile.closed?
+    @lockfile.flock(File::LOCK_UN)
+    @lockfile.close
   end
 
   def with_lock
@@ -31,13 +29,9 @@ class FormulaLock
 
   private
 
-  def get_or_create_lockfile
-    if @lockfile.nil? || @lockfile.closed?
-      @lockfile = @path.open(File::RDWR | File::CREAT)
-      @lockfile.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
-      @lockfile
-    else
-      @lockfile
-    end
+  def create_lockfile
+    return unless @lockfile.nil? || @lockfile.closed?
+    @lockfile = @path.open(File::RDWR | File::CREAT)
+    @lockfile.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
   end
 end

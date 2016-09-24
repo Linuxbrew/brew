@@ -328,9 +328,9 @@ class Tab < OpenStruct
     else
       s << "Built from source"
     end
-    if time
-      s << Time.at(time).strftime("on %Y-%m-%d at %H:%M:%S")
-    end
+
+    s << Time.at(time).strftime("on %Y-%m-%d at %H:%M:%S") if time
+
     unless used_options.empty?
       s << "with:"
       s << used_options.to_a.join(" ")

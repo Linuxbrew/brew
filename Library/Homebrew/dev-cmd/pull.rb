@@ -41,12 +41,12 @@ require "pkg_version"
 
 module Homebrew
   def pull
-    if ARGV[0] == "--rebase"
-      odie "You meant `git pull --rebase`."
-    end
+    odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
+
     if ARGV.named.empty?
       odie "This command requires at least one argument containing a URL or pull request number"
     end
+
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
     # Formulae with affected bottles that were published
@@ -429,9 +429,9 @@ module Homebrew
     # Returns nil if formula is absent or if there was an error reading it
     def self.lookup(name)
       json = Utils.popen_read(HOMEBREW_BREW_FILE, "info", "--json=v1", name)
-      unless $?.success?
-        return nil
-      end
+
+      return nil unless $?.success?
+
       Homebrew.force_utf8!(json)
       FormulaInfoFromJson.new(Utils::JSON.load(json)[0])
     end
@@ -531,19 +531,19 @@ module Homebrew
             req = Net::HTTP::Head.new bottle_info.url
             req.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
             res = http.request req
-            if res.is_a?(Net::HTTPSuccess)
-              break
-            elsif res.is_a?(Net::HTTPClientError)
-              if retry_count >= max_retries
-                raise "Failed to find published #{f} bottle at #{url}!"
-              end
-              print(wrote_dots ? "." : "Waiting on Bintray.")
-              wrote_dots = true
-              sleep poll_retry_delay_seconds
-              retry_count += 1
-            else
+            break if res.is_a?(Net::HTTPSuccess)
+
+            unless res.is_a?(Net::HTTPClientError)
               raise "Failed to find published #{f} bottle at #{url} (#{res.code} #{res.message})!"
             end
+
+            if retry_count >= max_retries
+              raise "Failed to find published #{f} bottle at #{url}!"
+            end
+            print(wrote_dots ? "." : "Waiting on Bintray.")
+            wrote_dots = true
+            sleep poll_retry_delay_seconds
+            retry_count += 1
           end
         end
 
