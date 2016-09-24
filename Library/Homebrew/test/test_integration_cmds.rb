@@ -273,8 +273,8 @@ class IntegrationCommandTests < Homebrew::TestCase
                  cmd("help", "cat")) # Internal command (documented, Ruby).
     assert_match(/^brew update /,
                  cmd("help", "update")) # Internal command (documented, Shell).
-    assert_match(/^brew test-bot /,
-                 cmd("help", "test-bot")) # Internal developer command (documented, Ruby).
+    assert_match(/^brew update-test /,
+                 cmd("help", "update-test")) # Internal developer command (documented, Ruby).
   end
 
   def test_config
