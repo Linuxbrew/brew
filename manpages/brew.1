@@ -752,7 +752,7 @@ Generate the README\.md file for a new tap\.
 .
 .TP
 \fBtest\fR [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-debug\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
-A few formulae provide a test method\. \fBbrew test\fR \fIformula\fR runs this test method\. There is no standard output or return code, but it should generally indicate to the user if something is wrong with the installed formula\.
+Most formulae provide a test method\. \fBbrew test\fR \fIformula\fR runs this test method\. There is no standard output or return code, but it should generally indicate to the user if something is wrong with the installed formula\.
 .
 .IP
 To test the development or head version of a formula, use \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
@@ -771,14 +771,14 @@ Example: \fBbrew install jruby && brew test jruby\fR
 Run Homebrew\'s unit and integration tests\.
 .
 .TP
-\fBupdate\-test\fR [\fB\-\-commit=<sha1>\fR] [\fB\-\-before=<date>\fR] [\fB\-\-keep\-tmp\fR]
+\fBupdate\-test\fR [\fB\-\-commit=<commit>\fR] [\fB\-\-before=<date>\fR] [\fB\-\-keep\-tmp\fR]
 Runs a test of \fBbrew update\fR with a new repository clone\.
 .
 .IP
 If no arguments are passed, use \fBorigin/master\fR as the start commit\.
 .
 .IP
-If \fB\-\-commit=<sha1>\fR is passed, use \fB<sha1>\fR as the start commit\.
+If \fB\-\-commit=<commit>\fR is passed, use \fB<commit>\fR as the start commit\.
 .
 .IP
 If \fB\-\-before=<date>\fR is passed, use the commit at \fB<date>\fR as the start commit\.
