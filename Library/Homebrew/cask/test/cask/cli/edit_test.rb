@@ -1,17 +1,21 @@
 require "test_helper"
 
 # monkeypatch for testing
-class Hbc::CLI::Edit
-  def self.exec_editor(*command)
-    editor_commands << command
-  end
+module Hbc
+  class CLI
+    class Edit
+      def self.exec_editor(*command)
+        editor_commands << command
+      end
 
-  def self.reset!
-    @editor_commands = []
-  end
+      def self.reset!
+        @editor_commands = []
+      end
 
-  def self.editor_commands
-    @editor_commands ||= []
+      def self.editor_commands
+        @editor_commands ||= []
+      end
+    end
   end
 end
 

@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::InputMethod < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class InputMethod < Moved
+    end
+  end
 end

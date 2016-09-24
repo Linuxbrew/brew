@@ -24,6 +24,8 @@ module FakeDirHooks
   end
 end
 
-class MiniTest::Spec
-  include FakeDirHooks
+module MiniTest
+  class Spec
+    include FakeDirHooks
+  end
 end

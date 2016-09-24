@@ -1,37 +1,39 @@
-module Hbc::Options
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
-
-  module ClassMethods
-    attr_writer :no_binaries
-
-    def no_binaries
-      @no_binaries ||= false
+module Hbc
+  module Options
+    def self.included(base)
+      base.extend(ClassMethods)
     end
 
-    attr_writer :debug
+    module ClassMethods
+      attr_writer :no_binaries
 
-    def debug
-      @debug ||= false
-    end
+      def no_binaries
+        @no_binaries ||= false
+      end
 
-    attr_writer :verbose
+      attr_writer :debug
 
-    def verbose
-      @verbose ||= false
-    end
+      def debug
+        @debug ||= false
+      end
 
-    attr_writer :cleanup_outdated
+      attr_writer :verbose
 
-    def cleanup_outdated
-      @cleanup_outdated ||= false
-    end
+      def verbose
+        @verbose ||= false
+      end
 
-    attr_writer :help
+      attr_writer :cleanup_outdated
 
-    def help
-      @help ||= false
+      def cleanup_outdated
+        @cleanup_outdated ||= false
+      end
+
+      attr_writer :help
+
+      def help
+        @help ||= false
+      end
     end
   end
 end

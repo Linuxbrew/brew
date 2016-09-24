@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::Font < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class Font < Moved
+    end
+  end
 end

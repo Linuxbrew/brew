@@ -1,43 +1,45 @@
 require "fileutils"
 require "hbc/verify"
 
-class Hbc::Download
-  attr_reader :cask
+module Hbc
+  class Download
+    attr_reader :cask
 
-  def initialize(cask, force: false)
-    @cask = cask
-    @force = force
-  end
+    def initialize(cask, force: false)
+      @cask = cask
+      @force = force
+    end
 
-  def perform
-    clear_cache
-    fetch
-    downloaded_path
-  end
+    def perform
+      clear_cache
+      fetch
+      downloaded_path
+    end
 
-  private
+    private
 
-  attr_reader :force
-  attr_accessor :downloaded_path
+    attr_reader :force
+    attr_accessor :downloaded_path
 
-  def downloader
-    @downloader ||= case cask.url.using
-                    when :svn
-                      Hbc::SubversionDownloadStrategy.new(cask)
-                    when :post
-                      Hbc::CurlPostDownloadStrategy.new(cask)
-                    else
-                      Hbc::CurlDownloadStrategy.new(cask)
-                    end
-  end
+    def downloader
+      @downloader ||= case cask.url.using
+                      when :svn
+                        SubversionDownloadStrategy.new(cask)
+                      when :post
+                        CurlPostDownloadStrategy.new(cask)
+                      else
+                        CurlDownloadStrategy.new(cask)
+                      end
+    end
 
-  def clear_cache
-    downloader.clear_cache if force || cask.version.latest?
-  end
+    def clear_cache
+      downloader.clear_cache if force || cask.version.latest?
+    end
 
-  def fetch
-    self.downloaded_path = downloader.fetch
-  rescue StandardError => e
-    raise Hbc::CaskError, "Download failed on Cask '#{cask}' with message: #{e}"
+    def fetch
+      self.downloaded_path = downloader.fetch
+    rescue StandardError => e
+      raise CaskError, "Download failed on Cask '#{cask}' with message: #{e}"
+    end
   end
 end

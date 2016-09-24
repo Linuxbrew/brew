@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::Colorpicker < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class Colorpicker < Moved
+    end
+  end
 end

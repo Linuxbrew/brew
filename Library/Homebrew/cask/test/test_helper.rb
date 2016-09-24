@@ -159,7 +159,9 @@ require "tempfile"
 FileUtils.mkdir_p Hbc.homebrew_prefix.join("bin")
 
 # Common superclass for test Casks for when we need to filter them out
-class Hbc::TestCask < Hbc::Cask; end
+module Hbc
+  class TestCask < Cask; end
+end
 
 # jack in some optional utilities
 FileUtils.ln_s "/usr/local/bin/cabextract", Hbc.homebrew_prefix.join("bin/cabextract")
