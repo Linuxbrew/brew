@@ -27,7 +27,7 @@ require "formula"
 module Homebrew
   def inreplace_pairs(path, replacement_pairs)
     if ARGV.dry_run?
-      contents = path.open("r") { |f| Formulary.set_encoding(f).read }
+      contents = path.open("r") { |f| Formulary.ensure_utf8_encoding(f).read }
       contents.extend(StringInreplaceExtension)
       replacement_pairs.each do |old, new|
         unless ARGV.flag?("--quiet")
@@ -48,7 +48,7 @@ module Homebrew
           s.gsub!(old, new)
         end
       end
-      path.open("r") { |f| Formulary.set_encoding(f).read }
+      path.open("r") { |f| Formulary.ensure_utf8_encoding(f).read }
     end
   end
 

@@ -30,7 +30,7 @@ module HomebrewArgvExtension
         if f.any_version_installed?
           tab = Tab.for_formula(f)
           resolved_spec = spec(nil) || tab.spec
-          f.set_active_spec(resolved_spec) if f.send(resolved_spec)
+          f.active_spec = resolved_spec if f.send(resolved_spec)
           f.build = tab
           if f.head? && tab.tabfile
             k = Keg.new(tab.tabfile.parent)

@@ -42,7 +42,7 @@ module Stdenv
     end
 
     # Os is the default Apple uses for all its stuff so let's trust them
-    set_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
+    define_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
 
     append "LDFLAGS", "-Wl,-headerpad_max_install_names"
 
@@ -136,12 +136,12 @@ module Stdenv
   end
 
   def minimal_optimization
-    set_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
+    define_cflags "-Os #{SAFE_CFLAGS_FLAGS}"
   end
   alias generic_minimal_optimization minimal_optimization
 
   def no_optimization
-    set_cflags SAFE_CFLAGS_FLAGS
+    define_cflags SAFE_CFLAGS_FLAGS
   end
   alias generic_no_optimization no_optimization
 
@@ -206,7 +206,7 @@ module Stdenv
   end
 
   # Convenience method to set all C compiler flags in one shot.
-  def set_cflags(val)
+  def define_cflags(val)
     CC_FLAG_VARS.each { |key| self[key] = val }
   end
 

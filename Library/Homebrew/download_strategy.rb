@@ -560,7 +560,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     Utils.popen_read("svn", "info", cached_location.to_s).strip[/^URL: (.+)$/, 1]
   end
 
-  def get_externals
+  def externals
     Utils.popen_read("svn", "propget", "svn:externals", @url).chomp.each_line do |line|
       name, url = line.split(/\s+/)
       yield name, url
@@ -600,7 +600,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
       main_revision = @ref[:trunk]
       fetch_repo cached_location, @url, main_revision, true
 
-      get_externals do |external_name, external_url|
+      externals do |external_name, external_url|
         fetch_repo cached_location+external_name, external_url, @ref[external_name], true
       end
     else

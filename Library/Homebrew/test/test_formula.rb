@@ -467,7 +467,7 @@ class FormulaTests < Homebrew::TestCase
     assert_version_equal "HEAD", f.head.version
   end
 
-  def test_formula_set_active_spec
+  def test_formula_active_spec=
     f = formula do
       url "foo"
       version "1.0"
@@ -481,11 +481,11 @@ class FormulaTests < Homebrew::TestCase
     assert_equal :stable, f.active_spec_sym
     assert_equal f.stable, f.send(:active_spec)
     assert_equal "1.0_1", f.pkg_version.to_s
-    f.set_active_spec(:devel)
+    f.active_spec = :devel
     assert_equal :devel, f.active_spec_sym
     assert_equal f.devel, f.send(:active_spec)
     assert_equal "1.0beta_1", f.pkg_version.to_s
-    assert_raises(FormulaSpecificationError) { f.set_active_spec(:head) }
+    assert_raises(FormulaSpecificationError) { f.active_spec = :head }
   end
 
   def test_path

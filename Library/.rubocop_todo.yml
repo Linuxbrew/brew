@@ -81,16 +81,6 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   Max: 6
 
-# Offense count: 8
-Style/AccessorMethodName:
-  Exclude:
-    - 'Homebrew/download_strategy.rb'
-    - 'Homebrew/extend/ENV/std.rb'
-    - 'Homebrew/formula.rb'
-    - 'Homebrew/formula_lock.rb'
-    - 'Homebrew/formulary.rb'
-    - 'Homebrew/migrator.rb'
-
 # Offense count: 1
 Style/CaseEquality:
   Exclude:
