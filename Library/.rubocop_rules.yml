@@ -1,4 +1,3 @@
-
 # ruby style guide favorite
 Style/StringLiterals:
   EnforcedStyle: double_quotes
@@ -18,6 +17,12 @@ Style/NumericLiteralPrefix:
 # percent-x is allowed for multiline
 Style/CommandLiteral:
   EnforcedStyle: mixed
+
+# depends_on foo: :bar looks rubbish
+Style/HashSyntax:
+  EnforcedStyle: ruby19
+  Exclude:
+    - 'Taps/**/*'
 
 # paths abound, easy escape
 Style/RegexpLiteral:
