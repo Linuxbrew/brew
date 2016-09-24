@@ -1,17 +1,21 @@
 require "test_helper"
 
 # monkeypatch for testing
-class Hbc::CLI::Home
-  def self.system(*command)
-    system_commands << command
-  end
+module Hbc
+  class CLI
+    class Home
+      def self.system(*command)
+        system_commands << command
+      end
 
-  def self.reset!
-    @system_commands = []
-  end
+      def self.reset!
+        @system_commands = []
+      end
 
-  def self.system_commands
-    @system_commands ||= []
+      def self.system_commands
+        @system_commands ||= []
+      end
+    end
   end
 end
 

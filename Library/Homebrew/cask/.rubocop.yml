@@ -86,7 +86,7 @@ Style/BlockDelimiters:
     - proc
 
 Style/ClassAndModuleChildren:
-  EnforcedStyle: compact
+  EnforcedStyle: nested
 
 Style/Documentation:
   Enabled: false

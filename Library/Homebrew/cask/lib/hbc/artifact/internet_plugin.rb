@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::InternetPlugin < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class InternetPlugin < Moved
+    end
+  end
 end

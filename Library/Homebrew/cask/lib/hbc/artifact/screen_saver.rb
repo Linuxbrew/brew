@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::ScreenSaver < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class ScreenSaver < Moved
+    end
+  end
 end
