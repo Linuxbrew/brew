@@ -4,7 +4,7 @@ require "thread"
 
 module Homebrew
   module Cleanup
-    @@disk_cleanup_size = 0
+    @disk_cleanup_size = 0
 
     def self.cleanup
       cleanup_cellar
@@ -17,11 +17,11 @@ module Homebrew
     end
 
     def self.update_disk_cleanup_size(path_size)
-      @@disk_cleanup_size += path_size
+      @disk_cleanup_size += path_size
     end
 
     def self.disk_cleanup_size
-      @@disk_cleanup_size
+      @disk_cleanup_size
     end
 
     def self.cleanup_formula(formula)
