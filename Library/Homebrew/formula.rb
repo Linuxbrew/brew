@@ -179,12 +179,12 @@ class Formula
       Tap.fetch($1, $2)
     end
 
-    @full_name = get_full_name(name)
-    @full_alias_name = get_full_name(@alias_name)
+    @full_name = full_name_with_optional_tap(name)
+    @full_alias_name = full_name_with_optional_tap(@alias_name)
 
-    set_spec :stable
-    set_spec :devel
-    set_spec :head
+    spec_eval :stable
+    spec_eval :devel
+    spec_eval :head
 
     @active_spec = determine_active_spec(spec)
     @active_spec_sym = if head?
@@ -201,7 +201,7 @@ class Formula
   end
 
   # @private
-  def set_active_spec(spec_sym)
+  def active_spec=(spec_sym)
     spec = send(spec_sym)
     raise FormulaSpecificationError, "#{spec_sym} spec is not available for #{full_name}" unless spec
     @active_spec = spec
@@ -214,7 +214,7 @@ class Formula
 
   # Allow full name logic to be re-used between names, aliases,
   # and installed aliases.
-  def get_full_name(name)
+  def full_name_with_optional_tap(name)
     if name.nil? || @tap.nil? || @tap.core_tap?
       name
     else
@@ -222,7 +222,7 @@ class Formula
     end
   end
 
-  def set_spec(name)
+  def spec_eval(name)
     spec = self.class.send(name)
     return unless spec.url
     spec.owner = self
@@ -264,7 +264,7 @@ class Formula
   end
 
   def full_installed_alias_name
-    get_full_name(installed_alias_name)
+    full_name_with_optional_tap(installed_alias_name)
   end
 
   # The path that was specified to find this formula.

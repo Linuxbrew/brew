@@ -37,18 +37,18 @@ class Formulary
   end
 
   def self.load_formula_from_path(name, path)
-    contents = path.open("r") { |f| set_encoding(f).read }
+    contents = path.open("r") { |f| ensure_utf8_encoding(f).read }
     namespace = "FormulaNamespace#{Digest::MD5.hexdigest(path.to_s)}"
     klass = load_formula(name, path, contents, namespace)
     FORMULAE[path] = klass
   end
 
   if IO.method_defined?(:set_encoding)
-    def self.set_encoding(io)
+    def self.ensure_utf8_encoding(io)
       io.set_encoding(Encoding::UTF_8)
     end
   else
-    def self.set_encoding(io)
+    def self.ensure_utf8_encoding(io)
       io
     end
   end

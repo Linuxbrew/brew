@@ -101,7 +101,7 @@ class Migrator
 
     @new_cellar = HOMEBREW_CELLAR/formula.name
 
-    if @old_linked_keg = get_linked_old_linked_keg
+    if @old_linked_keg = linked_old_linked_keg
       @old_linked_keg_record = old_linked_keg.linked_keg_record if old_linked_keg.linked?
       @old_opt_record = old_linked_keg.opt_record if old_linked_keg.optlinked?
       @new_linked_keg_record = HOMEBREW_CELLAR/"#{newname}/#{File.basename(old_linked_keg)}"
@@ -137,7 +137,7 @@ class Migrator
     end
   end
 
-  def get_linked_old_linked_keg
+  def linked_old_linked_keg
     kegs = old_cellar.subdirs.map { |d| Keg.new(d) }
     kegs.detect(&:linked?) || kegs.detect(&:optlinked?)
   end
