@@ -9,9 +9,9 @@ require "os/mac/keg"
 
 module OS
   module Mac
-    extend self
+    module_function
 
-    ::MacOS = self # compatibility
+    ::MacOS = self # rubocop:disable Style/ConstantName
 
     raise "Loaded OS::Mac on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
 

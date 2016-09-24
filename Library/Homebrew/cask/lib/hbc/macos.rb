@@ -4,6 +4,8 @@ require "os/mac/version"
 
 module OS
   module Mac
+    module_function
+
     SYSTEM_DIRS = [
                     "/",
                     "/Applications",

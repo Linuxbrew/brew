@@ -3,7 +3,7 @@ module OS
     X11 = XQuartz = Module.new
 
     module XQuartz
-      extend self
+      module_function
 
       FORGE_BUNDLE_ID = "org.macosforge.xquartz.X11".freeze
       APPLE_BUNDLE_ID = "org.x.X11".freeze
