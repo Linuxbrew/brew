@@ -49,7 +49,7 @@ class CompilerFailure
     instance_eval(&block) if block_given?
   end
 
-  def ===(compiler)
+  def fails_with?(compiler)
     name == compiler.name && version >= compiler.version
   end
 
@@ -127,7 +127,7 @@ class CompilerSelector
   end
 
   def fails_with?(compiler)
-    failures.any? { |failure| failure === compiler }
+    failures.any? { |failure| failure.fails_with?(compiler) }
   end
 
   def compiler_version(name)
