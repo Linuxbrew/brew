@@ -1,4 +1,4 @@
-HOMEBREW_VERSION="$(GIT_DIR="$HOMEBREW_REPOSITORY/.git" git describe --tags --dirty 2>/dev/null)"
+HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty 2>/dev/null)"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
   HOMEBREW_VERSION=">1.0.0 (no git repository)"
