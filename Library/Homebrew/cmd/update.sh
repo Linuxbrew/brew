@@ -225,7 +225,7 @@ merge_or_rebase() {
   if [ -n "$UPSTREAM_TAG" ]
   then
     REMOTE_REF="refs/tags/$UPSTREAM_TAG"
-    UPSTREAM_BRANCH="v$UPSTREAM_TAG"
+    UPSTREAM_BRANCH="stable"
   else
     REMOTE_REF="origin/$UPSTREAM_BRANCH"
   fi
