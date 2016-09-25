@@ -63,7 +63,7 @@ class Keg
   def text_files
     text_files = []
     which_file = OS.mac? ? "/usr/bin/file" : which("file")
-    return text_files unless File.exist?(which_file)
+    return text_files unless which_file && File.exist?(which_file)
 
     # file has known issues with reading files on other locales. Has
     # been fixed upstream for some time, but a sufficiently new enough
