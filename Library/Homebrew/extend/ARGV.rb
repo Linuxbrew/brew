@@ -65,6 +65,8 @@ module HomebrewArgvExtension
     require "keg"
     require "formula"
     @kegs ||= downcased_unique_named.collect do |name|
+      raise UsageError if name.empty?
+
       rack = Formulary.to_rack(name.downcase)
 
       dirs = rack.directory? ? rack.subdirs : []
