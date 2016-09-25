@@ -101,27 +101,37 @@ module Hbc
 
     def language(*args, &block)
       if !args.empty? && block_given?
-        args.each do |arg|
-          MacOS.languages.each_with_index do |l, index|
-            next unless arg == :default || l.match(arg)
-            next unless @language.nil? || @language[:level].nil? || @language[:level] > index
-            @language = {
-                          block: block,
-                          level: index,
-                        }
-          end
-        end
+        @language_blocks ||= {}
+        @language_blocks[args] = block
       else
         language_eval
         @language
       end
     end
 
-
     def language_eval
-      if @language.is_a?(Hash) && @language.key?(:block)
-        @language = @language[:block].call
+      return if instance_variable_defined?(:@language)
+
+      return unless instance_variable_defined?(:@language_blocks)
+
+      default_key = @language_blocks.keys.detect { |key| key.include?(:default) }
+
+      MacOS.languages.each do |language|
+        @language_blocks.each do |regexes_or_strings, block|
+          if regexes_or_strings.include?(:default)
+            regexes_or_strings = regexes_or_strings - [:default] + [%r{^en}]
+          end
+
+          case language
+          when *regexes_or_strings
+            @language = block.call
+            return
+          end
+        end
       end
+
+      # fallback to :default
+      @language = default_key.nil? ? nil : @language_blocks[default_key].call
     end
 
     def url(*args, &block)

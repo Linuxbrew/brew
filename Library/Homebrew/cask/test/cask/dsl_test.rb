@@ -148,6 +148,12 @@ describe Hbc::DSL do
 
       MacOS.stubs(languages: ["THIRD_LANGUAGE"])
       cask.call.language.must_equal :default
+
+      MacOS.stubs(languages: ["THIRD_LANGUAGE", "SECOND_LANGUAGE", "FIRST_LANGUAGE"])
+      cask.call.language.must_equal :second
+
+      MacOS.stubs(languages: ["THIRD_LANGUAGE", "FIRST_LANGUAGE", "SECOND_LANGUAGE"])
+      cask.call.language.must_equal :first
     end
   end
 
