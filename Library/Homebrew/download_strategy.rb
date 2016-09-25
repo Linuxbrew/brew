@@ -231,8 +231,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     when :bzip2_only
       with_system_path { buffered_write("bunzip2") }
     when :gzip, :bzip2, :compress, :tar
-      # Assume these are also tarred
-      tar_flags = ARGV.verbose? && ENV["TRAVIS"].nil? ? "xv" : "x"
+      tar_flags = "x"
       # Older versions of tar require an explicit format flag
       if cached_location.compression_type == :gzip
         tar_flags << "z"
