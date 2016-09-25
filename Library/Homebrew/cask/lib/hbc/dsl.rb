@@ -122,8 +122,13 @@ module Hbc
             regexes_or_strings = regexes_or_strings - [:default] + [%r{^en}]
           end
 
-          case language
-          when *regexes_or_strings
+          regexes_or_strings.each do |regex_or_string|
+            if regex_or_string.class == language.class
+              next unless regex_or_string == language
+            else
+              next unless regex_or_string =~ language
+            end
+
             @language = block.call
             return
           end
