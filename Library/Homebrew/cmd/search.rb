@@ -40,8 +40,8 @@ module Homebrew
       exec_browser "http://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
     elsif ARGV.include? "--desc"
       query = ARGV.next
-      rx = query_regexp(query)
-      Descriptions.search(rx, :desc).print
+      regex = query_regexp(query)
+      Descriptions.search(regex, :desc).print
     elsif ARGV.first =~ HOMEBREW_TAP_FORMULA_REGEX
       query = ARGV.first
       user, repo, name = query.split("/", 3)
@@ -55,10 +55,10 @@ module Homebrew
       puts_columns Array(result)
     else
       query = ARGV.first
-      rx = query_regexp(query)
-      local_results = search_formulae(rx)
+      regex = query_regexp(query)
+      local_results = search_formulae(regex)
       puts_columns(local_results)
-      tap_results = search_taps(rx)
+      tap_results = search_taps(regex)
       puts_columns(tap_results)
 
       if $stdout.tty?
@@ -112,15 +112,17 @@ module Homebrew
     odie "#{query} is not a valid regex"
   end
 
-  def search_taps(rx)
+  def search_taps(regex_or_string)
     SEARCHABLE_TAPS.map do |user, repo|
-      Thread.new { search_tap(user, repo, rx) }
+      Thread.new { search_tap(user, repo, regex_or_string) }
     end.inject([]) do |results, t|
       results.concat(t.value)
     end
   end
 
-  def search_tap(user, repo, rx)
+  def search_tap(user, repo, regex_or_string)
+    regex = regex_or_string.is_a?(String) ? /^#{Regexp.escape(regex_or_string)}$/ : regex_or_string
+
     if (HOMEBREW_LIBRARY/"Taps/#{user.downcase}/homebrew-#{repo.downcase}").directory? && \
        user != "Caskroom"
       return []
@@ -150,7 +152,7 @@ module Homebrew
 
     names = remote_tap_formulae["#{user}/#{repo}"]
     user = user.downcase if user == "Homebrew" # special handling for the Homebrew organization
-    names.select { |name| name =~ rx }.map { |name| "#{user}/#{repo}/#{name}" }
+    names.select { |name| name =~ regex }.map { |name| "#{user}/#{repo}/#{name}" }
   rescue GitHub::HTTPNotFoundError
     opoo "Failed to search tap: #{user}/#{repo}. Please run `brew update`"
     []
@@ -159,9 +161,9 @@ module Homebrew
     []
   end
 
-  def search_formulae(rx)
+  def search_formulae(regex)
     aliases = Formula.alias_full_names
-    results = (Formula.full_names+aliases).grep(rx).sort
+    results = (Formula.full_names+aliases).grep(regex).sort
 
     results.map do |name|
       begin
