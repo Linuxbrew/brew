@@ -42,11 +42,19 @@ module OS
     end
 
     def languages
-      @languages ||= if ENV["HOMEBREW_LANGUAGES"]
-        ENV["HOMEBREW_LANGUAGES"].split(",")
-      else
-        Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+      return @languages unless @languages.nil?
+
+      @languages = Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+
+      if ENV["HOMEBREW_LANGUAGES"]
+        @languages = ENV["HOMEBREW_LANGUAGES"].split(",") + @languages
       end
+
+      if ARGV.value("language")
+        @languages = ARGV.value("language").split(",") + @languages
+      end
+
+      @languages = @languages.uniq
     end
 
     def language
