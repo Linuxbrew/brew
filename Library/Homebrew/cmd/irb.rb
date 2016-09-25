@@ -19,6 +19,8 @@ class String
 end
 
 module Homebrew
+  module_function
+
   def irb
     if ARGV.include? "--examples"
       puts "'v8'.f # => instance of the v8 formula"

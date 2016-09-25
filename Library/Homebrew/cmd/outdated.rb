@@ -21,6 +21,8 @@ require "formula"
 require "keg"
 
 module Homebrew
+  module_function
+
   def outdated
     formulae = if ARGV.resolved_formulae.empty?
       Formula.installed

@@ -37,6 +37,8 @@ require "cmd/style"
 require "date"
 
 module Homebrew
+  module_function
+
   def audit
     Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
 

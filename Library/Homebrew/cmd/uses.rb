@@ -23,6 +23,8 @@ require "formula"
 # The intersection is harder to achieve with shell tools.
 
 module Homebrew
+  module_function
+
   def uses
     raise FormulaUnspecifiedError if ARGV.named.empty?
 

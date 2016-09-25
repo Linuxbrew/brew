@@ -21,6 +21,8 @@ require "sandbox"
 require "timeout"
 
 module Homebrew
+  module_function
+
   def test
     raise FormulaUnspecifiedError if ARGV.named.empty?
 

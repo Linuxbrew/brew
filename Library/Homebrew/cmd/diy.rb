@@ -11,6 +11,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def diy
     path = Pathname.getwd
 

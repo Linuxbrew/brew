@@ -10,6 +10,8 @@ require "cleanup"
 require "utils"
 
 module Homebrew
+  module_function
+
   def update_preinstall_header
     @header_already_printed ||= begin
       ohai "Auto-updated Homebrew!" if ARGV.include?("--preinstall")
@@ -106,11 +108,10 @@ module Homebrew
     end
   end
 
-  private
-
   def shorten_revision(revision)
     Utils.popen_read("git", "-C", HOMEBREW_REPOSITORY, "rev-parse", "--short", revision).chomp
   end
+  private_class_method :shorten_revision
 
   def install_core_tap_if_necessary
     core_tap = CoreTap.instance
@@ -120,6 +121,7 @@ module Homebrew
     ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
     ENV["HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE"] = revision
   end
+  private_class_method :install_core_tap_if_necessary
 
   def migrate_legacy_cache_if_necessary
     legacy_cache = Pathname.new "/Library/Caches/Homebrew"
@@ -174,6 +176,7 @@ module Homebrew
       end
     end
   end
+  private_class_method :migrate_legacy_cache_if_necessary
 
   def migrate_legacy_repository_if_necessary
     return unless HOMEBREW_PREFIX.to_s == "/usr/local"
@@ -292,6 +295,7 @@ module Homebrew
     EOS
     $stderr.puts e.backtrace
   end
+  private_class_method :migrate_legacy_repository_if_necessary
 
   def link_completions_and_docs(repository = HOMEBREW_REPOSITORY)
     command = "brew update"
@@ -309,6 +313,7 @@ module Homebrew
         #{e}
     EOS
   end
+  private_class_method :link_completions_and_docs
 end
 
 class Reporter

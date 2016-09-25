@@ -34,6 +34,8 @@ EOS
 require "commands"
 
 module Homebrew
+  module_function
+
   def help(cmd = nil, flags = {})
     # Resolve command aliases and find file containing the implementation.
     if cmd
@@ -69,8 +71,6 @@ module Homebrew
     exit 0
   end
 
-  private
-
   def command_help(path)
     help_lines = path.read.lines.grep(/^#:/)
     if help_lines.empty?
@@ -86,4 +86,5 @@ module Homebrew
       end.join.strip
     end
   end
+  private_class_method :command_help
 end

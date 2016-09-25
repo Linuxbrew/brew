@@ -8,6 +8,8 @@
 require "diagnostic"
 
 module Homebrew
+  module_function
+
   def doctor
     inject_dump_stats!(Diagnostic::Checks, /^check_*/) if ARGV.switch? "D"
 

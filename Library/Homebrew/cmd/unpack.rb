@@ -13,6 +13,8 @@ require "stringio"
 require "formula"
 
 module Homebrew
+  module_function
+
   def unpack
     formulae = ARGV.formulae
     raise FormulaUnspecifiedError if formulae.empty?

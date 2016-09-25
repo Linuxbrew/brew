@@ -11,6 +11,8 @@ require "keg"
 require "formula"
 
 module Homebrew
+  module_function
+
   def linkapps
     target_dir = linkapps_target(local: ARGV.include?("--local"))
 
@@ -55,10 +57,9 @@ module Homebrew
     end
   end
 
-  private
-
   def linkapps_target(opts = {})
     local = opts.fetch(:local, false)
     Pathname.new(local ? "~/Applications" : "/Applications").expand_path
   end
+  private_class_method :linkapps_target
 end

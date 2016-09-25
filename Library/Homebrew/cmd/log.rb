@@ -5,6 +5,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def log
     if ARGV.named.empty?
       cd HOMEBREW_REPOSITORY
@@ -15,8 +17,6 @@ module Homebrew
       git_log path
     end
   end
-
-  private
 
   def git_log(path = nil)
     if File.exist? "#{`git rev-parse --show-toplevel`.chomp}/.git/shallow"
@@ -29,4 +29,5 @@ module Homebrew
     args += ["--", path] unless path.nil?
     exec "git", "log", *args
   end
+  private_class_method :git_log
 end

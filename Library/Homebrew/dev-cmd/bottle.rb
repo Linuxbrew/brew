@@ -41,6 +41,8 @@ EOS
 MAXIMUM_STRING_MATCHES = 100
 
 module Homebrew
+  module_function
+
   def keg_contain?(string, keg, ignores)
     @put_string_exists_header, @put_filenames = nil
 

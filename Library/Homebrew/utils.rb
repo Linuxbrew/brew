@@ -224,7 +224,9 @@ def interactive_shell(f = nil)
 end
 
 module Homebrew
-  def self._system(cmd, *args)
+  module_function
+
+  def _system(cmd, *args)
     pid = fork do
       yield if block_given?
       args.collect!(&:to_s)
@@ -239,12 +241,12 @@ module Homebrew
     $?.success?
   end
 
-  def self.system(cmd, *args)
+  def system(cmd, *args)
     puts "#{cmd} #{args*" "}" if ARGV.verbose?
     _system(cmd, *args)
   end
 
-  def self.core_tap_version_string
+  def core_tap_version_string
     require "tap"
     tap = CoreTap.instance
     return "N/A" unless tap.installed?
@@ -256,7 +258,7 @@ module Homebrew
     end
   end
 
-  def self.install_gem_setup_path!(name, version = nil, executable = name)
+  def install_gem_setup_path!(name, version = nil, executable = name)
     # Respect user's preferences for where gems should be installed.
     ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
     ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
@@ -300,11 +302,11 @@ module Homebrew
   end
 
   # Hash of Module => Set(method_names)
-  @@injected_dump_stat_modules = {}
+  @injected_dump_stat_modules = {}
 
   def inject_dump_stats!(the_module, pattern)
-    @@injected_dump_stat_modules[the_module] ||= []
-    injected_methods = @@injected_dump_stat_modules[the_module]
+    @injected_dump_stat_modules[the_module] ||= []
+    injected_methods = @injected_dump_stat_modules[the_module]
     the_module.module_eval do
       instance_methods.grep(pattern).each do |name|
         next if injected_methods.include? name

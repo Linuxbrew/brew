@@ -15,6 +15,8 @@ require "stringio"
 require "socket"
 
 module Homebrew
+  module_function
+
   def gistify_logs(f)
     files = load_logs(f.logs)
     build_time = f.logs.ctime

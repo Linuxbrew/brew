@@ -9,6 +9,8 @@
 #:    Regenerate UUID used in Homebrew's analytics.
 
 module Homebrew
+  module_function
+
   def analytics
     config_file = HOMEBREW_REPOSITORY/".git/config"
 

@@ -9,6 +9,8 @@
 require "ostruct"
 
 module Homebrew
+  module_function
+
   def unlink
     raise KegUnspecifiedError if ARGV.named.empty?
 

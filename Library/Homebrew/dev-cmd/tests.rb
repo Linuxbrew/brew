@@ -5,6 +5,8 @@ require "fileutils"
 require "tap"
 
 module Homebrew
+  module_function
+
   def tests
     (HOMEBREW_LIBRARY/"Homebrew").cd do
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
