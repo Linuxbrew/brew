@@ -1,5 +1,33 @@
 require "testing_env"
 require "extend/ENV"
+require "helper/integration_command_test_case"
+
+class IntegrationCommandTestEnv < IntegrationCommandTestCase
+  def test_env
+    assert_match(/CMAKE_PREFIX_PATH="#{Regexp.escape(HOMEBREW_PREFIX)}[:"]/,
+                 cmd("--env"))
+  end
+
+  def test_env_fish
+    assert_match(/set [-]gx CMAKE_PREFIX_PATH "#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"/,
+                 cmd("--env", "--shell=fish"))
+  end
+
+  def test_env_csh
+    assert_match(/setenv CMAKE_PREFIX_PATH #{Regexp.quote(HOMEBREW_PREFIX.to_s)};/,
+                 cmd("--env", "--shell=tcsh"))
+  end
+
+  def test_env_bash
+    assert_match(/export CMAKE_PREFIX_PATH="#{Regexp.quote(HOMEBREW_PREFIX.to_s)}"/,
+                 cmd("--env", "--shell=bash"))
+  end
+
+  def test_env_plain
+    assert_match(/CMAKE_PREFIX_PATH: #{Regexp.quote(HOMEBREW_PREFIX)}/,
+                 cmd("--env", "--plain"))
+  end
+end
 
 module SharedEnvTests
   def setup
