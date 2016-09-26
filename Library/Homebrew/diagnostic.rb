@@ -961,31 +961,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_outdated_homebrew
-        return unless Utils.git_available?
-
-        timestamp = if File.directory?("#{HOMEBREW_REPOSITORY}/.git")
-          HOMEBREW_REPOSITORY.cd { `git log -1 --format="%ct" HEAD --`.to_i }
-        else
-          HOMEBREW_LIBRARY.mtime.to_i
-        end
-        return if Time.now.to_i - timestamp <= 60 * 60 * 24 # 24 hours
-
-        if File.directory?("#{HOMEBREW_REPOSITORY}/.git")
-          HOMEBREW_REPOSITORY.cd do
-            local = `git rev-parse -q --verify refs/remotes/origin/master`.chomp
-            remote = /^([a-f0-9]{40})/.match(`git ls-remote origin refs/heads/master 2>/dev/null`)
-            return if remote.nil? || local == remote[0]
-          end
-        end
-
-        <<-EOS.undent
-          Your Homebrew is outdated.
-          You haven't updated for at least 24 hours. This is a long time in brewland!
-          To update Homebrew, run `brew update`.
-        EOS
-      end
-
       def check_for_unlinked_but_not_keg_only
         unlinked = Formula.racks.reject do |rack|
           if !(HOMEBREW_LINKED_KEGS/rack.basename).directory?
