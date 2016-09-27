@@ -2,6 +2,14 @@ require "testing_env"
 require "cmd/command"
 require "cmd/commands"
 require "fileutils"
+require "helper/integration_command_test_case"
+
+class IntegrationCommandTestCommands < IntegrationCommandTestCase
+  def test_commands
+    assert_match "Built-in commands",
+                 cmd("commands")
+  end
+end
 
 class CommandsTests < Homebrew::TestCase
   def setup

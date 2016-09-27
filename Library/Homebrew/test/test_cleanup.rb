@@ -3,6 +3,14 @@ require "testball"
 require "cleanup"
 require "fileutils"
 require "pathname"
+require "helper/integration_command_test_case"
+
+class IntegrationCommandTestCleanup < IntegrationCommandTestCase
+  def test_cleanup
+    (HOMEBREW_CACHE/"test").write "test"
+    assert_match "#{HOMEBREW_CACHE}/test", cmd("cleanup", "--prune=all")
+  end
+end
 
 class CleanupTests < Homebrew::TestCase
   def setup
