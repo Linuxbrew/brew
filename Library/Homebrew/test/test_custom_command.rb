@@ -6,7 +6,9 @@ class IntegrationCommandTestCustomCommand < IntegrationCommandTestCase
       cmd = "int-test-#{rand}"
       file = "#{path}/brew-#{cmd}"
 
-      File.open(file, "w") { |f| f.write "#!/bin/sh\necho 'I am #{cmd}'\n" }
+      File.open(file, "w") do |f|
+        f.write "#!/bin/sh\necho 'I am #{cmd}'\n"
+      end
       FileUtils.chmod 0777, file
 
       assert_match "I am #{cmd}",
