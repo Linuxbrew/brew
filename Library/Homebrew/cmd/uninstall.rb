@@ -21,7 +21,7 @@ module Homebrew
           dependants_output = dependants.map { |k| "#{k.name} #{k.version}" }.join(", ")
           conjugation = dependants.count == 1 ? "is" : "are"
           ofail "Refusing to uninstall #{keg} because it is required by #{dependants_output}, which #{conjugation} currently installed."
-          puts "Remove it anyway with `brew uninstall --force #{keg.name}`."
+          puts "You can override this and force removal with `brew uninstall --force #{keg.name}`."
           next
         end
 
