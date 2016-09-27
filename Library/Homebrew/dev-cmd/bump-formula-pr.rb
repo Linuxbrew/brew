@@ -3,7 +3,8 @@
 #:    Creates a pull request to update the formula with a new url or a new tag.
 #:
 #:    If a <url> is specified, the <sha-256> checksum of the new download must
-#:    also be specified.
+#:    also be specified. A best effort to determine the <sha-256> and <formula>
+#:    name will be made if either or both values are not supplied by the user.
 #:
 #:    If a <tag> is specified, the git commit <revision> corresponding to that
 #:    tag must also be specified.
@@ -13,9 +14,18 @@
 #:
 #:    If `--dry-run` is passed, print what would be done rather than doing it.
 #:
+#:    If `--write` is passed along with `--dry-run`, perform a not-so-dry run
+#:    making the expected file modifications but not taking any git actions.
+#:
 #:    If `--audit` is passed, run `brew audit` before opening the PR.
 #:
 #:    If `--strict` is passed, run `brew audit --strict` before opening the PR.
+#:
+#:    If `--mirror=`<url> is passed, use the value as a mirror url.
+#:
+#:    If `--version=`<version> is passed, use the value to override the value
+#:    parsed from the url or tag. Note that `--version=0` can be used to delete
+#:    an existing `version` override from a formula if it has become redundant.
 #:
 #:    Note that this command cannot be used to transition a formula from a
 #:    url-and-sha256 style specification into a tag-and-revision style
