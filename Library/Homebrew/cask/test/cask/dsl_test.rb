@@ -124,36 +124,51 @@ describe Hbc::DSL do
 
   describe "language stanza" do
     it "allows multilingual casks" do
-      cask = lambda {
+      cask = lambda do
         Hbc::Cask.new("cask-with-apps") do
-          language "FIRST_LANGUAGE" do
-            :first
+          language "zh" do
+            sha256 "abc123"
+            "zh-CN"
           end
 
-          language %r{SECOND_LANGUAGE} do
-            :second
+          language "en-US", default: true do
+            sha256 "xyz789"
+            "en-US"
           end
 
-          language :default do
-            :default
-          end
+          url "https://example.org/#{language}.zip"
         end
-      }
+      end
 
-      MacOS.stubs(languages: ["FIRST_LANGUAGE"])
-      cask.call.language.must_equal :first
+      MacOS.stubs(languages: ["zh"])
+      cask.call.language.must_equal "zh-CN"
+      cask.call.sha256.must_equal "abc123"
+      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
 
-      MacOS.stubs(languages: ["SECOND_LANGUAGE"])
-      cask.call.language.must_equal :second
+      MacOS.stubs(languages: ["zh-XX"])
+      cask.call.language.must_equal "zh-CN"
+      cask.call.sha256.must_equal "abc123"
+      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
 
-      MacOS.stubs(languages: ["THIRD_LANGUAGE"])
-      cask.call.language.must_equal :default
+      MacOS.stubs(languages: ["en"])
+      cask.call.language.must_equal "en-US"
+      cask.call.sha256.must_equal "xyz789"
+      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
 
-      MacOS.stubs(languages: ["THIRD_LANGUAGE", "SECOND_LANGUAGE", "FIRST_LANGUAGE"])
-      cask.call.language.must_equal :second
+      MacOS.stubs(languages: ["xx-XX"])
+      cask.call.language.must_equal "en-US"
+      cask.call.sha256.must_equal "xyz789"
+      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
 
-      MacOS.stubs(languages: ["THIRD_LANGUAGE", "FIRST_LANGUAGE", "SECOND_LANGUAGE"])
-      cask.call.language.must_equal :first
+      MacOS.stubs(languages: ["xx-XX", "zh", "en"])
+      cask.call.language.must_equal "zh-CN"
+      cask.call.sha256.must_equal "abc123"
+      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+
+      MacOS.stubs(languages: ["xx-XX", "en-US", "zh"])
+      cask.call.language.must_equal "en-US"
+      cask.call.sha256.must_equal "xyz789"
+      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
     end
   end
 

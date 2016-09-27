@@ -1,4 +1,5 @@
 require "set"
+require "locale"
 
 require "hbc/dsl/appcast"
 require "hbc/dsl/base"
@@ -99,9 +100,10 @@ module Hbc
       @homepage ||= homepage
     end
 
-    def language(*args, &block)
+    def language(*args, default: false, &block)
       if !args.empty? && block_given?
         @language_blocks ||= {}
+        @language_blocks.default = block if default
         @language_blocks[args] = block
       else
         language_eval
@@ -114,29 +116,15 @@ module Hbc
 
       return unless instance_variable_defined?(:@language_blocks)
 
-      default_key = @language_blocks.keys.detect { |key| key.include?(:default) }
+      MacOS.languages.map(&Locale.method(:parse)).any? { |locale|
+        key = @language_blocks.keys.detect { |strings|
+          strings.any? { |string| locale.include?(string) }
+        }
 
-      MacOS.languages.each do |language|
-        @language_blocks.each do |regexes_or_strings, block|
-          if regexes_or_strings.include?(:default)
-            regexes_or_strings = regexes_or_strings - [:default] + [%r{^en}]
-          end
+        return @language = @language_blocks[key].call unless key.nil?
+      }
 
-          regexes_or_strings.each do |regex_or_string|
-            if regex_or_string.class == language.class
-              next unless regex_or_string == language
-            else
-              next unless regex_or_string =~ language
-            end
-
-            @language = block.call
-            return
-          end
-        end
-      end
-
-      # fallback to :default
-      @language = default_key.nil? ? nil : @language_blocks[default_key].call
+      @language = @language_blocks.default.call
     end
 
     def url(*args, &block)
