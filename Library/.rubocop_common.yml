@@ -1,3 +1,6 @@
+AllCops:
+  TargetRubyVersion: 2.0
+
 Metrics/AbcSize:
   Enabled: false
 
@@ -15,10 +18,6 @@ Metrics/MethodLength:
 
 Metrics/ModuleLength:
   CountComments: false
-  Exclude:
-    - 'Homebrew/cask/lib/hbc/locations.rb'
-    - 'Homebrew/cask/lib/hbc/macos.rb'
-    - 'Homebrew/cask/lib/hbc/utils.rb'
 
 Metrics/PerceivedComplexity:
   Enabled: false
@@ -36,11 +35,6 @@ Lint/AssignmentInCondition:
 Lint/EndAlignment:
   AlignWith: variable
 
-# `formula do` uses nested method definitions
-Lint/NestedMethodDefinition:
-  Exclude:
-    - 'Homebrew/test/**/*'
-
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false
 
@@ -53,85 +47,6 @@ Style/AlignHash:
 # `system` is a special case and aligns on second argument
 Style/AlignParameters:
   Enabled: false
-
-Style/BarePercentLiterals:
-  Exclude:
-    - 'Taps/**/*'
-  EnforcedStyle: percent_q
-
-Style/BlockDelimiters:
-  EnforcedStyle: semantic
-  Exclude:
-    - 'Taps/**/*'
-  FunctionalMethods:
-    - expect
-    - find
-    - let
-    - let!
-    - subject
-    - watch
-    - inject
-    - map
-    - map!
-    - collect
-    - collect!
-    - reject
-    - reject!
-    - delete_if
-    - with_object
-    - popen_read
-  ProceduralMethods:
-    - after
-    - at_exit
-    - before
-    - benchmark
-    - bm
-    - bmbm
-    - capture_io
-    - capture_output
-    - capture_subprocess_io
-    - chdir
-    - context
-    - create
-    - define_method
-    - define_singleton_method
-    - fork
-    - measure
-    - new
-    - open
-    - realtime
-    - shutup
-    - tap
-    - each
-    - each_pair
-    - each_with_index
-    - reverse_each
-    - ignore_interrupts
-  IgnoredMethods:
-    - each_with_object
-    - it
-    - its
-    - lambda
-    - proc
-    - formula
-    - mock
-    - devel
-    - stable
-    - head
-    - assert_raises
-    - assert_nothing_raised
-    - resource
-    - with_build_environment
-    - ensure_writable
-    - satisfy
-    - fetch
-    - brew
-    - expand
-    - env
-    - recursive_dependencies
-    - trap
-    - link_dir
-    - with_system_path
 
 Style/CaseIndentation:
   IndentWhenRelativeTo: end
@@ -158,28 +73,8 @@ Style/EmptyLineBetweenDefs:
 Style/FileName:
   Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
 
-# counterproductive in formulas, notably within the install method
-Style/GuardClause:
-  Exclude:
-    - 'Taps/**/*'
-
-# depends_on foo: :bar looks rubbish
-Style/HashSyntax:
-  EnforcedStyle: ruby19_no_mixed_keys
-  Exclude:
-    - 'Taps/**/*'
-
-Style/IfUnlessModifier:
-  Exclude:
-    - 'Taps/**/*'
-
 Style/IndentArray:
   EnforcedStyle: special_inside_parentheses
-
-# we won't change backward compatible method names
-Style/MethodName:
-  Exclude:
-    - 'Homebrew/compat/**/*'
 
 # only for numbers >= 1_000_000
 Style/NumericLiterals:
@@ -205,12 +100,6 @@ Style/PercentLiteralDelimiters:
 # we prefer Perl-style regex back references
 Style/PerlBackrefs:
   Enabled: false
-
-# we won't change backward compatible predicate names
-Style/PredicateName:
-  Exclude:
-    - 'Homebrew/compat/**/*'
-  NameWhitelist: is_32_bit?, is_64_bit?
 
 Style/RaiseArgs:
   EnforcedStyle: exploded

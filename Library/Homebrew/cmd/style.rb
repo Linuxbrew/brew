@@ -19,7 +19,7 @@ require "utils/json"
 module Homebrew
   def style
     target = if ARGV.named.empty?
-      [HOMEBREW_LIBRARY_PATH]
+      nil
     elsif ARGV.named.any? { |file| File.exist? file }
       ARGV.named
     elsif ARGV.named.any? { |tap| tap.count("/") == 1 }
@@ -49,10 +49,16 @@ module Homebrew
 
     args = %W[
       --force-exclusion
-      --config #{HOMEBREW_LIBRARY}/.rubocop.yml
     ]
     args << "--auto-correct" if fix
-    args += files
+
+    if files.nil?
+      args << "--config" << HOMEBREW_LIBRARY/".rubocop_core.yml"
+      args += [HOMEBREW_LIBRARY_PATH]
+    else
+      args << "--config" << HOMEBREW_LIBRARY/".rubocop_formula.yml"
+      args += files
+    end
 
     HOMEBREW_LIBRARY.cd do
       case output_type

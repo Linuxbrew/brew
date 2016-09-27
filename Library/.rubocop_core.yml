@@ -1,0 +1,112 @@
+inherit_from:
+  - .rubocop_common.yml
+  - .rubocop_todo.yml
+
+AllCops:
+  Include:
+    - '**/.simplecov'
+  Exclude:
+    - 'Homebrew/cask/**/*'
+    - 'Homebrew/**/vendor/**/*'
+
+# `formula do` uses nested method definitions
+Lint/NestedMethodDefinition:
+  Exclude:
+    - 'Homebrew/test/**/*'
+
+Metrics/ModuleLength:
+  CountComments: false
+  Exclude:
+    - 'Homebrew/cask/lib/hbc/locations.rb'
+    - 'Homebrew/cask/lib/hbc/macos.rb'
+    - 'Homebrew/cask/lib/hbc/utils.rb'
+
+Style/BarePercentLiterals:
+  EnforcedStyle: percent_q
+
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+  FunctionalMethods:
+    - expect
+    - find
+    - let
+    - let!
+    - subject
+    - watch
+    - inject
+    - map
+    - map!
+    - collect
+    - collect!
+    - reject
+    - reject!
+    - delete_if
+    - with_object
+    - popen_read
+  ProceduralMethods:
+    - after
+    - at_exit
+    - before
+    - benchmark
+    - bm
+    - bmbm
+    - capture_io
+    - capture_output
+    - capture_subprocess_io
+    - chdir
+    - context
+    - create
+    - define_method
+    - define_singleton_method
+    - fork
+    - measure
+    - new
+    - open
+    - realtime
+    - shutup
+    - tap
+    - each
+    - each_pair
+    - each_with_index
+    - reverse_each
+    - ignore_interrupts
+  IgnoredMethods:
+    - each_with_object
+    - it
+    - its
+    - lambda
+    - proc
+    - formula
+    - mock
+    - devel
+    - stable
+    - head
+    - assert_raises
+    - assert_nothing_raised
+    - resource
+    - with_build_environment
+    - ensure_writable
+    - satisfy
+    - fetch
+    - brew
+    - expand
+    - env
+    - recursive_dependencies
+    - trap
+    - link_dir
+    - with_system_path
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+# we won't change backward compatible method names
+Style/MethodName:
+  Exclude:
+    - 'Homebrew/compat/**/*'
+
+# we won't change backward compatible predicate names
+Style/PredicateName:
+  Exclude:
+    - 'Homebrew/compat/**/*'
+  NameWhitelist: is_32_bit?, is_64_bit?
+
