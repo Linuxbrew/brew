@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require "english"
+
 SimpleCov.start do
   coverage_dir File.expand_path("../test/coverage", File.realpath(__FILE__))
   root File.expand_path("..", File.realpath(__FILE__))
@@ -16,9 +18,9 @@ SimpleCov.start do
   add_filter "/Homebrew/vendor/"
 
   if ENV["HOMEBREW_INTEGRATION_TEST"]
-    command_name "#{ENV["HOMEBREW_INTEGRATION_TEST"]} (#{$$})"
+    command_name "#{ENV["HOMEBREW_INTEGRATION_TEST"]} (#{$PROCESS_ID})"
     at_exit do
-      exit_code = $!.nil? ? 0 : $!.status
+      exit_code = $ERROR_INFO.nil? ? 0 : $ERROR_INFO.status
       $stdout.reopen("/dev/null")
 
       # Just save result, but don't write formatted output.
@@ -30,7 +32,7 @@ SimpleCov.start do
       exit! exit_code
     end
   else
-    command_name "#{command_name} (#{$$})"
+    command_name "#{command_name} (#{$PROCESS_ID})"
     # Not using this during integration tests makes the tests 4x times faster
     # without changing the coverage.
     track_files "#{SimpleCov.root}/**/*.rb"

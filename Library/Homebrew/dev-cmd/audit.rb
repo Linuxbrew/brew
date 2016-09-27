@@ -38,9 +38,7 @@ require "date"
 
 module Homebrew
   def audit
-    if ARGV.switch? "D"
-      Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/)
-    end
+    Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
 
     formula_count = 0
     problem_count = 0
@@ -251,9 +249,7 @@ class FormulaAuditor
                      actual_mode & 0777, wanted_mode & 0777, formula.path)
     end
 
-    if text.data? && !text.end?
-      problem "'DATA' was found, but no '__END__'"
-    end
+    problem "'DATA' was found, but no '__END__'" if text.data? && !text.end?
 
     if text.end? && !text.data?
       problem "'__END__' was found, but 'DATA' is not used"
@@ -263,9 +259,7 @@ class FormulaAuditor
       problem "'inreplace ... do' was used for a single substitution (use the non-block form instead)."
     end
 
-    unless text.trailing_newline?
-      problem "File should end with a newline"
-    end
+    problem "File should end with a newline" unless text.trailing_newline?
 
     return unless @strict
 
@@ -742,9 +736,7 @@ class FormulaAuditor
     end
 
     # Commented-out cmake support from default template
-    if line.include?('# system "cmake')
-      problem "Commented cmake call found"
-    end
+    problem "Commented cmake call found" if line.include?('# system "cmake')
 
     # Comments from default template
     [
@@ -757,9 +749,8 @@ class FormulaAuditor
       "# if your formula fails when building in parallel",
       "# Remove unrecognized options if warned by configure",
     ].each do |comment|
-      if line.include? comment
-        problem "Please remove default template comments"
-      end
+      next unless line.include?(comment)
+      problem "Please remove default template comments"
     end
 
     # FileUtils is included in Formula
@@ -814,26 +805,18 @@ class FormulaAuditor
     end
 
     # Commented-out depends_on
-    if line =~ /#\s*depends_on\s+(.+)\s*$/
-      problem "Commented-out dep #{$1}"
-    end
+    problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
     # No trailing whitespace, please
-    if line =~ /[\t ]+$/
-      problem "#{lineno}: Trailing whitespace was found"
-    end
+    problem "#{lineno}: Trailing whitespace was found" if line =~ /[\t ]+$/
 
     if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
       problem "Use \"if build.#{$1.downcase}?\" instead"
     end
 
-    if line.include?("make && make")
-      problem "Use separate make calls"
-    end
+    problem "Use separate make calls" if line.include?("make && make")
 
-    if line =~ /^[ ]*\t/
-      problem "Use spaces instead of tabs for indentation"
-    end
+    problem "Use spaces instead of tabs for indentation" if line =~ /^[ ]*\t/
 
     if line.include?("ENV.x11")
       problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
@@ -892,9 +875,7 @@ class FormulaAuditor
       problem "Use build instead of ARGV to check options"
     end
 
-    if line.include?("def options")
-      problem "Use new-style option definitions"
-    end
+    problem "Use new-style option definitions" if line.include?("def options")
 
     if line.end_with?("def test")
       problem "Use new-style test definitions (test do)"
@@ -970,9 +951,7 @@ class FormulaAuditor
       end
     end
 
-    if line =~ /(require ["']formula["'])/
-      problem "`#{$1}` is now unnecessary"
-    end
+    problem "`#{$1}` is now unnecessary" if line =~ /(require ["']formula["'])/
 
     if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
       problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
@@ -1161,9 +1140,7 @@ class ResourceAuditor
     if using == :cvs
       mod = specs[:module]
 
-      if mod == name
-        problem "Redundant :module value in URL"
-      end
+      problem "Redundant :module value in URL" if mod == name
 
       if url =~ %r{:[^/]+$}
         mod = url.split(":").last
@@ -1264,9 +1241,7 @@ class ResourceAuditor
         problem "Don't use specific dl mirrors in SourceForge urls (url is #{p})."
       end
 
-      if p.start_with? "http://downloads"
-        problem "Please use https:// for #{p}"
-      end
+      problem "Please use https:// for #{p}" if p.start_with? "http://downloads"
     end
 
     # Debian has an abundance of secure mirrors. Let's not pluck the insecure

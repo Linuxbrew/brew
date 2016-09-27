@@ -1,10 +1,185 @@
-# ruby style guide favorite
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
+Metrics/AbcSize:
+  Enabled: false
 
-# consistency with above
-Style/StringLiteralsInInterpolation:
-  EnforcedStyle: double_quotes
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/LineLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  CountComments: false
+  Exclude:
+    - 'Homebrew/cask/lib/hbc/locations.rb'
+    - 'Homebrew/cask/lib/hbc/macos.rb'
+    - 'Homebrew/cask/lib/hbc/utils.rb'
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# favor parens-less DSL-style arguments
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Lint/EndAlignment:
+  AlignWith: variable
+
+# `formula do` uses nested method definitions
+Lint/NestedMethodDefinition:
+  Exclude:
+    - 'Homebrew/test/**/*'
+
+Lint/ParenthesesAsGroupedExpression:
+  Enabled: false
+
+Style/Alias:
+  EnforcedStyle: prefer_alias
+
+Style/AlignHash:
+  Enabled: false
+
+# `system` is a special case and aligns on second argument
+Style/AlignParameters:
+  Enabled: false
+
+Style/BarePercentLiterals:
+  Exclude:
+    - 'Taps/**/*'
+  EnforcedStyle: percent_q
+
+Style/BlockDelimiters:
+  EnforcedStyle: semantic
+  Exclude:
+    - 'Taps/**/*'
+  FunctionalMethods:
+    - expect
+    - find
+    - let
+    - let!
+    - subject
+    - watch
+    - inject
+    - map
+    - map!
+    - collect
+    - collect!
+    - reject
+    - reject!
+    - delete_if
+    - with_object
+    - popen_read
+  ProceduralMethods:
+    - after
+    - at_exit
+    - before
+    - benchmark
+    - bm
+    - bmbm
+    - capture_io
+    - capture_output
+    - capture_subprocess_io
+    - chdir
+    - context
+    - create
+    - define_method
+    - define_singleton_method
+    - fork
+    - measure
+    - new
+    - open
+    - realtime
+    - shutup
+    - tap
+    - each
+    - each_pair
+    - each_with_index
+    - reverse_each
+    - ignore_interrupts
+  IgnoredMethods:
+    - each_with_object
+    - it
+    - its
+    - lambda
+    - proc
+    - formula
+    - mock
+    - devel
+    - stable
+    - head
+    - assert_raises
+    - assert_nothing_raised
+    - resource
+    - with_build_environment
+    - ensure_writable
+    - satisfy
+    - fetch
+    - brew
+    - expand
+    - env
+    - recursive_dependencies
+    - trap
+    - link_dir
+    - with_system_path
+
+Style/CaseIndentation:
+  IndentWhenRelativeTo: end
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: nested
+
+# percent-x is allowed for multiline
+Style/CommandLiteral:
+  EnforcedStyle: mixed
+
+# our current conditional style is established, clear and
+# requiring users to change that now would be confusing.
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/Documentation:
+ Enabled: false
+
+Style/EmptyLineBetweenDefs:
+  AllowAdjacentOneLineDefs: true
+
+# dashes in filenames are typical
+Style/FileName:
+  Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
+
+# counterproductive in formulas, notably within the install method
+Style/GuardClause:
+  Exclude:
+    - 'Taps/**/*'
+
+# depends_on foo: :bar looks rubbish
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+  Exclude:
+    - 'Taps/**/*'
+
+Style/IfUnlessModifier:
+  Exclude:
+    - 'Taps/**/*'
+
+Style/IndentArray:
+  EnforcedStyle: special_inside_parentheses
+
+# we won't change backward compatible method names
+Style/MethodName:
+  Exclude:
+    - 'Homebrew/compat/**/*'
 
 # only for numbers >= 1_000_000
 Style/NumericLiterals:
@@ -13,62 +188,6 @@ Style/NumericLiterals:
 # zero-prefixed octal literals are just too widely used (and mostly understood)
 Style/NumericLiteralPrefix:
   EnforcedOctalStyle: zero_only
-
-# percent-x is allowed for multiline
-Style/CommandLiteral:
-  EnforcedStyle: mixed
-
-# depends_on foo: :bar looks rubbish
-Style/HashSyntax:
-  EnforcedStyle: ruby19
-  Exclude:
-    - 'Taps/**/*'
-
-# paths abound, easy escape
-Style/RegexpLiteral:
-  EnforcedStyle: slashes
-
-Style/Alias:
-  EnforcedStyle: prefer_alias
-
-# our current conditional style is established, clear and
-# requiring users to change that now would be confusing.
-Style/ConditionalAssignment:
-  Enabled: false
-
-# no metrics for formulas
-Metrics/AbcSize:
-  Enabled: false
-Metrics/CyclomaticComplexity:
-  Enabled: false
-Metrics/MethodLength:
-  Enabled: false
-Metrics/ClassLength:
-  Enabled: false
-Metrics/PerceivedComplexity:
-  Enabled: false
-
-# we often need very long lines
-Metrics/LineLength:
-  Enabled: false
-
-# formulas have no mandatory doc
-Style/Documentation:
-  Enabled: false
-
-# favor parens-less DSL-style arguments
-Lint/AmbiguousOperator:
-  Enabled: false
-Lint/AmbiguousRegexpLiteral:
-  Enabled: false
-Lint/AssignmentInCondition:
-  Enabled: false
-Lint/ParenthesesAsGroupedExpression:
-  Enabled: false
-
-# compact style
-Style/EmptyLineBetweenDefs:
-  AllowAdjacentOneLineDefs: true
 
 # consistency and readability when faced with string interpolation
 Style/PercentLiteralDelimiters:
@@ -83,6 +202,23 @@ Style/PercentLiteralDelimiters:
     '%W': '[]'
     '%x': '()'
 
+# we prefer Perl-style regex back references
+Style/PerlBackrefs:
+  Enabled: false
+
+# we won't change backward compatible predicate names
+Style/PredicateName:
+  Exclude:
+    - 'Homebrew/compat/**/*'
+  NameWhitelist: is_32_bit?, is_64_bit?
+
+Style/RaiseArgs:
+  EnforcedStyle: exploded
+
+# paths abound, easy escape
+Style/RegexpLiteral:
+  EnforcedStyle: slashes
+
 # conflicts with DSL-style path concatenation with `/`
 Style/SpaceAroundOperators:
   Enabled: false
@@ -91,66 +227,32 @@ Style/SpaceAroundOperators:
 Style/SpecialGlobalVars:
   Enabled: false
 
-# `system` is a special case and aligns on second argument
-Style/AlignParameters:
-  Enabled: false
+# ruby style guide favorite
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
 
-# counterproductive in formulas, notably within the install method
-Style/GuardClause:
-  Exclude:
-    - 'Taps/**/*'
-Style/IfUnlessModifier:
-  Exclude:
-    - 'Taps/**/*'
-
-# TODO: enforce when rubocop has fixed this
-# https://github.com/bbatsov/rubocop/issues/3516
-Style/VariableNumber:
-  Enabled: false
+# consistency with above
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
 
 # TODO: enforce when rubocop has shipped this
 # https://github.com/bbatsov/rubocop/pull/3513
 Style/TernaryParentheses:
   Enabled: false
 
-# dashes in filenames are typical
-Style/FileName:
-  Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
-
-# no percent word array, being friendly to non-ruby users
-# TODO: enforce when rubocop has fixed this
-# https://github.com/bbatsov/rubocop/issues/1543
-Style/WordArray:
-  Enabled: false
-Style/UnneededCapitalW:
-  Enabled: false
-
-# we prefer compact if-else-end/case-when-end alignment
-Lint/EndAlignment:
-  AlignWith: variable
-Style/CaseIndentation:
-  IndentWhenRelativeTo: end
-
-# we prefer Perl-style regex back references
-Style/PerlBackrefs:
-  Enabled: false
-
 # makes diffs nicer
 Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma
 
-# we won't change backward compatible method names
-Style/MethodName:
-  Exclude:
-    - 'Homebrew/compat/**/*'
+Style/UnneededCapitalW:
+  Enabled: false
 
-# we won't change backward compatible predicate names
-Style/PredicateName:
-  Exclude:
-    - 'Homebrew/compat/**/*'
-  NameWhitelist: is_32_bit?, is_64_bit?
+# TODO: enforce when rubocop has fixed this
+# https://github.com/bbatsov/rubocop/issues/3516
+Style/VariableNumber:
+  Enabled: false
 
-# `formula do` uses nested method definitions
-Lint/NestedMethodDefinition:
-  Exclude:
-    - 'Homebrew/test/**/*'
+# TODO: enforce when rubocop has fixed this
+# https://github.com/bbatsov/rubocop/issues/1543
+Style/WordArray:
+  Enabled: false
