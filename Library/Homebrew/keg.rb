@@ -292,7 +292,7 @@ class Keg
     PkgVersion.parse(path.basename.to_s)
   end
 
-  def formula
+  def to_formula
     Formulary.from_keg(self)
   end
 
@@ -302,7 +302,7 @@ class Keg
         # Resolve formula rather than directly comparing names
         # in case of conflicts between formulae from different taps.
         dep_formula = Formulary.factory(dep["full_name"])
-        dep_formula == formula && dep["version"] == version.to_s
+        dep_formula == to_formula && dep["version"] == version.to_s
       end
     end
   end
