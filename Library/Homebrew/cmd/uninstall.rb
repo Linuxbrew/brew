@@ -16,7 +16,7 @@ module Homebrew
 
     if !ARGV.force?
       ARGV.kegs.each do |keg|
-        dependents = keg.installed_dependents
+        dependents = keg.installed_dependents - ARGV.kegs
         if dependents.any?
           dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
           conjugation = dependents.count == 1 ? "is" : "are"
