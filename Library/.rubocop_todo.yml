@@ -34,11 +34,6 @@ Lint/Loop:
   Exclude:
     - 'Homebrew/patch.rb'
 
-# Offense count: 1
-Lint/NestedMethodDefinition:
-  Exclude:
-    - 'Homebrew/dev-cmd/bottle.rb'
-
 # Offense count: 28
 Lint/RescueException:
   Exclude:
