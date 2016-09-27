@@ -3,7 +3,8 @@
 #:    Creates a pull request to update the formula with a new url or a new tag.
 #:
 #:    If a <url> is specified, the <sha-256> checksum of the new download must
-#:    also be specified.
+#:    also be specified. A best effort to determine the <sha-256> and <formula>
+#:    name will be made if either or both values are not supplied by the user.
 #:
 #:    If a <tag> is specified, the git commit <revision> corresponding to that
 #:    tag must also be specified.
@@ -13,9 +14,18 @@
 #:
 #:    If `--dry-run` is passed, print what would be done rather than doing it.
 #:
+#:    If `--write` is passed along with `--dry-run`, perform a not-so-dry run
+#:    making the expected file modifications but not taking any git actions.
+#:
 #:    If `--audit` is passed, run `brew audit` before opening the PR.
 #:
 #:    If `--strict` is passed, run `brew audit --strict` before opening the PR.
+#:
+#:    If `--mirror=`<url> is passed, use the value as a mirror url.
+#:
+#:    If `--version=`<version> is passed, use the value to override the value
+#:    parsed from the url or tag. Note that `--version=0` can be used to delete
+#:    an existing `version` override from a formula if it has become redundant.
 #:
 #:    Note that this command cannot be used to transition a formula from a
 #:    url-and-sha256 style specification into a tag-and-revision style
@@ -38,6 +48,7 @@ module Homebrew
       unless contents.errors.empty?
         raise Utils::InreplaceError, path => contents.errors
       end
+      path.atomic_write(contents) if ARGV.include?("--write")
       contents
     else
       Utils::Inreplace.inreplace(path) do |s|
@@ -64,6 +75,25 @@ module Homebrew
 
   def bump_formula_pr
     formula = ARGV.formulae.first
+    new_url = ARGV.value("url")
+    if new_url && !formula
+      is_devel = ARGV.include?("--devel")
+      base_url = new_url.split("/")[0..4].join("/")
+      base_url = /#{Regexp.escape(base_url)}/
+      guesses = []
+      Formula.each do |f|
+        if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
+          guesses << f
+        elsif f.stable && f.stable.url && f.stable.url.match(base_url)
+          guesses << f
+        end
+      end
+      if guesses.count == 1
+        formula = guesses.shift
+      elsif guesses.count > 1
+        odie "Couldn't guess formula for sure: could be one of these:\n#{guesses}"
+      end
+    end
     odie "No formula found!" unless formula
 
     requested_spec, formula_spec = if ARGV.include?("--devel")
@@ -78,10 +108,11 @@ module Homebrew
       [checksum.hash_type.to_s, checksum.hexdigest]
     end
 
-    new_url = ARGV.value("url")
     new_hash = ARGV.value(hash_type)
     new_tag = ARGV.value("tag")
     new_revision = ARGV.value("revision")
+    new_mirror = ARGV.value("mirror")
+    forced_version = ARGV.value("version")
     new_url_hash = if new_url && new_hash
       true
     elsif new_tag && new_revision
@@ -89,7 +120,21 @@ module Homebrew
     elsif !hash_type
       odie "#{formula}: no tag/revision specified!"
     else
-      odie "#{formula}: no url/#{hash_type} specified!"
+      rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
+        new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
+        new_mirror
+      else
+        new_url
+      end
+      rsrc = Resource.new { @url = rsrc_url }
+      rsrc.download_strategy = CurlDownloadStrategy
+      rsrc.owner = Resource.new(formula.name)
+      rsrc_path = rsrc.fetch
+      if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ %r{/.*\.}
+        new_hash = rsrc_path.sha256
+      elsif new_url.include? ".tar"
+        odie "#{formula}: no url/#{hash_type} specified!"
+      end
     end
 
     if ARGV.dry_run?
@@ -105,6 +150,8 @@ module Homebrew
       replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
     end
 
+    replacement_pairs << [/(^  mirror .*\n)?/, ""] if requested_spec == :stable
+
     replacement_pairs += if new_url_hash
       [
         [formula_spec.url, new_url],
@@ -119,6 +166,29 @@ module Homebrew
 
     backup_file = File.read(formula.path) unless ARGV.dry_run?
 
+    if new_mirror
+      replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
+    end
+
+    if forced_version && forced_version != "0"
+      if requested_spec == :stable
+        if File.read(formula.path).include?("version \"#{old_formula_version}\"")
+          replacement_pairs << [old_formula_version.to_s, forced_version]
+        elsif new_mirror
+          replacement_pairs << [/^( +)(mirror \"#{new_mirror}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+        else
+          replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+        end
+      elsif requested_spec == :devel
+        replacement_pairs << [/(  devel do.+?version \")#{old_formula_version}(\"\n.+?end\n)/m, "\\1#{forced_version}\\2"]
+      end
+    elsif forced_version && forced_version == "0"
+      if requested_spec == :stable
+        replacement_pairs << [/^  version \"[a-z\d+\.]+\"\n/m, ""]
+      elsif requested_spec == :devel
+        replacement_pairs << [/(  devel do.+?)^ +version \"[^\n]+\"\n(.+?end\n)/m, "\\1\\2"]
+      end
+    end
     new_contents = inreplace_pairs(formula.path, replacement_pairs)
 
     new_formula_version = formula_version(formula, requested_spec, new_contents)
