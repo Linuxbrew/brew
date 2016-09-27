@@ -143,6 +143,15 @@ module Homebrew
       end
     end
 
+    unless f.requirements.to_a.empty?
+      ohai "Requirements"
+      %w[build required recommended optional].map do |type|
+        reqs = f.requirements.select(&:"#{type}?")
+        next if reqs.to_a.empty?
+        puts "#{type.capitalize}: #{decorate_requirements(reqs)}"
+      end
+    end
+
     unless f.options.empty?
       ohai "Options"
       Homebrew.dump_options_for_formula f
@@ -157,5 +166,13 @@ module Homebrew
       dep.installed? ? pretty_installed(dep) : pretty_uninstalled(dep)
     end
     deps_status * ", "
+  end
+
+  def decorate_requirements(requirements)
+    req_status = requirements.collect do |req|
+      req_s = req.display_s
+      req.satisfied? ? pretty_installed(req_s) : pretty_uninstalled(req_s)
+    end
+    req_status.join(", ")
   end
 end

@@ -121,6 +121,10 @@ class Requirement
     end
   end
 
+  def display_s
+    name
+  end
+
   private
 
   def infer_name

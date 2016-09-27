@@ -25,4 +25,12 @@ class RubyRequirement < Requirement
   def inspect
     "#<#{self.class.name}: #{name.inspect} #{tags.inspect} version=#{@version.inspect}>"
   end
+
+  def display_s
+    if @version
+      "#{name} >= #{@version}"
+    else
+      name
+    end
+  end
 end
