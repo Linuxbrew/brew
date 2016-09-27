@@ -164,17 +164,25 @@ module Homebrew
     end
 
     if forced_version && forced_version != "0"
-      if File.read(formula.path).include?("version \"#{old_formula_version}\"")
-        replacement_pairs << [old_formula_version.to_s, forced_version]
-      else
-        if new_mirror
-          replacement_pairs << [/^( +)(mirror \"#{new_mirror}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+      if requested_spec == :stable
+        if File.read(formula.path).include?("version \"#{old_formula_version}\"")
+          replacement_pairs << [old_formula_version.to_s, forced_version]
         else
-          replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+          if new_mirror
+            replacement_pairs << [/^( +)(mirror \"#{new_mirror}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+          else
+            replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
+          end
         end
+      elsif requested_spec == :devel
+        replacement_pairs << [/(  devel do.+?version \")#{old_formula_version}(\"\n.+?end\n)/m, "\\1#{forced_version}\\2"]
       end
     elsif forced_version && forced_version == "0"
-      replacement_pairs << [/^  version \"[a-z\d+\.]+\"\n/m, ""]
+      if requested_spec == :stable
+        replacement_pairs << [/^  version \"[a-z\d+\.]+\"\n/m, ""]
+      elsif requested_spec == :devel
+        replacement_pairs << [/(  devel do.+?)^ +version \"[^\n]+\"\n(.+?end\n)/m, "\\1\\2"]
+      end
     end
     new_contents = inreplace_pairs(formula.path, replacement_pairs)
 
