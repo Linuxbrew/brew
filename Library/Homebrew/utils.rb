@@ -293,12 +293,11 @@ module Homebrew
       odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
     end
 
-    unless which executable
-      odie <<-EOS.undent
-        The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
-        #{ENV["PATH"]}
-      EOS
-    end
+    return if which(executable)
+    odie <<-EOS.undent
+      The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
+      #{ENV["PATH"]}
+    EOS
   end
 
   # Hash of Module => Set(method_names)
