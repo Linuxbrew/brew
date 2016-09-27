@@ -7,6 +7,6 @@ class IntegrationCommandTestCreate < IntegrationCommandTestCase
 
     formula_file = CoreTap.new.formula_dir/"testball.rb"
     assert formula_file.exist?, "The formula source should have been created"
-    assert_match %(sha256 "#{TESTBALL_SHA256}"), formula_file.read
+    assert_match %Q(sha256 "#{TESTBALL_SHA256}"), formula_file.read
   end
 end
