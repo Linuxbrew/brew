@@ -16,11 +16,11 @@ module Homebrew
 
     if !ARGV.force?
       ARGV.kegs.each do |keg|
-        dependants = keg.installed_dependants
-        if dependants.any?
-          dependants_output = dependants.map { |k| "#{k.name} #{k.version}" }.join(", ")
-          conjugation = dependants.count == 1 ? "is" : "are"
-          ofail "Refusing to uninstall #{keg} because it is required by #{dependants_output}, which #{conjugation} currently installed."
+        dependents = keg.installed_dependents
+        if dependents.any?
+          dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
+          conjugation = dependents.count == 1 ? "is" : "are"
+          ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
           puts "You can override this and force removal with `brew uninstall --force #{keg.name}`."
           next
         end

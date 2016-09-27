@@ -296,7 +296,7 @@ class Keg
     Formulary.from_keg(self)
   end
 
-  def installed_dependants
+  def installed_dependents
     Formula.installed.flat_map(&:installed_kegs).select do |keg|
       Tab.for_keg(keg).runtime_dependencies.any? do |dep|
         # Resolve formula rather than directly comparing names

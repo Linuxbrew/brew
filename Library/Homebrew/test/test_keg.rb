@@ -329,34 +329,34 @@ class InstalledDependantsTests < LinkTests
 
   def setup
     super
-    @dependant = setup_test_keg("bar", "1.0")
+    @dependent = setup_test_keg("bar", "1.0")
   end
 
   def dependencies(deps)
-    tab = Tab.for_keg(@dependant)
-    tab.tabfile = @dependant.join("INSTALL_RECEIPT.json")
+    tab = Tab.for_keg(@dependent)
+    tab.tabfile = @dependent.join("INSTALL_RECEIPT.json")
     tab.runtime_dependencies = deps
     tab.write
   end
 
   def test_no_dependencies
     dependencies []
-    assert_empty @keg.installed_dependants
+    assert_empty @keg.installed_dependents
   end
 
   def test_same_name_different_version
     dependencies [{ "full_name" => "foo", "version" => "1.1" }]
-    assert_empty @keg.installed_dependants
+    assert_empty @keg.installed_dependents
   end
 
   def test_different_name_same_version
     stub_formula_name("baz")
     dependencies [{ "full_name" => "baz", "version" => @keg.version.to_s }]
-    assert_empty @keg.installed_dependants
+    assert_empty @keg.installed_dependents
   end
 
   def test_same_name_and_version
     dependencies [{ "full_name" => "foo", "version" => "1.0" }]
-    assert_equal [@dependant], @keg.installed_dependants
+    assert_equal [@dependent], @keg.installed_dependents
   end
 end
