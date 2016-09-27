@@ -103,8 +103,15 @@ module Hbc
     def language(*args, default: false, &block)
       if !args.empty? && block_given?
         @language_blocks ||= {}
-        @language_blocks.default = block if default
         @language_blocks[args] = block
+
+        return unless default
+
+        unless @language_blocks.default.nil?
+          raise CaskInvalidError.new(token, "Only one default language may be defined")
+        end
+
+        @language_blocks.default = block
       else
         language_eval
         @language
