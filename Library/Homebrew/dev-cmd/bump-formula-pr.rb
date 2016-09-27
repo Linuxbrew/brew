@@ -120,11 +120,10 @@ module Homebrew
       rsrc.download_strategy = CurlDownloadStrategy
       rsrc.owner = Resource.new(formula.name)
       rsrc_path = rsrc.fetch
-      if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ /\/.*\./
+      if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ %r{/.*\.}
         new_hash = rsrc_path.sha256
-      else
-        odie "#{formula}: no url/#{hash_type} specified!" if new_url.include?(".tar")
-        new_hash = rsrc_path.sha256
+      elsif new_url.include? ".tar"
+        odie "#{formula}: no url/#{hash_type} specified!"
       end
     end
 
@@ -141,9 +140,7 @@ module Homebrew
       replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
     end
 
-    if requested_spec == :stable
-      replacement_pairs << [/(^  mirror .*\n)?/, ""]
-    end
+    replacement_pairs << [/(^  mirror .*\n)?/, ""] if requested_spec == :stable
 
     replacement_pairs += if new_url_hash
       [
@@ -167,12 +164,10 @@ module Homebrew
       if requested_spec == :stable
         if File.read(formula.path).include?("version \"#{old_formula_version}\"")
           replacement_pairs << [old_formula_version.to_s, forced_version]
+        elsif new_mirror
+          replacement_pairs << [/^( +)(mirror \"#{new_mirror}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
         else
-          if new_mirror
-            replacement_pairs << [/^( +)(mirror \"#{new_mirror}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
-          else
-            replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
-          end
+          replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1version \"#{forced_version}\"\n"]
         end
       elsif requested_spec == :devel
         replacement_pairs << [/(  devel do.+?version \")#{old_formula_version}(\"\n.+?end\n)/m, "\\1#{forced_version}\\2"]
