@@ -127,7 +127,6 @@ class IntegrationCommandTestCase < Homebrew::TestCase
         sha256 "#{TESTBALL_SHA256}"
 
         option "with-foo", "Build with foo"
-        #{content}
 
         def install
           (prefix/"foo"/"test").write("test") if build.with? "foo"
@@ -137,6 +136,8 @@ class IntegrationCommandTestCase < Homebrew::TestCase
           bin.mkpath
           system ENV.cc, "test.c", "-o", bin/"test"
         end
+
+        #{content}
 
         # something here
       EOS
