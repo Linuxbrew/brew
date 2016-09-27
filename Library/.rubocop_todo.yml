@@ -96,11 +96,6 @@ Style/ClassVars:
     - 'Homebrew/test/testing_env.rb'
     - 'Homebrew/utils.rb'
 
-# Offense count: 1
-Style/ConstantName:
-  Exclude:
-    - 'Homebrew/os/mac.rb'
-
 # Offense count: 13
 # Configuration parameters: AllowedVariables.
 Style/GlobalVars:
@@ -129,7 +124,6 @@ Style/IndentArray:
 Style/ModuleFunction:
   Exclude:
     - 'Homebrew/global.rb'
-    - 'Homebrew/os/mac.rb'
     - 'Homebrew/os/mac/xcode.rb'
     - 'Homebrew/os/mac/xquartz.rb'
 
