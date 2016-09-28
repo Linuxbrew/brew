@@ -1,25 +1,25 @@
 inherit_from:
-  - .rubocop_common.yml
+  - ../.rubocop.yml
   - .rubocop_todo.yml
 
 AllCops:
   Include:
     - '**/.simplecov'
   Exclude:
-    - 'Homebrew/cask/**/*'
-    - 'Homebrew/**/vendor/**/*'
+    - 'cask/**/*'
+    - '**/vendor/**/*'
 
 # `formula do` uses nested method definitions
 Lint/NestedMethodDefinition:
   Exclude:
-    - 'Homebrew/test/**/*'
+    - 'test/**/*'
 
 Metrics/ModuleLength:
   CountComments: false
   Exclude:
-    - 'Homebrew/cask/lib/hbc/locations.rb'
-    - 'Homebrew/cask/lib/hbc/macos.rb'
-    - 'Homebrew/cask/lib/hbc/utils.rb'
+    - 'cask/lib/hbc/locations.rb'
+    - 'cask/lib/hbc/macos.rb'
+    - 'cask/lib/hbc/utils.rb'
 
 Style/BarePercentLiterals:
   EnforcedStyle: percent_q
@@ -102,11 +102,11 @@ Style/HashSyntax:
 # we won't change backward compatible method names
 Style/MethodName:
   Exclude:
-    - 'Homebrew/compat/**/*'
+    - 'compat/**/*'
 
 # we won't change backward compatible predicate names
 Style/PredicateName:
   Exclude:
-    - 'Homebrew/compat/**/*'
+    - 'compat/**/*'
   NameWhitelist: is_32_bit?, is_64_bit?
 

@@ -53,10 +53,10 @@ module Homebrew
     args << "--auto-correct" if fix
 
     if files.nil?
-      args << "--config" << HOMEBREW_LIBRARY/".rubocop_core.yml"
+      args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
       args += [HOMEBREW_LIBRARY_PATH]
     else
-      args << "--config" << HOMEBREW_LIBRARY/".rubocop_formula.yml"
+      args << "--config" << HOMEBREW_LIBRARY/"Taps/.rubocop.yml"
       args += files
     end
 
