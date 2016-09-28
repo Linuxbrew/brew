@@ -15,12 +15,25 @@ module Homebrew
     raise KegUnspecifiedError if ARGV.named.empty?
 
     kegs_by_rack = if ARGV.force?
-      ARGV.named.map do |name|
+      Hash[ARGV.named.map do |name|
         rack = Formulary.to_rack(name)
         [rack, rack.subdirs.map { |d| Keg.new(d) }]
-      end
+      end]
     else
       ARGV.kegs.group_by(&:rack)
+    end
+
+    kegs = kegs_by_rack.values.flatten(1)
+
+    kegs.each do |keg|
+      dependents = keg.installed_dependents - kegs
+      if dependents.any?
+        dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
+        conjugation = dependents.count == 1 ? "is" : "are"
+        ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
+        # puts "You can override this and force removal with `brew uninstall --force #{keg.name}`."
+        next
+      end
     end
 
     kegs_by_rack.each do |rack, kegs|
@@ -38,15 +51,6 @@ module Homebrew
         rm_pin rack
       else
         kegs.each do |keg|
-          dependents = keg.installed_dependents - ARGV.kegs
-          if dependents.any?
-            dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
-            conjugation = dependents.count == 1 ? "is" : "are"
-            ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
-            puts "You can override this and force removal with `brew uninstall --force #{keg.name}`."
-            next
-          end
-
           keg.lock do
             puts "Uninstalling #{keg}... (#{keg.abv})"
             keg.unlink
