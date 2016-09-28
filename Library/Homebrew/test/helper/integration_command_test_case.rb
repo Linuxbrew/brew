@@ -73,10 +73,12 @@ class IntegrationCommandTestCase < Homebrew::TestCase
     cmd_args << "-rintegration_mocks"
     cmd_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
     cmd_args += args
+    developer = ENV["HOMEBREW_DEVELOPER"]
     Bundler.with_original_env do
       ENV["HOMEBREW_BREW_FILE"] = HOMEBREW_PREFIX/"bin/brew"
       ENV["HOMEBREW_INTEGRATION_TEST"] = cmd_id_from_args(args)
       ENV["HOMEBREW_TEST_TMPDIR"] = TEST_TMPDIR
+      ENV["HOMEBREW_DEVELOPER"] = developer
       env.each_pair do |k, v|
         ENV[k] = v
       end
