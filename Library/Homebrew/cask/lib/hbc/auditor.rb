@@ -4,10 +4,9 @@ module Hbc
       saved_languages = MacOS.instance_variable_get(:@languages)
 
       if languages_blocks = cask.instance_variable_get(:@dsl).instance_variable_get(:@language_blocks)
-        languages_blocks.keys.map(&:first).each do |language|
-          ohai "Auditing language #{language.to_s}"
-          language = "en-US" if language == :default
-          MacOS.instance_variable_set(:@languages, [language])
+        languages_blocks.keys.each do |languages|
+          ohai "Auditing language: #{languages.map { |lang| "'#{lang}'" }.join(", ")}"
+          MacOS.instance_variable_set(:@languages, languages)
           audit_cask_instance(Hbc.load(cask.sourcefile_path), audit_download, check_token_conflicts)
           CLI::Cleanup.run(cask.token) if audit_download
         end
