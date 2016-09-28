@@ -23,17 +23,10 @@ module Homebrew
       ARGV.kegs.group_by(&:rack)
     end
 
-    kegs = kegs_by_rack.values.flatten(1)
-
-    kegs.each do |keg|
-      dependents = keg.installed_dependents - kegs
-      if dependents.any?
-        dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
-        conjugation = dependents.count == 1 ? "is" : "are"
-        ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
-        # puts "You can override this and force removal with `brew uninstall --force #{keg.name}`."
-        next
-      end
+    # --ignore-dependencies, to be consistent with install
+    unless ARGV.include?("--ignore-dependencies") || ARGV.homebrew_developer?
+      kegs = kegs_by_rack.values.flatten(1)
+      return if check_for_dependents kegs
     end
 
     kegs_by_rack.each do |rack, kegs|
@@ -79,6 +72,20 @@ module Homebrew
         rack.unlink if rack.symlink? && !rack.resolved_path_exists?
       end
     end
+  end
+
+  def check_for_dependents(kegs)
+    kegs.each do |keg|
+      dependents = keg.installed_dependents - kegs
+      if dependents.any?
+        dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
+        conjugation = dependents.count == 1 ? "is" : "are"
+        ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
+        puts "You can override this and force removal with `brew uninstall --ignore-dependencies #{keg.name}`."
+        return true
+      end
+    end
+    false
   end
 
   def rm_pin(rack)
