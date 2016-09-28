@@ -14,47 +14,54 @@ module Homebrew
   def uninstall
     raise KegUnspecifiedError if ARGV.named.empty?
 
-    if !ARGV.force?
-      ARGV.kegs.each do |keg|
-        dependents = keg.installed_dependents - ARGV.kegs
-        if dependents.any?
-          dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
-          conjugation = dependents.count == 1 ? "is" : "are"
-          ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
-          puts "You can override this and force removal with `brew uninstall --force #{keg.name}`."
-          next
-        end
-
-        keg.lock do
-          puts "Uninstalling #{keg}... (#{keg.abv})"
-          keg.unlink
-          keg.uninstall
-          rack = keg.rack
-          rm_pin rack
-
-          if rack.directory?
-            versions = rack.subdirs.map(&:basename)
-            verb = versions.length == 1 ? "is" : "are"
-            puts "#{keg.name} #{versions.join(", ")} #{verb} still installed."
-            puts "Remove all versions with `brew uninstall --force #{keg.name}`."
-          end
-        end
+    kegs_by_rack = if ARGV.force?
+      ARGV.named.map do |name|
+        rack = Formulary.to_rack(name)
+        [rack, rack.subdirs.map { |d| Keg.new(d) }]
       end
     else
-      ARGV.named.each do |name|
-        rack = Formulary.to_rack(name)
+      ARGV.kegs.group_by(&:rack)
+    end
+
+    kegs_by_rack.each do |rack, kegs|
+      if ARGV.force?
         name = rack.basename
 
         if rack.directory?
           puts "Uninstalling #{name}... (#{rack.abv})"
-          rack.subdirs.each do |d|
-            keg = Keg.new(d)
+          kegs.each do |keg|
             keg.unlink
             keg.uninstall
           end
         end
 
         rm_pin rack
+      else
+        kegs.each do |keg|
+          dependents = keg.installed_dependents - ARGV.kegs
+          if dependents.any?
+            dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
+            conjugation = dependents.count == 1 ? "is" : "are"
+            ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
+            puts "You can override this and force removal with `brew uninstall --force #{keg.name}`."
+            next
+          end
+
+          keg.lock do
+            puts "Uninstalling #{keg}... (#{keg.abv})"
+            keg.unlink
+            keg.uninstall
+            rack = keg.rack
+            rm_pin rack
+
+            if rack.directory?
+              versions = rack.subdirs.map(&:basename)
+              verb = versions.length == 1 ? "is" : "are"
+              puts "#{keg.name} #{versions.join(", ")} #{verb} still installed."
+              puts "Remove all versions with `brew uninstall --force #{keg.name}`."
+            end
+          end
+        end
       end
     end
   rescue MultipleVersionsInstalledError => e
