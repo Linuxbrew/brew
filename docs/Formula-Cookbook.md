@@ -5,11 +5,11 @@ A formula is a package definition written in Ruby. It can be created with `brew 
 
 | Term           | Description                                                | Example                                                         |
 |----------------|------------------------------------------------------------|-----------------------------------------------------------------|
-| **Formula**    | The package definition                                     | `/usr/local/Library/Taps/homebrew/homebrew-core/Formula/foo.rb` |
+| **Formula**    | The package definition                                     | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/foo.rb` |
 | **Keg**        | The installation prefix of a **Formula**                   | `/usr/local/Cellar/foo/0.1`                                     |
 | **opt prefix** | A symlink to the active version of a **Keg**               | `/usr/local/opt/foo `                                           |
 | **Cellar**     | All **Kegs** are installed here                            | `/usr/local/Cellar`                                             |
-| **Tap**        | An optional Git repository of **Formulae** and/or commands | `/usr/local/Library/Taps/homebrew/homebrew-versions`            |
+| **Tap**        | An optional Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-versions`            |
 | **Bottle**     | Pre-built **Keg** used instead of building from source     | `qt-4.8.4.mavericks.bottle.tar.gz`                              |
 
 ## An Introduction
