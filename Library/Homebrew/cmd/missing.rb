@@ -18,7 +18,7 @@ module Homebrew
       ARGV.resolved_formulae
     end
 
-    Diagnostic.missing_deps(ff) do |name, missing|
+    Diagnostic.missing_deps(ff, ARGV.value("hide")) do |name, missing|
       print "#{name}: " if ff.size > 1
       puts missing.join(" ")
     end
