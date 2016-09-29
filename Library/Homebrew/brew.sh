@@ -179,6 +179,15 @@ then
   set -- "$@" -v
 fi
 
+for arg in "$@"
+do
+  if [[ $arg = "--help" || $arg = "-h" || $arg = "--usage" || $arg = "-?" ]]
+  then
+    export HOMEBREW_HELP="1"
+    break
+  fi
+done
+
 HOMEBREW_ARG_COUNT="$#"
 HOMEBREW_COMMAND="$1"
 shift
@@ -268,6 +277,7 @@ setup-analytics
 report-analytics-screenview-command
 
 update-preinstall() {
+  [[ -z "$HOMEBREW_HELP" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
