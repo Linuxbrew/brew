@@ -1,7 +1,6 @@
 require "extend/pathname"
 require "keg_relocate"
 require "formula_lock"
-require "diagnostic"
 require "ostruct"
 
 class Keg
@@ -298,33 +297,14 @@ class Keg
   end
 
   def installed_dependents
-    installed_kegs = Formula.installed.flat_map(&:installed_kegs)
-    installed_kegs_and_tabs = installed_kegs.map { |k| [k, Tab.for_keg(k)] }
-    kegs_by_tab_deps_presence = installed_kegs_and_tabs.group_by do |_, tab|
-      !tab.runtime_dependencies.nil?
-    end
-    [true, false].each { |v| kegs_by_tab_deps_presence[v] ||= [] }
-
-    kegs_by_tab_deps_presence[true].select! do |_, tab|
-      tab.runtime_dependencies.any? do |dep|
+    Formula.installed.flat_map(&:installed_kegs).select do |keg|
+      Tab.for_keg(keg).runtime_dependencies.any? do |dep|
         # Resolve formula rather than directly comparing names
         # in case of conflicts between formulae from different taps.
         dep_formula = Formulary.factory(dep["full_name"])
         dep_formula == to_formula && dep["version"] == version.to_s
       end
     end
-
-    remaining_kegs_and_tabs = kegs_by_tab_deps_presence[false]
-    remaining_formulae = remaining_kegs_and_tabs.map { |k, _| k.to_formula }
-
-    # Expensive if installed_dependents of multiple kegs are being checked
-    deps = Homebrew::Diagnostic.missing_deps(remaining_formulae, [name])
-    remaining_kegs_and_tabs.select! do |keg, _|
-      keg_deps = deps[keg.to_formula.full_name]
-      keg_deps && keg_deps.any?
-    end
-
-    kegs_by_tab_deps_presence.values.flatten(1).map { |k, _| k }
   end
 
   def find(*args, &block)
