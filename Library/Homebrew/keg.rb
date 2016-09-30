@@ -298,7 +298,9 @@ class Keg
 
   def installed_dependents
     Formula.installed.flat_map(&:installed_kegs).select do |keg|
-      Tab.for_keg(keg).runtime_dependencies.any? do |dep|
+      tab = Tab.for_keg(keg)
+      next if tab.runtime_dependencies.nil? # no dependency information saved.
+      tab.runtime_dependencies.any? do |dep|
         # Resolve formula rather than directly comparing names
         # in case of conflicts between formulae from different taps.
         dep_formula = Formulary.factory(dep["full_name"])

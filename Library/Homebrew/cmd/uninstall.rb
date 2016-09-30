@@ -6,6 +6,7 @@
 
 require "keg"
 require "formula"
+require "diagnostic"
 require "migrator"
 
 module Homebrew
@@ -75,17 +76,45 @@ module Homebrew
   end
 
   def check_for_dependents(kegs)
+    return false unless result = find_some_installed_dependents(kegs)
+
+    requireds, dependents = result
+
+    msg = "Refusing to uninstall #{requireds.join(", ")} because "
+    msg << (requireds.count == 1 ? "it is" : "they are")
+    msg << " required by #{dependents.join(", ")}, which "
+    msg << (dependents.count == 1 ? "is" : "are")
+    msg << " currently installed."
+    ofail msg
+    print "You can override this and force removal with "
+    puts "`brew uninstall --ignore-dependencies #{requireds.map(&:name).join(" ")}`."
+
+    true
+  end
+
+  # Will return some kegs, and some dependencies, if they're present.
+  # For efficiency, we don't bother trying to get complete data.
+  def find_some_installed_dependents(kegs)
     kegs.each do |keg|
       dependents = keg.installed_dependents - kegs
-      next if dependents.empty?
-
-      dependents_output = dependents.map { |k| "#{k.name} #{k.version}" }.join(", ")
-      conjugation = dependents.count == 1 ? "is" : "are"
-      ofail "Refusing to uninstall #{keg} because it is required by #{dependents_output}, which #{conjugation} currently installed."
-      puts "You can override this and force removal with `brew uninstall --ignore-dependencies #{keg.name}`."
-      return true
+      dependents.map! { |d| "#{d.name} #{d.version}" }
+      return [keg], dependents if dependents.any?
     end
-    false
+
+    # Find formulae that didn't have dependencies saved in all of their kegs,
+    # so need them to be calculated now.
+    #
+    # This happens after the initial dependency check because it's sloooow.
+    remaining_formulae = Formula.installed.select { |f|
+      f.installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
+    }
+    Diagnostic.missing_deps(remaining_formulae, kegs.map(&:name)) do |dependent, required|
+      kegs_by_name = kegs.group_by(&:to_formula)
+      required_kegs = required.map { |f| kegs_by_name[f].sort_by(&:version).last }
+      return required_kegs, [dependent]
+    end
+
+    nil
   end
 
   def rm_pin(rack)

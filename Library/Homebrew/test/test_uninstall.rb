@@ -43,6 +43,24 @@ class IntegrationCommandTestUninstall < IntegrationCommandTestCase
     end
   end
 
+  def test_uninstall_leaving_dependents_no_runtime_dependencies_in_tab
+    cmd("install", "testball_f2")
+
+    f2_keg = f2.installed_kegs.first
+    f2_tab = Tab.for_keg(f2_keg)
+    f2_tab.runtime_dependencies = nil
+    f2_tab.write
+
+    run_as_not_developer do
+      assert_match "Refusing to uninstall",
+        cmd_fail("uninstall", "testball_f1")
+      refute_empty f1.installed_kegs
+      assert_match "Uninstalling #{f2.rack}",
+        cmd("uninstall", "testball_f2")
+      assert_empty f2.installed_kegs
+    end
+  end
+
   def test_uninstall_force_leaving_dependents
     cmd("install", "testball_f2")
     run_as_not_developer do
