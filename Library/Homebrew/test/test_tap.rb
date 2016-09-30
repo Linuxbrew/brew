@@ -25,7 +25,7 @@ class IntegrationCommandTestTap < IntegrationCommandTestCase
     assert_match "Unpinned homebrew/foo", cmd("tap-unpin", "homebrew/foo")
     assert_match "Tapped", cmd("tap", "homebrew/bar", path/".git")
     assert_match "Untapped", cmd("untap", "homebrew/bar")
-    assert_match /.*/, cmd("tap", "homebrew/bar", path/".git", "-q", "--full")
+    cmd("tap", "homebrew/bar", path/".git", "-q", "--full")
     assert_match "Untapped", cmd("untap", "homebrew/bar")
   end
 end
