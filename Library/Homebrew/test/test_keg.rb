@@ -339,8 +339,29 @@ class InstalledDependantsTests < LinkTests
     tab.write
   end
 
+  def test_unknown_dependencies
+    dependencies nil
+
+    bar = formula "bar" do
+      url "bar-1.0"
+      depends_on "foo"
+    end
+    stub_formula_loader bar
+
+    assert_equal [@dependent], @keg.installed_dependents
+  end
+
   def test_no_dependencies
     dependencies []
+
+    # Make sure formula dependencies aren't checked when dependencies are
+    # recorded in the tab.
+    bar = formula "bar" do
+      url "bar-1.0"
+      depends_on "foo"
+    end
+    stub_formula_loader bar
+
     assert_empty @keg.installed_dependents
   end
 
