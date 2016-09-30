@@ -1,5 +1,9 @@
-#:  * `man`:
+#:  * `man` [`--fail-if-changed`]:
 #:    Generate Homebrew's manpages.
+#:
+#:    If `--fail-if-changed` is passed, the command will return a failing
+#:    status code if changes are detected in the manpage outputs.
+#:    This can be used for CI to be notified when the manpages are out of date.
 
 require "formula"
 require "erb"
@@ -17,6 +21,12 @@ module Homebrew
       odie "`brew man --link` is now done automatically by `brew update`."
     else
       regenerate_man_pages
+    end
+
+    if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/brew.1.html", "manpages"
+      puts "No changes to manpage output detected."
+    elsif ARGV.include?("--fail-if-changed")
+      Homebrew.failed = true
     end
   end
 

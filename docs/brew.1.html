@@ -467,7 +467,8 @@ for instance, for implementing pre-commit hooks.</p></dd>
 <dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] <code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var> <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new url or a new tag.</p>
 
 <p>If a <var>url</var> is specified, the <var>sha-256</var> checksum of the new download must
-also be specified.</p>
+also be specified. A best effort to determine the <var>sha-256</var> and <var>formula</var>
+name will be made if either or both values are not supplied by the user.</p>
 
 <p>If a <var>tag</var> is specified, the git commit <var>revision</var> corresponding to that
 tag must also be specified.</p>
@@ -477,9 +478,18 @@ The development spec must already exist.</p>
 
 <p>If <code>--dry-run</code> is passed, print what would be done rather than doing it.</p>
 
+<p>If <code>--write</code> is passed along with <code>--dry-run</code>, perform a not-so-dry run
+making the expected file modifications but not taking any git actions.</p>
+
 <p>If <code>--audit</code> is passed, run <code>brew audit</code> before opening the PR.</p>
 
 <p>If <code>--strict</code> is passed, run <code>brew audit --strict</code> before opening the PR.</p>
+
+<p>If <code>--mirror=</code><var>url</var> is passed, use the value as a mirror url.</p>
+
+<p>If <code>--version=</code><var>version</var> is passed, use the value to override the value
+parsed from the url or tag. Note that <code>--version=0</code> can be used to delete
+an existing <code>version</code> override from a formula if it has become redundant.</p>
 
 <p>Note that this command cannot be used to transition a formula from a
 url-and-sha256 style specification into a tag-and-revision style
@@ -515,7 +525,11 @@ non-zero exit code if any missing libraries were found.</p>
 
 <p>If <code>--reverse</code> is passed, print the dylib followed by the binaries
 which link to it for each library the keg references.</p></dd>
-<dt class="flush"><code>man</code></dt><dd><p>Generate Homebrew's manpages.</p></dd>
+<dt><code>man</code> [<code>--fail-if-changed</code>]</dt><dd><p>Generate Homebrew's manpages.</p>
+
+<p>If <code>--fail-if-changed</code> is passed, the command will return a failing
+status code if changes are detected in the manpage outputs.
+This can be used for CI to be notified when the manpages are out of date.</p></dd>
 </dl>
 
 
