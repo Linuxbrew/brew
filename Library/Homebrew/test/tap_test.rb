@@ -60,9 +60,18 @@ class TapTest < Homebrew::TestCase
     @cmd_file.parent.mkpath
     touch @cmd_file
     chmod 0755, @cmd_file
-    @manpage_file = @path/"man/man1/brew-tap-cmd.1"
+    @manpage_file = @path/"manpages/brew-tap-cmd.1"
     @manpage_file.parent.mkpath
     touch @manpage_file
+    @bash_completion_file = @path/"completions/bash/brew-tap-cmd"
+    @bash_completion_file.parent.mkpath
+    touch @bash_completion_file
+    @zsh_completion_file = @path/"completions/zsh/_brew-tap-cmd"
+    @zsh_completion_file.parent.mkpath
+    touch @zsh_completion_file
+    @fish_completion_file = @path/"completions/fish/brew-tap-cmd.fish"
+    @fish_completion_file.parent.mkpath
+    touch @fish_completion_file
   end
 
   def setup_git_repo
@@ -238,10 +247,39 @@ class TapTest < Homebrew::TestCase
     shutup { tap.install clone_target: @tap.path/".git" }
     assert_predicate tap, :installed?
     assert_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :file?
+    assert_predicate HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd", :file?
+    assert_predicate HOMEBREW_PREFIX/"share/zsh/site-functions/_brew-tap-cmd", :file?
+    assert_predicate HOMEBREW_PREFIX/"share/fish/vendor_completions.d/brew-tap-cmd.fish", :file?
     shutup { tap.uninstall }
     refute_predicate tap, :installed?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :exist?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1", :exist?
+    refute_predicate HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd", :exist?
+    refute_predicate HOMEBREW_PREFIX/"share/zsh/site-functions/_brew-tap-cmd", :exist?
+    refute_predicate HOMEBREW_PREFIX/"share/fish/vendor_completions.d/brew-tap-cmd.fish", :exist?
+  ensure
+    (HOMEBREW_PREFIX/"etc").rmtree if (HOMEBREW_PREFIX/"etc").exist?
+    (HOMEBREW_PREFIX/"share").rmtree if (HOMEBREW_PREFIX/"share").exist?
+  end
+
+  def test_link_completions_and_manpages
+    setup_tap_files
+    setup_git_repo
+    tap = Tap.new("Homebrew", "baz")
+    shutup { tap.install clone_target: @tap.path/".git" }
+    (HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1").delete
+    (HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd").delete
+    (HOMEBREW_PREFIX/"share/zsh/site-functions/_brew-tap-cmd").delete
+    (HOMEBREW_PREFIX/"share/fish/vendor_completions.d/brew-tap-cmd.fish").delete
+    shutup { tap.link_completions_and_manpages }
+    assert_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :file?
+    assert_predicate HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd", :file?
+    assert_predicate HOMEBREW_PREFIX/"share/zsh/site-functions/_brew-tap-cmd", :file?
+    assert_predicate HOMEBREW_PREFIX/"share/fish/vendor_completions.d/brew-tap-cmd.fish", :file?
+    shutup { tap.uninstall }
+  ensure
+    (HOMEBREW_PREFIX/"etc").rmtree if (HOMEBREW_PREFIX/"etc").exist?
+    (HOMEBREW_PREFIX/"share").rmtree if (HOMEBREW_PREFIX/"share").exist?
   end
 
   def test_pin_and_unpin

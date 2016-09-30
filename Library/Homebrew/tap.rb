@@ -236,7 +236,7 @@ class Tap
       raise
     end
 
-    link_manpages
+    link_completions_and_manpages
 
     formula_count = formula_files.size
     puts "Tapped #{formula_count} formula#{plural(formula_count, "e")} (#{path.abv})" unless quiet
@@ -254,8 +254,10 @@ class Tap
     EOS
   end
 
-  def link_manpages
-    link_path_manpages(path, "brew tap --repair")
+  def link_completions_and_manpages
+    command = "brew tap --repair"
+    Utils::Link.link_manpages(path, command)
+    Utils::Link.link_completions(path, command)
   end
 
   # uninstall this {Tap}.
@@ -267,21 +269,12 @@ class Tap
     unpin if pinned?
     formula_count = formula_files.size
     Descriptions.uncache_formulae(formula_names)
-    unlink_manpages
+    Utils::Link.unlink_manpages(path)
+    Utils::Link.unlink_completions(path)
     path.rmtree
     path.parent.rmdir_if_possible
     puts "Untapped #{formula_count} formula#{plural(formula_count, "e")}"
     clear_cache
-  end
-
-  def unlink_manpages
-    return unless (path/"man").exist?
-    (path/"man").find do |src|
-      next if src.directory?
-      dst = HOMEBREW_PREFIX/"share"/src.relative_path_from(path)
-      dst.delete if dst.symlink? && src == dst.resolved_path
-      dst.parent.rmdir_if_possible
-    end
   end
 
   # True if the {#remote} of {Tap} is customized.
