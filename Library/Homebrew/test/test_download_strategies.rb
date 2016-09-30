@@ -22,11 +22,13 @@ class AbstractDownloadStrategyTests < Homebrew::TestCase
 
   def test_expand_safe_system_args_with_explicit_quiet_flag
     @args << { quiet_flag: "--flag" }
+    ARGV.stubs(verbose?: false)
     expanded_args = @strategy.expand_safe_system_args(@args)
     assert_equal %w[foo bar baz --flag], expanded_args
   end
 
   def test_expand_safe_system_args_with_implicit_quiet_flag
+    ARGV.stubs(verbose?: false)
     expanded_args = @strategy.expand_safe_system_args(@args)
     assert_equal %w[foo bar -q baz], expanded_args
   end

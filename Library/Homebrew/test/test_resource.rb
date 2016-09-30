@@ -117,7 +117,7 @@ class ResourceTests < Homebrew::TestCase
   end
 
   def test_verify_download_integrity_mismatch
-    fn = stub(file?: true)
+    fn = stub(file?: true, basename: "Ftest")
     checksum = @resource.sha256(TEST_SHA256)
 
     fn.expects(:verify_checksum).with(checksum)
