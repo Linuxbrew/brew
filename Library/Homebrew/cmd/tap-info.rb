@@ -80,10 +80,8 @@ module Homebrew
       end
     end
   end
-  private_class_method :print_tap_info
 
   def print_tap_json(taps)
     puts Utils::JSON.dump(taps.map(&:to_hash))
   end
-  private_class_method :print_tap_json
 end

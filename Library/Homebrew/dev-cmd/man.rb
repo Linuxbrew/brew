@@ -44,7 +44,6 @@ module Homebrew
     cask_markup = (HOMEBREW_LIBRARY/"Homebrew/manpages/brew-cask.1.md").read
     convert_man_page(cask_markup, TARGET_MAN_PATH/"brew-cask.1")
   end
-  private_class_method :regenerate_man_pages
 
   def path_glob_commands(glob)
     Pathname.glob(glob)
@@ -57,7 +56,6 @@ module Homebrew
     end
             .reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
   end
-  private_class_method :path_glob_commands
 
   def build_man_page
     template = (SOURCE_PATH/"brew.1.md.erb").read
@@ -75,13 +73,11 @@ module Homebrew
 
     ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end
-  private_class_method :build_man_page
 
   def sort_key_for_path(path)
     # Options after regular commands (`~` comes after `z` in ASCII table).
     path.basename.to_s.sub(/\.(rb|sh)$/, "").sub(/^--/, "~~")
   end
-  private_class_method :sort_key_for_path
 
   def convert_man_page(markup, target)
     manual = target.basename(".1")
@@ -114,7 +110,6 @@ module Homebrew
       target.atomic_write ronn.read
     end
   end
-  private_class_method :convert_man_page
 
   def target_path_to_format(target)
     case target.basename
@@ -124,5 +119,4 @@ module Homebrew
       odie "Failed to infer output format from '#{target.basename}'."
     end
   end
-  private_class_method :target_path_to_format
 end

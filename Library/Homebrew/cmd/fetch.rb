@@ -106,7 +106,6 @@ module Homebrew
       false
     end
   end
-  private_class_method :retry_fetch?
 
   def fetch_fetchable(f)
     f.clear_cache if ARGV.force?
@@ -127,5 +126,4 @@ module Homebrew
 
     f.verify_download_integrity(download)
   end
-  private_class_method :fetch_fetchable
 end

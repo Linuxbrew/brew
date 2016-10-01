@@ -55,5 +55,4 @@ module Homebrew
       cmds << f.basename.to_s.sub(/\.(?:rb|sh)$/, "") if f.file?
     end
   end
-  private_class_method :find_internal_commands
 end

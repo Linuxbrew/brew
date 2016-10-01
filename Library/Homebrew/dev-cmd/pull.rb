@@ -257,12 +257,10 @@ module Homebrew
     end
     published
   end
-  private_class_method :publish_changed_formula_bottles
 
   def pull_patch(url, description = nil)
     PatchPuller.new(url, description).pull_patch
   end
-  private_class_method :pull_patch
 
   class PatchPuller
     attr_reader :base_url
@@ -342,7 +340,6 @@ module Homebrew
     end
     { files: files, formulae: formulae, others: others }
   end
-  private_class_method :files_changed_in_patch
 
   # Get current formula versions without loading formula definition in this process
   # Returns info as a hash (type => version), for pull.rb's internal use
@@ -359,7 +356,6 @@ module Homebrew
     end
     versions
   end
-  private_class_method :current_versions_from_info_external
 
   def subject_for_bump(formula, old, new)
     if old[:nonexistent]
@@ -399,12 +395,10 @@ module Homebrew
     end
     subject
   end
-  private_class_method :subject_for_bump
 
   def pbcopy(text)
     Utils.popen_write("pbcopy") { |io| io.write text }
   end
-  private_class_method :pbcopy
 
   # Publishes the current bottle files for a given formula to Bintray
   def publish_bottle_file_on_bintray(f, creds)
@@ -421,7 +415,6 @@ module Homebrew
          "-d", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/homebrew/#{repo}/#{package}/#{version}/publish"
   end
-  private_class_method :publish_bottle_file_on_bintray
 
   # Formula info drawn from an external "brew info --json" call
   class FormulaInfoFromJson
@@ -582,5 +575,4 @@ module Homebrew
       end
     end
   end
-  private_class_method :verify_bintray_published
 end

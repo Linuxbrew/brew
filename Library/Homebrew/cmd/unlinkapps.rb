@@ -25,7 +25,6 @@ module Homebrew
     unlinkapps_from_dir(linkapps_target(local: false), opts)
     unlinkapps_from_dir(linkapps_target(local: true), opts)
   end
-  private_class_method :unlinkapps_prune
 
   def unlinkapps_from_dir(target_dir, opts = {})
     return unless target_dir.directory?
@@ -58,7 +57,6 @@ module Homebrew
       puts "Unlinked #{n} app#{plural(n)} from #{target_dir}"
     end
   end
-  private_class_method :unlinkapps_from_dir
 
   UNLINKAPPS_PREFIXES = %W[
     #{HOMEBREW_CELLAR}/
@@ -78,5 +76,4 @@ module Homebrew
       ARGV.kegs.any? { |keg| app.start_with?("#{keg}/", "#{keg.opt_record}/") }
     end
   end
-  private_class_method :unlinkapps_unlink?
 end

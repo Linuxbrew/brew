@@ -101,7 +101,6 @@ module Homebrew
     cd HOMEBREW_PREFIX
     exec "find", *args
   end
-  private_class_method :list_unbrewed
 
   def filtered_list
     names = if ARGV.named.empty?
@@ -128,7 +127,6 @@ module Homebrew
       end
     end
   end
-  private_class_method :filtered_list
 end
 
 class PrettyListing

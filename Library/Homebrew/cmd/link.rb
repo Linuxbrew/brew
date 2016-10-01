@@ -78,5 +78,4 @@ module Homebrew
   rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
     false
   end
-  private_class_method :keg_only?
 end

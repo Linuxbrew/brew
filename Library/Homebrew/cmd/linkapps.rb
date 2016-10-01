@@ -61,5 +61,4 @@ module Homebrew
     local = opts.fetch(:local, false)
     Pathname.new(local ? "~/Applications" : "/Applications").expand_path
   end
-  private_class_method :linkapps_target
 end

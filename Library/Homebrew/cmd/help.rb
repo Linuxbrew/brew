@@ -86,5 +86,4 @@ module Homebrew
       end.join.strip
     end
   end
-  private_class_method :command_help
 end

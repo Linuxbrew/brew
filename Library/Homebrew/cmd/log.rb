@@ -29,5 +29,4 @@ module Homebrew
     args += ["--", path] unless path.nil?
     exec "git", "log", *args
   end
-  private_class_method :git_log
 end
