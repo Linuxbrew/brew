@@ -185,8 +185,8 @@ module Homebrew
 
     def puts_result
       if ENV["TRAVIS"]
-        travis_start_time = @start_time.to_i*1000000000
-        travis_end_time = @end_time.to_i*1000000000
+        travis_start_time = @start_time.to_i * 1_000_000_000
+        travis_end_time = @end_time.to_i * 1_000_000_000
         travis_duration = travis_end_time - travis_start_time
         puts "#{Tty.white}==>#{Tty.green} PASSED#{Tty.reset}" if passed?
         puts "travis_time:end:#{@travis_timer_id},start=#{travis_start_time},finish=#{travis_end_time},duration=#{travis_duration}"
@@ -572,11 +572,10 @@ module Homebrew
 
       (installed & dependencies).each do |installed_dependency|
         installed_dependency_formula = Formulary.factory(installed_dependency)
-        if installed_dependency_formula.installed? &&
-           !installed_dependency_formula.keg_only? &&
-           !installed_dependency_formula.linked_keg.exist?
-          test "brew", "link", installed_dependency
-        end
+        next unless installed_dependency_formula.installed?
+        next if installed_dependency_formula.keg_only?
+        next if installed_dependency_formula.linked_keg.exist?
+        test "brew", "link", installed_dependency
       end
 
       dependencies -= installed
@@ -739,9 +738,7 @@ module Homebrew
         coverage_args = []
         if ARGV.include?("--coverage")
           if ENV["JENKINS_HOME"]
-            if OS.mac? && MacOS.version == :sierra
-              coverage_args << "--coverage"
-            end
+            coverage_args << "--coverage" if OS.mac? && MacOS.version == :sierra
           else
             coverage_args << "--coverage"
           end
@@ -757,14 +754,12 @@ module Homebrew
           test "brew", "cask-tests", *coverage_args
         end
       elsif @tap
-        if @tap.name == "homebrew/core"
-          test "brew", "style", @tap.name
-        end
+        test "brew", "style", @tap.name if @tap.name == "homebrew/core"
         test "brew", "readall", "--aliases", @tap.name
       end
     end
 
-    def cleanup_git
+    def cleanup_shared
       git "gc", "--auto"
       test "git", "clean", "-ffdx", "--exclude=Library/Taps"
 
@@ -774,8 +769,8 @@ module Homebrew
         safe_system "brew", "untap", tap
       end
 
-      Formula.installed.each do |formula|
-        safe_system "brew", "uninstall", "--force", formula
+      Dir.glob("#{HOMEBREW_PREFIX}/{Cellar,etc,var}/**/*").each do |file|
+        FileUtils.rm_rf file
       end
       safe_system "brew", "prune"
 
@@ -807,7 +802,7 @@ module Homebrew
         git "reset", "--hard", "origin/master"
       end
 
-      cleanup_git
+      cleanup_shared
 
       pr_locks = "#{@repository}/.git/refs/remotes/*/pr/*/*.lock"
       Dir.glob(pr_locks) { |lock| FileUtils.rm_rf lock }
@@ -828,7 +823,7 @@ module Homebrew
         git "stash", "pop"
         test "brew", "cleanup", "--prune=7"
 
-        cleanup_git
+        cleanup_shared
 
         if ARGV.include? "--local"
           FileUtils.rm_rf ENV["HOMEBREW_HOME"]
@@ -1098,9 +1093,7 @@ module Homebrew
       ARGV << "--junit" << "--local" << "--test-default-formula"
     end
 
-    if ARGV.include? "--ci-master"
-      ARGV << "--fast"
-    end
+    ARGV << "--fast" if ARGV.include?("--ci-master")
 
     if ARGV.include? "--local"
       ENV["HOMEBREW_CACHE"] = "#{ENV["HOME"]}/Library/Caches/Homebrew"
@@ -1124,9 +1117,7 @@ module Homebrew
       safe_system "brew", "tap", tap.name, "--full"
     end
 
-    if ARGV.include? "--ci-upload"
-      return test_ci_upload(tap)
-    end
+    return test_ci_upload(tap) if ARGV.include?("--ci-upload")
 
     tests = []
     any_errors = false

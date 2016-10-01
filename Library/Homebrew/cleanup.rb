@@ -12,7 +12,7 @@ module Homebrew
       cleanup_logs
       unless ARGV.dry_run?
         cleanup_lockfiles
-        rm_DS_Store
+        rm_ds_store
       end
     end
 
@@ -66,7 +66,7 @@ module Homebrew
         next unless path.file?
         file = path
 
-        if Pathname::BOTTLE_EXTNAME_RX === file.to_s
+        if file.to_s =~ Pathname::BOTTLE_EXTNAME_RX
           version = begin
                       Utils::Bottles.resolve_version(file)
                     rescue
@@ -86,7 +86,7 @@ module Homebrew
           next
         end
 
-        file_is_stale = if PkgVersion === version
+        file_is_stale = if version.is_a?(PkgVersion)
           f.pkg_version > version
         else
           f.version > version
@@ -119,7 +119,7 @@ module Homebrew
       end
     end
 
-    def self.rm_DS_Store
+    def self.rm_ds_store
       paths = Queue.new
       %w[Cellar Frameworks Library bin etc include lib opt sbin share var]
         .map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }

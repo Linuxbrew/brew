@@ -71,13 +71,13 @@ class Pathname
       when Array
         if src.empty?
           opoo "tried to install empty array to #{self}"
-          return
+          break
         end
         src.each { |s| install_p(s, File.basename(s)) }
       when Hash
         if src.empty?
           opoo "tried to install empty hash to #{self}"
-          return
+          break
         end
         src.each { |s, new_basename| install_p(s, new_basename) }
       else

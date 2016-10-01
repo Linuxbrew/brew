@@ -1,5 +1,2 @@
 require "extend/ENV/std"
-
-if OS.mac?
-  require "extend/os/mac/extend/ENV/std"
-end
+require "extend/os/mac/extend/ENV/std" if OS.mac?

@@ -1,6 +1,3 @@
 require "os"
 require "emoji"
-
-if OS.mac?
-  require "extend/os/mac/emoji"
-end
+require "extend/os/mac/emoji" if OS.mac?

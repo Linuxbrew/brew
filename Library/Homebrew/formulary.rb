@@ -301,9 +301,7 @@ class Formulary
       return TapLoader.new(ref)
     end
 
-    if File.extname(ref) == ".rb"
-      return FromPathLoader.new(ref)
-    end
+    return FromPathLoader.new(ref) if File.extname(ref) == ".rb"
 
     formula_with_that_name = core_path(ref)
     if formula_with_that_name.file?
@@ -311,9 +309,7 @@ class Formulary
     end
 
     possible_alias = CoreTap.instance.alias_dir/ref
-    if possible_alias.file?
-      return AliasLoader.new(possible_alias)
-    end
+    return AliasLoader.new(possible_alias) if possible_alias.file?
 
     possible_tap_formulae = tap_paths(ref)
     if possible_tap_formulae.size > 1

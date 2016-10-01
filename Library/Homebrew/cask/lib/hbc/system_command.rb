@@ -123,7 +123,7 @@ class Hbc::SystemCommand::Result
   end
 
   def success?
-    @exit_status == 0
+    @exit_status.zero?
   end
 
   def merged_output

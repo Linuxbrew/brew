@@ -10,7 +10,7 @@ class Hbc::Artifact::AbstractFlightBlock < Hbc::Artifact::Base
   end
 
   def self.class_for_dsl_key(dsl_key)
-    Object.const_get("Hbc::DSL::#{dsl_key.to_s.split('_').collect(&:capitalize).join}")
+    Object.const_get("Hbc::DSL::#{dsl_key.to_s.split("_").collect(&:capitalize).join}")
   end
 
   def self.me?(cask)

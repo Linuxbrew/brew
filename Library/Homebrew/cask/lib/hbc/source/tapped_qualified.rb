@@ -11,7 +11,7 @@ class Hbc::Source::TappedQualified < Hbc::Source::Tapped
     qualified_token = Hbc::QualifiedToken.parse(query)
     return if qualified_token.nil?
 
-    user, repo, token = qualified_token
+    user, repo = qualified_token[0..1]
     Tap.fetch(user, repo)
   end
 

@@ -54,11 +54,8 @@ module Homebrew
           end
         rescue FormulaUnavailableError
           # No formula with this name, try a blacklist lookup
-          if (blacklist = blacklisted?(f))
-            puts blacklist
-          else
-            raise
-          end
+          raise unless (blacklist = blacklisted?(f))
+          puts blacklist
         end
       end
     end

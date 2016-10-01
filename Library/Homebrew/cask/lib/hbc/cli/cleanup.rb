@@ -65,7 +65,7 @@ class Hbc::CLI::Cleanup < Hbc::CLI::Base
 
   def remove_cache_files(*tokens)
     message = "Removing cached downloads"
-    message.concat " for #{tokens.join(', ')}" unless tokens.empty?
+    message.concat " for #{tokens.join(", ")}" unless tokens.empty?
     message.concat " older than #{OUTDATED_DAYS} days old" if outdated_only
     ohai message
 

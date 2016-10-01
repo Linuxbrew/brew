@@ -48,7 +48,7 @@ class Hbc::CLI::List < Hbc::CLI::Base
       end
     end
 
-    count == 0 ? nil : count == cask_tokens.length
+    count.zero? ? nil : count == cask_tokens.length
   end
 
   def self.list_artifacts(cask)

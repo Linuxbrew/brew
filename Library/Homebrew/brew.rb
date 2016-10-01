@@ -37,9 +37,9 @@ begin
   cmd = nil
 
   ARGV.dup.each_with_index do |arg, i|
-    if help_flag && cmd
-      break
-    elsif help_flag_list.include?(arg)
+    break if help_flag && cmd
+
+    if help_flag_list.include?(arg)
       # Option-style help: Both `--help <cmd>` and `<cmd> --help` are fine.
       help_flag = true
     elsif arg == "help" && !cmd

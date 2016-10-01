@@ -1,5 +1,2 @@
 require "diagnostic"
-
-if OS.mac?
-  require "extend/os/mac/diagnostic"
-end
+require "extend/os/mac/diagnostic" if OS.mac?

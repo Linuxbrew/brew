@@ -216,7 +216,7 @@ module HomebrewArgvExtension
   end
 
   def build_all_from_source?
-    !!ENV["HOMEBREW_BUILD_FROM_SOURCE"]
+    !ENV["HOMEBREW_BUILD_FROM_SOURCE"].nil?
   end
 
   # Whether a given formula should be built from source during the current

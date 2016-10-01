@@ -12,7 +12,7 @@ describe Hbc::CLI::Cleanup do
 
   describe "cleanup" do
     it "removes cached downloads of given casks" do
-      cleaned_up_cached_download = 'caffeine'
+      cleaned_up_cached_download = "caffeine"
 
       cached_downloads = [
                            cache_location.join("#{cleaned_up_cached_download}--latest.zip"),

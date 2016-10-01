@@ -269,8 +269,16 @@ class Hbc::DSL
   end
 
   def method_missing(method, *)
-    Hbc::Utils.method_missing_message(method, token)
-    nil
+    if method
+      Hbc::Utils.method_missing_message(method, token)
+      nil
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(*)
+    true
   end
 
   def appdir

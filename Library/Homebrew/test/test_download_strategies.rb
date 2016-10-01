@@ -118,7 +118,7 @@ class GitDownloadStrategyTests < Homebrew::TestCase
 
   def test_source_modified_time
     setup_git_repo
-    assert_equal 1242860651, @strategy.source_modified_time.to_i
+    assert_equal 1_242_860_651, @strategy.source_modified_time.to_i
   end
 
   def test_last_commit

@@ -58,10 +58,11 @@ module Homebrew
 
   def restore_backup(keg, formula)
     path = backup_path(keg)
-    if path.directory?
-      path.rename keg
-      keg.link unless formula.keg_only?
-    end
+
+    return unless path.directory?
+
+    path.rename keg
+    keg.link unless formula.keg_only?
   end
 
   def backup_path(path)

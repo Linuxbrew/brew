@@ -169,11 +169,11 @@ class DiagnosticChecksTest < Homebrew::TestCase
     if OS.mac?
       ENV["DYLD_INSERT_LIBRARIES"] = "foo"
       assert_match "Setting DYLD_INSERT_LIBRARIES",
-        @checks.check_DYLD_vars
+        @checks.check_dyld_vars
     else
       ENV["LD_LIBRARY_PATH"] = "foo"
       assert_match "Setting LD_",
-        @checks.check_DYLD_vars
+        @checks.check_dyld_vars
     end
   end
 

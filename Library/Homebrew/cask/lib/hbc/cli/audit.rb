@@ -6,7 +6,7 @@ class Hbc::CLI::Audit < Hbc::CLI::Base
   def self.run(*args)
     failed_casks = new(args, Hbc::Auditor).run
     return if failed_casks.empty?
-    raise Hbc::CaskError, "audit failed for casks: #{failed_casks.join(' ')}"
+    raise Hbc::CaskError, "audit failed for casks: #{failed_casks.join(" ")}"
   end
 
   def initialize(args, auditor)

@@ -117,11 +117,11 @@ class Hbc::CLI
               rescue NameError
                 nil
               end
+
       if klass.respond_to?(:run)
         # invoke "run" on a Ruby library which follows our coding conventions
-        klass.run(*rest)
-      else
         # other Ruby libraries must do everything via "require"
+        klass.run(*rest)
       end
     elsif Hbc::Utils.which "brewcask-#{command}"
       # arbitrary external executable on PATH, Homebrew-style

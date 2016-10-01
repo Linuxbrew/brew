@@ -40,15 +40,11 @@ module Homebrew
         vols = get_mounts path
 
         # no volume found
-        if vols.empty?
-          return -1
-        end
+        return -1 if vols.empty?
 
         vol_index = @volumes.index(vols[0])
         # volume not found in volume list
-        if vol_index.nil?
-          return -1
-        end
+        return -1 if vol_index.nil?
         vol_index
       end
 
@@ -83,8 +79,8 @@ module Homebrew
         end
       end
 
-      def inject_file_list(list, str)
-        list.inject(str) { |s, f| s << "    #{f}\n" }
+      def inject_file_list(list, string)
+        list.inject(string) { |a, e| a << "    #{e}\n" }
       end
       ############# END HELPERS
 
@@ -619,7 +615,7 @@ module Homebrew
         EOS
       end
 
-      def check_DYLD_vars
+      def check_dyld_vars
         dyld = OS.mac? ? "DYLD" : "LD"
         dyld_vars = ENV.keys.grep(/^#{dyld}_/)
         return if dyld_vars.empty?
@@ -782,7 +778,7 @@ module Homebrew
               cd #{HOMEBREW_REPOSITORY}
               git remote add origin #{remote}
           EOS
-        elsif origin !~ /(Homebrew|Linuxbrew)\/brew(\.git)?$/
+        elsif origin !~ %r{(Homebrew|Linuxbrew)/brew(\.git)?$}
           <<-EOS.undent
             Suspicious git origin remote found.
 

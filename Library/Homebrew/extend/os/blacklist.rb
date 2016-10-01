@@ -1,5 +1,2 @@
 require "blacklist"
-
-if OS.mac?
-  require "extend/os/mac/blacklist"
-end
+require "extend/os/mac/blacklist" if OS.mac?
