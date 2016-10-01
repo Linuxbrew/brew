@@ -4,6 +4,10 @@ then
   HOMEBREW_VERSION=">1.0.0 (no git repository)"
 fi
 
+# A depth of 1 means this command was directly invoked by a user.
+# Higher depths mean this command was invoked by another Homebrew command.
+export HOMEBREW_COMMAND_DEPTH=$((HOMEBREW_COMMAND_DEPTH + 1))
+
 onoe() {
   if [[ -t 2 ]] # check whether stderr is a tty.
   then
