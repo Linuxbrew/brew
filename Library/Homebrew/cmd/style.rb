@@ -57,13 +57,13 @@ module Homebrew
       args += [HOMEBREW_LIBRARY_PATH]
     else
       args << "--config" << HOMEBREW_LIBRARY/".rubocop.yml"
-      args << "--format" << "simple"
       args += files
     end
 
     case output_type
     when :print
       args << "--display-cop-names" if ARGV.include? "--display-cop-names"
+      args << "--format" << "simple" if files
       system "rubocop", *args
       !$?.success?
     when :json
