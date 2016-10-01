@@ -65,21 +65,19 @@ module Hbc
     end
 
     def to_s
-      <<-EOS
-  Command failed to execute!
-
-  ==> Failed command:
-  #{@cmd}
-
-  ==> Standard Output of failed command:
-  #{@stdout}
-
-  ==> Standard Error of failed command:
-  #{@stderr}
-
-  ==> Exit status of failed command:
-  #{@status.inspect}
-      EOS
+      s = "Command failed to execute!\n"
+      s.concat("\n")
+      s.concat("==> Failed command:\n")
+      s.concat(@cmd).concat("\n")
+      s.concat("\n")
+      s.concat("==> Standard Output of failed command:\n")
+      s.concat(@stdout).concat("\n")
+      s.concat("\n")
+      s.concat("==> Standard Error of failed command:\n")
+      s.concat(@stderr).concat("\n")
+      s.concat("\n")
+      s.concat("==> Exit status of failed command:\n")
+      s.concat(@status.inspect).concat("\n")
     end
   end
 
