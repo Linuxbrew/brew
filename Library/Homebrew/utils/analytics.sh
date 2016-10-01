@@ -70,6 +70,9 @@ setup-analytics() {
 report-analytics-screenview-command() {
   [[ -n "$HOMEBREW_NO_ANALYTICS" || -n "$HOMEBREW_NO_ANALYTICS_THIS_RUN" ]] && return
 
+  # Don't report commands that are invoked as part of other commands.
+  [[ "$HOMEBREW_COMMAND_DEPTH" != 1 ]] && return
+
   # Don't report non-official commands.
   if ! [[ "$HOMEBREW_COMMAND" = "bundle"   ||
           "$HOMEBREW_COMMAND" = "services" ||
