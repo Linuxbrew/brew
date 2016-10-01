@@ -8,9 +8,10 @@ class Caveats
   def caveats
     caveats = []
     begin
-      build, f.build = f.build, Tab.for_formula(f)
+      build = f.build
+      f.build = Tab.for_formula(f)
       s = f.caveats.to_s
-      caveats << s.chomp + "\n" if s.length > 0
+      caveats << s.chomp + "\n" unless s.empty?
     ensure
       f.build = build
     end
@@ -33,7 +34,11 @@ class Caveats
 
   def keg
     @keg ||= [f.prefix, f.opt_prefix, f.linked_keg].map do |d|
-      Keg.new(d.resolved_path) rescue nil
+      begin
+        Keg.new(d.resolved_path)
+      rescue
+        nil
+      end
     end.compact.first
   end
 

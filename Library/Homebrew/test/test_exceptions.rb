@@ -32,7 +32,7 @@ class ExceptionsTest < Homebrew::TestCase
   end
 
   def test_tap_formula_unavailable_error
-    t = stub(:user => "u", :repo => "r", :to_s => "u/r", :installed? => false)
+    t = stub(user: "u", repo: "r", to_s: "u/r", installed?: false)
     assert_match "Please tap it and then try again: brew tap u/r",
       TapFormulaUnavailableError.new(t, "foo").to_s
   end
@@ -73,7 +73,7 @@ class ExceptionsTest < Homebrew::TestCase
   end
 
   def test_build_error
-    f = stub(:name => "foo")
+    f = stub(name: "foo")
     assert_equal "Failed executing: badprg arg1 arg2",
       BuildError.new(f, "badprg", %w[arg1 arg2], {}).to_s
   end
@@ -84,20 +84,20 @@ class ExceptionsTest < Homebrew::TestCase
   end
 
   def test_formula_installation_already_attempted_error
-    f = stub(:full_name => "foo/bar")
+    f = stub(full_name: "foo/bar")
     assert_equal "Formula installation already attempted: foo/bar",
       FormulaInstallationAlreadyAttemptedError.new(f).to_s
   end
 
   def test_formula_conflict_error
-    f = stub(:full_name => "foo/qux")
-    c = stub(:name => "bar", :reason => "I decided to")
+    f = stub(full_name: "foo/qux")
+    c = stub(name: "bar", reason: "I decided to")
     assert_match "Please `brew unlink bar` before continuing.",
       FormulaConflictError.new(f, [c]).to_s
   end
 
   def test_compiler_selection_error
-    f = stub(:full_name => "foo")
+    f = stub(full_name: "foo")
     assert_match "foo cannot be built with any available compilers.",
       CompilerSelectionError.new(f).to_s
   end
@@ -115,27 +115,27 @@ class ExceptionsTest < Homebrew::TestCase
   end
 
   def test_checksum_mismatch_error
-    h1 = stub(:hash_type => "sha256", :to_s => "deadbeef")
-    h2 = stub(:hash_type => "sha256", :to_s => "deadcafe")
+    h1 = stub(hash_type: "sha256", to_s: "deadbeef")
+    h2 = stub(hash_type: "sha256", to_s: "deadcafe")
     assert_match "SHA256 mismatch",
       ChecksumMismatchError.new("/file.tar.gz", h1, h2).to_s
   end
 
   def test_resource_missing_error
-    f = stub(:full_name => "bar")
-    r = stub(:inspect => "<resource foo>")
+    f = stub(full_name: "bar")
+    r = stub(inspect: "<resource foo>")
     assert_match "bar does not define resource <resource foo>",
       ResourceMissingError.new(f, r).to_s
   end
 
   def test_duplicate_resource_error
-    r = stub(:inspect => "<resource foo>")
+    r = stub(inspect: "<resource foo>")
     assert_equal "Resource <resource foo> is defined more than once",
       DuplicateResourceError.new(r).to_s
   end
 
   def test_bottle_version_mismatch_error
-    f = stub(:full_name => "foo")
+    f = stub(full_name: "foo")
     assert_match "Bottle version mismatch",
       BottleVersionMismatchError.new("/foo.bottle.tar.gz", "1.0", f, "1.1").to_s
   end

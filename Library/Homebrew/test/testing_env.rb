@@ -73,7 +73,7 @@ module Homebrew
     TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
 
     def formula(name = "formula_name", path = Formulary.core_path(name), spec = :stable, alias_path: nil, &block)
-      @_f = Class.new(Formula, &block).new(name, path, spec, :alias_path => alias_path)
+      @_f = Class.new(Formula, &block).new(name, path, spec, alias_path: alias_path)
     end
 
     def mktmpdir(prefix_suffix = nil, &block)
@@ -120,6 +120,14 @@ module Homebrew
       ensure
         ENV.replace old
       end
+    end
+
+    # Use a stubbed {Formulary::FormulaLoader} to make a given formula be found
+    # when loading from {Formulary} with `ref`.
+    def stub_formula_loader(formula, ref = formula.full_name)
+      loader = mock
+      loader.stubs(:get_formula).returns(formula)
+      Formulary.stubs(:loader_for).with(ref).returns(loader)
     end
   end
 end

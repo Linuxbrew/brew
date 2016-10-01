@@ -3,7 +3,7 @@ require "requirement"
 class TuntapRequirement < Requirement
   fatal true
   cask "tuntap"
-  satisfy(:build_env => false) { self.class.binary_tuntap_installed? }
+  satisfy(build_env: false) { self.class.binary_tuntap_installed? }
 
   def self.binary_tuntap_installed?
     %w[

@@ -7,7 +7,7 @@ class EmacsRequirement < Requirement
     super
   end
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     next false unless which "emacs"
     next true unless @version
     emacs_version = Utils.popen_read("emacs", "--batch", "--eval", "(princ emacs-version)")

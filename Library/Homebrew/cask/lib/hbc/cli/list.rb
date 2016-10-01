@@ -79,4 +79,8 @@ class Hbc::CLI::List < Hbc::CLI::Base
   def self.help
     "with no args, lists installed Casks; given installed Casks, lists staged files"
   end
+
+  def self.needs_init?
+    true
+  end
 end

@@ -166,7 +166,7 @@ module FormulaCellarChecks
     audit_check_output(check_elisp_dirname(formula.share, formula.name))
     audit_check_output(check_elisp_root(formula.share, formula.name))
   end
-  alias generic_audit_installed audit_installed
+  alias_method :generic_audit_installed, :audit_installed
 
   private
 

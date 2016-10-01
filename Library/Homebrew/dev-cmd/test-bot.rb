@@ -59,8 +59,10 @@
 #:
 #:    If `--no-pull` is passed, don't use `brew pull` when possible.
 #:
-#:    If `--coverage` is passed, generate coverage report and send it to
-#:    Coveralls.
+#:    If `--coverage` is passed, generate and uplaod a coverage report.
+#:
+#:    If `--test-default-formula` is passed, use a default testing formula
+#:    when not building a tap and no other formulae are specified.
 #:
 #:    If `--ci-master` is passed, use the Homebrew master branch CI
 #:    options.
@@ -68,6 +70,9 @@
 #:    If `--ci-pr` is passed, use the Homebrew pull request CI options.
 #:
 #:    If `--ci-testing` is passed, use the Homebrew testing CI options.
+#:
+#:    If `--ci-auto` is passed, automatically pick one of the Homebrew CI
+#:    options based on the environment.
 #:
 #:    If `--ci-upload` is passed, use the Homebrew CI bottle upload
 #:    options.
@@ -97,7 +102,7 @@ module Homebrew
     # Assume we are starting from a "mostly" UTF-8 string
     str.force_encoding(Encoding::UTF_8)
     return str if str.valid_encoding?
-    str.encode!(Encoding::UTF_16, :invalid => :replace)
+    str.encode!(Encoding::UTF_16, invalid: :replace)
     str.encode!(Encoding::UTF_8)
   end
 
@@ -389,7 +394,7 @@ module Homebrew
           @name = "#{diff_start_sha1}-#{diff_end_sha1}"
         end
       # Handle formulae arguments being passed on the command-line e.g. `brew test-bot wget fish`.
-      elsif @formulae && !@formulae.empty?
+      elsif !@formulae.empty?
         @name = "#{@formulae.first}-#{diff_end_sha1}"
         diff_start_sha1 = diff_end_sha1
       # Handle a hash being passed on the command-line e.g. `brew test-bot 1a2b3c`.
@@ -426,11 +431,20 @@ module Homebrew
 
       return unless diff_start_sha1 != diff_end_sha1
       return if @url && steps.last && !steps.last.passed?
-      return unless @tap
 
-      formula_path = @tap.formula_dir.to_s
-      @added_formulae += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "A")
-      @modified_formula += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "M")
+      if @tap
+        formula_path = @tap.formula_dir.to_s
+        @added_formulae += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "A")
+        @modified_formula += diff_formulae(diff_start_sha1, diff_end_sha1, formula_path, "M")\
+      elsif @formulae.empty? && ARGV.include?("--test-default-formula")
+        # Build the default test formula.
+        HOMEBREW_CACHE_FORMULA.mkpath
+        testbottest = "#{HOMEBREW_LIBRARY}/Homebrew/test/testbottest.rb"
+        FileUtils.cp testbottest, HOMEBREW_CACHE_FORMULA
+        @test_default_formula = true
+        @added_formulae = [testbottest]
+      end
+
       @formulae += @added_formulae + @modified_formula
     end
 
@@ -636,6 +650,7 @@ module Homebrew
           bottle_args = ["--verbose", "--json", formula_name]
           bottle_args << "--keep-old" if ARGV.include? "--keep-old"
           bottle_args << "--skip-relocation" if ARGV.include? "--skip-relocation"
+          bottle_args << "--force-core-tap" if @test_default_formula
           test "brew", "bottle", *bottle_args
           bottle_step = steps.last
           if bottle_step.passed? && bottle_step.output?
@@ -646,7 +661,7 @@ module Homebrew
             bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old"
             test "brew", "bottle", *bottle_merge_args
             test "brew", "uninstall", "--force", formula_name
-            FileUtils.ln bottle_filename, HOMEBREW_CACHE/bottle_filename, :force => true
+            FileUtils.ln bottle_filename, HOMEBREW_CACHE/bottle_filename, force: true
             @formulae.delete(formula_name)
             unless unchanged_build_dependencies.empty?
               test "brew", "uninstall", "--force", *unchanged_build_dependencies
@@ -709,23 +724,7 @@ module Homebrew
       @category = __method__
       return if @skip_homebrew
 
-      if @tap.nil? && Array(@formulae).empty?
-        tests_args = ["--official-cmd-taps"]
-        tests_args_no_compat = []
-        tests_args_no_compat << "--coverage" if ARGV.include?("--coverage")
-        test "brew", "tests", *tests_args
-        # brew tests --generic currently fails on Linux.
-        test "brew", "tests", "--generic", *tests_args unless OS.linux?
-        test "brew", "tests", "--no-compat", *tests_args_no_compat
-        test "brew", "readall", "--syntax"
-        if OS.mac? &&
-           (HOMEBREW_REPOSITORY/"Library/Homebrew/cask/cmd/brew-cask-tests.rb").exist?
-          run_as_not_developer { test "brew", "tap", "caskroom/cask" }
-          tests_args_cask = []
-          tests_args_cask << "--coverage" if ARGV.include?("--coverage")
-          test "brew", "cask-tests", *tests_args_cask
-        end
-
+      if !@tap && (@formulae.empty? || @test_default_formula)
         # TODO: try to fix this on Linux at some stage.
         if OS.mac?
           # test update from origin/master to current commit.
@@ -733,7 +732,34 @@ module Homebrew
           # test no-op update from current commit (to current commit, a no-op).
           test "brew", "update-test", "--commit=HEAD"
         end
+
+        test "brew", "style"
+        test "brew", "readall", "--syntax"
+
+        coverage_args = []
+        if ARGV.include?("--coverage")
+          if ENV["JENKINS_HOME"]
+            if OS.mac? && MacOS.version == :sierra
+              coverage_args << "--coverage"
+            end
+          else
+            coverage_args << "--coverage"
+          end
+        end
+
+        test "brew", "tests", "--no-compat"
+        # brew tests --generic currently fails on Linux.
+        test "brew", "tests", "--generic", *tests_args unless OS.linux?
+        test "brew", "tests", "--official-cmd-taps", *coverage_args
+
+        if OS.mac?
+          run_as_not_developer { test "brew", "tap", "caskroom/cask" }
+          test "brew", "cask-tests", *coverage_args
+        end
       elsif @tap
+        if @tap.name == "homebrew/core"
+          test "brew", "style", @tap.name
+        end
         test "brew", "readall", "--aliases", @tap.name
       end
     end
@@ -747,6 +773,11 @@ module Homebrew
         next if tap == @tap.to_s
         safe_system "brew", "untap", tap
       end
+
+      Formula.installed.each do |formula|
+        safe_system "brew", "uninstall", "--force", formula
+      end
+      safe_system "brew", "prune"
 
       unless @repository == HOMEBREW_REPOSITORY
         HOMEBREW_REPOSITORY.cd do
@@ -913,7 +944,7 @@ module Homebrew
       bottles = Dir["#{jenkins}/jobs/#{job}/configurations/axis-version/*/builds/#{id}/archive/*.bottle*.*"]
       return if bottles.empty?
 
-      FileUtils.cp bottles, Dir.pwd, :verbose => true
+      FileUtils.cp bottles, Dir.pwd, verbose: true
     else
       return if Dir["*.bottle*.*"].empty?
     end
@@ -1033,25 +1064,40 @@ module Homebrew
     ENV["HOMEBREW_NO_EMOJI"] = "1"
     ENV["HOMEBREW_FAIL_LOG_LINES"] = "150"
     ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"] = "1"
+    ENV["PATH"] = "#{HOMEBREW_PREFIX}/bin:#{HOMEBREW_PREFIX}/sbin:#{ENV["PATH"]}"
 
-    if ENV["TRAVIS"]
+    travis = !ENV["TRAVIS"].nil?
+    if travis
       ARGV << "--verbose"
-      ARGV << "--ci-master" if ENV["TRAVIS_PULL_REQUEST"] == "false"
       ENV["HOMEBREW_VERBOSE_USING_DOTS"] = "1"
+    end
 
-      # Only report coverage if build runs on macOS and this is indeed Homebrew,
-      # as we don't want this to be averaged with inferior Linux test coverage.
-      repo = ENV["TRAVIS_REPO_SLUG"]
-      if repo && repo.start_with?("Homebrew/") && ENV["OSX"]
-        ARGV << "--coverage"
+    # Only report coverage if build runs on macOS and this is indeed Homebrew,
+    # as we don't want this to be averaged with inferior Linux test coverage.
+    if OS.mac? && (ENV["COVERALLS_REPO_TOKEN"] || ENV["CODECOV_TOKEN"])
+      ARGV << "--coverage"
+    end
+
+    travis_pr = ENV["TRAVIS_PULL_REQUEST"] && ENV["TRAVIS_PULL_REQUEST"] != "false"
+    jenkins_pr = !ENV["ghprbPullLink"].nil?
+    jenkins_branch = !ENV["GIT_COMMIT"].nil?
+
+    if ARGV.include?("--ci-auto")
+      if travis_pr || jenkins_pr
+        ARGV << "--ci-pr"
+      elsif travis || jenkins_branch
+        ARGV << "--ci-master"
+      else
+        ARGV << "--ci-testing"
       end
     end
 
     if ARGV.include?("--ci-master") || ARGV.include?("--ci-pr") \
        || ARGV.include?("--ci-testing")
       ARGV << "--cleanup" if ENV["JENKINS_HOME"]
-      ARGV << "--junit" << "--local"
+      ARGV << "--junit" << "--local" << "--test-default-formula"
     end
+
     if ARGV.include? "--ci-master"
       ARGV << "--fast"
     end
@@ -1073,7 +1119,10 @@ module Homebrew
     # because Formula parsing and/or git commit hash lookup depends on it.
     # At the same time, make sure Tap is not a shallow clone.
     # bottle rebuild and bottle upload rely on full clone.
-    safe_system "brew", "tap", tap.name, "--full" if tap
+    if tap
+      ENV["HOMEBREW_UPDATE_TO_TAG"] = "1"
+      safe_system "brew", "tap", tap.name, "--full"
+    end
 
     if ARGV.include? "--ci-upload"
       return test_ci_upload(tap)
@@ -1084,21 +1133,21 @@ module Homebrew
     skip_homebrew = ARGV.include?("--skip-homebrew")
     if ARGV.named.empty?
       # With no arguments just build the most recent commit.
-      head_test = Test.new("HEAD", :tap => tap, :skip_homebrew => skip_homebrew)
-      any_errors = !head_test.run
-      tests << head_test
+      current_test = Test.new("HEAD", tap: tap, skip_homebrew: skip_homebrew)
+      any_errors = !current_test.run
+      tests << current_test
     else
       ARGV.named.each do |argument|
         test_error = false
         begin
-          test = Test.new(argument, :tap => tap, :skip_homebrew => skip_homebrew)
+          current_test = Test.new(argument, tap: tap, skip_homebrew: skip_homebrew)
           skip_homebrew = true
         rescue ArgumentError => e
           test_error = true
           ofail e.message
         else
-          test_error = !test.run
-          tests << test
+          test_error = !current_test.run
+          tests << current_test
         end
         any_errors ||= test_error
       end
@@ -1160,7 +1209,7 @@ module Homebrew
 
       # Truncate to 1MB to avoid hitting CI limits
       if output.bytesize > MAX_STEP_OUTPUT_SIZE
-        output = truncate_text_to_approximate_size(output, MAX_STEP_OUTPUT_SIZE, :front_weight => 0.0)
+        output = truncate_text_to_approximate_size(output, MAX_STEP_OUTPUT_SIZE, front_weight: 0.0)
         output = "truncated output to 1MB:\n" + output
       end
     end

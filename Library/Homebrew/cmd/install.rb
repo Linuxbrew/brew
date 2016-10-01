@@ -34,7 +34,7 @@
 #:
 #     Hidden developer option:
 #     If `--force-bottle` is passed, install from a bottle if it exists
-#    for the current version of OS X, even if custom options are given.
+#    for the current version of macOS, even if custom options are given.
 #
 #:    If `--devel` is passed, and <formula> defines it, install the development version.
 #:
@@ -133,9 +133,14 @@ module Homebrew
           raise "No devel block is defined for #{f.full_name}"
         end
 
-        if f.installed?
-          msg = "#{f.full_name}-#{f.installed_version} already installed"
-          msg << ", it's just not linked" unless f.linked_keg.symlink? || f.keg_only?
+        current = f if f.installed?
+        current ||= f.old_installed_formulae.first
+
+        if current
+          msg = "#{current.full_name}-#{current.installed_version} already installed"
+          unless current.linked_keg.symlink? || current.keg_only?
+            msg << ", it's just not linked"
+          end
           opoo msg
         elsif f.migration_needed? && !ARGV.force?
           # Check if the formula we try to install is the same as installed

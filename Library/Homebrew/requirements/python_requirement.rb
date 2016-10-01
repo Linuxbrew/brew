@@ -5,12 +5,12 @@ class PythonRequirement < Requirement
   default_formula "python"
   cask "python"
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     python = which_python
     next unless python
     version = python_short_version
     next unless version
-    # Always use Python 2.7 for consistency on older versions of OSX.
+    # Always use Python 2.7 for consistency on older versions of Mac OS X.
     version == Version.create("2.7")
   end
 
@@ -58,7 +58,7 @@ class Python3Requirement < PythonRequirement
   default_formula "python3"
   cask "python3"
 
-  satisfy(:build_env => false) { which_python }
+  satisfy(build_env: false) { which_python }
 
   def python_binary
     "python3"

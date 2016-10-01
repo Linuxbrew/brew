@@ -9,7 +9,7 @@
 #
 # When done, regenerate the man page and its HTML version by running `brew man`.
 %>
-brew(1) -- The missing package manager for OS X
+brew(1) -- The missing package manager for macOS
 ===============================================
 
 ## SYNOPSIS
@@ -20,7 +20,7 @@ brew(1) -- The missing package manager for OS X
 ## DESCRIPTION
 
 Homebrew is the easiest and most flexible way to install the UNIX tools Apple
-didn't include with OS X.
+didn't include with macOS.
 
 ## ESSENTIAL COMMANDS
 
@@ -62,7 +62,7 @@ scripts that reside somewhere in the `PATH`, named `brew-`<cmdname> or
 to create your own commands without modifying Homebrew's internals.
 
 Instructions for creating your own commands can be found in the docs:
-<https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/External-Commands.md>
+<https://github.com/Homebrew/brew/blob/master/docs/External-Commands.md>
 
 ## SPECIFYING FORMULAE
 
@@ -183,7 +183,7 @@ can take several different forms:
     *Default:* the number of available CPU cores.
 
   * `HOMEBREW_NO_ANALYTICS`:
-    If set, Homebrew will not send analytics. See: <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Analytics.md#analytics>
+    If set, Homebrew will not send analytics. See: <https://github.com/Homebrew/brew/blob/master/docs/Analytics.md#analytics>
 
   * `HOMEBREW_NO_AUTO_UPDATE`:
     If set, Homebrew will not auto-update before running `brew install`,
@@ -220,7 +220,7 @@ can take several different forms:
   * `HOMEBREW_TEMP`:
     If set, instructs Homebrew to use `HOMEBREW_TEMP` as the temporary directory
     for building packages. This may be needed if your system temp directory and
-    Homebrew Prefix are on different volumes, as OS X has trouble moving
+    Homebrew Prefix are on different volumes, as macOS has trouble moving
     symlinks across volumes when the target does not yet exist.
 
     This issue typically occurs when using FileVault or custom SSD
@@ -249,15 +249,17 @@ If your proxy requires authentication:
 
 ## SEE ALSO
 
-Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/>
+Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/docs/>
 
 `git`(1), `git-log`(1)
 
 ## AUTHORS
 
-Homebrew's current maintainers are <%= maintainers[0...-1].join(", ") %> and <%= maintainers[-1] %>.
+<%= lead_maintainer.concat("\n") %>
 
-Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.
+<%= maintainers.concat("\n") %>
+
+<%= former_maintainers.concat("\n") %>
 
 ## BUGS
 

@@ -1,7 +1,0 @@
-inherit_from: ../../.rubocop.yml
-
-# We won't change method or predicate names because of backward compatibility.
-Style/MethodName:
-  Enabled: false
-Style/PredicateName:
-  Enabled: false

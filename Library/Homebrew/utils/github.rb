@@ -33,7 +33,7 @@ module GitHub
         EOS
       else
         message << <<-EOS.undent
-          The GitHub credentials in the OS X keychain may be invalid.
+          The GitHub credentials in the macOS keychain may be invalid.
           Clear them with:
             printf "protocol=https\\nhost=github.com\\n" | git credential-osxkeychain erase
           Or create a personal access token:
@@ -103,7 +103,7 @@ module GitHub
         case GitHub.api_credentials_type
         when :keychain
           onoe <<-EOS.undent
-            Your OS X keychain GitHub credentials do not have sufficient scope!
+            Your macOS keychain GitHub credentials do not have sufficient scope!
             Scopes they have: #{credentials_scopes}
             Create a personal access token: https://github.com/settings/tokens
             and then set HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
@@ -235,8 +235,8 @@ module GitHub
 
   def build_search_qualifier_string(qualifiers)
     {
-      :repo => "#{OS::GITHUB_USER}/homebrew-core",
-      :in => "title",
+      repo: "#{OS::GITHUB_USER}/homebrew-core",
+      in: "title",
     }.update(qualifiers).map do |qualifier, value|
       "#{qualifier}:#{value}"
     end.join("+")
@@ -253,14 +253,14 @@ module GitHub
 
   def issues_for_formula(name, options = {})
     tap = options[:tap] || CoreTap.instance
-    issues_matching(name, :state => "open", :repo => "#{tap.user}/homebrew-#{tap.repo}")
+    issues_matching(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
   end
 
   def print_pull_requests_matching(query)
     return [] if ENV["HOMEBREW_NO_GITHUB_API"]
     ohai "Searching pull requests..."
 
-    open_or_closed_prs = issues_matching(query, :type => "pr")
+    open_or_closed_prs = issues_matching(query, type: "pr")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
     if !open_prs.empty?

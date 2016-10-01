@@ -30,8 +30,8 @@ class ReportTests < Homebrew::TestCase
   end
 
   def perform_update(fixture_name = "")
-    Formulary.stubs(:factory).returns(stub(:pkg_version => "1.0"))
-    FormulaVersions.stubs(:new).returns(stub(:formula_at_revision => "2.0"))
+    Formulary.stubs(:factory).returns(stub(pkg_version: "1.0"))
+    FormulaVersions.stubs(:new).returns(stub(formula_at_revision: "2.0"))
     @reporter.diff = fixture(fixture_name)
     @hub.add(@reporter) if @reporter.updated?
   end

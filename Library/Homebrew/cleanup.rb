@@ -33,7 +33,7 @@ module Homebrew
     def self.cleanup_logs
       return unless HOMEBREW_LOGS.directory?
       HOMEBREW_LOGS.subdirs.each do |dir|
-        cleanup_path(dir) { dir.rmtree } if prune?(dir, :days_default => 14)
+        cleanup_path(dir) { dir.rmtree } if prune?(dir, days_default: 14)
       end
     end
 
@@ -43,7 +43,7 @@ module Homebrew
       end
     end
 
-    def self.cleanup_cache(cache=HOMEBREW_CACHE)
+    def self.cleanup_cache(cache = HOMEBREW_CACHE)
       return unless cache.directory?
       cache.children.each do |path|
         if path.to_s.end_with? ".incomplete"
@@ -67,7 +67,11 @@ module Homebrew
         file = path
 
         if Pathname::BOTTLE_EXTNAME_RX === file.to_s
-          version = Utils::Bottles.resolve_version(file) rescue file.version
+          version = begin
+                      Utils::Bottles.resolve_version(file)
+                    rescue
+                      file.version
+                    end
         else
           version = file.version
         end
@@ -88,7 +92,7 @@ module Homebrew
           f.version > version
         end
 
-        if file_is_stale || ARGV.switch?("s") && !f.installed? || Utils::Bottles::file_outdated?(f, file)
+        if file_is_stale || ARGV.switch?("s") && !f.installed? || Utils::Bottles.file_outdated?(f, file)
           cleanup_path(file) { file.unlink }
         end
       end
@@ -117,8 +121,8 @@ module Homebrew
 
     def self.rm_DS_Store
       paths = Queue.new
-      %w[Cellar Frameworks Library bin etc include lib opt sbin share var].
-        map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }
+      %w[Cellar Frameworks Library bin etc include lib opt sbin share var]
+        .map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }
       workers = (0...Hardware::CPU.cores).map do
         Thread.new do
           Kernel.loop do

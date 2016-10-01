@@ -1,5 +1,5 @@
 #:  * `linkapps` [`--local`] [<formulae>]:
-#:    Find installed formulae that provide `.app`-style OS X apps and symlink them
+#:    Find installed formulae that provide `.app`-style macOS apps and symlink them
 #:    into `/Applications`, allowing for easier access.
 #:
 #:    If no <formulae> are provided, all of them will have their apps symlinked.
@@ -12,7 +12,7 @@ require "formula"
 
 module Homebrew
   def linkapps
-    target_dir = linkapps_target(:local => ARGV.include?("--local"))
+    target_dir = linkapps_target(local: ARGV.include?("--local"))
 
     unless target_dir.directory?
       opoo "#{target_dir} does not exist, stopping."

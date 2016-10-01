@@ -1,4 +1,4 @@
-#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`]:
+#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`] [`--force-core-tap`]:
 #:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
 #:
 #:    Generate a bottle (binary package) from a formula installed with
@@ -31,8 +31,8 @@ BOTTLE_ERB = <<-EOS.freeze
     <% end %>
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
-    <% checksum, osx = checksum_value.shift %>
-    <%= checksum_type %> "<%= checksum %>" => :<%= osx %>
+    <% checksum, macos = checksum_value.shift %>
+    <%= checksum_type %> "<%= checksum %>" => :<%= macos %>
     <% end %>
     <% end %>
   end
@@ -134,8 +134,14 @@ module Homebrew
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
 
-    unless f.tap
-      return ofail "Formula not from core or any taps: #{f.full_name}"
+    tap = f.tap
+
+    unless tap
+      if ARGV.include?("--force-core-tap")
+        tap = CoreTap.instance
+      else
+        return ofail "Formula not from core or any taps: #{f.full_name}"
+      end
     end
 
     if f.bottle_disabled?
@@ -152,7 +158,7 @@ module Homebrew
       return ofail "Formula has no stable version: #{f.full_name}"
     end
 
-    if ARGV.include? "--no-rebuild"
+    if ARGV.include?("--no-rebuild") || !f.tap
       rebuild = 0
     elsif ARGV.include? "--keep-old"
       rebuild = f.bottle_specification.rebuild
@@ -171,6 +177,7 @@ module Homebrew
     tar_path = Pathname.pwd/tar_filename
 
     prefix = HOMEBREW_PREFIX.to_s
+    repository = HOMEBREW_REPOSITORY.to_s
     cellar = HOMEBREW_CELLAR.to_s
 
     ohai "Bottling #{filename}..."
@@ -187,7 +194,8 @@ module Homebrew
           keg.relocate_dynamic_linkage prefix, Keg::PREFIX_PLACEHOLDER,
             cellar, Keg::CELLAR_PLACEHOLDER
           keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
-            cellar, Keg::CELLAR_PLACEHOLDER
+            cellar, Keg::CELLAR_PLACEHOLDER,
+            repository, Keg::REPOSITORY_PLACEHOLDER
         end
 
         keg.delete_pyc_files!
@@ -242,6 +250,7 @@ module Homebrew
           skip_relocation = true
         else
           relocatable = false if keg_contain?(prefix_check, keg, ignores)
+          relocatable = false if keg_contain?(repository, keg, ignores)
           relocatable = false if keg_contain?(cellar, keg, ignores)
           if prefix != prefix_check
             relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
@@ -259,7 +268,8 @@ module Homebrew
             keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, prefix,
               Keg::CELLAR_PLACEHOLDER, cellar
             keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
-              Keg::CELLAR_PLACEHOLDER, cellar
+              Keg::CELLAR_PLACEHOLDER, cellar,
+              Keg::REPOSITORY_PLACEHOLDER, repository
           end
         end
       end
@@ -270,7 +280,7 @@ module Homebrew
     root_url ||= ARGV.value("root_url")
 
     bottle = BottleSpecification.new
-    bottle.tap = f.tap
+    bottle.tap = tap
     bottle.root_url(root_url) if root_url
     if relocatable
       if skip_relocation
@@ -341,7 +351,7 @@ module Homebrew
           },
           "bintray" => {
             "package" => Utils::Bottles::Bintray.package(f.name),
-            "repository" => Utils::Bottles::Bintray.repository(f.tap),
+            "repository" => Utils::Bottles::Bintray.repository(tap),
           },
         },
       }

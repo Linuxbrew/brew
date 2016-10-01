@@ -22,7 +22,7 @@ class X11Requirement < Requirement
     super(tags)
   end
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     MacOS::XQuartz.installed? && min_version <= Version.create(MacOS::XQuartz.version)
   end
 

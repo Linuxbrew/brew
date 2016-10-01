@@ -86,11 +86,11 @@ class Migrator
   def initialize(formula)
     @oldname = formula.oldname
     @newname = formula.name
-    raise MigratorNoOldnameError.new(formula) unless oldname
+    raise MigratorNoOldnameError, formula unless oldname
 
     @formula = formula
     @old_cellar = HOMEBREW_CELLAR/formula.oldname
-    raise MigratorNoOldpathError.new(formula) unless old_cellar.exist?
+    raise MigratorNoOldpathError, formula unless old_cellar.exist?
 
     @old_tabs = old_cellar.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
     @old_tap = old_tabs.first.tap
@@ -107,8 +107,8 @@ class Migrator
       @new_linked_keg_record = HOMEBREW_CELLAR/"#{newname}/#{File.basename(old_linked_keg)}"
     end
 
-    @old_pin_record = HOMEBREW_LIBRARY/"PinnedKegs"/oldname
-    @new_pin_record = HOMEBREW_LIBRARY/"PinnedKegs"/newname
+    @old_pin_record = HOMEBREW_PINNED_KEGS/oldname
+    @new_pin_record = HOMEBREW_PINNED_KEGS/newname
     @pinned = old_pin_record.symlink?
     @old_pin_link_record = old_pin_record.readlink if @pinned
   end
@@ -234,7 +234,7 @@ class Migrator
       puts e
       puts
       puts "Possible conflicting files are:"
-      mode = OpenStruct.new(:dry_run => true, :overwrite => true)
+      mode = OpenStruct.new(dry_run: true, overwrite: true)
       new_keg.link(mode)
       raise
     rescue Keg::LinkError => e

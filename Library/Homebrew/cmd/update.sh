@@ -23,7 +23,7 @@ git() {
 }
 
 git_init_if_necessary() {
-  if [[ -n "$HOMEBREW_OSX" ]]
+  if [[ -n "$HOMEBREW_MACOS" ]]
   then
     BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
@@ -215,6 +215,19 @@ merge_or_rebase() {
 
   trap reset_on_interrupt SIGINT
 
+  if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
+  then
+    UPSTREAM_TAG="$(git tag --list --sort=-version:refname | head -n1)"
+  fi
+
+  if [ -n "$UPSTREAM_TAG" ]
+  then
+    REMOTE_REF="refs/tags/$UPSTREAM_TAG"
+    UPSTREAM_BRANCH="v$UPSTREAM_TAG"
+  else
+    REMOTE_REF="origin/$UPSTREAM_BRANCH"
+  fi
+
   if [[ -n "$(git status --untracked-files=all --porcelain 2>/dev/null)" ]]
   then
     if [[ -n "$HOMEBREW_VERBOSE" ]]
@@ -252,11 +265,11 @@ EOS
 
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
     # it to `origin/#{@upstream_branch}`. Otherwise, just check it out.
-    if git merge-base --is-ancestor "$UPSTREAM_BRANCH" "origin/$UPSTREAM_BRANCH" &>/dev/null
+    if git merge-base --is-ancestor "$UPSTREAM_BRANCH" "$REMOTE_REF" &>/dev/null
     then
       git checkout --force "$UPSTREAM_BRANCH" "${QUIET_ARGS[@]}"
     else
-      git checkout --force -B "$UPSTREAM_BRANCH" "origin/$UPSTREAM_BRANCH" "${QUIET_ARGS[@]}"
+      git checkout --force -B "$UPSTREAM_BRANCH" "$REMOTE_REF" "${QUIET_ARGS[@]}"
     fi
   fi
 
@@ -268,9 +281,9 @@ EOS
 
   if [[ -z "$HOMEBREW_MERGE" ]]
   then
-    git rebase "${QUIET_ARGS[@]}" "origin/$UPSTREAM_BRANCH"
+    git rebase "${QUIET_ARGS[@]}" "$REMOTE_REF"
   else
-    git merge --no-edit --ff "${QUIET_ARGS[@]}" "origin/$UPSTREAM_BRANCH" \
+    git merge --no-edit --ff "${QUIET_ARGS[@]}" "$REMOTE_REF" \
       --strategy=recursive \
       --strategy-option=ours \
       --strategy-option=ignore-all-space
@@ -335,7 +348,7 @@ EOS
     set -x
   fi
 
-  if [[ -z "$HOMEBREW_UPDATE_CLEANUP" ]]
+  if [[ -z "$HOMEBREW_UPDATE_CLEANUP" && -z "$HOMEBREW_UPDATE_TO_TAG" ]]
   then
     if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
     then
@@ -423,6 +436,12 @@ EOS
     declare UPSTREAM_BRANCH"$TAP_VAR"="$UPSTREAM_BRANCH_DIR"
     declare PREFETCH_REVISION"$TAP_VAR"="$(git rev-parse -q --verify refs/remotes/origin/"$UPSTREAM_BRANCH_DIR")"
 
+    # Force a full update if we don't have any tags.
+    if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -z "$(git tag --list)" ]]
+    then
+      HOMEBREW_UPDATE_FORCE=1
+    fi
+
     if [[ -z "$HOMEBREW_UPDATE_FORCE" ]]
     then
       [[ -n "$SKIP_FETCH_BREW_REPOSITORY" && "$DIR" = "$HOMEBREW_REPOSITORY" ]] && continue
@@ -478,10 +497,10 @@ EOS
 
       if [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
-        git fetch --force "${QUIET_ARGS[@]}" origin \
+        git fetch --tags --force "${QUIET_ARGS[@]}" origin \
           "refs/heads/$UPSTREAM_BRANCH_DIR:refs/remotes/origin/$UPSTREAM_BRANCH_DIR" 2>/dev/null
       else
-        if ! git fetch --force "${QUIET_ARGS[@]}" origin \
+        if ! git fetch --tags --force "${QUIET_ARGS[@]}" origin \
           "refs/heads/$UPSTREAM_BRANCH_DIR:refs/remotes/origin/$UPSTREAM_BRANCH_DIR"
         then
           echo "Fetching $DIR failed!" >>"$update_failed_file"
@@ -534,6 +553,7 @@ EOS
   if [[ -n "$HOMEBREW_UPDATED" ||
         -n "$HOMEBREW_UPDATE_FAILED" ||
         -n "$HOMEBREW_UPDATE_FORCE" ||
+        -d "$HOMEBREW_LIBRARY/LinkedKegs" ||
         (-n "$HOMEBREW_DEVELOPER" && -z "$HOMEBREW_UPDATE_PREINSTALL") ]]
   then
     brew update-report "$@"

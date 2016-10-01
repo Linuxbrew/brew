@@ -1,4 +1,4 @@
-HOMEBREW_VERSION="0.9.9"
+HOMEBREW_VERSION="1.0.0"
 
 onoe() {
   if [[ -t 2 ]] # check whether stderr is a tty.
@@ -59,6 +59,10 @@ then
   odie "Cowardly refusing to continue at this prefix: $HOMEBREW_PREFIX"
 fi
 
+# Save value to use for installing gems
+export GEM_OLD_HOME="$GEM_HOME"
+export GEM_OLD_PATH="$GEM_PATH"
+
 # Users may have these set, pointing the system Ruby
 # at non-system gem paths
 unset GEM_HOME
@@ -70,23 +74,23 @@ unset BASH_ENV
 
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
-  Darwin) HOMEBREW_OSX="1" ;;
+  Darwin) HOMEBREW_MACOS="1" ;;
   Linux)  HOMEBREW_LINUX="1" ;;
 esac
 
 HOMEBREW_CURL="/usr/bin/curl"
-if [[ -n "$HOMEBREW_OSX" ]]
+if [[ -n "$HOMEBREW_MACOS" ]]
 then
   HOMEBREW_PROCESSOR="$(uname -p)"
   HOMEBREW_PRODUCT="Homebrew"
   HOMEBREW_SYSTEM="Macintosh"
   # This is i386 even on x86_64 machines
   [[ "$HOMEBREW_PROCESSOR" = "i386" ]] && HOMEBREW_PROCESSOR="Intel"
-  HOMEBREW_OSX_VERSION="$(/usr/bin/sw_vers -productVersion)"
-  HOMEBREW_OS_VERSION="Mac OS X $HOMEBREW_OSX_VERSION"
+  HOMEBREW_MACOS_VERSION="$(/usr/bin/sw_vers -productVersion)"
+  HOMEBREW_OS_VERSION="macOS $HOMEBREW_MACOS_VERSION"
 
-  printf -v HOMEBREW_OSX_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_OSX_VERSION//./ }
-  if [[ "$HOMEBREW_OSX_VERSION_NUMERIC" -lt "100900" &&
+  printf -v HOMEBREW_MACOS_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" &&
         -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
   then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
@@ -127,11 +131,11 @@ export HOMEBREW_CURL
 export HOMEBREW_PROCESSOR
 export HOMEBREW_PRODUCT
 export HOMEBREW_OS_VERSION
-export HOMEBREW_OSX_VERSION
+export HOMEBREW_MACOS_VERSION
 export HOMEBREW_USER_AGENT
 export HOMEBREW_USER_AGENT_CURL
 
-if [[ -n "$HOMEBREW_OSX" ]]
+if [[ -n "$HOMEBREW_MACOS" ]]
 then
   XCODE_SELECT_PATH=$('/usr/bin/xcode-select' --print-path 2>/dev/null)
   if [[ "$XCODE_SELECT_PATH" = "/" ]]
@@ -230,7 +234,7 @@ check-run-command-as-root() {
   onoe <<EOS
 Running Homebrew as root is extremely dangerous. As Homebrew does not
 drop privileges on installation you are giving all build scripts full access
-to your system. As a result of the OS X sandbox not handling the root user
+to your system. As a result of the macOS sandbox not handling the root user
 correctly HOMEBREW_NO_SANDBOX has been set so the sandbox will not be used. If
 we have not merged a pull request to add privilege dropping by November 1st
 2016 running Homebrew as root will be disabled. No Homebrew maintainers plan
@@ -269,9 +273,23 @@ update-preinstall() {
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
+  # Allow auto-update migration now we have a fix in place (below in this function).
+  export HOMEBREW_ENABLE_AUTO_UPDATE_MIGRATION="1"
+
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ]]
   then
     brew update --preinstall
+  fi
+
+  # If brew update --preinstall did a migration then export the new locations.
+  if [[ "$HOMEBREW_REPOSITORY" = "/usr/local" &&
+        ! -d "$HOMEBREW_REPOSITORY/.git" &&
+        -d "/usr/local/Homebrew/.git" ]]
+  then
+    HOMEBREW_REPOSITORY="/usr/local/Homebrew"
+    HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
+    export HOMEBREW_REPOSITORY
+    export HOMEBREW_LIBRARY
   fi
 
   # If we've checked for updates, we don't need to check again.

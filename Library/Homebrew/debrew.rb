@@ -110,7 +110,7 @@ module Debrew
                              try_lock
 
     begin
-      puts "#{e.backtrace.first}"
+      puts e.backtrace.first.to_s
       puts "#{Tty.red}#{e.class.name}#{Tty.reset}: #{e}"
 
       loop do

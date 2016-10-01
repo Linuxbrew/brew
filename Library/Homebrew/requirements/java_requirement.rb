@@ -6,7 +6,7 @@ class JavaRequirement < Requirement
   cask "java"
   download "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     next quiet_system "java", "-version" unless File.executable? "/usr/libexec/java_home"
 
     args = %w[--failfast]

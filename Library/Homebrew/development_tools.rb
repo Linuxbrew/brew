@@ -27,7 +27,11 @@ class DevelopmentTools
 
     def default_cc
       cc = DevelopmentTools.locate "cc"
-      cc.realpath.basename.to_s rescue nil
+      begin
+        cc.realpath.basename.to_s
+      rescue
+        nil
+      end
     end
 
     def default_compiler

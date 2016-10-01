@@ -9,7 +9,7 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/lock.sh"
 VENDOR_DIR="$HOMEBREW_LIBRARY/Homebrew/vendor"
 
 # Built from https://github.com/Homebrew/homebrew-portable.
-if [[ -n "$HOMEBREW_OSX" ]]
+if [[ -n "$HOMEBREW_MACOS" ]]
 then
   if [[ "$HOMEBREW_PROCESSOR" = "Intel" ]]
   then

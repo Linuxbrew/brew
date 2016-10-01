@@ -8,11 +8,11 @@ class MaximumMacOSRequirement < Requirement
     super
   end
 
-  satisfy(:build_env => false) { !OS.mac? || MacOS.version <= @version }
+  satisfy(build_env: false) { !OS.mac? || MacOS.version <= @version }
 
   def message
     <<-EOS.undent
-      This formula either does not compile or function as expected on OS X
+      This formula either does not compile or function as expected on macOS
       versions newer than #{@version.pretty_name} due to an upstream incompatibility.
     EOS
   end

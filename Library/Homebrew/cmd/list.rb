@@ -64,6 +64,8 @@ module Homebrew
   UNBREWED_EXCLUDE_PATHS = %w[
     .github/*
     bin/brew
+    completions/zsh/_brew
+    docs/*
     lib/gdk-pixbuf-2.0/*
     lib/gio/*
     lib/node_modules/*
@@ -73,13 +75,11 @@ module Homebrew
     lib/ruby/gems/[12].*
     lib/ruby/site_ruby/[12].*
     lib/ruby/vendor_ruby/[12].*
+    manpages/brew.1
     share/pypy/*
     share/pypy3/*
-    share/doc/homebrew/*
     share/info/dir
-    share/man/man1/brew.1
     share/man/whatis
-    share/zsh/site-functions/_brew
   ].freeze
 
   def list_unbrewed
@@ -111,7 +111,7 @@ module Homebrew
     if ARGV.include? "--pinned"
       pinned_versions = {}
       names.each do |d|
-        keg_pin = (HOMEBREW_LIBRARY/"PinnedKegs"/d.basename.to_s)
+        keg_pin = (HOMEBREW_PINNED_KEGS/d.basename.to_s)
         if keg_pin.exist? || keg_pin.symlink?
           pinned_versions[d] = keg_pin.readlink.basename.to_s
         end

@@ -49,6 +49,7 @@ module Hbc
     Hbc::Cache.ensure_cache_exists
     Hbc::Cache.migrate_legacy_cache
 
+    Hbc::Caskroom.migrate_caskroom_from_repo_to_prefix
     Hbc::Caskroom.ensure_caskroom_exists
   end
 

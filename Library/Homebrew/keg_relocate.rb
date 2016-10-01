@@ -1,6 +1,7 @@
 class Keg
   PREFIX_PLACEHOLDER = "@@HOMEBREW_PREFIX@@".freeze
   CELLAR_PLACEHOLDER = "@@HOMEBREW_CELLAR@@".freeze
+  REPOSITORY_PLACEHOLDER = "@@HOMEBREW_REPOSITORY@@".freeze
 
   def fix_dynamic_linkage
     symlink_files.each do |file|
@@ -12,19 +13,21 @@ class Keg
       end
     end
   end
-  alias generic_fix_dynamic_linkage fix_dynamic_linkage
+  alias_method :generic_fix_dynamic_linkage, :fix_dynamic_linkage
 
-  def relocate_dynamic_linkage(old_prefix, new_prefix, old_cellar, new_cellar)
+  def relocate_dynamic_linkage(_old_prefix, _new_prefix, _old_cellar, _new_cellar)
     []
   end
 
-  def relocate_text_files(old_prefix, new_prefix, old_cellar, new_cellar)
+  def relocate_text_files(old_prefix, new_prefix, old_cellar, new_cellar,
+                          old_repository, new_repository)
     files = text_files | libtool_files
 
     files.group_by { |f| f.stat.ino }.each_value do |first, *rest|
       s = first.open("rb", &:read)
       changed = s.gsub!(old_cellar, new_cellar)
       changed = s.gsub!(old_prefix, new_prefix) || changed
+      changed = s.gsub!(old_repository, new_repository) || changed
 
       next unless changed
 
@@ -35,12 +38,12 @@ class Keg
           first.open("wb") { |f| f.write(s) }
         end
       else
-        rest.each { |file| FileUtils.ln(first, file, :force => true) }
+        rest.each { |file| FileUtils.ln(first, file, force: true) }
       end
     end
   end
 
-  def detect_cxx_stdlibs(options = {})
+  def detect_cxx_stdlibs(_options = {})
     []
   end
 
@@ -102,7 +105,7 @@ class Keg
     symlink_files
   end
 
-  def self.file_linked_libraries(file, string)
+  def self.file_linked_libraries(_file, _string)
     []
   end
 end

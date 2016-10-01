@@ -183,7 +183,7 @@ module Superenv
   end
 
   def determine_dependencies
-    deps.map {|d| d.name}.join(",")
+    deps.map(&:name).join(",")
   end
 
   def determine_cmake_prefix_path

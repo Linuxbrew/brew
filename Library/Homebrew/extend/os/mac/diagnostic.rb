@@ -3,12 +3,13 @@ module Homebrew
     class Checks
       def development_tools_checks
         %w[
-          check_for_unsupported_osx
+          check_for_unsupported_macos
           check_for_prerelease_xcode
           check_for_bad_install_name_tool
           check_for_installed_developer_tools
           check_xcode_license_approved
           check_for_osx_gcc_installer
+          check_xcode_8_without_clt_on_el_capitan
         ]
       end
 
@@ -24,7 +25,7 @@ module Homebrew
         end
       end
 
-      def check_for_unsupported_osx
+      def check_for_unsupported_macos
         return if ARGV.homebrew_developer?
 
         who = "We"
@@ -38,7 +39,7 @@ module Homebrew
         end
 
         <<-EOS.undent
-          You are using OS X #{MacOS.version}.
+          You are using macOS #{MacOS.version}.
           #{who} do not provide support for this #{what}.
           You may encounter build failures or other breakages.
           Please create pull-requests instead of filing issues.
@@ -90,6 +91,19 @@ module Homebrew
         EOS
       end
 
+      def check_xcode_8_without_clt_on_el_capitan
+        return unless MacOS::Xcode.without_clt?
+        # Scope this to Xcode 8 on El Cap for now
+        return unless MacOS.version == :el_capitan && MacOS::Xcode.version >= "8"
+
+        <<-EOS.undent
+          You have Xcode 8 installed without the CLT;
+          this causes certain builds to fail on OS X El Capitan (10.11).
+          Please install the CLT via:
+            sudo xcode-select --install
+        EOS
+      end
+
       def check_for_osx_gcc_installer
         return unless MacOS.version < "10.7" || ((MacOS::Xcode.version || "0") > "4.1")
         return unless DevelopmentTools.clang_version == "2.1"
@@ -136,7 +150,7 @@ module Homebrew
           You have an outdated version of /usr/bin/install_name_tool installed.
           This will cause binary package installations to fail.
           This can happen if you install osx-gcc-installer or RailsInstaller.
-          To restore it, you must reinstall OS X or restore the binary from
+          To restore it, you must reinstall macOS or restore the binary from
           the OS packages.
         EOS
       end

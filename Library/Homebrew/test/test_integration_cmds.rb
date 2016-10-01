@@ -14,6 +14,8 @@ class IntegrationCommandTests < Homebrew::TestCase
   def teardown
     coretap = CoreTap.new
     paths_to_delete = [
+      HOMEBREW_LINKED_KEGS,
+      HOMEBREW_PINNED_KEGS,
       HOMEBREW_CELLAR.children,
       HOMEBREW_CACHE.children,
       HOMEBREW_LOCK_DIR.children,
@@ -22,7 +24,6 @@ class IntegrationCommandTests < Homebrew::TestCase
       HOMEBREW_PREFIX/"bin",
       HOMEBREW_PREFIX/"share",
       HOMEBREW_PREFIX/"opt",
-      HOMEBREW_LIBRARY/"LinkedKegs",
       HOMEBREW_LIBRARY/"Taps/caskroom",
       HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle",
       HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo",
@@ -43,8 +44,8 @@ class IntegrationCommandTests < Homebrew::TestCase
     end
   end
 
-  def needs_osx
-    skip "Not on OS X" unless OS.mac?
+  def needs_macos
+    skip "Not on MacOS" unless OS.mac?
   end
 
   def cmd_id_from_args(args)
@@ -159,7 +160,7 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def setup_remote_tap(name)
     tap = Tap.fetch name
-    tap.install(:full_clone => false, :quiet => true) unless tap.installed?
+    tap.install(full_clone: false, quiet: true) unless tap.installed?
     tap
   end
 
@@ -533,12 +534,12 @@ class IntegrationCommandTests < Homebrew::TestCase
     setup_test_formula "testball"
 
     HOMEBREW_CELLAR.join("testball/0.1").mkpath
-    HOMEBREW_LIBRARY.join("PinnedKegs").mkpath
-    FileUtils.ln_s HOMEBREW_CELLAR.join("testball/0.1"), HOMEBREW_LIBRARY.join("PinnedKegs/testball")
+    HOMEBREW_PINNED_KEGS.mkpath
+    FileUtils.ln_s HOMEBREW_CELLAR.join("testball/0.1"), HOMEBREW_PINNED_KEGS/"testball"
 
     assert_match "testball is pinned. You must unpin it to reinstall.", cmd("reinstall", "testball")
 
-    HOMEBREW_LIBRARY.join("PinnedKegs").rmtree
+    HOMEBREW_PINNED_KEGS.rmtree
   end
 
   def test_home
@@ -728,14 +729,14 @@ class IntegrationCommandTests < Homebrew::TestCase
 
   def test_cask
     needs_test_cmd_taps
-    needs_osx
+    needs_macos
     setup_remote_tap("caskroom/cask")
     cmd("cask", "list")
   end
 
   def test_services
     needs_test_cmd_taps
-    needs_osx
+    needs_macos
     setup_remote_tap("homebrew/services")
     assert_equal "Warning: No services available to control with `brew services`",
       cmd("services", "list")

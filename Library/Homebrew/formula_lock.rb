@@ -1,16 +1,14 @@
 require "fcntl"
 
 class FormulaLock
-  LOCKDIR = HOMEBREW_LOCK_DIR
-
   def initialize(name)
     @name = name
-    @path = LOCKDIR.join("#{@name}.brewing")
+    @path = HOMEBREW_LOCK_DIR/"#{@name}.brewing"
     @lockfile = nil
   end
 
   def lock
-    LOCKDIR.mkpath
+    HOMEBREW_LOCK_DIR.mkpath
     @lockfile = get_or_create_lockfile
     unless @lockfile.flock(File::LOCK_EX | File::LOCK_NB)
       raise OperationInProgressError, @name

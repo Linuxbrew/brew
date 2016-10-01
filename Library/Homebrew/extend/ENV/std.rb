@@ -7,7 +7,7 @@ module Stdenv
   include SharedEnvExtension
 
   # @private
-  SAFE_CFLAGS_FLAGS = "-w -pipe"
+  SAFE_CFLAGS_FLAGS = "-w -pipe".freeze
   HOMEBREW_ARCH = (ENV["HOMEBREW_ARCH"] || "native").freeze
   DEFAULT_FLAGS = (OS.mac? ? "-march=core2 -msse4" : "-march=#{HOMEBREW_ARCH}").freeze
 
@@ -159,7 +159,7 @@ module Stdenv
     replace_in_cflags(/-Xarch_#{Hardware::CPU.arch_32_bit} (-march=\S*)/, '\1')
     # Clang mistakenly enables AES-NI on plain Nehalem
     map = Hardware::CPU.optimization_flags
-    map = map.merge(:nehalem => "-march=native -Xclang -target-feature -Xclang -aes")
+    map = map.merge(nehalem: "-march=native -Xclang -target-feature -Xclang -aes")
     set_cpu_cflags "-march=native", map
   end
 

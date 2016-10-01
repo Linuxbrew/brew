@@ -5,7 +5,7 @@ class MacOsxfuseRequirement < Requirement
   cask "osxfuse"
   download "https://osxfuse.github.io/"
 
-  satisfy(:build_env => false) { self.class.binary_osxfuse_installed? }
+  satisfy(build_env: false) { self.class.binary_osxfuse_installed? }
 
   def self.binary_osxfuse_installed?
     File.exist?("/usr/local/include/osxfuse/fuse.h") &&
@@ -30,7 +30,7 @@ OsxfuseRequirement = OS.mac? ? MacOsxfuseRequirement : LibfuseRequirement
 
 class NonBinaryOsxfuseRequirement < Requirement
   fatal true
-  satisfy(:build_env => false) { HOMEBREW_PREFIX.to_s != "/usr/local" || !OsxfuseRequirement.binary_osxfuse_installed? }
+  satisfy(build_env: false) { HOMEBREW_PREFIX.to_s != "/usr/local" || !OsxfuseRequirement.binary_osxfuse_installed? }
 
   def message
     <<-EOS.undent

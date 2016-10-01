@@ -7,8 +7,8 @@ require "ostruct"
 
 module Homebrew
   SOURCE_PATH = HOMEBREW_LIBRARY_PATH/"manpages"
-  TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"share/man/man1"
-  TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"share/doc/homebrew"
+  TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"manpages"
+  TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
 
   def man
     raise UsageError unless ARGV.named.empty?
@@ -51,9 +51,13 @@ module Homebrew
 
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
     variables[:developer_commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
-    variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md")
-                              .read[/Homebrew's current maintainers are (.*)\./, 1]
-                              .scan(/\[([^\]]*)\]/).flatten
+    readme = HOMEBREW_REPOSITORY/"README.md"
+    variables[:lead_maintainer] = readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
+                                        .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:maintainers] = readme.read[/(Homebrew's current maintainers .*\.)/, 1]
+                                    .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
+                                           .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
     ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end

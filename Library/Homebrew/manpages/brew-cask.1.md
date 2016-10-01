@@ -19,10 +19,10 @@ names, and other aspects of this manual are still subject to change.
 
 ## FREQUENTLY USED COMMANDS
 
-  * `install [--force] [--skip-cask-deps] [--require-sha]` <token> [ <token> ... ]:
+  * `install` [--force] [--skip-cask-deps] [--require-sha] <token> [ <token> ... ]:
     Install Cask identified by <token>.
 
-  * `uninstall [--force]` <token> [ <token> ... ]:
+  * `uninstall` [--force] <token> [ <token> ... ]:
     Uninstall Cask identified by <token>.
 
   * `search` <text> | /<regexp>/:
@@ -69,7 +69,7 @@ names, and other aspects of this manual are still subject to change.
   * `info` or `abv` <token> [ <token> ... ]:
     Display information about the given Cask.
 
-  * `install [--force] [--skip-cask-deps] [--require-sha]` <token> [ <token> ... ]:
+  * `install` [--force] [--skip-cask-deps] [--require-sha] <token> [ <token> ... ]:
     Install the given Cask. With `--force`, re-install even if the Cask
     appears to be already present. With `--skip-cask-deps`, skip any Cask
     dependencies. `--require-sha` will abort installation if the Cask does not
@@ -78,41 +78,28 @@ names, and other aspects of this manual are still subject to change.
     <token> is usually the ID of a Cask as returned by `brew cask search`,
     but see [OTHER WAYS TO SPECIFY A CASK][] for variations.
 
-  * `list` or `ls` [-1 | -l] [ <token> ... ]:
+  * `list` or `ls` [-1] [--versions] [ <token> ... ]:
     Without any arguments, list all installed Casks. With `-1`, always
-    format the output in a single column. With `-l`, give a more detailed
-    listing.
+    format the output in a single column. With `--versions`, show all installed
+    versions.
 
     If <token> is given, summarize the staged files associated with the
     given Cask.
 
-  * `search` or `-S`:
-    Display all Casks available for install.
-
-  * `search` or `-S` <text> | /<regexp>/:
-    Perform a substring search of known Cask tokens for <text>. If the text
-    is delimited by slashes, it is interpreted as a Ruby regular expression.
+  * `search` or `-S` [<text> | /<regexp>/]:
+    Without argument, display all Casks available for install, otherwise
+    perform a substring search of known Cask tokens for <text> or, if the
+    text is delimited by slashes (/<regexp>/), it is interpreted as a
+    Ruby regular expression.
 
   * `style` [--fix] [ <token> ... ]:
    Check the given Casks for correct style using [RuboCop Cask](https://github.com/caskroom/rubocop-cask).
    If no tokens are given on the command line, all Casks are checked.
    With `--fix`, auto-correct any style errors if possible.
 
-  * `uninstall [--force]` or `rm` or `remove` <token> [ <token> ... ]:
+  * `uninstall` or `rm` or `remove` [--force] <token> [ <token> ... ]:
     Uninstall the given Cask. With `--force`, uninstall even if the Cask
     does not appear to be present.
-
-    Note that `uninstall --force` is currently imperfect. It will follow
-    the `uninstall` instructions from *newest* Cask definition, even if
-    the given Cask has changed since you installed it. The result is that
-    `uninstall --force` will always succeed in removing relevant files
-    under `<Caskroom_path>`, but will sometimes fail to remove relevant
-    installed files outside of it. This issue is being
-    addressed.
-
-    `uninstall` without `--force` is also imperfect. It may be unable to
-    perform an `uninstall` operation if the given Cask has changed since you
-    installed it. This issue is being addressed.
 
   * `update`:
     For convenience. `brew cask update` is a synonym for `brew update`.

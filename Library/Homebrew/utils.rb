@@ -163,7 +163,7 @@ def odeprecated(method, replacement = nil, options = {})
 end
 
 def odisabled(method, replacement = nil, options = {})
-  options = { :die => true, :caller => caller }.merge(options)
+  options = { die: true, caller: caller }.merge(options)
   odeprecated(method, replacement, options)
 end
 
@@ -270,17 +270,24 @@ module Homebrew
   end
 
   def self.install_gem_setup_path!(name, version = nil, executable = name)
-    require "rubygems"
+    # Respect user's preferences for where gems should be installed.
+    ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
+    ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
+    ENV["GEM_PATH"] = ENV["GEM_OLD_PATH"] unless ENV["GEM_OLD_PATH"].to_s.empty?
+
+    # Make rubygems notice env changes.
+    Gem.clear_paths
+    Gem::Specification.reset
 
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
     path = ENV["PATH"].split(File::PATH_SEPARATOR)
     path.unshift(RUBY_BIN) if which("ruby") != RUBY_PATH
-    path.unshift("#{Gem.user_dir}/bin")
+    path.unshift("#{Gem.dir}/bin")
     ENV["PATH"] = path.join(File::PATH_SEPARATOR)
 
     if Gem::Specification.find_all_by_name(name, version).empty?
       ohai "Installing or updating '#{name}' gem"
-      install_args = %W[--no-ri --no-rdoc --user-install #{name}]
+      install_args = %W[--no-ri --no-rdoc #{name}]
       install_args << "--version" << version if version
 
       # Do `gem install [...]` without having to spawn a separate process or
@@ -588,7 +595,7 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
   end
   out = front + glue_bytes + back
   out.force_encoding("UTF-8")
-  out.encode!("UTF-16", :invalid => :replace)
+  out.encode!("UTF-16", invalid: :replace)
   out.encode!("UTF-8")
   out
 end
@@ -599,8 +606,11 @@ def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
   src_paths = link_dir ? [src_dir] : src_dir.find
   src_paths.each do |src|
     next if src.directory? && !link_dir
-    dst = dst_dir.parent/src.relative_path_from(src_dir.parent)
-    next if dst.symlink? && src == dst.resolved_path
+    dst = dst_dir/src.relative_path_from(src_dir)
+    if dst.symlink?
+      next if src == dst.resolved_path
+      dst.unlink
+    end
     if dst.exist?
       conflicts << dst
       next
@@ -613,11 +623,50 @@ def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
       Could not link:
       #{conflicts.join("\n")}
 
-      Please delete these files and run `#{command}`.
+      Please delete these paths and run `#{command}`.
     EOS
   end
 end
 
 def link_path_manpages(path, command)
   link_src_dst_dirs(path/"man", HOMEBREW_PREFIX/"share/man", command)
+end
+
+def migrate_legacy_keg_symlinks_if_necessary
+  legacy_linked_kegs = HOMEBREW_LIBRARY/"LinkedKegs"
+  return unless legacy_linked_kegs.directory?
+
+  HOMEBREW_LINKED_KEGS.mkpath unless legacy_linked_kegs.children.empty?
+  legacy_linked_kegs.children.each do |link|
+    name = link.basename.to_s
+    src = begin
+      link.realpath
+    rescue Errno::ENOENT
+      begin
+        (HOMEBREW_PREFIX/"opt/#{name}").realpath
+      rescue Errno::ENOENT
+        begin
+          Formulary.factory(name).installed_prefix
+        rescue
+          next
+        end
+      end
+    end
+    dst = HOMEBREW_LINKED_KEGS/name
+    dst.unlink if dst.exist?
+    FileUtils.ln_sf(src.relative_path_from(dst.parent), dst)
+  end
+  FileUtils.rm_rf legacy_linked_kegs
+
+  legacy_pinned_kegs = HOMEBREW_LIBRARY/"PinnedKegs"
+  return unless legacy_pinned_kegs.directory?
+
+  HOMEBREW_PINNED_KEGS.mkpath unless legacy_pinned_kegs.children.empty?
+  legacy_pinned_kegs.children.each do |link|
+    name = link.basename.to_s
+    src = link.realpath
+    dst = HOMEBREW_PINNED_KEGS/name
+    FileUtils.ln_sf(src.relative_path_from(dst.parent), dst)
+  end
+  FileUtils.rm_rf legacy_pinned_kegs
 end

@@ -37,11 +37,23 @@ module HomebrewArgvExtension
             f.version.update_commit(k.version.version.commit) if k.version.head?
           end
         end
-        f
       else
         rack = Formulary.to_rack(name)
-        Formulary.from_rack(rack, spec(nil))
+        alias_path = Formulary.factory(name).alias_path
+        f = Formulary.from_rack(rack, spec(nil), alias_path: alias_path)
       end
+
+      # If this formula was installed with an alias that has since changed,
+      # then it was specified explicitly in ARGV. (Using the alias would
+      # instead have found the new formula.)
+      #
+      # Because of this, the user is referring to this specific formula,
+      # not any formula targetted by the same alias, so in this context
+      # the formula shouldn't be considered outdated if the alias used to
+      # install it has changed.
+      f.follow_installed_alias = false
+
+      f
     end
   end
 
@@ -57,10 +69,10 @@ module HomebrewArgvExtension
 
       dirs = rack.directory? ? rack.subdirs : []
 
-      raise NoSuchKegError.new(rack.basename) if dirs.empty?
+      raise NoSuchKegError, rack.basename if dirs.empty?
 
-      linked_keg_ref = HOMEBREW_LIBRARY.join("LinkedKegs", rack.basename)
-      opt_prefix = HOMEBREW_PREFIX.join("opt", rack.basename)
+      linked_keg_ref = HOMEBREW_LINKED_KEGS/rack.basename
+      opt_prefix = HOMEBREW_PREFIX/"opt/#{rack.basename}"
 
       begin
         if opt_prefix.symlink? && opt_prefix.directory?
@@ -79,7 +91,7 @@ module HomebrewArgvExtension
           if (prefix = f.installed_prefix).directory?
             Keg.new(prefix)
           else
-            raise MultipleVersionsInstalledError.new(rack.basename)
+            raise MultipleVersionsInstalledError, rack.basename
           end
         end
       rescue FormulaUnavailableError
@@ -211,7 +223,7 @@ module HomebrewArgvExtension
   # installation run.
   def build_formula_from_source?(f)
     return true if build_all_from_source?
-    return false unless (build_from_source? || build_bottle?)
+    return false unless build_from_source? || build_bottle?
     formulae.any? { |argv_f| argv_f.full_name == f.full_name }
   end
 

@@ -182,7 +182,7 @@ class TapTest < Homebrew::TestCase
     already_tapped_tap = Tap.new("Homebrew", "foo")
     assert_equal true, already_tapped_tap.installed?
     right_remote = @tap.remote
-    assert_raises(TapAlreadyTappedError) { already_tapped_tap.install :clone_target => right_remote }
+    assert_raises(TapAlreadyTappedError) { already_tapped_tap.install clone_target: right_remote }
   end
 
   def test_install_tap_remote_mismatch_error
@@ -191,13 +191,13 @@ class TapTest < Homebrew::TestCase
     touch @tap.path/".git/shallow"
     assert_equal true, already_tapped_tap.installed?
     wrong_remote = "#{@tap.remote}-oops"
-    assert_raises(TapRemoteMismatchError) { already_tapped_tap.install :clone_target => wrong_remote, :full_clone => true }
+    assert_raises(TapRemoteMismatchError) { already_tapped_tap.install clone_target: wrong_remote, full_clone: true }
   end
 
   def test_install_tap_already_unshallow_error
     setup_git_repo
     already_tapped_tap = Tap.new("Homebrew", "foo")
-    assert_raises(TapAlreadyUnshallowError) { already_tapped_tap.install :full_clone => true }
+    assert_raises(TapAlreadyUnshallowError) { already_tapped_tap.install full_clone: true }
   end
 
   def test_uninstall_tap_unavailable_error
@@ -208,7 +208,7 @@ class TapTest < Homebrew::TestCase
   def test_install_git_error
     tap = Tap.new("user", "repo")
     assert_raises(ErrorDuringExecution) do
-      shutup { tap.install :clone_target => "file:///not/existed/remote/url" }
+      shutup { tap.install clone_target: "file:///not/existed/remote/url" }
     end
     refute_predicate tap, :installed?
     refute_predicate Tap::TAP_DIRECTORY/"user", :exist?
@@ -219,7 +219,7 @@ class TapTest < Homebrew::TestCase
     setup_git_repo
 
     tap = Tap.new("Homebrew", "bar")
-    shutup { tap.install :clone_target => @tap.path/".git" }
+    shutup { tap.install clone_target: @tap.path/".git" }
     assert_predicate tap, :installed?
     assert_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :file?
     shutup { tap.uninstall }

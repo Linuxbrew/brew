@@ -33,7 +33,7 @@ class Version
       when NullToken
         0
       when NumericToken
-        other.value == 0 ? 0 : -1
+        other.value.zero? ? 0 : -1
       when AlphaToken, BetaToken, RCToken
         1
       else
@@ -292,9 +292,9 @@ class Version
 
     stem = if spec.directory?
       spec.basename.to_s
-    elsif %r{((?:sourceforge\.net|sf\.net)/.*)/download$}.match(spec_s)
+    elsif %r{((?:sourceforge\.net|sf\.net)/.*)/download$} =~ spec_s
       Pathname.new(spec.dirname).stem
-    elsif %r{\.[^a-zA-Z]+$}.match(spec_s)
+    elsif /\.[^a-zA-Z]+$/ =~ spec_s
       Pathname.new(spec_s).basename
     else
       spec.stem

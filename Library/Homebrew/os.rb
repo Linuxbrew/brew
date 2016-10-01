@@ -25,7 +25,7 @@ module OS
   elsif OS.linux?
     NAME = "linux".freeze
     GITHUB_USER = "Linuxbrew".freeze
-    ISSUES_URL = "https://github.com/#{GITHUB_USER}/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting".freeze
+    ISSUES_URL = "https://github.com/Linuxbrew/brew/blob/master/docs/Troubleshooting.md#troubleshooting".freeze
     PATH_OPEN = "xdg-open".freeze
     PATH_PATCH = "patch".freeze
     # compatibility

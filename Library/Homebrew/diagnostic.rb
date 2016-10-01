@@ -309,8 +309,7 @@ module Homebrew
       def check_access_prefix_directories
         not_writable_dirs = []
 
-        extra_dirs = ["lib/pkgconfig", "share/locale", "share/man", "opt"]
-        (Keg::TOP_LEVEL_DIRECTORIES + extra_dirs).each do |dir|
+        Keg::ALL_TOP_LEVEL_DIRECTORIES.each do |dir|
           path = HOMEBREW_PREFIX/dir
           next unless path.exist?
           next if path.writable_real?
@@ -415,11 +414,11 @@ module Homebrew
             unless $seen_prefix_bin
               # only show the doctor message if there are any conflicts
               # rationale: a default install should not trigger any brew doctor messages
-              conflicts = Dir["#{HOMEBREW_PREFIX}/bin/*"].
-                          map { |fn| File.basename fn }.
-                          select { |bn| File.exist? "/usr/bin/#{bn}" }
+              conflicts = Dir["#{HOMEBREW_PREFIX}/bin/*"]
+                          .map { |fn| File.basename fn }
+                          .select { |bn| File.exist? "/usr/bin/#{bn}" }
 
-              if conflicts.size > 0
+              unless conflicts.empty?
                 message = inject_file_list conflicts, <<-EOS.undent
                   /usr/bin occurs before #{HOMEBREW_PREFIX}/bin
                   This means that system-provided programs will be used instead of those
@@ -459,7 +458,7 @@ module Homebrew
 
         # Don't complain about sbin not being in the path if it doesn't exist
         sbin = (HOMEBREW_PREFIX+"sbin")
-        return unless sbin.directory? && sbin.children.length > 0
+        return unless sbin.directory? && !sbin.children.empty?
 
         <<-EOS.undent
           Homebrew's sbin was not found in your PATH but you have installed
@@ -535,7 +534,11 @@ module Homebrew
         return if @found.empty?
 
         # Our gettext formula will be caught by check_linked_keg_only_brews
-        gettext = Formulary.factory("gettext") rescue nil
+        gettext = begin
+          Formulary.factory("gettext")
+        rescue
+          nil
+        end
         homebrew_owned = @found.all? do |path|
           Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
         end
@@ -553,7 +556,11 @@ module Homebrew
         find_relative_paths("lib/libiconv.dylib", "include/iconv.h")
         return if @found.empty?
 
-        libiconv = Formulary.factory("libiconv") rescue nil
+        libiconv = begin
+          Formulary.factory("libiconv")
+        rescue
+          nil
+        end
         if libiconv && libiconv.linked_keg.directory?
           unless libiconv.keg_only?
             <<-EOS.undent
@@ -567,7 +574,7 @@ module Homebrew
             Homebrew doesn't provide a libiconv formula, and expects to link against
             the system version in /usr. libiconv in other prefixes can cause
             compile or link failure, especially if compiled with improper
-            architectures. OS X itself never installs anything to /usr/local so
+            architectures. macOS itself never installs anything to /usr/local so
             it was either installed by a user or some other third party software.
 
             tl;dr: delete these files:
@@ -674,7 +681,7 @@ module Homebrew
 
         <<-EOS.undent
           Your Cellar and TEMP directories are on different volumes.
-          OS X won't move relative symlinks across volumes unless the target file already
+          macOS won't move relative symlinks across volumes unless the target file already
           exists. Brews known to be affected by this are Git and Narwhal.
 
           You should set the "HOMEBREW_TEMP" environmental variable to a suitable
@@ -712,7 +719,7 @@ module Homebrew
 
         <<-EOS.undent
           The filesystem on #{case_sensitive_vols.join(",")} appears to be case-sensitive.
-          The default OS X filesystem is case-insensitive. Please report any apparent problems.
+          The default macOS filesystem is case-insensitive. Please report any apparent problems.
         EOS
       end
 
@@ -831,9 +838,9 @@ module Homebrew
           libexpat.framework
           libcurl.framework
         ]
-        frameworks_found = frameworks_to_check.
-          map { |framework| "/Library/Frameworks/#{framework}" }.
-          select { |framework| File.exist? framework }
+        frameworks_found = frameworks_to_check
+                           .map { |framework| "/Library/Frameworks/#{framework}" }
+                           .select { |framework| File.exist? framework }
         return if frameworks_found.empty?
 
         inject_file_list frameworks_found, <<-EOS.undent
@@ -927,11 +934,10 @@ module Homebrew
       def check_for_old_homebrew_share_python_in_path
         message = ""
         ["", "3"].map do |suffix|
-          if paths.include?((HOMEBREW_PREFIX/"share/python#{suffix}").to_s)
-            message += <<-EOS.undent
+          next unless paths.include?((HOMEBREW_PREFIX/"share/python#{suffix}").to_s)
+          message += <<-EOS.undent
               #{HOMEBREW_PREFIX}/share/python#{suffix} is not needed in PATH.
-            EOS
-          end
+          EOS
         end
         unless message.empty?
           message += <<-EOS.undent
@@ -1028,7 +1034,7 @@ module Homebrew
 
       def check_for_unlinked_but_not_keg_only
         unlinked = Formula.racks.reject do |rack|
-          if !(HOMEBREW_REPOSITORY/"Library/LinkedKegs"/rack.basename).directory?
+          if !(HOMEBREW_LINKED_KEGS/rack.basename).directory?
             begin
               Formulary.from_rack(rack).keg_only?
             rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError

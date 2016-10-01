@@ -25,7 +25,7 @@ module Homebrew
       Homebrew.failed = true unless Readall.valid_ruby_syntax?(ruby_files)
     end
 
-    options = { :aliases => ARGV.include?("--aliases") }
+    options = { aliases: ARGV.include?("--aliases") }
     taps = if ARGV.named.empty?
       Tap
     else
