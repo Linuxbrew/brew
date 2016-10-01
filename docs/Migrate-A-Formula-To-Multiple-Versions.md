@@ -21,7 +21,7 @@ In separate pull-requests:
 
 In separate pull-requests:
 
-1. [Migrate the formula](Migrating-A-Formula-To-A-Tap) from Homebrew/homebrew-versions to Homebrew/homebrew-core with the same, old name e.g. `boost160.rb`.
+1. [Migrate the formula](Migrating-A-Formula-To-A-Tap.md) from Homebrew/homebrew-versions to Homebrew/homebrew-core with the same, old name e.g. `boost160.rb`.
 2. [Rename the formula](Rename-A-Formula.md) from e.g. `boost160.rb` to e.g. `boost@1.60.rb`. This should not require any `revision`ing or significant formula modification beyond the formula name.
 3. Tap authors should have their `depends_on "boost160"` updated to `depends_on "boost@1.60"`.
 5. When `boost@1.60` has two major/minor versions newer than it (e.g. `boost@1.62`) then consider removing `boost@1.60.rb` and anything that depends on it.
