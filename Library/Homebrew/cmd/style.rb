@@ -56,7 +56,7 @@ module Homebrew
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
       args += [HOMEBREW_LIBRARY_PATH]
     else
-      args << "--config" << Tap::TAP_DIRECTORY/".rubocop.yml"
+      args << "--config" << HOMEBREW_LIBRARY/".rubocop.yml"
       args << "--format" << "simple"
       args += files
     end

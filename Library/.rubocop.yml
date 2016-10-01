@@ -73,6 +73,15 @@ Style/EmptyLineBetweenDefs:
 Style/FileName:
   Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
 
+Style/GuardClause:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/IfUnlessModifier:
+  Enabled: false
+
 Style/IndentArray:
   EnforcedStyle: special_inside_parentheses
 
