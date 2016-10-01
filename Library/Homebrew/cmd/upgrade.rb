@@ -23,6 +23,14 @@ module Homebrew
 
     Homebrew.perform_preinstall_checks
 
+    if ARGV.include?("--all")
+      opoo <<-EOS.undent
+        We decided to not change the behaviour of `brew upgrade` so
+        `brew upgrade --all` is equivalent to `brew upgrade` without any other
+        arguments (so the `--all` is a no-op and can be removed).
+      EOS
+    end
+
     if ARGV.named.empty?
       outdated = Formula.installed.select do |f|
         f.outdated?(fetch_head: ARGV.fetch_head?)
