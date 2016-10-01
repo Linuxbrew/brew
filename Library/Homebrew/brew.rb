@@ -14,7 +14,7 @@ $:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
 
 if ARGV == %w[--version] || ARGV == %w[-v]
-  puts "Homebrew #{Homebrew.homebrew_version_string}"
+  puts "Homebrew #{HOMEBREW_VERSION}"
   puts "Homebrew/homebrew-core #{Homebrew.core_tap_version_string}"
   exit 0
 end

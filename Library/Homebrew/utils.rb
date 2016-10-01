@@ -248,15 +248,6 @@ module Homebrew
     _system(cmd, *args)
   end
 
-  def self.homebrew_version_string
-    if pretty_revision = HOMEBREW_REPOSITORY.git_short_head
-      last_commit = HOMEBREW_REPOSITORY.git_last_commit_date
-      "#{HOMEBREW_VERSION} (git revision #{pretty_revision}; last commit #{last_commit})"
-    else
-      "#{HOMEBREW_VERSION} (no git repository)"
-    end
-  end
-
   def self.core_tap_version_string
     require "tap"
     tap = CoreTap.instance

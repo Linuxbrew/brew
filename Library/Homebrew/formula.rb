@@ -1277,6 +1277,13 @@ class Formula
     ]
     # Set RPATH for Linux to fix error while loading shared libraries
     args += ["-DCMAKE_BUILD_WITH_INSTALL_RPATH=1", "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=1"] if OS.linux?
+
+    # Avoid false positives for clock_gettime support on 10.11.
+    # CMake cache entries for other weak symbols may be added here as needed.
+    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+      args << "-DHAVE_CLOCK_GETTIME:INTERNAL=0"
+    end
+
     args
   end
 
