@@ -8,11 +8,16 @@
 #:    If `--before=<date>` is passed, use the commit at `<date>` as the
 #:    start commit.
 #:
+#:    If `--to-tag` is passed, set HOMEBREW_UPDATE_TO_TAG to test updating
+#:    between tags.
+#:
 #:    If `--keep-tmp` is passed, retain the temporary directory containing
 #:    the new repository clone.
 
 module Homebrew
   def update_test
+    ENV["HOMEBREW_UPDATE_TO_TAG"] = "1" if ARGV.include?("--to-tag")
+
     cd HOMEBREW_REPOSITORY
     start_commit = if commit = ARGV.value("commit")
       commit
