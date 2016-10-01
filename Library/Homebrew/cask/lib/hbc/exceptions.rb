@@ -29,13 +29,30 @@ module Hbc
 
   class CaskAlreadyInstalledError < AbstractCaskErrorWithToken
     def to_s
-      %Q{A Cask for #{token} is already installed. Add the "--force" option to force re-install.}
+      s = <<-EOS.undent
+        A Cask for #{token} is already installed.
+      EOS
+
+      s.concat("\n").concat(reinstall_message)
+    end
+
+    private
+
+    def reinstall_message
+      <<-EOS.undent
+        To re-install #{token}, run:
+          brew cask uninstall --force #{token}; brew cask install #{token}
+      EOS
     end
   end
 
-  class CaskAutoUpdatesError < AbstractCaskErrorWithToken
+  class CaskAlreadyInstalledAutoUpdatesError < CaskAlreadyInstalledError
     def to_s
-      %Q{A Cask for #{token} is already installed and using auto-updates. Add the "--force" option to force re-install.}
+      s = <<-EOS.undent
+        A Cask for #{token} is already installed and using auto-updates.
+      EOS
+
+      s.concat("\n").concat(reinstall_message)
     end
   end
 
