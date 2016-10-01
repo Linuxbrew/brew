@@ -4,6 +4,8 @@
 #:    If `--fail-if-changed` is passed, the command will return a failing
 #:    status code if changes are detected in the manpage outputs.
 #:    This can be used for CI to be notified when the manpages are out of date.
+#:    Additionally, the date used in new manpages will match those in the existing
+#:    manpages (to allow comparison without factoring in the date).
 
 require "formula"
 require "erb"
