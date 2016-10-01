@@ -218,6 +218,8 @@ merge_or_rebase() {
   if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
   then
     UPSTREAM_TAG="$(git tag --list --sort=-version:refname | head -n1)"
+  else
+    UPSTREAM_TAG=""
   fi
 
   if [ -n "$UPSTREAM_TAG" ]
@@ -253,7 +255,8 @@ EOS
   fi
 
   INITIAL_BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
-  if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
+  if [[ -n "$UPSTREAM_TAG" ]] ||
+     [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" ]]
   then
 
     if [[ -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
@@ -265,7 +268,8 @@ EOS
 
     # Recreate and check out `#{upstream_branch}` if unable to fast-forward
     # it to `origin/#{@upstream_branch}`. Otherwise, just check it out.
-    if git merge-base --is-ancestor "$UPSTREAM_BRANCH" "$REMOTE_REF" &>/dev/null
+    if [[ -z "$UPSTREAM_TAG" ]] &&
+       git merge-base --is-ancestor "$UPSTREAM_BRANCH" "$REMOTE_REF" &>/dev/null
     then
       git checkout --force "$UPSTREAM_BRANCH" "${QUIET_ARGS[@]}"
     else
