@@ -75,9 +75,9 @@ class DependencyCollectorTests < Homebrew::TestCase
   end
 
   def test_x11_min_version_and_tag
+    skip "XQuartz versions are relevant only on Mac OS" unless OS.mac?
     @d.add x11: ["2.5.1", :optional]
-    req = OS.mac? ? X11Requirement : XorgRequirement
-    dep = find_requirement(req)
+    dep = find_requirement(X11Requirement )
     assert_equal "2.5.1", dep.min_version.to_s
     assert_predicate dep, :optional?
   end
