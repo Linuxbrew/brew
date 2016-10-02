@@ -4,21 +4,19 @@ module Kernel
   def puts_columns(*objects, gap_size: 2)
     objects.flatten!
 
-    if objects.empty? || (respond_to?(:tty?) ? !tty? : !$stdout.tty?)
+    fallback = proc do
       puts(*objects)
       return
     end
+
+    fallback.call if objects.empty?
+    fallback.call if respond_to?(:tty?) ? !tty? : !$stdout.tty?
 
     console_width = Tty.width
-
     object_lengths = objects.map { |obj| Tty.strip_ansi(obj.to_s).length }
-
     cols = (console_width + gap_size) / (object_lengths.max + gap_size)
 
-    if cols < 2
-      puts(*objects)
-      return
-    end
+    fallback.call if cols < 2
 
     rows = (objects.count + cols - 1) / cols
     cols = (objects.count + rows - 1) / rows # avoid empty trailing columns
