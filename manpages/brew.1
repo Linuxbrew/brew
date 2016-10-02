@@ -801,7 +801,21 @@ If \fB\-\-to\-tag\fR is passed, set HOMEBREW_UPDATE_TO_TAG to test updating betw
 .IP
 If \fB\-\-keep\-tmp\fR is passed, retain the temporary directory containing the new repository clone\.
 .
-.SH "EXTERNAL COMMANDS"
+.SH "OFFICIAL EXTERNAL COMMANDS"
+.
+.TP
+\fBbundle\fR
+Bundler for non\-Ruby dependencies from Homebrew: \fIhttps://github\.com/Homebrew/homebrew\-bundle\fR
+.
+.TP
+\fBcask\fR
+Install macOS applications distributed as binaries: \fIhttps://github\.com/caskroom/homebrew\-cask\fR
+.
+.TP
+\fBservices\fR
+Integrates Homebrew formulae with macOS\'s \fBlaunchctl\fR manager: \fIhttps://github\.com/Homebrew/homebrew\-services\fR
+.
+.SH "CUSTOM EXTERNAL COMMANDS"
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
 .
 .P
@@ -1007,7 +1021,7 @@ http_proxy=http://<user>:<password>@<host>:<port> brew install foo
 Homebrew Documentation: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/\fR
 .
 .P
-\fBgit\fR(1), \fBgit\-log\fR(1)
+\fBbrew\-cask\fR(1), \fBgit\fR(1), \fBgit\-log\fR(1)
 .
 .SH "AUTHORS"
 Homebrew\'s lead maintainer is Mike McQuaid\.
