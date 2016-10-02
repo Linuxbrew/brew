@@ -4,7 +4,7 @@ module Kernel
   def puts_columns(*objects, gap_size: 2)
     objects.flatten!
 
-    if objects.empty? || (respond_to?(:tty?) && !tty?)
+    if objects.empty? || (respond_to?(:tty?) ? !tty? : !$stdout.tty?)
       puts(*objects)
       return
     end
