@@ -389,10 +389,10 @@ module Homebrew
         return if HOMEBREW_PREFIX.to_s == "/usr/local"
 
         <<-EOS.undent
-          Your Homebrew is not installed to /usr/local
-          You can install Homebrew anywhere you want but some bottles (binary
-          packages) can only be used in /usr/local and some formulae (packages)
-          may not build correctly unless you install in /usr/local. Sorry!
+          Your Homebrew's prefix is not /usr/local.
+          You can install Homebrew anywhere you want but some bottles (binary packages)
+          can only be used with a /usr/local prefix and some formulae (packages)
+          may not build correctly with a non-/usr/local prefix.
         EOS
       end
 
