@@ -111,7 +111,7 @@ class UtilTests < Homebrew::TestCase
 
   def test_put_columns_empty
     out, err = capture_io do
-      puts_columns []
+      puts Formatter.columns([])
     end
 
     assert_equal out, "\n"

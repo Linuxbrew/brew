@@ -1,19 +1,20 @@
 require "utils/tty"
 
-module Kernel
-  def puts_columns(*objects, gap_size: 2)
-    objects.flatten!
+module Formatter
+  module_function
+
+  def columns(*objects, gap_size: 2)
+    objects = objects.flatten.map(&:to_s)
 
     fallback = proc do
-      puts(*objects)
-      return
+      return objects.join("\n").concat("\n")
     end
 
     fallback.call if objects.empty?
     fallback.call if respond_to?(:tty?) ? !tty? : !$stdout.tty?
 
     console_width = Tty.width
-    object_lengths = objects.map { |obj| Tty.strip_ansi(obj.to_s).length }
+    object_lengths = objects.map { |obj| Tty.strip_ansi(obj).length }
     cols = (console_width + gap_size) / (object_lengths.max + gap_size)
 
     fallback.call if cols < 2
@@ -25,6 +26,8 @@ module Kernel
 
     gap_string = "".rjust(gap_size)
 
+    output = ""
+
     rows.times do |row_index|
       item_indices_for_row = row_index.step(objects.size - 1, rows).to_a
 
@@ -35,7 +38,9 @@ module Kernel
       # don't add trailing whitespace to last column
       last = objects.values_at(item_indices_for_row.last)
 
-      puts (first_n + last).join(gap_string)
+      output.concat((first_n + last).join(gap_string)).concat("\n")
     end
+
+    output
   end
 end

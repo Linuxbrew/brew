@@ -1,3 +1,4 @@
+require "utils/formatter/columns"
 require "utils/tty"
 
 module Formatter

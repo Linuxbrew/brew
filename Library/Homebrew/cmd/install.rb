@@ -183,7 +183,7 @@ module Homebrew
           puts "To install it, run:\n  brew install #{formulae_search_results.first}"
         else
           puts "These similarly named formulae were found:"
-          puts_columns(formulae_search_results)
+          puts Formatter.columns(formulae_search_results)
           puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
         end
 
@@ -198,7 +198,7 @@ module Homebrew
           puts "To install it, run:\n  brew install #{taps_search_results.first}"
         else
           puts "These formulae were found in taps:"
-          puts_columns(taps_search_results)
+          puts Formatter.columns(taps_search_results)
           puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
         end
       end

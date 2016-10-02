@@ -49,7 +49,7 @@ module Homebrew
           end
         end
         return if full_names.empty?
-        puts_columns full_names
+        puts Formatter.columns(full_names)
       else
         ENV["CLICOLOR"] = nil
         exec "ls", *ARGV.options_only << HOMEBREW_CELLAR

@@ -11,7 +11,6 @@ require "utils/hash"
 require "utils/inreplace"
 require "utils/json"
 require "utils/popen"
-require "utils/puts_columns"
 require "utils/tty"
 
 def ohai(title, *sput)
