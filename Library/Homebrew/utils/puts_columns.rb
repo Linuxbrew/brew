@@ -1,10 +1,10 @@
 require "utils/tty"
 
-class IO
+module Kernel
   def puts_columns(*objects, gap_size: 2)
     objects.flatten!
 
-    if objects.empty? || !tty?
+    if objects.empty? || (respond_to?(:tty?) && !tty?)
       puts(*objects)
       return
     end
@@ -39,11 +39,5 @@ class IO
 
       puts (first_n + last).join(gap_string)
     end
-  end
-end
-
-module Kernel
-  def puts_columns(*objects)
-    $stdout.puts_columns(*objects)
   end
 end
