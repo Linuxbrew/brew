@@ -70,7 +70,7 @@ module Homebrew
       if ARGV.verbose?
         print_filename.call(string, file) unless linked_libraries.empty?
         linked_libraries.each do |lib|
-          puts " #{Tty.gray}-->#{Tty.reset} links to #{lib}"
+          puts " #{Tty.bold}-->#{Tty.reset} links to #{lib}"
         end
       end
 
@@ -93,7 +93,7 @@ module Homebrew
       next unless ARGV.verbose? && !text_matches.empty?
       print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
-        puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
+        puts " #{Tty.bold}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
       end
 
       if text_matches.size > MAXIMUM_STRING_MATCHES
