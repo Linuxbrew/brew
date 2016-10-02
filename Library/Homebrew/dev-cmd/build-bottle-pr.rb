@@ -9,7 +9,7 @@ module Homebrew
 
   def open_pull_request?(formula)
     prs = GitHub.issues_matching(formula,
-      :type => "pr", :state => "open", :repo => formula.tap.slug)
+      type: "pr", state: "open", repo: formula.tap.slug)
     prs = prs.select { |pr| pr["title"].start_with? "#{formula}: " }
     if prs.any?
       ohai "#{formula}: Skipping because a PR is open"
@@ -19,11 +19,11 @@ module Homebrew
   end
 
   def limit
-    @@limit ||= (ARGV.value("limit") || "10").to_i
+    @limit ||= (ARGV.value("limit") || "10").to_i
   end
 
   # The number of bottled formula.
-  @@n = 0
+  @n = 0
 
   def build_bottle(formula)
     remote = ARGV.value("remote") || ENV["GITHUB_USER"] || ENV["USER"]
@@ -33,8 +33,8 @@ module Homebrew
     return ohai "#{formula}: Skipping because it has a bottle" if formula.bottle_specification.tag?(tag)
     return if open_pull_request? formula
 
-    @@n += 1
-    return ohai "#{@@n}. #{formula}: Skipping because GitHub rate limits pull requests" if @@n > limit
+    @n += 1
+    return ohai "#{@n}. #{formula}: Skipping because GitHub rate limits pull requests" if @n > limit
 
     tap_dir = formula.tap.formula_dir
     cd tap_dir
@@ -44,7 +44,7 @@ module Homebrew
     end
 
     message = "#{formula}: Build a bottle for Linuxbrew"
-    oh1 "#{@@n}. #{message}"
+    oh1 "#{@n}. #{message}"
     return if ARGV.dry_run?
 
     File.open(formula.path, "r+") do |f|

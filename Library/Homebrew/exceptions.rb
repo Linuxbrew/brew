@@ -355,11 +355,9 @@ class BuildError < RuntimeError
       puts issues.map { |i| "#{i["title"]} #{i["html_url"]}" }.join("\n")
     end
 
-    if OS.mac?
-      require "diagnostic"
-      unsupported_macos = Homebrew::Diagnostic::Checks.new.check_for_unsupported_macos
-      opoo unsupported_macos if unsupported_macos
-    end
+    require "diagnostic"
+    unsupported_macos = Homebrew::Diagnostic::Checks.new.check_for_unsupported_macos if OS.mac?
+    opoo unsupported_macos if unsupported_macos
   end
 end
 

@@ -74,7 +74,7 @@ Metrics/BlockNesting:
 # Offense count: 20
 # Configuration parameters: CountComments.
 Metrics/ModuleLength:
-  Max: 370
+  Max: 373
 
 # Offense count: 2
 # Configuration parameters: CountKeywordArgs.

@@ -35,7 +35,7 @@ class Tap
     repo = repo.strip_prefix "homebrew-"
 
     if user == "Homebrew" && (repo == "homebrew" || repo == "core") ||
-        user == "Linuxbrew" && (repo == "linuxbrew" || repo == "core")
+       user == "Linuxbrew" && (repo == "linuxbrew" || repo == "core")
       return CoreTap.instance
     end
 
@@ -102,7 +102,7 @@ class Tap
     if remote.nil?
       "#{user}/homebrew-#{repo}"
     else
-      x = remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1]
+      x = remote[%r{^https://github\.com/([^.]+)(\.git)?$}, 1]
       (official? && !x.nil?) ? x.capitalize : x
     end
   end
@@ -153,9 +153,7 @@ class Tap
   # The issues URL of this {Tap}.
   # e.g. `https://github.com/user/homebrew-repo/issues`
   def issues_url
-    if official? || !custom_remote?
-      "https://github.com/#{slug}/issues"
-    end
+    "https://github.com/#{slug}/issues" if official? || !custom_remote?
   end
 
   def to_s
@@ -244,7 +242,7 @@ class Tap
     args << "-q" if quiet
 
     git_version = Version.new(`git --version`[/git version (\d\.\d+\.\d+)/, 1])
-    raise ErrorDuringExecution.new(cmd) unless $?.success?
+    raise ErrorDuringExecution, cmd unless $?.success?
     args << "--config" << "core.autocrlf=false" if git_version >= Version.new("1.7.10")
 
     begin

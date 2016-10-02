@@ -11,7 +11,9 @@ class BottleHookTests < Homebrew::TestCase
       false
     end
 
-    def name; "tests"; end
+    def name
+      "tests"
+    end
 
     def some_random_method
       true

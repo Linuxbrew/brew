@@ -940,8 +940,8 @@ module Homebrew
       return if bottles.empty?
 
       FileUtils.cp bottles, Dir.pwd, verbose: true
-    else
-      return if Dir["*.bottle*.*"].empty?
+    elsif Dir["*.bottle*.*"].empty?
+      return
     end
 
     json_files = Dir.glob("*.bottle.json")
@@ -980,7 +980,7 @@ module Homebrew
     end
 
     bottle_merge_args = ["--merge", "--write"]
-    bottle_merge_args << "--keep-old" if ARGV.include? "--keep-old" || ENV["UPSTREAM_BOTTLE_KEEP_OLD"] || ENV["BOT_PARAMS"].to_s.include?("--keep-old")
+    bottle_merge_args << "--keep-old" if ARGV.include?("--keep-old") || ENV["UPSTREAM_BOTTLE_KEEP_OLD"] || ENV["BOT_PARAMS"].to_s.include?("--keep-old")
     bottle_merge_args += json_files
     system "brew", "bottle", *bottle_merge_args
 

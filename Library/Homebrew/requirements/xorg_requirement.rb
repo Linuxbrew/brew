@@ -6,13 +6,11 @@ class XorgRequirement < Requirement
 
   def initialize(name = "xorg", tags = [])
     @name = name
-    if /(\d\.)+\d/ === tags.first
-      tags.shift
-    end
+    tags.shift if tags.first =~ /(\d\.)+\d/
     super(tags)
   end
 
-  satisfy :build_env => false do
+  satisfy build_env: false do
     Formula["linuxbrew/xorg/xorg"].installed?
   end
 end

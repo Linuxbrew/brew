@@ -433,8 +433,7 @@ class FormulaInstaller
       end
     end
 
-    expanded_deps = Dependency.merge_repeats(
-      bottle_dependencies(inherited_options) + expanded_deps) if poured_bottle
+    expanded_deps = Dependency.merge_repeats(bottle_dependencies(inherited_options) + expanded_deps) if poured_bottle
     expanded_deps.map { |dep| [dep, inherited_options[dep.name]] }
   end
 

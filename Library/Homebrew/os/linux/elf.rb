@@ -10,16 +10,16 @@ module ELF
       case header[0]
       when 0x7f454c46 # ELF
         arch = case read(2, 18).unpack("v")[0]
-          when 3 then :i386
-          when 62 then :x86_64
-          else :dunno
-          end
+        when 3 then :i386
+        when 62 then :x86_64
+        else :dunno
+        end
         type = case read(2, 16).unpack("v")[0]
-          when 2 then :executable
-          when 3 then :dylib
-          else :dunno
-          end
-        [{ :arch => arch, :type => type }]
+        when 2 then :executable
+        when 3 then :dylib
+        else :dunno
+        end
+        [{ arch: arch, type: type }]
       else
         raise "Not an ELF binary."
       end
@@ -38,15 +38,13 @@ module ELF
       @dylib_id = if path.dylib?
         command = ["patchelf", "--print-soname", path.expand_path.to_s]
         id = Utils.popen_read(*command).split("\n")
-        raise ErrorDuringExecution.new(command) unless $?.success?
+        raise ErrorDuringExecution, command unless $?.success?
         id
-      else
-        nil
       end
 
       command = ["ldd", path.expand_path.to_s]
       @dylibs = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution.new(command) unless $?.success?
+      raise ErrorDuringExecution, command unless $?.success?
       @dylibs.map! { |lib| lib[LDD_RX, 1] }.compact!
     end
   end

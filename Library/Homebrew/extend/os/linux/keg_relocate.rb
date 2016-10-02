@@ -1,5 +1,5 @@
 class Keg
-  def relocate_dynamic_linkage(old_prefix, new_prefix, old_cellar, new_cellar)
+  def relocate_dynamic_linkage(old_prefix, new_prefix, _old_cellar, _new_cellar)
     return if name == "glibc"
     elf_files.each do |file|
       file.ensure_writable do
@@ -23,20 +23,18 @@ class Keg
     return unless patchelf.installed?
     cmd = "#{patchelf.bin}/patchelf --set-rpath #{new_prefix}/lib"
     old_rpath = `#{patchelf.bin}/patchelf --print-rpath #{file}`.strip
-    raise ErrorDuringExecution.new(cmd) unless $?.success?
+    raise ErrorDuringExecution, cmd unless $?.success?
     lib_path = "#{new_prefix}/lib"
-    rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select do
-      |x| x.start_with?(new_prefix) || x.start_with?("$ORIGIN")
+    rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select do |x|
+      x.start_with?(new_prefix, "$ORIGIN")
     end
     rpath << lib_path unless rpath.include? lib_path
     new_rpath = rpath.join(":")
     cmd = ["#{patchelf.bin}/patchelf", "--set-rpath", new_rpath]
     if file.mach_o_executable?
       old_interpreter = `#{patchelf.bin}/patchelf --print-interpreter #{file}`.strip
-      raise ErrorDuringExecution.new(cmd) unless $?.success?
-      interpreter = new_prefix == PREFIX_PLACEHOLDER ?
-        "/lib64/ld-linux-x86-64.so.2" :
-        "#{HOMEBREW_PREFIX}/lib/ld.so"
+      raise ErrorDuringExecution, cmd unless $?.success?
+      interpreter = new_prefix == PREFIX_PLACEHOLDER ? "/lib64/ld-linux-x86-64.so.2" : "#{HOMEBREW_PREFIX}/lib/ld.so"
       cmd << "--set-interpreter" << interpreter unless old_interpreter == interpreter
     end
     cmd << file
@@ -65,5 +63,5 @@ class Keg
   end
 
   # For test/test_keg.rb
-  alias mach_o_files elf_files
+  alias_method :mach_o_files, :elf_files
 end

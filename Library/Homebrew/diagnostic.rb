@@ -466,17 +466,17 @@ module Homebrew
 
       def check_xdg_data_dirs
         share = "#{HOMEBREW_PREFIX}/share"
-        homebrew_in_xdg_data_dirs = !ENV["XDG_DATA_DIRS"] || ENV["XDG_DATA_DIRS"] == "" ||
+        homebrew_in_xdg_data_dirs =
+          !ENV["XDG_DATA_DIRS"] || ENV["XDG_DATA_DIRS"] == "" ||
           ENV["XDG_DATA_DIRS"].split(File::PATH_SEPARATOR).include?(share)
-        unless homebrew_in_xdg_data_dirs
-          <<-EOS.undent
+        return if homebrew_in_xdg_data_dirs
+        <<-EOS.undent
           Homebrew's share was not found in your XDG_DATA_DIRS but you have
           this variable set to include other locations.
           Some programs like `vapigen` may not work correctly.
           Consider setting the XDG_DATA_DIRS for example like so
               echo 'export XDG_DATA_DIRS="#{share}:$XDG_DATA_DIRS"' >> #{Utils::Shell.shell_profile}
         EOS
-        end
       end
 
       def check_user_curlrc
