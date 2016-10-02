@@ -85,7 +85,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
 
   def test_check_homebrew_prefix
     # the integration tests are run in a special prefix
-    assert_match "Your Homebrew is not installed to /usr/local",
+    assert_match "Your Homebrew's prefix is not /usr/local.",
       @checks.check_homebrew_prefix
   end
 
