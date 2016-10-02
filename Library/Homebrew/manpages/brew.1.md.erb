@@ -54,7 +54,21 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 <%= developer_commands.join("\n") %>
 
-## EXTERNAL COMMANDS
+## OFFICIAL EXTERNAL COMMANDS
+
+  * `bundle`:
+    Bundler for non-Ruby dependencies from Homebrew:
+    <https://github.com/Homebrew/homebrew-bundle>
+
+  * `cask`:
+    Install macOS applications distributed as binaries:
+    <https://github.com/caskroom/homebrew-cask>
+
+  * `services`:
+    Integrates Homebrew formulae with macOS's `launchctl` manager:
+    <https://github.com/Homebrew/homebrew-services>
+
+## CUSTOM EXTERNAL COMMANDS
 
 Homebrew, like `git`(1), supports external commands. These are executable
 scripts that reside somewhere in the `PATH`, named `brew-`<cmdname> or
@@ -251,7 +265,7 @@ If your proxy requires authentication:
 
 Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/docs/>
 
-`git`(1), `git-log`(1)
+`brew-cask`(1), `git`(1), `git-log`(1)
 
 ## AUTHORS
 
