@@ -25,7 +25,7 @@ module Homebrew
     end
 
     # --ignore-dependencies, to be consistent with install
-    unless ARGV.include?("--ignore-dependencies") || ARGV.homebrew_developer?
+    if !ARGV.include?("--ignore-dependencies") && !ARGV.homebrew_developer?
       all_kegs = kegs_by_rack.values.flatten(1)
       return if check_for_dependents all_kegs
     end
