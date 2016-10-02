@@ -110,8 +110,12 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_put_columns_empty
-    # Issue #217 put columns with no results fails.
-    assert_silent { puts_columns [] }
+    out, err = capture_io do
+      puts_columns []
+    end
+
+    assert_equal out, "\n"
+    assert_equal err, ""
   end
 
   def test_which
