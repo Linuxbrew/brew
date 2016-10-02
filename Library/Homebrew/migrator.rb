@@ -153,7 +153,7 @@ class Migrator
     end
 
     begin
-      oh1 "Migrating #{Tty.green}#{oldname}#{Tty.white} to #{Tty.green}#{newname}#{Tty.reset}"
+      oh1 "Migrating #{Formatter.identifier(oldname)} to #{Formatter.identifier(newname)}"
       lock
       unlink_oldname
       move_to_new_directory
@@ -200,7 +200,7 @@ class Migrator
   end
 
   def unlink_oldname
-    oh1 "Unlinking #{Tty.green}#{oldname}#{Tty.reset}"
+    oh1 "Unlinking #{Formatter.identifier(oldname)}"
     old_cellar.subdirs.each do |d|
       keg = Keg.new(d)
       keg.unlink
@@ -208,7 +208,7 @@ class Migrator
   end
 
   def link_newname
-    oh1 "Linking #{Tty.green}#{newname}#{Tty.reset}"
+    oh1 "Linking #{Formatter.identifier(newname)}"
     new_keg = Keg.new(new_linked_keg_record)
 
     # If old_keg wasn't linked then we just optlink a keg.

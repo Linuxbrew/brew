@@ -122,11 +122,11 @@ module Hbc
       end
 
       def self.notfound_string
-        "#{Tty.red}Not Found - Unknown Error#{Tty.reset}"
+        Formatter.error("Not Found - Unknown Error")
       end
 
       def self.error_string(string = "Error")
-        "#{Tty.red}(#{string})#{Tty.reset}"
+        Formatter.error("(#{string})")
       end
 
       def self.render_with_none(string)

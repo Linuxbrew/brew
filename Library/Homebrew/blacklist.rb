@@ -16,7 +16,7 @@ def blacklisted?(name)
     Homebrew provides pip via: `brew install python`. However you will then
     have two Pythons installed on your Mac, so alternatively you can install
     pip via the instructions at:
-      https://pip.readthedocs.io/en/stable/installing/
+      #{Formatter.url("https://pip.readthedocs.io/en/stable/installing/")}
     EOS
   when "pil" then <<-EOS.undent
     Instead of PIL, consider `pip install pillow` or `brew install Homebrew/python/pillow`.
@@ -24,7 +24,7 @@ def blacklisted?(name)
   when "macruby" then <<-EOS.undent
     MacRuby is not packaged and is on an indefinite development hiatus.
     You can read more about it at:
-      https://github.com/MacRuby/MacRuby
+      #{Formatter.url("https://github.com/MacRuby/MacRuby")}
     EOS
   when /(lib)?lzma/
     "lzma is now part of the xz formula."
@@ -50,7 +50,7 @@ def blacklisted?(name)
     To install Clojure you should install Leiningen:
       brew install leiningen
     and then follow the tutorial:
-      https://github.com/technomancy/leiningen/blob/stable/doc/TUTORIAL.md
+      #{Formatter.url("https://github.com/technomancy/leiningen/blob/stable/doc/TUTORIAL.md")}
     EOS
   when "osmium" then <<-EOS.undent
     The creator of Osmium requests that it not be packaged and that people
@@ -65,8 +65,8 @@ def blacklisted?(name)
       brew install typesafe-activator
 
     You can read more about this change at:
-      https://www.playframework.com/documentation/2.3.x/Migration23
-      https://www.playframework.com/documentation/2.3.x/Highlights23
+      #{Formatter.url("https://www.playframework.com/documentation/2.3.x/Migration23")}
+      #{Formatter.url("https://www.playframework.com/documentation/2.3.x/Highlights23")}
     EOS
   when "haskell-platform" then <<-EOS.undent
     We no longer package haskell-platform. Consider installing ghc

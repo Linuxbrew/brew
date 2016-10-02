@@ -473,7 +473,7 @@ module Homebrew
           If you have trouble downloading packages with Homebrew, then maybe this
           is the problem? If the following command doesn't work, then try removing
           your curlrc:
-            curl https://github.com
+            curl #{Formatter.url("https://github.com")}
         EOS
       end
 
@@ -610,7 +610,7 @@ module Homebrew
 
             Setting DYLD_INSERT_LIBRARIES can cause Go builds to fail.
             Having this set is common if you use this software:
-              http://asepsis.binaryage.com/
+              #{Formatter.url("http://asepsis.binaryage.com/")}
           EOS
         end
 
@@ -752,7 +752,7 @@ module Homebrew
             Without a correctly configured origin, Homebrew won't update
             properly. You can solve this by adding the Homebrew remote:
               cd #{HOMEBREW_REPOSITORY}
-              git remote add origin https://github.com/Homebrew/brew.git
+              git remote add origin #{Formatter.url("https://github.com/Homebrew/brew.git")}
           EOS
         elsif origin !~ %r{Homebrew/brew(\.git)?$}
           <<-EOS.undent
@@ -764,7 +764,7 @@ module Homebrew
 
             Unless you have compelling reasons, consider setting the
             origin remote to point at the main repository, located at:
-              https://github.com/Homebrew/brew.git
+              #{Formatter.url("https://github.com/Homebrew/brew.git")}
           EOS
         end
       end
@@ -956,8 +956,8 @@ module Homebrew
         <<-EOS.undent
           A .pydistutils.cfg file was found in $HOME, which may cause Python
           builds to fail. See:
-            https://bugs.python.org/issue6138
-            https://bugs.python.org/issue4655
+            #{Formatter.url("https://bugs.python.org/issue6138")}
+            #{Formatter.url("https://bugs.python.org/issue4655")}
         EOS
       end
 

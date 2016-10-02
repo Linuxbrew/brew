@@ -54,7 +54,7 @@ module Homebrew
 
       return if @put_filenames.include? filename
 
-      puts "#{Tty.red}#{filename}#{Tty.reset}"
+      puts Formatter.error(filename.to_s)
       @put_filenames << filename
     end
 
@@ -93,7 +93,7 @@ module Homebrew
       next unless ARGV.verbose? && !text_matches.empty?
       print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
-        puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.em}0x#{offset}#{Tty.reset}"
+        puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
       end
 
       if text_matches.size > MAXIMUM_STRING_MATCHES

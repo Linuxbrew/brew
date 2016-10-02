@@ -8,3 +8,11 @@ def shell_profile
   else "~/.bash_profile"
   end
 end
+
+module Tty
+  module_function
+
+  def white
+    reset.bold
+  end
+end

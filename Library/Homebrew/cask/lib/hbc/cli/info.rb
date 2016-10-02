@@ -18,16 +18,16 @@ module Hbc
 
       def self.info(cask)
         puts "#{cask.token}: #{cask.version}"
-        puts formatted_url(cask.homepage) if cask.homepage
+        puts Formatter.url(cask.homepage) if cask.homepage
         installation_info(cask)
-        puts "From: #{formatted_url(github_info(cask))}" if github_info(cask)
+        puts "From: #{Formatter.url(github_info(cask))}" if github_info(cask)
         name_info(cask)
         artifact_info(cask)
         Installer.print_caveats(cask)
       end
 
       def self.formatted_url(url)
-        "#{Tty.em}#{url}#{Tty.reset}"
+        "#{Tty.underline}#{url}#{Tty.reset}"
       end
 
       def self.installation_info(cask)
@@ -37,7 +37,7 @@ module Hbc
 
             puts versioned_staged_path.to_s
               .concat(" (")
-              .concat(versioned_staged_path.exist? ? versioned_staged_path.abv : "#{Tty.red}does not exist#{Tty.reset}")
+              .concat(versioned_staged_path.exist? ? versioned_staged_path.abv : Formatter.error("does not exist"))
               .concat(")")
           end
         else
@@ -47,7 +47,7 @@ module Hbc
 
       def self.name_info(cask)
         ohai cask.name.size > 1 ? "Names" : "Name"
-        puts cask.name.empty? ? "#{Tty.red}None#{Tty.reset}" : cask.name
+        puts cask.name.empty? ? Formatter.error("None") : cask.name
       end
 
       def self.github_info(cask)

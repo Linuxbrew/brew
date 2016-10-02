@@ -14,7 +14,7 @@ module GitHub
       super <<-EOS.undent
         GitHub API Error: #{error}
         Try again in #{pretty_ratelimit_reset(reset)}, or create a personal access token:
-          #{Tty.em}https://github.com/settings/tokens/new?scopes=&description=Homebrew#{Tty.reset}
+          #{Formatter.url("https://github.com/settings/tokens/new?scopes=&description=Homebrew")}
         and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
       EOS
     end
@@ -30,7 +30,7 @@ module GitHub
       if ENV["HOMEBREW_GITHUB_API_TOKEN"]
         message << <<-EOS.undent
           HOMEBREW_GITHUB_API_TOKEN may be invalid or expired; check:
-          #{Tty.em}https://github.com/settings/tokens#{Tty.reset}
+          #{Formatter.url("https://github.com/settings/tokens")}
         EOS
       else
         message << <<-EOS.undent
@@ -38,7 +38,7 @@ module GitHub
           Clear them with:
             printf "protocol=https\\nhost=github.com\\n" | git credential-osxkeychain erase
           Or create a personal access token:
-            #{Tty.em}https://github.com/settings/tokens/new?scopes=&description=Homebrew#{Tty.reset}
+            #{Formatter.url("https://github.com/settings/tokens/new?scopes=&description=Homebrew")}
           and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
         EOS
       end
@@ -106,14 +106,14 @@ module GitHub
           onoe <<-EOS.undent
             Your macOS keychain GitHub credentials do not have sufficient scope!
             Scopes they have: #{credentials_scopes}
-            Create a personal access token: https://github.com/settings/tokens
+            Create a personal access token: #{Formatter.url("https://github.com/settings/tokens")}
             and then set HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         when :environment
           onoe <<-EOS.undent
             Your HOMEBREW_GITHUB_API_TOKEN does not have sufficient scope!
             Scopes it has: #{credentials_scopes}
-            Create a new personal access token: https://github.com/settings/tokens
+            Create a new personal access token: #{Formatter.url("https://github.com/settings/tokens")}
             and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         end

@@ -79,9 +79,10 @@ module Homebrew
     else
       help_lines.map do |line|
         line.slice(2..-1)
-            .sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ")
-            .gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}")
-            .gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}")
+            .sub(/^  \* /, "#{Tty.bold}brew#{Tty.reset} ")
+            .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
+            .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
+            .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
             .gsub("@hide_from_man_page", "")
       end.join.strip
     end
