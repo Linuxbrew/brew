@@ -16,7 +16,14 @@
 
 module Homebrew
   def update_test
-    ENV["HOMEBREW_UPDATE_TO_TAG"] = "1" if ARGV.include?("--to-tag")
+    ENV["HOMEBREW_UPDATE_TEST"] = "1"
+
+    if ARGV.include?("--to-tag")
+      ENV["HOMEBREW_UPDATE_TO_TAG"] = "1"
+      branch = "stable"
+    else
+      branch = "master"
+    end
 
     cd HOMEBREW_REPOSITORY
     start_commit = if commit = ARGV.value("commit")
@@ -57,10 +64,10 @@ module Homebrew
       # run brew update
       oh1 "Running brew update..."
       safe_system "brew", "update", "--verbose"
-      actual_end_commit = Utils.popen_read("git", "rev-parse", "master").chomp
+      actual_end_commit = Utils.popen_read("git", "rev-parse", branch).chomp
       if start_commit != end_commit && start_commit == actual_end_commit
         raise <<-EOS.undent
-          brew update didn't update master!
+          brew update didn't update #{branch}!
           Start commit:        #{start_commit}
           Expected end commit: #{end_commit}
           Actual end commit:   #{actual_end_commit}
