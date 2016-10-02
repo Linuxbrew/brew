@@ -93,6 +93,7 @@ module Homebrew
       end
     end
 
+    return if uses.empty?
     puts_columns uses.map(&:full_name)
   end
 end

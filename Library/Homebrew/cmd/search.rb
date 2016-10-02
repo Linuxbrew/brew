@@ -59,9 +59,9 @@ module Homebrew
       query = ARGV.first
       regex = query_regexp(query)
       local_results = search_formulae(regex)
-      puts_columns(local_results)
+      puts_columns(local_results) unless local_results.empty?
       tap_results = search_taps(regex)
-      puts_columns(tap_results)
+      puts_columns(tap_results) unless tap_results.empty?
 
       if $stdout.tty?
         count = local_results.length + tap_results.length

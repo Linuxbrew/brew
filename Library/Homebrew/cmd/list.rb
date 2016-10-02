@@ -48,6 +48,7 @@ module Homebrew
             a <=> b
           end
         end
+        return if full_names.empty?
         puts_columns full_names
       else
         ENV["CLICOLOR"] = nil

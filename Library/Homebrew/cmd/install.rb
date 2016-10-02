@@ -179,7 +179,7 @@ module Homebrew
           ofail "No similarly named formulae found."
         when 1
           puts "This similarly named formula was found:"
-          puts_columns(formulae_search_results)
+          puts formulae_search_results
           puts "To install it, run:\n  brew install #{formulae_search_results.first}"
         else
           puts "These similarly named formulae were found:"
@@ -194,7 +194,7 @@ module Homebrew
           ofail "No formulae found in taps."
         when 1
           puts "This formula was found in a tap:"
-          puts_columns(taps_search_results)
+          puts taps_search_results
           puts "To install it, run:\n  brew install #{taps_search_results.first}"
         else
           puts "These formulae were found in taps:"
