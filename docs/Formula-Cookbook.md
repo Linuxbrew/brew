@@ -18,7 +18,7 @@ Homebrew uses Git for downloading updates and contributing to the project.
 
 Homebrew installs to the `Cellar` it then symlinks some of the installation into `/usr/local` so that other programs can see what's going on. We suggest you `brew ls` a few of the kegs in your Cellar to see how it is all arranged.
 
-Packages are installed according to their formulae, which live in `/usr/local/Library/Taps/homebrew/homebrew-core/Formula`. Check one out a simple one e.g. `brew edit etl` (or [etl](https://github.com/Homebrew/homebrew-core/blob/master/Formula/etl.rb)) or a more advanced one e.g. `brew edit git` or [Git](https://github.com/Homebrew/homebrew-core/blob/master/Formula/git.rb).
+Packages are installed according to their formulae, which live in `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula`. Check one out a simple one e.g. `brew edit etl` (or [etl](https://github.com/Homebrew/homebrew-core/blob/master/Formula/etl.rb)) or a more advanced one e.g. `brew edit git` or [Git](https://github.com/Homebrew/homebrew-core/blob/master/Formula/git.rb).
 
 # Basic Instructions
 
@@ -44,7 +44,7 @@ Run `brew create` with a URL to the source tarball:
 brew create https://example.com/foo-0.1.tar.gz
 ```
 
-This creates `/usr/local/Library/Taps/homebrew/homebrew-core/Formula/foo.rb` and opens it in your `$EDITOR`. It'll look something like:
+This creates `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/foo.rb` and opens it in your `$EDITOR`. It'll look something like:
 
 ```ruby
 class Foo < Formula
