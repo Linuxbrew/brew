@@ -21,4 +21,10 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
     assert_match "testball1 already installed, it's just not migrated",
       cmd("install", "testball2")
   end
+
+  def test_install_with_invalid_option
+    setup_test_formula "testball1"
+    assert_match "testball1: --with-fo is invalid for this formula and will be ignored!",
+      cmd("install", "testball1", "--with-fo")
+  end
 end

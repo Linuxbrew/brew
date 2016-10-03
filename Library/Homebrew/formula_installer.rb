@@ -32,7 +32,7 @@ class FormulaInstaller
   end
 
   attr_reader :formula
-  attr_accessor :options, :build_bottle
+  attr_accessor :options, :build_bottle, :invalid_opt_names
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :force_bottle
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
@@ -52,6 +52,7 @@ class FormulaInstaller
     @quieter = false
     @debug = false
     @options = Options.new
+    @invalid_opt_names = []
 
     @@attempted ||= Set.new
 
@@ -212,6 +213,10 @@ class FormulaInstaller
       old_flag = deprecated_option.old_flag
       new_flag = deprecated_option.current_flag
       opoo "#{formula.full_name}: #{old_flag} was deprecated; using #{new_flag} instead!"
+    end
+
+    invalid_opt_names.each do |option|
+      opoo "#{formula.full_name}: #{option} is invalid for this formula and will be ignored!"
     end
 
     oh1 "Installing #{Formatter.identifier(formula.full_name)}" if show_header?
