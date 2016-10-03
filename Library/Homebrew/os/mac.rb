@@ -41,8 +41,24 @@ module OS
       version.to_sym
     end
 
+    def languages
+      return @languages unless @languages.nil?
+
+      @languages = Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+
+      if ENV["HOMEBREW_LANGUAGES"]
+        @languages = ENV["HOMEBREW_LANGUAGES"].split(",") + @languages
+      end
+
+      if ARGV.value("language")
+        @languages = ARGV.value("language").split(",") + @languages
+      end
+
+      @languages = @languages.uniq
+    end
+
     def language
-      @language ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").delete(" \n\"()").sub(/,.*/, "")
+      languages.first
     end
 
     def active_developer_dir

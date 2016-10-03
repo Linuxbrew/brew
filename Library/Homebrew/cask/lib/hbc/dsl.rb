@@ -1,4 +1,5 @@
 require "set"
+require "locale"
 
 require "hbc/dsl/appcast"
 require "hbc/dsl/base"
@@ -64,6 +65,7 @@ module Hbc
                             :depends_on,
                             :gpg,
                             :homepage,
+                            :language,
                             :license,
                             :name,
                             :sha256,
@@ -96,6 +98,43 @@ module Hbc
     def homepage(homepage = nil)
       assert_only_one_stanza_allowed :homepage, !homepage.nil?
       @homepage ||= homepage
+    end
+
+    def language(*args, default: false, &block)
+      if !args.empty? && block_given?
+        @language_blocks ||= {}
+        @language_blocks[args] = block
+
+        return unless default
+
+        unless @language_blocks.default.nil?
+          raise CaskInvalidError.new(token, "Only one default language may be defined")
+        end
+
+        @language_blocks.default = block
+      else
+        language_eval
+      end
+    end
+
+    def language_eval
+      return @language if instance_variable_defined?(:@language)
+
+      if @language_blocks.nil? || @language_blocks.empty?
+        return @language = nil
+      end
+
+      MacOS.languages.map(&Locale.method(:parse)).each do |locale|
+        key = @language_blocks.keys.detect { |strings|
+          strings.any? { |string| locale.include?(string) }
+        }
+
+        next if key.nil?
+
+        return @language = @language_blocks[key].call
+      end
+
+      @language = @language_blocks.default.call
     end
 
     def url(*args, &block)

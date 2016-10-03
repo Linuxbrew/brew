@@ -8,7 +8,7 @@ module Hbc
         @command = command
       end
 
-      def_delegators :@cask, :token, :version, :caskroom_path, :staged_path, :appdir
+      def_delegators :@cask, :token, :version, :caskroom_path, :staged_path, :appdir, :language
 
       def system_command(executable, options = {})
         @command.run!(executable, options)
