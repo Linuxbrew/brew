@@ -217,7 +217,9 @@ merge_or_rebase() {
 
   if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
   then
-    UPSTREAM_TAG="$(git tag --list --sort=-version:refname | grep '^[0-9]*\.[0-9]*\.[0-9]*$' | head -n1)"
+    UPSTREAM_TAG="$(git tag --list |
+                    sort --field-separator=. --key=1,1nr -k 2,2nr -k 3,3nr |
+                    grep --max-count=1 '^[0-9]*\.[0-9]*\.[0-9]*$')"
   else
     UPSTREAM_TAG=""
   fi
