@@ -479,7 +479,7 @@ class Keg
     aliases.each do |a|
       alias_opt_record = opt_record.parent/a
       alias_opt_record.delete if alias_opt_record.symlink? || alias_opt_record.exist?
-      make_relative_symlink(alias_opt_record, opt_record, mode)
+      make_relative_symlink(alias_opt_record, path, mode)
     end
 
     return unless oldname_opt_record
