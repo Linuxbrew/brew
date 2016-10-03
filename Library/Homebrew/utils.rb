@@ -173,18 +173,6 @@ module Homebrew
     _system(cmd, *args)
   end
 
-  def core_tap_version_string
-    require "tap"
-    tap = CoreTap.instance
-    return "N/A" unless tap.installed?
-    if pretty_revision = tap.git_short_head
-      last_commit = tap.git_last_commit_date
-      "(git revision #{pretty_revision}; last commit #{last_commit})"
-    else
-      "(no git repository)"
-    end
-  end
-
   def install_gem_setup_path!(name, version = nil, executable = name)
     # Respect user's preferences for where gems should be installed.
     ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
