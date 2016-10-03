@@ -42,8 +42,8 @@ class BuildOptionsTests < Homebrew::TestCase
     refute_includes @bad_build.invalid_options, "--with-baz"
   end
 
-  def test_invalid_opt_names
-    assert_empty @build.invalid_opt_names
-    assert_equal @bad_build.invalid_opt_names, %w[--without-abc --without-bas]
+  def test_invalid_option_names
+    assert_empty @build.invalid_option_names
+    assert_equal @bad_build.invalid_option_names, %w[--without-abc --without-bas]
   end
 end
