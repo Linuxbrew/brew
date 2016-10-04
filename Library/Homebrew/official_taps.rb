@@ -18,6 +18,6 @@ OFFICIAL_TAPS = %w[
 
 OFFICIAL_CMD_TAPS = {
   "homebrew/bundle" => ["bundle"],
-  "homebrew/test-bot" => ["test-bot"],
+  (OS.mac? ? "homebrew/test-bot" : "linuxbrew/test-bot") => ["test-bot"],
   "homebrew/services" => ["services"],
 }.freeze
