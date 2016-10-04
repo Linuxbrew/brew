@@ -63,5 +63,5 @@ class Keg
   end
 
   # For test/test_keg.rb
-  alias_method :mach_o_files, :elf_files
+  alias mach_o_files elf_files
 end
