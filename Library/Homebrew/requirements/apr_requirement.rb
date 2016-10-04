@@ -4,16 +4,17 @@ class AprRequirement < Requirement
   fatal true
   default_formula "apr-util"
 
-  # APR shipped in Tiger is too old, but Leopard+ is usable
-  satisfy(build_env: false) { MacOS.version > :leopard && MacOS::CLT.installed? }
+  # APR shipped in Tiger is too old, but Leopard+ is usable.
+  # The *-config scripts were removed in Sierra, which is widely breaking.
+  satisfy(build_env: false) do
+    MacOS.version > :leopard && MacOS.version < :sierra && MacOS::CLT.installed?
+  end
 
   env do
-    unless MacOS::CLT.installed?
-      ENV.prepend_path "PATH", Formula["apr-util"].opt_bin
-      ENV.prepend_path "PATH", Formula["apr"].opt_bin
-      ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr"].opt_libexec}/lib/pkgconfig"
-      ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr-util"].opt_libexec}/lib/pkgconfig"
-    end
+    ENV.prepend_path "PATH", Formula["apr-util"].opt_bin
+    ENV.prepend_path "PATH", Formula["apr"].opt_bin
+    ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr"].opt_libexec}/lib/pkgconfig"
+    ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr-util"].opt_libexec}/lib/pkgconfig"
   end
 
   def to_dependency
