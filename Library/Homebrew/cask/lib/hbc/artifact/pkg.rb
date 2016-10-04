@@ -1,5 +1,7 @@
 require "hbc/artifact/base"
 
+require "hbc/utils/hash_validator"
+
 module Hbc
   module Artifact
     class Pkg < Base
@@ -14,7 +16,7 @@ module Hbc
         @pkg_install_opts = pkg_description.shift
         begin
           if @pkg_install_opts.respond_to?(:keys)
-            @pkg_install_opts.assert_valid_keys(:allow_untrusted)
+            @pkg_install_opts.extend(HashValidator).assert_valid_keys(:allow_untrusted)
           elsif @pkg_install_opts
             raise
           end
