@@ -535,7 +535,7 @@ manpages (to allow comparison without factoring in the date).</p></dd>
 </dl>
 
 
-<p> <code>pull</code> [<code>--bottle</code>] [<code>--bump</code>] [<code>--clean</code>] [<code>--ignore-whitespace</code>] [<code>--resolve</code>] [<code>--branch-okay</code>] [<code>--no-pbcopy</code>] [<code>--no-publish</code>] <var>patch-source</var> [<var>patch-source</var>]</p>
+<p> <code>pull</code> [<code>--bottle</code>] [<code>--bump</code>] [<code>--clean</code>] [<code>--ignore-whitespace</code>] [<code>--resolve</code>] [<code>--branch-okay</code>] [<code>--tap</code>] [<code>--no-pbcopy</code>] [<code>--no-publish</code>] <var>patch-source</var> [<var>patch-source</var>]</p>
 
 <pre><code>Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 Optionally, installs the formulae changed by the patch.
@@ -563,6 +563,7 @@ Each &lt;patch-source> may be one of:
                   resolve, instead of aborting.
    If <code>--branch-okay</code> was passed, do not warn if pulling to a branch
    besides master (useful for testing).
+   If <code>--tap</code> is passed, use the git repository of the given tap.
    If <code>--no-pbcopy</code> was passed, do not copy anything to the system
    If <code>--no-publish</code> was passed, do not publish bottles to Bintray.</p>
 

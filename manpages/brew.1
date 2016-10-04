@@ -733,7 +733,7 @@ Generate Homebrew\'s manpages\.
 If \fB\-\-fail\-if\-changed\fR is passed, the command will return a failing status code if changes are detected in the manpage outputs\. This can be used for CI to be notified when the manpages are out of date\. Additionally, the date used in new manpages will match those in the existing manpages (to allow comparison without factoring in the date)\.
 .
 .P
-\fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]
+\fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-tap\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]
 .
 .IP "" 4
 .
@@ -756,7 +756,7 @@ Each <patch\-source> may be one of:
 .IP "" 0
 .
 .P
-If \fB\-\-bottle\fR was passed, handle bottles, pulling the bottle\-update commit and publishing files on Bintray\. If \fB\-\-bump\fR was passed, for one\-formula PRs, automatically reword commit message to our preferred format\. If \fB\-\-clean\fR was passed, do not rewrite or otherwise modify the commits found in the pulled PR\. If \fB\-\-ignore\-whitespace\fR was passed, silently ignore whitespace discrepancies when applying diffs\. If \fB\-\-resolve\fR was passed, when a patch fails to apply, leave in progress and allow user to resolve, instead of aborting\. If \fB\-\-branch\-okay\fR was passed, do not warn if pulling to a branch besides master (useful for testing)\. If \fB\-\-no\-pbcopy\fR was passed, do not copy anything to the system If \fB\-\-no\-publish\fR was passed, do not publish bottles to Bintray\.
+If \fB\-\-bottle\fR was passed, handle bottles, pulling the bottle\-update commit and publishing files on Bintray\. If \fB\-\-bump\fR was passed, for one\-formula PRs, automatically reword commit message to our preferred format\. If \fB\-\-clean\fR was passed, do not rewrite or otherwise modify the commits found in the pulled PR\. If \fB\-\-ignore\-whitespace\fR was passed, silently ignore whitespace discrepancies when applying diffs\. If \fB\-\-resolve\fR was passed, when a patch fails to apply, leave in progress and allow user to resolve, instead of aborting\. If \fB\-\-branch\-okay\fR was passed, do not warn if pulling to a branch besides master (useful for testing)\. If \fB\-\-tap\fR is passed, use the git repository of the given tap\. If \fB\-\-no\-pbcopy\fR was passed, do not copy anything to the system If \fB\-\-no\-publish\fR was passed, do not publish bottles to Bintray\.
 .
 .TP
 \fBtap_readme\fR [\fB\-v\fR] \fIname\fR
