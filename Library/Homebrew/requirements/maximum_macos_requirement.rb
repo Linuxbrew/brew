@@ -16,4 +16,8 @@ class MaximumMacOSRequirement < Requirement
       versions newer than #{@version.pretty_name} due to an upstream incompatibility.
     EOS
   end
+
+  def display_s
+    "macOS <= #{@version}"
+  end
 end

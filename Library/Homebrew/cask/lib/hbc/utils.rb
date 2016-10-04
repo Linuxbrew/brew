@@ -32,12 +32,7 @@ end
 def odebug(title, *sput)
   return unless Hbc.respond_to?(:debug)
   return unless Hbc.debug
-
-  width = Tty.width * 4 - 6
-  if $stdout.tty? && title.to_s.length > width
-    title = title.to_s[0, width - 3] + "..."
-  end
-  puts "#{Tty.magenta}==>#{Tty.reset} #{Tty.white}#{title}#{Tty.reset}"
+  puts Formatter.headline(title, color: :magenta)
   puts sput unless sput.empty?
 end
 
@@ -151,12 +146,10 @@ module Hbc
     def self.error_message_with_suggestions
       <<-EOS.undent
         Most likely, this means you have an outdated version of Homebrew-Cask. Please run:
+          #{UPDATE_CMD}
 
-            #{Tty.green}#{UPDATE_CMD}
-
-        #{Tty.reset}If this doesn’t fix the problem, please report this bug:
-
-            #{Tty.em}#{ISSUES_URL}#{Tty.reset}
+        If this doesn’t fix the problem, please report this bug:
+          #{Formatter.url(ISSUES_URL)}
 
       EOS
     end

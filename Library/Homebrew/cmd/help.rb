@@ -39,6 +39,8 @@ module Homebrew
     if cmd
       cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
       path = Commands.path(cmd)
+      path ||= which("brew-#{cmd}")
+      path ||= which("brew-#{cmd}.rb")
     end
 
     # Display command-specific (or generic) help in response to `UsageError`.
@@ -61,7 +63,7 @@ module Homebrew
       exit 0
     end
 
-    # Resume execution in `brew.rb` for external/unknown commands.
+    # Resume execution in `brew.rb` for unknown commands.
     return if path.nil?
 
     # Display help for internal command (or generic help if undocumented).
@@ -79,9 +81,10 @@ module Homebrew
     else
       help_lines.map do |line|
         line.slice(2..-1)
-            .sub(/^  \* /, "#{Tty.highlight}brew#{Tty.reset} ")
-            .gsub(/`(.*?)`/, "#{Tty.highlight}\\1#{Tty.reset}")
-            .gsub(/<(.*?)>/, "#{Tty.em}\\1#{Tty.reset}")
+            .sub(/^  \* /, "#{Tty.bold}brew#{Tty.reset} ")
+            .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
+            .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
+            .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")
             .gsub("@hide_from_man_page", "")
       end.join.strip
     end

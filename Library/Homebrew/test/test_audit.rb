@@ -67,7 +67,9 @@ class FormulaAuditorTests < Homebrew::TestCase
 
   def formula_auditor(name, text, options = {})
     path = Pathname.new "#{@dir}/#{name}.rb"
-    path.open("w") { |f| f.write text }
+    path.open("w") do |f|
+      f.write text
+    end
     FormulaAuditor.new Formulary.factory(path), options
   end
 

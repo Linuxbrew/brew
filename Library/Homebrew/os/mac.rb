@@ -9,9 +9,9 @@ require "os/mac/keg"
 
 module OS
   module Mac
-    extend self
+    module_function
 
-    ::MacOS = self # compatibility
+    ::MacOS = self # rubocop:disable Style/ConstantName
 
     raise "Loaded OS::Mac on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
 
@@ -42,8 +42,24 @@ module OS
       version.to_sym
     end
 
+    def languages
+      return @languages unless @languages.nil?
+
+      @languages = Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+
+      if ENV["HOMEBREW_LANGUAGES"]
+        @languages = ENV["HOMEBREW_LANGUAGES"].split(",") + @languages
+      end
+
+      if ARGV.value("language")
+        @languages = ARGV.value("language").split(",") + @languages
+      end
+
+      @languages = @languages.uniq
+    end
+
     def language
-      @language ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").delete(" \n\"()").sub(/,.*/, "")
+      languages.first
     end
 
     def active_developer_dir

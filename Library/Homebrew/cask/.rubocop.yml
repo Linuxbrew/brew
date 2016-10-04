@@ -9,7 +9,7 @@ Metrics/AbcSize:
   Enabled: false
 
 Metrics/ClassLength:
-    Enabled: false
+  Enabled: false
 
 Metrics/CyclomaticComplexity:
   Enabled: false

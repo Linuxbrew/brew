@@ -101,6 +101,11 @@ module Superenv
          getentropy mkostemp mkostemps].each do |s|
         ENV["ac_cv_func_#{s}"] = "no"
       end
+
+      ENV["ac_cv_search_clock_gettime"] = "no"
+
+      # works around libev.m4 unsetting ac_cv_func_clock_gettime
+      ENV["ac_have_clock_syscall"] = "no"
     end
 
     # On 10.9, the tools in /usr/bin proxy to the active developer directory.

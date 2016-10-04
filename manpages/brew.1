@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "September 2016" "Homebrew" "brew"
+.TH "BREW" "1" "October 2016" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -656,7 +656,7 @@ Generate a bottle (binary package) from a formula installed with \fB\-\-build\-b
 Creates a pull request to update the formula with a new url or a new tag\.
 .
 .IP
-If a \fIurl\fR is specified, the \fIsha\-256\fR checksum of the new download must also be specified\.
+If a \fIurl\fR is specified, the \fIsha\-256\fR checksum of the new download must also be specified\. A best effort to determine the \fIsha\-256\fR and \fIformula\fR name will be made if either or both values are not supplied by the user\.
 .
 .IP
 If a \fItag\fR is specified, the git commit \fIrevision\fR corresponding to that tag must also be specified\.
@@ -668,10 +668,19 @@ If \fB\-\-devel\fR is passed, bump the development rather than stable version\. 
 If \fB\-\-dry\-run\fR is passed, print what would be done rather than doing it\.
 .
 .IP
+If \fB\-\-write\fR is passed along with \fB\-\-dry\-run\fR, perform a not\-so\-dry run making the expected file modifications but not taking any git actions\.
+.
+.IP
 If \fB\-\-audit\fR is passed, run \fBbrew audit\fR before opening the PR\.
 .
 .IP
 If \fB\-\-strict\fR is passed, run \fBbrew audit \-\-strict\fR before opening the PR\.
+.
+.IP
+If \fB\-\-mirror=\fR\fIurl\fR is passed, use the value as a mirror url\.
+.
+.IP
+If \fB\-\-version=\fR\fIversion\fR is passed, use the value to override the value parsed from the url or tag\. Note that \fB\-\-version=0\fR can be used to delete an existing \fBversion\fR override from a formula if it has become redundant\.
 .
 .IP
 Note that this command cannot be used to transition a formula from a url\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.
@@ -717,8 +726,11 @@ If \fB\-\-test\fR is passed, only display missing libraries and exit with a non\
 If \fB\-\-reverse\fR is passed, print the dylib followed by the binaries which link to it for each library the keg references\.
 .
 .TP
-\fBman\fR
+\fBman\fR [\fB\-\-fail\-if\-changed\fR]
 Generate Homebrew\'s manpages\.
+.
+.IP
+If \fB\-\-fail\-if\-changed\fR is passed, the command will return a failing status code if changes are detected in the manpage outputs\. This can be used for CI to be notified when the manpages are out of date\. Additionally, the date used in new manpages will match those in the existing manpages (to allow comparison without factoring in the date)\.
 .
 .P
 \fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]
@@ -784,9 +796,26 @@ If \fB\-\-commit=<commit>\fR is passed, use \fB<commit>\fR as the start commit\.
 If \fB\-\-before=<date>\fR is passed, use the commit at \fB<date>\fR as the start commit\.
 .
 .IP
+If \fB\-\-to\-tag\fR is passed, set HOMEBREW_UPDATE_TO_TAG to test updating between tags\.
+.
+.IP
 If \fB\-\-keep\-tmp\fR is passed, retain the temporary directory containing the new repository clone\.
 .
-.SH "EXTERNAL COMMANDS"
+.SH "OFFICIAL EXTERNAL COMMANDS"
+.
+.TP
+\fBbundle\fR
+Bundler for non\-Ruby dependencies from Homebrew: \fIhttps://github\.com/Homebrew/homebrew\-bundle\fR
+.
+.TP
+\fBcask\fR
+Install macOS applications distributed as binaries: \fIhttps://github\.com/caskroom/homebrew\-cask\fR
+.
+.TP
+\fBservices\fR
+Integrates Homebrew formulae with macOS\'s \fBlaunchctl\fR manager: \fIhttps://github\.com/Homebrew/homebrew\-services\fR
+.
+.SH "CUSTOM EXTERNAL COMMANDS"
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
 .
 .P
@@ -992,7 +1021,7 @@ http_proxy=http://<user>:<password>@<host>:<port> brew install foo
 Homebrew Documentation: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/\fR
 .
 .P
-\fBgit\fR(1), \fBgit\-log\fR(1)
+\fBbrew\-cask\fR(1), \fBgit\fR(1), \fBgit\-log\fR(1)
 .
 .SH "AUTHORS"
 Homebrew\'s lead maintainer is Mike McQuaid\.

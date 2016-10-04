@@ -217,7 +217,8 @@ merge_or_rebase() {
 
   if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -n "$HOMEBREW_UPDATE_TO_TAG" ]]
   then
-    UPSTREAM_TAG="$(git tag --list --sort=-version:refname |
+    UPSTREAM_TAG="$(git tag --list |
+                    sort --field-separator=. --key=1,1nr -k 2,2nr -k 3,3nr |
                     grep --max-count=1 '^[0-9]*\.[0-9]*\.[0-9]*$')"
   else
     UPSTREAM_TAG=""
@@ -477,7 +478,7 @@ EOS
         then
           # Only try to `git fetch` when the upstream tags have changed
           # (so the API does not return 304: unmodified).
-          GITHUB_API_ETAG="$(sed -n 's/^ETag: "\([a-f0-9]\{32\}\)".*/\1/p' ".git/GITHUB_HEADERS")"
+          GITHUB_API_ETAG="$(sed -n 's/^ETag: "\([a-f0-9]\{32\}\)".*/\1/p' ".git/GITHUB_HEADERS" 2>/dev/null)"
           GITHUB_API_ACCEPT="application/vnd.github.v3+json"
           GITHUB_API_ENDPOINT="tags"
         else

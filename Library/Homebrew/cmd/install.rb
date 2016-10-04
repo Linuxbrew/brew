@@ -199,16 +199,6 @@ module Homebrew
           puts_columns(taps_search_results)
           puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
         end
-
-        # If they haven't updated in 48 hours (172800 seconds), that
-        # might explain the error
-        master = HOMEBREW_REPOSITORY/".git/refs/heads/master"
-        return unless master.exist? && (Time.now.to_i - File.mtime(master).to_i) > 172800
-        ohai "You haven't updated Homebrew in a while."
-        puts <<-EOS.undent
-          A formula for #{e.name} might have been added recently.
-          Run `brew update` to get the latest Homebrew updates!
-        EOS
       end
     end
   end

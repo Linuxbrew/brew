@@ -44,9 +44,9 @@ module Homebrew
   def keg_contain?(string, keg, ignores)
     @put_string_exists_header, @put_filenames = nil
 
-    def print_filename(string, filename)
+    print_filename = lambda do |str, filename|
       unless @put_string_exists_header
-        opoo "String '#{string}' still exists in these files:"
+        opoo "String '#{str}' still exists in these files:"
         @put_string_exists_header = true
       end
 
@@ -54,7 +54,7 @@ module Homebrew
 
       return if @put_filenames.include? filename
 
-      puts "#{Tty.red}#{filename}#{Tty.reset}"
+      puts Formatter.error(filename.to_s)
       @put_filenames << filename
     end
 
@@ -68,9 +68,9 @@ module Homebrew
       result ||= !linked_libraries.empty?
 
       if ARGV.verbose?
-        print_filename(string, file) unless linked_libraries.empty?
+        print_filename.call(string, file) unless linked_libraries.empty?
         linked_libraries.each do |lib|
-          puts " #{Tty.gray}-->#{Tty.reset} links to #{lib}"
+          puts " #{Tty.bold}-->#{Tty.reset} links to #{lib}"
         end
       end
 
@@ -91,9 +91,9 @@ module Homebrew
       end
 
       next unless ARGV.verbose? && !text_matches.empty?
-      print_filename string, file
+      print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
-        puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.em}0x#{offset}#{Tty.reset}"
+        puts " #{Tty.bold}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
       end
 
       if text_matches.size > MAXIMUM_STRING_MATCHES

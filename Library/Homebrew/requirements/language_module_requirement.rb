@@ -51,4 +51,8 @@ class LanguageModuleRequirement < Requirement
     when :ruby    then "gem install"
     end
   end
+
+  def display_s
+    "#{@module_name} (#{@language} module)"
+  end
 end

@@ -1,5 +1,11 @@
-#:  * `man`:
+#:  * `man` [`--fail-if-changed`]:
 #:    Generate Homebrew's manpages.
+#:
+#:    If `--fail-if-changed` is passed, the command will return a failing
+#:    status code if changes are detected in the manpage outputs.
+#:    This can be used for CI to be notified when the manpages are out of date.
+#:    Additionally, the date used in new manpages will match those in the existing
+#:    manpages (to allow comparison without factoring in the date).
 
 require "formula"
 require "erb"
@@ -17,6 +23,12 @@ module Homebrew
       odie "`brew man --link` is now done automatically by `brew update`."
     else
       regenerate_man_pages
+    end
+
+    if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/brew.1.html", "manpages"
+      puts "No changes to manpage output detected."
+    elsif ARGV.include?("--fail-if-changed")
+      Homebrew.failed = true
     end
   end
 
@@ -68,10 +80,25 @@ module Homebrew
   end
 
   def convert_man_page(markup, target)
+    manual = target.basename(".1")
+    organisation = "Homebrew"
+
+    # Set the manpage date to the existing one if we're checking for changes.
+    # This avoids the only change being e.g. a new date.
+    date = if ARGV.include?("--fail-if-changed") &&
+              target.extname == ".1" && target.exist?
+      /"(\d{1,2})" "([A-Z][a-z]+) (\d{4})" "#{organisation}" "#{manual}"/ =~ target.read
+      Date.parse("#{$1} #{$2} #{$3}")
+    else
+      Date.today
+    end
+    date = date.strftime("%Y-%m-%d")
+
     shared_args = %W[
       --pipe
-      --organization=Homebrew
+      --organization=#{organisation}
       --manual=#{target.basename(".1")}
+      --date=#{date}
     ]
 
     format_flag, format_desc = target_path_to_format(target)

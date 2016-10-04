@@ -111,7 +111,7 @@ module Debrew
 
     begin
       puts e.backtrace.first.to_s
-      puts "#{Tty.red}#{e.class.name}#{Tty.reset}: #{e}"
+      puts Formatter.error(e, label: e.class.name)
 
       loop do
         Menu.choose do |menu|

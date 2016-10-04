@@ -65,8 +65,8 @@ module Homebrew
         return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
 
         message = <<-EOS.undent
-          Your Xcode (#{MacOS::Xcode.version}) is outdated
-          Please update to Xcode #{MacOS::Xcode.latest_version}.
+          Your Xcode (#{MacOS::Xcode.version}) is outdated.
+          Please update to Xcode #{MacOS::Xcode.latest_version} (or delete it).
           #{MacOS::Xcode.update_instructions}
         EOS
 
@@ -171,8 +171,7 @@ module Homebrew
       end
 
       def check_ruby_version
-        ruby_version = MacOS.version >= "10.9" ? "2.0" : "1.8"
-        return if RUBY_VERSION[/\d\.\d/] == ruby_version
+        return if RUBY_VERSION[/\d\.\d/] == "2.0"
 
         <<-EOS.undent
           Ruby version #{RUBY_VERSION} is unsupported on #{MacOS.version}. Homebrew
@@ -264,8 +263,8 @@ module Homebrew
         return if installed_version >= latest_version
 
         <<-EOS.undent
-          Your XQuartz (#{installed_version}) is outdated
-          Please install XQuartz #{latest_version}:
+          Your XQuartz (#{installed_version}) is outdated.
+          Please install XQuartz #{latest_version} (or delete it):
             https://xquartz.macosforge.org
         EOS
       end

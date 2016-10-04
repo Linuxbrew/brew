@@ -119,12 +119,12 @@ class Descriptions
   # Take search results -- a hash mapping formula names to descriptions -- and
   # print them.
   def print
-    blank = "#{Tty.yellow}[no description]#{Tty.reset}"
+    blank = Formatter.warning("[no description]")
     @descriptions.keys.sort.each do |full_name|
       short_name = short_names[full_name]
       printed_name = short_name_counts[short_name] == 1 ? short_name : full_name
       description = @descriptions[full_name] || blank
-      puts "#{Tty.white}#{printed_name}:#{Tty.reset} #{description}"
+      puts "#{Tty.bold}#{printed_name}:#{Tty.reset} #{description}"
     end
   end
 

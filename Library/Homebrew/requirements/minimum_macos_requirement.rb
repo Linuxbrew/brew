@@ -13,4 +13,8 @@ class MinimumMacOSRequirement < Requirement
   def message
     "macOS #{@version.pretty_name} or newer is required."
   end
+
+  def display_s
+    "macOS >= #{@version}"
+  end
 end

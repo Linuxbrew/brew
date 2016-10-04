@@ -106,7 +106,11 @@ module Homebrew
     names = if ARGV.named.empty?
       Formula.racks
     else
-      ARGV.named.map { |n| HOMEBREW_CELLAR+n }.select(&:exist?)
+      racks = ARGV.named.map { |n| HOMEBREW_CELLAR+n }
+      racks.select do |rack|
+        Homebrew.failed = true unless rack.exist?
+        rack.exist?
+      end
     end
     if ARGV.include? "--pinned"
       pinned_versions = {}
@@ -140,6 +144,8 @@ class PrettyListing
           # dylibs have multiple symlinks and we don't care about them
           (pnn.extname == ".dylib" || pnn.extname == ".pc") && !pnn.symlink?
         end
+      when ".brew"
+        # Ignore .brew
       else
         if pn.directory?
           if pn.symlink?

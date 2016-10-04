@@ -224,7 +224,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
     case cached_location.compression_type
     when :zip
-      with_system_path { quiet_safe_system "unzip", { quiet_flag: "-qq" }, cached_location }
+      with_system_path { quiet_safe_system "unzip", "-qq", cached_location }
       chdir
     when :gzip_only
       with_system_path { buffered_write("gunzip") }
@@ -252,7 +252,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     when :xar
       safe_system "/usr/bin/xar", "-xf", cached_location
     when :rar
-      quiet_safe_system "unrar", "x", { quiet_flag: "-inul" }, cached_location
+      quiet_safe_system "unrar", "x", "-inul", cached_location
     when :p7zip
       safe_system "7zr", "x", cached_location
     else

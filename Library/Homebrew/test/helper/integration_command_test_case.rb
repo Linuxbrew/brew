@@ -76,7 +76,9 @@ class IntegrationCommandTestCase < Homebrew::TestCase
       ENV["HOMEBREW_BREW_FILE"] = HOMEBREW_PREFIX/"bin/brew"
       ENV["HOMEBREW_INTEGRATION_TEST"] = cmd_id_from_args(args)
       ENV["HOMEBREW_TEST_TMPDIR"] = TEST_TMPDIR
-      env.each_pair { |k, v| ENV[k] = v }
+      env.each_pair do |k, v|
+        ENV[k] = v
+      end
 
       read, write = IO.pipe
       begin

@@ -75,12 +75,9 @@ begin
   end
 
   # Usage instructions should be displayed if and only if one of:
-  # - a help flag is passed AND an internal command is matched
+  # - a help flag is passed AND a command is matched
   # - a help flag is passed AND there is no command specified
   # - no arguments are passed
-  #
-  # It should never affect external commands so they can handle usage
-  # arguments themselves.
   if empty_argv || help_flag
     require "cmd/help"
     Homebrew.help cmd, empty_argv: empty_argv
@@ -147,8 +144,8 @@ rescue Exception => e
   Utils::Analytics.report_exception(e)
   onoe e
   if internal_cmd && defined?(OS::ISSUES_URL)
-    $stderr.puts "#{Tty.white}Please report this bug:"
-    $stderr.puts "    #{Tty.em}#{OS::ISSUES_URL}#{Tty.reset}"
+    $stderr.puts "#{Tty.bold}Please report this bug:#{Tty.reset}"
+    $stderr.puts "  #{Formatter.url(OS::ISSUES_URL)}"
   end
   $stderr.puts e.backtrace
   exit 1

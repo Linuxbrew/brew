@@ -1,7 +1,7 @@
 module OS
   module Mac
     module Xcode
-      extend self
+      module_function
 
       V4_BUNDLE_ID = "com.apple.dt.Xcode".freeze
       V3_BUNDLE_ID = "com.apple.Xcode".freeze
