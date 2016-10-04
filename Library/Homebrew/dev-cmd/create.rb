@@ -24,6 +24,8 @@ require "digest"
 require "erb"
 
 module Homebrew
+  module_function
+
   # Create a formula from a tarball URL
   def create
     # Allow searching MacPorts or Fink.

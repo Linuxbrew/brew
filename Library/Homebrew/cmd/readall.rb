@@ -9,6 +9,8 @@
 require "readall"
 
 module Homebrew
+  module_function
+
   def readall
     if ARGV.include?("--syntax")
       ruby_files = []

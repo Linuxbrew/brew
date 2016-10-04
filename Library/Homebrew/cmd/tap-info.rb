@@ -18,6 +18,8 @@
 require "tap"
 
 module Homebrew
+  module_function
+
   def tap_info
     if ARGV.include? "--installed"
       taps = Tap
@@ -33,8 +35,6 @@ module Homebrew
       print_tap_info(taps)
     end
   end
-
-  private
 
   def print_tap_info(taps)
     if taps.none?

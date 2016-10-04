@@ -40,6 +40,8 @@ require "version"
 require "pkg_version"
 
 module Homebrew
+  module_function
+
   def pull
     odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
 
@@ -234,8 +236,6 @@ module Homebrew
   def force_utf8!(str)
     str.force_encoding("UTF-8") if str.respond_to?(:force_encoding)
   end
-
-  private
 
   def publish_changed_formula_bottles(_tap, changed_formulae_names)
     if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]

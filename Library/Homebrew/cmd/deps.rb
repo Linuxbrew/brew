@@ -42,6 +42,8 @@ require "formula"
 require "ostruct"
 
 module Homebrew
+  module_function
+
   def deps
     mode = OpenStruct.new(
       installed?: ARGV.include?("--installed"),

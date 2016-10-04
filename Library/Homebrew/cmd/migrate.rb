@@ -8,6 +8,8 @@
 require "migrator"
 
 module Homebrew
+  module_function
+
   def migrate
     raise FormulaUnspecifiedError if ARGV.named.empty?
 

@@ -34,6 +34,8 @@
 require "tap"
 
 module Homebrew
+  module_function
+
   def tap
     if ARGV.include? "--repair"
       Tap.each(&:link_manpages)

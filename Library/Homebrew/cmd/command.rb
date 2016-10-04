@@ -4,6 +4,8 @@
 require "commands"
 
 module Homebrew
+  module_function
+
   def command
     abort "This command requires a command argument" if ARGV.empty?
     cmd = ARGV.first

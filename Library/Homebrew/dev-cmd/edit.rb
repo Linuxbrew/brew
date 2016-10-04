@@ -7,6 +7,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def edit
     unless (HOMEBREW_REPOSITORY/".git").directory?
       raise <<-EOS.undent

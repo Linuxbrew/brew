@@ -4,6 +4,8 @@
 require "tap"
 
 module Homebrew
+  module_function
+
   def untap
     raise "Usage is `brew untap <tap-name>`" if ARGV.empty?
 

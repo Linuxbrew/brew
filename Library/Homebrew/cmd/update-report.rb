@@ -10,6 +10,8 @@ require "cleanup"
 require "utils"
 
 module Homebrew
+  module_function
+
   def update_preinstall_header
     @header_already_printed ||= begin
       ohai "Auto-updated Homebrew!" if ARGV.include?("--preinstall")
@@ -105,8 +107,6 @@ module Homebrew
       migrate_legacy_repository_if_necessary
     end
   end
-
-  private
 
   def shorten_revision(revision)
     Utils.popen_read("git", "-C", HOMEBREW_REPOSITORY, "rev-parse", "--short", revision).chomp

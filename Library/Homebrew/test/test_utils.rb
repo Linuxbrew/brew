@@ -60,7 +60,7 @@ class UtilTests < Homebrew::TestCase
 
   def test_ofail
     shutup { ofail "foo" }
-    assert Homebrew.failed
+    assert Homebrew.failed?
   ensure
     Homebrew.failed = false
   end
