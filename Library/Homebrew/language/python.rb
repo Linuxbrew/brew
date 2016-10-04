@@ -215,6 +215,13 @@ module Language
             f.unlink
             f.make_symlink new_target
           end
+
+          Pathname.glob(@venv_root/"lib/python*/orig-prefix.txt").each do |prefix_file|
+            prefix_path = prefix_file.read
+            python = prefix_path.include?("python3") ? "python3" : "python"
+            prefix_path.sub! %r{^#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
+            prefix_file.atomic_write prefix_path
+          end
         end
 
         # Installs packages represented by `targets` into the virtualenv.
