@@ -7,7 +7,8 @@ class AprRequirement < Requirement
   # APR shipped in Tiger is too old, but Leopard+ is usable.
   # The *-config scripts were removed in Sierra, which is widely breaking.
   satisfy(build_env: false) do
-    MacOS.version > :leopard && MacOS.version < :sierra && MacOS::CLT.installed?
+    MacOS.version > :leopard && MacOS.version < :sierra &&
+      MacOS::CLT.installed? || Formula["apr-util"].installed?
   end
 
   env do
