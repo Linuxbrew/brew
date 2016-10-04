@@ -162,7 +162,7 @@ class Formula
   # Defaults to true.
   # @return [Boolean]
   attr_accessor :follow_installed_alias
-  alias_method :follow_installed_alias?, :follow_installed_alias
+  alias follow_installed_alias? follow_installed_alias
 
   # @private
   def initialize(name, path, spec, alias_path: nil)
@@ -179,12 +179,12 @@ class Formula
       Tap.fetch($1, $2)
     end
 
-    @full_name = get_full_name(name)
-    @full_alias_name = get_full_name(@alias_name)
+    @full_name = full_name_with_optional_tap(name)
+    @full_alias_name = full_name_with_optional_tap(@alias_name)
 
-    set_spec :stable
-    set_spec :devel
-    set_spec :head
+    spec_eval :stable
+    spec_eval :devel
+    spec_eval :head
 
     @active_spec = determine_active_spec(spec)
     @active_spec_sym = if head?
@@ -201,7 +201,7 @@ class Formula
   end
 
   # @private
-  def set_active_spec(spec_sym)
+  def active_spec=(spec_sym)
     spec = send(spec_sym)
     raise FormulaSpecificationError, "#{spec_sym} spec is not available for #{full_name}" unless spec
     @active_spec = spec
@@ -214,7 +214,7 @@ class Formula
 
   # Allow full name logic to be re-used between names, aliases,
   # and installed aliases.
-  def get_full_name(name)
+  def full_name_with_optional_tap(name)
     if name.nil? || @tap.nil? || @tap.core_tap?
       name
     else
@@ -222,12 +222,11 @@ class Formula
     end
   end
 
-  def set_spec(name)
+  def spec_eval(name)
     spec = self.class.send(name)
-    if spec.url
-      spec.owner = self
-      instance_variable_set("@#{name}", spec)
-    end
+    return unless spec.url
+    spec.owner = self
+    instance_variable_set("@#{name}", spec)
   end
 
   def determine_active_spec(requested)
@@ -246,9 +245,8 @@ class Formula
     end
 
     val = version.respond_to?(:to_str) ? version.to_str : version
-    if val.nil? || val.empty? || val =~ /\s/
-      raise FormulaValidationError.new(full_name, :version, val)
-    end
+    return unless val.nil? || val.empty? || val =~ /\s/
+    raise FormulaValidationError.new(full_name, :version, val)
   end
 
   public
@@ -266,7 +264,7 @@ class Formula
   end
 
   def full_installed_alias_name
-    get_full_name(installed_alias_name)
+    full_name_with_optional_tap(installed_alias_name)
   end
 
   # The path that was specified to find this formula.
@@ -1065,10 +1063,9 @@ class Formula
 
   # @private
   def patch
-    unless patchlist.empty?
-      ohai "Patching"
-      patchlist.each(&:apply)
-    end
+    return if patchlist.empty?
+    ohai "Patching"
+    patchlist.each(&:apply)
   end
 
   # yields |self,staging| with current working directory set to the uncompressed tarball
@@ -1094,10 +1091,11 @@ class Formula
   def lock
     @lock = FormulaLock.new(name)
     @lock.lock
-    if oldname && (oldname_rack = HOMEBREW_CELLAR/oldname).exist? && oldname_rack.resolved_path == rack
-      @oldname_lock = FormulaLock.new(oldname)
-      @oldname_lock.lock
-    end
+    return unless oldname
+    return unless (oldname_rack = HOMEBREW_CELLAR/oldname).exist?
+    return unless oldname_rack.resolved_path == rack
+    @oldname_lock = FormulaLock.new(oldname)
+    @oldname_lock.lock
   end
 
   # @private
@@ -1235,7 +1233,7 @@ class Formula
       name == other.name &&
       active_spec == other.active_spec
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   # @private
   def hash
@@ -1429,10 +1427,9 @@ class Formula
 
   # @private
   def print_tap_action(options = {})
-    if tap?
-      verb = options[:verb] || "Installing"
-      ohai "#{verb} #{name} from #{tap}"
-    end
+    return unless tap?
+    verb = options[:verb] || "Installing"
+    ohai "#{verb} #{name} from #{tap}"
   end
 
   # @private
@@ -1670,7 +1667,7 @@ class Formula
 
     @exec_count ||= 0
     @exec_count += 1
-    logfn = "#{logs}/#{active_log_prefix}%02d.%s" % [@exec_count, File.basename(cmd).split(" ").first]
+    logfn = format("#{logs}/#{active_log_prefix}%02d.%s", @exec_count, File.basename(cmd).split(" ").first)
     logs.mkpath
 
     File.open(logfn, "w") do |log|

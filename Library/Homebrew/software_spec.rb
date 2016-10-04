@@ -229,7 +229,7 @@ class Bottle
     def to_s
       prefix + suffix
     end
-    alias_method :to_str, :to_s
+    alias to_str to_s
 
     def prefix
       "#{name}-#{version}.#{tag}"

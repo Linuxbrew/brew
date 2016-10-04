@@ -2,7 +2,7 @@ require "vendor/okjson"
 
 module Utils
   module JSON
-    extend self
+    module_function
 
     Error = Class.new(StandardError)
 

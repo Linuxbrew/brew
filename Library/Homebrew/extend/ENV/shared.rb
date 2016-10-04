@@ -303,13 +303,11 @@ module SharedEnvExtension
     end
 
     return if OS.linux? && which(name)
-
-    unless gcc_formula.opt_prefix.exist?
-      raise <<-EOS.undent
-      The requested Homebrew GCC was not installed. You must:
-        brew install #{gcc_formula.full_name}
-      EOS
-    end
+    return if gcc_formula.opt_prefix.exist?
+    raise <<-EOS.undent
+    The requested Homebrew GCC was not installed. You must:
+      brew install #{gcc_formula.full_name}
+    EOS
   end
 
   def permit_arch_flags; end
@@ -343,9 +341,8 @@ module SharedEnvExtension
   end
 
   def check_for_compiler_universal_support
-    if homebrew_cc =~ GNU_GCC_REGEXP
-      raise "Non-Apple GCC can't build universal binaries"
-    end
+    return unless homebrew_cc =~ GNU_GCC_REGEXP
+    raise "Non-Apple GCC can't build universal binaries"
   end
 
   def gcc_with_cxx11_support?(cc)

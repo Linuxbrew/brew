@@ -22,7 +22,7 @@ class Dependencies
     @deps * arg
   end
 
-  alias_method :to_ary, :to_a
+  alias to_ary to_a
 
   def optional
     select(&:optional?)
@@ -50,7 +50,7 @@ class Dependencies
   def ==(other)
     deps == other.deps
   end
-  alias_method :eql?, :==
+  alias eql? ==
 
   def inspect
     "#<#{self.class.name}: #{to_a.inspect}>"
@@ -79,5 +79,5 @@ class Requirements
     self
   end
 
-  alias_method :to_ary, :to_a
+  alias to_ary to_a
 end

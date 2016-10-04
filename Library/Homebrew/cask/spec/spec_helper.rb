@@ -29,7 +29,9 @@ require "mocha/api"
 
 require "hbc"
 
-class Hbc::TestCask < Hbc::Cask; end
+module Hbc
+  class TestCask < Cask; end
+end
 
 TEST_TMPDIR = Dir.mktmpdir("homebrew_cask_tests")
 at_exit do

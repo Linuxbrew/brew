@@ -153,7 +153,8 @@ class Tap
   # The issues URL of this {Tap}.
   # e.g. `https://github.com/user/homebrew-repo/issues`
   def issues_url
-    "https://github.com/#{slug}/issues" if official? || !custom_remote?
+    return unless official? || !custom_remote?
+    "https://github.com/#{slug}/issues"
   end
 
   def to_s
@@ -268,15 +269,16 @@ class Tap
     puts "Tapped #{formula_count} formula#{plural(formula_count, "e")} (#{path.abv})" unless quiet
     Descriptions.cache_formulae(formula_names)
 
-    if !options[:clone_target] && private? && !quiet
-      puts <<-EOS.undent
-        It looks like you tapped a private repository. To avoid entering your
-        credentials each time you update, you can use git HTTP credential
-        caching or issue the following command:
-          cd #{path}
-          git remote set-url origin git@github.com:#{user}/homebrew-#{repo}.git
-      EOS
-    end
+    return if options[:clone_target]
+    return unless private?
+    return if quiet
+    puts <<-EOS.undent
+      It looks like you tapped a private repository. To avoid entering your
+      credentials each time you update, you can use git HTTP credential
+      caching or issue the following command:
+        cd #{path}
+        git remote set-url origin git@github.com:#{user}/homebrew-#{repo}.git
+    EOS
   end
 
   def link_manpages

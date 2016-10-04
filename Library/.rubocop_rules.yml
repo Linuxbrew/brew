@@ -1,4 +1,3 @@
-
 # ruby style guide favorite
 Style/StringLiterals:
   EnforcedStyle: double_quotes
@@ -19,13 +18,18 @@ Style/NumericLiteralPrefix:
 Style/CommandLiteral:
   EnforcedStyle: mixed
 
+# depends_on foo: :bar looks rubbish
+Style/HashSyntax:
+  EnforcedStyle: ruby19
+  Exclude:
+    - 'Taps/**/*'
+
 # paths abound, easy escape
 Style/RegexpLiteral:
   EnforcedStyle: slashes
 
-# too prevalent to change this now, but might be discussed/changed later
 Style/Alias:
-  EnforcedStyle: prefer_alias_method
+  EnforcedStyle: prefer_alias
 
 # our current conditional style is established, clear and
 # requiring users to change that now would be confusing.
@@ -111,13 +115,7 @@ Style/TernaryParentheses:
 
 # dashes in filenames are typical
 Style/FileName:
-  # matches:
-  #   file_name.rb (default)
-  #   file-name.rb, --filename.rb (command names)
-  #   FILENAME.rb (ARGV and ENV)
-  # does not match:
-  #   dashes-and_underscores.rb
-  Regex: !ruby/regexp /^((([\dA-Z]+|[\da-z]+)(_([\dA-Z]+|[\da-z]+))*|(\-\-)?([\dA-Z]+|[\da-z]+)(-([\dA-Z]+|[\da-z]+))*))(\.rb)?$/
+  Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
 
 # no percent word array, being friendly to non-ruby users
 # TODO: enforce when rubocop has fixed this

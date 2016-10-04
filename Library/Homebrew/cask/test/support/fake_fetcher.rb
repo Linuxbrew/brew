@@ -1,20 +1,22 @@
-class Hbc::FakeFetcher
-  def self.fake_response_for(url, response)
-    @responses[url] = response
-  end
+module Hbc
+  class FakeFetcher
+    def self.fake_response_for(url, response)
+      @responses[url] = response
+    end
 
-  def self.head(url)
-    @responses ||= {}
-    raise("no response faked for #{url.inspect}") unless @responses.key?(url)
-    @responses[url]
-  end
+    def self.head(url)
+      @responses ||= {}
+      raise("no response faked for #{url.inspect}") unless @responses.key?(url)
+      @responses[url]
+    end
 
-  def self.init
-    @responses = {}
-  end
+    def self.init
+      @responses = {}
+    end
 
-  def self.clear
-    @responses = {}
+    def self.clear
+      @responses = {}
+    end
   end
 end
 
@@ -30,6 +32,8 @@ module FakeFetcherHooks
   end
 end
 
-class MiniTest::Spec
-  include FakeFetcherHooks
+module MiniTest
+  class Spec
+    include FakeFetcherHooks
+  end
 end

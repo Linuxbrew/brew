@@ -1,6 +1,6 @@
 class Checksum
   attr_reader :hash_type, :hexdigest
-  alias_method :to_s, :hexdigest
+  alias to_s hexdigest
 
   TYPES = [:sha256].freeze
 

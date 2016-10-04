@@ -128,11 +128,11 @@ class DependencyCollector
   end
 
   def parse_class_spec(spec, tags)
-    if spec < Requirement
-      spec.new(tags)
-    else
+    unless spec < Requirement
       raise TypeError, "#{spec.inspect} is not a Requirement subclass"
     end
+
+    spec.new(tags)
   end
 
   def ant_dep(spec, tags)

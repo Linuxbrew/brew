@@ -1,2 +1,6 @@
-class Hbc::DSL::UninstallPostflight < Hbc::DSL::Base
+module Hbc
+  class DSL
+    class UninstallPostflight < Base
+    end
+  end
 end
