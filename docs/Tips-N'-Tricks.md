@@ -137,6 +137,9 @@ inline patches in Vim.
 highlighting for inline patches as well as a number of helper functions
 for editing formula files.
 
+[pcmpl-homebrew](https://github.com/hiddenlotus/pcmpl-homebrew) provides completion
+for emacs shell-mode and eshell-mode.
+
 ### Atom
 
 [language-homebrew-formula](https://atom.io/packages/language-homebrew-formula)

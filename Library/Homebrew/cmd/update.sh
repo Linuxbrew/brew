@@ -215,7 +215,7 @@ merge_or_rebase() {
 
   trap reset_on_interrupt SIGINT
 
-  if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
+  if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -n "$HOMEBREW_UPDATE_TO_TAG" ]]
   then
     UPSTREAM_TAG="$(git tag --list --sort=-version:refname |
                     grep --max-count=1 '^[0-9]*\.[0-9]*\.[0-9]*$')"
@@ -299,7 +299,7 @@ EOS
   if [[ -n "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
   then
     if [[ "$INITIAL_BRANCH" != "$UPSTREAM_BRANCH" && -n "$INITIAL_BRANCH" &&
-          ! "$INITIAL_BRANCH" =~ ^v[0-9]+\.[0-9]+\.[0-9]$ ]]
+          ! "$INITIAL_BRANCH" =~ ^v[0-9]+\.[0-9]+\.[0-9]|stable$ ]]
     then
       git checkout "$INITIAL_BRANCH" "${QUIET_ARGS[@]}"
     fi
@@ -351,6 +351,8 @@ EOS
     if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
     then
       export HOMEBREW_NO_UPDATE_CLEANUP="1"
+    else
+      export HOMEBREW_UPDATE_TO_TAG="1"
     fi
   fi
 
@@ -471,7 +473,7 @@ EOS
         UPSTREAM_REPOSITORY="${UPSTREAM_REPOSITORY_URL#https://github.com/}"
         UPSTREAM_REPOSITORY="${UPSTREAM_REPOSITORY%.git}"
 
-        if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -z "$HOMEBREW_NO_UPDATE_CLEANUP" ]]
+        if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -n "$HOMEBREW_UPDATE_TO_TAG" ]]
         then
           # Only try to `git fetch` when the upstream tags have changed
           # (so the API does not return 304: unmodified).

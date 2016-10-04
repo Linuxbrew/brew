@@ -5,11 +5,11 @@ class CompilerFailureTests < Homebrew::TestCase
   Compiler = Struct.new(:name, :version)
 
   def assert_fails_with(compiler, failure)
-    assert_operator failure, :===, compiler
+    assert_operator failure, :fails_with?, compiler
   end
 
   def refute_fails_with(compiler, failure)
-    refute_operator failure, :===, compiler
+    refute_operator failure, :fails_with?, compiler
   end
 
   def compiler(name, version)
