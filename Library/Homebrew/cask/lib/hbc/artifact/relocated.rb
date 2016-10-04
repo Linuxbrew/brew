@@ -1,5 +1,7 @@
 require "hbc/artifact/base"
 
+require "hbc/utils/hash_validator"
+
 module Hbc
   module Artifact
     class Relocated < Base
@@ -46,7 +48,7 @@ module Hbc
         @source = @cask.staged_path.join(source_string)
         if target_hash
           raise CaskInvalidError unless target_hash.respond_to?(:keys)
-          target_hash.assert_valid_keys(:target)
+          target_hash.extend(HashValidator).assert_valid_keys(:target)
           @target = Hbc.send(self.class.artifact_dirmethod).join(target_hash[:target])
         else
           @target = Hbc.send(self.class.artifact_dirmethod).join(source.basename)

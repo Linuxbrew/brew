@@ -1,6 +1,10 @@
 require "open3"
 require "shellwords"
 
+require "extend/io"
+
+require "hbc/utils/hash_validator"
+
 module Hbc
   class SystemCommand
     attr_reader :command
@@ -43,7 +47,8 @@ module Hbc
     attr_reader :executable, :options, :processed_output, :processed_status
 
     def process_options!
-      options.assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo, :bsexec
+      options.extend(HashValidator)
+             .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo, :bsexec
       sudo_prefix = %w[/usr/bin/sudo -E --]
       bsexec_prefix = ["/bin/launchctl", "bsexec", options[:bsexec] == :startup ? "/" : options[:bsexec]]
       @command = [executable]
