@@ -12,10 +12,13 @@ class AprRequirement < Requirement
   end
 
   env do
-    ENV.prepend_path "PATH", Formula["apr-util"].opt_bin
-    ENV.prepend_path "PATH", Formula["apr"].opt_bin
-    ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr"].opt_libexec}/lib/pkgconfig"
-    ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr-util"].opt_libexec}/lib/pkgconfig"
+    # Prefer system Apr as much as possible, even if our's is installed.
+    unless MacOS.version > :leopard && MacOS.version < :sierra && MacOS::CLT.installed?
+      ENV.prepend_path "PATH", Formula["apr-util"].opt_bin
+      ENV.prepend_path "PATH", Formula["apr"].opt_bin
+      ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr"].opt_libexec}/lib/pkgconfig"
+      ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["apr-util"].opt_libexec}/lib/pkgconfig"
+    end
   end
 
   def to_dependency
