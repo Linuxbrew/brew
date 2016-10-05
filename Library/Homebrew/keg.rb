@@ -87,6 +87,41 @@ class Keg
     mime-info pixmaps sounds postgresql
   ].freeze
 
+  # Will return some kegs, and some dependencies, if they're present.
+  # For efficiency, we don't bother trying to get complete data.
+  def self.find_some_installed_dependents(kegs)
+    # First, check in the tabs of installed Formulae.
+    kegs.each do |keg|
+      dependents = keg.installed_dependents - kegs
+      dependents.map! { |d| "#{d.name} #{d.version}" }
+      return [keg], dependents if dependents.any?
+    end
+
+    # Some kegs won't have modern Tabs with the dependencies listed.
+    # In this case, fall back to Formula#missing_dependencies.
+
+    # Find formulae that didn't have dependencies saved in all of their kegs,
+    # so need them to be calculated now.
+    #
+    # This happens after the initial dependency check because it's sloooow.
+    remaining_formulae = Formula.installed.select { |f|
+      f.installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
+    }
+
+    keg_names = kegs.map(&:name)
+    kegs_by_name = kegs.group_by(&:to_formula)
+    remaining_formulae.each do |dependent|
+      required = dependent.missing_dependencies(hide: keg_names)
+      required.select! { |f| kegs_by_name.key?(f) }
+      next unless required.any?
+
+      required_kegs = required.map { |f| kegs_by_name[f].sort_by(&:version).last }
+      return required_kegs, [dependent]
+    end
+
+    nil
+  end
+
   # if path is a file in a keg then this will return the containing Keg object
   def self.for(path)
     path = path.realpath

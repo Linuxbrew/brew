@@ -76,7 +76,7 @@ module Homebrew
   end
 
   def check_for_dependents(kegs)
-    return false unless result = find_some_installed_dependents(kegs)
+    return false unless result = Keg.find_some_installed_dependents(kegs)
 
     requireds, dependents = result
 
@@ -108,8 +108,16 @@ module Homebrew
     remaining_formulae = Formula.installed.select { |f|
       f.installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
     }
-    Diagnostic.missing_deps(remaining_formulae, kegs.map(&:name)) do |dependent, required|
-      kegs_by_name = kegs.group_by(&:to_formula)
+
+    keg_names = kegs.map(&:name)
+    kegs_by_name = kegs.group_by(&:to_formula)
+    remaining_formulae.each do |dependent|
+      required = dependent.missing_dependencies(hide: keg_names)
+      required.select! do |f|
+        kegs_by_name.key?(f)
+      end
+      next unless required.any?
+
       required_kegs = required.map { |f| kegs_by_name[f].sort_by(&:version).last }
       return required_kegs, [dependent]
     end

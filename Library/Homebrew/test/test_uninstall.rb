@@ -31,6 +31,32 @@ class IntegrationCommandTestUninstall < IntegrationCommandTestCase
     assert_empty Formulary.factory(testball).installed_kegs
   end
 
+  def test_uninstall_with_unrelated_missing_deps_in_tab
+    setup_test_formula "testball"
+    run_as_not_developer do
+      cmd("install", testball)
+      cmd("install", "testball_f2")
+      cmd("uninstall", "--ignore-dependencies", "testball_f1")
+      cmd("uninstall", testball)
+    end
+  end
+
+  def test_uninstall_with_unrelated_missing_deps_not_in_tab
+    setup_test_formula "testball"
+    run_as_not_developer do
+      cmd("install", testball)
+      cmd("install", "testball_f2")
+
+      f2_keg = f2.installed_kegs.first
+      f2_tab = Tab.for_keg(f2_keg)
+      f2_tab.runtime_dependencies = nil
+      f2_tab.write
+
+      cmd("uninstall", "--ignore-dependencies", "testball_f1")
+      cmd("uninstall", testball)
+    end
+  end
+
   def test_uninstall_leaving_dependents
     cmd("install", "testball_f2")
     run_as_not_developer do
