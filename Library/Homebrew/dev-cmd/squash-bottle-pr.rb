@@ -13,7 +13,7 @@ module Homebrew
     marker = "Build a bottle for Linuxbrew"
     safe_system "git", "reset", "--hard", "HEAD~2"
     safe_system "git", "merge", "--squash", head
-    safe_system "sed", "-i", "-e", "/^#.*: #{marker}$/d", file
+    safe_system "sed", "-i", "", "-e", "/^#.*: #{marker}$/d", file
 
     git_editor = ENV["GIT_EDITOR"]
     ENV["GIT_EDITOR"] = "sed -n -i -e 's/.*#{marker}//p;s/^    //p'"
