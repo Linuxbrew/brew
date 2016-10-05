@@ -1466,6 +1466,26 @@ class Formula
     recursive_dependencies.reject(&:build?)
   end
 
+  # Returns a list of formulae depended on by this formula that aren't
+  # installed
+  def missing_dependencies(hide: nil)
+    hide ||= []
+    missing_dependencies = recursive_dependencies do |dependent, dep|
+      if dep.optional? || dep.recommended?
+        tab = Tab.for_formula(dependent)
+        Dependency.prune unless tab.with?(dep)
+      elsif dep.build?
+        Dependency.prune
+      end
+    end
+
+    missing_dependencies.map!(&:to_formula)
+    missing_dependencies.select! do |d|
+      hide.include?(d.name) || d.installed_prefixes.empty?
+    end
+    missing_dependencies
+  end
+
   # @private
   def to_hash
     hsh = {
