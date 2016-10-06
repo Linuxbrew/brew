@@ -5,6 +5,6 @@ class IntegrationCommandTestCask < IntegrationCommandTestCase
     needs_test_cmd_taps
     needs_macos
     setup_remote_tap("caskroom/cask")
-    cmd("cask", "list")
+    cmd("cask", "list", "--caskroom=#{HOMEBREW_PREFIX}/Caskroom")
   end
 end
