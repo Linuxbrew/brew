@@ -58,11 +58,10 @@ module Hbc
     def install
       odebug "Hbc::Installer.install"
 
-      if @cask.installed? && @cask.auto_updates && !force
-        raise CaskAutoUpdatesError, @cask
+      if @cask.installed? && !force
+        raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
+        raise CaskAlreadyInstalledError, @cask
       end
-
-      raise CaskAlreadyInstalledError, @cask if @cask.installed? && !force
 
       print_caveats
 
