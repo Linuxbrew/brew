@@ -36,7 +36,7 @@ class Requirement
     if cask
       s += <<-EOS.undent
 
-        You can install with Homebrew Cask:
+        You can install with Homebrew-Cask:
           brew cask install #{cask}
       EOS
     end

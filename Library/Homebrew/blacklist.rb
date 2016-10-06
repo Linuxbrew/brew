@@ -9,7 +9,7 @@ def blacklisted?(name)
 
     We recommend using a MacTeX distribution: https://www.tug.org/mactex/
 
-    You can install it with Homebrew Cask:
+    You can install it with Homebrew-Cask:
       brew cask install mactex
     EOS
   when "pip" then <<-EOS.undent
@@ -73,7 +73,7 @@ def blacklisted?(name)
     and cabal-install instead:
       brew install ghc cabal-install
 
-    You can install with Homebrew Cask:
+    You can install with Homebrew-Cask:
       brew cask install haskell-platform
     EOS
   when "mysqldump-secure" then <<-EOS.undent
@@ -82,7 +82,7 @@ def blacklisted?(name)
   when "ngrok" then <<-EOS.undent
     Upstream sunsetted 1.x in March 2016 and 2.x is not open-source.
 
-    If you wish to use the 2.x release you can install with Homebrew Cask:
+    If you wish to use the 2.x release you can install with Homebrew-Cask:
       brew cask install ngrok
     EOS
   end
