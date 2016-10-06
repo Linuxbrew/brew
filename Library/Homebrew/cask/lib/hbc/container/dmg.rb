@@ -94,6 +94,7 @@ module Hbc
       DMG_METADATA_FILES = %w[
                              .background
                              .com.apple.timemachine.donotpresent
+                             .com.apple.timemachine.supported
                              .DocumentRevisions-V100
                              .DS_Store
                              .fseventsd
