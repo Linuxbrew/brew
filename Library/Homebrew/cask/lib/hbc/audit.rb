@@ -50,7 +50,6 @@ module Hbc
       %i{version sha256 url homepage}.each do |sym|
         add_error "a #{sym} stanza is required" unless cask.send(sym)
       end
-      add_error "a license stanza is required (:unknown is OK)" unless cask.license
       add_error "at least one name stanza is required" if cask.name.empty?
       # TODO: specific DSL knowledge should not be spread around in various files like this
       # TODO: nested_container should not still be a pseudo-artifact at this point

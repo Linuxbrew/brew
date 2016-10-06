@@ -406,31 +406,6 @@ describe Hbc::DSL do
     end
   end
 
-  describe "license stanza" do
-    it "allows the license to be specified" do
-      cask = Hbc.load("with-license")
-      cask.license.value.must_equal :gpl
-    end
-
-    it "the license has a category" do
-      cask = Hbc.load("with-license")
-      cask.license.category.must_equal :oss
-    end
-
-    it "prevents defining multiple license stanzas" do
-      err = lambda {
-        Hbc.load("invalid/invalid-license-multiple")
-      }.must_raise(Hbc::CaskInvalidError)
-      err.message.must_include "'license' stanza may only appear once"
-    end
-
-    it "refuses to load on invalid license value" do
-      lambda {
-        Hbc.load("invalid/invalid-license-value")
-      }.must_raise(Hbc::CaskInvalidError)
-    end
-  end
-
   describe "installer stanza" do
     it "allows installer script to be specified" do
       cask = Hbc.load("with-installer-script")

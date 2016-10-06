@@ -9,7 +9,6 @@ require "hbc/dsl/container"
 require "hbc/dsl/depends_on"
 require "hbc/dsl/gpg"
 require "hbc/dsl/installer"
-require "hbc/dsl/license"
 require "hbc/dsl/postflight"
 require "hbc/dsl/preflight"
 require "hbc/dsl/stanza_proxy"
@@ -66,7 +65,6 @@ module Hbc
                             :gpg,
                             :homepage,
                             :language,
-                            :license,
                             :name,
                             :sha256,
                             :staged_path,
@@ -204,16 +202,6 @@ module Hbc
       assert_only_one_stanza_allowed :sha256, !arg.nil?
       raise CaskInvalidError.new(token, "invalid 'sha256' value: '#{arg.inspect}'") if !arg.is_a?(String) && !SYMBOLIC_SHA256S.include?(arg)
       @sha256 ||= arg
-    end
-
-    def license(arg = nil)
-      return @license if arg.nil?
-      assert_only_one_stanza_allowed :license, !arg.nil?
-      @license ||= begin
-        DSL::License.new(arg) unless arg.nil?
-      rescue StandardError => e
-        raise CaskInvalidError.new(token, e)
-      end
     end
 
     # depends_on uses a load method so that multiple stanzas can be merged

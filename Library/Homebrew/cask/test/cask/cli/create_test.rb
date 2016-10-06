@@ -49,7 +49,6 @@ describe Hbc::CLI::Create do
         url 'https://'
         name ''
         homepage ''
-        license :unknown # TODO: change license and remove this comment; ':unknown' is a machine-generated placeholder
 
         app ''
       end
