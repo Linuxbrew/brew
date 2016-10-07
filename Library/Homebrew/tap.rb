@@ -138,6 +138,13 @@ class Tap
     name
   end
 
+  def version_string
+    return "N/A" unless installed?
+    pretty_revision = git_short_head
+    return "(no git repository)" unless pretty_revision
+    "(git revision #{pretty_revision}; last commit #{git_last_commit_date})"
+  end
+
   # True if this {Tap} is an official Homebrew tap.
   def official?
     user == "Homebrew"
@@ -525,7 +532,7 @@ class CoreTap < Tap
   end
 
   def self.instance
-    @instance ||= CoreTap.new
+    @instance ||= new
   end
 
   def self.ensure_installed!(options = {})
