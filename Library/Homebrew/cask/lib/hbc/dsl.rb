@@ -204,7 +204,7 @@ module Hbc
       @sha256 ||= arg
     end
 
-    def license(arg = nil)
+    def license(*)
       odeprecated "Hbc::DSL#license"
     end
 
