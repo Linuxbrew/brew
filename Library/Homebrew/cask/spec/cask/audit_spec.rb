@@ -52,7 +52,7 @@ describe Hbc::Audit do
     subject { audit.run! }
 
     describe "required stanzas" do
-      %w[version sha256 url name homepage license].each do |stanza|
+      %w[version sha256 url name homepage].each do |stanza|
         context "when missing #{stanza}" do
           let(:cask_token) { "missing-#{stanza}" }
           it { is_expected.to fail_with(%r{#{stanza} stanza is required}) }
