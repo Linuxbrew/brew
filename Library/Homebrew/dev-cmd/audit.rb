@@ -448,6 +448,11 @@ class FormulaAuditor
         problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
       end
     end
+
+    return unless @new_formula
+    unless formula.deprecated_options.empty?
+      problem "New formulae should not use `deprecated_option`."
+    end
   end
 
   def audit_desc
