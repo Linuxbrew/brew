@@ -50,7 +50,7 @@ module Homebrew
           cleanup_path(path) { path.unlink }
           next
         end
-        if %w[java_cache npm_cache].include?(path.basename.to_s) && path.directory?
+        if %w[glide_home java_cache npm_cache].include?(path.basename.to_s) && path.directory?
           cleanup_path(path) { FileUtils.rm_rf path }
           next
         end
