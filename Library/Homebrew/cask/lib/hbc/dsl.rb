@@ -205,7 +205,9 @@ module Hbc
     end
 
     def license(*)
-      odeprecated "Hbc::DSL#license"
+      # TODO: Uncomment after `license` has been
+      #       removed from all official taps.
+      # odeprecated "Hbc::DSL#license"
     end
 
     # depends_on uses a load method so that multiple stanzas can be merged
