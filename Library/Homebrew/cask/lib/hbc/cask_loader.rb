@@ -6,14 +6,7 @@ module Hbc
       raise CaskError, "File '#{path}' is not a plain file" unless path.file?
 
       token = path.basename(".rb").to_s
-
-      content = File.open(path, "rb") do |caskfile|
-        if defined?(Encoding)
-          caskfile.read.force_encoding("UTF-8")
-        else
-          caskfile.read
-        end
-      end
+      content = IO.read(path).force_encoding("UTF-8")
 
       new(token, content, path).load
     end
