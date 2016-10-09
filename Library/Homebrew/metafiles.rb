@@ -1,13 +1,15 @@
+require "set"
+
 class Metafiles
   # https://github.com/github/markup#markups
   EXTENSIONS = %w[
     .adoc .asc .asciidoc .creole .html .markdown .md .mdown .mediawiki .mkdn
     .org .pod .rdoc .rst .rtf .textile .txt .wiki
-  ].freeze
+  ].to_set.freeze
   BASENAMES = %w[
     about authors changelog changes copying copyright history license licence
     news notes notice readme todo
-  ].freeze
+  ].to_set.freeze
 
   def self.list?(file)
     return false if %w[.DS_Store INSTALL_RECEIPT.json].include?(file)
