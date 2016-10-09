@@ -19,10 +19,11 @@ class Keg
     []
   end
 
-  def relocate_text_files(old_prefix, new_prefix, old_cellar, new_cellar,
-                          old_repository, new_repository)
-    files = text_files | libtool_files
+  def relocate_text_files(old_prefix, new_prefix, old_cellar, new_cellar, # rubocop:disable Metrics/ParameterLists
+                          old_repository, new_repository, files = nil)
+    files ||= text_files | libtool_files
 
+    changed_files = []
     files.group_by { |f| f.stat.ino }.each_value do |first, *rest|
       s = first.open("rb", &:read)
       changed = s.gsub!(old_cellar, new_cellar)
@@ -30,6 +31,7 @@ class Keg
       changed = s.gsub!(old_repository, new_repository) || changed
 
       next unless changed
+      changed_files << first.relative_path_from(path)
 
       begin
         first.atomic_write(s)
@@ -41,6 +43,7 @@ class Keg
         rest.each { |file| FileUtils.ln(first, file, force: true) }
       end
     end
+    changed_files
   end
 
   def detect_cxx_stdlibs(_options = {})
