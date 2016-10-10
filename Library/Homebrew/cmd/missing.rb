@@ -1,6 +1,9 @@
-#:  * `missing` [<formulae>]:
+#:  * `missing` [`--hide=`<hidden>] [<formulae>]:
 #:    Check the given <formulae> for missing dependencies. If no <formulae> are
 #:    given, check all installed brews.
+#:
+#:    If `--hide=`<hidden> is passed, act as if none of <hidden> are installed.
+#:    <hidden> should be a comma-seperated list of formulae.
 
 require "formula"
 require "tab"
