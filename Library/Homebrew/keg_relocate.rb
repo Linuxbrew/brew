@@ -25,7 +25,7 @@ class Keg
     replacements = {
       HOMEBREW_PREFIX.to_s => PREFIX_PLACEHOLDER,
       HOMEBREW_CELLAR.to_s => CELLAR_PLACEHOLDER,
-      HOMEBREW_REPOSITORY.to_s => REPOSITORY_PLACEHOLDER
+      HOMEBREW_REPOSITORY.to_s => REPOSITORY_PLACEHOLDER,
     }
     replace_text_in_files(replacements)
   end
@@ -36,7 +36,7 @@ class Keg
     replacements = {
       PREFIX_PLACEHOLDER => HOMEBREW_PREFIX.to_s,
       CELLAR_PLACEHOLDER => HOMEBREW_CELLAR.to_s,
-      REPOSITORY_PLACEHOLDER => HOMEBREW_REPOSITORY.to_s
+      REPOSITORY_PLACEHOLDER => HOMEBREW_REPOSITORY.to_s,
     }
     replace_text_in_files(replacements, files)
   end
