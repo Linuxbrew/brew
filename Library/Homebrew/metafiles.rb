@@ -1,6 +1,6 @@
 require "set"
 
-class Metafiles
+module Metafiles
   # https://github.com/github/markup#markups
   EXTENSIONS = Set.new %w[
     .adoc .asc .asciidoc .creole .html .markdown .md .mdown .mediawiki .mkdn
@@ -11,12 +11,14 @@ class Metafiles
     news notes notice readme todo
   ].freeze
 
-  def self.list?(file)
+  module_function
+
+  def list?(file)
     return false if %w[.DS_Store INSTALL_RECEIPT.json].include?(file)
     !copy?(file)
   end
 
-  def self.copy?(file)
+  def copy?(file)
     file = file.downcase
     ext  = File.extname(file)
     file = File.basename(file, ext) if EXTENSIONS.include?(ext)
