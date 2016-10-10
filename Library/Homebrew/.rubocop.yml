@@ -6,7 +6,7 @@ AllCops:
   Include:
     - '**/.simplecov'
   Exclude:
-    - 'cask/**/*'
+    - '**/Casks/**/*'
     - '**/vendor/**/*'
 
 # so many of these in formulae but none in here
