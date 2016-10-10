@@ -762,18 +762,12 @@ class FormulaInstaller
     end
 
     keg = Keg.new(formula.prefix)
-    tab_file = formula.prefix.join(Tab::FILENAME)
-    # Skip the cache since the receipt will be rewritten
-    orig_tab = Tab.from_file_content(tab_file.read, tab_file)
-    changed_files = orig_tab.changed_files.map { |f| formula.prefix.join(f) }
 
     unless formula.bottle_specification.skip_relocation?
-      keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
-        Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
+      tab = Tab.for_keg(keg)
+      Tab.clear_cache
+      keg.replace_placeholders_with_locations tab.changed_files
     end
-    keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
-      Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s,
-      Keg::REPOSITORY_PLACEHOLDER, HOMEBREW_REPOSITORY.to_s, changed_files
 
     Pathname.glob("#{formula.bottle_prefix}/{etc,var}/**/*") do |path|
       path.extend(InstallRenamed)
@@ -781,7 +775,7 @@ class FormulaInstaller
     end
     FileUtils.rm_rf formula.bottle_prefix
 
-    tab = Tab.for_keg(formula.prefix)
+    tab = Tab.for_keg(keg)
 
     CxxStdlib.check_compatibility(
       formula, formula.recursive_dependencies,

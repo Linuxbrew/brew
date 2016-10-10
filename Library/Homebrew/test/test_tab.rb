@@ -34,7 +34,7 @@ class TabTests < Homebrew::TestCase
     tab = Tab.empty
     assert_empty tab.unused_options
     assert_empty tab.used_options
-    assert_empty tab.changed_files
+    assert_nil tab.changed_files
     refute_predicate tab, :built_as_bottle
     refute_predicate tab, :poured_from_bottle
     assert_predicate tab, :stable?

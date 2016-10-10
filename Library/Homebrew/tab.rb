@@ -25,7 +25,6 @@ class Tab < OpenStruct
       "tabfile" => formula.prefix.join(FILENAME),
       "built_as_bottle" => build.bottle?,
       "poured_from_bottle" => false,
-      "changed_files" => [],
       "time" => Time.now.to_i,
       "source_modified_time" => formula.source_modified_time.to_i,
       "HEAD" => HOMEBREW_REPOSITORY.git_head,
@@ -62,7 +61,6 @@ class Tab < OpenStruct
     attributes = Utils::JSON.load(content)
     attributes["tabfile"] = path
     attributes["source_modified_time"] ||= 0
-    attributes["changed_files"] ||= []
     attributes["source"] ||= {}
 
     tapped_from = attributes["tapped_from"]
@@ -173,7 +171,6 @@ class Tab < OpenStruct
       "unused_options" => [],
       "built_as_bottle" => false,
       "poured_from_bottle" => false,
-      "changed_files" => [],
       "time" => nil,
       "source_modified_time" => 0,
       "HEAD" => nil,
@@ -306,7 +303,7 @@ class Tab < OpenStruct
       "unused_options" => unused_options.as_flags,
       "built_as_bottle" => built_as_bottle,
       "poured_from_bottle" => poured_from_bottle,
-      "changed_files" => changed_files.map(&:to_s),
+      "changed_files" => changed_files && changed_files.map(&:to_s),
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,

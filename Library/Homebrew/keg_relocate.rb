@@ -19,16 +19,36 @@ class Keg
     []
   end
 
-  def relocate_text_files(old_prefix, new_prefix, old_cellar, new_cellar, # rubocop:disable Metrics/ParameterLists
-                          old_repository, new_repository, files = nil)
+  def replace_locations_with_placeholders
+    relocate_dynamic_linkage(HOMEBREW_PREFIX.to_s, PREFIX_PLACEHOLDER,
+      HOMEBREW_CELLAR.to_s, CELLAR_PLACEHOLDER)
+    replacements = {
+      HOMEBREW_PREFIX.to_s => PREFIX_PLACEHOLDER,
+      HOMEBREW_CELLAR.to_s => CELLAR_PLACEHOLDER,
+      HOMEBREW_REPOSITORY.to_s => REPOSITORY_PLACEHOLDER
+    }
+    replace_text_in_files(replacements)
+  end
+
+  def replace_placeholders_with_locations(files)
+    relocate_dynamic_linkage(PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
+      CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s)
+    replacements = {
+      PREFIX_PLACEHOLDER => HOMEBREW_PREFIX.to_s,
+      CELLAR_PLACEHOLDER => HOMEBREW_CELLAR.to_s,
+      REPOSITORY_PLACEHOLDER => HOMEBREW_REPOSITORY.to_s
+    }
+    replace_text_in_files(replacements, files)
+  end
+
+  def replace_text_in_files(replacements, files = nil)
     files ||= text_files | libtool_files
 
     changed_files = []
-    files.group_by { |f| f.stat.ino }.each_value do |first, *rest|
+    files.map(&path.method(:join)).group_by { |f| f.stat.ino }.each_value do |first, *rest|
       s = first.open("rb", &:read)
-      changed = s.gsub!(old_cellar, new_cellar)
-      changed = s.gsub!(old_prefix, new_prefix) || changed
-      changed = s.gsub!(old_repository, new_repository) || changed
+      regexp = Regexp.union(replacements.keys)
+      changed = s.gsub!(regexp, replacements)
 
       next unless changed
       changed_files << first.relative_path_from(path)
