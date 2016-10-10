@@ -243,6 +243,7 @@ check-run-command-as-root() {
 
   [[ "$HOMEBREW_COMMAND" = "cask" ]] && return
   [[ "$HOMEBREW_COMMAND" = "services" ]] && return
+  [[ "$HOMEBREW_COMMAND" = "--prefix" ]] && return
 
   onoe <<EOS
 Running Homebrew as root is extremely dangerous. As Homebrew does not
