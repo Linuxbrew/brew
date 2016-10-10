@@ -28,7 +28,7 @@ module Hbc
         user = dash_elements.join("-")
       else
         # eg caskroom/cask/google-chrome
-        # per https://github.com/Homebrew/homebrew/wiki/brew-tap
+        # per https://github.com/Homebrew/brew/blob/master/docs/brew-tap.md
         user, repo, token = path_elements
       end
       repo.sub!(%r{^#{REPO_PREFIX}}, "")
