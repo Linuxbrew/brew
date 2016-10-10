@@ -18,10 +18,8 @@ module Homebrew
       ARGV.resolved_formulae
     end
 
-    hide = (ARGV.value("hide") || "").split(",")
-
     ff.each do |f|
-      missing = f.missing_dependencies(hide: hide)
+      missing = f.missing_dependencies(hide: ARGV.values("hide"))
       next if missing.empty?
 
       print "#{f}: " if ff.size > 1
