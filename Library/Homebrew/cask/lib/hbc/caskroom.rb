@@ -13,7 +13,7 @@ module Hbc
         FileUtils.mv repo_caskroom, Hbc.caskroom
       else
         opoo "#{Hbc.caskroom.parent} is not writable, sudo is needed to move the Caskroom."
-        sudo "/bin/mv", repo_caskroom.to_s, Hbc.caskroom.parent.to_s
+        command "/bin/mv", repo_caskroom, Hbc.caskroom.parent, :use_sudo => true
       end
     end
 
@@ -22,16 +22,23 @@ module Hbc
 
       ohai "Creating Caskroom at #{Hbc.caskroom}"
       ohai "We'll set permissions properly so we won't need sudo in the future"
+      use_sudo = !Hbc.caskroom.parent.writable?
 
-      sudo "/bin/mkdir", "-p", Hbc.caskroom
-      sudo "/bin/chmod", "g+rwx", Hbc.caskroom
-      sudo "/usr/sbin/chown", Utils.current_user, Hbc.caskroom
-      sudo "/usr/bin/chgrp", "admin", Hbc.caskroom
+      command "/bin/mkdir", "-p", Hbc.caskroom, :use_sudo => use_sudo
+      command "/bin/chmod", "g+rwx", Hbc.caskroom, :use_sudo => use_sudo
+      command "/usr/sbin/chown", Utils.current_user, Hbc.caskroom, :use_sudo => use_sudo
+      command "/usr/bin/chgrp", "admin", Hbc.caskroom, :use_sudo => use_sudo
     end
 
-    def sudo(*args)
-      ohai "/usr/bin/sudo #{args.join(" ")}"
-      system "/usr/bin/sudo", *args
+    def command(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+
+      if options[:use_sudo]
+        args.unshift "/usr/bin/sudo"
+      end
+
+      ohai args.join(" ")
+      system *args
     end
   end
 end
