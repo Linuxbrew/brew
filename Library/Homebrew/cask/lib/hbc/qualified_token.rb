@@ -13,7 +13,7 @@ module Hbc
 
     TAP_REGEX = %r{#{USER_REGEX}[/\-]#{REPO_REGEX}}
 
-    QUALIFIED_TOKEN_REGEX ||= %r{#{TAP_REGEX}/#{TOKEN_REGEX}}
+    QUALIFIED_TOKEN_REGEX = %r{#{TAP_REGEX}/#{TOKEN_REGEX}}
 
     def self.parse(arg)
       return nil unless arg.is_a?(String) && arg.downcase =~ %r{^#{QUALIFIED_TOKEN_REGEX}$}
