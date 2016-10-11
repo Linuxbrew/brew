@@ -35,10 +35,10 @@ module Homebrew
         sandbox.record_log(formula.logs/"postinstall.sandbox.log")
         sandbox.allow_write_temp_and_cache
         sandbox.allow_write_log(formula)
-        sandbox.allow_write_cellar(formula)
         sandbox.allow_write_xcode
-        sandbox.allow_write_path HOMEBREW_PREFIX
         sandbox.deny_write_homebrew_repository
+        sandbox.allow_write_path HOMEBREW_PREFIX
+        sandbox.allow_write_cellar(formula)
         sandbox.exec(*args)
       else
         exec(*args)
