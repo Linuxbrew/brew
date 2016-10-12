@@ -79,7 +79,6 @@ class Keg
                                        stdin_data: files.join("\0"))
       output.each_line.with_index do |line, i|
         next unless line.include?("text")
-        next unless files[i].text_executable?
         text_files << files[i]
       end
     end
