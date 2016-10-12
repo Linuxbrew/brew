@@ -12,7 +12,6 @@ require "cmd/postinstall"
 require "hooks/bottles"
 require "debrew"
 require "sandbox"
-require "requirements/cctools_requirement"
 require "emoji"
 require "development_tools"
 
@@ -234,7 +233,6 @@ class FormulaInstaller
     pour_bottle = pour_bottle?(warn: true)
     if pour_bottle
       begin
-        install_relocation_tools unless formula.bottle_specification.skip_relocation?
         pour
       rescue Exception => e
         # any exceptions must leave us with nothing installed
@@ -432,19 +430,6 @@ class FormulaInstaller
     end
 
     @show_header = true unless deps.empty?
-  end
-
-  # Installs the relocation tools (as provided by the cctools formula) as a hard
-  # dependency for every formula installed from a bottle when the user has no
-  # developer tools. Invoked unless the formula explicitly sets
-  # :any_skip_relocation in its bottle DSL.
-  def install_relocation_tools
-    cctools = CctoolsRequirement.new
-    dependency = cctools.to_dependency
-    formula = dependency.to_formula
-    return if cctools.satisfied? || @@attempted.include?(formula)
-
-    install_dependency(dependency, inherited_options_for(cctools))
   end
 
   class DependencyInstaller < FormulaInstaller
