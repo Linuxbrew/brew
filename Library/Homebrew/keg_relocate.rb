@@ -73,7 +73,14 @@ class Keg
     # http://bugs.gw.com/view.php?id=292
     with_custom_locale("C") do
       files = path.find.reject { |pn|
-        pn.symlink? || pn.directory? || Metafiles::EXTENSIONS.include?(pn.extname)
+        next true if pn.symlink?
+        next true if pn.directory?
+        next true if Metafiles::EXTENSIONS.include?(pn.extname)
+        if pn.text_executable?
+          text_files << pn
+          next true
+        end
+        false
       }
       output, _status = Open3.capture2("/usr/bin/xargs -0 /usr/bin/file --no-dereference --brief",
                                        stdin_data: files.join("\0"))
