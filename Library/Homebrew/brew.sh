@@ -278,6 +278,7 @@ EOS
 check-run-command-as-root
 
 if [[ "$HOMEBREW_PREFIX" = "/usr/local" &&
+      "$HOMEBREW_PREFIX" != "$HOMEBREW_REPOSITORY" &&
       "$HOMEBREW_CELLAR" = "$HOMEBREW_REPOSITORY/Cellar" ]]
 then
   cat >&2 <<EOS
