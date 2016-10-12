@@ -13,7 +13,11 @@ module Homebrew
     marker = "Build a bottle for Linuxbrew"
     safe_system "git", "reset", "--hard", "HEAD~2"
     safe_system "git", "merge", "--squash", head
-    safe_system "sed", "-i", "", "-e", "/^#.*: #{marker}$/d", file
+
+    # HACK: achieve compatibility between BSD and GNU sed
+    # by using a dummy backup and then deleting it
+    safe_system "sed", "-iorig", "-e", "/^#.*: #{marker}$/d", file
+    rm_f file.to_s + "orig"
 
     git_editor = ENV["GIT_EDITOR"]
     ENV["GIT_EDITOR"] = "sed -n -i -e 's/.*#{marker}//p;s/^    //p'"
