@@ -8,7 +8,6 @@ GPGRequirement             = GPG2Requirement
 TeXDependency              = TeXRequirement
 MercurialDependency        = MercurialRequirement
 GitDependency              = GitRequirement
-AprDependency              = AprRequirement
 FortranDependency          = FortranRequirement
 JavaDependency             = JavaRequirement
 LanguageModuleDependency   = LanguageModuleRequirement
