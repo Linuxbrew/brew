@@ -811,6 +811,10 @@ class FormulaAuditor
       problem ":#{$1} is deprecated. Usage should be \"#{$1}\""
     end
 
+    if line =~ /depends_on :apr/
+      problem ":apr is deprecated. Usage should be \"apr-util\""
+    end
+
     # Commented-out depends_on
     problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
