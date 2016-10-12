@@ -72,7 +72,7 @@ class Keg
     # file with that fix is only available in macOS Sierra.
     # http://bugs.gw.com/view.php?id=292
     with_custom_locale("C") do
-      files = path.find.reject { |pn|
+      files = Set.new path.find.reject { |pn|
         next true if pn.symlink?
         next true if pn.directory?
         next true if Metafiles::EXTENSIONS.include?(pn.extname)
@@ -82,11 +82,14 @@ class Keg
         end
         false
       }
-      output, _status = Open3.capture2("/usr/bin/xargs -0 /usr/bin/file --no-dereference --brief",
-                                       stdin_data: files.join("\0"))
-      output.each_line.with_index do |line, i|
-        next unless line.include?("text")
-        text_files << files[i]
+      output, _status = Open3.capture2("/usr/bin/xargs -0 /usr/bin/file --no-dereference --print0",
+                                       stdin_data: files.to_a.join("\0"))
+      output.each_line do |line|
+        path, info = line.split("\0")
+        next unless info.to_s.include?("text")
+        path = Pathname.new(path)
+        next unless files.include?(path)
+        text_files << path
       end
     end
 
