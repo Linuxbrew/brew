@@ -42,7 +42,7 @@ you can assume you will have trouble if you don’t conform. Also, you can find
 PowerPC and Tiger branches from other users in the fork network. See
 [Interesting Taps & Forks](Interesting-Taps-&-Forks.md).
 
-<a name="2"><sup>2</sup></a> 10.10 or higher is recommended. 10.5 - 10.8 are
+<a name="2"><sup>2</sup></a> 10.10 or higher is recommended. 10.5 - 10.9 are
 supported on a best-effort basis. For 10.4 and 10.5, see
 [Tigerbrew](https://github.com/mistydemeo/tigerbrew).
 
