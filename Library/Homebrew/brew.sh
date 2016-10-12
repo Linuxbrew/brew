@@ -277,6 +277,18 @@ EOS
 }
 check-run-command-as-root
 
+if [[ "$HOMEBREW_PREFIX" = "/usr/local" &&
+      "$HOMEBREW_CELLAR" = "$HOMEBREW_REPOSITORY/Cellar" ]]
+then
+  cat >&2 <<EOS
+Warning: your HOMEBREW_PREFIX is set to /usr/local but HOMEBREW_CELLAR is set
+to $HOMEBREW_CELLAR. Your current HOMEBREW_CELLAR location will stop
+you being able to use all the binary packages (bottles) Homebrew provides. We
+recommend you move your HOMEBREW_CELLAR to /usr/local/Cellar which will get you
+access to all bottles."
+EOS
+fi
+
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
