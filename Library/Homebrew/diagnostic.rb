@@ -617,6 +617,18 @@ module Homebrew
         message
       end
 
+      def check_ssl_cert_file
+        return unless ENV.key?("SSL_CERT_FILE")
+        <<-EOS.undent
+          Setting SSL_CERT_FILE can break downloading files; if that happens
+          you should unset it before running Homebrew.
+
+          Homebrew uses the system curl which uses system certificates by
+          default. Setting SSL_CERT_FILE makes it use an outdated OpenSSL, which
+          does not support modern OpenSSL certificate stores.
+        EOS
+      end
+
       def check_for_symlinked_cellar
         return unless HOMEBREW_CELLAR.exist?
         return unless HOMEBREW_CELLAR.symlink?
