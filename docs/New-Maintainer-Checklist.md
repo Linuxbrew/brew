@@ -14,14 +14,16 @@ but we'd appreciate your continuing help in keeping on top of contributions.
 
 A few requests:
 
-- please make pull requests on any changes to core (i.e. non-formula) code or
-  any non-trivial (e.g. not a test or audit improvement or version bump)
-  changes to formulae code and don't merge them unless you get at least one +1
-- use `brew pull` and let it auto-close issues wherever possible (it may take
-  ~5m). When this isn't possible always use `git pull --rebase`, `git rebase`
-  and `git cherry-pick` rather than `git merge` and never use GitHub's "Merge
-  pull request" button. If in doubt, check with GitX that you've not
-  accidentally added merge commits
+- please make pull requests on any changes to Homebrew/brew code or any
+  non-trivial (e.g. not a test or audit improvement or version bump) changes
+  to formulae code and don't merge them unless you get at least one approval
+  and passing tests.
+- use `brew pull` for formulae changes that require new bottles or change 
+  multiple formulae and let it auto-close issues wherever possible (it may 
+  take ~5m). When this isn't necessary use GitHub's "Merge pull request" 
+  button in "create a merge commit" mode for Homebrew/brew or "squash and 
+  merge" for a single formulae change. If in doubt, check with e.g. GitX that
+  you've not accidentally added merge commits
 - still create your branches on your fork rather than in the main repository
 - if still in doubt please ask for help and we'll help you out - these are
   probably worth a read:
@@ -36,15 +38,15 @@ Thanks for all your work so far!
 
 If they accept, follow a few steps to get them set up:
 
-- [x] Invite them to the [**@Homebrew/maintainers** team](https://github.com/orgs/Homebrew/teams/maintainers) to give them write access to all repositories (but don't make them owners yet)
-- [x] Ask them to sign up for a [Bintray](https://bintray.com) account and invite them to [Bintray's Homebrew organisation](https://bintray.com/homebrew/organization/edit/members) as a member (but not administrator access yet) so they can publish new bottles
+- [x] Invite them to the [**@Homebrew/maintainers** team](https://github.com/orgs/Homebrew/teams/maintainers) to give them write access to all repositories (but don't make them owners yet). They will need to enable [GitHub's Two Factor Authentication](https://help.github.com/articles/about-two-factor-authentication/).
+- [x] Ask them to sign in to [Bintray](https://bintray.com) using their GitHub account and they should auto-sync to [Bintray's Homebrew organisation](https://bintray.com/homebrew/organization/edit/members) as a member so they can publish new bottles
 - [x] Add them to the [Jenkins' GitHub Authorization Settings admin user names](https://bot.brew.sh/configureSecurity/) so they can adjust settings and restart jobs
 - [x] Add them to the [Jenkins' GitHub Pull Request Builder admin list](https://bot.brew.sh/configure) to enable `@BrewTestBot test this please` for them
 - [x] Invite them to the [`homebrew-dev` private maintainers mailing list](https://groups.google.com/forum/#!managemembers/homebrew-dev/invite)
 - [x] Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites)
+- [x] Invite them to the [`homebrew` private maintainers 1Password](https://homebrew.1password.com/signin)
 - [x] Add them to [Homebrew's README](https://github.com/Homebrew/brew/edit/master/README.md)
-- [x] Encourage them to enable [GitHub's Two Factor Authentication](https://help.github.com/articles/about-two-factor-authentication/)
 
-After a few weeks/months with no problems consider making them [owners on the Homebrew GitHub organisation](https://github.com/orgs/Homebrew/people) and [administrators on Bintray](https://bintray.com/homebrew/organization/edit/members).
+After a few weeks/months with no problems consider making them [owners on the Homebrew GitHub organisation](https://github.com/orgs/Homebrew/people).
 
 Now sit back, relax and let the new maintainers handle more of our contributions.
