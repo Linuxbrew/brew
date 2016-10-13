@@ -245,3 +245,6 @@ to with `brew link`.
 ### How can I specify different configure arguments for a formula?
 `brew edit $FORMULA` and edit the formula. Currently there is no
 other way to do this.
+
+### Is there a glossary of terms around?
+All your terminology needs can be [found here](docs/Formula-Cookbook.md#homebrew-terminology).
