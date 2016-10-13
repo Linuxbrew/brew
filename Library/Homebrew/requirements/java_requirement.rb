@@ -9,7 +9,7 @@ class JavaRequirement < Requirement
   satisfy build_env: false do
     unless File.executable? "/usr/libexec/java_home"
       jdk = Formula["jdk"]
-      @java_home = jdk.opt_prefix if jdk
+      @java_home = jdk.opt_prefix if jdk && jdk.installed?
       next quiet_system "java", "-version"
     end
 
