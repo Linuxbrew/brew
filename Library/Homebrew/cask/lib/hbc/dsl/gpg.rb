@@ -2,9 +2,9 @@ module Hbc
   class DSL
     class Gpg
       KEY_PARAMETERS = Set.new [
-                                 :key_id,
-                                 :key_url,
-                               ]
+        :key_id,
+        :key_url,
+      ]
 
       VALID_PARAMETERS = Set.new []
       VALID_PARAMETERS.merge KEY_PARAMETERS

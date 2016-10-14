@@ -91,19 +91,19 @@ module Hbc
       end
 
       # unnecessary DMG metadata
-      DMG_METADATA_FILES = %w[
-                             .background
-                             .com.apple.timemachine.donotpresent
-                             .com.apple.timemachine.supported
-                             .DocumentRevisions-V100
-                             .DS_Store
-                             .fseventsd
-                             .MobileBackups
-                             .Spotlight-V100
-                             .TemporaryItems
-                             .Trashes
-                             .VolumeIcon.icns
-                           ].to_set.freeze
+      DMG_METADATA_FILES = Set.new %w[
+        .background
+        .com.apple.timemachine.donotpresent
+        .com.apple.timemachine.supported
+        .DocumentRevisions-V100
+        .DS_Store
+        .fseventsd
+        .MobileBackups
+        .Spotlight-V100
+        .TemporaryItems
+        .Trashes
+        .VolumeIcon.icns
+      ].freeze
 
       def dmg_metadata?(path)
         relative_root = path.sub(%r{/.*}, "")

@@ -34,8 +34,8 @@ describe Hbc::CLI::Create do
   it "opens the editor for the specified Cask" do
     Hbc::CLI::Create.run("new-cask")
     Hbc::CLI::Create.editor_commands.must_equal [
-                                                  [Hbc.path("new-cask")],
-                                                ]
+      [Hbc.path("new-cask")],
+    ]
   end
 
   it "drops a template down for the specified Cask" do
@@ -58,15 +58,15 @@ describe Hbc::CLI::Create do
   it "throws away additional Cask arguments and uses the first" do
     Hbc::CLI::Create.run("additional-cask", "another-cask")
     Hbc::CLI::Create.editor_commands.must_equal [
-                                                  [Hbc.path("additional-cask")],
-                                                ]
+      [Hbc.path("additional-cask")],
+    ]
   end
 
   it "throws away stray options" do
     Hbc::CLI::Create.run("--notavalidoption", "yet-another-cask")
     Hbc::CLI::Create.editor_commands.must_equal [
-                                                  [Hbc.path("yet-another-cask")],
-                                                ]
+      [Hbc.path("yet-another-cask")],
+    ]
   end
 
   it "raises an exception when the Cask already exists" do
@@ -78,8 +78,8 @@ describe Hbc::CLI::Create do
   it "allows creating Casks that are substrings of existing Casks" do
     Hbc::CLI::Create.run("feine")
     Hbc::CLI::Create.editor_commands.must_equal [
-                                                  [Hbc.path("feine")],
-                                                ]
+      [Hbc.path("feine")],
+    ]
   end
 
   describe "when no Cask is specified" do

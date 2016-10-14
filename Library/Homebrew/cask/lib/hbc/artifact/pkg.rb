@@ -47,9 +47,9 @@ module Hbc
           raise CaskError, "pkg source file not found: '#{source}'"
         end
         args = [
-                 "-pkg",    source,
-                 "-target", "/"
-               ]
+          "-pkg",    source,
+          "-target", "/"
+        ]
         args << "-verboseR" if Hbc.verbose
         args << "-allowUntrusted" if pkg_install_opts :allow_untrusted
         @command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true)

@@ -232,16 +232,16 @@ module Hbc
       elsif MacOS.version <= :yosemite
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                              Hbc.tcc_db,
-                              "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
-                            ],
+                        Hbc.tcc_db,
+                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
+                      ],
                       sudo: true)
       elsif MacOS.version <= :el_capitan
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                              Hbc.tcc_db,
-                              "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
-                            ],
+                        Hbc.tcc_db,
+                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
+                      ],
                       sudo: true)
       else
         opoo <<-EOS.undent
@@ -257,9 +257,9 @@ module Hbc
         ohai "Disabling accessibility access"
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                              Hbc.tcc_db,
-                              "DELETE FROM access WHERE client='#{bundle_identifier}';",
-                            ],
+                        Hbc.tcc_db,
+                        "DELETE FROM access WHERE client='#{bundle_identifier}';",
+                      ],
                       sudo: true)
       else
         opoo <<-EOS.undent

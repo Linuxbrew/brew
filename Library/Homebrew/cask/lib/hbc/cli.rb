@@ -31,46 +31,46 @@ require "hbc/cli/internal_stanza"
 module Hbc
   class CLI
     ALIASES = {
-                "ls"       => "list",
-                "homepage" => "home",
-                "-S"       => "search",    # verb starting with "-" is questionable
-                "up"       => "update",
-                "instal"   => "install",   # gem does the same
-                "rm"       => "uninstall",
-                "remove"   => "uninstall",
-                "abv"      => "info",
-                "dr"       => "doctor",
-                # aliases from Homebrew that we don't (yet) support
-                # 'ln'          => 'link',
-                # 'configure'   => 'diy',
-                # '--repo'      => '--repository',
-                # 'environment' => '--env',
-                # '-c1'         => '--config',
-              }.freeze
+      "ls"       => "list",
+      "homepage" => "home",
+      "-S"       => "search",    # verb starting with "-" is questionable
+      "up"       => "update",
+      "instal"   => "install",   # gem does the same
+      "rm"       => "uninstall",
+      "remove"   => "uninstall",
+      "abv"      => "info",
+      "dr"       => "doctor",
+      # aliases from Homebrew that we don't (yet) support
+      # 'ln'          => 'link',
+      # 'configure'   => 'diy',
+      # '--repo'      => '--repository',
+      # 'environment' => '--env',
+      # '-c1'         => '--config',
+    }.freeze
 
     OPTIONS = {
-                "--caskroom="             => :caskroom=,
-                "--appdir="               => :appdir=,
-                "--colorpickerdir="       => :colorpickerdir=,
-                "--prefpanedir="          => :prefpanedir=,
-                "--qlplugindir="          => :qlplugindir=,
-                "--fontdir="              => :fontdir=,
-                "--servicedir="           => :servicedir=,
-                "--input_methoddir="      => :input_methoddir=,
-                "--internet_plugindir="   => :internet_plugindir=,
-                "--audio_unit_plugindir=" => :audio_unit_plugindir=,
-                "--vst_plugindir="        => :vst_plugindir=,
-                "--vst3_plugindir="       => :vst3_plugindir=,
-                "--screen_saverdir="      => :screen_saverdir=,
-              }.freeze
+      "--caskroom="             => :caskroom=,
+      "--appdir="               => :appdir=,
+      "--colorpickerdir="       => :colorpickerdir=,
+      "--prefpanedir="          => :prefpanedir=,
+      "--qlplugindir="          => :qlplugindir=,
+      "--fontdir="              => :fontdir=,
+      "--servicedir="           => :servicedir=,
+      "--input_methoddir="      => :input_methoddir=,
+      "--internet_plugindir="   => :internet_plugindir=,
+      "--audio_unit_plugindir=" => :audio_unit_plugindir=,
+      "--vst_plugindir="        => :vst_plugindir=,
+      "--vst3_plugindir="       => :vst3_plugindir=,
+      "--screen_saverdir="      => :screen_saverdir=,
+    }.freeze
 
     FLAGS = {
-              "--no-binaries" => :no_binaries=,
-              "--debug"       => :debug=,
-              "--verbose"     => :verbose=,
-              "--outdated"    => :cleanup_outdated=,
-              "--help"        => :help=,
-            }.freeze
+      "--no-binaries" => :no_binaries=,
+      "--debug"       => :debug=,
+      "--verbose"     => :verbose=,
+      "--outdated"    => :cleanup_outdated=,
+      "--help"        => :help=,
+    }.freeze
 
     def self.command_classes
       @command_classes ||= self.constants

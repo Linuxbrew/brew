@@ -19,63 +19,63 @@ require "hbc/dsl/version"
 module Hbc
   class DSL
     ORDINARY_ARTIFACT_TYPES = [
-                                :app,
-                                :artifact,
-                                :audio_unit_plugin,
-                                :binary,
-                                :colorpicker,
-                                :font,
-                                :input_method,
-                                :internet_plugin,
-                                :pkg,
-                                :prefpane,
-                                :qlplugin,
-                                :screen_saver,
-                                :service,
-                                :stage_only,
-                                :suite,
-                                :vst_plugin,
-                                :vst3_plugin,
-                              ].freeze
+      :app,
+      :artifact,
+      :audio_unit_plugin,
+      :binary,
+      :colorpicker,
+      :font,
+      :input_method,
+      :internet_plugin,
+      :pkg,
+      :prefpane,
+      :qlplugin,
+      :screen_saver,
+      :service,
+      :stage_only,
+      :suite,
+      :vst_plugin,
+      :vst3_plugin,
+    ].freeze
 
     ACTIVATABLE_ARTIFACT_TYPES = ([:installer, *ORDINARY_ARTIFACT_TYPES] - [:stage_only]).freeze
 
     SPECIAL_ARTIFACT_TYPES = [
-                               :uninstall,
-                               :zap,
-                             ].freeze
+      :uninstall,
+      :zap,
+    ].freeze
 
     ARTIFACT_BLOCK_TYPES = [
-                             :preflight,
-                             :postflight,
-                             :uninstall_preflight,
-                             :uninstall_postflight,
-                           ].freeze
+      :preflight,
+      :postflight,
+      :uninstall_preflight,
+      :uninstall_postflight,
+    ].freeze
 
     DSL_METHODS = Set.new [
-                            :accessibility_access,
-                            :appcast,
-                            :artifacts,
-                            :auto_updates,
-                            :caskroom_path,
-                            :caveats,
-                            :conflicts_with,
-                            :container,
-                            :depends_on,
-                            :gpg,
-                            :homepage,
-                            :language,
-                            :name,
-                            :sha256,
-                            :staged_path,
-                            :url,
-                            :version,
-                            :appdir,
-                            *ORDINARY_ARTIFACT_TYPES,
-                            *ACTIVATABLE_ARTIFACT_TYPES,
-                            *SPECIAL_ARTIFACT_TYPES,
-                            *ARTIFACT_BLOCK_TYPES,
-                          ].freeze
+      :accessibility_access,
+      :appcast,
+      :artifacts,
+      :auto_updates,
+      :caskroom_path,
+      :caveats,
+      :conflicts_with,
+      :container,
+      :depends_on,
+      :gpg,
+      :homepage,
+      :language,
+      :name,
+      :sha256,
+      :staged_path,
+      :url,
+      :version,
+      :appdir,
+      *ORDINARY_ARTIFACT_TYPES,
+      *ACTIVATABLE_ARTIFACT_TYPES,
+      *SPECIAL_ARTIFACT_TYPES,
+      *ARTIFACT_BLOCK_TYPES,
+    ].freeze
 
     attr_reader :token
     def initialize(token)
@@ -183,8 +183,8 @@ module Hbc
     end
 
     SYMBOLIC_VERSIONS = Set.new [
-                                  :latest,
-                                ]
+      :latest,
+    ]
 
     def version(arg = nil)
       return @version if arg.nil?
@@ -194,8 +194,8 @@ module Hbc
     end
 
     SYMBOLIC_SHA256S = Set.new [
-                                 :no_check,
-                               ]
+      :no_check,
+    ]
 
     def sha256(arg = nil)
       return @sha256 if arg.nil?

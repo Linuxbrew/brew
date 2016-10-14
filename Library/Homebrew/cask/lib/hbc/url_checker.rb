@@ -23,16 +23,16 @@ module Hbc
     end
 
     HTTP_RESPONSES = [
-                       "HTTP/1.0 200 OK",
-                       "HTTP/1.1 200 OK",
-                       "HTTP/1.1 302 Found",
-                     ].freeze
+      "HTTP/1.0 200 OK",
+      "HTTP/1.1 200 OK",
+      "HTTP/1.1 302 Found",
+    ].freeze
 
     OK_RESPONSES = {
-                     "http"  => HTTP_RESPONSES,
-                     "https" => HTTP_RESPONSES,
-                     "ftp"   => ["OK"],
-                   }.freeze
+      "http"  => HTTP_RESPONSES,
+      "https" => HTTP_RESPONSES,
+      "ftp"   => ["OK"],
+    }.freeze
 
     def _check_response_status
       ok = OK_RESPONSES[cask.url.scheme]

@@ -4,40 +4,40 @@ module Hbc
   class DSL
     class DependsOn
       VALID_KEYS = Set.new [
-                             :formula,
-                             :cask,
-                             :macos,
-                             :arch,
-                             :x11,
-                             :java,
-                           ].freeze
+        :formula,
+        :cask,
+        :macos,
+        :arch,
+        :x11,
+        :java,
+      ].freeze
 
       VALID_ARCHES = {
-                       intel:    { type: :intel, bits: [32, 64] },
-                       ppc:      { type: :ppc,   bits: [32, 64] },
-                       # specific
-                       i386:     { type: :intel, bits: 32 },
-                       x86_64:   { type: :intel, bits: 64 },
-                       ppc_7400: { type: :ppc,   bits: 32 },
-                       ppc_64:   { type: :ppc,   bits: 64 },
-                     }.freeze
+        intel:    { type: :intel, bits: [32, 64] },
+        ppc:      { type: :ppc,   bits: [32, 64] },
+        # specific
+        i386:     { type: :intel, bits: 32 },
+        x86_64:   { type: :intel, bits: 64 },
+        ppc_7400: { type: :ppc,   bits: 32 },
+        ppc_64:   { type: :ppc,   bits: 64 },
+      }.freeze
 
       # Intentionally undocumented: catch variant spellings.
       ARCH_SYNONYMS = {
-                        x86_32:   :i386,
-                        x8632:    :i386,
-                        x8664:    :x86_64,
-                        intel_32: :i386,
-                        intel32:  :i386,
-                        intel_64: :x86_64,
-                        intel64:  :x86_64,
-                        amd_64:   :x86_64,
-                        amd64:    :x86_64,
-                        ppc7400:  :ppc_7400,
-                        ppc_32:   :ppc_7400,
-                        ppc32:    :ppc_7400,
-                        ppc64:    :ppc_64,
-                      }.freeze
+        x86_32:   :i386,
+        x8632:    :i386,
+        x8664:    :x86_64,
+        intel_32: :i386,
+        intel32:  :i386,
+        intel_64: :x86_64,
+        intel64:  :x86_64,
+        amd_64:   :x86_64,
+        amd64:    :x86_64,
+        ppc7400:  :ppc_7400,
+        ppc_32:   :ppc_7400,
+        ppc32:    :ppc_7400,
+        ppc64:    :ppc_64,
+      }.freeze
 
       attr_accessor :java
       attr_accessor :pairs

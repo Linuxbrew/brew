@@ -2,7 +2,7 @@ module Hbc
   class Auditor
     def self.audit(cask, audit_download: false, check_token_conflicts: false)
       if !ARGV.value("language") &&
-        languages_blocks = cask.instance_variable_get(:@dsl).instance_variable_get(:@language_blocks)
+         languages_blocks = cask.instance_variable_get(:@dsl).instance_variable_get(:@language_blocks)
         begin
           saved_languages = MacOS.instance_variable_get(:@languages)
 

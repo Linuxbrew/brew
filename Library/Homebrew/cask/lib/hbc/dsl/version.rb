@@ -2,11 +2,11 @@ module Hbc
   class DSL
     class Version < ::String
       DIVIDERS = {
-                   "." => :dots,
-                   "-" => :hyphens,
-                   "_" => :underscores,
-                   "/" => :slashes,
-                 }.freeze
+        "." => :dots,
+        "-" => :hyphens,
+        "_" => :underscores,
+        "/" => :slashes,
+      }.freeze
 
       DIVIDER_REGEX = /(#{DIVIDERS.keys.map { |v| Regexp.quote(v) }.join('|')})/
 

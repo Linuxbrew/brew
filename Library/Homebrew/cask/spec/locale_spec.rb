@@ -11,7 +11,7 @@ describe Locale do
 
     context "raises a ParserError when given" do
       it "an empty string" do
-        expect{ described_class.parse("") }.to raise_error(Locale::ParserError)
+        expect { described_class.parse("") }.to raise_error(Locale::ParserError)
       end
 
       it "a string in a wrong format" do

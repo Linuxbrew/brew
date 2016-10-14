@@ -88,10 +88,10 @@ module Hbc
         @homebrew_constants[name] = notfound_string
         begin
           @homebrew_constants[name] = SystemCommand.run!(Hbc.homebrew_executable,
-                                                              args:         ["--#{name}"],
-                                                              print_stderr: false)
-                                                        .stdout
-                                                        .strip
+                                                         args:         ["--#{name}"],
+                                                         print_stderr: false)
+                                                   .stdout
+                                                   .strip
           if @homebrew_constants[name] !~ /\S/
             @homebrew_constants[name] = "#{none_string} #{error_string}"
           end

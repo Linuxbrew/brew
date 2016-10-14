@@ -11,18 +11,18 @@ module Hbc
       PATH_ARG_SLICE_SIZE = 500
 
       ORDERED_DIRECTIVES = [
-                             :early_script,
-                             :launchctl,
-                             :quit,
-                             :signal,
-                             :login_item,
-                             :kext,
-                             :script,
-                             :pkgutil,
-                             :delete,
-                             :trash,
-                             :rmdir,
-                           ].freeze
+        :early_script,
+        :launchctl,
+        :quit,
+        :signal,
+        :login_item,
+        :kext,
+        :script,
+        :pkgutil,
+        :delete,
+        :trash,
+        :rmdir,
+      ].freeze
 
       # TODO: these methods were consolidated here from separate
       #       sources and should be refactored for consistency
