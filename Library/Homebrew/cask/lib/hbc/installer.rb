@@ -84,10 +84,10 @@ module Hbc
 
     def summary
       s = if MacOS.version >= :lion && !ENV["HOMEBREW_NO_EMOJI"]
-            (ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba") + "  "
-          else
-            Formatter.headline("Success! ", color: :blue)
-          end
+        (ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba") + "  "
+      else
+        Formatter.headline("Success! ", color: :blue)
+      end
       s << "#{@cask} was successfully installed!"
     end
 
@@ -113,10 +113,10 @@ module Hbc
       odebug "Extracting primary container"
       FileUtils.mkdir_p @cask.staged_path
       container = if @cask.container && @cask.container.type
-                    Container.from_type(@cask.container.type)
-                  else
-                    Container.for_path(@downloaded_path, @command)
-                  end
+        Container.from_type(@cask.container.type)
+      else
+        Container.for_path(@downloaded_path, @command)
+      end
       unless container
         raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'"
       end

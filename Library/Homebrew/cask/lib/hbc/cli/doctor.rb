@@ -78,8 +78,8 @@ module Hbc
 
       def self.homebrew_taps
         @homebrew_taps ||= if homebrew_repository.respond_to?(:join)
-                             homebrew_repository.join("Library", "Taps")
-                           end
+          homebrew_repository.join("Library", "Taps")
+        end
       end
 
       def self.homebrew_constants(name)

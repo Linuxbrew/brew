@@ -87,16 +87,16 @@ module Hbc
       def macos=(*arg)
         @macos ||= []
         macos = if arg.count == 1 && arg.first =~ /^\s*(<|>|[=<>]=)\s*(\S+)\s*$/
-                  raise "'depends_on macos' comparison expressions cannot be combined" unless @macos.empty?
-                  operator = Regexp.last_match[1].to_sym
-                  release = self.class.coerce_os_release(Regexp.last_match[2])
-                  [[operator, release]]
-                else
-                  raise "'depends_on macos' comparison expressions cannot be combined" if @macos.first.is_a?(Symbol)
-                  Array(*arg).map { |elt|
-                    self.class.coerce_os_release(elt)
-                  }.sort
-                end
+          raise "'depends_on macos' comparison expressions cannot be combined" unless @macos.empty?
+          operator = Regexp.last_match[1].to_sym
+          release = self.class.coerce_os_release(Regexp.last_match[2])
+          [[operator, release]]
+        else
+          raise "'depends_on macos' comparison expressions cannot be combined" if @macos.first.is_a?(Symbol)
+          Array(*arg).map { |elt|
+            self.class.coerce_os_release(elt)
+          }.sort
+        end
         @macos.concat(macos)
       end
 

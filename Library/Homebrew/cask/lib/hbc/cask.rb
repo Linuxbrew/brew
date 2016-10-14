@@ -38,12 +38,12 @@ module Hbc
         raise CaskError, "Cannot create metadata path when timestamp is :latest"
       end
       path = if timestamp == :latest
-               Pathname.glob(metadata_versioned_container_path.join("*")).sort.last
-             elsif timestamp == :now
-               Utils.nowstamp_metadata_path(metadata_versioned_container_path)
-             else
-               metadata_versioned_container_path.join(timestamp)
-             end
+        Pathname.glob(metadata_versioned_container_path.join("*")).sort.last
+      elsif timestamp == :now
+        Utils.nowstamp_metadata_path(metadata_versioned_container_path)
+      else
+        metadata_versioned_container_path.join(timestamp)
+      end
       if create
         odebug "Creating metadata directory #{path}"
         FileUtils.mkdir_p path
