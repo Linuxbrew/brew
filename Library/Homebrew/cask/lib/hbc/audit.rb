@@ -47,7 +47,7 @@ module Hbc
 
     def check_required_stanzas
       odebug "Auditing required stanzas"
-      %i{version sha256 url homepage}.each do |sym|
+      [:version, :sha256, :url, :homepage].each do |sym|
         add_error "a #{sym} stanza is required" unless cask.send(sym)
       end
       add_error "at least one name stanza is required" if cask.name.empty?
