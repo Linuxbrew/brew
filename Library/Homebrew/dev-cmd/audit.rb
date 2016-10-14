@@ -406,10 +406,9 @@ class FormulaAuditor
               depends_on :ruby => "1.8"
             where "1.8" is the minimum version of Ruby required.
           EOS
-        when "open-mpi", "mpich"
-          problem <<-EOS.undent
         when *BUILD_TIME_DEPS
           next if dep.build? || dep.run?
+        when "open-mpi", "mpich"
           problem <<-EOS.undent
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
               depends_on :mpi => [<lang list>]
