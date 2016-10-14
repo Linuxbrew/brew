@@ -23,7 +23,7 @@ module Hbc
 
   class CaskAlreadyCreatedError < AbstractCaskErrorWithToken
     def to_s
-      %Q{A Cask for #{token} already exists. Run "brew cask cat #{token}" to see it.}
+      %Q(A Cask for #{token} already exists. Run "brew cask cat #{token}" to see it.)
     end
   end
 

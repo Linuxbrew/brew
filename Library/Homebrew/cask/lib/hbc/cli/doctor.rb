@@ -104,7 +104,7 @@ module Hbc
       end
 
       def self.locale_variables
-        ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).collect { |v| %Q{#{v}="#{ENV[v]}"} }.sort.join("\n")
+        ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).collect { |v| %Q(#{v}="#{ENV[v]}") }.sort.join("\n")
       end
 
       def self.privileged_uid
@@ -154,7 +154,7 @@ module Hbc
 
       def self.render_env_var(var)
         if ENV.key?(var)
-          %Q{#{var}="#{ENV[var]}"}
+          %Q(#{var}="#{ENV[var]}")
         else
           none_string
         end

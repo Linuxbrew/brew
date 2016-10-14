@@ -266,7 +266,7 @@ module Hbc
           next unless klass.visible
           puts "    #{klass.command_name.ljust(max_command_len)}  #{_help_for(klass)}"
         end
-        puts %Q{\nSee also "man brew-cask"}
+        puts %Q(\nSee also "man brew-cask")
       end
 
       def help

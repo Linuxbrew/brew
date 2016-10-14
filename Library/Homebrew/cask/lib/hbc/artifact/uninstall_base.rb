@@ -87,7 +87,7 @@ module Hbc
       def warn_for_unknown_directives(directives)
         unknown_keys = directives.keys - ORDERED_DIRECTIVES
         return if unknown_keys.empty?
-        opoo %Q{Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. Running "brew update; brew cleanup; brew cask cleanup" will likely fix it.}
+        opoo %Q(Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. Running "brew update; brew cleanup; brew cask cleanup" will likely fix it.)
       end
 
       # Preserve prior functionality of script which runs first. Should rarely be needed.
@@ -129,7 +129,7 @@ module Hbc
           ohai "Quitting application ID #{id}"
           num_running = count_running_processes(id)
           next unless num_running > 0
-          @command.run!("/usr/bin/osascript", args: ["-e", %Q{tell application id "#{id}" to quit}], sudo: true)
+          @command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{id}" to quit)], sudo: true)
           sleep 3
         end
       end
@@ -156,13 +156,13 @@ module Hbc
 
       def count_running_processes(bundle_id)
         @command.run!("/usr/bin/osascript",
-                      args: ["-e", %Q{tell application "System Events" to count processes whose bundle identifier is "#{bundle_id}"}],
+                      args: ["-e", %Q(tell application "System Events" to count processes whose bundle identifier is "#{bundle_id}")],
                       sudo: true).stdout.to_i
       end
 
       def get_unix_pids(bundle_id)
         pid_string = @command.run!("/usr/bin/osascript",
-                                   args: ["-e", %Q{tell application "System Events" to get the unix id of every process whose bundle identifier is "#{bundle_id}"}],
+                                   args: ["-e", %Q(tell application "System Events" to get the unix id of every process whose bundle identifier is "#{bundle_id}")],
                                    sudo: true).stdout.chomp
         return [] unless pid_string =~ /\A\d+(?:\s*,\s*\d+)*\Z/ # sanity check
         pid_string.split(/\s*,\s*/).map(&:strip).map(&:to_i)
@@ -172,7 +172,7 @@ module Hbc
         Array(directives[:login_item]).each do |name|
           ohai "Removing login item #{name}"
           @command.run!("/usr/bin/osascript",
-                        args: ["-e", %Q{tell application "System Events" to delete every login item whose name is "#{name}"}],
+                        args: ["-e", %Q(tell application "System Events" to delete every login item whose name is "#{name}")],
                         sudo: false)
           sleep 1
         end

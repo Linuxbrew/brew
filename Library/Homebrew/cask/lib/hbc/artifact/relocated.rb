@@ -31,7 +31,7 @@ module Hbc
                                 print_stderr: false).stdout.sub(/\A\((.*)\)\Z/, '\1')
         odebug "Existing metadata is: '#{altnames}'"
         altnames.concat(", ") unless altnames.empty?
-        altnames.concat(%Q{"#{altname}"})
+        altnames.concat(%Q("#{altname}"))
         altnames = "(#{altnames})"
 
         # Some packges are shipped as u=rx (e.g. Bitcoin Core)

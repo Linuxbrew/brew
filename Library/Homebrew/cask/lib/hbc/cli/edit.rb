@@ -9,7 +9,7 @@ module Hbc
         cask_path = Hbc.path(cask_token)
         odebug "Opening editor for Cask #{cask_token}"
         unless cask_path.exist?
-          raise CaskUnavailableError, %Q{#{cask_token}, run "brew cask create #{cask_token}" to create a new Cask}
+          raise CaskUnavailableError, %Q(#{cask_token}, run "brew cask create #{cask_token}" to create a new Cask)
         end
         exec_editor cask_path
       end

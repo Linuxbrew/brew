@@ -302,7 +302,7 @@ module Hbc
     end
 
     def zap
-      ohai %Q{Implied "brew cask uninstall #{@cask}"}
+      ohai %Q(Implied "brew cask uninstall #{@cask}")
       uninstall_artifacts
       if Artifact::Zap.me?(@cask)
         ohai "Dispatching zap stanza"
