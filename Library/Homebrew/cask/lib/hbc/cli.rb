@@ -73,9 +73,8 @@ module Hbc
     }.freeze
 
     def self.command_classes
-      @command_classes ||= self.constants
-                               .map(&method(:const_get))
-                               .select { |sym| sym.respond_to?(:run) }
+      @command_classes ||= constants.map(&method(:const_get))
+                                    .select { |sym| sym.respond_to?(:run) }
     end
 
     def self.commands
@@ -114,7 +113,7 @@ module Hbc
         # for development and troubleshooting
         sym = Pathname.new(command.to_s).basename(".rb").to_s.capitalize
         klass = begin
-                  self.const_get(sym)
+                  const_get(sym)
                 rescue NameError
                   nil
                 end
