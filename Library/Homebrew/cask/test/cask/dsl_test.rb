@@ -250,7 +250,7 @@ describe Hbc::DSL do
   describe "appcast stanza" do
     it "allows appcasts to be specified" do
       cask = Hbc.load("with-appcast")
-      cask.appcast.to_s.must_match %r{^http}
+      cask.appcast.to_s.must_match(/^http/)
     end
 
     it "prevents defining multiple appcasts" do
@@ -270,12 +270,12 @@ describe Hbc::DSL do
   describe "gpg stanza" do
     it "allows gpg stanza to be specified" do
       cask = Hbc.load("with-gpg")
-      cask.gpg.to_s.must_match %r{\S}
+      cask.gpg.to_s.must_match(/\S/)
     end
 
     it "allows gpg stanza to be specified with :key_url" do
       cask = Hbc.load("with-gpg-key-url")
-      cask.gpg.to_s.must_match %r{\S}
+      cask.gpg.to_s.must_match(/\S/)
     end
 
     it "prevents specifying gpg stanza multiple times" do

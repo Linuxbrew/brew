@@ -16,7 +16,7 @@ module Hbc
 
       def method_missing(method, *)
         if method
-          underscored_class = self.class.name.gsub(%r{([[:lower:]])([[:upper:]][[:lower:]])}, '\1_\2').downcase
+          underscored_class = self.class.name.gsub(/([[:lower:]])([[:upper:]][[:lower:]])/, '\1_\2').downcase
           section = underscored_class.downcase.split("::").last
           Utils.method_missing_message(method, @cask.to_s, section)
           nil

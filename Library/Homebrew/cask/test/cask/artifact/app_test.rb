@@ -243,7 +243,7 @@ describe Hbc::Artifact::App do
     describe "app is missing" do
       it "returns a warning and the supposed path to the app" do
         contents.size.must_equal 1
-        contents[0].must_match(%r{.*Missing App.*: #{target_path}})
+        contents[0].must_match(/.*Missing App.*: #{target_path}/)
       end
     end
   end

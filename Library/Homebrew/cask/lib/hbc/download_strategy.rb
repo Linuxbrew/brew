@@ -74,7 +74,7 @@ module Hbc
     end
 
     def temporary_path
-      @temporary_path ||= tarball_path.sub(%r{$}, ".incomplete")
+      @temporary_path ||= tarball_path.sub(/$/, ".incomplete")
     end
 
     def cached_location
@@ -216,7 +216,7 @@ module Hbc
     end
 
     def repo_url
-      `svn info '#{@clone}' 2>/dev/null`.strip[%r{^URL: (.+)$}, 1]
+      `svn info '#{@clone}' 2>/dev/null`.strip[/^URL: (.+)$/, 1]
     end
 
     # super does not provide checks for already-existing downloads
@@ -224,7 +224,7 @@ module Hbc
       if tarball_path.exist?
         puts "Already downloaded: #{tarball_path}"
       else
-        @url = @url.sub(%r{^svn\+}, "") if @url =~ %r{^svn\+http://}
+        @url = @url.sub(/^svn\+/, "") if @url =~ %r{^svn\+http://}
         ohai "Checking out #{@url}"
 
         clear_cache unless @url.chomp("/") == repo_url || quiet_system("svn", "switch", @url, @clone)
@@ -291,12 +291,12 @@ module Hbc
     def shell_quote(str)
       # Oh god escaping shell args.
       # See http://notetoself.vrensk.com/2008/08/escaping-single-quotes-in-ruby-harder-than-expected/
-      str.gsub(%r{\\|'}) { |c| "\\#{c}" }
+      str.gsub(/\\|'/) { |c| "\\#{c}" }
     end
 
     def fetch_externals
       `svn propget svn:externals '#{shell_quote(@url)}'`.chomp.each_line do |line|
-        name, url = line.split(%r{\s+})
+        name, url = line.split(/\s+/)
         yield name, url
       end
     end

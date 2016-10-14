@@ -67,7 +67,7 @@ module Hbc
       end
 
       def fix?
-        args.any? { |arg| arg =~ %r{--(fix|(auto-?)?correct)} }
+        args.any? { |arg| arg =~ /--(fix|(auto-?)?correct)/ }
       end
     end
   end

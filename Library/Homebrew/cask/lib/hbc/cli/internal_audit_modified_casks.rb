@@ -10,7 +10,7 @@ module Hbc
 
         def run(*args)
           commit_range = commit_range(args)
-          cleanup = args.any? { |a| a =~ %r{^-+c(leanup)?$}i }
+          cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }
           new(commit_range, cleanup: cleanup).run
         end
 
@@ -109,7 +109,7 @@ module Hbc
 
       def relevant_stanza_modified?(cask_file)
         out = git("diff", commit_range, "--", cask_file)
-        out =~ %r{^\+\s*(#{RELEVANT_STANZAS.join('|')})}
+        out =~ /^\+\s*(#{RELEVANT_STANZAS.join('|')})/
       end
 
       def git(*args)

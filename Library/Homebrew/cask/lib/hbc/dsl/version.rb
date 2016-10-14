@@ -8,9 +8,9 @@ module Hbc
                    "/" => :slashes,
                  }.freeze
 
-      DIVIDER_REGEX = %r{(#{DIVIDERS.keys.map { |v| Regexp.quote(v) }.join('|')})}
+      DIVIDER_REGEX = /(#{DIVIDERS.keys.map { |v| Regexp.quote(v) }.join('|')})/
 
-      MAJOR_MINOR_PATCH_REGEX = %r{^(\d+)(?:\.(\d+)(?:\.(\d+))?)?}
+      MAJOR_MINOR_PATCH_REGEX = /^(\d+)(?:\.(\d+)(?:\.(\d+))?)?/
 
       class << self
         private

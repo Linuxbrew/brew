@@ -15,7 +15,7 @@ module Hbc
       attr_reader :source, :target
 
       def printable_target
-        target.to_s.sub(%r{^#{ENV['HOME']}(#{File::SEPARATOR}|$)}, "~/")
+        target.to_s.sub(/^#{ENV['HOME']}(#{File::SEPARATOR}|$)/, "~/")
       end
 
       ALT_NAME_ATTRIBUTE = "com.apple.metadata:kMDItemAlternateNames".freeze
@@ -28,7 +28,7 @@ module Hbc
         odebug "Adding #{ALT_NAME_ATTRIBUTE} metadata"
         altnames = @command.run("/usr/bin/xattr",
                                 args:         ["-p", ALT_NAME_ATTRIBUTE, file.to_s],
-                                print_stderr: false).stdout.sub(%r{\A\((.*)\)\Z}, '\1')
+                                print_stderr: false).stdout.sub(/\A\((.*)\)\Z/, '\1')
         odebug "Existing metadata is: '#{altnames}'"
         altnames.concat(", ") unless altnames.empty?
         altnames.concat(%Q{"#{altname}"})

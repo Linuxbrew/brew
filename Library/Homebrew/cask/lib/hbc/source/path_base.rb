@@ -7,7 +7,7 @@ module Hbc
       # derived classes must define method self.me?
 
       def self.path_for_query(query)
-        Pathname.new(query).sub(%r{(\.rb)?$}, ".rb")
+        Pathname.new(query).sub(/(\.rb)?$/, ".rb")
       end
 
       attr_reader :path

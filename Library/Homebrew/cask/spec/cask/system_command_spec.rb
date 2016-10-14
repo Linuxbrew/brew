@@ -84,7 +84,7 @@ describe Hbc::SystemCommand do
         (1..6).each do |i|
           expect {
             described_class.run(command, options)
-          }.to output(%r{==> #{ i }}).to_stdout
+          }.to output(/==> #{ i }/).to_stdout
         end
       end
 

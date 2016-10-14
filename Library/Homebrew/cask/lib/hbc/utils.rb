@@ -12,7 +12,7 @@ class Object
   def utf8_inspect
     return inspect unless defined?(Encoding)
     return map(&:utf8_inspect) if respond_to?(:map)
-    inspect.force_encoding("UTF-8").sub(%r{\A"(.*)"\Z}, '\1')
+    inspect.force_encoding("UTF-8").sub(/\A"(.*)"\Z/, '\1')
   end
 end
 

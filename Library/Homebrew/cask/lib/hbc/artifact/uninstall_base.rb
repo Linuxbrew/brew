@@ -103,7 +103,7 @@ module Hbc
           ohai "Removing launchctl service #{service}"
           [false, true].each do |with_sudo|
             plist_status = @command.run("/bin/launchctl", args: ["list", service], sudo: with_sudo, print_stderr: false).stdout
-            if plist_status =~ %r{^\{}
+            if plist_status =~ /^\{/
               @command.run!("/bin/launchctl", args: ["remove", service], sudo: with_sudo)
               sleep 1
             end
@@ -164,8 +164,8 @@ module Hbc
         pid_string = @command.run!("/usr/bin/osascript",
                                    args: ["-e", %Q{tell application "System Events" to get the unix id of every process whose bundle identifier is "#{bundle_id}"}],
                                    sudo: true).stdout.chomp
-        return [] unless pid_string =~ %r{\A\d+(?:\s*,\s*\d+)*\Z} # sanity check
-        pid_string.split(%r{\s*,\s*}).map(&:strip).map(&:to_i)
+        return [] unless pid_string =~ /\A\d+(?:\s*,\s*\d+)*\Z/ # sanity check
+        pid_string.split(/\s*,\s*/).map(&:strip).map(&:to_i)
       end
 
       def uninstall_login_item(directives)

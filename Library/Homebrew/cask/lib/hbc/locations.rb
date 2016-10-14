@@ -136,7 +136,7 @@ module Hbc
         return query_path if query_path.absolute?
         return query_path if query_path.exist? && query_path.extname == ".rb"
 
-        query_without_extension = query.sub(%r{\.rb$}i, "")
+        query_without_extension = query.sub(/\.rb$/i, "")
 
         token_with_tap = if query =~ %r{\A[^/]+/[^/]+/[^/]+\Z}
                            query_without_extension

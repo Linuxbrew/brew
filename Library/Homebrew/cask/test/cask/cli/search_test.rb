@@ -19,25 +19,25 @@ describe Hbc::CLI::Search do
 
   it "lists all available Casks with no search term" do
     out = capture_io { Hbc::CLI::Search.run }[0]
-    out.must_match(%r{google-chrome})
+    out.must_match(/google-chrome/)
     out.length.must_be :>, 1000
   end
 
   it "ignores hyphens in search terms" do
     out = capture_io { Hbc::CLI::Search.run("goo-gle-chrome") }[0]
-    out.must_match(%r{google-chrome})
+    out.must_match(/google-chrome/)
     out.length.must_be :<, 100
   end
 
   it "ignores hyphens in Cask tokens" do
     out = capture_io { Hbc::CLI::Search.run("googlechrome") }[0]
-    out.must_match(%r{google-chrome})
+    out.must_match(/google-chrome/)
     out.length.must_be :<, 100
   end
 
   it "accepts multiple arguments" do
     out = capture_io { Hbc::CLI::Search.run("google chrome") }[0]
-    out.must_match(%r{google-chrome})
+    out.must_match(/google-chrome/)
     out.length.must_be :<, 100
   end
 
@@ -49,11 +49,11 @@ describe Hbc::CLI::Search do
 
   it "Returns both exact and partial matches" do
     out = capture_io { Hbc::CLI::Search.run("mnemosyne") }[0]
-    out.must_match(%r{^==> Exact match\nmnemosyne\n==> Partial matches\nsubclassed-mnemosyne})
+    out.must_match(/^==> Exact match\nmnemosyne\n==> Partial matches\nsubclassed-mnemosyne/)
   end
 
   it "does not search the Tap name" do
     out = capture_io { Hbc::CLI::Search.run("caskroom") }[0]
-    out.must_match(%r{^No Cask found for "caskroom"\.\n})
+    out.must_match(/^No Cask found for "caskroom"\.\n/)
   end
 end

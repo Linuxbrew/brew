@@ -93,7 +93,7 @@ describe Hbc::CLI::Uninstall do
         Hbc::CLI::Uninstall.run("versioned-cask")
       end
 
-      out.must_match(%r{#{token} #{first_installed_version} is still installed.})
+      out.must_match(/#{token} #{first_installed_version} is still installed./)
       err.must_be :empty?
     end
   end

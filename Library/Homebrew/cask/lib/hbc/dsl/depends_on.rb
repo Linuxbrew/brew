@@ -62,7 +62,7 @@ module Hbc
         begin
           if arg.is_a?(Symbol)
             Gem::Version.new(@macos_symbols.fetch(arg))
-          elsif arg =~ %r{^\s*:?([a-z]\S+)\s*$}i
+          elsif arg =~ /^\s*:?([a-z]\S+)\s*$/i
             Gem::Version.new(@macos_symbols.fetch(Regexp.last_match[1].downcase.to_sym))
           elsif @inverted_macos_symbols.key?(arg)
             Gem::Version.new(arg)
@@ -86,7 +86,7 @@ module Hbc
 
       def macos=(*arg)
         @macos ||= []
-        macos = if arg.count == 1 && arg.first =~ %r{^\s*(<|>|[=<>]=)\s*(\S+)\s*$}
+        macos = if arg.count == 1 && arg.first =~ /^\s*(<|>|[=<>]=)\s*(\S+)\s*$/
                   raise "'depends_on macos' comparison expressions cannot be combined" unless @macos.empty?
                   operator = Regexp.last_match[1].to_sym
                   release = self.class.coerce_os_release(Regexp.last_match[2])
@@ -103,7 +103,7 @@ module Hbc
       def arch=(*arg)
         @arch ||= []
         arches = Array(*arg).map { |elt|
-          elt = elt.to_s.downcase.sub(%r{^:}, "").tr("-", "_").to_sym
+          elt = elt.to_s.downcase.sub(/^:/, "").tr("-", "_").to_sym
           ARCH_SYNONYMS.key?(elt) ? ARCH_SYNONYMS[elt] : elt
         }
         invalid_arches = arches - VALID_ARCHES.keys

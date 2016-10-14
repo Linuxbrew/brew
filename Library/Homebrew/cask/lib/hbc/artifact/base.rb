@@ -2,15 +2,15 @@ module Hbc
   module Artifact
     class Base
       def self.artifact_name
-        @artifact_name ||= name.sub(%r{^.*:}, "").gsub(%r{(.)([A-Z])}, '\1_\2').downcase
+        @artifact_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase
       end
 
       def self.artifact_english_name
-        @artifact_english_name ||= name.sub(%r{^.*:}, "").gsub(%r{(.)([A-Z])}, '\1 \2')
+        @artifact_english_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1 \2')
       end
 
       def self.artifact_english_article
-        @artifact_english_article ||= artifact_english_name =~ %r{^[aeiou]}i ? "an" : "a"
+        @artifact_english_article ||= artifact_english_name =~ /^[aeiou]/i ? "an" : "a"
       end
 
       def self.artifact_dsl_key

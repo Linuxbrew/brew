@@ -52,7 +52,7 @@ module Hbc
 
       case cask.url.scheme
       when "http", "https" then
-        @response_status = response_lines.grep(%r{^HTTP}).last
+        @response_status = response_lines.grep(/^HTTP/).last
         if @response_status.respond_to?(:strip)
           @response_status.strip!
           unless response_lines.index(@response_status).nil?

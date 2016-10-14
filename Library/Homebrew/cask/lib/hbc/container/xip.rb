@@ -4,8 +4,8 @@ module Hbc
   class Container
     class Xip < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^xar!}n) &&
-          IO.popen(["/usr/bin/xar", "-t", "-f", criteria.path.to_s], err: "/dev/null") { |io| io.read =~ %r{\AContent\nMetadata\n\Z} }
+        criteria.magic_number(/^xar!/n) &&
+          IO.popen(["/usr/bin/xar", "-t", "-f", criteria.path.to_s], err: "/dev/null") { |io| io.read =~ /\AContent\nMetadata\n\Z/ }
       end
 
       def extract

@@ -53,7 +53,7 @@ module Hbc
                                                      args:         %w[config --get remote.origin.url],
                                                      print_stderr: false).stdout.strip
           end
-          if homebrew_origin !~ %r{\S}
+          if homebrew_origin !~ /\S/
             homebrew_origin = "#{none_string} #{error_string}"
           elsif homebrew_origin !~ %r{(mxcl|Homebrew)/(home)?brew(\.git)?\Z}
             homebrew_origin.concat " #{error_string "warning: nonstandard origin"}"
@@ -92,7 +92,7 @@ module Hbc
                                                               print_stderr: false)
                                                         .stdout
                                                         .strip
-          if @homebrew_constants[name] !~ %r{\S}
+          if @homebrew_constants[name] !~ /\S/
             @homebrew_constants[name] = "#{none_string} #{error_string}"
           end
           path = Pathname.new(@homebrew_constants[name])
@@ -104,7 +104,7 @@ module Hbc
       end
 
       def self.locale_variables
-        ENV.keys.grep(%r{^(?:LC_\S+|LANG|LANGUAGE)\Z}).collect { |v| %Q{#{v}="#{ENV[v]}"} }.sort.join("\n")
+        ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).collect { |v| %Q{#{v}="#{ENV[v]}"} }.sort.join("\n")
       end
 
       def self.privileged_uid
@@ -118,7 +118,7 @@ module Hbc
       end
 
       def self.legacy_tap_pattern
-        %r{phinze}
+        /phinze/
       end
 
       def self.notfound_string

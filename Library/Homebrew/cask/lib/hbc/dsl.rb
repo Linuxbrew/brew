@@ -252,7 +252,7 @@ module Hbc
       if block_given?
         @caveats << Hbc::Caveats.new(block)
       elsif string.any?
-        @caveats << string.map { |s| s.to_s.sub(%r{[\r\n \t]*\Z}, "\n\n") }
+        @caveats << string.map { |s| s.to_s.sub(/[\r\n \t]*\Z/, "\n\n") }
       end
       @caveats
     end

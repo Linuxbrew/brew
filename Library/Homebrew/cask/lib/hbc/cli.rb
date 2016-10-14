@@ -129,7 +129,7 @@ module Hbc
         exec "brewcask-#{command}", *ARGV[1..-1]
       elsif Pathname.new(command.to_s).executable? &&
             command.to_s.include?("/") &&
-            !command.to_s.match(%r{\.rb$})
+            !command.to_s.match(/\.rb$/)
         # arbitrary external executable with literal path, useful
         # for development and troubleshooting
         exec command, *ARGV[1..-1]
@@ -163,7 +163,7 @@ module Hbc
       cask_taps = {}
       cask_list.each do |c|
         user, repo, token = c.split "/"
-        repo.sub!(%r{^homebrew-}i, "")
+        repo.sub!(/^homebrew-/i, "")
         cask_taps[token] ||= []
         cask_taps[token].push "#{user}/#{repo}"
       end
