@@ -75,7 +75,7 @@ describe Hbc::Pkg do
 
       fake_file = fake_dir.join("ima_installed_file").tap { |path| FileUtils.touch(path) }
 
-      fake_dir.chmod(0o000)
+      fake_dir.chmod(0000)
 
       pkg.stubs(:pkgutil_bom_specials).returns([])
       pkg.stubs(:pkgutil_bom_files).returns([fake_file])
@@ -88,7 +88,7 @@ describe Hbc::Pkg do
 
       fake_dir.must_be :directory?
       fake_file.wont_be :file?
-      (fake_dir.stat.mode % 0o1000).to_s(8).must_equal "0"
+      (fake_dir.stat.mode % 01000).to_s(8).must_equal "0"
     end
   end
 end

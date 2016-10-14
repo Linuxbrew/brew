@@ -76,7 +76,7 @@ module Hbc
     end
 
     def _with_full_permissions(path)
-      original_mode = (path.stat.mode % 0o1000).to_s(8)
+      original_mode = (path.stat.mode % 01000).to_s(8)
       # TODO: similarly read and restore macOS flags (cf man chflags)
       @command.run!("/bin/chmod", args: ["--", "777", path], sudo: true)
       yield
