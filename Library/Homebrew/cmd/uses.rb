@@ -93,6 +93,7 @@ module Homebrew
       end
     end
 
-    puts_columns uses.map(&:full_name)
+    return if uses.empty?
+    puts Formatter.columns(uses.map(&:full_name))
   end
 end

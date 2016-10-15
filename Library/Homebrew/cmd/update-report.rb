@@ -553,7 +553,7 @@ class ReporterHub
     return if formulae.empty?
     # Dump formula list.
     ohai title
-    puts_columns(formulae)
+    puts Formatter.columns(formulae)
   end
 
   def installed?(formula)
