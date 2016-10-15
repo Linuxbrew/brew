@@ -759,8 +759,8 @@ Each <patch\-source> may be one of:
 If \fB\-\-bottle\fR was passed, handle bottles, pulling the bottle\-update commit and publishing files on Bintray\. If \fB\-\-bump\fR was passed, for one\-formula PRs, automatically reword commit message to our preferred format\. If \fB\-\-clean\fR was passed, do not rewrite or otherwise modify the commits found in the pulled PR\. If \fB\-\-ignore\-whitespace\fR was passed, silently ignore whitespace discrepancies when applying diffs\. If \fB\-\-resolve\fR was passed, when a patch fails to apply, leave in progress and allow user to resolve, instead of aborting\. If \fB\-\-branch\-okay\fR was passed, do not warn if pulling to a branch besides master (useful for testing)\. If \fB\-\-no\-pbcopy\fR was passed, do not copy anything to the system If \fB\-\-no\-publish\fR was passed, do not publish bottles to Bintray\.
 .
 .TP
-\fBtap_readme\fR [\fB\-v\fR] \fIname\fR
-Generate the README\.md file for a new tap\.
+\fBtap\-new\fR \fIuser\fR\fB/\fR\fIrepo\fR
+Generate the template files for a new tap\.
 .
 .TP
 \fBtest\fR [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-debug\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR

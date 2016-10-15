@@ -442,7 +442,7 @@ _brew_tap_info() {
   __brew_complete_tapped
 }
 
-_brew_tap_readme() {
+_brew_tap_new() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   case "$cur" in
     --*)
@@ -612,7 +612,7 @@ _brew() {
     tap)                        _brew_tap ;;
     tap-info)                   _brew_tap_info ;;
     tap-pin)                    __brew_complete_tapped ;;
-    tap-readme)                 _brew_tap_readme ;;
+    tap-new)                    _brew_tap_new ;;
     tap-unpin)                  _brew_tap_unpin ;;
     test)                       __brew_complete_installed ;;
     tests)                      _brew_tests ;;
