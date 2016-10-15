@@ -61,6 +61,10 @@ class DependencyCollector
     parse_spec(spec, Array(tags))
   end
 
+  def self.tar_needs_xz_dependency?
+    !new.xz_dep([]).nil?
+  end
+
   private
 
   def parse_spec(spec, tags)
@@ -113,7 +117,7 @@ class DependencyCollector
     when :osxfuse    then OsxfuseRequirement.new(tags)
     when :perl       then PerlRequirement.new(tags)
     when :tuntap     then TuntapRequirement.new(tags)
-    when :ant        then ant_dep(spec, tags)
+    when :ant        then ant_dep(tags)
     when :emacs      then EmacsRequirement.new(tags)
     # Tiger's ld is too old to properly link some software
     when :ld64       then LD64Dependency.new if MacOS.version < :leopard
@@ -134,8 +138,12 @@ class DependencyCollector
     spec.new(tags)
   end
 
-  def ant_dep(spec, tags)
-    Dependency.new(spec.to_s, tags)
+  def ant_dep(tags)
+    Dependency.new("ant", tags)
+  end
+
+  def xz_dep(tags)
+    Dependency.new("xz", tags)
   end
 
   def resource_dep(spec, tags)
@@ -164,7 +172,7 @@ class DependencyCollector
 
   def parse_url_spec(url, tags)
     case File.extname(url)
-    when ".xz"          then Dependency.new("xz", tags)
+    when ".xz"          then xz_dep(tags)
     when ".lha", ".lzh" then Dependency.new("lha", tags)
     when ".lz"          then Dependency.new("lzip", tags)
     when ".rar"         then Dependency.new("unrar", tags)

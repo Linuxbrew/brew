@@ -114,12 +114,6 @@ class DependencyCollectorTests < Homebrew::TestCase
     assert_nil @d.add(resource)
   end
 
-  def test_resource_dep_xz_url
-    resource = Resource.new
-    resource.url("http://example.com/foo.tar.xz")
-    assert_equal Dependency.new("xz", [:build]), @d.add(resource)
-  end
-
   def test_resource_dep_lz_url
     resource = Resource.new
     resource.url("http://example.com/foo.lz")
