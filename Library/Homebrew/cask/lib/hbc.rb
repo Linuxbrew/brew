@@ -1,7 +1,6 @@
 module Hbc; end
 
 require "hardware"
-require "hbc/extend"
 require "hbc/artifact"
 require "hbc/audit"
 require "hbc/auditor"

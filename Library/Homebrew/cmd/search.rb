@@ -21,6 +21,8 @@ require "official_taps"
 require "descriptions"
 
 module Homebrew
+  module_function
+
   SEARCH_ERROR_QUEUE = Queue.new
 
   def search

@@ -2,6 +2,8 @@
 #:    Generate the README.md file for a new tap.
 
 module Homebrew
+  module_function
+
   def tap_readme
     name = ARGV.first
     raise "A name is required" if name.nil?

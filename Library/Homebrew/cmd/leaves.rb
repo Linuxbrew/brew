@@ -6,6 +6,8 @@ require "tab"
 require "set"
 
 module Homebrew
+  module_function
+
   def leaves
     installed = Formula.installed
     deps_of_installed = Set.new

@@ -5,6 +5,8 @@ require "formula_installer"
 require "development_tools"
 
 module Homebrew
+  module_function
+
   def reinstall
     FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 

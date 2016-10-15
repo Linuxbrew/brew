@@ -102,7 +102,6 @@ module Hbc
         :url,
         :appcast,
         :version,
-        :license,
         :sha256,
         :artifacts,
         :caveats,

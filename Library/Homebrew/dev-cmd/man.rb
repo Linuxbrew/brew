@@ -12,6 +12,8 @@ require "erb"
 require "ostruct"
 
 module Homebrew
+  module_function
+
   SOURCE_PATH = HOMEBREW_LIBRARY_PATH/"manpages"
   TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"manpages"
   TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
@@ -31,8 +33,6 @@ module Homebrew
       Homebrew.failed = true
     end
   end
-
-  private
 
   def regenerate_man_pages
     Homebrew.install_gem_setup_path! "ronn"

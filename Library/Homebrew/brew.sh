@@ -1,7 +1,9 @@
 HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty 2>/dev/null)"
+HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
   HOMEBREW_VERSION=">1.0.0 (no git repository)"
+  HOMEBREW_USER_AGENT_VERSION="1.X.Y"
 fi
 
 # A depth of 1 means this command was directly invoked by a user.
@@ -110,7 +112,7 @@ else
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
 fi
-HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_VERSION)"
+HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_VERSION)"
 HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | /usr/bin/awk '{print $1"/"$2}')"
 HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
 
@@ -188,6 +190,15 @@ then
   shift
   set -- "$@" -v
 fi
+
+for arg in "$@"
+do
+  if [[ $arg = "--help" || $arg = "-h" || $arg = "--usage" || $arg = "-?" ]]
+  then
+    export HOMEBREW_HELP="1"
+    break
+  fi
+done
 
 HOMEBREW_ARG_COUNT="$#"
 HOMEBREW_COMMAND="$1"
@@ -278,6 +289,7 @@ setup-analytics
 report-analytics-screenview-command
 
 update-preinstall() {
+  [[ -z "$HOMEBREW_HELP" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 

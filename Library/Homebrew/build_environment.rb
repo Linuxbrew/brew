@@ -32,6 +32,8 @@ module BuildEnvironmentDSL
 end
 
 module Homebrew
+  module_function
+
   def build_env_keys(env)
     keys = %w[
       CC CXX LD OBJC OBJCXX

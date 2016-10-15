@@ -29,13 +29,30 @@ module Hbc
 
   class CaskAlreadyInstalledError < AbstractCaskErrorWithToken
     def to_s
-      %Q{A Cask for #{token} is already installed. Add the "--force" option to force re-install.}
+      s = <<-EOS.undent
+        A Cask for #{token} is already installed.
+      EOS
+
+      s.concat("\n").concat(reinstall_message)
+    end
+
+    private
+
+    def reinstall_message
+      <<-EOS.undent
+        To re-install #{token}, run:
+          brew cask uninstall --force #{token} && brew cask install #{token}
+      EOS
     end
   end
 
-  class CaskAutoUpdatesError < AbstractCaskErrorWithToken
+  class CaskAlreadyInstalledAutoUpdatesError < CaskAlreadyInstalledError
     def to_s
-      %Q{A Cask for #{token} is already installed and using auto-updates. Add the "--force" option to force re-install.}
+      s = <<-EOS.undent
+        A Cask for #{token} is already installed and using auto-updates.
+      EOS
+
+      s.concat("\n").concat(reinstall_message)
     end
   end
 
@@ -48,21 +65,19 @@ module Hbc
     end
 
     def to_s
-      <<-EOS
-  Command failed to execute!
-
-  ==> Failed command:
-  #{@cmd}
-
-  ==> Standard Output of failed command:
-  #{@stdout}
-
-  ==> Standard Error of failed command:
-  #{@stderr}
-
-  ==> Exit status of failed command:
-  #{@status.inspect}
-      EOS
+      s = "Command failed to execute!\n"
+      s.concat("\n")
+      s.concat("==> Failed command:\n")
+      s.concat(@cmd).concat("\n")
+      s.concat("\n")
+      s.concat("==> Standard Output of failed command:\n")
+      s.concat(@stdout).concat("\n")
+      s.concat("\n")
+      s.concat("==> Standard Error of failed command:\n")
+      s.concat(@stderr).concat("\n")
+      s.concat("\n")
+      s.concat("==> Exit status of failed command:\n")
+      s.concat(@status.inspect).concat("\n")
     end
   end
 

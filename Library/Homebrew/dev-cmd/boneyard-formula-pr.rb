@@ -19,6 +19,8 @@ rescue LoadError
 end
 
 module Homebrew
+  module_function
+
   def boneyard_formula_pr
     local_only = ARGV.include?("--local")
     formula = ARGV.formulae.first

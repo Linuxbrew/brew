@@ -1,13 +1,10 @@
-HBC_VERSION = "0.60.0".freeze
-
 module Hbc
   def self.full_version
     @full_version ||= begin
-      revision, commit = Dir.chdir(Hbc.default_tap.path) do
-        [`git rev-parse --short=4 --verify -q HEAD 2>/dev/null`.chomp,
-         `git show -s --format="%cr" HEAD 2>/dev/null`.chomp]
-      end
-      "#{HBC_VERSION} (git revision #{revision}; last commit #{commit})"
+      <<-EOS.undent
+        Homebrew-Cask #{HOMEBREW_VERSION}
+        caskroom/homebrew-cask #{Hbc.default_tap.version_string}
+      EOS
     end
   end
 end

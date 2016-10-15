@@ -5,7 +5,6 @@ test_cask 'with-suite' do
   url TestHelper.local_binary_url('caffeine-suite.zip')
   name 'Caffeine'
   homepage 'http://example.com/with-suite'
-  license :unknown # TODO: change license and remove this comment; ':unknown' is a machine-generated placeholder
 
   suite 'Caffeine'
 end

@@ -5,6 +5,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def pin
     raise FormulaUnspecifiedError if ARGV.named.empty?
 

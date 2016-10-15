@@ -1,6 +1,8 @@
 require "optparse"
 require "shellwords"
 
+require "extend/optparse"
+
 require "hbc/cli/base"
 require "hbc/cli/audit"
 require "hbc/cli/cat"

@@ -5,8 +5,12 @@ require "fileutils"
 require "tap"
 
 module Homebrew
+  module_function
+
   def tests
     (HOMEBREW_LIBRARY/"Homebrew").cd do
+      ENV.delete "HOMEBREW_VERBOSE"
+      ENV.delete "VERBOSE"
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["TESTOPTS"] = "-v" if ARGV.verbose?

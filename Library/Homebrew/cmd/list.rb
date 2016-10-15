@@ -22,6 +22,8 @@ require "metafiles"
 require "formula"
 
 module Homebrew
+  module_function
+
   def list
     # Use of exec means we don't explicitly exit
     list_unbrewed if ARGV.flag? "--unbrewed"
@@ -57,8 +59,6 @@ module Homebrew
       ARGV.kegs.each { |keg| PrettyListing.new keg }
     end
   end
-
-  private
 
   UNBREWED_EXCLUDE_FILES = %w[.DS_Store].freeze
   UNBREWED_EXCLUDE_PATHS = %w[

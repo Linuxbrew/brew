@@ -39,14 +39,21 @@ HOMEBREW_CURL_ARGS = [
 require "tap_constants"
 
 module Homebrew
-  include FileUtils
-  extend self
+  extend FileUtils
 
-  attr_accessor :failed
-  alias failed? failed
+  class << self
+    attr_writer :failed
 
-  attr_accessor :raise_deprecation_exceptions
-  alias raise_deprecation_exceptions? raise_deprecation_exceptions
+    def failed?
+      @failed == true
+    end
+
+    attr_writer :raise_deprecation_exceptions
+
+    def raise_deprecation_exceptions?
+      @raise_deprecation_exceptions == true
+    end
+  end
 end
 
 HOMEBREW_PULL_API_REGEX = %r{https://api\.github\.com/repos/([\w-]+)/([\w-]+)?/pulls/(\d+)}

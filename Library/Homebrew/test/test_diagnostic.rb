@@ -16,7 +16,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   def test_inject_file_list
     assert_equal "foo:\n",
       @checks.inject_file_list([], "foo:\n")
-    assert_equal "foo:\n    /a\n    /b\n",
+    assert_equal "foo:\n  /a\n  /b\n",
       @checks.inject_file_list(%w[/a /b], "foo:\n")
   end
 

@@ -25,6 +25,8 @@ require "tab"
 require "utils/json"
 
 module Homebrew
+  module_function
+
   def info
     # eventually we'll solidify an API, but we'll keep old versions
     # awhile around for compatibility

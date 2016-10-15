@@ -5,6 +5,8 @@
 #:    With `--include-aliases`, the aliases of internal commands will be included.
 
 module Homebrew
+  module_function
+
   def commands
     if ARGV.include? "--quiet"
       cmds = internal_commands + external_commands
@@ -47,8 +49,6 @@ module Homebrew
       end
     end.sort
   end
-
-  private
 
   def find_internal_commands(directory)
     directory.children.each_with_object([]) do |f, cmds|

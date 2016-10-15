@@ -7,6 +7,8 @@
 require "cmd/fetch"
 
 module Homebrew
+  module_function
+
   def __cache
     if ARGV.named.empty?
       puts HOMEBREW_CACHE

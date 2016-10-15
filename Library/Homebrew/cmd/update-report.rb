@@ -10,6 +10,8 @@ require "cleanup"
 require "utils"
 
 module Homebrew
+  module_function
+
   def update_preinstall_header
     @header_already_printed ||= begin
       ohai "Auto-updated Homebrew!" if ARGV.include?("--preinstall")
@@ -105,8 +107,6 @@ module Homebrew
       migrate_legacy_repository_if_necessary
     end
   end
-
-  private
 
   def shorten_revision(revision)
     Utils.popen_read("git", "-C", HOMEBREW_REPOSITORY, "rev-parse", "--short", revision).chomp
@@ -443,7 +443,7 @@ class Reporter
       # For formulae migrated to cask: Auto-install cask or provide install instructions.
       if new_tap_name == "caskroom/cask"
         if new_tap.installed? && (HOMEBREW_REPOSITORY/"Caskroom").directory?
-          ohai "#{name} has been moved to Homebrew Cask."
+          ohai "#{name} has been moved to Homebrew-Cask."
           ohai "brew uninstall --force #{name}"
           system HOMEBREW_BREW_FILE, "uninstall", "--force", name
           ohai "brew prune"
@@ -451,7 +451,7 @@ class Reporter
           ohai "brew cask install #{name}"
           system HOMEBREW_BREW_FILE, "cask", "install", name
         else
-          ohai "#{name} has been moved to Homebrew Cask.", <<-EOS.undent
+          ohai "#{name} has been moved to Homebrew-Cask.", <<-EOS.undent
             To uninstall the formula and install the cask run:
               brew uninstall --force #{name}
               brew cask install #{name}

@@ -64,6 +64,8 @@ require "hardware"
 require "development_tools"
 
 module Homebrew
+  module_function
+
   def install
     raise FormulaUnspecifiedError if ARGV.named.empty?
 
