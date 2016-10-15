@@ -102,7 +102,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
   def cmd(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    puts "\n#{output}" if status.nonzero?
+    puts "\n'brew #{args.join " "}' output: #{output}" if status.nonzero?
     assert_equal 0, status
     output
   end
@@ -110,7 +110,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
   def cmd_fail(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    $stderr.puts "\n#{output}" if status.zero?
+    $stderr.puts "\n'brew #{args.join " "}'" if status.zero?
     refute_equal 0, status
     output
   end
