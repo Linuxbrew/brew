@@ -5,7 +5,7 @@ class DependencyCollector
   end
 
   def xz_dep(tags)
-    return if MacOS.version >= :lion
+    return if MacOS.version >= :mavericks
     Dependency.new("xz", tags)
   end
 end

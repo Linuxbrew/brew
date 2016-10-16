@@ -15,7 +15,7 @@ class OSMacDependencyCollectorTests < Homebrew::TestCase
   end
 
   def test_tar_needs_xz_dependency
-    MacOS.stubs(:version).returns(MacOS::Version.new("10.7"))
+    MacOS.stubs(:version).returns(MacOS::Version.new("10.9"))
     refute DependencyCollector.tar_needs_xz_dependency?
   end
 
@@ -41,15 +41,15 @@ class OSMacDependencyCollectorTests < Homebrew::TestCase
     assert_nil find_dependency("ant")
   end
 
-  def test_resource_dep_xz_url_pre_lion
-    MacOS.stubs(:version).returns(MacOS::Version.new("10.6"))
+  def test_resource_dep_xz_pre_mavericks
+    MacOS.stubs(:version).returns(MacOS::Version.new("10.8"))
     resource = Resource.new
     resource.url("http://example.com/foo.tar.xz")
     assert_equal Dependency.new("xz", [:build]), @d.add(resource)
   end
 
-  def test_resource_dep_xz_lion_or_newer
-    MacOS.stubs(:version).returns(MacOS::Version.new("10.7"))
+  def test_resource_dep_xz_mavericks_or_newer
+    MacOS.stubs(:version).returns(MacOS::Version.new("10.9"))
     resource = Resource.new
     resource.url("http://example.com/foo.tar.xz")
     assert_nil @d.add(resource)
