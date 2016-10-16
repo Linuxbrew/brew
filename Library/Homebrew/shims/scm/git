@@ -104,6 +104,7 @@ do
     safe_exec "$path" "$@"
   fi
 done
+unset IFS
 
 if executable "/usr/bin/xcode-select"
 then
@@ -113,11 +114,14 @@ then
   xcode_path="$(/usr/bin/xcode-select -print-path 2>/dev/null)"
   if [[ -z "$xcode_path" ]]
   then
-    macos_version="$(/usr/bin/sw_vers -productVersion)"
-    printf -v macos_version_numeric "%02d%02d%02d" ${macos_version//./ }
+    if [[ -z "$HOMEBREW_MACOS_VERSION" ]]
+    then
+      HOMEBREW_MACOS_VERSION="$(/usr/bin/sw_vers -productVersion)"
+    fi
+    printf -v macos_version_numeric "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
     if [[ "$macos_version_numeric" -ge "100900" ]]
     then
-      unset popup_stub=1
+      popup_stub=1
     fi
   fi
   if [[ -z "$popup_stub" && "$xcode_path" != "/" ]]
