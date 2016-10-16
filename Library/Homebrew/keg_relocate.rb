@@ -89,6 +89,10 @@ class Keg
       output.force_encoding(Encoding::ASCII_8BIT)
       output.each_line do |line|
         path, info = line.split("\0", 2)
+        # `file` sometimes prints more than one line of output per file;
+        # subsequent lines do not contain a null-byte separator, so `info`
+        # will be `nil` for those lines
+        next unless info
         next unless info.include?("text")
         path = Pathname.new(path)
         next unless files.include?(path)
