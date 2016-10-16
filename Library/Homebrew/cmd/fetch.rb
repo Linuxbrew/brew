@@ -24,6 +24,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def fetch
     raise FormulaUnspecifiedError if ARGV.named.empty?
 
@@ -92,8 +94,6 @@ module Homebrew
     Homebrew.failed = true
     opoo "Patch reports different #{e.hash_type}: #{e.expected}"
   end
-
-  private
 
   def retry_fetch?(f)
     @fetch_failed ||= Set.new

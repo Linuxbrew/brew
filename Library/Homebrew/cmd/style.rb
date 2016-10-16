@@ -17,6 +17,8 @@ require "utils"
 require "utils/json"
 
 module Homebrew
+  module_function
+
   def style
     target = if ARGV.named.empty?
       nil

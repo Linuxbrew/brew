@@ -83,7 +83,7 @@ def odeprecated(method, replacement = nil, options = {})
 
   if ARGV.homebrew_developer? || options[:die] ||
      Homebrew.raise_deprecation_exceptions?
-    raise FormulaMethodDeprecatedError, message
+    raise MethodDeprecatedError, message
   else
     opoo "#{message}\n"
   end
@@ -151,7 +151,9 @@ def interactive_shell(f = nil)
 end
 
 module Homebrew
-  def self._system(cmd, *args)
+  module_function
+
+  def _system(cmd, *args)
     pid = fork do
       yield if block_given?
       args.collect!(&:to_s)
@@ -166,24 +168,12 @@ module Homebrew
     $?.success?
   end
 
-  def self.system(cmd, *args)
+  def system(cmd, *args)
     puts "#{cmd} #{args*" "}" if ARGV.verbose?
     _system(cmd, *args)
   end
 
-  def self.core_tap_version_string
-    require "tap"
-    tap = CoreTap.instance
-    return "N/A" unless tap.installed?
-    if pretty_revision = tap.git_short_head
-      last_commit = tap.git_last_commit_date
-      "(git revision #{pretty_revision}; last commit #{last_commit})"
-    else
-      "(no git repository)"
-    end
-  end
-
-  def self.install_gem_setup_path!(name, version = nil, executable = name)
+  def install_gem_setup_path!(name, version = nil, executable = name)
     # Respect user's preferences for where gems should be installed.
     ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
     ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
@@ -218,20 +208,19 @@ module Homebrew
       odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
     end
 
-    unless which executable
-      odie <<-EOS.undent
-        The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
-        #{ENV["PATH"]}
-      EOS
-    end
+    return if which(executable)
+    odie <<-EOS.undent
+      The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
+      #{ENV["PATH"]}
+    EOS
   end
 
   # Hash of Module => Set(method_names)
-  @@injected_dump_stat_modules = {}
+  @injected_dump_stat_modules = {}
 
   def inject_dump_stats!(the_module, pattern)
-    @@injected_dump_stat_modules[the_module] ||= []
-    injected_methods = @@injected_dump_stat_modules[the_module]
+    @injected_dump_stat_modules[the_module] ||= []
+    injected_methods = @injected_dump_stat_modules[the_module]
     the_module.module_eval do
       instance_methods.grep(pattern).each do |name|
         next if injected_methods.include? name

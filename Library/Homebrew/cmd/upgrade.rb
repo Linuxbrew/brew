@@ -18,6 +18,8 @@ require "cleanup"
 require "development_tools"
 
 module Homebrew
+  module_function
+
   def upgrade
     FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 

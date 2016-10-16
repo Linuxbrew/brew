@@ -12,6 +12,8 @@ require "descriptions"
 require "cmd/search"
 
 module Homebrew
+  module_function
+
   def desc
     search_type = []
     search_type << :either if ARGV.flag? "--search"

@@ -13,6 +13,8 @@
 require "os/mac/linkage_checker"
 
 module Homebrew
+  module_function
+
   def linkage
     ARGV.kegs.each do |keg|
       ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1

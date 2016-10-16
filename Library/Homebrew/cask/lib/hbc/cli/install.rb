@@ -27,7 +27,7 @@ module Hbc
           rescue CaskAlreadyInstalledError => e
             opoo e.message
             count += 1
-          rescue CaskAutoUpdatesError => e
+          rescue CaskAlreadyInstalledAutoUpdatesError => e
             opoo e.message
             count += 1
           rescue CaskUnavailableError => e

@@ -6,6 +6,8 @@ require "build_environment"
 require "utils/shell"
 
 module Homebrew
+  module_function
+
   def __env
     ENV.activate_extensions!
     ENV.deps = ARGV.formulae if superenv?

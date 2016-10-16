@@ -7,6 +7,8 @@ require "tab"
 require "diagnostic"
 
 module Homebrew
+  module_function
+
   def missing
     return unless HOMEBREW_CELLAR.exist?
 

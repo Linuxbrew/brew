@@ -12,6 +12,8 @@ require "cmd/tap"
 require "cmd/unlinkapps"
 
 module Homebrew
+  module_function
+
   def prune
     ObserverPathnameExtension.reset_counts!
 

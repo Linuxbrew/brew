@@ -15,6 +15,8 @@
 #:    the new repository clone.
 
 module Homebrew
+  module_function
+
   def update_test
     ENV["HOMEBREW_UPDATE_TEST"] = "1"
 

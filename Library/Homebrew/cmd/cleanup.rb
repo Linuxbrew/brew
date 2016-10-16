@@ -15,6 +15,8 @@ require "cleanup"
 require "utils"
 
 module Homebrew
+  module_function
+
   def cleanup
     if ARGV.named.empty?
       Cleanup.cleanup

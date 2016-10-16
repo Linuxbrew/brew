@@ -5,6 +5,8 @@
 #:    Display the location in the cellar where <formula> is or would be installed.
 
 module Homebrew
+  module_function
+
   def __prefix
     if ARGV.named.empty?
       puts HOMEBREW_PREFIX

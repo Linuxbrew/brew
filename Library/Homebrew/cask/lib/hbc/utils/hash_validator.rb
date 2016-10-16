@@ -1,4 +1,4 @@
-class Hash
+module HashValidator
   def assert_valid_keys(*valid_keys)
     unknown_keys = keys - valid_keys
     return if unknown_keys.empty?

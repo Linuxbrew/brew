@@ -12,6 +12,8 @@ require "formula"
 require "options"
 
 module Homebrew
+  module_function
+
   def options
     if ARGV.include? "--all"
       puts_options Formula.to_a

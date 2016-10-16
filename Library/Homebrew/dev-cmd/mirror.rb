@@ -3,6 +3,8 @@
 #:    Reuploads the stable URL for a formula to Bintray to use it as a mirror.
 
 module Homebrew
+  module_function
+
   def mirror
     odie "This command requires at least formula argument!" if ARGV.named.empty?
 

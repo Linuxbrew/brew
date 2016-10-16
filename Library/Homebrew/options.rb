@@ -114,6 +114,8 @@ class Options
 end
 
 module Homebrew
+  module_function
+
   def dump_options_for_formula(f)
     f.options.sort_by(&:flag).each do |opt|
       puts "#{opt.flag}\n\t#{opt.description}"

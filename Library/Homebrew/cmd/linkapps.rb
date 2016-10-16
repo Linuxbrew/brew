@@ -11,6 +11,8 @@ require "keg"
 require "formula"
 
 module Homebrew
+  module_function
+
   def linkapps
     target_dir = linkapps_target(local: ARGV.include?("--local"))
 
@@ -54,8 +56,6 @@ module Homebrew
       puts "Linked #{link_count} app#{plural(link_count)} to #{target_dir}"
     end
   end
-
-  private
 
   def linkapps_target(opts = {})
     local = opts.fetch(:local, false)

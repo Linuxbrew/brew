@@ -9,6 +9,8 @@ require "formula"
 require "migrator"
 
 module Homebrew
+  module_function
+
   def uninstall
     raise KegUnspecifiedError if ARGV.named.empty?
 

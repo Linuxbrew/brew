@@ -80,7 +80,7 @@ module Homebrew
       end
 
       def inject_file_list(list, string)
-        list.inject(string) { |a, e| a << "    #{e}\n" }
+        list.inject(string) { |a, e| a << "  #{e}\n" }
       end
       ############# END HELPERS
 
@@ -666,13 +666,18 @@ module Homebrew
         real_cellar = HOMEBREW_CELLAR.realpath
         where_cellar = volumes.which real_cellar
 
-        tmp = Pathname.new(Dir.mktmpdir("doctor", HOMEBREW_TEMP))
         begin
-          real_tmp = tmp.realpath.parent
-          where_tmp = volumes.which real_tmp
-        ensure
-          Dir.delete tmp
+          tmp = Pathname.new(Dir.mktmpdir("doctor", HOMEBREW_TEMP))
+          begin
+            real_tmp = tmp.realpath.parent
+            where_tmp = volumes.which real_tmp
+          ensure
+            Dir.delete tmp
+          end
+        rescue
+          return
         end
+
         return if where_cellar == where_tmp
 
         <<-EOS.undent

@@ -35,6 +35,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def inreplace_pairs(path, replacement_pairs)
     if ARGV.dry_run?
       contents = path.open("r") { |f| Formulary.ensure_utf8_encoding(f).read }

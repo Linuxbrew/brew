@@ -60,7 +60,7 @@ class UtilTests < Homebrew::TestCase
 
   def test_ofail
     shutup { ofail "foo" }
-    assert Homebrew.failed
+    assert Homebrew.failed?
   ensure
     Homebrew.failed = false
   end
@@ -249,7 +249,7 @@ class UtilTests < Homebrew::TestCase
 
   def test_odeprecated
     ARGV.stubs(:homebrew_developer?).returns false
-    e = assert_raises(FormulaMethodDeprecatedError) do
+    e = assert_raises(MethodDeprecatedError) do
       odeprecated("method", "replacement",
         caller: ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
         die: true)

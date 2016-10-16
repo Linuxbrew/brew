@@ -1,19 +1,27 @@
 class Locale
-  class ParserError < ::RuntimeError
+  class ParserError < StandardError
   end
 
-  LANGUAGE_REGEX = /(?:[a-z]{2})/
-  REGION_REGEX = /(?:[A-Z]{2})/
-  SCRIPT_REGEX = /(?:[A-Z][a-z]{3})/
+  LANGUAGE_REGEX = /(?:[a-z]{2,3})/    # ISO 639-1 or ISO 639-2
+  REGION_REGEX   = /(?:[A-Z]{2})/      # ISO 3166-1
+  SCRIPT_REGEX   = /(?:[A-Z][a-z]{3})/ # ISO 15924
 
-  LOCALE_REGEX = /^(#{LANGUAGE_REGEX})?(?:(?:^|-)(#{REGION_REGEX}))?(?:(?:^|-)(#{SCRIPT_REGEX}))?$/
+  LOCALE_REGEX = /\A((?:#{LANGUAGE_REGEX}|#{REGION_REGEX}|#{SCRIPT_REGEX})(?:\-|$)){1,3}\Z/
 
   def self.parse(string)
-    language, region, script = string.to_s.scan(LOCALE_REGEX)[0]
+    string = string.to_s
 
-    if language.nil? && region.nil? && script.nil?
-      raise ParserError, "'#{string}' cannot be parsed to a #{self.class}"
+    if string !~ LOCALE_REGEX
+      raise ParserError, "'#{string}' cannot be parsed to a #{self}"
     end
+
+    scan = proc do |regex|
+      string.scan(/(?:\-|^)(#{regex})(?:\-|$)/).flatten.first
+    end
+
+    language = scan.call(LANGUAGE_REGEX)
+    region   = scan.call(REGION_REGEX)
+    script   = scan.call(SCRIPT_REGEX)
 
     new(language, region, script)
   end

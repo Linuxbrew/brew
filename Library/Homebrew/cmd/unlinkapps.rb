@@ -12,13 +12,13 @@
 require "cmd/linkapps"
 
 module Homebrew
+  module_function
+
   def unlinkapps
     target_dir = linkapps_target(local: ARGV.include?("--local"))
 
     unlinkapps_from_dir(target_dir, dry_run: ARGV.dry_run?)
   end
-
-  private
 
   def unlinkapps_prune(opts = {})
     opts = opts.merge(prune: true)

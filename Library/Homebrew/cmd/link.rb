@@ -15,6 +15,8 @@
 require "ostruct"
 
 module Homebrew
+  module_function
+
   def link
     raise KegUnspecifiedError if ARGV.named.empty?
 
@@ -70,8 +72,6 @@ module Homebrew
       end
     end
   end
-
-  private
 
   def keg_only?(rack)
     Formulary.from_rack(rack).keg_only?

@@ -37,6 +37,8 @@ require "cmd/style"
 require "date"
 
 module Homebrew
+  module_function
+
   def audit
     Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
 
@@ -445,6 +447,11 @@ class FormulaAuditor
       unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
         problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
       end
+    end
+
+    return unless @new_formula
+    unless formula.deprecated_options.empty?
+      problem "New formulae should not use `deprecated_option`."
     end
   end
 

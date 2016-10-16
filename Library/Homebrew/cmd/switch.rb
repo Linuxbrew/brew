@@ -6,6 +6,8 @@ require "keg"
 require "cmd/link"
 
 module Homebrew
+  module_function
+
   def switch
     if ARGV.named.length != 2
       onoe "Usage: brew switch <name> <version>"
