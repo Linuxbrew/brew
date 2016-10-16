@@ -84,9 +84,12 @@ class Keg
       }
       output, _status = Open3.capture2("/usr/bin/xargs -0 /usr/bin/file --no-dereference --print0",
                                        stdin_data: files.to_a.join("\0"))
+      # `file` output sometimes contains data from the file, which may include
+      # invalid UTF-8 entities, so tell Ruby this is just a bytestring
+      output.force_encoding(Encoding::ASCII_8BIT)
       output.each_line do |line|
-        path, info = line.split("\0")
-        next unless info.to_s.include?("text")
+        path, info = line.split("\0", 2)
+        next unless info.include?("text")
         path = Pathname.new(path)
         next unless files.include?(path)
         text_files << path
