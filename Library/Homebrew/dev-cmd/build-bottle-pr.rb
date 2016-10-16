@@ -1,7 +1,7 @@
 module Homebrew
   # Submit a pull request to build a bottle for a formula.
   # Usage:
-  #    brew build-bottle formula ...
+  #    brew build-bottle-pr formula ...
   # Options:
   #    --remote=$USER      Specify the GitHub remote
   #    --tag=x86_64_linux  Specify the bottle tag
