@@ -247,4 +247,4 @@ to with `brew link`.
 other way to do this.
 
 ### Is there a glossary of terms around?
-All your terminology needs can be [found here](docs/Formula-Cookbook.md#homebrew-terminology).
+All your terminology needs can be [found here](Formula-Cookbook.md#homebrew-terminology).
