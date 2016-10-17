@@ -12,7 +12,7 @@ module Formatter
   end
 
   def identifier(string)
-    "#{Tty.green}#{string}#{Tty.reset}"
+    "#{Tty.green}#{string}#{Tty.default}"
   end
 
   def success(string, label: nil)
