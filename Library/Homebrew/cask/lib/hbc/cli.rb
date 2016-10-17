@@ -152,7 +152,7 @@ module Hbc
       onoe msg
       exit 1
     rescue StandardError, ScriptError, NoMemoryError => e
-      msg = e.message
+      msg = "#{e.message}\n"
       msg << Utils.error_message_with_suggestions
       msg << e.backtrace.join("\n")
       onoe msg
