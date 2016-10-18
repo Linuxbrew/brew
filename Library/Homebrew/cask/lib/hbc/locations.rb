@@ -133,9 +133,8 @@ module Hbc
       def path(query)
         query_path = Pathname.new(query)
 
-        if query_path.exist? || query_path.absolute?
-          return query_path
-        end
+        return query_path if query_path.absolute?
+        return query_path if query_path.exist? && query_path.extname == ".rb"
 
         query_without_extension = query.sub(%r{\.rb$}i, "")
 
