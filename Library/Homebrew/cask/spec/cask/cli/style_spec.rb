@@ -175,12 +175,8 @@ describe Hbc::CLI::Style do
 
   describe "#default_args" do
     subject { cli.default_args }
-    let(:rubocop_config) { ".rubocop.yml" }
-    before do
-      allow(cli).to receive(:rubocop_config).and_return(rubocop_config)
-    end
 
-    it { is_expected.to include("--format", "simple", "--force-exclusion", "--config", rubocop_config) }
+    it { is_expected.to include("--require", "rubocop-cask", "--format", "simple", "--force-exclusion") }
   end
 
   describe "#autocorrect_args" do
