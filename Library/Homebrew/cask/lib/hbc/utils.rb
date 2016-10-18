@@ -38,34 +38,6 @@ end
 
 module Hbc
   module Utils
-    def self.which(cmd, path = ENV["PATH"])
-      unless File.basename(cmd) == cmd.to_s
-        # cmd contains a directory element
-        cmd_pn = Pathname(cmd)
-        return nil unless cmd_pn.absolute?
-        return resolve_executable(cmd_pn)
-      end
-      path.split(File::PATH_SEPARATOR).each do |elt|
-        fq_cmd = Pathname(elt).expand_path.join(cmd)
-        resolved = resolve_executable fq_cmd
-        return resolved if resolved
-      end
-      nil
-    end
-
-    def self.resolve_executable(cmd)
-      cmd_pn = Pathname(cmd)
-      return nil unless cmd_pn.exist?
-      return nil unless cmd_pn.executable?
-      begin
-        cmd_pn = Pathname(cmd_pn.realpath)
-      rescue RuntimeError
-        return nil
-      end
-      return nil unless cmd_pn.file?
-      cmd_pn
-    end
-
     def self.gain_permissions_remove(path, command: SystemCommand)
       if path.respond_to?(:rmtree) && path.exist?
         gain_permissions(path, ["-R"], command, &:rmtree)
