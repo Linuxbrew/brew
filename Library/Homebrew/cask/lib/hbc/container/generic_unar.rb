@@ -6,8 +6,7 @@ module Hbc
   class Container
     class GenericUnar < Base
       def self.me?(criteria)
-        lsar = Hbc.homebrew_prefix.join("bin", "lsar")
-        lsar.exist? &&
+        !(lsar = which("lsar")).nil? &&
           criteria.command.run(lsar,
                                args:         ["-l", "-t", "--", criteria.path],
                                print_stderr: false).stdout.chomp.end_with?("passed, 0 failed.")
