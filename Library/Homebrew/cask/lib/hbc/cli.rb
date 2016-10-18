@@ -107,7 +107,7 @@ module Hbc
       if command.respond_to?(:run)
         # usual case: built-in command verb
         command.run(*rest)
-      elsif require? Utils.which("brewcask-#{command}.rb").to_s
+      elsif require? which("brewcask-#{command}.rb").to_s
         # external command as Ruby library on PATH, Homebrew-style
       elsif command.to_s.include?("/") && require?(command.to_s)
         # external command as Ruby library with literal path, useful
@@ -124,7 +124,7 @@ module Hbc
           # other Ruby libraries must do everything via "require"
           klass.run(*rest)
         end
-      elsif Utils.which "brewcask-#{command}"
+      elsif which("brewcask-#{command}")
         # arbitrary external executable on PATH, Homebrew-style
         exec "brewcask-#{command}", *ARGV[1..-1]
       elsif Pathname.new(command.to_s).executable? &&

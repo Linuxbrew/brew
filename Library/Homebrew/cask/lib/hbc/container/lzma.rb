@@ -10,9 +10,7 @@ module Hbc
       end
 
       def extract
-        unlzma = Hbc.homebrew_prefix.join("bin", "unlzma")
-
-        unless unlzma.exist?
+        if (unlzma = which("unlzma")).nil?
           raise CaskError, "Expected to find unlzma executable. Cask '#{@cask}' must add: depends_on formula: 'lzma'"
         end
 
