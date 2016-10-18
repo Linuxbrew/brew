@@ -4,7 +4,7 @@ require "stringio"
 
 require "hbc/utils/file"
 
-UPDATE_CMD = "brew uninstall --force brew-cask; brew untap phinze/cask; brew untap caskroom/cask; brew update; brew cleanup; brew cask cleanup".freeze
+PREBUG_URL = "https://github.com/caskroom/homebrew-cask/blob/master/doc/reporting_bugs/pre_bug_report.md".freeze
 ISSUES_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
 # monkeypatch Object - not a great idea
@@ -145,8 +145,8 @@ module Hbc
 
     def self.error_message_with_suggestions
       <<-EOS.undent
-        Most likely, this means you have an outdated version of Homebrew-Cask. Please run:
-          #{UPDATE_CMD}
+        Follow the instuctions here:
+          #{Formatter.url(PREBUG_URL)}
 
         If this doesn’t fix the problem, please report this bug:
           #{Formatter.url(ISSUES_URL)}
