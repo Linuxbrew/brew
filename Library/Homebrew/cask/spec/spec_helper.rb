@@ -16,10 +16,6 @@ require "global"
 # add Homebrew-Cask to load path
 $LOAD_PATH.push(project_root.join("lib").to_s)
 
-# force some environment variables
-ENV["HOMEBREW_NO_EMOJI"] = "1"
-ENV["HOMEBREW_CASK_OPTS"] = nil
-
 require "test/helper/shutup"
 
 Dir["#{project_root}/spec/support/*.rb"].each(&method(:require))
