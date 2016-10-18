@@ -5,6 +5,8 @@
 require "tap"
 
 module Homebrew
+  module_function
+
   def tap_pin
     ARGV.named.each do |name|
       tap = Tap.fetch(name)

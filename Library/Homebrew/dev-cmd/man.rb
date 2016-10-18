@@ -1,14 +1,22 @@
-#:  * `man`:
+#:  * `man` [`--fail-if-changed`]:
 #:    Generate Homebrew's manpages.
+#:
+#:    If `--fail-if-changed` is passed, the command will return a failing
+#:    status code if changes are detected in the manpage outputs.
+#:    This can be used for CI to be notified when the manpages are out of date.
+#:    Additionally, the date used in new manpages will match those in the existing
+#:    manpages (to allow comparison without factoring in the date).
 
 require "formula"
 require "erb"
 require "ostruct"
 
 module Homebrew
+  module_function
+
   SOURCE_PATH = HOMEBREW_LIBRARY_PATH/"manpages"
-  TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"share/man/man1"
-  TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"share/doc/homebrew"
+  TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"manpages"
+  TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
 
   def man
     raise UsageError unless ARGV.named.empty?
@@ -18,9 +26,13 @@ module Homebrew
     else
       regenerate_man_pages
     end
-  end
 
-  private
+    if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/brew.1.html", "manpages"
+      puts "No changes to manpage output detected."
+    elsif ARGV.include?("--fail-if-changed")
+      Homebrew.failed = true
+    end
+  end
 
   def regenerate_man_pages
     Homebrew.install_gem_setup_path! "ronn"
@@ -51,9 +63,13 @@ module Homebrew
 
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
     variables[:developer_commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
-    variables[:maintainers] = (HOMEBREW_REPOSITORY/"README.md")
-                              .read[/Homebrew's current maintainers are (.*)\./, 1]
-                              .scan(/\[([^\]]*)\]/).flatten
+    readme = HOMEBREW_REPOSITORY/"README.md"
+    variables[:lead_maintainer] = readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
+                                        .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:maintainers] = readme.read[/(Homebrew's current maintainers .*\.)/, 1]
+                                    .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
+                                           .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
     ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end
@@ -64,10 +80,25 @@ module Homebrew
   end
 
   def convert_man_page(markup, target)
+    manual = target.basename(".1")
+    organisation = "Homebrew"
+
+    # Set the manpage date to the existing one if we're checking for changes.
+    # This avoids the only change being e.g. a new date.
+    date = if ARGV.include?("--fail-if-changed") &&
+              target.extname == ".1" && target.exist?
+      /"(\d{1,2})" "([A-Z][a-z]+) (\d{4})" "#{organisation}" "#{manual}"/ =~ target.read
+      Date.parse("#{$1} #{$2} #{$3}")
+    else
+      Date.today
+    end
+    date = date.strftime("%Y-%m-%d")
+
     shared_args = %W[
       --pipe
-      --organization=Homebrew
+      --organization=#{organisation}
       --manual=#{target.basename(".1")}
+      --date=#{date}
     ]
 
     format_flag, format_desc = target_path_to_format(target)

@@ -9,7 +9,7 @@ require "development_tools"
 # should not be called directly, instead use one of the class methods like
 # `Tab.create`.
 class Tab < OpenStruct
-  FILENAME = "INSTALL_RECEIPT.json"
+  FILENAME = "INSTALL_RECEIPT.json".freeze
   CACHE = {}
 
   def self.clear_cache
@@ -30,6 +30,10 @@ class Tab < OpenStruct
       "HEAD" => HOMEBREW_REPOSITORY.git_head,
       "compiler" => compiler,
       "stdlib" => stdlib,
+      "runtime_dependencies" => formula.runtime_dependencies.map do |dep|
+        f = dep.to_formula
+        { "full_name" => f.full_name, "version" => f.version.to_s }
+      end,
       "source" => {
         "path" => formula.specified_path.to_s,
         "tap" => formula.tap ? formula.tap.name : nil,
@@ -39,8 +43,8 @@ class Tab < OpenStruct
           "devel" => formula.devel ? formula.devel.version.to_s : nil,
           "head" => formula.head ? formula.head.version.to_s : nil,
           "version_scheme" => formula.version_scheme,
-        }
-      }
+        },
+      },
     }
 
     new(attributes)
@@ -56,6 +60,7 @@ class Tab < OpenStruct
   def self.from_file_content(content, path)
     attributes = Utils::JSON.load(content)
     attributes["tabfile"] = path
+    attributes["runtime_dependencies"] ||= []
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}
 
@@ -65,7 +70,7 @@ class Tab < OpenStruct
     end
 
     if attributes["source"]["tap"] == "mxcl/master" ||
-      attributes["source"]["tap"] == "Homebrew/homebrew"
+       attributes["source"]["tap"] == "Homebrew/homebrew"
       attributes["source"]["tap"] = "homebrew/core"
     end
 
@@ -161,7 +166,7 @@ class Tab < OpenStruct
           "devel" => f.devel ? f.devel.version.to_s : nil,
           "head" => f.head ? f.head.version.to_s : nil,
           "version_scheme" => f.version_scheme,
-        }
+        },
       }
     end
 
@@ -179,6 +184,7 @@ class Tab < OpenStruct
       "HEAD" => nil,
       "stdlib" => nil,
       "compiler" => DevelopmentTools.default_compiler,
+      "runtime_dependencies" => [],
       "source" => {
         "path" => nil,
         "tap" => nil,
@@ -188,8 +194,8 @@ class Tab < OpenStruct
           "devel" => nil,
           "head" => nil,
           "version_scheme" => 0,
-        }
-      }
+        },
+      },
     }
 
     new(attributes)
@@ -311,7 +317,8 @@ class Tab < OpenStruct
       "HEAD" => self.HEAD,
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
-      "source" => source
+      "runtime_dependencies" => runtime_dependencies,
+      "source" => source,
     }
 
     Utils::JSON.dump(attributes)
@@ -329,9 +336,9 @@ class Tab < OpenStruct
     else
       s << "Built from source"
     end
-    if time
-      s << Time.at(time).strftime("on %Y-%m-%d at %H:%M:%S")
-    end
+
+    s << Time.at(time).strftime("on %Y-%m-%d at %H:%M:%S") if time
+
     unless used_options.empty?
       s << "with:"
       s << used_options.to_a.join(" ")

@@ -36,14 +36,14 @@ class RequirementTests < Homebrew::TestCase
 
   def test_satisfy_true
     req = Class.new(Requirement) do
-      satisfy(:build_env => false) { true }
+      satisfy(build_env: false) { true }
     end.new
     assert_predicate req, :satisfied?
   end
 
   def test_satisfy_false
     req = Class.new(Requirement) do
-      satisfy(:build_env => false) { false }
+      satisfy(build_env: false) { false }
     end.new
     refute_predicate req, :satisfied?
   end
@@ -67,7 +67,7 @@ class RequirementTests < Homebrew::TestCase
 
   def test_satisfy_build_env_can_be_disabled
     req = Class.new(Requirement) do
-      satisfy(:build_env => false) { true }
+      satisfy(build_env: false) { true }
     end.new
 
     ENV.expects(:with_build_environment).never

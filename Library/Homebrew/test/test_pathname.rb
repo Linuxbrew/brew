@@ -26,7 +26,7 @@ class PathnameTests < Homebrew::TestCase
     mkdir_p @dir/"a-directory"
     touch @dir/".DS_Store"
     touch @dir/"a-file"
-    File.truncate(@dir/"a-file", 1048576)
+    File.truncate(@dir/"a-file", 1_048_576)
     ln_s @dir/"a-file", @dir/"a-symlink"
     ln @dir/"a-file", @dir/"a-hardlink"
     assert_equal 3, @dir.file_count
@@ -256,5 +256,12 @@ class PathnameInstallTests < Homebrew::TestCase
   def test_install_relative_symlink
     @dst.install_symlink "foo" => "bar"
     assert_equal Pathname.new("foo"), (@dst/"bar").readlink
+  end
+
+  def test_mkdir_creates_intermediate_directories
+    mkdir @dst/"foo/bar/baz" do
+      assert_predicate @dst/"foo/bar/baz", :exist?, "foo/bar/baz was not created"
+      assert_predicate @dst/"foo/bar/baz", :directory?, "foo/bar/baz was not a directory structure"
+    end
   end
 end

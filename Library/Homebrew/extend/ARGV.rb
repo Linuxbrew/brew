@@ -30,18 +30,30 @@ module HomebrewArgvExtension
         if f.any_version_installed?
           tab = Tab.for_formula(f)
           resolved_spec = spec(nil) || tab.spec
-          f.set_active_spec(resolved_spec) if f.send(resolved_spec)
+          f.active_spec = resolved_spec if f.send(resolved_spec)
           f.build = tab
           if f.head? && tab.tabfile
             k = Keg.new(tab.tabfile.parent)
             f.version.update_commit(k.version.version.commit) if k.version.head?
           end
         end
-        f
       else
         rack = Formulary.to_rack(name)
-        Formulary.from_rack(rack, spec(nil))
+        alias_path = Formulary.factory(name).alias_path
+        f = Formulary.from_rack(rack, spec(nil), alias_path: alias_path)
       end
+
+      # If this formula was installed with an alias that has since changed,
+      # then it was specified explicitly in ARGV. (Using the alias would
+      # instead have found the new formula.)
+      #
+      # Because of this, the user is referring to this specific formula,
+      # not any formula targetted by the same alias, so in this context
+      # the formula shouldn't be considered outdated if the alias used to
+      # install it has changed.
+      f.follow_installed_alias = false
+
+      f
     end
   end
 
@@ -53,14 +65,16 @@ module HomebrewArgvExtension
     require "keg"
     require "formula"
     @kegs ||= downcased_unique_named.collect do |name|
+      raise UsageError if name.empty?
+
       rack = Formulary.to_rack(name.downcase)
 
       dirs = rack.directory? ? rack.subdirs : []
 
-      raise NoSuchKegError.new(rack.basename) if dirs.empty?
+      raise NoSuchKegError, rack.basename if dirs.empty?
 
-      linked_keg_ref = HOMEBREW_LIBRARY.join("LinkedKegs", rack.basename)
-      opt_prefix = HOMEBREW_PREFIX.join("opt", rack.basename)
+      linked_keg_ref = HOMEBREW_LINKED_KEGS/rack.basename
+      opt_prefix = HOMEBREW_PREFIX/"opt/#{rack.basename}"
 
       begin
         if opt_prefix.symlink? && opt_prefix.directory?
@@ -76,11 +90,11 @@ module HomebrewArgvExtension
             Formulary.from_rack(rack)
           end
 
-          if (prefix = f.installed_prefix).directory?
-            Keg.new(prefix)
-          else
-            raise MultipleVersionsInstalledError.new(rack.basename)
+          unless (prefix = f.installed_prefix).directory?
+            raise MultipleVersionsInstalledError, rack.basename
           end
+
+          Keg.new(prefix)
         end
       rescue FormulaUnavailableError
         raise <<-EOS.undent
@@ -204,14 +218,14 @@ module HomebrewArgvExtension
   end
 
   def build_all_from_source?
-    !!ENV["HOMEBREW_BUILD_FROM_SOURCE"]
+    !ENV["HOMEBREW_BUILD_FROM_SOURCE"].nil?
   end
 
   # Whether a given formula should be built from source during the current
   # installation run.
   def build_formula_from_source?(f)
     return true if build_all_from_source?
-    return false unless (build_from_source? || build_bottle?)
+    return false unless build_from_source? || build_bottle?
     formulae.any? { |argv_f| argv_f.full_name == f.full_name }
   end
 

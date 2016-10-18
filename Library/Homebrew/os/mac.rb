@@ -9,9 +9,9 @@ require "os/mac/keg"
 
 module OS
   module Mac
-    extend self
+    module_function
 
-    ::MacOS = self # compatibility
+    ::MacOS = self # rubocop:disable Style/ConstantName
 
     raise "Loaded OS::Mac on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
 
@@ -25,45 +25,41 @@ module OS
     # This can be compared to numerics, strings, or symbols
     # using the standard Ruby Comparable methods.
     def full_version
-      @full_version ||= Version.new(ENV["HOMEBREW_OSX_VERSION"].chomp)
+      @full_version ||= Version.new((ENV["HOMEBREW_MACOS_VERSION"] || ENV["HOMEBREW_OSX_VERSION"]).chomp)
     end
 
     def prerelease?
       # TODO: bump version when new OS is released
-      version >= "10.12"
+      version >= "10.13"
     end
 
     def outdated_release?
       # TODO: bump version when new OS is released
-      version < "10.9"
+      version < "10.10"
     end
 
     def cat
       version.to_sym
     end
 
+    def languages
+      return @languages unless @languages.nil?
+
+      @languages = Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
+
+      if ENV["HOMEBREW_LANGUAGES"]
+        @languages = ENV["HOMEBREW_LANGUAGES"].split(",") + @languages
+      end
+
+      if ARGV.value("language")
+        @languages = ARGV.value("language").split(",") + @languages
+      end
+
+      @languages = @languages.uniq
+    end
+
     def language
-      @language ||= Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").delete(" \n\"()").sub(/,.*/, "")
-    end
-
-    # Locates a (working) copy of install_name_tool, guaranteed to function
-    # whether the user has developer tools installed or not.
-    def install_name_tool
-      if (path = HOMEBREW_PREFIX/"opt/cctools/bin/install_name_tool").executable?
-        path
-      else
-        DevelopmentTools.locate("install_name_tool")
-      end
-    end
-
-    # Locates a (working) copy of otool, guaranteed to function whether the user
-    # has developer tools installed or not.
-    def otool
-      if (path = HOMEBREW_PREFIX/"opt/cctools/bin/otool").executable?
-        path
-      else
-        DevelopmentTools.locate("otool")
-      end
+      languages.first
     end
 
     def active_developer_dir
@@ -161,50 +157,50 @@ module OS
     end
 
     STANDARD_COMPILERS = {
-      "2.0"   => { :gcc_40_build => 4061 },
-      "2.5"   => { :gcc_40_build => 5370 },
-      "3.1.4" => { :gcc_40_build => 5493, :gcc_42_build => 5577 },
-      "3.2.6" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "1.7", :clang_build => 77 },
-      "4.0"   => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "2.0", :clang_build => 137 },
-      "4.0.1" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "2.0", :clang_build => 137 },
-      "4.0.2" => { :gcc_40_build => 5494, :gcc_42_build => 5666, :clang => "2.0", :clang_build => 137 },
-      "4.2"   => { :clang => "3.0", :clang_build => 211 },
-      "4.3"   => { :clang => "3.1", :clang_build => 318 },
-      "4.3.1" => { :clang => "3.1", :clang_build => 318 },
-      "4.3.2" => { :clang => "3.1", :clang_build => 318 },
-      "4.3.3" => { :clang => "3.1", :clang_build => 318 },
-      "4.4"   => { :clang => "4.0", :clang_build => 421 },
-      "4.4.1" => { :clang => "4.0", :clang_build => 421 },
-      "4.5"   => { :clang => "4.1", :clang_build => 421 },
-      "4.5.1" => { :clang => "4.1", :clang_build => 421 },
-      "4.5.2" => { :clang => "4.1", :clang_build => 421 },
-      "4.6"   => { :clang => "4.2", :clang_build => 425 },
-      "4.6.1" => { :clang => "4.2", :clang_build => 425 },
-      "4.6.2" => { :clang => "4.2", :clang_build => 425 },
-      "4.6.3" => { :clang => "4.2", :clang_build => 425 },
-      "5.0"   => { :clang => "5.0", :clang_build => 500 },
-      "5.0.1" => { :clang => "5.0", :clang_build => 500 },
-      "5.0.2" => { :clang => "5.0", :clang_build => 500 },
-      "5.1"   => { :clang => "5.1", :clang_build => 503 },
-      "5.1.1" => { :clang => "5.1", :clang_build => 503 },
-      "6.0"   => { :clang => "6.0", :clang_build => 600 },
-      "6.0.1" => { :clang => "6.0", :clang_build => 600 },
-      "6.1"   => { :clang => "6.0", :clang_build => 600 },
-      "6.1.1" => { :clang => "6.0", :clang_build => 600 },
-      "6.2"   => { :clang => "6.0", :clang_build => 600 },
-      "6.3"   => { :clang => "6.1", :clang_build => 602 },
-      "6.3.1" => { :clang => "6.1", :clang_build => 602 },
-      "6.3.2" => { :clang => "6.1", :clang_build => 602 },
-      "6.4"   => { :clang => "6.1", :clang_build => 602 },
-      "7.0"   => { :clang => "7.0", :clang_build => 700 },
-      "7.0.1" => { :clang => "7.0", :clang_build => 700 },
-      "7.1"   => { :clang => "7.0", :clang_build => 700 },
-      "7.1.1" => { :clang => "7.0", :clang_build => 700 },
-      "7.2"   => { :clang => "7.0", :clang_build => 700 },
-      "7.2.1" => { :clang => "7.0", :clang_build => 700 },
-      "7.3"   => { :clang => "7.3", :clang_build => 703 },
-      "7.3.1" => { :clang => "7.3", :clang_build => 703 },
-      "8.0"   => { :clang => "8.0", :clang_build => 800 },
+      "2.0"   => { gcc_40_build: 4061 },
+      "2.5"   => { gcc_40_build: 5370 },
+      "3.1.4" => { gcc_40_build: 5493, gcc_42_build: 5577 },
+      "3.2.6" => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "1.7", clang_build: 77 },
+      "4.0"   => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "2.0", clang_build: 137 },
+      "4.0.1" => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "2.0", clang_build: 137 },
+      "4.0.2" => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "2.0", clang_build: 137 },
+      "4.2"   => { clang: "3.0", clang_build: 211 },
+      "4.3"   => { clang: "3.1", clang_build: 318 },
+      "4.3.1" => { clang: "3.1", clang_build: 318 },
+      "4.3.2" => { clang: "3.1", clang_build: 318 },
+      "4.3.3" => { clang: "3.1", clang_build: 318 },
+      "4.4"   => { clang: "4.0", clang_build: 421 },
+      "4.4.1" => { clang: "4.0", clang_build: 421 },
+      "4.5"   => { clang: "4.1", clang_build: 421 },
+      "4.5.1" => { clang: "4.1", clang_build: 421 },
+      "4.5.2" => { clang: "4.1", clang_build: 421 },
+      "4.6"   => { clang: "4.2", clang_build: 425 },
+      "4.6.1" => { clang: "4.2", clang_build: 425 },
+      "4.6.2" => { clang: "4.2", clang_build: 425 },
+      "4.6.3" => { clang: "4.2", clang_build: 425 },
+      "5.0"   => { clang: "5.0", clang_build: 500 },
+      "5.0.1" => { clang: "5.0", clang_build: 500 },
+      "5.0.2" => { clang: "5.0", clang_build: 500 },
+      "5.1"   => { clang: "5.1", clang_build: 503 },
+      "5.1.1" => { clang: "5.1", clang_build: 503 },
+      "6.0"   => { clang: "6.0", clang_build: 600 },
+      "6.0.1" => { clang: "6.0", clang_build: 600 },
+      "6.1"   => { clang: "6.0", clang_build: 600 },
+      "6.1.1" => { clang: "6.0", clang_build: 600 },
+      "6.2"   => { clang: "6.0", clang_build: 600 },
+      "6.3"   => { clang: "6.1", clang_build: 602 },
+      "6.3.1" => { clang: "6.1", clang_build: 602 },
+      "6.3.2" => { clang: "6.1", clang_build: 602 },
+      "6.4"   => { clang: "6.1", clang_build: 602 },
+      "7.0"   => { clang: "7.0", clang_build: 700 },
+      "7.0.1" => { clang: "7.0", clang_build: 700 },
+      "7.1"   => { clang: "7.0", clang_build: 700 },
+      "7.1.1" => { clang: "7.0", clang_build: 700 },
+      "7.2"   => { clang: "7.0", clang_build: 700 },
+      "7.2.1" => { clang: "7.0", clang_build: 700 },
+      "7.3"   => { clang: "7.3", clang_build: 703 },
+      "7.3.1" => { clang: "7.3", clang_build: 703 },
+      "8.0"   => { clang: "8.0", clang_build: 800 },
     }.freeze
 
     def compilers_standard?

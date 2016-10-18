@@ -1,4 +1,8 @@
 require "hbc/artifact/moved"
 
-class Hbc::Artifact::Service < Hbc::Artifact::Moved
+module Hbc
+  module Artifact
+    class Service < Moved
+    end
+  end
 end

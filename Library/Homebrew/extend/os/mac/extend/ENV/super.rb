@@ -94,6 +94,20 @@ module Superenv
       self["SDKROOT"] = MacOS.sdk_path
     end
 
+    # Filter out symbols known not to be defined on 10.11 since GNU Autotools
+    # can't reliably figure this out with Xcode 8 on its own yet.
+    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+      %w[basename_r clock_getres clock_gettime clock_settime dirname_r
+         getentropy mkostemp mkostemps].each do |s|
+        ENV["ac_cv_func_#{s}"] = "no"
+      end
+
+      ENV["ac_cv_search_clock_gettime"] = "no"
+
+      # works around libev.m4 unsetting ac_cv_func_clock_gettime
+      ENV["ac_have_clock_syscall"] = "no"
+    end
+
     # On 10.9, the tools in /usr/bin proxy to the active developer directory.
     # This means we can use them for any combination of CLT and Xcode.
     self["HOMEBREW_PREFER_CLT_PROXIES"] = "1" if MacOS.version >= "10.9"
@@ -104,11 +118,11 @@ module Superenv
   end
 
   def no_weak_imports
-    append "HOMEBREW_CCCFG", "w"
+    append "HOMEBREW_CCCFG", "w" if no_weak_imports_support?
   end
 
   # These methods are no longer necessary under superenv, but are needed to
   # maintain an interface compatible with stdenv.
-  alias_method :macosxsdk, :noop
-  alias_method :remove_macosxsdk, :noop
+  alias macosxsdk noop
+  alias remove_macosxsdk noop
 end

@@ -40,7 +40,7 @@ class SystemConfig
 
     def dump_verbose_config(f = $stdout)
       dump_generic_verbose_config(f)
-      f.puts "OS X: #{MacOS.full_version}-#{kernel}"
+      f.puts "macOS: #{MacOS.full_version}-#{kernel}"
       f.puts "Xcode: #{xcode ? xcode : "N/A"}"
       f.puts "CLT: #{clt ? clt : "N/A"}"
       f.puts "X11: #{describe_xquartz}"

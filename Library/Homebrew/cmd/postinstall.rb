@@ -4,6 +4,8 @@
 require "sandbox"
 
 module Homebrew
+  module_function
+
   def postinstall
     ARGV.resolved_formulae.each { |f| run_post_install(f) if f.post_install_defined? }
   end
@@ -36,7 +38,7 @@ module Homebrew
         sandbox.allow_write_cellar(formula)
         sandbox.allow_write_xcode
         sandbox.allow_write_path HOMEBREW_PREFIX
-        sandbox.deny_write_homebrew_library
+        sandbox.deny_write_homebrew_repository
         sandbox.exec(*args)
       else
         exec(*args)

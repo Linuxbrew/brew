@@ -15,6 +15,7 @@ TEST_DIRECTORY = File.dirname(File.expand_path(__FILE__))
 begin
   require "rubygems"
   require "minitest/autorun"
+  require "parallel_tests/test/runtime_logger"
   require "mocha/setup"
 rescue LoadError
   abort "Run `bundle install` or install the mocha and minitest gems before running the tests"
@@ -42,7 +43,7 @@ module Homebrew
   module FSLeakLogger
     def self.included(klass)
       require "find"
-      @@log = File.open("fs_leak_log", "w")
+      @@log = File.open("#{__dir__}/fs_leak_log", "w")
       klass.make_my_diffs_pretty!
     end
 
@@ -56,9 +57,8 @@ module Homebrew
       super
       files_after_test = []
       Find.find(TEST_TMPDIR) { |f| files_after_test << f.sub(TEST_TMPDIR, "") }
-      if @__files_before_test != files_after_test
-        @@log.puts location, diff(@__files_before_test, files_after_test)
-      end
+      return if @__files_before_test == files_after_test
+      @@log.puts location, diff(@__files_before_test, files_after_test)
     end
   end
 
@@ -73,7 +73,7 @@ module Homebrew
     TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
 
     def formula(name = "formula_name", path = Formulary.core_path(name), spec = :stable, alias_path: nil, &block)
-      @_f = Class.new(Formula, &block).new(name, path, spec, :alias_path => alias_path)
+      @_f = Class.new(Formula, &block).new(name, path, spec, alias_path: alias_path)
     end
 
     def mktmpdir(prefix_suffix = nil, &block)
@@ -120,6 +120,14 @@ module Homebrew
       ensure
         ENV.replace old
       end
+    end
+
+    # Use a stubbed {Formulary::FormulaLoader} to make a given formula be found
+    # when loading from {Formulary} with `ref`.
+    def stub_formula_loader(formula, ref = formula.full_name)
+      loader = mock
+      loader.stubs(:get_formula).returns(formula)
+      Formulary.stubs(:loader_for).with(ref).returns(loader)
     end
   end
 end

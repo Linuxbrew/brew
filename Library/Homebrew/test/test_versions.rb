@@ -3,7 +3,7 @@ require "version"
 
 class VersionTests < Homebrew::TestCase
   def test_accepts_objects_responding_to_to_str
-    value = stub(:to_str => "0.1")
+    value = stub(to_str: "0.1")
     assert_equal "0.1", Version.create(value).to_s
   end
 
@@ -63,6 +63,8 @@ class VersionComparisonTests < Homebrew::TestCase
   end
 
   def test_comparing_alpha_versions
+    assert_operator version("1.2.3alpha"), :<, version("1.2.3")
+    assert_operator version("1.2.3"), :<, version("1.2.3a")
     assert_operator version("1.2.3alpha4"), :==, version("1.2.3a4")
     assert_operator version("1.2.3alpha4"), :==, version("1.2.3A4")
     assert_operator version("1.2.3alpha4"), :>, version("1.2.3alpha3")
@@ -201,6 +203,10 @@ class VersionParsingTests < Homebrew::TestCase
 
   def test_codeload_style
     assert_version_detected "0.7.1", "https://codeload.github.com/gsamokovarov/jump/tar.gz/v0.7.1"
+  end
+
+  def test_elasticsearch_alpha_style
+    assert_version_detected "5.0.0-alpha5", "https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/5.0.0-alpha5/elasticsearch-5.0.0-alpha5.tar.gz"
   end
 
   def test_gloox_beta_style
@@ -452,7 +458,7 @@ class VersionParsingTests < Homebrew::TestCase
 
   def test_from_url
     assert_version_detected "1.2.3",
-      "http://github.com/foo/bar.git", :tag => "v1.2.3"
+      "http://github.com/foo/bar.git", tag: "v1.2.3"
   end
 end
 

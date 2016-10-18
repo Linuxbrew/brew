@@ -28,6 +28,6 @@ module OS
     PATH_OPEN = "xdg-open".freeze
     PATH_PATCH = "patch".freeze
     # compatibility
-    ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0"
+    ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0".freeze
   end
 end

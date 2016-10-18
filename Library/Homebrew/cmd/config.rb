@@ -6,6 +6,8 @@
 require "system_config"
 
 module Homebrew
+  module_function
+
   def config
     SystemConfig.dump_verbose_config
   end

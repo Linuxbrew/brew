@@ -32,6 +32,8 @@ module BuildEnvironmentDSL
 end
 
 module Homebrew
+  module_function
+
   def build_env_keys(env)
     keys = %w[
       CC CXX LD OBJC OBJCXX
@@ -43,7 +45,8 @@ module Homebrew
       HOMEBREW_SVN HOMEBREW_GIT
       HOMEBREW_SDKROOT HOMEBREW_BUILD_FROM_SOURCE
       MAKE GIT CPP
-      ACLOCAL_PATH PATH CPATH]
+      ACLOCAL_PATH PATH CPATH
+    ]
     keys += %w[LD_LIBRARY_PATH LD_RUN_PATH LIBRARY_PATH] if OS.linux?
     keys.select { |key| env.key?(key) }
   end

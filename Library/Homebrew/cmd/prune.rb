@@ -12,6 +12,8 @@ require "cmd/tap"
 require "cmd/unlinkapps"
 
 module Homebrew
+  module_function
+
   def prune
     ObserverPathnameExtension.reset_counts!
 
@@ -58,6 +60,6 @@ module Homebrew
       end
     end
 
-    unlinkapps_prune(:dry_run => ARGV.dry_run?, :quiet => true)
+    unlinkapps_prune(dry_run: ARGV.dry_run?, quiet: true)
   end
 end

@@ -1,4 +1,8 @@
 require "hbc/artifact/abstract_flight_block"
 
-class Hbc::Artifact::PreflightBlock < Hbc::Artifact::AbstractFlightBlock
+module Hbc
+  module Artifact
+    class PreflightBlock < AbstractFlightBlock
+    end
+  end
 end

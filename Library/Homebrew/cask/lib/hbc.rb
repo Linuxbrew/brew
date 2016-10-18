@@ -1,7 +1,6 @@
 module Hbc; end
 
 require "hardware"
-require "hbc/extend"
 require "hbc/artifact"
 require "hbc/audit"
 require "hbc/auditor"
@@ -40,21 +39,22 @@ require "utils"
 require "vendor/plist/plist"
 
 module Hbc
-  include Hbc::Locations
-  include Hbc::Scopes
-  include Hbc::Options
-  include Hbc::Utils
+  include Locations
+  include Scopes
+  include Options
+  include Utils
 
   def self.init
-    Hbc::Cache.ensure_cache_exists
-    Hbc::Cache.migrate_legacy_cache
+    Cache.ensure_cache_exists
+    Cache.migrate_legacy_cache
 
-    Hbc::Caskroom.ensure_caskroom_exists
+    Caskroom.migrate_caskroom_from_repo_to_prefix
+    Caskroom.ensure_caskroom_exists
   end
 
   def self.load(query)
     odebug "Loading Cask definitions"
-    cask = Hbc::Source.for_query(query).load
+    cask = Source.for_query(query).load
     cask.dumpcask
     cask
   end

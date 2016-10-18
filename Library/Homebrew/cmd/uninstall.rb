@@ -9,6 +9,8 @@ require "formula"
 require "migrator"
 
 module Homebrew
+  module_function
+
   def uninstall
     raise KegUnspecifiedError if ARGV.named.empty?
 
@@ -25,7 +27,7 @@ module Homebrew
             versions = rack.subdirs.map(&:basename)
             verb = versions.length == 1 ? "is" : "are"
             puts "#{keg.name} #{versions.join(", ")} #{verb} still installed."
-            puts "Remove them all with `brew uninstall --force #{keg.name}`."
+            puts "Remove all versions with `brew uninstall --force #{keg.name}`."
           end
         end
       end

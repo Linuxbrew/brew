@@ -13,6 +13,8 @@ require "stringio"
 require "formula"
 
 module Homebrew
+  module_function
+
   def unpack
     formulae = ARGV.formulae
     raise FormulaUnspecifiedError if formulae.empty?
@@ -39,7 +41,7 @@ module Homebrew
       ENV["VERBOSE"] = "1" # show messages about tar
       f.brew do
         f.patch if ARGV.flag?("--patch")
-        cp_r getwd, stage_dir, :preserve => true
+        cp_r getwd, stage_dir, preserve: true
       end
       ENV["VERBOSE"] = nil
 

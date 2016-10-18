@@ -5,11 +5,11 @@ class CompilerFailureTests < Homebrew::TestCase
   Compiler = Struct.new(:name, :version)
 
   def assert_fails_with(compiler, failure)
-    assert_operator failure, :===, compiler
+    assert_operator failure, :fails_with?, compiler
   end
 
   def refute_fails_with(compiler, failure)
-    refute_operator failure, :===, compiler
+    refute_operator failure, :fails_with?, compiler
   end
 
   def compiler(name, version)
@@ -37,14 +37,14 @@ class CompilerFailureTests < Homebrew::TestCase
   end
 
   def test_create_with_hash
-    failure = create(:gcc => "4.8")
+    failure = create(gcc: "4.8")
     assert_fails_with compiler("gcc-4.8", "4.8"), failure
     assert_fails_with compiler("gcc-4.8", "4.8.1"), failure
     refute_fails_with compiler("gcc-4.7", "4.7"), failure
   end
 
   def test_create_with_hash_and_version
-    failure = create(:gcc => "4.8") { version "4.8.1" }
+    failure = create(gcc: "4.8") { version "4.8.1" }
     assert_fails_with compiler("gcc-4.8", "4.8"), failure
     assert_fails_with compiler("gcc-4.8", "4.8.1"), failure
     refute_fails_with compiler("gcc-4.8", "4.8.2"), failure

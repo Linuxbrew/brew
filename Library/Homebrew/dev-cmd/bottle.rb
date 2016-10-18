@@ -1,4 +1,4 @@
-#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`]:
+#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`] [`--force-core-tap`]:
 #:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
 #:
 #:    Generate a bottle (binary package) from a formula installed with
@@ -31,8 +31,8 @@ BOTTLE_ERB = <<-EOS.freeze
     <% end %>
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
-    <% checksum, osx = checksum_value.shift %>
-    <%= checksum_type %> "<%= checksum %>" => :<%= osx %>
+    <% checksum, macos = checksum_value.shift %>
+    <%= checksum_type %> "<%= checksum %>" => :<%= macos %>
     <% end %>
     <% end %>
   end
@@ -41,20 +41,23 @@ EOS
 MAXIMUM_STRING_MATCHES = 100
 
 module Homebrew
+  module_function
+
   def keg_contain?(string, keg, ignores)
     @put_string_exists_header, @put_filenames = nil
 
-    def print_filename(string, filename)
+    print_filename = lambda do |str, filename|
       unless @put_string_exists_header
-        opoo "String '#{string}' still exists in these files:"
+        opoo "String '#{str}' still exists in these files:"
         @put_string_exists_header = true
       end
 
       @put_filenames ||= []
-      unless @put_filenames.include? filename
-        puts "#{Tty.red}#{filename}#{Tty.reset}"
-        @put_filenames << filename
-      end
+
+      return if @put_filenames.include? filename
+
+      puts Formatter.error(filename.to_s)
+      @put_filenames << filename
     end
 
     result = false
@@ -67,9 +70,9 @@ module Homebrew
       result ||= !linked_libraries.empty?
 
       if ARGV.verbose?
-        print_filename(string, file) unless linked_libraries.empty?
+        print_filename.call(string, file) unless linked_libraries.empty?
         linked_libraries.each do |lib|
-          puts " #{Tty.gray}-->#{Tty.reset} links to #{lib}"
+          puts " #{Tty.bold}-->#{Tty.reset} links to #{lib}"
         end
       end
 
@@ -90,9 +93,9 @@ module Homebrew
       end
 
       next unless ARGV.verbose? && !text_matches.empty?
-      print_filename string, file
+      print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
-        puts " #{Tty.gray}-->#{Tty.reset} match '#{match}' at offset #{Tty.em}0x#{offset}#{Tty.reset}"
+        puts " #{Tty.bold}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
       end
 
       if text_matches.size > MAXIMUM_STRING_MATCHES
@@ -107,9 +110,7 @@ module Homebrew
     absolute_symlinks_start_with_string = []
     keg.find do |pn|
       next unless pn.symlink? && (link = pn.readlink).absolute?
-      if link.to_s.start_with?(string)
-        absolute_symlinks_start_with_string << pn
-      end
+      absolute_symlinks_start_with_string << pn if link.to_s.start_with?(string)
     end
 
     if ARGV.verbose?
@@ -134,8 +135,14 @@ module Homebrew
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
 
-    unless f.tap
-      return ofail "Formula not from core or any taps: #{f.full_name}"
+    tap = f.tap
+
+    unless tap
+      unless ARGV.include?("--force-core-tap")
+        return ofail "Formula not from core or any taps: #{f.full_name}"
+      end
+
+      tap = CoreTap.instance
     end
 
     if f.bottle_disabled?
@@ -148,11 +155,9 @@ module Homebrew
       return ofail "Formula not installed with '--build-bottle': #{f.full_name}"
     end
 
-    unless f.stable
-      return ofail "Formula has no stable version: #{f.full_name}"
-    end
+    return ofail "Formula has no stable version: #{f.full_name}" unless f.stable
 
-    if ARGV.include? "--no-rebuild"
+    if ARGV.include?("--no-rebuild") || !f.tap
       rebuild = 0
     elsif ARGV.include? "--keep-old"
       rebuild = f.bottle_specification.rebuild
@@ -171,6 +176,7 @@ module Homebrew
     tar_path = Pathname.pwd/tar_filename
 
     prefix = HOMEBREW_PREFIX.to_s
+    repository = HOMEBREW_REPOSITORY.to_s
     cellar = HOMEBREW_CELLAR.to_s
 
     ohai "Bottling #{filename}..."
@@ -187,7 +193,8 @@ module Homebrew
           keg.relocate_dynamic_linkage prefix, Keg::PREFIX_PLACEHOLDER,
             cellar, Keg::CELLAR_PLACEHOLDER
           keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
-            cellar, Keg::CELLAR_PLACEHOLDER
+            cellar, Keg::CELLAR_PLACEHOLDER,
+            repository, Keg::REPOSITORY_PLACEHOLDER
         end
 
         keg.delete_pyc_files!
@@ -242,11 +249,12 @@ module Homebrew
           skip_relocation = true
         else
           relocatable = false if keg_contain?(prefix_check, keg, ignores)
+          relocatable = false if keg_contain?(repository, keg, ignores)
           relocatable = false if keg_contain?(cellar, keg, ignores)
           if prefix != prefix_check
             relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
           end
-          skip_relocation = relocatable && !keg.require_install_name_tool?
+          skip_relocation = relocatable && !keg.require_relocation?
         end
         puts if !relocatable && ARGV.verbose?
       rescue Interrupt
@@ -259,7 +267,8 @@ module Homebrew
             keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, prefix,
               Keg::CELLAR_PLACEHOLDER, cellar
             keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
-              Keg::CELLAR_PLACEHOLDER, cellar
+              Keg::CELLAR_PLACEHOLDER, cellar,
+              Keg::REPOSITORY_PLACEHOLDER, repository
           end
         end
       end
@@ -270,7 +279,7 @@ module Homebrew
     root_url ||= ARGV.value("root_url")
 
     bottle = BottleSpecification.new
-    bottle.tap = f.tap
+    bottle.tap = tap
     bottle.root_url(root_url) if root_url
     if relocatable
       if skip_relocation
@@ -320,34 +329,33 @@ module Homebrew
     puts "./#{filename}"
     puts output
 
-    if ARGV.include? "--json"
-      json = {
-        f.full_name => {
-          "formula" => {
-            "pkg_version" => f.pkg_version.to_s,
-            "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
-          },
-          "bottle" => {
-            "root_url" => bottle.root_url,
-            "prefix" => bottle.prefix,
-            "cellar" => bottle.cellar.to_s,
-            "rebuild" => bottle.rebuild,
-            "tags" => {
-              Utils::Bottles.tag.to_s => {
-                "filename" => filename.to_s,
-                "sha256" => sha256,
-              },
+    return unless ARGV.include? "--json"
+    json = {
+      f.full_name => {
+        "formula" => {
+          "pkg_version" => f.pkg_version.to_s,
+          "path" => f.path.to_s.strip_prefix("#{HOMEBREW_REPOSITORY}/"),
+        },
+        "bottle" => {
+          "root_url" => bottle.root_url,
+          "prefix" => bottle.prefix,
+          "cellar" => bottle.cellar.to_s,
+          "rebuild" => bottle.rebuild,
+          "tags" => {
+            Utils::Bottles.tag.to_s => {
+              "filename" => filename.to_s,
+              "sha256" => sha256,
             },
           },
-          "bintray" => {
-            "package" => Utils::Bottles::Bintray.package(f.name),
-            "repository" => Utils::Bottles::Bintray.repository(f.tap),
-          },
         },
-      }
-      File.open("#{filename.prefix}.bottle.json", "w") do |file|
-        file.write Utils::JSON.dump json
-      end
+        "bintray" => {
+          "package" => Utils::Bottles::Bintray.package(f.name),
+          "repository" => Utils::Bottles::Bintray.repository(tap),
+        },
+      },
+    }
+    File.open("#{filename.prefix}.bottle.json", "w") do |file|
+      file.write Utils::JSON.dump json
     end
   end
 
@@ -433,7 +441,7 @@ module Homebrew
             puts output
             update_or_add = "add"
             if s.include? "stable do"
-              indent = s.slice(/^ +stable do/).length - "stable do".length
+              indent = s.slice(/^( +)stable do/, 1).length
               string = s.sub!(/^ {#{indent}}stable do(.|\n)+?^ {#{indent}}end\n/m, '\0' + output + "\n")
             else
               string = s.sub!(

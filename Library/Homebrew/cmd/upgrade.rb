@@ -18,29 +18,39 @@ require "cleanup"
 require "development_tools"
 
 module Homebrew
+  module_function
+
   def upgrade
     FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
     Homebrew.perform_preinstall_checks
 
+    if ARGV.include?("--all")
+      opoo <<-EOS.undent
+        We decided to not change the behaviour of `brew upgrade` so
+        `brew upgrade --all` is equivalent to `brew upgrade` without any other
+        arguments (so the `--all` is a no-op and can be removed).
+      EOS
+    end
+
     if ARGV.named.empty?
       outdated = Formula.installed.select do |f|
-        f.outdated?(:fetch_head => ARGV.fetch_head?)
+        f.outdated?(fetch_head: ARGV.fetch_head?)
       end
 
       exit 0 if outdated.empty?
     else
       outdated = ARGV.resolved_formulae.select do |f|
-        f.outdated?(:fetch_head => ARGV.fetch_head?)
+        f.outdated?(fetch_head: ARGV.fetch_head?)
       end
 
       (ARGV.resolved_formulae - outdated).each do |f|
         versions = f.installed_kegs.map(&:version)
         if versions.empty?
-          onoe "#{f.full_name} not installed"
+          onoe "#{f.full_specified_name} not installed"
         else
           version = versions.max
-          onoe "#{f.full_name} #{version} already installed"
+          onoe "#{f.full_specified_name} #{version} already installed"
         end
       end
       exit 1 if outdated.empty?
@@ -51,19 +61,21 @@ module Homebrew
       outdated -= pinned
     end
 
-    if outdated.empty?
+    formulae_to_install = outdated.map(&:latest_formula)
+
+    if formulae_to_install.empty?
       oh1 "No packages to upgrade"
     else
-      oh1 "Upgrading #{outdated.length} outdated package#{plural(outdated.length)}, with result:"
-      puts outdated.map { |f| "#{f.full_name} #{f.pkg_version}" } * ", "
+      oh1 "Upgrading #{formulae_to_install.length} outdated package#{plural(formulae_to_install.length)}, with result:"
+      puts formulae_to_install.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
     unless upgrade_pinned? || pinned.empty?
       oh1 "Not upgrading #{pinned.length} pinned package#{plural(pinned.length)}:"
-      puts pinned.map { |f| "#{f.full_name} #{f.pkg_version}" } * ", "
+      puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
-    outdated.each do |f|
+    formulae_to_install.each do |f|
       upgrade_formula(f)
       next unless ARGV.include?("--cleanup")
       next unless f.installed?
@@ -76,7 +88,11 @@ module Homebrew
   end
 
   def upgrade_formula(f)
-    outdated_keg = Keg.new(f.linked_keg.resolved_path) if f.linked_keg.directory?
+    formulae_maybe_with_kegs = [f] + f.old_installed_formulae
+    outdated_kegs = formulae_maybe_with_kegs
+                    .map(&:linked_keg)
+                    .select(&:directory?)
+                    .map { |k| Keg.new(k.resolved_path) }
 
     fi = FormulaInstaller.new(f)
     fi.options             = f.build.used_options
@@ -87,12 +103,12 @@ module Homebrew
     fi.debug               = ARGV.debug?
     fi.prelude
 
-    oh1 "Upgrading #{f.full_name}"
+    oh1 "Upgrading #{f.full_specified_name}"
 
     # first we unlink the currently active keg for this formula otherwise it is
     # possible for the existing build to interfere with the build we are about to
     # do! Seriously, it happens!
-    outdated_keg.unlink if outdated_keg
+    outdated_kegs.each(&:unlink)
 
     fi.install
     fi.finish
@@ -117,7 +133,7 @@ module Homebrew
   ensure
     # restore previous installation state if build failed
     begin
-      outdated_keg.link if outdated_keg && !f.installed?
+      outdated_kegs.each(&:link) unless f.installed?
     rescue
       nil
     end

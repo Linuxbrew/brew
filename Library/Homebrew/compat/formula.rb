@@ -72,8 +72,8 @@ class Formula
     yield if block_given?
     PythonRequirement.new
   end
-  alias_method :python2, :python
-  alias_method :python3, :python
+  alias python2 python
+  alias python3 python
 
   def startup_plist
     odeprecated "Formula#startup_plist", "Formula#plist"

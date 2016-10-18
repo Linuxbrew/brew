@@ -2,6 +2,8 @@
 #:    Generate the README.md file for a new tap.
 
 module Homebrew
+  module_function
+
   def tap_readme
     name = ARGV.first
     raise "A name is required" if name.nil?
@@ -24,7 +26,7 @@ module Homebrew
     ```
 
     ## Documentation
-    `brew help`, `man brew` or check [Homebrew's documentation](https://github.com/Homebrew/brew/tree/master/share/doc/homebrew#readme).
+    `brew help`, `man brew` or check [Homebrew's documentation](https://github.com/Homebrew/brew/tree/master/docs#readme).
     EOS
 
     puts template if ARGV.verbose?

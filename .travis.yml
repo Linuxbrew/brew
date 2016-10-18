@@ -1,6 +1,6 @@
-os: linux
 language: ruby
 rvm: 2.0.0
+os: linux
 
 before_install:
   - export HOMEBREW_DEVELOPER=1

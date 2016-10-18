@@ -57,7 +57,7 @@ class SystemConfig
     end
 
     def describe_perl
-      describe_path(which "perl")
+      describe_path(which("perl"))
     end
 
     def describe_python
@@ -108,7 +108,7 @@ class SystemConfig
     end
 
     def describe_java
-      # java_home doesn't exist on all OS Xs; it might be missing on older versions.
+      # java_home doesn't exist on all macOSs; it might be missing on older versions.
       unless File.executable? "/usr/libexec/java_home"
         return "N/A" if which("java").nil?
         java = `java -version 2>&1`.lines.first.chomp
@@ -156,7 +156,7 @@ class SystemConfig
       f.puts "Ruby: #{describe_ruby}"
       f.puts "Java: #{describe_java}"
     end
-    alias_method :dump_generic_verbose_config, :dump_verbose_config
+    alias dump_generic_verbose_config dump_verbose_config
   end
 end
 

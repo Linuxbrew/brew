@@ -5,6 +5,8 @@ require "formula_installer"
 require "development_tools"
 
 module Homebrew
+  module_function
+
   def reinstall
     FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
@@ -58,10 +60,11 @@ module Homebrew
 
   def restore_backup(keg, formula)
     path = backup_path(keg)
-    if path.directory?
-      path.rename keg
-      keg.link unless formula.keg_only?
-    end
+
+    return unless path.directory?
+
+    path.rename keg
+    keg.link unless formula.keg_only?
   end
 
   def backup_path(path)

@@ -10,7 +10,7 @@ class LanguageModuleRequirement < Requirement
     super([language, module_name, import_name])
   end
 
-  satisfy(:build_env => false) { quiet_system(*the_test) }
+  satisfy(build_env: false) { quiet_system(*the_test) }
 
   def message
     s = <<-EOS.undent
@@ -50,5 +50,9 @@ class LanguageModuleRequirement < Requirement
     when :python3 then "pip3 install"
     when :ruby    then "gem install"
     end
+  end
+
+  def display_s
+    "#{@module_name} (#{@language} module)"
   end
 end

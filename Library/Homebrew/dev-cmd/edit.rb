@@ -7,6 +7,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def edit
     unless (HOMEBREW_REPOSITORY/".git").directory?
       raise <<-EOS.undent
@@ -33,9 +35,9 @@ module Homebrew
       # Don't use ARGV.formulae as that will throw if the file doesn't parse
       paths = ARGV.named.map do |name|
         path = Formulary.path(name)
-        unless path.file? || ARGV.force?
-          raise FormulaUnavailableError, name
-        end
+
+        raise FormulaUnavailableError, name unless path.file? || ARGV.force?
+
         path
       end
       exec_editor(*paths)

@@ -21,7 +21,7 @@ class AbstractDownloadStrategyTests < Homebrew::TestCase
   end
 
   def test_expand_safe_system_args_with_explicit_quiet_flag
-    @args << { :quiet_flag => "--flag" }
+    @args << { quiet_flag: "--flag" }
     expanded_args = @strategy.expand_safe_system_args(@args)
     assert_equal %w[foo bar baz --flag], expanded_args
   end
@@ -39,8 +39,8 @@ class AbstractDownloadStrategyTests < Homebrew::TestCase
 
   def test_source_modified_time
     mktemp "mtime" do
-      touch "foo", :mtime => Time.now - 10
-      touch "bar", :mtime => Time.now - 100
+      touch "foo", mtime: Time.now - 10
+      touch "bar", mtime: Time.now - 100
       ln_s "not-exist", "baz"
       assert_equal File.mtime("foo"), @strategy.source_modified_time
     end
@@ -118,7 +118,7 @@ class GitDownloadStrategyTests < Homebrew::TestCase
 
   def test_source_modified_time
     setup_git_repo
-    assert_equal 1242860651, @strategy.source_modified_time.to_i
+    assert_equal 1_242_860_651, @strategy.source_modified_time.to_i
   end
 
   def test_last_commit

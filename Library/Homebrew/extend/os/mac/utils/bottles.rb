@@ -21,7 +21,7 @@ module Utils
     class Collector
       private
 
-      alias_method :original_find_matching_tag, :find_matching_tag
+      alias original_find_matching_tag find_matching_tag
       def find_matching_tag(tag)
         original_find_matching_tag(tag) || find_altivec_tag(tag) || find_or_later_tag(tag)
       end
@@ -31,10 +31,9 @@ module Utils
       # sometimes a formula has just :tiger_altivec, other times it has
       # :tiger_g4, :tiger_g5, etc.
       def find_altivec_tag(tag)
-        if tag.to_s =~ /(\w+)_(g4|g4e|g5)$/
-          altivec_tag = "#{$1}_altivec".to_sym
-          altivec_tag if key?(altivec_tag)
-        end
+        return unless tag.to_s =~ /(\w+)_(g4|g4e|g5)$/
+        altivec_tag = "#{$1}_altivec".to_sym
+        altivec_tag if key?(altivec_tag)
       end
 
       # Allows a bottle tag to specify a specific OS or later,

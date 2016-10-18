@@ -1,21 +1,23 @@
-module Hbc::Cache
-  module_function
+module Hbc
+  module Cache
+    module_function
 
-  def ensure_cache_exists
-    return if Hbc.cache.exist?
-    odebug "Creating Cache at #{Hbc.cache}"
-    Hbc.cache.mkpath
-  end
+    def ensure_cache_exists
+      return if Hbc.cache.exist?
 
-  def migrate_legacy_cache
-    if Hbc.legacy_cache.exist?
+      odebug "Creating Cache at #{Hbc.cache}"
+      Hbc.cache.mkpath
+    end
+
+    def migrate_legacy_cache
+      return unless Hbc.legacy_cache.exist?
+
       ohai "Migrating cached files to #{Hbc.cache}..."
-
       Hbc.legacy_cache.children.select(&:symlink?).each do |symlink|
         file = symlink.readlink
 
         new_name = file.basename
-                       .sub(%r{\-((?:(\d|#{Hbc::DSL::Version::DIVIDER_REGEX})*\-\2*)*[^\-]+)$}x,
+                       .sub(%r{\-((?:(\d|#{DSL::Version::DIVIDER_REGEX})*\-\2*)*[^\-]+)$}x,
                             '--\1')
 
         renamed_file = Hbc.cache.join(new_name)

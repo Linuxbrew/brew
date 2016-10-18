@@ -27,7 +27,7 @@ setup-ruby-path() {
         fi
       fi
     else
-      if [[ -n "$HOMEBREW_OSX" ]]
+      if [[ -n "$HOMEBREW_MACOS" ]]
       then
         HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
       else

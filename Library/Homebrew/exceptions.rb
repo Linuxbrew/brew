@@ -56,7 +56,7 @@ end
 
 class FormulaSpecificationError < StandardError; end
 
-class FormulaMethodDeprecatedError < StandardError; end
+class MethodDeprecatedError < StandardError; end
 
 class FormulaUnavailableError < RuntimeError
   attr_reader :name
@@ -294,6 +294,17 @@ class FormulaConflictError < RuntimeError
   end
 end
 
+class FormulaAmbiguousPythonError < RuntimeError
+  def initialize(formula)
+    super <<-EOS.undent
+      The version of python to use with the virtualenv in the `#{formula.full_name}` formula
+      cannot be guessed automatically. If the simultaneous use of python and python3
+      is intentional, please add `:using => "python"` or `:using => "python3"` to
+      `virtualenv_install_with_resources` to resolve the ambiguity manually.
+    EOS
+  end
+end
+
 class BuildError < RuntimeError
   attr_reader :formula, :env
 
@@ -309,7 +320,7 @@ class BuildError < RuntimeError
   end
 
   def fetch_issues
-    GitHub.issues_for_formula(formula.name, :tap => formula.tap)
+    GitHub.issues_for_formula(formula.name, tap: formula.tap)
   rescue GitHub::RateLimitExceededError => e
     opoo e.message
     []
@@ -318,7 +329,7 @@ class BuildError < RuntimeError
   def dump
     if !ARGV.verbose?
       puts
-      puts "#{Tty.red}READ THIS#{Tty.reset}: #{Tty.em}#{OS::ISSUES_URL}#{Tty.reset}"
+      puts Formatter.error(Formatter.url(OS::ISSUES_URL), label: "READ THIS")
       if formula.tap
         case formula.tap.name
         when "homebrew/boneyard"
@@ -327,7 +338,7 @@ class BuildError < RuntimeError
         else
           if issues_url = formula.tap.issues_url
             puts "If reporting this issue please do so at (not Homebrew/brew):"
-            puts "  #{issues_url}"
+            puts "  #{Formatter.url(issues_url)}"
           end
         end
       end
@@ -355,11 +366,9 @@ class BuildError < RuntimeError
       puts issues.map { |i| "#{i["title"]} #{i["html_url"]}" }.join("\n")
     end
 
-    if OS.mac?
-      require "diagnostic"
-      unsupported_osx = Homebrew::Diagnostic::Checks.new.check_for_unsupported_osx
-      opoo unsupported_osx if unsupported_osx
-    end
+    require "diagnostic"
+    unsupported_macos = Homebrew::Diagnostic::Checks.new.check_for_unsupported_macos if OS.mac?
+    opoo unsupported_macos if unsupported_macos
   end
 end
 
@@ -484,7 +493,7 @@ class DuplicateResourceError < ArgumentError
 end
 
 # raised when a single patch file is not found and apply hasn't been specified
-class MissingApplyError < RuntimeError ; end
+class MissingApplyError < RuntimeError; end
 
 class BottleVersionMismatchError < RuntimeError
   def initialize(bottle_file, bottle_version, formula, formula_version)

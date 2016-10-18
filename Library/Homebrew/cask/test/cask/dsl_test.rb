@@ -122,6 +122,56 @@ describe Hbc::DSL do
     end
   end
 
+  describe "language stanza" do
+    it "allows multilingual casks" do
+      cask = lambda do
+        Hbc::Cask.new("cask-with-apps") do
+          language "zh" do
+            sha256 "abc123"
+            "zh-CN"
+          end
+
+          language "en-US", default: true do
+            sha256 "xyz789"
+            "en-US"
+          end
+
+          url "https://example.org/#{language}.zip"
+        end
+      end
+
+      MacOS.stubs(languages: ["zh"])
+      cask.call.language.must_equal "zh-CN"
+      cask.call.sha256.must_equal "abc123"
+      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+
+      MacOS.stubs(languages: ["zh-XX"])
+      cask.call.language.must_equal "zh-CN"
+      cask.call.sha256.must_equal "abc123"
+      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+
+      MacOS.stubs(languages: ["en"])
+      cask.call.language.must_equal "en-US"
+      cask.call.sha256.must_equal "xyz789"
+      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+
+      MacOS.stubs(languages: ["xx-XX"])
+      cask.call.language.must_equal "en-US"
+      cask.call.sha256.must_equal "xyz789"
+      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+
+      MacOS.stubs(languages: ["xx-XX", "zh", "en"])
+      cask.call.language.must_equal "zh-CN"
+      cask.call.sha256.must_equal "abc123"
+      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+
+      MacOS.stubs(languages: ["xx-XX", "en-US", "zh"])
+      cask.call.language.must_equal "en-US"
+      cask.call.sha256.must_equal "xyz789"
+      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+    end
+  end
+
   describe "app stanza" do
     it "allows you to specify app stanzas" do
       cask = Hbc::Cask.new("cask-with-apps") do
@@ -352,31 +402,6 @@ describe Hbc::DSL do
     it "refuses to load invalid conflicts_with key" do
       lambda {
         Hbc.load("invalid/invalid-conflicts-with-key")
-      }.must_raise(Hbc::CaskInvalidError)
-    end
-  end
-
-  describe "license stanza" do
-    it "allows the license to be specified" do
-      cask = Hbc.load("with-license")
-      cask.license.value.must_equal :gpl
-    end
-
-    it "the license has a category" do
-      cask = Hbc.load("with-license")
-      cask.license.category.must_equal :oss
-    end
-
-    it "prevents defining multiple license stanzas" do
-      err = lambda {
-        Hbc.load("invalid/invalid-license-multiple")
-      }.must_raise(Hbc::CaskInvalidError)
-      err.message.must_include "'license' stanza may only appear once"
-    end
-
-    it "refuses to load on invalid license value" do
-      lambda {
-        Hbc.load("invalid/invalid-license-value")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end

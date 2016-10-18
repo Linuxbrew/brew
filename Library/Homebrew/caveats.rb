@@ -8,9 +8,10 @@ class Caveats
   def caveats
     caveats = []
     begin
-      build, f.build = f.build, Tab.for_formula(f)
+      build = f.build
+      f.build = Tab.for_formula(f)
       s = f.caveats.to_s
-      caveats << s.chomp + "\n" if s.length > 0
+      caveats << s.chomp + "\n" unless s.empty?
     ensure
       f.build = build
     end
@@ -33,7 +34,11 @@ class Caveats
 
   def keg
     @keg ||= [f.prefix, f.opt_prefix, f.linked_keg].map do |d|
-      Keg.new(d.resolved_path) rescue nil
+      begin
+        Keg.new(d.resolved_path)
+      rescue
+        nil
+      end
     end.compact.first
   end
 
@@ -64,27 +69,34 @@ class Caveats
   end
 
   def bash_completion_caveats
-    if keg && keg.completion_installed?(:bash) then <<-EOS.undent
+    return unless keg
+    return unless keg.completion_installed?(:bash)
+
+    <<-EOS.undent
       Bash completion has been installed to:
         #{HOMEBREW_PREFIX}/etc/bash_completion.d
-      EOS
-    end
+    EOS
   end
 
   def zsh_completion_caveats
-    if keg && keg.completion_installed?(:zsh) then <<-EOS.undent
+    return unless keg
+    return unless keg.completion_installed?(:zsh)
+
+    <<-EOS.undent
       zsh completion has been installed to:
         #{HOMEBREW_PREFIX}/share/zsh/site-functions
-      EOS
-    end
+    EOS
   end
 
   def fish_completion_caveats
-    if keg && keg.completion_installed?(:fish) && which("fish") then <<-EOS.undent
+    return unless keg
+    return unless keg.completion_installed?(:fish)
+    return unless which("fish")
+
+    <<-EOS.undent
       fish completion has been installed to:
         #{HOMEBREW_PREFIX}/share/fish/vendor_completions.d
-      EOS
-    end
+    EOS
   end
 
   def python_caveats
@@ -135,22 +147,24 @@ class Caveats
   end
 
   def app_caveats
-    if keg && keg.app_installed?
-      <<-EOS.undent
-        .app bundles were installed.
-        Run `brew linkapps #{keg.name}` to symlink these to /Applications.
-      EOS
-    end
+    return unless keg
+    return unless keg.app_installed?
+
+    <<-EOS.undent
+      .app bundles were installed.
+      Run `brew linkapps #{keg.name}` to symlink these to /Applications.
+    EOS
   end
 
   def elisp_caveats
     return if f.keg_only?
-    if keg && keg.elisp_installed?
-      <<-EOS.undent
-        Emacs Lisp files have been installed to:
-          #{HOMEBREW_PREFIX}/share/emacs/site-lisp/#{f.name}
-      EOS
-    end
+    return unless keg
+    return unless keg.elisp_installed?
+
+    <<-EOS.undent
+      Emacs Lisp files have been installed to:
+        #{HOMEBREW_PREFIX}/share/emacs/site-lisp/#{f.name}
+    EOS
   end
 
   def plist_caveats

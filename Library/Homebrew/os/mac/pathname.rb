@@ -1,13 +1,9 @@
-require "os/mac/shared_mach"
-
 class Pathname
-  if OS.mac? && !ENV["HOMEBREW_NO_RUBY_MACHO"]
-    require "os/mac/ruby_mach"
-    include RubyMachO
-  else
-    require "os/mac/cctools_mach"
-    include CctoolsMachO
+  if OS.mac?
+    require "os/mac/mach"
+    include MachO
+  elsif OS.linux?
+    require "os/linux/elf"
+    include ELF
   end
-
-  include SharedMachO
 end

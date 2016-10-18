@@ -42,13 +42,15 @@ require "formula"
 require "ostruct"
 
 module Homebrew
+  module_function
+
   def deps
     mode = OpenStruct.new(
-      :installed?  => ARGV.include?("--installed"),
-      :tree?       => ARGV.include?("--tree"),
-      :all?        => ARGV.include?("--all"),
-      :topo_order? => ARGV.include?("-n"),
-      :union?      => ARGV.include?("--union")
+      installed?: ARGV.include?("--installed"),
+      tree?: ARGV.include?("--tree"),
+      all?: ARGV.include?("--all"),
+      topo_order?: ARGV.include?("-n"),
+      union?: ARGV.include?("--union")
     )
 
     if mode.installed? && mode.tree?

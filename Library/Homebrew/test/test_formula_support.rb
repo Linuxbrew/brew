@@ -8,8 +8,8 @@ class KegOnlyReasonTests < Homebrew::TestCase
   end
 
   def test_to_s_no_explanation
-    r = KegOnlyReason.new :provided_by_osx, ""
-    assert_match(/^OS X already provides/, r.to_s)
+    r = KegOnlyReason.new :provided_by_macos, ""
+    assert_match(/^macOS already provides/, r.to_s)
   end
 end
 

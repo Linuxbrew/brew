@@ -11,6 +11,8 @@
 require "formula"
 
 module Homebrew
+  module_function
+
   def diy
     path = Pathname.getwd
 
@@ -31,11 +33,9 @@ module Homebrew
   def detect_version(path)
     version = path.version.to_s
 
-    if version.empty?
-      raise "Couldn't determine version, set it with --version=<version>"
-    else
-      version
-    end
+    raise "Couldn't determine version, set it with --version=<version>" if version.empty?
+
+    version
   end
 
   def detect_name(path, version)

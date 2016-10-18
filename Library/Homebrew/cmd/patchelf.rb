@@ -11,7 +11,7 @@ module Homebrew
     Homebrew.install_formula(Formula["patchelf"])
   end
 
-  def patchelf_formula f
+  def patchelf_formula(f)
     return if f.name == "glibc"
 
     unless f.installed?
@@ -26,7 +26,7 @@ module Homebrew
     end
   end
 
-  def patchelf_formulae formulae
+  def patchelf_formulae(formulae)
     ensure_patchelf_installed!
     formulae.each { |f| patchelf_formula f }
   end

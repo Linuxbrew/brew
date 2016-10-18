@@ -7,7 +7,7 @@ class SystemConfig
       end
     end
 
-    def formula_version formula
+    def formula_version(formula)
       require "formula"
       begin
         f = Formula[formula]

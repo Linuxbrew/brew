@@ -14,7 +14,7 @@
 #:    information on all installed formulae.
 #:
 #:    See the docs for examples of using the JSON:
-#:    <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md>
+#:    <https://github.com/Homebrew/brew/blob/master/docs/Querying-Brew.md>
 
 require "blacklist"
 require "caveats"
@@ -25,6 +25,8 @@ require "tab"
 require "utils/json"
 
 module Homebrew
+  module_function
+
   def info
     # eventually we'll solidify an API, but we'll keep old versions
     # awhile around for compatibility
@@ -54,11 +56,8 @@ module Homebrew
           end
         rescue FormulaUnavailableError
           # No formula with this name, try a blacklist lookup
-          if (blacklist = blacklisted?(f))
-            puts blacklist
-          else
-            raise
-          end
+          raise unless (blacklist = blacklisted?(f))
+          puts blacklist
         end
       end
     end
@@ -120,7 +119,7 @@ module Homebrew
 
     puts "#{f.full_name}: #{specs * ", "}#{" [#{attrs * ", "}]" unless attrs.empty?}"
     puts f.desc if f.desc
-    puts "#{Tty.em}#{f.homepage}#{Tty.reset}" if f.homepage
+    puts Formatter.url(f.homepage) if f.homepage
 
     conflicts = f.conflicts.map(&:name).sort!
     puts "Conflicts with: #{conflicts*", "}" unless conflicts.empty?
@@ -136,13 +135,22 @@ module Homebrew
       end
     end
 
-    puts "From: #{Tty.em}#{github_info(f)}#{Tty.reset}"
+    puts "From: #{Formatter.url(github_info(f))}"
 
     unless f.deps.empty?
       ohai "Dependencies"
       %w[build required recommended optional].map do |type|
         deps = f.deps.send(type).uniq
         puts "#{type.capitalize}: #{decorate_dependencies deps}" unless deps.empty?
+      end
+    end
+
+    unless f.requirements.to_a.empty?
+      ohai "Requirements"
+      %w[build required recommended optional].map do |type|
+        reqs = f.requirements.select(&:"#{type}?")
+        next if reqs.to_a.empty?
+        puts "#{type.capitalize}: #{decorate_requirements(reqs)}"
       end
     end
 
@@ -160,5 +168,13 @@ module Homebrew
       dep.installed? ? pretty_installed(dep) : pretty_uninstalled(dep)
     end
     deps_status * ", "
+  end
+
+  def decorate_requirements(requirements)
+    req_status = requirements.collect do |req|
+      req_s = req.display_s
+      req.satisfied? ? pretty_installed(req_s) : pretty_uninstalled(req_s)
+    end
+    req_status.join(", ")
   end
 end

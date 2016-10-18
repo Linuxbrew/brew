@@ -1,16 +1,12 @@
-#:  * `style` [`--fix`] [`--display-cop-names`] [<formulae>|<files>]:
+#:  * `style` [`--fix`] [`--display-cop-names`] [<files>|<taps>|<formulae>]:
 #:    Check formulae or files for conformance to Homebrew style guidelines.
-#:
-#:    <formulae> is a list of formula names.
-#:
-#:    <files> is a list of file names.
 #:
 #:    <formulae> and <files> may not be combined. If both are omitted, style will run
 #:    style checks on the whole Homebrew `Library`, including core code and all
 #:    formulae.
 #:
-#:    If `--fix` is passed and `HOMEBREW_DEVELOPER` is set, style violations
-#:    will be automatically fixed using RuboCop's `--auto-correct` feature.
+#:    If `--fix` is passed, style violations will be automatically fixed using
+#:    RuboCop's `--auto-correct` feature.
 #:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
@@ -21,16 +17,20 @@ require "utils"
 require "utils/json"
 
 module Homebrew
+  module_function
+
   def style
     target = if ARGV.named.empty?
-      [HOMEBREW_LIBRARY]
+      nil
     elsif ARGV.named.any? { |file| File.exist? file }
       ARGV.named
+    elsif ARGV.named.any? { |tap| tap.count("/") == 1 }
+      ARGV.named.map { |tap| Tap.fetch(tap).path }
     else
       ARGV.formulae.map(&:path)
     end
 
-    Homebrew.failed = check_style_and_print(target, :fix => ARGV.flag?("--fix"))
+    Homebrew.failed = check_style_and_print(target, fix: ARGV.flag?("--fix"))
   end
 
   # Checks style for a list of files, printing simple RuboCop output.
@@ -47,19 +47,26 @@ module Homebrew
 
   def check_style_impl(files, output_type, options = {})
     fix = options[:fix]
-    Homebrew.install_gem_setup_path! "rubocop", "0.41.2"
+    Homebrew.install_gem_setup_path! "rubocop", "0.43.0"
 
     args = %W[
       --force-exclusion
-      --config #{HOMEBREW_LIBRARY}/.rubocop.yml
     ]
-    args << "--auto-correct" if ARGV.homebrew_developer? && fix
-    args += files
+    args << "--auto-correct" if fix
+
+    if files.nil?
+      args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
+      args += [HOMEBREW_LIBRARY_PATH]
+    else
+      args << "--config" << HOMEBREW_LIBRARY/".rubocop.yml"
+      args += files
+    end
 
     case output_type
     when :print
       args << "--display-cop-names" if ARGV.include? "--display-cop-names"
-      system "rubocop", "--format", "simple", *args
+      args << "--format" << "simple" if files
+      system "rubocop", *args
       !$?.success?
     when :json
       json = Utils.popen_read_text("rubocop", "--format", "json", *args)

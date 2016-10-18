@@ -32,7 +32,7 @@ class LanguageModuleRequirementTests < Homebrew::TestCase
   end
 
   def test_good_perl_deps
-    assert_deps_pass "Env" => :perl
+    assert_deps_pass "Config" => :perl
   end
 
   def test_bad_python_deps

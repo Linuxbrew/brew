@@ -14,8 +14,9 @@ $:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
 
 if ARGV == %w[--version] || ARGV == %w[-v]
-  puts "Homebrew #{Homebrew.homebrew_version_string}"
-  puts "Homebrew/homebrew-core #{Homebrew.core_tap_version_string}"
+  require "tap"
+  puts "Homebrew #{HOMEBREW_VERSION}"
+  puts "Homebrew/homebrew-core #{CoreTap.instance.version_string}"
   exit 0
 end
 
@@ -32,20 +33,17 @@ begin
 
   empty_argv = ARGV.empty?
   help_flag_list = %w[-h --help --usage -?]
-  help_flag = false
+  help_flag = !ENV["HOMEBREW_HELP"].nil?
   internal_cmd = true
   cmd = nil
 
   ARGV.dup.each_with_index do |arg, i|
-    if help_flag && cmd
-      break
-    elsif help_flag_list.include?(arg)
-      # Option-style help: Both `--help <cmd>` and `<cmd> --help` are fine.
-      help_flag = true
-    elsif arg == "help" && !cmd
+    break if help_flag && cmd
+
+    if arg == "help" && !cmd
       # Command-style help: `help <cmd>` is fine, but `<cmd> help` is not.
       help_flag = true
-    elsif !cmd
+    elsif !cmd && !help_flag_list.include?(arg)
       cmd = ARGV.delete_at(i)
     end
   end
@@ -75,17 +73,17 @@ begin
   end
 
   # Usage instructions should be displayed if and only if one of:
-  # - a help flag is passed AND an internal command is matched
+  # - a help flag is passed AND a command is matched
   # - a help flag is passed AND there is no command specified
   # - no arguments are passed
-  #
-  # It should never affect external commands so they can handle usage
-  # arguments themselves.
   if empty_argv || help_flag
     require "cmd/help"
-    Homebrew.help cmd, :empty_argv => empty_argv
+    Homebrew.help cmd, empty_argv: empty_argv
     # `Homebrew.help` never returns, except for external/unknown commands.
   end
+
+  # Migrate LinkedKegs/PinnedKegs if update didn't already do so
+  migrate_legacy_keg_symlinks_if_necessary
 
   # Uninstall old brew-cask if it's still around; we just use the tap now.
   if cmd == "cask" && (HOMEBREW_CELLAR/"brew-cask").exist?
@@ -122,7 +120,7 @@ begin
 
 rescue UsageError => e
   require "cmd/help"
-  Homebrew.help cmd, :usage_error => e.message
+  Homebrew.help cmd, usage_error: e.message
 rescue SystemExit => e
   onoe "Kernel.exit" if ARGV.verbose? && !e.success?
   $stderr.puts e.backtrace if ARGV.debug?
@@ -144,8 +142,8 @@ rescue Exception => e
   Utils::Analytics.report_exception(e)
   onoe e
   if internal_cmd && defined?(OS::ISSUES_URL)
-    $stderr.puts "#{Tty.white}Please report this bug:"
-    $stderr.puts "    #{Tty.em}#{OS::ISSUES_URL}#{Tty.reset}"
+    $stderr.puts "#{Tty.bold}Please report this bug:#{Tty.reset}"
+    $stderr.puts "  #{Formatter.url(OS::ISSUES_URL)}"
   end
   $stderr.puts e.backtrace
   exit 1

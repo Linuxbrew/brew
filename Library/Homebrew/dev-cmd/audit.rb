@@ -37,10 +37,10 @@ require "cmd/style"
 require "date"
 
 module Homebrew
+  module_function
+
   def audit
-    if ARGV.switch? "D"
-      Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/)
-    end
+    Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
 
     formula_count = 0
     problem_count = 0
@@ -62,11 +62,11 @@ module Homebrew
 
     if strict
       # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, :realpath => true)
+      style_results = check_style_json(files, realpath: true)
     end
 
     ff.each do |f|
-      options = { :new_formula => new_formula, :strict => strict, :online => online }
+      options = { new_formula: new_formula, strict: strict, online: online }
       options[:style_offenses] = style_results.file_offenses(f.path) if strict
       fa = FormulaAuditor.new(f, options)
       fa.audit
@@ -83,11 +83,11 @@ module Homebrew
       end
     end
 
-    unless problem_count.zero?
-      problems = "problem" + plural(problem_count)
-      formulae = "formula" + plural(formula_count, "e")
-      ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
-    end
+    return if problem_count.zero?
+
+    problems = "problem" + plural(problem_count)
+    formulae = "formula" + plural(formula_count, "e")
+    ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
   end
 end
 
@@ -172,7 +172,7 @@ class FormulaAuditor
     return unless @style_offenses
     display_cop_names = ARGV.include?("--display-cop-names")
     @style_offenses.each do |offense|
-      problem offense.to_s(:display_cop_name => display_cop_names)
+      problem offense.to_s(display_cop_name: display_cop_names)
     end
   end
 
@@ -251,9 +251,7 @@ class FormulaAuditor
                      actual_mode & 0777, wanted_mode & 0777, formula.path)
     end
 
-    if text.data? && !text.end?
-      problem "'DATA' was found, but no '__END__'"
-    end
+    problem "'DATA' was found, but no '__END__'" if text.data? && !text.end?
 
     if text.end? && !text.data?
       problem "'__END__' was found, but 'DATA' is not used"
@@ -263,9 +261,7 @@ class FormulaAuditor
       problem "'inreplace ... do' was used for a single substitution (use the non-block form instead)."
     end
 
-    unless text.trailing_newline?
-      problem "File should end with a newline"
-    end
+    problem "File should end with a newline" unless text.trailing_newline?
 
     return unless @strict
 
@@ -279,12 +275,13 @@ class FormulaAuditor
         end
       end
     end
+
     if present.include?("head") && present.include?("head block")
       problem "Should not have both `head` and `head do`"
     end
-    if present.include?("bottle modifier") && present.include?("bottle block")
-      problem "Should not have `bottle :unneeded/:disable` and `bottle do`"
-    end
+
+    return unless present.include?("bottle modifier") && present.include?("bottle block")
+    problem "Should not have `bottle :unneeded/:disable` and `bottle do`"
   end
 
   def audit_class
@@ -348,9 +345,8 @@ class FormulaAuditor
 
     same_name_tap_formulae.delete(full_name)
 
-    unless same_name_tap_formulae.empty?
-      problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
-    end
+    return if same_name_tap_formulae.empty?
+    problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
   end
 
   def audit_deps
@@ -452,6 +448,11 @@ class FormulaAuditor
         problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
       end
     end
+
+    return unless @new_formula
+    unless formula.deprecated_options.empty?
+      problem "New formulae should not use `deprecated_option`."
+    end
   end
 
   def audit_desc
@@ -467,7 +468,7 @@ class FormulaAuditor
 
     # Make sure the formula name plus description is no longer than 80 characters
     # Note full_name includes the name of the tap, while name does not
-    linelength = formula.name.length + ": ".length + desc.length
+    linelength = "#{formula.name}: #{desc}".length
     if linelength > 80
       problem <<-EOS.undent
         Description is too long. \"name: desc\" should be less than 80 characters.
@@ -483,9 +484,8 @@ class FormulaAuditor
       problem "Description shouldn't start with an indefinite article (#{$1})"
     end
 
-    if desc.downcase.start_with? "#{formula.name} "
-      problem "Description shouldn't include the formula name"
-    end
+    return unless desc.downcase.start_with? "#{formula.name} "
+    problem "Description shouldn't include the formula name"
   end
 
   def audit_homepage
@@ -562,9 +562,9 @@ class FormulaAuditor
   end
 
   def audit_bottle_spec
-    if formula.bottle_disabled? && !formula.bottle_disable_reason.valid?
-      problem "Unrecognized bottle modifier"
-    end
+    return unless formula.bottle_disabled?
+    return if formula.bottle_disable_reason.valid?
+    problem "Unrecognized bottle modifier"
   end
 
   def audit_github_repository
@@ -592,9 +592,8 @@ class FormulaAuditor
       problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
     end
 
-    if Date.parse(metadata["created_at"]) > (Date.today - 30)
-      problem "GitHub repository too new (<30 days old)"
-    end
+    return if Date.parse(metadata["created_at"]) <= (Date.today - 30)
+    problem "GitHub repository too new (<30 days old)"
   end
 
   def audit_specs
@@ -655,7 +654,7 @@ class FormulaAuditor
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
 
-    fv = FormulaVersions.new(formula, :max_depth => 10)
+    fv = FormulaVersions.new(formula, max_depth: 10)
     attributes = [:revision, :version_scheme]
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
@@ -668,24 +667,26 @@ class FormulaAuditor
     end
 
     revision_map = attributes_map[:revision]
-    if formula.revision.nonzero?
-      if formula.stable
-        if revision_map[formula.stable.version].empty? # check stable spec
-          problem "'revision #{formula.revision}' should be removed"
-        end
-      else # head/devel-only formula
+
+    return if formula.revision.zero?
+
+    if formula.stable
+      if revision_map[formula.stable.version].empty? # check stable spec
         problem "'revision #{formula.revision}' should be removed"
       end
+    else # head/devel-only formula
+      problem "'revision #{formula.revision}' should be removed"
     end
   end
 
   def audit_legacy_patches
     return unless formula.respond_to?(:patches)
     legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
-    unless legacy_patches.empty?
-      problem "Use the patch DSL instead of defining a 'patches' method"
-      legacy_patches.each { |p| audit_patch(p) }
-    end
+
+    return if legacy_patches.empty?
+
+    problem "Use the patch DSL instead of defining a 'patches' method"
+    legacy_patches.each { |p| audit_patch(p) }
   end
 
   def audit_patch(patch)
@@ -732,9 +733,8 @@ class FormulaAuditor
       problem "Please set plist_options when using a formula-defined plist."
     end
 
-    if text.include?('require "language/go"') && !text.include?("go_resource")
-      problem "require \"language/go\" is unnecessary unless using `go_resource`s"
-    end
+    return unless text.include?('require "language/go"') && !text.include?("go_resource")
+    problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
   def audit_line(line, lineno)
@@ -743,9 +743,7 @@ class FormulaAuditor
     end
 
     # Commented-out cmake support from default template
-    if line.include?('# system "cmake')
-      problem "Commented cmake call found"
-    end
+    problem "Commented cmake call found" if line.include?('# system "cmake')
 
     # Comments from default template
     [
@@ -758,9 +756,8 @@ class FormulaAuditor
       "# if your formula fails when building in parallel",
       "# Remove unrecognized options if warned by configure",
     ].each do |comment|
-      if line.include? comment
-        problem "Please remove default template comments"
-      end
+      next unless line.include?(comment)
+      problem "Please remove default template comments"
     end
 
     # FileUtils is included in Formula
@@ -815,26 +812,18 @@ class FormulaAuditor
     end
 
     # Commented-out depends_on
-    if line =~ /#\s*depends_on\s+(.+)\s*$/
-      problem "Commented-out dep #{$1}"
-    end
+    problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
     # No trailing whitespace, please
-    if line =~ /[\t ]+$/
-      problem "#{lineno}: Trailing whitespace was found"
-    end
+    problem "#{lineno}: Trailing whitespace was found" if line =~ /[\t ]+$/
 
     if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
       problem "Use \"if build.#{$1.downcase}?\" instead"
     end
 
-    if line.include?("make && make")
-      problem "Use separate make calls"
-    end
+    problem "Use separate make calls" if line.include?("make && make")
 
-    if line =~ /^[ ]*\t/
-      problem "Use spaces instead of tabs for indentation"
-    end
+    problem "Use spaces instead of tabs for indentation" if line =~ /^[ ]*\t/
 
     if line.include?("ENV.x11")
       problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
@@ -893,9 +882,7 @@ class FormulaAuditor
       problem "Use build instead of ARGV to check options"
     end
 
-    if line.include?("def options")
-      problem "Use new-style option definitions"
-    end
+    problem "Use new-style option definitions" if line.include?("def options")
 
     if line.end_with?("def test")
       problem "Use new-style test definitions (test do)"
@@ -961,61 +948,53 @@ class FormulaAuditor
       problem "Use Language::Node for npm install args"
     end
 
-    if @strict
-      if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
-        bad_system = $1
-        unless %w[| < > & ; *].any? { |c| bad_system.include? c }
-          good_system = bad_system.gsub(" ", "\", \"")
-          problem "Use `system #{good_system}` instead of `system #{bad_system}` "
-        end
-      end
+    return unless @strict
 
-      if line =~ /(require ["']formula["'])/
-        problem "`#{$1}` is now unnecessary"
-      end
-
-      if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
-        problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
-      end
-
-      if line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
-        problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
+    if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
+      bad_system = $1
+      unless %w[| < > & ; *].any? { |c| bad_system.include? c }
+        good_system = bad_system.gsub(" ", "\", \"")
+        problem "Use `system #{good_system}` instead of `system #{bad_system}` "
       end
     end
+
+    problem "`#{$1}` is now unnecessary" if line =~ /(require ["']formula["'])/
+
+    if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
+      problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
+    end
+
+    return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
+    problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
   end
 
   def audit_caveats
-    caveats = formula.caveats.to_s
-
-    if caveats.include?("setuid")
-      problem "Don't recommend setuid in the caveats, suggest sudo instead."
-    end
+    return unless formula.caveats.to_s.include?("setuid")
+    problem "Don't recommend setuid in the caveats, suggest sudo instead."
   end
 
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
     return unless formula.tap && formula.tap.official?
+    return unless formula.tap.tap_migrations.key?(formula.name)
 
-    if formula.tap.tap_migrations.key?(formula.name)
-      problem <<-EOS.undent
-        #{formula.name} seems to be listed in tap_migrations.json!
-        Please remove #{formula.name} from present tap & tap_migrations.json
-        before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
-      EOS
-    end
+    problem <<-EOS.undent
+      #{formula.name} seems to be listed in tap_migrations.json!
+      Please remove #{formula.name} from present tap & tap_migrations.json
+      before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
+    EOS
   end
 
   def audit_prefix_has_contents
     return unless formula.prefix.directory?
+    return unless Keg.new(formula.prefix).empty_installation?
 
-    if Keg.new(formula.prefix).empty_installation?
-      problem <<-EOS.undent
-        The installation seems to be empty. Please ensure the prefix
-        is set correctly and expected files are installed.
-        The prefix configure/make argument may be case-sensitive.
-      EOS
-    end
+    problem <<-EOS.undent
+      The installation seems to be empty. Please ensure the prefix
+      is set correctly and expected files are installed.
+      The prefix configure/make argument may be case-sensitive.
+    EOS
   end
 
   def audit_conditional_dep(dep, condition, line)
@@ -1116,9 +1095,8 @@ class ResourceAuditor
       problem "version #{version} should not have a leading 'v'"
     end
 
-    if version.to_s =~ /_\d+$/
-      problem "version #{version} should not end with an underline and a number"
-    end
+    return unless version.to_s =~ /_\d+$/
+    problem "version #{version} should not end with an underline and a number"
   end
 
   def audit_checksum
@@ -1169,9 +1147,7 @@ class ResourceAuditor
     if using == :cvs
       mod = specs[:module]
 
-      if mod == name
-        problem "Redundant :module value in URL"
-      end
+      problem "Redundant :module value in URL" if mod == name
 
       if url =~ %r{:[^/]+$}
         mod = url.split(":").last
@@ -1184,11 +1160,8 @@ class ResourceAuditor
       end
     end
 
-    using_strategy = DownloadStrategyDetector.detect("", using)
-
-    if url_strategy == using_strategy
-      problem "Redundant :using value in URL"
-    end
+    return unless url_strategy == DownloadStrategyDetector.detect("", using)
+    problem "Redundant :using value in URL"
   end
 
   def audit_urls
@@ -1275,9 +1248,7 @@ class ResourceAuditor
         problem "Don't use specific dl mirrors in SourceForge urls (url is #{p})."
       end
 
-      if p.start_with? "http://downloads"
-        problem "Please use https:// for #{p}"
-      end
+      problem "Please use https:// for #{p}" if p.start_with? "http://downloads"
     end
 
     # Debian has an abundance of secure mirrors. Let's not pluck the insecure

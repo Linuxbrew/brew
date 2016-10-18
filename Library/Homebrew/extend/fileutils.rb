@@ -60,10 +60,10 @@ module FileUtils
       # > When a new file is created, it is given the group of the directory which
       # contains it.
       group_id = if HOMEBREW_BREW_FILE.grpowned?
-                   HOMEBREW_BREW_FILE.stat.gid
-                 else
-                   Process.gid
-                 end
+        HOMEBREW_BREW_FILE.stat.gid
+      else
+        Process.gid
+      end
       begin
         chown(nil, group_id, tmpdir)
       rescue Errno::EPERM
@@ -84,15 +84,14 @@ module FileUtils
   end
 
   # @private
-  alias_method :old_mkdir, :mkdir
+  alias old_mkdir mkdir
 
   # A version of mkdir that also changes to that folder in a block.
   def mkdir(name, &_block)
-    old_mkdir(name)
-    if block_given?
-      chdir name do
-        yield
-      end
+    mkdir_p(name)
+    return unless block_given?
+    chdir name do
+      yield
     end
   end
   module_function :mkdir
@@ -122,7 +121,7 @@ module FileUtils
 
   if method_defined?(:ruby)
     # @private
-    alias_method :old_ruby, :ruby
+    alias old_ruby ruby
   end
 
   # Run the `ruby` Homebrew is using rather than whatever is in the `PATH`.

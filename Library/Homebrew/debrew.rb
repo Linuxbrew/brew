@@ -14,7 +14,7 @@ module Debrew
       super(e) unless Debrew.debug(e) == :ignore
     end
 
-    alias_method :fail, :raise
+    alias fail raise
   end
 
   module Formula
@@ -75,7 +75,7 @@ module Debrew
   end
 
   class << self
-    alias_method :original_raise, :raise
+    alias original_raise raise
   end
 
   @active = false
@@ -110,28 +110,30 @@ module Debrew
                              try_lock
 
     begin
-      puts "#{e.backtrace.first}"
-      puts "#{Tty.red}#{e.class.name}#{Tty.reset}: #{e}"
+      puts e.backtrace.first.to_s
+      puts Formatter.error(e, label: e.class.name)
 
       loop do
         Menu.choose do |menu|
           menu.prompt = "Choose an action: "
 
           menu.choice(:raise) { original_raise(e) }
-          menu.choice(:ignore) { return :ignore } if Ignorable === e
+          menu.choice(:ignore) { return :ignore } if e.is_a?(Ignorable)
           menu.choice(:backtrace) { puts e.backtrace }
 
-          menu.choice(:irb) do
-            puts "When you exit this IRB session, execution will continue."
-            set_trace_func proc { |event, _, _, id, binding, klass|
-              if klass == Raise && id == :raise && event == "return"
-                set_trace_func(nil)
-                synchronize { IRB.start_within(binding) }
-              end
-            }
+          if e.is_a?(Ignorable)
+            menu.choice(:irb) do
+              puts "When you exit this IRB session, execution will continue."
+              set_trace_func proc { |event, _, _, id, binding, klass|
+                if klass == Raise && id == :raise && event == "return"
+                  set_trace_func(nil)
+                  synchronize { IRB.start_within(binding) }
+                end
+              }
 
-            return :ignore
-          end if Ignorable === e
+              return :ignore
+            end
+          end
 
           menu.choice(:shell) do
             puts "When you exit this shell, you will return to the menu."

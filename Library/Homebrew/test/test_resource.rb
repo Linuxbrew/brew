@@ -12,42 +12,42 @@ class ResourceTests < Homebrew::TestCase
   end
 
   def test_url_with_specs
-    @resource.url("foo", :branch => "master")
+    @resource.url("foo", branch: "master")
     assert_equal "foo", @resource.url
-    assert_equal({ :branch => "master" }, @resource.specs)
+    assert_equal({ branch: "master" }, @resource.specs)
   end
 
   def test_url_with_custom_download_strategy_class
     strategy = Class.new(AbstractDownloadStrategy)
-    @resource.url("foo", :using => strategy)
+    @resource.url("foo", using: strategy)
     assert_equal "foo", @resource.url
     assert_equal strategy, @resource.download_strategy
   end
 
   def test_url_with_specs_and_download_strategy
     strategy = Class.new(AbstractDownloadStrategy)
-    @resource.url("foo", :using => strategy, :branch => "master")
+    @resource.url("foo", using: strategy, branch: "master")
     assert_equal "foo", @resource.url
-    assert_equal({ :branch => "master" }, @resource.specs)
+    assert_equal({ branch: "master" }, @resource.specs)
     assert_equal strategy, @resource.download_strategy
   end
 
   def test_url_with_custom_download_strategy_symbol
-    @resource.url("foo", :using => :git)
+    @resource.url("foo", using: :git)
     assert_equal "foo", @resource.url
     assert_equal GitDownloadStrategy, @resource.download_strategy
   end
 
   def test_raises_for_unknown_download_strategy_class
-    assert_raises(TypeError) { @resource.url("foo", :using => Class.new) }
+    assert_raises(TypeError) { @resource.url("foo", using: Class.new) }
   end
 
   def test_does_not_mutate_specs_hash
-    specs = { :using => :git, :branch => "master" }
+    specs = { using: :git, branch: "master" }
     @resource.url("foo", specs)
-    assert_equal({ :branch => "master" }, @resource.specs)
+    assert_equal({ branch: "master" }, @resource.specs)
     assert_equal(:git, @resource.using)
-    assert_equal({ :using => :git, :branch => "master" }, specs)
+    assert_equal({ using: :git, branch: "master" }, specs)
   end
 
   def test_version
@@ -70,7 +70,7 @@ class ResourceTests < Homebrew::TestCase
   end
 
   def test_version_from_tag
-    @resource.url("http://example.com/foo-1.0.tar.gz", :tag => "v1.0.2")
+    @resource.url("http://example.com/foo-1.0.tar.gz", tag: "v1.0.2")
     assert_version_equal "1.0.2", @resource.version
     assert_predicate @resource.version, :detected_from_url?
   end
@@ -109,7 +109,7 @@ class ResourceTests < Homebrew::TestCase
   def test_verify_download_integrity_missing
     fn = Pathname.new("test")
 
-    fn.stubs(:file? => true)
+    fn.stubs(file?: true)
     fn.expects(:verify_checksum).raises(ChecksumMissingError)
     fn.expects(:sha256)
 
@@ -117,7 +117,7 @@ class ResourceTests < Homebrew::TestCase
   end
 
   def test_verify_download_integrity_mismatch
-    fn = stub(:file? => true)
+    fn = stub(file?: true)
     checksum = @resource.sha256(TEST_SHA256)
 
     fn.expects(:verify_checksum).with(checksum)

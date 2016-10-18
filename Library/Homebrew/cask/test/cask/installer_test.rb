@@ -272,7 +272,7 @@ describe Hbc::Installer do
 
       lambda {
         installer.install
-      }.must_raise(Hbc::CaskAutoUpdatesError)
+      }.must_raise(Hbc::CaskAlreadyInstalledAutoUpdatesError)
     end
 
     it "allows already-installed Casks which auto-update to be installed if force is provided" do

@@ -49,7 +49,7 @@ class DependencyCollector
   end
 
   def cache_key(spec)
-    if Resource === spec && spec.download_strategy == CurlDownloadStrategy
+    if spec.is_a?(Resource) && spec.download_strategy == CurlDownloadStrategy
       File.extname(spec.url)
     else
       spec
@@ -57,7 +57,7 @@ class DependencyCollector
   end
 
   def build(spec)
-    spec, tags = Hash === spec ? spec.first : spec
+    spec, tags = spec.is_a?(Hash) ? spec.first : spec
     parse_spec(spec, Array(tags))
   end
 
@@ -81,7 +81,7 @@ class DependencyCollector
   end
 
   def parse_string_spec(spec, tags)
-    if HOMEBREW_TAP_FORMULA_REGEX === spec
+    if spec =~ HOMEBREW_TAP_FORMULA_REGEX
       TapDependency.new(spec, tags)
     elsif tags.empty?
       Dependency.new(spec, tags)
@@ -128,39 +128,36 @@ class DependencyCollector
   end
 
   def parse_class_spec(spec, tags)
-    if spec < Requirement
-      spec.new(tags)
-    else
+    unless spec < Requirement
       raise TypeError, "#{spec.inspect} is not a Requirement subclass"
     end
+
+    spec.new(tags)
   end
 
   def ant_dep(spec, tags)
-    if MacOS.version >= :mavericks || !OS.mac?
-      Dependency.new(spec.to_s, tags)
-    end
+    Dependency.new(spec.to_s, tags)
   end
 
   def resource_dep(spec, tags)
     tags << :build
     strategy = spec.download_strategy
 
-    case
-    when strategy <= CurlDownloadStrategy
+    if strategy <= CurlDownloadStrategy
       parse_url_spec(spec.url, tags)
-    when strategy <= GitDownloadStrategy
+    elsif strategy <= GitDownloadStrategy
       GitRequirement.new(tags)
-    when strategy <= MercurialDownloadStrategy
+    elsif strategy <= MercurialDownloadStrategy
       MercurialRequirement.new(tags)
-    when strategy <= FossilDownloadStrategy
+    elsif strategy <= FossilDownloadStrategy
       Dependency.new("fossil", tags)
-    when strategy <= BazaarDownloadStrategy
+    elsif strategy <= BazaarDownloadStrategy
       Dependency.new("bazaar", tags)
-    when strategy <= CVSDownloadStrategy
+    elsif strategy <= CVSDownloadStrategy
       Dependency.new("cvs", tags) if MacOS.version >= :mavericks || !MacOS::Xcode.provides_cvs?
-    when strategy <= SubversionDownloadStrategy
+    elsif strategy <= SubversionDownloadStrategy
       SubversionRequirement.new(tags)
-    when strategy < AbstractDownloadStrategy
+    elsif strategy <= AbstractDownloadStrategy
       # allow unknown strategies to pass through
     else
       raise TypeError,
@@ -170,12 +167,14 @@ class DependencyCollector
 
   def parse_url_spec(url, tags)
     case File.extname(url)
-    when ".xz"  then Dependency.new("xz", tags)
+    when ".xz"          then Dependency.new("xz", tags)
     when ".lha", ".lzh" then Dependency.new("lha", tags)
-    when ".lz"  then Dependency.new("lzip", tags)
-    when ".rar" then Dependency.new("unrar", tags)
-    when ".7z"  then Dependency.new("p7zip", tags)
-    when ".zip" then Dependency.new("homebrew/dupes/unzip", tags) unless OS.mac?
+    when ".lz"          then Dependency.new("lzip", tags)
+    when ".rar"         then Dependency.new("unrar", tags)
+    when ".7z"          then Dependency.new("p7zip", tags)
+    when ".zip"         then Dependency.new("homebrew/dupes/unzip", tags) unless OS.mac?
     end
   end
 end
+
+require "extend/os/dependency_collector"

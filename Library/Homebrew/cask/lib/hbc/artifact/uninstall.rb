@@ -1,4 +1,8 @@
 require "hbc/artifact/uninstall_base"
 
-class Hbc::Artifact::Uninstall < Hbc::Artifact::UninstallBase
+module Hbc
+  module Artifact
+    class Uninstall < UninstallBase
+    end
+  end
 end

@@ -2,7 +2,8 @@ require "uri"
 require "tempfile"
 
 module GitHub
-  extend self
+  module_function
+
   ISSUES_URI = URI.parse("https://api.github.com/search/issues")
 
   Error = Class.new(RuntimeError)
@@ -13,7 +14,7 @@ module GitHub
       super <<-EOS.undent
         GitHub API Error: #{error}
         Try again in #{pretty_ratelimit_reset(reset)}, or create a personal access token:
-          #{Tty.em}https://github.com/settings/tokens/new?scopes=&description=Homebrew#{Tty.reset}
+          #{Formatter.url("https://github.com/settings/tokens/new?scopes=&description=Homebrew")}
         and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
       EOS
     end
@@ -29,15 +30,15 @@ module GitHub
       if ENV["HOMEBREW_GITHUB_API_TOKEN"]
         message << <<-EOS.undent
           HOMEBREW_GITHUB_API_TOKEN may be invalid or expired; check:
-          #{Tty.em}https://github.com/settings/tokens#{Tty.reset}
+          #{Formatter.url("https://github.com/settings/tokens")}
         EOS
       else
         message << <<-EOS.undent
-          The GitHub credentials in the OS X keychain may be invalid.
+          The GitHub credentials in the macOS keychain may be invalid.
           Clear them with:
             printf "protocol=https\\nhost=github.com\\n" | git credential-osxkeychain erase
           Or create a personal access token:
-            #{Tty.em}https://github.com/settings/tokens/new?scopes=&description=Homebrew#{Tty.reset}
+            #{Formatter.url("https://github.com/settings/tokens/new?scopes=&description=Homebrew")}
           and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
         EOS
       end
@@ -103,16 +104,16 @@ module GitHub
         case GitHub.api_credentials_type
         when :keychain
           onoe <<-EOS.undent
-            Your OS X keychain GitHub credentials do not have sufficient scope!
+            Your macOS keychain GitHub credentials do not have sufficient scope!
             Scopes they have: #{credentials_scopes}
-            Create a personal access token: https://github.com/settings/tokens
+            Create a personal access token: #{Formatter.url("https://github.com/settings/tokens")}
             and then set HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         when :environment
           onoe <<-EOS.undent
             Your HOMEBREW_GITHUB_API_TOKEN does not have sufficient scope!
             Scopes it has: #{credentials_scopes}
-            Create a new personal access token: https://github.com/settings/tokens
+            Create a new personal access token: #{Formatter.url("https://github.com/settings/tokens")}
             and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         end
@@ -235,8 +236,8 @@ module GitHub
 
   def build_search_qualifier_string(qualifiers)
     {
-      :repo => "#{OS::GITHUB_USER}/homebrew-core",
-      :in => "title",
+      repo: "#{OS::GITHUB_USER}/homebrew-core",
+      in: "title",
     }.update(qualifiers).map do |qualifier, value|
       "#{qualifier}:#{value}"
     end.join("+")
@@ -253,14 +254,14 @@ module GitHub
 
   def issues_for_formula(name, options = {})
     tap = options[:tap] || CoreTap.instance
-    issues_matching(name, :state => "open", :repo => "#{tap.user}/homebrew-#{tap.repo}")
+    issues_matching(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
   end
 
   def print_pull_requests_matching(query)
     return [] if ENV["HOMEBREW_NO_GITHUB_API"]
     ohai "Searching pull requests..."
 
-    open_or_closed_prs = issues_matching(query, :type => "pr")
+    open_or_closed_prs = issues_matching(query, type: "pr")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
     if !open_prs.empty?

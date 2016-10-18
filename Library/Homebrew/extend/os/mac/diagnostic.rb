@@ -3,17 +3,18 @@ module Homebrew
     class Checks
       def development_tools_checks
         %w[
-          check_for_unsupported_osx
+          check_for_unsupported_macos
           check_for_prerelease_xcode
           check_for_bad_install_name_tool
           check_for_installed_developer_tools
           check_xcode_license_approved
           check_for_osx_gcc_installer
+          check_xcode_8_without_clt_on_el_capitan
         ]
       end
 
       def fatal_development_tools_checks
-        if MacOS.prerelease?
+        if MacOS.version >= :sierra && ENV["CI"].nil?
           %w[
             check_xcode_up_to_date
             check_clt_up_to_date
@@ -24,7 +25,7 @@ module Homebrew
         end
       end
 
-      def check_for_unsupported_osx
+      def check_for_unsupported_macos
         return if ARGV.homebrew_developer?
 
         who = "We"
@@ -38,7 +39,7 @@ module Homebrew
         end
 
         <<-EOS.undent
-          You are using OS X #{MacOS.version}.
+          You are using macOS #{MacOS.version}.
           #{who} do not provide support for this #{what}.
           You may encounter build failures or other breakages.
           Please create pull-requests instead of filing issues.
@@ -64,8 +65,8 @@ module Homebrew
         return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
 
         message = <<-EOS.undent
-          Your Xcode (#{MacOS::Xcode.version}) is outdated
-          Please update to Xcode #{MacOS::Xcode.latest_version}.
+          Your Xcode (#{MacOS::Xcode.version}) is outdated.
+          Please update to Xcode #{MacOS::Xcode.latest_version} (or delete it).
           #{MacOS::Xcode.update_instructions}
         EOS
 
@@ -87,6 +88,19 @@ module Homebrew
         <<-EOS.undent
           A newer Command Line Tools release is available.
           #{MacOS::CLT.update_instructions}
+        EOS
+      end
+
+      def check_xcode_8_without_clt_on_el_capitan
+        return unless MacOS::Xcode.without_clt?
+        # Scope this to Xcode 8 on El Cap for now
+        return unless MacOS.version == :el_capitan && MacOS::Xcode.version >= "8"
+
+        <<-EOS.undent
+          You have Xcode 8 installed without the CLT;
+          this causes certain builds to fail on OS X El Capitan (10.11).
+          Please install the CLT via:
+            sudo xcode-select --install
         EOS
       end
 
@@ -136,7 +150,7 @@ module Homebrew
           You have an outdated version of /usr/bin/install_name_tool installed.
           This will cause binary package installations to fail.
           This can happen if you install osx-gcc-installer or RailsInstaller.
-          To restore it, you must reinstall OS X or restore the binary from
+          To restore it, you must reinstall macOS or restore the binary from
           the OS packages.
         EOS
       end
@@ -157,8 +171,7 @@ module Homebrew
       end
 
       def check_ruby_version
-        ruby_version = MacOS.version >= "10.9" ? "2.0" : "1.8"
-        return if RUBY_VERSION[/\d\.\d/] == ruby_version
+        return if RUBY_VERSION[/\d\.\d/] == "2.0"
 
         <<-EOS.undent
           Ruby version #{RUBY_VERSION} is unsupported on #{MacOS.version}. Homebrew
@@ -250,8 +263,8 @@ module Homebrew
         return if installed_version >= latest_version
 
         <<-EOS.undent
-          Your XQuartz (#{installed_version}) is outdated
-          Please install XQuartz #{latest_version}:
+          Your XQuartz (#{installed_version}) is outdated.
+          Please install XQuartz #{latest_version} (or delete it):
             https://xquartz.macosforge.org
         EOS
       end

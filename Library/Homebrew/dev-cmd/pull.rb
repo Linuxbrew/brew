@@ -41,13 +41,15 @@ require "version"
 require "pkg_version"
 
 module Homebrew
+  module_function
+
   def pull
-    if ARGV[0] == "--rebase"
-      odie "You meant `git pull --rebase`."
-    end
+    odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
+
     if ARGV.named.empty?
       odie "This command requires at least one argument containing a URL or pull request number"
     end
+
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
     # Formulae with affected bottles that were published
@@ -242,15 +244,13 @@ module Homebrew
     str.force_encoding("UTF-8") if str.respond_to?(:force_encoding)
   end
 
-  private
-
   def publish_changed_formula_bottles(_tap, changed_formulae_names)
     if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
       raise "Need to load formulae to publish them!"
     end
 
     published = []
-    bintray_creds = { :user => ENV["BINTRAY_USER"], :key => ENV["BINTRAY_KEY"] }
+    bintray_creds = { user: ENV["BINTRAY_USER"], key: ENV["BINTRAY_KEY"] }
     if bintray_creds[:user] && bintray_creds[:key]
       changed_formulae_names.each do |name|
         f = Formula[name]
@@ -345,7 +345,7 @@ module Homebrew
         others << file
       end
     end
-    { :files => files, :formulae => formulae, :others => others }
+    { files: files, formulae: formulae, others: others }
   end
 
   # Get current formula versions without loading formula definition in this process
@@ -437,9 +437,9 @@ module Homebrew
     # Returns nil if formula is absent or if there was an error reading it
     def self.lookup(name)
       json = Utils.popen_read(HOMEBREW_BREW_FILE, "info", "--json=v1", name)
-      unless $?.success?
-        return nil
-      end
+
+      return nil unless $?.success?
+
       Homebrew.force_utf8!(json)
       FormulaInfoFromJson.new(Utils::JSON.load(json)[0])
     end
@@ -526,7 +526,8 @@ module Homebrew
             "x86_64_linux"
           else
             jinfo.bottle_tags.first
-          end)
+          end
+        )
         unless bottle_info
           opoo "No bottle defined in formula #{f.full_name}"
           next
@@ -544,19 +545,19 @@ module Homebrew
             req = Net::HTTP::Head.new bottle_info.url
             req.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
             res = http.request req
-            if res.is_a?(Net::HTTPSuccess)
-              break
-            elsif res.is_a?(Net::HTTPClientError)
-              if retry_count >= max_retries
-                raise "Failed to find published #{f} bottle at #{url}!"
-              end
-              print(wrote_dots ? "." : "Waiting on Bintray.")
-              wrote_dots = true
-              sleep poll_retry_delay_seconds
-              retry_count += 1
-            else
+            break if res.is_a?(Net::HTTPSuccess)
+
+            unless res.is_a?(Net::HTTPClientError)
               raise "Failed to find published #{f} bottle at #{url} (#{res.code} #{res.message})!"
             end
+
+            if retry_count >= max_retries
+              raise "Failed to find published #{f} bottle at #{url}!"
+            end
+            print(wrote_dots ? "." : "Waiting on Bintray.")
+            wrote_dots = true
+            sleep poll_retry_delay_seconds
+            retry_count += 1
           end
         end
 

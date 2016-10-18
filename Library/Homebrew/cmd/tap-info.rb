@@ -13,11 +13,13 @@
 #:    Pass `--installed` to get information on installed taps.
 #:
 #:    See the docs for examples of using the JSON:
-#:    <https://github.com/Homebrew/brew/blob/master/share/doc/homebrew/Querying-Brew.md>
+#:    <https://github.com/Homebrew/brew/blob/master/docs/Querying-Brew.md>
 
 require "tap"
 
 module Homebrew
+  module_function
+
   def tap_info
     if ARGV.include? "--installed"
       taps = Tap
@@ -33,8 +35,6 @@ module Homebrew
       print_tap_info(taps)
     end
   end
-
-  private
 
   def print_tap_info(taps)
     if taps.none?

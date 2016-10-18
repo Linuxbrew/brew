@@ -14,6 +14,12 @@
   "alias_path": "/usr/local/Library/Taps/homebrew/homebrew-core/Aliases/test-formula",
   "stdlib": "libcxx",
   "compiler": "clang",
+  "runtime_dependencies": [
+    {
+      "full_name": "foo",
+      "version": "1.0"
+    }
+  ],
   "source": {
       "path": "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb",
       "tap": "homebrew/core",

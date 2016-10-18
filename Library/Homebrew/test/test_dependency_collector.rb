@@ -49,8 +49,8 @@ class DependencyCollectorTests < Homebrew::TestCase
   end
 
   def test_requirement_tags
-    @d.add :x11 => "2.5.1"
-    @d.add :xcode => :build
+    @d.add x11: "2.5.1"
+    @d.add xcode: :build
     req = OS.mac? ? X11Requirement : XorgRequirement
     assert_empty find_requirement(req).tags
     assert_predicate find_requirement(XcodeRequirement), :build?
@@ -64,22 +64,27 @@ class DependencyCollectorTests < Homebrew::TestCase
 
   def test_x11_min_version
     skip "XQuartz versions are relevant only on Mac OS" unless OS.mac?
-    @d.add :x11 => "2.5.1"
+    @d.add x11: "2.5.1"
     assert_equal "2.5.1", find_requirement(X11Requirement).min_version.to_s
   end
 
   def test_x11_tag
-    @d.add :x11 => :optional
+    @d.add x11: :optional
     req = OS.mac? ? X11Requirement : XorgRequirement
     assert_predicate find_requirement(req), :optional?
   end
 
   def test_x11_min_version_and_tag
-    @d.add :x11 => ["2.5.1", :optional]
-    req = OS.mac? ? X11Requirement : XorgRequirement
-    dep = find_requirement(req)
-    assert_equal "2.5.1", dep.min_version.to_s if OS.mac?
+    skip "XQuartz versions are relevant only on Mac OS" unless OS.mac?
+    @d.add x11: ["2.5.1", :optional]
+    dep = find_requirement(X11Requirement)
+    assert_equal "2.5.1", dep.min_version.to_s
     assert_predicate dep, :optional?
+  end
+
+  def test_ant_dep
+    @d.add ant: :build
+    assert_equal find_dependency("ant"), Dependency.new("ant", [:build])
   end
 
   def test_raises_typeerror_for_unknown_classes

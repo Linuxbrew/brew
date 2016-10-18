@@ -8,6 +8,8 @@
 require "tap"
 
 module Homebrew
+  module_function
+
   def __repository
     if ARGV.named.empty?
       puts HOMEBREW_REPOSITORY

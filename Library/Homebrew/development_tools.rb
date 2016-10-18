@@ -22,12 +22,15 @@ class DevelopmentTools
     def installation_instructions
       "Install Clang or brew install gcc"
     end
-    alias_method :custom_installation_instructions,
-                 :installation_instructions
+    alias custom_installation_instructions installation_instructions
 
     def default_cc
       cc = DevelopmentTools.locate "cc"
-      cc.realpath.basename.to_s rescue nil
+      begin
+        cc.realpath.basename.to_s
+      rescue
+        nil
+      end
     end
 
     def default_compiler
@@ -45,7 +48,7 @@ class DevelopmentTools
           `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
         end
     end
-    alias_method :gcc_4_0_build_version, :gcc_40_build_version
+    alias gcc_4_0_build_version gcc_40_build_version
 
     def gcc_42_build_version
       @gcc_42_build_version ||=
@@ -56,7 +59,7 @@ class DevelopmentTools
           end
         end
     end
-    alias_method :gcc_build_version, :gcc_42_build_version
+    alias gcc_build_version gcc_42_build_version
 
     def clang_version
       @clang_version ||=

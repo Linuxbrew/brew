@@ -5,8 +5,11 @@ require "utils/shell"
 
 class TtyTests < Homebrew::TestCase
   def test_strip_ansi
-    assert_equal "hello",
-      Tty.strip_ansi("\033\[36;7mhello\033\[0m")
+    assert_equal "hello", Tty.strip_ansi("\033\[36;7mhello\033\[0m")
+  end
+
+  def test_width
+    assert_kind_of Integer, Tty.width
   end
 
   def test_truncate
@@ -21,15 +24,26 @@ class TtyTests < Homebrew::TestCase
 
   def test_no_tty_formatting
     $stdout.stubs(:tty?).returns false
-    assert_nil Tty.blue
-    assert_nil Tty.white
-    assert_nil Tty.red
-    assert_nil Tty.green
-    assert_nil Tty.gray
-    assert_nil Tty.yellow
-    assert_nil Tty.reset
-    assert_nil Tty.em
-    assert_nil Tty.highlight
+    assert_equal "", Tty.to_s
+    assert_equal "", Tty.red.to_s
+    assert_equal "", Tty.green.to_s
+    assert_equal "", Tty.yellow.to_s
+    assert_equal "", Tty.blue.to_s
+    assert_equal "", Tty.magenta.to_s
+    assert_equal "", Tty.cyan.to_s
+    assert_equal "", Tty.default.to_s
+  end
+
+  def test_formatting
+    $stdout.stubs(:tty?).returns(true)
+    assert_equal "",         Tty.to_s
+    assert_equal "\033[31m", Tty.red.to_s
+    assert_equal "\033[32m", Tty.green.to_s
+    assert_equal "\033[33m", Tty.yellow.to_s
+    assert_equal "\033[34m", Tty.blue.to_s
+    assert_equal "\033[35m", Tty.magenta.to_s
+    assert_equal "\033[36m", Tty.cyan.to_s
+    assert_equal "\033[39m", Tty.default.to_s
   end
 end
 
@@ -46,7 +60,7 @@ class UtilTests < Homebrew::TestCase
 
   def test_ofail
     shutup { ofail "foo" }
-    assert Homebrew.failed
+    assert Homebrew.failed?
   ensure
     Homebrew.failed = false
   end
@@ -227,18 +241,18 @@ class UtilTests < Homebrew::TestCase
     s = truncate_text_to_approximate_size(long_s, n)
     assert_equal n, s.length
     assert_match(/^x+#{Regexp.escape(glue)}x+$/, s)
-    s = truncate_text_to_approximate_size(long_s, n, :front_weight => 0.0)
+    s = truncate_text_to_approximate_size(long_s, n, front_weight: 0.0)
     assert_equal glue + ("x" * (n - glue.length)), s
-    s = truncate_text_to_approximate_size(long_s, n, :front_weight => 1.0)
+    s = truncate_text_to_approximate_size(long_s, n, front_weight: 1.0)
     assert_equal(("x" * (n - glue.length)) + glue, s)
   end
 
   def test_odeprecated
     ARGV.stubs(:homebrew_developer?).returns false
-    e = assert_raises(FormulaMethodDeprecatedError) do
+    e = assert_raises(MethodDeprecatedError) do
       odeprecated("method", "replacement",
-        :caller => ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
-        :die => true)
+        caller: ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
+        die: true)
     end
     assert_match "method", e.message
     assert_match "replacement", e.message

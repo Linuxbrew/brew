@@ -35,7 +35,7 @@ class Tap
     repo = repo.strip_prefix "homebrew-"
 
     if user == "Homebrew" && (repo == "homebrew" || repo == "core") ||
-        user == "Linuxbrew" && (repo == "linuxbrew" || repo == "core")
+       user == "Linuxbrew" && (repo == "linuxbrew" || repo == "core")
       return CoreTap.instance
     end
 
@@ -102,7 +102,7 @@ class Tap
     if remote.nil?
       "#{user}/homebrew-#{repo}"
     else
-      x = remote[%r"^https://github\.com/([^.]+)(\.git)?$", 1]
+      x = remote[%r{^https://github\.com/([^.]+)(\.git)?$}, 1]
       (official? && !x.nil?) ? x.capitalize : x
     end
   end
@@ -153,13 +153,19 @@ class Tap
   # The issues URL of this {Tap}.
   # e.g. `https://github.com/user/homebrew-repo/issues`
   def issues_url
-    if official? || !custom_remote?
-      "https://github.com/#{slug}/issues"
-    end
+    return unless official? || !custom_remote?
+    "https://github.com/#{slug}/issues"
   end
 
   def to_s
     name
+  end
+
+  def version_string
+    return "N/A" unless installed?
+    pretty_revision = git_short_head
+    return "(no git repository)" unless pretty_revision
+    "(git revision #{pretty_revision}; last commit #{git_last_commit_date})"
   end
 
   # True if this {Tap} is an official Homebrew tap.
@@ -244,12 +250,12 @@ class Tap
     args << "-q" if quiet
 
     git_version = Version.new(`git --version`[/git version (\d\.\d+\.\d+)/, 1])
-    raise ErrorDuringExecution.new(cmd) unless $?.success?
+    raise ErrorDuringExecution, cmd unless $?.success?
     args << "--config" << "core.autocrlf=false" if git_version >= Version.new("1.7.10")
 
     begin
       safe_system "git", *args
-      unless Readall.valid_tap?(self, :aliases => true)
+      unless Readall.valid_tap?(self, aliases: true)
         unless ARGV.homebrew_developer?
           raise "Cannot tap #{name}: invalid syntax in tap!"
         end
@@ -270,15 +276,16 @@ class Tap
     puts "Tapped #{formula_count} formula#{plural(formula_count, "e")} (#{path.abv})" unless quiet
     Descriptions.cache_formulae(formula_names)
 
-    if !options[:clone_target] && private? && !quiet
-      puts <<-EOS.undent
-        It looks like you tapped a private repository. To avoid entering your
-        credentials each time you update, you can use git HTTP credential
-        caching or issue the following command:
-          cd #{path}
-          git remote set-url origin git@github.com:#{user}/homebrew-#{repo}.git
-      EOS
-    end
+    return if options[:clone_target]
+    return unless private?
+    return if quiet
+    puts <<-EOS.undent
+      It looks like you tapped a private repository. To avoid entering your
+      credentials each time you update, you can use git HTTP credential
+      caching or issue the following command:
+        cd #{path}
+        git remote set-url origin git@github.com:#{user}/homebrew-#{repo}.git
+    EOS
   end
 
   def link_manpages
@@ -314,7 +321,7 @@ class Tap
   # True if the {#remote} of {Tap} is customized.
   def custom_remote?
     return true unless remote
-    remote.casecmp(default_remote) != 0
+    remote.casecmp(default_remote).nonzero?
   end
 
   # path to the directory of all {Formula} files for this {Tap}.
@@ -390,7 +397,7 @@ class Tap
   # @private
   def alias_table
     return @alias_table if @alias_table
-    @alias_table = Hash.new
+    @alias_table = {}
     alias_files.each do |alias_file|
       @alias_table[alias_file_to_name(alias_file)] = formula_file_to_name(alias_file.resolved_path)
     end
@@ -401,7 +408,7 @@ class Tap
   # @private
   def alias_reverse_table
     return @alias_reverse_table if @alias_reverse_table
-    @alias_reverse_table = Hash.new
+    @alias_reverse_table = {}
     alias_table.each do |alias_name, formula_name|
       @alias_reverse_table[formula_name] ||= []
       @alias_reverse_table[formula_name] << alias_name
@@ -455,7 +462,7 @@ class Tap
       "formula_names" => formula_names,
       "formula_files" => formula_files.map(&:to_s),
       "command_files" => command_files.map(&:to_s),
-      "pinned" => pinned?
+      "pinned" => pinned?,
     }
 
     if installed?
@@ -491,7 +498,7 @@ class Tap
 
   def ==(other)
     other = Tap.fetch(other) if other.is_a?(String)
-    self.class == other.class && self.name == other.name
+    self.class == other.class && name == other.name
   end
 
   def self.each
@@ -539,7 +546,6 @@ class Tap
       end
     end
   end
-
 end
 
 # A specialized {Tap} class for the core formulae
@@ -560,7 +566,7 @@ class CoreTap < Tap
   end
 
   def self.instance
-    @instance ||= CoreTap.new
+    @instance ||= new
   end
 
   def self.ensure_installed!(options = {})

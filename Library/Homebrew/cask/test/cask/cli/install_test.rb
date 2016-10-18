@@ -29,7 +29,7 @@ describe Hbc::CLI::Install do
 
     TestHelper.must_output(self, lambda {
       Hbc::CLI::Install.run("local-transmission", "")
-    }, %r{Warning: A Cask for local-transmission is already installed. Add the "--force" option to force re-install.})
+    }, %r{Warning: A Cask for local-transmission is already installed.})
   end
 
   it "allows double install with --force" do

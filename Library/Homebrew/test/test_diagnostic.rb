@@ -16,7 +16,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   def test_inject_file_list
     assert_equal "foo:\n",
       @checks.inject_file_list([], "foo:\n")
-    assert_equal "foo:\n    /a\n    /b\n",
+    assert_equal "foo:\n  /a\n  /b\n",
       @checks.inject_file_list(%w[/a /b], "foo:\n")
   end
 
@@ -86,7 +86,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   def test_check_homebrew_prefix
     skip "Only for Mac OS" unless OS.mac?
     # the integration tests are run in a special prefix
-    assert_match "Your Homebrew is not installed to /usr/local",
+    assert_match "Your Homebrew's prefix is not /usr/local.",
       @checks.check_homebrew_prefix
   end
 
@@ -169,11 +169,11 @@ class DiagnosticChecksTest < Homebrew::TestCase
     if OS.mac?
       ENV["DYLD_INSERT_LIBRARIES"] = "foo"
       assert_match "Setting DYLD_INSERT_LIBRARIES",
-        @checks.check_DYLD_vars
+        @checks.check_dyld_vars
     else
       ENV["LD_LIBRARY_PATH"] = "foo"
       assert_match "Setting LD_",
-        @checks.check_DYLD_vars
+        @checks.check_dyld_vars
     end
   end
 

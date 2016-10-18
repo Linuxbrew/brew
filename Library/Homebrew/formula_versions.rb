@@ -4,8 +4,8 @@ class FormulaVersions
   IGNORED_EXCEPTIONS = [
     ArgumentError, NameError, SyntaxError, TypeError,
     FormulaSpecificationError, FormulaValidationError,
-    ErrorDuringExecution, LoadError, FormulaMethodDeprecatedError
-  ]
+    ErrorDuringExecution, LoadError, MethodDeprecatedError
+  ].freeze
 
   attr_reader :name, :path, :repository, :entry_name
 
@@ -52,9 +52,7 @@ class FormulaVersions
     rev_list(branch) do |rev|
       formula_at_revision(rev) do |f|
         bottle = f.bottle_specification
-        unless bottle.checksums.empty?
-          map[f.pkg_version] << bottle.rebuild
-        end
+        map[f.pkg_version] << bottle.rebuild unless bottle.checksums.empty?
       end
     end
     map
