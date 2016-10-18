@@ -6,17 +6,15 @@ module Hbc
   class Container
     class Cab < Base
       def self.me?(criteria)
-        cabextract = Hbc.homebrew_prefix.join("bin", "cabextract")
+        cabextract = which("cabextract")
 
         criteria.magic_number(%r{^MSCF}n) &&
-          cabextract.exist? &&
+          !cabextract.nil? &&
           criteria.command.run(cabextract, args: ["-t", "--", criteria.path.to_s]).stderr.empty?
       end
 
       def extract
-        cabextract = Hbc.homebrew_prefix.join("bin", "cabextract")
-
-        unless cabextract.exist?
+        if (cabextract = which("cabextract")).nil?
           raise CaskError, "Expected to find cabextract executable. Cask '#{@cask}' must add: depends_on formula: 'cabextract'"
         end
 

@@ -14,9 +14,7 @@ module Hbc
       end
 
       def extract
-        unar = Hbc.homebrew_prefix.join("bin", "unar")
-
-        unless unar.exist?
+        if (unar = which("unar")).nil?
           raise CaskError, "Expected to find unar executable. Cask #{@cask} must add: depends_on formula: 'unar'"
         end
 
