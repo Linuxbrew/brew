@@ -54,15 +54,16 @@ module Hbc
       end
 
       def default_args
-        ["--format", "simple", "--force-exclusion", "--config", rubocop_config]
+        [
+          "--require", "rubocop-cask",
+          "--config", "/dev/null", # always use `rubocop-cask` default config
+          "--format", "simple",
+          "--force-exclusion"
+        ]
       end
 
       def autocorrect_args
         default_args + ["--auto-correct"]
-      end
-
-      def rubocop_config
-        Hbc.default_tap.cask_dir.join(".rubocop.yml")
       end
 
       def fix?
