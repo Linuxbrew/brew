@@ -736,7 +736,7 @@ class FormulaAuditor
     problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
-  def audit_line(line, lineno)
+  def audit_line(line, _lineno)
     if line =~ /<(Formula|AmazonWebServicesFormula|ScriptFileFormula|GithubGistFormula)/
       problem "Use a space in class inheritance: class Foo < #{$1}"
     end
@@ -816,9 +816,6 @@ class FormulaAuditor
 
     # Commented-out depends_on
     problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
-
-    # No trailing whitespace, please
-    problem "#{lineno}: Trailing whitespace was found" if line =~ /[\t ]+$/
 
     if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
       problem "Use \"if build.#{$1.downcase}?\" instead"
