@@ -63,7 +63,9 @@ module Homebrew
   end
 
   class TestCase < ::Minitest::Test
+    require "test/helper/env"
     require "test/helper/shutup"
+    include Test::Helper::Env
     include Test::Helper::Shutup
 
     include VersionAssertions
@@ -110,16 +112,6 @@ module Homebrew
 
     def bundle_path(name)
       Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.bundle")
-    end
-
-    def with_environment(partial_env)
-      old = ENV.to_hash
-      ENV.update partial_env
-      begin
-        yield
-      ensure
-        ENV.replace old
-      end
     end
 
     # Use a stubbed {Formulary::FormulaLoader} to make a given formula be found

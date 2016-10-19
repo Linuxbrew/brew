@@ -17,7 +17,9 @@ require "global"
 # add Homebrew-Cask to load path
 $LOAD_PATH.push(project_root.join("lib").to_s)
 
+require "test/helper/env"
 require "test/helper/shutup"
+include Test::Helper::Env
 include Test::Helper::Shutup
 
 def sudo(*args)
