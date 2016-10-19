@@ -58,7 +58,7 @@ module HomebrewArgvExtension
   end
 
   def casks
-    @casks ||= downcased_unique_named.grep HOMEBREW_CASK_TAP_FORMULA_REGEX
+    @casks ||= downcased_unique_named.grep HOMEBREW_CASK_TAP_CASK_REGEX
   end
 
   def kegs
