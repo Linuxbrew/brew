@@ -13,7 +13,7 @@ module Hbc
         FileUtils.mv repo_caskroom, Hbc.caskroom
       else
         opoo "#{Hbc.caskroom.parent} is not writable, sudo is needed to move the Caskroom."
-        SystemCommand.run("/bin/mv", :args => [repo_caskroom, Hbc.caskroom.parent], :sudo => true)
+        SystemCommand.run("/bin/mv", args: [repo_caskroom, Hbc.caskroom.parent], sudo: true)
       end
     end
 
@@ -24,10 +24,10 @@ module Hbc
       ohai "We'll set permissions properly so we won't need sudo in the future"
       sudo = !Hbc.caskroom.parent.writable?
 
-      SystemCommand.run("/bin/mkdir", :args => ["-p", Hbc.caskroom], :sudo => sudo)
-      SystemCommand.run("/bin/chmod", :args => ["g+rwx", Hbc.caskroom], :sudo => sudo)
-      SystemCommand.run("/usr/sbin/chown", :args => [Utils.current_user, Hbc.caskroom], :sudo => sudo)
-      SystemCommand.run("/usr/bin/chgrp", :args => ["admin", Hbc.caskroom], :sudo => sudo)
+      SystemCommand.run("/bin/mkdir", args: ["-p", Hbc.caskroom], sudo: sudo)
+      SystemCommand.run("/bin/chmod", args: ["g+rwx", Hbc.caskroom], sudo: sudo)
+      SystemCommand.run("/usr/sbin/chown", args: [Utils.current_user, Hbc.caskroom], sudo: sudo)
+      SystemCommand.run("/usr/bin/chgrp", args: ["admin", Hbc.caskroom], sudo: sudo)
     end
   end
 end
