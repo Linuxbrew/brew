@@ -31,12 +31,12 @@ describe Hbc::DSL do
         https://github.com/caskroom/homebrew-cask#reporting-bugs
       EOS
 
-      TestHelper.must_output(self, attempt_unknown_method, expected)
+      attempt_unknown_method.must_output nil, expected
     end
 
     it "will simply warn, not throw an exception" do
       begin
-        capture_subprocess_io do
+        shutup do
           attempt_unknown_method.call
         end
       rescue StandardError => e
@@ -70,11 +70,13 @@ describe Hbc::DSL do
 
     it "may use deprecated DSL version hash syntax" do
       with_environment "HOMEBREW_DEVELOPER" => nil do
-        test_cask = Hbc.load("with-dsl-version")
-        test_cask.token.must_equal "with-dsl-version"
-        test_cask.url.to_s.must_equal "http://example.com/TestCask.dmg"
-        test_cask.homepage.must_equal "http://example.com/"
-        test_cask.version.to_s.must_equal "1.2.3"
+        shutup do
+          test_cask = Hbc.load("with-dsl-version")
+          test_cask.token.must_equal "with-dsl-version"
+          test_cask.url.to_s.must_equal "http://example.com/TestCask.dmg"
+          test_cask.homepage.must_equal "http://example.com/"
+          test_cask.version.to_s.must_equal "1.2.3"
+        end
       end
     end
   end

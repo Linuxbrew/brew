@@ -27,9 +27,9 @@ describe Hbc::CLI::Install do
       Hbc::CLI::Install.run("local-transmission")
     end
 
-    TestHelper.must_output(self, lambda {
+    lambda {
       Hbc::CLI::Install.run("local-transmission", "")
-    }, %r{Warning: A Cask for local-transmission is already installed.})
+    }.must_output nil, %r{Warning: A Cask for local-transmission is already installed.}
   end
 
   it "allows double install with --force" do
@@ -37,9 +37,9 @@ describe Hbc::CLI::Install do
       Hbc::CLI::Install.run("local-transmission")
     end
 
-    TestHelper.must_output(self, lambda {
+    lambda {
       Hbc::CLI::Install.run("local-transmission", "--force")
-    }, %r{==> Success! local-transmission was successfully installed!})
+    }.must_output %r{==> Success! local-transmission was successfully installed!}
   end
 
   it "skips dependencies with --skip-cask-deps" do
@@ -60,25 +60,19 @@ describe Hbc::CLI::Install do
   end
 
   it "returns a suggestion for a misspelled Cask" do
-    _, err = capture_io do
+    lambda {
       begin
         Hbc::CLI::Install.run("googlechrome")
-      rescue Hbc::CaskError
-        return
-      end
-    end
-    err.must_match %r{No available Cask for googlechrome\. Did you mean:\ngoogle-chrome}
+      rescue Hbc::CaskError; end
+    }.must_output nil, %r{No available Cask for googlechrome\. Did you mean:\ngoogle-chrome}
   end
 
   it "returns multiple suggestions for a Cask fragment" do
-    _, err = capture_io do
+    lambda {
       begin
         Hbc::CLI::Install.run("google")
-      rescue Hbc::CaskError
-        return
-      end
-    end
-    err.must_match %r{No available Cask for google\. Did you mean one of:\ngoogle}
+      rescue Hbc::CaskError; end
+    }.must_output nil, %r{No available Cask for google\. Did you mean one of:\ngoogle}
   end
 
   describe "when no Cask is specified" do

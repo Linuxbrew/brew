@@ -93,20 +93,6 @@ class TestHelper
     Hbc::FakeFetcher.fake_response_for(*args)
   end
 
-  def self.must_output(test, lambda, expected = nil)
-    out, err = test.capture_subprocess_io do
-      lambda.call
-    end
-
-    if block_given?
-      yield (out + err).chomp
-    elsif expected.is_a?(Regexp)
-      (out + err).chomp.must_match expected
-    else
-      (out + err).chomp.must_equal expected.gsub(%r{^ *}, "")
-    end
-  end
-
   def self.valid_alias?(candidate)
     return false unless candidate.symlink?
     candidate.readlink.exist?
