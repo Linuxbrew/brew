@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::Artifact::Binary do
   let(:cask) {
     Hbc.load("with-binary").tap do |cask|

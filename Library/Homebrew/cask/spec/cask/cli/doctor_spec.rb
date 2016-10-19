@@ -1,4 +1,3 @@
-require "spec_helper"
 require "hbc/version"
 
 describe Hbc::CLI::Doctor do

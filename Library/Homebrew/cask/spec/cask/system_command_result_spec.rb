@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::SystemCommand::Result do
   describe "::_parse_plist" do
     let(:command) { Hbc::SystemCommand.new("/usr/bin/true", {}) }

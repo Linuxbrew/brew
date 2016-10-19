@@ -1,4 +1,3 @@
-require "spec_helper"
 require "utils/formatter"
 require "utils/tty"
 

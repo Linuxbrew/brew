@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe MacOS do
   it "says '/' is undeletable" do
     expect(MacOS).to be_undeletable(

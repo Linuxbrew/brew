@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::DSL::Version do
   include ExpectationsHashHelper
 

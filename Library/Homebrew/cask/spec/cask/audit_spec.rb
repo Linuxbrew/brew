@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::Audit do
   include AuditMatchers
   include Sha256Helper
