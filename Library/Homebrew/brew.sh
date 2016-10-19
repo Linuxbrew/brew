@@ -165,7 +165,7 @@ EOS
     then
       odie <<EOS
 You have not agreed to the Xcode license. Please resolve this by running:
-  sudo xcodebuild -license
+  sudo xcodebuild -license accept
 EOS
     fi
   fi
