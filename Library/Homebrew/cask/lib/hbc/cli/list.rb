@@ -83,7 +83,7 @@ module Hbc
       end
 
       def self.needs_init?
-        true
+        false
       end
     end
   end
