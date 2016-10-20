@@ -25,6 +25,8 @@ repo_root.cd do
 
   if rspec
     run_tests "parallel_rspec", Dir["spec/**/*_spec.rb"], %w[
+      --color
+      --require spec_helper
       --format progress
       --format ParallelTests::RSpec::RuntimeLogger
       --out tmp/parallel_runtime_rspec.log

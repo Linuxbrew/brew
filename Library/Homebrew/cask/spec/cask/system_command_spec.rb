@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::SystemCommand do
   describe "when the exit code is 0" do
     describe "its result" do

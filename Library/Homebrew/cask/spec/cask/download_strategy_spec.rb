@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe "download strategies" do
   let(:url) { "http://example.com/cask.dmg" }
   let(:url_options) { Hash.new }

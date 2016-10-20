@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::CLI::Cleanup do
   let(:cache_location) { Pathname.new(Dir.mktmpdir).realpath }
   let(:cleanup_outdated) { false }

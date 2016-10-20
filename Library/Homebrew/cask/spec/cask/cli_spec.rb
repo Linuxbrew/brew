@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::CLI do
   it "lists the taps for Casks that show up in two taps" do
     listing = Hbc::CLI.nice_listing(%w[

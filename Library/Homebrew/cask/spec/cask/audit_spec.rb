@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::Audit do
   include AuditMatchers
   include Sha256Helper
@@ -296,8 +294,8 @@ describe Hbc::Audit do
 
       context "when download and verification succeed" do
         before do
-          download.expects(:perform)
-          verify.expects(:all)
+          expect(download).to receive(:perform)
+          expect(verify).to receive(:all)
         end
 
         it { should_not fail_with(%r{#{error_msg}}) }
@@ -305,7 +303,7 @@ describe Hbc::Audit do
 
       context "when download fails" do
         before do
-          download.expects(:perform).raises(StandardError.new(error_msg))
+          expect(download).to receive(:perform).and_raise(StandardError.new(error_msg))
         end
 
         it { is_expected.to fail_with(%r{#{error_msg}}) }
@@ -313,8 +311,8 @@ describe Hbc::Audit do
 
       context "when verification fails" do
         before do
-          download.expects(:perform)
-          verify.expects(:all).raises(StandardError.new(error_msg))
+          expect(download).to receive(:perform)
+          expect(verify).to receive(:all).and_raise(StandardError.new(error_msg))
         end
 
         it { is_expected.to fail_with(%r{#{error_msg}}) }
@@ -324,7 +322,7 @@ describe Hbc::Audit do
     context "when an exception is raised" do
       let(:cask) { instance_double(Hbc::Cask) }
       before do
-        cask.expects(:version).raises(StandardError.new)
+        expect(cask).to receive(:version).and_raise(StandardError.new)
       end
 
       it { is_expected.to fail_with(%r{exception while auditing}) }

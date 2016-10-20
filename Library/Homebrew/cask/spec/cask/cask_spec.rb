@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::Cask do
   let(:cask) { described_class.new("versioned-cask") }
 

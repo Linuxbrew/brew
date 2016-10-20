@@ -6,23 +6,19 @@ if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
 end
 
-project_root = Pathname.new(File.expand_path("../..", __FILE__))
-
 # add Homebrew to load path
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew/test/lib"))
 
 require "global"
 
 # add Homebrew-Cask to load path
-$LOAD_PATH.push(project_root.join("lib").to_s)
+$LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
 
 require "test/helper/env"
 require "test/helper/shutup"
 
-Dir["#{project_root}/spec/support/*.rb"].each(&method(:require))
-
-# from Homebrew. Provides expects method.
-require "mocha/api"
+Pathname.glob(HOMEBREW_LIBRARY_PATH.join("cask", "spec", "support", "*.rb")).each(&method(:require))
 
 require "hbc"
 
@@ -30,35 +26,15 @@ module Hbc
   class TestCask < Cask; end
 end
 
-TEST_TMPDIR = Dir.mktmpdir("homebrew_cask_tests")
-at_exit do
-  FileUtils.remove_entry(TEST_TMPDIR)
-end
-
-# override Homebrew locations
-Hbc.homebrew_prefix = Pathname.new(TEST_TMPDIR).join("prefix")
-Hbc.homebrew_repository = Hbc.homebrew_prefix
-Hbc.binarydir = Hbc.homebrew_prefix.join("binarydir", "bin")
-Hbc.appdir = Pathname.new(TEST_TMPDIR).join("appdir")
-
-# Override Tap::TAP_DIRECTORY to use our test Tap directory.
-class Tap
-  send(:remove_const, :TAP_DIRECTORY)
-  TAP_DIRECTORY = Hbc.homebrew_repository.join("Library", "Taps")
-end
-
-Hbc.default_tap = Tap.fetch("caskroom", "speccasks")
-Hbc.default_tap.path.dirname.mkpath
-
-# also jack in some test Casks
-FileUtils.ln_s project_root.join("spec", "support"), Tap::TAP_DIRECTORY.join("caskroom", "homebrew-speccasks")
-
-# create cache directory
-Hbc.homebrew_cache = Pathname.new(TEST_TMPDIR).join("cache")
+# create and override default directories
+Hbc.appdir = Pathname.new(TEST_TMPDIR).join("Applications").tap(&:mkpath)
 Hbc.cache.mkpath
+Hbc.caskroom.mkpath
+Hbc.default_tap = Tap.fetch("caskroom", "spec").tap do |tap|
+  tap.path.dirname.mkpath
+end
 
-# our own testy caskroom
-Hbc.caskroom = Hbc.homebrew_prefix.join("TestCaskroom")
+FileUtils.ln_s Pathname.new(__FILE__).dirname.join("support"), Hbc.default_tap.path
 
 RSpec.configure do |config|
   config.order = :random

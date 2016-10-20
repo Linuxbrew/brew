@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::Verify do
   let(:cask) { double("cask") }
 
