@@ -3,7 +3,7 @@ module Hbc
     REPO_PREFIX = "homebrew-".freeze
 
     # per https://github.com/Homebrew/homebrew/blob/4c7bc9ec3bca729c898ee347b6135ba692ee0274/Library/Homebrew/cmd/tap.rb#L121
-    USER_REGEX = %r{[a-z_\-]+}
+    USER_REGEX = %r{[a-z0-9_\-]+}
 
     # per https://github.com/Homebrew/homebrew/blob/4c7bc9ec3bca729c898ee347b6135ba692ee0274/Library/Homebrew/cmd/tap.rb#L121
     REPO_REGEX = %r{(?:#{REPO_PREFIX})?\w+}
