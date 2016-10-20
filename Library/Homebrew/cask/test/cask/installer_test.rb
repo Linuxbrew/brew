@@ -237,17 +237,17 @@ describe Hbc::Installer do
 
     it "prints caveats if they're present" do
       with_caveats = Hbc.load("with-caveats")
-      TestHelper.must_output(self, lambda {
+      lambda {
         Hbc::Installer.new(with_caveats).install
-      }, %r{Here are some things you might want to know})
+      }.must_output %r{Here are some things you might want to know}
       with_caveats.must_be :installed?
     end
 
     it "prints installer :manual instructions when present" do
       with_installer_manual = Hbc.load("with-installer-manual")
-      TestHelper.must_output(self, lambda {
+      lambda {
         Hbc::Installer.new(with_installer_manual).install
-      }, %r{To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'})
+      }.must_output %r{To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'}
       with_installer_manual.must_be :installed?
     end
 
@@ -348,7 +348,7 @@ describe Hbc::Installer do
       end
 
       dest_path = Hbc.appdir.join("MyNestedApp.app")
-      File.ftype(dest_path).must_equal "directory"
+      dest_path.must_be :directory?
     end
 
     it "generates and finds a timestamped metadata directory for an installed Cask" do
