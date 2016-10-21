@@ -135,14 +135,45 @@ module Homebrew
           raise "No devel block is defined for #{f.full_name}"
         end
 
-        current = f if f.installed?
-        current ||= f.old_installed_formulae.first
+        installed_head_version = f.latest_head_version
+        new_head_installed = installed_head_version &&
+                             !f.head_version_outdated?(installed_head_version, fetch_head: ARGV.fetch_head?)
+        prefix_installed = f.prefix.exist? && !f.prefix.children.empty?
 
-        if current
-          msg = "#{current.full_name}-#{current.installed_version} already installed"
-          unless current.linked_keg.symlink? || current.keg_only?
-            msg << ", it's just not linked"
-            puts "You can link formula with `brew link #{f}`"
+        if f.keg_only? && f.any_version_installed? && f.optlinked? && !ARGV.force?
+          # keg-only install is only possible when no other version is
+          # linked to opt, because installing without any warnings can break
+          # dependencies. Therefore before performing other checks we need to be
+          # sure --force flag is passed.
+          opoo "#{f.full_name} is a keg-only and another version is linked to opt."
+          puts "Use `brew install --force` if you want to install this version"
+        elsif (ARGV.build_head? && new_head_installed) || prefix_installed
+          # After we're sure that --force flag is passed for linked to opt
+          # keg-only we need to be sure that the version we're attempting to
+          # install is not already installed.
+
+          installed_version = if ARGV.build_head?
+            f.latest_head_version
+          else
+            f.pkg_version
+          end
+
+          msg = "#{f.full_name}-#{installed_version} already installed"
+          linked_not_equals_installed = f.linked_version != installed_version
+          if f.linked? && linked_not_equals_installed
+            msg << ", however linked version is #{f.linked_version}"
+            opoo msg
+            puts "You can use `brew switch #{f} #{installed_version}` to link this version."
+          elsif !f.linked? || f.keg_only?
+            msg << ", it's just not linked."
+            opoo msg
+          else
+            opoo msg
+          end
+        elsif !f.any_version_installed? && old_formula = f.old_installed_formulae.first
+          msg = "#{old_formula.full_name}-#{old_formula.installed_version} already installed"
+          if !old_formula.linked? && !old_formula.keg_only?
+            msg << ", it's just not linked."
           end
           opoo msg
         elsif f.migration_needed? && !ARGV.force?
@@ -152,6 +183,8 @@ module Homebrew
           puts "You can migrate formula with `brew migrate #{f}`"
           puts "Or you can force install it with `brew install #{f} --force`"
         else
+          # If none of the above is true and the formula is linked, then
+          # FormulaInstaller will handle this case.
           formulae << f
         end
       end
