@@ -274,7 +274,7 @@ describe Hbc::Artifact::Zap do
 
     describe "when using rmdir" do
       let(:cask) { Hbc.load("with-zap-rmdir") }
-      let(:dir_pathname) { Pathname(TestHelper.local_binary_path("empty_directory")) }
+      let(:dir_pathname) { Pathname.new("#{TEST_FIXTURE_DIR}/cask/empty_directory") }
 
       it "can zap" do
         Hbc::FakeSystemCommand.expects_command(

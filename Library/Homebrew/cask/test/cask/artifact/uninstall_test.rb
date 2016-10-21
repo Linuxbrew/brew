@@ -273,7 +273,7 @@ describe Hbc::Artifact::Uninstall do
 
     describe "when using rmdir" do
       let(:cask) { Hbc.load("with-uninstall-rmdir") }
-      let(:dir_pathname) { Pathname(TestHelper.local_binary_path("empty_directory")) }
+      let(:dir_pathname) { Pathname.new("#{TEST_FIXTURE_DIR}/cask/empty_directory") }
 
       it "can uninstall" do
         Hbc::FakeSystemCommand.expects_command(
