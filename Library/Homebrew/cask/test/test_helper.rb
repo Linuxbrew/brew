@@ -2,20 +2,16 @@ require "bundler"
 require "bundler/setup"
 require "pathname"
 
-if ENV["HOMEBREW_TESTS_COVERAGE"]
-  require "simplecov"
-end
-
-project_root = Pathname.new(File.expand_path("../..", __FILE__))
-tap_root = Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask")
+require "simplecov" if ENV["HOMEBREW_TESTS_COVERAGE"]
 
 # add Homebrew to load path
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew/test/lib"))
 
 require "global"
 
 # add Homebrew-Cask to load path
-$LOAD_PATH.push(project_root.join("lib").to_s)
+$LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
 
 require "test/helper/env"
 require "test/helper/shutup"
@@ -23,12 +19,7 @@ include Test::Helper::Env
 include Test::Helper::Shutup
 
 def sudo(*args)
-  %w[/usr/bin/sudo -E --] + Array(args).flatten
-end
-
-TEST_TMPDIR = Dir.mktmpdir("homebrew_cask_tests")
-at_exit do
-  FileUtils.remove_entry(TEST_TMPDIR)
+  %w[/usr/bin/sudo -E --] + args.flatten
 end
 
 # must be called after testing_env so at_exit hooks are in proper order
@@ -46,30 +37,20 @@ Mocha::Integration::MiniTest.activate
 # our baby
 require "hbc"
 
-# override Homebrew locations
-Hbc.homebrew_prefix = Pathname.new(TEST_TMPDIR).join("prefix")
-Hbc.homebrew_repository = Hbc.homebrew_prefix
-
-# Override Tap::TAP_DIRECTORY to use our test Tap directory.
-class Tap
-  send(:remove_const, :TAP_DIRECTORY)
-  TAP_DIRECTORY = Hbc.homebrew_prefix.join("Library", "Taps")
+module Hbc
+  class TestCask < Cask; end
 end
 
-Hbc.default_tap = Tap.fetch("caskroom", "testcasks")
-
-# also jack in some test Casks
-FileUtils.ln_s project_root.join("test", "support"), Tap::TAP_DIRECTORY.join("caskroom").tap(&:mkpath).join("homebrew-testcasks")
+Hbc.cache.mkpath
+Hbc.caskroom.mkpath
+Hbc.default_tap = Tap.fetch("caskroom", "test").tap do |tap|
+  # link test casks
+  FileUtils.mkdir_p tap.path.dirname
+  FileUtils.ln_s Pathname.new(__FILE__).dirname.join("support"), tap.path
+end
 
 # pretend that the caskroom/cask Tap is installed
-FileUtils.ln_s tap_root, Tap::TAP_DIRECTORY.join("caskroom").tap(&:mkpath).join("homebrew-cask")
-
-# create cache directory
-Hbc.homebrew_cache = Pathname.new(TEST_TMPDIR).join("cache")
-Hbc.cache.mkpath
-
-# our own testy caskroom
-Hbc.caskroom = Hbc.homebrew_prefix.join("TestCaskroom")
+FileUtils.ln_s HOMEBREW_LIBRARY.join("Taps", "caskroom", "homebrew-cask"), Tap.fetch("caskroom", "cask").path
 
 class TestHelper
   # helpers for test Casks to reference local files easily
@@ -138,8 +119,3 @@ require "support/cleanup"
 require "support/never_sudo_system_command"
 require "tmpdir"
 require "tempfile"
-
-# Common superclass for test Casks for when we need to filter them out
-module Hbc
-  class TestCask < Cask; end
-end
