@@ -18,7 +18,7 @@ class FormularyFactoryTest < Homebrew::TestCase
   def setup
     @name = "testball_bottle"
     @path = CoreTap.new.formula_dir/"#{@name}.rb"
-    @bottle_dir = Pathname.new("#{File.expand_path("..", __FILE__)}/bottles")
+    @bottle_dir = Pathname.new("#{TEST_DIRECTORY}/bottles")
     @bottle = @bottle_dir/"testball_bottle-0.1.#{Utils::Bottles.tag}.bottle.tar.gz"
     @path.write <<-EOS.undent
       class #{Formulary.class_s(@name)} < Formula
