@@ -31,10 +31,10 @@ Hbc.appdir = Pathname.new(TEST_TMPDIR).join("Applications").tap(&:mkpath)
 Hbc.cache.mkpath
 Hbc.caskroom.mkpath
 Hbc.default_tap = Tap.fetch("caskroom", "spec").tap do |tap|
-  tap.path.dirname.mkpath
+  # link test casks
+  FileUtils.mkdir_p tap.path.dirname
+  FileUtils.ln_s Pathname.new(__FILE__).dirname.join("support"), tap.path
 end
-
-FileUtils.ln_s Pathname.new(__FILE__).dirname.join("support"), Hbc.default_tap.path
 
 RSpec.configure do |config|
   config.order = :random
