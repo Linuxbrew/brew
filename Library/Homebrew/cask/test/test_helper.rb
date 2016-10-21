@@ -62,18 +62,6 @@ class TestHelper
     "file://" + local_binary_path(name)
   end
 
-  def self.test_cask
-    @test_cask ||= Hbc.load("basic-cask")
-  end
-
-  def self.fake_fetcher
-    Hbc::FakeFetcher
-  end
-
-  def self.fake_response_for(*args)
-    Hbc::FakeFetcher.fake_response_for(*args)
-  end
-
   def self.valid_alias?(candidate)
     return false unless candidate.symlink?
     candidate.readlink.exist?
