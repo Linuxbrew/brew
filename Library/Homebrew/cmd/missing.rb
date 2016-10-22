@@ -20,7 +20,7 @@ module Homebrew
 
     Diagnostic.missing_deps(ff) do |name, missing|
       print "#{name}: " if ff.size > 1
-      puts (missing * " ").to_s
+      puts missing.join(" ")
     end
   end
 end

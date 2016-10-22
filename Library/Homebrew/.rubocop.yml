@@ -9,10 +9,18 @@ AllCops:
     - 'cask/**/*'
     - '**/vendor/**/*'
 
+# so many of these in formulae but none in here
+Lint/AmbiguousRegexpLiteral:
+  Enabled: true
+
 # `formula do` uses nested method definitions
 Lint/NestedMethodDefinition:
   Exclude:
     - 'test/**/*'
+
+# so many of these in formulae but none in here
+Lint/ParenthesesAsGroupedExpression:
+  Enabled: false
 
 Metrics/ModuleLength:
   CountComments: false
@@ -21,81 +29,11 @@ Metrics/ModuleLength:
     - 'cask/lib/hbc/macos.rb'
     - 'cask/lib/hbc/utils.rb'
 
-Style/BarePercentLiterals:
-  EnforcedStyle: percent_q
+# so many of these in formulae but none in here
+Style/GuardClause:
+  Enabled: true
 
-Style/BlockDelimiters:
-  EnforcedStyle: semantic
-  FunctionalMethods:
-    - expect
-    - find
-    - let
-    - let!
-    - subject
-    - watch
-    - inject
-    - map
-    - map!
-    - collect
-    - collect!
-    - reject
-    - reject!
-    - delete_if
-    - with_object
-    - popen_read
-  ProceduralMethods:
-    - after
-    - at_exit
-    - before
-    - benchmark
-    - bm
-    - bmbm
-    - capture_io
-    - capture_output
-    - capture_subprocess_io
-    - chdir
-    - context
-    - create
-    - define_method
-    - define_singleton_method
-    - fork
-    - measure
-    - new
-    - open
-    - realtime
-    - shutup
-    - tap
-    - each
-    - each_pair
-    - each_with_index
-    - reverse_each
-    - ignore_interrupts
-  IgnoredMethods:
-    - each_with_object
-    - it
-    - its
-    - lambda
-    - proc
-    - formula
-    - mock
-    - devel
-    - stable
-    - head
-    - assert_raises
-    - assert_nothing_raised
-    - resource
-    - with_build_environment
-    - ensure_writable
-    - satisfy
-    - fetch
-    - brew
-    - expand
-    - env
-    - recursive_dependencies
-    - trap
-    - link_dir
-    - with_system_path
-
+# hash-rockets preferred for formulae, a: 1 preferred elsewhere
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
 
@@ -109,4 +47,3 @@ Style/PredicateName:
   Exclude:
     - 'compat/**/*'
   NameWhitelist: is_32_bit?, is_64_bit?
-

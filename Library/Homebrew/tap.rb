@@ -206,7 +206,7 @@ class Tap
       end
 
       ohai "Unshallowing #{name}" unless quiet
-      args = %W[fetch --unshallow]
+      args = %w[fetch --unshallow]
       args << "-q" if quiet
       path.cd { safe_system "git", *args }
       return
