@@ -85,6 +85,8 @@ Style/GuardClause:
 # depends_on a: :b looks weird in formulae.
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
+  Exclude:
+    - '**/cmd/**/*'
 
 # disabled until it respects line length
 Style/IfUnlessModifier:
