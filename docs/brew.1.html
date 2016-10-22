@@ -567,6 +567,11 @@ Each &lt;patch-source> may be one of:
    If <code>--no-publish</code> was passed, do not publish bottles to Bintray.</p>
 
 <dl>
+<dt><code>release-notes</code> [<var>previous_tag</var>] [<var>end_ref</var>]</dt><dd><p>Output the merged pull requests on Homebrew/brew between two Git refs.
+If no <code>previous_tag</code> is provided it defaults to the newest tag.
+If no <code>end_ref</code> is provided it defaults to <code>origin/master</code>.</p>
+
+<p>If <code>--markdown</code> is passed, output as a Markdown list.</p></dd>
 <dt><code>tap-new</code> <var>user</var><code>/</code><var>repo</var></dt><dd><p>Generate the template files for a new tap.</p></dd>
 <dt><code>test</code> [<code>--devel</code>|<code>--HEAD</code>] [<code>--debug</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Most formulae provide a test method. <code>brew test</code> <var>formula</var> runs this
 test method. There is no standard output or return code, but it should
