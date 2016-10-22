@@ -759,6 +759,13 @@ Each <patch\-source> may be one of:
 If \fB\-\-bottle\fR was passed, handle bottles, pulling the bottle\-update commit and publishing files on Bintray\. If \fB\-\-bump\fR was passed, for one\-formula PRs, automatically reword commit message to our preferred format\. If \fB\-\-clean\fR was passed, do not rewrite or otherwise modify the commits found in the pulled PR\. If \fB\-\-ignore\-whitespace\fR was passed, silently ignore whitespace discrepancies when applying diffs\. If \fB\-\-resolve\fR was passed, when a patch fails to apply, leave in progress and allow user to resolve, instead of aborting\. If \fB\-\-branch\-okay\fR was passed, do not warn if pulling to a branch besides master (useful for testing)\. If \fB\-\-no\-pbcopy\fR was passed, do not copy anything to the system If \fB\-\-no\-publish\fR was passed, do not publish bottles to Bintray\.
 .
 .TP
+\fBrelease\-notes\fR [\fIprevious_tag\fR] [\fIend_ref\fR]
+Output the merged pull requests on Homebrew/brew between two Git refs\. If no \fBprevious_tag\fR is provided it defaults to the newest tag\. If no \fBend_ref\fR is provided it defaults to \fBorigin/master\fR\.
+.
+.IP
+If \fB\-\-markdown\fR is passed, output as a Markdown list\.
+.
+.TP
 \fBtap\-new\fR \fIuser\fR\fB/\fR\fIrepo\fR
 Generate the template files for a new tap\.
 .
