@@ -78,9 +78,9 @@ module Formatter
     rows.times do |row_index|
       item_indices_for_row = row_index.step(objects.size - 1, rows).to_a
 
-      first_n = item_indices_for_row[0...-1].map { |index|
+      first_n = item_indices_for_row[0...-1].map do |index|
         objects[index] + "".rjust(col_width - object_lengths[index])
-      }
+      end
 
       # don't add trailing whitespace to last column
       last = objects.values_at(item_indices_for_row.last)

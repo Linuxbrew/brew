@@ -137,7 +137,7 @@ class FormulaAuditor
 
   attr_reader :formula, :text, :problems
 
-  BUILD_TIME_DEPS = %W[
+  BUILD_TIME_DEPS = %w[
     autoconf
     automake
     boost-build
@@ -449,9 +449,8 @@ class FormulaAuditor
     end
 
     return unless @new_formula
-    unless formula.deprecated_options.empty?
-      problem "New formulae should not use `deprecated_option`."
-    end
+    return if formula.deprecated_options.empty?
+    problem "New formulae should not use `deprecated_option`."
   end
 
   def audit_desc

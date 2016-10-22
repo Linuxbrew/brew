@@ -51,20 +51,20 @@ class Locale
   def include?(other)
     other = self.class.parse(other) unless other.is_a?(self.class)
 
-    [:language, :region, :script].all? { |var|
+    [:language, :region, :script].all? do |var|
       if other.public_send(var).nil?
         true
       else
         public_send(var) == other.public_send(var)
       end
-    }
+    end
   end
 
   def eql?(other)
     other = self.class.parse(other) unless other.is_a?(self.class)
-    [:language, :region, :script].all? { |var|
+    [:language, :region, :script].all? do |var|
       public_send(var) == other.public_send(var)
-    }
+    end
   rescue ParserError
     false
   end
