@@ -20,7 +20,7 @@ Lint/NestedMethodDefinition:
 
 # so many of these in formulae but none in here
 Lint/ParenthesesAsGroupedExpression:
-  Enabled: false
+  Enabled: true
 
 Metrics/ModuleLength:
   CountComments: false
