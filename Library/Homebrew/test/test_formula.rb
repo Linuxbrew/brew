@@ -799,8 +799,8 @@ end
 class AliasChangeTests < Homebrew::TestCase
   attr_reader :f, :new_formula, :tab, :alias_path
 
-  def make_formula(version)
-    f = formula(alias_path: alias_path) { url "foo-#{version}" }
+  def make_formula(name, version)
+    f = formula(name, alias_path: alias_path) { url "foo-#{version}" }
     f.build = tab
     f
   end
@@ -811,8 +811,8 @@ class AliasChangeTests < Homebrew::TestCase
 
     @tab = Tab.empty
 
-    @f = make_formula("1.0")
-    @new_formula = make_formula("1.1")
+    @f = make_formula("formula_name", "1.0")
+    @new_formula = make_formula("new_formula_name", "1.1")
 
     Formula.stubs(:installed).returns([f])
   end

@@ -1167,7 +1167,7 @@ class Formula
   # Returns false if the formula wasn't installed with an alias.
   def installed_alias_target_changed?
     target = current_installed_alias_target
-    target && target != self
+    target && target.name != name
   end
 
   # Is this formula the target of an alias used to install an old formula?
@@ -1192,7 +1192,7 @@ class Formula
     # it doesn't make sense to say that other formulae are older versions of it
     # because we don't know which came first.
     return [] if alias_path.nil? || installed_alias_target_changed?
-    self.class.installed_with_alias_path(alias_path) - [self]
+    self.class.installed_with_alias_path(alias_path).reject { |f| f.name == name }
   end
 
   # @private
