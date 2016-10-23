@@ -53,7 +53,7 @@ module Hbc
       def self.repo_info(cask)
         user, repo, token = QualifiedToken.parse(Hbc.all_tokens.detect { |t| t.split("/").last == cask.token })
         remote_tap = Tap.fetch(user, repo)
-        return "#{remote_tap.remote}" if remote_tap.custom_remote?
+        return remote_tap.remote.to_s if remote_tap.custom_remote?
         "#{remote_tap.default_remote}/blob/master/Casks/#{token}.rb"
       end
 
