@@ -11,10 +11,9 @@ module Hbc
       @token = token
       @sourcefile_path = sourcefile_path
       @dsl = dsl || DSL.new(@token)
-      if block_given?
-        @dsl.instance_eval(&block)
-        @dsl.language_eval
-      end
+      return unless block_given?
+      @dsl.instance_eval(&block)
+      @dsl.language_eval
     end
 
     DSL::DSL_METHODS.each do |method_name|
