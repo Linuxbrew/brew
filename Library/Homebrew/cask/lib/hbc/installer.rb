@@ -171,10 +171,10 @@ module Hbc
     def arch_dependencies
       return if @cask.depends_on.arch.nil?
       @current_arch ||= { type: Hardware::CPU.type, bits: Hardware::CPU.bits }
-      return if @cask.depends_on.arch.any? { |arch|
+      return if @cask.depends_on.arch.any? do |arch|
         arch[:type] == @current_arch[:type] &&
         Array(arch[:bits]).include?(@current_arch[:bits])
-      }
+      end
       raise CaskError, "Cask #{@cask} depends on hardware architecture being one of [#{@cask.depends_on.arch.map(&:to_s).join(", ")}], but you are running #{@current_arch}"
     end
 

@@ -66,13 +66,13 @@ module Hbc
     end
 
     def expanded_command
-      @expanded_command ||= command.map { |arg|
+      @expanded_command ||= command.map do |arg|
         if arg.respond_to?(:to_path)
           File.absolute_path(arg)
         else
           String(arg)
         end
-      }
+      end
     end
 
     def each_output_line(&b)

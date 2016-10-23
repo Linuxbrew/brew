@@ -76,9 +76,9 @@ module Hbc
         else
           start_withs = tokens.map { |token| "#{token}--" }
 
-          cache_files.select { |path|
+          cache_files.select do |path|
             path.basename.to_s.start_with?(*start_withs)
-          }
+          end
         end
 
         delete_paths(deletable_cache_files)

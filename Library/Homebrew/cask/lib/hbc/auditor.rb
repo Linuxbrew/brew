@@ -6,12 +6,12 @@ module Hbc
         begin
           saved_languages = MacOS.instance_variable_get(:@languages)
 
-          languages_blocks.keys.map { |languages|
+          languages_blocks.keys.map do |languages|
             ohai "Auditing language: #{languages.map { |lang| "'#{lang}'" }.join(", ")}"
             MacOS.instance_variable_set(:@languages, languages)
             audit_cask_instance(Hbc.load(cask.sourcefile_path), audit_download, check_token_conflicts)
             CLI::Cleanup.run(cask.token) if audit_download
-          }.all?
+          end.all?
         ensure
           MacOS.instance_variable_set(:@languages, saved_languages)
         end

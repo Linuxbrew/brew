@@ -40,9 +40,9 @@ module Hbc
     end
 
     def extract_ref
-      key = REF_TYPES.find { |type|
+      key = REF_TYPES.find do |type|
         uri_object.respond_to?(type) && uri_object.send(type)
-      }
+      end
       [key, key ? uri_object.send(key) : nil]
     end
 

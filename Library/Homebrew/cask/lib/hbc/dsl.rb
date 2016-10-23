@@ -123,9 +123,9 @@ module Hbc
       end
 
       MacOS.languages.map(&Locale.method(:parse)).each do |locale|
-        key = @language_blocks.keys.detect { |strings|
+        key = @language_blocks.keys.detect do |strings|
           strings.any? { |string| locale.include?(string) }
-        }
+        end
 
         next if key.nil?
 

@@ -23,10 +23,10 @@ module Hbc
     def self.for_query(query)
       odebug "Translating '#{query}' into a valid Cask source"
       raise CaskUnavailableError, query if query.to_s =~ /^\s*$/
-      source = sources.find { |s|
+      source = sources.find do |s|
         odebug "Testing source class #{s}"
         s.me?(query)
-      }
+      end
       raise CaskUnavailableError, query unless source
       odebug "Success! Using source class #{source}"
       resolved_cask_source = source.new(query)

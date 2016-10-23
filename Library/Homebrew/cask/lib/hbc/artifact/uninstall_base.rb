@@ -28,15 +28,15 @@ module Hbc
       #       sources and should be refactored for consistency
 
       def self.expand_path_strings(path_strings)
-        path_strings.map { |path_string|
+        path_strings.map do |path_string|
           path_string.start_with?("~") ? Pathname.new(path_string).expand_path : Pathname.new(path_string)
-        }
+        end
       end
 
       def self.remove_relative_path_strings(action, path_strings)
-        relative = path_strings.map { |path_string|
+        relative = path_strings.map do |path_string|
           path_string if %r{/\.\.(?:/|\Z)}.match(path_string) || !%r{\A/}.match(path_string)
-        }.compact
+        end.compact
         relative.each do |path_string|
           opoo "Skipping #{action} for relative path #{path_string}"
         end
@@ -44,9 +44,9 @@ module Hbc
       end
 
       def self.remove_undeletable_path_strings(action, path_strings)
-        undeletable = path_strings.map { |path_string|
+        undeletable = path_strings.map do |path_string|
           path_string if MacOS.undeletable?(Pathname.new(path_string))
-        }.compact
+        end.compact
         undeletable.each do |path_string|
           opoo "Skipping #{action} for undeletable path #{path_string}"
         end

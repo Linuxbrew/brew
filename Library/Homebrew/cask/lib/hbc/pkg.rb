@@ -1,9 +1,9 @@
 module Hbc
   class Pkg
     def self.all_matching(regexp, command)
-      command.run("/usr/sbin/pkgutil", args: ["--pkgs=#{regexp}"]).stdout.split("\n").map { |package_id|
+      command.run("/usr/sbin/pkgutil", args: ["--pkgs=#{regexp}"]).stdout.split("\n").map do |package_id|
         new(package_id.chomp, command)
-      }
+      end
     end
 
     attr_reader :package_id

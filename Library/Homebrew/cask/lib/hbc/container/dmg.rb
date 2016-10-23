@@ -78,12 +78,12 @@ module Hbc
       end
 
       def bom_filelist_from_path(mount)
-        Dir.chdir(mount) {
-          Dir.glob("**/*", File::FNM_DOTMATCH).map { |path|
+        Dir.chdir(mount) do
+          Dir.glob("**/*", File::FNM_DOTMATCH).map do |path|
             next if skip_path?(Pathname(path))
             path == "." ? path : path.prepend("./")
-          }.compact.join("\n").concat("\n")
-        }
+          end.compact.join("\n").concat("\n")
+        end
       end
 
       def skip_path?(path)
@@ -117,9 +117,7 @@ module Hbc
 
       def mounts_from_plist(plist)
         return [] unless plist.respond_to?(:fetch)
-        plist.fetch("system-entities", []).map { |entity|
-          entity["mount-point"]
-        }.compact
+        plist.fetch("system-entities", []).map { |e| e["mount-point"] }.compact
       end
 
       def assert_mounts_found
