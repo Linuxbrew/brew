@@ -14,8 +14,9 @@ module Hbc
 
               unless latest_installed_version.nil?
                 latest_installed_cask_file = installed_cask.metadata_master_container_path
-                                                 .join(latest_installed_version.join(File::Separator),
-                                                 "Casks", "#{cask_token}.rb")
+                                                           .join(latest_installed_version
+                                                           .join(File::Separator),
+                                                           "Casks", "#{cask_token}.rb")
 
                 # use the same cask file that was used for installation, if possible
                 installed_cask = Hbc.load(latest_installed_cask_file) if latest_installed_cask_file.exist?
