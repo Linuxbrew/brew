@@ -109,6 +109,11 @@ else
   HOMEBREW_MACOS_VERSION=0
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
+
+  if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
+  then
+    HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
+  fi
 fi
 HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_VERSION)"
 HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | /usr/bin/awk '{print $1"/"$2}')"
