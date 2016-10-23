@@ -5,7 +5,7 @@ describe Hbc::Artifact::App do
     let(:cask) { Hbc.load("with-two-apps-correct") }
 
     let(:install_phase) {
-      lambda { Hbc::Artifact::App.new(cask).install_phase }
+      -> { Hbc::Artifact::App.new(cask).install_phase }
     }
 
     let(:source_path_mini) { cask.staged_path.join("Caffeine Mini.app") }

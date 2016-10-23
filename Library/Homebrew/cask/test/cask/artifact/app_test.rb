@@ -9,13 +9,8 @@ describe Hbc::Artifact::App do
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
   let(:target_path) { Hbc.appdir.join("Caffeine.app") }
 
-  let(:install_phase) {
-    lambda { app.install_phase }
-  }
-
-  let(:uninstall_phase) {
-    lambda { app.uninstall_phase }
-  }
+  let(:install_phase) { -> { app.install_phase } }
+  let(:uninstall_phase) { -> { app.uninstall_phase } }
 
   before do
     TestHelper.install_without_artifacts(cask)
