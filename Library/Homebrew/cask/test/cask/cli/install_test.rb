@@ -63,16 +63,20 @@ describe Hbc::CLI::Install do
     lambda {
       begin
         Hbc::CLI::Install.run("googlechrome")
-      rescue Hbc::CaskError; end
-    }.must_output nil, /No available Cask for googlechrome\. Did you mean:\ngoogle-chrome/
+      rescue Hbc::CaskError
+        nil
+      end
+    }.must_output(nil, /No available Cask for googlechrome\. Did you mean:\ngoogle-chrome/)
   end
 
   it "returns multiple suggestions for a Cask fragment" do
     lambda {
       begin
         Hbc::CLI::Install.run("google")
-      rescue Hbc::CaskError; end
-    }.must_output nil, /No available Cask for google\. Did you mean one of:\ngoogle/
+      rescue Hbc::CaskError
+        nil
+      end
+    }.must_output(nil, /No available Cask for google\. Did you mean one of:\ngoogle/)
   end
 
   describe "when no Cask is specified" do
