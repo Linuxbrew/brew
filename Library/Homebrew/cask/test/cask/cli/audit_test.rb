@@ -6,10 +6,11 @@ describe Hbc::CLI::Audit do
 
   describe "selection of Casks to audit" do
     it "audits all Casks if no tokens are given" do
-      Hbc.stubs(all: [cask, cask])
-      auditor.expects(:audit).times(2)
+      Hbc.stub :all, [cask, cask] do
+        auditor.expects(:audit).times(2)
 
-      run_audit([], auditor)
+        run_audit([], auditor)
+      end
     end
 
     it "audits specified Casks if tokens are given" do
@@ -23,37 +24,37 @@ describe Hbc::CLI::Audit do
 
   describe "rules for downloading a Cask" do
     it "does not download the Cask per default" do
-      Hbc.stubs(load: cask)
+      Hbc.stub :load, cask do
+        auditor.expects(:audit).with(cask, audit_download: false, check_token_conflicts: false)
 
-      auditor.expects(:audit).with(cask, audit_download: false, check_token_conflicts: false)
-
-      run_audit(["casktoken"], auditor)
+        run_audit(["casktoken"], auditor)
+      end
     end
 
     it "download a Cask if --download flag is set" do
-      Hbc.stubs(load: cask)
+      Hbc.stub :load, cask do
+        auditor.expects(:audit).with(cask, audit_download: true, check_token_conflicts: false)
 
-      auditor.expects(:audit).with(cask, audit_download: true, check_token_conflicts: false)
-
-      run_audit(["casktoken", "--download"], auditor)
+        run_audit(["casktoken", "--download"], auditor)
+      end
     end
   end
 
   describe "rules for checking token conflicts" do
     it "does not check for token conflicts per default" do
-      Hbc.stubs(load: cask)
+      Hbc.stub :load, cask do
+        auditor.expects(:audit).with(cask, audit_download: false, check_token_conflicts: false)
 
-      auditor.expects(:audit).with(cask, audit_download: false, check_token_conflicts: false)
-
-      run_audit(["casktoken"], auditor)
+        run_audit(["casktoken"], auditor)
+      end
     end
 
     it "checks for token conflicts if --token-conflicts flag is set" do
-      Hbc.stubs(load: cask)
+      Hbc.stub :load, cask do
+        auditor.expects(:audit).with(cask, audit_download: false, check_token_conflicts: true)
 
-      auditor.expects(:audit).with(cask, audit_download: false, check_token_conflicts: true)
-
-      run_audit(["casktoken", "--token-conflicts"], auditor)
+        run_audit(["casktoken", "--token-conflicts"], auditor)
+      end
     end
   end
 
