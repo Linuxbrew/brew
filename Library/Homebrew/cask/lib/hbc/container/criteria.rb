@@ -9,7 +9,7 @@ module Hbc
       end
 
       def extension(regex)
-        path.extname.sub(%r{^\.}, "") =~ Regexp.new(regex.source, regex.options | Regexp::IGNORECASE)
+        path.extname.sub(/^\./, "") =~ Regexp.new(regex.source, regex.options | Regexp::IGNORECASE)
       end
 
       def magic_number(regex)

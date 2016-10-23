@@ -11,10 +11,9 @@ module Hbc
       @token = token
       @sourcefile_path = sourcefile_path
       @dsl = dsl || DSL.new(@token)
-      if block_given?
-        @dsl.instance_eval(&block)
-        @dsl.language_eval
-      end
+      return unless block_given?
+      @dsl.instance_eval(&block)
+      @dsl.language_eval
     end
 
     DSL::DSL_METHODS.each do |method_name|
@@ -38,12 +37,12 @@ module Hbc
         raise CaskError, "Cannot create metadata path when timestamp is :latest"
       end
       path = if timestamp == :latest
-               Pathname.glob(metadata_versioned_container_path.join("*")).sort.last
-             elsif timestamp == :now
-               Utils.nowstamp_metadata_path(metadata_versioned_container_path)
-             else
-               metadata_versioned_container_path.join(timestamp)
-             end
+        Pathname.glob(metadata_versioned_container_path.join("*")).sort.last
+      elsif timestamp == :now
+        Utils.nowstamp_metadata_path(metadata_versioned_container_path)
+      else
+        metadata_versioned_container_path.join(timestamp)
+      end
       if create
         odebug "Creating metadata directory #{path}"
         FileUtils.mkdir_p path

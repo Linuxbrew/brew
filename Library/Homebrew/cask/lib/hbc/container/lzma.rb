@@ -6,7 +6,7 @@ module Hbc
   class Container
     class Lzma < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^\]\000\000\200\000}n)
+        criteria.magic_number(/^\]\000\000\200\000/n)
       end
 
       def extract

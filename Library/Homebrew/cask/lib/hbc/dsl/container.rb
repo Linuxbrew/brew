@@ -2,9 +2,9 @@ module Hbc
   class DSL
     class Container
       VALID_KEYS = Set.new [
-                             :type,
-                             :nested,
-                           ]
+        :type,
+        :nested,
+      ]
 
       attr_accessor(*VALID_KEYS)
       attr_accessor :pairs

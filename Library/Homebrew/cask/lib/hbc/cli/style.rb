@@ -37,12 +37,12 @@ module Hbc
 
       def cask_paths
         @cask_paths ||= if cask_tokens.empty?
-                          Hbc.all_tapped_cask_dirs
-                        elsif cask_tokens.any? { |file| File.exist?(file) }
-                          cask_tokens
-                        else
-                          cask_tokens.map { |token| Hbc.path(token) }
-                        end
+          Hbc.all_tapped_cask_dirs
+        elsif cask_tokens.any? { |file| File.exist?(file) }
+          cask_tokens
+        else
+          cask_tokens.map { |token| Hbc.path(token) }
+        end
       end
 
       def cask_tokens
@@ -67,7 +67,7 @@ module Hbc
       end
 
       def fix?
-        args.any? { |arg| arg =~ %r{--(fix|(auto-?)?correct)} }
+        args.any? { |arg| arg =~ /--(fix|(auto-?)?correct)/ }
       end
     end
   end

@@ -4,40 +4,40 @@ module Hbc
   class DSL
     class DependsOn
       VALID_KEYS = Set.new [
-                             :formula,
-                             :cask,
-                             :macos,
-                             :arch,
-                             :x11,
-                             :java,
-                           ].freeze
+        :formula,
+        :cask,
+        :macos,
+        :arch,
+        :x11,
+        :java,
+      ].freeze
 
       VALID_ARCHES = {
-                       intel:    { type: :intel, bits: [32, 64] },
-                       ppc:      { type: :ppc,   bits: [32, 64] },
-                       # specific
-                       i386:     { type: :intel, bits: 32 },
-                       x86_64:   { type: :intel, bits: 64 },
-                       ppc_7400: { type: :ppc,   bits: 32 },
-                       ppc_64:   { type: :ppc,   bits: 64 },
-                     }.freeze
+        intel:    { type: :intel, bits: [32, 64] },
+        ppc:      { type: :ppc,   bits: [32, 64] },
+        # specific
+        i386:     { type: :intel, bits: 32 },
+        x86_64:   { type: :intel, bits: 64 },
+        ppc_7400: { type: :ppc,   bits: 32 },
+        ppc_64:   { type: :ppc,   bits: 64 },
+      }.freeze
 
       # Intentionally undocumented: catch variant spellings.
       ARCH_SYNONYMS = {
-                        x86_32:   :i386,
-                        x8632:    :i386,
-                        x8664:    :x86_64,
-                        intel_32: :i386,
-                        intel32:  :i386,
-                        intel_64: :x86_64,
-                        intel64:  :x86_64,
-                        amd_64:   :x86_64,
-                        amd64:    :x86_64,
-                        ppc7400:  :ppc_7400,
-                        ppc_32:   :ppc_7400,
-                        ppc32:    :ppc_7400,
-                        ppc64:    :ppc_64,
-                      }.freeze
+        x86_32:   :i386,
+        x8632:    :i386,
+        x8664:    :x86_64,
+        intel_32: :i386,
+        intel32:  :i386,
+        intel_64: :x86_64,
+        intel64:  :x86_64,
+        amd_64:   :x86_64,
+        amd64:    :x86_64,
+        ppc7400:  :ppc_7400,
+        ppc_32:   :ppc_7400,
+        ppc32:    :ppc_7400,
+        ppc64:    :ppc_64,
+      }.freeze
 
       attr_accessor :java
       attr_accessor :pairs
@@ -62,7 +62,7 @@ module Hbc
         begin
           if arg.is_a?(Symbol)
             Gem::Version.new(@macos_symbols.fetch(arg))
-          elsif arg =~ %r{^\s*:?([a-z]\S+)\s*$}i
+          elsif arg =~ /^\s*:?([a-z]\S+)\s*$/i
             Gem::Version.new(@macos_symbols.fetch(Regexp.last_match[1].downcase.to_sym))
           elsif @inverted_macos_symbols.key?(arg)
             Gem::Version.new(arg)
@@ -86,26 +86,24 @@ module Hbc
 
       def macos=(*arg)
         @macos ||= []
-        macos = if arg.count == 1 && arg.first =~ %r{^\s*(<|>|[=<>]=)\s*(\S+)\s*$}
-                  raise "'depends_on macos' comparison expressions cannot be combined" unless @macos.empty?
-                  operator = Regexp.last_match[1].to_sym
-                  release = self.class.coerce_os_release(Regexp.last_match[2])
-                  [[operator, release]]
-                else
-                  raise "'depends_on macos' comparison expressions cannot be combined" if @macos.first.is_a?(Symbol)
-                  Array(*arg).map { |elt|
-                    self.class.coerce_os_release(elt)
-                  }.sort
-                end
+        macos = if arg.count == 1 && arg.first =~ /^\s*(<|>|[=<>]=)\s*(\S+)\s*$/
+          raise "'depends_on macos' comparison expressions cannot be combined" unless @macos.empty?
+          operator = Regexp.last_match[1].to_sym
+          release = self.class.coerce_os_release(Regexp.last_match[2])
+          [[operator, release]]
+        else
+          raise "'depends_on macos' comparison expressions cannot be combined" if @macos.first.is_a?(Symbol)
+          [*arg].map(&self.class.method(:coerce_os_release)).sort
+        end
         @macos.concat(macos)
       end
 
       def arch=(*arg)
         @arch ||= []
-        arches = Array(*arg).map { |elt|
-          elt = elt.to_s.downcase.sub(%r{^:}, "").tr("-", "_").to_sym
+        arches = Array(*arg).map do |elt|
+          elt = elt.to_s.downcase.sub(/^:/, "").tr("-", "_").to_sym
           ARCH_SYNONYMS.key?(elt) ? ARCH_SYNONYMS[elt] : elt
-        }
+        end
         invalid_arches = arches - VALID_ARCHES.keys
         raise "invalid 'depends_on arch' values: #{invalid_arches.inspect}" unless invalid_arches.empty?
         @arch.concat(arches.map { |arch| VALID_ARCHES[arch] })

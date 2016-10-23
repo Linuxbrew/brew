@@ -4,7 +4,7 @@ module Hbc
   class Container
     class Zip < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^PK(\003\004|\005\006)}n)
+        criteria.magic_number(/^PK(\003\004|\005\006)/n)
       end
 
       def extract

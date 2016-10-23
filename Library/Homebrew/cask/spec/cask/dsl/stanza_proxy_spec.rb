@@ -1,6 +1,6 @@
 describe Hbc::DSL::StanzaProxy do
   let(:stanza_proxy) {
-    described_class.new(Array) { %i{foo bar cake} }
+    described_class.new(Array) { [:foo, :bar, :cake] }
   }
 
   subject { stanza_proxy }

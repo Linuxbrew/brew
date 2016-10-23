@@ -72,14 +72,14 @@ module Hbc
         ohai message
 
         deletable_cache_files = if tokens.empty?
-                                  cache_files
-                                else
-                                  start_withs = tokens.map { |token| "#{token}--" }
+          cache_files
+        else
+          start_withs = tokens.map { |token| "#{token}--" }
 
-                                  cache_files.select { |path|
-                                    path.basename.to_s.start_with?(*start_withs)
-                                  }
-                                end
+          cache_files.select do |path|
+            path.basename.to_s.start_with?(*start_withs)
+          end
+        end
 
         delete_paths(deletable_cache_files)
       end

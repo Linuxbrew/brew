@@ -5,7 +5,7 @@ describe Hbc::Artifact::App do
     let(:cask) { Hbc.load("with-alt-target") }
 
     let(:install_phase) {
-      lambda { Hbc::Artifact::App.new(cask).install_phase }
+      -> { Hbc::Artifact::App.new(cask).install_phase }
     }
 
     let(:source_path) { cask.staged_path.join("Caffeine.app") }

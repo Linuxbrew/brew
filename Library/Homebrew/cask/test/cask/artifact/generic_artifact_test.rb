@@ -4,7 +4,7 @@ describe Hbc::Artifact::Artifact do
   let(:cask) { Hbc.load("with-generic-artifact") }
 
   let(:install_phase) {
-    lambda { Hbc::Artifact::Artifact.new(cask).install_phase }
+    -> { Hbc::Artifact::Artifact.new(cask).install_phase }
   }
 
   let(:source_path) { cask.staged_path.join("Caffeine.app") }

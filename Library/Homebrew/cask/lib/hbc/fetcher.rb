@@ -5,7 +5,7 @@ module Hbc
     TIMEOUT = 10
 
     def self.head(url)
-      if url.to_s =~ %r{googlecode}
+      if url.to_s =~ /googlecode/
         googlecode_fake_head(url)
       else
         SystemCommand.run("/usr/bin/curl",
@@ -18,7 +18,7 @@ module Hbc
     def self.googlecode_fake_head(url)
       command = "curl --max-time #{TIMEOUT} --verbose --location '#{url}' | head -n 20 > /dev/null"
       stderr = Open3.capture3(command)[1]
-      stderr.split("\n").grep(%r{^< }).map { |line| line.sub(%r{^< }, "") }.join("\n")
+      stderr.split("\n").grep(/^< /).map { |line| line.sub(/^< /, "") }.join("\n")
     end
   end
 end

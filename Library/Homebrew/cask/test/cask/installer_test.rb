@@ -239,7 +239,7 @@ describe Hbc::Installer do
       with_caveats = Hbc.load("with-caveats")
       lambda {
         Hbc::Installer.new(with_caveats).install
-      }.must_output %r{Here are some things you might want to know}
+      }.must_output(/Here are some things you might want to know/)
       with_caveats.must_be :installed?
     end
 
@@ -247,7 +247,7 @@ describe Hbc::Installer do
       with_installer_manual = Hbc.load("with-installer-manual")
       lambda {
         Hbc::Installer.new(with_installer_manual).install
-      }.must_output %r{To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'}
+      }.must_output(/To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'/)
       with_installer_manual.must_be :installed?
     end
 

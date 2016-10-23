@@ -23,16 +23,16 @@ module Hbc
     end
 
     HTTP_RESPONSES = [
-                       "HTTP/1.0 200 OK",
-                       "HTTP/1.1 200 OK",
-                       "HTTP/1.1 302 Found",
-                     ].freeze
+      "HTTP/1.0 200 OK",
+      "HTTP/1.1 200 OK",
+      "HTTP/1.1 302 Found",
+    ].freeze
 
     OK_RESPONSES = {
-                     "http"  => HTTP_RESPONSES,
-                     "https" => HTTP_RESPONSES,
-                     "ftp"   => ["OK"],
-                   }.freeze
+      "http"  => HTTP_RESPONSES,
+      "https" => HTTP_RESPONSES,
+      "ftp"   => ["OK"],
+    }.freeze
 
     def _check_response_status
       ok = OK_RESPONSES[cask.url.scheme]
@@ -52,7 +52,7 @@ module Hbc
 
       case cask.url.scheme
       when "http", "https" then
-        @response_status = response_lines.grep(%r{^HTTP}).last
+        @response_status = response_lines.grep(/^HTTP/).last
         if @response_status.respond_to?(:strip)
           @response_status.strip!
           unless response_lines.index(@response_status).nil?

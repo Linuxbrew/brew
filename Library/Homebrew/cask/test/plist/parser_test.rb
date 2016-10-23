@@ -53,10 +53,10 @@ describe Plist do
     parsed.keys.must_equal ["system-entities"]
     parsed["system-entities"].length.must_equal 3
     parsed["system-entities"].map { |e| e["dev-entry"] }.must_equal %w[
-                                                                      /dev/disk3s1
-                                                                      /dev/disk3
-                                                                      /dev/disk3s2
-                                                                    ]
+      /dev/disk3s1
+      /dev/disk3
+      /dev/disk3s2
+    ]
   end
 
   it "does not choke on empty input" do

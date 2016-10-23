@@ -68,9 +68,9 @@ describe "download strategies" do
       let(:url_options) {
         {
           cookies: {
-                     coo: "kie",
-                     mon: "ster",
-                   },
+            coo: "kie",
+            mon: "ster",
+          },
         }
       }
 
@@ -114,9 +114,9 @@ describe "download strategies" do
         {
           using: :post,
           data:  {
-                   form: "data",
-                   is:   "good",
-                 },
+            form: "data",
+            is:   "good",
+          },
         }
       }
 
@@ -190,13 +190,13 @@ describe "download strategies" do
       expect(fake_system_command).to have_received(:run!).with(
         "/usr/bin/svn",
         hash_including(args: [
-                               "checkout",
-                               "--force",
-                               "--config-option",
-                               "config:miscellany:use-commit-times=yes",
-                               cask.url.to_s,
-                               downloader.cached_location,
-                             ])
+                         "checkout",
+                         "--force",
+                         "--config-option",
+                         "config:miscellany:use-commit-times=yes",
+                         cask.url.to_s,
+                         downloader.cached_location,
+                       ])
       )
     end
 
@@ -218,15 +218,15 @@ describe "download strategies" do
         expect(fake_system_command).to have_received(:run!).with(
           "/usr/bin/svn",
           hash_including(args: [
-                                 "checkout",
-                                 "--force",
-                                 "--config-option",
-                                 "config:miscellany:use-commit-times=yes",
-                                 "--trust-server-cert",
-                                 "--non-interactive",
-                                 cask.url.to_s,
-                                 downloader.cached_location,
-                               ])
+                           "checkout",
+                           "--force",
+                           "--config-option",
+                           "config:miscellany:use-commit-times=yes",
+                           "--trust-server-cert",
+                           "--non-interactive",
+                           cask.url.to_s,
+                           downloader.cached_location,
+                         ])
         )
       end
     end
@@ -249,15 +249,15 @@ describe "download strategies" do
         expect(fake_system_command).to have_received(:run!).with(
           "/usr/bin/svn",
           hash_including(args: [
-                                 "checkout",
-                                 "--force",
-                                 "--config-option",
-                                 "config:miscellany:use-commit-times=yes",
-                                 cask.url.to_s,
-                                 downloader.cached_location,
-                                 "-r",
-                                 "10",
-                               ])
+                           "checkout",
+                           "--force",
+                           "--config-option",
+                           "config:miscellany:use-commit-times=yes",
+                           cask.url.to_s,
+                           downloader.cached_location,
+                           "-r",
+                           "10",
+                         ])
         )
       end
     end
@@ -276,14 +276,14 @@ describe "download strategies" do
       expect(fake_system_command).to have_received(:run!).with(
         "/usr/bin/tar",
         hash_including(args: [
-                               '-s/^\\.//',
-                               "--exclude",
-                               ".svn",
-                               "-cf",
-                               downloader.tarball_path,
-                               "--",
-                               ".",
-                             ])
+                         '-s/^\\.//',
+                         "--exclude",
+                         ".svn",
+                         "-cf",
+                         downloader.tarball_path,
+                         "--",
+                         ".",
+                       ])
       )
     end
   end

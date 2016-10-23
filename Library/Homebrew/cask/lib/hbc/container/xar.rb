@@ -6,7 +6,7 @@ module Hbc
   class Container
     class Xar < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^xar!}n)
+        criteria.magic_number(/^xar!/n)
       end
 
       def extract

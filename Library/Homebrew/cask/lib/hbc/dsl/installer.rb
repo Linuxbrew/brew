@@ -2,9 +2,9 @@ module Hbc
   class DSL
     class Installer
       VALID_KEYS = Set.new [
-                             :manual,
-                             :script,
-                           ]
+        :manual,
+        :script,
+      ]
 
       attr_accessor(*VALID_KEYS)
 

@@ -2,13 +2,13 @@ module Hbc
   class DSL
     class ConflictsWith
       VALID_KEYS = Set.new [
-                             :formula,
-                             :cask,
-                             :macos,
-                             :arch,
-                             :x11,
-                             :java,
-                           ]
+        :formula,
+        :cask,
+        :macos,
+        :arch,
+        :x11,
+        :java,
+      ]
 
       attr_accessor(*VALID_KEYS)
       attr_accessor :pairs

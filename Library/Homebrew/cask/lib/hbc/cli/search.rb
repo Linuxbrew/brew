@@ -21,12 +21,12 @@ module Hbc
         all_tokens = CLI.nice_listing(Hbc.all_tokens)
         if search_regexp
           search_term = arguments.first
-          partial_matches = all_tokens.grep(%r{#{search_regexp}}i)
+          partial_matches = all_tokens.grep(/#{search_regexp}/i)
         else
-          simplified_tokens = all_tokens.map { |t| t.sub(%r{^.*\/}, "").gsub(%r{[^a-z0-9]+}i, "") }
-          simplified_search_term = search_term.sub(%r{\.rb$}i, "").gsub(%r{[^a-z0-9]+}i, "")
-          exact_match = simplified_tokens.grep(%r{^#{simplified_search_term}$}i) { |t| all_tokens[simplified_tokens.index(t)] }.first
-          partial_matches = simplified_tokens.grep(%r{#{simplified_search_term}}i) { |t| all_tokens[simplified_tokens.index(t)] }
+          simplified_tokens = all_tokens.map { |t| t.sub(%r{^.*\/}, "").gsub(/[^a-z0-9]+/i, "") }
+          simplified_search_term = search_term.sub(/\.rb$/i, "").gsub(/[^a-z0-9]+/i, "")
+          exact_match = simplified_tokens.grep(/^#{simplified_search_term}$/i) { |t| all_tokens[simplified_tokens.index(t)] }.first
+          partial_matches = simplified_tokens.grep(/#{simplified_search_term}/i) { |t| all_tokens[simplified_tokens.index(t)] }
           partial_matches.delete(exact_match)
         end
         [exact_match, partial_matches, search_term]

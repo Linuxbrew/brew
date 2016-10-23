@@ -4,7 +4,7 @@ module Hbc
   module Artifact
     class AbstractFlightBlock < Base
       def self.artifact_dsl_key
-        super.to_s.sub(%r{_block$}, "").to_sym
+        super.to_s.sub(/_block$/, "").to_sym
       end
 
       def self.uninstall_artifact_dsl_key

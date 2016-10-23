@@ -20,7 +20,7 @@ describe Hbc::Audit do
         audit.add_error "bad"
       end
 
-      it { is_expected.to match(%r{failed}) }
+      it { is_expected.to match(/failed/) }
     end
 
     context "when there are warnings" do
@@ -28,7 +28,7 @@ describe Hbc::Audit do
         audit.add_warning "eh"
       end
 
-      it { is_expected.to match(%r{warning}) }
+      it { is_expected.to match(/warning/) }
     end
 
     context "when there are errors and warnings" do
@@ -37,11 +37,11 @@ describe Hbc::Audit do
         audit.add_warning "eh"
       end
 
-      it { is_expected.to match(%r{failed}) }
+      it { is_expected.to match(/failed/) }
     end
 
     context "when there are no errors or warnings" do
-      it { is_expected.to match(%r{passed}) }
+      it { is_expected.to match(/passed/) }
     end
   end
 
@@ -53,7 +53,7 @@ describe Hbc::Audit do
       %w[version sha256 url name homepage].each do |stanza|
         context "when missing #{stanza}" do
           let(:cask_token) { "missing-#{stanza}" }
-          it { is_expected.to fail_with(%r{#{stanza} stanza is required}) }
+          it { is_expected.to fail_with(/#{stanza} stanza is required/) }
         end
       end
     end
@@ -85,36 +85,36 @@ describe Hbc::Audit do
 
       context "when sha256 is sha256 for empty string" do
         let(:cask_token) { "sha256-for-empty-string" }
-        it { is_expected.to fail_with(%r{cannot use the sha256 for an empty string}) }
+        it { is_expected.to fail_with(/cannot use the sha256 for an empty string/) }
       end
     end
 
     describe "appcast checks" do
       context "when appcast has no sha256" do
         let(:cask_token) { "appcast-missing-checkpoint" }
-        it { is_expected.to fail_with(%r{checkpoint sha256 is required for appcast}) }
+        it { is_expected.to fail_with(/checkpoint sha256 is required for appcast/) }
       end
 
       context "when appcast checkpoint is not a string of 64 hexadecimal characters" do
         let(:cask_token) { "appcast-invalid-checkpoint" }
-        it { is_expected.to fail_with(%r{string must be of 64 hexadecimal characters}) }
+        it { is_expected.to fail_with(/string must be of 64 hexadecimal characters/) }
       end
 
       context "when appcast checkpoint is sha256 for empty string" do
         let(:cask_token) { "appcast-checkpoint-sha256-for-empty-string" }
-        it { is_expected.to fail_with(%r{cannot use the sha256 for an empty string}) }
+        it { is_expected.to fail_with(/cannot use the sha256 for an empty string/) }
       end
 
       context "when appcast checkpoint is valid sha256" do
         let(:cask_token) { "appcast-valid-checkpoint" }
-        it { should_not fail_with(%r{appcast :checkpoint}) }
+        it { should_not fail_with(/appcast :checkpoint/) }
       end
 
       context "when verifying appcast HTTP code" do
         let(:cask_token) { "appcast-valid-checkpoint" }
         let(:download) { instance_double(Hbc::Download) }
-        let(:wrong_code_msg) { %r{unexpected HTTP response code} }
-        let(:curl_error_msg) { %r{error retrieving appcast} }
+        let(:wrong_code_msg) { /unexpected HTTP response code/ }
+        let(:curl_error_msg) { /error retrieving appcast/ }
         let(:fake_curl_result) { instance_double(Hbc::SystemCommand::Result) }
 
         before do
@@ -155,8 +155,8 @@ describe Hbc::Audit do
       context "when verifying appcast checkpoint" do
         let(:cask_token) { "appcast-valid-checkpoint" }
         let(:download) { instance_double(Hbc::Download) }
-        let(:mismatch_msg) { %r{appcast checkpoint mismatch} }
-        let(:curl_error_msg) { %r{error retrieving appcast} }
+        let(:mismatch_msg) { /appcast checkpoint mismatch/ }
+        let(:curl_error_msg) { /error retrieving appcast/ }
         let(:fake_curl_result) { instance_double(Hbc::SystemCommand::Result) }
         let(:expected_checkpoint) { "d5b2dfbef7ea28c25f7a77cd7fa14d013d82b626db1d82e00e25822464ba19e2" }
 
@@ -203,7 +203,7 @@ describe Hbc::Audit do
     end
 
     describe "preferred download URL formats" do
-      let(:warning_msg) { %r{URL format incorrect} }
+      let(:warning_msg) { /URL format incorrect/ }
 
       context "with incorrect SourceForge URL format" do
         let(:cask_token) { "sourceforge-incorrect-url-format" }
@@ -234,17 +234,17 @@ describe Hbc::Audit do
     describe "generic artifact checks" do
       context "with no target" do
         let(:cask_token) { "generic-artifact-no-target" }
-        it { is_expected.to fail_with(%r{target required for generic artifact}) }
+        it { is_expected.to fail_with(/target required for generic artifact/) }
       end
 
       context "with relative target" do
         let(:cask_token) { "generic-artifact-relative-target" }
-        it { is_expected.to fail_with(%r{target must be absolute path for generic artifact}) }
+        it { is_expected.to fail_with(/target must be absolute path for generic artifact/) }
       end
 
       context "with absolute target" do
         let(:cask_token) { "generic-artifact-absolute-target" }
-        it { should_not fail_with(%r{target required for generic artifact}) }
+        it { should_not fail_with(/target required for generic artifact/) }
       end
     end
 
@@ -260,7 +260,7 @@ describe Hbc::Audit do
 
         context "when doing the audit" do
           it "evaluates the block" do
-            expect(subject).to fail_with(%r{Boom})
+            expect(subject).to fail_with(/Boom/)
           end
         end
       end
@@ -276,12 +276,12 @@ describe Hbc::Audit do
 
       context "when cask token conflicts with a core formula" do
         let(:formula_names) { %w[with-binary other-formula] }
-        it { is_expected.to warn_with(%r{possible duplicate}) }
+        it { is_expected.to warn_with(/possible duplicate/) }
       end
 
       context "when cask token does not conflict with a core formula" do
         let(:formula_names) { %w[other-formula] }
-        it { should_not warn_with(%r{possible duplicate}) }
+        it { should_not warn_with(/possible duplicate/) }
       end
     end
 
@@ -298,7 +298,7 @@ describe Hbc::Audit do
           expect(verify).to receive(:all)
         end
 
-        it { should_not fail_with(%r{#{error_msg}}) }
+        it { should_not fail_with(/#{error_msg}/) }
       end
 
       context "when download fails" do
@@ -306,7 +306,7 @@ describe Hbc::Audit do
           expect(download).to receive(:perform).and_raise(StandardError.new(error_msg))
         end
 
-        it { is_expected.to fail_with(%r{#{error_msg}}) }
+        it { is_expected.to fail_with(/#{error_msg}/) }
       end
 
       context "when verification fails" do
@@ -315,7 +315,7 @@ describe Hbc::Audit do
           expect(verify).to receive(:all).and_raise(StandardError.new(error_msg))
         end
 
-        it { is_expected.to fail_with(%r{#{error_msg}}) }
+        it { is_expected.to fail_with(/#{error_msg}/) }
       end
     end
 
@@ -325,7 +325,7 @@ describe Hbc::Audit do
         expect(cask).to receive(:version).and_raise(StandardError.new)
       end
 
-      it { is_expected.to fail_with(%r{exception while auditing}) }
+      it { is_expected.to fail_with(/exception while auditing/) }
     end
   end
 end

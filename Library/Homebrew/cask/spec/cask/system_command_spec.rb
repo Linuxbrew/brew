@@ -49,9 +49,9 @@ describe Hbc::SystemCommand do
     let(:command) { "/bin/bash" }
     let(:options) {
       { args: [
-                "-c",
-                "for i in $(seq 1 2 5); do echo $i; echo $(($i + 1)) >&2; done",
-              ] }
+        "-c",
+        "for i in $(seq 1 2 5); do echo $i; echo $(($i + 1)) >&2; done",
+      ] }
     }
 
     shared_examples "it returns '1 2 3 4 5 6'" do
@@ -84,7 +84,7 @@ describe Hbc::SystemCommand do
         (1..6).each do |i|
           expect {
             described_class.run(command, options)
-          }.to output(%r{==> #{ i }}).to_stdout
+          }.to output(/==> #{ i }/).to_stdout
         end
       end
 
@@ -125,9 +125,9 @@ describe Hbc::SystemCommand do
     let(:command) { "/bin/bash" }
     let(:options) {
       { args: [
-                "-c",
-                "for i in $(seq 1 2 100000); do echo $i; echo $(($i + 1)) >&2; done",
-              ] }
+        "-c",
+        "for i in $(seq 1 2 100000); do echo $i; echo $(($i + 1)) >&2; done",
+      ] }
     }
 
     it "returns without deadlocking" do

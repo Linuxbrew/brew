@@ -31,51 +31,50 @@ require "hbc/cli/internal_stanza"
 module Hbc
   class CLI
     ALIASES = {
-                "ls"       => "list",
-                "homepage" => "home",
-                "-S"       => "search",    # verb starting with "-" is questionable
-                "up"       => "update",
-                "instal"   => "install",   # gem does the same
-                "rm"       => "uninstall",
-                "remove"   => "uninstall",
-                "abv"      => "info",
-                "dr"       => "doctor",
-                # aliases from Homebrew that we don't (yet) support
-                # 'ln'          => 'link',
-                # 'configure'   => 'diy',
-                # '--repo'      => '--repository',
-                # 'environment' => '--env',
-                # '-c1'         => '--config',
-              }.freeze
+      "ls"       => "list",
+      "homepage" => "home",
+      "-S"       => "search",    # verb starting with "-" is questionable
+      "up"       => "update",
+      "instal"   => "install",   # gem does the same
+      "rm"       => "uninstall",
+      "remove"   => "uninstall",
+      "abv"      => "info",
+      "dr"       => "doctor",
+      # aliases from Homebrew that we don't (yet) support
+      # 'ln'          => 'link',
+      # 'configure'   => 'diy',
+      # '--repo'      => '--repository',
+      # 'environment' => '--env',
+      # '-c1'         => '--config',
+    }.freeze
 
     OPTIONS = {
-                "--caskroom="             => :caskroom=,
-                "--appdir="               => :appdir=,
-                "--colorpickerdir="       => :colorpickerdir=,
-                "--prefpanedir="          => :prefpanedir=,
-                "--qlplugindir="          => :qlplugindir=,
-                "--fontdir="              => :fontdir=,
-                "--servicedir="           => :servicedir=,
-                "--input_methoddir="      => :input_methoddir=,
-                "--internet_plugindir="   => :internet_plugindir=,
-                "--audio_unit_plugindir=" => :audio_unit_plugindir=,
-                "--vst_plugindir="        => :vst_plugindir=,
-                "--vst3_plugindir="       => :vst3_plugindir=,
-                "--screen_saverdir="      => :screen_saverdir=,
-              }.freeze
+      "--caskroom="             => :caskroom=,
+      "--appdir="               => :appdir=,
+      "--colorpickerdir="       => :colorpickerdir=,
+      "--prefpanedir="          => :prefpanedir=,
+      "--qlplugindir="          => :qlplugindir=,
+      "--fontdir="              => :fontdir=,
+      "--servicedir="           => :servicedir=,
+      "--input_methoddir="      => :input_methoddir=,
+      "--internet_plugindir="   => :internet_plugindir=,
+      "--audio_unit_plugindir=" => :audio_unit_plugindir=,
+      "--vst_plugindir="        => :vst_plugindir=,
+      "--vst3_plugindir="       => :vst3_plugindir=,
+      "--screen_saverdir="      => :screen_saverdir=,
+    }.freeze
 
     FLAGS = {
-              "--no-binaries" => :no_binaries=,
-              "--debug"       => :debug=,
-              "--verbose"     => :verbose=,
-              "--outdated"    => :cleanup_outdated=,
-              "--help"        => :help=,
-            }.freeze
+      "--no-binaries" => :no_binaries=,
+      "--debug"       => :debug=,
+      "--verbose"     => :verbose=,
+      "--outdated"    => :cleanup_outdated=,
+      "--help"        => :help=,
+    }.freeze
 
     def self.command_classes
-      @command_classes ||= self.constants
-                               .map(&method(:const_get))
-                               .select { |sym| sym.respond_to?(:run) }
+      @command_classes ||= constants.map(&method(:const_get))
+                                    .select { |sym| sym.respond_to?(:run) }
     end
 
     def self.commands
@@ -114,7 +113,7 @@ module Hbc
         # for development and troubleshooting
         sym = Pathname.new(command.to_s).basename(".rb").to_s.capitalize
         klass = begin
-                  self.const_get(sym)
+                  const_get(sym)
                 rescue NameError
                   nil
                 end
@@ -129,7 +128,7 @@ module Hbc
         exec "brewcask-#{command}", *ARGV[1..-1]
       elsif Pathname.new(command.to_s).executable? &&
             command.to_s.include?("/") &&
-            !command.to_s.match(%r{\.rb$})
+            !command.to_s.match(/\.rb$/)
         # arbitrary external executable with literal path, useful
         # for development and troubleshooting
         exec command, *ARGV[1..-1]
@@ -163,7 +162,7 @@ module Hbc
       cask_taps = {}
       cask_list.each do |c|
         user, repo, token = c.split "/"
-        repo.sub!(%r{^homebrew-}i, "")
+        repo.sub!(/^homebrew-/i, "")
         cask_taps[token] ||= []
         cask_taps[token].push "#{user}/#{repo}"
       end
@@ -266,7 +265,7 @@ module Hbc
           next unless klass.visible
           puts "    #{klass.command_name.ljust(max_command_len)}  #{_help_for(klass)}"
         end
-        puts %Q{\nSee also "man brew-cask"}
+        puts %Q(\nSee also "man brew-cask")
       end
 
       def help

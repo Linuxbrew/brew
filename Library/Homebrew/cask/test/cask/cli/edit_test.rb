@@ -27,15 +27,15 @@ describe Hbc::CLI::Edit do
   it "opens the editor for the specified Cask" do
     Hbc::CLI::Edit.run("alfred")
     Hbc::CLI::Edit.editor_commands.must_equal [
-                                                [Hbc.path("alfred")],
-                                              ]
+      [Hbc.path("alfred")],
+    ]
   end
 
   it "throws away additional arguments and uses the first" do
     Hbc::CLI::Edit.run("adium", "alfred")
     Hbc::CLI::Edit.editor_commands.must_equal [
-                                                [Hbc.path("adium")],
-                                              ]
+      [Hbc.path("adium")],
+    ]
   end
 
   it "raises an exception when the Cask doesnt exist" do

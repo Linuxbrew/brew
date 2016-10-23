@@ -6,8 +6,13 @@ AllCops:
   Include:
     - '**/.simplecov'
   Exclude:
-    - 'cask/**/*'
+    - '**/Casks/**/*'
     - '**/vendor/**/*'
+
+Style/BlockDelimiters:
+  Exclude:
+    - '**/cask/spec/**/*'
+    - '**/cask/test/**/*'
 
 # so many of these in formulae but none in here
 Lint/AmbiguousRegexpLiteral:

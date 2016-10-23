@@ -3,9 +3,7 @@ require "test_helper"
 describe Hbc::Artifact::Suite do
   let(:cask) { Hbc.load("with-suite") }
 
-  let(:install_phase) {
-    lambda { Hbc::Artifact::Suite.new(cask).install_phase }
-  }
+  let(:install_phase) { -> { Hbc::Artifact::Suite.new(cask).install_phase } }
 
   let(:target_path) { Hbc.appdir.join("Caffeine") }
   let(:source_path) { cask.staged_path.join("Caffeine") }

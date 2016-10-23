@@ -201,10 +201,10 @@ describe Hbc::Artifact::Uninstall do
       let(:bundle_id) { "my.fancy.package.app" }
       let(:count_processes_script) {
         'tell application "System Events" to count processes ' +
-          %Q{whose bundle identifier is "#{bundle_id}"}
+          %Q(whose bundle identifier is "#{bundle_id}")
       }
       let(:quit_application_script) {
-        %Q{tell application id "#{bundle_id}" to quit}
+        %Q(tell application id "#{bundle_id}" to quit)
       }
 
       it "can uninstall" do
@@ -227,7 +227,7 @@ describe Hbc::Artifact::Uninstall do
       let(:unix_pids) { [12_345, 67_890] }
       let(:get_unix_pids_script) {
         'tell application "System Events" to get the unix id of every process ' +
-          %Q{whose bundle identifier is "#{bundle_id}"}
+          %Q(whose bundle identifier is "#{bundle_id}")
       }
 
       it "can uninstall" do
