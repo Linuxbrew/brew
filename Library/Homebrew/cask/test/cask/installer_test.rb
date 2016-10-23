@@ -2,6 +2,10 @@ require "test_helper"
 
 describe Hbc::Installer do
   describe "install" do
+    let(:empty_depends_on_stub) {
+      stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
+    }
+
     it "downloads and installs a nice fresh Cask" do
       caffeine = Hbc.load("local-caffeine")
 
@@ -44,11 +48,11 @@ describe Hbc::Installer do
     it "works with cab-based Casks" do
       skip("cabextract not installed") if which("cabextract").nil?
       asset = Hbc.load("container-cab")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-cab", asset.version)
@@ -74,11 +78,11 @@ describe Hbc::Installer do
     it "works with 7z-based Casks" do
       skip("unar not installed") if which("unar").nil?
       asset = Hbc.load("container-7z")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-7z", asset.version)
@@ -103,11 +107,11 @@ describe Hbc::Installer do
     it "works with Stuffit-based Casks" do
       skip("unar not installed") if which("unar").nil?
       asset = Hbc.load("container-sit")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-sit", asset.version)
@@ -119,11 +123,11 @@ describe Hbc::Installer do
     it "works with RAR-based Casks" do
       skip("unar not installed") if which("unar").nil?
       asset = Hbc.load("container-rar")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-rar", asset.version)
@@ -161,11 +165,11 @@ describe Hbc::Installer do
     it "works with pure xz-based Casks" do
       skip("unxz not installed") if which("unxz").nil?
       asset = Hbc.load("container-xz")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-xz", asset.version)
@@ -177,11 +181,11 @@ describe Hbc::Installer do
     it "works with lzma-based Casks" do
       skip("unlzma not installed") if which("unlzma").nil?
       asset = Hbc.load("container-lzma")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-lzma", asset.version)
