@@ -50,7 +50,7 @@ Hbc.default_tap = Tap.fetch("caskroom", "test").tap do |tap|
 end
 
 # pretend that the caskroom/cask Tap is installed
-FileUtils.ln_s HOMEBREW_LIBRARY.join("Taps", "caskroom", "homebrew-cask"), Tap.fetch("caskroom", "cask").path
+FileUtils.ln_s Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask"), Tap.fetch("caskroom", "cask").path
 
 class TestHelper
   # helpers for test Casks to reference local files easily

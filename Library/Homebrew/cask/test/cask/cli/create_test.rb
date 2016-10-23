@@ -25,7 +25,7 @@ describe Hbc::CLI::Create do
   end
 
   after do
-    %w[new-cask additional-cask another-cask yet-another-cask feine].each do |cask|
+    %w[new-cask additional-cask another-cask yet-another-cask local-caff].each do |cask|
       path = Hbc.path(cask)
       path.delete if path.exist?
     end
@@ -71,14 +71,14 @@ describe Hbc::CLI::Create do
 
   it "raises an exception when the Cask already exists" do
     lambda {
-      Hbc::CLI::Create.run("caffeine")
+      Hbc::CLI::Create.run("basic-cask")
     }.must_raise Hbc::CaskAlreadyCreatedError
   end
 
   it "allows creating Casks that are substrings of existing Casks" do
-    Hbc::CLI::Create.run("feine")
+    Hbc::CLI::Create.run("local-caff")
     Hbc::CLI::Create.editor_commands.must_equal [
-      [Hbc.path("feine")],
+      [Hbc.path("local-caff")],
     ]
   end
 
