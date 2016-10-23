@@ -64,6 +64,12 @@ module Hbc
         @qlplugindir ||= Pathname.new("~/Library/QuickLook").expand_path
       end
 
+      attr_writer :dictionarydir
+
+      def dictionarydir
+        @dictionarydir ||= Pathname.new("~/Library/Dictionaries").expand_path
+      end
+
       attr_writer :fontdir
 
       def fontdir

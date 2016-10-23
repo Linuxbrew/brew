@@ -155,6 +155,9 @@ in a future version.
   * `--qlplugindir=<path>`:
     Target location for QuickLook Plugins. The default value is `~/Library/QuickLook`.
 
+  * `--dictionarydir=<path>`:
+    Target location for Dictionaries. The default value is `~/Library/Dictionaries`.
+
   * `--fontdir=<path>`:
     Target location for Fonts. The default value is `~/Library/Fonts`.
 

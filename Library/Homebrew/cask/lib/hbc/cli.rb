@@ -54,6 +54,7 @@ module Hbc
       "--colorpickerdir="       => :colorpickerdir=,
       "--prefpanedir="          => :prefpanedir=,
       "--qlplugindir="          => :qlplugindir=,
+      "--dictionarydir="        => :dictionarydir=,
       "--fontdir="              => :fontdir=,
       "--servicedir="           => :servicedir=,
       "--input_methoddir="      => :input_methoddir=,
