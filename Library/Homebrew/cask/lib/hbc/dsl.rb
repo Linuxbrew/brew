@@ -24,6 +24,7 @@ module Hbc
       :audio_unit_plugin,
       :binary,
       :colorpicker,
+      :dictionary,
       :font,
       :input_method,
       :internet_plugin,

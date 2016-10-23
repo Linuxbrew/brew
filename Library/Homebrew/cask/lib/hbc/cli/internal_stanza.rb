@@ -28,6 +28,7 @@ module Hbc
         :artifact,
         :prefpane,
         :qlplugin,
+        :dictionary,
         :font,
         :service,
         :colorpicker,
