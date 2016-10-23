@@ -9,7 +9,7 @@ module Hbc
 
             if cask.installed?
               # use copy of cask for uninstallation to avoid 'No such file or directory' bug
-              installed_cask = cask;
+              installed_cask = cask
               latest_installed_version = installed_cask.timestamped_versions.last
 
               unless latest_installed_version.nil?
