@@ -50,8 +50,7 @@ module Hbc
       def load(pairs = {})
         pairs.each do |key, value|
           raise "invalid depends_on key: '#{key.inspect}'" unless VALID_KEYS.include?(key)
-          writer_method = "#{key}=".to_sym
-          @pairs[key] = send(writer_method, value)
+          @pairs[key] = send(:"#{key}=", *value)
         end
       end
 
@@ -74,33 +73,33 @@ module Hbc
         end
       end
 
-      def formula=(*arg)
+      def formula=(*args)
         @formula ||= []
-        @formula.concat(Array(*arg))
+        @formula.concat(args)
       end
 
-      def cask=(*arg)
+      def cask=(*args)
         @cask ||= []
-        @cask.concat(Array(*arg))
+        @cask.concat(args)
       end
 
-      def macos=(*arg)
+      def macos=(*args)
         @macos ||= []
-        macos = if arg.count == 1 && arg.first =~ /^\s*(<|>|[=<>]=)\s*(\S+)\s*$/
+        macos = if args.count == 1 && args.first =~ /^\s*(<|>|[=<>]=)\s*(\S+)\s*$/
           raise "'depends_on macos' comparison expressions cannot be combined" unless @macos.empty?
           operator = Regexp.last_match[1].to_sym
           release = self.class.coerce_os_release(Regexp.last_match[2])
           [[operator, release]]
         else
           raise "'depends_on macos' comparison expressions cannot be combined" if @macos.first.is_a?(Symbol)
-          [*arg].map(&self.class.method(:coerce_os_release)).sort
+          args.map(&self.class.method(:coerce_os_release)).sort
         end
         @macos.concat(macos)
       end
 
-      def arch=(*arg)
+      def arch=(*args)
         @arch ||= []
-        arches = Array(*arg).map do |elt|
+        arches = args.map do |elt|
           elt = elt.to_s.downcase.sub(/^:/, "").tr("-", "_").to_sym
           ARCH_SYNONYMS.key?(elt) ? ARCH_SYNONYMS[elt] : elt
         end
