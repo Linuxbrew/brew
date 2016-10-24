@@ -146,7 +146,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
       FileUtils.chmod 0755, file
       ENV["PATH"] = "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
 
-      assert_match %("config" scripts exist),
+      assert_match '"config" scripts exist',
         @checks.check_for_config_scripts
     end
   end

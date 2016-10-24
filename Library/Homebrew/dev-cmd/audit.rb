@@ -716,11 +716,11 @@ class FormulaAuditor
     end
 
     if text =~ /system\s+['"]xcodebuild/
-      problem %(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
+      problem %q(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
     end
 
     if text =~ /xcodebuild[ (]["'*]/ && !text.include?("SYMROOT=")
-      problem %(xcodebuild should be passed an explicit "SYMROOT")
+      problem 'xcodebuild should be passed an explicit "SYMROOT"'
     end
 
     if text.include? "Formula.factory("
@@ -1002,9 +1002,9 @@ class FormulaAuditor
 
     case condition
     when /if build\.include\? ['"]with-#{dep}['"]$/, /if build\.with\? ['"]#{dep}['"]$/
-      problem %(Replace #{line.inspect} with "depends_on #{quoted_dep} => :optional")
+      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :optional")
     when /unless build\.include\? ['"]without-#{dep}['"]$/, /unless build\.without\? ['"]#{dep}['"]$/
-      problem %(Replace #{line.inspect} with "depends_on #{quoted_dep} => :recommended")
+      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :recommended")
     end
   end
 
