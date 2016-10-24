@@ -187,14 +187,11 @@ module Homebrew
 
     keg.lock do
       original_tab = nil
+      changed_files = nil
 
       begin
         unless ARGV.include? "--skip-relocation"
-          keg.relocate_dynamic_linkage prefix, Keg::PREFIX_PLACEHOLDER,
-            cellar, Keg::CELLAR_PLACEHOLDER
-          keg.relocate_text_files prefix, Keg::PREFIX_PLACEHOLDER,
-            cellar, Keg::CELLAR_PLACEHOLDER,
-            repository, Keg::REPOSITORY_PLACEHOLDER
+          changed_files = keg.replace_locations_with_placeholders
         end
 
         keg.delete_pyc_files!
@@ -205,6 +202,7 @@ module Homebrew
         tab.poured_from_bottle = false
         tab.HEAD = nil
         tab.time = nil
+        tab.changed_files = changed_files
         tab.write
 
         keg.find do |file|
@@ -264,11 +262,7 @@ module Homebrew
         ignore_interrupts do
           original_tab.write if original_tab
           unless ARGV.include? "--skip-relocation"
-            keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, prefix,
-              Keg::CELLAR_PLACEHOLDER, cellar
-            keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, prefix,
-              Keg::CELLAR_PLACEHOLDER, cellar,
-              Keg::REPOSITORY_PLACEHOLDER, repository
+            keg.replace_placeholders_with_locations changed_files
           end
         end
       end

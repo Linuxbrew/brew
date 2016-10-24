@@ -11,6 +11,7 @@ class TabTests < Homebrew::TestCase
                    "unused_options"       => @unused.as_flags,
                    "built_as_bottle"      => false,
                    "poured_from_bottle"   => true,
+                   "changed_files"        => [],
                    "time"                 => nil,
                    "source_modified_time" => 0,
                    "HEAD"                 => TEST_SHA1,
@@ -33,6 +34,7 @@ class TabTests < Homebrew::TestCase
     tab = Tab.empty
     assert_empty tab.unused_options
     assert_empty tab.used_options
+    assert_nil tab.changed_files
     refute_predicate tab, :built_as_bottle
     refute_predicate tab, :poured_from_bottle
     assert_predicate tab, :stable?
@@ -105,9 +107,11 @@ class TabTests < Homebrew::TestCase
     tab = Tab.from_file(path)
     source_path = "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb"
     runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
+    changed_files = %w[INSTALL_RECEIPT.json bin/foo]
 
     assert_equal @used.sort, tab.used_options.sort
     assert_equal @unused.sort, tab.unused_options.sort
+    assert_equal changed_files, tab.changed_files
     refute_predicate tab, :built_as_bottle
     assert_predicate tab, :poured_from_bottle
     assert_predicate tab, :stable?
@@ -187,6 +191,7 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.unused_options.sort, tab.unused_options.sort
     assert_equal @tab.built_as_bottle, tab.built_as_bottle
     assert_equal @tab.poured_from_bottle, tab.poured_from_bottle
+    assert_equal @tab.changed_files, tab.changed_files
     assert_equal @tab.tap, tab.tap
     assert_equal @tab.spec, tab.spec
     assert_equal @tab.time, tab.time

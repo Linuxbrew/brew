@@ -3,6 +3,14 @@ class Keg
   CELLAR_PLACEHOLDER = "@@HOMEBREW_CELLAR@@".freeze
   REPOSITORY_PLACEHOLDER = "@@HOMEBREW_REPOSITORY@@".freeze
 
+  Relocation = Struct.new(:old_prefix, :old_cellar, :old_repository,
+                          :new_prefix, :new_cellar, :new_repository) do
+    # Use keyword args instead of positional args for initialization
+    def initialize(**kwargs)
+      super(*members.map { |k| kwargs[k] })
+    end
+  end
+
   def fix_dynamic_linkage
     symlink_files.each do |file|
       link = file.readlink
@@ -15,21 +23,54 @@ class Keg
   end
   alias generic_fix_dynamic_linkage fix_dynamic_linkage
 
-  def relocate_dynamic_linkage(_old_prefix, _new_prefix, _old_cellar, _new_cellar)
+  def relocate_dynamic_linkage(_relocation)
     []
   end
 
-  def relocate_text_files(old_prefix, new_prefix, old_cellar, new_cellar,
-                          old_repository, new_repository)
-    files = text_files | libtool_files
+  def replace_locations_with_placeholders
+    relocation = Relocation.new(
+      old_prefix: HOMEBREW_PREFIX.to_s,
+      old_cellar: HOMEBREW_CELLAR.to_s,
+      old_repository: HOMEBREW_REPOSITORY.to_s,
+      new_prefix: PREFIX_PLACEHOLDER,
+      new_cellar: CELLAR_PLACEHOLDER,
+      new_repository: REPOSITORY_PLACEHOLDER
+    )
+    relocate_dynamic_linkage(relocation)
+    replace_text_in_files(relocation)
+  end
 
-    files.group_by { |f| f.stat.ino }.each_value do |first, *rest|
+  def replace_placeholders_with_locations(files)
+    relocation = Relocation.new(
+      old_prefix: PREFIX_PLACEHOLDER,
+      old_cellar: CELLAR_PLACEHOLDER,
+      old_repository: REPOSITORY_PLACEHOLDER,
+      new_prefix: HOMEBREW_PREFIX.to_s,
+      new_cellar: HOMEBREW_CELLAR.to_s,
+      new_repository: HOMEBREW_REPOSITORY.to_s
+    )
+    relocate_dynamic_linkage(relocation)
+    replace_text_in_files(relocation, files: files)
+  end
+
+  def replace_text_in_files(relocation, files: nil)
+    files ||= text_files | libtool_files
+
+    changed_files = []
+    files.map(&path.method(:join)).group_by { |f| f.stat.ino }.each_value do |first, *rest|
       s = first.open("rb", &:read)
-      changed = s.gsub!(old_cellar, new_cellar)
-      changed = s.gsub!(old_prefix, new_prefix) || changed
-      changed = s.gsub!(old_repository, new_repository) || changed
+
+      replacements = {
+        relocation.old_prefix => relocation.new_prefix,
+        relocation.old_cellar => relocation.new_cellar,
+        relocation.old_repository => relocation.new_repository,
+      }
+
+      regexp = Regexp.union(replacements.keys)
+      changed = s.gsub!(regexp, replacements)
 
       next unless changed
+      changed_files << first.relative_path_from(path)
 
       begin
         first.atomic_write(s)
@@ -41,6 +82,7 @@ class Keg
         rest.each { |file| FileUtils.ln(first, file, force: true) }
       end
     end
+    changed_files
   end
 
   def detect_cxx_stdlibs(_options = {})
