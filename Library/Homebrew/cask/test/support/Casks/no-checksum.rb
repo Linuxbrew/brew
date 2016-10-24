@@ -2,7 +2,7 @@ test_cask 'no-checksum' do
   version '1.2.3'
   sha256 :no_check
 
-  url TestHelper.local_binary_url('caffeine.zip')
+  url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
   homepage 'http://example.com/local-caffeine'
 
   app 'Caffeine.app'

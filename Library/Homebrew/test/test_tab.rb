@@ -81,7 +81,7 @@ class TabTests < Homebrew::TestCase
   end
 
   def test_from_old_version_file
-    path = Pathname.new(TEST_DIRECTORY).join("fixtures", "receipt_old.json")
+    path = Pathname.new("#{TEST_FIXTURE_DIR}/receipt_old.json")
     tab = Tab.from_file(path)
 
     assert_equal @used.sort, tab.used_options.sort
@@ -101,7 +101,7 @@ class TabTests < Homebrew::TestCase
   end
 
   def test_from_file
-    path = Pathname.new(TEST_DIRECTORY).join("fixtures", "receipt.json")
+    path = Pathname.new("#{TEST_FIXTURE_DIR}/receipt.json")
     tab = Tab.from_file(path)
     source_path = "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb"
     runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]

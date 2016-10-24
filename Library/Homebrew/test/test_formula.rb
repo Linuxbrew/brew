@@ -634,7 +634,7 @@ class FormulaTests < Homebrew::TestCase
       url "foo-1.0"
     end
 
-    assert_equal Pathname.new("#{HOMEBREW_LIBRARY}/Homebrew/test/fixtures/foo"),
+    assert_equal Pathname.new("#{HOMEBREW_LIBRARY_PATH}/test/fixtures/foo"),
       f1.test_fixtures("foo")
   end
 
