@@ -89,9 +89,6 @@ names, and other aspects of this manual are still subject to change.
   * `reinstall` <token> [ <token> ...]
     Reinstall the given Cask.
 
-    <token> is usually the ID of a Cask as returned by `brew cask search`,
-    but see [OTHER WAYS TO SPECIFY A CASK][] for variations.
-
   * `search` or `-S` [<text> | /<regexp>/]:
     Without argument, display all Casks available for install, otherwise
     perform a substring search of known Cask tokens for <text> or, if the
