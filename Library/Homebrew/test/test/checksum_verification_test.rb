@@ -12,7 +12,7 @@ class ChecksumVerificationTests < Homebrew::TestCase
 
   def formula(&block)
     super do
-      url "file://#{TEST_DIRECTORY}/tarballs/testball-0.1.tbz"
+      url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
       instance_eval(&block)
     end
   end

@@ -218,7 +218,7 @@ class TabLoadingTests < Homebrew::TestCase
     @f = formula { url "foo-1.0" }
     @f.prefix.mkpath
     @path = @f.prefix.join(Tab::FILENAME)
-    @path.write Pathname.new(TEST_DIRECTORY).join("fixtures", "receipt.json").read
+    @path.write TEST_FIXTURE_DIR.join("receipt.json").read
   end
 
   def teardown

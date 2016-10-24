@@ -14,7 +14,7 @@ TEST_TMPDIR = ENV.fetch("HOMEBREW_TEST_TMPDIR") do |k|
 end
 
 # Paths pointing into the Homebrew code base that persist across test runs
-HOMEBREW_LIBRARY_PATH  = Pathname.new(File.expand_path("../../..", __FILE__))
+HOMEBREW_LIBRARY_PATH  = Pathname.new(File.expand_path("../../../..", __FILE__))
 HOMEBREW_SHIMS_PATH    = HOMEBREW_LIBRARY_PATH.parent+"Homebrew/shims"
 HOMEBREW_LOAD_PATH     = [File.expand_path("..", __FILE__), HOMEBREW_LIBRARY_PATH].join(":")
 
@@ -31,7 +31,7 @@ HOMEBREW_CELLAR        = HOMEBREW_PREFIX.parent+"cellar"
 HOMEBREW_LOGS          = HOMEBREW_PREFIX.parent+"logs"
 HOMEBREW_TEMP          = HOMEBREW_PREFIX.parent+"temp"
 
-TEST_FIXTURE_DIR = HOMEBREW_LIBRARY_PATH.join("test", "fixtures")
+TEST_FIXTURE_DIR = HOMEBREW_LIBRARY_PATH.join("test", "support", "fixtures")
 
 TESTBALL_SHA1 = "be478fd8a80fe7f29196d6400326ac91dad68c37".freeze
 TESTBALL_SHA256 = "91e3f7930c98d7ccfb288e115ed52d06b0e5bc16fec7dce8bdda86530027067b".freeze

@@ -3,8 +3,8 @@ require "formula"
 require "formula_installer"
 require "keg"
 require "tab"
-require "testball"
-require "testball_bottle"
+require "test/support/fixtures/testball"
+require "test/support/fixtures/testball_bottle"
 
 class InstallBottleTests < Homebrew::TestCase
   def temporary_bottle_install(formula)

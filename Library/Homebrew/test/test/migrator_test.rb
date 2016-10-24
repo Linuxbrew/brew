@@ -1,6 +1,6 @@
 require "testing_env"
 require "migrator"
-require "testball"
+require "test/support/fixtures/testball"
 require "tab"
 require "keg"
 

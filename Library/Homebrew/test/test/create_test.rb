@@ -1,8 +1,9 @@
-require "helper/integration_command_test_case"
+require "testing_env"
+require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestCreate < IntegrationCommandTestCase
   def test_create
-    url = "file://#{TEST_DIRECTORY}/tarballs/testball-0.1.tbz"
+    url = "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
     cmd("create", url, "HOMEBREW_EDITOR" => "/bin/cat")
 
     formula_file = CoreTap.new.formula_dir/"testball.rb"

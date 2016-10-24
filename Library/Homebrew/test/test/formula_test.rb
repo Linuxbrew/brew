@@ -1,5 +1,5 @@
 require "testing_env"
-require "testball"
+require "test/support/fixtures/testball"
 require "formula"
 
 class FormulaTests < Homebrew::TestCase

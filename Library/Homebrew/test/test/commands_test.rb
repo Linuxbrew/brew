@@ -2,7 +2,8 @@ require "testing_env"
 require "cmd/command"
 require "cmd/commands"
 require "fileutils"
-require "helper/integration_command_test_case"
+require "testing_env"
+require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestCommands < IntegrationCommandTestCase
   def test_commands

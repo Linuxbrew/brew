@@ -1,5 +1,5 @@
 $:.unshift File.expand_path("../..", __FILE__)
-$:.unshift File.expand_path("../lib", __FILE__)
+$:.unshift File.expand_path("../support/lib", __FILE__)
 
 require "simplecov" if ENV["HOMEBREW_TESTS_COVERAGE"]
 require "global"
@@ -8,9 +8,6 @@ require "formulary"
 # Test environment setup
 (HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-core/Formula").mkpath
 %w[cache formula_cache locks cellar logs temp].each { |d| HOMEBREW_PREFIX.parent.join(d).mkpath }
-
-# Test fixtures and files can be found relative to this path
-TEST_DIRECTORY = File.dirname(File.expand_path(__FILE__))
 
 begin
   require "rubygems"
@@ -43,7 +40,9 @@ module Homebrew
   module FSLeakLogger
     def self.included(klass)
       require "find"
-      @@log = File.open(HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log", "w")
+      logdir = HOMEBREW_LIBRARY_PATH.join("tmp")
+      logdir.mkdir unless logdir.directory?
+      @@log = File.open(logdir.join("fs_leak.log"), "w")
       klass.make_my_diffs_pretty!
     end
 
@@ -63,8 +62,8 @@ module Homebrew
   end
 
   class TestCase < ::Minitest::Test
-    require "test/helper/env"
-    require "test/helper/shutup"
+    require "test/support/helper/env"
+    require "test/support/helper/shutup"
     include Test::Helper::Env
     include Test::Helper::Shutup
 
@@ -107,11 +106,11 @@ module Homebrew
     end
 
     def dylib_path(name)
-      Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.dylib")
+      Pathname.new("#{TEST_FIXTURE_DIR}/mach/#{name}.dylib")
     end
 
     def bundle_path(name)
-      Pathname.new("#{TEST_DIRECTORY}/mach/#{name}.bundle")
+      Pathname.new("#{TEST_FIXTURE_DIR}/mach/#{name}.bundle")
     end
 
     # Use a stubbed {Formulary::FormulaLoader} to make a given formula be found

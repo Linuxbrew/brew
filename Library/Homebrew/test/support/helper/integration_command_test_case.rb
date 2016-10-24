@@ -1,5 +1,4 @@
 require "bundler"
-require "testing_env"
 require "fileutils"
 require "pathname"
 require "formula"
@@ -21,6 +20,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
       HOMEBREW_LOCK_DIR.children,
       HOMEBREW_LOGS.children,
       HOMEBREW_TEMP.children,
+      HOMEBREW_PREFIX/".git",
       HOMEBREW_PREFIX/"bin",
       HOMEBREW_PREFIX/"share",
       HOMEBREW_PREFIX/"opt",
@@ -59,7 +59,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
     env = args.last.is_a?(Hash) ? args.pop : {}
     cmd_args = %W[
       -W0
-      -I#{HOMEBREW_LIBRARY_PATH}/test/lib
+      -I#{HOMEBREW_LIBRARY_PATH}/test/support/lib
       -rconfig
     ]
     if ENV["HOMEBREW_TESTS_COVERAGE"]
@@ -125,7 +125,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
       content = <<-EOS.undent
         desc "Some test"
         homepage "https://example.com/#{name}"
-        url "file://#{File.expand_path("../..", __FILE__)}/tarballs/testball-0.1.tbz"
+        url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
         sha256 "#{TESTBALL_SHA256}"
 
         option "with-foo", "Build with foo"
@@ -195,6 +195,6 @@ class IntegrationCommandTestCase < Homebrew::TestCase
   end
 
   def testball
-    "#{File.expand_path("../..", __FILE__)}/testball.rb"
+    "#{TEST_FIXTURE_DIR}/testball.rb"
   end
 end

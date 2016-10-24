@@ -17,8 +17,8 @@ class CleanerTests < Homebrew::TestCase
   def test_clean_file
     @f.bin.mkpath
     @f.lib.mkpath
-    cp "#{TEST_DIRECTORY}/mach/a.out", @f.bin
-    cp Dir["#{TEST_DIRECTORY}/mach/*.dylib"], @f.lib
+    cp "#{TEST_FIXTURE_DIR}/mach/a.out", @f.bin
+    cp Dir["#{TEST_FIXTURE_DIR}/mach/*.dylib"], @f.lib
 
     Cleaner.new(@f).clean
 

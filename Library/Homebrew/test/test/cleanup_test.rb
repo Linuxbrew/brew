@@ -1,9 +1,10 @@
 require "testing_env"
-require "testball"
+require "test/support/fixtures/testball"
 require "cleanup"
 require "fileutils"
 require "pathname"
-require "helper/integration_command_test_case"
+require "testing_env"
+require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestCleanup < IntegrationCommandTestCase
   def test_cleanup

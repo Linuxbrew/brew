@@ -1,4 +1,5 @@
-require "helper/integration_command_test_case"
+require "testing_env"
+require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestTestFormula < IntegrationCommandTestCase
   def test_test_formula
@@ -13,7 +14,7 @@ class IntegrationCommandTestTestFormula < IntegrationCommandTestCase
       head "https://github.com/example/testball2.git"
 
       devel do
-        url "file://#{File.expand_path("..", __FILE__)}/tarballs/testball-0.1.tbz"
+        url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
         sha256 "#{TESTBALL_SHA256}"
       end
 

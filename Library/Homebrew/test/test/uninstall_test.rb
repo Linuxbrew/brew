@@ -1,4 +1,4 @@
-require "helper/integration_command_test_case"
+require "test/support/helper/integration_command_test_case"
 require "cmd/uninstall"
 
 class UninstallTests < Homebrew::TestCase

@@ -41,7 +41,7 @@ class MachOPathnameTests < Homebrew::TestCase
   end
 
   def test_mach_o_executable
-    pn = Pathname.new("#{TEST_DIRECTORY}/mach/a.out")
+    pn = Pathname.new("#{TEST_FIXTURE_DIR}/mach/a.out")
     assert_predicate pn, :universal?
     refute_predicate pn, :i386?
     refute_predicate pn, :x86_64?
@@ -93,7 +93,7 @@ class MachOPathnameTests < Homebrew::TestCase
   end
 
   def test_non_mach_o
-    pn = Pathname.new("#{TEST_DIRECTORY}/tarballs/testball-0.1.tbz")
+    pn = Pathname.new("#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz")
     refute_predicate pn, :universal?
     refute_predicate pn, :i386?
     refute_predicate pn, :x86_64?

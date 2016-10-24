@@ -1,4 +1,5 @@
-require "helper/integration_command_test_case"
+require "testing_env"
+require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestReadall < IntegrationCommandTestCase
   def test_readall
