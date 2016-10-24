@@ -1,4 +1,5 @@
 require "hbc/checkable"
+require "hbc/fetcher"
 
 module Hbc
   class UrlChecker
