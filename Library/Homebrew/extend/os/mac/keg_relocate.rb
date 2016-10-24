@@ -17,19 +17,19 @@ class Keg
     generic_fix_dynamic_linkage
   end
 
-  def relocate_dynamic_linkage(old_prefix, new_prefix, old_cellar, new_cellar)
+  def relocate_dynamic_linkage(relocation)
     mach_o_files.each do |file|
       file.ensure_writable do
         if file.dylib?
-          id = dylib_id_for(file).sub(old_prefix, new_prefix)
+          id = dylib_id_for(file).sub(relocation.old_prefix, relocation.new_prefix)
           change_dylib_id(id, file)
         end
 
         each_install_name_for(file) do |old_name|
-          if old_name.start_with? old_cellar
-            new_name = old_name.sub(old_cellar, new_cellar)
-          elsif old_name.start_with? old_prefix
-            new_name = old_name.sub(old_prefix, new_prefix)
+          if old_name.start_with? relocation.old_cellar
+            new_name = old_name.sub(relocation.old_cellar, relocation.new_cellar)
+          elsif old_name.start_with? relocation.old_prefix
+            new_name = old_name.sub(relocation.old_prefix, relocation.new_prefix)
           end
 
           change_install_name(old_name, new_name, file) if new_name
