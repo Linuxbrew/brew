@@ -637,6 +637,8 @@ class FormulaAuditor
 
     stable = formula.stable
     case stable && stable.url
+    when /[\d\._-](alpha|beta|rc\d)/
+      problem "Stable version URLs should not contain #{$1}"
     when %r{download\.gnome\.org/sources}, %r{ftp\.gnome\.org/pub/GNOME/sources}i
       version = Version.parse(stable.url)
       if version >= Version.create("1.0")
