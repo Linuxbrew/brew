@@ -13,7 +13,7 @@ class ExceptionsTest < Homebrew::TestCase
   end
 
   def test_formula_validation_error
-    assert_equal %(invalid attribute for formula 'foo': sha257 ("magic")),
+    assert_equal %q(invalid attribute for formula 'foo': sha257 ("magic")),
       FormulaValidationError.new("foo", "sha257", "magic").to_s
   end
 
