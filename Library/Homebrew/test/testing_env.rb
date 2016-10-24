@@ -43,7 +43,7 @@ module Homebrew
   module FSLeakLogger
     def self.included(klass)
       require "find"
-      @@log = File.open("#{__dir__}/fs_leak_log", "w")
+      @@log = File.open(HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log", "w")
       klass.make_my_diffs_pretty!
     end
 

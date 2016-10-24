@@ -65,7 +65,7 @@ module Homebrew
 
       Homebrew.failed = !$?.success?
 
-      if (fs_leak_log = HOMEBREW_LIBRARY/"Homebrew/test/fs_leak_log").file?
+      if (fs_leak_log = HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log").file?
         fs_leak_log_content = fs_leak_log.read
         unless fs_leak_log_content.empty?
           opoo "File leak is detected"
