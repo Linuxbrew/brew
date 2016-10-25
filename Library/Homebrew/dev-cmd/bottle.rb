@@ -190,11 +190,11 @@ module Homebrew
       changed_files = nil
 
       begin
+        keg.delete_pyc_files!
+
         unless ARGV.include? "--skip-relocation"
           changed_files = keg.replace_locations_with_placeholders
         end
-
-        keg.delete_pyc_files!
 
         Tab.clear_cache
         tab = Tab.for_keg(keg)
