@@ -50,7 +50,6 @@ class IntegrationCommandTestUninstall < IntegrationCommandTestCase
   def test_uninstall
     cmd("install", "testball_f2")
     run_as_not_developer do
-
       assert_match "Refusing to uninstall",
         cmd_fail("uninstall", "testball_f1")
       refute_empty f1.installed_kegs
@@ -62,7 +61,6 @@ class IntegrationCommandTestUninstall < IntegrationCommandTestCase
       assert_match "Uninstalling #{f1.rack}",
         cmd("uninstall", "testball_f1")
       assert_empty f1.installed_kegs
-
     end
   end
 end
