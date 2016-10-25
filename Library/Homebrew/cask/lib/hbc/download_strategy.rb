@@ -105,7 +105,7 @@ module Hbc
       else
         had_incomplete_download = temporary_path.exist?
         begin
-          File.open(temporary_path, "w+") do |f|
+          File.open(temporary_path, "a+") do |f|
             f.flock(File::LOCK_EX)
             _fetch
             f.flock(File::LOCK_UN)
