@@ -104,9 +104,9 @@ class Keg
     # so need them to be calculated now.
     #
     # This happens after the initial dependency check because it's sloooow.
-    remaining_formulae = Formula.installed.select { |f|
+    remaining_formulae = Formula.installed.select do |f|
       f.installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
-    }
+    end
 
     keg_names = kegs.map(&:name)
     kegs_by_name = kegs.group_by(&:to_formula)

@@ -16,10 +16,10 @@ module Homebrew
     raise KegUnspecifiedError if ARGV.named.empty?
 
     kegs_by_rack = if ARGV.force?
-      Hash[ARGV.named.map { |name|
+      Hash[ARGV.named.map do |name|
         rack = Formulary.to_rack(name)
         [rack, rack.subdirs.map { |d| Keg.new(d) }]
-      }]
+      end]
     else
       ARGV.kegs.group_by(&:rack)
     end
