@@ -329,8 +329,11 @@ Migrate renamed packages to new name, where \fIformulae\fR are old names of pack
 If \fB\-\-force\fR is passed, then treat installed \fIformulae\fR and passed \fIformulae\fR like if they are from same taps and migrate them anyway\.
 .
 .TP
-\fBmissing\fR [\fIformulae\fR]
+\fBmissing\fR [\fB\-\-hide=\fR\fIhidden\fR] [\fIformulae\fR]
 Check the given \fIformulae\fR for missing dependencies\. If no \fIformulae\fR are given, check all installed brews\.
+.
+.IP
+If \fB\-\-hide=\fR\fIhidden\fR is passed, act as if none of \fIhidden\fR are installed\. \fIhidden\fR should be a comma\-seperated list of formulae\.
 .
 .TP
 \fBoptions\fR [\fB\-\-compact\fR] (\fB\-\-all\fR|\fB\-\-installed\fR|\fIformulae\fR)
@@ -484,11 +487,14 @@ Pin \fItap\fR, prioritizing its formulae over core when formula names are suppli
 Unpin \fItap\fR so its formulae are no longer prioritized\. See also \fBtap\-pin\fR\.
 .
 .TP
-\fBuninstall\fR, \fBrm\fR, \fBremove\fR [\fB\-\-force\fR] \fIformula\fR
+\fBuninstall\fR, \fBrm\fR, \fBremove\fR [\fB\-\-force\fR] [\fB\-\-ignore\-dependencies\fR] \fIformula\fR
 Uninstall \fIformula\fR\.
 .
 .IP
 If \fB\-\-force\fR is passed, and there are multiple versions of \fIformula\fR installed, delete all installed versions\.
+.
+.IP
+If \fB\-\-ignore\-dependencies\fR is passed, uninstalling won\'t fail, even if formulae depending on \fIformula\fR would still be installed\.
 .
 .TP
 \fBunlink\fR [\fB\-\-dry\-run\fR] \fIformula\fR

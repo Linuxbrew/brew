@@ -245,8 +245,11 @@ packages.</p>
 
 <p>If <code>--force</code> is passed, then treat installed <var>formulae</var> and passed <var>formulae</var>
 like if they are from same taps and migrate them anyway.</p></dd>
-<dt><code>missing</code> [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies. If no <var>formulae</var> are
-given, check all installed brews.</p></dd>
+<dt><code>missing</code> [<code>--hide=</code><var>hidden</var>] [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies. If no <var>formulae</var> are
+given, check all installed brews.</p>
+
+<p>If <code>--hide=</code><var>hidden</var> is passed, act as if none of <var>hidden</var> are installed.
+<var>hidden</var> should be a comma-seperated list of formulae.</p></dd>
 <dt><code>options</code> [<code>--compact</code>] (<code>--all</code>|<code>--installed</code>|<var>formulae</var>)</dt><dd><p>Display install options specific to <var>formulae</var>.</p>
 
 <p>If <code>--compact</code> is passed, show all options on a single line separated by
@@ -348,10 +351,13 @@ for <var>version</var> is <code>v1</code>.</p>
 <dt><code>tap-pin</code> <var>tap</var></dt><dd><p>Pin <var>tap</var>, prioritizing its formulae over core when formula names are supplied
 by the user. See also <code>tap-unpin</code>.</p></dd>
 <dt><code>tap-unpin</code> <var>tap</var></dt><dd><p>Unpin <var>tap</var> so its formulae are no longer prioritized. See also <code>tap-pin</code>.</p></dd>
-<dt><code>uninstall</code>, <code>rm</code>, <code>remove</code> [<code>--force</code>] <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p>
+<dt><code>uninstall</code>, <code>rm</code>, <code>remove</code> [<code>--force</code>] [<code>--ignore-dependencies</code>] <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p>
 
 <p>If <code>--force</code> is passed, and there are multiple versions of <var>formula</var>
-installed, delete all installed versions.</p></dd>
+installed, delete all installed versions.</p>
+
+<p>If <code>--ignore-dependencies</code> is passed, uninstalling won't fail, even if
+formulae depending on <var>formula</var> would still be installed.</p></dd>
 <dt><code>unlink</code> [<code>--dry-run</code>] <var>formula</var></dt><dd><p>Remove symlinks for <var>formula</var> from the Homebrew prefix. This can be useful
 for temporarily disabling a formula:
 <code>brew unlink foo &amp;&amp; commands &amp;&amp; brew link foo</code>.</p>

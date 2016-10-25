@@ -1,8 +1,11 @@
-#:  * `uninstall`, `rm`, `remove` [`--force`] <formula>:
+#:  * `uninstall`, `rm`, `remove` [`--force`] [`--ignore-dependencies`] <formula>:
 #:    Uninstall <formula>.
 #:
 #:    If `--force` is passed, and there are multiple versions of <formula>
 #:    installed, delete all installed versions.
+#:
+#:    If `--ignore-dependencies` is passed, uninstalling won't fail, even if
+#:    formulae depending on <formula> would still be installed.
 
 require "keg"
 require "formula"
