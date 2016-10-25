@@ -40,7 +40,7 @@ class Keg
     replace_text_in_files(relocation)
   end
 
-  def replace_placeholders_with_locations(files)
+  def replace_placeholders_with_locations(files, skip_linkage: false)
     relocation = Relocation.new(
       old_prefix: PREFIX_PLACEHOLDER,
       old_cellar: CELLAR_PLACEHOLDER,
@@ -49,7 +49,7 @@ class Keg
       new_cellar: HOMEBREW_CELLAR.to_s,
       new_repository: HOMEBREW_REPOSITORY.to_s
     )
-    relocate_dynamic_linkage(relocation)
+    relocate_dynamic_linkage(relocation) unless skip_linkage
     replace_text_in_files(relocation, files: files)
   end
 

@@ -762,12 +762,11 @@ class FormulaInstaller
     end
 
     keg = Keg.new(formula.prefix)
+    tab = Tab.for_keg(keg)
+    Tab.clear_cache
 
-    unless formula.bottle_specification.skip_relocation?
-      tab = Tab.for_keg(keg)
-      Tab.clear_cache
-      keg.replace_placeholders_with_locations tab.changed_files
-    end
+    skip_linkage = formula.bottle_specification.skip_relocation?
+    keg.replace_placeholders_with_locations tab.changed_files, skip_linkage: skip_linkage
 
     Pathname.glob("#{formula.bottle_prefix}/{etc,var}/**/*") do |path|
       path.extend(InstallRenamed)
