@@ -24,8 +24,7 @@ module Homebrew
       ARGV.kegs.group_by(&:rack)
     end
 
-    # --ignore-dependencies, to be consistent with install
-    if !ARGV.include?("--ignore-dependencies") && !ARGV.homebrew_developer?
+    if should_check_for_dependents?
       all_kegs = kegs_by_rack.values.flatten(1)
       return if check_for_dependents all_kegs
     end
@@ -73,6 +72,13 @@ module Homebrew
         rack.unlink if rack.symlink? && !rack.resolved_path_exists?
       end
     end
+  end
+
+  def should_check_for_dependents?
+    # --ignore-dependencies, to be consistent with install
+    return false if ARGV.include?("--ignore-dependencies")
+    return false if ARGV.homebrew_developer?
+    true
   end
 
   def check_for_dependents(kegs)
