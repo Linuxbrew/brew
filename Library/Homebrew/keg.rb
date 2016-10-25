@@ -116,7 +116,7 @@ class Keg
       next unless required.any?
 
       required_kegs = required.map { |f| kegs_by_name[f].sort_by(&:version).last }
-      return required_kegs, [dependent]
+      return required_kegs, [dependent.to_s]
     end
 
     nil

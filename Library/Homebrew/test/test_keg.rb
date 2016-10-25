@@ -332,31 +332,54 @@ class InstalledDependantsTests < LinkTests
     @dependent = setup_test_keg("bar", "1.0")
   end
 
-  def dependencies(deps)
-    tab = Tab.for_keg(@dependent)
-    tab.tabfile = @dependent.join("INSTALL_RECEIPT.json")
-    tab.runtime_dependencies = deps
+  def alter_tab(keg = @dependent)
+    tab = Tab.for_keg(keg)
+    yield tab
     tab.write
   end
 
-  def test_no_dependencies
+  def dependencies(deps)
+    alter_tab do |tab|
+      tab.tabfile = @dependent.join("INSTALL_RECEIPT.json")
+      tab.runtime_dependencies = deps
+    end
+  end
+
+  def test_no_dependencies_anywhere
+    dependencies nil
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_missing_formula_dependency
+    dependencies nil
+    Formula["bar"].class.depends_on "foo"
+    assert_empty @keg.installed_dependents
+    assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_empty_dependencies_in_tab
     dependencies []
     assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
   end
 
-  def test_same_name_different_version
+  def test_same_name_different_version_in_tab
     dependencies [{ "full_name" => "foo", "version" => "1.1" }]
     assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
   end
 
-  def test_different_name_same_version
+  def test_different_name_same_version_in_tab
     stub_formula_name("baz")
     dependencies [{ "full_name" => "baz", "version" => @keg.version.to_s }]
     assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
   end
 
-  def test_same_name_and_version
+  def test_same_name_and_version_in_tab
     dependencies [{ "full_name" => "foo", "version" => "1.0" }]
     assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 end
