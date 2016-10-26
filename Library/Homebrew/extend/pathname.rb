@@ -179,6 +179,7 @@ class Pathname
       rescue Errno::EPERM
       end
 
+      tf.close
       File.rename(tf.path, self)
     ensure
       tf.close!
