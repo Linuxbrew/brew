@@ -179,6 +179,8 @@ class Pathname
       rescue Errno::EPERM
       end
 
+      # Close the file before rename to prevent the error: Device or resource busy
+      tf.close
       File.rename(tf.path, self)
     ensure
       tf.close!
