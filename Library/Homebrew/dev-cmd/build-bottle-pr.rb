@@ -6,6 +6,8 @@ module Homebrew
   #    --remote=$USER      Specify the GitHub remote
   #    --tag=x86_64_linux  Specify the bottle tag
   #    --limit=10          Maximum number of PRs
+  #    --dry-run           Do a dry run
+  #    --verbose           Print extra information
 
   def open_pull_request?(formula)
     prs = GitHub.issues_matching(formula,
@@ -27,6 +29,9 @@ module Homebrew
 
   def build_bottle(formula)
     remote = ARGV.value("remote") || ENV["GITHUB_USER"] || ENV["USER"]
+    ohai "Using #{remote} remote to submit Pull Requests" if ARGV.verbose?
+    remotes = Utils.popen_read("git", "remote").split
+    odie "Remote #{remote} does not exist. Please use --remote=... to specify the remote repository name" unless remotes.include? remote
     tag = (ARGV.value("tag") || "x86_64_linux").to_sym
     return ohai "#{formula}: Skipping because a bottle is not needed" if formula.bottle_unneeded?
     return ohai "#{formula}: Skipping because bottles are disabled" if formula.bottle_disabled?
