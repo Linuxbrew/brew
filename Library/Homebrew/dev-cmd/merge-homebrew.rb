@@ -10,6 +10,10 @@ module Homebrew
   #   --dupes merge Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes
   #
   def git_merge
+    remotes = Utils.popen_read("git", "remote").split
+    odie "Please add a remote with the name 'homebrew' in #{Dir.pwd}" unless remotes.include? "homebrew"
+    odie "Please add a remote with the name 'origin' in #{Dir.pwd}" unless remotes.include? "origin"
+
     safe_system "git", "fetch", "homebrew"
     start_sha1 = Utils.popen_read("git", "rev-parse", "origin/master").chomp
     end_sha1 = Utils.popen_read("git", "rev-parse", "homebrew/master").chomp
