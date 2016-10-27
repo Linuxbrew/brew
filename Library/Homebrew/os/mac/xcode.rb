@@ -26,8 +26,8 @@ module OS
       end
 
       def prerelease?
-        # TODO: bump to version >= "8.2" after Xcode 8.1 is stable.
-        version >= "8.1"
+        # TODO: bump to version >= "8.3" after Xcode 8.2 is stable.
+        version >= "8.2"
       end
 
       def outdated?
