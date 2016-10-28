@@ -229,6 +229,13 @@ module Homebrew
           published = publish_changed_formula_bottles(tap, changed_formulae_names)
           bintray_published_formulae.concat(published)
         end
+
+        # Squash a Linuxbrew build-bottle-pr commit.
+        if Utils.popen_read("git", "diff", orig_revision, "HEAD") =~ /^\+# .*: Build a bottle for Linuxbrew$/
+          ohai "Squashing build-bottle-pr commit"
+          require "dev-cmd/squash-bottle-pr"
+          Homebrew.squash_bottle_pr
+        end
       end
 
       ohai "Patch changed:"
