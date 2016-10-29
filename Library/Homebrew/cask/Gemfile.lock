@@ -26,7 +26,7 @@ GEM
     metaclass (0.0.4)
     method_source (0.8.2)
     minitest (5.9.1)
-    minitest-reporters (1.1.11)
+    minitest-reporters (1.1.12)
       ansi
       builder
       minitest (>= 5.0)
