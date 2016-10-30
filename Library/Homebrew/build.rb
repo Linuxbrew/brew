@@ -132,6 +132,8 @@ class Build
       else
         formula.prefix.mkpath
 
+        (formula.logs/"00.options.out").write \
+          "#{formula.full_name} #{formula.build.used_options.sort.join(" ")}".strip
         formula.install
 
         stdlibs = detect_stdlibs(ENV.compiler)
