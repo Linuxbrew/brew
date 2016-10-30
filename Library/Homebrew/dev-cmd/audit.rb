@@ -1290,6 +1290,11 @@ class ResourceAuditor
       problem "Please use https:// for #{u}"
     end
 
+    # Check for master branch GitHub archives.
+    urls.grep(%r{^https://github\.com/.*archive/master\.(tar\.gz|zip)$}) do
+      problem "Use versioned rather than branch tarballs for stable checksums."
+    end
+
     # Use new-style archive downloads
     urls.each do |u|
       next unless u =~ %r{https://.*github.*/(?:tar|zip)ball/} && u !~ /\.git$/
