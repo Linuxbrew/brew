@@ -721,6 +721,19 @@ class FormulaAuditor
       problem %q(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
     end
 
+    bin_names = Set.new
+    bin_names << formula.name
+    bin_names += formula.aliases
+    [formula.bin, formula.sbin].each do |dir|
+      next unless dir.exist?
+      bin_names += dir.children.map(&:basename).map(&:to_s)
+    end
+    bin_names.each do |name|
+      if text =~ /test do.*system\s+['"]#{name}/m
+        problem %(fully scope test system calls e.g. system "\#{bin}/#{name}")
+      end
+    end
+
     if text =~ /xcodebuild[ (]["'*]/ && !text.include?("SYMROOT=")
       problem 'xcodebuild should be passed an explicit "SYMROOT"'
     end
