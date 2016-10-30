@@ -3,7 +3,7 @@
 #:    given, check all installed brews.
 #:
 #:    If `--hide=`<hidden> is passed, act as if none of <hidden> are installed.
-#:    <hidden> should be a comma-seperated list of formulae.
+#:    <hidden> should be a comma-separated list of formulae.
 
 require "formula"
 require "tab"
