@@ -59,8 +59,8 @@ module Homebrew
     ARGV.named.each do |arg|
       if arg.to_i > 0
         issue = arg
-        tap = CoreTap.instance
-        url = "https://github.com/#{tap.slug}/pull/#{arg}"
+        tap = ARGV.value("tap") ? Tap.fetch(ARGV.value("tap")) : CoreTap.instance
+        url = "https://github.com/#{tap.slug}/pull/#{issue}"
       elsif (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = ARGV.value("tap")
         tap = if tap && tap.start_with?("homebrew/")
