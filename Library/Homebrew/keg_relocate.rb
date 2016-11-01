@@ -77,7 +77,7 @@ class Keg
       changed = s.gsub!(regexp, replacements)
 
       next unless changed
-      changed_files << first.relative_path_from(path)
+      changed_files += [first, *rest].map { |file| file.relative_path_from(path) }
 
       begin
         first.atomic_write(s)
