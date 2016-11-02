@@ -47,13 +47,16 @@ module Homebrew
 
     if ARGV.include?("--new-issue") || ARGV.switch?("n")
       if GitHub.api_credentials_type == :none
-        puts "You can create a personal access token: https://github.com/settings/tokens"
-        puts "and then set HOMEBREW_GITHUB_API_TOKEN as authentication method."
-        puts
+        puts <<-EOS.undent
+          You can create a new personal access token:
+           #{GitHub::ALL_SCOPES_URL}
+          and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method.
+
+        EOS
         login!
       end
 
-      url = new_issue(f.tap, "#{f.name} failed to build on #{MacOS.full_version}", url)
+      url = create_issue(f.tap, "#{f.name} failed to build on #{MacOS.full_version}", url)
     end
 
     puts url if url
@@ -103,13 +106,17 @@ module Homebrew
   end
 
   def create_gist(files, description)
+    url = "https://api.github.com/gists"
     data = { "public" => true, "files" => files, "description" => description }
-    GitHub.open("https://api.github.com/gists", data)["html_url"]
+    scopes = GitHub::CREATE_GIST_SCOPES
+    GitHub.open(url, data: data, scopes: scopes)["html_url"]
   end
 
-  def new_issue(repo, title, body)
+  def create_issue(repo, title, body)
+    url = "https://api.github.com/repos/#{repo}/issues"
     data = { "title" => title, "body" => body }
-    GitHub.open("https://api.github.com/repos/#{repo}/issues", data)["html_url"]
+    scopes = GitHub::CREATE_ISSUE_SCOPES
+    GitHub.open(url, data: data, scopes: scopes)["html_url"]
   end
 
   def gist_logs
