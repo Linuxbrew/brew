@@ -734,8 +734,10 @@ class FormulaAuditor
       bin_names += dir.children.map(&:basename).map(&:to_s)
     end
     bin_names.each do |name|
-      if text =~ /test do.*system\s+['"]#{name}/m
-        problem %(fully scope test system calls e.g. system "\#{bin}/#{name}")
+      ["system", "shell_output", "pipe_output"].each do |cmd|
+        if text =~ /(def test|test do).*#{cmd}[\(\s]+['"]#{name}/m
+          problem %(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
+        end
       end
     end
 
