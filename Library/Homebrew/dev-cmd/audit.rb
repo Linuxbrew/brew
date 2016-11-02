@@ -653,12 +653,14 @@ class FormulaAuditor
   def audit_revision_and_version_scheme
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
+    return if @new_formula
 
     fv = FormulaVersions.new(formula, max_depth: 10)
-    attributes = [:revision, :version_scheme]
+    no_decrease_attributes = [:revision, :version_scheme]
+    attributes = no_decrease_attributes + [:version]
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
-    attributes.each do |attribute|
+    no_decrease_attributes.each do |attribute|
       attributes_for_version = attributes_map[attribute][formula.version]
       next if attributes_for_version.empty?
       if formula.send(attribute) < attributes_for_version.max
@@ -666,11 +668,14 @@ class FormulaAuditor
       end
     end
 
-    revision_map = attributes_map[:revision]
+    versions = attributes_map[:version].values.flatten
+    if !versions.empty? && formula.version < versions.max
+      problem "version should not decrease"
+    end
 
     return if formula.revision.zero?
-
     if formula.stable
+      revision_map = attributes_map[:revision]
       if revision_map[formula.stable.version].empty? # check stable spec
         problem "'revision #{formula.revision}' should be removed"
       end
