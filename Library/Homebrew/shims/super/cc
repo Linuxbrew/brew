@@ -169,6 +169,8 @@ class Cmd
     when "-Wno-deprecated-register"
       # older gccs don't support these flags
       args << arg unless tool =~ /^g..-4.[02]/
+    when /^-Wl,-z,defs/
+      # -Wl,-undefined,error is already the default
     when /^-W[alp],/, /^-Wno-/
       args << arg
     when /^-W.*/
