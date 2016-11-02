@@ -1,10 +1,12 @@
 #: @hide_from_man_page
-#:  * `boneyard-formula-pr` [`--dry-run`] [`--local`]  <formula-name>:
+#:  * `boneyard-formula-pr` [`--dry-run`] [`--local`] [`--reason=<reason>`] <formula-name> :
 #:    Creates a pull request to boneyard a formula.
 #:
 #:    If `--dry-run` is passed, print what would be done rather than doing it.
 #:
 #:    If `--local` is passed, perform only local operations (i.e. don't push or create PR).
+#:
+#:    If `--reason=<reason>` is passed, append this to the commit/PR message.
 
 require "formula"
 require "utils/json"
@@ -24,6 +26,7 @@ module Homebrew
   def boneyard_formula_pr
     local_only = ARGV.include?("--local")
     formula = ARGV.formulae.first
+    reason = ARGV.value("reason")
     odie "No formula found!" unless formula
 
     formula_relpath = formula.path.relative_path_from(formula.tap.path)
@@ -70,6 +73,9 @@ module Homebrew
       end
     end
     branch = "#{formula.name}-boneyard"
+
+    reason = " because #{reason}" if reason
+
     if ARGV.dry_run?
       puts "cd #{formula.tap.path}"
       puts "git checkout --no-track -b #{branch} origin/master"
@@ -80,7 +86,7 @@ module Homebrew
         puts "hub fork"
         puts "hub fork (to read $HUB_REMOTE)"
         puts "git push $HUB_REMOTE #{branch}:#{branch}"
-        puts "hub pull-request -m $'#{formula.name}: migrate to boneyard\\n\\nCreated with `brew boneyard-formula-pr`.'"
+        puts "hub pull-request -m $'#{formula.name}: migrate to boneyard\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
       end
     else
       cd formula.tap.path
@@ -98,7 +104,7 @@ module Homebrew
         pr_message = <<-EOS.undent
           #{formula.name}: migrate to boneyard
 
-          Created with `brew boneyard-formula-pr`.
+          Created with `brew boneyard-formula-pr`#{reason}.
         EOS
         pr_url = Utils.popen_read("hub", "pull-request", "-m", pr_message).chomp
       end
@@ -120,7 +126,7 @@ module Homebrew
         puts "hub fork"
         puts "hub fork (to read $HUB_REMOTE)"
         puts "git push $HUB_REMOTE #{branch}:#{branch}"
-        puts "hub pull-request --browse -m $'#{formula.name}: migrate from #{formula.tap.repo}\\n\\nGoes together with $PR_URL\\n\\nCreated with `brew boneyard-formula-pr`.'"
+        puts "hub pull-request --browse -m $'#{formula.name}: migrate from #{formula.tap.repo}\\n\\nGoes together with $PR_URL\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
       end
     else
       cd boneyard_tap.formula_dir
@@ -144,7 +150,7 @@ module Homebrew
 
           Goes together with #{pr_url}.
 
-          Created with `brew boneyard-formula-pr`.
+          Created with `brew boneyard-formula-pr`#{reason}.
         EOS
       end
     end
