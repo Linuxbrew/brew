@@ -36,7 +36,7 @@ module Homebrew
     end
 
     def assert_version_nil(url)
-      assert_nil Version.parse(url)
+      assert Version.parse(url).null?
     end
   end
 
