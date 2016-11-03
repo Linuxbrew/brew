@@ -14,7 +14,14 @@ end
 
 class CompilerFailure
   attr_reader :name
-  attr_rw :version
+
+  def version(val = nil)
+    if val
+      @version = Version.parse(val.to_s)
+    else
+      @version
+    end
+  end
 
   # Allows Apple compiler `fails_with` statements to keep using `build`
   # even though `build` and `version` are the same internally
@@ -45,7 +52,7 @@ class CompilerFailure
 
   def initialize(name, version, &block)
     @name = name
-    @version = version
+    @version = Version.parse(version.to_s)
     instance_eval(&block) if block_given?
   end
 

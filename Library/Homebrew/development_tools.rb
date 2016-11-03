@@ -44,7 +44,9 @@ class DevelopmentTools
     def gcc_40_build_version
       @gcc_40_build_version ||=
         if (path = locate("gcc-4.0"))
-          `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
+          Version.new `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
+        else
+          Version::NULL
         end
     end
     alias gcc_4_0_build_version gcc_40_build_version
@@ -54,7 +56,9 @@ class DevelopmentTools
         begin
           gcc = locate("gcc-4.2") || HOMEBREW_PREFIX.join("opt/apple-gcc42/bin/gcc-4.2")
           if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm")
-            `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
+            Version.new `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1]
+          else
+            Version::NULL
           end
         end
     end
@@ -63,14 +67,18 @@ class DevelopmentTools
     def clang_version
       @clang_version ||=
         if (path = locate("clang"))
-          `#{path} --version`[/(?:clang|LLVM) version (\d\.\d)/, 1]
+          Version.new `#{path} --version`[/(?:clang|LLVM) version (\d\.\d)/, 1]
+        else
+          Version::NULL
         end
     end
 
     def clang_build_version
       @clang_build_version ||=
         if (path = locate("clang"))
-          `#{path} --version`[/clang-(\d{2,})/, 1].to_i
+          Version.new `#{path} --version`[/clang-(\d{2,})/, 1]
+        else
+          Version::NULL
         end
     end
 
@@ -78,7 +86,11 @@ class DevelopmentTools
       (@non_apple_gcc_version ||= {}).fetch(cc) do
         path = HOMEBREW_PREFIX.join("opt", "gcc", "bin", cc)
         path = locate(cc) unless path.exist?
-        version = `#{path} --version`[/gcc(?:-\d(?:\.\d)? \(.+\))? (\d\.\d\.\d)/, 1] if path
+        version = if path
+          Version.new(`#{path} --version`[/gcc(?:-\d(?:\.\d)? \(.+\))? (\d\.\d\.\d)/, 1])
+        else
+          Version::NULL
+        end
         @non_apple_gcc_version[cc] = version
       end
     end
