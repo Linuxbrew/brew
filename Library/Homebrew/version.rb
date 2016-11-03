@@ -1,3 +1,5 @@
+require "version/null"
+
 class Version
   include Comparable
 
@@ -203,6 +205,10 @@ class Version
   end
 
   def head?
+    false
+  end
+
+  def null?
     false
   end
 

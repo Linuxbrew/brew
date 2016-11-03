@@ -30,6 +30,29 @@ class VersionTokenTests < Homebrew::TestCase
   end
 end
 
+class NullVersionTests < Homebrew::TestCase
+  def test_null_version_is_always_smaller
+    assert_operator Version::NULL, :<, version("1")
+  end
+
+  def test_null_version_is_never_greater
+    refute_operator Version::NULL, :>, version("0")
+  end
+
+  def test_null_version_is_not_equal_to_itself
+    refute_eql Version::NULL, Version::NULL
+  end
+
+  def test_null_version_creates_an_empty_string
+    assert_eql "", Version::NULL.to_s
+  end
+
+  def test_null_version_produces_nan_as_a_float
+    # Float::NAN is not equal to itself so compare object IDs
+    assert_eql Float::NAN.object_id, Version::NULL.to_f.object_id
+  end
+end
+
 class VersionNullTokenTests < Homebrew::TestCase
   def test_inspect
     assert_equal "#<Version::NullToken>", Version::NullToken.new.inspect
