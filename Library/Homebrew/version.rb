@@ -260,6 +260,10 @@ class Version
     version.hash
   end
 
+  def to_f
+    version.to_f
+  end
+
   def to_s
     version.dup
   end
