@@ -213,6 +213,8 @@ class Version
   end
 
   def <=>(other)
+    return 1 if other.nil?
+
     return unless other.is_a?(Version)
     return 0 if version == other.version
     return 1 if head? && !other.head?

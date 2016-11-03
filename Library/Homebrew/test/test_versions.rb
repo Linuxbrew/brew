@@ -145,6 +145,10 @@ class VersionComparisonTests < Homebrew::TestCase
     assert_operator version("2-p194"), :<, version("2.1-p195")
   end
 
+  def test_comparing_against_nil
+    assert_operator version("2.1.0-p194"), :>, nil
+  end
+
   def test_comparison_returns_nil_for_non_version
     v = version("1.0")
     assert_nil v <=> Object.new
