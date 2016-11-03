@@ -415,6 +415,12 @@ class FormulaAuditor
             EOS
         when *BUILD_TIME_DEPS
           next if dep.build? || dep.run?
+          problem <<-EOS.undent
+            #{dep} dependency should be
+              depends_on "#{dep}" => :build
+            Or if it is indeed a runtime dependency
+              depends_on "#{dep}" => :run
+          EOS
         end
       end
     end
