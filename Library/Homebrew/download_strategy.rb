@@ -20,7 +20,7 @@ class AbstractDownloadStrategy
   def fetch
   end
 
-  # Supress output
+  # Suppress output
   def shutup!
     @shutup = true
   end
