@@ -213,6 +213,11 @@ class Version
   end
 
   def <=>(other)
+    # Needed to retain API compatibility with older string comparisons
+    # for compiler versions, etc.
+    other = Version.new(other) if other.is_a? String
+    # Used by the *_build_version comparisons, which formerly returned Fixnum
+    other = Version.new(other.to_s) if other.is_a? Integer
     return 1 if other.nil?
 
     return unless other.is_a?(Version)
