@@ -11,7 +11,7 @@
 #:    connection are run.
 #:
 #:    If `--new-formula` is passed, various additional checks are run that check
-#:    if a new formula is eligable for Homebrew. This should be used when creating
+#:    if a new formula is eligible for Homebrew. This should be used when creating
 #:    new formulae and implies `--strict` and `--online`.
 #:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
