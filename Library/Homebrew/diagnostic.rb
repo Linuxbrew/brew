@@ -170,6 +170,7 @@ module Homebrew
           "libublio.*.dylib", # NTFS-3G
           "libUFSDNTFS.dylib", # Paragon NTFS
           "libUFSDExtFS.dylib", # Paragon ExtFS
+          "sentinel.dylib", # SentinelOne
         ]
 
         __check_stray_files "/usr/local/lib", "*.dylib", white_list, <<-EOS.undent
