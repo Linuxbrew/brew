@@ -142,6 +142,7 @@ module Homebrew
           msg = "#{current.full_name}-#{current.installed_version} already installed"
           unless current.linked_keg.symlink? || current.keg_only?
             msg << ", it's just not linked"
+            puts "You can link formula with `brew link #{f}`"
           end
           opoo msg
         elsif f.migration_needed? && !ARGV.force?
