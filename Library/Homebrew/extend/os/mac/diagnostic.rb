@@ -104,6 +104,27 @@ module Homebrew
         EOS
       end
 
+      def check_xcode_minimum_version
+        return unless MacOS::Xcode.installed?
+        return unless MacOS::Xcode.minimum_version?
+
+        <<-EOS.undent
+          Your Xcode (#{MacOS::Xcode.version}) is too outdated.
+          Please update to Xcode #{MacOS::Xcode.latest_version} (or delete it).
+          #{MacOS::Xcode.update_instructions}
+        EOS
+      end
+
+      def check_clt_minimum_version
+        return unless MacOS::CLT.installed?
+        return unless MacOS::CLT.minimum_version?
+
+        <<-EOS.undent
+          Your Command Line Tools are too outdated.
+          #{MacOS::CLT.update_instructions}
+        EOS
+      end
+
       def check_for_osx_gcc_installer
         return unless MacOS.version < "10.7" || ((MacOS::Xcode.version || "0") > "4.1")
         return unless DevelopmentTools.clang_version == "2.1"
