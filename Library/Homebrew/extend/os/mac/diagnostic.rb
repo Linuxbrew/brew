@@ -22,6 +22,11 @@ module Homebrew
           check_clt_minimum_version
         ].freeze
       end
+
+      def build_error_checks
+        (development_tools_checks + %w[
+          check_for_unsupported_macos
+        ]).freeze
       end
 
       def check_for_unsupported_macos

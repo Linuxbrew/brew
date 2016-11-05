@@ -93,6 +93,10 @@ module Homebrew
         %w[
         ].freeze
       end
+
+      def build_error_checks
+        (development_tools_checks + %w[
+        ]).freeze
       end
 
       def check_for_installed_developer_tools
