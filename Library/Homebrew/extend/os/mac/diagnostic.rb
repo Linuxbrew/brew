@@ -62,7 +62,8 @@ module Homebrew
       end
 
       def check_xcode_up_to_date
-        return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
+        return unless MacOS::Xcode.installed?
+        return unless MacOS::Xcode.outdated?
 
         message = <<-EOS.undent
           Your Xcode (#{MacOS::Xcode.version}) is outdated.
@@ -83,7 +84,8 @@ module Homebrew
       end
 
       def check_clt_up_to_date
-        return unless MacOS::CLT.installed? && MacOS::CLT.outdated?
+        return unless MacOS::CLT.installed?
+        return unless MacOS::CLT.outdated?
 
         <<-EOS.undent
           A newer Command Line Tools release is available.
@@ -94,7 +96,8 @@ module Homebrew
       def check_xcode_8_without_clt_on_el_capitan
         return unless MacOS::Xcode.without_clt?
         # Scope this to Xcode 8 on El Cap for now
-        return unless MacOS.version == :el_capitan && MacOS::Xcode.version >= "8"
+        return unless MacOS.version == :el_capitan
+        return unless MacOS::Xcode.version >= "8"
 
         <<-EOS.undent
           You have Xcode 8 installed without the CLT;
