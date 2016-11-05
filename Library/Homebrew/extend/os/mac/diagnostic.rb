@@ -10,19 +10,18 @@ module Homebrew
           check_xcode_license_approved
           check_for_osx_gcc_installer
           check_xcode_8_without_clt_on_el_capitan
-        ]
+          check_xcode_up_to_date
+          check_clt_up_to_date
+          check_for_other_package_managers
+        ].freeze
       end
 
       def fatal_development_tools_checks
-        if MacOS.version >= :sierra && ENV["CI"].nil?
-          %w[
-            check_xcode_up_to_date
-            check_clt_up_to_date
-          ]
-        else
-          %w[
-          ]
-        end
+        %w[
+          check_xcode_minimum_version
+          check_clt_minimum_version
+        ].freeze
+      end
       end
 
       def check_for_unsupported_macos

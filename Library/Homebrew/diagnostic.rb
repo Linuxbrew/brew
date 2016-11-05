@@ -86,12 +86,13 @@ module Homebrew
       def development_tools_checks
         %w[
           check_for_installed_developer_tools
-        ]
+        ].freeze
       end
 
       def fatal_development_tools_checks
         %w[
-        ]
+        ].freeze
+      end
       end
 
       def check_for_installed_developer_tools
