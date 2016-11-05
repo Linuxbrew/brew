@@ -415,7 +415,7 @@ class Reporter
 
       # This means it is a Cask
       if report[:DC].include? full_name
-        next unless (HOMEBREW_REPOSITORY/"Caskroom"/name).exist?
+        next unless (HOMEBREW_PREFIX/"Caskroom"/name).exist?
         new_tap = Tap.fetch(new_tap_name)
         new_tap.install unless new_tap.installed?
         ohai "#{name} has been moved to Homebrew.", <<-EOS.undent
@@ -442,7 +442,7 @@ class Reporter
       new_tap = Tap.fetch(new_tap_name)
       # For formulae migrated to cask: Auto-install cask or provide install instructions.
       if new_tap_name == "caskroom/cask"
-        if new_tap.installed? && (HOMEBREW_REPOSITORY/"Caskroom").directory?
+        if new_tap.installed? && (HOMEBREW_PREFIX/"Caskroom").directory?
           ohai "#{name} has been moved to Homebrew-Cask."
           ohai "brew uninstall --force #{name}"
           system HOMEBREW_BREW_FILE, "uninstall", "--force", name
