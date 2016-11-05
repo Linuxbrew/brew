@@ -367,8 +367,11 @@ class BuildError < RuntimeError
     end
 
     require "diagnostic"
-    unsupported_macos = Homebrew::Diagnostic::Checks.new.check_for_unsupported_macos
-    opoo unsupported_macos if unsupported_macos
+    checks = Homebrew::Diagnostic::Checks.new
+    checks.build_error_checks.each do |check|
+      next if out.nil?
+      ofail out
+    end
   end
 end
 
