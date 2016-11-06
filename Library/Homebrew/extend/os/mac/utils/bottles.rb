@@ -38,7 +38,6 @@ module Utils
 
       # Allows a bottle tag to specify a specific OS or later,
       # so the same bottle can target multiple OSs.
-      # Not used in core, used in taps.
       def find_or_later_tag(tag)
         begin
           tag_version = MacOS::Version.from_symbol(tag)
