@@ -10,10 +10,11 @@ brew gist-logs <formula>
 ## Check for common issues
 * Run `brew update` (twice).
 * Run `brew doctor` and fix all the warnings (**outdated Xcode/CLT and unbrewed dylibs are very likely to cause problems**).
-* Read through the [Common Issues](Common-Issues.md).
-* If you’re installing something Java-related, maybe you need to install Java (`brew cask install java`)?
 * Check that **Command Line Tools for Xcode (CLT)** and/or **Xcode** are up to date.
 * If things fail with permissions errors, check the permissions of `/usr/local`'s subdirectories. If you’re unsure what to do, you can `cd /usr/local && sudo chown -R $(whoami) bin etc include lib sbin share var Frameworks`.
+* Read through the [Common Issues](Common-Issues.md).
+* If you’re installing something Java-related, maybe you need to install Java (`brew cask install java`)?
+
 
 ## Check to see if the issue has been reported
 * Check the [issue tracker](https://github.com/Homebrew/homebrew-core/issues) to see if someone else has already reported the same issue.
