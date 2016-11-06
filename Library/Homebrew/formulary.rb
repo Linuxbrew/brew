@@ -159,6 +159,11 @@ class Formulary
     attr_reader :tap
 
     def initialize(tapped_name)
+      name, path = formula_name_path(tapped_name)
+      super name, path
+    end
+
+    def formula_name_path(tapped_name, warn: true)
       user, repo, name = tapped_name.split("/", 3).map(&:downcase)
       @tap = Tap.fetch user, repo
       formula_dir = @tap.formula_dir || @tap.path
@@ -170,12 +175,25 @@ class Formulary
           name = path.basename(".rb").to_s
         elsif (new_name = @tap.formula_renames[name]) &&
               (new_path = formula_dir/"#{new_name}.rb").file?
+          old_name = name
           path = new_path
           name = new_name
+          new_name = @tap.core_tap? ? name : "#{@tap}/#{name}"
+        elsif (new_tap_name = @tap.tap_migrations[name])
+          new_tap = Tap.fetch new_tap_name
+          new_tap.install unless new_tap.installed?
+          new_tapped_name = "#{new_tap_name}/#{name}"
+          name, path = formula_name_path(new_tapped_name, warn: false)
+          old_name = tapped_name
+          new_name = new_tap.core_tap? ? name : new_tapped_name
+        end
+
+        if warn && old_name && new_name
+          opoo "Use #{new_name} instead of deprecated #{old_name}"
         end
       end
 
-      super name, path
+      [name, path]
     end
 
     def get_formula(spec, alias_path: nil)
