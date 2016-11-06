@@ -1,11 +1,6 @@
 # Troubleshooting
-**Run `brew update` (twice) and `brew doctor` *before* creating an issue!**
 
-When creating a formula-related issue please include the link output by running:
-
-```shell
-brew gist-logs <formula>
-```
+Before creating an issue, check for common issues and make sure your issue has not already been reported.
 
 ## Check for common issues
 * Run `brew update` (twice).
