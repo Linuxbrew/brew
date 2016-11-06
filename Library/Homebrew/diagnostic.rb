@@ -175,6 +175,8 @@ module Homebrew
           "libublio.*.dylib", # NTFS-3G
           "libUFSDNTFS.dylib", # Paragon NTFS
           "libUFSDExtFS.dylib", # Paragon ExtFS
+          "libecomlodr.dylib", # Symantec Endpoint Protection
+          "libsymsea.*.dylib", # Symantec Endpoint Protection
           "sentinel.dylib", # SentinelOne
         ]
 
@@ -196,6 +198,13 @@ module Homebrew
           "libntfs-3g.a", # NTFS-3G
           "libntfs.a", # NTFS-3G
           "libublio.a", # NTFS-3G
+          "libappfirewall.a", # Symantec Endpoint Protection
+          "libautoblock.a", # Symantec Endpoint Protection
+          "libautosetup.a", # Symantec Endpoint Protection
+          "libconnectionsclient.a", # Symantec Endpoint Protection
+          "liblocationawareness.a", # Symantec Endpoint Protection
+          "libpersonalfirewall.a", # Symantec Endpoint Protection
+          "libtrustedcomponents.a", # Symantec Endpoint Protection
         ]
 
         __check_stray_files "/usr/local/lib", "*.a", white_list, <<-EOS.undent
