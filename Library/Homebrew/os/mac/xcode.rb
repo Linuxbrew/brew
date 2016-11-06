@@ -25,6 +25,17 @@ module OS
         end
       end
 
+      def minimum_version
+        case MacOS.version
+        when "10.12" then "8.0"
+        else "2.0"
+        end
+      end
+
+      def minimum_version?
+        version < minimum_version
+      end
+
       def prerelease?
         # TODO: bump to version >= "8.3" after Xcode 8.2 is stable.
         version >= "8.2"
@@ -203,6 +214,17 @@ module OS
         else
           "425.0.28"
         end
+      end
+
+      def minimum_version
+        case MacOS.version
+        when "10.12" then "8.0.0"
+        else "4.0.0"
+        end
+      end
+
+      def minimum_version?
+        version < minimum_version
       end
 
       def outdated?

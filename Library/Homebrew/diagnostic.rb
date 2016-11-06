@@ -86,12 +86,17 @@ module Homebrew
       def development_tools_checks
         %w[
           check_for_installed_developer_tools
-        ]
+        ].freeze
       end
 
       def fatal_development_tools_checks
         %w[
-        ]
+        ].freeze
+      end
+
+      def build_error_checks
+        (development_tools_checks + %w[
+        ]).freeze
       end
 
       def check_for_installed_developer_tools
@@ -172,6 +177,7 @@ module Homebrew
           "libUFSDExtFS.dylib", # Paragon ExtFS
           "libecomlodr.dylib", # Symantec Endpoint Protection
           "libsymsea.*.dylib", # Symantec Endpoint Protection
+          "sentinel.dylib", # SentinelOne
         ]
 
         __check_stray_files "/usr/local/lib", "*.dylib", white_list, <<-EOS.undent

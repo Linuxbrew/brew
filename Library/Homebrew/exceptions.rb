@@ -327,22 +327,9 @@ class BuildError < RuntimeError
   end
 
   def dump
-    if !ARGV.verbose?
-      puts
-      puts Formatter.error(Formatter.url(OS::ISSUES_URL), label: "READ THIS")
-      if formula.tap
-        case formula.tap.name
-        when "homebrew/boneyard"
-          puts "#{formula} was moved to homebrew-boneyard because it has unfixable issues."
-          puts "Please do not file any issues about this. Sorry!"
-        else
-          if issues_url = formula.tap.issues_url
-            puts "If reporting this issue please do so at (not Homebrew/brew):"
-            puts "  #{Formatter.url(issues_url)}"
-          end
-        end
-      end
-    else
+    puts
+
+    if ARGV.verbose?
       require "system_config"
       require "build_environment"
 
@@ -360,15 +347,50 @@ class BuildError < RuntimeError
         puts logs.map { |fn| "     #{fn}" }.join("\n")
       end
     end
+
+    if formula.tap && formula.tap.name == "homebrew/boneyard"
+      onoe <<-EOS.undent
+        #{formula} was moved to homebrew-boneyard because it has unfixable issues.
+        Please do not file any issues about this. Sorry!
+      EOS
+      return
+    end
+
+    if formula.tap
+      if formula.tap.official?
+        puts Formatter.error(Formatter.url(OS::ISSUES_URL), label: "READ THIS")
+      elsif issues_url = formula.tap.issues_url
+        puts <<-EOS.undent
+          If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):
+          #{Formatter.url(issues_url)}
+        EOS
+      else
+        puts <<-EOS.undent
+          If reporting this issue please do so to (not Homebrew/brew or Homebrew/core):
+          #{formula.tap}
+        EOS
+      end
+    else
+      puts <<-EOS.undent
+        Do not report this issue to Homebrew/brew or Homebrew/core!
+      EOS
+    end
+
     puts
+
     if issues && !issues.empty?
       puts "These open issues may also help:"
       puts issues.map { |i| "#{i["title"]} #{i["html_url"]}" }.join("\n")
     end
 
     require "diagnostic"
-    unsupported_macos = Homebrew::Diagnostic::Checks.new.check_for_unsupported_macos
-    opoo unsupported_macos if unsupported_macos
+    checks = Homebrew::Diagnostic::Checks.new
+    checks.build_error_checks.each do |check|
+      out = checks.send(check)
+      next if out.nil?
+      puts
+      ofail out
+    end
   end
 end
 

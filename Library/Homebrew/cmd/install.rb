@@ -142,6 +142,7 @@ module Homebrew
           msg = "#{current.full_name}-#{current.installed_version} already installed"
           unless current.linked_keg.symlink? || current.keg_only?
             msg << ", it's just not linked"
+            puts "You can link formula with `brew link #{f}`"
           end
           opoo msg
         elsif f.migration_needed? && !ARGV.force?
@@ -222,25 +223,12 @@ module Homebrew
 
   def check_development_tools
     checks = Diagnostic::Checks.new
-    all_development_tools_checks = checks.development_tools_checks +
-                                   checks.fatal_development_tools_checks
-    all_development_tools_checks.each do |check|
+    checks.fatal_development_tools_checks.each do |check|
       out = checks.send(check)
       next if out.nil?
-      if checks.fatal_development_tools_checks.include?(check)
-        odie out
-      else
-        opoo out
-      end
+      ofail out
     end
-  end
-
-  def check_macports
-    return if MacOS.macports_or_fink.empty?
-
-    opoo "It appears you have MacPorts or Fink installed."
-    puts "Software installed with other package managers causes known problems for"
-    puts "Homebrew. If a formula fails to build, uninstall MacPorts/Fink and try again."
+    exit 1 if Homebrew.failed?
   end
 
   def check_cellar
@@ -282,8 +270,5 @@ module Homebrew
     # another formula. In that case, don't generate an error, just move on.
   rescue CannotInstallFormulaError => e
     ofail e.message
-  rescue BuildError
-    check_macports
-    raise
   end
 end
