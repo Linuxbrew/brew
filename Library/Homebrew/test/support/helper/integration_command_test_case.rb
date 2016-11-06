@@ -60,6 +60,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
     cmd_args = %W[
       -W0
       -I#{HOMEBREW_LIBRARY_PATH}/test/support/lib
+      -I#{HOMEBREW_LIBRARY_PATH}
       -rconfig
     ]
     if ENV["HOMEBREW_TESTS_COVERAGE"]
@@ -70,7 +71,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
       cmd_args << "-rbundler/setup"
       cmd_args << "-rsimplecov"
     end
-    cmd_args << "-rintegration_mocks"
+    cmd_args << "-rtest/support/helper/integration_mocks"
     cmd_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
     cmd_args += args
     developer = ENV["HOMEBREW_DEVELOPER"]
