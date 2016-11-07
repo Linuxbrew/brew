@@ -2,7 +2,7 @@ HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty 2>/dev
 HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
-  HOMEBREW_VERSION=">1.0.0 (no git repository)"
+  HOMEBREW_VERSION=">1.1.0 (no git repository)"
   HOMEBREW_USER_AGENT_VERSION="1.X.Y"
 fi
 
