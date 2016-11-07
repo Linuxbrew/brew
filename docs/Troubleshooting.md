@@ -1,6 +1,8 @@
 # Troubleshooting
 
-Before creating an issue, check for common issues and make sure your issue has not already been reported.
+**Run `brew update` twice and `brew doctor` *before* creating an issue!**
+
+This document will help you check for common issues and make sure your issue has not already been reported.
 
 
 ## Check for common issues
