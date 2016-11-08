@@ -105,7 +105,7 @@ class TapTest < Homebrew::TestCase
   end
 
   def test_names
-    assert_equal ["homebrew/core", "homebrew/foo"], Tap.names
+    assert_equal ["homebrew/core", "homebrew/foo"], Tap.names.sort
   end
 
   def test_attributes
