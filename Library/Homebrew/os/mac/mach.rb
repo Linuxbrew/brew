@@ -1,7 +1,7 @@
 require "vendor/macho/macho"
 require "os/mac/architecture_list"
 
-module MachO
+module MachOShim
   # @private
   def macho
     @macho ||= begin
