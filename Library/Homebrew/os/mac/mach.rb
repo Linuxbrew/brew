@@ -51,8 +51,10 @@ module MachO
     end
   end
 
-  def dynamically_linked_libraries
-    macho.linked_dylibs
+  def dynamically_linked_libraries(except: :none)
+    lcs = macho.dylib_load_commands.reject { |lc| lc.type == except }
+
+    lcs.map(&:name).map(&:to_s)
   end
 
   def dylib_id
