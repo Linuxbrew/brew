@@ -122,13 +122,13 @@ class CompilerSelector
         GNU_GCC_VERSIONS.reverse_each do |v|
           name = "gcc-#{v}"
           version = compiler_version(name)
-          yield Compiler.new(name, version) if version
+          yield Compiler.new(name, version) unless version.null?
         end
       when :llvm
         # no-op. DSL supported, compiler is not.
       else
         version = compiler_version(compiler)
-        yield Compiler.new(compiler, version) if version
+        yield Compiler.new(compiler, version) unless version.null?
       end
     end
   end
