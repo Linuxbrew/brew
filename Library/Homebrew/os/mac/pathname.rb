@@ -1,5 +1,5 @@
 require "os/mac/mach"
 
 class Pathname
-  include MachO
+  include MachOShim
 end
