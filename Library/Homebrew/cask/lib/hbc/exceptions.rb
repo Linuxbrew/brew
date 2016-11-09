@@ -41,7 +41,7 @@ module Hbc
     def reinstall_message
       <<-EOS.undent
         To re-install #{token}, run:
-          brew cask uninstall --force #{token} && brew cask install #{token}
+          brew cask reinstall #{token}
       EOS
     end
   end
