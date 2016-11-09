@@ -23,10 +23,7 @@ class LinkageChecker
     @keg.find do |file|
       next if file.symlink? || file.directory?
       next unless file.dylib? || file.mach_o_executable? || file.mach_o_bundle?
-
-      # weakly loaded dylibs may not actually exist on disk, so skip them
-      # when checking for broken linkage
-      file.dynamically_linked_libraries(except: :LC_LOAD_WEAK_DYLIB).each do |dylib|
+      file.dynamically_linked_libraries.each do |dylib|
         @reverse_links[dylib] << file
         if dylib.start_with? "@"
           @variable_dylibs << dylib

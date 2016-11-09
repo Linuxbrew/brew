@@ -1,7 +1,7 @@
 require "vendor/macho/macho"
 require "os/mac/architecture_list"
 
-module MachOShim
+module MachO
   # @private
   def macho
     @macho ||= begin
@@ -51,10 +51,8 @@ module MachOShim
     end
   end
 
-  def dynamically_linked_libraries(except: :none)
-    lcs = macho.dylib_load_commands.reject { |lc| lc.type == except }
-
-    lcs.map(&:name).map(&:to_s)
+  def dynamically_linked_libraries
+    macho.linked_dylibs
   end
 
   def dylib_id
