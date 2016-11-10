@@ -3,7 +3,7 @@ module Hbc
     module_function
 
     def migrate_caskroom_from_repo_to_prefix
-      repo_caskroom = Hbc.homebrew_repository.join("Caskroom")
+      repo_caskroom = HOMEBREW_REPOSITORY.join("Caskroom")
       return if Hbc.caskroom.exist?
       return unless repo_caskroom.directory?
 

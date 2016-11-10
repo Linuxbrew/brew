@@ -31,7 +31,7 @@ module Hbc
 
       def files_in_usr_local
         localpath = "/usr/local"
-        return unless Hbc.homebrew_prefix.to_s.downcase.start_with?(localpath)
+        return unless HOMEBREW_PREFIX.to_s.downcase.start_with?(localpath)
         puts <<-EOS.undent
           Cask #{@cask} installs files under "#{localpath}". The presence of such
           files can cause warnings when running "brew doctor", which is considered
