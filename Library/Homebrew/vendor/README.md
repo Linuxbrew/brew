@@ -5,7 +5,7 @@ Vendored Dependencies
 
 * [plist](https://github.com/bleything/plist), version 3.1.0
 
-* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 0.2.5
+* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 0.2.6
 
 ## Licenses:
 
