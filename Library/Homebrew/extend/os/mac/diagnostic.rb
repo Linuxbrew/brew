@@ -292,8 +292,9 @@ module Homebrew
 
         <<-EOS.undent
           Your XQuartz (#{installed_version}) is outdated.
-          Please install XQuartz #{latest_version} (or delete it):
-            https://xquartz.macosforge.org
+          Please install XQuartz #{latest_version} (or delete the current version).
+          XQuartz can be updated using Homebrew-Cask by running
+            brew cask reinstall xquartz
         EOS
       end
 

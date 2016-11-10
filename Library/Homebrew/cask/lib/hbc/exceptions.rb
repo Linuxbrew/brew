@@ -84,13 +84,11 @@ module Hbc
   class CaskX11DependencyError < AbstractCaskErrorWithToken
     def to_s
       <<-EOS.undent
-        #{token} requires XQuartz/X11, which can be installed via homebrew-cask by
-
+        #{token} requires XQuartz/X11, which can be installed using Homebrew-Cask by running
           brew cask install xquartz
 
         or manually, by downloading the package from
-
-          https://www.xquartz.org/
+          #{Formatter.url("https://www.xquartz.org/")}
       EOS
     end
   end
