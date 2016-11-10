@@ -14,9 +14,6 @@ describe Hbc::CLI::Reinstall do
   end
 
   it "allows reinstalling a non installed Cask" do
-    shutup do
-      Hbc::CLI::Uninstall.run("local-transmission")
-    end
     Hbc.load("local-transmission").wont_be :installed?
 
     shutup do
