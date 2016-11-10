@@ -764,7 +764,7 @@ _brew_upgrade() {
     '--cc=-[attempt to compile using compiler]:compiler: ' \
     '(--build-from-source -s)'{--build-from-source,-s}'[compile the specified formula from source even if a bottle is provided]' \
     '(--devel --HEAD)'{--devel,--HEAD}'[install the development / HEAD version]' \
-    '--keep-tmp[don''t delet temporary files created during installation]' \
+    '--keep-tmp[don''t delete temporary files created during installation]' \
     '*: : __brew_outdated_formulae' \
   - interactive-install \
     '--interactive[download and patch formula, then open a shell]' \
