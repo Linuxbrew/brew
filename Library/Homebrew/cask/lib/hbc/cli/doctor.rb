@@ -31,7 +31,6 @@ module Hbc
         ohai "Contents of $PATH Environment Variable:", render_env_var("PATH")
         ohai "Contents of $SHELL Environment Variable:", render_env_var("SHELL")
         ohai "Contents of Locale Environment Variables:", render_with_none(locale_variables)
-        ohai "Running As Privileged User:", render_with_none_as_error(privileged_uid)
       end
 
       def self.alt_taps
@@ -105,12 +104,6 @@ module Hbc
 
       def self.locale_variables
         ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).collect { |v| %Q(#{v}="#{ENV[v]}") }.sort.join("\n")
-      end
-
-      def self.privileged_uid
-        Process.euid.zero? ? "Yes #{error_string "warning: not recommended"}" : "No"
-      rescue StandardError
-        notfound_string
       end
 
       def self.none_string

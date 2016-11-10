@@ -240,9 +240,6 @@ fi
 check-run-command-as-root() {
   [[ "$(id -u)" = 0 ]] || return
 
-  # Homebrew Cask may need `sudo` for system-wide installation.
-  [[ "$HOMEBREW_COMMAND" = "cask" ]] && return
-
   # Homebrew Services may need `sudo` for system-wide daemons.
   [[ "$HOMEBREW_COMMAND" = "services" ]] && return
 
