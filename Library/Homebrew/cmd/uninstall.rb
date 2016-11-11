@@ -28,10 +28,8 @@ module Homebrew
       ARGV.kegs.group_by(&:rack)
     end
 
-    if should_check_for_dependents?
-      all_kegs = kegs_by_rack.values.flatten(1)
-      return if check_for_dependents all_kegs
-    end
+    handle_unsatisfied_dependents(kegs_by_rack)
+    return if Homebrew.failed?
 
     kegs_by_rack.each do |rack, kegs|
       if ARGV.force?
@@ -78,28 +76,47 @@ module Homebrew
     end
   end
 
-  def should_check_for_dependents?
-    # --ignore-dependencies, to be consistent with install
-    return false if ARGV.include?("--ignore-dependencies")
-    return false if ARGV.homebrew_developer?
-    true
+  def handle_unsatisfied_dependents(kegs_by_rack)
+    return if ARGV.include?("--ignore-dependencies")
+
+    all_kegs = kegs_by_rack.values.flatten(1)
+    check_for_dependents all_kegs
   end
 
   def check_for_dependents(kegs)
     return false unless result = Keg.find_some_installed_dependents(kegs)
 
-    requireds, dependents = result
+    if ARGV.homebrew_developer?
+      dependents_output_for_developers(*result)
+    else
+      dependents_output_for_nondevelopers(*result)
+    end
 
+    true
+  end
+
+  def dependents_output_for_developers(requireds, dependents)
+    msg = requireds.join(", ")
+    msg << (requireds.count == 1 ? " is" : " are")
+    msg << " required by #{dependents.join(", ")}, which "
+    msg << (dependents.count == 1 ? "is" : "are")
+    msg << " currently installed."
+    msg << "\nYou can silence this warning with "
+    msg << "`brew uninstall --ignore-dependencies "
+    msg << "#{requireds.map(&:name).join(" ")}`."
+    opoo msg
+  end
+
+  def dependents_output_for_nondevelopers(requireds, dependents)
     msg = "Refusing to uninstall #{requireds.join(", ")} because "
     msg << (requireds.count == 1 ? "it is" : "they are")
     msg << " required by #{dependents.join(", ")}, which "
     msg << (dependents.count == 1 ? "is" : "are")
     msg << " currently installed."
+    msg << "\nYou can override this and force removal with "
+    msg << "`brew uninstall --ignore-dependencies "
+    msg << "#{requireds.map(&:name).join(" ")}`."
     ofail msg
-    print "You can override this and force removal with "
-    puts "`brew uninstall --ignore-dependencies #{requireds.map(&:name).join(" ")}`."
-
-    true
   end
 
   def rm_pin(rack)
