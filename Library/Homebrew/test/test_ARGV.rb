@@ -62,4 +62,19 @@ class ArgvExtensionTests < Homebrew::TestCase
     assert !@argv.flag?("--frotz")
     assert !@argv.flag?("--debug")
   end
+
+  def test_value
+    @argv << "--foo=" << "--bar=ab"
+    assert_equal "", @argv.value("foo")
+    assert_equal "ab", @argv.value("bar")
+    assert_nil @argv.value("baz")
+  end
+
+  def test_values
+    @argv << "--foo=" << "--bar=a" << "--baz=b,c"
+    assert_equal [], @argv.values("foo")
+    assert_equal ["a"], @argv.values("bar")
+    assert_equal ["b", "c"], @argv.values("baz")
+    assert_nil @argv.values("qux")
+  end
 end

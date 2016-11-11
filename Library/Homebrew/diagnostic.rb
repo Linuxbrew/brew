@@ -7,24 +7,14 @@ require "utils/shell"
 
 module Homebrew
   module Diagnostic
-    def self.missing_deps(ff)
+    def self.missing_deps(ff, hide = nil)
       missing = {}
       ff.each do |f|
-        missing_deps = f.recursive_dependencies do |dependent, dep|
-          if dep.optional? || dep.recommended?
-            tab = Tab.for_formula(dependent)
-            Dependency.prune unless tab.with?(dep)
-          elsif dep.build?
-            Dependency.prune
-          end
-        end
+        missing_dependencies = f.missing_dependencies(hide: hide)
 
-        missing_deps.map!(&:to_formula)
-        missing_deps.reject! { |d| d.installed_prefixes.any? }
-
-        unless missing_deps.empty?
-          yield f.full_name, missing_deps if block_given?
-          missing[f.full_name] = missing_deps
+        unless missing_dependencies.empty?
+          yield f.full_name, missing_dependencies if block_given?
+          missing[f.full_name] = missing_dependencies
         end
       end
       missing

@@ -5,15 +5,22 @@ require "stringio"
 class LinkTests < Homebrew::TestCase
   include FileUtils
 
-  def setup
-    keg = HOMEBREW_CELLAR.join("foo", "1.0")
-    keg.join("bin").mkpath
+  def setup_test_keg(name, version)
+    path = HOMEBREW_CELLAR.join(name, version)
+    path.join("bin").mkpath
 
     %w[hiworld helloworld goodbye_cruel_world].each do |file|
-      touch keg.join("bin", file)
+      touch path.join("bin", file)
     end
 
-    @keg = Keg.new(keg)
+    keg = Keg.new(path)
+    @kegs ||= []
+    @kegs << keg
+    keg
+  end
+
+  def setup
+    @keg = setup_test_keg("foo", "1.0")
     @dst = HOMEBREW_PREFIX.join("bin", "helloworld")
     @nonexistent = Pathname.new("/some/nonexistent/path")
 
@@ -27,8 +34,10 @@ class LinkTests < Homebrew::TestCase
   end
 
   def teardown
-    @keg.unlink
-    @keg.uninstall
+    @kegs.each do |keg|
+      keg.unlink
+      keg.uninstall
+    end
 
     $stdout = @old_stdout
 
@@ -303,5 +312,74 @@ class LinkTests < Homebrew::TestCase
   ensure
     keg.unlink
     keg.uninstall
+  end
+end
+
+class InstalledDependantsTests < LinkTests
+  def stub_formula_name(name)
+    stub_formula_loader formula(name) { url "foo-1.0" }
+  end
+
+  def setup_test_keg(name, version)
+    stub_formula_name(name)
+    keg = super
+    Formula.clear_cache
+    keg
+  end
+
+  def setup
+    super
+    @dependent = setup_test_keg("bar", "1.0")
+  end
+
+  def alter_tab(keg = @dependent)
+    tab = Tab.for_keg(keg)
+    yield tab
+    tab.write
+  end
+
+  def dependencies(deps)
+    alter_tab do |tab|
+      tab.tabfile = @dependent.join("INSTALL_RECEIPT.json")
+      tab.runtime_dependencies = deps
+    end
+  end
+
+  def test_no_dependencies_anywhere
+    dependencies nil
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_missing_formula_dependency
+    dependencies nil
+    Formula["bar"].class.depends_on "foo"
+    assert_empty @keg.installed_dependents
+    assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_empty_dependencies_in_tab
+    dependencies []
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_same_name_different_version_in_tab
+    dependencies [{ "full_name" => "foo", "version" => "1.1" }]
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_different_name_same_version_in_tab
+    stub_formula_name("baz")
+    dependencies [{ "full_name" => "baz", "version" => @keg.version.to_s }]
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_same_name_and_version_in_tab
+    dependencies [{ "full_name" => "foo", "version" => "1.0" }]
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 end
