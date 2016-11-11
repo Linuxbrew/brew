@@ -188,13 +188,13 @@ module Hbc
       ohai "Installing Formula dependencies from Homebrew"
       @cask.depends_on.formula.each do |dep_name|
         print "#{dep_name} ... "
-        installed = @command.run(Hbc.homebrew_executable,
+        installed = @command.run(HOMEBREW_BREW_FILE,
                                  args:         ["list", "--versions", dep_name],
                                  print_stderr: false).stdout.include?(dep_name)
         if installed
           puts "already installed"
         else
-          @command.run!(Hbc.homebrew_executable,
+          @command.run!(HOMEBREW_BREW_FILE,
                         args: ["install", dep_name])
           puts "done"
         end

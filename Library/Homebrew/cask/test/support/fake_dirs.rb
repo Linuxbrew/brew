@@ -8,7 +8,7 @@ module FakeDirHooks
     @canned_dirs = {}
 
     DIRS.each do |dir_name|
-      dir = Hbc.homebrew_prefix.join("#{dir_name}-#{Time.now.to_i}-#{rand(1024)}")
+      dir = HOMEBREW_PREFIX.join("#{dir_name}-#{Time.now.to_i}-#{rand(1024)}")
       dir.mkpath
       Hbc.send("#{dir_name}=", dir)
       @canned_dirs[:dir_name] = dir
