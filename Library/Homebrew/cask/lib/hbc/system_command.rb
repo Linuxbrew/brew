@@ -50,6 +50,7 @@ module Hbc
       options.extend(HashValidator)
              .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo, :bsexec
       sudo_prefix = %w[/usr/bin/sudo -E --]
+      sudo_prefix = sudo_prefix.insert(1, "-A") unless ENV["SUDO_ASKPASS"].nil?
       bsexec_prefix = ["/bin/launchctl", "bsexec", options[:bsexec] == :startup ? "/" : options[:bsexec]]
       @command = [executable]
       options[:print_stderr] = true    unless options.key?(:print_stderr)
