@@ -233,6 +233,7 @@ module Homebrew
 
       def check_xcode_select_path
         return if MacOS::CLT.installed?
+        return unless MacOS::Xcode.installed?
         return if File.file?("#{MacOS.active_developer_dir}/usr/bin/xcodebuild")
 
         path = MacOS::Xcode.bundle_path
