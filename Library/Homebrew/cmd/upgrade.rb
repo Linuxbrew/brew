@@ -96,6 +96,7 @@ module Homebrew
 
     fi = FormulaInstaller.new(f)
     fi.options             = f.build.used_options
+    fi.options            &= f.options
     fi.build_bottle        = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
     fi.build_from_source   = ARGV.build_from_source? || ARGV.build_all_from_source?
     fi.verbose             = ARGV.verbose?
