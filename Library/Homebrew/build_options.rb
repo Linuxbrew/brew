@@ -106,6 +106,7 @@ class BuildOptions
     @args - @options
   end
 
+  # @private
   def invalid_option_names
     invalid_options.map(&:flag).sort
   end
