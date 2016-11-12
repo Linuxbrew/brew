@@ -348,6 +348,20 @@ module Homebrew
         EOS
       end
 
+      def check_access_lock_dir
+        return unless HOMEBREW_LOCK_DIR.exist?
+        return if HOMEBREW_LOCK_DIR.writable_real?
+
+        <<-EOS.undent
+          #{HOMEBREW_LOCK_DIR} isn't writable.
+          Homebrew writes lock files to this location.
+
+          You should change the ownership and permissions of #{HOMEBREW_LOCK_DIR}
+          back to your user account.
+            sudo chown -R $(whoami) #{HOMEBREW_LOCK_DIR}
+        EOS
+      end
+
       def check_access_logs
         return unless HOMEBREW_LOGS.exist?
         return if HOMEBREW_LOGS.writable_real?
