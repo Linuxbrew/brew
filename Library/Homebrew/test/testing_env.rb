@@ -119,7 +119,8 @@ module Homebrew
     def stub_formula_loader(formula, ref = formula.full_name)
       loader = mock
       loader.stubs(:get_formula).returns(formula)
-      Formulary.stubs(:loader_for).with(ref).returns(loader)
+      Formulary.stubs(:loader_for).with(ref, from: :keg).returns(loader)
+      Formulary.stubs(:loader_for).with(ref, from: nil).returns(loader)
     end
   end
 end
