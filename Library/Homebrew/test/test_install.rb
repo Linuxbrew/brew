@@ -24,7 +24,7 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
 
   def test_install_with_invalid_option
     setup_test_formula "testball1"
-    assert_match "testball1: --with-fo is invalid for this formula and will be ignored!",
+    assert_match "testball1: this formula has no --with-fo option so it will be ignored!",
       cmd("install", "testball1", "--with-fo")
   end
 end
