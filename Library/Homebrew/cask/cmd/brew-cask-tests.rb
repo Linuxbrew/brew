@@ -26,6 +26,8 @@ repo_root.cd do
 
   ENV["HOMEBREW_TESTS_COVERAGE"] = "1" if ARGV.flag?("--coverage")
 
+  failed = false
+
   if rspec
     run_tests "parallel_rspec", Dir["spec/**/*_spec.rb"], %w[
       --color
@@ -34,15 +36,17 @@ repo_root.cd do
       --format ParallelTests::RSpec::RuntimeLogger
       --out tmp/parallel_runtime_rspec.log
     ]
+    failed ||= !$CHILD_STATUS.success?
   end
 
   if minitest
     run_tests "parallel_test", Dir["test/**/*_test.rb"]
+    failed ||= !$CHILD_STATUS.success?
   end
+
+  Homebrew.failed = failed
 
   if ENV["CODECOV_TOKEN"]
     system "bundle", "exec", "rake", "test:coverage:upload"
   end
-
-  Homebrew.failed = !$CHILD_STATUS.success?
 end
