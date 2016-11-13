@@ -814,9 +814,11 @@ class FormulaInstaller
 
   def lock
     return unless (@@locked ||= []).empty?
-    formula.recursive_dependencies.each do |dep|
-      @@locked << dep.to_formula
-    end unless ignore_deps?
+    unless ignore_deps?
+      formula.recursive_dependencies.each do |dep|
+        @@locked << dep.to_formula
+      end
+    end
     @@locked.unshift(formula)
     @@locked.uniq!
     @@locked.each(&:lock)
