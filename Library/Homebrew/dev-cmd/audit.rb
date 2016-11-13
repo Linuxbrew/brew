@@ -662,26 +662,39 @@ class FormulaAuditor
     return if @new_formula
 
     fv = FormulaVersions.new(formula, max_depth: 10)
-    no_decrease_attributes = [:revision, :version_scheme]
-    attributes = no_decrease_attributes + [:version]
+    attributes = [:revision, :version_scheme]
+
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
-    no_decrease_attributes.each do |attribute|
-      attributes_for_version = attributes_map[attribute][formula.version]
-      next if attributes_for_version.empty?
-      if formula.send(attribute) < attributes_for_version.max
-        problem "#{attribute} should not decrease"
-      end
-    end
+    [:stable, :devel].each do |spec|
+      attributes.each do |attribute|
+        spec_attribute_map = attributes_map[attribute][spec]
+        next if spec_attribute_map.nil? || spec_attribute_map.empty?
 
-    versions = attributes_map[:version].values.flatten
-    if !versions.empty? && formula.version < versions.max
-      problem "version should not decrease"
+        attributes_for_version = spec_attribute_map[formula.version]
+        next if attributes_for_version.nil? || attributes_for_version.empty?
+
+        if formula.send(attribute) < attributes_for_version.max
+          problem "#{spec} #{attribute} should not decrease"
+        end
+      end
+
+      spec_version_scheme_map = attributes_map[:version_scheme][spec]
+      next if spec_version_scheme_map.nil? || spec_version_scheme_map.empty?
+
+      max_version_scheme = spec_version_scheme_map.values.flatten.max
+      max_version = spec_version_scheme_map.select do |_, version_scheme|
+        version_scheme.first == max_version_scheme
+      end.keys.max
+
+      if max_version && formula.version < max_version
+        problem "#{spec} version should not decrease"
+      end
     end
 
     return if formula.revision.zero?
     if formula.stable
-      revision_map = attributes_map[:revision]
+      revision_map = attributes_map[:revision][:stable]
       if revision_map[formula.stable.version].empty? # check stable spec
         problem "'revision #{formula.revision}' should be removed"
       end
