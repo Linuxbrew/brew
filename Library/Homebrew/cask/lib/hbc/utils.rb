@@ -147,7 +147,7 @@ module Hbc
     end
 
     def self.size_in_bytes(files)
-      Array(files).reduce(0) { |a, e| a + (File.size?(e) || 0) }
+      Array(files).reduce(0) { |acc, elem| acc + (File.size?(elem) || 0) }
     end
 
     def self.capture_stderr

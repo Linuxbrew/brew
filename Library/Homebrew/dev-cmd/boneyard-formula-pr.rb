@@ -62,7 +62,7 @@ module Homebrew
       end
       tap_migrations = Utils::JSON.load(File.read(tap_migrations_path))
       tap_migrations[formula.name] = boneyard_tap.name
-      tap_migrations = tap_migrations.sort.inject({}) { |a, e| a.merge!(e[0] => e[1]) }
+      tap_migrations = tap_migrations.sort.inject({}) { |acc, elem| acc.merge!(elem[0] => elem[1]) }
       tap_migrations_path.atomic_write(JSON.pretty_generate(tap_migrations) + "\n")
     end
     unless which("hub") || local_only

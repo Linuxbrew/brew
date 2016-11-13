@@ -139,6 +139,9 @@ Style/RegexpLiteral:
 Style/SpaceAroundOperators:
   Enabled: false
 
+Style/SingleLineBlockParams:
+  Enabled: false
+
 # not a problem for typical shell users
 Style/SpecialGlobalVars:
   Enabled: false
