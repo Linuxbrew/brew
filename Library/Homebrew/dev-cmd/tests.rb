@@ -44,8 +44,8 @@ module Homebrew
       # Make it easier to reproduce test runs.
       ENV["SEED"] = ARGV.next if ARGV.include? "--seed"
 
-      files = Dir.glob("test/test/**/*_test.rb")
-                 .reject { |p| !OS.mac? && p.start_with?("test/test/os/mac/") }
+      files = Dir.glob("test/**/*_test.rb")
+                 .reject { |p| !OS.mac? && p.start_with?("test/os/mac/") }
 
       opts = []
       opts << "--serialize-stdout" if ENV["CI"]
@@ -55,7 +55,7 @@ module Homebrew
 
       if ARGV.value("only")
         test_name, test_method = ARGV.value("only").split(":", 2)
-        files = Dir.glob("test/test/{#{test_name},#{test_name}/**/*}_test.rb")
+        files = Dir.glob("test/{#{test_name},#{test_name}/**/*}_test.rb")
         args << "--name=test_#{test_method}" if test_method
       end
 
