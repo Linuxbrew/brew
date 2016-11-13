@@ -317,12 +317,16 @@ end
 
 class InstalledDependantsTests < LinkTests
   def stub_formula_name(name)
-    stub_formula_loader formula(name) { url "foo-1.0" }
+    f = formula(name) { url "foo-1.0" }
+    stub_formula_loader f
+    stub_formula_loader f, "homebrew/core/#{f}"
+    f
   end
 
   def setup_test_keg(name, version)
-    stub_formula_name(name)
+    f = stub_formula_name(name)
     keg = super
+    Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
     Formula.clear_cache
     keg
   end
@@ -343,6 +347,17 @@ class InstalledDependantsTests < LinkTests
       tab.tabfile = @dependent.join("INSTALL_RECEIPT.json")
       tab.runtime_dependencies = deps
     end
+  end
+
+  # Test with a keg whose formula isn't known.
+  # This can happen if e.g. a formula is installed
+  # from a file path or URL.
+  def test_unknown_formula
+    Formulary.unstub(:loader_for)
+    dependencies []
+    alter_tab { |t| t.source["path"] = nil }
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
   end
 
   def test_no_dependencies_anywhere

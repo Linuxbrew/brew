@@ -109,13 +109,20 @@ class Keg
     end
 
     keg_names = kegs.map(&:name)
-    kegs_by_name = kegs.group_by(&:to_formula)
+    kegs_by_source = kegs.group_by { |k| [k.name, Tab.for_keg(k).tap] }
+
     remaining_formulae.each do |dependent|
       required = dependent.missing_dependencies(hide: keg_names)
-      required.select! { |f| kegs_by_name.key?(f) }
-      next unless required.any?
 
-      required_kegs = required.map { |f| kegs_by_name[f].sort_by(&:version).last }
+      required_kegs = required.map do |f|
+        f_kegs = kegs_by_source[[f.name, f.tap]]
+        next unless f_kegs
+
+        f_kegs.sort_by(&:version).last
+      end
+
+      next unless required_kegs.any?
+
       return required_kegs, [dependent.to_s]
     end
 
