@@ -18,3 +18,4 @@ rescue LoadError
 end
 
 require "test/support/helper/test_case"
+require "test/support/helper/integration_command_test_case"

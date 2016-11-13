@@ -1,6 +1,5 @@
 require "testing_env"
 require "testing_env"
-require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestTap < IntegrationCommandTestCase
   def test_tap

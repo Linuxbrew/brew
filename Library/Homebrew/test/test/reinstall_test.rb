@@ -1,5 +1,4 @@
 require "testing_env"
-require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestReinstall < IntegrationCommandTestCase
   def test_reinstall

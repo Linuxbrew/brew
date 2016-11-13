@@ -1,7 +1,6 @@
 require "testing_env"
 require "options"
 require "testing_env"
-require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestOptions < IntegrationCommandTestCase
   def test_options

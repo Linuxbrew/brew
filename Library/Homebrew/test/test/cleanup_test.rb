@@ -4,7 +4,6 @@ require "cleanup"
 require "fileutils"
 require "pathname"
 require "testing_env"
-require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestCleanup < IntegrationCommandTestCase
   def test_cleanup

@@ -1,7 +1,6 @@
 require "testing_env"
 require "extend/ENV"
 require "testing_env"
-require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestEnv < IntegrationCommandTestCase
   def test_env

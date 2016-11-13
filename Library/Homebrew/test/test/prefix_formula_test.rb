@@ -1,5 +1,4 @@
 require "testing_env"
-require "test/support/helper/integration_command_test_case"
 
 class IntegrationCommandTestPrefixFormula < IntegrationCommandTestCase
   def test_prefix_formula
