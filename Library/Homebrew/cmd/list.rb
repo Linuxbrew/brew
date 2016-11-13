@@ -146,7 +146,7 @@ class PrettyListing
           (pnn.extname == ".dylib" || pnn.extname == ".pc") && !pnn.symlink?
         end
       when ".brew"
-        # Ignore .brew
+        next # Ignore .brew
       else
         if pn.directory?
           if pn.symlink?
@@ -187,12 +187,9 @@ class PrettyListing
   end
 
   def print_remaining_files(files, root, other = "")
-    case files.length
-    when 0
-      # noop
-    when 1
+    if files.length == 1
       puts files
-    else
+    elsif files.length > 1
       puts "#{root}/ (#{files.length} #{other}files)"
     end
   end
