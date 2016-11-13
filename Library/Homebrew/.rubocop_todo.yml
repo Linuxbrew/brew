@@ -90,7 +90,7 @@ Style/ClassVars:
   Exclude:
     - 'dev-cmd/audit.rb'
     - 'formula_installer.rb'
-    - 'test/testing_env.rb'
+    - 'test/support/helper/fs_leak_logger.rb'
 
 # Offense count: 13
 # Configuration parameters: AllowedVariables.
