@@ -38,15 +38,15 @@ module OS
 
       def prerelease?
         # TODO: bump to version >= "8.3" after Xcode 8.2 is stable.
-        version >= "8.2"
+        Version.new(version) >= "8.2"
       end
 
       def outdated?
-        version < latest_version
+        Version.new(version) < latest_version
       end
 
       def without_clt?
-        installed? && version >= "4.3" && !MacOS::CLT.installed?
+        installed? && Version.new(version) >= "4.3" && !MacOS::CLT.installed?
       end
 
       # Returns a Pathname object corresponding to Xcode.app's Developer
@@ -67,7 +67,7 @@ module OS
       end
 
       def toolchain_path
-        Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain") if installed? && version >= "4.3"
+        Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain") if installed? && Version.new(version) >= "4.3"
       end
 
       # Ask Spotlight where Xcode is. If the user didn't install the
@@ -82,7 +82,7 @@ module OS
       end
 
       def update_instructions
-        if MacOS.version >= "10.9" && !OS::Mac.prerelease?
+        if Version.new(MacOS.version) >= "10.9" && !OS::Mac.prerelease?
           <<-EOS.undent
             Xcode can be updated from the App Store.
           EOS
@@ -156,18 +156,24 @@ module OS
       end
 
       def provides_gcc?
-        installed? && version < "4.3"
+        installed? && Version.new(version) < "4.3"
       end
 
       def provides_cvs?
-        installed? && version < "5.0"
+        installed? && Version.new(version) < "5.0"
       end
 
       def default_prefix?
-        if version < "4.3"
+        if Version.new(version) < "4.3"
           prefix.to_s.start_with? "/Developer"
         else
           prefix.to_s == "/Applications/Xcode.app/Contents/Developer"
+        end
+      end
+
+      class Version < ::Version
+        def <=>(other)
+          super(Version.new(other))
         end
       end
     end
@@ -188,7 +194,7 @@ module OS
       end
 
       def update_instructions
-        if MacOS.version >= "10.9"
+        if Xcode::Version.new(MacOS.version) >= "10.9"
           <<-EOS.undent
             Update them from Software Update in the App Store.
           EOS
@@ -206,7 +212,7 @@ module OS
         # on the older supported platform for that Xcode release, i.e there's no
         # CLT package for 10.11 that contains the Clang version from Xcode 8.
         case MacOS.version
-        when "10.12" then "800.0.38"
+        when "10.12" then "800.0.42.1"
         when "10.11" then "703.0.31"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"
@@ -228,13 +234,13 @@ module OS
       end
 
       def outdated?
-        if MacOS.version >= :mavericks
+        if Xcode::Version.new(MacOS.version) >= :mavericks.to_s
           version = Utils.popen_read("#{MAVERICKS_PKG_PATH}/usr/bin/clang --version")
         else
           version = Utils.popen_read("/usr/bin/clang --version")
         end
         version = version[/clang-(\d+\.\d+\.\d+(\.\d+)?)/, 1] || "0"
-        version < latest_version
+        Xcode::Version.new(version) < latest_version
       end
 
       # Version string (a pretty long one) of the CLT package.
@@ -247,10 +253,10 @@ module OS
       def detect_version
         # CLT isn't a distinct entity pre-4.3, and pkgutil doesn't exist
         # at all on Tiger, so just count it as installed if Xcode is installed
-        return MacOS::Xcode.version if MacOS::Xcode.installed? && MacOS::Xcode.version < "3.0"
+        return MacOS::Xcode.version if MacOS::Xcode.installed? && Xcode::Version.new(MacOS::Xcode.version) < "3.0"
 
         [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].find do |id|
-          if MacOS.version >= :mavericks
+          if Xcode::Version.new(MacOS.version) >= :mavericks.to_s
             next unless File.exist?("#{MAVERICKS_PKG_PATH}/usr/bin/clang")
           end
           version = MacOS.pkgutil_info(id)[/version: (.+)$/, 1]
