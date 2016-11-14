@@ -27,10 +27,9 @@ class Sandbox
   end
 
   def self.print_sandbox_message
-    unless @printed_sandbox_message
-      ohai "Using the sandbox"
-      @printed_sandbox_message = true
-    end
+    return if @printed_sandbox_message
+    ohai "Using the sandbox"
+    @printed_sandbox_message = true
   end
 
   def initialize

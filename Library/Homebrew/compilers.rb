@@ -118,7 +118,7 @@ class CompilerSelector
           yield Compiler.new(name, version) if version
         end
       when :llvm
-        # no-op. DSL supported, compiler is not.
+        next # no-op. DSL supported, compiler is not.
       else
         version = compiler_version(compiler)
         yield Compiler.new(compiler, version) if version

@@ -148,13 +148,17 @@ class Pathname
     open("a", *open_args) { |f| f.puts(content) }
   end
 
-  def binwrite(contents, *open_args)
-    open("wb", *open_args) { |f| f.write(contents) }
-  end unless method_defined?(:binwrite)
+  unless method_defined?(:binwrite)
+    def binwrite(contents, *open_args)
+      open("wb", *open_args) { |f| f.write(contents) }
+    end
+  end
 
-  def binread(*open_args)
-    open("rb", *open_args, &:read)
-  end unless method_defined?(:binread)
+  unless method_defined?(:binread)
+    def binread(*open_args)
+      open("rb", *open_args, &:read)
+    end
+  end
 
   # NOTE always overwrites
   def atomic_write(content)
@@ -353,13 +357,15 @@ class Pathname
     File.symlink(src.relative_path_from(dirname), self)
   end
 
-  def /(other)
-    unless other.respond_to?(:to_str) || other.respond_to?(:to_path)
-      opoo "Pathname#/ called on #{inspect} with #{other.inspect} as an argument"
-      puts "This behavior is deprecated, please pass either a String or a Pathname"
+  unless method_defined?(:/)
+    def /(other)
+      unless other.respond_to?(:to_str) || other.respond_to?(:to_path)
+        opoo "Pathname#/ called on #{inspect} with #{other.inspect} as an argument"
+        puts "This behavior is deprecated, please pass either a String or a Pathname"
+      end
+      self + other.to_s
     end
-    self + other.to_s
-  end unless method_defined?(:/)
+  end
 
   # @private
   def ensure_writable

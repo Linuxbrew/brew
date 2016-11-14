@@ -69,7 +69,7 @@ module Homebrew
       end
 
       def inject_file_list(list, string)
-        list.inject(string) { |a, e| a << "  #{e}\n" }
+        list.inject(string) { |acc, elem| acc << "  #{elem}\n" }
       end
       ############# END HELPERS
 

@@ -28,22 +28,21 @@ module Hbc
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
-      unless cask.caveats.empty?
-        output = capture_output do
-          cask.caveats.each do |caveat|
-            if caveat.respond_to?(:eval_and_print)
-              caveat.eval_and_print(cask)
-            else
-              puts caveat
-            end
+      return if cask.caveats.empty?
+
+      output = capture_output do
+        cask.caveats.each do |caveat|
+          if caveat.respond_to?(:eval_and_print)
+            caveat.eval_and_print(cask)
+          else
+            puts caveat
           end
         end
-
-        unless output.empty?
-          ohai "Caveats"
-          puts output
-        end
       end
+
+      return if output.empty?
+      ohai "Caveats"
+      puts output
     end
 
     def self.capture_output(&block)

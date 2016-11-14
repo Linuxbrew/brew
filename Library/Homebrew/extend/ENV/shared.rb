@@ -98,11 +98,12 @@ module SharedEnvExtension
   end
 
   def remove(keys, value)
+    return if value.nil?
     Array(keys).each do |key|
       next unless self[key]
       self[key] = self[key].sub(value, "")
       delete(key) if self[key].empty?
-    end if value
+    end
   end
 
   def cc

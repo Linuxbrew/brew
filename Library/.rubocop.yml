@@ -6,6 +6,9 @@ AllCops:
 Metrics/AbcSize:
   Enabled: false
 
+Metrics/BlockLength:
+  Enabled: false
+
 Metrics/ClassLength:
   Enabled: false
 
@@ -134,6 +137,9 @@ Style/RegexpLiteral:
 
 # conflicts with DSL-style path concatenation with `/`
 Style/SpaceAroundOperators:
+  Enabled: false
+
+Style/SingleLineBlockParams:
   Enabled: false
 
 # not a problem for typical shell users
