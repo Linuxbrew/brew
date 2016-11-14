@@ -103,12 +103,18 @@ class BuildOptions
 
   # @private
   def invalid_options
-    @args - @options
+    @args - @options - BuildOptions.formula_install_options
   end
 
   # @private
   def invalid_option_names
     invalid_options.map(&:flag).sort
+  end
+
+  def self.formula_install_options
+    @formula_install_options ||= ARGV.formula_install_option_names.map do |option_name|
+      Option.new option_name[2..-1]
+    end
   end
 
   private

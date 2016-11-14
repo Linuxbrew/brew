@@ -1,4 +1,29 @@
 module HomebrewArgvExtension
+  def formula_install_option_names
+    %w[
+      --debug
+      --env=
+      --ignore-dependencies
+      --cc=
+      --build-from-source
+      --devel
+      --HEAD
+      --keep-tmp
+      --interactive
+      --git
+      --sandbox
+      --no-sandbox
+      --build-bottle
+      --force-bottle
+      --verbose
+      -i
+      -v
+      -d
+      -g
+      -s
+    ].freeze
+  end
+
   def named
     @named ||= self - options_only
   end
