@@ -1,3 +1,5 @@
+require "version/null"
+
 class Version
   include Comparable
 
@@ -206,7 +208,18 @@ class Version
     false
   end
 
+  def null?
+    false
+  end
+
   def <=>(other)
+    # Needed to retain API compatibility with older string comparisons
+    # for compiler versions, etc.
+    other = Version.new(other) if other.is_a? String
+    # Used by the *_build_version comparisons, which formerly returned Fixnum
+    other = Version.new(other.to_s) if other.is_a? Integer
+    return 1 if other.nil?
+
     return unless other.is_a?(Version)
     return 0 if version == other.version
     return 1 if head? && !other.head?
@@ -247,6 +260,10 @@ class Version
     version.hash
   end
 
+  def to_f
+    version.to_f
+  end
+
   def to_s
     version.dup
   end
@@ -281,7 +298,7 @@ class Version
 
   def self.parse(spec)
     version = _parse(spec)
-    new(version) unless version.nil?
+    version.nil? ? NULL : new(version)
   end
 
   def self._parse(spec)

@@ -14,7 +14,14 @@ end
 
 class CompilerFailure
   attr_reader :name
-  attr_rw :version
+
+  def version(val = nil)
+    if val
+      @version = Version.parse(val.to_s)
+    else
+      @version
+    end
+  end
 
   # Allows Apple compiler `fails_with` statements to keep using `build`
   # even though `build` and `version` are the same internally
@@ -45,7 +52,7 @@ class CompilerFailure
 
   def initialize(name, version, &block)
     @name = name
-    @version = version
+    @version = Version.parse(version.to_s)
     instance_eval(&block) if block_given?
   end
 
@@ -115,13 +122,13 @@ class CompilerSelector
         GNU_GCC_VERSIONS.reverse_each do |v|
           name = "gcc-#{v}"
           version = compiler_version(name)
-          yield Compiler.new(name, version) if version
+          yield Compiler.new(name, version) unless version.null?
         end
       when :llvm
         next # no-op. DSL supported, compiler is not.
       else
         version = compiler_version(compiler)
-        yield Compiler.new(compiler, version) if version
+        yield Compiler.new(compiler, version) unless version.null?
       end
     end
   end

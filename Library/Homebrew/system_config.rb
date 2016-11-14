@@ -143,9 +143,9 @@ class SystemConfig
       f.puts "HOMEBREW_BOTTLE_DOMAIN: #{BottleSpecification::DEFAULT_DOMAIN}"
       f.puts hardware if hardware
       f.puts "Homebrew Ruby: #{describe_homebrew_ruby}"
-      f.puts "GCC-4.0: build #{gcc_40}" if gcc_40
-      f.puts "GCC-4.2: build #{gcc_42}" if gcc_42
-      f.puts "Clang: #{clang ? "#{clang} build #{clang_build}" : "N/A"}"
+      f.puts "GCC-4.0: build #{gcc_40}" unless gcc_40.null?
+      f.puts "GCC-4.2: build #{gcc_42}" unless gcc_42.null?
+      f.puts "Clang: #{clang.null? ? "N/A" : "#{clang} build #{clang_build}"}"
       f.puts "Git: #{describe_git}"
       f.puts "Perl: #{describe_perl}"
       f.puts "Python: #{describe_python}"

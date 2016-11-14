@@ -145,7 +145,10 @@ class Resource
   end
 
   def version(val = nil)
-    @version ||= detect_version(val)
+    @version ||= begin
+      version = detect_version(val)
+      version.null? ? nil : version
+    end
   end
 
   def mirror(val)
@@ -155,7 +158,7 @@ class Resource
   private
 
   def detect_version(val)
-    return if val.nil? && url.nil?
+    return Version::NULL if val.nil? && url.nil?
 
     case val
     when nil     then Version.detect(url, specs)
