@@ -96,7 +96,7 @@ module Homebrew
   end
 
   class DependentsMessage
-    attr :reqs, :deps
+    attr_reader :reqs, :deps
 
     def initialize(requireds, dependents)
       @reqs = requireds
@@ -105,11 +105,11 @@ module Homebrew
 
     protected
 
-    def is(items)
+    def are(items)
       items.count == 1 ? "is" : "are"
     end
 
-    def it(items)
+    def they(items)
       items.count == 1 ? "it" : "they"
     end
 
@@ -121,15 +121,15 @@ module Homebrew
       "brew uninstall --ignore-dependencies #{list reqs.map(&:name)}"
     end
 
-    def is_required_by_deps
-      "#{is reqs} required by #{list deps}, which #{is deps} currently installed"
+    def are_required_by_deps
+      "#{are reqs} required by #{list deps}, which #{are deps} currently installed"
     end
   end
 
   class DeveloperDependentsMessage < DependentsMessage
     def output
       opoo <<-EOS.undent
-        #{list reqs} #{is_required_by_deps}.
+        #{list reqs} #{are_required_by_deps}.
         You can silence this warning with:
           #{sample_command}
       EOS
@@ -140,7 +140,7 @@ module Homebrew
     def output
       ofail <<-EOS.undent
         Refusing to uninstall #{list reqs}
-        because #{it reqs} #{is_required_by_deps}.
+        because #{they reqs} #{are_required_by_deps}.
         You can override this and force removal with:
           #{sample_command}
       EOS
