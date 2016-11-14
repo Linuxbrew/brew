@@ -87,36 +87,64 @@ module Homebrew
     return false unless result = Keg.find_some_installed_dependents(kegs)
 
     if ARGV.homebrew_developer?
-      dependents_output_for_developers(*result)
+      DeveloperDependentsMessage.new(*result).output
     else
-      dependents_output_for_nondevelopers(*result)
+      NondeveloperDependentsMessage.new(*result).output
     end
 
     true
   end
 
-  def dependents_output_for_developers(requireds, dependents)
-    msg = requireds.join(", ")
-    msg << (requireds.count == 1 ? " is" : " are")
-    msg << " required by #{dependents.join(", ")}, which "
-    msg << (dependents.count == 1 ? "is" : "are")
-    msg << " currently installed."
-    msg << "\nYou can silence this warning with "
-    msg << "`brew uninstall --ignore-dependencies "
-    msg << "#{requireds.map(&:name).join(" ")}`."
-    opoo msg
+  class DependentsMessage
+    attr :reqs, :deps
+
+    def initialize(requireds, dependents)
+      @reqs = requireds
+      @deps = dependents
+    end
+
+    protected
+
+    def is(items)
+      items.count == 1 ? "is" : "are"
+    end
+
+    def it(items)
+      items.count == 1 ? "it" : "they"
+    end
+
+    def list(items)
+      items.join(", ")
+    end
+
+    def sample_command
+      "brew uninstall --ignore-dependencies #{list reqs.map(&:name)}"
+    end
+
+    def is_required_by_deps
+      "#{is reqs} required by #{list deps}, which #{is deps} currently installed"
+    end
   end
 
-  def dependents_output_for_nondevelopers(requireds, dependents)
-    msg = "Refusing to uninstall #{requireds.join(", ")} because "
-    msg << (requireds.count == 1 ? "it is" : "they are")
-    msg << " required by #{dependents.join(", ")}, which "
-    msg << (dependents.count == 1 ? "is" : "are")
-    msg << " currently installed."
-    msg << "\nYou can override this and force removal with "
-    msg << "`brew uninstall --ignore-dependencies "
-    msg << "#{requireds.map(&:name).join(" ")}`."
-    ofail msg
+  class DeveloperDependentsMessage < DependentsMessage
+    def output
+      opoo <<-EOS.undent
+        #{list reqs} #{is_required_by_deps}.
+        You can silence this warning with:
+          #{sample_command}
+      EOS
+    end
+  end
+
+  class NondeveloperDependentsMessage < DependentsMessage
+    def output
+      ofail <<-EOS.undent
+        Refusing to uninstall #{list reqs}
+        because #{it reqs} #{is_required_by_deps}.
+        You can override this and force removal with:
+          #{sample_command}
+      EOS
+    end
   end
 
   def rm_pin(rack)
