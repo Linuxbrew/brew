@@ -77,7 +77,7 @@ class FormulaVersions
           end
           next unless f.devel
           map[:devel] ||= {}
-          map[:stable][f.devel.version] ||= []
+          map[:devel][f.devel.version] ||= []
           map[:devel][f.devel.version] << f.send(attribute)
         end
       end
