@@ -1271,8 +1271,6 @@ class Formula
       -DCMAKE_VERBOSE_MAKEFILE=ON
       -Wno-dev
     ]
-    # Set RPATH for Linux to fix error while loading shared libraries
-    args += ["-DCMAKE_BUILD_WITH_INSTALL_RPATH=1", "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=1"] if OS.linux?
 
     # Avoid false positives for clock_gettime support on 10.11.
     # CMake cache entries for other weak symbols may be added here as needed.
