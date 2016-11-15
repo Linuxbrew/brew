@@ -107,7 +107,7 @@ module Homebrew
     names = if ARGV.named.empty?
       Formula.racks
     else
-      racks = ARGV.named.map { |n| HOMEBREW_CELLAR+n }
+      racks = ARGV.named.map { |n| Formulary.to_rack(n) }
       racks.select do |rack|
         Homebrew.failed = true unless rack.exist?
         rack.exist?
