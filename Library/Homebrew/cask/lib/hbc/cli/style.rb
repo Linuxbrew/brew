@@ -23,7 +23,7 @@ module Hbc
         $CHILD_STATUS.success?
       end
 
-      RUBOCOP_CASK_VERSION = "~> 0.10.5".freeze
+      RUBOCOP_CASK_VERSION = "~> 0.10.6".freeze
 
       def install_rubocop
         Utils.capture_stderr do
