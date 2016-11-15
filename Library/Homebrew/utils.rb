@@ -376,6 +376,15 @@ ensure
   trap("INT", std_trap)
 end
 
+def capture_stderr
+  old = $stderr
+  $stderr = StringIO.new
+  yield
+  $stderr.string
+ensure
+  $stderr = old
+end
+
 def nostdout
   if ARGV.verbose?
     yield

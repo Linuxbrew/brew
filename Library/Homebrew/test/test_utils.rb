@@ -174,6 +174,10 @@ class UtilTests < Homebrew::TestCase
     end
   end
 
+  def test_capture_stderr
+    assert_equal "test\n", capture_stderr { $stderr.puts "test" }
+  end
+
   def test_shell_profile
     ENV["SHELL"] = "/bin/sh"
     assert_equal "~/.bash_profile", Utils::Shell.shell_profile
