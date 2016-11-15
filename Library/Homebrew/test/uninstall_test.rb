@@ -34,13 +34,11 @@ class UninstallTests < Homebrew::TestCase
   end
 
   def test_check_for_testball_f2s_when_developer
-    skip "Flaky test"
     assert_match "Warning", handle_unsatisfied_dependents
     refute_predicate Homebrew, :failed?
   end
 
   def test_check_for_dependents_when_not_developer
-    skip "Flaky test"
     run_as_not_developer do
       assert_match "Error", handle_unsatisfied_dependents
       assert_predicate Homebrew, :failed?
