@@ -674,8 +674,10 @@ class FormulaAuditor
         attributes_for_version = spec_attribute_map[formula.version]
         next if attributes_for_version.nil? || attributes_for_version.empty?
 
-        if formula.send(attribute) < attributes_for_version.max
-          problem "#{spec} #{attribute} should not decrease"
+        old_attribute = formula.send(attribute)
+        max_attribute = attributes_for_version.max
+        if max_attribute && old_attribute < max_attribute
+          problem "#{spec} #{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
         end
       end
 
@@ -687,8 +689,11 @@ class FormulaAuditor
         version_scheme.first == max_version_scheme
       end.keys.max
 
-      if max_version && formula.version < max_version
-        problem "#{spec} version should not decrease"
+      formula_spec = formula.send(spec)
+      next if formula_spec.nil?
+
+      if max_version && formula_spec.version < max_version
+        problem "#{spec} version should not decrease (from #{max_version} to #{formula_spec.version})"
       end
     end
 
