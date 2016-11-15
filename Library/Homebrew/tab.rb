@@ -317,6 +317,10 @@ class Tab < OpenStruct
   end
 
   def write
+    # If this is a new installation, the cache of installed formulae
+    # will no longer be valid.
+    Formula.clear_cache unless tabfile.exist?
+
     CACHE[tabfile] = self
     tabfile.atomic_write(to_json)
   end

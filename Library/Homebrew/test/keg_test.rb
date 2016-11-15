@@ -327,7 +327,6 @@ class InstalledDependantsTests < LinkTests
     f = stub_formula_name(name)
     keg = super
     Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
-    Formula.clear_cache
     keg
   end
 
