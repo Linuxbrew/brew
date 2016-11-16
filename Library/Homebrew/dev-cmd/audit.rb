@@ -661,7 +661,7 @@ class FormulaAuditor
     return unless formula.tap.git? # git log is required
     return if @new_formula
 
-    fv = FormulaVersions.new(formula, max_depth: 10)
+    fv = FormulaVersions.new(formula, max_depth: 1)
     attributes = [:revision, :version_scheme]
 
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
