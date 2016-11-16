@@ -700,7 +700,8 @@ class FormulaAuditor
     return if formula.revision.zero?
     if formula.stable
       revision_map = attributes_map[:revision][:stable]
-      if revision_map[formula.stable.version].empty? # check stable spec
+      stable_revisions = revision_map[formula.stable.version]
+      if !stable_revisions || stable_revisions.empty?
         problem "'revision #{formula.revision}' should be removed"
       end
     else # head/devel-only formula
