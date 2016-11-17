@@ -666,21 +666,21 @@ class FormulaAuditor
 
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
-    [:stable, :devel].each do |spec|
-      attributes.each do |attribute|
-        spec_attribute_map = attributes_map[attribute][spec]
-        next if spec_attribute_map.nil? || spec_attribute_map.empty?
+    attributes.each do |attribute|
+      stable_attribute_map = attributes_map[attribute][:stable]
+      next if stable_attribute_map.nil? || stable_attribute_map.empty?
 
-        attributes_for_version = spec_attribute_map[formula.version]
-        next if attributes_for_version.nil? || attributes_for_version.empty?
+      attributes_for_version = stable_attribute_map[formula.version]
+      next if attributes_for_version.nil? || attributes_for_version.empty?
 
-        old_attribute = formula.send(attribute)
-        max_attribute = attributes_for_version.max
-        if max_attribute && old_attribute < max_attribute
-          problem "#{spec} #{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
-        end
+      old_attribute = formula.send(attribute)
+      max_attribute = attributes_for_version.max
+      if max_attribute && old_attribute < max_attribute
+        problem "#{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
       end
+    end
 
+    [:stable, :devel].each do |spec|
       spec_version_scheme_map = attributes_map[:version_scheme][spec]
       next if spec_version_scheme_map.nil? || spec_version_scheme_map.empty?
 
