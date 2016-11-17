@@ -473,4 +473,12 @@ class InstalledDependantsTests < LinkTestCase
     assert_empty @keg.installed_dependents
     assert_nil Keg.find_some_installed_dependents([@keg])
   end
+
+  def test_keg_only
+    @keg.unlink
+    Formula["foo"].class.keg_only "a good reason"
+    dependencies [{ "full_name" => "foo", "version" => "1.1" }] # different version
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
+  end
 end
