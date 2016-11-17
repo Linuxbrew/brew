@@ -8,7 +8,7 @@ module Homebrew
   module_function
 
   def tests
-    (HOMEBREW_LIBRARY/"Homebrew").cd do
+    HOMEBREW_LIBRARY_PATH.cd do
       ENV.delete "HOMEBREW_VERBOSE"
       ENV.delete "VERBOSE"
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
@@ -44,8 +44,8 @@ module Homebrew
       # Make it easier to reproduce test runs.
       ENV["SEED"] = ARGV.next if ARGV.include? "--seed"
 
-      files = Dir["test/test_*.rb"]
-      files -= Dir["test/test_os_mac_*.rb"] unless OS.mac?
+      files = Dir.glob("test/**/*_test.rb")
+                 .reject { |p| !OS.mac? && p.start_with?("test/os/mac/") }
 
       opts = []
       opts << "--serialize-stdout" if ENV["CI"]
@@ -54,20 +54,18 @@ module Homebrew
       args << "--trace" if ARGV.include? "--trace"
 
       if ARGV.value("only")
-        ENV["HOMEBREW_TESTS_ONLY"] = "1"
-        test_name, test_method = ARGV.value("only").split("/", 2)
-        files = ["test/test_#{test_name}.rb"]
+        test_name, test_method = ARGV.value("only").split(":", 2)
+        files = Dir.glob("test/{#{test_name},#{test_name}/**/*}_test.rb")
         args << "--name=test_#{test_method}" if test_method
       end
 
       args += ARGV.named.select { |v| v[/^TEST(OPTS)?=/] }
 
-      system "bundle", "exec", "parallel_test", *opts,
-        "--", *args, "--", *files
+      system "bundle", "exec", "parallel_test", *opts, "--", *args, "--", *files
 
       Homebrew.failed = !$?.success?
 
-      if (fs_leak_log = HOMEBREW_LIBRARY/"Homebrew/test/fs_leak_log").file?
+      if (fs_leak_log = HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log").file?
         fs_leak_log_content = fs_leak_log.read
         unless fs_leak_log_content.empty?
           opoo "File leak is detected"

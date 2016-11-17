@@ -8,15 +8,15 @@ end
 
 # add Homebrew to load path
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew"))
-$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew/test/lib"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew/test/support/lib"))
 
 require "global"
 
 # add Homebrew-Cask to load path
 $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
 
-require "test/helper/env"
-require "test/helper/shutup"
+require "test/support/helper/env"
+require "test/support/helper/shutup"
 
 Pathname.glob(HOMEBREW_LIBRARY_PATH.join("cask", "spec", "support", "*.rb")).each(&method(:require))
 
