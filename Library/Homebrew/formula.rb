@@ -1623,7 +1623,7 @@ class Formula
 
   # @private
   def test_fixtures(file)
-    HOMEBREW_LIBRARY_PATH.join("test", "fixtures", file)
+    HOMEBREW_LIBRARY_PATH.join("test", "support", "fixtures", file)
   end
 
   # This method is overridden in {Formula} subclasses to provide the installation instructions.
