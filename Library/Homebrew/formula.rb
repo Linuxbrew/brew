@@ -1337,10 +1337,14 @@ class Formula
     end
   end
 
-  # Clear caches of .racks and .installed.
-  # @private
-  def self.clear_cache
+  # Clear cache of .racks
+  def self.clear_racks_cache
     @racks = nil
+  end
+
+  # Clear caches of .racks and .installed.
+  def self.clear_installed_formulae_cache
+    clear_racks_cache
     @installed = nil
   end
 
