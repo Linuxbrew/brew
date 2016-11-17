@@ -2,7 +2,7 @@ require "testing_env"
 require "keg"
 require "stringio"
 
-class LinkTests < Homebrew::TestCase
+class LinkTestCase < Homebrew::TestCase
   include FileUtils
 
   def setup_test_keg(name, version)
@@ -44,7 +44,9 @@ class LinkTests < Homebrew::TestCase
     rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
   end
+end
 
+class LinkTests < LinkTestCase
   def test_empty_installation
     %w[.DS_Store INSTALL_RECEIPT.json LICENSE.txt].each do |file|
       touch @keg/file
@@ -315,7 +317,7 @@ class LinkTests < Homebrew::TestCase
   end
 end
 
-class InstalledDependantsTests < LinkTests
+class InstalledDependantsTests < LinkTestCase
   def stub_formula_name(name)
     f = formula(name) { url "foo-1.0" }
     stub_formula_loader f
