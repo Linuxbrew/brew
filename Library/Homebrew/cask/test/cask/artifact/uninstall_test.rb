@@ -192,6 +192,14 @@ describe Hbc::Artifact::Uninstall do
           sudo(%W[/sbin/kextunload -b #{kext_id}])
         )
 
+        Hbc::FakeSystemCommand.expects_command(
+          sudo(%W[/usr/sbin/kextfind -b #{kext_id}]), "/Library/Extensions/FancyPackage.kext\n"
+        )
+
+        Hbc::FakeSystemCommand.expects_command(
+          sudo(["/bin/rm", "-rf", "/Library/Extensions/FancyPackage.kext"])
+        )
+
         subject
       end
     end
