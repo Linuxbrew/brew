@@ -1,4 +1,4 @@
-require "vendor/okjson"
+require "json"
 
 module Utils
   module JSON
@@ -7,13 +7,13 @@ module Utils
     Error = Class.new(StandardError)
 
     def load(str)
-      Vendor::OkJson.decode(str)
-    rescue Vendor::OkJson::Error => e
+      ::JSON.load(str)
+    rescue ::JSON::ParserError => e
       raise Error, e.message
     end
 
     def dump(obj)
-      Vendor::OkJson.encode(stringify_keys(obj))
+      ::JSON.generate(obj)
     end
 
     def stringify_keys(obj)
