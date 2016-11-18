@@ -46,6 +46,7 @@ module Homebrew
 
       files = Dir.glob("test/**/*_test.rb")
                  .reject { |p| !OS.mac? && p.start_with?("test/os/mac/") }
+                 .reject { |p| p.start_with?("test/vendor/bundle/") }
 
       opts = []
       opts << "--serialize-stdout" if ENV["CI"]
