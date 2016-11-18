@@ -81,6 +81,9 @@ module Homebrew
 
     all_kegs = kegs_by_rack.values.flatten(1)
     check_for_dependents all_kegs
+  rescue MethodDeprecatedError
+    # Silently ignore deprecations when uninstalling.
+    nil
   end
 
   def check_for_dependents(kegs)
