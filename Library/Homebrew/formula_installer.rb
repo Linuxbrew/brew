@@ -251,6 +251,7 @@ class FormulaInstaller
         opoo "Bottle installation failed: building from source."
         raise BuildToolsError, [formula] unless DevelopmentTools.installed?
       else
+        puts @requirement_messages
         @poured_bottle = true
       end
     end
@@ -260,6 +261,7 @@ class FormulaInstaller
     unless @poured_bottle
       not_pouring = !pour_bottle || @pour_failed
       compute_and_install_dependencies if not_pouring && !ignore_deps?
+      puts @requirement_messages
       build
       clean
 
@@ -334,17 +336,21 @@ class FormulaInstaller
   end
 
   def check_requirements(req_map)
+    @requirement_messages = []
     fatals = []
 
     req_map.each_pair do |dependent, reqs|
       next if dependent.installed?
       reqs.each do |req|
-        puts "#{dependent}: #{req.message}"
+        @requirement_messages << "#{dependent}: #{req.message}"
         fatals << req if req.fatal?
       end
     end
 
-    raise UnsatisfiedRequirements, fatals unless fatals.empty?
+    return if fatals.empty?
+
+    puts @requirement_messages
+    raise UnsatisfiedRequirements, fatals
   end
 
   def install_requirement_default_formula?(req, dependent, build)
