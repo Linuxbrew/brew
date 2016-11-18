@@ -1,3 +1,5 @@
+require "os/linux/architecture_list"
+
 module ELF
   # @private
   LDD_RX = /\t.* => (.*) \(.*\)/
