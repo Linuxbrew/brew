@@ -12,22 +12,22 @@ module Homebrew
       cmds = internal_commands + external_commands
       cmds += internal_developer_commands
       cmds += HOMEBREW_INTERNAL_COMMAND_ALIASES.keys if ARGV.include? "--include-aliases"
-      puts_columns cmds.sort
+      puts Formatter.columns(cmds.sort)
     else
       # Find commands in Homebrew/cmd
       puts "Built-in commands"
-      puts_columns internal_commands
+      puts Formatter.columns(internal_commands)
 
       # Find commands in Homebrew/dev-cmd
       puts
       puts "Built-in developer commands"
-      puts_columns internal_developer_commands
+      puts Formatter.columns(internal_developer_commands)
 
       # Find commands in the path
       unless (exts = external_commands).empty?
         puts
         puts "External commands"
-        puts_columns exts
+        puts Formatter.columns(exts)
       end
     end
   end

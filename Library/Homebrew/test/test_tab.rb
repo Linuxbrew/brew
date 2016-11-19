@@ -97,7 +97,7 @@ class TabTests < Homebrew::TestCase
     assert_equal TEST_SHA1, tab.HEAD
     assert_equal :clang, tab.cxxstdlib.compiler
     assert_equal :libcxx, tab.cxxstdlib.type
-    assert_empty tab.runtime_dependencies
+    assert_nil tab.runtime_dependencies
   end
 
   def test_from_file

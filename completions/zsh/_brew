@@ -83,7 +83,7 @@ __brew_common_commands() {
     'commands:show a list of commands'
     'config:show homebrew and system configuration'
     'create:create a new formula'
-    'deps:list dependencies and dependants of a formula'
+    'deps:list dependencies of formulae'
     'desc:display a description of a formula'
     'doctor:audits your installation for common issues'
     'edit:edit a formula'
@@ -297,23 +297,26 @@ _brew_create() {
 # The filters placeholder is any combination of options --include-build, --include-optional, and --skip-recommended as documented above.
 _brew_deps() {
   _arguments \
-    '--include-build[include \:build dependencie]' \
-    '--include-optional[include \:optional dependencies]' \
-    '--skip-recommended[skip \:recommended type dependencies]' \
     - formulae-deps \
+      '--include-build[include \:build dependencies]' \
+      '--include-optional[include \:optional dependencies]' \
+      '--skip-recommended[skip \:recommended type dependencies]' \
       '--1[only show dependencies one level down, instead of recursing]' \
       '-n[show dependencies in topological order]' \
       '--union[show the union of dependencies for formulae, instead of the intersection]' \
       '--full-name[list dependencies by their full name]' \
-      '--installed[only list those dependencies that are currently installed]' \
+      '--installed[only list currently installed dependencies, or show dependencies for all installed formulae]' \
       '*:formulae:__brew_formulae' \
     - tree-deps \
-      '--tree' \
-      '(*)--installed[output a tree for every installed formula]' \
+      '--tree[show dependencies as a tree]' \
+      '(*)--installed[show dependencies for all installed formulae]' \
       '(--installed)*:formulae:__brew_formulae' \
     - installed-all \
-      '(--all)--installed[show dependencies for installed formulae]' \
-      '(--installed)--all[Show dependencies for all available formulae]'
+      '--include-build[include \:build dependencies]' \
+      '--include-optional[include \:optional dependencies]' \
+      '--skip-recommended[skip \:recommended type dependencies]' \
+      '(--all)--installed[show dependencies for all installed formulae]' \
+      '(--installed)--all[show dependencies for all available formulae]'
 }
 
 # brew desc formula
@@ -564,7 +567,7 @@ _brew_reinstall() {
 _brew_search() {
   _arguments \
     '(--desc)--desc[include description for each package]:text: ' \
-    '(--desc --debian --fedora --fink --macports --opensuse --ubuntu)'{--debian,--fedora,--fink,--macports,--opensuse,--ubuntu}'[searcg for text in given package manager''s list]'
+    '(--desc --debian --fedora --fink --macports --opensuse --ubuntu)'{--debian,--fedora,--fink,--macports,--opensuse,--ubuntu}'[search for text in given package manager''s list]'
 }
 
 # brew sh [--env=std]:
