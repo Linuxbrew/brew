@@ -68,7 +68,7 @@ module Hbc
         elsif @options[:versions]
           puts installed_casks.map(&method(:format_versioned))
         else
-          puts_columns installed_casks.map(&:to_s)
+          puts Formatter.columns(installed_casks.map(&:to_s))
         end
 
         installed_casks.empty? ? nil : true

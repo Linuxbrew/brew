@@ -47,7 +47,7 @@ module Hbc
           else
             ohai "Partial matches"
           end
-          puts_columns partial_matches
+          puts Formatter.columns(partial_matches)
         end
       end
 

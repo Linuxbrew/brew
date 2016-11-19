@@ -408,14 +408,13 @@ class FormulaAuditor
           EOS
         when "open-mpi", "mpich"
           problem <<-EOS.undent
-        when *BUILD_TIME_DEPS
-          next if dep.build? || dep.run?
-          problem <<-EOS.undent
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
               depends_on :mpi => [<lang list>]
             Where <lang list> is a comma delimited list that can include:
               :cc, :cxx, :f77, :f90
             EOS
+        when *BUILD_TIME_DEPS
+          next if dep.build? || dep.run?
         end
       end
     end
@@ -809,6 +808,10 @@ class FormulaAuditor
 
     if line =~ /depends_on :(automake|autoconf|libtool)/
       problem ":#{$1} is deprecated. Usage should be \"#{$1}\""
+    end
+
+    if line =~ /depends_on :apr/
+      problem ":apr is deprecated. Usage should be \"apr-util\""
     end
 
     # Commented-out depends_on

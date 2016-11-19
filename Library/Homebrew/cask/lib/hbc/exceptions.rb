@@ -68,7 +68,7 @@ module Hbc
       s = "Command failed to execute!\n"
       s.concat("\n")
       s.concat("==> Failed command:\n")
-      s.concat(@cmd).concat("\n")
+      s.concat(@cmd.join(" ")).concat("\n")
       s.concat("\n")
       s.concat("==> Standard Output of failed command:\n")
       s.concat(@stdout).concat("\n")

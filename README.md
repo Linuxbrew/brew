@@ -6,7 +6,7 @@
 
 It can be installed in your home directory and does not require root access. The same package manager can be used on both your Linux server and your Mac laptop. Installing a modern version of *glibc* and *gcc* in your home directory on an old distribution of Linux takes five minutes.
 
-Features, usage and installation instructions are [summarised on the homepage](http://linuxbrew.sh).
+Features, usage and installation instructions are [summarised on the homepage](http://linuxbrew.sh). Terminology (e.g. the difference between a Cellar, Tap, Cask and so forth) is [explained here](docs/Formula-Cookbook.md#homebrew-terminology).
 
 To receive updates of major changes to Linuxbrew subscribe to the [Linuxbrew Updates](https://github.com/Linuxbrew/brew/issues/1) issue on GitHub.
 
@@ -153,9 +153,9 @@ Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](ht
 
 Homebrew's lead maintainer is [Mike McQuaid](https://github.com/mikemcquaid).
 
-Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Tomasz Pajor](https://github.com/nijikon), [Baptiste Fontaine](https://github.com/bfontaine), [Zhiming Wang](https://github.com/zmwangx), [Brett Koonce](https://github.com/asparagui), [ilovezfs](https://github.com/ilovezfs), [Martin Afanasjew](https://github.com/UniqMartin), [Uladzislau Shablinski](https://github.com/vladshablinsky), [Dominyk Tiller](https://github.com/DomT4), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
+Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Tomasz Pajor](https://github.com/nijikon), [Josh Hagins](https://github.com/jawshooah), [Baptiste Fontaine](https://github.com/bfontaine), [Zhiming Wang](https://github.com/zmwangx), [Markus Reiter](https://github.com/reitermarkus), [ilovezfs](https://github.com/ilovezfs), [Martin Afanasjew](https://github.com/UniqMartin), [Tom Schoonjans](https://github.com/tschoonj), [Uladzislau Shablinski](https://github.com/vladshablinsky), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
 
-Former maintainers with significant contributions include [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
+Former maintainers with significant contributions include [Dominyk Tiller](https://github.com/DomT4), [Brett Koonce](https://github.com/asparagui), [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
 ## License
 Code is under the [BSD 2 Clause (NetBSD) license](https://github.com/Homebrew/brew/tree/master/LICENSE.txt).

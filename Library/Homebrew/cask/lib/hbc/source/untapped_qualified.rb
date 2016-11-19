@@ -7,7 +7,7 @@ module Hbc
         return if (tap = tap_for_query(query)).nil?
 
         tap.install
-        tap.installed? && path_for_query(query).exist?
+        tap.installed? && Hbc.path(query).exist?
       end
     end
   end

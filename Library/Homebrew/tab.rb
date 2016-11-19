@@ -60,7 +60,6 @@ class Tab < OpenStruct
   def self.from_file_content(content, path)
     attributes = Utils::JSON.load(content)
     attributes["tabfile"] = path
-    attributes["runtime_dependencies"] ||= []
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}
 

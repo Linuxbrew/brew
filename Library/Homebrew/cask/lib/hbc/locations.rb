@@ -131,21 +131,32 @@ module Hbc
       end
 
       def path(query)
-        query = query.sub(%r{\.rb$}i, "")
-        token_with_tap = if query.include?("/")
-                           query
+        query_path = Pathname.new(query)
+
+        if query_path.exist? || query_path.absolute?
+          return query_path
+        end
+
+        query_without_extension = query.sub(%r{\.rb$}i, "")
+
+        token_with_tap = if query =~ %r{\A[^/]+/[^/]+/[^/]+\Z}
+                           query_without_extension
                          else
-                           all_tokens.detect do |tap_and_token|
-                             tap_and_token.split("/")[2] == query
-                           end
+                           all_tokens.detect { |tap_and_token|
+                             tap_and_token.split("/")[2] == query_without_extension
+                           }
                          end
 
         if token_with_tap
           user, repo, token = token_with_tap.split("/")
-          Tap.fetch(user, repo).cask_dir.join("#{token}.rb")
+          tap = Tap.fetch(user, repo)
         else
-          default_tap.cask_dir.join("#{query}.rb")
+          token = query_without_extension
+          tap = Hbc.default_tap
         end
+
+        return query_path if tap.cask_dir.nil?
+        tap.cask_dir.join("#{token}.rb")
       end
 
       def tcc_db

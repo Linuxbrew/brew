@@ -66,20 +66,39 @@ class Keg
   def text_files
     text_files = []
     which_file = OS.mac? ? "/usr/bin/file" : which("file")
-    return text_files unless which_file && File.exist?(which_file)
+    which_xargs = OS.mac? ? "/usr/bin/xargs" : which("xargs")
+    return text_files unless which_file && File.exist?(which_file) && which_xargs && File.exist?(which_xargs)
 
     # file has known issues with reading files on other locales. Has
     # been fixed upstream for some time, but a sufficiently new enough
     # file with that fix is only available in macOS Sierra.
     # http://bugs.gw.com/view.php?id=292
     with_custom_locale("C") do
-      path.find do |pn|
-        next if pn.symlink? || pn.directory?
-        next if Metafiles::EXTENSIONS.include? pn.extname
-        if Utils.popen_read(which_file, "--brief", pn).include?("text") ||
-           pn.text_executable?
+      files = Set.new path.find.reject { |pn|
+        next true if pn.symlink?
+        next true if pn.directory?
+        next true if Metafiles::EXTENSIONS.include?(pn.extname)
+        if pn.text_executable?
           text_files << pn
+          next true
         end
+        false
+      }
+      output, _status = Open3.capture2("#{which_xargs} -0 #{which_file} --no-dereference --print0",
+                                       stdin_data: files.to_a.join("\0"))
+      # `file` output sometimes contains data from the file, which may include
+      # invalid UTF-8 entities, so tell Ruby this is just a bytestring
+      output.force_encoding(Encoding::ASCII_8BIT)
+      output.each_line do |line|
+        path, info = line.split("\0", 2)
+        # `file` sometimes prints more than one line of output per file;
+        # subsequent lines do not contain a null-byte separator, so `info`
+        # will be `nil` for those lines
+        next unless info
+        next unless info.include?("text")
+        path = Pathname.new(path)
+        next unless files.include?(path)
+        text_files << path
       end
     end
 
