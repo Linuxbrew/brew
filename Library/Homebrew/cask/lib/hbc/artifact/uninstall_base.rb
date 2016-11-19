@@ -187,6 +187,10 @@ module Hbc
             @command.run!("/sbin/kextunload", args: ["-b", kext], sudo: true)
             sleep 1
           end
+          @command.run!("/usr/sbin/kextfind", args: ["-b", kext], sudo: true).stdout.chomp.lines.each do |kext_path|
+            ohai "Removing kernel extension #{kext_path}"
+            @command.run!("/bin/rm", args: ["-rf", kext_path], sudo: true)
+          end
         end
       end
 
