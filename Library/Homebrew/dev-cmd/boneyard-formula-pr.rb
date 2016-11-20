@@ -9,7 +9,7 @@
 #:    If `--reason=<reason>` is passed, append this to the commit/PR message.
 
 require "formula"
-require "utils/json"
+require "json"
 require "fileutils"
 
 begin
@@ -60,7 +60,7 @@ module Homebrew
         EOS
         safe_system "git", "add", tap_migrations_path
       end
-      tap_migrations = Utils::JSON.load(File.read(tap_migrations_path))
+      tap_migrations = JSON.parse(File.read(tap_migrations_path))
       tap_migrations[formula.name] = boneyard_tap.name
       tap_migrations = tap_migrations.sort.inject({}) { |acc, elem| acc.merge!(elem[0] => elem[1]) }
       tap_migrations_path.atomic_write(JSON.pretty_generate(tap_migrations) + "\n")

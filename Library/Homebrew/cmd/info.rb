@@ -22,7 +22,7 @@ require "options"
 require "formula"
 require "keg"
 require "tab"
-require "utils/json"
+require "json"
 
 module Homebrew
   module_function
@@ -72,7 +72,7 @@ module Homebrew
       ARGV.formulae
     end
     json = ff.map(&:to_hash)
-    puts Utils::JSON.dump(json)
+    puts JSON.generate(json)
   end
 
   def github_remote_path(remote, path)

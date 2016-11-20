@@ -149,9 +149,9 @@ module GitHub
     data_tmpfile = nil
     if data
       begin
-        data = Utils::JSON.dump data
+        data = JSON.generate data
         data_tmpfile = Tempfile.new("github_api_post", HOMEBREW_TEMP)
-      rescue Utils::JSON::Error => e
+      rescue JSON::ParserError => e
         raise Error, "Failed to parse JSON request:\n#{e.message}\n#{data}", e.backtrace
       end
     end
@@ -183,13 +183,13 @@ module GitHub
       if !http_code.start_with?("2") && !status.success?
         raise_api_error(output, errors, http_code, headers, scopes)
       end
-      json = Utils::JSON.load output
+      json = JSON.parse output
       if block_given?
         yield json
       else
         json
       end
-    rescue Utils::JSON::Error => e
+    rescue JSON::ParserError => e
       raise Error, "Failed to parse JSON response\n#{e.message}", e.backtrace
     end
   end
@@ -205,7 +205,7 @@ module GitHub
 
     if meta.fetch("x-ratelimit-remaining", 1).to_i <= 0
       reset = meta.fetch("x-ratelimit-reset").to_i
-      error = Utils::JSON.load(output)["message"]
+      error = JSON.parse(output)["message"]
       raise RateLimitExceededError.new(reset, error)
     end
 
@@ -218,7 +218,7 @@ module GitHub
       raise HTTPNotFoundError, output
     else
       error = begin
-        Utils::JSON.load(output)["message"]
+        JSON.parse(output)["message"]
       rescue
         nil
       end

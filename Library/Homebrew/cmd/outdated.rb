@@ -88,7 +88,7 @@ module Homebrew
                 installed_versions: outdated_versions.collect(&:to_s),
                 current_version: current_version }
     end
-    puts Utils::JSON.dump(json)
+    puts JSON.generate(json)
 
     outdated
   end

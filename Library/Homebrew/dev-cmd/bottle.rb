@@ -344,7 +344,7 @@ module Homebrew
       },
     }
     File.open("#{filename.prefix}.bottle.json", "w") do |file|
-      file.write Utils::JSON.dump json
+      file.write JSON.generate json
     end
   end
 
@@ -352,7 +352,7 @@ module Homebrew
     write = ARGV.include? "--write"
 
     bottles_hash = ARGV.named.reduce({}) do |hash, json_file|
-      deep_merge_hashes hash, Utils::JSON.load(IO.read(json_file))
+      deep_merge_hashes hash, JSON.parse(IO.read(json_file))
     end
 
     bottles_hash.each do |formula_name, bottle_hash|

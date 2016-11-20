@@ -14,7 +14,7 @@
 #:    Exits with a non-zero status if any style violations are found.
 
 require "utils"
-require "utils/json"
+require "json"
 
 module Homebrew
   module_function
@@ -74,7 +74,7 @@ module Homebrew
       # exitstatus can also be nil if RuboCop process crashes, e.g. due to
       # native extension problems
       raise "Error while running RuboCop" if $?.exitstatus.nil? || $?.exitstatus > 1
-      RubocopResults.new(Utils::JSON.load(json))
+      RubocopResults.new(JSON.parse(json))
     else
       raise "Invalid output_type for check_style_impl: #{output_type}"
     end
