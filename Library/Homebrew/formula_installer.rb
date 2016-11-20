@@ -52,6 +52,7 @@ class FormulaInstaller
     @debug = false
     @options = Options.new
     @invalid_option_names = []
+    @requirement_messages = []
 
     @@attempted ||= Set.new
 
@@ -251,7 +252,7 @@ class FormulaInstaller
         opoo "Bottle installation failed: building from source."
         raise BuildToolsError, [formula] unless DevelopmentTools.installed?
       else
-        puts @requirement_messages
+        puts_requirement_messages
         @poured_bottle = true
       end
     end
@@ -261,7 +262,7 @@ class FormulaInstaller
     unless @poured_bottle
       not_pouring = !pour_bottle || @pour_failed
       compute_and_install_dependencies if not_pouring && !ignore_deps?
-      puts @requirement_messages
+      puts_requirement_messages
       build
       clean
 
@@ -349,7 +350,7 @@ class FormulaInstaller
 
     return if fatals.empty?
 
-    puts @requirement_messages
+    puts_requirement_messages
     raise UnsatisfiedRequirements, fatals
   end
 
@@ -836,5 +837,11 @@ class FormulaInstaller
     @@locked.each(&:unlock)
     @@locked.clear
     @hold_locks = false
+  end
+
+  def puts_requirement_messages
+    return unless @requirement_messages
+    return if @requirement_messages.empty?
+    puts @requirement_messages
   end
 end
