@@ -60,8 +60,9 @@ describe Hbc::Artifact::Pkg do
         </plist>
       EOS
       file.stubs path: Pathname.new("/tmp/choices.xml")
-      file.expects(:close).with true
-      Tempfile.expects(:new).returns file
+      file.expects(:close)
+      file.expects(:unlink)
+      Tempfile.expects(:open).yields file
 
       Hbc::FakeSystemCommand.expects_command(["/usr/bin/sudo", "-E", "--", "/usr/sbin/installer", "-pkg", @cask.staged_path.join("MyFancyPkg", "Fancy.pkg"), "-target", "/", "-applyChoiceChangesXML", @cask.staged_path.join("/tmp/choices.xml")])
 

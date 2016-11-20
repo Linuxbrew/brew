@@ -54,24 +54,23 @@ module Hbc
         ]
         args << "-verboseR" if Hbc.verbose
         args << "-allowUntrusted" if pkg_install_opts :allow_untrusted
-        with_choices_file pkg_install_opts(:choices) do |choices_path|
+        with_choices_file do |choices_path|
           args << "-applyChoiceChangesXML" << choices_path if choices_path
           @command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true)
         end
       end
 
-      def with_choices_file(choices)
-        unless choices
-          yield nil
-          return
-        end
+      def with_choices_file
+        return yield nil unless pkg_install_opts(:choices)
 
-        begin
-          file = Tempfile.new(["choices", ".xml"])
-          file.write Plist::Emit.dump(choices)
-          yield file.path
-        ensure
-          file.close(true)
+        Tempfile.open(["choices", ".xml"]) do |file|
+          begin
+            file.write Plist::Emit.dump(pkg_install_opts(:choices))
+            file.close
+            yield file.path
+          ensure
+            file.unlink
+          end
         end
       end
     end
