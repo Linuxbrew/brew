@@ -86,6 +86,13 @@ class DevelopmentTools
         end
     end
 
+    def llvm_clang_build_version
+      @llvm_clang_build_version ||= if Tab.for_name "llvm"
+        path = Formulary.factory("llvm").opt_prefix/"bin/clang"
+        `#{path} --version`[/clang version (\d\.\d\.\d)/, 1]
+      end
+    end
+
     def non_apple_gcc_version(cc)
       (@non_apple_gcc_version ||= {}).fetch(cc) do
         path = HOMEBREW_PREFIX.join("opt", "gcc", "bin", cc)
