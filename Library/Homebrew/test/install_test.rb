@@ -27,4 +27,27 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
     assert_match "testball1: this formula has no --with-fo option so it will be ignored!",
       cmd("install", "testball1", "--with-fo")
   end
+
+  def test_install_with_nonfatal_requirement
+    setup_test_formula "testball1", <<-EOS.undent
+      class NonFatalRequirement < Requirement
+        satisfy { false }
+      end
+      depends_on NonFatalRequirement
+    EOS
+    message = "NonFatalRequirement unsatisfied!"
+    assert_equal 1, cmd("install", "testball1").scan(message).size
+  end
+
+  def test_install_with_fatal_requirement
+    setup_test_formula "testball1", <<-EOS.undent
+      class FatalRequirement < Requirement
+        fatal true
+        satisfy { false }
+      end
+      depends_on FatalRequirement
+    EOS
+    message = "FatalRequirement unsatisfied!"
+    assert_equal 1, cmd_fail("install", "testball1").scan(message).size
+  end
 end
