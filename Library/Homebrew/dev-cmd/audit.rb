@@ -35,6 +35,7 @@ require "official_taps"
 require "cmd/search"
 require "cmd/style"
 require "date"
+require "blacklist"
 
 module Homebrew
   module_function
@@ -309,6 +310,10 @@ class FormulaAuditor
 
     name = formula.name
     full_name = formula.full_name
+
+    if blacklisted?(name)
+      problem "'#{name}' is blacklisted."
+    end
 
     if Formula.aliases.include? name
       problem "Formula name conflicts with existing aliases."
