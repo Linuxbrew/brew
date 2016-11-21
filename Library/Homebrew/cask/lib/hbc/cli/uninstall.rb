@@ -20,7 +20,7 @@ module Hbc
                                                    "Casks", "#{cask_token}.rb")
 
             # use the same cask file that was used for installation, if possible
-            cask = Hbc.load(latest_installed_cask_file) if latest_installed_cask_file.exist?
+            cask = CaskLoader.load_from_file(latest_installed_cask_file) if latest_installed_cask_file.exist?
           end
 
           Installer.new(cask, force: force).uninstall
