@@ -186,7 +186,7 @@ class TabTests < Homebrew::TestCase
   end
 
   def test_to_json
-    tab = Tab.new(Utils::JSON.load(@tab.to_json))
+    tab = Tab.new(JSON.parse(@tab.to_json))
     assert_equal @tab.used_options.sort, tab.used_options.sort
     assert_equal @tab.unused_options.sort, tab.unused_options.sort
     assert_equal @tab.built_as_bottle, tab.built_as_bottle

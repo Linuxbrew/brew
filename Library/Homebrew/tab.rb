@@ -1,7 +1,7 @@
 require "cxxstdlib"
 require "ostruct"
 require "options"
-require "utils/json"
+require "json"
 require "development_tools"
 
 # Inherit from OpenStruct to gain a generic initialization method that takes a
@@ -58,7 +58,7 @@ class Tab < OpenStruct
 
   # Like Tab.from_file, but bypass the cache.
   def self.from_file_content(content, path)
-    attributes = Utils::JSON.load(content)
+    attributes = JSON.parse(content)
     attributes["tabfile"] = path
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}
@@ -313,7 +313,7 @@ class Tab < OpenStruct
       "source" => source,
     }
 
-    Utils::JSON.dump(attributes)
+    JSON.generate(attributes)
   end
 
   def write

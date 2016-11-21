@@ -185,7 +185,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
     cmd("install", old_name)
     (core_tap.path/"Formula/#{old_name}.rb").unlink
     formula_renames = core_tap.path/"formula_renames.json"
-    formula_renames.write Utils::JSON.dump(old_name => new_name)
+    formula_renames.write JSON.generate(old_name => new_name)
 
     core_tap.path.cd do
       shutup do

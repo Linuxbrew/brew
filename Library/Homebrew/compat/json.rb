@@ -7,16 +7,19 @@ module Utils
     Error = Class.new(StandardError)
 
     def load(str)
-      ::JSON.load(str)
+      odeprecated "Utils::JSON.load", "JSON.parse"
+      ::JSON.parse(str)
     rescue ::JSON::ParserError => e
       raise Error, e.message
     end
 
     def dump(obj)
+      odeprecated "Utils::JSON.dump", "JSON.generate"
       ::JSON.generate(obj)
     end
 
     def stringify_keys(obj)
+      odeprecated "Utils::JSON.stringify_keys"
       case obj
       when Array
         obj.map { |val| stringify_keys(val) }

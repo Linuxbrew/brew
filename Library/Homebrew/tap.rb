@@ -442,10 +442,10 @@ class Tap
 
   # Hash with tap formula renames
   def formula_renames
-    require "utils/json"
+    require "json"
 
     @formula_renames ||= if (rename_file = path/"formula_renames.json").file?
-      Utils::JSON.load(rename_file.read)
+      JSON.parse(rename_file.read)
     else
       {}
     end
@@ -453,10 +453,10 @@ class Tap
 
   # Hash with tap migrations
   def tap_migrations
-    require "utils/json"
+    require "json"
 
     @tap_migrations ||= if (migration_file = path/"tap_migrations.json").file?
-      Utils::JSON.load(migration_file.read)
+      JSON.parse(migration_file.read)
     else
       {}
     end
