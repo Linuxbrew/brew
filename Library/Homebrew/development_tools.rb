@@ -85,12 +85,18 @@ class DevelopmentTools
         else
           Version::NULL
         end
+      end
     end
 
     def llvm_clang_build_version
-      @llvm_clang_build_version ||= if Tab.for_name "llvm"
+      @llvm_clang_build_version ||= begin
         path = Formulary.factory("llvm").opt_prefix/"bin/clang"
-        `#{path} --version`[/clang version (\d\.\d\.\d)/, 1]
+        if path.executable? &&
+           build_version = `#{path} --version`[/clang version (\d\.\d\.\d)/, 1]
+          Version.new build_version
+        else
+          Version::NULL
+        end
       end
     end
 
