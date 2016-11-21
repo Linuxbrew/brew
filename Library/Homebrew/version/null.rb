@@ -34,5 +34,9 @@ class Version
       ""
     end
     alias_method :to_str, :to_s
+
+    def inspect
+      "#<Version::NULL>".freeze
+    end
   end.new
 end
