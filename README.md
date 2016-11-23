@@ -51,16 +51,8 @@ Documentation is under the [Creative Commons Attribution license](https://creati
 ## Donations
 Homebrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for software, hardware and hosting around continuous integration and future improvements to the project. Every donation will be spent on making Homebrew better for our users.
 
-Homebrew is a member of the [Software Freedom Conservancy](http://sfconservancy.org) which provides us with an ability to receive tax-deductible, Homebrew earmarked donations (and [many other services](http://sfconservancy.org/members/services/)). Software Freedom Conservancy, Inc. is a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law.
-
-- [Donate with PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=V6ZE57MJRYC8L)
-- Donate by USA $ check from a USA bank:
-  - Make check payable to "Software Freedom Conservancy, Inc." and place "Directed donation: Homebrew" in the memo field.  Checks should then be mailed to:
-    - Software Freedom Conservancy, Inc.
-      137 Montague ST  STE 380
-      BROOKLYN, NY 11201             USA
-- Donate by wire transfer: contact accounting@sfconservancy.org for wire transfer details.
-- Donate with Flattr or PayPal Giving Fund: coming soon.
+Please consider a regular donation through Patreon:
+[![Donate with Patreon](https://img.shields.io/badge/patreon-donate-green.svg)](https://www.patreon.com/homebrew)
 
 ## Sponsors
 Our CI infrastructure was paid for by [our Kickstarter supporters](https://github.com/Homebrew/brew/blob/master/docs/Kickstarter-Supporters.md).
