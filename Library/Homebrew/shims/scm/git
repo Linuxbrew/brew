@@ -104,6 +104,7 @@ do
     safe_exec "$path" "$@"
   fi
 done
+unset IFS
 
 if executable "/usr/bin/xcode-select"
 then
@@ -111,7 +112,18 @@ then
   #   /usr/bin/<tool> will be a popup stub under such configuration.
   # xcrun hangs if xcode-select is set to "/"
   xcode_path="$(/usr/bin/xcode-select -print-path 2>/dev/null)"
-  [[ -n "$xcode_path" ]] || popup_stub=1
+  if [[ -z "$xcode_path" ]]
+  then
+    if [[ -z "$HOMEBREW_MACOS_VERSION" ]]
+    then
+      HOMEBREW_MACOS_VERSION="$(/usr/bin/sw_vers -productVersion)"
+    fi
+    printf -v macos_version_numeric "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
+    if [[ "$macos_version_numeric" -ge "100900" ]]
+    then
+      popup_stub=1
+    fi
+  fi
   if [[ -z "$popup_stub" && "$xcode_path" != "/" ]]
   then
     path="$(/usr/bin/xcrun -find "$SCM_FILE" 2>/dev/null)"

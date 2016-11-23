@@ -1,5 +1,4 @@
 require "requirement"
-require "requirements/apr_requirement"
 require "requirements/fortran_requirement"
 require "requirements/gpg2_requirement"
 require "requirements/language_module_requirement"

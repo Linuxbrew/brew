@@ -42,13 +42,14 @@ module Hbc
 
       def self.warn_unavailable_with_suggestion(cask_token, e)
         exact_match, partial_matches = Search.search(cask_token)
-        errmsg = e.message
+        error_message = e.message
         if exact_match
-          errmsg.concat(". Did you mean:\n#{exact_match}")
+          error_message.concat(". Did you mean:\n#{exact_match}")
         elsif !partial_matches.empty?
-          errmsg.concat(". Did you mean one of:\n#{puts_columns(partial_matches.take(20))}\n")
+          error_message.concat(". Did you mean one of:\n")
+                       .concat(Formatter.columns(partial_matches.take(20)))
         end
-        onoe errmsg
+        onoe error_message
       end
 
       def self.help

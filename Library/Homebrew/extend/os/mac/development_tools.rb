@@ -76,5 +76,9 @@ class DevelopmentTools
         end
       end
     end
+
+    def tar_supports_xz?
+      false
+    end
   end
 end
