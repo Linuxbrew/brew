@@ -461,6 +461,7 @@ class FormulaAuditor
 
     return unless @new_formula
     return if formula.deprecated_options.empty?
+    return if formula.name.include?("@")
     problem "New formulae should not use `deprecated_option`."
   end
 
