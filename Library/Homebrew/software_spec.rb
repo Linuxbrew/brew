@@ -336,20 +336,19 @@ class BottleSpecification
   end
 
   def checksums
-    checksums = {}
-    os_versions = collector.keys
-    os_versions.map! do |macos|
+    tags = collector.keys.sort_by do |tag|
+      # Sort non-MacOS tags below MacOS tags.
       begin
-        MacOS::Version.from_symbol macos
+        MacOS::Version.from_symbol tag
       rescue
-        nil
+        "0.#{tag}"
       end
-    end.compact!
-    os_versions.sort.reverse_each do |os_version|
-      macos = os_version.to_sym
-      checksum = collector[macos]
+    end
+    checksums = {}
+    tags.reverse_each do |tag|
+      checksum = collector[tag]
       checksums[checksum.hash_type] ||= []
-      checksums[checksum.hash_type] << { checksum => macos }
+      checksums[checksum.hash_type] << { checksum => tag }
     end
     checksums
   end
