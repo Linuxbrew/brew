@@ -1069,6 +1069,19 @@ module Homebrew
         message
       end
 
+      def check_for_member_of_admin_group
+        groups = Utils.popen_read("groups").split
+        return unless groups.include?("admin")
+
+        <<-EOS.undent
+          You are not a member of the "admin" group, which will cause
+          commands like `brew linkapps` to fail.
+
+          To fix this, you can run:
+            `sudo dseditgroup -o edit -a $(whoami) -t user admin`
+        EOS
+      end
+
       def all
         methods.map(&:to_s).grep(/^check_/)
       end
