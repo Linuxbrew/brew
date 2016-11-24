@@ -26,7 +26,7 @@ require "migrator"
 # @see SharedEnvExtension
 # @see FileUtils
 # @see Pathname
-# @see http://www.rubydoc.info/github/Homebrew/brew/file/docs/Formula-Cookbook.md Formula Cookbook
+# @see https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md Formula Cookbook
 # @see https://github.com/styleguide/ruby Ruby Style Guide
 #
 # <pre>class Wget < Formula
