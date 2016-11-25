@@ -1071,7 +1071,7 @@ module Homebrew
 
       def check_for_member_of_admin_group
         groups = Utils.popen_read("groups").split
-        return if groups.include?("admin")
+        return unless groups.include?("admin")
 
         <<-EOS.undent
           You are not a member of the "admin" group, which will cause
