@@ -25,11 +25,19 @@ module Homebrew
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
       analytics_disabled = \
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
-      if analytics_message_displayed != "true" && analytics_disabled != "true" && !ENV["HOMEBREW_NO_ANALYTICS"]
+      if analytics_message_displayed != "true" && analytics_disabled != "true" &&
+         !ENV["HOMEBREW_NO_ANALYTICS"] && !ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"]
         ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
-        ohai "Homebrew has enabled anonymous aggregate user behaviour analytics"
-        puts "Read the analytics documentation (and how to opt-out) here:"
-        puts "  https://git.io/brew-analytics"
+        # Use the shell's audible bell.
+        print "\a"
+
+        # Use an extra newline and bold to avoid this being missed.
+        ohai <<-EOS.undent
+          Homebrew has enabled anonymous aggregate user behaviour analytics
+          Read the analytics documentation (and how to opt-out) here:
+            https://git.io/brew-analytics
+
+        EOS
 
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
