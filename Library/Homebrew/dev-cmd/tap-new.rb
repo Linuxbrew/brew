@@ -44,36 +44,35 @@ module Homebrew
     write_path(tap, "README.md", readme)
 
     travis = <<-EOS.undent
-    language: ruby
-    os: osx
-    env: OSX=10.11
-    osx_image: xcode7.3
-    rvm: system
+      language: ruby
+      os: osx
+      env: OSX=10.12
+      osx_image: xcode8.1
+      rvm: system
 
-    before_install:
-      - export TRAVIS_COMMIT="$(git rev-parse --verify -q HEAD)"
-      - if [ -f ".git/shallow" ]; then
-          travis_retry git fetch --unshallow;
-        fi
-      - sudo chown -R $USER "$(brew --repo)"
-      - git -C "$(brew --repo)" reset --hard origin/master
-      - git -C "$(brew --repo)" clean -qxdff
-      - brew update || brew update
-      - rm -rf "$(brew --repo $TRAVIS_REPO_SLUG)"
-      - mkdir -p "$(brew --repo $TRAVIS_REPO_SLUG)"
-      - rsync -az "$TRAVIS_BUILD_DIR/" "$(brew --repo $TRAVIS_REPO_SLUG)"
-      - export TRAVIS_BUILD_DIR="$(brew --repo $TRAVIS_REPO_SLUG)"
-      - cd "$(brew --repo)"
-      - export HOMEBREW_DEVELOPER="1"
-      - ulimit -n 1024
+      before_install:
+        - export TRAVIS_COMMIT="$(git rev-parse --verify -q HEAD)"
+        - if [ -f ".git/shallow" ]; then
+            travis_retry git fetch --unshallow;
+          fi
+        - sudo chown -R $USER "$(brew --repo)"
+        - git -C "$(brew --repo)" reset --hard origin/master
+        - brew update || brew update
+        - rm -rf "$(brew --repo $TRAVIS_REPO_SLUG)"
+        - mkdir -p "$(brew --repo $TRAVIS_REPO_SLUG)"
+        - rsync -az "$TRAVIS_BUILD_DIR/" "$(brew --repo $TRAVIS_REPO_SLUG)"
+        - export TRAVIS_BUILD_DIR="$(brew --repo $TRAVIS_REPO_SLUG)"
+        - cd "$(brew --repo)"
+        - export HOMEBREW_DEVELOPER="1"
+        - ulimit -n 1024
 
-    script:
-      - brew test-bot
+      script:
+        - brew test-bot
 
-    notifications:
-      email:
-        on_success: never
-        on_failure: always
+      notifications:
+        email:
+          on_success: never
+          on_failure: always
     EOS
     write_path(tap, ".travis.yml", travis)
   end
