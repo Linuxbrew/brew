@@ -11,6 +11,6 @@ class IntegrationCommandTestUses < IntegrationCommandTestCase
 
     assert_equal "", cmd("uses", "baz")
     assert_equal "baz", cmd("uses", "bar")
-    assert_equal "bar\nbaz", cmd("uses", "--recursive", "foo")
+    assert_match(/(bar\nbaz|baz\nbar)/, cmd("uses", "--recursive", "foo"))
   end
 end
