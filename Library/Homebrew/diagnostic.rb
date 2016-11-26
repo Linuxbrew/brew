@@ -407,6 +407,12 @@ module Homebrew
       def check_homebrew_prefix
         return if HOMEBREW_PREFIX.to_s == "/usr/local"
 
+        # Allow our Jenkins CI tests to live outside of /usr/local.
+        if ENV["JENKINS_HOME"] &&
+           ENV["GIT_URL"].to_s.start_with?("https://github.com/Homebrew/brew")
+          return
+        end
+
         <<-EOS.undent
           Your Homebrew's prefix is not /usr/local.
           You can install Homebrew anywhere you want but some bottles (binary packages)

@@ -84,6 +84,7 @@ class DiagnosticChecksTest < Homebrew::TestCase
   end
 
   def test_check_homebrew_prefix
+    ENV.delete("JENKINS_HOME")
     # the integration tests are run in a special prefix
     assert_match "Your Homebrew's prefix is not /usr/local.",
       @checks.check_homebrew_prefix
