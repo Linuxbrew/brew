@@ -1,7 +1,10 @@
 AllCops:
   TargetRubyVersion: 2.0
   Exclude:
+    - '**/Rakefile'
+    - '**/.*'
     - '**/Casks/**/*'
+    - '**/vendor/**/*'
 
 Metrics/AbcSize:
   Enabled: false
