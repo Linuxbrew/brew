@@ -22,6 +22,56 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
       cmd("install", "testball2")
   end
 
+  def test_install_failures
+    path = setup_test_formula "testball1", "version \"1.0\""
+    devel_content = <<-EOS.undent
+      version "3.0"
+      devel do
+        url "#{Formulary.factory("testball1").stable.url}"
+        sha256 "#{TESTBALL_SHA256}"
+        version "2.0"
+      end
+    EOS
+
+    assert_match "#{HOMEBREW_CELLAR}/testball1/1.0", cmd("install", "testball1")
+
+    FileUtils.rm path
+    setup_test_formula "testball1", devel_content
+
+    assert_match "first `brew unlink testball1`", cmd_fail("install", "testball1")
+    assert_match "#{HOMEBREW_CELLAR}/testball1/1.0", cmd("unlink", "testball1")
+    assert_match "#{HOMEBREW_CELLAR}/testball1/2.0", cmd("install", "testball1", "--devel")
+    assert_match "#{HOMEBREW_CELLAR}/testball1/2.0", cmd("unlink", "testball1")
+    assert_match "#{HOMEBREW_CELLAR}/testball1/3.0", cmd("install", "testball1")
+
+    cmd("switch", "testball1", "2.0")
+    assert_match "already installed, however linked version is",
+      cmd("install", "testball1")
+    assert_match "#{HOMEBREW_CELLAR}/testball1/2.0", cmd("unlink", "testball1")
+    assert_match "just not linked", cmd("install", "testball1")
+  end
+
+  def test_install_keg_only_outdated
+    path_keg_only = setup_test_formula "testball1", <<-EOS.undent
+    version "1.0"
+    keg_only "test reason"
+    EOS
+
+    assert_match "#{HOMEBREW_CELLAR}/testball1/1.0", cmd("install", "testball1")
+
+    FileUtils.rm path_keg_only
+    setup_test_formula "testball1", <<-EOS.undent
+      version "2.0"
+      keg_only "test reason"
+    EOS
+
+    assert_match "keg-only and another version is linked to opt",
+      cmd("install", "testball1")
+
+    assert_match "#{HOMEBREW_CELLAR}/testball1/2.0",
+      cmd("install", "testball1", "--force")
+  end
+
   def test_install_with_invalid_option
     setup_test_formula "testball1"
     assert_match "testball1: this formula has no --with-fo option so it will be ignored!",
