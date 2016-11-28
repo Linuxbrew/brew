@@ -1,9 +1,9 @@
 class Keg
-  def relocate_dynamic_linkage(old_prefix, new_prefix, _old_cellar, _new_cellar)
+  def relocate_dynamic_linkage(relocation)
     return if name == "glibc"
     elf_files.each do |file|
       file.ensure_writable do
-        change_rpath(file, old_prefix, new_prefix)
+        change_rpath(file, relocation.old_prefix, relocation.new_prefix)
       end
     end
   end
