@@ -126,7 +126,7 @@ class CompilerSelector
         end
         if OS.linux?
           version = versions.non_apple_gcc_version("gcc")
-          yield Compiler.new("gcc", version) if version
+          yield Compiler.new("gcc", version) unless version.null?
         end
       when :llvm
         next # no-op. DSL supported, compiler is not.
