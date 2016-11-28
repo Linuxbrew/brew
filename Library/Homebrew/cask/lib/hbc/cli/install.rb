@@ -35,6 +35,8 @@ module Hbc
           rescue CaskNoShasumError => e
             opoo e.message
             count += 1
+          rescue CaskError => e
+            onoe e.message
           end
         end
         count.zero? ? nil : count == cask_tokens.length

@@ -45,8 +45,7 @@ module Hbc
           if force
             ohai(warning_target_exists { |s| s << "overwriting." })
           else
-            ohai(warning_target_exists { |s| s << "not moving." })
-            return false
+            raise CaskError, warning_target_exists << "."
           end
         end
         unless source.exist?
