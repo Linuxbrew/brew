@@ -119,7 +119,7 @@ class ExternalPatchTests < Homebrew::TestCase
   end
 
   def test_inspect
-    assert_equal %(#<ExternalPatch: :p1 "file:///my.patch">), @p.inspect
+    assert_equal '#<ExternalPatch: :p1 "file:///my.patch">', @p.inspect
   end
 
   def test_cached_download

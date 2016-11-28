@@ -78,12 +78,12 @@ module Hbc
       end
 
       def bom_filelist_from_path(mount)
-        Dir.chdir(mount) {
-          Dir.glob("**/*", File::FNM_DOTMATCH).map { |path|
+        Dir.chdir(mount) do
+          Dir.glob("**/*", File::FNM_DOTMATCH).map do |path|
             next if skip_path?(Pathname(path))
             path == "." ? path : path.prepend("./")
-          }.compact.join("\n").concat("\n")
-        }
+          end.compact.join("\n").concat("\n")
+        end
       end
 
       def skip_path?(path)
@@ -91,19 +91,19 @@ module Hbc
       end
 
       # unnecessary DMG metadata
-      DMG_METADATA_FILES = %w[
-                             .background
-                             .com.apple.timemachine.donotpresent
-                             .com.apple.timemachine.supported
-                             .DocumentRevisions-V100
-                             .DS_Store
-                             .fseventsd
-                             .MobileBackups
-                             .Spotlight-V100
-                             .TemporaryItems
-                             .Trashes
-                             .VolumeIcon.icns
-                           ].to_set.freeze
+      DMG_METADATA_FILES = Set.new %w[
+        .background
+        .com.apple.timemachine.donotpresent
+        .com.apple.timemachine.supported
+        .DocumentRevisions-V100
+        .DS_Store
+        .fseventsd
+        .MobileBackups
+        .Spotlight-V100
+        .TemporaryItems
+        .Trashes
+        .VolumeIcon.icns
+      ].freeze
 
       def dmg_metadata?(path)
         relative_root = path.sub(%r{/.*}, "")
@@ -117,9 +117,7 @@ module Hbc
 
       def mounts_from_plist(plist)
         return [] unless plist.respond_to?(:fetch)
-        plist.fetch("system-entities", []).map { |entity|
-          entity["mount-point"]
-        }.compact
+        plist.fetch("system-entities", []).map { |e| e["mount-point"] }.compact
       end
 
       def assert_mounts_found

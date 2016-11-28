@@ -13,7 +13,7 @@ module Hbc
         FileUtils.mv repo_caskroom, Hbc.caskroom
       else
         opoo "#{Hbc.caskroom.parent} is not writable, sudo is needed to move the Caskroom."
-        system "/usr/bin/sudo", "--", "/bin/mv", "--", repo_caskroom.to_s, Hbc.caskroom.parent.to_s
+        SystemCommand.run("/bin/mv", args: [repo_caskroom, Hbc.caskroom.parent], sudo: true)
       end
     end
 
@@ -21,24 +21,13 @@ module Hbc
       return if Hbc.caskroom.exist?
 
       ohai "Creating Caskroom at #{Hbc.caskroom}"
-      if Hbc.caskroom.parent.writable?
-        Hbc.caskroom.mkpath
-      else
-        ohai "We'll set permissions properly so we won't need sudo in the future"
-        toplevel_dir = Hbc.caskroom
-        toplevel_dir = toplevel_dir.parent until toplevel_dir.parent.root?
-        unless toplevel_dir.directory?
-          # If a toplevel dir such as '/opt' must be created, enforce standard permissions.
-          # sudo in system is rude.
-          system "/usr/bin/sudo", "--", "/bin/mkdir", "--",         toplevel_dir
-          system "/usr/bin/sudo", "--", "/bin/chmod", "--", "0775", toplevel_dir
-        end
-        # sudo in system is rude.
-        system "/usr/bin/sudo", "--", "/bin/mkdir", "-p", "--", Hbc.caskroom
-        unless Hbc.caskroom.parent == toplevel_dir
-          system "/usr/bin/sudo", "--", "/usr/sbin/chown", "-R", "--", "#{Utils.current_user}:staff", Hbc.caskroom.parent.to_s
-        end
-      end
+      ohai "We'll set permissions properly so we won't need sudo in the future"
+      sudo = !Hbc.caskroom.parent.writable?
+
+      SystemCommand.run("/bin/mkdir", args: ["-p", Hbc.caskroom], sudo: sudo)
+      SystemCommand.run("/bin/chmod", args: ["g+rwx", Hbc.caskroom], sudo: sudo)
+      SystemCommand.run("/usr/sbin/chown", args: [Utils.current_user, Hbc.caskroom], sudo: sudo)
+      SystemCommand.run("/usr/bin/chgrp", args: ["admin", Hbc.caskroom], sudo: sudo)
     end
   end
 end

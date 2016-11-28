@@ -36,7 +36,7 @@ module Hbc
       end
 
       def respond_to?(method, include_private = false)
-        return true if %i{encode_with proxy? to_s type}.include?(method)
+        return true if [:encode_with, :proxy?, :to_s, :type].include?(method)
         return false if method == :to_ary
         @resolver.call.respond_to?(method, include_private)
       end

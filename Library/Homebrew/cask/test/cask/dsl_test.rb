@@ -26,17 +26,17 @@ describe Hbc::DSL do
         .*
         Unexpected method 'future_feature' called on Cask unexpected-method-cask\\.
         .*
-        brew update; brew cleanup; brew cask cleanup
+        https://github.com/caskroom/homebrew-cask/blob/master/doc/reporting_bugs/pre_bug_report.md
         .*
         https://github.com/caskroom/homebrew-cask#reporting-bugs
       EOS
 
-      TestHelper.must_output(self, attempt_unknown_method, expected)
+      attempt_unknown_method.must_output nil, expected
     end
 
     it "will simply warn, not throw an exception" do
       begin
-        capture_subprocess_io do
+        shutup do
           attempt_unknown_method.call
         end
       rescue StandardError => e
@@ -69,11 +69,15 @@ describe Hbc::DSL do
     end
 
     it "may use deprecated DSL version hash syntax" do
-      test_cask = Hbc.load("with-dsl-version")
-      test_cask.token.must_equal "with-dsl-version"
-      test_cask.url.to_s.must_equal "http://example.com/TestCask.dmg"
-      test_cask.homepage.must_equal "http://example.com/"
-      test_cask.version.to_s.must_equal "1.2.3"
+      with_environment "HOMEBREW_DEVELOPER" => nil do
+        shutup do
+          test_cask = Hbc.load("with-dsl-version")
+          test_cask.token.must_equal "with-dsl-version"
+          test_cask.url.to_s.must_equal "http://example.com/TestCask.dmg"
+          test_cask.homepage.must_equal "http://example.com/"
+          test_cask.version.to_s.must_equal "1.2.3"
+        end
+      end
     end
   end
 
@@ -84,8 +88,8 @@ describe Hbc::DSL do
       end
 
       cask.name.must_equal [
-                             "Proper Name",
-                           ]
+        "Proper Name",
+      ]
     end
 
     it "Accepts an array value to the name stanza" do
@@ -94,9 +98,9 @@ describe Hbc::DSL do
       end
 
       cask.name.must_equal [
-                             "Proper Name",
-                             "Alternate Name",
-                           ]
+        "Proper Name",
+        "Alternate Name",
+      ]
     end
 
     it "Accepts multiple name stanzas" do
@@ -106,9 +110,9 @@ describe Hbc::DSL do
       end
 
       cask.name.must_equal [
-                             "Proper Name",
-                             "Alternate Name",
-                           ]
+        "Proper Name",
+        "Alternate Name",
+      ]
     end
   end
 
@@ -140,35 +144,41 @@ describe Hbc::DSL do
         end
       end
 
-      MacOS.stubs(languages: ["zh"])
-      cask.call.language.must_equal "zh-CN"
-      cask.call.sha256.must_equal "abc123"
-      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+      MacOS.stub :languages, ["zh"] do
+        cask.call.language.must_equal "zh-CN"
+        cask.call.sha256.must_equal "abc123"
+        cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+      end
 
-      MacOS.stubs(languages: ["zh-XX"])
-      cask.call.language.must_equal "zh-CN"
-      cask.call.sha256.must_equal "abc123"
-      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+      MacOS.stub :languages, ["zh-XX"] do
+        cask.call.language.must_equal "zh-CN"
+        cask.call.sha256.must_equal "abc123"
+        cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+      end
 
-      MacOS.stubs(languages: ["en"])
-      cask.call.language.must_equal "en-US"
-      cask.call.sha256.must_equal "xyz789"
-      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+      MacOS.stub :languages, ["en"] do
+        cask.call.language.must_equal "en-US"
+        cask.call.sha256.must_equal "xyz789"
+        cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+      end
 
-      MacOS.stubs(languages: ["xx-XX"])
-      cask.call.language.must_equal "en-US"
-      cask.call.sha256.must_equal "xyz789"
-      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+      MacOS.stub :languages, ["xx-XX"] do
+        cask.call.language.must_equal "en-US"
+        cask.call.sha256.must_equal "xyz789"
+        cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+      end
 
-      MacOS.stubs(languages: ["xx-XX", "zh", "en"])
-      cask.call.language.must_equal "zh-CN"
-      cask.call.sha256.must_equal "abc123"
-      cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+      MacOS.stub :languages, ["xx-XX", "zh", "en"] do
+        cask.call.language.must_equal "zh-CN"
+        cask.call.sha256.must_equal "abc123"
+        cask.call.url.to_s.must_equal "https://example.org/zh-CN.zip"
+      end
 
-      MacOS.stubs(languages: ["xx-XX", "en-US", "zh"])
-      cask.call.language.must_equal "en-US"
-      cask.call.sha256.must_equal "xyz789"
-      cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+      MacOS.stub :languages, ["xx-XX", "en-US", "zh"] do
+        cask.call.language.must_equal "en-US"
+        cask.call.sha256.must_equal "xyz789"
+        cask.call.url.to_s.must_equal "https://example.org/en-US.zip"
+      end
     end
   end
 
@@ -246,7 +256,7 @@ describe Hbc::DSL do
   describe "appcast stanza" do
     it "allows appcasts to be specified" do
       cask = Hbc.load("with-appcast")
-      cask.appcast.to_s.must_match %r{^http}
+      cask.appcast.to_s.must_match(/^http/)
     end
 
     it "prevents defining multiple appcasts" do
@@ -266,12 +276,12 @@ describe Hbc::DSL do
   describe "gpg stanza" do
     it "allows gpg stanza to be specified" do
       cask = Hbc.load("with-gpg")
-      cask.gpg.to_s.must_match %r{\S}
+      cask.gpg.to_s.must_match(/\S/)
     end
 
     it "allows gpg stanza to be specified with :key_url" do
       cask = Hbc.load("with-gpg-key-url")
-      cask.gpg.to_s.must_match %r{\S}
+      cask.gpg.to_s.must_match(/\S/)
     end
 
     it "prevents specifying gpg stanza multiple times" do

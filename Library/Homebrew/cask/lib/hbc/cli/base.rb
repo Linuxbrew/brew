@@ -2,7 +2,7 @@ module Hbc
   class CLI
     class Base
       def self.command_name
-        @command_name ||= name.sub(%r{^.*:}, "").gsub(%r{(.)([A-Z])}, '\1_\2').downcase
+        @command_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase
       end
 
       def self.visible

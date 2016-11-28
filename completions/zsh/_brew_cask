@@ -169,6 +169,7 @@ _brew_cask()
     '--colorpickerdir=-:Target location for Color Pickers. The default value is ~/Library/ColorPickers.' \
     '--prefpanedir=-:Target location for Preference Panes. The default value is ~/Library/PreferencePanes.' \
     '--qlplugindir=-:Target location for QuickLook Plugins. The default value is ~/Library/QuickLook.' \
+    '--dictionarydir=-:Target location for Dictionaries. The default value is ~/Library/Dictionaries.' \
     '--fontdir=-:Target location for Fonts. The default value is ~/Library/Fonts.' \
     '--servicedir=-:Target location for Services. The default value is ~/Library/Services.' \
     '--input_methoddir=-:Target location for Input Methods. The default value is ~/Library/Input Methods.' \

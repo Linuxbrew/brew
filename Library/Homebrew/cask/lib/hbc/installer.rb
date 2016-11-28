@@ -84,10 +84,10 @@ module Hbc
 
     def summary
       s = if MacOS.version >= :lion && !ENV["HOMEBREW_NO_EMOJI"]
-            (ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba") + "  "
-          else
-            Formatter.headline("Success! ", color: :blue)
-          end
+        (ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba") + "  "
+      else
+        Formatter.headline("Success! ", color: :blue)
+      end
       s << "#{@cask} was successfully installed!"
     end
 
@@ -113,10 +113,10 @@ module Hbc
       odebug "Extracting primary container"
       FileUtils.mkdir_p @cask.staged_path
       container = if @cask.container && @cask.container.type
-                    Container.from_type(@cask.container.type)
-                  else
-                    Container.for_path(@downloaded_path, @command)
-                  end
+        Container.from_type(@cask.container.type)
+      else
+        Container.for_path(@downloaded_path, @command)
+      end
       unless container
         raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'"
       end
@@ -171,10 +171,10 @@ module Hbc
     def arch_dependencies
       return if @cask.depends_on.arch.nil?
       @current_arch ||= { type: Hardware::CPU.type, bits: Hardware::CPU.bits }
-      return if @cask.depends_on.arch.any? { |arch|
+      return if @cask.depends_on.arch.any? do |arch|
         arch[:type] == @current_arch[:type] &&
         Array(arch[:bits]).include?(@current_arch[:bits])
-      }
+      end
       raise CaskError, "Cask #{@cask} depends on hardware architecture being one of [#{@cask.depends_on.arch.map(&:to_s).join(", ")}], but you are running #{@current_arch}"
     end
 
@@ -232,16 +232,16 @@ module Hbc
       elsif MacOS.version <= :yosemite
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                              Hbc.tcc_db,
-                              "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
-                            ],
+                        Hbc.tcc_db,
+                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
+                      ],
                       sudo: true)
       elsif MacOS.version <= :el_capitan
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                              Hbc.tcc_db,
-                              "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
-                            ],
+                        Hbc.tcc_db,
+                        "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
+                      ],
                       sudo: true)
       else
         opoo <<-EOS.undent
@@ -257,9 +257,9 @@ module Hbc
         ohai "Disabling accessibility access"
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                              Hbc.tcc_db,
-                              "DELETE FROM access WHERE client='#{bundle_identifier}';",
-                            ],
+                        Hbc.tcc_db,
+                        "DELETE FROM access WHERE client='#{bundle_identifier}';",
+                      ],
                       sudo: true)
       else
         opoo <<-EOS.undent
@@ -302,7 +302,7 @@ module Hbc
     end
 
     def zap
-      ohai %Q{Implied "brew cask uninstall #{@cask}"}
+      ohai %Q(Implied "brew cask uninstall #{@cask}")
       uninstall_artifacts
       if Artifact::Zap.me?(@cask)
         ohai "Dispatching zap stanza"

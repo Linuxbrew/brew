@@ -4,7 +4,7 @@ module Hbc
   class Container
     class Sit < GenericUnar
       def self.me?(criteria)
-        criteria.magic_number(%r{^StuffIt}n) &&
+        criteria.magic_number(/^StuffIt/n) &&
           super
       end
     end

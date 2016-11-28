@@ -568,6 +568,11 @@ Each &lt;patch-source> may be one of:
    If <code>--no-publish</code> was passed, do not publish bottles to Bintray.</p>
 
 <dl>
+<dt><code>release-notes</code> [<var>previous_tag</var>] [<var>end_ref</var>]</dt><dd><p>Output the merged pull requests on Homebrew/brew between two Git refs.
+If no <code>previous_tag</code> is provided it defaults to the newest tag.
+If no <code>end_ref</code> is provided it defaults to <code>origin/master</code>.</p>
+
+<p>If <code>--markdown</code> is passed, output as a Markdown list.</p></dd>
 <dt><code>tap-new</code> <var>user</var><code>/</code><var>repo</var></dt><dd><p>Generate the template files for a new tap.</p></dd>
 <dt><code>test</code> [<code>--devel</code>|<code>--HEAD</code>] [<code>--debug</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Most formulae provide a test method. <code>brew test</code> <var>formula</var> runs this
 test method. There is no standard output or return code, but it should
@@ -761,7 +766,7 @@ your shell profile, or you can use it before a brew command:</p>
 
 <p>Homebrew's lead maintainer is Mike McQuaid.</p>
 
-<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Josh Hagins, Baptiste Fontaine, Zhiming Wang, Markus Reiter, ilovezfs, Martin Afanasjew, Tom Schoonjans, Uladzislau Shablinski, Tim Smith and Alex Dunn.</p>
+<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Josh Hagins, Baptiste Fontaine, Markus Reiter, ilovezfs, Martin Afanasjew, Tom Schoonjans, Uladzislau Shablinski, Tim Smith and Alex Dunn.</p>
 
 <p>Former maintainers with significant contributions include Dominyk Tiller, Brett Koonce, Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.</p>
 

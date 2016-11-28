@@ -6,13 +6,11 @@ module Hbc
   class Container
     class Lzma < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^\]\000\000\200\000}n)
+        criteria.magic_number(/^\]\000\000\200\000/n)
       end
 
       def extract
-        unlzma = Hbc.homebrew_prefix.join("bin", "unlzma")
-
-        unless unlzma.exist?
+        if (unlzma = which("unlzma")).nil?
           raise CaskError, "Expected to find unlzma executable. Cask '#{@cask}' must add: depends_on formula: 'lzma'"
         end
 

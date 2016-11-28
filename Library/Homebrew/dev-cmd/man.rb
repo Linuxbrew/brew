@@ -41,7 +41,7 @@ module Homebrew
     convert_man_page(markup, TARGET_DOC_PATH/"brew.1.html")
     convert_man_page(markup, TARGET_MAN_PATH/"brew.1")
 
-    cask_markup = (HOMEBREW_LIBRARY/"Homebrew/manpages/brew-cask.1.md").read
+    cask_markup = (SOURCE_PATH/"brew-cask.1.md").read
     convert_man_page(cask_markup, TARGET_MAN_PATH/"brew-cask.1")
   end
 

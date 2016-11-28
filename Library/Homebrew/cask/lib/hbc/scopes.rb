@@ -15,11 +15,11 @@ module Hbc
       end
 
       def all_tokens
-        Tap.map { |t|
-          t.cask_files.map { |p|
+        Tap.map do |t|
+          t.cask_files.map do |p|
             "#{t.name}/#{File.basename(p, ".rb")}"
-          }
-        }.flatten
+          end
+        end.flatten
       end
 
       def installed
@@ -28,19 +28,19 @@ module Hbc
         # TODO: speed up Hbc::Source::Tapped (main perf drag is calling Hbc.all_tokens repeatedly)
         # TODO: ability to specify expected source when calling Hbc.load (minor perf benefit)
         Pathname.glob(caskroom.join("*"))
-                .map { |caskroom_path|
+                .map do |caskroom_path|
                   token = caskroom_path.basename.to_s
 
-                  path_to_cask = all_tapped_cask_dirs.find { |tap_dir|
+                  path_to_cask = all_tapped_cask_dirs.find do |tap_dir|
                     tap_dir.join("#{token}.rb").exist?
-                  }
+                  end
 
                   if path_to_cask
                     Hbc.load(path_to_cask.join("#{token}.rb"))
                   else
                     Hbc.load(token)
                   end
-                }
+                end
       end
     end
   end

@@ -49,7 +49,7 @@ module Homebrew
     fix = options[:fix]
     Homebrew.install_gem_setup_path! "rubocop", "0.43.0"
 
-    args = %W[
+    args = %w[
       --force-exclusion
     ]
     args << "--auto-correct" if fix

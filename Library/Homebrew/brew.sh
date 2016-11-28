@@ -176,7 +176,7 @@ EOS
     then
       odie <<EOS
 You have not agreed to the Xcode license. Please resolve this by running:
-  sudo xcodebuild -license
+  sudo xcodebuild -license accept
 EOS
     fi
   fi
@@ -228,7 +228,7 @@ esac
 if [[ -z "$HOMEBREW_DEVELOPER" ]]
 then
   export HOMEBREW_GIT_CONFIG_FILE="$HOMEBREW_REPOSITORY/.git/config"
-  HOMEBREW_GIT_CONFIG_DEVELOPERMODE="$(git config --file="$HOMEBREW_GIT_CONFIG_FILE" --get homebrew.devcmdrun)"
+  HOMEBREW_GIT_CONFIG_DEVELOPERMODE="$(git config --file="$HOMEBREW_GIT_CONFIG_FILE" --get homebrew.devcmdrun 2>/dev/null)"
   if [[ "$HOMEBREW_GIT_CONFIG_DEVELOPERMODE" = "true" ]]
   then
     export HOMEBREW_DEV_CMD_RUN="1"
@@ -242,7 +242,7 @@ elif [[ -f "$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh" ]]
 then
   if [[ -z "$HOMEBREW_DEVELOPER" ]]
   then
-    git config --file="$HOMEBREW_GIT_CONFIG_FILE" --replace-all homebrew.devcmdrun true
+    git config --file="$HOMEBREW_GIT_CONFIG_FILE" --replace-all homebrew.devcmdrun true 2>/dev/null
     export HOMEBREW_DEV_CMD_RUN="1"
   fi
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"

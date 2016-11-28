@@ -6,7 +6,7 @@ module Hbc
   class Container
     class Gzip < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^\037\213}n)
+        criteria.magic_number(/^\037\213/n)
       end
 
       def extract

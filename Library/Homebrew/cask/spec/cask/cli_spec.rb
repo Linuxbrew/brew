@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::CLI do
   it "lists the taps for Casks that show up in two taps" do
     listing = Hbc::CLI.nice_listing(%w[
@@ -41,14 +39,14 @@ describe Hbc::CLI do
     end
 
     it "respects the env variable when choosing what appdir to create" do
-      EnvHelper.with_env_var("HOMEBREW_CASK_OPTS", "--appdir=/custom/appdir") do
+      with_environment "HOMEBREW_CASK_OPTS" => "--appdir=/custom/appdir" do
         expect(Hbc).to receive(:appdir=).with(Pathname("/custom/appdir"))
         described_class.process("noop")
       end
     end
 
     it "respects the env variable when choosing a non-default Caskroom location" do
-      EnvHelper.with_env_var "HOMEBREW_CASK_OPTS", "--caskroom=/custom/caskdir" do
+      with_environment "HOMEBREW_CASK_OPTS" => "--caskroom=/custom/caskdir" do
         expect(Hbc).to receive(:caskroom=).with(Pathname("/custom/caskdir"))
         described_class.process("noop")
       end

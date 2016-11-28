@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::Verify::Checksum do
   include Sha256Helper
 

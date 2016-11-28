@@ -4,7 +4,7 @@ module Hbc
   class Container
     class Rar < GenericUnar
       def self.me?(criteria)
-        criteria.magic_number(%r{^Rar!}n) &&
+        criteria.magic_number(/^Rar!/n) &&
           super
       end
     end

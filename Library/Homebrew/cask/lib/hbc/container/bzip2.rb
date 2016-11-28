@@ -6,7 +6,7 @@ module Hbc
   class Container
     class Bzip2 < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^BZh}n)
+        criteria.magic_number(/^BZh/n)
       end
 
       def extract

@@ -8,7 +8,7 @@ describe Hbc::CLI::Info do
       local-caffeine: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-testcasks/blob/master/Casks/local-caffeine.rb
+      From: https://github.com/caskroom/homebrew-test/blob/master/Casks/local-caffeine.rb
       ==> Name
       None
       ==> Artifacts
@@ -22,7 +22,7 @@ describe Hbc::CLI::Info do
         local-caffeine: 1.2.3
         http://example.com/local-caffeine
         Not installed
-        From: https://github.com/caskroom/homebrew-testcasks/blob/master/Casks/local-caffeine.rb
+        From: https://github.com/caskroom/homebrew-test/blob/master/Casks/local-caffeine.rb
         ==> Name
         None
         ==> Artifacts
@@ -30,7 +30,7 @@ describe Hbc::CLI::Info do
         local-transmission: 2.61
         http://example.com/local-transmission
         Not installed
-        From: https://github.com/caskroom/homebrew-testcasks/blob/master/Casks/local-transmission.rb
+        From: https://github.com/caskroom/homebrew-test/blob/master/Casks/local-transmission.rb
         ==> Name
         None
         ==> Artifacts
@@ -58,7 +58,7 @@ describe Hbc::CLI::Info do
       with-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-testcasks/blob/master/Casks/with-caveats.rb
+      From: https://github.com/caskroom/homebrew-test/blob/master/Casks/with-caveats.rb
       ==> Name
       None
       ==> Artifacts
@@ -84,7 +84,7 @@ describe Hbc::CLI::Info do
       with-conditional-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-testcasks/blob/master/Casks/with-conditional-caveats.rb
+      From: https://github.com/caskroom/homebrew-test/blob/master/Casks/with-conditional-caveats.rb
       ==> Name
       None
       ==> Artifacts

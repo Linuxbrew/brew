@@ -11,32 +11,32 @@ module Hbc
       PATH_ARG_SLICE_SIZE = 500
 
       ORDERED_DIRECTIVES = [
-                             :early_script,
-                             :launchctl,
-                             :quit,
-                             :signal,
-                             :login_item,
-                             :kext,
-                             :script,
-                             :pkgutil,
-                             :delete,
-                             :trash,
-                             :rmdir,
-                           ].freeze
+        :early_script,
+        :launchctl,
+        :quit,
+        :signal,
+        :login_item,
+        :kext,
+        :script,
+        :pkgutil,
+        :delete,
+        :trash,
+        :rmdir,
+      ].freeze
 
       # TODO: these methods were consolidated here from separate
       #       sources and should be refactored for consistency
 
       def self.expand_path_strings(path_strings)
-        path_strings.map { |path_string|
+        path_strings.map do |path_string|
           path_string.start_with?("~") ? Pathname.new(path_string).expand_path : Pathname.new(path_string)
-        }
+        end
       end
 
       def self.remove_relative_path_strings(action, path_strings)
-        relative = path_strings.map { |path_string|
+        relative = path_strings.map do |path_string|
           path_string if %r{/\.\.(?:/|\Z)}.match(path_string) || !%r{\A/}.match(path_string)
-        }.compact
+        end.compact
         relative.each do |path_string|
           opoo "Skipping #{action} for relative path #{path_string}"
         end
@@ -44,9 +44,9 @@ module Hbc
       end
 
       def self.remove_undeletable_path_strings(action, path_strings)
-        undeletable = path_strings.map { |path_string|
+        undeletable = path_strings.map do |path_string|
           path_string if MacOS.undeletable?(Pathname.new(path_string))
-        }.compact
+        end.compact
         undeletable.each do |path_string|
           opoo "Skipping #{action} for undeletable path #{path_string}"
         end
@@ -87,7 +87,7 @@ module Hbc
       def warn_for_unknown_directives(directives)
         unknown_keys = directives.keys - ORDERED_DIRECTIVES
         return if unknown_keys.empty?
-        opoo %Q{Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. Running "brew update; brew cleanup; brew cask cleanup" will likely fix it.}
+        opoo %Q(Unknown arguments to #{stanza} -- #{unknown_keys.inspect}. Running "brew update; brew cleanup; brew cask cleanup" will likely fix it.)
       end
 
       # Preserve prior functionality of script which runs first. Should rarely be needed.
@@ -103,7 +103,7 @@ module Hbc
           ohai "Removing launchctl service #{service}"
           [false, true].each do |with_sudo|
             plist_status = @command.run("/bin/launchctl", args: ["list", service], sudo: with_sudo, print_stderr: false).stdout
-            if plist_status =~ %r{^\{}
+            if plist_status =~ /^\{/
               @command.run!("/bin/launchctl", args: ["remove", service], sudo: with_sudo)
               sleep 1
             end
@@ -129,7 +129,7 @@ module Hbc
           ohai "Quitting application ID #{id}"
           num_running = count_running_processes(id)
           next unless num_running > 0
-          @command.run!("/usr/bin/osascript", args: ["-e", %Q{tell application id "#{id}" to quit}], sudo: true)
+          @command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{id}" to quit)], sudo: true)
           sleep 3
         end
       end
@@ -156,23 +156,23 @@ module Hbc
 
       def count_running_processes(bundle_id)
         @command.run!("/usr/bin/osascript",
-                      args: ["-e", %Q{tell application "System Events" to count processes whose bundle identifier is "#{bundle_id}"}],
+                      args: ["-e", %Q(tell application "System Events" to count processes whose bundle identifier is "#{bundle_id}")],
                       sudo: true).stdout.to_i
       end
 
       def get_unix_pids(bundle_id)
         pid_string = @command.run!("/usr/bin/osascript",
-                                   args: ["-e", %Q{tell application "System Events" to get the unix id of every process whose bundle identifier is "#{bundle_id}"}],
+                                   args: ["-e", %Q(tell application "System Events" to get the unix id of every process whose bundle identifier is "#{bundle_id}")],
                                    sudo: true).stdout.chomp
-        return [] unless pid_string =~ %r{\A\d+(?:\s*,\s*\d+)*\Z} # sanity check
-        pid_string.split(%r{\s*,\s*}).map(&:strip).map(&:to_i)
+        return [] unless pid_string =~ /\A\d+(?:\s*,\s*\d+)*\Z/ # sanity check
+        pid_string.split(/\s*,\s*/).map(&:strip).map(&:to_i)
       end
 
       def uninstall_login_item(directives)
         Array(directives[:login_item]).each do |name|
           ohai "Removing login item #{name}"
           @command.run!("/usr/bin/osascript",
-                        args: ["-e", %Q{tell application "System Events" to delete every login item whose name is "#{name}"}],
+                        args: ["-e", %Q(tell application "System Events" to delete every login item whose name is "#{name}")],
                         sudo: false)
           sleep 1
         end

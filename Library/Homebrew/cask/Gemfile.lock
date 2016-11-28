@@ -1,6 +1,7 @@
 GIT
   remote: https://github.com/colszowka/simplecov.git
   revision: 83d8031ddde0927f87ef9327200a98583ca18d77
+  ref: 83d8031ddde0927f87ef9327200a98583ca18d77
   branch: master
   specs:
     simplecov (0.12.0)
@@ -13,8 +14,8 @@ GEM
   specs:
     ansi (1.5.0)
     builder (3.2.2)
-    byebug (9.0.5)
-    codecov (0.1.5)
+    byebug (9.0.6)
+    codecov (0.1.6)
       json
       simplecov
       url
@@ -24,16 +25,16 @@ GEM
     json (2.0.2)
     metaclass (0.0.4)
     method_source (0.8.2)
-    minitest (5.4.1)
+    minitest (5.9.1)
     minitest-reporters (1.1.11)
       ansi
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    mocha (1.1.0)
+    mocha (1.2.1)
       metaclass (~> 0.0.1)
     parallel (1.9.0)
-    parallel_tests (2.9.0)
+    parallel_tests (2.10.0)
       parallel
     pry (0.10.4)
       coderay (~> 1.1.0)
@@ -42,22 +43,23 @@ GEM
     pry-byebug (3.4.0)
       byebug (~> 9.0)
       pry (~> 0.10)
-    rake (10.4.2)
-    rspec (3.0.0)
-      rspec-core (~> 3.0.0)
-      rspec-expectations (~> 3.0.0)
-      rspec-mocks (~> 3.0.0)
-    rspec-core (3.0.4)
-      rspec-support (~> 3.0.0)
-    rspec-expectations (3.0.4)
+    rake (11.3.0)
+    rspec (3.5.0)
+      rspec-core (~> 3.5.0)
+      rspec-expectations (~> 3.5.0)
+      rspec-mocks (~> 3.5.0)
+    rspec-core (3.5.4)
+      rspec-support (~> 3.5.0)
+    rspec-expectations (3.5.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.0.0)
+      rspec-support (~> 3.5.0)
     rspec-its (1.2.0)
       rspec-core (>= 3.0.0)
       rspec-expectations (>= 3.0.0)
-    rspec-mocks (3.0.4)
-      rspec-support (~> 3.0.0)
-    rspec-support (3.0.4)
+    rspec-mocks (3.5.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.5.0)
+    rspec-support (3.5.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
     ruby-progressbar (1.8.1)
@@ -70,17 +72,17 @@ PLATFORMS
 
 DEPENDENCIES
   codecov
-  minitest (= 5.4.1)
+  minitest (~> 5.9)
   minitest-reporters
-  mocha (= 1.1.0)
+  mocha (~> 1.1)
   parallel_tests
   pry
   pry-byebug
   rake
-  rspec (~> 3.0.0)
+  rspec (~> 3.5)
   rspec-its
   rspec-wait
   simplecov (= 0.12.0)!
 
 BUNDLED WITH
-   1.13.1
+   1.13.6

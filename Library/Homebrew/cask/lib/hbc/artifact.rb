@@ -2,6 +2,7 @@ require "hbc/artifact/app"
 require "hbc/artifact/artifact" # generic 'artifact' stanza
 require "hbc/artifact/binary"
 require "hbc/artifact/colorpicker"
+require "hbc/artifact/dictionary"
 require "hbc/artifact/font"
 require "hbc/artifact/input_method"
 require "hbc/artifact/installer"
@@ -38,6 +39,7 @@ module Hbc
         Pkg,
         Prefpane,
         Qlplugin,
+        Dictionary,
         Font,
         Service,
         StageOnly,

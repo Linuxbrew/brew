@@ -47,7 +47,7 @@ module Hbc
 
     def check_required_stanzas
       odebug "Auditing required stanzas"
-      %i{version sha256 url homepage}.each do |sym|
+      [:version, :sha256, :url, :homepage].each do |sym|
         add_error "a #{sym} stanza is required" unless cask.send(sym)
       end
       add_error "at least one name stanza is required" if cask.name.empty?
@@ -84,7 +84,7 @@ module Hbc
     def check_sha256_actually_256(sha256: cask.sha256, stanza: "sha256")
       odebug "Verifying #{stanza} string is a legal SHA-256 digest"
       return unless sha256.is_a?(String)
-      return if sha256.length == 64 && sha256[%r{^[0-9a-f]+$}i]
+      return if sha256.length == 64 && sha256[/^[0-9a-f]+$/i]
       add_error "#{stanza} string must be of 64 hexadecimal characters"
     end
 
@@ -162,7 +162,7 @@ module Hbc
     end
 
     def bad_sourceforge_url?
-      bad_url_format?(%r{sourceforge},
+      bad_url_format?(/sourceforge/,
                       [
                         %r{\Ahttps://sourceforge\.net/projects/[^/]+/files/latest/download\Z},
                         %r{\Ahttps://downloads\.sourceforge\.net/(?!(project|sourceforge)\/)},
@@ -174,7 +174,7 @@ module Hbc
     end
 
     def bad_osdn_url?
-      bad_url_format?(%r{osd}, [%r{\Ahttps?://([^/]+.)?dl\.osdn\.jp/}])
+      bad_url_format?(/osd/, [%r{\Ahttps?://([^/]+.)?dl\.osdn\.jp/}])
     end
 
     def check_generic_artifacts

@@ -76,7 +76,7 @@ module Homebrew
     unless ARGV.force?
       ARGV.named.each do |name|
         next if File.exist?(name)
-        if name !~ HOMEBREW_TAP_FORMULA_REGEX && name !~ HOMEBREW_CASK_TAP_FORMULA_REGEX
+        if name !~ HOMEBREW_TAP_FORMULA_REGEX && name !~ HOMEBREW_CASK_TAP_CASK_REGEX
           next
         end
         tap = Tap.fetch($1, $2)

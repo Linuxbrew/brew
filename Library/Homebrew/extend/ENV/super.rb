@@ -139,7 +139,7 @@ module Superenv
   end
 
   def determine_pkg_config_libdir
-    paths = %W[/usr/lib/pkgconfig]
+    paths = %w[/usr/lib/pkgconfig]
     paths += homebrew_extra_pkg_config_paths
     paths.to_path_s
   end
