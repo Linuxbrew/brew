@@ -8,9 +8,9 @@ module Hbc
         ohai "Ruby Path:", render_with_none_as_error(RbConfig.ruby)
         # TODO: consider removing most Homebrew constants from doctor output
         ohai "Homebrew Version:", render_with_none_as_error(homebrew_version)
-        ohai "Homebrew Executable Path:", render_with_none_as_error(Hbc.homebrew_executable)
+        ohai "Homebrew Executable Path:", render_with_none_as_error(HOMEBREW_BREW_FILE)
         ohai "Homebrew Cellar Path:", render_with_none_as_error(homebrew_cellar)
-        ohai "Homebrew Repository Path:", render_with_none_as_error(homebrew_repository)
+        ohai "Homebrew Repository Path:", render_with_none_as_error(HOMEBREW_REPOSITORY)
         ohai "Homebrew Origin:", render_with_none_as_error(homebrew_origin)
         ohai "Homebrew-Cask Version:", render_with_none_as_error(Hbc.full_version)
         ohai "Homebrew-Cask Install Location:", render_install_location
@@ -31,7 +31,6 @@ module Hbc
         ohai "Contents of $PATH Environment Variable:", render_env_var("PATH")
         ohai "Contents of $SHELL Environment Variable:", render_env_var("SHELL")
         ohai "Contents of Locale Environment Variables:", render_with_none(locale_variables)
-        ohai "Running As Privileged User:", render_with_none_as_error(privileged_uid)
       end
 
       def self.alt_taps
@@ -48,7 +47,7 @@ module Hbc
       def self.homebrew_origin
         homebrew_origin = notfound_string
         begin
-          Dir.chdir(homebrew_repository) do
+          Dir.chdir(HOMEBREW_REPOSITORY) do
             homebrew_origin = SystemCommand.run("/usr/bin/git",
                                                      args:         %w[config --get remote.origin.url],
                                                      print_stderr: false).stdout.strip
@@ -64,10 +63,6 @@ module Hbc
         homebrew_origin
       end
 
-      def self.homebrew_repository
-        homebrew_constants("repository")
-      end
-
       def self.homebrew_cellar
         homebrew_constants("cellar")
       end
@@ -77,9 +72,7 @@ module Hbc
       end
 
       def self.homebrew_taps
-        @homebrew_taps ||= if homebrew_repository.respond_to?(:join)
-          homebrew_repository.join("Library", "Taps")
-        end
+        Tap::TAP_DIRECTORY
       end
 
       def self.homebrew_constants(name)
@@ -87,7 +80,7 @@ module Hbc
         return @homebrew_constants[name] if @homebrew_constants.key?(name)
         @homebrew_constants[name] = notfound_string
         begin
-          @homebrew_constants[name] = SystemCommand.run!(Hbc.homebrew_executable,
+          @homebrew_constants[name] = SystemCommand.run!(HOMEBREW_BREW_FILE,
                                                          args:         ["--#{name}"],
                                                          print_stderr: false)
                                                    .stdout
@@ -105,12 +98,6 @@ module Hbc
 
       def self.locale_variables
         ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).collect { |v| %Q(#{v}="#{ENV[v]}") }.sort.join("\n")
-      end
-
-      def self.privileged_uid
-        Process.euid.zero? ? "Yes #{error_string "warning: not recommended"}" : "No"
-      rescue StandardError
-        notfound_string
       end
 
       def self.none_string

@@ -661,28 +661,47 @@ class FormulaAuditor
     return unless formula.tap.git? # git log is required
     return if @new_formula
 
-    fv = FormulaVersions.new(formula, max_depth: 10)
-    no_decrease_attributes = [:revision, :version_scheme]
-    attributes = no_decrease_attributes + [:version]
+    fv = FormulaVersions.new(formula, max_depth: 1)
+    attributes = [:revision, :version_scheme]
+
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
-    no_decrease_attributes.each do |attribute|
-      attributes_for_version = attributes_map[attribute][formula.version]
-      next if attributes_for_version.empty?
-      if formula.send(attribute) < attributes_for_version.max
-        problem "#{attribute} should not decrease"
-      end
-    end
+    [:stable, :devel].each do |spec|
+      attributes.each do |attribute|
+        spec_attribute_map = attributes_map[attribute][spec]
+        next if spec_attribute_map.nil? || spec_attribute_map.empty?
 
-    versions = attributes_map[:version].values.flatten
-    if !versions.empty? && formula.version < versions.max
-      problem "version should not decrease"
+        attributes_for_version = spec_attribute_map[formula.version]
+        next if attributes_for_version.nil? || attributes_for_version.empty?
+
+        old_attribute = formula.send(attribute)
+        max_attribute = attributes_for_version.max
+        if max_attribute && old_attribute < max_attribute
+          problem "#{spec} #{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
+        end
+      end
+
+      spec_version_scheme_map = attributes_map[:version_scheme][spec]
+      next if spec_version_scheme_map.nil? || spec_version_scheme_map.empty?
+
+      max_version_scheme = spec_version_scheme_map.values.flatten.max
+      max_version = spec_version_scheme_map.select do |_, version_scheme|
+        version_scheme.first == max_version_scheme
+      end.keys.max
+
+      formula_spec = formula.send(spec)
+      next if formula_spec.nil?
+
+      if max_version && formula_spec.version < max_version
+        problem "#{spec} version should not decrease (from #{max_version} to #{formula_spec.version})"
+      end
     end
 
     return if formula.revision.zero?
     if formula.stable
-      revision_map = attributes_map[:revision]
-      if revision_map[formula.stable.version].empty? # check stable spec
+      revision_map = attributes_map[:revision][:stable]
+      stable_revisions = revision_map[formula.stable.version]
+      if !stable_revisions || stable_revisions.empty?
         problem "'revision #{formula.revision}' should be removed"
       end
     else # head/devel-only formula

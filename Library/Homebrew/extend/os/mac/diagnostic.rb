@@ -233,6 +233,7 @@ module Homebrew
 
       def check_xcode_select_path
         return if MacOS::CLT.installed?
+        return unless MacOS::Xcode.installed?
         return if File.file?("#{MacOS.active_developer_dir}/usr/bin/xcodebuild")
 
         path = MacOS::Xcode.bundle_path
@@ -292,8 +293,9 @@ module Homebrew
 
         <<-EOS.undent
           Your XQuartz (#{installed_version}) is outdated.
-          Please install XQuartz #{latest_version} (or delete it):
-            https://xquartz.macosforge.org
+          Please install XQuartz #{latest_version} (or delete the current version).
+          XQuartz can be updated using Homebrew-Cask by running
+            brew cask reinstall xquartz
         EOS
       end
 

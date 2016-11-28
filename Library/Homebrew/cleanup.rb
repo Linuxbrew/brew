@@ -10,10 +10,9 @@ module Homebrew
       cleanup_cellar
       cleanup_cache
       cleanup_logs
-      unless ARGV.dry_run?
-        cleanup_lockfiles
-        rm_ds_store
-      end
+      return if ARGV.dry_run?
+      cleanup_lockfiles
+      rm_ds_store
     end
 
     def self.update_disk_cleanup_size(path_size)

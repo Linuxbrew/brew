@@ -612,31 +612,7 @@ module MachO
   # A load command containing the address of the dynamic shared library
   # initialization routine and an index into the module table for the module
   # that defines the routine. Corresponds to LC_ROUTINES_64.
-  class RoutinesCommand64 < LoadCommand
-    # @return [Fixnum] the address of the initialization routine
-    attr_reader :init_address
-
-    # @return [Fixnum] the index into the module table that the init routine is defined in
-    attr_reader :init_module
-
-    # @return [void]
-    attr_reader :reserved1
-
-    # @return [void]
-    attr_reader :reserved2
-
-    # @return [void]
-    attr_reader :reserved3
-
-    # @return [void]
-    attr_reader :reserved4
-
-    # @return [void]
-    attr_reader :reserved5
-
-    # @return [void]
-    attr_reader :reserved6
-
+  class RoutinesCommand64 < RoutinesCommand
     # @see MachOStructure::FORMAT
     # @api private
     FORMAT = "L=2Q=8".freeze
@@ -644,20 +620,6 @@ module MachO
     # @see MachOStructure::SIZEOF
     # @api private
     SIZEOF = 72
-
-    # @api private
-    def initialize(view, cmd, cmdsize, init_address, init_module, reserved1,
-                   reserved2, reserved3, reserved4, reserved5, reserved6)
-      super(view, cmd, cmdsize)
-      @init_address = init_address
-      @init_module = init_module
-      @reserved1 = reserved1
-      @reserved2 = reserved2
-      @reserved3 = reserved3
-      @reserved4 = reserved4
-      @reserved5 = reserved5
-      @reserved6 = reserved6
-    end
   end
 
   # A load command signifying membership of a subframework containing the name

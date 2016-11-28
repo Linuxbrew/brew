@@ -12,9 +12,8 @@ module Stdenv
   DEFAULT_FLAGS = (OS.mac? ? "-march=core2 -msse4" : "-march=#{HOMEBREW_ARCH}").freeze
 
   def self.extended(base)
-    unless ORIGINAL_PATHS.include? HOMEBREW_PREFIX/"bin"
-      base.prepend_path "PATH", "#{HOMEBREW_PREFIX}/bin"
-    end
+    return if ORIGINAL_PATHS.include? HOMEBREW_PREFIX/"bin"
+    base.prepend_path "PATH", "#{HOMEBREW_PREFIX}/bin"
   end
 
   # @private

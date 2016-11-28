@@ -8,24 +8,14 @@ require "utils/shell"
 
 module Homebrew
   module Diagnostic
-    def self.missing_deps(ff)
+    def self.missing_deps(ff, hide = nil)
       missing = {}
       ff.each do |f|
-        missing_deps = f.recursive_dependencies do |dependent, dep|
-          if dep.optional? || dep.recommended?
-            tab = Tab.for_formula(dependent)
-            Dependency.prune unless tab.with?(dep)
-          elsif dep.build?
-            Dependency.prune
-          end
-        end
+        missing_dependencies = f.missing_dependencies(hide: hide)
 
-        missing_deps.map!(&:to_formula)
-        missing_deps.reject! { |d| d.installed_prefixes.any? }
-
-        unless missing_deps.empty?
-          yield f.full_name, missing_deps if block_given?
-          missing[f.full_name] = missing_deps
+        unless missing_dependencies.empty?
+          yield f.full_name, missing_dependencies if block_given?
+          missing[f.full_name] = missing_dependencies
         end
       end
       missing
@@ -80,7 +70,7 @@ module Homebrew
       end
 
       def inject_file_list(list, string)
-        list.inject(string) { |a, e| a << "  #{e}\n" }
+        list.inject(string) { |acc, elem| acc << "  #{elem}\n" }
       end
       ############# END HELPERS
 
@@ -356,6 +346,20 @@ module Homebrew
           You should change the ownership and permissions of #{Language::Python.homebrew_site_packages}
           back to your user account.
             sudo chown -R $(whoami) #{Language::Python.homebrew_site_packages}
+        EOS
+      end
+
+      def check_access_lock_dir
+        return unless HOMEBREW_LOCK_DIR.exist?
+        return if HOMEBREW_LOCK_DIR.writable_real?
+
+        <<-EOS.undent
+          #{HOMEBREW_LOCK_DIR} isn't writable.
+          Homebrew writes lock files to this location.
+
+          You should change the ownership and permissions of #{HOMEBREW_LOCK_DIR}
+          back to your user account.
+            sudo chown -R $(whoami) #{HOMEBREW_LOCK_DIR}
         EOS
       end
 

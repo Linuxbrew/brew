@@ -15,15 +15,17 @@ class CompilerSelectorTests < Homebrew::TestCase
       :clang_build_version
 
     def initialize
-      @gcc_4_0_build_version = nil
-      @gcc_build_version = 5666
-      @clang_build_version = 425
+      @gcc_4_0_build_version = Version::NULL
+      @gcc_build_version = Version.create("5666")
+      @llvm_build_version = Version::NULL
+      @clang_build_version = Version.create("425")
     end
 
     def non_apple_gcc_version(name)
       case name
-      when "gcc-4.8" then "4.8.1"
-      when "gcc-4.7" then "4.7.1"
+      when "gcc-4.8" then Version.create("4.8.1")
+      when "gcc-4.7" then Version.create("4.7.1")
+      else Version::NULL
       end
     end
   end
@@ -101,13 +103,13 @@ class CompilerSelectorTests < Homebrew::TestCase
   end
 
   def test_missing_gcc
-    @versions.gcc_build_version = nil
+    @versions.gcc_build_version = Version::NULL
     @f << :clang << :llvm << { gcc: "4.8" } << { gcc: "4.7" }
     assert_raises(CompilerSelectionError) { actual_cc }
   end
 
   def test_missing_llvm_and_gcc
-    @versions.gcc_build_version = nil
+    @versions.gcc_build_version = Version::NULL
     @f << :clang << { gcc: "4.8" } << { gcc: "4.7" }
     assert_raises(CompilerSelectionError) { actual_cc }
   end

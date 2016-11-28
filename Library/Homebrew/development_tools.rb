@@ -44,8 +44,11 @@ class DevelopmentTools
 
     def gcc_40_build_version
       @gcc_40_build_version ||=
-        if (path = locate("gcc-4.0"))
-          `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
+        if (path = locate("gcc-4.0")) &&
+           build_version = `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1]
+          Version.new build_version
+        else
+          Version::NULL
         end
     end
     alias gcc_4_0_build_version gcc_40_build_version
@@ -54,8 +57,11 @@ class DevelopmentTools
       @gcc_42_build_version ||=
         begin
           gcc = locate("gcc-4.2") || HOMEBREW_PREFIX.join("opt/apple-gcc42/bin/gcc-4.2")
-          if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm")
-            `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1].to_i
+          if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm")&&
+             build_version = `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1]
+            Version.new build_version
+          else
+            Version::NULL
           end
         end
     end
@@ -63,15 +69,21 @@ class DevelopmentTools
 
     def clang_version
       @clang_version ||=
-        if (path = locate("clang"))
-          `#{path} --version`[/(?:clang|LLVM) version (\d\.\d)/, 1]
+        if (path = locate("clang")) &&
+           build_version = `#{path} --version`[/(?:clang|LLVM) version (\d\.\d)/, 1]
+          Version.new build_version
+        else
+          Version::NULL
         end
     end
 
     def clang_build_version
       @clang_build_version ||=
-        if (path = locate("clang"))
-          `#{path} --version`[/clang-(\d{2,})/, 1].to_i
+        if (path = locate("clang")) &&
+           build_version = `#{path} --version`[/clang-(\d{2,})/, 1]
+          Version.new build_version
+        else
+          Version::NULL
         end
     end
 
@@ -80,7 +92,12 @@ class DevelopmentTools
         path = HOMEBREW_PREFIX.join("opt", "gcc", "bin", cc)
         path = locate(cc) unless path.exist?
         path = locate(cc.delete("-.")) if OS.linux? && !path
-        version = `#{path} --version`[/gcc(?:-\d(?:\.\d)?)? \(.+\) (\d\.\d\.\d)/, 1] if path
+        version = if path &&
+                     build_version = `#{path} --version`[/gcc(?:-\d(?:\.\d)? \(.+\))? (\d\.\d\.\d)/, 1]
+          Version.new build_version
+        else
+          Version::NULL
+        end
         @non_apple_gcc_version[cc] = version
       end
     end

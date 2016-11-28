@@ -37,6 +37,7 @@ class InstallTests < Homebrew::TestCase
   end
 
   def test_a_basic_install
+    ARGV << "--with-invalid_flag" # added to ensure it doesn't fail install
     temporary_install(Testball.new) do |f|
       # Test that things made it into the Keg
       assert_predicate f.prefix+"readme", :exist?

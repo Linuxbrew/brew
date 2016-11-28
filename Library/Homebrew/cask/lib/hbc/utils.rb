@@ -137,17 +137,17 @@ module Hbc
 
     def self.nowstamp_metadata_path(container_path)
       @timenow ||= Time.now.gmtime
-      if container_path.respond_to?(:join)
-        precision = 3
-        timestamp = @timenow.strftime("%Y%m%d%H%M%S")
-        fraction = format("%.#{precision}f", @timenow.to_f - @timenow.to_i)[1..-1]
-        timestamp.concat(fraction)
-        container_path.join(timestamp)
-      end
+      return unless container_path.respond_to?(:join)
+
+      precision = 3
+      timestamp = @timenow.strftime("%Y%m%d%H%M%S")
+      fraction = format("%.#{precision}f", @timenow.to_f - @timenow.to_i)[1..-1]
+      timestamp.concat(fraction)
+      container_path.join(timestamp)
     end
 
     def self.size_in_bytes(files)
-      Array(files).reduce(0) { |a, e| a + (File.size?(e) || 0) }
+      Array(files).reduce(0) { |acc, elem| acc + (File.size?(elem) || 0) }
     end
 
     def self.capture_stderr

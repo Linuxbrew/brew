@@ -8,7 +8,7 @@ module Hbc
       def self.me?(criteria)
         cabextract = which("cabextract")
 
-        criteria.magic_number(/^MSCF/n) &&
+        criteria.magic_number(/^(MSCF|MZ)/n) &&
           !cabextract.nil? &&
           criteria.command.run(cabextract, args: ["-t", "--", criteria.path.to_s]).stderr.empty?
       end

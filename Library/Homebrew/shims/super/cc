@@ -160,7 +160,7 @@ class Cmd
       "-fcaller-saves", "-fthread-jumps", "-fno-reorder-blocks", "-fcse-skip-blocks",
       "-frerun-cse-after-loop", "-frerun-loop-opt", "-fcse-follow-jumps",
       "-fno-regmove", "-fno-for-scope", "-fno-tree-pre", "-fno-tree-dominator-opts",
-      "-fuse-linker-plugin"
+      "-fuse-linker-plugin", "-frounding-math"
       # clang doesn't support these flags
       args << arg unless tool =~ /^clang/
     when "--fast-math"

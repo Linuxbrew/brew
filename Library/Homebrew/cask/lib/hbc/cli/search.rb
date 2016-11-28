@@ -41,14 +41,15 @@ module Hbc
           ohai "Exact match"
           puts exact_match
         end
-        unless partial_matches.empty?
-          if extract_regexp search_term
-            ohai "Regexp matches"
-          else
-            ohai "Partial matches"
-          end
-          puts Formatter.columns(partial_matches)
+
+        return if partial_matches.empty?
+
+        if extract_regexp search_term
+          ohai "Regexp matches"
+        else
+          ohai "Partial matches"
         end
+        puts Formatter.columns(partial_matches)
       end
 
       def self.help

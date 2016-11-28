@@ -28,22 +28,21 @@ module Hbc
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
-      unless cask.caveats.empty?
-        output = capture_output do
-          cask.caveats.each do |caveat|
-            if caveat.respond_to?(:eval_and_print)
-              caveat.eval_and_print(cask)
-            else
-              puts caveat
-            end
+      return if cask.caveats.empty?
+
+      output = capture_output do
+        cask.caveats.each do |caveat|
+          if caveat.respond_to?(:eval_and_print)
+            caveat.eval_and_print(cask)
+          else
+            puts caveat
           end
         end
-
-        unless output.empty?
-          ohai "Caveats"
-          puts output
-        end
       end
+
+      return if output.empty?
+      ohai "Caveats"
+      puts output
     end
 
     def self.capture_output(&block)
@@ -188,13 +187,13 @@ module Hbc
       ohai "Installing Formula dependencies from Homebrew"
       @cask.depends_on.formula.each do |dep_name|
         print "#{dep_name} ... "
-        installed = @command.run(Hbc.homebrew_executable,
+        installed = @command.run(HOMEBREW_BREW_FILE,
                                  args:         ["list", "--versions", dep_name],
                                  print_stderr: false).stdout.include?(dep_name)
         if installed
           puts "already installed"
         else
-          @command.run!(Hbc.homebrew_executable,
+          @command.run!(HOMEBREW_BREW_FILE,
                         args: ["install", dep_name])
           puts "done"
         end

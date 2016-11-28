@@ -1,4 +1,29 @@
 module HomebrewArgvExtension
+  def formula_install_option_names
+    %w[
+      --debug
+      --env=
+      --ignore-dependencies
+      --cc=
+      --build-from-source
+      --devel
+      --HEAD
+      --keep-tmp
+      --interactive
+      --git
+      --sandbox
+      --no-sandbox
+      --build-bottle
+      --force-bottle
+      --verbose
+      -i
+      -v
+      -d
+      -g
+      -s
+    ].freeze
+  end
+
   def named
     @named ||= self - options_only
   end
@@ -119,6 +144,13 @@ module HomebrewArgvExtension
     arg_prefix = "--#{name}="
     flag_with_value = find { |arg| arg.start_with?(arg_prefix) }
     flag_with_value.strip_prefix(arg_prefix) if flag_with_value
+  end
+
+  # Returns an array of values that were given as a comma-seperated list.
+  # @see value
+  def values(name)
+    return unless val = value(name)
+    val.split(",")
   end
 
   def force?

@@ -30,6 +30,29 @@ class VersionTokenTests < Homebrew::TestCase
   end
 end
 
+class NullVersionTests < Homebrew::TestCase
+  def test_null_version_is_always_smaller
+    assert_operator Version::NULL, :<, version("1")
+  end
+
+  def test_null_version_is_never_greater
+    refute_operator Version::NULL, :>, version("0")
+  end
+
+  def test_null_version_is_not_equal_to_itself
+    refute_eql Version::NULL, Version::NULL
+  end
+
+  def test_null_version_creates_an_empty_string
+    assert_eql "", Version::NULL.to_s
+  end
+
+  def test_null_version_produces_nan_as_a_float
+    # Float::NAN is not equal to itself so compare object IDs
+    assert_eql Float::NAN.object_id, Version::NULL.to_f.object_id
+  end
+end
+
 class VersionNullTokenTests < Homebrew::TestCase
   def test_inspect
     assert_equal "#<Version::NullToken>", Version::NullToken.new.inspect
@@ -120,6 +143,15 @@ class VersionComparisonTests < Homebrew::TestCase
     assert_operator version("2.1-p194"), :<, version("2.1.0-p195")
     assert_operator version("2.1.0-p195"), :>, version("2.1-p194")
     assert_operator version("2-p194"), :<, version("2.1-p195")
+  end
+
+  def test_comparing_against_nil
+    assert_operator version("2.1.0-p194"), :>, nil
+  end
+
+  def test_comparing_against_strings
+    assert_operator version("2.1.0-p194"), :==, "2.1.0-p194"
+    assert_operator version("1"), :==, 1
   end
 
   def test_comparison_returns_nil_for_non_version

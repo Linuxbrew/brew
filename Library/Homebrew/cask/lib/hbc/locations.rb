@@ -10,7 +10,7 @@ module Hbc
       end
 
       def default_caskroom
-        @default_caskroom ||= homebrew_prefix.join("Caskroom")
+        @default_caskroom ||= HOMEBREW_PREFIX.join("Caskroom")
       end
 
       def caskroom
@@ -39,11 +39,11 @@ module Hbc
       end
 
       def legacy_cache
-        @legacy_cache ||= homebrew_cache.join("Casks")
+        @legacy_cache ||= HOMEBREW_CACHE.join("Casks")
       end
 
       def cache
-        @cache ||= homebrew_cache.join("Cask")
+        @cache ||= HOMEBREW_CACHE.join("Cask")
       end
 
       attr_writer :appdir
@@ -91,7 +91,7 @@ module Hbc
       attr_writer :binarydir
 
       def binarydir
-        @binarydir ||= homebrew_prefix.join("bin")
+        @binarydir ||= HOMEBREW_PREFIX.join("bin")
       end
 
       attr_writer :input_methoddir
@@ -178,36 +178,6 @@ module Hbc
 
       def x11_libpng
         @x11_libpng ||= [Pathname.new("/opt/X11/lib/libpng.dylib"), Pathname.new("/usr/X11/lib/libpng.dylib")]
-      end
-
-      def homebrew_cache
-        @homebrew_cache ||= HOMEBREW_CACHE
-      end
-
-      def homebrew_cache=(path)
-        @homebrew_cache = path ? Pathname.new(path) : path
-      end
-
-      def homebrew_executable
-        @homebrew_executable ||= HOMEBREW_BREW_FILE
-      end
-
-      def homebrew_prefix
-        # where Homebrew links
-        @homebrew_prefix ||= HOMEBREW_PREFIX
-      end
-
-      def homebrew_prefix=(path)
-        @homebrew_prefix = path ? Pathname.new(path) : path
-      end
-
-      def homebrew_repository
-        # where Homebrew's .git dir is found
-        @homebrew_repository ||= HOMEBREW_REPOSITORY
-      end
-
-      def homebrew_repository=(path)
-        @homebrew_repository = path ? Pathname.new(path) : path
       end
     end
   end

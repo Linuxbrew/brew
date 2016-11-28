@@ -2,8 +2,8 @@ module Hbc
   class CLI
     class Update < Base
       def self.run(*_ignored)
-        result = SystemCommand.run(Hbc.homebrew_executable,
-                                   args: %w[update])
+        result = SystemCommand.run(HOMEBREW_BREW_FILE,
+                                   args: ["update"])
         # TODO: separating stderr/stdout is undesirable here.
         #       Hbc::SystemCommand should have an option for plain
         #       unbuffered output.

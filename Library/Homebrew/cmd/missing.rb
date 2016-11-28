@@ -1,6 +1,9 @@
-#:  * `missing` [<formulae>]:
+#:  * `missing` [`--hide=`<hidden>] [<formulae>]:
 #:    Check the given <formulae> for missing dependencies. If no <formulae> are
 #:    given, check all installed brews.
+#:
+#:    If `--hide=`<hidden> is passed, act as if none of <hidden> are installed.
+#:    <hidden> should be a comma-separated list of formulae.
 
 require "formula"
 require "tab"
@@ -18,8 +21,11 @@ module Homebrew
       ARGV.resolved_formulae
     end
 
-    Diagnostic.missing_deps(ff) do |name, missing|
-      print "#{name}: " if ff.size > 1
+    ff.each do |f|
+      missing = f.missing_dependencies(hide: ARGV.values("hide"))
+      next if missing.empty?
+
+      print "#{f}: " if ff.size > 1
       puts missing.join(" ")
     end
   end
