@@ -805,7 +805,7 @@ Homebrew wants to maintain a consistent Ruby style across all formulae based on 
 
 ### Version detection fails
 
-Homebrew tries to automatically determine the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method) from the [`url`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#url-class_method) in avoid duplication. If the tarball has an unusual name you may need to manually assign the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method).
+Homebrew tries to automatically determine the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method) from the [`url`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#url-class_method) to avoid duplication. If the tarball has an unusual name you may need to manually assign the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method).
 
 ## Bad Makefiles
 

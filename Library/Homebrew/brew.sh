@@ -2,7 +2,7 @@ HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty 2>/dev
 HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
-  HOMEBREW_VERSION=">1.0.0 (no git repository)"
+  HOMEBREW_VERSION=">1.1.0 (no git repository)"
   HOMEBREW_USER_AGENT_VERSION="1.X.Y"
 fi
 
@@ -250,41 +250,21 @@ fi
 
 check-run-command-as-root() {
   [[ "$(id -u)" = 0 ]] || return
-  export HOMEBREW_NO_SANDBOX="1"
 
+  # Homebrew Cask may need `sudo` for system-wide installation.
   [[ "$HOMEBREW_COMMAND" = "cask" ]] && return
+
+  # Homebrew Services may need `sudo` for system-wide daemons.
   [[ "$HOMEBREW_COMMAND" = "services" ]] && return
+
+  # It's fine to run this as root as it's not changing anything.
   [[ "$HOMEBREW_COMMAND" = "--prefix" ]] && return
 
-  onoe <<EOS
-Running Homebrew as root is extremely dangerous. As Homebrew does not
-drop privileges on installation you are giving all build scripts full access
-to your system. As a result of the macOS sandbox not handling the root user
-correctly HOMEBREW_NO_SANDBOX has been set so the sandbox will not be used. If
-we have not merged a pull request to add privilege dropping by November 1st
-2016 running Homebrew as root will be disabled. No Homebrew maintainers plan
-to work on this functionality.
+  odie <<EOS
+Running Homebrew as root is extremely dangerous and no longer supported.
+As Homebrew does not drop privileges on installation you would be giving all
+build scripts full access to your system.
 EOS
-
-  case "$HOMEBREW_COMMAND" in
-    analytics|create|install|link|migrate|pin|postinstall|reinstall|switch|tap|\
-    tap-pin|update|upgrade|vendor-install)
-      ;;
-    *)
-      return
-      ;;
-  esac
-
-  local brew_file_ls_info=($(ls -nd "$HOMEBREW_BREW_FILE"))
-  if [[ "${brew_file_ls_info[2]}" != 0 ]]
-  then
-    odie <<EOS
-Cowardly refusing to 'sudo brew $HOMEBREW_COMMAND'
-You can use brew with sudo, but only if the brew executable is owned by root.
-However, this is both not recommended and completely unsupported so do so at
-your own risk.
-EOS
-  fi
 }
 check-run-command-as-root
 
@@ -307,6 +287,13 @@ source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
 setup-analytics
 report-analytics-screenview-command
 
+# Let user know we're still updating Homebrew if brew update --preinstall
+# exceeds 3 seconds.
+update-preinstall-timer() {
+  sleep 3
+  echo 'Updating Homebrew...' >&2
+}
+
 update-preinstall() {
   [[ -z "$HOMEBREW_HELP" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
@@ -317,7 +304,19 @@ update-preinstall() {
 
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ]]
   then
+    if [[ -z "$HOMEBREW_VERBOSE" ]]
+    then
+      update-preinstall-timer &
+      timer_pid=$!
+    fi
+
     brew update --preinstall
+
+    if [[ -n "$timer_pid" ]]
+    then
+      kill "$timer_pid" 2>/dev/null
+      wait "$timer_pid" 2>/dev/null
+    fi
   fi
 
   # If brew update --preinstall did a migration then export the new locations.

@@ -16,7 +16,10 @@ module OS
     require "os/mac"
     NAME = "darwin".freeze
     GITHUB_USER = "Homebrew".freeze
-    ISSUES_URL = "https://git.io/brew-troubleshooting".freeze
+    # Don't tell people to report issues on unsupported versions of macOS.
+    if !OS::Mac.prerelease? && !OS::Mac.outdated_release?
+      ISSUES_URL = "https://git.io/brew-troubleshooting".freeze
+    end
     PATH_OPEN = "/usr/bin/open".freeze
     PATH_PATCH = "/usr/bin/patch".freeze
     # compatibility

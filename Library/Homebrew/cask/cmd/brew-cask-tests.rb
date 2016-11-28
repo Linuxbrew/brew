@@ -1,5 +1,8 @@
 require "English"
 
+ENV["BUNDLE_GEMFILE"] = "#{HOMEBREW_LIBRARY_PATH}/cask/Gemfile"
+ENV["BUNDLE_PATH"] = "#{HOMEBREW_LIBRARY_PATH}/vendor/bundle"
+
 def run_tests(executable, files, args = [])
   opts = []
   opts << "--serialize-stdout" if ENV["CI"]
@@ -7,7 +10,7 @@ def run_tests(executable, files, args = [])
   system "bundle", "exec", executable, *opts, "--", *args, "--", *files
 end
 
-repo_root = Pathname(__FILE__).realpath.parent.parent
+repo_root = Pathname.new(__FILE__).realpath.parent.parent
 repo_root.cd do
   ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
   ENV["HOMEBREW_NO_EMOJI"] = "1"
@@ -15,7 +18,7 @@ repo_root.cd do
 
   Homebrew.install_gem_setup_path! "bundler"
   unless quiet_system("bundle", "check")
-    system "bundle", "install", "--path", "vendor/bundle"
+    system "bundle", "install"
   end
 
   rspec = ARGV.flag?("--rspec") || !ARGV.flag?("--minitest")

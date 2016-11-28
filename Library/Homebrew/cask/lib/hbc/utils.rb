@@ -117,7 +117,7 @@ module Hbc
 
     def self.error_message_with_suggestions
       <<-EOS.undent
-        Follow the instuctions here:
+        Follow the instructions here:
           #{Formatter.url(PREBUG_URL)}
 
         If this doesn’t fix the problem, please report this bug:

@@ -98,7 +98,7 @@ module Superenv
     # can't reliably figure this out with Xcode 8 on its own yet.
     if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
       %w[basename_r clock_getres clock_gettime clock_settime dirname_r
-         getentropy mkostemp mkostemps].each do |s|
+         getentropy mkostemp mkostemps timingsafe_bcmp].each do |s|
         ENV["ac_cv_func_#{s}"] = "no"
       end
 

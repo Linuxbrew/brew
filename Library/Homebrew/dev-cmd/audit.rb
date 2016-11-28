@@ -11,7 +11,7 @@
 #:    connection are run.
 #:
 #:    If `--new-formula` is passed, various additional checks are run that check
-#:    if a new formula is eligable for Homebrew. This should be used when creating
+#:    if a new formula is eligible for Homebrew. This should be used when creating
 #:    new formulae and implies `--strict` and `--online`.
 #:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
@@ -415,6 +415,12 @@ class FormulaAuditor
             EOS
         when *BUILD_TIME_DEPS
           next if dep.build? || dep.run?
+          problem <<-EOS.undent
+            #{dep} dependency should be
+              depends_on "#{dep}" => :build
+            Or if it is indeed a runtime dependency
+              depends_on "#{dep}" => :run
+          EOS
         end
       end
     end
@@ -653,12 +659,14 @@ class FormulaAuditor
   def audit_revision_and_version_scheme
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
+    return if @new_formula
 
     fv = FormulaVersions.new(formula, max_depth: 10)
-    attributes = [:revision, :version_scheme]
+    no_decrease_attributes = [:revision, :version_scheme]
+    attributes = no_decrease_attributes + [:version]
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
-    attributes.each do |attribute|
+    no_decrease_attributes.each do |attribute|
       attributes_for_version = attributes_map[attribute][formula.version]
       next if attributes_for_version.empty?
       if formula.send(attribute) < attributes_for_version.max
@@ -666,11 +674,14 @@ class FormulaAuditor
       end
     end
 
-    revision_map = attributes_map[:revision]
+    versions = attributes_map[:version].values.flatten
+    if !versions.empty? && formula.version < versions.max
+      problem "version should not decrease"
+    end
 
     return if formula.revision.zero?
-
     if formula.stable
+      revision_map = attributes_map[:revision]
       if revision_map[formula.stable.version].empty? # check stable spec
         problem "'revision #{formula.revision}' should be removed"
       end
@@ -719,6 +730,21 @@ class FormulaAuditor
 
     if text =~ /system\s+['"]xcodebuild/
       problem %q(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
+    end
+
+    bin_names = Set.new
+    bin_names << formula.name
+    bin_names += formula.aliases
+    [formula.bin, formula.sbin].each do |dir|
+      next unless dir.exist?
+      bin_names += dir.children.map(&:basename).map(&:to_s)
+    end
+    bin_names.each do |name|
+      ["system", "shell_output", "pipe_output"].each do |cmd|
+        if text =~ /(def test|test do).*#{cmd}[\(\s]+['"]#{Regexp.escape name}[\s'"]/m
+          problem %(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
+        end
+      end
     end
 
     if text =~ /xcodebuild[ (]["'*]/ && !text.include?("SYMROOT=")
@@ -1288,6 +1314,11 @@ class ResourceAuditor
     # Check for http:// GitHub repo urls, https:// is preferred.
     urls.grep(%r{^http://github\.com/.*\.git$}) do |u|
       problem "Please use https:// for #{u}"
+    end
+
+    # Check for master branch GitHub archives.
+    urls.grep(%r{^https://github\.com/.*archive/master\.(tar\.gz|zip)$}) do
+      problem "Use versioned rather than branch tarballs for stable checksums."
     end
 
     # Use new-style archive downloads

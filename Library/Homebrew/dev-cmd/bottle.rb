@@ -251,6 +251,8 @@ module Homebrew
           relocatable = false if keg_contain?(cellar, keg, ignores)
           if prefix != prefix_check
             relocatable = false if keg_contain_absolute_symlink_starting_with?(prefix, keg)
+            relocatable = false if keg_contain?("#{prefix}/etc", keg, ignores)
+            relocatable = false if keg_contain?("#{prefix}/var", keg, ignores)
           end
           skip_relocation = relocatable && !keg.require_relocation?
         end

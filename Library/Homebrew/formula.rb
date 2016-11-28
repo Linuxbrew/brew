@@ -1599,7 +1599,7 @@ class Formula
     HOMEBREW_LIBRARY_PATH.join("test", "fixtures", file)
   end
 
-  # This method is overriden in {Formula} subclasses to provide the installation instructions.
+  # This method is overridden in {Formula} subclasses to provide the installation instructions.
   # The sources (from {.url}) are downloaded, hash-checked and
   # Homebrew changes into a temporary directory where the
   # archive was unpacked or repository cloned.

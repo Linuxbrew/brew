@@ -66,11 +66,18 @@ class Keg
         relocation.old_repository => relocation.new_repository,
       }
 
-      regexp = Regexp.union(replacements.keys)
+      # Order matters here since `HOMEBREW_CELLAR` and `HOMEBREW_REPOSITORY` are
+      # children of `HOMEBREW_PREFIX` by default.
+      regexp = Regexp.union(
+        relocation.old_cellar,
+        relocation.old_repository,
+        relocation.old_prefix
+      )
+
       changed = s.gsub!(regexp, replacements)
 
       next unless changed
-      changed_files << first.relative_path_from(path)
+      changed_files += [first, *rest].map { |file| file.relative_path_from(path) }
 
       begin
         first.atomic_write(s)

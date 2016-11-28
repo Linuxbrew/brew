@@ -165,7 +165,7 @@ class Migrator
     rescue Interrupt
       ignore_interrupts { backup_oldname }
     rescue Exception => e
-      onoe "Error occured while migrating."
+      onoe "Error occurred while migrating."
       puts e
       puts e.backtrace if ARGV.debug?
       puts "Backuping..."
@@ -293,7 +293,7 @@ class Migrator
     end
   end
 
-  # Backup everything if errors occured while migrating.
+  # Backup everything if errors occurred while migrating.
   def backup_oldname
     unlink_oldname_opt
     unlink_oldname_cellar

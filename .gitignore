@@ -8,15 +8,13 @@
 !/Library/
 
 # Ignore generated files within `Library` (again).
+/Library/Homebrew/**/.bundle
+/Library/Homebrew/**/vendor/bundle
 /Library/Homebrew/doc
-/Library/Homebrew/cask/.bundle
 /Library/Homebrew/cask/bin
-/Library/Homebrew/cask/vendor
 /Library/Homebrew/cask/coverage
 /Library/Homebrew/cask/tmp
-/Library/Homebrew/test/.bundle
 /Library/Homebrew/test/bin
-/Library/Homebrew/test/vendor
 /Library/Homebrew/test/coverage
 /Library/Homebrew/test/fs_leak_log
 /Library/Homebrew/tmp
@@ -26,7 +24,7 @@
 /Library/PinnedTaps
 /Library/Taps
 
-# Ignore vendored files within `Library`
+# Ignore vendored files within `Library`.
 /Library/Homebrew/vendor/portable-ruby
 
 # Ignore `bin` contents (again).

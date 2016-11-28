@@ -222,7 +222,7 @@ class Bottle
     def initialize(name, version, tag, rebuild)
       @name = name
       @version = version
-      @tag = tag
+      @tag = tag.to_s.gsub(/_or_later$/, "")
       @rebuild = rebuild
     end
 

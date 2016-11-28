@@ -10,19 +10,23 @@ module Homebrew
           check_xcode_license_approved
           check_for_osx_gcc_installer
           check_xcode_8_without_clt_on_el_capitan
-        ]
+          check_xcode_up_to_date
+          check_clt_up_to_date
+          check_for_other_package_managers
+        ].freeze
       end
 
       def fatal_development_tools_checks
-        if MacOS.version >= :sierra && ENV["CI"].nil?
-          %w[
-            check_xcode_up_to_date
-            check_clt_up_to_date
-          ]
-        else
-          %w[
-          ]
-        end
+        %w[
+          check_xcode_minimum_version
+          check_clt_minimum_version
+        ].freeze
+      end
+
+      def build_error_checks
+        (development_tools_checks + %w[
+          check_for_unsupported_macos
+        ]).freeze
       end
 
       def check_for_unsupported_macos
@@ -62,7 +66,8 @@ module Homebrew
       end
 
       def check_xcode_up_to_date
-        return unless MacOS::Xcode.installed? && MacOS::Xcode.outdated?
+        return unless MacOS::Xcode.installed?
+        return unless MacOS::Xcode.outdated?
 
         message = <<-EOS.undent
           Your Xcode (#{MacOS::Xcode.version}) is outdated.
@@ -83,7 +88,8 @@ module Homebrew
       end
 
       def check_clt_up_to_date
-        return unless MacOS::CLT.installed? && MacOS::CLT.outdated?
+        return unless MacOS::CLT.installed?
+        return unless MacOS::CLT.outdated?
 
         <<-EOS.undent
           A newer Command Line Tools release is available.
@@ -94,13 +100,35 @@ module Homebrew
       def check_xcode_8_without_clt_on_el_capitan
         return unless MacOS::Xcode.without_clt?
         # Scope this to Xcode 8 on El Cap for now
-        return unless MacOS.version == :el_capitan && MacOS::Xcode.version >= "8"
+        return unless MacOS.version == :el_capitan
+        return unless MacOS::Xcode.version >= "8"
 
         <<-EOS.undent
           You have Xcode 8 installed without the CLT;
           this causes certain builds to fail on OS X El Capitan (10.11).
           Please install the CLT via:
             sudo xcode-select --install
+        EOS
+      end
+
+      def check_xcode_minimum_version
+        return unless MacOS::Xcode.installed?
+        return unless MacOS::Xcode.minimum_version?
+
+        <<-EOS.undent
+          Your Xcode (#{MacOS::Xcode.version}) is too outdated.
+          Please update to Xcode #{MacOS::Xcode.latest_version} (or delete it).
+          #{MacOS::Xcode.update_instructions}
+        EOS
+      end
+
+      def check_clt_minimum_version
+        return unless MacOS::CLT.installed?
+        return unless MacOS::CLT.minimum_version?
+
+        <<-EOS.undent
+          Your Command Line Tools are too outdated.
+          #{MacOS::CLT.update_instructions}
         EOS
       end
 
