@@ -42,11 +42,8 @@ module Hbc
 
       def preflight_checks
         if Utils.path_occupied?(target)
-          if force
-            ohai(warning_target_exists { |s| s << "overwriting." })
-          else
-            raise CaskError, warning_target_exists << "."
-          end
+          raise CaskError, warning_target_exists << "." unless force
+          opoo(warning_target_exists { |s| s << "overwriting." })
         end
         unless source.exist?
           message = "It seems the #{self.class.artifact_english_name} source is not there: '#{source}'"
