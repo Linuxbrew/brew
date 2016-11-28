@@ -61,6 +61,14 @@ class DependencyCollector
     parse_spec(spec, Array(tags))
   end
 
+  def ant_dep(tags)
+    Dependency.new("ant", tags)
+  end
+
+  def xz_dep(tags)
+    Dependency.new("xz", tags)
+  end
+
   def self.tar_needs_xz_dependency?
     !new.xz_dep([]).nil?
   end
@@ -136,14 +144,6 @@ class DependencyCollector
     end
 
     spec.new(tags)
-  end
-
-  def ant_dep(tags)
-    Dependency.new("ant", tags)
-  end
-
-  def xz_dep(tags)
-    Dependency.new("xz", tags)
   end
 
   def resource_dep(spec, tags)
