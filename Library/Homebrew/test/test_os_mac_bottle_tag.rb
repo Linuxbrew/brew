@@ -76,4 +76,4 @@ class OSMacBottleTagTests < Homebrew::TestCase
     MacOS.stubs(:version).returns(MacOS::Version.new("10.8"))
     assert_equal :mountain_lion, Utils::Bottles.tag
   end
-end if OS.mac?
+end
