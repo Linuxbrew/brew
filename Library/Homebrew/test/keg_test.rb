@@ -467,8 +467,8 @@ class InstalledDependantsTests < LinkTestCase
     assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
   end
 
-  def test_unlinked
-    @keg.unlink
+  def test_nonoptlinked
+    @keg.remove_opt_record
     dependencies [{ "full_name" => "foo", "version" => "1.0" }]
     assert_empty @keg.installed_dependents
     assert_nil Keg.find_some_installed_dependents([@keg])

@@ -385,7 +385,7 @@ class Keg
   end
 
   def installed_dependents
-    return [] if !linked? && !to_formula.keg_only?
+    return [] unless optlinked?
     tap = Tab.for_keg(self).source["tap"]
     Keg.all.select do |keg|
       tab = Tab.for_keg(keg)
