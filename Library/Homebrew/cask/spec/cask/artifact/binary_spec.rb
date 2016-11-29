@@ -26,9 +26,11 @@ describe Hbc::Artifact::Binary do
   it "avoids clobbering an existing binary by linking over it" do
     FileUtils.touch expected_path
 
-    shutup do
-      Hbc::Artifact::Binary.new(cask).install_phase
-    end
+    expect {
+      shutup do
+        Hbc::Artifact::Binary.new(cask).install_phase
+      end
+    }.to raise_error(Hbc::CaskError)
 
     expect(expected_path).not_to be :symlink?
   end
