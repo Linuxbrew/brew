@@ -61,7 +61,9 @@ module ELF
   # Returns an empty array both for software that links against no libraries,
   # and for non-ELF objects.
   # @private
-  def dynamically_linked_libraries
+  def dynamically_linked_libraries(except: :none)
+    # The argument except is unused.
+    puts if except == :unused
     metadata.dylibs
   end
 
