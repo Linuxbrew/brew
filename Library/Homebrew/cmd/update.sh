@@ -417,7 +417,7 @@ EOS
   safe_cd "$HOMEBREW_REPOSITORY"
 
   # kill all of subprocess on interrupt
-  trap '{ pkill -P $$; wait; exit 130; }' SIGINT
+  trap '{ /usr/bin/pkill -P $$; wait; exit 130; }' SIGINT
 
   local update_failed_file="$HOMEBREW_REPOSITORY/.git/UPDATE_FAILED"
   rm -f "$update_failed_file"
