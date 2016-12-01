@@ -2,7 +2,7 @@ require "os/linux/architecture_list"
 
 module ELF
   # @private
-  LDD_RX = /\t.* => (.*) \(.*\)/
+  LDD_RX = /\t.* => (.*) \(.*\)|\t(.*) => not found/
 
   # ELF data
   # @private
@@ -47,7 +47,7 @@ module ELF
       command = ["ldd", path.expand_path.to_s]
       @dylibs = Utils.popen_read(*command).split("\n")
       raise ErrorDuringExecution, command unless $?.success?
-      @dylibs.map! { |lib| lib[LDD_RX, 1] }.compact!
+      @dylibs.map! { |lib| lib[LDD_RX, 1] || lib[LDD_RX, 2] }.compact!
     end
   end
 
