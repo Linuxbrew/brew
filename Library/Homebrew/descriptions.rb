@@ -12,14 +12,14 @@ class Descriptions
   # If the cache file exists, load it into, and return, a hash; otherwise,
   # return nil.
   def self.load_cache
-    @cache = Utils::JSON.load(CACHE_FILE.read) if CACHE_FILE.exist?
+    @cache = JSON.parse(CACHE_FILE.read) if CACHE_FILE.exist?
   end
 
   # Write the cache to disk after ensuring the existence of the containing
   # directory.
   def self.save_cache
     HOMEBREW_CACHE.mkpath
-    CACHE_FILE.atomic_write Utils::JSON.dump(@cache)
+    CACHE_FILE.atomic_write JSON.dump(@cache)
   end
 
   # Create a hash mapping all formulae to their descriptions;

@@ -654,11 +654,11 @@ If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with 
 Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\.
 .
 .TP
-\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] \fB\-\-url=\fR\fIurl\fR \fB\-\-sha256=\fR\fIsha\-256\fR \fIformula\fR:
+\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] [\fB\-\-message=\fR\fImessage\fR] \fB\-\-url=\fR\fIurl\fR \fB\-\-sha256=\fR\fIsha\-256\fR \fIformula\fR:
 
 .
 .TP
-\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] \fB\-\-tag=\fR\fItag\fR \fB\-\-revision=\fR\fIrevision\fR \fIformula\fR
+\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] [\fB\-\-message=\fR\fImessage\fR] \fB\-\-tag=\fR\fItag\fR \fB\-\-revision=\fR\fIrevision\fR \fIformula\fR
 Creates a pull request to update the formula with a new url or a new tag\.
 .
 .IP
@@ -687,6 +687,9 @@ If \fB\-\-mirror=\fR\fIurl\fR is passed, use the value as a mirror url\.
 .
 .IP
 If \fB\-\-version=\fR\fIversion\fR is passed, use the value to override the value parsed from the url or tag\. Note that \fB\-\-version=0\fR can be used to delete an existing \fBversion\fR override from a formula if it has become redundant\.
+.
+.IP
+If \fB\-\-message=\fR\fImessage\fR is passed, append \fImessage\fR to the default PR message\.
 .
 .IP
 Note that this command cannot be used to transition a formula from a url\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.

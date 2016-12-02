@@ -33,7 +33,7 @@
 require "net/http"
 require "net/https"
 require "utils"
-require "utils/json"
+require "json"
 require "formula"
 require "formulary"
 require "tap"
@@ -448,7 +448,7 @@ module Homebrew
       return nil unless $?.success?
 
       Homebrew.force_utf8!(json)
-      FormulaInfoFromJson.new(Utils::JSON.load(json)[0])
+      FormulaInfoFromJson.new(JSON.parse(json)[0])
     end
 
     def bottle_tags

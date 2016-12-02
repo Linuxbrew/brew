@@ -35,6 +35,7 @@ require "official_taps"
 require "cmd/search"
 require "cmd/style"
 require "date"
+require "blacklist"
 
 module Homebrew
   module_function
@@ -310,6 +311,10 @@ class FormulaAuditor
     name = formula.name
     full_name = formula.full_name
 
+    if blacklisted?(name)
+      problem "'#{name}' is blacklisted."
+    end
+
     if Formula.aliases.include? name
       problem "Formula name conflicts with existing aliases."
       return
@@ -456,6 +461,7 @@ class FormulaAuditor
 
     return unless @new_formula
     return if formula.deprecated_options.empty?
+    return if formula.name.include?("@")
     problem "New formulae should not use `deprecated_option`."
   end
 
@@ -666,21 +672,21 @@ class FormulaAuditor
 
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
-    [:stable, :devel].each do |spec|
-      attributes.each do |attribute|
-        spec_attribute_map = attributes_map[attribute][spec]
-        next if spec_attribute_map.nil? || spec_attribute_map.empty?
+    attributes.each do |attribute|
+      stable_attribute_map = attributes_map[attribute][:stable]
+      next if stable_attribute_map.nil? || stable_attribute_map.empty?
 
-        attributes_for_version = spec_attribute_map[formula.version]
-        next if attributes_for_version.nil? || attributes_for_version.empty?
+      attributes_for_version = stable_attribute_map[formula.version]
+      next if attributes_for_version.nil? || attributes_for_version.empty?
 
-        old_attribute = formula.send(attribute)
-        max_attribute = attributes_for_version.max
-        if max_attribute && old_attribute < max_attribute
-          problem "#{spec} #{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
-        end
+      old_attribute = formula.send(attribute)
+      max_attribute = attributes_for_version.max
+      if max_attribute && old_attribute < max_attribute
+        problem "#{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
       end
+    end
 
+    [:stable, :devel].each do |spec|
       spec_version_scheme_map = attributes_map[:version_scheme][spec]
       next if spec_version_scheme_map.nil? || spec_version_scheme_map.empty?
 
@@ -760,8 +766,8 @@ class FormulaAuditor
     end
     bin_names.each do |name|
       ["system", "shell_output", "pipe_output"].each do |cmd|
-        if text =~ /(def test|test do).*#{cmd}[\(\s]+['"]#{Regexp.escape name}[\s'"]/m
-          problem %(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
+        if text =~ %r{(def test|test do).*(#{Regexp.escape HOMEBREW_PREFIX}/bin/)?#{cmd}[\(\s]+['"]#{Regexp.escape name}[\s'"]}m
+          problem %Q(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
         end
       end
     end

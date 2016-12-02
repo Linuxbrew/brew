@@ -58,6 +58,8 @@ class Cmd
     @tool ||= case @arg0
     when "ld" then "ld"
     when "cpp" then "cpp"
+    when /llvm_(clang(\+\+)?)/
+     "#{ENV["HOMEBREW_PREFIX"]}/opt/llvm/bin/#{$1}"
     when /\w\+\+(-\d(\.\d)?)?$/
       case ENV["HOMEBREW_CC"]
       when /clang/

@@ -72,7 +72,12 @@ module Hbc
     end
 
     def _rmdir(path)
-      @command.run!("/bin/rmdir", args: ["--", path], sudo: true) if path.children.empty?
+      return unless path.children.empty?
+      if path.symlink?
+        @command.run!("/bin/rm", args: ["-f", "--", path], sudo: true)
+      else
+        @command.run!("/bin/rmdir", args: ["--", path], sudo: true)
+      end
     end
 
     def _with_full_permissions(path)

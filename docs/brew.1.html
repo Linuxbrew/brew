@@ -469,8 +469,8 @@ for instance, for implementing pre-commit hooks.</p></dd>
 
 <p>Generate a bottle (binary package) from a formula installed with
 <code>--build-bottle</code>.</p></dd>
-<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] <code>--url=</code><var>url</var> <code>--sha256=</code><var>sha-256</var> <var>formula</var>:</dt><dd><p></p></dd>
-<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] <code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var> <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new url or a new tag.</p>
+<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] [<code>--message=</code><var>message</var>] <code>--url=</code><var>url</var> <code>--sha256=</code><var>sha-256</var> <var>formula</var>:</dt><dd><p></p></dd>
+<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] [<code>--message=</code><var>message</var>] <code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var> <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new url or a new tag.</p>
 
 <p>If a <var>url</var> is specified, the <var>sha-256</var> checksum of the new download must
 also be specified. A best effort to determine the <var>sha-256</var> and <var>formula</var>
@@ -496,6 +496,9 @@ making the expected file modifications but not taking any git actions.</p>
 <p>If <code>--version=</code><var>version</var> is passed, use the value to override the value
 parsed from the url or tag. Note that <code>--version=0</code> can be used to delete
 an existing <code>version</code> override from a formula if it has become redundant.</p>
+
+<p>If <code>--message=</code><var>message</var> is passed, append <var>message</var> to the default PR
+message.</p>
 
 <p>Note that this command cannot be used to transition a formula from a
 url-and-sha256 style specification into a tag-and-revision style

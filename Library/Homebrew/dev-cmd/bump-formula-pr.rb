@@ -1,5 +1,5 @@
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] `--url=`<url> `--sha256=`<sha-256> <formula>:
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] `--tag=`<tag> `--revision=`<revision> <formula>:
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] [`--message=`<message>] `--url=`<url> `--sha256=`<sha-256> <formula>:
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] [`--message=`<message>] `--tag=`<tag> `--revision=`<revision> <formula>:
 #:    Creates a pull request to update the formula with a new url or a new tag.
 #:
 #:    If a <url> is specified, the <sha-256> checksum of the new download must
@@ -26,6 +26,9 @@
 #:    If `--version=`<version> is passed, use the value to override the value
 #:    parsed from the url or tag. Note that `--version=0` can be used to delete
 #:    an existing `version` override from a formula if it has become redundant.
+#:
+#:    If `--message=`<message> is passed, append <message> to the default PR
+#:    message.
 #:
 #:    Note that this command cannot be used to transition a formula from a
 #:    url-and-sha256 style specification into a tag-and-revision style
@@ -259,8 +262,21 @@ module Homebrew
         remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists\./, 1]
         odie "cannot get remote from 'hub'!" if remote.to_s.empty?
         safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
-        safe_system "hub", "pull-request", "--browse", "-m",
-          "#{formula.name} #{new_formula_version}#{devel_message}\n\nCreated with `brew bump-formula-pr`."
+        pr_message = <<-EOS.undent
+          #{formula.name} #{new_formula_version}#{devel_message}
+
+          Created with `brew bump-formula-pr`.
+        EOS
+        user_message = ARGV.value("message")
+        if user_message
+          pr_message += <<-EOS.undent
+
+            ---
+
+            #{user_message}
+          EOS
+        end
+        safe_system "hub", "pull-request", "--browse", "-m", pr_message
         safe_system "git", "checkout", "-"
       end
     end

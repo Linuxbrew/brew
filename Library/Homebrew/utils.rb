@@ -9,7 +9,6 @@ require "utils/git"
 require "utils/github"
 require "utils/hash"
 require "utils/inreplace"
-require "utils/json"
 require "utils/popen"
 require "utils/tty"
 

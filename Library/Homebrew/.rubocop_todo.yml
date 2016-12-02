@@ -21,7 +21,7 @@ Lint/HandleExceptions:
     - 'extend/pathname.rb'
     - 'formula.rb'
     - 'formula_versions.rb'
-    - 'test/test_ENV.rb'
+    - 'test/ENV_test.rb'
 
 # Offense count: 3
 Lint/IneffectiveAccessModifier:
@@ -51,7 +51,7 @@ Lint/RescueException:
     - 'postinstall.rb'
     - 'readall.rb'
     - 'test.rb'
-    - 'test/test_ENV.rb'
+    - 'test/ENV_test.rb'
     - 'utils/fork.rb'
 
 # Offense count: 1
@@ -90,7 +90,7 @@ Style/ClassVars:
   Exclude:
     - 'dev-cmd/audit.rb'
     - 'formula_installer.rb'
-    - 'test/testing_env.rb'
+    - 'test/support/helper/fs_leak_logger.rb'
 
 # Offense count: 13
 # Configuration parameters: AllowedVariables.
@@ -114,7 +114,7 @@ Style/MultilineBlockChain:
     - 'dev-cmd/audit.rb'
     - 'dev-cmd/man.rb'
     - 'diagnostic.rb'
-    - 'test/test_patching.rb'
+    - 'test/patching_test.rb'
 
 # Offense count: 4
 # Cop supports --auto-correct.
