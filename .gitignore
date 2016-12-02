@@ -45,6 +45,7 @@
 !/.gitignore
 !/.travis.yml
 !/.yardopts
+!/circle.yml
 !/CODEOFCONDUCT.md
 !/CONTRIBUTING.md
 !/LICENSE.txt
