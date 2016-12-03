@@ -1,3 +1,4 @@
+require "testing_env"
 require "cmd/uninstall"
 
 class UninstallTests < Homebrew::TestCase
