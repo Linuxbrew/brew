@@ -319,9 +319,6 @@ class Tab < OpenStruct
   end
 
   def write
-    require 'pry-byebug'
-    binding.pry
-
     # If this is a new installation, the cache of installed formulae
     # will no longer be valid.
     Formula.clear_installed_formulae_cache unless tabfile.exist?
