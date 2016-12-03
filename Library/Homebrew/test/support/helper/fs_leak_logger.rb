@@ -4,7 +4,7 @@ module Test
       def self.included(klass)
         require "find"
         logdir = HOMEBREW_LIBRARY_PATH.join("tmp")
-        logdir.mkdir unless logdir.directory?
+        logdir.mkpath
         @@log = File.open(logdir.join("fs_leak.log"), "w")
         klass.make_my_diffs_pretty!
       end
