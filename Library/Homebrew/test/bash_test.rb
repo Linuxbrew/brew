@@ -2,6 +2,7 @@ require "testing_env"
 
 class BashTests < Homebrew::TestCase
   def assert_valid_bash_syntax(file)
+    return unless file.exist?
     output = Utils.popen_read("/bin/bash -n #{file} 2>&1")
     assert $?.success?, output
   end
