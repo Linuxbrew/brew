@@ -303,6 +303,11 @@ class Keg
     dir && dir.directory? && !dir.children.empty?
   end
 
+  def fish_functions_installed?
+    dir = path.join("share", "fish", "vendor_functions.d")
+    dir && dir.directory? && !dir.children.empty?
+  end
+
   def plist_installed?
     !Dir["#{path}/*.plist"].empty?
   end
