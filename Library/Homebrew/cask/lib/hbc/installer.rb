@@ -132,13 +132,28 @@ module Hbc
     end
 
     def install_artifacts
+      already_installed_artifacts = []
+      options = { command: @command, force: force }
+
       odebug "Installing artifacts"
       artifacts = Artifact.for_cask(@cask)
       odebug "#{artifacts.length} artifact/s defined", artifacts
+
       artifacts.each do |artifact|
         odebug "Installing artifact of class #{artifact}"
-        options = { command: @command, force: force }
+        already_installed_artifacts.unshift(artifact)
         artifact.new(@cask, options).install_phase
+      end
+    rescue StandardError => e
+      begin
+        ofail e.message
+        already_installed_artifacts.each do |artifact|
+          odebug "Reverting installation of artifact of class #{artifact}"
+          artifact.new(@cask, options).uninstall_phase
+        end
+      ensure
+        purge_versioned_files
+        raise e.class, "An error occured during installation of Cask #{@cask}: #{e.message}"
       end
     end
 
