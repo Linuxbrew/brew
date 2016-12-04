@@ -19,6 +19,7 @@ class Caveats
     caveats << bash_completion_caveats
     caveats << zsh_completion_caveats
     caveats << fish_completion_caveats
+    caveats << zsh_function_caveats
     caveats << fish_function_caveats
     caveats << plist_caveats
     caveats << python_caveats
@@ -97,6 +98,16 @@ class Caveats
     <<-EOS.undent
       fish completion has been installed to:
         #{HOMEBREW_PREFIX}/share/fish/vendor_completions.d
+    EOS
+  end
+
+  def zsh_function_caveats
+    return unless keg
+    return unless keg.zsh_functions_installed?
+
+    <<-EOS.undent
+      zsh functions have been installed to:
+        #{HOMEBREW_PREFIX}/share/zsh/site-functions
     EOS
   end
 
