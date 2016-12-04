@@ -11,7 +11,7 @@ it does it too. And you have to confirm everything it will do before it starts.
 ## Requirements
 * An Intel CPU <sup>[1](#1)</sup>
 * OS X 10.10 or higher <sup>[2](#2)</sup>
-* Command Line Tools for Xcode: `xcode-select --install`,
+* Command Line Tools (CLT) for Xcode: `xcode-select --install`,
   https://developer.apple.com/downloads or
   [Xcode](https://itunes.apple.com/us/app/xcode/id497799835) <sup>[3](#3)</sup>
 * A Bourne-compatible shell for installation (e.g. bash or zsh) <sup>[4](#4)</sup>
