@@ -54,8 +54,27 @@ module Hbc
       output
     end
 
+    def fetch
+      odebug "Hbc::Installer#fetch"
+
+      satisfy_dependencies
+      verify_has_sha if @require_sha && !@force
+      download
+      verify
+    end
+
+    def stage
+      odebug "Hbc::Installer#stage"
+
+      extract_primary_container
+      save_caskfile
+    rescue StandardError => e
+      purge_versioned_files
+      raise e
+    end
+
     def install
-      odebug "Hbc::Installer.install"
+      odebug "Hbc::Installer#install"
 
       if @cask.installed? && !force
         raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
@@ -63,20 +82,10 @@ module Hbc
       end
 
       print_caveats
-
-      begin
-        satisfy_dependencies
-        verify_has_sha if @require_sha && !@force
-        download
-        verify
-        extract_primary_container
-        install_artifacts
-        save_caskfile
-        enable_accessibility_access
-      rescue StandardError => e
-        purge_versioned_files
-        raise e
-      end
+      fetch
+      stage
+      install_artifacts
+      enable_accessibility_access
 
       puts summary
     end
@@ -89,8 +98,7 @@ module Hbc
 
     def download
       odebug "Downloading"
-      download = Download.new(@cask, force: false)
-      @downloaded_path = download.perform
+      @downloaded_path = Download.new(@cask, force: false).perform
       odebug "Downloaded to -> #{@downloaded_path}"
       @downloaded_path
     end
@@ -107,15 +115,18 @@ module Hbc
 
     def extract_primary_container
       odebug "Extracting primary container"
+
       FileUtils.mkdir_p @cask.staged_path
       container = if @cask.container && @cask.container.type
         Container.from_type(@cask.container.type)
       else
         Container.for_path(@downloaded_path, @command)
       end
+
       unless container
         raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'"
       end
+
       odebug "Using container class #{container} for #{@downloaded_path}"
       container.new(@cask, @downloaded_path, @command).extract
     end
@@ -245,6 +256,9 @@ module Hbc
           See System Preferences to enable it manually.
         EOS
       end
+    rescue StandardError => e
+      purge_versioned_files
+      raise e
     end
 
     def disable_accessibility_access
@@ -279,7 +293,7 @@ module Hbc
     end
 
     def uninstall
-      odebug "Hbc::Installer.uninstall"
+      odebug "Hbc::Installer#uninstall"
       disable_accessibility_access
       uninstall_artifacts
       purge_versioned_files
