@@ -179,7 +179,7 @@ module Hbc
 
     def x11_dependencies
       return unless @cask.depends_on.x11
-      raise CaskX11DependencyError, @cask.token if Hbc.x11_libpng.select(&:exist?).empty?
+      raise CaskX11DependencyError, @cask.token unless MacOS::X11.installed?
     end
 
     def formula_dependencies

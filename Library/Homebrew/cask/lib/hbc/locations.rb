@@ -171,14 +171,6 @@ module Hbc
       def pre_mavericks_accessibility_dotfile
         @pre_mavericks_accessibility_dotfile ||= Pathname.new("/private/var/db/.AccessibilityAPIEnabled")
       end
-
-      def x11_executable
-        @x11_executable ||= Pathname.new("/usr/X11/bin/X")
-      end
-
-      def x11_libpng
-        @x11_libpng ||= [Pathname.new("/opt/X11/lib/libpng.dylib"), Pathname.new("/usr/X11/lib/libpng.dylib")]
-      end
     end
   end
 end
