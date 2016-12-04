@@ -82,11 +82,8 @@ module Hbc
     end
 
     def summary
-      s = if MacOS.version >= :lion && !ENV["HOMEBREW_NO_EMOJI"]
-        (ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba") + "  "
-      else
-        Formatter.headline("Success! ", color: :blue)
-      end
+      s = ""
+      s << "#{Emoji.install_badge}  " if Emoji.enabled?
       s << "#{@cask} was successfully installed!"
     end
 
