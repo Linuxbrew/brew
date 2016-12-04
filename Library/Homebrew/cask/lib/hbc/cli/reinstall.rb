@@ -7,6 +7,24 @@ module Hbc
           begin
             cask = Hbc.load(cask_token)
 
+            installer = Installer.new(cask,
+                                      force:          force,
+                                      skip_cask_deps: skip_cask_deps,
+                                      require_sha:    require_sha)
+            installer.print_caveats
+
+            # Download
+            begin
+              installer.satisfy_dependencies
+              installer.verify_has_sha if @require_sha && !@force
+              installer.download
+              installer.verify
+            rescue StandardError => e
+              installer.purge_versioned_files
+              raise e
+            end
+
+            # Uninstall
             if cask.installed?
               # use copy of cask for uninstallation to avoid 'No such file or directory' bug
               installed_cask = cask
@@ -26,10 +44,18 @@ module Hbc
               Installer.new(installed_cask, force: true).uninstall
             end
 
-            Installer.new(cask,
-                          force:          force,
-                          skip_cask_deps: skip_cask_deps,
-                          require_sha:    require_sha).install
+            # Reinstall
+            begin
+              installer.extract_primary_container
+              installer.install_artifacts
+              installer.save_caskfile
+              installer.enable_accessibility_access
+            rescue StandardError => e
+              installer.purge_versioned_files
+              raise e
+            end
+
+            puts installer.summary
             count += 1
           rescue CaskUnavailableError => e
             warn_unavailable_with_suggestion cask_token, e
