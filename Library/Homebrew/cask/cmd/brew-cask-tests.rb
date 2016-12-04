@@ -24,7 +24,11 @@ repo_root.cd do
   rspec = ARGV.flag?("--rspec") || !ARGV.flag?("--minitest")
   minitest = ARGV.flag?("--minitest") || !ARGV.flag?("--rspec")
 
-  ENV["HOMEBREW_TESTS_COVERAGE"] = "1" if ARGV.flag?("--coverage")
+  p [:coverage, ARGV.flag?("--coverage"), ENV["CI"], ENV["TRAVIS"]]
+  if ARGV.flag?("--coverage")
+    ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
+    upload_coverage = ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
+  end
 
   failed = false
 
@@ -46,7 +50,8 @@ repo_root.cd do
 
   Homebrew.failed = failed
 
-  if ENV["CODECOV_TOKEN"]
+  if upload_coverage
+    puts "Submitting Codecov coverage..."
     system "bundle", "exec", "rake", "test:coverage:upload"
   end
 end

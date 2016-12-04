@@ -3,7 +3,7 @@ language: ruby
 matrix:
   include:
     - os: osx
-      osx_image: xcode8.0
+      osx_image: xcode8.1
       rvm: system
     - os: linux
       rvm: 2.0.0
@@ -13,7 +13,7 @@ before_install:
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       HOMEBREW_REPOSITORY="$(brew --repo)";
       sudo rm -rf "$HOMEBREW_REPOSITORY";
-      ln -s "$PWD" "$HOMEBREW_REPOSITORY";
+      sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
     else
       export PATH="$PWD/bin:$PATH";
       umask 022;
