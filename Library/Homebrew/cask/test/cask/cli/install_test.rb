@@ -39,7 +39,7 @@ describe Hbc::CLI::Install do
 
     lambda {
       Hbc::CLI::Install.run("local-transmission", "--force")
-    }.must_output(/==> Success! local-transmission was successfully installed!/)
+    }.must_output(/local-transmission was successfully installed!/)
   end
 
   it "skips dependencies with --skip-cask-deps" do

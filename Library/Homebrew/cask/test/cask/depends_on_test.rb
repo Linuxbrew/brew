@@ -93,6 +93,7 @@ describe "Satisfy Dependencies and Requirements" do
   describe "depends_on x11" do
     it "succeeds when depends_on x11 is satisfied" do
       x11_cask = Hbc.load("with-depends-on-x11")
+      MacOS::X11.stubs(:installed?).returns(true)
       shutup do
         Hbc::Installer.new(x11_cask).install
       end
@@ -100,7 +101,7 @@ describe "Satisfy Dependencies and Requirements" do
 
     it "raises an exception when depends_on x11 is not satisfied" do
       x11_cask = Hbc.load("with-depends-on-x11")
-      Hbc.stubs(:x11_libpng).returns([Pathname.new("/usr/path/does/not/exist")])
+      MacOS::X11.stubs(:installed?).returns(false)
       lambda {
         shutup do
           Hbc::Installer.new(x11_cask).install
@@ -110,7 +111,7 @@ describe "Satisfy Dependencies and Requirements" do
 
     it "never raises when depends_on x11: false" do
       x11_cask = Hbc.load("with-depends-on-x11-false")
-      Hbc.stubs(:x11_executable).returns(Pathname.new("/usr/path/does/not/exist"))
+      MacOS::X11.stubs(:installed?).returns(false)
       lambda do
         shutup do
           Hbc::Installer.new(x11_cask).install
