@@ -34,8 +34,10 @@ describe Hbc::Artifact::Artifact do
   it "avoids clobbering an existing artifact" do
     target_path.mkpath
 
-    shutup do
-      install_phase.call
+    assert_raises Hbc::CaskError do
+      shutup do
+        install_phase.call
+      end
     end
 
     source_path.must_be :directory?

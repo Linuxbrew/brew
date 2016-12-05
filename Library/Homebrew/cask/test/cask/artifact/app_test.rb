@@ -71,9 +71,9 @@ describe Hbc::Artifact::App do
       end
 
       it "avoids clobbering an existing app" do
-        install_phase.must_output <<-EOS.undent
-          ==> It seems there is already an App at '#{target_path}'; not moving.
-        EOS
+        err = install_phase.must_raise(Hbc::CaskError)
+
+        err.message.must_equal("It seems there is already an App at '#{target_path}'.")
 
         source_path.must_be :directory?
         target_path.must_be :directory?
@@ -92,11 +92,16 @@ describe Hbc::Artifact::App do
 
         describe "target is both writable and user-owned" do
           it "overwrites the existing app" do
-            install_phase.must_output <<-EOS.undent
-              ==> It seems there is already an App at '#{target_path}'; overwriting.
+            stdout = <<-EOS.undent
               ==> Removing App: '#{target_path}'
               ==> Moving App 'Caffeine.app' to '#{target_path}'
             EOS
+
+            stderr = <<-EOS.undent
+              Warning: It seems there is already an App at '#{target_path}'; overwriting.
+            EOS
+
+            install_phase.must_output(stdout, stderr)
 
             source_path.wont_be :exist?
             target_path.must_be :directory?
@@ -131,11 +136,16 @@ describe Hbc::Artifact::App do
             command.expect_and_pass_through(chmod_cmd)
             command.expect_and_pass_through(chmod_n_cmd)
 
-            install_phase.must_output <<-EOS.undent
-              ==> It seems there is already an App at '#{target_path}'; overwriting.
+            stdout = <<-EOS.undent
               ==> Removing App: '#{target_path}'
               ==> Moving App 'Caffeine.app' to '#{target_path}'
             EOS
+
+            stderr = <<-EOS.undent
+              Warning: It seems there is already an App at '#{target_path}'; overwriting.
+            EOS
+
+            install_phase.must_output(stdout, stderr)
 
             source_path.wont_be :exist?
             target_path.must_be :directory?
@@ -161,9 +171,9 @@ describe Hbc::Artifact::App do
       end
 
       it "leaves the target alone" do
-        install_phase.must_output <<-EOS.undent
-          ==> It seems there is already an App at '#{target_path}'; not moving.
-        EOS
+        err = install_phase.must_raise(Hbc::CaskError)
+
+        err.message.must_equal("It seems there is already an App at '#{target_path}'.")
 
         File.symlink?(target_path).must_equal true
       end
@@ -172,11 +182,16 @@ describe Hbc::Artifact::App do
         let(:force) { true }
 
         it "overwrites the existing app" do
-          install_phase.must_output <<-EOS.undent
-            ==> It seems there is already an App at '#{target_path}'; overwriting.
+          stdout = <<-EOS.undent
             ==> Removing App: '#{target_path}'
             ==> Moving App 'Caffeine.app' to '#{target_path}'
           EOS
+
+          stderr = <<-EOS.undent
+            Warning: It seems there is already an App at '#{target_path}'; overwriting.
+          EOS
+
+          install_phase.must_output(stdout, stderr)
 
           source_path.wont_be :exist?
           target_path.must_be :directory?

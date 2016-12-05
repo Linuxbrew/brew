@@ -69,9 +69,9 @@ describe Hbc::Artifact::App do
     it "avoids clobbering an existing app by moving over it" do
       target_path.mkpath
 
-      install_phase.must_output <<-EOS.undent
-        ==> It seems there is already an App at '#{target_path}'; not moving.
-      EOS
+      err = install_phase.must_raise(Hbc::CaskError)
+
+      err.message.must_equal("It seems there is already an App at '#{target_path}'.")
 
       source_path.must_be :directory?
       target_path.must_be :directory?
