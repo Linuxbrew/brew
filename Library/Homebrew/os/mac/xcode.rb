@@ -67,7 +67,9 @@ module OS
       end
 
       def toolchain_path
-        Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain") if installed? && Version.new(version) >= "4.3"
+        return unless installed?
+        return if Version.new(version) < "4.3"
+        Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain")
       end
 
       # Ask Spotlight where Xcode is. If the user didn't install the
@@ -82,7 +84,7 @@ module OS
       end
 
       def update_instructions
-        if Version.new(MacOS.version) >= "10.9" && !OS::Mac.prerelease?
+        if MacOS.version >= "10.9" && !OS::Mac.prerelease?
           <<-EOS.undent
             Xcode can be updated from the App Store.
           EOS
@@ -194,7 +196,7 @@ module OS
       end
 
       def update_instructions
-        if Xcode::Version.new(MacOS.version) >= "10.9"
+        if MacOS.version >= "10.9"
           <<-EOS.undent
             Update them from Software Update in the App Store.
           EOS
@@ -234,7 +236,7 @@ module OS
       end
 
       def outdated?
-        if Xcode::Version.new(MacOS.version) >= :mavericks.to_s
+        if MacOS.version >= :mavericks
           version = Utils.popen_read("#{MAVERICKS_PKG_PATH}/usr/bin/clang --version")
         else
           version = Utils.popen_read("/usr/bin/clang --version")
@@ -253,7 +255,9 @@ module OS
       def detect_version
         # CLT isn't a distinct entity pre-4.3, and pkgutil doesn't exist
         # at all on Tiger, so just count it as installed if Xcode is installed
-        return MacOS::Xcode.version if MacOS::Xcode.installed? && Xcode::Version.new(MacOS::Xcode.version) < "3.0"
+        if MacOS::Xcode.installed? && Xcode::Version.new(MacOS::Xcode.version) < "3.0"
+          return MacOS::Xcode.version
+        end
 
         [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].find do |id|
           if MacOS.version >= :mavericks
