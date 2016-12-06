@@ -61,8 +61,7 @@ module Homebrew
     puts "Updated upstream: #{files.join(" ")}"
     files.select! do |filename|
       next true unless File.readable? filename
-      s = File.read filename
-      !s[/bottle :(disabled|unneeded)/] && s[/bioinformatics|x86_64_linux/]
+      !File.read(filename)[/bottle :(disabled|unneeded)/]
     end
     unless files.empty?
       log = Utils.popen_read(git, "log", "origin/master..homebrew/master", "--", *files)
