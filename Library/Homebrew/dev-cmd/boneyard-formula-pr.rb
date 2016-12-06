@@ -88,6 +88,8 @@ module Homebrew
         ohai "git push $HUB_REMOTE #{branch}:#{branch}"
         ohai "hub pull-request -m $'#{formula.name}: migrate to boneyard\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
       end
+
+      ohai "git checkout -"
     else
       cd formula.tap.path
       safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
@@ -108,6 +110,8 @@ module Homebrew
         EOS
         pr_url = Utils.popen_read("hub", "pull-request", "-m", pr_message).chomp
       end
+
+      safe_system "git", "checkout", "-"
     end
 
     if ARGV.dry_run?
@@ -128,6 +132,8 @@ module Homebrew
         ohai "git push $HUB_REMOTE #{branch}:#{branch}"
         ohai "hub pull-request --browse -m $'#{formula.name}: migrate from #{formula.tap.repo}\\n\\nGoes together with $PR_URL\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
       end
+
+      ohai "git checkout -"
     else
       cd boneyard_tap.formula_dir
       safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
@@ -153,6 +159,8 @@ module Homebrew
           Created with `brew boneyard-formula-pr`#{reason}.
         EOS
       end
+
+      safe_system "git", "checkout", "-"
     end
   end
 end
