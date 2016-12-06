@@ -76,20 +76,22 @@ module Homebrew
 
     urls = issues.map { |n| "https://github.com/Homebrew/homebrew-science/pull/#{n}" }
     puts "Updating bottles: #{files.join(" ")}", "Pull requests: #{issues.join(" ")}", urls
-    system HOMEBREW_BREW_FILE, "pull", "--bottle", "--resolve", *urls
-    while Utils.popen_read(git, "status").include? "You are in the middle of an am session."
-      conflicts = Utils.popen_read(git, "diff", "--name-only", "--diff-filter=U").split
-      if conflicts.empty?
-        opoo "Skipping empty patch"
-        safe_system git, "am", "--skip"
-        next
+    urls.each do |url|
+      system HOMEBREW_BREW_FILE, "pull", "--bottle", "--resolve", url
+      while Utils.popen_read(git, "status").include? "You are in the middle of an am session."
+        conflicts = Utils.popen_read(git, "diff", "--name-only", "--diff-filter=U").split
+        if conflicts.empty?
+          opoo "Skipping empty patch"
+          safe_system git, "am", "--skip"
+          next
+        end
+        oh1 "Conflicts: #{conflicts.join(" ")}"
+        safe_system *editor, *conflicts
+        safe_system git, "add", *conflicts
+        system git, "am", "--continue"
       end
-      oh1 "Conflicts: #{conflicts.join(" ")}"
-      safe_system *editor, *conflicts
-      safe_system git, "add", *conflicts
-      system git, "am", "--continue"
+      safe_system git, "checkout", "-B", "master"
     end
-    safe_system git, "checkout", "-B", "master"
 
     system git, "rebase", "homebrew/master"
     until (conflicts = Utils.popen_read(git, "diff", "--name-only", "--diff-filter=U").split).empty?
