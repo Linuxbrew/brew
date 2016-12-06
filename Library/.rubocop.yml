@@ -169,3 +169,7 @@ Style/VariableNumber:
 
 Style/WordArray:
   Enabled: false
+
+# Disable for Linuxbrew
+Style/MultilineIfModifier:
+  Enabled: false
