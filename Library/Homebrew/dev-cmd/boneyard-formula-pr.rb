@@ -35,18 +35,18 @@ module Homebrew
     boneyard_tap = Tap.fetch("homebrew", "boneyard")
     tap_migrations_path = formula.tap.path/"tap_migrations.json"
     if ARGV.dry_run?
-      puts "brew update"
-      puts "brew tap #{boneyard_tap.name}"
-      puts "cd #{formula.tap.path}"
+      ohai "brew update"
+      ohai "brew tap #{boneyard_tap.name}"
+      ohai "cd #{formula.tap.path}"
       cd formula.tap.path
-      puts "cp #{formula_relpath} #{boneyard_tap.path}"
-      puts "git rm #{formula_relpath}"
+      ohai "cp #{formula_relpath} #{boneyard_tap.path}"
+      ohai "git rm #{formula_relpath}"
       unless File.exist? tap_migrations_path
-        puts "Creating tap_migrations.json for #{formula.tap.name}"
-        puts "git add #{tap_migrations_path}"
+        ohai "Creating tap_migrations.json for #{formula.tap.name}"
+        ohai "git add #{tap_migrations_path}"
       end
-      puts "Loading tap_migrations.json"
-      puts "Adding #{formula.name} to tap_migrations.json"
+      ohai "Loading tap_migrations.json"
+      ohai "Adding #{formula.name} to tap_migrations.json"
     else
       safe_system HOMEBREW_BREW_FILE, "update"
       safe_system HOMEBREW_BREW_FILE, "tap", boneyard_tap.name
@@ -67,7 +67,7 @@ module Homebrew
     end
     unless which("hub") || local_only
       if ARGV.dry_run?
-        puts "brew install hub"
+        ohai "brew install hub"
       else
         safe_system HOMEBREW_BREW_FILE, "install", "hub"
       end
@@ -77,16 +77,16 @@ module Homebrew
     reason = " because #{reason}" if reason
 
     if ARGV.dry_run?
-      puts "cd #{formula.tap.path}"
-      puts "git checkout --no-track -b #{branch} origin/master"
-      puts "git commit --no-edit --verbose --message=\"#{formula.name}: migrate to boneyard\" -- #{formula_relpath} #{tap_migrations_path.basename}"
+      ohai "cd #{formula.tap.path}"
+      ohai "git checkout --no-track -b #{branch} origin/master"
+      ohai "git commit --no-edit --verbose --message=\"#{formula.name}: migrate to boneyard\" -- #{formula_relpath} #{tap_migrations_path.basename}"
 
       unless local_only
-        puts "hub fork --no-remote"
-        puts "hub fork"
-        puts "hub fork (to read $HUB_REMOTE)"
-        puts "git push $HUB_REMOTE #{branch}:#{branch}"
-        puts "hub pull-request -m $'#{formula.name}: migrate to boneyard\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
+        ohai "hub fork --no-remote"
+        ohai "hub fork"
+        ohai "hub fork (to read $HUB_REMOTE)"
+        ohai "git push $HUB_REMOTE #{branch}:#{branch}"
+        ohai "hub pull-request -m $'#{formula.name}: migrate to boneyard\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
       end
     else
       cd formula.tap.path
@@ -111,22 +111,22 @@ module Homebrew
     end
 
     if ARGV.dry_run?
-      puts "cd #{boneyard_tap.path}"
-      puts "git checkout --no-track -b #{branch} origin/master"
+      ohai "cd #{boneyard_tap.path}"
+      ohai "git checkout --no-track -b #{branch} origin/master"
       if bottle_block
-        puts "Removing bottle block"
+        ohai "Removing bottle block"
       else
-        puts "No bottle block to remove"
+        ohai "No bottle block to remove"
       end
-      puts "git add #{formula_file}"
-      puts "git commit --no-edit --verbose --message=\"#{formula.name}: migrate from #{formula.tap.repo}\" -- #{formula_file}"
+      ohai "git add #{formula_file}"
+      ohai "git commit --no-edit --verbose --message=\"#{formula.name}: migrate from #{formula.tap.repo}\" -- #{formula_file}"
 
       unless local_only
-        puts "hub fork --no-remote"
-        puts "hub fork"
-        puts "hub fork (to read $HUB_REMOTE)"
-        puts "git push $HUB_REMOTE #{branch}:#{branch}"
-        puts "hub pull-request --browse -m $'#{formula.name}: migrate from #{formula.tap.repo}\\n\\nGoes together with $PR_URL\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
+        ohai "hub fork --no-remote"
+        ohai "hub fork"
+        ohai "hub fork (to read $HUB_REMOTE)"
+        ohai "git push $HUB_REMOTE #{branch}:#{branch}"
+        ohai "hub pull-request --browse -m $'#{formula.name}: migrate from #{formula.tap.repo}\\n\\nGoes together with $PR_URL\\n\\nCreated with `brew boneyard-formula-pr`#{reason}.'"
       end
     else
       cd boneyard_tap.formula_dir
