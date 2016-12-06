@@ -26,7 +26,7 @@ require "migrator"
 # @see SharedEnvExtension
 # @see FileUtils
 # @see Pathname
-# @see http://www.rubydoc.info/github/Homebrew/brew/file/docs/Formula-Cookbook.md Formula Cookbook
+# @see https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md Formula Cookbook
 # @see https://github.com/styleguide/ruby Ruby Style Guide
 #
 # <pre>class Wget < Formula
@@ -1167,7 +1167,7 @@ class Formula
   # Returns false if the formula wasn't installed with an alias.
   def installed_alias_target_changed?
     target = current_installed_alias_target
-    target && target != self
+    target && target.name != name
   end
 
   # Is this formula the target of an alias used to install an old formula?
@@ -1192,7 +1192,7 @@ class Formula
     # it doesn't make sense to say that other formulae are older versions of it
     # because we don't know which came first.
     return [] if alias_path.nil? || installed_alias_target_changed?
-    self.class.installed_with_alias_path(alias_path) - [self]
+    self.class.installed_with_alias_path(alias_path).reject { |f| f.name == name }
   end
 
   # @private
@@ -1271,8 +1271,6 @@ class Formula
       -DCMAKE_VERBOSE_MAKEFILE=ON
       -Wno-dev
     ]
-    # Set RPATH for Linux to fix error while loading shared libraries
-    args += ["-DCMAKE_BUILD_WITH_INSTALL_RPATH=1", "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=1"] if OS.linux?
 
     # Avoid false positives for clock_gettime support on 10.11.
     # CMake cache entries for other weak symbols may be added here as needed.
@@ -1337,6 +1335,17 @@ class Formula
         next
       end
     end
+  end
+
+  # Clear cache of .racks
+  def self.clear_racks_cache
+    @racks = nil
+  end
+
+  # Clear caches of .racks and .installed.
+  def self.clear_installed_formulae_cache
+    clear_racks_cache
+    @installed = nil
   end
 
   # An array of all racks currently installed.
@@ -1459,6 +1468,26 @@ class Formula
   # @private
   def runtime_dependencies
     recursive_dependencies.reject(&:build?)
+  end
+
+  # Returns a list of formulae depended on by this formula that aren't
+  # installed
+  def missing_dependencies(hide: nil)
+    hide ||= []
+    missing_dependencies = recursive_dependencies do |dependent, dep|
+      if dep.optional? || dep.recommended?
+        tab = Tab.for_formula(dependent)
+        Dependency.prune unless tab.with?(dep)
+      elsif dep.build?
+        Dependency.prune
+      end
+    end
+
+    missing_dependencies.map!(&:to_formula)
+    missing_dependencies.select! do |d|
+      hide.include?(d.name) || d.installed_prefixes.empty?
+    end
+    missing_dependencies
   end
 
   # @private
@@ -1598,10 +1627,10 @@ class Formula
 
   # @private
   def test_fixtures(file)
-    HOMEBREW_LIBRARY.join("Homebrew", "test", "fixtures", file)
+    HOMEBREW_LIBRARY_PATH.join("test", "support", "fixtures", file)
   end
 
-  # This method is overriden in {Formula} subclasses to provide the installation instructions.
+  # This method is overridden in {Formula} subclasses to provide the installation instructions.
   # The sources (from {.url}) are downloaded, hash-checked and
   # Homebrew changes into a temporary directory where the
   # archive was unpacked or repository cloned.

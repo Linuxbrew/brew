@@ -1,6 +1,8 @@
+require "os/linux/architecture_list"
+
 module ELF
   # @private
-  LDD_RX = /\t.* => (.*) \(.*\)/
+  LDD_RX = /\t.* => (.*) \(.*\)|\t(.*) => not found/
 
   # ELF data
   # @private
@@ -42,10 +44,16 @@ module ELF
         id
       end
 
-      command = ["ldd", path.expand_path.to_s]
-      @dylibs = Utils.popen_read(*command).split("\n")
+      command = ["patchelf", "--print-needed", path.expand_path.to_s]
+      needed = Utils.popen_read(*command).split("\n")
       raise ErrorDuringExecution, command unless $?.success?
-      @dylibs.map! { |lib| lib[LDD_RX, 1] }.compact!
+
+      command = ["ldd", path.expand_path.to_s]
+      libs = Utils.popen_read(*command).split("\n")
+      raise ErrorDuringExecution, command unless $?.success?
+      needed << "not found"
+      libs.select! { |lib| needed.any? { |soname| lib.include? soname } }
+      @dylibs = libs.map { |lib| lib[LDD_RX, 1] || lib[LDD_RX, 2] }.compact
     end
   end
 
@@ -59,7 +67,9 @@ module ELF
   # Returns an empty array both for software that links against no libraries,
   # and for non-ELF objects.
   # @private
-  def dynamically_linked_libraries
+  def dynamically_linked_libraries(except: :none)
+    # The argument except is unused.
+    puts if except == :unused
     metadata.dylibs
   end
 

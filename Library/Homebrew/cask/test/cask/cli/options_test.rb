@@ -57,6 +57,20 @@ describe Hbc::CLI do
     Hbc.colorpickerdir.must_equal Pathname("/some/path/bar")
   end
 
+  it "supports setting the dictionarydir" do
+    Hbc::CLI.process_options %w[help --dictionarydir=/some/path/foo]
+
+    Hbc.dictionarydir.must_equal Pathname("/some/path/foo")
+  end
+
+  it "supports setting the dictionarydir from ENV" do
+    ENV["HOMEBREW_CASK_OPTS"] = "--dictionarydir=/some/path/bar"
+
+    Hbc::CLI.process_options %w[help]
+
+    Hbc.dictionarydir.must_equal Pathname("/some/path/bar")
+  end
+
   it "supports setting the fontdir" do
     Hbc::CLI.process_options %w[help --fontdir=/some/path/foo]
 

@@ -12,7 +12,6 @@ require "cmd/postinstall"
 require "hooks/bottles"
 require "debrew"
 require "sandbox"
-require "requirements/cctools_requirement"
 require "requirements/glibc_requirement"
 require "emoji"
 require "development_tools"
@@ -33,7 +32,7 @@ class FormulaInstaller
   end
 
   attr_reader :formula
-  attr_accessor :options, :build_bottle
+  attr_accessor :options, :build_bottle, :invalid_option_names
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :force_bottle
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
@@ -53,6 +52,8 @@ class FormulaInstaller
     @quieter = false
     @debug = false
     @options = Options.new
+    @invalid_option_names = []
+    @requirement_messages = []
 
     @@attempted ||= Set.new
 
@@ -116,7 +117,7 @@ class FormulaInstaller
 
   def install_bottle_for?(dep, build)
     return pour_bottle? if dep == formula
-    return false if build_from_source?
+    return false if ARGV.build_formula_from_source?(dep)
     return false unless dep.bottle && dep.pour_bottle?
     return false unless build.used_options.empty?
     return false unless dep.bottle.compatible_cellar?
@@ -215,6 +216,10 @@ class FormulaInstaller
       opoo "#{formula.full_name}: #{old_flag} was deprecated; using #{new_flag} instead!"
     end
 
+    invalid_option_names.each do |option|
+      opoo "#{formula.full_name}: this formula has no #{option} option so it will be ignored!"
+    end
+
     oh1 "Installing #{Formatter.identifier(formula.full_name)}" if show_header?
 
     if formula.tap && !formula.tap.private?
@@ -235,7 +240,6 @@ class FormulaInstaller
     pour_bottle = pour_bottle?(warn: true)
     if pour_bottle
       begin
-        install_relocation_tools unless formula.bottle_specification.skip_relocation?
         pour
       rescue Exception => e
         # any exceptions must leave us with nothing installed
@@ -249,6 +253,7 @@ class FormulaInstaller
         opoo "Bottle installation failed: building from source."
         raise BuildToolsError, [formula] unless DevelopmentTools.installed?
       else
+        puts_requirement_messages
         @poured_bottle = true
       end
     end
@@ -258,6 +263,7 @@ class FormulaInstaller
     unless @poured_bottle
       not_pouring = !pour_bottle || @pour_failed
       compute_and_install_dependencies if not_pouring && !ignore_deps?
+      puts_requirement_messages
       build
       clean
 
@@ -332,17 +338,21 @@ class FormulaInstaller
   end
 
   def check_requirements(req_map)
+    @requirement_messages = []
     fatals = []
 
     req_map.each_pair do |dependent, reqs|
       next if dependent.installed?
       reqs.each do |req|
-        puts "#{dependent}: #{req.message}"
+        @requirement_messages << "#{dependent}: #{req.message}"
         fatals << req if req.fatal?
       end
     end
 
-    raise UnsatisfiedRequirements, fatals unless fatals.empty?
+    return if fatals.empty?
+
+    puts_requirement_messages
+    raise UnsatisfiedRequirements, fatals
   end
 
   def install_requirement_default_formula?(req, dependent, build)
@@ -470,20 +480,6 @@ class FormulaInstaller
     @show_header = true unless deps.empty?
   end
 
-  # Installs the relocation tools (as provided by the cctools formula) as a hard
-  # dependency for every formula installed from a bottle when the user has no
-  # developer tools. Invoked unless the formula explicitly sets
-  # :any_skip_relocation in its bottle DSL.
-  def install_relocation_tools
-    return unless OS.mac?
-    cctools = CctoolsRequirement.new
-    dependency = cctools.to_dependency
-    formula = dependency.to_formula
-    return if cctools.satisfied? || @@attempted.include?(formula)
-
-    install_dependency(dependency, inherited_options_for(cctools))
-  end
-
   class DependencyInstaller < FormulaInstaller
     def skip_deps_check?
       true
@@ -509,6 +505,7 @@ class FormulaInstaller
     fi.options           |= tab.used_options
     fi.options           |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
     fi.options           |= inherited_options
+    fi.options           &= df.options
     fi.build_bottle       = build_bottle? && ENV["HOMEBREW_BUILD_BOTTLE"] == "dependencies"
     fi.build_from_source  = ARGV.build_formula_from_source?(df)
     fi.verbose            = verbose? && !quieter?
@@ -815,13 +812,11 @@ class FormulaInstaller
     end
 
     keg = Keg.new(formula.prefix)
-    unless formula.bottle_specification.skip_relocation?
-      keg.relocate_dynamic_linkage Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
-        Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s
-    end
-    keg.relocate_text_files Keg::PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s,
-      Keg::CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s,
-      Keg::REPOSITORY_PLACEHOLDER, HOMEBREW_REPOSITORY.to_s
+    tab = Tab.for_keg(keg)
+    Tab.clear_cache
+
+    skip_linkage = formula.bottle_specification.skip_relocation?
+    keg.replace_placeholders_with_locations tab.changed_files, skip_linkage: skip_linkage
 
     Pathname.glob("#{formula.bottle_prefix}/{etc,var}/**/*") do |path|
       path.extend(InstallRenamed)
@@ -829,7 +824,7 @@ class FormulaInstaller
     end
     FileUtils.rm_rf formula.bottle_prefix
 
-    tab = Tab.for_keg(formula.prefix)
+    tab = Tab.for_keg(keg)
 
     CxxStdlib.check_compatibility(
       formula, formula.recursive_dependencies,
@@ -863,9 +858,11 @@ class FormulaInstaller
 
   def lock
     return unless (@@locked ||= []).empty?
-    formula.recursive_dependencies.each do |dep|
-      @@locked << dep.to_formula
-    end unless ignore_deps?
+    unless ignore_deps?
+      formula.recursive_dependencies.each do |dep|
+        @@locked << dep.to_formula
+      end
+    end
     @@locked.unshift(formula)
     @@locked.uniq!
     @@locked.each(&:lock)
@@ -877,5 +874,11 @@ class FormulaInstaller
     @@locked.each(&:unlock)
     @@locked.clear
     @hold_locks = false
+  end
+
+  def puts_requirement_messages
+    return unless @requirement_messages
+    return if @requirement_messages.empty?
+    puts @requirement_messages
   end
 end

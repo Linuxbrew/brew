@@ -36,9 +36,9 @@ describe Hbc::CLI::Uninstall do
     end
 
     caffeine.wont_be :installed?
-    File.exist?(Hbc.appdir.join("Transmission.app")).must_equal false
+    Hbc.appdir.join("Transmission.app").wont_be :exist?
     transmission.wont_be :installed?
-    File.exist?(Hbc.appdir.join("Caffeine.app")).must_equal false
+    Hbc.appdir.join("Caffeine.app").wont_be :exist?
   end
 
   describe "when multiple versions of a cask are installed" do
@@ -93,7 +93,7 @@ describe Hbc::CLI::Uninstall do
         Hbc::CLI::Uninstall.run("versioned-cask")
       end
 
-      out.must_match(%r{#{token} #{first_installed_version} is still installed.})
+      out.must_match(/#{token} #{first_installed_version} is still installed./)
       err.must_be :empty?
     end
   end

@@ -378,7 +378,7 @@ These wonderful people supported our Kickstarter by giving us £10 or more:
 * [Andrew Brown](http://pvalu.es)
 * [Bethany Sumner](http://www.bethanysumner.com/)
 * [Orta](http://orta.io)
-* [Michał Gołębiowski](https://mgol.eu)
+* [Michał Gołębiowski](https://github.com/mgol)
 * [Adam C. Foltzer](http://www.acfoltzer.net/)
 * [Steve Hiemstra](https://www.speg.com)
 * [Anton Sipos](http://www.softwarefuturism.com)

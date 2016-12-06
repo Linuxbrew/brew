@@ -2,9 +2,9 @@ module Hbc
   class DSL
     class Gpg
       KEY_PARAMETERS = Set.new [
-                                 :key_id,
-                                 :key_url,
-                               ]
+        :key_id,
+        :key_url,
+      ]
 
       VALID_PARAMETERS = Set.new []
       VALID_PARAMETERS.merge KEY_PARAMETERS
@@ -28,7 +28,7 @@ module Hbc
 
       def valid_id?(id)
         legal_lengths = Set.new [8, 16, 40]
-        is_valid = id.is_a?(String) && legal_lengths.include?(id.length) && id[%r{^[0-9a-f]+$}i]
+        is_valid = id.is_a?(String) && legal_lengths.include?(id.length) && id[/^[0-9a-f]+$/i]
         raise "invalid ':key_id' value: '#{id.inspect}'" unless is_valid
 
         is_valid

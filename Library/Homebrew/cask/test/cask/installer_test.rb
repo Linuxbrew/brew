@@ -2,6 +2,10 @@ require "test_helper"
 
 describe Hbc::Installer do
   describe "install" do
+    let(:empty_depends_on_stub) {
+      stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
+    }
+
     it "downloads and installs a nice fresh Cask" do
       caffeine = Hbc.load("local-caffeine")
 
@@ -42,13 +46,13 @@ describe Hbc::Installer do
     end
 
     it "works with cab-based Casks" do
-      skip("cabextract not installed") unless Hbc.homebrew_prefix.join("bin", "cabextract").exist?
+      skip("cabextract not installed") if which("cabextract").nil?
       asset = Hbc.load("container-cab")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-cab", asset.version)
@@ -72,13 +76,13 @@ describe Hbc::Installer do
     end
 
     it "works with 7z-based Casks" do
-      skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
+      skip("unar not installed") if which("unar").nil?
       asset = Hbc.load("container-7z")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-7z", asset.version)
@@ -101,13 +105,13 @@ describe Hbc::Installer do
     end
 
     it "works with Stuffit-based Casks" do
-      skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
+      skip("unar not installed") if which("unar").nil?
       asset = Hbc.load("container-sit")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-sit", asset.version)
@@ -117,13 +121,13 @@ describe Hbc::Installer do
     end
 
     it "works with RAR-based Casks" do
-      skip("unar not installed") unless Hbc.homebrew_prefix.join("bin", "unar").exist?
+      skip("unar not installed") if which("unar").nil?
       asset = Hbc.load("container-rar")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-rar", asset.version)
@@ -159,13 +163,13 @@ describe Hbc::Installer do
     end
 
     it "works with pure xz-based Casks" do
-      skip("unxz not installed") unless Hbc.homebrew_prefix.join("bin", "unxz").exist?
+      skip("unxz not installed") if which("unxz").nil?
       asset = Hbc.load("container-xz")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-xz", asset.version)
@@ -175,13 +179,13 @@ describe Hbc::Installer do
     end
 
     it "works with lzma-based Casks" do
-      skip("unlzma not installed") unless Hbc.homebrew_prefix.join("bin", "unlzma").exist?
+      skip("unlzma not installed") if which("unlzma").nil?
       asset = Hbc.load("container-lzma")
-      empty = stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
-      asset.stubs(:depends_on).returns(empty)
 
-      shutup do
-        Hbc::Installer.new(asset).install
+      asset.stub :depends_on, empty_depends_on_stub do
+        shutup do
+          Hbc::Installer.new(asset).install
+        end
       end
 
       dest_path = Hbc.caskroom.join("container-lzma", asset.version)
@@ -237,17 +241,17 @@ describe Hbc::Installer do
 
     it "prints caveats if they're present" do
       with_caveats = Hbc.load("with-caveats")
-      TestHelper.must_output(self, lambda {
+      lambda {
         Hbc::Installer.new(with_caveats).install
-      }, %r{Here are some things you might want to know})
+      }.must_output(/Here are some things you might want to know/)
       with_caveats.must_be :installed?
     end
 
     it "prints installer :manual instructions when present" do
       with_installer_manual = Hbc.load("with-installer-manual")
-      TestHelper.must_output(self, lambda {
+      lambda {
         Hbc::Installer.new(with_installer_manual).install
-      }, %r{To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'})
+      }.must_output(/To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'/)
       with_installer_manual.must_be :installed?
     end
 
@@ -348,7 +352,7 @@ describe Hbc::Installer do
       end
 
       dest_path = Hbc.appdir.join("MyNestedApp.app")
-      File.ftype(dest_path).must_equal "directory"
+      dest_path.must_be :directory?
     end
 
     it "generates and finds a timestamped metadata directory for an installed Cask" do

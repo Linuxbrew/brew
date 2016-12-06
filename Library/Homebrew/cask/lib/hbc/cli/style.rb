@@ -23,7 +23,7 @@ module Hbc
         $CHILD_STATUS.success?
       end
 
-      RUBOCOP_CASK_VERSION = "~> 0.10.0".freeze
+      RUBOCOP_CASK_VERSION = "~> 0.10.6".freeze
 
       def install_rubocop
         Utils.capture_stderr do
@@ -37,12 +37,12 @@ module Hbc
 
       def cask_paths
         @cask_paths ||= if cask_tokens.empty?
-                          Hbc.all_tapped_cask_dirs
-                        elsif cask_tokens.any? { |file| File.exist?(file) }
-                          cask_tokens
-                        else
-                          cask_tokens.map { |token| Hbc.path(token) }
-                        end
+          Hbc.all_tapped_cask_dirs
+        elsif cask_tokens.any? { |file| File.exist?(file) }
+          cask_tokens
+        else
+          cask_tokens.map { |token| Hbc.path(token) }
+        end
       end
 
       def cask_tokens
@@ -54,19 +54,20 @@ module Hbc
       end
 
       def default_args
-        ["--format", "simple", "--force-exclusion", "--config", rubocop_config]
+        [
+          "--require", "rubocop-cask",
+          "--config", "/dev/null", # always use `rubocop-cask` default config
+          "--format", "simple",
+          "--force-exclusion"
+        ]
       end
 
       def autocorrect_args
         default_args + ["--auto-correct"]
       end
 
-      def rubocop_config
-        Hbc.default_tap.cask_dir.join(".rubocop.yml")
-      end
-
       def fix?
-        args.any? { |arg| arg =~ %r{--(fix|(auto-?)?correct)} }
+        args.any? { |arg| arg =~ /--(fix|(auto-?)?correct)/ }
       end
     end
   end

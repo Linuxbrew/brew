@@ -78,11 +78,11 @@ describe Hbc::CLI::List do
       lambda {
         Hbc::CLI::List.run("local-transmission", "local-caffeine")
       }.must_output <<-EOS.undent
-      ==> Apps
-      #{Hbc.appdir.join("Transmission.app")} (#{Hbc.appdir.join("Transmission.app").abv})
-      ==> Apps
-      Missing App: #{Hbc.appdir.join("Caffeine.app")}
-    EOS
+        ==> Apps
+        #{Hbc.appdir.join("Transmission.app")} (#{Hbc.appdir.join("Transmission.app").abv})
+        ==> Apps
+        Missing App: #{Hbc.appdir.join("Caffeine.app")}
+      EOS
     end
   end
 end

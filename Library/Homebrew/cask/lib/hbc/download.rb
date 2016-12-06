@@ -23,13 +23,13 @@ module Hbc
 
     def downloader
       @downloader ||= case cask.url.using
-                      when :svn
-                        SubversionDownloadStrategy.new(cask)
-                      when :post
-                        CurlPostDownloadStrategy.new(cask)
-                      else
-                        CurlDownloadStrategy.new(cask)
-                      end
+      when :svn
+        SubversionDownloadStrategy.new(cask)
+      when :post
+        CurlPostDownloadStrategy.new(cask)
+      else
+        CurlDownloadStrategy.new(cask)
+      end
     end
 
     def clear_cache

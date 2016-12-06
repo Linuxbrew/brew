@@ -12,14 +12,14 @@ class Descriptions
   # If the cache file exists, load it into, and return, a hash; otherwise,
   # return nil.
   def self.load_cache
-    @cache = Utils::JSON.load(CACHE_FILE.read) if CACHE_FILE.exist?
+    @cache = JSON.parse(CACHE_FILE.read) if CACHE_FILE.exist?
   end
 
   # Write the cache to disk after ensuring the existence of the containing
   # directory.
   def self.save_cache
     HOMEBREW_CACHE.mkpath
-    CACHE_FILE.atomic_write Utils::JSON.dump(@cache)
+    CACHE_FILE.atomic_write JSON.dump(@cache)
   end
 
   # Create a hash mapping all formulae to their descriptions;
@@ -57,42 +57,41 @@ class Descriptions
   # If it does exist, but the Report is empty, just touch the cache file.
   # Otherwise, use the report to update the cache.
   def self.update_cache(report)
-    if CACHE_FILE.exist?
-      if report.empty?
-        FileUtils.touch CACHE_FILE
-      else
-        renamings = report.select_formula(:R)
-        alterations = report.select_formula(:A) + report.select_formula(:M) +
-                      renamings.map(&:last)
-        cache_formulae(alterations, save: false)
-        uncache_formulae(report.select_formula(:D) +
-                              renamings.map(&:first))
-      end
+    return unless CACHE_FILE.exist?
+
+    if report.empty?
+      FileUtils.touch CACHE_FILE
+    else
+      renamings = report.select_formula(:R)
+      alterations = report.select_formula(:A) + report.select_formula(:M) +
+                    renamings.map(&:last)
+      cache_formulae(alterations, save: false)
+      uncache_formulae(report.select_formula(:D) +
+                            renamings.map(&:first))
     end
   end
 
   # Given an array of formula names, add them and their descriptions to the
   # cache. Save the updated cache to disk, unless explicitly told not to.
   def self.cache_formulae(formula_names, options = { save: true })
-    if cache
-      formula_names.each do |name|
-        begin
-          desc = Formulary.factory(name).desc
-        rescue FormulaUnavailableError, *FormulaVersions::IGNORED_EXCEPTIONS
-        end
-        @cache[name] = desc
+    return unless cache
+
+    formula_names.each do |name|
+      begin
+        desc = Formulary.factory(name).desc
+      rescue FormulaUnavailableError, *FormulaVersions::IGNORED_EXCEPTIONS
       end
-      save_cache if options[:save]
+      @cache[name] = desc
     end
+    save_cache if options[:save]
   end
 
   # Given an array of formula names, remove them and their descriptions from
   # the cache. Save the updated cache to disk, unless explicitly told not to.
   def self.uncache_formulae(formula_names, options = { save: true })
-    if cache
-      formula_names.each { |name| @cache.delete(name) }
-      save_cache if options[:save]
-    end
+    return unless cache
+    formula_names.each { |name| @cache.delete(name) }
+    save_cache if options[:save]
   end
 
   # Given a regex, find all formulae whose specified fields contain a match.

@@ -58,6 +58,8 @@ class Cmd
     @tool ||= case @arg0
     when "ld" then "ld"
     when "cpp" then "cpp"
+    when /llvm_(clang(\+\+)?)/
+     "#{ENV["HOMEBREW_PREFIX"]}/opt/llvm/bin/#{$1}"
     when /\w\+\+(-\d(\.\d)?)?$/
       case ENV["HOMEBREW_CC"]
       when /clang/
@@ -160,7 +162,7 @@ class Cmd
       "-fcaller-saves", "-fthread-jumps", "-fno-reorder-blocks", "-fcse-skip-blocks",
       "-frerun-cse-after-loop", "-frerun-loop-opt", "-fcse-follow-jumps",
       "-fno-regmove", "-fno-for-scope", "-fno-tree-pre", "-fno-tree-dominator-opts",
-      "-fuse-linker-plugin"
+      "-fuse-linker-plugin", "-frounding-math"
       # clang doesn't support these flags
       args << arg unless tool =~ /^clang/
     when "--fast-math"
@@ -169,6 +171,8 @@ class Cmd
     when "-Wno-deprecated-register"
       # older gccs don't support these flags
       args << arg unless tool =~ /^g..-4.[02]/
+    when /^-Wl,-z,defs/
+      # -Wl,-undefined,error is already the default
     when /^-W[alp],/, /^-Wno-/
       args << arg
     when /^-W.*/

@@ -1,16 +1,15 @@
 require "pathname"
 require "emoji"
 require "exceptions"
+require "utils/analytics"
+require "utils/curl"
+require "utils/fork"
 require "utils/formatter"
+require "utils/git"
+require "utils/github"
 require "utils/hash"
-require "utils/json"
 require "utils/inreplace"
 require "utils/popen"
-require "utils/fork"
-require "utils/git"
-require "utils/analytics"
-require "utils/github"
-require "utils/curl"
 require "utils/tty"
 
 def ohai(title, *sput)
@@ -287,43 +286,6 @@ def quiet_system(cmd, *args)
   end
 end
 
-def puts_columns(items)
-  return if items.empty?
-
-  unless $stdout.tty?
-    puts items
-    return
-  end
-
-  # TTY case: If possible, output using multiple columns.
-  console_width = Tty.width
-  console_width = 80 if console_width <= 0
-  plain_item_lengths = items.map { |s| Tty.strip_ansi(s).length }
-  max_len = plain_item_lengths.max
-  col_gap = 2 # number of spaces between columns
-  gap_str = " " * col_gap
-  cols = (console_width + col_gap) / (max_len + col_gap)
-  cols = 1 if cols < 1
-  rows = (items.size + cols - 1) / cols
-  cols = (items.size + rows - 1) / rows # avoid empty trailing columns
-
-  if cols >= 2
-    col_width = (console_width + col_gap) / cols - col_gap
-    items = items.each_with_index.map do |item, index|
-      item + "".ljust(col_width - plain_item_lengths[index])
-    end
-  end
-
-  if cols == 1
-    puts items
-  else
-    rows.times do |row_index|
-      item_indices_for_row = row_index.step(items.size - 1, rows).to_a
-      puts items.values_at(*item_indices_for_row).join(gap_str)
-    end
-  end
-end
-
 def which(cmd, path = ENV["PATH"])
   path.split(File::PATH_SEPARATOR).each do |p|
     begin
@@ -412,6 +374,15 @@ def ignore_interrupts(opt = nil)
   yield
 ensure
   trap("INT", std_trap)
+end
+
+def capture_stderr
+  old = $stderr
+  $stderr = StringIO.new
+  yield
+  $stderr.string
+ensure
+  $stderr = old
 end
 
 def nostdout

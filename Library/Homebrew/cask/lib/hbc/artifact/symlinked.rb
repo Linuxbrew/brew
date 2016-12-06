@@ -61,10 +61,10 @@ module Hbc
           "#{printable_target} -> #{target.readlink} (#{target.readlink.abv})"
         else
           string = if self.class.islink?(target)
-                     "#{printable_target} -> #{target.readlink}"
-                   else
-                     printable_target
-                   end
+            "#{printable_target} -> #{target.readlink}"
+          else
+            printable_target
+          end
 
           Formatter.error(string, label: "Broken Link")
         end

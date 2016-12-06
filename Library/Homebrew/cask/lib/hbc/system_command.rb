@@ -50,6 +50,7 @@ module Hbc
       options.extend(HashValidator)
              .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo, :bsexec
       sudo_prefix = %w[/usr/bin/sudo -E --]
+      sudo_prefix = sudo_prefix.insert(1, "-A") unless ENV["SUDO_ASKPASS"].nil?
       bsexec_prefix = ["/bin/launchctl", "bsexec", options[:bsexec] == :startup ? "/" : options[:bsexec]]
       @command = [executable]
       options[:print_stderr] = true    unless options.key?(:print_stderr)
@@ -66,13 +67,13 @@ module Hbc
     end
 
     def expanded_command
-      @expanded_command ||= command.map { |arg|
+      @expanded_command ||= command.map do |arg|
         if arg.respond_to?(:to_path)
           File.absolute_path(arg)
         else
           String(arg)
         end
-      }
+      end
     end
 
     def each_output_line(&b)
@@ -144,7 +145,7 @@ module Hbc
       end
 
       def self._warn_plist_garbage(command, garbage)
-        return true unless garbage =~ %r{\S}
+        return true unless garbage =~ /\S/
         external = File.basename(command.first)
         lines = garbage.strip.split("\n")
         opoo "Non-XML stdout from #{external}:"
@@ -152,8 +153,8 @@ module Hbc
       end
 
       def self._parse_plist(command, output)
-        raise CaskError, "Empty plist input" unless output =~ %r{\S}
-        output.sub!(%r{\A(.*?)(<\?\s*xml)}m, '\2')
+        raise CaskError, "Empty plist input" unless output =~ /\S/
+        output.sub!(/\A(.*?)(<\?\s*xml)/m, '\2')
         _warn_plist_garbage(command, Regexp.last_match[1]) if Hbc.debug
         output.sub!(%r{(<\s*/\s*plist\s*>)(.*?)\Z}m, '\1')
         _warn_plist_garbage(command, Regexp.last_match[2])

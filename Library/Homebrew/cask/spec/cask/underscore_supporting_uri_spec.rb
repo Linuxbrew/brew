@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::UnderscoreSupportingURI do
   describe "parse" do
     it "works like normal on normal URLs" do

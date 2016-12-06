@@ -4,7 +4,7 @@ require "stringio"
 
 require "hbc/utils/file"
 
-UPDATE_CMD = "brew uninstall --force brew-cask; brew untap phinze/cask; brew untap caskroom/cask; brew update; brew cleanup; brew cask cleanup".freeze
+PREBUG_URL = "https://github.com/caskroom/homebrew-cask/blob/master/doc/reporting_bugs/pre_bug_report.md".freeze
 ISSUES_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
 # monkeypatch Object - not a great idea
@@ -12,7 +12,7 @@ class Object
   def utf8_inspect
     return inspect unless defined?(Encoding)
     return map(&:utf8_inspect) if respond_to?(:map)
-    inspect.force_encoding("UTF-8").sub(%r{\A"(.*)"\Z}, '\1')
+    inspect.force_encoding("UTF-8").sub(/\A"(.*)"\Z/, '\1')
   end
 end
 
@@ -38,34 +38,6 @@ end
 
 module Hbc
   module Utils
-    def self.which(cmd, path = ENV["PATH"])
-      unless File.basename(cmd) == cmd.to_s
-        # cmd contains a directory element
-        cmd_pn = Pathname(cmd)
-        return nil unless cmd_pn.absolute?
-        return resolve_executable(cmd_pn)
-      end
-      path.split(File::PATH_SEPARATOR).each do |elt|
-        fq_cmd = Pathname(elt).expand_path.join(cmd)
-        resolved = resolve_executable fq_cmd
-        return resolved if resolved
-      end
-      nil
-    end
-
-    def self.resolve_executable(cmd)
-      cmd_pn = Pathname(cmd)
-      return nil unless cmd_pn.exist?
-      return nil unless cmd_pn.executable?
-      begin
-        cmd_pn = Pathname(cmd_pn.realpath)
-      rescue RuntimeError
-        return nil
-      end
-      return nil unless cmd_pn.file?
-      cmd_pn
-    end
-
     def self.gain_permissions_remove(path, command: SystemCommand)
       if path.respond_to?(:rmtree) && path.exist?
         gain_permissions(path, ["-R"], command, &:rmtree)
@@ -145,8 +117,8 @@ module Hbc
 
     def self.error_message_with_suggestions
       <<-EOS.undent
-        Most likely, this means you have an outdated version of Homebrew-Cask. Please run:
-          #{UPDATE_CMD}
+        Follow the instructions here:
+          #{Formatter.url(PREBUG_URL)}
 
         If this doesn’t fix the problem, please report this bug:
           #{Formatter.url(ISSUES_URL)}
@@ -165,17 +137,17 @@ module Hbc
 
     def self.nowstamp_metadata_path(container_path)
       @timenow ||= Time.now.gmtime
-      if container_path.respond_to?(:join)
-        precision = 3
-        timestamp = @timenow.strftime("%Y%m%d%H%M%S")
-        fraction = format("%.#{precision}f", @timenow.to_f - @timenow.to_i)[1..-1]
-        timestamp.concat(fraction)
-        container_path.join(timestamp)
-      end
+      return unless container_path.respond_to?(:join)
+
+      precision = 3
+      timestamp = @timenow.strftime("%Y%m%d%H%M%S")
+      fraction = format("%.#{precision}f", @timenow.to_f - @timenow.to_i)[1..-1]
+      timestamp.concat(fraction)
+      container_path.join(timestamp)
     end
 
     def self.size_in_bytes(files)
-      Array(files).reduce(0) { |a, e| a + (File.size?(e) || 0) }
+      Array(files).reduce(0) { |acc, elem| acc + (File.size?(elem) || 0) }
     end
 
     def self.capture_stderr

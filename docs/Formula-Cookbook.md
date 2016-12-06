@@ -9,9 +9,11 @@ A formula is a package definition written in Ruby. It can be created with `brew 
 | **Keg**        | The installation prefix of a **Formula**                   | `/usr/local/Cellar/foo/0.1`                                     |
 | **opt prefix** | A symlink to the active version of a **Keg**               | `/usr/local/opt/foo `                                           |
 | **Cellar**     | All **Kegs** are installed here                            | `/usr/local/Cellar`                                             |
-| **Tap**        | An optional Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-versions`            |
+| **Tap**        | An optional Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-versions`   |
 | **Bottle**     | Pre-built **Keg** used instead of building from source     | `qt-4.8.4.mavericks.bottle.tar.gz`                              |
-
+| **Cask**       | An [extension of homebrew](https://github.com/caskroom/homebrew-cask) to install macOS native apps  | `/Applications/MacDown.app/Contents/SharedSupport/bin/macdown` |
+| **Brew Bundle**| An [extension of homebrew](https://github.com/Homebrew/homebrew-bundle) to describe dependencies    | `brew 'myservice', restart_service: true` |
+ 
 ## An Introduction
 
 Homebrew uses Git for downloading updates and contributing to the project.
@@ -803,7 +805,7 @@ Homebrew wants to maintain a consistent Ruby style across all formulae based on 
 
 ### Version detection fails
 
-Homebrew tries to automatically determine the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method) from the [`url`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#url-class_method) in avoid duplication. If the tarball has an unusual name you may need to manually assign the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method).
+Homebrew tries to automatically determine the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method) from the [`url`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#url-class_method) to avoid duplication. If the tarball has an unusual name you may need to manually assign the [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method).
 
 ## Bad Makefiles
 

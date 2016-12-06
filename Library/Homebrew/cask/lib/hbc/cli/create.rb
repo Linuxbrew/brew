@@ -4,7 +4,7 @@ module Hbc
       def self.run(*args)
         cask_tokens = cask_tokens_from(args)
         raise CaskUnspecifiedError if cask_tokens.empty?
-        cask_token = cask_tokens.first.sub(%r{\.rb$}i, "")
+        cask_token = cask_tokens.first.sub(/\.rb$/i, "")
         cask_path = Hbc.path(cask_token)
         odebug "Creating Cask #{cask_token}"
 

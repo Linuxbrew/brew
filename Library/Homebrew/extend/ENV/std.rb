@@ -12,9 +12,8 @@ module Stdenv
   DEFAULT_FLAGS = (OS.mac? ? "-march=core2 -msse4" : "-march=#{HOMEBREW_ARCH}").freeze
 
   def self.extended(base)
-    unless ORIGINAL_PATHS.include? HOMEBREW_PREFIX/"bin"
-      base.prepend_path "PATH", "#{HOMEBREW_PREFIX}/bin"
-    end
+    return if ORIGINAL_PATHS.include? HOMEBREW_PREFIX/"bin"
+    base.prepend_path "PATH", "#{HOMEBREW_PREFIX}/bin"
   end
 
   # @private
@@ -49,10 +48,15 @@ module Stdenv
 
     if OS.linux? && !["glibc", "glibc25"].include?(formula && formula.name)
       if formula
+        # Upgrading a package with a shared library can fail if that
+        # library is a dependency of a core package, like curl for
+        # example, so we also search for the new library in lib and
+        # then the previous version of the library in opt_lib.
         # To work around a bug in glibc 2.19 that is fixed in 2.20
         # add both lib and prefix to LD_LIBRARY_PATH.
         # segfault when LD_LIBRARY_PATH is set to non-existent directory.
         # See https://github.com/Linuxbrew/linuxbrew/issues/841
+        prepend_path "LD_LIBRARY_PATH", formula.opt_lib
         prepend_create_path "LD_LIBRARY_PATH", formula.prefix
         prepend "LD_LIBRARY_PATH", formula.lib, File::PATH_SEPARATOR
       end

@@ -23,7 +23,7 @@ module Hbc
 
   class CaskAlreadyCreatedError < AbstractCaskErrorWithToken
     def to_s
-      %Q{A Cask for #{token} already exists. Run "brew cask cat #{token}" to see it.}
+      %Q(A Cask for #{token} already exists. Run "brew cask cat #{token}" to see it.)
     end
   end
 
@@ -41,7 +41,7 @@ module Hbc
     def reinstall_message
       <<-EOS.undent
         To re-install #{token}, run:
-          brew cask uninstall --force #{token} && brew cask install #{token}
+          brew cask reinstall #{token}
       EOS
     end
   end
@@ -68,7 +68,7 @@ module Hbc
       s = "Command failed to execute!\n"
       s.concat("\n")
       s.concat("==> Failed command:\n")
-      s.concat(@cmd).concat("\n")
+      s.concat(@cmd.join(" ")).concat("\n")
       s.concat("\n")
       s.concat("==> Standard Output of failed command:\n")
       s.concat(@stdout).concat("\n")
@@ -84,13 +84,11 @@ module Hbc
   class CaskX11DependencyError < AbstractCaskErrorWithToken
     def to_s
       <<-EOS.undent
-        #{token} requires XQuartz/X11, which can be installed via homebrew-cask by
-
+        #{token} requires XQuartz/X11, which can be installed using Homebrew-Cask by running
           brew cask install xquartz
 
         or manually, by downloading the package from
-
-          https://www.xquartz.org/
+          #{Formatter.url("https://www.xquartz.org/")}
       EOS
     end
   end

@@ -40,10 +40,10 @@ module Hbc
 
       def import_key
         args = if cask.gpg.key_id
-                 ["--recv-keys", cask.gpg.key_id]
-               elsif cask.gpg.key_url
-                 ["--fetch-key", cask.gpg.key_url.to_s]
-               end
+          ["--recv-keys", cask.gpg.key_id]
+        elsif cask.gpg.key_url
+          ["--fetch-key", cask.gpg.key_url.to_s]
+        end
 
         @command.run!("gpg", args: args)
       end

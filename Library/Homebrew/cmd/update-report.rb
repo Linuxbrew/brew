@@ -25,11 +25,19 @@ module Homebrew
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsmessage").chuzzle
       analytics_disabled = \
         Utils.popen_read("git", "config", "--local", "--get", "homebrew.analyticsdisabled").chuzzle
-      if analytics_message_displayed != "true" && analytics_disabled != "true" && !ENV["HOMEBREW_NO_ANALYTICS"]
+      if analytics_message_displayed != "true" && analytics_disabled != "true" &&
+         !ENV["HOMEBREW_NO_ANALYTICS"] && !ENV["HOMEBREW_NO_ANALYTICS_MESSAGE_OUTPUT"]
         ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
-        ohai "Homebrew has enabled anonymous aggregate user behaviour analytics"
-        puts "Read the analytics documentation (and how to opt-out) here:"
-        puts "  https://git.io/brew-analytics"
+        # Use the shell's audible bell.
+        print "\a"
+
+        # Use an extra newline and bold to avoid this being missed.
+        ohai "Homebrew has enabled anonymous aggregate user behaviour analytics."
+        puts <<-EOS.undent
+          #{Tty.bold}Read the analytics documentation (and how to opt-out) here:
+            #{Formatter.url("https://git.io/brew-analytics")}#{Tty.reset}
+
+        EOS
 
         # Consider the message possibly missed if not a TTY.
         if $stdout.tty?
@@ -415,7 +423,7 @@ class Reporter
 
       # This means it is a Cask
       if report[:DC].include? full_name
-        next unless (HOMEBREW_REPOSITORY/"Caskroom"/name).exist?
+        next unless (HOMEBREW_PREFIX/"Caskroom"/name).exist?
         new_tap = Tap.fetch(new_tap_name)
         new_tap.install unless new_tap.installed?
         ohai "#{name} has been moved to Homebrew.", <<-EOS.undent
@@ -442,7 +450,7 @@ class Reporter
       new_tap = Tap.fetch(new_tap_name)
       # For formulae migrated to cask: Auto-install cask or provide install instructions.
       if new_tap_name == "caskroom/cask"
-        if new_tap.installed? && (HOMEBREW_REPOSITORY/"Caskroom").directory?
+        if new_tap.installed? && (HOMEBREW_PREFIX/"Caskroom").directory?
           ohai "#{name} has been moved to Homebrew-Cask."
           ohai "brew uninstall --force #{name}"
           system HOMEBREW_BREW_FILE, "uninstall", "--force", name
@@ -553,7 +561,7 @@ class ReporterHub
     return if formulae.empty?
     # Dump formula list.
     ohai title
-    puts_columns(formulae)
+    puts Formatter.columns(formulae)
   end
 
   def installed?(formula)

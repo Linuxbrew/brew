@@ -1,0 +1,12 @@
+machine:
+  environment:
+    HOMEBREW_DEVELOPER: 1
+checkout:
+  post:
+    - git config user.name LinuxbrewTestBot
+    - git config user.email testbot@linuxbrew.sh
+test:
+  override:
+    - umask 022;
+      PATH="$PWD/bin:$PWD/sbin:$PATH";
+      brew test-bot

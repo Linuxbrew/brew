@@ -16,3 +16,8 @@ module Tty
     reset.bold
   end
 end
+
+def puts_columns(items)
+  odeprecated "puts_columns", "puts Formatter.columns"
+  puts Formatter.columns(items)
+end

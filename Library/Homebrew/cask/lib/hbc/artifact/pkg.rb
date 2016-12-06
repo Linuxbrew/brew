@@ -2,6 +2,8 @@ require "hbc/artifact/base"
 
 require "hbc/utils/hash_validator"
 
+require "vendor/plist/plist"
+
 module Hbc
   module Artifact
     class Pkg < Base
@@ -16,7 +18,7 @@ module Hbc
         @pkg_install_opts = pkg_description.shift
         begin
           if @pkg_install_opts.respond_to?(:keys)
-            @pkg_install_opts.extend(HashValidator).assert_valid_keys(:allow_untrusted)
+            @pkg_install_opts.extend(HashValidator).assert_valid_keys(:allow_untrusted, :choices)
           elsif @pkg_install_opts
             raise
           end
@@ -47,12 +49,29 @@ module Hbc
           raise CaskError, "pkg source file not found: '#{source}'"
         end
         args = [
-                 "-pkg",    source,
-                 "-target", "/"
-               ]
+          "-pkg",    source,
+          "-target", "/"
+        ]
         args << "-verboseR" if Hbc.verbose
         args << "-allowUntrusted" if pkg_install_opts :allow_untrusted
-        @command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true)
+        with_choices_file do |choices_path|
+          args << "-applyChoiceChangesXML" << choices_path if choices_path
+          @command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true)
+        end
+      end
+
+      def with_choices_file
+        return yield nil unless pkg_install_opts(:choices)
+
+        Tempfile.open(["choices", ".xml"]) do |file|
+          begin
+            file.write Plist::Emit.dump(pkg_install_opts(:choices))
+            file.close
+            yield file.path
+          ensure
+            file.unlink
+          end
+        end
       end
     end
   end

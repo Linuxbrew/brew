@@ -3,9 +3,10 @@ module CompilerConstants
   GNU_GCC_VERSIONS = %w[4.3 4.4 4.5 4.6 4.7 4.8 4.9 5 6 7].freeze
   GNU_GCC_REGEXP = /^gcc-(4\.[3-9]|[5-7])$/
   COMPILER_SYMBOL_MAP = {
-    "gcc-4.0"  => :gcc_4_0,
+    "gcc-4.0"    => :gcc_4_0,
     (OS.mac? ? "gcc-4.2" : "gcc") => :gcc,
-    "clang"    => :clang,
+    "clang"      => :clang,
+    "llvm_clang" => :llvm_clang,
   }.freeze
 
   COMPILERS = COMPILER_SYMBOL_MAP.values +
@@ -14,7 +15,14 @@ end
 
 class CompilerFailure
   attr_reader :name
-  attr_rw :version
+
+  def version(val = nil)
+    if val
+      @version = Version.parse(val.to_s)
+    else
+      @version
+    end
+  end
 
   # Allows Apple compiler `fails_with` statements to keep using `build`
   # even though `build` and `version` are the same internally
@@ -45,7 +53,7 @@ class CompilerFailure
 
   def initialize(name, version, &block)
     @name = name
-    @version = version
+    @version = Version.parse(version.to_s)
     instance_eval(&block) if block_given?
   end
 
@@ -79,7 +87,7 @@ class CompilerSelector
   Compiler = Struct.new(:name, :version)
 
   COMPILER_PRIORITY = {
-    clang: [:clang, :gcc, :gnu, :gcc_4_0],
+    clang: [:clang, :gcc, :gnu, :gcc_4_0, :llvm_clang],
     gcc: [:gcc, :gnu, :clang, :gcc_4_0],
     gcc_4_0: [:gcc_4_0, :gcc, :gnu, :clang],
   }.freeze
@@ -115,17 +123,17 @@ class CompilerSelector
         GNU_GCC_VERSIONS.reverse_each do |v|
           name = "gcc-#{v}"
           version = compiler_version(name)
-          yield Compiler.new(name, version) if version
+          yield Compiler.new(name, version) unless version.null?
         end
         if OS.linux?
           version = versions.non_apple_gcc_version("gcc")
-          yield Compiler.new("gcc", version) if version
+          yield Compiler.new("gcc", version) unless version.null?
         end
       when :llvm
-        # no-op. DSL supported, compiler is not.
+        next # no-op. DSL supported, compiler is not.
       else
         version = compiler_version(compiler)
-        yield Compiler.new(compiler, version) if version
+        yield Compiler.new(compiler, version) unless version.null?
       end
     end
   end

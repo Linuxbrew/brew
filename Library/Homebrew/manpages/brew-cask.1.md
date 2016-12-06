@@ -86,6 +86,9 @@ names, and other aspects of this manual are still subject to change.
     If <token> is given, summarize the staged files associated with the
     given Cask.
 
+  * `reinstall` <token> [ <token> ...]
+    Reinstall the given Cask.
+
   * `search` or `-S` [<text> | /<regexp>/]:
     Without argument, display all Casks available for install, otherwise
     perform a substring search of known Cask tokens for <text> or, if the
@@ -154,6 +157,9 @@ in a future version.
 
   * `--qlplugindir=<path>`:
     Target location for QuickLook Plugins. The default value is `~/Library/QuickLook`.
+
+  * `--dictionarydir=<path>`:
+    Target location for Dictionaries. The default value is `~/Library/Dictionaries`.
 
   * `--fontdir=<path>`:
     Target location for Fonts. The default value is `~/Library/Fonts`.

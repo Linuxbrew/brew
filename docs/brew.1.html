@@ -245,8 +245,11 @@ packages.</p>
 
 <p>If <code>--force</code> is passed, then treat installed <var>formulae</var> and passed <var>formulae</var>
 like if they are from same taps and migrate them anyway.</p></dd>
-<dt><code>missing</code> [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies. If no <var>formulae</var> are
-given, check all installed brews.</p></dd>
+<dt><code>missing</code> [<code>--hide=</code><var>hidden</var>] [<var>formulae</var>]</dt><dd><p>Check the given <var>formulae</var> for missing dependencies. If no <var>formulae</var> are
+given, check all installed brews.</p>
+
+<p>If <code>--hide=</code><var>hidden</var> is passed, act as if none of <var>hidden</var> are installed.
+<var>hidden</var> should be a comma-separated list of formulae.</p></dd>
 <dt><code>options</code> [<code>--compact</code>] (<code>--all</code>|<code>--installed</code>|<var>formulae</var>)</dt><dd><p>Display install options specific to <var>formulae</var>.</p>
 
 <p>If <code>--compact</code> is passed, show all options on a single line separated by
@@ -348,10 +351,13 @@ for <var>version</var> is <code>v1</code>.</p>
 <dt><code>tap-pin</code> <var>tap</var></dt><dd><p>Pin <var>tap</var>, prioritizing its formulae over core when formula names are supplied
 by the user. See also <code>tap-unpin</code>.</p></dd>
 <dt><code>tap-unpin</code> <var>tap</var></dt><dd><p>Unpin <var>tap</var> so its formulae are no longer prioritized. See also <code>tap-pin</code>.</p></dd>
-<dt><code>uninstall</code>, <code>rm</code>, <code>remove</code> [<code>--force</code>] <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p>
+<dt><code>uninstall</code>, <code>rm</code>, <code>remove</code> [<code>--force</code>] [<code>--ignore-dependencies</code>] <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p>
 
 <p>If <code>--force</code> is passed, and there are multiple versions of <var>formula</var>
-installed, delete all installed versions.</p></dd>
+installed, delete all installed versions.</p>
+
+<p>If <code>--ignore-dependencies</code> is passed, uninstalling won't fail, even if
+formulae depending on <var>formula</var> would still be installed.</p></dd>
 <dt><code>unlink</code> [<code>--dry-run</code>] <var>formula</var></dt><dd><p>Remove symlinks for <var>formula</var> from the Homebrew prefix. This can be useful
 for temporarily disabling a formula:
 <code>brew unlink foo &amp;&amp; commands &amp;&amp; brew link foo</code>.</p>
@@ -374,7 +380,7 @@ be created in the directory named by <code>&lt;path></code> instead.</p>
 <p>If <code>--patch</code> is passed, patches for <var>formulae</var> will be applied to the
 unpacked source.</p>
 
-<p>If <code>--git</code> is passed, a Git repository will be initalized in the unpacked
+<p>If <code>--git</code> is passed, a Git repository will be initialized in the unpacked
 source. This is useful for creating patches for the software.</p></dd>
 <dt><code>unpin</code> <var>formulae</var></dt><dd><p>Unpin <var>formulae</var>, allowing them to be upgraded by <code>brew upgrade</code>. See also
 <code>pin</code>.</p></dd>
@@ -447,7 +453,7 @@ style checks.</p>
 connection are run.</p>
 
 <p>If <code>--new-formula</code> is passed, various additional checks are run that check
-if a new formula is eligable for Homebrew. This should be used when creating
+if a new formula is eligible for Homebrew. This should be used when creating
 new formulae and implies <code>--strict</code> and <code>--online</code>.</p>
 
 <p>If <code>--display-cop-names</code> is passed, the RuboCop cop name for each violation
@@ -463,8 +469,8 @@ for instance, for implementing pre-commit hooks.</p></dd>
 
 <p>Generate a bottle (binary package) from a formula installed with
 <code>--build-bottle</code>.</p></dd>
-<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] <code>--url=</code><var>url</var> <code>--sha256=</code><var>sha-256</var> <var>formula</var>:</dt><dd><p></p></dd>
-<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] <code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var> <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new url or a new tag.</p>
+<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] [<code>--message=</code><var>message</var>] <code>--url=</code><var>url</var> <code>--sha256=</code><var>sha-256</var> <var>formula</var>:</dt><dd><p></p></dd>
+<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] [<code>--message=</code><var>message</var>] <code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var> <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new url or a new tag.</p>
 
 <p>If a <var>url</var> is specified, the <var>sha-256</var> checksum of the new download must
 also be specified. A best effort to determine the <var>sha-256</var> and <var>formula</var>
@@ -490,6 +496,9 @@ making the expected file modifications but not taking any git actions.</p>
 <p>If <code>--version=</code><var>version</var> is passed, use the value to override the value
 parsed from the url or tag. Note that <code>--version=0</code> can be used to delete
 an existing <code>version</code> override from a formula if it has become redundant.</p>
+
+<p>If <code>--message=</code><var>message</var> is passed, append <var>message</var> to the default PR
+message.</p>
 
 <p>Note that this command cannot be used to transition a formula from a
 url-and-sha256 style specification into a tag-and-revision style
@@ -568,7 +577,12 @@ Each &lt;patch-source> may be one of:
    If <code>--no-publish</code> was passed, do not publish bottles to Bintray.</p>
 
 <dl>
-<dt><code>tap_readme</code> [<code>-v</code>] <var>name</var></dt><dd><p>Generate the README.md file for a new tap.</p></dd>
+<dt><code>release-notes</code> [<var>previous_tag</var>] [<var>end_ref</var>]</dt><dd><p>Output the merged pull requests on Homebrew/brew between two Git refs.
+If no <code>previous_tag</code> is provided it defaults to the newest tag.
+If no <code>end_ref</code> is provided it defaults to <code>origin/master</code>.</p>
+
+<p>If <code>--markdown</code> is passed, output as a Markdown list.</p></dd>
+<dt><code>tap-new</code> <var>user</var><code>/</code><var>repo</var></dt><dd><p>Generate the template files for a new tap.</p></dd>
 <dt><code>test</code> [<code>--devel</code>|<code>--HEAD</code>] [<code>--debug</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Most formulae provide a test method. <code>brew test</code> <var>formula</var> runs this
 test method. There is no standard output or return code, but it should
 generally indicate to the user if something is wrong with the installed
@@ -761,9 +775,9 @@ your shell profile, or you can use it before a brew command:</p>
 
 <p>Homebrew's lead maintainer is Mike McQuaid.</p>
 
-<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Baptiste Fontaine, Zhiming Wang, Brett Koonce, ilovezfs, Martin Afanasjew, Uladzislau Shablinski, Dominyk Tiller, Tim Smith and Alex Dunn.</p>
+<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Josh Hagins, Baptiste Fontaine, Markus Reiter, ilovezfs, Martin Afanasjew, Tom Schoonjans, Uladzislau Shablinski, Tim Smith and Alex Dunn.</p>
 
-<p>Former maintainers with significant contributions include Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.</p>
+<p>Former maintainers with significant contributions include Dominyk Tiller, Brett Koonce, Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.</p>
 
 <h2 id="BUGS">BUGS</h2>
 

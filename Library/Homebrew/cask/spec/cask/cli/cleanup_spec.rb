@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::CLI::Cleanup do
   let(:cache_location) { Pathname.new(Dir.mktmpdir).realpath }
   let(:cleanup_outdated) { false }
@@ -15,9 +13,9 @@ describe Hbc::CLI::Cleanup do
       cleaned_up_cached_download = "caffeine"
 
       cached_downloads = [
-                           cache_location.join("#{cleaned_up_cached_download}--latest.zip"),
-                           cache_location.join("transmission--2.61.dmg"),
-                         ]
+        cache_location.join("#{cleaned_up_cached_download}--latest.zip"),
+        cache_location.join("transmission--2.61.dmg"),
+      ]
 
       cached_downloads.each(&FileUtils.method(:touch))
 

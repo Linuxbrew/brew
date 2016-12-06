@@ -10,7 +10,7 @@ module Hbc
       end
 
       def default_caskroom
-        @default_caskroom ||= homebrew_prefix.join("Caskroom")
+        @default_caskroom ||= HOMEBREW_PREFIX.join("Caskroom")
       end
 
       def caskroom
@@ -39,11 +39,11 @@ module Hbc
       end
 
       def legacy_cache
-        @legacy_cache ||= homebrew_cache.join("Casks")
+        @legacy_cache ||= HOMEBREW_CACHE.join("Casks")
       end
 
       def cache
-        @cache ||= homebrew_cache.join("Cask")
+        @cache ||= HOMEBREW_CACHE.join("Cask")
       end
 
       attr_writer :appdir
@@ -62,6 +62,12 @@ module Hbc
 
       def qlplugindir
         @qlplugindir ||= Pathname.new("~/Library/QuickLook").expand_path
+      end
+
+      attr_writer :dictionarydir
+
+      def dictionarydir
+        @dictionarydir ||= Pathname.new("~/Library/Dictionaries").expand_path
       end
 
       attr_writer :fontdir
@@ -85,7 +91,7 @@ module Hbc
       attr_writer :binarydir
 
       def binarydir
-        @binarydir ||= homebrew_prefix.join("bin")
+        @binarydir ||= HOMEBREW_PREFIX.join("bin")
       end
 
       attr_writer :input_methoddir
@@ -131,21 +137,31 @@ module Hbc
       end
 
       def path(query)
-        query = query.sub(%r{\.rb$}i, "")
-        token_with_tap = if query.include?("/")
-                           query
-                         else
-                           all_tokens.detect do |tap_and_token|
-                             tap_and_token.split("/")[2] == query
-                           end
-                         end
+        query_path = Pathname.new(query)
+
+        return query_path if query_path.absolute?
+        return query_path if query_path.exist? && query_path.extname == ".rb"
+
+        query_without_extension = query.sub(/\.rb$/i, "")
+
+        token_with_tap = if query =~ %r{\A[^/]+/[^/]+/[^/]+\Z}
+          query_without_extension
+        else
+          all_tokens.detect do |tap_and_token|
+            tap_and_token.split("/")[2] == query_without_extension
+          end
+        end
 
         if token_with_tap
           user, repo, token = token_with_tap.split("/")
-          Tap.fetch(user, repo).cask_dir.join("#{token}.rb")
+          tap = Tap.fetch(user, repo)
         else
-          default_tap.cask_dir.join("#{query}.rb")
+          token = query_without_extension
+          tap = Hbc.default_tap
         end
+
+        return query_path if tap.cask_dir.nil?
+        tap.cask_dir.join("#{token}.rb")
       end
 
       def tcc_db
@@ -162,36 +178,6 @@ module Hbc
 
       def x11_libpng
         @x11_libpng ||= [Pathname.new("/opt/X11/lib/libpng.dylib"), Pathname.new("/usr/X11/lib/libpng.dylib")]
-      end
-
-      def homebrew_cache
-        @homebrew_cache ||= HOMEBREW_CACHE
-      end
-
-      def homebrew_cache=(path)
-        @homebrew_cache = path ? Pathname.new(path) : path
-      end
-
-      def homebrew_executable
-        @homebrew_executable ||= HOMEBREW_BREW_FILE
-      end
-
-      def homebrew_prefix
-        # where Homebrew links
-        @homebrew_prefix ||= HOMEBREW_PREFIX
-      end
-
-      def homebrew_prefix=(path)
-        @homebrew_prefix = path ? Pathname.new(path) : path
-      end
-
-      def homebrew_repository
-        # where Homebrew's .git dir is found
-        @homebrew_repository ||= HOMEBREW_REPOSITORY
-      end
-
-      def homebrew_repository=(path)
-        @homebrew_repository = path ? Pathname.new(path) : path
       end
     end
   end

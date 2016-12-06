@@ -58,8 +58,8 @@ module Hbc
 
       def warning_target_exists
         message_parts = [
-                          "It seems there is already #{self.class.artifact_english_article} #{self.class.artifact_english_name} at '#{target}'",
-                        ]
+          "It seems there is already #{self.class.artifact_english_article} #{self.class.artifact_english_name} at '#{target}'",
+        ]
         yield(message_parts) if block_given?
         message_parts.join("; ")
       end

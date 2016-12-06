@@ -1,4 +1,4 @@
-require "utils/json"
+require "json"
 require "rexml/document"
 require "time"
 
@@ -20,7 +20,7 @@ class AbstractDownloadStrategy
   def fetch
   end
 
-  # Supress output
+  # Suppress output
   def shutup!
     @shutup = true
   end
@@ -222,7 +222,7 @@ end
 
 class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
-    case cached_location.compression_type
+    case type = cached_location.compression_type
     when :zip
       with_system_path { quiet_safe_system "unzip", "-qq", cached_location }
       chdir
@@ -230,19 +230,23 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
       with_system_path { buffered_write("gunzip") }
     when :bzip2_only
       with_system_path { buffered_write("bunzip2") }
-    when :gzip, :bzip2, :compress, :tar
+    when :gzip, :bzip2, :xz, :compress, :tar
       tar_flags = "x"
-      # Older versions of tar require an explicit format flag
-      if cached_location.compression_type == :gzip
+      if type == :gzip
         tar_flags << "z"
-      elsif cached_location.compression_type == :bzip2
+      elsif type == :bzip2
         tar_flags << "j"
+      elsif type == :xz
+        tar_flags << "J"
       end
       tar_flags << "f"
-      with_system_path { safe_system "tar", tar_flags, cached_location }
-      chdir
-    when :xz
-      with_system_path { pipe_to_tar(xzpath) }
+      with_system_path do
+        if type == :xz && DependencyCollector.tar_needs_xz_dependency?
+          pipe_to_tar(xzpath)
+        else
+          safe_system "tar", tar_flags, cached_location
+        end
+      end
       chdir
     when :lzip
       with_system_path { pipe_to_tar(lzippath) }
@@ -440,14 +444,14 @@ class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
     return super if @tried_apache_mirror
     @tried_apache_mirror = true
 
-    mirrors = Utils::JSON.load(apache_mirrors)
+    mirrors = JSON.parse(apache_mirrors)
     path_info = mirrors.fetch("path_info")
     @url = mirrors.fetch("preferred") + path_info
     @mirrors |= %W[https://archive.apache.org/dist/#{path_info}]
 
     ohai "Best Mirror #{@url}"
     super
-  rescue IndexError, Utils::JSON::Error
+  rescue IndexError, JSON::ParserError
     raise CurlDownloadStrategyError, "Couldn't determine mirror, try again later."
   end
 end

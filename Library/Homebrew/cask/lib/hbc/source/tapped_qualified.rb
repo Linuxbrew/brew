@@ -6,7 +6,7 @@ module Hbc
       def self.me?(query)
         return if (tap = tap_for_query(query)).nil?
 
-        tap.installed? && path_for_query(query).exist?
+        tap.installed? && Hbc.path(query).exist?
       end
 
       def self.tap_for_query(query)
@@ -15,11 +15,6 @@ module Hbc
 
         user, repo = qualified_token[0..1]
         Tap.fetch(user, repo)
-      end
-
-      def self.path_for_query(query)
-        user, repo, token = QualifiedToken.parse(query)
-        Tap.fetch(user, repo).cask_dir.join(token.sub(%r{(\.rb)?$}i, ".rb"))
       end
     end
   end

@@ -6,7 +6,7 @@
 #:    If `--patch` is passed, patches for <formulae> will be applied to the
 #:    unpacked source.
 #:
-#:    If `--git` is passed, a Git repository will be initalized in the unpacked
+#:    If `--git` is passed, a Git repository will be initialized in the unpacked
 #:    source. This is useful for creating patches for the software.
 
 require "stringio"

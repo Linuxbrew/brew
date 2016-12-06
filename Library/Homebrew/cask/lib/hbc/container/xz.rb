@@ -6,13 +6,11 @@ module Hbc
   class Container
     class Xz < Base
       def self.me?(criteria)
-        criteria.magic_number(%r{^\xFD7zXZ\x00}n)
+        criteria.magic_number(/^\xFD7zXZ\x00/n)
       end
 
       def extract
-        unxz = Hbc.homebrew_prefix.join("bin", "unxz")
-
-        unless unxz.exist?
+        if (unxz = which("unxz")).nil?
           raise CaskError, "Expected to find unxz executable. Cask '#{@cask}' must add: depends_on formula: 'xz'"
         end
 

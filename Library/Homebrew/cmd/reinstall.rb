@@ -22,6 +22,7 @@ module Homebrew
   def reinstall_formula(f)
     options = BuildOptions.new(Options.create(ARGV.flags_only), f.options).used_options
     options |= f.build.used_options
+    options &= f.options
 
     notice  = "Reinstalling #{f.full_name}"
     notice += " with #{options * ", "}" unless options.empty?

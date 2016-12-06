@@ -76,7 +76,7 @@ module Homebrew
     unless ARGV.force?
       ARGV.named.each do |name|
         next if File.exist?(name)
-        if name !~ HOMEBREW_TAP_FORMULA_REGEX && name !~ HOMEBREW_CASK_TAP_FORMULA_REGEX
+        if name !~ HOMEBREW_TAP_FORMULA_REGEX && name !~ HOMEBREW_CASK_TAP_CASK_REGEX
           next
         end
         tap = Tap.fetch($1, $2)
@@ -142,6 +142,7 @@ module Homebrew
           msg = "#{current.full_name}-#{current.installed_version} already installed"
           unless current.linked_keg.symlink? || current.keg_only?
             msg << ", it's just not linked"
+            puts "You can link formula with `brew link #{f}`"
           end
           opoo msg
         elsif f.migration_needed? && !ARGV.force?
@@ -179,11 +180,11 @@ module Homebrew
           ofail "No similarly named formulae found."
         when 1
           puts "This similarly named formula was found:"
-          puts_columns(formulae_search_results)
+          puts formulae_search_results
           puts "To install it, run:\n  brew install #{formulae_search_results.first}"
         else
           puts "These similarly named formulae were found:"
-          puts_columns(formulae_search_results)
+          puts Formatter.columns(formulae_search_results)
           puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
         end
 
@@ -194,11 +195,11 @@ module Homebrew
           ofail "No formulae found in taps."
         when 1
           puts "This formula was found in a tap:"
-          puts_columns(taps_search_results)
+          puts taps_search_results
           puts "To install it, run:\n  brew install #{taps_search_results.first}"
         else
           puts "These formulae were found in taps:"
-          puts_columns(taps_search_results)
+          puts Formatter.columns(taps_search_results)
           puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
         end
       end
@@ -223,25 +224,12 @@ module Homebrew
   def check_development_tools
     return unless OS.mac?
     checks = Diagnostic::Checks.new
-    all_development_tools_checks = checks.development_tools_checks +
-                                   checks.fatal_development_tools_checks
-    all_development_tools_checks.each do |check|
+    checks.fatal_development_tools_checks.each do |check|
       out = checks.send(check)
       next if out.nil?
-      if checks.fatal_development_tools_checks.include?(check)
-        odie out
-      else
-        opoo out
-      end
+      ofail out
     end
-  end
-
-  def check_macports
-    return if MacOS.macports_or_fink.empty?
-
-    opoo "It appears you have MacPorts or Fink installed."
-    puts "Software installed with other package managers causes known problems for"
-    puts "Homebrew. If a formula fails to build, uninstall MacPorts/Fink and try again."
+    exit 1 if Homebrew.failed?
   end
 
   def check_cellar
@@ -258,9 +246,9 @@ module Homebrew
     return unless OS.linux?
     ld_so = HOMEBREW_PREFIX/"lib/ld.so"
     return if ld_so.readable?
-    sys_interpreter = ["/lib64/ld-linux-x86-64.so.2", "/lib/ld-linux.so.3", "/lib/ld-linux.so.2", "/lib/ld-linux-armhf.so.3"].find { |s|
+    sys_interpreter = ["/lib64/ld-linux-x86-64.so.2", "/lib/ld-linux.so.3", "/lib/ld-linux.so.2", "/lib/ld-linux-armhf.so.3"].find do |s|
       Pathname.new(s).executable?
-    }
+    end
     raise "Unable to locate the system's ld.so" unless sys_interpreter
     glibc = Formula["glibc"]
     interpreter = glibc && glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2" : sys_interpreter
@@ -280,19 +268,21 @@ module Homebrew
 
   def install_formula(f)
     f.print_tap_action
+    build_options = f.build
 
     fi = FormulaInstaller.new(f)
-    fi.options             = f.build.used_options
-    fi.ignore_deps         = ARGV.ignore_deps?
-    fi.only_deps           = ARGV.only_deps?
-    fi.build_bottle        = ARGV.build_bottle?
-    fi.build_from_source   = ARGV.build_from_source? || ARGV.build_all_from_source?
-    fi.force_bottle        = ARGV.force_bottle?
-    fi.interactive         = ARGV.interactive?
-    fi.git                 = ARGV.git?
-    fi.verbose             = ARGV.verbose?
-    fi.quieter             = ARGV.quieter?
-    fi.debug               = ARGV.debug?
+    fi.options              = build_options.used_options
+    fi.invalid_option_names = build_options.invalid_option_names
+    fi.ignore_deps          = ARGV.ignore_deps?
+    fi.only_deps            = ARGV.only_deps?
+    fi.build_bottle         = ARGV.build_bottle?
+    fi.build_from_source    = ARGV.build_from_source? || ARGV.build_all_from_source?
+    fi.force_bottle         = ARGV.force_bottle?
+    fi.interactive          = ARGV.interactive?
+    fi.git                  = ARGV.git?
+    fi.verbose              = ARGV.verbose?
+    fi.quieter              = ARGV.quieter?
+    fi.debug                = ARGV.debug?
     fi.prelude
     fi.install
     fi.finish
@@ -301,8 +291,5 @@ module Homebrew
     # another formula. In that case, don't generate an error, just move on.
   rescue CannotInstallFormulaError => e
     ofail e.message
-  rescue BuildError
-    check_macports
-    raise
   end
 end

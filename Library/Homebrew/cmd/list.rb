@@ -48,7 +48,8 @@ module Homebrew
             a <=> b
           end
         end
-        puts_columns full_names
+        return if full_names.empty?
+        puts Formatter.columns(full_names)
       else
         ENV["CLICOLOR"] = nil
         exec "ls", *ARGV.options_only << HOMEBREW_CELLAR
@@ -106,7 +107,7 @@ module Homebrew
     names = if ARGV.named.empty?
       Formula.racks
     else
-      racks = ARGV.named.map { |n| HOMEBREW_CELLAR+n }
+      racks = ARGV.named.map { |n| Formulary.to_rack(n) }
       racks.select do |rack|
         Homebrew.failed = true unless rack.exist?
         rack.exist?
@@ -145,7 +146,7 @@ class PrettyListing
           (pnn.extname == ".dylib" || pnn.extname == ".pc") && !pnn.symlink?
         end
       when ".brew"
-        # Ignore .brew
+        next # Ignore .brew
       else
         if pn.directory?
           if pn.symlink?
@@ -186,12 +187,9 @@ class PrettyListing
   end
 
   def print_remaining_files(files, root, other = "")
-    case files.length
-    when 0
-      # noop
-    when 1
+    if files.length == 1
       puts files
-    else
+    elsif files.length > 1
       puts "#{root}/ (#{files.length} #{other}files)"
     end
   end

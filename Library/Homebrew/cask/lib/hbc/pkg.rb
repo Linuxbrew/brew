@@ -1,9 +1,9 @@
 module Hbc
   class Pkg
     def self.all_matching(regexp, command)
-      command.run("/usr/sbin/pkgutil", args: ["--pkgs=#{regexp}"]).stdout.split("\n").map { |package_id|
+      command.run("/usr/sbin/pkgutil", args: ["--pkgs=#{regexp}"]).stdout.split("\n").map do |package_id|
         new(package_id.chomp, command)
-      }
+      end
     end
 
     attr_reader :package_id
@@ -72,11 +72,16 @@ module Hbc
     end
 
     def _rmdir(path)
-      @command.run!("/bin/rmdir", args: ["--", path], sudo: true) if path.children.empty?
+      return unless path.children.empty?
+      if path.symlink?
+        @command.run!("/bin/rm", args: ["-f", "--", path], sudo: true)
+      else
+        @command.run!("/bin/rmdir", args: ["--", path], sudo: true)
+      end
     end
 
     def _with_full_permissions(path)
-      original_mode = (path.stat.mode % 0o1000).to_s(8)
+      original_mode = (path.stat.mode % 01000).to_s(8)
       # TODO: similarly read and restore macOS flags (cf man chflags)
       @command.run!("/bin/chmod", args: ["--", "777", path], sudo: true)
       yield

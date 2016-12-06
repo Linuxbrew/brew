@@ -6,6 +6,11 @@ module GitHub
 
   ISSUES_URI = URI.parse("https://api.github.com/search/issues")
 
+  CREATE_GIST_SCOPES = ["gist"].freeze
+  CREATE_ISSUE_SCOPES = ["public_repo"].freeze
+  ALL_SCOPES = (CREATE_GIST_SCOPES + CREATE_ISSUE_SCOPES).freeze
+  ALL_SCOPES_URL = Formatter.url("https://github.com/settings/tokens/new?scopes=#{ALL_SCOPES.join(",")}&description=Homebrew").freeze
+
   Error = Class.new(RuntimeError)
   HTTPNotFoundError = Class.new(Error)
 
@@ -14,7 +19,7 @@ module GitHub
       super <<-EOS.undent
         GitHub API Error: #{error}
         Try again in #{pretty_ratelimit_reset(reset)}, or create a personal access token:
-          #{Formatter.url("https://github.com/settings/tokens/new?scopes=&description=Homebrew")}
+          #{ALL_SCOPES_URL}
         and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
       EOS
     end
@@ -38,7 +43,7 @@ module GitHub
           Clear them with:
             printf "protocol=https\\nhost=github.com\\n" | git credential-osxkeychain erase
           Or create a personal access token:
-            #{Formatter.url("https://github.com/settings/tokens/new?scopes=&description=Homebrew")}
+            #{ALL_SCOPES_URL}
           and then set the token as: export HOMEBREW_GITHUB_API_TOKEN="your_new_token"
         EOS
       end
@@ -92,28 +97,32 @@ module GitHub
     end
   end
 
-  def api_credentials_error_message(response_headers)
+  def api_credentials_error_message(response_headers, needed_scopes)
     return if response_headers.empty?
 
     @api_credentials_error_message_printed ||= begin
       unauthorized = (response_headers["http/1.1"] == "401 Unauthorized")
       scopes = response_headers["x-accepted-oauth-scopes"].to_s.split(", ")
+      needed_human_scopes = needed_scopes.join(", ")
+      needed_human_scopes = "none" if needed_human_scopes.empty?
       if !unauthorized && scopes.empty?
-        credentials_scopes = response_headers["x-oauth-scopes"].to_s.split(", ")
+        credentials_scopes = response_headers["x-oauth-scopes"]
 
         case GitHub.api_credentials_type
         when :keychain
           onoe <<-EOS.undent
             Your macOS keychain GitHub credentials do not have sufficient scope!
+            Scopes they need: #{needed_human_scopes}
             Scopes they have: #{credentials_scopes}
-            Create a personal access token: #{Formatter.url("https://github.com/settings/tokens")}
+            Create a personal access token: #{ALL_SCOPES_URL}
             and then set HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         when :environment
           onoe <<-EOS.undent
             Your HOMEBREW_GITHUB_API_TOKEN does not have sufficient scope!
+            Scopes they need: #{needed_human_scopes}
             Scopes it has: #{credentials_scopes}
-            Create a new personal access token: #{Formatter.url("https://github.com/settings/tokens")}
+            Create a new personal access token: #{ALL_SCOPES_URL}
             and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method instead.
           EOS
         end
@@ -122,7 +131,7 @@ module GitHub
     end
   end
 
-  def open(url, data = nil)
+  def open(url, data: nil, scopes: [].freeze)
     # This is a no-op if the user is opting out of using the GitHub API.
     return if ENV["HOMEBREW_NO_GITHUB_API"]
 
@@ -140,9 +149,9 @@ module GitHub
     data_tmpfile = nil
     if data
       begin
-        data = Utils::JSON.dump data
+        data = JSON.generate data
         data_tmpfile = Tempfile.new("github_api_post", HOMEBREW_TEMP)
-      rescue Utils::JSON::Error => e
+      rescue JSON::ParserError => e
         raise Error, "Failed to parse JSON request:\n#{e.message}\n#{data}", e.backtrace
       end
     end
@@ -172,20 +181,20 @@ module GitHub
 
     begin
       if !http_code.start_with?("2") && !status.success?
-        raise_api_error(output, errors, http_code, headers)
+        raise_api_error(output, errors, http_code, headers, scopes)
       end
-      json = Utils::JSON.load output
+      json = JSON.parse output
       if block_given?
         yield json
       else
         json
       end
-    rescue Utils::JSON::Error => e
+    rescue JSON::ParserError => e
       raise Error, "Failed to parse JSON response\n#{e.message}", e.backtrace
     end
   end
 
-  def raise_api_error(output, errors, http_code, headers)
+  def raise_api_error(output, errors, http_code, headers, scopes)
     meta = {}
     headers.lines.each do |l|
       key, _, value = l.delete(":").partition(" ")
@@ -196,11 +205,11 @@ module GitHub
 
     if meta.fetch("x-ratelimit-remaining", 1).to_i <= 0
       reset = meta.fetch("x-ratelimit-reset").to_i
-      error = Utils::JSON.load(output)["message"]
+      error = JSON.parse(output)["message"]
       raise RateLimitExceededError.new(reset, error)
     end
 
-    GitHub.api_credentials_error_message(meta)
+    GitHub.api_credentials_error_message(meta, scopes)
 
     case http_code
     when "401", "403"
@@ -209,7 +218,7 @@ module GitHub
       raise HTTPNotFoundError, output
     else
       error = begin
-        Utils::JSON.load(output)["message"]
+        JSON.parse(output)["message"]
       rescue
         nil
       end

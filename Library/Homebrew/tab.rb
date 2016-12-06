@@ -1,7 +1,7 @@
 require "cxxstdlib"
 require "ostruct"
 require "options"
-require "utils/json"
+require "json"
 require "development_tools"
 
 # Inherit from OpenStruct to gain a generic initialization method that takes a
@@ -58,9 +58,8 @@ class Tab < OpenStruct
 
   # Like Tab.from_file, but bypass the cache.
   def self.from_file_content(content, path)
-    attributes = Utils::JSON.load(content)
+    attributes = JSON.parse(content)
     attributes["tabfile"] = path
-    attributes["runtime_dependencies"] ||= []
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}
 
@@ -312,6 +311,7 @@ class Tab < OpenStruct
       "unused_options" => unused_options.as_flags,
       "built_as_bottle" => built_as_bottle,
       "poured_from_bottle" => poured_from_bottle,
+      "changed_files" => changed_files && changed_files.map(&:to_s),
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,
@@ -321,10 +321,14 @@ class Tab < OpenStruct
       "source" => source,
     }
 
-    Utils::JSON.dump(attributes)
+    JSON.generate(attributes)
   end
 
   def write
+    # If this is a new installation, the cache of installed formulae
+    # will no longer be valid.
+    Formula.clear_installed_formulae_cache unless tabfile.exist?
+
     CACHE[tabfile] = self
     tabfile.atomic_write(to_json)
   end

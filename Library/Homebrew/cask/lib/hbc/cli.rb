@@ -15,6 +15,7 @@ require "hbc/cli/home"
 require "hbc/cli/info"
 require "hbc/cli/install"
 require "hbc/cli/list"
+require "hbc/cli/reinstall"
 require "hbc/cli/search"
 require "hbc/cli/style"
 require "hbc/cli/uninstall"
@@ -31,51 +32,51 @@ require "hbc/cli/internal_stanza"
 module Hbc
   class CLI
     ALIASES = {
-                "ls"       => "list",
-                "homepage" => "home",
-                "-S"       => "search",    # verb starting with "-" is questionable
-                "up"       => "update",
-                "instal"   => "install",   # gem does the same
-                "rm"       => "uninstall",
-                "remove"   => "uninstall",
-                "abv"      => "info",
-                "dr"       => "doctor",
-                # aliases from Homebrew that we don't (yet) support
-                # 'ln'          => 'link',
-                # 'configure'   => 'diy',
-                # '--repo'      => '--repository',
-                # 'environment' => '--env',
-                # '-c1'         => '--config',
-              }.freeze
+      "ls"       => "list",
+      "homepage" => "home",
+      "-S"       => "search",    # verb starting with "-" is questionable
+      "up"       => "update",
+      "instal"   => "install",   # gem does the same
+      "rm"       => "uninstall",
+      "remove"   => "uninstall",
+      "abv"      => "info",
+      "dr"       => "doctor",
+      # aliases from Homebrew that we don't (yet) support
+      # 'ln'          => 'link',
+      # 'configure'   => 'diy',
+      # '--repo'      => '--repository',
+      # 'environment' => '--env',
+      # '-c1'         => '--config',
+    }.freeze
 
     OPTIONS = {
-                "--caskroom="             => :caskroom=,
-                "--appdir="               => :appdir=,
-                "--colorpickerdir="       => :colorpickerdir=,
-                "--prefpanedir="          => :prefpanedir=,
-                "--qlplugindir="          => :qlplugindir=,
-                "--fontdir="              => :fontdir=,
-                "--servicedir="           => :servicedir=,
-                "--input_methoddir="      => :input_methoddir=,
-                "--internet_plugindir="   => :internet_plugindir=,
-                "--audio_unit_plugindir=" => :audio_unit_plugindir=,
-                "--vst_plugindir="        => :vst_plugindir=,
-                "--vst3_plugindir="       => :vst3_plugindir=,
-                "--screen_saverdir="      => :screen_saverdir=,
-              }.freeze
+      "--caskroom="             => :caskroom=,
+      "--appdir="               => :appdir=,
+      "--colorpickerdir="       => :colorpickerdir=,
+      "--prefpanedir="          => :prefpanedir=,
+      "--qlplugindir="          => :qlplugindir=,
+      "--dictionarydir="        => :dictionarydir=,
+      "--fontdir="              => :fontdir=,
+      "--servicedir="           => :servicedir=,
+      "--input_methoddir="      => :input_methoddir=,
+      "--internet_plugindir="   => :internet_plugindir=,
+      "--audio_unit_plugindir=" => :audio_unit_plugindir=,
+      "--vst_plugindir="        => :vst_plugindir=,
+      "--vst3_plugindir="       => :vst3_plugindir=,
+      "--screen_saverdir="      => :screen_saverdir=,
+    }.freeze
 
     FLAGS = {
-              "--no-binaries" => :no_binaries=,
-              "--debug"       => :debug=,
-              "--verbose"     => :verbose=,
-              "--outdated"    => :cleanup_outdated=,
-              "--help"        => :help=,
-            }.freeze
+      "--no-binaries" => :no_binaries=,
+      "--debug"       => :debug=,
+      "--verbose"     => :verbose=,
+      "--outdated"    => :cleanup_outdated=,
+      "--help"        => :help=,
+    }.freeze
 
     def self.command_classes
-      @command_classes ||= self.constants
-                               .map(&method(:const_get))
-                               .select { |sym| sym.respond_to?(:run) }
+      @command_classes ||= constants.map(&method(:const_get))
+                                    .select { |sym| sym.respond_to?(:run) }
     end
 
     def self.commands
@@ -107,14 +108,14 @@ module Hbc
       if command.respond_to?(:run)
         # usual case: built-in command verb
         command.run(*rest)
-      elsif require? Utils.which("brewcask-#{command}.rb").to_s
+      elsif require? which("brewcask-#{command}.rb").to_s
         # external command as Ruby library on PATH, Homebrew-style
       elsif command.to_s.include?("/") && require?(command.to_s)
         # external command as Ruby library with literal path, useful
         # for development and troubleshooting
         sym = Pathname.new(command.to_s).basename(".rb").to_s.capitalize
         klass = begin
-                  self.const_get(sym)
+                  const_get(sym)
                 rescue NameError
                   nil
                 end
@@ -124,12 +125,12 @@ module Hbc
           # other Ruby libraries must do everything via "require"
           klass.run(*rest)
         end
-      elsif Utils.which "brewcask-#{command}"
+      elsif which("brewcask-#{command}")
         # arbitrary external executable on PATH, Homebrew-style
         exec "brewcask-#{command}", *ARGV[1..-1]
       elsif Pathname.new(command.to_s).executable? &&
             command.to_s.include?("/") &&
-            !command.to_s.match(%r{\.rb$})
+            !command.to_s.match(/\.rb$/)
         # arbitrary external executable with literal path, useful
         # for development and troubleshooting
         exec command, *ARGV[1..-1]
@@ -152,7 +153,7 @@ module Hbc
       onoe msg
       exit 1
     rescue StandardError, ScriptError, NoMemoryError => e
-      msg = e.message
+      msg = "#{e.message}\n"
       msg << Utils.error_message_with_suggestions
       msg << e.backtrace.join("\n")
       onoe msg
@@ -163,7 +164,7 @@ module Hbc
       cask_taps = {}
       cask_list.each do |c|
         user, repo, token = c.split "/"
-        repo.sub!(%r{^homebrew-}i, "")
+        repo.sub!(/^homebrew-/i, "")
         cask_taps[token] ||= []
         cask_taps[token].push "#{user}/#{repo}"
       end
@@ -266,7 +267,7 @@ module Hbc
           next unless klass.visible
           puts "    #{klass.command_name.ljust(max_command_len)}  #{_help_for(klass)}"
         end
-        puts %Q{\nSee also "man brew-cask"}
+        puts %Q(\nSee also "man brew-cask")
       end
 
       def help

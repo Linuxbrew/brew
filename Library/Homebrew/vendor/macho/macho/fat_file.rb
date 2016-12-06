@@ -34,9 +34,7 @@ module MachO
 
       @filename = filename
       @raw_data = File.open(@filename, "rb", &:read)
-      @header = populate_fat_header
-      @fat_archs = populate_fat_archs
-      @machos = populate_machos
+      populate_fields
     end
 
     # Initializes a new FatFile instance from a binary string.
@@ -45,9 +43,7 @@ module MachO
     def initialize_from_bin(bin)
       @filename = nil
       @raw_data = bin
-      @header = populate_fat_header
-      @fat_archs = populate_fat_archs
-      @machos = populate_machos
+      populate_fields
     end
 
     # The file's raw fat data.
@@ -122,6 +118,21 @@ module MachO
       machos.first.filetype
     end
 
+    # Populate the instance's fields with the raw Fat Mach-O data.
+    # @return [void]
+    # @note This method is public, but should (almost) never need to be called.
+    def populate_fields
+      @header = populate_fat_header
+      @fat_archs = populate_fat_archs
+      @machos = populate_machos
+    end
+
+    # All load commands responsible for loading dylibs in the file's Mach-O's.
+    # @return [Array<MachO::DylibCommand>] an array of DylibCommands
+    def dylib_load_commands
+      machos.map(&:dylib_load_commands).flatten
+    end
+
     # The file's dylib ID. If the file is not a dylib, returns `nil`.
     # @example
     #  file.dylib_id # => 'libBar.dylib'
@@ -149,7 +160,7 @@ module MachO
         macho.change_dylib_id(new_id, options)
       end
 
-      synchronize_raw_data
+      repopulate_raw_machos
     end
 
     alias dylib_id= change_dylib_id
@@ -180,7 +191,7 @@ module MachO
         macho.change_install_name(old_name, new_name, options)
       end
 
-      synchronize_raw_data
+      repopulate_raw_machos
     end
 
     alias change_dylib change_install_name
@@ -206,7 +217,7 @@ module MachO
         macho.change_rpath(old_path, new_path, options)
       end
 
-      synchronize_raw_data
+      repopulate_raw_machos
     end
 
     # Add the given runtime path to the file's Mach-Os.
@@ -221,7 +232,7 @@ module MachO
         macho.add_rpath(path, options)
       end
 
-      synchronize_raw_data
+      repopulate_raw_machos
     end
 
     # Delete the given runtime path from the file's Mach-Os.
@@ -236,7 +247,7 @@ module MachO
         macho.delete_rpath(path, options)
       end
 
-      synchronize_raw_data
+      repopulate_raw_machos
     end
 
     # Extract a Mach-O with the given CPU type from the file.
@@ -324,6 +335,17 @@ module MachO
       machos
     end
 
+    # Repopulate the raw Mach-O data with each internal Mach-O object.
+    # @return [void]
+    # @api private
+    def repopulate_raw_machos
+      machos.each_with_index do |macho, i|
+        arch = fat_archs[i]
+
+        @raw_data[arch.offset, arch.size] = macho.serialize
+      end
+    end
+
     # Yield each Mach-O object in the file, rescuing and accumulating errors.
     # @param options [Hash]
     # @option options [Boolean] :strict (true) whether or not to fail loudly
@@ -350,17 +372,6 @@ module MachO
 
       # Non-strict mode: Raise first error if *all* Mach-O slices failed.
       raise errors.first if errors.size == machos.size
-    end
-
-    # Synchronize the raw file data with each internal Mach-O object.
-    # @return [void]
-    # @api private
-    def synchronize_raw_data
-      machos.each_with_index do |macho, i|
-        arch = fat_archs[i]
-
-        @raw_data[arch.offset, arch.size] = macho.serialize
-      end
     end
   end
 end

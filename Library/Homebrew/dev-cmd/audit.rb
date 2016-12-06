@@ -11,7 +11,7 @@
 #:    connection are run.
 #:
 #:    If `--new-formula` is passed, various additional checks are run that check
-#:    if a new formula is eligable for Homebrew. This should be used when creating
+#:    if a new formula is eligible for Homebrew. This should be used when creating
 #:    new formulae and implies `--strict` and `--online`.
 #:
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
@@ -35,6 +35,7 @@ require "official_taps"
 require "cmd/search"
 require "cmd/style"
 require "date"
+require "blacklist"
 
 module Homebrew
   module_function
@@ -137,7 +138,7 @@ class FormulaAuditor
 
   attr_reader :formula, :text, :problems
 
-  BUILD_TIME_DEPS = %W[
+  BUILD_TIME_DEPS = %w[
     autoconf
     automake
     boost-build
@@ -310,6 +311,10 @@ class FormulaAuditor
     name = formula.name
     full_name = formula.full_name
 
+    if blacklisted?(name)
+      problem "'#{name}' is blacklisted."
+    end
+
     if Formula.aliases.include? name
       problem "Formula name conflicts with existing aliases."
       return
@@ -408,14 +413,19 @@ class FormulaAuditor
           EOS
         when "open-mpi", "mpich"
           problem <<-EOS.undent
-        when *BUILD_TIME_DEPS
-          next if dep.build? || dep.run?
-          problem <<-EOS.undent
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
               depends_on :mpi => [<lang list>]
             Where <lang list> is a comma delimited list that can include:
               :cc, :cxx, :f77, :f90
             EOS
+        when *BUILD_TIME_DEPS
+          next if dep.build? || dep.run?
+          problem <<-EOS.undent
+            #{dep} dependency should be
+              depends_on "#{dep}" => :build
+            Or if it is indeed a runtime dependency
+              depends_on "#{dep}" => :run
+          EOS
         end
       end
     end
@@ -450,9 +460,9 @@ class FormulaAuditor
     end
 
     return unless @new_formula
-    unless formula.deprecated_options.empty?
-      problem "New formulae should not use `deprecated_option`."
-    end
+    return if formula.deprecated_options.empty?
+    return if formula.name.include?("@")
+    problem "New formulae should not use `deprecated_option`."
   end
 
   def audit_desc
@@ -639,6 +649,8 @@ class FormulaAuditor
 
     stable = formula.stable
     case stable && stable.url
+    when /[\d\._-](alpha|beta|rc\d)/
+      problem "Stable version URLs should not contain #{$1}"
     when %r{download\.gnome\.org/sources}, %r{ftp\.gnome\.org/pub/GNOME/sources}i
       version = Version.parse(stable.url)
       if version >= Version.create("1.0")
@@ -653,25 +665,49 @@ class FormulaAuditor
   def audit_revision_and_version_scheme
     return unless formula.tap # skip formula not from core or any taps
     return unless formula.tap.git? # git log is required
+    return if @new_formula
 
-    fv = FormulaVersions.new(formula, max_depth: 10)
+    fv = FormulaVersions.new(formula, max_depth: 1)
     attributes = [:revision, :version_scheme]
+
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
     attributes.each do |attribute|
-      attributes_for_version = attributes_map[attribute][formula.version]
-      next if attributes_for_version.empty?
-      if formula.send(attribute) < attributes_for_version.max
-        problem "#{attribute} should not decrease"
+      stable_attribute_map = attributes_map[attribute][:stable]
+      next if stable_attribute_map.nil? || stable_attribute_map.empty?
+
+      attributes_for_version = stable_attribute_map[formula.version]
+      next if attributes_for_version.nil? || attributes_for_version.empty?
+
+      old_attribute = formula.send(attribute)
+      max_attribute = attributes_for_version.max
+      if max_attribute && old_attribute < max_attribute
+        problem "#{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
       end
     end
 
-    revision_map = attributes_map[:revision]
+    [:stable, :devel].each do |spec|
+      spec_version_scheme_map = attributes_map[:version_scheme][spec]
+      next if spec_version_scheme_map.nil? || spec_version_scheme_map.empty?
+
+      max_version_scheme = spec_version_scheme_map.values.flatten.max
+      max_version = spec_version_scheme_map.select do |_, version_scheme|
+        version_scheme.first == max_version_scheme
+      end.keys.max
+
+      formula_spec = formula.send(spec)
+      next if formula_spec.nil?
+
+      if max_version && formula_spec.version < max_version
+        problem "#{spec} version should not decrease (from #{max_version} to #{formula_spec.version})"
+      end
+    end
 
     return if formula.revision.zero?
-
     if formula.stable
-      if revision_map[formula.stable.version].empty? # check stable spec
+      revision_map = attributes_map[:revision][:stable]
+      stable_revisions = revision_map[formula.stable.version]
+      if !stable_revisions || stable_revisions.empty?
         problem "'revision #{formula.revision}' should be removed"
       end
     else # head/devel-only formula
@@ -718,11 +754,26 @@ class FormulaAuditor
     end
 
     if text =~ /system\s+['"]xcodebuild/
-      problem %(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
+      problem %q(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
+    end
+
+    bin_names = Set.new
+    bin_names << formula.name
+    bin_names += formula.aliases
+    [formula.bin, formula.sbin].each do |dir|
+      next unless dir.exist?
+      bin_names += dir.children.map(&:basename).map(&:to_s)
+    end
+    bin_names.each do |name|
+      ["system", "shell_output", "pipe_output"].each do |cmd|
+        if text =~ %r{(def test|test do).*(#{Regexp.escape HOMEBREW_PREFIX}/bin/)?#{cmd}[\(\s]+['"]#{Regexp.escape name}[\s'"]}m
+          problem %Q(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
+        end
+      end
     end
 
     if text =~ /xcodebuild[ (]["'*]/ && !text.include?("SYMROOT=")
-      problem %(xcodebuild should be passed an explicit "SYMROOT")
+      problem 'xcodebuild should be passed an explicit "SYMROOT"'
     end
 
     if text.include? "Formula.factory("
@@ -737,7 +788,7 @@ class FormulaAuditor
     problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
-  def audit_line(line, lineno)
+  def audit_line(line, _lineno)
     if line =~ /<(Formula|AmazonWebServicesFormula|ScriptFileFormula|GithubGistFormula)/
       problem "Use a space in class inheritance: class Foo < #{$1}"
     end
@@ -811,11 +862,12 @@ class FormulaAuditor
       problem ":#{$1} is deprecated. Usage should be \"#{$1}\""
     end
 
+    if line =~ /depends_on :apr/
+      problem ":apr is deprecated. Usage should be \"apr-util\""
+    end
+
     # Commented-out depends_on
     problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
-
-    # No trailing whitespace, please
-    problem "#{lineno}: Trailing whitespace was found" if line =~ /[\t ]+$/
 
     if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
       problem "Use \"if build.#{$1.downcase}?\" instead"
@@ -1003,9 +1055,9 @@ class FormulaAuditor
 
     case condition
     when /if build\.include\? ['"]with-#{dep}['"]$/, /if build\.with\? ['"]#{dep}['"]$/
-      problem %(Replace #{line.inspect} with "depends_on #{quoted_dep} => :optional")
+      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :optional")
     when /unless build\.include\? ['"]without-#{dep}['"]$/, /unless build\.without\? ['"]#{dep}['"]$/
-      problem %(Replace #{line.inspect} with "depends_on #{quoted_dep} => :recommended")
+      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :recommended")
     end
   end
 
@@ -1287,6 +1339,11 @@ class ResourceAuditor
     # Check for http:// GitHub repo urls, https:// is preferred.
     urls.grep(%r{^http://github\.com/.*\.git$}) do |u|
       problem "Please use https:// for #{u}"
+    end
+
+    # Check for master branch GitHub archives.
+    urls.grep(%r{^https://github\.com/.*archive/master\.(tar\.gz|zip)$}) do
+      problem "Use versioned rather than branch tarballs for stable checksums."
     end
 
     # Use new-style archive downloads

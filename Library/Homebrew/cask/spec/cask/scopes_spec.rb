@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Hbc::Scopes do
   describe "installed" do
     let(:fake_caskroom) { Pathname(Dir.mktmpdir) }

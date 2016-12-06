@@ -17,7 +17,7 @@ module Hbc
         file = symlink.readlink
 
         new_name = file.basename
-                       .sub(%r{\-((?:(\d|#{DSL::Version::DIVIDER_REGEX})*\-\2*)*[^\-]+)$}x,
+                       .sub(/\-((?:(\d|#{DSL::Version::DIVIDER_REGEX})*\-\2*)*[^\-]+)$/x,
                             '--\1')
 
         renamed_file = Hbc.cache.join(new_name)

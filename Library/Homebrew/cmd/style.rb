@@ -14,7 +14,7 @@
 #:    Exits with a non-zero status if any style violations are found.
 
 require "utils"
-require "utils/json"
+require "json"
 
 module Homebrew
   module_function
@@ -47,9 +47,9 @@ module Homebrew
 
   def check_style_impl(files, output_type, options = {})
     fix = options[:fix]
-    Homebrew.install_gem_setup_path! "rubocop", "0.43.0"
+    Homebrew.install_gem_setup_path! "rubocop", "0.45.0"
 
-    args = %W[
+    args = %w[
       --force-exclusion
     ]
     args << "--auto-correct" if fix
@@ -74,7 +74,7 @@ module Homebrew
       # exitstatus can also be nil if RuboCop process crashes, e.g. due to
       # native extension problems
       raise "Error while running RuboCop" if $?.exitstatus.nil? || $?.exitstatus > 1
-      RubocopResults.new(Utils::JSON.load(json))
+      RubocopResults.new(JSON.parse(json))
     else
       raise "Invalid output_type for check_style_impl: #{output_type}"
     end
