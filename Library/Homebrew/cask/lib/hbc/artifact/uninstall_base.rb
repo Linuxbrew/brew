@@ -1,4 +1,5 @@
 require "pathname"
+require "timeout"
 
 require "hbc/artifact/base"
 
@@ -127,10 +128,18 @@ module Hbc
       def uninstall_quit(directives)
         Array(directives[:quit]).each do |id|
           ohai "Quitting application ID #{id}"
-          num_running = count_running_processes(id)
-          next unless num_running > 0
+          next if running_processes(id).empty?
           @command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{id}" to quit)], sudo: true)
-          sleep 3
+
+          begin
+            Timeout.timeout(3) do
+              Kernel.loop do
+                break if running_processes(id).empty?
+              end
+            end
+          rescue Timeout::Error
+            next
+          end
         end
       end
 
@@ -138,9 +147,9 @@ module Hbc
       def uninstall_signal(directives)
         Array(directives[:signal]).flatten.each_slice(2) do |pair|
           raise CaskInvalidError.new(@cask, "Each #{stanza} :signal must have 2 elements.") unless pair.length == 2
-          signal, id = pair
-          ohai "Signalling '#{signal}' to application ID '#{id}'"
-          pids = get_unix_pids(id)
+          signal, bundle_id = pair
+          ohai "Signalling '#{signal}' to application ID '#{bundle_id}'"
+          pids = running_processes(bundle_id).map(&:first)
           next unless pids.any?
           # Note that unlike :quit, signals are sent from the current user (not
           # upgraded to the superuser).  This is a todo item for the future, but
@@ -148,24 +157,20 @@ module Hbc
           # misapplied "kill" by root could bring down the system. The fact that we
           # learned the pid from AppleScript is already some degree of protection,
           # though indirect.
-          odebug "Unix ids are #{pids.inspect} for processes with bundle identifier #{id}"
+          odebug "Unix ids are #{pids.inspect} for processes with bundle identifier #{bundle_id}"
           Process.kill(signal, *pids)
           sleep 3
         end
       end
 
-      def count_running_processes(bundle_id)
-        @command.run!("/usr/bin/osascript",
-                      args: ["-e", %Q(tell application "System Events" to count processes whose bundle identifier is "#{bundle_id}")],
-                      sudo: true).stdout.to_i
-      end
-
-      def get_unix_pids(bundle_id)
-        pid_string = @command.run!("/usr/bin/osascript",
-                                   args: ["-e", %Q(tell application "System Events" to get the unix id of every process whose bundle identifier is "#{bundle_id}")],
-                                   sudo: true).stdout.chomp
-        return [] unless pid_string =~ /\A\d+(?:\s*,\s*\d+)*\Z/ # sanity check
-        pid_string.split(/\s*,\s*/).map(&:strip).map(&:to_i)
+      def running_processes(bundle_id)
+        @command.run!("/bin/launchctl", args: ["list"]).stdout.lines
+                .map { |line| line.chomp.split("\t") }
+                .map { |pid, state, id| [pid.to_i, state.to_i, id] }
+                .select do |fields|
+                  next if fields[0].zero?
+                  fields[2] =~ /^#{Regexp.escape(bundle_id)}($|\.\d+)/
+                end
       end
 
       def uninstall_login_item(directives)

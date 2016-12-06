@@ -207,21 +207,17 @@ describe Hbc::Artifact::Uninstall do
     describe "when using quit" do
       let(:cask) { Hbc.load("with-uninstall-quit") }
       let(:bundle_id) { "my.fancy.package.app" }
-      let(:count_processes_script) {
-        'tell application "System Events" to count processes ' +
-          %Q(whose bundle identifier is "#{bundle_id}")
-      }
       let(:quit_application_script) {
         %Q(tell application id "#{bundle_id}" to quit)
       }
 
       it "can uninstall" do
         Hbc::FakeSystemCommand.stubs_command(
-          sudo(%W[/usr/bin/osascript -e #{count_processes_script}]), "1"
+          %w[/bin/launchctl list], "999\t0\t#{bundle_id}\n"
         )
 
         Hbc::FakeSystemCommand.stubs_command(
-          sudo(%W[/usr/bin/osascript -e #{quit_application_script}])
+          %w[/bin/launchctl list]
         )
 
         subject
@@ -233,14 +229,10 @@ describe Hbc::Artifact::Uninstall do
       let(:bundle_id) { "my.fancy.package.app" }
       let(:signals) { %w[TERM KILL] }
       let(:unix_pids) { [12_345, 67_890] }
-      let(:get_unix_pids_script) {
-        'tell application "System Events" to get the unix id of every process ' +
-          %Q(whose bundle identifier is "#{bundle_id}")
-      }
 
       it "can uninstall" do
         Hbc::FakeSystemCommand.stubs_command(
-          sudo(%W[/usr/bin/osascript -e #{get_unix_pids_script}]), unix_pids.join(", ")
+          %w[/bin/launchctl list], unix_pids.map { |pid| [pid, 0, bundle_id].join("\t") }.join("\n")
         )
 
         signals.each do |signal|
