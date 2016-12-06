@@ -20,8 +20,8 @@ describe Hbc::CLI::Uninstall do
   end
 
   it "can uninstall and unlink multiple Casks at once" do
-    caffeine = Hbc.load("local-caffeine")
-    transmission = Hbc.load("local-transmission")
+    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+    transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
 
     shutup do
       Hbc::Installer.new(caffeine).install

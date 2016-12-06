@@ -3,7 +3,7 @@ require "test_helper"
 # TODO: this test should be named after the corresponding class, once
 #       that class is abstracted from installer.rb.
 describe "Accessibility Access" do
-  let(:cask) { Hbc.load("with-accessibility-access") }
+  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-accessibility-access.rb") }
   let(:with_fake_command) { { command: Hbc::FakeSystemCommand } }
   let(:installer) { Hbc::Installer.new(cask, with_fake_command) }
 

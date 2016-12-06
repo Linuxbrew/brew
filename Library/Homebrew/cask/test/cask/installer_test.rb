@@ -7,7 +7,7 @@ describe Hbc::Installer do
     }
 
     it "downloads and installs a nice fresh Cask" do
-      caffeine = Hbc.load("local-caffeine")
+      caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
 
       shutup do
         Hbc::Installer.new(caffeine).install
@@ -20,7 +20,7 @@ describe Hbc::Installer do
     end
 
     it "works with dmg-based Casks" do
-      asset = Hbc.load("container-dmg")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-dmg.rb")
 
       shutup do
         Hbc::Installer.new(asset).install
@@ -33,7 +33,7 @@ describe Hbc::Installer do
     end
 
     it "works with tar-gz-based Casks" do
-      asset = Hbc.load("container-tar-gz")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-tar-gz.rb")
 
       shutup do
         Hbc::Installer.new(asset).install
@@ -47,7 +47,7 @@ describe Hbc::Installer do
 
     it "works with cab-based Casks" do
       skip("cabextract not installed") if which("cabextract").nil?
-      asset = Hbc.load("container-cab")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-cab.rb")
 
       asset.stub :depends_on, empty_depends_on_stub do
         shutup do
@@ -63,7 +63,7 @@ describe Hbc::Installer do
 
     it "works with Adobe AIR-based Casks" do
       skip("Adobe AIR not installed") unless Hbc::Container::Air.installer_exist?
-      asset = Hbc.load("container-air")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-air.rb")
 
       shutup do
         Hbc::Installer.new(asset).install
@@ -77,7 +77,7 @@ describe Hbc::Installer do
 
     it "works with 7z-based Casks" do
       skip("unar not installed") if which("unar").nil?
-      asset = Hbc.load("container-7z")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-7z.rb")
 
       asset.stub :depends_on, empty_depends_on_stub do
         shutup do
@@ -92,7 +92,7 @@ describe Hbc::Installer do
     end
 
     it "works with xar-based Casks" do
-      asset = Hbc.load("container-xar")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-xar.rb")
 
       shutup do
         Hbc::Installer.new(asset).install
@@ -106,7 +106,7 @@ describe Hbc::Installer do
 
     it "works with Stuffit-based Casks" do
       skip("unar not installed") if which("unar").nil?
-      asset = Hbc.load("container-sit")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-sit.rb")
 
       asset.stub :depends_on, empty_depends_on_stub do
         shutup do
@@ -122,7 +122,7 @@ describe Hbc::Installer do
 
     it "works with RAR-based Casks" do
       skip("unar not installed") if which("unar").nil?
-      asset = Hbc.load("container-rar")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-rar.rb")
 
       asset.stub :depends_on, empty_depends_on_stub do
         shutup do
@@ -137,7 +137,7 @@ describe Hbc::Installer do
     end
 
     it "works with pure bzip2-based Casks" do
-      asset = Hbc.load("container-bzip2")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-bzip2.rb")
 
       shutup do
         Hbc::Installer.new(asset).install
@@ -150,7 +150,7 @@ describe Hbc::Installer do
     end
 
     it "works with pure gzip-based Casks" do
-      asset = Hbc.load("container-gzip")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-gzip.rb")
 
       shutup do
         Hbc::Installer.new(asset).install
@@ -164,7 +164,7 @@ describe Hbc::Installer do
 
     it "works with pure xz-based Casks" do
       skip("unxz not installed") if which("unxz").nil?
-      asset = Hbc.load("container-xz")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-xz.rb")
 
       asset.stub :depends_on, empty_depends_on_stub do
         shutup do
@@ -180,7 +180,7 @@ describe Hbc::Installer do
 
     it "works with lzma-based Casks" do
       skip("unlzma not installed") if which("unlzma").nil?
-      asset = Hbc.load("container-lzma")
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-lzma.rb")
 
       asset.stub :depends_on, empty_depends_on_stub do
         shutup do
@@ -195,7 +195,7 @@ describe Hbc::Installer do
     end
 
     it "blows up on a bad checksum" do
-      bad_checksum = Hbc.load("bad-checksum")
+      bad_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/bad-checksum.rb")
       lambda {
         shutup do
           Hbc::Installer.new(bad_checksum).install
@@ -204,7 +204,7 @@ describe Hbc::Installer do
     end
 
     it "blows up on a missing checksum" do
-      missing_checksum = Hbc.load("missing-checksum")
+      missing_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/missing-checksum.rb")
       lambda {
         shutup do
           Hbc::Installer.new(missing_checksum).install
@@ -213,7 +213,7 @@ describe Hbc::Installer do
     end
 
     it "installs fine if sha256 :no_check is used" do
-      no_checksum = Hbc.load("no-checksum")
+      no_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/no-checksum.rb")
 
       shutup do
         Hbc::Installer.new(no_checksum).install
@@ -223,14 +223,14 @@ describe Hbc::Installer do
     end
 
     it "fails to install if sha256 :no_check is used with --require-sha" do
-      no_checksum = Hbc.load("no-checksum")
+      no_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/no-checksum.rb")
       lambda {
         Hbc::Installer.new(no_checksum, require_sha: true).install
       }.must_raise(Hbc::CaskNoShasumError)
     end
 
     it "installs fine if sha256 :no_check is used with --require-sha and --force" do
-      no_checksum = Hbc.load("no-checksum")
+      no_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/no-checksum.rb")
 
       shutup do
         Hbc::Installer.new(no_checksum, require_sha: true, force: true).install
@@ -240,7 +240,7 @@ describe Hbc::Installer do
     end
 
     it "prints caveats if they're present" do
-      with_caveats = Hbc.load("with-caveats")
+      with_caveats = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-caveats.rb")
       lambda {
         Hbc::Installer.new(with_caveats).install
       }.must_output(/Here are some things you might want to know/)
@@ -248,7 +248,7 @@ describe Hbc::Installer do
     end
 
     it "prints installer :manual instructions when present" do
-      with_installer_manual = Hbc.load("with-installer-manual")
+      with_installer_manual = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installer-manual.rb")
       lambda {
         Hbc::Installer.new(with_installer_manual).install
       }.must_output(/To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'/)
@@ -256,7 +256,7 @@ describe Hbc::Installer do
     end
 
     it "does not extract __MACOSX directories from zips" do
-      with_macosx_dir = Hbc.load("with-macosx-dir")
+      with_macosx_dir = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-macosx-dir.rb")
 
       shutup do
         Hbc::Installer.new(with_macosx_dir).install
@@ -266,7 +266,7 @@ describe Hbc::Installer do
     end
 
     it "installer method raises an exception when already-installed Casks which auto-update are attempted" do
-      auto_updates = Hbc.load("auto-updates")
+      auto_updates = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
       auto_updates.installed?.must_equal false
       installer = Hbc::Installer.new(auto_updates)
 
@@ -280,7 +280,7 @@ describe Hbc::Installer do
     end
 
     it "allows already-installed Casks which auto-update to be installed if force is provided" do
-      auto_updates = Hbc.load("auto-updates")
+      auto_updates = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
       auto_updates.installed?.must_equal false
 
       shutup do
@@ -294,7 +294,7 @@ describe Hbc::Installer do
 
     # unlike the CLI, the internal interface throws exception on double-install
     it "installer method raises an exception when already-installed Casks are attempted" do
-      transmission = Hbc.load("local-transmission")
+      transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
       transmission.installed?.must_equal false
       installer = Hbc::Installer.new(transmission)
 
@@ -308,7 +308,7 @@ describe Hbc::Installer do
     end
 
     it "allows already-installed Casks to be installed if force is provided" do
-      transmission = Hbc.load("local-transmission")
+      transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
       transmission.installed?.must_equal false
 
       shutup do
@@ -321,7 +321,7 @@ describe Hbc::Installer do
     end
 
     it "works naked-pkg-based Casks" do
-      naked_pkg = Hbc.load("container-pkg")
+      naked_pkg = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-pkg.rb")
 
       shutup do
         Hbc::Installer.new(naked_pkg).install
@@ -333,7 +333,7 @@ describe Hbc::Installer do
     end
 
     it "works properly with an overridden container :type" do
-      naked_executable = Hbc.load("naked-executable")
+      naked_executable = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/naked-executable.rb")
 
       shutup do
         Hbc::Installer.new(naked_executable).install
@@ -345,7 +345,7 @@ describe Hbc::Installer do
     end
 
     it "works fine with a nested container" do
-      nested_app = Hbc.load("nested-app")
+      nested_app = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/nested-app.rb")
 
       shutup do
         Hbc::Installer.new(nested_app).install
@@ -356,7 +356,7 @@ describe Hbc::Installer do
     end
 
     it "generates and finds a timestamped metadata directory for an installed Cask" do
-      caffeine = Hbc.load("local-caffeine")
+      caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
 
       shutup do
         Hbc::Installer.new(caffeine).install
@@ -368,7 +368,7 @@ describe Hbc::Installer do
     end
 
     it "generates and finds a metadata subdirectory for an installed Cask" do
-      caffeine = Hbc.load("local-caffeine")
+      caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
 
       shutup do
         Hbc::Installer.new(caffeine).install
@@ -383,7 +383,7 @@ describe Hbc::Installer do
 
   describe "uninstall" do
     it "fully uninstalls a Cask" do
-      caffeine = Hbc.load("local-caffeine")
+      caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
       installer = Hbc::Installer.new(caffeine)
 
       shutup do
@@ -397,7 +397,7 @@ describe Hbc::Installer do
     end
 
     it "uninstalls all versions if force is set" do
-      caffeine = Hbc.load("local-caffeine")
+      caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
       mutated_version = caffeine.version + ".1"
 
       shutup do

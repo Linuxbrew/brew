@@ -2,7 +2,7 @@ require "test_helper"
 
 describe Hbc::DSL do
   it "lets you set url, homepage, and version" do
-    test_cask = Hbc.load("basic-cask")
+    test_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/basic-cask.rb")
     test_cask.url.to_s.must_equal "http://example.com/TestCask.dmg"
     test_cask.homepage.must_equal "http://example.com/"
     test_cask.version.to_s.must_equal "1.2.3"
@@ -48,20 +48,20 @@ describe Hbc::DSL do
   describe "header line" do
     it "requires a valid header format" do
       lambda {
-        Hbc.load("invalid/invalid-header-format")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-header-format.rb")
       }.must_raise(SyntaxError)
     end
 
     it "requires the header token to match the file name" do
       err = lambda {
-        Hbc.load("invalid/invalid-header-token-mismatch")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-header-token-mismatch.rb")
       }.must_raise(Hbc::CaskTokenDoesNotMatchError)
       err.message.must_include "Bad header line:"
       err.message.must_include "does not match file name"
     end
 
     it "does not require a DSL version in the header" do
-      test_cask = Hbc.load("no-dsl-version")
+      test_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/no-dsl-version.rb")
       test_cask.token.must_equal "no-dsl-version"
       test_cask.url.to_s.must_equal "http://example.com/TestCask.dmg"
       test_cask.homepage.must_equal "http://example.com/"
@@ -75,7 +75,7 @@ describe Hbc::DSL do
 
       ENV.stub :[], stub do
         shutup do
-          test_cask = Hbc.load("with-dsl-version")
+          test_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-dsl-version.rb")
           test_cask.token.must_equal "with-dsl-version"
           test_cask.url.to_s.must_equal "http://example.com/TestCask.dmg"
           test_cask.homepage.must_equal "http://example.com/"
@@ -233,7 +233,7 @@ describe Hbc::DSL do
   describe "url stanza" do
     it "prevents defining multiple urls" do
       err = lambda {
-        Hbc.load("invalid/invalid-two-url")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-two-url.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'url' stanza may only appear once"
     end
@@ -242,7 +242,7 @@ describe Hbc::DSL do
   describe "homepage stanza" do
     it "prevents defining multiple homepages" do
       err = lambda {
-        Hbc.load("invalid/invalid-two-homepage")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-two-homepage.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'homepage' stanza may only appear once"
     end
@@ -251,7 +251,7 @@ describe Hbc::DSL do
   describe "version stanza" do
     it "prevents defining multiple versions" do
       err = lambda {
-        Hbc.load("invalid/invalid-two-version")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-two-version.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'version' stanza may only appear once"
     end
@@ -259,77 +259,77 @@ describe Hbc::DSL do
 
   describe "appcast stanza" do
     it "allows appcasts to be specified" do
-      cask = Hbc.load("with-appcast")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-appcast.rb")
       cask.appcast.to_s.must_match(/^http/)
     end
 
     it "prevents defining multiple appcasts" do
       err = lambda {
-        Hbc.load("invalid/invalid-appcast-multiple")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-appcast-multiple.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'appcast' stanza may only appear once"
     end
 
     it "refuses to load invalid appcast URLs" do
       lambda {
-        Hbc.load("invalid/invalid-appcast-url")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-appcast-url.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end
 
   describe "gpg stanza" do
     it "allows gpg stanza to be specified" do
-      cask = Hbc.load("with-gpg")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-gpg.rb")
       cask.gpg.to_s.must_match(/\S/)
     end
 
     it "allows gpg stanza to be specified with :key_url" do
-      cask = Hbc.load("with-gpg-key-url")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-gpg-key-url.rb")
       cask.gpg.to_s.must_match(/\S/)
     end
 
     it "prevents specifying gpg stanza multiple times" do
       err = lambda {
-        Hbc.load("invalid/invalid-gpg-multiple-stanzas")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-gpg-multiple-stanzas.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'gpg' stanza may only appear once"
     end
 
     it "prevents missing gpg key parameters" do
       err = lambda {
-        Hbc.load("invalid/invalid-gpg-missing-key")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-gpg-missing-key.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'gpg' stanza must include exactly one"
     end
 
     it "prevents conflicting gpg key parameters" do
       err = lambda {
-        Hbc.load("invalid/invalid-gpg-conflicting-keys")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-gpg-conflicting-keys.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'gpg' stanza must include exactly one"
     end
 
     it "refuses to load invalid gpg signature URLs" do
       lambda {
-        Hbc.load("invalid/invalid-gpg-signature-url")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-gpg-signature-url.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
 
     it "refuses to load invalid gpg key URLs" do
       lambda {
-        Hbc.load("invalid/invalid-gpg-key-url")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-gpg-key-url.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
 
     it "refuses to load invalid gpg key IDs" do
       lambda {
-        Hbc.load("invalid/invalid-gpg-key-id")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-gpg-key-id.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
 
     it "refuses to load if gpg parameter is unknown" do
       lambda {
-        Hbc.load("invalid/invalid-gpg-parameter")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-gpg-parameter.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end
@@ -337,112 +337,112 @@ describe Hbc::DSL do
   describe "depends_on stanza" do
     it "refuses to load with an invalid depends_on key" do
       lambda {
-        Hbc.load("invalid/invalid-depends-on-key")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-depends-on-key.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end
 
   describe "depends_on formula" do
     it "allows depends_on formula to be specified" do
-      cask = Hbc.load("with-depends-on-formula")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-formula.rb")
       cask.depends_on.formula.wont_be_nil
     end
 
     it "allows multiple depends_on formula to be specified" do
-      cask = Hbc.load("with-depends-on-formula-multiple")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-formula-multiple.rb")
       cask.depends_on.formula.wont_be_nil
     end
   end
 
   describe "depends_on cask" do
     it "allows depends_on cask to be specified" do
-      cask = Hbc.load("with-depends-on-cask")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask.rb")
       cask.depends_on.cask.wont_be_nil
     end
 
     it "allows multiple depends_on cask to be specified" do
-      cask = Hbc.load("with-depends-on-cask-multiple")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-multiple.rb")
       cask.depends_on.cask.wont_be_nil
     end
   end
 
   describe "depends_on macos" do
     it "allows depends_on macos to be specified" do
-      cask = Hbc.load("with-depends-on-macos-string")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-string.rb")
       cask.depends_on.macos.wont_be_nil
     end
     it "refuses to load with an invalid depends_on macos value" do
       lambda {
-        Hbc.load("invalid/invalid-depends-on-macos-bad-release")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-depends-on-macos-bad-release.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
     it "refuses to load with conflicting depends_on macos forms" do
       lambda {
-        Hbc.load("invalid/invalid-depends-on-macos-conflicting-forms")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-depends-on-macos-conflicting-forms.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end
 
   describe "depends_on arch" do
     it "allows depends_on arch to be specified" do
-      cask = Hbc.load("with-depends-on-arch")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-arch.rb")
       cask.depends_on.arch.wont_be_nil
     end
     it "refuses to load with an invalid depends_on arch value" do
       lambda {
-        Hbc.load("invalid/invalid-depends-on-arch-value")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-depends-on-arch-value.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end
 
   describe "depends_on x11" do
     it "allows depends_on x11 to be specified" do
-      cask = Hbc.load("with-depends-on-x11")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-x11.rb")
       cask.depends_on.x11.wont_be_nil
     end
     it "refuses to load with an invalid depends_on x11 value" do
       lambda {
-        Hbc.load("invalid/invalid-depends-on-x11-value")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-depends-on-x11-value.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end
 
   describe "conflicts_with stanza" do
     it "allows conflicts_with stanza to be specified" do
-      cask = Hbc.load("with-conflicts-with")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-conflicts-with.rb")
       cask.conflicts_with.formula.wont_be_nil
     end
 
     it "refuses to load invalid conflicts_with key" do
       lambda {
-        Hbc.load("invalid/invalid-conflicts-with-key")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-conflicts-with-key.rb")
       }.must_raise(Hbc::CaskInvalidError)
     end
   end
 
   describe "installer stanza" do
     it "allows installer script to be specified" do
-      cask = Hbc.load("with-installer-script")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installer-script.rb")
       cask.artifacts[:installer].first.script[:executable].must_equal "/usr/bin/true"
       cask.artifacts[:installer].first.script[:args].must_equal ["--flag"]
       cask.artifacts[:installer].to_a[1].script[:executable].must_equal "/usr/bin/false"
       cask.artifacts[:installer].to_a[1].script[:args].must_equal ["--flag"]
     end
     it "allows installer manual to be specified" do
-      cask = Hbc.load("with-installer-manual")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installer-manual.rb")
       cask.artifacts[:installer].first.manual.must_equal "Caffeine.app"
     end
   end
 
   describe "stage_only stanza" do
     it "allows stage_only stanza to be specified" do
-      cask = Hbc.load("stage-only")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/stage-only.rb")
       cask.artifacts[:stage_only].first.must_equal [true]
     end
 
     it "prevents specifying stage_only with other activatables" do
       err = lambda {
-        Hbc.load("invalid/invalid-stage-only-conflict")
+        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/invalid/invalid-stage-only-conflict.rb")
       }.must_raise(Hbc::CaskInvalidError)
       err.message.must_include "'stage_only' must be the only activatable artifact"
     end
@@ -450,14 +450,14 @@ describe Hbc::DSL do
 
   describe "auto_updates stanza" do
     it "allows auto_updates stanza to be specified" do
-      cask = Hbc.load("auto-updates")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
       cask.auto_updates.must_equal true
     end
   end
 
   describe "appdir" do
     it "allows interpolation of the appdir value in stanzas" do
-      cask = Hbc.load("appdir-interpolation")
+      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/appdir-interpolation.rb")
       cask.artifacts[:binary].first.must_equal ["#{Hbc.appdir}/some/path"]
     end
 

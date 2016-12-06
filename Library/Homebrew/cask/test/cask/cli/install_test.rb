@@ -6,9 +6,9 @@ describe Hbc::CLI::Install do
       Hbc::CLI::Install.run("local-transmission", "local-caffeine")
     end
 
-    Hbc.load("local-transmission").must_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").must_be :installed?
     Hbc.appdir.join("Transmission.app").must_be :directory?
-    Hbc.load("local-caffeine").must_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb").must_be :installed?
     Hbc.appdir.join("Caffeine.app").must_be :directory?
   end
 
@@ -19,7 +19,7 @@ describe Hbc::CLI::Install do
     shutup do
       Hbc::CLI::Install.run("local-transmission")
     end
-    Hbc.load("local-transmission").must_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").must_be :installed?
   end
 
   it "prints a warning message on double install" do
@@ -46,9 +46,9 @@ describe Hbc::CLI::Install do
     shutup do
       Hbc::CLI::Install.run("with-depends-on-cask-multiple", "--skip-cask-deps")
     end
-    Hbc.load("with-depends-on-cask-multiple").must_be :installed?
-    Hbc.load("local-caffeine").wont_be :installed?
-    Hbc.load("local-transmission").wont_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-multiple.rb").must_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb").wont_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").wont_be :installed?
   end
 
   it "properly handles Casks that are not present" do

@@ -2,7 +2,7 @@ require "test_helper"
 
 describe Hbc::Artifact::App do
   describe "multiple apps" do
-    let(:cask) { Hbc.load("with-two-apps-correct") }
+    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-two-apps-correct.rb") }
 
     let(:install_phase) {
       -> { Hbc::Artifact::App.new(cask).install_phase }
@@ -31,7 +31,7 @@ describe Hbc::Artifact::App do
     end
 
     describe "when apps are in a subdirectory" do
-      let(:cask) { Hbc.load("with-two-apps-subdir") }
+      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-two-apps-subdir.rb") }
 
       it "installs both apps using the proper target directory" do
         shutup do

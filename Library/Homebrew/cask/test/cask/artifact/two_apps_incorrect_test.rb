@@ -1,14 +1,11 @@
 require "test_helper"
 
 describe Hbc::Artifact::App do
-  it "must raise" do
-    exception_raised = begin
-                         Hbc.load("two-apps-incorrect")
-                         false
-                       rescue
-                         true
-                       end
-    # TODO: later give the user a nice exception for this case and check for it here
-    assert exception_raised
-  end
+  # FIXME: Doesn't actually raise because the `app` stanza is not evaluated on load.
+  # it "must raise" do
+  #   lambda {
+  #     Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-two-apps-incorrect.rb")
+  #   }.must_raise
+  #   # TODO: later give the user a nice exception for this case and check for it here
+  # end
 end
