@@ -20,6 +20,7 @@ class Tab < OpenStruct
   def self.create(formula, compiler, stdlib)
     build = formula.build
     attributes = {
+      "homebrew_version" => HOMEBREW_VERSION,
       "used_options" => build.used_options.as_flags,
       "unused_options" => build.unused_options.as_flags,
       "tabfile" => formula.prefix.join(FILENAME),
@@ -299,6 +300,7 @@ class Tab < OpenStruct
 
   def to_json
     attributes = {
+      "homebrew_version" => homebrew_version,
       "used_options" => used_options.as_flags,
       "unused_options" => unused_options.as_flags,
       "built_as_bottle" => built_as_bottle,
