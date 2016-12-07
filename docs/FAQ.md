@@ -96,8 +96,8 @@ will use a bottled version of $FORMULA, but
 `brew install $FORMULA --enable-bar` will trigger a source build.
 * The `--build-from-source` option is invoked.
 * The environment variable `HOMEBREW_BUILD_FROM_SOURCE` is set.
-* The machine is not running OS X 10.9+ as all bottled builds are
-generated on Mavericks or later.
+* The machine is not running OS X 10.10+ as all bottled builds are
+generated on Yosemite or later.
 * Homebrew is installed to a prefix other than the standard
 `/usr/local` (although some bottles support this)
 
