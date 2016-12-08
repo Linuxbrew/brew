@@ -31,16 +31,17 @@ To make a new branch and submit it for review, create a GitHub pull request with
 1. Check out the `master` branch with `git checkout master`.
 2. Retrieve new changes to the `master` branch with `brew update`.
 3. Create a new branch from the latest `master` branch with `git checkout -b <YOUR_BRANCH_NAME> origin/master`.
-4. Make your changes to any Homebrew formula with `brew edit` or your favorite text editor, following all the guidelines in the [Formula Cookbook](Formula-Cookbook.md).
+4. Make your changes.
+ * For formulae, use `brew edit` or your favorite text editor, following all the guidelines in the [Formula Cookbook](Formula-Cookbook.md).
  * If there's a `bottle do` block in the formula: don't remove or change it; we'll update it when we pull your PR.
-5. Test your changes on each changed formula by doing the following, and ensure they all pass without issue. (Make sure you do the `brew audit` step while your changed formula is installed.)
+5. Test your changes by doing the following, and ensure they all pass without issue. For changed formulae, make sure you do the `brew audit` step while your changed formula is installed.
  1. `brew tests`
  2. `brew install --build-from-source <CHANGED_FORMULA>`
  3. `brew test <CHANGED_FORMULA>`
  4. `brew audit --strict <CHANGED_FORMULA>`
 6. Make a separate commit for each changed formula with `git add` and `git commit`.
 7. Upload your new commits to the branch on your fork with `git push --set-upstream <YOUR_USERNAME> <YOUR_BRANCH_NAME>`.
-8. Go to https://github.com/Homebrew/homebrew-core and create a pull request to request review and merging of the commits in your pushed branch. Explain why the change is needed and, if fixing a bug, how to reproduce the bug. Make sure you have done each step in the checklist that appears in your new PR.
+8. Go to the relevant repository (e.g. https://github.com/Homebrew/brew, https://github.com/Homebrew/homebrew-core, etc.) and create a pull request to request review and merging of the commits in your pushed branch. Explain why the change is needed and, if fixing a bug, how to reproduce the bug. Make sure you have done each step in the checklist that appears in your new PR.
  * Please note that our preferred commit message format for simple version updates is "`<FORMULA_NAME> <NEW_VERSION>`", e.g. "`source-highlight 3.1.8`". `devel` version updates should have the commit message suffixed with `(devel)`, e.g. "`nginx 1.9.1 (devel)`". If updating both stable and `devel`, the format should be a concatenation of these two forms, e.g. "`x264 r2699, r2705 (devel)`".
 9. Await feedback or a merge from Homebrew's maintainers. We typically respond to all PRs within a couple days, but it may take up to a week, depending on the maintainers' workload.
 10. Thank you!
