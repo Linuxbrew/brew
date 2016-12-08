@@ -1490,6 +1490,11 @@ class ResourceAuditor
 
     return unless @online
     urls.each do |url|
+      begin
+        nostdout { curl "--connect-timeout", "15", "-o", "/dev/null", "-r", "0-0", url }
+      rescue ErrorDuringExecution
+        problem "The mirror #{u} is not reachable (curl exit code #{$?.exitstatus})"
+      end
       check_insecure_mirror(url) if url.start_with? "http:"
     end
   end
