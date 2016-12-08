@@ -198,6 +198,7 @@ class Formulary
     end
 
     def get_formula(spec, alias_path: nil)
+      tap.install if !tap.installed? && ARGV.homebrew_developer?
       super
     rescue FormulaUnavailableError => e
       raise TapFormulaUnavailableError.new(tap, name), "", e.backtrace
