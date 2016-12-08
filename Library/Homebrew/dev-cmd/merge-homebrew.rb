@@ -1,17 +1,28 @@
+# Merge branch homebrew/master into linuxbrew/master.
+#
+# Usage:
+#    brew merge-homebrew
+#
+# Options:
+#   --brew  merge Homebrew/brew into Linuxbrew/brew
+#   --core  merge Homebrew/homebrew-core into Linuxbrew/homebrew-core
+#   --dupes merge Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes
+#   --science merge Homebrew/homebrew-science into Linuxbrew/homebrew-science
+
+require "date"
+
 module Homebrew
-  # Merge branch homebrew/master into linuxbrew/master.
-  #
-  # Usage:
-  #    brew merge-homebrew
-  #
-  # Options:
-  #   --brew  merge Homebrew/brew into Linuxbrew/brew
-  #   --core  merge Homebrew/homebrew-core into Linuxbrew/homebrew-core
-  #   --dupes merge Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes
-  #   --science merge Homebrew/homebrew-science into Linuxbrew/homebrew-science
-  #
+  def editor
+    return @editor if @editor
+    @editor = [which_editor]
+    @editor += ["-f", "+/^<<<<"] if editor[0] == "gvim"
+  end
+
+  def git
+    @git ||= Utils.git_path
+  end
+
   def git_merge(fast_forward: false)
-    git = Utils.git_path
     remotes = Utils.popen_read(git, "remote").split
     odie "Please add a remote with the name 'homebrew' in #{Dir.pwd}" unless remotes.include? "homebrew"
     odie "Please add a remote with the name 'origin' in #{Dir.pwd}" unless remotes.include? "origin"
@@ -27,7 +38,19 @@ module Homebrew
     safe_system git, "checkout", "master"
     args = []
     args << "--ff-only" if fast_forward
-    safe_system git, "merge", *args, "homebrew/master", "-m", "Merge branch homebrew/master into linuxbrew/master"
+    system git, "merge", *args, "homebrew/master", "-m", "Merge branch homebrew/master into linuxbrew/master"
+  end
+
+  def resolve_conflicts
+    conflicts = Utils.popen_read(git, "diff", "--name-only", "--diff-filter=U").split
+    return conflicts if conflicts.empty?
+    oh1 "Conflicts"
+    puts conflicts.join(" ")
+    safe_system *editor, *conflicts
+    safe_system HOMEBREW_BREW_FILE, "style", *conflicts
+    safe_system git, "diff", "--check"
+    safe_system git, "add", "--", *conflicts
+    conflicts
   end
 
   def merge_brew
@@ -37,7 +60,23 @@ module Homebrew
 
   def merge_core
     oh1 "Merging Homebrew/homebrew-core into Linuxbrew/homebrew-core"
-    cd(CoreTap.instance.path) { git_merge }
+    cd(CoreTap.instance.path) do
+      git_merge
+      conflict_files = resolve_conflicts
+      next if conflict_files.empty?
+      safe_system git, "commit"
+      conflict_files = "Formula/closure-compiler.rb Formula/crystal-lang.rb Formula/ffmpeg.rb Formula/git-lfs.rb Formula/harfbuzz.rb Formula/imagemagick.rb Formula/jasper.rb Formula/jemalloc.rb Formula/libcue.rb Formula/neofetch.rb Formula/node.rb Formula/shared-mime-info.rb Formula/td.rb Formula/vala.rb Formula/vim.rb".split
+      conflicts = conflict_files.map { |s| s.gsub(%r{^Formula/|\.rb$}, "") }
+      message =
+        "Update bottles for merge #{Date.today}\n\n" +
+        conflicts.map { |s| "+ [ ] #{s}\n" }.join
+      Tempfile.open("merge-homebrew-message", HOMEBREW_TEMP) do |f|
+        f.write message
+        f.close
+        safe_system "hub", "issue", "create", "-l", "merge", "-f", f.path
+      end
+      puts "Now run:\n  git push origin\n  brew build-bottle-pr #{conflicts.join(" ")}"
+    end
   end
 
   def merge_dupes
@@ -49,10 +88,6 @@ module Homebrew
     oh1 "Merging Homebrew/homebrew-science into Linuxbrew/homebrew-science"
     cd Tap.fetch("homebrew/science").path
 
-    editor = [which_editor]
-    editor += ["-f", "+/^<<<<"] if editor[0] == "gvim"
-
-    git = Utils.git_path
     safe_system git, "fetch", "homebrew"
     safe_system git, "pull", "--ff-only", "origin"
     files = Utils.popen_read(git, "diff", "--name-only", "homebrew/master").split
@@ -79,15 +114,12 @@ module Homebrew
     urls.each do |url|
       system HOMEBREW_BREW_FILE, "pull", "--bottle", "--resolve", url
       while Utils.popen_read(git, "status").include? "You are in the middle of an am session."
-        conflicts = Utils.popen_read(git, "diff", "--name-only", "--diff-filter=U").split
+        conflicts = resolve_conflicts
         if conflicts.empty?
           opoo "Skipping empty patch"
           safe_system git, "am", "--skip"
           next
         end
-        oh1 "Conflicts: #{conflicts.join(" ")}"
-        safe_system *editor, *conflicts
-        safe_system git, "add", *conflicts
         system git, "am", "--continue"
       end
       safe_system git, "checkout", "-B", "master"
