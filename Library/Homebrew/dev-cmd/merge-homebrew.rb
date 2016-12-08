@@ -65,7 +65,6 @@ module Homebrew
       conflict_files = resolve_conflicts
       next if conflict_files.empty?
       safe_system git, "commit"
-      conflict_files = "Formula/closure-compiler.rb Formula/crystal-lang.rb Formula/ffmpeg.rb Formula/git-lfs.rb Formula/harfbuzz.rb Formula/imagemagick.rb Formula/jasper.rb Formula/jemalloc.rb Formula/libcue.rb Formula/neofetch.rb Formula/node.rb Formula/shared-mime-info.rb Formula/td.rb Formula/vala.rb Formula/vim.rb".split
       conflicts = conflict_files.map { |s| s.gsub(%r{^Formula/|\.rb$}, "") }
       message =
         "Update bottles for merge #{Date.today}\n\n" +
