@@ -1,16 +1,14 @@
-$:.unshift File.expand_path("../..", __FILE__)
-$:.unshift File.expand_path("../support/lib", __FILE__)
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/test/support/lib"))
 
 require "simplecov" if ENV["HOMEBREW_TESTS_COVERAGE"]
 require "global"
 require "formulary"
 
-# Test environment setup
-(HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-core/Formula").mkpath
-%w[cache formula_cache locks cellar logs temp].each { |d| HOMEBREW_PREFIX.parent.join(d).mkpath }
-
 begin
   require "minitest/autorun"
+  require "minitest/reporters"
+  Minitest::Reporters.use! Minitest::Reporters::DefaultReporter.new(color: true)
   require "parallel_tests/test/runtime_logger"
   require "mocha/setup"
 rescue LoadError
