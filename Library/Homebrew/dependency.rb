@@ -43,8 +43,12 @@ class Dependency
   end
 
   def missing_options(inherited_options)
-    required = options | inherited_options
-    required - Tab.for_formula(to_formula).used_options
+    formula = to_formula
+    required = options
+    required |= inherited_options
+    required &= formula.options.to_a
+    required -= Tab.for_formula(formula).used_options
+    required
   end
 
   def modify_build_environment

@@ -236,8 +236,7 @@ class FormulaInstaller
 
     @@attempted << formula
 
-    pour_bottle = pour_bottle?(warn: true)
-    if pour_bottle
+    if pour_bottle?(warn: true)
       begin
         pour
       rescue Exception => e
@@ -251,18 +250,17 @@ class FormulaInstaller
         onoe e.message
         opoo "Bottle installation failed: building from source."
         raise BuildToolsError, [formula] unless DevelopmentTools.installed?
+        compute_and_install_dependencies unless skip_deps_check?
       else
-        puts_requirement_messages
         @poured_bottle = true
       end
     end
 
+    puts_requirement_messages
+
     build_bottle_preinstall if build_bottle?
 
     unless @poured_bottle
-      not_pouring = !pour_bottle || @pour_failed
-      compute_and_install_dependencies if not_pouring && !ignore_deps?
-      puts_requirement_messages
       build
       clean
 
@@ -467,6 +465,7 @@ class FormulaInstaller
 
     fi = DependencyInstaller.new(df)
     fi.options           |= tab.used_options
+    fi.options           |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
     fi.options           |= inherited_options
     fi.options           &= df.options
     fi.build_from_source  = ARGV.build_formula_from_source?(df)
