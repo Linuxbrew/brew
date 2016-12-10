@@ -20,18 +20,14 @@ module Homebrew
   end
 
   def reinstall_formula(f)
-    options = BuildOptions.new(Options.create(ARGV.flags_only), f.options).used_options
-    options |= f.build.used_options
-    options &= f.options
-
-    notice  = "Reinstalling #{f.full_name}"
-    notice += " with #{options * ", "}" unless options.empty?
-    oh1 notice
-
     if f.opt_prefix.directory?
       keg = Keg.new(f.opt_prefix.resolved_path)
       backup keg
     end
+
+    options = BuildOptions.new(Options.create(ARGV.flags_only), f.options).used_options
+    options |= f.build.used_options
+    options &= f.options
 
     fi = FormulaInstaller.new(f)
     fi.options             = options
@@ -43,6 +39,9 @@ module Homebrew
     fi.verbose             = ARGV.verbose?
     fi.debug               = ARGV.debug?
     fi.prelude
+
+    oh1 "Reinstalling #{f.full_name} #{options.to_a.join " "}"
+
     fi.install
     fi.finish
   rescue FormulaInstallationAlreadyAttemptedError

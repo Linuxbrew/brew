@@ -219,16 +219,16 @@ class FormulaInstaller
       opoo "#{formula.full_name}: this formula has no #{option} option so it will be ignored!"
     end
 
-    oh1 "Installing #{Formatter.identifier(formula.full_name)}" if show_header?
+    options = []
+    if formula.head?
+      options << "--HEAD"
+    elsif formula.devel?
+      options << "--devel"
+    end
+    options += effective_build_options_for(formula).used_options.to_a
+    oh1 "Installing #{Formatter.identifier(formula.full_name)} #{options.join " "}" if show_header?
 
     if formula.tap && !formula.tap.private?
-      options = []
-      if formula.head?
-        options << "--HEAD"
-      elsif formula.devel?
-        options << "--devel"
-      end
-      options += effective_build_options_for(formula).used_options.to_a
       category = "install"
       action = ([formula.full_name] + options).join(" ")
       Utils::Analytics.report_event(category, action)
