@@ -56,7 +56,9 @@ end
 
 class FormulaSpecificationError < StandardError; end
 
-class MethodDeprecatedError < StandardError; end
+class MethodDeprecatedError < StandardError
+  attr_accessor :issues_url
+end
 
 class FormulaUnavailableError < RuntimeError
   attr_reader :name
