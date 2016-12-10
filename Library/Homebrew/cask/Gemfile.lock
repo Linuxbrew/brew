@@ -14,36 +14,26 @@ GEM
   specs:
     ansi (1.5.0)
     builder (3.2.2)
-    byebug (9.0.6)
-    codecov (0.1.6)
+    codecov (0.1.9)
       json
       simplecov
       url
-    coderay (1.1.1)
     diff-lcs (1.2.5)
     docile (1.1.5)
     json (2.0.2)
     metaclass (0.0.4)
-    method_source (0.8.2)
-    minitest (5.9.1)
-    minitest-reporters (1.1.12)
+    minitest (5.10.1)
+    minitest-reporters (1.1.13)
       ansi
       builder
       minitest (>= 5.0)
       ruby-progressbar
     mocha (1.2.1)
       metaclass (~> 0.0.1)
-    parallel (1.9.0)
+    parallel (1.10.0)
     parallel_tests (2.10.0)
       parallel
-    pry (0.10.4)
-      coderay (~> 1.1.0)
-      method_source (~> 0.8.1)
-      slop (~> 3.4)
-    pry-byebug (3.4.0)
-      byebug (~> 9.0)
-      pry (~> 0.10)
-    rake (11.3.0)
+    rake (12.0.0)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
       rspec-expectations (~> 3.5.0)
@@ -64,7 +54,6 @@ GEM
       rspec (>= 3, < 4)
     ruby-progressbar (1.8.1)
     simplecov-html (0.10.0)
-    slop (3.6.0)
     url (0.3.2)
 
 PLATFORMS
@@ -76,8 +65,6 @@ DEPENDENCIES
   minitest-reporters
   mocha (~> 1.1)
   parallel_tests
-  pry
-  pry-byebug
   rake
   rspec (~> 3.5)
   rspec-its
