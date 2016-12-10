@@ -276,6 +276,7 @@ class Formulary
       end
     end
     f.build = tab
+    f.build.used_options = Tab.remap_deprecated_options(f.deprecated_options, tab.used_options).as_flags
     f.version.update_commit(keg.version.version.commit) if f.head? && keg.version.head?
     f
   end
