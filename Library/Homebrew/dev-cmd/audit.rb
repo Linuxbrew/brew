@@ -1490,10 +1490,20 @@ class ResourceAuditor
 
     return unless @online
     urls.each do |url|
-      begin
-        nostdout { curl "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", url }
-      rescue ErrorDuringExecution
-        problem "The mirror #{url} is not reachable (curl exit code #{$?.exitstatus})"
+      if url.start_with? "http", "ftp"
+        status_code, _, _ = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
+                                        "--write-out", "%{http_code}", url
+        unless status_code.start_with? "20"
+          problem "The mirror #{url} is not reachable (HTTP status code #{status_code})"
+        end
+      elsif url.start_with? "git"
+        unless Utils.git_remote_exists url
+          problem "The mirror #{url} is not a valid git URL"
+        end
+      elsif url.start_with? "svn"
+        unless Utils.svn_remote_exists url
+          problem "The mirror #{url} is not a valid svn URL"
+        end
       end
       check_insecure_mirror(url) if url.start_with? "http:"
     end

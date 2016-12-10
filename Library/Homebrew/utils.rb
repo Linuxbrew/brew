@@ -10,6 +10,7 @@ require "utils/github"
 require "utils/hash"
 require "utils/inreplace"
 require "utils/popen"
+require "utils/svn"
 require "utils/tty"
 require "time"
 
