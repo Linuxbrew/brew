@@ -151,6 +151,11 @@ class Formulary
       FileUtils.rm_f(path)
       curl url, "-o", path
       super
+    rescue MethodDeprecatedError => e
+      if url =~ %r{github.com/([\w-]+)/homebrew-([\w-]+)/}
+        e.issues_url = "https://github.com/#{$1}/homebrew-#{$2}/issues/new"
+      end
+      raise
     end
   end
 
@@ -201,6 +206,13 @@ class Formulary
       super
     rescue FormulaUnavailableError => e
       raise TapFormulaUnavailableError.new(tap, name), "", e.backtrace
+    end
+
+    def load_file
+      super
+    rescue MethodDeprecatedError => e
+      e.issues_url = formula.tap.issues_url || formula.tap.to_s
+      raise
     end
   end
 

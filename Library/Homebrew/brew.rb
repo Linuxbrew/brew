@@ -138,6 +138,14 @@ rescue RuntimeError, SystemCallError => e
   onoe e
   $stderr.puts e.backtrace if ARGV.debug?
   exit 1
+rescue MethodDeprecatedError => e
+  Utils::Analytics.report_exception(e)
+  onoe e
+  if e.issues_url
+    $stderr.puts "If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):"
+    $stderr.puts "  #{Formatter.url(e.issues_url)}"
+  end
+  exit 1
 rescue Exception => e
   Utils::Analytics.report_exception(e)
   onoe e
