@@ -63,7 +63,9 @@ module Utils
 
       def report_exception(exception, options = {})
         if exception.is_a?(BuildError) &&
-           exception.formula.tap && !exception.formula.tap.private?
+           exception.formula.tap &&
+           exception.formula.tap.installed? &&
+           !exception.formula.tap.private?
           report_event("BuildError", exception.formula.full_name)
         end
 
