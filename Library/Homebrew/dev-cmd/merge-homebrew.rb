@@ -110,30 +110,33 @@ module Homebrew
 
     urls = issues.map { |n| "https://github.com/Homebrew/homebrew-science/pull/#{n}" }
     puts "Updating bottles: #{files.join(" ")}", "Pull requests: #{issues.join(" ")}", urls
-    urls.each do |url|
+    bottle_commits = urls.flat_map do |url|
+      safe_system git, "checkout", "-B", "master", "origin/master"
       system HOMEBREW_BREW_FILE, "pull", "--bottle", "--resolve", url
       while Utils.popen_read(git, "status").include? "You are in the middle of an am session."
         conflicts = resolve_conflicts
         if conflicts.empty?
           opoo "Skipping empty patch"
-          safe_system git, "am", "--skip"
+          system git, "am", "--skip"
           next
         end
         system git, "am", "--continue"
       end
-      safe_system git, "checkout", "-B", "master"
+      logs = Utils.popen_read(git, "log", "--oneline", "origin/master..").split("\n")
+      commits = logs.map do |s|
+        s[/^([0-9a-f]+) .+: (add|update) .+ bottle for Linuxbrew\.$/, 1]
+      end.compact
+      puts "Bottle commits: #{commits.join(" ")}"
+      commits
     end
 
-    system git, "rebase", "homebrew/master"
-    until (conflicts = Utils.popen_read(git, "diff", "--name-only", "--diff-filter=U").split).empty?
-      oh1 "Conflicts: #{conflicts.join(" ")}"
-      safe_system *editor, *conflicts
-      safe_system git, "add", *conflicts
-      system git, "rebase", "--continue"
-    end
+    puts "Updated bottle commits: #{bottle_commits.join(" ")}"
+    safe_system git, "checkout", "-B", "master", "homebrew/master"
+    system git, "cherry-pick", *bottle_commits
+    system git, "cherry-pick", "--continue" until resolve_conflicts.empty?
 
-    safe_system git, "log", "--oneline", "--decorate=short", "homebrew/master..master"
     safe_system git, "diff", "homebrew/master..master"
+    safe_system git, "log", "--oneline", "--decorate=short", "homebrew/master..master"
     oh1 "Done"
     puts "Now run:\n  git push homebrew && git push origin"
   end
