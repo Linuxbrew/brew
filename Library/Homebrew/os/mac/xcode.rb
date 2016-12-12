@@ -15,13 +15,13 @@ module OS
         when "10.8"  then "5.1.1"
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
-        when "10.11" then "8.1"
-        when "10.12" then "8.1"
+        when "10.11" then "8.2"
+        when "10.12" then "8.2"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "8.1"
+          "8.2"
         end
       end
 
@@ -37,8 +37,8 @@ module OS
       end
 
       def prerelease?
-        # TODO: bump to version >= "8.3" after Xcode 8.2 is stable.
-        Version.new(version) >= "8.2"
+        # TODO: bump to version >= "8.4" after Xcode 8.3 is stable.
+        Version.new(version) >= "8.3"
       end
 
       def outdated?
