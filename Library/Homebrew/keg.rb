@@ -297,10 +297,19 @@ class Keg
   def completion_installed?(shell)
     dir = case shell
     when :bash then path.join("etc", "bash_completion.d")
-    when :zsh  then path.join("share", "zsh", "site-functions")
+    when :zsh
+      dir = path.join("share", "zsh", "site-functions")
+      dir if dir && dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
     when :fish then path.join("share", "fish", "vendor_completions.d")
     end
     dir && dir.directory? && !dir.children.empty?
+  end
+
+  def zsh_functions_installed?
+    # Check for non completion functions (i.e. files not started with an underscore),
+    # since those can be checked separately
+    dir = path.join("share", "zsh", "site-functions")
+    dir && dir.directory? && dir.children.any? { |f| !f.basename.to_s.start_with?("_") }
   end
 
   def fish_functions_installed?

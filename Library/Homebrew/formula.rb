@@ -800,6 +800,14 @@ class Formula
     HOMEBREW_PREFIX+"var"
   end
 
+  # The directory where the formula's ZSH function files should be
+  # installed.
+  # This is symlinked into `HOMEBREW_PREFIX` after installation or with
+  # `brew link` for formulae that are not keg-only.
+  def zsh_function
+    share+"zsh/site-functions"
+  end
+
   # The directory where the formula's fish function files should be
   # installed.
   # This is symlinked into `HOMEBREW_PREFIX` after installation or with
