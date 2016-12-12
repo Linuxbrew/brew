@@ -651,12 +651,19 @@ class FormulaTests < Homebrew::TestCase
 
     f4 = formula("f4") do
       url "f4-1.0"
-      depends_on "f3"
+      depends_on "f1"
+    end
+    stub_formula_loader f4
+
+    f5 = formula("f5") do
+      url "f5-1.0"
+      depends_on "f3" => :build
+      depends_on "f4"
     end
 
-    assert_equal %w[f3], f4.deps.map(&:name)
-    assert_equal %w[f1 f2 f3], f4.recursive_dependencies.map(&:name)
-    assert_equal %w[f2 f3], f4.runtime_dependencies.map(&:name)
+    assert_equal %w[f3 f4], f5.deps.map(&:name)
+    assert_equal %w[f1 f2 f3 f4], f5.recursive_dependencies.map(&:name)
+    assert_equal %w[f1 f4], f5.runtime_dependencies.map(&:name)
   end
 
   def test_to_hash
