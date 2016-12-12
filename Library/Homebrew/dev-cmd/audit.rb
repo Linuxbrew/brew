@@ -1491,8 +1491,8 @@ class ResourceAuditor
     return unless @online
     urls.each do |url|
       if url.start_with? "http", "ftp"
-        status_code, _, _ = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
-                                        "--write-out", "%{http_code}", url
+        status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
+                                   "--write-out", "%{http_code}", url
         unless status_code.start_with? "20"
           problem "The URL #{url} is not reachable (HTTP status code #{status_code})"
         end
