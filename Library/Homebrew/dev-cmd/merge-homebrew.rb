@@ -88,7 +88,7 @@ module Homebrew
     cd Tap.fetch("homebrew/science").path
 
     safe_system git, "fetch", "homebrew"
-    safe_system git, "pull", "--ff-only", "linuxbrew"
+    safe_system git, "pull", "--ff-only", "linuxbrew", "master"
     files = Utils.popen_read(git, "diff", "--name-only", "homebrew/master").split
     return if files.empty?
 
@@ -129,9 +129,15 @@ module Homebrew
       puts "Bottle commits: #{commits.join(" ")}"
       commits
     end
+    safe_system git, "checkout", "-B", "master", "homebrew/master"
+
+    if bottle_commits.empty?
+      oh1 "No bottles to update"
+      puts "Now run:\n  git push homebrew && git push linuxbrew"
+      return
+    end
 
     puts "Updated bottle commits: #{bottle_commits.join(" ")}"
-    safe_system git, "checkout", "-B", "master", "homebrew/master"
     system git, "cherry-pick", *bottle_commits
     system git, "cherry-pick", "--continue" until resolve_conflicts.empty?
 
