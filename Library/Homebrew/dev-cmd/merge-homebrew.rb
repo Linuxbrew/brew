@@ -88,7 +88,7 @@ module Homebrew
     cd Tap.fetch("homebrew/science").path
 
     safe_system git, "fetch", "homebrew"
-    safe_system git, "pull", "--ff-only", "origin"
+    safe_system git, "pull", "--ff-only", "linuxbrew"
     files = Utils.popen_read(git, "diff", "--name-only", "homebrew/master").split
     return if files.empty?
 
@@ -98,20 +98,20 @@ module Homebrew
       !File.read(filename)[/bottle :(disabled|unneeded)/]
     end
     unless files.empty?
-      log = Utils.popen_read(git, "log", "origin/master..homebrew/master", "--", *files)
+      log = Utils.popen_read(git, "log", "linuxbrew/master..homebrew/master", "--", *files)
       issues = log.scan(/^    Closes #([0-9]*)\.$/).flatten.reverse
     end
     if issues.nil? || issues.empty?
       git_merge fast_forward: true
       oh1 "No bottles to update"
-      puts "Now run:\n  git push homebrew && git push origin"
+      puts "Now run:\n  git push homebrew && git push linuxbrew"
       return
     end
 
     urls = issues.map { |n| "https://github.com/Homebrew/homebrew-science/pull/#{n}" }
     puts "Updating bottles: #{files.join(" ")}", "Pull requests: #{issues.join(" ")}", urls
     bottle_commits = urls.flat_map do |url|
-      safe_system git, "checkout", "-B", "master", "origin/master"
+      safe_system git, "checkout", "-B", "master", "linuxbrew/master"
       system HOMEBREW_BREW_FILE, "pull", "--bottle", "--resolve", url
       while Utils.popen_read(git, "status").include? "You are in the middle of an am session."
         conflicts = resolve_conflicts
@@ -122,7 +122,7 @@ module Homebrew
         end
         system git, "am", "--continue"
       end
-      logs = Utils.popen_read(git, "log", "--oneline", "origin/master..").split("\n")
+      logs = Utils.popen_read(git, "log", "--oneline", "linuxbrew/master..").split("\n")
       commits = logs.map do |s|
         s[/^([0-9a-f]+) .+: (add|update) .+ bottle for Linuxbrew\.$/, 1]
       end.compact
