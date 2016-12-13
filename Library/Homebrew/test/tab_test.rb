@@ -105,7 +105,7 @@ class TabTests < Homebrew::TestCase
   def test_from_file
     path = Pathname.new("#{TEST_FIXTURE_DIR}/receipt.json")
     tab = Tab.from_file(path)
-    source_path = "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb"
+    source_path = "/usr/local/Library/Taps/homebrew/homebrew-core/Formula/foo.rb"
     runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
     changed_files = %w[INSTALL_RECEIPT.json bin/foo]
 
