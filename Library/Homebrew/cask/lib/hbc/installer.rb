@@ -54,8 +54,27 @@ module Hbc
       output
     end
 
+    def fetch
+      odebug "Hbc::Installer#fetch"
+
+      satisfy_dependencies
+      verify_has_sha if @require_sha && !@force
+      download
+      verify
+    end
+
+    def stage
+      odebug "Hbc::Installer#stage"
+
+      extract_primary_container
+      save_caskfile
+    rescue StandardError => e
+      purge_versioned_files
+      raise e
+    end
+
     def install
-      odebug "Hbc::Installer.install"
+      odebug "Hbc::Installer#install"
 
       if @cask.installed? && !force
         raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
@@ -63,37 +82,23 @@ module Hbc
       end
 
       print_caveats
-
-      begin
-        satisfy_dependencies
-        verify_has_sha if @require_sha && !@force
-        download
-        verify
-        extract_primary_container
-        install_artifacts
-        save_caskfile
-        enable_accessibility_access
-      rescue StandardError => e
-        purge_versioned_files
-        raise e
-      end
+      fetch
+      stage
+      install_artifacts
+      enable_accessibility_access
 
       puts summary
     end
 
     def summary
-      s = if MacOS.version >= :lion && !ENV["HOMEBREW_NO_EMOJI"]
-        (ENV["HOMEBREW_INSTALL_BADGE"] || "\xf0\x9f\x8d\xba") + "  "
-      else
-        Formatter.headline("Success! ", color: :blue)
-      end
+      s = ""
+      s << "#{Emoji.install_badge}  " if Emoji.enabled?
       s << "#{@cask} was successfully installed!"
     end
 
     def download
       odebug "Downloading"
-      download = Download.new(@cask, force: false)
-      @downloaded_path = download.perform
+      @downloaded_path = Download.new(@cask, force: false).perform
       odebug "Downloaded to -> #{@downloaded_path}"
       @downloaded_path
     end
@@ -110,27 +115,45 @@ module Hbc
 
     def extract_primary_container
       odebug "Extracting primary container"
+
       FileUtils.mkdir_p @cask.staged_path
       container = if @cask.container && @cask.container.type
         Container.from_type(@cask.container.type)
       else
         Container.for_path(@downloaded_path, @command)
       end
+
       unless container
         raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'"
       end
+
       odebug "Using container class #{container} for #{@downloaded_path}"
       container.new(@cask, @downloaded_path, @command).extract
     end
 
     def install_artifacts
+      already_installed_artifacts = []
+      options = { command: @command, force: force }
+
       odebug "Installing artifacts"
       artifacts = Artifact.for_cask(@cask)
       odebug "#{artifacts.length} artifact/s defined", artifacts
+
       artifacts.each do |artifact|
         odebug "Installing artifact of class #{artifact}"
-        options = { command: @command, force: force }
+        already_installed_artifacts.unshift(artifact)
         artifact.new(@cask, options).install_phase
+      end
+    rescue StandardError => e
+      begin
+        ofail e.message
+        already_installed_artifacts.each do |artifact|
+          odebug "Reverting installation of artifact of class #{artifact}"
+          artifact.new(@cask, options).uninstall_phase
+        end
+      ensure
+        purge_versioned_files
+        raise e.class, "An error occured during installation of Cask #{@cask}: #{e.message}"
       end
     end
 
@@ -179,7 +202,7 @@ module Hbc
 
     def x11_dependencies
       return unless @cask.depends_on.x11
-      raise CaskX11DependencyError, @cask.token if Hbc.x11_libpng.select(&:exist?).empty?
+      raise CaskX11DependencyError, @cask.token unless MacOS::X11.installed?
     end
 
     def formula_dependencies
@@ -248,6 +271,9 @@ module Hbc
           See System Preferences to enable it manually.
         EOS
       end
+    rescue StandardError => e
+      purge_versioned_files
+      raise e
     end
 
     def disable_accessibility_access
@@ -282,7 +308,7 @@ module Hbc
     end
 
     def uninstall
-      odebug "Hbc::Installer.uninstall"
+      odebug "Hbc::Installer#uninstall"
       disable_accessibility_access
       uninstall_artifacts
       purge_versioned_files

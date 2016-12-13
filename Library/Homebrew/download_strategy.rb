@@ -832,7 +832,12 @@ class GitHubGitDownloadStrategy < GitDownloadStrategy
     else
       return true unless commit
       return true unless @last_commit.start_with?(commit)
-      multiple_short_commits_exist?(commit)
+      if multiple_short_commits_exist?(commit)
+        true
+      else
+        version.update_commit(commit)
+        false
+      end
     end
   end
 end

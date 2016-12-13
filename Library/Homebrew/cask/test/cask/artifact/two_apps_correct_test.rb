@@ -64,10 +64,13 @@ describe Hbc::Artifact::App do
       it "when the first app of two already exists" do
         target_path_mini.mkpath
 
-        install_phase.must_output <<-EOS.undent
-          ==> It seems there is already an App at '#{target_path_mini}'; not moving.
-          ==> Moving App 'Caffeine Pro.app' to '#{target_path_pro}'
-        EOS
+        err = assert_raises Hbc::CaskError do
+          install_phase.must_output <<-EOS.undent
+            ==> Moving App 'Caffeine Pro.app' to '#{target_path_pro}'
+          EOS
+        end
+
+        err.message.must_equal("It seems there is already an App at '#{target_path_mini}'.")
 
         source_path_mini.must_be :directory?
         target_path_mini.must_be :directory?
@@ -77,10 +80,13 @@ describe Hbc::Artifact::App do
       it "when the second app of two already exists" do
         target_path_pro.mkpath
 
-        install_phase.must_output <<-EOS.undent
-          ==> Moving App 'Caffeine Mini.app' to '#{target_path_mini}'
-          ==> It seems there is already an App at '#{target_path_pro}'; not moving.
-        EOS
+        err = assert_raises Hbc::CaskError do
+          install_phase.must_output <<-EOS.undent
+            ==> Moving App 'Caffeine Mini.app' to '#{target_path_mini}'
+          EOS
+        end
+
+        err.message.must_equal("It seems there is already an App at '#{target_path_pro}'.")
 
         source_path_pro.must_be :directory?
         target_path_pro.must_be :directory?

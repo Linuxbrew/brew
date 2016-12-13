@@ -58,7 +58,7 @@ point it to the downloaded archive in order to avoid loading.
 ### We don’t like binary formulae
 Our policy is that formulae in the core repository
 ([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be open-source
-and either built from source or produce cross-platform binaries like e.g. Java).
+and either built from source or produce cross-platform binaries (like e.g. Java).
 Binary-only formulae should go to
 [Homebrew Cask](https://github.com/caskroom/homebrew-cask).
 
