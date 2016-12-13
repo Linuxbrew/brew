@@ -212,7 +212,7 @@ module Homebrew
         else
           bottle_branch = "pull-bottle-#{issue}"
           testbot = tap.linux? ? "LinuxbrewTestBot" : "BrewTestBot"
-          "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{issue}"
+          "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
         curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
