@@ -173,6 +173,8 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
+    # TODO: deprecate this in future.
+    # odeprecated "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
 
