@@ -50,6 +50,10 @@ module Homebrew
       odie "This command requires at least one argument containing a URL or pull request number"
     end
 
+    if ARGV.include?("--linux")
+      ENV["HOMEBREW_BOTTLE_DOMAIN"] ||= BottleSpecification::DEFAULT_DOMAIN_LINUX
+    end
+
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
     # Formulae with affected bottles that were published
@@ -211,7 +215,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          testbot = tap.linux? ? "LinuxbrewTestBot" : "BrewTestBot"
+          testbot = ARGV.include?("--linux") || tap.linux? ? "LinuxbrewTestBot" : "BrewTestBot"
           "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
@@ -416,7 +420,7 @@ module Homebrew
 
   # Publishes the current bottle files for a given formula to Bintray
   def publish_bottle_file_on_bintray(f, creds)
-    bintray_project = f.tap.linux? ? "linuxbrew" : "homebrew"
+    bintray_project = ARGV.include?("--linux") || f.tap.linux? ? "linuxbrew" : "homebrew"
     repo = Utils::Bottles::Bintray.repository(f.tap)
     package = Utils::Bottles::Bintray.package(f.name)
     info = FormulaInfoFromJson.lookup(f.name)
@@ -529,7 +533,7 @@ module Homebrew
           next
         end
         bottle_info = jinfo.bottle_info(
-          if f.tap.linux? && jinfo.bottle_tags.include?("x86_64_linux")
+          if (ARGV.include?("--linux") || f.tap.linux?) && jinfo.bottle_tags.include?("x86_64_linux")
             "x86_64_linux"
           else
             jinfo.bottle_tags.first
