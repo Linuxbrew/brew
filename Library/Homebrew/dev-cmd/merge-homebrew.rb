@@ -112,7 +112,7 @@ module Homebrew
     puts "Updating bottles: #{files.join(" ")}", "Pull requests: #{issues.join(" ")}", urls
     bottle_commits = urls.flat_map do |url|
       safe_system git, "checkout", "-B", "master", "linuxbrew/master"
-      system HOMEBREW_BREW_FILE, "pull", "--bottle", "--resolve", url
+      system HOMEBREW_BREW_FILE, "pull", "--bottle", "--linux", "--resolve", url
       while Utils.popen_read(git, "status").include? "You are in the middle of an am session."
         conflicts = resolve_conflicts
         if conflicts.empty?
