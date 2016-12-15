@@ -564,11 +564,10 @@ class FormulaAuditor
     end
 
     return unless @online
-    begin
-      nostdout { curl "--connect-timeout", "15", "-o", "/dev/null", homepage }
-    rescue ErrorDuringExecution
-      problem "The homepage is not reachable (curl exit code #{$?.exitstatus})"
-    end
+    status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
+                                   "--write-out", "%{http_code}", homepage
+    return if status_code.start_with? "20"
+    problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end
 
   def audit_bottle_spec
