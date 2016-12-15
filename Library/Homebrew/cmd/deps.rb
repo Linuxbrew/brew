@@ -145,7 +145,7 @@ module Homebrew
       chr = i == max ? "└──" : "├──"
       puts prefix + "#{chr} :#{req.to_dependency.name}"
     end
-    deps = f.deps.default
+    deps = f.deps.default.uniq
     max = deps.length - 1
     deps.each_with_index do |dep, i|
       chr = i == max ? "└──" : "├──"
