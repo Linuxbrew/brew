@@ -146,14 +146,13 @@ module Hbc
       end
     rescue StandardError => e
       begin
-        ofail e.message
         already_installed_artifacts.each do |artifact|
           odebug "Reverting installation of artifact of class #{artifact}"
           artifact.new(@cask, options).uninstall_phase
         end
       ensure
         purge_versioned_files
-        raise e.class, "An error occured during installation of Cask #{@cask}: #{e.message}"
+        raise e
       end
     end
 
