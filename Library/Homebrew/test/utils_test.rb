@@ -216,7 +216,7 @@ class UtilTests < Homebrew::TestCase
     e = assert_raises(MethodDeprecatedError) do
       odeprecated("method", "replacement",
         caller: ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],
-        die: true)
+        disable: true)
     end
     assert_match "method", e.message
     assert_match "replacement", e.message
