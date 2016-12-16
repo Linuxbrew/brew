@@ -19,7 +19,7 @@ require "hbc/cli/reinstall"
 require "hbc/cli/search"
 require "hbc/cli/style"
 require "hbc/cli/uninstall"
-require "hbc/cli/update"
+require "compat/hbc/cli/update"
 require "hbc/cli/zap"
 
 require "hbc/cli/internal_use_base"
