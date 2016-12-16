@@ -25,7 +25,7 @@
     }
   ],
   "source": {
-      "path": "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb",
+      "path": "/usr/local/Library/Taps/homebrew/homebrew-core/Formula/foo.rb",
       "tap": "homebrew/core",
       "spec": "stable",
       "versions": {
