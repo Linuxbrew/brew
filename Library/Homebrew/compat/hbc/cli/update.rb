@@ -10,7 +10,7 @@ module Hbc
       end
 
       def self.help
-        "a synonym for 'brew update'"
+        Formatter.warning("deprecated: use `brew update` instead")
       end
     end
   end
