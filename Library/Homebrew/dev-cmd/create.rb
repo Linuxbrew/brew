@@ -119,7 +119,7 @@ class FormulaCreator
     if @version
       @version = Version.create(@version)
     else
-      @version = Pathname.new(url).version
+      @version = Version.detect(url, {})
     end
   end
 
