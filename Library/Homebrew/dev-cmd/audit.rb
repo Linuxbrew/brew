@@ -1000,6 +1000,10 @@ class FormulaAuditor
       problem "Use Language::Node for npm install args"
     end
 
+    if line.include?("fails_with :llvm")
+      problem "'fails_with :llvm' is now a no-op so should be removed"
+    end
+
     return unless @strict
 
     if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
