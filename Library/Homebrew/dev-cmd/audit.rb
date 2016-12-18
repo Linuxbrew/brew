@@ -706,7 +706,7 @@ class FormulaAuditor
     return if formula.revision.zero?
     if formula.stable
       revision_map = attributes_map[:revision][:stable]
-      stable_revisions = revision_map[formula.stable.version]
+      stable_revisions = revision_map[formula.stable.version] if revision_map
       if !stable_revisions || stable_revisions.empty?
         problem "'revision #{formula.revision}' should be removed"
       end
