@@ -421,18 +421,27 @@ class Reporter
       new_tap_name = tap.tap_migrations[name]
       next if new_tap_name.nil? # skip if not in tap_migrations list.
 
+      new_tap_user, new_tap_repo, new_tap_new_name = new_tap_name.split("/")
+      new_name = if new_tap_new_name
+        new_full_name = new_tap_new_name
+        new_tap_name = "#{new_tap_user}/#{new_tap_repo}"
+        new_tap_new_name
+      else
+        new_full_name = "#{new_tap_name}/#{name}"
+        name
+      end
+
       # This means it is a Cask
       if report[:DC].include? full_name
-        next unless (HOMEBREW_PREFIX/"Caskroom"/name).exist?
+        next unless (HOMEBREW_PREFIX/"Caskroom"/new_name).exist?
         new_tap = Tap.fetch(new_tap_name)
         new_tap.install unless new_tap.installed?
         ohai "#{name} has been moved to Homebrew.", <<-EOS.undent
           To uninstall the cask run:
             brew cask uninstall --force #{name}
         EOS
-        new_full_name = "#{new_tap_name}/#{name}"
-        next if (HOMEBREW_CELLAR/name.split("/").last).directory?
-        ohai "Installing #{name}..."
+        next if (HOMEBREW_CELLAR/new_name.split("/").last).directory?
+        ohai "Installing #{new_name}..."
         system HOMEBREW_BREW_FILE, "install", new_full_name
         begin
           unless Formulary.factory(new_full_name).keg_only?
@@ -456,13 +465,13 @@ class Reporter
           system HOMEBREW_BREW_FILE, "uninstall", "--force", name
           ohai "brew prune"
           system HOMEBREW_BREW_FILE, "prune"
-          ohai "brew cask install #{name}"
-          system HOMEBREW_BREW_FILE, "cask", "install", name
+          ohai "brew cask install #{new_name}"
+          system HOMEBREW_BREW_FILE, "cask", "install", new_name
         else
           ohai "#{name} has been moved to Homebrew-Cask.", <<-EOS.undent
             To uninstall the formula and install the cask run:
               brew uninstall --force #{name}
-              brew cask install #{name}
+              brew cask install #{new_name}
           EOS
         end
       else
