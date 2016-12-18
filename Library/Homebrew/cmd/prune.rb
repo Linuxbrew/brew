@@ -35,7 +35,7 @@ module Homebrew
               path.unlink
             end
           end
-        elsif path.directory?
+        elsif path.directory? && !Keg::PRUNEABLE_DIRECTORIES.include?(path)
           dirs << path
         end
       end
