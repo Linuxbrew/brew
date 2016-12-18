@@ -116,7 +116,7 @@ module Homebrew
 
       def check_xcode_minimum_version
         return unless MacOS::Xcode.installed?
-        return unless MacOS::Xcode.minimum_version?
+        return unless MacOS::Xcode.below_minimum_version?
 
         <<-EOS.undent
           Your Xcode (#{MacOS::Xcode.version}) is too outdated.
@@ -127,7 +127,7 @@ module Homebrew
 
       def check_clt_minimum_version
         return unless MacOS::CLT.installed?
-        return unless MacOS::CLT.minimum_version?
+        return unless MacOS::CLT.below_minimum_version?
 
         <<-EOS.undent
           Your Command Line Tools are too outdated.
