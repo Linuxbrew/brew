@@ -404,6 +404,18 @@ module Homebrew
         EOS
       end
 
+      def check_multiple_cellars
+        return if HOMEBREW_PREFIX.to_s == HOMEBREW_REPOSITORY.to_s
+        return unless (HOMEBREW_REPOSITORY/"Cellar").exist?
+        return unless (HOMEBREW_PREFIX/"Cellar").exist?
+
+        <<-EOS.undent
+          You have multiple Cellars.
+          You should delete #{HOMEBREW_REPOSITORY}/Cellar:
+            rm -rf #{HOMEBREW_REPOSITORY}/Cellar
+        EOS
+      end
+
       def check_homebrew_prefix
         return if HOMEBREW_PREFIX.to_s == "/usr/local"
 
