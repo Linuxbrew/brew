@@ -1,4 +1,4 @@
-#:  * `create` <URL> [`--autotools`|`--cmake`] [`--no-fetch`] [`--set-name` <name>] [`--set-version` <version>] [`--tap` <user>`/`<repo>]:
+#:  * `create` <URL> [`--autotools`|`--cmake`|`--meson`] [`--no-fetch`] [`--set-name` <name>] [`--set-version` <version>] [`--tap` <user>`/`<repo>]:
 #:    Generate a formula for the downloadable file at <URL> and open it in the editor.
 #:    Homebrew will attempt to automatically derive the formula name
 #:    and version, but if it fails, you'll have to make your own template. The `wget`
@@ -8,6 +8,7 @@
 #:
 #:    If `--autotools` is passed, create a basic template for an Autotools-style build.
 #:    If `--cmake` is passed, create a basic template for a CMake-style build.
+#:    If `--meson` is passed, create a basic template for a Meson-style build.
 #:
 #:    If `--no-fetch` is passed, Homebrew will not download <URL> to the cache and
 #:    will thus not add the SHA256 to the formula for you.
@@ -59,6 +60,8 @@ module Homebrew
       :cmake
     elsif ARGV.include? "--autotools"
       :autotools
+    elsif ARGV.include? "--meson"
+      :meson
     end
 
     if fc.name.nil? || fc.name.strip.empty?
@@ -175,6 +178,9 @@ class FormulaCreator
 
     <% if mode == :cmake %>
       depends_on "cmake" => :build
+    <% elsif mode == :meson %>
+      depends_on "meson" => :build
+      depends_on "ninja" => :build
     <% elsif mode.nil? %>
       # depends_on "cmake" => :build
     <% end %>
@@ -191,6 +197,13 @@ class FormulaCreator
                               "--disable-dependency-tracking",
                               "--disable-silent-rules",
                               "--prefix=\#{prefix}"
+    <% elsif mode == :meson %>
+        mkdir "build" do
+          system "meson", "--prefix=\#{prefix}", ".."
+          system "ninja"
+          system "ninja", "test"
+          system "ninja", "install"
+        end
     <% else %>
         # Remove unrecognized options if warned by configure
         system "./configure", "--disable-debug",
@@ -199,7 +212,9 @@ class FormulaCreator
                               "--prefix=\#{prefix}"
         # system "cmake", ".", *std_cmake_args
     <% end %>
+    <% if mode != :meson %>
         system "make", "install" # if this fails, try separate make/make install steps
+    <% end %>
       end
 
       test do

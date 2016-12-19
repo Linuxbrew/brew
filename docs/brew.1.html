@@ -504,7 +504,7 @@ message.</p>
 url-and-sha256 style specification into a tag-and-revision style
 specification, nor vice versa. It must use whichever style specification
 the preexisting formula already uses.</p></dd>
-<dt><code>create</code> <var>URL</var> [<code>--autotools</code>|<code>--cmake</code>] [<code>--no-fetch</code>] [<code>--set-name</code> <var>name</var>] [<code>--set-version</code> <var>version</var>] [<code>--tap</code> <var>user</var><code>/</code><var>repo</var>]</dt><dd><p>Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
+<dt><code>create</code> <var>URL</var> [<code>--autotools</code>|<code>--cmake</code>|<code>--meson</code>] [<code>--no-fetch</code>] [<code>--set-name</code> <var>name</var>] [<code>--set-version</code> <var>version</var>] [<code>--tap</code> <var>user</var><code>/</code><var>repo</var>]</dt><dd><p>Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
 Homebrew will attempt to automatically derive the formula name
 and version, but if it fails, you'll have to make your own template. The <code>wget</code>
 formula serves as a simple example. For the complete API have a look at</p>
@@ -512,7 +512,8 @@ formula serves as a simple example. For the complete API have a look at</p>
 <p><a href="http://www.rubydoc.info/github/Homebrew/brew/master/Formula" data-bare-link="true">http://www.rubydoc.info/github/Homebrew/brew/master/Formula</a></p>
 
 <p>If <code>--autotools</code> is passed, create a basic template for an Autotools-style build.
-If <code>--cmake</code> is passed, create a basic template for a CMake-style build.</p>
+If <code>--cmake</code> is passed, create a basic template for a CMake-style build.
+If <code>--meson</code> is passed, create a basic template for a Meson-style build.</p>
 
 <p>If <code>--no-fetch</code> is passed, Homebrew will not download <var>URL</var> to the cache and
 will thus not add the SHA256 to the formula for you.</p>
