@@ -1,13 +1,10 @@
-# Merge branch homebrew/master into linuxbrew/master.
-#
-# Usage:
-#    brew merge-homebrew
-#
-# Options:
-#   --brew  merge Homebrew/brew into Linuxbrew/brew
-#   --core  merge Homebrew/homebrew-core into Linuxbrew/homebrew-core
-#   --dupes merge Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes
-#   --science merge Homebrew/homebrew-science into Linuxbrew/homebrew-science
+#:  * `merge-homebrew` [`--brew`|`--core`|`--dupes`|`--science`]:
+#:   Merge branch homebrew/master into linuxbrew/master.
+#:
+#:   If `--brew` is passed, merge Homebrew/brew into Linuxbrew/brew.
+#:   If `--core` is passed, merge Homebrew/homebrew-core into Linuxbrew/homebrew-core.
+#:   If `--dupes` is passed, merge Homebrew/homebrew-dupes into Linuxbrew/homebrew-dupes.
+#:   If `--science` is passed, merge Homebrew/homebrew-science into Linuxbrew/homebrew-science.
 
 require "date"
 
