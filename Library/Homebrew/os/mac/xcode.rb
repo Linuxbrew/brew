@@ -36,11 +36,6 @@ module OS
         version < minimum_version
       end
 
-      def prerelease?
-        # TODO: bump to version >= "8.4" after Xcode 8.3 is stable.
-        Version.new(version) >= "8.3"
-      end
-
       def outdated?
         Version.new(version) < latest_version
       end
