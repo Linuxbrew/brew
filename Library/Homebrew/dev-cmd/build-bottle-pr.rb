@@ -1,14 +1,14 @@
-module Homebrew
-  # Submit a pull request to build a bottle for a formula.
-  # Usage:
-  #    brew build-bottle-pr formula ...
-  # Options:
-  #    --remote=$USER      Specify the GitHub remote
-  #    --tag=x86_64_linux  Specify the bottle tag
-  #    --limit=10          Maximum number of PRs
-  #    --dry-run           Do a dry run
-  #    --verbose           Print extra information
+#:  * `build-bottle-pr` [`--remote=<user>`] [`--tag=<tag>`] [`--limit=<num>`] [`--dry-run`] [`--verbose`]:
+#:    Submit a pull request to build a bottle for a formula.
+#:
+#:    If `--remote` is passed, use the specified GitHub remote.
+#:      Otherwise, check $GITHUB_USER followed by $USER.
+#:    If `--tag` is passed, use the specified bottle tag. Defaults to x86_64_linux.
+#:    If `--limit` is passed, make at most the specified number of PR's at once. Defaults to 10.
+#:    If `--dry-run` is passed, do not actually make any PR's.
+#:    If `--verbose` is passed, print extra information.
 
+module Homebrew
   def open_pull_request?(formula)
     prs = GitHub.issues_matching(formula,
       type: "pr", state: "open", repo: formula.tap.slug)
