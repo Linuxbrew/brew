@@ -211,7 +211,7 @@ class Formulary
     def load_file
       super
     rescue MethodDeprecatedError => e
-      e.issues_url = formula.tap.issues_url || formula.tap.to_s
+      e.issues_url = tap.issues_url || tap.to_s
       raise
     end
   end
