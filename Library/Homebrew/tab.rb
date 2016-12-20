@@ -218,10 +218,6 @@ class Tab < OpenStruct
     include?("c++11")
   end
 
-  def build_32_bit?
-    include?("32-bit")
-  end
-
   def head?
     spec == :head
   end
