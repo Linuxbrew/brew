@@ -4,7 +4,6 @@ module Homebrew
       def development_tools_checks
         %w[
           check_for_unsupported_macos
-          check_for_prerelease_xcode
           check_for_bad_install_name_tool
           check_for_installed_developer_tools
           check_xcode_license_approved
@@ -45,21 +44,6 @@ module Homebrew
         <<-EOS.undent
           You are using macOS #{MacOS.version}.
           #{who} do not provide support for this #{what}.
-          You may encounter build failures or other breakages.
-          Please create pull-requests instead of filing issues.
-        EOS
-      end
-
-      def check_for_prerelease_xcode
-        return if ARGV.homebrew_developer?
-        # Running a pre-release Xcode on a pre-release OS is expected
-        # and likely to cause less problems than a stable Xcode will.
-        return if OS::Mac.prerelease?
-        return unless MacOS::Xcode.installed?
-        return unless MacOS::Xcode.prerelease?
-
-        <<-EOS.undent
-          You are using a pre-release version of Xcode.
           You may encounter build failures or other breakages.
           Please create pull-requests instead of filing issues.
         EOS
