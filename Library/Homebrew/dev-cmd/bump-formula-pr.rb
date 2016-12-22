@@ -156,7 +156,9 @@ module Homebrew
       replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
     end
 
-    replacement_pairs << [/(^  mirror .*\n)?/, ""] if requested_spec == :stable
+    replacement_pairs += formula_spec.mirrors.map do |mirror|
+      [/ +mirror \"#{mirror}\"\n/m, ""]
+    end
 
     replacement_pairs += if new_url_hash
       [
