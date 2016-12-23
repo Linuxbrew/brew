@@ -623,11 +623,11 @@ class FormulaAuditor
     %w[Stable Devel HEAD].each do |name|
       next unless spec = formula.send(name.downcase)
 
-      ra = ResourceAuditor.new(spec).audit
+      ra = ResourceAuditor.new(spec, online: @online).audit
       problems.concat ra.problems.map { |problem| "#{name}: #{problem}" }
 
       spec.resources.each_value do |resource|
-        ra = ResourceAuditor.new(resource).audit
+        ra = ResourceAuditor.new(resource, online: @online).audit
         problems.concat ra.problems.map { |problem|
           "#{name} resource #{resource.name.inspect}: #{problem}"
         }
@@ -1127,7 +1127,7 @@ class ResourceAuditor
   attr_reader :problems
   attr_reader :version, :checksum, :using, :specs, :url, :mirrors, :name
 
-  def initialize(resource)
+  def initialize(resource, options = {})
     @name     = resource.name
     @version  = resource.version
     @checksum = resource.checksum
@@ -1135,6 +1135,7 @@ class ResourceAuditor
     @mirrors  = resource.mirrors
     @using    = resource.using
     @specs    = resource.specs
+    @online   = options[:online]
     @problems = []
   end
 
@@ -1389,6 +1390,20 @@ class ResourceAuditor
     urls.each do |u|
       next unless u =~ %r{https?://(?:central|repo\d+)\.maven\.org/maven2/(.+)$}
       problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
+    end
+
+    return unless @online
+    urls.each do |url|
+      next unless url.start_with? "http:"
+      # Check for insecure mirrors
+      status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
+                                 "--write-out", "%{http_code}", url
+      secure_url = url.sub "http", "https"
+      secure_status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
+                                        "--write-out", "%{http_code}", secure_url
+      if status_code.start_with?("20") && secure_status_code.start_with?("20")
+        problem "The URL #{url} could use HTTPS rather than HTTP"
+      end
     end
   end
 
