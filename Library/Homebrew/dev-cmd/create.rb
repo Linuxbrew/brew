@@ -184,7 +184,6 @@ class FormulaCreator
     <% elsif mode.nil? %>
       # depends_on "cmake" => :build
     <% end %>
-      depends_on :x11 # if your formula requires any X11/XQuartz components
 
       def install
         # ENV.deparallelize  # if your formula fails when building in parallel
