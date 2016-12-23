@@ -1507,9 +1507,7 @@ class Formula
   def runtime_dependencies
     recursive_dependencies do |_dependent, dependency|
       Dependency.prune if dependency.build?
-      if dependency.optional? || dependency.recommended?
-        Dependency.prune unless build.with?(dependency)
-      end
+      Dependency.prune if !dependency.required? && build.without?(dependency)
     end
   end
 
