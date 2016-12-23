@@ -9,7 +9,10 @@ class UninstallTests < Homebrew::TestCase
       depends_on "dependency"
     end
 
-    [@dependency, @dependent].each { |f| f.installed_prefix.mkpath }
+    [@dependency, @dependent].each do |f|
+      f.installed_prefix.mkpath
+      Keg.new(f.installed_prefix).optlink
+    end
 
     tab = Tab.empty
     tab.homebrew_version = "1.1.6"
@@ -25,7 +28,10 @@ class UninstallTests < Homebrew::TestCase
 
   def teardown
     Homebrew.failed = false
-    [@dependency, @dependent].each { |f| f.rack.rmtree }
+    [@dependency, @dependent].each do |f|
+      f.installed_kegs.each(&:remove_opt_record)
+      f.rack.rmtree
+    end
   end
 
   def handle_unsatisfied_dependents
