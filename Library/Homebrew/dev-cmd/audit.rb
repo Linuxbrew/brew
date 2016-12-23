@@ -569,9 +569,20 @@ class FormulaAuditor
     end
 
     return unless @online
-    status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0",
-                               "--write-out", "%{http_code}", homepage
-    return if status_code.start_with? "20"
+
+    # The system Curl is too old and unreliable with HTTPS homepages on
+    # Yosemite and below.
+    return unless MacOS.version >= :el_capitan
+
+    retries = 3
+    retries.times do
+      status_code, = curl_output "--connect-timeout", "15",
+                                 "--output", "/dev/null",
+                                 "--range", "0-0",
+                                 "--write-out", "%{http_code}",
+                                 homepage
+      return if status_code.start_with? "20"
+    end
     problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end
 
