@@ -62,6 +62,7 @@ require "formula_installer"
 require "tap"
 require "hardware"
 require "development_tools"
+require "historic"
 
 module Homebrew
   module_function
@@ -212,6 +213,18 @@ module Homebrew
         ofail "What's updog?"
       else
         ofail e.message
+
+        migrations = search_for_migrated_formula(e.name)
+        return unless migrations.empty?
+
+        ohai "Searching among deleted formulae..."
+        begin
+          search_for_deleted_formula(e.name)
+          return
+        rescue
+          nil
+        end
+
         query = query_regexp(e.name)
 
         ohai "Searching for similarly named formulae..."
