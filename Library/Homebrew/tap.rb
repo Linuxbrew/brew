@@ -292,7 +292,11 @@ class Tap
 
   # path to the directory of all {Formula} files for this {Tap}.
   def formula_dir
-    @formula_dir ||= [path/"Formula", path/"HomebrewFormula", path].detect(&:directory?)
+    @formula_dir ||= potential_formula_dirs.detect(&:directory?)
+  end
+
+  def potential_formula_dirs
+    @potential_formula_dirs ||= [path/"Formula", path/"HomebrewFormula", path].freeze
   end
 
   # path to the directory of all {Cask} files for this {Tap}.
