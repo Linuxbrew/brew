@@ -357,7 +357,7 @@ class Keg
   end
 
   def installed_dependents
-    my_tab = Tab.for_keg(self)
+    tap = Tab.for_keg(self).source["tap"]
     Keg.all.select do |keg|
       tab = Tab.for_keg(keg)
       next if tab.runtime_dependencies.nil? # no dependency information saved.
@@ -368,7 +368,7 @@ class Keg
           dep_formula = Formulary.factory(dep["full_name"])
           next false unless dep_formula == to_formula
         rescue FormulaUnavailableError
-          next false unless my_tab["full_name"] = dep["full_name"]
+          next false unless "#{tap}/#{name}" == dep["full_name"]
         end
 
         dep["version"] == version.to_s

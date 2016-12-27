@@ -360,9 +360,11 @@ class InstalledDependantsTests < LinkTestCase
   # from a file path or URL.
   def test_unknown_formula
     Formulary.unstub(:loader_for)
-    alter_tab { |t| t.source["tap"] = "some/tap" }
-    dependencies [{ "full_name" => "some/tap/bar", "version" => "1.0" }]
-    alter_tab { |t| t.source["path"] = nil }
+    alter_tab(@keg) do |t|
+      t.source["tap"] = "some/tap"
+      t.source["path"] = nil
+    end
+    dependencies [{ "full_name" => "some/tap/foo", "version" => "1.0" }]
     assert_equal [@dependent], @keg.installed_dependents
     assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
