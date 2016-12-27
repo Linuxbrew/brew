@@ -47,6 +47,11 @@ class LinkTestCase < Homebrew::TestCase
 end
 
 class LinkTests < LinkTestCase
+  def test_all
+    Formula.clear_racks_cache
+    assert_equal [@keg], Keg.all
+  end
+
   def test_empty_installation
     %w[.DS_Store INSTALL_RECEIPT.json LICENSE.txt].each do |file|
       touch @keg/file
@@ -355,10 +360,11 @@ class InstalledDependantsTests < LinkTestCase
   # from a file path or URL.
   def test_unknown_formula
     Formulary.unstub(:loader_for)
-    dependencies []
+    alter_tab { |t| t.source["tap"] = "some/tap" }
+    dependencies [{ "full_name" => "some/tap/bar", "version" => "1.0" }]
     alter_tab { |t| t.source["path"] = nil }
-    assert_empty @keg.installed_dependents
-    assert_nil Keg.find_some_installed_dependents([@keg])
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 
   def test_no_dependencies_anywhere
