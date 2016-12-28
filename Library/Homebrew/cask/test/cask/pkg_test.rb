@@ -68,6 +68,23 @@ describe Hbc::Pkg do
       fake_dir.must_be :exist?
     end
 
+    it "chokes on directories that are really files" do
+      pkg = Hbc::Pkg.new("my.fake.pkg", Hbc::NeverSudoSystemCommand)
+
+      fake_dir  = Pathname(Dir.mktmpdir)
+      fake_file = fake_dir.join("ima_file").tap { |path| FileUtils.touch(path) }
+
+      pkg.stubs(:pkgutil_bom_specials).returns([])
+      pkg.stubs(:pkgutil_bom_files).returns([])
+      pkg.stubs(:pkgutil_bom_dirs).returns([fake_file, fake_dir])
+      pkg.stubs(:forget)
+
+      pkg.uninstall
+
+      fake_file.wont_be :exist?
+      fake_dir.wont_be :exist?
+    end
+
     it "snags permissions on ornery dirs, but returns them afterwords" do
       pkg = Hbc::Pkg.new("my.fake.pkg", Hbc::NeverSudoSystemCommand)
 

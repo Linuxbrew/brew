@@ -26,6 +26,7 @@ module Hbc
       _deepest_path_first(pkgutil_bom_dirs).each do |dir|
         next unless dir.exist? && !MacOS.undeletable?(dir)
         _with_full_permissions(dir) do
+          _delete_broken_file_dir(dir) && next
           _clean_broken_symlinks(dir)
           _clean_ds_store(dir)
           _rmdir(dir)
@@ -95,6 +96,13 @@ module Hbc
       paths.sort do |path_a, path_b|
         path_b.to_s.split("/").count <=> path_a.to_s.split("/").count
       end
+    end
+
+    # Some pkgs (microsoft office for one) leave files (generally nibs) but
+    # report them as directories.  We remove these as files instead.
+    def _delete_broken_file_dir(path)
+      return unless path.file? && !path.symlink?
+      @command.run!("/bin/rm", args: ["-f", "--", path], sudo: true)
     end
 
     # Some pkgs leave broken symlinks hanging around; we clean them out before
