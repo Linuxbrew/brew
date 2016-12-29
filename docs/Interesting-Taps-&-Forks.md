@@ -60,4 +60,4 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 ## Technical Details
 
-Your taps are git repositories located at `$(brew --prefix)/Library/Taps`.
+Your taps are git repositories located at `$(brew --repository)/Library/Taps`.
