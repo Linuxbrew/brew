@@ -333,7 +333,9 @@ class Formulary
       return TapLoader.new(ref, from: from)
     end
 
-    return FromPathLoader.new(ref) if File.extname(ref) == ".rb"
+    if File.extname(ref) == ".rb" && Pathname.new(ref).expand_path.exist?
+      return FromPathLoader.new(ref)
+    end
 
     formula_with_that_name = core_path(ref)
     if formula_with_that_name.file?
