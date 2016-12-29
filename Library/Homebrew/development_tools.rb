@@ -119,10 +119,6 @@ class DevelopmentTools
       @clang_version = @clang_build_version = nil
       @non_apple_gcc_version = {}
     end
-
-    def tar_supports_xz?
-      false
-    end
   end
 end
 
