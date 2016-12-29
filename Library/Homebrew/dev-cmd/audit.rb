@@ -788,6 +788,10 @@ class FormulaAuditor
       problem "Please set plist_options when using a formula-defined plist."
     end
 
+    if text =~ /depends_on\s+['"]openssl['"]/ && text =~ /depends_on\s+['"]libressl['"]/
+      problem "Formulae should not depend on both OpenSSL and LibreSSL (even optionally)."
+    end
+
     return unless text.include?('require "language/go"') && !text.include?("go_resource")
     problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
