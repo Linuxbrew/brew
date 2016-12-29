@@ -47,6 +47,8 @@ module Hardware
             :haswell
           when 0x3d, 0x47, 0x4f, 0x56
             :broadwell
+          when 0x8e
+            :kabylake
           else
             cpu_family_model
           end
