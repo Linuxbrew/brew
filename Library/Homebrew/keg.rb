@@ -139,6 +139,10 @@ class Keg
     raise NotAKegError, "#{path} is not inside a keg"
   end
 
+  def self.all
+    Formula.racks.flat_map(&:subdirs).map { |d| new(d) }
+  end
+
   attr_reader :path, :name, :linked_keg_record, :opt_record
   protected :path
 
@@ -353,14 +357,21 @@ class Keg
   end
 
   def installed_dependents
-    Formula.installed.flat_map(&:installed_kegs).select do |keg|
+    tap = Tab.for_keg(self).source["tap"]
+    Keg.all.select do |keg|
       tab = Tab.for_keg(keg)
       next if tab.runtime_dependencies.nil? # no dependency information saved.
       tab.runtime_dependencies.any? do |dep|
         # Resolve formula rather than directly comparing names
         # in case of conflicts between formulae from different taps.
-        dep_formula = Formulary.factory(dep["full_name"])
-        dep_formula == to_formula && dep["version"] == version.to_s
+        begin
+          dep_formula = Formulary.factory(dep["full_name"])
+          next false unless dep_formula == to_formula
+        rescue FormulaUnavailableError
+          next false unless "#{tap}/#{name}" == dep["full_name"]
+        end
+
+        dep["version"] == version.to_s
       end
     end
   end

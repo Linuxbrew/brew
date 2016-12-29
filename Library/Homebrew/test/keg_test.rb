@@ -2,7 +2,7 @@ require "testing_env"
 require "keg"
 require "stringio"
 
-class LinkTests < Homebrew::TestCase
+class LinkTestCase < Homebrew::TestCase
   include FileUtils
 
   def setup_test_keg(name, version)
@@ -43,6 +43,13 @@ class LinkTests < Homebrew::TestCase
 
     rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
+  end
+end
+
+class LinkTests < LinkTestCase
+  def test_all
+    Formula.clear_racks_cache
+    assert_equal [@keg], Keg.all
   end
 
   def test_empty_installation
@@ -315,7 +322,7 @@ class LinkTests < Homebrew::TestCase
   end
 end
 
-class InstalledDependantsTests < LinkTests
+class InstalledDependantsTests < LinkTestCase
   def stub_formula_name(name)
     f = formula(name) { url "foo-1.0" }
     stub_formula_loader f
@@ -353,10 +360,13 @@ class InstalledDependantsTests < LinkTests
   # from a file path or URL.
   def test_unknown_formula
     Formulary.unstub(:loader_for)
-    dependencies []
-    alter_tab { |t| t.source["path"] = nil }
-    assert_empty @keg.installed_dependents
-    assert_nil Keg.find_some_installed_dependents([@keg])
+    alter_tab(@keg) do |t|
+      t.source["tap"] = "some/tap"
+      t.source["path"] = nil
+    end
+    dependencies [{ "full_name" => "some/tap/foo", "version" => "1.0" }]
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 
   def test_no_dependencies_anywhere
