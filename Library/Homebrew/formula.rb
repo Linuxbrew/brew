@@ -1505,7 +1505,10 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    recursive_dependencies.reject(&:build?)
+    recursive_dependencies do |_dependent, dependency|
+      Dependency.prune if dependency.build?
+      Dependency.prune if !dependency.required? && build.without?(dependency)
+    end
   end
 
   # Returns a list of formulae depended on by this formula that aren't

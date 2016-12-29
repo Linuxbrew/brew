@@ -651,12 +651,42 @@ class FormulaTests < Homebrew::TestCase
 
     f4 = formula("f4") do
       url "f4-1.0"
-      depends_on "f3"
+      depends_on "f1"
+    end
+    stub_formula_loader f4
+
+    f5 = formula("f5") do
+      url "f5-1.0"
+      depends_on "f3" => :build
+      depends_on "f4"
     end
 
-    assert_equal %w[f3], f4.deps.map(&:name)
-    assert_equal %w[f1 f2 f3], f4.recursive_dependencies.map(&:name)
-    assert_equal %w[f2 f3], f4.runtime_dependencies.map(&:name)
+    assert_equal %w[f3 f4], f5.deps.map(&:name)
+    assert_equal %w[f1 f2 f3 f4], f5.recursive_dependencies.map(&:name)
+    assert_equal %w[f1 f4], f5.runtime_dependencies.map(&:name)
+  end
+
+  def test_runtime_dependencies_with_optional_deps_from_tap
+    tap_loader = mock
+    tap_loader.stubs(:get_formula).raises(RuntimeError, "tried resolving tap formula")
+    Formulary.stubs(:loader_for).with("foo/bar/f1", from: nil).returns(tap_loader)
+
+    stub_formula_loader formula("f2") { url "f2-1.0" }, "baz/qux/f2"
+
+    f3 = formula("f3") do
+      url "f3-1.0"
+      depends_on "foo/bar/f1" => :optional
+      depends_on "baz/qux/f2"
+    end
+
+    # f1 shouldn't be loaded by default.
+    # If it is, an exception will be raised.
+    assert_equal %w[baz/qux/f2], f3.runtime_dependencies.map(&:name)
+
+    # If --with-f1, f1 should be loaded.
+    stub_formula_loader formula("f1") { url "f1-1.0" }, "foo/bar/f1"
+    f3.build = BuildOptions.new(Options.create(%w[--with-f1]), f3.options)
+    assert_equal %w[foo/bar/f1 baz/qux/f2], f3.runtime_dependencies.map(&:name)
   end
 
   def test_to_hash
