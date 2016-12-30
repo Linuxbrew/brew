@@ -1,3 +1,5 @@
+require "cask/lib/hbc/cli/base"
+
 module Hbc
   class CLI
     class Update < Base

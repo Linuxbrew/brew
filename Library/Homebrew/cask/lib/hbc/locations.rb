@@ -1,3 +1,5 @@
+require "tap"
+
 module Hbc
   module Locations
     def self.included(base)
