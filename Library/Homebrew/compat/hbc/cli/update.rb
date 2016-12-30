@@ -11,8 +11,12 @@ module Hbc
         exit result.exit_status
       end
 
+      def self.visible
+        false
+      end
+
       def self.help
-        Formatter.warning("deprecated: use `brew update` instead")
+        "a synonym for 'brew update'"
       end
     end
   end
