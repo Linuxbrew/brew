@@ -348,11 +348,16 @@ class InstalledDependantsTests < LinkTestCase
     tab.write
   end
 
-  def dependencies(deps)
+  def dependencies(deps, homebrew_version: "1.1.6")
     alter_tab do |tab|
+      tab.homebrew_version = homebrew_version
       tab.tabfile = @dependent.join("INSTALL_RECEIPT.json")
       tab.runtime_dependencies = deps
     end
+  end
+
+  def unreliable_dependencies(deps)
+    dependencies(deps, homebrew_version: "1.1.5")
   end
 
   # Test with a keg whose formula isn't known.
@@ -405,5 +410,12 @@ class InstalledDependantsTests < LinkTestCase
     dependencies [{ "full_name" => "foo", "version" => "1.0" }]
     assert_equal [@dependent], @keg.installed_dependents
     assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_fallback_for_old_versions
+    unreliable_dependencies [{ "full_name" => "baz", "version" => "1.0" }]
+    Formula["bar"].class.depends_on "foo"
+    assert_empty @keg.installed_dependents
+    assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
   end
 end
