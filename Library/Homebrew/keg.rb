@@ -87,11 +87,23 @@ class Keg
     mime-info pixmaps sounds postgresql
   ].freeze
 
-  # Will return some kegs, and some dependencies, if they're present.
+  # Given an array of kegs, this method will try to find some other kegs
+  # that depend on them.
+  #
+  # If it does, it returns:
+  # - some kegs in the passed array that have installed dependents
+  # - some installed dependents of those kegs.
+  #
+  # If it doesn't, it returns nil.
+  #
+  # Note that nil will be returned if the only installed dependents
+  # in the passed kegs are other kegs in the array.
+  #
   # For efficiency, we don't bother trying to get complete data.
   def self.find_some_installed_dependents(kegs)
     # First, check in the tabs of installed Formulae.
     kegs.each do |keg|
+      # Don't include dependencies of kegs that were in the given array.
       dependents = keg.installed_dependents - kegs
       dependents.map! { |d| "#{d.name} #{d.version}" }
       return [keg], dependents if dependents.any?
@@ -107,8 +119,7 @@ class Keg
     remaining_formulae = Formula.installed.select do |f|
       installed_kegs = f.installed_kegs
 
-      # All installed kegs are going to be removed anyway,
-      # so it doesn't matter what they depend on.
+      # Don't include dependencies of kegs that were in the given array.
       next false if (installed_kegs - kegs).empty?
 
       installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
