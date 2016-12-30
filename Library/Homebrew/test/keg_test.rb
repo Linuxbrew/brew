@@ -348,6 +348,8 @@ class InstalledDependantsTests < LinkTestCase
     tab.write
   end
 
+  # 1.1.6 is the earliest version of Homebrew that generates correct runtime
+  # dependency lists in tabs.
   def dependencies(deps, homebrew_version: "1.1.6")
     alter_tab do |tab|
       tab.homebrew_version = homebrew_version
@@ -357,6 +359,8 @@ class InstalledDependantsTests < LinkTestCase
   end
 
   def unreliable_dependencies(deps)
+    # 1.1.5 is (hopefully!) the last version of Homebrew that generates
+    # incorrect runtime dependency lists in tabs.
     dependencies(deps, homebrew_version: "1.1.5")
   end
 
