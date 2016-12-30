@@ -242,10 +242,6 @@ class Tab < OpenStruct
     super || DevelopmentTools.default_compiler
   end
 
-  def homebrew_tag
-    homebrew_version.sub(/\-\d+\-g([a-f0-9]+)(?:\-dirty)?\Z/, "")
-  end
-
   def parsed_homebrew_version
     return Version::NULL if homebrew_version.nil?
     Version.new(homebrew_version)

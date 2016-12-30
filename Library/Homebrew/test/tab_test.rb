@@ -69,17 +69,6 @@ class TabTests < Homebrew::TestCase
     assert_predicate tab, :universal?
   end
 
-  def test_homebrew_tag
-    tab = Tab.new(homebrew_version: "1.2.3")
-    assert_equal "1.2.3", tab.homebrew_tag
-
-    tab.homebrew_version = "1.2.4-567-g12789abdf"
-    assert_equal "1.2.4", tab.homebrew_tag
-
-    tab.homebrew_version = "2.0.0-134-gabcdefabc-dirty"
-    assert_equal "2.0.0", tab.homebrew_tag
-  end
-
   def test_parsed_homebrew_version
     tab = Tab.new
     assert_same Version::NULL, tab.parsed_homebrew_version
