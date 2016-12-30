@@ -69,6 +69,53 @@ class TabTests < Homebrew::TestCase
     assert_predicate tab, :universal?
   end
 
+  def test_homebrew_tag
+    tab = Tab.new(homebrew_version: "1.2.3")
+    assert_equal "1.2.3", tab.homebrew_tag
+
+    tab.homebrew_version = "1.2.4-567-g12789abdf"
+    assert_equal "1.2.4", tab.homebrew_tag
+
+    tab.homebrew_version = "2.0.0-134-gabcdefabc-dirty"
+    assert_equal "2.0.0", tab.homebrew_tag
+  end
+
+  def test_parsed_homebrew_version
+    tab = Tab.new
+    assert_same Version::NULL, tab.parsed_homebrew_version
+
+    tab = Tab.new(homebrew_version: "1.2.3")
+    assert_equal "1.2.3", tab.parsed_homebrew_version
+    assert_kind_of Version, tab.parsed_homebrew_version
+
+    tab = Tab.new(homebrew_version: "2.0.0-134-gabcdefabc-dirty")
+    assert_equal "2.0.0", tab.parsed_homebrew_version
+    assert_kind_of Version, tab.parsed_homebrew_version
+  end
+
+  def test_reliable_runtime_dependencies?
+    tab = Tab.new
+    refute_predicate tab, :reliable_runtime_dependencies?
+
+    tab.homebrew_version = "1.1.6"
+    refute_predicate tab, :reliable_runtime_dependencies?
+
+    tab.runtime_dependencies = []
+    assert_predicate tab, :reliable_runtime_dependencies?
+
+    tab.homebrew_version = "1.1.5"
+    refute_predicate tab, :reliable_runtime_dependencies?
+
+    tab.homebrew_version = "1.1.7"
+    assert_predicate tab, :reliable_runtime_dependencies?
+
+    tab.homebrew_version = "1.1.10"
+    assert_predicate tab, :reliable_runtime_dependencies?
+
+    tab.runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
+    assert_predicate tab, :reliable_runtime_dependencies?
+  end
+
   def test_cxxstdlib
     assert_equal :clang, @tab.cxxstdlib.compiler
     assert_equal :libcxx, @tab.cxxstdlib.type
