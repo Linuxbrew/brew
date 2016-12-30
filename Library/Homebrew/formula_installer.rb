@@ -148,18 +148,24 @@ class FormulaInstaller
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
 
-    version_hash = {}
-    version_conflicts = Set.new
-    recursive_formulae.each do |f|
-      name = f.name
-      unversioned_name, = name.split("@")
-      version_hash[unversioned_name] ||= Set.new
-      version_hash[unversioned_name] << name
-      next if version_hash[unversioned_name].length < 2
-      version_conflicts += version_hash[unversioned_name]
-    end
-    unless version_conflicts.empty?
-      raise CannotInstallFormulaError, "#{formula.full_name} contains conflicting version dependencies (#{version_conflicts.to_a.join " "}) so cannot be installed"
+    if ENV["HOMEBREW_CHECK_RECURSIVE_VERSION_DEPENDENCIES"]
+      version_hash = {}
+      version_conflicts = Set.new
+      recursive_formulae.each do |f|
+        name = f.name
+        unversioned_name, = name.split("@")
+        version_hash[unversioned_name] ||= Set.new
+        version_hash[unversioned_name] << name
+        next if version_hash[unversioned_name].length < 2
+        version_conflicts += version_hash[unversioned_name]
+      end
+      unless version_conflicts.empty?
+        raise CannotInstallFormulaError, <<-EOS.undent
+          #{formula.full_name} contains conflicting version recursive dependencies:
+            #{version_conflicts.to_a.join ", "}
+          View these with `brew deps --tree #{formula.full_name}`.
+        EOS
+      end
     end
 
     unlinked_deps = recursive_formulae.select do |dep|
