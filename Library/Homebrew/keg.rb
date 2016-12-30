@@ -104,10 +104,8 @@ class Keg
     # so need them to be calculated now.
     #
     # This happens after the initial dependency check because it's sloooow.
-    remaining_formulae = Formula.installed.reject do |f|
-      f.installed_kegs.all? do |k|
-        Tab.for_keg(k).reliable_runtime_dependencies?
-      end
+    remaining_formulae = Formula.installed.select do |f|
+      f.installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
     end
 
     keg_names = kegs.map(&:name)
@@ -362,7 +360,7 @@ class Keg
     tap = Tab.for_keg(self).source["tap"]
     Keg.all.select do |keg|
       tab = Tab.for_keg(keg)
-      next unless tab.reliable_runtime_dependencies?
+      next if tab.runtime_dependencies.nil?
       tab.runtime_dependencies.any? do |dep|
         # Resolve formula rather than directly comparing names
         # in case of conflicts between formulae from different taps.

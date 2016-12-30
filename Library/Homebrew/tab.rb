@@ -247,15 +247,10 @@ class Tab < OpenStruct
     Version.new(homebrew_version)
   end
 
-  # Whether there is reliable runtime dependency information in the receipt.
-  def reliable_runtime_dependencies?
-    return false if runtime_dependencies.nil?
-
+  def runtime_dependencies
     # Homebrew versions prior to 1.1.6 generated incorrect runtime dependency
     # lists.
-    return false if parsed_homebrew_version < "1.1.6"
-
-    true
+    super unless parsed_homebrew_version < "1.1.6"
   end
 
   def cxxstdlib

@@ -32,6 +32,11 @@ class TabTests < Homebrew::TestCase
 
   def test_defaults
     tab = Tab.empty
+
+    # FIXME: remove this line after Homebrew 1.1.6 is released.
+    # See https://github.com/Homebrew/brew/pull/1750#discussion_r94254622
+    tab.homebrew_version = "1.1.6"
+
     assert_empty tab.unused_options
     assert_empty tab.used_options
     assert_nil tab.changed_files
@@ -89,27 +94,27 @@ class TabTests < Homebrew::TestCase
     assert tab.parsed_homebrew_version < "2.0.0-135-g01789abdf"
   end
 
-  def test_reliable_runtime_dependencies?
+  def test_runtime_dependencies
     tab = Tab.new
-    refute_predicate tab, :reliable_runtime_dependencies?
+    assert_nil tab.runtime_dependencies
 
     tab.homebrew_version = "1.1.6"
-    refute_predicate tab, :reliable_runtime_dependencies?
+    assert_nil tab.runtime_dependencies
 
     tab.runtime_dependencies = []
-    assert_predicate tab, :reliable_runtime_dependencies?
+    refute_nil tab.runtime_dependencies
 
     tab.homebrew_version = "1.1.5"
-    refute_predicate tab, :reliable_runtime_dependencies?
+    assert_nil tab.runtime_dependencies
 
     tab.homebrew_version = "1.1.7"
-    assert_predicate tab, :reliable_runtime_dependencies?
+    refute_nil tab.runtime_dependencies
 
     tab.homebrew_version = "1.1.10"
-    assert_predicate tab, :reliable_runtime_dependencies?
+    refute_nil tab.runtime_dependencies
 
     tab.runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
-    assert_predicate tab, :reliable_runtime_dependencies?
+    refute_nil tab.runtime_dependencies
   end
 
   def test_cxxstdlib
@@ -193,6 +198,10 @@ class TabTests < Homebrew::TestCase
     compiler = DevelopmentTools.default_compiler
     stdlib = :libcxx
     tab = Tab.create(f, compiler, stdlib)
+
+    # FIXME: remove this line after Homebrew 1.1.6 is released.
+    # See https://github.com/Homebrew/brew/pull/1750#discussion_r94254622
+    tab.homebrew_version = "1.1.6"
 
     runtime_dependencies = [
       { "full_name" => "bar", "version" => "2.0" },
