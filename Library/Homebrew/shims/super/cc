@@ -206,10 +206,6 @@ class Cmd
   end
 
   def keep?(path)
-    # The logic in this method will eventually become the default,
-    # but is currently opt-in.
-    return keep_orig?(path) unless ENV["HOMEBREW_EXPERIMENTAL_FILTER_FLAGS_ON_DEPS"]
-
     # Allow references to self
     if formula_prefix && path.start_with?("#{formula_prefix}/")
       true
@@ -224,11 +220,6 @@ class Cmd
       # ignore MacPorts, Boxen's Homebrew, X11, fink
       !path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
     end
-  end
-
-  # The original less-smart version of keep_orig; will eventually be removed
-  def keep_orig?(path)
-    path.start_with?(prefix, cellar, tmpdir) || !path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
   end
 
   def cflags
