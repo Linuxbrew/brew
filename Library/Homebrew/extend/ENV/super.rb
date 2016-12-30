@@ -16,9 +16,7 @@ module Superenv
 
   # @private
   attr_accessor :keg_only_deps, :deps
-
   attr_accessor :x11
-  alias x11? x11
 
   def self.extended(base)
     base.keg_only_deps = []
@@ -263,7 +261,6 @@ module Superenv
 
     old
   end
-  alias j1 deparallelize
 
   def make_jobs
     self["MAKEFLAGS"] =~ /-\w*j(\d+)/
@@ -329,23 +326,9 @@ module Superenv
   def set_x11_env_if_installed
   end
 
+  # This method does nothing in superenv since there's no custom CFLAGS API
   # @private
-  def noop(*_args); end
-
-  # These methods are no longer necessary under superenv, but are needed to
-  # maintain an interface compatible with stdenv.
-  alias fast noop
-  alias O4 noop
-  alias Og noop
-  alias libxml2 noop
-  alias set_cpu_flags noop
-
-  # These methods provide functionality that has not yet been ported to
-  # superenv.
-  alias gcc_4_0_1 noop
-  alias minimal_optimization noop
-  alias no_optimization noop
-  alias enable_warnings noop
+  def set_cpu_flags; end
 end
 
 class Array
