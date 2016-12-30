@@ -119,6 +119,10 @@ class DevelopmentTools
       @clang_version = @clang_build_version = nil
       @non_apple_gcc_version = {}
     end
+
+    def curl_handles_most_https_homepages?
+      true
+    end
   end
 end
 
