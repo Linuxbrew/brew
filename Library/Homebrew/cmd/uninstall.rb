@@ -121,7 +121,7 @@ module Homebrew
     end
 
     def sample_command
-      "brew uninstall --ignore-dependencies #{list reqs.map(&:name)}"
+      "brew uninstall --ignore-dependencies #{list ARGV.named}"
     end
 
     def are_required_by_deps
