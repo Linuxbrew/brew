@@ -6,7 +6,8 @@ class CxxStdlibTests < Homebrew::TestCase
   def setup
     @clang = CxxStdlib.create(:libstdcxx, :clang)
     @gcc   = CxxStdlib.create(:libstdcxx, :gcc)
-    @gcc4  = CxxStdlib.create(:libstdcxx, :gcc_4_0)
+    @gcc40 = CxxStdlib.create(:libstdcxx, :gcc_4_0)
+    @gcc42 = CxxStdlib.create(:libstdcxx, :gcc_4_2)
     @gcc48 = CxxStdlib.create(:libstdcxx, "gcc-4.8")
     @gcc49 = CxxStdlib.create(:libstdcxx, "gcc-4.9")
     @lcxx  = CxxStdlib.create(:libcxx, :clang)
@@ -15,7 +16,7 @@ class CxxStdlibTests < Homebrew::TestCase
 
   def test_apple_libstdcxx_intercompatibility
     assert @clang.compatible_with?(@gcc)
-    assert @clang.compatible_with?(@gcc4)
+    assert @clang.compatible_with?(@gcc42)
   end
 
   def test_compatibility_same_compilers_and_type
@@ -42,7 +43,7 @@ class CxxStdlibTests < Homebrew::TestCase
   def test_apple_compiler_reporting
     assert_predicate @clang, :apple_compiler?
     assert_predicate @gcc, :apple_compiler?
-    assert_predicate @gcc4, :apple_compiler?
+    assert_predicate @gcc42, :apple_compiler?
     refute_predicate @gcc48, :apple_compiler?
   end
 
