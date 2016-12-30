@@ -248,7 +248,7 @@ class Tab < OpenStruct
 
   def parsed_homebrew_version
     return Version::NULL if homebrew_version.nil?
-    Version.new(homebrew_tag)
+    Version.new(homebrew_version)
   end
 
   # Whether there is reliable runtime dependency information in the receipt.

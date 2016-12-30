@@ -86,11 +86,18 @@ class TabTests < Homebrew::TestCase
 
     tab = Tab.new(homebrew_version: "1.2.3")
     assert_equal "1.2.3", tab.parsed_homebrew_version
+    assert tab.parsed_homebrew_version < "1.2.3-1-g12789abdf"
     assert_kind_of Version, tab.parsed_homebrew_version
 
+    tab.homebrew_version = "1.2.4-567-g12789abdf"
+    assert tab.parsed_homebrew_version > "1.2.4"
+    assert tab.parsed_homebrew_version > "1.2.4-566-g21789abdf"
+    assert tab.parsed_homebrew_version < "1.2.4-568-g01789abdf"
+
     tab = Tab.new(homebrew_version: "2.0.0-134-gabcdefabc-dirty")
-    assert_equal "2.0.0", tab.parsed_homebrew_version
-    assert_kind_of Version, tab.parsed_homebrew_version
+    assert tab.parsed_homebrew_version > "2.0.0"
+    assert tab.parsed_homebrew_version > "2.0.0-133-g21789abdf"
+    assert tab.parsed_homebrew_version < "2.0.0-135-g01789abdf"
   end
 
   def test_reliable_runtime_dependencies?
