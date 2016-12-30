@@ -113,13 +113,9 @@ export PATH=/usr/bin:/bin:/usr/sbin:/sbin
 
 if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
 then
-  echo "----- HOMEBREW_ENV_FILTERING set -----"
-
   # Needed TERM to prevent "tput: No value for $TERM and no -T specified"
   env | grep -E '^(HOMEBREW.*|HOME|PATH|TERM)=.*$' > /tmp/homebrew-env
   env -i "$HOMEBREW_LIBRARY/Homebrew/utils/shell_env.sh" "$@"
 else
-  echo "----- HOMEBREW_ENV_FILTERING NOT set! -----"
-
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi
