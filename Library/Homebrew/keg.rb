@@ -105,7 +105,13 @@ class Keg
     #
     # This happens after the initial dependency check because it's sloooow.
     remaining_formulae = Formula.installed.select do |f|
-      f.installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
+      installed_kegs = f.installed_kegs
+
+      # All installed kegs are going to be removed anyway,
+      # so it doesn't matter what they depend on.
+      next false if (installed_kegs - kegs).empty?
+
+      installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
     end
 
     keg_names = kegs.map(&:name)
