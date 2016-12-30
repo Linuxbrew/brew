@@ -11,6 +11,7 @@ require "utils/hash"
 require "utils/inreplace"
 require "utils/popen"
 require "utils/tty"
+require "time"
 
 def ohai(title, *sput)
   title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
@@ -44,24 +45,32 @@ def odie(error)
   exit 1
 end
 
-def odeprecated(method, replacement = nil, options = {})
-  verb = if options[:die]
-    "disabled"
-  else
-    "deprecated"
-  end
-
+def odeprecated(method, replacement = nil, disable: false, disable_on: nil, caller: send(:caller))
   replacement_message = if replacement
     "Use #{replacement} instead."
   else
     "There is no replacement."
   end
 
+  unless disable_on.nil?
+    if disable_on > Time.now
+      will_be_disabled_message = " and will be disabled on #{disable_on.strftime("%Y-%m-%d")}"
+    else
+      disable = true
+    end
+  end
+
+  verb = if disable
+    "disabled"
+  else
+    "deprecated#{will_be_disabled_message}"
+  end
+
   # Try to show the most relevant location in message, i.e. (if applicable):
   # - Location in a formula.
   # - Location outside of 'compat/'.
   # - Location of caller of deprecated method (if all else fails).
-  backtrace = options.fetch(:caller, caller)
+  backtrace = caller
   tap_message = nil
   caller_message = backtrace.detect do |line|
     next unless line =~ %r{^#{Regexp.escape HOMEBREW_LIBRARY}/Taps/([^/]+/[^/]+)/}
@@ -80,7 +89,7 @@ def odeprecated(method, replacement = nil, options = {})
     #{caller_message}#{tap_message}
   EOS
 
-  if ARGV.homebrew_developer? || options[:die] ||
+  if ARGV.homebrew_developer? || disable ||
      Homebrew.raise_deprecation_exceptions?
     raise MethodDeprecatedError, message
   else
@@ -89,7 +98,7 @@ def odeprecated(method, replacement = nil, options = {})
 end
 
 def odisabled(method, replacement = nil, options = {})
-  options = { die: true, caller: caller }.merge(options)
+  options = { disable: true, caller: caller }.merge(options)
   odeprecated(method, replacement, options)
 end
 
