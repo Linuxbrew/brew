@@ -169,6 +169,33 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
+  def url_status_code(url, range: false)
+    # The system Curl is too old and unreliable with HTTPS homepages on
+    # Yosemite and below.
+    return "200" unless DevelopmentTools.curl_handles_most_https_homepages?
+
+    extra_args = [
+      "--connect-timeout", "15",
+      "--output", "/dev/null",
+      "--write-out", "%{http_code}"
+    ]
+    extra_args << "--range" << "0-0" if range
+    extra_args << url
+
+    args = curl_args(
+      extra_args: extra_args,
+      show_output: true,
+      default_user_agent: true
+    )
+    retries = 3
+    status_code = nil
+    retries.times do
+      status_code = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
+      break if status_code.start_with? "20"
+    end
+    status_code
+  end
+
   def audit_style
     return unless @style_offenses
     display_cop_names = ARGV.include?("--display-cop-names")
@@ -569,8 +596,8 @@ class FormulaAuditor
     end
 
     return unless @online
-    status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0",
-                               "--write-out", "%{http_code}", homepage
+
+    status_code = url_status_code(homepage)
     return if status_code.start_with? "20"
     problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end

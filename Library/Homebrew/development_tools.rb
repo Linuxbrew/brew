@@ -120,8 +120,8 @@ class DevelopmentTools
       @non_apple_gcc_version = {}
     end
 
-    def tar_supports_xz?
-      false
+    def curl_handles_most_https_homepages?
+      true
     end
   end
 end
