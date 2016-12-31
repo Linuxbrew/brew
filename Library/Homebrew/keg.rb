@@ -126,7 +126,18 @@ class Keg
     end
 
     keg_names = kegs.map(&:name)
-    kegs_by_source = kegs.group_by { |k| [k.name, Tab.for_keg(k).tap] }
+    kegs_by_source = kegs.group_by do |keg|
+      begin
+        # First, attempt to resolve the keg to a formula
+        # to get up-to-date name and tap information.
+        f = keg.to_formula
+        [f.name, f.tap]
+      rescue FormulaUnavailableError
+        # If the formula for the keg can't be found,
+        # fall back to the information in the tab.
+        [keg.name, Tab.for_keg(keg).tap]
+      end
+    end
 
     remaining_formulae.each do |dependent|
       required = dependent.missing_dependencies(hide: keg_names)

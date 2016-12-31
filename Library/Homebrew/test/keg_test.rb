@@ -373,6 +373,7 @@ class InstalledDependantsTests < LinkTestCase
       t.source["tap"] = "some/tap"
       t.source["path"] = nil
     end
+
     dependencies [{ "full_name" => "some/tap/foo", "version" => "1.0" }]
     assert_equal [@dependent], @keg.installed_dependents
     assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
@@ -388,7 +389,7 @@ class InstalledDependantsTests < LinkTestCase
     Formula["bar"].class.depends_on "baz"
 
     result = Keg.find_some_installed_dependents([@keg, @tap_dep])
-    assert_equal [[@tap_dep], ["bar"]], result
+    assert_equal [[@keg, @tap_dep], ["bar"]], result
   end
 
   def test_no_dependencies_anywhere
@@ -409,6 +410,23 @@ class InstalledDependantsTests < LinkTestCase
     Formula["bar"].class.depends_on "foo"
     assert_empty @keg.installed_dependents
     assert_nil Keg.find_some_installed_dependents([@keg, @dependent])
+  end
+
+  def test_renamed_dependency
+    dependencies nil
+
+    stub_formula_loader Formula["foo"], "homebrew/core/foo-old"
+    renamed_path = HOMEBREW_CELLAR/"foo-old"
+    (HOMEBREW_CELLAR/"foo").rename(renamed_path)
+    renamed_keg = Keg.new(renamed_path.join("1.0"))
+
+    Formula["bar"].class.depends_on "foo"
+
+    result = Keg.find_some_installed_dependents([renamed_keg])
+    assert_equal [[renamed_keg], ["bar"]], result
+  ensure
+    # Move it back to where it was so it'll be cleaned up.
+    (HOMEBREW_CELLAR/"foo-old").rename(HOMEBREW_CELLAR/"foo")
   end
 
   def test_empty_dependencies_in_tab
