@@ -44,7 +44,7 @@ module HomebrewArgvExtension
       else
         Formulary.find_with_priority(name, spec)
       end
-    end
+    end.uniq(&:name)
   end
 
   def resolved_formulae
@@ -79,7 +79,7 @@ module HomebrewArgvExtension
       f.follow_installed_alias = false
 
       f
-    end
+    end.uniq(&:name)
   end
 
   def casks
