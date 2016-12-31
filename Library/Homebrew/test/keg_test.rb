@@ -369,6 +369,19 @@ class InstalledDependantsTests < LinkTestCase
     assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 
+  def test_a_dependency_with_no_tap_in_tab
+    @tap_dep = setup_test_keg("baz", "1.0")
+
+    alter_tab(@keg) { |t| t.source["tap"] = nil }
+
+    dependencies nil
+    Formula["bar"].class.depends_on "foo"
+    Formula["bar"].class.depends_on "baz"
+
+    result = Keg.find_some_installed_dependents([@keg, @tap_dep])
+    assert_equal [[@tap_dep], ["bar"]], result
+  end
+
   def test_no_dependencies_anywhere
     dependencies nil
     assert_empty @keg.installed_dependents

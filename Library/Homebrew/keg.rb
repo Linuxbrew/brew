@@ -119,7 +119,7 @@ class Keg
         next unless f_kegs
 
         f_kegs.sort_by(&:version).last
-      end
+      end.compact
 
       next unless required_kegs.any?
 
