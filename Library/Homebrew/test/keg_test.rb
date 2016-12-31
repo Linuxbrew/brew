@@ -382,6 +382,13 @@ class InstalledDependantsTests < LinkTestCase
     assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
   end
 
+  def test_uninstalling_dependent_and_dependency
+    dependencies nil
+    Formula["bar"].class.depends_on "foo"
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg, @dependent])
+  end
+
   def test_empty_dependencies_in_tab
     dependencies []
     assert_empty @keg.installed_dependents
