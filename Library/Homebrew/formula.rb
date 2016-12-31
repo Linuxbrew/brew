@@ -1406,7 +1406,7 @@ class Formula
         Formulary.from_rack(rack)
       rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
       end
-    end.compact
+    end.compact.uniq(&:name)
   end
 
   def self.installed_with_alias_path(alias_path)
