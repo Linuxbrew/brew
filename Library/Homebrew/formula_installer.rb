@@ -546,7 +546,7 @@ class FormulaInstaller
   def summary
     s = ""
     s << "#{Emoji.install_badge}  " if Emoji.enabled?
-    s << "#{formula.prefix}: #{formula.prefix.abv}"
+    s << "#{formula.prefix.resolved_path}: #{formula.prefix.abv}"
     s << ", built in #{pretty_duration build_time}" if build_time
     s
   end

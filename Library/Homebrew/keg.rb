@@ -147,6 +147,7 @@ class Keg
   protected :path
 
   def initialize(path)
+    path = path.resolved_path if path.to_s.start_with?("#{HOMEBREW_PREFIX}/opt/")
     raise "#{path} is not a valid keg" unless path.parent.parent.realpath == HOMEBREW_CELLAR.realpath
     raise "#{path} is not a directory" unless path.directory?
     @path = path
