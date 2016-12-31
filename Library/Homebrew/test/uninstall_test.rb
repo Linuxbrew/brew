@@ -12,6 +12,7 @@ class UninstallTests < Homebrew::TestCase
     [@dependency, @dependent].each { |f| f.installed_prefix.mkpath }
 
     tab = Tab.empty
+    tab.homebrew_version = "1.1.6"
     tab.tabfile = @dependent.installed_prefix/Tab::FILENAME
     tab.runtime_dependencies = [
       { "full_name" => "dependency", "version" => "1" },

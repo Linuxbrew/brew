@@ -242,6 +242,17 @@ class Tab < OpenStruct
     super || DevelopmentTools.default_compiler
   end
 
+  def parsed_homebrew_version
+    return Version::NULL if homebrew_version.nil?
+    Version.new(homebrew_version)
+  end
+
+  def runtime_dependencies
+    # Homebrew versions prior to 1.1.6 generated incorrect runtime dependency
+    # lists.
+    super unless parsed_homebrew_version < "1.1.6"
+  end
+
   def cxxstdlib
     # Older tabs won't have these values, so provide sensible defaults
     lib = stdlib.to_sym if stdlib

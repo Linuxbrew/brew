@@ -377,7 +377,7 @@ class Keg
     tap = Tab.for_keg(self).source["tap"]
     Keg.all.select do |keg|
       tab = Tab.for_keg(keg)
-      next if tab.runtime_dependencies.nil? # no dependency information saved.
+      next if tab.runtime_dependencies.nil?
       tab.runtime_dependencies.any? do |dep|
         # Resolve formula rather than directly comparing names
         # in case of conflicts between formulae from different taps.
