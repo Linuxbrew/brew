@@ -328,7 +328,8 @@ module Superenv
 
   # This method does nothing in superenv since there's no custom CFLAGS API
   # @private
-  def set_cpu_flags; end
+  def set_cpu_flags(*_args)
+  end
 end
 
 class Array
