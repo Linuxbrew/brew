@@ -102,8 +102,8 @@ module Homebrew
     attr_reader :reqs, :deps
 
     def initialize(requireds, dependents)
-      @reqs = requireds.compact
-      @deps = dependents.compact
+      @reqs = requireds
+      @deps = dependents
     end
 
     protected
