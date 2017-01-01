@@ -340,6 +340,7 @@ class InstalledDependantsTests < LinkTestCase
   def setup
     super
     @dependent = setup_test_keg("bar", "1.0")
+    @keg.link
   end
 
   def alter_tab(keg = @dependent)
@@ -442,8 +443,8 @@ class InstalledDependantsTests < LinkTestCase
 
   def test_same_name_different_version_in_tab
     dependencies [{ "full_name" => "foo", "version" => "1.1" }]
-    assert_empty @keg.installed_dependents
-    assert_nil Keg.find_some_installed_dependents([@keg])
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 
   def test_different_name_same_version_in_tab
@@ -464,5 +465,20 @@ class InstalledDependantsTests < LinkTestCase
     Formula["bar"].class.depends_on "foo"
     assert_empty @keg.installed_dependents
     assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_nonoptlinked
+    @keg.remove_opt_record
+    dependencies [{ "full_name" => "foo", "version" => "1.0" }]
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_keg_only
+    @keg.unlink
+    Formula["foo"].class.keg_only "a good reason"
+    dependencies [{ "full_name" => "foo", "version" => "1.1" }] # different version
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 end

@@ -385,6 +385,7 @@ class Keg
   end
 
   def installed_dependents
+    return [] unless optlinked?
     tap = Tab.for_keg(self).source["tap"]
     Keg.all.select do |keg|
       tab = Tab.for_keg(keg)
@@ -394,12 +395,10 @@ class Keg
         # in case of conflicts between formulae from different taps.
         begin
           dep_formula = Formulary.factory(dep["full_name"])
-          next false unless dep_formula == to_formula
+          dep_formula == to_formula
         rescue FormulaUnavailableError
-          next false unless "#{tap}/#{name}" == dep["full_name"]
+          next "#{tap}/#{name}" == dep["full_name"]
         end
-
-        dep["version"] == version.to_s
       end
     end
   end
