@@ -3,9 +3,7 @@
 ## Installing previous versions of formulae
 
 The preferred and supported method of installing specific versions of
-formulae is to use the
-[homebrew/versions](https://github.com/Homebrew/homebrew-versions)
-tap.  If the version you’re looking for isn’t available, consider [opening a
+formulae is to use formula like e.g. `gcc@6`. If the version you’re looking for isn’t available, consider [opening a
 pull request](https://github.com/Homebrew/brew/blob/master/docs/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md)!
 
 ### Installing directly from pull-requests

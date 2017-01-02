@@ -4,6 +4,9 @@ The following commands are used by Homebrew contributors to set up a fork of Hom
 
 Depending on the change you want to make, you need to send the pull request to the appropriate one of Homebrew's main repositories. If you want to submit a change to Homebrew core code (the `brew` implementation), you should open the pull request on [Homebrew/brew](https://github.com/Homebrew/brew). If you want to submit a change for a formula, you should open the pull request on [the `homebrew/core` tap](https://github.com/Homebrew/homebrew-core) or another [official tap](https://github.com/Homebrew), based on the formula type.
 
+## Submit a new version of an existing formula
+1. Use `brew bump-formula-pr` to do everything (i.e. forking, committing, pushing) with a single command. Run `brew bump-formula-pr --help` to learn more.
+
 ## Set up your own fork of the Homebrew repository
 
 ### Core `brew` code related pull request
