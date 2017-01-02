@@ -2,11 +2,12 @@ require "testing_env"
 require "download_strategy"
 
 class ResourceDouble
-  attr_reader :url, :specs, :version
+  attr_reader :url, :specs, :version, :mirrors
 
   def initialize(url = "http://example.com/foo.tar.gz", specs = {})
     @url = url
     @specs = specs
+    @mirrors = []
   end
 end
 
@@ -57,6 +58,50 @@ class VCSDownloadStrategyTests < Homebrew::TestCase
     end
     downloader = strategy.new("baz", resource)
     assert_equal HOMEBREW_CACHE.join("baz--foo"), downloader.cached_location
+  end
+end
+
+class GitHubReleaseDownloadStrategyTests < Homebrew::TestCase
+  def setup
+    resource = ResourceDouble.new("https://github.com/owner/repo/releases/download/tag/foo_v0.1.0_darwin_amd64.tar.gz")
+    ENV["GITHUB_TOKEN"] = "token"
+    @strategy = GitHubReleaseDownloadStrategy.new("foo", resource)
+  end
+
+  def test_initialize
+    assert_equal "token", @strategy.instance_variable_get(:@github_token)
+    assert_equal "owner", @strategy.instance_variable_get(:@owner)
+    assert_equal "repo", @strategy.instance_variable_get(:@repo)
+    assert_equal "tag", @strategy.instance_variable_get(:@tag)
+    assert_equal "foo_v0.1.0_darwin_amd64.tar.gz", @strategy.instance_variable_get(:@filename)
+  end
+
+  def test_asset_url
+    @strategy.stubs(:resolve_asset_id).returns(456)
+    expected = "https://token@api.github.com/repos/owner/repo/releases/assets/456"
+    assert_equal expected, @strategy.send(:asset_url)
+  end
+
+  def test_resolve_asset_id
+    release_metadata = {
+      "assets" => [
+        {
+          "id" => 123,
+          "name" => "foo_v0.1.0_linux_amd64.tar.gz",
+        },
+        {
+          "id" => 456,
+          "name" => "foo_v0.1.0_darwin_amd64.tar.gz",
+        },
+      ]
+    }
+    @strategy.stubs(:fetch_release_metadata).returns(release_metadata)
+    assert_equal 456, @strategy.send(:resolve_asset_id)
+  end
+
+  def test_release_url
+    expected = "https://api.github.com/repos/owner/repo/releases/tags/tag"
+    assert_equal expected, @strategy.send(:release_url)
   end
 end
 

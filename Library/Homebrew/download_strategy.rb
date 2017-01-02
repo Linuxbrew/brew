@@ -532,6 +532,82 @@ class S3DownloadStrategy < CurlDownloadStrategy
   end
 end
 
+# GitHubReleaseDownloadStrategy downloads tarballs from GitHub Release assets.
+# To use it, add ":using => GitHubReleaseDownloadStrategy" to the URL section
+# of your formula. This download strategy uses GitHub access tokens (in the
+# environment variables GITHUB_TOKEN) to sign the request.
+# This strategy is suitable for corporate use just like S3DownloadStrategy,
+# because it lets you use a private GttHub repository for internal distribution.
+# It works with public one, but in that case simply use CurlDownloadStrategy.
+class GitHubReleaseDownloadStrategy < CurlDownloadStrategy
+  require 'open-uri'
+
+  def initialize(name, resource)
+    super
+
+    @github_token = ENV["GITHUB_TOKEN"]
+    unless @github_token
+      puts "Environmental variable GITHUB_TOKEN is required."
+      raise CurlDownloadStrategyError, @url
+    end
+
+    url_pattern = %r|https://github.com/(\S+)/(\S+)/releases/download/(\S+)/(\S+)|
+    unless @url =~ url_pattern
+      puts "Invalid url pattern for GitHub Release."
+      raise CurlDownloadStrategyError, @url
+    end
+
+    _, @owner, @repo, @tag, @filename = *(@url.match(url_pattern))
+  end
+
+  def _fetch
+    puts "Download asset_id: #{asset_id}"
+    # HTTP request header `Accept: application/octet-stream` is required.
+    # Without this, the GitHub API will respond with metadata, not binary.
+    curl asset_url, "-C", downloaded_size, "-o", temporary_path, "-H", 'Accept: application/octet-stream'
+  end
+
+  private
+
+  def asset_url
+    "https://#{@github_token}@api.github.com/repos/#{@owner}/#{@repo}/releases/assets/#{asset_id}"
+  end
+
+  def asset_id
+    @asset_id ||= resolve_asset_id
+  end
+
+  def resolve_asset_id
+    release_metadata = fetch_release_metadata
+    assets = release_metadata["assets"].select{ |a| a["name"] == @filename }
+    if assets.empty?
+      puts "Asset file not found."
+      raise CurlDownloadStrategyError, @url
+    end
+
+    return assets.first["id"]
+  end
+
+  def release_url
+    "https://api.github.com/repos/#{@owner}/#{@repo}/releases/tags/#{@tag}"
+  end
+
+  def fetch_release_metadata
+    begin
+      release_response = open(release_url, {:http_basic_authentication => [@github_token]}).read
+    rescue OpenURI::HTTPError => e
+      if e.message == '404 Not Found'
+        puts "GitHub Release not found."
+        raise CurlDownloadStrategyError, @url
+      else
+        raise e
+      end
+    end
+
+    return JSON.parse(release_response)
+  end
+end
+
 class SubversionDownloadStrategy < VCSDownloadStrategy
   def initialize(name, resource)
     super
