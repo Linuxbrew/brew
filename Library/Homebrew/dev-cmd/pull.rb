@@ -237,8 +237,7 @@ module Homebrew
         # Squash a Linuxbrew build-bottle-pr commit.
         if Utils.popen_read("git", "diff", orig_revision, "HEAD") =~ /^\+# .*: Build a bottle for Linuxbrew$/
           ohai "Squashing build-bottle-pr commit"
-          require "dev-cmd/squash-bottle-pr"
-          Homebrew.squash_bottle_pr
+          safe_system HOMEBREW_BREW_FILE, "squash-bottle-pr"
         end
       end
 
