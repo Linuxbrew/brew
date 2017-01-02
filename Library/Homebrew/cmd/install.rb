@@ -32,10 +32,10 @@
 #:    passed, then both <formula> and the dependencies installed as part of this process
 #:    are built from source even if bottles are available.
 #:
-#     Hidden developer option:
-#     If `--force-bottle` is passed, install from a bottle if it exists
-#    for the current version of macOS, even if custom options are given.
-#
+#:    If `--force-bottle` is passed, install from a bottle if it exists for the
+#:    current or newest version of macOS, even if it would not normally be used
+#:    for installation.
+#:
 #:    If `--devel` is passed, and <formula> defines it, install the development version.
 #:
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,

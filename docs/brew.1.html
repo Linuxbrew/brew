@@ -127,8 +127,9 @@ checksum of a previously cached version no longer matches.</p>
 <p>If <code>--build-from-source</code> is passed, download the source rather than a
 bottle.</p>
 
-<p>If <code>--force-bottle</code> is passed, download a bottle if it exists for the current
-version of macOS, even if it would not be used during installation.</p></dd>
+<p>If <code>--force-bottle</code> is passed, download a bottle if it exists for the
+current or newest version of macOS, even if it would not be used during
+installation.</p></dd>
 <dt><code>gist-logs</code> [<code>--new-issue</code>|<code>-n</code>] <var>formula</var></dt><dd><p>Upload logs for a failed build of <var>formula</var> to a new Gist.</p>
 
 <p><var>formula</var> is usually the name of the formula to install, but it can be specified
@@ -184,6 +185,10 @@ from bottles if they are available.</p>
 <p>If <code>HOMEBREW_BUILD_FROM_SOURCE</code> is set, regardless of whether <code>--build-from-source</code> was
 passed, then both <var>formula</var> and the dependencies installed as part of this process
 are built from source even if bottles are available.</p>
+
+<p>If <code>--force-bottle</code> is passed, install from a bottle if it exists for the
+current or newest version of macOS, even if it would not normally be used
+for installation.</p>
 
 <p>If <code>--devel</code> is passed, and <var>formula</var> defines it, install the development version.</p>
 
