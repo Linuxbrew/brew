@@ -49,6 +49,8 @@ module Utils
           if key.to_s.end_with?("_or_later")
             later_tag = key.to_s[/(\w+)_or_later$/, 1].to_sym
             MacOS::Version.from_symbol(later_tag) <= tag_version
+          elsif ARGV.force_bottle?
+            true
           end
         end
       end
