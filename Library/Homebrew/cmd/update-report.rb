@@ -387,7 +387,7 @@ class Reporter
       end
     end
 
-    renamed_formulae = []
+    renamed_formulae = Set.new
     @report[:D].each do |old_full_name|
       old_name = old_full_name.split("/").last
       new_name = tap.formula_renames[old_name]
@@ -402,10 +402,24 @@ class Reporter
       renamed_formulae << [old_full_name, new_full_name] if @report[:A].include? new_full_name
     end
 
+    @report[:A].each do |new_full_name|
+      new_name = new_full_name.split("/").last
+      old_name = tap.formula_renames.key(new_name)
+      next unless old_name
+
+      if tap.core_tap?
+        old_full_name = old_name
+      else
+        old_full_name = "#{tap}/#{old_name}"
+      end
+
+      renamed_formulae << [old_full_name, new_full_name]
+    end
+
     unless renamed_formulae.empty?
       @report[:A] -= renamed_formulae.map(&:last)
       @report[:D] -= renamed_formulae.map(&:first)
-      @report[:R] = renamed_formulae
+      @report[:R] = renamed_formulae.to_a
     end
 
     @report
