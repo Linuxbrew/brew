@@ -546,16 +546,10 @@ class GitHubReleaseDownloadStrategy < CurlDownloadStrategy
     super
 
     @github_token = ENV["GITHUB_TOKEN"]
-    unless @github_token
-      puts "Environmental variable GITHUB_TOKEN is required."
-      raise CurlDownloadStrategyError, @url
-    end
+    raise CurlDownloadStrategyError, "Environmental variable GITHUB_TOKEN is required." unless @github_token
 
     url_pattern = %r|https://github.com/(\S+)/(\S+)/releases/download/(\S+)/(\S+)|
-    unless @url =~ url_pattern
-      puts "Invalid url pattern for GitHub Release."
-      raise CurlDownloadStrategyError, @url
-    end
+    raise CurlDownloadStrategyError, "Invalid url pattern for GitHub Release." unless @url =~ url_pattern
 
     _, @owner, @repo, @tag, @filename = *(@url.match(url_pattern))
   end
@@ -580,10 +574,7 @@ class GitHubReleaseDownloadStrategy < CurlDownloadStrategy
   def resolve_asset_id
     release_metadata = fetch_release_metadata
     assets = release_metadata["assets"].select{ |a| a["name"] == @filename }
-    if assets.empty?
-      puts "Asset file not found."
-      raise CurlDownloadStrategyError, @url
-    end
+    raise CurlDownloadStrategyError, "Asset file not found." if assets.empty?
 
     return assets.first["id"]
   end
@@ -597,8 +588,7 @@ class GitHubReleaseDownloadStrategy < CurlDownloadStrategy
       release_response = open(release_url, {:http_basic_authentication => [@github_token]}).read
     rescue OpenURI::HTTPError => e
       if e.message == '404 Not Found'
-        puts "GitHub Release not found."
-        raise CurlDownloadStrategyError, @url
+        raise CurlDownloadStrategyError, "GitHub Release not found."
       else
         raise e
       end
