@@ -9,11 +9,11 @@ A formula is a package definition written in Ruby. It can be created with `brew 
 | **Keg**        | The installation prefix of a **Formula**                   | `/usr/local/Cellar/foo/0.1`                                     |
 | **opt prefix** | A symlink to the active version of a **Keg**               | `/usr/local/opt/foo `                                           |
 | **Cellar**     | All **Kegs** are installed here                            | `/usr/local/Cellar`                                             |
-| **Tap**        | An optional Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-versions`   |
+| **Tap**        | A Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core`   |
 | **Bottle**     | Pre-built **Keg** used instead of building from source     | `qt-4.8.4.mavericks.bottle.tar.gz`                              |
 | **Cask**       | An [extension of homebrew](https://github.com/caskroom/homebrew-cask) to install macOS native apps  | `/Applications/MacDown.app/Contents/SharedSupport/bin/macdown` |
 | **Brew Bundle**| An [extension of homebrew](https://github.com/Homebrew/homebrew-bundle) to describe dependencies    | `brew 'myservice', restart_service: true` |
- 
+
 ## An Introduction
 
 Homebrew uses Git for downloading updates and contributing to the project.
@@ -33,7 +33,7 @@ Before submitting a new formula make sure your package:
 *   isn't in another official [Homebrew tap](https://github.com/Homebrew)
 *   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
 *   is still supported by upstream (i.e. doesn't require extensive patching)
-*   has a stable, tagged version (i.e. not just a GitHub repository with no versions). See [Interesting-Taps-&-Forks](Interesting-Taps-&-Forks.md) for where pre-release versions belong.
+*   has a stable, tagged version (i.e. not just a GitHub repository with no versions).
 *   passes all `brew audit --new-formula $FORMULA` tests.
 
 Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md).
