@@ -1,7 +1,6 @@
 OFFICIAL_TAPS = %w[
   apache
   completions
-  devel-only
   dupes
   emacs
   fuse
@@ -12,7 +11,6 @@ OFFICIAL_TAPS = %w[
   python
   science
   tex
-  versions
   x11
 ].freeze
 
