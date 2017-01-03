@@ -73,19 +73,6 @@ fi
 export GEM_OLD_HOME="$GEM_HOME"
 export GEM_OLD_PATH="$GEM_PATH"
 
-# Users may have these set, pointing the system Ruby
-# at non-system gem paths
-unset GEM_HOME
-
-if [[ -z "$HOMEBREW_WHICH_RUBY" ]]
-then
-  unset GEM_PATH
-fi
-
-# Users may have this set, injecting arbitrary environment changes into
-# bash processes inside builds
-unset BASH_ENV
-
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_MACOS="1" ;;
@@ -271,12 +258,6 @@ access to all bottles."
 EOS
 fi
 
-if [[ -z "$HOMEBREW_ENV_PRUNED" ]]
-then
-  source "$HOMEBREW_LIBRARY/Homebrew/utils/shell_env.sh"
-  prune-shell-env
-fi
-
 # Hide shellcheck complaint:
 # shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
@@ -346,11 +327,6 @@ else
   # shellcheck source=/dev/null
   source "$HOMEBREW_LIBRARY/Homebrew/utils/ruby.sh"
   setup-ruby-path
-  
-  if [[ -n "$HOMEBREW_WHICH_RUBY" ]]
-  then
-    export HOMEBREW_RUBY_PATH="$(which ruby)"
-  fi
   
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
