@@ -1048,6 +1048,8 @@ class FormulaAuditor
 
     return unless @strict
 
+    problem "`#{$1}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
+
     if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
       bad_system = $1
       unless %w[| < > & ; *].any? { |c| bad_system.include? c }
