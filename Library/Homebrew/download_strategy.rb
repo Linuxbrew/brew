@@ -535,18 +535,19 @@ end
 # GitHubReleaseDownloadStrategy downloads tarballs from GitHub Release assets.
 # To use it, add ":using => GitHubReleaseDownloadStrategy" to the URL section
 # of your formula. This download strategy uses GitHub access tokens (in the
-# environment variables GITHUB_TOKEN) to sign the request.
+# environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.
 # This strategy is suitable for corporate use just like S3DownloadStrategy,
 # because it lets you use a private GttHub repository for internal distribution.
 # It works with public one, but in that case simply use CurlDownloadStrategy.
 class GitHubReleaseDownloadStrategy < CurlDownloadStrategy
-  require 'open-uri'
+  require "utils/formatter"
+  require 'utils/github'
 
   def initialize(name, resource)
     super
 
-    @github_token = ENV["GITHUB_TOKEN"]
-    raise CurlDownloadStrategyError, "Environmental variable GITHUB_TOKEN is required." unless @github_token
+    @github_token = ENV["HOMEBREW_GITHUB_API_TOKEN"]
+    raise CurlDownloadStrategyError, "Environmental variable HOMEBREW_GITHUB_API_TOKEN is required." unless @github_token
 
     url_pattern = %r|https://github.com/(\S+)/(\S+)/releases/download/(\S+)/(\S+)|
     raise CurlDownloadStrategyError, "Invalid url pattern for GitHub Release." unless @url =~ url_pattern
@@ -584,17 +585,7 @@ class GitHubReleaseDownloadStrategy < CurlDownloadStrategy
   end
 
   def fetch_release_metadata
-    begin
-      release_response = open(release_url, {:http_basic_authentication => [@github_token]}).read
-    rescue OpenURI::HTTPError => e
-      if e.message == '404 Not Found'
-        raise CurlDownloadStrategyError, "GitHub Release not found."
-      else
-        raise e
-      end
-    end
-
-    return JSON.parse(release_response)
+    GitHub.open(release_url)
   end
 end
 
