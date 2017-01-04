@@ -45,7 +45,16 @@ module Homebrew
     end
     ignores << "recommended?" if ARGV.include? "--skip-recommended"
 
+    verbose_using_dots = !ENV["HOMEBREW_VERBOSE_USING_DOTS"].nil?
+    last_dot = Time.at(0)
+
     uses = formulae.select do |f|
+      # Print a dot every minute.
+      if verbose_using_dots && (Time.now - last_dot) > 60
+        last_dot = Time.now
+        $stderr.print "."
+      end
+
       used_formulae.all? do |ff|
         begin
           if recursive
@@ -92,6 +101,7 @@ module Homebrew
         end
       end
     end
+    $stderr.puts if verbose_using_dots
 
     return if uses.empty?
     puts Formatter.columns(uses.map(&:full_name))

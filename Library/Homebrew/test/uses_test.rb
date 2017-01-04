@@ -9,8 +9,10 @@ class IntegrationCommandTestUses < IntegrationCommandTestCase
       depends_on "bar"
     EOS
 
-    assert_equal "", cmd("uses", "baz")
-    assert_equal "baz", cmd("uses", "bar")
-    assert_match(/(bar\nbaz|baz\nbar)/, cmd("uses", "--recursive", "foo"))
+    # Unset HOMEBREW_VERBOSE_USING_DOTS, as a dot in the output fails this test.
+    env = { "HOMEBREW_VERBOSE_USING_DOTS" => nil }
+    assert_equal "", cmd("uses", "baz", env)
+    assert_equal "baz", cmd("uses", "bar", env)
+    assert_match(/(bar\nbaz|baz\nbar)/, cmd("uses", "--recursive", "foo", env))
   end
 end
