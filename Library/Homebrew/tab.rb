@@ -168,6 +168,7 @@ class Tab < OpenStruct
 
   def self.empty
     attributes = {
+      "homebrew_version" => HOMEBREW_VERSION,
       "used_options" => [],
       "unused_options" => [],
       "built_as_bottle" => false,

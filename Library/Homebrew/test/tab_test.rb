@@ -33,6 +33,7 @@ class TabTests < Homebrew::TestCase
   def test_defaults
     tab = Tab.empty
 
+    assert_equal HOMEBREW_VERSION, tab.homebrew_version
     assert_empty tab.unused_options
     assert_empty tab.used_options
     assert_nil tab.changed_files
