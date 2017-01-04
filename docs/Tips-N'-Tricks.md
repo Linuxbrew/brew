@@ -1,4 +1,4 @@
-# Tips N' Tricks
+# Tips and Tricks
 
 ## Installing previous versions of formulae
 
@@ -7,16 +7,14 @@ some formulae is to see if there is a versions formula like e.g. `gcc@6` availab
 pull request](https://github.com/Homebrew/brew/blob/master/docs/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md)!
 
 ### Installing directly from pull-requests
-
-You can browse pull requests https://github.com/Homebrew/homebrew-core/pulls
-and install through the direct link. For example Python 3.3.0 pull request https://github.com/Homebrew/homebrew/pull/15199
+You can [browse pull requests](https://github.com/Homebrew/homebrew-core/pulls)
+and install through the direct link. For example Python 3.3.0 pull request [Homebrew/homebrew#15199](https://github.com/Homebrew/homebrew/pull/15199)
 
 ```sh
 brew install https://raw.github.com/dsr/homebrew/9b22d42f50fcbc5e52c764448b3ac002bc153bd7/Library/Formula/python3.rb
 ```
 
 ## Quickly remove something from /usr/local
-
 ```sh
 brew unlink $FORMULA
 ```
@@ -26,7 +24,6 @@ This can be useful if a package can't build against the version of something you
 And of course, you can simply `brew link $FORMULA` again afterwards!
 
 ## Activate a previously installed version of a formula
-
 ```sh
 brew info $FORMULA
 brew switch $FORMULA $VERSION
@@ -35,21 +32,18 @@ brew switch $FORMULA $VERSION
 Use `brew info $FORMULA` to check what versions are installed but not currently activated, then `brew switch $FORMULA $VERSION` to activate the desired version. This can be useful if you would like to switch between versions of a formula.
 
 ## Install into Homebrew without formulae
-
 ```sh
 ./configure --prefix=/usr/local/Cellar/foo/1.2 && make && make install && brew link foo
 ```
 
 ## Pre-downloading a file for a formula
-
 Sometimes it's faster to download a file via means other than those
 strategies that are available as part of Homebrew.  For example,
 Erlang provides a torrent that'll let you download at 4–5× the normal
 HTTP method.
 
 Download the file and drop it in `~/Library/Caches/Homebrew`, but
-watch the file name.  Homebrew downloads files as <code>{{ formula
-name }}-{{ version }}</code>.  In the case of Erlang, this requires
+watch the file name.  Homebrew downloads files as <code>${FORMULA_NAME}-${VERSION}</code>.  In the case of Erlang, this requires
 renaming the file from <code>otp_src_R13B03</code> to
 <code>erlang-R13B03</code>.
 
@@ -60,7 +54,6 @@ run `mv the_tarball $(brew --cache -s $FORMULA)`.
 You can also pre-cache the download by using the command `brew fetch formula` which also displays the SHA256 value. This can be useful for updating formulae to new versions.
 
 ## Using Homebrew behind a proxy
-
 Behind the scenes, Homebrew uses several commands for downloading files (e.g. curl, git, svn).  Many of these tools can download via a proxy.  It's a common (though not universal) convention for these command-line tools to observe getting the proxy parameters from environment variables (e.g. `http_proxy`).  Unfortunately, most tools are inconsistent in their use of these environment parameters (e.g. curl supports `http_proxy`, `HTTPS_PROXY`, `FTP_PROXY`, `GOPHER_PROXY`, `ALL_PROXY`, `NO_PROXY`).
 
 Luckily, for the majority of cases setting `http_proxy` is enough.
@@ -72,13 +65,11 @@ http_proxy=http://<proxyhost>:<proxyport> brew install $FORMULA
 ```
 
 ### Proxy Authentication
-
 ```sh
 http_proxy=http://<user>:<password>@<proxyhost>:<proxyport>  brew install $FORMULA
 ```
 
 ## Installing stuff without the Xcode-CLT
-
 ```sh
 $ brew sh          # or: eval $(brew --env)
 $ gem install ronn # or c-programs
@@ -87,13 +78,11 @@ $ gem install ronn # or c-programs
 This imports the brew environment into your existing shell, gem will pick up the environment variables and be able to build. As a bonus brew's automatically determined optimization flags are set.
 
 ## Install only a formula's dependencies (not the formula)
-
 ```sh
 brew install --only-dependencies $FORMULA
 ```
 
 ## Interactive Homebrew Shell
-
 ```sh
 $ brew irb
 1.8.7 :001 > Formula.factory("ace").methods - Object.methods
@@ -102,7 +91,6 @@ $ brew irb
 ```
 
 ## Hiding the beer mug emoji when finishing a build
-
 ```sh
 export HOMEBREW_NO_EMOJI=1
 ```
@@ -125,12 +113,10 @@ In Sublime Text 2/3, you can use Package Control to install
 which adds highlighting for inline patches.
 
 ### Vim
-
 [brew.vim](https://github.com/xu-cheng/brew.vim) adds highlighting to
 inline patches in Vim.
 
 ### Emacs
-
 [homebrew-mode](https://github.com/dunn/homebrew-mode) provides syntax
 highlighting for inline patches as well as a number of helper functions
 for editing formula files.
@@ -139,7 +125,6 @@ for editing formula files.
 for emacs shell-mode and eshell-mode.
 
 ### Atom
-
 [language-homebrew-formula](https://atom.io/packages/language-homebrew-formula)
 adds highlighting and diff support (with the
 [language-diff](https://atom.io/packages/language-diff) plugin).

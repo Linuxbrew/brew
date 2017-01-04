@@ -29,16 +29,16 @@ There are exceptions:
 
 #### Examples
 
-  Formula         | Reason
-  ---             | ---
-  ruby, python, perl    | People want newer versions
-  bash            | macOS's bash is stuck at 3.2 because newer versions are licensed under GPLv3
-  zsh             | This was a mistake, but it’s too late to remove it
-  emacs, vim      | [Too popular to move to dupes](https://github.com/Homebrew/homebrew/pull/21594#issuecomment-21968819)
-  subversion      | Originally added for 10.5, but people want the latest version
-  libcurl         | Some formulae require a newer version than macOS provides
-  openssl         | macOS's openssl is deprecated & outdated.
-  libxml2         | Historically, macOS's libxml2 has been buggy
+| Formula            | Reason                                                                                                |
+|--------------------|-------------------------------------------------------------------------------------------------------|
+| ruby, python, perl | People want newer versions                                                                            |
+| bash               | macOS's bash is stuck at 3.2 because newer versions are licensed under GPLv3                          |
+| zsh                | This was a mistake, but it’s too late to remove it                                                    |
+| emacs, vim         | [Too popular to move to dupes](https://github.com/Homebrew/homebrew/pull/21594#issuecomment-21968819) |
+| subversion         | Originally added for 10.5, but people want the latest version                                         |
+| libcurl            | Some formulae require a newer version than macOS provides                                             |
+| openssl            | macOS's openssl is deprecated & outdated.                                                             |
+| libxml2            | Historically, macOS's libxml2 has been buggy                                                          |
 
 We also maintain [a tap](https://github.com/Homebrew/homebrew-dupes) that
 contains many duplicates not otherwise found in Homebrew.
@@ -80,7 +80,8 @@ useful to people. Just install the stuff! Having to faff around with
 foo-ruby foo-perl etc. sucks.
 
 ### Niche (or self-submitted) Stuff<a name="Niche_Stuff"></a>
-The software in question must be
+The software in question must be:
+
 * maintained (e.g. upstream is still making new releases)
 * known
 * stable (e.g. not declared "unstable" or "beta" by upstream)
