@@ -553,7 +553,7 @@ class Formula
   # called from within the same formula's {#install} or {#post_install} methods.
   # Otherwise, return the full path to the formula's versioned cellar.
   def prefix(v = pkg_version)
-    prefix = rack/v
+    prefix = FormulaPrefixPathname.new(rack/v)
     if !@versioned_prefix && prefix.directory? && Keg.new(prefix).optlinked?
       opt_prefix
     else
@@ -938,7 +938,7 @@ class Formula
   # formula, as the path is stable even when the software is updated.
   # <pre>args << "--with-readline=#{Formula["readline"].opt_prefix}" if build.with? "readline"</pre>
   def opt_prefix
-    Pathname.new("#{HOMEBREW_PREFIX}/opt/#{name}")
+    FormulaPrefixPathname.new("#{HOMEBREW_PREFIX}/opt/#{name}")
   end
 
   def opt_bin
@@ -2421,6 +2421,12 @@ class Formula
     # @private
     def link_overwrite_paths
       @link_overwrite_paths ||= Set.new
+    end
+  end
+
+  class FormulaPrefixPathname < Pathname
+    def abv
+      Pathname.new(realpath).abv
     end
   end
 end
