@@ -574,7 +574,10 @@ class Formula
   # Is formula's linked keg points to the prefix.
   def prefix_linked?(v = pkg_version)
     return false unless linked?
-    linked_keg.resolved_path == prefix(v)
+    @versioned_prefix = true
+    result = linked_keg.resolved_path == prefix(v)
+    @versioned_prefix = false
+    result
   end
 
   # {PkgVersion} of the linked keg for the formula.
