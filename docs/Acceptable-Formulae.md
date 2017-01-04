@@ -1,4 +1,5 @@
 # Acceptable Formulae
+
 Some formulae should not go in
 [homebrew/core](https://github.com/Homebrew/homebrew-core). But there are
 additional [Interesting Taps & Forks](Interesting-Taps-&-Forks.md) and anyone can start their

@@ -1,4 +1,5 @@
 # Installation
+
 The suggested and easiest way to install Homebrew is on the
 [homepage](http://brew.sh).
 

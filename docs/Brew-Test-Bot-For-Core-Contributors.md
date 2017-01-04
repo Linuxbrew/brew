@@ -1,4 +1,5 @@
 # Brew Test Bot For Core Contributors
+
 If a build has run and passed on `brew test-bot` then it can be used to quickly bottle formulae.
 
 There are two types of Jenkins jobs you will interact with:

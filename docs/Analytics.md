@@ -1,4 +1,5 @@
 # Anonymous Aggregate User Behaviour Analytics
+
 Homebrew has begun gathering anonymous aggregate user behaviour analytics and reporting these to Google Analytics. You will be notified the first time you run `brew update` or install Homebrew.
 
 ## Why?
