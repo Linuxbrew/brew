@@ -1,4 +1,4 @@
-# Homebrew's Anonymous Aggregate User Behaviour Analytics
+# Anonymous Aggregate User Behaviour Analytics
 Homebrew has begun gathering anonymous aggregate user behaviour analytics and reporting these to Google Analytics. You will be notified the first time you run `brew update` or install Homebrew.
 
 ## Why?
@@ -41,7 +41,7 @@ Homebrew's analytics are sent throughout Homebrew's execution to Google Analytic
 Homebrew's analytics are accessible to Homebrew's current maintainers. Contact @mikemcquaid if you are a maintainer and need access.
 
 ## How?
-The code is viewable in https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.rb and https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.sh. They are done in a separate background process and fail fast to avoid delaying any execution. They will fail immediately and silently if you have no network connection.
+The code is viewable in [analytics.rb](https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.rb) and [analytics.sh](https://github.com/Homebrew/brew/blob/master/Library/Homebrew/utils/analytics.sh). They are done in a separate background process and fail fast to avoid delaying any execution. They will fail immediately and silently if you have no network connection.
 
 ## Opting out
 Homebrew analytics helps us maintainers and leaving it on is appreciated. However, if you want to opt out of Homebrew's analytics, you can set this variable in your environment:

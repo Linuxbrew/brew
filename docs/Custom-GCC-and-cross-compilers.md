@@ -1,4 +1,4 @@
-# Custom GCC and cross compilers
+# Custom GCC and Cross Compilers
 Homebrew depends on having an up-to-date version of Xcode because it comes with
 specific versions of build tools e.g. `clang`.
 
