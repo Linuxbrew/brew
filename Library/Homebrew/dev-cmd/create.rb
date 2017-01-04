@@ -159,7 +159,7 @@ class FormulaCreator
   end
 
   def template; <<-EOS.undent
-    # Documentation: https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md
+    # Documentation: http://docs.brew.sh/Formula-Cookbook.html
     #                http://www.rubydoc.info/github/Homebrew/brew/master/Formula
     # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 

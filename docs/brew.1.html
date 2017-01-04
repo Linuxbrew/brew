@@ -36,7 +36,7 @@ If no search term is given, all locally available formulae are listed.</p></dd>
 
 <dl>
 <dt><code>analytics</code> [<code>state</code>]</dt><dd><p>Display anonymous user behaviour analytics state.
-Read more at <a href="https://git.io/brew-analytics" data-bare-link="true">https://git.io/brew-analytics</a>.</p></dd>
+Read more at <a href="http://docs.brew.sh/Analytics.html" data-bare-link="true">http://docs.brew.sh/Analytics.html</a>.</p></dd>
 <dt><code>analytics</code> (<code>on</code>|<code>off</code>)</dt><dd><p>Turn on/off Homebrew's analytics.</p></dd>
 <dt><code>analytics</code> <code>regenerate-uuid</code></dt><dd><p>Regenerate UUID used in Homebrew's analytics.</p></dd>
 <dt><code>cat</code> <var>formula</var></dt><dd><p>Display the source to <var>formula</var>.</p></dd>
@@ -152,7 +152,7 @@ for <var>version</var> is <code>v1</code>.</p>
 information on all installed formulae.</p>
 
 <p>See the docs for examples of using the JSON:
-<a href="https://github.com/Homebrew/brew/blob/master/docs/Querying-Brew.md" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/docs/Querying-Brew.md</a></p></dd>
+<a href="http://docs.brew.sh/Querying-Brew.html" data-bare-link="true">http://docs.brew.sh/Querying-Brew.html</a></p></dd>
 <dt><code>install</code> [<code>--debug</code>] [<code>--env=</code><var>std</var>|<var>super</var>] [<code>--ignore-dependencies</code>] [<code>--only-dependencies</code>] [<code>--cc=</code><var>compiler</var>] [<code>--build-from-source</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Install <var>formula</var>.</p>
 
 <p><var>formula</var> is usually the name of the formula to install, but it can be specified
@@ -352,7 +352,7 @@ for <var>version</var> is <code>v1</code>.</p>
 <p>Pass <code>--installed</code> to get information on installed taps.</p>
 
 <p>See the docs for examples of using the JSON:
-<a href="https://github.com/Homebrew/brew/blob/master/docs/Querying-Brew.md" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/docs/Querying-Brew.md</a></p></dd>
+<a href="http://docs.brew.sh/Querying-Brew.html" data-bare-link="true">http://docs.brew.sh/Querying-Brew.html</a></p></dd>
 <dt><code>tap-pin</code> <var>tap</var></dt><dd><p>Pin <var>tap</var>, prioritizing its formulae over core when formula names are supplied
 by the user. See also <code>tap-unpin</code>.</p></dd>
 <dt><code>tap-unpin</code> <var>tap</var></dt><dd><p>Unpin <var>tap</var> so its formulae are no longer prioritized. See also <code>tap-pin</code>.</p></dd>
@@ -641,7 +641,7 @@ scripts that reside somewhere in the <code>PATH</code>, named <code>brew-</code>
 to create your own commands without modifying Homebrew's internals.</p>
 
 <p>Instructions for creating your own commands can be found in the docs:
-<a href="https://github.com/Homebrew/brew/blob/master/docs/External-Commands.md" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/docs/External-Commands.md</a></p>
+<a href="http://docs.brew.sh/External-Commands.html" data-bare-link="true">http://docs.brew.sh/External-Commands.html</a></p>
 
 <h2 id="SPECIFYING-FORMULAE">SPECIFYING FORMULAE</h2>
 
@@ -720,7 +720,7 @@ Homebrew uses the GitHub API for features such as <code>brew search</code>.</p>
 the number of parallel jobs to run when building with <code>make</code>(1).</p>
 
 <p><em>Default:</em> the number of available CPU cores.</p></dd>
-<dt><code>HOMEBREW_NO_ANALYTICS</code></dt><dd><p>If set, Homebrew will not send analytics. See: <a href="https://github.com/Homebrew/brew/blob/master/docs/Analytics.md#analytics" data-bare-link="true">https://github.com/Homebrew/brew/blob/master/docs/Analytics.md#analytics</a></p></dd>
+<dt><code>HOMEBREW_NO_ANALYTICS</code></dt><dd><p>If set, Homebrew will not send analytics. See: <a href="http://docs.brew.sh/Analytics.html" data-bare-link="true">http://docs.brew.sh/Analytics.html</a></p></dd>
 <dt><code>HOMEBREW_NO_AUTO_UPDATE</code></dt><dd><p>If set, Homebrew will not auto-update before running <code>brew install</code>,
 <code>brew upgrade</code> or <code>brew tap</code>.</p></dd>
 <dt><code>HOMEBREW_NO_EMOJI</code></dt><dd><p>If set, Homebrew will not print the <code>HOMEBREW_INSTALL_BADGE</code> on a
