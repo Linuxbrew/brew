@@ -16,7 +16,7 @@ class IntegrationCommandTestTap < IntegrationCommandTestCase
     end
 
     assert_match "homebrew/foo", cmd("tap")
-    assert_match "homebrew/versions", cmd("tap", "--list-official")
+    assert_match "homebrew/science", cmd("tap", "--list-official")
     assert_match "2 taps", cmd("tap-info")
     assert_match "https://github.com/Homebrew/homebrew-foo", cmd("tap-info", "homebrew/foo")
     assert_match "https://github.com/Homebrew/homebrew-foo", cmd("tap-info", "--json=v1", "--installed")
@@ -162,17 +162,17 @@ class TapTest < Homebrew::TestCase
     assert_raises(TapUnavailableError) { Tap.new("Homebrew", "bar").remote }
     refute_predicate @tap, :custom_remote?
 
-    version_tap = Tap.new("Homebrew", "versions")
-    version_tap.path.mkpath
-    version_tap.path.cd do
+    services_tap = Tap.new("Homebrew", "services")
+    services_tap.path.mkpath
+    services_tap.path.cd do
       shutup do
         system "git", "init"
-        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-versions"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-services"
       end
     end
-    refute_predicate version_tap, :private?
+    refute_predicate services_tap, :private?
   ensure
-    version_tap.path.rmtree if version_tap
+    services_tap.path.rmtree if services_tap
   end
 
   def test_remote_not_git_repo

@@ -79,15 +79,6 @@ describe "Satisfy Dependencies and Requirements" do
         Hbc::Installer.new(arch_cask).install
       end
     end
-
-    it "raises an exception when depends_on arch is not satisfied" do
-      arch_cask = Hbc.load("with-depends-on-arch-failure")
-      lambda {
-        shutup do
-          Hbc::Installer.new(arch_cask).install
-        end
-      }.must_raise(Hbc::CaskError)
-    end
   end
 
   describe "depends_on x11" do

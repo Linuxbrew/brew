@@ -212,23 +212,8 @@ Linking /usr/local/Cellar/foo/0.1… 17 symlinks created
 ```
 
 ### Where was a formula deleted?
-Use `brew log $FORMULA` to find out!
-
-Sometimes formulae are moved to specialized repositories. These are the
-likely candidates:
-
-* [homebrew/dupes](https://github.com/Homebrew/homebrew-dupes)
-* [homebrew/games](https://github.com/Homebrew/homebrew-games)
-* [homebrew/versions](https://github.com/Homebrew/homebrew-versions)
-
-You can use `brew tap` to access these formulae:
-
-```bash
-brew tap homebrew/games
-brew install …
-```
-
-Note that brew search still finds formula in taps.
+Use `brew log $FORMULA` to find out! Likely because it had unresolved issues or
+our analytics identified it was not widely used.
 
 ### Homebrew is a poor name, it is generic, why was it chosen?
 @mxcl was too concerned with the beer theme and didn’t consider that the

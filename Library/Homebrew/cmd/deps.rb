@@ -66,14 +66,14 @@ module Homebrew
     else
       all_deps = deps_for_formulae(ARGV.formulae, !ARGV.one?, &(mode.union? ? :| : :&))
       all_deps = all_deps.select(&:installed?) if mode.installed?
-      all_deps = if ARGV.include? "--full-name"
-        all_deps.map(&:to_formula).map(&:full_name)
-      else
-        all_deps.map(&:name)
-      end.uniq
+      all_deps = all_deps.map(&method(:dep_display_name)).uniq
       all_deps.sort! unless mode.topo_order?
       puts all_deps
     end
+  end
+
+  def dep_display_name(d)
+    ARGV.include?("--full-name") ? d.to_formula.full_name : d.name
   end
 
   def deps_for_formula(f, recursive = false)
@@ -127,7 +127,10 @@ module Homebrew
   end
 
   def puts_deps(formulae)
-    formulae.each { |f| puts "#{f.full_name}: #{deps_for_formula(f).sort_by(&:name) * " "}" }
+    formulae.each do |f|
+      deps = deps_for_formula(f).sort_by(&:name).map(&method(:dep_display_name))
+      puts "#{f.full_name}: #{deps.join(" ")}"
+    end
   end
 
   def puts_deps_tree(formulae)
@@ -143,14 +146,14 @@ module Homebrew
     max = reqs.length - 1
     reqs.each_with_index do |req, i|
       chr = i == max ? "└──" : "├──"
-      puts prefix + "#{chr} :#{req.to_dependency.name}"
+      puts prefix + "#{chr} :#{dep_display_name(req.to_dependency)}"
     end
     deps = f.deps.default
     max = deps.length - 1
     deps.each_with_index do |dep, i|
       chr = i == max ? "└──" : "├──"
       prefix_ext = i == max ? "    " : "│   "
-      puts prefix + "#{chr} #{dep.name}"
+      puts prefix + "#{chr} #{dep_display_name(dep)}"
       recursive_deps_tree(Formulary.factory(dep.name), prefix + prefix_ext)
     end
   end

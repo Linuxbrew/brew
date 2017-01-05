@@ -15,7 +15,6 @@ GCC or cross-compiler suite, please link it in here.
 
 * Homebrew provides a `gcc` formula for use with Xcode 4.2+ or when needing
 C++11 support on earlier versions.
-* [Homebrew-versions](https://github.com/homebrew/homebrew-versions) provides an
-up to date GCC duplicates e.g. `brew install homebrew/versions/gcc48`
+* Homebrew provides older GCC formulae e.g. `gcc@4.8` and `gcc@6`
 * [RISC-V](https://github.com/riscv/homebrew-riscv) provides the RISC-V
 toolchain including binutils and gcc.

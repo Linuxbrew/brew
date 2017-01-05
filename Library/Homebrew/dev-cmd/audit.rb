@@ -169,6 +169,33 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
+  def url_status_code(url, range: false)
+    # The system Curl is too old and unreliable with HTTPS homepages on
+    # Yosemite and below.
+    return "200" unless DevelopmentTools.curl_handles_most_https_homepages?
+
+    extra_args = [
+      "--connect-timeout", "15",
+      "--output", "/dev/null",
+      "--write-out", "%{http_code}"
+    ]
+    extra_args << "--range" << "0-0" if range
+    extra_args << url
+
+    args = curl_args(
+      extra_args: extra_args,
+      show_output: true,
+      default_user_agent: true
+    )
+    retries = 3
+    status_code = nil
+    retries.times do
+      status_code = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
+      break if status_code.start_with? "20"
+    end
+    status_code
+  end
+
   def audit_style
     return unless @style_offenses
     display_cop_names = ARGV.include?("--display-cop-names")
@@ -448,8 +475,13 @@ class FormulaAuditor
 
   def audit_options
     formula.options.each do |o|
+      if o.name == "32-bit"
+        problem "macOS has been 64-bit only since 10.6 so 32-bit options are deprecated."
+      end
+
       next unless @strict
-      if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal" && o.name != "32-bit"
+
+      if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal"
         problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
       end
 
@@ -564,11 +596,10 @@ class FormulaAuditor
     end
 
     return unless @online
-    begin
-      nostdout { curl "--connect-timeout", "15", "-o", "/dev/null", homepage }
-    rescue ErrorDuringExecution
-      problem "The homepage is not reachable (curl exit code #{$?.exitstatus})"
-    end
+
+    status_code = url_status_code(homepage)
+    return if status_code.start_with? "20"
+    problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end
 
   def audit_bottle_spec
@@ -706,7 +737,7 @@ class FormulaAuditor
     return if formula.revision.zero?
     if formula.stable
       revision_map = attributes_map[:revision][:stable]
-      stable_revisions = revision_map[formula.stable.version]
+      stable_revisions = revision_map[formula.stable.version] if revision_map
       if !stable_revisions || stable_revisions.empty?
         problem "'revision #{formula.revision}' should be removed"
       end
@@ -782,6 +813,10 @@ class FormulaAuditor
 
     if text.include?("def plist") && !text.include?("plist_options")
       problem "Please set plist_options when using a formula-defined plist."
+    end
+
+    if text =~ /depends_on\s+['"]openssl['"]/ && text =~ /depends_on\s+['"]libressl['"]/
+      problem "Formulae should not depend on both OpenSSL and LibreSSL (even optionally)."
     end
 
     return unless text.include?('require "language/go"') && !text.include?("go_resource")
@@ -998,6 +1033,17 @@ class FormulaAuditor
 
     if line.include?('system "npm", "install"') && !line.include?("Language::Node") && formula.name !~ /^kibana(\d{2})?$/
       problem "Use Language::Node for npm install args"
+    end
+
+    if line.include?("fails_with :llvm")
+      problem "'fails_with :llvm' is now a no-op so should be removed"
+    end
+
+    if formula.tap.to_s == "homebrew/core"
+      ["OS.mac?", "OS.linux?"].each do |check|
+        next unless line.include?(check)
+        problem "Don't use #{check}; Homebrew/core only supports macOS"
+      end
     end
 
     return unless @strict

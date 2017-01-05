@@ -226,10 +226,6 @@ class Tab < OpenStruct
     include?("c++11")
   end
 
-  def build_32_bit?
-    include?("32-bit")
-  end
-
   def head?
     spec == :head
   end
@@ -252,6 +248,17 @@ class Tab < OpenStruct
 
   def compiler
     super || DevelopmentTools.default_compiler
+  end
+
+  def parsed_homebrew_version
+    return Version::NULL if homebrew_version.nil?
+    Version.new(homebrew_version)
+  end
+
+  def runtime_dependencies
+    # Homebrew versions prior to 1.1.6 generated incorrect runtime dependency
+    # lists.
+    super unless parsed_homebrew_version < "1.1.6"
   end
 
   def cxxstdlib

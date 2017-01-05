@@ -104,9 +104,6 @@ names, and other aspects of this manual are still subject to change.
     Uninstall the given Cask. With `--force`, uninstall even if the Cask
     does not appear to be present.
 
-  * `update`:
-    For convenience. `brew cask update` is a synonym for `brew update`.
-
   * `zap` <token> [ <token> ... ]:
     Unconditionally remove _all_ files associated with the given Cask.
 

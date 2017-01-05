@@ -32,13 +32,8 @@ module OS
         end
       end
 
-      def minimum_version?
+      def below_minimum_version?
         version < minimum_version
-      end
-
-      def prerelease?
-        # TODO: bump to version >= "8.4" after Xcode 8.3 is stable.
-        Version.new(version) >= "8.3"
       end
 
       def outdated?
@@ -232,11 +227,16 @@ module OS
         end
       end
 
-      def minimum_version?
+      def below_minimum_version?
+        # Lion was the first version of OS X to ship with a CLT
+        return false if MacOS.version < :lion
         version < minimum_version
       end
 
       def outdated?
+        # Lion was the first version of OS X to ship with a CLT
+        return false if MacOS.version < :lion
+
         if MacOS.version >= :mavericks
           version = Utils.popen_read("#{MAVERICKS_PKG_PATH}/usr/bin/clang --version")
         else

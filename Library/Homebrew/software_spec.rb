@@ -13,9 +13,8 @@ class SoftwareSpec
   extend Forwardable
 
   PREDEFINED_OPTIONS = {
-    :universal => Option.new("universal", "Build a universal binary"),
-    :cxx11     => Option.new("c++11", "Build using C++11 mode"),
-    "32-bit"   => Option.new("32-bit", "Build 32-bit only"),
+    universal: Option.new("universal", "Build a universal binary"),
+    cxx11:     Option.new("c++11",     "Build using C++11 mode"),
   }.freeze
 
   attr_reader :name, :full_name, :owner
@@ -174,6 +173,8 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
+    # TODO: deprecate this in future.
+    # odeprecated "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
 

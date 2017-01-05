@@ -1406,7 +1406,7 @@ class Formula
         Formulary.from_rack(rack)
       rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
       end
-    end.compact
+    end.compact.uniq(&:name)
   end
 
   def self.installed_with_alias_path(alias_path)
@@ -1505,7 +1505,10 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    recursive_dependencies.reject(&:build?)
+    recursive_dependencies do |_dependent, dependency|
+      Dependency.prune if dependency.build?
+      Dependency.prune if !dependency.required? && build.without?(dependency)
+    end
   end
 
   # Returns a list of formulae depended on by this formula that aren't
@@ -2340,6 +2343,8 @@ class Formula
     #   version '4.8.1'
     # end</pre>
     def fails_with(compiler, &block)
+      # TODO: deprecate this in future.
+      # odeprecated "fails_with :llvm" if compiler == :llvm
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
 

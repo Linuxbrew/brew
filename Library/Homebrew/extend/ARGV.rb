@@ -44,7 +44,7 @@ module HomebrewArgvExtension
       else
         Formulary.find_with_priority(name, spec)
       end
-    end
+    end.uniq(&:name)
   end
 
   def resolved_formulae
@@ -79,7 +79,7 @@ module HomebrewArgvExtension
       f.follow_installed_alias = false
 
       f
-    end
+    end.uniq(&:name)
   end
 
   def casks
@@ -229,13 +229,6 @@ module HomebrewArgvExtension
     include? "--universal"
   end
 
-  # Request a 32-bit only build.
-  # This is needed for some use-cases though we prefer to build Universal
-  # when a 32-bit version is needed.
-  def build_32_bit?
-    include? "--32-bit"
-  end
-
   def build_bottle?
     include?("--build-bottle") || !ENV["HOMEBREW_BUILD_BOTTLE"].nil?
   end
@@ -294,7 +287,6 @@ module HomebrewArgvExtension
 
     build_flags << "--HEAD" if build_head?
     build_flags << "--universal" if build_universal?
-    build_flags << "--32-bit" if build_32_bit?
     build_flags << "--build-bottle" if build_bottle?
     build_flags << "--build-from-source" if build_from_source?
 

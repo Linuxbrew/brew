@@ -405,6 +405,18 @@ module Homebrew
         EOS
       end
 
+      def check_multiple_cellars
+        return if HOMEBREW_PREFIX.to_s == HOMEBREW_REPOSITORY.to_s
+        return unless (HOMEBREW_REPOSITORY/"Cellar").exist?
+        return unless (HOMEBREW_PREFIX/"Cellar").exist?
+
+        <<-EOS.undent
+          You have multiple Cellars.
+          You should delete #{HOMEBREW_REPOSITORY}/Cellar:
+            rm -rf #{HOMEBREW_REPOSITORY}/Cellar
+        EOS
+      end
+
       def check_homebrew_prefix
         return unless OS.mac?
         return if HOMEBREW_PREFIX.to_s == "/usr/local"
@@ -1115,6 +1127,29 @@ module Homebrew
         end
 
         message
+      end
+
+      def check_for_tap_ruby_files_locations
+        bad_tap_files = {}
+        Tap.each do |tap|
+          unused_formula_dirs = tap.potential_formula_dirs - [tap.formula_dir]
+          unused_formula_dirs.each do |dir|
+            next unless dir.exist?
+            dir.children.each do |path|
+              next unless path.extname == ".rb"
+              bad_tap_files[tap] ||= []
+              bad_tap_files[tap] << path
+            end
+          end
+        end
+        return if bad_tap_files.empty?
+        bad_tap_files.keys.map do |tap|
+          <<-EOS.undent
+            Found Ruby file outside #{tap} tap formula directory
+            (#{tap.formula_dir}):
+              #{bad_tap_files[tap].join("\n  ")}
+          EOS
+        end.join("\n")
       end
 
       def all

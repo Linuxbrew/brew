@@ -87,11 +87,23 @@ class Keg
     mime-info pixmaps sounds postgresql
   ].freeze
 
-  # Will return some kegs, and some dependencies, if they're present.
+  # Given an array of kegs, this method will try to find some other kegs
+  # that depend on them.
+  #
+  # If it does, it returns:
+  # - some kegs in the passed array that have installed dependents
+  # - some installed dependents of those kegs.
+  #
+  # If it doesn't, it returns nil.
+  #
+  # Note that nil will be returned if the only installed dependents
+  # in the passed kegs are other kegs in the array.
+  #
   # For efficiency, we don't bother trying to get complete data.
   def self.find_some_installed_dependents(kegs)
     # First, check in the tabs of installed Formulae.
     kegs.each do |keg|
+      # Don't include dependencies of kegs that were in the given array.
       dependents = keg.installed_dependents - kegs
       dependents.map! { |d| "#{d.name} #{d.version}" }
       return [keg], dependents if dependents.any?
@@ -105,11 +117,27 @@ class Keg
     #
     # This happens after the initial dependency check because it's sloooow.
     remaining_formulae = Formula.installed.select do |f|
-      f.installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
+      installed_kegs = f.installed_kegs
+
+      # Don't include dependencies of kegs that were in the given array.
+      next false if (installed_kegs - kegs).empty?
+
+      installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
     end
 
     keg_names = kegs.map(&:name)
-    kegs_by_source = kegs.group_by { |k| [k.name, Tab.for_keg(k).tap] }
+    kegs_by_source = kegs.group_by do |keg|
+      begin
+        # First, attempt to resolve the keg to a formula
+        # to get up-to-date name and tap information.
+        f = keg.to_formula
+        [f.name, f.tap]
+      rescue FormulaUnavailableError
+        # If the formula for the keg can't be found,
+        # fall back to the information in the tab.
+        [keg.name, Tab.for_keg(keg).tap]
+      end
+    end
 
     remaining_formulae.each do |dependent|
       required = dependent.missing_dependencies(hide: keg_names)
@@ -119,7 +147,7 @@ class Keg
         next unless f_kegs
 
         f_kegs.sort_by(&:version).last
-      end
+      end.compact
 
       next unless required_kegs.any?
 
@@ -137,6 +165,10 @@ class Keg
       path = path.parent.realpath # realpath() prevents root? failing
     end
     raise NotAKegError, "#{path} is not inside a keg"
+  end
+
+  def self.all
+    Formula.racks.flat_map(&:subdirs).map { |d| new(d) }
   end
 
   attr_reader :path, :name, :linked_keg_record, :opt_record
@@ -353,14 +385,20 @@ class Keg
   end
 
   def installed_dependents
-    Formula.installed.flat_map(&:installed_kegs).select do |keg|
+    return [] unless optlinked?
+    tap = Tab.for_keg(self).source["tap"]
+    Keg.all.select do |keg|
       tab = Tab.for_keg(keg)
-      next if tab.runtime_dependencies.nil? # no dependency information saved.
+      next if tab.runtime_dependencies.nil?
       tab.runtime_dependencies.any? do |dep|
         # Resolve formula rather than directly comparing names
         # in case of conflicts between formulae from different taps.
-        dep_formula = Formulary.factory(dep["full_name"])
-        dep_formula == to_formula && dep["version"] == version.to_s
+        begin
+          dep_formula = Formulary.factory(dep["full_name"])
+          dep_formula == to_formula
+        rescue FormulaUnavailableError
+          next "#{tap}/#{name}" == dep["full_name"]
+        end
       end
     end
   end
