@@ -47,48 +47,49 @@ module Homebrew
 
     uses = formulae.select do |f|
       used_formulae.all? do |ff|
-        begin
-          if recursive
-            deps = f.recursive_dependencies do |dependent, dep|
-              if dep.recommended?
-                Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
-              elsif dep.optional?
-                Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
-              elsif dep.build?
-                Dependency.prune unless includes.include?("build?")
-              end
+        if recursive
+          deps = f.recursive_dependencies do |dependent, dep|
+            if dep.recommended?
+              Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
+            elsif dep.optional?
+              Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
+            elsif dep.build?
+              Dependency.prune unless includes.include?("build?")
             end
-            reqs = f.recursive_requirements do |dependent, req|
-              if req.recommended?
-                Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
-              elsif req.optional?
-                Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
-              elsif req.build?
-                Requirement.prune unless includes.include?("build?")
-              end
-            end
-          else
-            deps = f.deps.reject do |dep|
-              ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
-            end
-            reqs = f.requirements.reject do |req|
-              ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
-            end
-          end
-          next true if deps.any? do |dep|
-            begin
-              dep.to_formula.full_name == ff.full_name
-            rescue
-              dep.name == ff.name
-            end
-          end
 
-          reqs.any? do |req|
-            req.name == ff.name || [ff.name, ff.full_name].include?(req.default_formula)
+            # If a tap isn't installed, we can't find the dependencies of one
+            # its formulae, and an exception will be thrown if we try.
+            if dep.is_a?(TapDependency) && !dep.tap.installed?
+              Dependency.keep_but_prune_recursive_deps
+            end
           end
-        rescue FormulaUnavailableError
-          # Silently ignore this case as we don't care about things used in
-          # taps that aren't currently tapped.
+          reqs = f.recursive_requirements do |dependent, req|
+            if req.recommended?
+              Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
+            elsif req.optional?
+              Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
+            elsif req.build?
+              Requirement.prune unless includes.include?("build?")
+            end
+          end
+        else
+          deps = f.deps.reject do |dep|
+            ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
+          end
+          reqs = f.requirements.reject do |req|
+            ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
+          end
+        end
+        next true if deps.any? do |dep|
+          begin
+            dep.to_formula.full_name == ff.full_name
+          rescue
+            dep.name == ff.name
+          end
+        end
+
+        reqs.any? do |req|
+          req.name == ff.name || [ff.name, ff.full_name].include?(req.default_formula)
         end
       end
     end
