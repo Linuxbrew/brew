@@ -1,4 +1,5 @@
 # New Maintainer Checklist
+
 **This is a guide used by existing maintainers to invite new maintainers. You might find it interesting but there's nothing here users should have to know.**
 
 So, there's someone who has been making consistently high-quality contributions to Homebrew for a long time and shown themselves able to make slightly more advanced contributions than just e.g. formula updates? Let's invite them to be a maintainer!

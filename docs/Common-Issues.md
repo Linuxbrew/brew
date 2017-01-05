@@ -1,4 +1,5 @@
 # Common Issues
+
 This is a list of commonly encountered problems, known issues, and their solutions.
 
 ### `brew` complains about absence of "Command Line Tools"
