@@ -1,6 +1,6 @@
 #:  * `analytics` [`state`]:
 #:    Display anonymous user behaviour analytics state.
-#:    Read more at <https://git.io/brew-analytics>.
+#:    Read more at <http://docs.brew.sh/Analytics.html>.
 #:
 #:  * `analytics` (`on`|`off`):
 #:    Turn on/off Homebrew's analytics.

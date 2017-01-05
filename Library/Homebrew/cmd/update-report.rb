@@ -35,7 +35,7 @@ module Homebrew
         ohai "Homebrew has enabled anonymous aggregate user behaviour analytics."
         puts <<-EOS.undent
           #{Tty.bold}Read the analytics documentation (and how to opt-out) here:
-            #{Formatter.url("https://git.io/brew-analytics")}#{Tty.reset}
+            #{Formatter.url("http://docs.brew.sh/Analytics.html")}#{Tty.reset}
 
         EOS
 

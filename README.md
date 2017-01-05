@@ -18,7 +18,7 @@ cd "$(brew --repo)" && git fetch && git reset --hard origin/master && brew updat
 ## Troubleshooting
 First, please run `brew update` and `brew doctor`.
 
-Second, read the [Troubleshooting Checklist](https://github.com/Homebrew/brew/blob/master/docs/Troubleshooting.md#troubleshooting).
+Second, read the [Troubleshooting Checklist](http://docs.brew.sh/Troubleshooting.html).
 
 **If you don't read these it will take us far longer to help you with your problem.**
 
@@ -27,7 +27,7 @@ We'd love you to contribute to Homebrew. First, please read our [Contribution Gu
 
 We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
 
-A good starting point for contributing is running `brew audit` (or `brew audit --strict`) with some of the packages you use (e.g. `brew audit wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit` shows no results and [submit a pull request](https://github.com/Homebrew/brew/blob/master/docs/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md). If no formulae you use have warnings you can run `brew audit` without arguments to have it run on all packages and pick one. Good luck!
+A good starting point for contributing is running `brew audit` (or `brew audit --strict`) with some of the packages you use (e.g. `brew audit wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit` shows no results and [submit a pull request](http://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request.html). If no formulae you use have warnings you can run `brew audit` without arguments to have it run on all packages and pick one. Good luck!
 
 ## Security
 Please report security issues to security@brew.sh.
@@ -61,7 +61,7 @@ Please consider a regular donation through Patreon:
 [![Donate with Patreon](https://img.shields.io/badge/patreon-donate-green.svg)](https://www.patreon.com/homebrew)
 
 ## Sponsors
-Our CI infrastructure was paid for by [our Kickstarter supporters](https://github.com/Homebrew/brew/blob/master/docs/Kickstarter-Supporters.md).
+Our CI infrastructure was paid for by [our Kickstarter supporters](http://docs.brew.sh/Kickstarter-Supporters.html).
 
 Our CI infrastructure is hosted by [The Positive Internet Company](http://www.positive-internet.com).
 

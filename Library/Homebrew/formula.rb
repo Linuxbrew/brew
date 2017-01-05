@@ -26,7 +26,7 @@ require "migrator"
 # @see SharedEnvExtension
 # @see FileUtils
 # @see Pathname
-# @see https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md Formula Cookbook
+# @see http://docs.brew.sh/Formula-Cookbook.html Formula Cookbook
 # @see https://github.com/styleguide/ruby Ruby Style Guide
 #
 # <pre>class Wget < Formula
@@ -2059,7 +2059,7 @@ class Formula
     # and you haven't passed or previously used any options on this formula.
     #
     # If you maintain your own repository, you can add your own bottle links.
-    # https://github.com/Homebrew/brew/blob/master/docs/Bottles.md
+    # http://docs.brew.sh/Bottles.html
     # You can ignore this block entirely if submitting to Homebrew/Homebrew, It'll be
     # handled for you by the Brew Test Bot.
     #
