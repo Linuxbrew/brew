@@ -326,13 +326,13 @@ class Formula
     active_spec.bottle_disable_reason
   end
 
-  # Does the currently active {SoftwareSpec} has any bottle?
+  # Does the currently active {SoftwareSpec} have any bottle?
   # @private
   def bottle_defined?
     active_spec.bottle_defined?
   end
 
-  # Does the currently active {SoftwareSpec} has an installable bottle?
+  # Does the currently active {SoftwareSpec} have an installable bottle?
   # @private
   def bottled?
     active_spec.bottled?
