@@ -1039,7 +1039,7 @@ class FormulaAuditor
       problem "'fails_with :llvm' is now a no-op so should be removed"
     end
 
-    if formula.tap.to_s == "homebrew/core"
+    if formula.tap.to_s == "homebrew/core" && OS.mac?
       ["OS.mac?", "OS.linux?"].each do |check|
         next unless line.include?(check)
         problem "Don't use #{check}; Homebrew/core only supports macOS"
