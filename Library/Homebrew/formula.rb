@@ -198,7 +198,7 @@ class Formula
     @build = active_spec.build
     @pin = FormulaPin.new(self)
     @follow_installed_alias = true
-    @versioned_prefix = false
+    @prefix_returns_versioned_prefix = false
   end
 
   # @private
@@ -553,11 +553,12 @@ class Formula
   # called from within the same formula's {#install} or {#post_install} methods.
   # Otherwise, return the full path to the formula's versioned cellar.
   def prefix(v = pkg_version)
-    prefix = FormulaPrefixPathname.new(rack/v)
-    if !@versioned_prefix && prefix.directory? && Keg.new(prefix).optlinked?
+    versioned_prefix = versioned_prefix(v)
+    if !@prefix_returns_versioned_prefix && v == pkg_version &&
+       versioned_prefix.directory? && Keg.new(versioned_prefix).optlinked?
       opt_prefix
     else
-      prefix
+      versioned_prefix
     end
   end
 
@@ -574,10 +575,7 @@ class Formula
   # Is formula's linked keg points to the prefix.
   def prefix_linked?(v = pkg_version)
     return false unless linked?
-    @versioned_prefix = true
-    result = linked_keg.resolved_path == prefix(v)
-    @versioned_prefix = false
-    result
+    linked_keg.resolved_path == versioned_prefix(v)
   end
 
   # {PkgVersion} of the linked keg for the formula.
@@ -941,7 +939,7 @@ class Formula
   # formula, as the path is stable even when the software is updated.
   # <pre>args << "--with-readline=#{Formula["readline"].opt_prefix}" if build.with? "readline"</pre>
   def opt_prefix
-    FormulaPrefixPathname.new("#{HOMEBREW_PREFIX}/opt/#{name}")
+    Pathname.new("#{HOMEBREW_PREFIX}/opt/#{name}")
   end
 
   def opt_bin
@@ -1005,7 +1003,7 @@ class Formula
 
   # @private
   def run_post_install
-    @versioned_prefix = true
+    @prefix_returns_versioned_prefix = true
     build = self.build
     self.build = Tab.for_formula(self)
     old_tmpdir = ENV["TMPDIR"]
@@ -1020,7 +1018,7 @@ class Formula
     ENV["TMPDIR"] = old_tmpdir
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
-    @versioned_prefix = false
+    @prefix_returns_versioned_prefix = false
   end
 
   # Tell the user about any caveats regarding this package.
@@ -1123,7 +1121,7 @@ class Formula
   # where staging is a Mktemp staging context
   # @private
   def brew
-    @versioned_prefix = true
+    @prefix_returns_versioned_prefix = true
     stage do |staging|
       staging.retain! if ARGV.keep_tmp?
       prepare_patches
@@ -1138,7 +1136,7 @@ class Formula
       end
     end
   ensure
-    @versioned_prefix = false
+    @prefix_returns_versioned_prefix = false
   end
 
   # @private
@@ -1640,7 +1638,7 @@ class Formula
 
   # @private
   def run_test
-    @versioned_prefix = true
+    @prefix_returns_versioned_prefix = true
     old_home = ENV["HOME"]
     old_curl_home = ENV["CURL_HOME"]
     old_tmpdir = ENV["TMPDIR"]
@@ -1672,7 +1670,7 @@ class Formula
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
     ENV["TERM"] = old_term
-    @versioned_prefix = false
+    @prefix_returns_versioned_prefix = false
   end
 
   # @private
@@ -1856,6 +1854,12 @@ class Formula
   end
 
   private
+
+  # Returns the prefix for a given formula version number.
+  # @private
+  def versioned_prefix(v)
+    rack/v
+  end
 
   def exec_cmd(cmd, args, out, logfn)
     ENV["HOMEBREW_CC_LOG_PATH"] = logfn
@@ -2424,12 +2428,6 @@ class Formula
     # @private
     def link_overwrite_paths
       @link_overwrite_paths ||= Set.new
-    end
-  end
-
-  class FormulaPrefixPathname < Pathname
-    def abv
-      Pathname.new(realpath).abv
     end
   end
 end
