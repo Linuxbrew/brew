@@ -598,7 +598,7 @@ class Keg
 
       if src.symlink? || src.file?
         Find.prune if File.basename(src) == ".DS_Store"
-        Find.prune if src.realpath == dst
+        Find.prune if src.resolved_path == dst
         # Don't link pyc or pyo files because Python overwrites these
         # cached object files and next time brew wants to link, the
         # file is in the way.
