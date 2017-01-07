@@ -21,10 +21,6 @@ module Stdenv
     gcc_4_2
   end
 
-  def libxml2
-    odeprecated "ENV.libxml2"
-  end
-
   def libpng
     odeprecated "ENV.libpng", "ENV.x11"
   end
