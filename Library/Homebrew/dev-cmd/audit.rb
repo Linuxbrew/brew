@@ -169,7 +169,7 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def url_status_code(url, range: false)
+  def url_status_code(url, range: false, user_agent: :default)
     # The system Curl is too old and unreliable with HTTPS homepages on
     # Yosemite and below.
     return "200" unless DevelopmentTools.curl_handles_most_https_homepages?
@@ -185,7 +185,7 @@ class FormulaAuditor
     args = curl_args(
       extra_args: extra_args,
       show_output: true,
-      default_user_agent: true
+      user_agent: user_agent
     )
     retries = 3
     status_code = nil
@@ -597,7 +597,7 @@ class FormulaAuditor
 
     return unless @online
 
-    status_code = url_status_code(homepage)
+    status_code = url_status_code(homepage, user_agent: :browser)
     return if status_code.start_with? "20"
     problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end

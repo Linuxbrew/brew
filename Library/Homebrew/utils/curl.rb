@@ -12,7 +12,10 @@ def curl_args(options = {})
     "--location",
   ]
 
-  unless options[:default_user_agent]
+  case options[:user_agent]
+  when :browser
+    args << "--user-agent" << HOMEBREW_USER_AGENT_FAKE_SAFARI
+  else
     args << "--user-agent" << HOMEBREW_USER_AGENT_CURL
   end
 
