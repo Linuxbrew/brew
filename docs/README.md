@@ -27,6 +27,7 @@
 - [How To Open A Pull Request (and get it merged)](How-To-Open-a-Homebrew-Pull-Request.md)
 - [Formula Cookbook](Formula-Cookbook.md)
 - [Acceptable Formulae](Acceptable-Formulae.md)
+- [Formulae Versions](Versions.md)
 - [Node for Formula Authors](Node-for-Formula-Authors.md)
 - [Python for Formula Authors](Python-for-Formula-Authors.md)
 - [Migrating A Formula To A Tap](Migrating-A-Formula-To-A-Tap.md)
