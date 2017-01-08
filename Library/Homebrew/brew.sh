@@ -88,7 +88,7 @@ case "$HOMEBREW_SYSTEM" in
   Linux)  HOMEBREW_LINUX="1" ;;
 esac
 
-HOMEBREW_CURL="/usr/bin/curl"
+[[ -z "$HOMEBREW_CURL" ]] && HOMEBREW_CURL="/usr/bin/curl"
 if [[ -n "$HOMEBREW_MACOS" ]]
 then
   HOMEBREW_PROCESSOR="$(uname -p)"
@@ -101,7 +101,8 @@ then
 
   printf -v HOMEBREW_MACOS_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" &&
-        -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
+        -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" &&
+        -z "$HOMEBREW_CURL" ]]
   then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
   fi
@@ -112,7 +113,8 @@ else
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
 
-  if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
+  if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" &&
+      -z "$HOMEBREW_CURL" ]]
   then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
   fi
