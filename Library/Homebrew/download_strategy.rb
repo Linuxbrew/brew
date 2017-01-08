@@ -542,7 +542,7 @@ end
 # works with public one, but in that case simply use CurlDownloadStrategy.
 class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   require "utils/formatter"
-  require 'utils/github'
+  require "utils/github"
 
   def initialize(name, resource)
     super
@@ -551,12 +551,12 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   end
 
   def parse_url_pattern
-    url_pattern = %r|https://github.com/([^/]+)/([^/]+)/(\S+)|
+    url_pattern = %r{https://github.com/([^/]+)/([^/]+)/(\S+)}
     unless @url =~ url_pattern
       raise CurlDownloadStrategyError, "Invalid url pattern for GitHub Repository."
     end
 
-    _, @owner, @repo, @filepath = *(@url.match(url_pattern))
+    _, @owner, @repo, @filepath = *@url.match(url_pattern)
   end
 
   def download_url
@@ -578,18 +578,16 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   end
 
   def validate_github_repository_access!
-    begin
-      # Test access to the repository
-      GitHub.repository(@owner, @repo)
-    rescue GitHub::HTTPNotFoundError
-      # We only handle HTTPNotFoundError here,
-      # becase AuthenticationFailedError is handled within util/github.
-      message = <<-EOS.undent
+    # Test access to the repository
+    GitHub.repository(@owner, @repo)
+  rescue GitHub::HTTPNotFoundError
+    # We only handle HTTPNotFoundError here,
+    # becase AuthenticationFailedError is handled within util/github.
+    message = <<-EOS.undent
         HOMEBREW_GITHUB_API_TOKEN can not access the repository: #{@owner}/#{@repo}
         This token may not have permission to access the repository or the url of formula may be incorrect.
-      EOS
-      raise CurlDownloadStrategyError, message
-    end
+    EOS
+    raise CurlDownloadStrategyError, message
   end
 end
 
@@ -600,12 +598,12 @@ end
 # environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.
 class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDownloadStrategy
   def parse_url_pattern
-    url_pattern = %r|https://github.com/([^/]+)/([^/]+)/releases/download/([^/]+)/(\S+)|
+    url_pattern = %r{https://github.com/([^/]+)/([^/]+)/releases/download/([^/]+)/(\S+)}
     unless @url =~ url_pattern
       raise CurlDownloadStrategyError, "Invalid url pattern for GitHub Release."
     end
 
-    _, @owner, @repo, @tag, @filename = *(@url.match(url_pattern))
+    _, @owner, @repo, @tag, @filename = *@url.match(url_pattern)
   end
 
   def download_url
@@ -615,7 +613,7 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
   def _fetch
     # HTTP request header `Accept: application/octet-stream` is required.
     # Without this, the GitHub API will respond with metadata, not binary.
-    curl download_url, "-C", downloaded_size, "-o", temporary_path, "-H", 'Accept: application/octet-stream'
+    curl download_url, "-C", downloaded_size, "-o", temporary_path, "-H", "Accept: application/octet-stream"
   end
 
   private
@@ -626,10 +624,10 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
 
   def resolve_asset_id
     release_metadata = fetch_release_metadata
-    assets = release_metadata["assets"].select{ |a| a["name"] == @filename }
+    assets = release_metadata["assets"].select { |a| a["name"] == @filename }
     raise CurlDownloadStrategyError, "Asset file not found." if assets.empty?
 
-    return assets.first["id"]
+    assets.first["id"]
   end
 
   def fetch_release_metadata

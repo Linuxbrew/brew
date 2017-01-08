@@ -117,7 +117,7 @@ class GitHubPrivateRepositoryReleaseDownloadStrategyTests < Homebrew::TestCase
           "id" => 456,
           "name" => "foo_v0.1.0_darwin_amd64.tar.gz",
         },
-      ]
+      ],
     }
     @strategy.stubs(:fetch_release_metadata).returns(release_metadata)
     assert_equal 456, @strategy.send(:resolve_asset_id)
