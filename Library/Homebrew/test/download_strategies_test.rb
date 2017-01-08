@@ -65,6 +65,7 @@ class GitHubPrivateRepositoryDownloadStrategyTests < Homebrew::TestCase
   def setup
     resource = ResourceDouble.new("https://github.com/owner/repo/archive/1.1.5.tar.gz")
     ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
+    GitHub.stubs(:repository).returns {}
     @strategy = GitHubPrivateRepositoryDownloadStrategy.new("foo", resource)
   end
 
@@ -88,6 +89,7 @@ class GitHubPrivateRepositoryReleaseDownloadStrategyTests < Homebrew::TestCase
   def setup
     resource = ResourceDouble.new("https://github.com/owner/repo/releases/download/tag/foo_v0.1.0_darwin_amd64.tar.gz")
     ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
+    GitHub.stubs(:repository).returns {}
     @strategy = GitHubPrivateRepositoryReleaseDownloadStrategy.new("foo", resource)
   end
 
