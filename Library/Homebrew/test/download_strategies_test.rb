@@ -61,25 +61,47 @@ class VCSDownloadStrategyTests < Homebrew::TestCase
   end
 end
 
-class GitHubReleaseDownloadStrategyTests < Homebrew::TestCase
+class GitHubPrivateRepositoryDownloadStrategyTests < Homebrew::TestCase
+  def setup
+    resource = ResourceDouble.new("https://github.com/owner/repo/archive/1.1.5.tar.gz")
+    ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
+    @strategy = GitHubPrivateRepositoryDownloadStrategy.new("foo", resource)
+  end
+
+  def test_set_github_token
+    assert_equal "token", @strategy.instance_variable_get(:@github_token)
+  end
+
+  def test_parse_url_pattern
+    assert_equal "owner", @strategy.instance_variable_get(:@owner)
+    assert_equal "repo", @strategy.instance_variable_get(:@repo)
+    assert_equal "archive/1.1.5.tar.gz", @strategy.instance_variable_get(:@filepath)
+  end
+
+  def test_download_url
+    expected = "https://token@github.com/owner/repo/archive/1.1.5.tar.gz"
+    assert_equal expected, @strategy.download_url
+  end
+end
+
+class GitHubPrivateRepositoryReleaseDownloadStrategyTests < Homebrew::TestCase
   def setup
     resource = ResourceDouble.new("https://github.com/owner/repo/releases/download/tag/foo_v0.1.0_darwin_amd64.tar.gz")
     ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
-    @strategy = GitHubReleaseDownloadStrategy.new("foo", resource)
+    @strategy = GitHubPrivateRepositoryReleaseDownloadStrategy.new("foo", resource)
   end
 
-  def test_initialize
-    assert_equal "token", @strategy.instance_variable_get(:@github_token)
+  def test_parse_url_pattern
     assert_equal "owner", @strategy.instance_variable_get(:@owner)
     assert_equal "repo", @strategy.instance_variable_get(:@repo)
     assert_equal "tag", @strategy.instance_variable_get(:@tag)
     assert_equal "foo_v0.1.0_darwin_amd64.tar.gz", @strategy.instance_variable_get(:@filename)
   end
 
-  def test_asset_url
+  def test_download_url
     @strategy.stubs(:resolve_asset_id).returns(456)
     expected = "https://token@api.github.com/repos/owner/repo/releases/assets/456"
-    assert_equal expected, @strategy.send(:asset_url)
+    assert_equal expected, @strategy.download_url
   end
 
   def test_resolve_asset_id
@@ -99,9 +121,14 @@ class GitHubReleaseDownloadStrategyTests < Homebrew::TestCase
     assert_equal 456, @strategy.send(:resolve_asset_id)
   end
 
-  def test_release_url
-    expected = "https://api.github.com/repos/owner/repo/releases/tags/tag"
-    assert_equal expected, @strategy.send(:release_url)
+  def test_fetch_release_metadata
+    expected_release_url = "https://api.github.com/repos/owner/repo/releases/tags/tag"
+    github_mock = MiniTest::Mock.new
+    github_mock.expect :call, {}, [expected_release_url]
+    GitHub.stub :open, github_mock do
+      @strategy.send(:fetch_release_metadata)
+    end
+    github_mock.verify
   end
 end
 
