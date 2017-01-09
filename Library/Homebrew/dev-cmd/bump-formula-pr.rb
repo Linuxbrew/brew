@@ -124,6 +124,8 @@ module Homebrew
       false
     elsif !hash_type
       odie "#{formula}: no tag/revision specified!"
+    elsif !new_url
+      odie "#{formula}: no url specified!"
     else
       rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
         new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
