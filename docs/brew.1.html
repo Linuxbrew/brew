@@ -223,7 +223,12 @@ actually link or delete any files.</p>
 
 <p>If <code>--force</code> is passed, Homebrew will allow keg-only formulae to be linked.</p></dd>
 <dt><code>linkapps</code> [<code>--local</code>] [<var>formulae</var>]</dt><dd><p>Find installed formulae that provide <code>.app</code>-style macOS apps and symlink them
-into <code>/Applications</code>, allowing for easier access.</p>
+into <code>/Applications</code>, allowing for easier access (deprecated).</p>
+
+<p>Unfortunately <code>brew linkapps</code> cannot behave nicely with e.g. Spotlight using
+either aliases or symlinks and Homebrew formulae do not build "proper" <code>.app</code>
+bundles that can be relocated. Instead, please consider using <code>brew cask</code> and
+migrate formulae using <code>.app</code>s to casks.</p>
 
 <p>If no <var>formulae</var> are provided, all of them will have their apps symlinked.</p>
 
@@ -369,7 +374,12 @@ for temporarily disabling a formula:
 
 <p>If <code>--dry-run</code> or <code>-n</code> is passed, Homebrew will list all files which would
 be unlinked, but will not actually unlink or delete any files.</p></dd>
-<dt><code>unlinkapps</code> [<code>--local</code>] [<code>--dry-run</code>] [<var>formulae</var>]</dt><dd><p>Remove symlinks created by <code>brew linkapps</code> from <code>/Applications</code>.</p>
+<dt><code>unlinkapps</code> [<code>--local</code>] [<code>--dry-run</code>] [<var>formulae</var>]</dt><dd><p>Remove symlinks created by <code>brew linkapps</code> from <code>/Applications</code> (deprecated).</p>
+
+<p>Unfortunately <code>brew linkapps</code> cannot behave nicely with e.g. Spotlight using
+either aliases or symlinks and Homebrew formulae do not build "proper" <code>.app</code>
+bundles that can be relocated. Instead, please consider using <code>brew cask</code> and
+migrate formulae using <code>.app</code>s to casks.</p>
 
 <p>If no <var>formulae</var> are provided, all linked apps will be removed.</p>
 
