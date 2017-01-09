@@ -3,6 +3,7 @@ module OS
     module Xcode
       module_function
 
+      DEFAULT_BUNDLE_PATH = Pathname.new("/Applications/Xcode.app").freeze
       BUNDLE_ID = "com.apple.dt.Xcode".freeze
       OLD_BUNDLE_ID = "com.apple.Xcode".freeze
 
@@ -67,11 +68,14 @@ module OS
         Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain")
       end
 
-      # Ask Spotlight where Xcode is. If the user didn't install the
-      # helper tools and installed Xcode in a non-conventional place, this
-      # is our only option. See: https://superuser.com/questions/390757
       def bundle_path
-        MacOS.app_with_bundle_id(V4_BUNDLE_ID, V3_BUNDLE_ID)
+        # Use the default location if it exists.
+        return DEFAULT_BUNDLE_PATH if DEFAULT_BUNDLE_PATH.exist?
+
+        # Ask Spotlight where Xcode is. If the user didn't install the
+        # helper tools and installed Xcode in a non-conventional place, this
+        # is our only option. See: https://superuser.com/questions/390757
+        MacOS.app_with_bundle_id(BUNDLE_ID, OLD_BUNDLE_ID)
       end
 
       def installed?
