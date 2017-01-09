@@ -23,7 +23,6 @@ class Caveats
     caveats << fish_function_caveats
     caveats << plist_caveats
     caveats << python_caveats
-    caveats << app_caveats
     caveats << elisp_caveats
     caveats.compact.join("\n")
   end
@@ -167,16 +166,6 @@ class Caveats
       s += instructions
     end
     s
-  end
-
-  def app_caveats
-    return unless keg
-    return unless keg.app_installed?
-
-    <<-EOS.undent
-      .app bundles were installed.
-      Run `brew linkapps #{keg.name}` to symlink these to /Applications.
-    EOS
   end
 
   def elisp_caveats
