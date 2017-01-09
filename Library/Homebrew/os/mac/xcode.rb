@@ -3,8 +3,8 @@ module OS
     module Xcode
       module_function
 
-      V4_BUNDLE_ID = "com.apple.dt.Xcode".freeze
-      V3_BUNDLE_ID = "com.apple.Xcode".freeze
+      BUNDLE_ID = "com.apple.dt.Xcode".freeze
+      OLD_BUNDLE_ID = "com.apple.Xcode".freeze
 
       def latest_version
         case MacOS.version
@@ -51,9 +51,9 @@ module OS
           begin
             dir = MacOS.active_developer_dir
 
-            if dir.empty? || dir == CLT::MAVERICKS_PKG_PATH || !File.directory?(dir)
+            if dir.empty? || dir == CLT::PKG_PATH || !File.directory?(dir)
               path = bundle_path
-              path.join("Contents", "Developer") if path
+              path/"Contents/Developer" if path
             else
               # Use cleanpath to avoid pathological trailing slash
               Pathname.new(dir).cleanpath
@@ -182,7 +182,7 @@ module OS
       FROM_XCODE_PKG_ID = "com.apple.pkg.DeveloperToolsCLI".freeze
       MAVERICKS_PKG_ID = "com.apple.pkg.CLTools_Executables".freeze
       MAVERICKS_NEW_PKG_ID = "com.apple.pkg.CLTools_Base".freeze # obsolete
-      MAVERICKS_PKG_PATH = "/Library/Developer/CommandLineTools".freeze
+      PKG_PATH = "/Library/Developer/CommandLineTools".freeze
 
       # Returns true even if outdated tools are installed, e.g.
       # tools from Xcode 4.x on 10.9
@@ -237,7 +237,7 @@ module OS
         return false if MacOS.version < :lion
 
         if MacOS.version >= :mavericks
-          version = Utils.popen_read("#{MAVERICKS_PKG_PATH}/usr/bin/clang --version")
+          version = Utils.popen_read("#{PKG_PATH}/usr/bin/clang --version")
         else
           version = Utils.popen_read("/usr/bin/clang --version")
         end
@@ -261,7 +261,7 @@ module OS
 
         [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].find do |id|
           if MacOS.version >= :mavericks
-            next unless File.exist?("#{MAVERICKS_PKG_PATH}/usr/bin/clang")
+            next unless File.exist?("#{PKG_PATH}/usr/bin/clang")
           end
           version = MacOS.pkgutil_info(id)[/version: (.+)$/, 1]
           return version if version
