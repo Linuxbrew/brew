@@ -819,6 +819,11 @@ class FormulaAuditor
       problem "Formulae should not depend on both OpenSSL and LibreSSL (even optionally)."
     end
 
+    if text =~ /virtualenv_(create|install_with_resources)/ &&
+       text =~ /resource\s+['"]setuptools['"]\s+do/
+      problem "Formulae using virtualenvs do not need a `setuptools` resource."
+    end
+
     return unless text.include?('require "language/go"') && !text.include?("go_resource")
     problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
