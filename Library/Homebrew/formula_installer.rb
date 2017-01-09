@@ -370,8 +370,8 @@ class FormulaInstaller
     raise UnsatisfiedRequirements, fatals
   end
 
-  def install_requirement_default_formula?(req, dependent, build)
-    return false unless req.default_formula?
+  def install_requirement_formula?(req, dependent, build)
+    return false unless req.to_dependency
     return true unless req.satisfied?
     return false if req.run?
     install_bottle_for?(dependent, build) || build_bottle?
@@ -390,7 +390,7 @@ class FormulaInstaller
           Requirement.prune
         elsif req.build? && install_bottle_for?(dependent, build)
           Requirement.prune
-        elsif install_requirement_default_formula?(req, dependent, build)
+        elsif install_requirement_formula?(req, dependent, build)
           dep = req.to_dependency
           deps.unshift(dep)
           formulae.unshift(dep.to_formula)
