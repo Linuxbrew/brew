@@ -380,6 +380,11 @@ class Formulary
       return TapLoader.new(possible_tap_newname_formulae.first, from: from)
     end
 
+    possible_keg_formula = Pathname.new("#{HOMEBREW_PREFIX}/opt/#{ref}/.brew/#{ref}.rb")
+    if possible_keg_formula.file?
+      return FormulaLoader.new(ref, possible_keg_formula)
+    end
+
     possible_cached_formula = Pathname.new("#{HOMEBREW_CACHE_FORMULA}/#{ref}.rb")
     if possible_cached_formula.file?
       return FormulaLoader.new(ref, possible_cached_formula)
