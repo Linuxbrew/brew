@@ -294,7 +294,10 @@ If \fB\-\-force\fR is passed, Homebrew will allow keg\-only formulae to be linke
 .
 .TP
 \fBlinkapps\fR [\fB\-\-local\fR] [\fIformulae\fR]
-Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access\.
+Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access (deprecated)\.
+.
+.IP
+Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
 .
 .IP
 If no \fIformulae\fR are provided, all of them will have their apps symlinked\.
@@ -508,7 +511,10 @@ If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all files which
 .
 .TP
 \fBunlinkapps\fR [\fB\-\-local\fR] [\fB\-\-dry\-run\fR] [\fIformulae\fR]
-Remove symlinks created by \fBbrew linkapps\fR from \fB/Applications\fR\.
+Remove symlinks created by \fBbrew linkapps\fR from \fB/Applications\fR (deprecated)\.
+.
+.IP
+Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
 .
 .IP
 If no \fIformulae\fR are provided, all linked apps will be removed\.

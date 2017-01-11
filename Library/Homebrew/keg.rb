@@ -367,10 +367,6 @@ class Keg
     Pathname.glob("#{app_prefix}/{,libexec/}*.app")
   end
 
-  def app_installed?
-    !apps.empty?
-  end
-
   def elisp_installed?
     return false unless (path/"share/emacs/site-lisp"/name).exist?
     (path/"share/emacs/site-lisp"/name).children.any? { |f| %w[.el .elc].include? f.extname }
