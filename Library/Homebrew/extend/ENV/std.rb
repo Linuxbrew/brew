@@ -132,7 +132,7 @@ module Stdenv
   # @private
   def determine_cxx
     dir, base = determine_cc.split
-    dir / base.to_s.sub("gcc", "g++").sub("clang", "clang++")
+    dir / base.to_s.sub("gcc", "g++").sub("clang", "clang++").sub(/\bcc\b/, "c++")
   end
 
   def gcc_4_0
