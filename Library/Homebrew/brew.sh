@@ -88,7 +88,10 @@ case "$HOMEBREW_SYSTEM" in
   Linux)  HOMEBREW_LINUX="1" ;;
 esac
 
+if [[ -z $HOMEBREW_CURL ]]
+then
 HOMEBREW_CURL="/usr/bin/curl"
+fi
 if [[ -n "$HOMEBREW_MACOS" ]]
 then
   HOMEBREW_PROCESSOR="$(uname -p)"
