@@ -143,15 +143,23 @@ module Homebrew
 
   def recursive_deps_tree(f, prefix)
     reqs = f.requirements.select(&:default_formula?)
+    deps = f.deps.default
     max = reqs.length - 1
     reqs.each_with_index do |req, i|
-      chr = i == max ? "└──" : "├──"
+      chr = if i == max && deps.empty?
+        "└──"
+      else
+        "├──"
+      end
       puts prefix + "#{chr} :#{dep_display_name(req.to_dependency)}"
     end
-    deps = f.deps.default
     max = deps.length - 1
     deps.each_with_index do |dep, i|
-      chr = i == max ? "└──" : "├──"
+      chr = if i == max
+        "└──"
+      else
+        "├──"
+      end
       prefix_ext = i == max ? "    " : "│   "
       puts prefix + "#{chr} #{dep_display_name(dep)}"
       recursive_deps_tree(Formulary.factory(dep.name), prefix + prefix_ext)
