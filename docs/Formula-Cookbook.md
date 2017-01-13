@@ -1,6 +1,6 @@
 # Formula Cookbook
 
-A formula is a package definition written in Ruby. It can be created with `brew create $URL`, installed with `brew install $FORMULA`, and debugged with `brew install --debug --verbose $FORMULA`. Formulae use the [Formula API](http://www.rubydoc.info/github/Homebrew/brew/master/Formula) which provides various Homebrew-specific helpers.
+A formula is a package definition written in Ruby. It can be created with `brew create $URL` where `$URL` is a zip or tarball, installed with `brew install $FORMULA`, and debugged with `brew install --debug --verbose $FORMULA`. Formulae use the [Formula API](http://www.rubydoc.info/github/Homebrew/brew/master/Formula) which provides various Homebrew-specific helpers.
 
 ## Homebrew Terminology
 
