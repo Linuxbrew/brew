@@ -1,9 +1,10 @@
 module Utils
   class InreplaceError < RuntimeError
     def initialize(errors)
-      super errors.inject("inreplace failed\n") do |s, (path, errs)|
+      formatted_errors = errors.inject("inreplace failed\n") do |s, (path, errs)|
         s << "#{path}:\n" << errs.map { |e| "  #{e}\n" }.join
       end
+      super formatted_errors
     end
   end
 
