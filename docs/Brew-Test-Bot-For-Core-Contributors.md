@@ -23,3 +23,18 @@ To bottle a test build :
 1. Ensure the job has already completed successfully.
 2. Run `brew pull --bottle https://bot.brew.sh/job/Homebrew%20Testing/1234/` where `https://bot.brew.sh/job/Homebrew%20Testing/1234/` is the testing build URL in Jenkins.
 3. Run `git push` to push the commits.
+
+## Linuxbrew testing
+From discusion [here](https://github.com/Linuxbrew/homebrew-core/issues/1568).
+The settings are here:
+https://github.com/Linuxbrew/homebrew-core/blob/master/.travis.yml
+https://github.com/Linuxbrew/homebrew-core/blob/master/circle.yml
+* runs each time a PR is updated/submitted, including for merges with homebrew upstream (homebrew-core and select taps). When a pull request is submitted to modify those formula, they'll be tested by CI and bottled for Linuxbrew. Once a formula has been bottled for Linuxbrew once, it'll be tested by us on every subsequent merger of Homebrew/core into Linuxbrew/core.
+* These CI runs time out after one hour (Travis) and two hours (Circle), and so are not complete. We do however test every formula that had a merge conflict, which includes every formula that was previously bottled for Linuxbrew.
+* runs Ubuntu 12 on Travis and Ubuntu 14 on Circle. Different versions by design choice to ensure that bottles built on Ubuntu 14 can run on Ubuntu 12.
+
+Current limitations:
+* does not run continously (ie needs to be triggered by PR's)
+* therefore, never tests formulas that are in homebrew but not yet modified to work in linuxbrew
+
+
