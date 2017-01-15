@@ -44,9 +44,6 @@
 #:    If `--keep-tmp` is passed, the temporary files created during installation
 #:    are not deleted.
 #:
-#:    To install a newer version of HEAD use
-#:    `brew rm <foo> && brew install --HEAD <foo>`.
-#:
 #:  * `install` `--interactive` [`--git`] <formula>:
 #:    Download and patch <formula>, then open a shell. This allows the user to
 #:    run `./configure --help` and otherwise determine how to turn the software
