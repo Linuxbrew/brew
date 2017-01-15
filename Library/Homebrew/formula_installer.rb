@@ -808,6 +808,7 @@ class FormulaInstaller
     tab.poured_from_bottle = true
     tab.time = Time.now.to_i
     tab.head = HOMEBREW_REPOSITORY.git_head
+    tab.source["path"] = formula.specified_path.to_s
     tab.write
   end
 
