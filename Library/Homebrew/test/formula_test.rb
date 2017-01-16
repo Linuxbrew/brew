@@ -694,8 +694,8 @@ class FormulaTests < Homebrew::TestCase
       url "f1-1"
 
       depends_on :python
-      depends_on :x11 => :recommended
-      depends_on :xcode => ['1.0', :optional]
+      depends_on x11: :recommended
+      depends_on xcode: ["1.0", :optional]
     end
     stub_formula_loader f1
 
@@ -721,7 +721,7 @@ class FormulaTests < Homebrew::TestCase
     assert_equal Set[python, x11, xcode], Set.new(f2.recursive_requirements {})
 
     # Requirements can be pruned
-    requirements = f2.recursive_requirements do |dependent, requirement|
+    requirements = f2.recursive_requirements do |_dependent, requirement|
       Requirement.prune if requirement.is_a?(PythonRequirement)
     end
     assert_equal Set[x11, xcode], Set.new(requirements)
