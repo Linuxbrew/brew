@@ -459,7 +459,7 @@ class FormulaAuditor
   end
 
   def audit_conflicts
-    if formula.versioned_formula?
+    if formula.conflicts.any? && formula.versioned_formula?
       problem <<-EOS
         Versioned formulae should not use `conflicts_with`.
         Use `keg_only :versioned_formula` instead.
