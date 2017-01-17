@@ -435,6 +435,7 @@ module Homebrew
             else
               string = s.sub!(
                 /(
+                  (\ {2}\#[^\n]*\n)*                                             # comments
                   \ {2}(                                                         # two spaces at the beginning
                     (url|head)\ ['"][\S\ ]+['"]                                  # url or head with a string
                     (
