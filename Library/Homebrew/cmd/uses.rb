@@ -58,15 +58,29 @@ module Homebrew
                 Dependency.prune unless includes.include?("build?")
               end
             end
-            reqs = f.recursive_requirements do |dependent, req|
+
+            dep_formulae = deps.map do |dep|
+              begin
+                dep.to_formula
+              rescue
+              end
+            end.compact
+
+            reqs_by_formula = ([f] + dep_formulae).flat_map do |formula|
+              formula.requirements.map { |req| [formula, req] }
+            end
+
+            reqs_by_formula.reject! do |dependent, req|
               if req.recommended?
-                Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
+                ignores.include?("recommended?") || dependent.build.without?(req)
               elsif req.optional?
-                Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
+                !includes.include?("optional?") && !dependent.build.with?(req)
               elsif req.build?
-                Requirement.prune unless includes.include?("build?")
+                !includes.include?("build?")
               end
             end
+
+            reqs = reqs_by_formula.map(&:last)
           else
             deps = f.deps.reject do |dep|
               ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
