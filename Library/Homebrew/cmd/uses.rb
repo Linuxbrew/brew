@@ -57,6 +57,12 @@ module Homebrew
               elsif dep.build?
                 Dependency.prune unless includes.include?("build?")
               end
+
+              # If a tap isn't installed, we can't find the dependencies of one
+              # its formulae, and an exception will be thrown if we try.
+              if dep.is_a?(TapDependency) && !dep.tap.installed?
+                Dependency.keep_but_prune_recursive_deps
+              end
             end
 
             dep_formulae = deps.map do |dep|

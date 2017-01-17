@@ -118,6 +118,11 @@ class DependencyTests < Homebrew::TestCase
 end
 
 class TapDependencyTests < Homebrew::TestCase
+  def test_tap
+    dep = TapDependency.new("foo/bar/dog")
+    assert_equal Tap.new("foo", "bar"), dep.tap
+  end
+
   def test_option_names
     dep = TapDependency.new("foo/bar/dog")
     assert_equal %w[dog], dep.option_names
