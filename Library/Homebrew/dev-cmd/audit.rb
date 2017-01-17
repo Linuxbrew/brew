@@ -459,6 +459,14 @@ class FormulaAuditor
   end
 
   def audit_conflicts
+    if formula.versioned_formula?
+      problem <<-EOS
+        Versioned formulae should not use `conflicts_with`.
+        Use `keg_only :versioned_formula` instead.
+      EOS
+      return
+    end
+
     formula.conflicts.each do |c|
       begin
         Formulary.factory(c.name)
@@ -497,7 +505,7 @@ class FormulaAuditor
 
     return unless @new_formula
     return if formula.deprecated_options.empty?
-    return if formula.name.include?("@")
+    return if formula.versioned_formula?
     problem "New formulae should not use `deprecated_option`."
   end
 

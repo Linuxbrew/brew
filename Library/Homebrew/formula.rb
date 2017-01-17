@@ -382,6 +382,11 @@ class Formula
     PkgVersion.new(version, revision)
   end
 
+  # If this is a `@`-versioned formula.
+  def versioned_formula?
+    name.include?("@")
+  end
+
   # A named Resource for the currently active {SoftwareSpec}.
   # Additional downloads can be defined as {#resource}s.
   # {Resource#stage} will create a temporary directory and yield to a block.
