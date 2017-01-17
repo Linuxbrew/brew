@@ -481,6 +481,10 @@ class FormulaAuditor
 
       next unless @strict
 
+      if o.name == "universal"
+        problem "macOS has been 64-bit only since 10.6 so universal options are deprecated."
+      end
+
       if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal"
         problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
       end
