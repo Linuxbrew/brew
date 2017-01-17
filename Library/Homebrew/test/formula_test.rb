@@ -689,6 +689,44 @@ class FormulaTests < Homebrew::TestCase
     assert_equal %w[foo/bar/f1 baz/qux/f2], f3.runtime_dependencies.map(&:name)
   end
 
+  def test_requirements
+    f1 = formula("f1") do
+      url "f1-1"
+
+      depends_on :python
+      depends_on x11: :recommended
+      depends_on xcode: ["1.0", :optional]
+    end
+    stub_formula_loader f1
+
+    python = PythonRequirement.new
+    x11 = X11Requirement.new("x11", [:recommended])
+    xcode = XcodeRequirement.new(["1.0", :optional])
+
+    # Default block should filter out deps that aren't being used
+    assert_equal Set[python, x11], Set.new(f1.recursive_requirements)
+
+    f1.build = BuildOptions.new(["--with-xcode", "--without-x11"], f1.options)
+    assert_equal Set[python, xcode], Set.new(f1.recursive_requirements)
+    f1.build = f1.stable.build
+
+    f2 = formula("f2") do
+      url "f2-1"
+      depends_on "f1"
+    end
+
+    assert_equal Set[python, x11], Set.new(f2.recursive_requirements)
+
+    # Empty block should allow all requirements
+    assert_equal Set[python, x11, xcode], Set.new(f2.recursive_requirements {})
+
+    # Requirements can be pruned
+    requirements = f2.recursive_requirements do |_dependent, requirement|
+      Requirement.prune if requirement.is_a?(PythonRequirement)
+    end
+    assert_equal Set[x11, xcode], Set.new(requirements)
+  end
+
   def test_to_hash
     f1 = formula("foo") do
       url "foo-1.0"
