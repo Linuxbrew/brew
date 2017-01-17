@@ -13,6 +13,8 @@ describe Hbc::Artifact::Suite do
   end
 
   it "moves the suite to the proper directory" do
+    skip("flaky test")
+
     shutup do
       install_phase.call
     end
