@@ -1,11 +1,14 @@
-#:  * `audit` [`--strict`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
 #:    If no <formulae> are provided, all of them are checked.
 #:
 #:    If `--strict` is passed, additional checks are run, including RuboCop
-#:    style checks.
+#:    style checks and custom cop checks.
+#:
+#:    If `--fix` is passed, style violations and custom cop violations will be
+#:    automatically fixed using RuboCop's `--auto-correct` feature.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
 #:    connection are run.
@@ -62,8 +65,9 @@ module Homebrew
     end
 
     if strict
+      options = { fix: ARGV.flag?("--fix"), realpath: true }
       # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, realpath: true)
+      style_results = check_style_json(files, options)
     end
 
     ff.each do |f|

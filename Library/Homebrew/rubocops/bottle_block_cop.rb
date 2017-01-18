@@ -1,36 +1,34 @@
 module RuboCop
   module Cop
-   module CustomCops 
+    module CustomCops
       class CorrectBottleBlock < Cop
-        MSG = 'Use rebuild instead of revision in bottle block'.freeze
+        MSG = "Use rebuild instead of revision in bottle block".freeze
 
         def on_block(node)
           return if block_length(node).zero?
-          method, _args, _body = *node
+          method, _args, body = *node
+          _keyword, method_name = *method
 
-          keyword, method_name = *method
-
-          if method_name.equal?(:bottle) and has_revision?(_body)
-            add_offense(node, :expression)
-          end
+          return unless method_name.equal?(:bottle) && revision?(body)
+          add_offense(node, :expression)
         end
 
         private
 
         def autocorrect(node)
-          ->(corrector) do
+          lambda do |corrector|
             # Check for revision
-            method, _args, _body = *node
-            if has_revision?(_body)
+            _method, _args, body = *node
+            if revision?(body)
               replace_revision(corrector, node)
             end
           end
         end
 
-        def has_revision?(body)
+        def revision?(body)
           body.children.each do |method_call_node|
-            _receiver, _method_name, *args = *method_call_node
-            if _method_name == :revision
+            _receiver, method_name, _args = *method_call_node
+            if method_name == :revision
               return true
             end
           end
@@ -38,10 +36,10 @@ module RuboCop
         end
 
         def replace_revision(corrector, node)
-          new_source = String.new
+          new_source = ""
           node.source.each_line do |line|
             if line =~ /\A\s*revision/
-              line = line.sub('revision','rebuild')
+              line = line.sub("revision", "rebuild")
             end
             new_source << line
           end
