@@ -32,11 +32,11 @@ class FormulaInstaller
 
   attr_reader :formula
   attr_accessor :options, :build_bottle, :invalid_option_names
+  attr_accessor :installed_as_dependency, :installed_on_request
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :force_bottle
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
   mode_attr_accessor :verbose, :debug, :quieter
-  mode_attr_accessor :installed_as_dependency, :installed_on_request
 
   def initialize(formula)
     @formula = formula
