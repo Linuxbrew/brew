@@ -6,6 +6,12 @@ AllCops:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
 
+require:
+  - ./Homebrew/rubocops/bottle_block_cop.rb
+
+CustomCops/CorrectBottleBlock:
+  Enabled: true
+
 Metrics/AbcSize:
   Enabled: false
 
