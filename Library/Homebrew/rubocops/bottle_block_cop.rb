@@ -9,42 +9,26 @@ module RuboCop
           method, _args, body = *node
           _keyword, method_name = *method
 
-          return unless method_name.equal?(:bottle) && revision?(body)
-          add_offense(node, :expression)
+          return unless method_name == :bottle
+          check_revision?(body)
         end
 
         private
 
         def autocorrect(node)
           lambda do |corrector|
-            # Check for revision
-            _method, _args, body = *node
-            if revision?(body)
-              replace_revision(corrector, node)
-            end
+            correction = node.source.sub("revision", "rebuild")
+            corrector.insert_before(node.source_range, correction)
+            corrector.remove(node.source_range)
           end
         end
 
-        def revision?(body)
+        def check_revision?(body)
           body.children.each do |method_call_node|
             _receiver, method_name, _args = *method_call_node
-            if method_name == :revision
-              return true
-            end
+            next unless method_name == :revision
+            add_offense(method_call_node, :expression)
           end
-          false
-        end
-
-        def replace_revision(corrector, node)
-          new_source = ""
-          node.source.each_line do |line|
-            if line =~ /\A\s*revision/
-              line = line.sub("revision", "rebuild")
-            end
-            new_source << line
-          end
-          corrector.insert_before(node.source_range, new_source)
-          corrector.remove(node.source_range)
         end
       end
     end

@@ -5,9 +5,9 @@
 #:    If no <formulae> are provided, all of them are checked.
 #:
 #:    If `--strict` is passed, additional checks are run, including RuboCop
-#:    style checks and custom cop checks.
+#:    style checks.
 #:
-#:    If `--fix` is passed, style violations and custom cop violations will be
+#:    If `--fix` is passed, style violations will be
 #:    automatically fixed using RuboCop's `--auto-correct` feature.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
