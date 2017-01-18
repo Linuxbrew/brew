@@ -1629,6 +1629,8 @@ class Formula
         "built_as_bottle" => tab.built_as_bottle,
         "poured_from_bottle" => tab.poured_from_bottle,
         "runtime_dependencies" => tab.runtime_dependencies,
+        "installed_as_dependency" => tab.installed_as_dependency,
+        "installed_on_request" => tab.installed_on_request,
       }
     end
 
