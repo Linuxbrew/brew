@@ -106,16 +106,20 @@ class IntegrationCommandTestCase < Homebrew::TestCase
   def cmd(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    puts "\n'brew #{args.join " "}' output: #{output}" if status.nonzero?
-    assert_equal 0, status
+    assert_equal 0, status, <<-EOS.undent
+      `brew #{args.join " "}` exited with non-zero status!
+      #{output}
+    EOS
     output
   end
 
   def cmd_fail(*args)
     output = cmd_output(*args)
     status = $?.exitstatus
-    $stderr.puts "\n'brew #{args.join " "}'" if status.zero?
-    refute_equal 0, status
+    refute_equal 0, status, <<-EOS.undent
+      `brew #{args.join " "}` exited with zero status!
+      #{output}
+    EOS
     output
   end
 
