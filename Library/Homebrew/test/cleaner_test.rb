@@ -22,7 +22,7 @@ class CleanerTests < Homebrew::TestCase
 
     Cleaner.new(@f).clean
 
-    mach_executable_perm = OS.mac? ? 0100555 : 0100444
+    mach_executable_perm = OS.linux? ? 0100444 : 0100555
     assert_equal mach_executable_perm, (@f.bin/"a.out").stat.mode
     assert_equal 0100444, (@f.lib/"fat.dylib").stat.mode
     assert_equal 0100444, (@f.lib/"x86_64.dylib").stat.mode
