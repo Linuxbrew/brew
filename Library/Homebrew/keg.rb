@@ -174,6 +174,12 @@ class Keg
   attr_reader :path, :name, :linked_keg_record, :opt_record
   protected :path
 
+  extend Forwardable
+
+  def_delegators :path,
+    :to_s, :hash, :abv, :disk_usage, :file_count, :directory?, :exist?, :/,
+    :join, :rename, :find
+
   def initialize(path)
     path = path.resolved_path if path.to_s.start_with?("#{HOMEBREW_PREFIX}/opt/")
     raise "#{path} is not a valid keg" unless path.parent.parent.realpath == HOMEBREW_CELLAR.realpath
@@ -184,19 +190,11 @@ class Keg
     @opt_record = HOMEBREW_PREFIX/"opt/#{name}"
   end
 
-  def to_s
-    path.to_s
-  end
-
   def rack
     path.parent
   end
 
-  if Pathname.method_defined?(:to_path)
-    alias to_path to_s
-  else
-    alias to_str to_s
-  end
+  alias to_path to_s
 
   def inspect
     "#<#{self.class.name}:#{path}>"
@@ -206,30 +204,6 @@ class Keg
     instance_of?(other.class) && path == other.path
   end
   alias eql? ==
-
-  def hash
-    path.hash
-  end
-
-  def abv
-    path.abv
-  end
-
-  def disk_usage
-    path.disk_usage
-  end
-
-  def file_count
-    path.file_count
-  end
-
-  def directory?
-    path.directory?
-  end
-
-  def exist?
-    path.exist?
-  end
 
   def empty_installation?
     Pathname.glob("#{path}/**/*") do |file|
@@ -241,18 +215,6 @@ class Keg
     end
 
     true
-  end
-
-  def /(other)
-    path / other
-  end
-
-  def join(*args)
-    path.join(*args)
-  end
-
-  def rename(*args)
-    path.rename(*args)
   end
 
   def linked?
@@ -398,10 +360,6 @@ class Keg
         end
       end
     end
-  end
-
-  def find(*args, &block)
-    path.find(*args, &block)
   end
 
   def oldname_opt_record
