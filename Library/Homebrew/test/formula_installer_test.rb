@@ -61,6 +61,8 @@ class InstallTests < Homebrew::TestCase
       assert_equal 3, bin.children.length
       assert_predicate f.prefix/".brew/testball.rb", :readable?
     end
+  ensure
+    ARGV.reject! { |a| a == "--with-invalid_flag" }
   end
 
   def test_bottle_unneeded_formula_install
