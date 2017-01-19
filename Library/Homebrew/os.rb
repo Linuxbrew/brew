@@ -9,7 +9,6 @@ module OS
     RUBY_PLATFORM.to_s.downcase.include?("linux") || RbConfig::CONFIG["host_os"].downcase.include?("linux")
   end
 
-  require "os/mac"
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
 
   if OS.mac?
@@ -26,6 +25,7 @@ module OS
     ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
     ::MACOS_VERSION = OS::Mac.version.to_s.freeze
   elsif OS.linux?
+    require "os/mac"
     NAME = "linux".freeze
     GITHUB_USER = "Linuxbrew".freeze
     ISSUES_URL = "https://github.com/Linuxbrew/brew/blob/master/docs/Troubleshooting.md#troubleshooting".freeze
@@ -33,5 +33,7 @@ module OS
     PATH_PATCH = "patch".freeze
     # compatibility
     ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0".freeze
+  else
+    PATH_PATCH = "patch".freeze
   end
 end
