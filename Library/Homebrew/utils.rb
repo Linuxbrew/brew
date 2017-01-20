@@ -106,7 +106,7 @@ def pretty_installed(f)
   if !$stdout.tty?
     f.to_s
   elsif Emoji.enabled?
-    "#{Tty.bold}#{f} #{Formatter.success(Emoji.tick)}#{Tty.reset}"
+    "#{Tty.bold}#{f} #{Formatter.success("✔")}#{Tty.reset}"
   else
     Formatter.success("#{Tty.bold}#{f} (installed)#{Tty.reset}")
   end
@@ -116,7 +116,7 @@ def pretty_uninstalled(f)
   if !$stdout.tty?
     f.to_s
   elsif Emoji.enabled?
-    "#{Tty.bold}#{f} #{Formatter.error(Emoji.cross)}#{Tty.reset}"
+    "#{Tty.bold}#{f} #{Formatter.error("✘")}#{Tty.reset}"
   else
     Formatter.error("#{Tty.bold}#{f} (uninstalled)#{Tty.reset}")
   end
