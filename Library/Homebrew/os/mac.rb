@@ -27,6 +27,11 @@ module OS
       @full_version ||= Version.new((ENV["HOMEBREW_MACOS_VERSION"] || ENV["HOMEBREW_OSX_VERSION"]).chomp)
     end
 
+    def full_version=(version)
+      @full_version = Version.new(version.chomp)
+      @version = nil
+    end
+
     def prerelease?
       # TODO: bump version when new OS is released
       version >= "10.13"
