@@ -15,7 +15,5 @@ class GpgTest < Homebrew::TestCase
         assert_predicate @dir/".gnupg/secring.gpg", :exist?
       end
     end
-  ensure
-    @dir.rmtree
   end
 end

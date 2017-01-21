@@ -32,8 +32,6 @@ class MigratorErrorsTests < Homebrew::TestCase
     tab.source["tap"] = "homebrew/core"
     tab.write
     assert_raises(Migrator::MigratorDifferentTapsError) { Migrator.new(@new_f) }
-  ensure
-    keg.parent.rmtree
   end
 end
 

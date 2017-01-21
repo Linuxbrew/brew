@@ -50,7 +50,6 @@ class OSMacLinkTests < Homebrew::TestCase
     assert_equal 1, keg.mach_o_files.size
   ensure
     keg.unlink
-    keg.uninstall
   end
 
   def test_mach_o_files_isnt_confused_by_symlinks
@@ -66,6 +65,5 @@ class OSMacLinkTests < Homebrew::TestCase
     assert_equal 1, keg.mach_o_files.size
   ensure
     keg.unlink
-    keg.uninstall
   end
 end

@@ -168,8 +168,6 @@ class TapTest < Homebrew::TestCase
       end
     end
     refute_predicate services_tap, :private?
-  ensure
-    services_tap.path.rmtree if services_tap
   end
 
   def test_remote_not_git_repo
@@ -253,8 +251,6 @@ class TapTest < Homebrew::TestCase
     refute_predicate tap, :installed?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :exist?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1", :exist?
-  ensure
-    (HOMEBREW_PREFIX/"share").rmtree if (HOMEBREW_PREFIX/"share").exist?
   end
 
   def test_pin_and_unpin
@@ -320,8 +316,5 @@ class CoreTapTest < Homebrew::TestCase
     assert_equal ["bar"], @repo.aliases
     assert_equal @repo.alias_table, "bar" => "foo"
     assert_equal @repo.alias_reverse_table, "foo" => ["bar"]
-  ensure
-    @formula_file.unlink
-    @repo.alias_dir.rmtree
   end
 end
