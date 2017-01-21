@@ -48,9 +48,4 @@ class FormulaPinTests < Homebrew::TestCase
     refute_predicate @pin, :pinned?
     refute_predicate HOMEBREW_PINNED_KEGS, :directory?
   end
-
-  def teardown
-    @f.rack.rmtree
-    super
-  end
 end

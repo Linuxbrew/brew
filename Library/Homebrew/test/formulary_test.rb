@@ -40,11 +40,6 @@ class FormularyFactoryTest < Homebrew::TestCase
     EOS
   end
 
-  def teardown
-    @path.unlink
-    super
-  end
-
   def test_factory
     assert_kind_of Formula, Formulary.factory(@name)
   end
@@ -142,11 +137,6 @@ class FormularyTapFactoryTest < Homebrew::TestCase
     @path.write @code
   end
 
-  def teardown
-    @tap.path.rmtree
-    super
-  end
-
   def test_factory_tap_formula
     assert_kind_of Formula, Formulary.factory(@name)
   end
@@ -189,12 +179,6 @@ class FormularyTapPriorityTest < Homebrew::TestCase
     EOS
     @core_path.write code
     @tap_path.write code
-  end
-
-  def teardown
-    @core_path.unlink
-    @tap.path.rmtree
-    super
   end
 
   def test_find_with_priority_core_formula

@@ -36,16 +36,9 @@ class LinkTestCase < Homebrew::TestCase
   end
 
   def teardown
-    @kegs.each do |keg|
-      keg.unlink
-      keg.uninstall
-    end
-
+    @kegs.each(&:unlink)
     $stdout = @old_stdout
-
-    rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
-
     super
   end
 end

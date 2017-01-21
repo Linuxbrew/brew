@@ -85,11 +85,6 @@ class TapTest < Homebrew::TestCase
     ENV.replace(env)
   end
 
-  def teardown
-    @path.rmtree
-    super
-  end
-
   def test_fetch
     assert_kind_of CoreTap, Tap.fetch("Homebrew", "homebrew")
     tap = Tap.fetch("Homebrew", "foo")

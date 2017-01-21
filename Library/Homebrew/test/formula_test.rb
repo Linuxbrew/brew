@@ -961,12 +961,6 @@ class OutdatedVersionsTests < Homebrew::TestCase
     @old_alias_target_prefix = HOMEBREW_CELLAR/"#{old_formula.name}/1.0"
   end
 
-  def teardown
-    formulae = [@f, @old_formula, @new_formula]
-    formulae.map(&:rack).select(&:exist?).each(&:rmtree)
-    super
-  end
-
   def alias_path
     "#{@f.tap.alias_dir}/bar"
   end

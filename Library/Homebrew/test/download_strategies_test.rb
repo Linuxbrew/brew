@@ -149,11 +149,6 @@ class GitDownloadStrategyTests < Homebrew::TestCase
     mkpath @cached_location
   end
 
-  def teardown
-    rmtree @cached_location
-    super
-  end
-
   def git_commit_all
     shutup do
       system "git", "add", "--all"

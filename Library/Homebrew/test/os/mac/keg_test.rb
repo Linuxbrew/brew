@@ -30,11 +30,9 @@ class OSMacLinkTests < Homebrew::TestCase
 
   def teardown
     @keg.unlink
-    @keg.uninstall
 
     $stdout = @old_stdout
 
-    rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
 
     super

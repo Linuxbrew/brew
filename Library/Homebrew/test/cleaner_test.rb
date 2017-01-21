@@ -11,11 +11,6 @@ class CleanerTests < Homebrew::TestCase
     @f.prefix.mkpath
   end
 
-  def teardown
-    @f.rack.rmtree if @f.rack.exist?
-    super
-  end
-
   def test_clean_file
     @f.bin.mkpath
     @f.lib.mkpath
