@@ -47,7 +47,7 @@ class SandboxTest < Homebrew::TestCase
 
   def test_complains_on_failure
     Utils.expects(popen_read: "foo")
-    ARGV.stubs(verbose?: true)
+    ENV["HOMEBREW_VERBOSE"] = "1"
     out, _err = capture_io do
       assert_raises(ErrorDuringExecution) { @sandbox.exec "false" }
     end
@@ -61,7 +61,7 @@ class SandboxTest < Homebrew::TestCase
       bar
     EOS
     Utils.expects(popen_read: with_bogus_error)
-    ARGV.stubs(verbose?: true)
+    ENV["HOMEBREW_VERBOSE"] = "1"
     out, _err = capture_io do
       assert_raises(ErrorDuringExecution) { @sandbox.exec "false" }
     end
