@@ -207,7 +207,7 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_odeprecated
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     e = assert_raises(MethodDeprecatedError) do
       odeprecated("method", "replacement",
         caller: ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],

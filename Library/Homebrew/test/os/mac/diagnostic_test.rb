@@ -16,7 +16,7 @@ class OSMacDiagnosticChecksTest < Homebrew::TestCase
   end
 
   def test_check_for_unsupported_macos
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     OS::Mac.stubs(:prerelease?).returns true
     assert_match "We do not provide support for this pre-release version.",
       @checks.check_for_unsupported_macos

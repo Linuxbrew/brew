@@ -243,7 +243,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = shutup do
       formula_auditor "foo", <<-EOS.undent
         class Foo < GithubGistFormula
@@ -260,7 +260,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < ScriptFileFormula
         url "http://example.com/foo-1.0.tgz"
@@ -275,7 +275,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < AmazonWebServicesFormula
         url "http://example.com/foo-1.0.tgz"
