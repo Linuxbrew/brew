@@ -73,24 +73,19 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
   end
 
   def test_install_head_installed
-    initial_env = ENV.to_hash
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
-
     repo_path = HOMEBREW_CACHE.join("repo")
     repo_path.join("bin").mkpath
 
-    repo_path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        FileUtils.touch "bin/something.bin"
-        FileUtils.touch "README"
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "Initial repo commit"
+    using_git_env do
+      repo_path.cd do
+        shutup do
+          system "git", "init"
+          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+          FileUtils.touch "bin/something.bin"
+          FileUtils.touch "README"
+          system "git", "add", "--all"
+          system "git", "commit", "-m", "Initial repo commit"
+        end
       end
     end
 
@@ -110,9 +105,6 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
       cmd("install", "testball1", "--HEAD", "--ignore-dependencies")
     assert_match "#{HOMEBREW_CELLAR}/testball1/HEAD-2ccdf4f", cmd("unlink", "testball1")
     assert_match "#{HOMEBREW_CELLAR}/testball1/1.0", cmd("install", "testball1")
-
-  ensure
-    ENV.replace(initial_env)
   end
 
   def test_install_with_invalid_option

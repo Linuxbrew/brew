@@ -157,18 +157,6 @@ class GitDownloadStrategyTests < Homebrew::TestCase
     end
   end
 
-  def using_git_env
-    initial_env = ENV.to_hash
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
-    yield
-  ensure
-    ENV.replace(initial_env)
-  end
-
   def setup_git_repo
     using_git_env do
       @cached_location.cd do

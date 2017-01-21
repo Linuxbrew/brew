@@ -66,23 +66,16 @@ class TapTest < Homebrew::TestCase
   end
 
   def setup_git_repo
-    env = ENV.to_hash
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
-
-    @path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "init"
+    using_git_env do
+      @path.cd do
+        shutup do
+          system "git", "init"
+          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+          system "git", "add", "--all"
+          system "git", "commit", "-m", "init"
+        end
       end
     end
-  ensure
-    ENV.replace(env)
   end
 
   def test_fetch
