@@ -31,6 +31,7 @@ end
 
 module SharedEnvTests
   def setup
+    super
     @env = {}.extend(EnvActivation)
   end
 

@@ -4,6 +4,7 @@ require "os/mac/version"
 
 class OSMacVersionTests < Homebrew::TestCase
   def setup
+    super
     @v = MacOS::Version.new("10.7")
   end
 

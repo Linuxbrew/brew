@@ -23,6 +23,7 @@ class PatchingTests < Homebrew::TestCase
   def teardown
     @_f.clear_cache
     @_f.patchlist.each { |p| p.clear_cache if p.external? }
+    super
   end
 
   def assert_patched(formula)

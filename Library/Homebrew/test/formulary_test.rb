@@ -16,6 +16,7 @@ end
 
 class FormularyFactoryTest < Homebrew::TestCase
   def setup
+    super
     @name = "testball_bottle"
     @path = CoreTap.new.formula_dir/"#{@name}.rb"
     @bottle_dir = Pathname.new("#{TEST_FIXTURE_DIR}/bottles")
@@ -41,6 +42,7 @@ class FormularyFactoryTest < Homebrew::TestCase
 
   def teardown
     @path.unlink
+    super
   end
 
   def test_factory
@@ -129,6 +131,7 @@ end
 
 class FormularyTapFactoryTest < Homebrew::TestCase
   def setup
+    super
     @name = "foo"
     @tap = Tap.new "homebrew", "foo"
     @path = @tap.path/"#{@name}.rb"
@@ -142,6 +145,7 @@ class FormularyTapFactoryTest < Homebrew::TestCase
 
   def teardown
     @tap.path.rmtree
+    super
   end
 
   def test_factory_tap_formula
@@ -174,6 +178,7 @@ end
 
 class FormularyTapPriorityTest < Homebrew::TestCase
   def setup
+    super
     @name = "foo"
     @core_path = CoreTap.new.formula_dir/"#{@name}.rb"
     @tap = Tap.new "homebrew", "foo"
@@ -190,6 +195,7 @@ class FormularyTapPriorityTest < Homebrew::TestCase
   def teardown
     @core_path.unlink
     @tap.path.rmtree
+    super
   end
 
   def test_find_with_priority_core_formula

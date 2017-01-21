@@ -15,6 +15,7 @@ class AbstractDownloadStrategyTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     @name = "foo"
     @resource = ResourceDouble.new
     @strategy = AbstractDownloadStrategy.new(@name, @resource)
@@ -63,6 +64,7 @@ end
 
 class GitHubPrivateRepositoryDownloadStrategyTests < Homebrew::TestCase
   def setup
+    super
     resource = ResourceDouble.new("https://github.com/owner/repo/archive/1.1.5.tar.gz")
     ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
     GitHub.stubs(:repository).returns {}
@@ -87,6 +89,7 @@ end
 
 class GitHubPrivateRepositoryReleaseDownloadStrategyTests < Homebrew::TestCase
   def setup
+    super
     resource = ResourceDouble.new("https://github.com/owner/repo/releases/download/tag/foo_v0.1.0_darwin_amd64.tar.gz")
     ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
     GitHub.stubs(:repository).returns {}
@@ -138,6 +141,7 @@ class GitDownloadStrategyTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     resource = ResourceDouble.new("https://github.com/homebrew/foo")
     @commit_id = 1
     @strategy = GitDownloadStrategy.new("baz", resource)
@@ -147,6 +151,7 @@ class GitDownloadStrategyTests < Homebrew::TestCase
 
   def teardown
     rmtree @cached_location
+    super
   end
 
   def git_commit_all
@@ -236,6 +241,7 @@ end
 
 class DownloadStrategyDetectorTests < Homebrew::TestCase
   def setup
+    super
     @d = DownloadStrategyDetector.new
   end
 

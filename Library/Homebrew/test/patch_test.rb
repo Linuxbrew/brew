@@ -111,6 +111,7 @@ end
 
 class ExternalPatchTests < Homebrew::TestCase
   def setup
+    super
     @p = ExternalPatch.new(:p1) { url "file:///my.patch" }
   end
 

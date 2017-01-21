@@ -109,6 +109,7 @@ end
 
 class ArchitectureListExtensionTests < MachOPathnameTests
   def setup
+    super
     @archs = [:i386, :x86_64, :ppc7400, :ppc64].extend(ArchitectureListExtension)
   end
 
@@ -157,11 +158,13 @@ class TextExecutableTests < Homebrew::TestCase
   attr_reader :pn
 
   def setup
+    super
     @pn = HOMEBREW_PREFIX.join("an_executable")
   end
 
   def teardown
     HOMEBREW_PREFIX.join("an_executable").unlink
+    super
   end
 
   def test_simple_shebang

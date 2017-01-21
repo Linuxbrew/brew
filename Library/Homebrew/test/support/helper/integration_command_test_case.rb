@@ -6,6 +6,7 @@ require "test/support/helper/test_case"
 
 class IntegrationCommandTestCase < Homebrew::TestCase
   def setup
+    super
     @cmd_id_index = 0 # Assign unique IDs to invocations of `cmd_output`.
     (HOMEBREW_PREFIX/"bin").mkpath
     FileUtils.touch HOMEBREW_PREFIX/"bin/brew"
@@ -38,6 +39,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
       coretap.path/"formula_renames.json",
     ].flatten
     FileUtils.rm_rf paths_to_delete
+    super
   end
 
   def needs_test_cmd_taps

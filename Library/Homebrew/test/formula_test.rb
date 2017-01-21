@@ -874,6 +874,8 @@ class AliasChangeTests < Homebrew::TestCase
   end
 
   def setup
+    super
+
     alias_name = "bar"
     @alias_path = "#{CoreTap.instance.alias_dir}/#{alias_name}"
 
@@ -942,6 +944,8 @@ class OutdatedVersionsTests < Homebrew::TestCase
   attr_reader :f, :old_formula, :new_formula
 
   def setup
+    super
+
     @f = formula do
       url "foo"
       version "1.20"
@@ -960,6 +964,7 @@ class OutdatedVersionsTests < Homebrew::TestCase
   def teardown
     formulae = [@f, @old_formula, @new_formula]
     formulae.map(&:rack).select(&:exist?).each(&:rmtree)
+    super
   end
 
   def alias_path

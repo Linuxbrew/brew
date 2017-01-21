@@ -3,6 +3,7 @@ require "dependency"
 
 class DependableTests < Homebrew::TestCase
   def setup
+    super
     @tags = ["foo", "bar", :build]
     @dep = Struct.new(:tags).new(@tags).extend(Dependable)
   end

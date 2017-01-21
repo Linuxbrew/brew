@@ -6,6 +6,8 @@ class OSMacLinkTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
+
     keg = HOMEBREW_CELLAR.join("foo", "1.0")
     keg.join("bin").mkpath
 
@@ -34,6 +36,8 @@ class OSMacLinkTests < Homebrew::TestCase
 
     rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
+
+    super
   end
 
   def test_mach_o_files_skips_hardlinks

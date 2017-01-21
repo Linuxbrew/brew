@@ -3,6 +3,7 @@ require "utils/bottles"
 
 class OSMacBottleCollectorTests < Homebrew::TestCase
   def setup
+    super
     @collector = Utils::Bottles::Collector.new
   end
 
