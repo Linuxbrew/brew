@@ -24,6 +24,7 @@ class ReportTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @tap = CoreTap.new
     @reporter = ReporterMock.new(@tap)
     @hub = ReporterHub.new

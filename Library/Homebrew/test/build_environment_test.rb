@@ -3,6 +3,7 @@ require "build_environment"
 
 class BuildEnvironmentTests < Homebrew::TestCase
   def setup
+    super
     @env = BuildEnvironment.new
   end
 

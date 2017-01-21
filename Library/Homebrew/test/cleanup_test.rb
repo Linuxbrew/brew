@@ -14,6 +14,7 @@ end
 
 class CleanupTests < Homebrew::TestCase
   def setup
+    super
     @ds_store = Pathname.new "#{HOMEBREW_PREFIX}/Library/.DS_Store"
     FileUtils.touch @ds_store
   end
@@ -22,6 +23,7 @@ class CleanupTests < Homebrew::TestCase
     FileUtils.rm_f @ds_store
     ARGV.delete "--dry-run"
     ARGV.delete "--prune=all"
+    super
   end
 
   def test_cleanup

@@ -20,6 +20,8 @@ class LinkTestCase < Homebrew::TestCase
   end
 
   def setup
+    super
+
     @keg = setup_test_keg("foo", "1.0")
     @dst = HOMEBREW_PREFIX.join("bin", "helloworld")
     @nonexistent = Pathname.new("/some/nonexistent/path")
@@ -43,6 +45,8 @@ class LinkTestCase < Homebrew::TestCase
 
     rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
+
+    super
   end
 end
 

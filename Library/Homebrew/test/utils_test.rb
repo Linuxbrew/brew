@@ -5,6 +5,7 @@ require "utils/shell"
 
 class UtilTests < Homebrew::TestCase
   def setup
+    super
     @dir = Pathname.new(mktmpdir)
     @env = ENV.to_hash
   end
@@ -12,6 +13,7 @@ class UtilTests < Homebrew::TestCase
   def teardown
     @dir.rmtree
     ENV.replace @env
+    super
   end
 
   def test_ofail

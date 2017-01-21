@@ -3,6 +3,7 @@ require "extend/ARGV"
 
 class ArgvExtensionTests < Homebrew::TestCase
   def setup
+    super
     @argv = [].extend(HomebrewArgvExtension)
   end
 

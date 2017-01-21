@@ -9,6 +9,7 @@ class DependencyExpansionTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @foo = build_dep(:foo)
     @bar = build_dep(:bar)
     @baz = build_dep(:baz)

@@ -34,6 +34,7 @@ class TapTest < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     @path = Tap::TAP_DIRECTORY/"homebrew/homebrew-foo"
     @path.mkpath
     @tap = Tap.new("Homebrew", "foo")
@@ -86,6 +87,7 @@ class TapTest < Homebrew::TestCase
 
   def teardown
     @path.rmtree
+    super
   end
 
   def test_fetch
@@ -285,6 +287,7 @@ class CoreTapTest < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     @repo = CoreTap.new
   end
 

@@ -3,6 +3,7 @@ require "formula_lock"
 
 class FormulaLockTests < Homebrew::TestCase
   def setup
+    super
     @lock = FormulaLock.new("foo")
     @lock.lock
   end
@@ -10,6 +11,7 @@ class FormulaLockTests < Homebrew::TestCase
   def teardown
     @lock.unlock
     HOMEBREW_LOCK_DIR.children.each(&:unlink)
+    super
   end
 
   def test_locking_file_with_existing_lock_raises_error

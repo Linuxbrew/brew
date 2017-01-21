@@ -3,6 +3,7 @@ require "gpg"
 
 class GpgTest < Homebrew::TestCase
   def setup
+    super
     skip "GPG Unavailable" unless Gpg.available?
     @dir = Pathname.new(mktmpdir)
   end

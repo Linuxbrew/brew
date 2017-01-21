@@ -3,6 +3,8 @@ require "cmd/uninstall"
 
 class UninstallTests < Homebrew::TestCase
   def setup
+    super
+
     @dependency = formula("dependency") { url "f-1" }
     @dependent = formula("dependent") do
       url "f-1"
@@ -32,6 +34,7 @@ class UninstallTests < Homebrew::TestCase
       f.installed_kegs.each(&:remove_opt_record)
       f.rack.rmtree
     end
+    super
   end
 
   def handle_unsatisfied_dependents

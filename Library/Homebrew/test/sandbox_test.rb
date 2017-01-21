@@ -3,6 +3,7 @@ require "sandbox"
 
 class SandboxTest < Homebrew::TestCase
   def setup
+    super
     skip "sandbox not implemented" unless Sandbox.available?
     @sandbox = Sandbox.new
     @dir = Pathname.new(mktmpdir)
@@ -11,6 +12,7 @@ class SandboxTest < Homebrew::TestCase
 
   def teardown
     @dir.rmtree
+    super
   end
 
   def test_formula?

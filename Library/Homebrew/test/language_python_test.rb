@@ -4,6 +4,7 @@ require "resource"
 
 class LanguagePythonTests < Homebrew::TestCase
   def setup
+    super
     @dir = Pathname.new(mktmpdir)
     resource = stub("resource", stage: true)
     formula_bin = @dir/"formula_bin"
@@ -16,6 +17,7 @@ class LanguagePythonTests < Homebrew::TestCase
 
   def teardown
     FileUtils.rm_rf @dir
+    super
   end
 
   def test_virtualenv_creation

@@ -21,6 +21,7 @@ class FormulaPinTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @f   = FormulaDouble.new
     @pin = FormulaPin.new(@f)
     @f.rack.mkpath
@@ -50,5 +51,6 @@ class FormulaPinTests < Homebrew::TestCase
 
   def teardown
     @f.rack.rmtree
+    super
   end
 end

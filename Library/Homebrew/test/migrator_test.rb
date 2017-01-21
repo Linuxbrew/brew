@@ -10,6 +10,7 @@ end
 
 class MigratorErrorsTests < Homebrew::TestCase
   def setup
+    super
     @new_f = Testball.new("newname")
     @new_f.oldname = "oldname"
     @old_f = Testball.new("oldname")
@@ -40,6 +41,8 @@ class MigratorTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
+
     @new_f = Testball.new("newname")
     @new_f.oldname = "oldname"
 
@@ -93,6 +96,8 @@ class MigratorTests < Homebrew::TestCase
     @new_f.unpin
 
     HOMEBREW_LOCK_DIR.children.each(&:unlink)
+
+    super
   end
 
   def test_move_cellar

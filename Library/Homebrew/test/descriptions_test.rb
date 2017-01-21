@@ -3,6 +3,8 @@ require "descriptions"
 
 class DescriptionsTest < Homebrew::TestCase
   def setup
+    super
+
     @descriptions_hash = {}
     @descriptions = Descriptions.new(@descriptions_hash)
 
@@ -12,6 +14,7 @@ class DescriptionsTest < Homebrew::TestCase
 
   def teardown
     $stdout = @old_stdout
+    super
   end
 
   def test_single_core_formula
