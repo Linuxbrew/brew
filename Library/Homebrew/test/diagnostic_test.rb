@@ -6,13 +6,7 @@ require "diagnostic"
 class DiagnosticChecksTest < Homebrew::TestCase
   def setup
     super
-    @env = ENV.to_hash
     @checks = Homebrew::Diagnostic::Checks.new
-  end
-
-  def teardown
-    ENV.replace(@env)
-    super
   end
 
   def test_inject_file_list

@@ -16,11 +16,14 @@ module Homebrew
 
     def setup
       super
+
       @__argv = ARGV.dup
+      @__env = copy_env # Call #to_hash to duplicate ENV
     end
 
     def teardown
       ARGV.replace(@__argv)
+      restore_env @__env
 
       Tab.clear_cache
 

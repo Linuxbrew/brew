@@ -361,13 +361,10 @@ class FormulaAuditorTests < Homebrew::TestCase
       end
     EOS
 
-    original_value = ENV["HOMEBREW_NO_GITHUB_API"]
     ENV["HOMEBREW_NO_GITHUB_API"] = "1"
 
     fa.audit_github_repository
     assert_equal [], fa.problems
-  ensure
-    ENV["HOMEBREW_NO_GITHUB_API"] = original_value
   end
 
   def test_audit_caveats
