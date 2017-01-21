@@ -14,8 +14,14 @@ module Homebrew
     TEST_SHA1   = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
     TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
 
+    def setup
+      super
+      @__argv = ARGV.dup
+    end
+
     def teardown
       Tab.clear_cache
+      ARGV.replace(@__argv)
       super
     end
 
