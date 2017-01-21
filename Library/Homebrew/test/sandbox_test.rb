@@ -10,11 +10,6 @@ class SandboxTest < Homebrew::TestCase
     @file = @dir/"foo"
   end
 
-  def teardown
-    @dir.rmtree
-    super
-  end
-
   def test_formula?
     f = formula { url "foo-1.0" }
     f2 = formula { url "bar-1.0" }

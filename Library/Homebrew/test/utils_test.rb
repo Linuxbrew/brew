@@ -11,7 +11,6 @@ class UtilTests < Homebrew::TestCase
   end
 
   def teardown
-    @dir.rmtree
     ENV.replace @env
     super
   end

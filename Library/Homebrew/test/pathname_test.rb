@@ -13,12 +13,6 @@ module PathnameTestExtension
     @file = @src/"foo"
     @dir  = @src/"bar"
   end
-
-  def teardown
-    rmtree(@src)
-    rmtree(@dst)
-    super
-  end
 end
 
 class PathnameTests < Homebrew::TestCase
