@@ -14,6 +14,11 @@ module Homebrew
     TEST_SHA1   = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
     TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
 
+    def teardown
+      Tab.clear_cache
+      super
+    end
+
     def formula(name = "formula_name", path = Formulary.core_path(name), spec = :stable, alias_path: nil, &block)
       @_f = Class.new(Formula, &block).new(name, path, spec, alias_path: alias_path)
     end

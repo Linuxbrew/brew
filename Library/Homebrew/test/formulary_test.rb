@@ -112,7 +112,6 @@ class FormularyFactoryTest < Homebrew::TestCase
     keg.uninstall
     formula.clear_cache
     formula.bottle.clear_cache
-    Tab.clear_cache
   end
 
   def test_load_from_contents
