@@ -69,7 +69,11 @@ describe Hbc::DSL do
     end
 
     it "may use deprecated DSL version hash syntax" do
-      with_environment "HOMEBREW_DEVELOPER" => nil do
+      stub = proc do |arg|
+        arg == "HOMEBREW_DEVELOPER" ? nil : ENV[arg]
+      end
+
+      ENV.stub :[], stub do
         shutup do
           test_cask = Hbc.load("with-dsl-version")
           test_cask.token.must_equal "with-dsl-version"
