@@ -18,7 +18,7 @@ module Homebrew
       super
 
       @__argv = ARGV.dup
-      @__env = copy_env # Call #to_hash to duplicate ENV
+      @__env = copy_env
     end
 
     def teardown
