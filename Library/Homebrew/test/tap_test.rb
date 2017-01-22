@@ -66,14 +66,12 @@ class TapTest < Homebrew::TestCase
   end
 
   def setup_git_repo
-    using_git_env do
-      @path.cd do
-        shutup do
-          system "git", "init"
-          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-          system "git", "add", "--all"
-          system "git", "commit", "-m", "init"
-        end
+    @path.cd do
+      shutup do
+        system "git", "init"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "init"
       end
     end
   end

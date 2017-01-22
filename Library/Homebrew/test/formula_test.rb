@@ -533,14 +533,12 @@ class FormulaTests < Homebrew::TestCase
     cached_location = f.head.downloader.cached_location
     cached_location.mkpath
 
-    using_git_env do
-      cached_location.cd do
-        FileUtils.touch "LICENSE"
-        shutup do
-          system "git", "init"
-          system "git", "add", "--all"
-          system "git", "commit", "-m", "Initial commit"
-        end
+    cached_location.cd do
+      FileUtils.touch "LICENSE"
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "Initial commit"
       end
     end
 
@@ -1105,14 +1103,12 @@ class OutdatedVersionsTests < Homebrew::TestCase
       head "file://#{testball_repo}", using: :git
     end
 
-    using_git_env do
-      testball_repo.cd do
-        FileUtils.touch "LICENSE"
-        shutup do
-          system "git", "init"
-          system "git", "add", "--all"
-          system "git", "commit", "-m", "Initial commit"
-        end
+    testball_repo.cd do
+      FileUtils.touch "LICENSE"
+      shutup do
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "Initial commit"
       end
     end
 

@@ -158,15 +158,13 @@ class GitDownloadStrategyTests < Homebrew::TestCase
   end
 
   def setup_git_repo
-    using_git_env do
-      @cached_location.cd do
-        shutup do
-          system "git", "init"
-          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        end
-        touch "README"
-        git_commit_all
+    @cached_location.cd do
+      shutup do
+        system "git", "init"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
       end
+      touch "README"
+      git_commit_all
     end
   end
 
@@ -185,11 +183,9 @@ class GitDownloadStrategyTests < Homebrew::TestCase
 
   def test_last_commit
     setup_git_repo
-    using_git_env do
-      @cached_location.cd do
-        touch "LICENSE"
-        git_commit_all
-      end
+    @cached_location.cd do
+      touch "LICENSE"
+      git_commit_all
     end
     assert_equal "f68266e", @strategy.last_commit
   end
@@ -202,17 +198,15 @@ class GitDownloadStrategyTests < Homebrew::TestCase
     resource.instance_variable_set(:@version, Version.create("HEAD"))
     @strategy = GitDownloadStrategy.new("baz", resource)
 
-    using_git_env do
-      remote_repo.cd do
-        shutup do
-          system "git", "init"
-          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        end
-        touch "README"
-        git_commit_all
-        touch "LICENSE"
-        git_commit_all
+    remote_repo.cd do
+      shutup do
+        system "git", "init"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
       end
+      touch "README"
+      git_commit_all
+      touch "LICENSE"
+      git_commit_all
     end
 
     @strategy.shutup!

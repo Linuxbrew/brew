@@ -76,16 +76,14 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
     repo_path = HOMEBREW_CACHE.join("repo")
     repo_path.join("bin").mkpath
 
-    using_git_env do
-      repo_path.cd do
-        shutup do
-          system "git", "init"
-          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-          FileUtils.touch "bin/something.bin"
-          FileUtils.touch "README"
-          system "git", "add", "--all"
-          system "git", "commit", "-m", "Initial repo commit"
-        end
+    repo_path.cd do
+      shutup do
+        system "git", "init"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+        FileUtils.touch "bin/something.bin"
+        FileUtils.touch "README"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "Initial repo commit"
       end
     end
 
