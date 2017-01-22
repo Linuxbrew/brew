@@ -125,11 +125,7 @@ class FormulaInstallerTests < Homebrew::TestCase
     fi = FormulaInstaller.new(dependent)
     assert_raises(CannotInstallFormulaError) { fi.check_install_sanity }
   ensure
-    dependency.unpin
     dependency_keg.unlink
-    dependency_keg.uninstall
-    dependency.clear_cache
-    dep_path.unlink
     Formulary::FORMULAE.delete(dep_path)
   end
 end

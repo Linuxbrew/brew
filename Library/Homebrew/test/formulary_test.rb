@@ -40,11 +40,6 @@ class FormularyFactoryTest < Homebrew::TestCase
     EOS
   end
 
-  def teardown
-    @path.unlink
-    super
-  end
-
   def test_factory
     assert_kind_of Formula, Formulary.factory(@name)
   end
@@ -63,8 +58,6 @@ class FormularyFactoryTest < Homebrew::TestCase
     path.write "class Wrong#{Formulary.class_s(name)} < Formula\nend\n"
 
     assert_raises(FormulaClassUnavailableError) { Formulary.factory(name) }
-  ensure
-    path.unlink
   end
 
   def test_factory_from_path
@@ -92,8 +85,6 @@ class FormularyFactoryTest < Homebrew::TestCase
     result = Formulary.factory("foo")
     assert_kind_of Formula, result
     assert_equal alias_path.to_s, result.alias_path
-  ensure
-    alias_dir.rmtree
   end
 
   def test_factory_from_rack_and_from_keg
@@ -109,9 +100,6 @@ class FormularyFactoryTest < Homebrew::TestCase
     assert_kind_of Tab, f.build
   ensure
     keg.unlink
-    keg.uninstall
-    formula.clear_cache
-    formula.bottle.clear_cache
   end
 
   def test_load_from_contents
@@ -123,8 +111,6 @@ class FormularyFactoryTest < Homebrew::TestCase
     (HOMEBREW_CELLAR/@name).mkpath
     assert_equal HOMEBREW_CELLAR/@name, Formulary.to_rack(@name)
     assert_raises(TapFormulaUnavailableError) { Formulary.to_rack("a/b/#{@name}") }
-  ensure
-    FileUtils.rm_rf HOMEBREW_CELLAR/@name
   end
 end
 
@@ -140,11 +126,6 @@ class FormularyTapFactoryTest < Homebrew::TestCase
       end
     EOS
     @path.write @code
-  end
-
-  def teardown
-    @tap.path.rmtree
-    super
   end
 
   def test_factory_tap_formula
@@ -189,12 +170,6 @@ class FormularyTapPriorityTest < Homebrew::TestCase
     EOS
     @core_path.write code
     @tap_path.write code
-  end
-
-  def teardown
-    @core_path.unlink
-    @tap.path.rmtree
-    super
   end
 
   def test_find_with_priority_core_formula

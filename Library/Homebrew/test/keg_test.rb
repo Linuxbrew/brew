@@ -36,16 +36,9 @@ class LinkTestCase < Homebrew::TestCase
   end
 
   def teardown
-    @kegs.each do |keg|
-      keg.unlink
-      keg.uninstall
-    end
-
+    @kegs.each(&:unlink)
     $stdout = @old_stdout
-
-    rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
-
     super
   end
 end
@@ -305,8 +298,6 @@ class LinkTests < LinkTestCase
     assert_equal 2, lib.children.length
   ensure
     a.unlink
-    a.uninstall
-    b.uninstall
   end
 
   def test_removes_broken_symlinks_that_conflict_with_directories
@@ -322,7 +313,6 @@ class LinkTests < LinkTestCase
     keg.link
   ensure
     keg.unlink
-    keg.uninstall
   end
 end
 
@@ -434,9 +424,6 @@ class InstalledDependantsTests < LinkTestCase
 
     result = Keg.find_some_installed_dependents([renamed_keg])
     assert_equal [[renamed_keg], ["bar"]], result
-  ensure
-    # Move it back to where it was so it'll be cleaned up.
-    (HOMEBREW_CELLAR/"foo-old").rename(HOMEBREW_CELLAR/"foo")
   end
 
   def test_empty_dependencies_in_tab

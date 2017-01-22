@@ -10,7 +10,6 @@ class FormulaLockTests < Homebrew::TestCase
 
   def teardown
     @lock.unlock
-    HOMEBREW_LOCK_DIR.children.each(&:unlink)
     super
   end
 

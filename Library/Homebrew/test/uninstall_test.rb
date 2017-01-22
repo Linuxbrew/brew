@@ -30,10 +30,6 @@ class UninstallTests < Homebrew::TestCase
 
   def teardown
     Homebrew.failed = false
-    [@dependency, @dependent].each do |f|
-      f.installed_kegs.each(&:remove_opt_record)
-      f.rack.rmtree
-    end
     super
   end
 

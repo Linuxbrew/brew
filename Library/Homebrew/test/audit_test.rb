@@ -10,11 +10,6 @@ class FormulaTextTests < Homebrew::TestCase
     @dir = mktmpdir
   end
 
-  def teardown
-    FileUtils.rm_rf @dir
-    super
-  end
-
   def formula_text(name, body = nil, options = {})
     path = Pathname.new "#{@dir}/#{name}.rb"
     path.open("w") do |f|
@@ -62,11 +57,6 @@ class FormulaAuditorTests < Homebrew::TestCase
   def setup
     super
     @dir = mktmpdir
-  end
-
-  def teardown
-    FileUtils.rm_rf @dir
-    super
   end
 
   def formula_auditor(name, text, options = {})

@@ -32,8 +32,6 @@ class MigratorErrorsTests < Homebrew::TestCase
     tab.source["tap"] = "homebrew/core"
     tab.write
     assert_raises(Migrator::MigratorDifferentTapsError) { Migrator.new(@new_f) }
-  ensure
-    keg.parent.rmtree
   end
 end
 
@@ -72,30 +70,14 @@ class MigratorTests < Homebrew::TestCase
   end
 
   def teardown
-    @old_pin.unlink if @old_pin.symlink?
-
-    if @old_keg_record.parent.symlink?
-      @old_keg_record.parent.unlink
-    elsif @old_keg_record.directory?
+    if !@old_keg_record.parent.symlink? && @old_keg_record.directory?
       @keg.unlink
-      @keg.uninstall
     end
 
     if @new_keg_record.directory?
       new_keg = Keg.new(@new_keg_record)
       new_keg.unlink
-      new_keg.uninstall
     end
-
-    @old_keg_record.parent.rmtree if @old_keg_record.parent.directory?
-    @new_keg_record.parent.rmtree if @new_keg_record.parent.directory?
-
-    rmtree HOMEBREW_PREFIX/"bin"
-    rmtree HOMEBREW_PREFIX/"opt" if (HOMEBREW_PREFIX/"opt").directory?
-    # What to do with pin?
-    @new_f.unpin
-
-    HOMEBREW_LOCK_DIR.children.each(&:unlink)
 
     super
   end

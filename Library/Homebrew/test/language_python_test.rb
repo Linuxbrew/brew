@@ -15,11 +15,6 @@ class LanguagePythonTests < Homebrew::TestCase
     @venv = Language::Python::Virtualenv::Virtualenv.new(@formula, @dir, "python")
   end
 
-  def teardown
-    FileUtils.rm_rf @dir
-    super
-  end
-
   def test_virtualenv_creation
     @formula.expects(:resource).with("homebrew-virtualenv").returns(
       mock("resource", stage: true)

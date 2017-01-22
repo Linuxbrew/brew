@@ -269,11 +269,6 @@ class TabLoadingTests < Homebrew::TestCase
     @path.write TEST_FIXTURE_DIR.join("receipt.json").read
   end
 
-  def teardown
-    @f.rack.rmtree
-    super
-  end
-
   def test_for_keg
     tab = Tab.for_keg(@f.prefix)
     assert_equal @path, tab.tabfile
