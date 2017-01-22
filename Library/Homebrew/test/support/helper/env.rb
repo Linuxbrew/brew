@@ -18,15 +18,15 @@ module Test
       end
 
       def using_git_env
-        initial_env = copy_env
-        %w[AUTHOR COMMITTER].each do |role|
-          ENV["GIT_#{role}_NAME"] = "brew tests"
-          ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-          ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
+        git_env = ["AUTHOR", "COMMITTER"].each_with_object({}) do |role, env|
+          env["GIT_#{role}_NAME"]  = "brew tests"
+          env["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
+          env["GIT_#{role}_DATE"]  = "Thu May 21 00:04:11 2009 +0100"
         end
-        yield
-      ensure
-        restore_env initial_env
+
+        with_environment(git_env) do
+          yield
+        end
       end
     end
   end
