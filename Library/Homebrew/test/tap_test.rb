@@ -177,10 +177,10 @@ class TapTest < Homebrew::TestCase
     touch @path/"README"
     setup_git_repo
 
-    assert_equal "e1893a6bd191ba895c71b652ff8376a6114c7fa7", @tap.git_head
-    assert_equal "e189", @tap.git_short_head
-    assert_match "years ago", @tap.git_last_commit
-    assert_equal "2009-05-21", @tap.git_last_commit_date
+    assert_equal "0453e16c8e3fac73104da50927a86221ca0740c2", @tap.git_head
+    assert_equal "0453", @tap.git_short_head
+    assert_match "ago", @tap.git_last_commit
+    assert_equal "2017-01-22", @tap.git_last_commit_date
   end
 
   def test_private_remote

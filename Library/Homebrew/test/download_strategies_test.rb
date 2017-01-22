@@ -180,7 +180,7 @@ class GitDownloadStrategyTests < Homebrew::TestCase
 
   def test_source_modified_time
     setup_git_repo
-    assert_equal 1_242_860_651, @strategy.source_modified_time.to_i
+    assert_equal 1_485_115_153, @strategy.source_modified_time.to_i
   end
 
   def test_last_commit
@@ -191,7 +191,7 @@ class GitDownloadStrategyTests < Homebrew::TestCase
         git_commit_all
       end
     end
-    assert_equal "c50c79b", @strategy.last_commit
+    assert_equal "f68266e", @strategy.last_commit
   end
 
   def test_fetch_last_commit
@@ -216,7 +216,7 @@ class GitDownloadStrategyTests < Homebrew::TestCase
     end
 
     @strategy.shutup!
-    assert_equal "c50c79b", @strategy.fetch_last_commit
+    assert_equal "f68266e", @strategy.fetch_last_commit
   ensure
     remote_repo.rmtree if remote_repo.directory?
   end

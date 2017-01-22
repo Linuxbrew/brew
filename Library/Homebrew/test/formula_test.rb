@@ -1090,7 +1090,7 @@ class OutdatedVersionsTests < Homebrew::TestCase
     outdated_stable_prefix = HOMEBREW_CELLAR.join("testball/1.0")
     head_prefix_a = HOMEBREW_CELLAR.join("testball/HEAD")
     head_prefix_b = HOMEBREW_CELLAR.join("testball/HEAD-aaaaaaa_1")
-    head_prefix_c = HOMEBREW_CELLAR.join("testball/HEAD-5658946")
+    head_prefix_c = HOMEBREW_CELLAR.join("testball/HEAD-18a7103")
 
     setup_tab_for_prefix(outdated_stable_prefix)
     tab_a = setup_tab_for_prefix(head_prefix_a, versions: { "stable" => "1.0" })
