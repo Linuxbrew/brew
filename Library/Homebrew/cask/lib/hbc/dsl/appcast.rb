@@ -15,11 +15,7 @@ module Hbc
         result = SystemCommand.run("/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", URL::FAKE_USER_AGENT, @uri], print_stderr: false)
 
         checkpoint = if result.success?
-          processed_appcast_text = result.stdout.gsub(%r{<pubDate>[^<]*</pubDate>}, "")
-
-          # This step is necessary to replicate running `sed` from the command line
-          processed_appcast_text << "\n" unless processed_appcast_text.end_with?("\n")
-
+          processed_appcast_text = result.stdout.gsub(%r{<pubDate>[^<]*</pubDate>}m, "")
           Digest::SHA2.hexdigest(processed_appcast_text)
         end
 
