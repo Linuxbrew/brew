@@ -61,8 +61,6 @@ class InstallTests < Homebrew::TestCase
       assert_equal 3, bin.children.length
       assert_predicate f.prefix/".brew/testball.rb", :readable?
     end
-  ensure
-    ARGV.reject! { |a| a == "--with-invalid_flag" }
   end
 
   def test_bottle_unneeded_formula_install
@@ -86,13 +84,10 @@ class InstallTests < Homebrew::TestCase
 
     cc_arg = "--cc=clang"
     ARGV << cc_arg
-    begin
-      temporary_install(TestballBottle.new) do |f|
-        tab = Tab.for_formula(f)
-        assert_equal "clang", tab.compiler
-      end
-    ensure
-      ARGV.delete_if { |x| x == cc_arg }
+
+    temporary_install(TestballBottle.new) do |f|
+      tab = Tab.for_formula(f)
+      assert_equal "clang", tab.compiler
     end
   end
 end

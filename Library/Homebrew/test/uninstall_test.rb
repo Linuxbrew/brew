@@ -62,8 +62,6 @@ class UninstallTests < Homebrew::TestCase
       assert_empty handle_unsatisfied_dependents
       refute_predicate Homebrew, :failed?
     end
-  ensure
-    ARGV.delete("--ignore-dependencies")
   end
 end
 

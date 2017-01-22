@@ -21,8 +21,6 @@ class CleanupTests < Homebrew::TestCase
 
   def teardown
     FileUtils.rm_f @ds_store
-    ARGV.delete "--dry-run"
-    ARGV.delete "--prune=all"
     super
   end
 
