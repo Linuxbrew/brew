@@ -55,7 +55,7 @@ module Hbc
         quiet = args.include? "--quiet"
         format = :to_yaml if args.include? "--yaml"
         format = :inspect if args.include? "--inspect"
-        cask_tokens = args.reject { |arg| arg.chars.first == "-" }
+        cask_tokens = cask_tokens_from(args)
         stanza = cask_tokens.shift.to_sym
         cask_tokens = Hbc.all_tokens if cask_tokens.empty?
 
