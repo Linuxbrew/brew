@@ -157,28 +157,14 @@ class GitDownloadStrategyTests < Homebrew::TestCase
     end
   end
 
-  def using_git_env
-    initial_env = ENV.to_hash
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
-    yield
-  ensure
-    ENV.replace(initial_env)
-  end
-
   def setup_git_repo
-    using_git_env do
-      @cached_location.cd do
-        shutup do
-          system "git", "init"
-          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        end
-        touch "README"
-        git_commit_all
+    @cached_location.cd do
+      shutup do
+        system "git", "init"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
       end
+      touch "README"
+      git_commit_all
     end
   end
 
@@ -192,18 +178,16 @@ class GitDownloadStrategyTests < Homebrew::TestCase
 
   def test_source_modified_time
     setup_git_repo
-    assert_equal 1_242_860_651, @strategy.source_modified_time.to_i
+    assert_equal 1_485_115_153, @strategy.source_modified_time.to_i
   end
 
   def test_last_commit
     setup_git_repo
-    using_git_env do
-      @cached_location.cd do
-        touch "LICENSE"
-        git_commit_all
-      end
+    @cached_location.cd do
+      touch "LICENSE"
+      git_commit_all
     end
-    assert_equal "c50c79b", @strategy.last_commit
+    assert_equal "f68266e", @strategy.last_commit
   end
 
   def test_fetch_last_commit
@@ -214,21 +198,19 @@ class GitDownloadStrategyTests < Homebrew::TestCase
     resource.instance_variable_set(:@version, Version.create("HEAD"))
     @strategy = GitDownloadStrategy.new("baz", resource)
 
-    using_git_env do
-      remote_repo.cd do
-        shutup do
-          system "git", "init"
-          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        end
-        touch "README"
-        git_commit_all
-        touch "LICENSE"
-        git_commit_all
+    remote_repo.cd do
+      shutup do
+        system "git", "init"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
       end
+      touch "README"
+      git_commit_all
+      touch "LICENSE"
+      git_commit_all
     end
 
     @strategy.shutup!
-    assert_equal "c50c79b", @strategy.fetch_last_commit
+    assert_equal "f68266e", @strategy.fetch_last_commit
   ensure
     remote_repo.rmtree if remote_repo.directory?
   end

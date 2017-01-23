@@ -39,17 +39,17 @@ describe Hbc::CLI do
     end
 
     it "respects the env variable when choosing what appdir to create" do
-      with_environment "HOMEBREW_CASK_OPTS" => "--appdir=/custom/appdir" do
-        expect(Hbc).to receive(:appdir=).with(Pathname("/custom/appdir"))
-        described_class.process("noop")
-      end
+      allow(ENV).to receive(:[])
+      allow(ENV).to receive(:[]).with("HOMEBREW_CASK_OPTS").and_return("--appdir=/custom/appdir")
+      expect(Hbc).to receive(:appdir=).with(Pathname.new("/custom/appdir"))
+      described_class.process("noop")
     end
 
     it "respects the env variable when choosing a non-default Caskroom location" do
-      with_environment "HOMEBREW_CASK_OPTS" => "--caskroom=/custom/caskdir" do
-        expect(Hbc).to receive(:caskroom=).with(Pathname("/custom/caskdir"))
-        described_class.process("noop")
-      end
+      allow(ENV).to receive(:[])
+      allow(ENV).to receive(:[]).with("HOMEBREW_CASK_OPTS").and_return("--caskroom=/custom/caskdir")
+      expect(Hbc).to receive(:caskroom=).with(Pathname.new("/custom/caskdir"))
+      described_class.process("noop")
     end
 
     it "exits with a status of 1 when something goes wrong" do

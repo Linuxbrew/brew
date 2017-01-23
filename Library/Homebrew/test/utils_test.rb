@@ -7,12 +7,6 @@ class UtilTests < Homebrew::TestCase
   def setup
     super
     @dir = Pathname.new(mktmpdir)
-    @env = ENV.to_hash
-  end
-
-  def teardown
-    ENV.replace @env
-    super
   end
 
   def test_ofail
@@ -213,7 +207,7 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_odeprecated
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     e = assert_raises(MethodDeprecatedError) do
       odeprecated("method", "replacement",
         caller: ["#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/"],

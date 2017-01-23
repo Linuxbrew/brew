@@ -526,20 +526,12 @@ class FormulaTests < Homebrew::TestCase
   end
 
   def test_update_head_version
-    initial_env = ENV.to_hash
-
     f = formula do
       head "foo", using: :git
     end
 
     cached_location = f.head.downloader.cached_location
     cached_location.mkpath
-
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
 
     cached_location.cd do
       FileUtils.touch "LICENSE"
@@ -552,8 +544,6 @@ class FormulaTests < Homebrew::TestCase
 
     f.update_head_version
     assert_equal Version.create("HEAD-5658946"), f.head.version
-  ensure
-    ENV.replace(initial_env)
   end
 
   def test_legacy_options
@@ -1098,13 +1088,12 @@ class OutdatedVersionsTests < Homebrew::TestCase
     outdated_stable_prefix = HOMEBREW_CELLAR.join("testball/1.0")
     head_prefix_a = HOMEBREW_CELLAR.join("testball/HEAD")
     head_prefix_b = HOMEBREW_CELLAR.join("testball/HEAD-aaaaaaa_1")
-    head_prefix_c = HOMEBREW_CELLAR.join("testball/HEAD-5658946")
+    head_prefix_c = HOMEBREW_CELLAR.join("testball/HEAD-18a7103")
 
     setup_tab_for_prefix(outdated_stable_prefix)
     tab_a = setup_tab_for_prefix(head_prefix_a, versions: { "stable" => "1.0" })
     setup_tab_for_prefix(head_prefix_b)
 
-    initial_env = ENV.to_hash
     testball_repo = HOMEBREW_PREFIX.join("testball_repo")
     testball_repo.mkdir
 
@@ -1112,12 +1101,6 @@ class OutdatedVersionsTests < Homebrew::TestCase
       url "foo"
       version "2.10"
       head "file://#{testball_repo}", using: :git
-    end
-
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
     end
 
     testball_repo.cd do
@@ -1144,7 +1127,6 @@ class OutdatedVersionsTests < Homebrew::TestCase
     reset_outdated_kegs
     assert_predicate f.outdated_kegs(fetch_head: true), :empty?
   ensure
-    ENV.replace(initial_env)
     testball_repo.rmtree if testball_repo.exist?
   end
 

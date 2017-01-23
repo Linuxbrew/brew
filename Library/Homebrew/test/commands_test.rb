@@ -47,8 +47,6 @@ class CommandsTests < Homebrew::TestCase
   end
 
   def test_external_commands
-    env = ENV.to_hash
-
     mktmpdir do |dir|
       %w[brew-t1 brew-t2.rb brew-t3.py].each do |file|
         path = "#{dir}/#{file}"
@@ -67,8 +65,6 @@ class CommandsTests < Homebrew::TestCase
         "Executable files with a non Ruby extension shoudn't be included"
       refute cmds.include?("t4"), "Non-executable files shouldn't be included"
     end
-  ensure
-    ENV.replace(env)
   end
 
   def test_internal_command_path

@@ -37,7 +37,6 @@ class ShellSmokeTest < Homebrew::TestCase
   end
 
   def prepend_path_shell(shell, path, fragment)
-    original_shell = ENV["SHELL"]
     ENV["SHELL"] = shell
 
     prepend_message = Utils::Shell.prepend_path_in_shell_profile(path)
@@ -45,8 +44,6 @@ class ShellSmokeTest < Homebrew::TestCase
       prepend_message.start_with?(fragment),
       "#{shell}: expected #{prepend_message} to match #{fragment}"
     )
-
-    ENV["SHELL"] = original_shell
   end
 
   def test_prepend_path_in_shell_profile
