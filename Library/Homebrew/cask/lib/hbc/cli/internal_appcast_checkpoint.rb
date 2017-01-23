@@ -6,7 +6,18 @@ module Hbc
         cask_tokens = cask_tokens_from(args)
         raise CaskUnspecifiedError if cask_tokens.empty?
 
-        appcask_checkpoint(cask_tokens, calculate)
+        if cask_tokens.all? { |t| t =~ %r{^https?://} && t !~ /\.rb$/ }
+          appcask_checkpoint_for_url(cask_tokens)
+        else
+          appcask_checkpoint(cask_tokens, calculate)
+        end
+      end
+
+      def self.appcask_checkpoint_for_url(urls)
+        urls.each do |url|
+          appcast = DSL::Appcast.new(url)
+          puts appcast.calculate_checkpoint[:checkpoint]
+        end
       end
 
       def self.appcask_checkpoint(cask_tokens, calculate)
@@ -39,7 +50,7 @@ module Hbc
       end
 
       def self.help
-        "prints (no flag) or calculates ('--calculate') a given Cask's appcast checkpoint"
+        "prints (no flag) or calculates ('--calculate') a given Cask's (or URL's) appcast checkpoint"
       end
 
       def self.needs_init?
