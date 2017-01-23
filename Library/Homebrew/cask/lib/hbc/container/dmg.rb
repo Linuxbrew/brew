@@ -45,10 +45,10 @@ module Hbc
           begin
             tries ||= 2
             @command.run("/usr/sbin/diskutil",
-                         args:         ["eject", mountpath],
+                         args:         ["unmount", "force", mountpath],
                          print_stderr: false)
 
-            raise CaskError, "Failed to eject #{mountpath}" if mountpath.exist?
+            raise CaskError, "Failed to unmount #{mountpath}" if mountpath.exist?
           rescue CaskError => e
             raise e if (tries -= 1).zero?
             sleep 1
