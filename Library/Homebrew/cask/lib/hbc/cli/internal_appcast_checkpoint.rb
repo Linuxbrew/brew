@@ -50,7 +50,7 @@ module Hbc
       end
 
       def self.help
-        "prints (no flag) or calculates ('--calculate') a given Cask's (or URL's) appcast checkpoint"
+        "prints or calculates a given Cask's or URL's appcast checkpoint"
       end
 
       def self.needs_init?

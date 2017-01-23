@@ -120,6 +120,13 @@ names, and other aspects of this manual are still subject to change.
 
     **`zap` may remove files which are shared between applications.**
 
+## INTERNAL COMMANDS
+
+  * `_appcast_checkpoint` [--calculate] [ <token> ... | <URL> ... ]:
+    Given a `token`, returns the current appcast checkpoint, or calculates
+    the appcast checkpoint if the `--calculate` flag is specified.  
+    Given a `URL`, calculates the appcast checkpoint for it.
+
 ## OPTIONS
 
 To make these options persistent, see the ENVIRONMENT section, below.
