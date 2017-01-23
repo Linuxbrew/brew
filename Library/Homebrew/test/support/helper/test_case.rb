@@ -1,11 +1,9 @@
 module Homebrew
   class TestCase < ::Minitest::Test
-    require "test/support/helper/env"
     require "test/support/helper/fs_leak_logger"
     require "test/support/helper/lifecycle_enforcer"
     require "test/support/helper/shutup"
     require "test/support/helper/version_assertions"
-    include Test::Helper::Env
     include Test::Helper::FSLeakLogger
     include Test::Helper::LifecycleEnforcer
     include Test::Helper::Shutup
@@ -18,12 +16,12 @@ module Homebrew
       super
 
       @__argv = ARGV.dup
-      @__env = copy_env
+      @__env = ENV.to_hash # dup doesn't work on ENV
     end
 
     def teardown
       ARGV.replace(@__argv)
-      restore_env @__env
+      ENV.replace(@__env)
 
       Tab.clear_cache
 

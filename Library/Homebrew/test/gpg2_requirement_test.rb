@@ -19,8 +19,7 @@ class GPG2RequirementTests < Homebrew::TestCase
   end
 
   def test_satisfied
-    with_environment("PATH" => @dir/"bin") do
-      assert_predicate GPG2Requirement.new, :satisfied?
-    end
+    ENV["PATH"] = @dir/"bin"
+    assert_predicate GPG2Requirement.new, :satisfied?
   end
 end
