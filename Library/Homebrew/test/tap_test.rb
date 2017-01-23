@@ -177,7 +177,7 @@ class TapTest < Homebrew::TestCase
 
     assert_equal "0453e16c8e3fac73104da50927a86221ca0740c2", @tap.git_head
     assert_equal "0453", @tap.git_short_head
-    assert_match "ago", @tap.git_last_commit
+    assert_match(/\A\d+ .+ ago\Z/, @tap.git_last_commit)
     assert_equal "2017-01-22", @tap.git_last_commit_date
   end
 
