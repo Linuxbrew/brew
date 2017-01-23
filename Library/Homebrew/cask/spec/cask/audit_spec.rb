@@ -162,7 +162,7 @@ describe Hbc::Audit do
 
         before do
           allow(audit).to receive(:check_appcast_http_code)
-          allow(fake_system_command).to receive(:run).and_return(fake_curl_result)
+          allow(Hbc::SystemCommand).to receive(:run).and_return(fake_curl_result)
           allow(fake_curl_result).to receive(:success?).and_return(success)
         end
 
