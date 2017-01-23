@@ -50,12 +50,12 @@ module Hbc
         :uninstall_postflight,
       ]
 
-      def self.run(*arguments)
-        table = arguments.include? "--table"
-        quiet = arguments.include? "--quiet"
-        format = :to_yaml if arguments.include? "--yaml"
-        format = :inspect if arguments.include? "--inspect"
-        cask_tokens = arguments.reject { |arg| arg.chars.first == "-" }
+      def self.run(*args)
+        table = args.include? "--table"
+        quiet = args.include? "--quiet"
+        format = :to_yaml if args.include? "--yaml"
+        format = :inspect if args.include? "--inspect"
+        cask_tokens = args.reject { |arg| arg.chars.first == "-" }
         stanza = cask_tokens.shift.to_sym
         cask_tokens = Hbc.all_tokens if cask_tokens.empty?
 
