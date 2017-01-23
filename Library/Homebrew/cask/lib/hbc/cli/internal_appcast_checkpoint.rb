@@ -2,13 +2,14 @@ module Hbc
   class CLI
     class InternalAppcastCheckpoint < InternalUseBase
       def self.run(*args)
+        calculate = args.include? "--calculate"
         cask_tokens = cask_tokens_from(args)
         raise CaskUnspecifiedError if cask_tokens.empty?
 
-        appcask_checkpoint(cask_tokens)
+        appcask_checkpoint(cask_tokens, calculate)
       end
 
-      def self.appcask_checkpoint(cask_tokens)
+      def self.appcask_checkpoint(cask_tokens, calculate)
         count = 0
 
         cask_tokens.each do |cask_token|
@@ -17,9 +18,13 @@ module Hbc
           if cask.appcast.nil?
             opoo "Cask '#{cask}' is missing an `appcast` stanza."
           else
-            result = cask.appcast.calculate_checkpoint
+            if calculate
+              result = cask.appcast.calculate_checkpoint
 
-            checkpoint = result[:checkpoint]
+              checkpoint = result[:checkpoint]
+            else
+              checkpoint = cask.appcast.checkpoint
+            end
 
             if checkpoint.nil?
               onoe "Could not retrieve `appcast` checkpoint for cask '#{cask}': #{result[:command_result].stderr}"
@@ -34,7 +39,7 @@ module Hbc
       end
 
       def self.help
-        "calculates a given Cask's appcast checkpoint"
+        "prints (no flag) or calculates ('--calculate') a given Cask's appcast checkpoint"
       end
 
       def self.needs_init?
