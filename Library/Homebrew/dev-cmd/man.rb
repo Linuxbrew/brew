@@ -23,9 +23,9 @@ module Homebrew
 
     if ARGV.flag? "--link"
       odie "`brew man --link` is now done automatically by `brew update`."
-    else
-      regenerate_man_pages
     end
+
+    regenerate_man_pages
 
     if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/brew.1.html", "manpages"
       puts "No changes to manpage output detected."
