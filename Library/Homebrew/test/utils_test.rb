@@ -9,13 +9,9 @@ class UtilTests < Homebrew::TestCase
     @dir = Pathname.new(mktmpdir)
   end
 
-  # Helper for matching escape sequences.
-  def e(code)
+  def esc(code)
     /(\e\[\d+m)*\e\[#{code}m/
   end
-
-  # Helper for matching that style is reset at the end of a string.
-  Z = /(\e\[\d+m)*\e\[0m\Z/
 
   def test_ofail
     shutup { ofail "foo" }
@@ -32,10 +28,12 @@ class UtilTests < Homebrew::TestCase
   def test_pretty_installed
     $stdout.stubs(:tty?).returns true
     ENV.delete("HOMEBREW_NO_EMOJI")
-    assert_match(/\A#{e 1}foo #{e 32}✔#{Z}/, pretty_installed("foo"))
+    tty_with_emoji_output = /\A#{esc 1}foo #{esc 32}✔#{esc 0}\Z/
+    assert_match tty_with_emoji_output, pretty_installed("foo")
 
     ENV["HOMEBREW_NO_EMOJI"] = "1"
-    assert_match(/\A#{e 1}foo \(installed\)#{Z}/, pretty_installed("foo"))
+    tty_no_emoji_output = /\A#{esc 1}foo \(installed\)#{esc 0}\Z/
+    assert_match tty_no_emoji_output, pretty_installed("foo")
 
     $stdout.stubs(:tty?).returns false
     assert_equal "foo", pretty_installed("foo")
@@ -44,10 +42,12 @@ class UtilTests < Homebrew::TestCase
   def test_pretty_uninstalled
     $stdout.stubs(:tty?).returns true
     ENV.delete("HOMEBREW_NO_EMOJI")
-    assert_match(/\A#{e 1}foo #{e 31}✘#{Z}/, pretty_uninstalled("foo"))
+    tty_with_emoji_output = /\A#{esc 1}foo #{esc 31}✘#{esc 0}\Z/
+    assert_match tty_with_emoji_output, pretty_uninstalled("foo")
 
     ENV["HOMEBREW_NO_EMOJI"] = "1"
-    assert_match(/\A#{e 1}foo \(uninstalled\)#{Z}/, pretty_uninstalled("foo"))
+    tty_no_emoji_output = /\A#{esc 1}foo \(uninstalled\)#{esc 0}\Z/
+    assert_match tty_no_emoji_output, pretty_uninstalled("foo")
 
     $stdout.stubs(:tty?).returns false
     assert_equal "foo", pretty_uninstalled("foo")
