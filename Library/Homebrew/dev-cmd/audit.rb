@@ -489,7 +489,7 @@ class FormulaAuditor
 
       next unless @strict
 
-      if o.name == "universal"
+      if o.name == "universal" && !Formula["wine"].recursive_dependencies.map(&:name).include?(formula.name)
         problem "macOS has been 64-bit only since 10.6 so universal options are deprecated."
       end
 
