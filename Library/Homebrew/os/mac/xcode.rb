@@ -226,7 +226,7 @@ module OS
       def minimum_version
         case MacOS.version
         when "10.12" then "8.0.0"
-        else "4.0.0"
+        else "1.0.0"
         end
       end
 
