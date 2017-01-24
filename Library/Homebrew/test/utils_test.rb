@@ -9,6 +9,10 @@ class UtilTests < Homebrew::TestCase
     @dir = Pathname.new(mktmpdir)
   end
 
+  def esc(code)
+    /(\e\[\d+m)*\e\[#{code}m/
+  end
+
   def test_ofail
     shutup { ofail "foo" }
     assert Homebrew.failed?
@@ -22,11 +26,29 @@ class UtilTests < Homebrew::TestCase
   end
 
   def test_pretty_installed
+    $stdout.stubs(:tty?).returns true
+    ENV.delete("HOMEBREW_NO_EMOJI")
+    tty_with_emoji_output = /\A#{esc 1}foo #{esc 32}✔#{esc 0}\Z/
+    assert_match tty_with_emoji_output, pretty_installed("foo")
+
+    ENV["HOMEBREW_NO_EMOJI"] = "1"
+    tty_no_emoji_output = /\A#{esc 1}foo \(installed\)#{esc 0}\Z/
+    assert_match tty_no_emoji_output, pretty_installed("foo")
+
     $stdout.stubs(:tty?).returns false
     assert_equal "foo", pretty_installed("foo")
   end
 
   def test_pretty_uninstalled
+    $stdout.stubs(:tty?).returns true
+    ENV.delete("HOMEBREW_NO_EMOJI")
+    tty_with_emoji_output = /\A#{esc 1}foo #{esc 31}✘#{esc 0}\Z/
+    assert_match tty_with_emoji_output, pretty_uninstalled("foo")
+
+    ENV["HOMEBREW_NO_EMOJI"] = "1"
+    tty_no_emoji_output = /\A#{esc 1}foo \(uninstalled\)#{esc 0}\Z/
+    assert_match tty_no_emoji_output, pretty_uninstalled("foo")
+
     $stdout.stubs(:tty?).returns false
     assert_equal "foo", pretty_uninstalled("foo")
   end
