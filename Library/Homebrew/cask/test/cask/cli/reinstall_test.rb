@@ -5,20 +5,20 @@ describe Hbc::CLI::Reinstall do
     shutup do
       Hbc::CLI::Install.run("local-transmission")
     end
-    Hbc.load("local-transmission").must_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").must_be :installed?
 
     shutup do
       Hbc::CLI::Reinstall.run("local-transmission")
     end
-    Hbc.load("local-transmission").must_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").must_be :installed?
   end
 
   it "allows reinstalling a non installed Cask" do
-    Hbc.load("local-transmission").wont_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").wont_be :installed?
 
     shutup do
       Hbc::CLI::Reinstall.run("local-transmission")
     end
-    Hbc.load("local-transmission").must_be :installed?
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").must_be :installed?
   end
 end

@@ -2,7 +2,7 @@ require "test_helper"
 
 describe Hbc::Artifact::Pkg do
   before do
-    @cask = Hbc.load("with-installable")
+    @cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb")
     shutup do
       TestHelper.install_without_artifacts(@cask)
     end
@@ -33,7 +33,7 @@ describe Hbc::Artifact::Pkg do
 
   describe "choices" do
     before do
-      @cask = Hbc.load("with-choices")
+      @cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-choices.rb")
       shutup do
         TestHelper.install_without_artifacts(@cask)
       end

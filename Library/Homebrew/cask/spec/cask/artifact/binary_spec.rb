@@ -1,6 +1,6 @@
 describe Hbc::Artifact::Binary do
   let(:cask) {
-    Hbc.load("with-binary").tap do |cask|
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb").tap do |cask|
       shutup do
         InstallHelper.install_without_artifacts(cask)
       end
@@ -69,7 +69,7 @@ describe Hbc::Artifact::Binary do
 
   context "binary is inside an app package" do
     let(:cask) {
-      Hbc.load("with-embedded-binary").tap do |cask|
+      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-embedded-binary.rb").tap do |cask|
         shutup do
           InstallHelper.install_without_artifacts(cask)
         end

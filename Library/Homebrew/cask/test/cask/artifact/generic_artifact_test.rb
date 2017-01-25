@@ -1,7 +1,7 @@
 require "test_helper"
 
 describe Hbc::Artifact::Artifact do
-  let(:cask) { Hbc.load("with-generic-artifact") }
+  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-generic-artifact.rb") }
 
   let(:install_phase) {
     -> { Hbc::Artifact::Artifact.new(cask).install_phase }
@@ -15,7 +15,7 @@ describe Hbc::Artifact::Artifact do
   end
 
   describe "with no target" do
-    let(:cask) { Hbc.load("with-generic-artifact-no-target") }
+    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-generic-artifact-no-target.rb") }
 
     it "fails to install with no target" do
       install_phase.must_raise Hbc::CaskInvalidError

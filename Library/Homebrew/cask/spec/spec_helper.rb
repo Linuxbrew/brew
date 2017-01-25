@@ -32,7 +32,7 @@ Hbc.caskroom = Hbc.default_caskroom.tap(&:mkpath)
 Hbc.default_tap = Tap.fetch("caskroom", "spec").tap do |tap|
   # link test casks
   FileUtils.mkdir_p tap.path.dirname
-  FileUtils.ln_s Pathname.new(__FILE__).dirname.join("support"), tap.path
+  FileUtils.ln_s TEST_FIXTURE_DIR.join("cask"), tap.path
 end
 
 RSpec.configure do |config|

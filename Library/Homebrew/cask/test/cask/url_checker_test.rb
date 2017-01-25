@@ -2,7 +2,7 @@ require "test_helper"
 
 describe Hbc::UrlChecker do
   describe "request processing" do
-    let(:cask) { Hbc.load("basic-cask") }
+    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/basic-cask.rb") }
     let(:checker) { Hbc::UrlChecker.new(cask) }
     let(:with_stubbed_fetcher) {
       lambda { |&block|

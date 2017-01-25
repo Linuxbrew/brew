@@ -13,7 +13,7 @@ describe "Satisfy Dependencies and Requirements" do
 
   describe "depends_on cask" do
     it "raises an exception when depends_on cask is cyclic" do
-      dep_cask = Hbc.load("with-depends-on-cask-cyclic")
+      dep_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-cyclic.rb")
       lambda {
         shutup do
           Hbc::Installer.new(dep_cask).install
@@ -22,7 +22,7 @@ describe "Satisfy Dependencies and Requirements" do
     end
 
     it "installs the dependency of a Cask and the Cask itself" do
-      csk = Hbc.load("with-depends-on-cask")
+      csk = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask.rb")
       dependency = Hbc.load(csk.depends_on.cask.first)
       shutup do
         Hbc::Installer.new(csk).install
@@ -35,35 +35,35 @@ describe "Satisfy Dependencies and Requirements" do
 
   describe "depends_on macos" do
     it "understands depends_on macos: <array>" do
-      macos_cask = Hbc.load("with-depends-on-macos-array")
+      macos_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-array.rb")
       shutup do
         Hbc::Installer.new(macos_cask).install
       end
     end
 
     it "understands depends_on macos: <comparison>" do
-      macos_cask = Hbc.load("with-depends-on-macos-comparison")
+      macos_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-comparison.rb")
       shutup do
         Hbc::Installer.new(macos_cask).install
       end
     end
 
     it "understands depends_on macos: <string>" do
-      macos_cask = Hbc.load("with-depends-on-macos-string")
+      macos_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-string.rb")
       shutup do
         Hbc::Installer.new(macos_cask).install
       end
     end
 
     it "understands depends_on macos: <symbol>" do
-      macos_cask = Hbc.load("with-depends-on-macos-symbol")
+      macos_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-symbol.rb")
       shutup do
         Hbc::Installer.new(macos_cask).install
       end
     end
 
     it "raises an exception when depends_on macos is not satisfied" do
-      macos_cask = Hbc.load("with-depends-on-macos-failure")
+      macos_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-failure.rb")
       lambda {
         shutup do
           Hbc::Installer.new(macos_cask).install
@@ -74,7 +74,7 @@ describe "Satisfy Dependencies and Requirements" do
 
   describe "depends_on arch" do
     it "succeeds when depends_on arch is satisfied" do
-      arch_cask = Hbc.load("with-depends-on-arch")
+      arch_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-arch.rb")
       shutup do
         Hbc::Installer.new(arch_cask).install
       end
@@ -83,7 +83,7 @@ describe "Satisfy Dependencies and Requirements" do
 
   describe "depends_on x11" do
     it "succeeds when depends_on x11 is satisfied" do
-      x11_cask = Hbc.load("with-depends-on-x11")
+      x11_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-x11.rb")
       MacOS::X11.stubs(:installed?).returns(true)
       shutup do
         Hbc::Installer.new(x11_cask).install
@@ -91,7 +91,7 @@ describe "Satisfy Dependencies and Requirements" do
     end
 
     it "raises an exception when depends_on x11 is not satisfied" do
-      x11_cask = Hbc.load("with-depends-on-x11")
+      x11_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-x11.rb")
       MacOS::X11.stubs(:installed?).returns(false)
       lambda {
         shutup do
@@ -101,7 +101,7 @@ describe "Satisfy Dependencies and Requirements" do
     end
 
     it "never raises when depends_on x11: false" do
-      x11_cask = Hbc.load("with-depends-on-x11-false")
+      x11_cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-x11-false.rb")
       MacOS::X11.stubs(:installed?).returns(false)
       lambda do
         shutup do

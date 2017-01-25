@@ -41,8 +41,8 @@ describe "Cask" do
     end
 
     it "uses exact match when loading by token" do
-      Hbc.load("test-opera").token.must_equal("test-opera")
-      Hbc.load("test-opera-mail").token.must_equal("test-opera-mail")
+      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/test-opera.rb").token.must_equal("test-opera")
+      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/test-opera-mail.rb").token.must_equal("test-opera-mail")
     end
 
     it "raises an error when attempting to load a Cask that doesn't exist" do

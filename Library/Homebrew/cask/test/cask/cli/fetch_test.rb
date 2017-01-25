@@ -2,11 +2,11 @@ require "test_helper"
 
 describe Hbc::CLI::Fetch do
   let(:local_transmission) {
-    Hbc.load("local-transmission")
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
   }
 
   let(:local_caffeine) {
-    Hbc.load("local-caffeine")
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
   }
 
   it "allows download the installer of a Cask" do
