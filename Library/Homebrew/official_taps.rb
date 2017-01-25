@@ -8,7 +8,6 @@ OFFICIAL_TAPS = %w[
   php
   science
   tex
-  x11
 ].freeze
 
 OFFICIAL_CMD_TAPS = {
