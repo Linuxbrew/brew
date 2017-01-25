@@ -12,7 +12,7 @@ module Homebrew
     TEST_SHA1   = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
     TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
 
-    def before_setup
+    def setup
       [
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-core/Formula",
         HOMEBREW_CACHE,
@@ -24,10 +24,6 @@ module Homebrew
       ].each(&:mkpath)
 
       super
-    end
-
-    def setup
-      super
 
       @__argv = ARGV.dup
       @__env = ENV.to_hash # dup doesn't work on ENV
@@ -37,10 +33,6 @@ module Homebrew
       ARGV.replace(@__argv)
       ENV.replace(@__env)
 
-      super
-    end
-
-    def after_teardown
       Tab.clear_cache
 
       coretap = CoreTap.new
