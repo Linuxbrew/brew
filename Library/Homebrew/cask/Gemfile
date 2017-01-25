@@ -2,11 +2,6 @@ source "https://rubygems.org"
 
 gem "rake"
 
-group :debug do
-  gem "pry"
-  gem "pry-byebug", platforms: :mri
-end
-
 group :test do
   # This is SimpleCov v0.12.0 with two fixes merged on top, that finally resolve
   # all issues with parallel tests, uncovered files, and tracked files. Switch
