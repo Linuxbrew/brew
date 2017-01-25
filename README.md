@@ -13,7 +13,7 @@ cd "$(brew --repo)" && git fetch && git reset --hard origin/master && brew updat
 3. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
-`brew help`, `man brew` or check [our documentation](https://brew.sh/brew/).
+`brew help`, `man brew` or check [our documentation](http://docs.brew.sh/).
 
 ## Troubleshooting
 First, please run `brew update` and `brew doctor`.
