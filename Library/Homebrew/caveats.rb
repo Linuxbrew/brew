@@ -48,20 +48,23 @@ class Caveats
 
     s = "This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX}."
     s << "\n\n#{f.keg_only_reason}"
+    if f.bin.directory? || f.sbin.directory?
+      s << "\nIf you need to have this software first in your PATH run:\n"
+      if f.bin.directory?
+        s << "  #{Utils::Shell.prepend_path_in_shell_profile(f.opt_bin.to_s)}\n"
+      end
+      if f.sbin.directory?
+        s << "  #{Utils::Shell.prepend_path_in_shell_profile(f.opt_sbin.to_s)}\n"
+      end
+    end
+
     if f.lib.directory? || f.include.directory?
-      s <<
-        <<-EOS.undent_________________________________________________________72
-
-
-        Generally there are no consequences of this for you. If you build your
-        own software and it requires this formula, you'll need to add to your
-        build variables:
-
-        EOS
+      s << "\nFor compilers to find this software you may need to set:\n"
       s << "    LDFLAGS:  -L#{f.opt_lib}\n" if f.lib.directory?
       s << "    CPPFLAGS: -I#{f.opt_include}\n" if f.include.directory?
-
-      if which("pkg-config")
+      if which("pkg-config") &&
+         ((f.lib/"pkgconfig").directory? || (f.share/"pkgconfig").directory?)
+        s << "For pkg-config to find this software you may need to set:\n"
         s << "    PKG_CONFIG_PATH: #{f.opt_lib}/pkgconfig\n" if (f.lib/"pkgconfig").directory?
         s << "    PKG_CONFIG_PATH: #{f.opt_share}/pkgconfig\n" if (f.share/"pkgconfig").directory?
       end
