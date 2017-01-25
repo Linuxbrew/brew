@@ -292,6 +292,9 @@ module Homebrew
         <<-EOS.undent
           #{HOMEBREW_TEMP} is world-writable but does not have the sticky bit set.
           Please execute `sudo chmod +t #{HOMEBREW_TEMP}` in your Terminal.
+          Alternatively, if you don't have administrative privileges on this
+          machine, point the HOMEBREW_TEMP environment variable to a directory
+          you control, e.g. `mkdir ~/tmp; chmod 755 ~/tmp; export HOMEBREW_TEMP=~/tmp`.
         EOS
       end
 
