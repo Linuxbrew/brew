@@ -23,6 +23,8 @@ module Homebrew
     ].freeze
 
     def setup
+      # These directories need to be created before
+      # `FSLeakLogger` is called with `super`.
       TEST_DIRECTORIES.each(&:mkpath)
 
       super
