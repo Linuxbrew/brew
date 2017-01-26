@@ -37,7 +37,7 @@ EOS
     echo
 
     echo "==> Resetting $DIR..."
-    git checkout -B master origin/master
+    git checkout --force -B master origin/master
     echo
   done
 }
