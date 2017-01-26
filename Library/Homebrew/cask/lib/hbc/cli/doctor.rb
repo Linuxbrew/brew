@@ -10,21 +10,22 @@ module Hbc
         puts render_taps(Hbc.default_tap)
         puts render_taps(*alt_taps)
         ohai "Contents of $LOAD_PATH:", render_load_path($LOAD_PATH)
-        ohai "Contents of $RUBYLIB Environment Variable:", render_env_var("RUBYLIB")
-        ohai "Contents of $RUBYOPT Environment Variable:", render_env_var("RUBYOPT")
-        ohai "Contents of $RUBYPATH Environment Variable:", render_env_var("RUBYPATH")
-        ohai "Contents of $RBENV_VERSION Environment Variable:", render_env_var("RBENV_VERSION")
-        ohai "Contents of $CHRUBY_VERSION Environment Variable:", render_env_var("CHRUBY_VERSION")
-        ohai "Contents of $GEM_HOME Environment Variable:", render_env_var("GEM_HOME")
-        ohai "Contents of $GEM_PATH Environment Variable:", render_env_var("GEM_PATH")
-        ohai "Contents of $BUNDLE_PATH Environment Variable:", render_env_var("BUNDLE_PATH")
-        ohai "Contents of $PATH Environment Variable:", render_env_var("PATH")
-        ohai "Contents of $SHELL Environment Variable:", render_env_var("SHELL")
-        ohai "Contents of Locale Environment Variables:", render_with_none(locale_variables)
+        ohai "Environment Variables:"
+        render_env_var("RUBYLIB")
+        render_env_var("RUBYOPT")
+        render_env_var("RUBYPATH")
+        render_env_var("RBENV_VERSION")
+        render_env_var("CHRUBY_VERSION")
+        render_env_var("GEM_HOME")
+        render_env_var("GEM_PATH")
+        render_env_var("BUNDLE_PATH")
+        render_env_var("PATH")
+        render_env_var("SHELL")
+        locale_variables
       end
 
       def self.locale_variables
-        ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).collect { |v| %Q(#{v}="#{ENV[v]}") }.sort.join("\n")
+        ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).sort.each(&method(:render_env_var))
       end
 
       def self.none_string
@@ -63,9 +64,8 @@ module Hbc
 
       def self.render_env_var(var)
         if ENV.key?(var)
-          %Q(#{var}="#{ENV[var]}")
-        else
-          none_string
+          var = %Q(#{var}="#{ENV[var]}")
+          puts var.gsub(ENV["HOME"], "~")
         end
       end
 
