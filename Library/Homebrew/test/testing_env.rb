@@ -3,7 +3,6 @@ $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/test/su
 
 require "simplecov" if ENV["HOMEBREW_TESTS_COVERAGE"]
 require "global"
-require "formulary"
 
 begin
   require "minitest/autorun"
