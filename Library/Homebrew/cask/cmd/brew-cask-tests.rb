@@ -1,5 +1,4 @@
 require "English"
-require "bundler/setup"
 
 ENV["BUNDLE_GEMFILE"] = "#{HOMEBREW_LIBRARY_PATH}/cask/Gemfile"
 ENV["BUNDLE_PATH"] = "#{HOMEBREW_LIBRARY_PATH}/vendor/bundle"
@@ -25,10 +24,8 @@ repo_root.cd do
   rspec = ARGV.flag?("--rspec") || !ARGV.flag?("--minitest")
   minitest = ARGV.flag?("--minitest") || !ARGV.flag?("--rspec")
 
-  p [:coverage, ARGV.flag?("--coverage"), ENV["CI"], ENV["TRAVIS"]]
   if ARGV.flag?("--coverage")
     ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
-    upload_coverage = ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
   end
 
   failed = false
@@ -50,12 +47,4 @@ repo_root.cd do
   end
 
   Homebrew.failed = failed
-
-  if upload_coverage
-    puts "Submitting Codecov coverage..."
-    require "simplecov"
-    require "codecov"
-    formatter = SimpleCov::Formatter::Codecov.new
-    formatter.format(SimpleCov::ResultMerger.merged_result)
-  end
 end

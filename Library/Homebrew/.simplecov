@@ -52,3 +52,9 @@ SimpleCov.start do
     /Homebrew/test.rb
   ]
 end
+
+if ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
+  require "codecov"
+  formatter = SimpleCov::Formatter::Codecov.new
+  formatter.format(SimpleCov::ResultMerger.merged_result)
+end
