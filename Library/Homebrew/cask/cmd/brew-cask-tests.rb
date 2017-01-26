@@ -1,4 +1,5 @@
 require "English"
+require "bundler/setup"
 
 ENV["BUNDLE_GEMFILE"] = "#{HOMEBREW_LIBRARY_PATH}/cask/Gemfile"
 ENV["BUNDLE_PATH"] = "#{HOMEBREW_LIBRARY_PATH}/vendor/bundle"
@@ -20,8 +21,6 @@ repo_root.cd do
   unless quiet_system("bundle", "check")
     system "bundle", "install"
   end
-
-  require "bundler/setup"
 
   rspec = ARGV.flag?("--rspec") || !ARGV.flag?("--minitest")
   minitest = ARGV.flag?("--minitest") || !ARGV.flag?("--rspec")
