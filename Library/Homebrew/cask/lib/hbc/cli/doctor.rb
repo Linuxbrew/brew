@@ -31,10 +31,6 @@ module Hbc
         "<NONE>"
       end
 
-      def self.legacy_tap_pattern
-        /phinze/
-      end
-
       def self.error_string(string = "Error")
         Formatter.error("(#{string})")
       end
@@ -59,8 +55,6 @@ module Hbc
         taps.collect do |tap|
           if tap.path.nil? || tap.path.to_s.empty?
             none_string
-          elsif tap.path.to_s.match(legacy_tap_pattern)
-            tap.path.to_s.concat(" #{error_string "Warning: legacy tap path"}")
           else
             "#{tap.path} (#{cask_count_for_tap(tap)})"
           end
