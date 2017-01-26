@@ -1,3 +1,6 @@
+require "formulary"
+require "tap"
+
 module Homebrew
   class TestCase < ::Minitest::Test
     require "test/support/helper/fs_leak_logger"
