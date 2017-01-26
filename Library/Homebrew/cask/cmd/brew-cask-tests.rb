@@ -21,6 +21,8 @@ repo_root.cd do
     system "bundle", "install"
   end
 
+  require "bundler/setup"
+
   rspec = ARGV.flag?("--rspec") || !ARGV.flag?("--minitest")
   minitest = ARGV.flag?("--minitest") || !ARGV.flag?("--rspec")
 
