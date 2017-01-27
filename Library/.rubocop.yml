@@ -41,7 +41,7 @@ Lint/AssignmentInCondition:
   Enabled: false
 
 Lint/EndAlignment:
-  AlignWith: variable
+  EnforcedStyleAlignWith: variable
 
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false
