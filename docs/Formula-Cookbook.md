@@ -359,6 +359,7 @@ Now, please [open a pull request](http://docs.brew.sh/How-To-Open-a-Homebrew-Pul
 *   Keep merge commits out of the pull request
 
 # Convenience Tools
+
 ## Messaging
 
 Three commands are provided for displaying informational messages to the user:
