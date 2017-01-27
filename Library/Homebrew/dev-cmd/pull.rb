@@ -248,7 +248,6 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        ohai "Publishing on Bintray: #{f.name} #{f.pkg_version}"
         publish_bottle_file_on_bintray(f, bintray_creds)
         published << f.full_name
       end
@@ -408,7 +407,12 @@ module Homebrew
     if info.nil?
       raise "Failed publishing bottle: failed reading formula info for #{f.full_name}"
     end
+    unless info.bottle_info_any
+      opoo "No bottle defined in formula #{package}"
+      return
+    end
     version = info.pkg_version
+    ohai "Publishing on Bintray: #{package} #{version}"
     curl "-w", '\n', "--silent", "--fail",
          "-u#{creds[:user]}:#{creds[:key]}", "-X", "POST",
          "-H", "Content-Type: application/json",
