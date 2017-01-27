@@ -153,16 +153,6 @@ module FormulaCellarChecks
     EOS
   end
 
-  def check_etc
-    bad_etc = (formula.prefix/"etc")
-    return unless bad_etc.directory?
-    <<-EOS.undent
-      #{bad_etc} exists!
-      The contents should instead be installed into:
-      #{formula.etc}
-    EOS
-  end
-
   def audit_installed
     audit_check_output(check_manpages)
     audit_check_output(check_infopages)
@@ -175,7 +165,6 @@ module FormulaCellarChecks
     audit_check_output(check_easy_install_pth(formula.lib))
     audit_check_output(check_elisp_dirname(formula.share, formula.name))
     audit_check_output(check_elisp_root(formula.share, formula.name))
-    audit_check_output(check_etc)
   end
   alias generic_audit_installed audit_installed
 
