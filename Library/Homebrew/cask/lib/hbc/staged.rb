@@ -27,7 +27,7 @@ module Hbc
       full_paths = remove_nonexistent(paths)
       return if full_paths.empty?
       @command.run!("/bin/chmod", args: ["-R", "--", permissions_str] + full_paths,
-                                  sudo: true)
+                                  sudo: false)
     end
 
     def set_ownership(paths, user: current_user, group: "staff")
