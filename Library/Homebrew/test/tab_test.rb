@@ -241,15 +241,18 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.changed_files, tab.changed_files
     assert_equal @tab.tap, tab.tap
     assert_equal @tab.spec, tab.spec
-    assert_equal @tab.time, tab.time
+    assert_nil @tab.time
+    assert_nil tab.time
     assert_equal @tab.HEAD, tab.HEAD
     assert_equal @tab.compiler, tab.compiler
     assert_equal @tab.stdlib, tab.stdlib
-    assert_equal @tab.runtime_dependencies, tab.runtime_dependencies
+    assert_nil @tab.runtime_dependencies
+    assert_nil tab.runtime_dependencies
     assert_equal @tab.stable_version, tab.stable_version
     assert_equal @tab.devel_version, tab.devel_version
     assert_equal @tab.head_version, tab.head_version
-    assert_equal @tab.source["path"], tab.source["path"]
+    assert_nil @tab.source["path"]
+    assert_nil tab.source["path"]
   end
 
   def test_remap_deprecated_options
