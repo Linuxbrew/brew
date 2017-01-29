@@ -1,4 +1,5 @@
 # Migrating A Formula To A Tap
+
 There are times when we may wish to migrate a formula from one tap into another tap. To do this:
 
 1. Create a pull request to the new tap adding the formula file as-is from the original tap. Fix any test failures that may occur due to the stricter requirements for new formulae than existing formula (e.g. `brew audit --strict` must pass for that formula).

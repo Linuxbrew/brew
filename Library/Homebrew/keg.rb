@@ -175,6 +175,7 @@ class Keg
   protected :path
 
   def initialize(path)
+    path = path.resolved_path if path.to_s.start_with?("#{HOMEBREW_PREFIX}/opt/")
     raise "#{path} is not a valid keg" unless path.parent.parent.realpath == HOMEBREW_CELLAR.realpath
     raise "#{path} is not a directory" unless path.directory?
     @path = path
@@ -597,7 +598,7 @@ class Keg
 
       if src.symlink? || src.file?
         Find.prune if File.basename(src) == ".DS_Store"
-        Find.prune if src.realpath == dst
+        Find.prune if src.resolved_path == dst
         # Don't link pyc or pyo files because Python overwrites these
         # cached object files and next time brew wants to link, the
         # file is in the way.

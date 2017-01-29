@@ -38,6 +38,13 @@
 !/docs
 !/manpages
 
+# Ignore generated documentation site
+/docs/_site
+/docs/.bundle
+/docs/bin
+/docs/vendor
+/docs/Gemfile.lock
+
 # Unignore our shell completion
 !/completions
 

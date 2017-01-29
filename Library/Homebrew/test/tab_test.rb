@@ -33,10 +33,7 @@ class TabTests < Homebrew::TestCase
   def test_defaults
     tab = Tab.empty
 
-    # FIXME: remove this line after Homebrew 1.1.6 is released.
-    # See https://github.com/Homebrew/brew/pull/1750#discussion_r94254622
-    tab.homebrew_version = "1.1.6"
-
+    assert_equal HOMEBREW_VERSION, tab.homebrew_version
     assert_empty tab.unused_options
     assert_empty tab.used_options
     assert_nil tab.changed_files
@@ -198,10 +195,6 @@ class TabTests < Homebrew::TestCase
     compiler = DevelopmentTools.default_compiler
     stdlib = :libcxx
     tab = Tab.create(f, compiler, stdlib)
-
-    # FIXME: remove this line after Homebrew 1.1.6 is released.
-    # See https://github.com/Homebrew/brew/pull/1750#discussion_r94254622
-    tab.homebrew_version = "1.1.6"
 
     runtime_dependencies = [
       { "full_name" => "bar", "version" => "2.0" },

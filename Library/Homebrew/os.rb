@@ -17,7 +17,7 @@ module OS
     GITHUB_USER = "Homebrew".freeze
     # Don't tell people to report issues on unsupported versions of macOS.
     if !OS::Mac.prerelease? && !OS::Mac.outdated_release?
-      ISSUES_URL = "https://git.io/brew-troubleshooting".freeze
+      ISSUES_URL = "http://docs.brew.sh/Troubleshooting.html".freeze
     end
     PATH_OPEN = "/usr/bin/open".freeze
     PATH_PATCH = "/usr/bin/patch".freeze
