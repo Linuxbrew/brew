@@ -1,6 +1,6 @@
 #:  * `update` [`--merge`] [`--force`]:
 #:    Fetch the newest version of Homebrew and all formulae from GitHub using
-#:    `git`(1).
+#:    `git`(1) and perform any necessary migrations.
 #:
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:    (rather than `git rebase`).
