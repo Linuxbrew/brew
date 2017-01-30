@@ -6,30 +6,34 @@ class TabTests < Homebrew::TestCase
   def setup
     super
 
+    @time = Time.now.to_i
     @used = Options.create(%w[--with-foo --without-bar])
     @unused = Options.create(%w[--with-baz --without-qux])
 
-    @tab = Tab.new("used_options"         => @used.as_flags,
-                   "unused_options"       => @unused.as_flags,
-                   "built_as_bottle"      => false,
-                   "poured_from_bottle"   => true,
-                   "changed_files"        => [],
-                   "time"                 => nil,
-                   "source_modified_time" => 0,
-                   "HEAD"                 => TEST_SHA1,
-                   "compiler"             => "clang",
-                   "stdlib"               => "libcxx",
-                   "runtime_dependencies" => [],
-                   "source"               => {
-                     "tap" => "homebrew/core",
-                     "path" => nil,
-                     "spec" => "stable",
-                     "versions" => {
-                       "stable" => "0.10",
-                       "devel" => "0.14",
-                       "head" => "HEAD-1111111",
-                     },
-                   })
+    @tab = Tab.new(
+      "homebrew_version" => HOMEBREW_VERSION,
+      "used_options"         => @used.as_flags,
+      "unused_options"       => @unused.as_flags,
+      "built_as_bottle"      => false,
+      "poured_from_bottle"   => true,
+      "changed_files"        => [],
+      "time"                 => @time,
+      "source_modified_time" => 0,
+      "HEAD"                 => TEST_SHA1,
+      "compiler"             => "clang",
+      "stdlib"               => "libcxx",
+      "runtime_dependencies" => [],
+      "source"               => {
+        "tap" => CoreTap.instance.to_s,
+        "path" => CoreTap.instance.path.to_s,
+        "spec" => "stable",
+        "versions" => {
+          "stable" => "0.10",
+          "devel" => "0.14",
+          "head" => "HEAD-1111111",
+        },
+      }
+    )
   end
 
   def test_defaults
@@ -124,7 +128,7 @@ class TabTests < Homebrew::TestCase
   def test_other_attributes
     assert_equal TEST_SHA1, @tab.HEAD
     assert_equal "homebrew/core", @tab.tap.name
-    assert_nil @tab.time
+    assert_equal @time, @tab.time
     refute_predicate @tab, :built_as_bottle
     assert_predicate @tab, :poured_from_bottle
   end
@@ -241,18 +245,15 @@ class TabTests < Homebrew::TestCase
     assert_equal @tab.changed_files, tab.changed_files
     assert_equal @tab.tap, tab.tap
     assert_equal @tab.spec, tab.spec
-    assert_nil @tab.time
-    assert_nil tab.time
+    assert_equal @tab.time, tab.time
     assert_equal @tab.HEAD, tab.HEAD
     assert_equal @tab.compiler, tab.compiler
     assert_equal @tab.stdlib, tab.stdlib
-    assert_nil @tab.runtime_dependencies
-    assert_nil tab.runtime_dependencies
+    assert_equal @tab.runtime_dependencies, tab.runtime_dependencies
     assert_equal @tab.stable_version, tab.stable_version
     assert_equal @tab.devel_version, tab.devel_version
     assert_equal @tab.head_version, tab.head_version
-    assert_nil @tab.source["path"]
-    assert_nil tab.source["path"]
+    assert_equal @tab.source["path"], tab.source["path"]
   end
 
   def test_remap_deprecated_options
