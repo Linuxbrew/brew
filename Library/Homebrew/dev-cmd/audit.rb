@@ -1491,7 +1491,7 @@ class ResourceAuditor
     return unless @online
     urls.each do |url|
       strategy = DownloadStrategyDetector.detect(url)
-      if strategy <= CurlDownloadStrategy
+      if strategy <= CurlDownloadStrategy && !url.start_with?("file")
         problem url
         status_code = FormulaAuditor.url_status_code url
         unless status_code.start_with? "2"
