@@ -1481,18 +1481,42 @@ class ResourceAuditor
     urls.each do |url|
       next unless url.start_with? "http:"
       # Check for insecure mirrors
-      status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
-                                 "--write-out", "%{http_code}", url
+      details =  get_content_details(url, 1)
       secure_url = url.sub "http", "https"
-      secure_status_code, = curl_output "--connect-timeout", "15", "--output", "/dev/null", "--range", "0-0", \
-                                        "--write-out", "%{http_code}", secure_url
-      if status_code.start_with?("20") && secure_status_code.start_with?("20")
+      secure_details = get_content_details(secure_url, 2)
+
+      next unless details[:status].start_with?("2") && secure_details[:status].start_with?("2")
+
+      if (details[:etag] && details[:etag] == secure_details[:etag]) \
+        || (details[:content_length] && details[:content_length] == secure_details[:content_length]) \
+        || are_same_file(details[:filename], secure_details[:filename])
         problem "The URL #{url} could use HTTPS rather than HTTP"
       end
+
+      remove_files details[:filename], secure_details[:filename]
     end
   end
 
   def problem(text)
     @problems << text
+  end
+
+  def get_content_details(url, id)
+    out = {}
+    out_file = "/tmp/_c#{id}"
+    headers, = curl_output "--connect-timeout", "15", "--output", out_file, "--dump-header", "/dev/stdout", url
+    out[:status] = headers[%r{HTTP\/.* (\d+)}, 1]
+    out[:etag] = headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2]
+    out[:content_length] = headers[/Content-Length: (\d+)/, 1]
+    out[:filename] = out_file
+    out
+  end
+
+  def are_same_file(one, two)
+    quiet_system "diff", "--report-identical-files", "--binary", "--speed-large-files", one, two
+  end
+
+  def remove_files(*files)
+    quiet_system "rm", "-f", *files
   end
 end
