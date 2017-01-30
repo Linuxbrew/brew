@@ -3,14 +3,11 @@ require "sandbox"
 
 class SandboxTest < Homebrew::TestCase
   def setup
+    super
     skip "sandbox not implemented" unless Sandbox.available?
     @sandbox = Sandbox.new
     @dir = Pathname.new(mktmpdir)
     @file = @dir/"foo"
-  end
-
-  def teardown
-    @dir.rmtree
   end
 
   def test_formula?
@@ -18,11 +15,11 @@ class SandboxTest < Homebrew::TestCase
     f2 = formula { url "bar-1.0" }
     f2.stubs(:tap).returns(Tap.fetch("test/tap"))
 
-    ARGV.stubs(:sandbox?).returns true
+    ENV["HOMEBREW_SANDBOX"] = "1"
     assert Sandbox.formula?(f),
       "Formulae should be sandboxed if --sandbox was passed."
 
-    ARGV.stubs(:sandbox?).returns false
+    ENV.delete("HOMEBREW_SANDBOX")
     assert Sandbox.formula?(f),
       "Formulae should be sandboxed if in a sandboxed tap."
     refute Sandbox.formula?(f2),
@@ -30,7 +27,7 @@ class SandboxTest < Homebrew::TestCase
   end
 
   def test_test?
-    ARGV.stubs(:no_sandbox?).returns false
+    ENV.delete("HOMEBREW_NO_SANDBOX")
     assert Sandbox.test?,
       "Tests should be sandboxed unless --no-sandbox was passed."
   end
@@ -50,7 +47,7 @@ class SandboxTest < Homebrew::TestCase
 
   def test_complains_on_failure
     Utils.expects(popen_read: "foo")
-    ARGV.stubs(verbose?: true)
+    ENV["HOMEBREW_VERBOSE"] = "1"
     out, _err = capture_io do
       assert_raises(ErrorDuringExecution) { @sandbox.exec "false" }
     end
@@ -64,7 +61,7 @@ class SandboxTest < Homebrew::TestCase
       bar
     EOS
     Utils.expects(popen_read: with_bogus_error)
-    ARGV.stubs(verbose?: true)
+    ENV["HOMEBREW_VERBOSE"] = "1"
     out, _err = capture_io do
       assert_raises(ErrorDuringExecution) { @sandbox.exec "false" }
     end

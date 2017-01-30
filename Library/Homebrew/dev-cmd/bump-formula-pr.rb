@@ -124,6 +124,8 @@ module Homebrew
       false
     elsif !hash_type
       odie "#{formula}: no tag/revision specified!"
+    elsif !new_url
+      odie "#{formula}: no url specified!"
     else
       rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
         new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
@@ -156,7 +158,9 @@ module Homebrew
       replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
     end
 
-    replacement_pairs << [/(^  mirror .*\n)?/, ""] if requested_spec == :stable
+    replacement_pairs += formula_spec.mirrors.map do |mirror|
+      [/ +mirror \"#{mirror}\"\n/m, ""]
+    end
 
     replacement_pairs += if new_url_hash
       [

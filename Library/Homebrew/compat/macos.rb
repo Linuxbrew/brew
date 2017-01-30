@@ -100,23 +100,23 @@ module OS
     end
 
     def gcc_40_build_version
-      odeprecated "MacOS.gcc_40_build_version", "DevelopmentTools.gcc_40_build_version"
-      DevelopmentTools.gcc_40_build_version
+      odeprecated "MacOS.gcc_40_build_version", "DevelopmentTools.gcc_4_0_build_version"
+      DevelopmentTools.gcc_4_0_build_version
     end
 
     def gcc_4_0_build_version
-      odeprecated "MacOS.gcc_4_0_build_version", "DevelopmentTools.gcc_40_build_version"
-      DevelopmentTools.gcc_40_build_version
+      odeprecated "MacOS.gcc_4_0_build_version", "DevelopmentTools.gcc_4_0_build_version"
+      DevelopmentTools.gcc_4_0_build_version
     end
 
     def gcc_42_build_version
-      odeprecated "MacOS.gcc_42_build_version", "DevelopmentTools.gcc_42_build_version"
-      DevelopmentTools.gcc_42_build_version
+      odeprecated "MacOS.gcc_42_build_version", "DevelopmentTools.gcc_4_2_build_version"
+      DevelopmentTools.gcc_4_2_build_version
     end
 
     def gcc_build_version
-      odeprecated "MacOS.gcc_build_version", "DevelopmentTools.gcc_42_build_version"
-      DevelopmentTools.gcc_42_build_version
+      odeprecated "MacOS.gcc_build_version", "DevelopmentTools.gcc_4_2_build_version"
+      DevelopmentTools.gcc_4_2_build_version
     end
 
     def llvm_build_version

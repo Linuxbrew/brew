@@ -43,7 +43,6 @@ __brew_cask_commands() {
     'search:searches all known Casks'
     'style:checks Cask style using RuboCop'
     'uninstall:uninstalls the given Cask'
-    "update:a synonym for 'brew update'"
     'zap:zaps all files associated with the given Cask'
   )
   _describe -t commands "brew cask command" commands

@@ -31,6 +31,7 @@ class CompilerSelectorTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @f  = Double.new
     @cc = :clang
     @versions = CompilerVersions.new

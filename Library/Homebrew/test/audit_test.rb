@@ -6,11 +6,8 @@ require "dev-cmd/audit"
 
 class FormulaTextTests < Homebrew::TestCase
   def setup
+    super
     @dir = mktmpdir
-  end
-
-  def teardown
-    FileUtils.rm_rf @dir
   end
 
   def formula_text(name, body = nil, options = {})
@@ -58,11 +55,8 @@ end
 
 class FormulaAuditorTests < Homebrew::TestCase
   def setup
+    super
     @dir = mktmpdir
-  end
-
-  def teardown
-    FileUtils.rm_rf @dir
   end
 
   def formula_auditor(name, text, options = {})
@@ -249,7 +243,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = shutup do
       formula_auditor "foo", <<-EOS.undent
         class Foo < GithubGistFormula
@@ -266,7 +260,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < ScriptFileFormula
         url "http://example.com/foo-1.0.tgz"
@@ -281,7 +275,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < AmazonWebServicesFormula
         url "http://example.com/foo-1.0.tgz"
@@ -367,13 +361,10 @@ class FormulaAuditorTests < Homebrew::TestCase
       end
     EOS
 
-    original_value = ENV["HOMEBREW_NO_GITHUB_API"]
     ENV["HOMEBREW_NO_GITHUB_API"] = "1"
 
     fa.audit_github_repository
     assert_equal [], fa.problems
-  ensure
-    ENV["HOMEBREW_NO_GITHUB_API"] = original_value
   end
 
   def test_audit_caveats
@@ -429,8 +420,8 @@ class FormulaAuditorTests < Homebrew::TestCase
 
     fa.audit_homepage
     assert_equal ["The homepage should start with http or https " \
-      "(URL is #{fa.formula.homepage}).", "The homepage is not reachable " \
-      "(curl exit code #{$?.exitstatus})"], fa.problems
+      "(URL is #{fa.formula.homepage}).", "The homepage #{fa.formula.homepage} is not reachable " \
+      "(HTTP status code 000)"], fa.problems
 
     formula_homepages = {
       "bar" => "http://www.freedesktop.org/wiki/bar",

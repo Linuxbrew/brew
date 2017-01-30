@@ -27,7 +27,7 @@ module Hbc
       end
 
       def self.help
-        "Dump the given Cask in YAML format"
+        "dump the given Cask in YAML format"
       end
     end
   end

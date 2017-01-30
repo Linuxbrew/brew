@@ -1,5 +1,6 @@
 # Formula Cookbook
-A formula is a package definition written in Ruby. It can be created with `brew create $URL`, installed with `brew install $FORMULA`, and debugged with `brew install --debug --verbose $FORMULA`. Formulae use the [Formula API](http://www.rubydoc.info/github/Homebrew/brew/master/Formula) which provides various Homebrew-specific helpers.
+
+A formula is a package definition written in Ruby. It can be created with `brew create $URL` where `$URL` is a zip or tarball, installed with `brew install $FORMULA`, and debugged with `brew install --debug --verbose $FORMULA`. Formulae use the [Formula API](http://www.rubydoc.info/github/Homebrew/brew/master/Formula) which provides various Homebrew-specific helpers.
 
 ## Homebrew Terminology
 
@@ -9,11 +10,11 @@ A formula is a package definition written in Ruby. It can be created with `brew 
 | **Keg**        | The installation prefix of a **Formula**                   | `/usr/local/Cellar/foo/0.1`                                     |
 | **opt prefix** | A symlink to the active version of a **Keg**               | `/usr/local/opt/foo `                                           |
 | **Cellar**     | All **Kegs** are installed here                            | `/usr/local/Cellar`                                             |
-| **Tap**        | An optional Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-versions`   |
+| **Tap**        | A Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core`   |
 | **Bottle**     | Pre-built **Keg** used instead of building from source     | `qt-4.8.4.mavericks.bottle.tar.gz`                              |
 | **Cask**       | An [extension of homebrew](https://github.com/caskroom/homebrew-cask) to install macOS native apps  | `/Applications/MacDown.app/Contents/SharedSupport/bin/macdown` |
 | **Brew Bundle**| An [extension of homebrew](https://github.com/Homebrew/homebrew-bundle) to describe dependencies    | `brew 'myservice', restart_service: true` |
- 
+
 ## An Introduction
 
 Homebrew uses Git for downloading updates and contributing to the project.
@@ -33,7 +34,7 @@ Before submitting a new formula make sure your package:
 *   isn't in another official [Homebrew tap](https://github.com/Homebrew)
 *   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
 *   is still supported by upstream (i.e. doesn't require extensive patching)
-*   has a stable, tagged version (i.e. not just a GitHub repository with no versions). See [Interesting-Taps-&-Forks](Interesting-Taps-&-Forks.md) for where pre-release versions belong.
+*   has a stable, tagged version (i.e. not just a GitHub repository with no versions).
 *   passes all `brew audit --new-formula $FORMULA` tests.
 
 Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md).
@@ -352,7 +353,7 @@ If you have already forked Homebrew on GitHub, then you can manually push (just 
 git push https://github.com/myname/homebrew-core/ <what-you-called-your-branch>
 ```
 
-Now, please [open a pull request](https://github.com/Homebrew/brew/blob/master/docs/How-To-Open-a-Homebrew-Pull-Request-(and-get-it-merged).md#how-to-open-a-homebrew-pull-request-and-get-it-merged) for your changes.
+Now, please [open a pull request](http://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request.html) for your changes.
 
 *   One formula per commit; one commit per formula
 *   Keep merge commits out of the pull request

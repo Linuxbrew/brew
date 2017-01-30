@@ -176,8 +176,6 @@ class FormulaTests < Homebrew::TestCase
     prefix.mkpath
     FileUtils.touch prefix+Tab::FILENAME
     assert_predicate f, :any_version_installed?
-  ensure
-    f.rack.rmtree
   end
 
   def test_migration_needed
@@ -203,9 +201,6 @@ class FormulaTests < Homebrew::TestCase
     newname_prefix.mkpath
 
     refute_predicate f, :migration_needed?
-  ensure
-    oldname_prefix.parent.rmtree
-    newname_prefix.parent.rmtree
   end
 
   def test_installed?
@@ -240,8 +235,6 @@ class FormulaTests < Homebrew::TestCase
     prefix = HOMEBREW_CELLAR+f.name+f.head.version
     prefix.mkpath
     assert_equal prefix, f.installed_prefix
-  ensure
-    f.rack.rmtree
   end
 
   def test_installed_prefix_devel_installed
@@ -255,8 +248,6 @@ class FormulaTests < Homebrew::TestCase
     prefix = HOMEBREW_CELLAR+f.name+f.devel.version
     prefix.mkpath
     assert_equal prefix, f.installed_prefix
-  ensure
-    f.rack.rmtree
   end
 
   def test_installed_prefix_stable_installed
@@ -270,8 +261,6 @@ class FormulaTests < Homebrew::TestCase
     prefix = HOMEBREW_CELLAR+f.name+f.version
     prefix.mkpath
     assert_equal prefix, f.installed_prefix
-  ensure
-    f.rack.rmtree
   end
 
   def test_installed_prefix_outdated_stable_head_installed
@@ -289,8 +278,6 @@ class FormulaTests < Homebrew::TestCase
     tab.write
 
     assert_equal HOMEBREW_CELLAR/"#{f.name}/#{f.version}", f.installed_prefix
-  ensure
-    f.rack.rmtree
   end
 
   def test_installed_prefix_outdated_devel_head_installed
@@ -311,8 +298,6 @@ class FormulaTests < Homebrew::TestCase
     tab.write
 
     assert_equal HOMEBREW_CELLAR/"#{f.name}/#{f.version}", f.installed_prefix
-  ensure
-    f.rack.rmtree
   end
 
   def test_installed_prefix_head
@@ -358,8 +343,6 @@ class FormulaTests < Homebrew::TestCase
 
     prefix = HOMEBREW_CELLAR/"#{f.name}/HEAD-222222_2"
     assert_equal prefix, f.latest_head_prefix
-  ensure
-    f.rack.rmtree
   end
 
   def test_equality
@@ -543,20 +526,12 @@ class FormulaTests < Homebrew::TestCase
   end
 
   def test_update_head_version
-    initial_env = ENV.to_hash
-
     f = formula do
       head "foo", using: :git
     end
 
     cached_location = f.head.downloader.cached_location
     cached_location.mkpath
-
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
 
     cached_location.cd do
       FileUtils.touch "LICENSE"
@@ -569,9 +544,6 @@ class FormulaTests < Homebrew::TestCase
 
     f.update_head_version
     assert_equal Version.create("HEAD-5658946"), f.head.version
-  ensure
-    ENV.replace(initial_env)
-    cached_location.rmtree
   end
 
   def test_legacy_options
@@ -651,12 +623,80 @@ class FormulaTests < Homebrew::TestCase
 
     f4 = formula("f4") do
       url "f4-1.0"
-      depends_on "f3"
+      depends_on "f1"
+    end
+    stub_formula_loader f4
+
+    f5 = formula("f5") do
+      url "f5-1.0"
+      depends_on "f3" => :build
+      depends_on "f4"
     end
 
-    assert_equal %w[f3], f4.deps.map(&:name)
-    assert_equal %w[f1 f2 f3], f4.recursive_dependencies.map(&:name)
-    assert_equal %w[f2 f3], f4.runtime_dependencies.map(&:name)
+    assert_equal %w[f3 f4], f5.deps.map(&:name)
+    assert_equal %w[f1 f2 f3 f4], f5.recursive_dependencies.map(&:name)
+    assert_equal %w[f1 f4], f5.runtime_dependencies.map(&:name)
+  end
+
+  def test_runtime_dependencies_with_optional_deps_from_tap
+    tap_loader = mock
+    tap_loader.stubs(:get_formula).raises(RuntimeError, "tried resolving tap formula")
+    Formulary.stubs(:loader_for).with("foo/bar/f1", from: nil).returns(tap_loader)
+
+    stub_formula_loader formula("f2") { url "f2-1.0" }, "baz/qux/f2"
+
+    f3 = formula("f3") do
+      url "f3-1.0"
+      depends_on "foo/bar/f1" => :optional
+      depends_on "baz/qux/f2"
+    end
+
+    # f1 shouldn't be loaded by default.
+    # If it is, an exception will be raised.
+    assert_equal %w[baz/qux/f2], f3.runtime_dependencies.map(&:name)
+
+    # If --with-f1, f1 should be loaded.
+    stub_formula_loader formula("f1") { url "f1-1.0" }, "foo/bar/f1"
+    f3.build = BuildOptions.new(Options.create(%w[--with-f1]), f3.options)
+    assert_equal %w[foo/bar/f1 baz/qux/f2], f3.runtime_dependencies.map(&:name)
+  end
+
+  def test_requirements
+    f1 = formula("f1") do
+      url "f1-1"
+
+      depends_on :python
+      depends_on x11: :recommended
+      depends_on xcode: ["1.0", :optional]
+    end
+    stub_formula_loader f1
+
+    python = PythonRequirement.new
+    x11 = X11Requirement.new("x11", [:recommended])
+    xcode = XcodeRequirement.new(["1.0", :optional])
+
+    # Default block should filter out deps that aren't being used
+    assert_equal Set[python, x11], Set.new(f1.recursive_requirements)
+
+    f1.build = BuildOptions.new(["--with-xcode", "--without-x11"], f1.options)
+    assert_equal Set[python, xcode], Set.new(f1.recursive_requirements)
+    f1.build = f1.stable.build
+
+    f2 = formula("f2") do
+      url "f2-1"
+      depends_on "f1"
+    end
+
+    assert_equal Set[python, x11], Set.new(f2.recursive_requirements)
+
+    # Empty block should allow all requirements
+    assert_equal Set[python, x11, xcode], Set.new(f2.recursive_requirements {})
+
+    # Requirements can be pruned
+    requirements = f2.recursive_requirements do |_dependent, requirement|
+      Requirement.prune if requirement.is_a?(PythonRequirement)
+    end
+    assert_equal Set[x11, xcode], Set.new(requirements)
   end
 
   def test_to_hash
@@ -703,9 +743,6 @@ class FormulaTests < Homebrew::TestCase
 
     assert_equal f3.installed_kegs.sort_by(&:version)[0..1],
                  f3.eligible_kegs_for_cleanup.sort_by(&:version)
-  ensure
-    [f1, f2, f3].each(&:clear_cache)
-    f3.rack.rmtree
   end
 
   def test_eligible_kegs_for_cleanup_keg_pinned
@@ -727,10 +764,6 @@ class FormulaTests < Homebrew::TestCase
     assert_predicate f3, :installed?
 
     assert_equal [Keg.new(f2.prefix)], shutup { f3.eligible_kegs_for_cleanup }
-  ensure
-    f1.unpin
-    [f1, f2, f3].each(&:clear_cache)
-    f3.rack.rmtree
   end
 
   def test_eligible_kegs_for_cleanup_head_installed
@@ -753,8 +786,6 @@ class FormulaTests < Homebrew::TestCase
 
     eligible_kegs = f.installed_kegs - [Keg.new(f.prefix("HEAD-111111_1"))]
     assert_equal eligible_kegs, f.eligible_kegs_for_cleanup
-  ensure
-    f.rack.rmtree
   end
 
   def test_pour_bottle
@@ -806,6 +837,8 @@ class AliasChangeTests < Homebrew::TestCase
   end
 
   def setup
+    super
+
     alias_name = "bar"
     @alias_path = "#{CoreTap.instance.alias_dir}/#{alias_name}"
 
@@ -874,6 +907,8 @@ class OutdatedVersionsTests < Homebrew::TestCase
   attr_reader :f, :old_formula, :new_formula
 
   def setup
+    super
+
     @f = formula do
       url "foo"
       version "1.20"
@@ -887,11 +922,6 @@ class OutdatedVersionsTests < Homebrew::TestCase
     @greater_prefix = HOMEBREW_CELLAR/"#{f.name}/1.21"
     @head_prefix = HOMEBREW_CELLAR/"#{f.name}/HEAD"
     @old_alias_target_prefix = HOMEBREW_CELLAR/"#{old_formula.name}/1.0"
-  end
-
-  def teardown
-    formulae = [@f, @old_formula, @new_formula]
-    formulae.map(&:rack).select(&:exist?).each(&:rmtree)
   end
 
   def alias_path
@@ -1058,13 +1088,12 @@ class OutdatedVersionsTests < Homebrew::TestCase
     outdated_stable_prefix = HOMEBREW_CELLAR.join("testball/1.0")
     head_prefix_a = HOMEBREW_CELLAR.join("testball/HEAD")
     head_prefix_b = HOMEBREW_CELLAR.join("testball/HEAD-aaaaaaa_1")
-    head_prefix_c = HOMEBREW_CELLAR.join("testball/HEAD-5658946")
+    head_prefix_c = HOMEBREW_CELLAR.join("testball/HEAD-18a7103")
 
     setup_tab_for_prefix(outdated_stable_prefix)
     tab_a = setup_tab_for_prefix(head_prefix_a, versions: { "stable" => "1.0" })
     setup_tab_for_prefix(head_prefix_b)
 
-    initial_env = ENV.to_hash
     testball_repo = HOMEBREW_PREFIX.join("testball_repo")
     testball_repo.mkdir
 
@@ -1072,12 +1101,6 @@ class OutdatedVersionsTests < Homebrew::TestCase
       url "foo"
       version "2.10"
       head "file://#{testball_repo}", using: :git
-    end
-
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
     end
 
     testball_repo.cd do
@@ -1104,13 +1127,7 @@ class OutdatedVersionsTests < Homebrew::TestCase
     reset_outdated_kegs
     assert_predicate f.outdated_kegs(fetch_head: true), :empty?
   ensure
-    ENV.replace(initial_env)
     testball_repo.rmtree if testball_repo.exist?
-    outdated_stable_prefix.rmtree if outdated_stable_prefix.exist?
-    head_prefix_b.rmtree if head_prefix.exist?
-    head_prefix_c.rmtree if head_prefix_c.exist?
-    FileUtils.rm_rf HOMEBREW_CACHE/"testball--git"
-    FileUtils.rm_rf HOMEBREW_CELLAR/"testball"
   end
 
   def test_outdated_kegs_version_scheme_changed
@@ -1124,8 +1141,6 @@ class OutdatedVersionsTests < Homebrew::TestCase
     setup_tab_for_prefix(prefix, versions: { "stable" => "0.1" })
 
     refute_predicate f.outdated_kegs, :empty?
-  ensure
-    prefix.rmtree
   end
 
   def test_outdated_kegs_mixed_version_schemes
@@ -1153,8 +1168,6 @@ class OutdatedVersionsTests < Homebrew::TestCase
     prefix_d = HOMEBREW_CELLAR.join("testball/20141011")
     setup_tab_for_prefix(prefix_d, versions: { "stable" => "20141009", "version_scheme" => 3 })
     assert_predicate f.outdated_kegs, :empty?
-  ensure
-    f.rack.rmtree
   end
 
   def test_outdated_kegs_head_with_version_scheme
@@ -1174,7 +1187,5 @@ class OutdatedVersionsTests < Homebrew::TestCase
 
     setup_tab_for_prefix(head_prefix, versions: { "stable" => "1.0", "version_scheme" => 2 })
     assert_predicate f.outdated_kegs, :empty?
-  ensure
-    head_prefix.rmtree
   end
 end

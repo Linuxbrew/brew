@@ -3,6 +3,7 @@ require "extend/ARGV"
 
 class ArgvExtensionTests < Homebrew::TestCase
   def setup
+    super
     @argv = [].extend(HomebrewArgvExtension)
   end
 
@@ -21,8 +22,6 @@ class ArgvExtensionTests < Homebrew::TestCase
     keg.mkpath
     @argv << "mxcl"
     assert_equal 1, @argv.kegs.length
-  ensure
-    keg.parent.rmtree
   end
 
   def test_argv_named

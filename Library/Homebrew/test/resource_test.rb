@@ -3,6 +3,7 @@ require "resource"
 
 class ResourceTests < Homebrew::TestCase
   def setup
+    super
     @resource = Resource.new("test")
   end
 

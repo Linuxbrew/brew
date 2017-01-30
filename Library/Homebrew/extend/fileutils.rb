@@ -3,7 +3,7 @@ require "tmpdir"
 require "etc"
 
 # Homebrew extends Ruby's `FileUtils` to make our code more readable.
-# @see http://ruby-doc.org/stdlib-1.8.7/libdoc/fileutils/rdoc/FileUtils.html Ruby's FileUtils API
+# @see http://ruby-doc.org/stdlib-2.0.0/libdoc/fileutils/rdoc/FileUtils.html Ruby's FileUtils API
 module FileUtils
   # Create a temporary directory then yield. When the block returns,
   # recursively delete the temporary directory. Passing opts[:retain]

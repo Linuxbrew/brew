@@ -1,4 +1,5 @@
-# Querying Brew
+# Querying `brew`
+
 _In this document we will be using [jq](https://stedolan.github.io/jq/) to parse JSON, available from Homebrew using `brew install jq`._
 
 ## Overview

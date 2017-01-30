@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "November 2016" "Homebrew" "brew"
+.TH "BREW" "1" "January 2017" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -26,7 +26,7 @@ With \fB\-\-verbose\fR or \fB\-v\fR, many commands print extra debugging informa
 Install \fIformula\fR\.
 .
 .TP
-\fBremove\fR \fIformula\fR
+\fBuninstall\fR \fIformula\fR
 Uninstall \fIformula\fR\.
 .
 .TP
@@ -45,7 +45,7 @@ Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is su
 .
 .TP
 \fBanalytics\fR [\fBstate\fR]
-Display anonymous user behaviour analytics state\. Read more at \fIhttps://git\.io/brew\-analytics\fR\.
+Display anonymous user behaviour analytics state\. Read more at \fIhttp://docs\.brew\.sh/Analytics\.html\fR\.
 .
 .TP
 \fBanalytics\fR (\fBon\fR|\fBoff\fR)
@@ -171,7 +171,7 @@ If \fB\-\-deps\fR is passed, also download dependencies for any listed \fIformul
 If \fB\-\-build\-from\-source\fR is passed, download the source rather than a bottle\.
 .
 .IP
-If \fB\-\-force\-bottle\fR is passed, download a bottle if it exists for the current version of macOS, even if it would not be used during installation\.
+If \fB\-\-force\-bottle\fR is passed, download a bottle if it exists for the current or newest version of macOS, even if it would not be used during installation\.
 .
 .TP
 \fBgist\-logs\fR [\fB\-\-new\-issue\fR|\fB\-n\fR] \fIformula\fR
@@ -213,7 +213,7 @@ Print a JSON representation of \fIformulae\fR\. Currently the only accepted valu
 Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to get information on all installed formulae\.
 .
 .IP
-See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/Querying\-Brew\.md\fR
+See the docs for examples of using the JSON: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
 .
 .TP
 \fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR\fIstd\fR|\fIsuper\fR] [\fB\-\-ignore\-dependencies\fR] [\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
@@ -247,6 +247,9 @@ If \fB\-\-build\-from\-source\fR or \fB\-s\fR is passed, compile the specified \
 If \fBHOMEBREW_BUILD_FROM_SOURCE\fR is set, regardless of whether \fB\-\-build\-from\-source\fR was passed, then both \fIformula\fR and the dependencies installed as part of this process are built from source even if bottles are available\.
 .
 .IP
+If \fB\-\-force\-bottle\fR is passed, install from a bottle if it exists for the current or newest version of macOS, even if it would not normally be used for installation\.
+.
+.IP
 If \fB\-\-devel\fR is passed, and \fIformula\fR defines it, install the development version\.
 .
 .IP
@@ -254,9 +257,6 @@ If \fB\-\-HEAD\fR is passed, and \fIformula\fR defines it, install the HEAD vers
 .
 .IP
 If \fB\-\-keep\-tmp\fR is passed, the temporary files created during installation are not deleted\.
-.
-.IP
-To install a newer version of HEAD use \fBbrew rm <foo> && brew install \-\-HEAD <foo>\fR\.
 .
 .TP
 \fBinstall\fR \fB\-\-interactive\fR [\fB\-\-git\fR] \fIformula\fR
@@ -291,7 +291,10 @@ If \fB\-\-force\fR is passed, Homebrew will allow keg\-only formulae to be linke
 .
 .TP
 \fBlinkapps\fR [\fB\-\-local\fR] [\fIformulae\fR]
-Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access\.
+Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access (deprecated)\.
+.
+.IP
+Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
 .
 .IP
 If no \fIformulae\fR are provided, all of them will have their apps symlinked\.
@@ -476,7 +479,7 @@ Print a JSON representation of \fItaps\fR\. Currently the only accepted value fo
 Pass \fB\-\-installed\fR to get information on installed taps\.
 .
 .IP
-See the docs for examples of using the JSON: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/Querying\-Brew\.md\fR
+See the docs for examples of using the JSON: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
 .
 .TP
 \fBtap\-pin\fR \fItap\fR
@@ -505,7 +508,10 @@ If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all files which
 .
 .TP
 \fBunlinkapps\fR [\fB\-\-local\fR] [\fB\-\-dry\-run\fR] [\fIformulae\fR]
-Remove symlinks created by \fBbrew linkapps\fR from \fB/Applications\fR\.
+Remove symlinks created by \fBbrew linkapps\fR from \fB/Applications\fR (deprecated)\.
+.
+.IP
+Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
 .
 .IP
 If no \fIformulae\fR are provided, all linked apps will be removed\.
@@ -695,14 +701,14 @@ If \fB\-\-message=\fR\fImessage\fR is passed, append \fImessage\fR to the defaul
 Note that this command cannot be used to transition a formula from a url\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.
 .
 .TP
-\fBcreate\fR \fIURL\fR [\fB\-\-autotools\fR|\fB\-\-cmake\fR] [\fB\-\-no\-fetch\fR] [\fB\-\-set\-name\fR \fIname\fR] [\fB\-\-set\-version\fR \fIversion\fR] [\fB\-\-tap\fR \fIuser\fR\fB/\fR\fIrepo\fR]
+\fBcreate\fR \fIURL\fR [\fB\-\-autotools\fR|\fB\-\-cmake\fR|\fB\-\-meson\fR] [\fB\-\-no\-fetch\fR] [\fB\-\-set\-name\fR \fIname\fR] [\fB\-\-set\-version\fR \fIversion\fR] [\fB\-\-tap\fR \fIuser\fR\fB/\fR\fIrepo\fR]
 Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at
 .
 .IP
 \fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR
 .
 .IP
-If \fB\-\-autotools\fR is passed, create a basic template for an Autotools\-style build\. If \fB\-\-cmake\fR is passed, create a basic template for a CMake\-style build\.
+If \fB\-\-autotools\fR is passed, create a basic template for an Autotools\-style build\. If \fB\-\-cmake\fR is passed, create a basic template for a CMake\-style build\. If \fB\-\-meson\fR is passed, create a basic template for a Meson\-style build\.
 .
 .IP
 If \fB\-\-no\-fetch\fR is passed, Homebrew will not download \fIURL\fR to the cache and will thus not add the SHA256 to the formula for you\.
@@ -835,7 +841,7 @@ Integrates Homebrew formulae with macOS\'s \fBlaunchctl\fR manager: \fIhttps://g
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
 .
 .P
-Instructions for creating your own commands can be found in the docs: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/External\-Commands\.md\fR
+Instructions for creating your own commands can be found in the docs: \fIhttp://docs\.brew\.sh/External\-Commands\.html\fR
 .
 .SH "SPECIFYING FORMULAE"
 Many Homebrew commands accept one or more \fIformula\fR arguments\. These arguments can take several different forms:
@@ -954,7 +960,7 @@ If set, instructs Homebrew to use the value of \fBHOMEBREW_MAKE_JOBS\fR as the n
 .
 .TP
 \fBHOMEBREW_NO_ANALYTICS\fR
-If set, Homebrew will not send analytics\. See: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/Analytics\.md#analytics\fR
+If set, Homebrew will not send analytics\. See: \fIhttp://docs\.brew\.sh/Analytics\.html\fR
 .
 .TP
 \fBHOMEBREW_NO_AUTO_UPDATE\fR
@@ -1043,10 +1049,10 @@ Homebrew Documentation: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/\f
 Homebrew\'s lead maintainer is Mike McQuaid\.
 .
 .P
-Homebrew\'s current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Josh Hagins, Baptiste Fontaine, Markus Reiter, ilovezfs, Martin Afanasjew, Tom Schoonjans, Uladzislau Shablinski, Tim Smith and Alex Dunn\.
+Homebrew\'s current maintainers are Misty De Meo, Andrew Janke, Xu Cheng, Tomasz Pajor, Josh Hagins, Baptiste Fontaine, Markus Reiter, ilovezfs, Tom Schoonjans, Uladzislau Shablinski, Tim Smith and Alex Dunn\.
 .
 .P
-Former maintainers with significant contributions include Dominyk Tiller, Brett Koonce, Jack Nagel, Adam Vandenberg and Homebrew\'s creator: Max Howell\.
+Former maintainers with significant contributions include Martin Afanasjew, Dominyk Tiller, Brett Koonce, Jack Nagel, Adam Vandenberg and Homebrew\'s creator: Max Howell\.
 .
 .SH "BUGS"
 See our issues on GitHub:

@@ -16,7 +16,7 @@ class IntegrationCommandTestTap < IntegrationCommandTestCase
     end
 
     assert_match "homebrew/foo", cmd("tap")
-    assert_match "homebrew/versions", cmd("tap", "--list-official")
+    assert_match "homebrew/science", cmd("tap", "--list-official")
     assert_match "2 taps", cmd("tap-info")
     assert_match "https://github.com/Homebrew/homebrew-foo", cmd("tap-info", "homebrew/foo")
     assert_match "https://github.com/Homebrew/homebrew-foo", cmd("tap-info", "--json=v1", "--installed")
@@ -34,6 +34,7 @@ class TapTest < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     @path = Tap::TAP_DIRECTORY/"homebrew/homebrew-foo"
     @path.mkpath
     @tap = Tap.new("Homebrew", "foo")
@@ -65,13 +66,6 @@ class TapTest < Homebrew::TestCase
   end
 
   def setup_git_repo
-    env = ENV.to_hash
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
-
     @path.cd do
       shutup do
         system "git", "init"
@@ -80,12 +74,6 @@ class TapTest < Homebrew::TestCase
         system "git", "commit", "-m", "init"
       end
     end
-  ensure
-    ENV.replace(env)
-  end
-
-  def teardown
-    @path.rmtree
   end
 
   def test_fetch
@@ -162,17 +150,15 @@ class TapTest < Homebrew::TestCase
     assert_raises(TapUnavailableError) { Tap.new("Homebrew", "bar").remote }
     refute_predicate @tap, :custom_remote?
 
-    version_tap = Tap.new("Homebrew", "versions")
-    version_tap.path.mkpath
-    version_tap.path.cd do
+    services_tap = Tap.new("Homebrew", "services")
+    services_tap.path.mkpath
+    services_tap.path.cd do
       shutup do
         system "git", "init"
-        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-versions"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-services"
       end
     end
-    refute_predicate version_tap, :private?
-  ensure
-    version_tap.path.rmtree if version_tap
+    refute_predicate services_tap, :private?
   end
 
   def test_remote_not_git_repo
@@ -189,10 +175,10 @@ class TapTest < Homebrew::TestCase
     touch @path/"README"
     setup_git_repo
 
-    assert_equal "e1893a6bd191ba895c71b652ff8376a6114c7fa7", @tap.git_head
-    assert_equal "e189", @tap.git_short_head
-    assert_match "years ago", @tap.git_last_commit
-    assert_equal "2009-05-21", @tap.git_last_commit_date
+    assert_equal "0453e16c8e3fac73104da50927a86221ca0740c2", @tap.git_head
+    assert_equal "0453", @tap.git_short_head
+    assert_match(/\A\d+ .+ ago\Z/, @tap.git_last_commit)
+    assert_equal "2017-01-22", @tap.git_last_commit_date
   end
 
   def test_private_remote
@@ -256,8 +242,6 @@ class TapTest < Homebrew::TestCase
     refute_predicate tap, :installed?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1", :exist?
     refute_predicate HOMEBREW_PREFIX/"share/man/man1", :exist?
-  ensure
-    (HOMEBREW_PREFIX/"share").rmtree if (HOMEBREW_PREFIX/"share").exist?
   end
 
   def test_pin_and_unpin
@@ -285,6 +269,7 @@ class CoreTapTest < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     @repo = CoreTap.new
   end
 
@@ -322,8 +307,5 @@ class CoreTapTest < Homebrew::TestCase
     assert_equal ["bar"], @repo.aliases
     assert_equal @repo.alias_table, "bar" => "foo"
     assert_equal @repo.alias_reverse_table, "foo" => ["bar"]
-  ensure
-    @formula_file.unlink
-    @repo.alias_dir.rmtree
   end
 end

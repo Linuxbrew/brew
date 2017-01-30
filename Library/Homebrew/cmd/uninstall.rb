@@ -102,8 +102,8 @@ module Homebrew
     attr_reader :reqs, :deps
 
     def initialize(requireds, dependents)
-      @reqs = requireds.compact
-      @deps = dependents.compact
+      @reqs = requireds
+      @deps = dependents
     end
 
     protected
@@ -121,7 +121,7 @@ module Homebrew
     end
 
     def sample_command
-      "brew uninstall --ignore-dependencies #{list reqs.map(&:name)}"
+      "brew uninstall --ignore-dependencies #{ARGV.named.join(" ")}"
     end
 
     def are_required_by_deps

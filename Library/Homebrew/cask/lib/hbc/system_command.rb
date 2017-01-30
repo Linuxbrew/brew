@@ -48,13 +48,11 @@ module Hbc
 
     def process_options!
       options.extend(HashValidator)
-             .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo, :bsexec
+             .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo
       sudo_prefix = %w[/usr/bin/sudo -E --]
       sudo_prefix = sudo_prefix.insert(1, "-A") unless ENV["SUDO_ASKPASS"].nil?
-      bsexec_prefix = ["/bin/launchctl", "bsexec", options[:bsexec] == :startup ? "/" : options[:bsexec]]
       @command = [executable]
       options[:print_stderr] = true    unless options.key?(:print_stderr)
-      @command.unshift(*bsexec_prefix) if  options[:bsexec]
       @command.unshift(*sudo_prefix)   if  options[:sudo]
       @command.concat(options[:args])  if  options.key?(:args) && !options[:args].empty?
       @command[0] = Shellwords.shellescape(@command[0]) if @command.size == 1

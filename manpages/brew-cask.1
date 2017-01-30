@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW\-CASK" "1" "November 2016" "Homebrew" "brew-cask"
+.TH "BREW\-CASK" "1" "January 2017" "Homebrew" "brew-cask"
 .
 .SH "NAME"
 \fBbrew\-cask\fR \- a friendly binary installer for macOS
@@ -89,9 +89,6 @@ If \fItoken\fR is given, summarize the staged files associated with the given Ca
 \fBuninstall\fR or \fBrm\fR or \fBremove\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]: Uninstall the given Cask\. With \fB\-\-force\fR, uninstall even if the Cask does not appear to be present\.
 .
 .IP "\(bu" 4
-\fBupdate\fR: For convenience\. \fBbrew cask update\fR is a synonym for \fBbrew update\fR\.
-.
-.IP "\(bu" 4
 \fBzap\fR \fItoken\fR [ \fItoken\fR \.\.\. ]: Unconditionally remove \fIall\fR files associated with the given Cask\.
 .
 .IP
@@ -107,6 +104,15 @@ If the Cask definition contains a \fBzap\fR stanza, performs additional \fBzap\f
 \fB\fBzap\fR may remove files which are shared between applications\.\fR
 .
 .IP "" 0
+.
+.SH "INTERNAL COMMANDS"
+.
+.TP
+\fB_appcast_checkpoint\fR [\-\-calculate] [ \fItoken\fR \.\.\. | \fIURL\fR \.\.\. ]
+Given a \fBtoken\fR, returns the current appcast checkpoint, or calculates the appcast checkpoint if the \fB\-\-calculate\fR flag is specified\.
+.
+.br
+Given a \fBURL\fR, calculates the appcast checkpoint for it\.
 .
 .SH "OPTIONS"
 To make these options persistent, see the ENVIRONMENT section, below\.

@@ -25,6 +25,8 @@ class Tab < OpenStruct
       "unused_options" => build.unused_options.as_flags,
       "tabfile" => formula.prefix.join(FILENAME),
       "built_as_bottle" => build.bottle?,
+      "installed_as_dependency" => false,
+      "installed_on_request" => true,
       "poured_from_bottle" => false,
       "time" => Time.now.to_i,
       "source_modified_time" => formula.source_modified_time.to_i,
@@ -168,9 +170,12 @@ class Tab < OpenStruct
 
   def self.empty
     attributes = {
+      "homebrew_version" => HOMEBREW_VERSION,
       "used_options" => [],
       "unused_options" => [],
       "built_as_bottle" => false,
+      "installed_as_dependency" => false,
+      "installed_on_request" => true,
       "poured_from_bottle" => false,
       "time" => nil,
       "source_modified_time" => 0,
@@ -242,6 +247,17 @@ class Tab < OpenStruct
     super || DevelopmentTools.default_compiler
   end
 
+  def parsed_homebrew_version
+    return Version::NULL if homebrew_version.nil?
+    Version.new(homebrew_version)
+  end
+
+  def runtime_dependencies
+    # Homebrew versions prior to 1.1.6 generated incorrect runtime dependency
+    # lists.
+    super unless parsed_homebrew_version < "1.1.6"
+  end
+
   def cxxstdlib
     # Older tabs won't have these values, so provide sensible defaults
     lib = stdlib.to_sym if stdlib
@@ -301,6 +317,8 @@ class Tab < OpenStruct
       "unused_options" => unused_options.as_flags,
       "built_as_bottle" => built_as_bottle,
       "poured_from_bottle" => poured_from_bottle,
+      "installed_as_dependency" => installed_as_dependency,
+      "installed_on_request" => installed_on_request,
       "changed_files" => changed_files && changed_files.map(&:to_s),
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,

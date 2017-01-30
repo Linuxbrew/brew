@@ -6,12 +6,12 @@ require "development_tools"
 
 class SystemConfig
   class << self
-    def gcc_42
-      @gcc_42 ||= DevelopmentTools.gcc_42_build_version if DevelopmentTools.installed?
+    def gcc_4_2
+      @gcc_4_2 ||= DevelopmentTools.gcc_4_2_build_version if DevelopmentTools.installed?
     end
 
-    def gcc_40
-      @gcc_40 ||= DevelopmentTools.gcc_40_build_version if DevelopmentTools.installed?
+    def gcc_4_0
+      @gcc_4_0 ||= DevelopmentTools.gcc_4_0_build_version if DevelopmentTools.installed?
     end
 
     def clang
@@ -143,8 +143,8 @@ class SystemConfig
       f.puts "HOMEBREW_BOTTLE_DOMAIN: #{BottleSpecification::DEFAULT_DOMAIN}"
       f.puts hardware if hardware
       f.puts "Homebrew Ruby: #{describe_homebrew_ruby}"
-      f.puts "GCC-4.0: build #{gcc_40}" unless gcc_40.null?
-      f.puts "GCC-4.2: build #{gcc_42}" unless gcc_42.null?
+      f.puts "GCC-4.0: build #{gcc_4_0}" unless gcc_4_0.null?
+      f.puts "GCC-4.2: build #{gcc_4_2}" unless gcc_4_2.null?
       f.puts "Clang: #{clang.null? ? "N/A" : "#{clang} build #{clang_build}"}"
       f.puts "Git: #{describe_git}"
       f.puts "Perl: #{describe_perl}"

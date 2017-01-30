@@ -64,21 +64,22 @@ class DevelopmentTools
       case default_cc
       # if GCC 4.2 is installed, e.g. via Tigerbrew, prefer it
       # over the system's GCC 4.0
-      when /^gcc-4\.0/ then gcc_42_build_version ? :gcc : :gcc_4_0
-      when /^gcc/ then :gcc
+      when /^gcc-4\.0/ then gcc_4_2_build_version ? :gcc_4_2 : :gcc_4_0
+      when /^gcc/ then :gcc_4_2
       when "clang" then :clang
       else
         # guess :(
         if MacOS::Xcode.version >= "4.3"
           :clang
         else
-          :gcc
+          :gcc_4_2
         end
       end
     end
 
-    def tar_supports_xz?
-      false
+    def curl_handles_most_https_homepages?
+      # The system Curl is too old for some modern HTTPS homepages on Yosemite.
+      MacOS.version >= :el_capitan
     end
   end
 end

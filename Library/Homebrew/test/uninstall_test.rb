@@ -3,15 +3,21 @@ require "cmd/uninstall"
 
 class UninstallTests < Homebrew::TestCase
   def setup
+    super
+
     @dependency = formula("dependency") { url "f-1" }
     @dependent = formula("dependent") do
       url "f-1"
       depends_on "dependency"
     end
 
-    [@dependency, @dependent].each { |f| f.installed_prefix.mkpath }
+    [@dependency, @dependent].each do |f|
+      f.installed_prefix.mkpath
+      Keg.new(f.installed_prefix).optlink
+    end
 
     tab = Tab.empty
+    tab.homebrew_version = "1.1.6"
     tab.tabfile = @dependent.installed_prefix/Tab::FILENAME
     tab.runtime_dependencies = [
       { "full_name" => "dependency", "version" => "1" },
@@ -24,7 +30,7 @@ class UninstallTests < Homebrew::TestCase
 
   def teardown
     Homebrew.failed = false
-    [@dependency, @dependent].each { |f| f.rack.rmtree }
+    super
   end
 
   def handle_unsatisfied_dependents
@@ -52,8 +58,6 @@ class UninstallTests < Homebrew::TestCase
       assert_empty handle_unsatisfied_dependents
       refute_predicate Homebrew, :failed?
     end
-  ensure
-    ARGV.delete("--ignore-dependencies")
   end
 end
 

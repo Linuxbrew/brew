@@ -13,7 +13,7 @@
 #:    Pass `--installed` to get information on installed taps.
 #:
 #:    See the docs for examples of using the JSON:
-#:    <https://github.com/Homebrew/brew/blob/master/docs/Querying-Brew.md>
+#:    <http://docs.brew.sh/Querying-Brew.html>
 
 require "tap"
 

@@ -60,12 +60,20 @@ module Hbc
     def check_version
       return unless cask.version
       check_no_string_version_latest
+      check_no_file_separator_in_version
     end
 
     def check_no_string_version_latest
       odebug "Verifying version :latest does not appear as a string ('latest')"
       return unless cask.version.raw_version == "latest"
       add_error "you should use version :latest instead of version 'latest'"
+    end
+
+    def check_no_file_separator_in_version
+      odebug "Verifying version does not contain '#{File::SEPARATOR}'"
+      return unless cask.version.raw_version.is_a?(String)
+      return unless cask.version.raw_version.include?(File::SEPARATOR)
+      add_error "version should not contain '#{File::SEPARATOR}'"
     end
 
     def check_sha256
@@ -125,20 +133,19 @@ module Hbc
 
     def check_appcast_checkpoint_accuracy
       odebug "Verifying appcast checkpoint is accurate"
-      result = @command.run("/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", URL::FAKE_USER_AGENT, cask.appcast], print_stderr: false)
-      if result.success?
-        processed_appcast_text = result.stdout.gsub(%r{<pubDate>[^<]*</pubDate>}, "")
-        # This step is necessary to replicate running `sed` from the command line
-        processed_appcast_text << "\n" unless processed_appcast_text.end_with?("\n")
+      result = cask.appcast.calculate_checkpoint
+
+      actual_checkpoint = result[:checkpoint]
+
+      if actual_checkpoint.nil?
+        add_warning "error retrieving appcast: #{result[:command_result].stderr}"
+      else
         expected = cask.appcast.checkpoint
-        actual = Digest::SHA2.hexdigest(processed_appcast_text)
-        add_warning <<-EOS.undent unless expected == actual
+        add_warning <<-EOS.undent unless expected == actual_checkpoint
           appcast checkpoint mismatch
           Expected: #{expected}
-          Actual: #{actual}
+          Actual: #{actual_checkpoint}
         EOS
-      else
-        add_warning "error retrieving appcast: #{result.stderr}"
       end
     end
 

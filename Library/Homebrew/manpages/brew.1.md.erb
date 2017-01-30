@@ -31,7 +31,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `install` <formula>:
     Install <formula>.
 
-  * `remove` <formula>:
+  * `uninstall` <formula>:
     Uninstall <formula>.
 
   * `update`:
@@ -76,7 +76,7 @@ scripts that reside somewhere in the `PATH`, named `brew-`<cmdname> or
 to create your own commands without modifying Homebrew's internals.
 
 Instructions for creating your own commands can be found in the docs:
-<https://github.com/Homebrew/brew/blob/master/docs/External-Commands.md>
+<http://docs.brew.sh/External-Commands.html>
 
 ## SPECIFYING FORMULAE
 
@@ -197,7 +197,7 @@ can take several different forms:
     *Default:* the number of available CPU cores.
 
   * `HOMEBREW_NO_ANALYTICS`:
-    If set, Homebrew will not send analytics. See: <https://github.com/Homebrew/brew/blob/master/docs/Analytics.md#analytics>
+    If set, Homebrew will not send analytics. See: <http://docs.brew.sh/Analytics.html>
 
   * `HOMEBREW_NO_AUTO_UPDATE`:
     If set, Homebrew will not auto-update before running `brew install`,

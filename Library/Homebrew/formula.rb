@@ -26,7 +26,7 @@ require "migrator"
 # @see SharedEnvExtension
 # @see FileUtils
 # @see Pathname
-# @see https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md Formula Cookbook
+# @see http://docs.brew.sh/Formula-Cookbook.html Formula Cookbook
 # @see https://github.com/styleguide/ruby Ruby Style Guide
 #
 # <pre>class Wget < Formula
@@ -198,6 +198,7 @@ class Formula
     @build = active_spec.build
     @pin = FormulaPin.new(self)
     @follow_installed_alias = true
+    @prefix_returns_versioned_prefix = false
   end
 
   # @private
@@ -325,13 +326,13 @@ class Formula
     active_spec.bottle_disable_reason
   end
 
-  # Does the currently active {SoftwareSpec} has any bottle?
+  # Does the currently active {SoftwareSpec} have any bottle?
   # @private
   def bottle_defined?
     active_spec.bottle_defined?
   end
 
-  # Does the currently active {SoftwareSpec} has an installable bottle?
+  # Does the currently active {SoftwareSpec} have an installable bottle?
   # @private
   def bottled?
     active_spec.bottled?
@@ -379,6 +380,11 @@ class Formula
   # The {PkgVersion} for this formula with {version} and {#revision} information.
   def pkg_version
     PkgVersion.new(version, revision)
+  end
+
+  # If this is a `@`-versioned formula.
+  def versioned_formula?
+    name.include?("@")
   end
 
   # A named Resource for the currently active {SoftwareSpec}.
@@ -548,9 +554,17 @@ class Formula
   end
 
   # The directory in the cellar that the formula is installed to.
-  # This directory contains the formula's name and version.
+  # This directory points to {#opt_prefix} if it exists and if #{prefix} is not
+  # called from within the same formula's {#install} or {#post_install} methods.
+  # Otherwise, return the full path to the formula's versioned cellar.
   def prefix(v = pkg_version)
-    Pathname.new("#{HOMEBREW_CELLAR}/#{name}/#{v}")
+    versioned_prefix = versioned_prefix(v)
+    if !@prefix_returns_versioned_prefix && v == pkg_version &&
+       versioned_prefix.directory? && Keg.new(versioned_prefix).optlinked?
+      opt_prefix
+    else
+      versioned_prefix
+    end
   end
 
   # Is the formula linked?
@@ -566,7 +580,7 @@ class Formula
   # Is formula's linked keg points to the prefix.
   def prefix_linked?(v = pkg_version)
     return false unless linked?
-    linked_keg.resolved_path == prefix(v)
+    linked_keg.resolved_path == versioned_prefix(v)
   end
 
   # {PkgVersion} of the linked keg for the formula.
@@ -579,7 +593,7 @@ class Formula
   # installed versions of this software
   # @private
   def rack
-    prefix.parent
+    Pathname.new("#{HOMEBREW_CELLAR}/#{name}")
   end
 
   # All currently installed prefix directories.
@@ -994,6 +1008,7 @@ class Formula
 
   # @private
   def run_post_install
+    @prefix_returns_versioned_prefix = true
     build = self.build
     self.build = Tab.for_formula(self)
     old_tmpdir = ENV["TMPDIR"]
@@ -1008,6 +1023,7 @@ class Formula
     ENV["TMPDIR"] = old_tmpdir
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
+    @prefix_returns_versioned_prefix = false
   end
 
   # Tell the user about any caveats regarding this package.
@@ -1110,6 +1126,7 @@ class Formula
   # where staging is a Mktemp staging context
   # @private
   def brew
+    @prefix_returns_versioned_prefix = true
     stage do |staging|
       staging.retain! if ARGV.keep_tmp?
       prepare_patches
@@ -1123,6 +1140,8 @@ class Formula
         cp Dir["config.log", "CMakeCache.txt"], logs
       end
     end
+  ensure
+    @prefix_returns_versioned_prefix = false
   end
 
   # @private
@@ -1406,7 +1425,7 @@ class Formula
         Formulary.from_rack(rack)
       rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
       end
-    end.compact
+    end.compact.uniq(&:name)
   end
 
   def self.installed_with_alias_path(alias_path)
@@ -1505,7 +1524,15 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    recursive_dependencies.reject(&:build?)
+    runtime_dependencies = recursive_dependencies do |_, dependency|
+      Dependency.prune if dependency.build?
+      Dependency.prune if !dependency.required? && build.without?(dependency)
+    end
+    runtime_requirement_deps = recursive_requirements do |_, requirement|
+      Requirement.prune if requirement.build?
+      Requirement.prune if !requirement.required? && build.without?(requirement)
+    end.map(&:to_dependency).compact
+    runtime_dependencies + runtime_requirement_deps
   end
 
   # Returns a list of formulae depended on by this formula that aren't
@@ -1601,6 +1628,9 @@ class Formula
         "used_options" => tab.used_options.as_flags,
         "built_as_bottle" => tab.built_as_bottle,
         "poured_from_bottle" => tab.poured_from_bottle,
+        "runtime_dependencies" => tab.runtime_dependencies,
+        "installed_as_dependency" => tab.installed_as_dependency,
+        "installed_on_request" => tab.installed_on_request,
       }
     end
 
@@ -1621,6 +1651,7 @@ class Formula
 
   # @private
   def run_test
+    @prefix_returns_versioned_prefix = true
     old_home = ENV["HOME"]
     old_curl_home = ENV["CURL_HOME"]
     old_tmpdir = ENV["TMPDIR"]
@@ -1652,6 +1683,7 @@ class Formula
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
     ENV["TERM"] = old_term
+    @prefix_returns_versioned_prefix = false
   end
 
   # @private
@@ -1835,6 +1867,12 @@ class Formula
   end
 
   private
+
+  # Returns the prefix for a given formula version number.
+  # @private
+  def versioned_prefix(v)
+    rack/v
+  end
 
   def exec_cmd(cmd, args, out, logfn)
     ENV["HOMEBREW_CC_LOG_PATH"] = logfn
@@ -2041,7 +2079,7 @@ class Formula
     # and you haven't passed or previously used any options on this formula.
     #
     # If you maintain your own repository, you can add your own bottle links.
-    # https://github.com/Homebrew/brew/blob/master/docs/Bottles.md
+    # http://docs.brew.sh/Bottles.html
     # You can ignore this block entirely if submitting to Homebrew/Homebrew, It'll be
     # handled for you by the Brew Test Bot.
     #

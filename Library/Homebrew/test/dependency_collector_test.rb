@@ -11,11 +11,13 @@ class DependencyCollectorTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @d = DependencyCollector.new
   end
 
   def teardown
     DependencyCollector.clear_cache
+    super
   end
 
   def test_dependency_creation

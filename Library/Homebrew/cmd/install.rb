@@ -32,10 +32,10 @@
 #:    passed, then both <formula> and the dependencies installed as part of this process
 #:    are built from source even if bottles are available.
 #:
-#     Hidden developer option:
-#     If `--force-bottle` is passed, install from a bottle if it exists
-#    for the current version of macOS, even if custom options are given.
-#
+#:    If `--force-bottle` is passed, install from a bottle if it exists for the
+#:    current or newest version of macOS, even if it would not normally be used
+#:    for installation.
+#:
 #:    If `--devel` is passed, and <formula> defines it, install the development version.
 #:
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
@@ -43,9 +43,6 @@
 #:
 #:    If `--keep-tmp` is passed, the temporary files created during installation
 #:    are not deleted.
-#:
-#:    To install a newer version of HEAD use
-#:    `brew rm <foo> && brew install --HEAD <foo>`.
 #:
 #:  * `install` `--interactive` [`--git`] <formula>:
 #:    Download and patch <formula>, then open a shell. This allows the user to
@@ -187,6 +184,14 @@ module Homebrew
           # FormulaInstaller will handle this case.
           formulae << f
         end
+
+        # Even if we don't install this formula mark it as no longer just
+        # installed as a dependency.
+        next unless f.opt_prefix.directory?
+        keg = Keg.new(f.opt_prefix.resolved_path)
+        tab = Tab.for_keg(keg)
+        tab.installed_on_request = true
+        tab.write
       end
 
       perform_preinstall_checks

@@ -45,6 +45,7 @@ If you submit a formula with this syntax to core, you may be asked to rewrite it
 ## Python declarations
 
 Applications that are compatible with Python 2 **should** use the Apple-provided system Python in /usr/bin on systems that provide Python 2.7. To do this, declare:
+
 ```ruby
 depends_on :python if MacOS.version <= :snow_leopard
 ```
@@ -159,6 +160,7 @@ Bindings should follow the same advice for Python module dependencies as librari
 ## Installing bindings
 
 If the bindings are installed by invoking a `setup.py`, do something like:
+
 ```ruby
 cd "source/python" do
   system "python", *Language::Python.setup_install_args(prefix)

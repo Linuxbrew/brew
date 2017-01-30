@@ -1,5 +1,6 @@
 # FAQ
-### How do I update my local packages?
+
+## How do I update my local packages?
 First update the formulae and Homebrew itself:
 
     brew update
@@ -18,7 +19,7 @@ Or upgrade a specific formula with:
 
 <a name="cleanup"></a>
 
-### How do I stop certain formulae from being updated?
+## How do I stop certain formulae from being updated?
 To stop something from being updated/upgraded:
 
     brew pin $FORMULA
@@ -27,7 +28,7 @@ To allow that formulae to update again:
 
     brew unpin $FORMULA
 
-### How do I uninstall old versions of a formula?
+## How do I uninstall old versions of a formula?
 By default, Homebrew does not uninstall old versions of a formula, so
 over time you will accumulate old versions. To remove them, simply use:
 
@@ -43,7 +44,7 @@ to see what would be cleaned up:
 
 <a name="uninstall"></a>
 
-### How do I uninstall Homebrew?
+## How do I uninstall Homebrew?
 To uninstall Homebrew, paste the command below in a terminal prompt.
 
 ```bash
@@ -54,7 +55,7 @@ and run `./uninstall --help` to view more uninstall options.
 
 <a name="uninstall-package"></a>
 
-### How do I uninstall a formula?
+## How do I uninstall a formula?
 If you do not uninstall all of the versions that Homebrew has installed,
 Homebrew will continue to attempt to install the newest version it knows
 about when you do (`brew upgrade --all`). This can be surprising.
@@ -64,13 +65,13 @@ To remove a formula entirely, you may do
 
 Be careful as this is a destructive operation.
 
-### Where does stuff get downloaded?
+## Where does stuff get downloaded?
 
     brew --cache
 
 Which is usually: `~/Library/Caches/Homebrew`
 
-### My Mac `.app`s don’t find `/usr/local/bin` utilities!
+## My Mac `.app`s don’t find `/usr/local/bin` utilities!
 GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by default.
 If you’re on Mountain Lion, you can fix this by running
 `launchctl setenv PATH "/usr/local/bin:$PATH"`. [More details
@@ -79,10 +80,10 @@ including how to set this across reboots. If you’re pre-Mountain Lion,
 [here’s an official
 alternative](https://developer.apple.com/legacy/library/qa/qa1067/_index.html).
 
-### How do I contribute to Homebrew?
+## How do I contribute to Homebrew?
 Read [CONTRIBUTING.md](/CONTRIBUTING.md).
 
-### Why do you compile everything?
+## Why do you compile everything?
 Homebrew provides pre-compiled versions for many formulae. These
 pre-compiled versions are referred to as **bottles** and are available
 at:
@@ -107,7 +108,7 @@ your profile.
 
 We aim to bottle everything.
 
-### How do I get a formula from someone else’s branch?
+## How do I get a formula from someone else’s branch?
 
     brew install hub
     brew update
@@ -122,7 +123,7 @@ Or:
 
 `brew pull https://github.com/Homebrew/homebrew-core/pull/1234`
 
-### Why does Homebrew prefer I install to `/usr/local`?
+## Why does Homebrew prefer I install to `/usr/local`?
 <a name="usrlocal"></a>
 
 1.  **It’s easier**<br>`/usr/local/bin` is already in your
@@ -142,7 +143,7 @@ brews then save yourself a bunch of hassle and install to
 
 It is not always straightforward to tell `gem` to look in non-standard directories for headers and libraries. If you choose `/usr/local`, many things will "just work".
 
-### Why does Homebrew say sudo is bad? <a name="sudo"></a>
+## Why does Homebrew say sudo is bad? <a name="sudo"></a>
 **tl;dr** Sudo is dangerous, and you installed TextMate.app without sudo
 anyway.
 
@@ -168,17 +169,17 @@ not. So is it that important to `chown root wget`?
 If you need to run Homebrew in a multi-user environment, consider
 creating a separate user account especially for use of Homebrew.
 
-### Why isn’t a particular command documented?
+## Why isn’t a particular command documented?
 
 If it’s not in `man brew`, it’s probably an external command. These are documented [here](External-Commands.md).
 
-### Why haven’t you pulled my pull request?
+## Why haven’t you pulled my pull request?
 If it’s been a while, bump it with a “bump” comment. Sometimes we miss requests and there are plenty of them. Maybe we were thinking on something. It will encourage consideration. In the meantime if you could rebase the pull request so that it can be cherry-picked more easily we will love you for a long time.
 
-### Can I edit formulae myself?
+## Can I edit formulae myself?
 Yes! It’s easy! Just `brew edit $FORMULA`. You don’t have to submit modifications back to *Homebrew/homebrew-core*, just edit the formula as you personally need it and `brew install`. As a bonus `brew update` will merge your changes with upstream so you can still keep the formula up-to-date **with** your personal modifications!
 
-### Can I make new formulae?
+## Can I make new formulae?
 Yes! It’s easy! Just `brew create URL` Homebrew will then open the
 formula in `$EDITOR` so you can edit it, but it probably already
 installs; try it: `brew install $FORMULA`. If you come up with any issues,
@@ -188,7 +189,7 @@ which drops you into a debugging shell.
 If you want your new formula to be part of *homebrew/core* or want
 to learn more about writing formulae, then please read the [Formula Cookbook](Formula-Cookbook.md).
 
-### Can I install my own stuff to `/usr/local`?
+## Can I install my own stuff to `/usr/local`?
 Yes, brew is designed to not get in your way so you can use it how you
 like.
 
@@ -211,40 +212,25 @@ $ brew link foo
 Linking /usr/local/Cellar/foo/0.1… 17 symlinks created
 ```
 
-### Where was a formula deleted?
-Use `brew log $FORMULA` to find out!
+## Why was a formula deleted?
+Use `brew log $FORMULA` to find out! Likely because it had unresolved issues or
+our analytics identified it was not widely used.
 
-Sometimes formulae are moved to specialized repositories. These are the
-likely candidates:
-
-* [homebrew/dupes](https://github.com/Homebrew/homebrew-dupes)
-* [homebrew/games](https://github.com/Homebrew/homebrew-games)
-* [homebrew/versions](https://github.com/Homebrew/homebrew-versions)
-
-You can use `brew tap` to access these formulae:
-
-```bash
-brew tap homebrew/games
-brew install …
-```
-
-Note that brew search still finds formula in taps.
-
-### Homebrew is a poor name, it is generic, why was it chosen?
+## Homebrew is a poor name, it is generic, why was it chosen?
 @mxcl was too concerned with the beer theme and didn’t consider that the
 project may actually prove popular. By the time he realized it was too
 late. However, today, the first google hit for “homebrew” is not beer
 related ;-)
 
-### What does *keg-only* mean?
+## What does *keg-only* mean?
 It means the formula is installed only into the Cellar; it is not linked
 into `/usr/local`. This means most tools will not find it. We don’t do
 this for stupid reasons. You can still link in the formula if you need
 to with `brew link`.
 
-### How can I specify different configure arguments for a formula?
+## How can I specify different configure arguments for a formula?
 `brew edit $FORMULA` and edit the formula. Currently there is no
 other way to do this.
 
-### Is there a glossary of terms around?
+## Is there a glossary of terms around?
 All your terminology needs can be [found here](Formula-Cookbook.md#homebrew-terminology).

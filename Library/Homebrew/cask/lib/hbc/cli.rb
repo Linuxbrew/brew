@@ -19,11 +19,11 @@ require "hbc/cli/reinstall"
 require "hbc/cli/search"
 require "hbc/cli/style"
 require "hbc/cli/uninstall"
-require "hbc/cli/update"
 require "hbc/cli/zap"
 
 require "hbc/cli/internal_use_base"
 require "hbc/cli/internal_audit_modified_casks"
+require "hbc/cli/internal_appcast_checkpoint"
 require "hbc/cli/internal_checkurl"
 require "hbc/cli/internal_dump"
 require "hbc/cli/internal_help"
@@ -77,6 +77,7 @@ module Hbc
     def self.command_classes
       @command_classes ||= constants.map(&method(:const_get))
                                     .select { |sym| sym.respond_to?(:run) }
+                                    .sort_by(&:command_name)
     end
 
     def self.commands

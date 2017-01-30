@@ -15,6 +15,7 @@ class FormulaVersions
     @repository = formula.tap.path
     @entry_name = @path.relative_path_from(repository).to_s
     @max_depth = options[:max_depth]
+    @current_formula = formula
   end
 
   def rev_list(branch)
@@ -64,25 +65,33 @@ class FormulaVersions
 
     attributes.each do |attribute|
       attributes_map[attribute] ||= {}
+      # Set the attributes for the current formula in case it's not been
+      # committed yet.
+      set_attribute_map(attributes_map[attribute], @current_formula, attribute)
     end
 
     rev_list(branch) do |rev|
       formula_at_revision(rev) do |f|
         attributes.each do |attribute|
-          map = attributes_map[attribute]
-          if f.stable
-            map[:stable] ||= {}
-            map[:stable][f.stable.version] ||= []
-            map[:stable][f.stable.version] << f.send(attribute)
-          end
-          next unless f.devel
-          map[:devel] ||= {}
-          map[:devel][f.devel.version] ||= []
-          map[:devel][f.devel.version] << f.send(attribute)
+          set_attribute_map(attributes_map[attribute], f, attribute)
         end
       end
     end
 
     attributes_map
+  end
+
+  private
+
+  def set_attribute_map(map, f, attribute)
+    if f.stable
+      map[:stable] ||= {}
+      map[:stable][f.stable.version] ||= []
+      map[:stable][f.stable.version] << f.send(attribute)
+    end
+    return unless f.devel
+    map[:devel] ||= {}
+    map[:devel][f.devel.version] ||= []
+    map[:devel][f.devel.version] << f.send(attribute)
   end
 end

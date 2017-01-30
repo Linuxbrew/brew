@@ -4,6 +4,8 @@ require "formula"
 
 class TabTests < Homebrew::TestCase
   def setup
+    super
+
     @used = Options.create(%w[--with-foo --without-bar])
     @unused = Options.create(%w[--with-baz --without-qux])
 
@@ -32,6 +34,8 @@ class TabTests < Homebrew::TestCase
 
   def test_defaults
     tab = Tab.empty
+
+    assert_equal HOMEBREW_VERSION, tab.homebrew_version
     assert_empty tab.unused_options
     assert_empty tab.used_options
     assert_nil tab.changed_files
@@ -67,6 +71,49 @@ class TabTests < Homebrew::TestCase
   def test_universal?
     tab = Tab.new(used_options: %w[--universal])
     assert_predicate tab, :universal?
+  end
+
+  def test_parsed_homebrew_version
+    tab = Tab.new
+    assert_same Version::NULL, tab.parsed_homebrew_version
+
+    tab = Tab.new(homebrew_version: "1.2.3")
+    assert_equal "1.2.3", tab.parsed_homebrew_version
+    assert tab.parsed_homebrew_version < "1.2.3-1-g12789abdf"
+    assert_kind_of Version, tab.parsed_homebrew_version
+
+    tab.homebrew_version = "1.2.4-567-g12789abdf"
+    assert tab.parsed_homebrew_version > "1.2.4"
+    assert tab.parsed_homebrew_version > "1.2.4-566-g21789abdf"
+    assert tab.parsed_homebrew_version < "1.2.4-568-g01789abdf"
+
+    tab = Tab.new(homebrew_version: "2.0.0-134-gabcdefabc-dirty")
+    assert tab.parsed_homebrew_version > "2.0.0"
+    assert tab.parsed_homebrew_version > "2.0.0-133-g21789abdf"
+    assert tab.parsed_homebrew_version < "2.0.0-135-g01789abdf"
+  end
+
+  def test_runtime_dependencies
+    tab = Tab.new
+    assert_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.6"
+    assert_nil tab.runtime_dependencies
+
+    tab.runtime_dependencies = []
+    refute_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.5"
+    assert_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.7"
+    refute_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.10"
+    refute_nil tab.runtime_dependencies
+
+    tab.runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
+    refute_nil tab.runtime_dependencies
   end
 
   def test_cxxstdlib
@@ -215,14 +262,11 @@ end
 
 class TabLoadingTests < Homebrew::TestCase
   def setup
+    super
     @f = formula { url "foo-1.0" }
     @f.prefix.mkpath
     @path = @f.prefix.join(Tab::FILENAME)
     @path.write TEST_FIXTURE_DIR.join("receipt.json").read
-  end
-
-  def teardown
-    @f.rack.rmtree
   end
 
   def test_for_keg

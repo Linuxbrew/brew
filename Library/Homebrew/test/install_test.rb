@@ -73,13 +73,6 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
   end
 
   def test_install_head_installed
-    initial_env = ENV.to_hash
-    %w[AUTHOR COMMITTER].each do |role|
-      ENV["GIT_#{role}_NAME"] = "brew tests"
-      ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
-      ENV["GIT_#{role}_DATE"] = "Thu May 21 00:04:11 2009 +0100"
-    end
-
     repo_path = HOMEBREW_CACHE.join("repo")
     repo_path.join("bin").mkpath
 
@@ -105,15 +98,11 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
     # Ignore dependencies, because we'll try to resolve requirements in build.rb
     # and there will be the git requirement, but we cannot instantiate git
     # formula since we only have testball1 formula.
-    assert_match "#{HOMEBREW_CELLAR}/testball1/HEAD-2ccdf4f", cmd("install", "testball1", "--HEAD", "--ignore-dependencies")
-    assert_match "testball1-HEAD-2ccdf4f already installed",
+    assert_match "#{HOMEBREW_CELLAR}/testball1/HEAD-d5eb689", cmd("install", "testball1", "--HEAD", "--ignore-dependencies")
+    assert_match "testball1-HEAD-d5eb689 already installed",
       cmd("install", "testball1", "--HEAD", "--ignore-dependencies")
-    assert_match "#{HOMEBREW_CELLAR}/testball1/HEAD-2ccdf4f", cmd("unlink", "testball1")
+    assert_match "#{HOMEBREW_CELLAR}/testball1/HEAD-d5eb689", cmd("unlink", "testball1")
     assert_match "#{HOMEBREW_CELLAR}/testball1/1.0", cmd("install", "testball1")
-
-  ensure
-    ENV.replace(initial_env)
-    repo_path.rmtree
   end
 
   def test_install_with_invalid_option

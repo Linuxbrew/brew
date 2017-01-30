@@ -1,4 +1,5 @@
 # Acceptable Formulae
+
 Some formulae should not go in
 [homebrew/core](https://github.com/Homebrew/homebrew-core). But there are
 additional [Interesting Taps & Forks](Interesting-Taps-&-Forks.md) and anyone can start their
@@ -29,16 +30,16 @@ There are exceptions:
 
 #### Examples
 
-  Formula         | Reason
-  ---             | ---
-  ruby, python, perl    | People want newer versions
-  bash            | macOS's bash is stuck at 3.2 because newer versions are licensed under GPLv3
-  zsh             | This was a mistake, but it’s too late to remove it
-  emacs, vim      | [Too popular to move to dupes](https://github.com/Homebrew/homebrew/pull/21594#issuecomment-21968819)
-  subversion      | Originally added for 10.5, but people want the latest version
-  libcurl         | Some formulae require a newer version than macOS provides
-  openssl         | macOS's openssl is deprecated & outdated.
-  libxml2         | Historically, macOS's libxml2 has been buggy
+| Formula            | Reason                                                                                                |
+|--------------------|-------------------------------------------------------------------------------------------------------|
+| ruby, python, perl | People want newer versions                                                                            |
+| bash               | macOS's bash is stuck at 3.2 because newer versions are licensed under GPLv3                          |
+| zsh                | This was a mistake, but it’s too late to remove it                                                    |
+| emacs, vim         | [Too popular to move to dupes](https://github.com/Homebrew/homebrew/pull/21594#issuecomment-21968819) |
+| subversion         | Originally added for 10.5, but people want the latest version                                         |
+| libcurl            | Some formulae require a newer version than macOS provides                                             |
+| openssl            | macOS's openssl is deprecated & outdated.                                                             |
+| libxml2            | Historically, macOS's libxml2 has been buggy                                                          |
 
 We also maintain [a tap](https://github.com/Homebrew/homebrew-dupes) that
 contains many duplicates not otherwise found in Homebrew.
@@ -67,12 +68,8 @@ Formulae in the core repository must have a stable version tagged by
 the upstream project. Tarballs are preferred to git checkouts, and
 tarballs should include the version in the filename whenever possible.
 
-Software that only provides a development/beta, tagged version should be put in
-[homebrew/devel-only](https://github.com/Homebrew/homebrew-devel-only).
 We don’t accept software without a tagged version because they regularly break
-due to upstream changes; we can’t provide [bottles](Bottles.md) for them; and
-we don’t have an automatic update mechanism for `head-only` formulae which
-makes them very quickly outdated.
+due to upstream changes and we can’t provide [bottles](Bottles.md) for them.
 
 ### Bindings
 First check that there is not already a binding available via
@@ -84,7 +81,8 @@ useful to people. Just install the stuff! Having to faff around with
 foo-ruby foo-perl etc. sucks.
 
 ### Niche (or self-submitted) Stuff<a name="Niche_Stuff"></a>
-The software in question must be
+The software in question must be:
+
 * maintained (e.g. upstream is still making new releases)
 * known
 * stable (e.g. not declared "unstable" or "beta" by upstream)

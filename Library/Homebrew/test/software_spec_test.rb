@@ -3,6 +3,7 @@ require "software_spec"
 
 class SoftwareSpecTests < Homebrew::TestCase
   def setup
+    super
     @spec = SoftwareSpec.new
   end
 
@@ -136,6 +137,7 @@ end
 
 class HeadSoftwareSpecTests < Homebrew::TestCase
   def setup
+    super
     @spec = HeadSoftwareSpec.new
   end
 
@@ -150,6 +152,7 @@ end
 
 class BottleSpecificationTests < Homebrew::TestCase
   def setup
+    super
     @spec = BottleSpecification.new
   end
 

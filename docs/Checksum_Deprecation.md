@@ -1,4 +1,4 @@
-# Checksum Deprecation
+# MD5 and SHA-1 Deprecation
 
 During early 2015 Homebrew started the process of deprecating _SHA1_ for package
 integrity verification. Since then every formulae under the Homebrew organisation

@@ -1,34 +1,44 @@
-# README
-Homebrew installs the stuff you need that Apple didn’t.
+# Documentation
 
-- [Install Homebrew](Installation.md)
+## Users
+- [Troubleshooting](Troubleshooting.md)
+- [Installation](Installation.md)
 - [Frequently Asked Questions](FAQ.md)
+- [Common Issues](Common-Issues.md)
+
 - [Tips and Tricks](Tips-N'-Tricks.md)
-- [Gems, Eggs and Perl Modules](Gems,-Eggs-and-Perl-Modules.md)
-- [Homebrew and Python](Homebrew-and-Python.md)
+- [Bottles (binary packages)](Bottles.md)
+- [Taps (third-party repositories)](brew-tap.md)
+- [Interesting Taps and Forks](Interesting-Taps-&-Forks.md)
+- [Anonymous Aggregate User Behaviour Analytics](Analytics.md)
 
-Please note: Homebrew generally works well, but when it doesn’t we’d hope you
-report the bug.
+- [Querying `brew`](Querying-Brew.md)
+- [C++ Standard Libraries](C++-Standard-Libraries.md)
+- [MD5 and SHA-1 Deprecation](Checksum_Deprecation.md)
+- [Custom GCC and Cross Compilers](Custom-GCC-and-cross-compilers.md)
+- [External Commands](External-Commands.md)
+- [Ruby Gems, Python Eggs and Perl Modules](Gems,-Eggs-and-Perl-Modules.md)
+- [Python](Homebrew-and-Python.md)
+- [How To Build Software Outside Homebrew With Homebrew `keg_only` dependencies](How-to-build-software-outside-Homebrew-with-Homebrew-keg-only-dependencies.md)
+- [Xcode](Xcode.md)
+- [Kickstarter Supporters](Kickstarter-Supporters.md)
 
-## Troubleshooting
-First, please run `brew update` (twice) and `brew doctor`.
+## Contributors
+- [How To Open A Pull Request (and get it merged)](How-To-Open-a-Homebrew-Pull-Request.md)
+- [Formula Cookbook](Formula-Cookbook.md)
+- [Acceptable Formulae](Acceptable-Formulae.md)
+- [Formulae Versions](Versions.md)
+- [Node for Formula Authors](Node-for-Formula-Authors.md)
+- [Python for Formula Authors](Python-for-Formula-Authors.md)
+- [Migrating A Formula To A Tap](Migrating-A-Formula-To-A-Tap.md)
+- [Rename A Formula](Rename-A-Formula.md)
+- [How To Create (And Maintain) A Tap](How-to-Create-and-Maintain-a-Tap.md)
+- [Brew Test Bot](Brew-Test-Bot.md)
+- [Prose Style Guidelines](Prose-Style-Guidelines.md)
 
-Second, please read the [Troubleshooting Checklist](Troubleshooting.md).
-
-**If you don’t follow these steps it will take us far longer to help you with
-your problem.**
-
-However! Fixing build issues is easier than you think: try
-`brew edit $FORMULA` and see how you fare.
-
-## Contributing
-Read [CONTRIBUTING.md](/CONTRIBUTING.md).
-
-### Community Forums
--  [@MacHomebrew](https://twitter.com/MacHomebrew)
--  [homebrew-discuss@googlegroups.com](mailto:homebrew-discuss@googlegroups.com) ([archive](https://groups.google.com/forum/#!forum/homebrew-discuss)) - subscribe by sending a mail to  [homebrew-discuss+subscribe@googlegroups.com](mailto:homebrew-discuss+subscribe@googlegroups.com)
--  [freenode.net\#machomebrew](irc://irc.freenode.net/#machomebrew)
-
-## Supporters
-[A list of the awesome people who gave £5 or more to our
-Kickstarter](./Kickstarter-Supporters.md).
+## Maintainers
+- [New Maintainer Checklist](New-Maintainer-Checklist.md)
+- [Maintainers Avoiding Burnout](Maintainers-Avoiding-Burnout.md)
+- [Maintainer Guidelines](Maintainer-Guidelines.md)
+- [Brew Test Bot For Maintainers](Brew-Test-Bot-For-Core-Contributors.md)
+- [Common Issues for Maintainers](Common-Issues-for-Core-Contributors.md)

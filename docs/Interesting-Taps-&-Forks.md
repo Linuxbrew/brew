@@ -1,4 +1,5 @@
 # Interesting Taps & Forks
+
 A Tap is homebrew-speak for a git repository containing extra formulae.
 Homebrew has the capability to add (and remove) multiple taps to your local installation with the `brew tap` and `brew untap` command. Type `man brew` in your Terminal. The main repository https://github.com/Homebrew/homebrew-core, often called `homebrew/core`, is always built-in.
 
@@ -12,15 +13,11 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 
 *   [homebrew/completions](https://github.com/Homebrew/homebrew-completions): Shell completion formulae.
 
-*   [homebrew/devel-only](https://github.com/Homebrew/homebrew-devel-only): A tap for brews that only have pre-release/development versions.
-
 *   [homebrew/dupes](https://github.com/Homebrew/homebrew-dupes): Need GDB or a newer Tk? System duplicates go here.
 
 *   [homebrew/emacs](https://github.com/Homebrew/homebrew-emacs): A tap for Emacs packages.
 
 *   [homebrew/games](https://github.com/Homebrew/homebrew-games): Game or gaming-emulation related formulae.
-
-*   [homebrew/head-only](https://github.com/Homebrew/homebrew-head-only): A tap for brews that only have unstable, unreleased versions. This tap is **deprecated** and doesn’t accept new formulae.
 
 *   [homebrew/nginx](https://github.com/Homebrew/homebrew-nginx): Feature rich Nginx tap for modules.
 
@@ -31,8 +28,6 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 *   [homebrew/science](https://github.com/Homebrew/homebrew-science): A collection of scientific libraries and tools.
 
 *   [homebrew/services](https://github.com/Homebrew/homebrew-services): A tool to start Homebrew formulae's plists with `launchctl`.
-
-*   [homebrew/versions](https://github.com/Homebrew/homebrew-versions): Need e.g. older or newer versions of Postgresql? Older versions of GCC?
 
 *   [homebrew/x11](https://github.com/Homebrew/homebrew-x11): Formulae with hard X11 dependencies.
 
@@ -60,4 +55,4 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 ## Technical Details
 
-Your taps are git repositories located at `$(brew --prefix)/Library/Taps`.
+Your taps are git repositories located at `$(brew --repository)/Library/Taps`.

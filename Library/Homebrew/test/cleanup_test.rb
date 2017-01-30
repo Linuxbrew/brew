@@ -14,14 +14,14 @@ end
 
 class CleanupTests < Homebrew::TestCase
   def setup
+    super
     @ds_store = Pathname.new "#{HOMEBREW_PREFIX}/Library/.DS_Store"
     FileUtils.touch @ds_store
   end
 
   def teardown
     FileUtils.rm_f @ds_store
-    ARGV.delete "--dry-run"
-    ARGV.delete "--prune=all"
+    super
   end
 
   def test_cleanup
@@ -55,9 +55,6 @@ class CleanupTests < Homebrew::TestCase
     refute_predicate f1, :installed?
     refute_predicate f2, :installed?
     assert_predicate f3, :installed?
-  ensure
-    [f1, f2, f3].each(&:clear_cache)
-    f3.rack.rmtree
   end
 
   def test_cleanup_logs
