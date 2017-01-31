@@ -53,6 +53,7 @@ module Homebrew
       if verbose_using_dots && (Time.now - last_dot) > 60
         last_dot = Time.now
         $stderr.print "."
+        $stderr.flush
       end
 
       used_formulae.all? do |ff|
