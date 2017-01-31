@@ -682,7 +682,7 @@ class FormulaTests < Homebrew::TestCase
     stub_formula_loader f1
 
     python = PythonRequirement.new
-    x11 = X11Requirement.new("x11", [:recommended])
+    x11 = (OS.mac? ? X11Requirement : XorgRequirement).new("x11", [:recommended])
     xcode = XcodeRequirement.new(["1.0", :optional])
 
     # Default block should filter out deps that aren't being used
