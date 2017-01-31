@@ -47,7 +47,7 @@ shared_examples_for Hbc::Staged do
     staged.stubs(Pathname: fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/bin/chmod", "-R", "--", "777", fake_pathname]
+      ["/bin/chmod", "-R", "--", "777", fake_pathname]
     )
     staged.set_permissions(fake_pathname.to_s, "777")
   end
@@ -57,7 +57,7 @@ shared_examples_for Hbc::Staged do
     staged.stubs(:Pathname).returns(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/bin/chmod", "-R", "--", "777", fake_pathname, fake_pathname]
+      ["/bin/chmod", "-R", "--", "777", fake_pathname, fake_pathname]
     )
     staged.set_permissions([fake_pathname.to_s, fake_pathname.to_s], "777")
   end
