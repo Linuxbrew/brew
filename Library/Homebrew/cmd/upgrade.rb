@@ -94,14 +94,24 @@ module Homebrew
                     .select(&:directory?)
                     .map { |k| Keg.new(k.resolved_path) }
 
+    if f.opt_prefix.directory?
+      keg = Keg.new(f.opt_prefix.resolved_path)
+      tab = Tab.for_keg(keg)
+    end
+
     fi = FormulaInstaller.new(f)
-    fi.options             = f.build.used_options
-    fi.options            &= f.options
-    fi.build_bottle        = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
-    fi.build_from_source   = ARGV.build_from_source? || ARGV.build_all_from_source?
-    fi.verbose             = ARGV.verbose?
-    fi.quieter             = ARGV.quieter?
-    fi.debug               = ARGV.debug?
+    fi.options  = f.build.used_options
+    fi.options &= f.options
+    fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
+    fi.build_from_source = ARGV.build_from_source? || ARGV.build_all_from_source?
+    fi.verbose = ARGV.verbose?
+    fi.quieter = ARGV.quieter?
+    fi.debug   = ARGV.debug?
+    fi.installed_on_request = !ARGV.named.empty?
+    if tab
+      fi.installed_as_dependency = tab.installed_as_dependency
+      fi.installed_on_request  ||= tab.installed_on_request
+    end
     fi.prelude
 
     oh1 "Upgrading #{f.full_specified_name} #{fi.options.to_a.join " "}"

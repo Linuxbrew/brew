@@ -20,11 +20,6 @@ class PatchingTests < Homebrew::TestCase
     end
   end
 
-  def teardown
-    @_f.clear_cache
-    @_f.patchlist.each { |p| p.clear_cache if p.external? }
-  end
-
   def assert_patched(formula)
     shutup do
       formula.brew do

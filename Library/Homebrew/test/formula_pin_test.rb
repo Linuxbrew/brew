@@ -21,6 +21,7 @@ class FormulaPinTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @f   = FormulaDouble.new
     @pin = FormulaPin.new(@f)
     @f.rack.mkpath
@@ -46,9 +47,5 @@ class FormulaPinTests < Homebrew::TestCase
 
     refute_predicate @pin, :pinned?
     refute_predicate HOMEBREW_PINNED_KEGS, :directory?
-  end
-
-  def teardown
-    @f.rack.rmtree
   end
 end

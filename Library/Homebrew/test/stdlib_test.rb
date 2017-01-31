@@ -4,6 +4,7 @@ require "cxxstdlib"
 
 class CxxStdlibTests < Homebrew::TestCase
   def setup
+    super
     @clang = CxxStdlib.create(:libstdcxx, :clang)
     @gcc   = CxxStdlib.create(:libstdcxx, :gcc)
     @gcc40 = CxxStdlib.create(:libstdcxx, :gcc_4_0)

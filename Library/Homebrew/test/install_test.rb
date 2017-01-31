@@ -113,7 +113,6 @@ class IntegrationCommandTestInstall < IntegrationCommandTestCase
 
   ensure
     ENV.replace(initial_env)
-    repo_path.rmtree
   end
 
   def test_install_with_invalid_option

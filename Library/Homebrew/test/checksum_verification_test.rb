@@ -17,10 +17,6 @@ class ChecksumVerificationTests < Homebrew::TestCase
     end
   end
 
-  def teardown
-    @_f.clear_cache
-  end
-
   def test_good_sha256
     formula do
       sha256 TESTBALL_SHA256

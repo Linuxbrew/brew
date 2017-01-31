@@ -13,6 +13,7 @@ end
 
 class CommandsTests < Homebrew::TestCase
   def setup
+    super
     @cmds = [
       # internal commands
       HOMEBREW_LIBRARY_PATH/"cmd/rbcmd.rb",
@@ -28,6 +29,7 @@ class CommandsTests < Homebrew::TestCase
 
   def teardown
     @cmds.each(&:unlink)
+    super
   end
 
   def test_internal_commands

@@ -382,6 +382,11 @@ class Formula
     PkgVersion.new(version, revision)
   end
 
+  # If this is a `@`-versioned formula.
+  def versioned_formula?
+    name.include?("@")
+  end
+
   # A named Resource for the currently active {SoftwareSpec}.
   # Additional downloads can be defined as {#resource}s.
   # {Resource#stage} will create a temporary directory and yield to a block.
@@ -1519,10 +1524,15 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    recursive_dependencies do |_dependent, dependency|
+    runtime_dependencies = recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
       Dependency.prune if !dependency.required? && build.without?(dependency)
     end
+    runtime_requirement_deps = recursive_requirements do |_, requirement|
+      Requirement.prune if requirement.build?
+      Requirement.prune if !requirement.required? && build.without?(requirement)
+    end.map(&:to_dependency).compact
+    runtime_dependencies + runtime_requirement_deps
   end
 
   # Returns a list of formulae depended on by this formula that aren't
@@ -1618,6 +1628,9 @@ class Formula
         "used_options" => tab.used_options.as_flags,
         "built_as_bottle" => tab.built_as_bottle,
         "poured_from_bottle" => tab.poured_from_bottle,
+        "runtime_dependencies" => tab.runtime_dependencies,
+        "installed_as_dependency" => tab.installed_as_dependency,
+        "installed_on_request" => tab.installed_on_request,
       }
     end
 

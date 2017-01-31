@@ -6,12 +6,9 @@ class CleanerTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     @f = formula("cleaner_test") { url "foo-1.0" }
     @f.prefix.mkpath
-  end
-
-  def teardown
-    @f.rack.rmtree if @f.rack.exist?
   end
 
   def test_clean_file

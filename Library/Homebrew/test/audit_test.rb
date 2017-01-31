@@ -6,11 +6,8 @@ require "dev-cmd/audit"
 
 class FormulaTextTests < Homebrew::TestCase
   def setup
+    super
     @dir = mktmpdir
-  end
-
-  def teardown
-    FileUtils.rm_rf @dir
   end
 
   def formula_text(name, body = nil, options = {})
@@ -58,11 +55,8 @@ end
 
 class FormulaAuditorTests < Homebrew::TestCase
   def setup
+    super
     @dir = mktmpdir
-  end
-
-  def teardown
-    FileUtils.rm_rf @dir
   end
 
   def formula_auditor(name, text, options = {})

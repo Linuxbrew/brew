@@ -26,7 +26,7 @@ With \fB\-\-verbose\fR or \fB\-v\fR, many commands print extra debugging informa
 Install \fIformula\fR\.
 .
 .TP
-\fBremove\fR \fIformula\fR
+\fBuninstall\fR \fIformula\fR
 Uninstall \fIformula\fR\.
 .
 .TP
@@ -258,9 +258,6 @@ If \fB\-\-HEAD\fR is passed, and \fIformula\fR defines it, install the HEAD vers
 .IP
 If \fB\-\-keep\-tmp\fR is passed, the temporary files created during installation are not deleted\.
 .
-.IP
-To install a newer version of HEAD use \fBbrew rm <foo> && brew install \-\-HEAD <foo>\fR\.
-.
 .TP
 \fBinstall\fR \fB\-\-interactive\fR [\fB\-\-git\fR] \fIformula\fR
 Download and patch \fIformula\fR, then open a shell\. This allows the user to run \fB\./configure \-\-help\fR and otherwise determine how to turn the software package into a Homebrew formula\.
@@ -294,7 +291,10 @@ If \fB\-\-force\fR is passed, Homebrew will allow keg\-only formulae to be linke
 .
 .TP
 \fBlinkapps\fR [\fB\-\-local\fR] [\fIformulae\fR]
-Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access\.
+Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access (deprecated)\.
+.
+.IP
+Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
 .
 .IP
 If no \fIformulae\fR are provided, all of them will have their apps symlinked\.
@@ -508,7 +508,10 @@ If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all files which
 .
 .TP
 \fBunlinkapps\fR [\fB\-\-local\fR] [\fB\-\-dry\-run\fR] [\fIformulae\fR]
-Remove symlinks created by \fBbrew linkapps\fR from \fB/Applications\fR\.
+Remove symlinks created by \fBbrew linkapps\fR from \fB/Applications\fR (deprecated)\.
+.
+.IP
+Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
 .
 .IP
 If no \fIformulae\fR are provided, all linked apps will be removed\.

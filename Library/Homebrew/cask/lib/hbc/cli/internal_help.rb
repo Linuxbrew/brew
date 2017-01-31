@@ -16,7 +16,7 @@ module Hbc
       end
 
       def self.help
-        "Print help strings for unstable internal-use commands"
+        "print help strings for unstable internal-use commands"
       end
     end
   end

@@ -4,6 +4,7 @@ require "fileutils"
 
 class GPG2RequirementTests < Homebrew::TestCase
   def setup
+    super
     @dir = Pathname.new(mktmpdir)
     (@dir/"bin/gpg").write <<-EOS.undent
       #!/bin/bash
@@ -14,6 +15,7 @@ class GPG2RequirementTests < Homebrew::TestCase
 
   def teardown
     FileUtils.rm_rf @dir
+    super
   end
 
   def test_satisfied

@@ -5,12 +5,14 @@ require "diagnostic"
 
 class DiagnosticChecksTest < Homebrew::TestCase
   def setup
+    super
     @env = ENV.to_hash
     @checks = Homebrew::Diagnostic::Checks.new
   end
 
   def teardown
     ENV.replace(@env)
+    super
   end
 
   def test_inject_file_list
@@ -104,8 +106,6 @@ class DiagnosticChecksTest < Homebrew::TestCase
 
     assert_match "/usr/bin occurs before #{HOMEBREW_PREFIX}/bin",
       @checks.check_user_path_1
-  ensure
-    bin.rmtree
   end
 
   def test_check_user_path_bin

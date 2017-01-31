@@ -5,6 +5,8 @@ module OS
     module XQuartz
       module_function
 
+      # TODO: confirm this path when you have internet
+      DEFAULT_BUNDLE_PATH = Pathname.new("Applications/Utilities/XQuartz.app").freeze
       FORGE_BUNDLE_ID = "org.macosforge.xquartz.X11".freeze
       APPLE_BUNDLE_ID = "org.x.X11".freeze
       FORGE_PKG_ID = "org.macosforge.xquartz.pkg".freeze
@@ -56,6 +58,11 @@ module OS
       end
 
       def bundle_path
+        # Use the default location if it exists.
+        return DEFAULT_BUNDLE_PATH if DEFAULT_BUNDLE_PATH.exist?
+
+        # Ask Spotlight where XQuartz is. If the user didn't install XQuartz
+        # in the conventional place, this is our only option.
         MacOS.app_with_bundle_id(FORGE_BUNDLE_ID, APPLE_BUNDLE_ID)
       end
 

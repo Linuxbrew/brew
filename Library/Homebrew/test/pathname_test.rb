@@ -7,15 +7,11 @@ module PathnameTestExtension
   include FileUtils
 
   def setup
+    super
     @src  = Pathname.new(mktmpdir)
     @dst  = Pathname.new(mktmpdir)
     @file = @src/"foo"
     @dir  = @src/"bar"
-  end
-
-  def teardown
-    rmtree(@src)
-    rmtree(@dst)
   end
 end
 

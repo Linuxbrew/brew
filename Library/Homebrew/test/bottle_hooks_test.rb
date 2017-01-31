@@ -21,6 +21,7 @@ class BottleHookTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @fi = FormulaInstaller.new FormulaDouble.new
   end
 
@@ -47,5 +48,6 @@ class BottleHookTests < Homebrew::TestCase
 
   def teardown
     Homebrew::Hooks::Bottles.reset_hooks
+    super
   end
 end

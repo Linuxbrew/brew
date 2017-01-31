@@ -44,9 +44,6 @@
 #:    If `--keep-tmp` is passed, the temporary files created during installation
 #:    are not deleted.
 #:
-#:    To install a newer version of HEAD use
-#:    `brew rm <foo> && brew install --HEAD <foo>`.
-#:
 #:  * `install` `--interactive` [`--git`] <formula>:
 #:    Download and patch <formula>, then open a shell. This allows the user to
 #:    run `./configure --help` and otherwise determine how to turn the software
@@ -187,6 +184,14 @@ module Homebrew
           # FormulaInstaller will handle this case.
           formulae << f
         end
+
+        # Even if we don't install this formula mark it as no longer just
+        # installed as a dependency.
+        next unless f.opt_prefix.directory?
+        keg = Keg.new(f.opt_prefix.resolved_path)
+        tab = Tab.for_keg(keg)
+        tab.installed_on_request = true
+        tab.write
       end
 
       perform_preinstall_checks

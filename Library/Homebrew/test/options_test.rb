@@ -15,6 +15,7 @@ end
 
 class OptionTests < Homebrew::TestCase
   def setup
+    super
     @option = Option.new("foo")
   end
 
@@ -43,6 +44,7 @@ end
 
 class DeprecatedOptionTests < Homebrew::TestCase
   def setup
+    super
     @deprecated_option = DeprecatedOption.new("foo", "bar")
   end
 
@@ -68,6 +70,7 @@ end
 
 class OptionsTests < Homebrew::TestCase
   def setup
+    super
     @options = Options.new
   end
 

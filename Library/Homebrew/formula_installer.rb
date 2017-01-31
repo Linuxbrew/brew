@@ -33,6 +33,7 @@ class FormulaInstaller
 
   attr_reader :formula
   attr_accessor :options, :build_bottle, :invalid_option_names
+  attr_accessor :installed_as_dependency, :installed_on_request
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :force_bottle
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
@@ -51,6 +52,8 @@ class FormulaInstaller
     @verbose = false
     @quieter = false
     @debug = false
+    @installed_as_dependency = false
+    @installed_on_request = true
     @options = Options.new
     @invalid_option_names = []
     @requirement_messages = []
@@ -251,6 +254,12 @@ class FormulaInstaller
       category = "install"
       action = ([formula.full_name] + options).join(" ")
       Utils::Analytics.report_event(category, action)
+
+      if installed_on_request
+        category = "install_on_request"
+        action = ([formula.full_name] + options).join(" ")
+        Utils::Analytics.report_event(category, action)
+      end
     end
 
     @@attempted << formula
@@ -288,6 +297,12 @@ class FormulaInstaller
       brew_prefix = formula.prefix/".brew"
       brew_prefix.mkdir
       Pathname(brew_prefix/"#{formula.name}.rb").atomic_write(s)
+
+      keg = Keg.new(formula.prefix)
+      tab = Tab.for_keg(keg)
+      tab.installed_as_dependency = installed_as_dependency
+      tab.installed_on_request = installed_on_request
+      tab.write
     end
 
     build_bottle_postinstall if build_bottle?
@@ -371,8 +386,8 @@ class FormulaInstaller
     raise UnsatisfiedRequirements, fatals
   end
 
-  def install_requirement_default_formula?(req, dependent, build)
-    return false unless req.default_formula?
+  def install_requirement_formula?(req, dependent, build)
+    return false unless req.to_dependency
     return true unless req.satisfied?
     return false if req.run?
     install_bottle_for?(dependent, build) || build_bottle?
@@ -391,7 +406,7 @@ class FormulaInstaller
           Requirement.prune
         elsif req.build? && install_bottle_for?(dependent, build)
           Requirement.prune
-        elsif install_requirement_default_formula?(req, dependent, build)
+        elsif install_requirement_formula?(req, dependent, build)
           dep = req.to_dependency
           deps.unshift(dep)
           formulae.unshift(dep.to_formula)
@@ -520,6 +535,8 @@ class FormulaInstaller
     fi.build_from_source  = ARGV.build_formula_from_source?(df)
     fi.verbose            = verbose? && !quieter?
     fi.debug              = debug?
+    fi.installed_as_dependency = true
+    fi.installed_on_request = false
     fi.prelude
     oh1 "Installing #{formula.full_name} dependency: #{Formatter.identifier(dep.name)}"
     fi.install
@@ -845,6 +862,9 @@ class FormulaInstaller
     tab.poured_from_bottle = true
     tab.time = Time.now.to_i
     tab.head = HOMEBREW_REPOSITORY.git_head
+    tab.source["path"] = formula.specified_path.to_s
+    tab.installed_as_dependency = installed_as_dependency
+    tab.installed_on_request = installed_on_request
     tab.write
   end
 

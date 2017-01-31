@@ -4,6 +4,8 @@ require "formula"
 
 class TabTests < Homebrew::TestCase
   def setup
+    super
+
     @used = Options.create(%w[--with-foo --without-bar])
     @unused = Options.create(%w[--with-baz --without-qux])
 
@@ -260,14 +262,11 @@ end
 
 class TabLoadingTests < Homebrew::TestCase
   def setup
+    super
     @f = formula { url "foo-1.0" }
     @f.prefix.mkpath
     @path = @f.prefix.join(Tab::FILENAME)
     @path.write TEST_FIXTURE_DIR.join("receipt.json").read
-  end
-
-  def teardown
-    @f.rack.rmtree
   end
 
   def test_for_keg

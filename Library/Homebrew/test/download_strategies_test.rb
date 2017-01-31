@@ -2,11 +2,12 @@ require "testing_env"
 require "download_strategy"
 
 class ResourceDouble
-  attr_reader :url, :specs, :version
+  attr_reader :url, :specs, :version, :mirrors
 
   def initialize(url = "http://example.com/foo.tar.gz", specs = {})
     @url = url
     @specs = specs
+    @mirrors = []
   end
 end
 
@@ -14,6 +15,7 @@ class AbstractDownloadStrategyTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     @name = "foo"
     @resource = ResourceDouble.new
     @strategy = AbstractDownloadStrategy.new(@name, @resource)
@@ -60,19 +62,91 @@ class VCSDownloadStrategyTests < Homebrew::TestCase
   end
 end
 
+class GitHubPrivateRepositoryDownloadStrategyTests < Homebrew::TestCase
+  def setup
+    super
+    resource = ResourceDouble.new("https://github.com/owner/repo/archive/1.1.5.tar.gz")
+    ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
+    GitHub.stubs(:repository).returns {}
+    @strategy = GitHubPrivateRepositoryDownloadStrategy.new("foo", resource)
+  end
+
+  def test_set_github_token
+    assert_equal "token", @strategy.instance_variable_get(:@github_token)
+  end
+
+  def test_parse_url_pattern
+    assert_equal "owner", @strategy.instance_variable_get(:@owner)
+    assert_equal "repo", @strategy.instance_variable_get(:@repo)
+    assert_equal "archive/1.1.5.tar.gz", @strategy.instance_variable_get(:@filepath)
+  end
+
+  def test_download_url
+    expected = "https://token@github.com/owner/repo/archive/1.1.5.tar.gz"
+    assert_equal expected, @strategy.download_url
+  end
+end
+
+class GitHubPrivateRepositoryReleaseDownloadStrategyTests < Homebrew::TestCase
+  def setup
+    super
+    resource = ResourceDouble.new("https://github.com/owner/repo/releases/download/tag/foo_v0.1.0_darwin_amd64.tar.gz")
+    ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
+    GitHub.stubs(:repository).returns {}
+    @strategy = GitHubPrivateRepositoryReleaseDownloadStrategy.new("foo", resource)
+  end
+
+  def test_parse_url_pattern
+    assert_equal "owner", @strategy.instance_variable_get(:@owner)
+    assert_equal "repo", @strategy.instance_variable_get(:@repo)
+    assert_equal "tag", @strategy.instance_variable_get(:@tag)
+    assert_equal "foo_v0.1.0_darwin_amd64.tar.gz", @strategy.instance_variable_get(:@filename)
+  end
+
+  def test_download_url
+    @strategy.stubs(:resolve_asset_id).returns(456)
+    expected = "https://token@api.github.com/repos/owner/repo/releases/assets/456"
+    assert_equal expected, @strategy.download_url
+  end
+
+  def test_resolve_asset_id
+    release_metadata = {
+      "assets" => [
+        {
+          "id" => 123,
+          "name" => "foo_v0.1.0_linux_amd64.tar.gz",
+        },
+        {
+          "id" => 456,
+          "name" => "foo_v0.1.0_darwin_amd64.tar.gz",
+        },
+      ],
+    }
+    @strategy.stubs(:fetch_release_metadata).returns(release_metadata)
+    assert_equal 456, @strategy.send(:resolve_asset_id)
+  end
+
+  def test_fetch_release_metadata
+    expected_release_url = "https://api.github.com/repos/owner/repo/releases/tags/tag"
+    github_mock = MiniTest::Mock.new
+    github_mock.expect :call, {}, [expected_release_url]
+    GitHub.stub :open, github_mock do
+      @strategy.send(:fetch_release_metadata)
+    end
+    github_mock.verify
+  end
+end
+
 class GitDownloadStrategyTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
     resource = ResourceDouble.new("https://github.com/homebrew/foo")
     @commit_id = 1
     @strategy = GitDownloadStrategy.new("baz", resource)
     @cached_location = @strategy.cached_location
     mkpath @cached_location
-  end
-
-  def teardown
-    rmtree @cached_location
   end
 
   def git_commit_all
@@ -162,6 +236,7 @@ end
 
 class DownloadStrategyDetectorTests < Homebrew::TestCase
   def setup
+    super
     @d = DownloadStrategyDetector.new
   end
 

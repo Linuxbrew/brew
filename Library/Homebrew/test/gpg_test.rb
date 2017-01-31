@@ -3,6 +3,7 @@ require "gpg"
 
 class GpgTest < Homebrew::TestCase
   def setup
+    super
     skip "GPG Unavailable" unless Gpg.available?
     @dir = Pathname.new(mktmpdir)
   end
@@ -14,7 +15,5 @@ class GpgTest < Homebrew::TestCase
         assert_predicate @dir/".gnupg/secring.gpg", :exist?
       end
     end
-  ensure
-    @dir.rmtree
   end
 end

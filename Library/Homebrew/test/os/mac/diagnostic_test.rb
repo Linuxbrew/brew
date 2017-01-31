@@ -5,12 +5,14 @@ require "diagnostic"
 
 class OSMacDiagnosticChecksTest < Homebrew::TestCase
   def setup
+    super
     @env = ENV.to_hash
     @checks = Homebrew::Diagnostic::Checks.new
   end
 
   def teardown
     ENV.replace(@env)
+    super
   end
 
   def test_check_for_other_package_managers

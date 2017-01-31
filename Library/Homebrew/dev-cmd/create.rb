@@ -142,12 +142,10 @@ class FormulaCreator
   def generate!
     raise "#{path} already exists" if path.exist?
 
-    if version.nil?
+    if version.nil? || version.null?
       opoo "Version cannot be determined from URL."
       puts "You'll need to add an explicit 'version' to the formula."
-    end
-
-    if fetch? && version
+    elsif fetch?
       r = Resource.new
       r.url(url)
       r.version(version)

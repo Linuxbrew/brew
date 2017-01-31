@@ -4,6 +4,7 @@ require "options"
 
 class BuildOptionsTests < Homebrew::TestCase
   def setup
+    super
     args = Options.create(%w[--with-foo --with-bar --without-qux])
     opts = Options.create(%w[--with-foo --with-bar --without-baz --without-qux])
     @build = BuildOptions.new(args, opts)
