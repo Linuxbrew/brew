@@ -56,6 +56,11 @@ class ExceptionsTest < Homebrew::TestCase
       FormulaClassUnavailableError.new("foo", "foo.rb", "Foo", list).to_s
   end
 
+  def test_formula_unreadable_error
+    formula_error = LoadError.new("bar")
+    assert_equal "foo: bar", FormulaUnreadableError.new("foo", formula_error).to_s
+  end
+
   def test_tap_unavailable_error
     assert_equal "No available tap foo.\n", TapUnavailableError.new("foo").to_s
   end
