@@ -36,6 +36,7 @@ require "cmd/search"
 require "cmd/style"
 require "date"
 require "blacklist"
+require "digest"
 
 module Homebrew
   module_function
@@ -1479,21 +1480,23 @@ class ResourceAuditor
 
     return unless @online
     urls.each do |url|
-      next unless url.start_with? "http:"
-      # Check for insecure mirrors
-      details =  get_content_details(url, 1)
-      secure_url = url.sub "http", "https"
-      secure_details = get_content_details(secure_url, 2)
+      check_insecure_mirror(url) if url.start_with? "http:"
+    end
+  end
 
-      next unless details[:status].start_with?("2") && secure_details[:status].start_with?("2")
+  def check_insecure_mirror(url)
+    details =  get_content_details(url)
+    secure_url = url.sub "http", "https"
+    secure_details = get_content_details(secure_url)
 
-      if (details[:etag] && details[:etag] == secure_details[:etag]) \
-        || (details[:content_length] && details[:content_length] == secure_details[:content_length]) \
-        || are_same_file(details[:filename], secure_details[:filename])
-        problem "The URL #{url} could use HTTPS rather than HTTP"
-      end
+    return if !details[:status].start_with?("2") || !secure_details[:status].start_with?("2")
 
-      remove_files details[:filename], secure_details[:filename]
+    etag_match = details[:etag] && details[:etag] == secure_details[:etag]
+    content_length_match = details[:content_length] && details[:content_length] == secure_details[:content_length]
+    file_match = details[:file_hash] == secure_details[:file_hash]
+
+    if etag_match || content_length_match || file_match
+      problem "The URL #{url} could use HTTPS rather than HTTP"
     end
   end
 
@@ -1501,22 +1504,15 @@ class ResourceAuditor
     @problems << text
   end
 
-  def get_content_details(url, id)
+  def get_content_details(url)
     out = {}
-    out_file = "/tmp/_c#{id}"
-    headers, = curl_output "--connect-timeout", "15", "--output", out_file, "--dump-header", "/dev/stdout", url
+    output, = curl_output "--connect-timeout", "15", "--include", url
+    split = output.partition("\r\n\r\n")
+    headers = split.first
     out[:status] = headers[%r{HTTP\/.* (\d+)}, 1]
     out[:etag] = headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2]
     out[:content_length] = headers[/Content-Length: (\d+)/, 1]
-    out[:filename] = out_file
+    out[:file_hash] = Digest::SHA256.digest split.last
     out
-  end
-
-  def are_same_file(one, two)
-    quiet_system "diff", "--report-identical-files", "--binary", "--speed-large-files", one, two
-  end
-
-  def remove_files(*files)
-    quiet_system "rm", "-f", *files
   end
 end
