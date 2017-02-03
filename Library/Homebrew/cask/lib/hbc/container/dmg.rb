@@ -43,11 +43,16 @@ module Hbc
           next unless mountpath.exist?
 
           begin
-            tries ||= 2
-            @command.run("/usr/sbin/diskutil",
-                         args:         ["eject", mountpath],
-                         print_stderr: false)
-
+            tries ||= 3
+            if tries > 1
+              @command.run("/usr/sbin/diskutil",
+                           args:         ["eject", mountpath],
+                           print_stderr: false)
+            else
+              @command.run("/usr/sbin/diskutil",
+                           args:         ["unmount", "force", mountpath],
+                           print_stderr: false)
+            end
             raise CaskError, "Failed to eject #{mountpath}" if mountpath.exist?
           rescue CaskError => e
             raise e if (tries -= 1).zero?
