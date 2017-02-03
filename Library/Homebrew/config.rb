@@ -2,6 +2,8 @@ unless ENV["HOMEBREW_BREW_FILE"]
   raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
 
+require "constants"
+
 # Path to `bin/brew` main executable in HOMEBREW_PREFIX
 HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
 
@@ -48,7 +50,3 @@ end
 
 # Load path used by standalone scripts to access the Homebrew code base
 HOMEBREW_LOAD_PATH = HOMEBREW_LIBRARY_PATH
-
-# RuboCop version used for `brew style` and `brew cask style`
-HOMEBREW_RUBOCOP_VERSION = "0.47.1".freeze
-HOMEBREW_RUBOCOP_CASK_VERSION = "~> 0.10.6".freeze # has to be updated when RuboCop version changes
