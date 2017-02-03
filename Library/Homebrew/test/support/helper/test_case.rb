@@ -1,3 +1,6 @@
+require "formulary"
+require "tap"
+
 module Homebrew
   class TestCase < ::Minitest::Test
     require "test/support/helper/fs_leak_logger"
@@ -12,7 +15,21 @@ module Homebrew
     TEST_SHA1   = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
     TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
 
+    TEST_DIRECTORIES = [
+      CoreTap.instance.path/"Formula",
+      HOMEBREW_CACHE,
+      HOMEBREW_CACHE_FORMULA,
+      HOMEBREW_CELLAR,
+      HOMEBREW_LOCK_DIR,
+      HOMEBREW_LOGS,
+      HOMEBREW_TEMP,
+    ].freeze
+
     def setup
+      # These directories need to be created before
+      # `FSLeakLogger` is called with `super`.
+      TEST_DIRECTORIES.each(&:mkpath)
+
       super
 
       @__argv = ARGV.dup
@@ -25,15 +42,10 @@ module Homebrew
 
       Tab.clear_cache
 
-      coretap = CoreTap.new
-      paths_to_delete = [
+      FileUtils.rm_rf [
+        TEST_DIRECTORIES.map(&:children),
         HOMEBREW_LINKED_KEGS,
         HOMEBREW_PINNED_KEGS,
-        HOMEBREW_CELLAR.children,
-        HOMEBREW_CACHE.children,
-        HOMEBREW_LOCK_DIR.children,
-        HOMEBREW_LOGS.children,
-        HOMEBREW_TEMP.children,
         HOMEBREW_PREFIX/".git",
         HOMEBREW_PREFIX/"bin",
         HOMEBREW_PREFIX/"share",
@@ -45,12 +57,10 @@ module Homebrew
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-shallow",
         HOMEBREW_REPOSITORY/".git",
-        coretap.path/".git",
-        coretap.alias_dir,
-        coretap.formula_dir.children,
-        coretap.path/"formula_renames.json",
-      ].flatten
-      FileUtils.rm_rf paths_to_delete
+        CoreTap.instance.path/".git",
+        CoreTap.instance.alias_dir,
+        CoreTap.instance.path/"formula_renames.json",
+      ]
 
       super
     end

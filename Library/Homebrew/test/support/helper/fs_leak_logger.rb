@@ -9,13 +9,13 @@ module Test
         klass.make_my_diffs_pretty!
       end
 
-      def before_setup
+      def setup
         @__files_before_test = []
         Find.find(TEST_TMPDIR) { |f| @__files_before_test << f.sub(TEST_TMPDIR, "") }
         super
       end
 
-      def after_teardown
+      def teardown
         super
         files_after_test = []
         Find.find(TEST_TMPDIR) { |f| files_after_test << f.sub(TEST_TMPDIR, "") }

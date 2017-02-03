@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    ansi (1.5.0)
+    builder (3.2.3)
     codecov (0.1.9)
       json
       simplecov
@@ -9,11 +11,17 @@ GEM
     json (2.0.3)
     metaclass (0.0.4)
     minitest (5.10.1)
+    minitest-reporters (1.1.14)
+      ansi
+      builder
+      minitest (>= 5.0)
+      ruby-progressbar
     mocha (1.2.1)
       metaclass (~> 0.0.1)
     parallel (1.10.0)
     parallel_tests (2.13.0)
       parallel
+    ruby-progressbar (1.8.1)
     simplecov (0.13.0)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
@@ -27,6 +35,7 @@ PLATFORMS
 DEPENDENCIES
   codecov
   minitest
+  minitest-reporters
   mocha
   parallel_tests
   simplecov

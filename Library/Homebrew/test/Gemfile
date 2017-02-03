@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem "mocha"
 gem "minitest"
+gem "minitest-reporters"
 gem "parallel_tests"
 
 group :coverage do
