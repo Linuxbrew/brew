@@ -36,11 +36,6 @@ module Hbc
       build_cask(header_token, &block)
     end
 
-    def test_cask(header_token, &block)
-      @klass = TestCask
-      build_cask(header_token, &block)
-    end
-
     def build_cask(header_token, &block)
       raise CaskTokenDoesNotMatchError.new(@token, header_token) unless @token == header_token
 

@@ -35,10 +35,6 @@ Mocha::Integration::MiniTest.activate
 # our baby
 require "hbc"
 
-module Hbc
-  class TestCask < Cask; end
-end
-
 # create and override default directories
 Hbc.appdir = Pathname.new(TEST_TMPDIR).join("Applications").tap(&:mkpath)
 Hbc.cache.mkpath
