@@ -5,13 +5,13 @@ describe Hbc::Pkg do
     it "removes files and dirs referenced by the pkg" do
       pkg = Hbc::Pkg.new("my.fake.pkg", Hbc::NeverSudoSystemCommand)
 
-      some_files = Array.new(3) { Pathname(Tempfile.new("testfile").path) }
+      some_files = Array.new(3) { Pathname.new(Tempfile.new("testfile").path) }
       pkg.stubs(:pkgutil_bom_files).returns some_files
 
-      some_specials = Array.new(3) { Pathname(Tempfile.new("testfile").path) }
+      some_specials = Array.new(3) { Pathname.new(Tempfile.new("testfile").path) }
       pkg.stubs(:pkgutil_bom_specials).returns some_specials
 
-      some_dirs = Array.new(3) { Pathname(Dir.mktmpdir) }
+      some_dirs = Array.new(3) { Pathname.new(Dir.mktmpdir) }
       pkg.stubs(:pkgutil_bom_dirs).returns some_dirs
 
       pkg.stubs(:forget)
@@ -50,7 +50,7 @@ describe Hbc::Pkg do
     it "cleans broken symlinks, but leaves AOK symlinks" do
       pkg = Hbc::Pkg.new("my.fake.pkg", Hbc::NeverSudoSystemCommand)
 
-      fake_dir  = Pathname(Dir.mktmpdir)
+      fake_dir  = Pathname.new(Dir.mktmpdir)
       fake_file = fake_dir.join("ima_file").tap { |path| FileUtils.touch(path) }
 
       intact_symlink = fake_dir.join("intact_symlink").tap { |path| path.make_symlink(fake_file) }
@@ -71,7 +71,7 @@ describe Hbc::Pkg do
     it "cleans files incorrectly reported as directories" do
       pkg = Hbc::Pkg.new("my.fake.pkg", Hbc::NeverSudoSystemCommand)
 
-      fake_dir  = Pathname(Dir.mktmpdir)
+      fake_dir  = Pathname.new(Dir.mktmpdir)
       fake_file = fake_dir.join("ima_file_pretending_to_be_a_dir").tap { |path| FileUtils.touch(path) }
 
       pkg.stubs(:pkgutil_bom_specials).returns([])
@@ -88,7 +88,7 @@ describe Hbc::Pkg do
     it "snags permissions on ornery dirs, but returns them afterwords" do
       pkg = Hbc::Pkg.new("my.fake.pkg", Hbc::NeverSudoSystemCommand)
 
-      fake_dir = Pathname(Dir.mktmpdir)
+      fake_dir = Pathname.new(Dir.mktmpdir)
 
       fake_file = fake_dir.join("ima_installed_file").tap { |path| FileUtils.touch(path) }
 
