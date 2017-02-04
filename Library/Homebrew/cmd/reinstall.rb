@@ -25,19 +25,21 @@ module Homebrew
       backup keg
     end
 
-    options = BuildOptions.new(Options.create(ARGV.flags_only), f.options).used_options
+    build_options = BuildOptions.new(Options.create(ARGV.flags_only), f.options)
+    options = build_options.used_options
     options |= f.build.used_options
     options &= f.options
 
     fi = FormulaInstaller.new(f)
-    fi.options             = options
-    fi.build_bottle        = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
-    fi.build_from_source   = ARGV.build_from_source? || ARGV.build_all_from_source?
-    fi.force_bottle        = ARGV.force_bottle?
-    fi.interactive         = ARGV.interactive?
-    fi.git                 = ARGV.git?
-    fi.verbose             = ARGV.verbose?
-    fi.debug               = ARGV.debug?
+    fi.options              = options
+    fi.invalid_option_names = build_options.invalid_option_names
+    fi.build_bottle         = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
+    fi.build_from_source    = ARGV.build_from_source? || ARGV.build_all_from_source?
+    fi.force_bottle         = ARGV.force_bottle?
+    fi.interactive          = ARGV.interactive?
+    fi.git                  = ARGV.git?
+    fi.verbose              = ARGV.verbose?
+    fi.debug                = ARGV.debug?
     fi.prelude
 
     oh1 "Reinstalling #{f.full_name} #{options.to_a.join " "}"
