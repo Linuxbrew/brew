@@ -7,25 +7,28 @@ module Hbc
         ohai "Homebrew-Cask Staging Location:", render_staging_location(Hbc.caskroom)
         ohai "Homebrew-Cask Cached Downloads:", render_cached_downloads
         ohai "Homebrew-Cask Taps:"
-        puts render_taps(Hbc.default_tap)
-        puts render_taps(*alt_taps)
+        puts render_taps(Hbc.default_tap, *alt_taps)
         ohai "Contents of $LOAD_PATH:", render_load_path($LOAD_PATH)
         ohai "Environment Variables:"
-        render_env_var("RUBYLIB")
-        render_env_var("RUBYOPT")
-        render_env_var("RUBYPATH")
-        render_env_var("RBENV_VERSION")
-        render_env_var("CHRUBY_VERSION")
-        render_env_var("GEM_HOME")
-        render_env_var("GEM_PATH")
-        render_env_var("BUNDLE_PATH")
-        render_env_var("PATH")
-        render_env_var("SHELL")
-        locale_variables
+
+        environment_variables = [
+          "RUBYLIB",
+          "RUBYOPT",
+          "RUBYPATH",
+          "RBENV_VERSION",
+          "CHRUBY_VERSION",
+          "GEM_HOME",
+          "GEM_PATH",
+          "BUNDLE_PATH",
+          "PATH",
+          "SHELL",
+        ]
+
+        (locale_variables + environment_variables).sort.each(&method(:render_env_var))
       end
 
       def self.locale_variables
-        ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).sort.each(&method(:render_env_var))
+        ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).sort
       end
 
       def self.none_string
@@ -63,10 +66,9 @@ module Hbc
       end
 
       def self.render_env_var(var)
-        if ENV.key?(var)
-          var = %Q(#{var}="#{ENV[var]}")
-          puts user_tilde(var)
-        end
+        return unless ENV.key?(var)
+        var = %Q(#{var}="#{ENV[var]}")
+        puts user_tilde(var)
       end
 
       def self.user_tilde(path)
