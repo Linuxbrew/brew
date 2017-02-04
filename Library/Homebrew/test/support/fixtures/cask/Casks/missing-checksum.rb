@@ -1,4 +1,4 @@
-test_cask 'missing-checksum' do
+cask 'missing-checksum' do
   version '1.2.3'
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"

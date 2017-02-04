@@ -1,4 +1,4 @@
-test_cask 'sourceforge-version-latest-correct-url-format' do
+cask 'sourceforge-version-latest-correct-url-format' do
   version :latest
 
   url 'https://sourceforge.net/projects/something/files/latest/download'

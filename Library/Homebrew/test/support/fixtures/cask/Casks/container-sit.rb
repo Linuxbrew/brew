@@ -1,4 +1,4 @@
-test_cask 'container-sit' do
+cask 'container-sit' do
   version '1.2.3'
   sha256 '0d21a64dce625044345c8ecca888e5439feaf254dac7f884917028a744f93cf3'
 
