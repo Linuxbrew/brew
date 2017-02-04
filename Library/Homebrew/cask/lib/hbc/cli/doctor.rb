@@ -106,13 +106,11 @@ module Hbc
 
       def self.render_cached_downloads
         cleanup = CLI::Cleanup.default
-        files = cleanup.cache_files
-        count = files.count
+        count = cleanup.cache_files.count
         size = cleanup.disk_cleanup_size
-        size_msg = "#{number_readable(count)} files, #{disk_usage_readable(size)}"
-        warn_msg = error_string('warning: run "brew cask cleanup"')
-        size_msg << " #{warn_msg}" if count > 0
-        [Hbc.cache, size_msg]
+        msg = user_tilde(Hbc.cache.to_s)
+        msg << " (#{number_readable(count)} files, #{disk_usage_readable(size)})" unless count.zero?
+        msg
       end
 
       def self.help
