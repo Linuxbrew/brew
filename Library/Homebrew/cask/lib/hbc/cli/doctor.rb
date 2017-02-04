@@ -65,8 +65,12 @@ module Hbc
       def self.render_env_var(var)
         if ENV.key?(var)
           var = %Q(#{var}="#{ENV[var]}")
-          puts var.gsub(ENV["HOME"], "~")
+          puts user_tilde(var)
         end
+      end
+
+      def self.user_tilde(path)
+        path.gsub(ENV["HOME"], "~")
       end
 
       # This could be done by calling into Homebrew, but the situation
@@ -84,7 +88,7 @@ module Hbc
       end
 
       def self.render_staging_location(path)
-        path = Pathname.new(path)
+        path = Pathname.new(user_tilde(path.to_s))
         if !path.exist?
           "#{path} #{error_string "error: path does not exist"}}"
         elsif !path.writable?
@@ -95,6 +99,7 @@ module Hbc
       end
 
       def self.render_load_path(paths)
+        paths.map(&method(:user_tilde))
         return "#{none_string} #{error_string}" if [*paths].empty?
         paths
       end
