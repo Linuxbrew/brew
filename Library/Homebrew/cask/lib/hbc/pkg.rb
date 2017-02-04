@@ -98,8 +98,8 @@ module Hbc
       end
     end
 
-    # Some pkgs (microsoft office for one) leave files (generally nibs) but
-    # report them as directories.  We remove these as files instead.
+    # Some pkgs incorrectly report files (generally nibs)
+    # as directories; we remove these as files instead.
     def _delete_broken_file_dir(path)
       return unless path.file? && !path.symlink?
       @command.run!("/bin/rm", args: ["-f", "--", path], sudo: true)

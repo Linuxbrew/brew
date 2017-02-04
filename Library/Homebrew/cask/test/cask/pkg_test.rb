@@ -68,11 +68,11 @@ describe Hbc::Pkg do
       fake_dir.must_be :exist?
     end
 
-    it "chokes on directories that are really files" do
+    it "cleans files incorrectly reported as directories" do
       pkg = Hbc::Pkg.new("my.fake.pkg", Hbc::NeverSudoSystemCommand)
 
       fake_dir  = Pathname(Dir.mktmpdir)
-      fake_file = fake_dir.join("ima_file").tap { |path| FileUtils.touch(path) }
+      fake_file = fake_dir.join("ima_file_pretending_to_be_a_dir").tap { |path| FileUtils.touch(path) }
 
       pkg.stubs(:pkgutil_bom_specials).returns([])
       pkg.stubs(:pkgutil_bom_files).returns([])
