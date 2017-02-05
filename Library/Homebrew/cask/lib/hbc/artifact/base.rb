@@ -27,10 +27,6 @@ module Hbc
 
       attr_reader :force
 
-      def zap_phase
-        odebug "Nothing to do. The #{self.class.artifact_name} artifact has no zap phase."
-      end
-
       # TODO: this sort of logic would make more sense in dsl.rb, or a
       #       constructor called from dsl.rb, so long as that isn't slow.
       def self.read_script_arguments(arguments, stanza, default_arguments = {}, override_arguments = {}, key = nil)
