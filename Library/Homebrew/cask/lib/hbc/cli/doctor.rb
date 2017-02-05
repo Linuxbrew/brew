@@ -2,14 +2,14 @@ module Hbc
   class CLI
     class Doctor < Base
       def self.run
-        ohai "Homebrew-Cask Version:", Hbc.full_version
-        ohai "Homebrew-Cask Install Location:", render_install_location
-        ohai "Homebrew-Cask Staging Location:", render_staging_location(Hbc.caskroom)
-        ohai "Homebrew-Cask Cached Downloads:", render_cached_downloads
+        ohai "Homebrew-Cask Version", Hbc.full_version
+        ohai "Homebrew-Cask Install Location", render_install_location
+        ohai "Homebrew-Cask Staging Location", render_staging_location(Hbc.caskroom)
+        ohai "Homebrew-Cask Cached Downloads", render_cached_downloads
         ohai "Homebrew-Cask Taps:"
         puts render_taps(Hbc.default_tap, *alt_taps)
-        ohai "Contents of $LOAD_PATH:", render_load_path($LOAD_PATH)
-        ohai "Environment Variables:"
+        ohai "Contents of $LOAD_PATH", render_load_path($LOAD_PATH)
+        ohai "Environment Variables"
 
         environment_variables = [
           "RUBYLIB",
