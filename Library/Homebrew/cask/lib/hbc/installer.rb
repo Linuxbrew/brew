@@ -133,16 +133,14 @@ module Hbc
 
     def install_artifacts
       already_installed_artifacts = []
-      options = { command: @command, force: force }
 
       odebug "Installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = Artifact.for_cask(@cask, command: @command, force: force)
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
-        artifact = artifact.new(@cask, options)
         next unless artifact.respond_to?(:install_phase)
-        odebug "Installing artifact of class #{artifact}"
+        odebug "Installing artifact of class #{artifact.class}"
         artifact.install_phase
         already_installed_artifacts.unshift(artifact)
       end
@@ -150,7 +148,7 @@ module Hbc
       begin
         already_installed_artifacts.each do |artifact|
           next unless artifact.respond_to?(:uninstall_phase)
-          odebug "Reverting installation of artifact of class #{artifact}"
+          odebug "Reverting installation of artifact of class #{artifact.class}"
           artifact.uninstall_phase
         end
       ensure
@@ -319,13 +317,11 @@ module Hbc
 
     def uninstall_artifacts
       odebug "Un-installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = Artifact.for_cask(@cask, command: @command, force: force)
       odebug "#{artifacts.length} artifact/s defined", artifacts
       artifacts.each do |artifact|
-        options = { command: @command, force: force }
-        artifact = artifact.new(@cask, options)
         next unless artifact.respond_to?(:uninstall_phase)
-        odebug "Un-installing artifact of class #{artifact}"
+        odebug "Un-installing artifact of class #{artifact.class}"
         artifact.uninstall_phase
       end
     end

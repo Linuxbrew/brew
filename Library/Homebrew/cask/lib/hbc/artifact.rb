@@ -56,12 +56,12 @@ module Hbc
       ]
     end
 
-    def self.for_cask(cask)
+    def self.for_cask(cask, command: SystemCommand, force: false)
       odebug "Determining which artifacts are present in Cask #{cask}"
-      artifacts.select do |artifact|
-        odebug "Checking for artifact class #{artifact}"
-        artifact.me?(cask)
-      end
+
+      artifacts
+        .select { |klass| klass.me?(cask) }
+        .map { |klass| klass.new(cask, command: command, force: force) }
     end
   end
 end
