@@ -21,16 +21,6 @@ describe Hbc::Artifact::Pkg do
     end
   end
 
-  describe "uninstall_phase" do
-    it "does nothing, because the uninstall_phase method is a no-op" do
-      pkg = Hbc::Artifact::Pkg.new(@cask,
-                                   command: Hbc::FakeSystemCommand)
-      shutup do
-        pkg.uninstall_phase
-      end
-    end
-  end
-
   describe "choices" do
     before do
       @cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-choices.rb")

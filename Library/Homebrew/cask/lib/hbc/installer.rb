@@ -140,15 +140,18 @@ module Hbc
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
+        artifact = artifact.new(@cask, options)
+        next unless artifact.respond_to?(:install_phase)
         odebug "Installing artifact of class #{artifact}"
-        artifact.new(@cask, options).install_phase
+        artifact.install_phase
         already_installed_artifacts.unshift(artifact)
       end
     rescue StandardError => e
       begin
         already_installed_artifacts.each do |artifact|
+          next unless artifact.respond_to?(:uninstall_phase)
           odebug "Reverting installation of artifact of class #{artifact}"
-          artifact.new(@cask, options).uninstall_phase
+          artifact.uninstall_phase
         end
       ensure
         purge_versioned_files
@@ -319,9 +322,11 @@ module Hbc
       artifacts = Artifact.for_cask(@cask)
       odebug "#{artifacts.length} artifact/s defined", artifacts
       artifacts.each do |artifact|
-        odebug "Un-installing artifact of class #{artifact}"
         options = { command: @command, force: force }
-        artifact.new(@cask, options).uninstall_phase
+        artifact = artifact.new(@cask, options)
+        next unless artifact.respond_to?(:uninstall_phase)
+        odebug "Un-installing artifact of class #{artifact}"
+        artifact.uninstall_phase
       end
     end
 
@@ -330,7 +335,7 @@ module Hbc
       uninstall_artifacts
       if Artifact::Zap.me?(@cask)
         ohai "Dispatching zap stanza"
-        Artifact::Zap.new(@cask, command: @command).zap_phase
+        Artifact::Zap.new(@cask, command: @command).uninstall_phase
       else
         opoo "No zap stanza present for Cask '#{@cask}'"
       end

@@ -13,28 +13,12 @@ describe Hbc::Artifact::Uninstall do
     end
   end
 
-  describe "install_phase" do
-    it "does nothing, because the install_phase method is a no-op" do
-      shutup do
-        uninstall_artifact.install_phase
-      end
-    end
-  end
-
-  describe "zap_phase" do
-    it "does nothing, because the zap_phase method is a no-op" do
-      shutup do
-        uninstall_artifact.zap_phase
-      end
-    end
-  end
-
   describe "uninstall_phase" do
-    subject do
+    subject {
       shutup do
         uninstall_artifact.uninstall_phase
       end
-    end
+    }
 
     describe "when using launchctl" do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-uninstall-launchctl.rb") }
