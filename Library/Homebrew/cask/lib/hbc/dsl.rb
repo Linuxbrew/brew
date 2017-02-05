@@ -270,14 +270,17 @@ module Hbc
 
     ORDINARY_ARTIFACT_TYPES.each do |type|
       define_method(type) do |*args|
-        if type == :stage_only && args != [true]
-          raise CaskInvalidError.new(token, "'stage_only' takes a single argument: true")
+        if type == :stage_only
+          if args != [true]
+            raise CaskInvalidError.new(token, "'stage_only' takes a single argument: true")
+          end
+
+          unless (artifacts.keys & ACTIVATABLE_ARTIFACT_TYPES).empty?
+            raise CaskInvalidError.new(token, "'stage_only' must be the only activatable artifact")
+          end
         end
-        artifacts[type] << args
-        if artifacts.key?(:stage_only) && artifacts.keys.count > 1 &&
-           !(artifacts.keys & ACTIVATABLE_ARTIFACT_TYPES).empty?
-          raise CaskInvalidError.new(token, "'stage_only' must be the only activatable artifact")
-        end
+
+        artifacts[type].add(args)
       end
     end
 
