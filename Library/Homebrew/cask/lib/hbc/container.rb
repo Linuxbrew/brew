@@ -16,7 +16,6 @@ require "hbc/container/tar"
 require "hbc/container/ttf"
 require "hbc/container/rar"
 require "hbc/container/xar"
-require "hbc/container/xip"
 require "hbc/container/xz"
 require "hbc/container/zip"
 
@@ -34,7 +33,6 @@ module Hbc
         Sit,
         Rar,
         Zip,
-        Xip,   # needs to be before xar as this is a cpio inside a gzip inside a xar
         Xar,   # need to be before tar as tar can also list xar
         Tar,   # or compressed tar (bzip2/gzip/lzma/xz)
         Bzip2, # pure bzip2
