@@ -27,39 +27,37 @@ module Hbc
   module Artifact
     # NOTE: order is important here, since we want to extract nested containers
     #       before we handle any other artifacts
-    def self.artifacts
-      [
-        PreflightBlock,
-        NestedContainer,
-        Installer,
-        App,
-        Suite,
-        Artifact, # generic 'artifact' stanza
-        Colorpicker,
-        Pkg,
-        Prefpane,
-        Qlplugin,
-        Dictionary,
-        Font,
-        Service,
-        StageOnly,
-        Binary,
-        InputMethod,
-        InternetPlugin,
-        AudioUnitPlugin,
-        VstPlugin,
-        Vst3Plugin,
-        ScreenSaver,
-        Uninstall,
-        PostflightBlock,
-        Zap,
-      ]
-    end
+    TYPES = [
+      PreflightBlock,
+      NestedContainer,
+      Installer,
+      App,
+      Suite,
+      Artifact, # generic 'artifact' stanza
+      Colorpicker,
+      Pkg,
+      Prefpane,
+      Qlplugin,
+      Dictionary,
+      Font,
+      Service,
+      StageOnly,
+      Binary,
+      InputMethod,
+      InternetPlugin,
+      AudioUnitPlugin,
+      VstPlugin,
+      Vst3Plugin,
+      ScreenSaver,
+      Uninstall,
+      PostflightBlock,
+      Zap,
+    ].freeze
 
     def self.for_cask(cask, command: SystemCommand, force: false)
       odebug "Determining which artifacts are present in Cask #{cask}"
 
-      artifacts
+      TYPES
         .select { |klass| klass.me?(cask) }
         .map { |klass| klass.new(cask, command: command, force: force) }
     end
