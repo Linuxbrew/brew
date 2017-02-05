@@ -58,6 +58,7 @@ Paste at a Terminal prompt:
 
 ```sh
 sudo apt-get install build-essential curl git python-setuptools ruby
+sudo gem install rake # for brew audit
 ```
 
 ### Fedora, CentOS or Red Hat
