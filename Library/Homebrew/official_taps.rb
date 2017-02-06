@@ -3,7 +3,6 @@ OFFICIAL_TAPS = %w[
   dupes
   emacs
   fuse
-  games
   nginx
   php
   science
