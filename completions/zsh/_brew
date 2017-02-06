@@ -678,7 +678,7 @@ _brew_test_bot() {
 }
 
 # brew tests [-v] [--coverage] [--generic] [--no-compat]
-#   [--only=test_script/test_method] [--seed seed] [--trace] [--online]
+#   [--only=test_script:test_method] [--seed seed] [--trace] [--online]
 #   [--official-cmd-taps]:
 _brew_tests() {
   _arguments \

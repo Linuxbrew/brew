@@ -1,4 +1,4 @@
-#:  * `tests` [`-v`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<test_script/test_method>] [`--seed` <seed>] [`--trace`] [`--online`] [`--official-cmd-taps`]:
+#:  * `tests` [`-v`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<test_script:test_method>] [`--seed` <seed>] [`--trace`] [`--online`] [`--official-cmd-taps`]:
 #:    Run Homebrew's unit and integration tests.
 
 require "fileutils"
