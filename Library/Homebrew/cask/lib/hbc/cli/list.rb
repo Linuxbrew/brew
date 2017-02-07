@@ -55,7 +55,7 @@ module Hbc
 
       def self.list_artifacts(cask)
         Artifact.for_cask(cask).each do |artifact|
-          summary = artifact.new(cask).summary
+          summary = artifact.summary
           ohai summary[:english_description], summary[:contents] unless summary.empty?
         end
       end
