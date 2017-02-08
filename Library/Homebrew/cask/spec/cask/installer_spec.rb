@@ -1,9 +1,9 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Installer do
   describe "install" do
     let(:empty_depends_on_stub) {
-      stub(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
+      double(formula: [], cask: [], macos: nil, arch: nil, x11: nil)
     }
 
     it "downloads and installs a nice fresh Cask" do
@@ -13,8 +13,8 @@ describe Hbc::Installer do
         Hbc::Installer.new(caffeine).install
       end
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).must_be :directory?
-      expect(Hbc.appdir.join("Caffeine.app")).must_be :directory?
+      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).to be_a_directory
+      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
     end
 
     it "works with dmg-based Casks" do
@@ -24,8 +24,8 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-dmg", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-dmg", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with tar-gz-based Casks" do
@@ -35,22 +35,22 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-tar-gz", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-tar-gz", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with cab-based Casks" do
       skip("cabextract not installed") if which("cabextract").nil?
       asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-cab.rb")
 
-      asset.stub :depends_on, empty_depends_on_stub do
-        shutup do
-          Hbc::Installer.new(asset).install
-        end
+      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
+
+      shutup do
+        Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-cab", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-cab", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with Adobe AIR-based Casks" do
@@ -61,22 +61,21 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-air", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container.app")).must_be :directory?
+      expect(Hbc.caskroom.join("container-air", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container.app")).to be_a_directory
     end
 
     it "works with 7z-based Casks" do
       skip("unar not installed") if which("unar").nil?
       asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-7z.rb")
 
-      asset.stub :depends_on, empty_depends_on_stub do
-        shutup do
-          Hbc::Installer.new(asset).install
-        end
+      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
+      shutup do
+        Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-7z", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-7z", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with xar-based Casks" do
@@ -86,36 +85,34 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-xar", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-xar", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with Stuffit-based Casks" do
       skip("unar not installed") if which("unar").nil?
       asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-sit.rb")
 
-      asset.stub :depends_on, empty_depends_on_stub do
-        shutup do
-          Hbc::Installer.new(asset).install
-        end
+      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
+      shutup do
+        Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-sit", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-sit", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with RAR-based Casks" do
       skip("unar not installed") if which("unar").nil?
       asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-rar.rb")
 
-      asset.stub :depends_on, empty_depends_on_stub do
-        shutup do
-          Hbc::Installer.new(asset).install
-        end
+      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
+      shutup do
+        Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-rar", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-rar", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with pure bzip2-based Casks" do
@@ -125,8 +122,8 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-bzip2", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container-bzip2--#{asset.version}")).must_be :file?
+      expect(Hbc.caskroom.join("container-bzip2", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container-bzip2--#{asset.version}")).to be_a_file
     end
 
     it "works with pure gzip-based Casks" do
@@ -136,36 +133,34 @@ describe Hbc::Installer do
         Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-gzip", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container")).must_be :file?
+      expect(Hbc.caskroom.join("container-gzip", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
     end
 
     it "works with pure xz-based Casks" do
       skip("unxz not installed") if which("unxz").nil?
       asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-xz.rb")
 
-      asset.stub :depends_on, empty_depends_on_stub do
-        shutup do
-          Hbc::Installer.new(asset).install
-        end
+      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
+      shutup do
+        Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-xz", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container-xz--#{asset.version}")).must_be :file?
+      expect(Hbc.caskroom.join("container-xz", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container-xz--#{asset.version}")).to be_a_file
     end
 
     it "works with lzma-based Casks" do
       skip("unlzma not installed") if which("unlzma").nil?
       asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-lzma.rb")
 
-      asset.stub :depends_on, empty_depends_on_stub do
-        shutup do
-          Hbc::Installer.new(asset).install
-        end
+      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
+      shutup do
+        Hbc::Installer.new(asset).install
       end
 
-      expect(Hbc.caskroom.join("container-lzma", asset.version)).must_be :directory?
-      expect(Hbc.appdir.join("container-lzma--#{asset.version}")).must_be :file?
+      expect(Hbc.caskroom.join("container-lzma", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container-lzma--#{asset.version}")).to be_a_file
     end
 
     it "blows up on a bad checksum" do
@@ -174,7 +169,7 @@ describe Hbc::Installer do
         shutup do
           Hbc::Installer.new(bad_checksum).install
         end
-      }.must_raise(Hbc::CaskSha256MismatchError)
+      }.to raise_error(Hbc::CaskSha256MismatchError)
     end
 
     it "blows up on a missing checksum" do
@@ -183,7 +178,7 @@ describe Hbc::Installer do
         shutup do
           Hbc::Installer.new(missing_checksum).install
         end
-      }.must_raise(Hbc::CaskSha256MissingError)
+      }.to raise_error(Hbc::CaskSha256MissingError)
     end
 
     it "installs fine if sha256 :no_check is used" do
@@ -193,14 +188,14 @@ describe Hbc::Installer do
         Hbc::Installer.new(no_checksum).install
       end
 
-      expect(no_checksum).must_be :installed?
+      expect(no_checksum).to be_installed
     end
 
     it "fails to install if sha256 :no_check is used with --require-sha" do
       no_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/no-checksum.rb")
       expect {
         Hbc::Installer.new(no_checksum, require_sha: true).install
-      }.must_raise(Hbc::CaskNoShasumError)
+      }.to raise_error(Hbc::CaskNoShasumError)
     end
 
     it "installs fine if sha256 :no_check is used with --require-sha and --force" do
@@ -210,7 +205,7 @@ describe Hbc::Installer do
         Hbc::Installer.new(no_checksum, require_sha: true, force: true).install
       end
 
-      expect(no_checksum).must_be :installed?
+      expect(no_checksum).to be_installed
     end
 
     it "prints caveats if they're present" do
@@ -218,9 +213,9 @@ describe Hbc::Installer do
 
       expect {
         Hbc::Installer.new(with_caveats).install
-      }.must_output(/Here are some things you might want to know/)
+      }.to output(/Here are some things you might want to know/).to_stdout
 
-      expect(with_caveats).must_be :installed?
+      expect(with_caveats).to be_installed
     end
 
     it "prints installer :manual instructions when present" do
@@ -228,9 +223,9 @@ describe Hbc::Installer do
 
       expect {
         Hbc::Installer.new(with_installer_manual).install
-      }.must_output(/To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'/)
+      }.to output(/To complete the installation of Cask with-installer-manual, you must also\nrun the installer at\n\n  '#{with_installer_manual.staged_path.join('Caffeine.app')}'/).to_stdout
 
-      expect(with_installer_manual).must_be :installed?
+      expect(with_installer_manual).to be_installed
     end
 
     it "does not extract __MACOSX directories from zips" do
@@ -240,13 +235,13 @@ describe Hbc::Installer do
         Hbc::Installer.new(with_macosx_dir).install
       end
 
-      expect(with_macosx_dir.staged_path.join("__MACOSX")).wont_be :directory?
+      expect(with_macosx_dir.staged_path.join("__MACOSX")).not_to be_a_directory
     end
 
     it "installer method raises an exception when already-installed Casks which auto-update are attempted" do
       with_auto_updates = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
 
-      expect(with_auto_updates).wont_be :installed?
+      expect(with_auto_updates).not_to be_installed
 
       installer = Hbc::Installer.new(with_auto_updates)
 
@@ -256,28 +251,30 @@ describe Hbc::Installer do
 
       expect {
         installer.install
-      }.must_raise(Hbc::CaskAlreadyInstalledAutoUpdatesError)
+      }.to raise_error(Hbc::CaskAlreadyInstalledAutoUpdatesError)
     end
 
     it "allows already-installed Casks which auto-update to be installed if force is provided" do
       with_auto_updates = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
 
-      expect(with_auto_updates).wont_be :installed?
+      expect(with_auto_updates).not_to be_installed
 
       shutup do
         Hbc::Installer.new(with_auto_updates).install
       end
 
-      shutup do
-        Hbc::Installer.new(with_auto_updates, force: true).install
-      end # wont_raise
+      expect {
+        shutup do
+          Hbc::Installer.new(with_auto_updates, force: true).install
+        end
+      }.not_to raise_error
     end
 
     # unlike the CLI, the internal interface throws exception on double-install
     it "installer method raises an exception when already-installed Casks are attempted" do
       transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
 
-      expect(transmission).wont_be :installed?
+      expect(transmission).not_to be_installed
 
       installer = Hbc::Installer.new(transmission)
 
@@ -287,13 +284,13 @@ describe Hbc::Installer do
 
       expect {
         installer.install
-      }.must_raise(Hbc::CaskAlreadyInstalledError)
+      }.to raise_error(Hbc::CaskAlreadyInstalledError)
     end
 
     it "allows already-installed Casks to be installed if force is provided" do
       transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
 
-      expect(transmission).wont_be :installed?
+      expect(transmission).not_to be_installed
 
       shutup do
         Hbc::Installer.new(transmission).install
@@ -311,7 +308,7 @@ describe Hbc::Installer do
         Hbc::Installer.new(naked_pkg).install
       end
 
-      expect(Hbc.caskroom.join("container-pkg", naked_pkg.version, "container.pkg")).must_be :file?
+      expect(Hbc.caskroom.join("container-pkg", naked_pkg.version, "container.pkg")).to be_a_file
     end
 
     it "works properly with an overridden container :type" do
@@ -321,7 +318,7 @@ describe Hbc::Installer do
         Hbc::Installer.new(naked_executable).install
       end
 
-      expect(Hbc.caskroom.join("naked-executable", naked_executable.version, "naked_executable")).must_be :file?
+      expect(Hbc.caskroom.join("naked-executable", naked_executable.version, "naked_executable")).to be_a_file
     end
 
     it "works fine with a nested container" do
@@ -331,7 +328,7 @@ describe Hbc::Installer do
         Hbc::Installer.new(nested_app).install
       end
 
-      expect(Hbc.appdir.join("MyNestedApp.app")).must_be :directory?
+      expect(Hbc.appdir.join("MyNestedApp.app")).to be_a_directory
     end
 
     it "generates and finds a timestamped metadata directory for an installed Cask" do
@@ -342,8 +339,8 @@ describe Hbc::Installer do
       end
 
       m_path = caffeine.metadata_path(:now, true)
-      expect(caffeine.metadata_path(:now, false)).must_equal(m_path)
-      expect(caffeine.metadata_path(:latest)).must_equal(m_path)
+      expect(caffeine.metadata_path(:now, false)).to eq(m_path)
+      expect(caffeine.metadata_path(:latest)).to eq(m_path)
     end
 
     it "generates and finds a metadata subdirectory for an installed Cask" do
@@ -355,8 +352,8 @@ describe Hbc::Installer do
 
       subdir_name = "Casks"
       m_subdir = caffeine.metadata_subdir(subdir_name, :now, true)
-      expect(caffeine.metadata_subdir(subdir_name, :now, false)).must_equal(m_subdir)
-      expect(caffeine.metadata_subdir(subdir_name, :latest)).must_equal(m_subdir)
+      expect(caffeine.metadata_subdir(subdir_name, :now, false)).to eq(m_subdir)
+      expect(caffeine.metadata_subdir(subdir_name, :latest)).to eq(m_subdir)
     end
   end
 
@@ -370,9 +367,9 @@ describe Hbc::Installer do
         installer.uninstall
       end
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version, "Caffeine.app")).wont_be :directory?
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).wont_be :directory?
-      expect(Hbc.caskroom.join("local-caffeine")).wont_be :directory?
+      expect(Hbc.caskroom.join("local-caffeine", caffeine.version, "Caffeine.app")).not_to be_a_directory
+      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Hbc.caskroom.join("local-caffeine")).not_to be_a_directory
     end
 
     it "uninstalls all versions if force is set" do
@@ -383,19 +380,19 @@ describe Hbc::Installer do
         Hbc::Installer.new(caffeine).install
       end
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).must_be :directory?
-      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).wont_be  :directory?
+      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).to be_a_directory
+      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).not_to be_a_directory
       FileUtils.mv(Hbc.caskroom.join("local-caffeine", caffeine.version), Hbc.caskroom.join("local-caffeine", mutated_version))
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).wont_be :directory?
-      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).must_be  :directory?
+      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).to be_a_directory
 
       shutup do
         Hbc::Installer.new(caffeine, force: true).uninstall
       end
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).wont_be :directory?
-      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).wont_be  :directory?
-      expect(Hbc.caskroom.join("local-caffeine")).wont_be :directory?
+      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).not_to be_a_directory
+      expect(Hbc.caskroom.join("local-caffeine")).not_to be_a_directory
     end
   end
 end
