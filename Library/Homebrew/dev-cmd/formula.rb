@@ -1,4 +1,4 @@
-#:  * `where` <formulae>:
+#:  * `formula` <formulae>:
 #:    echo location of the specified <formulae> to stdout
 
 require "formula"
@@ -6,7 +6,7 @@ require "formula"
 module Homebrew
   module_function
 
-  def where
+  def formula
     raise FormulaUnspecifiedError if ARGV.named.empty?
     ARGV.resolved_formulae.each do |f|
       puts "#{f.path}\n"
