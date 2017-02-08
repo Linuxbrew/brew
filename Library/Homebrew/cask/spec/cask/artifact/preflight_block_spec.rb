@@ -1,9 +1,9 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Artifact::PreflightBlock do
   describe "install_phase" do
     it "calls the specified block before installing, passing a Cask mini-dsl" do
-      called      = false
+      called = false
       yielded_arg = nil
 
       cask = Hbc::Cask.new("with-preflight") do
@@ -13,16 +13,16 @@ describe Hbc::Artifact::PreflightBlock do
         end
       end
 
-      Hbc::Artifact::PreflightBlock.new(cask).install_phase
+      described_class.new(cask).install_phase
 
-      called.must_equal true
-      yielded_arg.must_be_kind_of Hbc::DSL::Preflight
+      expect(called).to be true
+      expect(yielded_arg).to be_kind_of Hbc::DSL::Preflight
     end
   end
 
   describe "uninstall_phase" do
     it "calls the specified block before uninstalling, passing a Cask mini-dsl" do
-      called      = false
+      called = false
       yielded_arg = nil
 
       cask = Hbc::Cask.new("with-uninstall-preflight") do
@@ -32,10 +32,10 @@ describe Hbc::Artifact::PreflightBlock do
         end
       end
 
-      Hbc::Artifact::PreflightBlock.new(cask).uninstall_phase
+      described_class.new(cask).uninstall_phase
 
-      called.must_equal true
-      yielded_arg.must_be_kind_of Hbc::DSL::UninstallPreflight
+      expect(called).to be true
+      expect(yielded_arg).to be_kind_of Hbc::DSL::UninstallPreflight
     end
   end
 end
