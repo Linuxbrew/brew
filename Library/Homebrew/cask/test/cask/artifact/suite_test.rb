@@ -20,7 +20,7 @@ describe Hbc::Artifact::Suite do
     end
 
     target_path.must_be :directory?
-    TestHelper.valid_alias?(target_path).must_equal false
+    TestHelper.valid_symlink?(target_path).must_equal false
     source_path.wont_be :exist?
   end
 

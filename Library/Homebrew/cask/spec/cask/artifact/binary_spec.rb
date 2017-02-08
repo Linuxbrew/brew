@@ -20,7 +20,7 @@ describe Hbc::Artifact::Binary do
     shutup do
       Hbc::Artifact::Binary.new(cask).install_phase
     end
-    expect(FileHelper.valid_alias?(expected_path)).to be true
+    expect(expected_path).to be_a_valid_symlink
   end
 
   it "avoids clobbering an existing binary by linking over it" do
@@ -82,7 +82,7 @@ describe Hbc::Artifact::Binary do
         Hbc::Artifact::Binary.new(cask).install_phase
       end
 
-      expect(FileHelper.valid_alias?(expected_path)).to be true
+      expect(expected_path).to be_a_valid_symlink
     end
   end
 end
