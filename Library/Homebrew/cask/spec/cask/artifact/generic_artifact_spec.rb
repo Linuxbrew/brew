@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Artifact::Artifact do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-generic-artifact.rb") }
@@ -11,14 +11,14 @@ describe Hbc::Artifact::Artifact do
   let(:target_path) { Hbc.appdir.join("Caffeine.app") }
 
   before do
-    TestHelper.install_without_artifacts(cask)
+    InstallHelper.install_without_artifacts(cask)
   end
 
   describe "with no target" do
     let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-generic-artifact-no-target.rb") }
 
     it "fails to install with no target" do
-      install_phase.must_raise Hbc::CaskInvalidError
+      expect(install_phase).to raise_error(Hbc::CaskInvalidError)
     end
   end
 
@@ -27,21 +27,21 @@ describe Hbc::Artifact::Artifact do
       install_phase.call
     end
 
-    target_path.must_be :directory?
-    source_path.wont_be :exist?
+    expect(target_path).to be_a_directory
+    expect(source_path).not_to exist
   end
 
   it "avoids clobbering an existing artifact" do
     target_path.mkpath
 
-    assert_raises Hbc::CaskError do
+    expect {
       shutup do
         install_phase.call
       end
-    end
+    }.to raise_error(Hbc::CaskError)
 
-    source_path.must_be :directory?
-    target_path.must_be :directory?
-    File.identical?(source_path, target_path).must_equal false
+    expect(source_path).to be_a_directory
+    expect(target_path).to be_a_directory
+    expect(File.identical?(source_path, target_path)).to be false
   end
 end
