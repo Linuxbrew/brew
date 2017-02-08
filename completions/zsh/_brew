@@ -120,6 +120,7 @@ __brew_common_commands() {
     'update:fetch latest version of Homebrew and all formulae'
     'upgrade:upgrade outdated formulae'
     'uses:show formulae which depend on a formula'
+    'where:location of formulae'
     '--cellar:brew cellar'
     '--env:brew environment'
     '--repository:brew repository'
@@ -791,6 +792,12 @@ _brew_uses() {
 _brew_vendor_install() {
   _arguments \
     '--target'
+}
+
+
+# brew where formulae:
+_brew_where() {
+  __brew_formulae
 }
 
 # the main completion function

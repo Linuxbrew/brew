@@ -15,7 +15,7 @@ Troubleshooting:
 
 Developers:
   brew create [URL [--no-fetch]]
-  brew edit [FORMULA...]
+  brew (where|edit) [FORMULA...]
   http://docs.brew.sh/Formula-Cookbook.html
 
 Further help:
