@@ -1,16 +1,16 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::CLI::List do
   it "lists the installed Casks in a pretty fashion" do
     casks = %w[local-caffeine local-transmission].map { |c| Hbc.load(c) }
 
     casks.each do |c|
-      TestHelper.install_with_caskfile(c)
+      InstallHelper.install_with_caskfile(c)
     end
 
-    lambda {
+    expect {
       Hbc::CLI::List.run
-    }.must_output <<-EOS.undent
+    }.to output(<<-EOS.undent).to_stdout
       local-caffeine
       local-transmission
     EOS
@@ -18,7 +18,7 @@ describe Hbc::CLI::List do
 
   describe "lists versions" do
     let(:casks) { ["local-caffeine", "local-transmission"] }
-    let(:output) {
+    let(:expected_output) {
       <<-EOS.undent
         local-caffeine 1.2.3
         local-transmission 2.61
@@ -26,19 +26,19 @@ describe Hbc::CLI::List do
     }
 
     before(:each) do
-      casks.map(&Hbc.method(:load)).each(&TestHelper.method(:install_with_caskfile))
+      casks.map(&Hbc.method(:load)).each(&InstallHelper.method(:install_with_caskfile))
     end
 
     it "of all installed Casks" do
-      lambda {
+      expect {
         Hbc::CLI::List.run("--versions")
-      }.must_output(output)
+      }.to output(expected_output).to_stdout
     end
 
     it "of given Casks" do
-      lambda {
+      expect {
         Hbc::CLI::List.run("--versions", "local-caffeine", "local-transmission")
-      }.must_output(output)
+      }.to output(expected_output).to_stdout
     end
   end
 
@@ -50,14 +50,10 @@ describe Hbc::CLI::List do
       staged_path.mkpath
     end
 
-    after do
-      caskroom_path.rmtree
-    end
-
     it "lists installed Casks without backing ruby files (due to renames or otherwise)" do
-      lambda {
+      expect {
         Hbc::CLI::List.run
-      }.must_output <<-EOS.undent
+      }.to output(<<-EOS.undent).to_stdout
         ive-been-renamed (!)
       EOS
     end
@@ -69,15 +65,15 @@ describe Hbc::CLI::List do
     let(:casks) { [caffeine, transmission] }
 
     it "lists the installed files for those Casks" do
-      casks.each(&TestHelper.method(:install_without_artifacts_with_caskfile))
+      casks.each(&InstallHelper.method(:install_without_artifacts_with_caskfile))
 
       shutup do
         Hbc::Artifact::App.new(transmission).install_phase
       end
 
-      lambda {
+      expect {
         Hbc::CLI::List.run("local-transmission", "local-caffeine")
-      }.must_output <<-EOS.undent
+      }.to output(<<-EOS.undent).to_stdout
         ==> Apps
         #{Hbc.appdir.join("Transmission.app")} (#{Hbc.appdir.join("Transmission.app").abv})
         ==> Apps
