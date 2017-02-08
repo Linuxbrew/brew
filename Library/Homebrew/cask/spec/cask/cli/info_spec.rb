@@ -1,14 +1,14 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::CLI::Info do
   it "displays some nice info about the specified Cask" do
-    lambda {
+    expect {
       Hbc::CLI::Info.run("local-caffeine")
-    }.must_output <<-EOS.undent
+    }.to output(<<-EOS.undent).to_stdout
       local-caffeine: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-test/blob/master/Casks/local-caffeine.rb
+      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/local-caffeine.rb
       ==> Name
       None
       ==> Artifacts
@@ -17,12 +17,12 @@ describe Hbc::CLI::Info do
   end
 
   describe "given multiple Casks" do
-    before do
-      @expected_output = <<-EOS.undent
+    let(:expected_output) {
+      <<-EOS.undent
         local-caffeine: 1.2.3
         http://example.com/local-caffeine
         Not installed
-        From: https://github.com/caskroom/homebrew-test/blob/master/Casks/local-caffeine.rb
+        From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/local-caffeine.rb
         ==> Name
         None
         ==> Artifacts
@@ -30,35 +30,35 @@ describe Hbc::CLI::Info do
         local-transmission: 2.61
         http://example.com/local-transmission
         Not installed
-        From: https://github.com/caskroom/homebrew-test/blob/master/Casks/local-transmission.rb
+        From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/local-transmission.rb
         ==> Name
         None
         ==> Artifacts
         Transmission.app (app)
       EOS
-    end
+    }
 
     it "displays the info" do
-      lambda {
+      expect {
         Hbc::CLI::Info.run("local-caffeine", "local-transmission")
-      }.must_output(@expected_output)
+      }.to output(expected_output).to_stdout
     end
 
     it "throws away stray options" do
-      lambda {
+      expect {
         Hbc::CLI::Info.run("--notavalidoption", "local-caffeine", "local-transmission")
-      }.must_output(@expected_output)
+      }.to output(expected_output).to_stdout
     end
   end
 
   it "should print caveats if the Cask provided one" do
-    lambda {
+    expect {
       Hbc::CLI::Info.run("with-caveats")
-    }.must_output <<-EOS.undent
+    }.to output(<<-EOS.undent).to_stdout
       with-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-test/blob/master/Casks/with-caveats.rb
+      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/with-caveats.rb
       ==> Name
       None
       ==> Artifacts
@@ -78,13 +78,13 @@ describe Hbc::CLI::Info do
   end
 
   it 'should not print "Caveats" section divider if the caveats block has no output' do
-    lambda {
+    expect {
       Hbc::CLI::Info.run("with-conditional-caveats")
-    }.must_output <<-EOS.undent
+    }.to output(<<-EOS.undent).to_stdout
       with-conditional-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-test/blob/master/Casks/with-conditional-caveats.rb
+      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/with-conditional-caveats.rb
       ==> Name
       None
       ==> Artifacts
@@ -94,17 +94,17 @@ describe Hbc::CLI::Info do
 
   describe "when no Cask is specified" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Info.run
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 
   describe "when no Cask is specified, but an invalid option" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Info.run("--notavalidoption")
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 end
