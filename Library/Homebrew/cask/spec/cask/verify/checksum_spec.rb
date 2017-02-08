@@ -1,6 +1,4 @@
 describe Hbc::Verify::Checksum do
-  include Sha256Helper
-
   let(:cask) { double("cask") }
   let(:downloaded_path) { double("downloaded_path") }
   let(:verification) { described_class.new(cask, downloaded_path) }
@@ -35,7 +33,7 @@ describe Hbc::Verify::Checksum do
     end
 
     context "sha256 is a valid shasum" do
-      let(:sha256) { random_sha256 }
+      let(:sha256) { "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef" }
 
       it { is_expected.to be true }
     end
@@ -44,7 +42,7 @@ describe Hbc::Verify::Checksum do
   describe "#verify" do
     subject { verification.verify }
 
-    let(:computed) { random_sha256 }
+    let(:computed) { "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef" }
 
     before do
       allow(verification).to receive(:computed).and_return(computed)
@@ -67,7 +65,7 @@ describe Hbc::Verify::Checksum do
     end
 
     context "sha256 does not match computed" do
-      let(:sha256) { random_sha256 }
+      let(:sha256) { "d3adb33fd3adb33fd3adb33fd3adb33fd3adb33fd3adb33fd3adb33fd3adb33f" }
 
       it "raises an error" do
         expect { subject }.to raise_error(Hbc::CaskSha256MismatchError)

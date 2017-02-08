@@ -1,6 +1,5 @@
 describe Hbc::Audit do
   include AuditMatchers
-  include Sha256Helper
 
   let(:cask) { instance_double(Hbc::Cask) }
   let(:download) { false }
@@ -178,7 +177,7 @@ describe Hbc::Audit do
           end
 
           context "when appcast checkpoint is out of date" do
-            let(:actual_checkpoint) { random_sha256 }
+            let(:actual_checkpoint) { "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef" }
             it { is_expected.to warn_with(mismatch_msg) }
             it { should_not warn_with(curl_error_msg) }
           end
