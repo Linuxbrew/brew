@@ -1,22 +1,22 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::CLI::Uninstall do
   it "shows an error when a bad Cask is provided" do
-    lambda {
+    expect {
       Hbc::CLI::Uninstall.run("notacask")
-    }.must_raise Hbc::CaskUnavailableError
+    }.to raise_error(Hbc::CaskUnavailableError)
   end
 
   it "shows an error when a Cask is provided that's not installed" do
-    lambda {
+    expect {
       Hbc::CLI::Uninstall.run("anvil")
-    }.must_raise Hbc::CaskNotInstalledError
+    }.to raise_error(Hbc::CaskNotInstalledError)
   end
 
   it "tries anyway on a non-present Cask when --force is given" do
-    lambda do
+    expect {
       Hbc::CLI::Uninstall.run("anvil", "--force")
-    end # wont_raise
+    }.not_to raise_error
   end
 
   it "can uninstall and unlink multiple Casks at once" do
@@ -28,17 +28,17 @@ describe Hbc::CLI::Uninstall do
       Hbc::Installer.new(transmission).install
     end
 
-    caffeine.must_be :installed?
-    transmission.must_be :installed?
+    expect(caffeine).to be_installed
+    expect(transmission).to be_installed
 
     shutup do
       Hbc::CLI::Uninstall.run("local-caffeine", "local-transmission")
     end
 
-    caffeine.wont_be :installed?
-    Hbc.appdir.join("Transmission.app").wont_be :exist?
-    transmission.wont_be :installed?
-    Hbc.appdir.join("Caffeine.app").wont_be :exist?
+    expect(caffeine).not_to be_installed
+    expect(Hbc.appdir.join("Transmission.app")).not_to exist
+    expect(transmission).not_to be_installed
+    expect(Hbc.appdir.join("Caffeine.app")).not_to exist
   end
 
   describe "when multiple versions of a cask are installed" do
@@ -67,34 +67,29 @@ describe Hbc::CLI::Uninstall do
       end
     end
 
-    after(:each) do
-      caskroom_path.rmtree if caskroom_path.exist?
-    end
-
     it "uninstalls one version at a time" do
       shutup do
         Hbc::CLI::Uninstall.run("versioned-cask")
       end
 
-      caskroom_path.join(first_installed_version).must_be :exist?
-      caskroom_path.join(last_installed_version).wont_be :exist?
-      caskroom_path.must_be :exist?
+      expect(caskroom_path.join(first_installed_version)).to exist
+      expect(caskroom_path.join(last_installed_version)).not_to exist
+      expect(caskroom_path).to exist
 
       shutup do
         Hbc::CLI::Uninstall.run("versioned-cask")
       end
 
-      caskroom_path.join(first_installed_version).wont_be :exist?
-      caskroom_path.wont_be :exist?
+      expect(caskroom_path.join(first_installed_version)).not_to exist
+      expect(caskroom_path).not_to exist
     end
 
     it "displays a message when versions remain installed" do
-      out, err = capture_io do
-        Hbc::CLI::Uninstall.run("versioned-cask")
-      end
-
-      out.must_match(/#{token} #{first_installed_version} is still installed./)
-      err.must_be :empty?
+      expect {
+        expect {
+          Hbc::CLI::Uninstall.run("versioned-cask")
+        }.not_to output.to_stderr
+      }.to output(/#{token} #{first_installed_version} is still installed./).to_stdout
     end
   end
 
@@ -121,34 +116,29 @@ describe Hbc::CLI::Uninstall do
       EOS
     end
 
-    after do
-      app.rmtree if app.exist?
-      caskroom_path.rmtree if caskroom_path.exist?
-    end
-
     it "can still uninstall those Casks" do
       shutup do
         Hbc::CLI::Uninstall.run("ive-been-renamed")
       end
 
-      app.wont_be :exist?
-      caskroom_path.wont_be :exist?
+      expect(app).not_to exist
+      expect(caskroom_path).not_to exist
     end
   end
 
   describe "when no Cask is specified" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Uninstall.run
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 
   describe "when no Cask is specified, but an invalid option" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Uninstall.run("--notavalidoption")
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 end
