@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Artifact::App do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb") }
@@ -12,8 +12,8 @@ describe Hbc::Artifact::App do
   let(:install_phase) { -> { app.install_phase } }
   let(:uninstall_phase) { -> { app.uninstall_phase } }
 
-  before do
-    TestHelper.install_without_artifacts(cask)
+  before(:each) do
+    InstallHelper.install_without_artifacts(cask)
   end
 
   describe "install_phase" do
@@ -22,8 +22,8 @@ describe Hbc::Artifact::App do
         install_phase.call
       end
 
-      target_path.must_be :directory?
-      source_path.wont_be :exist?
+      expect(target_path).to be_a_directory
+      expect(source_path).not_to exist
     end
 
     describe "when app is in a subdirectory" do
@@ -45,8 +45,8 @@ describe Hbc::Artifact::App do
           install_phase.call
         end
 
-        target_path.must_be :directory?
-        appsubdir.join("Caffeine.app").wont_be :exist?
+        expect(target_path).to be_a_directory
+        expect(appsubdir.join("Caffeine.app")).not_to exist
       end
     end
 
@@ -58,36 +58,34 @@ describe Hbc::Artifact::App do
         install_phase.call
       end
 
-      target_path.must_be :directory?
-      source_path.wont_be :exist?
+      expect(target_path).to be_a_directory
+      expect(source_path).not_to exist
 
-      Hbc.appdir.join("Caffeine Deluxe.app").wont_be :exist?
-      cask.staged_path.join("Caffeine Deluxe.app").must_be :exist?
+      expect(Hbc.appdir.join("Caffeine Deluxe.app")).not_to exist
+      expect(cask.staged_path.join("Caffeine Deluxe.app")).to exist
     end
 
     describe "when the target already exists" do
-      before do
+      before(:each) do
         target_path.mkpath
       end
 
       it "avoids clobbering an existing app" do
-        err = install_phase.must_raise(Hbc::CaskError)
+        expect(install_phase).to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
 
-        err.message.must_equal("It seems there is already an App at '#{target_path}'.")
-
-        source_path.must_be :directory?
-        target_path.must_be :directory?
-        File.identical?(source_path, target_path).must_equal false
+        expect(source_path).to be_a_directory
+        expect(target_path).to be_a_directory
+        expect(File.identical?(source_path, target_path)).to be false
 
         contents_path = target_path.join("Contents/Info.plist")
-        contents_path.wont_be :exist?
+        expect(contents_path).not_to exist
       end
 
       describe "given the force option" do
         let(:force) { true }
 
-        before do
-          Hbc::Utils.stubs(current_user: "fake_user")
+        before(:each) do
+          allow(Hbc::Utils).to receive(:current_user).and_return("fake_user")
         end
 
         describe "target is both writable and user-owned" do
@@ -101,40 +99,31 @@ describe Hbc::Artifact::App do
               Warning: It seems there is already an App at '#{target_path}'; overwriting.
             EOS
 
-            install_phase.must_output(stdout, stderr)
+            expect {
+              expect(install_phase).to output(stdout).to_stdout
+            }.to output(stderr).to_stderr
 
-            source_path.wont_be :exist?
-            target_path.must_be :directory?
+            expect(source_path).not_to exist
+            expect(target_path).to be_a_directory
 
             contents_path = target_path.join("Contents/Info.plist")
-            contents_path.must_be :exist?
+            expect(contents_path).to exist
           end
         end
 
         describe "target is user-owned but contains read-only files" do
-          let(:command) { Hbc::FakeSystemCommand }
-
-          let(:chmod_cmd) {
-            ["/bin/chmod", "-R", "--", "u+rwx", target_path]
-          }
-
-          let(:chmod_n_cmd) {
-            ["/bin/chmod", "-R", "-N", target_path]
-          }
-
-          let(:chflags_cmd) {
-            ["/usr/bin/chflags", "-R", "--", "000", target_path]
-          }
-
-          before do
+          before(:each) do
             system "/usr/bin/touch", "--", "#{target_path}/foo"
             system "/bin/chmod", "--", "0555", target_path
           end
 
           it "overwrites the existing app" do
-            command.expect_and_pass_through(chflags_cmd)
-            command.expect_and_pass_through(chmod_cmd)
-            command.expect_and_pass_through(chmod_n_cmd)
+            expect(command).to receive(:run).with("/bin/chmod", args: ["-R", "--", "u+rwx", target_path], must_succeed: false)
+              .and_call_original
+            expect(command).to receive(:run).with("/bin/chmod", args: ["-R", "-N", target_path], must_succeed: false)
+              .and_call_original
+            expect(command).to receive(:run).with("/usr/bin/chflags", args: ["-R", "--", "000", target_path], must_succeed: false)
+              .and_call_original
 
             stdout = <<-EOS.undent
               ==> Removing App: '#{target_path}'
@@ -145,16 +134,18 @@ describe Hbc::Artifact::App do
               Warning: It seems there is already an App at '#{target_path}'; overwriting.
             EOS
 
-            install_phase.must_output(stdout, stderr)
+            expect {
+              expect(install_phase).to output(stdout).to_stdout
+            }.to output(stderr).to_stderr
 
-            source_path.wont_be :exist?
-            target_path.must_be :directory?
+            expect(source_path).not_to exist
+            expect(target_path).to be_a_directory
 
             contents_path = target_path.join("Contents/Info.plist")
-            contents_path.must_be :exist?
+            expect(contents_path).to exist
           end
 
-          after do
+          after(:each) do
             system "/bin/chmod", "--", "0755", target_path
           end
         end
@@ -164,18 +155,15 @@ describe Hbc::Artifact::App do
     describe "when the target is a broken symlink" do
       let(:deleted_path) { cask.staged_path.join("Deleted.app") }
 
-      before do
+      before(:each) do
         deleted_path.mkdir
         File.symlink(deleted_path, target_path)
         deleted_path.rmdir
       end
 
       it "leaves the target alone" do
-        err = install_phase.must_raise(Hbc::CaskError)
-
-        err.message.must_equal("It seems there is already an App at '#{target_path}'.")
-
-        File.symlink?(target_path).must_equal true
+        expect(install_phase).to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
+        expect(target_path).to be_a_symlink
       end
 
       describe "given the force option" do
@@ -191,13 +179,15 @@ describe Hbc::Artifact::App do
             Warning: It seems there is already an App at '#{target_path}'; overwriting.
           EOS
 
-          install_phase.must_output(stdout, stderr)
+          expect {
+            expect(install_phase).to output(stdout).to_stdout
+          }.to output(stderr).to_stderr
 
-          source_path.wont_be :exist?
-          target_path.must_be :directory?
+          expect(source_path).not_to exist
+          expect(target_path).to be_a_directory
 
           contents_path = target_path.join("Contents/Info.plist")
-          contents_path.must_be :exist?
+          expect(contents_path).to exist
         end
       end
     end
@@ -207,26 +197,23 @@ describe Hbc::Artifact::App do
 
       message = "It seems the App source is not there: '#{source_path}'"
 
-      error = install_phase.must_raise(Hbc::CaskError)
-      error.message.must_equal message
+      expect(install_phase).to raise_error(Hbc::CaskError, message)
     end
   end
 
   describe "uninstall_phase" do
-    before do
+    it "deletes managed apps" do
       shutup do
         install_phase.call
       end
-    end
 
-    it "deletes managed apps" do
-      target_path.must_be :exist?
+      expect(target_path).to exist
 
       shutup do
         uninstall_phase.call
       end
 
-      target_path.wont_be :exist?
+      expect(target_path).not_to exist
     end
   end
 
@@ -235,25 +222,23 @@ describe Hbc::Artifact::App do
     let(:contents) { app.summary[:contents] }
 
     it "returns the correct english_description" do
-      description.must_equal "Apps"
+      expect(description).to eq("Apps")
     end
 
     describe "app is correctly installed" do
-      before do
+      it "returns the path to the app" do
         shutup do
           install_phase.call
         end
-      end
 
-      it "returns the path to the app" do
-        contents.must_equal ["#{target_path} (#{target_path.abv})"]
+        expect(contents).to eq(["#{target_path} (#{target_path.abv})"])
       end
     end
 
     describe "app is missing" do
       it "returns a warning and the supposed path to the app" do
-        contents.size.must_equal 1
-        contents[0].must_match(/.*Missing App.*: #{target_path}/)
+        expect(contents.size).to eq(1)
+        expect(contents[0]).to match(/.*Missing App.*: #{target_path}/)
       end
     end
   end
