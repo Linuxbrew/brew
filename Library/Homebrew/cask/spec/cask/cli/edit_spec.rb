@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 # monkeypatch for testing
 module Hbc
@@ -20,43 +20,43 @@ module Hbc
 end
 
 describe Hbc::CLI::Edit do
-  before do
+  before(:each) do
     Hbc::CLI::Edit.reset!
   end
 
   it "opens the editor for the specified Cask" do
-    Hbc::CLI::Edit.run("alfred")
-    Hbc::CLI::Edit.editor_commands.must_equal [
-      [Hbc.path("alfred")],
+    Hbc::CLI::Edit.run("local-caffeine")
+    expect(Hbc::CLI::Edit.editor_commands).to eq [
+      [Hbc.path("local-caffeine")],
     ]
   end
 
   it "throws away additional arguments and uses the first" do
-    Hbc::CLI::Edit.run("adium", "alfred")
-    Hbc::CLI::Edit.editor_commands.must_equal [
-      [Hbc.path("adium")],
+    Hbc::CLI::Edit.run("local-caffeine", "local-transmission")
+    expect(Hbc::CLI::Edit.editor_commands).to eq [
+      [Hbc.path("local-caffeine")],
     ]
   end
 
   it "raises an exception when the Cask doesnt exist" do
-    lambda {
+    expect {
       Hbc::CLI::Edit.run("notacask")
-    }.must_raise Hbc::CaskUnavailableError
+    }.to raise_error(Hbc::CaskUnavailableError)
   end
 
   describe "when no Cask is specified" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Edit.run
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 
   describe "when no Cask is specified, but an invalid option" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Edit.run("--notavalidoption")
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 end
