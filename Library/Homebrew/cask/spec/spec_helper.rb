@@ -34,4 +34,10 @@ end
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
+  config.after(:each) do
+    FileUtils.rm_rf [
+      Hbc.appdir.children,
+      Hbc.caskroom.children,
+    ]
+  end
 end
