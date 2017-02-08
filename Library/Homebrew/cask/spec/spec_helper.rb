@@ -31,6 +31,9 @@ Hbc.default_tap = Tap.fetch("caskroom", "spec").tap do |tap|
   FileUtils.ln_s TEST_FIXTURE_DIR.join("cask"), tap.path
 end
 
+# pretend that the caskroom/cask Tap is installed
+FileUtils.ln_s Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask"), Tap.fetch("caskroom", "cask").path
+
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)

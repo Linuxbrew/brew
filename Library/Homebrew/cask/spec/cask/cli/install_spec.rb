@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::CLI::Install do
   it "allows staging and activation of multiple Casks at once" do
@@ -6,10 +6,10 @@ describe Hbc::CLI::Install do
       Hbc::CLI::Install.run("local-transmission", "local-caffeine")
     end
 
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").must_be :installed?
-    Hbc.appdir.join("Transmission.app").must_be :directory?
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb").must_be :installed?
-    Hbc.appdir.join("Caffeine.app").must_be :directory?
+    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
+    expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
+    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")).to be_installed
+    expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
   end
 
   it "skips double install (without nuking existing installation)" do
@@ -19,7 +19,7 @@ describe Hbc::CLI::Install do
     shutup do
       Hbc::CLI::Install.run("local-transmission")
     end
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").must_be :installed?
+    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
   end
 
   it "prints a warning message on double install" do
@@ -27,9 +27,9 @@ describe Hbc::CLI::Install do
       Hbc::CLI::Install.run("local-transmission")
     end
 
-    lambda {
+    expect {
       Hbc::CLI::Install.run("local-transmission", "")
-    }.must_output nil, /Warning: A Cask for local-transmission is already installed./
+    }.to output(/Warning: A Cask for local-transmission is already installed./).to_stderr
   end
 
   it "allows double install with --force" do
@@ -37,54 +37,56 @@ describe Hbc::CLI::Install do
       Hbc::CLI::Install.run("local-transmission")
     end
 
-    lambda {
-      Hbc::CLI::Install.run("local-transmission", "--force")
-    }.must_output(/local-transmission was successfully installed!/)
+    expect {
+      expect {
+        Hbc::CLI::Install.run("local-transmission", "--force")
+      }.to output(/It seems there is already an App at.*overwriting\./).to_stderr
+    }.to output(/local-transmission was successfully installed!/).to_stdout
   end
 
   it "skips dependencies with --skip-cask-deps" do
     shutup do
       Hbc::CLI::Install.run("with-depends-on-cask-multiple", "--skip-cask-deps")
     end
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-multiple.rb").must_be :installed?
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb").wont_be :installed?
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb").wont_be :installed?
+    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-multiple.rb")).to be_installed
+    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")).not_to be_installed
+    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).not_to be_installed
   end
 
   it "properly handles Casks that are not present" do
-    lambda {
+    expect {
       shutup do
         Hbc::CLI::Install.run("notacask")
       end
-    }.must_raise Hbc::CaskError
+    }.to raise_error(Hbc::CaskError)
   end
 
   it "returns a suggestion for a misspelled Cask" do
-    lambda {
+    expect {
       begin
         Hbc::CLI::Install.run("googlechrome")
       rescue Hbc::CaskError
         nil
       end
-    }.must_output(nil, /No available Cask for googlechrome\. Did you mean:\ngoogle-chrome/)
+    }.to output(/No available Cask for googlechrome\. Did you mean:\ngoogle-chrome/).to_stderr
   end
 
   it "returns multiple suggestions for a Cask fragment" do
-    lambda {
+    expect {
       begin
         Hbc::CLI::Install.run("google")
       rescue Hbc::CaskError
         nil
       end
-    }.must_output(nil, /No available Cask for google\. Did you mean one of:\ngoogle/)
+    }.to output(/No available Cask for google\. Did you mean one of:\ngoogle/).to_stderr
   end
 
   describe "when no Cask is specified" do
     with_options = lambda do |options|
       it "raises an exception" do
-        lambda {
+        expect {
           Hbc::CLI::Install.run(*options)
-        }.must_raise Hbc::CaskUnspecifiedError
+        }.to raise_error(Hbc::CaskUnspecifiedError)
       end
     end
 
