@@ -37,11 +37,33 @@ FileUtils.ln_s Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "h
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
-  config.after(:each) do
-    FileUtils.rm_rf [
-      Hbc.appdir.children,
-      Hbc.caskroom.children,
-    ]
+  config.around(:each) do |example|
+    begin
+      @__appdir = Hbc.appdir
+      @__caskroom = Hbc.caskroom
+      @__prefpanedir = Hbc.prefpanedir
+      @__qlplugindir = Hbc.qlplugindir
+      @__servicedir = Hbc.servicedir
+
+      @__argv = ARGV.dup
+      @__env = ENV.to_hash # dup doesn't work on ENV
+
+      example.run
+    ensure
+      ARGV.replace(@__argv)
+      ENV.replace(@__env)
+
+      Hbc.appdir = @__appdir
+      Hbc.caskroom = @__caskroom
+      Hbc.prefpanedir = @__prefpanedir
+      Hbc.qlplugindir = @__qlplugindir
+      Hbc.servicedir = @__servicedir
+
+      FileUtils.rm_rf [
+        Hbc.appdir.children,
+        Hbc.caskroom.children,
+      ]
+    end
   end
 end
 
