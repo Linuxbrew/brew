@@ -376,7 +376,7 @@ module Homebrew
           subject_strs << "remove stable"
           formula_name_str += ":" # just for cosmetics
         else
-          subject_strs << formula.version.to_s
+          subject_strs << new[:stable]
         end
       end
       if old[:devel] != new[:devel]
@@ -387,7 +387,7 @@ module Homebrew
             formula_name_str += ":" # just for cosmetics
           end
         else
-          subject_strs << "#{formula.devel.version} (devel)"
+          subject_strs << "#{new[:devel]} (devel)"
         end
       end
       subject = subject_strs.empty? ? nil : "#{formula_name_str} #{subject_strs.join(", ")}"
