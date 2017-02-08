@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Artifact::App do
   describe "activate to alternate target" do
@@ -12,19 +12,19 @@ describe Hbc::Artifact::App do
     let(:target_path) { Hbc.appdir.join("AnotherName.app") }
 
     before do
-      TestHelper.install_without_artifacts(cask)
+      InstallHelper.install_without_artifacts(cask)
     end
 
     it "installs the given apps using the proper target directory" do
-      source_path.must_be :directory?
-      target_path.wont_be :exist?
+      expect(source_path).to be_a_directory
+      expect(target_path).not_to exist
 
       shutup do
         install_phase.call
       end
 
-      target_path.must_be :directory?
-      source_path.wont_be :exist?
+      expect(target_path).to be_a_directory
+      expect(source_path).not_to exist
     end
 
     describe "when app is in a subdirectory" do
@@ -46,8 +46,8 @@ describe Hbc::Artifact::App do
           install_phase.call
         end
 
-        target_path.must_be :directory?
-        appsubdir.join("Caffeine.app").wont_be :exist?
+        expect(target_path).to be_a_directory
+        expect(appsubdir.join("Caffeine.app")).not_to exist
       end
     end
 
@@ -59,23 +59,21 @@ describe Hbc::Artifact::App do
         install_phase.call
       end
 
-      target_path.must_be :directory?
-      source_path.wont_be :exist?
+      expect(target_path).to be_a_directory
+      expect(source_path).not_to exist
 
-      Hbc.appdir.join("Caffeine Deluxe.app").wont_be :exist?
-      cask.staged_path.join("Caffeine Deluxe.app").must_be :directory?
+      expect(Hbc.appdir.join("Caffeine Deluxe.app")).not_to exist
+      expect(cask.staged_path.join("Caffeine Deluxe.app")).to be_a_directory
     end
 
     it "avoids clobbering an existing app by moving over it" do
       target_path.mkpath
 
-      err = install_phase.must_raise(Hbc::CaskError)
+      expect(install_phase).to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
 
-      err.message.must_equal("It seems there is already an App at '#{target_path}'.")
-
-      source_path.must_be :directory?
-      target_path.must_be :directory?
-      File.identical?(source_path, target_path).must_equal false
+      expect(source_path).to be_a_directory
+      expect(target_path).to be_a_directory
+      expect(File.identical?(source_path, target_path)).to be false
     end
   end
 end
