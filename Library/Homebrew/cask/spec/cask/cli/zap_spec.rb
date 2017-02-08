@@ -1,10 +1,10 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::CLI::Zap do
   it "shows an error when a bad Cask is provided" do
-    lambda {
+    expect {
       Hbc::CLI::Zap.run("notacask")
-    }.must_raise Hbc::CaskUnavailableError
+    }.to raise_error(Hbc::CaskUnavailableError)
   end
 
   it "can zap and unlink multiple Casks at once" do
@@ -16,18 +16,18 @@ describe Hbc::CLI::Zap do
       Hbc::Installer.new(transmission).install
     end
 
-    caffeine.must_be :installed?
-    transmission.must_be :installed?
+    expect(caffeine).to be_installed
+    expect(transmission).to be_installed
 
     shutup do
       Hbc::CLI::Zap.run("--notavalidoption",
                         "local-caffeine", "local-transmission")
     end
 
-    caffeine.wont_be :installed?
-    Hbc.appdir.join("Transmission.app").wont_be :symlink?
-    transmission.wont_be :installed?
-    Hbc.appdir.join("Caffeine.app").wont_be :symlink?
+    expect(caffeine).not_to be_installed
+    expect(Hbc.appdir.join("Caffeine.app")).not_to be_a_symlink
+    expect(transmission).not_to be_installed
+    expect(Hbc.appdir.join("Transmission.app")).not_to be_a_symlink
   end
 
   # TODO: Explicit test that both zap and uninstall directives get dispatched.
@@ -59,17 +59,17 @@ describe Hbc::CLI::Zap do
 
   describe "when no Cask is specified" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Zap.run
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 
   describe "when no Cask is specified, but an invalid option" do
     it "raises an exception" do
-      lambda {
+      expect {
         Hbc::CLI::Zap.run("--notavalidoption")
-      }.must_raise Hbc::CaskUnspecifiedError
+      }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
 end
