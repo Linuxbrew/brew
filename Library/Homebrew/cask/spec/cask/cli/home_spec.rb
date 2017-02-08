@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 # monkeypatch for testing
 module Hbc
@@ -25,23 +25,23 @@ describe Hbc::CLI::Home do
   end
 
   it "opens the homepage for the specified Cask" do
-    Hbc::CLI::Home.run("alfred")
-    Hbc::CLI::Home.system_commands.must_equal [
-      ["/usr/bin/open", "--", "https://www.alfredapp.com/"],
+    Hbc::CLI::Home.run("local-caffeine")
+    expect(Hbc::CLI::Home.system_commands).to eq [
+      ["/usr/bin/open", "--", "http://example.com/local-caffeine"],
     ]
   end
 
   it "works for multiple Casks" do
-    Hbc::CLI::Home.run("alfred", "adium")
-    Hbc::CLI::Home.system_commands.must_equal [
-      ["/usr/bin/open", "--", "https://www.alfredapp.com/"],
-      ["/usr/bin/open", "--", "https://www.adium.im/"],
+    Hbc::CLI::Home.run("local-caffeine", "local-transmission")
+    expect(Hbc::CLI::Home.system_commands).to eq [
+      ["/usr/bin/open", "--", "http://example.com/local-caffeine"],
+      ["/usr/bin/open", "--", "http://example.com/local-transmission"],
     ]
   end
 
   it "opens the project page when no Cask is specified" do
     Hbc::CLI::Home.run
-    Hbc::CLI::Home.system_commands.must_equal [
+    expect(Hbc::CLI::Home.system_commands).to eq [
       ["/usr/bin/open", "--", "http://caskroom.io/"],
     ]
   end
