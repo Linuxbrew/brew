@@ -217,6 +217,10 @@ class Keg
     true
   end
 
+  def require_relocation?
+    # no-op
+  end
+
   def linked?
     linked_keg_record.symlink? &&
       linked_keg_record.directory? &&
