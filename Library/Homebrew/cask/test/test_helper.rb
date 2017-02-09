@@ -58,7 +58,7 @@ class TestHelper
     "file://" + local_binary_path(name)
   end
 
-  def self.valid_alias?(candidate)
+  def self.valid_symlink?(candidate)
     return false unless candidate.symlink?
     candidate.readlink.exist?
   end
