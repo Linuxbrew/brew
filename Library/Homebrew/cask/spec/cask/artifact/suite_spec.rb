@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Artifact::Suite do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-suite.rb") }
@@ -8,20 +8,21 @@ describe Hbc::Artifact::Suite do
   let(:target_path) { Hbc.appdir.join("Caffeine") }
   let(:source_path) { cask.staged_path.join("Caffeine") }
 
-  before do
-    TestHelper.install_without_artifacts(cask)
+  before(:each) do
+    InstallHelper.install_without_artifacts(cask)
   end
 
   it "moves the suite to the proper directory" do
-    skip("flaky test")
+    skip("flaky test") # FIXME
 
     shutup do
       install_phase.call
     end
 
-    target_path.must_be :directory?
-    TestHelper.valid_symlink?(target_path).must_equal false
-    source_path.wont_be :exist?
+    expect(target_path).to be_a_directory
+    expect(target_path).to be_a_symlink
+    expect(target_path.readlink).to exist
+    expect(source_path).not_to exist
   end
 
   it "creates a suite containing the expected app" do
@@ -29,20 +30,20 @@ describe Hbc::Artifact::Suite do
       install_phase.call
     end
 
-    target_path.join("Caffeine.app").must_be :exist?
+    expect(target_path.join("Caffeine.app")).to exist
   end
 
   it "avoids clobbering an existing suite by moving over it" do
     target_path.mkpath
 
-    assert_raises Hbc::CaskError do
+    expect {
       shutup do
         install_phase.call
       end
-    end
+    }.to raise_error(Hbc::CaskError)
 
-    source_path.must_be :directory?
-    target_path.must_be :directory?
-    File.identical?(source_path, target_path).must_equal false
+    expect(source_path).to be_a_directory
+    expect(target_path).to be_a_directory
+    expect(File.identical?(source_path, target_path)).to be false
   end
 end
