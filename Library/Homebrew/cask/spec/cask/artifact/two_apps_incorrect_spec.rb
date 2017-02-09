@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Artifact::App do
   # FIXME: Doesn't actually raise because the `app` stanza is not evaluated on load.
