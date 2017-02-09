@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Container::Naked do
   it "saves files with spaces in them from uris with encoded spaces" do
@@ -13,8 +13,13 @@ describe Hbc::Container::Naked do
     Hbc::FakeSystemCommand.stubs_command(expected_command)
 
     container = Hbc::Container::Naked.new(cask, path, Hbc::FakeSystemCommand)
-    container.extract
 
-    Hbc::FakeSystemCommand.system_calls[expected_command].must_equal 1
+    expect {
+      shutup do
+        container.extract
+      end
+    }.not_to raise_error
+
+    expect(Hbc::FakeSystemCommand.system_calls[expected_command]).to eq(1)
   end
 end
