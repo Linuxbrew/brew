@@ -61,15 +61,19 @@ Please consider a regular donation through Patreon:
 [![Donate with Patreon](https://img.shields.io/badge/patreon-donate-green.svg)](https://www.patreon.com/homebrew)
 
 ## Sponsors
-Our CI infrastructure was paid for by [our Kickstarter supporters](http://docs.brew.sh/Kickstarter-Supporters.html).
+Our Xserve ESXi boxes for CI are hosted by [MacStadium](https://www.macstadium.com).
 
-Our CI infrastructure is hosted by [The Positive Internet Company](http://www.positive-internet.com).
+[![Powered by MacStadium](https://cloud.githubusercontent.com/assets/125011/22776032/097557ac-eea6-11e6-8ba8-eff22dfd58f1.png)](https://www.macstadium.com)
 
-Our bottles (binary packages) are hosted by Bintray.
+Our Mac Minis for CI were paid for by [our Kickstarter supporters](http://docs.brew.sh/Kickstarter-Supporters.html).
+
+Our Mac Minis for CI are hosted by [The Positive Internet Company](http://www.positive-internet.com).
+
+Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/homebrew).
 
 [![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/homebrew)
 
-Secure password storage and syncing provided by [1Password for Teams](https://1password.com/teams/) by AgileBits
+Secure password storage and syncing provided by [1Password for Teams](https://1password.com/teams/) by [AgileBits](https://agilebits.com)
 
 [![AgileBits](https://da36klfizjv29.cloudfront.net/assets/branding/agilebits-fcca96e9b8e815c5c48c6b3e98156cb5.png)](https://agilebits.com)
 
