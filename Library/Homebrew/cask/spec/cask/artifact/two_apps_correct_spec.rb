@@ -1,4 +1,4 @@
-require "test_helper"
+require "spec_helper"
 
 describe Hbc::Artifact::App do
   describe "multiple apps" do
@@ -14,8 +14,8 @@ describe Hbc::Artifact::App do
     let(:source_path_pro) { cask.staged_path.join("Caffeine Pro.app") }
     let(:target_path_pro) { Hbc.appdir.join("Caffeine Pro.app") }
 
-    before do
-      TestHelper.install_without_artifacts(cask)
+    before(:each) do
+      InstallHelper.install_without_artifacts(cask)
     end
 
     it "installs both apps using the proper target directory" do
@@ -23,11 +23,11 @@ describe Hbc::Artifact::App do
         install_phase.call
       end
 
-      target_path_mini.must_be :directory?
-      source_path_mini.wont_be :exist?
+      expect(target_path_mini).to be_a_directory
+      expect(source_path_mini).not_to exist
 
-      target_path_pro.must_be :directory?
-      source_path_pro.wont_be :exist?
+      expect(target_path_pro).to be_a_directory
+      expect(source_path_pro).not_to exist
     end
 
     describe "when apps are in a subdirectory" do
@@ -38,11 +38,11 @@ describe Hbc::Artifact::App do
           install_phase.call
         end
 
-        target_path_mini.must_be :directory?
-        source_path_mini.wont_be :exist?
+        expect(target_path_mini).to be_a_directory
+        expect(source_path_mini).not_to exist
 
-        target_path_pro.must_be :directory?
-        source_path_pro.wont_be :exist?
+        expect(target_path_pro).to be_a_directory
+        expect(source_path_pro).not_to exist
       end
     end
 
@@ -53,44 +53,40 @@ describe Hbc::Artifact::App do
         install_phase.call
       end
 
-      target_path_mini.must_be :directory?
-      source_path_mini.wont_be :exist?
+      expect(target_path_mini).to be_a_directory
+      expect(source_path_mini).not_to exist
 
-      Hbc.appdir.join("Caffeine Deluxe.app").wont_be :exist?
-      cask.staged_path.join("Caffeine Deluxe.app").must_be :exist?
+      expect(Hbc.appdir.join("Caffeine Deluxe.app")).not_to exist
+      expect(cask.staged_path.join("Caffeine Deluxe.app")).to exist
     end
 
     describe "avoids clobbering an existing app" do
       it "when the first app of two already exists" do
         target_path_mini.mkpath
 
-        err = assert_raises Hbc::CaskError do
-          install_phase.must_output <<-EOS.undent
+        expect {
+          expect(install_phase).to output(<<-EOS.undent).to_stdout
             ==> Moving App 'Caffeine Pro.app' to '#{target_path_pro}'
           EOS
-        end
+        }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path_mini}'.")
 
-        err.message.must_equal("It seems there is already an App at '#{target_path_mini}'.")
-
-        source_path_mini.must_be :directory?
-        target_path_mini.must_be :directory?
-        File.identical?(source_path_mini, target_path_mini).must_equal false
+        expect(source_path_mini).to be_a_directory
+        expect(target_path_mini).to be_a_directory
+        expect(File.identical?(source_path_mini, target_path_mini)).to be false
       end
 
       it "when the second app of two already exists" do
         target_path_pro.mkpath
 
-        err = assert_raises Hbc::CaskError do
-          install_phase.must_output <<-EOS.undent
+        expect {
+          expect(install_phase).to output(<<-EOS.undent).to_stdout
             ==> Moving App 'Caffeine Mini.app' to '#{target_path_mini}'
           EOS
-        end
+        }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path_pro}'.")
 
-        err.message.must_equal("It seems there is already an App at '#{target_path_pro}'.")
-
-        source_path_pro.must_be :directory?
-        target_path_pro.must_be :directory?
-        File.identical?(source_path_pro, target_path_pro).must_equal false
+        expect(source_path_pro).to be_a_directory
+        expect(target_path_pro).to be_a_directory
+        expect(File.identical?(source_path_pro, target_path_pro)).to be false
       end
     end
   end
