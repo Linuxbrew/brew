@@ -1343,6 +1343,7 @@ class ResourceAuditor
            %r{^http://(?:[^/]*\.)?bintray\.com/},
            %r{^http://tools\.ietf\.org/},
            %r{^http://launchpad\.net/},
+           %r{^http://github\.com/},
            %r{^http://bitbucket\.org/},
            %r{^http://anonscm\.debian\.org/},
            %r{^http://cpan\.metacpan\.org/},
