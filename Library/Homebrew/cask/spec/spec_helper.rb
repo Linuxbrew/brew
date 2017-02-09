@@ -34,5 +34,4 @@ end
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
-  config.include(FileMatchers)
 end

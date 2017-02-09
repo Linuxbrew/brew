@@ -20,7 +20,8 @@ describe Hbc::Artifact::Binary do
     shutup do
       Hbc::Artifact::Binary.new(cask).install_phase
     end
-    expect(expected_path).to be_a_valid_symlink
+    expect(expected_path).to be_a_symlink
+    expect(expected_path.readlink).to exist
   end
 
   it "avoids clobbering an existing binary by linking over it" do
@@ -82,7 +83,8 @@ describe Hbc::Artifact::Binary do
         Hbc::Artifact::Binary.new(cask).install_phase
       end
 
-      expect(expected_path).to be_a_valid_symlink
+      expect(expected_path).to be_a_symlink
+      expect(expected_path.readlink).to exist
     end
   end
 end
