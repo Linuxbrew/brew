@@ -34,16 +34,26 @@ end
 # pretend that the caskroom/cask Tap is installed
 FileUtils.ln_s Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask"), Tap.fetch("caskroom", "cask").path
 
+HOMEBREW_CASK_DIRS = [
+  :appdir,
+  :caskroom,
+  :prefpanedir,
+  :qlplugindir,
+  :servicedir,
+  :binarydir,
+].freeze
+
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
   config.around(:each) do |example|
     begin
-      @__appdir = Hbc.appdir
-      @__caskroom = Hbc.caskroom
-      @__prefpanedir = Hbc.prefpanedir
-      @__qlplugindir = Hbc.qlplugindir
-      @__servicedir = Hbc.servicedir
+      @__dirs = HOMEBREW_CASK_DIRS.map { |dir|
+        Pathname.new(TEST_TMPDIR).join(dir.to_s).tap { |path|
+          path.mkpath
+          Hbc.public_send("#{dir}=", path)
+        }
+      }
 
       @__argv = ARGV.dup
       @__env = ENV.to_hash # dup doesn't work on ENV
@@ -53,16 +63,7 @@ RSpec.configure do |config|
       ARGV.replace(@__argv)
       ENV.replace(@__env)
 
-      Hbc.appdir = @__appdir
-      Hbc.caskroom = @__caskroom
-      Hbc.prefpanedir = @__prefpanedir
-      Hbc.qlplugindir = @__qlplugindir
-      Hbc.servicedir = @__servicedir
-
-      FileUtils.rm_rf [
-        Hbc.appdir.children,
-        Hbc.caskroom.children,
-      ]
+      FileUtils.rm_rf @__dirs.map(&:children)
     end
   end
 end
