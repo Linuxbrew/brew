@@ -17,7 +17,7 @@ $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
 
 require "test/support/helper/shutup"
 
-Pathname.glob(HOMEBREW_LIBRARY_PATH.join("cask", "spec", "support", "*.rb")).each(&method(:require))
+Pathname.glob(HOMEBREW_LIBRARY_PATH.join("cask", "spec", "support", "**", "*.rb")).each(&method(:require))
 
 require "hbc"
 
