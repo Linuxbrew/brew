@@ -218,7 +218,7 @@ class Keg
   end
 
   def require_relocation?
-    # no-op
+    false
   end
 
   def linked?
