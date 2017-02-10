@@ -4,6 +4,9 @@ gem "mocha"
 gem "minitest"
 gem "minitest-reporters"
 gem "parallel_tests"
+gem "rspec"
+gem "rspec-its", require: false
+gem "rspec-wait", require: false
 
 group :coverage do
   gem "simplecov", require: false
