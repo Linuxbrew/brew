@@ -54,10 +54,6 @@ module Hbc
         path_strings - undeletable
       end
 
-      def uninstall_phase
-        dispatch_uninstall_directives
-      end
-
       def dispatch_uninstall_directives(expand_tilde: true)
         directives_set = @cask.artifacts[stanza]
         ohai "Running #{stanza} process for #{@cask}; your password may be necessary"

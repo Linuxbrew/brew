@@ -14,10 +14,10 @@ describe Hbc::Artifact::Zap do
     end
   end
 
-  describe "uninstall_phase" do
+  describe "#zap_phase" do
     subject {
       shutup do
-        zap_artifact.uninstall_phase
+        zap_artifact.zap_phase
       end
     }
 

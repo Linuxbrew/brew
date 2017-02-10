@@ -331,7 +331,7 @@ module Hbc
       uninstall_artifacts
       if Artifact::Zap.me?(@cask)
         ohai "Dispatching zap stanza"
-        Artifact::Zap.new(@cask, command: @command).uninstall_phase
+        Artifact::Zap.new(@cask, command: @command).zap_phase
       else
         opoo "No zap stanza present for Cask '#{@cask}'"
       end
