@@ -12,9 +12,6 @@ module Homebrew
     include Test::Helper::Shutup
     include Test::Helper::VersionAssertions
 
-    TEST_SHA1   = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
-    TEST_SHA256 = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef".freeze
-
     TEST_DIRECTORIES = [
       CoreTap.instance.path/"Formula",
       HOMEBREW_CACHE,
