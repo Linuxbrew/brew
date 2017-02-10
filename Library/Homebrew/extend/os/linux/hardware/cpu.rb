@@ -1,6 +1,16 @@
 module Hardware
   class CPU
     class << self
+      OPTIMIZATION_FLAGS_LINUX = {
+        core2: "-march=core2",
+        core: "-march=prescott",
+        dunno: "-march=native",
+      }.freeze
+
+      def optimization_flags
+        OPTIMIZATION_FLAGS_LINUX
+      end
+
       def universal_archs
         [].extend ArchitectureListExtension
       end
