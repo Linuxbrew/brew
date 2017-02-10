@@ -44,13 +44,15 @@ module Hbc
         :stage_only,
         :nested_container,
         :uninstall,
-        :postflight,
-        :uninstall_postflight,
         :preflight,
+        :postflight,
+        :uninstall_preflight,
         :uninstall_postflight,
       ]
 
       def self.run(*args)
+        raise ArgumentError, "No stanza given." if args.empty?
+
         table = args.include? "--table"
         quiet = args.include? "--quiet"
         format = :to_yaml if args.include? "--yaml"

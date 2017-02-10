@@ -152,7 +152,7 @@ module Hbc
       Hbc.default_tap.install unless Hbc.default_tap.installed?
       Hbc.init if should_init?(command)
       run_command(command, *rest)
-    rescue CaskError, CaskSha256MismatchError => e
+    rescue CaskError, CaskSha256MismatchError, ArgumentError => e
       msg = e.message
       msg << e.backtrace.join("\n") if Hbc.debug
       onoe msg
