@@ -21,36 +21,25 @@ cask_root.cd do
     system "bundle", "install"
   end
 
-  rspec = ARGV.flag?("--rspec") || !ARGV.flag?("--minitest")
-  minitest = ARGV.flag?("--minitest") || !ARGV.flag?("--rspec")
-
   if ARGV.flag?("--coverage")
     ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
     upload_coverage = ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
   end
 
-  failed = false
+  run_tests "parallel_rspec", Dir["spec/**/*_spec.rb"], %w[
+    --color
+    --require spec_helper
+    --format progress
+    --format ParallelTests::RSpec::RuntimeLogger
+    --out tmp/parallel_runtime_rspec.log
+  ]
 
-  if rspec
-    run_tests "parallel_rspec", Dir["spec/**/*_spec.rb"], %w[
-      --color
-      --require spec_helper
-      --format progress
-      --format ParallelTests::RSpec::RuntimeLogger
-      --out tmp/parallel_runtime_rspec.log
-    ]
-    failed ||= !$CHILD_STATUS.success?
+  unless $CHILD_STATUS.success?
+    Homebrew.failed = true
   end
-
-  if minitest
-    run_tests "parallel_test", Dir["test/**/*_test.rb"]
-    failed ||= !$CHILD_STATUS.success?
-  end
-
-  Homebrew.failed = failed
 
   if upload_coverage
     puts "Submitting Codecov coverage..."
-    system "bundle", "exec", "test/upload_coverage.rb"
+    system "bundle", "exec", "spec/upload_coverage.rb"
   end
 end
