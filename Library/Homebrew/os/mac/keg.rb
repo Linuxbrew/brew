@@ -24,8 +24,4 @@ class Keg
     EOS
     raise
   end
-
-  def require_relocation?
-    @require_relocation
-  end
 end
