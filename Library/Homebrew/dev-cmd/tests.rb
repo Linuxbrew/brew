@@ -7,10 +7,21 @@ require "tap"
 module Homebrew
   module_function
 
+  def run_tests(executable, files, args = [])
+    opts = []
+    opts << "--serialize-stdout" if ENV["CI"]
+
+    system "bundle", "exec", executable, *opts, "--", *args, "--", *files
+
+    return if $?.success?
+    Homebrew.failed = true
+  end
+
   def tests
     HOMEBREW_LIBRARY_PATH.cd do
       ENV.delete "HOMEBREW_VERBOSE"
       ENV.delete "VERBOSE"
+      ENV.delete("HOMEBREW_CASK_OPTS")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["TESTOPTS"] = "-v" if ARGV.verbose?
@@ -45,27 +56,35 @@ module Homebrew
       # Make it easier to reproduce test runs.
       ENV["SEED"] = ARGV.next if ARGV.include? "--seed"
 
-      files = Dir.glob("test/**/*_test.rb")
+      files = Dir.glob("test/**/*_{spec,test}.rb")
                  .reject { |p| !OS.mac? && p.start_with?("test/os/mac/") }
+                 .reject { |p| !OS.mac? && p.start_with?("test/cask/") }
                  .reject { |p| p.start_with?("test/vendor/bundle/") }
 
-      opts = []
-      opts << "--serialize-stdout" if ENV["CI"]
-
-      args = []
-      args << "--trace" if ARGV.include? "--trace"
+      test_args = []
+      test_args << "--trace" if ARGV.include? "--trace"
 
       if ARGV.value("only")
         test_name, test_method = ARGV.value("only").split(":", 2)
-        files = Dir.glob("test/{#{test_name},#{test_name}/**/*}_test.rb")
-        args << "--name=test_#{test_method}" if test_method
+        files = Dir.glob("test/{#{test_name},#{test_name}/**/*}_{spec,test}.rb")
+        test_args << "--name=test_#{test_method}" if test_method
       end
 
-      args += ARGV.named.select { |v| v[/^TEST(OPTS)?=/] }
+      test_files = files.select { |p| p.end_with?("_test.rb") }
+      spec_files = files.select { |p| p.end_with?("_spec.rb") }
 
-      system "bundle", "exec", "parallel_test", *opts, "--", *args, "--", *files
+      test_args += ARGV.named.select { |v| v[/^TEST(OPTS)?=/] }
+      run_tests "parallel_test", test_files, test_args
 
-      Homebrew.failed = !$?.success?
+      spec_args = [
+        "--color",
+        "-I", HOMEBREW_LIBRARY_PATH/"test",
+        "--require", "spec_helper",
+        "--format", "progress",
+        "--format", "ParallelTests::RSpec::RuntimeLogger",
+        "--out", "tmp/parallel_runtime_rspec.log"
+      ]
+      run_tests "parallel_rspec", spec_files, spec_args
 
       if (fs_leak_log = HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log").file?
         fs_leak_log_content = fs_leak_log.read
