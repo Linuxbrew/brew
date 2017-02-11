@@ -3,7 +3,6 @@ require "fileutils"
 require "pathname"
 require "formula"
 require "test/support/helper/test_case"
-require "open3"
 
 class IntegrationCommandTestCase < Homebrew::TestCase
   def setup
@@ -29,34 +28,57 @@ class IntegrationCommandTestCase < Homebrew::TestCase
   end
 
   def cmd_output(*args)
+    # 1.8-compatible way of writing def cmd_output(*args, **env)
     env = args.last.is_a?(Hash) ? args.pop : {}
-
-    env.merge!(
-      "HOMEBREW_BREW_FILE" => HOMEBREW_PREFIX/"bin/brew",
-      "HOMEBREW_INTEGRATION_TEST" => cmd_id_from_args(args),
-      "HOMEBREW_TEST_TMPDIR" => TEST_TMPDIR,
-      "HOMEBREW_DEVELOPER" => ENV["HOMEBREW_DEVELOPER"]
-    )
-
-    ruby_args = [
-      "-W0",
-      "-I", "#{HOMEBREW_LIBRARY_PATH}/test/support/lib",
-      "-I", HOMEBREW_LIBRARY_PATH.to_s,
-      "-rconfig"
+    cmd_args = %W[
+      -W0
+      -I#{HOMEBREW_LIBRARY_PATH}/test/support/lib
+      -I#{HOMEBREW_LIBRARY_PATH}
+      -rconfig
     ]
-    ruby_args << "-rsimplecov" if ENV["HOMEBREW_TESTS_COVERAGE"]
-    ruby_args << "-rtest/support/helper/integration_mocks"
-    ruby_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
-
+    if ENV["HOMEBREW_TESTS_COVERAGE"]
+      # This is needed only because we currently use a patched version of
+      # simplecov, and gems installed through git are not available without
+      # requiring bundler/setup first. See also the comment in test/Gemfile.
+      # Remove this line when we'll switch back to a stable simplecov release.
+      cmd_args << "-rbundler/setup"
+      cmd_args << "-rsimplecov"
+    end
+    cmd_args << "-rtest/support/helper/integration_mocks"
+    cmd_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
+    cmd_args += args
+    developer = ENV["HOMEBREW_DEVELOPER"]
     Bundler.with_original_env do
-      output, status = Open3.capture2e(env, RUBY_PATH, *ruby_args, *args)
-      [output.chomp, status]
+      ENV["HOMEBREW_BREW_FILE"] = HOMEBREW_PREFIX/"bin/brew"
+      ENV["HOMEBREW_INTEGRATION_TEST"] = cmd_id_from_args(args)
+      ENV["HOMEBREW_TEST_TMPDIR"] = TEST_TMPDIR
+      ENV["HOMEBREW_DEVELOPER"] = developer
+      env.each_pair do |k, v|
+        ENV[k] = v
+      end
+
+      read, write = IO.pipe
+      begin
+        pid = fork do
+          read.close
+          $stdout.reopen(write)
+          $stderr.reopen(write)
+          write.close
+          exec RUBY_PATH, *cmd_args
+        end
+        write.close
+        read.read.chomp
+      ensure
+        Process.wait(pid)
+        read.close
+      end
     end
   end
 
   def cmd(*args)
-    output, status = cmd_output(*args)
-    assert status.success?, <<-EOS.undent
+    output = cmd_output(*args)
+    status = $?.exitstatus
+    assert_equal 0, status, <<-EOS.undent
       `brew #{args.join " "}` exited with non-zero status!
       #{output}
     EOS
@@ -64,8 +86,9 @@ class IntegrationCommandTestCase < Homebrew::TestCase
   end
 
   def cmd_fail(*args)
-    output, status = cmd_output(*args)
-    refute status.success?, <<-EOS.undent
+    output = cmd_output(*args)
+    status = $?.exitstatus
+    refute_equal 0, status, <<-EOS.undent
       `brew #{args.join " "}` exited with zero status!
       #{output}
     EOS
