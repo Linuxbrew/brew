@@ -188,6 +188,7 @@ class Keg
     @name = path.parent.basename.to_s
     @linked_keg_record = HOMEBREW_LINKED_KEGS/name
     @opt_record = HOMEBREW_PREFIX/"opt/#{name}"
+    @require_relocation = false
   end
 
   def rack
@@ -215,6 +216,10 @@ class Keg
     end
 
     true
+  end
+
+  def require_relocation?
+    @require_relocation
   end
 
   def linked?
