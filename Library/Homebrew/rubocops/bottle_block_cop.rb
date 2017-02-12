@@ -1,6 +1,6 @@
 module RuboCop
   module Cop
-    module CustomCops
+    module Homebrew
       class CorrectBottleBlock < Cop
         MSG = "Use rebuild instead of revision in bottle block".freeze
 
