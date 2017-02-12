@@ -15,7 +15,7 @@ ARGV.extend(HomebrewArgvExtension)
 
 HOMEBREW_PRODUCT = ENV["HOMEBREW_PRODUCT"]
 HOMEBREW_VERSION = ENV["HOMEBREW_VERSION"]
-HOMEBREW_WWW = "http://brew.sh".freeze
+HOMEBREW_WWW = "https://brew.sh".freeze
 
 require "config"
 
