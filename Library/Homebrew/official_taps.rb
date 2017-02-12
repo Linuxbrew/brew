@@ -1,7 +1,6 @@
 OFFICIAL_TAPS = %w[
   apache
   dupes
-  emacs
   fuse
   nginx
   php
