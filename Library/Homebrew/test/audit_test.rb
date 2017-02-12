@@ -431,6 +431,9 @@ class FormulaAuditorTests < Homebrew::TestCase
       "corge" => "http://savannah.nongnu.org/corge",
       "grault" => "http://grault.github.io/",
       "garply" => "http://www.gnome.org/garply",
+      "sf1" => "http://foo.sourceforge.net/",
+      "sf2" => "http://foo.sourceforge.net",
+      "sf3" => "http://foo.sf.net/",
       "waldo" => "http://www.gnu.org/waldo",
     }
 
@@ -455,6 +458,8 @@ class FormulaAuditorTests < Homebrew::TestCase
         end
       elsif homepage =~ %r{https:\/\/code\.google\.com}
         assert_match "#{homepage} should end with a slash", fa.problems.first
+      elsif homepage =~ /foo\.(sf|sourceforge)\.net/
+        assert_match "#{homepage} should be `https://foo.sourceforge.io/`", fa.problems.first
       else
         assert_match "Please use https:// for #{homepage}", fa.problems.first
       end

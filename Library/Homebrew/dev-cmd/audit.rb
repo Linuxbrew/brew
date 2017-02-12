@@ -584,6 +584,10 @@ class FormulaAuditor
       problem "Please use https:// for #{homepage}"
     end
 
+    if homepage =~ %r{^http://([^/]*)\.(sf|sourceforge)\.net(/|$)}
+      problem "#{homepage} should be `https://#{$1}.sourceforge.io/`"
+    end
+
     # There's an auto-redirect here, but this mistake is incredibly common too.
     # Only applies to the homepage and subdomains for now, not the FTP URLs.
     if homepage =~ %r{^http://((?:build|cloud|developer|download|extensions|git|glade|help|library|live|nagios|news|people|projects|rt|static|wiki|www)\.)?gnome\.org}
