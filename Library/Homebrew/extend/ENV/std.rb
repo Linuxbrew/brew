@@ -218,8 +218,7 @@ module Stdenv
     append "CXX", "-stdlib=libstdc++" if compiler == :clang
   end
 
-  def libxml2
-  end
+  def libxml2(); end
 
   # @private
   def replace_in_cflags(before, after)
