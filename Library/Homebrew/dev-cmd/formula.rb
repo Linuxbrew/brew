@@ -1,5 +1,5 @@
-#:  * `formula` <formulae>:
-#:    echo location of the specified <formulae> to stdout
+#:  * `formula` <formula>:
+#:    Display the path where <formula> is
 
 require "formula"
 
@@ -8,8 +8,6 @@ module Homebrew
 
   def formula
     raise FormulaUnspecifiedError if ARGV.named.empty?
-    ARGV.resolved_formulae.each do |f|
-      puts "#{f.path}\n"
-    end
+    ARGV.resolved_formulae.each { |f| puts f.path }
   end
 end
