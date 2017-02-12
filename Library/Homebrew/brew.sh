@@ -73,6 +73,18 @@ fi
 export GEM_OLD_HOME="$GEM_HOME"
 export GEM_OLD_PATH="$GEM_PATH"
 
+# Users may have these set, pointing the system Ruby
+# at non-system gem paths
+unset GEM_HOME
+unset GEM_PATH
+
+# Users may have this set, injecting arbitrary environment changes into
+# bash processes inside builds
+unset BASH_ENV
+
+# Users may have this set, breaking grep's output.
+unset GREP_OPTIONS
+
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_MACOS="1" ;;
@@ -327,7 +339,7 @@ else
   # shellcheck source=/dev/null
   source "$HOMEBREW_LIBRARY/Homebrew/utils/ruby.sh"
   setup-ruby-path
-  
+
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
   { update-preinstall; exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
