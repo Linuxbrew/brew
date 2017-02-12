@@ -44,78 +44,17 @@ fi
 
 HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 
-# Refactor of code from '/Library/Homebrew/brew.sh'
-export HOMEBREW_BREW_FILE
-export HOMEBREW_PREFIX
-export HOMEBREW_REPOSITORY
-export HOMEBREW_LIBRARY
-
-# Set to system default value to avoid any possible later mis-direction based on the user's shell env
-export PATH=/usr/bin:/bin:/usr/sbin:/sbin
-
-# -------------------------------------------------------------------------------------------------------------------------
-# Setting 'HOMEBREW_OLD_ENV' would be removed with 'env -i' so would need to be passed as another arg to the 'env -i' cmd.
-
-# The resulting '/tmp/homebrew-env' for an update prior to install was 
-# (which may run into bash arg limits, so I suggest keeping the tmp file):
-
-#HOMEBREW_PROCESSOR=Intel
-#HOMEBREW_DEV_CMD_RUN=1
-#HOMEBREW_USER_AGENT=Homebrew/1.X.Y (Macintosh; Intel macOS 10.6.8)
-#HOMEBREW_UPDATE_BEFORE=f7bccee2145547d21b2629cab8b5fddff3299bda
-#HOMEBREW_LIBRARY=/usr/local/Homebrew/Library
-#HOMEBREW_COMMAND_DEPTH=2
-#TERM=xterm-color
-#HOMEBREW_OS_VERSION=macOS 10.6.8
-#HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_BUNDLE=a32e4559ef653c648426a4d52abdb570db09fccf
-#HOMEBREW_REPOSITORY=/usr/local/Homebrew
-#HOMEBREW_ENABLE_AUTO_UPDATE_MIGRATION=1
-#HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE=350aa1a6b9f5d31dabb9d2cfeeffb960a64509e6
-#HOMEBREW_GIT_CONFIG_FILE=/usr/local/Homebrew/.git/config
-#HOMEBREW_RUBY_PATH=/usr/local/Homebrew/Library/Homebrew/vendor/portable-ruby/current/bin/ruby
-#HOMEBREW_NO_AUTO_UPDATE=1
-#HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE=9bc16f465e1d7697426dd6dad685d161f1f4ee1d
-#HOMEBREW_ANALYTICS_USER_UUID=B2E8D13A-443F-4686-B946-DE6C797064D7
-#HOMEBREW_CACHE=/Users/doug/Library/Caches/Homebrew
-#HOMEBREW_USER_AGENT_CURL=Homebrew/1.X.Y (Macintosh; Intel macOS 10.6.8) curl/7.52.1
-#PATH=/usr/bin:/bin:/usr/sbin:/sbin
-#HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_VERSIONS=c94a1b18d5c2c198b4be302b604dd0c845a4344b
-#HOMEBREW_UPDATE_BEFORE_CASKROOM_HOMEBREW_CASK=258fd55c9c3d4fc3699753f363927c51a6fe9c18
-#HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_BUNDLE=a32e4559ef653c648426a4d52abdb570db09fccf
-#HOMEBREW_BREW_FILE=/usr/local/bin/brew
-#HOMEBREW_MACOS_VERSION=10.6.8
-#HOMEBREW_ANALYTICS_ID=UA-76679469-1
-#HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_VERSIONS=c94a1b18d5c2c198b4be302b604dd0c845a4344b
-#HOMEBREW_UPDATE_AFTER_CASKROOM_HOMEBREW_CASK=258fd55c9c3d4fc3699753f363927c51a6fe9c18
-#HOMEBREW_PRODUCT=Homebrew
-#HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_DUPES=25fa9b53f943de00fc83c5a85fa0d29180eb1030
-#HOME=/Users/doug
-#HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_DUPES=25fa9b53f943de00fc83c5a85fa0d29180eb1030
-#HOMEBREW_PREFIX=/usr/local
-#HOMEBREW_VERSION=>1.1.0 (no git repository)
-#HOMEBREW_CELLAR=/usr/local/Cellar
-#HOMEBREW_CURL=/usr/local/opt/curl/bin/curl
-#HOMEBREW_UPDATE_PREINSTALL=1
-#HOMEBREW_NO_UPDATE_CLEANUP=1
-#HOMEBREW_UPDATE_AFTER=f7bccee2145547d21b2629cab8b5fddff3299bda
-#HOMEBREW_SYSTEM=Macintosh
-
-# from an original of:
-
-#HOMEBREW_LIBRARY=/usr/local/Homebrew/Library
-#TERM=xterm-color
-#HOMEBREW_REPOSITORY=/usr/local/Homebrew
-#PATH=/usr/bin:/bin:/usr/sbin:/sbin
-#HOMEBREW_BREW_FILE=/usr/local/bin/brew
-#HOME=/Users/doug
-#HOMEBREW_PREFIX=/usr/local
-# -------------------------------------------------------------------------------------------------------------------------
-
 if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
 then
-  # Needed TERM to prevent "tput: No value for $TERM and no -T specified"
-  env | grep -E '^(HOMEBREW.*|HOME|PATH|TERM)=.*$' > /tmp/homebrew-env
-  env -i "$HOMEBREW_LIBRARY/Homebrew/utils/shell_env.sh" "$@"
+  env -i \
+    HOME="$HOME" \
+    PATH=/usr/bin:/bin:/usr/sbin:/sbin \
+    TERM="$TERM" \
+    HOMEBREW_BREW_FILE="$HOMEBREW_BREW_FILE" \
+    HOMEBREW_PREFIX="$HOMEBREW_PREFIX" \
+    HOMEBREW_REPOSITORY="$HOMEBREW_REPOSITORY" \
+    HOMEBREW_LIBRARY="$HOMEBREW_LIBRARY" \
+    /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
 else
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi
