@@ -169,7 +169,7 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def url_status_code(url, range: false, user_agent: :default)
+  def url_status_code(url, range: false)
     # The system Curl is too old and unreliable with HTTPS homepages on
     # Yosemite and below.
     return "200" unless DevelopmentTools.curl_handles_most_https_homepages?
@@ -182,14 +182,13 @@ class FormulaAuditor
     extra_args << "--range" << "0-0" if range
     extra_args << url
 
-    args = curl_args(
-      extra_args: extra_args,
-      show_output: true,
-      user_agent: user_agent
-    )
-    retries = 3
     status_code = nil
-    retries.times do
+    [:browser, :default].each do |user_agent|
+      args = curl_args(
+        extra_args: extra_args,
+        show_output: true,
+        user_agent: user_agent
+      )
       status_code = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
       break if status_code.start_with? "20"
     end
@@ -489,7 +488,7 @@ class FormulaAuditor
 
       next unless @strict
 
-      if o.name == "universal"
+      if o.name == "universal" && !Formula["wine"].recursive_dependencies.map(&:name).include?(formula.name)
         problem "macOS has been 64-bit only since 10.6 so universal options are deprecated."
       end
 
@@ -609,7 +608,7 @@ class FormulaAuditor
 
     return unless @online
 
-    status_code = url_status_code(homepage, user_agent: :browser)
+    status_code = url_status_code(homepage)
     return if status_code.start_with? "20"
     problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end

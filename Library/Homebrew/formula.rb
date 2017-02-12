@@ -1843,7 +1843,16 @@ class Formula
       eligible_kegs = if head? && (head_prefix = latest_head_prefix)
         installed_kegs - [Keg.new(head_prefix)]
       else
-        installed_kegs.select { |k| pkg_version > k.version }
+        installed_kegs.select do |keg|
+          tab = Tab.for_keg(keg)
+          if version_scheme > tab.version_scheme
+            true
+          elsif version_scheme == tab.version_scheme
+            pkg_version > keg.version
+          else
+            false
+          end
+        end
       end
 
       unless eligible_kegs.empty?

@@ -1,7 +1,7 @@
 require "test_helper"
 
 describe Hbc::Artifact::Suite do
-  let(:cask) { Hbc.load("with-suite") }
+  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-suite.rb") }
 
   let(:install_phase) { -> { Hbc::Artifact::Suite.new(cask).install_phase } }
 

@@ -34,6 +34,7 @@ module Homebrew
       %w[AUTHOR COMMITTER].each do |role|
         ENV["GIT_#{role}_NAME"] = "brew tests"
         ENV["GIT_#{role}_EMAIL"] = "brew-tests@localhost"
+        ENV["GIT_#{role}_DATE"]  = "Sun Jan 22 19:59:13 2017 +0000"
       end
 
       Homebrew.install_gem_setup_path! "bundler"

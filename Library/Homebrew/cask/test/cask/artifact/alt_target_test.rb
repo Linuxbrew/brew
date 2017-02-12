@@ -2,7 +2,7 @@ require "test_helper"
 
 describe Hbc::Artifact::App do
   describe "activate to alternate target" do
-    let(:cask) { Hbc.load("with-alt-target") }
+    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-alt-target.rb") }
 
     let(:install_phase) {
       -> { Hbc::Artifact::App.new(cask).install_phase }

@@ -32,12 +32,18 @@ class LanguageModuleRequirement < Requirement
 
   def the_test
     case @language
-    when :lua then %W[/usr/bin/env luarocks-5.2 show #{@import_name}]
-    when :lua51 then %W[/usr/bin/env luarocks-5.1 show #{@import_name}]
-    when :perl then %W[/usr/bin/env perl -e use\ #{@import_name}]
-    when :python then %W[/usr/bin/env python -c import\ #{@import_name}]
-    when :python3 then %W[/usr/bin/env python3 -c import\ #{@import_name}]
-    when :ruby then %W[/usr/bin/env ruby -rubygems -e require\ '#{@import_name}']
+    when :lua
+      ["/usr/bin/env", "luarocks-5.2", "show", @import_name.to_s]
+    when :lua51
+      ["/usr/bin/env", "luarocks-5.1", "show", @import_name.to_s]
+    when :perl
+      ["/usr/bin/env", "perl", "-e", "use #{@import_name}"]
+    when :python
+      ["/usr/bin/env", "python", "-c", "import #{@import_name}"]
+    when :python3
+      ["/usr/bin/env", "python3", "-c", "import #{@import_name}"]
+    when :ruby
+      ["/usr/bin/env", "ruby", "-rubygems", "-e", "require '#{@import_name}'"]
     end
   end
 

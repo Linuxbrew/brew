@@ -127,6 +127,11 @@ names, and other aspects of this manual are still subject to change.
     the appcast checkpoint if the `--calculate` flag is specified.  
     Given a `URL`, calculates the appcast checkpoint for it.
 
+  * `_stanza` <stanza_name> [ --table | --yaml | --inspect | --quiet ] [ <cask_token> ... ]:
+    Given a `stanza_name` and a `cask_token`, returns the current stanza
+    for a given Cask. If no `cask_token` is given, then data for all
+    Casks is returned.
+
 ## OPTIONS
 
 To make these options persistent, see the ENVIRONMENT section, below.

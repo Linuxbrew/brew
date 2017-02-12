@@ -1,7 +1,7 @@
 require "test_helper"
 
 describe Hbc::Artifact::App do
-  let(:cask) { Hbc.load("local-caffeine") }
+  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb") }
   let(:command) { Hbc::SystemCommand }
   let(:force) { false }
   let(:app) { Hbc::Artifact::App.new(cask, command: command, force: force) }

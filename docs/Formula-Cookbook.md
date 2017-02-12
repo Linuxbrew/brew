@@ -359,6 +359,7 @@ Now, please [open a pull request](http://docs.brew.sh/How-To-Open-a-Homebrew-Pul
 *   Keep merge commits out of the pull request
 
 # Convenience Tools
+
 ## Messaging
 
 Three commands are provided for displaying informational messages to the user:
@@ -782,6 +783,8 @@ The symlinks created by `install_symlink` are guaranteed to be relative. `ln_s` 
 ## Handling files that should persist over formula upgrades
 
 For example, Ruby 1.9’s gems should be installed to `var/lib/ruby/` so that gems don’t need to be reinstalled when upgrading Ruby. You can usually do this with symlink trickery, or *better* a configure option.
+
+Another example would be configuration files that should not be overwritten on package upgrades. If after installation you find that to-be-persisted configuration files are not copied but instead *symlinked* into `/usr/local/etc/` from the Cellar, this can often be rectified by passing an appropriate argument to the package’s configure script. That argument will vary depending on a given package’s configure script and/or Makefile, but one example might be: `--sysconfdir=#{etc}`
 
 ### launchd plist files
 

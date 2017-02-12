@@ -14,9 +14,9 @@ class ShellSmokeTest < Homebrew::TestCase
   end
 
   def test_path_to_shell_failure
-    assert_equal nil, Utils::Shell.path_to_shell("")
-    assert_equal nil, Utils::Shell.path_to_shell("@@@@@@")
-    assert_equal nil, Utils::Shell.path_to_shell("invalid_shell-4.2")
+    assert_nil Utils::Shell.path_to_shell("")
+    assert_nil Utils::Shell.path_to_shell("@@@@@@")
+    assert_nil Utils::Shell.path_to_shell("invalid_shell-4.2")
   end
 
   def test_sh_quote
@@ -37,7 +37,6 @@ class ShellSmokeTest < Homebrew::TestCase
   end
 
   def prepend_path_shell(shell, path, fragment)
-    original_shell = ENV["SHELL"]
     ENV["SHELL"] = shell
 
     prepend_message = Utils::Shell.prepend_path_in_shell_profile(path)
@@ -45,8 +44,6 @@ class ShellSmokeTest < Homebrew::TestCase
       prepend_message.start_with?(fragment),
       "#{shell}: expected #{prepend_message} to match #{fragment}"
     )
-
-    ENV["SHELL"] = original_shell
   end
 
   def test_prepend_path_in_shell_profile

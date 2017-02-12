@@ -13,9 +13,7 @@ require "global"
 # add Homebrew-Cask to load path
 $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
 
-require "test/support/helper/env"
 require "test/support/helper/shutup"
-include Test::Helper::Env
 include Test::Helper::Shutup
 
 def sudo(*args)
@@ -48,7 +46,7 @@ Hbc.caskroom = Hbc.default_caskroom.tap(&:mkpath)
 Hbc.default_tap = Tap.fetch("caskroom", "test").tap do |tap|
   # link test casks
   FileUtils.mkdir_p tap.path.dirname
-  FileUtils.ln_s Pathname.new(__FILE__).dirname.join("support"), tap.path
+  FileUtils.ln_s TEST_FIXTURE_DIR.join("cask"), tap.path
 end
 
 # pretend that the caskroom/cask Tap is installed

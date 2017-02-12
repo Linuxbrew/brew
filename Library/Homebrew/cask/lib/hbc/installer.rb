@@ -141,8 +141,8 @@ module Hbc
 
       artifacts.each do |artifact|
         odebug "Installing artifact of class #{artifact}"
-        already_installed_artifacts.unshift(artifact)
         artifact.new(@cask, options).install_phase
+        already_installed_artifacts.unshift(artifact)
       end
     rescue StandardError => e
       begin
