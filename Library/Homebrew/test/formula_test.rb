@@ -209,12 +209,12 @@ class FormulaTests < Homebrew::TestCase
     refute_predicate f, :installed?
 
     f.stubs(:installed_prefix).returns(
-      stub(directory?: true, children: [])
+      stub(directory?: true, children: []),
     )
     refute_predicate f, :installed?
 
     f.stubs(:installed_prefix).returns(
-      stub(directory?: true, children: [stub])
+      stub(directory?: true, children: [stub]),
     )
     assert_predicate f, :installed?
   end

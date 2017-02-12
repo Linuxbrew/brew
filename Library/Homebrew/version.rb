@@ -164,7 +164,7 @@ class Version
     RCToken::PATTERN,
     PatchToken::PATTERN,
     NumericToken::PATTERN,
-    StringToken::PATTERN
+    StringToken::PATTERN,
   )
 
   class FromURL < Version

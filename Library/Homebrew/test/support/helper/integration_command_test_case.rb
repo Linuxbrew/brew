@@ -35,7 +35,7 @@ class IntegrationCommandTestCase < Homebrew::TestCase
       "HOMEBREW_BREW_FILE" => HOMEBREW_PREFIX/"bin/brew",
       "HOMEBREW_INTEGRATION_TEST" => cmd_id_from_args(args),
       "HOMEBREW_TEST_TMPDIR" => TEST_TMPDIR,
-      "HOMEBREW_DEVELOPER" => ENV["HOMEBREW_DEVELOPER"]
+      "HOMEBREW_DEVELOPER" => ENV["HOMEBREW_DEVELOPER"],
     )
 
     ruby_args = [

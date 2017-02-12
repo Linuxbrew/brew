@@ -36,7 +36,7 @@ describe Hbc::UrlChecker do
           "Content-Type"   => "application/x-apple-diskimage",
           "ETag"           => '"b4208f3e84967be4b078ecaa03fba941"',
           "Content-Length" => "23726161",
-          "Last-Modified"  => "Sun, 12 Aug 2012 21:17:21 GMT"
+          "Last-Modified"  => "Sun, 12 Aug 2012 21:17:21 GMT",
         )
       end
     end

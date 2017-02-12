@@ -19,7 +19,7 @@ describe "Accessibility Access" do
       expect(fake_system_command).to receive(:run!).with(
         "/usr/bin/touch",
         args: [Hbc.pre_mavericks_accessibility_dotfile],
-        sudo: true
+        sudo: true,
       )
 
       shutup do
@@ -41,7 +41,7 @@ describe "Accessibility Access" do
       expect(fake_system_command).to receive(:run!).with(
         "/usr/bin/sqlite3",
         args: [Hbc.tcc_db, "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','com.example.BasicCask',0,1,1,NULL);"],
-        sudo: true
+        sudo: true,
       )
 
       shutup do
@@ -53,7 +53,7 @@ describe "Accessibility Access" do
       expect(fake_system_command).to receive(:run!).with(
         "/usr/bin/sqlite3",
         args: [Hbc.tcc_db, "DELETE FROM access WHERE client='com.example.BasicCask';"],
-        sudo: true
+        sudo: true,
       )
 
       shutup do

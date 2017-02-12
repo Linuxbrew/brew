@@ -61,7 +61,7 @@ describe Plist do
             /dev/disk3s1
             /dev/disk3
             /dev/disk3s2
-          ]
+          ],
         )
       end
     end

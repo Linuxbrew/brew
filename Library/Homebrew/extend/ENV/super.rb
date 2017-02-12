@@ -277,7 +277,7 @@ module Superenv
     return unless Hardware::CPU.is_32_bit?
     self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
       /-march=\S*/,
-      "-Xarch_#{Hardware::CPU.arch_32_bit} \\0"
+      "-Xarch_#{Hardware::CPU.arch_32_bit} \\0",
     )
   end
 

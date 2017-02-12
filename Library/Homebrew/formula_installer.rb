@@ -431,7 +431,7 @@ class FormulaInstaller
       inherited_options[dep.name] |= inherited_options_for(dep)
       build = effective_build_options_for(
         dependent,
-        inherited_options.fetch(dependent.name, [])
+        inherited_options.fetch(dependent.name, []),
       )
 
       if (dep.optional? || dep.recommended?) && build.without?(dep)

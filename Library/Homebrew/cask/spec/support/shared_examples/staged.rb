@@ -19,7 +19,7 @@ shared_examples Hbc::Staged do
 
   it "can run system commands with list-form arguments" do
     Hbc::FakeSystemCommand.expects_command(
-      ["echo", "homebrew-cask", "rocks!"]
+      ["echo", "homebrew-cask", "rocks!"],
     )
 
     shutup do
@@ -35,7 +35,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:bundle_identifier).and_return("com.example.BasicCask")
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/libexec/PlistBuddy", "-c", "Print CFBundleIdentifier", staged.info_plist_file]
+      ["/usr/libexec/PlistBuddy", "-c", "Print CFBundleIdentifier", staged.info_plist_file],
     )
 
     shutup do
@@ -47,7 +47,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:bundle_identifier).and_return("com.example.BasicCask")
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/libexec/PlistBuddy", "-c", "Set :JVMOptions:JVMVersion 1.6+", staged.info_plist_file]
+      ["/usr/libexec/PlistBuddy", "-c", "Set :JVMOptions:JVMVersion 1.6+", staged.info_plist_file],
     )
 
     shutup do
@@ -60,7 +60,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/bin/chmod", "-R", "--", "777", fake_pathname]
+      ["/bin/chmod", "-R", "--", "777", fake_pathname],
     )
 
     shutup do
@@ -73,7 +73,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/bin/chmod", "-R", "--", "777", fake_pathname, fake_pathname]
+      ["/bin/chmod", "-R", "--", "777", fake_pathname, fake_pathname],
     )
 
     shutup do
@@ -94,7 +94,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname]
+      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname],
     )
 
     shutup do
@@ -109,7 +109,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname, fake_pathname]
+      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname, fake_pathname],
     )
 
     shutup do
@@ -123,7 +123,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "other_user:other_group", fake_pathname]
+      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "other_user:other_group", fake_pathname],
     )
 
     shutup do

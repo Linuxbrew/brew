@@ -168,6 +168,8 @@ Style/TernaryParentheses:
 # makes diffs nicer
 Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
 
 Style/VariableNumber:
   Enabled: false

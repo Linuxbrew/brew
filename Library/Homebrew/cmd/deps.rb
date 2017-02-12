@@ -50,7 +50,7 @@ module Homebrew
       tree?: ARGV.include?("--tree"),
       all?: ARGV.include?("--all"),
       topo_order?: ARGV.include?("-n"),
-      union?: ARGV.include?("--union")
+      union?: ARGV.include?("--union"),
     )
 
     if mode.installed? && mode.tree?

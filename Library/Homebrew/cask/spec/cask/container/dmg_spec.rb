@@ -8,7 +8,7 @@ describe Hbc::Container::Dmg do
       dmg = Hbc::Container::Dmg.new(
         transmission,
         Pathname(transmission.url.path),
-        Hbc::SystemCommand
+        Hbc::SystemCommand,
       )
 
       begin
