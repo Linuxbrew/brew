@@ -42,7 +42,7 @@ class ShellSmokeTest < Homebrew::TestCase
     prepend_message = Utils::Shell.prepend_path_in_shell_profile(path)
     assert(
       prepend_message.start_with?(fragment),
-      "#{shell}: expected #{prepend_message} to match #{fragment}"
+      "#{shell}: expected #{prepend_message} to match #{fragment}",
     )
   end
 

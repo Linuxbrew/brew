@@ -18,7 +18,7 @@ describe Hbc::Artifact::Pkg do
         "/usr/sbin/installer",
         args: ["-pkg", cask.staged_path.join("MyFancyPkg", "Fancy.pkg"), "-target", "/"],
         sudo: true,
-        print_stdout: true
+        print_stdout: true,
       )
 
       shutup do
@@ -60,7 +60,7 @@ describe Hbc::Artifact::Pkg do
         "/usr/sbin/installer",
         args: ["-pkg", cask.staged_path.join("MyFancyPkg", "Fancy.pkg"), "-target", "/", "-applyChoiceChangesXML", cask.staged_path.join("/tmp/choices.xml")],
         sudo: true,
-        print_stdout: true
+        print_stdout: true,
       )
 
       shutup do

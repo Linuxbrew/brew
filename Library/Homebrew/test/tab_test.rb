@@ -32,7 +32,7 @@ class TabTests < Homebrew::TestCase
           "devel" => "0.14",
           "head" => "HEAD-1111111",
         },
-      }
+      },
     )
   end
 

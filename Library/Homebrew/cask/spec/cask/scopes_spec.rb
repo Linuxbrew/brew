@@ -14,7 +14,7 @@ describe Hbc::Scopes do
         %w[
           loaded-cask-bar
           loaded-cask-foo
-        ]
+        ],
       )
     end
 

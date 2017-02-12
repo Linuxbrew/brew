@@ -35,23 +35,23 @@ describe Hbc::Pkg do
       it "forgets the pkg" do
         allow(fake_system_command).to receive(:run!).with(
           "/usr/sbin/pkgutil",
-          args: ["--only-files", "--files", "my.fake.pkg"]
+          args: ["--only-files", "--files", "my.fake.pkg"],
         ).and_return(empty_response)
 
         allow(fake_system_command).to receive(:run!).with(
           "/usr/sbin/pkgutil",
-          args: ["--only-dirs", "--files", "my.fake.pkg"]
+          args: ["--only-dirs", "--files", "my.fake.pkg"],
         ).and_return(empty_response)
 
         allow(fake_system_command).to receive(:run!).with(
           "/usr/sbin/pkgutil",
-          args: ["--files", "my.fake.pkg"]
+          args: ["--files", "my.fake.pkg"],
         ).and_return(empty_response)
 
         expect(fake_system_command).to receive(:run!).with(
           "/usr/sbin/pkgutil",
           args: ["--forget", "my.fake.pkg"],
-          sudo: true
+          sudo: true,
         )
 
         pkg.uninstall

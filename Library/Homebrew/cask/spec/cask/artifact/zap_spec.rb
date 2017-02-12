@@ -45,12 +45,12 @@ describe Hbc::Artifact::Zap do
         it "can zap" do
           Hbc::FakeSystemCommand.stubs_command(
             launchctl_list_cmd,
-            service_info
+            service_info,
           )
 
           Hbc::FakeSystemCommand.stubs_command(
             sudo(launchctl_list_cmd),
-            unknown_response
+            unknown_response,
           )
 
           Hbc::FakeSystemCommand.expects_command(launchctl_remove_cmd)
@@ -63,12 +63,12 @@ describe Hbc::Artifact::Zap do
         it "can zap" do
           Hbc::FakeSystemCommand.stubs_command(
             launchctl_list_cmd,
-            unknown_response
+            unknown_response,
           )
 
           Hbc::FakeSystemCommand.stubs_command(
             sudo(launchctl_list_cmd),
-            service_info
+            service_info,
           )
 
           Hbc::FakeSystemCommand.expects_command(sudo(launchctl_remove_cmd))
@@ -126,7 +126,7 @@ describe Hbc::Artifact::Zap do
       it "can zap" do
         Hbc::FakeSystemCommand.stubs_command(
           %w[/usr/sbin/pkgutil --pkgs=my.fancy.package.*],
-          "#{main_pkg_id}\n#{agent_pkg_id}"
+          "#{main_pkg_id}\n#{agent_pkg_id}",
         )
 
         [
@@ -135,28 +135,28 @@ describe Hbc::Artifact::Zap do
         ].each do |pkg_id, pkg_files, pkg_dirs|
           Hbc::FakeSystemCommand.stubs_command(
             %W[/usr/sbin/pkgutil --only-files --files #{pkg_id}],
-            pkg_files.join("\n")
+            pkg_files.join("\n"),
           )
 
           Hbc::FakeSystemCommand.stubs_command(
             %W[/usr/sbin/pkgutil --only-dirs --files #{pkg_id}],
-            pkg_dirs.join("\n")
+            pkg_dirs.join("\n"),
           )
 
           Hbc::FakeSystemCommand.stubs_command(
             %W[/usr/sbin/pkgutil --files #{pkg_id}],
-            (pkg_files + pkg_dirs).join("\n")
+            (pkg_files + pkg_dirs).join("\n"),
           )
 
           Hbc::FakeSystemCommand.stubs_command(
             %W[/usr/sbin/pkgutil --pkg-info-plist #{pkg_id}],
-            pkg_info_plist
+            pkg_info_plist,
           )
 
           Hbc::FakeSystemCommand.expects_command(sudo(%W[/usr/sbin/pkgutil --forget #{pkg_id}]))
 
           Hbc::FakeSystemCommand.expects_command(
-            sudo(%w[/bin/rm -f --] + pkg_files.map { |path| Pathname("/tmp/#{path}") })
+            sudo(%w[/bin/rm -f --] + pkg_files.map { |path| Pathname("/tmp/#{path}") }),
           )
         end
 
@@ -174,7 +174,7 @@ describe Hbc::Artifact::Zap do
         )
 
         Hbc::FakeSystemCommand.expects_command(
-          sudo(%W[/sbin/kextunload -b #{kext_id}])
+          sudo(%W[/sbin/kextunload -b #{kext_id}]),
         )
 
         Hbc::FakeSystemCommand.expects_command(
@@ -182,7 +182,7 @@ describe Hbc::Artifact::Zap do
         )
 
         Hbc::FakeSystemCommand.expects_command(
-          sudo(["/bin/rm", "-rf", "/Library/Extensions/FancyPackage.kext"])
+          sudo(["/bin/rm", "-rf", "/Library/Extensions/FancyPackage.kext"]),
         )
 
         subject
@@ -202,7 +202,7 @@ describe Hbc::Artifact::Zap do
         )
 
         Hbc::FakeSystemCommand.stubs_command(
-          %w[/bin/launchctl list]
+          %w[/bin/launchctl list],
         )
 
         subject
@@ -235,7 +235,7 @@ describe Hbc::Artifact::Zap do
         Hbc::FakeSystemCommand.expects_command(
           sudo(%w[/bin/rm -rf --],
                Pathname.new("/permissible/absolute/path"),
-               Pathname.new("~/permissible/path/with/tilde").expand_path)
+               Pathname.new("~/permissible/path/with/tilde").expand_path),
         )
 
         subject
@@ -249,7 +249,7 @@ describe Hbc::Artifact::Zap do
         Hbc::FakeSystemCommand.expects_command(
           sudo(%w[/bin/rm -rf --],
                Pathname.new("/permissible/absolute/path"),
-               Pathname.new("~/permissible/path/with/tilde").expand_path)
+               Pathname.new("~/permissible/path/with/tilde").expand_path),
         )
 
         subject
@@ -262,11 +262,11 @@ describe Hbc::Artifact::Zap do
 
       it "can zap" do
         Hbc::FakeSystemCommand.expects_command(
-          sudo(%w[/bin/rm -f --], dir_pathname.join(".DS_Store"))
+          sudo(%w[/bin/rm -f --], dir_pathname.join(".DS_Store")),
         )
 
         Hbc::FakeSystemCommand.expects_command(
-          sudo(%w[/bin/rmdir --], dir_pathname)
+          sudo(%w[/bin/rmdir --], dir_pathname),
         )
 
         subject
@@ -281,7 +281,7 @@ describe Hbc::Artifact::Zap do
         Hbc::FakeSystemCommand.expects_command(%w[/bin/chmod -- +x] + [script_pathname])
 
         Hbc::FakeSystemCommand.expects_command(
-          sudo(cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"), "--please")
+          sudo(cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"), "--please"),
         )
 
         subject
@@ -296,7 +296,7 @@ describe Hbc::Artifact::Zap do
         Hbc::FakeSystemCommand.expects_command(%w[/bin/chmod -- +x] + [script_pathname])
 
         Hbc::FakeSystemCommand.expects_command(
-          sudo(cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"), "--please")
+          sudo(cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"), "--please"),
         )
 
         subject
@@ -309,7 +309,7 @@ describe Hbc::Artifact::Zap do
       it "can zap" do
         Hbc::FakeSystemCommand.expects_command(
           ["/usr/bin/osascript", "-e", 'tell application "System Events" to delete every login ' \
-                                       'item whose name is "Fancy"']
+                                       'item whose name is "Fancy"'],
         )
 
         subject

@@ -93,7 +93,7 @@ class DependencyExpansionTests < Homebrew::TestCase
       deps: [
         build_dep(:foo, [], [@bar, @baz]),
         build_dep(:foo, [], [@baz]),
-      ]
+      ],
     )
 
     deps = Dependency.expand(f) do |_dependent, dep|

@@ -191,7 +191,7 @@ class FormulaAuditor
       args = curl_args(
         extra_args: extra_args,
         show_output: true,
-        user_agent: user_agent
+        user_agent: user_agent,
       )
       status_code = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
       break if status_code.start_with? "20"
