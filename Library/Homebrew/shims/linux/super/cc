@@ -371,6 +371,8 @@ if __FILE__ == $PROGRAM_NAME
 
   log(basename, ARGV, tool, args)
 
+  superbin = Pathname.new(__FILE__).dirname.realpath
+  ENV["PATH"] = ENV["PATH"].split(":").reject { |x| Pathname.new(x).realpath == superbin }.join(":")
   args << { :close_others => false }
-  exec "#{dirname}/xcrun", tool, *args
+  exec tool, *args
 end
