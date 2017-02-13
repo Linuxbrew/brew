@@ -584,7 +584,9 @@ class FormulaAuditor
     # People will run into mixed content sometimes, but we should enforce and then add
     # exemptions as they are discovered. Treat mixed content on homepages as a bug.
     # Justify each exemptions with a code comment so we can keep track here.
-    if homepage =~ %r{^http://[^/]*github\.io/}
+    case homepage
+    when %r{^http://[^/]*github\.io/},
+         %r{^http://[^/]*\.sourceforge\.io/}
       problem "Please use https:// for #{homepage}"
     end
 
