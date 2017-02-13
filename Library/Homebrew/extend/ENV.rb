@@ -4,7 +4,11 @@ require "extend/ENV/std"
 require "extend/ENV/super"
 
 def superenv?
-  ARGV.env != "std" && ARGV.env != "inherit" && Superenv.bin
+  if OS.linux?
+    ARGV.env == "super"
+  else
+    ARGV.env != "std" && Superenv.bin
+  end
 end
 
 module EnvActivation
