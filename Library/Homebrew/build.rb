@@ -102,6 +102,16 @@ class Build
         ENV.prepend "LDFLAGS", "-L#{dep.opt_lib}" if dep.opt_lib.directory?
         ENV.prepend "CPPFLAGS", "-I#{dep.opt_include}" if dep.opt_include.directory?
       end
+
+      if OS.linux?
+        # Add the opt_lib directory of each dependency to the RPATH after
+        # $HOMEBREW_PREFIX/lib, which is searched first, allowing dependent
+        # libraries to be found even when the keg is unlinked.
+        run_time_deps.each do |dep|
+          ENV.append_path "LD_RUN_PATH", dep.opt_lib
+          ENV.append "LDFLAGS", "-Wl,-rpath=#{dep.opt_lib}" if dep.opt_lib.directory?
+        end
+      end
     end
 
     old_tmpdir = ENV["TMPDIR"]
