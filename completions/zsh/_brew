@@ -88,6 +88,7 @@ __brew_common_commands() {
     'doctor:audits your installation for common issues'
     'edit:edit a formula'
     'fetch:download formula resources to the cache'
+    'formula:the path for a formula'
     'gist-logs:generate a gist of the full build logs'
     'home:visit the homepage of a formula or the brew project'
     'info:information about a formula'
@@ -364,6 +365,11 @@ _brew_fetch() {
     '(--force-bottle)--build-from-source[download the source rather than a bottle]' \
     '(--build-from-source)--force-bottle[download a bottle if it exists for the current version of OS X, even if it would not be used during installation]' \
     '*:formula:__brew_formulae'
+}
+
+# brew formula formula:
+_brew_formula() {
+  __brew_formulae
 }
 
 # brew gist-logs [--new-issue|-n] formula
