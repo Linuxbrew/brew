@@ -434,6 +434,7 @@ class FormulaAuditorTests < Homebrew::TestCase
       "sf1" => "http://foo.sourceforge.net/",
       "sf2" => "http://foo.sourceforge.net",
       "sf3" => "http://foo.sf.net/",
+      "sf4" => "http://foo.sourceforge.io/",
       "waldo" => "http://www.gnu.org/waldo",
     }
 
