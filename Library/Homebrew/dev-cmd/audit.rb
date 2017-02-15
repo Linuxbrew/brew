@@ -1495,9 +1495,8 @@ class ResourceAuditor
     content_length_match = details[:content_length] && details[:content_length] == secure_details[:content_length]
     file_match = details[:file_hash] == secure_details[:file_hash]
 
-    if etag_match || content_length_match || file_match
-      problem "The URL #{url} could use HTTPS rather than HTTP"
-    end
+    return if !etag_match && !content_length_match && !file_match
+    problem "The URL #{url} could use HTTPS rather than HTTP"
   end
 
   def problem(text)
