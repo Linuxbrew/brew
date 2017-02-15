@@ -15,12 +15,13 @@ module Superenv
   include SharedEnvExtension
 
   # @private
-  attr_accessor :keg_only_deps, :deps
+  attr_accessor :keg_only_deps, :deps, :run_time_deps
   attr_accessor :x11
 
   def self.extended(base)
     base.keg_only_deps = []
     base.deps = []
+    base.run_time_deps = []
   end
 
   # @private
@@ -61,6 +62,7 @@ module Superenv
     self["HOMEBREW_ISYSTEM_PATHS"] = determine_isystem_paths
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
+    self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
     self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix unless formula.nil?
 
@@ -176,6 +178,10 @@ module Superenv
     paths << "#{HOMEBREW_PREFIX}/lib"
     paths += homebrew_extra_library_paths
     paths.to_path_s
+  end
+
+  def determine_rpath_paths
+    ""
   end
 
   def determine_dependencies
