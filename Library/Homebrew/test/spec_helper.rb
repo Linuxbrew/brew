@@ -16,6 +16,7 @@ require "tap"
 
 require "test/support/helper/shutup"
 require "test/support/helper/fixtures"
+require "test/support/helper/spec/shared_context/integration_test"
 
 TEST_DIRECTORIES = [
   CoreTap.instance.path/"Formula",
