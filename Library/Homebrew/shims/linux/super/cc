@@ -15,7 +15,7 @@ require "set"
 
 class Cmd
   attr_reader :config, :prefix, :cellar, :opt, :tmpdir, :sysroot, :deps
-  attr_reader :archflags, :optflags, :keg_regex, :formula_prefix
+  attr_reader :archflags, :optflags, :keg_regex, :formula_prefix, :rpath_paths
 
   def initialize(arg0, args)
     @arg0 = arg0
@@ -30,6 +30,7 @@ class Cmd
     @optflags = ENV.fetch("HOMEBREW_OPTFLAGS") { "" }.split(" ")
     @deps = Set.new(ENV.fetch("HOMEBREW_DEPENDENCIES") { "" }.split(","))
     @formula_prefix = ENV["HOMEBREW_FORMULA_PREFIX"]
+    @rpath_paths = ENV.fetch("HOMEBREW_RPATH_PATHS") { "" }
     # matches opt or cellar prefix and formula name
     @keg_regex = %r[(#{Regexp.escape(opt)}|#{Regexp.escape(cellar)})/([\w+-.@]+)]
   end
@@ -261,8 +262,12 @@ class Cmd
     args = path_flags("-L", library_paths)
     case mode
     when :ld
+      args << "--dynamic-linker=#{prefix}/lib/ld.so"
+      args << "-rpath" << rpath_paths unless rpath_paths.empty?
       args << "-no_weak_imports" if no_weak_imports?
     when :ccld, :cxxld
+      args << "-Wl,--dynamic-linker=#{prefix}/lib/ld.so"
+      args << "-Wl,-rpath," + rpath_paths unless rpath_paths.empty?
       args << "-Wl,-no_weak_imports" if no_weak_imports?
     end
     args
