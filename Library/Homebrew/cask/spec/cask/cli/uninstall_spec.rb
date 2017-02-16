@@ -41,6 +41,25 @@ describe Hbc::CLI::Uninstall do
     expect(Hbc.appdir.join("Caffeine.app")).not_to exist
   end
 
+  it "calls `uninstall` before removing artifacts" do
+    cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-uninstall-script-app.rb")
+
+    shutup do
+      Hbc::Installer.new(cask).install
+    end
+
+    expect(cask).to be_installed
+
+    expect {
+      shutup do
+        Hbc::CLI::Uninstall.run("with-uninstall-script-app")
+      end
+    }.not_to raise_error
+
+    expect(cask).not_to be_installed
+    expect(Hbc.appdir.join("MyFancyApp.app")).not_to exist
+  end
+
   describe "when multiple versions of a cask are installed" do
     let(:token) { "versioned-cask" }
     let(:first_installed_version) { "1.2.3" }
