@@ -83,15 +83,19 @@ class JavaRequirement < Requirement
   end
 
   def env_java_common
+    return unless @java_home
     java_home = Pathname.new(@java_home)
     ENV["JAVA_HOME"] = java_home
     ENV.prepend_path "PATH", java_home/"bin"
   end
 
   def env_oracle_jdk
+    return unless @java_home
     java_home = Pathname.new(@java_home)
+    return unless (java_home/"include").exist?
     ENV.append_to_cflags "-I#{java_home}/include"
     ENV.append_to_cflags "-I#{java_home}/include/#{oracle_java_os}"
+    true
   end
 
   def oracle_java_os

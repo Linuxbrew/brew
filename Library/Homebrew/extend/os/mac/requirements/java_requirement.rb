@@ -3,12 +3,7 @@ class JavaRequirement
 
   env do
     env_java_common
-    java_home = Pathname.new(@java_home)
-    if (java_home/"include").exist? # Oracle JVM
-      env_oracle_jdk
-    else # Apple JVM
-      env_apple
-    end
+    env_oracle_jdk || env_apple
   end
 
   private

@@ -4,11 +4,8 @@ class JavaRequirement < Requirement
   default_formula "jdk"
 
   env do
-    next unless @java_home
     env_java_common
-    if (Pathname.new(@java_home)/"include").exist? # Oracle JVM
-      env_oracle_jdk
-    end
+    env_oracle_jdk
   end
 
   private
