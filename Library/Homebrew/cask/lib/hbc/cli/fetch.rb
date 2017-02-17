@@ -15,6 +15,10 @@ module Hbc
         end
       end
 
+      def self.needs_init?
+        true
+      end
+
       def self.help
         "downloads remote application files to local cache"
       end

@@ -21,8 +21,9 @@ module Hbc
       return if Hbc.caskroom.exist?
 
       ohai "Creating Caskroom at #{Hbc.caskroom}"
-      ohai "We'll set permissions properly so we won't need sudo in the future"
       sudo = !Hbc.caskroom.parent.writable?
+
+      ohai "We'll set permissions properly so we won't need sudo in the future" if sudo
 
       SystemCommand.run("/bin/mkdir", args: ["-p", Hbc.caskroom], sudo: sudo)
       SystemCommand.run("/bin/chmod", args: ["g+rwx", Hbc.caskroom], sudo: sudo)
