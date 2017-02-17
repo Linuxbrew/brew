@@ -201,7 +201,15 @@ module Hbc
         ohai "Running uninstall script #{executable}"
         raise CaskInvalidError.new(@cask, "#{stanza} :#{directive_name} without :executable.") if executable.nil?
         executable_path = @cask.staged_path.join(executable)
-        @command.run("/bin/chmod", args: ["--", "+x", executable_path]) if File.exist?(executable_path)
+
+        unless executable_path.exist?
+          message = "uninstall script #{executable} does not exist"
+          raise CaskError, "#{message}." unless force
+          opoo "#{message}, skipping."
+          return
+        end
+
+        @command.run("/bin/chmod", args: ["--", "+x", executable_path])
         @command.run(executable_path, script_arguments)
         sleep 1
       end
