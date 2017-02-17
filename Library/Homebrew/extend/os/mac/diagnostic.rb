@@ -53,8 +53,8 @@ module Homebrew
         return unless MacOS::Xcode.installed?
         return unless MacOS::Xcode.outdated?
 
-        # CI images are going to end up outdated so don't complain.
-        return if ENV["TRAVIS"] || ENV["CIRCLECI"]
+        # Travis CI images are going to end up outdated so don't complain.
+        return if ENV["TRAVIS"]
 
         message = <<-EOS.undent
           Your Xcode (#{MacOS::Xcode.version}) is outdated.
