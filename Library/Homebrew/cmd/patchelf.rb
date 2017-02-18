@@ -27,7 +27,7 @@ module Homebrew
         old_repository: Keg::REPOSITORY_PLACEHOLDER,
         new_prefix: HOMEBREW_PREFIX.to_s,
         new_cellar: HOMEBREW_CELLAR.to_s,
-        new_repository: HOMEBREW_REPOSITORY.to_s
+        new_repository: HOMEBREW_REPOSITORY.to_s,
       )
     end
   end
