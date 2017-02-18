@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require "english"
+require "English"
 
 SimpleCov.start do
   coverage_dir File.expand_path("../test/coverage", File.realpath(__FILE__))
