@@ -202,17 +202,14 @@ class Cmd
     elsif path.start_with?(cellar) || path.start_with?(opt)
       dep = path[keg_regex, 2]
       dep && @deps.include?(dep)
-    elsif path.start_with?(prefix)
-      true
     else
-      # ignore MacPorts, Boxen's Homebrew, X11, fink
-      !path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
+      path.start_with?(prefix, tmpdir)
     end
   end
 
   # The original less-smart version of keep_orig; will eventually be removed
   def keep_orig?(path)
-    path.start_with?(prefix, cellar, tmpdir) || !path.start_with?("/opt/local", "/opt/boxen/homebrew", "/opt/X11", "/sw", "/usr/X11")
+    path.start_with?(prefix, cellar, tmpdir)
   end
 
   def cflags
