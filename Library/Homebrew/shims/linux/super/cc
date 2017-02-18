@@ -14,7 +14,7 @@ require "pathname"
 require "set"
 
 class Cmd
-  attr_reader :config, :prefix, :cellar, :opt, :tmpdir, :sysroot, :deps
+  attr_reader :config, :prefix, :cellar, :opt, :tmpdir, :deps
   attr_reader :archflags, :optflags, :keg_regex, :formula_prefix, :rpath_paths
 
   def initialize(arg0, args)
@@ -25,7 +25,6 @@ class Cmd
     @cellar = ENV["HOMEBREW_CELLAR"]
     @opt = ENV["HOMEBREW_OPT"]
     @tmpdir = ENV["HOMEBREW_TEMP"]
-    @sysroot = ENV["HOMEBREW_SDKROOT"]
     @archflags = ENV.fetch("HOMEBREW_ARCHFLAGS") { "" }.split(" ")
     @optflags = ENV.fetch("HOMEBREW_OPTFLAGS") { "" }.split(" ")
     @deps = Set.new(ENV.fetch("HOMEBREW_DEPENDENCIES") { "" }.split(","))
@@ -91,14 +90,6 @@ class Cmd
       args = refurbished_args
     end
 
-    if sysroot
-      if tool == "ld"
-        args << "-syslibroot" << sysroot
-      else
-        args << "-isysroot" << sysroot << "--sysroot=#{sysroot}"
-      end
-    end
-
     case mode
     when :ccld
       cflags + args + cppflags + ldflags
@@ -118,7 +109,7 @@ class Cmd
   end
 
   def refurbished_args
-    @lset = Set.new(library_paths + system_library_paths)
+    @lset = Set.new(library_paths)
     @iset = Set.new(isystem_paths + include_paths)
 
     args = []
@@ -178,18 +169,10 @@ class Cmd
       args << arg
     when /^-W.*/
       # prune warnings
-    when "-macosx_version_min", "-dylib_install_name"
-      args << "-Wl,#{arg},#{enum.next}"
     when "-multiply_definedsuppress"
       args << "-Wl,-multiply_defined,suppress"
     when "-undefineddynamic_lookup"
       args << "-Wl,-undefined,dynamic_lookup"
-    when /^-isysroot/, /^--sysroot/
-      sdk = enum.next
-      # We set the sysroot for macOS SDKs
-      args << "-isysroot" << sdk unless sdk.downcase.include? "osx"
-    when "-dylib"
-      args << "-Wl,#{arg}"
     when /^-I(.+)?/
       # Support both "-Ifoo" (one argument) and "-I foo" (two arguments)
       val  = chuzzle($1) || enum.next
@@ -264,11 +247,9 @@ class Cmd
     when :ld
       args << "--dynamic-linker=#{prefix}/lib/ld.so"
       args << "-rpath" << rpath_paths unless rpath_paths.empty?
-      args << "-no_weak_imports" if no_weak_imports?
     when :ccld, :cxxld
       args << "-Wl,--dynamic-linker=#{prefix}/lib/ld.so"
       args << "-Wl,-rpath," + rpath_paths unless rpath_paths.empty?
-      args << "-Wl,-no_weak_imports" if no_weak_imports?
     end
     args
   end
@@ -283,12 +264,6 @@ class Cmd
 
   def library_paths
     path_split("HOMEBREW_LIBRARY_PATHS")
-  end
-
-  def system_library_paths
-    paths = ["#{sysroot}/usr/lib"]
-    paths << "/usr/local/lib" unless sysroot || ENV["SDKROOT"]
-    paths
   end
 
   def configure?
@@ -314,10 +289,6 @@ class Cmd
 
   def permit_arch_flags?
     config.include?("K")
-  end
-
-  def no_weak_imports?
-    config.include?("w")
   end
 
   def canonical_path(path)
@@ -361,7 +332,7 @@ if __FILE__ == $PROGRAM_NAME
 
   if (cc = ENV["HOMEBREW_CC"]).nil? || cc.empty? || cc == "cc"
     # those values are not allowed
-    ENV["HOMEBREW_CC"] = "clang"
+    ENV["HOMEBREW_CC"] = "gcc"
   end
 
   ####################################################################### main
