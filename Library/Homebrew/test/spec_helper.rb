@@ -33,6 +33,8 @@ RSpec.configure do |config|
     begin
       TEST_DIRECTORIES.each(&:mkpath)
 
+      @__homebrew_failed = Homebrew.failed?
+
       @__files_before_test = Find.find(TEST_TMPDIR).map { |f| f.sub(TEST_TMPDIR, "") }
 
       @__argv = ARGV.dup
@@ -72,6 +74,10 @@ RSpec.configure do |config|
         file leak detected:
         #{diff.map { |f| "  #{f}" }.join("\n")}
       EOS
+
+      Homebrew.failed = @__homebrew_failed
     end
   end
 end
+
+RSpec::Matchers.alias_matcher :have_failed, :be_failed

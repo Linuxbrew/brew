@@ -1,7 +1,5 @@
 require "utils"
 
-RSpec::Matchers.alias_matcher :have_failed, :be_failed
-
 describe "globally-scoped helper methods" do
   let(:dir) { @dir = Pathname.new(Dir.mktmpdir) }
 
@@ -13,15 +11,11 @@ describe "globally-scoped helper methods" do
 
   describe "#ofail" do
     it "sets Homebrew.failed to true" do
-      begin
-        shutup do
-          ofail "foo"
-        end
+      expect {
+        ofail "foo"
+      }.to output("Error: foo\n").to_stderr
 
-        expect(Homebrew).to have_failed
-      ensure
-        Homebrew.failed = false
-      end
+      expect(Homebrew).to have_failed
     end
   end
 
