@@ -142,13 +142,17 @@ module Hbc
     end
 
     def self.process(arguments)
+      unless ENV["MACOS_VERSION"].nil?
+        MacOS.full_version = ENV["MACOS_VERSION"]
+      end
+
       command_string, *rest = *arguments
       rest = process_options(rest)
       command = Hbc.help ? "help" : lookup_command(command_string)
       Hbc.default_tap.install unless Hbc.default_tap.installed?
       Hbc.init if should_init?(command)
       run_command(command, *rest)
-    rescue CaskError, CaskSha256MismatchError => e
+    rescue CaskError, CaskSha256MismatchError, ArgumentError => e
       msg = e.message
       msg << e.backtrace.join("\n") if Hbc.debug
       onoe msg

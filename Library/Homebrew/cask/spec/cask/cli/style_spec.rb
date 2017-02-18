@@ -1,4 +1,6 @@
 require "English"
+require "open3"
+require "rubygems"
 
 describe Hbc::CLI::Style do
   let(:args) { [] }
@@ -75,6 +77,20 @@ describe Hbc::CLI::Style do
 
       it "raises an error" do
         expect { subject }.to raise_error(Hbc::CaskError)
+      end
+    end
+
+    context "version" do
+      it "matches `HOMEBREW_RUBOCOP_VERSION`" do
+        stdout, status = Open3.capture2("gem", "dependency", "rubocop-cask", "--version", HOMEBREW_RUBOCOP_CASK_VERSION, "--pipe", "--remote")
+
+        expect(status).to be_a_success
+
+        requirement = Gem::Requirement.new(stdout.scan(/rubocop --version '(.*)'/).flatten.first)
+        version = Gem::Version.new(HOMEBREW_RUBOCOP_VERSION)
+
+        expect(requirement).not_to be_none
+        expect(requirement).to be_satisfied_by(version)
       end
     end
   end

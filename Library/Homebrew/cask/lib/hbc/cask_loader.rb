@@ -32,22 +32,12 @@ module Hbc
     end
 
     def cask(header_token, &block)
-      @klass = Cask
-      build_cask(header_token, &block)
-    end
-
-    def test_cask(header_token, &block)
-      @klass = TestCask
-      build_cask(header_token, &block)
-    end
-
-    def build_cask(header_token, &block)
       raise CaskTokenDoesNotMatchError.new(@token, header_token) unless @token == header_token
 
       if @path.nil?
-        @klass.new(@token, &block)
+        Cask.new(@token, &block)
       else
-        @klass.new(@token, sourcefile_path: @path, &block)
+        Cask.new(@token, sourcefile_path: @path, &block)
       end
     end
   end

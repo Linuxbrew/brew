@@ -1,4 +1,4 @@
-test_cask 'bad-checksum' do
+cask 'bad-checksum' do
   version '1.2.3'
   sha256 'badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadb'
 

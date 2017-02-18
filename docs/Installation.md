@@ -1,7 +1,7 @@
 # Installation
 
 The suggested and easiest way to install Homebrew is on the
-[homepage](http://brew.sh).
+[homepage](https://brew.sh).
 
 The standard script installs Homebrew to `/usr/local` so that
 [you don’t need sudo](FAQ.md) when you
@@ -55,5 +55,5 @@ Apple Developer account on older versions of Mac OS X. Sign up for free
 [here](https://developer.apple.com/register/index.action).
 
 <a name="4"><sup>4</sup></a> The one-liner installation method found on
-[brew.sh](http://brew.sh) requires a Bourne-compatible shell (e.g. bash or
+[brew.sh](https://brew.sh) requires a Bourne-compatible shell (e.g. bash or
 zsh). Notably, fish, tcsh and csh will not work.

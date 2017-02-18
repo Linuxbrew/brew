@@ -22,7 +22,11 @@ class Formulary
 
     mod = Module.new
     const_set(namespace, mod)
-    mod.module_eval(contents, path)
+    begin
+      mod.module_eval(contents, path)
+    rescue ScriptError => e
+      raise FormulaUnreadableError.new(name, e)
+    end
     class_name = class_s(name)
 
     begin

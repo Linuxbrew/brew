@@ -17,7 +17,7 @@ class LanguagePythonTests < Homebrew::TestCase
 
   def test_virtualenv_creation
     @formula.expects(:resource).with("homebrew-virtualenv").returns(
-      mock("resource", stage: true)
+      mock("resource", stage: true),
     )
     @venv.create
   end
@@ -25,7 +25,7 @@ class LanguagePythonTests < Homebrew::TestCase
   # or at least doesn't crash the second time
   def test_virtualenv_creation_is_idempotent
     @formula.expects(:resource).with("homebrew-virtualenv").returns(
-      mock("resource", stage: true)
+      mock("resource", stage: true),
     )
     @venv.create
     FileUtils.mkdir_p @dir/"bin"

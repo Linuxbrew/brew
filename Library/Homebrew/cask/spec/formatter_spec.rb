@@ -21,7 +21,7 @@ describe Formatter do
         "aa\n" \
         "bbb\n" \
         "ccc\n" \
-        "dd\n"
+        "dd\n",
       )
     end
 
@@ -32,7 +32,7 @@ describe Formatter do
 
         expect(subject).to eq(
           "aa    ccc\n" \
-          "bbb   dd\n"
+          "bbb   dd\n",
         )
       end
 
@@ -41,7 +41,7 @@ describe Formatter do
         allow(Tty).to receive(:width).and_return(20)
 
         expect(subject).to eq(
-          "aa   bbb  ccc  dd\n"
+          "aa   bbb  ccc  dd\n",
         )
       end
     end

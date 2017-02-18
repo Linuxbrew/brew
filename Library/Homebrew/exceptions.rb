@@ -131,6 +131,19 @@ class FormulaClassUnavailableError < FormulaUnavailableError
   end
 end
 
+class FormulaUnreadableError < FormulaUnavailableError
+  attr_reader :formula_error
+
+  def initialize(name, error)
+    super(name)
+    @formula_error = error
+  end
+
+  def to_s
+    "#{name}: " + formula_error.to_s
+  end
+end
+
 class TapFormulaAmbiguityError < RuntimeError
   attr_reader :name, :paths, :formulae
 

@@ -9,7 +9,7 @@ class IntegrationCommandTestOptions < IntegrationCommandTestCase
     EOS
 
     assert_equal "--with-foo\n\tBuild with foo\n--without-bar\n\tBuild without bar support",
-      cmd_output("options", "testball").chomp
+      cmd("options", "testball").chomp
   end
 end
 

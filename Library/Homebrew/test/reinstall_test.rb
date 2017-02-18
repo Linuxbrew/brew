@@ -12,4 +12,13 @@ class IntegrationCommandTestReinstall < IntegrationCommandTestCase
       cmd("reinstall", "testball")
     assert foo_dir.exist?
   end
+
+  def test_reinstall_with_invalid_option
+    setup_test_formula "testball"
+
+    cmd("install", "testball", "--with-foo")
+
+    assert_match "testball: this formula has no --with-fo option so it will be ignored!",
+      cmd("reinstall", "testball", "--with-fo")
+  end
 end

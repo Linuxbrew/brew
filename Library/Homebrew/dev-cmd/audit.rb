@@ -1,4 +1,4 @@
-#:  * `audit` [`--strict`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
@@ -6,6 +6,9 @@
 #:
 #:    If `--strict` is passed, additional checks are run, including RuboCop
 #:    style checks.
+#:
+#:    If `--fix` is passed, style violations will be
+#:    automatically fixed using RuboCop's `--auto-correct` feature.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
 #:    connection are run.
@@ -62,8 +65,9 @@ module Homebrew
     end
 
     if strict
+      options = { fix: ARGV.flag?("--fix"), realpath: true }
       # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, realpath: true)
+      style_results = check_style_json(files, options)
     end
 
     ff.each do |f|
@@ -187,7 +191,7 @@ class FormulaAuditor
       args = curl_args(
         extra_args: extra_args,
         show_output: true,
-        user_agent: user_agent
+        user_agent: user_agent,
       )
       status_code = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
       break if status_code.start_with? "20"
@@ -580,8 +584,14 @@ class FormulaAuditor
     # People will run into mixed content sometimes, but we should enforce and then add
     # exemptions as they are discovered. Treat mixed content on homepages as a bug.
     # Justify each exemptions with a code comment so we can keep track here.
-    if homepage =~ %r{^http://[^/]*github\.io/}
+    case homepage
+    when %r{^http://[^/]*\.github\.io/},
+         %r{^http://[^/]*\.sourceforge\.io/}
       problem "Please use https:// for #{homepage}"
+    end
+
+    if homepage =~ %r{^http://([^/]*)\.(sf|sourceforge)\.net(/|$)}
+      problem "#{homepage} should be `https://#{$1}.sourceforge.io/`"
     end
 
     # There's an auto-redirect here, but this mistake is incredibly common too.
@@ -1343,6 +1353,7 @@ class ResourceAuditor
            %r{^http://(?:[^/]*\.)?bintray\.com/},
            %r{^http://tools\.ietf\.org/},
            %r{^http://launchpad\.net/},
+           %r{^http://github\.com/},
            %r{^http://bitbucket\.org/},
            %r{^http://anonscm\.debian\.org/},
            %r{^http://cpan\.metacpan\.org/},

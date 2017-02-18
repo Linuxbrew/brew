@@ -1,9 +1,7 @@
 OFFICIAL_TAPS = %w[
   apache
   dupes
-  emacs
   fuse
-  games
   nginx
   php
   science

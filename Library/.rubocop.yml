@@ -6,6 +6,11 @@ AllCops:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
 
+require: ./Homebrew/rubocops.rb
+
+Homebrew/CorrectBottleBlock:
+  Enabled: true
+
 Metrics/AbcSize:
   Enabled: false
 
@@ -162,6 +167,8 @@ Style/TernaryParentheses:
 
 # makes diffs nicer
 Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
 
 Style/VariableNumber:

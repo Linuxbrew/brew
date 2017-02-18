@@ -172,12 +172,14 @@ class FormulaInstaller
       end
     end
 
-    unlinked_deps = recursive_formulae.select do |dep|
-      dep.installed? && !dep.keg_only? && !dep.linked_keg.directory?
-    end
+    unless ENV["HOMEBREW_NO_CHECK_UNLINKED_DEPENDENCIES"]
+      unlinked_deps = recursive_formulae.select do |dep|
+        dep.installed? && !dep.keg_only? && !dep.linked_keg.directory?
+      end
 
-    unless unlinked_deps.empty?
-      raise CannotInstallFormulaError, "You must `brew link #{unlinked_deps*" "}` before #{formula.full_name} can be installed"
+      unless unlinked_deps.empty?
+        raise CannotInstallFormulaError, "You must `brew link #{unlinked_deps*" "}` before #{formula.full_name} can be installed"
+      end
     end
 
     pinned_unsatisfied_deps = recursive_deps.select do |dep|
@@ -465,7 +467,7 @@ class FormulaInstaller
       inherited_options[dep.name] |= inherited_options_for(dep)
       build = effective_build_options_for(
         dependent,
-        inherited_options.fetch(dependent.name, [])
+        inherited_options.fetch(dependent.name, []),
       )
       poured_bottle = true if install_bottle_for?(dep.to_formula, build)
 
