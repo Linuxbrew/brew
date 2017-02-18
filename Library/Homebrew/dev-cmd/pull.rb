@@ -541,7 +541,7 @@ module Homebrew
             "x86_64_linux"
           else
             jinfo.bottle_tags.first
-          end
+          end,
         )
         unless bottle_info
           opoo "No bottle defined in formula #{f.full_name}"
