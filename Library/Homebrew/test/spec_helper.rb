@@ -67,7 +67,7 @@ RSpec.configure do |config|
 
       files_after_test = Find.find(TEST_TMPDIR).map { |f| f.sub(TEST_TMPDIR, "") }
 
-      diff = Set.new(@__files_before_test).difference(Set.new(files_after_test))
+      diff = Set.new(@__files_before_test) ^ Set.new(files_after_test)
       expect(diff).to be_empty, <<-EOS.undent
         file leak detected:
         #{diff.map { |f| "  #{f}" }.join("\n")}
