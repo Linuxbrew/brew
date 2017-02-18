@@ -80,7 +80,8 @@ module Homebrew
 
   def fetch_pull_requests(formula)
     GitHub.issues_for_formula(formula.name, tap: formula.tap).select do |pr|
-      pr["html_url"].include?("/pull/")
+      pr["html_url"].include?("/pull/") &&
+        /(^|\s)#{Regexp.quote(formula.name)}(:|\s|$)/i =~ pr["title"]
     end
   rescue GitHub::RateLimitExceededError => e
     opoo e.message
