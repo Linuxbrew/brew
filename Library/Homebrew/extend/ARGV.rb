@@ -16,11 +16,13 @@ module HomebrewArgvExtension
       --build-bottle
       --force-bottle
       --verbose
+      --force
       -i
       -v
       -d
       -g
       -s
+      -f
     ].freeze
   end
 
