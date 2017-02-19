@@ -7,5 +7,5 @@ cask 'with-uninstall-rmdir' do
 
   pkg 'MyFancyPkg/Fancy.pkg'
 
-  uninstall rmdir: "#{TEST_FIXTURE_DIR}/cask/empty_directory"
+  uninstall rmdir: "#{TEST_TMPDIR}/empty_directory_path"
 end

@@ -7,5 +7,5 @@ cask 'with-zap-rmdir' do
 
   pkg 'MyFancyPkg/Fancy.pkg'
 
-  zap rmdir: "#{TEST_FIXTURE_DIR}/cask/empty_directory"
+  zap rmdir: "#{TEST_TMPDIR}/empty_directory_path"
 end
