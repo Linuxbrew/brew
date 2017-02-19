@@ -2033,7 +2033,7 @@ class Formula
     # @!attribute [w] url
     # The URL used to download the source for the {#stable} version of the formula.
     # We prefer `https` for security and proxy reasons.
-    # Optionally specify the download strategy with `:using => ...`
+    # If not inferrable, specify the download strategy with `:using => ...`
     #     `:git`, `:hg`, `:svn`, `:bzr`, `:cvs`,
     #     `:curl` (normal file download. Will also extract.)
     #     `:nounzip` (without extracting)
@@ -2041,7 +2041,10 @@ class Formula
     #     `S3DownloadStrategy` (download from S3 using signed request)
     #
     # <pre>url "https://packed.sources.and.we.prefer.https.example.com/archive-1.2.3.tar.bz2"</pre>
-    # <pre>url "https://some.dont.provide.archives.example.com", :using => :git, :tag => "1.2.3", :revision => "db8e4de5b2d6653f66aea53094624468caad15d2"</pre>
+    # <pre>url "https://some.dont.provide.archives.example.com",
+    #     :using => :git,
+    #     :tag => "1.2.3",
+    #     :revision => "db8e4de5b2d6653f66aea53094624468caad15d2"</pre>
     def url(val, specs = {})
       stable.url(val, specs)
     end
