@@ -46,15 +46,22 @@ HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 
 if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
 then
-  env -i \
-    HOME="$HOME" \
+
+  homebrew_vars=$("$HOMEBREW_LIBRARY/Homebrew/utils/homebrew_vars.rb")
+
+  cmd_str="/usr/bin/env -i \
+    HOME=$HOME \
     PATH=/usr/bin:/bin:/usr/sbin:/sbin \
-    TERM="$TERM" \
-    HOMEBREW_BREW_FILE="$HOMEBREW_BREW_FILE" \
-    HOMEBREW_PREFIX="$HOMEBREW_PREFIX" \
-    HOMEBREW_REPOSITORY="$HOMEBREW_REPOSITORY" \
-    HOMEBREW_LIBRARY="$HOMEBREW_LIBRARY" \
-    /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
+    TERM=$TERM \
+    HOMEBREW_BREW_FILE=$HOMEBREW_BREW_FILE \
+    HOMEBREW_PREFIX=$HOMEBREW_PREFIX \
+    HOMEBREW_REPOSITORY=$HOMEBREW_REPOSITORY \
+    HOMEBREW_LIBRARY=$HOMEBREW_LIBRARY \
+    $homebrew_vars \
+    /bin/bash $HOMEBREW_LIBRARY/Homebrew/brew.sh $@"
+    
+  command $cmd_str
+  
 else
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi
