@@ -34,6 +34,10 @@ module Hbc
         end
       end
 
+      def self.expand_glob(path_strings)
+        path_strings.flat_map(&Pathname.method(:glob))
+      end
+
       def self.remove_relative_path_strings(action, path_strings)
         relative = path_strings.map do |path_string|
           path_string if %r{/\.\.(?:/|\Z)}.match(path_string) || !%r{\A/}.match(path_string)
@@ -52,6 +56,13 @@ module Hbc
           opoo "Skipping #{action} for undeletable path #{path_string}"
         end
         path_strings - undeletable
+      end
+
+      def self.prepare_path_strings(action, path_strings, expand_tilde)
+        path_strings = expand_path_strings(path_strings) if expand_tilde
+        path_strings = remove_relative_path_strings(action, path_strings)
+        path_strings = expand_glob(path_strings)
+        remove_undeletable_path_strings(action, path_strings)
       end
 
       def dispatch_uninstall_directives(expand_tilde: true)
@@ -225,9 +236,7 @@ module Hbc
       def uninstall_delete(directives, expand_tilde = true)
         Array(directives[:delete]).concat(Array(directives[:trash])).flatten.each_slice(PATH_ARG_SLICE_SIZE) do |path_slice|
           ohai "Removing files: #{path_slice.utf8_inspect}"
-          path_slice = self.class.expand_path_strings(path_slice) if expand_tilde
-          path_slice = self.class.remove_relative_path_strings(:delete, path_slice)
-          path_slice = self.class.remove_undeletable_path_strings(:delete, path_slice)
+          path_slice = self.class.prepare_path_strings(:delete, path_slice, expand_tilde)
           @command.run!("/bin/rm", args: path_slice.unshift("-rf", "--"), sudo: true)
         end
       end
@@ -238,11 +247,9 @@ module Hbc
         uninstall_delete(directives, expand_tilde)
       end
 
-      def uninstall_rmdir(directives, expand_tilde = true)
-        Array(directives[:rmdir]).flatten.each do |directory|
-          directory = self.class.expand_path_strings([directory]).first if expand_tilde
-          directory = self.class.remove_relative_path_strings(:rmdir, [directory]).first
-          directory = self.class.remove_undeletable_path_strings(:rmdir, [directory]).first
+      def uninstall_rmdir(directories, expand_tilde = true)
+        action = :rmdir
+        self.class.prepare_path_strings(action, Array(directories[action]).flatten, expand_tilde).each do |directory|
           next if directory.to_s.empty?
           ohai "Removing directory if empty: #{directory.to_s.utf8_inspect}"
           directory = Pathname.new(directory)

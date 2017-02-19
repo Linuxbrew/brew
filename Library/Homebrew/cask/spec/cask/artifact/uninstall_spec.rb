@@ -7,7 +7,17 @@ describe Hbc::Artifact::Uninstall do
     Hbc::Artifact::Uninstall.new(cask, command: Hbc::FakeSystemCommand)
   }
 
+  let(:absolute_path) { Pathname.new("#{TEST_TMPDIR}/absolute_path") }
+  let(:path_with_tilde) { Pathname.new("#{TEST_TMPDIR}/path_with_tilde") }
+  let(:glob_path1) { Pathname.new("#{TEST_TMPDIR}/glob_path1") }
+  let(:glob_path2) { Pathname.new("#{TEST_TMPDIR}/glob_path2") }
+
   before(:each) do
+    FileUtils.touch(absolute_path)
+    FileUtils.touch(path_with_tilde)
+    FileUtils.touch(glob_path1)
+    FileUtils.touch(glob_path2)
+    ENV["HOME"] = TEST_TMPDIR
     shutup do
       InstallHelper.install_without_artifacts(cask)
     end
@@ -233,8 +243,10 @@ describe Hbc::Artifact::Uninstall do
       it "can uninstall" do
         Hbc::FakeSystemCommand.expects_command(
           sudo(%w[/bin/rm -rf --],
-               Pathname.new("/permissible/absolute/path"),
-               Pathname.new("~/permissible/path/with/tilde").expand_path),
+               absolute_path,
+               path_with_tilde,
+               glob_path1,
+               glob_path2),
         )
 
         subject
@@ -247,8 +259,10 @@ describe Hbc::Artifact::Uninstall do
       it "can uninstall" do
         Hbc::FakeSystemCommand.expects_command(
           sudo(%w[/bin/rm -rf --],
-               Pathname.new("/permissible/absolute/path"),
-               Pathname.new("~/permissible/path/with/tilde").expand_path),
+               absolute_path,
+               path_with_tilde,
+               glob_path1,
+               glob_path2),
         )
 
         subject
