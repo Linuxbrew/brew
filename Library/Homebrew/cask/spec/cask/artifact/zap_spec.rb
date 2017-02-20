@@ -8,7 +8,17 @@ describe Hbc::Artifact::Zap do
     Hbc::Artifact::Zap.new(cask, command: Hbc::FakeSystemCommand)
   }
 
+  let(:absolute_path) { Pathname.new("#{TEST_TMPDIR}/absolute_path") }
+  let(:path_with_tilde) { Pathname.new("#{TEST_TMPDIR}/path_with_tilde") }
+  let(:glob_path1) { Pathname.new("#{TEST_TMPDIR}/glob_path1") }
+  let(:glob_path2) { Pathname.new("#{TEST_TMPDIR}/glob_path2") }
+
   before(:each) do
+    FileUtils.touch(absolute_path)
+    FileUtils.touch(path_with_tilde)
+    FileUtils.touch(glob_path1)
+    FileUtils.touch(glob_path2)
+    ENV["HOME"] = TEST_TMPDIR
     shutup do
       InstallHelper.install_without_artifacts(cask)
     end
@@ -234,8 +244,10 @@ describe Hbc::Artifact::Zap do
       it "can zap" do
         Hbc::FakeSystemCommand.expects_command(
           sudo(%w[/bin/rm -rf --],
-               Pathname.new("/permissible/absolute/path"),
-               Pathname.new("~/permissible/path/with/tilde").expand_path),
+               absolute_path,
+               path_with_tilde,
+               glob_path1,
+               glob_path2),
         )
 
         subject
@@ -248,8 +260,10 @@ describe Hbc::Artifact::Zap do
       it "can zap" do
         Hbc::FakeSystemCommand.expects_command(
           sudo(%w[/bin/rm -rf --],
-               Pathname.new("/permissible/absolute/path"),
-               Pathname.new("~/permissible/path/with/tilde").expand_path),
+               absolute_path,
+               path_with_tilde,
+               glob_path1,
+               glob_path2),
         )
 
         subject
@@ -258,15 +272,23 @@ describe Hbc::Artifact::Zap do
 
     context "when using rmdir" do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-zap-rmdir.rb") }
-      let(:dir_pathname) { Pathname.new("#{TEST_FIXTURE_DIR}/cask/empty_directory") }
+      let(:empty_directory_path) { Pathname.new("#{TEST_TMPDIR}/empty_directory_path") }
+
+      before(:each) do
+        empty_directory_path.mkdir
+      end
+
+      after(:each) do
+        empty_directory_path.rmdir
+      end
 
       it "can zap" do
         Hbc::FakeSystemCommand.expects_command(
-          sudo(%w[/bin/rm -f --], dir_pathname.join(".DS_Store")),
+          sudo(%w[/bin/rm -f --], empty_directory_path/".DS_Store"),
         )
 
         Hbc::FakeSystemCommand.expects_command(
-          sudo(%w[/bin/rmdir --], dir_pathname),
+          sudo(%w[/bin/rmdir --], empty_directory_path),
         )
 
         subject
