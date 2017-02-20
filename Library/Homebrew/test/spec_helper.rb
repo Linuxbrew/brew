@@ -29,6 +29,11 @@ TEST_DIRECTORIES = [
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
+  config.before(:each) do |example|
+    if example.metadata[:needs_macos]
+      skip "not on macOS" unless OS.mac?
+    end
+  end
   config.around(:each) do |example|
     begin
       TEST_DIRECTORIES.each(&:mkpath)
