@@ -181,6 +181,7 @@ module OS
       "/usr/include",
       "/usr/lib",
       "/usr/libexec",
+      "/usr/libexec/cups",
       "/usr/local",
       "/usr/local/Cellar",
       "/usr/local/Frameworks",
