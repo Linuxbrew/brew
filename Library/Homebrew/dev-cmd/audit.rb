@@ -39,6 +39,7 @@ require "cmd/search"
 require "cmd/style"
 require "date"
 require "blacklist"
+require "digest"
 
 module Homebrew
   module_function
@@ -670,11 +671,11 @@ class FormulaAuditor
     %w[Stable Devel HEAD].each do |name|
       next unless spec = formula.send(name.downcase)
 
-      ra = ResourceAuditor.new(spec).audit
+      ra = ResourceAuditor.new(spec, online: @online).audit
       problems.concat ra.problems.map { |problem| "#{name}: #{problem}" }
 
       spec.resources.each_value do |resource|
-        ra = ResourceAuditor.new(resource).audit
+        ra = ResourceAuditor.new(resource, online: @online).audit
         problems.concat ra.problems.map { |problem|
           "#{name} resource #{resource.name.inspect}: #{problem}"
         }
@@ -1221,7 +1222,7 @@ class ResourceAuditor
   attr_reader :problems
   attr_reader :version, :checksum, :using, :specs, :url, :mirrors, :name
 
-  def initialize(resource)
+  def initialize(resource, options = {})
     @name     = resource.name
     @version  = resource.version
     @checksum = resource.checksum
@@ -1229,6 +1230,7 @@ class ResourceAuditor
     @mirrors  = resource.mirrors
     @using    = resource.using
     @specs    = resource.specs
+    @online   = options[:online]
     @problems = []
   end
 
@@ -1485,9 +1487,41 @@ class ResourceAuditor
       next unless u =~ %r{https?://(?:central|repo\d+)\.maven\.org/maven2/(.+)$}
       problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
     end
+
+    return unless @online
+    urls.each do |url|
+      check_insecure_mirror(url) if url.start_with? "http:"
+    end
+  end
+
+  def check_insecure_mirror(url)
+    details =  get_content_details(url)
+    secure_url = url.sub "http", "https"
+    secure_details = get_content_details(secure_url)
+
+    return if !details[:status].start_with?("2") || !secure_details[:status].start_with?("2")
+
+    etag_match = details[:etag] && details[:etag] == secure_details[:etag]
+    content_length_match = details[:content_length] && details[:content_length] == secure_details[:content_length]
+    file_match = details[:file_hash] == secure_details[:file_hash]
+
+    return if !etag_match && !content_length_match && !file_match
+    problem "The URL #{url} could use HTTPS rather than HTTP"
   end
 
   def problem(text)
     @problems << text
+  end
+
+  def get_content_details(url)
+    out = {}
+    output, = curl_output "--connect-timeout", "15", "--include", url
+    split = output.partition("\r\n\r\n")
+    headers = split.first
+    out[:status] = headers[%r{HTTP\/.* (\d+)}, 1]
+    out[:etag] = headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2]
+    out[:content_length] = headers[/Content-Length: (\d+)/, 1]
+    out[:file_hash] = Digest::SHA256.digest split.last
+    out
   end
 end
