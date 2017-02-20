@@ -239,6 +239,7 @@ class Keg
 
   def remove_opt_record
     opt_record.unlink
+    aliases.each { |a| (opt_record.parent/a).unlink }
     opt_record.parent.rmdir_if_possible
   end
 
@@ -461,9 +462,20 @@ class Keg
     @oldname_opt_record = nil
   end
 
+  def aliases
+    Formula[rack.basename.to_s].aliases
+  rescue FormulaUnavailableError
+    []
+  end
+
   def optlink(mode = OpenStruct.new)
     opt_record.delete if opt_record.symlink? || opt_record.exist?
     make_relative_symlink(opt_record, path, mode)
+    aliases.each do |a|
+      alias_opt_record = opt_record.parent/a
+      alias_opt_record.delete if alias_opt_record.symlink? || alias_opt_record.exist?
+      make_relative_symlink(alias_opt_record, path, mode)
+    end
 
     return unless oldname_opt_record
     oldname_opt_record.delete
