@@ -475,12 +475,18 @@ class Reporter
       if new_tap_name == "caskroom/cask"
         if new_tap.installed? && (HOMEBREW_PREFIX/"Caskroom").directory?
           ohai "#{name} has been moved to Homebrew-Cask."
-          ohai "brew uninstall --force #{name}"
-          system HOMEBREW_BREW_FILE, "uninstall", "--force", name
+          ohai "brew unlink #{name}"
+          system HOMEBREW_BREW_FILE, "unlink", name
           ohai "brew prune"
           system HOMEBREW_BREW_FILE, "prune"
           ohai "brew cask install #{new_name}"
           system HOMEBREW_BREW_FILE, "cask", "install", new_name
+          ohai <<-EOS.undent
+            #{name} has been moved to Homebrew-Cask.
+            The existing keg has been unlinked.
+            Please uninstall the formula when convenient by running:
+              brew uninstall --force #{name}
+          EOS
         else
           ohai "#{name} has been moved to Homebrew-Cask.", <<-EOS.undent
             To uninstall the formula and install the cask run:
