@@ -1499,7 +1499,7 @@ class ResourceAuditor
     secure_url = url.sub "http", "https"
     secure_details = get_content_details(secure_url)
 
-    return if !details[:status].start_with?("2") || !secure_details[:status].start_with?("2")
+    return if details[:status].nil? || secure_details[:status].nil? || !details[:status].start_with?("2") || !secure_details[:status].start_with?("2")
 
     etag_match = details[:etag] && details[:etag] == secure_details[:etag]
     content_length_match = details[:content_length] && details[:content_length] == secure_details[:content_length]
