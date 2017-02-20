@@ -174,7 +174,7 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.url_status_code(url, range: false)
+  def url_status_code(url, range: false)
     # The system Curl is too old and unreliable with HTTPS homepages on
     # Yosemite and below.
     return "200" unless DevelopmentTools.curl_handles_most_https_homepages?
@@ -619,8 +619,8 @@ class FormulaAuditor
 
     return unless @online
 
-    status_code = FormulaAuditor.url_status_code(homepage, user_agent: :browser)
-    return if status_code.start_with? "20"
+    status_code = url_status_code(homepage)
+    return if status_code.start_with? "2"
     problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end
 
@@ -1492,11 +1492,7 @@ class ResourceAuditor
     urls.each do |url|
       strategy = DownloadStrategyDetector.detect(url)
       if strategy <= CurlDownloadStrategy && !url.start_with?("file")
-        problem url
-        status_code = FormulaAuditor.url_status_code url
-        unless status_code.start_with? "2"
-          problem "The URL #{url} is not reachable (HTTP status code #{status_code})"
-        end
+        check_http_mirror url
       elsif strategy <= GitDownloadStrategy
         unless Utils.git_remote_exists url
           problem "The URL #{url} is not a valid git URL"
@@ -1506,12 +1502,20 @@ class ResourceAuditor
           problem "The URL #{url} is not a valid svn URL"
         end
       end
-      check_insecure_mirror(url) if url.start_with? "http:"
     end
   end
 
-  def check_insecure_mirror(url)
+  def check_http_mirror(url)
     details =  get_content_details(url)
+
+    if details[:status].nil?
+      problem "The URL #{url} is not reachable"
+    elsif !details[:status].start_with? "2"
+      problem "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
+    end
+
+    return unless url.start_with? "http:"
+
     secure_url = url.sub "http", "https"
     secure_details = get_content_details(secure_url)
 
