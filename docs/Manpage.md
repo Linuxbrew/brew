@@ -746,7 +746,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Additionally, the date used in new manpages will match those in the existing
     manpages (to allow comparison without factoring in the date).
 
-  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] <var>patch-source</var> [<var>patch-source</var>]:
+  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] <var>patch-source</var> [<var>patch-source</var>]:
+
     Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
     Optionally, installs the formulae changed by the patch.
 
@@ -785,6 +786,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     clipboard.
 
     If `--no-publish` is passed, do not publish bottles to Bintray.
+
+    If `--warn-on-publish-failure` was passed, do not exit if there's a
+    failure publishing bottles on Bintray.
 
   * `release-notes` [`--markdown`] [<var>previous_tag</var>] [<var>end_ref</var>]:
     Output the merged pull requests on Homebrew/brew between two Git refs.
