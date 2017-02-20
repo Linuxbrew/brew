@@ -33,6 +33,10 @@ RSpec.configure do |config|
     if example.metadata[:needs_macos]
       skip "not on macOS" unless OS.mac?
     end
+
+    if example.metadata[:needs_python]
+      skip "Python not installed." unless which("python")
+    end
   end
   config.around(:each) do |example|
     begin
