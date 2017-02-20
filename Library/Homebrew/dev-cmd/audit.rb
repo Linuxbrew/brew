@@ -1506,7 +1506,7 @@ class ResourceAuditor
   end
 
   def check_http_mirror(url)
-    details =  get_content_details(url)
+    details = get_content_details(url)
 
     if details[:status].nil?
       problem "The URL #{url} is not reachable"
