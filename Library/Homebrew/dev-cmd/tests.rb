@@ -57,9 +57,7 @@ module Homebrew
       ENV["SEED"] = ARGV.next if ARGV.include? "--seed"
 
       files = Dir.glob("test/**/*_{spec,test}.rb")
-                 .reject { |p| !OS.mac? && p.start_with?("test/os/mac/") }
-                 .reject { |p| !OS.mac? && p.start_with?("test/cask/") }
-                 .reject { |p| p.start_with?("test/vendor/bundle/") }
+                 .reject { |p| !OS.mac? && p =~ %r{^test/(os/mac|cask)(/.*|_(test|spec)\.rb)$} }
 
       test_args = []
       test_args << "--trace" if ARGV.include? "--trace"
