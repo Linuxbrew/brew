@@ -84,6 +84,8 @@ module Homebrew
         "--format", "ParallelTests::RSpec::RuntimeLogger",
         "--out", "tmp/parallel_runtime_rspec.log"
       ]
+      spec_args << "--tag" << "~needs_macos" unless OS.mac?
+
       run_tests "parallel_rspec", spec_files, spec_args
 
       if (fs_leak_log = HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log").file?
