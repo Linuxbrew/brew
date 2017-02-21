@@ -8,11 +8,10 @@ class RubyRequirement < Requirement
     super
   end
 
-  satisfy build_env: false do
-    found_ruby = rubies.detect { |ruby| suitable?(ruby) }
-    return unless found_ruby
-    ENV.prepend_path "PATH", found_ruby.dirname
-    found_ruby
+  satisfy build_env: false { suitable_ruby }
+
+  env do
+    ENV.prepend_path "PATH", suitable_ruby
   end
 
   def message
@@ -34,6 +33,10 @@ class RubyRequirement < Requirement
   end
 
   private
+
+  def suitable_ruby
+    rubies.detect { |ruby| suitable?(ruby) }
+  end
 
   def rubies
     rubies = which_all("ruby")
