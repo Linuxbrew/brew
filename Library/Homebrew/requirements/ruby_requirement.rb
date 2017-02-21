@@ -8,7 +8,7 @@ class RubyRequirement < Requirement
     super
   end
 
-  satisfy build_env: false { suitable_ruby }
+  satisfy(build_env: false) { suitable_ruby }
 
   env do
     ENV.prepend_path "PATH", suitable_ruby
