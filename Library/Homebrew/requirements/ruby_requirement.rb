@@ -40,7 +40,7 @@ class RubyRequirement < Requirement
 
   def rubies
     rubies = which_all("ruby")
-    if ruby_formula.installed?
+    if ruby_formula && ruby_formula.installed?
       rubies.unshift Pathname.new(ruby_formula.bin/"ruby")
     end
     rubies.uniq
