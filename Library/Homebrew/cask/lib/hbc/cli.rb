@@ -37,6 +37,7 @@ module Hbc
       "-S"       => "search",    # verb starting with "-" is questionable
       "up"       => "update",
       "instal"   => "install",   # gem does the same
+      "uninstal" => "uninstall",
       "rm"       => "uninstall",
       "remove"   => "uninstall",
       "abv"      => "info",

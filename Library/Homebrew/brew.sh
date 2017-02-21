@@ -207,6 +207,7 @@ case "$HOMEBREW_COMMAND" in
   up)          HOMEBREW_COMMAND="update" ;;
   ln)          HOMEBREW_COMMAND="link" ;;
   instal)      HOMEBREW_COMMAND="install" ;; # gem does the same
+  uninstal)    HOMEBREW_COMMAND="uninstall" ;;
   rm)          HOMEBREW_COMMAND="uninstall" ;;
   remove)      HOMEBREW_COMMAND="uninstall" ;;
   configure)   HOMEBREW_COMMAND="diy" ;;
