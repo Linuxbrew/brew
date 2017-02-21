@@ -15,6 +15,7 @@ require "global"
 require "tap"
 
 require "test/support/helper/shutup"
+require "test/support/helper/fixtures"
 
 TEST_DIRECTORIES = [
   CoreTap.instance.path/"Formula",
@@ -29,6 +30,7 @@ TEST_DIRECTORIES = [
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
+  config.include(Test::Helper::Fixtures)
   config.before(:each) do |example|
     if example.metadata[:needs_macos]
       skip "not on macOS" unless OS.mac?
