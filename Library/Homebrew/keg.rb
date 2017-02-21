@@ -239,7 +239,10 @@ class Keg
 
   def remove_opt_record
     opt_record.unlink
-    aliases.each { |a| (opt_record.parent/a).unlink }
+    aliases.each do |a|
+      next if !opt_record.symlink? && !opt_record.exist?
+      (opt_record.parent/a).delete
+    end
     opt_record.parent.rmdir_if_possible
   end
 
