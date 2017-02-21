@@ -69,6 +69,7 @@ HOMEBREW_INTERNAL_COMMAND_ALIASES = {
   "up" => "update",
   "ln" => "link",
   "instal" => "install", # gem does the same
+  "uninstal" => "uninstall",
   "rm" => "uninstall",
   "remove" => "uninstall",
   "configure" => "diy",
