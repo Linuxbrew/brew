@@ -9,15 +9,14 @@ class RubyRequirement < Requirement
   end
 
   satisfy build_env: false do
-    which_all("ruby").detect do |ruby|
-      version = /\d\.\d/.match Utils.popen_read(ruby, "--version")
-      next unless version
-      Version.create(version.to_s) >= Version.create(@version)
-    end
+    found_ruby = rubies.detect { |ruby| suitable?(ruby) }
+    return unless found_ruby
+    ENV.prepend_path "PATH", found_ruby.dirname
+    found_ruby
   end
 
   def message
-    s = "Ruby #{@version} is required to install this formula."
+    s = "Ruby >= #{@version} is required to install this formula."
     s += super
     s
   end
@@ -33,4 +32,30 @@ class RubyRequirement < Requirement
       name
     end
   end
+
+  private
+
+  def rubies
+    rubies = which_all("ruby")
+    if ruby_formula.installed?
+      rubies.unshift Pathname.new(ruby_formula.bin/"ruby")
+    end
+    rubies.uniq
+  end
+
+  def suitable?(ruby)
+    version = Utils.popen_read(ruby, "-e", "print RUBY_VERSION").strip
+    version =~ /^\d+\.\d+/ && Version.create(version) >= min_version
+  end
+
+  def min_version
+    @min_version ||= Version.create(@version)
+  end
+
+  def ruby_formula
+    @ruby_formula ||= Formula["ruby"]
+  rescue FormulaUnavailableError
+    nil
+  end
+
 end
