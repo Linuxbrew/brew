@@ -476,10 +476,20 @@ module Homebrew
     end
   end
 
+  def ensure_formula_installed!(formula)
+    return if Formula[formula].installed?
+    ohai "Installing #{formula}..."
+    safe_system HOMEBREW_BREW_FILE, "install", formula
+  rescue FormulaUnavailableError
+    # Fix for brew tests, which uses NullLoader.
+    nil
+  end
+
   def bottle
     if ARGV.include? "--merge"
       merge
     else
+      ensure_formula_installed! "patchelf" if OS.linux?
       ARGV.resolved_formulae.each do |f|
         bottle_formula f
       end
