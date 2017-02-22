@@ -8,10 +8,10 @@ class RubyRequirement < Requirement
     super
   end
 
-  satisfy(build_env: false) { suitable_ruby }
+  satisfy(build_env: false) { new_enough_ruby }
 
   env do
-    ENV.prepend_path "PATH", suitable_ruby
+    ENV.prepend_path "PATH", new_enough_ruby
   end
 
   def message
@@ -34,19 +34,20 @@ class RubyRequirement < Requirement
 
   private
 
-  def suitable_ruby
-    rubies.detect { |ruby| suitable?(ruby) }
+  def new_enough_ruby
+    rubies.detect { |ruby| new_enough?(ruby) }
   end
 
   def rubies
     rubies = which_all("ruby")
+    ruby_formula = Formula["ruby"]
     if ruby_formula && ruby_formula.installed?
-      rubies.unshift Pathname.new(ruby_formula.bin/"ruby")
+      rubies.unshift ruby_formula.bin/"ruby"
     end
     rubies.uniq
   end
 
-  def suitable?(ruby)
+  def new_enough?(ruby)
     version = Utils.popen_read(ruby, "-e", "print RUBY_VERSION").strip
     version =~ /^\d+\.\d+/ && Version.create(version) >= min_version
   end
@@ -54,11 +55,4 @@ class RubyRequirement < Requirement
   def min_version
     @min_version ||= Version.create(@version)
   end
-
-  def ruby_formula
-    @ruby_formula ||= Formula["ruby"]
-  rescue FormulaUnavailableError
-    nil
-  end
-
 end
