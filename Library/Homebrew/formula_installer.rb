@@ -632,6 +632,8 @@ class FormulaInstaller
       args << "--env=#{ARGV.env}"
     elsif formula.env.std? || formula.deps.select(&:build?).any? { |d| d.name == "scons" }
       args << "--env=std"
+    elsif formula.env.super?
+      args << "--env=super"
     end
 
     if formula.head?
