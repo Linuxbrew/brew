@@ -87,6 +87,80 @@ RSpec.shared_context "integration test" do
       status
     end
   end
+
+  def setup_test_formula(name, content = nil)
+    case name
+    when /^testball/
+      content = <<-EOS.undent
+        desc "Some test"
+        homepage "https://example.com/#{name}"
+        url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
+        sha256 "#{TESTBALL_SHA256}"
+
+        option "with-foo", "Build with foo"
+
+        def install
+          (prefix/"foo"/"test").write("test") if build.with? "foo"
+          prefix.install Dir["*"]
+          (buildpath/"test.c").write \
+            "#include <stdio.h>\\nint main(){return printf(\\"test\\");}"
+          bin.mkpath
+          system ENV.cc, "test.c", "-o", bin/"test"
+        end
+
+        #{content}
+
+        # something here
+      EOS
+    when "foo"
+      content = <<-EOS.undent
+        url "https://example.com/#{name}-1.0"
+      EOS
+    when "bar"
+      content = <<-EOS.undent
+        url "https://example.com/#{name}-1.0"
+        depends_on "foo"
+      EOS
+    end
+
+    Formulary.core_path(name).tap do |formula_path|
+      formula_path.write <<-EOS.undent
+        class #{Formulary.class_s(name)} < Formula
+          #{content}
+        end
+      EOS
+    end
+  end
+
+  def setup_remote_tap(name)
+    Tap.fetch(name).tap do |tap|
+      tap.install(full_clone: false, quiet: true) unless tap.installed?
+    end
+  end
+
+  def install_and_rename_coretap_formula(old_name, new_name)
+    shutup do
+      CoreTap.instance.path.cd do |tap_path|
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m",
+          "#{old_name.capitalize} has not yet been renamed"
+
+        brew "install", old_name
+
+        (tap_path/"Formula/#{old_name}.rb").unlink
+        (tap_path/"formula_renames.json").write JSON.generate(old_name => new_name)
+
+        system "git", "add", "--all"
+        system "git", "commit", "-m",
+          "#{old_name.capitalize} has been renamed to #{new_name.capitalize}"
+      end
+    end
+  end
+
+  def testball
+    "#{TEST_FIXTURE_DIR}/testball.rb"
+  end
 end
 
 RSpec.configure do |config|
