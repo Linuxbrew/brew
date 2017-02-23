@@ -34,7 +34,7 @@ RSpec.configure do |config|
   config.include(Test::Helper::Fixtures)
   config.before(:each) do |example|
     if example.metadata[:needs_macos]
-      skip "not on macOS" unless OS.mac?
+      skip "Not on macOS." unless OS.mac?
     end
 
     if example.metadata[:needs_python]
