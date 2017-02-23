@@ -1492,7 +1492,7 @@ class ResourceAuditor
     urls.each do |url|
       strategy = DownloadStrategyDetector.detect(url)
       if strategy <= CurlDownloadStrategy && !url.start_with?("file")
-        check_http_mirror url
+        check_http_content url
       elsif strategy <= GitDownloadStrategy
         unless Utils.git_remote_exists url
           problem "The URL #{url} is not a valid git URL"
@@ -1505,7 +1505,7 @@ class ResourceAuditor
     end
   end
 
-  def check_http_mirror(url)
+  def check_http_content(url)
     details = get_content_details(url)
 
     if details[:status].nil?
@@ -1519,10 +1519,16 @@ class ResourceAuditor
     secure_url = url.sub "http", "https"
     secure_details = get_content_details(secure_url)
 
-    return if !details[:status].start_with?("2") || !secure_details[:status].start_with?("2")
+    if !details[:status].to_s.start_with?("2") ||
+       !secure_details[:status].to_s.start_with?("2")
+      return
+    end
 
-    etag_match = details[:etag] && details[:etag] == secure_details[:etag]
-    content_length_match = details[:content_length] && details[:content_length] == secure_details[:content_length]
+    etag_match = details[:etag] &&
+                 details[:etag] == secure_details[:etag]
+    content_length_match =
+      details[:content_length] &&
+      details[:content_length] == secure_details[:content_length]
     file_match = details[:file_hash] == secure_details[:file_hash]
 
     return if !etag_match && !content_length_match && !file_match
