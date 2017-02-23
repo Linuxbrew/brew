@@ -48,11 +48,6 @@ if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
 then
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
-#  export HOMEBREW_BREW_FILE
-#  export HOMEBREW_PREFIX
-#  export HOMEBREW_REPOSITORY
-#  export HOMEBREW_LIBRARY
-
   execution_env=()
   for key in HOME SHELL PATH TERM LOGNAME USER "${!HOMEBREW_@}"
   do
