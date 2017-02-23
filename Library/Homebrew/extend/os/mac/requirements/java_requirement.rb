@@ -1,4 +1,4 @@
-class JavaRequirement
+class JavaRequirement < Requirement
   cask "java"
 
   env do

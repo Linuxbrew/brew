@@ -4,7 +4,7 @@ require "tap"
 # The Formulary is responsible for creating instances of Formula.
 # It is not meant to be used directly from formulae.
 
-class Formulary
+module Formulary
   FORMULAE = {}
 
   def self.formula_class_defined?(path)

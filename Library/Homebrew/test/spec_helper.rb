@@ -15,6 +15,8 @@ require "global"
 require "tap"
 
 require "test/support/helper/shutup"
+require "test/support/helper/fixtures"
+require "test/support/helper/spec/shared_context/integration_test"
 
 TEST_DIRECTORIES = [
   CoreTap.instance.path/"Formula",
@@ -29,9 +31,10 @@ TEST_DIRECTORIES = [
 RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
+  config.include(Test::Helper::Fixtures)
   config.before(:each) do |example|
     if example.metadata[:needs_macos]
-      skip "not on macOS" unless OS.mac?
+      skip "Not on macOS." unless OS.mac?
     end
 
     if example.metadata[:needs_python]
@@ -41,6 +44,8 @@ RSpec.configure do |config|
   config.around(:each) do |example|
     begin
       TEST_DIRECTORIES.each(&:mkpath)
+
+      @__homebrew_failed = Homebrew.failed?
 
       @__files_before_test = Find.find(TEST_TMPDIR).map { |f| f.sub(TEST_TMPDIR, "") }
 
@@ -81,6 +86,10 @@ RSpec.configure do |config|
         file leak detected:
         #{diff.map { |f| "  #{f}" }.join("\n")}
       EOS
+
+      Homebrew.failed = @__homebrew_failed
     end
   end
 end
+
+RSpec::Matchers.alias_matcher :have_failed, :be_failed

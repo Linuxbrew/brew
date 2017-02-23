@@ -57,9 +57,7 @@ module Homebrew
       ENV["SEED"] = ARGV.next if ARGV.include? "--seed"
 
       files = Dir.glob("test/**/*_{spec,test}.rb")
-                 .reject { |p| !OS.mac? && p.start_with?("test/os/mac/") }
-                 .reject { |p| !OS.mac? && p.start_with?("test/cask/") }
-                 .reject { |p| p.start_with?("test/vendor/bundle/") }
+                 .reject { |p| !OS.mac? && p =~ %r{^test/(os/mac|cask)(/.*|_(test|spec)\.rb)$} }
 
       test_args = []
       test_args << "--trace" if ARGV.include? "--trace"
@@ -84,6 +82,8 @@ module Homebrew
         "--format", "ParallelTests::RSpec::RuntimeLogger",
         "--out", "tmp/parallel_runtime_rspec.log"
       ]
+      spec_args << "--tag" << "~needs_macos" unless OS.mac?
+
       run_tests "parallel_rspec", spec_files, spec_args
 
       if (fs_leak_log = HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log").file?
