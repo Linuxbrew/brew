@@ -37,6 +37,10 @@ RSpec.configure do |config|
       skip "Not on macOS." unless OS.mac?
     end
 
+    if example.metadata[:needs_official_cmd_taps]
+      skip "Needs official command Taps." unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
+    end
+
     if example.metadata[:needs_python]
       skip "Python not installed." unless which("python")
     end
