@@ -3,15 +3,6 @@ require "cmd/info"
 require "formula"
 require "testing_env"
 
-class IntegrationCommandTestInfo < IntegrationCommandTestCase
-  def test_info
-    setup_test_formula "testball"
-
-    assert_match "testball: stable 0.1",
-                 cmd("info", "testball")
-  end
-end
-
 class InfoCommandTests < Homebrew::TestCase
   def test_github_remote_path
     remote = "https://github.com/Homebrew/homebrew-core"
