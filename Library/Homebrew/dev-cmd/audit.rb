@@ -1542,12 +1542,16 @@ class ResourceAuditor
   def get_content_details(url)
     out = {}
     output, = curl_output "--connect-timeout", "15", "--include", url
-    split = output.partition("\r\n\r\n")
-    headers = split.first
-    out[:status] = headers[%r{HTTP\/.* (\d+)}, 1]
+    status_code = :unknown
+    while status_code == :unknown || status_code.to_s.start_with?("3")
+      headers, _, output = output.partition("\r\n\r\n")
+      status_code = headers[%r{HTTP\/.* (\d+)}, 1]
+    end
+
+    out[:status] = status_code
     out[:etag] = headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2]
     out[:content_length] = headers[/Content-Length: (\d+)/, 1]
-    out[:file_hash] = Digest::SHA256.digest split.last
+    out[:file_hash] = Digest::SHA256.digest output
     out
   end
 end
