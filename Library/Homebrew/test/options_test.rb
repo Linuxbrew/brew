@@ -1,17 +1,5 @@
 require "testing_env"
 require "options"
-require "testing_env"
-
-class IntegrationCommandTestOptions < IntegrationCommandTestCase
-  def test_options
-    setup_test_formula "testball", <<-EOS.undent
-      depends_on "bar" => :recommended
-    EOS
-
-    assert_equal "--with-foo\n\tBuild with foo\n--without-bar\n\tBuild without bar support",
-      cmd("options", "testball").chomp
-  end
-end
 
 class OptionTests < Homebrew::TestCase
   def setup
