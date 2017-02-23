@@ -1,6 +1,6 @@
 # Versions
 
-Now that [Homebrew/versions](https://github.com/homebrew/homebrew-versions) has been deprecated [Homebrew/core](https://github.com/homebrew/homebrew-core) supports multiple versions of formulae with a new naming format.
+Now that [Homebrew/versions](https://github.com/homebrew/homebrew-versions) has been deprecated, [Homebrew/core](https://github.com/homebrew/homebrew-core) supports multiple versions of formulae with a new naming format.
 
 In [Homebrew/versions](https://github.com/homebrew/homebrew-versions) the formula for GCC 6 was named `gcc6.rb` and began `class Gcc6 < Formula`. In [Homebrew/core](https://github.com/homebrew/homebrew-core) this same formula is named `gcc@6.rb` and begins `class GccAT6 < Formula`.
 

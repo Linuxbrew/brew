@@ -44,8 +44,8 @@ We prefer:
 * More generally, parallel list item structure
 * Capitalize all list items if you want, even if they're not complete sentences; just be consistent within each list, and preferably, throughout the whole page
 * Use a subordinate list item instead of dropping a multi-sentence paragraph-long item into a list of sentence fragments
-* Prefer Markdown over other markup formats unless their specific features are needed.
-* GitHub flavored Markdown. GitHub's implementation is the standard, period.
+* Prefer Markdown over other markup formats unless their specific features are needed
+ * GitHub Flavored Markdown. GitHub's implementation is the standard, period.
 
 ### Typographical conventions
 

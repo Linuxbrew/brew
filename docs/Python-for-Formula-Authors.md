@@ -4,7 +4,7 @@ This document explains how to successfully use Python in a Homebrew formula.
 
 Homebrew draws a distinction between Python **applications** and Python **libraries**. The difference is that users generally do not care that applications are written in Python; it is unusual that a user would expect to be able to `import foo` after installing an application. Examples of applications are `ansible` and `jrnl`.
 
-Python libraries exist to be imported from other Python modules; they are often dependencies of Python applications. They are usually no more than incidentally useful from a Terminal.app command line. Examples of libraries are `py2cairo` and the bindings that are installed by `protobuf --with-python`.
+Python libraries exist to be imported by other Python modules; they are often dependencies of Python applications. They are usually no more than incidentally useful from a Terminal.app command line. Examples of libraries are `py2cairo` and the bindings that are installed by `protobuf --with-python`.
 
 Bindings are a special case of libraries that allow Python code to interact with a library or application implemented in another language.
 
@@ -22,7 +22,7 @@ where `prefix` is the destination prefix (usually `libexec` or `prefix`).
 
 # Python module dependencies
 
-In general, applications should unconditionally bundle all of their dependencies and libraries should install any unsatisfied dependencies; these strategies are discussed in depth in the following sections.
+In general, applications should unconditionally bundle all of their dependencies and libraries and should install any unsatisfied dependencies; these strategies are discussed in depth in the following sections.
 
 In the rare instance that this proves impractical, you can specify a Python module as an external dependency using the syntax:
 
@@ -49,9 +49,9 @@ Applications that are compatible with Python 2 **should** use the Apple-provided
 ```ruby
 depends_on :python if MacOS.version <= :snow_leopard
 ```
-No explicit Python dependency is needed on recent OS versions since /usr/bin is always in `PATH` for Homebrew formulæ; on Leopard and older, the python in `PATH` is used if it's at least version 2.7, or else Homebrew's python is installed.
+No explicit Python dependency is needed on recent OS versions since /usr/bin is always in `PATH` for Homebrew formulae; on Leopard and older, the python in `PATH` is used if it's at least version 2.7, or else Homebrew's python is installed.
 
-Formulæ for apps that require Python 3 **should** declare an unconditional dependency on `:python3`, which will cause the formula to use the first python3 discovered in `PATH` at install time (or install Homebrew's if there isn't one). These apps **must** work with the current Homebrew python3 formula.
+Formulae for apps that require Python 3 **should** declare an unconditional dependency on `:python3`, which will cause the formula to use the first python3 discovered in `PATH` at install time (or install Homebrew's if there isn't one). These apps **must** work with the current Homebrew python3 formula.
 
 ## Installing
 
@@ -183,7 +183,7 @@ Sometimes we have to `inreplace` a `Makefile` to use our prefix for the python b
 
 Libraries **should** declare a dependency on `:python` or `:python3` as appropriate, which will respectively cause the formula to use the first python or python3 discovered in `PATH` at install time. If a library supports both Python 2.x and Python 3.x, the `:python` dependency **should** be `:recommended` (i.e. built by default) and the :python3 dependency should be `:optional`. Python 2.x libraries **must** function when they are installed against either the system Python or Homebrew Python.
 
-Formulæ that declare a dependency on `:python` will always be bottled against Homebrew's python, since we cannot in general build binary packages that can be imported from both Pythons. Users can add `--build-from-source` after `brew install` to compile against whichever python is in `PATH`.
+Formulae that declare a dependency on `:python` will always be bottled against Homebrew's python, since we cannot in general build binary packages that can be imported from both Pythons. Users can add `--build-from-source` after `brew install` to compile against whichever python is in `PATH`.
 
 ## Installing
 

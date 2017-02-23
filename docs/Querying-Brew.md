@@ -31,9 +31,9 @@ The schema itself is not currently documented outside of the code that generates
 
 ## Examples
 
-_The top-level element of the JSON is always an array, so the `map` operator is used to act on the data._
+_The top-level element of the JSON output is always an array, so the `map` operator is used to act on the data._
 
-### Prety-print a single formula's info
+### Pretty-print a single formula's info
 
 `brew info --json=v1 tig | jq .`
 
@@ -63,6 +63,6 @@ To find the names of normal (not keg-only) formulae that are installed, but not 
 
 ## Concluding remarks
 
-Using the JSON output, queries can be made against Homebrew with less risk of being broken due to Homebrew code changes, and without needing to understand Homebrew's ruby internals.
+Using the JSON output, queries can be made against Homebrew with less risk of being broken due to Homebrew code changes, and without needing to understand Homebrew's Ruby internals.
 
-If the JSON does not provide some information that it ought to, please submit request, preferably with a patch to add the desired information.
+If the JSON output does not provide some information that it ought to, please submit a request, preferably with a patch to add the desired information.

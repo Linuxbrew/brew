@@ -25,7 +25,7 @@ Depending on the change you want to make, you need to send the pull request to t
 3. Add your pushable forked repository with `git remote add <YOUR_USERNAME> https://github.com/<YOUR_USERNAME>/homebrew-core.git`
  * `<YOUR_USERNAME>` is your GitHub username, not your local machine username.
 
-For formulae in central taps other than `homebrew/core`, such as `homebrew/science` or `homebrew/games`, substitute that tap's name for `homebrew/core` in each step, and alter the GitHub repository URLs as necessary.
+For formulae in central taps other than `homebrew/core`, such as `homebrew/science` or `homebrew/nginx`, substitute that tap's name for `homebrew/core` in each step, and alter the GitHub repository URLs as necessary.
 
 ## Create your pull request from a new branch
 

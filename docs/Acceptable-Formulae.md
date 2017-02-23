@@ -38,7 +38,7 @@ There are exceptions:
 | emacs, vim         | [Too popular to move to dupes](https://github.com/Homebrew/homebrew/pull/21594#issuecomment-21968819) |
 | subversion         | Originally added for 10.5, but people want the latest version                                         |
 | libcurl            | Some formulae require a newer version than macOS provides                                             |
-| openssl            | macOS's openssl is deprecated & outdated.                                                             |
+| openssl            | macOS's openssl is deprecated & outdated                                                              |
 | libxml2            | Historically, macOS's libxml2 has been buggy                                                          |
 
 We also maintain [a tap](https://github.com/Homebrew/homebrew-dupes) that
@@ -74,7 +74,7 @@ due to upstream changes and we can’t provide [bottles](Bottles.md) for them.
 ### Bindings
 First check that there is not already a binding available via
 [`gem`](https://rubygems.org/) or [`pip`](http://www.pip-installer.org/)
-etc..
+etc.
 
 If not, then put bindings in the formula they bind to. This is more
 useful to people. Just install the stuff! Having to faff around with
