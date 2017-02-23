@@ -208,6 +208,7 @@ class Keg
 
   def empty_installation?
     Pathname.glob("#{path}/**/*") do |file|
+      return false if file.executable?
       next if file.directory?
       basename = file.basename.to_s
       next if Metafiles.copy?(basename)
