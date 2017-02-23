@@ -46,22 +46,25 @@ HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 
 if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
 then
+  PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
-  homebrew_vars=$("$HOMEBREW_LIBRARY/Homebrew/utils/homebrew_vars.rb")
+  export HOMEBREW_BREW_FILE
+  export HOMEBREW_PREFIX
+  export HOMEBREW_REPOSITORY
+  export HOMEBREW_LIBRARY
 
-  cmd_str="/usr/bin/env -i \
-    HOME=$HOME \
-    PATH=/usr/bin:/bin:/usr/sbin:/sbin \
-    TERM=$TERM \
-    HOMEBREW_BREW_FILE=$HOMEBREW_BREW_FILE \
-    HOMEBREW_PREFIX=$HOMEBREW_PREFIX \
-    HOMEBREW_REPOSITORY=$HOMEBREW_REPOSITORY \
-    HOMEBREW_LIBRARY=$HOMEBREW_LIBRARY \
-    $homebrew_vars \
-    /bin/bash $HOMEBREW_LIBRARY/Homebrew/brew.sh $@"
-    
-  command $cmd_str
-  
+  execution_env=()
+  for key in HOME SHELL PATH TERM LOGNAME USER "${!HOMEBREW_@}"
+  do
+    # ugly, unfortunate consequence of lack of `export -p NAME` in bash's export
+
+    # The following failed to find non exported vars on Bash 3.2.48
+    [[ "$(declare -p "$key" 2>/dev/null)" =~ ^declare\ -[^\ ]*x[^\ ]*\  ]] || continue
+
+    execution_env+=( "${key}=${!key}" )
+  done
+
+  /usr/bin/env -i "${execution_env[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
 else
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi
