@@ -59,6 +59,10 @@ class LinkTests < LinkTestCase
 
     (@keg/"bin").rmtree
     assert_predicate @keg, :empty_installation?
+
+    (@keg/"bin").mkpath
+    touch @keg.join("bin", "todo")
+    refute_predicate @keg, :empty_installation?
   end
 
   def test_linking_keg
