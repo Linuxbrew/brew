@@ -58,7 +58,7 @@ Homebrew builds bindings against the first `python` (and `python-config`) in you
 **Warning!** Python may crash (see [Common Issues](Common-Issues.md)) if you `import <module>` from a brewed Python if you ran `brew install <formula_with_python_bindings>` against the system Python. If you decide to switch to the brewed Python, then reinstall all formulae with python bindings (e.g. `pyside`, `wxwidgets`, `pygtk`, `pygobject`, `opencv`, `vtk` and `boost-python`).
 
 ## Policy for non-brewed Python bindings
-These should be installed via `pip install <x>`. To discover, you can use `pip search` or <https://pypi.python.org/pypi>. (**Note:** System Python does not provide `pip`. Follow the instructions at https://pip.readthedocs.org/en/stable/installing/#install-pip to install it for your system Python if you would like it.)
+These should be installed via `pip install <x>`. To discover, you can use `pip search` or <https://pypi.python.org/pypi>. (**Note:** System Python does not provide `pip`. Follow the instructions at <https://pip.readthedocs.io/en/stable/installing/#install-pip> to install it for your system Python if you would like it.)
 
 
 ## Brewed Python modules
