@@ -1527,9 +1527,10 @@ class ResourceAuditor
 
     return unless @online
     urls.each do |url|
-      strategy = DownloadStrategyDetector.detect(url)
+      next if !@strict && mirrors.include?(url)
+
+      strategy = DownloadStrategyDetector.detect(url, using)
       if strategy <= CurlDownloadStrategy && !url.start_with?("file")
-        next if !@strict && mirrors.include?(url)
         if http_content_problem = FormulaAuditor.check_http_content(url)
           problem http_content_problem
         end
