@@ -166,6 +166,11 @@ class PathnameTests < Homebrew::TestCase
     @dir.cp_path_sub @src, @dst
     assert_predicate @dst/@dir.basename, :directory?
   end
+
+  def test_ds_store
+    refute_predicate @file, :ds_store?
+    assert_predicate @src/".DS_Store", :ds_store?
+  end
 end
 
 class PathnameInstallTests < Homebrew::TestCase

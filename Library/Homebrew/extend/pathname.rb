@@ -457,6 +457,10 @@ class Pathname
     end
   end
 
+  def ds_store?
+    basename.to_s == ".DS_Store"
+  end
+
   # https://bugs.ruby-lang.org/issues/9915
   if RUBY_VERSION == "2.0.0"
     prepend Module.new {
