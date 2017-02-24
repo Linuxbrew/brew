@@ -175,6 +175,8 @@ class FormulaAuditor
   end
 
   def self.check_http_content(url, user_agents: [:default])
+    return unless url.start_with? "http"
+
     details = nil
     user_agent = nil
     user_agents.each do |ua|

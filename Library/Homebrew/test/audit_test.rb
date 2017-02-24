@@ -419,9 +419,8 @@ class FormulaAuditorTests < Homebrew::TestCase
     EOS
 
     fa.audit_homepage
-    assert_equal ["The homepage should start with http or https " \
-      "(URL is #{fa.formula.homepage}).", "The homepage #{fa.formula.homepage} is not reachable " \
-      "(HTTP status code 000)"], fa.problems
+    assert_equal ["The homepage should start with http or https (URL is #{fa.formula.homepage})."],
+      fa.problems
 
     formula_homepages = {
       "bar" => "http://www.freedesktop.org/wiki/bar",
