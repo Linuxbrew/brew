@@ -86,19 +86,19 @@ names, and other aspects of this manual are still subject to change.
     If <token> is given, summarize the staged files associated with the
     given Cask.
 
-  * `reinstall` <token> [ <token> ...]
+  * `reinstall` <token> [ <token> ... ]:
     Reinstall the given Cask.
 
   * `search` or `-S` [<text> | /<regexp>/]:
-    Without argument, display all Casks available for install, otherwise
+    Without an argument, display all Casks available for install; otherwise
     perform a substring search of known Cask tokens for <text> or, if the
     text is delimited by slashes (/<regexp>/), it is interpreted as a
     Ruby regular expression.
 
   * `style` [--fix] [ <token> ... ]:
-   Check the given Casks for correct style using [RuboCop Cask](https://github.com/caskroom/rubocop-cask).
-   If no tokens are given on the command line, all Casks are checked.
-   With `--fix`, auto-correct any style errors if possible.
+    Check the given Casks for correct style using [RuboCop Cask](https://github.com/caskroom/rubocop-cask).
+    If no tokens are given on the command line, all Casks are checked.
+    With `--fix`, auto-correct any style errors if possible.
 
   * `uninstall` or `rm` or `remove` [--force] <token> [ <token> ... ]:
     Uninstall the given Cask. With `--force`, uninstall even if the Cask
@@ -111,7 +111,7 @@ names, and other aspects of this manual are still subject to change.
     the Cask does not appear to be currently installed.
 
     Removes all staged versions of the Cask distribution found under
-    `<Caskroom_path>/<token>`.
+    `<Caskroom_path>/`<token>.
 
     If the Cask definition contains a `zap` stanza, performs additional
     `zap` actions as defined there, such as removing local preference
@@ -123,18 +123,18 @@ names, and other aspects of this manual are still subject to change.
 ## INTERNAL COMMANDS
 
   * `_appcast_checkpoint` [--calculate] [ <token> ... | <URL> ... ]:
-    Given a `token`, returns the current appcast checkpoint, or calculates
-    the appcast checkpoint if the `--calculate` flag is specified.  
-    Given a `URL`, calculates the appcast checkpoint for it.
+    Given a <token>, returns the current appcast checkpoint, or calculates
+    the appcast checkpoint if the `--calculate` flag is specified.
 
-  * `_stanza` <stanza_name> [ --table | --yaml | --inspect | --quiet ] [ <cask_token> ... ]:
-    Given a `stanza_name` and a `cask_token`, returns the current stanza
-    for a given Cask. If no `cask_token` is given, then data for all
-    Casks is returned.
+    Given a <URL>, calculates the appcast checkpoint for it.
+
+  * `_stanza` <stanza_name> [ --table | --yaml | --inspect | --quiet ] [ <token> ... ]:
+    Given a <stanza_name> and a <token>, returns the current stanza for a
+    given Cask. If no <token> is given, then data for all Casks is returned.
 
 ## OPTIONS
 
-To make these options persistent, see the ENVIRONMENT section, below.
+To make these options persistent, see the [ENVIRONMENT][] section, below.
 
 Some of these (such as `--prefpanedir`) may be subject to removal
 in a future version.
@@ -150,7 +150,7 @@ in a future version.
     Abort Cask installation if the Cask does not have a checksum defined.
 
   * `--caskroom=<path>`:
-    Location of the Caskroom, where all binaries are stored. The default value is: `$(brew --prefix)/Caskroom`.
+    Set location of the Caskroom, where all binaries are stored. The default value is `$(brew --prefix)/Caskroom`.
 
   * `--verbose`:
     Give additional feedback during installation.
@@ -218,17 +218,17 @@ the Homebrew command:
 Most Homebrew-Cask commands can accept a Cask token as an argument. As
 described above, the argument can take the form of:
 
-  * A token as returned by `brew cask search`, _eg_ `google-chrome`
+  * A token as returned by `brew cask search`, e.g. `google-chrome`
 
 Homebrew-Cask also accepts three other forms in place of plain tokens:
 
-  * A fully-qualified token which includes the Tap name, _eg_
+  * A fully-qualified token which includes the Tap name, e.g.
     `caskroom/fonts/font-symbola`
 
-  * A fully-qualified pathname to a Cask file, _eg_
+  * A fully-qualified pathname to a Cask file, e.g.
     `/usr/local/Library/Taps/caskroom/homebrew-cask/Casks/google-chrome.rb`
 
-  * A `curl`-retrievable URI to a Cask file, _eg_
+  * A `curl`-retrievable URI to a Cask file, e.g.
     `https://raw.githubusercontent.com/caskroom/homebrew-cask/f25b6babcd398abf48e33af3d887b2d00de1d661/Casks/google-chrome.rb`
 
 ## ENVIRONMENT
@@ -239,17 +239,18 @@ information.
 
 Environment variables specific to Homebrew-Cask:
 
-  * HOMEBREW\_CASK\_OPTS:
+  * `HOMEBREW_CASK_OPTS`:
     This variable may contain any arguments normally used as options on
     the command-line. This is particularly useful to make options persistent.
     For example, you might add to your .bash_profile or .zshenv something like:
-    `export HOMEBREW_CASK_OPTS='--appdir=/Applications --caskroom=/etc/Caskroom'`.
+
+               export HOMEBREW_CASK_OPTS='--appdir=/Applications --caskroom=/etc/Caskroom'
 
 ## SEE ALSO
 
-The Homebrew-Cask home page: <http://caskroom.io>.
+The Homebrew-Cask home page: <http://caskroom.io>
 
-The Homebrew-Cask GitHub page: <https://github.com/caskroom/homebrew-cask>.
+The Homebrew-Cask GitHub page: <https://github.com/caskroom/homebrew-cask>
 
 `brew`(1), `curl`(1)
 
@@ -261,7 +262,7 @@ Man page format based on `brew.1.md` from Homebrew.
 
 ## BUGS
 
-We still have bugs — and we are busy fixing them!  If you have a problem, don’t
+We still have bugs - and we are busy fixing them!  If you have a problem, don't
 be shy about reporting it on our [GitHub issues page](https://github.com/caskroom/homebrew-cask/issues?state=open).
 
 When reporting bugs, remember that Homebrew-Cask is an independent project from
