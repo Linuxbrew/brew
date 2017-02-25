@@ -1,7 +1,7 @@
 require "extend/ARGV"
 
 describe HomebrewArgvExtension do
-  subject { argv.extend(HomebrewArgvExtension) }
+  subject { argv.extend(described_class) }
   let(:argv) { ["mxcl"] }
 
   describe "#formulae" do
