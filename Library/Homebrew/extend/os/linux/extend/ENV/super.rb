@@ -9,6 +9,9 @@ module Superenv
     binutils = Formula["binutils"]
     paths << binutils.opt_bin if binutils.installed?
     paths
+  rescue FormulaUnavailableError
+    # Fix for brew tests, which uses NullLoader.
+    []
   end
 
   def determine_rpath_paths
