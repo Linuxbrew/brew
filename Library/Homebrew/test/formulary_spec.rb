@@ -216,4 +216,12 @@ describe Formulary do
       end
     end
   end
+
+  describe "::core_path" do
+    it "returns the path to a Formula in the core tap" do
+      name = "foo-bar"
+      expect(subject.core_path(name))
+        .to eq(Pathname.new("#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/Formula/#{name}.rb"))
+    end
+  end
 end
