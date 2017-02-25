@@ -329,6 +329,27 @@ class FormulaAuditor
 
     problem "File should end with a newline" unless text.trailing_newline?
 
+    versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
+    needs_versioned_alias = !versioned_formulae.empty? &&
+                            formula.tap &&
+                            formula.aliases.grep(/.@\d/).empty?
+    if needs_versioned_alias
+      _, last_alias_version = File.basename(versioned_formulae.sort.reverse.first)
+                                  .gsub(/\.rb$/, "")
+                                  .split("@")
+      major, minor, = formula.version.to_s.split(".")
+      alias_name = if last_alias_version.split(".").length == 1
+        "#{formula.name}@#{major}"
+      else
+        "#{formula.name}@#{major}.#{minor}"
+      end
+      problem <<-EOS.undent
+        Formula has other versions so create an alias:
+          cd #{formula.tap.alias_dir}
+          ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
+      EOS
+    end
+
     return unless @strict
 
     present = audit_components
@@ -444,7 +465,8 @@ class FormulaAuditor
           problem "Dependency '#{dep.name}' was renamed; use new name '#{dep_f.name}'."
         end
 
-        if @@aliases.include?(dep.name)
+        if @@aliases.include?(dep.name) &&
+           (core_formula? || !dep_f.versioned_formula?)
           problem "Dependency '#{dep.name}' is an alias; use the canonical name '#{dep.to_formula.full_name}'."
         end
 
