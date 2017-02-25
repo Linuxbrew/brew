@@ -7,8 +7,8 @@
 #:    To view formula history locally: `brew log -p <formula>`.
 #:
 #:  * `info` `--json=`<version> (`--all`|`--installed`|<formulae>):
-#:    Print a JSON representation of <formulae>. Currently the only accepted value
-#:    for <version> is `v1`.
+#:    Print a JSON representation of <formulae>.
+#:    Current options for <version>: `v1|pretty|lines`.
 #:
 #:    Pass `--all` to get information on all formulae, or `--installed` to get
 #:    information on all installed formulae.
@@ -28,10 +28,8 @@ module Homebrew
   module_function
 
   def info
-    # eventually we'll solidify an API, but we'll keep old versions
-    # awhile around for compatibility
-    if ARGV.json == "v1"
-      print_json
+    if ARGV.json
+      print_json ARGV.json
     elsif ARGV.flag? "--github"
       exec_browser(*ARGV.formulae.map { |f| github_info(f) })
     else
@@ -63,7 +61,7 @@ module Homebrew
     end
   end
 
-  def print_json
+  def print_json(mode)
     ff = if ARGV.include? "--all"
       Formula
     elsif ARGV.include? "--installed"
@@ -72,7 +70,20 @@ module Homebrew
       ARGV.formulae
     end
     json = ff.map(&:to_hash)
-    puts JSON.generate(json)
+    # eventually we'll solidify an API, but we'll keep old versions
+    # awhile around for compatibility
+    if mode=="v1"
+      puts JSON.generate(json)
+    elsif mode=="pretty"
+      puts JSON.pretty_generate(json)
+    elsif mode=="lines"
+      json.each do |child|
+        puts JSON.generate(child)
+      end
+    else
+      puts "valid modes:[v1|pretty|lines], passed '#{mode}'"
+      raise
+    end
   end
 
   def github_remote_path(remote, path)
