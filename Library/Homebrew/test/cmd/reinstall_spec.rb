@@ -1,9 +1,6 @@
 require "extend/ENV"
 
 describe "brew reinstall", :integration_test do
-  let(:bin) { (HOMEBREW_PREFIX/"bin").realpath }
-  let(:path) { "#{bin}#{File::PATH_SEPARATOR}#{ENV["PATH"]}" }
-
   before(:each) do
     setup_test_formula "testball"
 
@@ -17,7 +14,7 @@ describe "brew reinstall", :integration_test do
     expect(foo_dir).to exist
     foo_dir.rmtree
 
-    expect { brew "reinstall", "testball", "PATH" => path }
+    expect { brew "reinstall", "testball" }
       .to output(/Reinstalling testball --with-foo/).to_stdout
       .and not_to_output.to_stderr
       .and be_a_success
@@ -26,7 +23,7 @@ describe "brew reinstall", :integration_test do
   end
 
   it "reinstalls a Formula even when one of the options is invalid" do
-    expect { brew "reinstall", "testball", "--with-fo", "PATH" => path }
+    expect { brew "reinstall", "testball", "--with-fo" }
       .to output(/Reinstalling testball --with-foo/).to_stdout
       .and output(/testball: this formula has no \-\-with-fo option so it will be ignored!/).to_stderr
       .and be_a_success

@@ -19,7 +19,7 @@ describe "brew install", :integration_test do
 
     expect { brew "install", "testball1" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/0\.1}).to_stdout
-      .and output(/not in your PATH/).to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
 
     expect { brew "install", "testball1" }
@@ -62,7 +62,7 @@ describe "brew install", :integration_test do
 
     expect { brew "install", "testball1" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/1\.0}).to_stdout
-      .and output(/not in your PATH/).to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
 
     FileUtils.rm path
@@ -88,7 +88,7 @@ describe "brew install", :integration_test do
 
     expect { brew "install", "testball1", "--devel" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
-      .and output(/not in your PATH/).to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
 
     expect { brew "unlink", "testball1" }
@@ -98,7 +98,7 @@ describe "brew install", :integration_test do
 
     expect { brew "install", "testball1" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/2\.0}).to_stdout
-      .and output(/not in your PATH/).to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
 
     shutup do
@@ -181,7 +181,7 @@ describe "brew install", :integration_test do
     # formula since we only have testball1 formula.
     expect { brew "install", "testball1", "--HEAD", "--ignore-dependencies" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/HEAD\-d5eb689}).to_stdout
-      .and output(/not in your PATH/).to_stderr
+      .and output(/Cloning into/).to_stderr
       .and be_a_success
 
     expect { brew "install", "testball1", "--HEAD", "--ignore-dependencies" }
@@ -196,7 +196,7 @@ describe "brew install", :integration_test do
 
     expect { brew "install", "testball1" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/1\.0}).to_stdout
-      .and output(/not in your PATH/).to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
   end
 
@@ -220,7 +220,7 @@ describe "brew install", :integration_test do
     # FIXME: This should output to STDERR.
     expect { brew "install", "testball1" }
       .to output(/NonFatalRequirement unsatisfied!/).to_stdout
-      .and output(/not in your PATH/).to_stderr
+      .and not_to_output.to_stderr
       .and be_a_success
   end
 
