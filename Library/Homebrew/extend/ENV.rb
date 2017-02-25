@@ -5,7 +5,7 @@ require "extend/ENV/super"
 
 def superenv?
   if OS.linux?
-    ARGV.env == "super"
+    ARGV.env == "super" || ARGV.homebrew_developer? && ARGV.env != "std"
   else
     ARGV.env != "std" && Superenv.bin
   end
