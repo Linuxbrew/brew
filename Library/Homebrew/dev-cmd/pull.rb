@@ -308,6 +308,18 @@ module Homebrew
       # Applies a patch previously downloaded with fetch_patch()
       # Deletes the patch file as a side effect, regardless of success
 
+      issue = patch_url[/([0-9]+)\.patch$/, 1]
+      safe_system "git", "fetch", "--quiet", "origin", "pull/#{issue}/head"
+      parents = Utils.popen_read("git", "rev-parse", "--parents", "-n1", "FETCH_HEAD").split.length - 1
+      if parents > 1
+        ohai "Fast-forwarding to the merge commit"
+        test_bot_origin = patch_url[%r{(https://github\.com/[\w-]+/[\w-]+)/compare/}, 1]
+        safe_system "git", "fetch", "--quiet", test_bot_origin, "pr-#{issue}" if test_bot_origin
+        safe_system "git", "merge", "--quiet", "--ff-only", "--no-edit", "FETCH_HEAD"
+        patchpath.unlink
+        return
+      end
+
       ohai "Applying patch"
       patch_args = []
       # Normally we don't want whitespace errors, but squashing them can break
@@ -438,11 +450,8 @@ module Homebrew
          "-d", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/#{bintray_project}/#{repo}/#{package}/#{version}/publish"
   rescue ErrorDuringExecution => e
-    if ARGV.include?("-k") || ARGV.include?("--keep-going")
-      puts e
-    else
-      raise e
-    end
+    raise e unless ARGV.include?("-k") || ARGV.include?("--keep-going")
+    puts e
   end
 
   # Formula info drawn from an external "brew info --json" call
