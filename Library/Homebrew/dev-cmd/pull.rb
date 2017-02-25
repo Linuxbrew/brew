@@ -437,6 +437,12 @@ module Homebrew
          "-H", "Content-Type: application/json",
          "-d", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/#{bintray_project}/#{repo}/#{package}/#{version}/publish"
+  rescue ErrorDuringExecution => e
+    if ARGV.include?("-k") || ARGV.include?("--keep-going")
+      puts e
+    else
+      raise e
+    end
   end
 
   # Formula info drawn from an external "brew info --json" call
