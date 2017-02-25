@@ -16,6 +16,7 @@ require "tap"
 
 require "test/support/helper/shutup"
 require "test/support/helper/fixtures"
+require "test/support/helper/formula"
 require "test/support/helper/spec/shared_context/integration_test"
 
 TEST_DIRECTORIES = [
@@ -32,6 +33,7 @@ RSpec.configure do |config|
   config.order = :random
   config.include(Test::Helper::Shutup)
   config.include(Test::Helper::Fixtures)
+  config.include(Test::Helper::Formula)
   config.before(:each) do |example|
     if example.metadata[:needs_macos]
       skip "Not on macOS." unless OS.mac?
