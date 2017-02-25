@@ -1,5 +1,5 @@
 #: @hide_from_man_page
-#:  * `boneyard-formula-pr` [`--dry-run`] [`--local`] [`--reason=<reason>`] <formula-name> :
+#:  * `boneyard-formula-pr` [`--dry-run`] [`--local`] [`--reason=<reason>`] <formula> :
 #:    Creates a pull request to boneyard a formula.
 #:
 #:    If `--dry-run` is passed, print what would be done rather than doing it.

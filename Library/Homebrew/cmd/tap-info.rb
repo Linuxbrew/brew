@@ -12,7 +12,7 @@
 #:
 #:    Pass `--installed` to get information on installed taps.
 #:
-#:    See the docs for examples of using the JSON:
+#:    See the docs for examples of using the JSON output:
 #:    <http://docs.brew.sh/Querying-Brew.html>
 
 require "tap"

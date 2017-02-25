@@ -38,7 +38,7 @@ Fetch the newest version of Homebrew from GitHub using \fBgit\fR(1)\.
 List all installed formulae\.
 .
 .TP
-\fBsearch\fR \fItext\fR|\fB/\fR\fItext\fR\fB/\fR
+\fBsearch\fR (\fItext\fR|\fB/\fR\fItext\fR\fB/\fR)
 Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is surrounded with slashes, then it is interpreted as a regular expression\. The search for \fItext\fR is extended online to some popular taps\. If no search term is given, all locally available formulae are listed\.
 .
 .SH "COMMANDS"
@@ -70,7 +70,7 @@ If \fB\-\-prune=\fR\fIdays\fR is specified, remove all cache files older than \f
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
 .
 .IP
-If \fB\-s\fR is passed, scrubs the cache, removing downloads for even the latest versions of formulae\. Note downloads for any installed formulae will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
+If \fB\-s\fR is passed, scrub the cache, removing downloads for even the latest versions of formulae\. Note downloads for any installed formulae will still not be deleted\. If you want to delete those too: \fBrm \-rf $(brew \-\-cache)\fR
 .
 .TP
 \fBcommand\fR \fIcmd\fR
@@ -131,8 +131,8 @@ The \fIfilters\fR placeholder is any combination of options \fB\-\-include\-buil
 Display \fIformula\fR\'s name and one\-line description\.
 .
 .TP
-\fBdesc\fR [\fB\-s\fR|\fB\-n\fR|\fB\-d\fR] \fIpattern\fR
-Search both name and description (\fB\-s\fR), just the names (\fB\-n\fR), or just the descriptions (\fB\-d\fR) for \fB<pattern>\fR\. \fB<pattern>\fR is by default interpreted as a literal string; if flanked by slashes, it is instead interpreted as a regular expression\. Formula descriptions are cached; the cache is created on the first search, making that search slower than subsequent ones\.
+\fBdesc\fR [\fB\-s\fR|\fB\-n\fR|\fB\-d\fR] (\fItext\fR|\fB/\fR\fItext\fR\fB/\fR)
+Search both name and description (\fB\-s\fR), just the names (\fB\-n\fR), or just the descriptions (\fB\-d\fR) for \fItext\fR\. If \fItext\fR is flanked by slashes, it is interpreted as a regular expression\. Formula descriptions are cached; the cache is created on the first search, making that search slower than subsequent ones\.
 .
 .TP
 \fBdiy\fR [\fB\-\-name=\fR\fIname\fR] [\fB\-\-version=\fR\fIversion\fR]
@@ -203,7 +203,7 @@ Display information about \fIformula\fR\.
 Open a browser to the GitHub History page for formula \fIformula\fR\.
 .
 .IP
-To view formula history locally: \fBbrew log \-p <formula>\fR\.
+To view formula history locally: \fBbrew log \-p <formula>\fR
 .
 .TP
 \fBinfo\fR \fB\-\-json=\fR\fIversion\fR (\fB\-\-all\fR|\fB\-\-installed\fR|\fIformulae\fR)
@@ -213,7 +213,7 @@ Print a JSON representation of \fIformulae\fR\. Currently the only accepted valu
 Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to get information on all installed formulae\.
 .
 .IP
-See the docs for examples of using the JSON: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
+See the docs for examples of using the JSON output: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
 .
 .TP
 \fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR\fIstd\fR|\fIsuper\fR] [\fB\-\-ignore\-dependencies\fR] [\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
@@ -352,7 +352,7 @@ If \fB\-\-all\fR is passed, show options for all formulae\.
 If \fB\-\-installed\fR is passed, show options for all installed formulae\.
 .
 .TP
-\fBoutdated\fR [\fB\-\-quiet\fR|\fB\-\-verbose\fR|\fB\-\-json=v1\fR] [\fB\-\-fetch\-HEAD\fR]
+\fBoutdated\fR [\fB\-\-quiet\fR|\fB\-\-verbose\fR|\fB\-\-json=\fR\fIversion\fR] [\fB\-\-fetch\-HEAD\fR]
 Show formulae that have an updated version available\.
 .
 .IP
@@ -394,7 +394,7 @@ Uninstall and then install \fIformula\fR\.
 Display all locally available formulae for brewing (including tapped ones)\. No online search is performed if called without arguments\.
 .
 .TP
-\fBsearch\fR [\fB\-\-desc\fR] \fItext\fR|\fB/\fR\fItext\fR\fB/\fR
+\fBsearch\fR [\fB\-\-desc\fR] (\fItext\fR|\fB/\fR\fItext\fR\fB/\fR)
 Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is surrounded with slashes, then it is interpreted as a regular expression\. The search for \fItext\fR is extended online to some popular taps\.
 .
 .IP
@@ -479,7 +479,7 @@ Print a JSON representation of \fItaps\fR\. Currently the only accepted value fo
 Pass \fB\-\-installed\fR to get information on installed taps\.
 .
 .IP
-See the docs for examples of using the JSON: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
+See the docs for examples of using the JSON output: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
 .
 .TP
 \fBtap\-pin\fR \fItap\fR
@@ -501,7 +501,7 @@ If \fB\-\-ignore\-dependencies\fR is passed, uninstalling won\'t fail, even if f
 .
 .TP
 \fBunlink\fR [\fB\-\-dry\-run\fR] \fIformula\fR
-Remove symlinks for \fIformula\fR from the Homebrew prefix\. This can be useful for temporarily disabling a formula: \fBbrew unlink foo && commands && brew link foo\fR\.
+Remove symlinks for \fIformula\fR from the Homebrew prefix\. This can be useful for temporarily disabling a formula: \fBbrew unlink <formula> && <commands> && brew link <formula>\fR
 .
 .IP
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all files which would be unlinked, but will not actually unlink or delete any files\.
@@ -524,7 +524,7 @@ If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all symlinks wh
 .
 .TP
 \fBunpack\fR [\fB\-\-git\fR|\fB\-\-patch\fR] [\fB\-\-destdir=\fR\fIpath\fR] \fIformulae\fR
-Unpack the source files for \fIformulae\fR into subdirectories of the current working directory\. If \fB\-\-destdir=\fR\fIpath\fR is given, the subdirectories will be created in the directory named by \fB<path>\fR instead\.
+Unpack the source files for \fIformulae\fR into subdirectories of the current working directory\. If \fB\-\-destdir=\fR\fIpath\fR is given, the subdirectories will be created in the directory named by \fIpath\fR instead\.
 .
 .IP
 If \fB\-\-patch\fR is passed, patches for \fIformulae\fR will be applied to the unpacked source\.
@@ -580,7 +580,7 @@ If \fB\-\-installed\fR is passed, only list installed formulae\.
 By default, \fBuses\fR shows all formulae that specify \fIformulae\fR as a required or recommended dependency\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\.
 .
 .IP
-By default, \fBuses\fR shows usages of \fBformula\fR by stable builds\. To find cases where \fBformula\fR is used by development or HEAD build, pass \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
+By default, \fBuses\fR shows usages of \fIformulae\fR by stable builds\. To find cases where \fIformulae\fR is used by development or HEAD build, pass \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
 .
 .TP
 \fB\-\-cache\fR
@@ -653,25 +653,19 @@ If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with 
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
 .
 .TP
-\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR] [\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=<root_url>\fR] [\fB\-\-force\-core\-tap\fR]:
+\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR] [\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=\fR\fIURL\fR] [\fB\-\-force\-core\-tap\fR]:
 
 .
 .TP
-\fBbottle\fR \fB\-\-merge\fR [\fB\-\-no\-commit\fR] [\fB\-\-keep\-old\fR] [\fB\-\-write\fR]:
-.
-.IP
+\fBbottle\fR \fB\-\-merge\fR [\fB\-\-no\-commit\fR] [\fB\-\-keep\-old\fR] [\fB\-\-write\fR]
 Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\.
 .
 .TP
-\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] [\fB\-\-message=\fR\fImessage\fR] \fB\-\-url=\fR\fIurl\fR \fB\-\-sha256=\fR\fIsha\-256\fR \fIformula\fR:
-
-.
-.TP
-\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR] [\fB\-\-audit\fR|\fB\-\-strict\fR] [\fB\-\-message=\fR\fImessage\fR] \fB\-\-tag=\fR\fItag\fR \fB\-\-revision=\fR\fIrevision\fR \fIformula\fR
-Creates a pull request to update the formula with a new url or a new tag\.
+\fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR [\fB\-\-write\fR]] [\fB\-\-audit\fR|\fB\-\-strict\fR] [\fB\-\-mirror=\fR\fIURL\fR] [\fB\-\-version=\fR\fIversion\fR] [\fB\-\-message=\fR\fImessage\fR] (\fB\-\-url=\fR\fIURL\fR \fB\-\-sha256=\fR\fIsha\-256\fR|\fB\-\-tag=\fR\fItag\fR \fB\-\-revision=\fR\fIrevision\fR) \fIformula\fR
+Creates a pull request to update the formula with a new URL or a new tag\.
 .
 .IP
-If a \fIurl\fR is specified, the \fIsha\-256\fR checksum of the new download must also be specified\. A best effort to determine the \fIsha\-256\fR and \fIformula\fR name will be made if either or both values are not supplied by the user\.
+If a \fIURL\fR is specified, the \fIsha\-256\fR checksum of the new download must also be specified\. A best effort to determine the \fIsha\-256\fR and \fIformula\fR name will be made if either or both values are not supplied by the user\.
 .
 .IP
 If a \fItag\fR is specified, the git commit \fIrevision\fR corresponding to that tag must also be specified\.
@@ -692,23 +686,20 @@ If \fB\-\-audit\fR is passed, run \fBbrew audit\fR before opening the PR\.
 If \fB\-\-strict\fR is passed, run \fBbrew audit \-\-strict\fR before opening the PR\.
 .
 .IP
-If \fB\-\-mirror=\fR\fIurl\fR is passed, use the value as a mirror url\.
+If \fB\-\-mirror=\fR\fIURL\fR is passed, use the value as a mirror URL\.
 .
 .IP
-If \fB\-\-version=\fR\fIversion\fR is passed, use the value to override the value parsed from the url or tag\. Note that \fB\-\-version=0\fR can be used to delete an existing \fBversion\fR override from a formula if it has become redundant\.
+If \fB\-\-version=\fR\fIversion\fR is passed, use the value to override the value parsed from the URL or tag\. Note that \fB\-\-version=0\fR can be used to delete an existing \fBversion\fR override from a formula if it has become redundant\.
 .
 .IP
 If \fB\-\-message=\fR\fImessage\fR is passed, append \fImessage\fR to the default PR message\.
 .
 .IP
-Note that this command cannot be used to transition a formula from a url\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.
+Note that this command cannot be used to transition a formula from a URL\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.
 .
 .TP
 \fBcreate\fR \fIURL\fR [\fB\-\-autotools\fR|\fB\-\-cmake\fR|\fB\-\-meson\fR] [\fB\-\-no\-fetch\fR] [\fB\-\-set\-name\fR \fIname\fR] [\fB\-\-set\-version\fR \fIversion\fR] [\fB\-\-tap\fR \fIuser\fR\fB/\fR\fIrepo\fR]
-Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at
-.
-.IP
-\fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR
+Generate a formula for the downloadable file at \fIURL\fR and open it in the editor\. Homebrew will attempt to automatically derive the formula name and version, but if it fails, you\'ll have to make your own template\. The \fBwget\fR formula serves as a simple example\. For the complete API have a look at \fIhttp://www\.rubydoc\.info/github/Homebrew/brew/master/Formula\fR\.
 .
 .IP
 If \fB\-\-autotools\fR is passed, create a basic template for an Autotools\-style build\. If \fB\-\-cmake\fR is passed, create a basic template for a CMake\-style build\. If \fB\-\-meson\fR is passed, create a basic template for a Meson\-style build\.
@@ -732,10 +723,10 @@ Open \fIformula\fR in the editor\.
 .
 .TP
 \fBformula\fR \fIformula\fR
-Display the path where \fIformula\fR is
+Display the path where \fIformula\fR is located\.
 .
 .TP
-\fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] \fIformula\-name\fR
+\fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] \fIformula\fR
 Checks the library links of an installed formula\.
 .
 .IP
@@ -754,35 +745,52 @@ Generate Homebrew\'s manpages\.
 .IP
 If \fB\-\-fail\-if\-changed\fR is passed, the command will return a failing status code if changes are detected in the manpage outputs\. This can be used for CI to be notified when the manpages are out of date\. Additionally, the date used in new manpages will match those in the existing manpages (to allow comparison without factoring in the date)\.
 .
-.P
+.TP
 \fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]
+Gets a patch from a GitHub commit or pull request and applies it to Homebrew\. Optionally, installs the formulae changed by the patch\.
 .
-.IP "" 4
+.IP
+Each \fIpatch\-source\fR may be one of:
 .
-.nf
-
-Gets a patch from a GitHub commit or pull request and applies it to Homebrew\.
-Optionally, installs the formulae changed by the patch\.
-
-Each <patch\-source> may be one of:
-  * The ID number of a PR (Pull Request) in the homebrew/core GitHub
-    repository
-  * The URL of a PR on GitHub, using either the web page or API URL
-    formats\. In this form, the PR may be on Homebrew/brew,
-    Homebrew/homebrew\-core or any tap\.
-  * The URL of a commit on GitHub
-  * A "http://bot\.brew\.sh/job/\.\.\." string specifying a testing job ID
+.IP
+~ The ID number of a PR (pull request) in the homebrew/core GitHub repository
 .
-.fi
+.IP
+~ The URL of a PR on GitHub, using either the web page or API URL formats\. In this form, the PR may be on Homebrew/brew, Homebrew/homebrew\-core or any tap\.
 .
-.IP "" 0
+.IP
+~ The URL of a commit on GitHub
 .
-.P
-If \fB\-\-bottle\fR was passed, handle bottles, pulling the bottle\-update commit and publishing files on Bintray\. If \fB\-\-bump\fR was passed, for one\-formula PRs, automatically reword commit message to our preferred format\. If \fB\-\-clean\fR was passed, do not rewrite or otherwise modify the commits found in the pulled PR\. If \fB\-\-ignore\-whitespace\fR was passed, silently ignore whitespace discrepancies when applying diffs\. If \fB\-\-resolve\fR was passed, when a patch fails to apply, leave in progress and allow user to resolve, instead of aborting\. If \fB\-\-branch\-okay\fR was passed, do not warn if pulling to a branch besides master (useful for testing)\. If \fB\-\-no\-pbcopy\fR was passed, do not copy anything to the system If \fB\-\-no\-publish\fR was passed, do not publish bottles to Bintray\.
+.IP
+~ A "http://bot\.brew\.sh/job/\.\.\." string specifying a testing job ID
+.
+.IP
+If \fB\-\-bottle\fR is passed, handle bottles, pulling the bottle\-update commit and publishing files on Bintray\.
+.
+.IP
+If \fB\-\-bump\fR is passed, for one\-formula PRs, automatically reword commit message to our preferred format\.
+.
+.IP
+If \fB\-\-clean\fR is passed, do not rewrite or otherwise modify the commits found in the pulled PR\.
+.
+.IP
+If \fB\-\-ignore\-whitespace\fR is passed, silently ignore whitespace discrepancies when applying diffs\.
+.
+.IP
+If \fB\-\-resolve\fR is passed, when a patch fails to apply, leave in progress and allow user to resolve, instead of aborting\.
+.
+.IP
+If \fB\-\-branch\-okay\fR is passed, do not warn if pulling to a branch besides master (useful for testing)\.
+.
+.IP
+If \fB\-\-no\-pbcopy\fR is passed, do not copy anything to the system clipboard\.
+.
+.IP
+If \fB\-\-no\-publish\fR is passed, do not publish bottles to Bintray\.
 .
 .TP
-\fBrelease\-notes\fR [\fIprevious_tag\fR] [\fIend_ref\fR]
-Output the merged pull requests on Homebrew/brew between two Git refs\. If no \fBprevious_tag\fR is provided it defaults to the newest tag\. If no \fBend_ref\fR is provided it defaults to \fBorigin/master\fR\.
+\fBrelease\-notes\fR [\fB\-\-markdown\fR] [\fIprevious_tag\fR] [\fIend_ref\fR]
+Output the merged pull requests on Homebrew/brew between two Git refs\. If no \fIprevious_tag\fR is provided it defaults to the newest tag\. If no \fIend_ref\fR is provided it defaults to \fBorigin/master\fR\.
 .
 .IP
 If \fB\-\-markdown\fR is passed, output as a Markdown list\.
@@ -808,24 +816,24 @@ If \fB\-\-keep\-tmp\fR is passed, the temporary files created for the test are n
 Example: \fBbrew install jruby && brew test jruby\fR
 .
 .TP
-\fBtests\fR [\fB\-v\fR] [\fB\-\-coverage\fR] [\fB\-\-generic\fR] [\fB\-\-no\-compat\fR] [\fB\-\-only=\fR<test_script:test_method>] [\fB\-\-seed\fR \fIseed\fR] [\fB\-\-trace\fR] [\fB\-\-online\fR] [\fB\-\-official\-cmd\-taps\fR]
+\fBtests\fR [\fB\-v\fR] [\fB\-\-coverage\fR] [\fB\-\-generic\fR] [\fB\-\-no\-compat\fR] [\fB\-\-only=\fR\fItest_script\fR\fB:\fR\fItest_method\fR] [\fB\-\-seed\fR \fIseed\fR] [\fB\-\-trace\fR] [\fB\-\-online\fR] [\fB\-\-official\-cmd\-taps\fR]
 Run Homebrew\'s unit and integration tests\.
 .
 .TP
-\fBupdate\-test\fR [\fB\-\-commit=<commit>\fR] [\fB\-\-before=<date>\fR] [\fB\-\-keep\-tmp\fR]
+\fBupdate\-test\fR [\fB\-\-commit=\fR\fIcommit\fR] [\fB\-\-before=\fR\fIdate\fR] [\fB\-\-keep\-tmp\fR]
 Runs a test of \fBbrew update\fR with a new repository clone\.
 .
 .IP
 If no arguments are passed, use \fBorigin/master\fR as the start commit\.
 .
 .IP
-If \fB\-\-commit=<commit>\fR is passed, use \fB<commit>\fR as the start commit\.
+If \fB\-\-commit=\fR\fIcommit\fR is passed, use \fIcommit\fR as the start commit\.
 .
 .IP
-If \fB\-\-before=<date>\fR is passed, use the commit at \fB<date>\fR as the start commit\.
+If \fB\-\-before=\fR\fIdate\fR is passed, use the commit at \fIdate\fR as the start commit\.
 .
 .IP
-If \fB\-\-to\-tag\fR is passed, set HOMEBREW_UPDATE_TO_TAG to test updating between tags\.
+If \fB\-\-to\-tag\fR is passed, set \fBHOMEBREW_UPDATE_TO_TAG\fR to test updating between tags\.
 .
 .IP
 If \fB\-\-keep\-tmp\fR is passed, retain the temporary directory containing the new repository clone\.
@@ -985,7 +993,7 @@ If set, Homebrew will not print the \fBHOMEBREW_INSTALL_BADGE\fR on a successful
 If set, Homebrew will not permit redirects from secure HTTPS to insecure HTTP\.
 .
 .IP
-While ensuring your downloads are fully secure, this is likely to cause from\-source Sourceforge, some GNU & GNOME based formulae to fail to download\.
+While ensuring your downloads are fully secure, this is likely to cause from\-source SourceForge, some GNU & GNOME based formulae to fail to download\.
 .
 .TP
 \fBHOMEBREW_NO_GITHUB_API\fR
@@ -1056,7 +1064,7 @@ Homebrew Documentation: \fIhttps://github\.com/Homebrew/brew/blob/master/docs/\f
 Homebrew\'s lead maintainer is Mike McQuaid\.
 .
 .P
-Homebrew\'s current maintainers are Alyssa Ross, Andrew Janke, Baptiste Fontaine, [Alex Dunn](https://github\.
+Homebrew\'s current maintainers are Alyssa Ross, Andrew Janke, Baptiste Fontaine, Alex Dunn, FX Coudert, ilovezfs, Josh Hagins, JCount, Misty De Meo, Tomasz Pajor, Markus Reiter, Tim Smith, Tom Schoonjans, Uladzislau Shablinski and William Woodruff\.
 .
 .P
 Former maintainers with significant contributions include Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Jack Nagel, Adam Vandenberg and Homebrew\'s creator: Max Howell\.

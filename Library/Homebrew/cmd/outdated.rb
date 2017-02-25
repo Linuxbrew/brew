@@ -1,4 +1,4 @@
-#:  * `outdated` [`--quiet`|`--verbose`|`--json=v1`] [`--fetch-HEAD`]:
+#:  * `outdated` [`--quiet`|`--verbose`|`--json=`<version>] [`--fetch-HEAD`]:
 #:    Show formulae that have an updated version available.
 #:
 #:    By default, version information is displayed in interactive shells, and

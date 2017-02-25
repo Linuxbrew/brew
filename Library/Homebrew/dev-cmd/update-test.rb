@@ -1,14 +1,14 @@
-#:  * `update-test` [`--commit=<commit>`] [`--before=<date>`] [`--keep-tmp`]:
+#:  * `update-test` [`--commit=`<commit>] [`--before=`<date>] [`--keep-tmp`]:
 #:    Runs a test of `brew update` with a new repository clone.
 #:
 #:    If no arguments are passed, use `origin/master` as the start commit.
 #:
-#:    If `--commit=<commit>` is passed, use `<commit>` as the start commit.
+#:    If `--commit=`<commit> is passed, use <commit> as the start commit.
 #:
-#:    If `--before=<date>` is passed, use the commit at `<date>` as the
+#:    If `--before=`<date> is passed, use the commit at <date> as the
 #:    start commit.
 #:
-#:    If `--to-tag` is passed, set HOMEBREW_UPDATE_TO_TAG to test updating
+#:    If `--to-tag` is passed, set `HOMEBREW_UPDATE_TO_TAG` to test updating
 #:    between tags.
 #:
 #:    If `--keep-tmp` is passed, retain the temporary directory containing

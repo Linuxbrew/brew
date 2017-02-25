@@ -1,7 +1,7 @@
 #:  * `unpack` [`--git`|`--patch`] [`--destdir=`<path>] <formulae>:
 #:    Unpack the source files for <formulae> into subdirectories of the current
 #:    working directory. If `--destdir=`<path> is given, the subdirectories will
-#:    be created in the directory named by `<path>` instead.
+#:    be created in the directory named by <path> instead.
 #:
 #:    If `--patch` is passed, patches for <formulae> will be applied to the
 #:    unpacked source.
