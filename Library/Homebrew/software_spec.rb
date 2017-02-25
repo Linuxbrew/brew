@@ -288,9 +288,7 @@ class Bottle
 end
 
 class BottleSpecification
-  DEFAULT_PREFIX_MAC = "/usr/local".freeze
-  DEFAULT_PREFIX_LINUX = "/home/linuxbrew/.linuxbrew".freeze
-  DEFAULT_PREFIX = (OS.linux? ? DEFAULT_PREFIX_LINUX : DEFAULT_PREFIX_MAC).freeze
+  DEFAULT_PREFIX = HOMEBREW_DEFAULT_PREFIX
   DEFAULT_CELLAR = "#{DEFAULT_PREFIX}/Cellar".freeze
   DEFAULT_DOMAIN_LINUX = "https://linuxbrew.bintray.com".freeze
   DEFAULT_DOMAIN_MAC = "https://homebrew.bintray.com".freeze

@@ -17,6 +17,8 @@ HOMEBREW_PRODUCT = ENV["HOMEBREW_PRODUCT"]
 HOMEBREW_VERSION = ENV["HOMEBREW_VERSION"]
 HOMEBREW_WWW = "https://brew.sh".freeze
 
+HOMEBREW_DEFAULT_PREFIX = (OS.linux? ? "/home/linuxbrew/.linuxbrew" : "/usr/local").freeze
+
 require "config"
 
 HOMEBREW_REPOSITORY.extend(GitRepositoryExtension)
