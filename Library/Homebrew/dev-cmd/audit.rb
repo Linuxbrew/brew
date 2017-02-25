@@ -740,6 +740,7 @@ class FormulaAuditor
 
     unstable_whitelist = %w[
       aalib 1.4rc5
+      angolmois 2.0.0alpha2
       automysqlbackup 3.0-rc6
       aview 1.3.0rc1
       distcc 3.2rc1
@@ -747,6 +748,8 @@ class FormulaAuditor
       ftgl 2.1.3-rc5
       hidapi 0.8.0-rc1
       libcaca 0.99b19
+      nethack4 4.3.0-beta2
+      opensyobon 1.0rc2
       premake 4.4-beta5
       pwnat 0.3-beta
       pxz 4.999.9
