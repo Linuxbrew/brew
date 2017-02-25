@@ -12,6 +12,7 @@ class Symbol
     Formulary.factory(to_s, *args)
   end
 end
+
 class String
   def f(*args)
     Formulary.factory(self, *args)
