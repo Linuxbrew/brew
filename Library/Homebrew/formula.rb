@@ -1026,7 +1026,9 @@ class Formula
     @prefix_returns_versioned_prefix = false
   end
 
-  # Tell the user about any caveats regarding this package.
+  # Tell the user about any Homebrew-specific caveats or locations regarding
+  # this package. These should not contain setup instructions that would apply
+  # to installation through a different package manager on a different OS.
   # @return [String]
   # <pre>def caveats
   #   <<-EOS.undent
