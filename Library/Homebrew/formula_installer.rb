@@ -151,6 +151,28 @@ class FormulaInstaller
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
 
+    recursive_dependencies = []
+    recursive_formulae.each do |dep|
+      dep_recursive_dependencies = dep.recursive_dependencies.map(&:to_s)
+      if dep_recursive_dependencies.include?(formula.name)
+        recursive_dependencies << "#{formula.full_name} depends on #{dep.full_name}"
+        recursive_dependencies << "#{dep.full_name} depends on #{formula.full_name}"
+      end
+    end
+
+    unless recursive_dependencies.empty?
+      raise CannotInstallFormulaError, <<-EOS.undent
+        #{formula.full_name} contains a recursive dependency on itself:
+          #{recursive_dependencies.join("\n  ")}
+      EOS
+    end
+
+    if recursive_formulae.flat_map(&:recursive_dependencies).map(&:to_s).include?(formula.name)
+      raise CannotInstallFormulaError, <<-EOS.undent
+        #{formula.full_name} contains a recursive dependency on itself!
+      EOS
+    end
+
     if ENV["HOMEBREW_CHECK_RECURSIVE_VERSION_DEPENDENCIES"]
       version_hash = {}
       version_conflicts = Set.new
