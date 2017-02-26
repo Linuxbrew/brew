@@ -1,5 +1,5 @@
 # Homebrew
-Features, usage and installation instructions are [summarised on the homepage](http://brew.sh). Terminology (e.g. the difference between a Cellar, Tap, Cask and so forth) is [explained here](docs/Formula-Cookbook.md#homebrew-terminology).
+Features, usage and installation instructions are [summarised on the homepage](https://brew.sh). Terminology (e.g. the difference between a Cellar, Tap, Cask and so forth) is [explained here](docs/Formula-Cookbook.md#homebrew-terminology).
 
 ## Update Bug
 If Homebrew was updated on Aug 10-11th 2016 and `brew update` always says `Already up-to-date.` you need to run:
@@ -13,7 +13,7 @@ cd "$(brew --repo)" && git fetch && git reset --hard origin/master && brew updat
 3. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
-`brew help`, `man brew` or check [our documentation](https://brew.sh/brew/).
+`brew help`, `man brew` or check [our documentation](http://docs.brew.sh/).
 
 ## Troubleshooting
 First, please run `brew update` and `brew doctor`.
@@ -40,9 +40,9 @@ This is our PGP key which is valid until May 24, 2017.
 ## Who Are You?
 Homebrew's lead maintainer is [Mike McQuaid](https://github.com/mikemcquaid).
 
-Homebrew's current maintainers are [Misty De Meo](https://github.com/mistydemeo), [Andrew Janke](https://github.com/apjanke), [Xu Cheng](https://github.com/xu-cheng), [Tomasz Pajor](https://github.com/nijikon), [Josh Hagins](https://github.com/jawshooah), [Baptiste Fontaine](https://github.com/bfontaine), [Markus Reiter](https://github.com/reitermarkus), [ilovezfs](https://github.com/ilovezfs), [Tom Schoonjans](https://github.com/tschoonj), [Uladzislau Shablinski](https://github.com/vladshablinsky), [Tim Smith](https://github.com/tdsmith) and [Alex Dunn](https://github.com/dunn).
+Homebrew's current maintainers are [Alyssa Ross](https://github.com/alyssais), [Andrew Janke](https://github.com/apjanke), [Baptiste Fontaine](https://github.com/bfontaine), [Alex Dunn](https://github.com/dunn), [FX Coudert](https://github.com/fxcoudert), [ilovezfs](https://github.com/ilovezfs), [Josh Hagins](https://github.com/jawshooah), [JCount](https://github.com/jcount), [Misty De Meo](https://github.com/mistydemeo), [Tomasz Pajor](https://github.com/nijikon), [Markus Reiter](https://github.com/reitermarkus), [Tim Smith](https://github.com/tdsmith), [Tom Schoonjans](https://github.com/tschoonj), [Uladzislau Shablinski](https://github.com/vladshablinsky) and [William Woodruff](https://github.com/woodruffw).
 
-Former maintainers with significant contributions include [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Brett Koonce](https://github.com/asparagui), [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
+Former maintainers with significant contributions include [Xu Cheng](https://github.com/xu-cheng), [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Brett Koonce](https://github.com/asparagui), [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
 ## Community
 - [discourse.brew.sh (forum)](http://discourse.brew.sh)
@@ -61,15 +61,23 @@ Please consider a regular donation through Patreon:
 [![Donate with Patreon](https://img.shields.io/badge/patreon-donate-green.svg)](https://www.patreon.com/homebrew)
 
 ## Sponsors
-Our CI infrastructure was paid for by [our Kickstarter supporters](http://docs.brew.sh/Kickstarter-Supporters.html).
+Our Xserve ESXi boxes for CI are hosted by [MacStadium](https://www.macstadium.com).
 
-Our CI infrastructure is hosted by [The Positive Internet Company](http://www.positive-internet.com).
+[![Powered by MacStadium](https://cloud.githubusercontent.com/assets/125011/22776032/097557ac-eea6-11e6-8ba8-eff22dfd58f1.png)](https://www.macstadium.com)
 
-Our bottles (binary packages) are hosted by Bintray.
+Our Mac Minis for CI were paid for by [our Kickstarter supporters](http://docs.brew.sh/Kickstarter-Supporters.html).
+
+Our Mac Minis for CI are hosted by [The Positive Internet Company](http://www.positive-internet.com).
+
+Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/homebrew).
 
 [![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/homebrew)
 
-Secure password storage and syncing provided by [1Password for Teams](https://1password.com/teams/) by AgileBits
+[Our website](https://brew.sh) is hosted by [Netlify](https://www.netlify.com).
+
+[![Deploys by Netlify](https://www.netlify.com/img/global/badges/netlify-color-accent.svg)](https://www.netlify.com)
+
+Secure password storage and syncing provided by [1Password for Teams](https://1password.com/teams/) by [AgileBits](https://agilebits.com)
 
 [![AgileBits](https://da36klfizjv29.cloudfront.net/assets/branding/agilebits-fcca96e9b8e815c5c48c6b3e98156cb5.png)](https://agilebits.com)
 

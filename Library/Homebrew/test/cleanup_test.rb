@@ -5,23 +5,16 @@ require "fileutils"
 require "pathname"
 require "testing_env"
 
-class IntegrationCommandTestCleanup < IntegrationCommandTestCase
-  def test_cleanup
-    (HOMEBREW_CACHE/"test").write "test"
-    assert_match "#{HOMEBREW_CACHE}/test", cmd("cleanup", "--prune=all")
-  end
-end
-
 class CleanupTests < Homebrew::TestCase
   def setup
+    super
     @ds_store = Pathname.new "#{HOMEBREW_PREFIX}/Library/.DS_Store"
     FileUtils.touch @ds_store
   end
 
   def teardown
     FileUtils.rm_f @ds_store
-    ARGV.delete "--dry-run"
-    ARGV.delete "--prune=all"
+    super
   end
 
   def test_cleanup
@@ -36,28 +29,40 @@ class CleanupTests < Homebrew::TestCase
   end
 
   def test_cleanup_formula
-    f1 = Class.new(Testball) { version "0.1" }.new
-    f2 = Class.new(Testball) { version "0.2" }.new
-    f3 = Class.new(Testball) { version "0.3" }.new
+    f1 = Class.new(Testball) do
+      version "1.0"
+    end.new
+    f2 = Class.new(Testball) do
+      version "0.2"
+      version_scheme 1
+    end.new
+    f3 = Class.new(Testball) do
+      version "0.3"
+      version_scheme 1
+    end.new
+    f4 = Class.new(Testball) do
+      version "0.1"
+      version_scheme 2
+    end.new
 
     shutup do
-      f1.brew { f1.install }
-      f2.brew { f2.install }
-      f3.brew { f3.install }
+      [f1, f2, f3, f4].each do |f|
+        f.brew { f.install }
+        Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
+      end
     end
 
     assert_predicate f1, :installed?
     assert_predicate f2, :installed?
     assert_predicate f3, :installed?
+    assert_predicate f4, :installed?
 
     shutup { Homebrew::Cleanup.cleanup_formula f3 }
 
     refute_predicate f1, :installed?
     refute_predicate f2, :installed?
     assert_predicate f3, :installed?
-  ensure
-    [f1, f2, f3].each(&:clear_cache)
-    f3.rack.rmtree
+    assert_predicate f4, :installed?
   end
 
   def test_cleanup_logs

@@ -12,7 +12,7 @@ AllCops:
 Style/BlockDelimiters:
   Exclude:
     - '**/cask/spec/**/*'
-    - '**/cask/test/**/*'
+    - '**/*_spec.rb'
 
 # so many of these in formulae but none in here
 Lint/AmbiguousRegexpLiteral:

@@ -26,7 +26,7 @@ module Homebrew
       EOS
     end
     args = ARGV.options_only
-    args += ["--", path] unless path.nil?
+    args += ["--follow", "--", path] unless path.nil?
     exec "git", "log", *args
   end
 end

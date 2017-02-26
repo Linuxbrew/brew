@@ -1,33 +1,42 @@
-#: `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] <patch-source> [<patch-source>]
-#:
+#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] <patch-source> [<patch-source>]:
 #:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 #:    Optionally, installs the formulae changed by the patch.
 #:
 #:    Each <patch-source> may be one of:
-#:      * The ID number of a PR (Pull Request) in the homebrew/core GitHub
+#:
+#:      ~ The ID number of a PR (pull request) in the homebrew/core GitHub
 #:        repository
-#:      * The URL of a PR on GitHub, using either the web page or API URL
+#:
+#:      ~ The URL of a PR on GitHub, using either the web page or API URL
 #:        formats. In this form, the PR may be on Homebrew/brew,
 #:        Homebrew/homebrew-core or any tap.
-#:      * The URL of a commit on GitHub
-#:      * A "http://bot.brew.sh/job/..." string specifying a testing job ID
 #:
-#:   If `--bottle` was passed, handle bottles, pulling the bottle-update
-#:   commit and publishing files on Bintray.
-#:   If `--bump` was passed, for one-formula PRs, automatically reword
-#:   commit message to our preferred format.
-#:   If `--clean` was passed, do not rewrite or otherwise modify the
-#:   commits found in the pulled PR.
-#:   If `--ignore-whitespace` was passed, silently ignore whitespace
-#:   discrepancies when applying diffs.
-#:   If `--resolve` was passed, when a patch fails to apply, leave in
-#:   progress and allow user to
-#:                  resolve, instead of aborting.
-#:   If `--branch-okay` was passed, do not warn if pulling to a branch
-#:   besides master (useful for testing).
-#:   If `--no-pbcopy` was passed, do not copy anything to the system
-#    clipboard.
-#:   If `--no-publish` was passed, do not publish bottles to Bintray.
+#:      ~ The URL of a commit on GitHub
+#:
+#:      ~ A "http://bot.brew.sh/job/..." string specifying a testing job ID
+#:
+#:    If `--bottle` is passed, handle bottles, pulling the bottle-update
+#:    commit and publishing files on Bintray.
+#:
+#:    If `--bump` is passed, for one-formula PRs, automatically reword
+#:    commit message to our preferred format.
+#:
+#:    If `--clean` is passed, do not rewrite or otherwise modify the
+#:    commits found in the pulled PR.
+#:
+#:    If `--ignore-whitespace` is passed, silently ignore whitespace
+#:    discrepancies when applying diffs.
+#:
+#:    If `--resolve` is passed, when a patch fails to apply, leave in
+#:    progress and allow user to resolve, instead of aborting.
+#:
+#:    If `--branch-okay` is passed, do not warn if pulling to a branch
+#:    besides master (useful for testing).
+#:
+#:    If `--no-pbcopy` is passed, do not copy anything to the system
+#:    clipboard.
+#:
+#:    If `--no-publish` is passed, do not publish bottles to Bintray.
 
 require "net/http"
 require "net/https"
@@ -248,7 +257,6 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        ohai "Publishing on Bintray: #{f.name} #{f.pkg_version}"
         publish_bottle_file_on_bintray(f, bintray_creds)
         published << f.full_name
       end
@@ -377,7 +385,7 @@ module Homebrew
           subject_strs << "remove stable"
           formula_name_str += ":" # just for cosmetics
         else
-          subject_strs << formula.version.to_s
+          subject_strs << new[:stable]
         end
       end
       if old[:devel] != new[:devel]
@@ -388,7 +396,7 @@ module Homebrew
             formula_name_str += ":" # just for cosmetics
           end
         else
-          subject_strs << "#{formula.devel.version} (devel)"
+          subject_strs << "#{new[:devel]} (devel)"
         end
       end
       subject = subject_strs.empty? ? nil : "#{formula_name_str} #{subject_strs.join(", ")}"
@@ -408,7 +416,12 @@ module Homebrew
     if info.nil?
       raise "Failed publishing bottle: failed reading formula info for #{f.full_name}"
     end
+    unless info.bottle_info_any
+      opoo "No bottle defined in formula #{package}"
+      return
+    end
     version = info.pkg_version
+    ohai "Publishing on Bintray: #{package} #{version}"
     curl "-w", '\n', "--silent", "--fail",
          "-u#{creds[:user]}:#{creds[:key]}", "-X", "POST",
          "-H", "Content-Type: application/json",

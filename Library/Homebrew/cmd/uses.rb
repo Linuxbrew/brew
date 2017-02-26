@@ -12,8 +12,8 @@
 #:    `--include-build`. Similarly, pass `--include-optional` to include `:optional`
 #:    dependencies. To skip `:recommended` type dependencies, pass `--skip-recommended`.
 #:
-#:    By default, `uses` shows usages of `formula` by stable builds. To find
-#:    cases where `formula` is used by development or HEAD build, pass
+#:    By default, `uses` shows usages of <formulae> by stable builds. To find
+#:    cases where <formulae> is used by development or HEAD build, pass
 #:    `--devel` or `--HEAD`.
 
 require "formula"
@@ -57,16 +57,36 @@ module Homebrew
               elsif dep.build?
                 Dependency.prune unless includes.include?("build?")
               end
-            end
-            reqs = f.recursive_requirements do |dependent, req|
-              if req.recommended?
-                Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
-              elsif req.optional?
-                Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
-              elsif req.build?
-                Requirement.prune unless includes.include?("build?")
+
+              # If a tap isn't installed, we can't find the dependencies of one
+              # its formulae, and an exception will be thrown if we try.
+              if dep.is_a?(TapDependency) && !dep.tap.installed?
+                Dependency.keep_but_prune_recursive_deps
               end
             end
+
+            dep_formulae = deps.map do |dep|
+              begin
+                dep.to_formula
+              rescue
+              end
+            end.compact
+
+            reqs_by_formula = ([f] + dep_formulae).flat_map do |formula|
+              formula.requirements.map { |req| [formula, req] }
+            end
+
+            reqs_by_formula.reject! do |dependent, req|
+              if req.recommended?
+                ignores.include?("recommended?") || dependent.build.without?(req)
+              elsif req.optional?
+                !includes.include?("optional?") && !dependent.build.with?(req)
+              elsif req.build?
+                !includes.include?("build?")
+              end
+            end
+
+            reqs = reqs_by_formula.map(&:last)
           else
             deps = f.deps.reject do |dep|
               ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }

@@ -7,10 +7,6 @@ module Hbc
         @cask.artifacts[:nested_container].each { |container| extract(container) }
       end
 
-      def uninstall_phase
-        # no need to take action; is removed after extraction
-      end
-
       def extract(container_relative_path)
         source = @cask.staged_path.join(container_relative_path)
         container = Container.for_path(source, @command)

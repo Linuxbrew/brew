@@ -1,8 +1,7 @@
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] [`--message=`<message>] `--url=`<url> `--sha256=`<sha-256> <formula>:
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] [`--message=`<message>] `--tag=`<tag> `--revision=`<revision> <formula>:
-#:    Creates a pull request to update the formula with a new url or a new tag.
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--audit`|`--strict`] [`--mirror=`<URL>] [`--version=`<version>] [`--message=`<message>] (`--url=`<URL> `--sha256=`<sha-256>|`--tag=`<tag> `--revision=`<revision>) <formula>:
+#:    Creates a pull request to update the formula with a new URL or a new tag.
 #:
-#:    If a <url> is specified, the <sha-256> checksum of the new download must
+#:    If a <URL> is specified, the <sha-256> checksum of the new download must
 #:    also be specified. A best effort to determine the <sha-256> and <formula>
 #:    name will be made if either or both values are not supplied by the user.
 #:
@@ -21,17 +20,17 @@
 #:
 #:    If `--strict` is passed, run `brew audit --strict` before opening the PR.
 #:
-#:    If `--mirror=`<url> is passed, use the value as a mirror url.
+#:    If `--mirror=`<URL> is passed, use the value as a mirror URL.
 #:
 #:    If `--version=`<version> is passed, use the value to override the value
-#:    parsed from the url or tag. Note that `--version=0` can be used to delete
+#:    parsed from the URL or tag. Note that `--version=0` can be used to delete
 #:    an existing `version` override from a formula if it has become redundant.
 #:
 #:    If `--message=`<message> is passed, append <message> to the default PR
 #:    message.
 #:
 #:    Note that this command cannot be used to transition a formula from a
-#:    url-and-sha256 style specification into a tag-and-revision style
+#:    URL-and-sha256 style specification into a tag-and-revision style
 #:    specification, nor vice versa. It must use whichever style specification
 #:    the preexisting formula already uses.
 
@@ -78,8 +77,44 @@ module Homebrew
     end
   end
 
+  def fetch_pull_requests(formula)
+    GitHub.issues_for_formula(formula.name, tap: formula.tap).select do |pr|
+      pr["html_url"].include?("/pull/") &&
+        /(^|\s)#{Regexp.quote(formula.name)}(:|\s|$)/i =~ pr["title"]
+    end
+  rescue GitHub::RateLimitExceededError => e
+    opoo e.message
+    []
+  end
+
+  def check_for_duplicate_pull_requests(formula)
+    pull_requests = fetch_pull_requests(formula)
+    return unless pull_requests && !pull_requests.empty?
+    duplicates_message = <<-EOS.undent
+      These open pull requests may be duplicates:
+      #{pull_requests.map { |pr| "#{pr["title"]} #{pr["html_url"]}" }.join("\n")}
+    EOS
+    error_message = "Duplicate PRs should not be opened. Use --force to override this error."
+    if ARGV.force? && !ARGV.flag?("--quiet")
+      opoo duplicates_message
+    elsif !ARGV.force? && ARGV.flag?("--quiet")
+      odie error_message
+    elsif !ARGV.force?
+      odie <<-EOS.undent
+        #{duplicates_message.chomp}
+        #{error_message}
+      EOS
+    end
+  end
+
   def bump_formula_pr
     formula = ARGV.formulae.first
+
+    if formula
+      check_for_duplicate_pull_requests(formula)
+      checked_for_duplicates = true
+    end
+
     new_url = ARGV.value("url")
     if new_url && !formula
       is_devel = ARGV.include?("--devel")
@@ -100,6 +135,8 @@ module Homebrew
       end
     end
     odie "No formula found!" unless formula
+
+    check_for_duplicate_pull_requests(formula) unless checked_for_duplicates
 
     requested_spec, formula_spec = if ARGV.include?("--devel")
       devel_message = " (devel)"

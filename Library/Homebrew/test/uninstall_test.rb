@@ -3,6 +3,8 @@ require "cmd/uninstall"
 
 class UninstallTests < Homebrew::TestCase
   def setup
+    super
+
     @dependency = formula("dependency") { url "f-1" }
     @dependent = formula("dependent") do
       url "f-1"
@@ -28,10 +30,7 @@ class UninstallTests < Homebrew::TestCase
 
   def teardown
     Homebrew.failed = false
-    [@dependency, @dependent].each do |f|
-      f.installed_kegs.each(&:remove_opt_record)
-      f.rack.rmtree
-    end
+    super
   end
 
   def handle_unsatisfied_dependents
@@ -59,14 +58,5 @@ class UninstallTests < Homebrew::TestCase
       assert_empty handle_unsatisfied_dependents
       refute_predicate Homebrew, :failed?
     end
-  ensure
-    ARGV.delete("--ignore-dependencies")
-  end
-end
-
-class IntegrationCommandTestUninstall < IntegrationCommandTestCase
-  def test_uninstall
-    cmd("install", testball)
-    assert_match "Uninstalling testball", cmd("uninstall", "--force", testball)
   end
 end

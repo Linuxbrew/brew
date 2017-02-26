@@ -6,11 +6,8 @@ require "dev-cmd/audit"
 
 class FormulaTextTests < Homebrew::TestCase
   def setup
+    super
     @dir = mktmpdir
-  end
-
-  def teardown
-    FileUtils.rm_rf @dir
   end
 
   def formula_text(name, body = nil, options = {})
@@ -58,11 +55,8 @@ end
 
 class FormulaAuditorTests < Homebrew::TestCase
   def setup
+    super
     @dir = mktmpdir
-  end
-
-  def teardown
-    FileUtils.rm_rf @dir
   end
 
   def formula_auditor(name, text, options = {})
@@ -249,7 +243,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = shutup do
       formula_auditor "foo", <<-EOS.undent
         class Foo < GithubGistFormula
@@ -266,7 +260,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < ScriptFileFormula
         url "http://example.com/foo-1.0.tgz"
@@ -281,7 +275,7 @@ class FormulaAuditorTests < Homebrew::TestCase
     needs_compat
     require "compat/formula_specialties"
 
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < AmazonWebServicesFormula
         url "http://example.com/foo-1.0.tgz"
@@ -367,13 +361,10 @@ class FormulaAuditorTests < Homebrew::TestCase
       end
     EOS
 
-    original_value = ENV["HOMEBREW_NO_GITHUB_API"]
     ENV["HOMEBREW_NO_GITHUB_API"] = "1"
 
     fa.audit_github_repository
     assert_equal [], fa.problems
-  ensure
-    ENV["HOMEBREW_NO_GITHUB_API"] = original_value
   end
 
   def test_audit_caveats
@@ -428,9 +419,8 @@ class FormulaAuditorTests < Homebrew::TestCase
     EOS
 
     fa.audit_homepage
-    assert_equal ["The homepage should start with http or https " \
-      "(URL is #{fa.formula.homepage}).", "The homepage #{fa.formula.homepage} is not reachable " \
-      "(HTTP status code 000)"], fa.problems
+    assert_equal ["The homepage should start with http or https (URL is #{fa.formula.homepage})."],
+      fa.problems
 
     formula_homepages = {
       "bar" => "http://www.freedesktop.org/wiki/bar",
@@ -440,6 +430,10 @@ class FormulaAuditorTests < Homebrew::TestCase
       "corge" => "http://savannah.nongnu.org/corge",
       "grault" => "http://grault.github.io/",
       "garply" => "http://www.gnome.org/garply",
+      "sf1" => "http://foo.sourceforge.net/",
+      "sf2" => "http://foo.sourceforge.net",
+      "sf3" => "http://foo.sf.net/",
+      "sf4" => "http://foo.sourceforge.io/",
       "waldo" => "http://www.gnu.org/waldo",
     }
 
@@ -464,9 +458,45 @@ class FormulaAuditorTests < Homebrew::TestCase
         end
       elsif homepage =~ %r{https:\/\/code\.google\.com}
         assert_match "#{homepage} should end with a slash", fa.problems.first
+      elsif homepage =~ /foo\.(sf|sourceforge)\.net/
+        assert_match "#{homepage} should be `https://foo.sourceforge.io/`", fa.problems.first
       else
         assert_match "Please use https:// for #{homepage}", fa.problems.first
       end
     end
+  end
+
+  def test_audit_xcodebuild_suggests_symroot
+    fa = formula_auditor "foo", <<-EOS.undent
+      class Foo < Formula
+        url "http://example.com/foo-1.0.tgz"
+        homepage "http://example.com"
+
+        def install
+          xcodebuild "-project", "meow.xcodeproject"
+        end
+      end
+    EOS
+
+    fa.audit_text
+
+    assert_match 'xcodebuild should be passed an explicit "SYMROOT"', fa.problems.first
+  end
+
+  def test_audit_bare_xcodebuild_suggests_symroot_also
+    fa = formula_auditor "foo", <<-EOS.undent
+      class Foo < Formula
+        url "http://example.com/foo-1.0.tgz"
+        homepage "http://example.com"
+
+        def install
+          xcodebuild
+        end
+      end
+    EOS
+
+    fa.audit_text
+
+    assert_match 'xcodebuild should be passed an explicit "SYMROOT"', fa.problems.first
   end
 end

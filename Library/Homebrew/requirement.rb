@@ -15,6 +15,7 @@ class Requirement
     @default_formula = self.class.default_formula
     @cask ||= self.class.cask
     @download ||= self.class.download
+    @formula = nil
     tags.each do |tag|
       next unless tag.is_a? Hash
       @cask ||= tag[:cask]
@@ -56,7 +57,14 @@ class Requirement
   def satisfied?
     result = self.class.satisfy.yielder { |p| instance_eval(&p) }
     @satisfied_result = result
-    result ? true : false
+    return false unless result
+
+    if parent = satisfied_result_parent
+      parent.to_s =~ %r{(#{Regexp.escape(HOMEBREW_CELLAR)}|#{Regexp.escape(HOMEBREW_PREFIX)}/opt)/([\w+-.@]+)}
+      @formula = $2
+    end
+
+    true
   end
 
   # Overriding #fatal? is deprecated.
@@ -67,6 +75,11 @@ class Requirement
 
   def default_formula?
     self.class.default_formula || false
+  end
+
+  def satisfied_result_parent
+    return unless @satisfied_result.is_a?(Pathname)
+    @satisfied_result.resolved_path.parent
   end
 
   # Overriding #modify_build_environment is deprecated.
@@ -81,11 +94,8 @@ class Requirement
     #   satisfy { which("executable") }
     # work, even under superenv where "executable" wouldn't normally be on the
     # PATH.
-    # This is undocumented magic and it should be removed, but we need to add
-    # a way to declare path-based requirements that work with superenv first.
-    return unless @satisfied_result.is_a?(Pathname)
-    parent = @satisfied_result.parent
-
+    parent = satisfied_result_parent
+    return unless parent
     return if ENV["PATH"].split(File::PATH_SEPARATOR).include?(parent.to_s)
     ENV.append_path("PATH", parent)
   end
@@ -111,13 +121,15 @@ class Requirement
     "#<#{self.class.name}: #{name.inspect} #{tags.inspect}>"
   end
 
+  def formula
+    @formula || self.class.default_formula
+  end
+
   def to_dependency
-    f = self.class.default_formula
-    raise "No default formula defined for #{inspect}" if f.nil?
-    if f =~ HOMEBREW_TAP_FORMULA_REGEX
-      TapDependency.new(f, tags, method(:modify_build_environment), name)
-    else
-      Dependency.new(f, tags, method(:modify_build_environment), name)
+    if formula =~ HOMEBREW_TAP_FORMULA_REGEX
+      TapDependency.new(formula, tags, method(:modify_build_environment), name)
+    elsif formula
+      Dependency.new(formula, tags, method(:modify_build_environment), name)
     end
   end
 

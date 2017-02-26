@@ -174,6 +174,12 @@ class Keg
   attr_reader :path, :name, :linked_keg_record, :opt_record
   protected :path
 
+  extend Forwardable
+
+  def_delegators :path,
+    :to_s, :hash, :abv, :disk_usage, :file_count, :directory?, :exist?, :/,
+    :join, :rename, :find
+
   def initialize(path)
     path = path.resolved_path if path.to_s.start_with?("#{HOMEBREW_PREFIX}/opt/")
     raise "#{path} is not a valid keg" unless path.parent.parent.realpath == HOMEBREW_CELLAR.realpath
@@ -182,21 +188,14 @@ class Keg
     @name = path.parent.basename.to_s
     @linked_keg_record = HOMEBREW_LINKED_KEGS/name
     @opt_record = HOMEBREW_PREFIX/"opt/#{name}"
-  end
-
-  def to_s
-    path.to_s
+    @require_relocation = false
   end
 
   def rack
     path.parent
   end
 
-  if Pathname.method_defined?(:to_path)
-    alias to_path to_s
-  else
-    alias to_str to_s
-  end
+  alias to_path to_s
 
   def inspect
     "#<#{self.class.name}:#{path}>"
@@ -206,30 +205,6 @@ class Keg
     instance_of?(other.class) && path == other.path
   end
   alias eql? ==
-
-  def hash
-    path.hash
-  end
-
-  def abv
-    path.abv
-  end
-
-  def disk_usage
-    path.disk_usage
-  end
-
-  def file_count
-    path.file_count
-  end
-
-  def directory?
-    path.directory?
-  end
-
-  def exist?
-    path.exist?
-  end
 
   def empty_installation?
     Pathname.glob("#{path}/**/*") do |file|
@@ -243,16 +218,8 @@ class Keg
     true
   end
 
-  def /(other)
-    path / other
-  end
-
-  def join(*args)
-    path.join(*args)
-  end
-
-  def rename(*args)
-    path.rename(*args)
+  def require_relocation?
+    @require_relocation
   end
 
   def linked?
@@ -272,6 +239,10 @@ class Keg
 
   def remove_opt_record
     opt_record.unlink
+    aliases.each do |a|
+      next if !opt_record.symlink? && !opt_record.exist?
+      (opt_record.parent/a).delete
+    end
     opt_record.parent.rmdir_if_possible
   end
 
@@ -400,10 +371,6 @@ class Keg
     end
   end
 
-  def find(*args, &block)
-    path.find(*args, &block)
-  end
-
   def oldname_opt_record
     @oldname_opt_record ||= if (opt_dir = HOMEBREW_PREFIX/"opt").directory?
       opt_dir.subdirs.detect do |dir|
@@ -498,9 +465,20 @@ class Keg
     @oldname_opt_record = nil
   end
 
+  def aliases
+    Formula[rack.basename.to_s].aliases
+  rescue FormulaUnavailableError
+    []
+  end
+
   def optlink(mode = OpenStruct.new)
     opt_record.delete if opt_record.symlink? || opt_record.exist?
     make_relative_symlink(opt_record, path, mode)
+    aliases.each do |a|
+      alias_opt_record = opt_record.parent/a
+      alias_opt_record.delete if alias_opt_record.symlink? || alias_opt_record.exist?
+      make_relative_symlink(alias_opt_record, path, mode)
+    end
 
     return unless oldname_opt_record
     oldname_opt_record.delete

@@ -382,6 +382,11 @@ class Formula
     PkgVersion.new(version, revision)
   end
 
+  # If this is a `@`-versioned formula.
+  def versioned_formula?
+    name.include?("@")
+  end
+
   # A named Resource for the currently active {SoftwareSpec}.
   # Additional downloads can be defined as {#resource}s.
   # {Resource#stage} will create a temporary directory and yield to a block.
@@ -1021,7 +1026,9 @@ class Formula
     @prefix_returns_versioned_prefix = false
   end
 
-  # Tell the user about any caveats regarding this package.
+  # Tell the user about any Homebrew-specific caveats or locations regarding
+  # this package. These should not contain setup instructions that would apply
+  # to installation through a different package manager on a different OS.
   # @return [String]
   # <pre>def caveats
   #   <<-EOS.undent
@@ -1519,10 +1526,15 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    recursive_dependencies do |_dependent, dependency|
+    runtime_dependencies = recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
       Dependency.prune if !dependency.required? && build.without?(dependency)
     end
+    runtime_requirement_deps = recursive_requirements do |_, requirement|
+      Requirement.prune if requirement.build?
+      Requirement.prune if !requirement.required? && build.without?(requirement)
+    end.map(&:to_dependency).compact
+    runtime_dependencies + runtime_requirement_deps
   end
 
   # Returns a list of formulae depended on by this formula that aren't
@@ -1619,6 +1631,8 @@ class Formula
         "built_as_bottle" => tab.built_as_bottle,
         "poured_from_bottle" => tab.poured_from_bottle,
         "runtime_dependencies" => tab.runtime_dependencies,
+        "installed_as_dependency" => tab.installed_as_dependency,
+        "installed_on_request" => tab.installed_on_request,
       }
     end
 
@@ -1831,7 +1845,16 @@ class Formula
       eligible_kegs = if head? && (head_prefix = latest_head_prefix)
         installed_kegs - [Keg.new(head_prefix)]
       else
-        installed_kegs.select { |k| pkg_version > k.version }
+        installed_kegs.select do |keg|
+          tab = Tab.for_keg(keg)
+          if version_scheme > tab.version_scheme
+            true
+          elsif version_scheme == tab.version_scheme
+            pkg_version > keg.version
+          else
+            false
+          end
+        end
       end
 
       unless eligible_kegs.empty?
@@ -2012,7 +2035,7 @@ class Formula
     # @!attribute [w] url
     # The URL used to download the source for the {#stable} version of the formula.
     # We prefer `https` for security and proxy reasons.
-    # Optionally specify the download strategy with `:using => ...`
+    # If not inferrable, specify the download strategy with `:using => ...`
     #     `:git`, `:hg`, `:svn`, `:bzr`, `:cvs`,
     #     `:curl` (normal file download. Will also extract.)
     #     `:nounzip` (without extracting)
@@ -2020,7 +2043,10 @@ class Formula
     #     `S3DownloadStrategy` (download from S3 using signed request)
     #
     # <pre>url "https://packed.sources.and.we.prefer.https.example.com/archive-1.2.3.tar.bz2"</pre>
-    # <pre>url "https://some.dont.provide.archives.example.com", :using => :git, :tag => "1.2.3", :revision => "db8e4de5b2d6653f66aea53094624468caad15d2"</pre>
+    # <pre>url "https://some.dont.provide.archives.example.com",
+    #     :using => :git,
+    #     :tag => "1.2.3",
+    #     :revision => "db8e4de5b2d6653f66aea53094624468caad15d2"</pre>
     def url(val, specs = {})
       stable.url(val, specs)
     end

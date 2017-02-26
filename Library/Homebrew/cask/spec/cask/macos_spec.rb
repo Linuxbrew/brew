@@ -1,67 +1,67 @@
 describe MacOS do
   it "says '/' is undeletable" do
     expect(MacOS).to be_undeletable(
-      "/"
+      "/",
     )
     expect(MacOS).to be_undeletable(
-      "/."
+      "/.",
     )
     expect(MacOS).to be_undeletable(
-      "/usr/local/Library/Taps/../../../.."
+      "/usr/local/Library/Taps/../../../..",
     )
   end
 
   it "says '/Applications' is undeletable" do
     expect(MacOS).to be_undeletable(
-      "/Applications"
+      "/Applications",
     )
     expect(MacOS).to be_undeletable(
-      "/Applications/"
+      "/Applications/",
     )
     expect(MacOS).to be_undeletable(
-      "/Applications/."
+      "/Applications/.",
     )
     expect(MacOS).to be_undeletable(
-      "/Applications/Mail.app/.."
+      "/Applications/Mail.app/..",
     )
   end
 
   it "says the home directory is undeletable" do
     expect(MacOS).to be_undeletable(
-      Dir.home
+      Dir.home,
     )
     expect(MacOS).to be_undeletable(
-      "#{Dir.home}/"
+      "#{Dir.home}/",
     )
     expect(MacOS).to be_undeletable(
-      "#{Dir.home}/Documents/.."
+      "#{Dir.home}/Documents/..",
     )
   end
 
   it "says the user library directory is undeletable" do
     expect(MacOS).to be_undeletable(
-      "#{Dir.home}/Library"
+      "#{Dir.home}/Library",
     )
     expect(MacOS).to be_undeletable(
-      "#{Dir.home}/Library/"
+      "#{Dir.home}/Library/",
     )
     expect(MacOS).to be_undeletable(
-      "#{Dir.home}/Library/."
+      "#{Dir.home}/Library/.",
     )
     expect(MacOS).to be_undeletable(
-      "#{Dir.home}/Library/Preferences/.."
+      "#{Dir.home}/Library/Preferences/..",
     )
   end
 
   it "says '/Applications/.app' is deletable" do
     expect(MacOS).not_to be_undeletable(
-      "/Applications/.app"
+      "/Applications/.app",
     )
   end
 
   it "says '/Applications/SnakeOil Professional.app' is deletable" do
     expect(MacOS).not_to be_undeletable(
-      "/Applications/SnakeOil Professional.app"
+      "/Applications/SnakeOil Professional.app",
     )
   end
 end

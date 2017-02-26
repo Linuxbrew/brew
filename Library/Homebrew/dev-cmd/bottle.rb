@@ -1,6 +1,5 @@
-#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`] [`--force-core-tap`]:
+#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=`<URL>] [`--force-core-tap`]:
 #:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
-#:
 #:    Generate a bottle (binary package) from a formula installed with
 #:    `--build-bottle`.
 
@@ -435,6 +434,7 @@ module Homebrew
             else
               string = s.sub!(
                 /(
+                  (\ {2}\#[^\n]*\n)*                                             # comments
                   \ {2}(                                                         # two spaces at the beginning
                     (url|head)\ ['"][\S\ ]+['"]                                  # url or head with a string
                     (
@@ -442,7 +442,7 @@ module Homebrew
                       (\n^\ {3}[\S\ ]+$)*                                        # options can be in multiple lines
                     )?|
                     (homepage|desc|sha1|sha256|version|mirror)\ ['"][\S\ ]+['"]| # specs with a string
-                    rebuild\ \d+                                                 # rebuild with a number
+                    revision\ \d+                                                # revision with a number
                   )\n+                                                           # multiple empty lines
                  )+
                /mx, '\0' + output + "\n"

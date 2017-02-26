@@ -17,7 +17,7 @@ module SharedEnvExtension
   FC_FLAG_VARS = %w[FCFLAGS FFLAGS].freeze
   # @private
   SANITIZED_VARS = %w[
-    CDPATH GREP_OPTIONS CLICOLOR_FORCE
+    CDPATH CLICOLOR_FORCE
     CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH
     CC CXX OBJC OBJCXX CPP MAKE LD LDSHARED
     CFLAGS CXXFLAGS OBJCFLAGS OBJCXXFLAGS LDFLAGS CPPFLAGS
@@ -269,7 +269,7 @@ module SharedEnvExtension
   # @private
   def gcc_version_formula(name)
     version = name[GNU_GCC_REGEXP, 1]
-    gcc_version_name = "gcc#{version.delete(".")}"
+    gcc_version_name = "gcc@#{version}"
 
     gcc = Formulary.factory("gcc")
     if gcc.version_suffix == version
@@ -286,7 +286,6 @@ module SharedEnvExtension
     rescue FormulaUnavailableError => e
       raise <<-EOS.undent
       Homebrew GCC requested, but formula #{e.name} not found!
-      You may need to: brew tap homebrew/versions
       EOS
     end
 

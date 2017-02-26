@@ -10,6 +10,7 @@ require "utils/github"
 require "utils/hash"
 require "utils/inreplace"
 require "utils/popen"
+require "utils/svn"
 require "utils/tty"
 require "time"
 
@@ -106,7 +107,7 @@ def pretty_installed(f)
   if !$stdout.tty?
     f.to_s
   elsif Emoji.enabled?
-    "#{Tty.bold}#{f} #{Formatter.success(Emoji.tick)}#{Tty.reset}"
+    "#{Tty.bold}#{f} #{Formatter.success("✔")}#{Tty.reset}"
   else
     Formatter.success("#{Tty.bold}#{f} (installed)#{Tty.reset}")
   end
@@ -116,7 +117,7 @@ def pretty_uninstalled(f)
   if !$stdout.tty?
     f.to_s
   elsif Emoji.enabled?
-    "#{Tty.bold}#{f} #{Formatter.error(Emoji.cross)}#{Tty.reset}"
+    "#{Tty.bold}#{f} #{Formatter.error("✘")}#{Tty.reset}"
   else
     Formatter.error("#{Tty.bold}#{f} (uninstalled)#{Tty.reset}")
   end
@@ -421,13 +422,13 @@ end
 def disk_usage_readable(size_in_bytes)
   if size_in_bytes >= 1_073_741_824
     size = size_in_bytes.to_f / 1_073_741_824
-    unit = "G"
+    unit = "GB"
   elsif size_in_bytes >= 1_048_576
     size = size_in_bytes.to_f / 1_048_576
-    unit = "M"
+    unit = "MB"
   elsif size_in_bytes >= 1_024
     size = size_in_bytes.to_f / 1_024
-    unit = "K"
+    unit = "KB"
   else
     size = size_in_bytes
     unit = "B"

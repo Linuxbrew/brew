@@ -133,22 +133,23 @@ module Hbc
 
     def install_artifacts
       already_installed_artifacts = []
-      options = { command: @command, force: force }
 
       odebug "Installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = Artifact.for_cask(@cask, command: @command, force: force)
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
-        odebug "Installing artifact of class #{artifact}"
+        next unless artifact.respond_to?(:install_phase)
+        odebug "Installing artifact of class #{artifact.class}"
+        artifact.install_phase
         already_installed_artifacts.unshift(artifact)
-        artifact.new(@cask, options).install_phase
       end
     rescue StandardError => e
       begin
         already_installed_artifacts.each do |artifact|
-          odebug "Reverting installation of artifact of class #{artifact}"
-          artifact.new(@cask, options).uninstall_phase
+          next unless artifact.respond_to?(:uninstall_phase)
+          odebug "Reverting installation of artifact of class #{artifact.class}"
+          artifact.uninstall_phase
         end
       ensure
         purge_versioned_files
@@ -316,12 +317,18 @@ module Hbc
 
     def uninstall_artifacts
       odebug "Un-installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = Artifact.for_cask(@cask, command: @command, force: force)
+
+      # Make sure the `uninstall` stanza is run first, as it
+      # may depend on other artifacts still being installed.
+      artifacts = artifacts.sort_by { |a| a.is_a?(Artifact::Uninstall) ? -1 : 1 }
+
       odebug "#{artifacts.length} artifact/s defined", artifacts
+
       artifacts.each do |artifact|
-        odebug "Un-installing artifact of class #{artifact}"
-        options = { command: @command, force: force }
-        artifact.new(@cask, options).uninstall_phase
+        next unless artifact.respond_to?(:uninstall_phase)
+        odebug "Un-installing artifact of class #{artifact.class}"
+        artifact.uninstall_phase
       end
     end
 

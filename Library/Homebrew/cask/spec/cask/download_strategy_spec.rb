@@ -176,7 +176,7 @@ describe "download strategies" do
 
       expect(downloader).to have_received(:fetch_repo).with(
         downloader.cached_location,
-        cask.url.to_s
+        cask.url.to_s,
       )
     end
 
@@ -196,7 +196,7 @@ describe "download strategies" do
                          "config:miscellany:use-commit-times=yes",
                          cask.url.to_s,
                          downloader.cached_location,
-                       ])
+                       ]),
       )
     end
 
@@ -226,7 +226,7 @@ describe "download strategies" do
                            "--non-interactive",
                            cask.url.to_s,
                            downloader.cached_location,
-                         ])
+                         ]),
         )
       end
     end
@@ -257,7 +257,7 @@ describe "download strategies" do
                            downloader.cached_location,
                            "-r",
                            "10",
-                         ])
+                         ]),
         )
       end
     end
@@ -283,7 +283,7 @@ describe "download strategies" do
                          downloader.tarball_path,
                          "--",
                          ".",
-                       ])
+                       ]),
       )
     end
   end

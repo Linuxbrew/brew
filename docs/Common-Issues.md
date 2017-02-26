@@ -7,8 +7,7 @@ You need to have the Xcode Command Line Utilities installed (and updated): run `
 (In OS X prior to 10.9, the "Command Line Tools" package can alternatively be installed from within Xcode. `⌘,` will get you to preferences. Visit the "Downloads" tab and hit the install button next to "Command Line Tools".)
 
 ### Ruby `bad interpreter: /usr/bin/ruby^M: no such file or directory`
-You cloned with git, and your git configuration is set to use Windows line endings. See this page: https://help.github.com/articles/dealing-with-line-endings
-
+You cloned with git, and your git configuration is set to use Windows line endings. See this page: <https://help.github.com/articles/dealing-with-line-endings>
 
 ### Ruby `bad interpreter: /usr/bin/ruby`
 You don't have a `/usr/bin/ruby` or it is not executable. It's not recommended to let this persist, you'd be surprised how many .apps, tools and scripts expect your macOS provided files and directories to be *unmodified* since macOS was installed.

@@ -5,6 +5,7 @@ require "requirements"
 
 class DependenciesTests < Homebrew::TestCase
   def setup
+    super
     @deps = Dependencies.new
   end
 
@@ -89,6 +90,7 @@ end
 
 class RequirementsTests < Homebrew::TestCase
   def setup
+    super
     @reqs = Requirements.new
   end
 

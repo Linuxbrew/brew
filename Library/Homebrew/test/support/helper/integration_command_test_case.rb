@@ -3,41 +3,14 @@ require "fileutils"
 require "pathname"
 require "formula"
 require "test/support/helper/test_case"
+require "open3"
 
 class IntegrationCommandTestCase < Homebrew::TestCase
   def setup
+    super
     @cmd_id_index = 0 # Assign unique IDs to invocations of `cmd_output`.
     (HOMEBREW_PREFIX/"bin").mkpath
     FileUtils.touch HOMEBREW_PREFIX/"bin/brew"
-  end
-
-  def teardown
-    coretap = CoreTap.new
-    paths_to_delete = [
-      HOMEBREW_LINKED_KEGS,
-      HOMEBREW_PINNED_KEGS,
-      HOMEBREW_CELLAR.children,
-      HOMEBREW_CACHE.children,
-      HOMEBREW_LOCK_DIR.children,
-      HOMEBREW_LOGS.children,
-      HOMEBREW_TEMP.children,
-      HOMEBREW_PREFIX/".git",
-      HOMEBREW_PREFIX/"bin",
-      HOMEBREW_PREFIX/"share",
-      HOMEBREW_PREFIX/"opt",
-      HOMEBREW_PREFIX/"Caskroom",
-      HOMEBREW_LIBRARY/"Taps/caskroom",
-      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle",
-      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo",
-      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services",
-      HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-shallow",
-      HOMEBREW_REPOSITORY/".git",
-      coretap.path/".git",
-      coretap.alias_dir,
-      coretap.formula_dir.children,
-      coretap.path/"formula_renames.json",
-    ].flatten
-    FileUtils.rm_rf paths_to_delete
   end
 
   def needs_test_cmd_taps
@@ -56,66 +29,46 @@ class IntegrationCommandTestCase < Homebrew::TestCase
   end
 
   def cmd_output(*args)
-    # 1.8-compatible way of writing def cmd_output(*args, **env)
     env = args.last.is_a?(Hash) ? args.pop : {}
-    cmd_args = %W[
-      -W0
-      -I#{HOMEBREW_LIBRARY_PATH}/test/support/lib
-      -I#{HOMEBREW_LIBRARY_PATH}
-      -rconfig
-    ]
-    if ENV["HOMEBREW_TESTS_COVERAGE"]
-      # This is needed only because we currently use a patched version of
-      # simplecov, and gems installed through git are not available without
-      # requiring bundler/setup first. See also the comment in test/Gemfile.
-      # Remove this line when we'll switch back to a stable simplecov release.
-      cmd_args << "-rbundler/setup"
-      cmd_args << "-rsimplecov"
-    end
-    cmd_args << "-rtest/support/helper/integration_mocks"
-    cmd_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
-    cmd_args += args
-    developer = ENV["HOMEBREW_DEVELOPER"]
-    Bundler.with_original_env do
-      ENV["HOMEBREW_BREW_FILE"] = HOMEBREW_PREFIX/"bin/brew"
-      ENV["HOMEBREW_INTEGRATION_TEST"] = cmd_id_from_args(args)
-      ENV["HOMEBREW_TEST_TMPDIR"] = TEST_TMPDIR
-      ENV["HOMEBREW_DEVELOPER"] = developer
-      env.each_pair do |k, v|
-        ENV[k] = v
-      end
 
-      read, write = IO.pipe
-      begin
-        pid = fork do
-          read.close
-          $stdout.reopen(write)
-          $stderr.reopen(write)
-          write.close
-          exec RUBY_PATH, *cmd_args
-        end
-        write.close
-        read.read.chomp
-      ensure
-        Process.wait(pid)
-        read.close
-      end
+    env.merge!(
+      "HOMEBREW_BREW_FILE" => HOMEBREW_PREFIX/"bin/brew",
+      "HOMEBREW_INTEGRATION_TEST" => cmd_id_from_args(args),
+      "HOMEBREW_TEST_TMPDIR" => TEST_TMPDIR,
+      "HOMEBREW_DEVELOPER" => ENV["HOMEBREW_DEVELOPER"],
+    )
+
+    ruby_args = [
+      "-W0",
+      "-I", "#{HOMEBREW_LIBRARY_PATH}/test/support/lib",
+      "-I", HOMEBREW_LIBRARY_PATH.to_s,
+      "-rconfig"
+    ]
+    ruby_args << "-rsimplecov" if ENV["HOMEBREW_TESTS_COVERAGE"]
+    ruby_args << "-rtest/support/helper/integration_mocks"
+    ruby_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
+
+    Bundler.with_original_env do
+      output, status = Open3.capture2e(env, RUBY_PATH, *ruby_args, *args)
+      [output.chomp, status]
     end
   end
 
   def cmd(*args)
-    output = cmd_output(*args)
-    status = $?.exitstatus
-    puts "\n'brew #{args.join " "}' output: #{output}" if status.nonzero?
-    assert_equal 0, status
+    output, status = cmd_output(*args)
+    assert status.success?, <<-EOS.undent
+      `brew #{args.join " "}` exited with non-zero status!
+      #{output}
+    EOS
     output
   end
 
   def cmd_fail(*args)
-    output = cmd_output(*args)
-    status = $?.exitstatus
-    $stderr.puts "\n'brew #{args.join " "}'" if status.zero?
-    refute_equal 0, status
+    output, status = cmd_output(*args)
+    refute status.success?, <<-EOS.undent
+      `brew #{args.join " "}` exited with zero status!
+      #{output}
+    EOS
     output
   end
 
