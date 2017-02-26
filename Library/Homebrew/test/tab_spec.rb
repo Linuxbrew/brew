@@ -1,7 +1,7 @@
 require "tab"
 require "formula"
 
-RSpec::Matchers.alias_matcher :have_option_with, :be_with
+RSpec::Matchers.alias_matcher :be_built_with, :be_with
 
 describe Tab do
   matcher :be_poured_from_bottle do
@@ -80,10 +80,10 @@ describe Tab do
   end
 
   specify "#with?" do
-    expect(subject).to have_option_with("foo")
-    expect(subject).to have_option_with("qux")
-    expect(subject).not_to have_option_with("bar")
-    expect(subject).not_to have_option_with("baz")
+    expect(subject).to be_built_with("foo")
+    expect(subject).to be_built_with("qux")
+    expect(subject).not_to be_built_with("bar")
+    expect(subject).not_to be_built_with("baz")
   end
 
   specify "#universal?" do
