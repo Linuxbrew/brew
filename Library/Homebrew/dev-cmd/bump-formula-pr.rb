@@ -1,8 +1,7 @@
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] [`--message=`<message>] `--url=`<url> `--sha256=`<sha-256> <formula>:
-#:  * `bump-formula-pr` [`--devel`] [`--dry-run`] [`--audit`|`--strict`] [`--message=`<message>] `--tag=`<tag> `--revision=`<revision> <formula>:
-#:    Creates a pull request to update the formula with a new url or a new tag.
+#:  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--audit`|`--strict`] [`--mirror=`<URL>] [`--version=`<version>] [`--message=`<message>] (`--url=`<URL> `--sha256=`<sha-256>|`--tag=`<tag> `--revision=`<revision>) <formula>:
+#:    Creates a pull request to update the formula with a new URL or a new tag.
 #:
-#:    If a <url> is specified, the <sha-256> checksum of the new download must
+#:    If a <URL> is specified, the <sha-256> checksum of the new download must
 #:    also be specified. A best effort to determine the <sha-256> and <formula>
 #:    name will be made if either or both values are not supplied by the user.
 #:
@@ -21,17 +20,17 @@
 #:
 #:    If `--strict` is passed, run `brew audit --strict` before opening the PR.
 #:
-#:    If `--mirror=`<url> is passed, use the value as a mirror url.
+#:    If `--mirror=`<URL> is passed, use the value as a mirror URL.
 #:
 #:    If `--version=`<version> is passed, use the value to override the value
-#:    parsed from the url or tag. Note that `--version=0` can be used to delete
+#:    parsed from the URL or tag. Note that `--version=0` can be used to delete
 #:    an existing `version` override from a formula if it has become redundant.
 #:
 #:    If `--message=`<message> is passed, append <message> to the default PR
 #:    message.
 #:
 #:    Note that this command cannot be used to transition a formula from a
-#:    url-and-sha256 style specification into a tag-and-revision style
+#:    URL-and-sha256 style specification into a tag-and-revision style
 #:    specification, nor vice versa. It must use whichever style specification
 #:    the preexisting formula already uses.
 

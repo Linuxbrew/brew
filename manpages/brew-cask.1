@@ -34,68 +34,84 @@ The tokens returned by \fBsearch\fR are suitable as arguments for most other com
 .
 .SH "COMMANDS"
 .
-.IP "\(bu" 4
-\fBaudit\fR [ \fItoken\fR \.\.\. ]: Check the given Casks for installability\. If no tokens are given on the command line, all Casks are audited\.
+.TP
+\fBaudit\fR [ \fItoken\fR \.\.\. ]
+Check the given Casks for installability\. If no tokens are given on the command line, all Casks are audited\.
 .
-.IP "\(bu" 4
-\fBcat\fR \fItoken\fR [ \fItoken\fR \.\.\. ]: Dump the given Cask definition file to the standard output\.
+.TP
+\fBcat\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+Dump the given Cask definition file to the standard output\.
 .
-.IP "\(bu" 4
-\fBcleanup\fR [\-\-outdated]: Clean up cached downloads and tracker symlinks\. With \fB\-\-outdated\fR, only clean up cached downloads older than 10 days old\.
+.TP
+\fBcleanup\fR [\-\-outdated]
+Clean up cached downloads and tracker symlinks\. With \fB\-\-outdated\fR, only clean up cached downloads older than 10 days old\.
 .
-.IP "\(bu" 4
-\fBcreate\fR \fItoken\fR: Generate a Cask definition file for the Cask identified by \fItoken\fR and open a template for it in your favorite editor\.
+.TP
+\fBcreate\fR \fItoken\fR
+Generate a Cask definition file for the Cask identified by \fItoken\fR and open a template for it in your favorite editor\.
 .
-.IP "\(bu" 4
-\fBdoctor\fR or \fBdr\fR: Check for configuration issues\. Can be useful to upload as a gist for developers along with a bug report\.
+.TP
+\fBdoctor\fR or \fBdr\fR
+Check for configuration issues\. Can be useful to upload as a gist for developers along with a bug report\.
 .
-.IP "\(bu" 4
-\fBedit\fR \fItoken\fR: Open the given Cask definition file for editing\.
+.TP
+\fBedit\fR \fItoken\fR
+Open the given Cask definition file for editing\.
 .
-.IP "\(bu" 4
-\fBfetch\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]: Download remote application files for the given Cask to the local cache\. With \fB\-\-force\fR, force re\-download even if the files are already cached\.
+.TP
+\fBfetch\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]
+Download remote application files for the given Cask to the local cache\. With \fB\-\-force\fR, force re\-download even if the files are already cached\.
 .
-.IP "\(bu" 4
-\fBhome\fR or \fBhomepage\fR [ \fItoken\fR \.\.\. ]: Display the homepage associated with a given Cask in a browser\.
+.TP
+\fBhome\fR or \fBhomepage\fR [ \fItoken\fR \.\.\. ]
+Display the homepage associated with a given Cask in a browser\.
 .
 .IP
 With no arguments, display the project page \fIhttp://caskroom\.io\fR\.
 .
-.IP "\(bu" 4
-\fBinfo\fR or \fBabv\fR \fItoken\fR [ \fItoken\fR \.\.\. ]: Display information about the given Cask\.
+.TP
+\fBinfo\fR or \fBabv\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+Display information about the given Cask\.
 .
-.IP "\(bu" 4
-\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] \fItoken\fR [ \fItoken\fR \.\.\. ]: Install the given Cask\. With \fB\-\-force\fR, re\-install even if the Cask appears to be already present\. With \fB\-\-skip\-cask\-deps\fR, skip any Cask dependencies\. \fB\-\-require\-sha\fR will abort installation if the Cask does not have a checksum defined\.
+.TP
+\fBinstall\fR [\-\-force] [\-\-skip\-cask\-deps] [\-\-require\-sha] \fItoken\fR [ \fItoken\fR \.\.\. ]
+Install the given Cask\. With \fB\-\-force\fR, re\-install even if the Cask appears to be already present\. With \fB\-\-skip\-cask\-deps\fR, skip any Cask dependencies\. \fB\-\-require\-sha\fR will abort installation if the Cask does not have a checksum defined\.
 .
 .IP
 \fItoken\fR is usually the ID of a Cask as returned by \fBbrew cask search\fR, but see \fIOTHER WAYS TO SPECIFY A CASK\fR for variations\.
 .
-.IP "\(bu" 4
-\fBlist\fR or \fBls\fR [\-1] [\-\-versions] [ \fItoken\fR \.\.\. ]: Without any arguments, list all installed Casks\. With \fB\-1\fR, always format the output in a single column\. With \fB\-\-versions\fR, show all installed versions\.
+.TP
+\fBlist\fR or \fBls\fR [\-1] [\-\-versions] [ \fItoken\fR \.\.\. ]
+Without any arguments, list all installed Casks\. With \fB\-1\fR, always format the output in a single column\. With \fB\-\-versions\fR, show all installed versions\.
 .
 .IP
 If \fItoken\fR is given, summarize the staged files associated with the given Cask\.
 .
-.IP "\(bu" 4
-\fBreinstall\fR \fItoken\fR [ \fItoken\fR \.\.\.] Reinstall the given Cask\.
+.TP
+\fBreinstall\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+Reinstall the given Cask\.
 .
-.IP "\(bu" 4
-\fBsearch\fR or \fB\-S\fR [\fItext\fR | /\fIregexp\fR/]: Without argument, display all Casks available for install, otherwise perform a substring search of known Cask tokens for \fItext\fR or, if the text is delimited by slashes (/\fIregexp\fR/), it is interpreted as a Ruby regular expression\.
+.TP
+\fBsearch\fR or \fB\-S\fR [\fItext\fR | /\fIregexp\fR/]
+Without an argument, display all Casks available for install; otherwise perform a substring search of known Cask tokens for \fItext\fR or, if the text is delimited by slashes (/\fIregexp\fR/), it is interpreted as a Ruby regular expression\.
 .
-.IP "\(bu" 4
-\fBstyle\fR [\-\-fix] [ \fItoken\fR \.\.\. ]: Check the given Casks for correct style using RuboCop Cask \fIhttps://github\.com/caskroom/rubocop\-cask\fR\. If no tokens are given on the command line, all Casks are checked\. With \fB\-\-fix\fR, auto\-correct any style errors if possible\.
+.TP
+\fBstyle\fR [\-\-fix] [ \fItoken\fR \.\.\. ]
+Check the given Casks for correct style using RuboCop Cask \fIhttps://github\.com/caskroom/rubocop\-cask\fR\. If no tokens are given on the command line, all Casks are checked\. With \fB\-\-fix\fR, auto\-correct any style errors if possible\.
 .
-.IP "\(bu" 4
-\fBuninstall\fR or \fBrm\fR or \fBremove\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]: Uninstall the given Cask\. With \fB\-\-force\fR, uninstall even if the Cask does not appear to be present\.
+.TP
+\fBuninstall\fR or \fBrm\fR or \fBremove\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]
+Uninstall the given Cask\. With \fB\-\-force\fR, uninstall even if the Cask does not appear to be present\.
 .
-.IP "\(bu" 4
-\fBzap\fR \fItoken\fR [ \fItoken\fR \.\.\. ]: Unconditionally remove \fIall\fR files associated with the given Cask\.
+.TP
+\fBzap\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+Unconditionally remove \fIall\fR files associated with the given Cask\.
 .
 .IP
 Implicitly performs all actions associated with \fBuninstall\fR, even if the Cask does not appear to be currently installed\.
 .
 .IP
-Removes all staged versions of the Cask distribution found under \fB<Caskroom_path>/<token>\fR\.
+Removes all staged versions of the Cask distribution found under \fB<Caskroom_path>/\fR\fItoken\fR\.
 .
 .IP
 If the Cask definition contains a \fBzap\fR stanza, performs additional \fBzap\fR actions as defined there, such as removing local preference files\. \fBzap\fR actions are variable, depending on the level of detail defined by the Cask author\.
@@ -103,23 +119,21 @@ If the Cask definition contains a \fBzap\fR stanza, performs additional \fBzap\f
 .IP
 \fB\fBzap\fR may remove files which are shared between applications\.\fR
 .
-.IP "" 0
-.
 .SH "INTERNAL COMMANDS"
 .
 .TP
 \fB_appcast_checkpoint\fR [\-\-calculate] [ \fItoken\fR \.\.\. | \fIURL\fR \.\.\. ]
-Given a \fBtoken\fR, returns the current appcast checkpoint, or calculates the appcast checkpoint if the \fB\-\-calculate\fR flag is specified\.
+Given a \fItoken\fR, returns the current appcast checkpoint, or calculates the appcast checkpoint if the \fB\-\-calculate\fR flag is specified\.
 .
-.br
-Given a \fBURL\fR, calculates the appcast checkpoint for it\.
+.IP
+Given a \fIURL\fR, calculates the appcast checkpoint for it\.
 .
 .TP
-\fB_stanza\fR \fIstanza_name\fR [ \-\-table | \-\-yaml | \-\-inspect | \-\-quiet ] [ \fIcask_token\fR \.\.\. ]
-Given a \fBstanza_name\fR and a \fBcask_token\fR, returns the current stanza for a given Cask\. If no \fBcask_token\fR is given, then data for all Casks is returned\.
+\fB_stanza\fR \fIstanza_name\fR [ \-\-table | \-\-yaml | \-\-inspect | \-\-quiet ] [ \fItoken\fR \.\.\. ]
+Given a \fIstanza_name\fR and a \fItoken\fR, returns the current stanza for a given Cask\. If no \fItoken\fR is given, then data for all Casks is returned\.
 .
 .SH "OPTIONS"
-To make these options persistent, see the ENVIRONMENT section, below\.
+To make these options persistent, see the \fIENVIRONMENT\fR section, below\.
 .
 .P
 Some of these (such as \fB\-\-prefpanedir\fR) may be subject to removal in a future version\.
@@ -138,7 +152,7 @@ Abort Cask installation if the Cask does not have a checksum defined\.
 .
 .TP
 \fB\-\-caskroom=<path>\fR
-Location of the Caskroom, where all binaries are stored\. The default value is: \fB$(brew \-\-prefix)/Caskroom\fR\.
+Set location of the Caskroom, where all binaries are stored\. The default value is \fB$(brew \-\-prefix)/Caskroom\fR\.
 .
 .TP
 \fB\-\-verbose\fR
@@ -234,7 +248,7 @@ brew update
 Most Homebrew\-Cask commands can accept a Cask token as an argument\. As described above, the argument can take the form of:
 .
 .IP "\(bu" 4
-A token as returned by \fBbrew cask search\fR, \fIeg\fR \fBgoogle\-chrome\fR
+A token as returned by \fBbrew cask search\fR, e\.g\. \fBgoogle\-chrome\fR
 .
 .IP "" 0
 .
@@ -242,13 +256,13 @@ A token as returned by \fBbrew cask search\fR, \fIeg\fR \fBgoogle\-chrome\fR
 Homebrew\-Cask also accepts three other forms in place of plain tokens:
 .
 .IP "\(bu" 4
-A fully\-qualified token which includes the Tap name, \fIeg\fR \fBcaskroom/fonts/font\-symbola\fR
+A fully\-qualified token which includes the Tap name, e\.g\. \fBcaskroom/fonts/font\-symbola\fR
 .
 .IP "\(bu" 4
-A fully\-qualified pathname to a Cask file, \fIeg\fR \fB/usr/local/Library/Taps/caskroom/homebrew\-cask/Casks/google\-chrome\.rb\fR
+A fully\-qualified pathname to a Cask file, e\.g\. \fB/usr/local/Library/Taps/caskroom/homebrew\-cask/Casks/google\-chrome\.rb\fR
 .
 .IP "\(bu" 4
-A \fBcurl\fR\-retrievable URI to a Cask file, \fIeg\fR \fBhttps://raw\.githubusercontent\.com/caskroom/homebrew\-cask/f25b6babcd398abf48e33af3d887b2d00de1d661/Casks/google\-chrome\.rb\fR
+A \fBcurl\fR\-retrievable URI to a Cask file, e\.g\. \fBhttps://raw\.githubusercontent\.com/caskroom/homebrew\-cask/f25b6babcd398abf48e33af3d887b2d00de1d661/Casks/google\-chrome\.rb\fR
 .
 .IP "" 0
 .
@@ -259,14 +273,25 @@ Homebrew\-Cask respects many of the environment variables used by the parent com
 Environment variables specific to Homebrew\-Cask:
 .
 .TP
-HOMEBREW_CASK_OPTS
-This variable may contain any arguments normally used as options on the command\-line\. This is particularly useful to make options persistent\. For example, you might add to your \.bash_profile or \.zshenv something like: \fBexport HOMEBREW_CASK_OPTS=\'\-\-appdir=/Applications \-\-caskroom=/etc/Caskroom\'\fR\.
+\fBHOMEBREW_CASK_OPTS\fR
+This variable may contain any arguments normally used as options on the command\-line\. This is particularly useful to make options persistent\. For example, you might add to your \.bash_profile or \.zshenv something like:
+.
+.IP "" 4
+.
+.nf
+
+       export HOMEBREW_CASK_OPTS=\'\-\-appdir=/Applications \-\-caskroom=/etc/Caskroom\'
+.
+.fi
+.
+.IP "" 0
+
 .
 .SH "SEE ALSO"
-The Homebrew\-Cask home page: \fIhttp://caskroom\.io\fR\.
+The Homebrew\-Cask home page: \fIhttp://caskroom\.io\fR
 .
 .P
-The Homebrew\-Cask GitHub page: \fIhttps://github\.com/caskroom/homebrew\-cask\fR\.
+The Homebrew\-Cask GitHub page: \fIhttps://github\.com/caskroom/homebrew\-cask\fR
 .
 .P
 \fBbrew\fR(1), \fBcurl\fR(1)
@@ -278,7 +303,7 @@ Paul Hinze and Contributors\.
 Man page format based on \fBbrew\.1\.md\fR from Homebrew\.
 .
 .SH "BUGS"
-We still have bugs — and we are busy fixing them! If you have a problem, don’t be shy about reporting it on our GitHub issues page \fIhttps://github\.com/caskroom/homebrew\-cask/issues?state=open\fR\.
+We still have bugs \- and we are busy fixing them! If you have a problem, don\'t be shy about reporting it on our GitHub issues page \fIhttps://github\.com/caskroom/homebrew\-cask/issues?state=open\fR\.
 .
 .P
 When reporting bugs, remember that Homebrew\-Cask is an independent project from Homebrew\. Do your best to direct bug reports to the appropriate project\. If your command\-line started with \fBbrew cask\fR, bring the bug to us first!

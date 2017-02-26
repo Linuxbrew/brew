@@ -1,5 +1,5 @@
 #:  * `formula` <formula>:
-#:    Display the path where <formula> is
+#:    Display the path where <formula> is located.
 
 require "formula"
 
