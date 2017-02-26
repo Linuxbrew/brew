@@ -466,6 +466,17 @@ class FormulaAuditorTests < Homebrew::TestCase
     end
   end
 
+  def test_audit_without_homepage
+    fa = formula_auditor "foo", <<-EOS.undent, online: true
+      class Foo < Formula
+        url "http://example.com/foo-1.0.tgz"
+      end
+    EOS
+
+    fa.audit_homepage
+    assert_match "Formula should have a homepage.", fa.problems.first
+  end
+
   def test_audit_xcodebuild_suggests_symroot
     fa = formula_auditor "foo", <<-EOS.undent
       class Foo < Formula

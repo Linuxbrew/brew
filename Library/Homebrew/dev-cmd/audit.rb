@@ -605,6 +605,11 @@ class FormulaAuditor
   def audit_homepage
     homepage = formula.homepage
 
+    if homepage.nil? || homepage.empty?
+      problem "Formula should have a homepage."
+      return
+    end
+
     unless homepage =~ %r{^https?://}
       problem "The homepage should start with http or https (URL is #{homepage})."
     end
