@@ -48,13 +48,13 @@ if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
 then
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
-  execution_env=()
-  for key in HOME SHELL PATH TERM LOGNAME USER "${!HOMEBREW_@}"
+  FILTERED_ENV=()
+  for VAR in HOME SHELL PATH TERM LOGNAME USER "${!HOMEBREW_@}"
   do
-    execution_env+=( "${key}=${!key}" )
+    FILTERED_ENV+=( "${VAR}=${!VAR}" )
   done
 
-  /usr/bin/env -i "${execution_env[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
+  /usr/bin/env -i "${FILTERED_ENV[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
 else
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi
