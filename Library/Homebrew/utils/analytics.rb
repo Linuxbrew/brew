@@ -6,7 +6,7 @@ module Utils
       def os_prefix_ci
         @anonymous_os_prefix_ci ||= begin
           os = OS_VERSION
-          prefix = (OS.mac? ? ", non-/usr/local" : ", custom-prefix") if HOMEBREW_PREFIX.to_s != BottleSpecification::DEFAULT_PREFIX
+          prefix = (OS.mac? ? ", non-/usr/local" : ", custom-prefix") if HOMEBREW_PREFIX.to_s != HOMEBREW_DEFAULT_PREFIX
           ci = ", CI" if ENV["CI"]
           "#{os}#{prefix}#{ci}"
         end
