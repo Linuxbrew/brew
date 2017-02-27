@@ -9,7 +9,7 @@ describe Emoji do
       ENV.delete("HOMEBREW_INSTALL_BADGE")
     end
 
-    it "returns 🍺 by default" do
+    it "returns 🍺  by default" do
       expect(subject).to eq "🍺"
     end
 
