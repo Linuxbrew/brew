@@ -38,14 +38,16 @@ RSpec.shared_context "integration test" do
     end
   end
 
-  before(:each) do
-    (HOMEBREW_PREFIX/"bin").mkpath
-    FileUtils.touch HOMEBREW_PREFIX/"bin/brew"
-  end
+  around(:each) do |example|
+    begin
+      (HOMEBREW_PREFIX/"bin").mkpath
+      FileUtils.touch HOMEBREW_PREFIX/"bin/brew"
 
-  after(:each) do
-    FileUtils.rm HOMEBREW_PREFIX/"bin/brew"
-    FileUtils.rmdir HOMEBREW_PREFIX/"bin"
+      example.run
+    ensure
+      FileUtils.rm HOMEBREW_PREFIX/"bin/brew"
+      FileUtils.rmdir HOMEBREW_PREFIX/"bin"
+    end
   end
 
   # Generate unique ID to be able to
