@@ -9,6 +9,7 @@ require "utils/git"
 require "utils/github"
 require "utils/hash"
 require "utils/inreplace"
+require "utils/link"
 require "utils/popen"
 require "utils/svn"
 require "utils/tty"
@@ -480,38 +481,6 @@ def truncate_text_to_approximate_size(s, max_bytes, options = {})
   out.encode!("UTF-16", invalid: :replace)
   out.encode!("UTF-8")
   out
-end
-
-def link_src_dst_dirs(src_dir, dst_dir, command, link_dir: false)
-  return unless src_dir.exist?
-  conflicts = []
-  src_paths = link_dir ? [src_dir] : src_dir.find
-  src_paths.each do |src|
-    next if src.directory? && !link_dir
-    dst = dst_dir/src.relative_path_from(src_dir)
-    if dst.symlink?
-      next if src == dst.resolved_path
-      dst.unlink
-    end
-    if dst.exist?
-      conflicts << dst
-      next
-    end
-    dst_dir.parent.mkpath
-    dst.make_relative_symlink(src)
-  end
-
-  return if conflicts.empty?
-  onoe <<-EOS.undent
-    Could not link:
-    #{conflicts.join("\n")}
-
-    Please delete these paths and run `#{command}`.
-  EOS
-end
-
-def link_path_manpages(path, command)
-  link_src_dst_dirs(path/"man", HOMEBREW_PREFIX/"share/man", command)
 end
 
 def migrate_legacy_keg_symlinks_if_necessary

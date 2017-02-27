@@ -38,7 +38,7 @@ module Homebrew
 
   def tap
     if ARGV.include? "--repair"
-      Tap.each(&:link_manpages)
+      Tap.each(&:link_completions_and_manpages)
     elsif ARGV.include? "--list-official"
       require "official_taps"
       puts OFFICIAL_TAPS.map { |t| "homebrew/#{t}" }
