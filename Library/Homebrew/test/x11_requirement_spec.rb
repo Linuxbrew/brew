@@ -33,4 +33,17 @@ describe X11Requirement do
       subject.modify_build_environment
     end
   end
+
+  describe "#satisfied?", :needs_macos do
+    it "returns true if X11 is installed" do
+      expect(MacOS::XQuartz).to receive(:version).and_return("2.7.5")
+      expect(MacOS::XQuartz).to receive(:installed?).and_return(true)
+      expect(subject).to be_satisfied
+    end
+
+    it "returns false if X11 is not installed" do
+      expect(MacOS::XQuartz).to receive(:installed?).and_return(false)
+      expect(subject).not_to be_satisfied
+    end
+  end
 end
