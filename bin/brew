@@ -44,4 +44,17 @@ fi
 
 HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 
-source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
+if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
+then
+  PATH="/usr/bin:/bin:/usr/sbin:/sbin"
+
+  FILTERED_ENV=()
+  for VAR in HOME SHELL PATH TERM LOGNAME USER "${!HOMEBREW_@}"
+  do
+    FILTERED_ENV+=( "${VAR}=${!VAR}" )
+  done
+
+  /usr/bin/env -i "${FILTERED_ENV[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
+else
+  source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
+fi
