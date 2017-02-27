@@ -6,11 +6,9 @@ module Homebrew
     require "test/support/helper/fs_leak_logger"
     require "test/support/helper/lifecycle_enforcer"
     require "test/support/helper/shutup"
-    require "test/support/helper/version_assertions"
     include Test::Helper::FSLeakLogger
     include Test::Helper::LifecycleEnforcer
     include Test::Helper::Shutup
-    include Test::Helper::VersionAssertions
 
     TEST_DIRECTORIES = [
       CoreTap.instance.path/"Formula",
