@@ -60,6 +60,10 @@ describe Keg do
 
     (keg/"bin").rmtree
     expect(keg).to be_an_empty_installation
+
+    (keg/"bin").mkpath
+    touch keg.join("bin", "todo")
+    expect(keg).not_to be_an_empty_installation
   end
 
   specify "#oldname_opt_record" do

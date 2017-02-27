@@ -284,6 +284,13 @@ describe Pathname do
       expect(dst/dir.basename).to be_a_directory
     end
   end
+
+  describe "#ds_store?" do
+    it "returns whether a file is .DS_Store or not" do
+      expect(file).not_to be_ds_store
+      expect(file/".DS_Store").to be_ds_store
+    end
+  end
 end
 
 describe FileUtils do

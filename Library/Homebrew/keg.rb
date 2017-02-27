@@ -207,8 +207,8 @@ class Keg
   alias eql? ==
 
   def empty_installation?
-    Pathname.glob("#{path}/**/*") do |file|
-      next if file.directory?
+    Pathname.glob("#{path}/*") do |file|
+      return false if file.directory? && !file.children.reject(&:ds_store?).empty?
       basename = file.basename.to_s
       next if Metafiles.copy?(basename)
       next if %w[.DS_Store INSTALL_RECEIPT.json].include?(basename)
