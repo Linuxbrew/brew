@@ -133,9 +133,8 @@ module HomebrewArgvExtension
     end
   end
 
-  # self documenting perhaps?
   def include?(arg)
-    @n=index arg
+    !(@n = index(arg)).nil?
   end
 
   def next
