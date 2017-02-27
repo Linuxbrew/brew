@@ -1,6 +1,5 @@
-#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=<root_url>`] [`--force-core-tap`]:
+#:  * `bottle` [`--verbose`] [`--no-rebuild`] [`--keep-old`] [`--skip-relocation`] [`--root-url=`<URL>] [`--force-core-tap`]:
 #:  * `bottle` `--merge` [`--no-commit`] [`--keep-old`] [`--write`]:
-#:
 #:    Generate a bottle (binary package) from a formula installed with
 #:    `--build-bottle`.
 

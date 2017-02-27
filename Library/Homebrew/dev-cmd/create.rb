@@ -3,8 +3,7 @@
 #:    Homebrew will attempt to automatically derive the formula name
 #:    and version, but if it fails, you'll have to make your own template. The `wget`
 #:    formula serves as a simple example. For the complete API have a look at
-#:
-#:    <http://www.rubydoc.info/github/Homebrew/brew/master/Formula>
+#:    <http://www.rubydoc.info/github/Homebrew/brew/master/Formula>.
 #:
 #:    If `--autotools` is passed, create a basic template for an Autotools-style build.
 #:    If `--cmake` is passed, create a basic template for a CMake-style build.

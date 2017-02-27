@@ -1,5 +1,5 @@
 #: @hide_from_man_page
-#:  * `mirror` [`--test`] <formula-name> [<formula-name> ...]:
+#:  * `mirror` [`--test`] <formulae>:
 #:    Reuploads the stable URL for a formula to Bintray to use it as a mirror.
 
 module Homebrew

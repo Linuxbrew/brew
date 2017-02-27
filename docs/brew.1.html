@@ -25,7 +25,7 @@ didn't include with macOS.</p>
 <dt><code>uninstall</code> <var>formula</var></dt><dd><p>Uninstall <var>formula</var>.</p></dd>
 <dt class="flush"><code>update</code></dt><dd><p>Fetch the newest version of Homebrew from GitHub using <code>git</code>(1).</p></dd>
 <dt class="flush"><code>list</code></dt><dd><p>List all installed formulae.</p></dd>
-<dt><code>search</code> <var>text</var>|<code>/</code><var>text</var><code>/</code></dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
+<dt><code>search</code> (<var>text</var>|<code>/</code><var>text</var><code>/</code>)</dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
 surrounded with slashes, then it is interpreted as a regular expression.
 The search for <var>text</var> is extended online to some popular taps.
 If no search term is given, all locally available formulae are listed.</p></dd>
@@ -48,7 +48,7 @@ cellar. In addition, old downloads from the Homebrew download-cache are deleted.
 <p>If <code>--dry-run</code> or <code>-n</code> is passed, show what would be removed, but do not
 actually remove anything.</p>
 
-<p>If <code>-s</code> is passed, scrubs the cache, removing downloads for even the latest
+<p>If <code>-s</code> is passed, scrub the cache, removing downloads for even the latest
 versions of formulae. Note downloads for any installed formulae will still not be
 deleted. If you want to delete those too: <code>rm -rf $(brew --cache)</code></p></dd>
 <dt><code>command</code> <var>cmd</var></dt><dd><p>Display the path to the file which is used when invoking <code>brew</code> <var>cmd</var>.</p></dd>
@@ -93,10 +93,9 @@ dependencies of that formula.</p>
 <p>The <var>filters</var> placeholder is any combination of options <code>--include-build</code>,
 <code>--include-optional</code>, and <code>--skip-recommended</code> as documented above.</p></dd>
 <dt><code>desc</code> <var>formula</var></dt><dd><p>Display <var>formula</var>'s name and one-line description.</p></dd>
-<dt><code>desc</code> [<code>-s</code>|<code>-n</code>|<code>-d</code>] <var>pattern</var></dt><dd><p>Search both name and description (<code>-s</code>), just the names (<code>-n</code>), or just  the
-descriptions (<code>-d</code>) for <code>&lt;pattern></code>. <code>&lt;pattern></code> is by default interpreted
-as a literal string; if flanked by slashes, it is instead interpreted as a
-regular expression. Formula descriptions are cached; the cache is created on
+<dt><code>desc</code> [<code>-s</code>|<code>-n</code>|<code>-d</code>] (<var>text</var>|<code>/</code><var>text</var><code>/</code>)</dt><dd><p>Search both name and description (<code>-s</code>), just the names (<code>-n</code>), or just  the
+descriptions (<code>-d</code>) for <var>text</var>. If <var>text</var> is flanked by slashes, it is interpreted
+as a regular expression. Formula descriptions are cached; the cache is created on
 the first search, making that search slower than subsequent ones.</p></dd>
 <dt><code>diy</code> [<code>--name=</code><var>name</var>] [<code>--version=</code><var>version</var>]</dt><dd><p>Automatically determine the installation prefix for non-Homebrew software.</p>
 
@@ -144,14 +143,14 @@ GitHub repository as well as creating the Gist.</p>
 <dt><code>info</code> <var>formula</var></dt><dd><p>Display information about <var>formula</var>.</p></dd>
 <dt><code>info</code> <code>--github</code> <var>formula</var></dt><dd><p>Open a browser to the GitHub History page for formula <var>formula</var>.</p>
 
-<p>To view formula history locally: <code>brew log -p &lt;formula></code>.</p></dd>
+<p>To view formula history locally: <code>brew log -p &lt;formula></code></p></dd>
 <dt><code>info</code> <code>--json=</code><var>version</var> (<code>--all</code>|<code>--installed</code>|<var>formulae</var>)</dt><dd><p>Print a JSON representation of <var>formulae</var>. Currently the only accepted value
 for <var>version</var> is <code>v1</code>.</p>
 
 <p>Pass <code>--all</code> to get information on all formulae, or <code>--installed</code> to get
 information on all installed formulae.</p>
 
-<p>See the docs for examples of using the JSON:
+<p>See the docs for examples of using the JSON output:
 <a href="http://docs.brew.sh/Querying-Brew.html" data-bare-link="true">http://docs.brew.sh/Querying-Brew.html</a></p></dd>
 <dt><code>install</code> [<code>--debug</code>] [<code>--env=</code><var>std</var>|<var>super</var>] [<code>--ignore-dependencies</code>] [<code>--only-dependencies</code>] [<code>--cc=</code><var>compiler</var>] [<code>--build-from-source</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Install <var>formula</var>.</p>
 
@@ -265,7 +264,7 @@ spaces.</p>
 <p>If <code>--all</code> is passed, show options for all formulae.</p>
 
 <p>If <code>--installed</code> is passed, show options for all installed formulae.</p></dd>
-<dt><code>outdated</code> [<code>--quiet</code>|<code>--verbose</code>|<code>--json=v1</code>] [<code>--fetch-HEAD</code>]</dt><dd><p>Show formulae that have an updated version available.</p>
+<dt><code>outdated</code> [<code>--quiet</code>|<code>--verbose</code>|<code>--json=</code><var>version</var>] [<code>--fetch-HEAD</code>]</dt><dd><p>Show formulae that have an updated version available.</p>
 
 <p>By default, version information is displayed in interactive shells, and
 suppressed otherwise.</p>
@@ -295,7 +294,7 @@ actually remove anything.</p></dd>
 <dt><code>reinstall</code> <var>formula</var></dt><dd><p>Uninstall and then install <var>formula</var>.</p></dd>
 <dt><code>search</code>, <code>-S</code></dt><dd><p>Display all locally available formulae for brewing (including tapped ones).
 No online search is performed if called without arguments.</p></dd>
-<dt><code>search</code> [<code>--desc</code>] <var>text</var>|<code>/</code><var>text</var><code>/</code></dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
+<dt><code>search</code> [<code>--desc</code>] (<var>text</var>|<code>/</code><var>text</var><code>/</code>)</dt><dd><p>Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
 surrounded with slashes, then it is interpreted as a regular expression.
 The search for <var>text</var> is extended online to some popular taps.</p>
 
@@ -353,7 +352,7 @@ for <var>version</var> is <code>v1</code>.</p>
 
 <p>Pass <code>--installed</code> to get information on installed taps.</p>
 
-<p>See the docs for examples of using the JSON:
+<p>See the docs for examples of using the JSON output:
 <a href="http://docs.brew.sh/Querying-Brew.html" data-bare-link="true">http://docs.brew.sh/Querying-Brew.html</a></p></dd>
 <dt><code>tap-pin</code> <var>tap</var></dt><dd><p>Pin <var>tap</var>, prioritizing its formulae over core when formula names are supplied
 by the user. See also <code>tap-unpin</code>.</p></dd>
@@ -367,7 +366,7 @@ installed, delete all installed versions.</p>
 formulae depending on <var>formula</var> would still be installed.</p></dd>
 <dt><code>unlink</code> [<code>--dry-run</code>] <var>formula</var></dt><dd><p>Remove symlinks for <var>formula</var> from the Homebrew prefix. This can be useful
 for temporarily disabling a formula:
-<code>brew unlink foo &amp;&amp; commands &amp;&amp; brew link foo</code>.</p>
+<code>brew unlink &lt;formula> &amp;&amp; &lt;commands> &amp;&amp; brew link &lt;formula></code></p>
 
 <p>If <code>--dry-run</code> or <code>-n</code> is passed, Homebrew will list all files which would
 be unlinked, but will not actually unlink or delete any files.</p></dd>
@@ -387,7 +386,7 @@ directory instead of the system directory.</p>
 would be removed, but will not actually delete any files.</p></dd>
 <dt><code>unpack</code> [<code>--git</code>|<code>--patch</code>] [<code>--destdir=</code><var>path</var>] <var>formulae</var></dt><dd><p>Unpack the source files for <var>formulae</var> into subdirectories of the current
 working directory. If <code>--destdir=</code><var>path</var> is given, the subdirectories will
-be created in the directory named by <code>&lt;path></code> instead.</p>
+be created in the directory named by <var>path</var> instead.</p>
 
 <p>If <code>--patch</code> is passed, patches for <var>formulae</var> will be applied to the
 unpacked source.</p>
@@ -431,8 +430,8 @@ or recommended dependency. To include the <code>:build</code> type dependencies,
 <code>--include-build</code>. Similarly, pass <code>--include-optional</code> to include <code>:optional</code>
 dependencies. To skip <code>:recommended</code> type dependencies, pass <code>--skip-recommended</code>.</p>
 
-<p>By default, <code>uses</code> shows usages of <code>formula</code> by stable builds. To find
-cases where <code>formula</code> is used by development or HEAD build, pass
+<p>By default, <code>uses</code> shows usages of <var>formulae</var> by stable builds. To find
+cases where <var>formulae</var> is used by development or HEAD build, pass
 <code>--devel</code> or <code>--HEAD</code>.</p></dd>
 <dt class="flush"><code>--cache</code></dt><dd><p>Display Homebrew's download cache. See also <code>HOMEBREW_CACHE</code>.</p></dd>
 <dt><code>--cache</code> <var>formula</var></dt><dd><p>Display the file or directory used to cache <var>formula</var>.</p></dd>
@@ -479,15 +478,12 @@ name of the file or formula being audited, to make the output easy to grep.</p>
 
 <p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
 for instance, for implementing pre-commit hooks.</p></dd>
-<dt><code>bottle</code> [<code>--verbose</code>] [<code>--no-rebuild</code>] [<code>--keep-old</code>] [<code>--skip-relocation</code>] [<code>--root-url=&lt;root_url></code>] [<code>--force-core-tap</code>]:</dt><dd><p></p></dd>
-<dt><code>bottle</code> <code>--merge</code> [<code>--no-commit</code>] [<code>--keep-old</code>] [<code>--write</code>]:</dt><dd><p></p>
-
-<p>Generate a bottle (binary package) from a formula installed with
+<dt><code>bottle</code> [<code>--verbose</code>] [<code>--no-rebuild</code>] [<code>--keep-old</code>] [<code>--skip-relocation</code>] [<code>--root-url=</code><var>URL</var>] [<code>--force-core-tap</code>]:</dt><dd><p></p></dd>
+<dt><code>bottle</code> <code>--merge</code> [<code>--no-commit</code>] [<code>--keep-old</code>] [<code>--write</code>]</dt><dd><p>Generate a bottle (binary package) from a formula installed with
 <code>--build-bottle</code>.</p></dd>
-<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] [<code>--message=</code><var>message</var>] <code>--url=</code><var>url</var> <code>--sha256=</code><var>sha-256</var> <var>formula</var>:</dt><dd><p></p></dd>
-<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code>] [<code>--audit</code>|<code>--strict</code>] [<code>--message=</code><var>message</var>] <code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var> <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new url or a new tag.</p>
+<dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code> [<code>--write</code>]] [<code>--audit</code>|<code>--strict</code>] [<code>--mirror=</code><var>URL</var>] [<code>--version=</code><var>version</var>] [<code>--message=</code><var>message</var>] (<code>--url=</code><var>URL</var> <code>--sha256=</code><var>sha-256</var>|<code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var>) <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new URL or a new tag.</p>
 
-<p>If a <var>url</var> is specified, the <var>sha-256</var> checksum of the new download must
+<p>If a <var>URL</var> is specified, the <var>sha-256</var> checksum of the new download must
 also be specified. A best effort to determine the <var>sha-256</var> and <var>formula</var>
 name will be made if either or both values are not supplied by the user.</p>
 
@@ -506,25 +502,24 @@ making the expected file modifications but not taking any git actions.</p>
 
 <p>If <code>--strict</code> is passed, run <code>brew audit --strict</code> before opening the PR.</p>
 
-<p>If <code>--mirror=</code><var>url</var> is passed, use the value as a mirror url.</p>
+<p>If <code>--mirror=</code><var>URL</var> is passed, use the value as a mirror URL.</p>
 
 <p>If <code>--version=</code><var>version</var> is passed, use the value to override the value
-parsed from the url or tag. Note that <code>--version=0</code> can be used to delete
+parsed from the URL or tag. Note that <code>--version=0</code> can be used to delete
 an existing <code>version</code> override from a formula if it has become redundant.</p>
 
 <p>If <code>--message=</code><var>message</var> is passed, append <var>message</var> to the default PR
 message.</p>
 
 <p>Note that this command cannot be used to transition a formula from a
-url-and-sha256 style specification into a tag-and-revision style
+URL-and-sha256 style specification into a tag-and-revision style
 specification, nor vice versa. It must use whichever style specification
 the preexisting formula already uses.</p></dd>
 <dt><code>create</code> <var>URL</var> [<code>--autotools</code>|<code>--cmake</code>|<code>--meson</code>] [<code>--no-fetch</code>] [<code>--set-name</code> <var>name</var>] [<code>--set-version</code> <var>version</var>] [<code>--tap</code> <var>user</var><code>/</code><var>repo</var>]</dt><dd><p>Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
 Homebrew will attempt to automatically derive the formula name
 and version, but if it fails, you'll have to make your own template. The <code>wget</code>
-formula serves as a simple example. For the complete API have a look at</p>
-
-<p><a href="http://www.rubydoc.info/github/Homebrew/brew/master/Formula" data-bare-link="true">http://www.rubydoc.info/github/Homebrew/brew/master/Formula</a></p>
+formula serves as a simple example. For the complete API have a look at
+<a href="http://www.rubydoc.info/github/Homebrew/brew/master/Formula" data-bare-link="true">http://www.rubydoc.info/github/Homebrew/brew/master/Formula</a>.</p>
 
 <p>If <code>--autotools</code> is passed, create a basic template for an Autotools-style build.
 If <code>--cmake</code> is passed, create a basic template for a CMake-style build.
@@ -540,8 +535,8 @@ you to explicitly set the name and version of the package you are creating.</p>
 the specified tap.</p></dd>
 <dt class="flush"><code>edit</code></dt><dd><p>Open all of Homebrew for editing.</p></dd>
 <dt><code>edit</code> <var>formula</var></dt><dd><p>Open <var>formula</var> in the editor.</p></dd>
-<dt><code>formula</code> <var>formula</var></dt><dd><p>Display the path where <var>formula</var> is</p></dd>
-<dt><code>linkage</code> [<code>--test</code>] [<code>--reverse</code>]  <var>formula-name</var></dt><dd><p>Checks the library links of an installed formula.</p>
+<dt><code>formula</code> <var>formula</var></dt><dd><p>Display the path where <var>formula</var> is located.</p></dd>
+<dt><code>linkage</code> [<code>--test</code>] [<code>--reverse</code>]  <var>formula</var></dt><dd><p>Checks the library links of an installed formula.</p>
 
 <p>Only works on installed formulae. An error is raised if it is run on
 uninstalled formulae.</p>
@@ -558,44 +553,47 @@ status code if changes are detected in the manpage outputs.
 This can be used for CI to be notified when the manpages are out of date.
 Additionally, the date used in new manpages will match those in the existing
 manpages (to allow comparison without factoring in the date).</p></dd>
-</dl>
+<dt><code>pull</code> [<code>--bottle</code>] [<code>--bump</code>] [<code>--clean</code>] [<code>--ignore-whitespace</code>] [<code>--resolve</code>] [<code>--branch-okay</code>] [<code>--no-pbcopy</code>] [<code>--no-publish</code>] <var>patch-source</var> [<var>patch-source</var>]</dt><dd><p>Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
+Optionally, installs the formulae changed by the patch.</p>
 
+<p>Each <var>patch-source</var> may be one of:</p>
 
-<p> <code>pull</code> [<code>--bottle</code>] [<code>--bump</code>] [<code>--clean</code>] [<code>--ignore-whitespace</code>] [<code>--resolve</code>] [<code>--branch-okay</code>] [<code>--no-pbcopy</code>] [<code>--no-publish</code>] <var>patch-source</var> [<var>patch-source</var>]</p>
+<p>  ~ The ID number of a PR (pull request) in the homebrew/core GitHub
+    repository</p>
 
-<pre><code>Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
-Optionally, installs the formulae changed by the patch.
-
-Each &lt;patch-source> may be one of:
-  * The ID number of a PR (Pull Request) in the homebrew/core GitHub
-    repository
-  * The URL of a PR on GitHub, using either the web page or API URL
+<p>  ~ The URL of a PR on GitHub, using either the web page or API URL
     formats. In this form, the PR may be on Homebrew/brew,
-    Homebrew/homebrew-core or any tap.
-  * The URL of a commit on GitHub
-  * A "http://bot.brew.sh/job/..." string specifying a testing job ID
-</code></pre>
+    Homebrew/homebrew-core or any tap.</p>
 
-<p>   If <code>--bottle</code> was passed, handle bottles, pulling the bottle-update
-   commit and publishing files on Bintray.
-   If <code>--bump</code> was passed, for one-formula PRs, automatically reword
-   commit message to our preferred format.
-   If <code>--clean</code> was passed, do not rewrite or otherwise modify the
-   commits found in the pulled PR.
-   If <code>--ignore-whitespace</code> was passed, silently ignore whitespace
-   discrepancies when applying diffs.
-   If <code>--resolve</code> was passed, when a patch fails to apply, leave in
-   progress and allow user to
-                  resolve, instead of aborting.
-   If <code>--branch-okay</code> was passed, do not warn if pulling to a branch
-   besides master (useful for testing).
-   If <code>--no-pbcopy</code> was passed, do not copy anything to the system
-   If <code>--no-publish</code> was passed, do not publish bottles to Bintray.</p>
+<p>  ~ The URL of a commit on GitHub</p>
 
-<dl>
-<dt><code>release-notes</code> [<var>previous_tag</var>] [<var>end_ref</var>]</dt><dd><p>Output the merged pull requests on Homebrew/brew between two Git refs.
-If no <code>previous_tag</code> is provided it defaults to the newest tag.
-If no <code>end_ref</code> is provided it defaults to <code>origin/master</code>.</p>
+<p>  ~ A "http://bot.brew.sh/job/..." string specifying a testing job ID</p>
+
+<p>If <code>--bottle</code> is passed, handle bottles, pulling the bottle-update
+commit and publishing files on Bintray.</p>
+
+<p>If <code>--bump</code> is passed, for one-formula PRs, automatically reword
+commit message to our preferred format.</p>
+
+<p>If <code>--clean</code> is passed, do not rewrite or otherwise modify the
+commits found in the pulled PR.</p>
+
+<p>If <code>--ignore-whitespace</code> is passed, silently ignore whitespace
+discrepancies when applying diffs.</p>
+
+<p>If <code>--resolve</code> is passed, when a patch fails to apply, leave in
+progress and allow user to resolve, instead of aborting.</p>
+
+<p>If <code>--branch-okay</code> is passed, do not warn if pulling to a branch
+besides master (useful for testing).</p>
+
+<p>If <code>--no-pbcopy</code> is passed, do not copy anything to the system
+clipboard.</p>
+
+<p>If <code>--no-publish</code> is passed, do not publish bottles to Bintray.</p></dd>
+<dt><code>release-notes</code> [<code>--markdown</code>] [<var>previous_tag</var>] [<var>end_ref</var>]</dt><dd><p>Output the merged pull requests on Homebrew/brew between two Git refs.
+If no <var>previous_tag</var> is provided it defaults to the newest tag.
+If no <var>end_ref</var> is provided it defaults to <code>origin/master</code>.</p>
 
 <p>If <code>--markdown</code> is passed, output as a Markdown list.</p></dd>
 <dt><code>tap-new</code> <var>user</var><code>/</code><var>repo</var></dt><dd><p>Generate the template files for a new tap.</p></dd>
@@ -614,17 +612,17 @@ launched with access to IRB or a shell inside the temporary test directory.</p>
 not deleted.</p>
 
 <p>Example: <code>brew install jruby &amp;&amp; brew test jruby</code></p></dd>
-<dt><code>tests</code> [<code>-v</code>] [<code>--coverage</code>] [<code>--generic</code>] [<code>--no-compat</code>] [<code>--only=</code>&lt;test_script:test_method>] [<code>--seed</code> <var>seed</var>] [<code>--trace</code>] [<code>--online</code>] [<code>--official-cmd-taps</code>]</dt><dd><p>Run Homebrew's unit and integration tests.</p></dd>
-<dt><code>update-test</code> [<code>--commit=&lt;commit></code>] [<code>--before=&lt;date></code>] [<code>--keep-tmp</code>]</dt><dd><p>Runs a test of <code>brew update</code> with a new repository clone.</p>
+<dt><code>tests</code> [<code>-v</code>] [<code>--coverage</code>] [<code>--generic</code>] [<code>--no-compat</code>] [<code>--only=</code><var>test_script</var><code>:</code><var>test_method</var>] [<code>--seed</code> <var>seed</var>] [<code>--trace</code>] [<code>--online</code>] [<code>--official-cmd-taps</code>]</dt><dd><p>Run Homebrew's unit and integration tests.</p></dd>
+<dt><code>update-test</code> [<code>--commit=</code><var>commit</var>] [<code>--before=</code><var>date</var>] [<code>--keep-tmp</code>]</dt><dd><p>Runs a test of <code>brew update</code> with a new repository clone.</p>
 
 <p>If no arguments are passed, use <code>origin/master</code> as the start commit.</p>
 
-<p>If <code>--commit=&lt;commit></code> is passed, use <code>&lt;commit></code> as the start commit.</p>
+<p>If <code>--commit=</code><var>commit</var> is passed, use <var>commit</var> as the start commit.</p>
 
-<p>If <code>--before=&lt;date></code> is passed, use the commit at <code>&lt;date></code> as the
+<p>If <code>--before=</code><var>date</var> is passed, use the commit at <var>date</var> as the
 start commit.</p>
 
-<p>If <code>--to-tag</code> is passed, set HOMEBREW_UPDATE_TO_TAG to test updating
+<p>If <code>--to-tag</code> is passed, set <code>HOMEBREW_UPDATE_TO_TAG</code> to test updating
 between tags.</p>
 
 <p>If <code>--keep-tmp</code> is passed, retain the temporary directory containing
@@ -742,7 +740,7 @@ successful build.</p>
 to insecure HTTP.</p>
 
 <p>While ensuring your downloads are fully secure, this is likely
-to cause from-source Sourceforge, some GNU &amp; GNOME based
+to cause from-source SourceForge, some GNU &amp; GNOME based
 formulae to fail to download.</p></dd>
 <dt><code>HOMEBREW_NO_GITHUB_API</code></dt><dd><p>If set, Homebrew will not use the GitHub API for e.g searches or
 fetching relevant issues on a failed install.</p></dd>
@@ -791,7 +789,7 @@ your shell profile, or you can use it before a brew command:</p>
 
 <p>Homebrew's lead maintainer is Mike McQuaid.</p>
 
-<p>Homebrew's current maintainers are Misty De Meo, Andrew Janke, Tomasz Pajor, Josh Hagins, Baptiste Fontaine, Markus Reiter, ilovezfs, Tom Schoonjans, Uladzislau Shablinski, Tim Smith and Alex Dunn.</p>
+<p>Homebrew's current maintainers are Alyssa Ross, Andrew Janke, Baptiste Fontaine, Alex Dunn, FX Coudert, ilovezfs, Josh Hagins, JCount, Misty De Meo, Tomasz Pajor, Markus Reiter, Tim Smith, Tom Schoonjans, Uladzislau Shablinski and William Woodruff.</p>
 
 <p>Former maintainers with significant contributions include Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.</p>
 

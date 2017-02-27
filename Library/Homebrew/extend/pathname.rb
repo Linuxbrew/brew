@@ -335,7 +335,7 @@ class Pathname
   alias to_str to_s unless method_defined?(:to_str)
 
   def cd
-    Dir.chdir(self) { yield }
+    Dir.chdir(self) { yield self }
   end
 
   def subdirs

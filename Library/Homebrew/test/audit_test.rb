@@ -419,9 +419,8 @@ class FormulaAuditorTests < Homebrew::TestCase
     EOS
 
     fa.audit_homepage
-    assert_equal ["The homepage should start with http or https " \
-      "(URL is #{fa.formula.homepage}).", "The homepage #{fa.formula.homepage} is not reachable " \
-      "(HTTP status code 000)"], fa.problems
+    assert_equal ["The homepage should start with http or https (URL is #{fa.formula.homepage})."],
+      fa.problems
 
     formula_homepages = {
       "bar" => "http://www.freedesktop.org/wiki/bar",
@@ -465,5 +464,50 @@ class FormulaAuditorTests < Homebrew::TestCase
         assert_match "Please use https:// for #{homepage}", fa.problems.first
       end
     end
+  end
+
+  def test_audit_without_homepage
+    fa = formula_auditor "foo", <<-EOS.undent, online: true
+      class Foo < Formula
+        url "http://example.com/foo-1.0.tgz"
+      end
+    EOS
+
+    fa.audit_homepage
+    assert_match "Formula should have a homepage.", fa.problems.first
+  end
+
+  def test_audit_xcodebuild_suggests_symroot
+    fa = formula_auditor "foo", <<-EOS.undent
+      class Foo < Formula
+        url "http://example.com/foo-1.0.tgz"
+        homepage "http://example.com"
+
+        def install
+          xcodebuild "-project", "meow.xcodeproject"
+        end
+      end
+    EOS
+
+    fa.audit_text
+
+    assert_match 'xcodebuild should be passed an explicit "SYMROOT"', fa.problems.first
+  end
+
+  def test_audit_bare_xcodebuild_suggests_symroot_also
+    fa = formula_auditor "foo", <<-EOS.undent
+      class Foo < Formula
+        url "http://example.com/foo-1.0.tgz"
+        homepage "http://example.com"
+
+        def install
+          xcodebuild
+        end
+      end
+    EOS
+
+    fa.audit_text
+
+    assert_match 'xcodebuild should be passed an explicit "SYMROOT"', fa.problems.first
   end
 end

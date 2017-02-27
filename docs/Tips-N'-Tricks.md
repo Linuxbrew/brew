@@ -5,7 +5,7 @@
 The supported method of installing specific versions of
 some formulae is to see if there is a versions formula like e.g. `gcc@6` available. If the version you’re looking for isn’t available, consider [opening a pull request](How-To-Open-a-Homebrew-Pull-Request.md)!
 
-### Installing directly from pull-requests
+### Installing directly from pull requests
 You can [browse pull requests](https://github.com/Homebrew/homebrew-core/pulls)
 and install through the direct link. For example Python 3.3.0 pull request [Homebrew/homebrew#15199](https://github.com/Homebrew/homebrew/pull/15199)
 

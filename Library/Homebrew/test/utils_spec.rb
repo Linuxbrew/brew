@@ -232,10 +232,10 @@ describe "globally-scoped helper methods" do
   specify "#disk_usage_readable" do
     expect(disk_usage_readable(1)).to eq("1B")
     expect(disk_usage_readable(1000)).to eq("1000B")
-    expect(disk_usage_readable(1024)).to eq("1K")
-    expect(disk_usage_readable(1025)).to eq("1K")
-    expect(disk_usage_readable(4_404_020)).to eq("4.2M")
-    expect(disk_usage_readable(4_509_715_660)).to eq("4.2G")
+    expect(disk_usage_readable(1024)).to eq("1KB")
+    expect(disk_usage_readable(1025)).to eq("1KB")
+    expect(disk_usage_readable(4_404_020)).to eq("4.2MB")
+    expect(disk_usage_readable(4_509_715_660)).to eq("4.2GB")
   end
 
   describe "#number_readable" do

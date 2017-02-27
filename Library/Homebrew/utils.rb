@@ -10,6 +10,7 @@ require "utils/github"
 require "utils/hash"
 require "utils/inreplace"
 require "utils/popen"
+require "utils/svn"
 require "utils/tty"
 require "time"
 
@@ -421,13 +422,13 @@ end
 def disk_usage_readable(size_in_bytes)
   if size_in_bytes >= 1_073_741_824
     size = size_in_bytes.to_f / 1_073_741_824
-    unit = "G"
+    unit = "GB"
   elsif size_in_bytes >= 1_048_576
     size = size_in_bytes.to_f / 1_048_576
-    unit = "M"
+    unit = "MB"
   elsif size_in_bytes >= 1_024
     size = size_in_bytes.to_f / 1_024
-    unit = "K"
+    unit = "KB"
   else
     size = size_in_bytes
     unit = "B"

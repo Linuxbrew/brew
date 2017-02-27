@@ -75,6 +75,17 @@ class CompilerFailure
       create(gcc: "4.5"),
       create(gcc: "4.6"),
     ],
+    cxx14: [
+      create(:clang) { build 600 },
+      create(:gcc_4_0),
+      create(:gcc_4_2),
+      create(gcc: "4.3"),
+      create(gcc: "4.4"),
+      create(gcc: "4.5"),
+      create(gcc: "4.6"),
+      create(gcc: "4.7"),
+      create(gcc: "4.8"),
+    ],
     openmp: [
       create(:clang),
     ],
