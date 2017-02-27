@@ -89,4 +89,89 @@ describe Hbc::Cask, :cask do
       expect(c.metadata_versioned_container_path.to_s).to eq(metadata_path.to_s)
     end
   end
+
+  describe "outdated" do
+    it "ignores the Casks that have auto_updates true (without --greedy)" do
+      c = Hbc.load("auto-updates")
+      expect(c).not_to be_outdated
+      expect(c.outdated_versions).to be_empty
+    end
+
+    it "ignores the Casks that have version :latest (without --greedy)" do
+      c = Hbc.load("version-latest-string")
+      expect(c).not_to be_outdated
+      expect(c.outdated_versions).to be_empty
+    end
+
+    describe "versioned casks" do
+      let(:cask) { described_class.new("basic-cask") }
+      subject { cask.outdated_versions }
+
+      shared_examples "versioned casks" do |tap_version, expectations|
+        expectations.each do |installed_versions, expected_output|
+          context "when versions #{installed_versions.inspect} are installed and the tap version is #{tap_version}" do
+            it {
+              allow(cask).to receive(:versions).and_return(installed_versions)
+              allow(cask).to receive(:version).and_return(Hbc::DSL::Version.new(tap_version))
+              expect(cask).to receive(:outdated_versions).and_call_original
+              is_expected.to eq expected_output
+            }
+          end
+        end
+      end
+
+      describe "installed version is equal to tap version => not outdated" do
+        include_examples "versioned casks", "1.2.3",
+                         ["1.2.3"]          => [],
+                         ["1.2.4", "1.2.3"] => []
+      end
+
+      describe "installed version is different than tap version => outdated" do
+        include_examples "versioned casks", "1.2.4",
+                         ["1.2.3"]                   => ["1.2.3"],
+                         ["1.2.4", "1.2.3"]          => ["1.2.3"],
+                         ["1.2.2", "1.2.3"]          => ["1.2.2", "1.2.3"],
+                         ["1.2.2", "1.2.4", "1.2.3"] => ["1.2.2", "1.2.3"]
+      end
+    end
+
+    describe ":latest casks" do
+      let(:cask) { described_class.new("basic-cask") }
+
+      shared_examples ":latest cask" do |greedy, tap_version, expectations|
+        expectations.each do |installed_version, expected_output|
+          context "when versions #{installed_version} are installed and the tap version is #{tap_version}, #{greedy ? "" : "not"} greedy" do
+            subject { cask.outdated_versions greedy }
+            it {
+              allow(cask).to receive(:versions).and_return(installed_version)
+              allow(cask).to receive(:version).and_return(Hbc::DSL::Version.new(tap_version))
+              expect(cask).to receive(:outdated_versions).and_call_original
+              is_expected.to eq expected_output
+            }
+          end
+        end
+      end
+
+      describe ":latest version installed, :latest version in tap" do
+        include_examples ":latest cask", false, "latest",
+                         ["latest"] => []
+        include_examples ":latest cask", true, "latest",
+                         ["latest"] => ["latest"]
+      end
+
+      describe "numbered version installed, :latest version in tap" do
+        include_examples ":latest cask", false, "latest",
+                         ["1.2.3"] => ["1.2.3"]
+        include_examples ":latest cask", true, "latest",
+                         ["1.2.3"] => ["1.2.3"]
+      end
+
+      describe "latest version installed, numbered version in tap" do
+        include_examples ":latest cask", false, "1.2.3",
+                         ["latest"] => ["latest"]
+        include_examples ":latest cask", true, "1.2.3",
+                         ["latest"] => ["latest"]
+      end
+    end
+  end
 end
