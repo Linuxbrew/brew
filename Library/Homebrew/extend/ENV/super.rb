@@ -274,6 +274,7 @@ module Superenv
   end
 
   def universal_binary
+    return unless OS.mac?
     check_for_compiler_universal_support
 
     self["HOMEBREW_ARCHFLAGS"] = Hardware::CPU.universal_archs.as_arch_flags
