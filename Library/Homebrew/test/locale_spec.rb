@@ -36,9 +36,9 @@ describe Locale do
     end
   end
 
-  subject { described_class.new("zh", "CN", "Hans") }
-
   describe "#include?" do
+    subject { described_class.new("zh", "CN", "Hans") }
+
     it { is_expected.to include("zh") }
     it { is_expected.to include("zh-CN") }
     it { is_expected.to include("CN") }
