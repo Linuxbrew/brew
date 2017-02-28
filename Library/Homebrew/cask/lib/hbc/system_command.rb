@@ -1,5 +1,6 @@
 require "open3"
 require "shellwords"
+require "vendor/plist/plist"
 
 require "extend/io"
 
@@ -167,16 +168,6 @@ module Hbc
           EOS
         end
         xml
-      rescue Plist::ParseError => e
-        raise CaskError, <<-EOS
-    Error parsing plist output from command.
-      command was:
-      #{command.utf8_inspect}
-      error was:
-      #{e}
-      output we attempted to parse:
-      #{output}
-        EOS
       end
     end
   end
