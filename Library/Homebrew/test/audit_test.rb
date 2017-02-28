@@ -4,55 +4,6 @@ require "pathname"
 require "formulary"
 require "dev-cmd/audit"
 
-class FormulaTextTests < Homebrew::TestCase
-  def setup
-    super
-    @dir = mktmpdir
-  end
-
-  def formula_text(name, body = nil, options = {})
-    path = Pathname.new "#{@dir}/#{name}.rb"
-    path.open("w") do |f|
-      f.write <<-EOS.undent
-        class #{Formulary.class_s(name)} < Formula
-          #{body}
-        end
-        #{options[:patch]}
-      EOS
-    end
-    FormulaText.new path
-  end
-
-  def test_simple_valid_formula
-    ft = formula_text "valid", 'url "http://www.example.com/valid-1.0.tar.gz"'
-
-    refute ft.data?, "The formula should not have DATA"
-    refute ft.end?, "The formula should not have __END__"
-    assert ft.trailing_newline?, "The formula should have a trailing newline"
-
-    assert ft =~ /\burl\b/, "The formula should match 'url'"
-    assert_nil ft.line_number(/desc/), "The formula should not match 'desc'"
-    assert_equal 2, ft.line_number(/\burl\b/)
-    assert ft.include?("Valid"), "The formula should include \"Valid\""
-  end
-
-  def test_trailing_newline
-    ft = formula_text "newline"
-    assert ft.trailing_newline?, "The formula must have a trailing newline"
-  end
-
-  def test_has_data
-    ft = formula_text "data", "patch :DATA"
-    assert ft.data?, "The formula must have DATA"
-  end
-
-  def test_has_end
-    ft = formula_text "end", "", patch: "__END__\na patch here"
-    assert ft.end?, "The formula must have __END__"
-    assert_equal "class End < Formula\n  \nend", ft.without_patch
-  end
-end
-
 class FormulaAuditorTests < Homebrew::TestCase
   def setup
     super
