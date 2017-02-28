@@ -13,7 +13,7 @@ describe Homebrew::Diagnostic::Checks do
   end
 
   specify "#check_for_anaconda" do
-    Dir.mktmpdir do |path|
+    mktmpdir do |path|
       anaconda = "#{path}/anaconda"
       python = "#{path}/python"
       FileUtils.touch anaconda
@@ -23,7 +23,7 @@ describe Homebrew::Diagnostic::Checks do
       FileUtils.chmod 0755, anaconda
       FileUtils.chmod 0755, python
 
-      ENV["PATH"] = path + File::PATH_SEPARATOR + ENV["PATH"]
+      ENV["PATH"] = "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
 
       expect(subject.check_for_anaconda).to match("Anaconda")
     end
@@ -124,7 +124,7 @@ describe Homebrew::Diagnostic::Checks do
   end
 
   specify "#check_user_curlrc" do
-    Dir.mktmpdir do |path|
+    mktmpdir do |path|
       FileUtils.touch "#{path}/.curlrc"
       ENV["CURL_HOME"] = path
 
@@ -133,7 +133,7 @@ describe Homebrew::Diagnostic::Checks do
   end
 
   specify "#check_for_config_scripts" do
-    Dir.mktmpdir do |path|
+    mktmpdir do |path|
       file = "#{path}/foo-config"
       FileUtils.touch file
       FileUtils.chmod 0755, file
@@ -153,7 +153,7 @@ describe Homebrew::Diagnostic::Checks do
     begin
       HOMEBREW_CELLAR.rmtree
 
-      Dir.mktmpdir do |path|
+      mktmpdir do |path|
         FileUtils.ln_s path, HOMEBREW_CELLAR
 
         expect(subject.check_for_symlinked_cellar).to match(path)
@@ -170,8 +170,8 @@ describe Homebrew::Diagnostic::Checks do
   end
 
   specify "#check_for_external_cmd_name_conflict" do
-    Dir.mktmpdir do |path1|
-      Dir.mktmpdir do |path2|
+    mktmpdir do |path1|
+      mktmpdir do |path2|
         [path1, path2].each do |path|
           cmd = "#{path}/brew-foo"
           FileUtils.touch cmd

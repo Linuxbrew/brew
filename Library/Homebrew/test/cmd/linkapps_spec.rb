@@ -1,10 +1,6 @@
 describe "brew linkapps", :integration_test do
-  let(:home_dir) { @home_dir = Pathname.new(Dir.mktmpdir) }
+  let(:home_dir) { mktmpdir }
   let(:apps_dir) { home_dir/"Applications" }
-
-  after(:each) do
-    home_dir.rmtree unless @home_dir.nil?
-  end
 
   it "symlinks applications" do
     apps_dir.mkpath

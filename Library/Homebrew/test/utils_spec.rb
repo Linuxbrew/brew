@@ -1,9 +1,7 @@
 require "utils"
 
 describe "globally-scoped helper methods" do
-  let(:dir) { @dir = Pathname.new(Dir.mktmpdir) }
-
-  after(:each) { dir.rmtree unless @dir.nil? }
+  let(:dir) { mktmpdir }
 
   def esc(code)
     /(\e\[\d+m)*\e\[#{code}m/
@@ -195,8 +193,7 @@ describe "globally-scoped helper methods" do
   end
 
   specify "#gzip" do
-    Dir.mktmpdir do |path|
-      path = Pathname.new(path)
+    mktmpdir do |path|
       somefile = path/"somefile"
       FileUtils.touch somefile
       expect(gzip(somefile)[0].to_s).to eq("#{somefile}.gz")

@@ -2,11 +2,7 @@ require "requirements/gpg2_requirement"
 require "fileutils"
 
 describe GPG2Requirement do
-  let(:dir) { @dir = Pathname.new(Dir.mktmpdir) }
-
-  after(:each) do
-    FileUtils.rm_rf dir unless @dir.nil?
-  end
+  let(:dir) { mktmpdir }
 
   describe "#satisfied?" do
     it "returns true if GPG2 is installed" do

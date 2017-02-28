@@ -54,7 +54,7 @@ describe Homebrew do
   end
 
   specify "::external_commands" do
-    Dir.mktmpdir do |dir|
+    mktmpdir do |dir|
       %w[brew-t1 brew-t2.rb brew-t3.py].each do |file|
         path = "#{dir}/#{file}"
         FileUtils.touch path

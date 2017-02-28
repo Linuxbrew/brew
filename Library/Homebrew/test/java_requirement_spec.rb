@@ -46,7 +46,7 @@ describe JavaRequirement do
     end
 
     context "when #possible_javas contains paths" do
-      let(:path) { Pathname.new(Dir.mktmpdir) }
+      let(:path) { mktmpdir }
       let(:java) { path/"java" }
 
       def setup_java_with_version(version)
@@ -59,10 +59,6 @@ describe JavaRequirement do
 
       before(:each) do
         allow(subject).to receive(:possible_javas).and_return([java])
-      end
-
-      after(:each) do
-        path.rmtree
       end
 
       context "and 1.7 is required" do

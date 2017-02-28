@@ -2,9 +2,7 @@ describe "brew unpack", :integration_test do
   it "unpacks a given Formula's archive" do
     setup_test_formula "testball"
 
-    Dir.mktmpdir do |path|
-      path = Pathname.new(path)
-
+    mktmpdir do |path|
       shutup do
         expect { brew "unpack", "testball", "--destdir=#{path}" }
           .to be_a_success

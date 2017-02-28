@@ -7,9 +7,8 @@ describe Gpg do
     it "creates a test key in the home directory" do
       skip "GPG Unavailable" unless subject.available?
 
-      Dir.mktmpdir do |dir|
+      mktmpdir do |dir|
         ENV["HOME"] = dir
-        dir = Pathname.new(dir)
 
         shutup do
           subject.create_test_key(dir)

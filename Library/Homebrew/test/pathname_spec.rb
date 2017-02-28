@@ -5,12 +5,10 @@ require "install_renamed"
 describe Pathname do
   include FileUtils
 
-  let(:src) { Pathname.new(Dir.mktmpdir) }
-  let(:dst) { Pathname.new(Dir.mktmpdir) }
+  let(:src) { mktmpdir }
+  let(:dst) { mktmpdir }
   let(:file) { src/"foo" }
   let(:dir) { src/"bar" }
-
-  after(:each) { rm_rf [src, dst] }
 
   describe DiskUsageExtension do
     before(:each) do
@@ -294,7 +292,7 @@ describe Pathname do
 end
 
 describe FileUtils do
-  let(:dst) { Pathname.new(Dir.mktmpdir) }
+  let(:dst) { mktmpdir }
 
   describe "#mkdir" do
     it "creates indermediate directories" do

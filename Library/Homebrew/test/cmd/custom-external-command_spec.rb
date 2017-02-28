@@ -1,8 +1,6 @@
 describe "brew custom-external-command", :integration_test do
   it "is supported" do
-    Dir.mktmpdir do |path|
-      path = Pathname.new(path)
-
+    mktmpdir do |path|
       cmd = "custom-external-command-#{rand}"
       file = path/"brew-#{cmd}"
 

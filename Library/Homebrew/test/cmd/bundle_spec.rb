@@ -10,9 +10,9 @@ describe "brew bundle", :integration_test, :needs_test_cmd_taps do
         end
       end
 
-      Dir.mktmpdir do |path|
+      mktmpdir do |path|
         FileUtils.touch "#{path}/Brewfile"
-        Dir.chdir path do
+        path.cd do
           expect { brew "bundle", "check" }
             .to output("The Brewfile's dependencies are satisfied.\n").to_stdout
             .and not_to_output.to_stderr
