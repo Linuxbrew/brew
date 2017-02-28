@@ -3,32 +3,29 @@ require "fileutils"
 
 describe JavaRequirement do
   subject { described_class.new(%w[1.8]) }
-  let(:java_home) { Dir.mktmpdir }
-  let(:java_home_path) { Pathname.new(java_home) }
+  let(:java_home) { mktmpdir }
 
   before(:each) do
-    FileUtils.mkdir java_home_path/"bin"
-    FileUtils.touch java_home_path/"bin/java"
-    allow(subject).to receive(:preferred_java).and_return(java_home_path/"bin/java")
+    FileUtils.mkdir java_home/"bin"
+    FileUtils.touch java_home/"bin/java"
+    allow(subject).to receive(:preferred_java).and_return(java_home/"bin/java")
     expect(subject).to be_satisfied
   end
-
-  after(:each) { java_home_path.rmtree }
 
   specify "Apple Java environment" do
     expect(ENV).to receive(:prepend_path)
     expect(ENV).to receive(:append_to_cflags)
 
     subject.modify_build_environment
-    expect(ENV["JAVA_HOME"]).to eq(java_home)
+    expect(ENV["JAVA_HOME"]).to eq(java_home.to_s)
   end
 
   specify "Oracle Java environment" do
-    FileUtils.mkdir java_home_path/"include"
+    FileUtils.mkdir java_home/"include"
     expect(ENV).to receive(:prepend_path)
     expect(ENV).to receive(:append_to_cflags).twice
 
     subject.modify_build_environment
-    expect(ENV["JAVA_HOME"]).to eq(java_home)
+    expect(ENV["JAVA_HOME"]).to eq(java_home.to_s)
   end
 end

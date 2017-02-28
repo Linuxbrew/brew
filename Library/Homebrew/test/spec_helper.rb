@@ -17,6 +17,7 @@ require "tap"
 require "test/support/helper/shutup"
 require "test/support/helper/fixtures"
 require "test/support/helper/formula"
+require "test/support/helper/mktmpdir"
 require "test/support/helper/spec/shared_context/integration_test"
 
 TEST_DIRECTORIES = [
@@ -35,6 +36,7 @@ RSpec.configure do |config|
   config.include(Test::Helper::Shutup)
   config.include(Test::Helper::Fixtures)
   config.include(Test::Helper::Formula)
+  config.include(Test::Helper::MkTmpDir)
 
   config.before(:each, :needs_compat) do
     skip "Requires compatibility layer." if ENV["HOMEBREW_NO_COMPAT"]

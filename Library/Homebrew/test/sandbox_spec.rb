@@ -3,15 +3,11 @@ require "sandbox"
 RSpec::Matchers.define_negated_matcher :not_matching, :matching
 
 describe Sandbox do
-  let(:dir) { @dir = Pathname.new(Dir.mktmpdir) }
+  let(:dir) { mktmpdir }
   let(:file) { dir/"foo" }
 
   before(:each) do
     skip "Sandbox not implemented." unless described_class.available?
-  end
-
-  after(:each) do
-    dir.rmtree unless @dir.nil?
   end
 
   specify "#formula?" do

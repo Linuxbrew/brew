@@ -6,11 +6,7 @@ RSpec::Matchers.alias_matcher :have_end, :be_end
 RSpec::Matchers.alias_matcher :have_trailing_newline, :be_trailing_newline
 
 describe FormulaText do
-  let(:dir) { @dir = Pathname.new(Dir.mktmpdir) }
-
-  after(:each) do
-    dir.rmtree unless @dir.nil?
-  end
+  let(:dir) { mktmpdir }
 
   def formula_text(name, body = nil, options = {})
     path = dir/"#{name}.rb"
@@ -70,11 +66,7 @@ describe FormulaAuditor do
     described_class.new(Formulary.factory(path), options)
   end
 
-  let(:dir) { @dir = Pathname.new(Dir.mktmpdir) }
-
-  after(:each) do
-    dir.rmtree unless @dir.nil?
-  end
+  let(:dir) { mktmpdir }
 
   describe "#problems" do
     it "is empty by default" do

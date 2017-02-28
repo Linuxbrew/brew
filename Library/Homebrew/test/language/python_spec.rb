@@ -4,13 +4,11 @@ require "resource"
 describe Language::Python::Virtualenv::Virtualenv do
   subject { described_class.new(formula, dir, "python") }
 
-  let(:dir) { @dir = Pathname.new(Dir.mktmpdir) }
+  let(:dir) { mktmpdir }
 
   let(:resource) { double("resource", stage: true) }
   let(:formula_bin) { dir/"formula_bin" }
   let(:formula) { double("formula", resource: resource, bin: formula_bin) }
-
-  after(:each) { dir.rmtree unless @dir.nil? }
 
   describe "#create" do
     it "creates a virtual environment" do
