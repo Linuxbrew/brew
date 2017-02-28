@@ -36,6 +36,10 @@ RSpec.configure do |config|
   config.include(Test::Helper::Fixtures)
   config.include(Test::Helper::Formula)
 
+  config.before(:each, :needs_compat) do
+    skip "Requires compatibility layer." if ENV["HOMEBREW_NO_COMPAT"]
+  end
+
   config.before(:each, :needs_official_cmd_taps) do
     skip "Needs official command Taps." unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
   end
