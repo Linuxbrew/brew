@@ -31,22 +31,23 @@ TEST_DIRECTORIES = [
 
 RSpec.configure do |config|
   config.order = :random
+
   config.include(Test::Helper::Shutup)
   config.include(Test::Helper::Fixtures)
   config.include(Test::Helper::Formula)
-  config.before(:each) do |example|
-    if example.metadata[:needs_macos]
-      skip "Not on macOS." unless OS.mac?
-    end
 
-    if example.metadata[:needs_official_cmd_taps]
-      skip "Needs official command Taps." unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
-    end
-
-    if example.metadata[:needs_python]
-      skip "Python not installed." unless which("python")
-    end
+  config.before(:each, :needs_official_cmd_taps) do
+    skip "Needs official command Taps." unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
   end
+
+  config.before(:each, :needs_macos) do
+    skip "Not on macOS." unless OS.mac?
+  end
+
+  config.before(:each, :needs_python) do
+    skip "Python not installed." unless which("python")
+  end
+
   config.around(:each) do |example|
     begin
       TEST_DIRECTORIES.each(&:mkpath)
