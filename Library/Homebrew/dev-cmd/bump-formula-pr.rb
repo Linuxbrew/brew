@@ -174,6 +174,7 @@ module Homebrew
       rsrc.download_strategy = CurlDownloadStrategy
       rsrc.owner = Resource.new(formula.name)
       rsrc.version = forced_version if forced_version
+      odie "No version specified!" unless rsrc.version
       rsrc_path = rsrc.fetch
       if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ %r{/.*\.}
         new_hash = rsrc_path.sha256
