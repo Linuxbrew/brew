@@ -340,7 +340,11 @@ if __FILE__ == $PROGRAM_NAME
   log(basename, ARGV, tool, args)
 
   superbin = Pathname.new(__FILE__).dirname.realpath
-  ENV["PATH"] = ENV["PATH"].split(":").reject { |x| Pathname.new(x).realpath == superbin }.join(":")
+  paths = ENV["PATH"].split(":").reject do |x|
+    path = Pathname.new(x)
+    path.directory? && path.realpath == superbin
+  end
+  ENV["PATH"] = paths.join(":")
   args << { :close_others => false }
   exec tool, *args
 end
