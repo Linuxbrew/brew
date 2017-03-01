@@ -344,10 +344,6 @@ describe FormulaAuditor do
         end
       EOS
 
-      fa.audit_desc
-      expect(fa.problems.shift)
-        .to eq("Description shouldn't include the formula name")
-
       fa.audit_line 'ohai "#{share}/foolibc++"', 3
       expect(fa.problems.shift)
         .to eq("Use \#{pkgshare} instead of \#{share}/foolibc++")
@@ -411,32 +407,6 @@ describe FormulaAuditor do
     fa.audit_caveats
     expect(fa.problems)
       .to eq(["Don't recommend setuid in the caveats, suggest sudo instead."])
-  end
-
-  specify "#audit_desc" do
-    formula_descriptions = [
-      { name: "foo", desc: nil,
-        problem: "Formula should have a desc" },
-      { name: "bar", desc: "bar" * 30,
-        problem: "Description is too long" },
-      { name: "baz", desc: "Baz commandline tool",
-        problem: "Description should use \"command-line\"" },
-      { name: "qux", desc: "A tool called Qux",
-        problem: "Description shouldn't start with an indefinite article" },
-    ]
-
-    formula_descriptions.each do |formula|
-      content = <<-EOS.undent
-        class #{Formulary.class_s(formula[:name])} < Formula
-          url "http://example.com/#{formula[:name]}-1.0.tgz"
-          desc "#{formula[:desc]}"
-        end
-      EOS
-
-      fa = formula_auditor formula[:name], content, strict: true
-      fa.audit_desc
-      expect(fa.problems.first).to match(formula[:problem])
-    end
   end
 
   describe "#audit_homepage" do

@@ -569,39 +569,6 @@ class FormulaAuditor
     problem "New formulae should not use `deprecated_option`."
   end
 
-  def audit_desc
-    # For now, only check the description when using `--strict`
-    return unless @strict
-
-    desc = formula.desc
-
-    unless desc && !desc.empty?
-      problem "Formula should have a desc (Description)."
-      return
-    end
-
-    # Make sure the formula name plus description is no longer than 80 characters
-    # Note full_name includes the name of the tap, while name does not
-    linelength = "#{formula.name}: #{desc}".length
-    if linelength > 80
-      problem <<-EOS.undent
-        Description is too long. \"name: desc\" should be less than 80 characters.
-        Length is calculated as #{formula.name} + desc. (currently #{linelength})
-      EOS
-    end
-
-    if desc =~ /([Cc]ommand ?line)/
-      problem "Description should use \"command-line\" instead of \"#{$1}\""
-    end
-
-    if desc =~ /^([Aa]n?)\s/
-      problem "Description shouldn't start with an indefinite article (#{$1})"
-    end
-
-    return unless desc.downcase.start_with? "#{formula.name} "
-    problem "Description shouldn't include the formula name"
-  end
-
   def audit_homepage
     homepage = formula.homepage
 
@@ -1254,7 +1221,6 @@ class FormulaAuditor
     audit_class
     audit_specs
     audit_revision_and_version_scheme
-    audit_desc
     audit_homepage
     audit_bottle_spec
     audit_github_repository
