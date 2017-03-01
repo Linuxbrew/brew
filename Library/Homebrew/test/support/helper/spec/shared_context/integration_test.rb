@@ -1,4 +1,3 @@
-require "rspec"
 require "open3"
 
 RSpec::Matchers.define_negated_matcher :not_to_output, :output
