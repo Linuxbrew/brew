@@ -14,7 +14,7 @@ class JavaRequirement < Requirement
     javas << java_home_cmd
     javas << which("java")
     javas.delete(Pathname.new("/usr/bin/java")) # /usr/bin/java is a stub on macOS
-    javas
+    javas.compact
   end
 
   def java_home_cmd
