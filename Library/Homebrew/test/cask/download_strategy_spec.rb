@@ -60,7 +60,7 @@ describe "download strategies", :cask do
           downloader.fetch
         end
 
-        expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) http://caskroom.io"])
+        expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) http://caskroom.github.io"])
       end
     end
 
