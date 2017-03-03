@@ -755,6 +755,9 @@ class FormulaAuditor
       if version.to_s !~ /\d/
         problem "#{name}: version (#{version}) is set to a string without a digit"
       end
+      if version.to_s.start_with?("HEAD")
+        problem "#{name}: non-HEAD version name (#{version}) should not begin with HEAD"
+      end
     end
 
     if formula.stable && formula.devel
