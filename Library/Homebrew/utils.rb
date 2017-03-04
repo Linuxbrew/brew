@@ -196,7 +196,7 @@ module Homebrew
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
     path = ENV["PATH"].split(File::PATH_SEPARATOR)
     path.unshift(RUBY_BIN) if which("ruby") != RUBY_PATH
-    path.unshift("#{Gem.dir}/bin")
+    path.unshift(Gem.bindir)
     ENV["PATH"] = path.join(File::PATH_SEPARATOR)
 
     if Gem::Specification.find_all_by_name(name, version).empty?
