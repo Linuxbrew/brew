@@ -1,4 +1,3 @@
-require "pathname"
 require "rspec/its"
 require "rspec/wait"
 
@@ -22,21 +21,16 @@ Pathname.glob(HOMEBREW_LIBRARY_PATH.join("cask", "spec", "support", "**", "*.rb"
 require "hbc"
 
 # create and override default directories
-Hbc.appdir = Pathname.new(TEST_TMPDIR).join("Applications").tap(&:mkpath)
-Hbc.cache.mkpath
-Hbc.caskroom = Hbc.default_caskroom.tap(&:mkpath)
 Hbc.default_tap = Tap.fetch("caskroom", "spec").tap do |tap|
   # link test casks
   FileUtils.mkdir_p tap.path.dirname
   FileUtils.ln_s TEST_FIXTURE_DIR.join("cask"), tap.path
 end
 
-# pretend that the caskroom/cask Tap is installed
-FileUtils.ln_s Pathname.new(ENV["HOMEBREW_LIBRARY"]).join("Taps", "caskroom", "homebrew-cask"), Tap.fetch("caskroom", "cask").path
-
 HOMEBREW_CASK_DIRS = [
   :appdir,
   :caskroom,
+  :cache,
   :prefpanedir,
   :qlplugindir,
   :servicedir,
