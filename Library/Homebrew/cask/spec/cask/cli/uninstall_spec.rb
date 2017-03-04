@@ -9,13 +9,13 @@ describe Hbc::CLI::Uninstall do
 
   it "shows an error when a Cask is provided that's not installed" do
     expect {
-      Hbc::CLI::Uninstall.run("anvil")
+      Hbc::CLI::Uninstall.run("local-caffeine")
     }.to raise_error(Hbc::CaskNotInstalledError)
   end
 
   it "tries anyway on a non-present Cask when --force is given" do
     expect {
-      Hbc::CLI::Uninstall.run("anvil", "--force")
+      Hbc::CLI::Uninstall.run("local-caffeine", "--force")
     }.not_to raise_error
   end
 

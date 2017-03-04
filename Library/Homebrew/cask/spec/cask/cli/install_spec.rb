@@ -64,21 +64,21 @@ describe Hbc::CLI::Install do
   it "returns a suggestion for a misspelled Cask" do
     expect {
       begin
-        Hbc::CLI::Install.run("googlechrome")
+        Hbc::CLI::Install.run("localcaffeine")
       rescue Hbc::CaskError
         nil
       end
-    }.to output(/No available Cask for googlechrome\. Did you mean:\ngoogle-chrome/).to_stderr
+    }.to output(/No available Cask for localcaffeine\. Did you mean:\nlocal-caffeine/).to_stderr
   end
 
   it "returns multiple suggestions for a Cask fragment" do
     expect {
       begin
-        Hbc::CLI::Install.run("google")
+        Hbc::CLI::Install.run("local-caf")
       rescue Hbc::CaskError
         nil
       end
-    }.to output(/No available Cask for google\. Did you mean one of:\ngoogle/).to_stderr
+    }.to output(/No available Cask for local-caf\. Did you mean one of:\nlocal-caffeine/).to_stderr
   end
 
   describe "when no Cask is specified" do

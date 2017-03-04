@@ -3,11 +3,11 @@ require "spec_helper"
 describe Hbc::CLI::Search do
   it "lists the available Casks that match the search term" do
     expect {
-      Hbc::CLI::Search.run("photoshop")
+      Hbc::CLI::Search.run("local")
     }.to output(<<-EOS.undent).to_stdout
       ==> Partial matches
-      adobe-photoshop-cc
-      adobe-photoshop-lightroom
+      local-caffeine
+      local-transmission
     EOS
   end
 
@@ -20,37 +20,37 @@ describe Hbc::CLI::Search do
   it "lists all available Casks with no search term" do
     expect {
       Hbc::CLI::Search.run
-    }.to output(/google-chrome/).to_stdout
+    }.to output(/local-caffeine/).to_stdout
   end
 
   it "ignores hyphens in search terms" do
     expect {
-      Hbc::CLI::Search.run("goo-gle-chrome")
-    }.to output(/google-chrome/).to_stdout
+      Hbc::CLI::Search.run("lo-cal-caffeine")
+    }.to output(/local-caffeine/).to_stdout
   end
 
   it "ignores hyphens in Cask tokens" do
     expect {
-      Hbc::CLI::Search.run("googlechrome")
-    }.to output(/google-chrome/).to_stdout
+      Hbc::CLI::Search.run("localcaffeine")
+    }.to output(/local-caffeine/).to_stdout
   end
 
   it "accepts multiple arguments" do
     expect {
-      Hbc::CLI::Search.run("google chrome")
-    }.to output(/google-chrome/).to_stdout
+      Hbc::CLI::Search.run("local caffeine")
+    }.to output(/local-caffeine/).to_stdout
   end
 
   it "accepts a regexp argument" do
     expect {
-      Hbc::CLI::Search.run("/^google-c[a-z]rome$/")
-    }.to output("==> Regexp matches\ngoogle-chrome\n").to_stdout
+      Hbc::CLI::Search.run("/^local-c[a-z]ffeine$/")
+    }.to output("==> Regexp matches\nlocal-caffeine\n").to_stdout
   end
 
   it "Returns both exact and partial matches" do
     expect {
-      Hbc::CLI::Search.run("mnemosyne")
-    }.to output(/^==> Exact match\nmnemosyne\n==> Partial matches\nsubclassed-mnemosyne/).to_stdout
+      Hbc::CLI::Search.run("test-opera")
+    }.to output(/^==> Exact match\ntest-opera\n==> Partial matches\ntest-opera-mail/).to_stdout
   end
 
   it "does not search the Tap name" do

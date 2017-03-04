@@ -22,33 +22,33 @@ describe Hbc::Cask do
   end
 
   describe "load" do
-    let(:hbc_relative_tap_path) { "../../Taps/caskroom/homebrew-cask" }
+    let(:tap_path) { Hbc.default_tap.path }
+    let(:file_dirname) { Pathname.new(__FILE__).dirname }
+    let(:relative_tap_path) { tap_path.relative_path_from(file_dirname) }
 
     it "returns an instance of the Cask for the given token" do
-      c = Hbc.load("adium")
+      c = Hbc.load("local-caffeine")
       expect(c).to be_kind_of(Hbc::Cask)
-      expect(c.token).to eq("adium")
+      expect(c.token).to eq("local-caffeine")
     end
 
     it "returns an instance of the Cask from a specific file location" do
-      location = File.expand_path(hbc_relative_tap_path + "/Casks/dia.rb")
-      c = Hbc.load(location)
+      c = Hbc.load("#{tap_path}/Casks/local-caffeine.rb")
       expect(c).to be_kind_of(Hbc::Cask)
-      expect(c.token).to eq("dia")
+      expect(c.token).to eq("local-caffeine")
     end
 
     it "returns an instance of the Cask from a url" do
-      url = "file://" + File.expand_path(hbc_relative_tap_path + "/Casks/dia.rb")
       c = shutup do
-        Hbc.load(url)
+        Hbc.load("file://#{tap_path}/Casks/local-caffeine.rb")
       end
       expect(c).to be_kind_of(Hbc::Cask)
-      expect(c.token).to eq("dia")
+      expect(c.token).to eq("local-caffeine")
     end
 
     it "raises an error when failing to download a Cask from a url" do
       expect {
-        url = "file://" + File.expand_path(hbc_relative_tap_path + "/Casks/notacask.rb")
+        url = "file://#{tap_path}/Casks/notacask.rb"
         shutup do
           Hbc.load(url)
         end
@@ -56,9 +56,9 @@ describe Hbc::Cask do
     end
 
     it "returns an instance of the Cask from a relative file location" do
-      c = Hbc.load(hbc_relative_tap_path + "/Casks/bbedit.rb")
+      c = Hbc.load(relative_tap_path/"Casks/local-caffeine.rb")
       expect(c).to be_kind_of(Hbc::Cask)
-      expect(c.token).to eq("bbedit")
+      expect(c.token).to eq("local-caffeine")
     end
 
     it "uses exact match when loading by token" do
@@ -83,7 +83,7 @@ describe Hbc::Cask do
 
   describe "metadata" do
     it "proposes a versioned metadata directory name for each instance" do
-      cask_token = "adium"
+      cask_token = "local-caffeine"
       c = Hbc.load(cask_token)
       metadata_path = Hbc.caskroom.join(cask_token, ".metadata", c.version)
       expect(c.metadata_versioned_container_path.to_s).to eq(metadata_path.to_s)
