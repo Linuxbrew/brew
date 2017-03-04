@@ -54,7 +54,7 @@ module MachOShim
   def dynamically_linked_libraries(except: :none)
     lcs = macho.dylib_load_commands.reject { |lc| lc.type == except }
 
-    lcs.map(&:name).map(&:to_s)
+    lcs.map(&:name).map(&:to_s).uniq
   end
 
   def dylib_id
