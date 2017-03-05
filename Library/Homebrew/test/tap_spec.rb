@@ -4,7 +4,7 @@ RSpec::Matchers.alias_matcher :have_custom_remote, :be_custom_remote
 describe Tap do
   include FileUtils
 
-  subject { Tap.new("Homebrew", "foo") }
+  subject { described_class.new("Homebrew", "foo") }
   let(:path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-foo" }
   let(:formula_file) { path/"Formula/foo.rb" }
   let(:alias_file) { path/"Aliases/bar" }
@@ -84,7 +84,7 @@ describe Tap do
     end
   end
 
-  specify "#names" do
+  specify "::names" do
     expect(described_class.names.sort).to eq(["homebrew/core", "homebrew/foo"])
   end
 
