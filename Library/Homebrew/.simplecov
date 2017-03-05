@@ -11,8 +11,6 @@ SimpleCov.start do
   # tests to be dropped. This causes random fluctuations in test coverage.
   merge_timeout 86400
 
-  add_filter "/Homebrew/cask/spec/"
-  add_filter "/Homebrew/cask/test/"
   add_filter "/Homebrew/compat/"
   add_filter "/Homebrew/dev-cmd/tests.rb"
   add_filter "/Homebrew/test/"

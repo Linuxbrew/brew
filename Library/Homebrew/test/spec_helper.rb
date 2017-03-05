@@ -1,4 +1,5 @@
 require "find"
+require "parallel_tests"
 require "pathname"
 require "rspec/its"
 require "rspec/wait"
@@ -6,6 +7,20 @@ require "set"
 
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
+
+  if ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
+    require "codecov"
+
+    if ParallelTests.last_process?
+      at_exit do
+        ParallelTests.wait_for_other_processes_to_finish
+
+        puts "Sending coverage report to CodeCov …"
+        formatter = SimpleCov::Formatter::Codecov.new
+        formatter.format SimpleCov::ResultMerger.merged_result
+      end
+    end
+  end
 end
 
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew"))
