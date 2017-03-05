@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::DSL do
+describe Hbc::DSL, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/#{token}.rb") }
   let(:token) { "basic-cask" }
 
@@ -76,7 +74,7 @@ describe Hbc::DSL do
       end
     end
 
-    context "when it contains a deprecated DSL version" do
+    context "when it contains a deprecated DSL version", :needs_compat do
       let(:token) { "with-dsl-version" }
 
       it "may use deprecated DSL version hash syntax" do

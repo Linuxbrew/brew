@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Uninstall do
+describe Hbc::CLI::Uninstall, :cask do
   it "shows an error when a bad Cask is provided" do
     expect {
       Hbc::CLI::Uninstall.run("notacask")

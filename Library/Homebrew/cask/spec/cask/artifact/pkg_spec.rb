@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Artifact::Pkg do
+describe Hbc::Artifact::Pkg, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb") }
   let(:fake_system_command) { class_double(Hbc::SystemCommand) }
 

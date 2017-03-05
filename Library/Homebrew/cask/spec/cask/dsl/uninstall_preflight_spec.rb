@@ -1,8 +1,7 @@
-require "spec_helper"
 require "test/support/helper/spec/shared_examples/hbc_dsl_base"
 require "test/support/helper/spec/shared_examples/hbc_staged"
 
-describe Hbc::DSL::UninstallPreflight do
+describe Hbc::DSL::UninstallPreflight, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/basic-cask.rb") }
   let(:dsl) { Hbc::DSL::UninstallPreflight.new(cask, Hbc::FakeSystemCommand) }
 

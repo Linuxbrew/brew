@@ -1,4 +1,4 @@
-describe Hbc::Verify do
+describe Hbc::Verify, :cask do
   let(:cask) { double("cask") }
 
   let(:verification_classes) {

@@ -1,4 +1,4 @@
-describe Hbc::Audit do
+describe Hbc::Audit, :cask do
   def include_msg?(messages, msg)
     if msg.is_a?(Regexp)
       Array(messages).any? { |m| m =~ msg }

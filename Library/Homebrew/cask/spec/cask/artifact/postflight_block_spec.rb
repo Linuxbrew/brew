@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Artifact::PostflightBlock do
+describe Hbc::Artifact::PostflightBlock, :cask do
   describe "install_phase" do
     it "calls the specified block after installing, passing a Cask mini-dsl" do
       called = false

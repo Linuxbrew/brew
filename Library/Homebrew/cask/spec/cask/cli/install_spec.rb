@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Install do
+describe Hbc::CLI::Install, :cask do
   it "allows staging and activation of multiple Casks at once" do
     shutup do
       Hbc::CLI::Install.run("local-transmission", "local-caffeine")

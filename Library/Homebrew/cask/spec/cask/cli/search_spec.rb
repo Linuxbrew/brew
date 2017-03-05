@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Search do
+describe Hbc::CLI::Search, :cask do
   it "lists the available Casks that match the search term" do
     expect {
       Hbc::CLI::Search.run("local")

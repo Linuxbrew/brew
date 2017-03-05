@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Info do
+describe Hbc::CLI::Info, :cask do
   it "displays some nice info about the specified Cask" do
     expect {
       Hbc::CLI::Info.run("local-caffeine")

@@ -1,4 +1,4 @@
-describe Hbc::Cask do
+describe Hbc::Cask, :cask do
   let(:cask) { described_class.new("versioned-cask") }
 
   context "when multiple versions are installed" do

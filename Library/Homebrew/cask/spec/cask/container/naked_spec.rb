@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Container::Naked do
+describe Hbc::Container::Naked, :cask do
   it "saves files with spaces in them from uris with encoded spaces" do
     cask = Hbc::Cask.new("spacey") do
       url "http://example.com/kevin%20spacey.pkg"

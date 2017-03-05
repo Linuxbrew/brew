@@ -1,7 +1,5 @@
-require "spec_helper"
-
 # TODO: test that zap removes an alternate version of the same Cask
-describe Hbc::Artifact::Zap do
+describe Hbc::Artifact::Zap, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb") }
 
   let(:zap_artifact) {

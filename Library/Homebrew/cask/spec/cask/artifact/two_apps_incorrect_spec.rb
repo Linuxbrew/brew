@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Artifact::App do
+describe Hbc::Artifact::App, :cask do
   # FIXME: Doesn't actually raise because the `app` stanza is not evaluated on load.
   # it "must raise" do
   #   lambda {

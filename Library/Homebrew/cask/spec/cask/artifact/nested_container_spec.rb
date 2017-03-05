@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Artifact::NestedContainer do
+describe Hbc::Artifact::NestedContainer, :cask do
   describe "install" do
     it "extracts the specified paths as containers" do
       cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/nested-app.rb").tap do |c|

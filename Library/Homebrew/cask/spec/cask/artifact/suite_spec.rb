@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Artifact::Suite do
+describe Hbc::Artifact::Suite, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-suite.rb") }
 
   let(:install_phase) { -> { Hbc::Artifact::Suite.new(cask).install_phase } }

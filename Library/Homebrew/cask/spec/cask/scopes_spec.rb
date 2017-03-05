@@ -1,4 +1,4 @@
-describe Hbc::Scopes do
+describe Hbc::Scopes, :cask do
   describe "installed" do
     it "returns a list installed Casks by loading Casks for all the dirs that exist in the caskroom" do
       allow(Hbc).to receive(:load) { |token| "loaded-#{token}" }

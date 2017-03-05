@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Fetch do
+describe Hbc::CLI::Fetch, :cask do
   let(:local_transmission) {
     Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
   }

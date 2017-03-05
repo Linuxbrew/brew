@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Reinstall do
+describe Hbc::CLI::Reinstall, :cask do
   it "allows reinstalling a Cask" do
     shutup do
       Hbc::CLI::Install.run("local-transmission")

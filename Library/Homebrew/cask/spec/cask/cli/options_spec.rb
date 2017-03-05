@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI do
+describe Hbc::CLI, :cask do
   it "supports setting the appdir" do
     Hbc::CLI.process_options %w[help --appdir=/some/path/foo]
 

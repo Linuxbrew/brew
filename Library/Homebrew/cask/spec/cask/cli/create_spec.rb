@@ -1,5 +1,3 @@
-require "spec_helper"
-
 # monkeypatch for testing
 module Hbc
   class CLI
@@ -19,7 +17,7 @@ module Hbc
   end
 end
 
-describe Hbc::CLI::Create do
+describe Hbc::CLI::Create, :cask do
   before(:each) do
     Hbc::CLI::Create.reset!
   end
