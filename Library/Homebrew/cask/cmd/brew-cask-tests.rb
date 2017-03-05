@@ -26,18 +26,6 @@ cask_root.cd do
     upload_coverage = ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
   end
 
-  run_tests "parallel_rspec", Dir["spec/**/*_spec.rb"], %w[
-    --color
-    --require spec_helper
-    --format progress
-    --format ParallelTests::RSpec::RuntimeLogger
-    --out tmp/parallel_runtime_rspec.log
-  ]
-
-  unless $CHILD_STATUS.success?
-    Homebrew.failed = true
-  end
-
   if upload_coverage
     puts "Submitting Codecov coverage..."
     system "bundle", "exec", "spec/upload_coverage.rb"

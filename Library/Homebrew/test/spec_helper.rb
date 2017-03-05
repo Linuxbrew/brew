@@ -18,6 +18,8 @@ require "test/support/helper/shutup"
 require "test/support/helper/fixtures"
 require "test/support/helper/formula"
 require "test/support/helper/mktmpdir"
+
+require "test/support/helper/spec/shared_context/homebrew_cask" if OS.mac?
 require "test/support/helper/spec/shared_context/integration_test"
 
 TEST_DIRECTORIES = [
