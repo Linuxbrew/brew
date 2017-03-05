@@ -4,9 +4,11 @@ require "test/spec_helper"
 # add Homebrew-Cask to load path
 $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
 
-Pathname.glob(HOMEBREW_LIBRARY_PATH.join("cask", "spec", "support", "**", "*.rb")).each(&method(:require))
-
 require "hbc"
+
+require "test/support/helper/cask/fake_system_command"
+require "test/support/helper/cask/install_helper"
+require "test/support/helper/cask/never_sudo_system_command"
 
 HOMEBREW_CASK_DIRS = [
   :appdir,
