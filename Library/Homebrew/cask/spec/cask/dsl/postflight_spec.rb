@@ -1,4 +1,6 @@
 require "spec_helper"
+require "test/support/helper/spec/shared_examples/hbc_dsl_base"
+require "test/support/helper/spec/shared_examples/hbc_staged"
 
 describe Hbc::DSL::Postflight do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/basic-cask.rb") }

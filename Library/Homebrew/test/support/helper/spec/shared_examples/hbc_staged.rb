@@ -1,21 +1,17 @@
-require "spec_helper"
-
 require "hbc/staged"
 
 shared_examples Hbc::Staged do
-  let(:fake_pathname_exists) {
-    fake_pathname = Pathname.new("/path/to/file/that/exists")
-    allow(fake_pathname).to receive(:exist?).and_return(true)
-    allow(fake_pathname).to receive(:expand_path).and_return(fake_pathname)
-    fake_pathname
-  }
+  let(:existing_path) { Pathname.new("/path/to/file/that/exists") }
+  let(:non_existent_path) { Pathname.new("/path/to/file/that/does/not/exist") }
 
-  let(:fake_pathname_does_not_exist) {
-    fake_pathname = Pathname.new("/path/to/file/that/does/not/exist")
-    allow(fake_pathname).to receive(:exist?).and_return(false)
-    allow(fake_pathname).to receive(:expand_path).and_return(fake_pathname)
-    fake_pathname
-  }
+  before(:each) do
+    allow(existing_path).to receive(:exist?).and_return(true)
+    allow(existing_path).to receive(:expand_path)
+      .and_return(existing_path)
+    allow(non_existent_path).to receive(:exist?).and_return(false)
+    allow(non_existent_path).to receive(:expand_path)
+      .and_return(non_existent_path)
+  end
 
   it "can run system commands with list-form arguments" do
     Hbc::FakeSystemCommand.expects_command(
@@ -56,7 +52,7 @@ shared_examples Hbc::Staged do
   end
 
   it "can set the permissions of a file" do
-    fake_pathname = fake_pathname_exists
+    fake_pathname = existing_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
@@ -69,7 +65,7 @@ shared_examples Hbc::Staged do
   end
 
   it "can set the permissions of multiple files" do
-    fake_pathname = fake_pathname_exists
+    fake_pathname = existing_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
@@ -82,13 +78,13 @@ shared_examples Hbc::Staged do
   end
 
   it "cannot set the permissions of a file that does not exist" do
-    fake_pathname = fake_pathname_does_not_exist
+    fake_pathname = non_existent_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
     staged.set_permissions(fake_pathname.to_s, "777")
   end
 
   it "can set the ownership of a file" do
-    fake_pathname = fake_pathname_exists
+    fake_pathname = existing_path
 
     allow(staged).to receive(:current_user).and_return("fake_user")
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
@@ -103,7 +99,7 @@ shared_examples Hbc::Staged do
   end
 
   it "can set the ownership of multiple files" do
-    fake_pathname = fake_pathname_exists
+    fake_pathname = existing_path
 
     allow(staged).to receive(:current_user).and_return("fake_user")
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
@@ -118,7 +114,7 @@ shared_examples Hbc::Staged do
   end
 
   it "can set the ownership of a file with a different user and group" do
-    fake_pathname = fake_pathname_exists
+    fake_pathname = existing_path
 
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
@@ -133,7 +129,7 @@ shared_examples Hbc::Staged do
 
   it "cannot set the ownership of a file that does not exist" do
     allow(staged).to receive(:current_user).and_return("fake_user")
-    fake_pathname = fake_pathname_does_not_exist
+    fake_pathname = non_existent_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     shutup do
