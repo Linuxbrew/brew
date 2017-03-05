@@ -7,19 +7,32 @@ describe Hbc::Artifact::Uninstall do
     Hbc::Artifact::Uninstall.new(cask, command: Hbc::FakeSystemCommand)
   }
 
-  let(:absolute_path) { Pathname.new("#{TEST_TMPDIR}/absolute_path") }
-  let(:path_with_tilde) { Pathname.new("#{TEST_TMPDIR}/path_with_tilde") }
-  let(:glob_path1) { Pathname.new("#{TEST_TMPDIR}/glob_path1") }
-  let(:glob_path2) { Pathname.new("#{TEST_TMPDIR}/glob_path2") }
+  let(:dir) { TEST_TMPDIR }
+  let(:absolute_path) { Pathname.new("#{dir}/absolute_path") }
+  let(:path_with_tilde) { Pathname.new("#{dir}/path_with_tilde") }
+  let(:glob_path1) { Pathname.new("#{dir}/glob_path1") }
+  let(:glob_path2) { Pathname.new("#{dir}/glob_path2") }
 
-  before(:each) do
-    FileUtils.touch(absolute_path)
-    FileUtils.touch(path_with_tilde)
-    FileUtils.touch(glob_path1)
-    FileUtils.touch(glob_path2)
-    ENV["HOME"] = TEST_TMPDIR
-    shutup do
-      InstallHelper.install_without_artifacts(cask)
+  around(:each) do |example|
+    begin
+      ENV["HOME"] = dir
+
+      paths = [
+        absolute_path,
+        path_with_tilde,
+        glob_path1,
+        glob_path2,
+      ]
+
+      FileUtils.touch paths
+
+      shutup do
+        InstallHelper.install_without_artifacts(cask)
+      end
+
+      example.run
+    ensure
+      FileUtils.rm_f paths
     end
   end
 
