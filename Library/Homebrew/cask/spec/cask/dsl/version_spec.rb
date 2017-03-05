@@ -1,7 +1,12 @@
 describe Hbc::DSL::Version do
-  include ExpectationsHashHelper
-
-  let(:version) { described_class.new(raw_version) }
+  shared_examples "expectations hash" do |input_name, expectations|
+    expectations.each do |input_value, expected_output|
+      context "when #{input_name} is #{input_value.inspect}" do
+        let(input_name.to_sym) { input_value }
+        it { is_expected.to eq expected_output }
+      end
+    end
+  end
 
   shared_examples "version equality" do
     let(:raw_version) { "1.2.3" }
@@ -35,6 +40,8 @@ describe Hbc::DSL::Version do
       end
     end
   end
+
+  let(:version) { described_class.new(raw_version) }
 
   describe "#==" do
     subject { version == other }
