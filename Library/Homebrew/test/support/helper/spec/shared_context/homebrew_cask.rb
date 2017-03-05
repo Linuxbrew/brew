@@ -1,7 +1,3 @@
-$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_REPOSITORY"]}/Library/Homebrew"))
-require "test/spec_helper"
-
-# add Homebrew-Cask to load path
 $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
 
 require "hbc"
@@ -20,18 +16,17 @@ HOMEBREW_CASK_DIRS = [
   :binarydir,
 ].freeze
 
-RSpec.configure do |config|
-  config.around(:each) do |example|
+RSpec.shared_context "Homebrew-Cask" do
+  around(:each) do |example|
     begin
-      dirs = HOMEBREW_CASK_DIRS.map { |dir|
-        Pathname.new(TEST_TMPDIR).join("cask-#{dir}").tap { |path|
+      dirs = HOMEBREW_CASK_DIRS.map do |dir|
+        Pathname.new(TEST_TMPDIR).join("cask-#{dir}").tap do |path|
           path.mkpath
           Hbc.public_send("#{dir}=", path)
-        }
-      }
+        end
+      end
 
       Hbc.default_tap = Tap.fetch("caskroom", "spec").tap do |tap|
-        # link test casks
         FileUtils.mkdir_p tap.path.dirname
         FileUtils.ln_sf TEST_FIXTURE_DIR.join("cask"), tap.path
       end
@@ -39,6 +34,12 @@ RSpec.configure do |config|
       example.run
     ensure
       FileUtils.rm_rf dirs
+      Hbc.default_tap.path.unlink
+      FileUtils.rm_rf Hbc.default_tap.path.parent
     end
   end
+end
+
+RSpec.configure do |config|
+  config.include_context "Homebrew-Cask", :cask
 end

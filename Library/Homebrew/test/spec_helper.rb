@@ -6,6 +6,11 @@ require "set"
 
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
+
+  if ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
+    require "codecov"
+    SimpleCov.formatter = SimpleCov::Formatter::Codecov
+  end
 end
 
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew"))
@@ -18,6 +23,8 @@ require "test/support/helper/shutup"
 require "test/support/helper/fixtures"
 require "test/support/helper/formula"
 require "test/support/helper/mktmpdir"
+
+require "test/support/helper/spec/shared_context/homebrew_cask" if OS.mac?
 require "test/support/helper/spec/shared_context/integration_test"
 
 TEST_DIRECTORIES = [
