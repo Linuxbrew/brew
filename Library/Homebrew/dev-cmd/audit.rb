@@ -519,14 +519,6 @@ class FormulaAuditor
   end
 
   def audit_conflicts
-    if formula.conflicts.any? && formula.versioned_formula?
-      problem <<-EOS
-        Versioned formulae should not use `conflicts_with`.
-        Use `keg_only :versioned_formula` instead.
-      EOS
-      return
-    end
-
     formula.conflicts.each do |c|
       begin
         Formulary.factory(c.name)
@@ -539,6 +531,13 @@ class FormulaAuditor
         problem "Ambiguous conflicting formula #{c.name.inspect}."
       end
     end
+
+    return unless formula.conflicts.any? && formula.versioned_formula?
+    return if formula.name.start_with? "node@"
+    problem <<-EOS
+      Versioned formulae should not use `conflicts_with`.
+      Use `keg_only :versioned_formula` instead.
+    EOS
   end
 
   def audit_options
