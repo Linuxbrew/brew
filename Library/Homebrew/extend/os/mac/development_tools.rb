@@ -78,8 +78,15 @@ class DevelopmentTools
     end
 
     def curl_handles_most_https_homepages?
-      # The system Curl is too old for some modern HTTPS homepages on Yosemite.
+      # The system Curl is too old for some modern HTTPS homepages on
+      # older macOS versions.
       MacOS.version >= :el_capitan
+    end
+
+    def subversion_handles_most_https_certificates?
+      # The system Subversion is too old for some HTTPS certificates on
+      # older macOS versions.
+      MacOS.version >= :sierra
     end
   end
 end

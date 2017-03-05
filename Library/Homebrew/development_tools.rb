@@ -117,6 +117,10 @@ class DevelopmentTools
     def curl_handles_most_https_homepages?
       true
     end
+
+    def subversion_handles_most_https_certificates?
+      true
+    end
   end
 end
 
