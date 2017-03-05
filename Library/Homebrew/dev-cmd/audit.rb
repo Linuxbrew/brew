@@ -679,8 +679,6 @@ class FormulaAuditor
 
     return unless @online
 
-    # The system Curl is too old and unreliable with HTTPS homepages on
-    # Yosemite and below.
     return unless DevelopmentTools.curl_handles_most_https_homepages?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
                                              user_agents: [:browser, :default])
@@ -1573,6 +1571,7 @@ class ResourceAuditor
           problem "The URL #{url} is not a valid git URL"
         end
       elsif strategy <= SubversionDownloadStrategy
+        next unless DevelopmentTools.subversion_handles_most_https_certificates?
         unless Utils.svn_remote_exists url
           problem "The URL #{url} is not a valid svn URL"
         end
