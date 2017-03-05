@@ -12,9 +12,10 @@ class JavaRequirement < Requirement
     javas = []
     javas << Pathname.new(ENV["JAVA_HOME"])/"bin/java" if ENV["JAVA_HOME"]
     javas << java_home_cmd
-    javas << which("java")
-    javas.delete(Pathname.new("/usr/bin/java")) # /usr/bin/java is a stub on macOS
-    javas.compact
+    which_java = which("java")
+    # /usr/bin/java is a stub on macOS
+    javas << which_java if which_java.to_s != "/usr/bin/java"
+    javas
   end
 
   def java_home_cmd
