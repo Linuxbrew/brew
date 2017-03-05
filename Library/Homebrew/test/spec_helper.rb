@@ -1,5 +1,4 @@
 require "find"
-require "parallel_tests"
 require "pathname"
 require "rspec/its"
 require "rspec/wait"
@@ -10,16 +9,7 @@ if ENV["HOMEBREW_TESTS_COVERAGE"]
 
   if ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
     require "codecov"
-
-    if ParallelTests.last_process?
-      at_exit do
-        ParallelTests.wait_for_other_processes_to_finish
-
-        puts "Sending coverage report to CodeCov …"
-        formatter = SimpleCov::Formatter::Codecov.new
-        formatter.format SimpleCov::ResultMerger.merged_result
-      end
-    end
+    SimpleCov.formatter = SimpleCov::Formatter::Codecov
   end
 end
 
