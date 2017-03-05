@@ -14,11 +14,13 @@ SimpleCov.start do
   add_filter "/Homebrew/cask/spec/"
   add_filter "/Homebrew/cask/test/"
   add_filter "/Homebrew/compat/"
+  add_filter "/Homebrew/dev-cmd/tests.rb"
   add_filter "/Homebrew/test/"
   add_filter "/Homebrew/vendor/"
 
   if ENV["HOMEBREW_INTEGRATION_TEST"]
     command_name "#{ENV["HOMEBREW_INTEGRATION_TEST"]} (#{$PROCESS_ID})"
+
     at_exit do
       exit_code = $ERROR_INFO.nil? ? 0 : $ERROR_INFO.status
       $stdout.reopen("/dev/null")
