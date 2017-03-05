@@ -54,9 +54,9 @@ module Hbc
       def default_args
         [
           "--require", "rubocop-cask",
-          "--config", "/dev/null", # always use `rubocop-cask` default config
-          "--format", "simple",
-          "--force-exclusion"
+          "--force-default-config",
+          "--force-exclusion",
+          "--format", "simple"
         ]
       end
 
