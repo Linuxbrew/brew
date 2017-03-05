@@ -1,6 +1,6 @@
 require "hbc/system_command"
 
-describe Hbc::SystemCommand::Result do
+describe Hbc::SystemCommand::Result, :cask do
   describe "::_parse_plist" do
     subject { described_class._parse_plist(command, input) }
     let(:command) { Hbc::SystemCommand.new("/usr/bin/true", {}) }

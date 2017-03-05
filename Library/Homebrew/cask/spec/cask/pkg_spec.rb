@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Pkg do
+describe Hbc::Pkg, :cask do
   describe "uninstall" do
     let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
     let(:empty_response) { double(stdout: "") }

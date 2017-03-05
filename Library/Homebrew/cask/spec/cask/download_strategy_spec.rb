@@ -1,4 +1,4 @@
-describe "download strategies" do
+describe "download strategies", :cask do
   let(:url) { "http://example.com/cask.dmg" }
   let(:url_options) { Hash.new }
   let(:cask) {

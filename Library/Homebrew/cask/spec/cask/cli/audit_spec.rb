@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Audit do
+describe Hbc::CLI::Audit, :cask do
   let(:auditor) { double }
   let(:cask) { double }
 

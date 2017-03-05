@@ -1,4 +1,4 @@
-describe Hbc::SystemCommand do
+describe Hbc::SystemCommand, :cask do
   describe "when the exit code is 0" do
     describe "its result" do
       subject { described_class.run("/usr/bin/true") }

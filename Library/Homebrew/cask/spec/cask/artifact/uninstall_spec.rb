@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Artifact::Uninstall do
+describe Hbc::Artifact::Uninstall, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb") }
 
   let(:uninstall_artifact) {

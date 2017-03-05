@@ -1,4 +1,4 @@
-describe Hbc::CLI do
+describe Hbc::CLI, :cask do
   it "lists the taps for Casks that show up in two taps" do
     listing = Hbc::CLI.nice_listing(%w[
                                       caskroom/cask/adium

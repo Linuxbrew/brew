@@ -1,4 +1,4 @@
-describe Hbc::UnderscoreSupportingURI do
+describe Hbc::UnderscoreSupportingURI, :cask do
   describe "parse" do
     it "works like normal on normal URLs" do
       uri = Hbc::UnderscoreSupportingURI.parse("http://example.com/TestCask.dmg")

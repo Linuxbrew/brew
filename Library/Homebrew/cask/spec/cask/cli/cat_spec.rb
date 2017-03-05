@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Cat do
+describe Hbc::CLI::Cat, :cask do
   describe "given a basic Cask" do
     let(:expected_output) {
       <<-EOS.undent

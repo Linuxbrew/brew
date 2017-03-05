@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Installer do
+describe Hbc::Installer, :cask do
   describe "install" do
     let(:empty_depends_on_stub) {
       double(formula: [], cask: [], macos: nil, arch: nil, x11: nil)

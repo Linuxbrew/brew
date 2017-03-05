@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::Zap do
+describe Hbc::CLI::Zap, :cask do
   it "shows an error when a bad Cask is provided" do
     expect {
       Hbc::CLI::Zap.run("notacask")

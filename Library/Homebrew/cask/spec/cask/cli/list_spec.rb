@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::CLI::List do
+describe Hbc::CLI::List, :cask do
   it "lists the installed Casks in a pretty fashion" do
     casks = %w[local-caffeine local-transmission].map { |c| Hbc.load(c) }
 

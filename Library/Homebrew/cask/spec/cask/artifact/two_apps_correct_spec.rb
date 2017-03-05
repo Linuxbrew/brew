@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe Hbc::Artifact::App do
+describe Hbc::Artifact::App, :cask do
   describe "multiple apps" do
     let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-two-apps-correct.rb") }
 

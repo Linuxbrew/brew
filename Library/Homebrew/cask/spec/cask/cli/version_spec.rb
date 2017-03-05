@@ -1,6 +1,4 @@
-require "spec_helper"
-
-describe "brew cask --version" do
+describe "brew cask --version", :cask do
   it "respects the --version argument" do
     expect {
       expect {

@@ -1,4 +1,4 @@
-describe Hbc::Artifact::Binary do
+describe Hbc::Artifact::Binary, :cask do
   let(:cask) {
     Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb").tap do |cask|
       shutup do
