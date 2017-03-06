@@ -437,7 +437,6 @@ module Homebrew
                   --keep-old was passed but there are changes in:
                   #{mismatches.join("\n")}
                 EOS
-                odie "--keep-old was passed but there were changes in #{mismatches.join(", ")}!"
               end
               output = bottle_output bottle
             end
