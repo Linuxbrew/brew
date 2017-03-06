@@ -10,10 +10,11 @@ module Hbc
     end
 
     def delete_legacy_cache
-      return unless Hbc.legacy_cache.exist?
+      legacy_cache = HOMEBREW_CACHE.join("Casks")
+      return unless legacy_cache.exist?
 
-      ohai "Deleting legacy cache at #{Hbc.legacy_cache}..."
-      FileUtils.remove_entry_secure(Hbc.legacy_cache)
+      ohai "Deleting legacy cache at #{legacy_cache}..."
+      FileUtils.remove_entry_secure(legacy_cache)
     end
   end
 end

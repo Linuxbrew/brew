@@ -38,10 +38,6 @@ module Hbc
         end
       end
 
-      def legacy_cache
-        @legacy_cache ||= HOMEBREW_CACHE.join("Casks")
-      end
-
       attr_writer :cache
 
       def cache
