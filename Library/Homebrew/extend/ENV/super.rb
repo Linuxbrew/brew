@@ -111,16 +111,16 @@ module Superenv
 
     # Homebrew's apple-gcc42 will be outside the PATH in superenv,
     # so xcrun may not be able to find it
-    case homebrew_cc
-    when "gcc-4.2"
-      begin
-        apple_gcc42 = Formulary.factory("apple-gcc42")
-      rescue FormulaUnavailableError
+    begin
+      case homebrew_cc
+      when "gcc-4.2"
+        paths << Formulary.factory("apple-gcc42").opt_bin
+      when GNU_GCC_REGEXP
+        paths << gcc_version_formula($&).opt_bin
       end
-      paths << apple_gcc42.opt_bin.to_s if apple_gcc42
-    when GNU_GCC_REGEXP
-      gcc_formula = gcc_version_formula($&)
-      paths << gcc_formula.opt_bin.to_s
+    rescue FormulaUnavailableError
+      # Don't fail and don't add these formulae to the path if they don't exist.
+      nil
     end
 
     paths.to_path_s
