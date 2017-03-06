@@ -419,11 +419,17 @@ module Homebrew
               end
 
               unless mismatches.empty?
-                odie <<-EOS.undent
+                message = <<-EOS.undent
                   --keep-old was passed but there are changes in:
                   #{mismatches.join("\n")}
                 EOS
-                odie "--keep-old was passed but there were changes in #{mismatches.join(", ")}!"
+                if ARGV.include? "--keep-going"
+                  opoo message
+                  update_or_add = nil
+                  break
+                else
+                  odie message
+                end
               end
               output = bottle_output bottle
             end
@@ -460,7 +466,7 @@ module Homebrew
           end
         end
 
-        unless ARGV.include? "--no-commit"
+        unless ARGV.include?("--no-commit") || update_or_add.nil?
           short_name = formula_name.split("/", -1).last
           pkg_version = bottle_hash["formula"]["pkg_version"]
 
