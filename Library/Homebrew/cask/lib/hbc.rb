@@ -21,7 +21,6 @@ require "hbc/fetcher"
 require "hbc/installer"
 require "hbc/locations"
 require "hbc/macos"
-require "hbc/options"
 require "hbc/pkg"
 require "hbc/qualified_token"
 require "hbc/scopes"
@@ -40,7 +39,6 @@ require "utils"
 module Hbc
   include Locations
   include Scopes
-  include Options
   include Utils
 
   def self.init

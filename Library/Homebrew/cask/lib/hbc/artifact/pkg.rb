@@ -48,7 +48,7 @@ module Hbc
           "-pkg",    source,
           "-target", "/"
         ]
-        args << "-verboseR" if Hbc.verbose
+        args << "-verboseR" if CLI.verbose?
         args << "-allowUntrusted" if pkg_install_opts :allow_untrusted
         with_choices_file do |choices_path|
           args << "-applyChoiceChangesXML" << choices_path if choices_path

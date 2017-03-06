@@ -30,8 +30,7 @@ end
 # global methods
 
 def odebug(title, *sput)
-  return unless Hbc.respond_to?(:debug)
-  return unless Hbc.debug
+  return unless Hbc::CLI.debug?
   puts Formatter.headline(title, color: :magenta)
   puts sput unless sput.empty?
 end

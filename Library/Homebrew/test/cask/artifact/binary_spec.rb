@@ -47,15 +47,19 @@ describe Hbc::Artifact::Binary, :cask do
   end
 
   it "respects --no-binaries flag" do
-    Hbc.no_binaries = true
+    begin
+      Hbc::CLI.binaries = false
 
-    shutup do
-      Hbc::Artifact::Binary.new(cask).install_phase
+      expect(Hbc::CLI).not_to be_binaries
+
+      shutup do
+        Hbc::Artifact::Binary.new(cask).install_phase
+      end
+
+      expect(expected_path.exist?).to be false
+    ensure
+      Hbc::CLI.binaries = true
     end
-
-    expect(expected_path.exist?).to be false
-
-    Hbc.no_binaries = false
   end
 
   it "creates parent directory if it doesn't exist" do

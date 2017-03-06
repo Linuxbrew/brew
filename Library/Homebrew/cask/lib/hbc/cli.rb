@@ -68,12 +68,24 @@ module Hbc
     }.freeze
 
     FLAGS = {
-      "--no-binaries" => :no_binaries=,
-      "--debug"       => :debug=,
-      "--verbose"     => :verbose=,
-      "--outdated"    => :cleanup_outdated=,
-      "--help"        => :help=,
+      ["--[no-]binaries", :binaries] => true,
+      ["--debug",         :debug]    => false,
+      ["--verbose",       :verbose]  => false,
+      ["--outdated",      :outdated] => false,
+      ["--help",          :help]     => false,
     }.freeze
+
+    FLAGS.each do |(_, method), default_value|
+      instance_variable_set(:"@#{method}", default_value)
+
+      define_singleton_method(:"#{method}=") do |arg|
+        instance_variable_set(:"@#{method}", arg)
+      end
+
+      define_singleton_method(:"#{method}?") do
+        instance_variable_get(:"@#{method}")
+      end
+    end
 
     def self.command_classes
       @command_classes ||= constants.map(&method(:const_get))
@@ -149,13 +161,13 @@ module Hbc
 
       command_string, *rest = *arguments
       rest = process_options(rest)
-      command = Hbc.help ? "help" : lookup_command(command_string)
+      command = help? ? "help" : lookup_command(command_string)
       Hbc.default_tap.install unless Hbc.default_tap.installed?
       Hbc.init if should_init?(command)
       run_command(command, *rest)
     rescue CaskError, CaskSha256MismatchError, ArgumentError => e
       msg = e.message
-      msg << e.backtrace.join("\n") if Hbc.debug
+      msg << e.backtrace.join("\n") if debug?
       onoe msg
       exit 1
     rescue StandardError, ScriptError, NoMemoryError => e
@@ -205,9 +217,9 @@ module Hbc
           EOS
         end
 
-        FLAGS.each do |flag, method|
-          opts.on(flag) do
-            Hbc.public_send(method, true)
+        FLAGS.keys.each do |flag, method|
+          opts.on(flag) do |bool|
+            send(:"#{method}=", bool)
           end
         end
 
@@ -235,7 +247,8 @@ module Hbc
       end
 
       # for compat with Homebrew, not certain if this is desirable
-      Hbc.verbose = true if !ENV["VERBOSE"].nil? || !ENV["HOMEBREW_VERBOSE"].nil?
+      self.verbose = true if ARGV.verbose?
+      self.debug = true if ARGV.debug?
 
       remaining
     end
