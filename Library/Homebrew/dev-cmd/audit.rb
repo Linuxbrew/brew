@@ -532,8 +532,10 @@ class FormulaAuditor
       end
     end
 
+    versioned_conflicts_whitelist = %w[node@ bash-completion@].freeze
+
     return unless formula.conflicts.any? && formula.versioned_formula?
-    return if formula.name.start_with? "node@"
+    return if formula.name.start_with?(*versioned_conflicts_whitelist)
     problem <<-EOS
       Versioned formulae should not use `conflicts_with`.
       Use `keg_only :versioned_formula` instead.
