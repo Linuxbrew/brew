@@ -45,9 +45,6 @@ module Hbc
 
   def self.init
     Cache.ensure_cache_exists
-    Cache.delete_legacy_cache
-
-    Caskroom.migrate_caskroom_from_repo_to_prefix
     Caskroom.ensure_caskroom_exists
   end
 
