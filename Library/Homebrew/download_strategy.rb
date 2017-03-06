@@ -538,7 +538,7 @@ end
 # your formula. This download strategy uses GitHub access tokens (in the
 # environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.  This
 # strategy is suitable for corporate use just like S3DownloadStrategy, because
-# it lets you use a private GttHub repository for internal distribution.  It
+# it lets you use a private GitHub repository for internal distribution.  It
 # works with public one, but in that case simply use CurlDownloadStrategy.
 class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   require "utils/formatter"
