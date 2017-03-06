@@ -1,6 +1,4 @@
-require "hbc/version"
-
-describe Hbc::CLI::Doctor do
+describe Hbc::CLI::Doctor, :cask do
   it "displays some nice info about the environment" do
     expect {
       Hbc::CLI::Doctor.run

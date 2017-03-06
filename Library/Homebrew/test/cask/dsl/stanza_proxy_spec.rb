@@ -1,4 +1,4 @@
-describe Hbc::DSL::StanzaProxy do
+describe Hbc::DSL::StanzaProxy, :cask do
   let(:stanza_proxy) {
     described_class.new(Array) { [:foo, :bar, :cake] }
   }

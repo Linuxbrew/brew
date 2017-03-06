@@ -2,7 +2,7 @@ require "English"
 require "open3"
 require "rubygems"
 
-describe Hbc::CLI::Style do
+describe Hbc::CLI::Style, :cask do
   let(:args) { [] }
   let(:cli) { described_class.new(args) }
 
