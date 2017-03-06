@@ -1,4 +1,4 @@
-#:  * `install` [`--debug`] [`--env=`<std>|<super>] [`--ignore-dependencies`] [`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`] [`--devel`|`--HEAD`] [`--keep-tmp`] <formula>:
+#:  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] <formula>:
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -43,6 +43,9 @@
 #:
 #:    If `--keep-tmp` is passed, the temporary files created during installation
 #:    are not deleted.
+#:
+#:    If `--build-bottle` is passed, prepare the formula for eventual bottling
+#:    during installation.
 #:
 #:  * `install` `--interactive` [`--git`] <formula>:
 #:    Download and patch <formula>, then open a shell. This allows the user to

@@ -1,4 +1,4 @@
-#:  * `update-test` [`--commit=`<commit>] [`--before=`<date>] [`--keep-tmp`]:
+#:  * `update-test` [`--commit=`<commit>] [`--before=`<date>] [`--to-tag`] [`--keep-tmp`]:
 #:    Runs a test of `brew update` with a new repository clone.
 #:
 #:    If no arguments are passed, use `origin/master` as the start commit.
