@@ -1,4 +1,4 @@
-describe Hbc::DSL::Version do
+describe Hbc::DSL::Version, :cask do
   shared_examples "expectations hash" do |input_name, expectations|
     expectations.each do |input_value, expected_output|
       context "when #{input_name} is #{input_value.inspect}" do

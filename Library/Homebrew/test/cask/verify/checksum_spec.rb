@@ -1,4 +1,4 @@
-describe Hbc::Verify::Checksum do
+describe Hbc::Verify::Checksum, :cask do
   let(:cask) { double("cask") }
   let(:downloaded_path) { double("downloaded_path") }
   let(:verification) { described_class.new(cask, downloaded_path) }

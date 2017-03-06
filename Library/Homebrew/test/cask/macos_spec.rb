@@ -1,4 +1,4 @@
-describe MacOS do
+describe MacOS, :cask do
   it "says '/' is undeletable" do
     expect(MacOS).to be_undeletable(
       "/",
