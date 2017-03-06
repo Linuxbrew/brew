@@ -152,7 +152,7 @@ information on all installed formulae.</p>
 
 <p>See the docs for examples of using the JSON output:
 <a href="http://docs.brew.sh/Querying-Brew.html" data-bare-link="true">http://docs.brew.sh/Querying-Brew.html</a></p></dd>
-<dt><code>install</code> [<code>--debug</code>] [<code>--env=</code><var>std</var>|<var>super</var>] [<code>--ignore-dependencies</code>] [<code>--only-dependencies</code>] [<code>--cc=</code><var>compiler</var>] [<code>--build-from-source</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--keep-tmp</code>] <var>formula</var></dt><dd><p>Install <var>formula</var>.</p>
+<dt><code>install</code> [<code>--debug</code>] [<code>--env=</code>(<code>std</code>|<code>super</code>)] [<code>--ignore-dependencies</code>|<code>--only-dependencies</code>] [<code>--cc=</code><var>compiler</var>] [<code>--build-from-source</code>|<code>--force-bottle</code>] [<code>--devel</code>|<code>--HEAD</code>] [<code>--keep-tmp</code>] [<code>--build-bottle</code>] <var>formula</var></dt><dd><p>Install <var>formula</var>.</p>
 
 <p><var>formula</var> is usually the name of the formula to install, but it can be specified
 in several different ways. See <a href="#SPECIFYING-FORMULAE" title="SPECIFYING FORMULAE" data-bare-link="true">SPECIFYING FORMULAE</a>.</p>
@@ -195,7 +195,10 @@ for installation.</p>
 aka master, trunk, unstable.</p>
 
 <p>If <code>--keep-tmp</code> is passed, the temporary files created during installation
-are not deleted.</p></dd>
+are not deleted.</p>
+
+<p>If <code>--build-bottle</code> is passed, prepare the formula for eventual bottling
+during installation.</p></dd>
 <dt><code>install</code> <code>--interactive</code> [<code>--git</code>] <var>formula</var></dt><dd><p>Download and patch <var>formula</var>, then open a shell. This allows the user to
 run <code>./configure --help</code> and otherwise determine how to turn the software
 package into a Homebrew formula.</p>
@@ -301,11 +304,13 @@ The search for <var>text</var> is extended online to some popular taps.</p>
 <p>If <code>--desc</code> is passed, browse available packages matching <var>text</var> including a
 description for each.</p></dd>
 <dt><code>search</code> (<code>--debian</code>|<code>--fedora</code>|<code>--fink</code>|<code>--macports</code>|<code>--opensuse</code>|<code>--ubuntu</code>) <var>text</var></dt><dd><p>Search for <var>text</var> in the given package manager's list.</p></dd>
-<dt><code>sh</code> [<code>--env=std</code>]</dt><dd><p>Instantiate a Homebrew build environment. Uses our years-battle-hardened
+<dt><code>sh</code> [<code>--env=std</code>]</dt><dd><p>Start a Homebrew build environment shell. Uses our years-battle-hardened
 Homebrew build logic to help your <code>./configure &amp;&amp; make &amp;&amp; make install</code>
 or even your <code>gem install</code> succeed. Especially handy if you run Homebrew
 in an Xcode-only configuration since it adds tools like <code>make</code> to your <code>PATH</code>
-which otherwise build-systems would not find.</p></dd>
+which otherwise build systems would not find.</p>
+
+<p>If <code>--env=std</code> is passed, use the standard <code>PATH</code> instead of superenv's.</p></dd>
 <dt><code>style</code> [<code>--fix</code>] [<code>--display-cop-names</code>] [<var>files</var>|<var>taps</var>|<var>formulae</var>]</dt><dd><p>Check formulae or files for conformance to Homebrew style guidelines.</p>
 
 <p><var>formulae</var> and <var>files</var> may not be combined. If both are omitted, style will run
@@ -478,9 +483,29 @@ name of the file or formula being audited, to make the output easy to grep.</p>
 
 <p><code>audit</code> exits with a non-zero status if any errors are found. This is useful,
 for instance, for implementing pre-commit hooks.</p></dd>
-<dt><code>bottle</code> [<code>--verbose</code>] [<code>--no-rebuild</code>] [<code>--keep-old</code>] [<code>--skip-relocation</code>] [<code>--root-url=</code><var>URL</var>] [<code>--force-core-tap</code>]:</dt><dd><p></p></dd>
-<dt><code>bottle</code> <code>--merge</code> [<code>--no-commit</code>] [<code>--keep-old</code>] [<code>--write</code>]</dt><dd><p>Generate a bottle (binary package) from a formula installed with
-<code>--build-bottle</code>.</p></dd>
+<dt><code>bottle</code> [<code>--verbose</code>] [<code>--no-rebuild</code>|<code>--keep-old</code>] [<code>--skip-relocation</code>] [<code>--root-url=</code><var>URL</var>] [<code>--force-core-tap</code>] <var>formulae</var></dt><dd><p>Generate a bottle (binary package) from a formula installed with
+<code>--build-bottle</code>.</p>
+
+<p>If the formula specifies a rebuild version, it will be incremented in the
+generated DSL. Passing <code>--keep-old</code> will attempt to keep it at its
+original value, while <code>--no-rebuild</code> will remove it.</p>
+
+<p>If <code>--verbose</code> is passed, print the bottling commands and any warnings
+encountered.</p>
+
+<p>If <code>--skip-relocation</code> is passed, do not check if the bottle can be marked
+as relocatable.</p>
+
+<p>If <code>--root-url</code> is passed, use the specified <var>URL</var> as the root of the
+bottle's URL instead of Homebrew's default.</p>
+
+<p>If <code>--force-core-tap</code> is passed, build a bottle even if <var>formula</var> is not
+in homebrew/core or any installed taps.</p></dd>
+<dt><code>bottle</code> <code>--merge</code> [<code>--keep-old</code>] [<code>--write</code> [<code>--no-commit</code>]] <var>formulae</var></dt><dd><p>Generate a bottle from a formula and print the new DSL merged into the
+existing formula.</p>
+
+<p>If <code>--write</code> is passed, write the changes to the formula file. A new
+commit will then be generated unless <code>--no-commit</code> is passed.</p></dd>
 <dt><code>bump-formula-pr</code> [<code>--devel</code>] [<code>--dry-run</code> [<code>--write</code>]] [<code>--audit</code>|<code>--strict</code>] [<code>--mirror=</code><var>URL</var>] [<code>--version=</code><var>version</var>] [<code>--message=</code><var>message</var>] (<code>--url=</code><var>URL</var> <code>--sha256=</code><var>sha-256</var>|<code>--tag=</code><var>tag</var> <code>--revision=</code><var>revision</var>) <var>formula</var></dt><dd><p>Creates a pull request to update the formula with a new URL or a new tag.</p>
 
 <p>If a <var>URL</var> is specified, the <var>sha-256</var> checksum of the new download must
@@ -612,8 +637,24 @@ launched with access to IRB or a shell inside the temporary test directory.</p>
 not deleted.</p>
 
 <p>Example: <code>brew install jruby &amp;&amp; brew test jruby</code></p></dd>
-<dt><code>tests</code> [<code>-v</code>] [<code>--coverage</code>] [<code>--generic</code>] [<code>--no-compat</code>] [<code>--only=</code><var>test_script</var><code>:</code><var>line_number</var>] [<code>--seed</code> <var>seed</var>] [<code>--online</code>] [<code>--official-cmd-taps</code>]</dt><dd><p>Run Homebrew's unit and integration tests.</p></dd>
-<dt><code>update-test</code> [<code>--commit=</code><var>commit</var>] [<code>--before=</code><var>date</var>] [<code>--keep-tmp</code>]</dt><dd><p>Runs a test of <code>brew update</code> with a new repository clone.</p>
+<dt><code>tests</code> [<code>--verbose</code>] [<code>--coverage</code>] [<code>--generic</code>] [<code>--no-compat</code>] [<code>--only=</code><var>test_script</var>[<code>:</code><var>line_number</var>]] [<code>--seed</code> <var>seed</var>] [<code>--online</code>] [<code>--official-cmd-taps</code>]</dt><dd><p>Run Homebrew's unit and integration tests. If provided,
+<code>--only=</code><var>test_script</var> runs only <var>test_script</var>_spec.rb, and <code>--seed</code>
+randomizes tests with the provided value instead of a random seed.</p>
+
+<p>If <code>--verbose</code> is passed, print the command that runs the tests.</p>
+
+<p>If <code>--coverage</code> is passed, also generate code coverage reports.</p>
+
+<p>If <code>--generic</code> is passed, only run OS-agnostic tests.</p>
+
+<p>If <code>--no-compat</code> is passed, do not load the compatibility layer when
+running tests.</p>
+
+<p>If <code>--online</code> is passed, include tests that use the GitHub API.</p>
+
+<p>If <code>--official-cmd-taps</code> is passed, include tests that use any of the
+taps for official external commands.</p></dd>
+<dt><code>update-test</code> [<code>--commit=</code><var>commit</var>] [<code>--before=</code><var>date</var>] [<code>--to-tag</code>] [<code>--keep-tmp</code>]</dt><dd><p>Runs a test of <code>brew update</code> with a new repository clone.</p>
 
 <p>If no arguments are passed, use <code>origin/master</code> as the start commit.</p>
 
@@ -637,7 +678,7 @@ the new repository clone.</p></dd>
 <a href="https://github.com/Homebrew/homebrew-bundle" data-bare-link="true">https://github.com/Homebrew/homebrew-bundle</a></p></dd>
 <dt class="flush"><code>cask</code></dt><dd><p>Install macOS applications distributed as binaries:
 <a href="https://github.com/caskroom/homebrew-cask" data-bare-link="true">https://github.com/caskroom/homebrew-cask</a></p></dd>
-<dt><code>services</code></dt><dd><p>Integrates Homebrew formulae with macOS's <code>launchctl</code> manager:
+<dt><code>services</code></dt><dd><p>Integrates Homebrew formulae with macOS's <code>launchctl</code>(1) manager:
 <a href="https://github.com/Homebrew/homebrew-services" data-bare-link="true">https://github.com/Homebrew/homebrew-services</a></p></dd>
 </dl>
 

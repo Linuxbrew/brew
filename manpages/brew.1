@@ -216,7 +216,7 @@ Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to
 See the docs for examples of using the JSON output: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
 .
 .TP
-\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR\fIstd\fR|\fIsuper\fR] [\fB\-\-ignore\-dependencies\fR] [\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] \fIformula\fR
+\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] \fIformula\fR
 Install \fIformula\fR\.
 .
 .IP
@@ -257,6 +257,9 @@ If \fB\-\-HEAD\fR is passed, and \fIformula\fR defines it, install the HEAD vers
 .
 .IP
 If \fB\-\-keep\-tmp\fR is passed, the temporary files created during installation are not deleted\.
+.
+.IP
+If \fB\-\-build\-bottle\fR is passed, prepare the formula for eventual bottling during installation\.
 .
 .TP
 \fBinstall\fR \fB\-\-interactive\fR [\fB\-\-git\fR] \fIformula\fR
@@ -406,7 +409,10 @@ Search for \fItext\fR in the given package manager\'s list\.
 .
 .TP
 \fBsh\fR [\fB\-\-env=std\fR]
-Instantiate a Homebrew build environment\. Uses our years\-battle\-hardened Homebrew build logic to help your \fB\./configure && make && make install\fR or even your \fBgem install\fR succeed\. Especially handy if you run Homebrew in an Xcode\-only configuration since it adds tools like \fBmake\fR to your \fBPATH\fR which otherwise build\-systems would not find\.
+Start a Homebrew build environment shell\. Uses our years\-battle\-hardened Homebrew build logic to help your \fB\./configure && make && make install\fR or even your \fBgem install\fR succeed\. Especially handy if you run Homebrew in an Xcode\-only configuration since it adds tools like \fBmake\fR to your \fBPATH\fR which otherwise build systems would not find\.
+.
+.IP
+If \fB\-\-env=std\fR is passed, use the standard \fBPATH\fR instead of superenv\'s\.
 .
 .TP
 \fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]
@@ -653,12 +659,30 @@ If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with 
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
 .
 .TP
-\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR] [\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=\fR\fIURL\fR] [\fB\-\-force\-core\-tap\fR]:
-
+\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR|\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=\fR\fIURL\fR] [\fB\-\-force\-core\-tap\fR] \fIformulae\fR
+Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\.
+.
+.IP
+If the formula specifies a rebuild version, it will be incremented in the generated DSL\. Passing \fB\-\-keep\-old\fR will attempt to keep it at its original value, while \fB\-\-no\-rebuild\fR will remove it\.
+.
+.IP
+If \fB\-\-verbose\fR is passed, print the bottling commands and any warnings encountered\.
+.
+.IP
+If \fB\-\-skip\-relocation\fR is passed, do not check if the bottle can be marked as relocatable\.
+.
+.IP
+If \fB\-\-root\-url\fR is passed, use the specified \fIURL\fR as the root of the bottle\'s URL instead of Homebrew\'s default\.
+.
+.IP
+If \fB\-\-force\-core\-tap\fR is passed, build a bottle even if \fIformula\fR is not in homebrew/core or any installed taps\.
 .
 .TP
-\fBbottle\fR \fB\-\-merge\fR [\fB\-\-no\-commit\fR] [\fB\-\-keep\-old\fR] [\fB\-\-write\fR]
-Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\.
+\fBbottle\fR \fB\-\-merge\fR [\fB\-\-keep\-old\fR] [\fB\-\-write\fR [\fB\-\-no\-commit\fR]] \fIformulae\fR
+Generate a bottle from a formula and print the new DSL merged into the existing formula\.
+.
+.IP
+If \fB\-\-write\fR is passed, write the changes to the formula file\. A new commit will then be generated unless \fB\-\-no\-commit\fR is passed\.
 .
 .TP
 \fBbump\-formula\-pr\fR [\fB\-\-devel\fR] [\fB\-\-dry\-run\fR [\fB\-\-write\fR]] [\fB\-\-audit\fR|\fB\-\-strict\fR] [\fB\-\-mirror=\fR\fIURL\fR] [\fB\-\-version=\fR\fIversion\fR] [\fB\-\-message=\fR\fImessage\fR] (\fB\-\-url=\fR\fIURL\fR \fB\-\-sha256=\fR\fIsha\-256\fR|\fB\-\-tag=\fR\fItag\fR \fB\-\-revision=\fR\fIrevision\fR) \fIformula\fR
@@ -816,11 +840,29 @@ If \fB\-\-keep\-tmp\fR is passed, the temporary files created for the test are n
 Example: \fBbrew install jruby && brew test jruby\fR
 .
 .TP
-\fBtests\fR [\fB\-v\fR] [\fB\-\-coverage\fR] [\fB\-\-generic\fR] [\fB\-\-no\-compat\fR] [\fB\-\-only=\fR\fItest_script\fR\fB:\fR\fIline_number\fR] [\fB\-\-seed\fR \fIseed\fR] [\fB\-\-online\fR] [\fB\-\-official\-cmd\-taps\fR]
-Run Homebrew\'s unit and integration tests\.
+\fBtests\fR [\fB\-\-verbose\fR] [\fB\-\-coverage\fR] [\fB\-\-generic\fR] [\fB\-\-no\-compat\fR] [\fB\-\-only=\fR\fItest_script\fR[\fB:\fR\fIline_number\fR]] [\fB\-\-seed\fR \fIseed\fR] [\fB\-\-online\fR] [\fB\-\-official\-cmd\-taps\fR]
+Run Homebrew\'s unit and integration tests\. If provided, \fB\-\-only=\fR\fItest_script\fR runs only \fItest_script\fR_spec\.rb, and \fB\-\-seed\fR randomizes tests with the provided value instead of a random seed\.
+.
+.IP
+If \fB\-\-verbose\fR is passed, print the command that runs the tests\.
+.
+.IP
+If \fB\-\-coverage\fR is passed, also generate code coverage reports\.
+.
+.IP
+If \fB\-\-generic\fR is passed, only run OS\-agnostic tests\.
+.
+.IP
+If \fB\-\-no\-compat\fR is passed, do not load the compatibility layer when running tests\.
+.
+.IP
+If \fB\-\-online\fR is passed, include tests that use the GitHub API\.
+.
+.IP
+If \fB\-\-official\-cmd\-taps\fR is passed, include tests that use any of the taps for official external commands\.
 .
 .TP
-\fBupdate\-test\fR [\fB\-\-commit=\fR\fIcommit\fR] [\fB\-\-before=\fR\fIdate\fR] [\fB\-\-keep\-tmp\fR]
+\fBupdate\-test\fR [\fB\-\-commit=\fR\fIcommit\fR] [\fB\-\-before=\fR\fIdate\fR] [\fB\-\-to\-tag\fR] [\fB\-\-keep\-tmp\fR]
 Runs a test of \fBbrew update\fR with a new repository clone\.
 .
 .IP
@@ -850,7 +892,7 @@ Install macOS applications distributed as binaries: \fIhttps://github\.com/caskr
 .
 .TP
 \fBservices\fR
-Integrates Homebrew formulae with macOS\'s \fBlaunchctl\fR manager: \fIhttps://github\.com/Homebrew/homebrew\-services\fR
+Integrates Homebrew formulae with macOS\'s \fBlaunchctl\fR(1) manager: \fIhttps://github\.com/Homebrew/homebrew\-services\fR
 .
 .SH "CUSTOM EXTERNAL COMMANDS"
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
