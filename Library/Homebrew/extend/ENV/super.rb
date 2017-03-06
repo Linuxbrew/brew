@@ -121,8 +121,11 @@ module Superenv
       end
       paths << apple_gcc42.opt_bin.to_s if apple_gcc42
     when GNU_GCC_REGEXP
-      gcc_formula = gcc_version_formula($&)
-      paths << gcc_formula.opt_bin.to_s
+      begin
+        gcc_formula = gcc_version_formula($&)
+      rescue FormulaUnavailableError
+      end
+      paths << gcc_formula.opt_bin.to_s if gcc_formula
     end
 
     paths.to_path_s
