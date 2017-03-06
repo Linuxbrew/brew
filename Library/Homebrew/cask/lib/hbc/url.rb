@@ -29,11 +29,8 @@ module Hbc
     end
 
     def user_agent
-      if @user_agent == :fake
-        FAKE_USER_AGENT
-      else
-        @user_agent
-      end
+      return FAKE_USER_AGENT if @user_agent == :fake
+      @user_agent
     end
   end
 end

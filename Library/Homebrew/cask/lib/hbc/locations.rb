@@ -7,35 +7,10 @@ module Hbc
     end
 
     module ClassMethods
-      def legacy_caskroom
-        @legacy_caskroom ||= Pathname.new("/opt/homebrew-cask/Caskroom")
-      end
-
-      def default_caskroom
-        @default_caskroom ||= HOMEBREW_PREFIX.join("Caskroom")
-      end
-
       attr_writer :caskroom
 
       def caskroom
-        @caskroom ||= begin
-          if Utils.path_occupied?(legacy_caskroom)
-            opoo <<-EOS.undent
-              The default Caskroom location has moved to #{default_caskroom}.
-
-              Please migrate your Casks to the new location and delete #{legacy_caskroom},
-              or if you would like to keep your Caskroom at #{legacy_caskroom}, add the
-              following to your HOMEBREW_CASK_OPTS:
-
-                --caskroom=#{legacy_caskroom}
-
-              For more details on each of those options, see https://github.com/caskroom/homebrew-cask/issues/21913.
-            EOS
-            legacy_caskroom
-          else
-            default_caskroom
-          end
-        end
+        @caskroom ||= HOMEBREW_PREFIX.join("Caskroom")
       end
 
       attr_writer :cache
