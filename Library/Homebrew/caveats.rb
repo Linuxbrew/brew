@@ -16,11 +16,9 @@ class Caveats
       f.build = build
     end
     caveats << keg_only_text
-    caveats << bash_completion_caveats
-    caveats << zsh_completion_caveats
-    caveats << fish_completion_caveats
-    caveats << zsh_function_caveats
-    caveats << fish_function_caveats
+    caveats << function_completion_caveats(:bash)
+    caveats << function_completion_caveats(:zsh)
+    caveats << function_completion_caveats(:fish)
     caveats << plist_caveats
     caveats << python_caveats
     caveats << elisp_caveats
@@ -72,56 +70,35 @@ class Caveats
     s << "\n"
   end
 
-  def bash_completion_caveats
+  def function_completion_caveats(shell)
     return unless keg
-    return unless keg.completion_installed?(:bash)
+    return unless which(shell.to_s)
 
-    <<-EOS.undent
-      Bash completion has been installed to:
-        #{HOMEBREW_PREFIX}/etc/bash_completion.d
-    EOS
-  end
+    completion_installed = keg.completion_installed?(shell)
+    functions_installed = keg.functions_installed?(shell)
+    return unless completion_installed || functions_installed
 
-  def zsh_completion_caveats
-    return unless keg
-    return unless keg.completion_installed?(:zsh)
+    installed = []
+    installed << "completions" if completion_installed
+    installed << "functions" if functions_installed
 
-    <<-EOS.undent
-      zsh completion has been installed to:
-        #{HOMEBREW_PREFIX}/share/zsh/site-functions
-    EOS
-  end
-
-  def fish_completion_caveats
-    return unless keg
-    return unless keg.completion_installed?(:fish)
-    return unless which("fish")
-
-    <<-EOS.undent
-      fish completion has been installed to:
-        #{HOMEBREW_PREFIX}/share/fish/vendor_completions.d
-    EOS
-  end
-
-  def zsh_function_caveats
-    return unless keg
-    return unless keg.zsh_functions_installed?
-
-    <<-EOS.undent
-      zsh functions have been installed to:
-        #{HOMEBREW_PREFIX}/share/zsh/site-functions
-    EOS
-  end
-
-  def fish_function_caveats
-    return unless keg
-    return unless keg.fish_functions_installed?
-    return unless which("fish")
-
-    <<-EOS.undent
-      fish functions have been installed to:
-        #{HOMEBREW_PREFIX}/share/fish/vendor_functions.d
-    EOS
+    case shell
+    when :bash
+      <<-EOS.undent
+        Bash completion has been installed to:
+          #{HOMEBREW_PREFIX}/etc/bash_completion.d
+      EOS
+    when :zsh
+      <<-EOS.undent
+        zsh #{installed.join(" and ")} have been installed to:
+          #{HOMEBREW_PREFIX}/share/zsh/site-functions
+      EOS
+    when :fish
+      fish_caveats = "fish #{installed.join(" and ")} have been installed to:"
+      fish_caveats << "\n  #{HOMEBREW_PREFIX}/share/fish/vendor_completions.d" if completion_installed
+      fish_caveats << "\n  #{HOMEBREW_PREFIX}/share/fish/vendor_functions.d" if functions_installed
+      fish_caveats
+    end
   end
 
   def python_caveats
