@@ -71,7 +71,7 @@ module Hbc
       Pathname.glob(metadata_master_container_path.join("*", "*"))
               .map { |p| p.relative_path_from(metadata_master_container_path) }
               .sort_by(&:basename) # sort by timestamp
-              .map(&:split)
+              .map { |p| p.split.map(&:to_s) }
     end
 
     def versions
