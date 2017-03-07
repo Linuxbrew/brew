@@ -19,7 +19,7 @@ describe Hbc::CLI::Cleanup, :cask do
 
       cached_downloads.each(&FileUtils.method(:touch))
 
-      cleanup_size = Hbc::Utils.size_in_bytes(cached_downloads[0])
+      cleanup_size = cached_downloads[0].disk_usage
 
       expect {
         subject.cleanup(cleaned_up_cached_download)

@@ -62,7 +62,7 @@ module Hbc
       end
 
       def disk_cleanup_size
-        Utils.size_in_bytes(cache_files)
+        cache_files.map(&:disk_usage).inject(:+)
       end
 
       def remove_cache_files(*tokens)
