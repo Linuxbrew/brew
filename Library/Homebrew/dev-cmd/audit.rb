@@ -1565,6 +1565,9 @@ class ResourceAuditor
 
       strategy = DownloadStrategyDetector.detect(url, using)
       if strategy <= CurlDownloadStrategy && !url.start_with?("file")
+        # A `brew mirror`'ed URL is usually not yet reachable at the time of
+        # pull request.
+        next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
         if http_content_problem = FormulaAuditor.check_http_content(url)
           problem http_content_problem
         end
