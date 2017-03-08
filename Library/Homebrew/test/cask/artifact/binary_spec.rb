@@ -9,9 +9,11 @@ describe Hbc::Artifact::Binary, :cask do
   let(:expected_path) {
     Hbc.binarydir.join("binary")
   }
+
   before(:each) do
     Hbc.binarydir.mkpath
   end
+
   after(:each) do
     FileUtils.rm expected_path if expected_path.exist?
   end
@@ -22,6 +24,17 @@ describe Hbc::Artifact::Binary, :cask do
     end
     expect(expected_path).to be_a_symlink
     expect(expected_path.readlink).to exist
+  end
+
+  it "makes the binary executable" do
+    expect(FileUtils).to receive(:chmod).with("+x", cask.staged_path.join("binary"))
+
+    shutup do
+      Hbc::Artifact::Binary.new(cask).install_phase
+    end
+
+    expect(expected_path).to be_a_symlink
+    expect(expected_path.readlink).to be_executable
   end
 
   it "avoids clobbering an existing binary by linking over it" do
