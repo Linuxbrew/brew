@@ -79,7 +79,7 @@ module Hbc
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
         Open3.popen3(*expanded_command)
 
-      write_input_to(raw_stdin) if options[:input]
+      write_input_to(raw_stdin)
       raw_stdin.close_write
       each_line_from [raw_stdout, raw_stderr], &b
 
@@ -87,7 +87,7 @@ module Hbc
     end
 
     def write_input_to(raw_stdin)
-      Array(options[:input]).each { |line| raw_stdin.puts line }
+      [*options[:input]].each { |line| raw_stdin.print line }
     end
 
     def each_line_from(sources)

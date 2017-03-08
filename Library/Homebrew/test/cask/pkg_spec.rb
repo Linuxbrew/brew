@@ -1,5 +1,5 @@
 describe Hbc::Pkg, :cask do
-  describe "uninstall" do
+  describe "#uninstall" do
     let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
     let(:empty_response) { double(stdout: "") }
     let(:pkg) { described_class.new("my.fake.pkg", fake_system_command) }
