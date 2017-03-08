@@ -31,7 +31,7 @@ module Hbc
         plist = @command.run!("/usr/bin/hdiutil",
                               # realpath is a failsafe against unusual filenames
                               args:  %w[mount -plist -nobrowse -readonly -noidme -mountrandom /tmp] + [Pathname.new(@path).realpath],
-                              input: %w[y])
+                              input: "y\n")
                         .plist
         @mounts = mounts_from_plist(plist)
       end

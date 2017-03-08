@@ -14,24 +14,31 @@ module Hbc
     end
 
     def uninstall
-      odebug "Deleting pkg files"
-      pkgutil_bom_files.each_slice(500) do |file_slice|
-        @command.run("/bin/rm", args: file_slice.unshift("-f", "--"), sudo: true)
+      unless pkgutil_bom_files.empty?
+        odebug "Deleting pkg files"
+        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "-f", "--"], input: pkgutil_bom_files.join("\0"), sudo: true)
       end
-      odebug "Deleting pkg symlinks and special files"
-      pkgutil_bom_specials.each_slice(500) do |file_slice|
-        @command.run("/bin/rm", args: file_slice.unshift("-f", "--"), sudo: true)
+
+      unless pkgutil_bom_specials.empty?
+        odebug "Deleting pkg symlinks and special files"
+        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "-f", "--"], input: pkgutil_bom_specials.join("\0"), sudo: true)
       end
-      odebug "Deleting pkg directories"
-      _deepest_path_first(pkgutil_bom_dirs).each do |dir|
-        next unless dir.exist? && !MacOS.undeletable?(dir)
-        _with_full_permissions(dir) do
-          _delete_broken_file_dir(dir) && next
-          _clean_broken_symlinks(dir)
-          _clean_ds_store(dir)
-          _rmdir(dir)
+
+      unless pkgutil_bom_dirs.empty?
+        odebug "Deleting pkg directories"
+        _deepest_path_first(pkgutil_bom_dirs).each do |dir|
+          next if MacOS.undeletable?(dir)
+          next unless dir.exist?
+
+          _with_full_permissions(dir) do
+            _delete_broken_file_dir(dir) && next
+            _clean_broken_symlinks(dir)
+            _clean_ds_store(dir)
+            _rmdir(dir)
+          end
         end
       end
+
       forget
     end
 
