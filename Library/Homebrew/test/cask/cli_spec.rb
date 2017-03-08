@@ -27,8 +27,10 @@ describe Hbc::CLI, :cask do
     end
 
     it "passes `--version` along to the subcommand" do
-      expect(described_class).to receive(:run_command).with(noop_command, "--version")
-      described_class.process(%w[noop --version])
+      version_command = double("CLI::Version")
+      allow(described_class).to receive(:lookup_command).with("--version").and_return(version_command)
+      expect(described_class).to receive(:run_command).with(version_command)
+      described_class.process(["--version"])
     end
 
     it "prints help output when subcommand receives `--help` flag" do
