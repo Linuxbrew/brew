@@ -57,13 +57,13 @@ Paste at a Terminal prompt:
 ### Debian or Ubuntu
 
 ```sh
-sudo apt-get install build-essential curl git python-setuptools ruby
+sudo apt-get install build-essential curl file git python-setuptools ruby
 ```
 
 ### Fedora, CentOS or Red Hat
 
 ```sh
-sudo yum groupinstall 'Development Tools' && sudo yum install curl git irb python-setuptools ruby
+sudo yum groupinstall 'Development Tools' && sudo yum install curl file git irb python-setuptools ruby
 ```
 
 ### 32-bit x86 platforms
