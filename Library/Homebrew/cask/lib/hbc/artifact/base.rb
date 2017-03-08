@@ -34,7 +34,6 @@ module Hbc
         #       stanza may not be needed as an explicit argument
         description = stanza.to_s
         if key
-          arguments = arguments[key]
           description.concat(" #{key.inspect}")
         end
 

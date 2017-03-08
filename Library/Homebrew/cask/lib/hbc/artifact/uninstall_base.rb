@@ -6,11 +6,6 @@ require "hbc/artifact/base"
 module Hbc
   module Artifact
     class UninstallBase < Base
-      # TODO: 500 is also hardcoded in cask/pkg.rb, but much of
-      #       that logic is probably in the wrong location
-
-      PATH_ARG_SLICE_SIZE = 500
-
       ORDERED_DIRECTIVES = [
         :early_script,
         :launchctl,
@@ -25,47 +20,7 @@ module Hbc
         :rmdir,
       ].freeze
 
-      # TODO: these methods were consolidated here from separate
-      #       sources and should be refactored for consistency
-
-      def self.expand_path_strings(path_strings)
-        path_strings.map do |path_string|
-          path_string.start_with?("~") ? Pathname.new(path_string).expand_path : Pathname.new(path_string)
-        end
-      end
-
-      def self.expand_glob(path_strings)
-        path_strings.flat_map(&Pathname.method(:glob))
-      end
-
-      def self.remove_relative_path_strings(action, path_strings)
-        relative = path_strings.map do |path_string|
-          path_string if %r{/\.\.(?:/|\Z)}.match(path_string) || !%r{\A/}.match(path_string)
-        end.compact
-        relative.each do |path_string|
-          opoo "Skipping #{action} for relative path #{path_string}"
-        end
-        path_strings - relative
-      end
-
-      def self.remove_undeletable_path_strings(action, path_strings)
-        undeletable = path_strings.map do |path_string|
-          path_string if MacOS.undeletable?(Pathname.new(path_string))
-        end.compact
-        undeletable.each do |path_string|
-          opoo "Skipping #{action} for undeletable path #{path_string}"
-        end
-        path_strings - undeletable
-      end
-
-      def self.prepare_path_strings(action, path_strings, expand_tilde)
-        path_strings = expand_path_strings(path_strings) if expand_tilde
-        path_strings = remove_relative_path_strings(action, path_strings)
-        path_strings = expand_glob(path_strings)
-        remove_undeletable_path_strings(action, path_strings)
-      end
-
-      def dispatch_uninstall_directives(expand_tilde: true)
+      def dispatch_uninstall_directives
         directives_set = @cask.artifacts[stanza]
         ohai "Running #{stanza} process for #{@cask}; your password may be necessary"
 
@@ -75,9 +30,8 @@ module Hbc
 
         ORDERED_DIRECTIVES.each do |directive_sym|
           directives_set.select { |h| h.key?(directive_sym) }.each do |directives|
-            args = [directives]
-            args << expand_tilde if [:delete, :trash, :rmdir].include?(directive_sym)
-            send("uninstall_#{directive_sym}", *args)
+            args = directives[directive_sym]
+            send("uninstall_#{directive_sym}", *(args.is_a?(Hash) ? [args] : args))
           end
         end
       end
@@ -102,8 +56,8 @@ module Hbc
       end
 
       # :launchctl must come before :quit/:signal for cases where app would instantly re-launch
-      def uninstall_launchctl(directives)
-        Array(directives[:launchctl]).each do |service|
+      def uninstall_launchctl(*services)
+        services.each do |service|
           ohai "Removing launchctl service #{service}"
           [false, true].each do |with_sudo|
             plist_status = @command.run("/bin/launchctl", args: ["list", service], sudo: with_sudo, print_stderr: false).stdout
@@ -127,45 +81,6 @@ module Hbc
         end
       end
 
-      # :quit/:signal must come before :kext so the kext will not be in use by a running process
-      def uninstall_quit(directives)
-        Array(directives[:quit]).each do |id|
-          ohai "Quitting application ID #{id}"
-          next if running_processes(id).empty?
-          @command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{id}" to quit)], sudo: true)
-
-          begin
-            Timeout.timeout(3) do
-              Kernel.loop do
-                break if running_processes(id).empty?
-              end
-            end
-          rescue Timeout::Error
-            next
-          end
-        end
-      end
-
-      # :signal should come after :quit so it can be used as a backup when :quit fails
-      def uninstall_signal(directives)
-        Array(directives[:signal]).flatten.each_slice(2) do |pair|
-          raise CaskInvalidError.new(@cask, "Each #{stanza} :signal must have 2 elements.") unless pair.length == 2
-          signal, bundle_id = pair
-          ohai "Signalling '#{signal}' to application ID '#{bundle_id}'"
-          pids = running_processes(bundle_id).map(&:first)
-          next unless pids.any?
-          # Note that unlike :quit, signals are sent from the current user (not
-          # upgraded to the superuser).  This is a todo item for the future, but
-          # there should be some additional thought/safety checks about that, as a
-          # misapplied "kill" by root could bring down the system. The fact that we
-          # learned the pid from AppleScript is already some degree of protection,
-          # though indirect.
-          odebug "Unix ids are #{pids.inspect} for processes with bundle identifier #{bundle_id}"
-          Process.kill(signal, *pids)
-          sleep 3
-        end
-      end
-
       def running_processes(bundle_id)
         @command.run!("/bin/launchctl", args: ["list"]).stdout.lines
                 .map { |line| line.chomp.split("\t") }
@@ -176,8 +91,50 @@ module Hbc
                 end
       end
 
-      def uninstall_login_item(directives)
-        Array(directives[:login_item]).each do |name|
+      # :quit/:signal must come before :kext so the kext will not be in use by a running process
+      def uninstall_quit(*bundle_ids)
+        bundle_ids.each do |bundle_id|
+          ohai "Quitting application ID #{bundle_id}"
+          next if running_processes(bundle_id).empty?
+          @command.run!("/usr/bin/osascript", args: ["-e", %Q(tell application id "#{bundle_id}" to quit)], sudo: true)
+
+          begin
+            Timeout.timeout(3) do
+              Kernel.loop do
+                break if running_processes(bundle_id).empty?
+              end
+            end
+          rescue Timeout::Error
+            next
+          end
+        end
+      end
+
+      # :signal should come after :quit so it can be used as a backup when :quit fails
+      def uninstall_signal(*signals)
+        signals.flatten.each_slice(2) do |pair|
+          unless pair.size == 2
+            raise CaskInvalidError.new(@cask, "Each #{stanza} :signal must consist of 2 elements.")
+          end
+
+          signal, bundle_id = pair
+          ohai "Signalling '#{signal}' to application ID '#{bundle_id}'"
+          pids = running_processes(bundle_id).map(&:first)
+          next unless pids.any?
+          # Note that unlike :quit, signals are sent from the current user (not
+          # upgraded to the superuser). This is a todo item for the future, but
+          # there should be some additional thought/safety checks about that, as a
+          # misapplied "kill" by root could bring down the system. The fact that we
+          # learned the pid from AppleScript is already some degree of protection,
+          # though indirect.
+          odebug "Unix ids are #{pids.inspect} for processes with bundle identifier #{bundle_id}"
+          Process.kill(signal, *pids)
+          sleep 3
+        end
+      end
+
+      def uninstall_login_item(*login_items)
+        login_items.each do |name|
           ohai "Removing login item #{name}"
           @command.run!("/usr/bin/osascript",
                         args: ["-e", %Q(tell application "System Events" to delete every login item whose name is "#{name}")],
@@ -187,8 +144,8 @@ module Hbc
       end
 
       # :kext should be unloaded before attempting to delete the relevant file
-      def uninstall_kext(directives)
-        Array(directives[:kext]).each do |kext|
+      def uninstall_kext(*kexts)
+        kexts.each do |kext|
           ohai "Unloading kernel extension #{kext}"
           is_loaded = @command.run!("/usr/sbin/kextstat", args: ["-l", "-b", kext], sudo: true).stdout
           if is_loaded.length > 1
@@ -209,6 +166,7 @@ module Hbc
                                                                         { must_succeed: true, sudo: true },
                                                                         { print_stdout: true },
                                                                         directive_name)
+
         ohai "Running uninstall script #{executable}"
         raise CaskInvalidError.new(@cask, "#{stanza} :#{directive_name} without :executable.") if executable.nil?
         executable_path = @cask.staged_path.join(executable)
@@ -225,43 +183,67 @@ module Hbc
         sleep 1
       end
 
-      def uninstall_pkgutil(directives)
-        ohai "Removing files from pkgutil Bill-of-Materials"
-        Array(directives[:pkgutil]).each do |regexp|
-          pkgs = Hbc::Pkg.all_matching(regexp, @command)
-          pkgs.each(&:uninstall)
+      def uninstall_pkgutil(*pkgs)
+        ohai "Uninstalling packages:"
+        pkgs.each do |regex|
+          Hbc::Pkg.all_matching(regex, @command).each do |pkg|
+            puts pkg.package_id
+            pkg.uninstall
+          end
         end
       end
 
-      def uninstall_delete(directives, expand_tilde = true)
-        Array(directives[:delete]).concat(Array(directives[:trash])).flatten.each_slice(PATH_ARG_SLICE_SIZE) do |path_slice|
-          ohai "Removing files: #{path_slice.utf8_inspect}"
-          path_slice = self.class.prepare_path_strings(:delete, path_slice, expand_tilde)
-          @command.run!("/bin/rm", args: path_slice.unshift("-rf", "--"), sudo: true)
+      def each_resolved_path(action, paths)
+        paths.each do |path|
+          resolved_path = Pathname.new(path)
+
+          if path.start_with?("~")
+            resolved_path = resolved_path.expand_path
+          end
+
+          if resolved_path.relative? || resolved_path.split.any? { |part| part.to_s == ".." }
+            opoo "Skipping #{Formatter.identifier(action)} for relative path '#{path}'."
+            next
+          end
+
+          if MacOS.undeletable?(resolved_path)
+            opoo "Skipping #{Formatter.identifier(action)} for undeletable path '#{path}'."
+            next
+          end
+
+          yield path, Pathname.glob(resolved_path)
         end
       end
 
-      # :trash functionality is stubbed as a synonym for :delete
-      # TODO: make :trash work differently, moving files to the Trash
-      def uninstall_trash(directives, expand_tilde = true)
-        uninstall_delete(directives, expand_tilde)
+      def uninstall_delete(*paths)
+        return if paths.empty?
+
+        ohai "Removing files:"
+        each_resolved_path(:delete, paths) do |path, resolved_paths|
+          puts path
+          @command.run!("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "-r", "-f", "--"], input: resolved_paths.join("\0"), sudo: true)
+        end
       end
 
-      def uninstall_rmdir(directories, expand_tilde = true)
-        action = :rmdir
-        self.class.prepare_path_strings(action, Array(directories[action]).flatten, expand_tilde).each do |directory|
-          next if directory.to_s.empty?
-          ohai "Removing directory if empty: #{directory.to_s.utf8_inspect}"
-          directory = Pathname.new(directory)
-          next unless directory.exist?
-          @command.run!("/bin/rm",
-                        args:         ["-f", "--", directory.join(".DS_Store")],
-                        sudo:         true,
-                        print_stderr: false)
-          @command.run("/bin/rmdir",
-                       args:         ["--", directory],
-                       sudo:         true,
-                       print_stderr: false)
+      def uninstall_trash(*paths)
+        # :trash functionality is stubbed as a synonym for :delete
+        # TODO: make :trash work differently, moving files to the Trash
+        uninstall_delete(*paths)
+      end
+
+      def uninstall_rmdir(*directories)
+        return if directories.empty?
+
+        ohai "Removing directories if empty:"
+        each_resolved_path(:rmdir, directories) do |path, resolved_paths|
+          puts path
+          resolved_paths.select(&:directory?).each do |resolved_path|
+            if (ds_store = resolved_path.join(".DS_Store")).exist?
+              @command.run!("/bin/rm", args: ["-f", "--", ds_store], sudo: true, print_stderr: false)
+            end
+
+            @command.run("/bin/rmdir", args: ["--", resolved_path], sudo: true, print_stderr: false)
+          end
         end
       end
     end
