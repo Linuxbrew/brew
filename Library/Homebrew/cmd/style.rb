@@ -70,10 +70,14 @@ module Homebrew
       !$?.success?
     when :json
       json = Utils.popen_read_text("rubocop", "--format", "json", *args)
-      # exit status of 1 just means violations were found; other numbers mean execution errors
+      # exit status of 1 just means violations were found; other numbers mean
+      # execution errors.
       # exitstatus can also be nil if RuboCop process crashes, e.g. due to
-      # native extension problems
-      raise "Error while running RuboCop" if $?.exitstatus.nil? || $?.exitstatus > 1
+      # native extension problems.
+      # JSON needs to be at least 2 characters.
+      if $?.exitstatus.nil? || $?.exitstatus > 1 || json.to_s.length < 2
+        raise "Error running `rubocop --format json #{args.join " "}`"
+      end
       RubocopResults.new(JSON.parse(json))
     else
       raise "Invalid output_type for check_style_impl: #{output_type}"
