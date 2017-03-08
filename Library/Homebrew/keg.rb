@@ -466,7 +466,7 @@ class Keg
   end
 
   def aliases
-    Formula[rack.basename.to_s].aliases
+    Formulary.from_rack(rack).aliases
   rescue FormulaUnavailableError
     []
   end
