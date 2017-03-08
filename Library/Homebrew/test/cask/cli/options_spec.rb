@@ -108,7 +108,7 @@ describe Hbc::CLI, :cask do
     it "shows a user-friendly error message" do
       expect {
         Hbc::CLI.process_options %w[install -f]
-      }.to raise_error(Hbc::CaskError)
+      }.to raise_error(ArgumentError)
     end
   end
 
@@ -116,7 +116,7 @@ describe Hbc::CLI, :cask do
     it "shows a user-friendly error message" do
       expect {
         Hbc::CLI.process_options %w[edit -c]
-      }.to raise_error(Hbc::CaskError)
+      }.to raise_error(ArgumentError)
     end
   end
 

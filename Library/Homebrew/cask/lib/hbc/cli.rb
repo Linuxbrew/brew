@@ -229,9 +229,9 @@ module Hbc
           remaining << head
           retry
         rescue OptionParser::MissingArgument
-          raise CaskError, "The option '#{head}' requires an argument"
+          raise ArgumentError, "The option '#{head}' requires an argument."
         rescue OptionParser::AmbiguousOption
-          raise CaskError, "There is more than one possible option that starts with '#{head}'"
+          raise ArgumentError, "There is more than one possible option that starts with '#{head}'."
         end
       end
 
