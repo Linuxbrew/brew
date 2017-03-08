@@ -19,6 +19,7 @@ require "hbc/cli/reinstall"
 require "hbc/cli/search"
 require "hbc/cli/style"
 require "hbc/cli/uninstall"
+require "hbc/cli/--version"
 require "hbc/cli/zap"
 
 require "hbc/cli/internal_use_base"
@@ -116,7 +117,7 @@ module Hbc
       elsif command.to_s.include?("/") && require?(command.to_s)
         # external command as Ruby library with literal path, useful
         # for development and troubleshooting
-        sym = Pathname.new(command.to_s).basename(".rb").to_s.capitalize
+        sym = File.basename(command.to_s, ".rb").capitalize
         klass = begin
                   const_get(sym)
                 rescue NameError
@@ -247,16 +248,14 @@ module Hbc
         @attempted_verb = attempted_verb
       end
 
-      def run(*args)
-        if args.include?("--version") || @attempted_verb == "--version"
-          puts Hbc.full_version
-        else
-          purpose
-          usage
-          unless @attempted_verb.to_s.strip.empty? || @attempted_verb == "help"
-            raise CaskError, "Unknown command: #{@attempted_verb}"
-          end
-        end
+      def run(*_args)
+        purpose
+        usage
+
+        return if @attempted_verb.to_s.strip.empty?
+        return if @attempted_verb == "help"
+
+        raise ArgumentError, "Unknown command: #{@attempted_verb}"
       end
 
       def purpose
