@@ -35,7 +35,7 @@ module Hbc
         altnames = "(#{altnames})"
 
         # Some packges are shipped as u=rx (e.g. Bitcoin Core)
-        @command.run!("/bin/chmod", args: ["--", "u=rwx", file.to_s, file.realpath.to_s])
+        @command.run!("/bin/chmod", args: ["--", "u+rw", file.to_s, file.realpath.to_s])
 
         @command.run!("/usr/bin/xattr",
                       args:         ["-w", ALT_NAME_ATTRIBUTE, altnames, file.to_s],
