@@ -154,7 +154,7 @@ module Hbc
       def self._parse_plist(command, output)
         raise CaskError, "Empty plist input" unless output =~ /\S/
         output.sub!(/\A(.*?)(<\?\s*xml)/m, '\2')
-        _warn_plist_garbage(command, Regexp.last_match[1]) if Hbc.debug
+        _warn_plist_garbage(command, Regexp.last_match[1]) if CLI.debug?
         output.sub!(%r{(<\s*/\s*plist\s*>)(.*?)\Z}m, '\1')
         _warn_plist_garbage(command, Regexp.last_match[2])
         xml = Plist.parse_xml(output)

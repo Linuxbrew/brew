@@ -32,10 +32,13 @@ describe Hbc::CLI, :cask do
     end
 
     it "prints help output when subcommand receives `--help` flag" do
-      expect(described_class).to receive(:run_command).with("help")
-      described_class.process(%w[noop --help])
-      expect(Hbc.help).to eq(true)
-      Hbc.help = false
+      begin
+        expect(described_class).to receive(:run_command).with("help")
+        described_class.process(%w[noop --help])
+        expect(Hbc::CLI.help?).to eq(true)
+      ensure
+        Hbc::CLI.help = false
+      end
     end
 
     it "respects the env variable when choosing what appdir to create" do

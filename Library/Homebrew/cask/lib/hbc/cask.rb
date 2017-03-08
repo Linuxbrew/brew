@@ -90,8 +90,7 @@ module Hbc
     end
 
     def dumpcask
-      return unless Hbc.respond_to?(:debug)
-      return unless Hbc.debug
+      return unless CLI.debug?
 
       odebug "Cask instance dumps in YAML:"
       odebug "Cask instance toplevel:", to_yaml

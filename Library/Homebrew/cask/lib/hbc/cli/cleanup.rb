@@ -21,7 +21,7 @@ module Hbc
       end
 
       def self.default
-        @default ||= new(Hbc.cache, Hbc.cleanup_outdated)
+        @default ||= new(Hbc.cache, CLI.outdated?)
       end
 
       attr_reader :cache_location, :outdated_only
