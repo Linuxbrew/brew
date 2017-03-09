@@ -36,6 +36,8 @@ class Cmd
   def mode
     if @arg0 == "cpp" || @arg0 == "ld"
       @arg0.to_sym
+    elsif @arg0 == "gold" || @arg0 == "ld.gold"
+      :ld
     elsif @args.include? "-c"
       if @arg0 =~ /(?:c|g|clang)\+\+/
         :cxx
@@ -56,6 +58,7 @@ class Cmd
   def tool
     @tool ||= case @arg0
     when "ld" then "ld"
+    when "gold", "ld.gold" then "ld.gold"
     when "cpp" then "cpp"
     when /llvm_(clang(\+\+)?)/
      "#{ENV["HOMEBREW_PREFIX"]}/opt/llvm/bin/#{$1}"
