@@ -66,94 +66,23 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:fake_system_command) { class_double(Hbc::SystemCommand) }
 
     let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-#{artifact_name}-pkgutil.rb") }
+
     let(:main_pkg_id) { "my.fancy.package.main" }
     let(:agent_pkg_id) { "my.fancy.package.agent" }
-    let(:main_files) do
-      %w[
-        fancy/bin/fancy.exe
-        fancy/var/fancy.data
-      ]
-    end
-    let(:main_dirs) do
-      %w[
-        fancy
-        fancy/bin
-        fancy/var
-      ]
-    end
-    let(:agent_files) do
-      %w[
-        fancy/agent/fancy-agent.exe
-        fancy/agent/fancy-agent.pid
-        fancy/agent/fancy-agent.log
-      ]
-    end
-    let(:agent_dirs) do
-      %w[
-        fancy
-        fancy/agent
-      ]
-    end
-    let(:pkg_info_plist) do
-      <<-EOS.undent
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-                <key>install-location</key>
-                <string>tmp</string>
-                <key>volume</key>
-                <string>/</string>
-        </dict>
-        </plist>
-      EOS
-    end
 
     it "is supported" do
-      allow(fake_system_command).to receive(:run).with(
-        "/usr/sbin/pkgutil",
-        args: ["--pkgs=my.fancy.package.*"],
-      ).and_return(double(stdout: "#{main_pkg_id}\n#{agent_pkg_id}"))
+      main_pkg = Hbc::Pkg.new(main_pkg_id, fake_system_command)
+      agent_pkg = Hbc::Pkg.new(agent_pkg_id, fake_system_command)
 
-      [
-        [main_pkg_id, main_files, main_dirs],
-        [agent_pkg_id, agent_files, agent_dirs],
-      ].each do |pkg_id, pkg_files, pkg_dirs|
+      expect(Hbc::Pkg).to receive(:all_matching).and_return(
+        [
+          main_pkg,
+          agent_pkg,
+        ],
+      )
 
-        allow(fake_system_command).to receive(:run!).with(
-          "/usr/sbin/pkgutil",
-          args: ["--only-files", "--files", pkg_id.to_s],
-        ).and_return(double(stdout: pkg_files.join("\n")))
-
-        allow(fake_system_command).to receive(:run!).with(
-          "/usr/sbin/pkgutil",
-          args: ["--only-dirs", "--files", pkg_id.to_s],
-        ).and_return(double(stdout: pkg_dirs.join("\n")))
-
-        allow(fake_system_command).to receive(:run!).with(
-          "/usr/sbin/pkgutil",
-          args: ["--files", pkg_id.to_s],
-        ).and_return(double(stdout: (pkg_files + pkg_dirs).join("\n")))
-
-        result = Hbc::SystemCommand::Result.new(nil, pkg_info_plist, nil, 0)
-        allow(fake_system_command).to receive(:run!).with(
-          "/usr/sbin/pkgutil",
-          args: ["--pkg-info-plist", pkg_id.to_s],
-        ).and_return(result)
-
-        expect(fake_system_command).to receive(:run).with(
-          "/usr/bin/xargs",
-          args: ["-0", "--", "/bin/rm", "-f", "--"],
-          input: pkg_files.map { |path| "/tmp/#{path}" }.join("\0"),
-          sudo: true,
-        )
-
-        expect(fake_system_command).to receive(:run!).with(
-          "/usr/sbin/pkgutil",
-          args: ["--forget", pkg_id.to_s],
-          sudo: true,
-        )
-      end
+      expect(main_pkg).to receive(:uninstall)
+      expect(agent_pkg).to receive(:uninstall)
 
       subject
     end
