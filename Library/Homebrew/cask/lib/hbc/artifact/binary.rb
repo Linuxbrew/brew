@@ -7,8 +7,8 @@ module Hbc
         super if CLI.binaries?
       end
 
-      def link(artifact_spec)
-        super(artifact_spec)
+      def link
+        super
         FileUtils.chmod "+x", source
       end
     end

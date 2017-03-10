@@ -42,6 +42,14 @@ module Hbc
                       print_stderr: false)
       end
 
+      def each_artifact
+        # the sort is for predictability between Ruby versions
+        @cask.artifacts[self.class.artifact_dsl_key].sort.each do |artifact|
+          load_specification(artifact)
+          yield
+        end
+      end
+
       def load_specification(artifact_spec)
         source_string, target_hash = artifact_spec
         raise CaskInvalidError if source_string.nil?

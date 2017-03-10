@@ -32,10 +32,7 @@ module Hbc
       def self.read_script_arguments(arguments, stanza, default_arguments = {}, override_arguments = {}, key = nil)
         # TODO: when stanza names are harmonized with class names,
         #       stanza may not be needed as an explicit argument
-        description = stanza.to_s
-        if key
-          description.concat(" #{key.inspect}")
-        end
+        description = key ? "#{stanza} #{key.inspect}" : stanza.to_s
 
         # backward-compatible string value
         arguments = { executable: arguments } if arguments.is_a?(String)

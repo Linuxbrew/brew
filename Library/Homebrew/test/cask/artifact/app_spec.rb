@@ -7,8 +7,8 @@ describe Hbc::Artifact::App, :cask do
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
   let(:target_path) { Hbc.appdir.join("Caffeine.app") }
 
-  let(:install_phase) { -> { app.install_phase } }
-  let(:uninstall_phase) { -> { app.uninstall_phase } }
+  let(:install_phase) { app.install_phase }
+  let(:uninstall_phase) { app.uninstall_phase }
 
   before(:each) do
     InstallHelper.install_without_artifacts(cask)
@@ -17,7 +17,7 @@ describe Hbc::Artifact::App, :cask do
   describe "install_phase" do
     it "installs the given app using the proper target directory" do
       shutup do
-        install_phase.call
+        install_phase
       end
 
       expect(target_path).to be_a_directory
@@ -40,7 +40,7 @@ describe Hbc::Artifact::App, :cask do
         FileUtils.mv(source_path, appsubdir)
 
         shutup do
-          install_phase.call
+          install_phase
         end
 
         expect(target_path).to be_a_directory
@@ -53,7 +53,7 @@ describe Hbc::Artifact::App, :cask do
       FileUtils.cp_r source_path, staged_app_copy
 
       shutup do
-        install_phase.call
+        install_phase
       end
 
       expect(target_path).to be_a_directory
@@ -69,7 +69,7 @@ describe Hbc::Artifact::App, :cask do
       end
 
       it "avoids clobbering an existing app" do
-        expect(install_phase).to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
+        expect { install_phase }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
 
         expect(source_path).to be_a_directory
         expect(target_path).to be_a_directory
@@ -89,17 +89,17 @@ describe Hbc::Artifact::App, :cask do
         describe "target is both writable and user-owned" do
           it "overwrites the existing app" do
             stdout = <<-EOS.undent
-              ==> Removing App: '#{target_path}'
-              ==> Moving App 'Caffeine.app' to '#{target_path}'
+              ==> Removing App '#{target_path}'.
+              ==> Moving App 'Caffeine.app' to '#{target_path}'.
             EOS
 
             stderr = <<-EOS.undent
               Warning: It seems there is already an App at '#{target_path}'; overwriting.
             EOS
 
-            expect {
-              expect(install_phase).to output(stdout).to_stdout
-            }.to output(stderr).to_stderr
+            expect { install_phase }
+              .to output(stdout).to_stdout
+              .and output(stderr).to_stderr
 
             expect(source_path).not_to exist
             expect(target_path).to be_a_directory
@@ -124,17 +124,17 @@ describe Hbc::Artifact::App, :cask do
               .and_call_original
 
             stdout = <<-EOS.undent
-              ==> Removing App: '#{target_path}'
-              ==> Moving App 'Caffeine.app' to '#{target_path}'
+              ==> Removing App '#{target_path}'.
+              ==> Moving App 'Caffeine.app' to '#{target_path}'.
             EOS
 
             stderr = <<-EOS.undent
               Warning: It seems there is already an App at '#{target_path}'; overwriting.
             EOS
 
-            expect {
-              expect(install_phase).to output(stdout).to_stdout
-            }.to output(stderr).to_stderr
+            expect { install_phase }
+              .to output(stdout).to_stdout
+              .and output(stderr).to_stderr
 
             expect(source_path).not_to exist
             expect(target_path).to be_a_directory
@@ -160,7 +160,7 @@ describe Hbc::Artifact::App, :cask do
       end
 
       it "leaves the target alone" do
-        expect(install_phase).to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
+        expect { install_phase }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path}'.")
         expect(target_path).to be_a_symlink
       end
 
@@ -169,17 +169,17 @@ describe Hbc::Artifact::App, :cask do
 
         it "overwrites the existing app" do
           stdout = <<-EOS.undent
-            ==> Removing App: '#{target_path}'
-            ==> Moving App 'Caffeine.app' to '#{target_path}'
+            ==> Removing App '#{target_path}'.
+            ==> Moving App 'Caffeine.app' to '#{target_path}'.
           EOS
 
           stderr = <<-EOS.undent
             Warning: It seems there is already an App at '#{target_path}'; overwriting.
           EOS
 
-          expect {
-            expect(install_phase).to output(stdout).to_stdout
-          }.to output(stderr).to_stderr
+          expect { install_phase }
+            .to output(stdout).to_stdout
+            .and output(stderr).to_stderr
 
           expect(source_path).not_to exist
           expect(target_path).to be_a_directory
@@ -193,22 +193,22 @@ describe Hbc::Artifact::App, :cask do
     it "gives a warning if the source doesn't exist" do
       source_path.rmtree
 
-      message = "It seems the App source is not there: '#{source_path}'"
+      message = "It seems the App source '#{source_path}' is not there."
 
-      expect(install_phase).to raise_error(Hbc::CaskError, message)
+      expect { install_phase }.to raise_error(Hbc::CaskError, message)
     end
   end
 
   describe "uninstall_phase" do
     it "deletes managed apps" do
       shutup do
-        install_phase.call
+        install_phase
       end
 
       expect(target_path).to exist
 
       shutup do
-        uninstall_phase.call
+        uninstall_phase
       end
 
       expect(target_path).not_to exist
@@ -226,7 +226,7 @@ describe Hbc::Artifact::App, :cask do
     describe "app is correctly installed" do
       it "returns the path to the app" do
         shutup do
-          install_phase.call
+          install_phase
         end
 
         expect(contents).to eq(["#{target_path} (#{target_path.abv})"])
