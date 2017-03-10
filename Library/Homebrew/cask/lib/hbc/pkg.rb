@@ -92,12 +92,14 @@ module Hbc
 
     def with_full_permissions(path)
       original_mode = (path.stat.mode % 01000).to_s(8)
-      # TODO: similarly read and restore macOS flags (cf man chflags)
+      original_flags = @command.run!("/usr/bin/stat", args: ["-f", "%Of", "--", path]).stdout.chomp
+
       @command.run!("/bin/chmod", args: ["--", "777", path], sudo: true)
       yield
     ensure
       if path.exist? # block may have removed dir
         @command.run!("/bin/chmod", args: ["--", original_mode, path], sudo: true)
+        @command.run!("/usr/bin/chflags", args: ["--", original_flags, path], sudo: true)
       end
     end
 

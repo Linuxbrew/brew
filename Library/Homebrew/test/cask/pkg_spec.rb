@@ -1,7 +1,7 @@
 describe Hbc::Pkg, :cask do
   describe "#uninstall" do
     let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
-    let(:empty_response) { double(stdout: "", plist: {"volume" => "/", "install-location" => "", "paths" => {}}) }
+    let(:empty_response) { double(stdout: "", plist: { "volume" => "/", "install-location" => "", "paths" => {} }) }
     let(:pkg) { described_class.new("my.fake.pkg", fake_system_command) }
 
     it "removes files and dirs referenced by the pkg" do
@@ -51,7 +51,7 @@ describe Hbc::Pkg, :cask do
 
     it "removes broken symlinks" do
       fake_dir  = Pathname.new(Dir.mktmpdir)
-      fake_root  = Pathname.new(Dir.mktmpdir)
+      fake_root = Pathname.new(Dir.mktmpdir)
       fake_file = fake_dir.join("ima_file").tap { |path| FileUtils.touch(path) }
 
       intact_symlink = fake_dir.join("intact_symlink").tap { |path| path.make_symlink(fake_file) }
