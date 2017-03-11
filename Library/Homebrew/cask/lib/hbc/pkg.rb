@@ -16,27 +16,30 @@ module Hbc
     def uninstall
       unless pkgutil_bom_files.empty?
         odebug "Deleting pkg files"
-        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "-f", "--"], input: pkgutil_bom_files.join("\0"), sudo: true)
+        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_files.join("\0"), sudo: true)
       end
 
       unless pkgutil_bom_specials.empty?
         odebug "Deleting pkg symlinks and special files"
-        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "-f", "--"], input: pkgutil_bom_specials.join("\0"), sudo: true)
+        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_specials.join("\0"), sudo: true)
       end
 
       unless pkgutil_bom_dirs.empty?
         odebug "Deleting pkg directories"
-        _deepest_path_first(pkgutil_bom_dirs).each do |dir|
+        deepest_path_first(pkgutil_bom_dirs).each do |dir|
           next if MacOS.undeletable?(dir)
-          next unless dir.exist?
 
-          _with_full_permissions(dir) do
-            _delete_broken_file_dir(dir) && next
-            _clean_broken_symlinks(dir)
-            _clean_ds_store(dir)
-            _rmdir(dir)
+          with_full_permissions(dir) do
+            clean_broken_symlinks(dir)
+            clean_ds_store(dir)
+            rmdir(dir)
           end
         end
+      end
+
+      if root.directory? && !MacOS.undeletable?(root)
+        clean_ds_store(root)
+        rmdir(root)
       end
 
       forget
@@ -47,39 +50,38 @@ module Hbc
       @command.run!("/usr/sbin/pkgutil", args: ["--forget", package_id], sudo: true)
     end
 
-    def pkgutil_bom(*type)
-      @command.run!("/usr/sbin/pkgutil", args: [*type, "--files", package_id].compact)
-              .stdout
-              .split("\n")
-              .map { |path| root.join(path) }
-    end
-
     def pkgutil_bom_files
-      @pkgutil_bom_files ||= pkgutil_bom("--only-files")
-    end
-
-    def pkgutil_bom_dirs
-      @pkgutil_bom_dirs ||= pkgutil_bom("--only-dirs")
-    end
-
-    def pkgutil_bom_all
-      @pkgutil_bom_all ||= pkgutil_bom
+      @pkgutil_bom_files ||= pkgutil_bom_all.select(&:file?) - pkgutil_bom_specials
     end
 
     def pkgutil_bom_specials
-      pkgutil_bom_all - pkgutil_bom_files - pkgutil_bom_dirs
+      @pkgutil_bom_specials ||= pkgutil_bom_all.select(&method(:special?))
+    end
+
+    def pkgutil_bom_dirs
+      @pkgutil_bom_dirs ||= pkgutil_bom_all.select(&:directory?) - pkgutil_bom_specials
+    end
+
+    def pkgutil_bom_all
+      @pkgutil_bom_all ||= info.fetch("paths").keys.map { |p| root.join(p) }
     end
 
     def root
-      @root ||= Pathname(info.fetch("volume")).join(info.fetch("install-location"))
+      @root ||= Pathname.new(info.fetch("volume")).join(info.fetch("install-location"))
     end
 
     def info
-      @command.run!("/usr/sbin/pkgutil", args: ["--pkg-info-plist", package_id])
-              .plist
+      @info ||= @command.run!("/usr/sbin/pkgutil", args: ["--export-plist", package_id])
+                        .plist
     end
 
-    def _rmdir(path)
+    private
+
+    def special?(path)
+      path.symlink? || path.chardev? || path.blockdev?
+    end
+
+    def rmdir(path)
       return unless path.children.empty?
       if path.symlink?
         @command.run!("/bin/rm", args: ["-f", "--", path], sudo: true)
@@ -88,47 +90,37 @@ module Hbc
       end
     end
 
-    def _with_full_permissions(path)
+    def with_full_permissions(path)
       original_mode = (path.stat.mode % 01000).to_s(8)
-      # TODO: similarly read and restore macOS flags (cf man chflags)
+      original_flags = @command.run!("/usr/bin/stat", args: ["-f", "%Of", "--", path]).stdout.chomp
+
       @command.run!("/bin/chmod", args: ["--", "777", path], sudo: true)
       yield
     ensure
       if path.exist? # block may have removed dir
         @command.run!("/bin/chmod", args: ["--", original_mode, path], sudo: true)
+        @command.run!("/usr/bin/chflags", args: ["--", original_flags, path], sudo: true)
       end
     end
 
-    def _deepest_path_first(paths)
-      paths.sort do |path_a, path_b|
-        path_b.to_s.split("/").count <=> path_a.to_s.split("/").count
+    def deepest_path_first(paths)
+      paths.sort_by { |path| -path.to_s.split(File::SEPARATOR).count }
+    end
+
+    def clean_ds_store(dir)
+      return unless (ds_store = dir.join(".DS_Store")).exist?
+      @command.run!("/bin/rm", args: ["--", ds_store], sudo: true)
+    end
+
+    # Some packages leave broken symlinks around; we clean them out before
+    # attempting to `rmdir` to prevent extra cruft from lying around.
+    def clean_broken_symlinks(dir)
+      dir.children.select(&method(:broken_symlink?)).each do |path|
+        @command.run!("/bin/rm", args: ["--", path], sudo: true)
       end
     end
 
-    # Some pkgs incorrectly report files (generally nibs)
-    # as directories; we remove these as files instead.
-    def _delete_broken_file_dir(path)
-      return unless path.file? && !path.symlink?
-      @command.run!("/bin/rm", args: ["-f", "--", path], sudo: true)
-    end
-
-    # Some pkgs leave broken symlinks hanging around; we clean them out before
-    # attempting to rmdir to prevent extra cruft from lying around after
-    # uninstall
-    def _clean_broken_symlinks(dir)
-      dir.children.each do |child|
-        if _broken_symlink?(child)
-          @command.run!("/bin/rm", args: ["--", child], sudo: true)
-        end
-      end
-    end
-
-    def _clean_ds_store(dir)
-      ds_store = dir.join(".DS_Store")
-      @command.run!("/bin/rm", args: ["--", ds_store], sudo: true) if ds_store.exist?
-    end
-
-    def _broken_symlink?(path)
+    def broken_symlink?(path)
       path.symlink? && !path.exist?
     end
   end
