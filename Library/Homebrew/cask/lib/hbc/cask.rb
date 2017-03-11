@@ -7,10 +7,10 @@ module Hbc
     extend Forwardable
 
     attr_reader :token, :sourcefile_path
-    def initialize(token, sourcefile_path: nil, dsl: nil, &block)
+    def initialize(token, sourcefile_path: nil, &block)
       @token = token
       @sourcefile_path = sourcefile_path
-      @dsl = dsl || DSL.new(@token)
+      @dsl = DSL.new(@token)
       return unless block_given?
       @dsl.instance_eval(&block)
       @dsl.language_eval
