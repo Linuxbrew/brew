@@ -5,7 +5,7 @@ by [our Kickstarter in 2013](https://www.kickstarter.com/projects/homebrew/brew-
 
 It comprises four Mac Minis running in a data centre in England which host
 [a Jenkins instance at https://bot.brew.sh](https://bot.brew.sh) and run the
-[`brew test-bot.rb`](https://github.com/Homebrew/homebrew-test-bot/blob/master/cmd/brew-test-bot.rb)
+[`brew-test-bot.rb`](https://github.com/Homebrew/homebrew-test-bot/blob/master/cmd/brew-test-bot.rb)
 Ruby script to perform automated testing of commits to the master branch, pull
 requests and custom builds requested by maintainers.
 
@@ -14,7 +14,7 @@ requests and custom builds requested by maintainers.
 The bot automatically builds pull requests and updates their status depending
 on the result of the job.
 
-For example, a job which has been queued but not yet started will have a
+For example, a job which has been queued but not yet completed will have a
 section in the pull request that looks like this:
 
 
