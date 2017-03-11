@@ -139,10 +139,6 @@ def pretty_duration(s)
   res << Formatter.pluralize(s, "second")
 end
 
-def plural(n, s = "s")
-  n == 1 ? "" : s
-end
-
 def interactive_shell(f = nil)
   unless f.nil?
     ENV["HOMEBREW_DEBUG_PREFIX"] = f.prefix

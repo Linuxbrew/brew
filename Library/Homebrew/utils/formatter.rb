@@ -96,11 +96,9 @@ module Formatter
 
     *adjectives, noun = singular.split(" ")
 
-    if plural.nil?
-      plural = {
-        "formula" => "formulae",
-      }.fetch(noun, "#{noun}s")
-    end
+    plural ||= {
+      "formula" => "formulae",
+    }.fetch(noun, "#{noun}s")
 
     words = adjectives << plural
 
