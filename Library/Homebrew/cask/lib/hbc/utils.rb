@@ -37,8 +37,7 @@ def odebug(title, *sput)
 end
 
 def highlight_installed(token)
-  cask = Hbc.load(token)
-  if cask.installed?
+  if (Hbc.caskroom/token).directory?
     token = pretty_installed token
   end
   token
