@@ -3,7 +3,6 @@ require "language/python"
 class PythonRequirement < Requirement
   fatal true
   default_formula "python"
-  cask "python"
 
   satisfy build_env: false do
     python = which_python
@@ -56,7 +55,6 @@ end
 class Python3Requirement < PythonRequirement
   fatal true
   default_formula "python3"
-  cask "python3"
 
   satisfy(build_env: false) { which_python }
 
