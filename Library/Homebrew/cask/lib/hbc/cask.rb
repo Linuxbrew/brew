@@ -32,7 +32,6 @@ module Hbc
     end
 
     def metadata_path(timestamp = :latest, create = false)
-      return nil unless metadata_versioned_container_path.respond_to?(:join)
       if create && timestamp == :latest
         raise CaskError, "Cannot create metadata path when timestamp is :latest"
       end
