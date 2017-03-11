@@ -36,6 +36,14 @@ def odebug(title, *sput)
   puts sput unless sput.empty?
 end
 
+def highlight_installed(token)
+  cask = Hbc.load(token)
+  if cask.installed?
+    token = pretty_installed token
+  end
+  token
+end
+
 module Hbc
   module Utils
     def self.gain_permissions_remove(path, command: SystemCommand)
