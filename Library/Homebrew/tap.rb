@@ -239,7 +239,7 @@ class Tap
     link_completions_and_manpages
 
     formula_count = formula_files.size
-    puts "Tapped #{formula_count} formula#{plural(formula_count, "e")} (#{path.abv})" unless quiet
+    puts "Tapped #{Formatter.pluralize(formula_count, "formula")} (#{path.abv})" unless quiet
     Descriptions.cache_formulae(formula_names)
 
     return if options[:clone_target]
@@ -273,7 +273,7 @@ class Tap
     Utils::Link.unlink_completions(path)
     path.rmtree
     path.parent.rmdir_if_possible
-    puts "Untapped #{formula_count} formula#{plural(formula_count, "e")}"
+    puts "Untapped #{Formatter.pluralize(formula_count, "formula")}"
     clear_cache
   end
 

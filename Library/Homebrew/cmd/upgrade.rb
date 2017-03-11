@@ -66,12 +66,12 @@ module Homebrew
     if formulae_to_install.empty?
       oh1 "No packages to upgrade"
     else
-      oh1 "Upgrading #{formulae_to_install.length} outdated package#{plural(formulae_to_install.length)}, with result:"
+      oh1 "Upgrading #{Formatter.pluralize(formulae_to_install.length, "outdated package")}, with result:"
       puts formulae_to_install.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
     unless upgrade_pinned? || pinned.empty?
-      oh1 "Not upgrading #{pinned.length} pinned package#{plural(pinned.length)}:"
+      oh1 "Not upgrading #{Formatter.pluralize(pinned.length, "pinned package")}:"
       puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 

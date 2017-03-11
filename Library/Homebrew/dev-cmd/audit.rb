@@ -91,9 +91,7 @@ module Homebrew
 
     return if problem_count.zero?
 
-    problems = "problem" + plural(problem_count)
-    formulae = "formula" + plural(formula_count, "e")
-    ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
+    ofail "#{Formatter.pluralize(problem_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
   end
 end
 
