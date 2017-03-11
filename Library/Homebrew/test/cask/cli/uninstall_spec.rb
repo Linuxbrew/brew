@@ -47,6 +47,7 @@ describe Hbc::CLI::Uninstall, :cask do
     end
 
     expect(cask).to be_installed
+    expect(Hbc.appdir.join("MyFancyApp.app")).to exist
 
     expect {
       shutup do
