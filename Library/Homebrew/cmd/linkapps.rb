@@ -67,7 +67,7 @@ module Homebrew
     if link_count.zero?
       puts "No apps linked to #{target_dir}" if ARGV.verbose?
     else
-      puts "Linked #{link_count} app#{plural(link_count)} to #{target_dir}"
+      puts "Linked #{Formatter.pluralize(link_count, "app")} to #{target_dir}"
     end
   end
 

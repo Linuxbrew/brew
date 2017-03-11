@@ -219,13 +219,6 @@ describe "globally-scoped helper methods" do
     end
   end
 
-  specify "#plural" do
-    expect(plural(1)).to eq("")
-    expect(plural(0)).to eq("s")
-    expect(plural(42)).to eq("s")
-    expect(plural(42, "")).to eq("")
-  end
-
   specify "#disk_usage_readable" do
     expect(disk_usage_readable(1)).to eq("1B")
     expect(disk_usage_readable(1000)).to eq("1000B")

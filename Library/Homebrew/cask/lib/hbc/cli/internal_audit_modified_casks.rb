@@ -83,7 +83,7 @@ module Hbc
         @modified_casks = modified_cask_files.map { |f| Hbc.load(f) }
         if @modified_casks.any?
           num_modified = @modified_casks.size
-          ohai "#{num_modified} modified cask#{plural(num_modified)}: " \
+          ohai "#{Formatter.pluralize(num_modified, "modified cask")}: " \
             "#{@modified_casks.join(" ")}"
         end
         @modified_casks
@@ -120,7 +120,7 @@ module Hbc
       def report_failures
         return if failed_casks.empty?
         num_failed = failed_casks.size
-        odie "audit failed for #{num_failed} cask#{plural(num_failed)}: " \
+        odie "audit failed for #{Formatter.pluralize(num_failed, "cask")}: " \
           "#{failed_casks.join(" ")}"
       end
 

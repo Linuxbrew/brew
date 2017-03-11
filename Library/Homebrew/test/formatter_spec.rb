@@ -52,4 +52,27 @@ describe Formatter do
       it { is_expected.to eq("\n") }
     end
   end
+
+  describe "::pluralize" do
+    it "pluralizes words" do
+      expect(described_class.pluralize(0, "cask")).to eq("0 casks")
+      expect(described_class.pluralize(1, "cask")).to eq("1 cask")
+      expect(described_class.pluralize(2, "cask")).to eq("2 casks")
+    end
+
+    it "allows specifying custom plural forms" do
+      expect(described_class.pluralize(1, "child", "children")).to eq("1 child")
+      expect(described_class.pluralize(2, "child", "children")).to eq("2 children")
+    end
+
+    it "has plural forms of Homebrew jargon" do
+      expect(described_class.pluralize(1, "formula")).to eq("1 formula")
+      expect(described_class.pluralize(2, "formula")).to eq("2 formulae")
+    end
+
+    it "pluralizes the last word of a string" do
+      expect(described_class.pluralize(1, "new formula")).to eq("1 new formula")
+      expect(described_class.pluralize(2, "new formula")).to eq("2 new formulae")
+    end
+  end
 end

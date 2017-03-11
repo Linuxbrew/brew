@@ -90,4 +90,18 @@ module Formatter
 
     output
   end
+
+  def pluralize(count, singular, plural = nil)
+    return "#{count} #{singular}" if count == 1
+
+    *adjectives, noun = singular.split(" ")
+
+    plural ||= {
+      "formula" => "formulae",
+    }.fetch(noun, "#{noun}s")
+
+    words = adjectives << plural
+
+    "#{count} #{words.join(" ")}"
+  end
 end
