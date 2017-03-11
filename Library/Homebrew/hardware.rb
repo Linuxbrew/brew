@@ -12,7 +12,7 @@ module Hardware
         penryn: "-march=core2 -msse4.1",
         core2: "-march=core2",
         core: "-march=prescott",
-        dunno: "",
+        dunno: "-march=native",
       }.freeze
 
       def optimization_flags
