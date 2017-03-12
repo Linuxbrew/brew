@@ -295,16 +295,15 @@ module Hbc
     end
 
     def save_caskfile
-      timestamp = :now
-      create    = true
-      savedir   = @cask.metadata_subdir("Casks", timestamp, create)
-      if Dir.entries(savedir).size > 2
-        # should not happen
-        raise CaskAlreadyInstalledError, @cask unless force
-        savedir.rmtree
-        FileUtils.mkdir_p savedir
+      unless (old_savedirs = Pathname.glob(@cask.metadata_path("*"))).empty?
+        old_savedirs.each(&:rmtree)
       end
-      FileUtils.copy(@cask.sourcefile_path, savedir) if @cask.sourcefile_path
+
+      return unless @cask.sourcefile_path
+
+      savedir = @cask.metadata_subdir("Casks", :now, true)
+      savedir.mkpath
+      FileUtils.copy @cask.sourcefile_path, savedir
     end
 
     def uninstall
