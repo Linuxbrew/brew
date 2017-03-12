@@ -73,7 +73,7 @@ If you need a formula to be installed from a particular tap, you can use fully
 qualified names to refer to them.
 
 For example, you can create a tap for an alternative `vim` formula. Without
-pinning it, the behavior will be
+pinning it, the behaviour will be
 
 ```bash
 brew install vim                     # installs from homebrew/core

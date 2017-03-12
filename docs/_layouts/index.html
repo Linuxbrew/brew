@@ -1,0 +1,147 @@
+---
+layout: base
+---
+<div id="informations">
+  <ul>
+    <li>
+      <div class="group row">
+        <h2 id="install">{{ page.pagecontent.install.install }}</h2>
+        <br>
+        <pre style='clear:both;text-align:center;margin-bottom:0.9em'><code id='selectable' onclick="selectText(this)">/usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</code></pre>
+        <div class="col-1">
+          <p>{{ page.pagecontent.install.paste }}</p>
+        </div>
+        <div class="col-2">
+          <p>{{ page.pagecontent.install.what }}</p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row">
+       <h2 id="question">{{ page.pagecontent.question }}</h2>
+       <br>
+        <div class="col-1">
+          <p>{{ page.pagecontent.what }}</p>
+        </div>
+        <div class="col-2">
+{% highlight bash %}
+$ brew install wget
+{% endhighlight %}
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="group row">
+        <div class="col-1">
+          <p>{{ page.pagecontent.how }}</p>
+        </div>
+        <div class="col-2">
+{% highlight bash %}
+$ cd /usr/local
+$ find Cellar
+Cellar/wget/1.16.1
+Cellar/wget/1.16.1/bin/wget
+Cellar/wget/1.16.1/share/man/man1/wget.1
+
+$ ls -l bin
+bin/wget -> ../Cellar/wget/1.16.1/bin/wget
+{% endhighlight %}
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="group row">
+        <div class="col-1">
+          <p>{{ page.pagecontent.prefix }}</p>
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="group row">
+        <div class="col-1">
+          <p>{{ page.pagecontent.createpackages }}</p>
+        </div>
+        <div class="col-2">
+{% highlight bash %}
+$ brew create https://foo.com/bar-1.0.tgz
+Created /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/bar.rb
+{% endhighlight %}
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="group row">
+        <div class="col-1">
+          <p>{{ page.pagecontent.hack }}</p>
+        </div>
+        <div class="col-2">
+{% highlight bash %}
+$ brew edit wget # {{ page.pagecontent.editor }}
+{% endhighlight %}
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="group row">
+        <div class="col-1">
+          <p>{{ page.pagecontent.formula }}</p>
+        </div>
+        <div class="col-2">
+{% highlight ruby %}
+class Wget < Formula
+  homepage "https://www.gnu.org/software/wget/"
+  url "https://ftp.gnu.org/gnu/wget/wget-1.15.tar.gz"
+  sha256 "52126be8cf1bddd7536886e74c053ad7d0ed2aa89b4b630f76785bac21695fcd"
+
+  def install
+    system "./configure", "--prefix=#{prefix}"
+    system "make", "install"
+  end
+end
+{% endhighlight %}
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="group row">
+        <div class="col-1">
+          <p>{{ page.pagecontent.complement }}</p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row">
+        <h2 id="further-doc">{{ page.pagecontent.doc.further }}</h2>
+        <div class="button">
+          <p><a href="http://docs.brew.sh">docs.brew.sh</a></p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row">
+        <h2 id="homebrew-community">{{ page.pagecontent.doc.community }}</h2>
+        <div class="button">
+          <p><a href="http://discourse.brew.sh">discourse.brew.sh</a></p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row">
+        <h2 id="homebrew-blog">{{ page.pagecontent.doc.blog }}</h2>
+        <div class="button">
+          <p><a href="/blog">brew.sh/blog</a></p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row credits">
+        <p>{{ page.pagecontent.foot.code }} {{ page.pagecontent.foot.page }} {{ page.pagecontent.foot.translation }}</p>
+      </div>
+    </li>
+  </ul>
+</div>

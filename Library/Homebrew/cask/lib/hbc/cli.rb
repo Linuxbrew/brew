@@ -37,6 +37,7 @@ module Hbc
       "-S"       => "search",    # verb starting with "-" is questionable
       "up"       => "update",
       "instal"   => "install",   # gem does the same
+      "uninstal" => "uninstall",
       "rm"       => "uninstall",
       "remove"   => "uninstall",
       "abv"      => "info",
@@ -88,17 +89,6 @@ module Hbc
       @lookup ||= Hash[commands.zip(command_classes)]
       command_string = ALIASES.fetch(command_string, command_string)
       @lookup.fetch(command_string, command_string)
-    end
-
-    # modified from Homebrew
-    def self.require?(path)
-      require path
-      true # OK if already loaded
-    rescue LoadError => e
-      # HACK: :( because we should raise on syntax errors
-      #       but not if the file doesn't exist.
-      # TODO: make robust!
-      raise unless e.to_s.include? path
     end
 
     def self.should_init?(command)

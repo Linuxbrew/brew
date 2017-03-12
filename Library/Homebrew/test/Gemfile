@@ -1,8 +1,5 @@
 source "https://rubygems.org"
 
-gem "mocha"
-gem "minitest"
-gem "minitest-reporters"
 gem "parallel_tests"
 gem "rspec"
 gem "rspec-its", require: false

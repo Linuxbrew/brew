@@ -1,5 +1,21 @@
-#:  * `tests` [`-v`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<test_script:test_method>] [`--seed` <seed>] [`--trace`] [`--online`] [`--official-cmd-taps`]:
-#:    Run Homebrew's unit and integration tests.
+#:  * `tests` [`--verbose`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<test_script>[`:`<line_number>]] [`--seed` <seed>] [`--online`] [`--official-cmd-taps`]:
+#:    Run Homebrew's unit and integration tests. If provided,
+#:    `--only=`<test_script> runs only <test_script>_spec.rb, and `--seed`
+#:    randomizes tests with the provided value instead of a random seed.
+#:
+#:    If `--verbose` is passed, print the command that runs the tests.
+#:
+#:    If `--coverage` is passed, also generate code coverage reports.
+#:
+#:    If `--generic` is passed, only run OS-agnostic tests.
+#:
+#:    If `--no-compat` is passed, do not load the compatibility layer when
+#:    running tests.
+#:
+#:    If `--online` is passed, include tests that use the GitHub API.
+#:
+#:    If `--official-cmd-taps` is passed, include tests that use any of the
+#:    taps for official external commands.
 
 require "fileutils"
 require "tap"
@@ -7,27 +23,17 @@ require "tap"
 module Homebrew
   module_function
 
-  def run_tests(executable, files, args = [])
-    opts = []
-    opts << "--serialize-stdout" if ENV["CI"]
-
-    system "bundle", "exec", executable, *opts, "--", *args, "--", *files
-
-    return if $?.success?
-    Homebrew.failed = true
-  end
-
   def tests
     HOMEBREW_LIBRARY_PATH.cd do
-      ENV.delete "HOMEBREW_VERBOSE"
-      ENV.delete "VERBOSE"
+      ENV.delete("HOMEBREW_VERBOSE")
+      ENV.delete("VERBOSE")
       ENV.delete("HOMEBREW_CASK_OPTS")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_DEVELOPER"] = "1"
-      ENV["TESTOPTS"] = "-v" if ARGV.verbose?
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
       ENV["HOMEBREW_NO_GITHUB_API"] = "1" unless ARGV.include? "--online"
+
       if ARGV.include? "--official-cmd-taps"
         ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"] = "1"
       end
@@ -38,7 +44,6 @@ module Homebrew
       end
 
       ENV["BUNDLE_GEMFILE"] = "#{HOMEBREW_LIBRARY_PATH}/test/Gemfile"
-      ENV["BUNDLE_PATH"] = "#{HOMEBREW_LIBRARY_PATH}/vendor/bundle"
 
       # Override author/committer as global settings might be invalid and thus
       # will cause silent failure during the setup of dummy Git repositories.
@@ -53,30 +58,29 @@ module Homebrew
         system "bundle", "install"
       end
 
-      # Make it easier to reproduce test runs.
-      ENV["SEED"] = ARGV.next if ARGV.include? "--seed"
+      parallel = true
 
-      files = Dir.glob("test/**/*_{spec,test}.rb")
-                 .reject { |p| !OS.mac? && p.start_with?("test/os/mac/") }
-                 .reject { |p| !OS.mac? && p.start_with?("test/cask/") }
-                 .reject { |p| p.start_with?("test/vendor/bundle/") }
+      files = if ARGV.value("only")
+        test_name, line = ARGV.value("only").split(":", 2)
 
-      test_args = []
-      test_args << "--trace" if ARGV.include? "--trace"
-
-      if ARGV.value("only")
-        test_name, test_method = ARGV.value("only").split(":", 2)
-        files = Dir.glob("test/{#{test_name},#{test_name}/**/*}_{spec,test}.rb")
-        test_args << "--name=test_#{test_method}" if test_method
+        if line.nil?
+          Dir.glob("test/{#{test_name},#{test_name}/**/*}_spec.rb")
+        else
+          parallel = false
+          ["test/#{test_name}_spec.rb:#{line}"]
+        end
+      else
+        Dir.glob("test/**/*_spec.rb").reject { |p| p =~ %r{^test/vendor/bundle/} }
       end
 
-      test_files = files.select { |p| p.end_with?("_test.rb") }
-      spec_files = files.select { |p| p.end_with?("_spec.rb") }
+      opts = []
 
-      test_args += ARGV.named.select { |v| v[/^TEST(OPTS)?=/] }
-      run_tests "parallel_test", test_files, test_args
+      if ENV["CI"]
+        opts << "--combine-stderr"
+        opts << "--serialize-stdout"
+      end
 
-      spec_args = [
+      args = [
         "--color",
         "-I", HOMEBREW_LIBRARY_PATH/"test",
         "--require", "spec_helper",
@@ -84,16 +88,22 @@ module Homebrew
         "--format", "ParallelTests::RSpec::RuntimeLogger",
         "--out", "tmp/parallel_runtime_rspec.log"
       ]
-      run_tests "parallel_rspec", spec_files, spec_args
 
-      if (fs_leak_log = HOMEBREW_LIBRARY_PATH/"tmp/fs_leak.log").file?
-        fs_leak_log_content = fs_leak_log.read
-        unless fs_leak_log_content.empty?
-          opoo "File leak is detected"
-          puts fs_leak_log_content
-          Homebrew.failed = true
-        end
+      args << "--seed" << ARGV.next if ARGV.include? "--seed"
+
+      unless OS.mac?
+        args << "--tag" << "~needs_macos"
+        files = files.reject { |p| p =~ %r{^test/(os/mac|cask)(/.*|_spec\.rb)$} }
       end
+
+      if parallel
+        system "bundle", "exec", "parallel_rspec", *opts, "--", *args, "--", *files
+      else
+        system "bundle", "exec", "rspec", *args, "--", *files
+      end
+
+      return if $?.success?
+      Homebrew.failed = true
     end
   end
 end

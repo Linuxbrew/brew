@@ -8,8 +8,9 @@ cask 'with-uninstall-delete' do
   pkg 'Fancy.pkg'
 
   uninstall delete: [
-                      '/permissible/absolute/path',
-                      '~/permissible/path/with/tilde',
+                      "#{TEST_TMPDIR}/absolute_path",
+                      '~/path_with_tilde',
+                      "#{TEST_TMPDIR}/glob_path*",
                       'impermissible/relative/path',
                       '/another/impermissible/../relative/path',
                     ]

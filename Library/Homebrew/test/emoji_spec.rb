@@ -4,7 +4,12 @@ describe Emoji do
   describe "#install_badge" do
     subject { described_class.install_badge }
 
-    it "returns 🍺 by default" do
+    before(:each) do
+      ENV.delete("HOMEBREW_NO_EMOJI")
+      ENV.delete("HOMEBREW_INSTALL_BADGE")
+    end
+
+    it "returns 🍺  by default" do
       expect(subject).to eq "🍺"
     end
 

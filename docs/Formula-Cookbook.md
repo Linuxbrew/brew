@@ -288,13 +288,13 @@ Name the formula like the project markets the product. So it’s `pkg-config`, n
 
 The only exception is stuff like “Apache Ant”. Apache sticks “Apache” in front of everything, but we use the formula name `ant`. We only include the prefix in cases like *GNUplot* (because it’s part of the name) and *GNU Go* (because everyone calls it “GNU go”—nobody just calls it “Go”). The word “Go” is too common and there are too many implementations of it.
 
-If you’re not sure about the name check the homepage, and check the Wikipedia page and [what Debian call it](https://www.debian.org/distrib/packages).
+If you’re not sure about the name check the homepage, and check the Wikipedia page and [what Debian calls it](https://www.debian.org/distrib/packages).
 
-Where Homebrew already has a formula called `foo` we typically do not accept requests to replace that formula with something else also named `foo`. This is to avoid both confusing and surprising users’ expectation.
+Where Homebrew already has a formula called `foo` we typically do not accept requests to replace that formula with something else also named `foo`. This is to avoid both confusing and surprising users’ expectations.
 
 When two formulae share an upstream name, e.g. [`AESCrypt`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/aescrypt.rb) and [`AESCrypt`](https://github.com/Homebrew/homebrew-core/blob/master/Formula/aescrypt-packetizer.rb) the newer formula must typically adapt the name to avoid conflict with the current formula.
 
-If you’re *still* not sure, just commit. We’ll apply some arbitrary rule and make a decision :wink:.
+If you’re *still* not sure, just commit. We’ll apply some arbitrary rule and make a decision 😉.
 
 When importing classes, Homebrew will require the formula and then create an instance of the class. It does this by assuming the formula name can be directly converted to the class name using a `regexp`. The rules are simple:
 

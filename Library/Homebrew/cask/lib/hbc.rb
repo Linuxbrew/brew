@@ -37,8 +37,6 @@ require "hbc/verify"
 require "hbc/version"
 require "utils"
 
-require "vendor/plist/plist"
-
 module Hbc
   include Locations
   include Scopes

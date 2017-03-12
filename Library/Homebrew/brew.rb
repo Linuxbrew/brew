@@ -53,9 +53,6 @@ begin
     ENV["PATH"] += "#{File::PATH_SEPARATOR}#{tap_cmd_dir}"
   end
 
-  # Add cask commands to PATH.
-  ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_LIBRARY}/Homebrew/cask/cmd"
-
   # Add SCM wrappers.
   ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_SHIMS_PATH}/scm"
 

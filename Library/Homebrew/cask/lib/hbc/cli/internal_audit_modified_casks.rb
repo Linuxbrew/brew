@@ -3,40 +3,38 @@ module Hbc
     class InternalAuditModifiedCasks < InternalUseBase
       RELEVANT_STANZAS = [:version, :sha256, :url, :appcast].freeze
 
-      class << self
-        def needs_init?
-          true
-        end
+      def self.needs_init?
+        true
+      end
 
-        def run(*args)
-          commit_range = commit_range(args)
-          cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }
-          new(commit_range, cleanup: cleanup).run
-        end
+      def self.run(*args)
+        commit_range = commit_range(args)
+        cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }
+        new(commit_range, cleanup: cleanup).run
+      end
 
-        def commit_range(args)
-          posargs = args.reject { |a| a.empty? || a.chars.first == "-" }
-          odie usage unless posargs.size == 1
-          posargs.first
-        end
+      def self.commit_range(args)
+        posargs = args.reject { |a| a.empty? || a.chars.first == "-" }
+        odie usage unless posargs.size == 1
+        posargs.first
+      end
 
-        def posargs(args)
-          args.reject { |a| a.empty? || a.chars.first == "-" }
-        end
+      def self.posargs(args)
+        args.reject { |a| a.empty? || a.chars.first == "-" }
+      end
 
-        def usage
-          <<-EOS.undent
-            Usage: brew cask _audit_modified_casks [options...] <commit range>
+      def self.usage
+        <<-EOS.undent
+          Usage: brew cask _audit_modified_casks [options...] <commit range>
 
-            Given a range of Git commits, find any Casks that were modified and run `brew
-            cask audit' on them. If the `url', `version', or `sha256' stanzas were modified,
-            run with the `--download' flag to verify the hash.
+          Given a range of Git commits, find any Casks that were modified and run `brew
+          cask audit' on them. If the `url', `version', or `sha256' stanzas were modified,
+          run with the `--download' flag to verify the hash.
 
-            Options:
-              -c, --cleanup
-                Remove all cached downloads. Use with care.
-          EOS
-        end
+          Options:
+            -c, --cleanup
+              Remove all cached downloads. Use with care.
+        EOS
       end
 
       def initialize(commit_range, cleanup: false)
@@ -85,7 +83,7 @@ module Hbc
         @modified_casks = modified_cask_files.map { |f| Hbc.load(f) }
         if @modified_casks.any?
           num_modified = @modified_casks.size
-          ohai "#{num_modified} modified #{pluralize("cask", num_modified)}: " \
+          ohai "#{num_modified} modified cask#{plural(num_modified)}: " \
             "#{@modified_casks.join(" ")}"
         end
         @modified_casks
@@ -122,13 +120,8 @@ module Hbc
       def report_failures
         return if failed_casks.empty?
         num_failed = failed_casks.size
-        cask_pluralized = pluralize("cask", num_failed)
-        odie "audit failed for #{num_failed} #{cask_pluralized}: " \
+        odie "audit failed for #{num_failed} cask#{plural(num_failed)}: " \
           "#{failed_casks.join(" ")}"
-      end
-
-      def pluralize(str, num)
-        num == 1 ?  str : "#{str}s"
       end
 
       def cleanup
