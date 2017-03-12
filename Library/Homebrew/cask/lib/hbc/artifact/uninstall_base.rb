@@ -163,7 +163,7 @@ module Hbc
       def uninstall_script(directives, directive_name: :script)
         executable, script_arguments = self.class.read_script_arguments(directives,
                                                                         "uninstall",
-                                                                        { must_succeed: true, sudo: true },
+                                                                        { must_succeed: true, sudo: false },
                                                                         { print_stdout: true },
                                                                         directive_name)
 

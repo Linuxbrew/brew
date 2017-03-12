@@ -216,35 +216,32 @@ shared_examples "#uninstall_phase or #zap_phase" do
     end
   end
 
-  context "using :script" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-#{artifact_name}-script.rb") }
-    let(:script_pathname) { cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool") }
+  [:script, :early_script].each do |script_type|
+    context "using #{script_type.inspect}" do
+      let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
+      let(:token) { "with-#{artifact_name}-#{script_type}".tr("_", "-") }
+      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/#{token}.rb") }
+      let(:script_pathname) { cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool") }
 
-    it "is supported" do
-      Hbc::FakeSystemCommand.expects_command(%w[/bin/chmod -- +x] + [script_pathname])
+      it "is supported" do
+        allow(fake_system_command).to receive(:run).with(any_args).and_call_original
 
-      Hbc::FakeSystemCommand.expects_command(
-        sudo(cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"), "--please"),
-      )
+        expect(fake_system_command).to receive(:run).with(
+          "/bin/chmod",
+          args: ["--", "+x", script_pathname],
+        )
 
-      InstallHelper.install_without_artifacts(cask)
-      subject
-    end
-  end
+        expect(fake_system_command).to receive(:run).with(
+          cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"),
+          args: ["--please"],
+          must_succeed: true,
+          print_stdout: true,
+          sudo: false,
+        )
 
-  context "using :early_script" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-#{artifact_name}-early-script.rb") }
-    let(:script_pathname) { cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool") }
-
-    it "is supported" do
-      Hbc::FakeSystemCommand.expects_command(%w[/bin/chmod -- +x] + [script_pathname])
-
-      Hbc::FakeSystemCommand.expects_command(
-        sudo(cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool"), "--please"),
-      )
-
-      InstallHelper.install_without_artifacts(cask)
-      subject
+        InstallHelper.install_without_artifacts(cask)
+        subject
+      end
     end
   end
 

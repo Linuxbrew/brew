@@ -16,7 +16,7 @@ module Hbc
           else
             executable, script_arguments = self.class.read_script_arguments(artifact.script,
                                                                             self.class.artifact_dsl_key.to_s,
-                                                                            { must_succeed: true, sudo: true },
+                                                                            { must_succeed: true, sudo: false },
                                                                             print_stdout: true)
             ohai "Running #{self.class.artifact_dsl_key} script #{executable}"
             raise CaskInvalidError.new(@cask, "#{self.class.artifact_dsl_key} missing executable") if executable.nil?
