@@ -458,14 +458,6 @@ EOS
       then
         # Skip taps checked/fetched recently
         [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mtime -"${HOMEBREW_AUTO_UPDATE_SECS}"s 2>/dev/null)" ]] && exit
-
-        # Skip taps without formulae (but always update Homebrew/brew and Homebrew/homebrew-core)
-        if [[ "$DIR" != "$HOMEBREW_REPOSITORY" &&
-              "$DIR" != "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]]
-        then
-          FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
-          [[ -z "$FORMULAE" ]] && exit
-        fi
       fi
 
       UPSTREAM_REPOSITORY_URL="$(git config remote.origin.url)"
