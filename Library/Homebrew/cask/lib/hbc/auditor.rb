@@ -42,7 +42,7 @@ module Hbc
     def audit_languages(languages)
       ohai "Auditing language: #{languages.map { |lang| "'#{lang}'" }.join(", ")}"
       MacOS.instance_variable_set(:@languages, languages)
-      audit_cask_instance(Hbc.load(cask.sourcefile_path))
+      audit_cask_instance(CaskLoader.load_from_file(cask.sourcefile_path))
     ensure
       CLI::Cleanup.run(cask.token) if audit_download?
     end
