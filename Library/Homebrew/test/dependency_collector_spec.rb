@@ -58,7 +58,7 @@ describe DependencyCollector do
       expect(find_requirement(x_requirement).tags).to be_empty
     end
 
-    specify "x11 with minimum version" do
+    specify "x11 with minimum version", :needs_macos do
       subject.add x11: "2.5.1"
       expect(find_requirement(X11Requirement).min_version.to_s).to eq("2.5.1")
     end
@@ -68,7 +68,7 @@ describe DependencyCollector do
       expect(find_requirement(x_requirement)).to be_optional
     end
 
-    specify "x11 with minimum version and tag" do
+    specify "x11 with minimum version and tag", :needs_macos do
       subject.add x11: ["2.5.1", :optional]
       dep = find_requirement(X11Requirement)
       expect(dep.min_version.to_s).to eq("2.5.1")
