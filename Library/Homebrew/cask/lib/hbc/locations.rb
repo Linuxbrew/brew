@@ -126,15 +126,14 @@ module Hbc
         end
 
         if token_with_tap
-          user, repo, token = token_with_tap.split("/")
+          user, repo, token = token_with_tap.split("/", 3)
           tap = Tap.fetch(user, repo)
         else
           token = query_without_extension
           tap = Hbc.default_tap
         end
 
-        return query_path if tap.cask_dir.nil?
-        tap.cask_dir.join("#{token}.rb")
+        CaskLoader.default_path(token)
       end
 
       def tcc_db

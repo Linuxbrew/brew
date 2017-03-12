@@ -11,15 +11,15 @@ module Hbc
       end
 
       def all_tapped_cask_dirs
-        Tap.map(&:cask_dir).compact
+        Tap.map(&:cask_dir).select(&:directory?)
       end
 
       def all_tokens
-        Tap.map do |t|
+        Tap.flat_map do |t|
           t.cask_files.map do |p|
             "#{t.name}/#{File.basename(p, ".rb")}"
           end
-        end.flatten
+        end
       end
 
       def installed

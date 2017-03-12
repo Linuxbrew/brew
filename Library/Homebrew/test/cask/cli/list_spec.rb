@@ -40,23 +40,6 @@ describe Hbc::CLI::List, :cask do
     end
   end
 
-  describe "when Casks have been renamed" do
-    let(:caskroom_path) { Hbc.caskroom.join("ive-been-renamed") }
-    let(:staged_path) { caskroom_path.join("latest") }
-
-    before do
-      staged_path.mkpath
-    end
-
-    it "lists installed Casks without backing ruby files (due to renames or otherwise)" do
-      expect {
-        Hbc::CLI::List.run
-      }.to output(<<-EOS.undent).to_stdout
-        ive-been-renamed (!)
-      EOS
-    end
-  end
-
   describe "given a set of installed Casks" do
     let(:caffeine) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb") }
     let(:transmission) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb") }
