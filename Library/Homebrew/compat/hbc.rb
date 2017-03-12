@@ -9,7 +9,9 @@ module Hbc
       Module.new do
         def init
           Cache.delete_legacy_cache
+
           Caskroom.migrate_caskroom_from_repo_to_prefix
+          Caskroom.migrate_legacy_caskroom
 
           super
         end
