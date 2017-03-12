@@ -76,7 +76,7 @@ describe Homebrew::Diagnostic::Checks do
     end
   end
 
-  specify "#check_homebrew_prefix" do
+  specify "#check_homebrew_prefix", :needs_macos do
     ENV.delete("JENKINS_HOME")
     # the integration tests are run in a special prefix
     expect(subject.check_homebrew_prefix)
