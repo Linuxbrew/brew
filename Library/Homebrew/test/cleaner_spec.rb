@@ -20,7 +20,8 @@ describe Cleaner do
 
       subject.clean
 
-      expect((f.bin/"a.out").stat.mode).to eq(0100555)
+      mach_executable_perm = OS.linux? ? 0100444 : 0100555
+      expect((f.bin/"a.out").stat.mode).to eq(mach_executable_perm)
       expect((f.lib/"fat.dylib").stat.mode).to eq(0100444)
       expect((f.lib/"x86_64.dylib").stat.mode).to eq(0100444)
       expect((f.lib/"i386.dylib").stat.mode).to eq(0100444)
