@@ -144,7 +144,7 @@ describe Homebrew::Diagnostic::Checks do
     end
   end
 
-  specify "#check_dyld_vars" do
+  specify "#check_dyld_vars", :needs_macos do
     ENV["DYLD_INSERT_LIBRARIES"] = "foo"
     expect(subject.check_dyld_vars).to match("Setting DYLD_INSERT_LIBRARIES")
   end
