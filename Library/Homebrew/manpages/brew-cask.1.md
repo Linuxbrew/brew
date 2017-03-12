@@ -64,7 +64,7 @@ names, and other aspects of this manual are still subject to change.
   * `home` or `homepage` [ <token> ... ]:
     Display the homepage associated with a given Cask in a browser.
 
-    With no arguments, display the project page <http://caskroom.io>.
+    With no arguments, display the project page <http://caskroom.github.io>.
 
   * `info` or `abv` <token> [ <token> ... ]:
     Display information about the given Cask.
@@ -248,7 +248,7 @@ Environment variables specific to Homebrew-Cask:
 
 ## SEE ALSO
 
-The Homebrew-Cask home page: <http://caskroom.io>
+The Homebrew-Cask home page: <http://caskroom.github.io>
 
 The Homebrew-Cask GitHub page: <https://github.com/caskroom/homebrew-cask>
 
