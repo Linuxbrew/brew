@@ -36,8 +36,7 @@ module Hbc
               elsif @options[:versions]
                 puts format_versioned(cask)
               else
-                installed_caskfile = cask.metadata_master_container_path.join(*cask.timestamped_versions.last, "Casks", "#{cask_token}.rb")
-                cask = Hbc.load(installed_caskfile)
+                cask = CaskLoader.load_from_file(cask.installed_caskfile)
                 list_artifacts(cask)
               end
 
