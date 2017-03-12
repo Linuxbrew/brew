@@ -84,6 +84,11 @@ module Hbc
       !versions.empty?
     end
 
+    def installed_caskfile
+      installed_version = timestamped_versions.last
+      metadata_master_container_path.join(*installed_version, "Casks", "#{token}.rb")
+    end
+
     def to_s
       @token
     end
