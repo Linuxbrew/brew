@@ -53,6 +53,13 @@ module Hbc
         puts Formatter.columns(highlighted)
       end
 
+      def self.highlight_installed(token)
+        if Hbc::Cask.new(token).installed?
+          token = pretty_installed token
+        end
+        token
+      end
+
       def self.help
         "searches all known Casks"
       end

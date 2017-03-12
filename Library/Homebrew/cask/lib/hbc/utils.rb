@@ -36,13 +36,6 @@ def odebug(title, *sput)
   puts sput unless sput.empty?
 end
 
-def highlight_installed(token)
-  if Hbc::Cask.new(token).installed?
-    token = pretty_installed token
-  end
-  token
-end
-
 module Hbc
   module Utils
     def self.gain_permissions_remove(path, command: SystemCommand)
