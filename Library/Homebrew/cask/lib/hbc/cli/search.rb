@@ -54,7 +54,7 @@ module Hbc
       end
 
       def self.highlight_installed(token)
-        if Hbc::Cask.new(token).installed?
+        if Cask.new(token).installed?
           token = pretty_installed token
         end
         token
