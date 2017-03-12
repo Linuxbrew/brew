@@ -40,7 +40,7 @@ describe Hbc::CLI::Home, :cask do
   it "opens the project page when no Cask is specified" do
     Hbc::CLI::Home.run
     expect(Hbc::CLI::Home.system_commands).to eq [
-      ["/usr/bin/open", "--", "http://caskroom.github.io/"],
+      ["/usr/bin/open", "--", "https://caskroom.github.io/"],
     ]
   end
 end
