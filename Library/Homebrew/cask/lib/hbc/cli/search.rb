@@ -49,15 +49,12 @@ module Hbc
         else
           ohai "Partial matches"
         end
-        highlighted = partial_matches.map { |match| highlight_installed match }
-        puts Formatter.columns(highlighted)
+        puts Formatter.columns(partial_matches.map(&method(:highlight_installed)))
       end
 
       def self.highlight_installed(token)
-        if Cask.new(token).installed?
-          token = pretty_installed token
-        end
-        token
+        return token unless Cask.new(token).installed?
+        pretty_installed token
       end
 
       def self.help
