@@ -177,8 +177,9 @@ class FormulaAuditor
 
     details = nil
     user_agent = nil
+    hash_needed = url.start_with?("http:")
     user_agents.each do |ua|
-      details = http_content_headers_and_checksum(url, user_agent: ua)
+      details = http_content_headers_and_checksum(url, hash_needed: hash_needed, user_agent: ua)
       user_agent = ua
       break if details[:status].to_s.start_with?("2")
     end
@@ -188,11 +189,11 @@ class FormulaAuditor
       return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
     end
 
-    return unless url.start_with? "http:"
+    return unless hash_needed
 
     secure_url = url.sub "http", "https"
     secure_details =
-      http_content_headers_and_checksum(secure_url, user_agent: user_agent)
+      http_content_headers_and_checksum(secure_url, hash_needed: true, user_agent: user_agent)
 
     if !details[:status].to_s.start_with?("2") ||
        !secure_details[:status].to_s.start_with?("2")
@@ -210,9 +211,10 @@ class FormulaAuditor
     "The URL #{url} could use HTTPS rather than HTTP"
   end
 
-  def self.http_content_headers_and_checksum(url, user_agent: :default)
+  def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
+    max_time = hash_needed ? "600" : "25"
     args = curl_args(
-      extra_args: ["--connect-timeout", "15", "--include", url],
+      extra_args: ["--connect-timeout", "15", "--include", "--max-time", max_time, url],
       show_output: true,
       user_agent: user_agent,
     )
@@ -224,11 +226,13 @@ class FormulaAuditor
       status_code = headers[%r{HTTP\/.* (\d+)}, 1]
     end
 
+    output_hash = Digest::SHA256.digest(output) if hash_needed
+
     {
       status: status_code,
       etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
       content_length: headers[/Content-Length: (\d+)/, 1],
-      file_hash: Digest::SHA256.digest(output),
+      file_hash: output_hash,
     }
   end
 
