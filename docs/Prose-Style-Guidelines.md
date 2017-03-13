@@ -28,7 +28,7 @@ We prefer:
 
 * British/Commonwealth English over American English, in general
 * "e.g." and "i.e.": Go ahead and use "e.g." or "i.e." instead of spelling them out. Don't worry about putting a comma after them.
- * "e.g." means "for example"; "i.e." means "that is"
+  * "e.g." means "for example"; "i.e." means "that is"
 * Offset nontrivial subordinate clauses with commas
 
 ### Personal pronouns
@@ -45,36 +45,36 @@ We prefer:
 * Capitalize all list items if you want, even if they're not complete sentences; just be consistent within each list, and preferably, throughout the whole page
 * Use a subordinate list item instead of dropping a multi-sentence paragraph-long item into a list of sentence fragments
 * Prefer Markdown over other markup formats unless their specific features are needed
- * GitHub Flavored Markdown. GitHub's implementation is the standard, period.
+  * GitHub Flavored Markdown. GitHub's implementation is the standard, period.
 
 ### Typographical conventions
 
 * Literal text in commands and code is styled in `fixed width font`
 * Placeholders inside code snippets are marked up with `<...>` brackets
- * e.g. `git remote add <my-user-name> https://github.com/<my-user-name>/homebrew-core.git`
+  * e.g. `git remote add <my-user-name> https://github.com/<my-user-name>/homebrew-core.git`
 * Names of commands like `git` and `brew` are styled in `fixed width font`
 * No "$" with environment variables mentioned outside code snippets
- * e.g. "Set `BLAH` to 5", not "Set `$BLAH` to 5"
+  * e.g. "Set `BLAH` to 5", not "Set `$BLAH` to 5"
 * One space after periods, not two
 * Capitalized proper nouns
 * We do not defer to extensive nonstandard capitalization, typesetting, or other styling of brand names, aside from the normal capitalization of proper nouns and simple internal capitalization
 * No "TM", &trade;, <sup>SM</sup>, &copy;, &reg;, or other explicit indicators of rights ownership or trademarks; we take these as understood when the brand name is mentioned
 * Tap names like `homebrew/core` are styled in `fixed width font`. Repository names may be styled in either fixed width font like "`Homebrew/homebrew-core`", as links like "[Homebrew/homebrew-core](https://github.com/homebrew/homebrew-core)", or regular text like "Homebrew/homebrew-core", based on which looks best for a given use.
- * But be consistent within a single document
- * Capitalize repository names to match the user and repository names on GitHub. Keep tap names in lower case.
+  * But be consistent within a single document
+  * Capitalize repository names to match the user and repository names on GitHub. Keep tap names in lower case.
 * Commas
- * No Oxford commas
- * Prefer a "loose" comma style: "when in doubt, leave it out" unless needed for clarity
+  * No Oxford commas
+  * Prefer a "loose" comma style: "when in doubt, leave it out" unless needed for clarity
 
 ### Terminology, words, and word styling
 
 * "pull request", not "Pull Request"
 * "check out" is the verb; "checkout" is the noun
 * Spell out certain technical words
- * "repository", not "repo"
- * When abbreviating, introduce the abbreviation with the first usage in any document
+  * "repository", not "repo"
+  * When abbreviating, introduce the abbreviation with the first usage in any document
 * Some abbreviations (near-universally understood among our user base) are fine, though.
- * "Mac" is fine; "Macintosh" isn't necessary
+  * "Mac" is fine; "Macintosh" isn't necessary
 * "macOS" for all versions, "OS X" or "Mac OS X" when describing specific older versions
 * "RuboCop", not "Rubocop"
 * A pull request is made "on" a repository; that repository is "at" a URL
