@@ -578,7 +578,7 @@ status code if changes are detected in the manpage outputs.
 This can be used for CI to be notified when the manpages are out of date.
 Additionally, the date used in new manpages will match those in the existing
 manpages (to allow comparison without factoring in the date).</p></dd>
-<dt><code>pull</code> [<code>--bottle</code>] [<code>--bump</code>] [<code>--clean</code>] [<code>--ignore-whitespace</code>] [<code>--resolve</code>] [<code>--branch-okay</code>] [<code>--no-pbcopy</code>] [<code>--no-publish</code>] <var>patch-source</var> [<var>patch-source</var>]</dt><dd><p>Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
+<dt><code>pull</code> [<code>--bottle</code>] [<code>--bump</code>] [<code>--clean</code>] [<code>--ignore-whitespace</code>] [<code>--resolve</code>] [<code>--branch-okay</code>] [<code>--tap</code>] [<code>--no-pbcopy</code>] [<code>--no-publish</code>] <var>patch-source</var> [<var>patch-source</var>]</dt><dd><p>Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 Optionally, installs the formulae changed by the patch.</p>
 
 <p>Each <var>patch-source</var> may be one of:</p>
@@ -611,6 +611,8 @@ progress and allow user to resolve, instead of aborting.</p>
 
 <p>If <code>--branch-okay</code> is passed, do not warn if pulling to a branch
 besides master (useful for testing).</p>
+
+<p>If <code>--tap</code> is passed, use the git repository of the given tap.</p>
 
 <p>If <code>--no-pbcopy</code> is passed, do not copy anything to the system
 clipboard.</p>
