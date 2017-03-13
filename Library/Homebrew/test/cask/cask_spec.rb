@@ -27,20 +27,20 @@ describe Hbc::Cask, :cask do
     let(:relative_tap_path) { tap_path.relative_path_from(file_dirname) }
 
     it "returns an instance of the Cask for the given token" do
-      c = Hbc.load("local-caffeine")
+      c = Hbc::CaskLoader.load("local-caffeine")
       expect(c).to be_kind_of(Hbc::Cask)
       expect(c.token).to eq("local-caffeine")
     end
 
     it "returns an instance of the Cask from a specific file location" do
-      c = Hbc.load("#{tap_path}/Casks/local-caffeine.rb")
+      c = Hbc::CaskLoader.load("#{tap_path}/Casks/local-caffeine.rb")
       expect(c).to be_kind_of(Hbc::Cask)
       expect(c.token).to eq("local-caffeine")
     end
 
     it "returns an instance of the Cask from a url" do
       c = shutup do
-        Hbc.load("file://#{tap_path}/Casks/local-caffeine.rb")
+        Hbc::CaskLoader.load("file://#{tap_path}/Casks/local-caffeine.rb")
       end
       expect(c).to be_kind_of(Hbc::Cask)
       expect(c.token).to eq("local-caffeine")
@@ -50,25 +50,25 @@ describe Hbc::Cask, :cask do
       expect {
         url = "file://#{tap_path}/Casks/notacask.rb"
         shutup do
-          Hbc.load(url)
+          Hbc::CaskLoader.load(url)
         end
       }.to raise_error(Hbc::CaskUnavailableError)
     end
 
     it "returns an instance of the Cask from a relative file location" do
-      c = Hbc.load(relative_tap_path/"Casks/local-caffeine.rb")
+      c = Hbc::CaskLoader.load(relative_tap_path/"Casks/local-caffeine.rb")
       expect(c).to be_kind_of(Hbc::Cask)
       expect(c.token).to eq("local-caffeine")
     end
 
     it "uses exact match when loading by token" do
-      expect(Hbc.load("test-opera").token).to eq("test-opera")
-      expect(Hbc.load("test-opera-mail").token).to eq("test-opera-mail")
+      expect(Hbc::CaskLoader.load("test-opera").token).to eq("test-opera")
+      expect(Hbc::CaskLoader.load("test-opera-mail").token).to eq("test-opera-mail")
     end
 
     it "raises an error when attempting to load a Cask that doesn't exist" do
       expect {
-        Hbc.load("notacask")
+        Hbc::CaskLoader.load("notacask")
       }.to raise_error(Hbc::CaskUnavailableError)
     end
   end
@@ -84,7 +84,7 @@ describe Hbc::Cask, :cask do
   describe "metadata" do
     it "proposes a versioned metadata directory name for each instance" do
       cask_token = "local-caffeine"
-      c = Hbc.load(cask_token)
+      c = Hbc::CaskLoader.load(cask_token)
       metadata_path = Hbc.caskroom.join(cask_token, ".metadata", c.version)
       expect(c.metadata_versioned_container_path.to_s).to eq(metadata_path.to_s)
     end
@@ -92,13 +92,13 @@ describe Hbc::Cask, :cask do
 
   describe "outdated" do
     it "ignores the Casks that have auto_updates true (without --greedy)" do
-      c = Hbc.load("auto-updates")
+      c = Hbc::CaskLoader.load("auto-updates")
       expect(c).not_to be_outdated
       expect(c.outdated_versions).to be_empty
     end
 
     it "ignores the Casks that have version :latest (without --greedy)" do
-      c = Hbc.load("version-latest-string")
+      c = Hbc::CaskLoader.load("version-latest-string")
       expect(c).not_to be_outdated
       expect(c.outdated_versions).to be_empty
     end

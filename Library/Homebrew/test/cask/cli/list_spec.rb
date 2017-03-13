@@ -1,6 +1,6 @@
 describe Hbc::CLI::List, :cask do
   it "lists the installed Casks in a pretty fashion" do
-    casks = %w[local-caffeine local-transmission].map { |c| Hbc.load(c) }
+    casks = %w[local-caffeine local-transmission].map { |c| Hbc::CaskLoader.load(c) }
 
     casks.each do |c|
       InstallHelper.install_with_caskfile(c)
@@ -24,7 +24,7 @@ describe Hbc::CLI::List, :cask do
     }
 
     before(:each) do
-      casks.map(&Hbc.method(:load)).each(&InstallHelper.method(:install_with_caskfile))
+      casks.map(&Hbc::CaskLoader.method(:load)).each(&InstallHelper.method(:install_with_caskfile))
     end
 
     it "of all installed Casks" do

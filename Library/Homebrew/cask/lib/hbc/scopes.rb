@@ -23,10 +23,10 @@ module Hbc
       end
 
       def installed
-        # Hbc.load has some DWIM which is slow.  Optimize here
-        # by spoon-feeding Hbc.load fully-qualified paths.
+        # CaskLoader.load has some DWIM which is slow.  Optimize here
+        # by spoon-feeding CaskLoader.load fully-qualified paths.
         # TODO: speed up Hbc::Source::Tapped (main perf drag is calling Hbc.all_tokens repeatedly)
-        # TODO: ability to specify expected source when calling Hbc.load (minor perf benefit)
+        # TODO: ability to specify expected source when calling CaskLoader.load (minor perf benefit)
         Pathname.glob(caskroom.join("*"))
                 .map do |caskroom_path|
                   token = caskroom_path.basename.to_s
@@ -36,9 +36,9 @@ module Hbc
                   end
 
                   if path_to_cask
-                    Hbc.load(path_to_cask.join("#{token}.rb"))
+                    CaskLoader.load(path_to_cask.join("#{token}.rb"))
                   else
-                    Hbc.load(token)
+                    CaskLoader.load(token)
                   end
                 end
       end

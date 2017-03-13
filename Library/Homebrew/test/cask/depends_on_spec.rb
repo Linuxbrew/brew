@@ -17,7 +17,7 @@ describe "Satisfy Dependencies and Requirements", :cask do
 
     context do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask.rb") }
-      let(:dependency) { Hbc.load(cask.depends_on.cask.first) }
+      let(:dependency) { Hbc::CaskLoader.load(cask.depends_on.cask.first) }
 
       it "installs the dependency of a Cask and the Cask itself" do
         expect(subject).not_to raise_error

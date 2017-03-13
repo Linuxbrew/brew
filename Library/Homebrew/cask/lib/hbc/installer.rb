@@ -229,7 +229,7 @@ module Hbc
       deps = CaskDependencies.new(@cask)
       deps.sorted.each do |dep_token|
         puts "#{dep_token} ..."
-        dep = Hbc.load(dep_token)
+        dep = CaskLoader.load(dep_token)
         if dep.installed?
           puts "already installed"
         else

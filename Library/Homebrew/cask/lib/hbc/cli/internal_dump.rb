@@ -16,7 +16,7 @@ module Hbc
         count = 0
         cask_tokens.each do |cask_token|
           begin
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
             count += 1
             cask.dumpcask
           rescue StandardError => e

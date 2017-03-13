@@ -8,7 +8,7 @@ module Hbc
 
         cask_tokens.each do |cask_token|
           ohai "Downloading external files for Cask #{cask_token}"
-          cask = Hbc.load(cask_token)
+          cask = CaskLoader.load(cask_token)
           downloaded_path = Download.new(cask, force: force).perform
           Verify.all(cask, downloaded_path)
           ohai "Success! Downloaded to -> #{downloaded_path}"

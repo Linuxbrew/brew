@@ -84,7 +84,7 @@ module Hbc
 
       def modified_casks
         return @modified_casks if defined? @modified_casks
-        @modified_casks = modified_cask_files.map { |f| Hbc.load(f) }
+        @modified_casks = modified_cask_files.map { |f| CaskLoader.load(f) }
         if @modified_casks.any?
           num_modified = @modified_casks.size
           ohai "#{Formatter.pluralize(num_modified, "modified cask")}: " \

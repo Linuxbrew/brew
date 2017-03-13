@@ -291,7 +291,7 @@ describe "download strategies", :cask do
   # does not work yet, because (for unknown reasons), the tar command
   # returns an error code when running under the test suite
   # it 'creates a tarball matching the expected checksum' do
-  #   cask = Hbc.load('svn-download-check-cask')
+  #   cask = Hbc::CaskLoader.load('svn-download-check-cask')
   #   downloader = Hbc::SubversionDownloadStrategy.new(cask)
   #   # special mocking required for tar to have something to work with
   #   def downloader.fetch_repo(target, url, revision = nil, ignore_externals=false)

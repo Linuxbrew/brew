@@ -18,7 +18,7 @@ module Hbc
         count = 0
         cask_tokens.each do |cask_token|
           begin
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
             Installer.new(cask,
                                force:          force,
                                skip_cask_deps: skip_cask_deps,

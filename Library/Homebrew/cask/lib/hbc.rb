@@ -42,8 +42,4 @@ module Hbc
     Cache.ensure_cache_exists
     Caskroom.ensure_caskroom_exists
   end
-
-  def self.load(ref)
-    CaskLoader.load(ref)
-  end
 end
