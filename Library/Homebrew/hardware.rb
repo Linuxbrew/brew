@@ -9,7 +9,6 @@ module Hardware
 
     class << self
       OPTIMIZATION_FLAGS = {
-        penryn: "-march=core2 -msse4.1",
         core2: "-march=core2",
         core: "-march=prescott",
         dunno: "-march=native",
