@@ -24,7 +24,7 @@ describe Hbc::CLI::Create, :cask do
 
   after(:each) do
     %w[new-cask additional-cask another-cask yet-another-cask local-caff].each do |cask|
-      path = Hbc.path(cask)
+      path = Hbc::CaskLoader.path(cask)
       path.delete if path.exist?
     end
   end
@@ -32,13 +32,13 @@ describe Hbc::CLI::Create, :cask do
   it "opens the editor for the specified Cask" do
     Hbc::CLI::Create.run("new-cask")
     expect(Hbc::CLI::Create.editor_commands).to eq [
-      [Hbc.path("new-cask")],
+      [Hbc::CaskLoader.path("new-cask")],
     ]
   end
 
   it "drops a template down for the specified Cask" do
     Hbc::CLI::Create.run("new-cask")
-    template = File.read(Hbc.path("new-cask"))
+    template = File.read(Hbc::CaskLoader.path("new-cask"))
     expect(template).to eq <<-EOS.undent
       cask 'new-cask' do
         version ''
@@ -56,14 +56,14 @@ describe Hbc::CLI::Create, :cask do
   it "throws away additional Cask arguments and uses the first" do
     Hbc::CLI::Create.run("additional-cask", "another-cask")
     expect(Hbc::CLI::Create.editor_commands).to eq [
-      [Hbc.path("additional-cask")],
+      [Hbc::CaskLoader.path("additional-cask")],
     ]
   end
 
   it "throws away stray options" do
     Hbc::CLI::Create.run("--notavalidoption", "yet-another-cask")
     expect(Hbc::CLI::Create.editor_commands).to eq [
-      [Hbc.path("yet-another-cask")],
+      [Hbc::CaskLoader.path("yet-another-cask")],
     ]
   end
 
@@ -76,7 +76,7 @@ describe Hbc::CLI::Create, :cask do
   it "allows creating Casks that are substrings of existing Casks" do
     Hbc::CLI::Create.run("local-caff")
     expect(Hbc::CLI::Create.editor_commands).to eq [
-      [Hbc.path("local-caff")],
+      [Hbc::CaskLoader.path("local-caff")],
     ]
   end
 

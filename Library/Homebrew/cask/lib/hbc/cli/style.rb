@@ -39,7 +39,7 @@ module Hbc
         elsif cask_tokens.any? { |file| File.exist?(file) }
           cask_tokens
         else
-          cask_tokens.map { |token| Hbc.path(token) }
+          cask_tokens.map { |token| CaskLoader.path(token) }
         end
       end
 

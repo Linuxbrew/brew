@@ -25,14 +25,14 @@ describe Hbc::CLI::Edit, :cask do
   it "opens the editor for the specified Cask" do
     Hbc::CLI::Edit.run("local-caffeine")
     expect(Hbc::CLI::Edit.editor_commands).to eq [
-      [Hbc.path("local-caffeine")],
+      [Hbc::CaskLoader.path("local-caffeine")],
     ]
   end
 
   it "throws away additional arguments and uses the first" do
     Hbc::CLI::Edit.run("local-caffeine", "local-transmission")
     expect(Hbc::CLI::Edit.editor_commands).to eq [
-      [Hbc.path("local-caffeine")],
+      [Hbc::CaskLoader.path("local-caffeine")],
     ]
   end
 

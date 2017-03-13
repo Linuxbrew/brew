@@ -5,7 +5,7 @@ module Hbc
         cask_tokens = cask_tokens_from(args)
         raise CaskUnspecifiedError if cask_tokens.empty?
         cask_token = cask_tokens.first.sub(/\.rb$/i, "")
-        cask_path = Hbc.path(cask_token)
+        cask_path = CaskLoader.path(cask_token)
         odebug "Creating Cask #{cask_token}"
 
         raise CaskAlreadyCreatedError, cask_token if cask_path.exist?
