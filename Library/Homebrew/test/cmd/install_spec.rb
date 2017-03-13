@@ -151,7 +151,7 @@ describe "brew install", :integration_test do
       .and be_a_success
   end
 
-  it "can install HEAD Formulae" do
+  it "can install HEAD Formulae", :needs_macos do
     repo_path = HOMEBREW_CACHE.join("repo")
     repo_path.join("bin").mkpath
 
