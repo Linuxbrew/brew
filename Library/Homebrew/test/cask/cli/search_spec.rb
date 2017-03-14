@@ -58,14 +58,14 @@ describe Hbc::CLI::Search, :cask do
   end
 
   it "doesn't highlight not installed packages" do
-    expect(Hbc::CLI::Search.highlight_installed "local-caffeine").to eq("local-caffeine")
+    expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq("local-caffeine")
   end
 
   it "highlights installed packages" do
     shutup do
-        Hbc::CLI::Install.run("local-caffeine")
+      Hbc::CLI::Install.run("local-caffeine")
     end
 
-    expect(Hbc::CLI::Search.highlight_installed "local-caffeine").to eq(pretty_installed "local-caffeine")
+    expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq(pretty_installed("local-caffeine"))
   end
 end
