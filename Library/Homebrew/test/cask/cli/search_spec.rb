@@ -57,7 +57,7 @@ describe Hbc::CLI::Search, :cask do
     }.to output(/^No Cask found for "caskroom"\.\n/).to_stdout
   end
 
-  it "doesn't highlight not installed packages" do
+  it "doesn't highlight packages that aren't installed" do
     expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq("local-caffeine")
   end
 
