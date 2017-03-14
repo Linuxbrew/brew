@@ -49,7 +49,7 @@ You'll note that processing all formulae can be slow; it's quicker to let `brew`
 
 ### Linked keg-only formulae
 
-Some formulae are marked as "keg-only", meaning that installed files are not linked to the shared `bin`, `lib`, etc. directors, as doing so can cause conflicts. Such formulae can be forced to link to the shared directories, but doing so is not recommended (and will cause `brew doctor` to complain.)
+Some formulae are marked as "keg-only", meaning that installed files are not linked to the shared `bin`, `lib`, etc. directories, as doing so can cause conflicts. Such formulae can be forced to link to the shared directories, but doing so is not recommended (and will cause `brew doctor` to complain.)
 
 To find the names of linked keg-only formulae:
 
