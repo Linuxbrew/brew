@@ -39,7 +39,7 @@ module Hbc
         end
         if exact_match
           ohai "Exact match"
-          puts exact_match
+          puts highlight_installed exact_match
         end
 
         return if partial_matches.empty?
@@ -49,7 +49,12 @@ module Hbc
         else
           ohai "Partial matches"
         end
-        puts Formatter.columns(partial_matches)
+        puts Formatter.columns(partial_matches.map(&method(:highlight_installed)))
+      end
+
+      def self.highlight_installed(token)
+        return token unless Cask.new(token).installed?
+        pretty_installed token
       end
 
       def self.help
