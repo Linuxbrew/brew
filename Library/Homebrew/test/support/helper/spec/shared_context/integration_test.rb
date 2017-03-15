@@ -123,11 +123,16 @@ RSpec.shared_context "integration test" do
   def setup_test_formula(name, content = nil)
     case name
     when /^testball/
+      tarball = if OS.linux?
+        TEST_FIXTURE_DIR/"tarballs/testball-0.1-linux.tbz"
+      else
+        TEST_FIXTURE_DIR/"tarballs/testball-0.1.tbz"
+      end
       content = <<~EOS
         desc "Some test"
         homepage "https://example.com/#{name}"
-        url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
-        sha256 "#{TESTBALL_SHA256}"
+        url "file://#{tarball}"
+        sha256 "#{tarball.sha256}"
 
         option "with-foo", "Build with foo"
 
