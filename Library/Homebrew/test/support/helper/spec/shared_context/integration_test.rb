@@ -103,8 +103,8 @@ RSpec.shared_context "integration test" do
       content = <<-EOS.undent
         desc "Some test"
         homepage "https://example.com/#{name}"
-        url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
-        sha256 "#{TESTBALL_SHA256}"
+        url "file://#{TEST_FIXTURE_DIR}/tarballs/#{OS.linux? ? "testball-0.1-linux.tbz" : "testball-0.1.tbz"}"
+        sha256 "#{OS.linux? ? LINUX_TESTBALL_SHA256 : TESTBALL_SHA256}"
 
         option "with-foo", "Build with foo"
 
