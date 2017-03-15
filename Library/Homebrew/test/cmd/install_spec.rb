@@ -86,39 +86,39 @@ describe "brew install", :integration_test do
       .and not_to_output.to_stderr
       .and be_a_success
 
-    expect { brew "install", "testball1", "--devel" }
-      .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
-      .and not_to_output.to_stderr
-      .and be_a_success
-
-    expect { brew "unlink", "testball1" }
-      .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
-      .and not_to_output.to_stderr
-      .and be_a_success
-
-    expect { brew "install", "testball1" }
-      .to output(%r{#{HOMEBREW_CELLAR}/testball1/2\.0}).to_stdout
-      .and not_to_output.to_stderr
-      .and be_a_success
-
-    shutup do
-      expect { brew "switch", "testball1", "3.0" }.to be_a_success
-    end
-
-    expect { brew "install", "testball1" }
-      .to output(/already installed, however linked version is/).to_stderr
-      .and output(/`brew switch testball1 2.0`/).to_stdout
-      .and be_a_success
-
-    expect { brew "unlink", "testball1" }
-      .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
-      .and not_to_output.to_stderr
-      .and be_a_success
-
-    expect { brew "install", "testball1" }
-      .to output(/just not linked/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_success
+    # expect { brew "install", "testball1", "--devel" }
+    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
+    #   .and not_to_output.to_stderr
+    # #   .and be_a_success
+    #
+    # expect { brew "unlink", "testball1" }
+    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
+    #   .and not_to_output.to_stderr
+    #   .and be_a_success
+    #
+    # expect { brew "install", "testball1" }
+    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/2\.0}).to_stdout
+    #   .and not_to_output.to_stderr
+    #   .and be_a_success
+    #
+    # shutup do
+    #   expect { brew "switch", "testball1", "3.0" }.to be_a_success
+    # end
+    #
+    # expect { brew "install", "testball1" }
+    #   .to output(/already installed, however linked version is/).to_stderr
+    #   .and output(/`brew switch testball1 2.0`/).to_stdout
+    #   .and be_a_success
+    #
+    # expect { brew "unlink", "testball1" }
+    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
+    #   .and not_to_output.to_stderr
+    #   .and be_a_success
+    #
+    # expect { brew "install", "testball1" }
+    #   .to output(/just not linked/).to_stderr
+    #   .and not_to_output.to_stdout
+    #   .and be_a_success
   end
 
   it "can install keg-only Formulae" do
