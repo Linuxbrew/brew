@@ -3,7 +3,7 @@ require "gpg"
 
 class GPG2Requirement < Requirement
   fatal true
-  default_formula "gnupg2"
+  default_formula "gnupg"
 
   # MacGPG2/GPGTools installs GnuPG 2.0.x as a vanilla `gpg` symlink
   # pointing to `gpg2`, as do we. Ensure we're actually using a 2.0 `gpg`.
