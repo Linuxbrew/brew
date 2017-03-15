@@ -4,7 +4,7 @@ module Hbc
       def self.run(*cask_tokens)
         if cask_tokens.empty?
           odebug "Opening project homepage"
-          system "/usr/bin/open", "--", "http://caskroom.github.io/"
+          system "/usr/bin/open", "--", "https://caskroom.github.io/"
         else
           cask_tokens.each do |cask_token|
             odebug "Opening homepage for Cask #{cask_token}"

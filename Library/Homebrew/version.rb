@@ -360,8 +360,8 @@ class Version
     m = /-((?:\d+\.)*\d+-(?:alpha|beta|rc)\d*)$/.match(stem)
     return m.captures.first unless m.nil?
 
-    # e.g. http://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip
-    # e.g. http://ftpmirror.gnu.org/libmicrohttpd/libmicrohttpd-0.9.17-w32.zip
+    # e.g. https://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip
+    # e.g. https://ftpmirror.gnu.org/libmicrohttpd/libmicrohttpd-0.9.17-w32.zip
     m = /-(\d+\.\d+(?:\.\d+)?)-w(?:in)?(?:32|64)$/.match(stem)
     return m.captures.first unless m.nil?
 
@@ -372,11 +372,11 @@ class Version
     m = /\.(\d+\.\d+(?:\.\d+)?)\+opam$/.match(stem)
     return m.captures.first unless m.nil?
 
-    # e.g. http://ftpmirror.gnu.org/mtools/mtools-4.0.18-1.i686.rpm
-    # e.g. http://ftpmirror.gnu.org/autogen/autogen-5.5.7-5.i386.rpm
-    # e.g. http://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x86.zip
-    # e.g. http://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x64.zip
-    # e.g. http://ftpmirror.gnu.org/mtools/mtools_4.0.18_i386.deb
+    # e.g. https://ftpmirror.gnu.org/mtools/mtools-4.0.18-1.i686.rpm
+    # e.g. https://ftpmirror.gnu.org/autogen/autogen-5.5.7-5.i386.rpm
+    # e.g. https://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x86.zip
+    # e.g. https://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x64.zip
+    # e.g. https://ftpmirror.gnu.org/mtools/mtools_4.0.18_i386.deb
     m = /[-_](\d+\.\d+(?:\.\d+)?(?:-\d+)?)[-_.](?:i[36]86|x86|x64(?:[-_](?:32|64))?)$/.match(stem)
     return m.captures.first unless m.nil?
 

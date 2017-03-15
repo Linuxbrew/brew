@@ -131,7 +131,7 @@ If you don’t even want (or can’t) use sudo for bootstrapping
 
 Another alternative is to use `perlbrew` to install a separate copy of Perl in your home directory, or wherever you like :
 ```bash
-curl -kL http://install.perlbrew.pl | bash
+curl -L https://install.perlbrew.pl | bash
 perlbrew install perl-5.16.2
 echo ".~/perl5/perlbrew/etc/bashrc" >> ~/.bashrc
 ```

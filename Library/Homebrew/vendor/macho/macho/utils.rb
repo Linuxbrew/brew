@@ -5,7 +5,7 @@ module MachO
     # @param value [Fixnum] the number being rounded
     # @param round [Fixnum] the number being rounded with
     # @return [Fixnum] the rounded value
-    # @see http://www.opensource.apple.com/source/cctools/cctools-870/libstuff/rnd.c
+    # @see https://www.opensource.apple.com/source/cctools/cctools-870/libstuff/rnd.c
     def self.round(value, round)
       round -= 1
       value += round

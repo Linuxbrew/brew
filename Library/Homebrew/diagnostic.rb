@@ -647,7 +647,7 @@ module Homebrew
 
             Setting DYLD_INSERT_LIBRARIES can cause Go builds to fail.
             Having this set is common if you use this software:
-              #{Formatter.url("http://asepsis.binaryage.com/")}
+              #{Formatter.url("https://asepsis.binaryage.com/")}
           EOS
         end
 
