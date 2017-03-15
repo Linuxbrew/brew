@@ -43,8 +43,7 @@ module Hbc
       end
 
       def each_artifact
-        # the sort is for predictability between Ruby versions
-        @cask.artifacts[self.class.artifact_dsl_key].sort.each do |artifact|
+        @cask.artifacts[self.class.artifact_dsl_key].each do |artifact|
           load_specification(artifact)
           yield
         end
