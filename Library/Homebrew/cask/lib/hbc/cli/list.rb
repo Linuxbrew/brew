@@ -28,7 +28,7 @@ module Hbc
         cask_tokens.each do |cask_token|
           odebug "Listing files for Cask #{cask_token}"
           begin
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
 
             if cask.installed?
               if @options[:one]

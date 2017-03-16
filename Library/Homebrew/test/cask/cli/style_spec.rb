@@ -130,7 +130,7 @@ describe Hbc::CLI::Style, :cask do
       end
 
       it "tries to find paths for all tokens" do
-        expect(Hbc).to receive(:path).twice
+        expect(Hbc::CaskLoader).to receive(:path).twice
         subject
       end
     end

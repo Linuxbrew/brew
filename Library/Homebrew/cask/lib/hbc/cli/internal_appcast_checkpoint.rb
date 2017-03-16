@@ -24,7 +24,7 @@ module Hbc
         count = 0
 
         cask_tokens.each do |cask_token|
-          cask = Hbc.load(cask_token)
+          cask = CaskLoader.load(cask_token)
 
           if cask.appcast.nil?
             opoo "Cask '#{cask}' is missing an `appcast` stanza."

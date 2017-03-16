@@ -15,7 +15,7 @@ module Hbc
       walk = lambda do |acc, deps|
         deps.each do |dep|
           next if acc.key?(dep)
-          succs = deps_in.call Hbc.load(dep)
+          succs = deps_in.call CaskLoader.load(dep)
           acc[dep] = succs
           walk.call(acc, succs)
         end

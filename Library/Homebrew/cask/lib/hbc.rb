@@ -7,7 +7,6 @@ require "hbc/auditor"
 require "hbc/cache"
 require "hbc/cask"
 require "hbc/cask_loader"
-require "hbc/without_source"
 require "hbc/caskroom"
 require "hbc/checkable"
 require "hbc/cli"
@@ -24,7 +23,6 @@ require "hbc/macos"
 require "hbc/pkg"
 require "hbc/qualified_token"
 require "hbc/scopes"
-require "hbc/source"
 require "hbc/staged"
 require "hbc/system_command"
 require "hbc/topological_hash"
@@ -43,12 +41,5 @@ module Hbc
   def self.init
     Cache.ensure_cache_exists
     Caskroom.ensure_caskroom_exists
-  end
-
-  def self.load(query)
-    odebug "Loading Cask definitions"
-    cask = Source.for_query(query).load
-    cask.dumpcask
-    cask
   end
 end

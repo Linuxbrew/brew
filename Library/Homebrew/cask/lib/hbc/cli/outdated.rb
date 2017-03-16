@@ -9,7 +9,7 @@ module Hbc
         casks_to_check = if cask_tokens.empty?
           Hbc.installed
         else
-          cask_tokens.map { |token| Hbc.load(token) }
+          cask_tokens.map { |token| CaskLoader.load(token) }
         end
 
         casks_to_check.each do |cask|

@@ -285,7 +285,7 @@ class Tap
 
   # path to the directory of all {Formula} files for this {Tap}.
   def formula_dir
-    @formula_dir ||= potential_formula_dirs.detect(&:directory?)
+    @formula_dir ||= potential_formula_dirs.detect(&:directory?) || path/"Formula"
   end
 
   def potential_formula_dirs
@@ -294,12 +294,12 @@ class Tap
 
   # path to the directory of all {Cask} files for this {Tap}.
   def cask_dir
-    @cask_dir ||= [path/"Casks"].detect(&:directory?)
+    @cask_dir ||= path/"Casks"
   end
 
   # an array of all {Formula} files of this {Tap}.
   def formula_files
-    @formula_files ||= if formula_dir
+    @formula_files ||= if formula_dir.directory?
       formula_dir.children.select(&method(:formula_file?))
     else
       []
@@ -308,7 +308,7 @@ class Tap
 
   # an array of all {Cask} files of this {Tap}.
   def cask_files
-    @cask_files ||= if cask_dir
+    @cask_files ||= if cask_dir.directory?
       cask_dir.children.select(&method(:cask_file?))
     else
       []

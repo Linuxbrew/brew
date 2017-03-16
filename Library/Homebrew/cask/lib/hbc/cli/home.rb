@@ -8,7 +8,7 @@ module Hbc
         else
           cask_tokens.each do |cask_token|
             odebug "Opening homepage for Cask #{cask_token}"
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
             system "/usr/bin/open", "--", cask.homepage
           end
         end
