@@ -12,6 +12,6 @@ Patches to fix issues particular to Linux should not affect the behaviour of the
 
 ### Propose a feature
 
-* Please create a pull request with your change proposal using the [proposal template](https://github.com/Homebrew/brew-evolution/blob/master/proposal_template.md).
+* Please open an issue (or pull request if you have an implementation) with your change proposal.
 
 Thanks!
