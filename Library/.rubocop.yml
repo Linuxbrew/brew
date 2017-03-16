@@ -8,17 +8,10 @@ AllCops:
 
 require: ./Homebrew/rubocops.rb
 
-Homebrew/FormulaCop:
-  Enabled: false
-
 Homebrew/CorrectBottleBlock:
-  Include:
-    - '**/Taps/homebrew/**/*.rb'
   Enabled: true
 
 Homebrew/FormulaDesc:
-  Include:
-    - '**/Taps/homebrew/**/*.rb'
   Enabled: true
 
 Metrics/AbcSize:

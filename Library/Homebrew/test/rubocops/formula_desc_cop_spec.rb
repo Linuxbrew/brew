@@ -42,7 +42,7 @@ describe RuboCop::Cop::Homebrew::FormulaDesc do
       expected_offenses = [{ message: msg,
                              severity: :convention,
                              line: 3,
-                             column: 7,
+                             column: 2,
                              source: source }]
 
       inspect_source(cop, source)
