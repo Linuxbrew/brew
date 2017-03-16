@@ -23,6 +23,10 @@ module Hbc
         args.reject { |a| a.empty? || a.chars.first == "-" }
       end
 
+      def self.help
+        "audit all modified Casks in a given commit range"
+      end
+
       def self.usage
         <<-EOS.undent
           Usage: brew cask _audit_modified_casks [options...] <commit range>
