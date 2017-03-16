@@ -63,4 +63,10 @@ describe Hbc::CLI, :cask do
       described_class.process("noop")
     end
   end
+
+  it "provides a help message for all commands" do
+    described_class.command_classes.each do |command_class|
+      expect(command_class.help).to match(/\w+/), command_class.name
+    end
+  end
 end

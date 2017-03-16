@@ -14,7 +14,7 @@ module Hbc
       end
 
       def self.help
-        "No help available for the #{command_name} command"
+        nil
       end
 
       def self.needs_init?
