@@ -88,6 +88,16 @@ Without any arguments, list all installed Casks\. With \fB\-1\fR, always format 
 If \fItoken\fR is given, summarize the staged files associated with the given Cask\.
 .
 .TP
+\fBoutdated\fR [\-\-greedy] [\-\-verbose|\-\-quiet] [ \fItoken\fR \.\.\.]
+Without token arguments, display all the installed Casks that have newer versions available in the tap; otherwise check only the tokens given in the command line\. If \fB\-\-greedy\fR is given then also include in the output the Casks having \fBauto_updates true\fR or \fBversion :latest\fR\. Otherwise they are skipped because there is no reliable way to know when updates are available for them\.
+.
+.br
+\fB\-\-verbose\fR forces the display of the outdated and latest version\.
+.
+.br
+\fB\-\-quiet\fR suppresses the display of versions\.
+.
+.TP
 \fBreinstall\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
 Reinstall the given Cask\.
 .
