@@ -42,7 +42,7 @@ avoid conflicts.
 
 ## Maintaining a tap
 A tap is just a git repository so you don’t have to do anything specific when
-making modifications,  apart from committing and pushing your changes.
+making modifications, apart from committing and pushing your changes.
 
 ### Updating
 Once your tap is installed, Homebrew will update it each time a user runs
