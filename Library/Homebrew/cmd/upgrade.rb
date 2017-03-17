@@ -75,6 +75,18 @@ module Homebrew
       puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
+    # Sort keg_only before non-keg_only formulae to avoid any needless conflicts
+    # with outdated, non-keg_only versions of formulae being upgraded.
+    formulae_to_install.sort! do |a, b|
+      if !a.keg_only? && b.keg_only?
+        1
+      elsif a.keg_only? && !b.keg_only?
+        -1
+      else
+        0
+      end
+    end
+
     formulae_to_install.each do |f|
       upgrade_formula(f)
       next unless ARGV.include?("--cleanup")
