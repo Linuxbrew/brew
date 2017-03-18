@@ -1,4 +1,27 @@
 describe Hbc::CLI::Reinstall, :cask do
+  it "displays the reinstallation progress" do
+    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+
+    shutup do
+      Hbc::Installer.new(caffeine).install
+    end
+
+    output = Regexp.new <<-EOS.undent
+      ==> Downloading file:.*/caffeine.zip
+      Already downloaded: .*/local-caffeine--1.2.3.zip
+      ==> Verifying checksum for Cask local-caffeine
+      ==> Uninstalling Cask local-caffeine
+      ==> Removing App '.*/Caffeine.app'.
+      ==> Installing Cask local-caffeine
+      ==> Moving App 'Caffeine.app' to '.*/Caffeine.app'.
+      🍺  local-caffeine was successfully installed!
+    EOS
+
+    expect {
+      Hbc::CLI::Reinstall.run("local-caffeine")
+    }.to output(output).to_stdout
+  end
+
   it "allows reinstalling a Cask" do
     shutup do
       Hbc::CLI::Install.run("local-transmission")

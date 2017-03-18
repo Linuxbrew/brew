@@ -85,6 +85,8 @@ module Hbc
       print_caveats
       fetch
       uninstall_if_neccessary
+
+      oh1 "Installing Cask #{@cask}"
       stage
       install_artifacts
       enable_accessibility_access
@@ -322,7 +324,7 @@ module Hbc
     end
 
     def uninstall
-      odebug "Hbc::Installer#uninstall"
+      oh1 "Uninstalling Cask #{@cask}"
       disable_accessibility_access
       uninstall_artifacts
       purge_versioned_files

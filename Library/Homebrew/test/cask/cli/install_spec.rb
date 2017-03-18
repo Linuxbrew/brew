@@ -1,4 +1,18 @@
 describe Hbc::CLI::Install, :cask do
+  it "displays the installation progress" do
+    output = Regexp.new <<-EOS.undent
+      ==> Downloading file:.*/caffeine.zip
+      ==> Verifying checksum for Cask local-caffeine
+      ==> Installing Cask local-caffeine
+      ==> Moving App 'Caffeine.app' to '.*/Caffeine.app'.
+      🍺  local-caffeine was successfully installed!
+    EOS
+
+    expect {
+      Hbc::CLI::Install.run("local-caffeine")
+    }.to output(output).to_stdout
+  end
+
   it "allows staging and activation of multiple Casks at once" do
     shutup do
       Hbc::CLI::Install.run("local-transmission", "local-caffeine")

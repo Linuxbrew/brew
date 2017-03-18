@@ -1,4 +1,21 @@
 describe Hbc::CLI::Uninstall, :cask do
+  it "displays the uninstallation progress" do
+    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+
+    shutup do
+      Hbc::Installer.new(caffeine).install
+    end
+
+    output = Regexp.new <<-EOS.undent
+      ==> Uninstalling Cask local-caffeine
+      ==> Removing App '.*/Caffeine.app'.
+    EOS
+
+    expect {
+      Hbc::CLI::Uninstall.run("local-caffeine")
+    }.to output(output).to_stdout
+  end
+
   it "shows an error when a bad Cask is provided" do
     expect {
       Hbc::CLI::Uninstall.run("notacask")
