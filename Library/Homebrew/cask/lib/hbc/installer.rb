@@ -18,12 +18,13 @@ module Hbc
 
     PERSISTENT_METADATA_SUBDIRS = ["gpg"].freeze
 
-    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, require_sha: false)
+    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, require_sha: false, reinstall: false)
       @cask = cask
       @command = command
       @force = force
       @skip_cask_deps = skip_cask_deps
       @require_sha = require_sha
+      @reinstall = reinstall
     end
 
     def self.print_caveats(cask)
@@ -76,18 +77,32 @@ module Hbc
     def install
       odebug "Hbc::Installer#install"
 
-      if @cask.installed? && !force
+      if @cask.installed? && !force && !@reinstall
         raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
         raise CaskAlreadyInstalledError, @cask
       end
 
       print_caveats
       fetch
+      uninstall_if_neccessary
       stage
       install_artifacts
       enable_accessibility_access
 
       puts summary
+    end
+
+    def uninstall_if_neccessary
+      return unless @cask.installed? && @reinstall
+      installed_cask = @cask
+
+      # use the same cask file that was used for installation, if possible
+      if (installed_caskfile = installed_cask.installed_caskfile).exist?
+        installed_cask = CaskLoader.load_from_file(installed_caskfile)
+      end
+
+      # Always force uninstallation, ignore method parameter
+      Installer.new(installed_cask, force: true).uninstall
     end
 
     def summary
