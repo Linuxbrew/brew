@@ -70,8 +70,7 @@ module Homebrew
         if msg = blacklisted?(query)
           if count > 0
             puts
-            puts "If you meant #{query.inspect} precisely:"
-            puts
+            puts "If you meant #{query.inspect} specifically:"
           end
           puts msg
         elsif count.zero?
