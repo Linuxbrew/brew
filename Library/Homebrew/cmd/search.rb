@@ -14,7 +14,7 @@
 #:    Search for <text> in the given package manager's list.
 
 require "formula"
-require "blacklist"
+require "missing_formula"
 require "utils"
 require "thread"
 require "official_taps"
@@ -67,7 +67,7 @@ module Homebrew
       if $stdout.tty?
         count = local_results.length + tap_results.length
 
-        if msg = blacklisted?(query)
+        if msg = Homebrew::MissingFormula.missing_formula(query)
           if count > 0
             puts
             puts "If you meant #{query.inspect} specifically:"

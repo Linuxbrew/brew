@@ -19,7 +19,7 @@
 #:    the specified tap.
 
 require "formula"
-require "blacklist"
+require "missing_formula"
 require "digest"
 require "erb"
 
@@ -73,8 +73,8 @@ module Homebrew
     # Don't allow blacklisted formula, or names that shadow aliases,
     # unless --force is specified.
     unless ARGV.force?
-      if msg = blacklisted?(fc.name)
-        raise "#{fc.name} is blacklisted for creation.\n#{msg}\nIf you really want to create this formula use --force."
+      if reason = Homebrew::MissingFormula.blacklisted_reason(fc.name)
+        raise "#{fc.name} is blacklisted for creation.\n#{reason}\nIf you really want to create this formula use --force."
       end
 
       if Formula.aliases.include? fc.name

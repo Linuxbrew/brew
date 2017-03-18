@@ -55,7 +55,7 @@
 #:    If `--git` is passed, Homebrew will create a Git repository, useful for
 #:    creating patches to the software.
 
-require "blacklist"
+require "missing_formula"
 require "diagnostic"
 require "cmd/search"
 require "formula_installer"
@@ -207,8 +207,8 @@ module Homebrew
       # formula was found, but there's a problem with its implementation).
       ofail e.message
     rescue FormulaUnavailableError => e
-      if (blacklist = blacklisted?(e.name))
-        ofail "#{e.message}\n#{blacklist}"
+      if (missing_formula = Homebrew::MissingFormula.missing_formula(e.name))
+        ofail "#{e.message}\n#{missing_formula}"
       elsif e.name == "updog"
         ofail "What's updog?"
       else
