@@ -7,7 +7,7 @@ definitely not a beginner’s guide.
 
 Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
 
-## Quick Checklist
+## Quick checklist
 
 This is all that really matters:
 - Ensure the name seems reasonable.
@@ -20,7 +20,7 @@ This is all that really matters:
 - Ensure that any dependencies are accurate and minimal. We don't need to
   support every possible optional feature for the software.
 - Use the GitHub squash & merge workflow where bottles aren't required.
-- Use `brew pull` otherwise, which adds messages to auto-close pull requests and pull bottles built by BrewTestBot.
+- Use `brew pull` otherwise, which adds messages to auto-close pull requests and pull bottles built by the Brew Test Bot.
 - Thank people for contributing.
 
 Checking dependencies is important, because they will probably stick around
@@ -53,23 +53,23 @@ For now, if someone submits a formula like this, we’ll leave them in
 their own tree.
 
 ### Merging, rebasing, cherry-picking
-Merging should be done in the brew repo to preserve history & GPG commit signing,
+Merging should be done in the `Homebrew/brew` repository to preserve history & GPG commit signing,
 and squash/merge via GitHub should be used for formulae where those formulae
 don't need bottles or the change does not require new bottles to be pulled.
 Otherwise, you should use `brew pull` (or `rebase`/`cherry-pick` contributions).
 
 Don’t `rebase` until you finally `push`. Once `master` is pushed, you can’t
-`rebase` : **you’re a maintainer now!**
+`rebase`: **you’re a maintainer now!**
 
 Cherry-picking changes the date of the commit, which kind of sucks.
 
-Don’t `merge` unclean branches. So if someone is still learning `git`
+Don’t `merge` unclean branches. So if someone is still learning `git` and
 their branch is filled with nonsensical merges, then `rebase` and squash
 the commits. Our main branch history should be useful to other people,
 not confusing.
 
 ### Testing
-We need to at least check it builds. Use [Brew Test Bot](Brew-Test-Bot.md) for this.
+We need to at least check that it builds. Use the [Brew Test Bot](Brew-Test-Bot.md) for this.
 
 Verify the formula works if possible. If you can’t tell (e.g. if it’s a
 library) trust the original contributor, it worked for them, so chances are it
@@ -80,14 +80,14 @@ open source works. Ideally, request a `test do` block to test that
 functionality is consistently available.
 
 If the formula uses a repository, then the `url` parameter should have a
-tag or revision. `url` s have versions and are stable (not yet
+tag or revision. `url`s have versions and are stable (not yet
 implemented!).
 
-## Common “Gotchas”
+## Common “gotchas”
 1.  [Ensure you have set your username and email address
     properly](https://help.github.com/articles/setting-your-email-in-git/)
-2.  Sign off cherry-picks if you amended them, [GitX-dev](https://github.com/rowanj/gitx) can do this,
-    otherwise there is a command line flag for it)
+2.  Sign off cherry-picks if you amended them ([GitX-dev](https://github.com/rowanj/gitx)
+    can do this, otherwise there is a command-line flag for it)
 3.  If the commit fixes a bug, use “Fixes \#104” syntax to close the bug
     report and link to the commit
 
@@ -97,7 +97,7 @@ libraries that macOS provides but have bugs, and the bugs are fixed in a
 newer version. Or libraries that macOS provides, but they are too old for
 some other formula. The rest should be in the `homebrew/dupes` tap.
 
-Still determine if it possible to avoid the duplicate. Be thorough. Duped
+Still determine if it's possible to avoid the duplicate. Be thorough. Duped
 libraries and tools cause bugs that are tricky to solve. Once the formula is
 pulled, we can’t go back on that willy-nilly.
 
@@ -108,9 +108,9 @@ Dupes we have allowed:
 -   `libxml` \<— macOS version is old and buggy
 -   `libpng` \<— Ditto
 
-#### Add comments
-It may be enough to refer to an issue ticket, but make sure changes that
-if you came to them unaware of the surrounding issues would make sense
+### Add comments
+It may be enough to refer to an issue ticket, but make sure changes are clear so that
+if you came to them unaware of the surrounding issues they would make sense
 to you. Many times on other projects I’ve seen code removed because the
 new guy didn’t know why it was there. Regressions suck.
 

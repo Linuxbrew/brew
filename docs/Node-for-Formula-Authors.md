@@ -1,10 +1,10 @@
-# Node for formula authors
+# Node for Formula Authors
 
 This document explains how to successfully use Node and npm in a Node module based Homebrew formula.
 
-# Running `npm install`
+## Running `npm install`
 
-Homebrew provides two helper methods in a `Language::Node` module, `std_npm_install_args` and `local_npm_install_args`. They both set up the correct environment for npm and return arguments for `npm install` for their specific use cases. Please use them instead of invoking `npm install` explicitly. The syntax for a standard Node module installation is:
+Homebrew provides two helper methods in a `Language::Node` module: `std_npm_install_args` and `local_npm_install_args`. They both set up the correct environment for npm and return arguments for `npm install` for their specific use cases. Your formula should use these instead of invoking `npm install` explicitly. The syntax for a standard Node module installation is:
 
 ```ruby
 system "npm", "install", *Language::Node.std_npm_install_args(libexec)
@@ -12,7 +12,7 @@ system "npm", "install", *Language::Node.std_npm_install_args(libexec)
 
 where `libexec` is the destination prefix (usually the `libexec` variable).
 
-# Download URL
+## Download URL
 
 If the Node module is also available on the npm registry, we prefer npm hosted release tarballs over GitHub (or elsewhere) hosted source tarballs. The advantages of these tarballs are that they don't include the files from the `.npmignore` (such as tests) resulting in a smaller download size and that any possible transpilation step is already done (e.g. no need to compile CoffeeScript files as a build step).
 
@@ -24,7 +24,7 @@ https://registry.npmjs.org/<name>/-/<name>-<version>.tgz
 
 Alternatively you could curl the JSON at `https://registry.npmjs.org/<name>` and look for the value of `versions[<version>].dist.tarball` for the correct tarball URL.
 
-# Dependencies
+## Dependencies
 
 Node modules which are compatible with the latest Node version should declare a dependency on the `node` formula.
 
@@ -36,15 +36,15 @@ If your formula requires being executed with an older Node version you must vend
 
 ### Special requirements for native addons
 
-If your node module is a native addon or has a native addon somewhere in its dependency tree you have to declare an additional dependency. Since the compilation of the native addon results in a invocation of `node-gyp` we need an additional build time dependency on `:python` (because gyp depends on Python 2.7).
+If your Node module is a native addon or has a native addon somewhere in its dependency tree you have to declare an additional dependency. Since the compilation of the native addon results in an invocation of `node-gyp` we need an additional build time dependency on `:python` (because gyp depends on Python 2.7).
 
 ```ruby
 depends_on :python => :build
 ```
 
-Please also note that such a formula would only be compatible with the same Node major version it originally was compiled with. This means that we need to revision every formula with a Node native addon with every major version bump of the `node` formula. To make sure we don't overlook your formula on a Node major version bump, write a meaningful test which would fail in such a case (invoked with an ABI incompatible Node version).
+Also note that such a formula would only be compatible with the same Node major version it originally was compiled with. This means that we need to revision every formula with a Node native addon with every major version bump of the `node` formula. To make sure we don't overlook your formula on a Node major version bump, write a meaningful test which would fail in such a case (invoked with an ABI-incompatible Node version).
 
-# Installation
+## Installation
 
 Node modules should be installed to `libexec`. This prevents the Node modules from contaminating the global `node_modules`, which is important so that npm doesn't try to manage Homebrew-installed Node modules.
 
@@ -82,9 +82,9 @@ In your formula's `install` method, do any installation steps which need to be d
 system "npm", "install", *Language::Node.local_npm_install_args
 ```
 
-This will install all of your Node modules dependencies to your local build path. You can now continue with your build steps and take care of the installation into the Homebrew `prefix` on your own, following the [general Homebrew formula instructions](https://github.com/Homebrew/brew/blob/master/docs/Formula-Cookbook.md).
+This will install all of your Node modules dependencies to your local build path. You can now continue with your build steps and take care of the installation into the Homebrew `prefix` on your own, following the [general Homebrew formula instructions](Formula-Cookbook.md).
 
-# Example
+## Example
 
 Installing a standard Node module based formula would look like this:
 
@@ -112,4 +112,4 @@ class Foo < Formula
 end
 ```
 
-For examples using the `local_npm_install_args` method look at the  [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/ec1e40d37e81af63122a354f0101c377f6a4e66d/Formula/elixirscript.rb) or [`kibana`](https://github.com/Homebrew/homebrew-core/blob/c6202f91a129e2f994d904f299a308cc6fbd58e5/Formula/kibana.rb) formula.
+For examples using the `local_npm_install_args` method look at the  [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/ec1e40d37e81af63122a354f0101c377f6a4e66d/Formula/elixirscript.rb) or [`kibana`](https://github.com/Homebrew/homebrew-core/blob/c6202f91a129e2f994d904f299a308cc6fbd58e5/Formula/kibana.rb) formulae.

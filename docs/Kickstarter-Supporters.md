@@ -173,7 +173,7 @@ These brilliant people supported our Kickstarter by giving us £15 or more:
 * [Nick Rogers](https://twitter.com/zikolas)
 * [Abe Estrada](https://abeestrada.com)
 * [Mattias Larsson](https://www.yahoo.com/)
-* [Dave  Ross](http://davidmichaelross.com)
+* [Dave Ross](http://davidmichaelross.com)
 * [Andrian Budantsov](http://andrian.io/)
 * [Jason Smith](https://twitter.com/waitingallday)
 * [Martin Coxall](https://twitter.com/grabcocque)

@@ -4,7 +4,7 @@ This page describes how Python is handled in Homebrew for users. See [Python for
 
 Homebrew should work with any [CPython](https://stackoverflow.com/questions/2324208/is-there-any-difference-between-cpython-and-python) and defaults to the macOS system Python.
 
-Homebrew provides formulae to brew a more up-to-date Python 2.7.x (and 3.x).
+Homebrew provides formulae to brew a more up-to-date Python 2.7.x and 3.x.
 
 **Important:** If you choose to install a Python which isn't either of these two (system Python or brewed Python), the Homebrew team can only provide limited support.
 
@@ -62,9 +62,9 @@ These should be installed via `pip install <x>`. To discover, you can use `pip s
 
 
 ## Brewed Python modules
-For brewed Python, modules installed with `pip` or `python setup.py install` will be installed to `$(brew --prefix)/lib/pythonX.Y/site-packages` directory (explained above). Executable python scripts will be in `$(brew --prefix)/bin`.
+For brewed Python, modules installed with `pip` or `python setup.py install` will be installed to the `$(brew --prefix)/lib/pythonX.Y/site-packages` directory (explained above). Executable python scripts will be in `$(brew --prefix)/bin`.
 
-The system Python may not know which compiler flags to set in order to build bindings for software installed in Homebrew so you may need to:
+The system Python may not know which compiler flags to set in order to build bindings for software installed in Homebrew so you may need to run:
 
 `CFLAGS=-I$(brew --prefix)/include LDFLAGS=-L$(brew --prefix)/lib pip install <package>`.
 

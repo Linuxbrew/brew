@@ -1,4 +1,4 @@
-# Introduction
+# Python for Formula Authors
 
 This document explains how to successfully use Python in a Homebrew formula.
 
@@ -10,9 +10,9 @@ Bindings are a special case of libraries that allow Python code to interact with
 
 Homebrew is happy to accept applications that are built in Python, whether the apps are available from PyPI or not. Homebrew generally won't accept libraries that can be installed correctly with `pip install foo`. Libraries that can be pip-installed but have several Homebrew dependencies may be appropriate for the [homebrew/python](https://github.com/Homebrew/homebrew-python) tap. Bindings may be installed for packages that provide them, especially if equivalent functionality isn't available through pip.
 
-# Running setup.py
+## Running setup.py
 
-Homebrew provides a helper method, `Language::Python.setup_install_args`, which returns arguments for invoking setup.py. Please use it instead of invoking `setup.py` explicitly. The syntax is:
+Homebrew provides a helper method, `Language::Python.setup_install_args`, which returns arguments for invoking setup.py. Your formula should use this instead of invoking `setup.py` explicitly. The syntax is:
 
 ```ruby
 system "python", *Language::Python.setup_install_args(prefix)
@@ -20,11 +20,11 @@ system "python", *Language::Python.setup_install_args(prefix)
 
 where `prefix` is the destination prefix (usually `libexec` or `prefix`).
 
-# Python module dependencies
+## Python module dependencies
 
 In general, applications should unconditionally bundle all of their dependencies and libraries and should install any unsatisfied dependencies; these strategies are discussed in depth in the following sections.
 
-In the rare instance that this proves impractical, you can specify a Python module as an external dependency using the syntax:
+In the rare instance that this proves impractical, you can specify a Python module as an external dependency using this syntax:
 
 ```ruby
 depends_on "numpy" => :python
@@ -38,11 +38,11 @@ depends_on "MacFSEvents" => [:python, "fsevents"]
 
 If you submit a formula with this syntax to core, you may be asked to rewrite it as a `Requirement`.
 
-# Applications
+## Applications
 
 `ansible.rb` and `jrnl.rb` are good examples of applications that follow this advice.
 
-## Python declarations
+### Python declarations
 
 Applications that are compatible with Python 2 **should** use the Apple-provided system Python in /usr/bin on systems that provide Python 2.7. To do this, declare:
 
@@ -53,7 +53,7 @@ No explicit Python dependency is needed on recent OS versions since /usr/bin is 
 
 Formulae for apps that require Python 3 **should** declare an unconditional dependency on `:python3`, which will cause the formula to use the first python3 discovered in `PATH` at install time (or install Homebrew's if there isn't one). These apps **must** work with the current Homebrew python3 formula.
 
-## Installing
+### Installing
 
 Applications should be installed into a Python [virtualenv](https://virtualenv.pypa.io/en/stable/) environment rooted in `libexec`. This prevents the app's Python modules from contaminating the system site-packages and vice versa.
 
@@ -108,7 +108,7 @@ def install
 end
 ```
 
-## Example
+### Example
 
 Installing a formula with dependencies will look like this:
 
@@ -134,7 +134,7 @@ class Foo < Formula
 end
 ```
 
-You can also use the more verbose form and request that specific resources are installed:
+You can also use the more verbose form and request that specific resources be installed:
 
 ```ruby
 def install
@@ -147,17 +147,17 @@ end
 ```
 in case you need to do different things for different resources.
 
-# Bindings
+## Bindings
 
 To add an option to a formula to build Python bindings, use `depends_on :python => :recommended` and install the bindings conditionally on `build.with? "python"` in your `install` method.
 
 Python bindings should be optional because if the formula is bottled, any `:recommended` or mandatory dependencies on `:python` are always resolved by installing the Homebrew `python` formula, which will upset users that prefer to use the system Python. This is because we cannot generally create a binary package that works against both versions of Python.
 
-## Dependencies
+### Dependencies
 
 Bindings should follow the same advice for Python module dependencies as libraries; see below for more.
 
-## Installing bindings
+### Installing bindings
 
 If the bindings are installed by invoking a `setup.py`, do something like:
 
@@ -177,31 +177,31 @@ If the `configure` and `make` scripts do not want to install into the Cellar, so
 
 Sometimes we have to `inreplace` a `Makefile` to use our prefix for the python bindings. (`inreplace` is one of Homebrew's helper methods, which greps and edits text files on-the-fly.)
 
-# Libraries
+## Libraries
 
-## Python declarations
+### Python declarations
 
 Libraries **should** declare a dependency on `:python` or `:python3` as appropriate, which will respectively cause the formula to use the first python or python3 discovered in `PATH` at install time. If a library supports both Python 2.x and Python 3.x, the `:python` dependency **should** be `:recommended` (i.e. built by default) and the :python3 dependency should be `:optional`. Python 2.x libraries **must** function when they are installed against either the system Python or Homebrew Python.
 
 Formulae that declare a dependency on `:python` will always be bottled against Homebrew's python, since we cannot in general build binary packages that can be imported from both Pythons. Users can add `--build-from-source` after `brew install` to compile against whichever python is in `PATH`.
 
-## Installing
+### Installing
 
 Libraries may be installed to `libexec` and added to `sys.path` by writing a .pth file (named like "homebrew-foo.pth") to the `prefix` site-packages. This simplifies the ensuing drama if pip is accidentally used to upgrade a Homebrew-installed package and prevents the accumulation of stale .pyc files in Homebrew's site-packages.
 
 Most formulae presently just install to `prefix`.
 
-## Dependencies
+### Dependencies
 
 The dependencies of libraries must be installed so that they are importable. The principle of minimum surprise suggests that installing a Homebrew library should not alter the other libraries in a user's sys.path. The best way to achieve this is to only install dependencies if they are not already installed. To minimize the potential for linking conflicts, dependencies should be installed to `libexec/"vendor"` and added to `sys.path` by writing a second .pth file (named like "homebrew-foo-dependencies.pth") to the `prefix` site-packages.
 
-The `matplotlib.rb` formula in homebrew-python deploys this strategy.
+The [matplotlib](https://github.com/Homebrew/homebrew-science/blob/master/matplotlib.rb) formula in [homebrew/science](https://github.com/Homebrew/homebrew-science) deploys this strategy.
 
-# Further down the rabbit hole
+## Further down the rabbit hole
 
 Additional commentary that explains why Homebrew does some of the things it does.
 
-## setuptools vs. distutils vs. pip
+### setuptools vs. distutils vs. pip
 
 Distutils is a module in the Python standard library that provides developers a basic package management API. Setuptools is a module distributed outside the standard library that extends distutils. It is a convention that Python packages provide a setup.py that calls the `setup()` function from either distutils or setuptools.
 
@@ -211,7 +211,7 @@ Distutils and pip use a "flat" installation hierarchy that installs modules as i
 
 Distribute (not to be confused with distutils) is an obsolete fork of setuptools. Distlib is a package maintained outside the standard library which is used by pip for some low-level packaging operations and is not relevant to most setup.py users.
 
-## What is `--single-version-externally-managed`?
+### What is `--single-version-externally-managed`?
 
 `--single-version-externally-managed` ("SVEM") is a setuptools-only [argument to setup.py install](https://setuptools.readthedocs.io/en/latest/setuptools.html?#install-run-easy-install-or-old-style-installation). The primary effect of SVEM is to use distutils to perform the install instead of using setuptools' `easy_install`.
 
@@ -226,7 +226,7 @@ setuptools requires that SVEM is used in conjunction with `--record`, which prov
 Detecting whether a `setup.py` uses `setup()` from setuptools or distutils is difficult, but we always need to pass this flag to setuptools-based scripts. `pip` faces the same problem that we do and forces `setup()` to use the setuptools version by loading a shim around `setup.py` that imports setuptools before doing anything else. Since setuptools monkey-patches distutils and replaces its `setup` function, this provides a single, consistent interface. We have borrowed this code and use it in `Language::Python.setup_install_args`.
 
 
-## `--prefix` vs `--root`
+### `--prefix` vs `--root`
 
 setup.py accepts a slightly bewildering array of installation options. The correct switch for Homebrew is `--prefix`, which automatically sets the `--install-foo` family of options using sane POSIX-y values.
 
@@ -234,6 +234,6 @@ setup.py accepts a slightly bewildering array of installation options. The corre
 
 It is probably safe to use `--prefix` with `--root=/`, which should work with either setuptools or distutils-based setup.py's but is kinda ugly.
 
-## pip vs. setup.py
+### pip vs. setup.py
 
 [PEP 453](http://legacy.python.org/dev/peps/pep-0453/#recommendations-for-downstream-distributors) makes a recommendation to downstream distributors (us) that sdist tarballs should be installed with pip instead of by invoking setup.py directly. We do not do this because Apple's Python distribution does not include pip, so we can't assume that pip is available. We could do something clever to work around Apple's piplessness but the value proposition is not yet clear.

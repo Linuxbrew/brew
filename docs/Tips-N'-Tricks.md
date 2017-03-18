@@ -3,11 +3,11 @@
 ## Installing previous versions of formulae
 
 The supported method of installing specific versions of
-some formulae is to see if there is a versions formula like e.g. `gcc@6` available. If the version you’re looking for isn’t available, consider [opening a pull request](How-To-Open-a-Homebrew-Pull-Request.md)!
+some formulae is to see if there is a versioned formula (e.g. `gcc@6`) available. If the version you’re looking for isn’t available, consider [opening a pull request](How-To-Open-a-Homebrew-Pull-Request.md)!
 
 ### Installing directly from pull requests
 You can [browse pull requests](https://github.com/Homebrew/homebrew-core/pulls)
-and install through the direct link. For example Python 3.3.0 pull request [Homebrew/homebrew#15199](https://github.com/Homebrew/homebrew/pull/15199)
+and install through the direct link. For example, Python 3.3.0 from pull request [Homebrew/homebrew#15199](https://github.com/Homebrew/homebrew/pull/15199):
 
 ```sh
 brew install https://raw.github.com/dsr/homebrew/9b22d42f50fcbc5e52c764448b3ac002bc153bd7/Library/Formula/python3.rb
@@ -50,7 +50,7 @@ renaming the file from <code>otp_src_R13B03</code> to
 download.  This means instead of manually renaming a formula, you can
 run `mv the_tarball $(brew --cache -s $FORMULA)`.
 
-You can also pre-cache the download by using the command `brew fetch formula` which also displays the SHA256 value. This can be useful for updating formulae to new versions.
+You can also pre-cache the download by using the command `brew fetch formula` which also displays the SHA-256 hash. This can be useful for updating formulae to new versions.
 
 ## Using Homebrew behind a proxy
 Behind the scenes, Homebrew uses several commands for downloading files (e.g. curl, git, svn).  Many of these tools can download via a proxy.  It's a common (though not universal) convention for these command-line tools to observe getting the proxy parameters from environment variables (e.g. `http_proxy`).  Unfortunately, most tools are inconsistent in their use of these environment parameters (e.g. curl supports `http_proxy`, `HTTPS_PROXY`, `FTP_PROXY`, `GOPHER_PROXY`, `ALL_PROXY`, `NO_PROXY`).
@@ -63,12 +63,13 @@ internet for details), including at runtime:
 http_proxy=http://<proxyhost>:<proxyport> brew install $FORMULA
 ```
 
-### Proxy Authentication
+To use proxy authentication:
+
 ```sh
 http_proxy=http://<user>:<password>@<proxyhost>:<proxyport>  brew install $FORMULA
 ```
 
-## Installing stuff without the Xcode-CLT
+## Installing stuff without the Xcode CLT
 ```sh
 $ brew sh          # or: eval $(brew --env)
 $ gem install ronn # or c-programs

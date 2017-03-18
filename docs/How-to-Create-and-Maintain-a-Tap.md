@@ -5,8 +5,8 @@ can be created by anyone to provide their own formulae and/or external commands
 to any Homebrew user.
 
 ## Creating a tap
-A tap is usually a git repository available online, but you can use anything as
-long as it’s a protocol that git understands, or even just a directory with
+A tap is usually a Git repository available online, but you can use anything as
+long as it’s a protocol that Git understands, or even just a directory with
 files in it.
 If hosted on GitHub, we recommend that the repository’s name start with
 `homebrew-`.
@@ -41,7 +41,7 @@ no core formula with the same name, or with `brew install user/repo/foo` to
 avoid conflicts.
 
 ## Maintaining a tap
-A tap is just a git repository so you don’t have to do anything specific when
+A tap is just a Git repository so you don’t have to do anything specific when
 making modifications, apart from committing and pushing your changes.
 
 ### Updating
