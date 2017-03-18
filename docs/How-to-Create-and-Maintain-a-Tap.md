@@ -42,11 +42,11 @@ avoid conflicts.
 
 ## Maintaining a tap
 A tap is just a git repository so you don’t have to do anything specific when
-making modifications apart from committing and pushing your changes.
+making modifications, apart from committing and pushing your changes.
 
 ### Updating
-Once your tap installed, Homebrew will update it each time an user runs
-`brew update`. Outdated formulae will be upgraded when an user runs
+Once your tap is installed, Homebrew will update it each time a user runs
+`brew update`. Outdated formulae will be upgraded when a user runs
 `brew upgrade`, like core formulae.
 
 ## External commands
