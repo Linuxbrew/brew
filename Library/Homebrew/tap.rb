@@ -41,6 +41,15 @@ class Tap
     CACHE.fetch(cache_key) { |key| CACHE[key] = Tap.new(user, repo) }
   end
 
+  def self.from_path(path)
+    path.to_s =~ HOMEBREW_TAP_PATH_REGEX
+    raise "Invalid tap path '#{path}'" unless $1
+    fetch($1, $2)
+  rescue
+    # No need to error as a nil tap is sufficient to show failure.
+    nil
+  end
+
   extend Enumerable
 
   # The user name of this {Tap}. Usually, it's the Github username of
