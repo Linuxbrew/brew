@@ -1036,6 +1036,10 @@ class FormulaAuditor
       problem ":apr is deprecated. Usage should be \"apr-util\""
     end
 
+    if line =~ /depends_on :tex/
+      problem ":tex is deprecated."
+    end
+
     # Commented-out depends_on
     problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
