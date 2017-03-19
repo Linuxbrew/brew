@@ -1,9 +1,9 @@
 # Interesting Taps & Forks
 
-A Tap is homebrew-speak for a git repository containing extra formulae.
-Homebrew has the capability to add (and remove) multiple taps to your local installation with the `brew tap` and `brew untap` command. Type `man brew` in your Terminal. The main repository <https://github.com/Homebrew/homebrew-core>, often called `homebrew/core`, is always built-in.
+A _tap_ is homebrew-speak for a Git repository containing extra formulae.
+Homebrew has the capability to add (and remove) multiple taps to your local installation with the `brew tap` and `brew untap` commands. Type `man brew` in your Terminal. The main repository <https://github.com/Homebrew/homebrew-core>, often called `homebrew/core`, is always built-in.
 
-## Main Taps
+## Main taps
 
 *   [homebrew/apache](https://github.com/Homebrew/homebrew-apache): A tap for Apache modules, extending macOS's built-in Apache. These brews may require unconventional additional setup, as explained in the caveats.
 
@@ -35,7 +35,7 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 
 You can be added as a maintainer for one of the Homebrew organization taps and aid the project! If you are interested write to our list: homebrew-discuss@googlegroups.com. We want your help!
 
-## Other Interesting Taps
+## Other interesting taps
 
 *   [InstantClientTap/instantclient](https://github.com/InstantClientTap/homebrew-instantclient): A tap for Oracle Instant Client. The packages need to be downloaded manually.
 
@@ -47,12 +47,12 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 *   [titanous/gnuradio](https://github.com/titanous/homebrew-gnuradio):  GNU Radio and friends running on macOS.
 
-## Interesting Forks
+## Interesting forks
 
 *   [mistydemeo/tigerbrew](https://github.com/mistydemeo/tigerbrew): Experimental Tiger PowerPC version
 
 *   [Linuxbrew/brew](https://github.com/Linuxbrew/brew): Experimental Linux version
 
-## Technical Details
+## Technical details
 
-Your taps are git repositories located at `$(brew --repository)/Library/Taps`.
+Your taps are Git repositories located at `$(brew --repository)/Library/Taps`.

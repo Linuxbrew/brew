@@ -5,7 +5,7 @@ The suggested and easiest way to install Homebrew is on the
 
 The standard script installs Homebrew to `/usr/local` so that
 [you don’t need sudo](FAQ.md) when you
-`brew install`. It is a careful script, it can be run even if you have stuff
+`brew install`. It is a careful script; it can be run even if you have stuff
 installed to `/usr/local` already. It tells you exactly what it will do before
 it does it too. And you have to confirm everything it will do before it starts.
 
@@ -44,7 +44,7 @@ you can assume you will have trouble if you don’t conform. Also, you can find
 PowerPC and Tiger branches from other users in the fork network. See
 [Interesting Taps & Forks](Interesting-Taps-&-Forks.md).
 
-<a name="2"><sup>2</sup></a> 10.10 or higher is recommended. 10.5 - 10.9 are
+<a name="2"><sup>2</sup></a> 10.10 or higher is recommended. 10.5–10.9 are
 supported on a best-effort basis. For 10.4 and 10.5, see
 [Tigerbrew](https://github.com/mistydemeo/tigerbrew).
 

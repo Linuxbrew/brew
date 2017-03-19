@@ -5,14 +5,14 @@ access** to Homebrew’s repository and help merge the contributions of
 others. You may find what is written here interesting, but it’s
 definitely not for everyone.
 
-# 1. Use Homebrew
+## 1. Use Homebrew
 
 Maintainers of Homebrew should be using it regularly. This is partly because
 you won't be a good maintainer unless you can put yourself in the shoes of our
-users but also because you may decide to stop using Homebrew and at that point
+users, but also because you may decide to stop using Homebrew and at that point
 you should also decide not to be a maintainer and find other things to work on.
 
-# 2. No Guilt About Leaving
+## 2. No Guilt About Leaving
 
 All maintainers can stop working on Homebrew at any time without any guilt or
 explanation (like a job). We may still ask for your help with questions after
@@ -23,10 +23,10 @@ Like a job, you should probably take a break from Homebrew at least a few times
 a year.
 
 This also means contributors should be consumers. If an owner finds they are
-not using a project in the real-world, they should reconsider their involvement
+not using a project in the real world, they should reconsider their involvement
 with the project.
 
-# 3. Prioritise Maintainers Over Users
+## 3. Prioritise Maintainers Over Users
 
 It's important to be user-focused but ultimately, as long as you follow #1
 above, Homebrew's minimum number of users will be the number of maintainers.
@@ -36,7 +36,7 @@ need takes priority over the burnout of maintainers. If users do not like the
 direction of the project, the easiest way to influence it is to make
 significant, high-quality code contributions and become a maintainer.
 
-# 4. Learn To Say No
+## 4. Learn To Say No
 
 Homebrew gets a lot of feature requests, non-reproducible bug reports, usage
 questions and PRs we won't accept. These should be closed out as soon as we
@@ -46,4 +46,4 @@ work to be done.
 
 ---
 
-Thanks to https://gist.github.com/ryanflorence/124070e7c4b3839d4573 which influenced this document
+_Thanks to https://gist.github.com/ryanflorence/124070e7c4b3839d4573 which influenced this document_

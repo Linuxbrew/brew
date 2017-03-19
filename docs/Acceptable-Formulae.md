@@ -53,19 +53,19 @@ Because that circumvents our hash-checks, makes finding/fixing bugs
 harder, often breaks patches and disables the caching. Almost always you
 can add a resource to the formula file to handle the
 separate download and then the installer script will not attempt to load
-that stuff on demand. Or there is a command line switch where you can
+that stuff on demand. Or there is a command-line switch where you can
 point it to the downloaded archive in order to avoid loading.
 
 ### We don’t like binary formulae
 Our policy is that formulae in the core repository
 ([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be open-source
-and either built from source or produce cross-platform binaries (like e.g. Java).
+and either built from source or produce cross-platform binaries (e.g. Java).
 Binary-only formulae should go to
 [Homebrew Cask](https://github.com/caskroom/homebrew-cask).
 
 ### Stable versions
 Formulae in the core repository must have a stable version tagged by
-the upstream project. Tarballs are preferred to git checkouts, and
+the upstream project. Tarballs are preferred to Git checkouts, and
 tarballs should include the version in the filename whenever possible.
 
 We don’t accept software without a tagged version because they regularly break
@@ -78,9 +78,9 @@ etc.
 
 If not, then put bindings in the formula they bind to. This is more
 useful to people. Just install the stuff! Having to faff around with
-foo-ruby foo-perl etc. sucks.
+foo-ruby, foo-perl etc. sucks.
 
-### Niche (or self-submitted) Stuff<a name="Niche_Stuff"></a>
+### Niche (or self-submitted) stuff
 The software in question must be:
 
 * maintained (e.g. upstream is still making new releases)
@@ -94,9 +94,9 @@ get maintained and partly because we have to draw the line somewhere.
 
 We frown on authors submitting their own work unless it is very popular.
 
-Don’t forget Homebrew is all `git` underneath! Maintain your tap if you have to!
+Don’t forget Homebrew is all Git underneath! Maintain your own tap if you have to!
 
-There may be exceptions to these rules in the main repository, we may
+There may be exceptions to these rules in the main repository; we may
 include things that don't meet these criteria or reject things that do.
 Please trust that we need to use our discretion based on our experience
 running a package manager.
@@ -110,5 +110,5 @@ Make it build a command-line tool or a library.
 ### Sometimes there are exceptions
 Even if all criteria are met we may not accept the formula.
 Documentation tends to lag behind current decision-making. Although some
-rejections may seem arbitrary or strange they are based from years of
+rejections may seem arbitrary or strange they are based on years of
 experience making Homebrew work acceptably for our users.

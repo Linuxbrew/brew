@@ -4,7 +4,7 @@ _In this document we will be using [jq](https://stedolan.github.io/jq/) to parse
 
 ## Overview
 
-`brew` provides commands for getting common types of information out of the system. `brew list` showed installed formulae. `brew deps foo` shows the dependencies that `foo` needs.
+`brew` provides commands for getting common types of information out of the system. `brew list` shows installed formulae. `brew deps foo` shows the dependencies that `foo` needs.
 
 Additional commands, including external commands, can of course be written to provide more detailed information. There are a couple of disadvantages here. First, it means writing Ruby against a possibly changing Homebrew codebase. There will be more code to touch during refactors, and Homebrew can't guarantee that external commands will continue to work. Second, it means designing the commands themselves, specifying input parameters and output formats.
 
@@ -16,9 +16,9 @@ To enable users to do rich queries without the problems above, Homebrew provides
 
 From the manpage:
 
-  * `info --json=<version> (--all|--installed|<formula>)`:
-    Print a JSON representation of `<formula>`. Currently the only accepted value
-    for <version> is `v1`.
+  * `info --json=<version> (--all|--installed|<formulae>)`:
+    Print a JSON representation of `<formulae>`. Currently the only accepted value
+    for `<version>` is `v1`.
 
     Pass `--all` to get information on all formulae, or `--installed` to get
     information on all installed formulae.

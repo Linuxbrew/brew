@@ -6,14 +6,14 @@ This is a list of commonly encountered problems, known issues, and their solutio
 You need to have the Xcode Command Line Utilities installed (and updated): run `xcode-select --install` in the terminal.
 (In OS X prior to 10.9, the "Command Line Tools" package can alternatively be installed from within Xcode. `⌘,` will get you to preferences. Visit the "Downloads" tab and hit the install button next to "Command Line Tools".)
 
-### Ruby `bad interpreter: /usr/bin/ruby^M: no such file or directory`
-You cloned with git, and your git configuration is set to use Windows line endings. See this page: <https://help.github.com/articles/dealing-with-line-endings>
+### Ruby: `bad interpreter: /usr/bin/ruby^M: no such file or directory`
+You cloned with `git`, and your Git configuration is set to use Windows line endings. See this page: <https://help.github.com/articles/dealing-with-line-endings>
 
-### Ruby `bad interpreter: /usr/bin/ruby`
-You don't have a `/usr/bin/ruby` or it is not executable. It's not recommended to let this persist, you'd be surprised how many .apps, tools and scripts expect your macOS provided files and directories to be *unmodified* since macOS was installed.
+### Ruby: `bad interpreter: /usr/bin/ruby`
+You don't have a `/usr/bin/ruby` or it is not executable. It's not recommended to let this persist; you'd be surprised how many `.app`s, tools and scripts expect your macOS-provided files and directories to be *unmodified* since macOS was installed.
 
 ### `brew update` complains about untracked working tree files
-After running `brew update`, you receive a git error warning about untracked files or local changes that would be overwritten by a checkout or merge, followed by a list of files inside your Homebrew installation.
+After running `brew update`, you receive a Git error warning about untracked files or local changes that would be overwritten by a checkout or merge, followed by a list of files inside your Homebrew installation.
 
 This is caused by an old bug in in the `update` code that has long since been fixed. However, the nature of the bug requires that you do the following:
 
@@ -27,7 +27,7 @@ cd $(brew --repository)/Library
 git clean -fd
 ```
 
-### invalid multibyte escape: /^\037\213/
+### Ruby: `invalid multibyte escape: /^\037\213/`
 
 You see an error similar to:
 
@@ -38,7 +38,7 @@ invalid multibyte escape: /^\037\235/
 
 In the past, Homebrew assumed that `/usr/bin/ruby` was Ruby 1.8. On OS X 10.9, it is now Ruby 2.0. There are various incompatibilities between the two versions, so if you upgrade to OS X 10.9 while using a sufficiently old version of Homebrew, you will encounter errors.
 
-The incompatibilities have been addressed in more recent versions of Homebrew, and it does not make assumptions about `/usr/bin/ruby`, instead it uses the executable inside MacOS's Ruby framework or a vendored Ruby.
+The incompatibilities have been addressed in more recent versions of Homebrew, and instead of making assumptions about `/usr/bin/ruby`, it uses the executable inside macOS's Ruby framework or a vendored Ruby.
 
 To recover from this situation, do the following:
 
@@ -125,7 +125,7 @@ Upgrading macOS can cause errors like the following:
 - `dyld: Library not loaded: /usr/local/opt/icu4c/lib/libicui18n.54.dylib`
 - `configure: error: Cannot find libz`
 
-Following an macOS upgrade it may be necessary to reinstall the Xcode Command Line Tools and `brew upgrade` all installed formula:
+Following a macOS upgrade it may be necessary to reinstall the Xcode Command Line Tools and `brew upgrade` all installed formula:
 
 ```bash
 xcode-select --install

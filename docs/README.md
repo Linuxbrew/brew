@@ -38,7 +38,7 @@
 
 ## Maintainers
 - [New Maintainer Checklist](New-Maintainer-Checklist.md)
-- [Maintainers Avoiding Burnout](Maintainers-Avoiding-Burnout.md)
+- [Maintainers: Avoiding Burnout](Maintainers-Avoiding-Burnout.md)
 - [Maintainer Guidelines](Maintainer-Guidelines.md)
 - [Brew Test Bot For Maintainers](Brew-Test-Bot-For-Core-Contributors.md)
 - [Common Issues for Maintainers](Common-Issues-for-Core-Contributors.md)
