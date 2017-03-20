@@ -499,9 +499,13 @@ class Reporter
   end
 
   def migrate_formula_rename
-    report[:R].each do |old_full_name, new_full_name|
-      old_name = old_full_name.split("/").last
+    Formula.installed.map(&:oldname).compact.each do |old_name|
       next unless (dir = HOMEBREW_CELLAR/old_name).directory? && !dir.subdirs.empty?
+
+      new_name = tap.formula_renames[old_name]
+      next unless new_name
+
+      new_full_name = "#{tap}/#{new_name}"
 
       begin
         f = Formulary.factory(new_full_name)
