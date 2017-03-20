@@ -361,7 +361,10 @@ class Reporter
 
       case status
       when "A", "D"
-        @report[status.to_sym] << tap.formula_file_to_name(src)
+        full_name = tap.formula_file_to_name(src)
+        name = full_name.split("/").last
+        new_tap = tap.tap_migrations[name]
+        @report[status.to_sym] << full_name unless new_tap
       when "M"
         begin
           formula = Formulary.factory(tap.path/src)
