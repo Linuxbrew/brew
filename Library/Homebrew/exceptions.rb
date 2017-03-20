@@ -94,19 +94,6 @@ class TapFormulaUnavailableError < FormulaUnavailableError
   end
 end
 
-class FormulaExistsError < RuntimeError
-  attr_reader :name, :path
-
-  def initialize(name, path)
-    @name = name
-    @path = path
-  end
-
-  def to_s
-    "Formula #{name} exists in #{path}"
-  end
-end
-
 class FormulaClassUnavailableError < FormulaUnavailableError
   attr_reader :path
   attr_reader :class_name

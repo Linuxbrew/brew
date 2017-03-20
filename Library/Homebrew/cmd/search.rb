@@ -67,12 +67,12 @@ module Homebrew
       if $stdout.tty?
         count = local_results.length + tap_results.length
 
-        if msg = Homebrew::MissingFormula.missing_formula(query)
+        if reason = Homebrew::MissingFormula.reason(query)
           if count > 0
             puts
             puts "If you meant #{query.inspect} specifically:"
           end
-          puts msg
+          puts reason
         elsif count.zero?
           puts "No formula found for #{query.inspect}."
           begin

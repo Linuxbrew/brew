@@ -6,7 +6,7 @@ module Homebrew
   module MissingFormula
     class << self
       def reason(name)
-        blacklisted_reason(name)
+        blacklisted_reason(name) || tap_migration_reason(name) || deleted_reason(name)
       end
 
       def blacklisted_reason(name)
@@ -99,6 +99,59 @@ module Homebrew
         end
       end
       alias generic_blacklisted_reason blacklisted_reason
+
+      def tap_migration_reason(name)
+        message = nil
+
+        Tap.each do |old_tap|
+          new_tap_name = old_tap.tap_migrations[name]
+          next unless new_tap_name
+          message = <<-EOS.undent
+            It was migrated from #{old_tap} to #{new_tap_name}.
+            You can access it again by running:
+              brew tap #{new_tap_name}
+          EOS
+          break
+        end
+
+        message
+      end
+
+      def deleted_reason(name)
+        path = Formulary.path name
+        return if File.exist? path
+        tap = Tap.from_path(path)
+        return unless File.exist? tap.path
+        relative_path = path.relative_path_from tap.path
+
+        tap.path.cd do
+          # We know this may return incomplete results for shallow clones but
+          # we don't want to nag everyone with a shallow clone to unshallow it.
+          log_command = "git log --name-only --max-count=1 --format=%H\\\\n%h\\\\n%B -- #{relative_path}"
+          hash, short_hash, *commit_message, relative_path =
+            Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)
+          if hash.to_s.empty? || short_hash.to_s.empty? ||
+             relative_path.to_s.empty?
+            return
+          end
+
+          commit_message = commit_message.reject(&:empty?).join("\n  ")
+
+          commit_message.sub!(/ \(#(\d+)\)$/, " (#{tap.issues_url}/\\1)")
+          commit_message.gsub!(/(Closes|Fixes) #(\d+)/, "\\1 #{tap.issues_url}/\\2")
+
+          <<-EOS.undent
+            #{name} was deleted from #{tap.name} in commit #{short_hash}:
+              #{commit_message}
+
+            To show the formula before removal run:
+              git -C "$(brew --repo #{tap})" show #{short_hash}^:#{relative_path}
+
+            If you still use this formula consider creating your own tap:
+              http://docs.brew.sh/How-to-Create-and-Maintain-a-Tap.html
+          EOS
+        end
+      end
 
       require "extend/os/missing_formula"
     end

@@ -62,7 +62,6 @@ require "formula_installer"
 require "tap"
 require "hardware"
 require "development_tools"
-require "historic"
 
 module Homebrew
   module_function
@@ -207,23 +206,12 @@ module Homebrew
       # formula was found, but there's a problem with its implementation).
       ofail e.message
     rescue FormulaUnavailableError => e
-      if (missing_formula = Homebrew::MissingFormula.missing_formula(e.name))
-        ofail "#{e.message}\n#{missing_formula}"
+      if (reason = Homebrew::MissingFormula.reason(e.name))
+        ofail "#{e.message}\n#{reason}"
       elsif e.name == "updog"
         ofail "What's updog?"
       else
         ofail e.message
-
-        migrations = search_for_migrated_formula(e.name)
-        return unless migrations.empty?
-
-        ohai "Searching among deleted formulae..."
-        begin
-          search_for_deleted_formula(e.name)
-          return
-        rescue
-          nil
-        end
 
         query = query_regexp(e.name)
 

@@ -23,7 +23,6 @@ require "formula"
 require "keg"
 require "tab"
 require "json"
-require "historic"
 
 module Homebrew
   module_function
@@ -57,22 +56,10 @@ module Homebrew
           end
         rescue FormulaUnavailableError => e
           # No formula with this name, try a missing formula lookup
-          if (missing_formula = Homebrew::MissingFormula.missing_formula(f))
-            ofail "#{e.message}\n#{missing_formula}"
+          if (reason = Homebrew::MissingFormula.reason(f))
+            ofail "#{e.message}\n#{reason}"
           else
             ofail e.message
-
-            # No point in searching if the specified tap isn't tapped yet
-            next if e.instance_of?(TapFormulaUnavailableError) && !e.tap.installed?
-
-            migrations = search_for_migrated_formula(f)
-            next unless migrations.empty?
-            ohai "Searching among deleted formulae..."
-            begin
-              search_for_deleted_formula(f)
-            rescue
-              nil
-            end
           end
         end
       end
