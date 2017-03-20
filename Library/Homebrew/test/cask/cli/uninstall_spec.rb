@@ -8,7 +8,7 @@ describe Hbc::CLI::Uninstall, :cask do
 
     output = Regexp.new <<-EOS.undent
       ==> Uninstalling Cask local-caffeine
-      ==> Removing App '.*/Caffeine.app'.
+      ==> Removing App '.*Caffeine.app'.
     EOS
 
     expect {
