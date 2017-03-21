@@ -472,6 +472,12 @@ class FormulaAuditor
           problem "Dependency '#{dep.name}' is an alias; use the canonical name '#{dep.to_formula.full_name}'."
         end
 
+        if @new_formula && dep_f.keg_only_reason &&
+           !["openssl", "apr", "apr-util"].include?(dep.name) &&
+           [:provided_by_macos, :provided_by_osx].include?(dep_f.keg_only_reason.reason)
+          problem "Dependency '#{dep.name}' may be unnecessary as it is provided by macOS; try to build this formula without it."
+        end
+
         dep.options.reject do |opt|
           next true if dep_f.option_defined?(opt)
           dep_f.requirements.detect do |r|

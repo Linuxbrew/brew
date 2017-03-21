@@ -4,6 +4,8 @@ FormulaConflict = Struct.new(:name, :reason)
 # Used to annotate formulae that duplicate macOS provided software
 # or cause conflicts when linked in.
 class KegOnlyReason
+  attr_reader :reason
+
   def initialize(reason, explanation)
     @reason = reason
     @explanation = explanation
