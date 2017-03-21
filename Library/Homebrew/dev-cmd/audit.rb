@@ -38,7 +38,7 @@ require "official_taps"
 require "cmd/search"
 require "cmd/style"
 require "date"
-require "blacklist"
+require "missing_formula"
 require "digest"
 
 module Homebrew
@@ -399,7 +399,7 @@ class FormulaAuditor
     name = formula.name
     full_name = formula.full_name
 
-    if blacklisted?(name)
+    if Homebrew::MissingFormula.blacklisted_reason(name)
       problem "'#{name}' is blacklisted."
     end
 

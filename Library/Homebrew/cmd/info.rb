@@ -16,7 +16,7 @@
 #:    See the docs for examples of using the JSON output:
 #:    <http://docs.brew.sh/Querying-Brew.html>
 
-require "blacklist"
+require "missing_formula"
 require "caveats"
 require "options"
 require "formula"
@@ -54,10 +54,13 @@ module Homebrew
           else
             info_formula Formulary.find_with_priority(f)
           end
-        rescue FormulaUnavailableError
-          # No formula with this name, try a blacklist lookup
-          raise unless (blacklist = blacklisted?(f))
-          puts blacklist
+        rescue FormulaUnavailableError => e
+          # No formula with this name, try a missing formula lookup
+          if (reason = Homebrew::MissingFormula.reason(f))
+            ofail "#{e.message}\n#{reason}"
+          else
+            ofail e.message
+          end
         end
       end
     end

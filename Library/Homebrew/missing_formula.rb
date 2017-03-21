@@ -1,0 +1,159 @@
+require "formulary"
+require "tap"
+require "utils"
+
+module Homebrew
+  module MissingFormula
+    class << self
+      def reason(name)
+        blacklisted_reason(name) || tap_migration_reason(name) || deleted_reason(name)
+      end
+
+      def blacklisted_reason(name)
+        case name.downcase
+        when "gem", /^rubygems?$/ then <<-EOS.undent
+          Homebrew provides gem via: `brew install ruby`.
+          EOS
+        when "tex", "tex-live", "texlive", "latex" then <<-EOS.undent
+          Installing TeX from source is weird and gross, requires a lot of patches,
+          and only builds 32-bit (and thus can't use Homebrew dependencies)
+
+          We recommend using a MacTeX distribution: https://www.tug.org/mactex/
+
+          You can install it with Homebrew-Cask:
+            brew cask install mactex
+          EOS
+        when "pip" then <<-EOS.undent
+          Homebrew provides pip via: `brew install python`. However you will then
+          have two Pythons installed on your Mac, so alternatively you can install
+          pip via the instructions at:
+            #{Formatter.url("https://pip.readthedocs.io/en/stable/installing/")}
+          EOS
+        when "pil" then <<-EOS.undent
+          Instead of PIL, consider `pip install pillow` or `brew install Homebrew/python/pillow`.
+          EOS
+        when "macruby" then <<-EOS.undent
+          MacRuby is not packaged and is on an indefinite development hiatus.
+          You can read more about it at:
+            #{Formatter.url("https://github.com/MacRuby/MacRuby")}
+          EOS
+        when /(lib)?lzma/
+          "lzma is now part of the xz formula."
+        when "gtest", "googletest", "google-test" then <<-EOS.undent
+          Installing gtest system-wide is not recommended; it should be vendored
+          in your projects that use it.
+          EOS
+        when "gmock", "googlemock", "google-mock" then <<-EOS.undent
+          Installing gmock system-wide is not recommended; it should be vendored
+          in your projects that use it.
+          EOS
+        when "sshpass" then <<-EOS.undent
+          We won't add sshpass because it makes it too easy for novice SSH users to
+          ruin SSH's security.
+          EOS
+        when "gsutil" then <<-EOS.undent
+          Install gsutil with `pip install gsutil`
+          EOS
+        when "clojure" then <<-EOS.undent
+          Clojure isn't really a program but a library managed as part of a
+          project and Leiningen is the user interface to that library.
+
+          To install Clojure you should install Leiningen:
+            brew install leiningen
+          and then follow the tutorial:
+            #{Formatter.url("https://github.com/technomancy/leiningen/blob/stable/doc/TUTORIAL.md")}
+          EOS
+        when "osmium" then <<-EOS.undent
+          The creator of Osmium requests that it not be packaged and that people
+          use the GitHub master branch instead.
+          EOS
+        when "gfortran" then <<-EOS.undent
+          GNU Fortran is now provided as part of GCC, and can be installed with:
+            brew install gcc
+          EOS
+        when "play" then <<-EOS.undent
+          Play 2.3 replaces the play command with activator:
+            brew install typesafe-activator
+
+          You can read more about this change at:
+            #{Formatter.url("https://www.playframework.com/documentation/2.3.x/Migration23")}
+            #{Formatter.url("https://www.playframework.com/documentation/2.3.x/Highlights23")}
+          EOS
+        when "haskell-platform" then <<-EOS.undent
+          We no longer package haskell-platform. Consider installing ghc
+          and cabal-install instead:
+            brew install ghc cabal-install
+
+          You can install with Homebrew-Cask:
+            brew cask install haskell-platform
+          EOS
+        when "mysqldump-secure" then <<-EOS.undent
+          The creator of mysqldump-secure tried to game our popularity metrics.
+          EOS
+        when "ngrok" then <<-EOS.undent
+          Upstream sunsetted 1.x in March 2016 and 2.x is not open-source.
+
+          If you wish to use the 2.x release you can install with Homebrew-Cask:
+            brew cask install ngrok
+          EOS
+        end
+      end
+      alias generic_blacklisted_reason blacklisted_reason
+
+      def tap_migration_reason(name)
+        message = nil
+
+        Tap.each do |old_tap|
+          new_tap_name = old_tap.tap_migrations[name]
+          next unless new_tap_name
+          message = <<-EOS.undent
+            It was migrated from #{old_tap} to #{new_tap_name}.
+            You can access it again by running:
+              brew tap #{new_tap_name}
+          EOS
+          break
+        end
+
+        message
+      end
+
+      def deleted_reason(name)
+        path = Formulary.path name
+        return if File.exist? path
+        tap = Tap.from_path(path)
+        return unless File.exist? tap.path
+        relative_path = path.relative_path_from tap.path
+
+        tap.path.cd do
+          # We know this may return incomplete results for shallow clones but
+          # we don't want to nag everyone with a shallow clone to unshallow it.
+          log_command = "git log --name-only --max-count=1 --format=%H\\\\n%h\\\\n%B -- #{relative_path}"
+          hash, short_hash, *commit_message, relative_path =
+            Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)
+          if hash.to_s.empty? || short_hash.to_s.empty? ||
+             relative_path.to_s.empty?
+            return
+          end
+
+          commit_message = commit_message.reject(&:empty?).join("\n  ")
+
+          commit_message.sub!(/ \(#(\d+)\)$/, " (#{tap.issues_url}/\\1)")
+          commit_message.gsub!(/(Closes|Fixes) #(\d+)/, "\\1 #{tap.issues_url}/\\2")
+
+          <<-EOS.undent
+            #{name} was deleted from #{tap.name} in commit #{short_hash}:
+              #{commit_message}
+
+            To show the formula before removal run:
+              git -C "$(brew --repo #{tap})" show #{short_hash}^:#{relative_path}
+
+            If you still use this formula consider creating your own tap:
+              http://docs.brew.sh/How-to-Create-and-Maintain-a-Tap.html
+          EOS
+        end
+      end
+
+      require "extend/os/missing_formula"
+    end
+  end
+end
