@@ -503,7 +503,9 @@ class Reporter
 
   def migrate_formula_rename
     Formula.installed.map(&:oldname).compact.each do |old_name|
-      next unless (dir = HOMEBREW_CELLAR/old_name).directory? && !dir.subdirs.empty?
+      old_name_dir = HOMEBREW_CELLAR/old_name
+      next if old_name_dir.symlink?
+      next unless old_name_dir.directory? && !old_name_dir.subdirs.empty?
 
       new_name = tap.formula_renames[old_name]
       next unless new_name
