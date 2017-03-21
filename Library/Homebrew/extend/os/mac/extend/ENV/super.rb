@@ -1,4 +1,6 @@
 module Superenv
+  alias x11? x11
+
   # @private
   def self.bin
     return unless DevelopmentTools.installed?
@@ -120,9 +122,4 @@ module Superenv
   def no_weak_imports
     append "HOMEBREW_CCCFG", "w" if no_weak_imports_support?
   end
-
-  # These methods are no longer necessary under superenv, but are needed to
-  # maintain an interface compatible with stdenv.
-  alias macosxsdk noop
-  alias remove_macosxsdk noop
 end

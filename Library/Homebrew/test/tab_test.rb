@@ -4,34 +4,42 @@ require "formula"
 
 class TabTests < Homebrew::TestCase
   def setup
+    super
+
+    @time = Time.now.to_i
     @used = Options.create(%w[--with-foo --without-bar])
     @unused = Options.create(%w[--with-baz --without-qux])
 
-    @tab = Tab.new("used_options"         => @used.as_flags,
-                   "unused_options"       => @unused.as_flags,
-                   "built_as_bottle"      => false,
-                   "poured_from_bottle"   => true,
-                   "changed_files"        => [],
-                   "time"                 => nil,
-                   "source_modified_time" => 0,
-                   "HEAD"                 => TEST_SHA1,
-                   "compiler"             => "clang",
-                   "stdlib"               => "libcxx",
-                   "runtime_dependencies" => [],
-                   "source"               => {
-                     "tap" => "homebrew/core",
-                     "path" => nil,
-                     "spec" => "stable",
-                     "versions" => {
-                       "stable" => "0.10",
-                       "devel" => "0.14",
-                       "head" => "HEAD-1111111",
-                     },
-                   })
+    @tab = Tab.new(
+      "homebrew_version" => HOMEBREW_VERSION,
+      "used_options"         => @used.as_flags,
+      "unused_options"       => @unused.as_flags,
+      "built_as_bottle"      => false,
+      "poured_from_bottle"   => true,
+      "changed_files"        => [],
+      "time"                 => @time,
+      "source_modified_time" => 0,
+      "HEAD"                 => TEST_SHA1,
+      "compiler"             => "clang",
+      "stdlib"               => "libcxx",
+      "runtime_dependencies" => [],
+      "source"               => {
+        "tap" => CoreTap.instance.to_s,
+        "path" => CoreTap.instance.path.to_s,
+        "spec" => "stable",
+        "versions" => {
+          "stable" => "0.10",
+          "devel" => "0.14",
+          "head" => "HEAD-1111111",
+        },
+      },
+    )
   end
 
   def test_defaults
     tab = Tab.empty
+
+    assert_equal HOMEBREW_VERSION, tab.homebrew_version
     assert_empty tab.unused_options
     assert_empty tab.used_options
     assert_nil tab.changed_files
@@ -69,6 +77,49 @@ class TabTests < Homebrew::TestCase
     assert_predicate tab, :universal?
   end
 
+  def test_parsed_homebrew_version
+    tab = Tab.new
+    assert_same Version::NULL, tab.parsed_homebrew_version
+
+    tab = Tab.new(homebrew_version: "1.2.3")
+    assert_equal "1.2.3", tab.parsed_homebrew_version
+    assert tab.parsed_homebrew_version < "1.2.3-1-g12789abdf"
+    assert_kind_of Version, tab.parsed_homebrew_version
+
+    tab.homebrew_version = "1.2.4-567-g12789abdf"
+    assert tab.parsed_homebrew_version > "1.2.4"
+    assert tab.parsed_homebrew_version > "1.2.4-566-g21789abdf"
+    assert tab.parsed_homebrew_version < "1.2.4-568-g01789abdf"
+
+    tab = Tab.new(homebrew_version: "2.0.0-134-gabcdefabc-dirty")
+    assert tab.parsed_homebrew_version > "2.0.0"
+    assert tab.parsed_homebrew_version > "2.0.0-133-g21789abdf"
+    assert tab.parsed_homebrew_version < "2.0.0-135-g01789abdf"
+  end
+
+  def test_runtime_dependencies
+    tab = Tab.new
+    assert_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.6"
+    assert_nil tab.runtime_dependencies
+
+    tab.runtime_dependencies = []
+    refute_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.5"
+    assert_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.7"
+    refute_nil tab.runtime_dependencies
+
+    tab.homebrew_version = "1.1.10"
+    refute_nil tab.runtime_dependencies
+
+    tab.runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
+    refute_nil tab.runtime_dependencies
+  end
+
   def test_cxxstdlib
     assert_equal :clang, @tab.cxxstdlib.compiler
     assert_equal :libcxx, @tab.cxxstdlib.type
@@ -77,7 +128,7 @@ class TabTests < Homebrew::TestCase
   def test_other_attributes
     assert_equal TEST_SHA1, @tab.HEAD
     assert_equal "homebrew/core", @tab.tap.name
-    assert_nil @tab.time
+    assert_equal @time, @tab.time
     refute_predicate @tab, :built_as_bottle
     assert_predicate @tab, :poured_from_bottle
   end
@@ -105,7 +156,7 @@ class TabTests < Homebrew::TestCase
   def test_from_file
     path = Pathname.new("#{TEST_FIXTURE_DIR}/receipt.json")
     tab = Tab.from_file(path)
-    source_path = "/usr/local/Library/Taps/hombrew/homebrew-core/Formula/foo.rb"
+    source_path = "/usr/local/Library/Taps/homebrew/homebrew-core/Formula/foo.rb"
     runtime_dependencies = [{ "full_name" => "foo", "version" => "1.0" }]
     changed_files = %w[INSTALL_RECEIPT.json bin/foo]
 
@@ -215,14 +266,11 @@ end
 
 class TabLoadingTests < Homebrew::TestCase
   def setup
+    super
     @f = formula { url "foo-1.0" }
     @f.prefix.mkpath
     @path = @f.prefix.join(Tab::FILENAME)
     @path.write TEST_FIXTURE_DIR.join("receipt.json").read
-  end
-
-  def teardown
-    @f.rack.rmtree
   end
 
   def test_for_keg

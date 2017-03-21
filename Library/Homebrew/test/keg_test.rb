@@ -2,7 +2,7 @@ require "testing_env"
 require "keg"
 require "stringio"
 
-class LinkTests < Homebrew::TestCase
+class LinkTestCase < Homebrew::TestCase
   include FileUtils
 
   def setup_test_keg(name, version)
@@ -20,6 +20,8 @@ class LinkTests < Homebrew::TestCase
   end
 
   def setup
+    super
+
     @keg = setup_test_keg("foo", "1.0")
     @dst = HOMEBREW_PREFIX.join("bin", "helloworld")
     @nonexistent = Pathname.new("/some/nonexistent/path")
@@ -34,15 +36,17 @@ class LinkTests < Homebrew::TestCase
   end
 
   def teardown
-    @kegs.each do |keg|
-      keg.unlink
-      keg.uninstall
-    end
-
+    @kegs.each(&:unlink)
     $stdout = @old_stdout
-
-    rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
+    super
+  end
+end
+
+class LinkTests < LinkTestCase
+  def test_all
+    Formula.clear_racks_cache
+    assert_equal [@keg], Keg.all
   end
 
   def test_empty_installation
@@ -294,8 +298,6 @@ class LinkTests < Homebrew::TestCase
     assert_equal 2, lib.children.length
   ensure
     a.unlink
-    a.uninstall
-    b.uninstall
   end
 
   def test_removes_broken_symlinks_that_conflict_with_directories
@@ -311,11 +313,10 @@ class LinkTests < Homebrew::TestCase
     keg.link
   ensure
     keg.unlink
-    keg.uninstall
   end
 end
 
-class InstalledDependantsTests < LinkTests
+class InstalledDependantsTests < LinkTestCase
   def stub_formula_name(name)
     f = formula(name) { url "foo-1.0" }
     stub_formula_loader f
@@ -333,6 +334,7 @@ class InstalledDependantsTests < LinkTests
   def setup
     super
     @dependent = setup_test_keg("bar", "1.0")
+    @keg.link
   end
 
   def alter_tab(keg = @dependent)
@@ -341,11 +343,20 @@ class InstalledDependantsTests < LinkTests
     tab.write
   end
 
-  def dependencies(deps)
+  # 1.1.6 is the earliest version of Homebrew that generates correct runtime
+  # dependency lists in tabs.
+  def dependencies(deps, homebrew_version: "1.1.6")
     alter_tab do |tab|
+      tab.homebrew_version = homebrew_version
       tab.tabfile = @dependent.join("INSTALL_RECEIPT.json")
       tab.runtime_dependencies = deps
     end
+  end
+
+  def unreliable_dependencies(deps)
+    # 1.1.5 is (hopefully!) the last version of Homebrew that generates
+    # incorrect runtime dependency lists in tabs.
+    dependencies(deps, homebrew_version: "1.1.5")
   end
 
   # Test with a keg whose formula isn't known.
@@ -353,10 +364,32 @@ class InstalledDependantsTests < LinkTests
   # from a file path or URL.
   def test_unknown_formula
     Formulary.unstub(:loader_for)
-    dependencies []
-    alter_tab { |t| t.source["path"] = nil }
-    assert_empty @keg.installed_dependents
+    alter_tab(@keg) do |t|
+      t.source["tap"] = "some/tap"
+      t.source["path"] = nil
+    end
+
+    dependencies [{ "full_name" => "some/tap/foo", "version" => "1.0" }]
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
+
+    dependencies nil
+    # It doesn't make sense for a keg with no formula to have any dependents,
+    # so that can't really be tested.
     assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_a_dependency_with_no_tap_in_tab
+    @tap_dep = setup_test_keg("baz", "1.0")
+
+    alter_tab(@keg) { |t| t.source["tap"] = nil }
+
+    dependencies nil
+    Formula["bar"].class.depends_on "foo"
+    Formula["bar"].class.depends_on "baz"
+
+    result = Keg.find_some_installed_dependents([@keg, @tap_dep])
+    assert_equal [[@keg, @tap_dep], ["bar"]], result
   end
 
   def test_no_dependencies_anywhere
@@ -372,6 +405,27 @@ class InstalledDependantsTests < LinkTests
     assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
   end
 
+  def test_uninstalling_dependent_and_dependency
+    dependencies nil
+    Formula["bar"].class.depends_on "foo"
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg, @dependent])
+  end
+
+  def test_renamed_dependency
+    dependencies nil
+
+    stub_formula_loader Formula["foo"], "homebrew/core/foo-old"
+    renamed_path = HOMEBREW_CELLAR/"foo-old"
+    (HOMEBREW_CELLAR/"foo").rename(renamed_path)
+    renamed_keg = Keg.new(renamed_path.join("1.0"))
+
+    Formula["bar"].class.depends_on "foo"
+
+    result = Keg.find_some_installed_dependents([renamed_keg])
+    assert_equal [[renamed_keg], ["bar"]], result
+  end
+
   def test_empty_dependencies_in_tab
     dependencies []
     assert_empty @keg.installed_dependents
@@ -380,8 +434,8 @@ class InstalledDependantsTests < LinkTests
 
   def test_same_name_different_version_in_tab
     dependencies [{ "full_name" => "foo", "version" => "1.1" }]
-    assert_empty @keg.installed_dependents
-    assert_nil Keg.find_some_installed_dependents([@keg])
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end
 
   def test_different_name_same_version_in_tab
@@ -393,6 +447,28 @@ class InstalledDependantsTests < LinkTests
 
   def test_same_name_and_version_in_tab
     dependencies [{ "full_name" => "foo", "version" => "1.0" }]
+    assert_equal [@dependent], @keg.installed_dependents
+    assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_fallback_for_old_versions
+    unreliable_dependencies [{ "full_name" => "baz", "version" => "1.0" }]
+    Formula["bar"].class.depends_on "foo"
+    assert_empty @keg.installed_dependents
+    assert_equal [[@keg], ["bar"]], Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_nonoptlinked
+    @keg.remove_opt_record
+    dependencies [{ "full_name" => "foo", "version" => "1.0" }]
+    assert_empty @keg.installed_dependents
+    assert_nil Keg.find_some_installed_dependents([@keg])
+  end
+
+  def test_keg_only
+    @keg.unlink
+    Formula["foo"].class.keg_only "a good reason"
+    dependencies [{ "full_name" => "foo", "version" => "1.1" }] # different version
     assert_equal [@dependent], @keg.installed_dependents
     assert_equal [[@keg], ["bar 1.0"]], Keg.find_some_installed_dependents([@keg])
   end

@@ -1,4 +1,4 @@
-#:  * `audit` [`--strict`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
@@ -6,6 +6,9 @@
 #:
 #:    If `--strict` is passed, additional checks are run, including RuboCop
 #:    style checks.
+#:
+#:    If `--fix` is passed, style violations will be
+#:    automatically fixed using RuboCop's `--auto-correct` feature.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
 #:    connection are run.
@@ -62,8 +65,9 @@ module Homebrew
     end
 
     if strict
+      options = { fix: ARGV.flag?("--fix"), realpath: true }
       # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, realpath: true)
+      style_results = check_style_json(files, options)
     end
 
     ff.each do |f|
@@ -167,6 +171,32 @@ class FormulaAuditor
     @problems = []
     @text = FormulaText.new(formula.path)
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
+  end
+
+  def url_status_code(url, range: false)
+    # The system Curl is too old and unreliable with HTTPS homepages on
+    # Yosemite and below.
+    return "200" unless DevelopmentTools.curl_handles_most_https_homepages?
+
+    extra_args = [
+      "--connect-timeout", "15",
+      "--output", "/dev/null",
+      "--write-out", "%{http_code}"
+    ]
+    extra_args << "--range" << "0-0" if range
+    extra_args << url
+
+    status_code = nil
+    [:browser, :default].each do |user_agent|
+      args = curl_args(
+        extra_args: extra_args,
+        show_output: true,
+        user_agent: user_agent,
+      )
+      status_code = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
+      break if status_code.start_with? "20"
+    end
+    status_code
   end
 
   def audit_style
@@ -432,6 +462,14 @@ class FormulaAuditor
   end
 
   def audit_conflicts
+    if formula.conflicts.any? && formula.versioned_formula?
+      problem <<-EOS
+        Versioned formulae should not use `conflicts_with`.
+        Use `keg_only :versioned_formula` instead.
+      EOS
+      return
+    end
+
     formula.conflicts.each do |c|
       begin
         Formulary.factory(c.name)
@@ -448,8 +486,17 @@ class FormulaAuditor
 
   def audit_options
     formula.options.each do |o|
+      if o.name == "32-bit"
+        problem "macOS has been 64-bit only since 10.6 so 32-bit options are deprecated."
+      end
+
       next unless @strict
-      if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal" && o.name != "32-bit"
+
+      if o.name == "universal" && !Formula["wine"].recursive_dependencies.map(&:name).include?(formula.name)
+        problem "macOS has been 64-bit only since 10.6 so universal options are deprecated."
+      end
+
+      if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal"
         problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
       end
 
@@ -461,7 +508,7 @@ class FormulaAuditor
 
     return unless @new_formula
     return if formula.deprecated_options.empty?
-    return if formula.name.include?("@")
+    return if formula.versioned_formula?
     problem "New formulae should not use `deprecated_option`."
   end
 
@@ -537,8 +584,14 @@ class FormulaAuditor
     # People will run into mixed content sometimes, but we should enforce and then add
     # exemptions as they are discovered. Treat mixed content on homepages as a bug.
     # Justify each exemptions with a code comment so we can keep track here.
-    if homepage =~ %r{^http://[^/]*github\.io/}
+    case homepage
+    when %r{^http://[^/]*\.github\.io/},
+         %r{^http://[^/]*\.sourceforge\.io/}
       problem "Please use https:// for #{homepage}"
+    end
+
+    if homepage =~ %r{^http://([^/]*)\.(sf|sourceforge)\.net(/|$)}
+      problem "#{homepage} should be `https://#{$1}.sourceforge.io/`"
     end
 
     # There's an auto-redirect here, but this mistake is incredibly common too.
@@ -564,11 +617,10 @@ class FormulaAuditor
     end
 
     return unless @online
-    begin
-      nostdout { curl "--connect-timeout", "15", "-o", "/dev/null", homepage }
-    rescue ErrorDuringExecution
-      problem "The homepage is not reachable (curl exit code #{$?.exitstatus})"
-    end
+
+    status_code = url_status_code(homepage)
+    return if status_code.start_with? "20"
+    problem "The homepage #{homepage} is not reachable (HTTP status code #{status_code})"
   end
 
   def audit_bottle_spec
@@ -647,11 +699,47 @@ class FormulaAuditor
       end
     end
 
+    unstable_whitelist = %w[
+      aalib 1.4rc5
+      automysqlbackup 3.0-rc6
+      aview 1.3.0rc1
+      distcc 3.2rc1
+      elm-format 0.5.2-alpha
+      ftgl 2.1.3-rc5
+      hidapi 0.8.0-rc1
+      libcaca 0.99b19
+      premake 4.4-beta5
+      pwnat 0.3-beta
+      pxz 4.999.9
+      recode 3.7-beta2
+      speexdsp 1.2rc3
+      sqoop 1.4.6
+      tcptraceroute 1.5beta7
+      testssl 2.8rc3
+      tiny-fugue 5.0b8
+      vbindiff 3.0_beta4
+    ].each_slice(2).to_a.map do |formula, version|
+      [formula, version.sub(/\d+$/, "")]
+    end
+
+    gnome_devel_whitelist = %w[
+      gtk-doc 1.25
+      libart 2.3.21
+      pygtkglext 1.1.0
+    ].each_slice(2).to_a.map do |formula, version|
+      [formula, version.split(".")[0..1].join(".")]
+    end
+
     stable = formula.stable
     case stable && stable.url
     when /[\d\._-](alpha|beta|rc\d)/
-      problem "Stable version URLs should not contain #{$1}"
+      matched = $1
+      version_prefix = stable.version.to_s.sub(/\d+$/, "")
+      return if unstable_whitelist.include?([formula.name, version_prefix])
+      problem "Stable version URLs should not contain #{matched}"
     when %r{download\.gnome\.org/sources}, %r{ftp\.gnome\.org/pub/GNOME/sources}i
+      version_prefix = stable.version.to_s.split(".")[0..1].join(".")
+      return if gnome_devel_whitelist.include?([formula.name, version_prefix])
       version = Version.parse(stable.url)
       if version >= Version.create("1.0")
         minor_version = version.to_s.split(".", 3)[1].to_i
@@ -706,7 +794,7 @@ class FormulaAuditor
     return if formula.revision.zero?
     if formula.stable
       revision_map = attributes_map[:revision][:stable]
-      stable_revisions = revision_map[formula.stable.version]
+      stable_revisions = revision_map[formula.stable.version] if revision_map
       if !stable_revisions || stable_revisions.empty?
         problem "'revision #{formula.revision}' should be removed"
       end
@@ -782,6 +870,15 @@ class FormulaAuditor
 
     if text.include?("def plist") && !text.include?("plist_options")
       problem "Please set plist_options when using a formula-defined plist."
+    end
+
+    if text =~ /depends_on\s+['"]openssl['"]/ && text =~ /depends_on\s+['"]libressl['"]/
+      problem "Formulae should not depend on both OpenSSL and LibreSSL (even optionally)."
+    end
+
+    if text =~ /virtualenv_(create|install_with_resources)/ &&
+       text =~ /resource\s+['"]setuptools['"]\s+do/
+      problem "Formulae using virtualenvs do not need a `setuptools` resource."
     end
 
     return unless text.include?('require "language/go"') && !text.include?("go_resource")
@@ -1000,7 +1097,20 @@ class FormulaAuditor
       problem "Use Language::Node for npm install args"
     end
 
+    if line.include?("fails_with :llvm")
+      problem "'fails_with :llvm' is now a no-op so should be removed"
+    end
+
+    if formula.tap.to_s == "homebrew/core" && !formula.tap.remote[/linuxbrew/i]
+      ["OS.mac?", "OS.linux?"].each do |check|
+        next unless line.include?(check)
+        problem "Don't use #{check}; Homebrew/core only supports macOS"
+      end
+    end
+
     return unless @strict
+
+    problem "`#{$1}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
 
     if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
       bad_system = $1
@@ -1243,6 +1353,7 @@ class ResourceAuditor
            %r{^http://(?:[^/]*\.)?bintray\.com/},
            %r{^http://tools\.ietf\.org/},
            %r{^http://launchpad\.net/},
+           %r{^http://github\.com/},
            %r{^http://bitbucket\.org/},
            %r{^http://anonscm\.debian\.org/},
            %r{^http://cpan\.metacpan\.org/},

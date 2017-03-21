@@ -1,13 +1,22 @@
 language: ruby
-rvm: 2.0.0
-os: linux
+
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode8.1
+      rvm: system
+    - os: linux
+      rvm: 2.0.0
 
 before_install:
   - export HOMEBREW_DEVELOPER=1
-  - export PATH="$PWD/bin:$PATH"
-  - umask 022
-  - if [ -f ".git/shallow" ]; then
-      travis_retry git fetch --unshallow;
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+      HOMEBREW_REPOSITORY="$(brew --repo)";
+      sudo rm -rf "$HOMEBREW_REPOSITORY";
+      sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
+    else
+      export PATH="$PWD/bin:$PATH";
+      umask 022;
     fi
 
 script:

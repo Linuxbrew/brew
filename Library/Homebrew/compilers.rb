@@ -4,9 +4,10 @@ module CompilerConstants
   GNU_GCC_REGEXP = /^gcc-(4\.[3-9]|[5-7])$/
   COMPILER_SYMBOL_MAP = {
     "gcc-4.0"    => :gcc_4_0,
-    (OS.mac? ? "gcc-4.2" : "gcc") => :gcc,
+    "gcc-4.2"    => :gcc_4_2,
     "clang"      => :clang,
     "llvm_clang" => :llvm_clang,
+    "cc"         => :c_compiler,
   }.freeze
 
   COMPILERS = COMPILER_SYMBOL_MAP.values +
@@ -68,7 +69,7 @@ class CompilerFailure
   COLLECTIONS = {
     cxx11: [
       create(:gcc_4_0),
-      create(:gcc),
+      create(:gcc_4_2),
       create(:clang) { build 425 },
       create(gcc: "4.3"),
       create(gcc: "4.4"),
@@ -87,9 +88,10 @@ class CompilerSelector
   Compiler = Struct.new(:name, :version)
 
   COMPILER_PRIORITY = {
-    clang: [:clang, :gcc, :gnu, :gcc_4_0, :llvm_clang],
-    gcc: [:gcc, :gnu, :clang, :gcc_4_0],
-    gcc_4_0: [:gcc_4_0, :gcc, :gnu, :clang],
+    clang: [:clang, :gcc_4_2, :gnu, :gcc_4_0, :llvm_clang],
+    gcc_4_2: [:gcc_4_2, :gnu, :clang, :gcc_4_0],
+    gcc_4_0: [:gcc_4_0, :gcc_4_2, :gnu, :clang],
+    c_compiler: [:gnu, :clang, :c_compiler, :gcc_4_2, :gcc_4_0, :llvm_clang],
   }.freeze
 
   def self.select_for(formula, compilers = self.compilers)
@@ -124,10 +126,6 @@ class CompilerSelector
           name = "gcc-#{v}"
           version = compiler_version(name)
           yield Compiler.new(name, version) unless version.null?
-        end
-        if OS.linux?
-          version = versions.non_apple_gcc_version("gcc")
-          yield Compiler.new("gcc", version) unless version.null?
         end
       when :llvm
         next # no-op. DSL supported, compiler is not.

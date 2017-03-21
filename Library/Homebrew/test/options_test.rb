@@ -9,12 +9,13 @@ class IntegrationCommandTestOptions < IntegrationCommandTestCase
     EOS
 
     assert_equal "--with-foo\n\tBuild with foo\n--without-bar\n\tBuild without bar support",
-      cmd_output("options", "testball").chomp
+      cmd("options", "testball").chomp
   end
 end
 
 class OptionTests < Homebrew::TestCase
   def setup
+    super
     @option = Option.new("foo")
   end
 
@@ -43,6 +44,7 @@ end
 
 class DeprecatedOptionTests < Homebrew::TestCase
   def setup
+    super
     @deprecated_option = DeprecatedOption.new("foo", "bar")
   end
 
@@ -68,6 +70,7 @@ end
 
 class OptionsTests < Homebrew::TestCase
   def setup
+    super
     @options = Options.new
   end
 

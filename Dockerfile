@@ -2,7 +2,7 @@ FROM ubuntu:trusty
 MAINTAINER Shaun Jackman <sjackman@gmail.com>
 
 RUN apt-get update \
-	&& apt-get install -y curl g++ git make ruby2.0 ruby2.0-dev uuid-runtime \
+	&& apt-get install -y curl file g++ git make ruby2.0 ruby2.0-dev uuid-runtime \
 	&& ln -sf ruby2.0 /usr/bin/ruby \
 	&& ln -sf gem2.0 /usr/bin/gem
 
@@ -17,4 +17,5 @@ RUN chown -R linuxbrew: /home/linuxbrew/.linuxbrew \
 USER linuxbrew
 WORKDIR /home/linuxbrew
 ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
-	SHELL=/bin/bash
+	SHELL=/bin/bash \
+	USER=linuxbrew

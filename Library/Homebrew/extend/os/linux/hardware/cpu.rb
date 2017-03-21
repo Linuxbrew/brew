@@ -1,6 +1,16 @@
 module Hardware
   class CPU
     class << self
+      OPTIMIZATION_FLAGS_LINUX = {
+        core2: "-march=core2",
+        core: "-march=prescott",
+        dunno: "-march=native",
+      }.freeze
+
+      def optimization_flags
+        OPTIMIZATION_FLAGS_LINUX
+      end
+
       def universal_archs
         [].extend ArchitectureListExtension
       end
@@ -49,6 +59,10 @@ module Hardware
             :haswell
           when 0x3d, 0x47, 0x4f, 0x56
             :broadwell
+          when 0x5e
+            :skylake
+          when 0x8e
+            :kabylake
           else
             cpu_family_model
           end

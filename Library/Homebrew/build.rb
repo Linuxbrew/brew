@@ -48,7 +48,7 @@ class Build
         Requirement.prune
       elsif req.build? && dependent != formula
         Requirement.prune
-      elsif req.satisfied? && req.default_formula? && (dep = req.to_dependency).installed?
+      elsif req.satisfied? && (dep = req.to_dependency) && dep.installed?
         deps << dep
         Requirement.prune
       end
@@ -71,6 +71,7 @@ class Build
   def install
     formula_deps = deps.map(&:to_formula)
     keg_only_deps = formula_deps.select(&:keg_only?)
+    run_time_deps = deps.reject(&:build?).map(&:to_formula)
 
     formula_deps.each do |dep|
       fixopt(dep) unless dep.opt_prefix.directory?
@@ -81,6 +82,7 @@ class Build
     if superenv?
       ENV.keg_only_deps = keg_only_deps
       ENV.deps = formula_deps
+      ENV.run_time_deps = run_time_deps
       ENV.x11 = reqs.any? { |rq| rq.is_a?(X11Requirement) }
       ENV.setup_build_environment(formula)
       post_superenv_hacks
@@ -99,6 +101,16 @@ class Build
         ENV.prepend_path "CMAKE_PREFIX_PATH", dep.opt_prefix.to_s
         ENV.prepend "LDFLAGS", "-L#{dep.opt_lib}" if dep.opt_lib.directory?
         ENV.prepend "CPPFLAGS", "-I#{dep.opt_include}" if dep.opt_include.directory?
+      end
+
+      if OS.linux?
+        # Add the opt_lib directory of each dependency to the RPATH after
+        # $HOMEBREW_PREFIX/lib, which is searched first, allowing dependent
+        # libraries to be found even when the keg is unlinked.
+        run_time_deps.each do |dep|
+          ENV.append_path "LD_RUN_PATH", dep.opt_lib
+          ENV.append "LDFLAGS", "-Wl,-rpath=#{dep.opt_lib}" if dep.opt_lib.directory?
+        end
       end
     end
 

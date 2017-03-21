@@ -6,7 +6,7 @@ module Utils
       def os_prefix_ci
         @anonymous_os_prefix_ci ||= begin
           os = OS_VERSION
-          prefix = (OS.mac? ? ", non-/usr/local" : ", custom-prefix") if HOMEBREW_PREFIX.to_s != BottleSpecification::DEFAULT_PREFIX
+          prefix = (OS.mac? ? ", non-/usr/local" : ", custom-prefix") if HOMEBREW_PREFIX.to_s != HOMEBREW_DEFAULT_PREFIX
           ci = ", CI" if ENV["CI"]
           "#{os}#{prefix}#{ci}"
         end
@@ -35,7 +35,7 @@ module Utils
         end
 
         # Send analytics. Don't send or store any personally identifiable information.
-        # https://github.com/Homebrew/brew/blob/master/docs/Analytics.md
+        # http://docs.brew.sh/Analytics.html
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         if ENV["HOMEBREW_ANALYTICS_DEBUG"]
@@ -63,7 +63,9 @@ module Utils
 
       def report_exception(exception, options = {})
         if exception.is_a?(BuildError) &&
-           exception.formula.tap && !exception.formula.tap.private?
+           exception.formula.tap &&
+           exception.formula.tap.installed? &&
+           !exception.formula.tap.private?
           report_event("BuildError", exception.formula.full_name)
         end
 

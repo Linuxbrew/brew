@@ -6,7 +6,9 @@ class DevelopmentTools
       # Give the name of the binary you look for as a string to this method
       # in order to get the full path back as a Pathname.
       (@locate ||= {}).fetch(tool) do |key|
-        @locate[key] = if File.executable?(path = "/usr/bin/#{tool}")
+        @locate[key] = if !OS.mac? && (path = HOMEBREW_PREFIX/"bin/#{tool}").executable?
+          path
+        elsif File.executable?(path = "/usr/bin/#{tool}")
           Pathname.new path
         # Homebrew GCCs most frequently; much faster to check this before xcrun
         elsif (path = HOMEBREW_PREFIX/"bin/#{tool}").executable?
@@ -34,16 +36,12 @@ class DevelopmentTools
     end
 
     def default_compiler
-      return :gcc unless OS.mac?
-      if default_cc =~ /^gcc/
-        :gcc
-      else
-        :clang
-      end
+      return :c_compiler unless OS.mac?
+      :clang
     end
 
-    def gcc_40_build_version
-      @gcc_40_build_version ||= begin
+    def gcc_4_0_build_version
+      @gcc_4_0_build_version ||= begin
         if (path = locate("gcc-4.0")) &&
            build_version = `#{path} --version 2>/dev/null`[/build (\d{4,})/, 1]
           Version.new build_version
@@ -52,10 +50,9 @@ class DevelopmentTools
         end
       end
     end
-    alias gcc_4_0_build_version gcc_40_build_version
 
-    def gcc_42_build_version
-      @gcc_42_build_version ||= begin
+    def gcc_4_2_build_version
+      @gcc_4_2_build_version ||= begin
         gcc = locate("gcc-4.2") || HOMEBREW_PREFIX.join("opt/apple-gcc42/bin/gcc-4.2")
         if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm")&&
            build_version = `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1]
@@ -65,7 +62,6 @@ class DevelopmentTools
         end
       end
     end
-    alias gcc_build_version gcc_42_build_version
 
     def clang_version
       @clang_version ||= begin
@@ -107,7 +103,7 @@ class DevelopmentTools
         path = locate(cc) unless path.exist?
         path = locate(cc.delete("-.")) if OS.linux? && !path
         version = if path &&
-                     build_version = `#{path} --version`[/gcc(?:(?:-\d(?:\.\d)?)? \(.+\))? (\d\.\d\.\d)/, 1]
+                     build_version = `#{path} --version`[/g?cc(?:(?:-\d(?:\.\d)?)? \(.+\))? (\d\.\d\.\d)/, 1]
           Version.new build_version
         else
           Version::NULL
@@ -116,14 +112,18 @@ class DevelopmentTools
       end
     end
 
+    def c_compiler_build_version
+      non_apple_gcc_version "cc"
+    end
+
     def clear_version_cache
-      @gcc_40_build_version = @gcc_42_build_version = nil
+      @gcc_4_0_build_version = @gcc_4_2_build_version = nil
       @clang_version = @clang_build_version = nil
       @non_apple_gcc_version = {}
     end
 
-    def tar_supports_xz?
-      false
+    def curl_handles_most_https_homepages?
+      true
     end
   end
 end

@@ -84,13 +84,10 @@ class InstallTests < Homebrew::TestCase
 
     cc_arg = "--cc=clang"
     ARGV << cc_arg
-    begin
-      temporary_install(TestballBottle.new) do |f|
-        tab = Tab.for_formula(f)
-        assert_equal "clang", tab.compiler
-      end
-    ensure
-      ARGV.delete_if { |x| x == cc_arg }
+
+    temporary_install(TestballBottle.new) do |f|
+      tab = Tab.for_formula(f)
+      assert_equal "clang", tab.compiler
     end
   end
 end
@@ -128,11 +125,7 @@ class FormulaInstallerTests < Homebrew::TestCase
     fi = FormulaInstaller.new(dependent)
     assert_raises(CannotInstallFormulaError) { fi.check_install_sanity }
   ensure
-    dependency.unpin
     dependency_keg.unlink
-    dependency_keg.uninstall
-    dependency.clear_cache
-    dep_path.unlink
     Formulary::FORMULAE.delete(dep_path)
   end
 end

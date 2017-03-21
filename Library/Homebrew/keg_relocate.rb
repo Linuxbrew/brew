@@ -34,7 +34,7 @@ class Keg
       old_repository: HOMEBREW_REPOSITORY.to_s,
       new_prefix: PREFIX_PLACEHOLDER,
       new_cellar: CELLAR_PLACEHOLDER,
-      new_repository: REPOSITORY_PLACEHOLDER
+      new_repository: REPOSITORY_PLACEHOLDER,
     )
     relocate_dynamic_linkage(relocation)
     replace_text_in_files(relocation)
@@ -47,7 +47,7 @@ class Keg
       old_repository: REPOSITORY_PLACEHOLDER,
       new_prefix: HOMEBREW_PREFIX.to_s,
       new_cellar: HOMEBREW_CELLAR.to_s,
-      new_repository: HOMEBREW_REPOSITORY.to_s
+      new_repository: HOMEBREW_REPOSITORY.to_s,
     )
     relocate_dynamic_linkage(relocation) unless skip_linkage
     replace_text_in_files(relocation, files: files)
@@ -71,7 +71,7 @@ class Keg
       regexp = Regexp.union(
         relocation.old_cellar,
         relocation.old_repository,
-        relocation.old_prefix
+        relocation.old_prefix,
       )
 
       changed = s.gsub!(regexp, replacements)

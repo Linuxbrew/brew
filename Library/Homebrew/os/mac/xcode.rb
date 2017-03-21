@@ -3,8 +3,9 @@ module OS
     module Xcode
       module_function
 
-      V4_BUNDLE_ID = "com.apple.dt.Xcode".freeze
-      V3_BUNDLE_ID = "com.apple.Xcode".freeze
+      DEFAULT_BUNDLE_PATH = Pathname.new("/Applications/Xcode.app").freeze
+      BUNDLE_ID = "com.apple.dt.Xcode".freeze
+      OLD_BUNDLE_ID = "com.apple.Xcode".freeze
 
       def latest_version
         case MacOS.version
@@ -15,13 +16,13 @@ module OS
         when "10.8"  then "5.1.1"
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
-        when "10.11" then "8.1"
-        when "10.12" then "8.1"
+        when "10.11" then "8.2"
+        when "10.12" then "8.2"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "8.1"
+          "8.2"
         end
       end
 
@@ -32,13 +33,8 @@ module OS
         end
       end
 
-      def minimum_version?
+      def below_minimum_version?
         version < minimum_version
-      end
-
-      def prerelease?
-        # TODO: bump to version >= "8.3" after Xcode 8.2 is stable.
-        Version.new(version) >= "8.2"
       end
 
       def outdated?
@@ -56,9 +52,9 @@ module OS
           begin
             dir = MacOS.active_developer_dir
 
-            if dir.empty? || dir == CLT::MAVERICKS_PKG_PATH || !File.directory?(dir)
+            if dir.empty? || dir == CLT::PKG_PATH || !File.directory?(dir)
               path = bundle_path
-              path.join("Contents", "Developer") if path
+              path/"Contents/Developer" if path
             else
               # Use cleanpath to avoid pathological trailing slash
               Pathname.new(dir).cleanpath
@@ -67,14 +63,19 @@ module OS
       end
 
       def toolchain_path
-        Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain") if installed? && Version.new(version) >= "4.3"
+        return unless installed?
+        return if Version.new(version) < "4.3"
+        Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain")
       end
 
-      # Ask Spotlight where Xcode is. If the user didn't install the
-      # helper tools and installed Xcode in a non-conventional place, this
-      # is our only option. See: https://superuser.com/questions/390757
       def bundle_path
-        MacOS.app_with_bundle_id(V4_BUNDLE_ID, V3_BUNDLE_ID)
+        # Use the default location if it exists.
+        return DEFAULT_BUNDLE_PATH if DEFAULT_BUNDLE_PATH.exist?
+
+        # Ask Spotlight where Xcode is. If the user didn't install the
+        # helper tools and installed Xcode in a non-conventional place, this
+        # is our only option. See: https://superuser.com/questions/390757
+        MacOS.app_with_bundle_id(BUNDLE_ID, OLD_BUNDLE_ID)
       end
 
       def installed?
@@ -82,7 +83,7 @@ module OS
       end
 
       def update_instructions
-        if Version.new(MacOS.version) >= "10.9" && !OS::Mac.prerelease?
+        if MacOS.version >= "10.9" && !OS::Mac.prerelease?
           <<-EOS.undent
             Xcode can be updated from the App Store.
           EOS
@@ -185,7 +186,7 @@ module OS
       FROM_XCODE_PKG_ID = "com.apple.pkg.DeveloperToolsCLI".freeze
       MAVERICKS_PKG_ID = "com.apple.pkg.CLTools_Executables".freeze
       MAVERICKS_NEW_PKG_ID = "com.apple.pkg.CLTools_Base".freeze # obsolete
-      MAVERICKS_PKG_PATH = "/Library/Developer/CommandLineTools".freeze
+      PKG_PATH = "/Library/Developer/CommandLineTools".freeze
 
       # Returns true even if outdated tools are installed, e.g.
       # tools from Xcode 4.x on 10.9
@@ -195,7 +196,7 @@ module OS
       end
 
       def update_instructions
-        if Xcode::Version.new(MacOS.version) >= "10.9"
+        if MacOS.version >= "10.9"
           <<-EOS.undent
             Update them from Software Update in the App Store.
           EOS
@@ -226,17 +227,22 @@ module OS
       def minimum_version
         case MacOS.version
         when "10.12" then "8.0.0"
-        else "4.0.0"
+        else "1.0.0"
         end
       end
 
-      def minimum_version?
+      def below_minimum_version?
+        # Lion was the first version of OS X to ship with a CLT
+        return false if MacOS.version < :lion
         version < minimum_version
       end
 
       def outdated?
-        if Xcode::Version.new(MacOS.version) >= :mavericks.to_s
-          version = Utils.popen_read("#{MAVERICKS_PKG_PATH}/usr/bin/clang --version")
+        # Lion was the first version of OS X to ship with a CLT
+        return false if MacOS.version < :lion
+
+        if MacOS.version >= :mavericks
+          version = Utils.popen_read("#{PKG_PATH}/usr/bin/clang --version")
         else
           version = Utils.popen_read("/usr/bin/clang --version")
         end
@@ -254,11 +260,13 @@ module OS
       def detect_version
         # CLT isn't a distinct entity pre-4.3, and pkgutil doesn't exist
         # at all on Tiger, so just count it as installed if Xcode is installed
-        return MacOS::Xcode.version if MacOS::Xcode.installed? && Xcode::Version.new(MacOS::Xcode.version) < "3.0"
+        if MacOS::Xcode.installed? && Xcode::Version.new(MacOS::Xcode.version) < "3.0"
+          return MacOS::Xcode.version
+        end
 
         [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].find do |id|
           if MacOS.version >= :mavericks
-            next unless File.exist?("#{MAVERICKS_PKG_PATH}/usr/bin/clang")
+            next unless File.exist?("#{PKG_PATH}/usr/bin/clang")
           end
           version = MacOS.pkgutil_info(id)[/version: (.+)$/, 1]
           return version if version

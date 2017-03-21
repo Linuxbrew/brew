@@ -9,6 +9,7 @@ class DependencyExpansionTests < Homebrew::TestCase
   end
 
   def setup
+    super
     @foo = build_dep(:foo)
     @bar = build_dep(:bar)
     @baz = build_dep(:baz)
@@ -92,7 +93,7 @@ class DependencyExpansionTests < Homebrew::TestCase
       deps: [
         build_dep(:foo, [], [@bar, @baz]),
         build_dep(:foo, [], [@baz]),
-      ]
+      ],
     )
 
     deps = Dependency.expand(f) do |_dependent, dep|

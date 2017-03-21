@@ -9,7 +9,6 @@ module OS
     RUBY_PLATFORM.to_s.downcase.include?("linux") || RbConfig::CONFIG["host_os"].downcase.include?("linux")
   end
 
-  require "os/mac"
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
   
   GITHUB_USER = "SuperNEMO-DBD".freeze
@@ -20,7 +19,7 @@ module OS
     NAME = "darwin".freeze
     # Don't tell people to report issues on unsupported versions of macOS.
     #if !OS::Mac.prerelease? && !OS::Mac.outdated_release?
-    #  ISSUES_URL = "https://git.io/brew-troubleshooting".freeze
+    #  ISSUES_URL = "http://docs.brew.sh/Troubleshooting.html".freeze
     #end
     PATH_OPEN = "/usr/bin/open".freeze
     PATH_PATCH = "/usr/bin/patch".freeze
@@ -28,10 +27,13 @@ module OS
     ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
     ::MACOS_VERSION = OS::Mac.version.to_s.freeze
   elsif OS.linux?
+    require "os/mac"
     NAME = "linux".freeze
     PATH_OPEN = "xdg-open".freeze
     PATH_PATCH = "patch".freeze
     # compatibility
     ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0".freeze
+  else
+    PATH_PATCH = "patch".freeze
   end
 end

@@ -115,10 +115,6 @@ module Stdenv
 
     old
   end
-  alias j1 deparallelize
-
-  # These methods are no-ops for compatibility.
-  %w[fast O4 Og].each { |opt| define_method(opt) {} }
 
   %w[O3 O2 O1 O0 Os].each do |opt|
     define_method opt do
@@ -136,20 +132,18 @@ module Stdenv
   # @private
   def determine_cxx
     dir, base = determine_cc.split
-    dir / base.to_s.sub("gcc", "g++").sub("clang", "clang++")
+    dir / base.to_s.sub("gcc", "g++").sub("clang", "clang++").sub(/^cc$/, "c++")
   end
 
   def gcc_4_0
     super
     set_cpu_cflags "-march=nocona -mssse3"
   end
-  alias gcc_4_0_1 gcc_4_0
 
-  def gcc
+  def gcc_4_2
     super
     set_cpu_cflags
   end
-  alias gcc_4_2 gcc
 
   GNU_GCC_VERSIONS.each do |n|
     define_method(:"gcc-#{n}") do
@@ -176,13 +170,6 @@ module Stdenv
     define_cflags SAFE_CFLAGS_FLAGS
   end
   alias generic_no_optimization no_optimization
-
-  def libxml2
-  end
-
-  def x11
-  end
-  alias libpng x11
 
   # we've seen some packages fail to build when warnings are disabled!
   def enable_warnings
@@ -230,6 +217,8 @@ module Stdenv
   def libstdcxx
     append "CXX", "-stdlib=libstdc++" if compiler == :clang
   end
+
+  def libxml2(); end
 
   # @private
   def replace_in_cflags(before, after)

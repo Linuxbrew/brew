@@ -36,10 +36,6 @@ module Hbc
         @cask.artifacts[:pkg].each { |pkg_description| run_installer(pkg_description) }
       end
 
-      def uninstall_phase
-        # Do nothing. Must be handled explicitly by a separate :uninstall stanza.
-      end
-
       def run_installer(pkg_description)
         load_pkg_description pkg_description
         ohai "Running installer for #{@cask}; your password may be necessary."

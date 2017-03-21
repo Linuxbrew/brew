@@ -28,6 +28,11 @@ module OS
       @full_version ||= Version.new((ENV["HOMEBREW_MACOS_VERSION"] || ENV["HOMEBREW_OSX_VERSION"]).chomp)
     end
 
+    def full_version=(version)
+      @full_version = Version.new(version.chomp)
+      @version = nil
+    end
+
     def prerelease?
       # TODO: bump version when new OS is released
       version >= "10.13"
@@ -157,13 +162,13 @@ module OS
     end
 
     STANDARD_COMPILERS = {
-      "2.0"   => { gcc_40_build: 4061 },
-      "2.5"   => { gcc_40_build: 5370 },
-      "3.1.4" => { gcc_40_build: 5493, gcc_42_build: 5577 },
-      "3.2.6" => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "1.7", clang_build: 77 },
-      "4.0"   => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "2.0", clang_build: 137 },
-      "4.0.1" => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "2.0", clang_build: 137 },
-      "4.0.2" => { gcc_40_build: 5494, gcc_42_build: 5666, clang: "2.0", clang_build: 137 },
+      "2.0"   => { gcc_4_0_build: 4061 },
+      "2.5"   => { gcc_4_0_build: 5370 },
+      "3.1.4" => { gcc_4_0_build: 5493, gcc_4_2_build: 5577 },
+      "3.2.6" => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "1.7", clang_build: 77 },
+      "4.0"   => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
+      "4.0.1" => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
+      "4.0.2" => { gcc_4_0_build: 5494, gcc_4_2_build: 5666, clang: "2.0", clang_build: 137 },
       "4.2"   => { clang: "3.0", clang_build: 211 },
       "4.3"   => { clang: "3.1", clang_build: 318 },
       "4.3.1" => { clang: "3.1", clang_build: 318 },

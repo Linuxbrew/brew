@@ -14,7 +14,7 @@ class IntegrationCommandTestBottle < IntegrationCommandTestCase
       FileUtils.ln_s "not-exist", "symlink"
     end
     assert_match(/testball-0\.1.*\.bottle\.tar\.gz/,
-                  cmd_output("bottle", "--no-rebuild", "testball"))
+                  cmd("bottle", "--no-rebuild", "testball"))
   ensure
     FileUtils.rm_f Dir["testball-0.1*.bottle.tar.gz"]
   end

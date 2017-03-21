@@ -4,18 +4,18 @@ module Test
       def self.included(klass)
         require "find"
         logdir = HOMEBREW_LIBRARY_PATH.join("tmp")
-        logdir.mkdir unless logdir.directory?
+        logdir.mkpath
         @@log = File.open(logdir.join("fs_leak.log"), "w")
         klass.make_my_diffs_pretty!
       end
 
-      def before_setup
+      def setup
         @__files_before_test = []
         Find.find(TEST_TMPDIR) { |f| @__files_before_test << f.sub(TEST_TMPDIR, "") }
         super
       end
 
-      def after_teardown
+      def teardown
         super
         files_after_test = []
         Find.find(TEST_TMPDIR) { |f| files_after_test << f.sub(TEST_TMPDIR, "") }

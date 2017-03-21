@@ -108,7 +108,7 @@ class DependencyCollector
     case spec
     when :x11        then OS.mac? ? X11Requirement.new(spec.to_s, tags) : XorgRequirement.new(spec.to_s, tags)
     when :xcode      then XcodeRequirement.new(tags)
-    when :macos      then MinimumMacOSRequirement.new(tags)
+    when :macos      then tags.empty? ? MacOSRequirement.new : MinimumMacOSRequirement.new(tags)
     when :mysql      then MysqlRequirement.new(tags)
     when :postgresql then PostgresqlRequirement.new(tags)
     when :gpg        then GPG2Requirement.new(tags)

@@ -6,6 +6,7 @@ require "hbc/audit"
 require "hbc/auditor"
 require "hbc/cache"
 require "hbc/cask"
+require "hbc/cask_loader"
 require "hbc/without_source"
 require "hbc/caskroom"
 require "hbc/checkable"
@@ -46,7 +47,7 @@ module Hbc
 
   def self.init
     Cache.ensure_cache_exists
-    Cache.migrate_legacy_cache
+    Cache.delete_legacy_cache
 
     Caskroom.migrate_caskroom_from_repo_to_prefix
     Caskroom.ensure_caskroom_exists

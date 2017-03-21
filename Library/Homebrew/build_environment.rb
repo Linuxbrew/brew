@@ -19,6 +19,10 @@ class BuildEnvironment
     @settings.include? :std
   end
 
+  def super?
+    @settings.include? :super
+  end
+
   def userpaths?
     @settings.include? :userpaths
   end
@@ -47,7 +51,7 @@ module Homebrew
       MAKE GIT CPP
       ACLOCAL_PATH PATH CPATH
     ]
-    keys += %w[LD_LIBRARY_PATH LD_RUN_PATH LIBRARY_PATH] if OS.linux?
+    keys += %w[LD_LIBRARY_PATH LD_RUN_PATH LD_PRELOAD LIBRARY_PATH] if OS.linux?
     keys.select { |key| env.key?(key) }
   end
 

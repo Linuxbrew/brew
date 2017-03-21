@@ -4,6 +4,7 @@ require "caveats"
 
 class CaveatsTests < Homebrew::TestCase
   def setup
+    super
     @f = formula { url "foo-1.0" }
     @c = Caveats.new @f
   end

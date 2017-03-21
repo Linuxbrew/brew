@@ -78,8 +78,43 @@ module Homebrew
     end
   end
 
+  def fetch_pull_requests(formula)
+    GitHub.issues_for_formula(formula.name, tap: formula.tap).select do |pr|
+      pr["html_url"].include?("/pull/")
+    end
+  rescue GitHub::RateLimitExceededError => e
+    opoo e.message
+    []
+  end
+
+  def check_for_duplicate_pull_requests(formula)
+    pull_requests = fetch_pull_requests(formula)
+    return unless pull_requests && !pull_requests.empty?
+    duplicates_message = <<-EOS.undent
+      These open pull requests may be duplicates:
+      #{pull_requests.map { |pr| "#{pr["title"]} #{pr["html_url"]}" }.join("\n")}
+    EOS
+    error_message = "Duplicate PRs should not be opened. Use --force to override this error."
+    if ARGV.force? && !ARGV.flag?("--quiet")
+      opoo duplicates_message
+    elsif !ARGV.force? && ARGV.flag?("--quiet")
+      odie error_message
+    elsif !ARGV.force?
+      odie <<-EOS.undent
+        #{duplicates_message.chomp}
+        #{error_message}
+      EOS
+    end
+  end
+
   def bump_formula_pr
     formula = ARGV.formulae.first
+
+    if formula
+      check_for_duplicate_pull_requests(formula)
+      checked_for_duplicates = true
+    end
+
     new_url = ARGV.value("url")
     if new_url && !formula
       is_devel = ARGV.include?("--devel")
@@ -100,6 +135,8 @@ module Homebrew
       end
     end
     odie "No formula found!" unless formula
+
+    check_for_duplicate_pull_requests(formula) unless checked_for_duplicates
 
     requested_spec, formula_spec = if ARGV.include?("--devel")
       devel_message = " (devel)"
@@ -124,6 +161,8 @@ module Homebrew
       false
     elsif !hash_type
       odie "#{formula}: no tag/revision specified!"
+    elsif !new_url
+      odie "#{formula}: no url specified!"
     else
       rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
         new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
@@ -134,6 +173,7 @@ module Homebrew
       rsrc = Resource.new { @url = rsrc_url }
       rsrc.download_strategy = CurlDownloadStrategy
       rsrc.owner = Resource.new(formula.name)
+      rsrc.version = forced_version if forced_version
       rsrc_path = rsrc.fetch
       if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ %r{/.*\.}
         new_hash = rsrc_path.sha256
@@ -155,7 +195,9 @@ module Homebrew
       replacement_pairs << [/^  revision \d+\n(\n(  head "))?/m, "\\2"]
     end
 
-    replacement_pairs << [/(^  mirror .*\n)?/, ""] if requested_spec == :stable
+    replacement_pairs += formula_spec.mirrors.map do |mirror|
+      [/ +mirror \"#{mirror}\"\n/m, ""]
+    end
 
     replacement_pairs += if new_url_hash
       [

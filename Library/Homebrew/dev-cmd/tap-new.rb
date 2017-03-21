@@ -55,14 +55,13 @@ module Homebrew
         - if [ -f ".git/shallow" ]; then
             travis_retry git fetch --unshallow;
           fi
-        - sudo chown -R $USER "$(brew --repo)"
-        - git -C "$(brew --repo)" reset --hard origin/master
+        - HOMEBREW_REPOSITORY="$(brew --repo)"
+        - sudo chown -R "$USER" "$HOMEBREW_REPOSITORY"
+        - git -C "$HOMEBREW_REPOSITORY" reset --hard origin/master
         - brew update || brew update
-        - rm -rf "$(brew --repo $TRAVIS_REPO_SLUG)"
-        - mkdir -p "$(brew --repo $TRAVIS_REPO_SLUG)"
-        - rsync -az "$TRAVIS_BUILD_DIR/" "$(brew --repo $TRAVIS_REPO_SLUG)"
-        - export TRAVIS_BUILD_DIR="$(brew --repo $TRAVIS_REPO_SLUG)"
-        - cd "$(brew --repo)"
+        - HOMEBREW_TAP_DIR="$(brew --repo "$TRAVIS_REPO_SLUG")"
+        - rm -rf "$HOMEBREW_TAP_DIR"
+        - ln -s "$PWD" "$HOMEBREW_TAP_DIR"
         - export HOMEBREW_DEVELOPER="1"
         - ulimit -n 1024
 

@@ -1,9 +1,10 @@
 # Installation
+
 The suggested and easiest way to install Homebrew is on the
-[homepage](http://brew.sh).
+[homepage](https://brew.sh).
 
 The standard script installs Homebrew to `/usr/local` so that
-[you don’t need sudo](FAQ.md#why-does-homebrew-say-sudo-is-bad-) when you
+[you don’t need sudo](FAQ.md) when you
 `brew install`. It is a careful script, it can be run even if you have stuff
 installed to `/usr/local` already. It tells you exactly what it will do before
 it does it too. And you have to confirm everything it will do before it starts.
@@ -11,12 +12,13 @@ it does it too. And you have to confirm everything it will do before it starts.
 ## Requirements
 * An Intel CPU <sup>[1](#1)</sup>
 * OS X 10.10 or higher <sup>[2](#2)</sup>
-* Command Line Tools for Xcode: `xcode-select --install`,
-  https://developer.apple.com/downloads or
+* Command Line Tools (CLT) for Xcode: `xcode-select --install`,
+  [developer.apple.com/downloads](https://developer.apple.com/downloads) or
   [Xcode](https://itunes.apple.com/us/app/xcode/id497799835) <sup>[3](#3)</sup>
 * A Bourne-compatible shell for installation (e.g. bash or zsh) <sup>[4](#4)</sup>
 
 ## Alternative Installs
+
 ### Untar anywhere
 Just extract (or `git clone`) Homebrew wherever you want. Just
 avoid:
@@ -53,5 +55,5 @@ Apple Developer account on older versions of Mac OS X. Sign up for free
 [here](https://developer.apple.com/register/index.action).
 
 <a name="4"><sup>4</sup></a> The one-liner installation method found on
-[brew.sh](http://brew.sh) requires a Bourne-compatible shell (e.g. bash or
+[brew.sh](https://brew.sh) requires a Bourne-compatible shell (e.g. bash or
 zsh). Notably, fish, tcsh and csh will not work.

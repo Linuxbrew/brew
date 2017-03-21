@@ -1,6 +1,11 @@
 #:  * `linkapps` [`--local`] [<formulae>]:
 #:    Find installed formulae that provide `.app`-style macOS apps and symlink them
-#:    into `/Applications`, allowing for easier access.
+#:    into `/Applications`, allowing for easier access (deprecated).
+#:
+#:    Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using
+#:    either aliases or symlinks and Homebrew formulae do not build "proper" `.app`
+#:    bundles that can be relocated. Instead, please consider using `brew cask` and
+#:    migrate formulae using `.app`s to casks.
 #:
 #:    If no <formulae> are provided, all of them will have their apps symlinked.
 #:
@@ -14,6 +19,15 @@ module Homebrew
   module_function
 
   def linkapps
+    opoo <<-EOS.undent
+      `brew linkapps` has been deprecated and will eventually be removed!
+
+      Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using
+      either aliases or symlinks and Homebrew formulae do not build "proper" `.app`
+      bundles that can be relocated. Instead, please consider using `brew cask` and
+      migrate formulae using `.app`s to casks.
+    EOS
+
     target_dir = linkapps_target(local: ARGV.include?("--local"))
 
     unless target_dir.directory?

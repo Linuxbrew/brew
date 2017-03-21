@@ -15,14 +15,13 @@ module Superenv
   include SharedEnvExtension
 
   # @private
-  attr_accessor :keg_only_deps, :deps
-
+  attr_accessor :keg_only_deps, :deps, :run_time_deps
   attr_accessor :x11
-  alias x11? x11
 
   def self.extended(base)
     base.keg_only_deps = []
     base.deps = []
+    base.run_time_deps = []
   end
 
   # @private
@@ -63,6 +62,7 @@ module Superenv
     self["HOMEBREW_ISYSTEM_PATHS"] = determine_isystem_paths
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
+    self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
     self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix unless formula.nil?
 
@@ -121,8 +121,11 @@ module Superenv
       end
       paths << apple_gcc42.opt_bin.to_s if apple_gcc42
     when GNU_GCC_REGEXP
-      gcc_formula = gcc_version_formula($&)
-      paths << gcc_formula.opt_bin.to_s
+      begin
+        gcc_formula = gcc_version_formula($&)
+      rescue FormulaUnavailableError
+      end
+      paths << gcc_formula.opt_bin.to_s if gcc_formula
     end
 
     paths.to_path_s
@@ -178,6 +181,10 @@ module Superenv
     paths << "#{HOMEBREW_PREFIX}/lib"
     paths += homebrew_extra_library_paths
     paths.to_path_s
+  end
+
+  def determine_rpath_paths
+    ""
   end
 
   def determine_dependencies
@@ -263,7 +270,6 @@ module Superenv
 
     old
   end
-  alias j1 deparallelize
 
   def make_jobs
     self["MAKEFLAGS"] =~ /-\w*j(\d+)/
@@ -271,6 +277,7 @@ module Superenv
   end
 
   def universal_binary
+    return unless OS.mac?
     check_for_compiler_universal_support
 
     self["HOMEBREW_ARCHFLAGS"] = Hardware::CPU.universal_archs.as_arch_flags
@@ -280,7 +287,7 @@ module Superenv
     return unless Hardware::CPU.is_32_bit?
     self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
       /-march=\S*/,
-      "-Xarch_#{Hardware::CPU.arch_32_bit} \\0"
+      "-Xarch_#{Hardware::CPU.arch_32_bit} \\0",
     )
   end
 
@@ -329,23 +336,10 @@ module Superenv
   def set_x11_env_if_installed
   end
 
+  # This method does nothing in superenv since there's no custom CFLAGS API
   # @private
-  def noop(*_args); end
-
-  # These methods are no longer necessary under superenv, but are needed to
-  # maintain an interface compatible with stdenv.
-  alias fast noop
-  alias O4 noop
-  alias Og noop
-  alias libxml2 noop
-  alias set_cpu_flags noop
-
-  # These methods provide functionality that has not yet been ported to
-  # superenv.
-  alias gcc_4_0_1 noop
-  alias minimal_optimization noop
-  alias no_optimization noop
-  alias enable_warnings noop
+  def set_cpu_flags(*_args)
+  end
 end
 
 class Array

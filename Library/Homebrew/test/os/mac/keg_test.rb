@@ -6,6 +6,8 @@ class OSMacLinkTests < Homebrew::TestCase
   include FileUtils
 
   def setup
+    super
+
     keg = HOMEBREW_CELLAR.join("foo", "1.0")
     keg.join("bin").mkpath
 
@@ -28,12 +30,12 @@ class OSMacLinkTests < Homebrew::TestCase
 
   def teardown
     @keg.unlink
-    @keg.uninstall
 
     $stdout = @old_stdout
 
-    rmtree HOMEBREW_PREFIX/"bin"
     rmtree HOMEBREW_PREFIX/"lib"
+
+    super
   end
 
   def test_mach_o_files_skips_hardlinks
@@ -48,7 +50,6 @@ class OSMacLinkTests < Homebrew::TestCase
     assert_equal 1, keg.mach_o_files.size
   ensure
     keg.unlink
-    keg.uninstall
   end
 
   def test_mach_o_files_isnt_confused_by_symlinks
@@ -64,6 +65,5 @@ class OSMacLinkTests < Homebrew::TestCase
     assert_equal 1, keg.mach_o_files.size
   ensure
     keg.unlink
-    keg.uninstall
   end
 end

@@ -1,6 +1,6 @@
 #:  * `update` [`--merge`] [`--force`]:
 #:    Fetch the newest version of Homebrew and all formulae from GitHub using
-#:    `git`(1).
+#:    `git`(1) and perform any necessary migrations.
 #:
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:    (rather than `git rebase`).
@@ -427,7 +427,7 @@ EOS
   safe_cd "$HOMEBREW_REPOSITORY"
 
   # kill all of subprocess on interrupt
-  trap '{ pkill -P $$; wait; exit 130; }' SIGINT
+  trap '{ /usr/bin/pkill -P $$; wait; exit 130; }' SIGINT
 
   local update_failed_file="$HOMEBREW_REPOSITORY/.git/UPDATE_FAILED"
   rm -f "$update_failed_file"

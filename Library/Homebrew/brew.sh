@@ -82,15 +82,18 @@ unset GEM_PATH
 # bash processes inside builds
 unset BASH_ENV
 
+# Users may have this set, breaking grep's output.
+unset GREP_OPTIONS
+
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_MACOS="1" ;;
   Linux)  HOMEBREW_LINUX="1" ;;
 esac
 
-HOMEBREW_CURL="/usr/bin/curl"
 if [[ -n "$HOMEBREW_MACOS" ]]
 then
+  HOMEBREW_CURL="/usr/bin/curl"
   HOMEBREW_PROCESSOR="$(uname -p)"
   HOMEBREW_PRODUCT="Homebrew"
   HOMEBREW_SYSTEM="Macintosh"
@@ -106,6 +109,7 @@ then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
   fi
 else
+  HOMEBREW_CURL="curl"
   HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
   HOMEBREW_MACOS_VERSION=0

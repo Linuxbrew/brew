@@ -4,6 +4,7 @@ require "resource"
 
 class LanguagePythonTests < Homebrew::TestCase
   def setup
+    super
     @dir = Pathname.new(mktmpdir)
     resource = stub("resource", stage: true)
     formula_bin = @dir/"formula_bin"
@@ -14,13 +15,9 @@ class LanguagePythonTests < Homebrew::TestCase
     @venv = Language::Python::Virtualenv::Virtualenv.new(@formula, @dir, "python")
   end
 
-  def teardown
-    FileUtils.rm_rf @dir
-  end
-
   def test_virtualenv_creation
     @formula.expects(:resource).with("homebrew-virtualenv").returns(
-      mock("resource", stage: true)
+      mock("resource", stage: true),
     )
     @venv.create
   end
@@ -28,7 +25,7 @@ class LanguagePythonTests < Homebrew::TestCase
   # or at least doesn't crash the second time
   def test_virtualenv_creation_is_idempotent
     @formula.expects(:resource).with("homebrew-virtualenv").returns(
-      mock("resource", stage: true)
+      mock("resource", stage: true),
     )
     @venv.create
     FileUtils.mkdir_p @dir/"bin"

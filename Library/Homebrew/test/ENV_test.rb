@@ -31,6 +31,7 @@ end
 
 module SharedEnvTests
   def setup
+    super
     @env = {}.extend(EnvActivation)
   end
 
@@ -133,7 +134,7 @@ module SharedEnvTests
   end
 
   def test_switching_compilers_updates_compiler
-    [:clang, :gcc, :gcc_4_0].each do |compiler|
+    [:clang, :gcc_4_2, :gcc_4_0].each do |compiler|
       @env.send(compiler)
       assert_equal compiler, @env.compiler
     end

@@ -50,6 +50,10 @@ module Homebrew
       odie "This command requires at least one argument containing a URL or pull request number"
     end
 
+    if ARGV.include?("--linux")
+      ENV["HOMEBREW_BOTTLE_DOMAIN"] ||= BottleSpecification::DEFAULT_DOMAIN_LINUX
+    end
+
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
     # Formulae with affected bottles that were published
@@ -211,8 +215,8 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          testbot = tap.linux? ? "LinuxbrewTestBot" : "BrewTestBot"
-          "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/linuxbrew:master...pr-#{issue}"
+          testbot = ARGV.include?("--linux") || tap.linux? ? "LinuxbrewTestBot" : "BrewTestBot"
+          "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
         curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
@@ -233,8 +237,8 @@ module Homebrew
         # Squash a Linuxbrew build-bottle-pr commit.
         if Utils.popen_read("git", "diff", orig_revision, "HEAD") =~ /^\+# .*: Build a bottle for Linuxbrew$/
           ohai "Squashing build-bottle-pr commit"
-          require "dev-cmd/squash-bottle-pr"
-          Homebrew.squash_bottle_pr
+          tap.install unless (tap = Tap.new("Linuxbrew", "developer")).installed?
+          safe_system HOMEBREW_BREW_FILE, "squash-bottle-pr"
         end
       end
 
@@ -262,7 +266,6 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        ohai "Publishing on Bintray: #{f.name} #{f.pkg_version}"
         publish_bottle_file_on_bintray(f, bintray_creds)
         published << f.full_name
       end
@@ -304,6 +307,18 @@ module Homebrew
     def apply_patch
       # Applies a patch previously downloaded with fetch_patch()
       # Deletes the patch file as a side effect, regardless of success
+
+      issue = patch_url[/([0-9]+)\.patch$/, 1]
+      safe_system "git", "fetch", "--quiet", "origin", "pull/#{issue}/head"
+      parents = Utils.popen_read("git", "rev-list", "--parents", "-n1", "FETCH_HEAD").split.length - 1
+      if parents > 1
+        ohai "Fast-forwarding to the merge commit"
+        test_bot_origin = patch_url[%r{(https://github\.com/[\w-]+/[\w-]+)/compare/}, 1]
+        safe_system "git", "fetch", "--quiet", test_bot_origin, "pr-#{issue}" if test_bot_origin
+        safe_system "git", "merge", "--quiet", "--ff-only", "--no-edit", "FETCH_HEAD"
+        patchpath.unlink
+        return
+      end
 
       ohai "Applying patch"
       patch_args = []
@@ -391,7 +406,7 @@ module Homebrew
           subject_strs << "remove stable"
           formula_name_str += ":" # just for cosmetics
         else
-          subject_strs << formula.version.to_s
+          subject_strs << new[:stable]
         end
       end
       if old[:devel] != new[:devel]
@@ -402,7 +417,7 @@ module Homebrew
             formula_name_str += ":" # just for cosmetics
           end
         else
-          subject_strs << "#{formula.devel.version} (devel)"
+          subject_strs << "#{new[:devel]} (devel)"
         end
       end
       subject = subject_strs.empty? ? nil : "#{formula_name_str} #{subject_strs.join(", ")}"
@@ -416,19 +431,27 @@ module Homebrew
 
   # Publishes the current bottle files for a given formula to Bintray
   def publish_bottle_file_on_bintray(f, creds)
-    bintray_project = f.tap.linux? ? "linuxbrew" : "homebrew"
+    bintray_project = ARGV.include?("--linux") || f.tap.linux? ? "linuxbrew" : "homebrew"
     repo = Utils::Bottles::Bintray.repository(f.tap)
     package = Utils::Bottles::Bintray.package(f.name)
-    info = FormulaInfoFromJson.lookup(f.name)
+    info = FormulaInfoFromJson.lookup(f.full_name)
     if info.nil?
       raise "Failed publishing bottle: failed reading formula info for #{f.full_name}"
     end
+    unless info.bottle_info_any
+      opoo "No bottle defined in formula #{package}"
+      return
+    end
     version = info.pkg_version
+    ohai "Publishing on Bintray: #{package} #{version}"
     curl "-w", '\n', "--silent", "--fail",
          "-u#{creds[:user]}:#{creds[:key]}", "-X", "POST",
          "-H", "Content-Type: application/json",
          "-d", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/#{bintray_project}/#{repo}/#{package}/#{version}/publish"
+  rescue ErrorDuringExecution => e
+    raise e unless ARGV.include?("-k") || ARGV.include?("--keep-going")
+    puts e
   end
 
   # Formula info drawn from an external "brew info --json" call
@@ -529,11 +552,11 @@ module Homebrew
           next
         end
         bottle_info = jinfo.bottle_info(
-          if f.tap.linux? && jinfo.bottle_tags.include?("x86_64_linux")
+          if (ARGV.include?("--linux") || f.tap.linux?) && jinfo.bottle_tags.include?("x86_64_linux")
             "x86_64_linux"
           else
             jinfo.bottle_tags.first
-          end
+          end,
         )
         unless bottle_info
           opoo "No bottle defined in formula #{f.full_name}"

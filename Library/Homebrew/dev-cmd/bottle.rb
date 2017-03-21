@@ -419,11 +419,17 @@ module Homebrew
               end
 
               unless mismatches.empty?
-                odie <<-EOS.undent
+                message = <<-EOS.undent
                   --keep-old was passed but there are changes in:
                   #{mismatches.join("\n")}
                 EOS
-                odie "--keep-old was passed but there were changes in #{mismatches.join(", ")}!"
+                if ARGV.include? "--keep-going"
+                  opoo message
+                  update_or_add = nil
+                  break
+                else
+                  odie message
+                end
               end
               output = bottle_output bottle
             end
@@ -442,6 +448,7 @@ module Homebrew
             else
               string = s.sub!(
                 /(
+                  (\ {2}\#[^\n]*\n)*                                             # comments
                   \ {2}(                                                         # two spaces at the beginning
                     (url|head)\ ['"][\S\ ]+['"]                                  # url or head with a string
                     (
@@ -449,7 +456,7 @@ module Homebrew
                       (\n^\ {3}[\S\ ]+$)*                                        # options can be in multiple lines
                     )?|
                     (homepage|desc|sha1|sha256|version|mirror)\ ['"][\S\ ]+['"]| # specs with a string
-                    rebuild\ \d+                                                 # rebuild with a number
+                    revision\ \d+                                                # revision with a number
                   )\n+                                                           # multiple empty lines
                  )+
                /mx, '\0' + output + "\n"
@@ -459,7 +466,7 @@ module Homebrew
           end
         end
 
-        unless ARGV.include? "--no-commit"
+        unless ARGV.include?("--no-commit") || update_or_add.nil?
           short_name = formula_name.split("/", -1).last
           pkg_version = bottle_hash["formula"]["pkg_version"]
 
@@ -475,10 +482,20 @@ module Homebrew
     end
   end
 
+  def ensure_formula_installed!(formula)
+    return if Formula[formula].installed?
+    ohai "Installing #{formula}..."
+    safe_system HOMEBREW_BREW_FILE, "install", formula
+  rescue FormulaUnavailableError
+    # Fix for brew tests, which uses NullLoader.
+    nil
+  end
+
   def bottle
     if ARGV.include? "--merge"
       merge
     else
+      ensure_formula_installed! "patchelf" if OS.linux?
       ARGV.resolved_formulae.each do |f|
         bottle_formula f
       end

@@ -39,8 +39,7 @@ module Hbc
 
       def preflight_checks(source, target)
         if target.exist? && !self.class.islink?(target)
-          ohai "It seems there is already #{self.class.artifact_english_article} #{self.class.artifact_english_name} at '#{target}'; not linking."
-          return false
+          raise CaskError, "It seems there is already #{self.class.artifact_english_article} #{self.class.artifact_english_name} at '#{target}'; not linking."
         end
         unless source.exist?
           raise CaskError, "It seems the #{self.class.link_type_english_name.downcase} source is not there: '#{source}'"

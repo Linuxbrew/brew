@@ -1,3 +1,5 @@
+require "hbc/system_command"
+
 module Hbc
   class DSL
     class Appcast
@@ -7,6 +9,20 @@ module Hbc
         @parameters     = parameters
         @uri            = UnderscoreSupportingURI.parse(uri)
         @checkpoint     = @parameters[:checkpoint]
+      end
+
+      def calculate_checkpoint
+        result = SystemCommand.run("/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", URL::FAKE_USER_AGENT, @uri], print_stderr: false)
+
+        checkpoint = if result.success?
+          processed_appcast_text = result.stdout.gsub(%r{<pubDate>[^<]*</pubDate>}m, "")
+          Digest::SHA2.hexdigest(processed_appcast_text)
+        end
+
+        {
+          checkpoint: checkpoint,
+          command_result: result,
+        }
       end
 
       def to_yaml

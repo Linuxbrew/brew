@@ -5,12 +5,8 @@ require "diagnostic"
 
 class OSMacDiagnosticChecksTest < Homebrew::TestCase
   def setup
-    @env = ENV.to_hash
+    super
     @checks = Homebrew::Diagnostic::Checks.new
-  end
-
-  def teardown
-    ENV.replace(@env)
   end
 
   def test_check_for_other_package_managers
@@ -20,7 +16,7 @@ class OSMacDiagnosticChecksTest < Homebrew::TestCase
   end
 
   def test_check_for_unsupported_macos
-    ARGV.stubs(:homebrew_developer?).returns false
+    ENV.delete("HOMEBREW_DEVELOPER")
     OS::Mac.stubs(:prerelease?).returns true
     assert_match "We do not provide support for this pre-release version.",
       @checks.check_for_unsupported_macos

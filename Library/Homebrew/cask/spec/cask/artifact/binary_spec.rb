@@ -1,6 +1,6 @@
 describe Hbc::Artifact::Binary do
   let(:cask) {
-    Hbc.load("with-binary").tap do |cask|
+    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb").tap do |cask|
       shutup do
         InstallHelper.install_without_artifacts(cask)
       end
@@ -20,15 +20,18 @@ describe Hbc::Artifact::Binary do
     shutup do
       Hbc::Artifact::Binary.new(cask).install_phase
     end
-    expect(FileHelper.valid_alias?(expected_path)).to be true
+    expect(expected_path).to be_a_symlink
+    expect(expected_path.readlink).to exist
   end
 
   it "avoids clobbering an existing binary by linking over it" do
     FileUtils.touch expected_path
 
-    shutup do
-      Hbc::Artifact::Binary.new(cask).install_phase
-    end
+    expect {
+      shutup do
+        Hbc::Artifact::Binary.new(cask).install_phase
+      end
+    }.to raise_error(Hbc::CaskError)
 
     expect(expected_path).not_to be :symlink?
   end
@@ -67,7 +70,7 @@ describe Hbc::Artifact::Binary do
 
   context "binary is inside an app package" do
     let(:cask) {
-      Hbc.load("with-embedded-binary").tap do |cask|
+      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-embedded-binary.rb").tap do |cask|
         shutup do
           InstallHelper.install_without_artifacts(cask)
         end
@@ -80,7 +83,8 @@ describe Hbc::Artifact::Binary do
         Hbc::Artifact::Binary.new(cask).install_phase
       end
 
-      expect(FileHelper.valid_alias?(expected_path)).to be true
+      expect(expected_path).to be_a_symlink
+      expect(expected_path.readlink).to exist
     end
   end
 end

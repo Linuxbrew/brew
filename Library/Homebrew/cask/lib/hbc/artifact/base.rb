@@ -27,10 +27,6 @@ module Hbc
 
       attr_reader :force
 
-      def zap_phase
-        odebug "Nothing to do. The #{self.class.artifact_name} artifact has no zap phase."
-      end
-
       # TODO: this sort of logic would make more sense in dsl.rb, or a
       #       constructor called from dsl.rb, so long as that isn't slow.
       def self.read_script_arguments(arguments, stanza, default_arguments = {}, override_arguments = {}, key = nil)
@@ -46,7 +42,7 @@ module Hbc
         arguments = { executable: arguments } if arguments.is_a?(String)
 
         # key sanity
-        permitted_keys = [:args, :input, :executable, :must_succeed, :sudo, :bsexec, :print_stdout, :print_stderr]
+        permitted_keys = [:args, :input, :executable, :must_succeed, :sudo, :print_stdout, :print_stderr]
         unknown_keys = arguments.keys - permitted_keys
         unless unknown_keys.empty?
           opoo %Q{Unknown arguments to #{description} -- #{unknown_keys.inspect} (ignored). Running "brew update; brew cleanup; brew cask cleanup" will likely fix it.}

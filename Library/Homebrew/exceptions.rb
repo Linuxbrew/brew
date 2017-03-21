@@ -56,7 +56,9 @@ end
 
 class FormulaSpecificationError < StandardError; end
 
-class MethodDeprecatedError < StandardError; end
+class MethodDeprecatedError < StandardError
+  attr_accessor :issues_url
+end
 
 class FormulaUnavailableError < RuntimeError
   attr_reader :name
@@ -126,6 +128,19 @@ class FormulaClassUnavailableError < FormulaUnavailableError
 
   def format_list(class_list)
     class_list.map { |klass| klass.name.split("::")[-1] }.join(", ")
+  end
+end
+
+class FormulaUnreadableError < FormulaUnavailableError
+  attr_reader :formula_error
+
+  def initialize(name, error)
+    super(name)
+    @formula_error = error
+  end
+
+  def to_s
+    "#{name}: " + formula_error.to_s
   end
 end
 
