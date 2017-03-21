@@ -410,10 +410,13 @@ class FormulaInstaller
   end
 
   def install_requirement_formula?(req, dependent, build)
-    return false unless req.to_dependency
+    req_dependency = req.to_dependency
+    return false unless req_dependency
     return true unless req.satisfied?
     return false if req.run?
-    install_bottle_for?(dependent, build) || build_bottle?
+    return true if build_bottle?
+    return true unless req_dependency.installed?
+    install_bottle_for?(dependent, build)
   end
 
   def expand_requirements
