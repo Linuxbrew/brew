@@ -60,6 +60,7 @@ module Homebrew
         - git -C "$HOMEBREW_REPOSITORY" reset --hard origin/master
         - brew update || brew update
         - HOMEBREW_TAP_DIR="$(brew --repo "$TRAVIS_REPO_SLUG")"
+        - mkdir -p "$HOMEBREW_TAP_DIR"
         - rm -rf "$HOMEBREW_TAP_DIR"
         - ln -s "$PWD" "$HOMEBREW_TAP_DIR"
         - export HOMEBREW_DEVELOPER="1"
