@@ -55,11 +55,10 @@ module Homebrew
             info_formula Formulary.find_with_priority(f)
           end
         rescue FormulaUnavailableError => e
+          ofail e.message
           # No formula with this name, try a missing formula lookup
           if (reason = Homebrew::MissingFormula.reason(f))
-            ofail "#{e.message}\n#{reason}"
-          else
-            ofail e.message
+            $stderr.puts reason
           end
         end
       end
