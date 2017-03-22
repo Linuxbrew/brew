@@ -67,7 +67,7 @@ module Homebrew
       if $stdout.tty?
         count = local_results.length + tap_results.length
 
-        if reason = Homebrew::MissingFormula.reason(query)
+        if reason = Homebrew::MissingFormula.reason(query, silent: true)
           if count > 0
             puts
             puts "If you meant #{query.inspect} specifically:"
