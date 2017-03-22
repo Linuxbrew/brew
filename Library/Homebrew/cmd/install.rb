@@ -206,44 +206,47 @@ module Homebrew
       # formula was found, but there's a problem with its implementation).
       ofail e.message
     rescue FormulaUnavailableError => e
-      if (reason = Homebrew::MissingFormula.reason(e.name))
-        ofail "#{e.message}\n#{reason}"
-      elsif e.name == "updog"
+      if e.name == "updog"
         ofail "What's updog?"
+        return
+      end
+
+      ofail e.message
+      if (reason = Homebrew::MissingFormula.reason(e.name))
+        $stderr.puts reason
+        return
+      end
+
+      query = query_regexp(e.name)
+
+      ohai "Searching for similarly named formulae..."
+      formulae_search_results = search_formulae(query)
+      case formulae_search_results.length
+      when 0
+        ofail "No similarly named formulae found."
+      when 1
+        puts "This similarly named formula was found:"
+        puts formulae_search_results
+        puts "To install it, run:\n  brew install #{formulae_search_results.first}"
       else
-        ofail e.message
+        puts "These similarly named formulae were found:"
+        puts Formatter.columns(formulae_search_results)
+        puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
+      end
 
-        query = query_regexp(e.name)
-
-        ohai "Searching for similarly named formulae..."
-        formulae_search_results = search_formulae(query)
-        case formulae_search_results.length
-        when 0
-          ofail "No similarly named formulae found."
-        when 1
-          puts "This similarly named formula was found:"
-          puts formulae_search_results
-          puts "To install it, run:\n  brew install #{formulae_search_results.first}"
-        else
-          puts "These similarly named formulae were found:"
-          puts Formatter.columns(formulae_search_results)
-          puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
-        end
-
-        ohai "Searching taps..."
-        taps_search_results = search_taps(query)
-        case taps_search_results.length
-        when 0
-          ofail "No formulae found in taps."
-        when 1
-          puts "This formula was found in a tap:"
-          puts taps_search_results
-          puts "To install it, run:\n  brew install #{taps_search_results.first}"
-        else
-          puts "These formulae were found in taps:"
-          puts Formatter.columns(taps_search_results)
-          puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
-        end
+      ohai "Searching taps..."
+      taps_search_results = search_taps(query)
+      case taps_search_results.length
+      when 0
+        ofail "No formulae found in taps."
+      when 1
+        puts "This formula was found in a tap:"
+        puts taps_search_results
+        puts "To install it, run:\n  brew install #{taps_search_results.first}"
+      else
+        puts "These formulae were found in taps:"
+        puts Formatter.columns(taps_search_results)
+        puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
       end
     end
   end
