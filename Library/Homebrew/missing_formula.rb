@@ -125,11 +125,23 @@ module Homebrew
         relative_path = path.relative_path_from tap.path
 
         tap.path.cd do
-          # We know this may return incomplete results for shallow clones but
-          # we don't want to nag everyone with a shallow clone to unshallow it.
-          log_command = "git log --name-only --max-count=1 --format=%H\\\\n%h\\\\n%B -- #{relative_path}"
-          hash, short_hash, *commit_message, relative_path =
-            Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)
+          begin
+            timer_pid = fork do
+              # Let the user know what's going on when the search goes on for
+              # more than two seconds.
+              sleep 2
+              opoo "Searching through git history. This may take a while..."
+            end
+
+            # We know this may return incomplete results for shallow clones but
+            # we don't want to nag everyone with a shallow clone to unshallow it.
+            log_command = "git log --name-only --max-count=1 --format=%H\\\\n%h\\\\n%B -- #{relative_path}"
+            hash, short_hash, *commit_message, relative_path =
+              Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)
+          ensure
+            Process.kill "TERM", timer_pid
+          end
+
           if hash.to_s.empty? || short_hash.to_s.empty? ||
              relative_path.to_s.empty?
             return
