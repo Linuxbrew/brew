@@ -147,15 +147,25 @@ class Migrator
   end
 
   def migrate
-    if new_cellar.exist?
-      onoe "#{new_cellar} already exists; remove it manually and run brew migrate #{oldname}."
-      return
+    if old_cellar.exist? && new_cellar.exist?
+      conflicted = false
+      old_cellar.each_child do |c|
+        if (new_cellar/c.basename).exist?
+          conflicted = true
+          onoe "#{new_cellar/c.basename} already exists."
+        end
+      end
+      if conflicted
+        onoe "Remove #{new_cellar} manually and run brew migrate #{oldname}."
+        return
+      end
     end
 
     begin
       oh1 "Migrating #{Formatter.identifier(oldname)} to #{Formatter.identifier(newname)}"
       lock
       unlink_oldname
+      unlink_newname if new_cellar.exist?
       move_to_new_directory
       repin
       link_oldname_cellar
@@ -178,7 +188,11 @@ class Migrator
   # move everything from Cellar/oldname to Cellar/newname
   def move_to_new_directory
     puts "Moving to: #{new_cellar}"
-    FileUtils.mv(old_cellar, new_cellar)
+    if new_cellar.exist?
+      FileUtils.mv(old_cellar.children, new_cellar)
+    else
+      FileUtils.mv(old_cellar, new_cellar)
+    end
   end
 
   def repin
@@ -202,6 +216,14 @@ class Migrator
   def unlink_oldname
     oh1 "Unlinking #{Formatter.identifier(oldname)}"
     old_cellar.subdirs.each do |d|
+      keg = Keg.new(d)
+      keg.unlink
+    end
+  end
+
+  def unlink_newname
+    oh1 "Unlinking #{Formatter.identifier(newname)}"
+    new_cellar.subdirs.each do |d|
       keg = Keg.new(d)
       keg.unlink
     end
