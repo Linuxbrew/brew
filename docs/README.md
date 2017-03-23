@@ -1,6 +1,7 @@
 # Documentation
 
 ## Users
+- [`brew` man-page (command documentation)](Manpage.md)
 - [Troubleshooting](Troubleshooting.md)
 - [Installation](Installation.md)
 - [Frequently Asked Questions](FAQ.md)
