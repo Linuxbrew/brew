@@ -5,8 +5,9 @@ require "utils"
 module Homebrew
   module MissingFormula
     class << self
-      def reason(name)
-        blacklisted_reason(name) || tap_migration_reason(name) || deleted_reason(name)
+      def reason(name, silent: false)
+        blacklisted_reason(name) || tap_migration_reason(name) ||
+          deleted_reason(name, silent: silent)
       end
 
       def blacklisted_reason(name)
@@ -117,7 +118,7 @@ module Homebrew
         message
       end
 
-      def deleted_reason(name)
+      def deleted_reason(name, silent: false)
         path = Formulary.path name
         return if File.exist? path
         tap = Tap.from_path(path)
@@ -125,13 +126,17 @@ module Homebrew
         relative_path = path.relative_path_from tap.path
 
         tap.path.cd do
+          ohai "Searching for a previously deleted formula..." unless silent
+
           # We know this may return incomplete results for shallow clones but
           # we don't want to nag everyone with a shallow clone to unshallow it.
           log_command = "git log --name-only --max-count=1 --format=%H\\\\n%h\\\\n%B -- #{relative_path}"
           hash, short_hash, *commit_message, relative_path =
             Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)
+
           if hash.to_s.empty? || short_hash.to_s.empty? ||
              relative_path.to_s.empty?
+            ofail "No previously deleted formula found." unless silent
             return
           end
 
