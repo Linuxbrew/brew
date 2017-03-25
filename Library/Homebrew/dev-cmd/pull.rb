@@ -1,4 +1,5 @@
-#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] <patch-source> [<patch-source>]:
+#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] <patch-source> [<patch-source>]:
+#:
 #:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 #:    Optionally, installs the formulae changed by the patch.
 #:
@@ -37,6 +38,9 @@
 #:    clipboard.
 #:
 #:    If `--no-publish` is passed, do not publish bottles to Bintray.
+#:
+#:    If `--warn-on-publish-failure` was passed, do not exit if there's a
+#:    failure publishing bottles on Bintray.
 
 require "net/http"
 require "net/https"
@@ -264,7 +268,7 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        publish_bottle_file_on_bintray(f, bintray_creds)
+        next unless publish_bottle_file_on_bintray(f, bintray_creds)
         published << f.full_name
       end
     else
@@ -425,7 +429,7 @@ module Homebrew
     end
     unless info.bottle_info_any
       opoo "No bottle defined in formula #{package}"
-      return
+      return false
     end
     version = info.pkg_version
     ohai "Publishing on Bintray: #{package} #{version}"
@@ -434,6 +438,11 @@ module Homebrew
          "-H", "Content-Type: application/json",
          "-d", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/homebrew/#{repo}/#{package}/#{version}/publish"
+    true
+  rescue => e
+    raise unless ARGV.include?("--warn-on-publish-failure")
+    onoe e
+    false
   end
 
   # Formula info drawn from an external "brew info --json" call
