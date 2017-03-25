@@ -415,7 +415,7 @@ class FormulaInstaller
     return true unless req.satisfied?
     return false if req.run?
     return true if build_bottle?
-    return true unless req_dependency.installed?
+    return true if req.satisfied_by_formula?
     install_bottle_for?(dependent, build)
   end
 
