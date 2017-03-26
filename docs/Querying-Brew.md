@@ -35,17 +35,23 @@ _The top-level element of the JSON output is always an array, so the `map` opera
 
 ### Pretty-print a single formula's info
 
-`brew info --json=v1 tig | jq .`
+```sh
+brew info --json=v1 tig | jq .
+```
 
 ### Installed formulae
 
 To show full JSON information about all installed formulae:
 
-`brew info --json=v1 --all | jq "map(select(.installed != []))"`
+```sh
+brew info --json=v1 --all | jq "map(select(.installed != []))"
+```
 
 You'll note that processing all formulae can be slow; it's quicker to let `brew` do this:
 
-`brew info --json=v1 --installed`
+```sh
+brew info --json=v1 --installed
+```
 
 ### Linked keg-only formulae
 
@@ -53,13 +59,17 @@ Some formulae are marked as "keg-only", meaning that installed files are not lin
 
 To find the names of linked keg-only formulae:
 
-`brew info --json=v1 --installed | jq "map(select(.keg_only == true and .linked_keg != null) | .name)"`
+```sh
+brew info --json=v1 --installed | jq "map(select(.keg_only == true and .linked_keg != null) | .name)"
+```
 
 ### Unlinked normal formulae
 
 To find the names of normal (not keg-only) formulae that are installed, but not linked to the shared directories:
 
-`brew info --json=v1 --installed | jq "map(select(.keg_only == false and .linked_keg == null) | .name)"`
+```sh
+brew info --json=v1 --installed | jq "map(select(.keg_only == false and .linked_keg == null) | .name)"
+```
 
 ## Concluding remarks
 

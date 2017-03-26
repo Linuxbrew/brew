@@ -18,11 +18,9 @@ If the Node module is also available on the npm registry, we prefer npm hosted r
 
 The npm registry URLs usually have the format of:
 
-```
-https://registry.npmjs.org/<name>/-/<name>-<version>.tgz
-```
+    https://registry.npmjs.org/<name>/-/<name>-<version>.tgz
 
-Alternatively you could curl the JSON at `https://registry.npmjs.org/<name>` and look for the value of `versions[<version>].dist.tarball` for the correct tarball URL.
+Alternatively you could `curl` the JSON at `https://registry.npmjs.org/<name>` and look for the value of `versions[<version>].dist.tarball` for the correct tarball URL.
 
 ## Dependencies
 
@@ -52,7 +50,7 @@ In the following we distinguish between two types of Node modules using formulae
 * formulae for standard Node modules compatible with npm's global module format which should use [`std_npm_install_args`](#installing-global-style-modules-with-std_npm_install_args-to-libexec) (like [`azure-cli`](https://github.com/Homebrew/homebrew-core/blob/d93fe9ba3bcc9071b699c8da4e7d733518d3337e/Formula/azure-cli.rb) or [`autocode`](https://github.com/Homebrew/homebrew-core/blob/1a670a6269e1e07f86683c2d164977c9bd8a3fb6/Formula/autocode.rb)) and
 * formulae where the `npm install` step is only one of multiple not exclusively Node related install steps (not compatible with npm's global module format) which have to use [`local_npm_install_args`](#installing-module-dependencies-locally-with-local_npm_install_args) (like [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/ec1e40d37e81af63122a354f0101c377f6a4e66d/Formula/elixirscript.rb) or [`kibana`](https://github.com/Homebrew/homebrew-core/blob/c6202f91a129e2f994d904f299a308cc6fbd58e5/Formula/kibana.rb))
 
-Both methods have in common that they are setting the correct environment for using npm inside Homebrew and are returning the arguments for invoking `npm install` for their specific use cases. This includes fixing an important edge case with the npm cache (caused by Homebrew's redirection of `$HOME` during the build and test process) by using our own custom `npm_cache` inside `HOMEBREW_CACHE`, which would otherwise result in very long build times and high disk space usage.
+Both methods have in common that they are setting the correct environment for using npm inside Homebrew and are returning the arguments for invoking `npm install` for their specific use cases. This includes fixing an important edge case with the npm cache (caused by Homebrew's redirection of `HOME` during the build and test process) by using our own custom `npm_cache` inside `HOMEBREW_CACHE`, which would otherwise result in very long build times and high disk space usage.
 
 To use them you have to require the Node language module at the beginning of your formula file with:
 
@@ -60,15 +58,15 @@ To use them you have to require the Node language module at the beginning of you
 require "language/node"
 ```
 
-### Installing global style modules with `std_npm_install_args` to libexec
+### Installing global style modules with `std_npm_install_args` to `libexec`
 
-In your formula's `install` method, simply cd to the top level of your Node module if necessary and then use `system` to invoke `npm install` with `Language::Node.std_npm_install_args` like:
+In your formula's `install` method, simply `cd` to the top level of your Node module if necessary and then use `system` to invoke `npm install` with `Language::Node.std_npm_install_args` like:
 
 ```ruby
 system "npm", "install", *Language::Node.std_npm_install_args(libexec)
 ```
 
-This will install your Node module in npm's global module style with a custom prefix to `libexec`. All your modules' executables will be automatically resolved by npm into `libexec/"bin"` for you, which is not symlinked into Homebrew's prefix. We need to make sure these are installed. To do this we need to symlink all executables to `bin` with:
+This will install your Node module in npm's global module style with a custom prefix to `libexec`. All your modules' executables will be automatically resolved by npm into `libexec/bin` for you, which is not symlinked into Homebrew's prefix. We need to make sure these are installed. To do this we need to symlink all executables to `bin` with:
 
 ```ruby
 bin.install_symlink Dir["#{libexec}/bin/*"]
@@ -76,7 +74,7 @@ bin.install_symlink Dir["#{libexec}/bin/*"]
 
 ### Installing module dependencies locally with `local_npm_install_args`
 
-In your formula's `install` method, do any installation steps which need to be done before the `npm install` step and then cd to the top level of the included Node module. Then, use `system` with `Language::Node.local_npm_install_args` to invoke `npm install` like:
+In your formula's `install` method, do any installation steps which need to be done before the `npm install` step and then `cd` to the top level of the included Node module. Then, use `system` with `Language::Node.local_npm_install_args` to invoke `npm install` like:
 
 ```ruby
 system "npm", "install", *Language::Node.local_npm_install_args

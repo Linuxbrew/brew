@@ -1,6 +1,6 @@
 # Formula Cookbook
 
-A formula is a package definition written in Ruby. It can be created with `brew create $URL` where `$URL` is a zip or tarball, installed with `brew install $FORMULA`, and debugged with `brew install --debug --verbose $FORMULA`. Formulae use the [Formula API](http://www.rubydoc.info/github/Homebrew/brew/master/Formula) which provides various Homebrew-specific helpers.
+A formula is a package definition written in Ruby. It can be created with `brew create <URL>` where `<URL>` is a zip or tarball, installed with `brew install <formula>`, and debugged with `brew install --debug --verbose <formula>`. Formulae use the [Formula API](http://www.rubydoc.info/github/Homebrew/brew/master/Formula) which provides various Homebrew-specific helpers.
 
 ## Homebrew terminology
 
@@ -30,12 +30,12 @@ Make sure you run `brew update` before you start. This turns your Homebrew insta
 Before submitting a new formula make sure your package:
 
 *   meets all our [Acceptable Formulae](Acceptable-Formulae.md) requirements
-*   isn't already in Homebrew (check `brew search $FORMULA`)
+*   isn't already in Homebrew (check `brew search <formula>`)
 *   isn't in another official [Homebrew tap](https://github.com/Homebrew)
 *   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
 *   is still supported by upstream (i.e. doesn't require extensive patching)
 *   has a stable, tagged version (i.e. not just a GitHub repository with no versions)
-*   passes all `brew audit --new-formula $FORMULA` tests.
+*   passes all `brew audit --new-formula <formula>` tests.
 
 Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md).
 
@@ -43,11 +43,11 @@ Before submitting a new formula make sure you read over our [contribution guidel
 
 Run `brew create` with a URL to the source tarball:
 
-```shell
+```sh
 brew create https://example.com/foo-0.1.tar.gz
 ```
 
-This creates `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/foo.rb` and opens it in your `$EDITOR`. It'll look something like:
+This creates `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/foo.rb` and opens it in your `EDITOR`. It'll look something like:
 
 ```ruby
 class Foo < Formula
@@ -77,7 +77,7 @@ end
 If `brew` said `Warning: Version cannot be determined from URL` when doing the `create` step, you’ll need to explicitly add the correct [`version`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#version-class_method) to the formula and then save the formula.
 
 Homebrew will try to guess the formula’s name from its URL. If it fails to do
-so you can override this with `brew create <url> --set-name <name>`.
+so you can override this with `brew create <URL> --set-name <name>`.
 
 ### Fill in the [`homepage`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#homepage%3D-class_method)
 
@@ -89,7 +89,7 @@ Try to summarize from the [`homepage`](http://www.rubydoc.info/github/Homebrew/b
 
 ### Check the build system
 
-```shell
+```sh
 brew install -i foo
 ```
 
@@ -126,7 +126,7 @@ to favour finding `keg_only` formulae first.
 
 Homebrew maintains a special [tap that provides other useful system duplicates](https://github.com/Homebrew/homebrew-dupes).
 
-*Important:* `$(brew --prefix)/bin` is NOT on the `$PATH` during formula installation. If you have dependencies at build time, you must specify them and brew will add them to the `$PATH` or create a [`Requirement`](http://www.rubydoc.info/github/Homebrew/brew/master/Requirement).
+*Important:* `$(brew --prefix)/bin` is NOT on the `PATH` during formula installation. If you have dependencies at build time, you must specify them and `brew` will add them to the `PATH` or create a [`Requirement`](http://www.rubydoc.info/github/Homebrew/brew/master/Requirement).
 
 ### Specifying other formulae as dependencies
 
@@ -217,7 +217,7 @@ When a version scheme of a formula fails to recognise a new version as newer it 
 
 When you already have a lot of formulae installed, it's easy to miss a common dependency. You can double-check which libraries a binary links to with the `otool` command (perhaps you need to use `xcrun otool`):
 
-```shell
+```sh
 $ otool -L /usr/local/bin/ldapvi
 /usr/local/bin/ldapvi:
 /usr/local/opt/openssl/lib/libssl.1.0.0.dylib (compatibility version 1.0.0, current version 1.0.0)
@@ -257,7 +257,7 @@ end
 
 ### Install the formula
 
-```shell
+```sh
 brew install --verbose --debug foo
 ```
 
@@ -325,7 +325,7 @@ correct. Add an explicit [`version`](http://www.rubydoc.info/github/Homebrew/bre
 
 Everything is built on Git, so contribution is easy:
 
-```shell
+```sh
 brew update # required in more ways than you think (initializes the brew git repository if you don't already have it)
 cd $(brew --repo homebrew/core)
 # Create a new git branch for your formula so your pull request is easy to
@@ -356,7 +356,7 @@ If you haven’t forked Homebrew yet, [go to the `homebrew-core` repository and 
 
 If you have already forked Homebrew on GitHub, then you can manually push (just make sure you have been pulling from the `Homebrew/homebrew-core` master):
 
-```shell
+```sh
 git push https://github.com/myname/homebrew-core/ <what-you-called-your-branch>
 ```
 
@@ -392,7 +392,9 @@ You’ll see stuff like this in some formulae. This moves the file `foo` into th
 
 A convenience function that can edit files in-place. For example:
 
-`inreplace "path", before, after`
+```ruby
+inreplace "path", before, after
+```
 
 `before` and `after` can be strings or regular expressions. You should use the block form if you need to make multiple replacements in a file:
 
@@ -409,11 +411,11 @@ Make sure you modify `s`! This block ignores the returned value.
 
 If you need modify variables in a `Makefile`, rather than using `inreplace`, pass them as arguments to `make`:
 
-```rb
+```ruby
 system "make", "target", "VAR2=value1", "VAR2=value2", "VAR3=values can have spaces"
 ```
 
-```rb
+```ruby
 args = %W[
   CC=#{ENV.cc}
   PREFIX=#{prefix}
@@ -452,7 +454,7 @@ end
 
 [`patch`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#patch-class_method)es can be declared in [`stable`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#stable-class_method), [`devel`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#devel-class_method), and [`head`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#head-class_method) blocks. NOTE: always use a block instead of a conditional, i.e. `stable do ... end` instead of `if build.stable? then ... end`.
 
-```rb
+```ruby
 stable do
   # some other things...
 
@@ -465,7 +467,7 @@ end
 
 Embedded (__END__) patches can be declared like so:
 
-```rb
+```ruby
 patch :DATA
 patch :p0, :DATA
 ```
@@ -483,6 +485,7 @@ index 643c60b..543379c 100644
 ```
 
 Patches can also be embedded by passing a string. This makes it possible to provide multiple embedded patches while making only some of them conditional.
+
 ```rb
 patch :p0, "..."
 ```
@@ -491,7 +494,7 @@ In embedded patches, the string `HOMEBREW_PREFIX` is replaced with the value of 
 
 ### Creating the diff
 
-```shell
+```sh
 brew install --interactive --git foo
 # (make some edits)
 git diff | pbcopy
@@ -557,7 +560,7 @@ fails_with :llvm do
     the URLs of any relevant information, such as upstream bug reports. Wrap
     the text at a sensible boundary (~72-80 characters), but do not break
     URLs over multiple lines.
-    EOS
+  EOS
 end
 ```
 
@@ -591,7 +594,6 @@ Download strategies offered by Homebrew are:
 | `:svn`         | `SubversionDownloadStrategy`  |
 
 If you need more control over the way files are downloaded and staged, you can create a custom download strategy and specify it using the [`url`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#url-class_method) method's `:using` option:
-
 
 ```ruby
 class MyDownloadStrategy < SomeHomebrewDownloadStrategy
@@ -649,7 +651,7 @@ These can be used, for instance, in code such as
 bin.install Dir["output/*"]
 ```
 
-to move binaries into their correct location into the cellar, and
+to move binaries into their correct location into the Cellar, and
 
 ```ruby
 man.mkpath
@@ -756,7 +758,7 @@ If that fixes it, please open an [issue](https://github.com/Homebrew/homebrew-co
 
 Check out what MacPorts and Fink do:
 
-```shell
+```sh
 brew -S --macports foo
 brew -S --fink foo
 ```
@@ -779,7 +781,7 @@ When using Homebrew's `gfortran` compiler, the standard `CFLAGS` are used and us
 
 Have you created a real mess in Git which stops you from creating a commit you want to submit to us? You might want to consider starting again from scratch. Your changes can be reset to the Homebrew `master` branch by running:
 
-```shell
+```sh
 git checkout -f master
 git reset --hard origin/master
 ```

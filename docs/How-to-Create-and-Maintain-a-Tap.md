@@ -16,7 +16,7 @@ repository’s root, or under `Formula` or `HomebrewFormula` subdirectories. We
 recommend the latter options because it makes the repository organisation
 easier to grasp, and top-level files are not mixed with formulae.
 
-See [homebrew/tex](https://github.com/Homebrew/homebrew-tex) for an example of
+See [homebrew/php](https://github.com/Homebrew/homebrew-php) for an example of
 a tap with a `Formula` subdirectory.
 
 ### Installing
@@ -32,8 +32,8 @@ users can add it with the [`brew tap` command](brew-tap.md).
 If it’s on GitHub, they can use `brew tap user/repo`, where `user` is your
 GitHub username and `homebrew-repo` your repository.
 
-If it’s hosted outside of GitHub, they have to use `brew tap user/repo <url>`,
-where `user` and `repo` will be used to refer to your tap and `<url>` is your
+If it’s hosted outside of GitHub, they have to use `brew tap user/repo <URL>`,
+where `user` and `repo` will be used to refer to your tap and `<URL>` is your
 Git clone URL.
 
 Users can then install your formulae either with `brew install foo` if there’s

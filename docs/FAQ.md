@@ -15,22 +15,22 @@ Upgrade everything with:
 
 Or upgrade a specific formula with:
 
-    brew upgrade $FORMULA
+    brew upgrade <formula>
 
 ## How do I stop certain formulae from being updated?
 To stop something from being updated/upgraded:
 
-    brew pin $FORMULA
+    brew pin <formula>
 
 To allow that formulae to update again:
 
-    brew unpin $FORMULA
+    brew unpin <formula>
 
 ## How do I uninstall old versions of a formula?
 By default, Homebrew does not uninstall old versions of a formula, so
 over time you will accumulate old versions. To remove them, simply use:
 
-    brew cleanup $FORMULA
+    brew cleanup <formula>
 
 or clean up everything at once:
 
@@ -43,9 +43,10 @@ or to see what would be cleaned up:
 ## How do I uninstall Homebrew?
 To uninstall Homebrew, paste the command below in a terminal prompt.
 
-```bash
+```sh
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
 ```
+
 Download the [uninstall script](https://raw.githubusercontent.com/Homebrew/install/master/uninstall)
 and run `./uninstall --help` to view more uninstall options.
 
@@ -84,9 +85,9 @@ at <https://bintray.com/homebrew/bottles>.
 If available, bottled binaries will be used by default except under the
 following conditions:
 
-* Options were passed to the install command, i.e. `brew install $FORMULA`
-will use a bottled version of $FORMULA, but
-`brew install $FORMULA --enable-bar` will trigger a source build.
+* Options were passed to the install command, i.e. `brew install <formula>`
+will use a bottled version of the formula, but
+`brew install <formula> --enable-bar` will trigger a source build.
 * The `--build-from-source` option is invoked.
 * The environment variable `HOMEBREW_BUILD_FROM_SOURCE` is set.
 * The machine is not running a supported version of macOS as all
@@ -102,18 +103,20 @@ We aim to bottle everything.
 
 ## How do I get a formula from someone else’s branch?
 
-    brew install hub
-    brew update
-    cd $(brew --repository)
-    hub pull someone_else
+```sh
+brew install hub
+brew update
+cd $(brew --repository)
+hub pull someone_else
+```
 
 Or:
 
-`brew install https://raw.github.com/user/repo/branch/formula.rb`
+    brew install https://raw.github.com/user/repo/branch/formula.rb
 
 Or:
 
-`brew pull https://github.com/Homebrew/homebrew-core/pull/1234`
+    brew pull https://github.com/Homebrew/homebrew-core/pull/1234
 
 ## Why does Homebrew prefer I install to `/usr/local`?
 
@@ -168,20 +171,20 @@ If it’s not in `man brew`, it’s probably an external command. These are docu
 If it’s been a while, bump it with a “bump” comment. Sometimes we miss requests and there are plenty of them. Maybe we were thinking on something. It will encourage consideration. In the meantime if you could rebase the pull request so that it can be cherry-picked more easily we will love you for a long time.
 
 ## Can I edit formulae myself?
-Yes! It’s easy! Just `brew edit $FORMULA`. You don’t have to submit modifications back to *Homebrew/homebrew-core*, just edit the formula as you personally need it and `brew install`. As a bonus `brew update` will merge your changes with upstream so you can still keep the formula up-to-date **with** your personal modifications!
+Yes! It’s easy! Just `brew edit <formula>`. You don’t have to submit modifications back to `homebrew/core`, just edit the formula as you personally need it and `brew install`. As a bonus `brew update` will merge your changes with upstream so you can still keep the formula up-to-date **with** your personal modifications!
 
 ## Can I make new formulae?
 Yes! It’s easy! Just `brew create URL`. Homebrew will then open the
-formula in `$EDITOR` so you can edit it, but it probably already
-installs; try it: `brew install $FORMULA`. If you come up with any issues,
-run the command with the `-d` switch like so: `brew install -d $FORMULA`,
+formula in `EDITOR` so you can edit it, but it probably already
+installs; try it: `brew install <formula>`. If you encounter any issues,
+run the command with the `-d` switch like so: `brew install -d <formula>`,
 which drops you into a debugging shell.
 
-If you want your new formula to be part of *homebrew/core* or want
+If you want your new formula to be part of `homebrew/core` or want
 to learn more about writing formulae, then please read the [Formula Cookbook](Formula-Cookbook.md).
 
 ## Can I install my own stuff to `/usr/local`?
-Yes, brew is designed to not get in your way so you can use it how you
+Yes, `brew` is designed to not get in your way so you can use it how you
 like.
 
 Install your own stuff, but be aware that if you install common
@@ -192,7 +195,7 @@ about this.
 Thus it’s probably better to install your own stuff to the Cellar and
 then `brew link` it. Like so:
 
-```bash
+```sh
 $ cd foo-0.1
 $ brew diy
 ./configure --prefix=/usr/local/Cellar/foo/0.1
@@ -204,7 +207,7 @@ Linking /usr/local/Cellar/foo/0.1… 17 symlinks created
 ```
 
 ## Why was a formula deleted?
-Use `brew log $FORMULA` to find out! Likely because it had unresolved issues or
+Use `brew log <formula>` to find out! Likely because it had unresolved issues or
 our analytics identified it was not widely used.
 
 ## Homebrew is a poor name, it's too generic, why was it chosen?
@@ -220,7 +223,7 @@ this for stupid reasons. You can still link in the formula if you need
 to with `brew link`.
 
 ## How can I specify different configure arguments for a formula?
-`brew edit $FORMULA` and edit the formula. Currently there is no
+`brew edit <formula>` and edit the formula. Currently there is no
 other way to do this.
 
 ## Is there a glossary of terms around?

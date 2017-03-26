@@ -17,20 +17,17 @@ on the result of the job.
 For example, a job which has been queued but not yet completed will have a
 section in the pull request that looks like this:
 
-
 ![Triggered Pull Request](img/docs/brew-test-bot-triggered-pr.png)
 
 ---
 
 A failed build looks like this:
 
-
 ![Failed Pull Request](img/docs/brew-test-bot-failed-pr.png)
 
 ---
 
 A passed build looks like this:
-
 
 ![Passed Pull Request](img/docs/brew-test-bot-passed-pr.png)
 
@@ -43,13 +40,11 @@ When you click this you'll see the results.
 
 A passed build looks like this:
 
-
 ![Passed Jenkins Build](img/docs/brew-test-bot-passed-jenkins.png)
 
 ---
 
 A failed build looks like this:
-
 
 ![Failed Jenkins Build](img/docs/brew-test-bot-failed-jenkins.png)
 

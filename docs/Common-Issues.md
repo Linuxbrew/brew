@@ -17,12 +17,14 @@ After running `brew update`, you receive a Git error warning about untracked fil
 
 This is caused by an old bug in in the `update` code that has long since been fixed. However, the nature of the bug requires that you do the following:
 
-```bash
+```sh
 cd $(brew --repository)
 git reset --hard FETCH_HEAD
 ```
+
 If `brew doctor` still complains about uncommitted modifications, also run this command:
-```bash
+
+```sh
 cd $(brew --repository)/Library
 git clean -fd
 ```
@@ -42,8 +44,8 @@ The incompatibilities have been addressed in more recent versions of Homebrew, a
 
 To recover from this situation, do the following:
 
-```
-cd /usr/local # your Homebrew prefix
+```sh
+cd $(brew --prefix)
 git fetch origin
 git reset --hard FETCH_HEAD
 brew update
@@ -56,9 +58,10 @@ When trying to load a plist file into launchctl, you receive an error that resem
 Bug: launchctl.c:2325 (23930):13: (dbfd = open(g_job_overrides_db_path, [...]
 launch_msg(): Socket is not connected
 ```
+
 or
 
-```bash
+```
 Could not open job overrides database at: /private/var/db/launchd.db/com.apple.launchd/overrides.plist: 13: Permission denied
 launch_msg(): Socket is not connected
 ```
@@ -68,11 +71,12 @@ These are likely due to one of four issues:
 1. You are using iTerm. The solution is to use Terminal.app when interacting with `launchctl`.
 2. You are using a terminal multiplexer such as `tmux` or `screen`. You should interact with `launchctl` from a separate Terminal.app shell.
 3. You are attempting to run `launchctl` while logged in remotely.  You should enable screen sharing on the remote machine and issue the command using Terminal.app running on that machine.
-4. You are su'ed as a different user.
+4. You are `su`'ed as a different user.
 
 ### `brew upgrade` errors out
 When running `brew upgrade`, you see something like this:
-```text
+
+```
 $ brew upgrade
 Error: undefined method `include?' for nil:NilClass
 Please report this bug:
@@ -89,23 +93,24 @@ Please report this bug:
 
 This happens because an old version of the upgrade command is hanging around for some reason. The fix:
 
-```
-$ cd $(brew --repository)/Library/Contributions/examples
-$ git clean -n # if this doesn't list anything that you want to keep, then
-$ git clean -f # this will remove untracked files
+```sh
+cd $(brew --repository)/Library/Contributions/examples
+git clean -n # if this doesn't list anything that you want to keep, then
+git clean -f # this will remove untracked files
 ```
 
 ### Python: easy-install.pth cannot be linked
+
 ```
-Warning: Could not link <formulaname>. Unlinking...
+Warning: Could not link <formula>. Unlinking...
 Error: The `brew link` step did not complete successfully
 The formula built, but is not symlinked into /usr/local
-You can try again using `brew link <formulaname>'
+You can try again using `brew link <formula>'
 
 Possible conflicting files are:
 /usr/local/lib/python2.7/site-packages/site.py
 /usr/local/lib/python2.7/site-packages/easy-install.pth
-==> Could not symlink file: /homebrew/Cellar/<formulaname>/<version>/lib/python2.7/site-packages/site.py
+==> Could not symlink file: /homebrew/Cellar/<formula>/<version>/lib/python2.7/site-packages/site.py
 Target /usr/local/lib/python2.7/site-packages/site.py already exists. You may need to delete it.
 To force the link and overwrite all other conflicting files, do:
   brew link --overwrite formula_name
@@ -127,7 +132,7 @@ Upgrading macOS can cause errors like the following:
 
 Following a macOS upgrade it may be necessary to reinstall the Xcode Command Line Tools and `brew upgrade` all installed formula:
 
-```bash
+```sh
 xcode-select --install
 brew upgrade
 ```
