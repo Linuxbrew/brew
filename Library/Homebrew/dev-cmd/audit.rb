@@ -1176,7 +1176,8 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
-    if line.include?('system "npm", "install"') && !line.include?("Language::Node") && formula.name !~ /^kibana(\d{2})?$/
+    if line.include?('system "npm", "install"') && !line.include?("Language::Node") &&
+       formula.name !~ /^kibana(\@\d+(\.\d+)?)?$/
       problem "Use Language::Node for npm install args"
     end
 
