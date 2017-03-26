@@ -3,7 +3,7 @@ Vendored Dependencies
 
 * [plist](https://github.com/bleything/plist), version 3.1.0
 
-* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 0.2.6
+* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 1.1.0
 
 ## Licenses:
 
@@ -33,7 +33,7 @@ Vendored Dependencies
 ### ruby-macho
 
 > The MIT License
-> Copyright (c) 2015, 2016 William Woodruff <william @ tuffbizz.com>
+> Copyright (c) 2015, 2016, 2017 William Woodruff <william @ tuffbizz.com>
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
