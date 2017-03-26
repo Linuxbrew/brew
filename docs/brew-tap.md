@@ -9,7 +9,7 @@ but the command isn't limited to any one location.
 * `brew tap` without arguments lists the currently tapped repositories. For
   example:
 
-```bash
+```sh
 $ brew tap
 homebrew/dupes
 mistydemeo/tigerbrew
@@ -55,14 +55,15 @@ edavis/emacs
 
 ## Formula duplicate names
 
-If your tap contains a formula that is also present in [`homebrew/core`](https://github.com/Homebrew/homebrew-core), that's fine,
+If your tap contains a formula that is also present in
+[`homebrew/core`](https://github.com/Homebrew/homebrew-core), that's fine,
 but it means that you must install it explicitly by default.
 
 If you would like to prioritize a tap over `homebrew/core`, you can use
 `brew tap-pin username/repo` to pin the tap,
 and use `brew tap-unpin username/repo` to revert the pin.
 
-Whenever a `brew install foo` command is issued, brew will find which formula
+Whenever a `brew install foo` command is issued, `brew` will find which formula
 to use by searching in the following order:
 
 * pinned taps
@@ -75,7 +76,7 @@ qualified names to refer to them.
 For example, you can create a tap for an alternative `vim` formula. Without
 pinning it, the behaviour will be
 
-```bash
+```sh
 brew install vim                     # installs from homebrew/core
 brew install username/repo/vim       # installs from your custom repo
 ```
@@ -83,7 +84,7 @@ brew install username/repo/vim       # installs from your custom repo
 However if you pin the tap with `brew tap-pin username/repo`, you will need to
 use `homebrew/core` to refer to the core formula.
 
-```bash
+```sh
 brew install vim                     # installs from your custom repo
 brew install homebrew/core/vim       # installs from homebrew/core
 ```

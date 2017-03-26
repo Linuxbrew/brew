@@ -7,7 +7,7 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 
 *   [homebrew/apache](https://github.com/Homebrew/homebrew-apache): A tap for Apache modules, extending macOS's built-in Apache. These brews may require unconventional additional setup, as explained in the caveats.
 
-*   [homebrew/boneyard](https://github.com/Homebrew/homebrew-boneyard): Formulae from other official taps, primarily (homebrew/core) are not deleted, they are moved here.
+*   [homebrew/boneyard](https://github.com/Homebrew/homebrew-boneyard): Formulae from other official taps, primarily `homebrew/core` are not deleted, they are moved here.
 
 *   [homebrew/bundle](https://github.com/Homebrew/homebrew-bundle): Bundler for non-Ruby dependencies from Homebrew.
 

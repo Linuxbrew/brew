@@ -31,10 +31,12 @@ not build when installed elsewhere. One of the reasons Homebrew just
 works relative to the competition is **because** we recommend installing
 to `/usr/local`. *Pick another prefix at your peril!*
 
-`mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew`
+```sh
+mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+```
 
 ### Multiple installations
-Create a Homebrew installation wherever you extract the tarball. Whichever brew command is called is where the packages will be installed. You can use this as you see fit, e.g. a system set of libs in `/usr/local` and tweaked formulae for development in `~/homebrew`.
+Create a Homebrew installation wherever you extract the tarball. Whichever `brew` command is called is where the packages will be installed. You can use this as you see fit, e.g. a system set of libs in `/usr/local` and tweaked formulae for development in `~/homebrew`.
 
 ## Uninstallation
 Uninstallation is documented in the [FAQ](FAQ.md).

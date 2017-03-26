@@ -5,7 +5,7 @@ Some formulae should not go in
 additional [Interesting Taps & Forks](Interesting-Taps-&-Forks.md) and anyone can start their
 own!
 
-### We try hard to avoid dupes in Homebrew/homebrew
+### We try hard to avoid dupes in `homebrew/core`
 Stuff that comes with macOS or libraries that are provided by
 [RubyGems, CPAN or PyPi](Gems,-Eggs-and-Perl-Modules.md)
 should not be duplicated. There are good reasons for this:
@@ -19,8 +19,7 @@ There are exceptions:
 
 * OpenSSL - Apple has formally deprecated OpenSSL on macOS in favour of their own Security Framework
   & consequently the macOS OpenSSL is rarely updated and frequently falls behind important security updates.
-  Homebrew endeavours to use our shipped OpenSSL as much
-   as possible.
+  Homebrew endeavours to use our shipped OpenSSL as much as possible.
 * Programs that a user will regularly interact with directly, like editors and
   language runtimes
 * Libraries that provide functionality or contain security updates not found in
@@ -57,7 +56,7 @@ that stuff on demand. Or there is a command-line switch where you can
 point it to the downloaded archive in order to avoid loading.
 
 ### We don’t like binary formulae
-Our policy is that formulae in the core repository
+Our policy is that formulae in the core tap
 ([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be open-source
 and either built from source or produce cross-platform binaries (e.g. Java).
 Binary-only formulae should go to
@@ -101,7 +100,7 @@ include things that don't meet these criteria or reject things that do.
 Please trust that we need to use our discretion based on our experience
 running a package manager.
 
-### Stuff that builds an .app
+### Stuff that builds an `.app`
 Don’t make your formula build an `.app` (native macOS Application); we
 don’t want those things in Homebrew (but
 [Homebrew Cask](https://github.com/caskroom/homebrew-cask) does).

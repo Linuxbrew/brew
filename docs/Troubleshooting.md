@@ -4,7 +4,6 @@
 
 This document will help you check for common issues and make sure your issue has not already been reported.
 
-
 ## Check for common issues
 
 Follow these steps to fix common problems:
@@ -16,12 +15,10 @@ Follow these steps to fix common problems:
 * Read through the [Common Issues](Common-Issues.md).
 * If you’re installing something Java-related, make sure you have installed Java (you can run `brew cask install java`).
 
-
 ## Check to see if the issue has been reported
 
 * Search the [issue tracker](https://github.com/Homebrew/homebrew-core/issues) to see if someone else has already reported the same issue.
 * Make sure you search issues on the correct repository. If a formula that has failed to build is part of a tap like [homebrew/science](https://github.com/Homebrew/homebrew-science/issues) or [homebrew/dupes](https://github.com/Homebrew/homebrew-dupes/issues) check those issue trackers instead.
-
 
 ## Create an issue
 
@@ -31,6 +28,6 @@ If your problem hasn't been solved or reported, then create an issue:
   - If you had a formula-related problem: run `brew gist-logs <formula>` (where `<formula>` is the name of the formula).
   - If you encountered a non-formula problem: upload the output of `brew config` and `brew doctor` to a new [Gist](https://gist.github.com).
 1. [Create a new issue](https://github.com/Homebrew/homebrew-core/issues/new).
-  - Give your issue a descriptive title which includes the formula name (if applicable) and the version of macOS you are using. For example, if a formula fails to build, title your issue "\<formula name> failed to build on \<10.x>", where "\<formula name>" is the name of the formula that failed to build, and "\<10.x>" is the version of macOS you are using.
+  - Give your issue a descriptive title which includes the formula name (if applicable) and the version of macOS you are using. For example, if a formula fails to build, title your issue "\<formula> failed to build on \<10.x>", where "\<formula>" is the name of the formula that failed to build, and "\<10.x>" is the version of macOS you are using.
   - Include the URL output by `brew gist-logs <formula>` (if applicable).
   - Include links to any additional Gists you may have created (such as for the output of `brew config` and `brew doctor`).

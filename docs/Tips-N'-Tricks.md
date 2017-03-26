@@ -13,24 +13,27 @@ and install through the direct link. For example, Python 3.3.0 from pull request
 brew install https://raw.github.com/dsr/homebrew/9b22d42f50fcbc5e52c764448b3ac002bc153bd7/Library/Formula/python3.rb
 ```
 
-## Quickly remove something from /usr/local
+## Quickly remove something from `/usr/local`
+
 ```sh
-brew unlink $FORMULA
+brew unlink <formula>
 ```
 
 This can be useful if a package can't build against the version of something you have linked into `/usr/local`.
 
-And of course, you can simply `brew link $FORMULA` again afterwards!
+And of course, you can simply `brew link <formula>` again afterwards!
 
 ## Activate a previously installed version of a formula
+
 ```sh
-brew info $FORMULA
-brew switch $FORMULA $VERSION
+brew info <formula>
+brew switch <formula> <version>
 ```
 
-Use `brew info $FORMULA` to check what versions are installed but not currently activated, then `brew switch $FORMULA $VERSION` to activate the desired version. This can be useful if you would like to switch between versions of a formula.
+Use `brew info <formula>` to check what versions are installed but not currently activated, then `brew switch <formula> <version>` to activate the desired version. This can be useful if you would like to switch between versions of a formula.
 
 ## Install into Homebrew without formulae
+
 ```sh
 ./configure --prefix=/usr/local/Cellar/foo/1.2 && make && make install && brew link foo
 ```
@@ -42,47 +45,50 @@ Erlang provides a torrent that'll let you download at 4–5× the normal
 HTTP method.
 
 Download the file and drop it in `~/Library/Caches/Homebrew`, but
-watch the file name.  Homebrew downloads files as <code>${FORMULA_NAME}-${VERSION}</code>.  In the case of Erlang, this requires
-renaming the file from <code>otp_src_R13B03</code> to
-<code>erlang-R13B03</code>.
+watch the file name.  Homebrew downloads files as `<formula>-<version>`.
+In the case of Erlang, this requires renaming the file from `otp_src_R13B03` to
+`erlang-R13B03`.
 
 `brew --cache -s erlang` will print the correct name of the cached
 download.  This means instead of manually renaming a formula, you can
-run `mv the_tarball $(brew --cache -s $FORMULA)`.
+run `mv the_tarball $(brew --cache -s <formula>)`.
 
 You can also pre-cache the download by using the command `brew fetch formula` which also displays the SHA-256 hash. This can be useful for updating formulae to new versions.
 
 ## Using Homebrew behind a proxy
-Behind the scenes, Homebrew uses several commands for downloading files (e.g. curl, git, svn).  Many of these tools can download via a proxy.  It's a common (though not universal) convention for these command-line tools to observe getting the proxy parameters from environment variables (e.g. `http_proxy`).  Unfortunately, most tools are inconsistent in their use of these environment parameters (e.g. curl supports `http_proxy`, `HTTPS_PROXY`, `FTP_PROXY`, `GOPHER_PROXY`, `ALL_PROXY`, `NO_PROXY`).
+Behind the scenes, Homebrew uses several commands for downloading files (e.g. `curl`, `git`, `svn`).  Many of these tools can download via a proxy.  It's a common (though not universal) convention for these command-line tools to observe getting the proxy parameters from environment variables (e.g. `http_proxy`).  Unfortunately, most tools are inconsistent in their use of these environment parameters (e.g. `curl` supports `http_proxy`, `HTTPS_PROXY`, `FTP_PROXY`, `GOPHER_PROXY`, `ALL_PROXY`, `NO_PROXY`).
 
 Luckily, for the majority of cases setting `http_proxy` is enough.
 You can set this environment variable in several ways (search on the
 internet for details), including at runtime:
 
-```
-http_proxy=http://<proxyhost>:<proxyport> brew install $FORMULA
+```sh
+http_proxy=http://<proxyhost>:<proxyport> brew install <formula>
 ```
 
 To use proxy authentication:
 
 ```sh
-http_proxy=http://<user>:<password>@<proxyhost>:<proxyport>  brew install $FORMULA
+http_proxy=http://<user>:<password>@<proxyhost>:<proxyport>  brew install <formula>
 ```
 
 ## Installing stuff without the Xcode CLT
+
 ```sh
-$ brew sh          # or: eval $(brew --env)
-$ gem install ronn # or c-programs
+brew sh          # or: eval $(brew --env)
+gem install ronn # or c-programs
 ```
 
-This imports the brew environment into your existing shell, gem will pick up the environment variables and be able to build. As a bonus brew's automatically determined optimization flags are set.
+This imports the `brew` environment into your existing shell; `gem` will pick up the environment variables and be able to build. As a bonus `brew`'s automatically determined optimization flags are set.
 
 ## Install only a formula's dependencies (not the formula)
+
 ```sh
-brew install --only-dependencies $FORMULA
+brew install --only-dependencies <formula>
 ```
 
 ## Interactive Homebrew Shell
+
 ```sh
 $ brew irb
 1.8.7 :001 > Formula.factory("ace").methods - Object.methods
@@ -91,6 +97,7 @@ $ brew irb
 ```
 
 ## Hiding the beer mug emoji when finishing a build
+
 ```sh
 export HOMEBREW_NO_EMOJI=1
 ```

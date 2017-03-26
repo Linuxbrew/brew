@@ -10,7 +10,7 @@ add-ons available to all users:
 Starting with OS X Lion (10.7), you need `sudo` to install to these like
 so: `sudo gem install`, `sudo easy_install` or `sudo cpan -i`.
 
-An option to avoid `sudo` is to use an access control list:
+An option to avoid sudo is to use an access control list:
 `chmod +a 'user:YOUR_NAME_HERE allow add_subdirectory,add_file,delete_child,directory_inherit' /Library/Python/2.7/site-packages`,
 for example, will let you add packages to Python 2.7 as yourself. That
 is probably safer than changing the group ownership of the directory.
@@ -23,13 +23,14 @@ writable location. But if you installed Homebrew as we recommend,
 `/usr/local` will be writable without sudo. So now you are good to
 install the development tools you need without risking the use of sudo.
 
-Rather than changing the rights on /Library/Python, we recommend the
 ## Python packages (eggs) without sudo
+
+Rather than changing the rights on `/Library/Python`, we recommend the
 following options:
 
 ### With a brewed Python
 Note, `easy_install` is deprecated. We install `pip` (or `pip3` for
-python3) along with python/python3.
+Python 3) along with python/python3.
 
 We set up distutils such that `pip install` will always put modules in
 `$(brew --prefix)/lib/pythonX.Y/site-packages` and scripts in
@@ -47,7 +48,10 @@ On macOS, any [Python version X.Y also searches in
 `~/Library/Python/X.Y/lib/python/site-packages` for
 modules](https://docs.python.org/2/install/index.html#inst-alt-install-user).
 That dir might not yet exist, but you can create it:
-`mkdir -p ~/Library/Python/2.7/lib/python/site-packages`
+
+```sh
+mkdir -p ~/Library/Python/2.7/lib/python/site-packages
+```
 
 To teach `easy_install` and `pip` to install there, either use the
 `--user` switch or create a `~/.pydistutils.cfg` file with the
@@ -76,20 +80,26 @@ To make Ruby install to `/usr/local`, we need to add
 `gem: -n/usr/local/bin` to your `~/.gemrc`. It’s YAML, so do it manually
 or use this:
 
-    echo "gem: -n/usr/local/bin" >> ~/.gemrc
+```sh
+echo "gem: -n/usr/local/bin" >> ~/.gemrc
+```
 
 **However, all versions of RubyGems before 1.3.6 are buggy** and ignore
 the above setting. Sadly a fresh install of Snow Leopard comes with
 1.3.5. Currently the only known way to get around this is to upgrade
 rubygems as root:
 
-`sudo gem update --system`
+```sh
+sudo gem update --system
+```
 
 ### An alternative
 
 Just install everything into the Homebrew prefix like this:
 
-`echo "export GEM_HOME=\"$(brew --prefix)\"" >> ~/.bashrc`
+```sh
+echo "export GEM_HOME=\"$(brew --prefix)\"" >> ~/.bashrc
+```
 
 ### It doesn’t work! I get some “permissions” error when I try to install stuff!
 
@@ -99,23 +109,29 @@ is not a good default.*
 If you ever did a `sudo gem`, etc. before then a lot of files will have
 been created owned by root. Fix with:
 
-`sudo chown -R $USER /Library/Ruby /Library/Perl /Library/Python`
+```sh
+sudo chown -R $USER /Library/Ruby /Library/Perl /Library/Python
+```
 
 ## Perl CPAN modules without sudo
 
-The Perl module local::lib works similarly to rbenv/RVM (although for
+The Perl module `local::lib` works similarly to rbenv/RVM (although for
 modules only, not perl installations). A simple solution that only
-pollutes your /Library/Perl a little is to install
-[local::lib](https://metacpan.org/pod/local::lib) with sudo:
+pollutes your `/Library/Perl` a little is to install
+[`local::lib`](https://metacpan.org/pod/local::lib) with sudo:
 
-`sudo cpan local::lib`
+```sh
+sudo cpan local::lib
+```
 
 Note that this will install some other dependencies like `Module::Install`.
 Then put the appropriate incantation in your shell’s startup, e.g. for
 `.bash_profile` you insert the below, for others see the
-[local::lib](https://metacpan.org/pod/local::lib) docs.
+[`local::lib`](https://metacpan.org/pod/local::lib) docs.
 
-`eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)`
+```sh
+eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)
+```
 
 Now (after you restart your shell) `cpan` or `perl -MCPAN -eshell` etc.
 will install modules and binaries in `~/perl5` and the relevant
@@ -124,11 +140,12 @@ subdirectories will be in your `PATH` and `PERL5LIB` etc.
 ### Avoiding sudo altogether for Perl
 
 If you don’t even want (or can’t) use sudo for bootstrapping
-~/perl5 and add the relevant path to `PERL5LIB` before the .bashrc eval incantation.
 `local::lib`, just manually install `local::lib` in
+`~/perl5` and add the relevant path to `PERL5LIB` before the .bashrc eval incantation.
 
-```bash
 Another alternative is to use `perlbrew` to install a separate copy of Perl in your home directory, or wherever you like:
+
+```sh
 curl -L https://install.perlbrew.pl | bash
 perlbrew install perl-5.16.2
 echo ".~/perl5/perlbrew/etc/bashrc" >> ~/.bashrc

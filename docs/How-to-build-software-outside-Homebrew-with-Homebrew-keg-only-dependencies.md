@@ -6,13 +6,13 @@ The [FAQ](FAQ.md) briefly explains this.
 
 As an example:
 
-*OpenSSL isn’t symlinked into my `$PATH` and non-Homebrew builds can’t find it!*
+*OpenSSL isn’t symlinked into my `PATH` and non-Homebrew builds can’t find it!*
 
 This is because Homebrew keeps it locked inside its individual prefix, rather than symlinking to the publicly-available location, usually `/usr/local`.
 
 ## Advice on potential workarounds
 
-A number of people in this situation are either forcefully linking `keg_only` tools with `brew link --force` or moving default system utilities out of the `$PATH` and replacing them with manually-created symlinks to the Homebrew-provided tool.
+A number of people in this situation are either forcefully linking `keg_only` tools with `brew link --force` or moving default system utilities out of the `PATH` and replacing them with manually-created symlinks to the Homebrew-provided tool.
 
 *Please* do not remove macOS native tools and forcefully replace them with symlinks back to the Homebrew-provided tool. Doing so can and likely will cause significant breakage when attempting to build software.
 
@@ -26,27 +26,27 @@ Useful, reliable alternatives exist should you wish to use `keg_only` tools outs
 
 You can set flags to give configure scripts or Makefiles a nudge in the right direction. An example of flag setting:
 
-```shell
+```sh
 ./configure --prefix=/Users/Dave/Downloads CFLAGS=-I$(brew --prefix)/opt/openssl/include LDFLAGS=-L$(brew --prefix)/opt/openssl/lib
 ```
 
 An example using `pip`:
 
-```shell
+```sh
 CFLAGS=-I$(brew --prefix)/opt/icu4c/include LDFLAGS=-L$(brew --prefix)/opt/icu4c/lib pip install pyicu
 ```
 
-### `$PATH` modification
+### `PATH` modification
 
-You can temporarily prepend your `$PATH` with the tool’s bin directory, such as:
+You can temporarily prepend your `PATH` with the tool’s bin directory, such as:
 
-```shell
+```sh
 export PATH=$(brew --prefix)/opt/openssl/bin:$PATH
 ```
 
-This will prepend that folder to your `$PATH`, ensuring any build script that searches the `$PATH` will find it first.
+This will prepend that folder to your `PATH`, ensuring any build script that searches the `PATH` will find it first.
 
-Changing your `$PATH` using that command ensures the change only exists for the duration of that shell session. Once you are no longer in that session, the `$PATH` reverts to the prior state.
+Changing your `PATH` using that command ensures the change only exists for the duration of that shell session. Once you are no longer in that session, the `PATH` reverts to the prior state.
 
 ### `pkg-config` detection
 
@@ -54,7 +54,7 @@ If the tool you are attempting to build is [pkg-config](https://en.wikipedia.org
 
 An example of this is:
 
-```shell
+```sh
 export PKG_CONFIG_PATH=$(brew --prefix)/opt/openssl/lib/pkgconfig
 ```
 
@@ -62,6 +62,6 @@ If you’re curious about the `PKG_CONFIG_PATH` variable `man pkg-config` goes i
 
 You can get `pkg-config` to detail the default search path with:
 
-```shell
+```sh
 pkg-config --variable pc_path pkg-config
 ```
