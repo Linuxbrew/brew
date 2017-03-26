@@ -59,9 +59,17 @@ class Foo < Formula
   # depends_on "cmake" => :build
 
   def install
-    system "./configure", "--prefix=#{prefix}", "--disable-debug", "--disable-dependency-tracking"
+    # ENV.deparallelize
+    system "./configure", "--disable-debug",
+                          "--disable-dependency-tracking",
+                          "--disable-silent-rules",
+                          "--prefix=#{prefix}"
     # system "cmake", ".", *std_cmake_args
     system "make", "install"
+  end
+
+  test do
+    system "false"
   end
 end
 ```
@@ -259,7 +267,7 @@ Check the top of the e.g. `./configure` output. Some configure scripts do not re
 
 ### Add a test to the formula
 
-Please add a [`test do`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#test-class_method) block to the formula. This will be run by `brew test foo` and the [Brew Test Bot](Brew-Test-Bot.md).
+Add a valid test to the [`test do`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula&num;test-class_method) block of the formula. This will be run by `brew test foo` and the [Brew Test Bot](Brew-Test-Bot.md).
 
 The
 [`test do`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#test-class_method)
