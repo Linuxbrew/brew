@@ -19,7 +19,7 @@ module MachO
 
     # @param endianness [Symbol] either `:big` or `:little`
     # @param bin [String] the string to be unpacked into the new structure
-    # @return [MachO::MachOStructure] a new MachOStructure initialized with `bin`
+    # @return [MachO::MachOStructure] the resulting structure
     # @api private
     def self.new_from_bin(endianness, bin)
       format = Utils.specialize_format(self::FORMAT, endianness)
