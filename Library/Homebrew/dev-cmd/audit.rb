@@ -1177,7 +1177,7 @@ class FormulaAuditor
     end
 
     if line.include?('system "npm", "install"') && !line.include?("Language::Node") &&
-      formula.name !~ /^kibana(\@\d+(\.\d+)?)?$/
+       formula.name !~ /^kibana(\@\d+(\.\d+)?)?$/
       problem "Use Language::Node for npm install args"
     end
 
