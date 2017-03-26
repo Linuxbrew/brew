@@ -331,25 +331,33 @@ class FormulaAuditor
 
     problem "File should end with a newline" unless text.trailing_newline?
 
-    versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
-    needs_versioned_alias = !versioned_formulae.empty? &&
-                            formula.tap &&
-                            formula.aliases.grep(/.@\d/).empty?
-    if needs_versioned_alias
-      _, last_alias_version = File.basename(versioned_formulae.sort.reverse.first)
-                                  .gsub(/\.rb$/, "")
-                                  .split("@")
-      major, minor, = formula.version.to_s.split(".")
-      alias_name = if last_alias_version.split(".").length == 1
-        "#{formula.name}@#{major}"
-      else
-        "#{formula.name}@#{major}.#{minor}"
+    if formula.versioned_formula?
+      unversioned_formula = Pathname.new formula.path.to_s.gsub(/@.*\.rb$/, ".rb")
+      unless unversioned_formula.exist?
+        unversioned_name = unversioned_formula.basename(".rb")
+        problem "#{formula} is versioned but no #{unversioned_name} formula exists"
       end
-      problem <<-EOS.undent
-        Formula has other versions so create an alias:
-          cd #{formula.tap.alias_dir}
-          ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
-      EOS
+    else
+      versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
+      needs_versioned_alias = !versioned_formulae.empty? &&
+                              formula.tap &&
+                              formula.aliases.grep(/.@\d/).empty?
+      if needs_versioned_alias
+        _, last_alias_version = File.basename(versioned_formulae.sort.reverse.first)
+                                    .gsub(/\.rb$/, "")
+                                    .split("@")
+        major, minor, = formula.version.to_s.split(".")
+        alias_name = if last_alias_version.split(".").length == 1
+          "#{formula.name}@#{major}"
+        else
+          "#{formula.name}@#{major}.#{minor}"
+        end
+        problem <<-EOS.undent
+          Formula has other versions so create an alias:
+            cd #{formula.tap.alias_dir}
+            ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
+        EOS
+      end
     end
 
     return unless @strict
