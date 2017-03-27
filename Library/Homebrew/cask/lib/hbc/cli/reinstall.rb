@@ -10,8 +10,7 @@ module Hbc
             Installer.new(cask,
                           force:          force,
                           skip_cask_deps: skip_cask_deps,
-                          require_sha:    require_sha,
-                          reinstall:      true).install
+                          require_sha:    require_sha).reinstall
 
             count += 1
           rescue CaskUnavailableError => e

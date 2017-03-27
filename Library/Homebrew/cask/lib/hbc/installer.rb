@@ -18,13 +18,13 @@ module Hbc
 
     PERSISTENT_METADATA_SUBDIRS = ["gpg"].freeze
 
-    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, require_sha: false, reinstall: false)
+    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, require_sha: false)
       @cask = cask
       @command = command
       @force = force
       @skip_cask_deps = skip_cask_deps
       @require_sha = require_sha
-      @reinstall = reinstall
+      @reinstall = false
     end
 
     def self.print_caveats(cask)
@@ -92,6 +92,12 @@ module Hbc
       enable_accessibility_access
 
       puts summary
+    end
+
+    def reinstall
+      odebug "Hbc::Installer#reinstall"
+      @reinstall = true
+      install
     end
 
     def uninstall_if_neccessary
