@@ -781,7 +781,7 @@ class FormulaAuditor
       automysqlbackup 3.0-rc6
       aview 1.3.0rc1
       distcc 3.2rc1
-      elm-format 0.5.2-alpha
+      elm-format 0.6.0-alpha
       ftgl 2.1.3-rc5
       hidapi 0.8.0-rc1
       libcaca 0.99b19
