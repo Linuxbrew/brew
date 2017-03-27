@@ -33,7 +33,7 @@ module Homebrew
     elsif date = ARGV.value("before")
       Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
     elsif ARGV.include?("--to-tag")
-      Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1].chomp
+      Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1].to_s.chomp
     else
       Utils.popen_read("git", "rev-parse", "origin/master").chomp
     end
