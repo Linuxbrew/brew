@@ -102,7 +102,7 @@ class CompilerSelector
     clang: [:clang, :gcc_4_2, :gnu, :gcc_4_0, :llvm_clang],
     gcc_4_2: [:gcc_4_2, :gnu, :clang, :gcc_4_0],
     gcc_4_0: [:gcc_4_0, :gcc_4_2, :gnu, :clang],
-    c_compiler: [:gnu, :clang, :c_compiler, :gcc_4_2, :gcc_4_0, :llvm_clang],
+    c_compiler: [:gnu, :clang, :gcc_4_2, :gcc_4_0, :llvm_clang],
   }.freeze
 
   def self.select_for(formula, compilers = self.compilers)
