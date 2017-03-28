@@ -15,6 +15,8 @@
 
 require "utils"
 require "json"
+require "rubocop"
+require_relative "../rubocops"
 
 module Homebrew
   module_function
@@ -53,6 +55,10 @@ module Homebrew
       --force-exclusion
     ]
     args << "--auto-correct" if fix
+
+    if options[:only]
+      args << "--only" << RuboCop::Cop::Cop.registry.with_department(options[:only]).names.join(" ")
+    end
 
     if files.nil?
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"

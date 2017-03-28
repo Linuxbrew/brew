@@ -75,9 +75,14 @@ module Homebrew
       style_results = check_style_json(files, options)
     end
 
+    if !strict
+      options = { fix: ARGV.flag?("--fix"), realpath: true, only: :Homebrew }
+      style_results = check_style_json(files, options)
+    end
+
     ff.each do |f|
       options = { new_formula: new_formula, strict: strict, online: online }
-      options[:style_offenses] = style_results.file_offenses(f.path) if strict
+      options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
 
