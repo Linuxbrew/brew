@@ -27,7 +27,7 @@ describe "brew switch", :integration_test do
       .and be_a_success
 
     expect { brew "switch", "testball", "0.3" }
-      .to output("Versions available: 0.1, 0.2\n").to_stdout
+      .to output(/Versions available: (0.1, 0.2|0.2, 0.1)\n/).to_stdout
       .and output(/testball does not have a version "0.3"/).to_stderr
       .and be_a_failure
   end
