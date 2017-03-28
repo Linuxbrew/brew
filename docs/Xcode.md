@@ -11,8 +11,8 @@ Tools available for your platform:
 | 10.8  | 5.1.1 | April 2014         |
 | 10.9  | 6.2   | 6.2                |
 | 10.10 | 7.2.1 | 7.2                |
-| 10.11 | 8.0   | 7.3                |
-| 10.12 | 8.0   | 8.0                |
+| 10.11 | 8.2.1 | 8.2                |
+| 10.12 | 8.3   | 8.3                |
 
 ## Compiler version database
 
@@ -66,6 +66,10 @@ Tools available for your platform:
 | 7.3   | —       | —       | —            | —          | 7.3 (703.0.29)  | —          |
 | 7.3.1 | —       | —       | —            | —          | 7.3 (703.0.31)  | —          |
 | 8.0   | —       | —       | —            | —          | 8.0 (800.0.38)  | —          |
+| 8.1   | —       | —       | —            | —          | 8.0 (800.0.42.1)| —          |
+| 8.2   | —       | —       | —            | —          | 8.0 (800.0.42.1)| —          |
+| 8.2.1 | —       | —       | —            | —          | 8.0 (800.0.42.1)| —          |
+| 8.3   | —       | —       | —            | —          | 8.1 (802.0.38)  | —          |
 
 ## References to Xcode and compiler versions in code
 When a new Xcode release is made, the following things need to be
