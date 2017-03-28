@@ -753,13 +753,14 @@ module Homebrew
       def check_git_version
         # https://help.github.com/articles/https-cloning-errors
         return unless Utils.git_available?
-        return unless Version.create(Utils.git_version) < Version.create("1.7.10")
+        return unless Version.create(Utils.git_version) < Version.create("1.8.5")
 
         git = Formula["git"]
         git_upgrade_cmd = git.any_version_installed? ? "upgrade" : "install"
         <<-EOS.undent
           An outdated version (#{Utils.git_version}) of Git was detected in your PATH.
-          Git 1.7.10 or newer is required to perform checkouts over HTTPS from GitHub.
+          Git 1.8.5 or newer is required to perform checkouts over HTTPS from GitHub and
+          to support the 'git -C <path>' option.
           Please upgrade:
             brew #{git_upgrade_cmd} git
         EOS
