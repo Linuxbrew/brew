@@ -90,7 +90,7 @@ module OS
         else
           <<-EOS.undent
             Xcode can be updated from
-              https://developer.apple.com/xcode/downloads/
+              https://developer.apple.com/download/more/
           EOS
         end
       end
@@ -202,7 +202,7 @@ module OS
         elsif MacOS.version == "10.8" || MacOS.version == "10.7"
           <<-EOS.undent
             The standalone package can be obtained from
-              https://developer.apple.com/downloads
+              https://developer.apple.com/download/more/
             or it can be installed via Xcode's preferences.
           EOS
         end

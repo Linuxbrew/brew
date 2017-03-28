@@ -10,7 +10,7 @@ module Homebrew
             EOS
           else
             <<-EOS.undent
-            Xcode can be installed from #{Formatter.url("https://developer.apple.com/xcode/downloads/")}.
+            Xcode can be installed from #{Formatter.url("https://developer.apple.com/download/more/")}.
             EOS
           end
         else

@@ -31,13 +31,13 @@ class DevelopmentTools
       elsif MacOS.version == "10.8" || MacOS.version == "10.7"
         <<-EOS.undent
           Install the Command Line Tools from
-            https://developer.apple.com/downloads/
+            https://developer.apple.com/download/more/
           or via Xcode's preferences.
         EOS
       else
         <<-EOS.undent
           Install Xcode from
-            https://developer.apple.com/xcode/downloads/
+            https://developer.apple.com/download/more/
         EOS
       end
     end
