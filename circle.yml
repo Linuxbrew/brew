@@ -6,7 +6,6 @@ machine:
 checkout:
   post:
     - if [ -e .git/shallow ]; then echo git fetch --unshallow; fi
-    - git fetch --tags
     - git config user.name LinuxbrewTestBot
     - git config user.email testbot@linuxbrew.sh
 test:
