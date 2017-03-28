@@ -5,6 +5,7 @@ checkout:
   post:
     - git config user.name LinuxbrewTestBot
     - git config user.email testbot@linuxbrew.sh
+    - git fetch --tags --unshallow
 test:
   override:
     - umask 022;
