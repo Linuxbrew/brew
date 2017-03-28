@@ -11,7 +11,7 @@ class RubyRequirement < Requirement
   satisfy(build_env: false) { new_enough_ruby }
 
   env do
-    ENV.prepend_path "PATH", new_enough_ruby.dirname
+    ENV.prepend_path "PATH", new_enough_ruby.dirname unless new_enough_ruby.nil?
   end
 
   def message
