@@ -3,9 +3,10 @@ machine:
     HOMEBREW_DEVELOPER: 1
 checkout:
   post:
+    - if [ -e .git/shallow ]; then echo git fetch --unshallow; fi
+    - git fetch --tags
     - git config user.name LinuxbrewTestBot
     - git config user.email testbot@linuxbrew.sh
-    - git fetch --tags --unshallow
 test:
   override:
     - umask 022;
