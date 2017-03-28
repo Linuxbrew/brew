@@ -808,7 +808,7 @@ module Homebrew
             properly. You can solve this by adding the Homebrew remote:
               git -C "#{HOMEBREW_REPOSITORY}" remote add origin #{Formatter.url("https://github.com/Homebrew/brew.git")}
           EOS
-        elsif origin !~ %r{Homebrew/brew(\.git)?$}
+        elsif origin !~ %r{Homebrew/brew(\.git|/)?$}
           <<-EOS.undent
             Suspicious Homebrew/brew git origin remote found.
 
@@ -837,7 +837,7 @@ module Homebrew
             properly. You can solve this by adding the Homebrew remote:
               git -C "#{coretap_path}" remote add origin #{Formatter.url("https://github.com/Homebrew/homebrew-core.git")}
           EOS
-        elsif origin !~ %r{Homebrew/homebrew-core(\.git)?$}
+        elsif origin !~ %r{Homebrew/homebrew-core(\.git|/)?$}
           <<-EOS.undent
             Suspicious #{CoreTap.instance} git origin remote found.
 
