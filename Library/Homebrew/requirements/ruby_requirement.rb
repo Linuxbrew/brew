@@ -11,7 +11,7 @@ class RubyRequirement < Requirement
   satisfy(build_env: false) { new_enough_ruby }
 
   env do
-    ENV.prepend_path "PATH", new_enough_ruby
+    ENV.prepend_path "PATH", new_enough_ruby.dirname
   end
 
   def message
@@ -35,7 +35,11 @@ class RubyRequirement < Requirement
   private
 
   def new_enough_ruby
-    rubies.detect { |ruby| new_enough?(ruby) }
+    rubies.detect do |ruby|
+      next unless new_enough?(ruby)
+      rubyhdrdir = Pathname.new Utils.popen_read(ruby, "-rrbconfig", "-e", "print RbConfig::CONFIG['rubyhdrdir']")
+      next unless (rubyhdrdir/"ruby.h").readable?
+    end
   end
 
   def rubies
@@ -44,6 +48,7 @@ class RubyRequirement < Requirement
     if ruby_formula && ruby_formula.installed?
       rubies.unshift ruby_formula.bin/"ruby"
     end
+    rubies.push RUBY_PATH unless rubies.include? RUBY_PATH
     rubies.uniq
   end
 
