@@ -33,12 +33,24 @@ module Homebrew
     elsif date = ARGV.value("before")
       Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
     elsif ARGV.include?("--to-tag")
-      Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1].chomp
+      previous_tag =
+        Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1]
+      unless previous_tag
+        safe_system "git", "fetch", "--tags"
+        previous_tag =
+          Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1]
+      end
+      previous_tag.to_s.chomp
     else
       Utils.popen_read("git", "rev-parse", "origin/master").chomp
     end
+    odie "Could not find start commit!" if start_commit.empty?
+
     start_commit = Utils.popen_read("git", "rev-parse", start_commit).chomp
+    odie "Could not find start commit!" if start_commit.empty?
+
     end_commit = Utils.popen_read("git", "rev-parse", "HEAD").chomp
+    odie "Could not find end commit!" if end_commit.empty?
 
     puts "Start commit: #{start_commit}"
     puts "End   commit: #{end_commit}"
