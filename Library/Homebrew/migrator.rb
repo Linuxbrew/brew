@@ -217,7 +217,7 @@ class Migrator
       end
     end
 
-    puts "Moving to: #{new_cellar}"
+    oh1 "Moving #{Formatter.identifier(oldname)} children"
     if new_cellar.exist?
       FileUtils.mv(old_cellar.children, new_cellar)
     else
