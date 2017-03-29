@@ -83,7 +83,26 @@ class Migrator
   # path to newname keg that will be linked if old_linked_keg isn't nil
   attr_reader :new_linked_keg_record
 
-  def initialize(formula)
+  def self.needs_migration?(formula)
+    oldname = formula.oldname
+    return false unless oldname
+    oldname_rack = HOMEBREW_CELLAR/oldname
+    return false if oldname_rack.symlink?
+    return false unless oldname_rack.directory?
+    true
+  end
+
+  def self.migrate_if_needed(formula)
+    return unless Migrator.needs_migration?(formula)
+    begin
+      migrator = Migrator.new(formula, force: true)
+      migrator.migrate
+    rescue Exception => e
+      onoe e
+    end
+  end
+
+  def initialize(formula, force: ARGV.force?)
     @oldname = formula.oldname
     @newname = formula.name
     raise MigratorNoOldnameError, formula unless oldname
@@ -95,7 +114,7 @@ class Migrator
     @old_tabs = old_cellar.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
     @old_tap = old_tabs.first.tap
 
-    if !ARGV.force? && !from_same_taps?
+    if !force && !from_same_taps?
       raise MigratorDifferentTapsError.new(formula, old_tap)
     end
 
