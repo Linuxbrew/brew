@@ -88,6 +88,7 @@ module Homebrew
     end
 
     formulae_to_install.each do |f|
+      Migrator.migrate_if_needed(f)
       upgrade_formula(f)
       next unless ARGV.include?("--cleanup")
       next unless f.installed?
