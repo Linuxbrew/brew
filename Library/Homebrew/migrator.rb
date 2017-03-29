@@ -173,46 +173,50 @@ class Migrator
   end
 
   def migrate
-    if old_cellar.exist? && new_cellar.exist?
+    oh1 "Migrating #{Formatter.identifier(oldname)} to #{Formatter.identifier(newname)}"
+    lock
+    unlink_oldname
+    unlink_newname if new_cellar.exist?
+    repin
+    move_to_new_directory
+    link_oldname_cellar
+    link_oldname_opt
+    link_newname unless old_linked_keg.nil?
+    update_tabs
+  rescue Interrupt
+    ignore_interrupts { backup_oldname }
+  rescue Exception => e
+    onoe "Error occurred while migrating."
+    puts e
+    puts e.backtrace if ARGV.debug?
+    puts "Backing up..."
+    ignore_interrupts { backup_oldname }
+  ensure
+    unlock
+  end
+
+  # move everything from Cellar/oldname to Cellar/newname
+  def move_to_new_directory
+    return unless old_cellar.exist?
+
+    if new_cellar.exist?
       conflicted = false
       old_cellar.each_child do |c|
-        if (new_cellar/c.basename).exist?
+        next unless (new_cellar/c.basename).exist?
+        begin
+          FileUtils.rm_rf c
+        rescue Errno::EACCES
           conflicted = true
           onoe "#{new_cellar/c.basename} already exists."
         end
       end
+
       if conflicted
         onoe "Remove #{new_cellar} manually and run brew migrate #{oldname}."
         return
       end
     end
 
-    begin
-      oh1 "Migrating #{Formatter.identifier(oldname)} to #{Formatter.identifier(newname)}"
-      lock
-      unlink_oldname
-      unlink_newname if new_cellar.exist?
-      move_to_new_directory
-      repin
-      link_oldname_cellar
-      link_oldname_opt
-      link_newname unless old_linked_keg.nil?
-      update_tabs
-    rescue Interrupt
-      ignore_interrupts { backup_oldname }
-    rescue Exception => e
-      onoe "Error occurred while migrating."
-      puts e
-      puts e.backtrace if ARGV.debug?
-      puts "Backuping..."
-      ignore_interrupts { backup_oldname }
-    ensure
-      unlock
-    end
-  end
-
-  # move everything from Cellar/oldname to Cellar/newname
-  def move_to_new_directory
     puts "Moving to: #{new_cellar}"
     if new_cellar.exist?
       FileUtils.mv(old_cellar.children, new_cellar)
