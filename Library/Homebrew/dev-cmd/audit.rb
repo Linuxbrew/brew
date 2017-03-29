@@ -1185,6 +1185,10 @@ class FormulaAuditor
       problem "'fails_with :llvm' is now a no-op so should be removed"
     end
 
+    if line =~ /system\s+['"](otool)|(install_name_tool)|(lipo)/
+      problem "Use ruby-macho instead of calling #{$1}"
+    end
+
     if formula.tap.to_s == "homebrew/core"
       ["OS.mac?", "OS.linux?"].each do |check|
         next unless line.include?(check)
