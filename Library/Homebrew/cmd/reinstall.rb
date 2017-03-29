@@ -15,6 +15,7 @@ module Homebrew
         onoe "#{f.full_name} is pinned. You must unpin it to reinstall."
         next
       end
+      Migrator.migrate_if_needed(f)
       reinstall_formula(f)
     end
   end
