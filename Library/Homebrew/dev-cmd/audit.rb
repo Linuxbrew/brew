@@ -1185,7 +1185,7 @@ class FormulaAuditor
       problem "'fails_with :llvm' is now a no-op so should be removed"
     end
 
-    if line =~ /system\s+['"](otool)|(install_name_tool)|(lipo)/
+    if line =~ /system\s+['"](otool|install_name_tool|lipo)/ && formula.name != "cctools"
       problem "Use ruby-macho instead of calling #{$1}"
     end
 
