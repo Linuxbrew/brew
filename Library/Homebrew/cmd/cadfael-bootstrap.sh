@@ -221,6 +221,7 @@ doCheckRedHat-6 () {
                  "git.x86_64" \
                  "openssl-devel" \
                  "ruby-irb.x86_64" \
+                 "redhat-lsb-core" \
                  "HEP_OSlibs_SL6")
 
   for pkg in "${rpmList[@]}"  ; do
