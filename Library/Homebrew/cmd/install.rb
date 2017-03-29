@@ -199,7 +199,10 @@ module Homebrew
 
       perform_preinstall_checks
 
-      formulae.each { |f| install_formula(f) }
+      formulae.each do |f|
+        Migrator.migrate_if_needed(f)
+        install_formula(f)
+      end
     rescue FormulaClassUnavailableError => e
       # Need to rescue before `FormulaUnavailableError` (superclass of this)
       # is handled, as searching for a formula doesn't make sense here (the
