@@ -36,7 +36,7 @@ module Homebrew
       previous_tag =
         Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1]
       unless previous_tag
-        safe_system "git", "fetch", "--tags"
+        safe_system "git", "fetch", "--tags", "--depth=1"
         previous_tag =
           Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1]
       end
