@@ -363,14 +363,6 @@ class BuildError < RuntimeError
       end
     end
 
-    if formula.tap && formula.tap.name == "homebrew/boneyard"
-      onoe <<-EOS.undent
-        #{formula} was moved to homebrew-boneyard because it has unfixable issues.
-        Please do not file any issues about this. Sorry!
-      EOS
-      return
-    end
-
     if formula.tap && defined?(OS::ISSUES_URL)
       if formula.tap.official?
         puts Formatter.error(Formatter.url(OS::ISSUES_URL), label: "READ THIS")

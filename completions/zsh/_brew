@@ -205,14 +205,6 @@ _brew_audit() {
     '*:formula:__brew_formulae'
 }
 
-# brew boneyard-formula-pr [--dry-run] [--local]  formula-name
-_brew_boneyard_formula_pr() {
-  _arguments \
-    '--dry-run[print what would be done rather than doing it]' \
-    '--local[perform only local operations(i.e. don''t push or create PR)]' \
-    ':formula:__brew_formulae'
-}
-
 # brew bottle [--verbose] [--no-rebuild] [--keep-old] [--skip-relocation] [--root-url=root_url]
 # brew bottle --merge [--no-commit] [--keep-old] [--write]
 # TODO missing argument docs
