@@ -361,19 +361,23 @@ doCheckSUSELINUX-11 () {
 #-----------------------------------------------------------------------
 # Ubuntu Checks
 #-----------------------------------------------------------------------
-# - Ubuntu 16.04 (Xenial)
+# - Ubuntu 16.04 (Xenial LTS)
 doCheckUbuntu-16.04 () {
   _echo_info "Checking system software for Ubuntu 16.04"
 
-  local debList=("build-essential" \
+  local debList=("lsb-release" \
+                 "iputils-ping" \
+                 "build-essential" \
                  "curl" \
+                 "file" \
                  "git" \
+                 "python-setuptools" \
+                 "ruby" \
                  "m4" \
                  "libbz2-dev" \
                  "libcurl4-openssl-dev" \
-                 "libexpat-dev" \
-                 "libncurses-dev" \
-                 "ruby" \
+                 "libexpat1-dev" \
+                 "libncurses5-dev" \
                  "texinfo" \
                  "zlib1g-dev" \
                  "libx11-dev" \
@@ -381,7 +385,12 @@ doCheckUbuntu-16.04 () {
                  "libxft-dev" \
                  "libxext-dev" \
                  "libpng12-dev" \
-                 "libjpeg-dev")
+                 "libjpeg-dev" \
+                 "libegl1-mesa-dev" \
+                 "libgl1-mesa-dev" \
+                 "libglu1-mesa-dev" \
+                 "libgles2-mesa-dev"
+                 )
 
   for pkg in "${debList[@]}"  ; do
     if ! checkDeb $pkg ; then
