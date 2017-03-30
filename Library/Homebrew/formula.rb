@@ -1557,6 +1557,8 @@ class Formula
       hide.include?(d.name) || d.installed_prefixes.empty?
     end
     missing_dependencies
+  rescue FormulaUnavailableError
+    []
   end
 
   # @private
