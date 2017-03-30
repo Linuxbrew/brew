@@ -71,7 +71,7 @@ _echo_error()
 readonly _kRHELIDREGEX='(RedHatEnterprise[[:alpha:]]*|CentOS|Scientific[[:alpha:]]*)'
 
 declare -a kSUPPORTEDSYSTEMS
-readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(9|10|11)" \
+readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(10|11|12)" \
                             "${_kRHELIDREGEX}-[6-7]\.[0-9][0-9]?" \
                             "SUSELINUX-11" \
                             "Ubuntu-14\.04" \
@@ -460,8 +460,8 @@ doCheckUbuntu-14.04 () {
 #-----------------------------------------------------------------------
 # DARWIN CHECKS
 #-----------------------------------------------------------------------
-# - OS X 10.11/El Capitan
-doCheckMacOSX-10.11 () {
+# - OS X 10.12/Sierra
+doCheckMacOSX-10.12 () {
   developerDir=$(/usr/bin/xcode-select -print-path 2>/dev/null)
   if [ -z "$developerDir" ] || [ ! -f "$developerDir/usr/bin/git" ] ; then
     _echo_info "Installing the Command Line Tools (expect a GUI popup):"
@@ -470,15 +470,15 @@ doCheckMacOSX-10.11 () {
   return 0
 }
 
-# - OS X 10.10/Yosemite
-doCheckMacOSX-10.10 () {
-  doCheckMacOSX-10.11
+# - OS X 10.11/El Capitan
+doCheckMacOSX-10.11 () {
+  doCheckMacOSX-10.12
   return $?
 }
 
-# - OS X 10.9/Mavericks
-doCheckMacOSX-10.9 () {
-  doCheckMacOSX-10.10
+# - OS X 10.10/Yosemite
+doCheckMacOSX-10.10 () {
+  doCheckMacOSX-10.11
   return $?
 }
 
