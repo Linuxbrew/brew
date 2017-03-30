@@ -122,6 +122,13 @@ class Migrator
   end
 
   def from_same_taps?
+    new_tap = if old_tap
+      if migrate_tap = old_tap.tap_migrations[formula.oldname]
+        new_tap_user, new_tap_repo, = migrate_tap.split("/")
+        "#{new_tap_user}/#{new_tap_repo}"
+      end
+    end
+
     if formula.tap == old_tap
       true
     # Homebrew didn't use to update tabs while performing tap-migrations,
@@ -129,7 +136,7 @@ class Migrator
     # so we check if there is an entry about oldname migrated to tap and if
     # newname's tap is the same as tap to which oldname migrated, then we
     # can perform migrations and the taps for oldname and newname are the same.
-    elsif formula.tap && old_tap && formula.tap == old_tap.tap_migrations[formula.oldname]
+    elsif formula.tap && old_tap && formula.tap == new_tap
       fix_tabs
       true
     else
