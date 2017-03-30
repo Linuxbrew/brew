@@ -159,6 +159,13 @@ describe FormulaInstaller do
       it { is_expected.to be false }
     end
 
+    context "it returns false when requirement is satisfied but default formula is installed" do
+      let(:satisfied?) { true }
+      let(:satisfied_by_formula?) { false }
+      let(:installed?) { true }
+      it { is_expected.to be false }
+    end
+
     context "it returns true when requirement isn't satisfied" do
       let(:satisfied?) { false }
       let(:satisfied_by_formula?) { false }
