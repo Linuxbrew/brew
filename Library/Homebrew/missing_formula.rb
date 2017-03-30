@@ -105,10 +105,14 @@ module Homebrew
         message = nil
 
         Tap.each do |old_tap|
-          new_tap_name = old_tap.tap_migrations[name]
-          next unless new_tap_name
+          new_tap = old_tap.tap_migrations[name]
+          next unless new_tap
+
+          new_tap_user, new_tap_repo, = new_tap.split("/")
+          new_tap_name = "#{new_tap_user}/#{new_tap_repo}"
+
           message = <<-EOS.undent
-            It was migrated from #{old_tap} to #{new_tap_name}.
+            It was migrated from #{old_tap} to #{new_tap}.
             You can access it again by running:
               brew tap #{new_tap_name}
           EOS
