@@ -71,7 +71,7 @@ _echo_error()
 readonly _kRHELIDREGEX='(RedHatEnterprise[[:alpha:]]*|CentOS|Scientific[[:alpha:]]*)'
 
 declare -a kSUPPORTEDSYSTEMS
-readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(9|10|11)" \
+readonly kSUPPORTEDSYSTEMS=("MacOSX-10\.(10|11|12)" \
                             "${_kRHELIDREGEX}-[6-7]\.[0-9][0-9]?" \
                             "SUSELINUX-11" \
                             "Ubuntu-14\.04" \
@@ -213,72 +213,6 @@ checkDeb () {
 
 #-----------------------------------------------------------------------
 # General Checks for RHEL based systems
-# - RHEL 5.X
-doCheckRedHat-5 () {
-  _echo_info "Checking system software for RedHat5 ($kOSDISTRO)"
-  local rpmList=("expat-devel" \
-                 "gcc44" \
-                 "gcc44-c++" \
-                 "gcc44-gfortran" \
-                 "git" \
-                 "glibc-devel" \
-                 "HEP_OSlibs_SL5" \
-                 "ruby-irb" \
-                 "redhat-lsb" \
-                 "mesa-libGL-devel" \
-                 "mesa-libGLU-devel" \
-                 "ncurses-devel" \
-                 "libX11-devel" \
-                 "libXau-devel" \
-                 "libXdamage-devel" \
-                 "libXdmcp-devel" \
-                 "libXext-devel" \
-                 "libXfixes-devel" \
-                 "libXft-devel" \
-                 "libXpm-devel")
-  for pkg in "${rpmList[@]}"  ; do
-    if ! checkRPM $pkg ; then
-      local missingPkgs="$pkg ${missingPkgs}"
-    fi
-  done
-
-  # Yum groups
-  local devGroup="Development tools"
-  local devGroupSansSpace=$(echo $devGroup | tr -d '[:space:]')
-
-
-  if yum grouplist "$devGroup" 2>/dev/null | tr -d '[:space:]' | grep -i "InstalledGroups:$devGroupSansSpace" > /dev/null ; then
-    _echo_info "Checking for install of Yum Group '$devGroup': Installed"
-  else
-    _echo_error "Yum Group '$devGroup' is not installed"
-    local missingGroups="'$devGroup'"
-  fi
-
-  local returnVal=0
-
-  if [ -n "$missingPkgs" ] ; then
-    _echo_error "RPMs '$missingPkgs' are not installed on this system"
-    _echo_error "Please run (or get your sysadmin to run):
-
-  $kPACKAGEMANAGER install $missingPkgs
-
-  "
-    returnVal=1
-  fi
-
-  if [ -n "$missingGroups" ] ; then
-    _echo_error "Yum Groups '$missingGroups' are not installed on this system"
-    _echo_error "Please run (or get your sysadmin to run):
-
-  yum groupinstall $missingGroups
-
-  "
-    returnVal=1
-  fi
-
-  return $returnVal
-}
-
 # - RHEL 6.X
 doCheckRedHat-6 () {
   _echo_info "Checking system software for RedHat6 ($kOSDISTRO)"
@@ -287,6 +221,7 @@ doCheckRedHat-6 () {
                  "git.x86_64" \
                  "openssl-devel" \
                  "ruby-irb.x86_64" \
+                 "redhat-lsb-core" \
                  "HEP_OSlibs_SL6")
 
   for pkg in "${rpmList[@]}"  ; do
@@ -426,19 +361,23 @@ doCheckSUSELINUX-11 () {
 #-----------------------------------------------------------------------
 # Ubuntu Checks
 #-----------------------------------------------------------------------
-# - Ubuntu 16.04 (Xenial)
+# - Ubuntu 16.04 (Xenial LTS)
 doCheckUbuntu-16.04 () {
   _echo_info "Checking system software for Ubuntu 16.04"
 
-  local debList=("build-essential" \
+  local debList=("lsb-release" \
+                 "iputils-ping" \
+                 "build-essential" \
                  "curl" \
+                 "file" \
                  "git" \
+                 "python-setuptools" \
+                 "ruby" \
                  "m4" \
                  "libbz2-dev" \
                  "libcurl4-openssl-dev" \
-                 "libexpat-dev" \
-                 "libncurses-dev" \
-                 "ruby" \
+                 "libexpat1-dev" \
+                 "libncurses5-dev" \
                  "texinfo" \
                  "zlib1g-dev" \
                  "libx11-dev" \
@@ -446,7 +385,12 @@ doCheckUbuntu-16.04 () {
                  "libxft-dev" \
                  "libxext-dev" \
                  "libpng12-dev" \
-                 "libjpeg-dev")
+                 "libjpeg-dev" \
+                 "libegl1-mesa-dev" \
+                 "libgl1-mesa-dev" \
+                 "libglu1-mesa-dev" \
+                 "libgles2-mesa-dev"
+                 )
 
   for pkg in "${debList[@]}"  ; do
     if ! checkDeb $pkg ; then
@@ -472,13 +416,15 @@ doCheckUbuntu-14.04 () {
 
   local debList=("build-essential" \
                  "curl" \
+                 "file" \
                  "git" \
+                 "python-setuptools" \
+                 "ruby2.0" \
                  "m4" \
                  "libbz2-dev" \
                  "libcurl4-openssl-dev" \
-                 "libexpat-dev" \
-                 "libncurses-dev" \
-                 "ruby2.0" \
+                 "libexpat1-dev" \
+                 "libncurses5-dev" \
                  "texinfo" \
                  "zlib1g-dev" \
                  "libx11-dev" \
@@ -486,7 +432,12 @@ doCheckUbuntu-14.04 () {
                  "libxft-dev" \
                  "libxext-dev" \
                  "libpng12-dev" \
-                 "libjpeg-dev")
+                 "libjpeg-dev" \
+                 "libegl1-mesa-dev" \
+                 "libgl1-mesa-dev" \
+                 "libglu1-mesa-dev" \
+                 "libgles2-mesa-dev"
+                 )
 
   for pkg in "${debList[@]}"  ; do
     if ! checkDeb $pkg ; then
@@ -509,8 +460,8 @@ doCheckUbuntu-14.04 () {
 #-----------------------------------------------------------------------
 # DARWIN CHECKS
 #-----------------------------------------------------------------------
-# - OS X 10.11/El Capitan
-doCheckMacOSX-10.11 () {
+# - OS X 10.12/Sierra
+doCheckMacOSX-10.12 () {
   developerDir=$(/usr/bin/xcode-select -print-path 2>/dev/null)
   if [ -z "$developerDir" ] || [ ! -f "$developerDir/usr/bin/git" ] ; then
     _echo_info "Installing the Command Line Tools (expect a GUI popup):"
@@ -519,15 +470,15 @@ doCheckMacOSX-10.11 () {
   return 0
 }
 
-# - OS X 10.10/Yosemite
-doCheckMacOSX-10.10 () {
-  doCheckMacOSX-10.11
+# - OS X 10.11/El Capitan
+doCheckMacOSX-10.11 () {
+  doCheckMacOSX-10.12
   return $?
 }
 
-# - OS X 10.9/Mavericks
-doCheckMacOSX-10.9 () {
-  doCheckMacOSX-10.10
+# - OS X 10.10/Yosemite
+doCheckMacOSX-10.10 () {
+  doCheckMacOSX-10.11
   return $?
 }
 
