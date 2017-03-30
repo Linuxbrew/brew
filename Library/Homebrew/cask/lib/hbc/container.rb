@@ -4,6 +4,7 @@ require "hbc/container/bzip2"
 require "hbc/container/cab"
 require "hbc/container/criteria"
 require "hbc/container/dmg"
+require "hbc/container/executable"
 require "hbc/container/generic_unar"
 require "hbc/container/gzip"
 require "hbc/container/lzma"
@@ -39,6 +40,7 @@ module Hbc
         Gzip,  # pure gzip
         Lzma,  # pure lzma
         Xz,    # pure xz
+        Executable,
       ]
       # for explicit use only (never autodetected):
       # Hbc::Container::Naked
