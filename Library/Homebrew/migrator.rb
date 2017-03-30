@@ -164,7 +164,10 @@ class Migrator
   end
 
   def linked_old_linked_keg
-    kegs = old_cellar.subdirs.map { |d| Keg.new(d) }
+    keg_dirs = []
+    keg_dirs += new_cellar.subdirs if new_cellar.exist?
+    keg_dirs += old_cellar.subdirs
+    kegs = keg_dirs.map { |d| Keg.new(d) }
     kegs.detect(&:linked?) || kegs.detect(&:optlinked?)
   end
 
