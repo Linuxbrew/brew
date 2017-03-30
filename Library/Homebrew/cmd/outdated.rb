@@ -64,7 +64,9 @@ module Homebrew
           "#{full_name} (#{kegs.map(&:version).join(", ")})"
         end.join(", ")
 
-        puts "#{outdated_versions} < #{current_version}"
+        pinned_version = " [pinned at #{f.pinned_version}]" if f.pinned?
+
+        puts "#{outdated_versions} < #{current_version}#{pinned_version}"
       else
         puts f.full_installed_specified_name
       end
@@ -86,7 +88,9 @@ module Homebrew
 
       json << { name: f.full_name,
                 installed_versions: outdated_versions.collect(&:to_s),
-                current_version: current_version }
+                current_version: current_version,
+                pinned: f.pinned?,
+                pinned_version: f.pinned_version }
     end
     puts JSON.generate(json)
 
