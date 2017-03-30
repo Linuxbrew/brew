@@ -252,12 +252,14 @@ class Formula
 
   public
 
-  # The alias path that was used to install this formula, if present.
+  # The alias path that was used to install this formula, if it exists.
   # Can differ from alias_path, which is the alias used to find the formula,
   # and is specified to this instance.
   def installed_alias_path
     path = build.source["path"] if build.is_a?(Tab)
-    path if path =~ %r{#{HOMEBREW_TAP_DIR_REGEX}/Aliases}
+    return unless path =~ %r{#{HOMEBREW_TAP_DIR_REGEX}/Aliases}
+    return unless File.symlink?(path)
+    path
   end
 
   def installed_alias_name
