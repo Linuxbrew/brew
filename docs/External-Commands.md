@@ -47,15 +47,15 @@ brew tap youtux/livecheck
 ```
 
 ### brew-gem
-Install any gem package into a self-contained Homebrew cellar location: [https://github.com/sportngin/brew-gem](https://github.com/sportngin/brew-gem).
+Install any gem package into a self-contained Homebrew cellar location: <https://github.com/sportngin/brew-gem>
 
 Note this can also be installed with `brew install brew-gem`.
 
 ### brew-growl
-Get Growl notifications for Homebrew https://github.com/secondplanet/brew-growl
+Get Growl notifications for Homebrew: <https://github.com/secondplanet/homebrew-growl>
 
 ### brew-services
-Simple support to start formulae using launchctl, has out of the box support for any formula which defines `startup_plist` (e.g. mysql, postgres, redis u.v.m.): [https://github.com/Homebrew/homebrew-services](https://github.com/Homebrew/homebrew-services)
+Simple support to start formulae using launchctl, has out of the box support for any formula which defines `startup_plist` (e.g. mysql, postgres, redis u.v.m.): <https://github.com/Homebrew/homebrew-services>
 
 Install using:
 ```sh

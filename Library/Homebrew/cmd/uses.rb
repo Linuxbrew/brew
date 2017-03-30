@@ -12,8 +12,8 @@
 #:    `--include-build`. Similarly, pass `--include-optional` to include `:optional`
 #:    dependencies. To skip `:recommended` type dependencies, pass `--skip-recommended`.
 #:
-#:    By default, `uses` shows usages of `formula` by stable builds. To find
-#:    cases where `formula` is used by development or HEAD build, pass
+#:    By default, `uses` shows usages of <formulae> by stable builds. To find
+#:    cases where <formulae> is used by development or HEAD build, pass
 #:    `--devel` or `--HEAD`.
 
 require "formula"

@@ -81,13 +81,12 @@ including how to set this across reboots. If you’re pre-Mountain Lion,
 alternative](https://developer.apple.com/legacy/library/qa/qa1067/_index.html).
 
 ## How do I contribute to Homebrew?
-Read [CONTRIBUTING.md](/CONTRIBUTING.md).
+Read [CONTRIBUTING.md](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md).
 
 ## Why do you compile everything?
 Homebrew provides pre-compiled versions for many formulae. These
 pre-compiled versions are referred to as **bottles** and are available
-at:
-[https://bintray.com/homebrew/bottles](https://bintray.com/homebrew/bottles).
+at <https://bintray.com/homebrew/bottles>.
 
 If available, bottled binaries will be used by default except under the
 following conditions:

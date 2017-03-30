@@ -1,2 +1,5 @@
-theme: jekyll-theme-cayman
 exclude: [bin, vendor, CNAME, Gemfile, Gemfile.lock]
+
+gems:
+  - jekyll-feed
+  - jekyll-seo-tag

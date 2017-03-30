@@ -76,6 +76,17 @@ class CompilerFailure
       create(gcc: "4.5"),
       create(gcc: "4.6"),
     ],
+    cxx14: [
+      create(:clang) { build 600 },
+      create(:gcc_4_0),
+      create(:gcc_4_2),
+      create(gcc: "4.3"),
+      create(gcc: "4.4"),
+      create(gcc: "4.5"),
+      create(gcc: "4.6"),
+      create(gcc: "4.7"),
+      create(gcc: "4.8"),
+    ],
     openmp: [
       create(:clang),
     ],
@@ -91,7 +102,7 @@ class CompilerSelector
     clang: [:clang, :gcc_4_2, :gnu, :gcc_4_0, :llvm_clang],
     gcc_4_2: [:gcc_4_2, :gnu, :clang, :gcc_4_0],
     gcc_4_0: [:gcc_4_0, :gcc_4_2, :gnu, :clang],
-    c_compiler: [:gnu, :clang, :c_compiler, :gcc_4_2, :gcc_4_0, :llvm_clang],
+    c_compiler: [:gnu, :clang, :gcc_4_2, :gcc_4_0, :llvm_clang],
   }.freeze
 
   def self.select_for(formula, compilers = self.compilers)

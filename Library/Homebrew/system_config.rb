@@ -7,19 +7,35 @@ require "development_tools"
 class SystemConfig
   class << self
     def gcc_4_2
-      @gcc_4_2 ||= DevelopmentTools.gcc_4_2_build_version if DevelopmentTools.installed?
+      @gcc_4_2 ||= if DevelopmentTools.installed?
+        DevelopmentTools.gcc_4_2_build_version
+      else
+        Version::NULL
+      end
     end
 
     def gcc_4_0
-      @gcc_4_0 ||= DevelopmentTools.gcc_4_0_build_version if DevelopmentTools.installed?
+      @gcc_4_0 ||= if DevelopmentTools.installed?
+        DevelopmentTools.gcc_4_0_build_version
+      else
+        Version::NULL
+      end
     end
 
     def clang
-      @clang ||= DevelopmentTools.clang_version if DevelopmentTools.installed?
+      @clang ||= if DevelopmentTools.installed?
+        DevelopmentTools.clang_version
+      else
+        Version::NULL
+      end
     end
 
     def clang_build
-      @clang_build ||= DevelopmentTools.clang_build_version if DevelopmentTools.installed?
+      @clang_build ||= if DevelopmentTools.installed?
+        DevelopmentTools.clang_build_version
+      else
+        Version::NULL
+      end
     end
 
     def head

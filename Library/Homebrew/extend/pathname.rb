@@ -349,7 +349,7 @@ class Pathname
   alias to_str to_s unless method_defined?(:to_str)
 
   def cd
-    Dir.chdir(self) { yield }
+    Dir.chdir(self) { yield self }
   end
 
   def subdirs
@@ -469,6 +469,10 @@ class Pathname
       filename.chmod 0644
       install(filename)
     end
+  end
+
+  def ds_store?
+    basename.to_s == ".DS_Store"
   end
 
   # https://bugs.ruby-lang.org/issues/9915

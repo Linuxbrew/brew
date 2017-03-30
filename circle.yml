@@ -1,8 +1,11 @@
 machine:
   environment:
     HOMEBREW_DEVELOPER: 1
+    HOMEBREW_NO_AUTO_UPDATE: 1
+    HOMEBREW_NO_ANALYTICS: 1
 checkout:
   post:
+    - if [ -e .git/shallow ]; then echo git fetch --unshallow; fi
     - git config user.name LinuxbrewTestBot
     - git config user.email testbot@linuxbrew.sh
 test:

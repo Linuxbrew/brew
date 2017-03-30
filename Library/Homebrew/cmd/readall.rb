@@ -4,7 +4,7 @@
 #:
 #:    This can be useful for debugging issues across all formulae
 #:    when making significant changes to `formula.rb`,
-#:    or to determine if any current formulae have Ruby issues
+#:    or to determine if any current formulae have Ruby issues.
 
 require "readall"
 

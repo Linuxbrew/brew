@@ -15,6 +15,8 @@ module Hbc
         @default_caskroom ||= HOMEBREW_PREFIX.join("Caskroom")
       end
 
+      attr_writer :caskroom
+
       def caskroom
         @caskroom ||= begin
           if Utils.path_occupied?(legacy_caskroom)
@@ -36,13 +38,11 @@ module Hbc
         end
       end
 
-      def caskroom=(caskroom)
-        @caskroom = caskroom
-      end
-
       def legacy_cache
         @legacy_cache ||= HOMEBREW_CACHE.join("Casks")
       end
+
+      attr_writer :cache
 
       def cache
         @cache ||= HOMEBREW_CACHE.join("Cask")

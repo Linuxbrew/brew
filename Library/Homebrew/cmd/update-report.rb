@@ -104,8 +104,8 @@ module Homebrew
       puts if ARGV.include?("--preinstall")
     end
 
-    link_completions_and_docs
-    Tap.each(&:link_manpages)
+    link_completions_manpages_and_docs
+    Tap.each(&:link_completions_and_manpages)
 
     Homebrew.failed = true if ENV["HOMEBREW_UPDATE_FAILED"]
 
@@ -281,7 +281,7 @@ module Homebrew
       EOS
     end
 
-    link_completions_and_docs(new_homebrew_repository)
+    link_completions_manpages_and_docs(new_homebrew_repository)
 
     ohai "Migrated HOMEBREW_REPOSITORY to #{new_homebrew_repository}!"
     puts <<-EOS.undent
@@ -302,16 +302,11 @@ module Homebrew
     $stderr.puts e.backtrace
   end
 
-  def link_completions_and_docs(repository = HOMEBREW_REPOSITORY)
+  def link_completions_manpages_and_docs(repository = HOMEBREW_REPOSITORY)
     command = "brew update"
-    link_src_dst_dirs(repository/"completions/bash",
-                      HOMEBREW_PREFIX/"etc/bash_completion.d", command)
-    link_src_dst_dirs(repository/"docs",
-                      HOMEBREW_PREFIX/"share/doc/homebrew", command, link_dir: true)
-    link_src_dst_dirs(repository/"completions/zsh",
-                      HOMEBREW_PREFIX/"share/zsh/site-functions", command)
-    link_src_dst_dirs(repository/"manpages",
-                      HOMEBREW_PREFIX/"share/man/man1", command)
+    Utils::Link.link_completions(repository, command)
+    Utils::Link.link_manpages(repository, command)
+    Utils::Link.link_docs(repository, command)
   rescue => e
     ofail <<-EOS.undent
       Failed to link all completions, docs and manpages:
@@ -475,12 +470,18 @@ class Reporter
       if new_tap_name == "caskroom/cask"
         if new_tap.installed? && (HOMEBREW_PREFIX/"Caskroom").directory?
           ohai "#{name} has been moved to Homebrew-Cask."
-          ohai "brew uninstall --force #{name}"
-          system HOMEBREW_BREW_FILE, "uninstall", "--force", name
+          ohai "brew unlink #{name}"
+          system HOMEBREW_BREW_FILE, "unlink", name
           ohai "brew prune"
           system HOMEBREW_BREW_FILE, "prune"
           ohai "brew cask install #{new_name}"
           system HOMEBREW_BREW_FILE, "cask", "install", new_name
+          ohai <<-EOS.undent
+            #{name} has been moved to Homebrew-Cask.
+            The existing keg has been unlinked.
+            Please uninstall the formula when convenient by running:
+              brew uninstall --force #{name}
+          EOS
         else
           ohai "#{name} has been moved to Homebrew-Cask.", <<-EOS.undent
             To uninstall the formula and install the cask run:

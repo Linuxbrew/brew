@@ -1,12 +1,8 @@
 require "blacklist"
 
-RSpec::Matchers.define :be_blacklisted do
-  match do |actual|
-    blacklisted?(actual)
-  end
-end
-
 describe "Blacklist" do
+  matcher(:be_blacklisted) { match(&method(:blacklisted?)) }
+
   context "rubygems" do
     %w[gem rubygem rubygems].each do |s|
       subject { s }
@@ -103,9 +99,17 @@ describe "Blacklist" do
     it { is_expected.to be_blacklisted }
   end
 
-  context "haskell_platform" do
+  context "haskell-platform" do
     subject { "haskell-platform" }
 
     it { is_expected.to be_blacklisted }
+  end
+
+  context "xcode", :needs_macos do
+    %w[xcode Xcode].each do |s|
+      subject { s }
+
+      it { is_expected.to be_blacklisted }
+    end
   end
 end

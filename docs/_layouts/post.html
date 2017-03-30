@@ -1,0 +1,11 @@
+---
+layout: base
+---
+<div id="post">
+  <h2>{{ page.title }}</h2>
+  <h3>{{ page.date | date_to_long_string }}</h3>
+  <h3 class="author"><a href="https://github.com/{{ page.author }}"><img class="avatar" src="https://avatars2.githubusercontent.com/{{ page.author }}?v=3&amp;s=80" alt="{{ page.author }}" width="40" height="40">{{ page.author }}</a></h3>
+  <div class="postcontent singlepostcontent">
+    {{ content }}
+  </div>
+</div>
