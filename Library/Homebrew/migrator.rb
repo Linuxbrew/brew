@@ -77,6 +77,9 @@ class Migrator
   # path to newname cellar according to new name
   attr_reader :new_cellar
 
+  # true if new cellar existed at initialization time
+  attr_reader :new_cellar_existed
+
   # path to newname pin
   attr_reader :new_pin_record
 
@@ -119,6 +122,7 @@ class Migrator
     end
 
     @new_cellar = HOMEBREW_CELLAR/formula.name
+    @new_cellar_existed = @new_cellar.exist?
 
     if @old_linked_keg = linked_old_linked_keg
       @old_linked_keg_record = old_linked_keg.linked_keg_record if old_linked_keg.linked?
@@ -368,7 +372,7 @@ class Migrator
       new_cellar.subdirs.each do |d|
         newname_keg = Keg.new(d)
         newname_keg.unlink
-        newname_keg.uninstall
+        newname_keg.uninstall if new_cellar_existed
       end
     end
 
