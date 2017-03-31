@@ -19,10 +19,6 @@ class BuildEnvironment
     @settings.include? :std
   end
 
-  def super?
-    @settings.include? :super
-  end
-
   def userpaths?
     @settings.include? :userpaths
   end
