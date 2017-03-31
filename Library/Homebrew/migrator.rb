@@ -95,7 +95,7 @@ class Migrator
   def self.migrate_if_needed(formula)
     return unless Migrator.needs_migration?(formula)
     begin
-      migrator = Migrator.new(formula, force: true)
+      migrator = Migrator.new(formula)
       migrator.migrate
     rescue Exception => e
       onoe e
@@ -114,7 +114,7 @@ class Migrator
     @old_tabs = old_cellar.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
     @old_tap = old_tabs.first.tap
 
-    if !force && !from_same_taps?
+    if !force && !from_same_tap_user?
       raise MigratorDifferentTapsError.new(formula, old_tap)
     end
 
@@ -140,15 +140,19 @@ class Migrator
     end
   end
 
-  def from_same_taps?
+  def from_same_tap_user?
+    formula_tap_user = formula.tap.user if formula.tap
+    old_tap_user = nil
+
     new_tap = if old_tap
+      old_tap_user, = old_tap.user
       if migrate_tap = old_tap.tap_migrations[formula.oldname]
-        new_tap_user, new_tap_repo, = migrate_tap.split("/")
+        new_tap_user, new_tap_repo = migrate_tap.split("/")
         "#{new_tap_user}/#{new_tap_repo}"
       end
     end
 
-    if formula.tap == old_tap
+    if formula_tap_user == old_tap_user
       true
     # Homebrew didn't use to update tabs while performing tap-migrations,
     # so there can be INSTALL_RECEIPT's containing wrong information about tap,
@@ -215,8 +219,7 @@ class Migrator
       end
 
       if conflicted
-        onoe "Remove #{new_cellar} manually and run brew migrate #{oldname}."
-        return
+        odie "Remove #{new_cellar} manually and run brew migrate #{oldname}."
       end
     end
 

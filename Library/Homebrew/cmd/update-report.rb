@@ -525,12 +525,7 @@ class Reporter
         next
       end
 
-      begin
-        migrator = Migrator.new(f, force: true)
-        migrator.migrate
-      rescue Exception => e
-        onoe e
-      end
+      Migrator.migrate_if_needed(f)
     end
   end
 
