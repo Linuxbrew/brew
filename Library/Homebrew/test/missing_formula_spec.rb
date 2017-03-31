@@ -88,14 +88,6 @@ describe Homebrew::MissingFormula do
       it { is_expected.to be_blacklisted }
     end
 
-    context "osmium" do
-      %w[osmium Osmium].each do |s|
-        subject { s }
-
-        it { is_expected.to be_blacklisted }
-      end
-    end
-
     context "gfortran" do
       subject { "gfortran" }
 
