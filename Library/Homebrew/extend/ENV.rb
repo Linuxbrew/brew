@@ -4,11 +4,7 @@ require "extend/ENV/std"
 require "extend/ENV/super"
 
 def superenv?
-  if OS.linux?
-    ARGV.env == "super" || (ENV["CI"] || ARGV.homebrew_developer?) && ARGV.env != "std"
-  else
-    ARGV.env != "std" && Superenv.bin
-  end
+  ARGV.env != "std" && Superenv.bin
 end
 
 module EnvActivation
