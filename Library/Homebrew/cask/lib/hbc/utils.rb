@@ -4,8 +4,7 @@ require "stringio"
 
 require "hbc/utils/file"
 
-PREBUG_URL = "https://github.com/caskroom/homebrew-cask/blob/master/doc/reporting_bugs/pre_bug_report.md".freeze
-ISSUES_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
+BUG_REPORTS_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
 # monkeypatch Object - not a great idea
 class Object
@@ -96,11 +95,7 @@ module Hbc
     def self.error_message_with_suggestions
       <<-EOS.undent
         Follow the instructions here:
-          #{Formatter.url(PREBUG_URL)}
-
-        If this doesn’t fix the problem, please report this bug:
-          #{Formatter.url(ISSUES_URL)}
-
+          #{Formatter.url(BUG_REPORTS_URL)}
       EOS
     end
 
