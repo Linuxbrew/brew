@@ -77,13 +77,35 @@ class Migrator
   # path to newname cellar according to new name
   attr_reader :new_cellar
 
+  # true if new cellar existed at initialization time
+  attr_reader :new_cellar_existed
+
   # path to newname pin
   attr_reader :new_pin_record
 
   # path to newname keg that will be linked if old_linked_keg isn't nil
   attr_reader :new_linked_keg_record
 
-  def initialize(formula)
+  def self.needs_migration?(formula)
+    oldname = formula.oldname
+    return false unless oldname
+    oldname_rack = HOMEBREW_CELLAR/oldname
+    return false if oldname_rack.symlink?
+    return false unless oldname_rack.directory?
+    true
+  end
+
+  def self.migrate_if_needed(formula)
+    return unless Migrator.needs_migration?(formula)
+    begin
+      migrator = Migrator.new(formula)
+      migrator.migrate
+    rescue Exception => e
+      onoe e
+    end
+  end
+
+  def initialize(formula, force: ARGV.force?)
     @oldname = formula.oldname
     @newname = formula.name
     raise MigratorNoOldnameError, formula unless oldname
@@ -95,11 +117,12 @@ class Migrator
     @old_tabs = old_cellar.subdirs.map { |d| Tab.for_keg(Keg.new(d)) }
     @old_tap = old_tabs.first.tap
 
-    if !ARGV.force? && !from_same_taps?
+    if !force && !from_same_tap_user?
       raise MigratorDifferentTapsError.new(formula, old_tap)
     end
 
     @new_cellar = HOMEBREW_CELLAR/formula.name
+    @new_cellar_existed = @new_cellar.exist?
 
     if @old_linked_keg = linked_old_linked_keg
       @old_linked_keg_record = old_linked_keg.linked_keg_record if old_linked_keg.linked?
@@ -121,15 +144,19 @@ class Migrator
     end
   end
 
-  def from_same_taps?
+  def from_same_tap_user?
+    formula_tap_user = formula.tap.user if formula.tap
+    old_tap_user = nil
+
     new_tap = if old_tap
+      old_tap_user, = old_tap.user
       if migrate_tap = old_tap.tap_migrations[formula.oldname]
-        new_tap_user, new_tap_repo, = migrate_tap.split("/")
+        new_tap_user, new_tap_repo = migrate_tap.split("/")
         "#{new_tap_user}/#{new_tap_repo}"
       end
     end
 
-    if formula.tap == old_tap
+    if formula_tap_user == old_tap_user
       true
     # Homebrew didn't use to update tabs while performing tap-migrations,
     # so there can be INSTALL_RECEIPT's containing wrong information about tap,
@@ -145,7 +172,10 @@ class Migrator
   end
 
   def linked_old_linked_keg
-    kegs = old_cellar.subdirs.map { |d| Keg.new(d) }
+    keg_dirs = []
+    keg_dirs += new_cellar.subdirs if new_cellar.exist?
+    keg_dirs += old_cellar.subdirs
+    kegs = keg_dirs.map { |d| Keg.new(d) }
     kegs.detect(&:linked?) || kegs.detect(&:optlinked?)
   end
 
@@ -154,47 +184,50 @@ class Migrator
   end
 
   def migrate
-    if old_cellar.exist? && new_cellar.exist?
-      conflicted = false
-      old_cellar.each_child do |c|
-        if (new_cellar/c.basename).exist?
-          conflicted = true
-          onoe "#{new_cellar/c.basename} already exists."
-        end
-      end
-      if conflicted
-        onoe "Remove #{new_cellar} manually and run brew migrate #{oldname}."
-        return
-      end
-    end
-
-    begin
-      oh1 "Migrating #{Formatter.identifier(oldname)} to #{Formatter.identifier(newname)}"
-      lock
-      unlink_oldname
-      unlink_newname if new_cellar.exist?
-      move_to_new_directory
-      repin
-      link_oldname_cellar
-      link_oldname_opt
-      link_newname unless old_linked_keg.nil?
-      update_tabs
-    rescue Interrupt
-      ignore_interrupts { backup_oldname }
-    rescue Exception => e
-      onoe "Error occurred while migrating."
-      puts e
-      puts e.backtrace if ARGV.debug?
-      puts "Backuping..."
-      ignore_interrupts { backup_oldname }
-    ensure
-      unlock
-    end
+    oh1 "Migrating #{Formatter.identifier(oldname)} to #{Formatter.identifier(newname)}"
+    lock
+    unlink_oldname
+    unlink_newname if new_cellar.exist?
+    repin
+    move_to_new_directory
+    link_oldname_cellar
+    link_oldname_opt
+    link_newname unless old_linked_keg.nil?
+    update_tabs
+  rescue Interrupt
+    ignore_interrupts { backup_oldname }
+  rescue Exception => e
+    onoe "Error occurred while migrating."
+    puts e
+    puts e.backtrace if ARGV.debug?
+    puts "Backing up..."
+    ignore_interrupts { backup_oldname }
+  ensure
+    unlock
   end
 
   # move everything from Cellar/oldname to Cellar/newname
   def move_to_new_directory
-    puts "Moving to: #{new_cellar}"
+    return unless old_cellar.exist?
+
+    if new_cellar.exist?
+      conflicted = false
+      old_cellar.each_child do |c|
+        next unless (new_cellar/c.basename).exist?
+        begin
+          FileUtils.rm_rf c
+        rescue Errno::EACCES
+          conflicted = true
+          onoe "#{new_cellar/c.basename} already exists."
+        end
+      end
+
+      if conflicted
+        odie "Remove #{new_cellar} manually and run brew migrate #{oldname}."
+      end
+    end
+
+    oh1 "Moving #{Formatter.identifier(oldname)} children"
     if new_cellar.exist?
       FileUtils.mv(old_cellar.children, new_cellar)
     else
@@ -339,7 +372,7 @@ class Migrator
       new_cellar.subdirs.each do |d|
         newname_keg = Keg.new(d)
         newname_keg.unlink
-        newname_keg.uninstall
+        newname_keg.uninstall if new_cellar_existed
       end
     end
 

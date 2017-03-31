@@ -502,12 +502,18 @@ class Reporter
   end
 
   def migrate_formula_rename
-    Formula.installed.map(&:oldname).compact.each do |old_name|
-      old_name_dir = HOMEBREW_CELLAR/old_name
-      next if old_name_dir.symlink?
-      next unless old_name_dir.directory? && !old_name_dir.subdirs.empty?
+    Formula.installed.each do |formula|
+      next unless Migrator.needs_migration?(formula)
 
-      new_name = tap.formula_renames[old_name]
+      oldname = formula.oldname
+      oldname_rack = HOMEBREW_CELLAR/oldname
+
+      if oldname_rack.subdirs.empty?
+        oldname_rack.rmdir_if_possible
+        next
+      end
+
+      new_name = tap.formula_renames[oldname]
       next unless new_name
 
       new_full_name = "#{tap}/#{new_name}"
@@ -519,13 +525,7 @@ class Reporter
         next
       end
 
-      begin
-        migrator = Migrator.new(f)
-        migrator.migrate
-      rescue Migrator::MigratorDifferentTapsError
-      rescue Exception => e
-        onoe e
-      end
+      Migrator.migrate_if_needed(f)
     end
   end
 
