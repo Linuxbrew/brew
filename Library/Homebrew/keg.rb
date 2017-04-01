@@ -240,8 +240,9 @@ class Keg
   def remove_opt_record
     opt_record.unlink
     aliases.each do |a|
-      next if !opt_record.symlink? && !opt_record.exist?
-      (opt_record.parent/a).delete
+      alias_symlink = opt_record.parent/a
+      next if !alias_symlink.symlink? && !alias_symlink.exist?
+      alias_symlink.delete
     end
     opt_record.parent.rmdir_if_possible
   end
