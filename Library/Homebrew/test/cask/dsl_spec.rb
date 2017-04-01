@@ -26,8 +26,6 @@ describe Hbc::DSL, :cask do
         .*
         Unexpected method 'future_feature' called on Cask unexpected-method-cask\\.
         .*
-        https://github.com/caskroom/homebrew-cask/blob/master/doc/reporting_bugs/pre_bug_report.md
-        .*
         https://github.com/caskroom/homebrew-cask#reporting-bugs
       EOS
 
