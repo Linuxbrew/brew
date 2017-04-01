@@ -13,7 +13,12 @@ describe Gpg do
         shutup do
           subject.create_test_key(dir)
         end
-        expect(dir/".gnupg/secring.gpg").to exist
+
+        begin
+          expect(dir/".gnupg/pubring.kbx").to be_file
+        rescue RSpec::Expectations::ExpectationNotMetError
+          expect(dir/".gnupg/secring.gpg").to be_file
+        end
       end
     end
   end
