@@ -86,8 +86,8 @@ module Homebrew
 
     opt = HOMEBREW_PREFIX/"opt/#{keg.name}"
     puts "\nIf you need to have this software first in your PATH instead consider running:"
-    puts "  #{Utils::Shell.prepend_path_in_shell_profile(opt)}/bin"  if bin.directory?
-    puts "  #{Utils::Shell.prepend_path_in_shell_profile(opt)}/sbin" if sbin.directory?
+    puts "  #{Utils::Shell.prepend_path_in_shell_profile(opt/"bin")}"  if bin.directory?
+    puts "  #{Utils::Shell.prepend_path_in_shell_profile(opt/"sbin")}" if sbin.directory?
   end
 
   def keg_only?(rack)
