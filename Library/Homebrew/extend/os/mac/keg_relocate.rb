@@ -131,6 +131,12 @@ class Keg
     mach_o_files
   end
 
+  def recursive_fgrep_args
+    # Don't recurse into symlinks; the man page says this is the default, but
+    # it's wrong. -O is a BSD-grep-only option.
+    "-lrO"
+  end
+
   def self.file_linked_libraries(file, string)
     # Check dynamic library linkage. Importantly, do not perform for static
     # libraries, which will falsely report "linkage" to themselves.

@@ -98,13 +98,14 @@ class Keg
     []
   end
 
+  def recursive_fgrep_args
+    # for GNU grep; overridden for BSD grep on OS X
+    "-lr"
+  end
+  alias generic_recursive_fgrep_args recursive_fgrep_args
+
   def each_unique_file_matching(string)
-    bsd = `/usr/bin/fgrep -V`.include?("BSD grep")
-    grep_args = "-lr"
-    # Don't recurse into symlinks; the man page says this is the default, but
-    # it's wrong.
-    grep_args += "O" if bsd
-    Utils.popen_read("/usr/bin/fgrep", grep_args, string, to_s) do |io|
+    Utils.popen_read("/usr/bin/fgrep", recursive_fgrep_args, string, to_s) do |io|
       hardlinks = Set.new
 
       until io.eof?
