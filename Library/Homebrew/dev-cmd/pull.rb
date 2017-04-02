@@ -231,12 +231,21 @@ module Homebrew
 
         curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
 
+        pr_head = Utils.popen_read("git", "rev-parse", "HEAD").chomp
         safe_system "git", "checkout", "--quiet", "-B", bottle_branch, orig_revision
         pull_patch bottle_commit_url, "bottle commit"
         safe_system "git", "rebase", "--quiet", branch
         safe_system "git", "checkout", "--quiet", branch
         safe_system "git", "merge", "--quiet", "--ff-only", "--no-edit", bottle_branch
         safe_system "git", "branch", "--quiet", "-D", bottle_branch
+
+        if Utils.popen_read("git", "rev-list", "--parents", "-n1", pr_head).count(" ") > 1
+          # Publish and verify bottles for those formulae whose bottles were updated.
+          changed_formulae_names = Utils.popen_read(
+            "git", "diff-tree", "-r", "--name-only",
+            "--diff-filter=AM", pr_head, branch, "--", tap.formula_dir
+          ).lines.map { |s| File.basename(s, ".rb\n") if s.end_with? ".rb\n" }.compact
+        end
 
         # Publish bottles on Bintray
         unless ARGV.include? "--no-publish"
@@ -259,6 +268,8 @@ module Homebrew
     # Verify bintray publishing after all patches have been applied
     bintray_published_formulae.uniq!
     verify_bintray_published(bintray_published_formulae)
+    ohai "Published bottles for:"
+    puts bintray_published_formulae.join " "
   end
 
   def force_utf8!(str)
