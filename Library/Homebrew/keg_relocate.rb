@@ -97,7 +97,12 @@ class Keg
   end
 
   def each_unique_file_matching(string)
-    Utils.popen_read("/usr/bin/fgrep", "-lr", string, to_s) do |io|
+    bsd = `/usr/bin/fgrep -V`.include?("BSD grep")
+    grep_args = "-lr"
+    # Don't recurse into symlinks; the man page says this is the default, but
+    # it's wrong.
+    grep_args += "O" if bsd
+    Utils.popen_read("/usr/bin/fgrep", grep_args, string, to_s) do |io|
       hardlinks = Set.new
 
       until io.eof?
