@@ -43,7 +43,7 @@ class XcodeRequirement < Requirement
       EOS
     else
       message + <<-EOS.undent
-        Xcode can be installed from #{Formatter.url("https://developer.apple.com/xcode/downloads/")}
+        Xcode can be installed from #{Formatter.url("https://developer.apple.com/download/more/")}.
       EOS
     end
   end
