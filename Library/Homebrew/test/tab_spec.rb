@@ -258,7 +258,7 @@ describe Tab do
     it "can create a Tab for a non-existant Keg" do
       f.prefix.mkpath
 
-      expect(subject.tabfile).to be nil
+      expect(subject.tabfile).to eq(f_tab_path)
     end
   end
 
