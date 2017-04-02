@@ -194,8 +194,10 @@ module Homebrew
         next unless f.opt_prefix.directory?
         keg = Keg.new(f.opt_prefix.resolved_path)
         tab = Tab.for_keg(keg)
-        tab.installed_on_request = true
-        tab.write
+        unless tab.installed_on_request
+          tab.installed_on_request = true
+          tab.write
+        end
       end
 
       perform_preinstall_checks
