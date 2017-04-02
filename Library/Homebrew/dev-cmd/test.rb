@@ -7,7 +7,7 @@
 #:    To test the development or head version of a formula, use `--devel` or
 #:    `--HEAD`.
 #:
-#:    If `--debug` is passed and the test fails, an interactive debugger will be
+#:    If `--debug` (or `-d`) is passed and the test fails, an interactive debugger will be
 #:    launched with access to IRB or a shell inside the temporary test directory.
 #:
 #:    If `--keep-tmp` is passed, the temporary files created for the test are

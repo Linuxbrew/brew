@@ -4,7 +4,7 @@
 #:    <formula> is usually the name of the formula to install, but it can be specified
 #:    in several different ways. See [SPECIFYING FORMULAE][].
 #:
-#:    If `--debug` is passed and brewing fails, open an interactive debugging
+#:    If `--debug` (or `-d`) is passed and brewing fails, open an interactive debugging
 #:    session with access to IRB or a shell inside the temporary build directory.
 #:
 #:    If `--env=std` is passed, use the standard build environment instead of superenv.
@@ -24,7 +24,7 @@
 #:    `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
 #:    4.9.
 #:
-#:    If `--build-from-source` or `-s` is passed, compile the specified <formula> from
+#:    If `--build-from-source` (or `-s`) is passed, compile the specified <formula> from
 #:    source even if a bottle is provided. Dependencies will still be installed
 #:    from bottles if they are available.
 #:
@@ -48,11 +48,12 @@
 #:    during installation.
 #:
 #:  * `install` `--interactive` [`--git`] <formula>:
-#:    Download and patch <formula>, then open a shell. This allows the user to
-#:    run `./configure --help` and otherwise determine how to turn the software
-#:    package into a Homebrew formula.
+#:    If `--interactive` (or `-i`) is passed, download and patch <formula>, then
+#:    open a shell. This allows the user to run `./configure --help` and
+#:    otherwise determine how to turn the software package into a Homebrew
+#:    formula.
 #:
-#:    If `--git` is passed, Homebrew will create a Git repository, useful for
+#:    If `--git` (or `-g`) is passed, Homebrew will create a Git repository, useful for
 #:    creating patches to the software.
 
 require "missing_formula"

@@ -5,7 +5,7 @@
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:    (rather than `git rebase`).
 #:
-#:    If `--force` is specified then always do a slower, full update check even
+#:    If `--force` (or `-f`) is specified then always do a slower, full update check even
 #:    if unnecessary.
 
 # Hide shellcheck complaint:

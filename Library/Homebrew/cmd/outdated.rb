@@ -7,7 +7,7 @@
 #:    If `--quiet` is passed, list only the names of outdated brews (takes
 #:    precedence over `--verbose`).
 #:
-#:    If `--verbose` is passed, display detailed version information.
+#:    If `--verbose` (or `-v`) is passed, display detailed version information.
 #:
 #:    If `--json=`<version> is passed, the output will be in JSON format. The only
 #:    valid version is `v1`.
