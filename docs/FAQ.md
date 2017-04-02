@@ -174,11 +174,11 @@ If it’s been a while, bump it with a “bump” comment. Sometimes we miss req
 Yes! It’s easy! Just `brew edit <formula>`. You don’t have to submit modifications back to `homebrew/core`, just edit the formula as you personally need it and `brew install`. As a bonus `brew update` will merge your changes with upstream so you can still keep the formula up-to-date **with** your personal modifications!
 
 ## Can I make new formulae?
-Yes! It’s easy! Just `brew create URL`. Homebrew will then open the
-formula in `EDITOR` so you can edit it, but it probably already
-installs; try it: `brew install <formula>`. If you encounter any issues,
-run the command with the `-d` switch like so: `brew install -d <formula>`,
-which drops you into a debugging shell.
+Yes! It’s easy! Just `brew create URL`. Homebrew will then open the formula in
+`EDITOR` so you can edit it, but it probably already installs; try it: `brew
+install <formula>`. If you encounter any issues, run the command with the
+`--debug` switch like so: `brew install --debug <formula>`, which drops you
+into a debugging shell.
 
 If you want your new formula to be part of `homebrew/core` or want
 to learn more about writing formulae, then please read the [Formula Cookbook](Formula-Cookbook.md).

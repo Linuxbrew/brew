@@ -3,7 +3,7 @@
 #:    `--only=`<test_script> runs only <test_script>_spec.rb, and `--seed`
 #:    randomizes tests with the provided value instead of a random seed.
 #:
-#:    If `--verbose` is passed, print the command that runs the tests.
+#:    If `--verbose` (or `-v`) is passed, print the command that runs the tests.
 #:
 #:    If `--coverage` is passed, also generate code coverage reports.
 #:

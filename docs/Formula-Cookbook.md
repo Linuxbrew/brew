@@ -90,7 +90,7 @@ Try to summarize from the [`homepage`](http://www.rubydoc.info/github/Homebrew/b
 ### Check the build system
 
 ```sh
-brew install -i foo
+brew install --interactive foo
 ```
 
 You’re now at a new prompt with the tarball extracted to a temporary sandbox.

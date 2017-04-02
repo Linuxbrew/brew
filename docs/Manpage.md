@@ -4,7 +4,7 @@ brew(1) -- The missing package manager for macOS
 ## SYNOPSIS
 
 `brew` `--version`<br>
-`brew` <var>command</var> [`--verbose`|`-v`] [<var>options</var>] [<var>formula</var>] ...
+`brew` `command` [`--verbose`|`-v`] [`options`] [`formula`] ...
 
 ## DESCRIPTION
 
@@ -17,11 +17,11 @@ For the full command list, see the [COMMANDS][] section.
 
 With `--verbose` or `-v`, many commands print extra debugging information. Note that these flags should only appear after a command.
 
-  * `install` <var>formula</var>:
-    Install <var>formula</var>.
+  * `install` `formula`:
+    Install `formula`.
 
-  * `uninstall` <var>formula</var>:
-    Uninstall <var>formula</var>.
+  * `uninstall` `formula`:
+    Uninstall `formula`.
 
   * `update`:
     Fetch the newest version of Homebrew from GitHub using `git`(1).
@@ -29,10 +29,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `list`:
     List all installed formulae.
 
-  * `search` (<var>text</var>|`/`<var>text</var>`/`):
-    Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
+  * `search` (`text`|`/``text``/`):
+    Perform a substring search of formula names for `text`. If `text` is
     surrounded with slashes, then it is interpreted as a regular expression.
-    The search for <var>text</var> is extended online to some popular taps.
+    The search for `text` is extended online to some popular taps.
     If no search term is given, all locally available formulae are listed.
 
 ## COMMANDS
@@ -47,14 +47,14 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `analytics` `regenerate-uuid`:
     Regenerate UUID used in Homebrew's analytics.
 
-  * `cat` <var>formula</var>:
-    Display the source to <var>formula</var>.
+  * `cat` `formula`:
+    Display the source to `formula`.
 
-  * `cleanup` [`--prune=`<var>days</var>] [`--dry-run`] [`-s`] [<var>formulae</var>]:
+  * `cleanup` [`--prune=``days`] [`--dry-run`] [`-s`] [`formulae`]:
     For all installed or specific formulae, remove any older versions from the
     cellar. In addition, old downloads from the Homebrew download-cache are deleted.
 
-    If `--prune=`<var>days</var> is specified, remove all cache files older than <var>days</var>.
+    If `--prune=``days` is specified, remove all cache files older than `days`.
 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
@@ -63,8 +63,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     versions of formulae. Note downloads for any installed formulae will still not be
     deleted. If you want to delete those too: `rm -rf $(brew --cache)`
 
-  * `command` <var>cmd</var>:
-    Display the path to the file which is used when invoking `brew` <var>cmd</var>.
+  * `command` `cmd`:
+    Display the path to the file which is used when invoking `brew` `cmd`.
 
   * `commands` [`--quiet` [`--include-aliases`]]:
     Show a list of built-in and external commands.
@@ -77,16 +77,16 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     a bug report, you will likely be asked for this information if you do not
     provide it.
 
-  * `deps` [`--1`] [`-n`] [`--union`] [`--full-name`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] <var>formulae</var>:
-    Show dependencies for <var>formulae</var>. When given multiple formula arguments,
-    show the intersection of dependencies for <var>formulae</var>.
+  * `deps` [`--1`] [`-n`] [`--union`] [`--full-name`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] `formulae`:
+    Show dependencies for `formulae`. When given multiple formula arguments,
+    show the intersection of dependencies for `formulae`.
 
     If `--1` is passed, only show dependencies one level down, instead of
     recursing.
 
     If `-n` is passed, show dependencies in topological order.
 
-    If `--union` is passed, show the union of dependencies for <var>formulae</var>,
+    If `--union` is passed, show the union of dependencies for `formulae`,
     instead of the intersection.
 
     If `--full-name` is passed, list dependencies by their full name.
@@ -95,43 +95,43 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     currently installed.
 
     By default, `deps` shows required and recommended dependencies for
-    <var>formulae</var>. To include the `:build` type dependencies, pass `--include-build`.
+    `formulae`. To include the `:build` type dependencies, pass `--include-build`.
     Similarly, pass `--include-optional` to include `:optional` dependencies.
     To skip `:recommended` type dependencies, pass `--skip-recommended`.
 
-  * `deps` `--tree` [<var>filters</var>] (<var>formulae</var>|`--installed`):
+  * `deps` `--tree` [`filters`] (`formulae`|`--installed`):
     Show dependencies as a tree. When given multiple formula arguments, output
     individual trees for every formula.
 
     If `--installed` is passed, output a tree for every installed formula.
 
-    The <var>filters</var> placeholder is any combination of options `--include-build`,
+    The `filters` placeholder is any combination of options `--include-build`,
     `--include-optional`, and `--skip-recommended` as documented above.
 
-  * `deps` [<var>filters</var>] (`--installed`|`--all`):
+  * `deps` [`filters`] (`--installed`|`--all`):
     Show dependencies for installed or all available formulae. Every line of
     output starts with the formula name, followed by a colon and all direct
     dependencies of that formula.
 
-    The <var>filters</var> placeholder is any combination of options `--include-build`,
+    The `filters` placeholder is any combination of options `--include-build`,
     `--include-optional`, and `--skip-recommended` as documented above.
 
-  * `desc` <var>formula</var>:
-    Display <var>formula</var>'s name and one-line description.
+  * `desc` `formula`:
+    Display `formula`'s name and one-line description.
 
-  * `desc` [`-s`|`-n`|`-d`] (<var>text</var>|`/`<var>text</var>`/`):
+  * `desc` [`-s`|`-n`|`-d`] (`text`|`/``text``/`):
     Search both name and description (`-s`), just the names (`-n`), or just  the
-    descriptions (`-d`) for <var>text</var>. If <var>text</var> is flanked by slashes, it is interpreted
+    descriptions (`-d`) for `text`. If `text` is flanked by slashes, it is interpreted
     as a regular expression. Formula descriptions are cached; the cache is created on
     the first search, making that search slower than subsequent ones.
 
-  * `diy` [`--name=`<var>name</var>] [`--version=`<var>version</var>]:
+  * `diy` [`--name=``name`] [`--version=``version`]:
     Automatically determine the installation prefix for non-Homebrew software.
 
     Using the output from this command, you can install your own software into
     the Cellar and then link it into Homebrew's prefix with `brew link`.
 
-    The options `--name=`<var>name</var> and `--version=`<var>version</var> each take an argument
+    The options `--name=``name` and `--version=``version` each take an argument
     and allow you to explicitly set the name and version of the package you are
     installing.
 
@@ -139,8 +139,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Check your system for potential problems. Doctor exits with a non-zero status
     if any problems are found.
 
-  * `fetch` [`--force`] [`--retry`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] <var>formulae</var>:
-    Download the source packages for the given <var>formulae</var>.
+  * `fetch` [`--force`] [`--retry`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] `formulae`:
+    Download the source packages for the given `formulae`.
     For tarballs, also print SHA-256 checksums.
 
     If `--HEAD` or `--devel` is passed, fetch that version instead of the
@@ -149,24 +149,24 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `-v` is passed, do a verbose VCS checkout, if the URL represents a VCS.
     This is useful for seeing if an existing VCS cache has been updated.
 
-    If `--force` is passed, remove a previously cached version and re-fetch.
+    If `--force` (or `-f`) is passed, remove a previously cached version and re-fetch.
 
     If `--retry` is passed, retry if a download fails or re-download if the
     checksum of a previously cached version no longer matches.
 
-    If `--deps` is passed, also download dependencies for any listed <var>formulae</var>.
+    If `--deps` is passed, also download dependencies for any listed `formulae`.
 
-    If `--build-from-source` is passed, download the source rather than a
+    If `--build-from-source` (or `-s`) is passed, download the source rather than a
     bottle.
 
     If `--force-bottle` is passed, download a bottle if it exists for the
     current or newest version of macOS, even if it would not be used during
     installation.
 
-  * `gist-logs` [`--new-issue`|`-n`] <var>formula</var>:
-    Upload logs for a failed build of <var>formula</var> to a new Gist.
+  * `gist-logs` [`--new-issue`|`-n`] `formula`:
+    Upload logs for a failed build of `formula` to a new Gist.
 
-    <var>formula</var> is usually the name of the formula to install, but it can be specified
+    `formula` is usually the name of the formula to install, but it can be specified
     in several different ways. See [SPECIFYING FORMULAE][].
 
     If `--new-issue` is passed, automatically create a new issue in the appropriate
@@ -177,20 +177,20 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `home`:
     Open Homebrew's own homepage in a browser.
 
-  * `home` <var>formula</var>:
-    Open <var>formula</var>'s homepage in a browser.
+  * `home` `formula`:
+    Open `formula`'s homepage in a browser.
 
-  * `info` <var>formula</var>:
-    Display information about <var>formula</var>.
+  * `info` `formula`:
+    Display information about `formula`.
 
-  * `info` `--github` <var>formula</var>:
-    Open a browser to the GitHub History page for formula <var>formula</var>.
+  * `info` `--github` `formula`:
+    Open a browser to the GitHub History page for formula `formula`.
 
-    To view formula history locally: `brew log -p <var>formula</var>`
+    To view formula history locally: `brew log -p `formula``
 
-  * `info` `--json=`<var>version</var> (`--all`|`--installed`|<var>formulae</var>):
-    Print a JSON representation of <var>formulae</var>. Currently the only accepted value
-    for <var>version</var> is `v1`.
+  * `info` `--json=``version` (`--all`|`--installed`|`formulae`):
+    Print a JSON representation of `formulae`. Currently the only accepted value
+    for `version` is `v1`.
 
     Pass `--all` to get information on all formulae, or `--installed` to get
     information on all installed formulae.
@@ -198,13 +198,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     See the docs for examples of using the JSON output:
     <http://docs.brew.sh/Querying-Brew.html>
 
-  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<var>compiler</var>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] <var>formula</var>:
-    Install <var>formula</var>.
+  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] `formula`:
+    Install `formula`.
 
-    <var>formula</var> is usually the name of the formula to install, but it can be specified
+    `formula` is usually the name of the formula to install, but it can be specified
     in several different ways. See [SPECIFYING FORMULAE][].
 
-    If `--debug` is passed and brewing fails, open an interactive debugging
+    If `--debug` (or `-d`) is passed and brewing fails, open an interactive debugging
     session with access to IRB or a shell inside the temporary build directory.
 
     If `--env=std` is passed, use the standard build environment instead of superenv.
@@ -219,26 +219,26 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--only-dependencies` is passed, install the dependencies with specified
     options but do not install the specified formula.
 
-    If `--cc=`<var>compiler</var> is passed, attempt to compile using <var>compiler</var>.
-    <var>compiler</var> should be the name of the compiler's executable, for instance
+    If `--cc=``compiler` is passed, attempt to compile using `compiler`.
+    `compiler` should be the name of the compiler's executable, for instance
     `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
     4.9.
 
-    If `--build-from-source` or `-s` is passed, compile the specified <var>formula</var> from
+    If `--build-from-source` (or `-s`) is passed, compile the specified `formula` from
     source even if a bottle is provided. Dependencies will still be installed
     from bottles if they are available.
 
     If `HOMEBREW_BUILD_FROM_SOURCE` is set, regardless of whether `--build-from-source` was
-    passed, then both <var>formula</var> and the dependencies installed as part of this process
+    passed, then both `formula` and the dependencies installed as part of this process
     are built from source even if bottles are available.
 
     If `--force-bottle` is passed, install from a bottle if it exists for the
     current or newest version of macOS, even if it would not normally be used
     for installation.
 
-    If `--devel` is passed, and <var>formula</var> defines it, install the development version.
+    If `--devel` is passed, and `formula` defines it, install the development version.
 
-    If `--HEAD` is passed, and <var>formula</var> defines it, install the HEAD version,
+    If `--HEAD` is passed, and `formula` defines it, install the HEAD version,
     aka master, trunk, unstable.
 
     If `--keep-tmp` is passed, the temporary files created during installation
@@ -247,12 +247,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--build-bottle` is passed, prepare the formula for eventual bottling
     during installation.
 
-  * `install` `--interactive` [`--git`] <var>formula</var>:
-    Download and patch <var>formula</var>, then open a shell. This allows the user to
-    run `./configure --help` and otherwise determine how to turn the software
-    package into a Homebrew formula.
+  * `install` `--interactive` [`--git`] `formula`:
+    If `--interactive` (or `-i`) is passed, download and patch `formula`, then
+    open a shell. This allows the user to run `./configure --help` and
+    otherwise determine how to turn the software package into a Homebrew
+    formula.
 
-    If `--git` is passed, Homebrew will create a Git repository, useful for
+    If `--git` (or `-g`) is passed, Homebrew will create a Git repository, useful for
     creating patches to the software.
 
   * `irb` [`--examples`]:
@@ -263,8 +264,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `leaves`:
     Show installed formulae that are not dependencies of another installed formula.
 
-  * `ln`, `link` [`--overwrite`] [`--dry-run`] [`--force`] <var>formula</var>:
-    Symlink all of <var>formula</var>'s installed files into the Homebrew prefix. This
+  * `ln`, `link` [`--overwrite`] [`--dry-run`] [`--force`] `formula`:
+    Symlink all of `formula`'s installed files into the Homebrew prefix. This
     is done automatically when you install formulae but can be useful for DIY
     installations.
 
@@ -275,9 +276,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     be linked or which would be deleted by `brew link --overwrite`, but will not
     actually link or delete any files.
 
-    If `--force` is passed, Homebrew will allow keg-only formulae to be linked.
+    If `--force` (or `-f`) is passed, Homebrew will allow keg-only formulae to be linked.
 
-  * `linkapps` [`--local`] [<var>formulae</var>]:
+  * `linkapps` [`--local`] [`formulae`]:
     Find installed formulae that provide `.app`-style macOS apps and symlink them
     into `/Applications`, allowing for easier access (deprecated).
 
@@ -286,7 +287,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     bundles that can be relocated. Instead, please consider using `brew cask` and
     migrate formulae using `.app`s to casks.
 
-    If no <var>formulae</var> are provided, all of them will have their apps symlinked.
+    If no `formulae` are provided, all of them will have their apps symlinked.
 
     If provided, `--local` will symlink them into the user's `~/Applications`
     directory instead of the system directory.
@@ -299,38 +300,38 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `list`, `ls` `--unbrewed`:
     List all files in the Homebrew prefix not installed by Homebrew.
 
-  * `list`, `ls` [`--versions` [`--multiple`]] [`--pinned`] [<var>formulae</var>]:
-    List the installed files for <var>formulae</var>. Combined with `--verbose`, recursively
-    list the contents of all subdirectories in each <var>formula</var>'s keg.
+  * `list`, `ls` [`--versions` [`--multiple`]] [`--pinned`] [`formulae`]:
+    List the installed files for `formulae`. Combined with `--verbose`, recursively
+    list the contents of all subdirectories in each `formula`'s keg.
 
     If `--versions` is passed, show the version number for installed formulae,
-    or only the specified formulae if <var>formulae</var> are given. With `--multiple`,
+    or only the specified formulae if `formulae` are given. With `--multiple`,
     only show formulae with multiple versions installed.
 
     If `--pinned` is passed, show the versions of pinned formulae, or only the
-    specified (pinned) formulae if <var>formulae</var> are given.
+    specified (pinned) formulae if `formulae` are given.
     See also `pin`, `unpin`.
 
-  * `log` [<var>git-log-options</var>] <var>formula</var> ...:
+  * `log` [`git-log-options`] `formula` ...:
     Show the git log for the given formulae. Options that `git-log`(1)
     recognizes can be passed before the formula list.
 
-  * `migrate` [`--force`] <var>formulae</var>:
-    Migrate renamed packages to new name, where <var>formulae</var> are old names of
+  * `migrate` [`--force`] `formulae`:
+    Migrate renamed packages to new name, where `formulae` are old names of
     packages.
 
-    If `--force` is passed, then treat installed <var>formulae</var> and passed <var>formulae</var>
+    If `--force` (or `-f`) is passed, then treat installed `formulae` and passed `formulae`
     like if they are from same taps and migrate them anyway.
 
-  * `missing` [`--hide=`<var>hidden</var>] [<var>formulae</var>]:
-    Check the given <var>formulae</var> for missing dependencies. If no <var>formulae</var> are
+  * `missing` [`--hide=``hidden`] [`formulae`]:
+    Check the given `formulae` for missing dependencies. If no `formulae` are
     given, check all installed brews.
 
-    If `--hide=`<var>hidden</var> is passed, act as if none of <var>hidden</var> are installed.
-    <var>hidden</var> should be a comma-separated list of formulae.
+    If `--hide=``hidden` is passed, act as if none of `hidden` are installed.
+    `hidden` should be a comma-separated list of formulae.
 
-  * `options` [`--compact`] (`--all`|`--installed`|<var>formulae</var>):
-    Display install options specific to <var>formulae</var>.
+  * `options` [`--compact`] (`--all`|`--installed`|`formulae`):
+    Display install options specific to `formulae`.
 
     If `--compact` is passed, show all options on a single line separated by
     spaces.
@@ -339,7 +340,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--installed` is passed, show options for all installed formulae.
 
-  * `outdated` [`--quiet`|`--verbose`|`--json=`<var>version</var>] [`--fetch-HEAD`]:
+  * `outdated` [`--quiet`|`--verbose`|`--json=``version`] [`--fetch-HEAD`]:
     Show formulae that have an updated version available.
 
     By default, version information is displayed in interactive shells, and
@@ -348,9 +349,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--quiet` is passed, list only the names of outdated brews (takes
     precedence over `--verbose`).
 
-    If `--verbose` is passed, display detailed version information.
+    If `--verbose` (or `-v`) is passed, display detailed version information.
 
-    If `--json=`<var>version</var> is passed, the output will be in JSON format. The only
+    If `--json=``version` is passed, the output will be in JSON format. The only
     valid version is `v1`.
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
@@ -358,12 +359,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     repository's HEAD will be checked for updates when a new stable or devel
     version has been released.
 
-  * `pin` <var>formulae</var>:
-    Pin the specified <var>formulae</var>, preventing them from being upgraded when
+  * `pin` `formulae`:
+    Pin the specified `formulae`, preventing them from being upgraded when
     issuing the `brew upgrade` command. See also `unpin`.
 
-  * `postinstall` <var>formula</var>:
-    Rerun the post-install steps for <var>formula</var>.
+  * `postinstall` `formula`:
+    Rerun the post-install steps for `formula`.
 
   * `prune` [`--dry-run`]:
     Remove dead symlinks from the Homebrew prefix. This is generally not
@@ -374,23 +375,23 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
 
-  * `reinstall` <var>formula</var>:
-    Uninstall and then install <var>formula</var>.
+  * `reinstall` `formula`:
+    Uninstall and then install `formula`.
 
   * `search`, `-S`:
     Display all locally available formulae for brewing (including tapped ones).
     No online search is performed if called without arguments.
 
-  * `search` [`--desc`] (<var>text</var>|`/`<var>text</var>`/`):
-    Perform a substring search of formula names for <var>text</var>. If <var>text</var> is
+  * `search` [`--desc`] (`text`|`/``text``/`):
+    Perform a substring search of formula names for `text`. If `text` is
     surrounded with slashes, then it is interpreted as a regular expression.
-    The search for <var>text</var> is extended online to some popular taps.
+    The search for `text` is extended online to some popular taps.
 
-    If `--desc` is passed, browse available packages matching <var>text</var> including a
+    If `--desc` is passed, browse available packages matching `text` including a
     description for each.
 
-  * `search` (`--debian`|`--fedora`|`--fink`|`--macports`|`--opensuse`|`--ubuntu`) <var>text</var>:
-    Search for <var>text</var> in the given package manager's list.
+  * `search` (`--debian`|`--fedora`|`--fink`|`--macports`|`--opensuse`|`--ubuntu`) `text`:
+    Search for `text` in the given package manager's list.
 
   * `sh` [`--env=std`]:
     Start a Homebrew build environment shell. Uses our years-battle-hardened
@@ -401,10 +402,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--env=std` is passed, use the standard `PATH` instead of superenv's.
 
-  * `style` [`--fix`] [`--display-cop-names`] [<var>files</var>|<var>taps</var>|<var>formulae</var>]:
+  * `style` [`--fix`] [`--display-cop-names`] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
 
-    <var>formulae</var> and <var>files</var> may not be combined. If both are omitted, style will run
+    `formulae` and `files` may not be combined. If both are omitted, style will run
     style checks on the whole Homebrew `Library`, including core code and all
     formulae.
 
@@ -416,20 +417,20 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     Exits with a non-zero status if any style violations are found.
 
-  * `switch` <var>name</var> <var>version</var>:
-    Symlink all of the specific <var>version</var> of <var>name</var>'s install to Homebrew prefix.
+  * `switch` `name` `version`:
+    Symlink all of the specific `version` of `name`'s install to Homebrew prefix.
 
   * `tap`:
     List all installed taps.
 
-  * `tap` [`--full`] <var>user</var>`/`<var>repo</var> [<var>URL</var>]:
+  * `tap` [`--full`] `user``/``repo` [`URL`]:
     Tap a formula repository.
 
-    With <var>URL</var> unspecified, taps a formula repository from GitHub using HTTPS.
+    With `URL` unspecified, taps a formula repository from GitHub using HTTPS.
     Since so many taps are hosted on GitHub, this command is a shortcut for
-    `tap <var>user</var>/<var>repo</var> https://github.com/<var>user</var>/homebrew-<var>repo</var>`.
+    `tap `user`/`repo` https://github.com/`user`/homebrew-`repo``.
 
-    With <var>URL</var> specified, taps a formula repository from anywhere, using
+    With `URL` specified, taps a formula repository from anywhere, using
     any transport protocol that `git` handles. The one-argument form of `tap`
     simplifies but also limits. This two-argument command makes no
     assumptions, so taps can be cloned from places other than GitHub and
@@ -440,8 +441,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     to a full copy, you can retap passing `--full` without first untapping.
 
     `tap` is re-runnable and exits successfully if there's nothing to do.
-    However, retapping with a different <var>URL</var> will cause an exception, so first
-    `untap` if you need to modify the <var>URL</var>.
+    However, retapping with a different `URL` will cause an exception, so first
+    `untap` if you need to modify the `URL`.
 
   * `tap` `--repair`:
     Migrate tapped formulae from symlink-based to directory-based structure.
@@ -455,45 +456,45 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `tap-info`:
     Display a brief summary of all installed taps.
 
-  * `tap-info` (`--installed`|<var>taps</var>):
-    Display detailed information about one or more <var>taps</var>.
+  * `tap-info` (`--installed`|`taps`):
+    Display detailed information about one or more `taps`.
 
     Pass `--installed` to display information on all installed taps.
 
-  * `tap-info` `--json=`<var>version</var> (`--installed`|<var>taps</var>):
-    Print a JSON representation of <var>taps</var>. Currently the only accepted value
-    for <var>version</var> is `v1`.
+  * `tap-info` `--json=``version` (`--installed`|`taps`):
+    Print a JSON representation of `taps`. Currently the only accepted value
+    for `version` is `v1`.
 
     Pass `--installed` to get information on installed taps.
 
     See the docs for examples of using the JSON output:
     <http://docs.brew.sh/Querying-Brew.html>
 
-  * `tap-pin` <var>tap</var>:
-    Pin <var>tap</var>, prioritizing its formulae over core when formula names are supplied
+  * `tap-pin` `tap`:
+    Pin `tap`, prioritizing its formulae over core when formula names are supplied
     by the user. See also `tap-unpin`.
 
-  * `tap-unpin` <var>tap</var>:
-    Unpin <var>tap</var> so its formulae are no longer prioritized. See also `tap-pin`.
+  * `tap-unpin` `tap`:
+    Unpin `tap` so its formulae are no longer prioritized. See also `tap-pin`.
 
-  * `uninstall`, `rm`, `remove` [`--force`] [`--ignore-dependencies`] <var>formula</var>:
-    Uninstall <var>formula</var>.
+  * `uninstall`, `rm`, `remove` [`--force`] [`--ignore-dependencies`] `formula`:
+    Uninstall `formula`.
 
-    If `--force` is passed, and there are multiple versions of <var>formula</var>
+    If `--force` (or `-f`) is passed, and there are multiple versions of `formula`
     installed, delete all installed versions.
 
     If `--ignore-dependencies` is passed, uninstalling won't fail, even if
-    formulae depending on <var>formula</var> would still be installed.
+    formulae depending on `formula` would still be installed.
 
-  * `unlink` [`--dry-run`] <var>formula</var>:
-    Remove symlinks for <var>formula</var> from the Homebrew prefix. This can be useful
+  * `unlink` [`--dry-run`] `formula`:
+    Remove symlinks for `formula` from the Homebrew prefix. This can be useful
     for temporarily disabling a formula:
-    `brew unlink <var>formula</var> && <var>commands</var> && brew link <var>formula</var>`
+    `brew unlink `formula` && `commands` && brew link `formula``
 
     If `--dry-run` or `-n` is passed, Homebrew will list all files which would
     be unlinked, but will not actually unlink or delete any files.
 
-  * `unlinkapps` [`--local`] [`--dry-run`] [<var>formulae</var>]:
+  * `unlinkapps` [`--local`] [`--dry-run`] [`formulae`]:
     Remove symlinks created by `brew linkapps` from `/Applications` (deprecated).
 
     Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using
@@ -501,7 +502,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     bundles that can be relocated. Instead, please consider using `brew cask` and
     migrate formulae using `.app`s to casks.
 
-    If no <var>formulae</var> are provided, all linked apps will be removed.
+    If no `formulae` are provided, all linked apps will be removed.
 
     If provided, `--local` will remove symlinks from the user's `~/Applications`
     directory instead of the system directory.
@@ -509,22 +510,22 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--dry-run` or `-n` is passed, Homebrew will list all symlinks which
     would be removed, but will not actually delete any files.
 
-  * `unpack` [`--git`|`--patch`] [`--destdir=`<var>path</var>] <var>formulae</var>:
-    Unpack the source files for <var>formulae</var> into subdirectories of the current
-    working directory. If `--destdir=`<var>path</var> is given, the subdirectories will
-    be created in the directory named by <var>path</var> instead.
+  * `unpack` [`--git`|`--patch`] [`--destdir=``path`] `formulae`:
+    Unpack the source files for `formulae` into subdirectories of the current
+    working directory. If `--destdir=``path` is given, the subdirectories will
+    be created in the directory named by `path` instead.
 
-    If `--patch` is passed, patches for <var>formulae</var> will be applied to the
+    If `--patch` is passed, patches for `formulae` will be applied to the
     unpacked source.
 
-    If `--git` is passed, a Git repository will be initialized in the unpacked
+    If `--git` (or `-g`) is passed, a Git repository will be initialized in the unpacked
     source. This is useful for creating patches for the software.
 
-  * `unpin` <var>formulae</var>:
-    Unpin <var>formulae</var>, allowing them to be upgraded by `brew upgrade`. See also
+  * `unpin` `formulae`:
+    Unpin `formulae`, allowing them to be upgraded by `brew upgrade`. See also
     `pin`.
 
-  * `untap` <var>tap</var>:
+  * `untap` `tap`:
     Remove a tapped repository.
 
   * `update` [`--merge`] [`--force`]:
@@ -534,54 +535,54 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--merge` is specified then `git merge` is used to include updates
     (rather than `git rebase`).
 
-    If `--force` is specified then always do a slower, full update check even
+    If `--force` (or `-f`) is specified then always do a slower, full update check even
     if unnecessary.
 
-  * `upgrade` [<var>install-options</var>] [`--cleanup`] [`--fetch-HEAD`] [<var>formulae</var>]:
+  * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`formulae`]:
     Upgrade outdated, unpinned brews.
 
     Options for the `install` command are also valid here.
 
-    If `--cleanup` is specified then remove previously installed <var>formula</var> version(s).
+    If `--cleanup` is specified then remove previously installed `formula` version(s).
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
     the HEAD installation of the formula is outdated. Otherwise, the
     repository's HEAD will be checked for updates when a new stable or devel
     version has been released.
 
-    If <var>formulae</var> are given, upgrade only the specified brews (but do so even
+    If `formulae` are given, upgrade only the specified brews (but do so even
     if they are pinned; see `pin`, `unpin`).
 
-  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] <var>formulae</var>:
-    Show the formulae that specify <var>formulae</var> as a dependency. When given
+  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] `formulae`:
+    Show the formulae that specify `formulae` as a dependency. When given
     multiple formula arguments, show the intersection of formulae that use
-    <var>formulae</var>.
+    `formulae`.
 
     Use `--recursive` to resolve more than one level of dependencies.
 
     If `--installed` is passed, only list installed formulae.
 
-    By default, `uses` shows all formulae that specify <var>formulae</var> as a required
+    By default, `uses` shows all formulae that specify `formulae` as a required
     or recommended dependency. To include the `:build` type dependencies, pass
     `--include-build`. Similarly, pass `--include-optional` to include `:optional`
     dependencies. To skip `:recommended` type dependencies, pass `--skip-recommended`.
 
-    By default, `uses` shows usages of <var>formulae</var> by stable builds. To find
-    cases where <var>formulae</var> is used by development or HEAD build, pass
+    By default, `uses` shows usages of `formulae` by stable builds. To find
+    cases where `formulae` is used by development or HEAD build, pass
     `--devel` or `--HEAD`.
 
   * `--cache`:
     Display Homebrew's download cache. See also `HOMEBREW_CACHE`.
 
-  * `--cache` <var>formula</var>:
-    Display the file or directory used to cache <var>formula</var>.
+  * `--cache` `formula`:
+    Display the file or directory used to cache `formula`.
 
   * `--cellar`:
     Display Homebrew's Cellar path. *Default:* `$(brew --prefix)/Cellar`, or if
     that directory doesn't exist, `$(brew --repository)/Cellar`.
 
-  * `--cellar` <var>formula</var>:
-    Display the location in the cellar where <var>formula</var> would be installed,
+  * `--cellar` `formula`:
+    Display the location in the cellar where `formula` would be installed,
     without any sort of versioned directory as the last path.
 
   * `--env`:
@@ -590,26 +591,26 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `--prefix`:
     Display Homebrew's install path. *Default:* `/usr/local`
 
-  * `--prefix` <var>formula</var>:
-    Display the location in the cellar where <var>formula</var> is or would be installed.
+  * `--prefix` `formula`:
+    Display the location in the cellar where `formula` is or would be installed.
 
   * `--repository`:
     Display where Homebrew's `.git` directory is located. For standard installs,
     the `prefix` and `repository` are the same directory.
 
-  * `--repository` <var>user</var>`/`<var>repo</var>:
-    Display where tap <var>user</var>`/`<var>repo</var>'s directory is located.
+  * `--repository` `user``/``repo`:
+    Display where tap `user``/``repo`'s directory is located.
 
   * `--version`:
     Print the version number of Homebrew to standard output and exit.
 
 ## DEVELOPER COMMANDS
 
-  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<var>formulae</var>]:
-    Check <var>formulae</var> for Homebrew coding style violations. This should be
+  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`formulae`]:
+    Check `formulae` for Homebrew coding style violations. This should be
     run before submitting a new formula.
 
-    If no <var>formulae</var> are provided, all of them are checked.
+    If no `formulae` are provided, all of them are checked.
 
     If `--strict` is passed, additional checks are run, including RuboCop
     style checks.
@@ -633,7 +634,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.
 
-  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--root-url=`<var>URL</var>] [`--force-core-tap`] <var>formulae</var>:
+  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--root-url=``URL`] [`--force-core-tap`] `formulae`:
     Generate a bottle (binary package) from a formula installed with
     `--build-bottle`.
 
@@ -641,33 +642,33 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     generated DSL. Passing `--keep-old` will attempt to keep it at its
     original value, while `--no-rebuild` will remove it.
 
-    If `--verbose` is passed, print the bottling commands and any warnings
+    If `--verbose` (or `-v`) is passed, print the bottling commands and any warnings
     encountered.
 
     If `--skip-relocation` is passed, do not check if the bottle can be marked
     as relocatable.
 
-    If `--root-url` is passed, use the specified <var>URL</var> as the root of the
+    If `--root-url` is passed, use the specified `URL` as the root of the
     bottle's URL instead of Homebrew's default.
 
-    If `--force-core-tap` is passed, build a bottle even if <var>formula</var> is not
+    If `--force-core-tap` is passed, build a bottle even if `formula` is not
     in homebrew/core or any installed taps.
 
-  * `bottle` `--merge` [`--keep-old`] [`--write` [`--no-commit`]] <var>formulae</var>:
+  * `bottle` `--merge` [`--keep-old`] [`--write` [`--no-commit`]] `formulae`:
     Generate a bottle from a formula and print the new DSL merged into the
     existing formula.
 
     If `--write` is passed, write the changes to the formula file. A new
     commit will then be generated unless `--no-commit` is passed.
 
-  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--audit`|`--strict`] [`--mirror=`<var>URL</var>] [`--version=`<var>version</var>] [`--message=`<var>message</var>] (`--url=`<var>URL</var> `--sha256=`<var>sha-256</var>|`--tag=`<var>tag</var> `--revision=`<var>revision</var>) <var>formula</var>:
+  * `bump-formula-pr` [`--devel`] [`--dry-run` [`--write`]] [`--audit`|`--strict`] [`--mirror=``URL`] [`--version=``version`] [`--message=``message`] (`--url=``URL` `--sha256=``sha-256`|`--tag=``tag` `--revision=``revision`) `formula`:
     Creates a pull request to update the formula with a new URL or a new tag.
 
-    If a <var>URL</var> is specified, the <var>sha-256</var> checksum of the new download must
-    also be specified. A best effort to determine the <var>sha-256</var> and <var>formula</var>
+    If a `URL` is specified, the `sha-256` checksum of the new download must
+    also be specified. A best effort to determine the `sha-256` and `formula`
     name will be made if either or both values are not supplied by the user.
 
-    If a <var>tag</var> is specified, the git commit <var>revision</var> corresponding to that
+    If a `tag` is specified, the git commit `revision` corresponding to that
     tag must also be specified.
 
     If `--devel` is passed, bump the development rather than stable version.
@@ -682,13 +683,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--strict` is passed, run `brew audit --strict` before opening the PR.
 
-    If `--mirror=`<var>URL</var> is passed, use the value as a mirror URL.
+    If `--mirror=``URL` is passed, use the value as a mirror URL.
 
-    If `--version=`<var>version</var> is passed, use the value to override the value
+    If `--version=``version` is passed, use the value to override the value
     parsed from the URL or tag. Note that `--version=0` can be used to delete
     an existing `version` override from a formula if it has become redundant.
 
-    If `--message=`<var>message</var> is passed, append <var>message</var> to the default PR
+    If `--message=``message` is passed, append `message` to the default PR
     message.
 
     Note that this command cannot be used to transition a formula from a
@@ -696,8 +697,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     specification, nor vice versa. It must use whichever style specification
     the preexisting formula already uses.
 
-  * `create` <var>URL</var> [`--autotools`|`--cmake`|`--meson`] [`--no-fetch`] [`--set-name` <var>name</var>] [`--set-version` <var>version</var>] [`--tap` <var>user</var>`/`<var>repo</var>]:
-    Generate a formula for the downloadable file at <var>URL</var> and open it in the editor.
+  * `create` `URL` [`--autotools`|`--cmake`|`--meson`] [`--no-fetch`] [`--set-name` `name`] [`--set-version` `version`] [`--tap` `user``/``repo`]:
+    Generate a formula for the downloadable file at `URL` and open it in the editor.
     Homebrew will attempt to automatically derive the formula name
     and version, but if it fails, you'll have to make your own template. The `wget`
     formula serves as a simple example. For the complete API have a look at
@@ -707,7 +708,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--cmake` is passed, create a basic template for a CMake-style build.
     If `--meson` is passed, create a basic template for a Meson-style build.
 
-    If `--no-fetch` is passed, Homebrew will not download <var>URL</var> to the cache and
+    If `--no-fetch` is passed, Homebrew will not download `URL` to the cache and
     will thus not add the SHA256 to the formula for you.
 
     The options `--set-name` and `--set-version` each take an argument and allow
@@ -719,13 +720,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `edit`:
     Open all of Homebrew for editing.
 
-  * `edit` <var>formula</var>:
-    Open <var>formula</var> in the editor.
+  * `edit` `formula`:
+    Open `formula` in the editor.
 
-  * `formula` <var>formula</var>:
-    Display the path where <var>formula</var> is located.
+  * `formula` `formula`:
+    Display the path where `formula` is located.
 
-  * `linkage` [`--test`] [`--reverse`]  <var>formula</var>:
+  * `linkage` [`--test`] [`--reverse`]  `formula`:
     Checks the library links of an installed formula.
 
     Only works on installed formulae. An error is raised if it is run on
@@ -746,12 +747,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Additionally, the date used in new manpages will match those in the existing
     manpages (to allow comparison without factoring in the date).
 
-  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] <var>patch-source</var> [<var>patch-source</var>]:
+  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] `patch-source` [`patch-source`]:
 
     Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
     Optionally, installs the formulae changed by the patch.
 
-    Each <var>patch-source</var> may be one of:
+    Each `patch-source` may be one of:
 
       ~ The ID number of a PR (pull request) in the homebrew/core GitHub
         repository
@@ -790,18 +791,18 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--warn-on-publish-failure` was passed, do not exit if there's a
     failure publishing bottles on Bintray.
 
-  * `release-notes` [`--markdown`] [<var>previous_tag</var>] [<var>end_ref</var>]:
+  * `release-notes` [`--markdown`] [`previous_tag`] [`end_ref`]:
     Output the merged pull requests on Homebrew/brew between two Git refs.
-    If no <var>previous_tag</var> is provided it defaults to the newest tag.
-    If no <var>end_ref</var> is provided it defaults to `origin/master`.
+    If no `previous_tag` is provided it defaults to the newest tag.
+    If no `end_ref` is provided it defaults to `origin/master`.
 
     If `--markdown` is passed, output as a Markdown list.
 
-  * `tap-new` <var>user</var>`/`<var>repo</var>:
+  * `tap-new` `user``/``repo`:
     Generate the template files for a new tap.
 
-  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] <var>formula</var>:
-    Most formulae provide a test method. `brew test` <var>formula</var> runs this
+  * `test` [`--devel`|`--HEAD`] [`--debug`] [`--keep-tmp`] `formula`:
+    Most formulae provide a test method. `brew test` `formula` runs this
     test method. There is no standard output or return code, but it should
     generally indicate to the user if something is wrong with the installed
     formula.
@@ -809,7 +810,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     To test the development or head version of a formula, use `--devel` or
     `--HEAD`.
 
-    If `--debug` is passed and the test fails, an interactive debugger will be
+    If `--debug` (or `-d`) is passed and the test fails, an interactive debugger will be
     launched with access to IRB or a shell inside the temporary test directory.
 
     If `--keep-tmp` is passed, the temporary files created for the test are
@@ -817,12 +818,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     Example: `brew install jruby && brew test jruby`
 
-  * `tests` [`--verbose`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=`<var>test_script</var>[`:`<var>line_number</var>]] [`--seed` <var>seed</var>] [`--online`] [`--official-cmd-taps`]:
+  * `tests` [`--verbose`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=``test_script`[`:``line_number`]] [`--seed` `seed`] [`--online`] [`--official-cmd-taps`]:
     Run Homebrew's unit and integration tests. If provided,
-    `--only=`<var>test_script</var> runs only <var>test_script</var>_spec.rb, and `--seed`
+    `--only=``test_script` runs only `test_script`_spec.rb, and `--seed`
     randomizes tests with the provided value instead of a random seed.
 
-    If `--verbose` is passed, print the command that runs the tests.
+    If `--verbose` (or `-v`) is passed, print the command that runs the tests.
 
     If `--coverage` is passed, also generate code coverage reports.
 
@@ -836,14 +837,14 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--official-cmd-taps` is passed, include tests that use any of the
     taps for official external commands.
 
-  * `update-test` [`--commit=`<var>commit</var>] [`--before=`<var>date</var>] [`--to-tag`] [`--keep-tmp`]:
+  * `update-test` [`--commit=``commit`] [`--before=``date`] [`--to-tag`] [`--keep-tmp`]:
     Runs a test of `brew update` with a new repository clone.
 
     If no arguments are passed, use `origin/master` as the start commit.
 
-    If `--commit=`<var>commit</var> is passed, use <var>commit</var> as the start commit.
+    If `--commit=``commit` is passed, use `commit` as the start commit.
 
-    If `--before=`<var>date</var> is passed, use the commit at <var>date</var> as the
+    If `--before=``date` is passed, use the commit at `date` as the
     start commit.
 
     If `--to-tag` is passed, set `HOMEBREW_UPDATE_TO_TAG` to test updating
@@ -869,8 +870,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 ## CUSTOM EXTERNAL COMMANDS
 
 Homebrew, like `git`(1), supports external commands. These are executable
-scripts that reside somewhere in the `PATH`, named `brew-`<var>cmdname</var> or
-`brew-`<var>cmdname</var>`.rb`, which can be invoked like `brew` <var>cmdname</var>. This allows you
+scripts that reside somewhere in the `PATH`, named `brew-``cmdname` or
+`brew-``cmdname``.rb`, which can be invoked like `brew` `cmdname`. This allows you
 to create your own commands without modifying Homebrew's internals.
 
 Instructions for creating your own commands can be found in the docs:
@@ -878,7 +879,7 @@ Instructions for creating your own commands can be found in the docs:
 
 ## SPECIFYING FORMULAE
 
-Many Homebrew commands accept one or more <var>formula</var> arguments. These arguments
+Many Homebrew commands accept one or more `formula` arguments. These arguments
 can take several different forms:
 
   * The name of a formula:
@@ -1053,11 +1054,11 @@ to read proxy parameters from environment variables.
 For the majority of cases setting `http_proxy` is enough. You can set this in
 your shell profile, or you can use it before a brew command:
 
-    http_proxy=http://<var>host</var>:<var>port</var> brew install foo
+    http_proxy=http://`host`:`port` brew install foo
 
 If your proxy requires authentication:
 
-    http_proxy=http://<var>user</var>:<var>password</var>@<var>host</var>:<var>port</var> brew install foo
+    http_proxy=http://`user`:`password`@`host`:`port` brew install foo
 
 ## SEE ALSO
 

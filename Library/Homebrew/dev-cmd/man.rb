@@ -106,7 +106,9 @@ module Homebrew
     Utils.popen(["ronn", format_flag] + shared_args, "rb+") do |ronn|
       ronn.write markup
       ronn.close_write
-      target.atomic_write ronn.read
+      ronn_output = ronn.read
+      ronn_output.gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
+      target.atomic_write ronn_output
     end
   end
 

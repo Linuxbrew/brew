@@ -10,7 +10,7 @@
 #:    be linked or which would be deleted by `brew link --overwrite`, but will not
 #:    actually link or delete any files.
 #:
-#:    If `--force` is passed, Homebrew will allow keg-only formulae to be linked.
+#:    If `--force` (or `-f`) is passed, Homebrew will allow keg-only formulae to be linked.
 
 require "ostruct"
 
