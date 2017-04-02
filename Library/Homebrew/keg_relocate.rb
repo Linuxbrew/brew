@@ -17,7 +17,9 @@ class Keg
       # Don't fix relative symlinks
       next unless link.absolute?
       if link.to_s.start_with?(HOMEBREW_CELLAR.to_s) || link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
-        FileUtils.ln_sf(link.relative_path_from(file.parent), file)
+        new_src = link.relative_path_from(file.parent)
+        file.unlink
+        FileUtils.ln_s(new_src, file)
       end
     end
   end
