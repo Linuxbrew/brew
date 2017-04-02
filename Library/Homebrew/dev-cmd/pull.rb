@@ -320,8 +320,7 @@ module Homebrew
 
       issue = patch_url[/([0-9]+)\.patch$/, 1]
       safe_system "git", "fetch", "--quiet", "origin", "pull/#{issue}/head"
-      parents = Utils.popen_read("git", "rev-list", "--parents", "-n1", "FETCH_HEAD").split.length - 1
-      if parents > 1
+      if Utils.popen_read("git", "rev-list", "--parents", "-n1", "FETCH_HEAD").count(" ") > 1
         ohai "Fast-forwarding to the merge commit"
         test_bot_origin = patch_url[%r{(https://github\.com/[\w-]+/[\w-]+)/compare/}, 1]
         safe_system "git", "fetch", "--quiet", test_bot_origin, "pr-#{issue}" if test_bot_origin
