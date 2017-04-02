@@ -38,7 +38,15 @@ module Hbc
   module Utils
     def self.gain_permissions_remove(path, command: SystemCommand)
       if path.respond_to?(:rmtree) && path.exist?
-        gain_permissions(path, ["-R"], command, &:rmtree)
+        gain_permissions(path, ["-R"], command) do |p|
+          if p.parent.writable?
+            p.rmtree
+          else
+            command.run("/bin/rm",
+                        args: command_args + ["-r", "-f", "--", p],
+                        sudo: true)
+          end
+        end
       elsif File.symlink?(path)
         gain_permissions(path, ["-h"], command, &FileUtils.method(:rm_f))
       end

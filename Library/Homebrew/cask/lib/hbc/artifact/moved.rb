@@ -31,20 +31,26 @@ module Hbc
 
         ohai "Moving #{self.class.artifact_english_name} '#{source.basename}' to '#{target}'."
         target.dirname.mkpath
-        FileUtils.move(source, target)
+
+        if target.parent.writable?
+          FileUtils.move(source, target)
+        else
+          SystemCommand.run("/bin/mv", args: [source, target], sudo: true)
+        end
+
         add_altname_metadata target, source.basename.to_s
       end
 
       def delete
         ohai "Removing #{self.class.artifact_english_name} '#{target}'."
-        return unless Utils.path_occupied?(target)
-
         raise CaskError, "Cannot remove undeletable #{self.class.artifact_english_name}." if MacOS.undeletable?(target)
 
-        if force
-          Utils.gain_permissions_remove(target, command: @command)
-        else
+        return unless Utils.path_occupied?(target)
+
+        if target.parent.writable? && !force
           target.rmtree
+        else
+          Utils.gain_permissions_remove(target, command: @command)
         end
       end
 
