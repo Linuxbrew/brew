@@ -1,17 +1,17 @@
-If Homebrew was updated on Aug 10-11th 2016 and `brew update` always says `Already up-to-date.` you need to run: `cd "$(brew --repo)" && git fetch && git reset --hard origin/master && brew update`.
-
-# Please follow the general troubleshooting steps first:
-
+# Please always follow these steps:
+- [ ] Confirmed this is a problem with Homebrew/brew and not one or more formulae? If it's a formulae-specific problem please file this issue at https://github.com/Homebrew/homebrew-core/issues/new
 - [ ] Ran `brew update` and retried your prior step?
 - [ ] Ran `brew doctor`, fixed as many issues as possible and retried your prior step?
-- [ ] Confirmed this is a problem with Homebrew/brew and not specific formulae? If it's a formulae-specific problem please file this issue at https://github.com/Homebrew/homebrew-core/issues/new
+- [ ] Ran `brew config` and `brew doctor` and included their output with your issue?
 
-_You can erase any parts of this template not applicable to your Issue._
+To help us debug your issue please explain:
+- What you were trying to do (and why)
+- What happened (include command output)
+- What you expected to happen
+- Step-by-step reproduction instructions (by running `brew` commands)
 
-### Bug reports:
+**Please note we may immediately close your issue without comment if you do not fill out the issue template and provide ALL the requested information.**
 
-Please replace this section with a brief summary of your issue **AND** the output of `brew config` and `brew doctor`. Please note we may immediately close your issue without comment if you do not fill out the issue template and provide the requested information.
-
-### Propose a feature:
-
-Please replace this section with a detailed description of your proposed feature, the motivation for it and alternatives considered. Please note we may close this issue or ask you to create a pull-request if it's something we're not actively planning to work on.
+# Or propose a feature:
+Please replace this section with a detailed description of your proposed feature, the motivation for it and alternatives considered.
+Please note we may close this issue or ask you to create a pull-request if it's something we're not actively planning to work on.
