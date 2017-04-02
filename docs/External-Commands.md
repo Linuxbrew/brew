@@ -31,6 +31,12 @@ A shell script for a command named `extcmd` should be named `brew-extcmd`. This 
 
 Note that the script itself can use any suitable shebang (`#!`) line, so an external “shell script” can be written for sh, bash, Ruby, or anything else.
 
+## Providing `--help`
+
+All internal and external Homebrew commands can provide styled `--help` output by using lines starting with `#:` (a comment then `:` character in both Bash and Ruby) which are then output by `--help`.
+
+For example, see the [header of `brew services`](https://github.com/Homebrew/homebrew-services/blob/a5115e47b05e8d2a632ba7775599e698b240e5a2/cmd/brew-services.rb#L1-L31) which is output with `brew services --help`.
+
 ## User-submitted commands
 These commands have been contributed by Homebrew users but are not included in the main Homebrew repository, nor are they installed by the installer script. You can install them manually, as outlined above.
 
