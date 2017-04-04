@@ -12,11 +12,13 @@ describe Gpg do
 
         shutup do
           subject.create_test_key(dir)
+          gpg = subject::GPG_EXECUTABLE
+          @version = Utils.popen_read(gpg, "--version")[/\d\.\d/, 0]
         end
 
-        begin
+        if @version.to_s.start_with?("2.1")
           expect(dir/".gnupg/pubring.kbx").to be_file
-        rescue RSpec::Expectations::ExpectationNotMetError
+        else
           expect(dir/".gnupg/secring.gpg").to be_file
         end
       end
