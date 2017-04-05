@@ -476,7 +476,7 @@ class FormulaAuditor
         end
 
         if @@aliases.include?(dep.name) &&
-           (core_formula? || !dep_f.versioned_formula?)
+           (dep_f.core_formula? || !dep_f.versioned_formula?)
           problem "Dependency '#{dep.name}' is an alias; use the canonical name '#{dep.to_formula.full_name}'."
         end
 
