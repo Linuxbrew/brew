@@ -16,9 +16,12 @@ class Keg
       link = file.readlink
       # Don't fix relative symlinks
       next unless link.absolute?
-      if link.to_s.start_with?(HOMEBREW_CELLAR.to_s) || link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
-        FileUtils.ln_sf(link.relative_path_from(file.parent), file)
-      end
+      link_starts_cellar = link.to_s.start_with?(HOMEBREW_CELLAR.to_s)
+      link_starts_prefix = link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
+      next if !link_starts_cellar && !link_starts_prefix
+      new_src = link.relative_path_from(file.parent)
+      file.unlink
+      FileUtils.ln_s(new_src, file)
     end
   end
   alias generic_fix_dynamic_linkage fix_dynamic_linkage
@@ -96,8 +99,14 @@ class Keg
     []
   end
 
+  def recursive_fgrep_args
+    # for GNU grep; overridden for BSD grep on OS X
+    "-lr"
+  end
+  alias generic_recursive_fgrep_args recursive_fgrep_args
+
   def each_unique_file_matching(string)
-    Utils.popen_read("/usr/bin/fgrep", "-lr", string, to_s) do |io|
+    Utils.popen_read("/usr/bin/fgrep", recursive_fgrep_args, string, to_s) do |io|
       hardlinks = Set.new
 
       until io.eof?
