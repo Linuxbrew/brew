@@ -16,7 +16,9 @@ class Keg
       link = file.readlink
       # Don't fix relative symlinks
       next unless link.absolute?
-      next unless link.to_s.start_with?(HOMEBREW_CELLAR.to_s) || link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
+      link_starts_cellar = link.to_s.start_with?(HOMEBREW_CELLAR.to_s)
+      link_starts_prefix = link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
+      next if !link_starts_cellar && !link_starts_prefix
       new_src = link.relative_path_from(file.parent)
       file.unlink
       FileUtils.ln_s(new_src, file)
