@@ -21,34 +21,9 @@ module Hbc
       #     brew cask _stanza artifacts --table --yaml    alfred google-chrome adium voicemac logisim vagrant
       #
 
-      # TODO: this should be retrievable from Hbc::DSL
-      ARTIFACTS = Set.new [
-        :app,
-        :suite,
-        :artifact,
-        :prefpane,
-        :qlplugin,
-        :dictionary,
-        :font,
-        :service,
-        :colorpicker,
-        :binary,
-        :input_method,
-        :internet_plugin,
-        :audio_unit_plugin,
-        :vst_plugin,
-        :vst3_plugin,
-        :screen_saver,
-        :pkg,
-        :installer,
-        :stage_only,
-        :nested_container,
-        :uninstall,
-        :preflight,
-        :postflight,
-        :uninstall_preflight,
-        :uninstall_postflight,
-      ]
+      ARTIFACTS =
+        DSL::ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key) +
+        DSL::ARTIFACT_BLOCK_CLASSES.map(&:dsl_key)
 
       option "--table",   :table,   false
       option "--quiet",   :quiet,   false
@@ -93,7 +68,7 @@ module Hbc
           end
 
           begin
-            value = cask.send(@stanza)
+            value = cask.send(stanza)
           rescue StandardError
             opoo "failure calling '#{stanza}' on Cask '#{cask}'" unless quiet?
             puts ""
@@ -108,8 +83,8 @@ module Hbc
 
           value = value.fetch(artifact_name).to_a.flatten if artifact_name
 
-          if @format
-            puts value.send(@format)
+          if format
+            puts value.send(format)
           elsif artifact_name || value.is_a?(Symbol)
             puts value.inspect
           else

@@ -17,7 +17,7 @@ module Hbc
       @token = token
       @sourcefile_path = sourcefile_path
       @tap = tap
-      @dsl = DSL.new(@token)
+      @dsl = DSL.new(self)
       return unless block_given?
       @dsl.instance_eval(&block)
       @dsl.language_eval

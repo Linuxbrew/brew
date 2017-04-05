@@ -1,10 +1,10 @@
-require "hbc/artifact/uninstall_base"
+require "hbc/artifact/abstract_uninstall"
 
 module Hbc
   module Artifact
-    class Zap < UninstallBase
-      def zap_phase
-        dispatch_uninstall_directives
+    class Zap < AbstractUninstall
+      def zap_phase(**options)
+        dispatch_uninstall_directives(**options)
       end
     end
   end

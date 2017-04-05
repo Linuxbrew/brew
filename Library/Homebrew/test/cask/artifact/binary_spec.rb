@@ -26,7 +26,8 @@ describe Hbc::Artifact::Binary, :cask do
   end
 
   it "links the binary to the proper directory" do
-    Hbc::Artifact::Binary.new(cask).install_phase
+    described_class.for_cask(cask)
+      .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
     expect(expected_path).to be_a_symlink
     expect(expected_path.readlink).to exist
@@ -45,7 +46,8 @@ describe Hbc::Artifact::Binary, :cask do
       expect(FileUtils).to receive(:chmod)
         .with("+x", cask.staged_path.join("naked_non_executable")).and_call_original
 
-      Hbc::Artifact::Binary.new(cask).install_phase
+      described_class.for_cask(cask)
+      .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect(expected_path).to be_a_symlink
       expect(expected_path.readlink).to be_executable
@@ -56,7 +58,8 @@ describe Hbc::Artifact::Binary, :cask do
     FileUtils.touch expected_path
 
     expect {
-      Hbc::Artifact::Binary.new(cask).install_phase
+      described_class.for_cask(cask)
+        .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
     }.to raise_error(Hbc::CaskError)
 
     expect(expected_path).not_to be :symlink?
@@ -65,7 +68,8 @@ describe Hbc::Artifact::Binary, :cask do
   it "clobbers an existing symlink" do
     expected_path.make_symlink("/tmp")
 
-    Hbc::Artifact::Binary.new(cask).install_phase
+    described_class.for_cask(cask)
+      .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
     expect(File.readlink(expected_path)).not_to eq("/tmp")
   end
@@ -73,7 +77,8 @@ describe Hbc::Artifact::Binary, :cask do
   it "creates parent directory if it doesn't exist" do
     FileUtils.rmdir Hbc.binarydir
 
-    Hbc::Artifact::Binary.new(cask).install_phase
+    described_class.for_cask(cask)
+      .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
     expect(expected_path.exist?).to be true
   end
@@ -86,8 +91,10 @@ describe Hbc::Artifact::Binary, :cask do
     }
 
     it "links the binary to the proper directory" do
-      Hbc::Artifact::App.new(cask).install_phase
-      Hbc::Artifact::Binary.new(cask).install_phase
+      Hbc::Artifact::App.for_cask(cask)
+        .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
+      described_class.for_cask(cask)
+        .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect(expected_path).to be_a_symlink
       expect(expected_path.readlink).to exist

@@ -8,47 +8,18 @@ module Hbc
       end
 
       def self.english_description
-        "#{artifact_english_name} #{link_type_english_name}s"
+        "#{english_name} #{link_type_english_name}s"
       end
 
-      def install_phase
-        each_artifact(&method(:link))
+      def install_phase(**options)
+        link(**options)
       end
 
-      def uninstall_phase
-        each_artifact(&method(:unlink))
+      def uninstall_phase(**options)
+        unlink(**options)
       end
 
-      private
-
-      def link
-        unless source.exist?
-          raise CaskError, "It seems the #{self.class.link_type_english_name.downcase} source '#{source}' is not there."
-        end
-
-        if target.exist? && !target.symlink?
-          raise CaskError, "It seems there is already #{self.class.artifact_english_article} #{self.class.artifact_english_name} at '#{target}'; not linking."
-        end
-
-        ohai "Linking #{self.class.artifact_english_name} '#{source.basename}' to '#{target}'."
-        create_filesystem_link(source, target)
-      end
-
-      def unlink
-        return unless target.symlink?
-        ohai "Unlinking #{self.class.artifact_english_name} '#{target}'."
-        target.delete
-      end
-
-      def create_filesystem_link(source, target)
-        target.dirname.mkpath
-        @command.run!("/bin/ln", args: ["-h", "-f", "-s", "--", source, target])
-        add_altname_metadata source, target.basename.to_s
-      end
-
-      def summarize_artifact(artifact_spec)
-        load_specification artifact_spec
-
+      def summarize_installed
         if target.symlink? && target.exist? && target.readlink.exist?
           "#{printable_target} -> #{target.readlink} (#{target.readlink.abv})"
         else
@@ -60,6 +31,33 @@ module Hbc
 
           Formatter.error(string, label: "Broken Link")
         end
+      end
+
+      private
+
+      def link(**options)
+        unless source.exist?
+          raise CaskError, "It seems the #{self.class.link_type_english_name.downcase} source '#{source}' is not there."
+        end
+
+        if target.exist? && !target.symlink?
+          raise CaskError, "It seems there is already #{self.class.english_article} #{self.class.english_name} at '#{target}'; not linking."
+        end
+
+        ohai "Linking #{self.class.english_name} '#{source.basename}' to '#{target}'."
+        create_filesystem_link(**options)
+      end
+
+      def unlink(**)
+        return unless target.symlink?
+        ohai "Unlinking #{self.class.english_name} '#{target}'."
+        target.delete
+      end
+
+      def create_filesystem_link(command: nil, **_)
+        target.dirname.mkpath
+        command.run!("/bin/ln", args: ["-h", "-f", "-s", "--", source, target])
+        add_altname_metadata(source, target.basename, command: command)
       end
     end
   end

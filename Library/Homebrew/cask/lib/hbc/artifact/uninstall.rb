@@ -1,10 +1,10 @@
-require "hbc/artifact/uninstall_base"
+require "hbc/artifact/abstract_uninstall"
 
 module Hbc
   module Artifact
-    class Uninstall < UninstallBase
-      def uninstall_phase
-        dispatch_uninstall_directives
+    class Uninstall < AbstractUninstall
+      def uninstall_phase(**options)
+        dispatch_uninstall_directives(**options)
       end
     end
   end

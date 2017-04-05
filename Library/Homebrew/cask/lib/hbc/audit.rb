@@ -214,12 +214,10 @@ module Hbc
     end
 
     def check_generic_artifacts
-      cask.artifacts[:artifact].each do |source, target_hash|
-        unless target_hash.is_a?(Hash) && target_hash[:target]
-          add_error "target required for generic artifact #{source}"
-          next
+      cask.artifacts[:artifact].each do |artifact|
+        unless artifact.target.absolute?
+          add_error "target must be absolute path for #{artifact.class.english_name} #{artifact.source}"
         end
-        add_error "target must be absolute path for generic artifact #{source}" unless Pathname.new(target_hash[:target]).absolute?
       end
     end
 

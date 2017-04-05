@@ -30,9 +30,9 @@ module Hbc
       end
 
       def self.list_artifacts(cask)
-        Artifact.for_cask(cask).each do |artifact|
-          summary = artifact.summary
-          ohai summary[:english_description], summary[:contents] unless summary.empty?
+        Artifact.for_cask(cask).group_by(&:class).each do |klass, artifacts|
+          next unless klass.respond_to?(:english_description)
+          ohai klass.english_description, artifacts.map(&:summarize_installed)
         end
       end
 
