@@ -184,6 +184,11 @@ class Cmd
       val  = chuzzle($1) || enum.next
       path = canonical_path(val)
       args << "-L#{val}" if keep?(path) && @lset.add?(path)
+    when /^-R(.+)?/
+      # -R is not the correct way to pass rpaths to the linker
+      val  = chuzzle($1) || enum.next
+      path = canonical_path(val)
+      args << "-Wl,-R," if keep?(path) && @lset.add?(path)
     else
       args << arg
     end
