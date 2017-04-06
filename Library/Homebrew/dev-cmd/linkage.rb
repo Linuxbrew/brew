@@ -22,6 +22,11 @@ module Homebrew
       if ARGV.include?("--test")
         result.display_test_output
         Homebrew.failed = true if result.broken_dylibs?
+        if OS.linux?
+          host_whitelist = %w[libc.so.6 libm.so.6 libgcc_s.so.1 libstdc++.so.6]
+          host_deps = result.system_dylibs.to_a.map { |s| File.basename s }
+          Homebrew.failed = true unless (host_deps - host_whitelist).empty?
+        end
       elsif ARGV.include?("--reverse")
         result.display_reverse_output
       else
