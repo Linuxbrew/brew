@@ -102,6 +102,7 @@ class LinkageChecker
   end
 
   def display_test_output
+    display_items "System libraries", @system_dylibs if OS.linux?
     display_items "Missing libraries", @broken_dylibs
     puts "No broken dylib links" if @broken_dylibs.empty?
   end
