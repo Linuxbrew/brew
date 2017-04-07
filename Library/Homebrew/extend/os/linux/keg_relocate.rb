@@ -46,6 +46,24 @@ class Keg
     end
   end
 
+  # Detects the C++ dynamic libraries in place, scanning the dynamic links
+  # of the files within the keg.
+  # Note that this doesn't attempt to distinguish between libstdc++ versions,
+  # for instance between Apple libstdc++ and GNU libstdc++
+  def detect_cxx_stdlibs(options = {})
+    skip_executables = options.fetch(:skip_executables, false)
+    results = Set.new
+
+    elf_files.each do |file|
+      next if !file.dynamic? || file.mach_o_executable? && skip_executables
+      dylibs = file.dynamically_linked_libraries
+      results << :libcxx if dylibs.any? { |s| s.include? "libc++.so" }
+      results << :libstdcxx if dylibs.any? { |s| s.include? "libstdc++.so" }
+    end
+
+    results.to_a
+  end
+
   def elf_files
     hardlinks = Set.new
     elf_files = []
