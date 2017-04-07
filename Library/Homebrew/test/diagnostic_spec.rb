@@ -46,7 +46,7 @@ describe Homebrew::Diagnostic::Checks do
       mode = HOMEBREW_LOCK_DIR.stat.mode & 0777
       HOMEBREW_LOCK_DIR.chmod 0555
 
-      expect(subject.check_access_logs)
+      expect(subject.check_access_lock_dir)
         .to match("#{HOMEBREW_LOCK_DIR} isn't writable.")
     ensure
       HOMEBREW_LOCK_DIR.chmod mode
