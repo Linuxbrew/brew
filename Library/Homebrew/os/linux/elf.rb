@@ -37,6 +37,13 @@ module ELF
     def initialize(path)
       @path = path
 
+      begin
+        odie "patchelf must be installed: brew install patchelf" unless (Formula["patchelf"].bin/"patchelf").executable?
+      rescue FormulaUnavailableError
+        @dylibs = []
+        return
+      end
+
       @dylib_id = if path.dylib?
         command = ["patchelf", "--print-soname", path.expand_path.to_s]
         id = Utils.popen_read(*command).split("\n")
