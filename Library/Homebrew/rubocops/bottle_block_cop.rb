@@ -13,7 +13,7 @@ module RuboCop
         def audit_formula(_node, _class_node, _parent_class_node, formula_class_body_node)
           bottle = find_block(formula_class_body_node, :bottle)
           return if bottle.nil? || block_size(bottle).zero?
-          problem "Use rebuild instead of revision in bottle block" if method_called?(bottle, :revision)
+          problem "Use rebuild instead of revision in bottle block" if method_called_in_block?(bottle, :revision)
         end
 
         private
