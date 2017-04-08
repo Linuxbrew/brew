@@ -23,9 +23,19 @@ module Homebrew
         result.display_test_output
         Homebrew.failed = true if result.broken_dylibs?
         if OS.linux?
-          host_whitelist =
-            %w[libc.so.6 libdl.so.2 libm.so.6 libpthread.so.0 librt.so.1] +
-            %w[libgcc_s.so.1 libstdc++.so.6]
+          host_whitelist = %w[
+            libc.so.6
+            libcrypt.so.1
+            libdl.so.2
+            libm.so.6
+            libnsl.so.1
+            libpthread.so.0
+            librt.so.1
+            libutil.so.1
+
+            libgcc_s.so.1
+            libstdc++.so.6
+          ]
           host_deps = result.system_dylibs.to_a.map { |s| File.basename s }
           Homebrew.failed = true unless (host_deps - host_whitelist).empty?
         end
