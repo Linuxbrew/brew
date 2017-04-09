@@ -123,8 +123,12 @@ module Homebrew
     puts f.desc if f.desc
     puts Formatter.url(f.homepage) if f.homepage
 
-    conflicts = f.conflicts.map(&:name).sort!
-    puts "Conflicts with: #{conflicts*", "}" unless conflicts.empty?
+    conflicts = f.conflicts.map{ |f|
+      f.name +
+      if f.reason then " (because #{f.reason})" else "" end
+    }.sort!
+    msg="Conflicts with: "
+    puts msg+conflicts*(",\n"+" "*msg.length) unless conflicts.empty?
 
     kegs = f.installed_kegs.sort_by(&:version)
     if kegs.empty?
