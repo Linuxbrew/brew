@@ -83,7 +83,8 @@ class Build
       ENV.keg_only_deps = keg_only_deps
       ENV.deps = formula_deps
       ENV.run_time_deps = run_time_deps
-      ENV.x11 = reqs.any? { |rq| rq.is_a?(X11Requirement) }
+      ENV.x11 = reqs.any? { |rq| rq.is_a?(X11Requirement) } ||
+                deps.any? { |dep| dep.name == "linuxbrew/xorg/xorg" }
       ENV.setup_build_environment(formula)
       post_superenv_hacks
       reqs.each(&:modify_build_environment)
