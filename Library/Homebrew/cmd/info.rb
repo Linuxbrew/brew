@@ -123,10 +123,10 @@ module Homebrew
     puts f.desc if f.desc
     puts Formatter.url(f.homepage) if f.homepage
 
-    conflicts = f.conflicts.map{ |f|
-      f.name +
-      if f.reason then " (because #{f.reason})" else "" end
-    }.sort!
+    conflicts = f.conflicts.map do |c|
+      c.name +
+        (c.reason ? " (because #{c.reason})" : "")
+    end.sort!
     msg="Conflicts with: "
     puts msg+conflicts*(",\n"+" "*msg.length) unless conflicts.empty?
 
