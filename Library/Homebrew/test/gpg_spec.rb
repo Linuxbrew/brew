@@ -13,7 +13,12 @@ describe Gpg do
         shutup do
           subject.create_test_key(dir)
         end
-        expect(dir/".gnupg/secring.gpg").to exist
+
+        if subject.version == Version.create("2.0")
+          expect(dir/".gnupg/secring.gpg").to be_a_file
+        else
+          expect(dir/".gnupg/pubring.kbx").to be_a_file
+        end
       end
     end
   end
