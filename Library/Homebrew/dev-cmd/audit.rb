@@ -1021,6 +1021,10 @@ class FormulaAuditor
       problem ":tex is deprecated."
     end
 
+    if line =~ /depends_on\s+['"].+['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
+      problem "Formulae should vendor #{$1} modules rather than use `depends_on ... => :#{$1}#{$2}`."
+    end
+
     # Commented-out depends_on
     problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
