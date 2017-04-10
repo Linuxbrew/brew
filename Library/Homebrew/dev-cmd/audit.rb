@@ -337,7 +337,7 @@ class FormulaAuditor
         unversioned_name = unversioned_formula.basename(".rb")
         problem "#{formula} is versioned but no #{unversioned_name} formula exists"
       end
-    else
+    elsif ARGV.build_stable?
       versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
       needs_versioned_alias = !versioned_formulae.empty? &&
                               formula.tap &&
