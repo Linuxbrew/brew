@@ -34,6 +34,7 @@ module Homebrew
             libutil.so.1
 
             libgcc_s.so.1
+            libgomp.so.1
             libstdc++.so.6
           ]
           host_deps = result.system_dylibs.to_a.map { |s| File.basename s }
