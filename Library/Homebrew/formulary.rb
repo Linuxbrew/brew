@@ -402,7 +402,7 @@ module Formulary
   end
 
   def self.tap_paths(name, taps = Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/"])
-    name = name.downcase
+    name = name.to_s.downcase
     taps.map do |tap|
       Pathname.glob([
                       "#{tap}Formula/#{name}.rb",
