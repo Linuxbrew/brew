@@ -122,7 +122,7 @@ module Homebrew
         path = Formulary.path name
         return if File.exist? path
         tap = Tap.from_path(path)
-        return unless File.exist? tap.path
+        return if tap.nil? || !File.exist?(tap.path)
         relative_path = path.relative_path_from tap.path
 
         tap.path.cd do
