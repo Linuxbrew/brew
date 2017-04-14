@@ -408,6 +408,11 @@ class Version
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)
     return m.captures.first unless m.nil?
+
+    # date-based versioning
+    # e.g. ltopers-v2017-04-14.tar.gz
+    m = /-v?((?:\d{4}-\d{2}-\d{2}))/.match(stem)
+    return m.captures.first unless m.nil?
   end
 end
 
