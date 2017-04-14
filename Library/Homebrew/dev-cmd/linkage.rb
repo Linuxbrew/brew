@@ -23,23 +23,7 @@ module Homebrew
         result.display_test_output
         Homebrew.failed = true if result.broken_dylibs?
         if OS.linux?
-          host_whitelist = %w[
-            ld-linux-x86-64.so.2
-            libc.so.6
-            libcrypt.so.1
-            libdl.so.2
-            libm.so.6
-            libnsl.so.1
-            libpthread.so.0
-            librt.so.1
-            libutil.so.1
-
-            libgcc_s.so.1
-            libgomp.so.1
-            libstdc++.so.6
-          ]
-          host_deps = result.system_dylibs.to_a.map { |s| File.basename s }
-          Homebrew.failed = true unless (host_deps - host_whitelist).empty?
+          Homebrew.failed = true if result.unwanted_system_dylibs?
         end
       elsif ARGV.include?("--reverse")
         result.display_reverse_output
