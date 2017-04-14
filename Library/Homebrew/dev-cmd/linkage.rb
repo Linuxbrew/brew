@@ -24,6 +24,7 @@ module Homebrew
         Homebrew.failed = true if result.broken_dylibs?
         if OS.linux?
           host_whitelist = %w[
+            ld-linux-x86-64.so.2
             libc.so.6
             libcrypt.so.1
             libdl.so.2
