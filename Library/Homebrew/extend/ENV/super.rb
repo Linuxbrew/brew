@@ -95,7 +95,7 @@ module Superenv
   end
 
   def determine_cxx
-    determine_cc.to_s.gsub("gcc", "g++").gsub("clang", "clang++")
+    determine_cc.to_s.gsub("gcc", "g++").gsub("clang", "clang++").sub(/^cc$/, "c++")
   end
 
   def homebrew_extra_paths
