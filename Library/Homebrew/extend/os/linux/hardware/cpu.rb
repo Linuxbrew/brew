@@ -20,9 +20,10 @@ module Hardware
       end
 
       def type
-        @type ||= if cpuinfo =~ /Intel|AMD/
+        @type ||= case Utils.popen_read("uname", "-m").chomp
+        when "x86_64", "amd64", /^i\d86$/
           :intel
-        elsif cpuinfo =~ /ARM|Marvell/
+        when /^arm/
           :arm
         else
           :dunno
