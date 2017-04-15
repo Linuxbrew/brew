@@ -63,6 +63,7 @@ module Superenv
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
     self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths
+    self["HOMEBREW_DYNAMIC_LINKER"] = determine_dynamic_linker_path(formula)
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
     self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix unless formula.nil?
 
@@ -184,6 +185,10 @@ module Superenv
   end
 
   def determine_rpath_paths
+    ""
+  end
+
+  def determine_dynamic_linker_path(_formula)
     ""
   end
 
