@@ -586,6 +586,11 @@ describe Version do
         .to be_detected_from("ftp://gcc.gnu.org/pub/gcc/snapshots/6-20151227/gcc-6-20151227.tar.bz2")
     end
 
+    specify "date-based version style" do
+      expect(Version.create("2017-04-17"))
+        .to be_detected_from("https://example.com/dada-v2017-04-17.tar.gz")
+    end
+
     specify "from URL" do
       expect(Version.create("1.2.3"))
         .to be_detected_from("http://github.com/foo/bar.git", tag: "v1.2.3")
