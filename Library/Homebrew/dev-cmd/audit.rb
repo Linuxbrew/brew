@@ -1053,6 +1053,14 @@ class FormulaAuditor
       problem "Use ENV instead of invoking '#{$1}' to modify the environment"
     end
 
+    if formula.name != "wine" && line =~ /ENV\.universal_binary/
+      problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
+    end
+
+    if line =~ /build\.universal\?/
+      problem "macOS has been 64-bit only so build.universal? is deprecated."
+    end
+
     if line =~ /version == ['"]HEAD['"]/
       problem "Use 'build.head?' instead of inspecting 'version'"
     end
