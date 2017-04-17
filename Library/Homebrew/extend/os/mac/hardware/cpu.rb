@@ -107,6 +107,20 @@ module Hardware
         end
       end
 
+      # Determines whether the current CPU and macOS combination
+      # can run an executable of the specified architecture.
+      # `arch` is a symbol in the same format returned by
+      # Hardware::CPU.family
+      def can_run?(arch)
+        if Hardware::CPU.intel?
+          intel_can_run? arch
+        elsif Hardware::CPU.ppc?
+          ppc_can_run? arch
+        else
+          false
+        end
+      end
+
       def features
         @features ||= sysctl_n(
           "machdep.cpu.features",
@@ -160,6 +174,35 @@ module Hardware
       def sysctl_n(*keys)
         (@properties ||= {}).fetch(keys) do
           @properties[keys] = Utils.popen_read("/usr/sbin/sysctl", "-n", *keys)
+        end
+      end
+
+      def intel_can_run?(arch)
+        case arch
+        when :ppc
+          # Rosetta is still available
+          MacOS.version < :lion
+        when :ppc64
+          # Rosetta never supported PPC64
+          false
+        when :x86_64
+          Hardware::CPU.is_64_bit?
+        when :i386
+          true
+        else # dunno
+          false
+        end
+      end
+
+      def ppc_can_run?(arch)
+        case arch
+        when :ppc
+          true
+        when :ppc64
+          Hardware::CPU.is_64_bit?
+        else
+          # Intel is never supported
+          false
         end
       end
     end
