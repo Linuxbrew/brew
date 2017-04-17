@@ -240,6 +240,8 @@ module Homebrew
         puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
       end
 
+      # Do not search taps if the formula name is qualified
+      return if e.name.include?("/")
       ohai "Searching taps..."
       taps_search_results = search_taps(query)
       case taps_search_results.length
