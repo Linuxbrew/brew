@@ -12,6 +12,8 @@ before_install:
   - export HOMEBREW_DEVELOPER=1
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       HOMEBREW_REPOSITORY="$(brew --repo)";
+      sudo chown -R "$USER" "$HOMEBREW_REPOSITORY/Library/Taps";
+      mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
     else
