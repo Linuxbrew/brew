@@ -35,12 +35,7 @@ We explicitly welcome contributions from people who have never contributed to op
 A good starting point for contributing is running `brew audit --strict`with some of the packages you use (e.g. `brew audit --strict wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit --strict` shows no results and [submit a pull request](http://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request.html). If no formulae you use have warnings you can run `brew audit --strict` without arguments to have it run on all packages and pick one. Good luck!
 
 ## Security
-Please report security issues to security@brew.sh.
-
-This is our PGP key which is valid until May 24, 2017.
-* Key ID: `0xE33A3D3CCE59E297`
-* Fingerprint: `C657 8F76 2E23 441E C879  EC5C E33A 3D3C CE59 E297`
-* Full key: https://keybase.io/homebrew/key.asc
+Please report security issues to our [HackerOne](https://hackerone.com/homebrew/).
 
 ## Who Are You?
 Homebrew's lead maintainer is [Mike McQuaid](https://github.com/mikemcquaid).
