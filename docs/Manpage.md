@@ -709,7 +709,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--meson` is passed, create a basic template for a Meson-style build.
 
     If `--no-fetch` is passed, Homebrew will not download `URL` to the cache and
-    will thus not add the SHA256 to the formula for you.
+    will thus not add the SHA256 to the formula for you. It will also not check
+    the GitHub API for GitHub projects (to fill out the description and homepage).
 
     The options `--set-name` and `--set-version` each take an argument and allow
     you to explicitly set the name and version of the package you are creating.
