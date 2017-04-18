@@ -303,7 +303,7 @@ describe FormulaAuditor do
     end
   end
 
-  describe "#audit_line" do
+  describe "#line_problems" do
     specify "pkgshare" do
       fa = formula_auditor "foo", <<-EOS.undent, strict: true
         class Foo < Formula
@@ -311,25 +311,25 @@ describe FormulaAuditor do
         end
       EOS
 
-      fa.audit_line 'ohai "#{share}/foo"', 3
+      fa.line_problems 'ohai "#{share}/foo"', 3
       expect(fa.problems.shift).to eq("Use \#{pkgshare} instead of \#{share}/foo")
 
-      fa.audit_line 'ohai "#{share}/foo/bar"', 3
+      fa.line_problems 'ohai "#{share}/foo/bar"', 3
       expect(fa.problems.shift).to eq("Use \#{pkgshare} instead of \#{share}/foo")
 
-      fa.audit_line 'ohai share/"foo"', 3
+      fa.line_problems 'ohai share/"foo"', 3
       expect(fa.problems.shift).to eq('Use pkgshare instead of (share/"foo")')
 
-      fa.audit_line 'ohai share/"foo/bar"', 3
+      fa.line_problems 'ohai share/"foo/bar"', 3
       expect(fa.problems.shift).to eq('Use pkgshare instead of (share/"foo")')
 
-      fa.audit_line 'ohai "#{share}/foo-bar"', 3
+      fa.line_problems 'ohai "#{share}/foo-bar"', 3
       expect(fa.problems).to eq([])
 
-      fa.audit_line 'ohai share/"foo-bar"', 3
+      fa.line_problems 'ohai share/"foo-bar"', 3
       expect(fa.problems).to eq([])
 
-      fa.audit_line 'ohai share/"bar"', 3
+      fa.line_problems 'ohai share/"bar"', 3
       expect(fa.problems).to eq([])
     end
 
@@ -344,11 +344,11 @@ describe FormulaAuditor do
         end
       EOS
 
-      fa.audit_line 'ohai "#{share}/foolibc++"', 3
+      fa.line_problems 'ohai "#{share}/foolibc++"', 3
       expect(fa.problems.shift)
         .to eq("Use \#{pkgshare} instead of \#{share}/foolibc++")
 
-      fa.audit_line 'ohai share/"foolibc++"', 3
+      fa.line_problems 'ohai share/"foolibc++"', 3
       expect(fa.problems.shift)
         .to eq('Use pkgshare instead of (share/"foolibc++")')
     end
@@ -360,7 +360,7 @@ describe FormulaAuditor do
         end
       EOS
 
-      fa.audit_line "class Foo<Formula", 1
+      fa.line_problems "class Foo<Formula", 1
       expect(fa.problems.shift)
         .to eq("Use a space in class inheritance: class Foo < Formula")
     end
@@ -368,10 +368,10 @@ describe FormulaAuditor do
     specify "default template" do
       fa = formula_auditor "foo", "class Foo < Formula; url '/foo-1.0.tgz'; end"
 
-      fa.audit_line '# system "cmake", ".", *std_cmake_args', 3
+      fa.line_problems '# system "cmake", ".", *std_cmake_args', 3
       expect(fa.problems.shift).to eq("Commented cmake call found")
 
-      fa.audit_line "# PLEASE REMOVE", 3
+      fa.line_problems "# PLEASE REMOVE", 3
       expect(fa.problems.shift).to eq("Please remove default template comments")
     end
   end

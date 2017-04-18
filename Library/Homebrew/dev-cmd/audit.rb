@@ -1,4 +1,4 @@
-#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [<formulae>]:
+#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
@@ -22,6 +22,10 @@
 #:
 #:    If `--display-filename` is passed, every line of output is prefixed with the
 #:    name of the file or formula being audited, to make the output easy to grep.
+#:
+#:    If `--only` is passed, only the methods named `audit_<method>` will be run.
+#:
+#:    If `--except` is passed, the methods named `audit_<method>` will not be run.
 #:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
@@ -728,7 +732,7 @@ class FormulaAuditor
         }
       end
 
-      spec.patches.each { |p| audit_patch(p) if p.external? }
+      spec.patches.each { |p| patch_problems(p) if p.external? }
     end
 
     %w[Stable Devel].each do |name|
@@ -864,10 +868,10 @@ class FormulaAuditor
     return if legacy_patches.empty?
 
     problem "Use the patch DSL instead of defining a 'patches' method"
-    legacy_patches.each { |p| audit_patch(p) }
+    legacy_patches.each { |p| patch_problems(p) }
   end
 
-  def audit_patch(patch)
+  def patch_problems(patch)
     case patch.url
     when /raw\.github\.com/, %r{gist\.github\.com/raw}, %r{gist\.github\.com/.+/raw},
       %r{gist\.githubusercontent\.com/.+/raw}
@@ -939,7 +943,13 @@ class FormulaAuditor
     problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
-  def audit_line(line, _lineno)
+  def audit_lines
+    text.without_patch.split("\n").each_with_index do |line, lineno|
+      line_problems(line, lineno+1)
+    end
+  end
+
+  def line_problems(line, _lineno)
     if line =~ /<(Formula|AmazonWebServicesFormula|ScriptFileFormula|GithubGistFormula)/
       problem "Use a space in class inheritance: class Foo < #{$1}"
     end
@@ -1142,11 +1152,11 @@ class FormulaAuditor
     end
 
     if line =~ /depends_on :(.+) (if.+|unless.+)$/
-      audit_conditional_dep($1.to_sym, $2, $&)
+      conditional_dep_problems($1.to_sym, $2, $&)
     end
 
     if line =~ /depends_on ['"](.+)['"] (if.+|unless.+)$/
-      audit_conditional_dep($1, $2, $&)
+      conditional_dep_problems($1, $2, $&)
     end
 
     if line =~ /(Dir\[("[^\*{},]+")\])/
@@ -1234,7 +1244,7 @@ class FormulaAuditor
     EOS
   end
 
-  def audit_conditional_dep(dep, condition, line)
+  def conditional_dep_problems(dep, condition, line)
     quoted_dep = quote_dep(dep)
     dep = Regexp.escape(dep.to_s)
 
@@ -1250,30 +1260,26 @@ class FormulaAuditor
     dep.is_a?(Symbol) ? dep.inspect : "'#{dep}'"
   end
 
-  def audit_check_output(output)
+  def problem_if_output(output)
     problem(output) if output
   end
 
   def audit
-    audit_file
-    audit_formula_name
-    audit_class
-    audit_specs
-    audit_revision_and_version_scheme
-    audit_homepage
-    audit_bottle_spec
-    audit_github_repository
-    audit_deps
-    audit_conflicts
-    audit_options
-    audit_legacy_patches
-    audit_text
-    audit_caveats
-    text.without_patch.split("\n").each_with_index { |line, lineno| audit_line(line, lineno+1) }
-    audit_installed
-    audit_prefix_has_contents
-    audit_reverse_migration
-    audit_style
+    only_audits = ARGV.value("only").to_s.split(",")
+    except_audits = ARGV.value("except").to_s.split(",")
+    if !only_audits.empty? && !except_audits.empty?
+      odie "--only and --except cannot be used simulataneously!"
+    end
+
+    methods.map(&:to_s).grep(/^audit_/).each do |audit_method_name|
+      name = audit_method_name.gsub(/^audit_/, "")
+      if !only_audits.empty?
+        next unless only_audits.include?(name)
+      elsif !except_audits.empty?
+        next if except_audits.include?(name)
+      end
+      send(audit_method_name)
+    end
   end
 
   private
