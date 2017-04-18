@@ -606,7 +606,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## DEVELOPER COMMANDS
 
-  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`formulae`]:
+  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=``method`|`--except=``method] [<formulae`]:
     Check `formulae` for Homebrew coding style violations. This should be
     run before submitting a new formula.
 
@@ -630,6 +630,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--display-filename` is passed, every line of output is prefixed with the
     name of the file or formula being audited, to make the output easy to grep.
+
+    If `--only` is passed, only the methods named `audit_`method`` will be run.
+
+    If `--except` is passed, the methods named `audit_`method`` will not be run.
 
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.

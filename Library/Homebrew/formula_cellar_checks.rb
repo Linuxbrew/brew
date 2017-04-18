@@ -154,17 +154,17 @@ module FormulaCellarChecks
   end
 
   def audit_installed
-    audit_check_output(check_manpages)
-    audit_check_output(check_infopages)
-    audit_check_output(check_jars)
-    audit_check_output(check_non_libraries)
-    audit_check_output(check_non_executables(formula.bin))
-    audit_check_output(check_generic_executables(formula.bin))
-    audit_check_output(check_non_executables(formula.sbin))
-    audit_check_output(check_generic_executables(formula.sbin))
-    audit_check_output(check_easy_install_pth(formula.lib))
-    audit_check_output(check_elisp_dirname(formula.share, formula.name))
-    audit_check_output(check_elisp_root(formula.share, formula.name))
+    problem_if_output(check_manpages)
+    problem_if_output(check_infopages)
+    problem_if_output(check_jars)
+    problem_if_output(check_non_libraries)
+    problem_if_output(check_non_executables(formula.bin))
+    problem_if_output(check_generic_executables(formula.bin))
+    problem_if_output(check_non_executables(formula.sbin))
+    problem_if_output(check_generic_executables(formula.sbin))
+    problem_if_output(check_easy_install_pth(formula.lib))
+    problem_if_output(check_elisp_dirname(formula.share, formula.name))
+    problem_if_output(check_elisp_root(formula.share, formula.name))
   end
   alias generic_audit_installed audit_installed
 

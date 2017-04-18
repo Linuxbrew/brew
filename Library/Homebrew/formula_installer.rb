@@ -858,15 +858,15 @@ class FormulaInstaller
     tab.write
   end
 
-  def audit_check_output(output)
+  def problem_if_output(output)
     return unless output
     opoo output
     @show_summary_heading = true
   end
 
   def audit_installed
-    audit_check_output(check_env_path(formula.bin))
-    audit_check_output(check_env_path(formula.sbin))
+    problem_if_output(check_env_path(formula.bin))
+    problem_if_output(check_env_path(formula.sbin))
     super
   end
 
