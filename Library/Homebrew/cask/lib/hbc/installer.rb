@@ -84,7 +84,7 @@ module Hbc
 
       print_caveats
       fetch
-      uninstall_if_neccessary
+      uninstall_existing_cask if @reinstall
 
       oh1 "Installing Cask #{@cask}"
       stage
@@ -100,14 +100,12 @@ module Hbc
       install
     end
 
-    def uninstall_if_neccessary
-      return unless @cask.installed? && @reinstall
-      installed_cask = @cask
+    def uninstall_existing_cask
+      return unless @cask.installed?
 
       # use the same cask file that was used for installation, if possible
-      if (installed_caskfile = installed_cask.installed_caskfile).exist?
-        installed_cask = CaskLoader.load_from_file(installed_caskfile)
-      end
+      installed_caskfile = @cask.installed_caskfile
+      installed_cask = installed_caskfile.exist? ? CaskLoader.load_from_file(installed_caskfile) : @cask
 
       # Always force uninstallation, ignore method parameter
       Installer.new(installed_cask, force: true).uninstall
