@@ -10,7 +10,8 @@
 #:    If `--meson` is passed, create a basic template for a Meson-style build.
 #:
 #:    If `--no-fetch` is passed, Homebrew will not download <URL> to the cache and
-#:    will thus not add the SHA256 to the formula for you.
+#:    will thus not add the SHA256 to the formula for you. It will also not check
+#:    the GitHub API for GitHub projects (to fill out the description and homepage).
 #:
 #:    The options `--set-name` and `--set-version` each take an argument and allow
 #:    you to explicitly set the name and version of the package you are creating.
@@ -100,7 +101,7 @@ module Homebrew
 end
 
 class FormulaCreator
-  attr_reader :url, :sha256
+  attr_reader :url, :sha256, :desc, :homepage
   attr_accessor :name, :version, :tap, :path, :mode
 
   def url=(url)
@@ -108,11 +109,15 @@ class FormulaCreator
     path = Pathname.new(url)
     if @name.nil?
       case url
-      when %r{github\.com/\S+/(\S+)\.git}
-        @name = $1
+      when %r{github\.com/(\S+)/(\S+)\.git}
+        @user = $1
+        @name = $2
         @head = true
-      when %r{github\.com/\S+/(\S+)/archive/}
-        @name = $1
+        @github = true
+      when %r{github\.com/(\S+)/(\S+)/(archive|releases)/}
+        @user = $1
+        @name = $2
+        @github = true
       else
         @name = path.basename.to_s[/(.*?)[-_.]?#{Regexp.escape(path.version.to_s)}/, 1]
       end
@@ -131,7 +136,7 @@ class FormulaCreator
   end
 
   def fetch?
-    !head? && !ARGV.include?("--no-fetch")
+    !ARGV.include?("--no-fetch")
   end
 
   def head?
@@ -145,11 +150,25 @@ class FormulaCreator
       opoo "Version cannot be determined from URL."
       puts "You'll need to add an explicit 'version' to the formula."
     elsif fetch?
-      r = Resource.new
-      r.url(url)
-      r.version(version)
-      r.owner = self
-      @sha256 = r.fetch.sha256 if r.download_strategy == CurlDownloadStrategy
+      unless head?
+        r = Resource.new
+        r.url(url)
+        r.version(version)
+        r.owner = self
+        @sha256 = r.fetch.sha256 if r.download_strategy == CurlDownloadStrategy
+      end
+
+      if @user && @name
+        begin
+          metadata = GitHub.repository(@user, @name)
+          @desc = metadata["description"]
+          @homepage = metadata["homepage"]
+        rescue GitHub::HTTPNotFoundError
+          # If there was no repository found assume the network connection is at
+          # fault rather than the input URL.
+          nil
+        end
+      end
     end
 
     path.write ERB.new(template, nil, ">").result(binding)
@@ -161,8 +180,8 @@ class FormulaCreator
     # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 
     class #{Formulary.class_s(name)} < Formula
-      desc ""
-      homepage ""
+      desc "#{desc}"
+      homepage "#{homepage}"
     <% if head? %>
       head "#{url}"
     <% else %>
