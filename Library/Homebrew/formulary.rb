@@ -210,6 +210,10 @@ module Formulary
 
     def get_formula(spec, alias_path: nil)
       super
+    rescue FormulaUnreadableError => e
+      raise TapFormulaUnreadableError.new(tap, name, e.formula_error), "", e.backtrace
+    rescue FormulaClassUnavailableError => e
+      raise TapFormulaClassUnavailableError.new(tap, name, e.path, e.class_name, e.class_list), "", e.backtrace
     rescue FormulaUnavailableError => e
       raise TapFormulaUnavailableError.new(tap, name), "", e.backtrace
     end
