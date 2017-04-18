@@ -98,10 +98,17 @@ module Hardware
       %w[aes altivec avx avx2 lm sse3 ssse3 sse4 sse4_2].each do |flag|
         define_method(flag + "?") { flags.include? flag }
       end
-      alias is_64_bit? lm?
 
       def bits
-        is_64_bit? ? 64 : 32
+        Utils.popen_read("getconf", "LONG_BIT").chomp.to_i
+      end
+
+      def arch_32_bit
+        intel? ? :i386 : :arm
+      end
+
+      def arch_64_bit
+        intel? ? :x86_64 : :arm64
       end
     end
   end
