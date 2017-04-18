@@ -4,6 +4,7 @@ module Hardware
       OPTIMIZATION_FLAGS_LINUX = {
         core2: "-march=core2",
         core: "-march=prescott",
+        arm: "-march=armv6",
         dunno: "-march=native",
       }.freeze
 
