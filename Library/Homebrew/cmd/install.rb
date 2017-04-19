@@ -206,7 +206,8 @@ module Homebrew
         Migrator.migrate_if_needed(f)
         install_formula(f)
       end
-    rescue FormulaClassUnavailableError => e
+    rescue FormulaUnreadableError, FormulaClassUnavailableError,
+           TapFormulaUnreadableError, TapFormulaClassUnavailableError => e
       # Need to rescue before `FormulaUnavailableError` (superclass of this)
       # is handled, as searching for a formula doesn't make sense here (the
       # formula was found, but there's a problem with its implementation).
