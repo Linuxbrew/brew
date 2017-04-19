@@ -320,8 +320,8 @@ def which_all(cmd, path = ENV["PATH"])
 end
 
 def which_editor
-  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL", "EDITOR").compact.first
-  return editor unless editor.nil?
+  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL").compact.first
+  return which(editor, ENV["HOMEBREW_PATH"]) unless editor.nil?
 
   # Find Textmate
   editor = "mate" if which "mate"
@@ -334,7 +334,7 @@ def which_editor
 
   opoo <<-EOS.undent
     Using #{editor} because no editor was set in the environment.
-    This may change in the future, so we recommend setting EDITOR, VISUAL,
+    This may change in the future, so we recommend setting EDITOR,
     or HOMEBREW_EDITOR to your preferred text editor.
   EOS
 
