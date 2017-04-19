@@ -13,7 +13,13 @@ module Hardware
       end
 
       def universal_archs
-        [].extend ArchitectureListExtension
+        arch = case bits
+        when 32
+          arch_32_bit
+        when 64
+          arch_64_bit
+        end
+        [arch].compact.extend ArchitectureListExtension
       end
 
       def cpuinfo
