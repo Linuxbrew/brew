@@ -321,6 +321,8 @@ class BottleSpecification
 
   # Does the Bottle this BottleSpecification belongs to need to be relocated?
   def skip_relocation?
+    # Allow bottles to skip at their own peril with force-skip-relocation.
+    return true if cellar == :force_skip_relocation
     # Relocation is always required on Linux to locate glibc.
     return false if OS.linux?
     cellar == :any_skip_relocation
