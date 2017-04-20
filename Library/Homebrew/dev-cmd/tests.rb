@@ -97,6 +97,10 @@ module Homebrew
         files = files.reject { |p| p =~ %r{^test/(os/mac|cask)(/.*|_spec\.rb)$} }
       end
 
+      unless OS.linux?
+        files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
+      end
+
       if parallel
         system "bundle", "exec", "parallel_rspec", *opts, "--", *args, "--", *files
       else
