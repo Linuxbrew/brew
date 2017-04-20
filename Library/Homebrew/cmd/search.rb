@@ -100,10 +100,8 @@ module Homebrew
     raise SEARCH_ERROR_QUEUE.pop unless SEARCH_ERROR_QUEUE.empty?
   end
 
-  SEARCHABLE_TAPS = OFFICIAL_TAPS.map { |tap| ["Homebrew", tap] } + [
-    %w[Caskroom cask],
-    %w[Caskroom versions],
-  ]
+  SEARCHABLE_TAPS = OFFICIAL_TAPS.map { |tap| ["Homebrew", tap] } +
+                    OFFICIAL_CASK_TAPS.map { |tap| ["caskroom", tap] }
 
   def query_regexp(query)
     case query
@@ -126,7 +124,7 @@ module Homebrew
     regex = regex_or_string.is_a?(String) ? /^#{Regexp.escape(regex_or_string)}$/ : regex_or_string
 
     if (HOMEBREW_LIBRARY/"Taps/#{user.downcase}/homebrew-#{repo.downcase}").directory? && \
-       user != "Caskroom"
+       user != "caskroom"
       return []
     end
 
