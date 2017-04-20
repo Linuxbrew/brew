@@ -69,6 +69,11 @@ module Plist
         @xml = plist_data_or_file
       end
 
+      # TODO: Update vendored `plist` parser when
+      #       https://github.com/patsplat/plist/pull/38
+      #       is merged.
+      @xml.force_encoding("UTF-8")
+
       @listener = listener
     end
 
