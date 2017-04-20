@@ -5,6 +5,7 @@ require "formula"
 class LinkageChecker
   attr_reader :keg, :formula
   attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :variable_dylibs
+  attr_reader :unwanted_system_dylibs
   attr_reader :undeclared_deps, :reverse_links
 
   def initialize(keg, formula = nil)
@@ -16,6 +17,7 @@ class LinkageChecker
     @variable_dylibs = Set.new
     @undeclared_deps = []
     @reverse_links = Hash.new { |h, k| h[k] = Set.new }
+    @unwanted_system_dylibs = Set.new
     check_dylibs
   end
 
@@ -49,6 +51,25 @@ class LinkageChecker
           end
         end
       end
+
+      next unless OS.linux?
+      system_whitelist = %w[
+        ld-linux-x86-64.so.2
+        libc.so.6
+        libcrypt.so.1
+        libdl.so.2
+        libm.so.6
+        libnsl.so.1
+        libpthread.so.0
+        librt.so.1
+        libutil.so.1
+
+        libgcc_s.so.1
+        libgomp.so.1
+        libstdc++.so.6
+      ]
+      system_sonames = @system_dylibs.to_a.map { |s| File.basename s }
+      @unwanted_system_dylibs += system_sonames - system_whitelist
     end
 
     @undeclared_deps = check_undeclared_deps if formula
@@ -105,6 +126,9 @@ class LinkageChecker
     display_items "System libraries", @system_dylibs if OS.linux?
     display_items "Missing libraries", @broken_dylibs
     puts "No broken dylib links" if @broken_dylibs.empty?
+    return unless OS.linux?
+    display_items "Unwanted system libraries", @unwanted_system_dylibs
+    puts "No unwanted system libraries" if @unwanted_system_dylibs.empty?
   end
 
   def broken_dylibs?
@@ -113,6 +137,10 @@ class LinkageChecker
 
   def undeclared_deps?
     !@undeclared_deps.empty?
+  end
+
+  def unwanted_system_dylibs?
+    !@unwanted_system_dylibs.empty?
   end
 
   private
