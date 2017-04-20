@@ -61,6 +61,7 @@ class LinkageChecker
         libm.so.6
         libnsl.so.1
         libpthread.so.0
+        libresolv.so.2
         librt.so.1
         libutil.so.1
 
