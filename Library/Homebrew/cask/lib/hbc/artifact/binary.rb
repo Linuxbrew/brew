@@ -9,7 +9,12 @@ module Hbc
 
       def link
         super
-        FileUtils.chmod "+x", source
+        return if source.executable?
+        if source.writable?
+          FileUtils.chmod "+x", source
+        else
+          @command.run!.run("/bin/chmod", args: ["+x", source], sudo: true)
+        end
       end
     end
   end
