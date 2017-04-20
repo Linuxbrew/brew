@@ -1100,11 +1100,11 @@ class FormulaAuditor
     end
 
     if line =~ /(not\s|!)\s*build\.with?\?/
-      problem "Don't negate 'build.without?': use 'build.with?'"
+      problem "Don't negate 'build.with?': use 'build.without?'"
     end
 
     if line =~ /(not\s|!)\s*build\.without?\?/
-      problem "Don't negate 'build.with?': use 'build.without?'"
+      problem "Don't negate 'build.without?': use 'build.with?'"
     end
 
     if line =~ /ARGV\.(?!(debug\?|verbose\?|value[\(\s]))/
