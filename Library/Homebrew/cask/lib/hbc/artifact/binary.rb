@@ -13,7 +13,7 @@ module Hbc
         if source.writable?
           FileUtils.chmod "+x", source
         else
-          @command.run!.run("/bin/chmod", args: ["+x", source], sudo: true)
+          @command.run!("/bin/chmod", args: ["+x", source], sudo: true)
         end
       end
     end
