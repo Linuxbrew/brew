@@ -1,10 +1,12 @@
 require "forwardable"
 
 require "hbc/dsl"
+require "hbc/metadata"
 
 module Hbc
   class Cask
     extend Forwardable
+    include Metadata
 
     attr_reader :token, :sourcefile_path
     def initialize(token, sourcefile_path: nil, &block)
@@ -20,55 +22,9 @@ module Hbc
       define_method(method_name) { @dsl.send(method_name) }
     end
 
-    METADATA_SUBDIR = ".metadata".freeze
-
-    def metadata_master_container_path
-      @metadata_master_container_path ||= caskroom_path.join(METADATA_SUBDIR)
-    end
-
-    def metadata_versioned_container_path
-      cask_version = version ? version : :unknown
-      metadata_master_container_path.join(cask_version.to_s)
-    end
-
-    def metadata_path(timestamp = :latest, create = false)
-      if create && timestamp == :latest
-        raise CaskError, "Cannot create metadata path when timestamp is :latest"
-      end
-      path = if timestamp == :latest
-        Pathname.glob(metadata_versioned_container_path.join("*")).sort.last
-      elsif timestamp == :now
-        Utils.nowstamp_metadata_path(metadata_versioned_container_path)
-      else
-        metadata_versioned_container_path.join(timestamp)
-      end
-      if create
-        odebug "Creating metadata directory #{path}"
-        FileUtils.mkdir_p path
-      end
-      path
-    end
-
-    def metadata_subdir(leaf, timestamp = :latest, create = false)
-      if create && timestamp == :latest
-        raise CaskError, "Cannot create metadata subdir when timestamp is :latest"
-      end
-      unless leaf.respond_to?(:length) && !leaf.empty?
-        raise CaskError, "Cannot create metadata subdir for empty leaf"
-      end
-      parent = metadata_path(timestamp, create)
-      return nil unless parent.respond_to?(:join)
-      subdir = parent.join(leaf)
-      if create
-        odebug "Creating metadata subdirectory #{subdir}"
-        FileUtils.mkdir_p subdir
-      end
-      subdir
-    end
-
     def timestamped_versions
-      Pathname.glob(metadata_master_container_path.join("*", "*"))
-              .map { |p| p.relative_path_from(metadata_master_container_path) }
+      Pathname.glob(metadata_timestamped_path(version: "*", timestamp: "*"))
+              .map { |p| p.relative_path_from(p.parent.parent) }
               .sort_by(&:basename) # sort by timestamp
               .map { |p| p.split.map(&:to_s) }
     end

@@ -295,15 +295,13 @@ module Hbc
     end
 
     def save_caskfile
-      unless (old_savedirs = Pathname.glob(@cask.metadata_path("*"))).empty?
-        old_savedirs.each(&:rmtree)
-      end
+      old_savedir = @cask.metadata_timestamped_path
 
       return unless @cask.sourcefile_path
 
-      savedir = @cask.metadata_subdir("Casks", :now, true)
-      savedir.mkpath
+      savedir = @cask.metadata_subdir("Casks", timestamp: :now, create: true)
       FileUtils.copy @cask.sourcefile_path, savedir
+      old_savedir.rmtree unless old_savedir.nil?
     end
 
     def uninstall
@@ -355,15 +353,15 @@ module Hbc
       gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
 
       # Homebrew-Cask metadata
-      if @cask.metadata_versioned_container_path.respond_to?(:children) &&
-         @cask.metadata_versioned_container_path.exist?
-        @cask.metadata_versioned_container_path.children.each do |subdir|
+      if @cask.metadata_versioned_path.respond_to?(:children) &&
+         @cask.metadata_versioned_path.exist?
+        @cask.metadata_versioned_path.children.each do |subdir|
           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
             gain_permissions_remove(subdir)
           end
         end
       end
-      @cask.metadata_versioned_container_path.rmdir_if_possible
+      @cask.metadata_versioned_path.rmdir_if_possible
       @cask.metadata_master_container_path.rmdir_if_possible
 
       # toplevel staged distribution

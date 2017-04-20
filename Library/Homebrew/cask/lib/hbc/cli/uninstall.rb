@@ -12,15 +12,9 @@ module Hbc
 
           raise CaskNotInstalledError, cask unless cask.installed? || force
 
-          latest_installed_version = cask.timestamped_versions.last
-
-          unless latest_installed_version.nil?
-            latest_installed_cask_file = cask.metadata_master_container_path
-                                             .join(latest_installed_version.join(File::Separator),
-                                                   "Casks", "#{cask_token}.rb")
-
+          if cask.installed? && !cask.installed_caskfile.nil?
             # use the same cask file that was used for installation, if possible
-            cask = CaskLoader.load_from_file(latest_installed_cask_file) if latest_installed_cask_file.exist?
+            cask = CaskLoader.load_from_file(cask.installed_caskfile) if cask.installed_caskfile.exist?
           end
 
           Installer.new(cask, force: force).uninstall
