@@ -91,16 +91,10 @@ module Hbc
     end
 
     def each_line_from(sources)
-      tries = 3
-
       loop do
-        selected_sources = IO.select(sources, [], [], 1)
+        selected_sources = IO.select(sources, [], [], 10)
 
-        if selected_sources.nil?
-          next unless (tries -= 1).zero?
-          odebug "IO#select failed, skipping line."
-          break
-        end
+        break if selected_sources.nil?
 
         readable_sources = selected_sources[0].delete_if(&:eof?)
 
