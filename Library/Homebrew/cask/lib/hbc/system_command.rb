@@ -91,18 +91,32 @@ module Hbc
     end
 
     def each_line_from(sources)
+      tries = 3
+
       loop do
-        readable_sources = IO.select(sources)[0]
-        readable_sources.delete_if(&:eof?).first(1).each do |source|
+        selected_sources = IO.select(sources, [], [], 1)
+
+        if selected_sources.nil?
+          next unless (tries -= 1).zero?
+          odebug "IO#select failed, skipping line."
+          break
+        end
+
+        readable_sources = selected_sources[0].delete_if(&:eof?)
+
+        readable_sources.each do |source|
           type = (source == sources[0] ? :stdout : :stderr)
+
           begin
             yield(type, source.readline_nonblock || "")
           rescue IO::WaitReadable, EOFError
             next
           end
         end
+
         break if readable_sources.empty?
       end
+
       sources.each(&:close_read)
     end
 
