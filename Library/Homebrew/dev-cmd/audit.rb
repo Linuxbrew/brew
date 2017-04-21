@@ -732,7 +732,10 @@ class FormulaAuditor
         }
       end
 
+      next if spec.patches.empty?
       spec.patches.each { |p| patch_problems(p) if p.external? }
+      next unless @new_formula
+      problem "New formulae should not require patches to build. Patches should be submitted and accepted upstream first."
     end
 
     %w[Stable Devel].each do |name|
