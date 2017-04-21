@@ -92,7 +92,7 @@ module Hbc
       def self.render_staging_location(path)
         path = Pathname.new(user_tilde(path.to_s))
         if !path.exist?
-          "#{path} #{error_string "error: path does not exist"}}"
+          "#{path} #{error_string "error: path does not exist"}"
         elsif !path.writable?
           "#{path} #{error_string "error: not writable by current user"}"
         else
