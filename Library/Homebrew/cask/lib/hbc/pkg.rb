@@ -63,7 +63,10 @@ module Hbc
     end
 
     def pkgutil_bom_all
-      @pkgutil_bom_all ||= info.fetch("paths").keys.map { |p| root.join(p) }
+      @pkgutil_bom_all ||= @command.run!("/usr/sbin/pkgutil", args: ["--files", package_id])
+                                   .stdout
+                                   .split("\n")
+                                   .map { |path| root.join(path) }
     end
 
     def root
@@ -71,7 +74,7 @@ module Hbc
     end
 
     def info
-      @info ||= @command.run!("/usr/sbin/pkgutil", args: ["--export-plist", package_id])
+      @info ||= @command.run!("/usr/sbin/pkgutil", args: ["--pkg-info-plist", package_id])
                         .plist
     end
 
