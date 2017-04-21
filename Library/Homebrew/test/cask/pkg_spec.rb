@@ -36,7 +36,12 @@ describe Hbc::Pkg, :cask do
       it "forgets the pkg" do
         allow(fake_system_command).to receive(:run!).with(
           "/usr/sbin/pkgutil",
-          args: ["--export-plist", "my.fake.pkg"],
+          args: ["--pkg-info-plist", "my.fake.pkg"],
+        ).and_return(empty_response)
+
+        expect(fake_system_command).to receive(:run!).with(
+          "/usr/sbin/pkgutil",
+          args: ["--files", "my.fake.pkg"],
         ).and_return(empty_response)
 
         expect(fake_system_command).to receive(:run!).with(
@@ -139,7 +144,7 @@ describe Hbc::Pkg, :cask do
 
       expect(fake_system_command).to receive(:run!).with(
         "/usr/sbin/pkgutil",
-      args: ["--export-plist", pkg_id],
+      args: ["--pkg-info-plist", pkg_id],
       ).and_return(
         Hbc::SystemCommand::Result.new(nil, pkg_info_plist, nil, 0),
       )
