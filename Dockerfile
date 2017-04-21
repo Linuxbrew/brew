@@ -16,6 +16,7 @@ RUN chown -R linuxbrew: /home/linuxbrew/.linuxbrew \
 
 USER linuxbrew
 WORKDIR /home/linuxbrew
+ENV HOMEBREW_DEVELOPER=1 HOMEBREW_NO_AUTO_UPDATE=1
 ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
 	SHELL=/bin/bash \
 	USER=linuxbrew
