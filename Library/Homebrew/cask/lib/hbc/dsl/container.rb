@@ -1,3 +1,5 @@
+require "hbc/container"
+
 module Hbc
   class DSL
     class Container
@@ -13,9 +15,12 @@ module Hbc
         @pairs = pairs
         pairs.each do |key, value|
           raise "invalid container key: '#{key.inspect}'" unless VALID_KEYS.include?(key)
-          writer_method = "#{key}=".to_sym
-          send(writer_method, value)
+          send(:"#{key}=", value)
         end
+
+        return if type.nil?
+        return unless Hbc::Container.from_type(type).nil?
+        raise "invalid container type: #{type.inspect}"
       end
 
       def to_yaml
