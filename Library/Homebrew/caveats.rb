@@ -49,10 +49,10 @@ class Caveats
     if f.bin.directory? || f.sbin.directory?
       s << "\nIf you need to have this software first in your PATH run:\n"
       if f.bin.directory?
-        s << "  #{Utils::Shell.prepend_path_in_shell_profile(f.opt_bin.to_s)}\n"
+        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_bin.to_s)}\n"
       end
       if f.sbin.directory?
-        s << "  #{Utils::Shell.prepend_path_in_shell_profile(f.opt_sbin.to_s)}\n"
+        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_sbin.to_s)}\n"
       end
     end
 

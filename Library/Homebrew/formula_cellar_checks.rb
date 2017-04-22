@@ -14,7 +14,7 @@ module FormulaCellarChecks
 
     <<-EOS.undent
       #{prefix_bin} is not in your PATH
-      You can amend this by altering your #{Utils::Shell.shell_profile} file
+      You can amend this by altering your #{Utils::Shell.profile} file
     EOS
   end
 

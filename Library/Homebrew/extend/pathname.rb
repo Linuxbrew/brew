@@ -365,9 +365,8 @@ class Pathname
 
   unless method_defined?(:/)
     def /(other)
-      unless other.respond_to?(:to_str) || other.respond_to?(:to_path)
-        opoo "Pathname#/ called on #{inspect} with #{other.inspect} as an argument"
-        puts "This behavior is deprecated, please pass either a String or a Pathname"
+      if !other.respond_to?(:to_str) && !other.respond_to?(:to_path)
+        odeprecated "Pathname#/ with #{other.class}", "a String or a Pathname"
       end
       self + other.to_s
     end
