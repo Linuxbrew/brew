@@ -139,7 +139,7 @@ describe Homebrew::MissingFormula do
   end
 
   context "::deleted_reason" do
-    subject { described_class.deleted_reason(formula) }
+    subject { described_class.deleted_reason(formula, silent: true) }
 
     before do
       Tap.clear_cache

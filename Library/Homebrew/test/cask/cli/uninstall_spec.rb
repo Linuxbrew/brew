@@ -13,7 +13,9 @@ describe Hbc::CLI::Uninstall, :cask do
 
   it "tries anyway on a non-present Cask when --force is given" do
     expect {
-      Hbc::CLI::Uninstall.run("local-caffeine", "--force")
+      shutup do
+        Hbc::CLI::Uninstall.run("local-caffeine", "--force")
+      end
     }.not_to raise_error
   end
 

@@ -6,9 +6,7 @@ describe "brew pull", :integration_test do
       .and be_a_failure
   end
 
-  it "fetches a patch from a GitHub commit or pull request and applies it" do
-    skip "Requires network connection." if ENV["HOMEBREW_NO_GITHUB_API"]
-
+  it "fetches a patch from a GitHub commit or pull request and applies it", :needs_network do
     CoreTap.instance.path.cd do
       shutup do
         system "git", "init"
