@@ -325,6 +325,9 @@ module Superenv
 
   def set_x11_env_if_installed
   end
+
+  def set_cpu_flags(*)
+  end
 end
 
 class Array
