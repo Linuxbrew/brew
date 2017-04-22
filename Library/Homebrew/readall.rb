@@ -25,7 +25,7 @@ module Readall
     end
 
     def valid_aliases?(alias_dir, formula_dir)
-      return false unless alias_dir.directory?
+      return true unless alias_dir.directory?
 
       failed = false
       alias_dir.each_child do |f|
