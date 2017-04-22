@@ -320,15 +320,15 @@ def which_all(cmd, path = ENV["PATH"])
 end
 
 def which_editor
-  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL").compact.first
+  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL").compact.reject(&:empty?).first
   return which(editor, ENV["HOMEBREW_PATH"]) unless editor.nil?
 
   # Find Textmate
-  editor = "mate" if which "mate"
+  editor = which("mate", ENV["HOMEBREW_PATH"])
   # Find BBEdit / TextWrangler
-  editor ||= "edit" if which "edit"
+  editor ||= which("edit", ENV["HOMEBREW_PATH"])
   # Find vim
-  editor ||= "vim" if which "vim"
+  editor ||= which("vim", ENV["HOMEBREW_PATH"])
   # Default to standard vim
   editor ||= "/usr/bin/vim"
 
