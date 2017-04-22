@@ -336,7 +336,18 @@ class FormulaAuditor
     problem "File should end with a newline" unless text.trailing_newline?
 
     if formula.versioned_formula?
-      unversioned_formula = Pathname.new formula.path.to_s.gsub(/@.*\.rb$/, ".rb")
+      unversioned_formula = begin
+        # build this ourselves as we want e.g. homebrew/core to be present
+        full_name = if formula.tap
+          "#{formula.tap}/#{formula.name}"
+        else
+          formula.name
+        end
+        Formulary.factory(full_name.gsub(/@.*$/, "")).path
+      rescue FormulaUnavailableError, TapFormulaAmbiguityError,
+             TapFormulaWithOldnameAmbiguityError
+        Pathname.new formula.path.to_s.gsub(/@.*\.rb$/, ".rb")
+      end
       unless unversioned_formula.exist?
         unversioned_name = unversioned_formula.basename(".rb")
         problem "#{formula} is versioned but no #{unversioned_name} formula exists"
