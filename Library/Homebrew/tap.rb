@@ -201,6 +201,10 @@ class Tap
     quiet = options.fetch(:quiet, false)
     requested_remote = options[:clone_target] || default_remote
 
+    if official? && DEPRECATED_OFFICIAL_TAPS.include?(repo)
+      opoo "#{name} was deprecated. This tap is now empty as all its formulae were migrated."
+    end
+
     if installed?
       raise TapAlreadyTappedError, name unless full_clone
       raise TapAlreadyUnshallowError, name unless shallow?
