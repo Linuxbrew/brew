@@ -44,6 +44,14 @@ fi
 
 HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 
+for VAR in EDITOR PATH
+do
+  VAR_NEW="HOMEBREW_${VAR}"
+  # TODO: find a better solution than this.
+  env | grep -q "$VAR_NEW" && continue
+  export "$VAR_NEW"="${!VAR}"
+done
+
 if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
 then
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
