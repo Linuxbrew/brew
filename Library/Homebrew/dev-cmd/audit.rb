@@ -27,6 +27,10 @@
 #:
 #:    If `--except` is passed, the methods named `audit_<method>` will not be run.
 #:
+#:    If `--only-cops` is passed, only the mentioned cops' violations would be checked.
+#:
+#:    If `--except-cops` is passed, the mentioned cops' checks would be skipped.
+#:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
 
@@ -69,16 +73,22 @@ module Homebrew
       files = ARGV.resolved_formulae.map(&:path)
     end
 
-    if strict
-      options = { fix: ARGV.flag?("--fix"), realpath: true }
-      # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, options)
+    only_cops = ARGV.value("only-cops").to_s.split(",")
+    except_cops = ARGV.value("except-cops").to_s.split(",")
+    if !only_cops.empty? && !except_cops.empty?
+      odie "--only-cops and --except-cops cannot be used simulataneously!"
     end
 
-    if !strict
-      options = { fix: ARGV.flag?("--fix"), realpath: true, only: :Homebrew }
-      style_results = check_style_json(files, options)
+    if strict
+      options = { fix: ARGV.flag?("--fix"), realpath: true }
+    else
+      options = { fix: ARGV.flag?("--fix"), realpath: true, exclude: :FormulaAuditStrict }
     end
+
+    options[:only] = only_cops unless only_cops.empty?
+    options[:except] = except_cops unless except_cops.empty?
+    # Check style in a single batch run up front for performance
+    style_results = check_style_json(files, options)
 
     ff.each do |f|
       options = { new_formula: new_formula, strict: strict, online: online }

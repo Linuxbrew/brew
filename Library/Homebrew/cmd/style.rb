@@ -56,8 +56,18 @@ module Homebrew
     ]
     args << "--auto-correct" if fix
 
+    if options[:exclude].eql?(:FormulaAuditStrict) && !(options.key?(:except) || options.key?(:only))
+      args << "--except" << :FormulaAuditStrict
+    end
+
+    if options[:except]
+      cops_to_exclude = options[:except].select { |cop| RuboCop::Cop::Cop.registry.names.include?(cop) }
+      args << "--except" << cops_to_exclude.join(" ") unless cops_to_exclude.empty?
+    end
+
     if options[:only]
-      args << "--only" << RuboCop::Cop::Cop.registry.with_department(options[:only]).names.join(" ")
+      cops_to_include = options[:only].select { |cop| RuboCop::Cop::Cop.registry.names.include?(cop) }
+      args << "--only" << cops_to_include.join(" ") unless cops_to_include.empty?
     end
 
     if files.nil?

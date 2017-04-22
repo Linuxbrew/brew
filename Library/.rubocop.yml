@@ -8,10 +8,10 @@ AllCops:
 
 require: ./Homebrew/rubocops.rb
 
-Homebrew/CorrectBottleBlock:
+FormulaAuditStrict/CorrectBottleBlock:
   Enabled: true
 
-Homebrew/FormulaDesc:
+FormulaAuditStrict/FormulaDesc:
   Enabled: true
 
 Homebrew/FormulaComponentsOrder:

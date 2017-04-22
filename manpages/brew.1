@@ -662,6 +662,12 @@ If \fB\-\-only\fR is passed, only the methods named \fBaudit_<method>\fR will be
 If \fB\-\-except\fR is passed, the methods named \fBaudit_<method>\fR will not be run\.
 .
 .IP
+If \fB\-\-only\-cops\fR is passed, only the mentioned cops\' violations would be checked\.
+.
+.IP
+If \fB\-\-except\-cops\fR is passed, the mentioned cops\' checks would be skipped\.
+.
+.IP
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
 .
 .TP

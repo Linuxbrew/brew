@@ -3,7 +3,7 @@ require "rubocop/rspec/support"
 require_relative "../../extend/string"
 require_relative "../../rubocops/formula_desc_cop"
 
-describe RuboCop::Cop::Homebrew::FormulaDesc do
+describe RuboCop::Cop::FormulaAuditStrict::FormulaDesc do
   subject(:cop) { described_class.new }
 
   context "When auditing formula desc" do

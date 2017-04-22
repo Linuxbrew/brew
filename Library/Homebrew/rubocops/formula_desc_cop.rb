@@ -3,7 +3,7 @@ require_relative "../extend/string"
 
 module RuboCop
   module Cop
-    module Homebrew
+    module FormulaAuditStrict
       # This cop audits `desc` in Formulae
       #
       # - Checks for existence of `desc`

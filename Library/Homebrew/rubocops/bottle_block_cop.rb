@@ -2,7 +2,7 @@ require_relative "./extend/formula_cop"
 
 module RuboCop
   module Cop
-    module Homebrew
+    module FormulaAuditStrict
       # This cop audits `bottle` block in Formulae
       #
       # - `rebuild` should be used instead of `revision` in `bottle` block

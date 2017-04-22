@@ -635,6 +635,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--except` is passed, the methods named `audit_`method`` will not be run.
 
+    If `--only-cops` is passed, only the mentioned cops' violations would be checked.
+
+    If `--except-cops` is passed, the mentioned cops' checks would be skipped.
+
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.
 
