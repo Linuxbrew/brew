@@ -117,8 +117,7 @@ class SoftwareSpec
   def option(name, description = "")
     opt = PREDEFINED_OPTIONS.fetch(name) do
       if name.is_a?(Symbol)
-        opoo "Passing arbitrary symbols to `option` is deprecated: #{name.inspect}"
-        puts "Symbols are reserved for future use, please pass a string instead"
+        odeprecated "passing arbitrary symbols (i.e. #{name.inspect}) to `option`"
         name = name.to_s
       end
       unless name.is_a?(String)
@@ -172,7 +171,6 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
-    # TODO: deprecate this in future.
     # odeprecated "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end

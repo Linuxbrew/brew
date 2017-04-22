@@ -128,11 +128,10 @@ module OS
           end
         end
 
-        # The remaining logic provides a fake Xcode version for CLT-only
-        # systems. This behavior only exists because Homebrew used to assume
-        # Xcode.version would always be non-nil. This is deprecated, and will
-        # be removed in a future version. To remain compatible, guard usage of
-        # Xcode.version with an Xcode.installed? check.
+        # The remaining logic provides a fake Xcode version based on the
+        # installed CLT version. This is useful as they are packaged
+        # simultaneously so workarounds need to apply to both based on their
+        # comparable version.
         case (DevelopmentTools.clang_version.to_f * 10).to_i
         when 0       then "dunno"
         when 1..14   then "3.2.2"

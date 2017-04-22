@@ -14,7 +14,6 @@ class DependencyCollector
       output_deprecation(spec, tags)
       Dependency.new(spec.to_s, tags)
     when :apr
-      # TODO: reenable in future when we've fixed a few of the audits.
       # output_deprecation(spec, tags, "apr-util")
       Dependency.new("apr-util", tags)
     when :libltdl

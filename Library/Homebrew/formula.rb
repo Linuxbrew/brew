@@ -2396,7 +2396,6 @@ class Formula
     #   version '4.8.1'
     # end</pre>
     def fails_with(compiler, &block)
-      # TODO: deprecate this in future.
       # odeprecated "fails_with :llvm" if compiler == :llvm
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
