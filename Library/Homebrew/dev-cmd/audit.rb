@@ -1417,8 +1417,8 @@ class ResourceAuditor
 
   def audit_urls
     # Check GNU urls; doesn't apply to mirrors
-    if url =~ %r{^(?:https?|ftp)://(?!alpha).+/gnu/}
-      problem "Please use \"https://ftpmirror.gnu.org\" instead of #{url}."
+    if url =~ %r{^(?:https?|ftp)://ftpmirror.gnu.org/(.*)}
+      problem "Please use \"https://ftp.gnu.org/gnu/#{$1}\" instead of #{url}."
     end
 
     if mirrors.include?(url)
