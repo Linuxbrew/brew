@@ -24,14 +24,21 @@ module Readall
       !failed
     end
 
-    def valid_aliases?(alias_dirs)
+    def valid_aliases?(alias_dir, formula_dir)
+      return false unless alias_dir.directory?
+
       failed = false
-      alias_dirs.each do |alias_dir|
-        next unless alias_dir.directory?
-        alias_dir.children.each do |f|
-          next unless f.symlink?
-          next if f.file?
-          onoe "Broken alias: #{f}"
+      alias_dir.each_child do |f|
+        if !f.symlink?
+          onoe "Non-symlink alias: #{f}"
+          failed = true
+        elsif !f.file?
+          onoe "Non-file alias: #{f}"
+          failed = true
+        end
+
+        if (formula_dir/"#{f.basename}.rb").exist?
+          onoe "Formula duplicating alias: #{f}"
           failed = true
         end
       end
@@ -57,7 +64,7 @@ module Readall
     def valid_tap?(tap, options = {})
       failed = false
       if options[:aliases]
-        valid_aliases = valid_aliases?([tap.alias_dir])
+        valid_aliases = valid_aliases?(tap.alias_dir, tap.formula_dir)
         failed = true unless valid_aliases
       end
       valid_formulae = valid_formulae?(tap.formula_files)
