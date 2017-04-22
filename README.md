@@ -149,7 +149,9 @@ This is our PGP key which is valid until May 24, 2017.
 * Full key: https://keybase.io/homebrew/key.asc
 
 ## Who Are You?
-Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), and [Jonathan Chang](https://github.com/jonchang).
+Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), and [Jonathan Chang](https://github.com/jonchang).
+
+[Bob W. Hogg](https://github.com/rwhogg) is also a Linuxbrew maintainer, but is currently on leave and will return later in the year.
 
 Homebrew's lead maintainer is [Mike McQuaid](https://github.com/mikemcquaid).
 
