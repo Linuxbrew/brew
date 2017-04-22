@@ -263,7 +263,7 @@ module Homebrew
     end
 
     published = []
-    bintray_creds = { user: ENV["BINTRAY_USER"], key: ENV["BINTRAY_KEY"] }
+    bintray_creds = { user: ENV["HOMEBREW_BINTRAY_USER"], key: ENV["HOMEBREW_BINTRAY_KEY"] }
     if bintray_creds[:user] && bintray_creds[:key]
       changed_formulae_names.each do |name|
         f = Formula[name]
@@ -272,7 +272,7 @@ module Homebrew
         published << f.full_name
       end
     else
-      opoo "You must set BINTRAY_USER and BINTRAY_KEY to add or update bottles on Bintray!"
+      opoo "You must set HOMEBREW_BINTRAY_USER and HOMEBREW_BINTRAY_KEY to add or update bottles on Bintray!"
     end
     published
   end
