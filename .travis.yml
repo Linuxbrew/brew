@@ -1,9 +1,13 @@
 language: ruby
+cache:
+  directories:
+    - $HOME/.gem/ruby
+    - Library/Homebrew/vendor/bundle
 
 matrix:
   include:
     - os: osx
-      osx_image: xcode8.1
+      osx_image: xcode8.3
       rvm: system
     - os: linux
       rvm: 2.0.0
