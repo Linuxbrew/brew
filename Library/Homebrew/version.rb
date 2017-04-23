@@ -346,7 +346,7 @@ class Version
 
     # date-based versioning
     # e.g. ltopers-v2017-04-14.tar.gz
-    m = /-v?((?:\d{4}-\d{2}-\d{2}))/.match(stem)
+    m = /-v?(?:\d{4}-\d{2}-\d{2})/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. lame-398-1
