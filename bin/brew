@@ -47,8 +47,7 @@ HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 for VAR in EDITOR PATH
 do
   VAR_NEW="HOMEBREW_${VAR}"
-  # TODO: find a better solution than this.
-  env | grep -q "$VAR_NEW" && continue
+  [[ -n "${!VAR_NEW}" ]] && continue
   export "$VAR_NEW"="${!VAR}"
 done
 

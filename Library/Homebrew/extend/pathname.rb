@@ -331,7 +331,6 @@ class Pathname
     raise ChecksumMismatchError.new(self, expected, actual) unless expected == actual
   end
 
-  # FIXME: eliminate the places where we rely on this method
   alias to_str to_s unless method_defined?(:to_str)
 
   def cd

@@ -887,6 +887,6 @@ class FormulaInstaller
   def puts_requirement_messages
     return unless @requirement_messages
     return if @requirement_messages.empty?
-    puts @requirement_messages
+    $stderr.puts @requirement_messages
   end
 end
