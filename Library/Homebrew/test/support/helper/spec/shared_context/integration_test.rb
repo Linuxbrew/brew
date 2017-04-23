@@ -72,6 +72,7 @@ RSpec.shared_context "integration test" do
 
     env.merge!(
       "PATH" => path,
+      "HOMEBREW_PATH" => path,
       "HOMEBREW_BREW_FILE" => HOMEBREW_PREFIX/"bin/brew",
       "HOMEBREW_INTEGRATION_TEST" => command_id_from_args(args),
       "HOMEBREW_TEST_TMPDIR" => TEST_TMPDIR,

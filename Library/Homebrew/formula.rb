@@ -13,6 +13,7 @@ require "pkg_version"
 require "tap"
 require "keg"
 require "migrator"
+require "extend/ENV"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.
@@ -1013,10 +1014,17 @@ class Formula
     @prefix_returns_versioned_prefix = true
     build = self.build
     self.build = Tab.for_formula(self)
+
     old_tmpdir = ENV["TMPDIR"]
     old_temp = ENV["TEMP"]
     old_tmp = ENV["TMP"]
+    old_path = ENV["HOMEBREW_PATH"]
+
     ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
+    ENV["HOMEBREW_PATH"] = nil
+
+    ENV.clear_sensitive_environment!
+
     with_logging("post_install") do
       post_install
     end
@@ -1025,6 +1033,7 @@ class Formula
     ENV["TMPDIR"] = old_tmpdir
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
+    ENV["HOMEBREW_PATH"] = old_path
     @prefix_returns_versioned_prefix = false
   end
 
@@ -1664,9 +1673,15 @@ class Formula
     old_temp = ENV["TEMP"]
     old_tmp = ENV["TMP"]
     old_term = ENV["TERM"]
+    old_path = ENV["HOMEBREW_PATH"]
+
     ENV["CURL_HOME"] = old_curl_home || old_home
     ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
     ENV["TERM"] = "dumb"
+    ENV["HOMEBREW_PATH"] = nil
+
+    ENV.clear_sensitive_environment!
+
     mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
@@ -1689,6 +1704,7 @@ class Formula
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
     ENV["TERM"] = old_term
+    ENV["HOMEBREW_PATH"] = old_path
     @prefix_returns_versioned_prefix = false
   end
 
@@ -1925,10 +1941,16 @@ class Formula
       mkdir_p env_home
 
       old_home = ENV["HOME"]
-      ENV["HOME"] = env_home
       old_curl_home = ENV["CURL_HOME"]
+      old_path = ENV["HOMEBREW_PATH"]
+
+      ENV["HOME"] = env_home
       ENV["CURL_HOME"] = old_curl_home || old_home
+      ENV["HOMEBREW_PATH"] = nil
+
       setup_home env_home
+
+      ENV.clear_sensitive_environment!
 
       begin
         yield staging
@@ -1936,6 +1958,7 @@ class Formula
         @buildpath = nil
         ENV["HOME"] = old_home
         ENV["CURL_HOME"] = old_curl_home
+        ENV["HOMEBREW_PATH"] = old_path
       end
     end
   end

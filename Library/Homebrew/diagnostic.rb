@@ -439,7 +439,7 @@ module Homebrew
 
         message = ""
 
-        paths.each do |p|
+        paths(ENV["HOMEBREW_PATH"]).each do |p|
           case p
           when "/usr/bin"
             unless $seen_prefix_bin
@@ -609,7 +609,7 @@ module Homebrew
           /Applications/Server.app/Contents/ServerRoot/usr/sbin
         ].map(&:downcase)
 
-        paths.each do |p|
+        paths(ENV["HOMEBREW_PATH"]).each do |p|
           next if whitelist.include?(p.downcase) || !File.directory?(p)
 
           realpath = Pathname.new(p).realpath.to_s
