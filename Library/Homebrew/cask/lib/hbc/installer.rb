@@ -24,6 +24,7 @@ module Hbc
       @force = force
       @skip_cask_deps = skip_cask_deps
       @require_sha = require_sha
+      @reinstall = false
     end
 
     def self.print_caveats(cask)
@@ -76,18 +77,38 @@ module Hbc
     def install
       odebug "Hbc::Installer#install"
 
-      if @cask.installed? && !force
+      if @cask.installed? && !force && !@reinstall
         raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
         raise CaskAlreadyInstalledError, @cask
       end
 
       print_caveats
       fetch
+      uninstall_existing_cask if @reinstall
+
+      oh1 "Installing Cask #{@cask}"
       stage
       install_artifacts
       enable_accessibility_access
 
       puts summary
+    end
+
+    def reinstall
+      odebug "Hbc::Installer#reinstall"
+      @reinstall = true
+      install
+    end
+
+    def uninstall_existing_cask
+      return unless @cask.installed?
+
+      # use the same cask file that was used for installation, if possible
+      installed_caskfile = @cask.installed_caskfile
+      installed_cask = installed_caskfile.exist? ? CaskLoader.load_from_file(installed_caskfile) : @cask
+
+      # Always force uninstallation, ignore method parameter
+      Installer.new(installed_cask, force: true).uninstall
     end
 
     def summary
@@ -305,7 +326,7 @@ module Hbc
     end
 
     def uninstall
-      odebug "Hbc::Installer#uninstall"
+      oh1 "Uninstalling Cask #{@cask}"
       disable_accessibility_access
       uninstall_artifacts
       purge_versioned_files
