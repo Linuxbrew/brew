@@ -62,7 +62,6 @@ ORIGINAL_PATHS = ENV["HOMEBREW_PATH"].split(File::PATH_SEPARATOR).map do |p|
   end
 end.compact.freeze
 
-# TODO: remove this as soon as it's removed from commands.rb.
 HOMEBREW_INTERNAL_COMMAND_ALIASES = {
   "ls" => "list",
   "homepage" => "home",

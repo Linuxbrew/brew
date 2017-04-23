@@ -23,8 +23,7 @@ end
 def require?(path)
   require path
 rescue LoadError => e
-  # HACK: ( because we should raise on syntax errors but
-  # not if the file doesn't exist. TODO make robust!
+  # we should raise on syntax errors but not if the file doesn't exist.
   raise unless e.to_s.include? path
 end
 

@@ -85,8 +85,6 @@ report-analytics-screenview-command() {
   fi
 
   # Don't report commands used mostly by our scripts and not users.
-  # TODO: list more e.g. shell completion things here perhaps using a single
-  # script as a shell-completion entry point.
   case "$HOMEBREW_COMMAND" in
     --prefix|analytics|command|commands)
       return

@@ -20,8 +20,6 @@ module Dependable
   end
 
   def required?
-    # FIXME: Should `required?` really imply `!build?`? And if so, why doesn't
-    #        any of `optional?` and `recommended?` equally imply `!build?`?
     !build? && !optional? && !recommended?
   end
 
