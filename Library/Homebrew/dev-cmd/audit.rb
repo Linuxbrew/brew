@@ -827,51 +827,71 @@ class FormulaAuditor
     return unless formula.tap.git? # git log is required
     return if @new_formula
 
-    fv = FormulaVersions.new(formula, max_depth: 1)
+    fv = FormulaVersions.new(formula)
     attributes = [:revision, :version_scheme]
-
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
-    attributes.each do |attribute|
-      stable_attribute_map = attributes_map[attribute][:stable]
-      next if stable_attribute_map.nil? || stable_attribute_map.empty?
-
-      attributes_for_version = stable_attribute_map[formula.version]
-      next if attributes_for_version.nil? || attributes_for_version.empty?
-
-      old_attribute = formula.send(attribute)
-      max_attribute = attributes_for_version.max
-      if max_attribute && old_attribute < max_attribute
-        problem "#{attribute} should not decrease (from #{max_attribute} to #{old_attribute})"
-      end
-    end
-
+    current_version_scheme = formula.version_scheme
     [:stable, :devel].each do |spec|
       spec_version_scheme_map = attributes_map[:version_scheme][spec]
       next if spec_version_scheme_map.nil? || spec_version_scheme_map.empty?
 
-      max_version_scheme = spec_version_scheme_map.values.flatten.max
+      version_schemes = spec_version_scheme_map.values.flatten
+      max_version_scheme = version_schemes.max
       max_version = spec_version_scheme_map.select do |_, version_scheme|
         version_scheme.first == max_version_scheme
       end.keys.max
 
-      formula_spec = formula.send(spec)
-      next if formula_spec.nil?
-
-      if max_version && formula_spec.version < max_version
-        problem "#{spec} version should not decrease (from #{max_version} to #{formula_spec.version})"
+      if max_version_scheme && current_version_scheme < max_version_scheme
+        problem "version_scheme should not decrease (from #{max_version_scheme} to #{current_version_scheme})"
       end
+
+      if max_version_scheme && current_version_scheme >= max_version_scheme &&
+         current_version_scheme > 1 &&
+         !version_schemes.include?(current_version_scheme - 1)
+        problem "version_schemes should only increment by 1"
+      end
+
+      formula_spec = formula.send(spec)
+      next unless formula_spec
+
+      spec_version = formula_spec.version
+      next unless max_version
+      next if spec_version >= max_version
+
+      above_max_version_scheme = current_version_scheme > max_version_scheme
+      map_includes_version = spec_version_scheme_map.keys.include?(spec_version)
+      next if !current_version_scheme.zero? &&
+              (above_max_version_scheme || map_includes_version)
+      problem "#{spec} version should not decrease (from #{max_version} to #{spec_version})"
     end
 
-    return if formula.revision.zero?
+    current_revision = formula.revision
     if formula.stable
-      revision_map = attributes_map[:revision][:stable]
-      stable_revisions = revision_map[formula.stable.version] if revision_map
-      if !stable_revisions || stable_revisions.empty?
-        problem "'revision #{formula.revision}' should be removed"
+      if revision_map = attributes_map[:revision][:stable]
+        if !revision_map.nil? && !revision_map.empty?
+          stable_revisions = revision_map[formula.stable.version]
+          stable_revisions ||= []
+          current_revision = formula.revision
+          max_revision = stable_revisions.max || 0
+
+          if current_revision < max_revision
+            problem "revision should not decrease (from #{max_revision} to #{current_revision})"
+          end
+
+          stable_revisions -= [formula.revision]
+          if !current_revision.zero? && stable_revisions.empty? &&
+             revision_map.keys.length > 1
+            problem "'revision #{formula.revision}' should be removed"
+          elsif current_revision > 1 &&
+                current_revision != max_revision &&
+                !stable_revisions.include?(current_revision - 1)
+            problem "revisions should only increment by 1"
+          end
+        end
       end
-    else # head/devel-only formula
-      problem "'revision #{formula.revision}' should be removed"
+    elsif !current_revision.zero? # head/devel-only formula
+      problem "'revision #{current_revision}' should be removed"
     end
   end
 
@@ -1209,6 +1229,10 @@ class FormulaAuditor
         next unless line.include?(check)
         problem "Don't use #{check}; Homebrew/core only supports macOS"
       end
+    end
+
+    if line =~ /((revision|version_scheme)\s+0)/
+      problem "'#{$1}' should be removed"
     end
 
     return unless @strict

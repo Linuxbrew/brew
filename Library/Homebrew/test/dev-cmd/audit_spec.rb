@@ -5,6 +5,13 @@ RSpec::Matchers.alias_matcher :have_data, :be_data
 RSpec::Matchers.alias_matcher :have_end, :be_end
 RSpec::Matchers.alias_matcher :have_trailing_newline, :be_trailing_newline
 
+module Count
+  def self.increment
+    @count ||= 0
+    @count  += 1
+  end
+end
+
 describe FormulaText do
   let(:dir) { mktmpdir }
 
@@ -516,6 +523,189 @@ describe FormulaAuditor do
       fa.audit_text
       expect(fa.problems.first)
         .to match('xcodebuild should be passed an explicit "SYMROOT"')
+    end
+  end
+
+  describe "#audit_revision_and_version_scheme" do
+    let(:origin_tap_path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-foo" }
+    let(:formula_subpath) { "Formula/foo#{@foo_version}.rb" }
+    let(:origin_formula_path) { origin_tap_path/formula_subpath }
+    let(:tap_path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-bar" }
+    let(:formula_path) { tap_path/formula_subpath }
+
+    before(:each) do
+      @foo_version = Count.increment
+
+      origin_formula_path.write <<-EOS.undent
+        class Foo#{@foo_version} < Formula
+          url "https://example.com/foo-1.0.tar.gz"
+          revision 2
+          version_scheme 1
+        end
+      EOS
+
+      origin_tap_path.mkpath
+      origin_tap_path.cd do
+        shutup do
+          system "git", "init"
+          system "git", "add", "--all"
+          system "git", "commit", "-m", "init"
+        end
+      end
+
+      tap_path.mkpath
+      tap_path.cd do
+        shutup do
+          system "git", "clone", origin_tap_path, "."
+        end
+      end
+    end
+
+    subject do
+      fa = described_class.new(Formulary.factory(formula_path))
+      fa.audit_revision_and_version_scheme
+      fa.problems.first
+    end
+
+    def formula_gsub(before, after = "")
+      text = formula_path.read
+      text.gsub! before, after
+      formula_path.unlink
+      formula_path.write text
+    end
+
+    def formula_gsub_commit(before, after = "")
+      text = origin_formula_path.read
+      text.gsub!(before, after)
+      origin_formula_path.unlink
+      origin_formula_path.write text
+
+      origin_tap_path.cd do
+        shutup do
+          system "git", "commit", "-am", "commit"
+        end
+      end
+
+      tap_path.cd do
+        shutup do
+          system "git", "fetch"
+          system "git", "reset", "--hard", "origin/master"
+        end
+      end
+    end
+
+    context "revisions" do
+      context "should not be removed when first committed above 0" do
+        it { is_expected.to be_nil }
+      end
+
+      context "should not decrease with the same version" do
+        before { formula_gsub_commit "revision 2", "revision 1" }
+
+        it { is_expected.to match("revision should not decrease (from 2 to 1)") }
+      end
+
+      context "should not be removed with the same version" do
+        before { formula_gsub_commit "revision 2" }
+
+        it { is_expected.to match("revision should not decrease (from 2 to 0)") }
+      end
+
+      context "should not decrease with the same, uncommitted version" do
+        before { formula_gsub "revision 2", "revision 1" }
+
+        it { is_expected.to match("revision should not decrease (from 2 to 1)") }
+      end
+
+      context "should be removed with a newer version" do
+        before { formula_gsub_commit "foo-1.0.tar.gz", "foo-1.1.tar.gz" }
+
+        it { is_expected.to match("'revision 2' should be removed") }
+      end
+
+      context "should not warn on an newer version revision removal" do
+        before do
+          formula_gsub_commit "revision 2", ""
+          formula_gsub_commit "foo-1.0.tar.gz", "foo-1.1.tar.gz"
+        end
+
+        it { is_expected.to be_nil }
+      end
+
+      context "should only increment by 1 with an uncommitted version" do
+        before do
+          formula_gsub "foo-1.0.tar.gz", "foo-1.1.tar.gz"
+          formula_gsub "revision 2", "revision 4"
+        end
+
+        it { is_expected.to match("revisions should only increment by 1") }
+      end
+
+      context "should not warn on past increment by more than 1" do
+        before do
+          formula_gsub_commit "revision 2", "# no revision"
+          formula_gsub_commit "foo-1.0.tar.gz", "foo-1.1.tar.gz"
+          formula_gsub_commit "# no revision", "revision 3"
+        end
+
+        it { is_expected.to be_nil }
+      end
+    end
+
+    context "version_schemes" do
+      context "should not decrease with the same version" do
+        before { formula_gsub_commit "version_scheme 1" }
+
+        it { is_expected.to match("version_scheme should not decrease (from 1 to 0)") }
+      end
+
+      context "should not decrease with a new version" do
+        before do
+          formula_gsub_commit "foo-1.0.tar.gz", "foo-1.1.tar.gz"
+          formula_gsub_commit "version_scheme 1", ""
+          formula_gsub_commit "revision 2", ""
+        end
+
+        it { is_expected.to match("version_scheme should not decrease (from 1 to 0)") }
+      end
+
+      context "should only increment by 1" do
+        before do
+          formula_gsub_commit "version_scheme 1", "# no version_scheme"
+          formula_gsub_commit "foo-1.0.tar.gz", "foo-1.1.tar.gz"
+          formula_gsub_commit "revision 2", ""
+          formula_gsub_commit "# no version_scheme", "version_scheme 3"
+        end
+
+        it { is_expected.to match("version_schemes should only increment by 1") }
+      end
+    end
+
+    context "versions" do
+      context "uncommitted should not decrease" do
+        before { formula_gsub "foo-1.0.tar.gz", "foo-0.9.tar.gz" }
+
+        it { is_expected.to match("stable version should not decrease (from 1.0 to 0.9)") }
+      end
+
+      context "committed can decrease" do
+        before do
+          formula_gsub_commit "revision 2"
+          formula_gsub_commit "foo-1.0.tar.gz", "foo-0.9.tar.gz"
+        end
+
+        it { is_expected.to be_nil }
+      end
+
+      context "can decrease with version_scheme increased" do
+        before do
+          formula_gsub "revision 2"
+          formula_gsub "foo-1.0.tar.gz", "foo-0.9.tar.gz"
+          formula_gsub "version_scheme 1", "version_scheme 2"
+        end
+
+        it { is_expected.to be_nil }
+      end
     end
   end
 end
