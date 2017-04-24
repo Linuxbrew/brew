@@ -10,6 +10,7 @@ require "exceptions"
 require "set"
 require "rbconfig"
 require "official_taps"
+require "pp"
 
 ARGV.extend(HomebrewArgvExtension)
 
