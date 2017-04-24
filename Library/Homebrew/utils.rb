@@ -321,7 +321,16 @@ end
 
 def which_editor
   editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL").compact.reject(&:empty?).first
-  return which(editor, ENV["HOMEBREW_PATH"]) unless editor.nil?
+  if editor
+    editor_name, _, editor_args = editor.partition " "
+    editor_path = which(editor_name, ENV["HOMEBREW_PATH"])
+    editor = if editor_args.to_s.empty?
+      editor_path.to_s
+    else
+      "#{editor_path} #{editor_args}"
+    end
+    return editor
+  end
 
   # Find Textmate
   editor = which("mate", ENV["HOMEBREW_PATH"])
@@ -338,7 +347,7 @@ def which_editor
     or HOMEBREW_EDITOR to your preferred text editor.
   EOS
 
-  editor
+  editor.to_s
 end
 
 def exec_editor(*args)
