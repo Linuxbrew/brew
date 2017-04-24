@@ -191,7 +191,7 @@ describe "globally-scoped helper methods" do
     ENV["HOMEBREW_EDITOR"] = "vemate"
     ENV["HOMEBREW_PATH"] = dir
 
-    editor = dir/"vemate"
+    editor = "#{dir}/vemate"
     FileUtils.touch editor
     FileUtils.chmod 0755, editor
 
