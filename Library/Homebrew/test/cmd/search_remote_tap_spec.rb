@@ -7,10 +7,7 @@ describe Homebrew do
         {
           "path" => "Formula/some-formula.rb",
           "repository" => {
-            "name" => "homebrew-foo",
-            "owner" => {
-              "login" => "Homebrew",
-            },
+            "full_name" => "Homebrew/homebrew-foo",
           },
         },
       ],
