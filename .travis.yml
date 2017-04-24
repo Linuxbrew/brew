@@ -27,3 +27,6 @@ before_install:
 
 script:
   - brew test-bot
+
+notifications:
+  slack: machomebrew:1XNF7p1JRCdBUuKaeSwsWEc1
