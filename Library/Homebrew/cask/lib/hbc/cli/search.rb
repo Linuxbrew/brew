@@ -13,6 +13,15 @@ module Hbc
         end
       end
 
+      def self.search_remote(query)
+        matches = GitHub.search_code("user:caskroom", "path:Casks", "filename:#{query}", "extension:rb")
+        [*matches].map do |match|
+          tap = Tap.fetch(match["repository"]["full_name"])
+          next if tap.installed?
+          "#{tap.name}/#{File.basename(match["path"], ".rb")}"
+        end.compact
+      end
+
       def self.search(*arguments)
         exact_match = nil
         partial_matches = []
@@ -29,27 +38,34 @@ module Hbc
           partial_matches = simplified_tokens.grep(/#{simplified_search_term}/i) { |t| all_tokens[simplified_tokens.index(t)] }
           partial_matches.delete(exact_match)
         end
-        [exact_match, partial_matches, search_term]
+
+        remote_matches = search_remote(search_term)
+
+        [exact_match, partial_matches, remote_matches, search_term]
       end
 
-      def self.render_results(exact_match, partial_matches, search_term)
+      def self.render_results(exact_match, partial_matches, remote_matches, search_term)
         if !exact_match && partial_matches.empty?
           puts "No Cask found for \"#{search_term}\"."
           return
         end
         if exact_match
-          ohai "Exact match"
+          ohai "Exact Match"
           puts highlight_installed exact_match
         end
 
-        return if partial_matches.empty?
-
-        if extract_regexp search_term
-          ohai "Regexp matches"
-        else
-          ohai "Partial matches"
+        unless partial_matches.empty?
+          if extract_regexp search_term
+            ohai "Regexp Matches"
+          else
+            ohai "Partial Matches"
+          end
+          puts Formatter.columns(partial_matches.map(&method(:highlight_installed)))
         end
-        puts Formatter.columns(partial_matches.map(&method(:highlight_installed)))
+
+        return if remote_matches.empty?
+        ohai "Remote Matches"
+        puts Formatter.columns(remote_matches.map(&method(:highlight_installed)))
       end
 
       def self.highlight_installed(token)
