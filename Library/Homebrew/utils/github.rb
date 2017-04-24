@@ -234,7 +234,7 @@ module GitHub
   end
 
   def repository(user, repo)
-    open(URI.parse("#{API_URL}/repos/#{user}/#{repo}")) { |j| j }
+    open(URI.parse("#{API_URL}/repos/#{user}/#{repo}"))
   end
 
   def search_code(*params)
