@@ -16,14 +16,11 @@
 require "formula"
 require "missing_formula"
 require "utils"
-require "thread"
 require "official_taps"
 require "descriptions"
 
 module Homebrew
   module_function
-
-  SEARCH_ERROR_QUEUE = Queue.new
 
   def search
     if ARGV.empty?
@@ -61,8 +58,8 @@ module Homebrew
       regex = query_regexp(query)
       local_results = search_formulae(regex)
       puts Formatter.columns(local_results) unless local_results.empty?
-      tap_results = search_taps(regex)
-      puts Formatter.columns(tap_results) unless tap_results.empty?
+      tap_results = search_taps(query)
+      puts Formatter.columns(tap_results) if tap_results && !tap_results.empty?
 
       if $stdout.tty?
         count = local_results.length + tap_results.length
@@ -75,33 +72,24 @@ module Homebrew
           puts reason
         elsif count.zero?
           puts "No formula found for #{query.inspect}."
-          begin
-            GitHub.print_pull_requests_matching(query)
-          rescue GitHub::Error => e
-            SEARCH_ERROR_QUEUE << e
-          end
+          GitHub.print_pull_requests_matching(query)
         end
       end
     end
 
-    if $stdout.tty?
-      metacharacters = %w[\\ | ( ) [ ] { } ^ $ * + ?]
-      bad_regex = metacharacters.any? do |char|
-        ARGV.any? do |arg|
-          arg.include?(char) && !arg.start_with?("/")
-        end
-      end
-      if !ARGV.empty? && bad_regex
-        ohai "Did you mean to perform a regular expression search?"
-        ohai "Surround your query with /slashes/ to search by regex."
+    return unless $stdout.tty?
+    return if ARGV.empty?
+    metacharacters = %w[\\ | ( ) [ ] { } ^ $ * + ?].freeze
+    return unless metacharacters.any? do |char|
+      ARGV.any? do |arg|
+        arg.include?(char) && !arg.start_with?("/")
       end
     end
-
-    raise SEARCH_ERROR_QUEUE.pop unless SEARCH_ERROR_QUEUE.empty?
+    ohai <<-EOS.undent
+      Did you mean to perform a regular expression search?
+      Surround your query with /slashes/ to search locally by regex.
+    EOS
   end
-
-  SEARCHABLE_TAPS = OFFICIAL_TAPS.map { |tap| ["Homebrew", tap] } +
-                    OFFICIAL_CASK_TAPS.map { |tap| ["caskroom", tap] }
 
   def query_regexp(query)
     case query
@@ -112,53 +100,22 @@ module Homebrew
     odie "#{query} is not a valid regex"
   end
 
-  def search_taps(regex_or_string)
-    SEARCHABLE_TAPS.map do |user, repo|
-      Thread.new { search_tap(user, repo, regex_or_string) }
-    end.inject([]) do |results, t|
-      results.concat(t.value)
+  def search_taps(query)
+    valid_dirnames = ["Formula", "HomebrewFormula", "Casks", ".", ""].freeze
+    q = "user:Homebrew%20user:caskroom%20filename:#{query}"
+    GitHub.open "https://api.github.com/search/code?q=#{q}" do |json|
+      json["items"].map do |object|
+        dirname, filename = File.split(object["path"])
+        next unless valid_dirnames.include?(dirname)
+        user = object["repository"]["owner"]["login"]
+        user = user.downcase if user == "Homebrew"
+        repo = object["repository"]["name"].sub(/^homebrew-/, "")
+        tap = Tap.fetch user, repo
+        next if tap.installed?
+        basename = File.basename(filename, ".rb")
+        "#{user}/#{repo}/#{basename}"
+      end.compact
     end
-  end
-
-  def search_tap(user, repo, regex_or_string)
-    regex = regex_or_string.is_a?(String) ? /^#{Regexp.escape(regex_or_string)}$/ : regex_or_string
-
-    if (HOMEBREW_LIBRARY/"Taps/#{user.downcase}/homebrew-#{repo.downcase}").directory? && \
-       user != "caskroom"
-      return []
-    end
-
-    remote_tap_formulae = Hash.new do |cache, key|
-      user, repo = key.split("/", 2)
-      tree = {}
-
-      GitHub.open "https://api.github.com/repos/#{user}/homebrew-#{repo}/git/trees/HEAD?recursive=1" do |json|
-        json["tree"].each do |object|
-          next unless object["type"] == "blob"
-
-          subtree, file = File.split(object["path"])
-
-          if File.extname(file) == ".rb"
-            tree[subtree] ||= []
-            tree[subtree] << file
-          end
-        end
-      end
-
-      paths = tree["Formula"] || tree["HomebrewFormula"] || tree["."] || []
-      paths += tree["Casks"] || []
-      cache[key] = paths.map { |path| File.basename(path, ".rb") }
-    end
-
-    names = remote_tap_formulae["#{user}/#{repo}"]
-    user = user.downcase if user == "Homebrew" # special handling for the Homebrew organization
-    names.select { |name| name =~ regex }.map { |name| "#{user}/#{repo}/#{name}" }
-  rescue GitHub::HTTPNotFoundError
-    opoo "Failed to search tap: #{user}/#{repo}. Please run `brew update`"
-    []
-  rescue GitHub::Error => e
-    SEARCH_ERROR_QUEUE << e
-    []
   end
 
   def search_formulae(regex)
