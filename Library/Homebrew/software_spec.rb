@@ -8,6 +8,7 @@ require "dependency_collector"
 require "utils/bottles"
 require "patch"
 require "compilers"
+require "os/mac/version"
 
 class SoftwareSpec
   extend Forwardable
@@ -338,8 +339,8 @@ class BottleSpecification
     tags = collector.keys.sort_by do |tag|
       # Sort non-MacOS tags below MacOS tags.
       begin
-        MacOS::Version.from_symbol tag
-      rescue
+        OS::Mac::Version.from_symbol tag
+      rescue ArgumentError
         "0.#{tag}"
       end
     end
