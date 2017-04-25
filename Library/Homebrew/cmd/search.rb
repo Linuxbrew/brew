@@ -59,7 +59,7 @@ module Homebrew
       local_results = search_formulae(regex)
       puts Formatter.columns(local_results) unless local_results.empty?
       tap_results = search_taps(query)
-      puts Formatter.columns(tap_results) if tap_results && !tap_results.empty?
+      puts Formatter.columns(tap_results) unless tap_results.empty?
 
       if $stdout.tty?
         count = local_results.length + tap_results.length
@@ -101,21 +101,15 @@ module Homebrew
   end
 
   def search_taps(query)
-    valid_dirnames = ["Formula", "HomebrewFormula", "Casks", ".", ""].freeze
-    q = "user:Homebrew%20user:caskroom%20filename:#{query}"
-    GitHub.open "https://api.github.com/search/code?q=#{q}" do |json|
-      json["items"].map do |object|
-        dirname, filename = File.split(object["path"])
-        next unless valid_dirnames.include?(dirname)
-        user = object["repository"]["owner"]["login"]
-        user = user.downcase if user == "Homebrew"
-        repo = object["repository"]["name"].sub(/^homebrew-/, "")
-        tap = Tap.fetch user, repo
-        next if tap.installed?
-        basename = File.basename(filename, ".rb")
-        "#{user}/#{repo}/#{basename}"
-      end.compact
-    end
+    valid_dirnames = ["Formula", "HomebrewFormula", "Casks", "."].freeze
+    matches = GitHub.search_code("user:Homebrew", "user:caskroom", "filename:#{query}", "extension:rb")
+    [*matches].map do |match|
+      dirname, filename = File.split(match["path"])
+      next unless valid_dirnames.include?(dirname)
+      tap = Tap.fetch(match["repository"]["full_name"])
+      next if tap.installed?
+      "#{tap.name}/#{File.basename(filename, ".rb")}"
+    end.compact
   end
 
   def search_formulae(regex)
