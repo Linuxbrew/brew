@@ -77,7 +77,7 @@ describe "brew install", :integration_test do
     EOS
 
     expect { brew "install", "testball1" }
-      .to output(/first `brew unlink testball1`/).to_stderr
+      .to output(/`brew upgrade testball1`/).to_stderr
       .and not_to_output.to_stdout
       .and be_a_failure
 

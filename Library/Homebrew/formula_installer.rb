@@ -217,11 +217,20 @@ class FormulaInstaller
     # function but after instantiating this class so that it can avoid having to
     # relink the active keg if possible (because it is slow).
     if formula.linked_keg.directory?
-      # some other version is already installed *and* linked
-      raise CannotInstallFormulaError, <<-EOS.undent
-        #{formula.name}-#{formula.linked_keg.resolved_path.basename} already installed
-        To install this version, first `brew unlink #{formula.name}`
+      message = <<-EOS.undent
+        #{formula.name} #{formula.linked_keg.resolved_path.basename} is already installed
       EOS
+      message += if formula.outdated? && !formula.head?
+        <<-EOS.undent
+          To upgrade to #{formula.version}, run `brew upgrade #{formula.name}`
+        EOS
+      else
+        # some other version is already installed *and* linked
+        <<-EOS.undent
+          To install #{formula.version}, first run `brew unlink #{formula.name}`
+        EOS
+      end
+      raise CannotInstallFormulaError, message
     end
 
     check_conflicts
