@@ -190,10 +190,10 @@ module Homebrew
     Gem::Specification.reset
 
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
-    path = ENV["PATH"].split(File::PATH_SEPARATOR)
-    path.unshift(RUBY_BIN) if which("ruby") != RUBY_PATH
-    path.unshift(Gem.bindir)
-    ENV["PATH"] = path.join(File::PATH_SEPARATOR)
+    paths = ENV["PATH"].split(File::PATH_SEPARATOR)
+    paths.unshift(RUBY_BIN) if which("ruby") != RUBY_PATH
+    paths.unshift(Gem.bindir)
+    ENV["PATH"] = paths.to_path_s
 
     if Gem::Specification.find_all_by_name(name, version).empty?
       ohai "Installing or updating '#{name}' gem"
