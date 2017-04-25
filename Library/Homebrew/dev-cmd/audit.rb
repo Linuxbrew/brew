@@ -368,11 +368,11 @@ class FormulaAuditor
     same_name_tap_formulae = @@local_official_taps_name_map[name] || []
 
     if @online
-      @@remote_official_taps ||= OFFICIAL_TAPS - Tap.select(&:official?).map(&:repo)
-
-      same_name_tap_formulae += @@remote_official_taps.map do |tap|
-        Thread.new { Homebrew.search_tap "homebrew", tap, name }
-      end.flat_map(&:value)
+      Homebrew.search_taps(name).each do |tap_formula_full_name|
+        tap_formula_name = tap_formula_full_name.split("/").last
+        next if tap_formula_name != name
+        same_name_tap_formulae << tap_formula_full_name
+      end
     end
 
     same_name_tap_formulae.delete(full_name)
