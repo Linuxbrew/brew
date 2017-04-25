@@ -330,10 +330,4 @@ module Superenv
   end
 end
 
-class Array
-  def to_path_s
-    map(&:to_s).uniq.select { |s| File.directory? s }.join(File::PATH_SEPARATOR).chuzzle
-  end
-end
-
 require "extend/os/extend/ENV/super"

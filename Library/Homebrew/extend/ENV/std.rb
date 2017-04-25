@@ -62,7 +62,7 @@ module Stdenv
     paths << "#{HOMEBREW_PREFIX}/share/pkgconfig"
     paths += homebrew_extra_pkg_config_paths
     paths << "/usr/lib/pkgconfig"
-    paths.select { |d| File.directory? d }.join(File::PATH_SEPARATOR)
+    paths.to_path_s
   end
 
   # Removes the MAKEFLAGS environment variable, causing make to use a single job.

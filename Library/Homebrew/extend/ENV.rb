@@ -3,6 +3,12 @@ require "extend/ENV/shared"
 require "extend/ENV/std"
 require "extend/ENV/super"
 
+class Array
+  def to_path_s
+    map(&:to_s).uniq.select { |s| File.directory?(s) }.join(File::PATH_SEPARATOR).chuzzle
+  end
+end
+
 def superenv?
   ARGV.env != "std" && Superenv.bin
 end
