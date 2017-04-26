@@ -750,7 +750,7 @@ class FormulaAuditor
     current_version_scheme = formula.version_scheme
     [:stable, :devel].each do |spec|
       spec_version_scheme_map = attributes_map[:version_scheme][spec]
-      next if spec_version_scheme_map.nil? || spec_version_scheme_map.empty?
+      next if spec_version_scheme_map.empty?
 
       version_schemes = spec_version_scheme_map.values.flatten
       max_version_scheme = version_schemes.max
@@ -783,28 +783,24 @@ class FormulaAuditor
     end
 
     current_revision = formula.revision
-    if formula.stable
-      if revision_map = attributes_map[:revision][:stable]
-        if !revision_map.nil? && !revision_map.empty?
-          stable_revisions = revision_map[formula.stable.version]
-          stable_revisions ||= []
-          current_revision = formula.revision
-          max_revision = stable_revisions.max || 0
+    revision_map = attributes_map[:revision][:stable]
+    if formula.stable && !revision_map.empty?
+      stable_revisions = revision_map[formula.stable.version]
+      stable_revisions ||= []
+      max_revision = stable_revisions.max || 0
 
-          if current_revision < max_revision
-            problem "revision should not decrease (from #{max_revision} to #{current_revision})"
-          end
+      if current_revision < max_revision
+        problem "revision should not decrease (from #{max_revision} to #{current_revision})"
+      end
 
-          stable_revisions -= [formula.revision]
-          if !current_revision.zero? && stable_revisions.empty? &&
-             revision_map.keys.length > 1
-            problem "'revision #{formula.revision}' should be removed"
-          elsif current_revision > 1 &&
-                current_revision != max_revision &&
-                !stable_revisions.include?(current_revision - 1)
-            problem "revisions should only increment by 1"
-          end
-        end
+      stable_revisions -= [formula.revision]
+      if !current_revision.zero? && stable_revisions.empty? &&
+         revision_map.keys.length > 1
+        problem "'revision #{formula.revision}' should be removed"
+      elsif current_revision > 1 &&
+            current_revision != max_revision &&
+            !stable_revisions.include?(current_revision - 1)
+        problem "revisions should only increment by 1"
       end
     elsif !current_revision.zero? # head/devel-only formula
       problem "'revision #{current_revision}' should be removed"
