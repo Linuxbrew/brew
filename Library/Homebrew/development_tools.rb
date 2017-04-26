@@ -94,6 +94,8 @@ class DevelopmentTools
         else
           Version::NULL
         end
+      rescue FormulaUnavailableError
+        Version::NULL
       end
     end
 
