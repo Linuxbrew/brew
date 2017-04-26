@@ -38,20 +38,21 @@ module ELF
       @path = path
 
       begin
-        odie "patchelf must be installed: brew install patchelf" unless (Formula["patchelf"].bin/"patchelf").executable?
+        patchelf = Formula["patchelf"].bin/"patchelf"
+        odie "patchelf must be installed: brew install patchelf" unless patchelf.executable?
       rescue FormulaUnavailableError
         @dylibs = []
         return
       end
 
       @dylib_id = if path.dylib?
-        command = ["patchelf", "--print-soname", path.expand_path.to_s]
+        command = [patchelf, "--print-soname", path.expand_path.to_s]
         id = Utils.popen_read(*command).split("\n")
         raise ErrorDuringExecution, command unless $?.success?
         id
       end
 
-      command = ["patchelf", "--print-needed", path.expand_path.to_s]
+      command = [patchelf, "--print-needed", path.expand_path.to_s]
       needed = Utils.popen_read(*command).split("\n")
       raise ErrorDuringExecution, command unless $?.success?
 
