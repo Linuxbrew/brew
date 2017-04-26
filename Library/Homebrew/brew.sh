@@ -100,7 +100,8 @@ then
   # This is i386 even on x86_64 machines
   [[ "$HOMEBREW_PROCESSOR" = "i386" ]] && HOMEBREW_PROCESSOR="Intel"
   HOMEBREW_MACOS_VERSION="$(/usr/bin/sw_vers -productVersion)"
-  HOMEBREW_OS_VERSION="macOS $HOMEBREW_MACOS_VERSION"
+  # Don't change this from OS X to match what macOS itself does
+  HOMEBREW_OS_VERSION="OS X $HOMEBREW_MACOS_VERSION"
 
   printf -v HOMEBREW_MACOS_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" &&
