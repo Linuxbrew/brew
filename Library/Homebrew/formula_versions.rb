@@ -67,11 +67,17 @@ class FormulaVersions
     attributes_map = {}
     return attributes_map if attributes.empty?
 
+    attributes.each do |attribute|
+      attributes_map[attribute] ||= {
+        stable: {},
+        devel: {},
+      }
+    end
+
     stable_versions_seen = 0
     rev_list(branch) do |rev|
       formula_at_revision(rev) do |f|
         attributes.each do |attribute|
-          attributes_map[attribute] ||= {}
           map = attributes_map[attribute]
           set_attribute_map(map, f, attribute)
 
@@ -89,12 +95,10 @@ class FormulaVersions
 
   def set_attribute_map(map, f, attribute)
     if f.stable
-      map[:stable] ||= {}
       map[:stable][f.stable.version] ||= []
       map[:stable][f.stable.version] << f.send(attribute)
     end
     return unless f.devel
-    map[:devel] ||= {}
     map[:devel][f.devel.version] ||= []
     map[:devel][f.devel.version] << f.send(attribute)
   end
