@@ -359,7 +359,7 @@ if __FILE__ == $PROGRAM_NAME
     path = Pathname.new(x)
     path.directory? && path.realpath == superbin
   end
-  paths << "#{ENV["HOMEBREW_PREFIX"]}/bin"
+  paths.unshift "#{ENV["HOMEBREW_PREFIX"]}/bin"
   ENV["PATH"] = paths.join(":")
   args << { :close_others => false }
   exec tool, *args
