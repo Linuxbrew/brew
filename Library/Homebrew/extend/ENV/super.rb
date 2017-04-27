@@ -101,29 +101,28 @@ module Superenv
   end
 
   def determine_path
-    paths = [Superenv.bin]
+    path = PATH.new(Superenv.bin)
 
     # Formula dependencies can override standard tools.
-    paths += deps.map { |d| d.opt_bin.to_s }
-
-    paths += homebrew_extra_paths
-    paths += %w[/usr/bin /bin /usr/sbin /sbin]
+    path.append(deps.map { |d| d.opt_bin.to_s })
+    path.append(homebrew_extra_paths)
+    path.append("/usr/bin", "/bin", "/usr/sbin", "/sbin")
 
     # Homebrew's apple-gcc42 will be outside the PATH in superenv,
     # so xcrun may not be able to find it
     begin
       case homebrew_cc
       when "gcc-4.2"
-        paths << Formulary.factory("apple-gcc42").opt_bin
+        path.append(Formulary.factory("apple-gcc42").opt_bin)
       when GNU_GCC_REGEXP
-        paths << gcc_version_formula($&).opt_bin
+        path.append(gcc_version_formula($&).opt_bin)
       end
     rescue FormulaUnavailableError
       # Don't fail and don't add these formulae to the path if they don't exist.
       nil
     end
 
-    paths.to_path_s
+    path.validate
   end
 
   def homebrew_extra_pkg_config_paths
@@ -131,15 +130,17 @@ module Superenv
   end
 
   def determine_pkg_config_path
-    paths  = deps.map { |d| "#{d.opt_lib}/pkgconfig" }
-    paths += deps.map { |d| "#{d.opt_share}/pkgconfig" }
-    paths.to_path_s
+    PATH.new(
+      deps.map { |d| d.opt_lib/"pkgconfig" },
+      deps.map { |d| d.opt_share/"pkgconfig" },
+    ).validate
   end
 
   def determine_pkg_config_libdir
-    paths = %w[/usr/lib/pkgconfig]
-    paths += homebrew_extra_pkg_config_paths
-    paths.to_path_s
+    PATH.new(
+      "/usr/lib/pkgconfig",
+      homebrew_extra_pkg_config_paths,
+    ).validate
   end
 
   def homebrew_extra_aclocal_paths
@@ -147,10 +148,11 @@ module Superenv
   end
 
   def determine_aclocal_path
-    paths = keg_only_deps.map { |d| "#{d.opt_share}/aclocal" }
-    paths << "#{HOMEBREW_PREFIX}/share/aclocal"
-    paths += homebrew_extra_aclocal_paths
-    paths.to_path_s
+    PATH.new(
+      keg_only_deps.map { |d| d.opt_share/"aclocal" },
+      HOMEBREW_PREFIX/"share/aclocal",
+      homebrew_extra_aclocal_paths,
+    ).validate
   end
 
   def homebrew_extra_isystem_paths
@@ -158,13 +160,14 @@ module Superenv
   end
 
   def determine_isystem_paths
-    paths = ["#{HOMEBREW_PREFIX}/include"]
-    paths += homebrew_extra_isystem_paths
-    paths.to_path_s
+    PATH.new(
+      HOMEBREW_PREFIX/"include",
+      homebrew_extra_isystem_paths,
+    ).validate
   end
 
   def determine_include_paths
-    keg_only_deps.map { |d| d.opt_include.to_s }.to_path_s
+    PATH.new(keg_only_deps.map(&:opt_include)).validate
   end
 
   def homebrew_extra_library_paths
@@ -172,10 +175,11 @@ module Superenv
   end
 
   def determine_library_paths
-    paths = keg_only_deps.map { |d| d.opt_lib.to_s }
-    paths << "#{HOMEBREW_PREFIX}/lib"
-    paths += homebrew_extra_library_paths
-    paths.to_path_s
+    PATH.new(
+      keg_only_deps.map(&:opt_lib),
+      HOMEBREW_PREFIX/"lib",
+      homebrew_extra_library_paths,
+    ).validate
   end
 
   def determine_dependencies
@@ -183,9 +187,10 @@ module Superenv
   end
 
   def determine_cmake_prefix_path
-    paths = keg_only_deps.map { |d| d.opt_prefix.to_s }
-    paths << HOMEBREW_PREFIX.to_s
-    paths.to_path_s
+    PATH.new(
+      keg_only_deps.map(&:opt_prefix),
+      HOMEBREW_PREFIX.to_s,
+    ).validate
   end
 
   def homebrew_extra_cmake_include_paths
@@ -193,9 +198,7 @@ module Superenv
   end
 
   def determine_cmake_include_path
-    paths = []
-    paths += homebrew_extra_cmake_include_paths
-    paths.to_path_s
+    PATH.new(homebrew_extra_cmake_include_paths).validate
   end
 
   def homebrew_extra_cmake_library_paths
@@ -203,9 +206,7 @@ module Superenv
   end
 
   def determine_cmake_library_path
-    paths = []
-    paths += homebrew_extra_cmake_library_paths
-    paths.to_path_s
+    PATH.new(homebrew_extra_cmake_library_paths).validate
   end
 
   def homebrew_extra_cmake_frameworks_paths
@@ -213,9 +214,10 @@ module Superenv
   end
 
   def determine_cmake_frameworks_path
-    paths = deps.map { |d| d.opt_frameworks.to_s }
-    paths += homebrew_extra_cmake_frameworks_paths
-    paths.to_path_s
+    PATH.new(
+      deps.map(&:opt_frameworks),
+      homebrew_extra_cmake_frameworks_paths,
+    ).validate
   end
 
   def determine_make_jobs
