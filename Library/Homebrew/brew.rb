@@ -12,9 +12,9 @@ require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
 $:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
+require "tap"
 
 if ARGV == %w[--version] || ARGV == %w[-v]
-  require "tap"
   puts "Homebrew #{HOMEBREW_VERSION}"
   puts "Homebrew/homebrew-core #{CoreTap.instance.version_string}"
   exit 0
@@ -47,13 +47,15 @@ begin
     end
   end
 
+  path = PATH.new(ENV["PATH"])
+
   # Add contributed commands to PATH before checking.
-  Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/cmd"].each do |tap_cmd_dir|
-    ENV["PATH"] += "#{File::PATH_SEPARATOR}#{tap_cmd_dir}"
-  end
+  path.append(Pathname.glob(Tap::TAP_DIRECTORY/"*/*/cmd"))
 
   # Add SCM wrappers.
-  ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_SHIMS_PATH}/scm"
+  path.append(HOMEBREW_SHIMS_PATH/"scm")
+
+  ENV["PATH"] = path
 
   if cmd
     internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("cmd", cmd)

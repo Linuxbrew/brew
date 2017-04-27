@@ -56,7 +56,7 @@ HOMEBREW_PULL_OR_COMMIT_URL_REGEX = %r[https://github\.com/([\w-]+)/([\w-]+)?/(?
 require "compat" unless ARGV.include?("--no-compat") || ENV["HOMEBREW_NO_COMPAT"]
 
 ENV["HOMEBREW_PATH"] ||= ENV["PATH"]
-ORIGINAL_PATHS = ENV["HOMEBREW_PATH"].split(File::PATH_SEPARATOR).map do |p|
+ORIGINAL_PATHS = PATH.new(ENV["HOMEBREW_PATH"]).to_a.map do |p|
   begin
     Pathname.new(p).expand_path
   rescue

@@ -293,7 +293,7 @@ def quiet_system(cmd, *args)
 end
 
 def which(cmd, path = ENV["PATH"])
-  path.split(File::PATH_SEPARATOR).each do |p|
+  PATH.new(path).to_a.each do |p|
     begin
       pcmd = File.expand_path(cmd, p)
     rescue ArgumentError
@@ -307,7 +307,7 @@ def which(cmd, path = ENV["PATH"])
 end
 
 def which_all(cmd, path = ENV["PATH"])
-  path.to_s.split(File::PATH_SEPARATOR).map do |p|
+  PATH.new(path).to_a.map do |p|
     begin
       pcmd = File.expand_path(cmd, p)
     rescue ArgumentError
@@ -416,7 +416,7 @@ def nostdout
 end
 
 def paths(env_path = ENV["PATH"])
-  @paths ||= env_path.split(File::PATH_SEPARATOR).collect do |p|
+  @paths ||= PATH.new(env_path).to_a.collect do |p|
     begin
       File.expand_path(p).chomp("/")
     rescue ArgumentError

@@ -104,7 +104,7 @@ module Superenv
     path = PATH.new(Superenv.bin)
 
     # Formula dependencies can override standard tools.
-    path.append(deps.map { |d| d.opt_bin.to_s })
+    path.append(deps.map(&:opt_bin))
     path.append(homebrew_extra_paths)
     path.append("/usr/bin", "/bin", "/usr/sbin", "/sbin")
 
