@@ -164,7 +164,7 @@ module GitHub
         args += ["--data", "@#{data_tmpfile.path}"]
       end
 
-      args += ["--dump-header", headers_tmpfile.path.to_s]
+      args += ["--dump-header", headers_tmpfile.path]
 
       output, errors, status = curl_output(url.to_s, *args)
       output, _, http_code = output.rpartition("\n")

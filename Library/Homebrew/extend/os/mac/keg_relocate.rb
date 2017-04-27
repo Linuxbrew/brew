@@ -63,9 +63,9 @@ class Keg
   # expensive recursive search if possible.
   def fixed_name(file, bad_name)
     if bad_name.start_with? PREFIX_PLACEHOLDER
-      bad_name.sub(PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s)
+      bad_name.sub(PREFIX_PLACEHOLDER, HOMEBREW_PREFIX)
     elsif bad_name.start_with? CELLAR_PLACEHOLDER
-      bad_name.sub(CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s)
+      bad_name.sub(CELLAR_PLACEHOLDER, HOMEBREW_CELLAR)
     elsif (file.dylib? || file.mach_o_bundle?) && (file.parent + bad_name).exist?
       "@loader_path/#{bad_name}"
     elsif file.mach_o_executable? && (lib + bad_name).exist?

@@ -94,7 +94,7 @@ module Homebrew
 
     if files.nil?
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
-      args += [HOMEBREW_LIBRARY_PATH]
+      args << HOMEBREW_LIBRARY_PATH
     else
       args << "--config" << HOMEBREW_LIBRARY/".rubocop.yml"
       args += files

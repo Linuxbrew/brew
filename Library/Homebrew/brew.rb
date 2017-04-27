@@ -24,7 +24,7 @@ def require?(path)
   require path
 rescue LoadError => e
   # we should raise on syntax errors but not if the file doesn't exist.
-  raise unless e.to_s.include? path
+  raise unless e.message.include?(path)
 end
 
 begin
