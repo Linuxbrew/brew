@@ -33,7 +33,7 @@ ul { margin-left: 20px; }
 a { text-decoration: none; cursor: pointer; color: #ba832c; font-weight: bold; }
 a:focus { outline: 1px dotted; }
 a:visited {  }
-a:hover, a:focus { color: #d3a459; text-decoration: none; }
+a:hover, a:focus { color: #d3a459; text-decoration: underline; }
 a *, button * { cursor: pointer; }
 hr { display: none; }
 small { font-size: 90%; }
@@ -87,7 +87,6 @@ h1 a,
 h1 a:hover {
   color: #F9D094;
   font-weight: 900;
-  text-decoration: none;
 }
 
 #wrap {
@@ -158,12 +157,8 @@ pre code {
   box-shadow: 0 -1px 0 rgba(0,0,0,0.5);
 }
 
-#home ol, #page ol, .postcontent ol {
-  list-style: decimal;
-}
-
 #home ul, #page ul, .postcontent ul {
-  list-style: disc;
+  list-style: inherit;
 }
 
 #home h1, #page h1 {
@@ -193,6 +188,39 @@ pre code {
 
 #home pre code, #page pre code {
   font-size: 80%;
+}
+
+table {
+  border-collapse: separate;
+  border: solid rgba(0,0,0,0.4) 1px;
+  border-radius: 0.4em;
+  -moz-border-radius: 0.4em;
+  -webkit-border-radius: 0.4em;
+  margin-top: 1em;
+}
+
+.full-width {
+  width: 100%;
+}
+
+table td, th {
+  padding: 0.1em 1em;
+}
+
+table code {
+  font-size: 130%;
+}
+
+.number-data {
+  text-align: right;
+}
+
+table tr:nth-child(odd) {
+  background: rgba(0,0,0,0.2);
+}
+
+table tr th, table tr:nth-child(even) {
+  background: rgba(0,0,0,0.4);
 }
 
 /*}}}*/
@@ -248,7 +276,6 @@ pre code {
   box-shadow: 0 0 5px rgba(0,0,0,0.4);
   -moz-box-shadow: 0 0 5px rgba(0,0,0,0.4);
   -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.4);
-  text-decoration: none;
   font-size: larger;
 }
 
