@@ -981,7 +981,7 @@ class FormulaAuditor
       problem "#{$2} modules should be vendored rather than use deprecated `depends_on \"#{$1}\" => :#{$2}#{$3}`"
     end
 
-    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+.*['"](.+)['"]/
+    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+.*(?<!\?[( ])['"](.+)['"]/
       problem "Dependency #{$1} should not use option #{$2}"
     end
 
