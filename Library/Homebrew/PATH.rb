@@ -23,7 +23,7 @@ class PATH
   end
   alias to_s to_str
 
-  def eql?(other)
+  def ==(other)
     if other.respond_to?(:to_ary)
       return true if to_ary == other.to_ary
     end
@@ -34,7 +34,6 @@ class PATH
 
     false
   end
-  alias == eql?
 
   def empty?
     @paths.empty?
