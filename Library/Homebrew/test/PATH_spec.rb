@@ -13,6 +13,10 @@ describe PATH do
     it "splits an existing PATH" do
       expect(described_class.new("/path1:/path2")).to eq(["/path1", "/path2"])
     end
+
+    it "removes duplicates" do
+      expect(described_class.new("/path1", "/path1")).to eq("/path1")
+    end
   end
 
   describe "#to_ary" do
@@ -31,11 +35,19 @@ describe PATH do
     it "prepends a path to a PATH" do
       expect(described_class.new("/path1").prepend("/path2").to_str).to eq("/path2:/path1")
     end
+
+    it "removes duplicates" do
+      expect(described_class.new("/path1").prepend("/path1").to_str).to eq("/path1")
+    end
   end
 
   describe "#append" do
     it "prepends a path to a PATH" do
       expect(described_class.new("/path1").append("/path2").to_str).to eq("/path1:/path2")
+    end
+
+    it "removes duplicates" do
+      expect(described_class.new("/path1").append("/path1").to_str).to eq("/path1")
     end
   end
 

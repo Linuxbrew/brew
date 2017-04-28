@@ -4,12 +4,12 @@ class PATH
   end
 
   def prepend(*paths)
-    @paths.unshift(*parse(*paths))
+    @paths = parse(*paths, *@paths)
     self
   end
 
   def append(*paths)
-    @paths.concat(parse(*paths))
+    @paths = parse(*@paths, *paths)
     self
   end
 
