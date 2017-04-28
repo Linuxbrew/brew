@@ -430,6 +430,21 @@ describe FormulaAuditor do
       expect(fa.problems.first)
         .to match('xcodebuild should be passed an explicit "SYMROOT"')
     end
+
+    specify "disallow go get usage" do
+      fa = formula_auditor "foo", <<-EOS.undent
+        class Foo <Formula
+          url "http://example.com/foo-1.0.tgz"
+
+          def install
+            system "go", "get", "bar"
+          end
+        end
+      EOS
+      fa.audit_text
+      expect(fa.problems.first)
+        .to match("Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s.")
+    end
   end
 
   describe "#audit_revision_and_version_scheme" do
