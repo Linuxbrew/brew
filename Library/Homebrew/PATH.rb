@@ -44,7 +44,8 @@ class PATH
   end
 
   def validate
-    self.class.new(@paths.select(&File.method(:directory?)))
+    validated_path = self.class.new(@paths.select(&File.method(:directory?)))
+    validated_path unless validated_path.empty?
   end
 
   private
