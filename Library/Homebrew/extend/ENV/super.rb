@@ -122,7 +122,7 @@ module Superenv
       nil
     end
 
-    path.validate
+    path.existing
   end
 
   def homebrew_extra_pkg_config_paths
@@ -133,14 +133,14 @@ module Superenv
     PATH.new(
       deps.map { |d| d.opt_lib/"pkgconfig" },
       deps.map { |d| d.opt_share/"pkgconfig" },
-    ).validate
+    ).existing
   end
 
   def determine_pkg_config_libdir
     PATH.new(
       "/usr/lib/pkgconfig",
       homebrew_extra_pkg_config_paths,
-    ).validate
+    ).existing
   end
 
   def homebrew_extra_aclocal_paths
@@ -152,7 +152,7 @@ module Superenv
       keg_only_deps.map { |d| d.opt_share/"aclocal" },
       HOMEBREW_PREFIX/"share/aclocal",
       homebrew_extra_aclocal_paths,
-    ).validate
+    ).existing
   end
 
   def homebrew_extra_isystem_paths
@@ -163,11 +163,11 @@ module Superenv
     PATH.new(
       HOMEBREW_PREFIX/"include",
       homebrew_extra_isystem_paths,
-    ).validate
+    ).existing
   end
 
   def determine_include_paths
-    PATH.new(keg_only_deps.map(&:opt_include)).validate
+    PATH.new(keg_only_deps.map(&:opt_include)).existing
   end
 
   def homebrew_extra_library_paths
@@ -179,7 +179,7 @@ module Superenv
       keg_only_deps.map(&:opt_lib),
       HOMEBREW_PREFIX/"lib",
       homebrew_extra_library_paths,
-    ).validate
+    ).existing
   end
 
   def determine_dependencies
@@ -190,7 +190,7 @@ module Superenv
     PATH.new(
       keg_only_deps.map(&:opt_prefix),
       HOMEBREW_PREFIX.to_s,
-    ).validate
+    ).existing
   end
 
   def homebrew_extra_cmake_include_paths
@@ -198,7 +198,7 @@ module Superenv
   end
 
   def determine_cmake_include_path
-    PATH.new(homebrew_extra_cmake_include_paths).validate
+    PATH.new(homebrew_extra_cmake_include_paths).existing
   end
 
   def homebrew_extra_cmake_library_paths
@@ -206,7 +206,7 @@ module Superenv
   end
 
   def determine_cmake_library_path
-    PATH.new(homebrew_extra_cmake_library_paths).validate
+    PATH.new(homebrew_extra_cmake_library_paths).existing
   end
 
   def homebrew_extra_cmake_frameworks_paths
@@ -217,7 +217,7 @@ module Superenv
     PATH.new(
       deps.map(&:opt_frameworks),
       homebrew_extra_cmake_frameworks_paths,
-    ).validate
+    ).existing
   end
 
   def determine_make_jobs

@@ -62,7 +62,7 @@ module Stdenv
       HOMEBREW_PREFIX/"share/pkgconfig",
       homebrew_extra_pkg_config_paths,
       "/usr/lib/pkgconfig",
-    ).validate
+    ).existing
   end
 
   # Removes the MAKEFLAGS environment variable, causing make to use a single job.

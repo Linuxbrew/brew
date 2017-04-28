@@ -23,6 +23,14 @@ class PATH
     self
   end
 
+  def select(&block)
+    self.class.new(@paths.select(&block))
+  end
+
+  def reject(&block)
+    self.class.new(@paths.reject(&block))
+  end
+
   def to_ary
     @paths
   end
@@ -49,9 +57,9 @@ class PATH
     @paths.empty?
   end
 
-  def validate
-    validated_path = self.class.new(@paths.select(&File.method(:directory?)))
-    validated_path unless validated_path.empty?
+  def existing
+    existing_path = select(&File.method(:directory?))
+    existing_path unless existing_path.empty?
   end
 
   private

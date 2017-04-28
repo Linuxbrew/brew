@@ -193,7 +193,7 @@ module Homebrew
     path = PATH.new(ENV["PATH"])
     path.prepend(RUBY_BIN) if which("ruby") != RUBY_PATH
     path.prepend(Gem.bindir)
-    ENV["PATH"] = path.validate
+    ENV["PATH"] = path.existing
 
     if Gem::Specification.find_all_by_name(name, version).empty?
       ohai "Installing or updating '#{name}' gem"

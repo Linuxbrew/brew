@@ -86,13 +86,13 @@ describe PATH do
     end
   end
 
-  describe "#validate" do
+  describe "#existing" do
     it "returns a new PATH without non-existent paths" do
       allow(File).to receive(:directory?).with("/path1").and_return(true)
       allow(File).to receive(:directory?).with("/path2").and_return(false)
 
       path = described_class.new("/path1", "/path2")
-      expect(path.validate.to_ary).to eq(["/path1"])
+      expect(path.existing.to_ary).to eq(["/path1"])
       expect(path.to_ary).to eq(["/path1", "/path2"])
     end
   end
