@@ -65,11 +65,9 @@ class PATH
   private
 
   def parse(*paths)
-    paths
-      .flatten
-      .flat_map { |p| p.respond_to?(:to_str) ? p.to_str.split(File::PATH_SEPARATOR): p }
-      .compact
-      .map { |p| p.respond_to?(:to_path) ? p.to_path : p.to_str }
-      .uniq
+    paths.flatten
+         .compact
+         .flat_map { |p| Pathname.new(p).to_path.split(File::PATH_SEPARATOR) }
+         .uniq
   end
 end
