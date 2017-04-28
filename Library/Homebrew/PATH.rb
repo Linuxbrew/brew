@@ -39,10 +39,6 @@ class PATH
     @paths.empty?
   end
 
-  def inspect
-    "<PATH##{to_str}>"
-  end
-
   def validate
     validated_path = self.class.new(@paths.select(&File.method(:directory?)))
     validated_path unless validated_path.empty?
