@@ -100,7 +100,7 @@ module Homebrew
 
       # See https://github.com/Homebrew/legacy-homebrew/pull/9986
       def check_path_for_trailing_slashes
-        bad_paths = PATH.new(ENV["PATH"]).select { |p| p[-1..-1] == "/" }
+        bad_paths = PATH.new(ENV["PATH"]).select { |p| p.end_with?("/") }
         return if bad_paths.empty?
 
         inject_file_list bad_paths, <<-EOS.undent

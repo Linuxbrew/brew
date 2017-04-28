@@ -197,22 +197,23 @@ module SharedEnvExtension
 
   # @private
   def userpaths!
-    paths = PATH.new(self["PATH"]).to_a
-    # put Superenv.bin and opt path at the first
-    new_paths = paths.select { |p| p.start_with?("#{HOMEBREW_REPOSITORY}/Library/ENV", "#{HOMEBREW_PREFIX}/opt") }
-    # XXX hot fix to prefer brewed stuff (e.g. python) over /usr/bin.
-    new_paths << "#{HOMEBREW_PREFIX}/bin"
-    # reset of self["PATH"]
-    new_paths += paths
-    # user paths
-    new_paths += ORIGINAL_PATHS.map do |p|
-      begin
-        p.realpath.to_s
-      rescue
-        nil
-      end
-    end - %w[/usr/X11/bin /opt/X11/bin]
-    self["PATH"] = PATH.new(new_paths.uniq)
+    path = PATH.new(self["PATH"]).select do |p|
+      # put Superenv.bin and opt path at the first
+      p.start_with?("#{HOMEBREW_REPOSITORY}/Library/ENV", "#{HOMEBREW_PREFIX}/opt")
+    end
+    path.append(HOMEBREW_PREFIX/"bin") # XXX hot fix to prefer brewed stuff (e.g. python) over /usr/bin.
+    path.append(self["PATH"]) # reset of self["PATH"]
+    path.append(
+      # user paths
+      ORIGINAL_PATHS.map do |p|
+        begin
+          p.realpath.to_s
+        rescue
+          nil
+        end
+      end - %w[/usr/X11/bin /opt/X11/bin],
+    )
+    self["PATH"] = path
   end
 
   def fortran
