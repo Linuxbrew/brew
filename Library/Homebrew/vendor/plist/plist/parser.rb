@@ -1,5 +1,5 @@
-#!/usr/bin/env ruby
-#
+# encoding: utf-8
+
 # = plist
 #
 # Copyright 2006-2010 Ben Bleything and Patrick May
@@ -69,19 +69,14 @@ module Plist
         @xml = plist_data_or_file
       end
 
-      # TODO: Update vendored `plist` parser when
-      #       https://github.com/patsplat/plist/pull/38
-      #       is merged.
-      @xml.force_encoding("UTF-8")
-
       @listener = listener
     end
 
     TEXT       = /([^<]+)/
-    XMLDECL_PATTERN = /<\?xml\s+(.*?)\?>*/um
-    DOCTYPE_PATTERN = /\s*<!DOCTYPE\s+(.*?)(\[|>)/um
-    COMMENT_START = /\A<!--/u
-    COMMENT_END = /.*?-->/um
+    XMLDECL_PATTERN = /<\?xml\s+(.*?)\?>*/m
+    DOCTYPE_PATTERN = /\s*<!DOCTYPE\s+(.*?)(\[|>)/m
+    COMMENT_START = /\A<!--/
+    COMMENT_END = /.*?-->/m
 
 
     def parse
@@ -96,7 +91,14 @@ module Plist
         if @scanner.scan(COMMENT_START)
           @scanner.scan(COMMENT_END)
         elsif @scanner.scan(XMLDECL_PATTERN)
+          encoding = parse_encoding_from_xml_declaration(@scanner[1])
+          next if encoding.nil?
+
+          # use the specified encoding for the rest of the file
+          next unless String.method_defined?(:force_encoding)
+          @scanner.string = @scanner.rest.force_encoding(encoding)
         elsif @scanner.scan(DOCTYPE_PATTERN)
+          next
         elsif @scanner.scan(start_tag)
           @listener.tag_start(@scanner[1], nil)
           if (@scanner[2] =~ /\/$/)
@@ -109,6 +111,22 @@ module Plist
         else
           raise "Unimplemented element"
         end
+      end
+    end
+
+    private
+
+    def parse_encoding_from_xml_declaration(xml_declaration)
+      return unless defined?(Encoding)
+
+      xml_encoding = xml_declaration.match(/(?:\A|\s)encoding=(?:"(.*?)"|'(.*?)')(?:\s|\Z)/)
+
+      return if xml_encoding.nil?
+
+      begin
+        Encoding.find(xml_encoding[1])
+      rescue ArgumentError
+        nil
       end
     end
   end
@@ -218,7 +236,7 @@ module Plist
       data = Base64.decode64(text.gsub(/\s+/, '')) unless text.nil?
       begin
         return Marshal.load(data)
-      rescue Exception => e
+      rescue Exception
         io = StringIO.new
         io.write data
         io.rewind
