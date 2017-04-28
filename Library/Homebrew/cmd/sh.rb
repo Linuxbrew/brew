@@ -23,7 +23,7 @@ module Homebrew
     ENV.setup_build_environment
     if superenv?
       # superenv stopped adding brew's bin but generally users will want it
-      ENV["PATH"] = PATH.new(PATH.new(ENV["PATH"]).to_a.insert(1, HOMEBREW_PREFIX/"bin"))
+      ENV["PATH"] = PATH.new(ENV["PATH"]).insert(1, HOMEBREW_PREFIX/"bin")
     end
     ENV["PS1"] = 'brew \[\033[1;32m\]\w\[\033[0m\]$ '
     ENV["VERBOSE"] = "1"

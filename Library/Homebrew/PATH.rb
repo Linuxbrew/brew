@@ -1,4 +1,9 @@
 class PATH
+  include Enumerable
+  extend Forwardable
+
+  def_delegator :@paths, :each
+
   def initialize(*paths)
     @paths = parse(*paths)
   end
@@ -10,6 +15,11 @@ class PATH
 
   def append(*paths)
     @paths = parse(*@paths, *paths)
+    self
+  end
+
+  def insert(index, *paths)
+    @paths = parse(*@paths.insert(index, *paths))
     self
   end
 

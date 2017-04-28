@@ -51,6 +51,41 @@ describe PATH do
     end
   end
 
+  describe "#insert" do
+    it "inserts a path at a given index" do
+      expect(described_class.new("/path1").insert(0, "/path2").to_str).to eq("/path2:/path1")
+    end
+
+    it "can insert multiple paths" do
+      expect(described_class.new("/path1").insert(0, "/path2", "/path3")).to eq("/path2:/path3:/path1")
+    end
+  end
+
+  describe "#include?" do
+    it "returns true if a path is included" do
+      path = described_class.new("/path1", "/path2")
+      expect(path).to include("/path1")
+      expect(path).to include("/path2")
+    end
+
+    it "returns false if a path is not included" do
+      expect(described_class.new("/path1")).not_to include("/path2")
+    end
+
+    it "returns false if the given string contains a separator" do
+      expect(described_class.new("/path1", "/path2")).not_to include("/path1:")
+    end
+  end
+
+  describe "#each" do
+    it "loops through each path" do
+      enum = described_class.new("/path1", "/path2").each
+
+      expect(enum.next).to eq("/path1")
+      expect(enum.next).to eq("/path2")
+    end
+  end
+
   describe "#validate" do
     it "returns a new PATH without non-existent paths" do
       allow(File).to receive(:directory?).with("/path1").and_return(true)
