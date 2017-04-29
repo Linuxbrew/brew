@@ -150,7 +150,7 @@ class Cmd
       /^-O[0-9zs]?$/, "-fast", "-no-cpp-precomp",
       "-pedantic", "-pedantic-errors", "-Wno-long-double",
       "-Wno-unused-but-set-variable"
-    when "-lintl"
+    when "-liconv", "-lintl"
       # Not needed on Linux.
     when "-fopenmp", "-lgomp", "-mno-fused-madd", "-fforce-addr", "-fno-defer-pop",
       "-mno-dynamic-no-pic", "-fearly-inlining", /^-f(?:no-)?inline-functions-called-once/,
