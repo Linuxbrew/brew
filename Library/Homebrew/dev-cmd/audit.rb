@@ -885,6 +885,10 @@ class FormulaAuditor
       problem "Formulae using virtualenvs do not need a `setuptools` resource."
     end
 
+    if text =~ /system\s+['"]go['"],\s+['"]get['"]/
+      problem "Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s."
+    end
+
     return unless text.include?('require "language/go"') && !text.include?("go_resource")
     problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
