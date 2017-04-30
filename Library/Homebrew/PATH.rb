@@ -59,6 +59,7 @@ class PATH
 
   def existing
     existing_path = select(&File.method(:directory?))
+    # return nil instead of empty PATH, to unset environment variables
     existing_path unless existing_path.empty?
   end
 

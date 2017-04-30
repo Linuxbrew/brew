@@ -107,5 +107,9 @@ describe PATH do
       expect(path.existing.to_ary).to eq(["/path1"])
       expect(path.to_ary).to eq(["/path1", "/path2"])
     end
+
+    it "returns nil instead of an empty #{described_class}" do
+      expect(described_class.new.existing).to be nil
+    end
   end
 end
