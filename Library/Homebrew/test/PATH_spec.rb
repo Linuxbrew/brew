@@ -86,6 +86,18 @@ describe PATH do
     end
   end
 
+  describe "#select" do
+    it "returns an object of the same class instead of an Array" do
+      expect(described_class.new.select { true }).to be_a(described_class)
+    end
+  end
+
+  describe "#reject" do
+    it "returns an object of the same class instead of an Array" do
+      expect(described_class.new.reject { true }).to be_a(described_class)
+    end
+  end
+
   describe "#existing" do
     it "returns a new PATH without non-existent paths" do
       allow(File).to receive(:directory?).with("/path1").and_return(true)
