@@ -608,7 +608,7 @@ module Homebrew
   def check_bintray_mirror(name, url)
     headers = curl_output("--connect-timeout", "15", "--head", url)[0]
     status_code = headers.scan(%r{^HTTP\/.* (\d+)}).last.first
-    return if status_code.start_with?("3")
+    return if status_code.start_with?("2")
     opoo "The Bintray mirror #{url} is not reachable (HTTP status code #{status_code})."
     opoo "Do you need to upload it with `brew mirror #{name}`?"
   end
