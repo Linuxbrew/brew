@@ -308,7 +308,7 @@ class Pathname
   # @private
   def elf?
     @which_file ||= which("file")
-    !@which_file.nil? && `#{@which_file} -b #{self}` =~ /^ELF/
+    !@which_file.nil? && `#{@which_file} -b #{self.to_s.gsub(/(\(|\))/,'\\\\\1')}` =~ /^ELF/
   end
 
   # @private
