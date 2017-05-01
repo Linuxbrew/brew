@@ -65,9 +65,7 @@ Our Xserve ESXi boxes for CI are hosted by [MacStadium](https://www.macstadium.c
 
 [![Powered by MacStadium](https://cloud.githubusercontent.com/assets/125011/22776032/097557ac-eea6-11e6-8ba8-eff22dfd58f1.png)](https://www.macstadium.com)
 
-Our Mac Minis for CI were paid for by [our Kickstarter supporters](http://docs.brew.sh/Kickstarter-Supporters.html).
-
-Our Mac Minis for CI are hosted by [The Positive Internet Company](http://www.positive-internet.com).
+Our Jenkins CI installation is hosted by [DigitalOcean](https://m.do.co/c/7e39c35d5581).
 
 Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/homebrew).
 
