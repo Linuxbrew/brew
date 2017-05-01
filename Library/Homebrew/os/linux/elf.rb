@@ -36,32 +36,54 @@ module ELF
 
     def initialize(path)
       @path = path
-
-      begin
-        patchelf = Formula["patchelf"].bin/"patchelf"
-        odie "patchelf must be installed: brew install patchelf" unless patchelf.executable?
-      rescue FormulaUnavailableError
+      @dylib_id, needed = if DevelopmentTools.locate "readelf"
+        elf_soname_needed_readelf path
+      elsif DevelopmentTools.locate "patchelf"
+        elf_soname_needed_patchelf path
+      else
+        odie "patchelf must be installed: brew install patchelf"
+      end
+      if needed.empty?
         @dylibs = []
         return
       end
-
-      @dylib_id = if path.dylib?
-        command = [patchelf, "--print-soname", path.expand_path.to_s]
-        id = Utils.popen_read(*command).split("\n")
-        raise ErrorDuringExecution, command unless $?.success?
-        id
-      end
-
-      command = [patchelf, "--print-needed", path.expand_path.to_s]
-      needed = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $?.success?
-
       command = ["ldd", path.expand_path.to_s]
       libs = Utils.popen_read(*command).split("\n")
       raise ErrorDuringExecution, command unless $?.success?
       needed << "not found"
       libs.select! { |lib| needed.any? { |soname| lib.include? soname } }
       @dylibs = libs.map { |lib| lib[LDD_RX, 1] || lib[LDD_RX, 2] }.compact
+    end
+
+    private
+
+    def elf_soname_needed_patchelf(path)
+      if path.dylib?
+        command = [patchelf, "--print-soname", path.expand_path.to_s]
+        soname = Utils.popen_read(*command).chomp
+        raise ErrorDuringExecution, command unless $?.success?
+      end
+      command = [patchelf, "--print-needed", path.expand_path.to_s]
+      needed = Utils.popen_read(*command).split("\n")
+      raise ErrorDuringExecution, command unless $?.success?
+      [soname, needed]
+    end
+
+    def elf_soname_needed_readelf(path)
+      soname = nil
+      needed = []
+      command = ["readelf", "-d", path.expand_path.to_s]
+      lines = Utils.popen_read(*command).split("\n")
+      raise ErrorDuringExecution, command unless $?.success?
+      lines.each do |s|
+        case s
+        when /\(SONAME\)/
+          soname = s[/Library soname: \[(.*)\]/, 1]
+        when /\(NEEDED\)/
+          needed << s[/Shared library: \[(.*)\]/, 1]
+        end
+      end
+      [soname, needed]
     end
   end
 
