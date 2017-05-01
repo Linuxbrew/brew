@@ -41,7 +41,7 @@ class Keg
     end
 
     cmd << file
-    if old_rpath == "#{new_prefix}/lib" && old_interpreter == new_interpreter
+    if old_rpath == new_rpath && old_interpreter == new_interpreter
       puts "Skipping relocation of #{file}" if ARGV.debug?
     else
       puts "Setting RPATH of #{file}" if ARGV.debug?
