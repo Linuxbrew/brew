@@ -41,13 +41,8 @@ class Keg
       cmd << "--set-interpreter" << new_interpreter unless old_interpreter == new_interpreter
     end
 
-    cmd << file
-    if old_rpath == new_rpath && old_interpreter == new_interpreter
-      puts "Skipping relocation of #{file}" if ARGV.debug?
-    else
-      puts "Setting RPATH of #{file}" if ARGV.debug?
-      safe_system(*cmd)
-    end
+    return if old_rpath == new_rpath && old_interpreter == new_interpreter
+    safe_system(*cmd, file)
   end
 
   # Detects the C++ dynamic libraries in place, scanning the dynamic links
