@@ -20,9 +20,10 @@ class Keg
       return
     end
 
-    cmd_rpath = [patchelf, "--print-rpath", file]
+    cmd_rpath = "#{patchelf} --print-rpath '#{file}' 2>&1"
     old_rpath = Utils.popen_read(*cmd_rpath).strip
-    raise ErrorDuringExecution, cmd_rpath unless $?.success?
+    return if old_rpath == "cannot find section .dynstr"
+    raise ErrorDuringExecution, "#{cmd_rpath}\n#{old_rpath}" unless $?.success?
     rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select do |x|
       x.start_with?(new_prefix, "$ORIGIN")
     end
