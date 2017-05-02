@@ -502,6 +502,7 @@ class FormulaAuditor
       GPG
       GNOME
       BSD
+      Firefox
     ].freeze
 
     reason = formula.keg_only_reason.to_s
