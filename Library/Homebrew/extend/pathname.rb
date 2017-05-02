@@ -307,8 +307,7 @@ class Pathname
 
   # @private
   def elf?
-    @which_file ||= which("file")
-    !@which_file.nil? && `#{@which_file} -b #{self}` =~ /^ELF/
+    read(4) == "\x7fELF"
   end
 
   # @private
