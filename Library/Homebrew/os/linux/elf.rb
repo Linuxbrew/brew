@@ -43,7 +43,7 @@ module ELF
       else
         odie "patchelf must be installed: brew install patchelf"
       end
-      if needed.empty?
+      if needed.empty? || path.arch != Hardware::CPU.arch
         @dylibs = []
         return
       end
