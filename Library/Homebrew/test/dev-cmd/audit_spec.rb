@@ -322,6 +322,69 @@ describe FormulaAuditor do
       .to eq(["Don't recommend setuid in the caveats, suggest sudo instead."])
   end
 
+  describe "#audit_keg_only_style" do
+    specify "keg_only_needs_downcasing" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+
+          keg_only "Because why not"
+        end
+      EOS
+
+      fa.audit_keg_only_style
+      expect(fa.problems)
+        .to eq(["'Because' from the keg_only reason should be 'because'.\n"])
+    end
+
+    specify "keg_only_redundant_period" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+
+          keg_only "because this line ends in a period."
+        end
+      EOS
+
+      fa.audit_keg_only_style
+      expect(fa.problems)
+        .to eq(["keg_only reason should not end with a period."])
+    end
+
+    specify "keg_only_handles_block_correctly" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+
+          keg_only <<-EOF.undent
+            this line starts with a lowercase word.
+
+            This line does not but that shouldn't be a
+            problem
+          EOF
+        end
+      EOS
+
+      fa.audit_keg_only_style
+      expect(fa.problems)
+        .to eq([])
+    end
+
+    specify "keg_only_handles_whitelist_correctly" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+
+          keg_only "Apple ships foo in the CLT package"
+        end
+      EOS
+
+      fa.audit_keg_only_style
+      expect(fa.problems)
+        .to eq([])
+    end
+  end
+
   describe "#audit_homepage" do
     specify "homepage URLs" do
       fa = formula_auditor "foo", <<-EOS.undent, online: true
