@@ -12,14 +12,19 @@ module Hardware
         OPTIMIZATION_FLAGS_LINUX
       end
 
-      def universal_archs
-        arch = case bits
+      def arch
+        case bits
         when 32
           arch_32_bit
         when 64
           arch_64_bit
+        else
+          :dunno
         end
-        [arch].compact.extend ArchitectureListExtension
+      end
+
+      def universal_archs
+        [arch].extend ArchitectureListExtension
       end
 
       def cpuinfo
@@ -107,7 +112,7 @@ module Hardware
       end
 
       def bits
-        Utils.popen_read("getconf", "LONG_BIT").chomp.to_i
+        @bits ||= Utils.popen_read("getconf", "LONG_BIT").chomp.to_i
       end
 
       def arch_32_bit
