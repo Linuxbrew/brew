@@ -489,6 +489,37 @@ class FormulaAuditor
     EOS
   end
 
+  def audit_keg_only_style
+    return unless @strict
+    return unless formula.keg_only?
+
+    whitelist = %w[
+      Apple
+      macOS
+      OS
+      Homebrew
+      Xcode
+      GPG
+      GNOME
+      BSD
+    ].freeze
+
+    reason = formula.keg_only_reason.to_s
+    # Formulae names can legitimately be uppercase/lowercase/both.
+    name = Regexp.new(formula.name, Regexp::IGNORECASE)
+    reason.sub!(name, "")
+    first_word = reason.split[0]
+
+    if reason =~ /^[A-Z]/ && !reason.start_with?(*whitelist)
+      problem <<-EOS.undent
+        '#{first_word}' from the keg_only reason should be '#{first_word.downcase}'.
+      EOS
+    end
+
+    return unless reason.end_with?(".")
+    problem "keg_only reason should not end with a period."
+  end
+
   def audit_options
     formula.options.each do |o|
       if o.name == "32-bit"

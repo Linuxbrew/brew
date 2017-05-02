@@ -44,8 +44,10 @@ class Caveats
   def keg_only_text
     return unless f.keg_only?
 
-    s = "This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX}."
-    s << "\n\n#{f.keg_only_reason}\n"
+    s = <<-EOS.undent
+      This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX},
+      because #{f.keg_only_reason}.
+    EOS
     if f.bin.directory? || f.sbin.directory?
       s << "\nIf you need to have this software first in your PATH run:\n"
       if f.bin.directory?
