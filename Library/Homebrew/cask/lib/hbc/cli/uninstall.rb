@@ -8,7 +8,7 @@ module Hbc
 
         cask_tokens.each do |cask_token|
           odebug "Uninstalling Cask #{cask_token}"
-          cask = Hbc.load(cask_token)
+          cask = CaskLoader.load(cask_token)
 
           raise CaskNotInstalledError, cask unless cask.installed? || force
 

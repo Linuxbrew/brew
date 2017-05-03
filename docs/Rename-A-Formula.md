@@ -7,7 +7,6 @@ you need to:
 
 2. Create a pull request to the corresponding tap deleting the old formula file, adding the new formula file, and adding it to `formula_renames.json` with a commit message like `newack: renamed from ack`. Use the canonical name (e.g. `ack` instead of `user/repo/ack`).
 
-
 A `formula_renames.json` example for a formula rename:
 
 ```json

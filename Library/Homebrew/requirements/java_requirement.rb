@@ -2,7 +2,7 @@ require "language/java"
 
 class JavaRequirement < Requirement
   fatal true
-  download "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
+  download "https://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
   satisfy build_env: false do
     setup_java

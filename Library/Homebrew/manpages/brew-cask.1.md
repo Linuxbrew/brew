@@ -64,7 +64,7 @@ names, and other aspects of this manual are still subject to change.
   * `home` or `homepage` [ <token> ... ]:
     Display the homepage associated with a given Cask in a browser.
 
-    With no arguments, display the project page <http://caskroom.io>.
+    With no arguments, display the project page <https://caskroom.github.io/>.
 
   * `info` or `abv` <token> [ <token> ... ]:
     Display information about the given Cask.
@@ -85,6 +85,17 @@ names, and other aspects of this manual are still subject to change.
 
     If <token> is given, summarize the staged files associated with the
     given Cask.
+    
+  * `outdated` [--greedy] [--verbose|--quiet] [ <token> ...]:
+    Without token arguments, display all the installed Casks that have newer 
+    versions available in the tap; otherwise check only the tokens given 
+    in the command line.
+    If `--greedy` is given then also include in the output the Casks having 
+    `auto_updates true` or `version :latest`. Otherwise they are skipped
+    because there is no reliable way to know when updates are available for 
+    them.<br>
+    `--verbose` forces the display of the outdated and latest version.<br>
+    `--quiet` suppresses the display of versions.
 
   * `reinstall` <token> [ <token> ... ]:
     Reinstall the given Cask.
@@ -248,7 +259,7 @@ Environment variables specific to Homebrew-Cask:
 
 ## SEE ALSO
 
-The Homebrew-Cask home page: <http://caskroom.io>
+The Homebrew-Cask home page: <https://caskroom.github.io/>
 
 The Homebrew-Cask GitHub page: <https://github.com/caskroom/homebrew-cask>
 

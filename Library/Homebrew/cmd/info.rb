@@ -16,7 +16,7 @@
 #:    See the docs for examples of using the JSON output:
 #:    <http://docs.brew.sh/Querying-Brew.html>
 
-require "blacklist"
+require "missing_formula"
 require "caveats"
 require "options"
 require "formula"
@@ -43,7 +43,7 @@ module Homebrew
     if ARGV.named.empty?
       if HOMEBREW_CELLAR.exist?
         count = Formula.racks.length
-        puts "#{count} keg#{plural(count)}, #{HOMEBREW_CELLAR.abv}"
+        puts "#{Formatter.pluralize(count, "keg")}, #{HOMEBREW_CELLAR.abv}"
       end
     else
       ARGV.named.each_with_index do |f, i|
@@ -54,10 +54,12 @@ module Homebrew
           else
             info_formula Formulary.find_with_priority(f)
           end
-        rescue FormulaUnavailableError
-          # No formula with this name, try a blacklist lookup
-          raise unless (blacklist = blacklisted?(f))
-          puts blacklist
+        rescue FormulaUnavailableError => e
+          ofail e.message
+          # No formula with this name, try a missing formula lookup
+          if (reason = Homebrew::MissingFormula.reason(f))
+            $stderr.puts reason
+          end
         end
       end
     end

@@ -6,7 +6,7 @@ module Hbc
         raise CaskUnspecifiedError if cask_tokens.empty?
         # only respects the first argument
         cask_token = cask_tokens.first.sub(/\.rb$/i, "")
-        cask_path = Hbc.path(cask_token)
+        cask_path = CaskLoader.path(cask_token)
         raise CaskUnavailableError, cask_token.to_s unless cask_path.exist?
         puts File.open(cask_path, &:read)
       end

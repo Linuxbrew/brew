@@ -5,7 +5,7 @@ module Hbc
         count = 0
         cask_tokens.each do |cask_token|
           begin
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
 
             installer = Installer.new(cask,
                                       force:          force,
@@ -17,16 +17,10 @@ module Hbc
             if cask.installed?
               # use copy of cask for uninstallation to avoid 'No such file or directory' bug
               installed_cask = cask
-              latest_installed_version = installed_cask.timestamped_versions.last
 
-              unless latest_installed_version.nil?
-                latest_installed_cask_file = installed_cask.metadata_master_container_path
-                                                           .join(latest_installed_version
-                                                           .join(File::Separator),
-                                                           "Casks", "#{cask_token}.rb")
-
-                # use the same cask file that was used for installation, if possible
-                installed_cask = CaskLoader.load_from_file(latest_installed_cask_file) if latest_installed_cask_file.exist?
+              # use the same cask file that was used for installation, if possible
+              if (installed_caskfile = installed_cask.installed_caskfile).exist?
+                installed_cask = CaskLoader.load_from_file(installed_caskfile)
               end
 
               # Always force uninstallation, ignore method parameter

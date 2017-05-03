@@ -10,7 +10,7 @@ module Homebrew
   module_function
 
   def aspell_dictionaries
-    dict_url    = "http://ftpmirror.gnu.org/aspell/dict"
+    dict_url    = "https://ftpmirror.gnu.org/aspell/dict"
     dict_mirror = "https://ftp.gnu.org/gnu/aspell/dict"
     languages   = {}
 

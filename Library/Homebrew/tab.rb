@@ -107,11 +107,14 @@ class Tab < OpenStruct
   def self.for_keg(keg)
     path = keg.join(FILENAME)
 
-    if path.exist?
+    tab = if path.exist?
       from_file(path)
     else
       empty
     end
+
+    tab["tabfile"] = path
+    tab
   end
 
   # Returns a tab for the named formula's installation,

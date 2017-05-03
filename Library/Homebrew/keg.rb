@@ -240,8 +240,9 @@ class Keg
   def remove_opt_record
     opt_record.unlink
     aliases.each do |a|
-      next if !opt_record.symlink? && !opt_record.exist?
-      (opt_record.parent/a).delete
+      alias_symlink = opt_record.parent/a
+      next if !alias_symlink.symlink? && !alias_symlink.exist?
+      alias_symlink.delete
     end
     opt_record.parent.rmdir_if_possible
   end
@@ -302,23 +303,24 @@ class Keg
     dir = case shell
     when :bash then path.join("etc", "bash_completion.d")
     when :zsh
-      dir = path.join("share", "zsh", "site-functions")
-      dir if dir && dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
-    when :fish then path.join("share", "fish", "vendor_completions.d")
+      dir = path/"share/zsh/site-functions"
+      dir if dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
+    when :fish then path/"share/fish/vendor_completions.d"
     end
     dir && dir.directory? && !dir.children.empty?
   end
 
-  def zsh_functions_installed?
-    # Check for non completion functions (i.e. files not started with an underscore),
-    # since those can be checked separately
-    dir = path.join("share", "zsh", "site-functions")
-    dir && dir.directory? && dir.children.any? { |f| !f.basename.to_s.start_with?("_") }
-  end
-
-  def fish_functions_installed?
-    dir = path.join("share", "fish", "vendor_functions.d")
-    dir && dir.directory? && !dir.children.empty?
+  def functions_installed?(shell)
+    case shell
+    when :fish
+      dir = path/"share/fish/vendor_functions.d"
+      dir.directory? && !dir.children.empty?
+    when :zsh
+      # Check for non completion functions (i.e. files not started with an underscore),
+      # since those can be checked separately
+      dir = path/"share/zsh/site-functions"
+      dir.directory? && dir.children.any? { |f| !f.basename.to_s.start_with?("_") }
+    end
   end
 
   def plist_installed?
@@ -466,7 +468,7 @@ class Keg
   end
 
   def aliases
-    Formula[rack.basename.to_s].aliases
+    Formulary.from_rack(rack).aliases
   rescue FormulaUnavailableError
     []
   end

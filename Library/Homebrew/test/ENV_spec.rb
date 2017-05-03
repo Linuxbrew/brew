@@ -115,11 +115,11 @@ shared_examples EnvActivation do
 
   describe "#prepend_path" do
     it "prepends to a path" do
-      subject.prepend_path "FOO", "/usr/bin"
-      expect(subject["FOO"]).to eq("/usr/bin")
+      subject.prepend_path "FOO", "/usr/libexec"
+      expect(subject["FOO"]).to eq("/usr/libexec")
 
-      subject.prepend_path "FOO", "/bin"
-      expect(subject["FOO"]).to eq("/bin#{File::PATH_SEPARATOR}/usr/bin")
+      subject.prepend_path "FOO", "/usr"
+      expect(subject["FOO"]).to eq("/usr#{File::PATH_SEPARATOR}/usr/libexec")
     end
   end
 

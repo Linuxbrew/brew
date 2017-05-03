@@ -6,7 +6,7 @@ module Hbc
         raise CaskUnspecifiedError if cask_tokens.empty?
         # only respects the first argument
         cask_token = cask_tokens.first.sub(/\.rb$/i, "")
-        cask_path = Hbc.path(cask_token)
+        cask_path = CaskLoader.path(cask_token)
         odebug "Opening editor for Cask #{cask_token}"
         unless cask_path.exist?
           raise CaskUnavailableError, %Q(#{cask_token}, run "brew cask create #{cask_token}" to create a new Cask)

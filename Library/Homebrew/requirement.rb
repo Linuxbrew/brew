@@ -125,6 +125,10 @@ class Requirement
     @formula || self.class.default_formula
   end
 
+  def satisfied_by_formula?
+    !@formula.nil?
+  end
+
   def to_dependency
     if formula =~ HOMEBREW_TAP_FORMULA_REGEX
       TapDependency.new(formula, tags, method(:modify_build_environment), name)

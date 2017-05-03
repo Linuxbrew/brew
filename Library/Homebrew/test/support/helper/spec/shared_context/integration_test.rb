@@ -1,6 +1,5 @@
 require "open3"
 
-RSpec::Matchers.define_negated_matcher :not_to_output, :output
 RSpec::Matchers.define_negated_matcher :be_a_failure, :be_a_success
 
 RSpec.shared_context "integration test" do

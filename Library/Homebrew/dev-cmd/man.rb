@@ -27,7 +27,7 @@ module Homebrew
 
     regenerate_man_pages
 
-    if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/brew.1.html", "manpages"
+    if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/Manpage.md", "manpages"
       puts "No changes to manpage output detected."
     elsif ARGV.include?("--fail-if-changed")
       Homebrew.failed = true
@@ -38,7 +38,7 @@ module Homebrew
     Homebrew.install_gem_setup_path! "ronn"
 
     markup = build_man_page
-    convert_man_page(markup, TARGET_DOC_PATH/"brew.1.html")
+    convert_man_page(markup, TARGET_DOC_PATH/"Manpage.md")
     convert_man_page(markup, TARGET_MAN_PATH/"brew.1")
 
     cask_markup = (SOURCE_PATH/"brew-cask.1.md").read
@@ -53,8 +53,7 @@ module Homebrew
                  .grep(/^#:/)
                  .map { |line| line.slice(2..-1) }
                  .join
-    end
-            .reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
+    end.reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
   end
 
   def build_man_page
@@ -107,13 +106,15 @@ module Homebrew
     Utils.popen(["ronn", format_flag] + shared_args, "rb+") do |ronn|
       ronn.write markup
       ronn.close_write
-      target.atomic_write ronn.read
+      ronn_output = ronn.read
+      ronn_output.gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
+      target.atomic_write ronn_output
     end
   end
 
   def target_path_to_format(target)
     case target.basename
-    when /\.html?$/ then ["--fragment", "HTML fragment"]
+    when /\.md$/    then ["--markdown", "markdown"]
     when /\.\d$/    then ["--roff", "man page"]
     else
       odie "Failed to infer output format from '#{target.basename}'."

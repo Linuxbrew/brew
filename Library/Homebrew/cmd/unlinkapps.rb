@@ -65,7 +65,7 @@ module Homebrew
       puts "No apps unlinked from #{target_dir}" if ARGV.verbose?
     else
       n = ObserverPathnameExtension.total
-      puts "Unlinked #{n} app#{plural(n)} from #{target_dir}"
+      puts "Unlinked #{Formatter.pluralize(n, "app")} from #{target_dir}"
     end
   end
 

@@ -6,7 +6,7 @@
 #:    generated DSL. Passing `--keep-old` will attempt to keep it at its
 #:    original value, while `--no-rebuild` will remove it.
 #:
-#:    If `--verbose` is passed, print the bottling commands and any warnings
+#:    If `--verbose` (or `-v`) is passed, print the bottling commands and any warnings
 #:    encountered.
 #:
 #:    If `--skip-relocation` is passed, do not check if the bottle can be marked

@@ -50,11 +50,11 @@ module Homebrew
         pinned_count += 1 if tap.pinned?
         private_count += 1 if tap.private?
       end
-      info = "#{tap_count} tap#{plural(tap_count)}"
+      info = Formatter.pluralize(tap_count, "tap").to_s
       info += ", #{pinned_count} pinned"
       info += ", #{private_count} private"
-      info += ", #{formula_count} formula#{plural(formula_count, "e")}"
-      info += ", #{command_count} command#{plural(command_count)}"
+      info += ", #{Formatter.pluralize(formula_count, "formula")}"
+      info += ", #{Formatter.pluralize(command_count, "command")}"
       info += ", #{Tap::TAP_DIRECTORY.abv}" if Tap::TAP_DIRECTORY.directory?
       puts info
     else
@@ -65,10 +65,10 @@ module Homebrew
           info += tap.pinned? ? "pinned" : "unpinned"
           info += ", private" if tap.private?
           if (formula_count = tap.formula_files.size) > 0
-            info += ", #{formula_count} formula#{plural(formula_count, "e")}"
+            info += ", #{Formatter.pluralize(formula_count, "formula")}"
           end
           if (command_count = tap.command_files.size) > 0
-            info += ", #{command_count} command#{plural(command_count)}"
+            info += ", #{Formatter.pluralize(command_count, "command")}"
           end
           info += ", no formulae/commands" if (formula_count + command_count).zero?
           info += "\n#{tap.path} (#{tap.path.abv})"

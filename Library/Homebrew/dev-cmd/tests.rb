@@ -3,7 +3,7 @@
 #:    `--only=`<test_script> runs only <test_script>_spec.rb, and `--seed`
 #:    randomizes tests with the provided value instead of a random seed.
 #:
-#:    If `--verbose` is passed, print the command that runs the tests.
+#:    If `--verbose` (or `-v`) is passed, print the command that runs the tests.
 #:
 #:    If `--coverage` is passed, also generate code coverage reports.
 #:
@@ -28,6 +28,7 @@ module Homebrew
       ENV.delete("HOMEBREW_VERBOSE")
       ENV.delete("VERBOSE")
       ENV.delete("HOMEBREW_CASK_OPTS")
+      ENV.delete("HOMEBREW_TEMP")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"

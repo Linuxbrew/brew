@@ -4,7 +4,7 @@
 #:    <formula> is usually the name of the formula to install, but it can be specified
 #:    in several different ways. See [SPECIFYING FORMULAE][].
 #:
-#:    If `--debug` is passed and brewing fails, open an interactive debugging
+#:    If `--debug` (or `-d`) is passed and brewing fails, open an interactive debugging
 #:    session with access to IRB or a shell inside the temporary build directory.
 #:
 #:    If `--env=std` is passed, use the standard build environment instead of superenv.
@@ -24,7 +24,7 @@
 #:    `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
 #:    4.9.
 #:
-#:    If `--build-from-source` or `-s` is passed, compile the specified <formula> from
+#:    If `--build-from-source` (or `-s`) is passed, compile the specified <formula> from
 #:    source even if a bottle is provided. Dependencies will still be installed
 #:    from bottles if they are available.
 #:
@@ -48,14 +48,15 @@
 #:    during installation.
 #:
 #:  * `install` `--interactive` [`--git`] <formula>:
-#:    Download and patch <formula>, then open a shell. This allows the user to
-#:    run `./configure --help` and otherwise determine how to turn the software
-#:    package into a Homebrew formula.
+#:    If `--interactive` (or `-i`) is passed, download and patch <formula>, then
+#:    open a shell. This allows the user to run `./configure --help` and
+#:    otherwise determine how to turn the software package into a Homebrew
+#:    formula.
 #:
-#:    If `--git` is passed, Homebrew will create a Git repository, useful for
+#:    If `--git` (or `-g`) is passed, Homebrew will create a Git repository, useful for
 #:    creating patches to the software.
 
-require "blacklist"
+require "missing_formula"
 require "diagnostic"
 require "cmd/search"
 require "formula_installer"
@@ -193,56 +194,65 @@ module Homebrew
         next unless f.opt_prefix.directory?
         keg = Keg.new(f.opt_prefix.resolved_path)
         tab = Tab.for_keg(keg)
-        tab.installed_on_request = true
-        tab.write
+        unless tab.installed_on_request
+          tab.installed_on_request = true
+          tab.write
+        end
       end
 
       perform_preinstall_checks
 
-      formulae.each { |f| install_formula(f) }
+      formulae.each do |f|
+        Migrator.migrate_if_needed(f)
+        install_formula(f)
+      end
     rescue FormulaClassUnavailableError => e
       # Need to rescue before `FormulaUnavailableError` (superclass of this)
       # is handled, as searching for a formula doesn't make sense here (the
       # formula was found, but there's a problem with its implementation).
       ofail e.message
     rescue FormulaUnavailableError => e
-      if (blacklist = blacklisted?(e.name))
-        ofail "#{e.message}\n#{blacklist}"
-      elsif e.name == "updog"
+      if e.name == "updog"
         ofail "What's updog?"
+        return
+      end
+
+      ofail e.message
+      if (reason = Homebrew::MissingFormula.reason(e.name))
+        $stderr.puts reason
+        return
+      end
+
+      query = query_regexp(e.name)
+
+      ohai "Searching for similarly named formulae..."
+      formulae_search_results = search_formulae(query)
+      case formulae_search_results.length
+      when 0
+        ofail "No similarly named formulae found."
+      when 1
+        puts "This similarly named formula was found:"
+        puts formulae_search_results
+        puts "To install it, run:\n  brew install #{formulae_search_results.first}"
       else
-        ofail e.message
-        query = query_regexp(e.name)
+        puts "These similarly named formulae were found:"
+        puts Formatter.columns(formulae_search_results)
+        puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
+      end
 
-        ohai "Searching for similarly named formulae..."
-        formulae_search_results = search_formulae(query)
-        case formulae_search_results.length
-        when 0
-          ofail "No similarly named formulae found."
-        when 1
-          puts "This similarly named formula was found:"
-          puts formulae_search_results
-          puts "To install it, run:\n  brew install #{formulae_search_results.first}"
-        else
-          puts "These similarly named formulae were found:"
-          puts Formatter.columns(formulae_search_results)
-          puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
-        end
-
-        ohai "Searching taps..."
-        taps_search_results = search_taps(query)
-        case taps_search_results.length
-        when 0
-          ofail "No formulae found in taps."
-        when 1
-          puts "This formula was found in a tap:"
-          puts taps_search_results
-          puts "To install it, run:\n  brew install #{taps_search_results.first}"
-        else
-          puts "These formulae were found in taps:"
-          puts Formatter.columns(taps_search_results)
-          puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
-        end
+      ohai "Searching taps..."
+      taps_search_results = search_taps(query)
+      case taps_search_results.length
+      when 0
+        ofail "No formulae found in taps."
+      when 1
+        puts "This formula was found in a tap:"
+        puts taps_search_results
+        puts "To install it, run:\n  brew install #{taps_search_results.first}"
+      else
+        puts "These formulae were found in taps:"
+        puts Formatter.columns(taps_search_results)
+        puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
       end
     end
   end

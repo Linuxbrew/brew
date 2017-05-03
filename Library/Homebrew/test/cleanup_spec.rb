@@ -34,6 +34,39 @@ describe Homebrew::Cleanup do
 
       expect(ds_store).to exist
     end
+
+    context "when it can't remove a keg" do
+      let(:f1) { Class.new(Testball) { version "0.1" }.new }
+      let(:f2) { Class.new(Testball) { version "0.2" }.new }
+      let(:unremovable_kegs) { [] }
+
+      before(:each) do
+        described_class.instance_variable_set(:@unremovable_kegs, [])
+        shutup do
+          [f1, f2].each do |f|
+            f.brew do
+              f.install
+            end
+
+            Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
+          end
+        end
+
+        allow_any_instance_of(Keg)
+          .to receive(:uninstall)
+          .and_raise(Errno::EACCES)
+      end
+
+      it "doesn't remove any kegs" do
+        shutup { described_class.cleanup_formula f2 }
+        expect(f1.installed_kegs.size).to eq(2)
+      end
+
+      it "lists the unremovable kegs" do
+        shutup { described_class.cleanup_formula f2 }
+        expect(described_class.unremovable_kegs).to contain_exactly(f1.installed_kegs[0])
+      end
+    end
   end
 
   specify "::cleanup_formula" do

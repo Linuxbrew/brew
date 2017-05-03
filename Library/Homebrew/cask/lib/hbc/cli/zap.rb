@@ -6,7 +6,7 @@ module Hbc
         raise CaskUnspecifiedError if cask_tokens.empty?
         cask_tokens.each do |cask_token|
           odebug "Zapping Cask #{cask_token}"
-          cask = Hbc.load(cask_token)
+          cask = CaskLoader.load(cask_token)
           Installer.new(cask).zap
         end
       end

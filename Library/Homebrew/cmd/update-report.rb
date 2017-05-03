@@ -80,7 +80,7 @@ module Homebrew
 
     unless updated_taps.empty?
       update_preinstall_header
-      puts "Updated #{updated_taps.size} tap#{plural(updated_taps.size)} " \
+      puts "Updated #{Formatter.pluralize(updated_taps.size, "tap")} " \
            "(#{updated_taps.join(", ")})."
       updated = true
     end
@@ -361,7 +361,10 @@ class Reporter
 
       case status
       when "A", "D"
-        @report[status.to_sym] << tap.formula_file_to_name(src)
+        full_name = tap.formula_file_to_name(src)
+        name = full_name.split("/").last
+        new_tap = tap.tap_migrations[name]
+        @report[status.to_sym] << full_name unless new_tap
       when "M"
         begin
           formula = Formulary.factory(tap.path/src)
@@ -499,9 +502,21 @@ class Reporter
   end
 
   def migrate_formula_rename
-    report[:R].each do |old_full_name, new_full_name|
-      old_name = old_full_name.split("/").last
-      next unless (dir = HOMEBREW_CELLAR/old_name).directory? && !dir.subdirs.empty?
+    Formula.installed.each do |formula|
+      next unless Migrator.needs_migration?(formula)
+
+      oldname = formula.oldname
+      oldname_rack = HOMEBREW_CELLAR/oldname
+
+      if oldname_rack.subdirs.empty?
+        oldname_rack.rmdir_if_possible
+        next
+      end
+
+      new_name = tap.formula_renames[oldname]
+      next unless new_name
+
+      new_full_name = "#{tap}/#{new_name}"
 
       begin
         f = Formulary.factory(new_full_name)
@@ -510,13 +525,7 @@ class Reporter
         next
       end
 
-      begin
-        migrator = Migrator.new(f)
-        migrator.migrate
-      rescue Migrator::MigratorDifferentTapsError
-      rescue Exception => e
-        onoe e
-      end
+      Migrator.migrate_if_needed(f)
     end
   end
 

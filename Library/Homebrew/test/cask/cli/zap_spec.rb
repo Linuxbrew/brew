@@ -32,7 +32,7 @@ describe Hbc::CLI::Zap, :cask do
   #       The above tests that implicitly.
   #
   # it "dispatches both uninstall and zap stanzas" do
-  #   with_zap = Hbc.load('with-zap')
+  #   with_zap = Hbc::CaskLoader.load('with-zap')
   #
   #   shutup do
   #     Hbc::Installer.new(with_zap).install

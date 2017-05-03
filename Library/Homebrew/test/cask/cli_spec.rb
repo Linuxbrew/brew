@@ -27,15 +27,20 @@ describe Hbc::CLI, :cask do
     end
 
     it "passes `--version` along to the subcommand" do
-      expect(described_class).to receive(:run_command).with(noop_command, "--version")
-      described_class.process(%w[noop --version])
+      version_command = double("CLI::Version")
+      allow(described_class).to receive(:lookup_command).with("--version").and_return(version_command)
+      expect(described_class).to receive(:run_command).with(version_command)
+      described_class.process(["--version"])
     end
 
     it "prints help output when subcommand receives `--help` flag" do
-      expect(described_class).to receive(:run_command).with("help")
-      described_class.process(%w[noop --help])
-      expect(Hbc.help).to eq(true)
-      Hbc.help = false
+      begin
+        expect(described_class).to receive(:run_command).with("help")
+        described_class.process(%w[noop --help])
+        expect(Hbc::CLI.help?).to eq(true)
+      ensure
+        Hbc::CLI.help = false
+      end
     end
 
     it "respects the env variable when choosing what appdir to create" do
@@ -56,6 +61,12 @@ describe Hbc::CLI, :cask do
       allow(described_class).to receive(:lookup_command).and_raise(Hbc::CaskError)
       expect(described_class).to receive(:exit).with(1)
       described_class.process("noop")
+    end
+  end
+
+  it "provides a help message for all commands" do
+    described_class.command_classes.each do |command_class|
+      expect(command_class.help).to match(/\w+/), command_class.name
     end
   end
 end

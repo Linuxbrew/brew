@@ -40,7 +40,7 @@ module Hbc
         if cask_tokens.empty?
           Hbc.all
         else
-          cask_tokens.map { |token| Hbc.load(token) }
+          cask_tokens.map { |token| CaskLoader.load(token) }
         end
       end
 

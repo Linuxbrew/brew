@@ -2,7 +2,7 @@ require "forwardable"
 
 module Hbc
   class URL
-    FAKE_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) http://caskroom.io".freeze
+    FAKE_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) https://caskroom.github.io".freeze
 
     attr_reader :using, :revision, :trust_cert, :uri, :cookies, :referer, :data
 
@@ -29,11 +29,8 @@ module Hbc
     end
 
     def user_agent
-      if @user_agent == :fake
-        FAKE_USER_AGENT
-      else
-        @user_agent
-      end
+      return FAKE_USER_AGENT if @user_agent == :fake
+      @user_agent
     end
   end
 end

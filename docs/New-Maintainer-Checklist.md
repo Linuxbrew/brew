@@ -12,6 +12,9 @@ your contributions around $THEIR_CONTRIBUTIONS.
 
 We would like to invite you to have commit access. There are no obligations,
 but we'd appreciate your continuing help in keeping on top of contributions.
+The easiest way to do this is to watch the Homebrew/brew and
+Homebrew/homebrew-core repositories on GitHub to provide help and code review
+and to pull suitable changes.
 
 A few requests:
 
@@ -25,12 +28,15 @@ A few requests:
   button in "create a merge commit" mode for Homebrew/brew or "squash and
   merge" for a single formulae change. If in doubt, check with e.g. GitX that
   you've not accidentally added merge commits
-- still create your branches on your fork rather than in the main repository
-- if still in doubt please ask for help and we'll help you out - these are
-  probably worth a read:
-    - https://github.com/Homebrew/brew/blob/master/docs/Brew-Test-Bot-For-Core-Contributors.md
-    - https://github.com/Homebrew/brew/blob/master/docs/Maintainer-Guidelines.md
-    - possibly everything else in the documentation
+- still create your branches on your fork rather than in the main repository.
+  Note GitHub's UI will create edits and reverts on the main repository if you
+  make edits or click revert on the Homebrew/brew repository rather than your
+  own fork.
+- if still in doubt please ask for help and we'll help you out
+- please read:
+    - http://docs.brew.sh/Brew-Test-Bot-For-Core-Contributors.html
+    - http://docs.brew.sh/Maintainer-Guidelines.html
+    - possibly everything else on http://docs.brew.sh
 
 How does that sound?
 

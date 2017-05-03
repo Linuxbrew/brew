@@ -84,7 +84,7 @@ module Hbc
           print "#{cask_token}\t" if table
 
           begin
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
           rescue StandardError
             opoo "Cask '#{cask_token}' was not found" unless quiet
             puts ""

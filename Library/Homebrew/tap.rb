@@ -43,6 +43,15 @@ class Tap
     CACHE.fetch(cache_key) { |key| CACHE[key] = Tap.new(user, repo) }
   end
 
+  def self.from_path(path)
+    path.to_s =~ HOMEBREW_TAP_PATH_REGEX
+    raise "Invalid tap path '#{path}'" unless $1
+    fetch($1, $2)
+  rescue
+    # No need to error as a nil tap is sufficient to show failure.
+    nil
+  end
+
   extend Enumerable
 
   # The user name of this {Tap}. Usually, it's the Github username of
@@ -273,7 +282,7 @@ class Tap
     link_completions_and_manpages
 
     formula_count = formula_files.size
-    puts "Tapped #{formula_count} formula#{plural(formula_count, "e")} (#{path.abv})" unless quiet
+    puts "Tapped #{Formatter.pluralize(formula_count, "formula")} (#{path.abv})" unless quiet
     Descriptions.cache_formulae(formula_names)
 
     return if options[:clone_target]
@@ -307,7 +316,7 @@ class Tap
     Utils::Link.unlink_completions(path)
     path.rmtree
     path.parent.rmdir_if_possible
-    puts "Untapped #{formula_count} formula#{plural(formula_count, "e")}"
+    puts "Untapped #{Formatter.pluralize(formula_count, "formula")}"
     clear_cache
   end
 
@@ -319,7 +328,7 @@ class Tap
 
   # path to the directory of all {Formula} files for this {Tap}.
   def formula_dir
-    @formula_dir ||= potential_formula_dirs.detect(&:directory?)
+    @formula_dir ||= potential_formula_dirs.detect(&:directory?) || path/"Formula"
   end
 
   def potential_formula_dirs
@@ -328,12 +337,12 @@ class Tap
 
   # path to the directory of all {Cask} files for this {Tap}.
   def cask_dir
-    @cask_dir ||= [path/"Casks"].detect(&:directory?)
+    @cask_dir ||= path/"Casks"
   end
 
   # an array of all {Formula} files of this {Tap}.
   def formula_files
-    @formula_files ||= if formula_dir
+    @formula_files ||= if formula_dir.directory?
       formula_dir.children.select(&method(:formula_file?))
     else
       []
@@ -342,7 +351,7 @@ class Tap
 
   # an array of all {Cask} files of this {Tap}.
   def cask_files
-    @cask_files ||= if cask_dir
+    @cask_files ||= if cask_dir.directory?
       cask_dir.children.select(&method(:cask_file?))
     else
       []

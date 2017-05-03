@@ -1,4 +1,5 @@
-#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--tap`] [`--no-pbcopy`] [`--no-publish`] <patch-source> [<patch-source>]:
+#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] <patch-source> [<patch-source>]:
+#:
 #:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 #:    Optionally, installs the formulae changed by the patch.
 #:
@@ -13,7 +14,7 @@
 #:
 #:      ~ The URL of a commit on GitHub
 #:
-#:      ~ A "http://bot.brew.sh/job/..." string specifying a testing job ID
+#:      ~ A "https://bot.brew.sh/job/..." string specifying a testing job ID
 #:
 #:    If `--bottle` is passed, handle bottles, pulling the bottle-update
 #:    commit and publishing files on Bintray.
@@ -39,6 +40,9 @@
 #:    clipboard.
 #:
 #:    If `--no-publish` is passed, do not publish bottles to Bintray.
+#:
+#:    If `--warn-on-publish-failure` was passed, do not exit if there's a
+#:    failure publishing bottles on Bintray.
 
 require "net/http"
 require "net/https"
@@ -160,6 +164,13 @@ module Homebrew
         # Make sure we catch syntax errors.
         rescue Exception
           next
+        end
+
+        if f.stable
+          stable_urls = [f.stable.url] + f.stable.mirrors
+          stable_urls.grep(%r{^https://dl.bintray.com/homebrew/mirror/}) do |mirror_url|
+            check_bintray_mirror(f.full_name, mirror_url)
+          end
         end
 
         if ARGV.include? "--bottle"
@@ -287,7 +298,7 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        publish_bottle_file_on_bintray(f, bintray_creds)
+        next unless publish_bottle_file_on_bintray(f, bintray_creds)
         published << f.full_name
       end
     else
@@ -460,7 +471,7 @@ module Homebrew
     end
     unless info.bottle_info_any
       opoo "No bottle defined in formula #{package}"
-      return
+      return false
     end
     version = info.pkg_version
     ohai "Publishing on Bintray: #{package} #{version}"
@@ -469,9 +480,11 @@ module Homebrew
          "-H", "Content-Type: application/json",
          "-d", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/#{bintray_project}/#{repo}/#{package}/#{version}/publish"
-  rescue ErrorDuringExecution => e
-    raise e unless ARGV.include?("-k") || ARGV.include?("--keep-going")
-    puts e
+    true
+  rescue => e
+    raise unless ARGV.include?("--warn-on-publish-failure")
+    onoe e
+    false
   end
 
   # Formula info drawn from an external "brew info --json" call
@@ -638,5 +651,13 @@ module Homebrew
         Pathname.new(filename).verify_checksum(checksum)
       end
     end
+  end
+
+  def check_bintray_mirror(name, url)
+    headers = curl_output("--connect-timeout", "15", "--head", url)[0]
+    status_code = headers.scan(%r{^HTTP\/.* (\d+)}).last.first
+    return if status_code.start_with?("3")
+    opoo "The Bintray mirror #{url} is not reachable (HTTP status code #{status_code})."
+    opoo "Do you need to upload it with `brew mirror #{name}`?"
   end
 end

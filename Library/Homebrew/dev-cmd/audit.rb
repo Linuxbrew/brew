@@ -38,7 +38,7 @@ require "official_taps"
 require "cmd/search"
 require "cmd/style"
 require "date"
-require "blacklist"
+require "missing_formula"
 require "digest"
 
 module Homebrew
@@ -91,9 +91,7 @@ module Homebrew
 
     return if problem_count.zero?
 
-    problems = "problem" + plural(problem_count)
-    formulae = "formula" + plural(formula_count, "e")
-    ofail "#{problem_count} #{problems} in #{formula_count} #{formulae}"
+    ofail "#{Formatter.pluralize(problem_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
   end
 end
 
@@ -179,8 +177,9 @@ class FormulaAuditor
 
     details = nil
     user_agent = nil
+    hash_needed = url.start_with?("http:")
     user_agents.each do |ua|
-      details = http_content_headers_and_checksum(url, user_agent: ua)
+      details = http_content_headers_and_checksum(url, hash_needed: hash_needed, user_agent: ua)
       user_agent = ua
       break if details[:status].to_s.start_with?("2")
     end
@@ -190,11 +189,11 @@ class FormulaAuditor
       return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
     end
 
-    return unless url.start_with? "http:"
+    return unless hash_needed
 
     secure_url = url.sub "http", "https"
     secure_details =
-      http_content_headers_and_checksum(secure_url, user_agent: user_agent)
+      http_content_headers_and_checksum(secure_url, hash_needed: true, user_agent: user_agent)
 
     if !details[:status].to_s.start_with?("2") ||
        !secure_details[:status].to_s.start_with?("2")
@@ -212,9 +211,10 @@ class FormulaAuditor
     "The URL #{url} could use HTTPS rather than HTTP"
   end
 
-  def self.http_content_headers_and_checksum(url, user_agent: :default)
+  def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
+    max_time = hash_needed ? "600" : "25"
     args = curl_args(
-      extra_args: ["--connect-timeout", "15", "--include", url],
+      extra_args: ["--connect-timeout", "15", "--include", "--max-time", max_time, url],
       show_output: true,
       user_agent: user_agent,
     )
@@ -226,11 +226,13 @@ class FormulaAuditor
       status_code = headers[%r{HTTP\/.* (\d+)}, 1]
     end
 
+    output_hash = Digest::SHA256.digest(output) if hash_needed
+
     {
       status: status_code,
       etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
       content_length: headers[/Content-Length: (\d+)/, 1],
-      file_hash: Digest::SHA256.digest(output),
+      file_hash: output_hash,
     }
   end
 
@@ -329,25 +331,33 @@ class FormulaAuditor
 
     problem "File should end with a newline" unless text.trailing_newline?
 
-    versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
-    needs_versioned_alias = !versioned_formulae.empty? &&
-                            formula.tap &&
-                            formula.aliases.grep(/.@\d/).empty?
-    if needs_versioned_alias
-      _, last_alias_version = File.basename(versioned_formulae.sort.reverse.first)
-                                  .gsub(/\.rb$/, "")
-                                  .split("@")
-      major, minor, = formula.version.to_s.split(".")
-      alias_name = if last_alias_version.split(".").length == 1
-        "#{formula.name}@#{major}"
-      else
-        "#{formula.name}@#{major}.#{minor}"
+    if formula.versioned_formula?
+      unversioned_formula = Pathname.new formula.path.to_s.gsub(/@.*\.rb$/, ".rb")
+      unless unversioned_formula.exist?
+        unversioned_name = unversioned_formula.basename(".rb")
+        problem "#{formula} is versioned but no #{unversioned_name} formula exists"
       end
-      problem <<-EOS.undent
-        Formula has other versions so create an alias:
-          cd #{formula.tap.alias_dir}
-          ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
-      EOS
+    else
+      versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
+      needs_versioned_alias = !versioned_formulae.empty? &&
+                              formula.tap &&
+                              formula.aliases.grep(/.@\d/).empty?
+      if needs_versioned_alias
+        _, last_alias_version = File.basename(versioned_formulae.sort.reverse.first)
+                                    .gsub(/\.rb$/, "")
+                                    .split("@")
+        major, minor, = formula.version.to_s.split(".")
+        alias_name = if last_alias_version.split(".").length == 1
+          "#{formula.name}@#{major}"
+        else
+          "#{formula.name}@#{major}.#{minor}"
+        end
+        problem <<-EOS.undent
+          Formula has other versions so create an alias:
+            cd #{formula.tap.alias_dir}
+            ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
+        EOS
+      end
     end
 
     return unless @strict
@@ -397,7 +407,7 @@ class FormulaAuditor
     name = formula.name
     full_name = formula.full_name
 
-    if blacklisted?(name)
+    if Homebrew::MissingFormula.blacklisted_reason(name)
       problem "'#{name}' is blacklisted."
     end
 
@@ -468,6 +478,12 @@ class FormulaAuditor
         if @@aliases.include?(dep.name) &&
            (core_formula? || !dep_f.versioned_formula?)
           problem "Dependency '#{dep.name}' is an alias; use the canonical name '#{dep.to_formula.full_name}'."
+        end
+
+        if @new_formula && dep_f.keg_only_reason &&
+           !["openssl", "apr", "apr-util"].include?(dep.name) &&
+           [:provided_by_macos, :provided_by_osx].include?(dep_f.keg_only_reason.reason)
+          problem "Dependency '#{dep.name}' may be unnecessary as it is provided by macOS; try to build this formula without it."
         end
 
         dep.options.reject do |opt|
@@ -550,7 +566,7 @@ class FormulaAuditor
 
       next unless @strict
 
-      if o.name == "universal" && !Formula["wine"].recursive_dependencies.map(&:name).include?(formula.name)
+      if o.name == "universal"
         problem "macOS has been 64-bit only since 10.6 so universal options are deprecated."
       end
 
@@ -773,7 +789,7 @@ class FormulaAuditor
       automysqlbackup 3.0-rc6
       aview 1.3.0rc1
       distcc 3.2rc1
-      elm-format 0.5.2-alpha
+      elm-format 0.6.0-alpha
       ftgl 2.1.3-rc5
       hidapi 0.8.0-rc1
       libcaca 0.99b19
@@ -1034,6 +1050,10 @@ class FormulaAuditor
       problem ":apr is deprecated. Usage should be \"apr-util\""
     end
 
+    if line =~ /depends_on :tex/
+      problem ":tex is deprecated."
+    end
+
     # Commented-out depends_on
     problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
@@ -1164,12 +1184,17 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
-    if line.include?('system "npm", "install"') && !line.include?("Language::Node") && formula.name !~ /^kibana(\d{2})?$/
+    if line.include?('system "npm", "install"') && !line.include?("Language::Node") &&
+       formula.name !~ /^kibana(\@\d+(\.\d+)?)?$/
       problem "Use Language::Node for npm install args"
     end
 
     if line.include?("fails_with :llvm")
       problem "'fails_with :llvm' is now a no-op so should be removed"
+    end
+
+    if line =~ /system\s+['"](otool|install_name_tool|lipo)/ && formula.name != "cctools"
+      problem "Use ruby-macho instead of calling #{$1}"
     end
 
     if formula.tap.to_s == "homebrew/core" && !formula.tap.remote[/linuxbrew/i]
@@ -1565,6 +1590,9 @@ class ResourceAuditor
 
       strategy = DownloadStrategyDetector.detect(url, using)
       if strategy <= CurlDownloadStrategy && !url.start_with?("file")
+        # A `brew mirror`'ed URL is usually not yet reachable at the time of
+        # pull request.
+        next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
         if http_content_problem = FormulaAuditor.check_http_content(url)
           problem http_content_problem
         end

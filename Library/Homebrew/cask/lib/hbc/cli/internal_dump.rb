@@ -12,11 +12,11 @@ module Hbc
       end
 
       def self.dump_casks(*cask_tokens)
-        Hbc.debug = true # Yuck. At the moment this is the only way to make dumps visible
+        CLI.debug = true # Yuck. At the moment this is the only way to make dumps visible
         count = 0
         cask_tokens.each do |cask_token|
           begin
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
             count += 1
             cask.dumpcask
           rescue StandardError => e

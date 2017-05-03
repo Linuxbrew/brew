@@ -28,7 +28,7 @@ module Hbc
         cask_tokens.each do |cask_token|
           odebug "Listing files for Cask #{cask_token}"
           begin
-            cask = Hbc.load(cask_token)
+            cask = CaskLoader.load(cask_token)
 
             if cask.installed?
               if @options[:one]
@@ -36,8 +36,7 @@ module Hbc
               elsif @options[:versions]
                 puts format_versioned(cask)
               else
-                installed_caskfile = cask.metadata_master_container_path.join(*cask.timestamped_versions.last, "Casks", "#{cask_token}.rb")
-                cask = Hbc.load(installed_caskfile)
+                cask = CaskLoader.load_from_file(cask.installed_caskfile)
                 list_artifacts(cask)
               end
 
@@ -83,7 +82,7 @@ module Hbc
       end
 
       def self.needs_init?
-        false
+        true
       end
     end
   end
