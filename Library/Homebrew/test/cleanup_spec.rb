@@ -64,7 +64,7 @@ describe Homebrew::Cleanup do
 
       it "lists the unremovable kegs" do
         shutup { described_class.cleanup_formula f2 }
-        expect(described_class.unremovable_kegs).to contain_exactly(f1.installed_kegs[0])
+        expect(described_class.unremovable_kegs).to contain_exactly(f1.installed_kegs.sort_by(&:to_s)[0])
       end
     end
   end
