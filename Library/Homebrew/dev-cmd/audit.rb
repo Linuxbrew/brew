@@ -502,6 +502,7 @@ class FormulaAuditor
       GPG
       GNOME
       BSD
+      Firefox
     ].freeze
 
     reason = formula.keg_only_reason.to_s
@@ -510,7 +511,7 @@ class FormulaAuditor
     reason.sub!(name, "")
     first_word = reason.split[0]
 
-    if reason =~ /^[A-Z]/ && !reason.start_with?(*whitelist)
+    if reason =~ /\A[A-Z]/ && !reason.start_with?(*whitelist)
       problem <<-EOS.undent
         '#{first_word}' from the keg_only reason should be '#{first_word.downcase}'.
       EOS

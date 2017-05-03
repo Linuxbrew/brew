@@ -46,7 +46,7 @@ class Caveats
 
     s = <<-EOS.undent
       This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX},
-      because #{f.keg_only_reason}.
+      because #{f.keg_only_reason.to_s.chomp}.
     EOS
     if f.bin.directory? || f.sbin.directory?
       s << "\nIf you need to have this software first in your PATH run:\n"
