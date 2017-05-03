@@ -564,13 +564,11 @@ class FormulaInstaller
       fix_dynamic_linkage(keg)
     end
 
-    if formula.post_install_defined?
-      if build_bottle?
-        ohai "Not running post_install as we're building a bottle"
-        puts "You can run it manually using `brew postinstall #{formula.full_name}`"
-      else
-        post_install
-      end
+    if build_bottle?
+      ohai "Not running post_install as we're building a bottle"
+      puts "You can run it manually using `brew postinstall #{formula.full_name}`"
+    else
+      post_install
     end
 
     caveats
@@ -831,12 +829,6 @@ class FormulaInstaller
 
     skip_linkage = formula.bottle_specification.skip_relocation?
     keg.replace_placeholders_with_locations tab.changed_files, skip_linkage: skip_linkage
-
-    Pathname.glob("#{formula.bottle_prefix}/{etc,var}/**/*") do |path|
-      path.extend(InstallRenamed)
-      path.cp_path_sub(formula.bottle_prefix, HOMEBREW_PREFIX)
-    end
-    FileUtils.rm_rf formula.bottle_prefix
 
     tab = Tab.for_keg(keg)
 
