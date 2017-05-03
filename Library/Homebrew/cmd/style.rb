@@ -75,7 +75,7 @@ module Homebrew
     args << "--auto-correct" if fix
 
     if options[:except_cops]
-      options[:except_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop, "") }
+      options[:except_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop.to_s, "") }
       cops_to_exclude = options[:except_cops].select do |cop|
         RuboCop::Cop::Cop.registry.names.include?(cop) ||
           RuboCop::Cop::Cop.registry.departments.include?(cop.to_sym)
@@ -83,7 +83,7 @@ module Homebrew
 
       args << "--except" << cops_to_exclude.join(",") unless cops_to_exclude.empty?
     elsif options[:only_cops]
-      options[:only_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop, "") }
+      options[:only_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop.to_s, "") }
       cops_to_include = options[:only_cops].select do |cop|
         RuboCop::Cop::Cop.registry.names.include?(cop) ||
           RuboCop::Cop::Cop.registry.departments.include?(cop.to_sym)
