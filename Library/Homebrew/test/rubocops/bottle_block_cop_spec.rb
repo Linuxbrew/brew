@@ -3,7 +3,7 @@ require "rubocop/rspec/support"
 require_relative "../../extend/string"
 require_relative "../../rubocops/bottle_block_cop"
 
-describe RuboCop::Cop::FormulaAuditStrict::CorrectBottleBlock do
+describe RuboCop::Cop::FormulaAuditStrict::BottleBlock do
   subject(:cop) { described_class.new }
 
   context "When auditing Bottle Block" do

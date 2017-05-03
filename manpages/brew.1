@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "April 2017" "Homebrew" "brew"
+.TH "BREW" "1" "May 2017" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -415,7 +415,7 @@ Start a Homebrew build environment shell\. Uses our years\-battle\-hardened Home
 If \fB\-\-env=std\fR is passed, use the standard \fBPATH\fR instead of superenv\'s\.
 .
 .TP
-\fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]
+\fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-only\-cops=\fR[COP1,COP2\.\.]|\fB\-\-except\-cops=\fR[COP1,COP2\.\.]] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]
 Check formulae or files for conformance to Homebrew style guidelines\.
 .
 .IP
@@ -426,6 +426,12 @@ If \fB\-\-fix\fR is passed, style violations will be automatically fixed using R
 .
 .IP
 If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
+.
+.IP
+If \fB\-\-only\-cops\fR is passed, only the given Rubocop cop(s)\' violations would be checked\.
+.
+.IP
+If \fB\-\-except\-cops\fR is passed, the given Rubocop cop(s)\' checks would be skipped\.
 .
 .IP
 Exits with a non\-zero status if any style violations are found\.
@@ -631,7 +637,7 @@ Print the version number of Homebrew to standard output and exit\.
 .SH "DEVELOPER COMMANDS"
 .
 .TP
-\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-fix\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fB\-\-only=\fR\fImethod\fR|\fB\-\-except=\fR\fImethod] [<formulae\fR]
+\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-fix\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fB\-\-only=\fR\fImethod\fR|\fB\-\-except=\fR\fImethod\fR] [\fB\-\-only\-cops=\fR[COP1,COP2\.\.]|\fB\-\-except\-cops=\fR[COP1,COP2\.\.]] [\fIformulae\fR]
 Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\.
 .
 .IP
@@ -662,10 +668,10 @@ If \fB\-\-only\fR is passed, only the methods named \fBaudit_<method>\fR will be
 If \fB\-\-except\fR is passed, the methods named \fBaudit_<method>\fR will not be run\.
 .
 .IP
-If \fB\-\-only\-cops\fR is passed, only the mentioned cops\' violations would be checked\.
+If \fB\-\-only\-cops\fR is passed, only the given Rubocop cop(s)\' violations would be checked\.
 .
 .IP
-If \fB\-\-except\-cops\fR is passed, the mentioned cops\' checks would be skipped\.
+If \fB\-\-except\-cops\fR is passed, the given Rubocop cop(s)\' checks would be skipped\.
 .
 .IP
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.

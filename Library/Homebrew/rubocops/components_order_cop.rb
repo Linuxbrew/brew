@@ -2,12 +2,12 @@ require_relative "./extend/formula_cop"
 
 module RuboCop
   module Cop
-    module Homebrew
+    module FormulaAuditStrict
       # This cop checks for correct order of components in a Formula
       #
       # - component_precedence_list has component hierarchy in a nested list
       #   where each sub array contains components' details which are at same precedence level
-      class FormulaComponentsOrder < FormulaCop
+      class ComponentsOrder < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, formula_class_body_node)
           component_precedence_list = [
             [{ name: :include,  type: :method_call }],
