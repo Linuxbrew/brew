@@ -34,8 +34,6 @@
 #:    If `--branch-okay` is passed, do not warn if pulling to a branch
 #:    besides master (useful for testing).
 #:
-#:    If `--tap` is passed, use the git repository of the given tap.
-#:
 #:    If `--no-pbcopy` is passed, do not copy anything to the system
 #:    clipboard.
 #:
