@@ -3,7 +3,7 @@ require "rubocop/rspec/support"
 require_relative "../../extend/string"
 require_relative "../../rubocops/components_order_cop"
 
-describe RuboCop::Cop::Homebrew::FormulaComponentsOrder do
+describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
   subject(:cop) { described_class.new }
 
   context "When auditing formula components order" do

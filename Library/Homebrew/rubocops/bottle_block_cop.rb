@@ -2,12 +2,12 @@ require_relative "./extend/formula_cop"
 
 module RuboCop
   module Cop
-    module Homebrew
+    module FormulaAuditStrict
       # This cop audits `bottle` block in Formulae
       #
       # - `rebuild` should be used instead of `revision` in `bottle` block
 
-      class CorrectBottleBlock < FormulaCop
+      class BottleBlock < FormulaCop
         MSG = "Use rebuild instead of revision in bottle block".freeze
 
         def audit_formula(_node, _class_node, _parent_class_node, formula_class_body_node)

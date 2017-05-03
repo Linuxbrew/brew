@@ -3,7 +3,7 @@ require "rubocop/rspec/support"
 require_relative "../../extend/string"
 require_relative "../../rubocops/components_redundancy_cop"
 
-describe RuboCop::Cop::Homebrew::ComponentsRedundancy do
+describe RuboCop::Cop::FormulaAuditStrict::ComponentsRedundancy do
   subject(:cop) { described_class.new }
 
   context "When auditing formula components common errors" do

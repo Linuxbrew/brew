@@ -1,4 +1,4 @@
-#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method] [<formulae>]:
+#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method>] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
@@ -26,6 +26,10 @@
 #:    If `--only` is passed, only the methods named `audit_<method>` will be run.
 #:
 #:    If `--except` is passed, the methods named `audit_<method>` will not be run.
+#:
+#:    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
+#:
+#:    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 #:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
@@ -69,15 +73,30 @@ module Homebrew
       files = ARGV.resolved_formulae.map(&:path)
     end
 
-    if strict
-      options = { fix: ARGV.flag?("--fix"), realpath: true }
-      # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, options)
+    only_cops = ARGV.value("only-cops").to_s.split(",")
+    except_cops = ARGV.value("except-cops").to_s.split(",")
+    if !only_cops.empty? && !except_cops.empty?
+      odie "--only-cops and --except-cops cannot be used simultaneously!"
+    elsif (!only_cops.empty? || !except_cops.empty?) && strict
+      odie "--only-cops/--except-cops and --strict cannot be used simultaneously"
     end
+
+    options = { fix: ARGV.flag?("--fix"), realpath: true }
+
+    if !only_cops.empty?
+      options[:only_cops] = only_cops
+    elsif !except_cops.empty?
+      options[:except_cops] = except_cops
+    elsif !strict
+      options[:except_cops] = [:FormulaAuditStrict]
+    end
+
+    # Check style in a single batch run up front for performance
+    style_results = check_style_json(files, options)
 
     ff.each do |f|
       options = { new_formula: new_formula, strict: strict, online: online }
-      options[:style_offenses] = style_results.file_offenses(f.path) if strict
+      options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
 
@@ -1258,7 +1277,7 @@ class FormulaAuditor
     only_audits = ARGV.value("only").to_s.split(",")
     except_audits = ARGV.value("except").to_s.split(",")
     if !only_audits.empty? && !except_audits.empty?
-      odie "--only and --except cannot be used simulataneously!"
+      odie "--only and --except cannot be used simultaneously!"
     end
 
     methods.map(&:to_s).grep(/^audit_/).each do |audit_method_name|

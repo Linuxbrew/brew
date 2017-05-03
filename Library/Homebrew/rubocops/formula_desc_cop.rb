@@ -3,7 +3,7 @@ require_relative "../extend/string"
 
 module RuboCop
   module Cop
-    module Homebrew
+    module FormulaAuditStrict
       # This cop audits `desc` in Formulae
       #
       # - Checks for existence of `desc`
@@ -11,7 +11,7 @@ module RuboCop
       # - Checks if `desc` begins with an article
       # - Checks for correct usage of `command-line` in `desc`
       # - Checks if `desc` contains the formula name
-      class FormulaDesc < FormulaCop
+      class Desc < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body)
           desc_call = find_node_method_by_name(body, :desc)
 

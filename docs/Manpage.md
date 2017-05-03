@@ -402,7 +402,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--env=std` is passed, use the standard `PATH` instead of superenv's.
 
-  * `style` [`--fix`] [`--display-cop-names`] [`files`|`taps`|`formulae`]:
+  * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
 
     `formulae` and `files` may not be combined. If both are omitted, style will run
@@ -414,6 +414,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--display-cop-names` is passed, the RuboCop cop name for each violation
     is included in the output.
+
+    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
+
+    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 
     Exits with a non-zero status if any style violations are found.
 
@@ -606,7 +610,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## DEVELOPER COMMANDS
 
-  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=``method`|`--except=``method] [<formulae`]:
+  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=``method`|`--except=``method`] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [`formulae`]:
     Check `formulae` for Homebrew coding style violations. This should be
     run before submitting a new formula.
 
@@ -634,6 +638,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--only` is passed, only the methods named `audit_`method`` will be run.
 
     If `--except` is passed, the methods named `audit_`method`` will not be run.
+
+    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
+
+    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.

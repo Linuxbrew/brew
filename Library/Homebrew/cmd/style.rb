@@ -1,4 +1,4 @@
-#:  * `style` [`--fix`] [`--display-cop-names`] [<files>|<taps>|<formulae>]:
+#:  * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [<files>|<taps>|<formulae>]:
 #:    Check formulae or files for conformance to Homebrew style guidelines.
 #:
 #:    <formulae> and <files> may not be combined. If both are omitted, style will run
@@ -11,10 +11,16 @@
 #:    If `--display-cop-names` is passed, the RuboCop cop name for each violation
 #:    is included in the output.
 #:
+#:    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
+#:
+#:    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
+#:
 #:    Exits with a non-zero status if any style violations are found.
 
 require "utils"
 require "json"
+require "rubocop"
+require_relative "../rubocops"
 
 module Homebrew
   module_function
@@ -30,7 +36,20 @@ module Homebrew
       ARGV.formulae.map(&:path)
     end
 
-    Homebrew.failed = check_style_and_print(target, fix: ARGV.flag?("--fix"))
+    only_cops = ARGV.value("only-cops").to_s.split(",")
+    except_cops = ARGV.value("except-cops").to_s.split(",")
+    if !only_cops.empty? && !except_cops.empty?
+      odie "--only-cops and --except-cops cannot be used simultaneously!"
+    end
+
+    options = { fix: ARGV.flag?("--fix") }
+    if !only_cops.empty?
+      options[:only_cops] = only_cops
+    elsif !except_cops.empty?
+      options[:except_cops] = except_cops
+    end
+
+    Homebrew.failed = check_style_and_print(target, options)
   end
 
   # Checks style for a list of files, printing simple RuboCop output.
@@ -53,6 +72,24 @@ module Homebrew
       --force-exclusion
     ]
     args << "--auto-correct" if fix
+
+    if options[:except_cops]
+      options[:except_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop, "") }
+      cops_to_exclude = options[:except_cops].select do |cop|
+        RuboCop::Cop::Cop.registry.names.include?(cop) ||
+          RuboCop::Cop::Cop.registry.departments.include?(cop.to_sym)
+      end
+
+      args << "--except" << cops_to_exclude.join(",") unless cops_to_exclude.empty?
+    elsif options[:only_cops]
+      options[:only_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop, "") }
+      cops_to_include = options[:only_cops].select do |cop|
+        RuboCop::Cop::Cop.registry.names.include?(cop) ||
+          RuboCop::Cop::Cop.registry.departments.include?(cop.to_sym)
+      end
+
+      args << "--only" << cops_to_include.join(",") unless cops_to_include.empty?
+    end
 
     if files.nil?
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
