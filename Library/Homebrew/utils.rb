@@ -189,6 +189,9 @@ module Homebrew
     Gem.clear_paths
     Gem::Specification.reset
 
+    # Create GEM_HOME which may not exist yet so it exists when creating PATH.
+    FileUtils.mkdir_p Gem.bindir
+
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
     path = PATH.new(ENV["PATH"])
     path.prepend(RUBY_BIN) if which("ruby") != RUBY_PATH
