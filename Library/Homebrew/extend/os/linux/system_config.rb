@@ -33,6 +33,7 @@ class SystemConfig
       dump_generic_verbose_config(out)
       out.puts "Kernel: #{`uname -mors`.chomp}"
       out.puts "OS: #{host_os_version}"
+      out.puts "Host glibc: #{GlibcRequirement.system_version}"
       out.puts "/usr/bin/gcc: #{host_gcc_version}"
       ["glibc", "gcc", "xorg"].each do |f|
         out.puts "#{f}: #{formula_version f}"
