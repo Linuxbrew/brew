@@ -10,7 +10,6 @@ RSpec::Matchers.alias_matcher :supersede_an_installed_formula, :be_supersedes_an
 RSpec::Matchers.alias_matcher :have_changed_alias, :be_alias_changed
 
 RSpec::Matchers.alias_matcher :have_option_defined, :be_option_defined
-RSpec::Matchers.alias_matcher :have_post_install_defined, :be_post_install_defined
 RSpec::Matchers.alias_matcher :have_test_defined, :be_test_defined
 RSpec::Matchers.alias_matcher :pour_bottle, :be_pour_bottle
 
@@ -622,23 +621,6 @@ describe Formula do
     end
 
     expect(f.desc).to eq("a formula")
-  end
-
-  specify "#post_install_defined?" do
-    f1 = formula do
-      url "foo-1.0"
-
-      def post_install
-        # do nothing
-      end
-    end
-
-    f2 = formula do
-      url "foo-1.0"
-    end
-
-    expect(f1).to have_post_install_defined
-    expect(f2).not_to have_post_install_defined
   end
 
   specify "#test_defined?" do

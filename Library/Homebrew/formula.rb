@@ -1005,11 +1005,6 @@ class Formula
   def post_install; end
 
   # @private
-  def post_install_defined?
-    method(:post_install).owner == self.class
-  end
-
-  # @private
   def run_post_install
     @prefix_returns_versioned_prefix = true
     build = self.build
@@ -1024,6 +1019,11 @@ class Formula
     ENV["HOMEBREW_PATH"] = nil
 
     ENV.clear_sensitive_environment!
+
+    Pathname.glob("#{bottle_prefix}/{etc,var}/**/*") do |path|
+      path.extend(InstallRenamed)
+      path.cp_path_sub(bottle_prefix, HOMEBREW_PREFIX)
+    end
 
     with_logging("post_install") do
       post_install
