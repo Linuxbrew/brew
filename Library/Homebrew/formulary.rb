@@ -105,7 +105,18 @@ module Formulary
   # Loads formulae from bottles.
   class BottleLoader < FormulaLoader
     def initialize(bottle_name)
-      @bottle_filename = Pathname(bottle_name).realpath
+      case bottle_name
+      when %r{(https?|ftp|file)://}
+        # The name of the formula is found between the last slash and the last hyphen.
+        resource = Resource.new bottle_name[%r{([^/]+)-}, 1] { url bottle_name }
+        downloader = CurlBottleDownloadStrategy.new resource.name, resource
+        @bottle_filename = downloader.cached_location
+        cached = @bottle_filename.exist?
+        downloader.fetch
+        ohai "Pouring the cached bottle" if cached
+      else
+        @bottle_filename = Pathname(bottle_name).realpath
+      end
       name, full_name = Utils::Bottles.resolve_formula_names @bottle_filename
       super name, Formulary.path(full_name)
     end
@@ -335,10 +346,10 @@ module Formulary
 
   def self.loader_for(ref, from: nil)
     case ref
-    when %r{(https?|ftp|file)://}
-      return FromUrlLoader.new(ref)
     when Pathname::BOTTLE_EXTNAME_RX
       return BottleLoader.new(ref)
+    when %r{(https?|ftp|file)://}
+      return FromUrlLoader.new(ref)
     when HOMEBREW_TAP_FORMULA_REGEX
       return TapLoader.new(ref, from: from)
     end
