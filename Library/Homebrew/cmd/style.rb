@@ -19,8 +19,6 @@
 
 require "utils"
 require "json"
-require "rubocop"
-require_relative "../rubocops"
 
 module Homebrew
   module_function
@@ -66,7 +64,10 @@ module Homebrew
 
   def check_style_impl(files, output_type, options = {})
     fix = options[:fix]
+
     Homebrew.install_gem_setup_path! "rubocop", HOMEBREW_RUBOCOP_VERSION
+    require "rubocop"
+    require_relative "../rubocops"
 
     args = %w[
       --force-exclusion
