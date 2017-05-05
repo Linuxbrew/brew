@@ -39,6 +39,7 @@ class RubyRequirement < Requirement
       next unless new_enough?(ruby)
       rubyhdrdir = Pathname.new Utils.popen_read(ruby, "-rrbconfig", "-e", "print RbConfig::CONFIG['rubyhdrdir']")
       next unless (rubyhdrdir/"ruby.h").readable?
+      ruby
     end
   end
 
