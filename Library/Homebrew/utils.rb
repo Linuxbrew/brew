@@ -179,48 +179,6 @@ module Homebrew
     _system(cmd, *args)
   end
 
-  def install_gem_setup_path!(name, version = nil, executable = name)
-    # Respect user's preferences for where gems should be installed.
-    ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
-    ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
-    ENV["GEM_PATH"] = ENV["GEM_OLD_PATH"] unless ENV["GEM_OLD_PATH"].to_s.empty?
-
-    # Make rubygems notice env changes.
-    Gem.clear_paths
-    Gem::Specification.reset
-
-    # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
-    path = PATH.new(ENV["PATH"])
-    path.prepend(RUBY_BIN) if which("ruby") != RUBY_PATH
-    path.prepend(Gem.bindir)
-    ENV["PATH"] = path
-
-    if Gem::Specification.find_all_by_name(name, version).empty?
-      ohai "Installing or updating '#{name}' gem"
-      install_args = %W[--no-ri --no-rdoc #{name}]
-      install_args << "--version" << version if version
-
-      # Do `gem install [...]` without having to spawn a separate process or
-      # having to find the right `gem` binary for the running Ruby interpreter.
-      require "rubygems/commands/install_command"
-      install_cmd = Gem::Commands::InstallCommand.new
-      install_cmd.handle_options(install_args)
-      exit_code = 1 # Should not matter as `install_cmd.execute` always throws.
-      begin
-        install_cmd.execute
-      rescue Gem::SystemExitException => e
-        exit_code = e.exit_code
-      end
-      odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
-    end
-
-    return if which(executable)
-    odie <<-EOS.undent
-      The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
-      #{ENV["PATH"]}
-    EOS
-  end
-
   def run_bundler_if_needed!
     return unless Pathname.glob("#{HOMEBREW_GEM_HOME}/bin/*").empty?
 
