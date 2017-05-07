@@ -8,13 +8,13 @@ std_trap = trap("INT") { exit! 130 } # no backtrace thanks
 RUBY_TWO = RUBY_VERSION.split(".").first.to_i >= 2
 raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
 
-require "pathname"
-HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
-$:.unshift(HOMEBREW_LIBRARY_PATH)
+homebrew_library_path = File.dirname(File.realpath(__FILE__))
+$:.unshift(homebrew_library_path)
 
-load_path_before_bundler = $:.dup
-require_relative "#{HOMEBREW_LIBRARY_PATH}/vendor/bundler/setup"
-ENV["HOMEBREW_GEMS_LOAD_PATH"] = ($: - load_path_before_bundler).join(":")
+require_relative "#{homebrew_library_path}/vendor/bundler/setup"
+
+require "pathname"
+HOMEBREW_LIBRARY_PATH = Pathname.new(homebrew_library_path)
 
 require "global"
 require "tap"
@@ -24,6 +24,8 @@ if ARGV == %w[--version] || ARGV == %w[-v]
   puts "Homebrew/homebrew-core #{CoreTap.instance.version_string}"
   exit 0
 end
+
+HOMEBREW_GEM_HOME = HOMEBREW_LIBRARY_PATH/"vendor/#{RUBY_ENGINE}/#{RUBY_VERSION}"
 
 def require?(path)
   require path
@@ -58,20 +60,17 @@ begin
   path.append(Pathname.glob(Tap::TAP_DIRECTORY/"*/*/cmd"))
 
   # Add RubyGems.
-  HOMEBREW_GEM_HOME = HOMEBREW_LIBRARY_PATH/"vendor/#{RUBY_ENGINE}/#{RUBY_VERSION}"
+  ENV["GEM_HOME"] = ENV["GEM_PATH"] = HOMEBREW_GEM_HOME
   path.append(HOMEBREW_GEM_HOME/"bin")
+
+  # Make RubyGems notice environment changes.
+  Gem.clear_paths
+  Gem::Specification.reset
 
   # Add SCM wrappers.
   path.append(HOMEBREW_SHIMS_PATH/"scm")
 
   ENV["PATH"] = path
-
-  # Setup RubyGems environment.
-  ENV["GEM_HOME"] = ENV["GEM_PATH"] = HOMEBREW_GEM_HOME
-  # Make RubyGems notice environment changes.
-  Gem.clear_paths
-  Gem::Specification.reset
-  Homebrew.run_bundler_if_needed! unless HOMEBREW_GEM_HOME.exist?
 
   if cmd
     internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("cmd", cmd)
