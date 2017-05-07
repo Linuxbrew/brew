@@ -2,6 +2,8 @@ unless ENV["HOMEBREW_BREW_FILE"]
   raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
 
+require "constants"
+
 # Path to `bin/brew` main executable in HOMEBREW_PREFIX
 HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
 

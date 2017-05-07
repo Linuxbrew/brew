@@ -1,6 +1,6 @@
 require "open3"
 require "shellwords"
-require "plist"
+require "vendor/plist/plist"
 
 require "extend/io"
 

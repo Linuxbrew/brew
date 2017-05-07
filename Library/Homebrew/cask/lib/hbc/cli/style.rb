@@ -26,7 +26,7 @@ module Hbc
       def install_rubocop
         capture_stderr do
           begin
-            Homebrew.run_bundler_if_needed!
+            Homebrew.install_gem_setup_path! "rubocop-cask", HOMEBREW_RUBOCOP_CASK_VERSION, "rubocop"
           rescue SystemExit
             raise CaskError, Tty.strip_ansi($stderr.string).chomp.sub(/\AError: /, "")
           end

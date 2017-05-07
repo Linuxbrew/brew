@@ -1,4 +1,4 @@
-require "macho"
+require "vendor/macho/macho"
 require "os/mac/architecture_list"
 
 module MachOShim

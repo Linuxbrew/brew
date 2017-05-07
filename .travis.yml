@@ -1,6 +1,8 @@
 language: ruby
-bundler_args: --path Library/Homebrew/vendor --standalone --jobs 3
-cache: bundler
+cache:
+  directories:
+    - $HOME/.gem/ruby
+    - Library/Homebrew/vendor/bundle
 
 matrix:
   include:
@@ -11,9 +13,6 @@ matrix:
       rvm: 2.0.0
 
 before_install:
-  - export GEM_HOME="$PWD/Library/Homebrew/vendor/ruby/2.0.0"
-  - gem list --installed bundler || gem install bundler
-  - export PATH="$GEM_HOME/bin:$PATH"
   - export HOMEBREW_DEVELOPER=1
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       HOMEBREW_REPOSITORY="$(brew --repo)";
