@@ -24,7 +24,7 @@ describe Hbc::Cask, :cask do
   describe "load" do
     let(:tap_path) { Hbc.default_tap.path }
     let(:file_dirname) { Pathname.new(__FILE__).dirname }
-    let(:relative_tap_path) { tap_path.relative_path_from(file_dirname) }
+    let(:relative_tap_path) { tap_path.realpath.relative_path_from(file_dirname) }
 
     it "returns an instance of the Cask for the given token" do
       c = Hbc::CaskLoader.load("local-caffeine")
@@ -56,7 +56,9 @@ describe Hbc::Cask, :cask do
     end
 
     it "returns an instance of the Cask from a relative file location" do
-      c = Hbc::CaskLoader.load(relative_tap_path/"Casks/local-caffeine.rb")
+      c = file_dirname.cd do
+        Hbc::CaskLoader.load(relative_tap_path/"Casks/local-caffeine.rb")
+      end
       expect(c).to be_kind_of(Hbc::Cask)
       expect(c.token).to eq("local-caffeine")
     end

@@ -8,15 +8,10 @@
 !/Library/
 
 # Ignore generated files within `Library` (again).
-/Library/Homebrew/**/.bundle
-/Library/Homebrew/**/vendor/bundle
 /Library/Homebrew/doc
 /Library/Homebrew/cask/bin
 /Library/Homebrew/cask/coverage
 /Library/Homebrew/cask/tmp
-/Library/Homebrew/test/bin
-/Library/Homebrew/test/coverage
-/Library/Homebrew/test/fs_leak_log
 /Library/Homebrew/tmp
 /Library/LinkedKegs
 /Library/Locks
@@ -24,8 +19,24 @@
 /Library/PinnedTaps
 /Library/Taps
 
-# Ignore vendored files within `Library`.
+# Ignore some vendored files within `Library`.
 /Library/Homebrew/vendor/portable-ruby
+/Library/Homebrew/vendor/ruby/2.0.0/bin
+/Library/Homebrew/vendor/ruby/2.0.0/cache
+/Library/Homebrew/vendor/ruby/2.0.0/extensions
+/Library/Homebrew/vendor/ruby/2.0.0/gems/*
+/Library/Homebrew/vendor/ruby/2.0.0/gems/ruby-macho-*/*
+/Library/Homebrew/vendor/ruby/2.0.0/gems/plist-*/*
+/Library/Homebrew/vendor/ruby/2.0.0/specifications
+/Library/Homebrew/vendor/ruby/2.0.0/tmp
+
+# Unignore our vendored gems
+!/Library/Homebrew/vendor/ruby/2.0.0/gems/ruby-macho-*
+!/Library/Homebrew/vendor/ruby/2.0.0/gems/ruby-macho-*/LICENSE*
+!/Library/Homebrew/vendor/ruby/2.0.0/gems/ruby-macho-*/lib
+!/Library/Homebrew/vendor/ruby/2.0.0/gems/plist-*
+!/Library/Homebrew/vendor/ruby/2.0.0/gems/plist-*/LICENSE*
+!/Library/Homebrew/vendor/ruby/2.0.0/gems/plist-*/lib
 
 # Ignore `bin` contents (again).
 /bin
@@ -50,13 +61,13 @@
 !/completions
 
 # Unignore our root-level metadata files.
+!/.bundle
 !/.gitignore
 !/.travis.yml
 !/.yardopts
 !/CODEOFCONDUCT.md
 !/CONTRIBUTING.md
+!/Gemfile
+!/Gemfile.lock
 !/LICENSE.txt
 !/README.md
-
-# Unignore tests' bundle config
-!/Library/Homebrew/test/.bundle

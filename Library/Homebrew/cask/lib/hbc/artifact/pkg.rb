@@ -2,7 +2,7 @@ require "hbc/artifact/base"
 
 require "hbc/utils/hash_validator"
 
-require "vendor/plist/plist"
+require "plist"
 
 module Hbc
   module Artifact
