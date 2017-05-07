@@ -8,9 +8,11 @@ matrix:
       osx_image: xcode8.3
       rvm: system
     - os: linux
+      sudo: false
       rvm: 2.0.0
 
 before_install:
+  - rm -rf Library/Homebrew/vendor/bundle/
   - export GEM_HOME="$PWD/Library/Homebrew/vendor/ruby/2.0.0"
   - gem list --installed bundler || gem install bundler
   - export PATH="$GEM_HOME/bin:$PATH"
