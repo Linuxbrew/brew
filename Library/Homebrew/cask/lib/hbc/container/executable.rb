@@ -1,5 +1,5 @@
 require "hbc/container/naked"
-require "macho"
+require "vendor/macho/macho"
 
 module Hbc
   class Container

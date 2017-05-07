@@ -2,6 +2,8 @@ unless ENV["HOMEBREW_BREW_FILE"]
   raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
 
+require "constants"
+
 require "tmpdir"
 require "pathname"
 
@@ -14,9 +16,9 @@ TEST_TMPDIR = ENV.fetch("HOMEBREW_TEST_TMPDIR") do |k|
 end
 
 # Paths pointing into the Homebrew code base that persist across test runs
-HOMEBREW_LIBRARY_PATH   = Pathname.new(File.expand_path("../../../..", __FILE__))
-HOMEBREW_SHIMS_PATH     = HOMEBREW_LIBRARY_PATH.parent+"Homebrew/shims"
-HOMEBREW_LOAD_PATH      = [File.expand_path("..", __FILE__), HOMEBREW_LIBRARY_PATH, ENV["HOMEBREW_GEMS_LOAD_PATH"]].join(":")
+HOMEBREW_LIBRARY_PATH  = Pathname.new(File.expand_path("../../../..", __FILE__))
+HOMEBREW_SHIMS_PATH    = HOMEBREW_LIBRARY_PATH.parent+"Homebrew/shims"
+HOMEBREW_LOAD_PATH     = [File.expand_path("..", __FILE__), HOMEBREW_LIBRARY_PATH].join(":")
 
 # Paths redirected to a temporary directory and wiped at the end of the test run
 HOMEBREW_PREFIX        = Pathname.new(TEST_TMPDIR).join("prefix")

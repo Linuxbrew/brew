@@ -1,0 +1,12 @@
+source "https://rubygems.org"
+
+gem "parallel_tests"
+gem "rspec"
+gem "rubocop"
+gem "rspec-its", require: false
+gem "rspec-wait", require: false
+
+group :coverage do
+  gem "simplecov", require: false
+  gem "codecov", require: false
+end

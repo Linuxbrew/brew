@@ -2,6 +2,8 @@ unless ENV["HOMEBREW_BREW_FILE"]
   raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
 
+require "constants"
+
 # Path to `bin/brew` main executable in HOMEBREW_PREFIX
 HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])
 
@@ -46,8 +48,5 @@ unless defined? HOMEBREW_LIBRARY_PATH
   HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
 end
 
-# Load path to vendored gems used by Homebrew
-HOMEBREW_GEMS_LOAD_PATH = ENV["HOMEBREW_GEMS_LOAD_PATH"]
-
 # Load path used by standalone scripts to access the Homebrew code base
-HOMEBREW_LOAD_PATH = [HOMEBREW_LIBRARY_PATH, *HOMEBREW_GEMS_LOAD_PATH].join(":")
+HOMEBREW_LOAD_PATH = HOMEBREW_LIBRARY_PATH

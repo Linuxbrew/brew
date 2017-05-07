@@ -1,11 +1,10 @@
+require "vendor/macho/macho"
 require "os/mac/architecture_list"
 
 module MachOShim
   # @private
   def macho
     @macho ||= begin
-      require "macho"
-
       MachO.open(to_s)
     end
   end
@@ -13,8 +12,6 @@ module MachOShim
   # @private
   def mach_data
     @mach_data ||= begin
-      require "macho"
-
       machos = []
       mach_data = []
 

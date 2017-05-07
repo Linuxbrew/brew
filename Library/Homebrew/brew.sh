@@ -69,6 +69,10 @@ then
   odie "Cowardly refusing to continue at this prefix: $HOMEBREW_PREFIX"
 fi
 
+# Save value to use for installing gems
+export GEM_OLD_HOME="$GEM_HOME"
+export GEM_OLD_PATH="$GEM_PATH"
+
 # Users may have these set, pointing the system Ruby
 # at non-system gem paths
 unset GEM_HOME

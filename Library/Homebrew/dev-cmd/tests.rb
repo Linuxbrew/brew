@@ -49,6 +49,8 @@ module Homebrew
         FileUtils.rm_f "test/coverage/.resultset.json"
       end
 
+      ENV["BUNDLE_GEMFILE"] = "#{HOMEBREW_LIBRARY_PATH}/test/Gemfile"
+
       # Override author/committer as global settings might be invalid and thus
       # will cause silent failure during the setup of dummy Git repositories.
       %w[AUTHOR COMMITTER].each do |role|
@@ -57,7 +59,10 @@ module Homebrew
         ENV["GIT_#{role}_DATE"]  = "Sun Jan 22 19:59:13 2017 +0000"
       end
 
-      Homebrew.run_bundler_if_needed!
+      Homebrew.install_gem_setup_path! "bundler"
+      unless quiet_system("bundle", "check")
+        system "bundle", "install"
+      end
 
       parallel = true
 
@@ -101,15 +106,10 @@ module Homebrew
         files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
       end
 
-      files.map! { |p| HOMEBREW_LIBRARY_PATH/p }
-
-      (HOMEBREW_LIBRARY_PATH/"vendor/#{RUBY_ENGINE}/#{RUBY_VERSION}").cd do
-        if parallel
-          system "parallel_rspec", *opts, "--", *args, "--", *files
-        else
-          system "rspec", *args, "--", *files
-        end
-        FileUtils.rm_rf "tmp"
+      if parallel
+        system "bundle", "exec", "parallel_rspec", *opts, "--", *args, "--", *files
+      else
+        system "bundle", "exec", "rspec", *args, "--", *files
       end
 
       return if $?.success?

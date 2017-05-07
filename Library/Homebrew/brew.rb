@@ -10,12 +10,7 @@ raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
 
 require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
-$:.unshift(HOMEBREW_LIBRARY_PATH)
-
-load_path_before_bundler = $:.dup
-require_relative "#{HOMEBREW_LIBRARY_PATH}/vendor/bundler/setup"
-ENV["HOMEBREW_GEMS_LOAD_PATH"] = ($: - load_path_before_bundler).join(":")
-
+$:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
 require "tap"
 
@@ -57,21 +52,10 @@ begin
   # Add contributed commands to PATH before checking.
   path.append(Pathname.glob(Tap::TAP_DIRECTORY/"*/*/cmd"))
 
-  # Add RubyGems.
-  HOMEBREW_GEM_HOME = HOMEBREW_LIBRARY_PATH/"vendor/#{RUBY_ENGINE}/#{RUBY_VERSION}"
-  path.append(HOMEBREW_GEM_HOME/"bin")
-
   # Add SCM wrappers.
   path.append(HOMEBREW_SHIMS_PATH/"scm")
 
   ENV["PATH"] = path
-
-  # Setup RubyGems environment.
-  ENV["GEM_HOME"] = ENV["GEM_PATH"] = HOMEBREW_GEM_HOME
-  # Make RubyGems notice environment changes.
-  Gem.clear_paths
-  Gem::Specification.reset
-  Homebrew.run_bundler_if_needed! unless HOMEBREW_GEM_HOME.exist?
 
   if cmd
     internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("cmd", cmd)
