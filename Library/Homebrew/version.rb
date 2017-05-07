@@ -316,6 +316,11 @@ class Version
       spec.stem
     end
 
+    # date-based versioning
+    # e.g. ltopers-v2017-04-14.tar.gz
+    m = /-v?(\d{4}-\d{2}-\d{2})/.match(stem)
+    return m.captures.first unless m.nil?
+
     # GitHub tarballs
     # e.g. https://github.com/foo/bar/tarball/v1.2.3
     # e.g. https://github.com/sam-github/libnet/tarball/libnet-1.1.4
@@ -342,11 +347,6 @@ class Version
     # e.g. https://waf.io/waf-1.8.12
     # e.g. https://codeload.github.com/gsamokovarov/jump/tar.gz/v0.7.1
     m = /[-v]((?:\d+\.)*\d+)$/.match(spec_s)
-    return m.captures.first unless m.nil?
-
-    # date-based versioning
-    # e.g. ltopers-v2017-04-14.tar.gz
-    m = /-v?(\d{4}-\d{2}-\d{2})/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. lame-398-1
