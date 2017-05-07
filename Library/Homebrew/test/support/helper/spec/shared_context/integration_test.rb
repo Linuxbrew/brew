@@ -89,12 +89,10 @@ RSpec.shared_context "integration test" do
     ruby_args << "-rtest/support/helper/integration_mocks"
     ruby_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
 
-    Bundler.with_original_env do
-      stdout, stderr, status = Open3.capture3(env, RUBY_PATH, *ruby_args, *args)
-      $stdout.print stdout
-      $stderr.print stderr
-      status
-    end
+    stdout, stderr, status = Open3.capture3(env, RUBY_PATH, *ruby_args, *args)
+    $stdout.print stdout
+    $stderr.print stderr
+    status
   end
 
   def setup_test_formula(name, content = nil)

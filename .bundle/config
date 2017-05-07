@@ -1,0 +1,5 @@
+---
+BUNDLE_CLEAN: "true"
+BUNDLE_DISABLE_SHARED_GEMS: "true"
+BUNDLE_PATH: "Library/Homebrew/vendor"
+BUNDLE_JOBS: "3"

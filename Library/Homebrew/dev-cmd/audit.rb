@@ -65,6 +65,9 @@ module Homebrew
     ENV.activate_extensions!
     ENV.setup_build_environment
 
+    # Add RubyGems (for RuboCop).
+    ENV["PATH"] = PATH.new(ENV["PATH"]).append(HOMEBREW_GEM_HOME/"bin")
+
     if ARGV.named.empty?
       ff = Formula
       files = Tap.map(&:formula_dir)

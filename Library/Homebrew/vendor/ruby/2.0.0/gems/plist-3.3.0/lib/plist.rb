@@ -13,9 +13,9 @@ require 'base64'
 require 'cgi'
 require 'stringio'
 
-require_relative 'plist/generator'
-require_relative 'plist/parser'
-require_relative 'plist/version'
+require 'plist/generator'
+require 'plist/parser'
+require 'plist/version'
 
 module Plist
 end
