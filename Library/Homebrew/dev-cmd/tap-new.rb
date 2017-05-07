@@ -46,10 +46,9 @@ module Homebrew
     travis = <<-EOS.undent
       language: ruby
       os: osx
+      env: OSX=10.12
       osx_image: xcode8.3
       rvm: system
-      cache:
-        directories: /usr/local/Homebrew/Library/Homebrew/vendor
 
       before_install:
         - export TRAVIS_COMMIT="$(git rev-parse --verify -q HEAD)"
