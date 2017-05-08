@@ -3,6 +3,8 @@ cache:
   directories:
     - $HOME/.gem/ruby
     - Library/Homebrew/vendor/bundle
+    # For parallel_rspec
+    - Library/Homebrew/tmp
 
 matrix:
   include:
@@ -10,6 +12,7 @@ matrix:
       osx_image: xcode8.3
       rvm: system
     - os: linux
+      sudo: false
       rvm: 2.0.0
 
 before_install:
