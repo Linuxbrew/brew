@@ -674,6 +674,9 @@ If \fB\-\-only\-cops\fR is passed, only the given Rubocop cop(s)\' violations wo
 If \fB\-\-except\-cops\fR is passed, the given Rubocop cop(s)\' checks would be skipped\.
 .
 .IP
+If \fB\-\-commit\-range\fR is is passed, the audited Formula will be compared to the last revision before the \fB<commit_range>\fR\.
+.
+.IP
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
 .
 .TP

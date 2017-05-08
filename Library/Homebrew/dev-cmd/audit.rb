@@ -31,6 +31,9 @@
 #:
 #:    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 #:
+#:    If `--commit-range` is is passed, the audited Formula will be compared to the
+#:    last revision before the `<commit_range>`.
+#:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
 
@@ -648,8 +651,24 @@ class FormulaAuditor
       problem "Devel-only (no stable download)"
     end
 
+    previous_formula_contents = unless formula.tap.nil?
+      commit_range = ARGV.value("commit-range")
+      Git.last_revision_of_file(formula.tap.path, formula.path, before_commit: commit_range)
+    end
+    previous_formula = unless (previous_formula_contents || "").empty?
+      Formulary.from_contents(formula.name, formula.path, previous_formula_contents)
+    end
+
     %w[Stable Devel HEAD].each do |name|
       next unless spec = formula.send(name.downcase)
+
+      unless previous_formula.nil?
+        previous_spec = previous_formula.send(name.downcase)
+
+        if previous_spec.version == spec.version && previous_spec.checksum != spec.checksum
+          problem "#{name}: only sha256 changed; needs to be confirmed by the developer"
+        end
+      end
 
       ra = ResourceAuditor.new(spec, online: @online, strict: @strict).audit
       problems.concat ra.problems.map { |problem| "#{name}: #{problem}" }
