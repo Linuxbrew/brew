@@ -78,9 +78,9 @@ module ELF
       lines.each do |s|
         case s
         when /\(SONAME\)/
-          soname = s[/Library soname: \[(.*)\]/, 1]
+          soname = s[/: \[(.*)\]/, 1]
         when /\(NEEDED\)/
-          needed << s[/Shared library: \[(.*)\]/, 1]
+          needed << s[/: \[(.*)\]/, 1]
         end
       end
       [soname, needed]
