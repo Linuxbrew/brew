@@ -263,7 +263,7 @@ module GitHub
 
   def issues_for_formula(name, options = {})
     tap = options[:tap] || CoreTap.instance
-    issues_matching(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
+    issues_matching(name, state: "open", repo: tap.slug)
   end
 
   def print_pull_requests_matching(query)
