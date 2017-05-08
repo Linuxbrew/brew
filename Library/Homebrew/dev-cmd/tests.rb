@@ -79,20 +79,24 @@ module Homebrew
         Dir.glob("test/**/*_spec.rb").reject { |p| p =~ %r{^test/vendor/bundle/} }
       end
 
-      opts = []
-
-      if ENV["CI"]
-        opts << "--combine-stderr"
-        opts << "--serialize-stdout"
+      opts = if ENV["CI"]
+        %w[
+          --combine-stderr
+          --serialize-stdout
+        ]
+      else
+        %w[
+          --nice
+        ]
       end
 
-      args = [
-        "--color",
-        "-I", HOMEBREW_LIBRARY_PATH/"test",
-        "--require", "spec_helper",
-        "--format", "progress",
-        "--format", "ParallelTests::RSpec::RuntimeLogger",
-        "--out", "tmp/parallel_runtime_rspec.log"
+      args = ["-I", HOMEBREW_LIBRARY_PATH/"test"]
+      args += %w[
+        --color
+        --require spec_helper
+        --format progress
+        --format ParallelTests::RSpec::RuntimeLogger
+        --out tmp/parallel_runtime_rspec.log
       ]
 
       args << "--seed" << ARGV.next if ARGV.include? "--seed"
