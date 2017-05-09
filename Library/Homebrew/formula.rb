@@ -1943,8 +1943,10 @@ class Formula
       old_curl_home = ENV["CURL_HOME"]
       old_path = ENV["HOMEBREW_PATH"]
 
-      ENV["HOME"] = env_home
-      ENV["CURL_HOME"] = old_curl_home || old_home
+      unless ARGV.interactive?
+        ENV["HOME"] = env_home
+        ENV["CURL_HOME"] = old_curl_home || old_home
+      end
       ENV["HOMEBREW_PATH"] = nil
 
       setup_home env_home
@@ -1955,8 +1957,10 @@ class Formula
         yield staging
       ensure
         @buildpath = nil
-        ENV["HOME"] = old_home
-        ENV["CURL_HOME"] = old_curl_home
+        unless ARGV.interactive?
+          ENV["HOME"] = old_home
+          ENV["CURL_HOME"] = old_curl_home
+        end
         ENV["HOMEBREW_PATH"] = old_path
       end
     end
