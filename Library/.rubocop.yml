@@ -40,6 +40,11 @@ Metrics/MethodLength:
 
 Metrics/ModuleLength:
   CountComments: false
+  Exclude:
+    - '**/bin/**/*'
+    - '**/cmd/**/*'
+    - '**/lib/**/*'
+    - '**/spec/**/*'
 
 Metrics/PerceivedComplexity:
   Enabled: false
