@@ -13,12 +13,11 @@ Follow these steps to fix common problems:
 * Check that **Command Line Tools for Xcode (CLT)** and **Xcode** are up to date.
 * If commands fail with permissions errors, check the permissions of `/usr/local`'s subdirectories. If you’re unsure what to do, you can run `cd /usr/local && sudo chown -R $(whoami) bin etc include lib sbin share var Frameworks`.
 * Read through the [Common Issues](Common-Issues.md).
-* If you’re installing something Java-related, make sure you have installed Java (you can run `brew cask install java`).
 
 ## Check to see if the issue has been reported
 
 * Search the [issue tracker](https://github.com/Homebrew/homebrew-core/issues) to see if someone else has already reported the same issue.
-* Make sure you search issues on the correct repository. If a formula that has failed to build is part of a tap like [homebrew/science](https://github.com/Homebrew/homebrew-science/issues) or [homebrew/dupes](https://github.com/Homebrew/homebrew-dupes/issues) check those issue trackers instead.
+* Make sure you search issues on the correct repository. If a formula that has failed to build is part of a tap like [homebrew/science](https://github.com/Homebrew/homebrew-science/issues) or a cask is part of [caskroom/cask](https://github.com/caskroom/homebrew-cask/issues) check those issue trackers instead.
 
 ## Create an issue
 
