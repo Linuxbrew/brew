@@ -468,7 +468,10 @@ class Keg
   end
 
   def aliases
-    Formulary.from_rack(rack).aliases
+    formula = Formulary.from_rack(rack)
+    aliases = formula.aliases
+    return aliases if formula.stable?
+    aliases.reject { |a| a.include?("@") }
   rescue FormulaUnavailableError
     []
   end
