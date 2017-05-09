@@ -1,9 +1,9 @@
 require "software_spec"
 
-RSpec::Matchers.alias_matcher :have_defined_resource, :be_resource_defined
-RSpec::Matchers.alias_matcher :have_defined_option, :be_option_defined
-
 describe SoftwareSpec do
+  alias_matcher :have_defined_resource, :be_resource_defined
+  alias_matcher :have_defined_option, :be_option_defined
+
   let(:owner) { double(name: "some_name", full_name: "some_name", tap: "homebrew/core") }
 
   describe "#resource" do

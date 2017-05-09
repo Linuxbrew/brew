@@ -1,10 +1,10 @@
 require "extend/ENV"
 require "requirement"
 
-RSpec::Matchers.alias_matcher :have_a_default_formula, :be_a_default_formula
-RSpec::Matchers.alias_matcher :be_a_build_requirement, :be_a_build
-
 describe Requirement do
+  alias_matcher :have_a_default_formula, :be_a_default_formula
+  alias_matcher :be_a_build_requirement, :be_a_build
+
   subject { klass.new }
 
   let(:klass) { Class.new(described_class) }
