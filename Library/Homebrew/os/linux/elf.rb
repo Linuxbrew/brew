@@ -58,6 +58,7 @@ module ELF
     private
 
     def elf_soname_needed_patchelf(path)
+      patchelf = DevelopmentTools.locate "patchelf"
       if path.dylib?
         command = [patchelf, "--print-soname", path.expand_path.to_s]
         soname = Utils.popen_read(*command).chomp
