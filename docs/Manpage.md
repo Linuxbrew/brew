@@ -643,9 +643,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 
-    If `--commit-range` is is passed, the audited Formula will be compared to the
-    last revision before the ``commit_range``.
-
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.
 

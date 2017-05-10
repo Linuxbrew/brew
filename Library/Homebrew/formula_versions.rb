@@ -63,6 +63,26 @@ class FormulaVersions
     map
   end
 
+  def previous_version_and_checksum(branch)
+    map = {}
+
+    rev_list(branch) do |rev|
+      formula_at_revision(rev) do |f|
+        [:stable, :devel].each do |spec_sym|
+          next unless spec = f.send(spec_sym)
+          map[spec_sym] ||= { version: spec.version, checksum: spec.checksum }
+        end
+
+        break if map[:stable] && map[:devel]
+      end
+    end
+
+    map[:stable] ||= {}
+    map[:devel] ||= {}
+
+    map
+  end
+
   def version_attributes_map(attributes, branch)
     attributes_map = {}
     return attributes_map if attributes.empty?

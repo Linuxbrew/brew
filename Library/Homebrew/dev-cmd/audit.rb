@@ -31,9 +31,6 @@
 #:
 #:    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 #:
-#:    If `--commit-range` is is passed, the audited Formula will be compared to the
-#:    last revision before the `<commit_range>`.
-#:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
 
@@ -651,24 +648,8 @@ class FormulaAuditor
       problem "Devel-only (no stable download)"
     end
 
-    previous_formula_contents = unless formula.tap.nil?
-      commit_range = ARGV.value("commit-range")
-      Git.last_revision_of_file(formula.tap.path, formula.path, before_commit: commit_range)
-    end
-    previous_formula = unless (previous_formula_contents || "").empty?
-      Formulary.from_contents(formula.name, formula.path, previous_formula_contents)
-    end
-
     %w[Stable Devel HEAD].each do |name|
       next unless spec = formula.send(name.downcase)
-
-      unless previous_formula.nil?
-        previous_spec = previous_formula.send(name.downcase)
-
-        if previous_spec.version == spec.version && previous_spec.checksum != spec.checksum
-          problem "#{name}: only sha256 changed; needs to be confirmed by the developer"
-        end
-      end
 
       ra = ResourceAuditor.new(spec, online: @online, strict: @strict).audit
       problems.concat ra.problems.map { |problem| "#{name}: #{problem}" }
@@ -765,6 +746,15 @@ class FormulaAuditor
     return if @new_formula
 
     fv = FormulaVersions.new(formula)
+
+    previous_version_and_checksum = fv.previous_version_and_checksum("origin/master")
+    [:stable, :devel].each do |spec_sym|
+      next unless spec = formula.send(spec_sym)
+      next unless previous_version_and_checksum[spec_sym][:version] == spec.version
+      next if previous_version_and_checksum[spec_sym][:checksum] == spec.checksum
+      problem "#{spec_sym}: only sha256 changed; needs to be confirmed by the developer"
+    end
+
     attributes = [:revision, :version_scheme]
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
