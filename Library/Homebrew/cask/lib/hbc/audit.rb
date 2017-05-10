@@ -66,6 +66,7 @@ module Hbc
       tap = Tap.select { |t| t.cask_file?(@cask.sourcefile_path) }.first
       return if tap.nil?
 
+      return if commit_range.nil?
       previous_cask_contents = Git.last_revision_of_file(tap.path, @cask.sourcefile_path, before_commit: commit_range)
       return if previous_cask_contents.empty?
 
