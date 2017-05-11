@@ -6,12 +6,12 @@ module Hbc
   class Container
     class Gpg < Base
       def self.me?(criteria)
-        criteria.extension(/GPG/n)
+        criteria.extension(/GPG|SIG/n)
       end
 
       def import_key
         if @cask.gpg.nil?
-          raise CaskError, "Expected to find gpg public key in formula. Cask '#{@cask}' must add: key_id or key_url"
+          raise CaskError, "Expected to find gpg public key in formula. Cask '#{@cask}' must add: 'gpg :embedded, key_id: [Public Key ID]' or 'gpg :embedded, key_url: [Public Key URL]'"
         end
 
         args = if @cask.gpg.key_id
