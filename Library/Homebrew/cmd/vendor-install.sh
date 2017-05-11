@@ -39,10 +39,10 @@ fetch() {
 
   if [[ -n "$HOMEBREW_QUIET" ]]
   then
-    curl_args+=(--silent)
+    curl_args[${#curl_args[*]}]="--silent"
   elif [[ -z "$HOMEBREW_VERBOSE" ]]
   then
-    curl_args+=(--progress-bar)
+    curl_args[${#curl_args[*]}]="--progress-bar"
   fi
 
   temporary_path="$CACHED_LOCATION.incomplete"
