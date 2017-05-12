@@ -3,7 +3,7 @@
 # Linuxbrew
 [![GitHub release](https://img.shields.io/github/release/Linuxbrew/brew.svg)](https://github.com/Linuxbrew/brew/releases)
 
-[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the Mac OS package manager, for Linux.
+[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux.
 
 It can be installed in your home directory and does not require root access. The same package manager can be used on both your Linux server and your Mac laptop. Installing a modern version of *glibc* and *gcc* in your home directory on an old distribution of Linux takes five minutes.
 
