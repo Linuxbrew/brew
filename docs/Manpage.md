@@ -910,31 +910,6 @@ can take several different forms:
     The formula file will be cached for later use.
 
 ## ENVIRONMENT
-
-  * `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`:
-    When using the `S3` download strategy, Homebrew will look in
-    these variables for access credentials (see
-    <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
-    to retrieve these access credentials from AWS).  If they are not set,
-    the `S3` download strategy will download with a public
-    (unsigned) URL.
-
-  * `BROWSER`:
-    If set, and `HOMEBREW_BROWSER` is not, use `BROWSER` as the web browser
-    when opening project homepages.
-
-  * `EDITOR`:
-    If set, and `HOMEBREW_EDITOR` and `VISUAL` are not, use `EDITOR` as the text editor.
-
-  * `GIT`:
-    When using Git, Homebrew will use `GIT` if set,
-    a Homebrew-built Git if installed, or the system-provided binary.
-
-    Set this to force Homebrew to use a particular git binary.
-
-  * `HOMEBREW_BOTTLE_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles.
-
   * `HOMEBREW_ARTIFACT_DOMAIN`:
     If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
 
@@ -942,6 +917,17 @@ can take several different forms:
     If set, Homebrew will only check for autoupdates once per this seconds interval.
 
     *Default:* `60`.
+
+  * `HOMEBREW_AWS_ACCESS_KEY_ID`, `HOMEBREW_AWS_SECRET_ACCESS_KEY`:
+    When using the `S3` download strategy, Homebrew will look in
+    these variables for access credentials (see
+    <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
+    to retrieve these access credentials from AWS).  If they are not set,
+    the `S3` download strategy will download with a public
+    (unsigned) URL.
+
+  * `HOMEBREW_BOTTLE_DOMAIN`:
+    If set, instructs Homebrew to use the given URL as a download mirror for bottles.
 
   * `HOMEBREW_BROWSER`:
     If set, uses this setting as the browser when opening project homepages,
@@ -989,6 +975,12 @@ can take several different forms:
   * `HOMEBREW_FORCE_VENDOR_RUBY`:
     If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
     even if the system version of Ruby is >=2.0.
+
+  * `HOMEBREW_GIT`:
+    When using Git, Homebrew will use `GIT` if set,
+    a Homebrew-built Git if installed, or the system-provided binary.
+
+    Set this to force Homebrew to use a particular git binary.
 
   * `HOMEBREW_GITHUB_API_TOKEN`:
     A personal access token for the GitHub API, which you can create at
@@ -1054,9 +1046,6 @@ can take several different forms:
 
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.
-
-  * `VISUAL`:
-    If set, and `HOMEBREW_EDITOR` is not, use `VISUAL` as the text editor.
 
 ## USING HOMEBREW BEHIND A PROXY
 

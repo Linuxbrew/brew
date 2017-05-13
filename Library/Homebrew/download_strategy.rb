@@ -520,6 +520,9 @@ class S3DownloadStrategy < CurlDownloadStrategy
     bucket = $1
     key = $2
 
+    ENV["AWS_ACCESS_KEY_ID"] = ENV["HOMEBREW_AWS_ACCESS_KEY_ID"]
+    ENV["AWS_SECRET_ACCESS_KEY"] = ENV["HOMEBREW_AWS_SECRET_ACCESS_KEY"]
+
     obj = AWS::S3.new.buckets[bucket].objects[key]
     begin
       s3url = obj.url_for(:get)
