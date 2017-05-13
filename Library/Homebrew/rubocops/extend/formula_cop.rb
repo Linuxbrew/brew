@@ -180,9 +180,10 @@ module RuboCop
         node.source_range.source_buffer
       end
 
-      # Returns the string representation if node is of type str
+      # Returns the string representation if node is of type str(plain) or dstr(interpolated)
       def string_content(node)
-        node.str_content if node.type == :str
+        return node.str_content if node.type == :str
+        node.each_child_node(:str).map(&:str_content).join("") if node.type == :dstr
       end
 
       # Returns printable component name
