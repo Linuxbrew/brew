@@ -9,7 +9,7 @@ describe GPG2Requirement do
       ENV["PATH"] = dir/"bin"
       (dir/"bin/gpg").write <<-EOS.undent
         #!/bin/bash
-        echo 2.0.30
+        echo 2.1.20
       EOS
       FileUtils.chmod 0755, dir/"bin/gpg"
 

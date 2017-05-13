@@ -6,8 +6,7 @@ module Hbc
 
     module ClassMethods
       def all
-        @all_casks ||= {}
-        all_tokens.map { |t| @all_casks[t] ||= load(t) }
+        all_tokens.map(&CaskLoader.public_method(:load))
       end
 
       def all_tapped_cask_dirs

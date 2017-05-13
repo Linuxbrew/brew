@@ -582,14 +582,17 @@ class ReporterHub
   def dump_formula_report(key, title)
     formulae = select_formula(key).sort.map do |name, new_name|
       # Format list items of renamed formulae
-      if key == :R
+      case key
+      when :R
         name = pretty_installed(name) if installed?(name)
         new_name = pretty_installed(new_name) if installed?(new_name)
         "#{name} -> #{new_name}"
+      when :A
+        name unless installed?(name)
       else
         installed?(name) ? pretty_installed(name) : name
       end
-    end
+    end.compact
 
     return if formulae.empty?
     # Dump formula list.

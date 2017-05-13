@@ -11,6 +11,9 @@ require: ./Homebrew/rubocops.rb
 Homebrew/CorrectBottleBlock:
   Enabled: true
 
+Homebrew/FormulaDesc:
+  Enabled: true
+
 Metrics/AbcSize:
   Enabled: false
 
