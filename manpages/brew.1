@@ -941,29 +941,6 @@ Homebrew can install formulae via URL, e\.g\. \fBhttps://raw\.github\.com/Homebr
 .SH "ENVIRONMENT"
 .
 .TP
-\fBAWS_ACCESS_KEY_ID\fR, \fBAWS_SECRET_ACCESS_KEY\fR
-When using the \fBS3\fR download strategy, Homebrew will look in these variables for access credentials (see \fIhttps://docs\.aws\.amazon\.com/cli/latest/userguide/cli\-chap\-getting\-started\.html#cli\-environment\fR to retrieve these access credentials from AWS)\. If they are not set, the \fBS3\fR download strategy will download with a public (unsigned) URL\.
-.
-.TP
-\fBBROWSER\fR
-If set, and \fBHOMEBREW_BROWSER\fR is not, use \fBBROWSER\fR as the web browser when opening project homepages\.
-.
-.TP
-\fBEDITOR\fR
-If set, and \fBHOMEBREW_EDITOR\fR and \fBVISUAL\fR are not, use \fBEDITOR\fR as the text editor\.
-.
-.TP
-\fBGIT\fR
-When using Git, Homebrew will use \fBGIT\fR if set, a Homebrew\-built Git if installed, or the system\-provided binary\.
-.
-.IP
-Set this to force Homebrew to use a particular git binary\.
-.
-.TP
-\fBHOMEBREW_BOTTLE_DOMAIN\fR
-If set, instructs Homebrew to use the given URL as a download mirror for bottles\.
-.
-.TP
 \fBHOMEBREW_ARTIFACT_DOMAIN\fR
 If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries\.
 .
@@ -973,6 +950,14 @@ If set, Homebrew will only check for autoupdates once per this seconds interval\
 .
 .IP
 \fIDefault:\fR \fB60\fR\.
+.
+.TP
+\fBHOMEBREW_AWS_ACCESS_KEY_ID\fR, \fBHOMEBREW_AWS_SECRET_ACCESS_KEY\fR
+When using the \fBS3\fR download strategy, Homebrew will look in these variables for access credentials (see \fIhttps://docs\.aws\.amazon\.com/cli/latest/userguide/cli\-chap\-getting\-started\.html#cli\-environment\fR to retrieve these access credentials from AWS)\. If they are not set, the \fBS3\fR download strategy will download with a public (unsigned) URL\.
+.
+.TP
+\fBHOMEBREW_BOTTLE_DOMAIN\fR
+If set, instructs Homebrew to use the given URL as a download mirror for bottles\.
 .
 .TP
 \fBHOMEBREW_BROWSER\fR
@@ -1019,6 +1004,13 @@ If set, Homebrew will use this editor when editing a single formula, or several 
 .TP
 \fBHOMEBREW_FORCE_VENDOR_RUBY\fR
 If set, Homebrew will always use its vendored, relocatable Ruby 2\.0 version even if the system version of Ruby is >=2\.0\.
+.
+.TP
+\fBHOMEBREW_GIT\fR
+When using Git, Homebrew will use \fBGIT\fR if set, a Homebrew\-built Git if installed, or the system\-provided binary\.
+.
+.IP
+Set this to force Homebrew to use a particular git binary\.
 .
 .TP
 \fBHOMEBREW_GITHUB_API_TOKEN\fR
@@ -1085,10 +1077,6 @@ This issue typically occurs when using FileVault or custom SSD configurations\.
 .TP
 \fBHOMEBREW_VERBOSE\fR
 If set, Homebrew always assumes \fB\-\-verbose\fR when running commands\.
-.
-.TP
-\fBVISUAL\fR
-If set, and \fBHOMEBREW_EDITOR\fR is not, use \fBVISUAL\fR as the text editor\.
 .
 .SH "USING HOMEBREW BEHIND A PROXY"
 Homebrew uses several commands for downloading files (e\.g\. \fBcurl\fR, \fBgit\fR, \fBsvn\fR)\. Many of these tools can download via a proxy\. It\'s common for these tools to read proxy parameters from environment variables\.

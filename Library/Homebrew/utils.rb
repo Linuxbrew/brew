@@ -320,7 +320,7 @@ def which_all(cmd, path = ENV["PATH"])
 end
 
 def which_editor
-  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL").compact.reject(&:empty?).first
+  editor = ENV.values_at("HOMEBREW_EDITOR", "HOMEBREW_VISUAL").compact.reject(&:empty?).first
   if editor
     editor_name, _, editor_args = editor.partition " "
     editor_path = which(editor_name, ENV["HOMEBREW_PATH"])
@@ -356,7 +356,7 @@ def exec_editor(*args)
 end
 
 def exec_browser(*args)
-  browser = ENV["HOMEBREW_BROWSER"] || ENV["BROWSER"]
+  browser = ENV["HOMEBREW_BROWSER"]
   browser ||= OS::PATH_OPEN if defined?(OS::PATH_OPEN)
   return unless browser
   safe_exec(browser, *args)

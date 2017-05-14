@@ -7,7 +7,7 @@ describe Homebrew::Diagnostic::Checks do
   end
 
   specify "#check_path_for_trailing_slashes" do
-    ENV["PATH"] += File::PATH_SEPARATOR + "/foo/bar/"
+    ENV["HOMEBREW_PATH"] += File::PATH_SEPARATOR + "/foo/bar/"
     expect(subject.check_path_for_trailing_slashes)
       .to match("Some directories in your path end in a slash")
   end
