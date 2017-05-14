@@ -5,10 +5,6 @@ class Sandbox
   SANDBOX_EXEC = "/usr/bin/sandbox-exec".freeze
   SANDBOXED_TAPS = %w[
     homebrew/core
-    homebrew/dupes
-    homebrew/fuse
-    homebrew/devel-only
-    homebrew/tex
   ].freeze
 
   def self.available?
