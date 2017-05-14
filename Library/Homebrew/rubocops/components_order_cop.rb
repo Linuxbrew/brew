@@ -36,7 +36,7 @@ module RuboCop
             [{ name: :test, type: :block_call }],
           ]
 
-          present_components = component_precedence_list.map do |components|
+          @present_components = component_precedence_list.map do |components|
             relevant_components = []
             components.each do |component|
               case component[:type]
@@ -51,19 +51,62 @@ module RuboCop
             relevant_components.delete_if(&:nil?)
           end
 
-          present_components = present_components.delete_if(&:empty?)
-
-          present_components.each_cons(2) do |preceding_component, succeeding_component|
-            offensive_nodes = check_precedence(preceding_component, succeeding_component)
-            component_problem offensive_nodes[0], offensive_nodes[1] if offensive_nodes
+          # Check if each present_components is above rest of the present_components
+          @present_components.take(@present_components.size-1).each_with_index do |preceding_component, p_idx|
+            next if preceding_component.empty?
+            @present_components.drop(p_idx+1).each do |succeeding_component|
+              next if succeeding_component.empty?
+              @offensive_nodes = check_precedence(preceding_component, succeeding_component)
+              component_problem @offensive_nodes[0], @offensive_nodes[1] if @offensive_nodes
+            end
           end
         end
 
         private
 
+        # Method to format message for reporting component precedence violations
         def component_problem(c1, c2)
-          # Method to format message for reporting component precedence violations
           problem "`#{format_component(c1)}` (line #{line_number(c1)}) should be put before `#{format_component(c2)}` (line #{line_number(c2)})"
+        end
+
+        # autocorrect method gets called just after component_problem method call
+        def autocorrect(_node)
+          succeeding_node = @offensive_nodes[0]
+          preceding_node = @offensive_nodes[1]
+          lambda do |corrector|
+            reorder_components(corrector, succeeding_node, preceding_node)
+          end
+        end
+
+        # Reorder two nodes in the source, using the corrector instance in autocorrect method
+        # Components of same type are grouped together when rewriting the source
+        # Linebreaks are introduced if components are of two different methods/blocks/multilines
+        def reorder_components(corrector, node1, node2)
+          # order_idx : node1's index in component_precedence_list
+          # curr_p_idx: node1's index in preceding_comp_arr
+          # preceding_comp_arr: array containing components of same type
+          order_idx, curr_p_idx, preceding_comp_arr = get_state(node1)
+
+          # curr_p_idx > 0 means node1 needs to be grouped with its own kind
+          if curr_p_idx>0
+            node2 = preceding_comp_arr[curr_p_idx-1]
+            indentation = " " * (start_column(node2) - line_start_column(node2))
+            line_breaks = node2.multiline? ? "\n\n" : "\n"
+            corrector.insert_after(node2.source_range, line_breaks+indentation+node1.source)
+          else
+            indentation = " " * (start_column(node2) - line_start_column(node2))
+            # No line breaks upto version_scheme, order_idx == 8
+            line_breaks = order_idx>8 ? "\n\n" : "\n"
+            corrector.insert_before(node2.source_range, node1.source+line_breaks+indentation)
+          end
+          corrector.remove(range_with_surrounding_space(node1.source_range, :left))
+        end
+
+        # Returns precedence index and component's index to properly reorder and group during autocorrect
+        def get_state(node1)
+          @present_components.each_with_index do |comp, idx|
+            return [idx, comp.index(node1), comp] if comp.member?(node1)
+          end
         end
       end
     end
