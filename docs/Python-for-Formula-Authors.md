@@ -143,7 +143,7 @@ def install
   %w[six parsedatetime].each do |r|
     venv.pip_install resource(r)
   end
-  venv.link_scripts(bin) { venv.pip_install buildpath }
+  venv.pip_install_and_link buildpath
 end
 ```
 
