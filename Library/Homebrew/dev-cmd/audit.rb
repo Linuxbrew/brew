@@ -307,25 +307,41 @@ class FormulaAuditor
         unversioned_name = unversioned_formula.basename(".rb")
         problem "#{formula} is versioned but no #{unversioned_name} formula exists"
       end
-    elsif ARGV.build_stable?
-      versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
-      needs_versioned_alias = !versioned_formulae.empty? &&
-                              formula.tap &&
-                              formula.aliases.grep(/.@\d/).empty?
-      if needs_versioned_alias
-        _, last_alias_version = File.basename(versioned_formulae.sort.reverse.first)
-                                    .gsub(/\.rb$/, "")
-                                    .split("@")
-        major, minor, = formula.version.to_s.split(".")
-        alias_name = if last_alias_version.split(".").length == 1
-          "#{formula.name}@#{major}"
+    elsif ARGV.build_stable? &&
+          !(versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]).empty?
+      versioned_aliases = formula.aliases.grep(/.@\d/)
+      _, last_alias_version =
+        File.basename(versioned_formulae.sort.reverse.first)
+            .gsub(/\.rb$/, "").split("@")
+      major, minor, = formula.version.to_s.split(".")
+      alias_name_major = "#{formula.name}@#{major}"
+      alias_name_major_minor = "#{alias_name_major}.#{minor}"
+      alias_name = if last_alias_version.split(".").length == 1
+        alias_name_major
+      else
+        alias_name_major_minor
+      end
+      valid_alias_names = [alias_name_major, alias_name_major_minor]
+
+      valid_versioned_aliases = versioned_aliases & valid_alias_names
+      invalid_versioned_aliases = versioned_aliases - valid_alias_names
+
+      if valid_versioned_aliases.empty?
+        if formula.tap
+          problem <<-EOS.undent
+            Formula has other versions so create a versioned alias:
+              cd #{formula.tap.alias_dir}
+              ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
+          EOS
         else
-          "#{formula.name}@#{major}.#{minor}"
+          problem "Formula has other versions so create an alias named #{alias_name}."
         end
+      end
+
+      unless invalid_versioned_aliases.empty?
         problem <<-EOS.undent
-          Formula has other versions so create an alias:
-            cd #{formula.tap.alias_dir}
-            ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
+          Formula has invalid versioned aliases:
+            #{invalid_versioned_aliases.join("\n  ")}
         EOS
       end
     end
