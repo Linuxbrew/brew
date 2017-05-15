@@ -20,6 +20,9 @@ FormulaAuditStrict/ComponentsOrder:
 FormulaAuditStrict/ComponentsRedundancy:
   Enabled: true
 
+FormulaAudit/Homepage:
+  Enabled: true
+
 Metrics/AbcSize:
   Enabled: false
 
