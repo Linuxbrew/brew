@@ -127,8 +127,12 @@ module Homebrew
       reason = " (because #{c.reason})" if c.reason
       "#{c.name}#{reason}"
     end.sort!
-    msg="Conflicts with: "
-    puts msg+conflicts*(",\n"+" "*msg.length) unless conflicts.empty?
+    unless conflicts.empty?
+      puts <<-EOS.undent
+        Conflicts with:
+          #{conflicts.join("  \n")}
+      EOS
+    end
 
     kegs = f.installed_kegs.sort_by(&:version)
     if kegs.empty?
