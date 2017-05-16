@@ -130,7 +130,7 @@ module Homebrew
     unless conflicts.empty?
       puts <<-EOS.undent
         Conflicts with:
-          #{conflicts.join("  \n")}
+          #{conflicts.join("\n  ")}
       EOS
     end
 
