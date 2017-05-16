@@ -1,6 +1,7 @@
 require "requirement"
 
 class OsxfuseRequirement < Requirement
+  default_formula "libfuse"
   download "https://github.com/libfuse/libfuse"
 
   satisfy(build_env: false) do
