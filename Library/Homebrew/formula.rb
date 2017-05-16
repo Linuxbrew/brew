@@ -2366,7 +2366,7 @@ class Formula
     end
 
     # If this formula conflicts with another one.
-    # <pre>conflicts_with "imagemagick", :because => "because this is just a stupid example"</pre>
+    # <pre>conflicts_with "imagemagick", :because => "because both install 'convert' binaries"</pre>
     def conflicts_with(*names)
       opts = names.last.is_a?(Hash) ? names.pop : {}
       names.each { |name| conflicts << FormulaConflict.new(name, opts[:because]) }
