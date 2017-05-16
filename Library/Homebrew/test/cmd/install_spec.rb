@@ -77,7 +77,7 @@ describe "brew install", :integration_test do
     EOS
 
     expect { brew "install", "testball1" }
-      .to output(/first `brew unlink testball1`/).to_stderr
+      .to output(/`brew upgrade testball1`/).to_stderr
       .and not_to_output.to_stdout
       .and be_a_failure
 
@@ -217,10 +217,9 @@ describe "brew install", :integration_test do
       depends_on NonFatalRequirement
     EOS
 
-    # FIXME: This should output to STDERR.
     expect { brew "install", "testball1" }
-      .to output(/NonFatalRequirement unsatisfied!/).to_stdout
-      .and not_to_output.to_stderr
+      .to output(/NonFatalRequirement unsatisfied!/).to_stderr
+      .and output(/built in/).to_stdout
       .and be_a_success
   end
 
@@ -234,10 +233,9 @@ describe "brew install", :integration_test do
       depends_on FatalRequirement
     EOS
 
-    # FIXME: This should output to STDERR.
     expect { brew "install", "testball1" }
-      .to output(/FatalRequirement unsatisfied!/).to_stdout
-      .and output(/An unsatisfied requirement failed this build./).to_stderr
+      .to output(/FatalRequirement unsatisfied!/).to_stderr
+      .and not_to_output.to_stdout
       .and be_a_failure
   end
 end

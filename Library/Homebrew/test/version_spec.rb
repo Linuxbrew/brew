@@ -433,6 +433,11 @@ describe Version do
         .to be_detected_from("https://homebrew.bintray.com/bottles/imagemagick-6.7.5-7.lion.bottle.1.tar.gz")
     end
 
+    specify "date-based version style" do
+      expect(Version.create("2017-04-17"))
+        .to be_detected_from("https://example.com/dada-v2017-04-17.tar.gz")
+    end
+
     specify "dash version style" do
       expect(Version.create("3.4"))
         .to be_detected_from("http://www.antlr.org/download/antlr-3.4-complete.jar")

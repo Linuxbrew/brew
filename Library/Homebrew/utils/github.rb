@@ -4,7 +4,7 @@ require "tempfile"
 module GitHub
   module_function
 
-  ISSUES_URI = URI.parse("https://api.github.com/search/issues")
+  API_URL = "https://api.github.com".freeze
 
   CREATE_GIST_SCOPES = ["gist"].freeze
   CREATE_ISSUE_SCOPES = ["public_repo"].freeze
@@ -228,13 +228,19 @@ module GitHub
   end
 
   def issues_matching(query, qualifiers = {})
-    uri = ISSUES_URI.dup
+    uri = URI.parse("#{API_URL}/search/issues")
     uri.query = build_query_string(query, qualifiers)
     open(uri) { |json| json["items"] }
   end
 
   def repository(user, repo)
-    open(URI.parse("https://api.github.com/repos/#{user}/#{repo}")) { |j| j }
+    open(URI.parse("#{API_URL}/repos/#{user}/#{repo}"))
+  end
+
+  def search_code(*params)
+    uri = URI.parse("#{API_URL}/search/code")
+    uri.query = "q=#{uri_escape(params.join(" "))}"
+    open(uri) { |json| json["items"] }
   end
 
   def build_query_string(query, qualifiers)
@@ -286,7 +292,7 @@ module GitHub
   end
 
   def private_repo?(user, repo)
-    uri = URI.parse("https://api.github.com/repos/#{user}/#{repo}")
+    uri = URI.parse("#{API_URL}/repos/#{user}/#{repo}")
     open(uri) { |json| json["private"] }
   end
 end

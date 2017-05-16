@@ -33,7 +33,12 @@ module Homebrew
       ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
-      ENV["HOMEBREW_NO_GITHUB_API"] = "1" unless ARGV.include? "--online"
+
+      if ARGV.include? "--online"
+        ENV["HOMEBREW_TEST_ONLINE"] = "1"
+      else
+        ENV["HOMEBREW_NO_GITHUB_API"] = "1"
+      end
 
       if ARGV.include? "--official-cmd-taps"
         ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"] = "1"
@@ -95,6 +100,10 @@ module Homebrew
       unless OS.mac?
         args << "--tag" << "~needs_macos"
         files = files.reject { |p| p =~ %r{^test/(os/mac|cask)(/.*|_spec\.rb)$} }
+      end
+
+      unless OS.linux?
+        files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
       end
 
       if parallel

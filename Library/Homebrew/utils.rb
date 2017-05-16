@@ -321,25 +321,34 @@ def which_all(cmd, path = ENV["PATH"])
 end
 
 def which_editor
-  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL", "EDITOR").compact.first
-  return editor unless editor.nil?
+  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL").compact.reject(&:empty?).first
+  if editor
+    editor_name, _, editor_args = editor.partition " "
+    editor_path = which(editor_name, ENV["HOMEBREW_PATH"])
+    editor = if editor_args.to_s.empty?
+      editor_path.to_s
+    else
+      "#{editor_path} #{editor_args}"
+    end
+    return editor
+  end
 
   # Find Textmate
-  editor = "mate" if which "mate"
+  editor = which("mate", ENV["HOMEBREW_PATH"])
   # Find BBEdit / TextWrangler
-  editor ||= "edit" if which "edit"
+  editor ||= which("edit", ENV["HOMEBREW_PATH"])
   # Find vim
-  editor ||= "vim" if which "vim"
+  editor ||= which("vim", ENV["HOMEBREW_PATH"])
   # Default to standard vim
   editor ||= "/usr/bin/vim"
 
   opoo <<-EOS.undent
     Using #{editor} because no editor was set in the environment.
-    This may change in the future, so we recommend setting EDITOR, VISUAL,
+    This may change in the future, so we recommend setting EDITOR,
     or HOMEBREW_EDITOR to your preferred text editor.
   EOS
 
-  editor
+  editor.to_s
 end
 
 def exec_editor(*args)
@@ -407,8 +416,8 @@ def nostdout
   end
 end
 
-def paths
-  @paths ||= ENV["PATH"].split(File::PATH_SEPARATOR).collect do |p|
+def paths(env_path = ENV["PATH"])
+  @paths ||= env_path.split(File::PATH_SEPARATOR).collect do |p|
     begin
       File.expand_path(p).chomp("/")
     rescue ArgumentError

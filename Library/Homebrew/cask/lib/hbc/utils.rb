@@ -115,16 +115,5 @@ module Hbc
 
       opoo(poo.join(" ") + "\n" + error_message_with_suggestions)
     end
-
-    def self.nowstamp_metadata_path(container_path)
-      @timenow ||= Time.now.gmtime
-      return unless container_path.respond_to?(:join)
-
-      precision = 3
-      timestamp = @timenow.strftime("%Y%m%d%H%M%S")
-      fraction = format("%.#{precision}f", @timenow.to_f - @timenow.to_i)[1..-1]
-      timestamp.concat(fraction)
-      container_path.join(timestamp)
-    end
   end
 end

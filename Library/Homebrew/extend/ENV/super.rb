@@ -338,9 +338,7 @@ module Superenv
   def set_x11_env_if_installed
   end
 
-  # This method does nothing in superenv since there's no custom CFLAGS API
-  # @private
-  def set_cpu_flags(*_args)
+  def set_cpu_flags(*)
   end
 end
 

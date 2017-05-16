@@ -631,7 +631,7 @@ Print the version number of Homebrew to standard output and exit\.
 .SH "DEVELOPER COMMANDS"
 .
 .TP
-\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-fix\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fIformulae\fR]
+\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-fix\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fB\-\-only=\fR\fImethod\fR|\fB\-\-except=\fR\fImethod] [<formulae\fR]
 Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\.
 .
 .IP
@@ -654,6 +654,12 @@ If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violat
 .
 .IP
 If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with the name of the file or formula being audited, to make the output easy to grep\.
+.
+.IP
+If \fB\-\-only\fR is passed, only the methods named \fBaudit_<method>\fR will be run\.
+.
+.IP
+If \fB\-\-except\fR is passed, the methods named \fBaudit_<method>\fR will not be run\.
 .
 .IP
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
@@ -729,7 +735,7 @@ Generate a formula for the downloadable file at \fIURL\fR and open it in the edi
 If \fB\-\-autotools\fR is passed, create a basic template for an Autotools\-style build\. If \fB\-\-cmake\fR is passed, create a basic template for a CMake\-style build\. If \fB\-\-meson\fR is passed, create a basic template for a Meson\-style build\.
 .
 .IP
-If \fB\-\-no\-fetch\fR is passed, Homebrew will not download \fIURL\fR to the cache and will thus not add the SHA256 to the formula for you\.
+If \fB\-\-no\-fetch\fR is passed, Homebrew will not download \fIURL\fR to the cache and will thus not add the SHA256 to the formula for you\. It will also not check the GitHub API for GitHub projects (to fill out the description and homepage)\.
 .
 .IP
 The options \fB\-\-set\-name\fR and \fB\-\-set\-version\fR each take an argument and allow you to explicitly set the name and version of the package you are creating\.
@@ -1114,7 +1120,7 @@ Homebrew\'s lead maintainer is Mike McQuaid\.
 Homebrew\'s current maintainers are Alyssa Ross, Andrew Janke, Baptiste Fontaine, Alex Dunn, FX Coudert, ilovezfs, Josh Hagins, JCount, Misty De Meo, neutric, Tomasz Pajor, Markus Reiter, Tim Smith, Tom Schoonjans, Uladzislau Shablinski and William Woodruff\.
 .
 .P
-Former maintainers with significant contributions include Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Jack Nagel, Adam Vandenberg and Homebrew\'s creator: Max Howell\.
+Former maintainers with significant contributions include Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg and Homebrew\'s creator: Max Howell\.
 .
 .SH "BUGS"
 See our issues on GitHub:

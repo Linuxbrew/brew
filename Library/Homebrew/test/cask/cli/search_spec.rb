@@ -3,7 +3,7 @@ describe Hbc::CLI::Search, :cask do
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<-EOS.undent).to_stdout
-      ==> Partial matches
+      ==> Partial Matches
       local-caffeine
       local-transmission
     EOS
@@ -42,13 +42,13 @@ describe Hbc::CLI::Search, :cask do
   it "accepts a regexp argument" do
     expect {
       Hbc::CLI::Search.run("/^local-c[a-z]ffeine$/")
-    }.to output("==> Regexp matches\nlocal-caffeine\n").to_stdout
+    }.to output("==> Regexp Matches\nlocal-caffeine\n").to_stdout
   end
 
   it "Returns both exact and partial matches" do
     expect {
       Hbc::CLI::Search.run("test-opera")
-    }.to output(/^==> Exact match\ntest-opera\n==> Partial matches\ntest-opera-mail/).to_stdout
+    }.to output(/^==> Exact Match\ntest-opera\n==> Partial Matches\ntest-opera-mail/).to_stdout
   end
 
   it "does not search the Tap name" do

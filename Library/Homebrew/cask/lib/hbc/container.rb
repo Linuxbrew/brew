@@ -61,7 +61,7 @@ module Hbc
       begin
         const_get(type.to_s.split("_").map(&:capitalize).join)
       rescue NameError
-        false
+        nil
       end
     end
   end

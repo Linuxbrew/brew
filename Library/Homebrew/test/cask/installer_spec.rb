@@ -336,9 +336,8 @@ describe Hbc::Installer, :cask do
         Hbc::Installer.new(caffeine).install
       end
 
-      m_path = caffeine.metadata_path(:now, true)
-      expect(caffeine.metadata_path(:now, false)).to eq(m_path)
-      expect(caffeine.metadata_path(:latest)).to eq(m_path)
+      m_path = caffeine.metadata_timestamped_path(timestamp: :now, create: true)
+      expect(caffeine.metadata_timestamped_path(timestamp: :latest)).to eq(m_path)
     end
 
     it "generates and finds a metadata subdirectory for an installed Cask" do
@@ -349,9 +348,8 @@ describe Hbc::Installer, :cask do
       end
 
       subdir_name = "Casks"
-      m_subdir = caffeine.metadata_subdir(subdir_name, :now, true)
-      expect(caffeine.metadata_subdir(subdir_name, :now, false)).to eq(m_subdir)
-      expect(caffeine.metadata_subdir(subdir_name, :latest)).to eq(m_subdir)
+      m_subdir = caffeine.metadata_subdir(subdir_name, timestamp: :now, create: true)
+      expect(caffeine.metadata_subdir(subdir_name, timestamp: :latest)).to eq(m_subdir)
     end
   end
 

@@ -44,6 +44,7 @@
 /docs/bin
 /docs/vendor
 /docs/Gemfile.lock
+/docs/.jekyll-metadata
 
 # Unignore our shell completion
 !/completions

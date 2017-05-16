@@ -24,6 +24,7 @@ module Hbc
       @force = force
       @skip_cask_deps = skip_cask_deps
       @require_sha = require_sha
+      @reinstall = false
     end
 
     def self.print_caveats(cask)
@@ -76,18 +77,38 @@ module Hbc
     def install
       odebug "Hbc::Installer#install"
 
-      if @cask.installed? && !force
+      if @cask.installed? && !force && !@reinstall
         raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
         raise CaskAlreadyInstalledError, @cask
       end
 
       print_caveats
       fetch
+      uninstall_existing_cask if @reinstall
+
+      oh1 "Installing Cask #{@cask}"
       stage
       install_artifacts
       enable_accessibility_access
 
       puts summary
+    end
+
+    def reinstall
+      odebug "Hbc::Installer#reinstall"
+      @reinstall = true
+      install
+    end
+
+    def uninstall_existing_cask
+      return unless @cask.installed?
+
+      # use the same cask file that was used for installation, if possible
+      installed_caskfile = @cask.installed_caskfile
+      installed_cask = installed_caskfile.exist? ? CaskLoader.load_from_file(installed_caskfile) : @cask
+
+      # Always force uninstallation, ignore method parameter
+      Installer.new(installed_cask, force: true).uninstall
     end
 
     def summary
@@ -295,19 +316,17 @@ module Hbc
     end
 
     def save_caskfile
-      unless (old_savedirs = Pathname.glob(@cask.metadata_path("*"))).empty?
-        old_savedirs.each(&:rmtree)
-      end
+      old_savedir = @cask.metadata_timestamped_path
 
       return unless @cask.sourcefile_path
 
-      savedir = @cask.metadata_subdir("Casks", :now, true)
-      savedir.mkpath
+      savedir = @cask.metadata_subdir("Casks", timestamp: :now, create: true)
       FileUtils.copy @cask.sourcefile_path, savedir
+      old_savedir.rmtree unless old_savedir.nil?
     end
 
     def uninstall
-      odebug "Hbc::Installer#uninstall"
+      oh1 "Uninstalling Cask #{@cask}"
       disable_accessibility_access
       uninstall_artifacts
       purge_versioned_files
@@ -355,15 +374,15 @@ module Hbc
       gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
 
       # Homebrew-Cask metadata
-      if @cask.metadata_versioned_container_path.respond_to?(:children) &&
-         @cask.metadata_versioned_container_path.exist?
-        @cask.metadata_versioned_container_path.children.each do |subdir|
+      if @cask.metadata_versioned_path.respond_to?(:children) &&
+         @cask.metadata_versioned_path.exist?
+        @cask.metadata_versioned_path.children.each do |subdir|
           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
             gain_permissions_remove(subdir)
           end
         end
       end
-      @cask.metadata_versioned_container_path.rmdir_if_possible
+      @cask.metadata_versioned_path.rmdir_if_possible
       @cask.metadata_master_container_path.rmdir_if_possible
 
       # toplevel staged distribution

@@ -61,6 +61,10 @@ RSpec.configure do |config|
     skip "Python not installed." unless which("python")
   end
 
+  config.before(:each, :needs_network) do
+    skip "Requires network connection." unless ENV["HOMEBREW_TEST_ONLINE"]
+  end
+
   config.around(:each) do |example|
     begin
       TEST_DIRECTORIES.each(&:mkpath)
@@ -89,6 +93,7 @@ RSpec.configure do |config|
         HOMEBREW_PREFIX/"opt",
         HOMEBREW_PREFIX/"Caskroom",
         HOMEBREW_LIBRARY/"Taps/caskroom",
+        HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bar",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services",

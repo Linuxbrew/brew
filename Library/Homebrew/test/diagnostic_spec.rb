@@ -122,8 +122,9 @@ describe Homebrew::Diagnostic::Checks do
   specify "#check_user_path_3" do
     begin
       sbin = HOMEBREW_PREFIX/"sbin"
-      ENV["PATH"] = "#{HOMEBREW_PREFIX}/bin#{File::PATH_SEPARATOR}" +
-                    ENV["PATH"].gsub(/(?:^|#{Regexp.escape(File::PATH_SEPARATOR)})#{Regexp.escape(sbin)}/, "")
+      ENV["HOMEBREW_PATH"] =
+        "#{HOMEBREW_PREFIX}/bin#{File::PATH_SEPARATOR}" +
+        ENV["HOMEBREW_PATH"].gsub(/(?:^|#{Regexp.escape(File::PATH_SEPARATOR)})#{Regexp.escape(sbin)}/, "")
       (sbin/"something").mkpath
 
       expect(subject.check_user_path_1).to be nil
@@ -149,7 +150,9 @@ describe Homebrew::Diagnostic::Checks do
       file = "#{path}/foo-config"
       FileUtils.touch file
       FileUtils.chmod 0755, file
-      ENV["PATH"] = "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
+      ENV["HOMEBREW_PATH"] =
+        ENV["PATH"] =
+          "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}"
 
       expect(subject.check_for_config_scripts)
         .to match('"config" scripts exist')

@@ -1,6 +1,6 @@
 describe "brew bundle", :integration_test, :needs_test_cmd_taps do
   describe "check" do
-    it "checks if a Brewfile's dependencies are satisfied" do
+    it "checks if a Brewfile's dependencies are satisfied", :needs_network do
       setup_remote_tap "homebrew/bundle"
 
       HOMEBREW_REPOSITORY.cd do

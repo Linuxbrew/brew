@@ -17,12 +17,12 @@ module OS
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
         when "10.11" then "8.2.1"
-        when "10.12" then "8.3.1"
+        when "10.12" then "8.3.2"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "8.3.1"
+          "8.3.2"
         end
       end
 
@@ -128,11 +128,10 @@ module OS
           end
         end
 
-        # The remaining logic provides a fake Xcode version for CLT-only
-        # systems. This behavior only exists because Homebrew used to assume
-        # Xcode.version would always be non-nil. This is deprecated, and will
-        # be removed in a future version. To remain compatible, guard usage of
-        # Xcode.version with an Xcode.installed? check.
+        # The remaining logic provides a fake Xcode version based on the
+        # installed CLT version. This is useful as they are packaged
+        # simultaneously so workarounds need to apply to both based on their
+        # comparable version.
         case (DevelopmentTools.clang_version.to_f * 10).to_i
         when 0       then "dunno"
         when 1..14   then "3.2.2"
@@ -215,7 +214,7 @@ module OS
         # on the older supported platform for that Xcode release, i.e there's no
         # CLT package for 10.11 that contains the Clang version from Xcode 8.
         case MacOS.version
-        when "10.12" then "802.0.38"
+        when "10.12" then "802.0.42"
         when "10.11" then "800.0.42.1"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"

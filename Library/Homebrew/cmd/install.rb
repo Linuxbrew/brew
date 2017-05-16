@@ -206,7 +206,8 @@ module Homebrew
         Migrator.migrate_if_needed(f)
         install_formula(f)
       end
-    rescue FormulaClassUnavailableError => e
+    rescue FormulaUnreadableError, FormulaClassUnavailableError,
+           TapFormulaUnreadableError, TapFormulaClassUnavailableError => e
       # Need to rescue before `FormulaUnavailableError` (superclass of this)
       # is handled, as searching for a formula doesn't make sense here (the
       # formula was found, but there's a problem with its implementation).
@@ -240,6 +241,8 @@ module Homebrew
         puts "To install one of them, run (for example):\n  brew install #{formulae_search_results.first}"
       end
 
+      # Do not search taps if the formula name is qualified
+      return if e.name.include?("/")
       ohai "Searching taps..."
       taps_search_results = search_taps(query)
       case taps_search_results.length

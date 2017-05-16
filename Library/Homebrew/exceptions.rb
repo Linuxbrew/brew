@@ -77,34 +77,10 @@ class FormulaUnavailableError < RuntimeError
   end
 end
 
-class TapFormulaUnavailableError < FormulaUnavailableError
-  attr_reader :tap, :user, :repo
-
-  def initialize(tap, name)
-    @tap = tap
-    @user = tap.user
-    @repo = tap.repo
-    super "#{tap}/#{name}"
-  end
-
-  def to_s
-    s = super
-    s += "\nPlease tap it and then try again: brew tap #{tap}" unless tap.installed?
-    s
-  end
-end
-
-class FormulaClassUnavailableError < FormulaUnavailableError
+module FormulaClassUnavailableErrorModule
   attr_reader :path
   attr_reader :class_name
   attr_reader :class_list
-
-  def initialize(name, path, class_name, class_list)
-    @path = path
-    @class_name = class_name
-    @class_list = class_list
-    super name
-  end
 
   def to_s
     s = super
@@ -131,16 +107,70 @@ class FormulaClassUnavailableError < FormulaUnavailableError
   end
 end
 
-class FormulaUnreadableError < FormulaUnavailableError
+class FormulaClassUnavailableError < FormulaUnavailableError
+  include FormulaClassUnavailableErrorModule
+
+  def initialize(name, path, class_name, class_list)
+    @path = path
+    @class_name = class_name
+    @class_list = class_list
+    super name
+  end
+end
+
+module FormulaUnreadableErrorModule
   attr_reader :formula_error
+
+  def to_s
+    "#{name}: " + formula_error.to_s
+  end
+end
+
+class FormulaUnreadableError < FormulaUnavailableError
+  include FormulaUnreadableErrorModule
 
   def initialize(name, error)
     super(name)
     @formula_error = error
   end
+end
+
+class TapFormulaUnavailableError < FormulaUnavailableError
+  attr_reader :tap, :user, :repo
+
+  def initialize(tap, name)
+    @tap = tap
+    @user = tap.user
+    @repo = tap.repo
+    super "#{tap}/#{name}"
+  end
 
   def to_s
-    "#{name}: " + formula_error.to_s
+    s = super
+    s += "\nPlease tap it and then try again: brew tap #{tap}" unless tap.installed?
+    s
+  end
+end
+
+class TapFormulaClassUnavailableError < TapFormulaUnavailableError
+  include FormulaClassUnavailableErrorModule
+
+  attr_reader :tap
+
+  def initialize(tap, name, path, class_name, class_list)
+    @path = path
+    @class_name = class_name
+    @class_list = class_list
+    super tap, name
+  end
+end
+
+class TapFormulaUnreadableError < TapFormulaUnavailableError
+  include FormulaUnreadableErrorModule
+
+  def initialize(tap, name, error)
+    super(tap, name)
+    @formula_error = error
   end
 end
 

@@ -174,34 +174,22 @@ class FormulaInstaller
       EOS
     end
 
-    if ENV["HOMEBREW_CHECK_RECURSIVE_VERSION_DEPENDENCIES"]
-      version_hash = {}
-      version_conflicts = Set.new
-      recursive_formulae.each do |f|
-        name = f.name
-        unversioned_name, = name.split("@")
-        version_hash[unversioned_name] ||= Set.new
-        version_hash[unversioned_name] << name
-        next if version_hash[unversioned_name].length < 2
-        version_conflicts += version_hash[unversioned_name]
-      end
-      unless version_conflicts.empty?
-        raise CannotInstallFormulaError, <<-EOS.undent
-          #{formula.full_name} contains conflicting version recursive dependencies:
-            #{version_conflicts.to_a.join ", "}
-          View these with `brew deps --tree #{formula.full_name}`.
-        EOS
-      end
+    version_hash = {}
+    version_conflicts = Set.new
+    recursive_formulae.each do |f|
+      name = f.name
+      unversioned_name, = name.split("@")
+      version_hash[unversioned_name] ||= Set.new
+      version_hash[unversioned_name] << name
+      next if version_hash[unversioned_name].length < 2
+      version_conflicts += version_hash[unversioned_name]
     end
-
-    unless ENV["HOMEBREW_NO_CHECK_UNLINKED_DEPENDENCIES"]
-      unlinked_deps = recursive_formulae.select do |dep|
-        dep.installed? && !dep.keg_only? && !dep.linked_keg.directory?
-      end
-
-      unless unlinked_deps.empty?
-        raise CannotInstallFormulaError, "You must `brew link #{unlinked_deps*" "}` before #{formula.full_name} can be installed"
-      end
+    unless version_conflicts.empty?
+      raise CannotInstallFormulaError, <<-EOS.undent
+        #{formula.full_name} contains conflicting version recursive dependencies:
+          #{version_conflicts.to_a.join ", "}
+        View these with `brew deps --tree #{formula.full_name}`.
+      EOS
     end
 
     pinned_unsatisfied_deps = recursive_deps.select do |dep|
@@ -230,11 +218,20 @@ class FormulaInstaller
     # function but after instantiating this class so that it can avoid having to
     # relink the active keg if possible (because it is slow).
     if formula.linked_keg.directory?
-      # some other version is already installed *and* linked
-      raise CannotInstallFormulaError, <<-EOS.undent
-        #{formula.name}-#{formula.linked_keg.resolved_path.basename} already installed
-        To install this version, first `brew unlink #{formula.name}`
+      message = <<-EOS.undent
+        #{formula.name} #{formula.linked_keg.resolved_path.basename} is already installed
       EOS
+      message += if formula.outdated? && !formula.head?
+        <<-EOS.undent
+          To upgrade to #{formula.version}, run `brew upgrade #{formula.name}`
+        EOS
+      else
+        # some other version is already installed *and* linked
+        <<-EOS.undent
+          To install #{formula.version}, first run `brew unlink #{formula.name}`
+        EOS
+      end
+      raise CannotInstallFormulaError, message
     end
 
     check_conflicts
@@ -895,15 +892,15 @@ class FormulaInstaller
     tab.write
   end
 
-  def audit_check_output(output)
+  def problem_if_output(output)
     return unless output
     opoo output
     @show_summary_heading = true
   end
 
   def audit_installed
-    audit_check_output(check_env_path(formula.bin))
-    audit_check_output(check_env_path(formula.sbin))
+    problem_if_output(check_env_path(formula.bin))
+    problem_if_output(check_env_path(formula.sbin))
     super
   end
 
@@ -936,6 +933,6 @@ class FormulaInstaller
   def puts_requirement_messages
     return unless @requirement_messages
     return if @requirement_messages.empty?
-    puts @requirement_messages
+    $stderr.puts @requirement_messages
   end
 end

@@ -161,11 +161,9 @@ class Requirement
   class << self
     include BuildEnvironmentDSL
 
-    attr_reader :env_proc
+    attr_reader :env_proc, :build
     attr_rw :fatal, :default_formula
     attr_rw :cask, :download
-    # build is deprecated, use `depends_on <requirement> => :build` instead
-    attr_rw :build
 
     def satisfy(options = {}, &block)
       @satisfied ||= Requirement::Satisfier.new(options, &block)

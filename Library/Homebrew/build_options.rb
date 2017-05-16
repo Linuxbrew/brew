@@ -50,7 +50,6 @@ class BuildOptions
   def bottle?
     include? "build-bottle"
   end
-  alias build_bottle? bottle?
 
   # True if a {Formula} is being built with {Formula.head} instead of {Formula.stable}.
   # <pre>args << "--some-new-stuff" if build.head?</pre>

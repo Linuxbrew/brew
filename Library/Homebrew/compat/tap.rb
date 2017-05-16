@@ -6,5 +6,3 @@ class Tap
     core_tap?
   end
 end
-
-CoreFormulaRepository = CoreTap

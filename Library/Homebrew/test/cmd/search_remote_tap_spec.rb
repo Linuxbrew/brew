@@ -1,19 +1,21 @@
 require "cmd/search"
 
 describe Homebrew do
-  specify "#search_tap" do
+  specify "#search_taps" do
     json_response = {
-      "tree" => [
+      "items" => [
         {
-          "path" => "Formula/not-a-formula.rb",
-          "type" => "blob",
+          "path" => "Formula/some-formula.rb",
+          "repository" => {
+            "full_name" => "Homebrew/homebrew-foo",
+          },
         },
       ],
     }
 
     allow(GitHub).to receive(:open).and_yield(json_response)
 
-    expect(described_class.search_tap("homebrew", "not-a-tap", "not-a-formula"))
-      .to eq(["homebrew/not-a-tap/not-a-formula"])
+    expect(described_class.search_taps("some-formula"))
+      .to match(["homebrew/foo/some-formula"])
   end
 end

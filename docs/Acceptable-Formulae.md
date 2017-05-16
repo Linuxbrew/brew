@@ -80,12 +80,12 @@ useful to people. Just install the stuff! Having to faff around with
 foo-ruby, foo-perl etc. sucks.
 
 ### Niche (or self-submitted) stuff
-The software in question must be:
+The software in question must:
 
-* maintained (e.g. upstream is still making new releases)
-* known
-* stable (e.g. not declared "unstable" or "beta" by upstream)
-* used
+* be maintained (e.g. upstream is still making new releases)
+* be known
+* be stable (e.g. not declared "unstable" or "beta" by upstream)
+* be used
 * have a homepage
 
 We will reject formulae that seem too obscure, partly because they won’t
@@ -93,7 +93,8 @@ get maintained and partly because we have to draw the line somewhere.
 
 We frown on authors submitting their own work unless it is very popular.
 
-Don’t forget Homebrew is all Git underneath! Maintain your own tap if you have to!
+Don’t forget Homebrew is all Git underneath!
+[Maintain your own tap](How-to-Create-and-Maintain-a-Tap.md) if you have to!
 
 There may be exceptions to these rules in the main repository; we may
 include things that don't meet these criteria or reject things that do.

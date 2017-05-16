@@ -444,7 +444,7 @@ module Homebrew
 
         message = ""
 
-        paths.each do |p|
+        paths(ENV["HOMEBREW_PATH"]).each do |p|
           case p
           when "/usr/bin"
             unless $seen_prefix_bin
@@ -465,7 +465,7 @@ module Homebrew
 
                   Consider setting your PATH so that #{HOMEBREW_PREFIX}/bin
                   occurs before /usr/bin. Here is a one-liner:
-                    #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin")}
+                    #{Utils::Shell.prepend_path_in_profile("#{HOMEBREW_PREFIX}/bin")}
                 EOS
               end
             end
@@ -485,7 +485,7 @@ module Homebrew
         <<-EOS.undent
           Homebrew's bin was not found in your PATH.
           Consider setting the PATH for example like so
-            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin")}
+            #{Utils::Shell.prepend_path_in_profile("#{HOMEBREW_PREFIX}/bin")}
         EOS
       end
 
@@ -500,7 +500,7 @@ module Homebrew
           Homebrew's sbin was not found in your PATH but you have installed
           formulae that put executables in #{HOMEBREW_PREFIX}/sbin.
           Consider setting the PATH for example like so
-            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/sbin")}
+            #{Utils::Shell.prepend_path_in_profile("#{HOMEBREW_PREFIX}/sbin")}
         EOS
       end
 
@@ -632,7 +632,7 @@ module Homebrew
           /Applications/Server.app/Contents/ServerRoot/usr/sbin
         ].map(&:downcase)
 
-        paths.each do |p|
+        paths(ENV["HOMEBREW_PATH"]).each do |p|
           next if whitelist.include?(p.downcase) || !File.directory?(p)
 
           realpath = Pathname.new(p).realpath.to_s
