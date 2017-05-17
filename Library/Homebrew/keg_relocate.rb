@@ -77,6 +77,20 @@ class Keg
         relocation.old_prefix,
       )
 
+      if !OS.mac? && relocation.old_repository == REPOSITORY_PLACEHOLDER
+        # Work around for bottles that incorrectly use @@HOMEBREW_REPOSITORY@@
+        # where they should have used @@HOMEBREW_PREFIX@@.
+        # Change @@HOMEBREW_REPOSITORY@@/Library to $HOMEBREW_REPOSITORY/Library
+        # and all other instances of @@HOMEBREW_REPOSITORY@@ to $HOMEBREW_PREFIX.
+        replacements = {
+          relocation.old_prefix => relocation.new_prefix,
+          relocation.old_cellar => relocation.new_cellar,
+          relocation.old_repository => relocation.new_prefix,
+          relocation.old_repository + "/Library" => relocation.new_repository + "/Library",
+        }
+        regexp = Regexp.union(replacements.keys)
+      end
+
       changed = s.gsub!(regexp, replacements)
 
       next unless changed
