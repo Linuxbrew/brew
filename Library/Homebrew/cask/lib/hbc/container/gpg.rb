@@ -6,7 +6,7 @@ module Hbc
   class Container
     class Gpg < Base
       def self.me?(criteria)
-        criteria.extension(/GPG|SIG/n)
+        criteria.extension(/gpg/n)
       end
 
       def import_key
@@ -31,7 +31,7 @@ module Hbc
         import_key
 
         Dir.mktmpdir do |unpack_dir|
-          @command.run!(gpg, args: ["--batch", "--yes", "--output", Pathname(unpack_dir).join(File.basename(@path.basename)), "--decrypt", @path])
+          @command.run!(gpg, args: ["--batch", "--yes", "--output", Pathname(unpack_dir).join(File.basename(@path.basename, ".gpg")), "--decrypt", @path])
 
           extract_nested_inside(unpack_dir)
         end
