@@ -113,7 +113,7 @@ module Hbc
       if command.respond_to?(:run)
         # usual case: built-in command verb
         command.run(*rest)
-      elsif require?(which("brewcask-#{command}.rb"))
+      elsif require?(which("brewcask-#{command}.rb").to_s)
         # external command as Ruby library on PATH, Homebrew-style
       elsif command.to_s.include?("/") && require?(command.to_s)
         # external command as Ruby library with literal path, useful
