@@ -145,7 +145,7 @@ names, and other aspects of this manual are still subject to change.
 
 ## OPTIONS
 
-To make these options persistent, see the [ENVIRONMENT][] section, below.
+To make these options persistent, see the [ENVIRONMENT](#environment) section, below.
 
 Some of these (such as `--prefpanedir`) may be subject to removal
 in a future version.
