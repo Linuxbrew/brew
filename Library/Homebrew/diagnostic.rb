@@ -119,7 +119,7 @@ module Homebrew
         return unless which("python")
 
         anaconda_directory = which("anaconda").realpath.dirname
-        python_binary = Utils.popen_read which("python"), "-c", "import sys; sys.stdout.write(sys.executable)"
+        python_binary = Utils.popen_read(which("python"), "-c", "import sys; sys.stdout.write(sys.executable)")
         python_directory = Pathname.new(python_binary).realpath.dirname
 
         # Only warn if Python lives with Anaconda, since is most problematic case.

@@ -856,7 +856,7 @@ class FormulaAuditor
     end
     bin_names.each do |name|
       ["system", "shell_output", "pipe_output"].each do |cmd|
-        if text =~ %r{(def test|test do).*(#{Regexp.escape HOMEBREW_PREFIX}/bin/)?#{cmd}[\(\s]+['"]#{Regexp.escape name}[\s'"]}m
+        if text =~ %r{(def test|test do).*(#{Regexp.escape(HOMEBREW_PREFIX)}/bin/)?#{cmd}[\(\s]+['"]#{Regexp.escape(name)}[\s'"]}m
           problem %Q(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
         end
       end
