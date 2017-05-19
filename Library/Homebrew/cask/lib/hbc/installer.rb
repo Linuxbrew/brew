@@ -18,13 +18,18 @@ module Hbc
 
     PERSISTENT_METADATA_SUBDIRS = ["gpg"].freeze
 
-    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, require_sha: false)
+    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, binaries: true, require_sha: false)
       @cask = cask
       @command = command
       @force = force
       @skip_cask_deps = skip_cask_deps
+      @binaries = binaries
       @require_sha = require_sha
       @reinstall = false
+    end
+
+    def binaries?
+      @binaries
     end
 
     def self.print_caveats(cask)
@@ -108,7 +113,7 @@ module Hbc
       installed_cask = installed_caskfile.exist? ? CaskLoader.load_from_file(installed_caskfile) : @cask
 
       # Always force uninstallation, ignore method parameter
-      Installer.new(installed_cask, force: true).uninstall
+      Installer.new(installed_cask, binaries: binaries?, force: true).uninstall
     end
 
     def summary
@@ -162,6 +167,11 @@ module Hbc
       artifacts.each do |artifact|
         next unless artifact.respond_to?(:install_phase)
         odebug "Installing artifact of class #{artifact.class}"
+
+        if artifact.is_a?(Artifact::Binary)
+          next unless binaries?
+        end
+
         artifact.install_phase
         already_installed_artifacts.unshift(artifact)
       end
@@ -254,7 +264,7 @@ module Hbc
         if dep.installed?
           puts "already installed"
         else
-          Installer.new(dep, force: false, skip_cask_deps: true).install
+          Installer.new(dep, force: false, binaries: binaries?, skip_cask_deps: true).install
           puts "done"
         end
       end

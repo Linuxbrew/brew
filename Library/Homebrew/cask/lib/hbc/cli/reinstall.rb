@@ -8,6 +8,7 @@ module Hbc
             cask = CaskLoader.load(cask_token)
 
             Installer.new(cask,
+                          binaries:       CLI.binaries?,
                           force:          force,
                           skip_cask_deps: skip_cask_deps,
                           require_sha:    require_sha).reinstall

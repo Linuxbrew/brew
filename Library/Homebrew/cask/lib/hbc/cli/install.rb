@@ -19,10 +19,10 @@ module Hbc
         cask_tokens.each do |cask_token|
           begin
             cask = CaskLoader.load(cask_token)
-            Installer.new(cask,
-                               force:          force,
-                               skip_cask_deps: skip_cask_deps,
-                               require_sha:    require_sha).install
+            Installer.new(cask, binaries:       CLI.binaries?,
+                                force:          force,
+                                skip_cask_deps: skip_cask_deps,
+                                require_sha:    require_sha).install
             count += 1
           rescue CaskAlreadyInstalledError => e
             opoo e.message
