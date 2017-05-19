@@ -2,9 +2,13 @@ module Hbc
   class CLI
     class Fetch < Base
       def self.run(*args)
-        cask_tokens = cask_tokens_from(args)
+        new(*args).run
+      end
+
+      def run
+        cask_tokens = self.class.cask_tokens_from(@args)
         raise CaskUnspecifiedError if cask_tokens.empty?
-        force = args.include? "--force"
+        force = @args.include? "--force"
 
         cask_tokens.each do |cask_token|
           ohai "Downloading external files for Cask #{cask_token}"
