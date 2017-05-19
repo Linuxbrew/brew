@@ -6,20 +6,24 @@ module Hbc
       end
 
       def self.run(*args)
-        failed_casks = new(args, Auditor).run
-        return if failed_casks.empty?
-        raise CaskError, "audit failed for casks: #{failed_casks.join(" ")}"
+        new(*args).run
       end
 
-      def initialize(args, auditor)
+      def initialize(*args, auditor: Auditor)
         @args = args
         @auditor = auditor
       end
 
       def run
-        casks_to_audit.each_with_object([]) do |cask, failed|
-          failed << cask unless audit(cask)
+        failed_casks = []
+
+        casks_to_audit.each do |cask|
+          next if audit(cask)
+          failed_casks << cask
         end
+
+        return if failed_casks.empty?
+        raise CaskError, "audit failed for casks: #{failed_casks.join(" ")}"
       end
 
       def audit(cask)
