@@ -1,17 +1,26 @@
 module Hbc
   class CLI
     class Home < Base
-      def self.run(*cask_tokens)
-        if cask_tokens.empty?
+      def self.run(*args)
+        new(*args).run
+      end
+
+      def run
+        casks = @args.map(&CaskLoader.public_method(:load))
+
+        if casks.empty?
           odebug "Opening project homepage"
-          system "/usr/bin/open", "--", "https://caskroom.github.io/"
+          self.class.open_url "https://caskroom.github.io/"
         else
-          cask_tokens.each do |cask_token|
-            odebug "Opening homepage for Cask #{cask_token}"
-            cask = CaskLoader.load(cask_token)
-            system "/usr/bin/open", "--", cask.homepage
+          casks.each do |cask|
+            odebug "Opening homepage for Cask #{cask}"
+            self.class.open_url cask.homepage
           end
         end
+      end
+
+      def self.open_url(url)
+        SystemCommand.run!(OS::PATH_OPEN, args: ["--", url])
       end
 
       def self.help
