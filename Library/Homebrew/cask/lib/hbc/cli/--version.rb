@@ -6,7 +6,11 @@ module Hbc
       end
 
       def self.run(*args)
-        raise ArgumentError, "#{command_name} does not take arguments." unless args.empty?
+        new(*args).run
+      end
+
+      def run
+        raise ArgumentError, "#{self.class.command_name} does not take arguments." unless @args.empty?
         puts Hbc.full_version
       end
 
