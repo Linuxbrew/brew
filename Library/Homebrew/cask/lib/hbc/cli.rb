@@ -71,7 +71,6 @@ module Hbc
 
     FLAGS = {
       ["--[no-]binaries", :binaries] => true,
-      ["--debug",         :debug]    => false,
       ["--verbose",       :verbose]  => false,
       ["--outdated",      :outdated] => false,
       ["--help",          :help]     => false,
@@ -158,7 +157,7 @@ module Hbc
       run_command(command, *rest)
     rescue CaskError, CaskSha256MismatchError, ArgumentError => e
       msg = e.message
-      msg << e.backtrace.join("\n") if debug?
+      msg << e.backtrace.join("\n") if ARGV.debug?
       onoe msg
       exit 1
     rescue StandardError, ScriptError, NoMemoryError => e
@@ -239,7 +238,6 @@ module Hbc
 
       # for compat with Homebrew, not certain if this is desirable
       self.verbose = true if ARGV.verbose?
-      self.debug = true if ARGV.debug?
 
       remaining
     end

@@ -12,7 +12,6 @@ module Hbc
       end
 
       def self.dump_casks(*cask_tokens)
-        CLI.debug = true # Yuck. At the moment this is the only way to make dumps visible
         count = 0
         cask_tokens.each do |cask_token|
           begin

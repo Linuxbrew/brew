@@ -120,17 +120,6 @@ describe Hbc::CLI, :cask do
     end
   end
 
-  describe "--debug" do
-    it "sets the Cask debug method to true" do
-      begin
-        Hbc::CLI.process_options %w[help --debug]
-        expect(Hbc::CLI.debug?).to be true
-      ensure
-        Hbc::CLI.debug = false
-      end
-    end
-  end
-
   describe "--help" do
     it "sets the Cask help method to true" do
       begin
