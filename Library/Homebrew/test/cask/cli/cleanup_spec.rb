@@ -1,19 +1,20 @@
 describe Hbc::CLI::Cleanup, :cask do
   let(:cache_location) { Pathname.new(Dir.mktmpdir).realpath }
-  let(:cleanup_outdated) { false }
+  let(:outdated_only) { false }
 
-  subject { described_class.new(cache_location, cleanup_outdated) }
+  subject { described_class.new(*cask_tokens, cache_location: cache_location, outdated_only: outdated_only) }
 
   after do
     cache_location.rmtree
   end
 
   describe "cleanup" do
-    it "removes cached downloads of given casks" do
-      cleaned_up_cached_download = "caffeine"
+    let(:cask_token) { "caffeine" }
+    let(:cask_tokens) { [cask_token] }
 
+    it "removes cached downloads of given casks" do
       cached_downloads = [
-        cache_location.join("#{cleaned_up_cached_download}--latest.zip"),
+        cache_location.join("#{cask_token}--latest.zip"),
         cache_location.join("transmission--2.61.dmg"),
       ]
 
@@ -22,9 +23,9 @@ describe Hbc::CLI::Cleanup, :cask do
       cleanup_size = cached_downloads[0].disk_usage
 
       expect {
-        subject.cleanup(cleaned_up_cached_download)
+        subject.run
       }.to output(<<-EOS.undent).to_stdout
-        ==> Removing cached downloads for #{cleaned_up_cached_download}
+        ==> Removing cached downloads for #{cask_token}
         #{cached_downloads[0]}
         ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
       EOS
@@ -32,61 +33,42 @@ describe Hbc::CLI::Cleanup, :cask do
       expect(cached_downloads[0].exist?).to eq(false)
       expect(cached_downloads[1].exist?).to eq(true)
     end
-  end
 
-  describe "cleanup!" do
-    it "removes cached downloads" do
-      cached_download = cache_location.join("SomeDownload.dmg")
-      FileUtils.touch(cached_download)
-      cleanup_size = subject.disk_cleanup_size
+    context "when no argument is given" do
+      let(:cask_tokens) { [] }
 
-      expect {
-        subject.cleanup!
-      }.to output(<<-EOS.undent).to_stdout
-        ==> Removing cached downloads
-        #{cached_download}
-        ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
-      EOS
-
-      expect(cached_download.exist?).to eq(false)
-    end
-
-    # TODO: uncomment when unflaky.
-    # it "does not removed locked files" do
-    #   cached_download = cache_location.join("SomeDownload.dmg")
-    #   FileUtils.touch(cached_download)
-    #   cleanup_size = subject.disk_cleanup_size
-    #
-    #   File.new(cached_download).flock(File::LOCK_EX)
-    #
-    #   expect(Hbc::Utils).to be_file_locked(cached_download)
-    #
-    #   expect {
-    #     subject.cleanup!
-    #   }.to output(<<-EOS.undent).to_stdout
-    #     ==> Removing cached downloads
-    #     skipping: #{cached_download} is locked
-    #     ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
-    #   EOS
-    #
-    #   expect(cached_download.exist?).to eq(true)
-    # end
-
-    context "when cleanup_outdated is specified" do
-      let(:cleanup_outdated) { true }
-
-      it "does not remove cache files newer than 10 days old" do
-        cached_download = cache_location.join("SomeNewDownload.dmg")
+      it "removes all cached downloads" do
+        cached_download = cache_location.join("SomeDownload.dmg")
         FileUtils.touch(cached_download)
+        cleanup_size = subject.disk_cleanup_size
 
         expect {
-          subject.cleanup!
+          subject.run
         }.to output(<<-EOS.undent).to_stdout
-          ==> Removing cached downloads older than 10 days old
-          Nothing to do
+          ==> Removing cached downloads
+          #{cached_download}
+          ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
         EOS
 
-        expect(cached_download.exist?).to eq(true)
+        expect(cached_download.exist?).to eq(false)
+      end
+
+      context "and :outdated_only is specified" do
+        let(:outdated_only) { true }
+
+        it "does not remove cache files newer than 10 days old" do
+          cached_download = cache_location.join("SomeNewDownload.dmg")
+          FileUtils.touch(cached_download)
+
+          expect {
+            subject.run
+          }.to output(<<-EOS.undent).to_stdout
+            ==> Removing cached downloads older than 10 days old
+            Nothing to do
+          EOS
+
+          expect(cached_download.exist?).to eq(true)
+        end
       end
     end
   end

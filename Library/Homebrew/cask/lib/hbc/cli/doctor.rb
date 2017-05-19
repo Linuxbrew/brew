@@ -107,7 +107,7 @@ module Hbc
       end
 
       def self.render_cached_downloads
-        cleanup = CLI::Cleanup.default
+        cleanup = CLI::Cleanup.new
         count = cleanup.cache_files.count
         size = cleanup.disk_cleanup_size
         msg = user_tilde(Hbc.cache.to_s)

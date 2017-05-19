@@ -13,29 +13,19 @@ module Hbc
       end
 
       def self.run(*args)
-        if args.empty?
-          default.cleanup!
-        else
-          default.cleanup(args)
-        end
-      end
-
-      def self.default
-        @default ||= new(Hbc.cache, CLI.outdated?)
+        new(*args).run
       end
 
       attr_reader :cache_location, :outdated_only
-      def initialize(cache_location, outdated_only)
+
+      def initialize(*args, cache_location: Hbc.cache, outdated_only: CLI.outdated?)
+        @args = args
         @cache_location = Pathname.new(cache_location)
         @outdated_only = outdated_only
       end
 
-      def cleanup!
-        remove_cache_files
-      end
-
-      def cleanup(tokens)
-        remove_cache_files(*tokens)
+      def run
+        remove_cache_files(*@args)
       end
 
       def cache_files
