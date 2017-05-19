@@ -1,51 +1,30 @@
-# monkeypatch for testing
-module Hbc
-  class CLI
-    class Edit
-      def self.exec_editor(*command)
-        editor_commands << command
-      end
-
-      def self.reset!
-        @editor_commands = []
-      end
-
-      def self.editor_commands
-        @editor_commands ||= []
-      end
-    end
-  end
-end
-
 describe Hbc::CLI::Edit, :cask do
   before(:each) do
-    Hbc::CLI::Edit.reset!
+    allow_any_instance_of(described_class).to receive(:exec_editor)
   end
 
   it "opens the editor for the specified Cask" do
-    Hbc::CLI::Edit.run("local-caffeine")
-    expect(Hbc::CLI::Edit.editor_commands).to eq [
-      [Hbc::CaskLoader.path("local-caffeine")],
-    ]
+    command = described_class.new("local-caffeine")
+    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("local-caffeine"))
+    command.run
   end
 
   it "throws away additional arguments and uses the first" do
-    Hbc::CLI::Edit.run("local-caffeine", "local-transmission")
-    expect(Hbc::CLI::Edit.editor_commands).to eq [
-      [Hbc::CaskLoader.path("local-caffeine")],
-    ]
+    command = described_class.new("local-caffeine", "local-transmission")
+    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("local-caffeine"))
+    command.run
   end
 
   it "raises an exception when the Cask doesnt exist" do
     expect {
-      Hbc::CLI::Edit.run("notacask")
+      described_class.run("notacask")
     }.to raise_error(Hbc::CaskUnavailableError)
   end
 
   describe "when no Cask is specified" do
     it "raises an exception" do
       expect {
-        Hbc::CLI::Edit.run
+        described_class.run
       }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end
@@ -53,7 +32,7 @@ describe Hbc::CLI::Edit, :cask do
   describe "when no Cask is specified, but an invalid option" do
     it "raises an exception" do
       expect {
-        Hbc::CLI::Edit.run("--notavalidoption")
+        described_class.run("--notavalidoption")
       }.to raise_error(Hbc::CaskUnspecifiedError)
     end
   end

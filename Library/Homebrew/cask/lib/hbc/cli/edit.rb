@@ -2,7 +2,11 @@ module Hbc
   class CLI
     class Edit < Base
       def self.run(*args)
-        cask_tokens = cask_tokens_from(args)
+        new(*args).run
+      end
+
+      def run
+        cask_tokens = self.class.cask_tokens_from(@args)
         raise CaskUnspecifiedError if cask_tokens.empty?
         # only respects the first argument
         cask_token = cask_tokens.first.sub(/\.rb$/i, "")
