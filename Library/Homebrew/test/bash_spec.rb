@@ -1,20 +1,20 @@
 require "open3"
 
-RSpec::Matchers.define :have_valid_bash_syntax do
-  match do |file|
-    stdout, stderr, status = Open3.capture3("/bin/bash", "-n", file)
-
-    @actual = [file, stderr]
-
-    stdout.empty? && status.success?
-  end
-
-  failure_message do |(file, stderr)|
-    "expected that #{file} is a valid Bash file:\n#{stderr}"
-  end
-end
-
 describe "Bash" do
+  matcher :have_valid_bash_syntax do
+    match do |file|
+      stdout, stderr, status = Open3.capture3("/bin/bash", "-n", file)
+
+      @actual = [file, stderr]
+
+      stdout.empty? && status.success?
+    end
+
+    failure_message do |(file, stderr)|
+      "expected that #{file} is a valid Bash file:\n#{stderr}"
+    end
+  end
+
   context "brew" do
     subject { HOMEBREW_LIBRARY_PATH.parent.parent/"bin/brew" }
     it { is_expected.to have_valid_bash_syntax }

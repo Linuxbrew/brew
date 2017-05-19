@@ -1,8 +1,8 @@
 require "build_environment"
 
-RSpec::Matchers.alias_matcher :use_userpaths, :be_userpaths
-
 describe BuildEnvironment do
+  alias_matcher :use_userpaths, :be_userpaths
+
   let(:env) { described_class.new }
 
   describe "#<<" do
@@ -38,29 +38,29 @@ describe BuildEnvironment do
       expect(env).not_to use_userpaths
     end
   end
-end
 
-describe BuildEnvironmentDSL do
-  subject { double.extend(described_class) }
+  describe BuildEnvironment::DSL do
+    subject { double.extend(described_class) }
 
-  context "single argument" do
-    before(:each) do
-      subject.instance_eval do
-        env :userpaths
+    context "single argument" do
+      before(:each) do
+        subject.instance_eval do
+          env :userpaths
+        end
       end
+
+      its(:env) { is_expected.to use_userpaths }
     end
 
-    its(:env) { is_expected.to use_userpaths }
-  end
-
-  context "multiple arguments" do
-    before(:each) do
-      subject.instance_eval do
-        env :userpaths, :std
+    context "multiple arguments" do
+      before(:each) do
+        subject.instance_eval do
+          env :userpaths, :std
+        end
       end
-    end
 
-    its(:env) { is_expected.to be_std }
-    its(:env) { is_expected.to use_userpaths }
+      its(:env) { is_expected.to be_std }
+      its(:env) { is_expected.to use_userpaths }
+    end
   end
 end

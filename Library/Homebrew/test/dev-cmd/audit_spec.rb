@@ -1,10 +1,6 @@
 require "dev-cmd/audit"
 require "formulary"
 
-RSpec::Matchers.alias_matcher :have_data, :be_data
-RSpec::Matchers.alias_matcher :have_end, :be_end
-RSpec::Matchers.alias_matcher :have_trailing_newline, :be_trailing_newline
-
 module Count
   def self.increment
     @count ||= 0
@@ -13,6 +9,10 @@ module Count
 end
 
 describe FormulaText do
+  alias_matcher :have_data, :be_data
+  alias_matcher :have_end, :be_end
+  alias_matcher :have_trailing_newline, :be_trailing_newline
+
   let(:dir) { mktmpdir }
 
   def formula_text(name, body = nil, options = {})

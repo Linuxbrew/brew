@@ -1,19 +1,19 @@
 require "test/support/fixtures/testball"
 require "formula"
 
-RSpec::Matchers.alias_matcher :follow_installed_alias, :be_follow_installed_alias
-RSpec::Matchers.alias_matcher :have_any_version_installed, :be_any_version_installed
-RSpec::Matchers.alias_matcher :need_migration, :be_migration_needed
-
-RSpec::Matchers.alias_matcher :have_changed_installed_alias_target, :be_installed_alias_target_changed
-RSpec::Matchers.alias_matcher :supersede_an_installed_formula, :be_supersedes_an_installed_formula
-RSpec::Matchers.alias_matcher :have_changed_alias, :be_alias_changed
-
-RSpec::Matchers.alias_matcher :have_option_defined, :be_option_defined
-RSpec::Matchers.alias_matcher :have_test_defined, :be_test_defined
-RSpec::Matchers.alias_matcher :pour_bottle, :be_pour_bottle
-
 describe Formula do
+  alias_matcher :follow_installed_alias, :be_follow_installed_alias
+  alias_matcher :have_any_version_installed, :be_any_version_installed
+  alias_matcher :need_migration, :be_migration_needed
+
+  alias_matcher :have_changed_installed_alias_target, :be_installed_alias_target_changed
+  alias_matcher :supersede_an_installed_formula, :be_supersedes_an_installed_formula
+  alias_matcher :have_changed_alias, :be_alias_changed
+
+  alias_matcher :have_option_defined, :be_option_defined
+  alias_matcher :have_test_defined, :be_test_defined
+  alias_matcher :pour_bottle, :be_pour_bottle
+
   describe "::new" do
     let(:klass) do
       Class.new(described_class) do

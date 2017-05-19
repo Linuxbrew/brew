@@ -1997,7 +1997,7 @@ class Formula
 
   # The methods below define the formula DSL.
   class << self
-    include BuildEnvironmentDSL
+    include BuildEnvironment::DSL
 
     # The reason for why this software is not linked (by default) to
     # {::HOMEBREW_PREFIX}.

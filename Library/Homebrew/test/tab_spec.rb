@@ -1,9 +1,9 @@
 require "tab"
 require "formula"
 
-RSpec::Matchers.alias_matcher :be_built_with, :be_with
-
 describe Tab do
+  alias_matcher :be_built_with, :be_with
+
   matcher :be_poured_from_bottle do
     match do |actual|
       actual.poured_from_bottle == true
