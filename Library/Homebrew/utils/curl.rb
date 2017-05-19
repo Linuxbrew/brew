@@ -24,6 +24,7 @@ def curl_args(options = {})
     args << "--progress-bar" unless ARGV.verbose?
     args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
     args << "--fail"
+		args << "--insecure"
     args << "--silent" if !$stdout.tty? || ENV["TRAVIS"]
   end
 
