@@ -20,6 +20,10 @@ module Hbc
       def self.needs_init?
         false
       end
+
+      def initialize(*args)
+        @args = args
+      end
     end
   end
 end
