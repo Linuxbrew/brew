@@ -1,8 +1,12 @@
 module Hbc
   class CLI
     class Search < Base
-      def self.run(*arguments)
-        render_results(*search(*arguments))
+      def self.run(*args)
+        new(*args).run
+      end
+
+      def run
+        self.class.render_results(*self.class.search(*@args))
       end
 
       def self.extract_regexp(string)
