@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Version < Base
+    class Version < AbstractCommand
       def self.command_name
         "--#{super}"
       end

@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Zap < Base
+    class Zap < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

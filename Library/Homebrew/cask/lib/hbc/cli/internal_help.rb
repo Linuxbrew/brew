@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class InternalHelp < InternalUseBase
+    class InternalHelp < AbstractInternalCommand
       def self.run(*args)
         new(*args).run
       end

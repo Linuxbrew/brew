@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Cat < Base
+    class Cat < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

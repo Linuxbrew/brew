@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class InternalCheckurl < InternalUseBase
+    class InternalCheckurl < AbstractInternalCommand
       def self.run(*args)
         new(*args).run
       end

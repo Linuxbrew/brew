@@ -2,13 +2,9 @@ require "English"
 
 module Hbc
   class CLI
-    class Style < Base
+    class Style < AbstractCommand
       def self.help
         "checks Cask style using RuboCop"
-      end
-
-      def self.run(*args)
-        new(*args).run
       end
 
       attr_reader :args

@@ -1,8 +1,12 @@
 module Hbc
   class CLI
-    class Base
+    class AbstractCommand
       def self.command_name
         @command_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase
+      end
+
+      def self.abstract?
+        !(name.split("::").last !~ /^Abstract[^a-z]/)
       end
 
       def self.visible
@@ -19,6 +23,10 @@ module Hbc
 
       def self.needs_init?
         false
+      end
+
+      def self.run(*args)
+        new(*args).run
       end
 
       def initialize(*args)

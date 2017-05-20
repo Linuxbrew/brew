@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Cleanup < Base
+    class Cleanup < AbstractCommand
       OUTDATED_DAYS = 10
       OUTDATED_TIMESTAMP = Time.now - (60 * 60 * 24 * OUTDATED_DAYS)
 

@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class InternalAuditModifiedCasks < InternalUseBase
+    class InternalAuditModifiedCasks < AbstractInternalCommand
       RELEVANT_STANZAS = [:version, :sha256, :url, :appcast].freeze
 
       def self.needs_init?

@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Edit < Base
+    class Edit < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

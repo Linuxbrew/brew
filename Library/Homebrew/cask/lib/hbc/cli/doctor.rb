@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Doctor < Base
+    class Doctor < AbstractCommand
       def self.run
         ohai "Homebrew-Cask Version", Hbc.full_version
         ohai "Homebrew-Cask Install Location", render_install_location

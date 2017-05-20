@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class InternalAppcastCheckpoint < InternalUseBase
+    class InternalAppcastCheckpoint < AbstractInternalCommand
       def self.run(*args)
         new(*args).run
       end

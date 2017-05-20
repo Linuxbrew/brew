@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Install < Base
+    class Install < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

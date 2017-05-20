@@ -1,10 +1,6 @@
 module Hbc
   class CLI
-    class Home < Base
-      def self.run(*args)
-        new(*args).run
-      end
-
+    class Home < AbstractCommand
       def run
         casks = @args.map(&CaskLoader.public_method(:load))
 

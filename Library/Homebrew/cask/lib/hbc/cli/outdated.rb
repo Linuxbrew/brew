@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Outdated < Base
+    class Outdated < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

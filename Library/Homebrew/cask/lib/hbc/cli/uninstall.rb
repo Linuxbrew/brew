@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Uninstall < Base
+    class Uninstall < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

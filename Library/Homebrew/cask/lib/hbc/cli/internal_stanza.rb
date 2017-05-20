@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class InternalStanza < InternalUseBase
+    class InternalStanza < AbstractInternalCommand
       # Syntax
       #
       #     brew cask _stanza <stanza_name> [ --table | --yaml | --inspect | --quiet ] [ <cask_token> ... ]

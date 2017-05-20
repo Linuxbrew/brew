@@ -3,7 +3,7 @@ require "shellwords"
 
 require "extend/optparse"
 
-require "hbc/cli/base"
+require "hbc/cli/abstract_command"
 require "hbc/cli/audit"
 require "hbc/cli/cat"
 require "hbc/cli/cleanup"
@@ -23,7 +23,7 @@ require "hbc/cli/uninstall"
 require "hbc/cli/--version"
 require "hbc/cli/zap"
 
-require "hbc/cli/internal_use_base"
+require "hbc/cli/abstract_internal_command"
 require "hbc/cli/internal_audit_modified_casks"
 require "hbc/cli/internal_appcast_checkpoint"
 require "hbc/cli/internal_checkurl"
@@ -90,7 +90,8 @@ module Hbc
 
     def self.command_classes
       @command_classes ||= constants.map(&method(:const_get))
-                                    .select { |sym| sym.respond_to?(:run) }
+                                    .select { |klass| klass.respond_to?(:run) }
+                                    .reject(&:abstract?)
                                     .sort_by(&:command_name)
     end
 
@@ -105,7 +106,7 @@ module Hbc
     end
 
     def self.should_init?(command)
-      (command.is_a? Class) && (command < CLI::Base) && command.needs_init?
+      command.is_a?(Class) && !command.abstract? && command.needs_init?
     end
 
     def self.run_command(command, *rest)

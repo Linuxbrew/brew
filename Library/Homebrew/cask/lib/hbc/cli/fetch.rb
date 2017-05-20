@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Fetch < Base
+    class Fetch < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

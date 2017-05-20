@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Search < Base
+    class Search < AbstractCommand
       def self.run(*args)
         new(*args).run
       end

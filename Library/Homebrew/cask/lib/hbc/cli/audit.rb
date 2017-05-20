@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Audit < Base
+    class Audit < AbstractCommand
       def self.help
         "verifies installability of Casks"
       end
