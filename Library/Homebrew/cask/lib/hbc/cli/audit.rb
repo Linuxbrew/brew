@@ -5,10 +5,6 @@ module Hbc
         "verifies installability of Casks"
       end
 
-      def self.run(*args)
-        new(*args).run
-      end
-
       def initialize(*args, auditor: Auditor)
         @args = args
         @auditor = auditor

@@ -1,10 +1,6 @@
 module Hbc
   class CLI
     class Outdated < AbstractCommand
-      def self.run(*args)
-        new(*args).run
-      end
-
       def initialize(*args)
         @cask_tokens = self.class.cask_tokens_from(args)
 

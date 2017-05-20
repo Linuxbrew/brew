@@ -7,10 +7,6 @@ module Hbc
         true
       end
 
-      def self.run(*args)
-        new(*args).run
-      end
-
       def initialize(*args)
         @commit_range = self.class.commit_range(args)
         @cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }

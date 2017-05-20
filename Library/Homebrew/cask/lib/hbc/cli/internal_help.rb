@@ -1,10 +1,6 @@
 module Hbc
   class CLI
     class InternalHelp < AbstractInternalCommand
-      def self.run(*args)
-        new(*args).run
-      end
-
       def run
         max_command_len = CLI.commands.map(&:length).max
         puts "Unstable Internal-use Commands:\n\n"

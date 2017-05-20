@@ -1,10 +1,6 @@
 module Hbc
   class CLI
     class InternalCheckurl < AbstractInternalCommand
-      def self.run(*args)
-        new(*args).run
-      end
-
       def run
         casks_to_check = @args.empty? ? Hbc.all : @args.map { |arg| CaskLoader.load(arg) }
         casks_to_check.each do |cask|

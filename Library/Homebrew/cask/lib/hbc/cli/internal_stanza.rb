@@ -50,10 +50,6 @@ module Hbc
         :uninstall_postflight,
       ]
 
-      def self.run(*args)
-        new(*args).run
-      end
-
       def initialize(*args)
         raise ArgumentError, "No stanza given." if args.empty?
 

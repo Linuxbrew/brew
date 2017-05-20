@@ -1,10 +1,6 @@
 module Hbc
   class CLI
     class Search < AbstractCommand
-      def self.run(*args)
-        new(*args).run
-      end
-
       def run
         self.class.render_results(*self.class.search(*@args))
       end

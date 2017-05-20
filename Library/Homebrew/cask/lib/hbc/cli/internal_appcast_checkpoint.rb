@@ -1,10 +1,6 @@
 module Hbc
   class CLI
     class InternalAppcastCheckpoint < AbstractInternalCommand
-      def self.run(*args)
-        new(*args).run
-      end
-
       def initialize(*args)
         @cask_tokens = cask_tokens_from(args)
         raise CaskUnspecifiedError if cask_tokens.empty?

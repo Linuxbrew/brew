@@ -12,10 +12,6 @@ module Hbc
         true
       end
 
-      def self.run(*args)
-        new(*args).run
-      end
-
       attr_reader :cache_location, :outdated_only
 
       def initialize(*args, cache_location: Hbc.cache, outdated_only: CLI.outdated?)
