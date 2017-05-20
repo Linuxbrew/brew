@@ -12,12 +12,11 @@ module Hbc
         true
       end
 
-      attr_reader :cache_location, :outdated_only
+      attr_reader :cache_location
 
-      def initialize(*args, cache_location: Hbc.cache, outdated_only: CLI.outdated?)
-        @args = args
+      def initialize(*args, cache_location: Hbc.cache)
+        super(*args)
         @cache_location = Pathname.new(cache_location)
-        @outdated_only = outdated_only
       end
 
       def run
@@ -32,7 +31,7 @@ module Hbc
       end
 
       def outdated?(file)
-        outdated_only && file && file.stat.mtime > OUTDATED_TIMESTAMP
+        outdated_only? && file && file.stat.mtime > OUTDATED_TIMESTAMP
       end
 
       def incomplete?(file)
@@ -54,7 +53,7 @@ module Hbc
       def remove_cache_files(*tokens)
         message = "Removing cached downloads"
         message.concat " for #{tokens.join(", ")}" unless tokens.empty?
-        message.concat " older than #{OUTDATED_DAYS} days old" if outdated_only
+        message.concat " older than #{OUTDATED_DAYS} days old" if outdated_only?
         ohai message
 
         deletable_cache_files = if tokens.empty?

@@ -173,7 +173,7 @@ module Hbc
 
         unless executable_path.exist?
           message = "uninstall script #{executable} does not exist"
-          raise CaskError, "#{message}." unless force
+          raise CaskError, "#{message}." unless force?
           opoo "#{message}, skipping."
           return
         end

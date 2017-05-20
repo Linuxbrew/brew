@@ -65,10 +65,19 @@ module Hbc
         {}
       end
 
-      def initialize(cask, command: SystemCommand, force: false)
+      def verbose?
+        @verbose
+      end
+
+      def force?
+        @force
+      end
+
+      def initialize(cask, command: SystemCommand, force: false, verbose: false)
         @cask = cask
         @command = command
         @force = force
+        @verbose = verbose
       end
     end
   end

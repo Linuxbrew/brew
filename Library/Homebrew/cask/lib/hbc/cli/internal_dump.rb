@@ -1,9 +1,9 @@
 module Hbc
   class CLI
     class InternalDump < AbstractInternalCommand
-      def initialize(*args)
-        @cask_tokens = self.class.cask_tokens_from(args)
-        raise CaskUnspecifiedError if @cask_tokens.empty?
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
       end
 
       def run
@@ -16,7 +16,7 @@ module Hbc
 
       def dump_casks
         count = 0
-        @cask_tokens.each do |cask_token|
+        args.each do |cask_token|
           begin
             cask = CaskLoader.load(cask_token)
             count += 1
@@ -25,7 +25,7 @@ module Hbc
             opoo "#{cask_token} was not found or would not load: #{e}"
           end
         end
-        count.zero? ? nil : count == @cask_tokens.length
+        count.zero? ? nil : count == args.length
       end
 
       def self.help

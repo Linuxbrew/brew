@@ -3,15 +3,16 @@ module Hbc
     class Reinstall < Install
       def install_casks
         count = 0
-        @cask_tokens.each do |cask_token|
+        args.each do |cask_token|
           begin
             cask = CaskLoader.load(cask_token)
 
             Installer.new(cask,
-                          binaries:       CLI.binaries?,
-                          force:          @force,
-                          skip_cask_deps: @skip_cask_deps,
-                          require_sha:    @require_sha).reinstall
+                          binaries:       binaries?,
+                          verbose: verbose?,
+                          force:          force?,
+                          skip_cask_deps: skip_cask_deps?,
+                          require_sha:    require_sha?).reinstall
 
             count += 1
           rescue CaskUnavailableError => e
@@ -22,7 +23,7 @@ module Hbc
           end
         end
 
-        count.zero? ? nil : count == @cask_tokens.length
+        count.zero? ? nil : count == args.length
       end
 
       def self.help

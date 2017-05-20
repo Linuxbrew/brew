@@ -1,23 +1,20 @@
 module Hbc
   class CLI
     class Outdated < AbstractCommand
-      def initialize(*args)
-        @cask_tokens = self.class.cask_tokens_from(args)
+      option "--greedy", :greedy, false
+      option "--quiet",  :quiet, false
 
-        @greedy  = args.include?("--greedy")
-        @verbose = ($stdout.tty? || CLI.verbose?) && !args.include?("--quiet")
+      def initialize(*)
+        super
+        self.verbose = ($stdout.tty? || verbose?) && !quiet?
       end
 
       def run
-        casks_to_check = if @cask_tokens.empty?
-          Hbc.installed
-        else
-          @cask_tokens.map(&CaskLoader.public_method(:load))
-        end
+        casks_to_check = args.empty? ? Hbc.installed : args.map(&CaskLoader.public_method(:load))
 
         casks_to_check.each do |cask|
           odebug "Checking update info of Cask #{cask}"
-          self.class.list_if_outdated(cask, @greedy, @verbose)
+          self.class.list_if_outdated(cask, greedy?, verbose?)
         end
       end
 

@@ -2,7 +2,7 @@ module Hbc
   class CLI
     class Home < AbstractCommand
       def run
-        casks = @args.map(&CaskLoader.public_method(:load))
+        casks = args.map(&CaskLoader.public_method(:load))
 
         if casks.empty?
           odebug "Opening project homepage"

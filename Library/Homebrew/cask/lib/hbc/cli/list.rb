@@ -1,20 +1,18 @@
 module Hbc
   class CLI
     class List < AbstractCommand
-      def initialize(*args)
-        @cask_tokens = self.class.cask_tokens_from(args)
-        @one = true if args.delete("-1")
-        @versions = true if args.delete("--versions")
+      option "-1", :one, false
+      option "--versions", :versions, false
 
-        return unless args.delete("-l")
-        @one = true
+      option "-l", (lambda do |*|
+        one = true # rubocop:disable Lint/UselessAssignment
         opoo "Option -l is obsolete! Implying option -1."
-      end
+      end)
 
       def run
-        retval = @cask_tokens.any? ? list : list_installed
+        retval = args.any? ? list : list_installed
         # retval is ternary: true/false/nil
-        if retval.nil? && !@cask_tokens.any?
+        if retval.nil? && !args.any?
           opoo "nothing to list" # special case: avoid exit code
         elsif retval.nil?
           raise CaskError, "nothing to list"
@@ -26,15 +24,15 @@ module Hbc
       def list
         count = 0
 
-        @cask_tokens.each do |cask_token|
+        args.each do |cask_token|
           odebug "Listing files for Cask #{cask_token}"
           begin
             cask = CaskLoader.load(cask_token)
 
             if cask.installed?
-              if @one
+              if one?
                 puts cask.token
-              elsif @versions
+              elsif versions?
                 puts self.class.format_versioned(cask)
               else
                 cask = CaskLoader.load_from_file(cask.installed_caskfile)
@@ -50,7 +48,7 @@ module Hbc
           end
         end
 
-        count.zero? ? nil : count == @cask_tokens.length
+        count.zero? ? nil : count == args.length
       end
 
       def self.list_artifacts(cask)
@@ -63,9 +61,9 @@ module Hbc
       def list_installed
         installed_casks = Hbc.installed
 
-        if @one
+        if one?
           puts installed_casks.map(&:to_s)
-        elsif @versions
+        elsif versions?
           puts installed_casks.map(&self.class.method(:format_versioned))
         elsif !installed_casks.empty?
           puts Formatter.columns(installed_casks.map(&:to_s))

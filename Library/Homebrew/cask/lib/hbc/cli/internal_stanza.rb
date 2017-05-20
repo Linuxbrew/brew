@@ -50,51 +50,60 @@ module Hbc
         :uninstall_postflight,
       ]
 
-      def initialize(*args)
+      option "--table",   :table,   false
+      option "--quiet",   :quiet,   false
+      option "--yaml",    :yaml,    false
+      option "--inspect", :inspect, false
+
+      attr_accessor :format
+      private :format, :format=
+
+      attr_accessor :stanza
+      private :stanza, :stanza=
+
+      def initialize(*)
+        super
         raise ArgumentError, "No stanza given." if args.empty?
 
-        @table = args.include? "--table"
-        @quiet = args.include? "--quiet"
-        @format = :to_yaml if args.include? "--yaml"
-        @format = :inspect if args.include? "--inspect"
-        @cask_tokens = self.class.cask_tokens_from(args)
-        @stanza = @cask_tokens.shift.to_sym
-        @cask_tokens = Hbc.all_tokens if @cask_tokens.empty?
+        @stanza = args.shift.to_sym
+
+        @format = :to_yaml if yaml?
+        @format = :inspect if inspect?
       end
 
       def run
         retval = print_stanzas
-
         # retval is ternary: true/false/nil
         if retval.nil?
-          exit 1 if @quiet
+          exit 1 if quiet?
           raise CaskError, "nothing to print"
         elsif !retval
-          exit 1 if @quiet
+          exit 1 if quiet?
           raise CaskError, "print incomplete"
         end
       end
 
       def print_stanzas
         count = 0
-        if ARTIFACTS.include?(@stanza)
-          artifact_name = @stanza
+        if ARTIFACTS.include?(stanza)
+          artifact_name = stanza
           @stanza = :artifacts
         end
 
-        @cask_tokens.each do |cask_token|
-          print "#{cask_token}\t" if @table
+        cask_tokens = args.empty? ? Hbc.all_tokens : args
+        cask_tokens.each do |cask_token|
+          print "#{cask_token}\t" if table?
 
           begin
             cask = CaskLoader.load(cask_token)
           rescue StandardError
-            opoo "Cask '#{cask_token}' was not found" unless @quiet
+            opoo "Cask '#{cask_token}' was not found" unless quiet?
             puts ""
             next
           end
 
-          unless cask.respond_to?(@stanza)
-            opoo "no such stanza '#{@stanza}' on Cask '#{cask_token}'" unless @quiet
+          unless cask.respond_to?(stanza)
+            opoo "no such stanza '#{stanza}' on Cask '#{cask_token}'" unless quiet?
             puts ""
             next
           end
@@ -102,13 +111,13 @@ module Hbc
           begin
             value = cask.send(@stanza)
           rescue StandardError
-            opoo "failure calling '#{@stanza}' on Cask '#{cask_token}'" unless @quiet
+            opoo "failure calling '#{stanza}' on Cask '#{cask_token}'" unless quiet?
             puts ""
             next
           end
 
           if artifact_name && !value.key?(artifact_name)
-            opoo "no such stanza '#{artifact_name}' on Cask '#{cask_token}'" unless @quiet
+            opoo "no such stanza '#{artifact_name}' on Cask '#{cask_token}'" unless quiet?
             puts ""
             next
           end
@@ -125,7 +134,7 @@ module Hbc
 
           count += 1
         end
-        count.zero? ? nil : count == @cask_tokens.length
+        count.zero? ? nil : count == cask_tokens.length
       end
 
       def self.help

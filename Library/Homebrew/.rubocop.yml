@@ -34,6 +34,9 @@ Metrics/ModuleLength:
     - 'cask/lib/hbc/macos.rb'
     - 'cask/lib/hbc/utils.rb'
 
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
 # so many of these in formulae but none in here
 Style/GuardClause:
   Enabled: true

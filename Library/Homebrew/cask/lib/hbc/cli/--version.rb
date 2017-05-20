@@ -5,8 +5,13 @@ module Hbc
         "--#{super}"
       end
 
+      def initialize(*)
+        super
+        return if args.empty?
+        raise ArgumentError, "#{self.class.command_name} does not take arguments."
+      end
+
       def run
-        raise ArgumentError, "#{self.class.command_name} does not take arguments." unless @args.empty?
         puts Hbc.full_version
       end
 

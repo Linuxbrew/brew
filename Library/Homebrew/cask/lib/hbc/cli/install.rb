@@ -1,12 +1,13 @@
 module Hbc
   class CLI
     class Install < AbstractCommand
-      def initialize(*args)
-        @cask_tokens = self.class.cask_tokens_from(args)
-        raise CaskUnspecifiedError if @cask_tokens.empty?
-        @force = args.include? "--force"
-        @skip_cask_deps = args.include? "--skip-cask-deps"
-        @require_sha = args.include? "--require-sha"
+      option "--force",          :force,          false
+      option "--skip-cask-deps", :skip_cask_deps, false
+      option "--require-sha",    :require_sha,    false
+
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
       end
 
       def run
@@ -19,13 +20,14 @@ module Hbc
 
       def install_casks
         count = 0
-        @cask_tokens.each do |cask_token|
+        args.each do |cask_token|
           begin
             cask = CaskLoader.load(cask_token)
-            Installer.new(cask, binaries:       CLI.binaries?,
-                                force:          @force,
-                                skip_cask_deps: @skip_cask_deps,
-                                require_sha:    @require_sha).install
+            Installer.new(cask, binaries:       binaries?,
+            verbose: verbose?,
+                                force:          force?,
+                                skip_cask_deps: skip_cask_deps?,
+                                require_sha:    require_sha?).install
             count += 1
           rescue CaskAlreadyInstalledError => e
             opoo e.message
@@ -43,7 +45,7 @@ module Hbc
           end
         end
 
-        count.zero? ? nil : count == @cask_tokens.length
+        count.zero? ? nil : count == args.length
       end
 
       def self.warn_unavailable_with_suggestion(cask_token, e)

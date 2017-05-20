@@ -1,17 +1,18 @@
 module Hbc
   class CLI
     class InternalAppcastCheckpoint < AbstractInternalCommand
-      def initialize(*args)
-        @cask_tokens = cask_tokens_from(args)
-        raise CaskUnspecifiedError if cask_tokens.empty?
-        @calculate = args.include? "--calculate"
+      option "--calculate", :calculate, false
+
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
       end
 
       def run
-        if @cask_tokens.all? { |t| t =~ %r{^https?://} && t !~ /\.rb$/ }
+        if cask_tokens.all? { |t| t =~ %r{^https?://} && t !~ /\.rb$/ }
           self.class.appcask_checkpoint_for_url(cask_tokens)
         else
-          self.class.appcask_checkpoint(@cask_tokens, @calculate)
+          self.class.appcask_checkpoint(cask_tokens, calculate?)
         end
       end
 

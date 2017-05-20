@@ -7,15 +7,7 @@ module Hbc
         "checks Cask style using RuboCop"
       end
 
-      attr_reader :args
-      def initialize(*args)
-        @cask_tokens = self.class.cask_tokens_from(args)
-        @fix = args.any? { |arg| arg =~ /^--(fix|(auto-?)?correct)$/ }
-      end
-
-      def fix?
-        @fix
-      end
+      option "--fix", :fix, false
 
       def run
         install_rubocop
@@ -35,12 +27,12 @@ module Hbc
       end
 
       def cask_paths
-        @cask_paths ||= if @cask_tokens.empty?
+        @cask_paths ||= if args.empty?
           Hbc.all_tapped_cask_dirs
-        elsif @cask_tokens.any? { |file| File.exist?(file) }
-          @cask_tokens
+        elsif args.any? { |file| File.exist?(file) }
+          args
         else
-          @cask_tokens.map { |token| CaskLoader.path(token) }
+          args.map { |token| CaskLoader.path(token) }
         end
       end
 

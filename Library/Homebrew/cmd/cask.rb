@@ -5,6 +5,6 @@ module Homebrew
   module_function
 
   def cask
-    Hbc::CLI.process(ARGV)
+    Hbc::CLI.run(*ARGV)
   end
 end

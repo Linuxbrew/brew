@@ -3,23 +3,27 @@ module Hbc
     class InternalAuditModifiedCasks < AbstractInternalCommand
       RELEVANT_STANZAS = [:version, :sha256, :url, :appcast].freeze
 
+      option "--cleanup", :cleanup, false
+
       def self.needs_init?
         true
       end
 
-      def initialize(*args)
-        @commit_range = self.class.commit_range(args)
-        @cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }
-      end
+      attr_accessor :commit_range
+      private :commit_range=
 
-      def self.commit_range(args)
-        posargs = args.reject { |a| a.empty? || a.chars.first == "-" }
-        odie usage unless posargs.size == 1
-        posargs.first
-      end
+      def initialize(*)
+        super
 
-      def self.posargs(args)
-        args.reject { |a| a.empty? || a.chars.first == "-" }
+        if args.count != 1
+          raise ArgumentError, <<-EOS.undent
+            This command requires exactly one argument.
+
+            #{self.class.usage}
+          EOS
+        end
+
+        @commit_range = args.first
       end
 
       def self.help
@@ -38,12 +42,6 @@ module Hbc
             -c, --cleanup
               Remove all cached downloads. Use with care.
         EOS
-      end
-
-      attr_reader :commit_range
-
-      def cleanup?
-        @cleanup
       end
 
       def run

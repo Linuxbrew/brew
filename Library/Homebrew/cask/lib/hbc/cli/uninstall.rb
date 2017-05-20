@@ -1,25 +1,26 @@
 module Hbc
   class CLI
     class Uninstall < AbstractCommand
-      def initialize(*args)
-        @cask_tokens = self.class.cask_tokens_from(args)
-        raise CaskUnspecifiedError if @cask_tokens.empty?
-        @force = args.include? "--force"
+      option "--force", :force, false
+
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
       end
 
       def run
-        @cask_tokens.each do |cask_token|
+        args.each do |cask_token|
           odebug "Uninstalling Cask #{cask_token}"
           cask = CaskLoader.load(cask_token)
 
-          raise CaskNotInstalledError, cask unless cask.installed? || @force
+          raise CaskNotInstalledError, cask unless cask.installed? || force?
 
           if cask.installed? && !cask.installed_caskfile.nil?
             # use the same cask file that was used for installation, if possible
             cask = CaskLoader.load_from_file(cask.installed_caskfile) if cask.installed_caskfile.exist?
           end
 
-          Installer.new(cask, binaries: CLI.binaries?, force: @force).uninstall
+          Installer.new(cask, binaries: binaries?, verbose: verbose?, force: force?).uninstall
 
           next if (versions = cask.versions).empty?
 

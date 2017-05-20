@@ -1,8 +1,13 @@
 module Hbc
   class CLI
     class Search < AbstractCommand
+      def initialize(*args)
+        @args = args
+      end
+
       def run
-        self.class.render_results(*self.class.search(*@args))
+        results = self.class.search(*args)
+        self.class.render_results(*results)
       end
 
       def self.extract_regexp(string)
