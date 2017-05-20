@@ -8,9 +8,12 @@ module Hbc
       end
 
       def self.run(*args)
-        commit_range = commit_range(args)
-        cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }
-        new(commit_range, cleanup: cleanup).run
+        new(*args).run
+      end
+
+      def initialize(*args)
+        @commit_range = self.class.commit_range(args)
+        @cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }
       end
 
       def self.commit_range(args)
@@ -39,11 +42,6 @@ module Hbc
             -c, --cleanup
               Remove all cached downloads. Use with care.
         EOS
-      end
-
-      def initialize(commit_range, cleanup: false)
-        @commit_range = commit_range
-        @cleanup = cleanup
       end
 
       attr_reader :commit_range
