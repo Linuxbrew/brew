@@ -1,9 +1,8 @@
 # Please always follow these steps:
-- [ ] Confirmed this is a problem with Homebrew/brew and not one or more formulae? If it's a formulae-specific problem please file this issue at https://github.com/Homebrew/homebrew-core/issues/new
+- [ ] Confirmed this is a problem with Linuxbrew/brew and not one or more formulae? If it's a formulae-specific problem please file this issue at https://github.com/Linuxbrew/homebrew-core/issues/new
 - [ ] Ran `brew update` and retried your prior step?
 - [ ] Ran `brew doctor`, fixed as many issues as possible and retried your prior step?
 - [ ] Ran `brew config` and `brew doctor` and included their output with your issue?
-- [ ] Confirmed this is a problem with Linuxbrew/brew and not specific formulae? If it's a formulae-specific problem please file this issue at https://github.com/Linuxbrew/homebrew-core/issues/new
 
 To help us debug your issue please explain:
 - What you were trying to do (and why)
