@@ -2,27 +2,34 @@ module Hbc
   class CLI
     class Install < Base
       def self.run(*args)
-        cask_tokens = cask_tokens_from(args)
-        raise CaskUnspecifiedError if cask_tokens.empty?
-        force = args.include? "--force"
-        skip_cask_deps = args.include? "--skip-cask-deps"
-        require_sha = args.include? "--require-sha"
-        retval = install_casks cask_tokens, force, skip_cask_deps, require_sha
+        new(*args).run
+      end
+
+      def initialize(*args)
+        @cask_tokens = self.class.cask_tokens_from(args)
+        raise CaskUnspecifiedError if @cask_tokens.empty?
+        @force = args.include? "--force"
+        @skip_cask_deps = args.include? "--skip-cask-deps"
+        @require_sha = args.include? "--require-sha"
+      end
+
+      def run
+        retval = install_casks
         # retval is ternary: true/false/nil
 
         raise CaskError, "nothing to install" if retval.nil?
         raise CaskError, "install incomplete" unless retval
       end
 
-      def self.install_casks(cask_tokens, force, skip_cask_deps, require_sha)
+      def install_casks
         count = 0
-        cask_tokens.each do |cask_token|
+        @cask_tokens.each do |cask_token|
           begin
             cask = CaskLoader.load(cask_token)
             Installer.new(cask, binaries:       CLI.binaries?,
-                                force:          force,
-                                skip_cask_deps: skip_cask_deps,
-                                require_sha:    require_sha).install
+                                force:          @force,
+                                skip_cask_deps: @skip_cask_deps,
+                                require_sha:    @require_sha).install
             count += 1
           rescue CaskAlreadyInstalledError => e
             opoo e.message
@@ -31,7 +38,7 @@ module Hbc
             opoo e.message
             count += 1
           rescue CaskUnavailableError => e
-            warn_unavailable_with_suggestion cask_token, e
+            self.class.warn_unavailable_with_suggestion cask_token, e
           rescue CaskNoShasumError => e
             opoo e.message
             count += 1
@@ -39,7 +46,8 @@ module Hbc
             onoe e.message
           end
         end
-        count.zero? ? nil : count == cask_tokens.length
+
+        count.zero? ? nil : count == @cask_tokens.length
       end
 
       def self.warn_unavailable_with_suggestion(cask_token, e)
