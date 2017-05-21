@@ -1553,11 +1553,11 @@ class Formula
   def missing_dependencies(hide: nil)
     hide ||= []
     missing_dependencies = recursive_dependencies do |dependent, dep|
-      if dep.optional? || dep.recommended?
+      if dep.build?
+        Dependency.prune
+      elsif dep.optional? || dep.recommended?
         tab = Tab.for_formula(dependent)
         Dependency.prune unless tab.with?(dep)
-      elsif dep.build?
-        Dependency.prune
       end
     end
 
