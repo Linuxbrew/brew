@@ -77,7 +77,7 @@ describe Hbc::CLI::Style, :cask do
     subject { cli.cask_paths }
 
     before do
-      allow(described_class).to receive(:cask_tokens_from).and_return(tokens)
+      allow(cli).to receive(:args).and_return(tokens)
     end
 
     context "when no cask tokens are given" do
@@ -145,35 +145,6 @@ describe Hbc::CLI::Style, :cask do
     it "should add --auto-correct to default args" do
       allow(cli).to receive(:default_args).and_return(default_args)
       expect(subject).to include("--auto-correct", *default_args)
-    end
-  end
-
-  describe "#fix?" do
-    subject { cli.fix? }
-
-    context "when --fix is passed as an argument" do
-      let(:args) { ["adium", "--fix"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when --correct is passed as an argument" do
-      let(:args) { ["adium", "--correct"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when --auto-correct is passed as an argument" do
-      let(:args) { ["adium", "--auto-correct"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when --auto-correct is misspelled as --autocorrect" do
-      let(:args) { ["adium", "--autocorrect"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when no flag equivalent to --fix is passed as an argument" do
-      let(:args) { ["adium"] }
-      it { is_expected.to be_falsey }
     end
   end
 end

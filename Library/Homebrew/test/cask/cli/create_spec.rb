@@ -36,16 +36,10 @@ describe Hbc::CLI::Create, :cask do
     EOS
   end
 
-  it "throws away additional Cask arguments and uses the first" do
-    command = described_class.new("additional-cask", "another-cask")
-    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("additional-cask"))
-    command.run
-  end
-
-  it "throws away stray options" do
-    command = described_class.new("--notavalidoption", "yet-another-cask")
-    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("yet-another-cask"))
-    command.run
+  it "raises an exception when more than one Cask is given" do
+    expect {
+      described_class.run("additional-cask", "another-cask")
+    }.to raise_error(/Only one Cask can be created at a time./)
   end
 
   it "raises an exception when the Cask already exists" do
@@ -68,11 +62,17 @@ describe Hbc::CLI::Create, :cask do
     end
   end
 
-  describe "when no Cask is specified, but an invalid option" do
-    it "raises an exception" do
+  context "when an invalid option is specified" do
+    it "raises an exception when no Cask is specified" do
       expect {
         described_class.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
+    end
+
+    it "raises an exception" do
+      expect {
+        described_class.run("--notavalidoption", "yet-another-cask")
+      }.to raise_error(/invalid option/)
     end
   end
 end

@@ -9,10 +9,10 @@ describe Hbc::CLI::Edit, :cask do
     command.run
   end
 
-  it "throws away additional arguments and uses the first" do
-    command = described_class.new("local-caffeine", "local-transmission")
-    expect(command).to receive(:exec_editor).with(Hbc::CaskLoader.path("local-caffeine"))
-    command.run
+  it "raises an error when given more than one argument" do
+    expect {
+      described_class.new("local-caffeine", "local-transmission")
+    }.to raise_error(/Only one Cask can be created at a time./)
   end
 
   it "raises an exception when the Cask doesnt exist" do
@@ -33,7 +33,7 @@ describe Hbc::CLI::Edit, :cask do
     it "raises an exception" do
       expect {
         described_class.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

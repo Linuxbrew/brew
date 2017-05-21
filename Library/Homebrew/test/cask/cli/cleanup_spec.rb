@@ -2,7 +2,11 @@ describe Hbc::CLI::Cleanup, :cask do
   let(:cache_location) { Pathname.new(Dir.mktmpdir).realpath }
   let(:outdated_only) { false }
 
-  subject { described_class.new(*cask_tokens, cache_location: cache_location, outdated_only: outdated_only) }
+  subject { described_class.new(*cask_tokens, cache_location: cache_location) }
+
+  before(:each) do
+    allow_any_instance_of(described_class).to receive(:outdated_only?).and_return(outdated_only)
+  end
 
   after do
     cache_location.rmtree

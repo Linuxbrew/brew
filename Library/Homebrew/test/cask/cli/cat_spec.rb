@@ -1,6 +1,6 @@
 describe Hbc::CLI::Cat, :cask do
   describe "given a basic Cask" do
-    let(:expected_output) {
+    let(:basic_cask_content) {
       <<-EOS.undent
         cask 'basic-cask' do
           version '1.2.3'
@@ -17,19 +17,19 @@ describe Hbc::CLI::Cat, :cask do
     it "displays the Cask file content about the specified Cask" do
       expect {
         Hbc::CLI::Cat.run("basic-cask")
-      }.to output(expected_output).to_stdout
+      }.to output(basic_cask_content).to_stdout
     end
 
-    it "throws away additional Cask arguments and uses the first" do
+    it "can display multiple Casks" do
       expect {
-        Hbc::CLI::Cat.run("basic-cask", "local-caffeine")
-      }.to output(expected_output).to_stdout
+        Hbc::CLI::Cat.run("basic-cask", "basic-cask")
+      }.to output(basic_cask_content * 2).to_stdout
     end
 
-    it "throws away stray options" do
+    it "fails when option is unknown" do
       expect {
         Hbc::CLI::Cat.run("--notavalidoption", "basic-cask")
-      }.to output(expected_output).to_stdout
+      }.to raise_error(/invalid option/)
     end
   end
 
@@ -51,7 +51,7 @@ describe Hbc::CLI::Cat, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Cat.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end
