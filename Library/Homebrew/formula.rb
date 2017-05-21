@@ -1673,11 +1673,13 @@ class Formula
     old_temp = ENV["TEMP"]
     old_tmp = ENV["TMP"]
     old_term = ENV["TERM"]
-    old_path = ENV["HOMEBREW_PATH"]
+    old_path = ENV["PATH"]
+    old_homebrew_path = ENV["HOMEBREW_PATH"]
 
     ENV["CURL_HOME"] = old_curl_home || old_home
     ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
     ENV["TERM"] = "dumb"
+    ENV["PATH"] = PATH.new(old_path).append(HOMEBREW_PREFIX/"bin")
     ENV["HOMEBREW_PATH"] = nil
 
     ENV.clear_sensitive_environment!
@@ -1704,7 +1706,8 @@ class Formula
     ENV["TEMP"] = old_temp
     ENV["TMP"] = old_tmp
     ENV["TERM"] = old_term
-    ENV["HOMEBREW_PATH"] = old_path
+    ENV["PATH"] = old_path
+    ENV["HOMEBREW_PATH"] = old_homebrew_path
     @prefix_returns_versioned_prefix = false
   end
 
