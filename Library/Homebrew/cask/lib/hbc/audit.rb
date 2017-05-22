@@ -1,16 +1,18 @@
 require "hbc/checkable"
 require "hbc/download"
 require "digest"
+require "utils/git"
 
 module Hbc
   class Audit
     include Checkable
 
-    attr_reader :cask, :download
+    attr_reader :cask, :commit_range, :download
 
-    def initialize(cask, download: false, check_token_conflicts: false, command: SystemCommand)
+    def initialize(cask, download: false, check_token_conflicts: false, commit_range: nil, command: SystemCommand)
       @cask = cask
       @download = download
+      @commit_range = commit_range
       @check_token_conflicts = check_token_conflicts
       @command = command
     end
@@ -21,6 +23,7 @@ module Hbc
 
     def run!
       check_required_stanzas
+      check_version_and_checksum
       check_version
       check_sha256
       check_appcast
@@ -55,6 +58,24 @@ module Hbc
       # TODO: nested_container should not still be a pseudo-artifact at this point
       installable_artifacts = cask.artifacts.reject { |k| [:uninstall, :zap, :nested_container].include?(k) }
       add_error "at least one activatable artifact stanza is required" if installable_artifacts.empty?
+    end
+
+    def check_version_and_checksum
+      return if @cask.sourcefile_path.nil?
+
+      tap = Tap.select { |t| t.cask_file?(@cask.sourcefile_path) }.first
+      return if tap.nil?
+
+      return if commit_range.nil?
+      previous_cask_contents = Git.last_revision_of_file(tap.path, @cask.sourcefile_path, before_commit: commit_range)
+      return if previous_cask_contents.empty?
+
+      previous_cask = CaskLoader.load_from_string(previous_cask_contents)
+
+      return unless previous_cask.version == cask.version
+      return if previous_cask.sha256 == cask.sha256
+
+      add_error "only sha256 changed (see: https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
     end
 
     def check_version

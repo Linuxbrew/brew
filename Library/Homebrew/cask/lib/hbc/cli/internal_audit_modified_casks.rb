@@ -97,7 +97,8 @@ module Hbc
         audit_download = audit_download?(cask, cask_file)
         check_token_conflicts = added_cask_files.include?(cask_file)
         success = Auditor.audit(cask, audit_download:        audit_download,
-                                      check_token_conflicts: check_token_conflicts)
+                                      check_token_conflicts: check_token_conflicts,
+                                      commit_range: commit_range)
         failed_casks << cask unless success
       end
 

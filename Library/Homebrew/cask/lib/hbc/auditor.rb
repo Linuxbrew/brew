@@ -1,14 +1,15 @@
 module Hbc
   class Auditor
-    def self.audit(cask, audit_download: false, check_token_conflicts: false)
-      new(cask, audit_download, check_token_conflicts).audit
+    def self.audit(cask, audit_download: false, check_token_conflicts: false, commit_range: nil)
+      new(cask, audit_download, check_token_conflicts, commit_range).audit
     end
 
-    attr_reader :cask
+    attr_reader :cask, :commit_range
 
-    def initialize(cask, audit_download, check_token_conflicts)
+    def initialize(cask, audit_download, check_token_conflicts, commit_range)
       @cask = cask
       @audit_download = audit_download
+      @commit_range = commit_range
       @check_token_conflicts = check_token_conflicts
     end
 
@@ -50,7 +51,8 @@ module Hbc
     def audit_cask_instance(cask)
       download = audit_download? && Download.new(cask)
       audit = Audit.new(cask, download:              download,
-                              check_token_conflicts: check_token_conflicts?)
+                              check_token_conflicts: check_token_conflicts?,
+                              commit_range: commit_range)
       audit.run!
       puts audit.summary
       audit.success?
