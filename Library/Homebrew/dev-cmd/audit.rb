@@ -1148,11 +1148,6 @@ class FormulaAuditor
     problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
   end
 
-  def audit_caveats
-    return unless formula.caveats.to_s.include?("setuid")
-    problem "Don't recommend setuid in the caveats, suggest sudo instead."
-  end
-
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
