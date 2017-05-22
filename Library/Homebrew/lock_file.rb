@@ -1,9 +1,9 @@
 require "fcntl"
 
-class FormulaLock
+class LockFile
   def initialize(name)
     @name = name
-    @path = HOMEBREW_LOCK_DIR/"#{@name}.brewing"
+    @path = HOMEBREW_LOCK_DIR/"#{@name}.lock"
     @lockfile = nil
   end
 
@@ -33,5 +33,17 @@ class FormulaLock
     return unless @lockfile.nil? || @lockfile.closed?
     @lockfile = @path.open(File::RDWR | File::CREAT)
     @lockfile.fcntl(Fcntl::F_SETFD, Fcntl::FD_CLOEXEC)
+  end
+end
+
+class FormulaLock < LockFile
+  def initialize(name)
+    super("#{name}.formula")
+  end
+end
+
+class CaskLock < LockFile
+  def initialize(name)
+    super("#{name}.cask")
   end
 end
