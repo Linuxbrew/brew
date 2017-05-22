@@ -75,7 +75,7 @@ module Hbc
       return unless previous_cask.version == cask.version
       return if previous_cask.sha256 == cask.sha256
 
-      add_error "only sha256 changed; needs to be confirmed by the developer"
+      add_error "only sha256 changed (see: https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
     end
 
     def check_version

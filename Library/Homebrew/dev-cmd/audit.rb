@@ -752,7 +752,7 @@ class FormulaAuditor
       next unless spec = formula.send(spec_sym)
       next unless previous_version_and_checksum[spec_sym][:version] == spec.version
       next if previous_version_and_checksum[spec_sym][:checksum] == spec.checksum
-      problem "#{spec_sym}: only sha256 changed; needs to be confirmed by the developer"
+      problem "#{spec_sym}: sha256 changed without the version also changing; please create an issue upstream to rule out malicious circumstances and to find out why the file changed."
     end
 
     attributes = [:revision, :version_scheme]
