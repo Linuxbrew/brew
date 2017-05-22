@@ -2,7 +2,7 @@ require "fcntl"
 
 class LockFile
   def initialize(name)
-    @name = name
+    @name = name.to_s
     @path = HOMEBREW_LOCK_DIR/"#{@name}.lock"
     @lockfile = nil
   end
