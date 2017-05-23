@@ -36,7 +36,7 @@ class FormulaVersions
 
     begin
       Homebrew.raise_deprecation_exceptions = true
-      nostdout { yield Formulary.from_contents(name, path, contents) }
+      yield nostdout { Formulary.from_contents(name, path, contents) }
     rescue *IGNORED_EXCEPTIONS => e
       # We rescue these so that we can skip bad versions and
       # continue walking the history
@@ -72,9 +72,9 @@ class FormulaVersions
           next unless spec = f.send(spec_sym)
           map[spec_sym] ||= { version: spec.version, checksum: spec.checksum }
         end
-
-        break if map[:stable] && map[:devel]
       end
+
+      break if map[:stable] || map[:devel]
     end
 
     map[:stable] ||= {}
