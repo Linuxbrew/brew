@@ -87,12 +87,12 @@ names, and other aspects of this manual are still subject to change.
     given Cask.
     
   * `outdated` [--greedy] [--verbose|--quiet] [ <token> ...]:
-    Without token arguments, display all the installed Casks that have newer 
-    versions available in the tap; otherwise check only the tokens given 
+    Without token arguments, display all the installed Casks that have newer
+    versions available in the tap; otherwise check only the tokens given
     in the command line.
-    If `--greedy` is given then also include in the output the Casks having 
+    If `--greedy` is given then also include in the output the Casks having
     `auto_updates true` or `version :latest`. Otherwise they are skipped
-    because there is no reliable way to know when updates are available for 
+    because there is no reliable way to know when updates are available for
     them.<br>
     `--verbose` forces the display of the outdated and latest version.<br>
     `--quiet` suppresses the display of versions.
@@ -256,6 +256,12 @@ Environment variables specific to Homebrew-Cask:
     For example, you might add to your .bash_profile or .zshenv something like:
 
                export HOMEBREW_CASK_OPTS='--appdir=/Applications --caskroom=/etc/Caskroom'
+
+Other environment variables:
+           
+  * `SUDO_ASKPASS`:
+    When this variable is set, Homebrew-Cask will call `sudo`(8) with the `-A` option.
+
 
 ## SEE ALSO
 
