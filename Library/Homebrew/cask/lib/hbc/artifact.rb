@@ -25,10 +25,17 @@ require "hbc/artifact/zap"
 
 module Hbc
   module Artifact
-    # NOTE: order is important here, since we want to extract nested containers
-    #       before we handle any other artifacts
+    # NOTE: Order is important here!
+    #
+    # The `uninstall` stanza should be run first, as it may
+    # depend on other artifacts still being installed.
+    #
+    # We want to extract nested containers before we
+    # handle any other artifacts.
+    #
     TYPES = [
       PreflightBlock,
+      Uninstall,
       NestedContainer,
       Installer,
       App,
@@ -49,7 +56,6 @@ module Hbc
       VstPlugin,
       Vst3Plugin,
       ScreenSaver,
-      Uninstall,
       PostflightBlock,
       Zap,
     ].freeze
