@@ -22,10 +22,6 @@ module Hbc
         true
       end
 
-      def self.cask_tokens_from(args)
-        args.reject { |a| a.empty? || a.chars.first == "-" }
-      end
-
       def self.help
         nil
       end
