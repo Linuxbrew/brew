@@ -358,10 +358,6 @@ module Hbc
       odebug "Un-installing artifacts"
       artifacts = Artifact.for_cask(@cask, command: @command, verbose: verbose?, force: force?)
 
-      # Make sure the `uninstall` stanza is run first, as it
-      # may depend on other artifacts still being installed.
-      artifacts = artifacts.sort_by { |a| a.is_a?(Artifact::Uninstall) ? -1 : 1 }
-
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
