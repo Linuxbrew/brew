@@ -155,7 +155,10 @@ Homebrew's current maintainers are [Alyssa Ross](https://github.com/alyssais), [
 
 Former maintainers with significant contributions include [Xu Cheng](https://github.com/xu-cheng), [Martin Afanasjew](https://github.com/UniqMartin), [Dominyk Tiller](https://github.com/DomT4), [Brett Koonce](https://github.com/asparagui), [Charlie Sharpsteen](https://github.com/Sharpie), [Jack Nagel](https://github.com/jacknagel), [Adam Vandenberg](https://github.com/adamv) and Homebrew's creator: [Max Howell](https://github.com/mxcl).
 
-## Community
+## Linuxbrew Community
+- [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)
+
+## Homebrew for macOS Community
 - [discourse.brew.sh (forum)](https://discourse.brew.sh)
 - [freenode.net\#machomebrew (IRC)](irc://irc.freenode.net/#machomebrew)
 - [@MacHomebrew (Twitter)](https://twitter.com/MacHomebrew)
