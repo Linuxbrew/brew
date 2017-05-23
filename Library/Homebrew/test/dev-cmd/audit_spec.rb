@@ -385,57 +385,6 @@ describe FormulaAuditor do
     end
   end
 
-  describe "#audit_text" do
-    specify "xcodebuild suggests symroot" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
-
-          def install
-            xcodebuild "-project", "meow.xcodeproject"
-          end
-        end
-      EOS
-
-      fa.audit_text
-      expect(fa.problems.first)
-        .to match('xcodebuild should be passed an explicit "SYMROOT"')
-    end
-
-    specify "bare xcodebuild also suggests symroot" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
-
-          def install
-            xcodebuild
-          end
-        end
-      EOS
-
-      fa.audit_text
-      expect(fa.problems.first)
-        .to match('xcodebuild should be passed an explicit "SYMROOT"')
-    end
-
-    specify "disallow go get usage" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo <Formula
-          url "http://example.com/foo-1.0.tgz"
-
-          def install
-            system "go", "get", "bar"
-          end
-        end
-      EOS
-      fa.audit_text
-      expect(fa.problems.first)
-        .to match("Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s.")
-    end
-  end
-
   describe "#audit_revision_and_version_scheme" do
     let(:origin_tap_path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-foo" }
     let(:formula_subpath) { "Formula/foo#{@foo_version}.rb" }
