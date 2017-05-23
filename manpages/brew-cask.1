@@ -161,10 +161,6 @@ Skip Cask dependencies when installing\.
 Abort Cask installation if the Cask does not have a checksum defined\.
 .
 .TP
-\fB\-\-caskroom=<path>\fR
-Set location of the Caskroom, where all binaries are stored\. The default value is \fB$(brew \-\-prefix)/Caskroom\fR\.
-.
-.TP
 \fB\-\-verbose\fR
 Give additional feedback during installation\.
 .
@@ -290,7 +286,7 @@ This variable may contain any arguments normally used as options on the command\
 .
 .nf
 
-       export HOMEBREW_CASK_OPTS=\'\-\-appdir=/Applications \-\-caskroom=/etc/Caskroom\'
+       export HOMEBREW_CASK_OPTS=\'\-\-appdir=~/Applications \-\-fontdir=/Library/Fonts\'
 .
 .fi
 .

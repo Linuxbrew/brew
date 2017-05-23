@@ -49,7 +49,6 @@ module Hbc
 
     include Options
 
-    option "--caskroom=PATH",             ->(value) { Hbc.caskroom             = value }
     option "--appdir=PATH",               ->(value) { Hbc.appdir               = value }
     option "--colorpickerdir=PATH",       ->(value) { Hbc.colorpickerdir       = value }
     option "--prefpanedir=PATH",          ->(value) { Hbc.prefpanedir          = value }
