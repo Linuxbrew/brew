@@ -74,8 +74,6 @@ module Hbc
     end
 
     def dumpcask
-      return unless CLI.debug?
-
       odebug "Cask instance dumps in YAML:"
       odebug "Cask instance toplevel:", to_yaml
       [

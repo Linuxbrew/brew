@@ -1,19 +1,18 @@
 module Hbc
   class CLI
-    class List < Base
-      def self.run(*arguments)
-        @options = {}
-        @options[:one] = true if arguments.delete("-1")
-        @options[:versions] = true if arguments.delete("--versions")
+    class List < AbstractCommand
+      option "-1", :one, false
+      option "--versions", :versions, false
 
-        if arguments.delete("-l")
-          @options[:one] = true
-          opoo "Option -l is obsolete! Implying option -1."
-        end
+      option "-l", (lambda do |*|
+        one = true # rubocop:disable Lint/UselessAssignment
+        opoo "Option -l is obsolete! Implying option -1."
+      end)
 
-        retval = arguments.any? ? list(*arguments) : list_installed
+      def run
+        retval = args.any? ? list : list_installed
         # retval is ternary: true/false/nil
-        if retval.nil? && !arguments.any?
+        if retval.nil? && !args.any?
           opoo "nothing to list" # special case: avoid exit code
         elsif retval.nil?
           raise CaskError, "nothing to list"
@@ -22,22 +21,22 @@ module Hbc
         end
       end
 
-      def self.list(*cask_tokens)
+      def list
         count = 0
 
-        cask_tokens.each do |cask_token|
+        args.each do |cask_token|
           odebug "Listing files for Cask #{cask_token}"
           begin
             cask = CaskLoader.load(cask_token)
 
             if cask.installed?
-              if @options[:one]
+              if one?
                 puts cask.token
-              elsif @options[:versions]
-                puts format_versioned(cask)
+              elsif versions?
+                puts self.class.format_versioned(cask)
               else
                 cask = CaskLoader.load_from_file(cask.installed_caskfile)
-                list_artifacts(cask)
+                self.class.list_artifacts(cask)
               end
 
               count += 1
@@ -49,7 +48,7 @@ module Hbc
           end
         end
 
-        count.zero? ? nil : count == cask_tokens.length
+        count.zero? ? nil : count == args.length
       end
 
       def self.list_artifacts(cask)
@@ -59,13 +58,13 @@ module Hbc
         end
       end
 
-      def self.list_installed
+      def list_installed
         installed_casks = Hbc.installed
 
-        if @options[:one]
+        if one?
           puts installed_casks.map(&:to_s)
-        elsif @options[:versions]
-          puts installed_casks.map(&method(:format_versioned))
+        elsif versions?
+          puts installed_casks.map(&self.class.method(:format_versioned))
         elsif !installed_casks.empty?
           puts Formatter.columns(installed_casks.map(&:to_s))
         end

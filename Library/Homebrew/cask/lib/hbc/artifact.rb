@@ -54,12 +54,12 @@ module Hbc
       Zap,
     ].freeze
 
-    def self.for_cask(cask, command: SystemCommand, force: false)
+    def self.for_cask(cask, options = {})
       odebug "Determining which artifacts are present in Cask #{cask}"
 
       TYPES
         .select { |klass| klass.me?(cask) }
-        .map { |klass| klass.new(cask, command: command, force: force) }
+        .map { |klass| klass.new(cask, options) }
     end
   end
 end

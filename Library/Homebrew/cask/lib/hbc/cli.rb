@@ -2,8 +2,9 @@ require "optparse"
 require "shellwords"
 
 require "extend/optparse"
+require "hbc/cli/options"
 
-require "hbc/cli/base"
+require "hbc/cli/abstract_command"
 require "hbc/cli/audit"
 require "hbc/cli/cat"
 require "hbc/cli/cleanup"
@@ -23,7 +24,7 @@ require "hbc/cli/uninstall"
 require "hbc/cli/--version"
 require "hbc/cli/zap"
 
-require "hbc/cli/internal_use_base"
+require "hbc/cli/abstract_internal_command"
 require "hbc/cli/internal_audit_modified_casks"
 require "hbc/cli/internal_appcast_checkpoint"
 require "hbc/cli/internal_checkurl"
@@ -44,54 +45,41 @@ module Hbc
       "remove"   => "uninstall",
       "abv"      => "info",
       "dr"       => "doctor",
-      # aliases from Homebrew that we don't (yet) support
-      # 'ln'          => 'link',
-      # 'configure'   => 'diy',
-      # '--repo'      => '--repository',
-      # 'environment' => '--env',
-      # '-c1'         => '--config',
     }.freeze
 
-    OPTIONS = {
-      "--caskroom="             => :caskroom=,
-      "--appdir="               => :appdir=,
-      "--colorpickerdir="       => :colorpickerdir=,
-      "--prefpanedir="          => :prefpanedir=,
-      "--qlplugindir="          => :qlplugindir=,
-      "--dictionarydir="        => :dictionarydir=,
-      "--fontdir="              => :fontdir=,
-      "--servicedir="           => :servicedir=,
-      "--input_methoddir="      => :input_methoddir=,
-      "--internet_plugindir="   => :internet_plugindir=,
-      "--audio_unit_plugindir=" => :audio_unit_plugindir=,
-      "--vst_plugindir="        => :vst_plugindir=,
-      "--vst3_plugindir="       => :vst3_plugindir=,
-      "--screen_saverdir="      => :screen_saverdir=,
-    }.freeze
+    include Options
 
-    FLAGS = {
-      ["--[no-]binaries", :binaries] => true,
-      ["--debug",         :debug]    => false,
-      ["--verbose",       :verbose]  => false,
-      ["--outdated",      :outdated] => false,
-      ["--help",          :help]     => false,
-    }.freeze
+    option "--caskroom=PATH",             ->(value) { Hbc.caskroom             = value }
+    option "--appdir=PATH",               ->(value) { Hbc.appdir               = value }
+    option "--colorpickerdir=PATH",       ->(value) { Hbc.colorpickerdir       = value }
+    option "--prefpanedir=PATH",          ->(value) { Hbc.prefpanedir          = value }
+    option "--qlplugindir=PATH",          ->(value) { Hbc.qlplugindir          = value }
+    option "--dictionarydir=PATH",        ->(value) { Hbc.dictionarydir        = value }
+    option "--fontdir=PATH",              ->(value) { Hbc.fontdir              = value }
+    option "--servicedir=PATH",           ->(value) { Hbc.servicedir           = value }
+    option "--input_methoddir=PATH",      ->(value) { Hbc.input_methoddir      = value }
+    option "--internet_plugindir=PATH",   ->(value) { Hbc.internet_plugindir   = value }
+    option "--audio_unit_plugindir=PATH", ->(value) { Hbc.audio_unit_plugindir = value }
+    option "--vst_plugindir=PATH",        ->(value) { Hbc.vst_plugindir        = value }
+    option "--vst3_plugindir=PATH",       ->(value) { Hbc.vst3_plugindir       = value }
+    option "--screen_saverdir=PATH",      ->(value) { Hbc.screen_saverdir      = value }
+    option "--binarydir=PATH",            ->(*) { opoo(<<-EOS.undent) }
+      Option --binarydir is obsolete!
+      Homebrew-Cask now uses the same location as your Homebrew installation for executable links.
+    EOS
 
-    FLAGS.each do |(_, method), default_value|
-      instance_variable_set(:"@#{method}", default_value)
+    option "--help", :help, false
 
-      define_singleton_method(:"#{method}=") do |arg|
-        instance_variable_set(:"@#{method}", arg)
-      end
+    # handled in OS::Mac
+    option "--language a,b,c", ->(*) { raise OptionParser::InvalidOption }
 
-      define_singleton_method(:"#{method}?") do
-        instance_variable_get(:"@#{method}")
-      end
-    end
+    # override default handling of --version
+    option "--version", ->(*) { raise OptionParser::InvalidOption }
 
     def self.command_classes
       @command_classes ||= constants.map(&method(:const_get))
-                                    .select { |sym| sym.respond_to?(:run) }
+                                    .select { |klass| klass.respond_to?(:run) }
+                                    .reject(&:abstract?)
                                     .sort_by(&:command_name)
     end
 
@@ -99,14 +87,14 @@ module Hbc
       @commands ||= command_classes.map(&:command_name)
     end
 
-    def self.lookup_command(command_string)
+    def self.lookup_command(command_name)
       @lookup ||= Hash[commands.zip(command_classes)]
-      command_string = ALIASES.fetch(command_string, command_string)
-      @lookup.fetch(command_string, command_string)
+      command_name = ALIASES.fetch(command_name, command_name)
+      @lookup.fetch(command_name, command_name)
     end
 
     def self.should_init?(command)
-      (command.is_a? Class) && (command < CLI::Base) && command.needs_init?
+      command.is_a?(Class) && !command.abstract? && command.needs_init?
     end
 
     def self.run_command(command, *rest)
@@ -145,20 +133,28 @@ module Hbc
       end
     end
 
-    def self.process(arguments)
+    def self.run(*args)
+      new(*args).run
+    end
+
+    def initialize(*args)
+      @args = process_options(*args)
+    end
+
+    def run
+      command_name, *args = *@args
+      command = help? ? "help" : self.class.lookup_command(command_name)
+
       unless ENV["MACOS_VERSION"].nil?
         MacOS.full_version = ENV["MACOS_VERSION"]
       end
 
-      command_string, *rest = *arguments
-      rest = process_options(rest)
-      command = help? ? "help" : lookup_command(command_string)
       Hbc.default_tap.install unless Hbc.default_tap.installed?
-      Hbc.init if should_init?(command)
-      run_command(command, *rest)
-    rescue CaskError, CaskSha256MismatchError, ArgumentError => e
+      Hbc.init if self.class.should_init?(command)
+      self.class.run_command(command, *args)
+    rescue CaskError, CaskSha256MismatchError, ArgumentError, OptionParser::InvalidOption => e
       msg = e.message
-      msg << e.backtrace.join("\n") if debug?
+      msg << e.backtrace.join("\n") if ARGV.debug?
       onoe msg
       exit 1
     rescue StandardError, ScriptError, NoMemoryError => e
@@ -188,60 +184,25 @@ module Hbc
       list.sort
     end
 
-    def self.parser
-      # If you modify these arguments, please update USAGE.md
-      @parser ||= OptionParser.new do |opts|
-        opts.on("--language STRING") do
-          # handled in OS::Mac
-        end
-
-        OPTIONS.each do |option, method|
-          opts.on("#{option}" "PATH", Pathname) do |path|
-            Hbc.public_send(method, path)
-          end
-        end
-
-        opts.on("--binarydir=PATH") do
-          opoo <<-EOS.undent
-            Option --binarydir is obsolete!
-            Homebrew-Cask now uses the same location as your Homebrew installation for executable links.
-          EOS
-        end
-
-        FLAGS.keys.each do |flag, method|
-          opts.on(flag) do |bool|
-            send(:"#{method}=", bool)
-          end
-        end
-
-        opts.on("--version") do
-          raise OptionParser::InvalidOption # override default handling of --version
-        end
-      end
-    end
-
-    def self.process_options(args)
+    def process_options(*args)
       all_args = Shellwords.shellsplit(ENV["HOMEBREW_CASK_OPTS"] || "") + args
-      remaining = []
-      until all_args.empty?
+
+      non_options = []
+
+      if idx = all_args.index("--")
+        non_options += all_args.drop(idx)
+        all_args = all_args.first(idx)
+      end
+
+      remaining = all_args.select do |arg|
         begin
-          head = all_args.shift
-          remaining.concat(parser.parse([head]))
-        rescue OptionParser::InvalidOption
-          remaining << head
-          retry
-        rescue OptionParser::MissingArgument
-          raise ArgumentError, "The option '#{head}' requires an argument."
-        rescue OptionParser::AmbiguousOption
-          raise ArgumentError, "There is more than one possible option that starts with '#{head}'."
+          !process_arguments([arg]).empty?
+        rescue OptionParser::InvalidOption, OptionParser::MissingArgument, OptionParser::AmbiguousOption
+          true
         end
       end
 
-      # for compat with Homebrew, not certain if this is desirable
-      self.verbose = true if ARGV.verbose?
-      self.debug = true if ARGV.debug?
-
-      remaining
+      remaining + non_options
     end
 
     class NullCommand

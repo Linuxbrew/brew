@@ -13,7 +13,7 @@ describe Hbc::CLI, :cask do
                           ])
   end
 
-  context ".process" do
+  context "::run" do
     let(:noop_command) { double("CLI::Noop") }
 
     before do
@@ -30,37 +30,35 @@ describe Hbc::CLI, :cask do
       version_command = double("CLI::Version")
       allow(described_class).to receive(:lookup_command).with("--version").and_return(version_command)
       expect(described_class).to receive(:run_command).with(version_command)
-      described_class.process(["--version"])
+      described_class.run("--version")
     end
 
     it "prints help output when subcommand receives `--help` flag" do
-      begin
-        expect(described_class).to receive(:run_command).with("help")
-        described_class.process(%w[noop --help])
-        expect(Hbc::CLI.help?).to eq(true)
-      ensure
-        Hbc::CLI.help = false
-      end
+      command = Hbc::CLI.new("noop", "--help")
+      expect(described_class).to receive(:run_command).with("help")
+      command.run
+      expect(command.help?).to eq(true)
     end
 
     it "respects the env variable when choosing what appdir to create" do
       allow(ENV).to receive(:[])
       allow(ENV).to receive(:[]).with("HOMEBREW_CASK_OPTS").and_return("--appdir=/custom/appdir")
       expect(Hbc).to receive(:appdir=).with(Pathname.new("/custom/appdir"))
-      described_class.process("noop")
+      described_class.run("noop")
     end
 
     it "respects the env variable when choosing a non-default Caskroom location" do
       allow(ENV).to receive(:[])
       allow(ENV).to receive(:[]).with("HOMEBREW_CASK_OPTS").and_return("--caskroom=/custom/caskdir")
       expect(Hbc).to receive(:caskroom=).with(Pathname.new("/custom/caskdir"))
-      described_class.process("noop")
+      described_class.run("noop")
     end
 
     it "exits with a status of 1 when something goes wrong" do
       allow(described_class).to receive(:lookup_command).and_raise(Hbc::CaskError)
-      expect(described_class).to receive(:exit).with(1)
-      described_class.process("noop")
+      command = Hbc::CLI.new("noop")
+      expect(command).to receive(:exit).with(1)
+      command.run
     end
   end
 

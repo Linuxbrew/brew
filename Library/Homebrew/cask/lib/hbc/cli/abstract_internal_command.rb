@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class InternalUseBase < Base
+    class AbstractInternalCommand < AbstractCommand
       def self.command_name
         super.sub(/^internal_/i, "_")
       end

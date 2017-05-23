@@ -45,7 +45,7 @@ describe Hbc::CLI::Info, :cask do
     it "throws away stray options" do
       expect {
         Hbc::CLI::Info.run("--notavalidoption", "local-caffeine", "local-transmission")
-      }.to output(expected_output).to_stdout
+      }.to raise_error(/invalid option/)
     end
   end
 
@@ -102,7 +102,7 @@ describe Hbc::CLI::Info, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Info.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

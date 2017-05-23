@@ -1,14 +1,17 @@
 module Hbc
   class CLI
-    class Info < Base
-      def self.run(*args)
-        cask_tokens = cask_tokens_from(args)
-        raise CaskUnspecifiedError if cask_tokens.empty?
-        cask_tokens.each do |cask_token|
+    class Info < AbstractCommand
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
+      end
+
+      def run
+        args.each do |cask_token|
           odebug "Getting info for Cask #{cask_token}"
           cask = CaskLoader.load(cask_token)
 
-          info(cask)
+          self.class.info(cask)
         end
       end
 
