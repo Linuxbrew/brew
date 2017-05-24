@@ -49,7 +49,6 @@ module Hbc
 
     include Options
 
-    option "--caskroom=PATH",             ->(value) { Hbc.caskroom             = value }
     option "--appdir=PATH",               ->(value) { Hbc.appdir               = value }
     option "--colorpickerdir=PATH",       ->(value) { Hbc.colorpickerdir       = value }
     option "--prefpanedir=PATH",          ->(value) { Hbc.prefpanedir          = value }
@@ -63,10 +62,6 @@ module Hbc
     option "--vst_plugindir=PATH",        ->(value) { Hbc.vst_plugindir        = value }
     option "--vst3_plugindir=PATH",       ->(value) { Hbc.vst3_plugindir       = value }
     option "--screen_saverdir=PATH",      ->(value) { Hbc.screen_saverdir      = value }
-    option "--binarydir=PATH",            ->(*) { opoo(<<-EOS.undent) }
-      Option --binarydir is obsolete!
-      Homebrew-Cask now uses the same location as your Homebrew installation for executable links.
-    EOS
 
     option "--help", :help, false
 

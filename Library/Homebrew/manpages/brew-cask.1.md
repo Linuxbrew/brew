@@ -160,9 +160,6 @@ in a future version.
   *  `--require-sha`:
     Abort Cask installation if the Cask does not have a checksum defined.
 
-  * `--caskroom=<path>`:
-    Set location of the Caskroom, where all binaries are stored. The default value is `$(brew --prefix)/Caskroom`.
-
   * `--verbose`:
     Give additional feedback during installation.
 
@@ -255,7 +252,7 @@ Environment variables specific to Homebrew-Cask:
     the command-line. This is particularly useful to make options persistent.
     For example, you might add to your .bash_profile or .zshenv something like:
 
-               export HOMEBREW_CASK_OPTS='--appdir=/Applications --caskroom=/etc/Caskroom'
+               export HOMEBREW_CASK_OPTS='--appdir=~/Applications --fontdir=/Library/Fonts'
 
 Other environment variables:
            
