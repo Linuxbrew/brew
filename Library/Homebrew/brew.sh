@@ -145,7 +145,7 @@ export HOMEBREW_MACOS_VERSION
 export HOMEBREW_USER_AGENT
 export HOMEBREW_USER_AGENT_CURL
 
-if [[ -n "$HOMEBREW_MACOS" ]]
+if [[ -n "$HOMEBREW_MACOS" && -x "/usr/bin/xcode-select" ]]
 then
   XCODE_SELECT_PATH=$('/usr/bin/xcode-select' --print-path 2>/dev/null)
   if [[ "$XCODE_SELECT_PATH" = "/" ]]

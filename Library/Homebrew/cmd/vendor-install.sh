@@ -39,10 +39,10 @@ fetch() {
 
   if [[ -n "$HOMEBREW_QUIET" ]]
   then
-    curl_args+=(--silent)
+    curl_args[${#curl_args[*]}]="--silent"
   elif [[ -z "$HOMEBREW_VERBOSE" ]]
   then
-    curl_args+=(--progress-bar)
+    curl_args[${#curl_args[*]}]="--progress-bar"
   fi
 
   temporary_path="$CACHED_LOCATION.incomplete"
@@ -76,10 +76,10 @@ fetch() {
     trap - SIGINT
   fi
 
-  if [[ -n "$(which shasum)" ]]
+  if [[ -x "$(which shasum)" ]]
   then
     sha="$(shasum -a 256 "$CACHED_LOCATION" | cut -d' ' -f1)"
-  elif [[ -n "$(which sha256sum)" ]]
+  elif [[ -x "$(which sha256sum)" ]]
   then
     sha="$(sha256sum "$CACHED_LOCATION" | cut -d' ' -f1)"
   else
