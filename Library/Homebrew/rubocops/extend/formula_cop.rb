@@ -102,14 +102,11 @@ module RuboCop
 
       # Returns nil if does not depend on dependency_name
       # args: node - dependency_name - dependency's name
-      def depends_on?(dependency_name)
+      def depends_on?(dependency_name, *types)
+        types = [:required, :build, :optional, :recommended, :run] if types.empty?
         dependency_nodes = find_every_method_call_by_name(@body, :depends_on)
         idx = dependency_nodes.index do |n|
-          depends_on_name_type?(n, dependency_name, :required) ||
-            depends_on_name_type?(n, dependency_name, :build) ||
-            depends_on_name_type?(n, dependency_name, :optional) ||
-            depends_on_name_type?(n, dependency_name, :recommended) ||
-            depends_on_name_type?(n, dependency_name, :run)
+          types.any? { |type| depends_on_name_type?(n, dependency_name, type) }
         end
         return if idx.nil?
         @offense_source_range = dependency_nodes[idx].source_range
@@ -138,6 +135,8 @@ module RuboCop
           if type_match && !name_match
             name_match = node_equals?(node.method_args.first.keys.first.children.first, name)
           end
+        else
+          type_match = false
         end
 
         if type_match || name_match
@@ -334,11 +333,13 @@ module RuboCop
       def string_content(node)
         case node.type
         when :str
-          return node.str_content if node.type == :str
+          node.str_content
         when :dstr
-          return node.each_child_node(:str).map(&:str_content).join("") if node.type == :dstr
+          node.each_child_node(:str).map(&:str_content).join("")
         when :const
-          return node.const_name if node.type == :const
+          node.const_name
+        when :sym
+          node.children.first.to_s
         else
           ""
         end

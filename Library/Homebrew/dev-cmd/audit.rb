@@ -555,10 +555,6 @@ class FormulaAuditor
 
   def audit_options
     formula.options.each do |o|
-      if o.name == "32-bit"
-        problem "macOS has been 64-bit only since 10.6 so 32-bit options are deprecated."
-      end
-
       next unless @strict
 
       if o.name == "universal"
