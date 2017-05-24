@@ -13,6 +13,13 @@ describe Hbc::CLI, :cask do
                           ])
   end
 
+  context "when no option is specified" do
+    it "--binaries is true by default" do
+      command = Hbc::CLI::Install.new("some-cask")
+      expect(command.binaries?).to be true
+    end
+  end
+
   context "::run" do
     let(:noop_command) { double("CLI::Noop") }
 

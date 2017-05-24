@@ -24,10 +24,12 @@ module Hbc
 
           if [true, false].include?(default_value)
             define_method(:"#{method}?") do
+              return default_value unless instance_variable_defined?(:"@#{method}")
               instance_variable_get(:"@#{method}") == true
             end
           else
             define_method(:"#{method}") do
+              return default_value unless instance_variable_defined?(:"@#{method}")
               instance_variable_get(:"@#{method}")
             end
           end
