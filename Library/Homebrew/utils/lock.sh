@@ -42,13 +42,13 @@ _create_lock() {
   [[ -x "$ruby" ]] || ruby="$(which ruby 2>/dev/null)"
   [[ -x "$python" ]] || python="$(which python 2>/dev/null)"
 
-  if [[ -n "$ruby" && $("$ruby" -e "puts RUBY_VERSION >= '1.8.7' ? 0 : 1") = 0 ]]
+  if [[ -x "$ruby" && $("$ruby" -e "puts RUBY_VERSION >= '1.8.7' ? 0 : 1") = 0 ]]
   then
     "$ruby" -e "File.new($lock_fd).flock(File::LOCK_EX | File::LOCK_NB) || exit(1)"
-  elif [[ -n "$(which flock)" ]]
+  elif [[ -x "$(which flock)" ]]
   then
     flock -n "$lock_fd"
-  elif [[ -n "$python" ]]
+  elif [[ -x "$python" ]]
   then
     "$python" -c "import fcntl; fcntl.flock($lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)"
   else
