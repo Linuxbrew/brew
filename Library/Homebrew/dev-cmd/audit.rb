@@ -817,16 +817,6 @@ class FormulaAuditor
     end
   end
 
-  def audit_legacy_patches
-    return unless formula.respond_to?(:patches)
-    legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
-
-    return if legacy_patches.empty?
-
-    problem "Use the patch DSL instead of defining a 'patches' method"
-    legacy_patches.each { |p| patch_problems(p) }
-  end
-
   def patch_problems(patch)
     case patch.url
     when /raw\.github\.com/, %r{gist\.github\.com/raw}, %r{gist\.github\.com/.+/raw},
