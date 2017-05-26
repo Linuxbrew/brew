@@ -11,20 +11,28 @@ Features, usage and installation instructions are [summarised on the homepage](h
 
 To receive updates of major changes to Linuxbrew subscribe to the [Linuxbrew Updates](https://github.com/Linuxbrew/brew/issues/1) issue on GitHub.
 
-Install Linuxbrew (tl;dr)
--------------------------
+## Install Linuxbrew
+
+The installation script installs Linuxbrew to `/home/linuxbrew/.linuxbrew` if possible and in your home directory at `~/.linuxbrew` otherwise.
 
 Paste at a Terminal prompt:
 
 ```sh
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
-PATH="$HOME/.linuxbrew/bin:$PATH"
 ```
 
-Edit your `~/.bash_profile` to add `~/.linuxbrew/bin` to your `PATH`:
+Follow the *Next steps* instructions to add Linuxbrew to your `PATH` and to your `~/.bash_profile`.
 
-```sh
+If you installed Linuxbrew in your home directory:
+```
+PATH="$HOME/.linuxbrew/bin:$PATH"
 echo 'export PATH="$HOME/.linuxbrew/bin:$PATH"' >>~/.bash_profile
+```
+
+If you installed Linuxbrew in `/home/linuxbrew/.linuxbrew`:
+```
+PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' >>~/.bash_profile
 ```
 
 You're done! Try installing a package:
@@ -33,9 +41,9 @@ You're done! Try installing a package:
 brew install hello
 ```
 
-Use `brew doctor` to troubleshoot common issues.
+If you're using an older distribution of Linux, installing your first package will also install a recent version of `gcc`.
 
-See [Dependencies](#dependencies) and [Installation](#installation) below for more details.
+Use `brew doctor` to troubleshoot common issues.
 
 Features
 --------
@@ -78,36 +86,19 @@ Bottles are Linuxbrew's precompiled binary packages. Linuxbrew bottles work on a
 
 `export HOMEBREW_BUILD_FROM_SOURCE=1`
 
-Installation
-------------
+## Alternative Installation
 
-Paste at a Terminal prompt:
-
-```sh
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
-```
-
-Or if you prefer:
+Extract (or `git clone`) Linuxbrew wherever you want. Use `/home/linuxbrew/.linuxbrew` if possible.
 
 ```sh
 git clone https://github.com/Linuxbrew/brew.git ~/.linuxbrew
 ```
 
-Add to your `.bashrc` or `.zshrc`:
-
 ```sh
-export PATH="$HOME/.linuxbrew/bin:$PATH"
-export MANPATH="$HOME/.linuxbrew/share/man:$MANPATH"
-export INFOPATH="$HOME/.linuxbrew/share/info:$INFOPATH"
+PATH="$HOME/.linuxbrew/bin:$PATH"
+export MANPATH="$(brew --prefix)/share/man:$MANPATH"
+export INFOPATH="$(brew --prefix)/share/info:$INFOPATH"
 ```
-
-You're done! Try installing a package:
-
-```sh
-brew install hello
-```
-
-If you're using an older distribution of Linux, installing your first package will also install a recent version of `gcc`.
 
 ## Update Bug
 If Homebrew was updated on Aug 10-11th 2016 and `brew update` always says `Already up-to-date.` you need to run:
