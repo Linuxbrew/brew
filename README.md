@@ -23,16 +23,16 @@ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master
 
 Follow the *Next steps* instructions to add Linuxbrew to your `PATH` and to your `~/.bash_profile`.
 
+If you installed Linuxbrew in `/home/linuxbrew/.linuxbrew` (recommended):
+```
+PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' >>~/.bash_profile
+```
+
 If you installed Linuxbrew in your home directory:
 ```
 PATH="$HOME/.linuxbrew/bin:$PATH"
 echo 'export PATH="$HOME/.linuxbrew/bin:$PATH"' >>~/.bash_profile
-```
-
-If you installed Linuxbrew in `/home/linuxbrew/.linuxbrew`:
-```
-PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' >>~/.bash_profile
 ```
 
 You're done! Try installing a package:
