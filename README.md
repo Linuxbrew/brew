@@ -1,7 +1,7 @@
 ![Linuxbrew logo](http://linuxbrew.sh/images/linuxbrew-256x256.png)
 
 # Linuxbrew
-[![GitHub release](https://img.shields.io/github/release/Linuxbrew/brew.svg)](https://github.com/Linuxbrew/brew/releases)
+[![GitHub release](https://img.shields.io/github/tag/Linuxbrew/brew.svg)](https://github.com/Linuxbrew/brew/releases)
 
 [Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux.
 
