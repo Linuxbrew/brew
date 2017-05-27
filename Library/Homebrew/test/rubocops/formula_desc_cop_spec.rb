@@ -120,7 +120,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
       source = <<-EOS.undent
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
-          desc 'Foo'
+          desc 'Foo: foobar'
         end
       EOS
 

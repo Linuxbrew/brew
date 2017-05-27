@@ -40,7 +40,7 @@ module RuboCop
           end
 
           # Check if formula's name is used in formula's desc
-          problem "Description shouldn't include the formula name" if regex_match_group(desc, /^#{@formula_name}/i)
+          problem "Description shouldn't include the formula name" if regex_match_group(desc, /^#{@formula_name}\b/i)
         end
       end
     end
