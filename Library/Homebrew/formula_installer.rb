@@ -218,7 +218,7 @@ class FormulaInstaller
     # relink the active keg if possible (because it is slow).
     if formula.linked_keg.directory?
       message = <<-EOS.undent
-        #{formula.name} #{formula.linked_keg.resolved_path.basename} is already installed
+        #{formula.name} #{formula.linked_version} is already installed
       EOS
       message += if formula.outdated? && !formula.head?
         <<-EOS.undent
