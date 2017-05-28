@@ -415,23 +415,6 @@ module Homebrew
         EOS
       end
 
-      def check_homebrew_prefix
-        return if HOMEBREW_PREFIX.to_s == "/usr/local"
-
-        # Allow our Jenkins CI tests to live outside of /usr/local.
-        if ENV["JENKINS_HOME"] &&
-           ENV["GIT_URL"].to_s.start_with?("https://github.com/Homebrew/brew")
-          return
-        end
-
-        <<-EOS.undent
-          Your Homebrew's prefix is not /usr/local.
-          You can install Homebrew anywhere you want but some bottles (binary packages)
-          can only be used with a /usr/local prefix and some formulae (packages)
-          may not build correctly with a non-/usr/local prefix.
-        EOS
-      end
-
       def check_user_path_1
         $seen_prefix_bin = false
         $seen_prefix_sbin = false
@@ -511,33 +494,6 @@ module Homebrew
           your curlrc:
             curl #{Formatter.url("https://github.com")}
         EOS
-      end
-
-      def check_which_pkg_config
-        binary = which "pkg-config"
-        return if binary.nil?
-
-        mono_config = Pathname.new("/usr/bin/pkg-config")
-        if mono_config.exist? && mono_config.realpath.to_s.include?("Mono.framework")
-          <<-EOS.undent
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              /usr/bin/pkg-config => #{mono_config.realpath}
-
-            This was most likely created by the Mono installer. `./configure` may
-            have problems finding brew-installed packages using this other pkg-config.
-
-            Mono no longer installs this file as of 3.0.4. You should
-            `sudo rm /usr/bin/pkg-config` and upgrade to the latest version of Mono.
-          EOS
-        elsif binary.to_s != "#{HOMEBREW_PREFIX}/bin/pkg-config"
-          <<-EOS.undent
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              #{binary}
-
-            `./configure` may have problems finding brew-installed packages using
-            this other pkg-config.
-          EOS
-        end
       end
 
       def check_for_gettext
@@ -713,39 +669,6 @@ module Homebrew
 
           You should set the "HOMEBREW_TEMP" environmental variable to a suitable
           directory on the same volume as your Cellar.
-        EOS
-      end
-
-      def check_filesystem_case_sensitive
-        dirs_to_check = [
-          HOMEBREW_PREFIX,
-          HOMEBREW_REPOSITORY,
-          HOMEBREW_CELLAR,
-          HOMEBREW_TEMP,
-        ]
-        case_sensitive_dirs = dirs_to_check.select do |dir|
-          # We select the dir as being case-sensitive if either the UPCASED or the
-          # downcased variant is missing.
-          # Of course, on a case-insensitive fs, both exist because the os reports so.
-          # In the rare situation when the user has indeed a downcased and an upcased
-          # dir (e.g. /TMP and /tmp) this check falsely thinks it is case-insensitive
-          # but we don't care because: 1. there is more than one dir checked, 2. the
-          # check is not vital and 3. we would have to touch files otherwise.
-          upcased = Pathname.new(dir.to_s.upcase)
-          downcased = Pathname.new(dir.to_s.downcase)
-          dir.exist? && !(upcased.exist? && downcased.exist?)
-        end
-        return if case_sensitive_dirs.empty?
-
-        volumes = Volumes.new
-        case_sensitive_vols = case_sensitive_dirs.map do |case_sensitive_dir|
-          volumes.get_mounts(case_sensitive_dir)
-        end
-        case_sensitive_vols.uniq!
-
-        <<-EOS.undent
-          The filesystem on #{case_sensitive_vols.join(",")} appears to be case-sensitive.
-          The default macOS filesystem is case-insensitive. Please report any apparent problems.
         EOS
       end
 
