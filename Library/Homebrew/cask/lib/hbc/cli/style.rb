@@ -11,7 +11,7 @@ module Hbc
 
       def run
         install_rubocop
-        system "rubocop", *rubocop_args, "--", *cask_paths
+        system({ "XDG_CACHE_HOME" => HOMEBREW_CACHE }, "rubocop", *rubocop_args, "--", *cask_paths)
         raise CaskError, "style check failed" unless $CHILD_STATUS.success?
         true
       end
