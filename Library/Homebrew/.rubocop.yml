@@ -9,9 +9,8 @@ AllCops:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
 
-Style/BlockDelimiters:
+Layout/MultilineMethodCallIndentation:
   Exclude:
-    - '**/cask/spec/**/*'
     - '**/*_spec.rb'
 
 # so many of these in formulae but none in here
@@ -27,15 +26,12 @@ Lint/NestedMethodDefinition:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: true
 
-Metrics/ModuleLength:
-  CountComments: false
-  Exclude:
-    - 'cask/lib/hbc/locations.rb'
-    - 'cask/lib/hbc/macos.rb'
-    - 'cask/lib/hbc/utils.rb'
-
 Metrics/ParameterLists:
   CountKeywordArgs: false
+
+Style/BlockDelimiters:
+  Exclude:
+    - '**/*_spec.rb'
 
 # so many of these in formulae but none in here
 Style/GuardClause:

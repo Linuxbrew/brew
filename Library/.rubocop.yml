@@ -23,23 +23,67 @@ FormulaAuditStrict/ComponentsRedundancy:
 FormulaAudit/Homepage:
   Enabled: true
 
-Metrics/AbcSize:
+# `system` is a special case and aligns on second argument
+Layout/AlignParameters:
   Enabled: false
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+
+Layout/EmptyLineBetweenDefs:
+  AllowAdjacentOneLineDefs: true
+
+Layout/IndentArray:
+  EnforcedStyle: special_inside_parentheses
+
+Layout/IndentHeredoc:
+  EnforcedStyle: unindent
+
+# conflicts with DSL-style path concatenation with `/`
+Layout/SpaceAroundOperators:
+  Enabled: false
+
+# favor parens-less DSL-style arguments
+Lint/AmbiguousOperator:
+  Enabled: false
+
+# so many of these in formulae and can't be autocorrected
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
+
+# favor parens-less DSL-style arguments
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+# assignment in conditions are useful sometimes
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Lint/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+# so many of these in formulae and can't be autocorrected
+Lint/ParenthesesAsGroupedExpression:
+  Enabled: false
+
+# TODO: try to bring down all metrics maximums
+Metrics/AbcSize:
+  Max: 250
 
 Metrics/BlockLength:
-  Enabled: false
+  Max: 1250
 
 Metrics/ClassLength:
-  Enabled: false
+  Max: 1500
 
 Metrics/CyclomaticComplexity:
-  Enabled: false
+  Max: 75
 
 Metrics/LineLength:
-  Enabled: false
+  Max: 400
 
 Metrics/MethodLength:
-  Enabled: false
+  Max: 250
 
 Metrics/ModuleLength:
   CountComments: false
@@ -47,45 +91,25 @@ Metrics/ModuleLength:
     - '**/bin/**/*'
     - '**/cmd/**/*'
     - '**/lib/**/*'
-    - '**/spec/**/*'
 
 Metrics/PerceivedComplexity:
-  Enabled: false
+  Max: 80
 
-# favor parens-less DSL-style arguments
-Lint/AmbiguousOperator:
-  Enabled: false
-
-Lint/AmbiguousRegexpLiteral:
-  Enabled: false
-
-Lint/AssignmentInCondition:
-  Enabled: false
-
-Lint/EndAlignment:
-  EnforcedStyleAlignWith: variable
-
-Lint/ParenthesesAsGroupedExpression:
+# makes code less readable for minor performance increases
+Performance/Caller:
   Enabled: false
 
 Style/Alias:
   EnforcedStyle: prefer_alias
 
-Style/AlignHash:
-  Enabled: false
-
-# `system` is a special case and aligns on second argument
-Style/AlignParameters:
-  Enabled: false
+Style/AutoResourceCleanup:
+  Enabled: true
 
 Style/BarePercentLiterals:
   EnforcedStyle: percent_q
 
 Style/BlockDelimiters:
   EnforcedStyle: line_count_based
-
-Style/CaseIndentation:
-  EnforcedStyle: end
 
 Style/ClassAndModuleChildren:
   EnforcedStyle: nested
@@ -99,16 +123,22 @@ Style/CommandLiteral:
 Style/ConditionalAssignment:
   Enabled: false
 
+# most of our APIs are internal so don't require docs
 Style/Documentation:
  Enabled: false
 
-Style/EmptyLineBetweenDefs:
-  AllowAdjacentOneLineDefs: true
+Style/Encoding:
+  Enabled: true
 
 # dashes in filenames are typical
 Style/FileName:
   Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
 
+# falsely flags e.g. curl formatting arguments as format strings
+Style/FormatStringToken:
+  Enabled: false
+
+# so many of these in formulae and can't be autocorrected
 Style/GuardClause:
   Enabled: false
 
@@ -120,13 +150,6 @@ Style/HashSyntax:
     - '**/cmd/**/*'
     - '**/lib/**/*'
     - '**/spec/**/*'
-
-# disabled until it respects line length
-Style/IfUnlessModifier:
-  Enabled: false
-
-Style/IndentArray:
-  EnforcedStyle: special_inside_parentheses
 
 # only for numbers >= 1_000_000
 Style/NumericLiterals:
@@ -160,13 +183,6 @@ Style/RaiseArgs:
 Style/RegexpLiteral:
   EnforcedStyle: slashes
 
-# conflicts with DSL-style path concatenation with `/`
-Style/SpaceAroundOperators:
-  Enabled: false
-
-Style/SingleLineBlockParams:
-  Enabled: false
-
 # not a problem for typical shell users
 Style/SpecialGlobalVars:
   Enabled: false
@@ -179,17 +195,22 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
 Style/TernaryParentheses:
-  Enabled: false
+  EnforcedStyle: require_parentheses_when_complex
 
 # makes diffs nicer
 Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma
+
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
 
+# we have too many variables like sha256 where this harms readability
 Style/VariableNumber:
   Enabled: false
 
 Style/WordArray:
-  Enabled: false
+  MinSize: 4

@@ -2,6 +2,7 @@ class String
   def undent
     gsub(/^[ \t]{#{(slice(/^[ \t]+/) || '').length}}/, "")
   end
+  alias unindent undent
 
   # eg:
   #   if foo then <<-EOS.undent_________________________________________________________72

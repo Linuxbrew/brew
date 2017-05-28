@@ -2,9 +2,9 @@ language: ruby
 cache:
   directories:
     - $HOME/.gem/ruby
+    - $HOME/Library/Caches/Homebrew/style
+    - $HOME/Library/Caches/Homebrew/tests
     - Library/Homebrew/vendor/bundle
-    # For parallel_rspec
-    - Library/Homebrew/tmp
 
 matrix:
   include:
