@@ -36,8 +36,12 @@ module Homebrew
       tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
       previous_tag = tags.lines[1]
       previous_tag ||= begin
-        safe_system "git", "fetch", "--tags", "--depth=1"
-        tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
+        if (HOMEBREW_REPOSITORY/".git/shallow").exist?
+          safe_system "git", "fetch", "--tags", "--depth=1"
+          tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
+        elsif OS.linux?
+          tags = Utils.popen_read("git tag --list | sort -rV")
+        end
         tags.lines[1]
       end
       previous_tag = previous_tag.to_s.chomp
