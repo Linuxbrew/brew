@@ -51,7 +51,7 @@ class DevelopmentTools
     def gcc_4_2_build_version
       @gcc_4_2_build_version ||= begin
         gcc = locate("gcc-4.2") || HOMEBREW_PREFIX.join("opt/apple-gcc42/bin/gcc-4.2")
-        if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm")&&
+        if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm") &&
            build_version = `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1]
           Version.new build_version
         else

@@ -868,7 +868,7 @@ class FormulaAuditor
 
   def audit_lines
     text.without_patch.split("\n").each_with_index do |line, lineno|
-      line_problems(line, lineno+1)
+      line_problems(line, lineno + 1)
     end
   end
 
