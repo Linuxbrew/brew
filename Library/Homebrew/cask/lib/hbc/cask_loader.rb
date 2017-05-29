@@ -54,7 +54,7 @@ module Hbc
 
     class FromURILoader < FromPathLoader
       def self.can_load?(ref)
-        ref.to_s =~ ::URI.regexp
+        ref.to_s.match?(::URI.regexp)
       end
 
       def initialize(url)
@@ -80,7 +80,7 @@ module Hbc
 
     class FromTapLoader < FromPathLoader
       def self.can_load?(ref)
-        ref.to_s =~ HOMEBREW_TAP_CASK_REGEX
+        ref.to_s.match?(HOMEBREW_TAP_CASK_REGEX)
       end
 
       def initialize(tapped_name)
