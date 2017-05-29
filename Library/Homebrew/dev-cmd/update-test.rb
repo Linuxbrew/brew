@@ -33,14 +33,16 @@ module Homebrew
     elsif date = ARGV.value("before")
       Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
     elsif ARGV.include?("--to-tag")
-      previous_tag =
-        Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1]
-      unless previous_tag
+      tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
+      previous_tag = tags.lines[1]
+      previous_tag ||= begin
         safe_system "git", "fetch", "--tags", "--depth=1"
-        previous_tag =
-          Utils.popen_read("git", "tag", "--list", "--sort=-version:refname").lines[1]
+        tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
+        tags.lines[1]
       end
-      previous_tag.to_s.chomp
+      previous_tag = previous_tag.to_s.chomp
+      odie "Could not find previous tag in:\n#{tags}" if previous_tag.empty?
+      previous_tag
     else
       Utils.popen_read("git", "rev-parse", "origin/master").chomp
     end
