@@ -19,5 +19,5 @@ end
 
 def plural(n, s = "s")
   odeprecated "#plural", "Formatter.pluralize"
-  n == 1 ? "" : s
+  (n == 1) ? "" : s
 end

@@ -66,7 +66,7 @@ module Hbc
       return [] if current == version
 
       # collect all installed versions that are different than tap version and return them
-      installed.select { |v| v != version }
+      installed.reject { |v| v == version }
     end
 
     def to_s

@@ -98,10 +98,10 @@ module Homebrew
             reqs = reqs_by_formula.map(&:last)
           else
             deps = f.deps.reject do |dep|
-              ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
+              ignores.any? { |ignore| dep.send(ignore) } && includes.none? { |include| dep.send(include) }
             end
             reqs = f.requirements.reject do |req|
-              ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
+              ignores.any? { |ignore| req.send(ignore) } && includes.none? { |include| req.send(include) }
             end
           end
           next true if deps.any? do |dep|

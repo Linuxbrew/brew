@@ -280,7 +280,7 @@ class Version
   private
 
   def max(a, b)
-    a > b ? a : b
+    (a > b) ? a : b
   end
 
   def tokenize

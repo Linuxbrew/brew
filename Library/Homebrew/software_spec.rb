@@ -235,7 +235,7 @@ class Bottle
     end
 
     def suffix
-      s = rebuild > 0 ? ".#{rebuild}" : ""
+      s = (rebuild > 0) ? ".#{rebuild}" : ""
       ".bottle#{s}.tar.gz"
     end
   end

@@ -73,7 +73,11 @@ module Homebrew
     args = %w[
       --force-exclusion
     ]
-    args << "--auto-correct" if fix
+    if fix
+      args << "--auto-correct"
+    else
+      args << "--parallel"
+    end
 
     if options[:except_cops]
       options[:except_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop.to_s, "") }
@@ -101,14 +105,16 @@ module Homebrew
       args += files
     end
 
+    cache_env = { "XDG_CACHE_HOME" => "#{HOMEBREW_CACHE}/style" }
+
     case output_type
     when :print
       args << "--display-cop-names" if ARGV.include? "--display-cop-names"
       args << "--format" << "simple" if files
-      system({ "XDG_CACHE_HOME" => HOMEBREW_CACHE }, "rubocop", *args)
+      system(cache_env, "rubocop", *args)
       !$?.success?
     when :json
-      json, _, status = Open3.capture3({ "XDG_CACHE_HOME" => HOMEBREW_CACHE }, "rubocop", "--format", "json", *args)
+      json, _, status = Open3.capture3(cache_env, "rubocop", "--format", "json", *args)
       # exit status of 1 just means violations were found; other numbers mean
       # execution errors.
       # exitstatus can also be nil if RuboCop process crashes, e.g. due to

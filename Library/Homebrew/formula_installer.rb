@@ -472,7 +472,7 @@ class FormulaInstaller
 
   def effective_build_options_for(dependent, inherited_options = [])
     args  = dependent.build.used_options
-    args |= dependent == formula ? options : inherited_options
+    args |= (dependent == formula) ? options : inherited_options
     args |= Tab.for_formula(dependent).used_options
     args &= dependent.options
     BuildOptions.new(args, dependent.options)
@@ -680,7 +680,6 @@ class FormulaInstaller
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
-
   rescue Exception
     ignore_interrupts do
       # any exceptions must leave us with nothing installed

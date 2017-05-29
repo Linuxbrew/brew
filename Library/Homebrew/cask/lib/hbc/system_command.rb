@@ -94,7 +94,7 @@ module Hbc
       loop do
         readable_sources = IO.select(sources)[0]
         readable_sources.delete_if(&:eof?).first(1).each do |source|
-          type = (source == sources[0] ? :stdout : :stderr)
+          type = ((source == sources[0]) ? :stdout : :stderr)
           begin
             yield(type, source.readline_nonblock || "")
           rescue IO::WaitReadable, EOFError

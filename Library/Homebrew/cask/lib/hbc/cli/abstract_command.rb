@@ -15,7 +15,7 @@ module Hbc
       end
 
       def self.abstract?
-        !(name.split("::").last !~ /^Abstract[^a-z]/)
+        name.split("::").last =~ /^Abstract[^a-z]/
       end
 
       def self.visible

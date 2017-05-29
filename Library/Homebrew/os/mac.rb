@@ -90,7 +90,7 @@ module OS
       @locator ||= SDKLocator.new
       begin
         sdk = if v.nil?
-          Xcode.version.to_i >= 7 ? @locator.latest_sdk : @locator.sdk_for(version)
+          (Xcode.version.to_i >= 7) ? @locator.latest_sdk : @locator.sdk_for(version)
         else
           @locator.sdk_for v
         end

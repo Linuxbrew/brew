@@ -4,11 +4,11 @@ require "utils/tty"
 describe Formatter do
   describe "::columns" do
     let(:input) {
-      [
-        "aa",
-        "bbb",
-        "ccc",
-        "dd",
+      %w[
+        aa
+        bbb
+        ccc
+        dd
       ]
     }
     subject { described_class.columns(input) }

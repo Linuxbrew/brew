@@ -12,7 +12,7 @@ module Hbc
       def run
         retval = args.any? ? list : list_installed
         # retval is ternary: true/false/nil
-        if retval.nil? && !args.any?
+        if retval.nil? && args.none?
           opoo "nothing to list" # special case: avoid exit code
         elsif retval.nil?
           raise CaskError, "nothing to list"

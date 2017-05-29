@@ -60,9 +60,7 @@ module Homebrew
       end
 
       Homebrew.install_gem_setup_path! "bundler"
-      unless quiet_system("bundle", "check")
-        system "bundle", "install"
-      end
+      system "bundle", "install" unless quiet_system("bundle", "check")
 
       parallel = true
 
@@ -91,12 +89,12 @@ module Homebrew
       end
 
       args = ["-I", HOMEBREW_LIBRARY_PATH/"test"]
-      args += %w[
+      args += %W[
         --color
         --require spec_helper
         --format progress
         --format ParallelTests::RSpec::RuntimeLogger
-        --out tmp/parallel_runtime_rspec.log
+        --out #{HOMEBREW_CACHE}/tests/parallel_runtime_rspec.log
       ]
 
       args << "--seed" << ARGV.next if ARGV.include? "--seed"
