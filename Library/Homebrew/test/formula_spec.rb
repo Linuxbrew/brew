@@ -683,7 +683,7 @@ describe Formula do
     end
 
     expect(f5.deps.map(&:name)).to eq(["f3", "f4"])
-    expect(f5.recursive_dependencies.map(&:name)).to eq(["f1", "f2", "f3", "f4"])
+    expect(f5.recursive_dependencies.map(&:name)).to eq(%w[f1 f2 f3 f4])
     expect(f5.runtime_dependencies.map(&:name)).to eq(["f1", "f4"])
   end
 

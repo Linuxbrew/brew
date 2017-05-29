@@ -314,8 +314,8 @@ module Homebrew
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
-      mismatches = [:root_url, :prefix, :cellar, :rebuild].select do |key|
-        old_spec.send(key) != bottle.send(key)
+      mismatches = [:root_url, :prefix, :cellar, :rebuild].reject do |key|
+        old_spec.send(key) == bottle.send(key)
       end
       mismatches.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       unless mismatches.empty?
@@ -382,9 +382,7 @@ module Homebrew
       bottle = BottleSpecification.new
       bottle.root_url bottle_hash["bottle"]["root_url"]
       cellar = bottle_hash["bottle"]["cellar"]
-      if cellar == "any" || cellar == "any_skip_relocation"
-        cellar = cellar.to_sym
-      end
+      cellar = cellar.to_sym if ["any", "any_skip_relocation"].include?(cellar)
       bottle.cellar cellar
       bottle.prefix bottle_hash["bottle"]["prefix"]
       bottle.rebuild bottle_hash["bottle"]["rebuild"]

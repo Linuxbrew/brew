@@ -10,7 +10,7 @@ module Hbc
       end
 
       def self.artifact_english_article
-        @artifact_english_article ||= artifact_english_name =~ /^[aeiou]/i ? "an" : "a"
+        @artifact_english_article ||= (artifact_english_name =~ /^[aeiou]/i) ? "an" : "a"
       end
 
       def self.artifact_dsl_key
@@ -43,7 +43,7 @@ module Hbc
         unless unknown_keys.empty?
           opoo %Q{Unknown arguments to #{description} -- #{unknown_keys.inspect} (ignored). Running "brew update; brew cleanup; brew cask cleanup" will likely fix it.}
         end
-        arguments.reject! { |k| !permitted_keys.include?(k) }
+        arguments.select! { |k| permitted_keys.include?(k) }
 
         # key warnings
         override_keys = override_arguments.keys

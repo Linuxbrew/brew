@@ -591,9 +591,7 @@ class FormulaAuditor
   def audit_homepage
     homepage = formula.homepage
 
-    if homepage.nil? || homepage.empty?
-      return
-    end
+    return if homepage.nil? || homepage.empty?
 
     return unless @online
 
@@ -988,9 +986,7 @@ class FormulaAuditor
       problem ":apr is deprecated. Usage should be \"apr-util\""
     end
 
-    if line =~ /depends_on :tex/
-      problem ":tex is deprecated"
-    end
+    problem ":tex is deprecated" if line =~ /depends_on :tex/
 
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
       problem "#{$2} modules should be vendored rather than use deprecated `depends_on \"#{$1}\" => :#{$2}#{$3}`"

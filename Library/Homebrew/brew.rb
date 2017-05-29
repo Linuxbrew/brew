@@ -116,7 +116,6 @@ begin
       odie "Unknown command: #{cmd}"
     end
   end
-
 rescue UsageError => e
   require "cmd/help"
   Homebrew.help cmd, usage_error: e.message

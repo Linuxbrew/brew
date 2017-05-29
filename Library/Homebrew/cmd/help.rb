@@ -1,27 +1,27 @@
-HOMEBREW_HELP = <<-EOS.freeze
-Example usage:
-  brew search [TEXT|/REGEX/]
-  brew (info|home|options) [FORMULA...]
-  brew install FORMULA...
-  brew update
-  brew upgrade [FORMULA...]
-  brew uninstall FORMULA...
-  brew list [FORMULA...]
+HOMEBREW_HELP = <<-EOS.unindent.freeze
+  Example usage:
+    brew search [TEXT|/REGEX/]
+    brew (info|home|options) [FORMULA...]
+    brew install FORMULA...
+    brew update
+    brew upgrade [FORMULA...]
+    brew uninstall FORMULA...
+    brew list [FORMULA...]
 
-Troubleshooting:
-  brew config
-  brew doctor
-  brew install -vd FORMULA
+  Troubleshooting:
+    brew config
+    brew doctor
+    brew install -vd FORMULA
 
-Developers:
-  brew create [URL [--no-fetch]]
-  brew edit [FORMULA...]
-  http://docs.brew.sh/Formula-Cookbook.html
+  Developers:
+    brew create [URL [--no-fetch]]
+    brew edit [FORMULA...]
+    http://docs.brew.sh/Formula-Cookbook.html
 
-Further help:
-  man brew
-  brew help [COMMAND]
-  brew home
+  Further help:
+    man brew
+    brew help [COMMAND]
+    brew home
 EOS
 
 # NOTE Keep the lenth of vanilla --help less than 25 lines!

@@ -60,9 +60,7 @@ module Homebrew
       end
 
       Homebrew.install_gem_setup_path! "bundler"
-      unless quiet_system("bundle", "check")
-        system "bundle", "install"
-      end
+      system "bundle", "install" unless quiet_system("bundle", "check")
 
       parallel = true
 

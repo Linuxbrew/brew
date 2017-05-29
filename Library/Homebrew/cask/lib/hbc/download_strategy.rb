@@ -212,7 +212,7 @@ module Hbc
   class SubversionDownloadStrategy < HbVCSDownloadStrategy
     def cache_tag
       # TODO: pass versions as symbols, support :head here
-      version == "head" ? "svn-HEAD" : "svn"
+      (version == "head") ? "svn-HEAD" : "svn"
     end
 
     def repo_valid?

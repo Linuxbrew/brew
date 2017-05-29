@@ -140,9 +140,7 @@ module Hbc
       command_name, *args = *@args
       command = help? ? "help" : self.class.lookup_command(command_name)
 
-      unless ENV["MACOS_VERSION"].nil?
-        MacOS.full_version = ENV["MACOS_VERSION"]
-      end
+      MacOS.full_version = ENV["MACOS_VERSION"] unless ENV["MACOS_VERSION"].nil?
 
       Hbc.default_tap.install unless Hbc.default_tap.installed?
       Hbc.init if self.class.should_init?(command)

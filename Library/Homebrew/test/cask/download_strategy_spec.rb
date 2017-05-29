@@ -1,6 +1,6 @@
 describe "download strategies", :cask do
   let(:url) { "http://example.com/cask.dmg" }
-  let(:url_options) { Hash.new }
+  let(:url_options) { {} }
   let(:cask) {
     instance_double(Hbc::Cask, token:   "some-cask",
                                url:     Hbc::URL.new(url, url_options),

@@ -44,9 +44,7 @@ describe Migrator do
   end
 
   after(:each) do
-    if !old_keg_record.parent.symlink? && old_keg_record.directory?
-      keg.unlink
-    end
+    keg.unlink if !old_keg_record.parent.symlink? && old_keg_record.directory?
 
     if new_keg_record.directory?
       new_keg = Keg.new(new_keg_record)

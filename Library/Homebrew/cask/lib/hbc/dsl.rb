@@ -119,9 +119,7 @@ module Hbc
     def language_eval
       return @language if instance_variable_defined?(:@language)
 
-      if @language_blocks.nil? || @language_blocks.empty?
-        return @language = nil
-      end
+      return @language = nil if @language_blocks.nil? || @language_blocks.empty?
 
       MacOS.languages.map(&Locale.method(:parse)).each do |locale|
         key = @language_blocks.keys.detect do |strings|
