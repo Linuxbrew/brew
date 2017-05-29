@@ -1588,7 +1588,7 @@ class Formula
       "revision" => revision,
       "version_scheme" => version_scheme,
       "installed" => [],
-      "linked_keg" => (linked_keg.resolved_path.basename.to_s if linked_keg.exist?),
+      "linked_keg" => (linked_version.to_s if linked_keg.exist?),
       "pinned" => pinned?,
       "outdated" => outdated?,
       "keg_only" => keg_only?,
