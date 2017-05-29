@@ -91,17 +91,17 @@ module Formatter
     output
   end
 
-  def pluralize(count, singular, plural = nil)
-    return "#{count} #{singular}" if count == 1
+  def pluralize(count, singular, plural = nil, show_count: true)
+    return (show_count ? "#{count} #{singular}" : singular.to_s) if count == 1
 
-    *adjectives, noun = singular.split(" ")
+    *adjectives, noun = singular.to_s.split(" ")
 
     plural ||= {
       "formula" => "formulae",
     }.fetch(noun, "#{noun}s")
 
-    words = adjectives << plural
+    words = adjectives.push(plural).join(" ")
 
-    "#{count} #{words.join(" ")}"
+    show_count ? "#{count} #{words}" : words
   end
 end
