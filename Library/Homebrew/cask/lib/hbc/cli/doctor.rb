@@ -55,8 +55,7 @@ module Hbc
       end
 
       def self.cask_count_for_tap(tap)
-        count = tap.cask_files.count
-        "#{count} #{count == 1 ? "cask" : "casks"}"
+        Formatter.pluralize(tap.cask_files.count, "cask")
       rescue StandardError
         "0 #{error_string "error reading #{tap.path}"}"
       end
