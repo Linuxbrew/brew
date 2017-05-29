@@ -1,5 +1,5 @@
 require "formula"
-require "formula_lock"
+require "lock_file"
 require "keg"
 require "tab"
 

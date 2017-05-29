@@ -2,8 +2,6 @@ require "yaml"
 require "open3"
 require "stringio"
 
-require "hbc/utils/file"
-
 BUG_REPORTS_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
 # monkeypatch Object - not a great idea

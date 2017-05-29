@@ -1,6 +1,6 @@
-require "formula_lock"
+require "lock_file"
 
-describe FormulaLock do
+describe LockFile do
   subject { described_class.new("foo") }
 
   describe "#lock" do
@@ -24,7 +24,7 @@ describe FormulaLock do
       expect { subject.unlock }.not_to raise_error
     end
 
-    it "unlocks a locked Formula" do
+    it "unlocks when locked" do
       subject.lock
       subject.unlock
 

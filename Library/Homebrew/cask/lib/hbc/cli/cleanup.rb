@@ -75,14 +75,18 @@ module Hbc
         paths.each do |item|
           next unless item.exist?
           processed_files += 1
-          if Utils.file_locked?(item)
+
+          begin
+            LockFile.new(item.basename).with_lock do
+              puts item
+              item_size = File.size?(item)
+              cleanup_size += item_size unless item_size.nil?
+              item.unlink
+            end
+          rescue OperationInProgressError
             puts "skipping: #{item} is locked"
             next
           end
-          puts item
-          item_size = File.size?(item)
-          cleanup_size += item_size unless item_size.nil?
-          item.unlink
         end
 
         if processed_files.zero?

@@ -1,5 +1,5 @@
 require "formula_support"
-require "formula_lock"
+require "lock_file"
 require "formula_pin"
 require "hardware"
 require "utils/bottles"

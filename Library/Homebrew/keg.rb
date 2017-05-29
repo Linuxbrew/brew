@@ -1,6 +1,6 @@
 require "extend/pathname"
 require "keg_relocate"
-require "formula_lock"
+require "lock_file"
 require "ostruct"
 
 class Keg
