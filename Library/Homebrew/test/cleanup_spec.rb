@@ -63,6 +63,28 @@ describe Homebrew::Cleanup do
     end
   end
 
+  specify "::update_disk_cleanup_size" do
+    shutup do
+      described_class.instance_eval("@disk_cleanup_size = 0")
+      described_class.update_disk_cleanup_size(128)
+    end
+    expect(described_class.instance_variable_get("@disk_cleanup_size")).to eq(128)
+  end
+
+  specify "::disk_cleanup_size" do
+    shutup do
+      described_class.instance_eval("@disk_cleanup_size = 0")
+    end
+    expect(described_class.disk_cleanup_size).to eq(described_class.instance_variable_get("@disk_cleanup_size"))
+  end
+
+  specify "::unremovable_kegs" do
+    shutup do
+      described_class.unremovable_kegs
+    end
+    expect(described_class.instance_variable_get("@unremovable_kegs")).to eq([])
+  end
+
   specify "::cleanup_formula" do
     f1 = Class.new(Testball) do
       version "1.0"
