@@ -16,7 +16,9 @@ matrix:
       rvm: 2.0.0
 
 before_install:
+  - export HOMEBREW_NO_AUTO_UPDATE=1
   - export HOMEBREW_DEVELOPER=1
+  - git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       HOMEBREW_REPOSITORY="$(brew --repo)";
       sudo chown -R "$USER" "$HOMEBREW_REPOSITORY/Library/Taps";
@@ -24,7 +26,10 @@ before_install:
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
     else
+      git fetch --unshallow;
       export PATH="$PWD/bin:$PATH";
+      rm -rf Library/Taps/homebrew/homebrew-test-bot/.git;
+      mv Library/Taps/homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-core;
       umask 022;
     fi
 
