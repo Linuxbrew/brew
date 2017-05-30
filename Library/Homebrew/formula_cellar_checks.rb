@@ -62,7 +62,7 @@ module FormulaCellarChecks
     valid_extensions = %w[.a .dylib .framework .jnilib .la .o .so
                           .jar .prl .pm .sh]
     non_libraries = formula.lib.children.reject do |g|
-      next if g.directory?
+      next true if g.directory?
       valid_extensions.include? g.extname
     end
     return if non_libraries.empty?
