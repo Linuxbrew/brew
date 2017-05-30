@@ -82,6 +82,15 @@ fetch() {
   elif [[ -x "$(which sha256sum)" ]]
   then
     sha="$(sha256sum "$CACHED_LOCATION" | cut -d' ' -f1)"
+  elif [[ -x "$(which ruby)" ]]
+  then
+    sha="$(ruby <<EOSCRIPT
+            require 'digest/sha2'
+            digest = Digest::SHA256.new
+            File.open('$CACHED_LOCATION', 'rb') { |f| digest.update(f.read) }
+            puts digest.hexdigest
+EOSCRIPT
+)"
   else
     odie "Cannot verify the checksum ('shasum' or 'sha256sum' not found)!"
   fi
