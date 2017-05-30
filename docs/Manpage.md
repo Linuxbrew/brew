@@ -776,7 +776,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
       ~ The URL of a commit on GitHub
 
-      ~ A "https://bot.brew.sh/job/..." string specifying a testing job ID
+      ~ A "https://jenkins.brew.sh/job/..." string specifying a testing job ID
 
     If `--bottle` is passed, handle bottles, pulling the bottle-update
     commit and publishing files on Bintray.
