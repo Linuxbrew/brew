@@ -47,7 +47,13 @@ module ELF
         @dylibs = []
         return
       end
-      command = ["ldd", path.expand_path.to_s]
+      begin
+        ldd = Formula["glibc"].bin/"ldd"
+        ldd = "ldd" unless ldd.executable?
+      rescue FormulaUnavailableError
+        ldd = "ldd"
+      end
+      command = [ldd, path.expand_path.to_s]
       libs = Utils.popen_read(*command).split("\n")
       raise ErrorDuringExecution, command unless $?.success?
       needed << "not found"
