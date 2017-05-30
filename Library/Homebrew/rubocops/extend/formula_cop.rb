@@ -1,3 +1,5 @@
+require "parser/current"
+
 module RuboCop
   module Cop
     class FormulaCop < Cop
@@ -7,11 +9,11 @@ module RuboCop
       def on_class(node)
         file_path = processed_source.buffer.name
         return unless file_path_allowed?(file_path)
-        class_node, parent_class_node, body = *node
-        return unless formula_class?(parent_class_node)
+        return unless formula_class?(node)
         return unless respond_to?(:audit_formula)
+        class_node, parent_class_node, @body = *node
         @formula_name = class_name(class_node)
-        audit_formula(node, class_node, parent_class_node, body)
+        audit_formula(node, class_node, parent_class_node, @body)
       end
 
       # Checks for regex match of pattern in the node and
@@ -46,10 +48,98 @@ module RuboCop
         nil
       end
 
-      # Returns an array of method call nodes matching method_name inside node
+      # Set the given node as the offending node when required in custom cops
+      def offending_node(node)
+        @offensive_node = node
+        @offense_source_range = node.source_range
+      end
+
+      # Returns an array of method call nodes matching method_name inside node with depth first order (Children nodes)
       def find_method_calls_by_name(node, method_name)
         return if node.nil?
         node.each_child_node(:send).select { |method_node| method_name == method_node.method_name }
+      end
+
+      # Returns an array of method call nodes matching method_name in every descendant of node
+      def find_every_method_call_by_name(node, method_name)
+        return if node.nil?
+        node.each_descendant(:send).select { |method_node| method_name == method_node.method_name }
+      end
+
+      # Given a method_name and arguments, yields to a block with
+      # matching method passed as a parameter to the block
+      def find_method_with_args(node, method_name, *args)
+        methods = find_every_method_call_by_name(node, method_name)
+        methods.each do |method|
+          next unless parameters_passed?(method, *args)
+          yield method
+        end
+      end
+
+      # Matches a method with a receiver,
+      # EX: to match `Formula.factory(name)`
+      # call `find_instance_method_call(node, "Formula", :factory)`
+      # yields to a block with matching method node
+      def find_instance_method_call(node, instance, method_name)
+        methods = find_every_method_call_by_name(node, method_name)
+        methods.each do |method|
+          next unless method.receiver.const_name == instance
+          @offense_source_range = method.source_range
+          @offensive_node = method
+          yield method
+        end
+      end
+
+      # Returns nil if does not depend on dependency_name
+      # args: node - dependency_name - dependency's name
+      def depends_on?(dependency_name)
+        dependency_nodes = find_every_method_call_by_name(@body, :depends_on)
+        idx = dependency_nodes.index do |n|
+          depends_on_name_type?(n, dependency_name, :required) ||
+            depends_on_name_type?(n, dependency_name, :build) ||
+            depends_on_name_type?(n, dependency_name, :optional) ||
+            depends_on_name_type?(n, dependency_name, :recommended) ||
+            depends_on_name_type?(n, dependency_name, :run)
+        end
+        return if idx.nil?
+        @offense_source_range = dependency_nodes[idx].source_range
+        @offensive_node = dependency_nodes[idx]
+      end
+
+      # Returns true if given dependency name and dependency type exist in given dependency method call node
+      # TODO: Add case where key of hash is an array
+      def depends_on_name_type?(node, name = nil, type = :required)
+        if name
+          name_match = false
+        else
+          name_match = true # Match only by type when name is nil
+        end
+
+        case type
+        when :required
+          type_match = !node.method_args.nil? && node.method_args.first.str_type?
+          if type_match && !name_match
+            name_match = node_equals?(node.method_args.first, name)
+          end
+        when :build, :optional, :recommended, :run
+          type_match = !node.method_args.nil? &&
+                       node.method_args.first.hash_type? &&
+                       node.method_args.first.values.first.children.first == type
+          if type_match && !name_match
+            name_match = node_equals?(node.method_args.first.keys.first.children.first, name)
+          end
+        end
+
+        if type_match || name_match
+          @offensive_node = node
+          @offense_source_range = node.source_range
+        end
+        type_match && name_match
+      end
+
+      # To compare node with appropriate Ruby variable
+      def node_equals?(node, var)
+        node == Parser::CurrentRuby.parse(var.inspect)
       end
 
       # Returns a block named block_name inside node
@@ -112,6 +202,17 @@ module RuboCop
         false
       end
 
+      # Check if method_name is called among every descendant node of given node
+      def method_called_ever?(node, method_name)
+        node.each_descendant(:send) do |call_node|
+          next unless call_node.method_name == method_name
+          @offensive_node = call_node
+          @offense_source_range = call_node.source_range
+          return true
+        end
+        false
+      end
+
       # Checks for precedence, returns the first pair of precedence violating nodes
       def check_precedence(first_nodes, next_nodes)
         next_nodes.each do |each_next_node|
@@ -136,6 +237,24 @@ module RuboCop
       def parameters(method_node)
         return unless method_node.send_type?
         method_node.method_args
+      end
+
+      # Returns true if the given parameters are present in method call
+      # and sets the method call as the offending node
+      # params can be string, symbol, array, hash, matching regex
+      def parameters_passed?(method_node, *params)
+        method_params = parameters(method_node)
+        @offensive_node = method_node
+        @offense_source_range = method_node.source_range
+        params.all? do |given_param|
+          method_params.any? do |method_param|
+            if given_param.class == Regexp
+              regex_match_group(method_param, given_param)
+            else
+              node_equals?(method_param, given_param)
+            end
+          end
+        end
       end
 
       # Returns the begin position of the node's line in source code
@@ -180,10 +299,16 @@ module RuboCop
         node.source_range.source_buffer
       end
 
-      # Returns the string representation if node is of type str(plain) or dstr(interpolated)
+      # Returns the string representation if node is of type str(plain) or dstr(interpolated) or const
       def string_content(node)
-        return node.str_content if node.type == :str
-        node.each_child_node(:str).map(&:str_content).join("") if node.type == :dstr
+        case node.type
+        when :str
+          return node.str_content if node.type == :str
+        when :dstr
+          return node.each_child_node(:str).map(&:str_content).join("") if node.type == :dstr
+        when :const
+          return node.const_name if node.type == :const
+        end
       end
 
       # Returns printable component name
@@ -198,8 +323,9 @@ module RuboCop
 
       private
 
-      def formula_class?(parent_class_node)
-        parent_class_node && parent_class_node.const_name == "Formula"
+      def formula_class?(node)
+        _, class_node, = *node
+        class_node && string_content(class_node) == "Formula"
       end
 
       def file_path_allowed?(file_path)

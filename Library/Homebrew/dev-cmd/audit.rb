@@ -850,14 +850,6 @@ class FormulaAuditor
   end
 
   def audit_text
-    if text =~ /system\s+['"]scons/
-      problem "use \"scons *args\" instead of \"system 'scons', *args\""
-    end
-
-    if text =~ /system\s+['"]xcodebuild/
-      problem %q(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
-    end
-
     bin_names = Set.new
     bin_names << formula.name
     bin_names += formula.aliases
@@ -872,34 +864,6 @@ class FormulaAuditor
         end
       end
     end
-
-    if text =~ /xcodebuild[ (]*["'*]*/ && !text.include?("SYMROOT=")
-      problem 'xcodebuild should be passed an explicit "SYMROOT"'
-    end
-
-    if text.include? "Formula.factory("
-      problem "\"Formula.factory(name)\" is deprecated in favor of \"Formula[name]\""
-    end
-
-    if text.include?("def plist") && !text.include?("plist_options")
-      problem "Please set plist_options when using a formula-defined plist."
-    end
-
-    if text =~ /depends_on\s+['"]openssl['"]/ && text =~ /depends_on\s+['"]libressl['"]/
-      problem "Formulae should not depend on both OpenSSL and LibreSSL (even optionally)."
-    end
-
-    if text =~ /virtualenv_(create|install_with_resources)/ &&
-       text =~ /resource\s+['"]setuptools['"]\s+do/
-      problem "Formulae using virtualenvs do not need a `setuptools` resource."
-    end
-
-    if text =~ /system\s+['"]go['"],\s+['"]get['"]/
-      problem "Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s."
-    end
-
-    return unless text.include?('require "language/go"') && !text.include?("go_resource")
-    problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
   def audit_lines

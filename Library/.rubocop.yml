@@ -8,6 +8,9 @@ AllCops:
 
 require: ./Homebrew/rubocops.rb
 
+FormulaAudit/Text:
+  Enabled: true
+
 FormulaAuditStrict/BottleBlock:
   Enabled: true
 
