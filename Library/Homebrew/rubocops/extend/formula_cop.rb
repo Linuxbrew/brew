@@ -167,10 +167,16 @@ module RuboCop
         nil
       end
 
-      # Returns an array of block nodes named block_name inside node
+      # Returns an array of block nodes of depth first order named block_name below node
       def find_blocks(node, block_name)
         return if node.nil?
         node.each_child_node(:block).select { |block_node| block_name == block_node.method_name }
+      end
+
+      # Returns an array of block nodes of any depth below node in AST
+      def find_all_blocks(node, block_name)
+        return if node.nil?
+        node.each_descendant(:block).select { |block_node| block_name == block_node.method_name}
       end
 
       # Returns a method definition node with method_name
@@ -250,7 +256,7 @@ module RuboCop
 
       # Returns the array of arguments of the method_node
       def parameters(method_node)
-        return unless method_node.send_type?
+        return unless method_node.send_type? || method_node.block_type?
         method_node.method_args
       end
 
