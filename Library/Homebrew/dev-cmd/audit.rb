@@ -1246,7 +1246,6 @@ class ResourceAuditor
 
   def audit
     audit_version
-    audit_checksum
     audit_download_strategy
     audit_urls
     self
@@ -1271,28 +1270,6 @@ class ResourceAuditor
 
     return unless version.to_s =~ /_\d+$/
     problem "version #{version} should not end with an underline and a number"
-  end
-
-  def audit_checksum
-    return unless checksum
-
-    case checksum.hash_type
-    when :md5
-      problem "MD5 checksums are deprecated, please use SHA256"
-      return
-    when :sha1
-      problem "SHA1 checksums are deprecated, please use SHA256"
-      return
-    when :sha256 then len = 64
-    end
-
-    if checksum.empty?
-      problem "#{checksum.hash_type} is empty"
-    else
-      problem "#{checksum.hash_type} should be #{len} characters" unless checksum.hexdigest.length == len
-      problem "#{checksum.hash_type} contains invalid characters" unless checksum.hexdigest =~ /^[a-fA-F0-9]+$/
-      problem "#{checksum.hash_type} should be lowercase" unless checksum.hexdigest == checksum.hexdigest.downcase
-    end
   end
 
   def audit_download_strategy
