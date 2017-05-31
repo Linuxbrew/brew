@@ -341,11 +341,15 @@ module Homebrew
       issue = patch_url[/([0-9]+)\.patch$/, 1]
       safe_system "git", "fetch", "--quiet", "origin", "pull/#{issue}/head"
       if Utils.popen_read("git", "rev-list", "--parents", "-n1", "FETCH_HEAD").count(" ") > 1
+        patchpath.unlink
         ohai "Fast-forwarding to the merge commit"
         test_bot_origin = patch_url[%r{(https://github\.com/[\w-]+/[\w-]+)/compare/}, 1]
         safe_system "git", "fetch", "--quiet", test_bot_origin, "pr-#{issue}" if test_bot_origin
-        safe_system "git", "merge", "--quiet", "--ff-only", "--no-edit", "FETCH_HEAD"
-        patchpath.unlink
+        system "git", "merge", "--quiet", "--ff-only", "--no-edit", "FETCH_HEAD"
+        unless $?.success?
+          opoo "Not possible to fast-forward, using git reset --hard"
+          safe_system "git", "reset", "--hard", "FETCH_HEAD"
+        end
         return
       end
 
