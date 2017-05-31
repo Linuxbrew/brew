@@ -322,7 +322,7 @@ class Pathname
 
   def sha256
     require "digest/sha2"
-    incremental_hash(Digest::SHA2)
+    incremental_hash(Digest::SHA256)
   end
 
   def verify_checksum(expected)
