@@ -210,6 +210,8 @@ module Stdenv
   end
   alias generic_set_cpu_flags set_cpu_flags
 
+  def x11; end
+
   # @private
   def effective_arch
     if ARGV.build_bottle?
