@@ -1,7 +1,0 @@
-comment: false
-coverage:
-  fixes:
-    - "::Library/Homebrew/"
-  parsers:
-    v1:
-      include_full_missed_files: yes

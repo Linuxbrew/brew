@@ -52,6 +52,7 @@
 # Unignore our root-level metadata files.
 !/.gitignore
 !/.travis.yml
+!/.codecov.yml
 !/.yardopts
 !/CODEOFCONDUCT.md
 !/CONTRIBUTING.md
