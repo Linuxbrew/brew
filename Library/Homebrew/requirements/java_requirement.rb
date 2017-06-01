@@ -46,7 +46,7 @@ class JavaRequirement < Requirement
     if exact_version?
       @version
     else
-      @version[0, @version.length - 1]
+      @version[0, @version.length-1]
     end
   end
 

@@ -138,7 +138,7 @@ module HomebrewArgvExtension
   end
 
   def next
-    at(@n + 1) || raise(UsageError)
+    at(@n+1) || raise(UsageError)
   end
 
   def value(name)

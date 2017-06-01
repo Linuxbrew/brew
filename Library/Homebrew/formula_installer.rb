@@ -197,7 +197,7 @@ class FormulaInstaller
 
     return if pinned_unsatisfied_deps.empty?
     raise CannotInstallFormulaError,
-      "You must `brew unpin #{pinned_unsatisfied_deps * " "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
+      "You must `brew unpin #{pinned_unsatisfied_deps*" "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
   end
 
   def build_bottle_preinstall

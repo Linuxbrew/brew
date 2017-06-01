@@ -28,12 +28,12 @@ module ArchitectureListExtension
   end
 
   def ppc?
-    (Hardware::CPU::PPC_32BIT_ARCHS + Hardware::CPU::PPC_64BIT_ARCHS).any? { |a| include? a }
+    (Hardware::CPU::PPC_32BIT_ARCHS+Hardware::CPU::PPC_64BIT_ARCHS).any? { |a| include? a }
   end
 
   # @private
   def remove_ppc!
-    (Hardware::CPU::PPC_32BIT_ARCHS + Hardware::CPU::PPC_64BIT_ARCHS).each { |a| delete a }
+    (Hardware::CPU::PPC_32BIT_ARCHS+Hardware::CPU::PPC_64BIT_ARCHS).each { |a| delete a }
   end
 
   def as_arch_flags

@@ -246,7 +246,7 @@ class Pathname
     rmdir
     true
   rescue Errno::ENOTEMPTY
-    if (ds_store = join(".DS_Store")).exist? && children.length == 1
+    if (ds_store = self+".DS_Store").exist? && children.length == 1
       ds_store.unlink
       retry
     else
@@ -343,7 +343,7 @@ class Pathname
 
   # @private
   def resolved_path
-    symlink? ? dirname.join(readlink) : self
+    symlink? ? dirname+readlink : self
   end
 
   # @private
@@ -353,7 +353,7 @@ class Pathname
     # The link target contains NUL bytes
     false
   else
-    dirname.join(link).exist?
+    (dirname+link).exist?
   end
 
   # @private
@@ -367,7 +367,7 @@ class Pathname
       if !other.respond_to?(:to_str) && !other.respond_to?(:to_path)
         odeprecated "Pathname#/ with #{other.class}", "a String or a Pathname"
       end
-      join(other.to_s)
+      self + other.to_s
     end
   end
 
@@ -403,7 +403,7 @@ class Pathname
     mkpath
     targets.each do |target|
       target = Pathname.new(target) # allow pathnames or strings
-      join(target.basename).write <<-EOS.undent
+      (self+target.basename).write <<-EOS.undent
         #!/bin/bash
         exec "#{target}" "$@"
       EOS
@@ -427,7 +427,7 @@ class Pathname
     Pathname.glob("#{self}/*") do |file|
       next if file.directory?
       dst.install(file)
-      new_file = dst.join(file.basename)
+      new_file = dst+file.basename
       file.write_env_script(new_file, env)
     end
   end
@@ -435,7 +435,7 @@ class Pathname
   # Writes an exec script that invokes a java jar
   def write_jar_script(target_jar, script_name, java_opts = "")
     mkpath
-    join(script_name).write <<-EOS.undent
+    (self+script_name).write <<-EOS.undent
       #!/bin/bash
       exec java #{java_opts} -jar #{target_jar} "$@"
     EOS

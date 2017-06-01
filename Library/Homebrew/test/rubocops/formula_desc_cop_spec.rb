@@ -31,7 +31,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
       source = <<-EOS.undent
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
-          desc '#{"bar" * 30}'
+          desc '#{"bar"*30}'
         end
       EOS
 
@@ -55,8 +55,8 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
       source = <<-EOS.undent
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
-          desc '#{"bar" * 10}'\
-            '#{"foo" * 21}'
+          desc '#{"bar"*10}'\
+            '#{"foo"*21}'
         end
       EOS
 
