@@ -114,7 +114,7 @@ module Homebrew
 
   def search_formulae(regex)
     aliases = Formula.alias_full_names
-    results = (Formula.full_names + aliases).grep(regex).sort
+    results = (Formula.full_names+aliases).grep(regex).sort
 
     results.map do |name|
       begin

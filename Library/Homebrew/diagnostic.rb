@@ -158,7 +158,7 @@ module Homebrew
           "libosxfuse_i32.2.dylib", # OSXFuse
           "libosxfuse_i64.2.dylib", # OSXFuse
           "libosxfuse.2.dylib", # OSXFuse
-          "libTrAPI.dylib", # TrAPI/Endpoint Security VPN
+          "libTrAPI.dylib", # TrAPI / Endpoint Security VPN
           "libntfs-3g.*.dylib", # NTFS-3G
           "libntfs.*.dylib", # NTFS-3G
           "libublio.*.dylib", # NTFS-3G
@@ -470,7 +470,7 @@ module Homebrew
         return if $seen_prefix_sbin
 
         # Don't complain about sbin not being in the path if it doesn't exist
-        sbin = HOMEBREW_PREFIX/"sbin"
+        sbin = (HOMEBREW_PREFIX+"sbin")
         return unless sbin.directory? && !sbin.children.empty?
 
         <<-EOS.undent

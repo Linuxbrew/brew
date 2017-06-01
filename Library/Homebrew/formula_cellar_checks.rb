@@ -20,7 +20,7 @@ module FormulaCellarChecks
 
   def check_manpages
     # Check for man pages that aren't in share/man
-    return unless (formula.prefix/"man").directory?
+    return unless (formula.prefix+"man").directory?
 
     <<-EOS.undent
       A top-level "man" directory was found
@@ -31,7 +31,7 @@ module FormulaCellarChecks
 
   def check_infopages
     # Check for info pages that aren't in share/info
-    return unless (formula.prefix/"info").directory?
+    return unless (formula.prefix+"info").directory?
 
     <<-EOS.undent
       A top-level "info" directory was found

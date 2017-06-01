@@ -248,7 +248,7 @@ module Homebrew
           mv "#{relocatable_tar_path}.gz", bottle_path
         end
 
-        if bottle_path.size > 1 * 1024 * 1024
+        if bottle_path.size > 1*1024*1024
           ohai "Detecting if #{filename} is relocatable..."
         end
 

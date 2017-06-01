@@ -568,7 +568,7 @@ class Keg
 
   # symlinks the contents of path+relative_dir recursively into #{HOMEBREW_PREFIX}/relative_dir
   def link_dir(relative_dir, mode)
-    root = path/relative_dir
+    root = path+relative_dir
     return unless root.exist?
     root.find do |src|
       next if src == root

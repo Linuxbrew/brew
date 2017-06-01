@@ -43,7 +43,7 @@ module Hbc
             if checkpoint.nil?
               onoe "Could not retrieve `appcast` checkpoint for cask '#{cask}': #{result[:command_result].stderr}"
             else
-              puts((cask_tokens.count > 1) ? "#{checkpoint}  #{cask}" : checkpoint)
+              puts((cask_tokens.count > 1) ? "#{checkpoint}  #{cask}": checkpoint)
               count += 1
             end
           end
