@@ -175,7 +175,7 @@ module Homebrew
   end
 
   def system(cmd, *args)
-    puts "#{cmd} #{args*" "}" if ARGV.verbose?
+    puts "#{cmd} #{args * " "}" if ARGV.verbose?
     _system(cmd, *args)
   end
 
@@ -334,7 +334,7 @@ def which_editor
 
   # Find Textmate
   editor = which("mate", ENV["HOMEBREW_PATH"])
-  # Find BBEdit / TextWrangler
+  # Find BBEdit/TextWrangler
   editor ||= which("edit", ENV["HOMEBREW_PATH"])
   # Find vim
   editor ||= which("vim", ENV["HOMEBREW_PATH"])
