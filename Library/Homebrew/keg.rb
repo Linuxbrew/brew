@@ -259,7 +259,7 @@ class Keg
 
     dirs = []
 
-    TOP_LEVEL_DIRECTORIES.map { |d| path.join(d) }.each do |dir|
+    TOP_LEVEL_DIRECTORIES.map { |d| path/d }.each do |dir|
       next unless dir.exist?
       dir.find do |src|
         dst = HOMEBREW_PREFIX + src.relative_path_from(path)
@@ -301,7 +301,7 @@ class Keg
 
   def completion_installed?(shell)
     dir = case shell
-    when :bash then path.join("etc", "bash_completion.d")
+    when :bash then path/"etc/bash_completion.d"
     when :zsh
       dir = path/"share/zsh/site-functions"
       dir if dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
@@ -328,7 +328,7 @@ class Keg
   end
 
   def python_site_packages_installed?
-    path.join("lib", "python2.7", "site-packages").directory?
+    (path/"lib/python2.7/site-packages").directory?
   end
 
   def python_pth_files_installed?
@@ -568,7 +568,7 @@ class Keg
 
   # symlinks the contents of path+relative_dir recursively into #{HOMEBREW_PREFIX}/relative_dir
   def link_dir(relative_dir, mode)
-    root = path+relative_dir
+    root = path/relative_dir
     return unless root.exist?
     root.find do |src|
       next if src == root

@@ -59,10 +59,10 @@ begin
   ENV["PATH"] = path
 
   if cmd
-    internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("cmd", cmd)
+    internal_cmd = require? HOMEBREW_LIBRARY_PATH/"cmd"/cmd
 
     unless internal_cmd
-      internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("dev-cmd", cmd)
+      internal_cmd = require? HOMEBREW_LIBRARY_PATH/"dev-cmd"/cmd
       if internal_cmd && !ARGV.homebrew_developer?
         system "git", "config", "--file=#{HOMEBREW_REPOSITORY}/.git/config",
                                 "--replace-all", "homebrew.devcmdrun", "true"

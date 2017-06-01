@@ -216,7 +216,7 @@ module Hbc
     end
 
     def repo_valid?
-      @clone.join(".svn").directory?
+      (@clone/".svn").directory?
     end
 
     def repo_url

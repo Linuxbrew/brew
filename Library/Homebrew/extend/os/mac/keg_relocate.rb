@@ -89,7 +89,7 @@ class Keg
     # the basename of the file itself.
     basename = File.basename(file.dylib_id)
     relative_dirname = file.dirname.relative_path_from(path)
-    opt_record.join(relative_dirname, basename).to_s
+    (opt_record/relative_dirname/basename).to_s
   end
 
   # Matches framework references like `XXX.framework/Versions/YYY/XXX` and
