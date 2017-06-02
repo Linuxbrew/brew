@@ -107,7 +107,7 @@ module Homebrew
       dirname, filename = File.split(match["path"])
       next unless valid_dirnames.include?(dirname)
       tap = Tap.fetch(match["repository"]["full_name"])
-      next if tap.installed?
+      next if tap.installed? && match["repository"]["owner"]["login"] != "caskroom"
       "#{tap.name}/#{File.basename(filename, ".rb")}"
     end.compact
   end
