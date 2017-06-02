@@ -222,12 +222,12 @@ class FormulaInstaller
       EOS
       message += if formula.outdated? && !formula.head?
         <<-EOS.undent
-          To upgrade to #{formula.version}, run `brew upgrade #{formula.name}`
+          To upgrade to #{formula.pkg_version}, run `brew upgrade #{formula.name}`
         EOS
       else
         # some other version is already installed *and* linked
         <<-EOS.undent
-          To install #{formula.version}, first run `brew unlink #{formula.name}`
+          To install #{formula.pkg_version}, first run `brew unlink #{formula.name}`
         EOS
       end
       raise CannotInstallFormulaError, message
