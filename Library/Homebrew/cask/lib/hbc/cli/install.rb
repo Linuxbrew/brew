@@ -3,7 +3,6 @@ module Hbc
     class Install < AbstractCommand
       option "--force",          :force,          false
       option "--skip-cask-deps", :skip_cask_deps, false
-      option "--require-sha",    :require_sha,    false
 
       def initialize(*)
         super
