@@ -24,13 +24,23 @@ module RuboCop
         return unless match_object
         node_begin_pos = start_column(node)
         line_begin_pos = line_start_column(node)
-        @column = node_begin_pos + match_object.begin(0) - line_begin_pos + 1
+        if node_begin_pos == line_begin_pos
+          @column = node_begin_pos + match_object.begin(0) - line_begin_pos
+        else
+          @column = node_begin_pos + match_object.begin(0) - line_begin_pos + 1
+        end
         @length = match_object.to_s.length
         @line_no = line_number(node)
         @source_buf = source_buffer(node)
         @offense_source_range = source_range(@source_buf, @line_no, @column, @length)
         @offensive_node = node
         match_object
+      end
+
+      # Returns all string nodes among the descendants of given node
+      def find_strings(node)
+        return [] if node.nil?
+        node.each_descendant(:str)
       end
 
       # Returns method_node matching method_name
@@ -233,6 +243,11 @@ module RuboCop
         true
       end
 
+      # Return all the caveats' string nodes in an array
+      def caveats_strings
+        find_strings(find_method_def(@body, :caveats))
+      end
+
       # Returns the array of arguments of the method_node
       def parameters(method_node)
         return unless method_node.send_type?
@@ -308,6 +323,8 @@ module RuboCop
           return node.each_child_node(:str).map(&:str_content).join("") if node.type == :dstr
         when :const
           return node.const_name if node.type == :const
+        else
+          ""
         end
       end
 

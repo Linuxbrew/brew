@@ -305,23 +305,6 @@ describe FormulaAuditor do
     end
   end
 
-  specify "#audit_caveats" do
-    fa = formula_auditor "foo", <<-EOS.undent
-      class Foo < Formula
-        homepage "http://example.com/foo"
-        url "http://example.com/foo-1.0.tgz"
-
-        def caveats
-          "setuid"
-        end
-      end
-    EOS
-
-    fa.audit_caveats
-    expect(fa.problems)
-      .to eq(["Don't recommend setuid in the caveats, suggest sudo instead."])
-  end
-
   describe "#audit_keg_only_style" do
     specify "keg_only_needs_downcasing" do
       fa = formula_auditor "foo", <<-EOS.undent, strict: true
