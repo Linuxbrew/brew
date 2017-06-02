@@ -262,6 +262,14 @@ ensure
   ENV["PATH"] = old_path
 end
 
+def with_homebrew_path
+  old_path = ENV["PATH"]
+  ENV["PATH"] = ENV["HOMEBREW_PATH"]
+  yield
+ensure
+  ENV["PATH"] = old_path
+end
+
 def with_custom_locale(locale)
   old_locale = ENV["LC_ALL"]
   ENV["LC_ALL"] = locale
@@ -321,23 +329,13 @@ end
 
 def which_editor
   editor = ENV.values_at("HOMEBREW_EDITOR", "HOMEBREW_VISUAL").compact.reject(&:empty?).first
-  if editor
-    editor_name, _, editor_args = editor.partition " "
-    editor_path = which(editor_name, ENV["HOMEBREW_PATH"])
-    editor = if editor_args.to_s.empty?
-      editor_path.to_s
-    else
-      "#{editor_path} #{editor_args}"
-    end
-    return editor
+  return editor unless editor.nil?
+
+  # Find Textmate, BBEdit / TextWrangler, or vim
+  %w[mate edit vim].each do |candidate|
+    editor = candidate if which(candidate, ENV["HOMEBREW_PATH"])
   end
 
-  # Find Textmate
-  editor = which("mate", ENV["HOMEBREW_PATH"])
-  # Find BBEdit / TextWrangler
-  editor ||= which("edit", ENV["HOMEBREW_PATH"])
-  # Find vim
-  editor ||= which("vim", ENV["HOMEBREW_PATH"])
   # Default to standard vim
   editor ||= "/usr/bin/vim"
 
@@ -347,12 +345,12 @@ def which_editor
     or HOMEBREW_EDITOR to your preferred text editor.
   EOS
 
-  editor.to_s
+  editor
 end
 
 def exec_editor(*args)
   puts "Editing #{args.join "\n"}"
-  safe_exec(which_editor, *args)
+  with_homebrew_path { safe_exec(which_editor, *args) }
 end
 
 def exec_browser(*args)
