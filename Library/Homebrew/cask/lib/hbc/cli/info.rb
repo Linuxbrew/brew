@@ -23,7 +23,7 @@ module Hbc
         puts "#{cask.token}: #{cask.version}"
         puts Formatter.url(cask.homepage) if cask.homepage
         installation_info(cask)
-        puts "From: #{Formatter.url(repo_info(cask))}"
+        repo_info(cask)
         name_info(cask)
         artifact_info(cask)
         Installer.print_caveats(cask)
@@ -55,13 +55,18 @@ module Hbc
 
       def self.repo_info(cask)
         user, repo, token = QualifiedToken.parse(Hbc.all_tokens.detect { |t| t.split("/").last == cask.token })
+
+        return if user.nil? || repo.nil?
+
         remote_tap = Tap.fetch(user, repo)
 
-        if remote_tap.custom_remote? && !remote_tap.remote.nil?
-          return remote_tap.remote.to_s
+        url = if remote_tap.custom_remote? && !remote_tap.remote.nil?
+          remote_tap.remote
+        else
+          "#{remote_tap.default_remote}/blob/master/Casks/#{token}.rb"
         end
 
-        "#{remote_tap.default_remote}/blob/master/Casks/#{token}.rb"
+        puts "From: #{Formatter.url(url)}"
       end
 
       def self.artifact_info(cask)
