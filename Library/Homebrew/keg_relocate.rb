@@ -108,7 +108,7 @@ class Keg
   end
 
   def lib
-    path.join("lib")
+    path/"lib"
   end
 
   def text_files

@@ -248,7 +248,7 @@ class Migrator
     # Pathname#make_relative_symlink, where Pathname#relative_path_from
     # is used to find relative path from source to destination parent and
     # it assumes no symlinks.
-    src_oldname = old_pin_record.dirname.join(old_pin_link_record).expand_path
+    src_oldname = (old_pin_record.dirname/old_pin_link_record).expand_path
     new_pin_record.make_relative_symlink(src_oldname.sub(oldname, newname))
     old_pin_record.delete
   end
@@ -363,7 +363,7 @@ class Migrator
     backup_old_tabs
 
     if pinned? && !old_pin_record.symlink?
-      src_oldname = old_pin_record.dirname.join(old_pin_link_record).expand_path
+      src_oldname = (old_pin_record.dirname/old_pin_link_record).expand_path
       old_pin_record.make_relative_symlink(src_oldname)
       new_pin_record.delete
     end
