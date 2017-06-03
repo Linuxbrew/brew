@@ -959,6 +959,7 @@ class FormulaAuditor
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+(.*)/
       dep = $1
       $2.split(" ").map do |o|
+        break if ["if", "unless"].include?(o)
         next unless o =~ /^\[?['"](.*)['"]/
         problem "Dependency #{dep} should not use option #{$1}"
       end
