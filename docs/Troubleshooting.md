@@ -13,7 +13,6 @@ Follow these steps to fix common problems:
 * Check that **Command Line Tools for Xcode (CLT)** and **Xcode** are up to date.
 * If commands fail with permissions errors, check the permissions of `/usr/local`'s subdirectories. If you’re unsure what to do, you can run `cd /usr/local && sudo chown -R $(whoami) bin etc include lib sbin share var Frameworks`.
 * Read through the [Common Issues](Common-Issues.md).
-* If you’re installing something Java-related, make sure you have installed Java (you can run `brew cask install java`).
 
 ## Check to see if the issue has been reported
 

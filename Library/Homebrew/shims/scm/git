@@ -86,7 +86,6 @@ fi
 case "$(lowercase "$SCM_FILE")" in
   git)
     [[ -n "$HOMEBREW_GIT" ]] && safe_exec "$(which "$HOMEBREW_GIT")" "$@"
-    [[ -n "$GIT" ]] && safe_exec "$(which "$GIT")" "$@"
     ;;
   svn)
     [[ -n "$HOMEBREW_SVN" ]] && safe_exec "$(which "$HOMEBREW_SVN")" "$@"

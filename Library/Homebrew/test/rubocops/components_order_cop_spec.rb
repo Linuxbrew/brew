@@ -3,7 +3,7 @@ require "rubocop/rspec/support"
 require_relative "../../extend/string"
 require_relative "../../rubocops/components_order_cop"
 
-describe RuboCop::Cop::Homebrew::FormulaComponentsOrder do
+describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
   subject(:cop) { described_class.new }
 
   context "When auditing formula components order" do
@@ -111,6 +111,53 @@ describe RuboCop::Cop::Homebrew::FormulaComponentsOrder do
       expect(actual.severity).to eq(expected[:severity])
       expect(actual.line).to eq(expected[:line])
       expect(actual.column).to eq(expected[:column])
+    end
+  end
+
+  context "When auditing formula components order with autocorrect" do
+    it "When url precedes homepage" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+          homepage "http://example.com"
+        end
+      EOS
+      correct_source = <<-EOS.undent
+        class Foo < Formula
+          homepage "http://example.com"
+          url "http://example.com/foo-1.0.tgz"
+        end
+      EOS
+
+      corrected_source = autocorrect_source(cop, source)
+      expect(corrected_source).to eq(correct_source)
+    end
+
+    it "When `resource` precedes `depends_on`" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          url "https://example.com/foo-1.0.tgz"
+
+          resource "foo2" do
+            url "https://example.com/foo-2.0.tgz"
+          end
+
+          depends_on "openssl"
+        end
+      EOS
+      correct_source = <<-EOS.undent
+        class Foo < Formula
+          url "https://example.com/foo-1.0.tgz"
+
+          depends_on "openssl"
+
+          resource "foo2" do
+            url "https://example.com/foo-2.0.tgz"
+          end
+        end
+      EOS
+      corrected_source = autocorrect_source(cop, source)
+      expect(corrected_source).to eq(correct_source)
     end
   end
 end

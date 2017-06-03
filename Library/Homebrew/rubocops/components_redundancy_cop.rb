@@ -2,7 +2,7 @@ require_relative "./extend/formula_cop"
 
 module RuboCop
   module Cop
-    module Homebrew
+    module FormulaAuditStrict
       # This cop checks if redundant components are present and other component errors
       #
       # - `url|checksum|mirror` should be inside `stable` block

@@ -3,7 +3,7 @@ require "rubocop/rspec/support"
 require_relative "../../extend/string"
 require_relative "../../rubocops/formula_desc_cop"
 
-describe RuboCop::Cop::Homebrew::FormulaDesc do
+describe RuboCop::Cop::FormulaAuditStrict::Desc do
   subject(:cop) { described_class.new }
 
   context "When auditing formula desc" do
@@ -38,6 +38,31 @@ describe RuboCop::Cop::Homebrew::FormulaDesc do
       msg = <<-EOS.undent
         Description is too long. "name: desc" should be less than 80 characters.
         Length is calculated as Foo + desc. (currently 95)
+      EOS
+      expected_offenses = [{ message: msg,
+                             severity: :convention,
+                             line: 3,
+                             column: 2,
+                             source: source }]
+
+      inspect_source(cop, source)
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "When desc is multiline string" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          desc '#{"bar"*10}'\
+            '#{"foo"*21}'
+        end
+      EOS
+
+      msg = <<-EOS.undent
+        Description is too long. "name: desc" should be less than 80 characters.
+        Length is calculated as Foo + desc. (currently 98)
       EOS
       expected_offenses = [{ message: msg,
                              severity: :convention,

@@ -601,13 +601,11 @@ class FormulaInstaller
       fix_dynamic_linkage(keg)
     end
 
-    if formula.post_install_defined?
-      if build_bottle?
-        ohai "Not running post_install as we're building a bottle"
-        puts "You can run it manually using `brew postinstall #{formula.full_name}`"
-      else
-        post_install
-      end
+    if build_bottle?
+      ohai "Not running post_install as we're building a bottle"
+      puts "You can run it manually using `brew postinstall #{formula.full_name}`"
+    else
+      post_install
     end
 
     caveats
@@ -695,13 +693,15 @@ class FormulaInstaller
     Sandbox.print_sandbox_message if Sandbox.formula?(formula)
 
     Utils.safe_fork do
-      # Invalidate the current sudo timestamp in case a build script calls sudo
-      system "/usr/bin/sudo", "-k"
+      # Invalidate the current sudo timestamp in case a build script calls sudo.
+      # Travis CI's Linux sudoless workers have a weird sudo that fails here.
+      system "/usr/bin/sudo", "-k" unless ENV["TRAVIS_SUDO"] == "false"
 
       if Sandbox.formula?(formula)
         sandbox = Sandbox.new
         formula.logs.mkpath
         sandbox.record_log(formula.logs/"build.sandbox.log")
+        sandbox.allow_write_path(ENV["HOME"]) if ARGV.interactive?
         sandbox.allow_write_temp_and_cache
         sandbox.allow_write_log(formula)
         sandbox.allow_write_xcode
@@ -868,12 +868,6 @@ class FormulaInstaller
 
     skip_linkage = formula.bottle_specification.skip_relocation?
     keg.replace_placeholders_with_locations tab.changed_files, skip_linkage: skip_linkage
-
-    Pathname.glob("#{formula.bottle_prefix}/{etc,var}/**/*") do |path|
-      path.extend(InstallRenamed)
-      path.cp_path_sub(formula.bottle_prefix, HOMEBREW_PREFIX)
-    end
-    FileUtils.rm_rf formula.bottle_prefix
 
     tab = Tab.for_keg(keg)
 

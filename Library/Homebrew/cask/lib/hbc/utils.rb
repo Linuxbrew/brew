@@ -43,7 +43,7 @@ module Hbc
             p.rmtree
           else
             command.run("/bin/rm",
-                        args: command_args + ["-r", "-f", "--", p],
+                        args: ["-r", "-f", "--", p],
                         sudo: true)
           end
         end

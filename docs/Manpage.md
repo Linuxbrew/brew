@@ -402,7 +402,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--env=std` is passed, use the standard `PATH` instead of superenv's.
 
-  * `style` [`--fix`] [`--display-cop-names`] [`files`|`taps`|`formulae`]:
+  * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
 
     `formulae` and `files` may not be combined. If both are omitted, style will run
@@ -414,6 +414,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--display-cop-names` is passed, the RuboCop cop name for each violation
     is included in the output.
+
+    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
+
+    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 
     Exits with a non-zero status if any style violations are found.
 
@@ -606,7 +610,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## DEVELOPER COMMANDS
 
-  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=``method`|`--except=``method] [<formulae`]:
+  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=``method`|`--except=``method`] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [`formulae`]:
     Check `formulae` for Homebrew coding style violations. This should be
     run before submitting a new formula.
 
@@ -634,6 +638,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--only` is passed, only the methods named `audit_`method`` will be run.
 
     If `--except` is passed, the methods named `audit_`method`` will not be run.
+
+    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
+
+    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.
@@ -902,31 +910,6 @@ can take several different forms:
     The formula file will be cached for later use.
 
 ## ENVIRONMENT
-
-  * `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`:
-    When using the `S3` download strategy, Homebrew will look in
-    these variables for access credentials (see
-    <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
-    to retrieve these access credentials from AWS).  If they are not set,
-    the `S3` download strategy will download with a public
-    (unsigned) URL.
-
-  * `BROWSER`:
-    If set, and `HOMEBREW_BROWSER` is not, use `BROWSER` as the web browser
-    when opening project homepages.
-
-  * `EDITOR`:
-    If set, and `HOMEBREW_EDITOR` and `VISUAL` are not, use `EDITOR` as the text editor.
-
-  * `GIT`:
-    When using Git, Homebrew will use `GIT` if set,
-    a Homebrew-built Git if installed, or the system-provided binary.
-
-    Set this to force Homebrew to use a particular git binary.
-
-  * `HOMEBREW_BOTTLE_DOMAIN`:
-    If set, instructs Homebrew to use the given URL as a download mirror for bottles.
-
   * `HOMEBREW_ARTIFACT_DOMAIN`:
     If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
 
@@ -934,6 +917,17 @@ can take several different forms:
     If set, Homebrew will only check for autoupdates once per this seconds interval.
 
     *Default:* `60`.
+
+  * `HOMEBREW_AWS_ACCESS_KEY_ID`, `HOMEBREW_AWS_SECRET_ACCESS_KEY`:
+    When using the `S3` download strategy, Homebrew will look in
+    these variables for access credentials (see
+    <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
+    to retrieve these access credentials from AWS).  If they are not set,
+    the `S3` download strategy will download with a public
+    (unsigned) URL.
+
+  * `HOMEBREW_BOTTLE_DOMAIN`:
+    If set, instructs Homebrew to use the given URL as a download mirror for bottles.
 
   * `HOMEBREW_BROWSER`:
     If set, uses this setting as the browser when opening project homepages,
@@ -981,6 +975,12 @@ can take several different forms:
   * `HOMEBREW_FORCE_VENDOR_RUBY`:
     If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
     even if the system version of Ruby is >=2.0.
+
+  * `HOMEBREW_GIT`:
+    When using Git, Homebrew will use `GIT` if set,
+    a Homebrew-built Git if installed, or the system-provided binary.
+
+    Set this to force Homebrew to use a particular git binary.
 
   * `HOMEBREW_GITHUB_API_TOKEN`:
     A personal access token for the GitHub API, which you can create at
@@ -1046,9 +1046,6 @@ can take several different forms:
 
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.
-
-  * `VISUAL`:
-    If set, and `HOMEBREW_EDITOR` is not, use `VISUAL` as the text editor.
 
 ## USING HOMEBREW BEHIND A PROXY
 

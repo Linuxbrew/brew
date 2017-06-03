@@ -322,77 +322,66 @@ describe FormulaAuditor do
       .to eq(["Don't recommend setuid in the caveats, suggest sudo instead."])
   end
 
-  describe "#audit_homepage" do
-    specify "homepage URLs" do
-      fa = formula_auditor "foo", <<-EOS.undent, online: true
+  describe "#audit_keg_only_style" do
+    specify "keg_only_needs_downcasing" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
         class Foo < Formula
-          homepage "ftp://example.com/foo"
           url "http://example.com/foo-1.0.tgz"
+
+          keg_only "Because why not"
         end
       EOS
 
-      fa.audit_homepage
+      fa.audit_keg_only_style
       expect(fa.problems)
-        .to eq(["The homepage should start with http or https (URL is #{fa.formula.homepage})."])
-
-      formula_homepages = {
-        "bar" => "http://www.freedesktop.org/wiki/bar",
-        "baz" => "http://www.freedesktop.org/wiki/Software/baz",
-        "qux" => "https://code.google.com/p/qux",
-        "quux" => "http://github.com/quux",
-        "corge" => "http://savannah.nongnu.org/corge",
-        "grault" => "http://grault.github.io/",
-        "garply" => "http://www.gnome.org/garply",
-        "sf1" => "http://foo.sourceforge.net/",
-        "sf2" => "http://foo.sourceforge.net",
-        "sf3" => "http://foo.sf.net/",
-        "sf4" => "http://foo.sourceforge.io/",
-        "waldo" => "http://www.gnu.org/waldo",
-      }
-
-      formula_homepages.each do |name, homepage|
-        fa = formula_auditor name, <<-EOS.undent
-          class #{Formulary.class_s(name)} < Formula
-            homepage "#{homepage}"
-            url "http://example.com/#{name}-1.0.tgz"
-          end
-        EOS
-
-        fa.audit_homepage
-        if homepage =~ %r{http:\/\/www\.freedesktop\.org}
-          if homepage =~ /Software/
-            expect(fa.problems.first).to match(
-              "#{homepage} should be styled " \
-              "`https://wiki.freedesktop.org/www/Software/project_name`",
-            )
-          else
-            expect(fa.problems.first).to match(
-              "#{homepage} should be styled " \
-              "`https://wiki.freedesktop.org/project_name`",
-            )
-          end
-        elsif homepage =~ %r{https:\/\/code\.google\.com}
-          expect(fa.problems.first)
-            .to match("#{homepage} should end with a slash")
-        elsif homepage =~ /foo\.(sf|sourceforge)\.net/
-          expect(fa.problems.first)
-            .to match("#{homepage} should be `https://foo.sourceforge.io/`")
-        else
-          expect(fa.problems.first)
-            .to match("Please use https:// for #{homepage}")
-        end
-      end
+        .to eq(["'Because' from the keg_only reason should be 'because'.\n"])
     end
 
-    specify "missing homepage" do
-      fa = formula_auditor "foo", <<-EOS.undent, online: true
+    specify "keg_only_redundant_period" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
+
+          keg_only "because this line ends in a period."
         end
       EOS
 
-      fa.audit_homepage
-      expect(fa.problems.first).to match("Formula should have a homepage.")
+      fa.audit_keg_only_style
+      expect(fa.problems)
+        .to eq(["keg_only reason should not end with a period."])
+    end
+
+    specify "keg_only_handles_block_correctly" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+
+          keg_only <<-EOF.undent
+            this line starts with a lowercase word.
+
+            This line does not but that shouldn't be a
+            problem
+          EOF
+        end
+      EOS
+
+      fa.audit_keg_only_style
+      expect(fa.problems)
+        .to eq([])
+    end
+
+    specify "keg_only_handles_whitelist_correctly" do
+      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+
+          keg_only "Apple ships foo in the CLT package"
+        end
+      EOS
+
+      fa.audit_keg_only_style
+      expect(fa.problems)
+        .to eq([])
     end
   end
 

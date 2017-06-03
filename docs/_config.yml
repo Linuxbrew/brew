@@ -1,3 +1,4 @@
+include: [.well-known]
 exclude: [bin, vendor, CNAME, Gemfile, Gemfile.lock]
 
 gems:

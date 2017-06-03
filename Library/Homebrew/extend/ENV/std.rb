@@ -90,12 +90,12 @@ module Stdenv
   end
 
   def determine_pkg_config_libdir
-    paths = []
-    paths << "#{HOMEBREW_PREFIX}/lib/pkgconfig"
-    paths << "#{HOMEBREW_PREFIX}/share/pkgconfig"
-    paths += homebrew_extra_pkg_config_paths
-    paths << "/usr/lib/pkgconfig" if OS.mac?
-    paths.select { |d| File.directory? d }.join(File::PATH_SEPARATOR)
+    PATH.new(
+      HOMEBREW_PREFIX/"lib/pkgconfig",
+      HOMEBREW_PREFIX/"share/pkgconfig",
+      homebrew_extra_pkg_config_paths,
+      *("/usr/lib/pkgconfig" if OS.mac?),
+    ).existing
   end
 
   # Removes the MAKEFLAGS environment variable, causing make to use a single job.

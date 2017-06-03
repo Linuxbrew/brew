@@ -1,4 +1,4 @@
-#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method] [<formulae>]:
+#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method>] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
@@ -26,6 +26,10 @@
 #:    If `--only` is passed, only the methods named `audit_<method>` will be run.
 #:
 #:    If `--except` is passed, the methods named `audit_<method>` will not be run.
+#:
+#:    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
+#:
+#:    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
 #:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
@@ -69,15 +73,30 @@ module Homebrew
       files = ARGV.resolved_formulae.map(&:path)
     end
 
-    if strict
-      options = { fix: ARGV.flag?("--fix"), realpath: true }
-      # Check style in a single batch run up front for performance
-      style_results = check_style_json(files, options)
+    only_cops = ARGV.value("only-cops").to_s.split(",")
+    except_cops = ARGV.value("except-cops").to_s.split(",")
+    if !only_cops.empty? && !except_cops.empty?
+      odie "--only-cops and --except-cops cannot be used simultaneously!"
+    elsif (!only_cops.empty? || !except_cops.empty?) && strict
+      odie "--only-cops/--except-cops and --strict cannot be used simultaneously"
     end
+
+    options = { fix: ARGV.flag?("--fix"), realpath: true }
+
+    if !only_cops.empty?
+      options[:only_cops] = only_cops
+    elsif !except_cops.empty?
+      options[:except_cops] = except_cops
+    elsif !strict
+      options[:except_cops] = [:FormulaAuditStrict]
+    end
+
+    # Check style in a single batch run up front for performance
+    style_results = check_style_json(files, options)
 
     ff.each do |f|
       options = { new_formula: new_formula, strict: strict, online: online }
-      options[:style_offenses] = style_results.file_offenses(f.path) if strict
+      options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
 
@@ -288,25 +307,41 @@ class FormulaAuditor
         unversioned_name = unversioned_formula.basename(".rb")
         problem "#{formula} is versioned but no #{unversioned_name} formula exists"
       end
-    elsif ARGV.build_stable?
-      versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]
-      needs_versioned_alias = !versioned_formulae.empty? &&
-                              formula.tap &&
-                              formula.aliases.grep(/.@\d/).empty?
-      if needs_versioned_alias
-        _, last_alias_version = File.basename(versioned_formulae.sort.reverse.first)
-                                    .gsub(/\.rb$/, "")
-                                    .split("@")
-        major, minor, = formula.version.to_s.split(".")
-        alias_name = if last_alias_version.split(".").length == 1
-          "#{formula.name}@#{major}"
+    elsif ARGV.build_stable? &&
+          !(versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]).empty?
+      versioned_aliases = formula.aliases.grep(/.@\d/)
+      _, last_alias_version =
+        File.basename(versioned_formulae.sort.reverse.first)
+            .gsub(/\.rb$/, "").split("@")
+      major, minor, = formula.version.to_s.split(".")
+      alias_name_major = "#{formula.name}@#{major}"
+      alias_name_major_minor = "#{alias_name_major}.#{minor}"
+      alias_name = if last_alias_version.split(".").length == 1
+        alias_name_major
+      else
+        alias_name_major_minor
+      end
+      valid_alias_names = [alias_name_major, alias_name_major_minor]
+
+      valid_versioned_aliases = versioned_aliases & valid_alias_names
+      invalid_versioned_aliases = versioned_aliases - valid_alias_names
+
+      if valid_versioned_aliases.empty?
+        if formula.tap
+          problem <<-EOS.undent
+            Formula has other versions so create a versioned alias:
+              cd #{formula.tap.alias_dir}
+              ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
+          EOS
         else
-          "#{formula.name}@#{major}.#{minor}"
+          problem "Formula has other versions so create an alias named #{alias_name}."
         end
+      end
+
+      unless invalid_versioned_aliases.empty?
         problem <<-EOS.undent
-          Formula has other versions so create an alias:
-            cd #{formula.tap.alias_dir}
-            ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
+          Formula has invalid versioned aliases:
+            #{invalid_versioned_aliases.join("\n  ")}
         EOS
       end
     end
@@ -489,6 +524,38 @@ class FormulaAuditor
     EOS
   end
 
+  def audit_keg_only_style
+    return unless @strict
+    return unless formula.keg_only?
+
+    whitelist = %w[
+      Apple
+      macOS
+      OS
+      Homebrew
+      Xcode
+      GPG
+      GNOME
+      BSD
+      Firefox
+    ].freeze
+
+    reason = formula.keg_only_reason.to_s
+    # Formulae names can legitimately be uppercase/lowercase/both.
+    name = Regexp.new(formula.name, Regexp::IGNORECASE)
+    reason.sub!(name, "")
+    first_word = reason.split[0]
+
+    if reason =~ /\A[A-Z]/ && !reason.start_with?(*whitelist)
+      problem <<-EOS.undent
+        '#{first_word}' from the keg_only reason should be '#{first_word.downcase}'.
+      EOS
+    end
+
+    return unless reason.end_with?(".")
+    problem "keg_only reason should not end with a period."
+  end
+
   def audit_options
     formula.options.each do |o|
       if o.name == "32-bit"
@@ -521,76 +588,7 @@ class FormulaAuditor
     homepage = formula.homepage
 
     if homepage.nil? || homepage.empty?
-      problem "Formula should have a homepage."
       return
-    end
-
-    unless homepage =~ %r{^https?://}
-      problem "The homepage should start with http or https (URL is #{homepage})."
-    end
-
-    # Check for http:// GitHub homepage urls, https:// is preferred.
-    # Note: only check homepages that are repo pages, not *.github.com hosts
-    if homepage.start_with? "http://github.com/"
-      problem "Please use https:// for #{homepage}"
-    end
-
-    # Savannah has full SSL/TLS support but no auto-redirect.
-    # Doesn't apply to the download URLs, only the homepage.
-    if homepage.start_with? "http://savannah.nongnu.org/"
-      problem "Please use https:// for #{homepage}"
-    end
-
-    # Freedesktop is complicated to handle - It has SSL/TLS, but only on certain subdomains.
-    # To enable https Freedesktop change the URL from http://project.freedesktop.org/wiki to
-    # https://wiki.freedesktop.org/project_name.
-    # "Software" is redirected to https://wiki.freedesktop.org/www/Software/project_name
-    if homepage =~ %r{^http://((?:www|nice|libopenraw|liboil|telepathy|xorg)\.)?freedesktop\.org/(?:wiki/)?}
-      if homepage =~ /Software/
-        problem "#{homepage} should be styled `https://wiki.freedesktop.org/www/Software/project_name`"
-      else
-        problem "#{homepage} should be styled `https://wiki.freedesktop.org/project_name`"
-      end
-    end
-
-    # Google Code homepages should end in a slash
-    if homepage =~ %r{^https?://code\.google\.com/p/[^/]+[^/]$}
-      problem "#{homepage} should end with a slash"
-    end
-
-    # People will run into mixed content sometimes, but we should enforce and then add
-    # exemptions as they are discovered. Treat mixed content on homepages as a bug.
-    # Justify each exemptions with a code comment so we can keep track here.
-    case homepage
-    when %r{^http://[^/]*\.github\.io/},
-         %r{^http://[^/]*\.sourceforge\.io/}
-      problem "Please use https:// for #{homepage}"
-    end
-
-    if homepage =~ %r{^http://([^/]*)\.(sf|sourceforge)\.net(/|$)}
-      problem "#{homepage} should be `https://#{$1}.sourceforge.io/`"
-    end
-
-    # There's an auto-redirect here, but this mistake is incredibly common too.
-    # Only applies to the homepage and subdomains for now, not the FTP URLs.
-    if homepage =~ %r{^http://((?:build|cloud|developer|download|extensions|git|glade|help|library|live|nagios|news|people|projects|rt|static|wiki|www)\.)?gnome\.org}
-      problem "Please use https:// for #{homepage}"
-    end
-
-    # Compact the above into this list as we're able to remove detailed notations, etc over time.
-    case homepage
-    when %r{^http://[^/]*\.apache\.org},
-         %r{^http://packages\.debian\.org},
-         %r{^http://wiki\.freedesktop\.org/},
-         %r{^http://((?:www)\.)?gnupg\.org/},
-         %r{^http://ietf\.org},
-         %r{^http://[^/.]+\.ietf\.org},
-         %r{^http://[^/.]+\.tools\.ietf\.org},
-         %r{^http://www\.gnu\.org/},
-         %r{^http://code\.google\.com/},
-         %r{^http://bitbucket\.org/},
-         %r{^http://(?:[^/]*\.)?archive\.org}
-      problem "Please use https:// for #{homepage}"
     end
 
     return unless @online
@@ -985,8 +983,12 @@ class FormulaAuditor
       problem "#{$2} modules should be vendored rather than use deprecated `depends_on \"#{$1}\" => :#{$2}#{$3}`"
     end
 
-    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+.*(?<!\?[( ])['"](.+)['"]/
-      problem "Dependency #{$1} should not use option #{$2}"
+    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+(.*)/
+      dep = $1
+      $2.split(" ").map do |o|
+        next unless o =~ /^\[?['"](.*)['"]/
+        problem "Dependency #{dep} should not use option #{$1}"
+      end
     end
 
     # Commented-out depends_on
@@ -1226,7 +1228,7 @@ class FormulaAuditor
     only_audits = ARGV.value("only").to_s.split(",")
     except_audits = ARGV.value("except").to_s.split(",")
     if !only_audits.empty? && !except_audits.empty?
-      odie "--only and --except cannot be used simulataneously!"
+      odie "--only and --except cannot be used simultaneously!"
     end
 
     methods.map(&:to_s).grep(/^audit_/).each do |audit_method_name|
