@@ -1501,7 +1501,7 @@ class ResourceAuditor
     if @strict
       urls.each do |p|
         next unless p =~ %r{^https?://pypi.python.org/(.*)}
-        problem "#{p} should be `https://files.pythonhosted.org/#{$2}`"
+        problem "#{p} should be `https://files.pythonhosted.org/#{$1}`"
       end
     end
 
