@@ -1497,6 +1497,14 @@ class ResourceAuditor
       problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
     end
 
+    # Check pypi urls
+    if @strict
+      urls.each do |p|
+        next unless p =~ %r{^https?://pypi.python.org/(.*)}
+        problem "#{p} should be `https://files.pythonhosted.org/#{$2}`"
+      end
+    end
+
     return unless @online
     urls.each do |url|
       next if !@strict && mirrors.include?(url)
