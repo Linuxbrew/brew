@@ -32,11 +32,16 @@ module RuboCop
 
           # Check if command-line is wrongly used in formula's desc
           if match = regex_match_group(desc, /(command ?line)/i)
-            problem "Description should use \"command-line\" instead of \"#{match}\""
+            c = match.to_s.chars.first
+            problem "Description should use \"#{c}ommand-line\" instead of \"#{match}\""
           end
 
           if match = regex_match_group(desc, /^(an?)\s/i)
             problem "Description shouldn't start with an indefinite article (#{match})"
+          end
+
+          if regex_match_group(desc, /^[a-z]/)
+            problem "Description should start with a capital letter"
           end
 
           # Check if formula's name is used in formula's desc
