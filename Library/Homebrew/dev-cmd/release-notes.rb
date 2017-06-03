@@ -27,7 +27,7 @@ module Homebrew
                   .lines.grep(/Merge pull request/)
 
     output.map! do |s|
-      s.gsub(/.*Merge pull request #(\d+) from ([^\/]+)\/[^>]*(>>)*/,
+      s.gsub(%r{.*Merge pull request #(\d+) from ([^/]+)/[^>]*(>>)*},
              "https://github.com/Homebrew/brew/pull/\\1 (@\\2)")
     end
     if ARGV.include?("--markdown")
