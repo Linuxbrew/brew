@@ -49,12 +49,16 @@ begin
   end
 
   path = PATH.new(ENV["PATH"])
+  homebrew_path = PATH.new(ENV["HOMEBREW_PATH"])
 
   # Add contributed commands to PATH before checking.
-  path.append(Pathname.glob(Tap::TAP_DIRECTORY/"*/*/cmd"))
+  tap_cmds = Pathname.glob(Tap::TAP_DIRECTORY/"*/*/cmd")
+  path.append(tap_cmds)
+  homebrew_path.append(tap_cmds)
 
   # Add SCM wrappers.
   path.append(HOMEBREW_SHIMS_PATH/"scm")
+  homebrew_path.append(HOMEBREW_SHIMS_PATH/"scm")
 
   ENV["PATH"] = path
 
@@ -88,6 +92,9 @@ begin
   if cmd == "cask" && (HOMEBREW_CELLAR/"brew-cask").exist?
     system(HOMEBREW_BREW_FILE, "uninstall", "--force", "brew-cask")
   end
+
+  # External commands expect a normal PATH
+  ENV["PATH"] = homebrew_path unless internal_cmd
 
   if internal_cmd
     Homebrew.send cmd.to_s.tr("-", "_").downcase
