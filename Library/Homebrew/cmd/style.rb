@@ -120,7 +120,7 @@ module Homebrew
       # exitstatus can also be nil if RuboCop process crashes, e.g. due to
       # native extension problems.
       # JSON needs to be at least 2 characters.
-      if !status.success? || json.to_s.length < 2
+      if !(0..1).cover?(status.exitstatus) || json.to_s.length < 2
         raise "Error running `rubocop --format json #{args.join " "}`"
       end
       RubocopResults.new(JSON.parse(json))
