@@ -2,7 +2,7 @@
 #:    Upload logs for a failed build of <formula> to a new Gist.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
-#:    in several different ways. See [SPECIFYING FORMULAE][].
+#:    in several different ways. See [SPECIFYING FORMULAE](#specifying-formulae).
 #:
 #:    If `--new-issue` is passed, automatically create a new issue in the appropriate
 #:    GitHub repository as well as creating the Gist.
