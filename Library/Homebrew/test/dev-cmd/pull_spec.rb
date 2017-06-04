@@ -34,7 +34,7 @@ describe "brew pull", :integration_test do
       .and output(/Can only bump one changed formula/).to_stderr
       .and be_a_failure
 
-    expect { brew "pull", "https://github.com/Homebrew/homebrew-core/pull/1" }
+    expect { brew "pull", "https://github.com/Homebrew/brew/pull/1249" }
       .to output(/Fetching patch/).to_stdout
       .and output(/Patch failed to apply/).to_stderr
       .and be_a_failure
