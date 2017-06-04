@@ -1,3 +1,6 @@
+# Contains backports from newer versions of Ruby
+require_relative "../vendor/backports/string"
+
 class String
   def undent
     gsub(/^[ \t]{#{(slice(/^[ \t]+/) || '').length}}/, "")
