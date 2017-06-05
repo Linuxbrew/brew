@@ -185,8 +185,12 @@ module Superenv
     ).existing
   end
 
+  def determine_extra_rpath_paths
+    []
+  end
+
   def determine_rpath_paths
-    ""
+    PATH.new(determine_extra_rpath_paths).existing
   end
 
   def determine_dynamic_linker_path(_formula)

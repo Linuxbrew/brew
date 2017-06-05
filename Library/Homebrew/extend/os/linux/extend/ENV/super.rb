@@ -24,11 +24,11 @@ module Superenv
     []
   end
 
-  def determine_rpath_paths
+  def determine_extra_rpath_paths
     paths = ["#{HOMEBREW_PREFIX}/lib"]
     paths += run_time_deps.map { |d| d.opt_lib.to_s }
     paths += homebrew_extra_library_paths
-    paths.to_path_s
+    paths
   end
 
   def determine_dynamic_linker_path(formula)
