@@ -67,6 +67,8 @@ Our Xserve ESXi boxes for CI are hosted by [MacStadium](https://www.macstadium.c
 
 Our Jenkins CI installation is hosted by [DigitalOcean](https://m.do.co/c/7e39c35d5581).
 
+![DigitalOcean](https://cloud.githubusercontent.com/assets/125011/26827038/4b7b5ade-4ab3-11e7-811b-fed3ab0e934d.png)
+
 Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/homebrew).
 
 [![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/homebrew)
