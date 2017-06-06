@@ -195,7 +195,8 @@ module Homebrew
       end
 
       def check_ruby_version
-        return if RUBY_VERSION[/\d\.\d/] == "2.0"
+        ruby_version = "2.0"
+        return if RUBY_VERSION[/\d\.\d/] == ruby_version
 
         <<-EOS.undent
           Ruby version #{RUBY_VERSION} is unsupported on #{MacOS.version}. Homebrew
