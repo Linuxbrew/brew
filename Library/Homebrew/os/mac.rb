@@ -208,6 +208,7 @@ module OS
       "8.3.1" => { clang: "8.1", clang_build: 802 },
       "8.3.2" => { clang: "8.1", clang_build: 802 },
       "8.3.3" => { clang: "8.1", clang_build: 802 },
+      "9.0"   => { clang: "9.0", clang_build: 900 },
     }.freeze
 
     def compilers_standard?
