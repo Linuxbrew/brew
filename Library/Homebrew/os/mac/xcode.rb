@@ -17,12 +17,12 @@ module OS
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
         when "10.11" then "8.2.1"
-        when "10.12" then "8.3.2"
+        when "10.12" then "8.3.3"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "8.3.2"
+          "8.3.3"
         end
       end
 
