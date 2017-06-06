@@ -18,16 +18,18 @@ module OS
         when "10.10" then "7.2.1"
         when "10.11" then "8.2.1"
         when "10.12" then "8.3.3"
+        when "10.13" then "9.0"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "8.3.3"
+          "9.0"
         end
       end
 
       def minimum_version
         case MacOS.version
+        when "10.13" then "9.0"
         when "10.12" then "8.0"
         else "2.0"
         end
@@ -152,7 +154,8 @@ module OS
         when 73      then "7.3"
         when 80      then "8.0"
         when 81      then "8.3"
-        else "8.3"
+        when 90      then "9.0"
+        else "9.0"
         end
       end
 
