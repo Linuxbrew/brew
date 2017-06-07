@@ -66,6 +66,7 @@ module Homebrew
 
     return unless path.directory?
 
+    keg.rmtree if keg.exist?
     path.rename keg
     keg.link unless formula.keg_only?
   end
