@@ -134,17 +134,15 @@ rescue Interrupt
   $stderr.puts # seemingly a newline is typical
   exit 130
 rescue BuildError => e
-  Utils::Analytics.report_exception(e)
+  Utils::Analytics.report_build_error(e)
   e.dump
   exit 1
 rescue RuntimeError, SystemCallError => e
-  Utils::Analytics.report_exception(e)
   raise if e.message.empty?
   onoe e
   $stderr.puts e.backtrace if ARGV.debug?
   exit 1
 rescue MethodDeprecatedError => e
-  Utils::Analytics.report_exception(e)
   onoe e
   if e.issues_url
     $stderr.puts "If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):"
@@ -152,7 +150,6 @@ rescue MethodDeprecatedError => e
   end
   exit 1
 rescue Exception => e
-  Utils::Analytics.report_exception(e)
   onoe e
   if internal_cmd && defined?(OS::ISSUES_URL)
     $stderr.puts "#{Tty.bold}Please report this bug:#{Tty.reset}"

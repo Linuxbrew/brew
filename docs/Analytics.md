@@ -18,14 +18,12 @@ Homebrew's analytics record some shared information for every event:
 - If the Google Analytics anonymous IP setting is enabled, i.e. `1` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#aip)
 - The Homebrew application name, e.g. `Homebrew` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#an)
 - The Homebrew application version, e.g. `0.9.9` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#av)
-- The Homebrew analytics hit type, e.g. `screenview` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#t)
+- The Homebrew analytics hit type, e.g. `event` (https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters#t)
 
 Homebrew's analytics records the following different events:
 
-- a `screenview` hit type with the official Homebrew command you have run (with arguments stripped), e.g. `brew list` (not `brew list foo` or any external commands except `bundle` and `services`)
 - an `event` hit type with the `install` event category and the Homebrew formula from a non-private GitHub tap you have requested to install plus any used options, e.g. `wget --with-pcre` as the action and an event label e.g. `macOS 10.12, non-/usr/local, CI` to indicate the OS version, non-standard installation location and invocation as part of CI. This allows us to identify the formulae that need fixing and where more easily.
 - an `event` hit type with the `BuildError` event category and the Homebrew formula that failed to install, e.g. `wget` as the action and an event label e.g. `macOS 10.12`
-- an `exception` hit type with the `exception` event category and exception description of the exception name, e.g. `FormulaUnavailableError` and whether the exception was fatal e.g. `1`
 
 You can also view all the information that is sent by Homebrew's analytics by setting `HOMEBREW_ANALYTICS_DEBUG=1` in your environment. Please note this will also stop any analytics from being sent.
 
