@@ -12,10 +12,8 @@
 #:    If `--no-compat` is passed, do not load the compatibility layer when
 #:    running tests.
 #:
-#:    If `--online` is passed, include tests that use the GitHub API.
-#:
-#:    If `--official-cmd-taps` is passed, include tests that use any of the
-#:    taps for official external commands.
+#:    If `--online` is passed, include tests that use the GitHub API and tests
+#:    that use any of the taps for official external commands.
 
 require "fileutils"
 require "tap"
@@ -38,10 +36,6 @@ module Homebrew
         ENV["HOMEBREW_TEST_ONLINE"] = "1"
       else
         ENV["HOMEBREW_NO_GITHUB_API"] = "1"
-      end
-
-      if ARGV.include? "--official-cmd-taps"
-        ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"] = "1"
       end
 
       if ARGV.include? "--coverage"
