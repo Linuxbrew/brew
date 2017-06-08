@@ -195,12 +195,12 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, user_agents: [:default])
+  def self.check_http_content(url, name, user_agents: [:default])
     return unless url.start_with? "http"
 
     details = nil
     user_agent = nil
-    hash_needed = url.start_with?("http:")
+    hash_needed = url.start_with?("http:") && name != "curl"
     user_agents.each do |ua|
       details = http_content_headers_and_checksum(url, hash_needed: hash_needed, user_agent: ua)
       user_agent = ua
@@ -597,7 +597,8 @@ class FormulaAuditor
 
     return unless DevelopmentTools.curl_handles_most_https_homepages?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
-                                             user_agents: [:browser, :default])
+                                               formula.name,
+                                               user_agents: [:browser, :default])
       problem http_content_problem
     end
   end
@@ -1497,6 +1498,10 @@ class ResourceAuditor
       problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
     end
 
+    if name == "curl" && !urls.find { |u| u.start_with?("http://") }
+      problem "should always include at least one HTTP url"
+    end
+
     # Check pypi urls
     if @strict
       urls.each do |p|
@@ -1514,7 +1519,7 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url)
+        if http_content_problem = FormulaAuditor.check_http_content(url, name)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy
