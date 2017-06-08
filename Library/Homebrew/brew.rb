@@ -154,7 +154,8 @@ rescue MethodDeprecatedError => e
 rescue Exception => e
   Utils::Analytics.report_exception(e)
   onoe e
-  if internal_cmd && defined?(OS::ISSUES_URL)
+  if internal_cmd && defined?(OS::ISSUES_URL) &&
+     !ENV["HOMEBREW_NO_AUTO_UPDATE"]
     $stderr.puts "#{Tty.bold}Please report this bug:#{Tty.reset}"
     $stderr.puts "  #{Formatter.url(OS::ISSUES_URL)}"
   end
