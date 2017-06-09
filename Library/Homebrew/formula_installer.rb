@@ -271,14 +271,11 @@ class FormulaInstaller
     oh1 "Installing #{Formatter.identifier(formula.full_name)} #{options.join " "}" if show_header?
 
     if formula.tap && !formula.tap.private?
-      category = "install"
       action = ([formula.full_name] + options).join(" ")
-      Utils::Analytics.report_event(category, action)
+      Utils::Analytics.report_event("install", action)
 
       if installed_on_request
-        category = "install_on_request"
-        action = ([formula.full_name] + options).join(" ")
-        Utils::Analytics.report_event(category, action)
+        Utils::Analytics.report_event("install_on_request", action)
       end
     end
 
