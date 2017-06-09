@@ -352,6 +352,7 @@ end
 
 class BuildError < RuntimeError
   attr_reader :formula, :env
+  attr_accessor :options
 
   def initialize(formula, cmd, args, env)
     @formula = formula
