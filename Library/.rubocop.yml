@@ -12,9 +12,6 @@ FormulaAudit/Text:
 FormulaAudit/Caveats:
   Enabled: true
 
-FormulaAudit/Checksum:
-  Enabled: true
-
 FormulaAuditStrict/BottleBlock:
   Enabled: true
 
