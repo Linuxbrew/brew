@@ -54,7 +54,7 @@ module RuboCop
             problem "Please use https:// for #{homepage}"
 
           when %r{^http://([^/]*)\.(sf|sourceforge)\.net(/|$)}
-            problem "#{homepage} should be `https://#{$1}.sourceforge.io/`"
+            problem "#{homepage} should be `https://#{Regexp.last_match(1)}.sourceforge.io/`"
 
           # There's an auto-redirect here, but this mistake is incredibly common too.
           # Only applies to the homepage and subdomains for now, not the FTP URLs.

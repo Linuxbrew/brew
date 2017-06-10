@@ -49,7 +49,7 @@ module Homebrew
             case line.chomp
               # regex matches: /dev/disk0s2   489562928 440803616  48247312    91%    /
             when /^.+\s+[0-9]+\s+[0-9]+\s+[0-9]+\s+[0-9]{1,3}%\s+(.+)/
-              vols << $1
+              vols << Regexp.last_match(1)
             end
           end
         end
@@ -919,11 +919,11 @@ module Homebrew
         return unless which "python"
         `python -V 2>&1` =~ /Python (\d+)\./
         # This won't be the right warning if we matched nothing at all
-        return if $1.nil?
-        return if $1 == "2"
+        return if Regexp.last_match(1).nil?
+        return if Regexp.last_match(1) == "2"
 
         <<-EOS.undent
-          python is symlinked to python#{$1}
+          python is symlinked to python#{Regexp.last_match(1)}
           This will confuse build scripts and in general lead to subtle breakage.
         EOS
       end

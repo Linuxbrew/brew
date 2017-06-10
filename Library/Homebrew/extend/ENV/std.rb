@@ -200,7 +200,7 @@ module Stdenv
   # @private
   def set_cpu_flags(flags, default = DEFAULT_FLAGS, map = Hardware::CPU.optimization_flags)
     cflags =~ /(-Xarch_#{Hardware::CPU.arch_32_bit} )-march=/
-    xarch = $1.to_s
+    xarch = Regexp.last_match(1).to_s
     remove flags, /(-Xarch_#{Hardware::CPU.arch_32_bit} )?-march=\S*/
     remove flags, /( -Xclang \S+)+/
     remove flags, /-mssse3/

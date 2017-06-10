@@ -76,7 +76,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   tap_message = nil
   caller_message = backtrace.detect do |line|
     next unless line =~ %r{^#{Regexp.escape(HOMEBREW_LIBRARY)}/Taps/([^/]+/[^/]+)/}
-    tap = Tap.fetch $1
+    tap = Tap.fetch Regexp.last_match(1)
     tap_message = "\nPlease report this to the #{tap} tap!"
     true
   end

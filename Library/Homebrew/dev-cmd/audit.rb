@@ -578,7 +578,7 @@ class FormulaAuditor
 
       next unless o.name =~ /^with(out)?-(?:checks?|tests)$/
       unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
-        problem "Use '--with#{$1}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
+        problem "Use '--with#{Regexp.last_match(1)}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
       end
     end
 
@@ -722,7 +722,7 @@ class FormulaAuditor
     stable = formula.stable
     case stable && stable.url
     when /[\d\._-](alpha|beta|rc\d)/
-      matched = $1
+      matched = Regexp.last_match(1)
       version_prefix = stable.version.to_s.sub(/\d+$/, "")
       return if unstable_whitelist.include?([formula.name, version_prefix])
       problem "Stable version URLs should not contain #{matched}"
@@ -837,7 +837,7 @@ class FormulaAuditor
     when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
       problem <<-EOS.undent
         use GitHub pull request URLs:
-          https://github.com/#{$1}/#{$2}/pull/#{$3}.patch
+          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/pull/#{Regexp.last_match(3)}.patch
         Rather than patch-diff:
           #{patch.url}
       EOS
@@ -875,7 +875,7 @@ class FormulaAuditor
 
   def line_problems(line, _lineno)
     if line =~ /<(Formula|AmazonWebServicesFormula|ScriptFileFormula|GithubGistFormula)/
-      problem "Use a space in class inheritance: class Foo < #{$1}"
+      problem "Use a space in class inheritance: class Foo < #{Regexp.last_match(1)}"
     end
 
     # Commented-out cmake support from default template
@@ -899,52 +899,52 @@ class FormulaAuditor
     # FileUtils is included in Formula
     # encfs modifies a file with this name, so check for some leading characters
     if line =~ %r{[^'"/]FileUtils\.(\w+)}
-      problem "Don't need 'FileUtils.' before #{$1}."
+      problem "Don't need 'FileUtils.' before #{Regexp.last_match(1)}."
     end
 
     # Check for long inreplace block vars
     if line =~ /inreplace .* do \|(.{2,})\|/
-      problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{$1}|\"."
+      problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{Regexp.last_match(1)}|\"."
     end
 
     # Check for string interpolation of single values.
     if line =~ /(system|inreplace|gsub!|change_make_var!).*[ ,]"#\{([\w.]+)\}"/
-      problem "Don't need to interpolate \"#{$2}\" with #{$1}"
+      problem "Don't need to interpolate \"#{Regexp.last_match(2)}\" with #{Regexp.last_match(1)}"
     end
 
     # Check for string concatenation; prefer interpolation
     if line =~ /(#\{\w+\s*\+\s*['"][^}]+\})/
-      problem "Try not to concatenate paths in string interpolation:\n   #{$1}"
+      problem "Try not to concatenate paths in string interpolation:\n   #{Regexp.last_match(1)}"
     end
 
     # Prefer formula path shortcuts in Pathname+
     if line =~ %r{\(\s*(prefix\s*\+\s*(['"])(bin|include|libexec|lib|sbin|share|Frameworks)[/'"])}
-      problem "\"(#{$1}...#{$2})\" should be \"(#{$3.downcase}+...)\""
+      problem "\"(#{Regexp.last_match(1)}...#{Regexp.last_match(2)})\" should be \"(#{Regexp.last_match(3).downcase}+...)\""
     end
 
     if line =~ /((man)\s*\+\s*(['"])(man[1-8])(['"]))/
-      problem "\"#{$1}\" should be \"#{$4}\""
+      problem "\"#{Regexp.last_match(1)}\" should be \"#{Regexp.last_match(4)}\""
     end
 
     # Prefer formula path shortcuts in strings
     if line =~ %r[(\#\{prefix\}/(bin|include|libexec|lib|sbin|share|Frameworks))]
-      problem "\"#{$1}\" should be \"\#{#{$2.downcase}}\""
+      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2).downcase}}\""
     end
 
     if line =~ %r[((\#\{prefix\}/share/man/|\#\{man\}/)(man[1-8]))]
-      problem "\"#{$1}\" should be \"\#{#{$3}}\""
+      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(3)}}\""
     end
 
     if line =~ %r[((\#\{share\}/(man)))[/'"]]
-      problem "\"#{$1}\" should be \"\#{#{$3}}\""
+      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(3)}}\""
     end
 
     if line =~ %r[(\#\{prefix\}/share/(info|man))]
-      problem "\"#{$1}\" should be \"\#{#{$2}}\""
+      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2)}}\""
     end
 
     if line =~ /depends_on :(automake|autoconf|libtool)/
-      problem ":#{$1} is deprecated. Usage should be \"#{$1}\""
+      problem ":#{Regexp.last_match(1)} is deprecated. Usage should be \"#{Regexp.last_match(1)}\""
     end
 
     if line =~ /depends_on :apr/
@@ -954,23 +954,23 @@ class FormulaAuditor
     problem ":tex is deprecated" if line =~ /depends_on :tex/
 
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
-      problem "#{$2} modules should be vendored rather than use deprecated `depends_on \"#{$1}\" => :#{$2}#{$3}`"
+      problem "#{Regexp.last_match(2)} modules should be vendored rather than use deprecated `depends_on \"#{Regexp.last_match(1)}\" => :#{Regexp.last_match(2)}#{Regexp.last_match(3)}`"
     end
 
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+(.*)/
-      dep = $1
-      $2.split(" ").map do |o|
+      dep = Regexp.last_match(1)
+      Regexp.last_match(2).split(" ").map do |o|
         break if ["if", "unless"].include?(o)
         next unless o =~ /^\[?['"](.*)['"]/
-        problem "Dependency #{dep} should not use option #{$1}"
+        problem "Dependency #{dep} should not use option #{Regexp.last_match(1)}"
       end
     end
 
     # Commented-out depends_on
-    problem "Commented-out dep #{$1}" if line =~ /#\s*depends_on\s+(.+)\s*$/
+    problem "Commented-out dep #{Regexp.last_match(1)}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
     if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
-      problem "Use \"if build.#{$1.downcase}?\" instead"
+      problem "Use \"if build.#{Regexp.last_match(1).downcase}?\" instead"
     end
 
     problem "Use separate make calls" if line.include?("make && make")
@@ -983,15 +983,15 @@ class FormulaAuditor
 
     # Avoid hard-coding compilers
     if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?(gcc|llvm-gcc|clang)['" ]}
-      problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{$3}\""
+      problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
     end
 
     if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?((g|llvm-g|clang)\+\+)['" ]}
-      problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{$3}\""
+      problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
     end
 
     if line =~ /system\s+['"](env|export)(\s+|['"])/
-      problem "Use ENV instead of invoking '#{$1}' to modify the environment"
+      problem "Use ENV instead of invoking '#{Regexp.last_match(1)}' to modify the environment"
     end
 
     if formula.name != "wine" && line =~ /ENV\.universal_binary/
@@ -1007,27 +1007,27 @@ class FormulaAuditor
     end
 
     if line =~ /build\.include\?[\s\(]+['"]\-\-(.*)['"]/
-      problem "Reference '#{$1}' without dashes"
+      problem "Reference '#{Regexp.last_match(1)}' without dashes"
     end
 
     if line =~ /build\.include\?[\s\(]+['"]with(out)?-(.*)['"]/
-      problem "Use build.with#{$1}? \"#{$2}\" instead of build.include? 'with#{$1}-#{$2}'"
+      problem "Use build.with#{Regexp.last_match(1)}? \"#{Regexp.last_match(2)}\" instead of build.include? 'with#{Regexp.last_match(1)}-#{Regexp.last_match(2)}'"
     end
 
     if line =~ /build\.with\?[\s\(]+['"]-?-?with-(.*)['"]/
-      problem "Don't duplicate 'with': Use `build.with? \"#{$1}\"` to check for \"--with-#{$1}\""
+      problem "Don't duplicate 'with': Use `build.with? \"#{Regexp.last_match(1)}\"` to check for \"--with-#{Regexp.last_match(1)}\""
     end
 
     if line =~ /build\.without\?[\s\(]+['"]-?-?without-(.*)['"]/
-      problem "Don't duplicate 'without': Use `build.without? \"#{$1}\"` to check for \"--without-#{$1}\""
+      problem "Don't duplicate 'without': Use `build.without? \"#{Regexp.last_match(1)}\"` to check for \"--without-#{Regexp.last_match(1)}\""
     end
 
     if line =~ /unless build\.with\?(.*)/
-      problem "Use if build.without?#{$1} instead of unless build.with?#{$1}"
+      problem "Use if build.without?#{Regexp.last_match(1)} instead of unless build.with?#{Regexp.last_match(1)}"
     end
 
     if line =~ /unless build\.without\?(.*)/
-      problem "Use if build.with?#{$1} instead of unless build.without?#{$1}"
+      problem "Use if build.with?#{Regexp.last_match(1)} instead of unless build.without?#{Regexp.last_match(1)}"
     end
 
     if line =~ /(not\s|!)\s*build\.with?\?/
@@ -1071,7 +1071,7 @@ class FormulaAuditor
     end
 
     if line =~ /^def (\w+).*$/
-      problem "Define method #{$1.inspect} in the class body, not at the top-level"
+      problem "Define method #{Regexp.last_match(1).inspect} in the class body, not at the top-level"
     end
 
     if line.include?("ENV.fortran") && !formula.requirements.map(&:class).include?(FortranRequirement)
@@ -1083,20 +1083,20 @@ class FormulaAuditor
     end
 
     if line =~ /depends_on :(.+) (if.+|unless.+)$/
-      conditional_dep_problems($1.to_sym, $2, $&)
+      conditional_dep_problems(Regexp.last_match(1).to_sym, Regexp.last_match(2), $&)
     end
 
     if line =~ /depends_on ['"](.+)['"] (if.+|unless.+)$/
-      conditional_dep_problems($1, $2, $&)
+      conditional_dep_problems(Regexp.last_match(1), Regexp.last_match(2), $&)
     end
 
     if line =~ /(Dir\[("[^\*{},]+")\])/
-      problem "#{$1} is unnecessary; just use #{$2}"
+      problem "#{Regexp.last_match(1)} is unnecessary; just use #{Regexp.last_match(2)}"
     end
 
     if line =~ /system (["'](#{FILEUTILS_METHODS})["' ])/o
-      system = $1
-      method = $2
+      system = Regexp.last_match(1)
+      method = Regexp.last_match(2)
       problem "Use the `#{method}` Ruby method instead of `system #{system}`"
     end
 
@@ -1114,7 +1114,7 @@ class FormulaAuditor
     end
 
     if line =~ /system\s+['"](otool|install_name_tool|lipo)/ && formula.name != "cctools"
-      problem "Use ruby-macho instead of calling #{$1}"
+      problem "Use ruby-macho instead of calling #{Regexp.last_match(1)}"
     end
 
     if formula.tap.to_s == "homebrew/core"
@@ -1125,29 +1125,29 @@ class FormulaAuditor
     end
 
     if line =~ /((revision|version_scheme)\s+0)/
-      problem "'#{$1}' should be removed"
+      problem "'#{Regexp.last_match(1)}' should be removed"
     end
 
     return unless @strict
 
-    problem "`#{$1}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
+    problem "`#{Regexp.last_match(1)}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
 
     if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
-      bad_system = $1
+      bad_system = Regexp.last_match(1)
       unless %w[| < > & ; *].any? { |c| bad_system.include? c }
         good_system = bad_system.gsub(" ", "\", \"")
         problem "Use `system #{good_system}` instead of `system #{bad_system}` "
       end
     end
 
-    problem "`#{$1}` is now unnecessary" if line =~ /(require ["']formula["'])/
+    problem "`#{Regexp.last_match(1)}` is now unnecessary" if line =~ /(require ["']formula["'])/
 
     if line =~ %r{#\{share\}/#{Regexp.escape(formula.name)}[/'"]}
       problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
     end
 
     return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
-    problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
+    problem "Use pkgshare instead of (share#{Regexp.last_match(1)}\"#{formula.name}\")"
   end
 
   def audit_reverse_migration
@@ -1297,7 +1297,7 @@ class ResourceAuditor
 
   def audit_download_strategy
     if url =~ %r{^(cvs|bzr|hg|fossil)://} || url =~ %r{^(svn)\+http://}
-      problem "Use of the #{$&} scheme is deprecated, pass `:using => :#{$1}` instead"
+      problem "Use of the #{$&} scheme is deprecated, pass `:using => :#{Regexp.last_match(1)}` instead"
     end
 
     url_strategy = DownloadStrategyDetector.detect(url)
@@ -1341,7 +1341,7 @@ class ResourceAuditor
   def audit_urls
     # Check GNU urls; doesn't apply to mirrors
     if url =~ %r{^(?:https?|ftp)://ftpmirror.gnu.org/(.*)}
-      problem "Please use \"https://ftp.gnu.org/gnu/#{$1}\" instead of #{url}."
+      problem "Please use \"https://ftp.gnu.org/gnu/#{Regexp.last_match(1)}\" instead of #{url}."
     end
 
     if mirrors.include?(url)
@@ -1375,11 +1375,11 @@ class ResourceAuditor
            %r{^http://(?:[^/]*\.)?mirrorservice\.org/}
         problem "Please use https:// for #{p}"
       when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
-        problem "#{p} should be `https://cpan.metacpan.org/#{$1}`"
+        problem "#{p} should be `https://cpan.metacpan.org/#{Regexp.last_match(1)}`"
       when %r{^(http|ftp)://ftp\.gnome\.org/pub/gnome/(.*)}i
-        problem "#{p} should be `https://download.gnome.org/#{$2}`"
+        problem "#{p} should be `https://download.gnome.org/#{Regexp.last_match(2)}`"
       when %r{^git://anonscm\.debian\.org/users/(.*)}i
-        problem "#{p} should be `https://anonscm.debian.org/git/users/#{$1}`"
+        problem "#{p} should be `https://anonscm.debian.org/git/users/#{Regexp.last_match(1)}`"
       end
     end
 
@@ -1389,7 +1389,7 @@ class ResourceAuditor
       when %r{^ftp://ftp\.mirrorservice\.org}
         problem "Please use https:// for #{p}"
       when %r{^ftp://ftp\.cpan\.org/pub/CPAN(.*)}i
-        problem "#{p} should be `http://search.cpan.org/CPAN#{$1}`"
+        problem "#{p} should be `http://search.cpan.org/CPAN#{Regexp.last_match(1)}`"
       end
     end
 
@@ -1403,7 +1403,7 @@ class ResourceAuditor
       next unless p =~ %r{^https?://.*\b(sourceforge|sf)\.(com|net)}
 
       if p =~ /(\?|&)use_mirror=/
-        problem "Don't use #{$1}use_mirror in SourceForge urls (url is #{p})."
+        problem "Don't use #{Regexp.last_match(1)}use_mirror in SourceForge urls (url is #{p})."
       end
 
       if p.end_with?("/download")
@@ -1433,7 +1433,7 @@ class ResourceAuditor
       problem <<-EOS.undent
         Please use a secure mirror for Debian URLs.
         We recommend:
-          https://mirrors.ocf.berkeley.edu/debian/#{$1}
+          https://mirrors.ocf.berkeley.edu/debian/#{Regexp.last_match(1)}
       EOS
     end
 
@@ -1486,7 +1486,7 @@ class ResourceAuditor
       next unless u =~ %r{https?://codeload\.github\.com/(.+)/(.+)/(?:tar\.gz|zip)/(.+)}
       problem <<-EOS.undent
         use GitHub archive URLs:
-          https://github.com/#{$1}/#{$2}/archive/#{$3}.tar.gz
+          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/archive/#{Regexp.last_match(3)}.tar.gz
         Rather than codeload:
           #{u}
       EOS
@@ -1495,7 +1495,7 @@ class ResourceAuditor
     # Check for Maven Central urls, prefer HTTPS redirector over specific host
     urls.each do |u|
       next unless u =~ %r{https?://(?:central|repo\d+)\.maven\.org/maven2/(.+)$}
-      problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
+      problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{Regexp.last_match(1)}`"
     end
 
     if name == "curl" && !urls.find { |u| u.start_with?("http://") }
@@ -1506,7 +1506,7 @@ class ResourceAuditor
     if @strict
       urls.each do |p|
         next unless p =~ %r{^https?://pypi.python.org/(.*)}
-        problem "#{p} should be `https://files.pythonhosted.org/#{$1}`"
+        problem "#{p} should be `https://files.pythonhosted.org/#{Regexp.last_match(1)}`"
       end
     end
 

@@ -93,7 +93,7 @@ module Homebrew
 
   def query_regexp(query)
     case query
-    when %r{^/(.*)/$} then Regexp.new($1)
+    when %r{^/(.*)/$} then Regexp.new(Regexp.last_match(1))
     else /.*#{Regexp.escape(query)}.*/i
     end
   rescue RegexpError
