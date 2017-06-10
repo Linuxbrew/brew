@@ -65,7 +65,11 @@ module Utils
         return unless exception.formula.tap
         return unless exception.formula.tap.installed?
         return if exception.formula.tap.private?
-        report_event("BuildError", exception.formula.full_name)
+        action = exception.formula.full_name
+        if (options = exception.options)
+          action = "#{action} #{options}".strip
+        end
+        report_event("BuildError", action)
       end
     end
   end
