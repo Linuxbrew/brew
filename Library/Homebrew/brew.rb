@@ -10,7 +10,8 @@ raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
 
 require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
-$:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
+require "English"
+$LOAD_PATH.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 require "global"
 require "tap"
 

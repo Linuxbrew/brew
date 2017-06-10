@@ -1,5 +1,3 @@
-require "English"
-
 module Hbc
   class CLI
     class Style < AbstractCommand

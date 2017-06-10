@@ -118,7 +118,7 @@ module OS
         ].uniq.each do |xcodebuild_path|
           next unless File.executable? xcodebuild_path
           xcodebuild_output = Utils.popen_read(xcodebuild_path, "-version")
-          next unless $?.success?
+          next unless $CHILD_STATUS.success?
 
           xcode_version = xcodebuild_output[/Xcode (\d(\.\d)*)/, 1]
           return xcode_version if xcode_version

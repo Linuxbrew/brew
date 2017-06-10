@@ -338,7 +338,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       rescue ErrorDuringExecution
         # 33 == range not supported
         # try wiping the incomplete download and retrying once
-        unless $?.exitstatus == 33 && had_incomplete_download
+        unless $CHILD_STATUS.exitstatus == 33 && had_incomplete_download
           raise CurlDownloadStrategyError, @url
         end
 

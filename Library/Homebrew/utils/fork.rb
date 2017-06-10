@@ -37,8 +37,8 @@ module Utils
           read.close
           Process.wait(pid) unless socket.nil?
           raise Marshal.load(data) unless data.nil? || data.empty?
-          raise Interrupt if $?.exitstatus == 130
-          raise "Suspicious failure" unless $?.success?
+          raise Interrupt if $CHILD_STATUS.exitstatus == 130
+          raise "Suspicious failure" unless $CHILD_STATUS.success?
         end
       end
     end
