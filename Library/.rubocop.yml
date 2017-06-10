@@ -187,10 +187,6 @@ Style/RaiseArgs:
 Style/RegexpLiteral:
   EnforcedStyle: slashes
 
-# not a problem for typical shell users
-Style/SpecialGlobalVars:
-  Enabled: false
-
 # ruby style guide favorite
 Style/StringLiterals:
   EnforcedStyle: double_quotes
