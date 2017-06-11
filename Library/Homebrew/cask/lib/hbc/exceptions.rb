@@ -3,56 +3,40 @@ module Hbc
 
   class AbstractCaskErrorWithToken < CaskError
     attr_reader :token
+    attr_reader :reason
 
-    def initialize(token)
+    def initialize(token, reason = nil)
       @token = token
+      @reason = reason.to_s
     end
   end
 
   class CaskNotInstalledError < AbstractCaskErrorWithToken
     def to_s
-      "#{token} is not installed"
+      "Cask '#{token}' is not installed."
     end
   end
 
   class CaskUnavailableError < AbstractCaskErrorWithToken
     def to_s
-      "No available Cask for #{token}"
+      "Cask '#{token}' is unavailable" << (reason.empty? ? "." : ": #{reason}")
     end
   end
 
   class CaskAlreadyCreatedError < AbstractCaskErrorWithToken
     def to_s
-      %Q(A Cask for #{token} already exists. Run "brew cask cat #{token}" to see it.)
+      %Q(Cask '#{token}' already exists. Run #{Formatter.identifier("brew cask cat #{token}")} to edit it.)
     end
   end
 
   class CaskAlreadyInstalledError < AbstractCaskErrorWithToken
     def to_s
-      s = <<-EOS.undent
-        A Cask for #{token} is already installed.
-      EOS
-
-      s.concat("\n").concat(reinstall_message)
-    end
-
-    private
-
-    def reinstall_message
       <<-EOS.undent
+        Cask '#{token}' is already installed.
+
         To re-install #{token}, run:
-          brew cask reinstall #{token}
+          #{Formatter.identifier("brew cask reinstall #{token}")}
       EOS
-    end
-  end
-
-  class CaskAlreadyInstalledAutoUpdatesError < CaskAlreadyInstalledError
-    def to_s
-      s = <<-EOS.undent
-        A Cask for #{token} is already installed and using auto-updates.
-      EOS
-
-      s.concat("\n").concat(reinstall_message)
     end
   end
 
@@ -84,8 +68,8 @@ module Hbc
   class CaskX11DependencyError < AbstractCaskErrorWithToken
     def to_s
       <<-EOS.undent
-        #{token} requires XQuartz/X11, which can be installed using Homebrew-Cask by running
-          brew cask install xquartz
+        Cask '#{token}' requires XQuartz/X11, which can be installed using Homebrew-Cask by running
+          #{Formatter.identifier("brew cask install xquartz")}
 
         or manually, by downloading the package from
           #{Formatter.url("https://www.xquartz.org/")}
@@ -101,60 +85,67 @@ module Hbc
 
   class CaskUnspecifiedError < CaskError
     def to_s
-      "This command requires a Cask token"
+      "This command requires a Cask token."
     end
   end
 
   class CaskInvalidError < AbstractCaskErrorWithToken
-    attr_reader :submsg
-    def initialize(token, *submsg)
-      super(token)
-      @submsg = submsg.join(" ")
-    end
-
     def to_s
-      "Cask '#{token}' definition is invalid#{": #{submsg}" unless submsg.empty?}"
+      "Cask '#{token}' definition is invalid" << (reason.empty? ? ".": ": #{reason}")
     end
   end
 
-  class CaskTokenDoesNotMatchError < CaskInvalidError
+  class CaskTokenMismatchError < CaskInvalidError
     def initialize(token, header_token)
-      super(token, "Bad header line: '#{header_token}' does not match file name")
+      super(token, "Token '#{header_token}' in header line does not match the file name.")
     end
   end
 
-  class CaskSha256MissingError < ArgumentError
-  end
+  class CaskSha256Error < AbstractCaskErrorWithToken
+    attr_reader :expected, :actual
 
-  class CaskSha256MismatchError < RuntimeError
-    attr_reader :path, :expected, :actual
-    def initialize(path, expected, actual)
-      @path = path
+    def initialize(token, expected = nil, actual = nil)
+      super(token)
       @expected = expected
       @actual = actual
+    end
+  end
+
+  class CaskSha256MissingError < CaskSha256Error
+    def to_s
+      <<-EOS.undent
+        Cask '#{token}' requires a checksum:
+          #{Formatter.identifier("sha256 '#{actual}'")}
+      EOS
+    end
+  end
+
+  class CaskSha256MismatchError < CaskSha256Error
+    attr_reader :path
+
+    def initialize(token, expected, actual, path)
+      super(token, expected, actual)
+      @path = path
     end
 
     def to_s
       <<-EOS.undent
-        sha256 mismatch
-        Expected: #{expected}
-        Actual: #{actual}
-        File: #{path}
+        Checksum for Cask '#{token}' does not match.
+
+        Expected: #{Formatter.success(expected.to_s)}
+        Actual:   #{Formatter.error(actual.to_s)}
+        File:     #{path}
+
         To retry an incomplete download, remove the file above.
       EOS
     end
   end
 
-  class CaskNoShasumError < CaskError
-    attr_reader :token
-    def initialize(token)
-      @token = token
-    end
-
+  class CaskNoShasumError < CaskSha256Error
     def to_s
       <<-EOS.undent
         Cask '#{token}' does not have a sha256 checksum defined and was not installed.
-        This means you have the "--require-sha" option set, perhaps in your HOMEBREW_CASK_OPTS.
+        This means you have the #{Formatter.identifier("--require-sha")} option set, perhaps in your HOMEBREW_CASK_OPTS.
       EOS
     end
   end

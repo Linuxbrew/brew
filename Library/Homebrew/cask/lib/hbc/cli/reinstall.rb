@@ -17,9 +17,8 @@ module Hbc
             count += 1
           rescue CaskUnavailableError => e
             self.class.warn_unavailable_with_suggestion cask_token, e
-          rescue CaskNoShasumError => e
-            opoo e.message
-            count += 1
+          rescue CaskError => e
+            onoe e.message
           end
         end
 

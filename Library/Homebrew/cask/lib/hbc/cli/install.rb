@@ -31,14 +31,8 @@ module Hbc
           rescue CaskAlreadyInstalledError => e
             opoo e.message
             count += 1
-          rescue CaskAlreadyInstalledAutoUpdatesError => e
-            opoo e.message
-            count += 1
           rescue CaskUnavailableError => e
             self.class.warn_unavailable_with_suggestion cask_token, e
-          rescue CaskNoShasumError => e
-            opoo e.message
-            count += 1
           rescue CaskError => e
             onoe e.message
           end
@@ -51,9 +45,9 @@ module Hbc
         exact_match, partial_matches = Search.search(cask_token)
         error_message = e.message
         if exact_match
-          error_message.concat(". Did you mean:\n#{exact_match}")
+          error_message.concat(" Did you mean:\n#{exact_match}")
         elsif !partial_matches.empty?
-          error_message.concat(". Did you mean one of:\n")
+          error_message.concat(" Did you mean one of:\n")
                        .concat(Formatter.columns(partial_matches.take(20)))
         end
         onoe error_message

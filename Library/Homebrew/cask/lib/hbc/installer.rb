@@ -94,7 +94,6 @@ module Hbc
       odebug "Hbc::Installer#install"
 
       if @cask.installed? && !force? && !@reinstall
-        raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
         raise CaskAlreadyInstalledError, @cask
       end
 
@@ -143,7 +142,7 @@ module Hbc
     def verify_has_sha
       odebug "Checking cask has checksum"
       return unless @cask.sha256 == :no_check
-      raise CaskNoShasumError, @cask
+      raise CaskNoShasumError, @cask.token
     end
 
     def verify

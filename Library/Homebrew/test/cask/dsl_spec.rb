@@ -57,7 +57,7 @@ describe Hbc::DSL, :cask do
       it "raises an error" do
         expect {
           cask
-        }.to raise_error(Hbc::CaskTokenDoesNotMatchError, /Bad header line:.*does not match file name/)
+        }.to raise_error(Hbc::CaskTokenMismatchError, /header line does not match the file name/)
       end
     end
 

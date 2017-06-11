@@ -12,7 +12,7 @@ module Hbc
         cask_path = CaskLoader.path(cask_token)
 
         unless cask_path.exist?
-          raise CaskUnavailableError, %Q(#{cask_token}, run "brew cask create #{cask_token}" to create a new Cask)
+          raise CaskUnavailableError.new(cask_token, "Run #{Formatter.identifier("brew cask create #{cask_token}")} to create a new Cask.")
         end
 
         odebug "Opening editor for Cask #{cask_token}"

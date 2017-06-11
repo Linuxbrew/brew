@@ -32,9 +32,9 @@ module Hbc
       end
 
       def load
-        raise CaskError, "'#{@path}' does not exist."  unless @path.exist?
-        raise CaskError, "'#{@path}' is not readable." unless @path.readable?
-        raise CaskError, "'#{@path}' is not a file."   unless @path.file?
+        raise CaskUnavailableError.new(@token, "'#{@path}' does not exist.")  unless @path.exist?
+        raise CaskUnavailableError.new(@token, "'#{@path}' is not readable.") unless @path.readable?
+        raise CaskUnavailableError.new(@token, "'#{@path}' is not a file.")   unless @path.file?
 
         @content = IO.read(@path)
 
@@ -45,7 +45,7 @@ module Hbc
 
       def cask(header_token, &block)
         if @token != header_token
-          raise CaskTokenDoesNotMatchError.new(@token, header_token)
+          raise CaskTokenMismatchError.new(@token, header_token)
         end
 
         Cask.new(header_token, sourcefile_path: @path, &block)
@@ -57,10 +57,11 @@ module Hbc
         ref.to_s.match?(::URI.regexp)
       end
 
+      attr_reader :url
+
       def initialize(url)
-        @url = url
-        uri = URI(url)
-        super Hbc.cache/File.basename(uri.path)
+        @url = URI(url)
+        super Hbc.cache/File.basename(@url.path)
       end
 
       def load
@@ -71,7 +72,7 @@ module Hbc
           ohai "Downloading #{@url}."
           curl @url, "-o", @path
         rescue ErrorDuringExecution
-          raise CaskUnavailableError, @url
+          raise CaskUnavailableError.new(@token, "Failed to download #{Formatter.url(@url)}.")
         end
 
         super
@@ -108,7 +109,7 @@ module Hbc
       end
 
       def load
-        raise CaskUnavailableError, @token
+        raise CaskUnavailableError.new(@token, "No Cask with this name exists.")
       end
     end
 
