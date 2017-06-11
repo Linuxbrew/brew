@@ -13,60 +13,59 @@ module Hbc
                               print_stderr: false).stdout.empty?
       end
 
-      attr_reader :mounts
-      def initialize(*args)
-        super(*args)
-        @mounts = []
-      end
-
       def extract
-        mount!
-        assert_mounts_found
-        extract_mounts
-      ensure
-        eject!
-      end
-
-      def mount!
-        plist = @command.run!("/usr/bin/hdiutil",
-                              # realpath is a failsafe against unusual filenames
-                              args:  %w[mount -plist -nobrowse -readonly -noidme -mountrandom /tmp] + [Pathname.new(@path).realpath],
-                              input: "y\n")
-                        .plist
-        @mounts = mounts_from_plist(plist)
-      end
-
-      def eject!
-        @mounts.each do |mount|
-          # realpath is a failsafe against unusual filenames
-          mountpath = Pathname.new(mount).realpath
-          next unless mountpath.exist?
-
+        mount do |mounts|
           begin
-            tries ||= 3
-            if tries > 1
-              @command.run("/usr/sbin/diskutil",
-                           args:         ["eject", mountpath],
-                           print_stderr: false)
-            else
-              @command.run("/usr/sbin/diskutil",
-                           args:         ["unmount", "force", mountpath],
-                           print_stderr: false)
-            end
-            raise CaskError, "Failed to eject #{mountpath}" if mountpath.exist?
-          rescue CaskError => e
-            raise e if (tries -= 1).zero?
-            sleep 1
-            retry
+            raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad DMG?" if mounts.empty?
+            mounts.each(&method(:extract_mount))
+          ensure
+            mounts.each(&method(:eject))
           end
         end
       end
 
-      private
+      def mount
+        # realpath is a failsafe against unusual filenames
+        path = Pathname.new(@path).realpath
 
-      def extract_mounts
-        @mounts.each(&method(:extract_mount))
+        Dir.mktmpdir do |unpack_dir|
+          cdr_path = Pathname.new(unpack_dir).join("#{path.basename(".dmg")}.cdr")
+
+          @command.run!("/usr/bin/hdiutil", args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path])
+
+          plist = @command.run!("/usr/bin/hdiutil",
+                                args:  ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, cdr_path],
+                                input: "qy\n").plist
+
+          yield mounts_from_plist(plist)
+        end
       end
+
+      def eject(mount)
+        # realpath is a failsafe against unusual filenames
+        mountpath = Pathname.new(mount).realpath
+        return unless mountpath.exist?
+
+        begin
+          tries ||= 3
+          if tries > 1
+            @command.run("/usr/sbin/diskutil",
+                         args:         ["eject", mountpath],
+                         print_stderr: false)
+          else
+            @command.run("/usr/sbin/diskutil",
+                         args:         ["unmount", "force", mountpath],
+                         print_stderr: false)
+          end
+          raise CaskError, "Failed to eject #{mountpath}" if mountpath.exist?
+        rescue CaskError => e
+          raise e if (tries -= 1).zero?
+          sleep 1
+          retry
+        end
+      end
+
+      private
 
       def extract_mount(mount)
         Tempfile.open(["", ".bom"]) do |bomfile|
@@ -123,10 +122,6 @@ module Hbc
       def mounts_from_plist(plist)
         return [] unless plist.respond_to?(:fetch)
         plist.fetch("system-entities", []).map { |e| e["mount-point"] }.compact
-      end
-
-      def assert_mounts_found
-        raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad DMG?" if @mounts.empty?
       end
     end
   end
