@@ -165,7 +165,7 @@ module Hbc
       end
 
       odebug "Using container class #{container} for #{@downloaded_path}"
-      container.new(@cask, @downloaded_path, @command).extract
+      container.new(@cask, @downloaded_path, @command, verbose: verbose?).extract
     end
 
     def install_artifacts

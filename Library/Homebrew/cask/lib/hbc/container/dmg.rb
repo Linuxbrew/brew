@@ -31,11 +31,27 @@ module Hbc
         Dir.mktmpdir do |unpack_dir|
           cdr_path = Pathname.new(unpack_dir).join("#{path.basename(".dmg")}.cdr")
 
-          @command.run!("/usr/bin/hdiutil", args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path])
+          without_eula = @command.run("/usr/bin/hdiutil",
+                                 args:  ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, path],
+                                 input: "qn\n",
+                                 print_stderr: false)
 
-          plist = @command.run!("/usr/bin/hdiutil",
-                                args:  ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, cdr_path],
-                                input: "qy\n").plist
+          # If mounting without agreeing to EULA succeeded, there is none.
+          plist = if without_eula.success?
+            without_eula.plist
+          else
+            @command.run!("/usr/bin/hdiutil", args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path])
+
+            with_eula = @command.run!("/usr/bin/hdiutil",
+                          args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, cdr_path])
+
+            if verbose? && !(eula_text = without_eula.stdout).empty?
+              ohai "Software License Agreement for '#{path}':"
+              puts eula_text
+            end
+
+            with_eula.plist
+          end
 
           yield mounts_from_plist(plist)
         end
