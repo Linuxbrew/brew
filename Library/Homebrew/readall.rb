@@ -82,7 +82,7 @@ module Readall
 
       # Only syntax errors result in a non-zero status code. To detect syntax
       # warnings we also need to inspect the output to `$stderr`.
-      !$?.success? || !messages.chomp.empty?
+      !$CHILD_STATUS.success? || !messages.chomp.empty?
     end
   end
 end

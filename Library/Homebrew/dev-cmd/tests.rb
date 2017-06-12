@@ -111,7 +111,7 @@ module Homebrew
         system "bundle", "exec", "rspec", *args, "--", *files
       end
 
-      return if $?.success?
+      return if $CHILD_STATUS.success?
       Homebrew.failed = true
     end
   end

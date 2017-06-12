@@ -265,10 +265,10 @@ module Homebrew
       failed_audit = false
       if ARGV.include? "--strict"
         system HOMEBREW_BREW_FILE, "audit", "--strict", formula.path
-        failed_audit = !$?.success?
+        failed_audit = !$CHILD_STATUS.success?
       elsif ARGV.include? "--audit"
         system HOMEBREW_BREW_FILE, "audit", formula.path
-        failed_audit = !$?.success?
+        failed_audit = !$CHILD_STATUS.success?
       end
       if failed_audit
         formula.path.atomic_write(backup_file)

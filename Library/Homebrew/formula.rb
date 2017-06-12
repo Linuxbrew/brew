@@ -1836,7 +1836,7 @@ class Formula
 
       $stdout.flush
 
-      unless $?.success?
+      unless $CHILD_STATUS.success?
         log_lines = ENV["HOMEBREW_FAIL_LOG_LINES"]
         log_lines ||= "15"
 
