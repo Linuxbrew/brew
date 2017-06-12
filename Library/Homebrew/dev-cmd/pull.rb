@@ -347,7 +347,7 @@ module Homebrew
     formulae = []
     others = []
     File.foreach(patchfile) do |line|
-      files << $1 if line =~ %r{^\+\+\+ b/(.*)}
+      files << Regexp.last_match(1) if line =~ %r{^\+\+\+ b/(.*)}
     end
     files.each do |file|
       if tap && tap.formula_file?(file)

@@ -43,8 +43,8 @@ class Tap
 
   def self.from_path(path)
     path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-    raise "Invalid tap path '#{path}'" unless $1
-    fetch($1, $2)
+    raise "Invalid tap path '#{path}'" unless Regexp.last_match(1)
+    fetch(Regexp.last_match(1), Regexp.last_match(2))
   rescue
     # No need to error as a nil tap is sufficient to show failure.
     nil

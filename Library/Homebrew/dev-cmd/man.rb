@@ -87,7 +87,7 @@ module Homebrew
     date = if ARGV.include?("--fail-if-changed") &&
               target.extname == ".1" && target.exist?
       /"(\d{1,2})" "([A-Z][a-z]+) (\d{4})" "#{organisation}" "#{manual}"/ =~ target.read
-      Date.parse("#{$1} #{$2} #{$3}")
+      Date.parse("#{Regexp.last_match(1)} #{Regexp.last_match(2)} #{Regexp.last_match(3)}")
     else
       Date.today
     end

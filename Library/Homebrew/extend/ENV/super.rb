@@ -266,7 +266,7 @@ module Superenv
 
   def make_jobs
     self["MAKEFLAGS"] =~ /-\w*j(\d+)/
-    [$1.to_i, 1].max
+    [Regexp.last_match(1).to_i, 1].max
   end
 
   def universal_binary

@@ -517,8 +517,8 @@ class S3DownloadStrategy < CurlDownloadStrategy
     if @url !~ %r{^https?://([^.].*)\.s3\.amazonaws\.com/(.+)$}
       raise "Bad S3 URL: " + @url
     end
-    bucket = $1
-    key = $2
+    bucket = Regexp.last_match(1)
+    key = Regexp.last_match(2)
 
     ENV["AWS_ACCESS_KEY_ID"] = ENV["HOMEBREW_AWS_ACCESS_KEY_ID"]
     ENV["AWS_SECRET_ACCESS_KEY"] = ENV["HOMEBREW_AWS_SECRET_ACCESS_KEY"]

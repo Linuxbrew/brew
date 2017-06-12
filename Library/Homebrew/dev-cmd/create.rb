@@ -101,13 +101,13 @@ class FormulaCreator
     if @name.nil?
       case url
       when %r{github\.com/(\S+)/(\S+)\.git}
-        @user = $1
-        @name = $2
+        @user = Regexp.last_match(1)
+        @name = Regexp.last_match(2)
         @head = true
         @github = true
       when %r{github\.com/(\S+)/(\S+)/(archive|releases)/}
-        @user = $1
-        @name = $2
+        @user = Regexp.last_match(1)
+        @name = Regexp.last_match(2)
         @github = true
       else
         @name = path.basename.to_s[/(.*?)[-_.]?#{Regexp.escape(path.version.to_s)}/, 1]

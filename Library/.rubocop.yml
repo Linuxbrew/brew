@@ -172,10 +172,6 @@ Style/PercentLiteralDelimiters:
     '%W': '[]'
     '%x': '()'
 
-# we prefer Perl-style regex back references
-Style/PerlBackrefs:
-  Enabled: false
-
 Style/RaiseArgs:
   EnforcedStyle: exploded
 
