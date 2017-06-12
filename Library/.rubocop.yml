@@ -118,10 +118,6 @@ Style/BlockDelimiters:
 Style/ClassAndModuleChildren:
   EnforcedStyle: nested
 
-# percent-x is allowed for multiline
-Style/CommandLiteral:
-  EnforcedStyle: mixed
-
 # our current conditional style is established, clear and
 # requiring users to change that now would be confusing.
 Style/ConditionalAssignment:
