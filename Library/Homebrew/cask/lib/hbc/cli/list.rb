@@ -11,44 +11,22 @@ module Hbc
 
       def run
         retval = args.any? ? list : list_installed
-        # retval is ternary: true/false/nil
-        if retval.nil? && args.none?
-          opoo "nothing to list" # special case: avoid exit code
-        elsif retval.nil?
-          raise CaskError, "nothing to list"
-        elsif !retval
-          raise CaskError, "listing incomplete"
-        end
+        raise CaskError, "Listing incomplete." if retval == :incomplete
       end
 
       def list
-        count = 0
+        casks.each do |cask|
+          raise CaskNotInstalledError, cask unless cask.installed?
 
-        args.each do |cask_token|
-          odebug "Listing files for Cask #{cask_token}"
-          begin
-            cask = CaskLoader.load(cask_token)
-
-            if cask.installed?
-              if one?
-                puts cask.token
-              elsif versions?
-                puts self.class.format_versioned(cask)
-              else
-                cask = CaskLoader.load_from_file(cask.installed_caskfile)
-                self.class.list_artifacts(cask)
-              end
-
-              count += 1
-            else
-              opoo "#{cask} is not installed"
-            end
-          rescue CaskUnavailableError => e
-            onoe e
+          if one?
+            puts cask.token
+          elsif versions?
+            puts self.class.format_versioned(cask)
+          else
+            cask = CaskLoader.load_from_file(cask.installed_caskfile)
+            self.class.list_artifacts(cask)
           end
         end
-
-        count.zero? ? nil : count == args.length
       end
 
       def self.list_artifacts(cask)
@@ -69,7 +47,7 @@ module Hbc
           puts Formatter.columns(installed_casks.map(&:to_s))
         end
 
-        installed_casks.empty? ? nil : true
+        installed_casks.empty? ? :empty : :complete
       end
 
       def self.format_versioned(cask)

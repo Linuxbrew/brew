@@ -31,7 +31,7 @@ module Hbc
         elsif args.any? { |file| File.exist?(file) }
           args
         else
-          args.map { |token| CaskLoader.path(token) }
+          casks.map(&:sourcefile_path)
         end
       end
 

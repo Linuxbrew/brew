@@ -72,38 +72,22 @@ module Hbc
       end
 
       def run
-        retval = print_stanzas
-        # retval is ternary: true/false/nil
-        if retval.nil?
-          exit 1 if quiet?
-          raise CaskError, "nothing to print"
-        elsif !retval
-          exit 1 if quiet?
-          raise CaskError, "print incomplete"
-        end
+        return unless print_stanzas == :incomplete
+        exit 1 if quiet?
+        raise CaskError, "Print incomplete."
       end
 
       def print_stanzas
-        count = 0
         if ARTIFACTS.include?(stanza)
           artifact_name = stanza
           @stanza = :artifacts
         end
 
-        cask_tokens = args.empty? ? Hbc.all_tokens : args
-        cask_tokens.each do |cask_token|
-          print "#{cask_token}\t" if table?
-
-          begin
-            cask = CaskLoader.load(cask_token)
-          rescue StandardError
-            opoo "Cask '#{cask_token}' was not found" unless quiet?
-            puts ""
-            next
-          end
+        casks(alternative: -> { Hbc.all }).each do |cask|
+          print "#{cask}\t" if table?
 
           unless cask.respond_to?(stanza)
-            opoo "no such stanza '#{stanza}' on Cask '#{cask_token}'" unless quiet?
+            opoo "no such stanza '#{stanza}' on Cask '#{cask}'" unless quiet?
             puts ""
             next
           end
@@ -111,13 +95,13 @@ module Hbc
           begin
             value = cask.send(@stanza)
           rescue StandardError
-            opoo "failure calling '#{stanza}' on Cask '#{cask_token}'" unless quiet?
+            opoo "failure calling '#{stanza}' on Cask '#{cask}'" unless quiet?
             puts ""
             next
           end
 
           if artifact_name && !value.key?(artifact_name)
-            opoo "no such stanza '#{artifact_name}' on Cask '#{cask_token}'" unless quiet?
+            opoo "no such stanza '#{artifact_name}' on Cask '#{cask}'" unless quiet?
             puts ""
             next
           end
@@ -131,10 +115,7 @@ module Hbc
           else
             puts value.to_s
           end
-
-          count += 1
         end
-        count.zero? ? nil : count == cask_tokens.length
       end
 
       def self.help

@@ -70,7 +70,7 @@ describe Hbc::CLI::Install, :cask do
       shutup do
         Hbc::CLI::Install.run("notacask")
       end
-    }.to raise_error(Hbc::CaskError)
+    }.to raise_error(Hbc::CaskError, "Install incomplete.")
   end
 
   it "returns a suggestion for a misspelled Cask" do
@@ -80,7 +80,7 @@ describe Hbc::CLI::Install, :cask do
       rescue Hbc::CaskError
         nil
       end
-    }.to output(/Cask 'localcaffeine' is unavailable\. Did you mean:\nlocal-caffeine/).to_stderr
+    }.to output(/Cask 'localcaffeine' is unavailable: No Cask with this name exists\. Did you mean:\nlocal-caffeine/).to_stderr
   end
 
   it "returns multiple suggestions for a Cask fragment" do
@@ -90,7 +90,7 @@ describe Hbc::CLI::Install, :cask do
       rescue Hbc::CaskError
         nil
       end
-    }.to output(/Cask 'local-caf' is unavailable\. Did you mean one of:\nlocal-caffeine/).to_stderr
+    }.to output(/Cask 'local-caf' is unavailable: No Cask with this name exists\. Did you mean one of:\nlocal-caffeine/).to_stderr
   end
 
   describe "when no Cask is specified" do

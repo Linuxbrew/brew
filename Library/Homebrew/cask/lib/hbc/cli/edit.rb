@@ -9,10 +9,12 @@ module Hbc
 
       def run
         cask_token = args.first
-        cask_path = CaskLoader.path(cask_token)
-
-        unless cask_path.exist?
-          raise CaskUnavailableError.new(cask_token, "Run #{Formatter.identifier("brew cask create #{cask_token}")} to create a new Cask.")
+        cask_path = begin
+          CaskLoader.load(cask_token).sourcefile_path
+        rescue CaskUnavailableError => e
+          reason = e.reason.empty? ? "" : "#{e.reason} "
+          reason.concat("Run #{Formatter.identifier("brew cask create #{e.token}")} to create a new Cask.")
+          raise e.class.new(e.token, reason)
         end
 
         odebug "Opening editor for Cask #{cask_token}"
