@@ -38,8 +38,13 @@ module RuboCop
       # - Checks if `desc` contains the formula name
       class Desc < FormulaCop
         VALID_LOWERCASE_WORDS = %w[
+          ex
+          eXtensible
           iOS
           macOS
+          malloc
+          ooc
+          preexec
           xUnit
         ].freeze
 
