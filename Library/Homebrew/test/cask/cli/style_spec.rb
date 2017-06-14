@@ -107,7 +107,7 @@ describe Hbc::CLI::Style, :cask do
       end
 
       it "tries to find paths for all tokens" do
-        expect(Hbc::CaskLoader).to receive(:path).twice
+        expect(Hbc::CaskLoader).to receive(:load).twice.and_return(double("cask", sourcefile_path: nil))
         subject
       end
     end

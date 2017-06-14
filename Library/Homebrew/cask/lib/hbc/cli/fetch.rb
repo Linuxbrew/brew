@@ -9,9 +9,12 @@ module Hbc
       end
 
       def run
-        args.each do |cask_token|
-          ohai "Downloading external files for Cask #{cask_token}"
-          cask = CaskLoader.load(cask_token)
+        raise CaskError, "Fetch incomplete." if fetch_casks == :incomplete
+      end
+
+      def fetch_casks
+        casks.each do |cask|
+          ohai "Downloading external files for Cask #{cask}"
           downloaded_path = Download.new(cask, force: force?).perform
           Verify.all(cask, downloaded_path)
           ohai "Success! Downloaded to -> #{downloaded_path}"

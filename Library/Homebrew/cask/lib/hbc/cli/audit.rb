@@ -9,11 +9,8 @@ module Hbc
       end
 
       def run
-        casks_to_audit = args.empty? ? Hbc.all : args.map(&CaskLoader.public_method(:load))
-
-        failed_casks = casks_to_audit.reject do |cask|
-          audit(cask)
-        end
+        failed_casks = casks(alternative: -> { Hbc.all })
+                       .reject { |cask| audit(cask) }
 
         return if failed_casks.empty?
         raise CaskError, "audit failed for casks: #{failed_casks.join(" ")}"

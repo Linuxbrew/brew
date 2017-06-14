@@ -20,7 +20,7 @@ module Hbc
       end
 
       def run
-        remove_cache_files(*@args)
+        remove_cache_files(*args)
       end
 
       def cache_files

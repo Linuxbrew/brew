@@ -166,7 +166,7 @@ module Hbc
       Hbc.default_tap.install unless Hbc.default_tap.installed?
       Hbc.init if self.class.should_init?(command)
       self.class.run_command(command, *args)
-    rescue CaskError, CaskSha256MismatchError, ArgumentError, OptionParser::InvalidOption => e
+    rescue CaskError, ArgumentError, OptionParser::InvalidOption => e
       msg = e.message
       msg << e.backtrace.join("\n").prepend("\n") if ARGV.debug?
       onoe msg

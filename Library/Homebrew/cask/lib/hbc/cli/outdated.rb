@@ -10,9 +10,7 @@ module Hbc
       end
 
       def run
-        casks_to_check = args.empty? ? Hbc.installed : args.map(&CaskLoader.public_method(:load))
-
-        casks_to_check.each do |cask|
+        casks(alternative: -> { Hbc.installed }).each do |cask|
           odebug "Checking update info of Cask #{cask}"
           self.class.list_if_outdated(cask, greedy?, verbose?)
         end
