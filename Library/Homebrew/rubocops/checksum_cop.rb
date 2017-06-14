@@ -5,55 +5,48 @@ module RuboCop
     module FormulaAudit
       class Checksum < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
-          %w[stable devel head].each do |name|
-            next unless spec_node = find_block(body_node, name.to_sym)
-            _, _, spec_body = *spec_node
-            audit_checksums(spec_body, name)
-            if name == "stable"
-              resource_blocks = find_blocks(body_node, :resource) +
-                                find_all_blocks(spec_body, :resource)
-            else
-              resource_blocks = find_all_blocks(spec_body, :resource)
-            end
-            resource_blocks.each do |rb|
-              _, _, resource_body = *rb
-              audit_checksums(resource_body, name, string_content(parameters(rb).first))
-            end
+          return if body_node.nil?
+          if method_called_ever?(body_node, :md5)
+            problem "MD5 checksums are deprecated, please use SHA256"
+          end
+
+          if method_called_ever?(body_node, :sha1)
+            problem "SHA1 checksums are deprecated, please use SHA256"
+          end
+
+          sha256_calls = find_every_method_call_by_name(body_node, :sha256)
+          sha256_calls.each do |sha256_call|
+            sha256_node = get_checksum_node(sha256_call)
+            audit_sha256(sha256_node)
           end
         end
 
-        def audit_checksums(node, spec, resource_name = nil)
-          msg_prefix = if resource_name
-            "#{spec} resource \"#{resource_name}\": "
-          else
-            "#{spec}: "
+        def get_checksum_node(call)
+          return if parameters(call).empty? || parameters(call).nil?
+          if parameters(call).first.str_type?
+            parameters(call).first
+          elsif parameters(call).first.hash_type?
+            parameters(call).first.keys.first
           end
-          if find_node_method_by_name(node, :md5)
-            problem "#{msg_prefix}MD5 checksums are deprecated, please use SHA256"
-          end
+        end
 
-          if find_node_method_by_name(node, :sha1)
-            problem "#{msg_prefix}SHA1 checksums are deprecated, please use SHA256"
-          end
-
-          checksum_node = find_node_method_by_name(node, :sha256)
-          return if checksum_node.nil?
-          checksum = parameters(checksum_node).first
-          if string_content(checksum).size.zero?
-            problem "#{msg_prefix}sha256 is empty"
+        def audit_sha256(checksum)
+          return if checksum.nil?
+          if regex_match_group(checksum, /^$/)
+            problem "sha256 is empty"
             return
           end
 
           if string_content(checksum).size != 64 && regex_match_group(checksum, /^\w*$/)
-            problem "#{msg_prefix}sha256 should be 64 characters"
+            problem "sha256 should be 64 characters"
           end
 
-          unless regex_match_group(checksum, /^[a-f0-9]+$/i)
-            problem "#{msg_prefix}sha256 contains invalid characters"
+          if regex_match_group(checksum, /[^a-f0-9]+/i)
+            problem "sha256 contains invalid characters"
           end
 
           return unless regex_match_group(checksum, /[A-F]+/)
-          problem "#{msg_prefix}sha256 should be lowercase"
+          problem "sha256 should be lowercase"
         end
       end
     end

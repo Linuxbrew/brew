@@ -23,15 +23,15 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
         end
       EOS
 
-      expected_offenses = [{  message: "stable: sha256 is empty",
+      expected_offenses = [{  message: "sha256 is empty",
                               severity: :convention,
                               line: 5,
-                              column: 4,
+                              column: 12,
                               source: source },
-                           {  message: "stable resource \"foo-package\": sha256 is empty",
+                           {  message: "sha256 is empty",
                               severity: :convention,
                               line: 9,
-                              column: 6,
+                              column: 14,
                               source: source }]
 
       inspect_source(cop, source)
@@ -57,12 +57,12 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
         end
       EOS
 
-      expected_offenses = [{  message: "stable: sha256 should be 64 characters",
+      expected_offenses = [{  message: "sha256 should be 64 characters",
                               severity: :convention,
                               line: 5,
                               column: 12,
                               source: source },
-                           {  message: "stable resource \"foo-package\": sha256 should be 64 characters",
+                           {  message: "sha256 should be 64 characters",
                               severity: :convention,
                               line: 9,
                               column: 14,
@@ -91,15 +91,15 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
         end
       EOS
 
-      expected_offenses = [{  message: "stable: sha256 contains invalid characters",
+      expected_offenses = [{  message: "sha256 contains invalid characters",
                               severity: :convention,
                               line: 5,
-                              column: 4,
+                              column: 31,
                               source: source },
-                           {  message: "stable resource \"foo-package\": sha256 contains invalid characters",
+                           {  message: "sha256 contains invalid characters",
                               severity: :convention,
                               line: 9,
-                              column: 6,
+                              column: 31,
                               source: source }]
 
       inspect_source(cop, source)
@@ -125,12 +125,12 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
         end
       EOS
 
-      expected_offenses = [{  message: "stable: sha256 should be lowercase",
+      expected_offenses = [{  message: "sha256 should be lowercase",
                               severity: :convention,
                               line: 5,
                               column: 21,
                               source: source },
-                           {  message: "stable resource \"foo-package\": sha256 should be lowercase",
+                           {  message: "sha256 should be lowercase",
                               severity: :convention,
                               line: 9,
                               column: 20,
@@ -163,7 +163,7 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
         end
       EOS
 
-      expected_offenses = [{  message: "stable resource \"foo-outside\": sha256 should be lowercase",
+      expected_offenses = [{  message: "sha256 should be lowercase",
                               severity: :convention,
                               line: 5,
                               column: 12,
