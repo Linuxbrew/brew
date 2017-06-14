@@ -740,7 +740,7 @@ module Homebrew
 
             Unless you have compelling reasons, consider setting the
             origin remote to point at the main repository by running:
-              git -C "#{HOMEBREW_REPOSITORY}" remote add origin #{Formatter.url("https://github.com/Homebrew/brew.git")}
+              git -C "#{HOMEBREW_REPOSITORY}" remote set-url origin #{Formatter.url("https://github.com/Homebrew/brew.git")}
           EOS
         end
       end
@@ -769,7 +769,7 @@ module Homebrew
 
             Unless you have compelling reasons, consider setting the
             origin remote to point at the main repository by running:
-              git -C "#{coretap_path}" remote add origin #{Formatter.url("https://github.com/Homebrew/homebrew-core.git")}
+              git -C "#{coretap_path}" remote set-url origin #{Formatter.url("https://github.com/Homebrew/homebrew-core.git")}
           EOS
         end
       end
