@@ -1,16 +1,23 @@
 describe Hbc::CLI, :cask do
   it "lists the taps for Casks that show up in two taps" do
-    listing = Hbc::CLI.nice_listing(%w[
-                                      caskroom/cask/adium
-                                      caskroom/cask/google-chrome
-                                      passcod/homebrew-cask/adium
-                                    ])
+    listing = described_class.nice_listing(%w[
+                                             caskroom/cask/adium
+                                             caskroom/cask/google-chrome
+                                             passcod/homebrew-cask/adium
+                                           ])
 
     expect(listing).to eq(%w[
                             caskroom/cask/adium
                             google-chrome
                             passcod/cask/adium
                           ])
+  end
+
+  it "ignores the `--language` option, which is handled in `OS::Mac`" do
+    cli = described_class.new("--language=en")
+    expect(cli).to receive(:detect_command_and_arguments).with(no_args)
+    expect(cli).to receive(:exit).with(1)
+    shutup { cli.run }
   end
 
   context "when no option is specified" do
@@ -41,7 +48,7 @@ describe Hbc::CLI, :cask do
     end
 
     it "prints help output when subcommand receives `--help` flag" do
-      command = Hbc::CLI.new("noop", "--help")
+      command = described_class.new("noop", "--help")
       expect(described_class).to receive(:run_command).with("help", "noop")
       command.run
       expect(command.help?).to eq(true)
@@ -56,7 +63,7 @@ describe Hbc::CLI, :cask do
 
     it "exits with a status of 1 when something goes wrong" do
       allow(described_class).to receive(:lookup_command).and_raise(Hbc::CaskError)
-      command = Hbc::CLI.new("noop")
+      command = described_class.new("noop")
       expect(command).to receive(:exit).with(1)
       command.run
     end

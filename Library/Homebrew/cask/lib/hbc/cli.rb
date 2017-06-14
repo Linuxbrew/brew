@@ -66,7 +66,7 @@ module Hbc
     option "--help", :help, false
 
     # handled in OS::Mac
-    option "--language a,b,c", ->(*) { raise OptionParser::InvalidOption }
+    option "--language a,b,c", ->(*) {}
 
     # override default handling of --version
     option "--version", ->(*) { raise OptionParser::InvalidOption }

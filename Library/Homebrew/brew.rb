@@ -21,14 +21,6 @@ if ARGV == %w[--version] || ARGV == %w[-v]
   exit 0
 end
 
-def require?(path)
-  return false if path.nil?
-  require path
-rescue LoadError => e
-  # we should raise on syntax errors but not if the file doesn't exist.
-  raise unless e.message.include?(path)
-end
-
 begin
   trap("INT", std_trap) # restore default CTRL-C handler
 
