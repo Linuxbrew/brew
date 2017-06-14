@@ -10,6 +10,7 @@
 # Ignore generated files within `Library` (again).
 /Library/Homebrew/**/.bundle
 /Library/Homebrew/**/vendor/bundle
+/Library/Homebrew/bin/
 /Library/Homebrew/doc
 /Library/Homebrew/cask/bin
 /Library/Homebrew/cask/coverage
@@ -18,6 +19,7 @@
 /Library/Homebrew/test/coverage
 /Library/Homebrew/test/fs_leak_log
 /Library/Homebrew/tmp
+/Library/Homebrew/.npmignore
 /Library/LinkedKegs
 /Library/Locks
 /Library/PinnedKegs
