@@ -108,7 +108,13 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
         expect_offense(expected, actual)
       end
     end
+  end
+end
 
+describe RuboCop::Cop::FormulaAudit::ChecksumCase do
+  subject(:cop) { described_class.new }
+
+  context "When auditing spec checksums" do
     it "When the checksum has upper case characters" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -174,6 +180,43 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
+    end
+  end
+
+  context "When auditing checksum with autocorrect" do
+    it "When there is uppercase sha256" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          stable do
+            url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
+            sha256 "5cf6e1ae0A645b426c0a7cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea0e9a"
+
+            resource "foo-package" do
+              url "https://github.com/foo-lang/foo-package/archive/0.18.0.tar.gz"
+              sha256 "5cf6e1Ae0a645b426b047aa4cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea9"
+            end
+          end
+        end
+      EOS
+
+      corrected_source = <<-EOS.undent
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          stable do
+            url "https://github.com/foo-lang/foo-compiler/archive/0.18.0.tar.gz"
+            sha256 "5cf6e1ae0a645b426c0a7cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea0e9a"
+
+            resource "foo-package" do
+              url "https://github.com/foo-lang/foo-package/archive/0.18.0.tar.gz"
+              sha256 "5cf6e1ae0a645b426b047aa4cc7cd3f7d1605ffa1ac5756a39a8b2268ddc7ea9"
+            end
+          end
+        end
+      EOS
+
+      new_source = autocorrect_source(cop, source)
+      expect(new_source).to eq(corrected_source)
     end
   end
 end

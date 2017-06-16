@@ -277,6 +277,17 @@ module RuboCop
         end
       end
 
+      # Returns the sha256 str node given a sha256 call node
+      def get_checksum_node(call)
+        return if parameters(call).empty? || parameters(call).nil?
+        if parameters(call).first.str_type?
+          parameters(call).first
+        # sha256 is passed as a key-value pair in bottle blocks
+        elsif parameters(call).first.hash_type?
+          parameters(call).first.keys.first
+        end
+      end
+
       # Returns the begin position of the node's line in source code
       def line_start_column(node)
         node.source_range.source_buffer.line_range(node.loc.line).begin_pos

@@ -15,6 +15,9 @@ FormulaAudit/Caveats:
 FormulaAudit/Checksum:
   Enabled: true
 
+FormulaAudit/ChecksumCase:
+  Enabled: true
+
 FormulaAuditStrict/BottleBlock:
   Enabled: true
 
