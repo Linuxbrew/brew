@@ -108,7 +108,8 @@ module Formulary
       case bottle_name
       when %r{(https?|ftp|file)://}
         # The name of the formula is found between the last slash and the last hyphen.
-        resource = Resource.new bottle_name[%r{([^/]+)-}, 1] { url bottle_name }
+        formula_name = File.basename(bottle_name)[/(.+)-/, 1]
+        resource = Resource.new(formula_name) { url bottle_name }
         downloader = CurlBottleDownloadStrategy.new resource.name, resource
         @bottle_filename = downloader.cached_location
         cached = @bottle_filename.exist?
