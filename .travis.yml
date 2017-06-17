@@ -28,8 +28,10 @@ before_install:
     else
       git fetch --unshallow;
       export PATH="$PWD/bin:$PATH";
-      rm -rf Library/Taps/homebrew/homebrew-test-bot/.git;
-      mv Library/Taps/homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-core;
+      HOMEBREW_CORE_TAP_DIR="$(brew --repo "homebrew/core")";
+      mkdir -p "$HOMEBREW_CORE_TAP_DIR";
+      HOMEBREW_TEST_BOT_TAP_DIR="$(brew --repo "homebrew/test-bot")";
+      ln -s "$HOMEBREW_TEST_BOT_TAP_DIR/.git" "$HOMEBREW_TEST_BOT_TAP_DIR/Formula" "$HOMEBREW_CORE_TAP_DIR";
       umask 022;
     fi
 
