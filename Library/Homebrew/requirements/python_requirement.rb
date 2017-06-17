@@ -33,7 +33,23 @@ class PythonRequirement < Requirement
   def which_python
     python = which python_binary
     return unless python
-    Pathname.new Utils.popen_read(python, "-c", "import sys; print(sys.executable)").strip
+    python_executable = Pathname.new Utils.popen_read(python, "-c", "import sys; print(sys.executable)").strip
+    return python_executable if OS.mac?
+
+    short_version = Language::Python.major_minor_version python_executable
+    python_config = Pathname.new python_executable/"../python#{short_version}-config"
+    return unless python_config.executable?
+
+    python_prefix = Pathname.new Utils.popen_read(python_config, "--prefix").strip
+    return unless (python_prefix/"include/python#{short_version}/Python.h").readable?
+
+    # some versions of python-config don't include a --configdir option,
+    # so have to do two checks for libpython
+    libpython = "libpython#{short_version}.so"
+    python_configdir = Utils.popen_read(python_config, "--configdir")
+    return python_executable if $?.zero? && (Pathname.new(python_configdir.strip)/libpython).readable?
+    exec_prefix = Pathname.new Utils.popen_read(python_config, "--exec-prefix").strip
+    return python_executable if (exec_prefix/"lib/"/libpython).readable?
   end
 
   def system_python
