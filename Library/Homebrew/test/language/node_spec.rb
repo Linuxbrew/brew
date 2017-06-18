@@ -7,10 +7,14 @@ describe Language::Node do
     end
 
     it "calls prepend_path when npmrc does not exist" do
-      allow(Formula).to receive(:[]).with("node").and_return(formula { url "foo-1.0" })
+      node = formula "node" do
+        url "node-test"
+      end
+      stub_formula_loader(node)
       allow_any_instance_of(Pathname).to receive(:exist?).and_return(false)
-      allow(ENV).to receive(:prepend_path).with("PATH", Formula["node"].opt_libexec/"bin").and_return("prepend_path called")
-      expect(subject.setup_npm_environment).to eq("prepend_path called")
+
+      subject.setup_npm_environment
+      expect(ENV["PATH"]).to include(Formula["node"].opt_libexec/"bin")
     end
   end
 
