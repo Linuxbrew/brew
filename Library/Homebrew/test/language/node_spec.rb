@@ -6,7 +6,7 @@ describe Language::Node do
       expect(subject.setup_npm_environment).to be_nil
     end
 
-    it "calls prepend_path when npmrc does not exist" do
+    it "calls prepend_path when node formula exists and npmrc does not exist" do
       node = formula "node" do
         url "node-test"
       end
@@ -15,6 +15,11 @@ describe Language::Node do
 
       subject.setup_npm_environment
       expect(ENV["PATH"]).to include(Formula["node"].opt_libexec/"bin")
+    end
+
+    it "does not call prepend_path when node formula does not exist but npmrc exists" do
+      allow_any_instance_of(Pathname).to receive(:exist?).and_return(false)
+      expect(subject.setup_npm_environment).to eq(nil)
     end
   end
 
