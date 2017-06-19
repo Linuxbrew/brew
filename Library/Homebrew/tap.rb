@@ -64,6 +64,11 @@ class Tap
   # e.g. `user/repo`
   attr_reader :name
 
+  # The full name of this {Tap}, including the `homebrew-` prefix.
+  # It combines {#user} and 'homebrew-'-prefixed {#repo} with a slash.
+  # e.g. `user/homebrew-repo`
+  attr_reader :full_name
+
   # The local path to this {Tap}.
   # e.g. `/usr/local/Library/Taps/user/homebrew-repo`
   attr_reader :path
@@ -73,7 +78,8 @@ class Tap
     @user = user
     @repo = repo
     @name = "#{@user}/#{@repo}".downcase
-    @path = TAP_DIRECTORY/"#{@user}/homebrew-#{@repo}".downcase
+    @full_name = "#{@user}/homebrew-#{@repo}"
+    @path = TAP_DIRECTORY/@full_name.downcase
     @path.extend(GitRepositoryExtension)
   end
 
@@ -104,7 +110,7 @@ class Tap
 
   # The default remote path to this {Tap}.
   def default_remote
-    "https://github.com/#{user}/homebrew-#{repo}"
+    "https://github.com/#{full_name}"
   end
 
   # True if this {Tap} is a git repository.
@@ -140,7 +146,7 @@ class Tap
   # e.g. `https://github.com/user/homebrew-repo/issues`
   def issues_url
     return unless official? || !custom_remote?
-    "https://github.com/#{user}/homebrew-#{repo}/issues"
+    "#{default_remote}/issues"
   end
 
   def to_s
@@ -263,7 +269,7 @@ class Tap
       credentials each time you update, you can use git HTTP credential
       caching or issue the following command:
         cd #{path}
-        git remote set-url origin git@github.com:#{user}/homebrew-#{repo}.git
+        git remote set-url origin git@github.com:#{full_name}.git
     EOS
   end
 
@@ -513,7 +519,7 @@ class Tap
         if custom_remote?
           true
         else
-          GitHub.private_repo?(user, "homebrew-#{repo}")
+          GitHub.private_repo?(full_name)
         end
       rescue GitHub::HTTPNotFoundError
         true
