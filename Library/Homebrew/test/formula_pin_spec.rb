@@ -9,7 +9,7 @@ describe FormulaPin do
     formula.rack.mkpath
 
     allow(formula).to receive(:installed_prefixes) do
-      formula.rack.directory? ? formula.rack.subdirs : []
+      formula.rack.directory? ? formula.rack.subdirs.sort : []
     end
 
     allow(formula).to receive(:installed_kegs) do

@@ -602,7 +602,7 @@ class Formula
   # All currently installed prefix directories.
   # @private
   def installed_prefixes
-    rack.directory? ? rack.subdirs : []
+    rack.directory? ? rack.subdirs.sort : []
   end
 
   # All currently installed kegs.
@@ -1182,7 +1182,7 @@ class Formula
     return false unless old_rack.directory?
     return false if old_rack.subdirs.empty?
 
-    tap == Tab.for_keg(old_rack.subdirs.first).tap
+    tap == Tab.for_keg(old_rack.subdirs.sort.first).tap
   end
 
   # @private
