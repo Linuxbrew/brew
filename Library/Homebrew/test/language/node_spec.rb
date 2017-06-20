@@ -12,9 +12,8 @@ describe Language::Node do
       end
       stub_formula_loader(node)
       allow_any_instance_of(Pathname).to receive(:exist?).and_return(false)
-
+      expect(ENV).to receive(:prepend_path)
       subject.setup_npm_environment
-      expect(ENV["PATH"]).to include(Formula["node"].opt_libexec/"bin")
     end
 
     it "does not call prepend_path when node formula does not exist but npmrc exists" do
