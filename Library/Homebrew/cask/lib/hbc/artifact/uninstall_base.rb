@@ -224,9 +224,14 @@ module Hbc
       end
 
       def uninstall_trash(*paths)
-        # :trash functionality is stubbed as a synonym for :delete
-        # TODO: make :trash work differently, moving files to the Trash
-        uninstall_delete(*paths)
+        return if paths.empty?
+
+        ohai "Trashing files:"
+        each_resolved_path(:trash, paths) do |path, resolved_paths|
+          puts path
+          resolved_paths.each { |resolved_path| Utils.gain_permissions(resolved_path, ["-R"], @command) }
+          @command.run!("/usr/bin/xargs", args: ["-0", "--", HOMEBREW_LIBRARY_PATH/"utils/trash.swift"], input: resolved_paths.join("\0"))
+        end
       end
 
       def uninstall_rmdir(*directories)
