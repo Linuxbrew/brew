@@ -36,6 +36,7 @@ class LinkageChecker
           rescue NotAKegError
             @system_dylibs << dylib
           rescue Errno::ENOENT
+            next if harmless_broken_link?(dylib)
             @broken_dylibs << dylib
           else
             tap = Tab.for_keg(owner).tap
@@ -113,6 +114,14 @@ class LinkageChecker
   end
 
   private
+
+  # Whether or not dylib is a harmless broken link, meaning that it's
+  # okay to skip (and not report) as broken.
+  def harmless_broken_link?(dylib)
+    # libgcc_s_ppc64 is referenced by programs that use the Java Service Wrapper,
+    # and is harmless on x86(_64) machines
+    ["/usr/lib/libgcc_s_ppc64.1.dylib"].include?(dylib)
+  end
 
   # Display a list of things.
   # Things may either be an array, or a hash of (label -> array)
