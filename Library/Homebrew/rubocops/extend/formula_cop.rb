@@ -173,6 +173,12 @@ module RuboCop
         node.each_child_node(:block).select { |block_node| block_name == block_node.method_name }
       end
 
+      # Returns an array of block nodes of any depth below node in AST
+      def find_all_blocks(node, block_name)
+        return if node.nil?
+        node.each_descendant(:block).select { |block_node| block_name == block_node.method_name }
+      end
+
       # Returns a method definition node with method_name
       def find_method_def(node, method_name)
         return if node.nil?
@@ -250,8 +256,7 @@ module RuboCop
 
       # Returns the array of arguments of the method_node
       def parameters(method_node)
-        return unless method_node.send_type?
-        method_node.method_args
+        method_node.method_args if method_node.send_type? || method_node.block_type?
       end
 
       # Returns true if the given parameters are present in method call
@@ -269,6 +274,17 @@ module RuboCop
               node_equals?(method_param, given_param)
             end
           end
+        end
+      end
+
+      # Returns the sha256 str node given a sha256 call node
+      def get_checksum_node(call)
+        return if parameters(call).empty? || parameters(call).nil?
+        if parameters(call).first.str_type?
+          parameters(call).first
+        # sha256 is passed as a key-value pair in bottle blocks
+        elsif parameters(call).first.hash_type?
+          parameters(call).first.keys.first
         end
       end
 
