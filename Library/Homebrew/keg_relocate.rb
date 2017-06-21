@@ -68,15 +68,6 @@ class Keg
         relocation.old_cellar => relocation.new_cellar,
         relocation.old_repository => relocation.new_repository,
       }
-
-      # Order matters here since `HOMEBREW_CELLAR` and `HOMEBREW_REPOSITORY` are
-      # children of `HOMEBREW_PREFIX` by default.
-      regexp = Regexp.union(
-        relocation.old_cellar,
-        relocation.old_repository,
-        relocation.old_prefix,
-      )
-
       if !OS.mac? && relocation.old_repository == REPOSITORY_PLACEHOLDER
         # Work around for bottles that incorrectly use @@HOMEBREW_REPOSITORY@@
         # where they should have used @@HOMEBREW_PREFIX@@.
@@ -88,11 +79,8 @@ class Keg
           relocation.old_repository => relocation.new_prefix,
           relocation.old_repository + "/Library" => relocation.new_repository + "/Library",
         }
-        regexp = Regexp.union(replacements.keys)
       end
-
-      changed = s.gsub!(regexp, replacements)
-
+      changed = s.gsub!(Regexp.union(replacements.keys), replacements)
       next unless changed
       changed_files += [first, *rest].map { |file| file.relative_path_from(path) }
 
@@ -133,7 +121,7 @@ class Keg
   end
 
   def lib
-    path.join("lib")
+    path/"lib"
   end
 
   def text_files
@@ -150,6 +138,7 @@ class Keg
       files = Set.new path.find.reject { |pn|
         next true if pn.symlink?
         next true if pn.directory?
+        next false if pn.basename.to_s == "orig-prefix.txt" # for python virtualenvs
         next true if Metafiles::EXTENSIONS.include?(pn.extname)
         if pn.text_executable?
           text_files << pn

@@ -107,14 +107,14 @@ module Homebrew
       dirname, filename = File.split(match["path"])
       next unless valid_dirnames.include?(dirname)
       tap = Tap.fetch(match["repository"]["full_name"])
-      next if tap.installed?
+      next if tap.installed? && match["repository"]["owner"]["login"] != "caskroom"
       "#{tap.name}/#{File.basename(filename, ".rb")}"
     end.compact
   end
 
   def search_formulae(regex)
     aliases = Formula.alias_full_names
-    results = (Formula.full_names+aliases).grep(regex).sort
+    results = (Formula.full_names + aliases).grep(regex).sort
 
     results.map do |name|
       begin

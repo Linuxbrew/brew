@@ -4,35 +4,10 @@ require "rubygems"
 
 describe Hbc::CLI::Style, :cask do
   let(:args) { [] }
-  let(:cli) { described_class.new(args) }
+  let(:cli) { described_class.new(*args) }
 
   around do |example|
     shutup { example.run }
-  end
-
-  describe ".run" do
-    subject { described_class.run(args) }
-
-    before do
-      allow(described_class).to receive(:new).and_return(cli)
-      allow(cli).to receive(:run).and_return(retval)
-    end
-
-    context "when rubocop succeeds" do
-      let(:retval) { true }
-
-      it "exits successfully" do
-        subject
-      end
-    end
-
-    context "when rubocop fails" do
-      let(:retval) { false }
-
-      it "raises an exception" do
-        expect { subject }.to raise_error(Hbc::CaskError)
-      end
-    end
   end
 
   describe "#run" do
@@ -53,7 +28,10 @@ describe Hbc::CLI::Style, :cask do
 
     context "when rubocop fails" do
       let(:success) { false }
-      it { is_expected.to be_falsey }
+
+      it "raises an error" do
+        expect { subject }.to raise_error(Hbc::CaskError)
+      end
     end
   end
 
@@ -99,7 +77,7 @@ describe Hbc::CLI::Style, :cask do
     subject { cli.cask_paths }
 
     before do
-      allow(cli).to receive(:cask_tokens).and_return(tokens)
+      allow(cli).to receive(:args).and_return(tokens)
     end
 
     context "when no cask tokens are given" do
@@ -136,40 +114,6 @@ describe Hbc::CLI::Style, :cask do
     end
   end
 
-  describe "#cask_tokens" do
-    subject { cli.cask_tokens }
-
-    context "when no args are given" do
-      let(:args) { [] }
-      it { is_expected.to be_empty }
-    end
-
-    context "when only flags are given" do
-      let(:args) { ["--fix"] }
-      it { is_expected.to be_empty }
-    end
-
-    context "when only empty args are given" do
-      let(:args) { ["", ""] }
-      it { is_expected.to be_empty }
-    end
-
-    context "when a cask token is given" do
-      let(:args) { ["adium"] }
-      it { is_expected.to eq(["adium"]) }
-    end
-
-    context "when multiple cask tokens are given" do
-      let(:args) { %w[adium dropbox] }
-      it { is_expected.to eq(%w[adium dropbox]) }
-    end
-
-    context "when cask tokens are given with flags" do
-      let(:args) { ["adium", "dropbox", "--fix"] }
-      it { is_expected.to eq(%w[adium dropbox]) }
-    end
-  end
-
   describe "#rubocop_args" do
     subject { cli.rubocop_args }
 
@@ -201,35 +145,6 @@ describe Hbc::CLI::Style, :cask do
     it "should add --auto-correct to default args" do
       allow(cli).to receive(:default_args).and_return(default_args)
       expect(subject).to include("--auto-correct", *default_args)
-    end
-  end
-
-  describe "#fix?" do
-    subject { cli.fix? }
-
-    context "when --fix is passed as an argument" do
-      let(:args) { ["adium", "--fix"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when --correct is passed as an argument" do
-      let(:args) { ["adium", "--correct"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when --auto-correct is passed as an argument" do
-      let(:args) { ["adium", "--auto-correct"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when --auto-correct is misspelled as --autocorrect" do
-      let(:args) { ["adium", "--autocorrect"] }
-      it { is_expected.to be_truthy }
-    end
-
-    context "when no flag equivalent to --fix is passed as an argument" do
-      let(:args) { ["adium"] }
-      it { is_expected.to be_falsey }
     end
   end
 end

@@ -19,6 +19,7 @@
 
 require "utils"
 require "json"
+require "open3"
 
 module Homebrew
   module_function
@@ -72,7 +73,11 @@ module Homebrew
     args = %w[
       --force-exclusion
     ]
-    args << "--auto-correct" if fix
+    if fix
+      args << "--auto-correct"
+    else
+      args << "--parallel"
+    end
 
     if options[:except_cops]
       options[:except_cops].map! { |cop| RuboCop::Cop::Cop.registry.qualified_cop_name(cop.to_s, "") }
@@ -94,26 +99,28 @@ module Homebrew
 
     if files.nil?
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
-      args += [HOMEBREW_LIBRARY_PATH]
+      args << HOMEBREW_LIBRARY_PATH
     else
       args << "--config" << HOMEBREW_LIBRARY/".rubocop.yml"
       args += files
     end
 
+    cache_env = { "XDG_CACHE_HOME" => "#{HOMEBREW_CACHE}/style" }
+
     case output_type
     when :print
       args << "--display-cop-names" if ARGV.include? "--display-cop-names"
       args << "--format" << "simple" if files
-      system "rubocop", *args
+      system(cache_env, "rubocop", *args)
       !$?.success?
     when :json
-      json = Utils.popen_read_text("rubocop", "--format", "json", *args)
+      json, _, status = Open3.capture3(cache_env, "rubocop", "--format", "json", *args)
       # exit status of 1 just means violations were found; other numbers mean
       # execution errors.
       # exitstatus can also be nil if RuboCop process crashes, e.g. due to
       # native extension problems.
       # JSON needs to be at least 2 characters.
-      if $?.exitstatus.nil? || $?.exitstatus > 1 || json.to_s.length < 2
+      if !(0..1).cover?(status.exitstatus) || json.to_s.length < 2
         raise "Error running `rubocop --format json #{args.join " "}`"
       end
       RubocopResults.new(JSON.parse(json))

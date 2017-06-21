@@ -66,7 +66,7 @@ module Hbc
       return [] if current == version
 
       # collect all installed versions that are different than tap version and return them
-      installed.select { |v| v != version }
+      installed.reject { |v| v == version }
     end
 
     def to_s
@@ -74,8 +74,6 @@ module Hbc
     end
 
     def dumpcask
-      return unless CLI.debug?
-
       odebug "Cask instance dumps in YAML:"
       odebug "Cask instance toplevel:", to_yaml
       [

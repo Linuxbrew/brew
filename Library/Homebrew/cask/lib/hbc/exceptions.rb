@@ -113,7 +113,7 @@ module Hbc
     end
 
     def to_s
-      "Cask '#{token}' definition is invalid" + (!submsg.empty? ? ": #{submsg}" : "")
+      "Cask '#{token}' definition is invalid#{": #{submsg}" unless submsg.empty?}"
     end
   end
 

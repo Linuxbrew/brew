@@ -59,10 +59,11 @@ module Homebrew
         ENV["GIT_#{role}_DATE"]  = "Sun Jan 22 19:59:13 2017 +0000"
       end
 
-      Homebrew.install_gem_setup_path! "bundler"
-      unless quiet_system("bundle", "check")
-        system "bundle", "install"
-      end
+      # TODO: unpin this version when this error no longer shows:
+      # bundler-1.15.0/lib/bundler/shared_helpers.rb:25:
+      #   stack level too deep (SystemStackError)
+      Homebrew.install_gem_setup_path! "bundler", "1.14.6"
+      system "bundle", "install" unless quiet_system("bundle", "check")
 
       parallel = true
 
@@ -91,12 +92,12 @@ module Homebrew
       end
 
       args = ["-I", HOMEBREW_LIBRARY_PATH/"test"]
-      args += %w[
+      args += %W[
         --color
         --require spec_helper
         --format progress
         --format ParallelTests::RSpec::RuntimeLogger
-        --out tmp/parallel_runtime_rspec.log
+        --out #{HOMEBREW_CACHE}/tests/parallel_runtime_rspec.log
       ]
 
       args << "--seed" << ARGV.next if ARGV.include? "--seed"

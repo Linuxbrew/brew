@@ -18,8 +18,7 @@ describe Hbc::CLI::Zap, :cask do
     expect(transmission).to be_installed
 
     shutup do
-      Hbc::CLI::Zap.run("--notavalidoption",
-                        "local-caffeine", "local-transmission")
+      Hbc::CLI::Zap.run("local-caffeine", "local-transmission")
     end
 
     expect(caffeine).not_to be_installed
@@ -67,7 +66,7 @@ describe Hbc::CLI::Zap, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Zap.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

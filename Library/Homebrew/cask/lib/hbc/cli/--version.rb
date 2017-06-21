@@ -1,12 +1,17 @@
 module Hbc
   class CLI
-    class Version < Base
+    class Version < AbstractCommand
       def self.command_name
         "--#{super}"
       end
 
-      def self.run(*args)
-        raise ArgumentError, "#{command_name} does not take arguments." unless args.empty?
+      def initialize(*)
+        super
+        return if args.empty?
+        raise ArgumentError, "#{self.class.command_name} does not take arguments."
+      end
+
+      def run
         puts Hbc.full_version
       end
 

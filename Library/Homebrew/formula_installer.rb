@@ -198,7 +198,7 @@ class FormulaInstaller
 
     return if pinned_unsatisfied_deps.empty?
     raise CannotInstallFormulaError,
-      "You must `brew unpin #{pinned_unsatisfied_deps*" "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
+      "You must `brew unpin #{pinned_unsatisfied_deps * " "}` as installing #{formula.full_name} requires the latest version of pinned dependencies"
   end
 
   def build_bottle_preinstall
@@ -219,16 +219,16 @@ class FormulaInstaller
     # relink the active keg if possible (because it is slow).
     if formula.linked_keg.directory?
       message = <<-EOS.undent
-        #{formula.name} #{formula.linked_keg.resolved_path.basename} is already installed
+        #{formula.name} #{formula.linked_version} is already installed
       EOS
       message += if formula.outdated? && !formula.head?
         <<-EOS.undent
-          To upgrade to #{formula.version}, run `brew upgrade #{formula.name}`
+          To upgrade to #{formula.pkg_version}, run `brew upgrade #{formula.name}`
         EOS
       else
         # some other version is already installed *and* linked
         <<-EOS.undent
-          To install #{formula.version}, first run `brew unlink #{formula.name}`
+          To install #{formula.pkg_version}, first run `brew unlink #{formula.name}`
         EOS
       end
       raise CannotInstallFormulaError, message
@@ -508,7 +508,7 @@ class FormulaInstaller
 
   def effective_build_options_for(dependent, inherited_options = [])
     args  = dependent.build.used_options
-    args |= dependent == formula ? options : inherited_options
+    args |= (dependent == formula) ? options : inherited_options
     args |= Tab.for_formula(dependent).used_options
     args &= dependent.options
     BuildOptions.new(args, dependent.options)
@@ -717,7 +717,6 @@ class FormulaInstaller
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
-
   rescue Exception
     ignore_interrupts do
       # any exceptions must leave us with nothing installed

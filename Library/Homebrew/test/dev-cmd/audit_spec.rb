@@ -1,10 +1,6 @@
 require "dev-cmd/audit"
 require "formulary"
 
-RSpec::Matchers.alias_matcher :have_data, :be_data
-RSpec::Matchers.alias_matcher :have_end, :be_end
-RSpec::Matchers.alias_matcher :have_trailing_newline, :be_trailing_newline
-
 module Count
   def self.increment
     @count ||= 0
@@ -13,6 +9,10 @@ module Count
 end
 
 describe FormulaText do
+  alias_matcher :have_data, :be_data
+  alias_matcher :have_end, :be_end
+  alias_matcher :have_trailing_newline, :be_trailing_newline
+
   let(:dir) { mktmpdir }
 
   def formula_text(name, body = nil, options = {})
@@ -305,23 +305,6 @@ describe FormulaAuditor do
     end
   end
 
-  specify "#audit_caveats" do
-    fa = formula_auditor "foo", <<-EOS.undent
-      class Foo < Formula
-        homepage "http://example.com/foo"
-        url "http://example.com/foo-1.0.tgz"
-
-        def caveats
-          "setuid"
-        end
-      end
-    EOS
-
-    fa.audit_caveats
-    expect(fa.problems)
-      .to eq(["Don't recommend setuid in the caveats, suggest sudo instead."])
-  end
-
   describe "#audit_keg_only_style" do
     specify "keg_only_needs_downcasing" do
       fa = formula_auditor "foo", <<-EOS.undent, strict: true
@@ -382,57 +365,6 @@ describe FormulaAuditor do
       fa.audit_keg_only_style
       expect(fa.problems)
         .to eq([])
-    end
-  end
-
-  describe "#audit_text" do
-    specify "xcodebuild suggests symroot" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
-
-          def install
-            xcodebuild "-project", "meow.xcodeproject"
-          end
-        end
-      EOS
-
-      fa.audit_text
-      expect(fa.problems.first)
-        .to match('xcodebuild should be passed an explicit "SYMROOT"')
-    end
-
-    specify "bare xcodebuild also suggests symroot" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
-
-          def install
-            xcodebuild
-          end
-        end
-      EOS
-
-      fa.audit_text
-      expect(fa.problems.first)
-        .to match('xcodebuild should be passed an explicit "SYMROOT"')
-    end
-
-    specify "disallow go get usage" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo <Formula
-          url "http://example.com/foo-1.0.tgz"
-
-          def install
-            system "go", "get", "bar"
-          end
-        end
-      EOS
-      fa.audit_text
-      expect(fa.problems.first)
-        .to match("Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s.")
     end
   end
 

@@ -139,7 +139,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     super
     @ref_type, @ref = extract_ref(meta)
     @revision = meta[:revision]
-    @clone = HOMEBREW_CACHE.join(cache_filename)
+    @clone = HOMEBREW_CACHE/cache_filename
   end
 
   def fetch
@@ -322,7 +322,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
   def initialize(name, resource)
     super
     @mirrors = resource.mirrors.dup
-    @tarball_path = HOMEBREW_CACHE.join("#{name}-#{version}#{ext}")
+    @tarball_path = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
 
@@ -698,7 +698,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def repo_valid?
-    cached_location.join(".svn").directory?
+    (cached_location/".svn").directory?
   end
 
   def clone_repo
@@ -711,7 +711,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
       fetch_repo cached_location, @url, main_revision, true
 
       externals do |external_name, external_url|
-        fetch_repo cached_location+external_name, external_url, @ref[external_name], true
+        fetch_repo cached_location/external_name, external_url, @ref[external_name], true
       end
     else
       fetch_repo cached_location, @url
@@ -773,7 +773,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def shallow_dir?
-    git_dir.join("shallow").exist?
+    (git_dir/"shallow").exist?
   end
 
   def support_depth?
@@ -781,7 +781,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def git_dir
-    cached_location.join(".git")
+    cached_location/".git"
   end
 
   def ref?
@@ -797,7 +797,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def submodules?
-    cached_location.join(".gitmodules").exist?
+    (cached_location/".gitmodules").exist?
   end
 
   def clone_args
@@ -987,7 +987,7 @@ class CVSDownloadStrategy < VCSDownloadStrategy
   end
 
   def repo_valid?
-    cached_location.join("CVS").directory?
+    (cached_location/"CVS").directory?
   end
 
   def clone_repo
@@ -1004,8 +1004,8 @@ class CVSDownloadStrategy < VCSDownloadStrategy
 
   def split_url(in_url)
     parts = in_url.split(/:/)
-    mod=parts.pop
-    url=parts.join(":")
+    mod = parts.pop
+    url = parts.join(":")
     [mod, url]
   end
 end
@@ -1045,7 +1045,7 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   end
 
   def repo_valid?
-    cached_location.join(".hg").directory?
+    (cached_location/".hg").directory?
   end
 
   def clone_repo
@@ -1085,7 +1085,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   end
 
   def repo_valid?
-    cached_location.join(".bzr").directory?
+    (cached_location/".bzr").directory?
   end
 
   def clone_repo

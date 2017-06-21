@@ -188,14 +188,14 @@ describe "globally-scoped helper methods" do
   end
 
   specify "#which_editor" do
-    ENV["HOMEBREW_EDITOR"] = "vemate"
+    ENV["HOMEBREW_EDITOR"] = "vemate -w"
     ENV["HOMEBREW_PATH"] = dir
 
     editor = "#{dir}/vemate"
     FileUtils.touch editor
     FileUtils.chmod 0755, editor
 
-    expect(which_editor).to eql editor
+    expect(which_editor).to eq("vemate -w")
   end
 
   specify "#gzip" do

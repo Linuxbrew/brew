@@ -17,6 +17,7 @@ class FormulaVersions
     @repository = formula.tap.path
     @entry_name = @path.relative_path_from(repository).to_s
     @current_formula = formula
+    @formula_at_revision = {}
   end
 
   def rev_list(branch)
@@ -32,20 +33,20 @@ class FormulaVersions
   end
 
   def formula_at_revision(rev)
-    contents = file_contents_at_revision(rev)
+    Homebrew.raise_deprecation_exceptions = true
 
-    begin
-      Homebrew.raise_deprecation_exceptions = true
-      nostdout { yield Formulary.from_contents(name, path, contents) }
-    rescue *IGNORED_EXCEPTIONS => e
-      # We rescue these so that we can skip bad versions and
-      # continue walking the history
-      ohai "#{e} in #{name} at revision #{rev}", e.backtrace if ARGV.debug?
-    rescue FormulaUnavailableError
-      # Suppress this error
-    ensure
-      Homebrew.raise_deprecation_exceptions = false
+    yield @formula_at_revision[rev] ||= begin
+      contents = file_contents_at_revision(rev)
+      nostdout { Formulary.from_contents(name, path, contents) }
     end
+  rescue *IGNORED_EXCEPTIONS => e
+    # We rescue these so that we can skip bad versions and
+    # continue walking the history
+    ohai "#{e} in #{name} at revision #{rev}", e.backtrace if ARGV.debug?
+  rescue FormulaUnavailableError
+    # Suppress this error
+  ensure
+    Homebrew.raise_deprecation_exceptions = false
   end
 
   def bottle_version_map(branch)
@@ -60,6 +61,26 @@ class FormulaVersions
       end
       return map if versions_seen > MAX_VERSIONS_DEPTH
     end
+    map
+  end
+
+  def previous_version_and_checksum(branch)
+    map = {}
+
+    rev_list(branch) do |rev|
+      formula_at_revision(rev) do |f|
+        [:stable, :devel].each do |spec_sym|
+          next unless spec = f.send(spec_sym)
+          map[spec_sym] ||= { version: spec.version, checksum: spec.checksum }
+        end
+      end
+
+      break if map[:stable] || map[:devel]
+    end
+
+    map[:stable] ||= {}
+    map[:devel] ||= {}
+
     map
   end
 

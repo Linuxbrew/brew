@@ -323,6 +323,10 @@ class FormulaAuditor
       end
       valid_alias_names = [alias_name_major, alias_name_major_minor]
 
+      if formula.tap && !formula.tap.core_tap?
+        valid_alias_names.map! { |a| "#{formula.tap}/#{a}" }
+      end
+
       valid_versioned_aliases = versioned_aliases & valid_alias_names
       invalid_versioned_aliases = versioned_aliases - valid_alias_names
 
@@ -587,9 +591,7 @@ class FormulaAuditor
   def audit_homepage
     homepage = formula.homepage
 
-    if homepage.nil? || homepage.empty?
-      return
-    end
+    return if homepage.nil? || homepage.empty?
 
     return unless @online
 
@@ -742,6 +744,15 @@ class FormulaAuditor
     return if @new_formula
 
     fv = FormulaVersions.new(formula)
+
+    previous_version_and_checksum = fv.previous_version_and_checksum("origin/master")
+    [:stable, :devel].each do |spec_sym|
+      next unless spec = formula.send(spec_sym)
+      next unless previous_version_and_checksum[spec_sym][:version] == spec.version
+      next if previous_version_and_checksum[spec_sym][:checksum] == spec.checksum
+      problem "#{spec_sym}: sha256 changed without the version also changing; please create an issue upstream to rule out malicious circumstances and to find out why the file changed."
+    end
+
     attributes = [:revision, :version_scheme]
     attributes_map = fv.version_attributes_map(attributes, "origin/master")
 
@@ -839,14 +850,6 @@ class FormulaAuditor
   end
 
   def audit_text
-    if text =~ /system\s+['"]scons/
-      problem "use \"scons *args\" instead of \"system 'scons', *args\""
-    end
-
-    if text =~ /system\s+['"]xcodebuild/
-      problem %q(use "xcodebuild *args" instead of "system 'xcodebuild', *args")
-    end
-
     bin_names = Set.new
     bin_names << formula.name
     bin_names += formula.aliases
@@ -856,44 +859,16 @@ class FormulaAuditor
     end
     bin_names.each do |name|
       ["system", "shell_output", "pipe_output"].each do |cmd|
-        if text =~ %r{(def test|test do).*(#{Regexp.escape HOMEBREW_PREFIX}/bin/)?#{cmd}[\(\s]+['"]#{Regexp.escape name}[\s'"]}m
+        if text =~ %r{(def test|test do).*(#{Regexp.escape(HOMEBREW_PREFIX)}/bin/)?#{cmd}[\(\s]+['"]#{Regexp.escape(name)}[\s'"]}m
           problem %Q(fully scope test #{cmd} calls e.g. #{cmd} "\#{bin}/#{name}")
         end
       end
     end
-
-    if text =~ /xcodebuild[ (]*["'*]*/ && !text.include?("SYMROOT=")
-      problem 'xcodebuild should be passed an explicit "SYMROOT"'
-    end
-
-    if text.include? "Formula.factory("
-      problem "\"Formula.factory(name)\" is deprecated in favor of \"Formula[name]\""
-    end
-
-    if text.include?("def plist") && !text.include?("plist_options")
-      problem "Please set plist_options when using a formula-defined plist."
-    end
-
-    if text =~ /depends_on\s+['"]openssl['"]/ && text =~ /depends_on\s+['"]libressl['"]/
-      problem "Formulae should not depend on both OpenSSL and LibreSSL (even optionally)."
-    end
-
-    if text =~ /virtualenv_(create|install_with_resources)/ &&
-       text =~ /resource\s+['"]setuptools['"]\s+do/
-      problem "Formulae using virtualenvs do not need a `setuptools` resource."
-    end
-
-    if text =~ /system\s+['"]go['"],\s+['"]get['"]/
-      problem "Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s."
-    end
-
-    return unless text.include?('require "language/go"') && !text.include?("go_resource")
-    problem "require \"language/go\" is unnecessary unless using `go_resource`s"
   end
 
   def audit_lines
     text.without_patch.split("\n").each_with_index do |line, lineno|
-      line_problems(line, lineno+1)
+      line_problems(line, lineno + 1)
     end
   end
 
@@ -975,9 +950,7 @@ class FormulaAuditor
       problem ":apr is deprecated. Usage should be \"apr-util\""
     end
 
-    if line =~ /depends_on :tex/
-      problem ":tex is deprecated"
-    end
+    problem ":tex is deprecated" if line =~ /depends_on :tex/
 
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
       problem "#{$2} modules should be vendored rather than use deprecated `depends_on \"#{$1}\" => :#{$2}#{$3}`"
@@ -986,6 +959,7 @@ class FormulaAuditor
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+(.*)/
       dep = $1
       $2.split(" ").map do |o|
+        break if ["if", "unless"].include?(o)
         next unless o =~ /^\[?['"](.*)['"]/
         problem "Dependency #{dep} should not use option #{$1}"
       end
@@ -1173,11 +1147,6 @@ class FormulaAuditor
 
     return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
     problem "Use pkgshare instead of (share#{$1}\"#{formula.name}\")"
-  end
-
-  def audit_caveats
-    return unless formula.caveats.to_s.include?("setuid")
-    problem "Don't recommend setuid in the caveats, suggest sudo instead."
   end
 
   def audit_reverse_migration
@@ -1526,6 +1495,14 @@ class ResourceAuditor
     urls.each do |u|
       next unless u =~ %r{https?://(?:central|repo\d+)\.maven\.org/maven2/(.+)$}
       problem "#{u} should be `https://search.maven.org/remotecontent?filepath=#{$1}`"
+    end
+
+    # Check pypi urls
+    if @strict
+      urls.each do |p|
+        next unless p =~ %r{^https?://pypi.python.org/(.*)}
+        problem "#{p} should be `https://files.pythonhosted.org/#{$1}`"
+      end
     end
 
     return unless @online

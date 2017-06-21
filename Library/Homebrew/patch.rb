@@ -108,7 +108,13 @@ class StringPatch < EmbeddedPatch
 end
 
 class ExternalPatch
+  extend Forwardable
+
   attr_reader :resource, :strip
+
+  def_delegators :resource,
+    :url, :fetch, :patch_files, :verify_download_integrity, :cached_download,
+    :clear_cache
 
   def initialize(strip, &block)
     @strip    = strip
@@ -146,30 +152,6 @@ class ExternalPatch
         end
       end
     end
-  end
-
-  def url
-    resource.url
-  end
-
-  def fetch
-    resource.fetch
-  end
-
-  def patch_files
-    resource.patch_files
-  end
-
-  def verify_download_integrity(fn)
-    resource.verify_download_integrity(fn)
-  end
-
-  def cached_download
-    resource.cached_download
-  end
-
-  def clear_cache
-    resource.clear_cache
   end
 
   def inspect

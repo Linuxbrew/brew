@@ -29,7 +29,7 @@ module Homebrew
     raise "Cannot write to #{unpack_dir}" unless unpack_dir.writable_real?
 
     formulae.each do |f|
-      stage_dir = unpack_dir.join("#{f.name}-#{f.version}")
+      stage_dir = unpack_dir/"#{f.name}-#{f.version}"
 
       if stage_dir.exist?
         raise "Destination #{stage_dir} already exists!" unless ARGV.force?

@@ -40,7 +40,7 @@ describe Hbc::CLI::Install, :cask do
     end
 
     expect {
-      Hbc::CLI::Install.run("local-transmission", "")
+      Hbc::CLI::Install.run("local-transmission")
     }.to output(/Warning: A Cask for local-transmission is already installed./).to_stderr
   end
 
@@ -115,7 +115,11 @@ describe Hbc::CLI::Install, :cask do
     end
 
     describe "with an invalid option" do
-      with_options.call(["--notavalidoption"])
+      it "raises an error" do
+        expect {
+          Hbc::CLI::Install.run("--notavalidoption")
+        }.to raise_error(/invalid option/)
+      end
     end
   end
 end

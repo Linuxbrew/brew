@@ -86,7 +86,7 @@ module Hbc
         Dir.chdir(mount) do
           Dir.glob("**/*", File::FNM_DOTMATCH).map do |path|
             next if skip_path?(Pathname(path))
-            path == "." ? path : path.prepend("./")
+            (path == ".") ? path : path.prepend("./")
           end.compact.join("\n").concat("\n")
         end
       end

@@ -39,4 +39,10 @@ describe Homebrew::Diagnostic::Checks do
     expect(subject.check_xcode_8_without_clt_on_el_capitan)
       .to match("You have Xcode 8 installed without the CLT")
   end
+
+  specify "#check_homebrew_prefix" do
+    # the integration tests are run in a special prefix
+    expect(subject.check_homebrew_prefix)
+      .to match("Your Homebrew's prefix is not /usr/local.")
+  end
 end

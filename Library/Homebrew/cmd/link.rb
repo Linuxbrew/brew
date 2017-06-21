@@ -72,9 +72,7 @@ module Homebrew
           puts "#{n} symlinks created"
         end
 
-        if keg_only && !ARGV.homebrew_developer?
-          puts_keg_only_path_message(keg)
-        end
+        puts_keg_only_path_message(keg) if keg_only && !ARGV.homebrew_developer?
       end
     end
   end

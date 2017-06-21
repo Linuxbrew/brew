@@ -1,8 +1,8 @@
 module Hbc
   class CLI
-    class InternalCheckurl < InternalUseBase
-      def self.run(*args)
-        casks_to_check = args.empty? ? Hbc.all : args.map { |arg| CaskLoader.load(arg) }
+    class InternalCheckurl < AbstractInternalCommand
+      def run
+        casks_to_check = args.empty? ? Hbc.all : args.map(&CaskLoader.public_method(:load))
         casks_to_check.each do |cask|
           odebug "Checking URL for Cask #{cask}"
           checker = UrlChecker.new(cask)

@@ -325,10 +325,10 @@ class FormulaConflictError < RuntimeError
 
   def message
     message = []
-    message << "Cannot install #{formula.full_name} because conflicting formulae are installed.\n"
+    message << "Cannot install #{formula.full_name} because conflicting formulae are installed."
     message.concat conflicts.map { |c| conflict_message(c) } << ""
     message << <<-EOS.undent
-      Please `brew unlink #{conflicts.map(&:name)*" "}` before continuing.
+      Please `brew unlink #{conflicts.map(&:name) * " "}` before continuing.
 
       Unlinking removes a formula's symlinks from #{HOMEBREW_PREFIX}. You can
       link the formula again after the install finishes. You can --force this

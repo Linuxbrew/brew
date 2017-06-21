@@ -55,7 +55,7 @@ module Homebrew
 
             if rack.directory?
               versions = rack.subdirs.map(&:basename)
-              verb = versions.length == 1 ? "is" : "are"
+              verb = Formatter.pluralize(versions.length, "is", "are")
               puts "#{keg.name} #{versions.join(", ")} #{verb} still installed."
               puts "Remove all versions with `brew uninstall --force #{keg.name}`."
             end
@@ -109,11 +109,11 @@ module Homebrew
     protected
 
     def are(items)
-      items.count == 1 ? "is" : "are"
+      Formatter.pluralize(items.count, "is", "are", show_count: false)
     end
 
     def they(items)
-      items.count == 1 ? "it" : "they"
+      Formatter.pluralize(items.count, "it", "they", show_count: false)
     end
 
     def list(items)
