@@ -38,13 +38,13 @@ class PythonRequirement < Requirement
     python = which python_binary
     return unless python
     python_executable = Pathname.new Utils.popen_read(python, "-c", "import sys; print(sys.executable)").strip
-    return python_executable if OS.mac? or devel_installed? python_executable
+    return python_executable if OS.mac? || devel_installed?(python_executable)
   end
 
   def devel_installed?(python_executable)
     short_version = Language::Python.major_minor_version python_executable
     python_prefix = Pathname.new Utils.popen_read(python_executable, "-c", "import sys; print(sys.#{sys_prefix_name})").strip
-    return (python_prefix/"include/python#{short_version}/Python.h").readable?
+    (python_prefix/"include/python#{short_version}#{include_suffix}/Python.h").readable?
   end
 
   def system_python
@@ -63,6 +63,10 @@ class PythonRequirement < Requirement
     "prefix"
   end
 
+  def include_suffix
+    ""
+  end
+
   # Deprecated
   alias to_s python_binary
 end
@@ -79,5 +83,9 @@ class Python3Requirement < PythonRequirement
 
   def sys_prefix_name
     "base_prefix"
+  end
+
+  def include_suffix
+    "m"
   end
 end
