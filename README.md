@@ -136,7 +136,7 @@ A good starting point for contributing is running `brew audit --strict` with som
 Please report security issues to our [HackerOne](https://hackerone.com/homebrew/).
 
 ## Who Are You?
-Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), and [Jonathan Chang](https://github.com/jonchang).
+Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Michka Popoff](https://github.com/iMichka).
 
 [Bob W. Hogg](https://github.com/rwhogg) is also a Linuxbrew maintainer, but is currently on leave and will return later in the year.
 
