@@ -35,21 +35,13 @@ class PythonRequirement < Requirement
     return unless python
     python_executable = Pathname.new Utils.popen_read(python, "-c", "import sys; print(sys.executable)").strip
     return python_executable if OS.mac?
+    return devel_installed? python_executable
+  end
 
+  def devel_installed?(python_executable)
     short_version = Language::Python.major_minor_version python_executable
-    python_config = Pathname.new python_executable/"../python#{short_version}-config"
-    return unless python_config.executable?
-
-    python_prefix = Pathname.new Utils.popen_read(python_config, "--prefix").strip
-    return unless (python_prefix/"include/python#{short_version}/Python.h").readable?
-
-    # some versions of python-config don't include a --configdir option,
-    # so have to do two checks for libpython
-    libpython = "libpython#{short_version}.so"
-    python_configdir = Utils.popen_read(python_config, "--configdir")
-    return python_executable if $?.zero? && (Pathname.new(python_configdir.strip)/libpython).readable?
-    exec_prefix = Pathname.new Utils.popen_read(python_config, "--exec-prefix").strip
-    return python_executable if (exec_prefix/"lib/"/libpython).readable?
+    python_prefix = Pathname.new Utils.popen_read(python_executable, "-c", "import sys; print(sys.#{sys_prefix_name}").strip
+    return (python_prefix/"include/python#{short_version}/Python.h").readable?
   end
 
   def system_python
@@ -64,6 +56,10 @@ class PythonRequirement < Requirement
     "python"
   end
 
+  def sys_prefix_name
+    "prefix"
+  end
+
   # Deprecated
   alias to_s python_binary
 end
@@ -76,5 +72,9 @@ class Python3Requirement < PythonRequirement
 
   def python_binary
     "python3"
+  end
+
+  def sys_prefix_name
+    "base_prefix"
   end
 end
