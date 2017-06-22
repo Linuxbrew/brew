@@ -165,7 +165,7 @@ module Homebrew
           "libUFSDNTFS.dylib", # Paragon NTFS
           "libUFSDExtFS.dylib", # Paragon ExtFS
           "libecomlodr.dylib", # Symantec Endpoint Protection
-          "libsymsea.*.dylib", # Symantec Endpoint Protection
+          "libsymsea*.dylib", # Symantec Endpoint Protection
           "sentinel.dylib", # SentinelOne
         ]
 
