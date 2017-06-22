@@ -31,16 +31,19 @@ class PythonRequirement < Requirement
   end
 
   def which_python
+    @python_executable ||= find_python
+  end
+
+  def find_python
     python = which python_binary
     return unless python
     python_executable = Pathname.new Utils.popen_read(python, "-c", "import sys; print(sys.executable)").strip
-    return python_executable if OS.mac?
-    return devel_installed? python_executable
+    return python_executable if OS.mac? or devel_installed? python_executable
   end
 
   def devel_installed?(python_executable)
     short_version = Language::Python.major_minor_version python_executable
-    python_prefix = Pathname.new Utils.popen_read(python_executable, "-c", "import sys; print(sys.#{sys_prefix_name}").strip
+    python_prefix = Pathname.new Utils.popen_read(python_executable, "-c", "import sys; print(sys.#{sys_prefix_name})").strip
     return (python_prefix/"include/python#{short_version}/Python.h").readable?
   end
 
