@@ -409,12 +409,21 @@ class FormulaInstaller
     install_bottle_for?(dependent, build)
   end
 
+  def runtime_requirements(formula)
+    runtime_deps = formula.runtime_dependencies.map(&:to_formula)
+    recursive_requirements = formula.recursive_requirements do |dependent, _|
+      Requirement.prune unless runtime_deps.include?(dependent)
+    end
+    (recursive_requirements.to_a + formula.requirements.to_a).reject(&:build?).uniq
+  end
+
   def expand_requirements
     unsatisfied_reqs = Hash.new { |h, k| h[k] = [] }
     deps = []
     formulae = [formula]
 
     while f = formulae.pop
+      runtime_requirements = runtime_requirements(f)
       f.recursive_requirements do |dependent, req|
         build = effective_build_options_for(dependent)
 
@@ -428,6 +437,8 @@ class FormulaInstaller
           formulae.unshift(dep.to_formula)
           Requirement.prune
         elsif req.satisfied?
+          Requirement.prune
+        elsif !runtime_requirements.include?(req) && install_bottle_for?(dependent, build)
           Requirement.prune
         else
           unsatisfied_reqs[dependent] << req
