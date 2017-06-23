@@ -18,7 +18,7 @@ describe Language::Node do
 
     it "does not call prepend_path when node formula does not exist but npmrc exists" do
       allow_any_instance_of(Pathname).to receive(:exist?).and_return(false)
-      expect(subject.setup_npm_environment).to eq(nil)
+      expect(subject.setup_npm_environment).to be_nil
     end
   end
 
@@ -26,7 +26,8 @@ describe Language::Node do
     npm_install_arg = "libexec"
 
     it "raises error with non zero exitstatus" do
-      expect { subject.std_npm_install_args(npm_install_arg) }.to raise_error("npm failed to pack #{Dir.pwd}")
+      expect { subject.std_npm_install_args(npm_install_arg) }.to \
+        raise_error("npm failed to pack #{Dir.pwd}")
     end
 
     it "does not raise error with a zero exitstatus" do
