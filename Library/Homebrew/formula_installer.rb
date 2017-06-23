@@ -472,9 +472,9 @@ class FormulaInstaller
       deps += Dependency.expand(gcc_dep.to_formula) << gcc_dep
     end
 
-    deps = deps.select do |dep|
+    deps = deps.reject do |dep|
       options = inherited_options[dep.name] = inherited_options_for(dep)
-      !dep.satisfied?(options)
+      dep.satisfied? options
     end
     deps = Dependency.merge_repeats(deps)
     i = deps.find_index { |x| x.to_formula == formula } || deps.length

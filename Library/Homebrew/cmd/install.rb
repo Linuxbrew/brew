@@ -320,7 +320,7 @@ module Homebrew
     end
     raise "Unable to locate the system's ld.so" unless sys_interpreter
     glibc = Formula["glibc"]
-    interpreter = glibc && glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2" : sys_interpreter
+    interpreter = glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2" : sys_interpreter
     mkdir_p HOMEBREW_PREFIX/"lib"
     FileUtils.ln_sf interpreter, ld_so
   rescue FormulaUnavailableError
@@ -331,7 +331,7 @@ module Homebrew
   def symlink_host_gcc
     version = DevelopmentTools.non_apple_gcc_version "/usr/bin/gcc"
     return if version.null?
-    suffix = version < 5 ? version.to_s[/^\d+\.\d+/] : version.to_s[/^\d+/]
+    suffix = (version < 5) ? version.to_s[/^\d+\.\d+/] : version.to_s[/^\d+/]
     return if File.executable?("/usr/bin/gcc-#{suffix}") || File.executable?(HOMEBREW_PREFIX/"bin/gcc-#{suffix}")
     FileUtils.mkdir_p HOMEBREW_PREFIX/"bin"
     ["gcc", "g++", "gfortran"].each do |tool|

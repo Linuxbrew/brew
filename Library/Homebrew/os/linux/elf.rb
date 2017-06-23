@@ -121,7 +121,7 @@ module ELF
   end
 
   def arch
-    archs.length == 1 ? archs.first : :dunno
+    (archs.length == 1) ? archs.first : :dunno
   end
 
   def universal?

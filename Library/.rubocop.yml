@@ -81,7 +81,7 @@ Metrics/ClassLength:
   Max: 1500
 
 Metrics/CyclomaticComplexity:
-  Max: 75
+  Max: 76
 
 Metrics/LineLength:
   Max: 400

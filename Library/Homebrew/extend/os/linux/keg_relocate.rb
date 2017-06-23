@@ -37,7 +37,7 @@ class Keg
       cmd_interpreter = [patchelf, "--print-interpreter", file]
       old_interpreter = Utils.popen_read(*cmd_interpreter).strip
       raise ErrorDuringExecution, cmd_interpreter unless $?.success?
-      new_interpreter = new_prefix == PREFIX_PLACEHOLDER ? "/lib64/ld-linux-x86-64.so.2" : "#{HOMEBREW_PREFIX}/lib/ld.so"
+      new_interpreter = (new_prefix == PREFIX_PLACEHOLDER) ? "/lib64/ld-linux-x86-64.so.2" : "#{HOMEBREW_PREFIX}/lib/ld.so"
       cmd << "--set-interpreter" << new_interpreter unless old_interpreter == new_interpreter
     end
 
