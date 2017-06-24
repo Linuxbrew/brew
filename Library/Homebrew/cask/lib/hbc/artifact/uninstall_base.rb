@@ -234,13 +234,27 @@ module Hbc
 
         ohai "Trashing files:"
         puts resolved_paths.map(&:first)
-        @command.run!("/usr/bin/osascript", args: ["-e", <<-EOS.undent, *resolved_paths.flat_map(&:last)])
+        trash_paths(*resolved_paths.flat_map(&:last))
+      end
+
+      def trash_paths(*paths)
+        @command.run!("/usr/bin/osascript", args: ["-e", <<-'EOS'.undent, *paths])
           on run argv
             repeat with i from 1 to (count argv)
               set item i of argv to (item i of argv as POSIX file)
             end repeat
 
-            tell application "Finder" to move argv to trash
+            tell application "Finder"
+              set trashedItems to (move argv to trash)
+              set output to ""
+
+              repeat with i from 1 to (count trashedItems)
+                set item i of trashedItems to POSIX path of (item i of trashedItems as string)
+                set output to output & (item i of trashedItems) & (do shell script "printf \"\\0\"")
+              end repeat
+
+              return output
+            end tell
           end run
         EOS
       end
