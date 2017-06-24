@@ -25,7 +25,11 @@ module Language
       npmrc.write npm_cache_config
       # explicitly use our npm and node-gyp executables instead of the user
       # managed ones in HOMEBREW_PREFIX/lib/node_modules which might be broken
-      ENV.prepend_path "PATH", Formula["node"].opt_libexec/"bin"
+      begin
+        ENV.prepend_path "PATH", Formula["node"].opt_libexec/"bin"
+      rescue FormulaUnavailableError
+        nil
+      end
     end
 
     def self.std_npm_install_args(libexec)
