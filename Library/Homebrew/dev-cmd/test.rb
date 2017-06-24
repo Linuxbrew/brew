@@ -39,6 +39,12 @@ module Homebrew
         next
       end
 
+      # Don't test unlinked formulae
+      if !ARGV.force? && !f.keg_only? && !f.linked?
+        ofail "#{f.full_name} is not linked"
+        next
+      end
+
       puts "Testing #{f.full_name}"
 
       env = ENV.to_hash
