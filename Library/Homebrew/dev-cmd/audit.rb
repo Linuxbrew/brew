@@ -1321,6 +1321,12 @@ class ResourceAuditor
       problem "Please use \"https://ftp.gnu.org/gnu/#{Regexp.last_match(1)}\" instead of #{url}."
     end
 
+    # Fossies upstream requests they aren't used as primary URLs
+    # https://github.com/Homebrew/homebrew-core/issues/14486#issuecomment-307753234
+    if url =~ %r{^https?://fossies\.org/}
+      problem "Please don't use fossies.org in the url (using as a mirror is fine)"
+    end
+
     if mirrors.include?(url)
       problem "URL should not be duplicated as a mirror: #{url}"
     end
