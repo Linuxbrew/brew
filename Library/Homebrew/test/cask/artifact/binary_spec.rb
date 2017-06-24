@@ -16,6 +16,20 @@ describe Hbc::Artifact::Binary, :cask do
     FileUtils.rm expected_path if expected_path.exist?
   end
 
+  context "when --no-binaries is specified" do
+    let(:cask) {
+      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb")
+    }
+
+    it "doesn't link the binary when --no-binaries is specified" do
+      shutup do
+        Hbc::Installer.new(cask, binaries: false).install
+      end
+
+      expect(expected_path).not_to exist
+    end
+  end
+
   it "links the binary to the proper directory" do
     shutup do
       Hbc::Artifact::Binary.new(cask).install_phase
@@ -68,22 +82,6 @@ describe Hbc::Artifact::Binary, :cask do
     end
 
     expect(File.readlink(expected_path)).not_to eq("/tmp")
-  end
-
-  it "respects --no-binaries flag" do
-    begin
-      Hbc::CLI.binaries = false
-
-      expect(Hbc::CLI).not_to be_binaries
-
-      shutup do
-        Hbc::Artifact::Binary.new(cask).install_phase
-      end
-
-      expect(expected_path.exist?).to be false
-    ensure
-      Hbc::CLI.binaries = true
-    end
   end
 
   it "creates parent directory if it doesn't exist" do

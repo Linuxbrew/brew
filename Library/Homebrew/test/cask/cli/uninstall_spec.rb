@@ -203,7 +203,7 @@ describe Hbc::CLI::Uninstall, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Uninstall.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

@@ -2,7 +2,7 @@
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
-#:    in several different ways. See [SPECIFYING FORMULAE][].
+#:    in several different ways. See [SPECIFYING FORMULAE](#specifying-formulae).
 #:
 #:    If `--debug` (or `-d`) is passed and brewing fails, open an interactive debugging
 #:    session with access to IRB or a shell inside the temporary build directory.
@@ -95,9 +95,8 @@ module Homebrew
         args << "--verbose" if ARGV.verbose?
 
         ARGV.casks.each do |c|
-          cmd = "brew", "cask", "install", c, *args
-          ohai cmd.join " "
-          system(*cmd)
+          ohai "brew cask install #{c} #{args.join " "}"
+          system("#{HOMEBREW_PREFIX}/bin/brew", "cask", "install", c, *args)
         end
       end
 
@@ -146,8 +145,17 @@ module Homebrew
           # linked to opt, because installing without any warnings can break
           # dependencies. Therefore before performing other checks we need to be
           # sure --force flag is passed.
-          opoo "#{f.full_name} is a keg-only and another version is linked to opt."
-          puts "Use `brew install --force` if you want to install this version"
+          if f.outdated?
+            optlinked_version = Keg.for(f.opt_prefix).version
+            onoe <<-EOS.undent
+              #{f.full_name} #{optlinked_version} is already installed
+              To upgrade to #{f.version}, run `brew upgrade #{f.name}`
+            EOS
+          else
+            opoo <<-EOS.undent
+              #{f.full_name} #{f.pkg_version} is already installed
+            EOS
+          end
         elsif (ARGV.build_head? && new_head_installed) || prefix_installed
           # After we're sure that --force flag is passed for linked to opt
           # keg-only we need to be sure that the version we're attempting to
@@ -159,30 +167,38 @@ module Homebrew
             f.pkg_version
           end
 
-          msg = "#{f.full_name}-#{installed_version} already installed"
+          msg = "#{f.full_name} #{installed_version} is already installed"
           linked_not_equals_installed = f.linked_version != installed_version
           if f.linked? && linked_not_equals_installed
-            msg << ", however linked version is #{f.linked_version}"
-            opoo msg
-            puts "You can use `brew switch #{f} #{installed_version}` to link this version."
+            msg = <<-EOS.undent
+              #{msg}
+              The currently linked version is #{f.linked_version}
+              You can use `brew switch #{f} #{installed_version}` to link this version.
+            EOS
           elsif !f.linked? || f.keg_only?
-            msg << ", it's just not linked."
-            opoo msg
-          else
-            opoo msg
+            msg = <<-EOS.undent
+              #{msg}, it's just not linked.
+              You can use `brew link #{f}` to link this version.
+            EOS
           end
+          opoo msg
         elsif !f.any_version_installed? && old_formula = f.old_installed_formulae.first
-          msg = "#{old_formula.full_name}-#{old_formula.installed_version} already installed"
+          msg = "#{old_formula.full_name} #{old_formula.installed_version} already installed"
           if !old_formula.linked? && !old_formula.keg_only?
-            msg << ", it's just not linked."
+            msg = <<-EOS.undent
+              #{msg}, it's just not linked.
+              You can use `brew link #{old_formula.full_name}` to link this version.
+            EOS
           end
           opoo msg
         elsif f.migration_needed? && !ARGV.force?
           # Check if the formula we try to install is the same as installed
           # but not migrated one. If --force passed then install anyway.
-          opoo "#{f.oldname} already installed, it's just not migrated"
-          puts "You can migrate formula with `brew migrate #{f}`"
-          puts "Or you can force install it with `brew install #{f} --force`"
+          opoo <<-EOS.undent
+            #{f.oldname} already installed, it's just not migrated
+            You can migrate formula with `brew migrate #{f}`
+            Or you can force install it with `brew install #{f} --force`
+          EOS
         else
           # If none of the above is true and the formula is linked, then
           # FormulaInstaller will handle this case.
@@ -304,7 +320,7 @@ module Homebrew
     end
     raise "Unable to locate the system's ld.so" unless sys_interpreter
     glibc = Formula["glibc"]
-    interpreter = glibc && glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2" : sys_interpreter
+    interpreter = glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2" : sys_interpreter
     mkdir_p HOMEBREW_PREFIX/"lib"
     FileUtils.ln_sf interpreter, ld_so
   rescue FormulaUnavailableError
@@ -315,7 +331,7 @@ module Homebrew
   def symlink_host_gcc
     version = DevelopmentTools.non_apple_gcc_version "/usr/bin/gcc"
     return if version.null?
-    suffix = version < 5 ? version.to_s[/^\d+\.\d+/] : version.to_s[/^\d+/]
+    suffix = (version < 5) ? version.to_s[/^\d+\.\d+/] : version.to_s[/^\d+/]
     return if File.executable?("/usr/bin/gcc-#{suffix}") || File.executable?(HOMEBREW_PREFIX/"bin/gcc-#{suffix}")
     FileUtils.mkdir_p HOMEBREW_PREFIX/"bin"
     ["gcc", "g++", "gfortran"].each do |tool|

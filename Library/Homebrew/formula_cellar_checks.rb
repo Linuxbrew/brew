@@ -20,7 +20,7 @@ module FormulaCellarChecks
 
   def check_manpages
     # Check for man pages that aren't in share/man
-    return unless (formula.prefix+"man").directory?
+    return unless (formula.prefix/"man").directory?
 
     <<-EOS.undent
       A top-level "man" directory was found
@@ -31,7 +31,7 @@ module FormulaCellarChecks
 
   def check_infopages
     # Check for info pages that aren't in share/info
-    return unless (formula.prefix+"info").directory?
+    return unless (formula.prefix/"info").directory?
 
     <<-EOS.undent
       A top-level "info" directory was found
@@ -61,9 +61,9 @@ module FormulaCellarChecks
 
     valid_extensions = %w[.a .dylib .framework .jnilib .la .o .so
                           .jar .prl .pm .sh]
-    non_libraries = formula.lib.children.select do |g|
-      next if g.directory?
-      !(valid_extensions.include?(g.extname) || g.basename.to_s.include?(".so."))
+    non_libraries = formula.lib.children.reject do |g|
+      next true if g.directory?
+      valid_extensions.include?(g.extname) || g.basename.to_s.include?(".so.")
     end
     return if non_libraries.empty?
 

@@ -173,7 +173,7 @@ module Hbc
 
         unless executable_path.exist?
           message = "uninstall script #{executable} does not exist"
-          raise CaskError, "#{message}." unless force
+          raise CaskError, "#{message}." unless force?
           opoo "#{message}, skipping."
           return
         end
@@ -197,9 +197,7 @@ module Hbc
         paths.each do |path|
           resolved_path = Pathname.new(path)
 
-          if path.start_with?("~")
-            resolved_path = resolved_path.expand_path
-          end
+          resolved_path = resolved_path.expand_path if path.start_with?("~")
 
           if resolved_path.relative? || resolved_path.split.any? { |part| part.to_s == ".." }
             opoo "Skipping #{Formatter.identifier(action)} for relative path '#{path}'."

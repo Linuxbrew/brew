@@ -1,17 +1,20 @@
 module Hbc
   class CLI
-    class Create < Base
-      def self.run(*args)
-        cask_tokens = cask_tokens_from(args)
-        raise CaskUnspecifiedError if cask_tokens.empty?
-        cask_token = cask_tokens.first.sub(/\.rb$/i, "")
-        cask_path = CaskLoader.path(cask_token)
-        odebug "Creating Cask #{cask_token}"
+    class Create < AbstractCommand
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
+        raise ArgumentError, "Only one Cask can be created at a time." if args.count > 1
+      end
 
+      def run
+        cask_token = args.first
+        cask_path = CaskLoader.path(cask_token)
         raise CaskAlreadyCreatedError, cask_token if cask_path.exist?
 
+        odebug "Creating Cask #{cask_token}"
         File.open(cask_path, "w") do |f|
-          f.write template(cask_token)
+          f.write self.class.template(cask_token)
         end
 
         exec_editor cask_path

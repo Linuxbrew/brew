@@ -1,10 +1,10 @@
 require "build_options"
 require "options"
 
-RSpec::Matchers.alias_matcher :be_built_with, :be_with
-RSpec::Matchers.alias_matcher :be_built_without, :be_without
-
 describe BuildOptions do
+  alias_matcher :be_built_with, :be_with
+  alias_matcher :be_built_without, :be_without
+
   subject { described_class.new(args, opts) }
   let(:bad_build) { described_class.new(bad_args, opts) }
   let(:args) { Options.create(%w[--with-foo --with-bar --without-qux]) }

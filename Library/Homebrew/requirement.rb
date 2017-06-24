@@ -159,7 +159,7 @@ class Requirement
   end
 
   class << self
-    include BuildEnvironmentDSL
+    include BuildEnvironment::DSL
 
     attr_reader :env_proc, :build
     attr_rw :fatal, :default_formula

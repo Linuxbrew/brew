@@ -131,7 +131,7 @@ module Stdenv
   # @private
   def determine_cxx
     dir, base = determine_cc.split
-    dir / base.to_s.sub("gcc", "g++").sub("clang", "clang++").sub(/^cc$/, "c++")
+    dir/base.to_s.sub("gcc", "g++").sub("clang", "clang++").sub(/^cc$/, "c++")
   end
 
   def gcc_4_0
@@ -245,6 +245,8 @@ module Stdenv
     append flags, map.fetch(effective_arch, default)
   end
   alias generic_set_cpu_flags set_cpu_flags
+
+  def x11; end
 
   # @private
   def effective_arch

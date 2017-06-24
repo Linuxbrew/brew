@@ -126,10 +126,17 @@ module Homebrew
         relative_path = path.relative_path_from tap.path
 
         tap.path.cd do
-          ohai "Searching for a previously deleted formula..." unless silent
+          unless silent
+            ohai "Searching for a previously deleted formula..."
+            if (tap.path/".git/shallow").exist?
+              opoo <<-EOS.undent
+                #{tap} is shallow clone. To get complete history run:
+                  git -C "$(brew --repo #{tap})" fetch --unshallow
 
-          # We know this may return incomplete results for shallow clones but
-          # we don't want to nag everyone with a shallow clone to unshallow it.
+              EOS
+            end
+          end
+
           log_command = "git log --name-only --max-count=1 --format=%H\\\\n%h\\\\n%B -- #{relative_path}"
           hash, short_hash, *commit_message, relative_path =
             Utils.popen_read(log_command).gsub("\\n", "\n").lines.map(&:chomp)

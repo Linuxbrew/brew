@@ -161,6 +161,19 @@ describe Hbc::Installer, :cask do
       expect(Hbc.appdir.join("container-lzma--#{asset.version}")).to be_a_file
     end
 
+    it "works with gpg-based Casks" do
+      skip("gpg not installed") if which("gpg").nil?
+      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-gpg.rb")
+
+      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
+      shutup do
+        Hbc::Installer.new(asset).install
+      end
+
+      expect(Hbc.caskroom.join("container-gpg", asset.version)).to be_a_directory
+      expect(Hbc.appdir.join("container")).to be_a_file
+    end
+
     it "blows up on a bad checksum" do
       bad_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/bad-checksum.rb")
       expect {

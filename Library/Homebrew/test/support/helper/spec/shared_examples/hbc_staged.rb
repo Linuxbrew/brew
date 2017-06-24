@@ -24,7 +24,7 @@ shared_examples Hbc::Staged do
   end
 
   it "can get the Info.plist file for the primary app" do
-    expect(staged.info_plist_file.to_s).to include Hbc.appdir.join("TestCask.app/Contents/Info.plist")
+    expect(staged.info_plist_file).to eq Hbc.appdir.join("TestCask.app/Contents/Info.plist")
   end
 
   it "can execute commands on the Info.plist file" do

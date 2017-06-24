@@ -128,7 +128,7 @@ class SystemConfig
       unless File.executable? "/usr/libexec/java_home"
         return "N/A" if which("java").nil?
         java = `java -version 2>&1`.lines.first.chomp
-        return java =~ /java version "(.+?)"/ ? $1 : java
+        return (java =~ /java version "(.+?)"/) ? $1 : java
       end
 
       java_xml = Utils.popen_read("/usr/libexec/java_home", "--xml", "--failfast")

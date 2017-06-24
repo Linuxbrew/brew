@@ -2,8 +2,6 @@ require "yaml"
 require "open3"
 require "stringio"
 
-require "hbc/utils/file"
-
 BUG_REPORTS_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
 # monkeypatch Object - not a great idea
@@ -29,7 +27,7 @@ end
 # global methods
 
 def odebug(title, *sput)
-  return unless Hbc::CLI.debug?
+  return unless ARGV.debug?
   puts Formatter.headline(title, color: :magenta)
   puts sput unless sput.empty?
 end

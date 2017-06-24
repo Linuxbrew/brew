@@ -7,7 +7,7 @@ module Stdenv
       # Mountain Lion's sed is stricter, and errors out when
       # it encounters files with mixed character sets
       delete("LC_ALL")
-      self["LC_CTYPE"]="C"
+      self["LC_CTYPE"] = "C"
     end
 
     # Add lib and include etc. from the current macosxsdk to compiler flags:

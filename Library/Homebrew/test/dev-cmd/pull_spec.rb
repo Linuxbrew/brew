@@ -14,7 +14,7 @@ describe "brew pull", :integration_test do
       end
     end
 
-    expect { brew "pull", "https://bot.brew.sh/job/Homebrew\%20Testing/1028/" }
+    expect { brew "pull", "https://jenkins.brew.sh/job/Homebrew\%20Testing/1028/" }
       .to output(/Testing URLs require `\-\-bottle`!/).to_stderr
       .and not_to_output.to_stdout
       .and be_a_failure

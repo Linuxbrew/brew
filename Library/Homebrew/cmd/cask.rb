@@ -6,7 +6,6 @@ module Homebrew
 
   def cask
     odie "Homebrew Cask is only supported on macOS" unless OS.mac?
-
-    Hbc::CLI.process(ARGV)
+    Hbc::CLI.run(*ARGV)
   end
 end

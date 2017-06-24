@@ -69,7 +69,7 @@ describe Hbc::CLI::Fetch, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Fetch.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

@@ -14,7 +14,7 @@
 #:
 #:      ~ The URL of a commit on GitHub
 #:
-#:      ~ A "https://bot.brew.sh/job/..." string specifying a testing job ID
+#:      ~ A "https://jenkins.brew.sh/job/..." string specifying a testing job ID
 #:
 #:    If `--bottle` is passed, handle bottles, pulling the bottle-update
 #:    commit and publishing files on Bintray.
@@ -234,7 +234,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          testbot = ARGV.include?("--linux") || tap.linux? ? "LinuxbrewTestBot" : "BrewTestBot"
+          testbot = (ARGV.include?("--linux") || tap.linux?) ? "LinuxbrewTestBot" : "BrewTestBot"
           "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
@@ -464,7 +464,7 @@ module Homebrew
 
   # Publishes the current bottle files for a given formula to Bintray
   def publish_bottle_file_on_bintray(f, creds)
-    bintray_project = ARGV.include?("--linux") || f.tap.linux? ? "linuxbrew" : "homebrew"
+    bintray_project = (ARGV.include?("--linux") || f.tap.linux?) ? "linuxbrew" : "homebrew"
     repo = Utils::Bottles::Bintray.repository(f.tap)
     package = Utils::Bottles::Bintray.package(f.name)
     info = FormulaInfoFromJson.lookup(f.full_name)

@@ -1,8 +1,8 @@
 require "sandbox"
 
-RSpec::Matchers.define_negated_matcher :not_matching, :matching
-
 describe Sandbox do
+  define_negated_matcher :not_matching, :matching
+
   let(:dir) { mktmpdir }
   let(:file) { dir/"foo" }
 

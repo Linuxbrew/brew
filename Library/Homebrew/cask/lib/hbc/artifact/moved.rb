@@ -20,7 +20,7 @@ module Hbc
       def move
         if Utils.path_occupied?(target)
           message = "It seems there is already #{self.class.artifact_english_article} #{self.class.artifact_english_name} at '#{target}'"
-          raise CaskError, "#{message}." unless force
+          raise CaskError, "#{message}." unless force?
           opoo "#{message}; overwriting."
           delete
         end

@@ -1,8 +1,8 @@
 require "compilers"
 
-RSpec::Matchers.alias_matcher :fail_with, :be_fails_with
-
 describe CompilerFailure do
+  alias_matcher :fail_with, :be_fails_with
+
   describe "::create" do
     it "creates a failure when given a symbol" do
       failure = described_class.create(:clang)
