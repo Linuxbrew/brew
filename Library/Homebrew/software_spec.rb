@@ -161,8 +161,22 @@ class SoftwareSpec
     dependency_collector.deps
   end
 
+  def recursive_dependencies
+    recursive_dependencies = deps
+    deps.map(&:to_formula).compact.uniq.each do |f|
+      f.recursive_dependencies.each do |dep|
+        recursive_dependencies << dep unless recursive_dependencies.include?(dep)
+      end
+    end
+    recursive_dependencies
+  end
+
   def requirements
     dependency_collector.requirements
+  end
+
+  def recursive_requirements
+    Requirement.expand(self)
   end
 
   def patch(strip = :p1, src = nil, &block)
