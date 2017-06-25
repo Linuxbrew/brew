@@ -1,26 +1,6 @@
 module Homebrew
   module Assertions
-    if defined?(Gem)
-      begin
-        gem "minitest", "< 5.0.0"
-      rescue Gem::LoadError
-        require "test/unit/assertions"
-      else
-        require "minitest/unit"
-        require "test/unit/assertions"
-      end
-    else
-      require "test/unit/assertions"
-    end
-
-    if defined?(MiniTest::Assertion)
-      FailedAssertion = MiniTest::Assertion
-    elsif defined?(Minitest::Assertion)
-      FailedAssertion = Minitest::Assertion
-    else
-      FailedAssertion = Test::Unit::AssertionFailedError
-    end
-
+    require "test/unit/assertions"
     include ::Test::Unit::Assertions
 
     # Returns the output of running cmd, and asserts the exit status

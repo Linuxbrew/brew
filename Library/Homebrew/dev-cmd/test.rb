@@ -83,7 +83,7 @@ module Homebrew
             exec(*args)
           end
         end
-      rescue Assertions::FailedAssertion => e
+      rescue MiniTest::Assertion => e
         ofail "#{f.full_name}: failed"
         puts e.message
       rescue Exception => e
