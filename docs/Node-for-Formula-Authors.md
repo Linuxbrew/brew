@@ -30,7 +30,7 @@ Node modules which are compatible with the latest Node version should declare a 
 depends_on "node"
 ```
 
-If your formula requires being executed with an older Node version you must vendor this older Node version as done in the [`kibana` formula](https://github.com/Homebrew/homebrew-core/blob/c6202f91a129e2f994d904f299a308cc6fbd58e5/Formula/kibana.rb).
+If your formula requires being executed with an older Node version you should use one of the versioned node formulae (e.g. `node@6`).
 
 ### Special requirements for native addons
 
@@ -47,8 +47,8 @@ Also note that such a formula would only be compatible with the same Node major 
 Node modules should be installed to `libexec`. This prevents the Node modules from contaminating the global `node_modules`, which is important so that npm doesn't try to manage Homebrew-installed Node modules.
 
 In the following we distinguish between two types of Node modules using formulae:
-* formulae for standard Node modules compatible with npm's global module format which should use [`std_npm_install_args`](#installing-global-style-modules-with-std_npm_install_args-to-libexec) (like [`azure-cli`](https://github.com/Homebrew/homebrew-core/blob/d93fe9ba3bcc9071b699c8da4e7d733518d3337e/Formula/azure-cli.rb) or [`autocode`](https://github.com/Homebrew/homebrew-core/blob/1a670a6269e1e07f86683c2d164977c9bd8a3fb6/Formula/autocode.rb)) and
-* formulae where the `npm install` step is only one of multiple not exclusively Node related install steps (not compatible with npm's global module format) which have to use [`local_npm_install_args`](#installing-module-dependencies-locally-with-local_npm_install_args) (like [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/ec1e40d37e81af63122a354f0101c377f6a4e66d/Formula/elixirscript.rb) or [`kibana`](https://github.com/Homebrew/homebrew-core/blob/c6202f91a129e2f994d904f299a308cc6fbd58e5/Formula/kibana.rb))
+* formulae for standard Node modules compatible with npm's global module format which should use [`std_npm_install_args`](#installing-global-style-modules-with-std_npm_install_args-to-libexec) (like [`azure-cli`](https://github.com/Homebrew/homebrew-core/blob/0f3b27d252b8112c744e0460d871cfe1def6b993/Formula/azure-cli.rb) or [`webpack`](https://github.com/Homebrew/homebrew-core/blob/6282879973d569962e63da7c81ac4623e1a8336b/Formula/webpack.rb)) and
+* formulae where the `npm install` call is not the only required install step (e.g. need to compile non-JavaScript sources too) have to use [`local_npm_install_args`](#installing-module-dependencies-locally-with-local_npm_install_args) (like [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/4bb491b7b246830aed57b97348a17e9401374978/Formula/elixirscript.rb)
 
 Both methods have in common that they are setting the correct environment for using npm inside Homebrew and are returning the arguments for invoking `npm install` for their specific use cases. This includes fixing an important edge case with the npm cache (caused by Homebrew's redirection of `HOME` during the build and test process) by using our own custom `npm_cache` inside `HOMEBREW_CACHE`, which would otherwise result in very long build times and high disk space usage.
 
@@ -71,6 +71,8 @@ This will install your Node module in npm's global module style with a custom pr
 ```ruby
 bin.install_symlink Dir["#{libexec}/bin/*"]
 ```
+
+**Note:** Because of a required workaround for `npm@5` calling `npm pack` we currently don't support installing modules (from non-npm registry tarballs), which require a prepublish step (e.g. for transpiling sources). See [Homebrew/brew#2820](https://github.com/Homebrew/brew/pull/2820) for more information.
 
 ### Installing module dependencies locally with `local_npm_install_args`
 
