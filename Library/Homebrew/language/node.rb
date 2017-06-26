@@ -10,7 +10,9 @@ module Language
       # fed to `npm install` only symlinks are created linking back to that
       # directory, consequently breaking that assumption. We require a tarball
       # because npm install creates a "real" installation when fed a tarball.
-      output = Utils.popen_read("npm pack").chomp
+      pack_cmd = "npm pack -ddd"
+      ohai pack_cmd
+      output = `#{pack_cmd}`
       if !$CHILD_STATUS.exitstatus.zero? || output.lines.empty?
         raise "npm failed to pack #{Dir.pwd}"
       end
