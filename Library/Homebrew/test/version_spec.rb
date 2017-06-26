@@ -438,16 +438,32 @@ describe Version do
         .to be_detected_from("https://example.com/dada-v2017-04-17.tar.gz")
     end
 
-    specify "dash version style" do
-      expect(Version.create("3.4"))
-        .to be_detected_from("http://www.antlr.org/download/antlr-3.4-complete.jar")
-    end
-
     specify "jenkins version style" do
       expect(Version.create("1.486"))
         .to be_detected_from("http://mirrors.jenkins-ci.org/war/1.486/jenkins.war")
       expect(Version.create("0.10.11"))
         .to be_detected_from("https://github.com/hechoendrupal/DrupalConsole/releases/download/0.10.11/drupal.phar")
+    end
+
+    specify "char prefixed, url-only version style" do
+      expect(Version.create("1.9.293"))
+        .to be_detected_from("https://github.com/clojure/clojurescript/releases/download/r1.9.293/cljs.jar")
+      expect(Version.create("0.6.1"))
+        .to be_detected_from("https://github.com/fibjs/fibjs/releases/download/v0.6.1/fullsrc.zip")
+      expect(Version.create("1.9"))
+        .to be_detected_from("https://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_1.9/E.tgz")
+    end
+
+    specify "w.x.y.z url-only version style" do
+      expect(Version.create("2.3.2.0"))
+        .to be_detected_from("https://github.com/JustArchi/ArchiSteamFarm/releases/download/2.3.2.0/ASF.zip")
+      expect(Version.create("1.7.5.2"))
+        .to be_detected_from("https://people.gnome.org/~newren/eg/download/1.7.5.2/eg")
+    end
+
+    specify "dash version style" do
+      expect(Version.create("3.4"))
+        .to be_detected_from("http://www.antlr.org/download/antlr-3.4-complete.jar")
     end
 
     specify "apache version style" do
