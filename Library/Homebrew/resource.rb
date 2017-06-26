@@ -1,7 +1,6 @@
 require "download_strategy"
 require "checksum"
 require "version"
-require "forwardable"
 
 # Resource is the fundamental representation of an external resource. The
 # primary formula download, along with other declared resources, are instances

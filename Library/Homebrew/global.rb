@@ -1,4 +1,6 @@
+require "forwardable"
 require "extend/module"
+require "extend/predicable"
 require "extend/fileutils"
 require "extend/pathname"
 require "extend/git_repository"

@@ -1,5 +1,3 @@
-require "forwardable"
-
 module Hbc
   class URL
     FAKE_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) https://caskroom.github.io".freeze

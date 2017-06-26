@@ -6,6 +6,7 @@ require "hbc/verify"
 
 module Hbc
   class Installer
+    extend Predicable
     # TODO: it is unwise for Hbc::Staged to be a module, when we are
     #       dealing with both staged and unstaged Casks here. This should
     #       either be a class which is only sometimes instantiated, or there
@@ -27,21 +28,7 @@ module Hbc
       @reinstall = false
     end
 
-    def skip_cask_deps?
-      @skip_cask_deps
-    end
-
-    def force?
-      @force
-    end
-
-    def binaries?
-      @binaries
-    end
-
-    def verbose?
-      @verbose
-    end
+    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :verbose?
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
@@ -75,7 +62,7 @@ module Hbc
       odebug "Hbc::Installer#fetch"
 
       satisfy_dependencies
-      verify_has_sha if @require_sha && !force?
+      verify_has_sha if require_sha? && !force?
       download
       verify
     end

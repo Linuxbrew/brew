@@ -3,6 +3,7 @@ require "rexml/document"
 require "time"
 
 class AbstractDownloadStrategy
+  extend Forwardable
   include FileUtils
 
   attr_reader :meta, :name, :version, :resource
@@ -181,9 +182,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     @clone
   end
 
-  def head?
-    version.head?
-  end
+  delegate head?: :version
 
   # Return last commit's unique identifier for the repository.
   # Return most recent modified timestamp unless overridden.

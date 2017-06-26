@@ -1,5 +1,3 @@
-require "forwardable"
-
 require "hbc/dsl"
 require "hbc/metadata"
 

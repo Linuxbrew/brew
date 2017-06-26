@@ -14,13 +14,13 @@ class Object
 end
 
 class Buffer < StringIO
+  extend Predicable
+
+  attr_predicate :tty?
+
   def initialize(tty = false)
     super()
     @tty = tty
-  end
-
-  def tty?
-    @tty
   end
 end
 

@@ -17,6 +17,7 @@ require "development_tools"
 
 class FormulaInstaller
   include FormulaCellarChecks
+  extend Predicable
 
   def self.mode_attr_accessor(*names)
     attr_accessor(*names)
@@ -559,11 +560,11 @@ class FormulaInstaller
 
     audit_installed if ARGV.homebrew_developer? && !formula.keg_only?
 
-    c = Caveats.new(formula)
+    caveats = Caveats.new(formula)
 
-    return if c.empty?
+    return if caveats.empty?
     @show_summary_heading = true
-    ohai "Caveats", c.caveats
+    ohai "Caveats", caveats.to_s
   end
 
   def finish
@@ -879,9 +880,7 @@ class FormulaInstaller
 
   private
 
-  def hold_locks?
-    @hold_locks || false
-  end
+  attr_predicate :hold_locks?
 
   def lock
     return unless (@@locked ||= []).empty?

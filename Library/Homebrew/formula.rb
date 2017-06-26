@@ -45,6 +45,7 @@ class Formula
   include Utils::Inreplace
   include Utils::Shell
   extend Enumerable
+  extend Forwardable
 
   # @!method inreplace(paths, before = nil, after = nil)
   # Actually implemented in {Utils::Inreplace.inreplace}.
@@ -314,37 +315,14 @@ class Formula
     active_spec == head
   end
 
-  # @private
-  def bottle_unneeded?
-    active_spec.bottle_unneeded?
-  end
-
-  # @private
-  def bottle_disabled?
-    active_spec.bottle_disabled?
-  end
-
-  # @private
-  def bottle_disable_reason
-    active_spec.bottle_disable_reason
-  end
-
-  # Does the currently active {SoftwareSpec} have any bottle?
-  # @private
-  def bottle_defined?
-    active_spec.bottle_defined?
-  end
-
-  # Does the currently active {SoftwareSpec} have an installable bottle?
-  # @private
-  def bottled?
-    active_spec.bottled?
-  end
-
-  # @private
-  def bottle_specification
-    active_spec.bottle_specification
-  end
+  delegate [
+    :bottle_unneeded?,
+    :bottle_disabled?,
+    :bottle_disable_reason,
+    :bottle_defined?,
+    :bottled?,
+    :bottle_specification,
+  ] => :active_spec
 
   # The Bottle object for the currently active {SoftwareSpec}.
   # @private
@@ -353,24 +331,21 @@ class Formula
   end
 
   # The description of the software.
+  # @method desc
   # @see .desc
-  def desc
-    self.class.desc
-  end
+  delegate desc: :"self.class"
 
   # The homepage for the software.
+  # @method homepage
   # @see .homepage
-  def homepage
-    self.class.homepage
-  end
+  delegate homepage: :"self.class"
 
   # The version for the currently active {SoftwareSpec}.
   # The version is autodetected from the URL and/or tag so only needs to be
   # declared if it cannot be autodetected correctly.
+  # @method version
   # @see .version
-  def version
-    active_spec.version
-  end
+  delegate version: :active_spec
 
   def update_head_version
     return unless head?
@@ -394,9 +369,8 @@ class Formula
   # Additional downloads can be defined as {#resource}s.
   # {Resource#stage} will create a temporary directory and yield to a block.
   # <pre>resource("additional_files").stage { bin.install "my/extra/tool" }</pre>
-  def resource(name)
-    active_spec.resource(name)
-  end
+  # @method resource
+  delegate resource: :active_spec
 
   # An old name for the formula
   def oldname
@@ -416,68 +390,39 @@ class Formula
   end
 
   # The {Resource}s for the currently active {SoftwareSpec}.
-  def resources
-    active_spec.resources.values
-  end
+  # @method resources
+  def_delegator :"active_spec.resources", :values, :resources
 
   # The {Dependency}s for the currently active {SoftwareSpec}.
-  # @private
-  def deps
-    active_spec.deps
-  end
+  delegate deps: :active_spec
 
   # The {Requirement}s for the currently active {SoftwareSpec}.
-  # @private
-  def requirements
-    active_spec.requirements
-  end
+  delegate requirements: :active_spec
 
   # The cached download for the currently active {SoftwareSpec}.
-  # @private
-  def cached_download
-    active_spec.cached_download
-  end
+  delegate cached_download: :active_spec
 
   # Deletes the download for the currently active {SoftwareSpec}.
-  # @private
-  def clear_cache
-    active_spec.clear_cache
-  end
+  delegate clear_cache: :active_spec
 
   # The list of patches for the currently active {SoftwareSpec}.
-  # @private
-  def patchlist
-    active_spec.patches
-  end
+  def_delegator :active_spec, :patches, :patchlist
 
   # The options for the currently active {SoftwareSpec}.
-  # @private
-  def options
-    active_spec.options
-  end
+  delegate options: :active_spec
 
   # The deprecated options for the currently active {SoftwareSpec}.
-  # @private
-  def deprecated_options
-    active_spec.deprecated_options
-  end
+  delegate deprecated_options: :active_spec
 
   # The deprecated option flags for the currently active {SoftwareSpec}.
-  # @private
-  def deprecated_flags
-    active_spec.deprecated_flags
-  end
+  delegate deprecated_flags: :active_spec
 
   # If a named option is defined for the currently active {SoftwareSpec}.
-  def option_defined?(name)
-    active_spec.option_defined?(name)
-  end
+  # @method option_defined?
+  delegate option_defined?: :active_spec
 
   # All the {.fails_with} for the currently active {SoftwareSpec}.
-  # @private
-  def compiler_failures
-    active_spec.compiler_failures
-  end
+  delegate compiler_failures: :active_spec
 
   # If this {Formula} is installed.
   # This is actually just a check for if the {#installed_prefix} directory

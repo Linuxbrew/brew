@@ -1,6 +1,8 @@
 module Hbc
   module Artifact
     class Base
+      extend Predicable
+
       def self.artifact_name
         @artifact_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase
       end
@@ -65,13 +67,7 @@ module Hbc
         {}
       end
 
-      def verbose?
-        @verbose
-      end
-
-      def force?
-        @force
-      end
+      attr_predicate :force?, :verbose?
 
       def initialize(cask, command: SystemCommand, force: false, verbose: false)
         @cask = cask
