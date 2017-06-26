@@ -407,8 +407,13 @@ class Version
 
     # e.g. http://mirrors.jenkins-ci.org/war/1.486/jenkins.war
     # e.g. https://github.com/foo/bar/releases/download/0.10.11/bar.phar
-    m = %r{/(\d\.\d+(\.\d+)?)}.match(spec_s)
-    return m.captures.first unless m.nil?
+    # e.g. https://github.com/clojure/clojurescript/releases/download/r1.9.293/cljs.jar
+    # e.g. https://github.com/fibjs/fibjs/releases/download/v0.6.1/fullsrc.zip
+    # e.g. https://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_1.9/E.tgz
+    # e.g. https://github.com/JustArchi/ArchiSteamFarm/releases/download/2.3.2.0/ASF.zip
+    # e.g. https://people.gnome.org/~newren/eg/download/1.7.5.2/eg
+    m = %r{/([rvV]_?)?(\d\.\d+(\.\d+){,2})}.match(spec_s)
+    return m.captures[1] unless m.nil?
 
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)
