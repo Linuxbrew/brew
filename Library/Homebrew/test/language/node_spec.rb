@@ -41,6 +41,6 @@ describe Language::Node do
 
   specify "#local_npm_install_args" do
     resp = subject.local_npm_install_args
-    expect(resp).to include("-ddd")
+    expect(resp).to include("-ddd", "--build-from-source")
   end
 end

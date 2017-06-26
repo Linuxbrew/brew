@@ -44,6 +44,7 @@ module Language
       %W[
         -ddd
         --global
+        --build-from-source
         --prefix=#{libexec}
         #{Dir.pwd}/#{pack}
       ]
@@ -52,7 +53,10 @@ module Language
     def self.local_npm_install_args
       setup_npm_environment
       # npm install args for local style module format
-      ["-ddd"]
+      %w[
+        -ddd
+        --build-from-source
+      ]
     end
   end
 end
