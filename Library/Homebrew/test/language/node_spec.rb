@@ -2,22 +2,21 @@ require "language/node"
 
 describe Language::Node do
   describe "#setup_npm_environment" do
-    it "does nothing when npmrc exists" do
-      expect(subject.setup_npm_environment).to be_nil
-    end
-
-    it "calls prepend_path when node formula exists and npmrc does not exist" do
+    it "calls prepend_path when node formula exists only during the first call" do
       node = formula "node" do
         url "node-test"
       end
       stub_formula_loader(node)
-      allow_any_instance_of(Pathname).to receive(:exist?).and_return(false)
       expect(ENV).to receive(:prepend_path)
-      subject.setup_npm_environment
+      subject.instance_variable_set(:@env_set, false)
+      expect(subject.setup_npm_environment).to be_nil
+
+      expect(subject.instance_variable_get(:@env_set)).to eq(true)
+      expect(ENV).not_to receive(:prepend_path)
+      expect(subject.setup_npm_environment).to be_nil
     end
 
-    it "does not call prepend_path when node formula does not exist but npmrc exists" do
-      allow_any_instance_of(Pathname).to receive(:exist?).and_return(false)
+    it "does not call prepend_path when node formula does not exist" do
       expect(subject.setup_npm_environment).to be_nil
     end
   end
@@ -51,6 +50,6 @@ describe Language::Node do
 
   specify "#local_npm_install_args" do
     resp = subject.local_npm_install_args
-    expect(resp).to include("-ddd", "--build-from-source")
+    expect(resp).to include("-ddd", "--build-from-source", "--cache=#{HOMEBREW_CACHE}/npm_cache")
   end
 end
