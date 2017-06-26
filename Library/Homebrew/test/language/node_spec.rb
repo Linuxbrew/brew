@@ -41,6 +41,6 @@ describe Language::Node do
 
   specify "#local_npm_install_args" do
     resp = subject.local_npm_install_args
-    expect(resp).to include("--verbose")
+    expect(resp).to include("-ddd")
   end
 end
