@@ -12,6 +12,7 @@ require "set"
 require "rbconfig"
 require "official_taps"
 require "pp"
+require "English"
 
 ARGV.extend(HomebrewArgvExtension)
 

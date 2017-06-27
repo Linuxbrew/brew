@@ -195,7 +195,8 @@ module Homebrew
       end
 
       def check_ruby_version
-        return if RUBY_VERSION[/\d\.\d/] == "2.0"
+        ruby_version = "2.0"
+        return if RUBY_VERSION[/\d\.\d/] == ruby_version
 
         <<-EOS.undent
           Ruby version #{RUBY_VERSION} is unsupported on #{MacOS.version}. Homebrew
@@ -270,7 +271,7 @@ module Homebrew
       def check_xcode_license_approved
         # If the user installs Xcode-only, they have to approve the
         # license or no "xc*" tool will work.
-        return unless `/usr/bin/xcrun clang 2>&1` =~ /license/ && !$?.success?
+        return unless `/usr/bin/xcrun clang 2>&1` =~ /license/ && !$CHILD_STATUS.success?
 
         <<-EOS.undent
           You have not agreed to the Xcode license.

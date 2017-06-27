@@ -21,8 +21,8 @@ module Homebrew
     # If no brews are listed, open the project root in an editor.
     if ARGV.named.empty?
       editor = File.basename which_editor
-      if ["mate", "subl"].include?(editor)
-        # If the user is using TextMate or Sublime Text,
+      if ["atom", "subl", "mate"].include?(editor)
+        # If the user is using Atom, Sublime Text or TextMate
         # give a nice project view instead.
         exec_editor HOMEBREW_REPOSITORY/"bin/brew",
                     HOMEBREW_REPOSITORY/"README.md",

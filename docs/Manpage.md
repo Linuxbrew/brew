@@ -845,10 +845,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--no-compat` is passed, do not load the compatibility layer when
     running tests.
 
-    If `--online` is passed, include tests that use the GitHub API.
-
-    If `--official-cmd-taps` is passed, include tests that use any of the
-    taps for official external commands.
+    If `--online` is passed, include tests that use the GitHub API and tests
+    that use any of the taps for official external commands.
 
   * `update-test` [`--commit=``commit`] [`--before=``date`] [`--to-tag`] [`--keep-tmp`]:
     Runs a test of `brew update` with a new repository clone.

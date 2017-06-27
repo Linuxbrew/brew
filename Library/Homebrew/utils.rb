@@ -76,7 +76,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   tap_message = nil
   caller_message = backtrace.detect do |line|
     next unless line =~ %r{^#{Regexp.escape(HOMEBREW_LIBRARY)}/Taps/([^/]+/[^/]+)/}
-    tap = Tap.fetch $1
+    tap = Tap.fetch Regexp.last_match(1)
     tap_message = "\nPlease report this to the #{tap} tap!"
     true
   end
@@ -151,9 +151,9 @@ def interactive_shell(f = nil)
 
   Process.wait fork { exec ENV["SHELL"] }
 
-  return if $?.success?
-  raise "Aborted due to non-zero exit status (#{$?.exitstatus})" if $?.exited?
-  raise $?.inspect
+  return if $CHILD_STATUS.success?
+  raise "Aborted due to non-zero exit status (#{$CHILD_STATUS.exitstatus})" if $CHILD_STATUS.exited?
+  raise $CHILD_STATUS.inspect
 end
 
 module Homebrew
@@ -171,7 +171,7 @@ module Homebrew
       exit! 1 # never gets here unless exec failed
     end
     Process.wait(pid)
-    $?.success?
+    $CHILD_STATUS.success?
   end
 
   def system(cmd, *args)
@@ -329,21 +329,16 @@ def which_all(cmd, path = ENV["PATH"])
 end
 
 def which_editor
-  editor = ENV.values_at("HOMEBREW_EDITOR", "HOMEBREW_VISUAL").compact.reject(&:empty?).first
-  return editor unless editor.nil?
+  editor = ENV.values_at("HOMEBREW_EDITOR", "HOMEBREW_VISUAL")
+              .compact
+              .reject(&:empty?)
+              .first
+  return editor if editor
 
-  # Find Textmate, BBEdit / TextWrangler, or vim
-  %w[mate edit vim].each do |candidate|
-    editor = candidate if which(candidate, ENV["HOMEBREW_PATH"])
+  # Find Atom, Sublime Text, Textmate, BBEdit / TextWrangler, or vim
+  editor = %w[atom subl mate edit vim].find do |candidate|
+    candidate if which(candidate, ENV["HOMEBREW_PATH"])
   end
-
-  # Find Textmate
-  editor = which("mate", ENV["HOMEBREW_PATH"])
-  # Find BBEdit/TextWrangler
-  editor ||= which("edit", ENV["HOMEBREW_PATH"])
-  # Find vim
-  editor ||= which("vim", ENV["HOMEBREW_PATH"])
-  # Default to standard vim
   editor ||= "/usr/bin/vim"
 
   opoo <<-EOS.undent

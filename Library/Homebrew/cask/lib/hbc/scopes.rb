@@ -27,6 +27,7 @@ module Hbc
         # TODO: speed up Hbc::Source::Tapped (main perf drag is calling Hbc.all_tokens repeatedly)
         # TODO: ability to specify expected source when calling CaskLoader.load (minor perf benefit)
         Pathname.glob(caskroom.join("*"))
+                .sort
                 .map do |caskroom_path|
                   token = caskroom_path.basename.to_s
 

@@ -182,7 +182,7 @@ class TapFormulaAmbiguityError < RuntimeError
     @paths = paths
     @formulae = paths.map do |path|
       path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-      "#{Tap.fetch($1, $2)}/#{path.basename(".rb")}"
+      "#{Tap.fetch(Regexp.last_match(1), Regexp.last_match(2))}/#{path.basename(".rb")}"
     end
 
     super <<-EOS.undent
@@ -202,7 +202,7 @@ class TapFormulaWithOldnameAmbiguityError < RuntimeError
 
     @taps = possible_tap_newname_formulae.map do |newname|
       newname =~ HOMEBREW_TAP_FORMULA_REGEX
-      "#{$1}/#{$2}"
+      "#{Regexp.last_match(1)}/#{Regexp.last_match(2)}"
     end
 
     super <<-EOS.undent
@@ -352,6 +352,7 @@ end
 
 class BuildError < RuntimeError
   attr_reader :formula, :env
+  attr_accessor :options
 
   def initialize(formula, cmd, args, env)
     @formula = formula
@@ -504,7 +505,7 @@ class CurlDownloadStrategyError < RuntimeError
   def initialize(url)
     case url
     when %r{^file://(.+)}
-      super "File does not exist: #{$1}"
+      super "File does not exist: #{Regexp.last_match(1)}"
     else
       super "Download failed: #{url}"
     end

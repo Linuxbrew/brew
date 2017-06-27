@@ -262,24 +262,17 @@ class FormulaInstaller
       opoo "#{formula.full_name}: this formula has no #{option} option so it will be ignored!"
     end
 
-    options = []
-    if formula.head?
-      options << "--HEAD"
-    elsif formula.devel?
-      options << "--devel"
+    options = display_options(formula)
+    if show_header?
+      oh1 "Installing #{Formatter.identifier(formula.full_name)} #{options}".strip
     end
-    options += effective_build_options_for(formula).used_options.to_a
-    oh1 "Installing #{Formatter.identifier(formula.full_name)} #{options.join " "}" if show_header?
 
     if formula.tap && !formula.tap.private?
-      category = "install"
-      action = ([formula.full_name] + options).join(" ")
-      Utils::Analytics.report_event(category, action)
+      action = "#{formula.full_name} #{options}".strip
+      Utils::Analytics.report_event("install", action)
 
       if installed_on_request
-        category = "install_on_request"
-        action = ([formula.full_name] + options).join(" ")
-        Utils::Analytics.report_event(category, action)
+        Utils::Analytics.report_event("install_on_request", action)
       end
     end
 
@@ -514,6 +507,18 @@ class FormulaInstaller
     BuildOptions.new(args, dependent.options)
   end
 
+  def display_options(formula)
+    options = []
+    if formula.head?
+      options << "--HEAD"
+    elsif formula.devel?
+      options << "--devel"
+    end
+    options += effective_build_options_for(formula).used_options.to_a
+    return if options.empty?
+    options.join(" ")
+  end
+
   def inherited_options_for(dep)
     inherited_options = Options.new
     u = Option.new("universal")
@@ -717,7 +722,8 @@ class FormulaInstaller
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
-  rescue Exception
+  rescue Exception => e
+    e.options = display_options(formula) if e.is_a?(BuildError)
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
       formula.update_head_version

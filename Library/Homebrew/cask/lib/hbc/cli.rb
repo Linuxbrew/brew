@@ -92,10 +92,10 @@ module Hbc
       command.is_a?(Class) && !command.abstract? && command.needs_init?
     end
 
-    def self.run_command(command, *rest)
+    def self.run_command(command, *args)
       if command.respond_to?(:run)
         # usual case: built-in command verb
-        command.run(*rest)
+        command.run(*args)
       elsif require?(which("brewcask-#{command}.rb"))
         # external command as Ruby library on PATH, Homebrew-style
       elsif command.to_s.include?("/") && require?(command.to_s)
@@ -111,7 +111,7 @@ module Hbc
         if klass.respond_to?(:run)
           # invoke "run" on a Ruby library which follows our coding conventions
           # other Ruby libraries must do everything via "require"
-          klass.run(*rest)
+          klass.run(*args)
         end
       elsif which("brewcask-#{command}")
         # arbitrary external executable on PATH, Homebrew-style
@@ -124,7 +124,7 @@ module Hbc
         exec command, *ARGV[1..-1]
       else
         # failure
-        NullCommand.new(command).run
+        NullCommand.new(command, *args).run
       end
     end
 
@@ -136,9 +136,30 @@ module Hbc
       @args = process_options(*args)
     end
 
+    def detect_command_and_arguments(*args)
+      command = args.detect do |arg|
+        if self.class.commands.include?(arg)
+          true
+        else
+          break unless arg.start_with?("-")
+        end
+      end
+
+      if index = args.index(command)
+        args.delete_at(index)
+      end
+
+      [*command, *args]
+    end
+
     def run
-      command_name, *args = *@args
-      command = help? ? "help" : self.class.lookup_command(command_name)
+      command_name, *args = detect_command_and_arguments(*@args)
+      command = if help?
+        args.unshift(command_name)
+        "help"
+      else
+        self.class.lookup_command(command_name)
+      end
 
       MacOS.full_version = ENV["MACOS_VERSION"] unless ENV["MACOS_VERSION"].nil?
 
@@ -147,7 +168,7 @@ module Hbc
       self.class.run_command(command, *args)
     rescue CaskError, CaskSha256MismatchError, ArgumentError, OptionParser::InvalidOption => e
       msg = e.message
-      msg << e.backtrace.join("\n") if ARGV.debug?
+      msg << e.backtrace.join("\n").prepend("\n") if ARGV.debug?
       onoe msg
       exit 1
     rescue StandardError, ScriptError, NoMemoryError => e
@@ -199,18 +220,19 @@ module Hbc
     end
 
     class NullCommand
-      def initialize(attempted_verb)
-        @attempted_verb = attempted_verb
+      def initialize(command, *args)
+        @command = command
+        @args = args
       end
 
       def run(*_args)
         purpose
         usage
 
-        return if @attempted_verb.to_s.strip.empty?
-        return if @attempted_verb == "help"
+        return if @command == "help" && @args.empty?
 
-        raise ArgumentError, "Unknown command: #{@attempted_verb}"
+        unknown_command = @args.empty? ? @command : @args.first
+        raise ArgumentError, "Unknown command: #{unknown_command}"
       end
 
       def purpose

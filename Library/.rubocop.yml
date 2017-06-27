@@ -118,10 +118,6 @@ Style/BlockDelimiters:
 Style/ClassAndModuleChildren:
   EnforcedStyle: nested
 
-# percent-x is allowed for multiline
-Style/CommandLiteral:
-  EnforcedStyle: mixed
-
 # our current conditional style is established, clear and
 # requiring users to change that now would be confusing.
 Style/ConditionalAssignment:
@@ -176,20 +172,12 @@ Style/PercentLiteralDelimiters:
     '%W': '[]'
     '%x': '()'
 
-# we prefer Perl-style regex back references
-Style/PerlBackrefs:
-  Enabled: false
-
 Style/RaiseArgs:
   EnforcedStyle: exploded
 
 # paths abound, easy escape
 Style/RegexpLiteral:
   EnforcedStyle: slashes
-
-# not a problem for typical shell users
-Style/SpecialGlobalVars:
-  Enabled: false
 
 # ruby style guide favorite
 Style/StringLiterals:

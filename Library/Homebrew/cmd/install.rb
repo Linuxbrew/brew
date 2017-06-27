@@ -80,7 +80,7 @@ module Homebrew
         if name !~ HOMEBREW_TAP_FORMULA_REGEX && name !~ HOMEBREW_CASK_TAP_CASK_REGEX
           next
         end
-        tap = Tap.fetch($1, $2)
+        tap = Tap.fetch(Regexp.last_match(1), Regexp.last_match(2))
         tap.install unless tap.installed?
       end
     end

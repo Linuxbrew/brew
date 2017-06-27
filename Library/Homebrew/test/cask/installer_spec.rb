@@ -37,45 +37,6 @@ describe Hbc::Installer, :cask do
       expect(Hbc.appdir.join("container")).to be_a_file
     end
 
-    it "works with cab-based Casks" do
-      skip("cabextract not installed") if which("cabextract").nil?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-cab.rb")
-
-      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
-
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-cab", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
-    end
-
-    it "works with Adobe AIR-based Casks" do
-      skip("Adobe AIR not installed") unless Hbc::Container::Air.installer_exist?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-air.rb")
-
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-air", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container.app")).to be_a_directory
-    end
-
-    it "works with 7z-based Casks" do
-      skip("unar not installed") if which("unar").nil?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-7z.rb")
-
-      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-7z", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
-    end
-
     it "works with xar-based Casks" do
       asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-xar.rb")
 
@@ -84,32 +45,6 @@ describe Hbc::Installer, :cask do
       end
 
       expect(Hbc.caskroom.join("container-xar", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
-    end
-
-    it "works with Stuffit-based Casks" do
-      skip("unar not installed") if which("unar").nil?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-sit.rb")
-
-      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-sit", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
-    end
-
-    it "works with RAR-based Casks" do
-      skip("unar not installed") if which("unar").nil?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-rar.rb")
-
-      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-rar", asset.version)).to be_a_directory
       expect(Hbc.appdir.join("container")).to be_a_file
     end
 
@@ -132,45 +67,6 @@ describe Hbc::Installer, :cask do
       end
 
       expect(Hbc.caskroom.join("container-gzip", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
-    end
-
-    it "works with pure xz-based Casks" do
-      skip("unxz not installed") if which("unxz").nil?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-xz.rb")
-
-      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-xz", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container-xz--#{asset.version}")).to be_a_file
-    end
-
-    it "works with lzma-based Casks" do
-      skip("unlzma not installed") if which("unlzma").nil?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-lzma.rb")
-
-      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-lzma", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container-lzma--#{asset.version}")).to be_a_file
-    end
-
-    it "works with gpg-based Casks" do
-      skip("gpg not installed") if which("gpg").nil?
-      asset = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/container-gpg.rb")
-
-      allow(asset).to receive(:depends_on).and_return(empty_depends_on_stub)
-      shutup do
-        Hbc::Installer.new(asset).install
-      end
-
-      expect(Hbc.caskroom.join("container-gpg", asset.version)).to be_a_directory
       expect(Hbc.appdir.join("container")).to be_a_file
     end
 

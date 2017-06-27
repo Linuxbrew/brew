@@ -177,7 +177,7 @@ class Formula
     @tap = if path == Formulary.core_path(name)
       CoreTap.instance
     elsif path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-      Tap.fetch($1, $2)
+      Tap.fetch(Regexp.last_match(1), Regexp.last_match(2))
     end
 
     @full_name = full_name_with_optional_tap(name)
@@ -1836,7 +1836,7 @@ class Formula
 
       $stdout.flush
 
-      unless $?.success?
+      unless $CHILD_STATUS.success?
         log_lines = ENV["HOMEBREW_FAIL_LOG_LINES"]
         log_lines ||= "15"
 

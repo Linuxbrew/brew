@@ -61,7 +61,7 @@ class Requirement
 
     if parent = satisfied_result_parent
       parent.to_s =~ %r{(#{Regexp.escape(HOMEBREW_CELLAR)}|#{Regexp.escape(HOMEBREW_PREFIX)}/opt)/([\w+-.@]+)}
-      @formula = $2
+      @formula = Regexp.last_match(2)
     end
 
     true

@@ -27,7 +27,7 @@ module Homebrew
     def shell_output(cmd, result = 0)
       ohai cmd
       output = `#{cmd}`
-      assert_equal result, $?.exitstatus
+      assert_equal result, $CHILD_STATUS.exitstatus
       output
     end
 
@@ -40,7 +40,7 @@ module Homebrew
         pipe.close_write
         pipe.read
       end
-      assert_equal result, $?.exitstatus unless result.nil?
+      assert_equal result, $CHILD_STATUS.exitstatus unless result.nil?
       output
     end
   end

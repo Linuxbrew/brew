@@ -11,7 +11,7 @@ module Language
       # directory, consequently breaking that assumption. We require a tarball
       # because npm install creates a "real" installation when fed a tarball.
       output = Utils.popen_read("npm pack").chomp
-      raise "npm failed to pack #{Dir.pwd}" unless $?.exitstatus.zero?
+      raise "npm failed to pack #{Dir.pwd}" unless $CHILD_STATUS.exitstatus.zero?
       output
     end
 

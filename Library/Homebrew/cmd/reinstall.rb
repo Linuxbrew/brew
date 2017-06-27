@@ -34,7 +34,7 @@ module Homebrew
     fi = FormulaInstaller.new(f)
     fi.options              = options
     fi.invalid_option_names = build_options.invalid_option_names
-    fi.build_bottle         = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
+    fi.build_bottle         = ARGV.build_bottle? || (!f.bottled? && f.build.bottle?)
     fi.build_from_source    = ARGV.build_from_source? || ARGV.build_all_from_source?
     fi.force_bottle         = ARGV.force_bottle?
     fi.interactive          = ARGV.interactive?
@@ -65,6 +65,8 @@ module Homebrew
     path = backup_path(keg)
 
     return unless path.directory?
+
+    Pathname.new(keg).rmtree if keg.exist?
 
     path.rename keg
     keg.link unless formula.keg_only?

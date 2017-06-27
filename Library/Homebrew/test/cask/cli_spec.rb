@@ -42,7 +42,7 @@ describe Hbc::CLI, :cask do
 
     it "prints help output when subcommand receives `--help` flag" do
       command = Hbc::CLI.new("noop", "--help")
-      expect(described_class).to receive(:run_command).with("help")
+      expect(described_class).to receive(:run_command).with("help", "noop")
       command.run
       expect(command.help?).to eq(true)
     end

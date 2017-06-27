@@ -132,7 +132,7 @@ class SystemConfig
       end
 
       java_xml = Utils.popen_read("/usr/libexec/java_home", "--xml", "--failfast")
-      return "N/A" unless $?.success?
+      return "N/A" unless $CHILD_STATUS.success?
       javas = []
       REXML::XPath.each(REXML::Document.new(java_xml), "//key[text()='JVMVersion']/following-sibling::string") do |item|
         javas << item.text

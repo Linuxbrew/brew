@@ -40,9 +40,6 @@ There are exceptions:
 | openssl            | macOS's openssl is deprecated & outdated                                                              |
 | libxml2            | Historically, macOS's libxml2 has been buggy                                                          |
 
-We also maintain [a tap](https://github.com/Homebrew/homebrew-dupes) that
-contains many duplicates not otherwise found in Homebrew.
-
 ### We don’t like tools that upgrade themselves
 Software that can upgrade itself does not integrate well with Homebrew's own
 upgrade functionality.

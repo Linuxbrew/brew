@@ -33,7 +33,7 @@ module Homebrew
     if ARGV.include?("--markdown")
       output.map! do |s|
         /(.*\d)+ \(@(.+)\) - (.*)/ =~ s
-        "- [#{$3}](#{$1}) (@#{$2})"
+        "- [#{Regexp.last_match(3)}](#{Regexp.last_match(1)}) (@#{Regexp.last_match(2)})"
       end
     end
 

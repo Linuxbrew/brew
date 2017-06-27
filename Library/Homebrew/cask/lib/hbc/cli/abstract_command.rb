@@ -9,6 +9,7 @@ module Hbc
       option "--debug",         :debug,         false
       option "--verbose",       :verbose,       false
       option "--outdated",      :outdated_only, false
+      option "--require-sha",   :require_sha, false
 
       def self.command_name
         @command_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase

@@ -10,19 +10,6 @@ describe Hbc::Artifact::Suite, :cask do
     InstallHelper.install_without_artifacts(cask)
   end
 
-  it "moves the suite to the proper directory" do
-    skip("flaky test") # FIXME
-
-    shutup do
-      install_phase.call
-    end
-
-    expect(target_path).to be_a_directory
-    expect(target_path).to be_a_symlink
-    expect(target_path.readlink).to exist
-    expect(source_path).not_to exist
-  end
-
   it "creates a suite containing the expected app" do
     shutup do
       install_phase.call

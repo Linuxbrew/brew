@@ -676,8 +676,7 @@ _brew_test_bot() {
 }
 
 # brew tests [-v] [--coverage] [--generic] [--no-compat]
-#   [--only=test_script:test_method] [--seed seed] [--trace] [--online]
-#   [--official-cmd-taps]:
+#   [--only=test_script:test_method] [--seed seed] [--trace] [--online]:
 _brew_tests() {
   _arguments \
   '(-v)-v' \
@@ -687,8 +686,7 @@ _brew_tests() {
   '(--only)--only=-:test_method: ' \
   '(--seed)--seed:seed: ' \
   '(--trace)--trace' \
-  '(--online)--online' \
-  '(--official-cmd-taps)--official-cmd-taps'
+  '(--online)--online'
 }
 
 # brew uninstall, rm, remove [--force] formula:

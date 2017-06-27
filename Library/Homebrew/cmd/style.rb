@@ -112,7 +112,7 @@ module Homebrew
       args << "--display-cop-names" if ARGV.include? "--display-cop-names"
       args << "--format" << "simple" if files
       system(cache_env, "rubocop", *args)
-      !$?.success?
+      !$CHILD_STATUS.success?
     when :json
       json, _, status = Open3.capture3(cache_env, "rubocop", "--format", "json", *args)
       # exit status of 1 just means violations were found; other numbers mean

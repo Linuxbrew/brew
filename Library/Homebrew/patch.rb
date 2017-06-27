@@ -68,7 +68,7 @@ class EmbeddedPatch
     cmd = OS::PATH_PATCH
     args = %W[-g 0 -f -#{strip}]
     IO.popen("#{cmd} #{args.join(" ")}", "w") { |p| p.write(data) }
-    raise ErrorDuringExecution.new(cmd, args) unless $?.success?
+    raise ErrorDuringExecution.new(cmd, args) unless $CHILD_STATUS.success?
   end
 
   def inspect

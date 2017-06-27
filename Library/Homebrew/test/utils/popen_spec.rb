@@ -4,7 +4,7 @@ describe Utils do
   describe "::popen_read" do
     it "reads the standard output of a given command" do
       expect(subject.popen_read("sh", "-c", "echo success").chomp).to eq("success")
-      expect($?).to be_a_success
+      expect($CHILD_STATUS).to be_a_success
     end
 
     it "can be given a block to manually read from the pipe" do
@@ -13,7 +13,7 @@ describe Utils do
           pipe.read.chomp
         end,
       ).to eq("success")
-      expect($?).to be_a_success
+      expect($CHILD_STATUS).to be_a_success
     end
   end
 
@@ -22,7 +22,7 @@ describe Utils do
       subject.popen_write("grep", "-q", "success") do |pipe|
         pipe.write("success\n")
       end
-      expect($?).to be_a_success
+      expect($CHILD_STATUS).to be_a_success
     end
   end
 end
