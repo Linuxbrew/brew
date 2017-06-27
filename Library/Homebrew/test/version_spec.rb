@@ -93,6 +93,21 @@ describe Version do
     expect(Version.create("1.2.3beta2")).to be < Version.create("1.2.3-p34")
   end
 
+  specify "comparing pre versions" do
+    expect(Version.create("1.2.3pre9")).to be == Version.create("1.2.3PRE9")
+    expect(Version.create("1.2.3pre9")).to be > Version.create("1.2.3pre8")
+    expect(Version.create("1.2.3pre8")).to be < Version.create("1.2.3pre9")
+    expect(Version.create("1.2.3pre9")).to be < Version.create("1.2.3pre10")
+
+    expect(Version.create("1.2.3pre3")).to be > Version.create("1.2.3alpha2")
+    expect(Version.create("1.2.3pre3")).to be > Version.create("1.2.3alpha4")
+    expect(Version.create("1.2.3pre3")).to be > Version.create("1.2.3beta3")
+    expect(Version.create("1.2.3pre3")).to be > Version.create("1.2.3beta5")
+    expect(Version.create("1.2.3pre3")).to be < Version.create("1.2.3rc2")
+    expect(Version.create("1.2.3pre3")).to be < Version.create("1.2.3")
+    expect(Version.create("1.2.3pre3")).to be < Version.create("1.2.3-p2")
+  end
+
   specify "comparing RC versions" do
     expect(Version.create("1.2.3rc3")).to be == Version.create("1.2.3RC3")
     expect(Version.create("1.2.3rc3")).to be > Version.create("1.2.3rc2")

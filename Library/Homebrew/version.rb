@@ -36,7 +36,7 @@ class Version
         0
       when NumericToken
         other.value.zero? ? 0 : -1
-      when AlphaToken, BetaToken, RCToken
+      when AlphaToken, BetaToken, PreToken, RCToken
         1
       else
         -1
@@ -103,6 +103,8 @@ class Version
       case other
       when AlphaToken
         rev <=> other.rev
+      when BetaToken, RCToken, PreToken, PatchToken
+        -1
       else
         super
       end
@@ -117,6 +119,23 @@ class Version
       when BetaToken
         rev <=> other.rev
       when AlphaToken
+        1
+      when PreToken, RCToken, PatchToken
+        -1
+      else
+        super
+      end
+    end
+  end
+
+  class PreToken < CompositeToken
+    PATTERN = /pre[0-9]*/i
+
+    def <=>(other)
+      case other
+      when PreToken
+        rev <=> other.rev
+      when AlphaToken, BetaToken
         1
       when RCToken, PatchToken
         -1
@@ -133,7 +152,7 @@ class Version
       case other
       when RCToken
         rev <=> other.rev
-      when AlphaToken, BetaToken
+      when AlphaToken, BetaToken, PreToken
         1
       when PatchToken
         -1
@@ -150,7 +169,7 @@ class Version
       case other
       when PatchToken
         rev <=> other.rev
-      when AlphaToken, BetaToken, RCToken
+      when AlphaToken, BetaToken, RCToken, PreToken
         1
       else
         super
@@ -161,6 +180,7 @@ class Version
   SCAN_PATTERN = Regexp.union(
     AlphaToken::PATTERN,
     BetaToken::PATTERN,
+    PreToken::PATTERN,
     RCToken::PATTERN,
     PatchToken::PATTERN,
     NumericToken::PATTERN,
@@ -289,6 +309,7 @@ class Version
       when /\A#{AlphaToken::PATTERN}\z/o   then AlphaToken
       when /\A#{BetaToken::PATTERN}\z/o    then BetaToken
       when /\A#{RCToken::PATTERN}\z/o      then RCToken
+      when /\A#{PreToken::PATTERN}\z/o     then PreToken
       when /\A#{PatchToken::PATTERN}\z/o   then PatchToken
       when /\A#{NumericToken::PATTERN}\z/o then NumericToken
       when /\A#{StringToken::PATTERN}\z/o  then StringToken
