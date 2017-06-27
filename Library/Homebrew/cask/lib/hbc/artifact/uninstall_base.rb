@@ -228,8 +228,6 @@ module Hbc
       def uninstall_trash(*paths)
         return if paths.empty?
 
-        return `say No trash for you!` if Utils.current_user == "ilovezfs"
-
         resolved_paths = each_resolved_path(:trash, paths).to_a
 
         ohai "Trashing files:"
