@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html {% if page.direction == "rtl" %}dir="rtl" {% endif %}lang="{{ page.lang }}">
   <head>
-    <meta charset="utf-8">
-    <meta name="dc.creator" content="Rémi Prévost - http://exomel.com">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     {% if page.title %}
     <title>{{ page.title }} — Homebrew</title>
     {% elsif page.direction == "rtl" %}
@@ -12,7 +11,7 @@
     {% endif %}
     {% seo title=false %}
     {% feed_meta %}
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width">
     <link rel="shortcut icon" href="/img/favicon.ico">
     <link rel="icon" sizes="16x16" href="/img/favicon-16x16.png" >
     <link rel="icon" sizes="32x32" href="/img/favicon-32x32.png">
