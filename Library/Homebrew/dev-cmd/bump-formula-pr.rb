@@ -286,8 +286,11 @@ module Homebrew
 
     formula.path.parent.cd do
       branch = "#{formula.name}-#{new_formula_version}"
+      git_dir = Utils.popen_read("git rev-parse --git-dir")
+      shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
+
       if ARGV.dry_run?
-        ohai "git fetch --unshallow origin"
+        ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
         ohai "hub fork --no-remote"
@@ -297,7 +300,7 @@ module Homebrew
         ohai "hub pull-request --browse -m '#{formula.name} #{new_formula_version}#{devel_message}'"
         ohai "git checkout -"
       else
-        safe_system "git", "fetch", "--unshallow", "origin"
+        safe_system "git", "fetch", "--unshallow", "origin" if shallow
         safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
         safe_system "git", "commit", "--no-edit", "--verbose",
           "--message=#{formula.name} #{new_formula_version}#{devel_message}",
