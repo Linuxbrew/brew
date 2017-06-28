@@ -1,5 +1,7 @@
 require "rubygems"
 
+require "formula_installer"
+
 require "hbc/cask_dependencies"
 require "hbc/staged"
 require "hbc/verify"
@@ -197,7 +199,6 @@ module Hbc
       x11_dependencies
       formula_dependencies
       cask_dependencies unless skip_cask_deps?
-      puts "complete"
     end
 
     def macos_dependencies
@@ -234,36 +235,50 @@ module Hbc
     end
 
     def formula_dependencies
-      return unless @cask.depends_on.formula && !@cask.depends_on.formula.empty?
-      ohai "Installing Formula dependencies from Homebrew"
-      @cask.depends_on.formula.each do |dep_name|
-        print "#{dep_name} ... "
-        installed = @command.run(HOMEBREW_BREW_FILE,
-                                 args:         ["list", "--versions", dep_name],
-                                 print_stderr: false).stdout.include?(dep_name)
-        if installed
-          puts "already installed"
-        else
-          @command.run!(HOMEBREW_BREW_FILE,
-                        args: ["install", dep_name])
-          puts "done"
+      formulae = @cask.depends_on.formula.map { |f| Formula[f] }
+      return if formulae.empty?
+
+      if formulae.all?(&:any_version_installed?)
+        puts "All Formula dependencies satisfied."
+        return
+      end
+
+      not_installed = formulae.reject(&:any_version_installed?)
+
+      ohai "Installing Formula dependencies: #{not_installed.map(&:to_s).join(", ")}"
+      not_installed.each do |formula|
+        begin
+          old_argv = ARGV.dup
+          ARGV.replace([])
+          FormulaInstaller.new(formula).tap do |fi|
+            fi.installed_as_dependency = true
+            fi.installed_on_request = false
+            fi.show_header = true
+            fi.verbose = verbose?
+            fi.prelude
+            fi.install
+            fi.finish
+          end
+        ensure
+          ARGV.replace(old_argv)
         end
       end
     end
 
     def cask_dependencies
-      return unless @cask.depends_on.cask && !@cask.depends_on.cask.empty?
-      ohai "Installing Cask dependencies: #{@cask.depends_on.cask.join(", ")}"
-      deps = CaskDependencies.new(@cask)
-      deps.sorted.each do |dep_token|
-        puts "#{dep_token} ..."
-        dep = CaskLoader.load(dep_token)
-        if dep.installed?
-          puts "already installed"
-        else
-          Installer.new(dep, binaries: binaries?, verbose: verbose?, skip_cask_deps: true, force: false).install
-          puts "done"
-        end
+      return if @cask.depends_on.cask.empty?
+      casks = CaskDependencies.new(@cask)
+
+      if casks.all?(&:installed?)
+        puts "All Cask dependencies satisfied."
+        return
+      end
+
+      not_installed = casks.reject(&:installed?)
+
+      ohai "Installing Cask dependencies: #{not_installed.map(&:to_s).join(", ")}"
+      not_installed.each do |cask|
+        Installer.new(cask, binaries: binaries?, verbose: verbose?, skip_cask_deps: true, force: false).install
       end
     end
 

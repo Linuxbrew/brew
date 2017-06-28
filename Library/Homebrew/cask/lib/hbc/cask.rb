@@ -71,6 +71,15 @@ module Hbc
       @token
     end
 
+    def hash
+      token.hash
+    end
+
+    def eql?(other)
+      token == other.token
+    end
+    alias == eql?
+
     def dumpcask
       odebug "Cask instance dumps in YAML:"
       odebug "Cask instance toplevel:", to_yaml

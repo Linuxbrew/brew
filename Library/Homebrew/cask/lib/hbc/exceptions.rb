@@ -77,9 +77,15 @@ module Hbc
     end
   end
 
-  class CaskCyclicCaskDependencyError < AbstractCaskErrorWithToken
+  class CaskCyclicDependencyError < AbstractCaskErrorWithToken
     def to_s
-      "Cask '#{token}' includes cyclic dependencies on other Casks and could not be installed."
+      "Cask '#{token}' includes cyclic dependencies on other Casks" << (reason.empty? ? "." : ": #{reason}")
+    end
+  end
+
+  class CaskSelfReferencingDependencyError < CaskCyclicDependencyError
+    def to_s
+      "Cask '#{token}' depends on itself."
     end
   end
 
@@ -91,7 +97,7 @@ module Hbc
 
   class CaskInvalidError < AbstractCaskErrorWithToken
     def to_s
-      "Cask '#{token}' definition is invalid" << (reason.empty? ? ".": ": #{reason}")
+      "Cask '#{token}' definition is invalid" << (reason.empty? ? "." : ": #{reason}")
     end
   end
 
