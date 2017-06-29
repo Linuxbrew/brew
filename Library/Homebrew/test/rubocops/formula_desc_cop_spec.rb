@@ -146,11 +146,11 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
       source = <<-EOS.undent
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
-          desc 'Foo: foobar'
+          desc 'Foo is a foobar'
         end
       EOS
 
-      expected_offenses = [{ message: "Description shouldn't include the formula name",
+      expected_offenses = [{ message: "Description shouldn't start with the formula name",
                              severity: :convention,
                              line: 3,
                              column: 8,
