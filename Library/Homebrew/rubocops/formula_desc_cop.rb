@@ -72,9 +72,9 @@ module RuboCop
             problem "Description should start with a capital letter"
           end
 
-          # Check if formula's name is used in formula's desc
-          return unless regex_match_group(desc, /(^|[^a-z])#{@formula_name}([^a-z]|$)/i)
-          problem "Description shouldn't include the formula name"
+          # Check if formula's desc starts with formula's name
+          return unless regex_match_group(desc, /^#{@formula_name} /i)
+          problem "Description shouldn't start with the formula name"
         end
 
         private
