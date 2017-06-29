@@ -346,7 +346,7 @@ module Homebrew
         test_bot_origin = patch_url[%r{(https://github\.com/[\w-]+/[\w-]+)/compare/}, 1]
         safe_system "git", "fetch", "--quiet", test_bot_origin, "pr-#{issue}" if test_bot_origin
         system "git", "merge", "--quiet", "--ff-only", "--no-edit", "FETCH_HEAD"
-        unless $?.success?
+        unless $CHILD_STATUS.success?
           opoo "Not possible to fast-forward, using git reset --hard"
           safe_system "git", "reset", "--hard", "FETCH_HEAD"
         end

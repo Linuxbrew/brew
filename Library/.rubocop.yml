@@ -72,7 +72,7 @@ Lint/ParenthesesAsGroupedExpression:
 
 # TODO: try to bring down all metrics maximums
 Metrics/AbcSize:
-  Max: 250
+  Max: 254
 
 Metrics/BlockLength:
   Max: 1250
@@ -210,3 +210,11 @@ Style/WordArray:
 # Disable for Linuxbrew
 Style/MultilineIfModifier:
   Enabled: false
+
+# Disable for Linuxbrew
+Layout/EmptyLineAfterMagicComment:
+  Description: 'Add an empty line after magic comments to separate them from code.'
+  StyleGuide: '#separate-magic-comments-from-code'
+  Enabled: true
+  Exclude:
+    - '**/bin/**/*'

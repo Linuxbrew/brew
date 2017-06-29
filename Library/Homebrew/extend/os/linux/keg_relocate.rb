@@ -23,7 +23,7 @@ class Keg
     cmd_rpath = "#{patchelf} --print-rpath '#{file}' 2>&1"
     old_rpath = Utils.popen_read(*cmd_rpath).strip
     return if old_rpath == "cannot find section .dynstr"
-    raise ErrorDuringExecution, "#{cmd_rpath}\n#{old_rpath}" unless $?.success?
+    raise ErrorDuringExecution, "#{cmd_rpath}\n#{old_rpath}" unless $CHILD_STATUS.success?
     rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select do |x|
       x.start_with?(new_prefix, "$ORIGIN")
     end
@@ -36,7 +36,7 @@ class Keg
     if file.mach_o_executable?
       cmd_interpreter = [patchelf, "--print-interpreter", file]
       old_interpreter = Utils.popen_read(*cmd_interpreter).strip
-      raise ErrorDuringExecution, cmd_interpreter unless $?.success?
+      raise ErrorDuringExecution, cmd_interpreter unless $CHILD_STATUS.success?
       new_interpreter = (new_prefix == PREFIX_PLACEHOLDER) ? "/lib64/ld-linux-x86-64.so.2" : "#{HOMEBREW_PREFIX}/lib/ld.so"
       cmd << "--set-interpreter" << new_interpreter unless old_interpreter == new_interpreter
     end

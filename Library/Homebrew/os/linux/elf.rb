@@ -55,7 +55,7 @@ module ELF
       end
       command = [ldd, path.expand_path.to_s]
       libs = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $?.success?
+      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
       needed << "not found"
       libs.select! { |lib| needed.any? { |soname| lib.include? soname } }
       @dylibs = libs.map { |lib| lib[LDD_RX, 1] || lib[LDD_RX, 2] }.compact
@@ -68,11 +68,11 @@ module ELF
       if path.dylib?
         command = [patchelf, "--print-soname", path.expand_path.to_s]
         soname = Utils.popen_read(*command).chomp
-        raise ErrorDuringExecution, command unless $?.success?
+        raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
       end
       command = [patchelf, "--print-needed", path.expand_path.to_s]
       needed = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $?.success?
+      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
       [soname, needed]
     end
 
@@ -81,7 +81,7 @@ module ELF
       needed = []
       command = ["readelf", "-d", path.expand_path.to_s]
       lines = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $?.success?
+      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
       lines.each do |s|
         case s
         when /\(SONAME\)/

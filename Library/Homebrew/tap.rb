@@ -263,7 +263,7 @@ class Tap
     args << "-q" if quiet
 
     git_version = Version.new(`git --version`[/git version (\d\.\d+\.\d+)/, 1])
-    raise ErrorDuringExecution, cmd unless $?.success?
+    raise ErrorDuringExecution, cmd unless $CHILD_STATUS.success?
     args << "--config" << "core.autocrlf=false" if git_version >= Version.new("1.7.10")
 
     begin
