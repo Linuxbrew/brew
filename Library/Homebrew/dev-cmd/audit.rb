@@ -819,6 +819,13 @@ class FormulaAuditor
 
   def patch_problems(patch)
     case patch.url
+    when %r{https?://github\.com/.+/.+/(?:commit|pull)/[a-fA-F0-9]*.(?:patch|diff)}
+      unless patch.url =~ /\?full_index=\w+$/
+        problem <<-EOS.undent
+          GitHub patches should use the full_index parameter:
+            #{patch.url}?full_index=1
+        EOS
+      end
     when /raw\.github\.com/, %r{gist\.github\.com/raw}, %r{gist\.github\.com/.+/raw},
       %r{gist\.githubusercontent\.com/.+/raw}
       unless patch.url =~ /[a-fA-F0-9]{40}/
@@ -827,7 +834,7 @@ class FormulaAuditor
     when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
       problem <<-EOS.undent
         use GitHub pull request URLs:
-          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/pull/#{Regexp.last_match(3)}.patch
+          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/pull/#{Regexp.last_match(3)}.patch?full_index=1
         Rather than patch-diff:
           #{patch.url}
       EOS
