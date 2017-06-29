@@ -10,7 +10,7 @@ module Language
       # fed to `npm install` only symlinks are created linking back to that
       # directory, consequently breaking that assumption. We require a tarball
       # because npm install creates a "real" installation when fed a tarball.
-      pack_cmd = "npm pack -ddd"
+      pack_cmd = "npm pack -ddd --ignore-scripts"
       ohai pack_cmd
       output = `#{pack_cmd}`
       if !$CHILD_STATUS.exitstatus.zero? || output.lines.empty?

@@ -24,7 +24,7 @@ describe Language::Node do
 
   describe "#std_npm_install_args" do
     npm_install_arg = "libexec"
-    npm_pack_cmd = "npm pack -ddd"
+    npm_pack_cmd = "npm pack -ddd --ignore-scripts"
 
     it "raises error with non zero exitstatus" do
       allow(Language::Node).to receive(:`).with(npm_pack_cmd).and_return("error msg")
