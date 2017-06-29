@@ -103,7 +103,7 @@ Metrics/ModuleLength:
     - '**/lib/**/*'
 
 Metrics/PerceivedComplexity:
-  Max: 80
+  Max: 100
 
 # makes code less readable for minor performance increases
 Performance/Caller:
