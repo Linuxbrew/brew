@@ -194,6 +194,8 @@ module Hbc
       end
 
       def each_resolved_path(action, paths)
+        return enum_for(:each_resolved_path, action, paths) unless block_given?
+
         paths.each do |path|
           resolved_path = Pathname.new(path)
 
@@ -226,12 +228,33 @@ module Hbc
       def uninstall_trash(*paths)
         return if paths.empty?
 
+        resolved_paths = each_resolved_path(:trash, paths).to_a
+
         ohai "Trashing files:"
-        each_resolved_path(:trash, paths) do |path, resolved_paths|
-          puts path
-          resolved_paths.each { |resolved_path| Utils.gain_permissions(resolved_path, ["-R"], @command) }
-          @command.run!("/usr/bin/xargs", args: ["-0", "--", HOMEBREW_LIBRARY_PATH/"utils/trash.swift"], input: resolved_paths.join("\0"))
-        end
+        puts resolved_paths.map(&:first)
+        trash_paths(*resolved_paths.flat_map(&:last))
+      end
+
+      def trash_paths(*paths)
+        @command.run!("/usr/bin/osascript", args: ["-e", <<-'EOS'.undent, *paths])
+          on run argv
+            repeat with i from 1 to (count argv)
+              set item i of argv to (item i of argv as POSIX file)
+            end repeat
+
+            tell application "Finder"
+              set trashedItems to (move argv to trash)
+              set output to ""
+
+              repeat with i from 1 to (count trashedItems)
+                set item i of trashedItems to POSIX path of (item i of trashedItems as string)
+                set output to output & (item i of trashedItems) & (do shell script "printf \"\\0\"")
+              end repeat
+
+              return output
+            end tell
+          end run
+        EOS
       end
 
       def uninstall_rmdir(*directories)
