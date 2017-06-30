@@ -1,7 +1,7 @@
 module Language
   module Node
     def self.npm_cache_config
-      "cache=#{HOMEBREW_CACHE}/npm_cache\n"
+      "cache=#{HOMEBREW_CACHE}/npm_cache"
     end
 
     def self.pack_for_installation
@@ -10,19 +10,18 @@ module Language
       # fed to `npm install` only symlinks are created linking back to that
       # directory, consequently breaking that assumption. We require a tarball
       # because npm install creates a "real" installation when fed a tarball.
-      output = Utils.popen_read("npm pack").chomp
-      raise "npm failed to pack #{Dir.pwd}" unless $CHILD_STATUS.exitstatus.zero?
-      output
+      pack_cmd = "npm pack --ignore-scripts"
+      output = Utils.popen_read(pack_cmd)
+      if !$CHILD_STATUS.exitstatus.zero? || output.lines.empty?
+        raise "npm failed to pack #{Dir.pwd}"
+      end
+      output.lines.last.chomp
     end
 
     def self.setup_npm_environment
-      npmrc = Pathname.new("#{ENV["HOME"]}/.npmrc")
-      # only run setup_npm_environment once per formula
-      return if npmrc.exist?
-      # explicitly set npm's cache path to HOMEBREW_CACHE/npm_cache to fix
-      # issues caused by overriding $HOME (long build times, high disk usage)
-      # https://github.com/Homebrew/brew/pull/37#issuecomment-208840366
-      npmrc.write npm_cache_config
+      # guard that this is only run once
+      return if @env_set
+      @env_set = true
       # explicitly use our npm and node-gyp executables instead of the user
       # managed ones in HOMEBREW_PREFIX/lib/node_modules which might be broken
       begin
@@ -42,8 +41,10 @@ module Language
 
       # npm install args for global style module format installed into libexec
       %W[
-        --verbose
+        -ddd
         --global
+        --build-from-source
+        --#{npm_cache_config}
         --prefix=#{libexec}
         #{Dir.pwd}/#{pack}
       ]
@@ -52,7 +53,11 @@ module Language
     def self.local_npm_install_args
       setup_npm_environment
       # npm install args for local style module format
-      ["--verbose"]
+      %W[
+        -ddd
+        --build-from-source
+        --#{npm_cache_config}
+      ]
     end
   end
 end
