@@ -33,6 +33,9 @@ FormulaAuditStrict/ComponentsRedundancy:
 FormulaAudit/Homepage:
   Enabled: true
 
+FormulaAudit/LegacyPatches:
+  Enabled: true
+
 # `system` is a special case and aligns on second argument
 Layout/AlignParameters:
   Enabled: false
