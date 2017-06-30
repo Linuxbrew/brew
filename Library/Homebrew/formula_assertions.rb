@@ -3,6 +3,19 @@ module Homebrew
     require "test/unit/assertions"
     include ::Test::Unit::Assertions
 
+    # Custom name here for cross-version compatibility.
+    # In Ruby 2.0, Test::Unit::Assertions raise a MiniTest::Assertion,
+    # but they raise Test::Unit::AssertionFailedError in 2.3.
+    # If neither is defined, this might be a completely different
+    # version of Ruby.
+    if defined?(MiniTest::Assertion)
+      AssertionFailed = MiniTest::Assertion
+    elsif defined?(Test::Unit::AssertionFailedError)
+      AssertionFailed = Test::Unit::AssertionFailedError
+    else
+      raise NameError, "Unable to find an assertion class for this version of Ruby (#{RUBY_VERSION})"
+    end
+
     # Returns the output of running cmd, and asserts the exit status
     def shell_output(cmd, result = 0)
       ohai cmd
