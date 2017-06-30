@@ -75,16 +75,18 @@ module Homebrew
 
     only_cops = ARGV.value("only-cops").to_s.split(",")
     except_cops = ARGV.value("except-cops").to_s.split(",")
+
     if !only_cops.empty? && !except_cops.empty?
       odie "--only-cops and --except-cops cannot be used simultaneously!"
-    elsif (!only_cops.empty? || !except_cops.empty?) && strict
-      odie "--only-cops/--except-cops and --strict cannot be used simultaneously"
+    elsif (!only_cops.empty? || !except_cops.empty?) && (strict || ARGV.value("only"))
+      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously"
     end
 
     options = { fix: ARGV.flag?("--fix"), realpath: true }
 
     if !only_cops.empty?
       options[:only_cops] = only_cops
+      ARGV.push("--only=style")
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif !strict

@@ -94,7 +94,11 @@ module Homebrew
           RuboCop::Cop::Cop.registry.departments.include?(cop.to_sym)
       end
 
-      args << "--only" << cops_to_include.join(",") unless cops_to_include.empty?
+      if cops_to_include.empty?
+        odie "RuboCops #{options[:only_cops].join(",")} were not found"
+      end
+
+      args << "--only" << cops_to_include.join(",")
     end
 
     if files.nil?
