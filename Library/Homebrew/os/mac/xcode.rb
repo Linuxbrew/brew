@@ -216,7 +216,7 @@ module OS
         # on the older supported platform for that Xcode release, i.e there's no
         # CLT package for 10.11 that contains the Clang version from Xcode 8.
         case MacOS.version
-        when "10.13" then "900.0.22.8"
+        when "10.13" then "900.0.26"
         when "10.12" then "802.0.42"
         when "10.11" then "800.0.42.1"
         when "10.10" then "700.1.81"
@@ -229,6 +229,7 @@ module OS
 
       def minimum_version
         case MacOS.version
+        when "10.13" then "9.0.0"
         when "10.12" then "8.0.0"
         else "1.0.0"
         end
