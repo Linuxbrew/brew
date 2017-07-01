@@ -1,4 +1,3 @@
-require "forwardable"
 require "resource"
 require "checksum"
 require "version"

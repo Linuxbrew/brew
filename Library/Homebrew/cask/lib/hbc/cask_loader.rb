@@ -1,12 +1,14 @@
 module Hbc
   module CaskLoader
     class FromContentLoader
+      attr_reader :content
+
       def initialize(content)
         @content = content
       end
 
       def load
-        instance_eval(@content.force_encoding("UTF-8"), __FILE__, __LINE__)
+        instance_eval(content.force_encoding("UTF-8"), __FILE__, __LINE__)
       end
 
       private
@@ -18,25 +20,25 @@ module Hbc
 
     class FromPathLoader < FromContentLoader
       def self.can_load?(ref)
-        path = Pathname.new(ref)
+        path = Pathname(ref)
         path.extname == ".rb" && path.expand_path.exist?
       end
 
       attr_reader :token, :path
 
       def initialize(path)
-        path = Pathname.new(path).expand_path
+        path = Pathname(path).expand_path
 
         @token = path.basename(".rb").to_s
         @path = path
       end
 
       def load
-        raise CaskUnavailableError.new(@token, "'#{@path}' does not exist.")  unless @path.exist?
-        raise CaskUnavailableError.new(@token, "'#{@path}' is not readable.") unless @path.readable?
-        raise CaskUnavailableError.new(@token, "'#{@path}' is not a file.")   unless @path.file?
+        raise CaskUnavailableError.new(token, "'#{path}' does not exist.")  unless path.exist?
+        raise CaskUnavailableError.new(token, "'#{path}' is not readable.") unless path.readable?
+        raise CaskUnavailableError.new(token, "'#{path}' is not a file.")   unless path.file?
 
-        @content = IO.read(@path)
+        @content = IO.read(path)
 
         super
       end
@@ -44,11 +46,11 @@ module Hbc
       private
 
       def cask(header_token, &block)
-        if @token != header_token
-          raise CaskTokenMismatchError.new(@token, header_token)
+        if token != header_token
+          raise CaskTokenMismatchError.new(token, header_token)
         end
 
-        Cask.new(header_token, sourcefile_path: @path, &block)
+        Cask.new(header_token, sourcefile_path: path, &block)
       end
     end
 
@@ -65,14 +67,13 @@ module Hbc
       end
 
       def load
-        Hbc.cache.mkpath
-        FileUtils.rm_f @path
+        path.dirname.mkpath
 
         begin
-          ohai "Downloading #{@url}."
-          curl @url, "-o", @path
+          ohai "Downloading #{url}."
+          curl url, "-o", path
         rescue ErrorDuringExecution
-          raise CaskUnavailableError.new(@token, "Failed to download #{Formatter.url(@url)}.")
+          raise CaskUnavailableError.new(token, "Failed to download #{Formatter.url(url)}.")
         end
 
         super
@@ -84,15 +85,17 @@ module Hbc
         ref.to_s.match?(HOMEBREW_TAP_CASK_REGEX)
       end
 
+      attr_reader :tap
+
       def initialize(tapped_name)
-        user, repo, token = tapped_name.split("/", 3).map(&:downcase)
+        user, repo, token = tapped_name.split("/", 3)
         @tap = Tap.fetch(user, repo)
 
         super @tap.cask_dir/"#{token}.rb"
       end
 
       def load
-        @tap.install unless @tap.installed?
+        tap.install unless tap.installed?
 
         super
       end
@@ -104,12 +107,12 @@ module Hbc
       end
 
       def initialize(ref)
-        @token = File.basename(ref, ".rb")
-        super CaskLoader.default_path(@token)
+        token = File.basename(ref, ".rb")
+        super CaskLoader.default_path(token)
       end
 
       def load
-        raise CaskUnavailableError.new(@token, "No Cask with this name exists.")
+        raise CaskUnavailableError.new(token, "No Cask with this name exists.")
       end
     end
 

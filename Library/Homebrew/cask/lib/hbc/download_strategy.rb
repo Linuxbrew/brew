@@ -100,7 +100,7 @@ module Hbc
     end
 
     def _fetch
-      odebug "Calling curl with args #{cask_curl_args.utf8_inspect}"
+      odebug "Calling curl with args #{cask_curl_args}"
       curl(*cask_curl_args)
     end
 
