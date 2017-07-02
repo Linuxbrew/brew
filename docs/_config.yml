@@ -1,6 +1,16 @@
 include: [.well-known]
 exclude: [bin, vendor, CNAME, Gemfile, Gemfile.lock]
 
+# Same as GitHub Pages
+# https://help.github.com/articles/using-jekyll-with-pages#troubleshooting
+# Disable despite enabled on GitHub Pages for supported plugins to work.
+# safe: true
+kramdown:
+  input: GFM
+  hard_wrap: false
+lsi: false
+highlighter: rouge
+
 gems:
-  - jekyll-feed
+  - jekyll-sitemap
   - jekyll-seo-tag
