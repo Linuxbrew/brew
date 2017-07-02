@@ -12,5 +12,6 @@ lsi: false
 highlighter: rouge
 
 gems:
+  - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
