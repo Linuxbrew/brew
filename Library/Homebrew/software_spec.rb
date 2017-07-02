@@ -161,8 +161,17 @@ class SoftwareSpec
   end
 
   def recursive_dependencies
-    recursive_dependencies = deps
-    deps.map(&:to_formula).compact.uniq.each do |f|
+    deps_f = []
+    recursive_dependencies = deps.map do |dep|
+      begin
+        deps_f << dep.to_formula
+        dep
+      rescue TapFormulaUnavailableError
+        # Don't complain about missing cross-tap dependencies
+        next
+      end
+    end.compact.uniq
+    deps_f.compact.each do |f|
       f.recursive_dependencies.each do |dep|
         recursive_dependencies << dep unless recursive_dependencies.include?(dep)
       end
