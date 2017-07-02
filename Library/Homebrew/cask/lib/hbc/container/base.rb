@@ -1,11 +1,16 @@
 module Hbc
   class Container
     class Base
-      def initialize(cask, path, command, nested: false)
+      def initialize(cask, path, command, nested: false, verbose: false)
         @cask = cask
         @path = path
         @command = command
         @nested = nested
+        @verbose = verbose
+      end
+
+      def verbose?
+        @verbose
       end
 
       def extract_nested_inside(dir)
@@ -32,7 +37,7 @@ module Hbc
         return false unless container
 
         ohai "Extracting nested container #{source.basename}"
-        container.new(@cask, source, @command, nested: true).extract
+        container.new(@cask, source, @command, nested: true, verbose: verbose?).extract
 
         true
       end
