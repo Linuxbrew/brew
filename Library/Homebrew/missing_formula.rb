@@ -109,6 +109,10 @@ module Homebrew
 
           message = <<-EOS.undent
             It was migrated from #{old_tap} to #{new_tap}.
+          EOS
+          break if new_tap_name == CoreTap.instance.name
+
+          message += <<-EOS.undent
             You can access it again by running:
               brew tap #{new_tap_name}
           EOS
