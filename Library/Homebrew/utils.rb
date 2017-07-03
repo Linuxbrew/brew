@@ -180,6 +180,7 @@ module Homebrew
   end
 
   def install_gem_setup_path!(name, version = nil, executable = name)
+    require "rubygems" unless OS.mac?
     # Respect user's preferences for where gems should be installed.
     ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
     ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
