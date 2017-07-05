@@ -57,18 +57,16 @@ describe Hbc::CLI::Style, :cask do
       end
     end
 
-    context "version" do
-      it "matches `HOMEBREW_RUBOCOP_VERSION`", :needs_network do
-        stdout, status = Open3.capture2("gem", "dependency", "rubocop-cask", "--version", HOMEBREW_RUBOCOP_CASK_VERSION, "--pipe", "--remote")
+    specify "`rubocop-cask` supports `HOMEBREW_RUBOCOP_VERSION`", :needs_network do
+      stdout, status = Open3.capture2("gem", "dependency", "rubocop-cask", "--version", HOMEBREW_RUBOCOP_CASK_VERSION, "--pipe", "--remote")
 
-        expect(status).to be_a_success
+      expect(status).to be_a_success
 
-        requirement = Gem::Requirement.new(stdout.scan(/rubocop --version '(.*)'/).flatten.first)
-        version = Gem::Version.new(HOMEBREW_RUBOCOP_VERSION)
+      requirement = Gem::Requirement.new(stdout.scan(/rubocop --version '(.*)'/).flatten.first)
+      version = Gem::Version.new(HOMEBREW_RUBOCOP_VERSION)
 
-        expect(requirement).not_to be_none
-        expect(requirement).to be_satisfied_by(version)
-      end
+      expect(requirement).not_to be_none
+      expect(requirement).to be_satisfied_by(version)
     end
   end
 
