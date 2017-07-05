@@ -21,18 +21,13 @@ Paste at a Terminal prompt:
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
 ```
 
-Follow the *Next steps* instructions to add Linuxbrew to your `PATH` and to your `~/.bash_profile`.
+Follow the *Next steps* instructions to add Linuxbrew to your `PATH` and to your bash shell profile script, either `~/.profile` on Debian/Ubuntu or `~/.bash_profile` on CentOS/Fedora/RedHat.
 
-If you installed Linuxbrew in `/home/linuxbrew/.linuxbrew` (recommended):
-```
-PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-echo 'export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"' >>~/.bash_profile
-```
-
-If you installed Linuxbrew in your home directory:
-```
-PATH="$HOME/.linuxbrew/bin:$PATH"
-echo 'export PATH="$HOME/.linuxbrew/bin:$PATH"' >>~/.bash_profile
+```sh
+test -d ~/.linuxbrew && PATH="$HOME/.linuxbrew/bin:$PATH"
+test -d /home/linuxbrew/.linuxbrew && PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+test -r ~/.bash_profile && echo 'export PATH="$(brew --prefix)/bin:$PATH"' >>~/.bash_profile
+echo 'export PATH="$(brew --prefix)/bin:$PATH"' >>~/.profile
 ```
 
 You're done! Try installing a package:
