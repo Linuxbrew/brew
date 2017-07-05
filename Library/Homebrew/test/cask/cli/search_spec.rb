@@ -1,4 +1,8 @@
 describe Hbc::CLI::Search, :cask do
+  before(:each) do
+    allow($stdout).to receive(:tty?).and_return(true)
+  end
+
   it "lists the available Casks that match the search term" do
     expect {
       Hbc::CLI::Search.run("local")
