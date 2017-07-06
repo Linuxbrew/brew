@@ -7,10 +7,8 @@ module Hbc
       end
 
       def run
-        args.each do |cask_token|
-          odebug "Getting info for Cask #{cask_token}"
-          cask = CaskLoader.load(cask_token)
-
+        casks.each do |cask|
+          odebug "Getting info for Cask #{cask}"
           self.class.info(cask)
         end
       end

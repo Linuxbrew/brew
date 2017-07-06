@@ -16,7 +16,7 @@ module Hbc
         end
 
         ohai "Extracting nested container #{source.basename}"
-        container.new(@cask, source, @command).extract
+        container.new(@cask, source, @command, verbose: verbose?).extract
         FileUtils.remove_entry_secure(source)
       end
     end

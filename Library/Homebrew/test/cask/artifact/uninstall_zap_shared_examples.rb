@@ -176,6 +176,14 @@ shared_examples "#uninstall_phase or #zap_phase" do
       let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-#{artifact_name}-#{directive}.rb") }
 
+      before(:each) do
+        allow_any_instance_of(Hbc::Artifact::UninstallBase).to receive(:trash_paths)
+          .and_wrap_original do |method, *args|
+            result = method.call(*args)
+            FileUtils.rm_rf result.stdout.split("\0")
+          end
+      end
+
       it "is supported" do
         paths.each do |path|
           expect(path).to exist

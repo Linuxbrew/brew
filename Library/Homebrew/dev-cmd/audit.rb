@@ -75,16 +75,18 @@ module Homebrew
 
     only_cops = ARGV.value("only-cops").to_s.split(",")
     except_cops = ARGV.value("except-cops").to_s.split(",")
+
     if !only_cops.empty? && !except_cops.empty?
       odie "--only-cops and --except-cops cannot be used simultaneously!"
-    elsif (!only_cops.empty? || !except_cops.empty?) && strict
-      odie "--only-cops/--except-cops and --strict cannot be used simultaneously"
+    elsif (!only_cops.empty? || !except_cops.empty?) && (strict || ARGV.value("only"))
+      odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously"
     end
 
     options = { fix: ARGV.flag?("--fix"), realpath: true }
 
     if !only_cops.empty?
       options[:only_cops] = only_cops
+      ARGV.push("--only=style")
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif !strict
@@ -817,18 +819,15 @@ class FormulaAuditor
     end
   end
 
-  def audit_legacy_patches
-    return unless formula.respond_to?(:patches)
-    legacy_patches = Patch.normalize_legacy_patches(formula.patches).grep(LegacyPatch)
-
-    return if legacy_patches.empty?
-
-    problem "Use the patch DSL instead of defining a 'patches' method"
-    legacy_patches.each { |p| patch_problems(p) }
-  end
-
   def patch_problems(patch)
     case patch.url
+    when %r{https?://github\.com/.+/.+/(?:commit|pull)/[a-fA-F0-9]*.(?:patch|diff)}
+      unless patch.url =~ /\?full_index=\w+$/
+        problem <<-EOS.undent
+          GitHub patches should use the full_index parameter:
+            #{patch.url}?full_index=1
+        EOS
+      end
     when /raw\.github\.com/, %r{gist\.github\.com/raw}, %r{gist\.github\.com/.+/raw},
       %r{gist\.githubusercontent\.com/.+/raw}
       unless patch.url =~ /[a-fA-F0-9]{40}/
@@ -837,7 +836,7 @@ class FormulaAuditor
     when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
       problem <<-EOS.undent
         use GitHub pull request URLs:
-          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/pull/#{Regexp.last_match(3)}.patch
+          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/pull/#{Regexp.last_match(3)}.patch?full_index=1
         Rather than patch-diff:
           #{patch.url}
       EOS
@@ -1246,7 +1245,6 @@ class ResourceAuditor
 
   def audit
     audit_version
-    audit_checksum
     audit_download_strategy
     audit_urls
     self
@@ -1271,28 +1269,6 @@ class ResourceAuditor
 
     return unless version.to_s =~ /_\d+$/
     problem "version #{version} should not end with an underline and a number"
-  end
-
-  def audit_checksum
-    return unless checksum
-
-    case checksum.hash_type
-    when :md5
-      problem "MD5 checksums are deprecated, please use SHA256"
-      return
-    when :sha1
-      problem "SHA1 checksums are deprecated, please use SHA256"
-      return
-    when :sha256 then len = 64
-    end
-
-    if checksum.empty?
-      problem "#{checksum.hash_type} is empty"
-    else
-      problem "#{checksum.hash_type} should be #{len} characters" unless checksum.hexdigest.length == len
-      problem "#{checksum.hash_type} contains invalid characters" unless checksum.hexdigest =~ /^[a-fA-F0-9]+$/
-      problem "#{checksum.hash_type} should be lowercase" unless checksum.hexdigest == checksum.hexdigest.downcase
-    end
   end
 
   def audit_download_strategy
@@ -1342,6 +1318,12 @@ class ResourceAuditor
     # Check GNU urls; doesn't apply to mirrors
     if url =~ %r{^(?:https?|ftp)://ftpmirror.gnu.org/(.*)}
       problem "Please use \"https://ftp.gnu.org/gnu/#{Regexp.last_match(1)}\" instead of #{url}."
+    end
+
+    # Fossies upstream requests they aren't used as primary URLs
+    # https://github.com/Homebrew/homebrew-core/issues/14486#issuecomment-307753234
+    if url =~ %r{^https?://fossies\.org/}
+      problem "Please don't use fossies.org in the url (using as a mirror is fine)"
     end
 
     if mirrors.include?(url)

@@ -5,8 +5,8 @@ module RuboCop
     module FormulaAudit
       # This cop audits `homepage` url in Formulae
       class Homepage < FormulaCop
-        def audit_formula(_node, _class_node, _parent_class_node, formula_class_body_node)
-          homepage_node = find_node_method_by_name(formula_class_body_node, :homepage)
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          homepage_node = find_node_method_by_name(body_node, :homepage)
           homepage = if homepage_node
             string_content(parameters(homepage_node).first)
           else

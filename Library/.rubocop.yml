@@ -12,6 +12,12 @@ FormulaAudit/Text:
 FormulaAudit/Caveats:
   Enabled: true
 
+FormulaAudit/Checksum:
+  Enabled: true
+
+FormulaAudit/ChecksumCase:
+  Enabled: true
+
 FormulaAuditStrict/BottleBlock:
   Enabled: true
 
@@ -25,6 +31,9 @@ FormulaAuditStrict/ComponentsRedundancy:
   Enabled: true
 
 FormulaAudit/Homepage:
+  Enabled: true
+
+FormulaAudit/LegacyPatches:
   Enabled: true
 
 # `system` is a special case and aligns on second argument
@@ -97,7 +106,7 @@ Metrics/ModuleLength:
     - '**/lib/**/*'
 
 Metrics/PerceivedComplexity:
-  Max: 80
+  Max: 100
 
 # makes code less readable for minor performance increases
 Performance/Caller:

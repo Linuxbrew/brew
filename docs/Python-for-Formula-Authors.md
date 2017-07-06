@@ -98,14 +98,12 @@ def install
   venv = virtualenv_create(libexec)
   # Install all of the resources declared on the formula into the virtualenv.
   venv.pip_install resources
-  # `link_scripts` takes a look at the virtualenv's bin directory before and
-  # after executing the block which is passed into it. If the block caused any
-  # new scripts to be written to the virtualenv's bin directory, link_scripts
-  # will symlink those scripts into the path given as its argument (here, the
-  # formula's `bin` directory in the Cellar.)
-  # `pip_install buildpath` will install the package that the formula points to,
-  # because buildpath is the location where the formula's tarball was unpacked.
-  venv.link_scripts(bin) { venv.pip_install buildpath }
+  # `pip_install_and_link` takes a look at the virtualenv's bin directory
+  # before and after installing its argument. New scripts will be symlinked
+  # into `bin`. `pip_install_and_link buildpath` will install the package
+  # that the formula points to, because buildpath is the location where the
+  # formula's tarball was unpacked.
+  venv.pip_install_and_link buildpath
 end
 ```
 

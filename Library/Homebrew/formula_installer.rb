@@ -18,6 +18,7 @@ require "development_tools"
 
 class FormulaInstaller
   include FormulaCellarChecks
+  extend Predicable
 
   def self.mode_attr_accessor(*names)
     attr_accessor(*names)
@@ -410,12 +411,21 @@ class FormulaInstaller
     install_bottle_for?(dependent, build)
   end
 
+  def runtime_requirements(formula)
+    runtime_deps = formula.runtime_dependencies.map(&:to_formula)
+    recursive_requirements = formula.recursive_requirements do |dependent, _|
+      Requirement.prune unless runtime_deps.include?(dependent)
+    end
+    (recursive_requirements.to_a + formula.requirements.to_a).reject(&:build?).uniq
+  end
+
   def expand_requirements
     unsatisfied_reqs = Hash.new { |h, k| h[k] = [] }
     deps = []
     formulae = [formula]
 
     while f = formulae.pop
+      runtime_requirements = runtime_requirements(f)
       f.recursive_requirements do |dependent, req|
         build = effective_build_options_for(dependent)
 
@@ -429,6 +439,8 @@ class FormulaInstaller
           formulae.unshift(dep.to_formula)
           Requirement.prune
         elsif req.satisfied?
+          Requirement.prune
+        elsif !runtime_requirements.include?(req) && install_bottle_for?(dependent, build)
           Requirement.prune
         else
           unsatisfied_reqs[dependent] << req
@@ -585,11 +597,11 @@ class FormulaInstaller
 
     audit_installed if ARGV.homebrew_developer? && !formula.keg_only?
 
-    c = Caveats.new(formula)
+    caveats = Caveats.new(formula)
 
-    return if c.empty?
+    return if caveats.empty?
     @show_summary_heading = true
-    ohai "Caveats", c.caveats
+    ohai "Caveats", caveats.to_s
   end
 
   def finish
@@ -905,9 +917,7 @@ class FormulaInstaller
 
   private
 
-  def hold_locks?
-    @hold_locks || false
-  end
+  attr_predicate :hold_locks?
 
   def lock
     return unless (@@locked ||= []).empty?

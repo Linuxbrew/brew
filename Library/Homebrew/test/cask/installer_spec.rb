@@ -145,22 +145,6 @@ describe Hbc::Installer, :cask do
       expect(with_macosx_dir.staged_path.join("__MACOSX")).not_to be_a_directory
     end
 
-    it "installer method raises an exception when already-installed Casks which auto-update are attempted" do
-      with_auto_updates = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
-
-      expect(with_auto_updates).not_to be_installed
-
-      installer = Hbc::Installer.new(with_auto_updates)
-
-      shutup do
-        installer.install
-      end
-
-      expect {
-        installer.install
-      }.to raise_error(Hbc::CaskAlreadyInstalledAutoUpdatesError)
-    end
-
     it "allows already-installed Casks which auto-update to be installed if force is provided" do
       with_auto_updates = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
 

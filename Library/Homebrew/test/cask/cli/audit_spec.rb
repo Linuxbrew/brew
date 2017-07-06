@@ -1,5 +1,5 @@
 describe Hbc::CLI::Audit, :cask do
-  let(:cask) { double }
+  let(:cask) { double("cask", token: nil) }
 
   describe "selection of Casks to audit" do
     it "audits all Casks if no tokens are given" do

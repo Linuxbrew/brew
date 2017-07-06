@@ -28,7 +28,7 @@ module Homebrew
     unless (rack/version).directory?
       onoe "#{name} does not have a version \"#{version}\" in the Cellar."
 
-      versions = rack.subdirs.map { |d| Keg.new(d).version }
+      versions = rack.subdirs.map { |d| Keg.new(d).version }.sort
       puts "Versions available: #{versions.join(", ")}"
 
       exit 3

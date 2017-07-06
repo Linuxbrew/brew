@@ -74,18 +74,13 @@ module Debrew
     end
   end
 
-  class << self
-    alias original_raise raise
-  end
-
   @active = false
   @debugged_exceptions = Set.new
 
-  def self.active?
-    @active
-  end
-
   class << self
+    extend Predicable
+    alias original_raise raise
+    attr_predicate :active?
     attr_reader :debugged_exceptions
   end
 

@@ -36,7 +36,7 @@ class Version
         0
       when NumericToken
         other.value.zero? ? 0 : -1
-      when AlphaToken, BetaToken, RCToken
+      when AlphaToken, BetaToken, PreToken, RCToken
         1
       else
         -1
@@ -103,6 +103,8 @@ class Version
       case other
       when AlphaToken
         rev <=> other.rev
+      when BetaToken, RCToken, PreToken, PatchToken
+        -1
       else
         super
       end
@@ -117,6 +119,23 @@ class Version
       when BetaToken
         rev <=> other.rev
       when AlphaToken
+        1
+      when PreToken, RCToken, PatchToken
+        -1
+      else
+        super
+      end
+    end
+  end
+
+  class PreToken < CompositeToken
+    PATTERN = /pre[0-9]*/i
+
+    def <=>(other)
+      case other
+      when PreToken
+        rev <=> other.rev
+      when AlphaToken, BetaToken
         1
       when RCToken, PatchToken
         -1
@@ -133,7 +152,7 @@ class Version
       case other
       when RCToken
         rev <=> other.rev
-      when AlphaToken, BetaToken
+      when AlphaToken, BetaToken, PreToken
         1
       when PatchToken
         -1
@@ -150,7 +169,7 @@ class Version
       case other
       when PatchToken
         rev <=> other.rev
-      when AlphaToken, BetaToken, RCToken
+      when AlphaToken, BetaToken, RCToken, PreToken
         1
       else
         super
@@ -161,6 +180,7 @@ class Version
   SCAN_PATTERN = Regexp.union(
     AlphaToken::PATTERN,
     BetaToken::PATTERN,
+    PreToken::PATTERN,
     RCToken::PATTERN,
     PatchToken::PATTERN,
     NumericToken::PATTERN,
@@ -289,6 +309,7 @@ class Version
       when /\A#{AlphaToken::PATTERN}\z/o   then AlphaToken
       when /\A#{BetaToken::PATTERN}\z/o    then BetaToken
       when /\A#{RCToken::PATTERN}\z/o      then RCToken
+      when /\A#{PreToken::PATTERN}\z/o     then PreToken
       when /\A#{PatchToken::PATTERN}\z/o   then PatchToken
       when /\A#{NumericToken::PATTERN}\z/o then NumericToken
       when /\A#{StringToken::PATTERN}\z/o  then StringToken
@@ -407,8 +428,13 @@ class Version
 
     # e.g. http://mirrors.jenkins-ci.org/war/1.486/jenkins.war
     # e.g. https://github.com/foo/bar/releases/download/0.10.11/bar.phar
-    m = %r{/(\d\.\d+(\.\d+)?)}.match(spec_s)
-    return m.captures.first unless m.nil?
+    # e.g. https://github.com/clojure/clojurescript/releases/download/r1.9.293/cljs.jar
+    # e.g. https://github.com/fibjs/fibjs/releases/download/v0.6.1/fullsrc.zip
+    # e.g. https://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_1.9/E.tgz
+    # e.g. https://github.com/JustArchi/ArchiSteamFarm/releases/download/2.3.2.0/ASF.zip
+    # e.g. https://people.gnome.org/~newren/eg/download/1.7.5.2/eg
+    m = %r{/([rvV]_?)?(\d\.\d+(\.\d+){,2})}.match(spec_s)
+    return m.captures[1] unless m.nil?
 
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)

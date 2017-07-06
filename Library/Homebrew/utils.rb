@@ -15,6 +15,14 @@ require "utils/svn"
 require "utils/tty"
 require "time"
 
+def require?(path)
+  return false if path.nil?
+  require path
+rescue LoadError => e
+  # we should raise on syntax errors but not if the file doesn't exist.
+  raise unless e.message.include?(path)
+end
+
 def ohai(title, *sput)
   title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
   puts Formatter.headline(title, color: :blue)

@@ -68,12 +68,18 @@ RSpec.configure do |config|
   end
 
   config.around(:each) do |example|
+    def find_files
+      Find.find(TEST_TMPDIR)
+          .reject { |f| File.basename(f) == ".DS_Store" }
+          .map { |f| f.sub(TEST_TMPDIR, "") }
+    end
+
     begin
       TEST_DIRECTORIES.each(&:mkpath)
 
       @__homebrew_failed = Homebrew.failed?
 
-      @__files_before_test = Find.find(TEST_TMPDIR).map { |f| f.sub(TEST_TMPDIR, "") }
+      @__files_before_test = find_files
 
       @__argv = ARGV.dup
       @__env = ENV.to_hash # dup doesn't work on ENV
@@ -106,7 +112,7 @@ RSpec.configure do |config|
         CoreTap.instance.path/"formula_renames.json",
       ]
 
-      files_after_test = Find.find(TEST_TMPDIR).map { |f| f.sub(TEST_TMPDIR, "") }
+      files_after_test = find_files
 
       diff = Set.new(@__files_before_test) ^ Set.new(files_after_test)
       expect(diff).to be_empty, <<-EOS.undent

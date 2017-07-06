@@ -1,5 +1,3 @@
-require "forwardable"
-
 require "hbc/dsl"
 require "hbc/metadata"
 
@@ -72,6 +70,15 @@ module Hbc
     def to_s
       @token
     end
+
+    def hash
+      token.hash
+    end
+
+    def eql?(other)
+      token == other.token
+    end
+    alias == eql?
 
     def dumpcask
       odebug "Cask instance dumps in YAML:"

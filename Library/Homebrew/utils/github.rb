@@ -291,8 +291,8 @@ module GitHub
     prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
   end
 
-  def private_repo?(user, repo)
-    uri = URI.parse("#{API_URL}/repos/#{user}/#{repo}")
+  def private_repo?(full_name)
+    uri = URI.parse("#{API_URL}/repos/#{full_name}")
     open(uri) { |json| json["private"] }
   end
 end

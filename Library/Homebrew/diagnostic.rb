@@ -166,7 +166,7 @@ module Homebrew
           "libUFSDNTFS.dylib", # Paragon NTFS
           "libUFSDExtFS.dylib", # Paragon ExtFS
           "libecomlodr.dylib", # Symantec Endpoint Protection
-          "libsymsea.*.dylib", # Symantec Endpoint Protection
+          "libsymsea*.dylib", # Symantec Endpoint Protection
           "sentinel.dylib", # SentinelOne
         ]
 
@@ -764,7 +764,8 @@ module Homebrew
 
             Unless you have compelling reasons, consider setting the
             origin remote to point at the main repository by running:
-              git -C "#{HOMEBREW_REPOSITORY}" remote add origin #{Formatter.url(remote)}
+
+              git -C "#{HOMEBREW_REPOSITORY}" remote set-url origin #{Formatter.url(remote)}
           EOS
         end
       end
@@ -785,6 +786,8 @@ module Homebrew
               git -C "#{coretap_path}" remote add origin #{Formatter.url(remote)}
           EOS
         elsif origin !~ %r{(Homebrew|Linuxbrew)/homebrew-core(\.git|/)?$}
+          return if ENV["CI"] && origin.include?("Homebrew/homebrew-test-bot")
+
           <<-EOS.undent
             Suspicious #{CoreTap.instance} git origin remote found.
 
@@ -794,7 +797,7 @@ module Homebrew
 
             Unless you have compelling reasons, consider setting the
             origin remote to point at the main repository by running:
-              git -C "#{coretap_path}" remote add origin #{Formatter.url(remote)}
+              git -C "#{coretap_path}" remote set-url origin #{Formatter.url(remote)}
           EOS
         end
       end
@@ -1069,6 +1072,11 @@ module Homebrew
         end
         cmd_map.reject! { |_cmd_name, cmd_paths| cmd_paths.size == 1 }
         return if cmd_map.empty?
+
+        if ENV["CI"] && cmd_map.keys.length == 1 &&
+           cmd_map.keys.first == "brew-test-bot"
+          return
+        end
 
         message = "You have external commands with conflicting names.\n"
         cmd_map.each do |cmd_name, cmd_paths|

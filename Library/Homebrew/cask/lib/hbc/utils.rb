@@ -4,23 +4,14 @@ require "stringio"
 
 BUG_REPORTS_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
-# monkeypatch Object - not a great idea
-class Object
-  def utf8_inspect
-    return inspect unless defined?(Encoding)
-    return map(&:utf8_inspect) if respond_to?(:map)
-    inspect.force_encoding("UTF-8").sub(/\A"(.*)"\Z/, '\1')
-  end
-end
-
 class Buffer < StringIO
+  extend Predicable
+
+  attr_predicate :tty?
+
   def initialize(tty = false)
     super()
     @tty = tty
-  end
-
-  def tty?
-    @tty
   end
 end
 

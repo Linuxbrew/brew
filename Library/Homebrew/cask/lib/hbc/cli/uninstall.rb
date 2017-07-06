@@ -9,9 +9,12 @@ module Hbc
       end
 
       def run
-        args.each do |cask_token|
-          odebug "Uninstalling Cask #{cask_token}"
-          cask = CaskLoader.load(cask_token)
+        raise CaskError, "Uninstall incomplete." if uninstall_casks == :incomplete
+      end
+
+      def uninstall_casks
+        casks.each do |cask|
+          odebug "Uninstalling Cask #{cask}"
 
           raise CaskNotInstalledError, cask unless cask.installed? || force?
 
@@ -27,8 +30,8 @@ module Hbc
           single = versions.count == 1
 
           puts <<-EOS.undent
-            #{cask_token} #{versions.join(", ")} #{single ? "is" : "are"} still installed.
-            Remove #{single ? "it" : "them all"} with `brew cask uninstall --force #{cask_token}`.
+            #{cask} #{versions.join(", ")} #{single ? "is" : "are"} still installed.
+            Remove #{single ? "it" : "them all"} with `brew cask uninstall --force #{cask}`.
           EOS
         end
       end

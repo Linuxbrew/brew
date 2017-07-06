@@ -9,8 +9,8 @@ module RuboCop
       # - Checks for existence of `desc`
       # - Checks if size of `desc` > 80
       class DescLength < FormulaCop
-        def audit_formula(_node, _class_node, _parent_class_node, body)
-          desc_call = find_node_method_by_name(body, :desc)
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          desc_call = find_node_method_by_name(body_node, :desc)
 
           # Check if a formula's desc is present
           if desc_call.nil?
@@ -38,13 +38,18 @@ module RuboCop
       # - Checks if `desc` contains the formula name
       class Desc < FormulaCop
         VALID_LOWERCASE_WORDS = %w[
+          ex
+          eXtensible
           iOS
           macOS
+          malloc
+          ooc
+          preexec
           xUnit
         ].freeze
 
-        def audit_formula(_node, _class_node, _parent_class_node, body)
-          desc_call = find_node_method_by_name(body, :desc)
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          desc_call = find_node_method_by_name(body_node, :desc)
           return if desc_call.nil?
 
           desc = parameters(desc_call).first
@@ -67,9 +72,9 @@ module RuboCop
             problem "Description should start with a capital letter"
           end
 
-          # Check if formula's name is used in formula's desc
-          return unless regex_match_group(desc, /(^|[^a-z])#{@formula_name}([^a-z]|$)/i)
-          problem "Description shouldn't include the formula name"
+          # Check if formula's desc starts with formula's name
+          return unless regex_match_group(desc, /^#{@formula_name} /i)
+          problem "Description shouldn't start with the formula name"
         end
 
         private

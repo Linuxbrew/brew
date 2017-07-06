@@ -169,8 +169,8 @@ module Homebrew
       Homebrew.dump_options_for_formula f
     end
 
-    c = Caveats.new(f)
-    ohai "Caveats", c.caveats unless c.empty?
+    caveats = Caveats.new(f)
+    ohai "Caveats", caveats.to_s unless caveats.empty?
   end
 
   def decorate_dependencies(dependencies)

@@ -2,9 +2,7 @@ module Hbc
   class CLI
     class Home < AbstractCommand
       def run
-        casks = args.map(&CaskLoader.public_method(:load))
-
-        if casks.empty?
+        if casks.none?
           odebug "Opening project homepage"
           self.class.open_url "https://caskroom.github.io/"
         else

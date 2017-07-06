@@ -33,13 +33,13 @@ module Hbc
       end
 
       def verify_checksum
-        raise CaskSha256MissingError, "sha256 required: sha256 '#{computed}'" if expected.nil? || expected.empty?
+        raise CaskSha256MissingError.new(cask.token, expected, computed) if expected.nil? || expected.empty?
 
         if expected == computed
           odebug "SHA256 checksums match"
         else
           ohai 'Note: running "brew update" may fix sha256 checksum errors'
-          raise CaskSha256MismatchError.new(downloaded_path, expected, computed)
+          raise CaskSha256MismatchError.new(cask.token, expected, computed, downloaded_path)
         end
       end
     end

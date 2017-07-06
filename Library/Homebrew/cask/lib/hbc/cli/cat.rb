@@ -7,10 +7,12 @@ module Hbc
       end
 
       def run
-        args.each do |cask_token|
-          cask_path = CaskLoader.path(cask_token)
-          raise CaskUnavailableError, cask_token.to_s unless cask_path.exist?
-          puts File.open(cask_path, &:read)
+        raise CaskError, "Cat incomplete." if cat_casks == :incomplete
+      end
+
+      def cat_casks
+        casks.each do |cask|
+          puts File.open(cask.sourcefile_path, &:read)
         end
       end
 

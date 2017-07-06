@@ -83,7 +83,7 @@ class BottleDisableReason
   end
 
   def to_s
-    if @type == :unneeded
+    if unneeded?
       "This formula doesn't require compiling."
     else
       @reason

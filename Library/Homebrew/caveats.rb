@@ -1,4 +1,6 @@
 class Caveats
+  extend Forwardable
+
   attr_reader :f
 
   def initialize(f)
@@ -25,9 +27,7 @@ class Caveats
     caveats.compact.join("\n")
   end
 
-  def empty?
-    caveats.empty?
-  end
+  delegate [:empty?, :to_s] => :caveats
 
   private
 

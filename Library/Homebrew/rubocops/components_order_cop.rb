@@ -8,7 +8,7 @@ module RuboCop
       # - component_precedence_list has component hierarchy in a nested list
       #   where each sub array contains components' details which are at same precedence level
       class ComponentsOrder < FormulaCop
-        def audit_formula(_node, _class_node, _parent_class_node, formula_class_body_node)
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
           component_precedence_list = [
             [{ name: :include,  type: :method_call }],
             [{ name: :desc,     type: :method_call }],
@@ -41,11 +41,11 @@ module RuboCop
             components.each do |component|
               case component[:type]
               when :method_call
-                relevant_components += find_method_calls_by_name(formula_class_body_node, component[:name]).to_a
+                relevant_components += find_method_calls_by_name(body_node, component[:name]).to_a
               when :block_call
-                relevant_components += find_blocks(formula_class_body_node, component[:name]).to_a
+                relevant_components += find_blocks(body_node, component[:name]).to_a
               when :method_definition
-                relevant_components << find_method_def(formula_class_body_node, component[:name])
+                relevant_components << find_method_def(body_node, component[:name])
               end
             end
             relevant_components.delete_if(&:nil?)

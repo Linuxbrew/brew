@@ -599,8 +599,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Display the location in the cellar where `formula` is or would be installed.
 
   * `--repository`:
-    Display where Homebrew's `.git` directory is located. For standard installs,
-    the `prefix` and `repository` are the same directory.
+    Display where Homebrew's `.git` directory is located.
 
   * `--repository` `user``/``repo`:
     Display where tap `user``/``repo`'s directory is located.
@@ -1070,9 +1069,9 @@ Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/docs/>
 
 Homebrew's lead maintainer is Mike McQuaid.
 
-Homebrew's current maintainers are Alyssa Ross, Andrew Janke, Baptiste Fontaine, Alex Dunn, FX Coudert, ilovezfs, Josh Hagins, JCount, Misty De Meo, neutric, Tomasz Pajor, Markus Reiter, Tim Smith, Tom Schoonjans, Uladzislau Shablinski and William Woodruff.
+Homebrew's current maintainers are Alyssa Ross, Andrew Janke, Alex Dunn, FX Coudert, ilovezfs, Josh Hagins, JCount, Misty De Meo, neutric, Tomasz Pajor, Markus Reiter, Tim Smith, Tom Schoonjans, Uladzislau Shablinski and William Woodruff.
 
-Former maintainers with significant contributions include Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.
+Former maintainers with significant contributions include Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.
 
 ## BUGS
 
