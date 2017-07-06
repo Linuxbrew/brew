@@ -33,6 +33,10 @@ Style/BlockDelimiters:
   Exclude:
     - '**/*_spec.rb'
 
+# used idiomatically to return boolean values
+Style/DoubleNegation:
+  Enabled: false
+
 # so many of these in formulae but none in here
 Style/GuardClause:
   Enabled: true
