@@ -84,9 +84,14 @@ module Hardware
         @features ||= flags[1..-1].map(&:intern)
       end
 
-      %w[aes altivec avx avx2 lm sse3 ssse3 sse4 sse4_2].each do |flag|
+      %w[aes altivec avx avx2 lm ssse3 sse4 sse4_2].each do |flag|
         define_method(flag + "?") { flags.include? flag }
       end
+
+      def sse3?
+        flags.include?("pni") || flags.include?("sse3")
+      end
+
       alias is_64_bit? lm?
 
       def bits
