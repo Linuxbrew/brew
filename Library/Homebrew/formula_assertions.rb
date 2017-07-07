@@ -3,6 +3,11 @@ module Homebrew
     require "test/unit/assertions"
     include ::Test::Unit::Assertions
 
+    # TODO: remove this when we no longer support Ruby 2.0.
+    unless defined?(Test::Unit::AssertionFailedError)
+      Test::Unit::AssertionFailedError = MiniTest::Assertion
+    end
+
     # Returns the output of running cmd, and asserts the exit status
     def shell_output(cmd, result = 0)
       ohai cmd
