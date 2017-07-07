@@ -83,7 +83,7 @@ module Homebrew
             exec(*args)
           end
         end
-      rescue Homebrew::Assertions::AssertionFailed => e
+      rescue ::Test::Unit::AssertionFailedError => e
         ofail "#{f.full_name}: failed"
         puts e.message
       rescue Exception => e
