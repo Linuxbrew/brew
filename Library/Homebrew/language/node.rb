@@ -10,8 +10,7 @@ module Language
       # fed to `npm install` only symlinks are created linking back to that
       # directory, consequently breaking that assumption. We require a tarball
       # because npm install creates a "real" installation when fed a tarball.
-      pack_cmd = "npm pack --ignore-scripts"
-      output = Utils.popen_read(pack_cmd)
+      output = Utils.popen_read("npm pack --ignore-scripts")
       if !$CHILD_STATUS.exitstatus.zero? || output.lines.empty?
         raise "npm failed to pack #{Dir.pwd}"
       end
