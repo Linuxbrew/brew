@@ -23,6 +23,7 @@ require "test/support/helper/shutup"
 require "test/support/helper/fixtures"
 require "test/support/helper/formula"
 require "test/support/helper/mktmpdir"
+require "test/support/helper/output_as_tty"
 require "test/support/helper/rubocop"
 
 require "test/support/helper/spec/shared_context/homebrew_cask" if OS.mac?
@@ -45,6 +46,7 @@ RSpec.configure do |config|
   config.include(Test::Helper::Fixtures)
   config.include(Test::Helper::Formula)
   config.include(Test::Helper::MkTmpDir)
+  config.include(Test::Helper::OutputAsTTY)
   config.include(Test::Helper::RuboCop)
 
   config.before(:each, :needs_compat) do
