@@ -46,6 +46,8 @@ module Homebrew
       options[:only_cops] = only_cops
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
+    elsif only_cops.empty? && except_cops.empty?
+      options[:except_cops] = %w[FormulaAuditStrict FormulaAudit]
     end
 
     Homebrew.failed = check_style_and_print(target, options)
