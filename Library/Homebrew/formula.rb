@@ -1008,7 +1008,8 @@ class Formula
   # rarely, you don't want your library symlinked into the main prefix
   # see gettext.rb for an example
   def keg_only?
-    !!keg_only_reason && keg_only_reason.valid?
+    return false unless keg_only_reason
+    keg_only_reason.valid?
   end
 
   # @private
