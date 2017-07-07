@@ -77,6 +77,7 @@ RSpec.shared_context "integration test" do
       "HOMEBREW_INTEGRATION_TEST" => command_id_from_args(args),
       "HOMEBREW_TEST_TMPDIR" => TEST_TMPDIR,
       "HOMEBREW_DEVELOPER" => ENV["HOMEBREW_DEVELOPER"],
+      "GEM_HOME" => nil,
     )
 
     ruby_args = [
@@ -89,7 +90,7 @@ RSpec.shared_context "integration test" do
     ruby_args << "-rtest/support/helper/integration_mocks"
     ruby_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
 
-    Bundler.with_original_env do
+    Bundler.with_clean_env do
       stdout, stderr, status = Open3.capture3(env, RUBY_PATH, *ruby_args, *args)
       $stdout.print stdout
       $stderr.print stderr
