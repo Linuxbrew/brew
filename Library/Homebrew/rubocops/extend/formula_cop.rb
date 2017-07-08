@@ -344,6 +344,16 @@ module RuboCop
         end
       end
 
+      # Returns true if the formula is versioned
+      def versioned_formula?
+        formula_file_name.include?("@") || @formula_name.match(/AT\d+/)
+      end
+
+      # Returns filename of the formula without the extension
+      def formula_file_name
+        File.basename(processed_source.buffer.name, ".rb")
+      end
+
       # Returns printable component name
       def format_component(component_node)
         return component_node.method_name if component_node.send_type? || component_node.block_type?

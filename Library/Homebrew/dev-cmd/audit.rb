@@ -519,15 +519,6 @@ class FormulaAuditor
         problem "Ambiguous conflicting formula #{c.name.inspect}."
       end
     end
-
-    versioned_conflicts_whitelist = %w[node@ bash-completion@].freeze
-
-    return unless formula.conflicts.any? && formula.versioned_formula?
-    return if formula.name.start_with?(*versioned_conflicts_whitelist)
-    problem <<-EOS
-      Versioned formulae should not use `conflicts_with`.
-      Use `keg_only :versioned_formula` instead.
-    EOS
   end
 
   def audit_keg_only_style
