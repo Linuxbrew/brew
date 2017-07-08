@@ -13,6 +13,15 @@ describe Hbc::CLI::Search, :cask do
     EOS
   end
 
+  it "outputs a plain list when stdout is not a TTY" do
+    expect {
+      Hbc::CLI::Search.run("local")
+    }.to output(<<-EOS.undent).to_stdout
+      local-caffeine
+      local-transmission
+    EOS
+  end
+
   it "shows that there are no Casks matching a search term that did not result in anything" do
     expect {
       Hbc::CLI::Search.run("foo-bar-baz")

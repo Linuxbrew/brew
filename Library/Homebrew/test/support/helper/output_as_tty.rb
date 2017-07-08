@@ -3,14 +3,6 @@ require "delegate"
 module Test
   module Helper
     module OutputAsTTY
-      module TTYTrue
-        def tty?
-          true
-        end
-
-        alias isatty tty?
-      end
-
       # This is a custom wrapper for the `output` matcher,
       # used for testing output to a TTY:
       #
@@ -26,41 +18,33 @@ module Test
         def matches?(block)
           return super(block) unless @tty
 
-          colored_tty_block = if @output == :stdout
-            lambda do
-              $stdout.extend(TTYTrue)
-              block.call
-            end
-          elsif @output == :stderr
-            lambda do
-              $stderr.extend(TTYTrue)
-              block.call
-            end
-          else
-            raise "`as_tty` can only be chained to `stdout` or `stderr`."
+          colored_tty_block = lambda do
+            instance_eval("$#{@output}").extend(Module.new do
+              def tty?
+                true
+              end
+
+              alias_method :isatty, :tty?
+            end)
+            block.call
           end
 
           return super(colored_tty_block) if @colors
 
           uncolored_tty_block = lambda do
-            begin
-              out_stream = StringIO.new
-              err_stream = StringIO.new
+            instance_eval <<-EOS
+              begin
+                captured_stream = StringIO.new
 
-              old_stdout = $stdout
-              old_stderr = $stderr
+                original_stream = $#{@output}
+                $#{@output} = captured_stream
 
-              $stdout = out_stream
-              $stderr = err_stream
-
-              colored_tty_block.call
-            ensure
-              $stdout = old_stdout
-              $stderr = old_stderr
-
-              $stdout.print Tty.strip_ansi(out_stream.string)
-              $stderr.print Tty.strip_ansi(err_stream.string)
-            end
+                colored_tty_block.call
+              ensure
+                $#{@output} = original_stream
+                $#{@output}.print Tty.strip_ansi(captured_stream.string)
+              end
+            EOS
           end
 
           super(uncolored_tty_block)
@@ -80,7 +64,8 @@ module Test
 
         def as_tty
           @tty = true
-          self
+          return self if [:stdout, :stderr].include?(@output)
+          raise "`as_tty` can only be chained to `stdout` or `stderr`."
         end
 
         def with_color
