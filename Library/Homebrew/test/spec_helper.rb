@@ -41,6 +41,8 @@ TEST_DIRECTORIES = [
 RSpec.configure do |config|
   config.order = :random
 
+  config.filter_run_when_matching :focus
+
   config.include(Test::Helper::Shutup)
   config.include(Test::Helper::Fixtures)
   config.include(Test::Helper::Formula)
