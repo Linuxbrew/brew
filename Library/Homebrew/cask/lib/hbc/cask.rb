@@ -41,6 +41,14 @@ module Hbc
                           .reverse
     end
 
+    def full_name
+      if @tap.nil? || @tap == Hbc.default_tap
+        token
+      else
+        "#{@tap}/#{token}"
+      end
+    end
+
     def installed?
       !versions.empty?
     end
