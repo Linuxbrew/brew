@@ -5,40 +5,11 @@ Some formulae should not go in
 additional [Interesting Taps & Forks](Interesting-Taps-&-Forks.md) and anyone can start their
 own!
 
-### We try hard to avoid dupes in `homebrew/core`
-Stuff that comes with macOS or libraries that are provided by
-[RubyGems, CPAN or PyPi](Gems,-Eggs-and-Perl-Modules.md)
-should not be duplicated. There are good reasons for this:
+### Dupes in `homebrew/core`
+We now accept stuff that comes with macOS as long as it uses `keg_only :provided_by_macos` to be keg-only by default.
 
-* Duplicate libraries regularly break builds
-* Subtle bugs emerge with duplicate libraries, and to a lesser extent,
-  duplicate tools
-* We want our formulae to work with what comes with macOS
-
-There are exceptions:
-
-* OpenSSL - Apple has formally deprecated OpenSSL on macOS in favour of their own Security Framework
-  & consequently the macOS OpenSSL is rarely updated and frequently falls behind important security updates.
-  Homebrew endeavours to use our shipped OpenSSL as much as possible.
-* Programs that a user will regularly interact with directly, like editors and
-  language runtimes
-* Libraries that provide functionality or contain security updates not found in
-  the system version
-* Things that are **designed to be installed in parallel to earlier versions of
-  themselves**
-
-#### Examples
-
-| Formula            | Reason                                                                                                |
-|--------------------|-------------------------------------------------------------------------------------------------------|
-| ruby, python, perl | People want newer versions                                                                            |
-| bash               | macOS's bash is stuck at 3.2 because newer versions are licensed under GPLv3                          |
-| zsh                | This was a mistake, but it’s too late to remove it                                                    |
-| emacs, vim         | [Too popular to move to dupes](https://github.com/Homebrew/homebrew/pull/21594#issuecomment-21968819) |
-| subversion         | Originally added for 10.5, but people want the latest version                                         |
-| libcurl            | Some formulae require a newer version than macOS provides                                             |
-| openssl            | macOS's openssl is deprecated & outdated                                                              |
-| libxml2            | Historically, macOS's libxml2 has been buggy                                                          |
+### Versioned formulae in `homebrew/core`
+We now accept versioned formulae as long as they [meet the requirements](Versions.md).
 
 ### We don’t like tools that upgrade themselves
 Software that can upgrade itself does not integrate well with Homebrew's own
@@ -74,7 +45,7 @@ etc.
 
 If not, then put bindings in the formula they bind to. This is more
 useful to people. Just install the stuff! Having to faff around with
-foo-ruby, foo-perl etc. sucks.
+foo-ruby, foo-perl etc. is a bad user experience.
 
 ### Niche (or self-submitted) stuff
 The software in question must:
@@ -100,9 +71,16 @@ running a package manager.
 
 ### Stuff that builds an `.app`
 Don’t make your formula build an `.app` (native macOS Application); we
-don’t want those things in Homebrew (but
-[Homebrew Cask](https://github.com/caskroom/homebrew-cask) does).
-Make it build a command-line tool or a library.
+don’t want those things in Homebrew. Encourage upstream projects to build and support a `.app` that can be distributed by [Homebrew Cask](https://github.com/caskroom/homebrew-cask) (and used without it, too).
+
+### Stuff that builds a GUI by default (but doesn't have to)
+Make it build a command-line tool or a library by default and, if the GUI is useful and would be widely used, add an option to build the GUI. Don't offer an option for multiple GUI backends e.g. X11 is a bad user experience for GUIs on macOS.
+
+### Stuff that doesn't build with the latest, stable Xcode's Clang
+Clang is the default C/C++ compiler on macOS (and has been for a long time). Software that doesn't build with it hasn't been adequately ported to macOS.
+
+### Stuff that requires heavy manual pre/post-install intervention
+We're a package manager so we want to do things like resolve dependencies and setup applications for our users. If things require too much manual intervention then they aren't useful in a package manager.
 
 ### Sometimes there are exceptions
 Even if all criteria are met we may not accept the formula.
