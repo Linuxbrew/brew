@@ -77,20 +77,37 @@ RSpec.shared_context "integration test" do
       "HOMEBREW_INTEGRATION_TEST" => command_id_from_args(args),
       "HOMEBREW_TEST_TMPDIR" => TEST_TMPDIR,
       "HOMEBREW_DEVELOPER" => ENV["HOMEBREW_DEVELOPER"],
+      "GEM_HOME" => nil,
     )
 
-    ruby_args = [
-      "-W0",
-      "-I", "#{HOMEBREW_LIBRARY_PATH}/test/support/lib",
-      "-I", HOMEBREW_LIBRARY_PATH.to_s,
-      "-rconfig"
-    ]
-    ruby_args << "-rsimplecov" if ENV["HOMEBREW_TESTS_COVERAGE"]
-    ruby_args << "-rtest/support/helper/integration_mocks"
-    ruby_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
+    @ruby_args ||= begin
+      ruby_args = [
+        "-W0",
+        "-I", "#{HOMEBREW_LIBRARY_PATH}/test/support/lib",
+        "-I", HOMEBREW_LIBRARY_PATH.to_s,
+        "-rconfig"
+      ]
+      if ENV["HOMEBREW_TESTS_COVERAGE"]
+        simplecov_spec = Gem.loaded_specs["simplecov"]
+        specs = simplecov_spec.runtime_dependencies.flat_map(&:to_specs)
+        specs << simplecov_spec
+        libs = specs.flat_map do |spec|
+          full_gem_path = spec.full_gem_path
+          # full_require_paths isn't available in RubyGems < 2.2.
+          spec.require_paths.map do |lib|
+            next lib if lib.include?(full_gem_path)
+            "#{full_gem_path}/#{lib}"
+          end
+        end
+        libs.each { |lib| ruby_args << "-I" << lib }
+        ruby_args << "-rsimplecov"
+      end
+      ruby_args << "-rtest/support/helper/integration_mocks"
+      ruby_args << (HOMEBREW_LIBRARY_PATH/"brew.rb").resolved_path.to_s
+    end
 
-    Bundler.with_original_env do
-      stdout, stderr, status = Open3.capture3(env, RUBY_PATH, *ruby_args, *args)
+    Bundler.with_clean_env do
+      stdout, stderr, status = Open3.capture3(env, RUBY_PATH, *@ruby_args, *args)
       $stdout.print stdout
       $stderr.print stderr
       status
