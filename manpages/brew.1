@@ -216,7 +216,7 @@ Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to
 See the docs for examples of using the JSON output: \fIhttp://docs\.brew\.sh/Querying\-Brew\.html\fR
 .
 .TP
-\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] \fIformula\fR [\fIinstall\-options\fR]
+\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] \fIformula\fR [\fIoptions\fR \.\.\.]
 Install \fIformula\fR\.
 .
 .IP
@@ -260,6 +260,9 @@ If \fB\-\-keep\-tmp\fR is passed, the temporary files created during installatio
 .
 .IP
 If \fB\-\-build\-bottle\fR is passed, prepare the formula for eventual bottling during installation\.
+.
+.IP
+Installation \fIoptions\fR specific to \fIformula\fR may be appended to the command, and can be listed with \fBbrew options <formula>\fR.
 .
 .TP
 \fBinstall\fR \fB\-\-interactive\fR [\fB\-\-git\fR] \fIformula\fR
