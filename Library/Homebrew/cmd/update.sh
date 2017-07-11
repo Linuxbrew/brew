@@ -336,7 +336,7 @@ homebrew-update() {
       *)
         odie <<EOS
 This command updates brew itself, and does not take formula names.
-Use 'brew upgrade <formula>'.
+Use 'brew upgrade $@' instead.
 EOS
         ;;
     esac
