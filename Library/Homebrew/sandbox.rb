@@ -156,6 +156,7 @@ class Sandbox
           (literal "/dev/ptmx")
           (literal "/dev/dtracehelper")
           (literal "/dev/null")
+          (literal "/dev/random")
           (literal "/dev/zero")
           (regex #"^/dev/fd/[0-9]+$")
           (regex #"^/dev/ttys?[0-9]*$")
