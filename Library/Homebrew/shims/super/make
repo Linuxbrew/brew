@@ -1,5 +1,4 @@
 #!/bin/bash
 
-export MAKE=${MAKE:-make}
 export HOMEBREW_CCCFG="O$HOMEBREW_CCCFG"
-exec xcrun $MAKE "$@"
+exec xcrun make "$@"

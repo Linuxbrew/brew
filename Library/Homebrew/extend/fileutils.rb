@@ -111,16 +111,10 @@ module FileUtils
   # path to the actually-installed make on Tiger or older.
   def make(*args)
     if Utils.popen_read("/usr/bin/make", "--version").match(/Make (\d\.\d+)/)[1] > "3.80"
-      make_path = "/usr/bin/make"
+      system "/usr/bin/make", *args
     else
       make = Formula["make"].opt_bin/"make"
       make_path = make.exist? ? make.to_s : (Formula["make"].opt_bin/"gmake").to_s
-    end
-
-    if superenv?
-      make_name = File.basename(make_path)
-      system({ "MAKE" => make_name }, "make", *args)
-    else
       system make_path, *args
     end
   end
