@@ -2,7 +2,7 @@
 
 Some formulae should not go in
 [homebrew/core](https://github.com/Homebrew/homebrew-core). But there are
-additional [Interesting Taps & Forks](Interesting-Taps-&-Forks.md) and anyone can start their
+additional [Interesting Taps and Forks](Interesting-Taps-and-Forks.md) and anyone can start their
 own!
 
 ### Dupes in `homebrew/core`
