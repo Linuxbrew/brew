@@ -1,4 +1,4 @@
-HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty 2>/dev/null)"
+HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty --abbrev=7 2>/dev/null)"
 HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
