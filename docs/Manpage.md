@@ -198,7 +198,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     See the docs for examples of using the JSON output:
     <http://docs.brew.sh/Querying-Brew.html>
 
-  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] `formula` [<`options`> ...]:
+  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] `formula` [`options` ...]:
     Install `formula`.
 
     `formula` is usually the name of the formula to install, but it can be specified
@@ -248,7 +248,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     during installation.
 
     Installation options specific to `formula` may be appended to the command,
-    and can be listed with `brew options <formula>`.
+    and can be listed with `brew options` `formula`.
 
   * `install` `--interactive` [`--git`] `formula`:
     If `--interactive` (or `-i`) is passed, download and patch `formula`, then
