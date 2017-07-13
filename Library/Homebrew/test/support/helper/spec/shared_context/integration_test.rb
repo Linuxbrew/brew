@@ -89,8 +89,14 @@ RSpec.shared_context "integration test" do
       ]
       if ENV["HOMEBREW_TESTS_COVERAGE"]
         simplecov_spec = Gem.loaded_specs["simplecov"]
-        specs = simplecov_spec.runtime_dependencies.flat_map(&:to_specs)
-        specs << simplecov_spec
+        specs = [simplecov_spec]
+        simplecov_spec.runtime_dependencies.each do |dep|
+          begin
+            specs += dep.to_specs
+          rescue Gem::LoadError => e
+            onoe e
+          end
+        end
         libs = specs.flat_map do |spec|
           full_gem_path = spec.full_gem_path
           # full_require_paths isn't available in RubyGems < 2.2.
