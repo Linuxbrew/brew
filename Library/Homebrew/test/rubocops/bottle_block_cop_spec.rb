@@ -18,7 +18,7 @@ describe RuboCop::Cop::FormulaAuditStrict::BottleBlock do
         end
       EOS
 
-      expected_offenses = [{  message: "Use rebuild instead of revision in bottle block",
+      expected_offenses = [{  message: described_class::MSG,
                               severity: :convention,
                               line: 5,
                               column: 4,

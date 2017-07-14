@@ -21,6 +21,9 @@ FormulaAudit/ChecksumCase:
 FormulaAudit/Conflicts:
   Enabled: true
 
+FormulaAudit/Options:
+  Enabled: true
+
 FormulaAuditStrict/BottleBlock:
   Enabled: true
 

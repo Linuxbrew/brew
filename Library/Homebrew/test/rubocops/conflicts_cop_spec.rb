@@ -16,11 +16,7 @@ describe RuboCop::Cop::FormulaAudit::Conflicts do
         end
       EOS
 
-      msg = <<-EOS.undent
-            Versioned formulae should not use `conflicts_with`.
-            Use `keg_only :versioned_formula` instead.
-      EOS
-      expected_offenses = [{  message: msg,
+      expected_offenses = [{  message: described_class::MSG,
                               severity: :convention,
                               line: 3,
                               column: 2,
