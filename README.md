@@ -97,8 +97,7 @@ export INFOPATH="$(brew --prefix)/share/info:$INFOPATH"
 
 ## What Packages Are Available?
 1. Type `brew search` for a list.
-2. Or visit [braumeister.org](http://braumeister.org) to browse packages online.
-3. Or use `brew search --desc <keyword>` to browse packages from the command line.
+2. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
 `brew help`, `man brew` or check [our documentation](https://github.com/Linuxbrew/brew/tree/master/docs#readme).
