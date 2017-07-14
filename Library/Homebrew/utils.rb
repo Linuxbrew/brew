@@ -287,10 +287,9 @@ ensure
 end
 
 def run_as_not_developer(&_block)
-  old = ENV.delete "HOMEBREW_DEVELOPER"
-  yield
-ensure
-  ENV["HOMEBREW_DEVELOPER"] = old
+  with_env "HOMEBREW_DEVELOPER" => nil do
+    yield
+  end
 end
 
 # Kernel.system but with exceptions
