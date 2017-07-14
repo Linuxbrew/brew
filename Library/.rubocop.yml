@@ -24,6 +24,9 @@ FormulaAudit/Conflicts:
 FormulaAudit/Options:
   Enabled: true
 
+FormulaAuditStrict/Options:
+  Enabled: true
+
 FormulaAuditStrict/BottleBlock:
   Enabled: true
 

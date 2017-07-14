@@ -554,23 +554,6 @@ class FormulaAuditor
   end
 
   def audit_options
-    formula.options.each do |o|
-      next unless @strict
-
-      if o.name == "universal"
-        problem "macOS has been 64-bit only since 10.6 so universal options are deprecated."
-      end
-
-      if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal"
-        problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
-      end
-
-      next unless o.name =~ /^with(out)?-(?:checks?|tests)$/
-      unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
-        problem "Use '--with#{Regexp.last_match(1)}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
-      end
-    end
-
     return unless @new_formula
     return if formula.deprecated_options.empty?
     return if formula.versioned_formula?
