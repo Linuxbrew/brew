@@ -11,6 +11,7 @@ First time contributing to Linuxbrew? Read our [Code of Conduct](https://github.
 
 * run `brew update` (twice)
 * run and read `brew doctor`
+* read [the Troubleshooting Checklist](https://github.com/Linuxbrew/brew/blob/master/docs/Troubleshooting.md#troubleshooting)
 * open an issue on the Linuxbrew formula's repository or on Linuxbrew/brew if it's not a formula-specific issue
 
 ### Propose a feature
