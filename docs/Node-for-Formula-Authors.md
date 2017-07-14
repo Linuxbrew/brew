@@ -113,3 +113,7 @@ end
 ```
 
 For examples using the `local_npm_install_args` method look at the  [`elixirscript`](https://github.com/Homebrew/homebrew-core/blob/ec1e40d37e81af63122a354f0101c377f6a4e66d/Formula/elixirscript.rb) or [`kibana`](https://github.com/Homebrew/homebrew-core/blob/c6202f91a129e2f994d904f299a308cc6fbd58e5/Formula/kibana.rb) formulae.
+
+## Tooling
+
+You can use [homebrew-npm-noob](https://github.com/zmwangx/homebrew-npm-noob) to automatically generate a formula like the example above for an npm package.
