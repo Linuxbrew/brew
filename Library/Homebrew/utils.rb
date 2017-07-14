@@ -533,3 +533,27 @@ def migrate_legacy_keg_symlinks_if_necessary
   end
   FileUtils.rm_rf legacy_pinned_kegs
 end
+
+# Calls the given block with the passed environment variables
+# added to ENV, then restores ENV afterwards.
+# Example:
+# with_env "PATH" => "/bin" do
+#   system "echo $PATH"
+# end
+#
+# Note that this method is *not* thread-safe - other threads
+# which happen to be scheduled during the block will also
+# see these environment variables.
+def with_env(hash)
+  old_values = {}
+  begin
+    hash.each do |key, value|
+      old_values[key] = ENV.delete(key)
+      ENV[key] = value
+    end
+
+    yield if block_given?
+  ensure
+    ENV.update(old_values)
+  end
+end

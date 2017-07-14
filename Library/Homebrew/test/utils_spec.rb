@@ -270,4 +270,30 @@ describe "globally-scoped helper methods" do
       }.to raise_error(MethodDeprecatedError, %r{method.*replacement.*homebrew/homebrew-core.*homebrew/core}m)
     end
   end
+
+  describe "#with_env" do
+    it "sets environment variables within the block" do
+      expect(ENV["PATH"]).not_to eq("/bin")
+      with_env "PATH" => "/bin" do
+        expect(ENV["PATH"]).to eq("/bin")
+      end
+    end
+
+    it "restores ENV after the block" do
+      with_env "PATH" => "/bin" do
+        expect(ENV["PATH"]).to eq("/bin")
+      end
+      expect(ENV["PATH"]).not_to eq("/bin")
+    end
+
+    it "restores ENV if an exception is raised" do
+      expect {
+        with_env "PATH" => "/bin" do
+          raise StandardError, "boom"
+        end
+      }.to raise_error(StandardError)
+
+      expect(ENV["PATH"]).not_to eq("/bin")
+    end
+  end
 end
