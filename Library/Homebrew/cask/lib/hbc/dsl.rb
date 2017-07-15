@@ -203,10 +203,6 @@ module Hbc
       @sha256 ||= arg
     end
 
-    def license(*)
-      odeprecated "Hbc::DSL#license"
-    end
-
     # depends_on uses a load method so that multiple stanzas can be merged
     def depends_on(*args)
       @depends_on ||= DSL::DependsOn.new
