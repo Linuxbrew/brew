@@ -103,3 +103,30 @@ describe RuboCop::Cop::FormulaAuditStrict::Options do
     end
   end
 end
+
+describe RuboCop::Cop::NewFormulaAudit::Options do
+  subject(:cop) { described_class.new }
+
+  context "When auditing options for a new formula" do
+    it "with deprecated options" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          deprecated_option "examples" => "with-examples"
+        end
+      EOS
+
+      expected_offenses = [{  message: described_class::MSG,
+                              severity: :convention,
+                              line: 3,
+                              column: 2,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+  end
+end

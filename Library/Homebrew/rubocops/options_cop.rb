@@ -43,5 +43,16 @@ module RuboCop
         end
       end
     end
+
+    module NewFormulaAudit
+      class Options < FormulaCop
+        MSG = "New Formula should not use `deprecated_option`".freeze
+
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          return if versioned_formula?
+          problem MSG if method_called_ever?(body_node, :deprecated_option)
+        end
+      end
+    end
   end
 end
