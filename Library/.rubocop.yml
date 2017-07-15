@@ -28,7 +28,7 @@ FormulaAuditStrict/Options:
   Enabled: true
 
 NewFormulaAudit/Options:
-  Enabled: true
+  Enabled: false
 
 FormulaAuditStrict/BottleBlock:
   Enabled: true
