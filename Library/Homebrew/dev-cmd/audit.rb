@@ -87,10 +87,14 @@ module Homebrew
     if !only_cops.empty?
       options[:only_cops] = only_cops
       ARGV.push("--only=style")
+    elsif new_formula
+      options[:only_cops] = [:FormulaAudit, :FormulaAuditStrict, :NewFormulaAudit]
+    elsif strict
+      options[:only_cops] = [:FormulaAudit, :FormulaAuditStrict]
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif !strict
-      options[:except_cops] = [:FormulaAuditStrict]
+      options[:except_cops] = [:FormulaAuditStrict, :NewFormulaAudit]
     end
 
     # Check style in a single batch run up front for performance
@@ -551,13 +555,6 @@ class FormulaAuditor
 
     return unless reason.end_with?(".")
     problem "keg_only reason should not end with a period."
-  end
-
-  def audit_options
-    return unless @new_formula
-    return if formula.deprecated_options.empty?
-    return if formula.versioned_formula?
-    problem "New formulae should not use `deprecated_option`."
   end
 
   def audit_homepage
