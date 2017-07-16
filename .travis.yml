@@ -4,7 +4,6 @@ cache:
     - $HOME/.gem/ruby
     - $HOME/Library/Caches/Homebrew/style
     - $HOME/Library/Caches/Homebrew/tests
-    - Library/Homebrew/vendor/bundle
 
 matrix:
   include:
