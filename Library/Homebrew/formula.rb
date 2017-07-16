@@ -955,30 +955,27 @@ class Formula
     build = self.build
     self.build = Tab.for_formula(self)
 
-    old_tmpdir = ENV["TMPDIR"]
-    old_temp = ENV["TEMP"]
-    old_tmp = ENV["TMP"]
-    old_path = ENV["HOMEBREW_PATH"]
+    new_env = {
+      "TMPDIR" => HOMEBREW_TEMP,
+      "TEMP" => HOMEBREW_TEMP,
+      "TMP" => HOMEBREW_TEMP,
+      "HOMEBREW_PATH" => nil,
+    }
 
-    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
-    ENV["HOMEBREW_PATH"] = nil
+    with_env(new_env) do
+      ENV.clear_sensitive_environment!
 
-    ENV.clear_sensitive_environment!
+      Pathname.glob("#{bottle_prefix}/{etc,var}/**/*") do |path|
+        path.extend(InstallRenamed)
+        path.cp_path_sub(bottle_prefix, HOMEBREW_PREFIX)
+      end
 
-    Pathname.glob("#{bottle_prefix}/{etc,var}/**/*") do |path|
-      path.extend(InstallRenamed)
-      path.cp_path_sub(bottle_prefix, HOMEBREW_PREFIX)
-    end
-
-    with_logging("post_install") do
-      post_install
+      with_logging("post_install") do
+        post_install
+      end
     end
   ensure
     self.build = build
-    ENV["TMPDIR"] = old_tmpdir
-    ENV["TEMP"] = old_temp
-    ENV["TMP"] = old_tmp
-    ENV["HOMEBREW_PATH"] = old_path
     @prefix_returns_versioned_prefix = false
   end
 
