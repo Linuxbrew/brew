@@ -1,5 +1,6 @@
 require "formula"
 require "caveats"
+require "pathname"
 
 describe Caveats do
   subject { described_class.new(f) }
@@ -37,7 +38,7 @@ describe Caveats do
           end
           plist_options startup: true
         end
-        expect(described_class.new(f).caveats).to include("startup:\n  sudo brew")
+        expect(described_class.new(f).caveats).to include("startup")
       end
 
       it "prints plist login information when f.plist_startup is nil" do
@@ -47,29 +48,53 @@ describe Caveats do
             "plist_test.plist"
           end
         end
-        expect(described_class.new(f).caveats).to include("login:\n  brew")
+        expect(described_class.new(f).caveats).to include("login")
       end
     end
 
     context "when f.keg_only is not nil" do
-      it "tells formula is keg_only and gives information about command to be run when f.bin and f.sbin are directories" do
-        Path = Pathname.new("path")
-        f = formula do
+      let(:f) {
+        formula do
           url "foo-1.0"
           keg_only "some reason"
         end
+      }
+      let(:caveats) { described_class.new(f).caveats }
 
-        allow(f).to receive(:bin).and_return(Path)
-        allow(f.bin).to receive(:directory?).and_return(true)
-
-        allow(f).to receive(:sbin).and_return(Path)
-        allow(f.sbin).to receive(:directory?).and_return(true)
-
-        caveats = described_class.new(f).caveats
-
+      it "tells formula is keg_only" do
         expect(caveats).to include("keg-only")
+      end
+
+      it "gives command to be run when f.bin is a directory" do
+        Pathname.new(f.bin).mkpath
         expect(caveats).to include(f.opt_bin.to_s)
+      end
+
+      it "gives command to be run when f.sbin is a directory" do
+        Pathname.new(f.sbin).mkpath
         expect(caveats).to include(f.opt_sbin.to_s)
+      end
+
+      context "when f.lib or f.include is a directory" do
+        it "gives command to be run when f.lib is a directory" do
+          Pathname.new(f.lib).mkpath
+          expect(caveats).to include("-L#{f.opt_lib}")
+        end
+
+        it "gives command to be run when f.include is a directory" do
+          Pathname.new(f.include).mkpath
+          expect(caveats).to include("-I#{f.opt_include}")
+        end
+
+        it "gives PKG_CONFIG_PATH when f.lib/'pkgconfig' and f.share/'pkgconfig' are directories" do
+          allow_any_instance_of(Object).to receive(:which).with(any_args).and_return(Pathname.new("blah"))
+
+          Pathname.new(f.share/"pkgconfig").mkpath
+          Pathname.new(f.lib/"pkgconfig").mkpath
+
+          expect(caveats).to include("#{f.opt_lib}/pkgconfig")
+          expect(caveats).to include("#{f.opt_share}/pkgconfig")
+        end
       end
     end
   end
