@@ -109,7 +109,7 @@ module Homebrew
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
       args << HOMEBREW_LIBRARY_PATH
     else
-      args << "--config" << HOMEBREW_LIBRARY/".rubocop.yml"
+      args << "--config" << HOMEBREW_LIBRARY/".auditcops.yml"
       args += files
     end
 

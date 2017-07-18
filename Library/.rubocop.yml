@@ -6,47 +6,14 @@ AllCops:
 
 require: ./Homebrew/rubocops.rb
 
-FormulaAudit/Text:
+FormulaAudit:
   Enabled: true
 
-FormulaAudit/Caveats:
+FormulaAuditStrict:
   Enabled: true
 
-FormulaAudit/Checksum:
-  Enabled: true
-
-FormulaAudit/ChecksumCase:
-  Enabled: true
-
-FormulaAudit/Conflicts:
-  Enabled: true
-
-FormulaAudit/Options:
-  Enabled: true
-
-FormulaAuditStrict/Options:
-  Enabled: true
-
-NewFormulaAudit/Options:
-  Enabled: true 
-
-FormulaAuditStrict/BottleBlock:
-  Enabled: true
-
-FormulaAuditStrict/Desc:
-  Enabled: true
-
-FormulaAuditStrict/ComponentsOrder:
-  Enabled: true
-
-FormulaAuditStrict/ComponentsRedundancy:
-  Enabled: true
-
-FormulaAudit/Homepage:
-  Enabled: true
-
-FormulaAudit/LegacyPatches:
-  Enabled: true
+NewFormulaAudit:
+  Enabled: false
 
 # `system` is a special case and aligns on second argument
 Layout/AlignParameters:
