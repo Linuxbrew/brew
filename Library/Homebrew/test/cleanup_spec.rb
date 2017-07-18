@@ -163,5 +163,21 @@ describe Homebrew::Cleanup do
 
       expect(npm_cache).not_to exist
     end
+
+    it "cleans up files and directories with name containing -- if ARGV prune is all" do
+      a = (HOMEBREW_CACHE/"--a")
+      b = (HOMEBREW_CACHE/"b")
+      c = (HOMEBREW_CACHE/"c")
+      a.mkpath
+      b.mkpath
+      FileUtils.touch c
+      allow(ARGV).to receive(:value).with("prune").and_return("all")
+      shutup do
+        described_class.cleanup_cache
+      end
+      expect(a).not_to exist
+      expect(b).to exist
+      expect(c).not_to exist
+    end
   end
 end
