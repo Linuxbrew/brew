@@ -9,12 +9,12 @@ Homebrew provides formulae to brew a more up-to-date Python 2.7.x and 3.x.
 **Important:** If you choose to install a Python which isn't either of these two (system Python or brewed Python), the Homebrew team can only provide limited support.
 
 ## Python 2.x or Python 3.x
-Homebrew provides a formula for Python 2.7.x and one for Python 3.x. They don't conflict, so they can both be installed. The executable `python` will always point to the 2.x and `python3` to the 3.x version.
+Homebrew provides a formula for Python 2.7.x and one for Python 3.x. They don't conflict, so they can both be installed. The executable `python2` will always point to the 2.x and `python3` to the 3.x version. The executable `python` will always point to the macOS system Python.
 
 ([Wondering which one to choose?](https://wiki.python.org/moin/Python2orPython3))
 
 ## Setuptools, Pip, etc.
-The Python formulae install [`pip`](http://www.pip-installer.org) and [Setuptools](https://pypi.python.org/pypi/setuptools).
+The Python formulae install [pip](http://www.pip-installer.org) (as `pip2` or `pip3`) and [Setuptools](https://pypi.python.org/pypi/setuptools).
 
 Setuptools can be updated via pip, without having to re-brew Python:
 
