@@ -102,53 +102,52 @@ class Build
       end
     end
 
-    old_tmpdir = ENV["TMPDIR"]
-    old_temp = ENV["TEMP"]
-    old_tmp = ENV["TMP"]
-    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
+    new_env = {
+      "TMPDIR" => HOMEBREW_TEMP,
+      "TEMP" => HOMEBREW_TEMP,
+      "TMP" => HOMEBREW_TEMP,
+    }
 
-    formula.extend(Debrew::Formula) if ARGV.debug?
+    with_env(new_env) do
+      formula.extend(Debrew::Formula) if ARGV.debug?
 
-    formula.brew do |_formula, staging|
-      staging.retain! if ARGV.keep_tmp?
-      formula.patch
-
-      if ARGV.git?
-        system "git", "init"
-        system "git", "add", "-A"
-      end
-      if ARGV.interactive?
-        ohai "Entering interactive mode"
-        puts "Type `exit' to return and finalize the installation"
-        puts "Install to this prefix: #{formula.prefix}"
+      formula.brew do |_formula, staging|
+        staging.retain! if ARGV.keep_tmp?
+        formula.patch
 
         if ARGV.git?
-          puts "This directory is now a git repo. Make your changes and then use:"
-          puts "  git diff | pbcopy"
-          puts "to copy the diff to the clipboard."
+          system "git", "init"
+          system "git", "add", "-A"
         end
+        if ARGV.interactive?
+          ohai "Entering interactive mode"
+          puts "Type `exit' to return and finalize the installation"
+          puts "Install to this prefix: #{formula.prefix}"
 
-        interactive_shell(formula)
-      else
-        formula.prefix.mkpath
+          if ARGV.git?
+            puts "This directory is now a git repo. Make your changes and then use:"
+            puts "  git diff | pbcopy"
+            puts "to copy the diff to the clipboard."
+          end
 
-        (formula.logs/"00.options.out").write \
-          "#{formula.full_name} #{formula.build.used_options.sort.join(" ")}".strip
-        formula.install
+          interactive_shell(formula)
+        else
+          formula.prefix.mkpath
 
-        stdlibs = detect_stdlibs(ENV.compiler)
-        tab = Tab.create(formula, ENV.compiler, stdlibs.first)
-        tab.write
+          (formula.logs/"00.options.out").write \
+            "#{formula.full_name} #{formula.build.used_options.sort.join(" ")}".strip
+          formula.install
 
-        # Find and link metafiles
-        formula.prefix.install_metafiles formula.buildpath
-        formula.prefix.install_metafiles formula.libexec if formula.libexec.exist?
+          stdlibs = detect_stdlibs(ENV.compiler)
+          tab = Tab.create(formula, ENV.compiler, stdlibs.first)
+          tab.write
+
+          # Find and link metafiles
+          formula.prefix.install_metafiles formula.buildpath
+          formula.prefix.install_metafiles formula.libexec if formula.libexec.exist?
+        end
       end
     end
-  ensure
-    ENV["TMPDIR"] = old_tmpdir
-    ENV["TEMP"] = old_temp
-    ENV["TMP"] = old_tmp
   end
 
   def detect_stdlibs(compiler)
