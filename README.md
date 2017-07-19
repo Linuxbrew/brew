@@ -54,6 +54,7 @@ Dependencies
 * **Ruby** 1.8.6 or newer
 + **GCC** 4.4 or newer
 + **Linux** 2.6.16 or newer
++ **Git** 1.8.5 or newer
 + **64-bit x86** or **32-bit ARM** (Raspberry Pi)
 
 Paste at a Terminal prompt:
