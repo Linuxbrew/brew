@@ -111,7 +111,7 @@ html {
   margin: 0;
   padding: 0;
   font-size: 62.5%;
-  font-family: "-apple-system", "BlinkMacSystemFont", "Helvetica Neue", "Roboto", "sans-serif";
+  font-family: "-apple-system", "BlinkMacSystemFont", "Helvetica Neue", "Roboto", sans-serif;
   height: 100%;
 }
 
@@ -176,7 +176,7 @@ pre {
   @include border-radius(0.4em);
   overflow-x: auto;
   code {
-    font-family: "Monaco", "Menlo", "monospace";
+    font-family: "Monaco", "Menlo", monospace;
     font-size: 11px;
     line-height: 1.6;
   }
