@@ -99,7 +99,7 @@ module Homebrew
       end
 
       def check_build_from_source
-        return if !ENV.has_key?("HOMEBREW_BUILD_FROM_SOURCE")
+        return unless ENV.key?("HOMEBREW_BUILD_FROM_SOURCE")
 
         <<-EOS.undent
           You have HOMEBREW_BUILD_FROM_SOURCE set. This environment variable is
