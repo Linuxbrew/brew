@@ -18,11 +18,11 @@ class PythonRequirement < Requirement
 
     if !system_python? && short_version == Version.create("2.7")
       ENV.prepend_path "PATH", which_python.dirname
-    # Homebrew Python should take precedence over older Pythons in the PATH
-    elsif short_version != Version.create("2.7")
-      ENV.prepend_path "PATH", Formula["python"].opt_bin
-      ENV.prepend_path "PATH", Formula["python"].opt_libexec/"bin"
     end
+
+    # Homebrew Python should take precedence over other Pythons in the PATH
+    ENV.prepend_path "PATH", Formula["python"].opt_bin
+    ENV.prepend_path "PATH", Formula["python"].opt_libexec/"bin"
 
     ENV["PYTHONPATH"] = "#{HOMEBREW_PREFIX}/lib/python#{short_version}/site-packages"
   end
