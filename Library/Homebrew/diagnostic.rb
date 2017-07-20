@@ -98,6 +98,17 @@ module Homebrew
         EOS
       end
 
+      def check_build_from_source
+        return if !ENV.has_key?("HOMEBREW_BUILD_FROM_SOURCE")
+
+        <<-EOS.undent
+          You have HOMEBREW_BUILD_FROM_SOURCE set. This environment variable is
+          intended for use by Homebrew developers. If you are encountering errors,
+          please try unsetting this. Please do not file issues if you encounter
+          errors when using this environment variable.
+        EOS
+      end
+
       # See https://github.com/Homebrew/legacy-homebrew/pull/9986
       def check_path_for_trailing_slashes
         bad_paths = PATH.new(ENV["HOMEBREW_PATH"]).select { |p| p.end_with?("/") }
