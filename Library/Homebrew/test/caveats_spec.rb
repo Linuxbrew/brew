@@ -1,6 +1,5 @@
 require "formula"
 require "caveats"
-require "pathname"
 
 describe Caveats do
   subject { described_class.new(f) }
@@ -49,6 +48,81 @@ describe Caveats do
           end
         end
         expect(described_class.new(f).caveats).to include("login")
+      end
+
+      it "gives information about restarting services after upgrade" do
+        f = formula do
+          url "foo-1.0"
+          def plist
+            "plist_test.plist"
+          end
+          plist_options startup: true
+        end
+        f_obj = described_class.new(f)
+        plist_path = Pathname.new("plist")
+        FileUtils.touch plist_path
+        allow(f_obj).to receive(:plist_path).and_return(plist_path)
+        allow(plist_path).to receive(:symlink?).and_return(true)
+        expect(f_obj.caveats).to include("restart #{f.full_name}")
+        expect(f_obj.caveats).to include("sudo")
+      end
+
+      context "when plist_path is not a file nor symlinked and plist_startup is false" do
+        let(:f) {
+          formula do
+            url "foo-1.0"
+            def plist
+              "plist_test.plist"
+            end
+          end
+        }
+        let(:f_obj) { described_class.new(f) }
+        let(:caveats) { f_obj.caveats }
+        let(:plist_path) { Pathname.new("plist") }
+
+        before do
+          FileUtils.touch plist_path
+          allow(f_obj).to receive(:plist_path).and_return(plist_path)
+          allow(plist_path).to receive(:symlink?).and_return(true)
+        end
+
+        it "tells command to run after upgrade" do
+          allow(Kernel).to receive(:system).with(any_args).and_return(true)
+          expect(caveats).to include("restart #{f.full_name} after an upgrade")
+        end
+
+        it "tells command to run to start formula" do
+          expect(caveats).to include("To start #{f.full_name}:")
+        end
+      end
+
+      it "gives information about plist_manual" do
+        f = formula do
+          url "foo-1.0"
+          def plist
+            "plist_test.plist"
+          end
+          plist_options manual: "foo"
+        end
+        caveats = described_class.new(f).caveats
+
+        expect(caveats).to include("background service")
+        expect(caveats).to include(f.plist_manual)
+      end
+
+      it "warns about brew failing under tmux" do
+        f = formula do
+          url "foo-1.0"
+          def plist
+            "plist_test.plist"
+          end
+        end
+        allow(ENV).to receive(:[]).with("TMUX").and_return(true)
+        allow(Homebrew).to receive(:_system).with("/usr/bin/pbpaste").and_return(false)
+        caveats = described_class.new(f).caveats
+
+        expect(caveats).to include("WARNING:")
+        expect(caveats).to include("tmux")
       end
     end
 
@@ -125,54 +199,6 @@ describe Caveats do
       it "gives dir where fish completions have been installed" do
         (path/"share/fish/vendor_completions.d").mkpath
         expect(caveats).to include(HOMEBREW_PREFIX/"share/fish/vendor_completions.d")
-      end
-    end
-
-    context "when plist_caveats are given" do
-      it "gives information about plist_manual" do
-        f = formula do
-          url "foo-1.0"
-          def plist
-            "plist_test.plist"
-          end
-          plist_options manual: "foo"
-        end
-        caveats = described_class.new(f).caveats
-
-        expect(caveats).to include("background service")
-        expect(caveats).to include(f.plist_manual)
-      end
-
-      it "warns about brew failing under tmux" do
-        f = formula do
-          url "foo-1.0"
-          def plist
-            "plist_test.plist"
-          end
-        end
-        allow(ENV).to receive(:[]).with("TMUX").and_return(true)
-        allow(Homebrew).to receive(:_system).with("/usr/bin/pbpaste").and_return(false)
-        caveats = described_class.new(f).caveats
-
-        expect(caveats).to include("WARNING:")
-        expect(caveats).to include("tmux")
-      end
-
-      it "gives information about restarting services after upgrade" do
-        f = formula do
-          url "foo-1.0"
-          def plist
-            "plist_test.plist"
-          end
-          plist_options startup: true
-        end
-        f_obj = described_class.new(f)
-        plist_path = Pathname.new("plist")
-        FileUtils.touch plist_path
-        allow(f_obj).to receive(:plist_complete_path).and_return(plist_path)
-        allow(plist_path).to receive(:symlink?).and_return(true)
-        expect(f_obj.caveats).to include("restart #{f.full_name}")
-        expect(f_obj.caveats).to include("sudo")
       end
     end
   end
