@@ -89,15 +89,12 @@ following conditions:
 will use a bottled version of the formula, but
 `brew install <formula> --enable-bar` will trigger a source build.
 * The `--build-from-source` option is invoked.
-* The environment variable `HOMEBREW_BUILD_FROM_SOURCE` is set.
+* The environment variable `HOMEBREW_BUILD_FROM_SOURCE` is set
+(intended for developers only).
 * The machine is not running a supported version of macOS as all
 bottled builds are generated only for supported macOS versions.
 * Homebrew is installed to a prefix other than the standard
 `/usr/local` (although some bottles support this).
-
-In order to completely disable bottled builds, simply add a value for
-the environment variable `HOMEBREW_BUILD_FROM_SOURCE` to
-your profile.
 
 We aim to bottle everything.
 
