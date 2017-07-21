@@ -77,7 +77,14 @@ class SystemConfig
     end
 
     def describe_python
-      python = which "python"
+      python = begin
+        python_path = PATH.new(ENV["HOMEBREW_PATH"])
+                          .prepend(Formula["python"].opt_libexec/"bin")
+        which "python", python_path
+      rescue FormulaUnavailableError
+        which "python"
+      end
+
       return "N/A" if python.nil?
       python_binary = Utils.popen_read python, "-c", "import sys; sys.stdout.write(sys.executable)"
       python_binary = Pathname.new(python_binary).realpath
