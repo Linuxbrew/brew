@@ -47,7 +47,9 @@ module Homebrew
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif only_cops.empty? && except_cops.empty?
-      options[:except_cops] = %w[FormulaAuditStrict FormulaAudit]
+      options[:except_cops] = %w[FormulaAudit
+                                 FormulaAuditStrict
+                                 NewFormulaAudit]
     end
 
     Homebrew.failed = check_style_and_print(target, options)
@@ -107,7 +109,7 @@ module Homebrew
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
       args << HOMEBREW_LIBRARY_PATH
     else
-      args << "--config" << HOMEBREW_LIBRARY/".rubocop.yml"
+      args << "--config" << HOMEBREW_LIBRARY/".auditcops.yml"
       args += files
     end
 
