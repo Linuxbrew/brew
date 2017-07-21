@@ -863,6 +863,7 @@ class FormulaInstaller
     tab.source["path"] = formula.specified_path.to_s
     tab.installed_as_dependency = installed_as_dependency
     tab.installed_on_request = installed_on_request
+    tab.aliases = formula.aliases
     tab.write
   end
 
