@@ -453,6 +453,17 @@ describe Version do
         .to be_detected_from("https://example.com/dada-v2017-04-17.tar.gz")
     end
 
+    specify "devel spec version style" do
+      expect(Version.create("1.3.0-beta.1"))
+        .to be_detected_from("https://registry.npmjs.org/@angular/cli/-/cli-1.3.0-beta.1.tgz")
+      expect(Version.create("2.074.0-beta1"))
+        .to be_detected_from("https://github.com/dlang/dmd/archive/v2.074.0-beta1.tar.gz")
+      expect(Version.create("2.074.0-rc1"))
+        .to be_detected_from("https://github.com/dlang/dmd/archive/v2.074.0-rc1.tar.gz")
+      expect(Version.create("5.0.0-alpha10"))
+        .to be_detected_from("https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-src.zip")
+    end
+
     specify "jenkins version style" do
       expect(Version.create("1.486"))
         .to be_detected_from("http://mirrors.jenkins-ci.org/war/1.486/jenkins.war")
@@ -479,6 +490,12 @@ describe Version do
     specify "dash version style" do
       expect(Version.create("3.4"))
         .to be_detected_from("http://www.antlr.org/download/antlr-3.4-complete.jar")
+      expect(Version.create("9.2"))
+        .to be_detected_from("https://cdn.nuxeo.com/nuxeo-9.2/nuxeo-server-9.2-tomcat.zip")
+      expect(Version.create("0.181"))
+        .to be_detected_from("https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-cli/0.181/presto-cli-0.181-executable.jar")
+      expect(Version.create("1.2.3"))
+        .to be_detected_from("https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/1.2.3/orc-tools-1.2.3-uber.jar")
     end
 
     specify "apache version style" do
