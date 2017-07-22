@@ -118,9 +118,12 @@ class LinkageChecker
   # Whether or not dylib is a harmless broken link, meaning that it's
   # okay to skip (and not report) as broken.
   def harmless_broken_link?(dylib)
-    # libgcc_s_ppc64 is referenced by programs that use the Java Service Wrapper,
+    # libgcc_s_* is referenced by programs that use the Java Service Wrapper,
     # and is harmless on x86(_64) machines
-    ["/usr/lib/libgcc_s_ppc64.1.dylib"].include?(dylib)
+    [
+      "/usr/lib/libgcc_s_ppc64.1.dylib",
+      "/opt/local/lib/libgcc/libgcc_s.1.dylib",
+    ].include?(dylib)
   end
 
   # Display a list of things.
