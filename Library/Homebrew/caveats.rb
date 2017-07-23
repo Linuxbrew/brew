@@ -196,7 +196,7 @@ class Caveats
         s << "  #{f.plist_manual}"
       end
 
-      # pbpaste pastes the system clipboard tool on macOS and fails with `tmux` by default
+      # pbpaste is the system clipboard tool on macOS and fails with `tmux` by default
       # check if this is being run under `tmux` to avoid failing
       if ENV["TMUX"] && !quiet_system("/usr/bin/pbpaste")
         s << "" << "WARNING: brew services will fail when run under tmux."

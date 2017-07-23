@@ -28,7 +28,7 @@ describe Caveats do
   end
 
   describe "#caveats" do
-    context "when f.plist is not nil" do
+    context "when f.plist is not nil", :needs_macos do
       it "prints plist startup information when f.plist_startup is not nil" do
         f = formula do
           url "foo-1.0"
@@ -199,6 +199,46 @@ describe Caveats do
       it "gives dir where fish completions have been installed" do
         (path/"share/fish/vendor_completions.d").mkpath
         expect(caveats).to include(HOMEBREW_PREFIX/"share/fish/vendor_completions.d")
+      end
+    end
+
+    context "python caveats" do
+      before do
+        (f.prefix.resolved_path/"lib/python2.7/site-packages").mkpath
+      end
+
+      context "when f is not keg_only" do
+        let(:f) {
+          formula do
+            url "foo-1.0"
+          end
+        }
+        let(:caveats) { described_class.new(f).caveats }
+        let(:user_site_packages) { Language::Python.user_site_packages("python") }
+
+        it "give commands to run when Homebrew's site-packages is not in Python sys.path" do
+          expect(caveats).to include("Homebrew's site-packages is not\nin your Python sys.path")
+          expect(caveats).to include(user_site_packages)
+          expect(caveats).to include("import site")
+        end
+
+        it "gives commands to run when python pth files are installed" do
+          allow(Homebrew).to receive(:_system).and_return(true)
+          allow(Dir).to receive(:[]).with(any_args).and_return(["blah.pth"])
+          expect(caveats).to include(".pth files to Homebrew's site-packages and your\nPython isn't configured")
+          expect(caveats).to include(user_site_packages)
+          expect(caveats).to include("import site")
+        end
+      end
+
+      it "gives commands to run when formula is keg_only" do
+        f = formula do
+          url "foo-1.0"
+          keg_only "some reason"
+        end
+        caveats = described_class.new(f).caveats
+        homebrew_site_packages = Language::Python.homebrew_site_packages
+        expect(caveats).to include("echo #{f.opt_prefix}/lib/python2.7/site-packages >> #{homebrew_site_packages/f.name}.pth")
       end
     end
   end
