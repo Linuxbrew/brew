@@ -46,6 +46,11 @@ module Hbc
       end
 
       def self.render_results(exact_match, partial_matches, remote_matches, search_term)
+        unless $stdout.tty?
+          puts [*exact_match, *partial_matches, *remote_matches]
+          return
+        end
+
         if !exact_match && partial_matches.empty?
           puts "No Cask found for \"#{search_term}\"."
           return
