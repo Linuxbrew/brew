@@ -1,7 +1,7 @@
 title: Linuxbrew
 description: The Homebrew package manager for Linux
 google_analytics: UA-2437900-5
-show_downloads: true
+show_downloads: false
 theme: jekyll-theme-cayman
 
 gems:
