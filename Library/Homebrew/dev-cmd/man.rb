@@ -63,12 +63,8 @@ module Homebrew
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
     variables[:developer_commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
     readme = HOMEBREW_REPOSITORY/"README.md"
-    variables[:lead_maintainer] = readme.read[/(Homebrew's lead maintainer .*\.)/, 1]
-                                        .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:maintainers] = readme.read[/(Homebrew's current maintainers .*\.)/, 1]
+    variables[:maintainers] = readme.read[/(Linuxbrew is maintained by .*\.)/, 1]
                                     .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
-                                           .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
     ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end
