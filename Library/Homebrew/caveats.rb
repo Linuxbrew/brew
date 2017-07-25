@@ -164,20 +164,7 @@ class Caveats
   def plist_caveats
     s = []
     if f.plist || (keg && keg.plist_installed?)
-      destination = if f.plist_startup
-        "/Library/LaunchDaemons"
-      else
-        "~/Library/LaunchAgents"
-      end
-
-      plist_filename = if f.plist
-        f.plist_path.basename
-      else
-        File.basename Dir["#{keg}/*.plist"].first
-      end
       plist_domain = f.plist_path.basename(".plist")
-      destination_path = Pathname.new File.expand_path destination
-      plist_path = destination_path/plist_filename
 
       # we readlink because this path probably doesn't exist since caveats
       # occurs before the link step of installation
@@ -209,10 +196,29 @@ class Caveats
         s << "  #{f.plist_manual}"
       end
 
+      # pbpaste is the system clipboard tool on macOS and fails with `tmux` by default
+      # check if this is being run under `tmux` to avoid failing
       if ENV["TMUX"] && !quiet_system("/usr/bin/pbpaste")
         s << "" << "WARNING: brew services will fail when run under tmux."
       end
     end
     s.join("\n") + "\n" unless s.empty?
+  end
+
+  def plist_path
+    destination = if f.plist_startup
+      "/Library/LaunchDaemons"
+    else
+      "~/Library/LaunchAgents"
+    end
+
+    plist_filename = if f.plist
+      f.plist_path.basename
+    else
+      File.basename Dir["#{keg}/*.plist"].first
+    end
+    destination_path = Pathname.new(File.expand_path(destination))
+
+    destination_path/plist_filename
   end
 end
