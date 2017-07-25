@@ -1282,56 +1282,7 @@ class ResourceAuditor
   end
 
   def audit_urls
-    # Check GNU urls; doesn't apply to mirrors
-    if url =~ %r{^(?:https?|ftp)://ftpmirror.gnu.org/(.*)}
-      problem "Please use \"https://ftp.gnu.org/gnu/#{Regexp.last_match(1)}\" instead of #{url}."
-    end
-
-    # Fossies upstream requests they aren't used as primary URLs
-    # https://github.com/Homebrew/homebrew-core/issues/14486#issuecomment-307753234
-    if url =~ %r{^https?://fossies\.org/}
-      problem "Please don't use fossies.org in the url (using as a mirror is fine)"
-    end
-
-    if mirrors.include?(url)
-      problem "URL should not be duplicated as a mirror: #{url}"
-    end
-
     urls = [url] + mirrors
-
-    # Check a variety of SSL/TLS URLs that don't consistently auto-redirect
-    # or are overly common errors that need to be reduced & fixed over time.
-    urls.each do |p|
-      case p
-      when %r{^http://ftp\.gnu\.org/},
-           %r{^http://ftpmirror\.gnu\.org/},
-           %r{^http://download\.savannah\.gnu\.org/},
-           %r{^http://download-mirror\.savannah\.gnu\.org/},
-           %r{^http://[^/]*\.apache\.org/},
-           %r{^http://code\.google\.com/},
-           %r{^http://fossies\.org/},
-           %r{^http://mirrors\.kernel\.org/},
-           %r{^http://(?:[^/]*\.)?bintray\.com/},
-           %r{^http://tools\.ietf\.org/},
-           %r{^http://launchpad\.net/},
-           %r{^http://github\.com/},
-           %r{^http://bitbucket\.org/},
-           %r{^http://anonscm\.debian\.org/},
-           %r{^http://cpan\.metacpan\.org/},
-           %r{^http://hackage\.haskell\.org/},
-           %r{^http://(?:[^/]*\.)?archive\.org},
-           %r{^http://(?:[^/]*\.)?freedesktop\.org},
-           %r{^http://(?:[^/]*\.)?mirrorservice\.org/}
-        problem "Please use https:// for #{p}"
-      when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
-        problem "#{p} should be `https://cpan.metacpan.org/#{Regexp.last_match(1)}`"
-      when %r{^(http|ftp)://ftp\.gnome\.org/pub/gnome/(.*)}i
-        problem "#{p} should be `https://download.gnome.org/#{Regexp.last_match(2)}`"
-      when %r{^git://anonscm\.debian\.org/users/(.*)}i
-        problem "#{p} should be `https://anonscm.debian.org/git/users/#{Regexp.last_match(1)}`"
-      end
-    end
-
     # Prefer HTTP/S when possible over FTP protocol due to possible firewalls.
     urls.each do |p|
       case p
