@@ -11,7 +11,7 @@ but the command isn't limited to any one location.
 
 ```sh
 $ brew tap
-homebrew/core
+homebrew/bundle
 mistydemeo/tigerbrew
 edavis/emacs
 ```
