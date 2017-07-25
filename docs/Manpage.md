@@ -1067,11 +1067,7 @@ Homebrew Documentation: <https://github.com/Homebrew/brew/blob/master/docs/>
 
 ## AUTHORS
 
-Homebrew's lead maintainer is Mike McQuaid.
-
-Homebrew's current maintainers are Alyssa Ross, Andrew Janke, Alex Dunn, FX Coudert, ilovezfs, Josh Hagins, JCount, Misty De Meo, neutric, Tomasz Pajor, Markus Reiter, Tim Smith, Tom Schoonjans, Uladzislau Shablinski and William Woodruff.
-
-Former maintainers with significant contributions include Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg and Homebrew's creator: Max Howell.
+Linuxbrew is maintained by Shaun Jackman, Bob W. Hogg, Piotr Gaczkowski, Maxim Belkin, Jonathan Chang, and Michka Popoff.
 
 ## BUGS
 
