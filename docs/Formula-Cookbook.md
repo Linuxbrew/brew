@@ -124,8 +124,6 @@ to locate our OpenSSL. You can see this mechanism in the
 formula. Usually this is unnecessary because Homebrew sets up our [build environment](https://github.com/Homebrew/brew/blob/fb3bec8d70d375a97554d4c3fed82ad2332b2191/Library/Homebrew/extend/ENV/super.rb)
 to favour finding `keg_only` formulae first.
 
-Homebrew maintains a special [tap that provides other useful system duplicates](https://github.com/Homebrew/homebrew-dupes).
-
 *Important:* `$(brew --prefix)/bin` is NOT on the `PATH` during formula installation. If you have dependencies at build time, you must specify them and `brew` will add them to the `PATH` or create a [`Requirement`](http://www.rubydoc.info/github/Homebrew/brew/master/Requirement).
 
 ### Specifying other formulae as dependencies
