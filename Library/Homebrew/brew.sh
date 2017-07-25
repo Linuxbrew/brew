@@ -110,21 +110,31 @@ then
   then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
   fi
+
+  if [[ -z "$HOMEBREW_CACHE" ]]
+  then
+    HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
+  fi
 else
   HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
+
+  if [[ -z "$HOMEBREW_CACHE" ]]
+  then
+    if [[ -n "$XDG_CACHE_HOME" ]]
+    then
+      HOMEBREW_CACHE="$XDG_CACHE_HOME/Homebrew"
+    else
+      HOMEBREW_CACHE="$HOME/.cache/Homebrew"
+    fi
+  fi
 fi
 HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_USER_AGENT_VERSION)"
 HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | /usr/bin/awk '{print $1"/"$2}')"
 HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
-
-if [[ -z "$HOMEBREW_CACHE" ]]
-then
-  HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
-fi
 
 # Declared in bin/brew
 export HOMEBREW_BREW_FILE
