@@ -26,25 +26,19 @@ describe Language::Node do
     npm_pack_cmd = "npm pack --ignore-scripts"
 
     it "raises error with non zero exitstatus" do
-      allow(Utils).to receive(:popen_read).with(npm_pack_cmd).and_return("error msg")
-      allow_any_instance_of(Process::Status).to receive(:exitstatus).and_return(42)
-      allow_any_instance_of(nil::NilClass).to receive(:exitstatus).and_return(42)
+      allow(Utils).to receive(:popen_read).with(npm_pack_cmd) { `false` }
       expect { subject.std_npm_install_args(npm_install_arg) }.to \
         raise_error("npm failed to pack #{Dir.pwd}")
     end
 
     it "raises error with empty npm pack output" do
-      allow(Utils).to receive(:popen_read).with(npm_pack_cmd).and_return("")
-      allow_any_instance_of(Process::Status).to receive(:exitstatus).and_return(0)
-      allow_any_instance_of(nil::NilClass).to receive(:exitstatus).and_return(0)
+      allow(Utils).to receive(:popen_read).with(npm_pack_cmd) { `true` }
       expect { subject.std_npm_install_args(npm_install_arg) }.to \
         raise_error("npm failed to pack #{Dir.pwd}")
     end
 
     it "does not raise error with a zero exitstatus" do
-      allow(Utils).to receive(:popen_read).with(npm_pack_cmd).and_return("pack.tgz")
-      allow_any_instance_of(Process::Status).to receive(:exitstatus).and_return(0)
-      allow_any_instance_of(nil::NilClass).to receive(:exitstatus).and_return(0)
+      allow(Utils).to receive(:popen_read).with(npm_pack_cmd) { `echo pack.tgz` }
       resp = subject.std_npm_install_args(npm_install_arg)
       expect(resp).to include("--prefix=#{npm_install_arg}", "#{Dir.pwd}/pack.tgz")
     end

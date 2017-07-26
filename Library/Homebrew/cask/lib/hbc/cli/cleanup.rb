@@ -79,9 +79,8 @@ module Hbc
           begin
             LockFile.new(item.basename).with_lock do
               puts item
-              item_size = File.size?(item)
-              cleanup_size += item_size unless item_size.nil?
-              item.unlink
+              cleanup_size += File.size(item)
+              item.rmtree
             end
           rescue OperationInProgressError
             puts "skipping: #{item} is locked"

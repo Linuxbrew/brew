@@ -87,10 +87,14 @@ module Homebrew
     if !only_cops.empty?
       options[:only_cops] = only_cops
       ARGV.push("--only=style")
+    elsif new_formula
+      options[:only_cops] = [:FormulaAudit, :FormulaAuditStrict, :NewFormulaAudit]
+    elsif strict
+      options[:only_cops] = [:FormulaAudit, :FormulaAuditStrict]
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif !strict
-      options[:except_cops] = [:FormulaAuditStrict]
+      options[:except_cops] = [:FormulaAuditStrict, :NewFormulaAudit]
     end
 
     # Check style in a single batch run up front for performance
@@ -309,7 +313,7 @@ class FormulaAuditor
         unversioned_name = unversioned_formula.basename(".rb")
         problem "#{formula} is versioned but no #{unversioned_name} formula exists"
       end
-    elsif ARGV.build_stable? &&
+    elsif ARGV.build_stable? && formula.stable? &&
           !(versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]).empty?
       versioned_aliases = formula.aliases.grep(/.@\d/)
       _, last_alias_version =
@@ -519,15 +523,6 @@ class FormulaAuditor
         problem "Ambiguous conflicting formula #{c.name.inspect}."
       end
     end
-
-    versioned_conflicts_whitelist = %w[node@ bash-completion@].freeze
-
-    return unless formula.conflicts.any? && formula.versioned_formula?
-    return if formula.name.start_with?(*versioned_conflicts_whitelist)
-    problem <<-EOS
-      Versioned formulae should not use `conflicts_with`.
-      Use `keg_only :versioned_formula` instead.
-    EOS
   end
 
   def audit_keg_only_style
@@ -560,34 +555,6 @@ class FormulaAuditor
 
     return unless reason.end_with?(".")
     problem "keg_only reason should not end with a period."
-  end
-
-  def audit_options
-    formula.options.each do |o|
-      if o.name == "32-bit"
-        problem "macOS has been 64-bit only since 10.6 so 32-bit options are deprecated."
-      end
-
-      next unless @strict
-
-      if o.name == "universal"
-        problem "macOS has been 64-bit only since 10.6 so universal options are deprecated."
-      end
-
-      if o.name !~ /with(out)?-/ && o.name != "c++11" && o.name != "universal"
-        problem "Options should begin with with/without. Migrate '--#{o.name}' with `deprecated_option`."
-      end
-
-      next unless o.name =~ /^with(out)?-(?:checks?|tests)$/
-      unless formula.deps.any? { |d| d.name == "check" && (d.optional? || d.recommended?) }
-        problem "Use '--with#{Regexp.last_match(1)}-test' instead of '--#{o.name}'. Migrate '--#{o.name}' with `deprecated_option`."
-      end
-    end
-
-    return unless @new_formula
-    return if formula.deprecated_options.empty?
-    return if formula.versioned_formula?
-    problem "New formulae should not use `deprecated_option`."
   end
 
   def audit_homepage
@@ -1315,56 +1282,7 @@ class ResourceAuditor
   end
 
   def audit_urls
-    # Check GNU urls; doesn't apply to mirrors
-    if url =~ %r{^(?:https?|ftp)://ftpmirror.gnu.org/(.*)}
-      problem "Please use \"https://ftp.gnu.org/gnu/#{Regexp.last_match(1)}\" instead of #{url}."
-    end
-
-    # Fossies upstream requests they aren't used as primary URLs
-    # https://github.com/Homebrew/homebrew-core/issues/14486#issuecomment-307753234
-    if url =~ %r{^https?://fossies\.org/}
-      problem "Please don't use fossies.org in the url (using as a mirror is fine)"
-    end
-
-    if mirrors.include?(url)
-      problem "URL should not be duplicated as a mirror: #{url}"
-    end
-
     urls = [url] + mirrors
-
-    # Check a variety of SSL/TLS URLs that don't consistently auto-redirect
-    # or are overly common errors that need to be reduced & fixed over time.
-    urls.each do |p|
-      case p
-      when %r{^http://ftp\.gnu\.org/},
-           %r{^http://ftpmirror\.gnu\.org/},
-           %r{^http://download\.savannah\.gnu\.org/},
-           %r{^http://download-mirror\.savannah\.gnu\.org/},
-           %r{^http://[^/]*\.apache\.org/},
-           %r{^http://code\.google\.com/},
-           %r{^http://fossies\.org/},
-           %r{^http://mirrors\.kernel\.org/},
-           %r{^http://(?:[^/]*\.)?bintray\.com/},
-           %r{^http://tools\.ietf\.org/},
-           %r{^http://launchpad\.net/},
-           %r{^http://github\.com/},
-           %r{^http://bitbucket\.org/},
-           %r{^http://anonscm\.debian\.org/},
-           %r{^http://cpan\.metacpan\.org/},
-           %r{^http://hackage\.haskell\.org/},
-           %r{^http://(?:[^/]*\.)?archive\.org},
-           %r{^http://(?:[^/]*\.)?freedesktop\.org},
-           %r{^http://(?:[^/]*\.)?mirrorservice\.org/}
-        problem "Please use https:// for #{p}"
-      when %r{^http://search\.mcpan\.org/CPAN/(.*)}i
-        problem "#{p} should be `https://cpan.metacpan.org/#{Regexp.last_match(1)}`"
-      when %r{^(http|ftp)://ftp\.gnome\.org/pub/gnome/(.*)}i
-        problem "#{p} should be `https://download.gnome.org/#{Regexp.last_match(2)}`"
-      when %r{^git://anonscm\.debian\.org/users/(.*)}i
-        problem "#{p} should be `https://anonscm.debian.org/git/users/#{Regexp.last_match(1)}`"
-      end
-    end
-
     # Prefer HTTP/S when possible over FTP protocol due to possible firewalls.
     urls.each do |p|
       case p

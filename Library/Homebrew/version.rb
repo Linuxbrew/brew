@@ -406,12 +406,29 @@ class Version
     m = /[-_](\d+\.\d+(?:\.\d+)?(?:-\d+)?)[-_.](?:i[36]86|x86|x64(?:[-_](?:32|64))?)$/.match(stem)
     return m.captures.first unless m.nil?
 
+    # devel spec
+    # e.g. https://registry.npmjs.org/@angular/cli/-/cli-1.3.0-beta.1.tgz
+    # e.g. https://github.com/dlang/dmd/archive/v2.074.0-beta1.tar.gz
+    # e.g. https://github.com/dlang/dmd/archive/v2.074.0-rc1.tar.gz
+    # e.g. https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-src.zip
+    m = /[-.vV]?((?:\d+\.)+\d+[-_.]?(?i:alpha|beta|pre|rc)\.?\d{,2})/.match(stem)
+    return m.captures.first unless m.nil?
+
     # e.g. foobar4.5.1
     m = /((?:\d+\.)*\d+)$/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. foobar-4.5.0-bin
     m = /-((?:\d+\.)+\d+[abc]?)[-._](?:bin|dist|stable|src|sources?)$/.match(stem)
+    return m.captures.first unless m.nil?
+
+    # dash version style
+    # e.g. http://www.antlr.org/download/antlr-3.4-complete.jar
+    # e.g. https://cdn.nuxeo.com/nuxeo-9.2/nuxeo-server-9.2-tomcat.zip
+    # e.g. https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-cli/0.181/presto-cli-0.181-executable.jar
+    # e.g. https://search.maven.org/remotecontent?filepath=org/fusesource/fuse-extra/fusemq-apollo-mqtt/1.3/fusemq-apollo-mqtt-1.3-uber.jar
+    # e.g. https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/1.2.3/orc-tools-1.2.3-uber.jar
+    m = /-((?:\d+\.)+\d+)-/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. dash_0.5.5.1.orig.tar.gz (Debian style)
