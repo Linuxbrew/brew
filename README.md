@@ -9,12 +9,12 @@ Features, usage and installation instructions are [summarised on the homepage](h
 3. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
-`brew help`, `man brew` or check [our documentation](http://docs.brew.sh/).
+`brew help`, `man brew` or check [our documentation](https://docs.brew.sh/).
 
 ## Troubleshooting
 First, please run `brew update` and `brew doctor`.
 
-Second, read the [Troubleshooting Checklist](http://docs.brew.sh/Troubleshooting.html).
+Second, read the [Troubleshooting Checklist](https://docs.brew.sh/Troubleshooting.html).
 
 **If you don't read these it will take us far longer to help you with your problem.**
 
@@ -26,7 +26,7 @@ We'd love you to contribute to Homebrew. First, please read our [Contribution Gu
 
 We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
 
-A good starting point for contributing is running `brew audit --strict` with some of the packages you use (e.g. `brew audit --strict wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit --strict` shows no results and [submit a pull request](http://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request.html). If no formulae you use have warnings you can run `brew audit --strict` without arguments to have it run on all packages and pick one. Good luck!
+A good starting point for contributing is running `brew audit --strict` with some of the packages you use (e.g. `brew audit --strict wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit --strict` shows no results and [submit a pull request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request.html). If no formulae you use have warnings you can run `brew audit --strict` without arguments to have it run on all packages and pick one. Good luck!
 
 ## Security
 Please report security issues to our [HackerOne](https://hackerone.com/homebrew/).
