@@ -1,12 +1,14 @@
+require "rbconfig"
+
 module OS
   def self.mac?
     return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
-    RUBY_PLATFORM.to_s.downcase.include? "darwin"
+    RbConfig::CONFIG["host_os"].include? "darwin"
   end
 
   def self.linux?
     return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
-    RUBY_PLATFORM.to_s.downcase.include? "linux"
+    RbConfig::CONFIG["host_os"].include? "linux"
   end
 
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
