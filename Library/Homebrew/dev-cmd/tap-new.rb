@@ -39,7 +39,7 @@ module Homebrew
       ```
 
       ## Documentation
-      `brew help`, `man brew` or check [Homebrew's documentation](https://github.com/Homebrew/brew/tree/master/docs#readme).
+      `brew help`, `man brew` or check [Homebrew's documentation](https://docs.brew.sh).
     EOS
     write_path(tap, "README.md", readme)
 

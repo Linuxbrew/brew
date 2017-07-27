@@ -34,9 +34,9 @@ A few requests:
   own fork.
 - if still in doubt please ask for help and we'll help you out
 - please read:
-    - http://docs.brew.sh/Brew-Test-Bot-For-Core-Contributors.html
-    - http://docs.brew.sh/Maintainer-Guidelines.html
-    - possibly everything else on http://docs.brew.sh
+    - https://docs.brew.sh/Brew-Test-Bot-For-Core-Contributors.html
+    - https://docs.brew.sh/Maintainer-Guidelines.html
+    - possibly everything else on https://docs.brew.sh
 
 How does that sound?
 
