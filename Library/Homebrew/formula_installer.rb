@@ -151,6 +151,8 @@ class FormulaInstaller
 
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
+    recursive_runtime_deps = formula.recursive_dependencies.reject(&:build?)
+    recursive_runtime_formulae = recursive_runtime_deps.map(&:to_formula)
 
     recursive_dependencies = []
     recursive_formulae.each do |dep|
@@ -176,7 +178,7 @@ class FormulaInstaller
 
     version_hash = {}
     version_conflicts = Set.new
-    recursive_formulae.each do |f|
+    recursive_runtime_formulae.each do |f|
       name = f.name
       unversioned_name, = name.split("@")
       version_hash[unversioned_name] ||= Set.new
