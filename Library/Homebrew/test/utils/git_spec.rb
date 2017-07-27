@@ -45,3 +45,22 @@ describe Git do
     end
   end
 end
+
+describe Utils do
+  describe "::git_available?" do
+    it "returns true if git --version command succeeds" do
+      allow_any_instance_of(Process::Status).to receive(:success?).and_return(true)
+      expect(described_class.git_available?).to be_truthy
+    end
+
+    it "returns false if git --version command does not succeed" do
+      allow_any_instance_of(Process::Status).to receive(:success?).and_return(false)
+      expect(described_class.git_available?).to be_falsey
+    end
+
+    it "returns git version if already set" do
+      described_class.instance_variable_set(:@git, true)
+      expect(described_class.git_available?).to be_truthy
+    end
+  end
+end

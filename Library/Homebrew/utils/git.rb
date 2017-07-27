@@ -27,7 +27,8 @@ end
 
 module Utils
   def self.git_available?
-    @git ||= quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
+    return @git if instance_variable_defined?(:@git)
+    @git = quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
   end
 
   def self.git_path
