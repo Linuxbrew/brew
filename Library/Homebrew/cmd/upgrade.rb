@@ -106,6 +106,7 @@ module Homebrew
                     .map(&:linked_keg)
                     .select(&:directory?)
                     .map { |k| Keg.new(k.resolved_path) }
+    linked_kegs = outdated_kegs.select(&:linked?)
 
     if f.opt_prefix.directory?
       keg = Keg.new(f.opt_prefix.resolved_path)
@@ -153,7 +154,7 @@ module Homebrew
   ensure
     # restore previous installation state if build failed
     begin
-      outdated_kegs.each(&:link) unless f.installed?
+      linked_kegs.each(&:link) unless f.installed?
     rescue
       nil
     end

@@ -37,10 +37,17 @@ class FormulaInstaller
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :force_bottle
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
-  mode_attr_accessor :verbose, :debug, :quieter
+  mode_attr_accessor :verbose, :debug, :quieter, :keg_was_linked
 
   def initialize(formula)
     @formula = formula
+    @rack_was_present = formula.rack.directory?
+    @keg_was_linked = if formula.linked_keg.directory?
+      keg = Keg.new(formula.linked_keg.resolved_path)
+      keg.linked?
+    else
+      false
+    end
     @show_header = false
     @ignore_deps = false
     @only_deps = false
@@ -524,6 +531,7 @@ class FormulaInstaller
 
     if df.linked_keg.directory?
       linked_keg = Keg.new(df.linked_keg.resolved_path)
+      keg_was_linked = keg.linked?
       linked_keg.unlink
     end
 
@@ -542,6 +550,7 @@ class FormulaInstaller
     fi.verbose            = verbose?
     fi.quieter            = quieter?
     fi.debug              = debug?
+    fi.keg_was_linked     = keg_was_linked
     fi.installed_as_dependency = true
     fi.installed_on_request = false
     fi.prelude
@@ -551,7 +560,7 @@ class FormulaInstaller
   rescue Exception
     ignore_interrupts do
       tmp_keg.rename(installed_keg) if tmp_keg && !installed_keg.directory?
-      linked_keg.link if linked_keg
+      linked_keg.link if keg_was_linked
     end
     raise
   else
@@ -712,7 +721,13 @@ class FormulaInstaller
   end
 
   def link(keg)
-    if formula.keg_only?
+    link_formula = if @rack_was_present
+      keg_was_linked?
+    else
+      !formula.keg_only?
+    end
+
+    unless link_formula
       begin
         keg.optlink
       rescue Keg::LinkError => e
