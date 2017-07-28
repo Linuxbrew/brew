@@ -88,9 +88,9 @@ module Homebrew
       options[:only_cops] = only_cops
       ARGV.push("--only=style")
     elsif new_formula
-      options[:only_cops] = [:FormulaAudit, :FormulaAuditStrict, :NewFormulaAudit]
+      nil
     elsif strict
-      options[:only_cops] = [:FormulaAudit, :FormulaAuditStrict]
+      options[:except_cops] = [:NewFormulaAudit]
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif !strict
