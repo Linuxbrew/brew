@@ -13,8 +13,8 @@ module Hbc
 
       private
 
-      def cask(header_token, &block)
-        Cask.new(header_token, &block)
+      def cask(header_token, **options, &block)
+        Cask.new(header_token, **options, &block)
       end
     end
 
@@ -45,12 +45,12 @@ module Hbc
 
       private
 
-      def cask(header_token, &block)
+      def cask(header_token, **options, &block)
         if token != header_token
           raise CaskTokenMismatchError.new(token, header_token)
         end
 
-        Cask.new(header_token, sourcefile_path: path, &block)
+        super(header_token, **options, sourcefile_path: path, &block)
       end
     end
 
@@ -80,18 +80,33 @@ module Hbc
       end
     end
 
-    class FromTapLoader < FromPathLoader
+    class FromTapPathLoader < FromPathLoader
       def self.can_load?(ref)
-        ref.to_s.match?(HOMEBREW_TAP_CASK_REGEX)
+        ref.to_s.match?(HOMEBREW_TAP_PATH_REGEX) && super
       end
 
       attr_reader :tap
 
+      def initialize(tap_path)
+        @tap = Tap.from_path(tap_path)
+        super tap_path
+      end
+
+      private
+
+      def cask(*args, &block)
+        super(*args, tap: tap, &block)
+      end
+    end
+
+    class FromTapLoader < FromTapPathLoader
+      def self.can_load?(ref)
+        ref.to_s.match?(HOMEBREW_TAP_CASK_REGEX)
+      end
+
       def initialize(tapped_name)
         user, repo, token = tapped_name.split("/", 3)
-        @tap = Tap.fetch(user, repo)
-
-        super @tap.cask_dir/"#{token}.rb"
+        super Tap.fetch(user, repo).cask_dir/"#{token}.rb"
       end
 
       def load
@@ -136,19 +151,26 @@ module Hbc
       [
         FromURILoader,
         FromTapLoader,
+        FromTapPathLoader,
         FromPathLoader,
       ].each do |loader_class|
         return loader_class.new(ref) if loader_class.can_load?(ref)
       end
 
-      if FromPathLoader.can_load?(default_path(ref))
-        return FromPathLoader.new(default_path(ref))
+      if FromTapPathLoader.can_load?(default_path(ref))
+        return FromTapPathLoader.new(default_path(ref))
       end
 
-      possible_tap_casks = tap_paths(ref)
-      if possible_tap_casks.count == 1
-        possible_tap_cask = possible_tap_casks.first
-        return FromPathLoader.new(possible_tap_cask)
+      case (possible_tap_casks = tap_paths(ref)).count
+      when 1
+        return FromTapPathLoader.new(possible_tap_casks.first)
+      when 2..Float::INFINITY
+        loaders = possible_tap_casks.map(&FromTapPathLoader.method(:new))
+
+        raise CaskError, <<-EOS.undent
+          Cask #{ref} exists in multiple taps:
+          #{loaders.map { |loader| "  #{loader.tap}/#{loader.token}" }.join("\n")}
+        EOS
       end
 
       possible_installed_cask = Cask.new(ref)

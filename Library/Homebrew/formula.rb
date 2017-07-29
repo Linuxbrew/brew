@@ -177,8 +177,8 @@ class Formula
 
     @tap = if path == Formulary.core_path(name)
       CoreTap.instance
-    elsif path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-      Tap.fetch(Regexp.last_match(1), Regexp.last_match(2))
+    elsif match = path.to_s.match(HOMEBREW_TAP_PATH_REGEX)
+      Tap.fetch(match[:user], match[:repo])
     end
 
     @full_name = full_name_with_optional_tap(name)
