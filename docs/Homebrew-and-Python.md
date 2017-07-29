@@ -9,7 +9,12 @@ Homebrew provides formulae to brew a more up-to-date Python 2.7.x and 3.x.
 **Important:** If you choose to install a Python which isn't either of these two (system Python or brewed Python), the Homebrew team can only provide limited support.
 
 ## Python 2.x or Python 3.x
-Homebrew provides a formula for Python 2.7.x and one for Python 3.x. They don't conflict, so they can both be installed. The executable `python2` will always point to the 2.x and `python3` to the 3.x version. The executable `python` will always point to the macOS system Python.
+Homebrew provides one formula for Python 2.7.x and another for Python 3.x. The executables are organized as follows so that Python 2 and Python 3 can both be installed without conflict:
+* `python` by default points to the macOS system Python
+* `python2` will point to the brew-installed Python 2.7.x
+* `python3` will point to the brew-installed Python 3.x
+* `pip2` will point to the pip associated with the brew-installed Python 2.7.x
+* `pip3` will point to the pip associated with the brew-installed Python 3.x
 
 ([Wondering which one to choose?](https://wiki.python.org/moin/Python2orPython3))
 
