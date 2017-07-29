@@ -101,7 +101,9 @@ describe Hbc::Installer, :cask do
     it "fails to install if sha256 :no_check is used with --require-sha" do
       no_checksum = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/no-checksum.rb")
       expect {
-        Hbc::Installer.new(no_checksum, require_sha: true).install
+        shutup do
+          Hbc::Installer.new(no_checksum, require_sha: true).install
+        end
       }.to raise_error(Hbc::CaskNoShasumError)
     end
 
