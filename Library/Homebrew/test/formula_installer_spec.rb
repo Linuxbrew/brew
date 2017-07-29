@@ -18,9 +18,7 @@ describe FormulaInstaller do
 
     installer = described_class.new(formula)
 
-    shutup do
-      installer.install
-    end
+    installer.install
 
     keg = Keg.new(formula.prefix)
 

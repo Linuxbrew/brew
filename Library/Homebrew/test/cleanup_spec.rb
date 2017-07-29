@@ -18,9 +18,7 @@ describe Homebrew::Cleanup do
 
   describe "::cleanup" do
     it "removes .DS_Store files" do
-      shutup do
-        described_class.cleanup
-      end
+      described_class.cleanup
 
       expect(ds_store).not_to exist
     end
@@ -28,9 +26,7 @@ describe Homebrew::Cleanup do
     it "doesn't remove anything if `--dry-run` is specified" do
       ARGV << "--dry-run"
 
-      shutup do
-        described_class.cleanup
-      end
+      described_class.cleanup
 
       expect(ds_store).to exist
     end
@@ -42,14 +38,12 @@ describe Homebrew::Cleanup do
 
       before(:each) do
         described_class.instance_variable_set(:@unremovable_kegs, [])
-        shutup do
-          [f1, f2].each do |f|
-            f.brew do
-              f.install
-            end
-
-            Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
+        [f1, f2].each do |f|
+          f.brew do
+            f.install
           end
+
+          Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
         end
 
         allow_any_instance_of(Keg)
@@ -58,12 +52,12 @@ describe Homebrew::Cleanup do
       end
 
       it "doesn't remove any kegs" do
-        shutup { described_class.cleanup_formula f2 }
+        described_class.cleanup_formula f2
         expect(f1.installed_kegs.size).to eq(2)
       end
 
       it "lists the unremovable kegs" do
-        shutup { described_class.cleanup_formula f2 }
+        described_class.cleanup_formula f2
         expect(described_class.unremovable_kegs).to contain_exactly(f1.installed_kegs[0])
       end
     end
@@ -89,14 +83,12 @@ describe Homebrew::Cleanup do
       version_scheme 2
     end.new
 
-    shutup do
-      [f1, f2, f3, f4].each do |f|
-        f.brew do
-          f.install
-        end
-
-        Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
+    [f1, f2, f3, f4].each do |f|
+      f.brew do
+        f.install
       end
+
+      Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
     end
 
     expect(f1).to be_installed
@@ -104,9 +96,7 @@ describe Homebrew::Cleanup do
     expect(f3).to be_installed
     expect(f4).to be_installed
 
-    shutup do
-      described_class.cleanup_formula f3
-    end
+    described_class.cleanup_formula f3
 
     expect(f1).not_to be_installed
     expect(f2).not_to be_installed
@@ -119,9 +109,7 @@ describe Homebrew::Cleanup do
     path.mkpath
     ARGV << "--prune=all"
 
-    shutup do
-      described_class.cleanup_logs
-    end
+    described_class.cleanup_logs
 
     expect(path).not_to exist
   end
@@ -131,9 +119,7 @@ describe Homebrew::Cleanup do
       incomplete = (HOMEBREW_CACHE/"something.incomplete")
       incomplete.mkpath
 
-      shutup do
-        described_class.cleanup_cache
-      end
+      described_class.cleanup_cache
 
       expect(incomplete).not_to exist
     end
@@ -142,9 +128,7 @@ describe Homebrew::Cleanup do
       java_cache = (HOMEBREW_CACHE/"java_cache")
       java_cache.mkpath
 
-      shutup do
-        described_class.cleanup_cache
-      end
+      described_class.cleanup_cache
 
       expect(java_cache).not_to exist
     end
@@ -153,9 +137,7 @@ describe Homebrew::Cleanup do
       npm_cache = (HOMEBREW_CACHE/"npm_cache")
       npm_cache.mkpath
 
-      shutup do
-        described_class.cleanup_cache
-      end
+      described_class.cleanup_cache
 
       expect(npm_cache).not_to exist
     end

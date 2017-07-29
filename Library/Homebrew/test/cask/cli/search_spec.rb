@@ -75,9 +75,7 @@ describe Hbc::CLI::Search, :cask do
   end
 
   it "highlights installed packages" do
-    shutup do
-      Hbc::CLI::Install.run("local-caffeine")
-    end
+    Hbc::CLI::Install.run("local-caffeine")
 
     expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq(pretty_installed("local-caffeine"))
   end

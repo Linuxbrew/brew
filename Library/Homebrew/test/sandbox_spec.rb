@@ -37,11 +37,9 @@ describe Sandbox do
 
   describe "#exec" do
     it "fails when writing to file not specified with ##allow_write" do
-      shutup do
-        expect {
-          subject.exec "touch", file
-        }.to raise_error(ErrorDuringExecution)
-      end
+      expect {
+        subject.exec "touch", file
+      }.to raise_error(ErrorDuringExecution)
 
       expect(file).not_to exist
     end
