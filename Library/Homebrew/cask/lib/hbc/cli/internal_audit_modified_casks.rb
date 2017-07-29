@@ -117,7 +117,6 @@ module Hbc
         odie "audit failed for #{Formatter.pluralize(num_failed, "cask")}: " \
           "#{failed_casks.join(" ")}"
       end
-
     end
   end
 end
