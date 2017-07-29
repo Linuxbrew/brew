@@ -45,13 +45,10 @@ module Hbc
       end
 
       def run
-        at_exit do
-          cleanup
-        end
-
         Dir.chdir git_root do
           modified_cask_files.zip(modified_casks).each do |cask_file, cask|
             audit(cask, cask_file)
+            Cleanup.run(cask) if cleanup?
           end
         end
         report_failures
@@ -119,10 +116,6 @@ module Hbc
         num_failed = failed_casks.size
         odie "audit failed for #{Formatter.pluralize(num_failed, "cask")}: " \
           "#{failed_casks.join(" ")}"
-      end
-
-      def cleanup
-        Cleanup.run if cleanup?
       end
     end
   end
