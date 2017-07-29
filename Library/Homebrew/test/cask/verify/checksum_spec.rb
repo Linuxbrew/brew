@@ -7,10 +7,6 @@ describe Hbc::Verify::Checksum, :cask do
     allow(cask).to receive(:sha256).and_return(sha256)
   end
 
-  around do |example|
-    shutup { example.run }
-  end
-
   describe ".me?" do
     subject { described_class.me?(cask) }
 

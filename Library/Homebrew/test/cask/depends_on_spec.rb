@@ -3,9 +3,7 @@
 describe "Satisfy Dependencies and Requirements", :cask do
   subject {
     lambda do
-      shutup do
-        Hbc::Installer.new(cask).install
-      end
+      Hbc::Installer.new(cask).install
     end
   }
 

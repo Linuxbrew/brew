@@ -9,17 +9,13 @@ describe Hbc::CLI::Zap, :cask do
     caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
     transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
 
-    shutup do
-      Hbc::Installer.new(caffeine).install
-      Hbc::Installer.new(transmission).install
-    end
+    Hbc::Installer.new(caffeine).install
+    Hbc::Installer.new(transmission).install
 
     expect(caffeine).to be_installed
     expect(transmission).to be_installed
 
-    shutup do
-      Hbc::CLI::Zap.run("local-caffeine", "local-transmission")
-    end
+    Hbc::CLI::Zap.run("local-caffeine", "local-transmission")
 
     expect(caffeine).not_to be_installed
     expect(Hbc.appdir.join("Caffeine.app")).not_to be_a_symlink
@@ -33,9 +29,7 @@ describe Hbc::CLI::Zap, :cask do
   # it "dispatches both uninstall and zap stanzas" do
   #   with_zap = Hbc::CaskLoader.load('with-zap')
   #
-  #   shutup do
-  #     Hbc::Installer.new(with_zap).install
-  #   end
+  #   Hbc::Installer.new(with_zap).install
   #
   #   with_zap.must_be :installed?
   #
@@ -48,9 +42,8 @@ describe Hbc::CLI::Zap, :cask do
   #   Hbc::FakeSystemCommand.expects_command(['/usr/bin/sudo', '-E', '--', '/bin/rm', '-rf', '--',
   #                                             Pathname.new('~/Library/Preferences/my.fancy.app.plist').expand_path])
   #
-  #   shutup do
-  #     Hbc::CLI::Zap.run('with-zap')
-  #   end
+  #   Hbc::CLI::Zap.run('with-zap')
+  #
   #   with_zap.wont_be :installed?
   # end
 

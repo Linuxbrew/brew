@@ -3,9 +3,7 @@ describe "brew create", :integration_test do
   let(:formula_file) { CoreTap.new.formula_dir/"testball.rb" }
 
   it "creates a new Formula file for a given URL" do
-    shutup do
-      brew "create", url, "HOMEBREW_EDITOR" => "/bin/cat"
-    end
+    brew "create", url, "HOMEBREW_EDITOR" => "/bin/cat"
 
     expect(formula_file).to exist
     expect(formula_file.read).to match(%Q(sha256 "#{TESTBALL_SHA256}"))

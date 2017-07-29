@@ -81,9 +81,7 @@ describe Migrator do
 
   specify "#move_to_new_directory" do
     keg.unlink
-    shutup do
-      subject.move_to_new_directory
-    end
+    subject.move_to_new_directory
 
     expect(new_keg_record).to be_a_directory
     expect(new_keg_record/"bin").to be_a_directory
@@ -117,9 +115,7 @@ describe Migrator do
     expect(HOMEBREW_LINKED_KEGS.children.count).to eq(1)
     expect((HOMEBREW_PREFIX/"opt").children.count).to eq(1)
 
-    shutup do
-      subject.unlink_oldname
-    end
+    subject.unlink_oldname
 
     expect(HOMEBREW_LINKED_KEGS).not_to exist
     expect(HOMEBREW_LIBRARY/"bin").not_to exist
@@ -134,9 +130,7 @@ describe Migrator do
       FileUtils.touch new_keg_record/"bin"/file
     end
 
-    shutup do
-      subject.link_newname
-    end
+    subject.link_newname
 
     expect(HOMEBREW_LINKED_KEGS.children.count).to eq(1)
     expect((HOMEBREW_PREFIX/"opt").children.count).to eq(1)
@@ -172,9 +166,7 @@ describe Migrator do
     tab.source["path"] = old_formula.path.to_s
     tab.write
 
-    shutup do
-      subject.migrate
-    end
+    subject.migrate
 
     expect(new_keg_record).to exist
     expect(old_keg_record.parent).to be_a_symlink
