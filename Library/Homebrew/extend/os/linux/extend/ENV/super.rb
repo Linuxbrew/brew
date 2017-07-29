@@ -52,6 +52,7 @@ module Superenv
         paths << share/"pkgconfig"
       end
     end
+    paths += deps.map { |d| d.opt_lib/"x86_64-linux-gnu/pkgconfig" }
     paths
   end
 
@@ -83,6 +84,7 @@ module Superenv
   def homebrew_extra_library_paths
     paths = []
     paths += xorg_lib_paths if x11?
+    paths += deps.map { |d| d.opt_lib/"x86_64-linux-gnu" }
     paths
   end
 
