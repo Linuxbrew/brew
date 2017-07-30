@@ -15,6 +15,49 @@ module RuboCop
           problem ":tex is deprecated" if depends_on?(:tex)
         end
       end
+
+      class ClassInheritance < FormulaCop
+        def audit_formula(_node, class_node, parent_class_node, _body_node)
+          begin_pos = start_column(parent_class_node)
+          end_pos = end_column(class_node)
+          return unless begin_pos-end_pos != 3
+          problem "Use a space in class inheritance: class #{@formula_name} < #{class_name(parent_class_node)}"
+        end
+      end
+
+      class Comments < FormulaCop
+        def audit_formula(_node, _class_node, _parent_class_node, _body_node)
+          # Commented-out cmake support from default template
+          audit_comments do |comment|
+            next unless comment.include?('# system "cmake')
+            problem "Commented cmake call found"
+          end
+
+          # Comments from default template
+          audit_comments do |comment|
+            [
+              "# PLEASE REMOVE",
+              "# Documentation:",
+              "# if this fails, try separate make/make install steps",
+              "# The URL of the archive",
+              "## Naming --",
+              "# if your formula requires any X11/XQuartz components",
+              "# if your formula fails when building in parallel",
+              "# Remove unrecognized options if warned by configure",
+            ].each do |template_comment|
+              next unless comment.include?(template_comment)
+              problem "Please remove default template comments"
+              break
+            end
+          end
+
+          audit_comments do |comment|
+            # Commented-out depends_on
+            next unless comment =~ /#\s*depends_on\s+(.+)\s*$/
+            problem "Commented-out dep #{Regexp.last_match(1)}"
+          end
+        end
+      end
     end
   end
 end

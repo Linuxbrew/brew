@@ -302,6 +302,15 @@ module RuboCop
         end
       end
 
+      # Yields to a block with comment text as parameter
+      def audit_comments
+        @processed_source.comments.each do |comment_node|
+          @offensive_node = comment_node
+          @offense_source_range = :expression
+          yield comment_node.text
+        end
+      end
+
       # Returns the begin position of the node's line in source code
       def line_start_column(node)
         node.source_range.source_buffer.line_range(node.loc.line).begin_pos
@@ -310,6 +319,11 @@ module RuboCop
       # Returns the begin position of the node in source code
       def start_column(node)
         node.source_range.begin_pos
+      end
+
+      # Returns the ending position of the node in source code
+      def end_column(node)
+        node.source_range.end_pos
       end
 
       # Returns the line number of the node
