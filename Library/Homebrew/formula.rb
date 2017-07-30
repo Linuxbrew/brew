@@ -383,7 +383,9 @@ class Formula
   # All of aliases for the formula
   def aliases
     @aliases ||= if tap
-      tap.alias_reverse_table[full_name] || []
+      tap.alias_reverse_table[full_name].to_a.map do |a|
+        a.split("/")[-1]
+      end
     else
       []
     end

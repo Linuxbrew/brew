@@ -33,6 +33,7 @@ class Tab < OpenStruct
       "HEAD" => HOMEBREW_REPOSITORY.git_head,
       "compiler" => compiler,
       "stdlib" => stdlib,
+      "aliases" => formula.aliases,
       "runtime_dependencies" => formula.runtime_dependencies.map do |dep|
         f = dep.to_formula
         { "full_name" => f.full_name, "version" => f.version.to_s }
@@ -185,6 +186,7 @@ class Tab < OpenStruct
       "HEAD" => nil,
       "stdlib" => nil,
       "compiler" => DevelopmentTools.default_compiler,
+      "aliases" => [],
       "runtime_dependencies" => [],
       "source" => {
         "path" => nil,
@@ -328,6 +330,7 @@ class Tab < OpenStruct
       "HEAD" => self.HEAD,
       "stdlib" => (stdlib.to_s if stdlib),
       "compiler" => (compiler.to_s if compiler),
+      "aliases" => aliases,
       "runtime_dependencies" => runtime_dependencies,
       "source" => source,
     }
