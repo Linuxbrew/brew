@@ -23,6 +23,7 @@ module Homebrew
   def reinstall_formula(f)
     if f.opt_prefix.directory?
       keg = Keg.new(f.opt_prefix.resolved_path)
+      keg_had_linked_opt = true
       keg_was_linked = keg.linked?
       backup keg
     end
@@ -38,7 +39,7 @@ module Homebrew
     fi.build_bottle         = ARGV.build_bottle? || (!f.bottled? && f.build.bottle?)
     fi.interactive          = ARGV.interactive?
     fi.git                  = ARGV.git?
-    fi.keg_was_linked       = keg_was_linked
+    fi.link_keg             = keg_was_linked if keg_had_linked_opt
     fi.prelude
 
     oh1 "Reinstalling #{f.full_name} #{options.to_a.join " "}"

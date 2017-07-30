@@ -101,6 +101,12 @@ module Homebrew
   end
 
   def upgrade_formula(f)
+    if f.opt_prefix.directory?
+      keg = Keg.new(f.opt_prefix.resolved_path)
+      keg_had_linked_opt = true
+      keg_was_linked = keg.linked?
+    end
+
     formulae_maybe_with_kegs = [f] + f.old_installed_formulae
     outdated_kegs = formulae_maybe_with_kegs
                     .map(&:linked_keg)
@@ -118,6 +124,7 @@ module Homebrew
     fi.options &= f.options
     fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
     fi.installed_on_request = !ARGV.named.empty?
+    fi.link_keg             = keg_was_linked if keg_had_linked_opt
     if tab
       fi.installed_as_dependency = tab.installed_as_dependency
       fi.installed_on_request  ||= tab.installed_on_request
