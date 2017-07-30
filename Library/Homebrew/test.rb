@@ -16,10 +16,13 @@ begin
 
   ENV.extend(Stdenv)
   formula = ARGV.formulae.first
-  if OS.linux?
-    ENV.setup_build_environment(formula)
-  else
+  if OS.mac?
     ENV.setup_build_environment
+  else
+    ENV.setup_build_environment(formula)
+    # Add the python executable to the PATH.
+    req = formula.recursive_requirements.grep(PythonRequirement).first
+    req.modify_build_environment unless req.nil?
   end
 
   trap("INT", old_trap)
