@@ -188,17 +188,32 @@ module RuboCop
             problem "#{url} should be `https://search.maven.org/remotecontent?filepath=#{match[1]}`"
           end
         end
+      end
+    end
+    module FormulaAuditStrict
+      class PyPiUrls < FormulaCop
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          urls = find_every_method_call_by_name(body_node, :url)
+          mirrors = find_every_method_call_by_name(body_node, :mirror)
+          urls += mirrors
+
+          # Check pypi urls
+          @pypi_pattern = %r{^https?://pypi.python.org/(.*)}
+          audit_urls(urls, @pypi_pattern) do |match, url|
+            problem "#{url} should be `https://files.pythonhosted.org/#{match[1]}`"
+          end
+        end
 
         private
 
-        def audit_urls(urls, regex)
-          urls.each do |url_node|
-            url_string_node = parameters(url_node).first
-            url_string = string_content(url_string_node)
-            match_object = regex_match_group(url_string_node, regex)
-            next unless match_object
-            offending_node(url_string_node.parent)
-            yield match_object, url_string
+        def autocorrect(node)
+          lambda do |corrector|
+            url_string_node = parameters(node).first
+            url = string_content(url_string_node)
+            match = regex_match_group(url_string_node, @pypi_pattern)
+            correction = node.source.sub(url, "https://files.pythonhosted.org/#{match[1]}")
+            corrector.insert_before(node.source_range, correction)
+            corrector.remove(node.source_range)
           end
         end
       end
