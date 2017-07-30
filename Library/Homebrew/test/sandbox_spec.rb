@@ -12,15 +12,7 @@ describe Sandbox do
 
   specify "#formula?" do
     f = formula { url "foo-1.0" }
-    f2 = formula { url "bar-1.0" }
-    allow(f2).to receive(:tap).and_return(Tap.fetch("test/tap"))
-
-    ENV["HOMEBREW_SANDBOX"] = "1"
-    expect(described_class).to be_formula(f), "Formulae should be sandboxed if --sandbox was passed."
-
-    ENV.delete("HOMEBREW_SANDBOX")
-    expect(described_class).to be_formula(f), "Formulae should be sandboxed if in a sandboxed tap."
-    expect(described_class).not_to be_formula(f2), "Formulae should not be sandboxed if not in a sandboxed tap."
+    expect(described_class).to be_formula(f), "Formulae should be sandboxed."
   end
 
   specify "#test?" do
