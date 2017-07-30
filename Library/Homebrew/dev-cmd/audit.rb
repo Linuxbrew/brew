@@ -809,28 +809,6 @@ class FormulaAuditor
   end
 
   def line_problems(line, _lineno)
-    if line =~ /<(Formula|AmazonWebServicesFormula|ScriptFileFormula|GithubGistFormula)/
-      problem "Use a space in class inheritance: class Foo < #{Regexp.last_match(1)}"
-    end
-
-    # Commented-out cmake support from default template
-    problem "Commented cmake call found" if line.include?('# system "cmake')
-
-    # Comments from default template
-    [
-      "# PLEASE REMOVE",
-      "# Documentation:",
-      "# if this fails, try separate make/make install steps",
-      "# The URL of the archive",
-      "## Naming --",
-      "# if your formula requires any X11/XQuartz components",
-      "# if your formula fails when building in parallel",
-      "# Remove unrecognized options if warned by configure",
-    ].each do |comment|
-      next unless line.include?(comment)
-      problem "Please remove default template comments"
-    end
-
     # FileUtils is included in Formula
     # encfs modifies a file with this name, so check for some leading characters
     if line =~ %r{[^'"/]FileUtils\.(\w+)}
@@ -890,9 +868,6 @@ class FormulaAuditor
         problem "Dependency #{dep} should not use option #{Regexp.last_match(1)}"
       end
     end
-
-    # Commented-out depends_on
-    problem "Commented-out dep #{Regexp.last_match(1)}" if line =~ /#\s*depends_on\s+(.+)\s*$/
 
     if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
       problem "Use \"if build.#{Regexp.last_match(1).downcase}?\" instead"
