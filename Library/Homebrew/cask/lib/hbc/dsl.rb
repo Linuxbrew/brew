@@ -89,14 +89,20 @@ module Hbc
       @name.concat(args.flatten)
     end
 
-    def assert_only_one_stanza_allowed(stanza, arg_given)
-      return unless instance_variable_defined?("@#{stanza}") && arg_given
-      raise CaskInvalidError.new(token, "'#{stanza}' stanza may only appear once")
+    def set_unique_stanza(stanza, should_return)
+      return instance_variable_get("@#{stanza}") if should_return
+
+      if instance_variable_defined?("@#{stanza}")
+        raise CaskInvalidError.new(token, "'#{stanza}' stanza may only appear once")
+      end
+
+      instance_variable_set("@#{stanza}", yield)
+    rescue StandardError => e
+      raise CaskInvalidError.new(token, "'#{stanza}' stanza failed with: #{e}")
     end
 
     def homepage(homepage = nil)
-      assert_only_one_stanza_allowed :homepage, !homepage.nil?
-      @homepage ||= homepage
+      set_unique_stanza(:homepage, homepage.nil?) { homepage }
     end
 
     def language(*args, default: false, &block)
@@ -135,72 +141,51 @@ module Hbc
     end
 
     def url(*args, &block)
-      url_given = !args.empty? || block_given?
-      return @url unless url_given
-      assert_only_one_stanza_allowed :url, url_given
-      @url ||= begin
-        URL.from(*args, &block)
-      rescue StandardError => e
-        raise CaskInvalidError.new(token, "'url' stanza failed with: #{e}")
+      set_unique_stanza(:url, args.empty? && !block_given?) do
+        begin
+          URL.from(*args, &block)
+        end
       end
     end
 
     def appcast(*args)
-      return @appcast if args.empty?
-      assert_only_one_stanza_allowed :appcast, !args.empty?
-      @appcast ||= begin
-        DSL::Appcast.new(*args) unless args.empty?
-      rescue StandardError => e
-        raise CaskInvalidError.new(token, e)
-      end
+      set_unique_stanza(:appcast, args.empty?) { DSL::Appcast.new(*args) }
     end
 
     def gpg(*args)
-      return @gpg if args.empty?
-      assert_only_one_stanza_allowed :gpg, !args.empty?
-      @gpg ||= begin
-        DSL::Gpg.new(*args) unless args.empty?
-      rescue StandardError => e
-        raise CaskInvalidError.new(token, e)
-      end
+      set_unique_stanza(:gpg, args.empty?) { DSL::Gpg.new(*args) }
     end
 
     def container(*args)
-      return @container if args.empty?
       # TODO: remove this constraint, and instead merge multiple container stanzas
-      assert_only_one_stanza_allowed :container, !args.empty?
-      @container ||= begin
-        DSL::Container.new(*args) unless args.empty?
-      rescue StandardError => e
-        raise CaskInvalidError.new(token, e)
+      set_unique_stanza(:container, args.empty?) do
+        begin
+          DSL::Container.new(*args).tap do |container|
+            # TODO: remove this backward-compatibility section after removing nested_container
+            if container && container.nested
+              artifacts[:nested_container] << container.nested
+            end
+          end
+        end
       end
-      # TODO: remove this backward-compatibility section after removing nested_container
-      if @container && @container.nested
-        artifacts[:nested_container] << @container.nested
-      end
-      @container
     end
-
-    SYMBOLIC_VERSIONS = Set.new [
-      :latest,
-    ]
 
     def version(arg = nil)
-      return @version if arg.nil?
-      assert_only_one_stanza_allowed :version, !arg.nil?
-      raise CaskInvalidError.new(token, "invalid 'version' value: '#{arg.inspect}'") if !arg.is_a?(String) && !SYMBOLIC_VERSIONS.include?(arg)
-      @version ||= DSL::Version.new(arg)
+      set_unique_stanza(:version, arg.nil?) do
+        if !arg.is_a?(String) && arg != :latest
+          raise CaskInvalidError.new(token, "invalid 'version' value: '#{arg.inspect}'")
+        end
+        DSL::Version.new(arg)
+      end
     end
 
-    SYMBOLIC_SHA256S = Set.new [
-      :no_check,
-    ]
-
     def sha256(arg = nil)
-      return @sha256 if arg.nil?
-      assert_only_one_stanza_allowed :sha256, !arg.nil?
-      raise CaskInvalidError.new(token, "invalid 'sha256' value: '#{arg.inspect}'") if !arg.is_a?(String) && !SYMBOLIC_SHA256S.include?(arg)
-      @sha256 ||= arg
+      set_unique_stanza(:sha256, arg.nil?) do
+        if !arg.is_a?(String) && arg != :no_check
+          raise CaskInvalidError.new(token, "invalid 'sha256' value: '#{arg.inspect}'")
+        end
+        arg
+      end
     end
 
     # depends_on uses a load method so that multiple stanzas can be merged
@@ -216,14 +201,8 @@ module Hbc
     end
 
     def conflicts_with(*args)
-      return @conflicts_with if args.empty?
       # TODO: remove this constraint, and instead merge multiple conflicts_with stanzas
-      assert_only_one_stanza_allowed :conflicts_with, !args.empty?
-      @conflicts_with ||= begin
-        DSL::ConflictsWith.new(*args) unless args.empty?
-      rescue StandardError => e
-        raise CaskInvalidError.new(token, e)
-      end
+      set_unique_stanza(:conflicts_with, args.empty?) { DSL::ConflictsWith.new(*args) }
     end
 
     def artifacts
@@ -251,13 +230,11 @@ module Hbc
     end
 
     def accessibility_access(accessibility_access = nil)
-      assert_only_one_stanza_allowed :accessibility_access, !accessibility_access.nil?
-      @accessibility_access ||= accessibility_access
+      set_unique_stanza(:accessibility_access, accessibility_access.nil?) { accessibility_access }
     end
 
     def auto_updates(auto_updates = nil)
-      assert_only_one_stanza_allowed :auto_updates, !auto_updates.nil?
-      @auto_updates ||= auto_updates
+      set_unique_stanza(:auto_updates, auto_updates.nil?) { auto_updates }
     end
 
     ORDINARY_ARTIFACT_TYPES.each do |type|
