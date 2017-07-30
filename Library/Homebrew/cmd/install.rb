@@ -330,13 +330,8 @@ module Homebrew
     fi.ignore_deps          = ARGV.ignore_deps?
     fi.only_deps            = ARGV.only_deps?
     fi.build_bottle         = ARGV.build_bottle?
-    fi.build_from_source    = ARGV.build_from_source? || ARGV.build_all_from_source?
-    fi.force_bottle         = ARGV.force_bottle?
     fi.interactive          = ARGV.interactive?
     fi.git                  = ARGV.git?
-    fi.verbose              = ARGV.verbose?
-    fi.quieter              = ARGV.quieter?
-    fi.debug                = ARGV.debug?
     fi.prelude
     fi.install
     fi.finish

@@ -35,12 +35,8 @@ module Homebrew
     fi.options              = options
     fi.invalid_option_names = build_options.invalid_option_names
     fi.build_bottle         = ARGV.build_bottle? || (!f.bottled? && f.build.bottle?)
-    fi.build_from_source    = ARGV.build_from_source? || ARGV.build_all_from_source?
-    fi.force_bottle         = ARGV.force_bottle?
     fi.interactive          = ARGV.interactive?
     fi.git                  = ARGV.git?
-    fi.verbose              = ARGV.verbose?
-    fi.debug                = ARGV.debug?
     fi.prelude
 
     oh1 "Reinstalling #{f.full_name} #{options.to_a.join " "}"
