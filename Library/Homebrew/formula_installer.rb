@@ -532,7 +532,7 @@ class FormulaInstaller
 
     if df.linked_keg.directory?
       linked_keg = Keg.new(df.linked_keg.resolved_path)
-      keg_was_linked = keg.linked?
+      keg_was_linked = linked_keg.linked?
       linked_keg.unlink
     end
 
