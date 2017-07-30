@@ -133,22 +133,22 @@ describe FormulaInstaller do
     }.to raise_error(CannotInstallFormulaError)
   end
 
-  describe "#install_requirement_formula?" do
+  describe "#install_requirement_formula?", :focus do
     before do
       @requirement = Python3Requirement.new
+      @requirement_dependency = @requirement.to_dependency
+      @install_bottle_for_dependent = false
       allow(@requirement).to receive(:satisfied?).and_return(satisfied?)
       allow(@requirement).to receive(:satisfied_by_formula?).and_return(satisfied_by_formula?)
-      allow_any_instance_of(Dependency).to receive(:installed?).and_return(installed?)
       @dependent = formula do
         url "foo"
         version "0.1"
         depends_on :python3
       end
-      @build = BuildOptions.new [], []
       @fi = FormulaInstaller.new(@dependent)
     end
 
-    subject { @fi.install_requirement_formula?(@requirement, @dependent, @build) }
+    subject { @fi.install_requirement_formula?(@requirement_dependency, @requirement, @install_bottle_for_dependent) }
 
     context "it returns false when requirement is satisfied" do
       let(:satisfied?) { true }
