@@ -630,7 +630,6 @@ class FormulaAuditor
       end
 
       next if spec.patches.empty?
-      spec.patches.each { |p| patch_problems(p) if p.external? }
       next unless @new_formula
       problem "New formulae should not require patches to build. Patches should be submitted and accepted upstream first."
     end
@@ -783,36 +782,6 @@ class FormulaAuditor
       end
     elsif !current_revision.zero? # head/devel-only formula
       problem "'revision #{current_revision}' should be removed"
-    end
-  end
-
-  def patch_problems(patch)
-    case patch.url
-    when %r{https?://github\.com/.+/.+/(?:commit|pull)/[a-fA-F0-9]*.(?:patch|diff)}
-      unless patch.url =~ /\?full_index=\w+$/
-        problem <<-EOS.undent
-          GitHub patches should use the full_index parameter:
-            #{patch.url}?full_index=1
-        EOS
-      end
-    when /raw\.github\.com/, %r{gist\.github\.com/raw}, %r{gist\.github\.com/.+/raw},
-      %r{gist\.githubusercontent\.com/.+/raw}
-      unless patch.url =~ /[a-fA-F0-9]{40}/
-        problem "GitHub/Gist patches should specify a revision:\n#{patch.url}"
-      end
-    when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
-      problem <<-EOS.undent
-        use GitHub pull request URLs:
-          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/pull/#{Regexp.last_match(3)}.patch?full_index=1
-        Rather than patch-diff:
-          #{patch.url}
-      EOS
-    when %r{macports/trunk}
-      problem "MacPorts patches should specify a revision instead of trunk:\n#{patch.url}"
-    when %r{^http://trac\.macports\.org}
-      problem "Patches from MacPorts Trac should be https://, not http:\n#{patch.url}"
-    when %r{^http://bugs\.debian\.org}
-      problem "Patches from Debian should be https://, not http:\n#{patch.url}"
     end
   end
 
