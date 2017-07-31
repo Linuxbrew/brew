@@ -52,6 +52,23 @@ module RuboCop
           end
         end
       end
+
+      class Miscellaneous < FormulaCop
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          # FileUtils is included in Formula
+          # encfs modifies a file with this name, so check for some leading characters
+          find_instance_method_call(body_node, "FileUtils", nil) do |method_node|
+            problem "Don't need 'FileUtils.' before #{method_node.method_name}"
+          end
+
+          # Check for long inreplace block vars
+          find_all_blocks(body_node, :inreplace) do |node|
+            block_arg = node.arguments.children.first
+            next unless block_arg.source.size>1
+            problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{block_arg.source}|\"."
+          end
+        end
+      end
     end
   end
 end

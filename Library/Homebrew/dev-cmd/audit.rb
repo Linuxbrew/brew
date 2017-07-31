@@ -809,17 +809,6 @@ class FormulaAuditor
   end
 
   def line_problems(line, _lineno)
-    # FileUtils is included in Formula
-    # encfs modifies a file with this name, so check for some leading characters
-    if line =~ %r{[^'"/]FileUtils\.(\w+)}
-      problem "Don't need 'FileUtils.' before #{Regexp.last_match(1)}."
-    end
-
-    # Check for long inreplace block vars
-    if line =~ /inreplace .* do \|(.{2,})\|/
-      problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{Regexp.last_match(1)}|\"."
-    end
-
     # Check for string interpolation of single values.
     if line =~ /(system|inreplace|gsub!|change_make_var!).*[ ,]"#\{([\w.]+)\}"/
       problem "Don't need to interpolate \"#{Regexp.last_match(2)}\" with #{Regexp.last_match(1)}"
