@@ -543,6 +543,8 @@ class FormulaInstaller
     fi.options           |= inherited_options
     fi.options           &= df.options
     fi.build_from_source  = ARGV.build_formula_from_source?(df)
+    fi.build_bottle       = false
+    fi.force_bottle       = false
     fi.verbose            = verbose?
     fi.quieter            = quieter?
     fi.debug              = debug?
