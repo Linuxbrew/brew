@@ -12,7 +12,7 @@ Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
 This is all that really matters:
 - Ensure the name seems reasonable.
 - Add aliases.
-- Ensure it is not an unreasonable dupe of anything that comes with macOS.
+- Ensure it uses `keg_only :provided_by_macos` if it already comes with macOS.
 - Ensure it is not a library that can be installed with
   [gem](https://en.wikipedia.org/wiki/RubyGems),
   [cpan](https://en.wikipedia.org/wiki/Cpan) or
@@ -45,12 +45,7 @@ Add other names as aliases as symlinks in `Aliases` in the tap root. Ensure the
 name referenced on the homepage is one of these, as it may be different and have
 underscores and hyphens and so on.
 
-We mostly don’t allow versions in formula names (e.g. `bash4.rb`); these should
-be in the `homebrew/versions` tap. (`python3.rb` is a rare exception, because it’s
-basically a “new” language and installs no conflicting executables.)
-
-For now, if someone submits a formula like this, we’ll leave them in
-their own tree.
+We now accept versioned formulae as long as they [meet the requirements](Versions.md).
 
 ### Merging, rebasing, cherry-picking
 Merging should be done in the `Homebrew/brew` repository to preserve history & GPG commit signing,
@@ -92,21 +87,7 @@ implemented!).
     report and link to the commit
 
 ### Duplicates
-The main repository avoids duplicates as much as possible. The exception is
-libraries that macOS provides but have bugs, and the bugs are fixed in a
-newer version. Or libraries that macOS provides, but they are too old for
-some other formula. The rest should be in the `homebrew/dupes` tap.
-
-Still determine if it's possible to avoid the duplicate. Be thorough. Duped
-libraries and tools cause bugs that are tricky to solve. Once the formula is
-pulled, we can’t go back on that willy-nilly.
-
-If it duplicates anything ask another maintainer first. Some dupes are okay,
-some can cause subtle issues we don’t want to have to deal with in the future.
-
-Dupes we have allowed:
--   `libxml` \<— macOS version is old and buggy
--   `libpng` \<— Ditto
+We now accept stuff that comes with macOS as long as it uses `keg_only :provided_by_macos` to be keg-only by default.
 
 ### Add comments
 It may be enough to refer to an issue ticket, but make sure changes are clear so that

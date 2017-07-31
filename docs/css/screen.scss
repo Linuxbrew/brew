@@ -3,7 +3,7 @@
 
 $color_peach_orange_approx: #f9d094;
 $color_rangitoto_approx: #2e2a24;
-$color_marigold_approx: #ba832c;
+$color_marigold_approx: #be862d;
 $color_di_serria_approx: #d3a459;
 $color_dallas_approx: #745626;
 $black_25: rgba(0, 0, 0, 0.25);
@@ -195,6 +195,15 @@ a {
   &:hover {
     color: $color_di_serria_approx;
     text-decoration: underline;
+  }
+
+  h2, h3 {
+    color: $color_marigold_approx;
+
+    &:hover {
+      color: $color_di_serria_approx;
+      text-decoration: underline;
+    }
   }
 }
 
