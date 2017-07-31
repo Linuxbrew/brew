@@ -6,16 +6,18 @@ describe Git do
     file = "lib/blah.rb"
     repo = Pathname.new("repo")
     FileUtils.mkpath("repo/lib")
-    `#{git} init`
-    FileUtils.touch("repo/#{file}")
-    File.open(repo.to_s+"/"+file, "w") { |f| f.write("blah") }
-    `#{git} add repo/#{file}`
-    `#{git} commit -m"File added"`
-    @hash1 = `git rev-parse HEAD`
-    File.open(repo.to_s+"/"+file, "w") { |f| f.write("brew") }
-    `#{git} add repo/#{file}`
-    `#{git} commit -m"written to File"`
-    @hash2 = `git rev-parse HEAD`
+    shutup do
+      system "#{git} init"
+      FileUtils.touch("repo/#{file}")
+      File.open(repo.join("file").to_s, "w") { |f| f.write("blah") }
+      system "#{git} add repo/#{file}"
+      system "#{git} commit -m'File added'"
+      @hash1 = `git rev-parse HEAD`
+      File.open(repo.join("file").to_s, "w") { |f| f.write("brew") }
+      system "#{git} add repo/#{file}"
+      system "#{git} commit -m'written to File'"
+      @hash2 = `git rev-parse HEAD`
+    end
   end
 
   let(:file) { "lib/blah.rb" }
@@ -37,11 +39,11 @@ describe Git do
 
   describe "#last_revision_of_file" do
     it "returns last revision of file" do
-      expect(described_class.last_revision_of_file(repo, repo.to_s+"/"+file)).to eq("blah")
+      expect(described_class.last_revision_of_file(repo, repo.join("file").to_s)).to eq("blah")
     end
 
     it "returns last revision of file based on before_commit" do
-      expect(described_class.last_revision_of_file(repo, repo.to_s+"/"+file, before_commit: "0..3")).to eq("brew")
+      expect(described_class.last_revision_of_file(repo, repo.join("file").to_s, before_commit: "0..3")).to eq("brew")
     end
   end
 end
@@ -82,7 +84,8 @@ describe Utils do
       end
 
       it "returns path of git" do
-        expect(described_class.git_path).to eq("/Applications/Xcode.app/Contents/Developer/usr/bin/git")
+        allow(Utils).to receive(popen_read).with(HOMEBREW_SHIMS_PATH/"scm/git", "--homebrew=print-path").and_return("git")
+        expect(described_class.git_path).to eq("git")
       end
 
       it "returns git_path if already set" do
@@ -99,7 +102,7 @@ describe Utils do
         described_class.instance_variable_set(:@git, false)
       end
 
-      it "returns" do
+      it "returns nil" do
         expect(described_class.git_path).to eq(nil)
       end
     end
@@ -138,10 +141,12 @@ describe Utils do
         git = HOMEBREW_SHIMS_PATH/"scm/git"
         @repo = Pathname.new("hey")
         FileUtils.mkpath("hey")
-        `cd #{@repo}`
-        `#{git} init`
-        `#{git} remote add origin git@github.com:Homebrew/brew`
-        `cd ..`
+        shutup do
+          system "cd #{@repo}"
+          system "#{git} init"
+          system "#{git} remote add origin git@github.com:Homebrew/brew"
+          system "cd .."
+        end
       end
 
       after(:all) do
