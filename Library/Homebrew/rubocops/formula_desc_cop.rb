@@ -45,6 +45,7 @@ module RuboCop
           malloc
           ooc
           preexec
+          x86
           xUnit
         ].freeze
 
