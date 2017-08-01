@@ -36,9 +36,7 @@ describe Hbc::DSL, :cask do
 
     it "will simply warn, not throw an exception" do
       expect {
-        shutup do
-          attempt_unknown_method.call
-        end
+        attempt_unknown_method.call
       }.not_to raise_error
     end
   end
@@ -78,12 +76,10 @@ describe Hbc::DSL, :cask do
       it "may use deprecated DSL version hash syntax" do
         allow(ENV).to receive(:[]).with("HOMEBREW_DEVELOPER").and_return(nil)
 
-        shutup do
-          expect(cask.token).to eq("with-dsl-version")
-          expect(cask.url.to_s).to eq("http://example.com/TestCask.dmg")
-          expect(cask.homepage).to eq("http://example.com/")
-          expect(cask.version.to_s).to eq("1.2.3")
-        end
+        expect(cask.token).to eq("with-dsl-version")
+        expect(cask.url.to_s).to eq("http://example.com/TestCask.dmg")
+        expect(cask.homepage).to eq("http://example.com/")
+        expect(cask.version.to_s).to eq("1.2.3")
       end
     end
   end

@@ -5,9 +5,7 @@ describe Hbc::CLI::Style, :cask do
   let(:args) { [] }
   let(:cli) { described_class.new(*args) }
 
-  around do |example|
-    shutup { example.run }
-  end
+  around(&:run)
 
   describe "#run" do
     subject { cli.run }

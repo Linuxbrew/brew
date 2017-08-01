@@ -39,9 +39,7 @@ describe Hbc::Cask, :cask do
     end
 
     it "returns an instance of the Cask from a url" do
-      c = shutup do
-        Hbc::CaskLoader.load("file://#{tap_path}/Casks/local-caffeine.rb")
-      end
+      c = Hbc::CaskLoader.load("file://#{tap_path}/Casks/local-caffeine.rb")
       expect(c).to be_kind_of(Hbc::Cask)
       expect(c.token).to eq("local-caffeine")
     end
@@ -49,9 +47,8 @@ describe Hbc::Cask, :cask do
     it "raises an error when failing to download a Cask from a url" do
       expect {
         url = "file://#{tap_path}/Casks/notacask.rb"
-        shutup do
-          Hbc::CaskLoader.load(url)
-        end
+
+        Hbc::CaskLoader.load(url)
       }.to raise_error(Hbc::CaskUnavailableError)
     end
 

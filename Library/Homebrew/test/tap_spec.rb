@@ -52,12 +52,10 @@ describe Tap do
 
   def setup_git_repo
     path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "init"
-      end
+      system "git", "init"
+      system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+      system "git", "add", "--all"
+      system "git", "commit", "-m", "init"
     end
   end
 
@@ -104,7 +102,7 @@ describe Tap do
       path = Tap::TAP_DIRECTORY/"someone/homebrew-foo"
       path.mkpath
       cd path do
-        shutup { system "git", "init" }
+        system "git", "init"
         system "git", "remote", "add", "origin",
           "https://github.com/someone/homebrew-foo"
       end
@@ -148,10 +146,8 @@ describe Tap do
       services_tap = described_class.new("Homebrew", "services")
       services_tap.path.mkpath
       services_tap.path.cd do
-        shutup do
-          system "git", "init"
-          system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-services"
-        end
+        system "git", "init"
+        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-services"
       end
       expect(services_tap).not_to be_private
     end
@@ -217,7 +213,7 @@ describe Tap do
       tap = described_class.new("user", "repo")
 
       expect {
-        shutup { tap.install clone_target: "file:///not/existed/remote/url" }
+        tap.install clone_target: "file:///not/existed/remote/url"
       }.to raise_error(ErrorDuringExecution)
 
       expect(tap).not_to be_installed
@@ -238,17 +234,16 @@ describe Tap do
       setup_git_repo
 
       tap = Tap.new("Homebrew", "bar")
-      shutup do
-        tap.install clone_target: subject.path/".git"
-      end
+
+      tap.install clone_target: subject.path/".git"
+
       expect(tap).to be_installed
       expect(HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1").to be_a_file
       expect(HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd").to be_a_file
       expect(HOMEBREW_PREFIX/"share/zsh/site-functions/_brew-tap-cmd").to be_a_file
       expect(HOMEBREW_PREFIX/"share/fish/vendor_completions.d/brew-tap-cmd.fish").to be_a_file
-      shutup do
-        tap.uninstall
-      end
+      tap.uninstall
+
       expect(tap).not_to be_installed
       expect(HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1").not_to exist
       expect(HOMEBREW_PREFIX/"share/man/man1").not_to exist
@@ -266,17 +261,17 @@ describe Tap do
       setup_tap_files
       setup_git_repo
       tap = Tap.new("Homebrew", "baz")
-      shutup { tap.install clone_target: subject.path/".git" }
+      tap.install clone_target: subject.path/".git"
       (HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1").delete
       (HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd").delete
       (HOMEBREW_PREFIX/"share/zsh/site-functions/_brew-tap-cmd").delete
       (HOMEBREW_PREFIX/"share/fish/vendor_completions.d/brew-tap-cmd.fish").delete
-      shutup { tap.link_completions_and_manpages }
+      tap.link_completions_and_manpages
       expect(HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1").to be_a_file
       expect(HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd").to be_a_file
       expect(HOMEBREW_PREFIX/"share/zsh/site-functions/_brew-tap-cmd").to be_a_file
       expect(HOMEBREW_PREFIX/"share/fish/vendor_completions.d/brew-tap-cmd.fish").to be_a_file
-      shutup { tap.uninstall }
+      tap.uninstall
     ensure
       (HOMEBREW_PREFIX/"etc").rmtree if (HOMEBREW_PREFIX/"etc").exist?
       (HOMEBREW_PREFIX/"share").rmtree if (HOMEBREW_PREFIX/"share").exist?

@@ -1,10 +1,8 @@
 describe "brew bottle", :integration_test do
   it "builds a bottle for the given Formula" do
     begin
-      shutup do
-        expect { brew "install", "--build-bottle", testball }
-          .to be_a_success
-      end
+      expect { brew "install", "--build-bottle", testball }
+        .to be_a_success
 
       expect { brew "bottle", "--no-rebuild", testball }
         .to output(/Formula not from core or any taps/).to_stderr

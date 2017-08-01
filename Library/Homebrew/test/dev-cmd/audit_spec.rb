@@ -174,13 +174,11 @@ describe FormulaAuditor do
     specify "GithubGistFormula", :needs_compat do
       ENV.delete("HOMEBREW_DEVELOPER")
 
-      fa = shutup do
-        formula_auditor "foo", <<-EOS.undent
-          class Foo < GithubGistFormula
-            url "http://example.com/foo-1.0.tgz"
-          end
-        EOS
-      end
+      fa = formula_auditor "foo", <<-EOS.undent
+        class Foo < GithubGistFormula
+          url "http://example.com/foo-1.0.tgz"
+        end
+      EOS
 
       fa.audit_class
       expect(fa.problems)
@@ -388,18 +386,14 @@ describe FormulaAuditor do
 
       origin_tap_path.mkpath
       origin_tap_path.cd do
-        shutup do
-          system "git", "init"
-          system "git", "add", "--all"
-          system "git", "commit", "-m", "init"
-        end
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "init"
       end
 
       tap_path.mkpath
       tap_path.cd do
-        shutup do
-          system "git", "clone", origin_tap_path, "."
-        end
+        system "git", "clone", origin_tap_path, "."
       end
     end
 
@@ -423,16 +417,12 @@ describe FormulaAuditor do
       origin_formula_path.write text
 
       origin_tap_path.cd do
-        shutup do
-          system "git", "commit", "-am", "commit"
-        end
+        system "git", "commit", "-am", "commit"
       end
 
       tap_path.cd do
-        shutup do
-          system "git", "fetch"
-          system "git", "reset", "--hard", "origin/master"
-        end
+        system "git", "fetch"
+        system "git", "reset", "--hard", "origin/master"
       end
     end
 

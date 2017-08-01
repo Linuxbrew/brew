@@ -84,10 +84,7 @@ describe Formulary do
     end
 
     it "returns a Formula when given a URL" do
-      formula = shutup do
-        subject.factory("file://#{formula_path}")
-      end
-
+      formula = subject.factory("file://#{formula_path}")
       expect(formula).to be_kind_of(Formula)
     end
 
@@ -112,9 +109,7 @@ describe Formulary do
       let(:installer) { FormulaInstaller.new(formula) }
 
       it "returns a Formula when given a rack" do
-        shutup do
-          installer.install
-        end
+        installer.install
 
         f = subject.from_rack(formula.rack)
         expect(f).to be_kind_of(Formula)
@@ -122,9 +117,7 @@ describe Formulary do
       end
 
       it "returns a Formula when given a Keg" do
-        shutup do
-          installer.install
-        end
+        installer.install
 
         keg = Keg.new(formula.prefix)
         f = subject.from_keg(keg)
@@ -206,9 +199,7 @@ describe Formulary do
     it "prioritizes Formulae from pinned Taps" do
       begin
         tap.pin
-        formula = shutup do
-          subject.find_with_priority(formula_name)
-        end
+        formula = subject.find_with_priority(formula_name)
         expect(formula).to be_kind_of(Formula)
         expect(formula.path).to eq(tap_path.realpath)
       ensure

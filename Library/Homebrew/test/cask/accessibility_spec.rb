@@ -20,9 +20,7 @@ describe "Accessibility Access", :cask do
         sudo: true,
       )
 
-      shutup do
-        installer.enable_accessibility_access
-      end
+      installer.enable_accessibility_access
     end
 
     it "warns about disabling accessibility access on old macOS releases" do
@@ -42,9 +40,7 @@ describe "Accessibility Access", :cask do
         sudo: true,
       )
 
-      shutup do
-        installer.enable_accessibility_access
-      end
+      installer.enable_accessibility_access
     end
 
     it "can disable accessibility access" do
@@ -54,9 +50,7 @@ describe "Accessibility Access", :cask do
         sudo: true,
       )
 
-      shutup do
-        installer.disable_accessibility_access
-      end
+      installer.disable_accessibility_access
     end
   end
 

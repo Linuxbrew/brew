@@ -14,9 +14,7 @@ describe "brew test", :integration_test do
   end
 
   it "fails when a Formula has no test" do
-    shutup do
-      expect { brew "install", testball }.to be_a_success
-    end
+    expect { brew "install", testball }.to be_a_success
 
     expect { brew "test", testball }
       .to output(/testball defines no test/).to_stderr
@@ -39,9 +37,7 @@ describe "brew test", :integration_test do
       end
     EOS
 
-    shutup do
-      expect { brew "install", "testball" }.to be_a_success
-    end
+    expect { brew "install", "testball" }.to be_a_success
 
     expect { brew "test", "--HEAD", "testball" }
       .to output(/Testing testball/).to_stdout

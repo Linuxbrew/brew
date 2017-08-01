@@ -11,9 +11,7 @@ describe Hbc::Artifact::Suite, :cask do
   end
 
   it "creates a suite containing the expected app" do
-    shutup do
-      install_phase.call
-    end
+    install_phase.call
 
     expect(target_path.join("Caffeine.app")).to exist
   end
@@ -22,9 +20,7 @@ describe Hbc::Artifact::Suite, :cask do
     target_path.mkpath
 
     expect {
-      shutup do
-        install_phase.call
-      end
+      install_phase.call
     }.to raise_error(Hbc::CaskError)
 
     expect(source_path).to be_a_directory

@@ -10,9 +10,8 @@ describe Hbc::CLI::Outdated, :cask do
   end
 
   before do
-    shutup do
-      installed.each { |cask| InstallHelper.install_with_caskfile(cask) }
-    end
+    installed.each { |cask| InstallHelper.install_with_caskfile(cask) }
+
     allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
   end
 

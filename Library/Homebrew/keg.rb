@@ -237,13 +237,37 @@ class Keg
     opt_record.symlink? && path == opt_record.resolved_path
   end
 
-  def remove_opt_record
-    opt_record.unlink
-    aliases.each do |a|
-      alias_symlink = opt_record.parent/a
-      next if !alias_symlink.symlink? && !alias_symlink.exist?
+  def remove_old_aliases
+    opt = opt_record.parent
+
+    tap = begin
+      to_formula.tap
+    rescue FormulaUnavailableError, TapFormulaAmbiguityError,
+           TapFormulaWithOldnameAmbiguityError
+      # If the formula can't be found, just ignore aliases for now.
+      nil
+    end
+
+    if tap
+      bad_tap_opt = opt/tap.user
+      FileUtils.rm_rf bad_tap_opt if bad_tap_opt.directory?
+    end
+
+    Pathname.glob("#{opt_record}@*").each do |a|
+      a = a.basename
+      next if aliases.include?(a)
+
+      alias_symlink = opt/a
+      if alias_symlink.symlink? && alias_symlink.exist?
+        next if rack != alias_symlink.realpath.parent
+      end
+
       alias_symlink.delete
     end
+  end
+
+  def remove_opt_record
+    opt_record.unlink
     opt_record.parent.rmdir_if_possible
   end
 
@@ -251,6 +275,7 @@ class Keg
     path.rmtree
     path.parent.rmdir_if_possible
     remove_opt_record if optlinked?
+    remove_old_aliases
     remove_oldname_opt_record
   end
 
@@ -277,6 +302,7 @@ class Keg
 
         dst.uninstall_info if dst.to_s =~ INFOFILE_RX
         dst.unlink
+        remove_old_aliases
         Find.prune if src.directory?
       end
     end
@@ -468,12 +494,7 @@ class Keg
   end
 
   def aliases
-    formula = Formulary.from_rack(rack)
-    aliases = formula.aliases
-    return aliases if formula.stable?
-    aliases.reject { |a| a.include?("@") }
-  rescue FormulaUnavailableError
-    []
+    Tab.for_keg(self).aliases || []
   end
 
   def optlink(mode = OpenStruct.new)

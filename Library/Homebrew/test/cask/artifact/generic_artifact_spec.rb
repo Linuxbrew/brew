@@ -21,9 +21,7 @@ describe Hbc::Artifact::Artifact, :cask do
   end
 
   it "moves the artifact to the proper directory" do
-    shutup do
-      install_phase.call
-    end
+    install_phase.call
 
     expect(target_path).to be_a_directory
     expect(source_path).not_to exist
@@ -33,9 +31,7 @@ describe Hbc::Artifact::Artifact, :cask do
     target_path.mkpath
 
     expect {
-      shutup do
-        install_phase.call
-      end
+      install_phase.call
     }.to raise_error(Hbc::CaskError)
 
     expect(source_path).to be_a_directory

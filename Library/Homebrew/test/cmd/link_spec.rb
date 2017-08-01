@@ -9,19 +9,15 @@ describe "brew link", :integration_test do
   it "does not fail if the given Formula is already linked" do
     setup_test_formula "testball1"
 
-    shutup do
-      expect { brew "install", "testball1" }.to be_a_success
-      expect { brew "link", "testball1" }.to be_a_success
-    end
+    expect { brew "install", "testball1" }.to be_a_success
+    expect { brew "link", "testball1" }.to be_a_success
   end
 
   it "links a given Formula" do
     setup_test_formula "testball1"
 
-    shutup do
-      expect { brew "install", "testball1" }.to be_a_success
-      expect { brew "unlink", "testball1" }.to be_a_success
-    end
+    expect { brew "install", "testball1" }.to be_a_success
+    expect { brew "unlink", "testball1" }.to be_a_success
 
     expect { brew "link", "--dry-run", "testball1" }
       .to output(/Would link/).to_stdout
@@ -44,9 +40,7 @@ describe "brew link", :integration_test do
       keg_only "just because"
     EOS
 
-    shutup do
-      expect { brew "install", "testball1" }.to be_a_success
-    end
+    expect { brew "install", "testball1" }.to be_a_success
 
     expect { brew "link", "testball1", "SHELL" => "/bin/zsh" }
       .to output(/testball1 is keg-only/).to_stderr

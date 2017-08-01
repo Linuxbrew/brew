@@ -4,9 +4,7 @@ describe "brew reinstall", :integration_test do
   before(:each) do
     setup_test_formula "testball"
 
-    shutup do
-      expect { brew "install", "testball", "--with-foo" }.to be_a_success
-    end
+    expect { brew "install", "testball", "--with-foo" }.to be_a_success
   end
 
   it "reinstalls a Formula" do
