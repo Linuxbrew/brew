@@ -1278,14 +1278,6 @@ class ResourceAuditor
       problem "should always include at least one HTTP url"
     end
 
-    # Check pypi urls
-    if @strict
-      urls.each do |p|
-        next unless p =~ %r{^https?://pypi.python.org/(.*)}
-        problem "#{p} should be `https://files.pythonhosted.org/#{Regexp.last_match(1)}`"
-      end
-    end
-
     return unless @online
     urls.each do |url|
       next if !@strict && mirrors.include?(url)
