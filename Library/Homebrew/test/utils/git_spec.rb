@@ -5,50 +5,71 @@ describe Git do
     git = HOMEBREW_SHIMS_PATH/"scm/git"
     file = "lib/blah.rb"
     repo = Pathname.new("repo")
-    FileUtils.mkpath("repo/lib")
-    shutup do
-      system "#{git} init"
-      FileUtils.touch("repo/#{file}")
-      File.open(repo.join("file").to_s, "w") { |f| f.write("blah") }
-      system "#{git} add repo/#{file}"
-      system "#{git} commit -m'File added'"
-      @hash1 = `git rev-parse HEAD`
-      File.open(repo.join("file").to_s, "w") { |f| f.write("brew") }
-      system "#{git} add repo/#{file}"
-      system "#{git} commit -m'written to File'"
-      @hash2 = `git rev-parse HEAD`
-    end
+
+    (repo/"lib").mkpath
+    system git, "init"
+    FileUtils.touch("repo/#{file}")
+
+    File.open(repo/file, "w") { |f| f.write("blah") }
+    system git, "add", repo/file
+    system git, "commit", "-m", "'File added'"
+    @h1 = `git rev-parse HEAD`
+
+    File.open(repo/file, "w") { |f| f.write("brew") }
+    system git, "add", repo/file
+    system git, "commit", "-m", "'written to File'"
+    @h2 = `git rev-parse HEAD`
   end
 
   let(:file) { "lib/blah.rb" }
   let(:repo) { Pathname.new("repo") }
+  let(:hash1) { @h1[0..6] }
+  let(:hash2) { @h2[0..6] }
 
   after(:all) do
     FileUtils.rm_rf("repo")
   end
 
   describe "#last_revision_commit_of_file" do
-    it "sets args as --skip=1 when before_commit is nil" do
-      expect(described_class.last_revision_commit_of_file(repo, file)).to eq(@hash1[0..6])
+    it "gives last revision commit when before_commit is nil" do
+      expect(
+        described_class.last_revision_commit_of_file(repo, file),
+      ).to eq(hash1)
     end
 
-    it "sets args as --skip=1 when before_commit is nil" do
-      expect(described_class.last_revision_commit_of_file(repo, file, before_commit: "0..3")).to eq(@hash2[0..6])
+    it "gives revision commit based on before_commit when it is not nil" do
+      expect(
+        described_class.last_revision_commit_of_file(repo,
+                                                    file,
+                                                    before_commit: "0..3"),
+      ).to eq(hash2)
     end
   end
 
   describe "#last_revision_of_file" do
     it "returns last revision of file" do
-      expect(described_class.last_revision_of_file(repo, repo.join("file").to_s)).to eq("blah")
+      expect(
+        described_class.last_revision_of_file(repo,
+                                              repo/file),
+      ).to eq("blah")
     end
 
     it "returns last revision of file based on before_commit" do
-      expect(described_class.last_revision_of_file(repo, repo.join("file").to_s, before_commit: "0..3")).to eq("brew")
+      expect(
+        described_class.last_revision_of_file(repo, repo/file,
+                                              before_commit: "0..3"),
+      ).to eq("brew")
     end
   end
 end
 
 describe Utils do
+  before(:each) do
+    if described_class.instance_variable_defined?(:@git)
+      described_class.send(:remove_instance_variable, :@git)
+    end
+  end
+
   describe "::git_available?" do
     it "returns true if git --version command succeeds" do
       allow_any_instance_of(Process::Status).to receive(:success?).and_return(true)
@@ -73,7 +94,7 @@ describe Utils do
         described_class.instance_variable_set(:@git, false)
       end
 
-      it "returns" do
+      it "returns nil" do
         expect(described_class.git_path).to eq(nil)
       end
     end
@@ -84,8 +105,7 @@ describe Utils do
       end
 
       it "returns path of git" do
-        allow(Utils).to receive(popen_read).with(HOMEBREW_SHIMS_PATH/"scm/git", "--homebrew=print-path").and_return("git")
-        expect(described_class.git_path).to eq("git")
+        expect(described_class.git_path).to end_with("git")
       end
 
       it "returns git_path if already set" do
@@ -138,23 +158,27 @@ describe Utils do
     context "when git is available" do
       before(:all) do
         described_class.instance_variable_set(:@git, true)
-        git = HOMEBREW_SHIMS_PATH/"scm/git"
-        @repo = Pathname.new("hey")
-        FileUtils.mkpath("hey")
-        shutup do
-          system "cd #{@repo}"
-          system "#{git} init"
-          system "#{git} remote add origin git@github.com:Homebrew/brew"
-          system "cd .."
-        end
       end
 
       after(:all) do
-        FileUtils.rm_rf(@repo)
+        if described_class.instance_variable_defined?(:@git)
+          described_class.send(:remove_instance_variable, :@git)
+        end
       end
 
-      it "returns true when git remote exists" do
+      it "returns true when git remote exists", :needs_network do
+        git = HOMEBREW_SHIMS_PATH/"scm/git"
+        repo = Pathname.new("hey")
+        repo.mkpath
+
+        system "cd", repo
+        system git, "init"
+        system git, "remote", "add", "origin", "git@github.com:Homebrew/brew"
+        system "cd .."
+
         expect(described_class.git_remote_exists("git@github.com:Homebrew/brew")).to be_truthy
+
+        FileUtils.rm_rf(repo)
       end
 
       it "returns false when git remote does not exist" do
@@ -166,16 +190,25 @@ describe Utils do
   describe "::clear_git_available_cache" do
     it "removes @git_path and @git_version if defined" do
       described_class.clear_git_available_cache
+
       expect(@git_path).to be_nil
       expect(@git_version).to be_nil
     end
 
     it "removes @git if defined" do
       described_class.instance_variable_set(:@git, true)
-      described_class.clear_git_available_cache
-      expect(@git).to be_nil
-      expect(@git_path).to be_nil
-      expect(@git_version).to be_nil
+
+      begin
+        described_class.clear_git_available_cache
+
+        expect(@git).to be_nil
+        expect(@git_path).to be_nil
+        expect(@git_version).to be_nil
+      ensure
+        if described_class.instance_variable_defined?(:@git)
+          described_class.send(:remove_instance_variable, :@git)
+        end
+      end
     end
   end
 end
