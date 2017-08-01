@@ -94,7 +94,7 @@ module Homebrew
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif !strict
-      options[:except_cops] = [:FormulaAuditStrict, :NewFormulaAudit]
+      options[:only_cops] = [:FormulaAudit]
     end
 
     # Check style in a single batch run up front for performance
