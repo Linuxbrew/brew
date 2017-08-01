@@ -124,7 +124,8 @@ module RuboCop
 
         case type
         when :required
-          type_match = !node.method_args.nil? && node.method_args.first.str_type?
+          type_match = !node.method_args.nil? &&
+                       (node.method_args.first.str_type? || node.method_args.first.sym_type?)
           if type_match && !name_match
             name_match = node_equals?(node.method_args.first, name)
           end

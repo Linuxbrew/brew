@@ -909,16 +909,6 @@ class FormulaAuditor
       problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2)}}\""
     end
 
-    if line =~ /depends_on :(automake|autoconf|libtool)/
-      problem ":#{Regexp.last_match(1)} is deprecated. Usage should be \"#{Regexp.last_match(1)}\""
-    end
-
-    if line =~ /depends_on :apr/
-      problem ":apr is deprecated. Usage should be \"apr-util\""
-    end
-
-    problem ":tex is deprecated" if line =~ /depends_on :tex/
-
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
       problem "#{Regexp.last_match(2)} modules should be vendored rather than use deprecated `depends_on \"#{Regexp.last_match(1)}\" => :#{Regexp.last_match(2)}#{Regexp.last_match(3)}`"
     end
