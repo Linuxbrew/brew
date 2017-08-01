@@ -558,3 +558,7 @@ def with_env(hash)
     ENV.update(old_values)
   end
 end
+
+def shell_profile
+  Utils::Shell.profile
+end

@@ -12,6 +12,7 @@ describe Homebrew::Hooks::Bottles do
       local_bottle_path: nil,
       bottle_disabled?: false,
       some_random_method: true,
+      keg_only?: false,
     )
   end
 

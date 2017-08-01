@@ -1,10 +1,8 @@
 describe "brew log", :integration_test do
   it "shows the Git log for the Homebrew repository when no argument is given" do
     HOMEBREW_REPOSITORY.cd do
-      shutup do
-        system "git", "init"
-        system "git", "commit", "--allow-empty", "-m", "This is a test commit"
-      end
+      system "git", "init"
+      system "git", "commit", "--allow-empty", "-m", "This is a test commit"
     end
 
     expect { brew "log" }
@@ -18,18 +16,15 @@ describe "brew log", :integration_test do
 
     core_tap = CoreTap.new
     core_tap.path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "This is a test commit for Testball"
-      end
+      system "git", "init"
+      system "git", "add", "--all"
+      system "git", "commit", "-m", "This is a test commit for Testball"
     end
 
     core_tap_url = "file://#{core_tap.path}"
     shallow_tap = Tap.fetch("homebrew", "shallow")
-    shutup do
-      system "git", "clone", "--depth=1", core_tap_url, shallow_tap.path
-    end
+
+    system "git", "clone", "--depth=1", core_tap_url, shallow_tap.path
 
     expect { brew "log", "#{shallow_tap}/testball" }
       .to output(/This is a test commit for Testball/).to_stdout

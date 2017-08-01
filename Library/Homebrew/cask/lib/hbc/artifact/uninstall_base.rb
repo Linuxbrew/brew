@@ -247,8 +247,11 @@ module Hbc
               set output to ""
 
               repeat with i from 1 to (count trashedItems)
-                set item i of trashedItems to POSIX path of (item i of trashedItems as string)
-                set output to output & (item i of trashedItems) & (do shell script "printf \"\\0\"")
+                set trashedItem to POSIX path of (item i of trashedItems as string)
+                set output to output & trashedItem
+                if i < count trashedItems then
+                  set output to output & (do shell script "printf \"\\0\"")
+                end if
               end repeat
 
               return output

@@ -88,9 +88,7 @@ describe Hbc::Pkg, :cask do
       allow(pkg).to receive(:root).and_return(fake_root)
       allow(pkg).to receive(:forget)
 
-      shutup do
-        pkg.uninstall
-      end
+      pkg.uninstall
 
       expect(fake_dir).to be_a_directory
       expect(fake_file).not_to be_a_file

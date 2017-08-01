@@ -6,6 +6,7 @@ cache:
     - $HOME/Library/Caches/Homebrew/tests
 
 matrix:
+  fast_finish: true
   include:
     - os: osx
       osx_image: xcode8.3

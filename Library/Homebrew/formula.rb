@@ -383,7 +383,9 @@ class Formula
   # All of aliases for the formula
   def aliases
     @aliases ||= if tap
-      tap.alias_reverse_table[full_name] || []
+      tap.alias_reverse_table[full_name].to_a.map do |a|
+        a.split("/")[-1]
+      end
     else
       []
     end
@@ -2368,7 +2370,7 @@ class Formula
     #   version '4.8.1'
     # end</pre>
     def fails_with(compiler, &block)
-      # odeprecated "fails_with :llvm" if compiler == :llvm
+      odeprecated "fails_with :llvm" if compiler == :llvm
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
 

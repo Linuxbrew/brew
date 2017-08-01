@@ -8,10 +8,8 @@ describe "brew pull", :integration_test do
 
   it "fetches a patch from a GitHub commit or pull request and applies it", :needs_network do
     CoreTap.instance.path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "checkout", "-b", "new-branch"
-      end
+      system "git", "init"
+      system "git", "checkout", "-b", "new-branch"
     end
 
     expect { brew "pull", "https://jenkins.brew.sh/job/Homebrew\%20Testing/1028/" }
