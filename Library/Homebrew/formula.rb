@@ -2072,8 +2072,8 @@ class Formula
     #
     # If you maintain your own repository, you can add your own bottle links.
     # https://docs.brew.sh/Bottles.html
-    # You can ignore this block entirely if submitting to Homebrew/Homebrew, It'll be
-    # handled for you by the Brew Test Bot.
+    # You can ignore this block entirely if submitting to Homebrew/homebrew-core.
+    # It'll be handled for you by the Brew Test Bot.
     #
     # <pre>bottle do
     #   root_url "https://example.com" # Optional root to calculate bottle URLs
