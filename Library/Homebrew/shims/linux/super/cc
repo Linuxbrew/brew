@@ -188,7 +188,7 @@ class Cmd
       args << "-L#{val}" if keep?(path) && @lset.add?(path)
     when /^-R(.+)?/
       # -R is not the correct way to pass rpaths to the linker
-      val  = chuzzle($1) || enum.next
+      path = chuzzle($1) || enum.next
       wl = "-Wl," unless mode == :ld
       args << "#{wl}-rpath=" if keep?(path)
     else
