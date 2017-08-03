@@ -73,7 +73,64 @@ module RuboCop
             next unless block_arg.source.size>1
             problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{block_arg.source}|\"."
           end
+
+          [:rebuild, :version_scheme].each do |m|
+            find_method_with_args(body_node, m, 0) do
+              problem "'#{m} 0' should be removed"
+            end
+          end
+
+          [:mac?, :linux?].each do |m|
+            next unless formula_tap == "homebrew-core"
+            find_instance_method_call(body_node, "OS", m) do |check|
+              problem "Don't use #{check.source}; Homebrew/core only supports macOS"
+            end
+          end
+
+          find_method_with_args(body_node, :fails_with, :llvm) do
+            problem "'fails_with :llvm' is now a no-op so should be removed"
+          end
+
+          find_method_with_args(body_node, :system, /^(otool|install_name_tool|lipo)$/) do
+            problem "Use ruby-macho instead of calling #{@offensive_node.source}"
+          end
+          #
+          find_method_with_args(body_node, :system, /npm/, /install/) do |m|
+            next if @formula_name =~ /^kibana(\@\d+(\.\d+)?)?$/
+            problem "Use Language::Node for npm install args" unless languageNode?(m)
+          end
+          if find_method_def(body_node, :test)
+            problem "Use new-style test definitions (test do)"
+          end
+
+          if find_method_def(body_node, :options)
+            problem "Use new-style option definitions"
+          end
+
+          find_method_with_args(body_node, :skip_clean, :all) do
+            problem "`skip_clean :all` is deprecated; brew no longer strips symbols\n" \
+              "\tPass explicit paths to prevent Homebrew from removing empty folders."
+          end
+
+          find_instance_method_call(body_node, :build, :universal?) do
+            problem "macOS has been 64-bit only so build.universal? is deprecated."
+          end
+
+          find_instance_method_call(body_node, "ENV", :universal_binary) do
+            problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
+          end
+
+          find_instance_method_call(body_node, "ENV", :x11) do
+            problem 'Use "depends_on :x11" instead of "ENV.x11"'
+          end
         end
+
+        # This is Pattern Matching method for AST
+        # Takes the AST node as argument and yields matching node if block given
+        # Else returns boolean for the match
+        def_node_search :languageNode?, <<-PATTERN
+          (const (const nil :Language) :Node)
+        PATTERN
       end
     end
   end

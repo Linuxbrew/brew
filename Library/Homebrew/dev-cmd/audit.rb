@@ -866,10 +866,6 @@ class FormulaAuditor
 
     problem "Use spaces instead of tabs for indentation" if line =~ /^[ ]*\t/
 
-    if line.include?("ENV.x11")
-      problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
-    end
-
     # Avoid hard-coding compilers
     if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?(gcc|llvm-gcc|clang)['" ]}
       problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
@@ -881,14 +877,6 @@ class FormulaAuditor
 
     if line =~ /system\s+['"](env|export)(\s+|['"])/
       problem "Use ENV instead of invoking '#{Regexp.last_match(1)}' to modify the environment"
-    end
-
-    if formula.name != "wine" && line =~ /ENV\.universal_binary/
-      problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
-    end
-
-    if line =~ /build\.universal\?/
-      problem "macOS has been 64-bit only so build.universal? is deprecated."
     end
 
     if line =~ /version == ['"]HEAD['"]/
@@ -931,12 +919,6 @@ class FormulaAuditor
       problem "Use build instead of ARGV to check options"
     end
 
-    problem "Use new-style option definitions" if line.include?("def options")
-
-    if line.end_with?("def test")
-      problem "Use new-style test definitions (test do)"
-    end
-
     if line.include?("MACOS_VERSION")
       problem "Use MacOS.version instead of MACOS_VERSION"
     end
@@ -948,11 +930,6 @@ class FormulaAuditor
     cats = %w[leopard snow_leopard lion mountain_lion].join("|")
     if line =~ /MacOS\.(?:#{cats})\?/
       problem "\"#{$&}\" is deprecated, use a comparison to MacOS.version instead"
-    end
-
-    if line =~ /skip_clean\s+:all/
-      problem "`skip_clean :all` is deprecated; brew no longer strips symbols\n" \
-              "\tPass explicit paths to prevent Homebrew from removing empty folders."
     end
 
     if line =~ /depends_on [A-Z][\w:]+\.new$/
@@ -991,30 +968,6 @@ class FormulaAuditor
 
     if line =~ /assert [^!]+\.include?/
       problem "Use `assert_match` instead of `assert ...include?`"
-    end
-
-    if line.include?('system "npm", "install"') && !line.include?("Language::Node") &&
-       formula.name !~ /^kibana(\@\d+(\.\d+)?)?$/
-      problem "Use Language::Node for npm install args"
-    end
-
-    if line.include?("fails_with :llvm")
-      problem "'fails_with :llvm' is now a no-op so should be removed"
-    end
-
-    if line =~ /system\s+['"](otool|install_name_tool|lipo)/ && formula.name != "cctools"
-      problem "Use ruby-macho instead of calling #{Regexp.last_match(1)}"
-    end
-
-    if formula.tap.to_s == "homebrew/core"
-      ["OS.mac?", "OS.linux?"].each do |check|
-        next unless line.include?(check)
-        problem "Don't use #{check}; Homebrew/core only supports macOS"
-      end
-    end
-
-    if line =~ /((revision|version_scheme)\s+0)/
-      problem "'#{Regexp.last_match(1)}' should be removed"
     end
 
     return unless @strict

@@ -3,12 +3,13 @@ require "parser/current"
 module RuboCop
   module Cop
     class FormulaCop < Cop
+      attr_accessor :file_path
       @registry = Cop.registry
 
       # This method is called by RuboCop and is the main entry point
       def on_class(node)
-        file_path = processed_source.buffer.name
-        return unless file_path_allowed?(file_path)
+        @file_path = processed_source.buffer.name
+        return unless file_path_allowed?
         return unless formula_class?(node)
         return unless respond_to?(:audit_formula)
         class_node, parent_class_node, @body = *node
@@ -99,8 +100,7 @@ module RuboCop
       def find_method_with_args(node, method_name, *args)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          next unless parameters_passed?(method, *args)
-          yield method
+          yield method if parameters_passed?(method, *args)
         end
       end
 
@@ -111,7 +111,7 @@ module RuboCop
       def find_instance_method_call(node, instance, method_name)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          next unless method.receiver && method.receiver.const_name == instance
+          next unless method.receiver && (method.receiver.const_name == instance || method.receiver.method_name == instance)
           @offense_source_range = method.source_range
           @offensive_node = method
           yield method
@@ -400,6 +400,12 @@ module RuboCop
         method_name(component_node) if component_node.def_type?
       end
 
+      # Returns the formula tap
+      def formula_tap
+        return unless match_obj = @file_path.match(%r{/(homebrew-\w+)/})
+        match_obj[1]
+      end
+
       def problem(msg)
         add_offense(@offensive_node, @offense_source_range, msg)
       end
@@ -411,11 +417,11 @@ module RuboCop
         class_node && string_content(class_node) == "Formula"
       end
 
-      def file_path_allowed?(file_path)
+      def file_path_allowed?
         paths_to_exclude = [%r{/Library/Homebrew/compat/},
                             %r{/Library/Homebrew/test/}]
-        return true if file_path.nil? # file_path is nil when source is directly passed to the cop eg., in specs
-        file_path !~ Regexp.union(paths_to_exclude)
+        return true if @file_path.nil? # file_path is nil when source is directly passed to the cop eg., in specs
+        @file_path !~ Regexp.union(paths_to_exclude)
       end
     end
   end
