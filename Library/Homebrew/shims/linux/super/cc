@@ -252,7 +252,7 @@ class Cmd
     args = []
     args += ["#{wl}--dynamic-linker=#{dynamic_linker_path}"] if dynamic_linker_path
     args += path_flags("-L", library_paths)
-    args += path_flags("#{wl}-rpath=", rpath_paths)
+    args += rpath_flags("#{wl}-rpath=", rpath_paths)
   end
 
   def isystem_paths
@@ -309,6 +309,12 @@ class Cmd
   def path_flags(prefix, paths)
     paths = paths.uniq.select { |path| File.directory?(path) }
     paths.map! { |path| prefix + path }
+  end
+
+  # Unlike path_flags, do not prune non-existant directories.
+  # formula.lib for example does not yet exist, but should not be pruned.
+  def rpath_flags(prefix, paths)
+    paths.uniq.map { |path| prefix + path }
   end
 
   def path_split(key)
