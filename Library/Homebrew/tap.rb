@@ -486,6 +486,8 @@ class Tap
   def self.each
     return unless TAP_DIRECTORY.directory?
 
+    return to_enum unless block_given?
+
     TAP_DIRECTORY.subdirs.each do |user|
       user.subdirs.each do |repo|
         yield fetch(user.basename.to_s, repo.basename.to_s)
