@@ -27,8 +27,11 @@ describe "download strategies", :cask do
 
       expect(downloader).to have_received(:curl).with(
         cask.url.to_s,
-        "-C", 0,
-        "-o", kind_of(Pathname)
+        "--location",
+        "--remote-time",
+        "--continue-at", "-",
+        "--output", kind_of(Pathname),
+        user_agent: :default
       )
     end
 
@@ -36,25 +39,25 @@ describe "download strategies", :cask do
       let(:url_options) { { user_agent: "Mozilla/25.0.1" } }
 
       it "adds the appropriate curl args" do
-        curl_args = []
-        allow(downloader).to receive(:curl) { |*args| curl_args = args }
+        expect(downloader).to receive(:safe_system) { |*args|
+          expect(args.each_cons(2)).to include(["--user-agent", "Mozilla/25.0.1"])
+        }
 
         downloader.fetch
-
-        expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/25.0.1"])
       end
     end
 
     context "with a generalized fake user agent" do
+      alias_matcher :a_string_matching, :match
+
       let(:url_options) { { user_agent: :fake } }
 
       it "adds the appropriate curl args" do
-        curl_args = []
-        allow(downloader).to receive(:curl) { |*args| curl_args = args }
+        expect(downloader).to receive(:safe_system) { |*args|
+          expect(args.each_cons(2).to_a).to include(["--user-agent", a_string_matching(/Mozilla.*Mac OS X 10.*AppleWebKit/)])
+        }
 
         downloader.fetch
-
-        expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) https://caskroom.github.io"])
       end
     end
 

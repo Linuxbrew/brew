@@ -90,13 +90,8 @@ module Hbc
       end
     end
 
-    def downloaded_size
-      temporary_path.size? || 0
-    end
-
     def _fetch
-      odebug "Calling curl with args #{cask_curl_args}"
-      curl(*cask_curl_args)
+      curl_download url, *cask_curl_args, to: temporary_path, user_agent: uri_object.user_agent
     end
 
     def fetch
@@ -131,23 +126,7 @@ module Hbc
     private
 
     def cask_curl_args
-      default_curl_args.tap do |args|
-        args.concat(user_agent_args)
-        args.concat(cookies_args)
-        args.concat(referer_args)
-      end
-    end
-
-    def default_curl_args
-      [url, "-C", downloaded_size, "-o", temporary_path]
-    end
-
-    def user_agent_args
-      if uri_object.user_agent
-        ["-A", uri_object.user_agent]
-      else
-        []
-      end
+      cookies_args + referer_args
     end
 
     def cookies_args
@@ -181,8 +160,7 @@ module Hbc
 
   class CurlPostDownloadStrategy < CurlDownloadStrategy
     def cask_curl_args
-      super
-      default_curl_args.concat(post_args)
+      super.concat(post_args)
     end
 
     def post_args

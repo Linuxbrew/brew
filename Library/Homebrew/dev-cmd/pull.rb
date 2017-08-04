@@ -228,7 +228,7 @@ module Homebrew
           "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
         end
 
-        curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
+        curl "--silent", "--fail", "--output", "/dev/null", "--head", bottle_commit_url
 
         safe_system "git", "checkout", "--quiet", "-B", bottle_branch, orig_revision
         pull_patch bottle_commit_url, "bottle commit"
@@ -303,7 +303,7 @@ module Homebrew
       extra_msg = @description ? "(#{@description})" : nil
       ohai "Fetching patch #{extra_msg}"
       puts "Patch: #{patch_url}"
-      curl patch_url, "-s", "-o", patchpath
+      curl_download patch_url, to: patchpath
     end
 
     def apply_patch
@@ -433,10 +433,10 @@ module Homebrew
     end
     version = info.pkg_version
     ohai "Publishing on Bintray: #{package} #{version}"
-    curl "-w", '\n', "--silent", "--fail",
-         "-u#{creds[:user]}:#{creds[:key]}", "-X", "POST",
-         "-H", "Content-Type: application/json",
-         "-d", '{"publish_wait_for_secs": 0}',
+    curl "--write-out", '\n', "--silent", "--fail",
+         "--user", "#{creds[:user]}:#{creds[:key]}", "--request", "POST",
+         "--header", "Content-Type: application/json",
+         "--data", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/homebrew/#{repo}/#{package}/#{version}/publish"
     true
   rescue => e
@@ -587,7 +587,7 @@ module Homebrew
         # We're in the cache; make sure to force re-download
         loop do
           begin
-            curl url, "-o", filename
+            curl_download url, to: filename
             break
           rescue
             if retry_count >= max_curl_retries
@@ -606,7 +606,7 @@ module Homebrew
   end
 
   def check_bintray_mirror(name, url)
-    headers = curl_output("--connect-timeout", "15", "--head", url)[0]
+    headers, = curl_output("--connect-timeout", "15", "--location", "--head", url)
     status_code = headers.scan(%r{^HTTP\/.* (\d+)}).last.first
     return if status_code.start_with?("2")
     opoo "The Bintray mirror #{url} is not reachable (HTTP status code #{status_code})."
