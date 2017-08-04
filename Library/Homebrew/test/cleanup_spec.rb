@@ -164,20 +164,37 @@ describe Homebrew::Cleanup do
       expect(npm_cache).not_to exist
     end
 
-    it "cleans up files and directories with name containing -- if ARGV prune is all" do
-      a = (HOMEBREW_CACHE/"--a")
-      b = (HOMEBREW_CACHE/"b")
-      c = (HOMEBREW_CACHE/"c")
-      a.mkpath
-      b.mkpath
-      FileUtils.touch c
+    it "cleans up all files and directories" do
+      git = (HOMEBREW_CACHE/"gist--git")
+      gist = (HOMEBREW_CACHE/"gist")
+      svn = (HOMEBREW_CACHE/"gist--svn")
+      git.mkpath
+      gist.mkpath
+      FileUtils.touch svn
       allow(ARGV).to receive(:value).with("prune").and_return("all")
-      shutup do
-        described_class.cleanup_cache
+      begin
+        shutup do
+          described_class.cleanup_cache
+        end
+        expect(git).not_to exist
+        expect(gist).to exist
+        expect(svn).not_to exist
+      ensure
+        FileUtils.rm_rf(git)
+        FileUtils.rm_rf(gist)
+        FileUtils.rm_rf(svn)
       end
-      expect(a).not_to exist
-      expect(b).to exist
-      expect(c).not_to exist
+    end
+
+    it "raises error when formula name is ambiguous" do
+      bottle = (HOMEBREW_CACHE/"foo-0.2.bottle.gz")
+      FileUtils.touch bottle
+      (HOMEBREW_CELLAR/"foo/foo-0.2").mkpath
+      begin
+          described_class.cleanup_cache
+      ensure
+        FileUtils.rm_rf(bottle)
+      end
     end
   end
 end
