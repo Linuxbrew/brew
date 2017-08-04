@@ -35,6 +35,12 @@ module Hbc
         @target = self.class.resolve_target(target)
       end
 
+      def to_a
+        [@source_string].tap do |ary|
+          ary << { target: @target_string } unless @target_string.empty?
+        end
+      end
+
       def summarize
         target_string = @target_string.empty? ? "" : " -> #{@target_string}"
         "#{@source_string}#{target_string}"

@@ -73,6 +73,12 @@ module Hbc
       def summarize
         path.relative_path_from(cask.staged_path).to_s
       end
+
+      def to_h
+        { path: path.relative_path_from(cask.staged_path).to_s }.tap do |h|
+          h[:args] = args unless is_a?(ManualInstaller)
+        end
+      end
     end
   end
 end

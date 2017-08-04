@@ -14,6 +14,10 @@ module Hbc
       def initialize(cask)
         super(cask)
       end
+
+      def to_a
+        [true]
+      end
     end
   end
 end

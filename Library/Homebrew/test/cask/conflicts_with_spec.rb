@@ -8,7 +8,7 @@ describe "conflicts_with", :cask do
       Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-conflicts-with.rb")
     }
 
-    it "installs the dependency of a Cask and the Cask itself", :focus do
+    it "installs the dependency of a Cask and the Cask itself" do
       Hbc::Installer.new(local_caffeine).install
 
       expect(local_caffeine).to be_installed

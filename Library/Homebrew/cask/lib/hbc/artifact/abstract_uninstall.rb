@@ -31,6 +31,10 @@ module Hbc
         @directives = directives
       end
 
+      def to_h
+        directives.to_h
+      end
+
       private
 
       def dispatch_uninstall_directives(**options)
