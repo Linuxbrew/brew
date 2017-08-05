@@ -5,7 +5,7 @@ cask 'with-conflicts-with' do
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
   homepage 'http://example.com/with-conflicts-with'
 
-  conflicts_with formula: 'unar'
+  conflicts_with cask: 'local-caffeine'
 
   app 'Caffeine.app'
 end
