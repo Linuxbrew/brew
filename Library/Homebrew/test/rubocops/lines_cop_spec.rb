@@ -200,5 +200,274 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with invalid rebuild" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          bottle do
+            rebuild 0
+            sha256 "fe0679b932dd43a87fd415b609a7fbac7a069d117642ae8ebaac46ae1fb9f0b3" => :sierra
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "'rebuild 0' should be removed",
+                              severity: :convention,
+                              line: 5,
+                              column: 4,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with OS.linux? check" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          bottle do
+            if OS.linux?
+              nil
+            end
+            sha256 "fe0679b932dd43a87fd415b609a7fbac7a069d117642ae8ebaac46ae1fb9f0b3" => :sierra
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Don't use OS.linux?; Homebrew/core only supports macOS",
+                              severity: :convention,
+                              line: 5,
+                              column: 7,
+                              source: source }]
+
+      inspect_source(cop, source, "/homebrew-core/")
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with fails_with :llvm" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          bottle do
+            sha256 "fe0679b932dd43a87fd415b609a7fbac7a069d117642ae8ebaac46ae1fb9f0b3" => :sierra
+          end
+          fails_with :llvm do
+            build 2335
+            cause "foo"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "'fails_with :llvm' is now a no-op so should be removed",
+                              severity: :convention,
+                              line: 7,
+                              column: 2,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with def test" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+
+          def test
+            assert_equals "1", "1"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use new-style test definitions (test do)",
+                              severity: :convention,
+                              line: 5,
+                              column: 2,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with def options" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+
+          def options
+            [["--bar", "desc"]]
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use new-style option definitions",
+                              severity: :convention,
+                              line: 5,
+                              column: 2,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with deprecated skip_clean call" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          skip_clean :all
+        end
+      EOS
+
+      expected_offenses = [{ message: "`skip_clean :all` is deprecated; brew no longer strips symbols\n" \
+                                      "\tPass explicit paths to prevent Homebrew from removing empty folders.",
+                             severity: :convention,
+                             line: 4,
+                             column: 2,
+                             source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with build.universal?" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build.universal?
+             "foo"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "macOS has been 64-bit only so build.universal? is deprecated.",
+                              severity: :convention,
+                              line: 4,
+                              column: 5,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with ENV.universal_binary" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build?
+             ENV.universal_binary
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated.",
+                              severity: :convention,
+                              line: 5,
+                              column: 5,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with ENV.universal_binary" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build?
+             ENV.x11
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: 'Use "depends_on :x11" instead of "ENV.x11"',
+                              severity: :convention,
+                              line: 5,
+                              column: 5,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with ruby-macho alternatives" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "install_name_tool", "-id"
+        end
+      EOS
+
+      expected_offenses = [{  message: 'Use ruby-macho instead of calling "install_name_tool"',
+                              severity: :convention,
+                              line: 4,
+                              column: 10,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with npm install without language::Node args" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "npm", "install"
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use Language::Node for npm install args",
+                              severity: :convention,
+                              line: 4,
+                              column: 17,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
 end
