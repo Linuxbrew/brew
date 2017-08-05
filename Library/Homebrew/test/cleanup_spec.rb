@@ -64,24 +64,18 @@ describe Homebrew::Cleanup do
   end
 
   specify "::update_disk_cleanup_size" do
-    shutup do
-      described_class.instance_eval("@disk_cleanup_size = 0")
-      described_class.update_disk_cleanup_size(128)
-    end
+    described_class.instance_eval("@disk_cleanup_size = 0")
+    described_class.update_disk_cleanup_size(128)
     expect(described_class.instance_variable_get("@disk_cleanup_size")).to eq(128)
   end
 
   specify "::disk_cleanup_size" do
-    shutup do
-      described_class.instance_eval("@disk_cleanup_size = 0")
-    end
+    described_class.instance_eval("@disk_cleanup_size = 0")
     expect(described_class.disk_cleanup_size).to eq(described_class.instance_variable_get("@disk_cleanup_size"))
   end
 
   specify "::unremovable_kegs" do
-    shutup do
-      described_class.unremovable_kegs
-    end
+    described_class.unremovable_kegs
     expect(described_class.instance_variable_get("@unremovable_kegs")).to eq([])
   end
 
@@ -173,9 +167,7 @@ describe Homebrew::Cleanup do
       FileUtils.touch svn
       allow(ARGV).to receive(:value).with("prune").and_return("all")
       begin
-        shutup do
-          described_class.cleanup_cache
-        end
+        described_class.cleanup_cache
         expect(git).not_to exist
         expect(gist).to exist
         expect(svn).not_to exist
@@ -186,14 +178,41 @@ describe Homebrew::Cleanup do
       end
     end
 
-    it "raises error when formula name is ambiguous" do
-      bottle = (HOMEBREW_CACHE/"foo-0.2.bottle.gz")
-      FileUtils.touch bottle
-      (HOMEBREW_CELLAR/"foo/foo-0.2").mkpath
-      begin
-          described_class.cleanup_cache
-      ensure
-        FileUtils.rm_rf(bottle)
+    context "cleaning old files in HOMEBREW_CACHE" do
+      before(:each) do
+        @bottle = (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz")
+        @testball = (HOMEBREW_CACHE/"testball-0.0.1")
+        FileUtils.touch(@bottle)
+        FileUtils.touch(@testball)
+        (HOMEBREW_CELLAR/"testball"/"0.0.1").mkpath
+        FileUtils.touch(CoreTap.instance.formula_dir/"testball.rb")
+      end
+
+      after(:each) do
+        FileUtils.rm_rf(@bottle)
+        FileUtils.rm_rf(@testball)
+        FileUtils.rm_rf(HOMEBREW_CELLAR/"testball")
+        FileUtils.rm_rf(CoreTap.instance.formula_dir/"testball.rb")
+      end
+
+      it "cleans up file if outdated" do
+        allow(Utils::Bottles).to receive(:file_outdated?).with(any_args).and_return(true)
+        described_class.cleanup_cache
+        expect(@bottle).not_to exist
+        expect(@testball).not_to exist
+      end
+
+      it "cleans up file if ARGV has -s and formula not installed" do
+        ARGV << "-s"
+        described_class.cleanup_cache
+        expect(@bottle).not_to exist
+        expect(@testball).not_to exist
+      end
+
+      it "cleans up file if stale" do
+        puts described_class.cleanup_cache
+        expect(@bottle).not_to exist
+        expect(@testball).not_to exist
       end
     end
   end
