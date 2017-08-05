@@ -133,7 +133,7 @@ describe FormulaInstaller do
     }.to raise_error(CannotInstallFormulaError)
   end
 
-  describe "#install_requirement_formula?", :focus do
+  describe "#install_requirement_formula?" do
     before do
       @requirement = Python3Requirement.new
       @requirement_dependency = @requirement.to_dependency
