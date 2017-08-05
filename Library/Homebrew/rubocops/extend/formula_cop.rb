@@ -108,6 +108,8 @@ module RuboCop
       # Matches a method with a receiver,
       # EX: to match `Formula.factory(name)`
       # call `find_instance_method_call(node, "Formula", :factory)`
+      # EX: to match `build.head?`
+      # call `find_instance_method_call(node, :build, :head?)`
       # yields to a block with matching method node
       def find_instance_method_call(node, instance, method_name)
         methods = find_every_method_call_by_name(node, method_name)

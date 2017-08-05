@@ -129,7 +129,7 @@ module RuboCop
         end
 
         # Node Pattern search for Language::Node
-        def_node_search :languageNodeModule?, <<-EOS.undent 
+        def_node_search :languageNodeModule?, <<-EOS.undent
           (const (const nil :Language) :Node)
         EOS
       end
