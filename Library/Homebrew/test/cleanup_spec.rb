@@ -63,20 +63,9 @@ describe Homebrew::Cleanup do
     end
   end
 
-  specify "::update_disk_cleanup_size" do
-    described_class.instance_eval("@disk_cleanup_size = 0")
-    described_class.update_disk_cleanup_size(128)
-    expect(described_class.instance_variable_get("@disk_cleanup_size")).to eq(128)
-  end
-
   specify "::disk_cleanup_size" do
     described_class.instance_eval("@disk_cleanup_size = 0")
     expect(described_class.disk_cleanup_size).to eq(described_class.instance_variable_get("@disk_cleanup_size"))
-  end
-
-  specify "::unremovable_kegs" do
-    described_class.unremovable_kegs
-    expect(described_class.instance_variable_get("@unremovable_kegs")).to eq([])
   end
 
   specify "::cleanup_formula" do
@@ -178,7 +167,20 @@ describe Homebrew::Cleanup do
       end
     end
 
-    context "cleaning old files in HOMEBREW_CACHE" do
+    it "cleans up VCS checkout directories with modified time < prune time" do
+      foo = (HOMEBREW_CACHE/"--foo")
+      foo.mkpath
+      allow(ARGV).to receive(:value).with("prune").and_return("1")
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
+      begin
+        described_class.cleanup_cache
+        expect(foo).not_to exist
+      ensure
+        FileUtils.rm_rf(foo)
+      end
+    end
+
+    context "cleans old files in HOMEBREW_CACHE" do
       before(:each) do
         @bottle = (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz")
         @testball = (HOMEBREW_CACHE/"testball-0.0.1")
@@ -214,6 +216,17 @@ describe Homebrew::Cleanup do
         expect(@bottle).not_to exist
         expect(@testball).not_to exist
       end
+    end
+  end
+
+  specify "::prune?" do
+    foo = mktmpdir/"foo.rb"
+    foo.mkpath
+    allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
+    begin
+      expect(described_class.prune?(foo, days_default: "1")).to be_truthy
+    ensure
+      FileUtils.rm_rf(foo)
     end
   end
 end
