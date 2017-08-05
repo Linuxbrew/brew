@@ -4,15 +4,24 @@ require_relative "../extend/string"
 module RuboCop
   module Cop
     module FormulaAudit
-      # This cop checks for and audits legacy patches in Formulae
-      class LegacyPatches < FormulaCop
+      # This cop audits patches in Formulae
+      class Patches < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body)
+          external_patches = find_all_blocks(body, :patch)
+          external_patches.each do |patch_block|
+            url_node = find_every_method_call_by_name(patch_block, :url).first
+            url_string = parameters(url_node).first
+            patch_problems(url_string)
+          end
+
           patches_node = find_method_def(body, :patches)
           return if patches_node.nil?
           legacy_patches = find_strings(patches_node)
           problem "Use the patch DSL instead of defining a 'patches' method"
           legacy_patches.each { |p| patch_problems(p) }
         end
+
+        private
 
         def patch_problems(patch)
           patch_url = string_content(patch)
@@ -30,7 +39,7 @@ module RuboCop
           if match_obj = regex_match_group(patch, gh_patch_diff_pattern)
             problem <<-EOS.undent
               use GitHub pull request URLs:
-                https://github.com/#{match_obj[1]}/#{match_obj[2]}/pull/#{match_ojb[3]}.patch
+                https://github.com/#{match_obj[1]}/#{match_obj[2]}/pull/#{match_obj[3]}.patch
               Rather than patch-diff:
                 #{patch_url}
             EOS
