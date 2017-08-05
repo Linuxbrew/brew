@@ -2213,7 +2213,7 @@ class Formula
     # depends_on :arch => :x86_64 # If this formula only builds on Intel x86 64-bit.
     # depends_on :arch => :ppc # Only builds on PowerPC?
     # depends_on :ld64 # Sometimes ld fails on `MacOS.version < :leopard`. Then use this.
-    # depends_on :x11 # X11/XQuartz components. Non-optional X11 deps should go in Homebrew/Homebrew-x11
+    # depends_on :x11 # X11/XQuartz components.
     # depends_on :osxfuse # Permits the use of the upstream signed binary or our source package.
     # depends_on :tuntap # Does the same thing as above. This is vital for Yosemite and above.
     # depends_on :mysql => :recommended</pre>
