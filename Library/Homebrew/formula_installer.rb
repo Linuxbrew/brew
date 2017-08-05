@@ -46,7 +46,7 @@ class FormulaInstaller
     @ignore_deps = false
     @only_deps = false
     @build_from_source = ARGV.build_from_source? || ARGV.build_all_from_source?
-    @build_bottle = ARGV.build_bottle?
+    @build_bottle = false
     @force_bottle = ARGV.force_bottle?
     @interactive = false
     @git = false
@@ -543,7 +543,6 @@ class FormulaInstaller
     fi.options           |= inherited_options
     fi.options           &= df.options
     fi.build_from_source  = ARGV.build_formula_from_source?(df)
-    fi.build_bottle       = false
     fi.force_bottle       = false
     fi.verbose            = verbose?
     fi.quieter            = quieter?
