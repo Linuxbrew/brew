@@ -17,6 +17,19 @@ module Hbc
     end
   end
 
+  class CaskConflictError < AbstractCaskErrorWithToken
+    attr_reader :conflicting_cask
+
+    def initialize(token, conflicting_cask)
+      super(token)
+      @conflicting_cask = conflicting_cask
+    end
+
+    def to_s
+      "Cask '#{token}' conflicts with '#{conflicting_cask}'."
+    end
+  end
+
   class CaskUnavailableError < AbstractCaskErrorWithToken
     def to_s
       "Cask '#{token}' is unavailable" << (reason.empty? ? "." : ": #{reason}")
