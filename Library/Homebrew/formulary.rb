@@ -165,7 +165,7 @@ module Formulary
     def load_file
       HOMEBREW_CACHE_FORMULA.mkpath
       FileUtils.rm_f(path)
-      curl_download url, to: path
+      curl url, "-o", path
       super
     rescue MethodDeprecatedError => e
       if url =~ %r{github.com/([\w-]+)/homebrew-([\w-]+)/}

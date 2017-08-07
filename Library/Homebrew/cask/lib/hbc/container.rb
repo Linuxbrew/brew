@@ -4,7 +4,6 @@ require "hbc/container/bzip2"
 require "hbc/container/cab"
 require "hbc/container/criteria"
 require "hbc/container/dmg"
-require "hbc/container/directory"
 require "hbc/container/executable"
 require "hbc/container/generic_unar"
 require "hbc/container/gpg"
@@ -15,7 +14,6 @@ require "hbc/container/otf"
 require "hbc/container/pkg"
 require "hbc/container/seven_zip"
 require "hbc/container/sit"
-require "hbc/container/svn_repository"
 require "hbc/container/tar"
 require "hbc/container/ttf"
 require "hbc/container/rar"
@@ -45,7 +43,6 @@ module Hbc
         Xz,    # pure xz
         Gpg,   # GnuPG signed data
         Executable,
-        SvnRepository,
       ]
       # for explicit use only (never autodetected):
       # Hbc::Container::Naked

@@ -242,10 +242,12 @@ class FormulaAuditor
 
   def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
     max_time = hash_needed ? "600" : "25"
-    output, = curl_output(
-      "--connect-timeout", "15", "--include", "--max-time", max_time, "--location", url,
-      user_agent: user_agent
+    args = curl_args(
+      extra_args: ["--connect-timeout", "15", "--include", "--max-time", max_time, url],
+      show_output: true,
+      user_agent: user_agent,
     )
+    output = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
 
     status_code = :unknown
     while status_code == :unknown || status_code.to_s.start_with?("3")

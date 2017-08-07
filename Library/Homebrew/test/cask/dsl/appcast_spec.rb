@@ -33,18 +33,13 @@ describe Hbc::DSL::Appcast do
 
   describe "#calculate_checkpoint" do
     before do
-      expect(Hbc::SystemCommand).to receive(:run) do |executable, **options|
-        expect(executable).to eq "/usr/bin/curl"
-        expect(options[:args]).to include(*cmd_args)
-        expect(options[:print_stderr]).to be false
-        cmd_result
-      end
+      expect(Hbc::SystemCommand).to receive(:run).with(*cmd_args).and_return(cmd_result)
       allow(cmd_result).to receive(:success?).and_return(cmd_success)
       allow(cmd_result).to receive(:stdout).and_return(cmd_stdout)
     end
 
     context "when server returns a successful HTTP status" do
-      let(:cmd_args) { [HOMEBREW_USER_AGENT_FAKE_SAFARI, "--compressed", "--location", "--fail", uri] }
+      let(:cmd_args) { ["/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", Hbc::URL::FAKE_USER_AGENT, "--fail", uri], print_stderr: false] }
       let(:cmd_result) { double("Hbc::SystemCommand::Result") }
       let(:cmd_success) { true }
       let(:cmd_stdout) { "hello world" }
@@ -61,7 +56,7 @@ describe Hbc::DSL::Appcast do
     end
 
     context "when server returns a non-successful HTTP status" do
-      let(:cmd_args) { [HOMEBREW_USER_AGENT_FAKE_SAFARI, "--compressed", "--location", "--fail", uri] }
+      let(:cmd_args) { ["/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", Hbc::URL::FAKE_USER_AGENT, "--fail", uri], print_stderr: false] }
       let(:cmd_result) { double("Hbc::SystemCommand::Result") }
       let(:cmd_success) { false }
       let(:cmd_stdout) { "some error message from the server" }
