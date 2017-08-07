@@ -927,15 +927,6 @@ class FormulaAuditor
       problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
     end
 
-    cats = %w[leopard snow_leopard lion mountain_lion].join("|")
-    if line =~ /MacOS\.(?:#{cats})\?/
-      problem "\"#{$&}\" is deprecated, use a comparison to MacOS.version instead"
-    end
-
-    if line =~ /depends_on [A-Z][\w:]+\.new$/
-      problem "`depends_on` can take requirement classes instead of instances"
-    end
-
     if line =~ /^def (\w+).*$/
       problem "Define method #{Regexp.last_match(1).inspect} in the class body, not at the top-level"
     end
@@ -954,20 +945,6 @@ class FormulaAuditor
 
     if line =~ /depends_on ['"](.+)['"] (if.+|unless.+)$/
       conditional_dep_problems(Regexp.last_match(1), Regexp.last_match(2), $&)
-    end
-
-    if line =~ /(Dir\[("[^\*{},]+")\])/
-      problem "#{Regexp.last_match(1)} is unnecessary; just use #{Regexp.last_match(2)}"
-    end
-
-    if line =~ /system (["'](#{FILEUTILS_METHODS})["' ])/o
-      system = Regexp.last_match(1)
-      method = Regexp.last_match(2)
-      problem "Use the `#{method}` Ruby method instead of `system #{system}`"
-    end
-
-    if line =~ /assert [^!]+\.include?/
-      problem "Use `assert_match` instead of `assert ...include?`"
     end
 
     return unless @strict

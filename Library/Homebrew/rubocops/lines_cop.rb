@@ -1,3 +1,4 @@
+require 'FileUtils'
 require_relative "./extend/formula_cop"
 
 module RuboCop
@@ -123,6 +124,37 @@ module RuboCop
           find_instance_method_call(body_node, "ENV", :x11) do
             problem 'Use "depends_on :x11" instead of "ENV.x11"'
           end
+
+          find_every_method_call_by_name(body_node, :assert).each do |m|
+            if method_called?(m, :include?) && !method_called?(m, :!)
+              problem "Use `assert_match` instead of `assert ...include?`"
+            end
+          end
+
+          find_every_method_call_by_name(body_node, :depends_on).each do |m|
+            next unless method_called?(m, :new)
+            problem "`depends_on` can take requirement classes instead of instances"
+          end
+
+          os = [:leopard?, :snow_leopard?, :lion?, :mountain_lion?]
+          os.each do |version|
+            find_instance_method_call(body_node, :MacOS, version) do |m|
+              problem "\"#{m.source}\" is deprecated, use a comparison to MacOS.version instead"
+            end
+          end
+
+          dirPattern(body_node) do |m|
+            next unless m =~ /\[("[^\*{},]+")\]/
+            problem "Dir(#{Regexp.last_match(1)}) is unnecessary; just use #{Regexp.last_match(1)}"
+          end
+
+          fileUtils_methods= FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
+          find_method_with_args(body_node, :system, /fileUtils_methods/) do |m|
+            method = string_content(@offensive_node)
+            problem "Use the `#{method}` Ruby method instead of `#{m.source}`"
+          end
+
+
         end
 
         # This is Pattern Matching method for AST
@@ -131,7 +163,16 @@ module RuboCop
         def_node_search :languageNode?, <<-PATTERN
           (const (const nil :Language) :Node)
         PATTERN
+
+        def_node_search :dirPattern, <<-PATTERN
+          (send (const nil :Dir) :[] (str $_))
+        PATTERN
       end
     end
   end
 end
+
+# Strict rules ported early
+# find_method_with_args(@processed_source.ast, :require, "formula") do |m|
+#   problem "#{m.source} is now unnecessary"
+# end
