@@ -75,7 +75,7 @@ module FormulaCellarChecks
     if tab.poured_from_bottle
       output += <<-EOS.undent
         Rebuild this from source with:
-          brew reinstall --build-from-source #{formula}`
+          brew reinstall --build-from-source #{formula}
         If that's successful, file an issue#{formula.tap ? " here:\n  #{formula.tap.issues_url}" : "."}
       EOS
     end
