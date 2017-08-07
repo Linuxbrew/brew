@@ -18,12 +18,6 @@ class Sandbox
     !ARGV.no_sandbox?
   end
 
-  def self.print_sandbox_message
-    return if @printed_sandbox_message
-    ohai "Using the sandbox"
-    @printed_sandbox_message = true
-  end
-
   def initialize
     @profile = SandboxProfile.new
   end

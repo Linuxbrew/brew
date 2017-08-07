@@ -29,8 +29,6 @@ module Homebrew
       args << "--devel"
     end
 
-    Sandbox.print_sandbox_message if Sandbox.formula?(formula)
-
     Utils.safe_fork do
       if Sandbox.formula?(formula)
         sandbox = Sandbox.new
