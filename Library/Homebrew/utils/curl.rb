@@ -1,46 +1,42 @@
 require "pathname"
 require "open3"
 
-def curl_executable
+def curl_args(options = {})
   curl = Pathname.new ENV["HOMEBREW_CURL"]
   curl = Pathname.new "/usr/bin/curl" unless curl.exist?
-  return curl if curl.executable?
-  raise "#{curl} is not executable"
-end
+  raise "#{curl} is not executable" unless curl.exist? && curl.executable?
 
-def curl_args(*extra_args, show_output: false, user_agent: :default)
   args = [
-    curl_executable.to_s,
-    "--fail",
-    "--show-error",
+    curl.to_s,
+    "--remote-time",
+    "--location",
   ]
 
-  args << "--user-agent" << case user_agent
-  when :browser, :fake
-    HOMEBREW_USER_AGENT_FAKE_SAFARI
-  when :default
-    HOMEBREW_USER_AGENT_CURL
+  case options[:user_agent]
+  when :browser
+    args << "--user-agent" << HOMEBREW_USER_AGENT_FAKE_SAFARI
   else
-    user_agent
+    args << "--user-agent" << HOMEBREW_USER_AGENT_CURL
   end
 
-  unless show_output
+  unless options[:show_output]
     args << "--progress-bar" unless ARGV.verbose?
     args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
+    args << "--fail"
     args << "--silent" if !$stdout.tty? || ENV["TRAVIS"]
   end
 
-  args + extra_args
+  args += options[:extra_args] if options[:extra_args]
+  args
 end
 
 def curl(*args)
-  safe_system(*curl_args(*args))
+  safe_system(*curl_args(extra_args: args))
 end
 
-def curl_download(*args, to: nil, **options)
-  curl(*args, "--location", "--remote-time", "--continue-at", "-", "--output", to, **options)
-end
-
-def curl_output(*args, **options)
-  Open3.capture3(*curl_args(*args, show_output: true, **options))
+def curl_output(*args)
+  curl_args = curl_args(extra_args: args, show_output: true)
+  Open3.popen3(*curl_args) do |_, stdout, stderr, wait_thread|
+    [stdout.read, stderr.read, wait_thread.value]
+  end
 end

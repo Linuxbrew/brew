@@ -71,7 +71,7 @@ module Hbc
 
         begin
           ohai "Downloading #{url}."
-          curl_download url, to: path
+          curl url, "-o", path
         rescue ErrorDuringExecution
           raise CaskUnavailableError.new(token, "Failed to download #{Formatter.url(url)}.")
         end

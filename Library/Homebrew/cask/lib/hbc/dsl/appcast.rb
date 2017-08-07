@@ -12,11 +12,7 @@ module Hbc
       end
 
       def calculate_checkpoint
-        curl_executable, *args = curl_args(
-          "--compressed", "--location", "--fail", @uri,
-          user_agent: :fake
-        )
-        result = SystemCommand.run(curl_executable, args: args, print_stderr: false)
+        result = SystemCommand.run("/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", URL::FAKE_USER_AGENT, "--fail", @uri], print_stderr: false)
 
         checkpoint = if result.success?
           processed_appcast_text = result.stdout.gsub(%r{<pubDate>[^<]*</pubDate>}m, "")

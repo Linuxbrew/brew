@@ -143,15 +143,7 @@ module Hbc
 
     def check_appcast_http_code
       odebug "Verifying appcast returns 200 HTTP response code"
-
-      curl_executable, *args = curl_args(
-        "--compressed", "--location", "--fail",
-        "--write-out", "%{http_code}",
-        "--output", "/dev/null",
-        cask.appcast,
-        user_agent: :fake
-      )
-      result = @command.run(curl_executable, args: args, print_stderr: false)
+      result = @command.run("/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", URL::FAKE_USER_AGENT, "--output", "/dev/null", "--write-out", "%{http_code}", cask.appcast], print_stderr: false)
       if result.success?
         http_code = result.stdout.chomp
         add_warning "unexpected HTTP response code retrieving appcast: #{http_code}" unless http_code == "200"

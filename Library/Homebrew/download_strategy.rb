@@ -375,59 +375,75 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       ohai "Downloading from #{url}"
     end
 
-    curl_download resolved_url(url), to: temporary_path
+    urls = actual_urls(url)
+    unless urls.empty?
+      ohai "Downloading from #{urls.last}"
+      if !ENV["HOMEBREW_NO_INSECURE_REDIRECT"].nil? && url.start_with?("https://") &&
+         urls.any? { |u| !u.start_with? "https://" }
+        puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
+        raise CurlDownloadStrategyError, url
+      end
+      url = urls.last
+    end
+
+    curl url, "-C", downloaded_size, "-o", temporary_path
   end
 
   # Curl options to be always passed to curl,
-  # with raw head calls (`curl --head`) or with actual `fetch`.
+  # with raw head calls (`curl -I`) or with actual `fetch`.
   def _curl_opts
-    return ["--user" << meta.fetch(:user)] if meta.key?(:user)
-    []
+    copts = []
+    copts << "--user" << meta.fetch(:user) if meta.key?(:user)
+    copts
   end
 
-  def resolved_url(url)
-    redirect_url, _, status = curl_output(
-      *_curl_opts, "--silent", "--head",
-      "--write-out", "%{redirect_url}",
-      "--output", "/dev/null",
-      url.to_s
-    )
-
-    return url unless status.success?
-    return url if redirect_url.empty?
-
-    ohai "Downloading from #{redirect_url}"
-    if ENV["HOMEBREW_NO_INSECURE_REDIRECT"] &&
-       url.start_with?("https://") && !redirect_url.start_with?("https://")
-      puts "HTTPS to HTTP redirect detected & HOMEBREW_NO_INSECURE_REDIRECT is set."
-      raise CurlDownloadStrategyError, url
+  def actual_urls(url)
+    urls = []
+    curl_args = _curl_opts << "-I" << "-L" << url
+    Utils.popen_read("curl", *curl_args).scan(/^Location: (.+)$/).map do |m|
+      urls << URI.join(urls.last || url, m.first.chomp).to_s
     end
-
-    redirect_url
+    urls
   end
 
-  def curl(*args, **options)
+  def downloaded_size
+    temporary_path.size? || 0
+  end
+
+  def curl(*args)
     args.concat _curl_opts
     args << "--connect-timeout" << "5" unless mirrors.empty?
-    super(*args, **options)
+    super
   end
 end
 
 # Detect and download from Apache Mirror
 class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
   def apache_mirrors
-    mirrors, = Open3.capture3(
-      *curl_args(*_curl_opts, "--silent", "--location", "#{@url}&asjson=1"),
-    )
+    rd, wr = IO.pipe
+    buf = ""
 
-    JSON.parse(mirrors)
+    pid = fork do
+      ENV.delete "HOMEBREW_CURL_VERBOSE"
+      rd.close
+      $stdout.reopen(wr)
+      $stderr.reopen(wr)
+      curl "#{@url}&asjson=1"
+    end
+    wr.close
+
+    rd.readline if ARGV.verbose? # Remove Homebrew output
+    buf << rd.read until rd.eof?
+    rd.close
+    Process.wait(pid)
+    buf
   end
 
   def _fetch
     return super if @tried_apache_mirror
     @tried_apache_mirror = true
 
-    mirrors = apache_mirrors
+    mirrors = JSON.parse(apache_mirrors)
     path_info = mirrors.fetch("path_info")
     @url = mirrors.fetch("preferred") + path_info
     @mirrors |= %W[https://archive.apache.org/dist/#{path_info}]
@@ -444,7 +460,7 @@ end
 class CurlPostDownloadStrategy < CurlDownloadStrategy
   def _fetch
     base_url, data = @url.split("?")
-    curl_download base_url, "--data", data, to: temporary_path
+    curl base_url, "-d", data, "-C", downloaded_size, "-o", temporary_path
   end
 end
 
@@ -514,7 +530,7 @@ class S3DownloadStrategy < CurlDownloadStrategy
       s3url = obj.public_url
     end
 
-    curl_download s3url, to: temporary_path
+    curl s3url, "-C", downloaded_size, "-o", temporary_path
   end
 end
 
@@ -550,7 +566,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   end
 
   def _fetch
-    curl_download download_url, to: temporary_path
+    curl download_url, "-C", downloaded_size, "-o", temporary_path
   end
 
   private
@@ -599,7 +615,7 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
   def _fetch
     # HTTP request header `Accept: application/octet-stream` is required.
     # Without this, the GitHub API will respond with metadata, not binary.
-    curl_download download_url, "--header", "Accept: application/octet-stream", to: temporary_path
+    curl download_url, "-C", downloaded_size, "-o", temporary_path, "-H", "Accept: application/octet-stream"
   end
 
   private
@@ -899,27 +915,18 @@ class GitHubGitDownloadStrategy < GitDownloadStrategy
   def github_last_commit
     return if ENV["HOMEBREW_NO_GITHUB_API"]
 
-    output, _, status = curl_output(
-      "--silent", "--head", "--location",
-      "-H", "Accept: application/vnd.github.v3.sha",
-      "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{@ref}"
-    )
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{@ref}"
 
-    return unless status.success?
-
-    commit = output[/^ETag: \"(\h+)\"/, 1]
+    commit = output[/^ETag: \"(\h+)\"/, 1] if status.success?
     version.update_commit(commit) if commit
     commit
   end
 
   def multiple_short_commits_exist?(commit)
     return if ENV["HOMEBREW_NO_GITHUB_API"]
-
-    output, _, status = curl_output(
-      "--silent", "--head", "--location",
-      "-H", "Accept: application/vnd.github.v3.sha",
-      "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{commit}"
-    )
+    output, _, status = curl_output "-H", "Accept: application/vnd.github.v3.sha", \
+      "-I", "https://api.github.com/repos/#{@user}/#{@repo}/commits/#{commit}"
 
     !(status.success? && output && output[/^Status: (200)/, 1] == "200")
   end
@@ -1152,13 +1159,15 @@ class DownloadStrategyDetector
       SubversionDownloadStrategy
     when %r{^cvs://}
       CVSDownloadStrategy
-    when %r{^hg://}, %r{^https?://(.+?\.)?googlecode\.com/hg}
+    when %r{^https?://(.+?\.)?googlecode\.com/hg}
+      MercurialDownloadStrategy
+    when %r{^hg://}
       MercurialDownloadStrategy
     when %r{^bzr://}
       BazaarDownloadStrategy
     when %r{^fossil://}
       FossilDownloadStrategy
-    when %r{^svn\+http://}, %r{^http://svn\.apache\.org/repos/}
+    when %r{^http://svn\.apache\.org/repos/}, %r{^svn\+http://}
       SubversionDownloadStrategy
     when %r{^https?://(.+?\.)?sourceforge\.net/hgweb/}
       MercurialDownloadStrategy

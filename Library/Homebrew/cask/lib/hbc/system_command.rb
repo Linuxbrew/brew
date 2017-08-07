@@ -112,7 +112,11 @@ module Hbc
                  processed_output[:stderr],
                  processed_status.exitstatus)
     end
+  end
+end
 
+module Hbc
+  class SystemCommand
     class Result
       attr_accessor :command, :stdout, :stderr, :exit_status
 
