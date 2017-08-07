@@ -51,8 +51,18 @@ class SoftwareSpec
     @owner = owner
     @resource.owner = self
     resources.each_value do |r|
-      r.owner     = self
-      r.version ||= (version.head? ? Version.create("HEAD") : version.dup)
+      r.owner = self
+      r.version ||= begin
+        if version.nil?
+          raise "#{full_name}: version missing for \"#{r.name}\" resource!"
+        end
+
+        if version.head?
+          Version.create("HEAD")
+        else
+          version.dup
+        end
+      end
     end
     patches.each { |p| p.owner = self }
   end
