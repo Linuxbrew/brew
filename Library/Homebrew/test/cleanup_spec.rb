@@ -64,8 +64,8 @@ describe Homebrew::Cleanup do
   end
 
   specify "::disk_cleanup_size" do
-    described_class.instance_eval("@disk_cleanup_size = 0")
-    expect(described_class.disk_cleanup_size).to eq(described_class.instance_variable_get("@disk_cleanup_size"))
+    disk_cleanup_size = described_class.instance_variable_get(:@disk_cleanup_size)
+    expect(described_class.disk_cleanup_size).to eq(disk_cleanup_size)
   end
 
   specify "::cleanup_formula" do
