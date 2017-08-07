@@ -181,18 +181,19 @@ describe Homebrew::Cleanup do
     end
 
     context "cleans old files in HOMEBREW_CACHE" do
+      let(:bottle) { (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz") }
+      let(:testball) { (HOMEBREW_CACHE/"testball-0.0.1") }
+
       before(:each) do
-        @bottle = (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz")
-        @testball = (HOMEBREW_CACHE/"testball-0.0.1")
-        FileUtils.touch(@bottle)
-        FileUtils.touch(@testball)
+        FileUtils.touch(bottle)
+        FileUtils.touch(testball)
         (HOMEBREW_CELLAR/"testball"/"0.0.1").mkpath
         FileUtils.touch(CoreTap.instance.formula_dir/"testball.rb")
       end
 
       after(:each) do
-        FileUtils.rm_rf(@bottle)
-        FileUtils.rm_rf(@testball)
+        FileUtils.rm_rf(bottle)
+        FileUtils.rm_rf(testball)
         FileUtils.rm_rf(HOMEBREW_CELLAR/"testball")
         FileUtils.rm_rf(CoreTap.instance.formula_dir/"testball.rb")
       end
@@ -200,21 +201,21 @@ describe Homebrew::Cleanup do
       it "cleans up file if outdated" do
         allow(Utils::Bottles).to receive(:file_outdated?).with(any_args).and_return(true)
         described_class.cleanup_cache
-        expect(@bottle).not_to exist
-        expect(@testball).not_to exist
+        expect(bottle).not_to exist
+        expect(testball).not_to exist
       end
 
       it "cleans up file if ARGV has -s and formula not installed" do
         ARGV << "-s"
         described_class.cleanup_cache
-        expect(@bottle).not_to exist
-        expect(@testball).not_to exist
+        expect(bottle).not_to exist
+        expect(testball).not_to exist
       end
 
       it "cleans up file if stale" do
         puts described_class.cleanup_cache
-        expect(@bottle).not_to exist
-        expect(@testball).not_to exist
+        expect(bottle).not_to exist
+        expect(testball).not_to exist
       end
     end
   end
