@@ -8,7 +8,7 @@ module Hbc
         return true if criteria.magic_number(/^#!\s*\S+/)
 
         begin
-          MachO.open(criteria.path).header.executable?
+          criteria.path.file? && MachO.open(criteria.path).header.executable?
         rescue MachO::MagicError
           false
         end
