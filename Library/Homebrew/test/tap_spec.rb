@@ -297,6 +297,12 @@ describe Tap do
     subject.config["foo"] = nil
     expect(subject.config["foo"]).to be nil
   end
+
+  describe "#each" do
+    it "returns an enumerator if no block is passed" do
+      expect(described_class.each).to be_an_instance_of(Enumerator)
+    end
+  end
 end
 
 describe CoreTap do

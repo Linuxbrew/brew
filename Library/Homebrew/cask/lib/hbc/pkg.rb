@@ -16,19 +16,17 @@ module Hbc
     def uninstall
       unless pkgutil_bom_files.empty?
         odebug "Deleting pkg files"
-        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_files.join("\0"), sudo: true)
+        @command.run!("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_files.join("\0"), sudo: true)
       end
 
       unless pkgutil_bom_specials.empty?
         odebug "Deleting pkg symlinks and special files"
-        @command.run("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_specials.join("\0"), sudo: true)
+        @command.run!("/usr/bin/xargs", args: ["-0", "--", "/bin/rm", "--"], input: pkgutil_bom_specials.join("\0"), sudo: true)
       end
 
       unless pkgutil_bom_dirs.empty?
         odebug "Deleting pkg directories"
         deepest_path_first(pkgutil_bom_dirs).each do |dir|
-          next if MacOS.undeletable?(dir)
-
           with_full_permissions(dir) do
             clean_broken_symlinks(dir)
             clean_ds_store(dir)
@@ -67,6 +65,7 @@ module Hbc
                                    .stdout
                                    .split("\n")
                                    .map { |path| root.join(path) }
+                                   .reject(&MacOS.public_method(:undeletable?))
     end
 
     def root

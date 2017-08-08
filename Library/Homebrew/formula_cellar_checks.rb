@@ -157,7 +157,7 @@ module FormulaCellarChecks
     problem_if_output(check_manpages)
     problem_if_output(check_infopages)
     problem_if_output(check_jars)
-    problem_if_output(check_non_libraries)
+    problem_if_output(check_non_libraries) if @new_formula
     problem_if_output(check_non_executables(formula.bin))
     problem_if_output(check_generic_executables(formula.bin))
     problem_if_output(check_non_executables(formula.sbin))
