@@ -69,7 +69,7 @@ module FormulaCellarChecks
     return unless checker.broken_dylibs?
     output = <<-EOS.undent
       #{formula} has broken dynamic library links:
-        #{checker.broken_dylibs.to_a * "\n          "}
+        #{checker.broken_dylibs.to_a * "\n  "}
     EOS
     tab = Tab.for_keg(keg)
     if tab.poured_from_bottle
