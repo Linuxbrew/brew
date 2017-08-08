@@ -25,9 +25,9 @@ module Homebrew
            "public_download_numbers": true,
            "public_stats": true}
         EOS
-        curl "--silent", "--fail", "-u#{bintray_user}:#{bintray_key}",
-             "-H", "Content-Type: application/json",
-             "-d", package_blob, bintray_repo_url
+        curl "--silent", "--fail", "--user", "#{bintray_user}:#{bintray_key}",
+             "--header", "Content-Type: application/json",
+             "--data", package_blob, bintray_repo_url
         puts
       end
 
@@ -40,8 +40,8 @@ module Homebrew
       content_url = "https://api.bintray.com/content/homebrew/mirror"
       content_url += "/#{bintray_package}/#{f.pkg_version}/#{filename}"
       content_url += "?publish=1"
-      curl "--silent", "--fail", "-u#{bintray_user}:#{bintray_key}",
-           "-T", download, content_url
+      curl "--silent", "--fail", "--user", "#{bintray_user}:#{bintray_key}",
+           "--upload-file", download, content_url
       puts
       ohai "Mirrored #{filename}!"
     end

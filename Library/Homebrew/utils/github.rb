@@ -166,7 +166,7 @@ module GitHub
 
       args += ["--dump-header", headers_tmpfile.path]
 
-      output, errors, status = curl_output(url.to_s, *args)
+      output, errors, status = curl_output(url.to_s, "--location", *args)
       output, _, http_code = output.rpartition("\n")
       output, _, http_code = output.rpartition("\n") if http_code == "000"
       headers = headers_tmpfile.read
