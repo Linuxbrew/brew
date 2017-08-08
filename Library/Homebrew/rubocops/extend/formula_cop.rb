@@ -1,4 +1,5 @@
 require "parser/current"
+require_relative "../../extend/string"
 
 module RuboCop
   module Cop
@@ -138,17 +139,14 @@ module RuboCop
 
         case type
         when :required
-          type_match = !node.method_args.nil? &&
-                       (node.method_args.first.str_type? || node.method_args.first.sym_type?)
+          type_match = required_dependency?(node)
           if type_match && !name_match
-            name_match = node_equals?(node.method_args.first, name)
+            name_match = required_dependency_name?(node, name)
           end
         when :build, :optional, :recommended, :run
-          type_match = !node.method_args.nil? &&
-                       node.method_args.first.hash_type? &&
-                       node.method_args.first.values.first.children.first == type
+          type_match = dependency_type_hash_match?(node, type)
           if type_match && !name_match
-            name_match = node_equals?(node.method_args.first.keys.first.children.first, name)
+            name_match = dependency_name_hash_match?(node, name)
           end
         else
           type_match = false
@@ -160,6 +158,22 @@ module RuboCop
         end
         type_match && name_match
       end
+
+      def_node_search :required_dependency?, <<-EOS.undent
+        (send nil :depends_on ({str sym} _))
+      EOS
+
+      def_node_search :required_dependency_name?, <<-EOS.undent
+        (send nil :depends_on ({str sym} %1))
+      EOS
+
+      def_node_search :dependency_type_hash_match?, <<-EOS.undent
+        (hash (pair ({str sym} _) ({str sym} %1)))
+      EOS
+
+      def_node_search :dependency_name_hash_match?, <<-EOS.undent
+        (hash (pair ({str sym} %1) ({str sym} _)))
+      EOS
 
       # To compare node with appropriate Ruby variable
       def node_equals?(node, var)
