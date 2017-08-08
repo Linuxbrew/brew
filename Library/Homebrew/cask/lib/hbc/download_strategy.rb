@@ -10,7 +10,7 @@ module Hbc
   class AbstractDownloadStrategy
     attr_reader :cask, :name, :url, :uri_object, :version
 
-    def initialize(cask, command = SystemCommand)
+    def initialize(cask, command: SystemCommand)
       @cask       = cask
       @command    = command
       # TODO: this excess of attributes is a function of integrating
@@ -33,8 +33,8 @@ module Hbc
   class HbVCSDownloadStrategy < AbstractDownloadStrategy
     REF_TYPES = [:branch, :revision, :revisions, :tag].freeze
 
-    def initialize(cask, command = SystemCommand)
-      super
+    def initialize(*args, **options)
+      super(*args, **options)
       @ref_type, @ref = extract_ref
       @clone = Hbc.cache.join(cache_filename)
     end
@@ -64,11 +64,6 @@ module Hbc
   end
 
   class CurlDownloadStrategy < AbstractDownloadStrategy
-    # TODO: should be part of url object
-    def mirrors
-      @mirrors ||= []
-    end
-
     def tarball_path
       @tarball_path ||= Hbc.cache.join("#{name}--#{version}#{ext}")
     end
@@ -131,11 +126,6 @@ module Hbc
         ignore_interrupts { temporary_path.rename(tarball_path) }
       end
       tarball_path
-    rescue CurlDownloadStrategyError
-      raise if mirrors.empty?
-      puts "Trying a mirror..."
-      @url = mirrors.shift
-      retry
     end
 
     private
@@ -225,8 +215,8 @@ module Hbc
 
     # super does not provide checks for already-existing downloads
     def fetch
-      if tarball_path.exist?
-        puts "Already downloaded: #{tarball_path}"
+      if cached_location.directory?
+        puts "Already downloaded: #{cached_location}"
       else
         @url = @url.sub(/^svn\+/, "") if @url =~ %r{^svn\+http://}
         ohai "Checking out #{@url}"
@@ -252,9 +242,8 @@ module Hbc
         else
           fetch_repo @clone, @url
         end
-        compress
       end
-      tarball_path
+      cached_location
     end
 
     # This primary reason for redefining this method is the trust_cert
@@ -288,10 +277,6 @@ module Hbc
                     print_stderr: false)
     end
 
-    def tarball_path
-      @tarball_path ||= cached_location.dirname.join(cached_location.basename.to_s + "-#{@cask.version}.tar")
-    end
-
     def shell_quote(str)
       # Oh god escaping shell args.
       # See http://notetoself.vrensk.com/2008/08/escaping-single-quotes-in-ruby-harder-than-expected/
@@ -303,36 +288,6 @@ module Hbc
         name, url = line.split(/\s+/)
         yield name, url
       end
-    end
-
-    private
-
-    # TODO/UPDATE: the tar approach explained below is fragile
-    # against challenges such as case-sensitive filesystems,
-    # and must be re-implemented.
-    #
-    # Seems nutty: we "download" the contents into a tape archive.
-    # Why?
-    # * A single file is tractable to the rest of the Cask toolchain,
-    # * An alternative would be to create a Directory container type.
-    #   However, some type of file-serialization trick would still be
-    #   needed in order to enable calculating a single checksum over
-    #   a directory.  So, in that alternative implementation, the
-    #   special cases would propagate outside this class, including
-    #   the use of tar or equivalent.
-    # * SubversionDownloadStrategy.cached_location is not versioned
-    # * tarball_path provides a needed return value for our overridden
-    #   fetch method.
-    # * We can also take this private opportunity to strip files from
-    #   the download which are protocol-specific.
-
-    def compress
-      Dir.chdir(cached_location) do
-        @command.run!("/usr/bin/tar",
-                      args:         ['-s/^\.//', "--exclude", ".svn", "-cf", Pathname.new(tarball_path), "--", "."],
-                      print_stderr: false)
-      end
-      clear_cache
     end
   end
 end

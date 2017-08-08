@@ -138,7 +138,7 @@ describe "download strategies", :cask do
   describe Hbc::SubversionDownloadStrategy do
     let(:url_options) { { using: :svn } }
     let(:fake_system_command) { class_double(Hbc::SystemCommand) }
-    let(:downloader) { Hbc::SubversionDownloadStrategy.new(cask, fake_system_command) }
+    let(:downloader) { Hbc::SubversionDownloadStrategy.new(cask, command: fake_system_command) }
     before do
       allow(fake_system_command).to receive(:run!)
     end
@@ -147,7 +147,7 @@ describe "download strategies", :cask do
       allow(downloader).to receive(:compress)
       allow(downloader).to receive(:fetch_repo)
 
-      expect(downloader.fetch).to equal(downloader.tarball_path)
+      expect(downloader.fetch).to equal(downloader.cached_location)
     end
 
     it "calls fetch_repo with default arguments for a simple Cask" do
@@ -237,44 +237,5 @@ describe "download strategies", :cask do
         )
       end
     end
-
-    it "runs tar to serialize svn downloads" do
-      # sneaky stub to remake the directory, since homebrew code removes it
-      # before tar is called
-      allow(downloader).to receive(:fetch_repo) {
-        downloader.cached_location.mkdir
-      }
-
-      downloader.fetch
-
-      expect(fake_system_command).to have_received(:run!).with(
-        "/usr/bin/tar",
-        hash_including(args: [
-                         '-s/^\\.//',
-                         "--exclude",
-                         ".svn",
-                         "-cf",
-                         downloader.tarball_path,
-                         "--",
-                         ".",
-                       ]),
-      )
-    end
   end
-
-  # does not work yet, because (for unknown reasons), the tar command
-  # returns an error code when running under the test suite
-  # it 'creates a tarball matching the expected checksum' do
-  #   cask = Hbc::CaskLoader.load('svn-download-check-cask')
-  #   downloader = Hbc::SubversionDownloadStrategy.new(cask)
-  #   # special mocking required for tar to have something to work with
-  #   def downloader.fetch_repo(target, url, revision = nil, ignore_externals=false)
-  #     target.mkpath
-  #     FileUtils.touch(target.join('empty_file.txt'))
-  #     File.utime(1000,1000,target.join('empty_file.txt'))
-  #   end
-  #   expect(downloader.fetch).to equal(downloader.tarball_path)
-  #   d = Hbc::Download.new(cask)
-  #   d.send(:_check_sums, downloader.tarball_path, cask.sums)
-  # end
 end
