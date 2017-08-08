@@ -44,7 +44,7 @@ describe "brew search", :integration_test do
     "fink" => "http://pdb.finkproject.org/pdb/browse.php?summary=testball",
     "debian" => "https://packages.debian.org/search?keywords=testball&searchon=names&suite=all&section=all",
     "opensuse" => "https://software.opensuse.org/search?q=testball",
-    "fedora" => "https://admin.fedoraproject.org/pkgdb/packages/%2Atestball%2A/",
+    "fedora" => "https://apps.fedoraproject.org/packages/s/testball",
     "ubuntu" => "http://packages.ubuntu.com/search?keywords=testball&searchon=names&suite=all&section=all",
   }.each do |flag, url|
     specify "--#{flag}" do
