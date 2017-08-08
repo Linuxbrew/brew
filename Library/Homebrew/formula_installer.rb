@@ -47,7 +47,7 @@ class FormulaInstaller
     @ignore_deps = false
     @only_deps = false
     @build_from_source = ARGV.build_from_source? || ARGV.build_all_from_source?
-    @build_bottle = ARGV.build_bottle?
+    @build_bottle = false
     @force_bottle = ARGV.force_bottle?
     @interactive = false
     @git = false
@@ -580,7 +580,6 @@ class FormulaInstaller
     fi.options           &= df.options
     fi.build_bottle       = build_bottle? && ENV["HOMEBREW_BUILD_BOTTLE"] == "dependencies"
     fi.build_from_source  = ARGV.build_formula_from_source?(df)
-    fi.build_bottle       = false
     fi.force_bottle       = false
     fi.verbose            = verbose?
     fi.quieter            = quieter?
@@ -716,8 +715,6 @@ class FormulaInstaller
       #{HOMEBREW_LIBRARY_PATH}/build.rb
       #{formula.specified_path}
     ].concat(build_argv)
-
-    Sandbox.print_sandbox_message if Sandbox.formula?(formula)
 
     Utils.safe_fork do
       # Invalidate the current sudo timestamp in case a build script calls sudo.

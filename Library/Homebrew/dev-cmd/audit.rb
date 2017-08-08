@@ -94,7 +94,7 @@ module Homebrew
     elsif !except_cops.empty?
       options[:except_cops] = except_cops
     elsif !strict
-      options[:except_cops] = [:FormulaAuditStrict, :NewFormulaAudit]
+      options[:only_cops] = [:FormulaAudit]
     end
 
     # Check style in a single batch run up front for performance
@@ -630,7 +630,6 @@ class FormulaAuditor
       end
 
       next if spec.patches.empty?
-      spec.patches.each { |p| patch_problems(p) if p.external? }
       next unless @new_formula
       problem "New formulae should not require patches to build. Patches should be submitted and accepted upstream first."
     end
@@ -786,36 +785,6 @@ class FormulaAuditor
     end
   end
 
-  def patch_problems(patch)
-    case patch.url
-    when %r{https?://github\.com/.+/.+/(?:commit|pull)/[a-fA-F0-9]*.(?:patch|diff)}
-      unless patch.url =~ /\?full_index=\w+$/
-        problem <<-EOS.undent
-          GitHub patches should use the full_index parameter:
-            #{patch.url}?full_index=1
-        EOS
-      end
-    when /raw\.github\.com/, %r{gist\.github\.com/raw}, %r{gist\.github\.com/.+/raw},
-      %r{gist\.githubusercontent\.com/.+/raw}
-      unless patch.url =~ /[a-fA-F0-9]{40}/
-        problem "GitHub/Gist patches should specify a revision:\n#{patch.url}"
-      end
-    when %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
-      problem <<-EOS.undent
-        use GitHub pull request URLs:
-          https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/pull/#{Regexp.last_match(3)}.patch?full_index=1
-        Rather than patch-diff:
-          #{patch.url}
-      EOS
-    when %r{macports/trunk}
-      problem "MacPorts patches should specify a revision instead of trunk:\n#{patch.url}"
-    when %r{^http://trac\.macports\.org}
-      problem "Patches from MacPorts Trac should be https://, not http:\n#{patch.url}"
-    when %r{^http://bugs\.debian\.org}
-      problem "Patches from Debian should be https://, not http:\n#{patch.url}"
-    end
-  end
-
   def audit_text
     bin_names = Set.new
     bin_names << formula.name
@@ -908,16 +877,6 @@ class FormulaAuditor
     if line =~ %r[(\#\{prefix\}/share/(info|man))]
       problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2)}}\""
     end
-
-    if line =~ /depends_on :(automake|autoconf|libtool)/
-      problem ":#{Regexp.last_match(1)} is deprecated. Usage should be \"#{Regexp.last_match(1)}\""
-    end
-
-    if line =~ /depends_on :apr/
-      problem ":apr is deprecated. Usage should be \"apr-util\""
-    end
-
-    problem ":tex is deprecated" if line =~ /depends_on :tex/
 
     if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
       problem "#{Regexp.last_match(2)} modules should be vendored rather than use deprecated `depends_on \"#{Regexp.last_match(1)}\" => :#{Regexp.last_match(2)}#{Regexp.last_match(3)}`"
@@ -1286,14 +1245,6 @@ class ResourceAuditor
 
     if name == "curl" && !urls.find { |u| u.start_with?("http://") }
       problem "should always include at least one HTTP url"
-    end
-
-    # Check pypi urls
-    if @strict
-      urls.each do |p|
-        next unless p =~ %r{^https?://pypi.python.org/(.*)}
-        problem "#{p} should be `https://files.pythonhosted.org/#{Regexp.last_match(1)}`"
-      end
     end
 
     return unless @online

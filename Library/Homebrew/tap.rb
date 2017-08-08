@@ -44,9 +44,9 @@ class Tap
   end
 
   def self.from_path(path)
-    path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-    raise "Invalid tap path '#{path}'" unless Regexp.last_match(1)
-    fetch(Regexp.last_match(1), Regexp.last_match(2))
+    match = path.to_s.match(HOMEBREW_TAP_PATH_REGEX)
+    raise "Invalid tap path '#{path}'" unless match
+    fetch(match[:user], match[:repo])
   rescue
     # No need to error as a nil tap is sufficient to show failure.
     nil
@@ -519,6 +519,8 @@ class Tap
 
   def self.each
     return unless TAP_DIRECTORY.directory?
+
+    return to_enum unless block_given?
 
     TAP_DIRECTORY.subdirs.each do |user|
       user.subdirs.each do |repo|

@@ -1,9 +1,9 @@
 require "rubocop"
 require "rubocop/rspec/support"
 require_relative "../../extend/string"
-require_relative "../../rubocops/legacy_patches_cop"
+require_relative "../../rubocops/patches_cop"
 
-describe RuboCop::Cop::FormulaAudit::LegacyPatches do
+describe RuboCop::Cop::FormulaAudit::Patches do
   subject(:cop) { described_class.new }
 
   context "When auditing legacy patches" do
@@ -47,6 +47,7 @@ describe RuboCop::Cop::FormulaAudit::LegacyPatches do
         "https://mirrors.ustc.edu.cn/macports/trunk/",
         "http://trac.macports.org/export/102865/trunk/dports/mail/uudeview/files/inews.c.patch",
         "http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=5;filename=patch-libunac1.txt;att=1;bug=623340",
+        "https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch",
       ]
       patch_urls.each do |patch_url|
         source = <<-EOS.undent
@@ -80,6 +81,15 @@ describe RuboCop::Cop::FormulaAudit::LegacyPatches do
                                   source: source }]
         elsif patch_url =~ %r{^http://bugs\.debian\.org}
           expected_offenses = [{  message:  "Patches from Debian should be https://, not http:\n#{patch_url}",
+                                  severity: :convention,
+                                  line: 5,
+                                  column: 5,
+                                  source: source }]
+        elsif patch_url =~ %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
+          expected_offenses = [{  message:  "use GitHub pull request URLs:\n"\
+                                            "  https://github.com/foo/foo-bar/pull/100.patch\n"\
+                                            "Rather than patch-diff:\n"\
+                                            "  https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch\n",
                                   severity: :convention,
                                   line: 5,
                                   column: 5,
@@ -122,6 +132,69 @@ describe RuboCop::Cop::FormulaAudit::LegacyPatches do
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
+      end
+    end
+  end
+
+  context "When auditing external patches" do
+    it "Patch URLs" do
+      patch_urls = [
+        "https://raw.github.com/mogaal/sendemail",
+        "https://mirrors.ustc.edu.cn/macports/trunk/",
+        "http://trac.macports.org/export/102865/trunk/dports/mail/uudeview/files/inews.c.patch",
+        "http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=5;filename=patch-libunac1.txt;att=1;bug=623340",
+        "https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch",
+      ]
+      patch_urls.each do |patch_url|
+        source = <<-EOS.undent
+          class Foo < Formula
+            homepage "ftp://example.com/foo"
+            url "http://example.com/foo-1.0.tgz"
+            patch do
+              url "#{patch_url}"
+              sha256 "63376b8fdd6613a91976106d9376069274191860cd58f039b29ff16de1925621"
+            end
+          end
+        EOS
+
+        inspect_source(cop, source)
+        if patch_url =~ %r{/raw\.github\.com/}
+          expected_offenses = [{  message: "GitHub/Gist patches should specify a revision:\n#{patch_url}",
+                                  severity: :convention,
+                                  line: 5,
+                                  column: 16,
+                                  source: source }]
+        elsif patch_url =~ %r{macports/trunk}
+          expected_offenses = [{  message:  "MacPorts patches should specify a revision instead of trunk:\n#{patch_url}",
+                                  severity: :convention,
+                                  line: 5,
+                                  column: 37,
+                                  source: source }]
+        elsif patch_url =~ %r{^http://trac\.macports\.org}
+          expected_offenses = [{  message:  "Patches from MacPorts Trac should be https://, not http:\n#{patch_url}",
+                                  severity: :convention,
+                                  line: 5,
+                                  column: 9,
+                                  source: source }]
+        elsif patch_url =~ %r{^http://bugs\.debian\.org}
+          expected_offenses = [{  message:  "Patches from Debian should be https://, not http:\n#{patch_url}",
+                                  severity: :convention,
+                                  line: 5,
+                                  column: 9,
+                                  source: source }]
+        elsif patch_url =~ %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
+          expected_offenses = [{  message:  "use GitHub pull request URLs:\n"\
+                                            "  https://github.com/foo/foo-bar/pull/100.patch\n"\
+                                            "Rather than patch-diff:\n"\
+                                            "  https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch\n",
+                                  severity: :convention,
+                                  line: 5,
+                                  column: 9,
+                                  source: source }]
+        end
+        expected_offenses.zip([cop.offenses.last]).each do |expected, actual|
+          expect_offense(expected, actual)
+        end
       end
     end
   end
