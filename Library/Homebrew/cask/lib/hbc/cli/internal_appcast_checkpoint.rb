@@ -1,15 +1,18 @@
 module Hbc
   class CLI
-    class InternalAppcastCheckpoint < InternalUseBase
-      def self.run(*args)
-        calculate = args.include? "--calculate"
-        cask_tokens = cask_tokens_from(args)
-        raise CaskUnspecifiedError if cask_tokens.empty?
+    class InternalAppcastCheckpoint < AbstractInternalCommand
+      option "--calculate", :calculate, false
 
-        if cask_tokens.all? { |t| t =~ %r{^https?://} && t !~ /\.rb$/ }
-          appcask_checkpoint_for_url(cask_tokens)
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
+      end
+
+      def run
+        if args.all? { |t| t =~ %r{^https?://} && t !~ /\.rb$/ }
+          self.class.appcask_checkpoint_for_url(args)
         else
-          appcask_checkpoint(cask_tokens, calculate)
+          self.class.appcask_checkpoint(args, calculate?)
         end
       end
 
@@ -24,7 +27,7 @@ module Hbc
         count = 0
 
         cask_tokens.each do |cask_token|
-          cask = Hbc.load(cask_token)
+          cask = CaskLoader.load(cask_token)
 
           if cask.appcast.nil?
             opoo "Cask '#{cask}' is missing an `appcast` stanza."
@@ -40,7 +43,7 @@ module Hbc
             if checkpoint.nil?
               onoe "Could not retrieve `appcast` checkpoint for cask '#{cask}': #{result[:command_result].stderr}"
             else
-              puts cask_tokens.count > 1 ? "#{checkpoint}  #{cask}": checkpoint
+              puts((cask_tokens.count > 1) ? "#{checkpoint}  #{cask}" : checkpoint)
               count += 1
             end
           end

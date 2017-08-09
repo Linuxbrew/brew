@@ -1,8 +1,8 @@
-RSpec::Matchers.alias_matcher :have_formula_file, :be_formula_file
-RSpec::Matchers.alias_matcher :have_custom_remote, :be_custom_remote
-
 describe Tap do
   include FileUtils
+
+  alias_matcher :have_formula_file, :be_formula_file
+  alias_matcher :have_custom_remote, :be_custom_remote
 
   subject { described_class.new("Homebrew", "foo") }
   let(:path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-foo" }

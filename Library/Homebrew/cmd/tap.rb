@@ -63,17 +63,4 @@ module Homebrew
   def full_clone?
     ARGV.include?("--full") || ARGV.homebrew_developer?
   end
-
-  # @deprecated this method will be removed in the future, if no external commands use it.
-  def install_tap(user, repo, clone_target = nil)
-    opoo "Homebrew.install_tap is deprecated, use Tap#install."
-    tap = Tap.fetch(user, repo)
-    begin
-      tap.install(clone_target: clone_target, full_clone: full_clone?)
-    rescue TapAlreadyTappedError
-      false
-    else
-      true
-    end
-  end
 end

@@ -102,8 +102,22 @@ module Hardware
           # Amazingly, this order (64, then 32) matters. It shouldn't, but it
           # does. GCC (some versions? some systems?) can blow up if the other
           # order is used.
-          # http://superuser.com/questions/740563/gcc-4-8-on-macos-fails-depending-on-arch-order
+          # https://superuser.com/questions/740563/gcc-4-8-on-macos-fails-depending-on-arch-order
           [arch_64_bit, arch_32_bit].extend ArchitectureListExtension
+        end
+      end
+
+      # Determines whether the current CPU and macOS combination
+      # can run an executable of the specified architecture.
+      # `arch` is a symbol in the same format returned by
+      # Hardware::CPU.family
+      def can_run?(arch)
+        if Hardware::CPU.intel?
+          intel_can_run? arch
+        elsif Hardware::CPU.ppc?
+          ppc_can_run? arch
+        else
+          false
         end
       end
 
@@ -160,6 +174,35 @@ module Hardware
       def sysctl_n(*keys)
         (@properties ||= {}).fetch(keys) do
           @properties[keys] = Utils.popen_read("/usr/sbin/sysctl", "-n", *keys)
+        end
+      end
+
+      def intel_can_run?(arch)
+        case arch
+        when :ppc
+          # Rosetta is still available
+          MacOS.version < :lion
+        when :ppc64
+          # Rosetta never supported PPC64
+          false
+        when :x86_64
+          Hardware::CPU.is_64_bit?
+        when :i386
+          true
+        else # dunno
+          false
+        end
+      end
+
+      def ppc_can_run?(arch)
+        case arch
+        when :ppc
+          true
+        when :ppc64
+          Hardware::CPU.is_64_bit?
+        else
+          # Intel is never supported
+          false
         end
       end
     end

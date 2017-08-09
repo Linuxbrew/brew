@@ -1,29 +1,27 @@
 module Hbc
   module Checkable
     def errors
-      Array(@errors)
+      @errors ||= []
     end
 
     def warnings
-      Array(@warnings)
+      @warnings ||= []
     end
 
     def add_error(message)
-      @errors ||= []
-      @errors << message
+      errors << message
     end
 
     def add_warning(message)
-      @warnings ||= []
-      @warnings << message
+      warnings << message
     end
 
     def errors?
-      Array(@errors).any?
+      errors.any?
     end
 
     def warnings?
-      Array(@warnings).any?
+      warnings.any?
     end
 
     def result

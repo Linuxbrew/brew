@@ -1,12 +1,12 @@
-#!/usr/bin/env ruby
-#
+# encoding: utf-8
+
 # = plist
 #
 # Copyright 2006-2010 Ben Bleything and Patrick May
 # Distributed under the MIT License
 #
 
-module Plist ; end
+module Plist; end
 
 # === Create a plist
 # You can dump an object to a plist in one of two ways:
@@ -94,7 +94,7 @@ module Plist::Emit
         output << tag('date', element.utc.strftime('%Y-%m-%dT%H:%M:%SZ'))
       when Date # also catches DateTime
         output << tag('date', element.strftime('%Y-%m-%dT%H:%M:%SZ'))
-      when String, Symbol, Fixnum, Bignum, Integer, Float
+      when String, Symbol, Integer, Float
         output << tag(element_type(element), CGI::escapeHTML(element.to_s))
       when IO, StringIO
         element.rewind
@@ -159,7 +159,7 @@ module Plist::Emit
     when String, Symbol
       'string'
 
-    when Fixnum, Bignum, Integer
+    when Integer
       'integer'
 
     when Float

@@ -1,20 +1,19 @@
 require "test/support/fixtures/testball"
 require "formula"
 
-RSpec::Matchers.alias_matcher :follow_installed_alias, :be_follow_installed_alias
-RSpec::Matchers.alias_matcher :have_any_version_installed, :be_any_version_installed
-RSpec::Matchers.alias_matcher :need_migration, :be_migration_needed
-
-RSpec::Matchers.alias_matcher :have_changed_installed_alias_target, :be_installed_alias_target_changed
-RSpec::Matchers.alias_matcher :supersede_an_installed_formula, :be_supersedes_an_installed_formula
-RSpec::Matchers.alias_matcher :have_changed_alias, :be_alias_changed
-
-RSpec::Matchers.alias_matcher :have_option_defined, :be_option_defined
-RSpec::Matchers.alias_matcher :have_post_install_defined, :be_post_install_defined
-RSpec::Matchers.alias_matcher :have_test_defined, :be_test_defined
-RSpec::Matchers.alias_matcher :pour_bottle, :be_pour_bottle
-
 describe Formula do
+  alias_matcher :follow_installed_alias, :be_follow_installed_alias
+  alias_matcher :have_any_version_installed, :be_any_version_installed
+  alias_matcher :need_migration, :be_migration_needed
+
+  alias_matcher :have_changed_installed_alias_target, :be_installed_alias_target_changed
+  alias_matcher :supersede_an_installed_formula, :be_supersedes_an_installed_formula
+  alias_matcher :have_changed_alias, :be_alias_changed
+
+  alias_matcher :have_option_defined, :be_option_defined
+  alias_matcher :have_test_defined, :be_test_defined
+  alias_matcher :pour_bottle, :be_pour_bottle
+
   describe "::new" do
     let(:klass) do
       Class.new(described_class) do
@@ -129,6 +128,8 @@ describe Formula do
 
     alias_name = "bar"
     alias_path = "#{CoreTap.instance.alias_dir}/#{alias_name}"
+    CoreTap.instance.alias_dir.mkpath
+    FileUtils.ln_sf f.path, alias_path
 
     f.build = Tab.new(source: { "path" => alias_path })
 
@@ -160,6 +161,8 @@ describe Formula do
     alias_name = "bar"
     full_alias_name = "#{tap.user}/#{tap.repo}/#{alias_name}"
     alias_path = "#{tap.alias_dir}/#{alias_name}"
+    tap.alias_dir.mkpath
+    FileUtils.ln_sf f.path, alias_path
 
     f.build = Tab.new(source: { "path" => alias_path })
 
@@ -168,6 +171,8 @@ describe Formula do
     expect(f.full_installed_alias_name).to eq(full_alias_name)
     expect(f.installed_specified_name).to eq(alias_name)
     expect(f.full_installed_specified_name).to eq(full_alias_name)
+
+    FileUtils.rm_rf HOMEBREW_LIBRARY/"Taps/user"
   end
 
   specify "#prefix" do
@@ -402,6 +407,8 @@ describe Formula do
         url "foo-1.0"
       end
       f.build = Tab.new(source: { "path" => source_path.to_s })
+      CoreTap.instance.alias_dir.mkpath
+      FileUtils.ln_sf f.path, source_path
 
       expect(f.alias_path).to eq(alias_path)
       expect(f.installed_alias_path).to eq(source_path.to_s)
@@ -442,6 +449,9 @@ describe Formula do
       ]
 
       allow(described_class).to receive(:installed).and_return(formulae)
+
+      CoreTap.instance.alias_dir.mkpath
+      FileUtils.ln_sf formula_with_alias.path, alias_path
 
       expect(described_class.installed_with_alias_path(alias_path))
         .to eq([formula_with_alias])
@@ -613,23 +623,6 @@ describe Formula do
     expect(f.desc).to eq("a formula")
   end
 
-  specify "#post_install_defined?" do
-    f1 = formula do
-      url "foo-1.0"
-
-      def post_install
-        # do nothing
-      end
-    end
-
-    f2 = formula do
-      url "foo-1.0"
-    end
-
-    expect(f1).to have_post_install_defined
-    expect(f2).not_to have_post_install_defined
-  end
-
   specify "#test_defined?" do
     f1 = formula do
       url "foo-1.0"
@@ -690,7 +683,7 @@ describe Formula do
     end
 
     expect(f5.deps.map(&:name)).to eq(["f3", "f4"])
-    expect(f5.recursive_dependencies.map(&:name)).to eq(["f1", "f2", "f3", "f4"])
+    expect(f5.recursive_dependencies.map(&:name)).to eq(%w[f1 f2 f3 f4])
     expect(f5.runtime_dependencies.map(&:name)).to eq(["f1", "f4"])
   end
 
@@ -940,6 +933,9 @@ describe Formula do
       tab.source["path"] = alias_path
       stub_formula_loader(f, alias_path)
 
+      CoreTap.instance.alias_dir.mkpath
+      FileUtils.ln_sf f.path, alias_path
+
       expect(f.current_installed_alias_target).to eq(f)
       expect(f.latest_formula).to eq(f)
       expect(f).not_to have_changed_installed_alias_target
@@ -952,6 +948,9 @@ describe Formula do
       tab.source["path"] = alias_path
       stub_formula_loader(new_formula, alias_path)
 
+      CoreTap.instance.alias_dir.mkpath
+      FileUtils.ln_sf new_formula.path, alias_path
+
       expect(f.current_installed_alias_target).to eq(new_formula)
       expect(f.latest_formula).to eq(new_formula)
       expect(f).to have_changed_installed_alias_target
@@ -963,6 +962,9 @@ describe Formula do
     specify "alias changes when old formulae installed" do
       tab.source["path"] = alias_path
       stub_formula_loader(new_formula, alias_path)
+
+      CoreTap.instance.alias_dir.mkpath
+      FileUtils.ln_sf new_formula.path, alias_path
 
       expect(new_formula.current_installed_alias_target).to eq(new_formula)
       expect(new_formula.latest_formula).to eq(new_formula)
@@ -1050,6 +1052,10 @@ describe Formula do
       f.follow_installed_alias = true
       f.build = setup_tab_for_prefix(same_prefix, path: alias_path)
       stub_formula_loader(new_formula, alias_path)
+
+      CoreTap.instance.alias_dir.mkpath
+      FileUtils.ln_sf new_formula.path, alias_path
+
       expect(f.outdated_kegs).not_to be_empty
     end
 
@@ -1088,6 +1094,10 @@ describe Formula do
       tab = setup_tab_for_prefix(old_alias_target_prefix, path: alias_path)
       old_formula.build = tab
       allow(described_class).to receive(:installed).and_return([old_formula])
+
+      CoreTap.instance.alias_dir.mkpath
+      FileUtils.ln_sf f.path, alias_path
+
       expect(f.outdated_kegs).not_to be_empty
     end
 

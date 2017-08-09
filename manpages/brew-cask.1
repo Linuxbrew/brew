@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW\-CASK" "1" "March 2017" "Homebrew" "brew-cask"
+.TH "BREW\-CASK" "1" "July 2017" "Homebrew" "brew-cask"
 .
 .SH "NAME"
 \fBbrew\-cask\fR \- a friendly binary installer for macOS
@@ -67,7 +67,7 @@ Download remote application files for the given Cask to the local cache\. With \
 Display the homepage associated with a given Cask in a browser\.
 .
 .IP
-With no arguments, display the project page \fIhttp://caskroom\.io\fR\.
+With no arguments, display the project page \fIhttps://caskroom\.github\.io/\fR\.
 .
 .TP
 \fBinfo\fR or \fBabv\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
@@ -86,6 +86,16 @@ Without any arguments, list all installed Casks\. With \fB\-1\fR, always format 
 .
 .IP
 If \fItoken\fR is given, summarize the staged files associated with the given Cask\.
+.
+.TP
+\fBoutdated\fR [\-\-greedy] [\-\-verbose|\-\-quiet] [ \fItoken\fR \.\.\.]
+Without token arguments, display all the installed Casks that have newer versions available in the tap; otherwise check only the tokens given in the command line\. If \fB\-\-greedy\fR is given then also include in the output the Casks having \fBauto_updates true\fR or \fBversion :latest\fR\. Otherwise they are skipped because there is no reliable way to know when updates are available for them\.
+.
+.br
+\fB\-\-verbose\fR forces the display of the outdated and latest version\.
+.
+.br
+\fB\-\-quiet\fR suppresses the display of versions\.
 .
 .TP
 \fBreinstall\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
@@ -149,10 +159,6 @@ Skip Cask dependencies when installing\.
 .TP
 \fB\-\-require\-sha\fR
 Abort Cask installation if the Cask does not have a checksum defined\.
-.
-.TP
-\fB\-\-caskroom=<path>\fR
-Set location of the Caskroom, where all binaries are stored\. The default value is \fB$(brew \-\-prefix)/Caskroom\fR\.
 .
 .TP
 \fB\-\-verbose\fR
@@ -280,15 +286,22 @@ This variable may contain any arguments normally used as options on the command\
 .
 .nf
 
-       export HOMEBREW_CASK_OPTS=\'\-\-appdir=/Applications \-\-caskroom=/etc/Caskroom\'
+       export HOMEBREW_CASK_OPTS=\'\-\-appdir=~/Applications \-\-fontdir=/Library/Fonts\'
 .
 .fi
 .
 .IP "" 0
 
 .
+.P
+Other environment variables:
+.
+.TP
+\fBSUDO_ASKPASS\fR
+When this variable is set, Homebrew\-Cask will call \fBsudo\fR(8) with the \fB\-A\fR option\.
+.
 .SH "SEE ALSO"
-The Homebrew\-Cask home page: \fIhttp://caskroom\.io\fR
+The Homebrew\-Cask home page: \fIhttps://caskroom\.github\.io/\fR
 .
 .P
 The Homebrew\-Cask GitHub page: \fIhttps://github\.com/caskroom/homebrew\-cask\fR

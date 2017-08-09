@@ -20,7 +20,7 @@ module Hbc
 
     def run!
       @processed_output = { stdout: "", stderr: "" }
-      odebug "Executing: #{expanded_command.utf8_inspect}"
+      odebug "Executing: #{expanded_command}"
 
       each_output_line do |type, line|
         case type
@@ -62,7 +62,7 @@ module Hbc
 
     def assert_success
       return if processed_status && processed_status.success?
-      raise CaskCommandFailedError.new(command.utf8_inspect, processed_output[:stdout], processed_output[:stderr], processed_status)
+      raise CaskCommandFailedError.new(command, processed_output[:stdout], processed_output[:stderr], processed_status)
     end
 
     def expanded_command
@@ -79,7 +79,7 @@ module Hbc
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
         Open3.popen3(*expanded_command)
 
-      write_input_to(raw_stdin) if options[:input]
+      write_input_to(raw_stdin)
       raw_stdin.close_write
       each_line_from [raw_stdout, raw_stderr], &b
 
@@ -87,14 +87,14 @@ module Hbc
     end
 
     def write_input_to(raw_stdin)
-      Array(options[:input]).each { |line| raw_stdin.puts line }
+      [*options[:input]].each { |line| raw_stdin.print line }
     end
 
     def each_line_from(sources)
       loop do
         readable_sources = IO.select(sources)[0]
         readable_sources.delete_if(&:eof?).first(1).each do |source|
-          type = (source == sources[0] ? :stdout : :stderr)
+          type = ((source == sources[0]) ? :stdout : :stderr)
           begin
             yield(type, source.readline_nonblock || "")
           rescue IO::WaitReadable, EOFError
@@ -154,7 +154,7 @@ module Hbc
       def self._parse_plist(command, output)
         raise CaskError, "Empty plist input" unless output =~ /\S/
         output.sub!(/\A(.*?)(<\?\s*xml)/m, '\2')
-        _warn_plist_garbage(command, Regexp.last_match[1]) if Hbc.debug
+        _warn_plist_garbage(command, Regexp.last_match[1]) if ARGV.debug?
         output.sub!(%r{(<\s*/\s*plist\s*>)(.*?)\Z}m, '\1')
         _warn_plist_garbage(command, Regexp.last_match[2])
         xml = Plist.parse_xml(output)
@@ -162,7 +162,7 @@ module Hbc
           raise CaskError, <<-EOS
     Empty result parsing plist output from command.
       command was:
-      #{command.utf8_inspect}
+      #{command}
       output we attempted to parse:
       #{output}
           EOS

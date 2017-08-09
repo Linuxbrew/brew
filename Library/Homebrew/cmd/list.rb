@@ -129,7 +129,7 @@ module Homebrew
       names.each do |d|
         versions = d.subdirs.map { |pn| pn.basename.to_s }
         next if ARGV.include?("--multiple") && versions.length < 2
-        puts "#{d.basename} #{versions*" "}"
+        puts "#{d.basename} #{versions * " "}"
       end
     end
   end

@@ -39,4 +39,23 @@ describe Homebrew::Diagnostic::Checks do
     expect(subject.check_xcode_8_without_clt_on_el_capitan)
       .to match("You have Xcode 8 installed without the CLT")
   end
+
+  specify "#check_homebrew_prefix" do
+    # the integration tests are run in a special prefix
+    expect(subject.check_homebrew_prefix)
+      .to match("Your Homebrew's prefix is not /usr/local.")
+  end
+
+  specify "#check_ruby_version" do
+    allow(MacOS).to receive(:version).and_return(OS::Mac::Version.new("10.13"))
+    stub_const("RUBY_VERSION", "2.3.3p222")
+
+    expect(subject.check_ruby_version)
+      .to match <<-EOS.undent
+      Ruby version 2.3.3p222 is unsupported on 10.13. Homebrew
+      is developed and tested on Ruby 2.0, and may not work correctly
+      on other Rubies. Patches are accepted as long as they don't cause breakage
+      on supported Rubies.
+    EOS
+  end
 end

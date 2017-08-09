@@ -23,7 +23,7 @@ class JavaRequirement < Requirement
     args = %w[--failfast]
     args << "--version" << @version.to_s if @version
     java_home = Utils.popen_read("/usr/libexec/java_home", *args).chomp
-    return nil unless $?.success?
+    return nil unless $CHILD_STATUS.success?
     Pathname.new(java_home)/"bin/java"
   end
 

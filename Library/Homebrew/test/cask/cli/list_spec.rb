@@ -1,6 +1,6 @@
 describe Hbc::CLI::List, :cask do
   it "lists the installed Casks in a pretty fashion" do
-    casks = %w[local-caffeine local-transmission].map { |c| Hbc.load(c) }
+    casks = %w[local-caffeine local-transmission].map { |c| Hbc::CaskLoader.load(c) }
 
     casks.each do |c|
       InstallHelper.install_with_caskfile(c)
@@ -24,7 +24,7 @@ describe Hbc::CLI::List, :cask do
     }
 
     before(:each) do
-      casks.map(&Hbc.method(:load)).each(&InstallHelper.method(:install_with_caskfile))
+      casks.map(&Hbc::CaskLoader.method(:load)).each(&InstallHelper.method(:install_with_caskfile))
     end
 
     it "of all installed Casks" do
@@ -37,23 +37,6 @@ describe Hbc::CLI::List, :cask do
       expect {
         Hbc::CLI::List.run("--versions", "local-caffeine", "local-transmission")
       }.to output(expected_output).to_stdout
-    end
-  end
-
-  describe "when Casks have been renamed" do
-    let(:caskroom_path) { Hbc.caskroom.join("ive-been-renamed") }
-    let(:staged_path) { caskroom_path.join("latest") }
-
-    before do
-      staged_path.mkpath
-    end
-
-    it "lists installed Casks without backing ruby files (due to renames or otherwise)" do
-      expect {
-        Hbc::CLI::List.run
-      }.to output(<<-EOS.undent).to_stdout
-        ive-been-renamed (!)
-      EOS
     end
   end
 

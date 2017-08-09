@@ -6,9 +6,7 @@ describe "brew pull", :integration_test do
       .and be_a_failure
   end
 
-  it "fetches a patch from a GitHub commit or pull request and applies it" do
-    skip "Requires network connection." if ENV["HOMEBREW_NO_GITHUB_API"]
-
+  it "fetches a patch from a GitHub commit or pull request and applies it", :needs_network do
     CoreTap.instance.path.cd do
       shutup do
         system "git", "init"
@@ -16,7 +14,7 @@ describe "brew pull", :integration_test do
       end
     end
 
-    expect { brew "pull", "https://bot.brew.sh/job/Homebrew\%20Testing/1028/" }
+    expect { brew "pull", "https://jenkins.brew.sh/job/Homebrew\%20Testing/1028/" }
       .to output(/Testing URLs require `\-\-bottle`!/).to_stderr
       .and not_to_output.to_stdout
       .and be_a_failure
@@ -36,7 +34,7 @@ describe "brew pull", :integration_test do
       .and output(/Can only bump one changed formula/).to_stderr
       .and be_a_failure
 
-    expect { brew "pull", "https://github.com/Homebrew/homebrew-core/pull/1" }
+    expect { brew "pull", "https://github.com/Homebrew/brew/pull/1249" }
       .to output(/Fetching patch/).to_stdout
       .and output(/Patch failed to apply/).to_stderr
       .and be_a_failure

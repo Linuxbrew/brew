@@ -1,24 +1,50 @@
+require "forwardable"
+
 module MachO
   # Represents a "Fat" file, which contains a header, a listing of available
   # architectures, and one or more Mach-O binaries.
   # @see https://en.wikipedia.org/wiki/Mach-O#Multi-architecture_binaries
-  # @see MachO::MachOFile
+  # @see MachOFile
   class FatFile
+    extend Forwardable
+
     # @return [String] the filename loaded from, or nil if loaded from a binary string
     attr_accessor :filename
 
-    # @return [MachO::FatHeader] the file's header
+    # @return [Headers::FatHeader] the file's header
     attr_reader :header
 
-    # @return [Array<MachO::FatArch>] an array of fat architectures
+    # @return [Array<Headers::FatArch>] an array of fat architectures
     attr_reader :fat_archs
 
-    # @return [Array<MachO::MachOFile>] an array of Mach-O binaries
+    # @return [Array<MachOFile>] an array of Mach-O binaries
     attr_reader :machos
+
+    # Creates a new FatFile from the given (single-arch) Mach-Os
+    # @param machos [Array<MachOFile>] the machos to combine
+    # @return [FatFile] a new FatFile containing the give machos
+    def self.new_from_machos(*machos)
+      header = Headers::FatHeader.new(Headers::FAT_MAGIC, machos.size)
+      offset = Headers::FatHeader.bytesize + (machos.size * Headers::FatArch.bytesize)
+      fat_archs = []
+      machos.each do |macho|
+        fat_archs << Headers::FatArch.new(macho.header.cputype,
+                                          macho.header.cpusubtype,
+                                          offset, macho.serialize.bytesize,
+                                          macho.alignment)
+        offset += macho.serialize.bytesize
+      end
+
+      bin = header.serialize
+      bin << fat_archs.map(&:serialize).join
+      bin << machos.map(&:serialize).join
+
+      new_from_bin(bin)
+    end
 
     # Creates a new FatFile instance from a binary string.
     # @param bin [String] a binary string containing raw Mach-O data
-    # @return [MachO::FatFile] a new FatFile
+    # @return [FatFile] a new FatFile
     def self.new_from_bin(bin)
       instance = allocate
       instance.initialize_from_bin(bin)
@@ -38,7 +64,7 @@ module MachO
     end
 
     # Initializes a new FatFile instance from a binary string.
-    # @see MachO::FatFile.new_from_bin
+    # @see new_from_bin
     # @api private
     def initialize_from_bin(bin)
       @filename = nil
@@ -52,70 +78,41 @@ module MachO
       @raw_data
     end
 
-    # @return [Boolean] true if the file is of type `MH_OBJECT`, false otherwise
-    def object?
-      machos.first.object?
-    end
+    # @!method object?
+    #  @return (see MachO::MachOFile#object?)
+    # @!method executable?
+    #  @return (see MachO::MachOFile#executable?)
+    # @!method fvmlib?
+    #  @return (see MachO::MachOFile#fvmlib?)
+    # @!method core?
+    #  @return (see MachO::MachOFile#core?)
+    # @!method preload?
+    #  @return (see MachO::MachOFile#preload?)
+    # @!method dylib?
+    #  @return (see MachO::MachOFile#dylib?)
+    # @!method dylinker?
+    #  @return (see MachO::MachOFile#dylinker?)
+    # @!method bundle?
+    #  @return (see MachO::MachOFile#bundle?)
+    # @!method dsym?
+    #  @return (see MachO::MachOFile#dsym?)
+    # @!method kext?
+    #  @return (see MachO::MachOFile#kext?)
+    # @!method filetype
+    #  @return (see MachO::MachOFile#filetype)
+    # @!method dylib_id
+    #  @return (see MachO::MachOFile#dylib_id)
+    def_delegators :canonical_macho, :object?, :executable?, :fvmlib?,
+                   :core?, :preload?, :dylib?, :dylinker?, :bundle?,
+                   :dsym?, :kext?, :filetype, :dylib_id
 
-    # @return [Boolean] true if the file is of type `MH_EXECUTE`, false otherwise
-    def executable?
-      machos.first.executable?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_FVMLIB`, false otherwise
-    def fvmlib?
-      machos.first.fvmlib?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_CORE`, false otherwise
-    def core?
-      machos.first.core?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_PRELOAD`, false otherwise
-    def preload?
-      machos.first.preload?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_DYLIB`, false otherwise
-    def dylib?
-      machos.first.dylib?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_DYLINKER`, false otherwise
-    def dylinker?
-      machos.first.dylinker?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_BUNDLE`, false otherwise
-    def bundle?
-      machos.first.bundle?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_DSYM`, false otherwise
-    def dsym?
-      machos.first.dsym?
-    end
-
-    # @return [Boolean] true if the file is of type `MH_KEXT_BUNDLE`, false otherwise
-    def kext?
-      machos.first.kext?
-    end
-
-    # @return [Fixnum] the file's magic number
-    def magic
-      header.magic
-    end
+    # @!method magic
+    #  @return (see MachO::Headers::FatHeader#magic)
+    def_delegators :header, :magic
 
     # @return [String] a string representation of the file's magic number
     def magic_string
-      MH_MAGICS[magic]
-    end
-
-    # The file's type. Assumed to be the same for every Mach-O within.
-    # @return [Symbol] the filetype
-    def filetype
-      machos.first.filetype
+      Headers::MH_MAGICS[magic]
     end
 
     # Populate the instance's fields with the raw Fat Mach-O data.
@@ -128,21 +125,13 @@ module MachO
     end
 
     # All load commands responsible for loading dylibs in the file's Mach-O's.
-    # @return [Array<MachO::DylibCommand>] an array of DylibCommands
+    # @return [Array<LoadCommands::DylibCommand>] an array of DylibCommands
     def dylib_load_commands
       machos.map(&:dylib_load_commands).flatten
     end
 
-    # The file's dylib ID. If the file is not a dylib, returns `nil`.
-    # @example
-    #  file.dylib_id # => 'libBar.dylib'
-    # @return [String, nil] the file's dylib ID
-    # @see MachO::MachOFile#linked_dylibs
-    def dylib_id
-      machos.first.dylib_id
-    end
-
-    # Changes the file's dylib ID to `new_id`. If the file is not a dylib, does nothing.
+    # Changes the file's dylib ID to `new_id`. If the file is not a dylib,
+    #  does nothing.
     # @example
     #  file.change_dylib_id('libFoo.dylib')
     # @param new_id [String] the new dylib ID
@@ -151,7 +140,7 @@ module MachO
     #  if false, fail only if all slices fail.
     # @return [void]
     # @raise [ArgumentError] if `new_id` is not a String
-    # @see MachO::MachOFile#linked_dylibs
+    # @see MachOFile#linked_dylibs
     def change_dylib_id(new_id, options = {})
       raise ArgumentError, "argument must be a String" unless new_id.is_a?(String)
       return unless machos.all?(&:dylib?)
@@ -167,7 +156,7 @@ module MachO
 
     # All shared libraries linked to the file's Mach-Os.
     # @return [Array<String>] an array of all shared libraries
-    # @see MachO::MachOFile#linked_dylibs
+    # @see MachOFile#linked_dylibs
     def linked_dylibs
       # Individual architectures in a fat binary can link to different subsets
       # of libraries, but at this point we want to have the full picture, i.e.
@@ -175,8 +164,9 @@ module MachO
       machos.map(&:linked_dylibs).flatten.uniq
     end
 
-    # Changes all dependent shared library install names from `old_name` to `new_name`.
-    # In a fat file, this changes install names in all internal Mach-Os.
+    # Changes all dependent shared library install names from `old_name` to
+    # `new_name`. In a fat file, this changes install names in all internal
+    # Mach-Os.
     # @example
     #  file.change_install_name('/usr/lib/libFoo.dylib', '/usr/lib/libBar.dylib')
     # @param old_name [String] the shared library name being changed
@@ -185,7 +175,7 @@ module MachO
     # @option options [Boolean] :strict (true) if true, fail if one slice fails.
     #  if false, fail only if all slices fail.
     # @return [void]
-    # @see MachO::MachOFile#change_install_name
+    # @see MachOFile#change_install_name
     def change_install_name(old_name, new_name, options = {})
       each_macho(options) do |macho|
         macho.change_install_name(old_name, new_name, options)
@@ -198,7 +188,7 @@ module MachO
 
     # All runtime paths associated with the file's Mach-Os.
     # @return [Array<String>] an array of all runtime paths
-    # @see MachO::MachOFile#rpaths
+    # @see MachOFile#rpaths
     def rpaths
       # Can individual architectures have different runtime paths?
       machos.map(&:rpaths).flatten.uniq
@@ -211,7 +201,7 @@ module MachO
     # @option options [Boolean] :strict (true) if true, fail if one slice fails.
     #  if false, fail only if all slices fail.
     # @return [void]
-    # @see MachO::MachOFile#change_rpath
+    # @see MachOFile#change_rpath
     def change_rpath(old_path, new_path, options = {})
       each_macho(options) do |macho|
         macho.change_rpath(old_path, new_path, options)
@@ -226,7 +216,7 @@ module MachO
     # @option options [Boolean] :strict (true) if true, fail if one slice fails.
     #  if false, fail only if all slices fail.
     # @return [void]
-    # @see MachO::MachOFile#add_rpath
+    # @see MachOFile#add_rpath
     def add_rpath(path, options = {})
       each_macho(options) do |macho|
         macho.add_rpath(path, options)
@@ -241,7 +231,7 @@ module MachO
     # @option options [Boolean] :strict (true) if true, fail if one slice fails.
     #  if false, fail only if all slices fail.
     # @return void
-    # @see MachO::MachOFile#delete_rpath
+    # @see MachOFile#delete_rpath
     def delete_rpath(path, options = {})
       each_macho(options) do |macho|
         macho.delete_rpath(path, options)
@@ -254,20 +244,21 @@ module MachO
     # @example
     #  file.extract(:i386) # => MachO::MachOFile
     # @param cputype [Symbol] the CPU type of the Mach-O being extracted
-    # @return [MachO::MachOFile, nil] the extracted Mach-O or nil if no Mach-O has the given CPU type
+    # @return [MachOFile, nil] the extracted Mach-O or nil if no Mach-O has the given CPU type
     def extract(cputype)
       machos.select { |macho| macho.cputype == cputype }.first
     end
 
     # Write all (fat) data to the given filename.
     # @param filename [String] the file to write to
+    # @return [void]
     def write(filename)
       File.open(filename, "wb") { |f| f.write(@raw_data) }
     end
 
     # Write all (fat) data to the file used to initialize the instance.
     # @return [void]
-    # @raise [MachO::MachOError] if the instance was initialized without a file
+    # @raise [MachOError] if the instance was initialized without a file
     # @note Overwrites all data in the file!
     def write!
       if filename.nil?
@@ -280,17 +271,18 @@ module MachO
     private
 
     # Obtain the fat header from raw file data.
-    # @return [MachO::FatHeader] the fat header
-    # @raise [MachO::TruncatedFileError] if the file is too small to have a valid header
-    # @raise [MachO::MagicError] if the magic is not valid Mach-O magic
-    # @raise [MachO::MachOBinaryError] if the magic is for a non-fat Mach-O file
-    # @raise [MachO::JavaClassFileError] if the file is a Java classfile
+    # @return [Headers::FatHeader] the fat header
+    # @raise [TruncatedFileError] if the file is too small to have a
+    #  valid header
+    # @raise [MagicError] if the magic is not valid Mach-O magic
+    # @raise [MachOBinaryError] if the magic is for a non-fat Mach-O file
+    # @raise [JavaClassFileError] if the file is a Java classfile
     # @api private
     def populate_fat_header
       # the smallest fat Mach-O header is 8 bytes
       raise TruncatedFileError if @raw_data.size < 8
 
-      fh = FatHeader.new_from_bin(:big, @raw_data[0, FatHeader.bytesize])
+      fh = Headers::FatHeader.new_from_bin(:big, @raw_data[0, Headers::FatHeader.bytesize])
 
       raise MagicError, fh.magic unless Utils.magic?(fh.magic)
       raise MachOBinaryError unless Utils.fat_magic?(fh.magic)
@@ -308,22 +300,22 @@ module MachO
     end
 
     # Obtain an array of fat architectures from raw file data.
-    # @return [Array<MachO::FatArch>] an array of fat architectures
+    # @return [Array<Headers::FatArch>] an array of fat architectures
     # @api private
     def populate_fat_archs
       archs = []
 
-      fa_off = FatHeader.bytesize
-      fa_len = FatArch.bytesize
+      fa_off = Headers::FatHeader.bytesize
+      fa_len = Headers::FatArch.bytesize
       header.nfat_arch.times do |i|
-        archs << FatArch.new_from_bin(:big, @raw_data[fa_off + (fa_len * i), fa_len])
+        archs << Headers::FatArch.new_from_bin(:big, @raw_data[fa_off + (fa_len * i), fa_len])
       end
 
       archs
     end
 
     # Obtain an array of Mach-O blobs from raw file data.
-    # @return [Array<MachO::MachOFile>] an array of Mach-Os
+    # @return [Array<MachOFile>] an array of Mach-Os
     # @api private
     def populate_machos
       machos = []
@@ -351,7 +343,7 @@ module MachO
     # @option options [Boolean] :strict (true) whether or not to fail loudly
     #  with an exception if at least one Mach-O raises an exception. If false,
     #  only raises an exception if *all* Mach-Os raise exceptions.
-    # @raise [MachO::RecoverableModificationError] under the conditions of
+    # @raise [RecoverableModificationError] under the conditions of
     #  the `:strict` option above.
     # @api private
     def each_macho(options = {})
@@ -372,6 +364,14 @@ module MachO
 
       # Non-strict mode: Raise first error if *all* Mach-O slices failed.
       raise errors.first if errors.size == machos.size
+    end
+
+    # Return a single-arch Mach-O that represents this fat Mach-O for purposes
+    #  of delegation.
+    # @return [MachOFile] the Mach-O file
+    # @api private
+    def canonical_macho
+      machos.first
     end
   end
 end

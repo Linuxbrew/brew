@@ -5,7 +5,6 @@ module OS
     module XQuartz
       module_function
 
-      # TODO: confirm this path when you have internet
       DEFAULT_BUNDLE_PATH = Pathname.new("Applications/Utilities/XQuartz.app").freeze
       FORGE_BUNDLE_ID = "org.macosforge.xquartz.X11".freeze
       APPLE_BUNDLE_ID = "org.x.X11".freeze

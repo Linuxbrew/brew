@@ -6,7 +6,10 @@ module Tty
   end
 
   def width
-    `/usr/bin/tput cols`.strip.to_i
+    width = `/bin/stty size 2>/dev/null`.split[1]
+    width ||= `/usr/bin/tput cols 2>/dev/null`.split[0]
+    width ||= 80
+    width.to_i
   end
 
   def truncate(string)

@@ -3,7 +3,7 @@ require "software_spec"
 
 describe CompilerSelector do
   subject { described_class.new(software_spec, versions, compilers) }
-  let(:compilers) { [:clang, :gcc, :llvm, :gnu] }
+  let(:compilers) { [:clang, :gcc, :gnu] }
   let(:software_spec) { SoftwareSpec.new }
   let(:cc) { :clang }
   let(:versions) do
@@ -28,7 +28,6 @@ describe CompilerSelector do
   describe "#compiler" do
     it "raises an error if no matching compiler can be found" do
       software_spec.fails_with(:clang)
-      software_spec.fails_with(:llvm)
       software_spec.fails_with(:gcc)
       software_spec.fails_with(gcc: "4.8")
       software_spec.fails_with(gcc: "4.7")
@@ -43,11 +42,6 @@ describe CompilerSelector do
     it "returns gcc if it fails with clang" do
       software_spec.fails_with(:clang)
       expect(subject.compiler).to eq(:gcc)
-    end
-
-    it "returns clang if it fails with llvm" do
-      software_spec.fails_with(:llvm)
-      expect(subject.compiler).to eq(:clang)
     end
 
     it "returns clang if it fails with gcc" do
@@ -68,13 +62,11 @@ describe CompilerSelector do
 
     it "returns gcc if it fails with clang and llvm" do
       software_spec.fails_with(:clang)
-      software_spec.fails_with(:llvm)
       expect(subject.compiler).to eq(:gcc)
     end
 
     it "returns clang if it fails with gcc and llvm" do
       software_spec.fails_with(:gcc)
-      software_spec.fails_with(:llvm)
       expect(subject.compiler).to eq(:clang)
     end
 
@@ -87,7 +79,6 @@ describe CompilerSelector do
     example "returns a lower version of gcc if it fails with the highest version" do
       software_spec.fails_with(:clang)
       software_spec.fails_with(:gcc)
-      software_spec.fails_with(:llvm)
       software_spec.fails_with(gcc: "4.8")
       expect(subject.compiler).to eq("gcc-4.7")
     end
@@ -102,7 +93,6 @@ describe CompilerSelector do
       allow(versions).to receive(:gcc_build_version).and_return(Version::NULL)
 
       software_spec.fails_with(:clang)
-      software_spec.fails_with(:llvm)
       software_spec.fails_with(gcc: "4.8")
       software_spec.fails_with(gcc: "4.7")
 

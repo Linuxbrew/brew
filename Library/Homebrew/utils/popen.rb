@@ -3,10 +3,6 @@ module Utils
     popen(args, "rb", &block)
   end
 
-  def self.popen_read_text(*args, &block)
-    popen(args, "r", &block)
-  end
-
   def self.popen_write(*args, &block)
     popen(args, "wb", &block)
   end

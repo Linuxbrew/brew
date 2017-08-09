@@ -1,33 +1,18 @@
 module Homebrew
   module Assertions
-    if defined?(Gem)
-      begin
-        gem "minitest", "< 5.0.0"
-      rescue Gem::LoadError
-        require "test/unit/assertions"
-      else
-        require "minitest/unit"
-        require "test/unit/assertions"
-      end
-    else
-      require "test/unit/assertions"
-    end
-
-    if defined?(MiniTest::Assertion)
-      FailedAssertion = MiniTest::Assertion
-    elsif defined?(Minitest::Assertion)
-      FailedAssertion = Minitest::Assertion
-    else
-      FailedAssertion = Test::Unit::AssertionFailedError
-    end
-
+    require "test/unit/assertions"
     include ::Test::Unit::Assertions
+
+    # TODO: remove this when we no longer support Ruby 2.0.
+    unless defined?(Test::Unit::AssertionFailedError)
+      Test::Unit::AssertionFailedError = MiniTest::Assertion
+    end
 
     # Returns the output of running cmd, and asserts the exit status
     def shell_output(cmd, result = 0)
       ohai cmd
       output = `#{cmd}`
-      assert_equal result, $?.exitstatus
+      assert_equal result, $CHILD_STATUS.exitstatus
       output
     end
 
@@ -40,7 +25,7 @@ module Homebrew
         pipe.close_write
         pipe.read
       end
-      assert_equal result, $?.exitstatus unless result.nil?
+      assert_equal result, $CHILD_STATUS.exitstatus unless result.nil?
       output
     end
   end

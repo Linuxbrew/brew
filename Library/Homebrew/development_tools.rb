@@ -53,8 +53,8 @@ class DevelopmentTools
 
     def gcc_4_2_build_version
       @gcc_4_2_build_version ||= begin
-        gcc = locate("gcc-4.2") || HOMEBREW_PREFIX.join("opt/apple-gcc42/bin/gcc-4.2")
-        if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm")&&
+        gcc = locate("gcc-4.2") || HOMEBREW_PREFIX/"opt/apple-gcc42/bin/gcc-4.2"
+        if gcc.exist? && !gcc.realpath.basename.to_s.start_with?("llvm") &&
            build_version = `#{gcc} --version 2>/dev/null`[/build (\d{4,})/, 1]
           Version.new build_version
         else
@@ -94,12 +94,14 @@ class DevelopmentTools
         else
           Version::NULL
         end
+      rescue FormulaUnavailableError
+        Version::NULL
       end
     end
 
     def non_apple_gcc_version(cc)
       (@non_apple_gcc_version ||= {}).fetch(cc) do
-        path = HOMEBREW_PREFIX.join("opt", "gcc", "bin", cc)
+        path = HOMEBREW_PREFIX/"opt/gcc/bin"/cc
         path = locate(cc) unless path.exist?
         path = locate(cc.delete("-.")) if OS.linux? && !path
         version = if path &&

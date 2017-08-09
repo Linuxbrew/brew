@@ -72,7 +72,11 @@ class Cmd
     else
       # Note that this is a universal fallback, so that we'll always invoke
       # HOMEBREW_CC regardless of what name under which the tool was invoked.
-      ENV["HOMEBREW_CC"]
+      if ENV["HOMEBREW_CC"] == "llvm_clang"
+        "#{ENV["HOMEBREW_PREFIX"]}/opt/llvm/bin/clang"
+      else
+        ENV["HOMEBREW_CC"]
+      end
     end
   end
 

@@ -59,7 +59,7 @@ module Formulary
 
   def self.class_s(name)
     class_name = name.capitalize
-    class_name.gsub!(/[-_.\s]([a-zA-Z0-9])/) { $1.upcase }
+    class_name.gsub!(/[-_.\s]([a-zA-Z0-9])/) { Regexp.last_match(1).upcase }
     class_name.tr!("+", "x")
     class_name.sub!(/(.)@(\d)/, "\\1AT\\2")
     class_name
@@ -96,7 +96,7 @@ module Formulary
     private
 
     def load_file
-      $stderr.puts "#{$0} (#{self.class.name}): loading #{path}" if ARGV.debug?
+      $stderr.puts "#{$PROGRAM_NAME} (#{self.class.name}): loading #{path}" if ARGV.debug?
       raise FormulaUnavailableError, name unless path.file?
       Formulary.load_formula_from_path(name, path)
     end
@@ -105,7 +105,19 @@ module Formulary
   # Loads formulae from bottles.
   class BottleLoader < FormulaLoader
     def initialize(bottle_name)
-      @bottle_filename = Pathname(bottle_name).realpath
+      case bottle_name
+      when %r{(https?|ftp|file)://}
+        # The name of the formula is found between the last slash and the last hyphen.
+        formula_name = File.basename(bottle_name)[/(.+)-/, 1]
+        resource = Resource.new(formula_name) { url bottle_name }
+        downloader = CurlBottleDownloadStrategy.new resource.name, resource
+        @bottle_filename = downloader.cached_location
+        cached = @bottle_filename.exist?
+        downloader.fetch
+        ohai "Pouring the cached bottle" if cached
+      else
+        @bottle_filename = Pathname(bottle_name).realpath
+      end
       name, full_name = Utils::Bottles.resolve_formula_names @bottle_filename
       super name, Formulary.path(full_name)
     end
@@ -157,7 +169,7 @@ module Formulary
       super
     rescue MethodDeprecatedError => e
       if url =~ %r{github.com/([\w-]+)/homebrew-([\w-]+)/}
-        e.issues_url = "https://github.com/#{$1}/homebrew-#{$2}/issues/new"
+        e.issues_url = "https://github.com/#{Regexp.last_match(1)}/homebrew-#{Regexp.last_match(2)}/issues/new"
       end
       raise
     end
@@ -210,6 +222,10 @@ module Formulary
 
     def get_formula(spec, alias_path: nil)
       super
+    rescue FormulaUnreadableError => e
+      raise TapFormulaUnreadableError.new(tap, name, e.formula_error), "", e.backtrace
+    rescue FormulaClassUnavailableError => e
+      raise TapFormulaClassUnavailableError.new(tap, name, e.path, e.class_name, e.class_list), "", e.backtrace
     rescue FormulaUnavailableError => e
       raise TapFormulaUnavailableError.new(tap, name), "", e.backtrace
     end
@@ -243,7 +259,7 @@ module Formulary
     end
 
     def klass
-      $stderr.puts "#{$0} (#{self.class.name}): loading #{path}" if ARGV.debug?
+      $stderr.puts "#{$PROGRAM_NAME} (#{self.class.name}): loading #{path}" if ARGV.debug?
       namespace = "FormulaNamespace#{Digest::MD5.hexdigest(contents)}"
       Formulary.load_formula(name, path, contents, namespace)
     end
@@ -331,10 +347,10 @@ module Formulary
 
   def self.loader_for(ref, from: nil)
     case ref
-    when %r{(https?|ftp|file)://}
-      return FromUrlLoader.new(ref)
     when Pathname::BOTTLE_EXTNAME_RX
       return BottleLoader.new(ref)
+    when %r{(https?|ftp|file)://}
+      return FromUrlLoader.new(ref)
     when HOMEBREW_TAP_FORMULA_REGEX
       return TapLoader.new(ref, from: from)
     end
@@ -402,7 +418,7 @@ module Formulary
   end
 
   def self.tap_paths(name, taps = Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/"])
-    name = name.downcase
+    name = name.to_s.downcase
     taps.map do |tap|
       Pathname.glob([
                       "#{tap}Formula/#{name}.rb",

@@ -77,7 +77,14 @@ class SystemConfig
     end
 
     def describe_python
-      python = which "python"
+      python = begin
+        python_path = PATH.new(ENV["HOMEBREW_PATH"])
+                          .prepend(Formula["python"].opt_libexec/"bin")
+        which "python", python_path
+      rescue FormulaUnavailableError
+        which "python"
+      end
+
       return "N/A" if python.nil?
       python_binary = Utils.popen_read python, "-c", "import sys; sys.stdout.write(sys.executable)"
       python_binary = Pathname.new(python_binary).realpath
@@ -128,11 +135,11 @@ class SystemConfig
       unless File.executable? "/usr/libexec/java_home"
         return "N/A" if which("java").nil?
         java = `java -version 2>&1`.lines.first.chomp
-        return java =~ /java version "(.+?)"/ ? $1 : java
+        return (java =~ /java version "(.+?)"/) ? Regexp.last_match[1] : java
       end
 
       java_xml = Utils.popen_read("/usr/libexec/java_home", "--xml", "--failfast")
-      return "N/A" unless $?.success?
+      return "N/A" unless $CHILD_STATUS.success?
       javas = []
       REXML::XPath.each(REXML::Document.new(java_xml), "//key[text()='JVMVersion']/following-sibling::string") do |item|
         javas << item.text

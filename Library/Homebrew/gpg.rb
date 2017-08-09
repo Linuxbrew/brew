@@ -5,7 +5,10 @@ class Gpg
     which_all(executable).detect do |gpg|
       gpg_short_version = Utils.popen_read(gpg, "--version")[/\d\.\d/, 0]
       next unless gpg_short_version
-      Version.create(gpg_short_version.to_s) == Version.create("2.0")
+      gpg_version = Version.create(gpg_short_version.to_s)
+      @version = gpg_version
+      gpg_version == Version.create("2.0") ||
+        gpg_version == Version.create("2.1")
     end
   end
 
@@ -21,6 +24,10 @@ class Gpg
 
   def self.available?
     File.executable?(GPG_EXECUTABLE.to_s)
+  end
+
+  def self.version
+    @version if available?
   end
 
   def self.create_test_key(path)

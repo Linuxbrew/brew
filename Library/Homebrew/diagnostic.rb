@@ -50,7 +50,7 @@ module Homebrew
             case line.chomp
               # regex matches: /dev/disk0s2   489562928 440803616  48247312    91%    /
             when /^.+\s+[0-9]+\s+[0-9]+\s+[0-9]+\s+[0-9]{1,3}%\s+(.+)/
-              vols << $1
+              vols << Regexp.last_match(1)
             end
           end
         end
@@ -99,10 +99,20 @@ module Homebrew
         EOS
       end
 
+      def check_build_from_source
+        return unless ENV["HOMEBREW_BUILD_FROM_SOURCE"]
+
+        <<-EOS.undent
+          You have HOMEBREW_BUILD_FROM_SOURCE set. This environment variable is
+          intended for use by Homebrew developers. If you are encountering errors,
+          please try unsetting this. Please do not file issues if you encounter
+          errors when using this environment variable.
+        EOS
+      end
+
       # See https://github.com/Homebrew/legacy-homebrew/pull/9986
       def check_path_for_trailing_slashes
-        all_paths = ENV["PATH"].split(File::PATH_SEPARATOR)
-        bad_paths = all_paths.select { |p| p[-1..-1] == "/" }
+        bad_paths = PATH.new(ENV["HOMEBREW_PATH"]).select { |p| p.end_with?("/") }
         return if bad_paths.empty?
 
         inject_file_list bad_paths, <<-EOS.undent
@@ -121,7 +131,7 @@ module Homebrew
         return unless which("python")
 
         anaconda_directory = which("anaconda").realpath.dirname
-        python_binary = Utils.popen_read which("python"), "-c", "import sys; sys.stdout.write(sys.executable)"
+        python_binary = Utils.popen_read(which("python"), "-c", "import sys; sys.stdout.write(sys.executable)")
         python_directory = Pathname.new(python_binary).realpath.dirname
 
         # Only warn if Python lives with Anaconda, since is most problematic case.
@@ -160,14 +170,14 @@ module Homebrew
           "libosxfuse_i32.2.dylib", # OSXFuse
           "libosxfuse_i64.2.dylib", # OSXFuse
           "libosxfuse.2.dylib", # OSXFuse
-          "libTrAPI.dylib", # TrAPI / Endpoint Security VPN
+          "libTrAPI.dylib", # TrAPI/Endpoint Security VPN
           "libntfs-3g.*.dylib", # NTFS-3G
           "libntfs.*.dylib", # NTFS-3G
           "libublio.*.dylib", # NTFS-3G
           "libUFSDNTFS.dylib", # Paragon NTFS
           "libUFSDExtFS.dylib", # Paragon ExtFS
           "libecomlodr.dylib", # Symantec Endpoint Protection
-          "libsymsea.*.dylib", # Symantec Endpoint Protection
+          "libsymsea*.dylib", # Symantec Endpoint Protection
           "sentinel.dylib", # SentinelOne
         ]
 
@@ -420,31 +430,13 @@ module Homebrew
         EOS
       end
 
-      def check_homebrew_prefix
-        return unless OS.mac?
-        return if HOMEBREW_PREFIX.to_s == "/usr/local"
-
-        # Allow our Jenkins CI tests to live outside of /usr/local.
-        if ENV["JENKINS_HOME"] &&
-           ENV["GIT_URL"].to_s.start_with?("https://github.com/Homebrew/brew")
-          return
-        end
-
-        <<-EOS.undent
-          Your Homebrew's prefix is not /usr/local.
-          You can install Homebrew anywhere you want but some bottles (binary packages)
-          can only be used with a /usr/local prefix and some formulae (packages)
-          may not build correctly with a non-/usr/local prefix.
-        EOS
-      end
-
       def check_user_path_1
         $seen_prefix_bin = false
         $seen_prefix_sbin = false
 
         message = ""
 
-        paths.each do |p|
+        paths(ENV["HOMEBREW_PATH"]).each do |p|
           case p
           when "/usr/bin"
             unless $seen_prefix_bin
@@ -465,7 +457,7 @@ module Homebrew
 
                   Consider setting your PATH so that #{HOMEBREW_PREFIX}/bin
                   occurs before /usr/bin. Here is a one-liner:
-                    #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin")}
+                    #{Utils::Shell.prepend_path_in_profile("#{HOMEBREW_PREFIX}/bin")}
                 EOS
               end
             end
@@ -485,7 +477,7 @@ module Homebrew
         <<-EOS.undent
           Homebrew's bin was not found in your PATH.
           Consider setting the PATH for example like so
-            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/bin")}
+            #{Utils::Shell.prepend_path_in_profile("#{HOMEBREW_PREFIX}/bin")}
         EOS
       end
 
@@ -493,14 +485,14 @@ module Homebrew
         return if $seen_prefix_sbin
 
         # Don't complain about sbin not being in the path if it doesn't exist
-        sbin = (HOMEBREW_PREFIX+"sbin")
+        sbin = HOMEBREW_PREFIX/"sbin"
         return unless sbin.directory? && !sbin.children.empty?
 
         <<-EOS.undent
           Homebrew's sbin was not found in your PATH but you have installed
           formulae that put executables in #{HOMEBREW_PREFIX}/sbin.
           Consider setting the PATH for example like so
-            #{Utils::Shell.prepend_path_in_shell_profile("#{HOMEBREW_PREFIX}/sbin")}
+            #{Utils::Shell.prepend_path_in_profile("#{HOMEBREW_PREFIX}/sbin")}
         EOS
       end
 
@@ -532,34 +524,6 @@ module Homebrew
           your curlrc:
             curl #{Formatter.url("https://github.com")}
         EOS
-      end
-
-      def check_which_pkg_config
-        return unless OS.mac? || Formula["pkg-config"].installed?
-        binary = which "pkg-config"
-        return if binary.nil?
-
-        mono_config = Pathname.new("/usr/bin/pkg-config")
-        if mono_config.exist? && mono_config.realpath.to_s.include?("Mono.framework")
-          <<-EOS.undent
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              /usr/bin/pkg-config => #{mono_config.realpath}
-
-            This was most likely created by the Mono installer. `./configure` may
-            have problems finding brew-installed packages using this other pkg-config.
-
-            Mono no longer installs this file as of 3.0.4. You should
-            `sudo rm /usr/bin/pkg-config` and upgrade to the latest version of Mono.
-          EOS
-        elsif binary.to_s != "#{HOMEBREW_PREFIX}/bin/pkg-config"
-          <<-EOS.undent
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              #{binary}
-
-            `./configure` may have problems finding brew-installed packages using
-            this other pkg-config.
-          EOS
-        end
       end
 
       def check_for_gettext
@@ -632,7 +596,7 @@ module Homebrew
           /Applications/Server.app/Contents/ServerRoot/usr/sbin
         ].map(&:downcase)
 
-        paths.each do |p|
+        paths(ENV["HOMEBREW_PATH"]).each do |p|
           next if whitelist.include?(p.downcase) || !File.directory?(p)
 
           realpath = Pathname.new(p).realpath.to_s
@@ -671,7 +635,7 @@ module Homebrew
 
             Setting DYLD_INSERT_LIBRARIES can cause Go builds to fail.
             Having this set is common if you use this software:
-              #{Formatter.url("http://asepsis.binaryage.com/")}
+              #{Formatter.url("https://asepsis.binaryage.com/")}
           EOS
         end
 
@@ -742,50 +706,17 @@ module Homebrew
         EOS
       end
 
-      def check_filesystem_case_sensitive
-        return unless OS.mac?
-        dirs_to_check = [
-          HOMEBREW_PREFIX,
-          HOMEBREW_REPOSITORY,
-          HOMEBREW_CELLAR,
-          HOMEBREW_TEMP,
-        ]
-        case_sensitive_dirs = dirs_to_check.select do |dir|
-          # We select the dir as being case-sensitive if either the UPCASED or the
-          # downcased variant is missing.
-          # Of course, on a case-insensitive fs, both exist because the os reports so.
-          # In the rare situation when the user has indeed a downcased and an upcased
-          # dir (e.g. /TMP and /tmp) this check falsely thinks it is case-insensitive
-          # but we don't care because: 1. there is more than one dir checked, 2. the
-          # check is not vital and 3. we would have to touch files otherwise.
-          upcased = Pathname.new(dir.to_s.upcase)
-          downcased = Pathname.new(dir.to_s.downcase)
-          dir.exist? && !(upcased.exist? && downcased.exist?)
-        end
-        return if case_sensitive_dirs.empty?
-
-        volumes = Volumes.new
-        case_sensitive_vols = case_sensitive_dirs.map do |case_sensitive_dir|
-          volumes.get_mounts(case_sensitive_dir)
-        end
-        case_sensitive_vols.uniq!
-
-        <<-EOS.undent
-          The filesystem on #{case_sensitive_vols.join(",")} appears to be case-sensitive.
-          The default macOS filesystem is case-insensitive. Please report any apparent problems.
-        EOS
-      end
-
       def check_git_version
         # https://help.github.com/articles/https-cloning-errors
         return unless Utils.git_available?
-        return unless Version.create(Utils.git_version) < Version.create("1.7.10")
+        return unless Version.create(Utils.git_version) < Version.create("1.8.5")
 
         git = Formula["git"]
         git_upgrade_cmd = git.any_version_installed? ? "upgrade" : "install"
         <<-EOS.undent
           An outdated version (#{Utils.git_version}) of Git was detected in your PATH.
-          Git 1.7.10 or newer is required to perform checkouts over HTTPS from GitHub.
+          Git 1.8.5 or newer is required to perform checkouts over HTTPS from GitHub and
+          to support the 'git -C <path>' option.
           Please upgrade:
             brew #{git_upgrade_cmd} git
         EOS
@@ -820,7 +751,7 @@ module Homebrew
         EOS
       end
 
-      def check_git_origin
+      def check_brew_git_origin
         return if !Utils.git_available? || !(HOMEBREW_REPOSITORY/".git").exist?
 
         origin = HOMEBREW_REPOSITORY.git_origin
@@ -828,24 +759,56 @@ module Homebrew
 
         if origin.nil?
           <<-EOS.undent
-            Missing git origin remote.
+            Missing Homebrew/brew git origin remote.
 
             Without a correctly configured origin, Homebrew won't update
             properly. You can solve this by adding the Homebrew remote:
-              cd #{HOMEBREW_REPOSITORY}
-              git remote add origin #{Formatter.url(remote)}
+              git -C "#{HOMEBREW_REPOSITORY}" remote add origin #{Formatter.url(remote)}
           EOS
         elsif origin !~ /(?i:#{OS::GITHUB_USER})\/brew(\.git)?$/
           <<-EOS.undent
-            Suspicious git origin remote found.
+            Suspicious Homebrew/brew git origin remote found.
 
             With a non-standard origin, Homebrew won't pull updates from
             the main repository. The current git origin is:
               #{origin}
 
             Unless you have compelling reasons, consider setting the
-            origin remote to point at the main repository, located at:
-              #{Formatter.url(remote)}
+            origin remote to point at the main repository by running:
+
+              git -C "#{HOMEBREW_REPOSITORY}" remote set-url origin #{Formatter.url(remote)}
+          EOS
+        end
+      end
+
+      def check_coretap_git_origin
+        coretap_path = CoreTap.instance.path
+        return if !Utils.git_available? || !(coretap_path/".git").exist?
+
+        origin = coretap_path.git_origin
+        remote = "https://github.com/#{OS::GITHUB_USER}/homebrew-core.git"
+
+        if origin.nil?
+          <<-EOS.undent
+            Missing #{CoreTap.instance} git origin remote.
+
+            Without a correctly configured origin, Homebrew won't update
+            properly. You can solve this by adding the Homebrew remote:
+              git -C "#{coretap_path}" remote add origin #{Formatter.url(remote)}
+          EOS
+        elsif origin !~ %r{(Homebrew|Linuxbrew)/homebrew-core(\.git|/)?$}
+          return if ENV["CI"] && origin.include?("Homebrew/homebrew-test-bot")
+
+          <<-EOS.undent
+            Suspicious #{CoreTap.instance} git origin remote found.
+
+            With a non-standard origin, Homebrew won't pull updates from
+            the main repository. The current git origin is:
+              #{origin}
+
+            Unless you have compelling reasons, consider setting the
+            origin remote to point at the main repository by running:
+              git -C "#{coretap_path}" remote set-url origin #{Formatter.url(remote)}
           EOS
         end
       end
@@ -1012,11 +975,11 @@ module Homebrew
         return unless which "python"
         `python -V 2>&1` =~ /Python (\d+)\./
         # This won't be the right warning if we matched nothing at all
-        return if $1.nil?
-        return if $1 == "2"
+        return if Regexp.last_match(1).nil?
+        return if Regexp.last_match(1) == "2"
 
         <<-EOS.undent
-          python is symlinked to python#{$1}
+          python is symlinked to python#{Regexp.last_match(1)}
           This will confuse build scripts and in general lead to subtle breakage.
         EOS
       end
@@ -1120,6 +1083,11 @@ module Homebrew
         end
         cmd_map.reject! { |_cmd_name, cmd_paths| cmd_paths.size == 1 }
         return if cmd_map.empty?
+
+        if ENV["CI"] && cmd_map.keys.length == 1 &&
+           cmd_map.keys.first == "brew-test-bot"
+          return
+        end
 
         message = "You have external commands with conflicting names.\n"
         cmd_map.each do |cmd_name, cmd_paths|

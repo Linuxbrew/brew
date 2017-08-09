@@ -4,6 +4,8 @@ FormulaConflict = Struct.new(:name, :reason)
 # Used to annotate formulae that duplicate macOS provided software
 # or cause conflicts when linked in.
 class KegOnlyReason
+  attr_reader :reason
+
   def initialize(reason, explanation)
     @reason = reason
     @explanation = explanation
@@ -32,30 +34,30 @@ class KegOnlyReason
     return @explanation unless @explanation.empty?
     case @reason
     when :versioned_formula then <<-EOS.undent
-      This is an alternate version of another formula.
+      this is an alternate version of another formula
     EOS
     when :provided_by_macos, :provided_by_osx then <<-EOS.undent
       macOS already provides this software and installing another version in
-      parallel can cause all kinds of trouble.
+      parallel can cause all kinds of trouble
     EOS
     when :shadowed_by_macos, :shadowed_by_osx then <<-EOS.undent
       macOS provides similar software and installing this software in
-      parallel can cause all kinds of trouble.
+      parallel can cause all kinds of trouble
     EOS
     when :provided_pre_mountain_lion then <<-EOS.undent
-      macOS already provides this software in versions before Mountain Lion.
+      macOS already provides this software in versions before Mountain Lion
     EOS
     when :provided_pre_mavericks then <<-EOS.undent
-      macOS already provides this software in versions before Mavericks.
+      macOS already provides this software in versions before Mavericks
     EOS
     when :provided_pre_el_capitan then <<-EOS.undent
-      macOS already provides this software in versions before El Capitan.
+      macOS already provides this software in versions before El Capitan
     EOS
     when :provided_until_xcode43 then <<-EOS.undent
-      Xcode provides this software prior to version 4.3.
+      Xcode provides this software prior to version 4.3
     EOS
     when :provided_until_xcode5 then <<-EOS.undent
-      Xcode provides this software prior to version 5.
+      Xcode provides this software prior to version 5
     EOS
     else
       @reason
@@ -81,7 +83,7 @@ class BottleDisableReason
   end
 
   def to_s
-    if @type == :unneeded
+    if unneeded?
       "This formula doesn't require compiling."
     else
       @reason

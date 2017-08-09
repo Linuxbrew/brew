@@ -5,7 +5,7 @@
 #:    If `--merge` is specified then `git merge` is used to include updates
 #:    (rather than `git rebase`).
 #:
-#:    If `--force` is specified then always do a slower, full update check even
+#:    If `--force` (or `-f`) is specified then always do a slower, full update check even
 #:    if unnecessary.
 
 # Hide shellcheck complaint:
@@ -23,7 +23,7 @@ git() {
 }
 
 git_init_if_necessary() {
-  if [[ -n "$HOMEBREW_MACOS" ]]
+  if [[ -n "$HOMEBREW_MACOS" ]] || [[ -n "$HOMEBREW_FORCE_HOMEBREW_ORG" ]]
   then
     BREW_OFFICIAL_REMOTE="https://github.com/SuperNEMO-DBD/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
@@ -218,8 +218,8 @@ merge_or_rebase() {
   if [[ "$DIR" = "$HOMEBREW_REPOSITORY" && -n "$HOMEBREW_UPDATE_TO_TAG" ]]
   then
     UPSTREAM_TAG="$(git tag --list |
-                    sort --field-separator=. --key=1,1nr -k 2,2nr -k 3,3nr |
-                    grep --max-count=1 '^[0-9]*\.[0-9]*\.[0-9]*$')"
+                    sort --field-separator=. -k 1,1nr -k 2,2nr -k 3,3nr -k 4,4nr |
+                    grep -E --max-count=1 '^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$')"
   else
     UPSTREAM_TAG=""
   fi
@@ -336,7 +336,7 @@ homebrew-update() {
       *)
         odie <<EOS
 This command updates brew itself, and does not take formula names.
-Use 'brew upgrade <formula>'.
+Use 'brew upgrade $@' instead.
 EOS
         ;;
     esac
@@ -468,14 +468,6 @@ EOS
       then
         # Skip taps checked/fetched recently
         [[ -n "$(find "$DIR/.git/FETCH_HEAD" -type f -mtime -"${HOMEBREW_AUTO_UPDATE_SECS}"s 2>/dev/null)" ]] && exit
-
-        # Skip taps without formulae (but always update Homebrew/brew and Homebrew/homebrew-core)
-        if [[ "$DIR" != "$HOMEBREW_REPOSITORY" &&
-              "$DIR" != "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]]
-        then
-          FORMULAE="$(find "$DIR" -maxdepth 1 \( -name "*.rb" -or -name Formula -or -name HomebrewFormula \) -print -quit)"
-          [[ -z "$FORMULAE" ]] && exit
-        fi
       fi
 
       UPSTREAM_REPOSITORY_URL="$(git config remote.origin.url)"

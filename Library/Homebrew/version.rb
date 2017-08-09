@@ -36,7 +36,7 @@ class Version
         0
       when NumericToken
         other.value.zero? ? 0 : -1
-      when AlphaToken, BetaToken, RCToken
+      when AlphaToken, BetaToken, PreToken, RCToken
         1
       else
         -1
@@ -103,6 +103,8 @@ class Version
       case other
       when AlphaToken
         rev <=> other.rev
+      when BetaToken, RCToken, PreToken, PatchToken
+        -1
       else
         super
       end
@@ -117,6 +119,23 @@ class Version
       when BetaToken
         rev <=> other.rev
       when AlphaToken
+        1
+      when PreToken, RCToken, PatchToken
+        -1
+      else
+        super
+      end
+    end
+  end
+
+  class PreToken < CompositeToken
+    PATTERN = /pre[0-9]*/i
+
+    def <=>(other)
+      case other
+      when PreToken
+        rev <=> other.rev
+      when AlphaToken, BetaToken
         1
       when RCToken, PatchToken
         -1
@@ -133,7 +152,7 @@ class Version
       case other
       when RCToken
         rev <=> other.rev
-      when AlphaToken, BetaToken
+      when AlphaToken, BetaToken, PreToken
         1
       when PatchToken
         -1
@@ -150,7 +169,7 @@ class Version
       case other
       when PatchToken
         rev <=> other.rev
-      when AlphaToken, BetaToken, RCToken
+      when AlphaToken, BetaToken, RCToken, PreToken
         1
       else
         super
@@ -161,6 +180,7 @@ class Version
   SCAN_PATTERN = Regexp.union(
     AlphaToken::PATTERN,
     BetaToken::PATTERN,
+    PreToken::PATTERN,
     RCToken::PATTERN,
     PatchToken::PATTERN,
     NumericToken::PATTERN,
@@ -280,7 +300,7 @@ class Version
   private
 
   def max(a, b)
-    a > b ? a : b
+    (a > b) ? a : b
   end
 
   def tokenize
@@ -289,6 +309,7 @@ class Version
       when /\A#{AlphaToken::PATTERN}\z/o   then AlphaToken
       when /\A#{BetaToken::PATTERN}\z/o    then BetaToken
       when /\A#{RCToken::PATTERN}\z/o      then RCToken
+      when /\A#{PreToken::PATTERN}\z/o     then PreToken
       when /\A#{PatchToken::PATTERN}\z/o   then PatchToken
       when /\A#{NumericToken::PATTERN}\z/o then NumericToken
       when /\A#{StringToken::PATTERN}\z/o  then StringToken
@@ -307,7 +328,7 @@ class Version
     spec_s = spec.to_s
 
     stem = if spec.directory?
-      spec.basename.to_s
+      spec.basename
     elsif %r{((?:sourceforge\.net|sf\.net)/.*)/download$} =~ spec_s
       Pathname.new(spec.dirname).stem
     elsif /\.[^a-zA-Z]+$/ =~ spec_s
@@ -315,6 +336,11 @@ class Version
     else
       spec.stem
     end
+
+    # date-based versioning
+    # e.g. ltopers-v2017-04-14.tar.gz
+    m = /-v?(\d{4}-\d{2}-\d{2})/.match(stem)
+    return m.captures.first unless m.nil?
 
     # GitHub tarballs
     # e.g. https://github.com/foo/bar/tarball/v1.2.3
@@ -360,8 +386,8 @@ class Version
     m = /-((?:\d+\.)*\d+-(?:alpha|beta|rc)\d*)$/.match(stem)
     return m.captures.first unless m.nil?
 
-    # e.g. http://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip
-    # e.g. http://ftpmirror.gnu.org/libmicrohttpd/libmicrohttpd-0.9.17-w32.zip
+    # e.g. https://ftpmirror.gnu.org/libidn/libidn-1.29-win64.zip
+    # e.g. https://ftpmirror.gnu.org/libmicrohttpd/libmicrohttpd-0.9.17-w32.zip
     m = /-(\d+\.\d+(?:\.\d+)?)-w(?:in)?(?:32|64)$/.match(stem)
     return m.captures.first unless m.nil?
 
@@ -372,12 +398,20 @@ class Version
     m = /\.(\d+\.\d+(?:\.\d+)?)\+opam$/.match(stem)
     return m.captures.first unless m.nil?
 
-    # e.g. http://ftpmirror.gnu.org/mtools/mtools-4.0.18-1.i686.rpm
-    # e.g. http://ftpmirror.gnu.org/autogen/autogen-5.5.7-5.i386.rpm
-    # e.g. http://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x86.zip
-    # e.g. http://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x64.zip
-    # e.g. http://ftpmirror.gnu.org/mtools/mtools_4.0.18_i386.deb
+    # e.g. https://ftpmirror.gnu.org/mtools/mtools-4.0.18-1.i686.rpm
+    # e.g. https://ftpmirror.gnu.org/autogen/autogen-5.5.7-5.i386.rpm
+    # e.g. https://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x86.zip
+    # e.g. https://ftpmirror.gnu.org/libtasn1/libtasn1-2.8-x64.zip
+    # e.g. https://ftpmirror.gnu.org/mtools/mtools_4.0.18_i386.deb
     m = /[-_](\d+\.\d+(?:\.\d+)?(?:-\d+)?)[-_.](?:i[36]86|x86|x64(?:[-_](?:32|64))?)$/.match(stem)
+    return m.captures.first unless m.nil?
+
+    # devel spec
+    # e.g. https://registry.npmjs.org/@angular/cli/-/cli-1.3.0-beta.1.tgz
+    # e.g. https://github.com/dlang/dmd/archive/v2.074.0-beta1.tar.gz
+    # e.g. https://github.com/dlang/dmd/archive/v2.074.0-rc1.tar.gz
+    # e.g. https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-src.zip
+    m = /[-.vV]?((?:\d+\.)+\d+[-_.]?(?i:alpha|beta|pre|rc)\.?\d{,2})/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. foobar4.5.1
@@ -386,6 +420,15 @@ class Version
 
     # e.g. foobar-4.5.0-bin
     m = /-((?:\d+\.)+\d+[abc]?)[-._](?:bin|dist|stable|src|sources?)$/.match(stem)
+    return m.captures.first unless m.nil?
+
+    # dash version style
+    # e.g. http://www.antlr.org/download/antlr-3.4-complete.jar
+    # e.g. https://cdn.nuxeo.com/nuxeo-9.2/nuxeo-server-9.2-tomcat.zip
+    # e.g. https://search.maven.org/remotecontent?filepath=com/facebook/presto/presto-cli/0.181/presto-cli-0.181-executable.jar
+    # e.g. https://search.maven.org/remotecontent?filepath=org/fusesource/fuse-extra/fusemq-apollo-mqtt/1.3/fusemq-apollo-mqtt-1.3-uber.jar
+    # e.g. https://search.maven.org/remotecontent?filepath=org/apache/orc/orc-tools/1.2.3/orc-tools-1.2.3-uber.jar
+    m = /-((?:\d+\.)+\d+)-/.match(stem)
     return m.captures.first unless m.nil?
 
     # e.g. dash_0.5.5.1.orig.tar.gz (Debian style)
@@ -402,8 +445,13 @@ class Version
 
     # e.g. http://mirrors.jenkins-ci.org/war/1.486/jenkins.war
     # e.g. https://github.com/foo/bar/releases/download/0.10.11/bar.phar
-    m = %r{/(\d\.\d+(\.\d+)?)}.match(spec_s)
-    return m.captures.first unless m.nil?
+    # e.g. https://github.com/clojure/clojurescript/releases/download/r1.9.293/cljs.jar
+    # e.g. https://github.com/fibjs/fibjs/releases/download/v0.6.1/fullsrc.zip
+    # e.g. https://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_1.9/E.tgz
+    # e.g. https://github.com/JustArchi/ArchiSteamFarm/releases/download/2.3.2.0/ASF.zip
+    # e.g. https://people.gnome.org/~newren/eg/download/1.7.5.2/eg
+    m = %r{/([rvV]_?)?(\d\.\d+(\.\d+){,2})}.match(spec_s)
+    return m.captures[1] unless m.nil?
 
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)

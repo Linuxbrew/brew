@@ -4,9 +4,10 @@ gem "parallel_tests"
 gem "rspec"
 gem "rspec-its", require: false
 gem "rspec-wait", require: false
+gem "rubocop"
 gem "test-unit"
 
 group :coverage do
-  gem "simplecov", require: false
   gem "codecov", require: false
+  gem "simplecov", require: false
 end

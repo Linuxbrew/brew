@@ -1,18 +1,17 @@
-If Homebrew was updated on Aug 10-11th 2016 and `brew update` always says `Already up-to-date.` you need to run: `cd "$(brew --repo)" && git fetch && git reset --hard origin/master && brew update`.
-
-# Please follow the general troubleshooting steps first:
-
+# Please always follow these steps:
+- [ ] Confirmed this is a problem with running a `brew` command and not `brew install`ing or the post-install behaviour of one or more formulae? If it's a formulae-specific problem please file this issue at https://github.com/Linuxbrew/homebrew-core/issues/new
 - [ ] Ran `brew update` and retried your prior step?
-- [ ] Ran `brew doctor`, fixed as many issues as possible and retried your prior step?
-- [ ] Confirmed this is a problem with Linuxbrew/brew and not specific formulae? If it's a formulae-specific problem please file this issue at https://github.com/Linuxbrew/homebrew-core/issues/new
+- [ ] Ran `brew doctor`, fixed all issues and retried your prior step?
+- [ ] Ran `brew config` and `brew doctor` and included their output with your issue?
 
-_You can erase any parts of this template not applicable to your Issue._
+**Please note we will close your issue without comment if you delete or do not fill out the issue checklist and provide ALL the requested information.**
 
-### Bug reports:
+To help us debug your issue please explain:
+- What you were trying to do (and why)
+- What happened (include command output)
+- What you expected to happen
+- Step-by-step reproduction instructions (by running `brew` commands)
 
-Please replace this section with a brief summary of your issue **AND** the output of `brew config` and `brew doctor`. Please note we may immediately close your issue without comment if you do not fill out the issue template and provide the requested information.
-
-### Feature Requests:
-
-**Please note by far the quickest way to get a new feature into Cadfaelbrew is to file a [Pull Request](https://github.com/SuperNEMO-DBD/brew/blob/master/.github/CONTRIBUTING.md).**
-
+# Or propose a feature:
+Please replace this section with a detailed description of your proposed feature, the motivation for it, how it would be relevant to at least 90% of Linuxbrew users and alternatives considered.
+Please note we will close this issue or ask you to create a pull-request if it's something we're not actively planning to work on.

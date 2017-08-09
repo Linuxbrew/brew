@@ -15,6 +15,14 @@ require "utils/svn"
 require "utils/tty"
 require "time"
 
+def require?(path)
+  return false if path.nil?
+  require path
+rescue LoadError => e
+  # we should raise on syntax errors but not if the file doesn't exist.
+  raise unless e.message.include?(path)
+end
+
 def ohai(title, *sput)
   title = Tty.truncate(title) if $stdout.tty? && !ARGV.verbose?
   puts Formatter.headline(title, color: :blue)
@@ -75,8 +83,8 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   backtrace = caller
   tap_message = nil
   caller_message = backtrace.detect do |line|
-    next unless line =~ %r{^#{Regexp.escape HOMEBREW_LIBRARY}/Taps/([^/]+/[^/]+)/}
-    tap = Tap.fetch $1
+    next unless line =~ %r{^#{Regexp.escape(HOMEBREW_LIBRARY)}/Taps/([^/]+/[^/]+)/}
+    tap = Tap.fetch Regexp.last_match(1)
     tap_message = "\nPlease report this to the #{tap} tap!"
     true
   end
@@ -131,16 +139,12 @@ def pretty_duration(s)
   if s > 59
     m = s / 60
     s %= 60
-    res = "#{m} minute#{plural m}"
+    res = Formatter.pluralize(m, "minute")
     return res if s.zero?
     res << " "
   end
 
-  res + "#{s} second#{plural s}"
-end
-
-def plural(n, s = "s")
-  n == 1 ? "" : s
+  res << Formatter.pluralize(s, "second")
 end
 
 def interactive_shell(f = nil)
@@ -155,9 +159,9 @@ def interactive_shell(f = nil)
 
   Process.wait fork { exec ENV["SHELL"] }
 
-  return if $?.success?
-  raise "Aborted due to non-zero exit status (#{$?.exitstatus})" if $?.exited?
-  raise $?.inspect
+  return if $CHILD_STATUS.success?
+  raise "Aborted due to non-zero exit status (#{$CHILD_STATUS.exitstatus})" if $CHILD_STATUS.exited?
+  raise $CHILD_STATUS.inspect
 end
 
 module Homebrew
@@ -175,15 +179,16 @@ module Homebrew
       exit! 1 # never gets here unless exec failed
     end
     Process.wait(pid)
-    $?.success?
+    $CHILD_STATUS.success?
   end
 
   def system(cmd, *args)
-    puts "#{cmd} #{args*" "}" if ARGV.verbose?
+    puts "#{cmd} #{args * " "}" if ARGV.verbose?
     _system(cmd, *args)
   end
 
   def install_gem_setup_path!(name, version = nil, executable = name)
+    require "rubygems" unless OS.mac?
     # Respect user's preferences for where gems should be installed.
     ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
     ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
@@ -194,10 +199,10 @@ module Homebrew
     Gem::Specification.reset
 
     # Add Gem binary directory and (if missing) Ruby binary directory to PATH.
-    path = ENV["PATH"].split(File::PATH_SEPARATOR)
-    path.unshift(RUBY_BIN) if which("ruby") != RUBY_PATH
-    path.unshift(Gem.bindir)
-    ENV["PATH"] = path.join(File::PATH_SEPARATOR)
+    path = PATH.new(ENV["PATH"])
+    path.prepend(RUBY_BIN) if which("ruby") != RUBY_PATH
+    path.prepend(Gem.bindir)
+    ENV["PATH"] = path
 
     if Gem::Specification.find_all_by_name(name, version).empty?
       ohai "Installing or updating '#{name}' gem"
@@ -267,6 +272,14 @@ ensure
   ENV["PATH"] = old_path
 end
 
+def with_homebrew_path
+  old_path = ENV["PATH"]
+  ENV["PATH"] = ENV["HOMEBREW_PATH"]
+  yield
+ensure
+  ENV["PATH"] = old_path
+end
+
 def with_custom_locale(locale)
   old_locale = ENV["LC_ALL"]
   ENV["LC_ALL"] = locale
@@ -276,10 +289,9 @@ ensure
 end
 
 def run_as_not_developer(&_block)
-  old = ENV.delete "HOMEBREW_DEVELOPER"
-  yield
-ensure
-  ENV["HOMEBREW_DEVELOPER"] = old
+  with_env "HOMEBREW_DEVELOPER" => nil do
+    yield
+  end
 end
 
 # Kernel.system but with exceptions
@@ -298,7 +310,7 @@ def quiet_system(cmd, *args)
 end
 
 def which(cmd, path = ENV["PATH"])
-  path.split(File::PATH_SEPARATOR).each do |p|
+  PATH.new(path).each do |p|
     begin
       pcmd = File.expand_path(cmd, p)
     rescue ArgumentError
@@ -312,7 +324,7 @@ def which(cmd, path = ENV["PATH"])
 end
 
 def which_all(cmd, path = ENV["PATH"])
-  path.to_s.split(File::PATH_SEPARATOR).map do |p|
+  PATH.new(path).map do |p|
     begin
       pcmd = File.expand_path(cmd, p)
     rescue ArgumentError
@@ -325,21 +337,21 @@ def which_all(cmd, path = ENV["PATH"])
 end
 
 def which_editor
-  editor = ENV.values_at("HOMEBREW_EDITOR", "VISUAL", "EDITOR").compact.first
-  return editor unless editor.nil?
+  editor = ENV.values_at("HOMEBREW_EDITOR", "HOMEBREW_VISUAL")
+              .compact
+              .reject(&:empty?)
+              .first
+  return editor if editor
 
-  # Find Textmate
-  editor = "mate" if which "mate"
-  # Find BBEdit / TextWrangler
-  editor ||= "edit" if which "edit"
-  # Find vim
-  editor ||= "vim" if which "vim"
-  # Default to standard vim
+  # Find Atom, Sublime Text, Textmate, BBEdit / TextWrangler, or vim
+  editor = %w[atom subl mate edit vim].find do |candidate|
+    candidate if which(candidate, ENV["HOMEBREW_PATH"])
+  end
   editor ||= "/usr/bin/vim"
 
   opoo <<-EOS.undent
     Using #{editor} because no editor was set in the environment.
-    This may change in the future, so we recommend setting EDITOR, VISUAL,
+    This may change in the future, so we recommend setting EDITOR,
     or HOMEBREW_EDITOR to your preferred text editor.
   EOS
 
@@ -348,11 +360,11 @@ end
 
 def exec_editor(*args)
   puts "Editing #{args.join "\n"}"
-  safe_exec(which_editor, *args)
+  with_homebrew_path { safe_exec(which_editor, *args) }
 end
 
 def exec_browser(*args)
-  browser = ENV["HOMEBREW_BROWSER"] || ENV["BROWSER"]
+  browser = ENV["HOMEBREW_BROWSER"]
   browser ||= OS::PATH_OPEN if defined?(OS::PATH_OPEN)
   return unless browser
   safe_exec(browser, *args)
@@ -411,8 +423,8 @@ def nostdout
   end
 end
 
-def paths
-  @paths ||= ENV["PATH"].split(File::PATH_SEPARATOR).collect do |p|
+def paths(env_path = ENV["PATH"])
+  @paths ||= PATH.new(env_path).collect do |p|
     begin
       File.expand_path(p).chomp("/")
     rescue ArgumentError
@@ -521,4 +533,28 @@ def migrate_legacy_keg_symlinks_if_necessary
     FileUtils.ln_sf(src.relative_path_from(dst.parent), dst)
   end
   FileUtils.rm_rf legacy_pinned_kegs
+end
+
+# Calls the given block with the passed environment variables
+# added to ENV, then restores ENV afterwards.
+# Example:
+# with_env "PATH" => "/bin" do
+#   system "echo $PATH"
+# end
+#
+# Note that this method is *not* thread-safe - other threads
+# which happen to be scheduled during the block will also
+# see these environment variables.
+def with_env(hash)
+  old_values = {}
+  begin
+    hash.each do |key, value|
+      old_values[key] = ENV.delete(key)
+      ENV[key] = value
+    end
+
+    yield if block_given?
+  ensure
+    ENV.update(old_values)
+  end
 end

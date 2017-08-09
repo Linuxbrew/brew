@@ -1,6 +1,6 @@
 module Hbc
   class CLI
-    class Cleanup < Base
+    class Cleanup < AbstractCommand
       OUTDATED_DAYS = 10
       OUTDATED_TIMESTAMP = Time.now - (60 * 60 * 24 * OUTDATED_DAYS)
 
@@ -12,30 +12,15 @@ module Hbc
         true
       end
 
-      def self.run(*args)
-        if args.empty?
-          default.cleanup!
-        else
-          default.cleanup(args)
-        end
-      end
+      attr_reader :cache_location
 
-      def self.default
-        @default ||= new(Hbc.cache, Hbc.cleanup_outdated)
-      end
-
-      attr_reader :cache_location, :outdated_only
-      def initialize(cache_location, outdated_only)
+      def initialize(*args, cache_location: Hbc.cache)
+        super(*args)
         @cache_location = Pathname.new(cache_location)
-        @outdated_only = outdated_only
       end
 
-      def cleanup!
-        remove_cache_files
-      end
-
-      def cleanup(tokens)
-        remove_cache_files(*tokens)
+      def run
+        remove_cache_files(*args)
       end
 
       def cache_files
@@ -46,7 +31,7 @@ module Hbc
       end
 
       def outdated?(file)
-        outdated_only && file && file.stat.mtime > OUTDATED_TIMESTAMP
+        outdated_only? && file && file.stat.mtime > OUTDATED_TIMESTAMP
       end
 
       def incomplete?(file)
@@ -62,13 +47,13 @@ module Hbc
       end
 
       def disk_cleanup_size
-        Utils.size_in_bytes(cache_files)
+        cache_files.map(&:disk_usage).inject(:+)
       end
 
       def remove_cache_files(*tokens)
         message = "Removing cached downloads"
         message.concat " for #{tokens.join(", ")}" unless tokens.empty?
-        message.concat " older than #{OUTDATED_DAYS} days old" if outdated_only
+        message.concat " older than #{OUTDATED_DAYS} days old" if outdated_only?
         ohai message
 
         deletable_cache_files = if tokens.empty?
@@ -90,14 +75,17 @@ module Hbc
         paths.each do |item|
           next unless item.exist?
           processed_files += 1
-          if Utils.file_locked?(item)
+
+          begin
+            LockFile.new(item.basename).with_lock do
+              puts item
+              cleanup_size += File.size(item)
+              item.rmtree
+            end
+          rescue OperationInProgressError
             puts "skipping: #{item} is locked"
             next
           end
-          puts item
-          item_size = File.size?(item)
-          cleanup_size += item_size unless item_size.nil?
-          item.unlink
         end
 
         if processed_files.zero?

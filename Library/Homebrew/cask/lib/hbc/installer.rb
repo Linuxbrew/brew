@@ -1,11 +1,14 @@
 require "rubygems"
 
+require "formula_installer"
+
 require "hbc/cask_dependencies"
 require "hbc/staged"
 require "hbc/verify"
 
 module Hbc
   class Installer
+    extend Predicable
     # TODO: it is unwise for Hbc::Staged to be a module, when we are
     #       dealing with both staged and unstaged Casks here. This should
     #       either be a class which is only sometimes instantiated, or there
@@ -14,17 +17,20 @@ module Hbc
     include Staged
     include Verify
 
-    attr_reader :force, :skip_cask_deps
-
     PERSISTENT_METADATA_SUBDIRS = ["gpg"].freeze
 
-    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, require_sha: false)
+    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, binaries: true, verbose: false, require_sha: false)
       @cask = cask
       @command = command
       @force = force
       @skip_cask_deps = skip_cask_deps
+      @binaries = binaries
+      @verbose = verbose
       @require_sha = require_sha
+      @reinstall = false
     end
+
+    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :verbose?
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
@@ -58,7 +64,7 @@ module Hbc
       odebug "Hbc::Installer#fetch"
 
       satisfy_dependencies
-      verify_has_sha if @require_sha && !@force
+      verify_has_sha if require_sha? && !force?
       download
       verify
     end
@@ -76,18 +82,37 @@ module Hbc
     def install
       odebug "Hbc::Installer#install"
 
-      if @cask.installed? && !force
-        raise CaskAlreadyInstalledAutoUpdatesError, @cask if @cask.auto_updates
+      if @cask.installed? && !force? && !@reinstall
         raise CaskAlreadyInstalledError, @cask
       end
 
       print_caveats
       fetch
+      uninstall_existing_cask if @reinstall
+
+      oh1 "Installing Cask #{@cask}"
       stage
       install_artifacts
       enable_accessibility_access
 
       puts summary
+    end
+
+    def reinstall
+      odebug "Hbc::Installer#reinstall"
+      @reinstall = true
+      install
+    end
+
+    def uninstall_existing_cask
+      return unless @cask.installed?
+
+      # use the same cask file that was used for installation, if possible
+      installed_caskfile = @cask.installed_caskfile
+      installed_cask = installed_caskfile.exist? ? CaskLoader.load_from_file(installed_caskfile) : @cask
+
+      # Always force uninstallation, ignore method parameter
+      Installer.new(installed_cask, binaries: binaries?, verbose: verbose?, force: true).uninstall
     end
 
     def summary
@@ -106,7 +131,7 @@ module Hbc
     def verify_has_sha
       odebug "Checking cask has checksum"
       return unless @cask.sha256 == :no_check
-      raise CaskNoShasumError, @cask
+      raise CaskNoShasumError, @cask.token
     end
 
     def verify
@@ -128,19 +153,24 @@ module Hbc
       end
 
       odebug "Using container class #{container} for #{@downloaded_path}"
-      container.new(@cask, @downloaded_path, @command).extract
+      container.new(@cask, @downloaded_path, @command, verbose: verbose?).extract
     end
 
     def install_artifacts
       already_installed_artifacts = []
 
       odebug "Installing artifacts"
-      artifacts = Artifact.for_cask(@cask, command: @command, force: force)
+      artifacts = Artifact.for_cask(@cask, command: @command, verbose: verbose?, force: force?)
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
         next unless artifact.respond_to?(:install_phase)
         odebug "Installing artifact of class #{artifact.class}"
+
+        if artifact.is_a?(Artifact::Binary)
+          next unless binaries?
+        end
+
         artifact.install_phase
         already_installed_artifacts.unshift(artifact)
       end
@@ -168,8 +198,7 @@ module Hbc
       arch_dependencies
       x11_dependencies
       formula_dependencies
-      cask_dependencies unless skip_cask_deps
-      puts "complete"
+      cask_dependencies unless skip_cask_deps?
     end
 
     def macos_dependencies
@@ -206,36 +235,50 @@ module Hbc
     end
 
     def formula_dependencies
-      return unless @cask.depends_on.formula && !@cask.depends_on.formula.empty?
-      ohai "Installing Formula dependencies from Homebrew"
-      @cask.depends_on.formula.each do |dep_name|
-        print "#{dep_name} ... "
-        installed = @command.run(HOMEBREW_BREW_FILE,
-                                 args:         ["list", "--versions", dep_name],
-                                 print_stderr: false).stdout.include?(dep_name)
-        if installed
-          puts "already installed"
-        else
-          @command.run!(HOMEBREW_BREW_FILE,
-                        args: ["install", dep_name])
-          puts "done"
+      formulae = @cask.depends_on.formula.map { |f| Formula[f] }
+      return if formulae.empty?
+
+      if formulae.all?(&:any_version_installed?)
+        puts "All Formula dependencies satisfied."
+        return
+      end
+
+      not_installed = formulae.reject(&:any_version_installed?)
+
+      ohai "Installing Formula dependencies: #{not_installed.map(&:to_s).join(", ")}"
+      not_installed.each do |formula|
+        begin
+          old_argv = ARGV.dup
+          ARGV.replace([])
+          FormulaInstaller.new(formula).tap do |fi|
+            fi.installed_as_dependency = true
+            fi.installed_on_request = false
+            fi.show_header = true
+            fi.verbose = verbose?
+            fi.prelude
+            fi.install
+            fi.finish
+          end
+        ensure
+          ARGV.replace(old_argv)
         end
       end
     end
 
     def cask_dependencies
-      return unless @cask.depends_on.cask && !@cask.depends_on.cask.empty?
-      ohai "Installing Cask dependencies: #{@cask.depends_on.cask.join(", ")}"
-      deps = CaskDependencies.new(@cask)
-      deps.sorted.each do |dep_token|
-        puts "#{dep_token} ..."
-        dep = Hbc.load(dep_token)
-        if dep.installed?
-          puts "already installed"
-        else
-          Installer.new(dep, force: false, skip_cask_deps: true).install
-          puts "done"
-        end
+      return if @cask.depends_on.cask.empty?
+      casks = CaskDependencies.new(@cask)
+
+      if casks.all?(&:installed?)
+        puts "All Cask dependencies satisfied."
+        return
+      end
+
+      not_installed = casks.reject(&:installed?)
+
+      ohai "Installing Cask dependencies: #{not_installed.map(&:to_s).join(", ")}"
+      not_installed.each do |cask|
+        Installer.new(cask, binaries: binaries?, verbose: verbose?, skip_cask_deps: true, force: false).install
       end
     end
 
@@ -295,33 +338,26 @@ module Hbc
     end
 
     def save_caskfile
-      timestamp = :now
-      create    = true
-      savedir   = @cask.metadata_subdir("Casks", timestamp, create)
-      if Dir.entries(savedir).size > 2
-        # should not happen
-        raise CaskAlreadyInstalledError, @cask unless force
-        savedir.rmtree
-        FileUtils.mkdir_p savedir
-      end
-      FileUtils.copy(@cask.sourcefile_path, savedir) if @cask.sourcefile_path
+      old_savedir = @cask.metadata_timestamped_path
+
+      return unless @cask.sourcefile_path
+
+      savedir = @cask.metadata_subdir("Casks", timestamp: :now, create: true)
+      FileUtils.copy @cask.sourcefile_path, savedir
+      old_savedir.rmtree unless old_savedir.nil?
     end
 
     def uninstall
-      odebug "Hbc::Installer#uninstall"
+      oh1 "Uninstalling Cask #{@cask}"
       disable_accessibility_access
       uninstall_artifacts
       purge_versioned_files
-      purge_caskroom_path if force
+      purge_caskroom_path if force?
     end
 
     def uninstall_artifacts
       odebug "Un-installing artifacts"
-      artifacts = Artifact.for_cask(@cask, command: @command, force: force)
-
-      # Make sure the `uninstall` stanza is run first, as it
-      # may depend on other artifacts still being installed.
-      artifacts = artifacts.sort_by { |a| a.is_a?(Artifact::Uninstall) ? -1 : 1 }
+      artifacts = Artifact.for_cask(@cask, command: @command, verbose: verbose?, force: force?)
 
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
@@ -356,15 +392,15 @@ module Hbc
       gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
 
       # Homebrew-Cask metadata
-      if @cask.metadata_versioned_container_path.respond_to?(:children) &&
-         @cask.metadata_versioned_container_path.exist?
-        @cask.metadata_versioned_container_path.children.each do |subdir|
+      if @cask.metadata_versioned_path.respond_to?(:children) &&
+         @cask.metadata_versioned_path.exist?
+        @cask.metadata_versioned_path.children.each do |subdir|
           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
             gain_permissions_remove(subdir)
           end
         end
       end
-      @cask.metadata_versioned_container_path.rmdir_if_possible
+      @cask.metadata_versioned_path.rmdir_if_possible
       @cask.metadata_master_container_path.rmdir_if_possible
 
       # toplevel staged distribution

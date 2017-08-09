@@ -1,6 +1,6 @@
 require "extend/pathname"
 require "keg_relocate"
-require "formula_lock"
+require "lock_file"
 require "ostruct"
 
 class Keg
@@ -240,8 +240,9 @@ class Keg
   def remove_opt_record
     opt_record.unlink
     aliases.each do |a|
-      next if !opt_record.symlink? && !opt_record.exist?
-      (opt_record.parent/a).delete
+      alias_symlink = opt_record.parent/a
+      next if !alias_symlink.symlink? && !alias_symlink.exist?
+      alias_symlink.delete
     end
     opt_record.parent.rmdir_if_possible
   end
@@ -258,7 +259,7 @@ class Keg
 
     dirs = []
 
-    TOP_LEVEL_DIRECTORIES.map { |d| path.join(d) }.each do |dir|
+    TOP_LEVEL_DIRECTORIES.map { |d| path/d }.each do |dir|
       next unless dir.exist?
       dir.find do |src|
         dst = HOMEBREW_PREFIX + src.relative_path_from(path)
@@ -300,25 +301,26 @@ class Keg
 
   def completion_installed?(shell)
     dir = case shell
-    when :bash then path.join("etc", "bash_completion.d")
+    when :bash then path/"etc/bash_completion.d"
     when :zsh
-      dir = path.join("share", "zsh", "site-functions")
-      dir if dir && dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
-    when :fish then path.join("share", "fish", "vendor_completions.d")
+      dir = path/"share/zsh/site-functions"
+      dir if dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
+    when :fish then path/"share/fish/vendor_completions.d"
     end
     dir && dir.directory? && !dir.children.empty?
   end
 
-  def zsh_functions_installed?
-    # Check for non completion functions (i.e. files not started with an underscore),
-    # since those can be checked separately
-    dir = path.join("share", "zsh", "site-functions")
-    dir && dir.directory? && dir.children.any? { |f| !f.basename.to_s.start_with?("_") }
-  end
-
-  def fish_functions_installed?
-    dir = path.join("share", "fish", "vendor_functions.d")
-    dir && dir.directory? && !dir.children.empty?
+  def functions_installed?(shell)
+    case shell
+    when :fish
+      dir = path/"share/fish/vendor_functions.d"
+      dir.directory? && !dir.children.empty?
+    when :zsh
+      # Check for non completion functions (i.e. files not started with an underscore),
+      # since those can be checked separately
+      dir = path/"share/zsh/site-functions"
+      dir.directory? && dir.children.any? { |f| !f.basename.to_s.start_with?("_") }
+    end
   end
 
   def plist_installed?
@@ -326,7 +328,7 @@ class Keg
   end
 
   def python_site_packages_installed?
-    path.join("lib", "python2.7", "site-packages").directory?
+    (path/"lib/python2.7/site-packages").directory?
   end
 
   def python_pth_files_installed?
@@ -365,7 +367,7 @@ class Keg
           dep_formula = Formulary.factory(dep["full_name"])
           dep_formula == to_formula
         rescue FormulaUnavailableError
-          next "#{tap}/#{name}" == dep["full_name"]
+          next dep["full_name"] == "#{tap}/#{name}"
         end
       end
     end
@@ -466,7 +468,10 @@ class Keg
   end
 
   def aliases
-    Formula[rack.basename.to_s].aliases
+    formula = Formulary.from_rack(rack)
+    aliases = formula.aliases
+    return aliases if formula.stable?
+    aliases.reject { |a| a.include?("@") }
   rescue FormulaUnavailableError
     []
   end
@@ -563,7 +568,7 @@ class Keg
 
   # symlinks the contents of path+relative_dir recursively into #{HOMEBREW_PREFIX}/relative_dir
   def link_dir(relative_dir, mode)
-    root = path+relative_dir
+    root = path/relative_dir
     return unless root.exist?
     root.find do |src|
       next if src == root

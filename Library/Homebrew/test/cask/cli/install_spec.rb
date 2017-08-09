@@ -1,4 +1,18 @@
 describe Hbc::CLI::Install, :cask do
+  it "displays the installation progress" do
+    output = Regexp.new <<-EOS.undent
+      ==> Downloading file:.*caffeine.zip
+      ==> Verifying checksum for Cask local-caffeine
+      ==> Installing Cask local-caffeine
+      ==> Moving App 'Caffeine.app' to '.*Caffeine.app'.
+      .*local-caffeine was successfully installed!
+    EOS
+
+    expect {
+      Hbc::CLI::Install.run("local-caffeine")
+    }.to output(output).to_stdout
+  end
+
   it "allows staging and activation of multiple Casks at once" do
     shutup do
       Hbc::CLI::Install.run("local-transmission", "local-caffeine")
@@ -26,8 +40,8 @@ describe Hbc::CLI::Install, :cask do
     end
 
     expect {
-      Hbc::CLI::Install.run("local-transmission", "")
-    }.to output(/Warning: A Cask for local-transmission is already installed./).to_stderr
+      Hbc::CLI::Install.run("local-transmission")
+    }.to output(/Warning: Cask 'local-transmission' is already installed./).to_stderr
   end
 
   it "allows double install with --force" do
@@ -56,7 +70,7 @@ describe Hbc::CLI::Install, :cask do
       shutup do
         Hbc::CLI::Install.run("notacask")
       end
-    }.to raise_error(Hbc::CaskError)
+    }.to raise_error(Hbc::CaskError, "Install incomplete.")
   end
 
   it "returns a suggestion for a misspelled Cask" do
@@ -66,7 +80,7 @@ describe Hbc::CLI::Install, :cask do
       rescue Hbc::CaskError
         nil
       end
-    }.to output(/No available Cask for localcaffeine\. Did you mean:\nlocal-caffeine/).to_stderr
+    }.to output(/Cask 'localcaffeine' is unavailable: No Cask with this name exists\. Did you mean:\nlocal-caffeine/).to_stderr
   end
 
   it "returns multiple suggestions for a Cask fragment" do
@@ -76,7 +90,7 @@ describe Hbc::CLI::Install, :cask do
       rescue Hbc::CaskError
         nil
       end
-    }.to output(/No available Cask for local-caf\. Did you mean one of:\nlocal-caffeine/).to_stderr
+    }.to output(/Cask 'local-caf' is unavailable: No Cask with this name exists\. Did you mean one of:\nlocal-caffeine/).to_stderr
   end
 
   describe "when no Cask is specified" do
@@ -101,7 +115,11 @@ describe Hbc::CLI::Install, :cask do
     end
 
     describe "with an invalid option" do
-      with_options.call(["--notavalidoption"])
+      it "raises an error" do
+        expect {
+          Hbc::CLI::Install.run("--notavalidoption")
+        }.to raise_error(/invalid option/)
+      end
     end
   end
 end

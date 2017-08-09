@@ -80,7 +80,8 @@ module MachO
     # @param cputype [Fixnum] the CPU type of the unknown pair
     # @param cpusubtype [Fixnum] the CPU sub-type of the unknown pair
     def initialize(cputype, cpusubtype)
-      super "Unrecognized CPU sub-type: 0x#{"%08x" % cpusubtype} (for CPU type: 0x#{"%08x" % cputype})"
+      super "Unrecognized CPU sub-type: 0x#{"%08x" % cpusubtype}" \
+        " (for CPU type: 0x#{"%08x" % cputype})"
     end
   end
 
@@ -108,13 +109,15 @@ module MachO
     end
   end
 
-  # Raised when the number of arguments used to create a load command manually is wrong.
+  # Raised when the number of arguments used to create a load command manually
+  # is wrong.
   class LoadCommandCreationArityError < MachOError
     # @param cmd_sym [Symbol] the load command's symbol
     # @param expected_arity [Fixnum] the number of arguments expected
     # @param actual_arity [Fixnum] the number of arguments received
     def initialize(cmd_sym, expected_arity, actual_arity)
-      super "Expected #{expected_arity} arguments for #{cmd_sym} creation, got #{actual_arity}"
+      super "Expected #{expected_arity} arguments for #{cmd_sym} creation," \
+        " got #{actual_arity}"
     end
   end
 
@@ -130,7 +133,8 @@ module MachO
   class LCStrMalformedError < MachOError
     # @param lc [MachO::LoadCommand] the load command containing the string
     def initialize(lc)
-      super "Load command #{lc.type} at offset #{lc.view.offset} contains a malformed string"
+      super "Load command #{lc.type} at offset #{lc.view.offset} contains a" \
+        " malformed string"
     end
   end
 

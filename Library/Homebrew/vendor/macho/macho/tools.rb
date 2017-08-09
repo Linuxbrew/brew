@@ -1,5 +1,6 @@
 module MachO
-  # A collection of convenient methods for common operations on Mach-O and Fat binaries.
+  # A collection of convenient methods for common operations on Mach-O and Fat
+  # binaries.
   module Tools
     # @param filename [String] the Mach-O or Fat binary being read
     # @return [Array<String>] an array of all dylibs linked to the binary
@@ -9,7 +10,8 @@ module MachO
       file.linked_dylibs
     end
 
-    # Changes the dylib ID of a Mach-O or Fat binary, overwriting the source file.
+    # Changes the dylib ID of a Mach-O or Fat binary, overwriting the source
+    #  file.
     # @param filename [String] the Mach-O or Fat binary being modified
     # @param new_id [String] the new dylib ID for the binary
     # @param options [Hash]
@@ -23,7 +25,8 @@ module MachO
       file.write!
     end
 
-    # Changes a shared library install name in a Mach-O or Fat binary, overwriting the source file.
+    # Changes a shared library install name in a Mach-O or Fat binary,
+    #  overwriting the source file.
     # @param filename [String] the Mach-O or Fat binary being modified
     # @param old_name [String] the old shared library name
     # @param new_name [String] the new shared library name
@@ -38,7 +41,8 @@ module MachO
       file.write!
     end
 
-    # Changes a runtime path in a Mach-O or Fat binary, overwriting the source file.
+    # Changes a runtime path in a Mach-O or Fat binary, overwriting the source
+    #  file.
     # @param filename [String] the Mach-O or Fat binary being modified
     # @param old_path [String] the old runtime path
     # @param new_path [String] the new runtime path
@@ -67,7 +71,8 @@ module MachO
       file.write!
     end
 
-    # Delete a runtime path from a Mach-O or Fat binary, overwriting the source file.
+    # Delete a runtime path from a Mach-O or Fat binary, overwriting the source
+    #  file.
     # @param filename [String] the Mach-O or Fat binary being modified
     # @param old_path [String] the old runtime path
     # @param options [Hash]
@@ -79,6 +84,25 @@ module MachO
 
       file.delete_rpath(old_path, options)
       file.write!
+    end
+
+    # Merge multiple Mach-Os into one universal (Fat) binary.
+    # @param filename [String] the fat binary to create
+    # @param files [Array<MachO::MachOFile, MachO::FatFile>] the files to merge
+    # @return [void]
+    def self.merge_machos(filename, *files)
+      machos = files.map do |file|
+        macho = MachO.open(file)
+        case macho
+        when MachO::MachOFile
+          macho
+        else
+          macho.machos
+        end
+      end.flatten
+
+      fat_macho = MachO::FatFile.new_from_machos(*machos)
+      fat_macho.write(filename)
     end
   end
 end

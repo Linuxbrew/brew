@@ -4,7 +4,7 @@ module Hbc
   module Artifact
     class Zap < UninstallBase
       def zap_phase
-        dispatch_uninstall_directives(expand_tilde: true)
+        dispatch_uninstall_directives
       end
     end
   end

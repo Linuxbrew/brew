@@ -1,8 +1,8 @@
 describe Hbc::CLI::Zap, :cask do
   it "shows an error when a bad Cask is provided" do
-    expect {
-      Hbc::CLI::Zap.run("notacask")
-    }.to raise_error(Hbc::CaskUnavailableError)
+    expect { Hbc::CLI::Zap.run("notacask") }
+      .to output(/is unavailable/).to_stderr
+      .and raise_error(Hbc::CaskError, "Zap incomplete.")
   end
 
   it "can zap and unlink multiple Casks at once" do
@@ -18,8 +18,7 @@ describe Hbc::CLI::Zap, :cask do
     expect(transmission).to be_installed
 
     shutup do
-      Hbc::CLI::Zap.run("--notavalidoption",
-                        "local-caffeine", "local-transmission")
+      Hbc::CLI::Zap.run("local-caffeine", "local-transmission")
     end
 
     expect(caffeine).not_to be_installed
@@ -32,7 +31,7 @@ describe Hbc::CLI::Zap, :cask do
   #       The above tests that implicitly.
   #
   # it "dispatches both uninstall and zap stanzas" do
-  #   with_zap = Hbc.load('with-zap')
+  #   with_zap = Hbc::CaskLoader.load('with-zap')
   #
   #   shutup do
   #     Hbc::Installer.new(with_zap).install
@@ -67,7 +66,7 @@ describe Hbc::CLI::Zap, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Zap.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

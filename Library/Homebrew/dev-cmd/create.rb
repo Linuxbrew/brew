@@ -10,7 +10,8 @@
 #:    If `--meson` is passed, create a basic template for a Meson-style build.
 #:
 #:    If `--no-fetch` is passed, Homebrew will not download <URL> to the cache and
-#:    will thus not add the SHA256 to the formula for you.
+#:    will thus not add the SHA256 to the formula for you. It will also not check
+#:    the GitHub API for GitHub projects (to fill out the description and homepage).
 #:
 #:    The options `--set-name` and `--set-version` each take an argument and allow
 #:    you to explicitly set the name and version of the package you are creating.
@@ -19,7 +20,7 @@
 #:    the specified tap.
 
 require "formula"
-require "blacklist"
+require "missing_formula"
 require "digest"
 require "erb"
 
@@ -28,15 +29,6 @@ module Homebrew
 
   # Create a formula from a tarball URL
   def create
-    # Allow searching MacPorts or Fink.
-    if ARGV.include? "--macports"
-      opoo "`brew create --macports` is deprecated; use `brew search --macports` instead"
-      exec_browser "https://www.macports.org/ports.php?by=name&substr=#{ARGV.next}"
-    elsif ARGV.include? "--fink"
-      opoo "`brew create --fink` is deprecated; use `brew search --fink` instead"
-      exec_browser "http://pdb.finkproject.org/pdb/browse.php?summary=#{ARGV.next}"
-    end
-
     raise UsageError if ARGV.named.empty?
 
     # Ensure that the cache exists so we can fetch the tarball
@@ -73,8 +65,8 @@ module Homebrew
     # Don't allow blacklisted formula, or names that shadow aliases,
     # unless --force is specified.
     unless ARGV.force?
-      if msg = blacklisted?(fc.name)
-        raise "#{fc.name} is blacklisted for creation.\n#{msg}\nIf you really want to create this formula use --force."
+      if reason = Homebrew::MissingFormula.blacklisted_reason(fc.name)
+        raise "#{fc.name} is blacklisted for creation.\n#{reason}\nIf you really want to create this formula use --force."
       end
 
       if Formula.aliases.include? fc.name
@@ -100,7 +92,7 @@ module Homebrew
 end
 
 class FormulaCreator
-  attr_reader :url, :sha256
+  attr_reader :url, :sha256, :desc, :homepage
   attr_accessor :name, :version, :tap, :path, :mode
 
   def url=(url)
@@ -108,11 +100,15 @@ class FormulaCreator
     path = Pathname.new(url)
     if @name.nil?
       case url
-      when %r{github\.com/\S+/(\S+)\.git}
-        @name = $1
+      when %r{github\.com/(\S+)/(\S+)\.git}
+        @user = Regexp.last_match(1)
+        @name = Regexp.last_match(2)
         @head = true
-      when %r{github\.com/\S+/(\S+)/archive/}
-        @name = $1
+        @github = true
+      when %r{github\.com/(\S+)/(\S+)/(archive|releases)/}
+        @user = Regexp.last_match(1)
+        @name = Regexp.last_match(2)
+        @github = true
       else
         @name = path.basename.to_s[/(.*?)[-_.]?#{Regexp.escape(path.version.to_s)}/, 1]
       end
@@ -131,7 +127,7 @@ class FormulaCreator
   end
 
   def fetch?
-    !head? && !ARGV.include?("--no-fetch")
+    !ARGV.include?("--no-fetch")
   end
 
   def head?
@@ -145,24 +141,38 @@ class FormulaCreator
       opoo "Version cannot be determined from URL."
       puts "You'll need to add an explicit 'version' to the formula."
     elsif fetch?
-      r = Resource.new
-      r.url(url)
-      r.version(version)
-      r.owner = self
-      @sha256 = r.fetch.sha256 if r.download_strategy == CurlDownloadStrategy
+      unless head?
+        r = Resource.new
+        r.url(url)
+        r.version(version)
+        r.owner = self
+        @sha256 = r.fetch.sha256 if r.download_strategy == CurlDownloadStrategy
+      end
+
+      if @user && @name
+        begin
+          metadata = GitHub.repository(@user, @name)
+          @desc = metadata["description"]
+          @homepage = metadata["homepage"]
+        rescue GitHub::HTTPNotFoundError
+          # If there was no repository found assume the network connection is at
+          # fault rather than the input URL.
+          nil
+        end
+      end
     end
 
     path.write ERB.new(template, nil, ">").result(binding)
   end
 
   def template; <<-EOS.undent
-    # Documentation: http://docs.brew.sh/Formula-Cookbook.html
+    # Documentation: https://docs.brew.sh/Formula-Cookbook.html
     #                http://www.rubydoc.info/github/Homebrew/brew/master/Formula
     # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 
     class #{Formulary.class_s(name)} < Formula
-      desc ""
-      homepage ""
+      desc "#{desc}"
+      homepage "#{homepage}"
     <% if head? %>
       head "#{url}"
     <% else %>
@@ -216,9 +226,9 @@ class FormulaCreator
       test do
         # `test do` will create, run in and delete a temporary directory.
         #
-        # This test will fail and we won't accept that! It's enough to just replace
-        # "false" with the main program this formula installs, but it'd be nice if you
-        # were more thorough. Run the test with `brew test #{name}`. Options passed
+        # This test will fail and we won't accept that! For Homebrew/homebrew-core
+        # this will need to be a test that verifies the functionality of the
+        # software. Run the test with `brew test #{name}`. Options passed
         # to `brew install` such as `--HEAD` also need to be provided to `brew test`.
         #
         # The installed folder is not in the path, so use the entire path to any

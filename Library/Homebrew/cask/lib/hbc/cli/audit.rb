@@ -1,51 +1,24 @@
 module Hbc
   class CLI
-    class Audit < Base
+    class Audit < AbstractCommand
+      option "--download",        :download,        false
+      option "--token-conflicts", :token_conflicts, false
+
       def self.help
         "verifies installability of Casks"
       end
 
-      def self.run(*args)
-        failed_casks = new(args, Auditor).run
+      def run
+        failed_casks = casks(alternative: -> { Hbc.all })
+                       .reject { |cask| audit(cask) }
+
         return if failed_casks.empty?
         raise CaskError, "audit failed for casks: #{failed_casks.join(" ")}"
       end
 
-      def initialize(args, auditor)
-        @args = args
-        @auditor = auditor
-      end
-
-      def run
-        casks_to_audit.each_with_object([]) do |cask, failed|
-          failed << cask unless audit(cask)
-        end
-      end
-
       def audit(cask)
         odebug "Auditing Cask #{cask}"
-        @auditor.audit(cask, audit_download:        audit_download?,
-                             check_token_conflicts: check_token_conflicts?)
-      end
-
-      def audit_download?
-        @args.include?("--download")
-      end
-
-      def check_token_conflicts?
-        @args.include?("--token-conflicts")
-      end
-
-      def casks_to_audit
-        if cask_tokens.empty?
-          Hbc.all
-        else
-          cask_tokens.map { |token| Hbc.load(token) }
-        end
-      end
-
-      def cask_tokens
-        @cask_tokens ||= self.class.cask_tokens_from(@args)
+        Auditor.audit(cask, audit_download: download?, check_token_conflicts: token_conflicts?)
       end
 
       def self.needs_init?

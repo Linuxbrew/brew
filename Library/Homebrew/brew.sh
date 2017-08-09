@@ -1,8 +1,29 @@
-HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty 2>/dev/null)"
+# Force UTF-8 to avoid encoding issues for users with broken locale settings.
+if [[ "$(locale charmap 2>/dev/null)" != "UTF-8" ]]
+then
+  export LC_ALL="en_US.UTF-8"
+fi
+
+# Where we store built products; a Cellar in HOMEBREW_PREFIX (often /usr/local
+# for bottles) unless there's already a Cellar in HOMEBREW_REPOSITORY.
+if [[ -d "$HOMEBREW_REPOSITORY/Cellar" ]]
+then
+  HOMEBREW_CELLAR="$HOMEBREW_REPOSITORY/Cellar"
+else
+  HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
+fi
+
+case "$*" in
+  --prefix)            echo "$HOMEBREW_PREFIX"; exit 0 ;;
+  --cellar)            echo "$HOMEBREW_CELLAR"; exit 0 ;;
+  --repository|--repo) echo "$HOMEBREW_REPOSITORY"; exit 0 ;;
+esac
+
+HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty --abbrev=7 2>/dev/null)"
 HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
-  HOMEBREW_VERSION=">1.1.0 (no git repository)"
+  HOMEBREW_VERSION=">1.2.0 (no git repository)"
   HOMEBREW_USER_AGENT_VERSION="1.X.Y"
 fi
 
@@ -42,27 +63,6 @@ git() {
   "$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" "$@"
 }
 
-# Force UTF-8 to avoid encoding issues for users with broken locale settings.
-if [[ "$(locale charmap 2>/dev/null)" != "UTF-8" ]]
-then
-  export LC_ALL="en_US.UTF-8"
-fi
-
-# Where we store built products; a Cellar in HOMEBREW_PREFIX (often /usr/local
-# for bottles) unless there's already a Cellar in HOMEBREW_REPOSITORY.
-if [[ -d "$HOMEBREW_REPOSITORY/Cellar" ]]
-then
-  HOMEBREW_CELLAR="$HOMEBREW_REPOSITORY/Cellar"
-else
-  HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
-fi
-
-case "$*" in
-  --prefix)            echo "$HOMEBREW_PREFIX"; exit 0 ;;
-  --cellar)            echo "$HOMEBREW_CELLAR"; exit 0 ;;
-  --repository|--repo) echo "$HOMEBREW_REPOSITORY"; exit 0 ;;
-esac
-
 if [[ "$HOMEBREW_PREFIX" = "/" || "$HOMEBREW_PREFIX" = "/usr" ]]
 then
   # it may work, but I only see pain this route and don't want to support it
@@ -101,12 +101,19 @@ then
   [[ "$HOMEBREW_PROCESSOR" = "i386" ]] && HOMEBREW_PROCESSOR="Intel"
   HOMEBREW_MACOS_VERSION="$(/usr/bin/sw_vers -productVersion)"
   HOMEBREW_OS_VERSION="macOS $HOMEBREW_MACOS_VERSION"
+  # Don't change this from Mac OS X to match what macOS itself does in Safari on 10.12
+  HOMEBREW_OS_USER_AGENT_VERSION="Mac OS X $HOMEBREW_MACOS_VERSION"
 
   printf -v HOMEBREW_MACOS_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" &&
         -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
   then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
+  fi
+
+  if [[ -z "$HOMEBREW_CACHE" ]]
+  then
+    HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
   fi
 else
   HOMEBREW_CURL="curl"
@@ -115,25 +122,26 @@ else
   HOMEBREW_MACOS_VERSION=0
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
+  HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
 
   if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
   then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
   fi
-fi
-HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_VERSION)"
-HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | /usr/bin/awk '{print $1"/"$2}')"
-HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
 
-if [[ -z "$HOMEBREW_CACHE" ]]
-then
-  if [[ -n "$HOMEBREW_OSX" ]]
+  if [[ -z "$HOMEBREW_CACHE" ]]
   then
-    HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
-  else
-    HOMEBREW_CACHE="$HOME/.cache/Homebrew"
+    if [[ -n "$XDG_CACHE_HOME" ]]
+    then
+      HOMEBREW_CACHE="$XDG_CACHE_HOME/Homebrew"
+    else
+      HOMEBREW_CACHE="$HOME/.cache/Homebrew"
+    fi
   fi
 fi
+HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_USER_AGENT_VERSION)"
+HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | awk '{print $1"/"$2}')"
+HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
 
 # Declared in bin/brew
 export HOMEBREW_BREW_FILE
@@ -154,7 +162,7 @@ export HOMEBREW_MACOS_VERSION
 export HOMEBREW_USER_AGENT
 export HOMEBREW_USER_AGENT_CURL
 
-if [[ -n "$HOMEBREW_MACOS" ]]
+if [[ -n "$HOMEBREW_MACOS" && -x "/usr/bin/xcode-select" ]]
 then
   XCODE_SELECT_PATH=$('/usr/bin/xcode-select' --print-path 2>/dev/null)
   if [[ "$XCODE_SELECT_PATH" = "/" ]]
@@ -296,7 +304,6 @@ fi
 # shellcheck source=/dev/null
 source "$HOMEBREW_LIBRARY/Homebrew/utils/analytics.sh"
 setup-analytics
-report-analytics-screenview-command
 
 # Let user know we're still updating Homebrew if brew update --preinstall
 # exceeds 3 seconds.

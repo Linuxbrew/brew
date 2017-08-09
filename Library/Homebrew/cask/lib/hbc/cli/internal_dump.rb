@@ -1,29 +1,17 @@
 module Hbc
   class CLI
-    class InternalDump < InternalUseBase
-      def self.run(*arguments)
-        cask_tokens = cask_tokens_from(arguments)
-        raise CaskUnspecifiedError if cask_tokens.empty?
-        retval = dump_casks(*cask_tokens)
-        # retval is ternary: true/false/nil
-
-        raise CaskError, "nothing to dump" if retval.nil?
-        raise CaskError, "dump incomplete" unless retval
+    class InternalDump < AbstractInternalCommand
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
       end
 
-      def self.dump_casks(*cask_tokens)
-        Hbc.debug = true # Yuck. At the moment this is the only way to make dumps visible
-        count = 0
-        cask_tokens.each do |cask_token|
-          begin
-            cask = Hbc.load(cask_token)
-            count += 1
-            cask.dumpcask
-          rescue StandardError => e
-            opoo "#{cask_token} was not found or would not load: #{e}"
-          end
-        end
-        count.zero? ? nil : count == cask_tokens.length
+      def run
+        raise CaskError, "Dump incomplete." if dump_casks == :incomplet
+      end
+
+      def dump_casks
+        casks.each(&:dumpcask)
       end
 
       def self.help

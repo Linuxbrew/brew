@@ -1,8 +1,11 @@
+require "forwardable"
 require "extend/module"
+require "extend/predicable"
 require "extend/fileutils"
 require "extend/pathname"
 require "extend/git_repository"
 require "extend/ARGV"
+require "PATH"
 require "extend/string"
 require "os"
 require "utils"
@@ -10,12 +13,14 @@ require "exceptions"
 require "set"
 require "rbconfig"
 require "official_taps"
+require "pp"
+require "English"
 
 ARGV.extend(HomebrewArgvExtension)
 
 HOMEBREW_PRODUCT = ENV["HOMEBREW_PRODUCT"]
 HOMEBREW_VERSION = ENV["HOMEBREW_VERSION"]
-HOMEBREW_WWW = "https://brew.sh".freeze
+HOMEBREW_WWW = "http://linuxbrew.sh".freeze
 
 HOMEBREW_DEFAULT_PREFIX = (OS.linux? ? "/home/linuxbrew/.linuxbrew" : "/usr/local").freeze
 
@@ -55,7 +60,8 @@ HOMEBREW_PULL_OR_COMMIT_URL_REGEX = %r[https://github\.com/([\w-]+)/([\w-]+)?/(?
 
 require "compat" unless ARGV.include?("--no-compat") || ENV["HOMEBREW_NO_COMPAT"]
 
-ORIGINAL_PATHS = ENV["PATH"].split(File::PATH_SEPARATOR).map do |p|
+ENV["HOMEBREW_PATH"] ||= ENV["PATH"]
+ORIGINAL_PATHS = PATH.new(ENV["HOMEBREW_PATH"]).map do |p|
   begin
     Pathname.new(p).expand_path
   rescue
@@ -63,7 +69,6 @@ ORIGINAL_PATHS = ENV["PATH"].split(File::PATH_SEPARATOR).map do |p|
   end
 end.compact.freeze
 
-# TODO: remove this as soon as it's removed from commands.rb.
 HOMEBREW_INTERNAL_COMMAND_ALIASES = {
   "ls" => "list",
   "homepage" => "home",

@@ -16,9 +16,12 @@ class Keg
       link = file.readlink
       # Don't fix relative symlinks
       next unless link.absolute?
-      if link.to_s.start_with?(HOMEBREW_CELLAR.to_s) || link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
-        FileUtils.ln_sf(link.relative_path_from(file.parent), file)
-      end
+      link_starts_cellar = link.to_s.start_with?(HOMEBREW_CELLAR.to_s)
+      link_starts_prefix = link.to_s.start_with?(HOMEBREW_PREFIX.to_s)
+      next if !link_starts_cellar && !link_starts_prefix
+      new_src = link.relative_path_from(file.parent)
+      file.unlink
+      FileUtils.ln_s(new_src, file)
     end
   end
   alias generic_fix_dynamic_linkage fix_dynamic_linkage
@@ -65,17 +68,19 @@ class Keg
         relocation.old_cellar => relocation.new_cellar,
         relocation.old_repository => relocation.new_repository,
       }
-
-      # Order matters here since `HOMEBREW_CELLAR` and `HOMEBREW_REPOSITORY` are
-      # children of `HOMEBREW_PREFIX` by default.
-      regexp = Regexp.union(
-        relocation.old_cellar,
-        relocation.old_repository,
-        relocation.old_prefix,
-      )
-
-      changed = s.gsub!(regexp, replacements)
-
+      if !OS.mac? && relocation.old_repository == REPOSITORY_PLACEHOLDER
+        # Work around for bottles that incorrectly use @@HOMEBREW_REPOSITORY@@
+        # where they should have used @@HOMEBREW_PREFIX@@.
+        # Change @@HOMEBREW_REPOSITORY@@/Library to $HOMEBREW_REPOSITORY/Library
+        # and all other instances of @@HOMEBREW_REPOSITORY@@ to $HOMEBREW_PREFIX.
+        replacements = {
+          relocation.old_prefix => relocation.new_prefix,
+          relocation.old_cellar => relocation.new_cellar,
+          relocation.old_repository => relocation.new_prefix,
+          relocation.old_repository + "/Library" => relocation.new_repository + "/Library",
+        }
+      end
+      changed = s.gsub!(Regexp.union(replacements.keys), replacements)
       next unless changed
       changed_files += [first, *rest].map { |file| file.relative_path_from(path) }
 
@@ -96,8 +101,15 @@ class Keg
     []
   end
 
+  def recursive_fgrep_args
+    # for GNU grep; overridden for BSD grep on OS X
+    "-lr"
+  end
+  alias generic_recursive_fgrep_args recursive_fgrep_args
+
   def each_unique_file_matching(string)
-    Utils.popen_read("fgrep", "-lr", string, to_s) do |io|
+    fgrep = OS.mac? ? "/usr/bin/fgrep" : "fgrep"
+    Utils.popen_read(fgrep, recursive_fgrep_args, string, to_s) do |io|
       hardlinks = Set.new
 
       until io.eof?
@@ -109,7 +121,7 @@ class Keg
   end
 
   def lib
-    path.join("lib")
+    path/"lib"
   end
 
   def text_files
@@ -121,11 +133,12 @@ class Keg
     # file has known issues with reading files on other locales. Has
     # been fixed upstream for some time, but a sufficiently new enough
     # file with that fix is only available in macOS Sierra.
-    # http://bugs.gw.com/view.php?id=292
+    # https://bugs.gw.com/view.php?id=292
     with_custom_locale("C") do
       files = Set.new path.find.reject { |pn|
         next true if pn.symlink?
         next true if pn.directory?
+        next false if pn.basename.to_s == "orig-prefix.txt" # for python virtualenvs
         next true if Metafiles::EXTENSIONS.include?(pn.extname)
         if pn.text_executable?
           text_files << pn

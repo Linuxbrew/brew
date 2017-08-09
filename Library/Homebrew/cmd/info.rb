@@ -14,9 +14,9 @@
 #:    information on all installed formulae.
 #:
 #:    See the docs for examples of using the JSON output:
-#:    <http://docs.brew.sh/Querying-Brew.html>
+#:    <https://docs.brew.sh/Querying-Brew.html>
 
-require "blacklist"
+require "missing_formula"
 require "caveats"
 require "options"
 require "formula"
@@ -43,7 +43,7 @@ module Homebrew
     if ARGV.named.empty?
       if HOMEBREW_CELLAR.exist?
         count = Formula.racks.length
-        puts "#{count} keg#{plural(count)}, #{HOMEBREW_CELLAR.abv}"
+        puts "#{Formatter.pluralize(count, "keg")}, #{HOMEBREW_CELLAR.abv}"
       end
     else
       ARGV.named.each_with_index do |f, i|
@@ -54,10 +54,12 @@ module Homebrew
           else
             info_formula Formulary.find_with_priority(f)
           end
-        rescue FormulaUnavailableError
-          # No formula with this name, try a blacklist lookup
-          raise unless (blacklist = blacklisted?(f))
-          puts blacklist
+        rescue FormulaUnavailableError => e
+          ofail e.message
+          # No formula with this name, try a missing formula lookup
+          if (reason = Homebrew::MissingFormula.reason(f))
+            $stderr.puts reason
+          end
         end
       end
     end
@@ -77,7 +79,7 @@ module Homebrew
 
   def github_remote_path(remote, path)
     if remote =~ %r{^(?:https?://|git(?:@|://))github\.com[:/](.+)/(.+?)(?:\.git)?$}
-      "https://github.com/#{$1}/#{$2}/blob/master/#{path}"
+      "https://github.com/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}/blob/master/#{path}"
     else
       "#{remote}/#{path}"
     end
@@ -121,8 +123,16 @@ module Homebrew
     puts f.desc if f.desc
     puts Formatter.url(f.homepage) if f.homepage
 
-    conflicts = f.conflicts.map(&:name).sort!
-    puts "Conflicts with: #{conflicts*", "}" unless conflicts.empty?
+    conflicts = f.conflicts.map do |c|
+      reason = " (because #{c.reason})" if c.reason
+      "#{c.name}#{reason}"
+    end.sort!
+    unless conflicts.empty?
+      puts <<-EOS.undent
+        Conflicts with:
+          #{conflicts.join("\n  ")}
+      EOS
+    end
 
     kegs = f.installed_kegs.sort_by(&:version)
     if kegs.empty?
@@ -159,8 +169,8 @@ module Homebrew
       Homebrew.dump_options_for_formula f
     end
 
-    c = Caveats.new(f)
-    ohai "Caveats", c.caveats unless c.empty?
+    caveats = Caveats.new(f)
+    ohai "Caveats", caveats.to_s unless caveats.empty?
   end
 
   def decorate_dependencies(dependencies)

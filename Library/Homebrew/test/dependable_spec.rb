@@ -1,8 +1,8 @@
 require "dependable"
 
-RSpec::Matchers.alias_matcher :be_a_build_dependency, :be_build
-
 describe Dependable do
+  alias_matcher :be_a_build_dependency, :be_build
+
   subject { double(tags: tags).extend(described_class) }
   let(:tags) { ["foo", "bar", :build] }
 

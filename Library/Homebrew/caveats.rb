@@ -1,4 +1,6 @@
 class Caveats
+  extend Forwardable
+
   attr_reader :f
 
   def initialize(f)
@@ -16,20 +18,16 @@ class Caveats
       f.build = build
     end
     caveats << keg_only_text
-    caveats << bash_completion_caveats
-    caveats << zsh_completion_caveats
-    caveats << fish_completion_caveats
-    caveats << zsh_function_caveats
-    caveats << fish_function_caveats
+    caveats << function_completion_caveats(:bash)
+    caveats << function_completion_caveats(:zsh)
+    caveats << function_completion_caveats(:fish)
     caveats << plist_caveats
     caveats << python_caveats
     caveats << elisp_caveats
     caveats.compact.join("\n")
   end
 
-  def empty?
-    caveats.empty?
-  end
+  delegate [:empty?, :to_s] => :caveats
 
   private
 
@@ -46,15 +44,17 @@ class Caveats
   def keg_only_text
     return unless f.keg_only?
 
-    s = "This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX}."
-    s << "\n\n#{f.keg_only_reason}\n"
+    s = <<-EOS.undent
+      This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX},
+      because #{f.keg_only_reason.to_s.chomp}.
+    EOS
     if f.bin.directory? || f.sbin.directory?
       s << "\nIf you need to have this software first in your PATH run:\n"
       if f.bin.directory?
-        s << "  #{Utils::Shell.prepend_path_in_shell_profile(f.opt_bin.to_s)}\n"
+        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_bin.to_s)}\n"
       end
       if f.sbin.directory?
-        s << "  #{Utils::Shell.prepend_path_in_shell_profile(f.opt_sbin.to_s)}\n"
+        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_sbin.to_s)}\n"
       end
     end
 
@@ -72,56 +72,35 @@ class Caveats
     s << "\n"
   end
 
-  def bash_completion_caveats
+  def function_completion_caveats(shell)
     return unless keg
-    return unless keg.completion_installed?(:bash)
+    return unless which(shell.to_s)
 
-    <<-EOS.undent
-      Bash completion has been installed to:
-        #{HOMEBREW_PREFIX}/etc/bash_completion.d
-    EOS
-  end
+    completion_installed = keg.completion_installed?(shell)
+    functions_installed = keg.functions_installed?(shell)
+    return unless completion_installed || functions_installed
 
-  def zsh_completion_caveats
-    return unless keg
-    return unless keg.completion_installed?(:zsh)
+    installed = []
+    installed << "completions" if completion_installed
+    installed << "functions" if functions_installed
 
-    <<-EOS.undent
-      zsh completion has been installed to:
-        #{HOMEBREW_PREFIX}/share/zsh/site-functions
-    EOS
-  end
-
-  def fish_completion_caveats
-    return unless keg
-    return unless keg.completion_installed?(:fish)
-    return unless which("fish")
-
-    <<-EOS.undent
-      fish completion has been installed to:
-        #{HOMEBREW_PREFIX}/share/fish/vendor_completions.d
-    EOS
-  end
-
-  def zsh_function_caveats
-    return unless keg
-    return unless keg.zsh_functions_installed?
-
-    <<-EOS.undent
-      zsh functions have been installed to:
-        #{HOMEBREW_PREFIX}/share/zsh/site-functions
-    EOS
-  end
-
-  def fish_function_caveats
-    return unless keg
-    return unless keg.fish_functions_installed?
-    return unless which("fish")
-
-    <<-EOS.undent
-      fish functions have been installed to:
-        #{HOMEBREW_PREFIX}/share/fish/vendor_functions.d
-    EOS
+    case shell
+    when :bash
+      <<-EOS.undent
+        Bash completion has been installed to:
+          #{HOMEBREW_PREFIX}/etc/bash_completion.d
+      EOS
+    when :zsh
+      <<-EOS.undent
+        zsh #{installed.join(" and ")} have been installed to:
+          #{HOMEBREW_PREFIX}/share/zsh/site-functions
+      EOS
+    when :fish
+      fish_caveats = "fish #{installed.join(" and ")} have been installed to:"
+      fish_caveats << "\n  #{HOMEBREW_PREFIX}/share/fish/vendor_completions.d" if completion_installed
+      fish_caveats << "\n  #{HOMEBREW_PREFIX}/share/fish/vendor_functions.d" if functions_installed
+      fish_caveats
+    end
   end
 
   def python_caveats
@@ -186,20 +165,7 @@ class Caveats
     return "" unless OS.mac?
     s = []
     if f.plist || (keg && keg.plist_installed?)
-      destination = if f.plist_startup
-        "/Library/LaunchDaemons"
-      else
-        "~/Library/LaunchAgents"
-      end
-
-      plist_filename = if f.plist
-        f.plist_path.basename
-      else
-        File.basename Dir["#{keg}/*.plist"].first
-      end
       plist_domain = f.plist_path.basename(".plist")
-      destination_path = Pathname.new File.expand_path destination
-      plist_path = destination_path/plist_filename
 
       # we readlink because this path probably doesn't exist since caveats
       # occurs before the link step of installation
@@ -231,10 +197,29 @@ class Caveats
         s << "  #{f.plist_manual}"
       end
 
+      # pbpaste is the system clipboard tool on macOS and fails with `tmux` by default
+      # check if this is being run under `tmux` to avoid failing
       if ENV["TMUX"] && !quiet_system("/usr/bin/pbpaste")
         s << "" << "WARNING: brew services will fail when run under tmux."
       end
     end
     s.join("\n") + "\n" unless s.empty?
+  end
+
+  def plist_path
+    destination = if f.plist_startup
+      "/Library/LaunchDaemons"
+    else
+      "~/Library/LaunchAgents"
+    end
+
+    plist_filename = if f.plist
+      f.plist_path.basename
+    else
+      File.basename Dir["#{keg}/*.plist"].first
+    end
+    destination_path = Pathname.new(File.expand_path(destination))
+
+    destination_path/plist_filename
   end
 end

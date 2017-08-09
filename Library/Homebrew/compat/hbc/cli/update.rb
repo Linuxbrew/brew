@@ -1,8 +1,8 @@
-require "cask/lib/hbc/cli/base"
+require "cask/lib/hbc/cli/abstract_command"
 
 module Hbc
   class CLI
-    class Update < Base
+    class Update < AbstractCommand
       def self.run(*_ignored)
         odeprecated "`brew cask update`", "`brew update`", disable_on: Time.utc(2017, 7, 1)
         result = SystemCommand.run(HOMEBREW_BREW_FILE, args:         ["update"],

@@ -1,8 +1,8 @@
 require "dependency_collector"
 
-RSpec::Matchers.alias_matcher :need_tar_xz_dependency, :be_tar_needs_xz_dependency
-
 describe DependencyCollector do
+  alias_matcher :need_tar_xz_dependency, :be_tar_needs_xz_dependency
+
   after(:each) do
     described_class.clear_cache
   end

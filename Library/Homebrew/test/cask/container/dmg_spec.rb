@@ -9,11 +9,12 @@ describe Hbc::Container::Dmg, :cask do
         Hbc::SystemCommand,
       )
 
-      begin
-        dmg.mount!
-        expect(dmg.mounts).not_to include nil
-      ensure
-        dmg.eject!
+      dmg.mount do |mounts|
+        begin
+          expect(mounts).not_to include nil
+        ensure
+          mounts.each(&dmg.public_method(:eject))
+        end
       end
     end
   end

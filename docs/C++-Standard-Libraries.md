@@ -3,10 +3,10 @@
 There are two C++ standard libraries supported by Apple compilers.
 
 The default for 10.8 and earlier is **libstdc++**, supported by Apple GCC
-compilers, GNU GCC compilers, and clang. This was marked deprecated with a
+compilers, GNU GCC compilers, and `clang`. This was marked deprecated with a
 warning during compile as of Xcode 8.
 
-The default for 10.9 is **libc++**, which is also the default for clang on older
+The default for 10.9 is **libc++**, which is also the default for `clang` on older
 platforms when building C++11 code.
 
 There are subtle incompatibilities between several of the C++ standard libraries,

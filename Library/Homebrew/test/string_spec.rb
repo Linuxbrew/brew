@@ -3,19 +3,19 @@ require "extend/string"
 describe String do
   describe "#undent" do
     it "removes leading whitespace, taking the first line as reference" do
-      string = <<-EOS.undent
-        hi
-........my friend over
-          there
+      string = <<-EOS.unindent
+                hi
+                ........my friend over
+                  there
       EOS
 
       expect(string).to eq("hi\n........my friend over\n  there\n")
     end
 
     it "removes nothing if the text is not indented" do
-      string = <<-EOS.undent
-hi
-I'm not indented
+      string = <<-EOS.unindent
+        hi
+        I'm not indented
       EOS
 
       expect(string).to eq("hi\nI'm not indented\n")

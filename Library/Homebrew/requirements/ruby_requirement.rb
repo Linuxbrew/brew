@@ -11,7 +11,7 @@ class RubyRequirement < Requirement
   satisfy(build_env: false) { new_enough_ruby }
 
   env do
-    ENV.prepend_path "PATH", new_enough_ruby.dirname unless new_enough_ruby.nil?
+    ENV.prepend_path "PATH", new_enough_ruby.dirname
   end
 
   def message
@@ -39,6 +39,7 @@ class RubyRequirement < Requirement
       next unless new_enough?(ruby)
       rubyhdrdir = Pathname.new Utils.popen_read(ruby, "-rrbconfig", "-e", "print RbConfig::CONFIG['rubyhdrdir']")
       next unless (rubyhdrdir/"ruby.h").readable?
+      ruby
     end
   end
 

@@ -1,6 +1,6 @@
 describe "download strategies", :cask do
   let(:url) { "http://example.com/cask.dmg" }
-  let(:url_options) { Hash.new }
+  let(:url_options) { {} }
   let(:cask) {
     instance_double(Hbc::Cask, token:   "some-cask",
                                url:     Hbc::URL.new(url, url_options),
@@ -60,7 +60,7 @@ describe "download strategies", :cask do
           downloader.fetch
         end
 
-        expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) http://caskroom.io"])
+        expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) https://caskroom.github.io"])
       end
     end
 
@@ -291,7 +291,7 @@ describe "download strategies", :cask do
   # does not work yet, because (for unknown reasons), the tar command
   # returns an error code when running under the test suite
   # it 'creates a tarball matching the expected checksum' do
-  #   cask = Hbc.load('svn-download-check-cask')
+  #   cask = Hbc::CaskLoader.load('svn-download-check-cask')
   #   downloader = Hbc::SubversionDownloadStrategy.new(cask)
   #   # special mocking required for tar to have something to work with
   #   def downloader.fetch_repo(target, url, revision = nil, ignore_externals=false)

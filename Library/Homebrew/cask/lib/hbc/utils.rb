@@ -2,36 +2,23 @@ require "yaml"
 require "open3"
 require "stringio"
 
-require "hbc/utils/file"
-
-PREBUG_URL = "https://github.com/caskroom/homebrew-cask/blob/master/doc/reporting_bugs/pre_bug_report.md".freeze
-ISSUES_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
-
-# monkeypatch Object - not a great idea
-class Object
-  def utf8_inspect
-    return inspect unless defined?(Encoding)
-    return map(&:utf8_inspect) if respond_to?(:map)
-    inspect.force_encoding("UTF-8").sub(/\A"(.*)"\Z/, '\1')
-  end
-end
+BUG_REPORTS_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
 class Buffer < StringIO
+  extend Predicable
+
+  attr_predicate :tty?
+
   def initialize(tty = false)
     super()
     @tty = tty
-  end
-
-  def tty?
-    @tty
   end
 end
 
 # global methods
 
 def odebug(title, *sput)
-  return unless Hbc.respond_to?(:debug)
-  return unless Hbc.debug
+  return unless ARGV.debug?
   puts Formatter.headline(title, color: :magenta)
   puts sput unless sput.empty?
 end
@@ -40,7 +27,15 @@ module Hbc
   module Utils
     def self.gain_permissions_remove(path, command: SystemCommand)
       if path.respond_to?(:rmtree) && path.exist?
-        gain_permissions(path, ["-R"], command, &:rmtree)
+        gain_permissions(path, ["-R"], command) do |p|
+          if p.parent.writable?
+            p.rmtree
+          else
+            command.run("/bin/rm",
+                        args: ["-r", "-f", "--", p],
+                        sudo: true)
+          end
+        end
       elsif File.symlink?(path)
         gain_permissions(path, ["-h"], command, &FileUtils.method(:rm_f))
       end
@@ -90,27 +85,6 @@ module Hbc
       Etc.getpwuid(Process.euid).name
     end
 
-    # paths that "look" descendant (textually) will still
-    # return false unless both the given paths exist
-    def self.file_is_descendant(file, dir)
-      file = Pathname.new(file)
-      dir  = Pathname.new(dir)
-      return false unless file.exist? && dir.exist?
-      unless dir.directory?
-        onoe "Argument must be a directory: '#{dir}'"
-        return false
-      end
-      unless file.absolute? && dir.absolute?
-        onoe "Both arguments must be absolute: '#{file}', '#{dir}'"
-        return false
-      end
-      while file.parent != file
-        return true if File.identical?(file, dir)
-        file = file.parent
-      end
-      false
-    end
-
     def self.path_occupied?(path)
       File.exist?(path) || File.symlink?(path)
     end
@@ -118,11 +92,7 @@ module Hbc
     def self.error_message_with_suggestions
       <<-EOS.undent
         Follow the instructions here:
-          #{Formatter.url(PREBUG_URL)}
-
-        If this doesn’t fix the problem, please report this bug:
-          #{Formatter.url(ISSUES_URL)}
-
+          #{Formatter.url(BUG_REPORTS_URL)}
       EOS
     end
 
@@ -133,30 +103,6 @@ module Hbc
       poo << "on Cask #{token}."
 
       opoo(poo.join(" ") + "\n" + error_message_with_suggestions)
-    end
-
-    def self.nowstamp_metadata_path(container_path)
-      @timenow ||= Time.now.gmtime
-      return unless container_path.respond_to?(:join)
-
-      precision = 3
-      timestamp = @timenow.strftime("%Y%m%d%H%M%S")
-      fraction = format("%.#{precision}f", @timenow.to_f - @timenow.to_i)[1..-1]
-      timestamp.concat(fraction)
-      container_path.join(timestamp)
-    end
-
-    def self.size_in_bytes(files)
-      Array(files).reduce(0) { |acc, elem| acc + (File.size?(elem) || 0) }
-    end
-
-    def self.capture_stderr
-      previous_stderr = $stderr
-      $stderr = StringIO.new
-      yield
-      $stderr.string
-    ensure
-      $stderr = previous_stderr
     end
   end
 end

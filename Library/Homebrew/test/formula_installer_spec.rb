@@ -5,10 +5,10 @@ require "tab"
 require "test/support/fixtures/testball"
 require "test/support/fixtures/testball_bottle"
 
-RSpec::Matchers.define_negated_matcher :need_bottle, :be_bottle_unneeded
-RSpec::Matchers.alias_matcher :have_disabled_bottle, :be_bottle_disabled
-
 describe FormulaInstaller do
+  define_negated_matcher :need_bottle, :be_bottle_unneeded
+  alias_matcher :have_disabled_bottle, :be_bottle_disabled
+
   matcher :be_poured_from_bottle do
     match(&:poured_from_bottle)
   end
@@ -133,5 +133,51 @@ describe FormulaInstaller do
     expect {
       fi.check_install_sanity
     }.to raise_error(CannotInstallFormulaError)
+  end
+
+  describe "#install_requirement_formula?" do
+    before do
+      @requirement = Python3Requirement.new
+      allow(@requirement).to receive(:satisfied?).and_return(satisfied?)
+      allow(@requirement).to receive(:satisfied_by_formula?).and_return(satisfied_by_formula?)
+      allow_any_instance_of(Dependency).to receive(:installed?).and_return(installed?)
+      @dependent = formula do
+        url "foo"
+        version "0.1"
+        depends_on :python3
+      end
+      @build = BuildOptions.new [], []
+      @fi = FormulaInstaller.new(@dependent)
+    end
+
+    subject { @fi.install_requirement_formula?(@requirement, @dependent, @build) }
+
+    context "it returns false when requirement is satisfied" do
+      let(:satisfied?) { true }
+      let(:satisfied_by_formula?) { false }
+      let(:installed?) { false }
+      it { is_expected.to be false }
+    end
+
+    context "it returns false when requirement is satisfied but default formula is installed" do
+      let(:satisfied?) { true }
+      let(:satisfied_by_formula?) { false }
+      let(:installed?) { true }
+      it { is_expected.to be false }
+    end
+
+    context "it returns true when requirement isn't satisfied" do
+      let(:satisfied?) { false }
+      let(:satisfied_by_formula?) { false }
+      let(:installed?) { false }
+      it { is_expected.to be true }
+    end
+
+    context "it returns true when requirement is satisfied by a formula" do
+      let(:satisfied?) { true }
+      let(:satisfied_by_formula?) { true }
+      let(:installed?) { false }
+      it { is_expected.to be true }
+    end
   end
 end

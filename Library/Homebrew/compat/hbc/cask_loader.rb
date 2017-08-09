@@ -12,7 +12,11 @@ module CaskLoaderCompatibilityLayer
 end
 
 module Hbc
-  class CaskLoader
-    prepend CaskLoaderCompatibilityLayer
+  module CaskLoader
+    class FromContentLoader; end
+
+    class FromPathLoader < FromContentLoader
+      prepend CaskLoaderCompatibilityLayer
+    end
   end
 end

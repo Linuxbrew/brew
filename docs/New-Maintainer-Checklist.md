@@ -12,6 +12,9 @@ your contributions around $THEIR_CONTRIBUTIONS.
 
 We would like to invite you to have commit access. There are no obligations,
 but we'd appreciate your continuing help in keeping on top of contributions.
+The easiest way to do this is to watch the Homebrew/brew and
+Homebrew/homebrew-core repositories on GitHub to provide help and code review
+and to pull suitable changes.
 
 A few requests:
 
@@ -25,12 +28,15 @@ A few requests:
   button in "create a merge commit" mode for Homebrew/brew or "squash and
   merge" for a single formulae change. If in doubt, check with e.g. GitX that
   you've not accidentally added merge commits
-- still create your branches on your fork rather than in the main repository
-- if still in doubt please ask for help and we'll help you out - these are
-  probably worth a read:
-    - https://github.com/Homebrew/brew/blob/master/docs/Brew-Test-Bot-For-Core-Contributors.md
-    - https://github.com/Homebrew/brew/blob/master/docs/Maintainer-Guidelines.md
-    - possibly everything else in the documentation
+- still create your branches on your fork rather than in the main repository.
+  Note GitHub's UI will create edits and reverts on the main repository if you
+  make edits or click revert on the Homebrew/brew repository rather than your
+  own fork.
+- if still in doubt please ask for help and we'll help you out
+- please read:
+    - https://docs.brew.sh/Brew-Test-Bot-For-Core-Contributors.html
+    - https://docs.brew.sh/Maintainer-Guidelines.html
+    - possibly everything else on https://docs.brew.sh
 
 How does that sound?
 
@@ -41,9 +47,9 @@ If they accept, follow a few steps to get them set up:
 
 - Invite them to the [**@Homebrew/maintainers** team](https://github.com/orgs/Homebrew/teams/maintainers) to give them write access to all repositories (but don't make them owners yet). They will need to enable [GitHub's Two Factor Authentication](https://help.github.com/articles/about-two-factor-authentication/).
 - Ask them to sign in to [Bintray](https://bintray.com) using their GitHub account and they should auto-sync to [Bintray's Homebrew organisation](https://bintray.com/homebrew/organization/edit/members) as a member so they can publish new bottles
-- Add them to the [Jenkins' GitHub Authorization Settings admin user names](https://bot.brew.sh/configureSecurity/) so they can adjust settings and restart jobs
-- Add them to the [Jenkins' GitHub Pull Request Builder admin list](https://bot.brew.sh/configure) to enable `@BrewTestBot test this please` for them
-- Invite them to the [`homebrew-dev` private maintainers mailing list](https://groups.google.com/forum/#!managemembers/homebrew-dev/invite)
+- Add them to the [Jenkins' GitHub Authorization Settings admin user names](https://jenkins.brew.sh/configureSecurity/) so they can adjust settings and restart jobs
+- Add them to the [Jenkins' GitHub Pull Request Builder admin list](https://jenkins.brew.sh/configure) to enable `@BrewTestBot test this please` for them
+- Invite them to the [`homebrew-maintainers` private maintainers mailing list](https://lists.sfconservancy.org/mailman/admin/homebrew-maintainers/members/add)
 - Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites)
 - Invite them to the [`homebrew` private maintainers 1Password](https://homebrew.1password.com/signin)
 - Invite them to [Google Analytics](https://analytics.google.com/analytics/web/?authuser=1#management/Settings/a76679469w115400090p120682403/%3Fm.page%3DAccountUsers/)

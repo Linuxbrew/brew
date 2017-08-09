@@ -1,65 +1,101 @@
 AllCops:
   TargetRubyVersion: 2.0
   Exclude:
-    - '**/Rakefile'
-    - '**/.*'
     - '**/Casks/**/*'
     - '**/vendor/**/*'
 
 require: ./Homebrew/rubocops.rb
 
-Homebrew/CorrectBottleBlock:
+FormulaAudit:
   Enabled: true
 
-Metrics/AbcSize:
+FormulaAuditStrict:
+  Enabled: true
+
+NewFormulaAudit:
   Enabled: false
 
-Metrics/BlockLength:
+# `system` is a special case and aligns on second argument
+Layout/AlignParameters:
   Enabled: false
 
-Metrics/ClassLength:
-  Enabled: false
+Layout/CaseIndentation:
+  EnforcedStyle: end
 
-Metrics/CyclomaticComplexity:
-  Enabled: false
+Layout/EmptyLineBetweenDefs:
+  AllowAdjacentOneLineDefs: true
 
-Metrics/LineLength:
-  Enabled: false
+Layout/IndentArray:
+  EnforcedStyle: special_inside_parentheses
 
-Metrics/MethodLength:
-  Enabled: false
+Layout/IndentHeredoc:
+  EnforcedStyle: unindent
 
-Metrics/ModuleLength:
-  CountComments: false
-
-Metrics/PerceivedComplexity:
+# conflicts with DSL-style path concatenation with `/`
+Layout/SpaceAroundOperators:
   Enabled: false
 
 # favor parens-less DSL-style arguments
 Lint/AmbiguousOperator:
   Enabled: false
 
+# so many of these in formulae and can't be autocorrected
 Lint/AmbiguousRegexpLiteral:
   Enabled: false
 
+# favor parens-less DSL-style arguments
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+# assignment in conditions are useful sometimes
 Lint/AssignmentInCondition:
   Enabled: false
 
 Lint/EndAlignment:
   EnforcedStyleAlignWith: variable
 
+# so many of these in formulae and can't be autocorrected
 Lint/ParenthesesAsGroupedExpression:
+  Enabled: false
+
+# TODO: try to bring down all metrics maximums
+Metrics/AbcSize:
+  Max: 254
+
+Metrics/BlockLength:
+  Max: 1250
+
+Metrics/ClassLength:
+  Max: 1500
+
+Metrics/CyclomaticComplexity:
+  Max: 76
+
+Metrics/LineLength:
+  Max: 400
+
+Metrics/MethodLength:
+  Max: 250
+
+Metrics/ModuleLength:
+  CountComments: false
+  Exclude:
+    - '**/bin/**/*'
+    - '**/cmd/**/*'
+    - '**/lib/**/*'
+
+Metrics/PerceivedComplexity:
+  Max: 100
+
+# makes code less readable for minor performance increases
+Performance/Caller:
   Enabled: false
 
 Style/Alias:
   EnforcedStyle: prefer_alias
 
-Style/AlignHash:
-  Enabled: false
-
-# `system` is a special case and aligns on second argument
-Style/AlignParameters:
-  Enabled: false
+Style/AutoResourceCleanup:
+  Enabled: true
 
 Style/BarePercentLiterals:
   EnforcedStyle: percent_q
@@ -67,31 +103,30 @@ Style/BarePercentLiterals:
 Style/BlockDelimiters:
   EnforcedStyle: line_count_based
 
-Style/CaseIndentation:
-  EnforcedStyle: end
-
 Style/ClassAndModuleChildren:
   EnforcedStyle: nested
-
-# percent-x is allowed for multiline
-Style/CommandLiteral:
-  EnforcedStyle: mixed
 
 # our current conditional style is established, clear and
 # requiring users to change that now would be confusing.
 Style/ConditionalAssignment:
   Enabled: false
 
+# most of our APIs are internal so don't require docs
 Style/Documentation:
  Enabled: false
 
-Style/EmptyLineBetweenDefs:
-  AllowAdjacentOneLineDefs: true
+Style/Encoding:
+  Enabled: true
 
 # dashes in filenames are typical
 Style/FileName:
   Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
 
+# falsely flags e.g. curl formatting arguments as format strings
+Style/FormatStringToken:
+  Enabled: false
+
+# so many of these in formulae and can't be autocorrected
 Style/GuardClause:
   Enabled: false
 
@@ -103,13 +138,6 @@ Style/HashSyntax:
     - '**/cmd/**/*'
     - '**/lib/**/*'
     - '**/spec/**/*'
-
-# disabled until it respects line length
-Style/IfUnlessModifier:
-  Enabled: false
-
-Style/IndentArray:
-  EnforcedStyle: special_inside_parentheses
 
 # only for numbers >= 1_000_000
 Style/NumericLiterals:
@@ -132,27 +160,12 @@ Style/PercentLiteralDelimiters:
     '%W': '[]'
     '%x': '()'
 
-# we prefer Perl-style regex back references
-Style/PerlBackrefs:
-  Enabled: false
-
 Style/RaiseArgs:
   EnforcedStyle: exploded
 
 # paths abound, easy escape
 Style/RegexpLiteral:
   EnforcedStyle: slashes
-
-# conflicts with DSL-style path concatenation with `/`
-Style/SpaceAroundOperators:
-  Enabled: false
-
-Style/SingleLineBlockParams:
-  Enabled: false
-
-# not a problem for typical shell users
-Style/SpecialGlobalVars:
-  Enabled: false
 
 # ruby style guide favorite
 Style/StringLiterals:
@@ -162,21 +175,34 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
 Style/TernaryParentheses:
-  Enabled: false
+  EnforcedStyle: require_parentheses_when_complex
 
 # makes diffs nicer
 Style/TrailingCommaInLiteral:
   EnforcedStyleForMultiline: comma
+
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
 
+# we have too many variables like sha256 where this harms readability
 Style/VariableNumber:
   Enabled: false
 
 Style/WordArray:
-  Enabled: false
+  MinSize: 4
 
 # Disable for Linuxbrew
 Style/MultilineIfModifier:
   Enabled: false
+
+# Disable for Linuxbrew
+Layout/EmptyLineAfterMagicComment:
+  Description: 'Add an empty line after magic comments to separate them from code.'
+  StyleGuide: '#separate-magic-comments-from-code'
+  Enabled: true
+  Exclude:
+    - '**/bin/**/*'

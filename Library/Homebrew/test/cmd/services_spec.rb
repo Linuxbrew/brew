@@ -1,4 +1,4 @@
-describe "brew services", :integration_test, :needs_macos, :needs_official_cmd_taps do
+describe "brew services", :integration_test, :needs_macos, :needs_network do
   it "allows controlling services" do
     setup_remote_tap "homebrew/services"
 

@@ -1,19 +1,38 @@
 describe Hbc::CLI::Uninstall, :cask do
-  it "shows an error when a bad Cask is provided" do
+  it "displays the uninstallation progress" do
+    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+
+    shutup do
+      Hbc::Installer.new(caffeine).install
+    end
+
+    output = Regexp.new <<-EOS.undent
+      ==> Uninstalling Cask local-caffeine
+      ==> Removing App '.*Caffeine.app'.
+    EOS
+
     expect {
-      Hbc::CLI::Uninstall.run("notacask")
-    }.to raise_error(Hbc::CaskUnavailableError)
+      Hbc::CLI::Uninstall.run("local-caffeine")
+    }.to output(output).to_stdout
+  end
+
+  it "shows an error when a bad Cask is provided" do
+    expect { Hbc::CLI::Uninstall.run("notacask") }
+      .to output(/is unavailable/).to_stderr
+      .and raise_error(Hbc::CaskError, "Uninstall incomplete.")
   end
 
   it "shows an error when a Cask is provided that's not installed" do
-    expect {
-      Hbc::CLI::Uninstall.run("local-caffeine")
-    }.to raise_error(Hbc::CaskNotInstalledError)
+    expect { Hbc::CLI::Uninstall.run("local-caffeine") }
+    .to output(/is not installed/).to_stderr
+    .and raise_error(Hbc::CaskError, "Uninstall incomplete.")
   end
 
   it "tries anyway on a non-present Cask when --force is given" do
     expect {
-      Hbc::CLI::Uninstall.run("local-caffeine", "--force")
+      shutup do
+        Hbc::CLI::Uninstall.run("local-caffeine", "--force")
+      end
     }.not_to raise_error
   end
 
@@ -47,6 +66,7 @@ describe Hbc::CLI::Uninstall, :cask do
     end
 
     expect(cask).to be_installed
+    expect(Hbc.appdir.join("MyFancyApp.app")).to exist
 
     expect {
       shutup do
@@ -69,11 +89,9 @@ describe Hbc::CLI::Uninstall, :cask do
 
     Hbc.appdir.join("MyFancyApp.app").rmtree
 
-    expect {
-      shutup do
-        Hbc::CLI::Uninstall.run("with-uninstall-script-app")
-      end
-    }.to raise_error(Hbc::CaskError, /does not exist/)
+    expect { shutup { Hbc::CLI::Uninstall.run("with-uninstall-script-app") } }
+    .to output(/does not exist/).to_stderr
+    .and raise_error(Hbc::CaskError, "Uninstall incomplete.")
 
     expect(cask).to be_installed
 
@@ -183,7 +201,7 @@ describe Hbc::CLI::Uninstall, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Uninstall.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

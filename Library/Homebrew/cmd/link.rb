@@ -10,7 +10,7 @@
 #:    be linked or which would be deleted by `brew link --overwrite`, but will not
 #:    actually link or delete any files.
 #:
-#:    If `--force` is passed, Homebrew will allow keg-only formulae to be linked.
+#:    If `--force` (or `-f`) is passed, Homebrew will allow keg-only formulae to be linked.
 
 require "ostruct"
 
@@ -44,6 +44,7 @@ module Homebrew
       elsif keg_only && !ARGV.force?
         opoo "#{keg.name} is keg-only and must be linked with --force"
         puts "Note that doing so can interfere with building software."
+        puts_keg_only_path_message(keg)
         next
       elsif mode.dry_run && mode.overwrite
         puts "Would remove:"
@@ -53,6 +54,7 @@ module Homebrew
       elsif mode.dry_run
         puts "Would link:"
         keg.link(mode)
+        puts_keg_only_path_message(keg) if keg_only
 
         next
       end
@@ -69,8 +71,21 @@ module Homebrew
         else
           puts "#{n} symlinks created"
         end
+
+        puts_keg_only_path_message(keg) if keg_only && !ARGV.homebrew_developer?
       end
     end
+  end
+
+  def puts_keg_only_path_message(keg)
+    bin = keg/"bin"
+    sbin = keg/"sbin"
+    return if !bin.directory? && !sbin.directory?
+
+    opt = HOMEBREW_PREFIX/"opt/#{keg.name}"
+    puts "\nIf you need to have this software first in your PATH instead consider running:"
+    puts "  #{Utils::Shell.prepend_path_in_profile(opt/"bin")}"  if bin.directory?
+    puts "  #{Utils::Shell.prepend_path_in_profile(opt/"sbin")}" if sbin.directory?
   end
 
   def keg_only?(rack)

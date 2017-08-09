@@ -38,6 +38,7 @@
 #:    `--include-optional`, and `--skip-recommended` as documented above.
 
 # encoding: UTF-8
+
 require "formula"
 require "ostruct"
 
@@ -112,10 +113,10 @@ module Homebrew
       end
     else
       deps = f.deps.reject do |dep|
-        ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
+        ignores.any? { |ignore| dep.send(ignore) } && includes.none? { |include| dep.send(include) }
       end
       reqs = f.requirements.reject do |req|
-        ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
+        ignores.any? { |ignore| req.send(ignore) } && includes.none? { |include| req.send(include) }
       end
     end
 
@@ -160,7 +161,7 @@ module Homebrew
       else
         "├──"
       end
-      prefix_ext = i == max ? "    " : "│   "
+      prefix_ext = (i == max) ? "    " : "│   "
       puts prefix + "#{chr} #{dep_display_name(dep)}"
       recursive_deps_tree(Formulary.factory(dep.name), prefix + prefix_ext)
     end

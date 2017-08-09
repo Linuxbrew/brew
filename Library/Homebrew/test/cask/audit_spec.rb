@@ -79,7 +79,7 @@ describe Hbc::Audit, :cask do
   end
 
   describe "#run!" do
-    let(:cask) { Hbc.load(cask_token) }
+    let(:cask) { Hbc::CaskLoader.load(cask_token) }
     subject { audit.run! }
 
     describe "required stanzas" do
@@ -320,7 +320,7 @@ describe Hbc::Audit, :cask do
 
     describe "audit of downloads" do
       let(:cask_token) { "with-binary" }
-      let(:cask) { Hbc.load(cask_token) }
+      let(:cask) { Hbc::CaskLoader.load(cask_token) }
       let(:download) { instance_double(Hbc::Download) }
       let(:verify) { class_double(Hbc::Verify).as_stubbed_const }
       let(:error_msg) { "Download Failed" }

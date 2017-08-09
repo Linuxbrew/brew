@@ -9,10 +9,9 @@ module Hardware
 
     class << self
       OPTIMIZATION_FLAGS = {
-        penryn: "-march=core2 -msse4.1",
         core2: "-march=core2",
         core: "-march=prescott",
-        dunno: "",
+        dunno: "-march=native",
       }.freeze
 
       def optimization_flags
@@ -80,6 +79,18 @@ module Hardware
 
       def feature?(name)
         features.include?(name)
+      end
+
+      def can_run?(arch)
+        if is_32_bit?
+          arch_32_bit == arch
+        elsif intel?
+          [:i386, :x86_64].include? arch
+        elsif ppc?
+          [:ppc, :ppc64].include? arch
+        else
+          false
+        end
       end
     end
   end

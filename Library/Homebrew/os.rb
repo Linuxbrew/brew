@@ -1,12 +1,14 @@
+require "rbconfig"
+
 module OS
   def self.mac?
     return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
-    RUBY_PLATFORM.to_s.downcase.include? "darwin"
+    RbConfig::CONFIG["host_os"].include? "darwin"
   end
 
   def self.linux?
     return false if ENV["HOMEBREW_TEST_GENERIC_OS"]
-    RUBY_PLATFORM.to_s.downcase.include?("linux") || RbConfig::CONFIG["host_os"].downcase.include?("linux")
+    RbConfig::CONFIG["host_os"].include? "linux"
   end
 
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
@@ -18,9 +20,9 @@ module OS
     require "os/mac"
     NAME = "darwin".freeze
     # Don't tell people to report issues on unsupported versions of macOS.
-    #if !OS::Mac.prerelease? && !OS::Mac.outdated_release?
-    #  ISSUES_URL = "http://docs.brew.sh/Troubleshooting.html".freeze
-    #end
+    if !OS::Mac.prerelease? && !OS::Mac.outdated_release?
+      ISSUES_URL = "https://docs.brew.sh/Troubleshooting.html".freeze
+    end
     PATH_OPEN = "/usr/bin/open".freeze
     PATH_PATCH = "/usr/bin/patch".freeze
     # compatibility

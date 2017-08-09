@@ -16,7 +16,7 @@ class CxxStdlib
     if type && ![:libstdcxx, :libcxx].include?(type)
       raise ArgumentError, "Invalid C++ stdlib type: #{type}"
     end
-    klass = compiler.to_s =~ GNU_GCC_REGEXP ? GnuStdlib : AppleStdlib
+    klass = (compiler.to_s =~ GNU_GCC_REGEXP) ? GnuStdlib : AppleStdlib
     klass.new(type, compiler)
   end
 

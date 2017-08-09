@@ -2,6 +2,7 @@ require "dependable"
 
 # A dependency on another Homebrew formula.
 class Dependency
+  extend Forwardable
   include Dependable
 
   attr_reader :name, :tags, :env_proc, :option_names
@@ -34,9 +35,7 @@ class Dependency
     formula
   end
 
-  def installed?
-    to_formula.installed?
-  end
+  delegate installed?: :to_formula
 
   def satisfied?(inherited_options)
     installed? && missing_options(inherited_options).empty?

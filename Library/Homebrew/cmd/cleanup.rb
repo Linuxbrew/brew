@@ -21,16 +21,26 @@ module Homebrew
     if ARGV.named.empty?
       Cleanup.cleanup
     else
-      ARGV.resolved_formulae.each { |f| Cleanup.cleanup_formula f }
+      Cleanup.cleanup_cellar(ARGV.resolved_formulae)
     end
 
-    return if Cleanup.disk_cleanup_size.zero?
+    report_disk_usage unless Cleanup.disk_cleanup_size.zero?
+    report_unremovable_kegs unless Cleanup.unremovable_kegs.empty?
+  end
 
+  def report_disk_usage
     disk_space = disk_usage_readable(Cleanup.disk_cleanup_size)
     if ARGV.dry_run?
       ohai "This operation would free approximately #{disk_space} of disk space."
     else
       ohai "This operation has freed approximately #{disk_space} of disk space."
     end
+  end
+
+  def report_unremovable_kegs
+    ofail <<-EOS.undent
+      Could not cleanup old kegs! Fix your permissions on:
+        #{Cleanup.unremovable_kegs.join "\n  "}
+    EOS
   end
 end

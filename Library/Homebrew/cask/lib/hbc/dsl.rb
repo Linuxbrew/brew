@@ -119,9 +119,7 @@ module Hbc
     def language_eval
       return @language if instance_variable_defined?(:@language)
 
-      if @language_blocks.nil? || @language_blocks.empty?
-        return @language = nil
-      end
+      return @language = nil if @language_blocks.nil? || @language_blocks.empty?
 
       MacOS.languages.map(&Locale.method(:parse)).each do |locale|
         key = @language_blocks.keys.detect do |strings|
@@ -213,10 +211,10 @@ module Hbc
 
     # depends_on uses a load method so that multiple stanzas can be merged
     def depends_on(*args)
-      return @depends_on if args.empty?
       @depends_on ||= DSL::DependsOn.new
+      return @depends_on if args.empty?
       begin
-        @depends_on.load(*args) unless args.empty?
+        @depends_on.load(*args)
       rescue RuntimeError => e
         raise CaskInvalidError.new(token, e)
       end

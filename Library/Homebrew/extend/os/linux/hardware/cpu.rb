@@ -4,6 +4,7 @@ module Hardware
       OPTIMIZATION_FLAGS_LINUX = {
         core2: "-march=core2",
         core: "-march=prescott",
+        arm: "-march=armv6",
         dunno: "-march=native",
       }.freeze
 
@@ -11,8 +12,19 @@ module Hardware
         OPTIMIZATION_FLAGS_LINUX
       end
 
+      def arch
+        case bits
+        when 32
+          arch_32_bit
+        when 64
+          arch_64_bit
+        else
+          :dunno
+        end
+      end
+
       def universal_archs
-        [].extend ArchitectureListExtension
+        [arch].extend ArchitectureListExtension
       end
 
       def cpuinfo
@@ -20,9 +32,10 @@ module Hardware
       end
 
       def type
-        @type ||= if cpuinfo =~ /Intel|AMD/
+        @type ||= case Utils.popen_read("uname", "-m").chomp
+        when "x86_64", "amd64", /^i\d86$/
           :intel
-        elsif cpuinfo =~ /ARM|Marvell/
+        when /^arm/
           :arm
         else
           :dunno
@@ -94,13 +107,30 @@ module Hardware
         @features ||= flags[1..-1].map(&:intern)
       end
 
-      %w[aes altivec avx avx2 lm sse3 ssse3 sse4 sse4_2].each do |flag|
+      %w[aes altivec avx avx2 lm ssse3 sse4_2].each do |flag|
         define_method(flag + "?") { flags.include? flag }
       end
+
+      def sse3?
+        flags.include?("pni") || flags.include?("sse3")
+      end
+
+      def sse4?
+        flags.include? "sse4_1"
+      end
+
       alias is_64_bit? lm?
 
       def bits
-        is_64_bit? ? 64 : 32
+        @bits ||= Utils.popen_read("getconf", "LONG_BIT").chomp.to_i
+      end
+
+      def arch_32_bit
+        intel? ? :i386 : :arm
+      end
+
+      def arch_64_bit
+        intel? ? :x86_64 : :arm64
       end
     end
   end

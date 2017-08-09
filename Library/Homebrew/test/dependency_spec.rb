@@ -1,9 +1,9 @@
 require "dependency"
 
-RSpec::Matchers.alias_matcher :be_a_build_dependency, :be_build
-RSpec::Matchers.alias_matcher :be_a_runtime_dependency, :be_run
-
 describe Dependency do
+  alias_matcher :be_a_build_dependency, :be_build
+  alias_matcher :be_a_runtime_dependency, :be_run
+
   describe "::new" do
     it "accepts a single tag" do
       dep = described_class.new("foo", %w[bar])

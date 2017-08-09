@@ -22,6 +22,15 @@ module Homebrew
       if ARGV.include?("--test")
         result.display_test_output
         Homebrew.failed = true if result.broken_dylibs?
+        if OS.linux?
+          Homebrew.failed = true if result.unwanted_system_dylibs?
+
+          formula = keg.to_formula
+          CxxStdlib.check_compatibility(
+            formula, ARGV.one? ? formula.deps : formula.recursive_dependencies,
+            keg, Tab.for_keg(keg)
+          )
+        end
       elsif ARGV.include?("--reverse")
         result.display_reverse_output
       else

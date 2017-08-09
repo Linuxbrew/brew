@@ -14,7 +14,7 @@ Fix permissions by running:
   sudo chown -R \$(whoami) $HOMEBREW_PREFIX/var/homebrew
 EOS
   fi
-  # 200 is the file descriptor used in the lock.
+  # 99 is the file descriptor used in the lock.
   # This FD should be used exclusively for lock purpose.
   # Any value except 0(stdin), 1(stdout) and 2(stderr) can do the job.
   # Noted, FD is unique per process but it will be shared to subprocess.
@@ -22,10 +22,10 @@ EOS
   # other FD opened by the script.
   #
   # close FD first, this is required if parent process holds a different lock.
-  exec 200>&-
+  exec 99>&-
   # open the lock file to FD, so the shell process can hold the lock.
-  exec 200>"$lock_file"
-  if ! _create_lock 200 "$name"
+  exec 99>"$lock_file"
+  if ! _create_lock 99 "$name"
   then
     odie <<EOS
 Another active Homebrew $name process is already in progress.
@@ -38,14 +38,19 @@ _create_lock() {
   local lock_fd="$1"
   local name="$2"
   local ruby="/usr/bin/ruby"
+  local python="/usr/bin/python"
   [[ -x "$ruby" ]] || ruby="$(which ruby 2>/dev/null)"
+  [[ -x "$python" ]] || python="$(which python 2>/dev/null)"
 
-  if [[ -n "$ruby" ]]
+  if [[ -x "$ruby" ]] && "$ruby" -e "exit(RUBY_VERSION >= '1.8.7')"
   then
     "$ruby" -e "File.new($lock_fd).flock(File::LOCK_EX | File::LOCK_NB) || exit(1)"
-  elif [[ -n "$(which flock)" ]]
+  elif [[ -x "$(which flock)" ]]
   then
     flock -n "$lock_fd"
+  elif [[ -x "$python" ]]
+  then
+    "$python" -c "import fcntl; fcntl.flock($lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)"
   else
     onoe "Cannot create $name lock, please avoid running Homebrew in parallel."
   fi

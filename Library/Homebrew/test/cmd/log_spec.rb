@@ -33,7 +33,7 @@ describe "brew log", :integration_test do
 
     expect { brew "log", "#{shallow_tap}/testball" }
       .to output(/This is a test commit for Testball/).to_stdout
-      .and output(/Warning: The git repository is a shallow clone/).to_stderr
+      .and output(%r{Warning: homebrew/shallow is a shallow clone}).to_stderr
       .and be_a_success
 
     expect(shallow_tap.path/".git/shallow").to exist, "A shallow clone should have been created."

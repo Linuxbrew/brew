@@ -4,7 +4,7 @@ require "tempfile"
 module GitHub
   module_function
 
-  ISSUES_URI = URI.parse("https://api.github.com/search/issues")
+  API_URL = "https://api.github.com".freeze
 
   CREATE_GIST_SCOPES = ["gist"].freeze
   CREATE_ISSUE_SCOPES = ["public_repo"].freeze
@@ -164,7 +164,7 @@ module GitHub
         args += ["--data", "@#{data_tmpfile.path}"]
       end
 
-      args += ["--dump-header", headers_tmpfile.path.to_s]
+      args += ["--dump-header", headers_tmpfile.path]
 
       output, errors, status = curl_output(url.to_s, *args)
       output, _, http_code = output.rpartition("\n")
@@ -228,13 +228,19 @@ module GitHub
   end
 
   def issues_matching(query, qualifiers = {})
-    uri = ISSUES_URI.dup
+    uri = URI.parse("#{API_URL}/search/issues")
     uri.query = build_query_string(query, qualifiers)
     open(uri) { |json| json["items"] }
   end
 
   def repository(user, repo)
-    open(URI.parse("https://api.github.com/repos/#{user}/#{repo}")) { |j| j }
+    open(URI.parse("#{API_URL}/repos/#{user}/#{repo}"))
+  end
+
+  def search_code(*params)
+    uri = URI.parse("#{API_URL}/search/code")
+    uri.query = "q=#{uri_escape(params.join(" "))}"
+    open(uri) { |json| json["items"] }
   end
 
   def build_query_string(query, qualifiers)
@@ -263,12 +269,11 @@ module GitHub
 
   def issues_for_formula(name, options = {})
     tap = options[:tap] || CoreTap.instance
-    issues_matching(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
+    issues_matching(name, state: "open", repo: tap.slug)
   end
 
   def print_pull_requests_matching(query)
     return [] if ENV["HOMEBREW_NO_GITHUB_API"]
-    ohai "Searching pull requests..."
 
     open_or_closed_prs = issues_matching(query, type: "pr")
 
@@ -286,8 +291,8 @@ module GitHub
     prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
   end
 
-  def private_repo?(user, repo)
-    uri = URI.parse("https://api.github.com/repos/#{user}/#{repo}")
+  def private_repo?(full_name)
+    uri = URI.parse("#{API_URL}/repos/#{full_name}")
     open(uri) { |json| json["private"] }
   end
 end

@@ -35,7 +35,7 @@ module Utils
         end
 
         # Send analytics. Don't send or store any personally identifiable information.
-        # http://docs.brew.sh/Analytics.html
+        # https://docs.brew.sh/Analytics.html
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         if ENV["HOMEBREW_ANALYTICS_DEBUG"]
@@ -61,22 +61,15 @@ module Utils
           ev: value)
       end
 
-      def report_exception(exception, options = {})
-        if exception.is_a?(BuildError) &&
-           exception.formula.tap &&
-           exception.formula.tap.installed? &&
-           !exception.formula.tap.private?
-          report_event("BuildError", exception.formula.full_name)
+      def report_build_error(exception)
+        return unless exception.formula.tap
+        return unless exception.formula.tap.installed?
+        return if exception.formula.tap.private?
+        action = exception.formula.full_name
+        if (options = exception.options)
+          action = "#{action} #{options}".strip
         end
-
-        fatal = options.fetch(:fatal, true) ? "1" : "0"
-        report(:exception,
-          exd: exception.class.name,
-          exf: fatal)
-      end
-
-      def report_screenview(screen_name)
-        report(:screenview, cd: screen_name)
+        report_event("BuildError", action)
       end
     end
   end

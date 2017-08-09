@@ -1,9 +1,9 @@
 require "formula_installer"
 require "hooks/bottles"
 
-RSpec::Matchers.alias_matcher :pour_bottle, :be_pour_bottle
-
 describe Homebrew::Hooks::Bottles do
+  alias_matcher :pour_bottle, :be_pour_bottle
+
   subject { FormulaInstaller.new formula }
 
   let(:formula) do

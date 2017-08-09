@@ -6,11 +6,7 @@ module Hbc
   class Container
     class Cab < Base
       def self.me?(criteria)
-        cabextract = which("cabextract")
-
-        criteria.magic_number(/^(MSCF|MZ)/n) &&
-          !cabextract.nil? &&
-          criteria.command.run(cabextract, args: ["-t", "--", criteria.path.to_s]).stderr.empty?
+        criteria.magic_number(/^(MSCF|MZ)/n)
       end
 
       def extract

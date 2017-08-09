@@ -63,6 +63,7 @@ module Superenv
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
     self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths
+    self["HOMEBREW_DYNAMIC_LINKER"] = determine_dynamic_linker_path(formula)
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
     self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix unless formula.nil?
 
@@ -95,7 +96,7 @@ module Superenv
   end
 
   def determine_cxx
-    determine_cc.to_s.gsub("gcc", "g++").gsub("clang", "clang++")
+    determine_cc.to_s.gsub("gcc", "g++").gsub("clang", "clang++").sub(/^cc$/, "c++")
   end
 
   def homebrew_extra_paths
@@ -103,32 +104,28 @@ module Superenv
   end
 
   def determine_path
-    paths = [Superenv.bin]
+    path = PATH.new(Superenv.bin)
 
     # Formula dependencies can override standard tools.
-    paths += deps.map { |d| d.opt_bin.to_s }
-
-    paths += homebrew_extra_paths
-    paths += %w[/usr/bin /bin /usr/sbin /sbin]
+    path.append(deps.map(&:opt_bin))
+    path.append(homebrew_extra_paths)
+    path.append("/usr/bin", "/bin", "/usr/sbin", "/sbin")
 
     # Homebrew's apple-gcc42 will be outside the PATH in superenv,
     # so xcrun may not be able to find it
-    case homebrew_cc
-    when "gcc-4.2"
-      begin
-        apple_gcc42 = Formulary.factory("apple-gcc42")
-      rescue FormulaUnavailableError
+    begin
+      case homebrew_cc
+      when "gcc-4.2"
+        path.append(Formulary.factory("apple-gcc42").opt_bin)
+      when GNU_GCC_REGEXP
+        path.append(gcc_version_formula($&).opt_bin)
       end
-      paths << apple_gcc42.opt_bin.to_s if apple_gcc42
-    when GNU_GCC_REGEXP
-      begin
-        gcc_formula = gcc_version_formula($&)
-      rescue FormulaUnavailableError
-      end
-      paths << gcc_formula.opt_bin.to_s if gcc_formula
+    rescue FormulaUnavailableError
+      # Don't fail and don't add these formulae to the path if they don't exist.
+      nil
     end
 
-    paths.to_path_s
+    path.existing
   end
 
   def homebrew_extra_pkg_config_paths
@@ -136,15 +133,17 @@ module Superenv
   end
 
   def determine_pkg_config_path
-    paths  = deps.map { |d| "#{d.opt_lib}/pkgconfig" }
-    paths += deps.map { |d| "#{d.opt_share}/pkgconfig" }
-    paths.to_path_s
+    PATH.new(
+      deps.map { |d| d.opt_lib/"pkgconfig" },
+      deps.map { |d| d.opt_share/"pkgconfig" },
+    ).existing
   end
 
   def determine_pkg_config_libdir
-    paths = %w[/usr/lib/pkgconfig]
-    paths += homebrew_extra_pkg_config_paths
-    paths.to_path_s
+    PATH.new(
+      "/usr/lib/pkgconfig",
+      homebrew_extra_pkg_config_paths,
+    ).existing
   end
 
   def homebrew_extra_aclocal_paths
@@ -152,10 +151,11 @@ module Superenv
   end
 
   def determine_aclocal_path
-    paths = keg_only_deps.map { |d| "#{d.opt_share}/aclocal" }
-    paths << "#{HOMEBREW_PREFIX}/share/aclocal"
-    paths += homebrew_extra_aclocal_paths
-    paths.to_path_s
+    PATH.new(
+      keg_only_deps.map { |d| d.opt_share/"aclocal" },
+      HOMEBREW_PREFIX/"share/aclocal",
+      homebrew_extra_aclocal_paths,
+    ).existing
   end
 
   def homebrew_extra_isystem_paths
@@ -163,13 +163,14 @@ module Superenv
   end
 
   def determine_isystem_paths
-    paths = ["#{HOMEBREW_PREFIX}/include"]
-    paths += homebrew_extra_isystem_paths
-    paths.to_path_s
+    PATH.new(
+      HOMEBREW_PREFIX/"include",
+      homebrew_extra_isystem_paths,
+    ).existing
   end
 
   def determine_include_paths
-    keg_only_deps.map { |d| d.opt_include.to_s }.to_path_s
+    PATH.new(keg_only_deps.map(&:opt_include)).existing
   end
 
   def homebrew_extra_library_paths
@@ -177,13 +178,22 @@ module Superenv
   end
 
   def determine_library_paths
-    paths = keg_only_deps.map { |d| d.opt_lib.to_s }
-    paths << "#{HOMEBREW_PREFIX}/lib"
-    paths += homebrew_extra_library_paths
-    paths.to_path_s
+    PATH.new(
+      keg_only_deps.map(&:opt_lib),
+      HOMEBREW_PREFIX/"lib",
+      homebrew_extra_library_paths,
+    ).existing
+  end
+
+  def determine_extra_rpath_paths
+    []
   end
 
   def determine_rpath_paths
+    PATH.new(determine_extra_rpath_paths).existing
+  end
+
+  def determine_dynamic_linker_path(_formula)
     ""
   end
 
@@ -192,9 +202,10 @@ module Superenv
   end
 
   def determine_cmake_prefix_path
-    paths = keg_only_deps.map { |d| d.opt_prefix.to_s }
-    paths << HOMEBREW_PREFIX.to_s
-    paths.to_path_s
+    PATH.new(
+      keg_only_deps.map(&:opt_prefix),
+      HOMEBREW_PREFIX.to_s,
+    ).existing
   end
 
   def homebrew_extra_cmake_include_paths
@@ -202,9 +213,7 @@ module Superenv
   end
 
   def determine_cmake_include_path
-    paths = []
-    paths += homebrew_extra_cmake_include_paths
-    paths.to_path_s
+    PATH.new(homebrew_extra_cmake_include_paths).existing
   end
 
   def homebrew_extra_cmake_library_paths
@@ -212,9 +221,7 @@ module Superenv
   end
 
   def determine_cmake_library_path
-    paths = []
-    paths += homebrew_extra_cmake_library_paths
-    paths.to_path_s
+    PATH.new(homebrew_extra_cmake_library_paths).existing
   end
 
   def homebrew_extra_cmake_frameworks_paths
@@ -222,9 +229,10 @@ module Superenv
   end
 
   def determine_cmake_frameworks_path
-    paths = deps.map { |d| d.opt_frameworks.to_s }
-    paths += homebrew_extra_cmake_frameworks_paths
-    paths.to_path_s
+    PATH.new(
+      deps.map(&:opt_frameworks),
+      homebrew_extra_cmake_frameworks_paths,
+    ).existing
   end
 
   def determine_make_jobs
@@ -273,7 +281,7 @@ module Superenv
 
   def make_jobs
     self["MAKEFLAGS"] =~ /-\w*j(\d+)/
-    [$1.to_i, 1].max
+    [Regexp.last_match(1).to_i, 1].max
   end
 
   def universal_binary
@@ -336,15 +344,7 @@ module Superenv
   def set_x11_env_if_installed
   end
 
-  # This method does nothing in superenv since there's no custom CFLAGS API
-  # @private
-  def set_cpu_flags(*_args)
-  end
-end
-
-class Array
-  def to_path_s
-    map(&:to_s).uniq.select { |s| File.directory? s }.join(File::PATH_SEPARATOR).chuzzle
+  def set_cpu_flags(*)
   end
 end
 

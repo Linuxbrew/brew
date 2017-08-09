@@ -26,8 +26,6 @@ describe Hbc::DSL, :cask do
         .*
         Unexpected method 'future_feature' called on Cask unexpected-method-cask\\.
         .*
-        https://github.com/caskroom/homebrew-cask/blob/master/doc/reporting_bugs/pre_bug_report.md
-        .*
         https://github.com/caskroom/homebrew-cask#reporting-bugs
       EOS
 
@@ -59,7 +57,7 @@ describe Hbc::DSL, :cask do
       it "raises an error" do
         expect {
           cask
-        }.to raise_error(Hbc::CaskTokenDoesNotMatchError, /Bad header line:.*does not match file name/)
+        }.to raise_error(Hbc::CaskTokenMismatchError, /header line does not match the file name/)
       end
     end
 

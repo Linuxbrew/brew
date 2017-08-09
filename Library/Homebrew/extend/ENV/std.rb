@@ -1,7 +1,6 @@
 require "hardware"
 require "extend/ENV/shared"
 
-# TODO: deprecate compiling related codes after it's only used by brew test.
 # @private
 module Stdenv
   include SharedEnvExtension
@@ -91,12 +90,12 @@ module Stdenv
   end
 
   def determine_pkg_config_libdir
-    paths = []
-    paths << "#{HOMEBREW_PREFIX}/lib/pkgconfig"
-    paths << "#{HOMEBREW_PREFIX}/share/pkgconfig"
-    paths += homebrew_extra_pkg_config_paths
-    paths << "/usr/lib/pkgconfig" if OS.mac?
-    paths.select { |d| File.directory? d }.join(File::PATH_SEPARATOR)
+    PATH.new(
+      HOMEBREW_PREFIX/"lib/pkgconfig",
+      HOMEBREW_PREFIX/"share/pkgconfig",
+      homebrew_extra_pkg_config_paths,
+      *("/usr/lib/pkgconfig" if OS.mac?),
+    ).existing
   end
 
   # Removes the MAKEFLAGS environment variable, causing make to use a single job.
@@ -132,7 +131,7 @@ module Stdenv
   # @private
   def determine_cxx
     dir, base = determine_cc.split
-    dir / base.to_s.sub("gcc", "g++").sub("clang", "clang++").sub(/^cc$/, "c++")
+    dir/base.to_s.sub("gcc", "g++").sub("clang", "clang++").sub(/^cc$/, "c++")
   end
 
   def gcc_4_0
@@ -237,7 +236,7 @@ module Stdenv
   # @private
   def set_cpu_flags(flags, default = DEFAULT_FLAGS, map = Hardware::CPU.optimization_flags)
     cflags =~ /(-Xarch_#{Hardware::CPU.arch_32_bit} )-march=/
-    xarch = $1.to_s
+    xarch = Regexp.last_match(1).to_s
     remove flags, /(-Xarch_#{Hardware::CPU.arch_32_bit} )?-march=\S*/
     remove flags, /( -Xclang \S+)+/
     remove flags, /-mssse3/
@@ -246,6 +245,8 @@ module Stdenv
     append flags, map.fetch(effective_arch, default)
   end
   alias generic_set_cpu_flags set_cpu_flags
+
+  def x11; end
 
   # @private
   def effective_arch

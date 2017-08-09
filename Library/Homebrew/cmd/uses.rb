@@ -28,7 +28,16 @@ module Homebrew
   def uses
     raise FormulaUnspecifiedError if ARGV.named.empty?
 
-    used_formulae = ARGV.formulae
+    used_formulae_missing = false
+    used_formulae = begin
+      ARGV.formulae
+    rescue FormulaUnavailableError => e
+      opoo e
+      used_formulae_missing = true
+      # If the formula doesn't exist: fake the needed formula object name.
+      ARGV.named.map { |name| OpenStruct.new name: name, full_name: name }
+    end
+
     formulae = ARGV.include?("--installed") ? Formula.installed : Formula
     recursive = ARGV.flag? "--recursive"
     includes = []
@@ -99,10 +108,10 @@ module Homebrew
             reqs = reqs_by_formula.map(&:last)
           else
             deps = f.deps.reject do |dep|
-              ignores.any? { |ignore| dep.send(ignore) } && !includes.any? { |include| dep.send(include) }
+              ignores.any? { |ignore| dep.send(ignore) } && includes.none? { |include| dep.send(include) }
             end
             reqs = f.requirements.reject do |req|
-              ignores.any? { |ignore| req.send(ignore) } && !includes.any? { |include| req.send(include) }
+              ignores.any? { |ignore| req.send(ignore) } && includes.none? { |include| req.send(include) }
             end
           end
           next true if deps.any? do |dep|
@@ -126,5 +135,6 @@ module Homebrew
 
     return if uses.empty?
     puts Formatter.columns(uses.map(&:full_name))
+    odie "Missing formulae should not have dependents!" if used_formulae_missing
   end
 end

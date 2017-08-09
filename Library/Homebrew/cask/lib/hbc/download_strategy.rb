@@ -82,10 +82,16 @@ module Hbc
     end
 
     def clear_cache
-      [cached_location, temporary_path].each do |f|
-        next unless f.exist?
-        raise CurlDownloadStrategyError, "#{f} is in use by another process" if Utils.file_locked?(f)
-        f.unlink
+      [cached_location, temporary_path].each do |path|
+        next unless path.exist?
+
+        begin
+          LockFile.new(path.basename).with_lock do
+            path.unlink
+          end
+        rescue OperationInProgressError
+          raise CurlDownloadStrategyError, "#{path} is in use by another process"
+        end
       end
     end
 
@@ -94,7 +100,7 @@ module Hbc
     end
 
     def _fetch
-      odebug "Calling curl with args #{cask_curl_args.utf8_inspect}"
+      odebug "Calling curl with args #{cask_curl_args}"
       curl(*cask_curl_args)
     end
 
@@ -105,10 +111,8 @@ module Hbc
       else
         had_incomplete_download = temporary_path.exist?
         begin
-          File.open(temporary_path, "a+") do |f|
-            f.flock(File::LOCK_EX)
+          LockFile.new(temporary_path.basename).with_lock do
             _fetch
-            f.flock(File::LOCK_UN)
           end
         rescue ErrorDuringExecution
           # 33 == range not supported
@@ -208,11 +212,11 @@ module Hbc
   class SubversionDownloadStrategy < HbVCSDownloadStrategy
     def cache_tag
       # TODO: pass versions as symbols, support :head here
-      version == "head" ? "svn-HEAD" : "svn"
+      (version == "head") ? "svn-HEAD" : "svn"
     end
 
     def repo_valid?
-      @clone.join(".svn").directory?
+      (@clone/".svn").directory?
     end
 
     def repo_url

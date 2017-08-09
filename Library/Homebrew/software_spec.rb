@@ -1,4 +1,3 @@
-require "forwardable"
 require "resource"
 require "checksum"
 require "version"
@@ -8,6 +7,7 @@ require "dependency_collector"
 require "utils/bottles"
 require "patch"
 require "compilers"
+require "os/mac/version"
 
 class SoftwareSpec
   extend Forwardable
@@ -117,8 +117,7 @@ class SoftwareSpec
   def option(name, description = "")
     opt = PREDEFINED_OPTIONS.fetch(name) do
       if name.is_a?(Symbol)
-        opoo "Passing arbitrary symbols to `option` is deprecated: #{name.inspect}"
-        puts "Symbols are reserved for future use, please pass a string instead"
+        odeprecated "passing arbitrary symbols (i.e. #{name.inspect}) to `option`"
         name = name.to_s
       end
       unless name.is_a?(String)
@@ -161,8 +160,31 @@ class SoftwareSpec
     dependency_collector.deps
   end
 
+  def recursive_dependencies
+    deps_f = []
+    recursive_dependencies = deps.map do |dep|
+      begin
+        deps_f << dep.to_formula
+        dep
+      rescue TapFormulaUnavailableError
+        # Don't complain about missing cross-tap dependencies
+        next
+      end
+    end.compact.uniq
+    deps_f.compact.each do |f|
+      f.recursive_dependencies.each do |dep|
+        recursive_dependencies << dep unless recursive_dependencies.include?(dep)
+      end
+    end
+    recursive_dependencies
+  end
+
   def requirements
     dependency_collector.requirements
+  end
+
+  def recursive_requirements
+    Requirement.expand(self)
   end
 
   def patch(strip = :p1, src = nil, &block)
@@ -173,7 +195,6 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
-    # TODO: deprecate this in future.
     # odeprecated "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
@@ -237,7 +258,7 @@ class Bottle
     end
 
     def suffix
-      s = rebuild > 0 ? ".#{rebuild}" : ""
+      s = (rebuild > 0) ? ".#{rebuild}" : ""
       ".bottle#{s}.tar.gz"
     end
   end
@@ -307,7 +328,7 @@ class BottleSpecification
 
   def root_url(var = nil)
     if var.nil?
-      default_domain = !OS.mac? || (tap && tap.linux?) ? DEFAULT_DOMAIN_LINUX : DEFAULT_DOMAIN_MAC
+      default_domain = (!OS.mac? || tap && tap.linux?) ? DEFAULT_DOMAIN_LINUX : DEFAULT_DOMAIN_MAC
       domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || default_domain
       @root_url ||= "#{domain}/#{Utils::Bottles::Bintray.repository(tap)}"
     else
@@ -347,8 +368,8 @@ class BottleSpecification
     tags = collector.keys.sort_by do |tag|
       # Sort non-MacOS tags below MacOS tags.
       begin
-        MacOS::Version.from_symbol tag
-      rescue
+        OS::Mac::Version.from_symbol tag
+      rescue ArgumentError
         "0.#{tag}"
       end
     end

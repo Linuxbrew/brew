@@ -19,19 +19,15 @@ class BuildEnvironment
     @settings.include? :std
   end
 
-  def super?
-    @settings.include? :super
-  end
-
   def userpaths?
     @settings.include? :userpaths
   end
-end
 
-module BuildEnvironmentDSL
-  def env(*settings)
-    @env ||= BuildEnvironment.new
-    @env.merge(settings)
+  module DSL
+    def env(*settings)
+      @env ||= BuildEnvironment.new
+      @env.merge(settings)
+    end
   end
 end
 

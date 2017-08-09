@@ -265,10 +265,10 @@ module Homebrew
       failed_audit = false
       if ARGV.include? "--strict"
         system HOMEBREW_BREW_FILE, "audit", "--strict", formula.path
-        failed_audit = !$?.success?
+        failed_audit = !$CHILD_STATUS.success?
       elsif ARGV.include? "--audit"
         system HOMEBREW_BREW_FILE, "audit", formula.path
-        failed_audit = !$?.success?
+        failed_audit = !$CHILD_STATUS.success?
       end
       if failed_audit
         formula.path.atomic_write(backup_file)
@@ -286,7 +286,11 @@ module Homebrew
 
     formula.path.parent.cd do
       branch = "#{formula.name}-#{new_formula_version}"
+      git_dir = Utils.popen_read("git rev-parse --git-dir").chomp
+      shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
+
       if ARGV.dry_run?
+        ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
         ohai "hub fork --no-remote"
@@ -296,6 +300,7 @@ module Homebrew
         ohai "hub pull-request --browse -m '#{formula.name} #{new_formula_version}#{devel_message}'"
         ohai "git checkout -"
       else
+        safe_system "git", "fetch", "--unshallow", "origin" if shallow
         safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
         safe_system "git", "commit", "--no-edit", "--verbose",
           "--message=#{formula.name} #{new_formula_version}#{devel_message}",

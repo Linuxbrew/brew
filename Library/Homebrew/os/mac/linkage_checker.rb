@@ -5,6 +5,7 @@ require "formula"
 class LinkageChecker
   attr_reader :keg, :formula
   attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :variable_dylibs
+  attr_reader :unwanted_system_dylibs
   attr_reader :undeclared_deps, :reverse_links
 
   def initialize(keg, formula = nil)
@@ -16,12 +17,14 @@ class LinkageChecker
     @variable_dylibs = Set.new
     @undeclared_deps = []
     @reverse_links = Hash.new { |h, k| h[k] = Set.new }
+    @unwanted_system_dylibs = Set.new
     check_dylibs
   end
 
   def check_dylibs
     @keg.find do |file|
       next if file.symlink? || file.directory?
+      next if file.elf? && !file.dynamic?
       next unless file.dylib? || file.mach_o_executable? || file.mach_o_bundle?
 
       # weakly loaded dylibs may not actually exist on disk, so skip them
@@ -36,6 +39,7 @@ class LinkageChecker
           rescue NotAKegError
             @system_dylibs << dylib
           rescue Errno::ENOENT
+            next if harmless_broken_link?(dylib)
             @broken_dylibs << dylib
           else
             tap = Tab.for_keg(owner).tap
@@ -48,6 +52,26 @@ class LinkageChecker
           end
         end
       end
+
+      next unless OS.linux?
+      system_whitelist = %w[
+        ld-linux-x86-64.so.2
+        libc.so.6
+        libcrypt.so.1
+        libdl.so.2
+        libm.so.6
+        libnsl.so.1
+        libpthread.so.0
+        libresolv.so.2
+        librt.so.1
+        libutil.so.1
+
+        libgcc_s.so.1
+        libgomp.so.1
+        libstdc++.so.6
+      ]
+      system_sonames = @system_dylibs.to_a.map { |s| File.basename s }
+      @unwanted_system_dylibs += system_sonames - system_whitelist
     end
 
     @undeclared_deps = check_undeclared_deps if formula
@@ -63,10 +87,10 @@ class LinkageChecker
     declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
     declared_requirement_deps = formula.requirements.reject { |req| filter_out.call(req) }.map(&:default_formula).compact
     declared_dep_names = (declared_deps + declared_requirement_deps).map { |dep| dep.split("/").last }
-    undeclared_deps = @brewed_dylibs.keys.select do |full_name|
+    undeclared_deps = @brewed_dylibs.keys.reject do |full_name|
       name = full_name.split("/").last
-      next false if name == formula.name
-      !declared_dep_names.include?(name)
+      next true if name == formula.name
+      declared_dep_names.include?(name)
     end
     undeclared_deps.sort do |a, b|
       if a.include?("/") && !b.include?("/")
@@ -101,8 +125,12 @@ class LinkageChecker
   end
 
   def display_test_output
+    display_items "System libraries", @system_dylibs if OS.linux?
     display_items "Missing libraries", @broken_dylibs
     puts "No broken dylib links" if @broken_dylibs.empty?
+    return unless OS.linux?
+    display_items "Unwanted system libraries", @unwanted_system_dylibs
+    puts "No unwanted system libraries" if @unwanted_system_dylibs.empty?
   end
 
   def broken_dylibs?
@@ -113,7 +141,22 @@ class LinkageChecker
     !@undeclared_deps.empty?
   end
 
+  def unwanted_system_dylibs?
+    !@unwanted_system_dylibs.empty?
+  end
+
   private
+
+  # Whether or not dylib is a harmless broken link, meaning that it's
+  # okay to skip (and not report) as broken.
+  def harmless_broken_link?(dylib)
+    # libgcc_s_* is referenced by programs that use the Java Service Wrapper,
+    # and is harmless on x86(_64) machines
+    [
+      "/usr/lib/libgcc_s_ppc64.1.dylib",
+      "/opt/local/lib/libgcc/libgcc_s.1.dylib",
+    ].include?(dylib)
+  end
 
   # Display a list of things.
   # Things may either be an array, or a hash of (label -> array)

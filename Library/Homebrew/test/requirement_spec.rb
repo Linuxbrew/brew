@@ -1,10 +1,10 @@
 require "extend/ENV"
 require "requirement"
 
-RSpec::Matchers.alias_matcher :have_a_default_formula, :be_a_default_formula
-RSpec::Matchers.alias_matcher :be_a_build_requirement, :be_a_build
-
 describe Requirement do
+  alias_matcher :have_a_default_formula, :be_a_default_formula
+  alias_matcher :be_a_build_requirement, :be_a_build
+
   subject { klass.new }
 
   let(:klass) { Class.new(described_class) }
@@ -146,17 +146,13 @@ describe Requirement do
   end
 
   describe "#build?" do
-    context "#build true is specified" do
-      let(:klass) do
-        Class.new(described_class) do
-          build true
-        end
-      end
+    context ":build tag is specified" do
+      subject { described_class.new([:build]) }
 
       it { is_expected.to be_a_build_requirement }
     end
 
-    context "#build ommitted" do
+    context "#build omitted" do
       it { is_expected.not_to be_a_build_requirement }
     end
   end

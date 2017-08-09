@@ -54,7 +54,7 @@ describe Hbc::CLI::Fetch, :cask do
       shutup do
         Hbc::CLI::Fetch.run("notacask")
       end
-    }.to raise_error(Hbc::CaskUnavailableError)
+    }.to raise_error(Hbc::CaskError, "Fetch incomplete.")
   end
 
   describe "when no Cask is specified" do
@@ -69,7 +69,7 @@ describe Hbc::CLI::Fetch, :cask do
     it "raises an exception" do
       expect {
         Hbc::CLI::Fetch.run("--notavalidoption")
-      }.to raise_error(Hbc::CaskUnspecifiedError)
+      }.to raise_error(/invalid option/)
     end
   end
 end

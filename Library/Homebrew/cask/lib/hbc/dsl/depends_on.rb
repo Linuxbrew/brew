@@ -24,6 +24,8 @@ module Hbc
 
       def initialize
         @pairs ||= {}
+        @cask ||= []
+        @formula ||= []
       end
 
       def load(pairs = {})
@@ -53,12 +55,10 @@ module Hbc
       end
 
       def formula=(*args)
-        @formula ||= []
         @formula.concat(args)
       end
 
       def cask=(*args)
-        @cask ||= []
         @cask.concat(args)
       end
 

@@ -1,6 +1,7 @@
 require "formula"
 require "compilers"
 require "development_tools"
+require "PATH"
 
 # Homebrew extends Ruby's `ENV` to make our code more readable.
 # Implemented in {SharedEnvExtension} and either {Superenv} or
@@ -84,15 +85,19 @@ module SharedEnvExtension
   end
 
   def append_path(key, path)
-    append key, path, File::PATH_SEPARATOR if File.directory? path
+    self[key] = PATH.new(self[key]).append(path)
   end
 
   # Prepends a directory to `PATH`.
   # Is the formula struggling to find the pkgconfig file? Point it to it.
   # This is done automatically for `keg_only` formulae.
   # <pre>ENV.prepend_path "PKG_CONFIG_PATH", "#{Formula["glib"].opt_lib}/pkgconfig"</pre>
+  # Prepending a system path such as /usr/bin is a no-op so that requirements
+  # don't accidentally override superenv shims or formulae's `bin` directories
+  # (e.g. <pre>ENV.prepend_path "PATH", which("emacs").dirname</pre>)
   def prepend_path(key, path)
-    prepend key, path, File::PATH_SEPARATOR if File.directory? path
+    return if %w[/usr/bin /bin /usr/sbin /sbin].include? path.to_s
+    self[key] = PATH.new(self[key]).prepend(path)
   end
 
   def prepend_create_path(key, path)
@@ -205,22 +210,23 @@ module SharedEnvExtension
 
   # @private
   def userpaths!
-    paths = self["PATH"].split(File::PATH_SEPARATOR)
-    # put Superenv.bin and opt path at the first
-    new_paths = paths.select { |p| p.start_with?("#{HOMEBREW_REPOSITORY}/Library/ENV", "#{HOMEBREW_PREFIX}/opt") }
-    # XXX hot fix to prefer brewed stuff (e.g. python) over /usr/bin.
-    new_paths << "#{HOMEBREW_PREFIX}/bin"
-    # reset of self["PATH"]
-    new_paths += paths
-    # user paths
-    new_paths += ORIGINAL_PATHS.map do |p|
-      begin
-        p.realpath.to_s
-      rescue
-        nil
-      end
-    end - %w[/usr/X11/bin /opt/X11/bin]
-    self["PATH"] = new_paths.uniq.join(File::PATH_SEPARATOR)
+    path = PATH.new(self["PATH"]).select do |p|
+      # put Superenv.bin and opt path at the first
+      p.start_with?("#{HOMEBREW_REPOSITORY}/Library/ENV", "#{HOMEBREW_PREFIX}/opt")
+    end
+    path.append(HOMEBREW_PREFIX/"bin") # XXX hot fix to prefer brewed stuff (e.g. python) over /usr/bin.
+    path.append(self["PATH"]) # reset of self["PATH"]
+    path.append(
+      # user paths
+      ORIGINAL_PATHS.map do |p|
+        begin
+          p.realpath.to_s
+        rescue
+          nil
+        end
+      end - %w[/usr/X11/bin /opt/X11/bin],
+    )
+    self["PATH"] = path
   end
 
   def fortran
@@ -253,7 +259,7 @@ module SharedEnvExtension
     else
       if (gfortran = which("gfortran", (HOMEBREW_PREFIX/"bin").to_s))
         ohai "Using Homebrew-provided fortran compiler."
-      elsif (gfortran = which("gfortran", ORIGINAL_PATHS.join(File::PATH_SEPARATOR)))
+      elsif (gfortran = which("gfortran", PATH.new(ORIGINAL_PATHS)))
         ohai "Using a fortran compiler found at #{gfortran}."
       end
       if gfortran

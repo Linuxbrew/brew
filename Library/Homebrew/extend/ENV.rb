@@ -4,11 +4,7 @@ require "extend/ENV/std"
 require "extend/ENV/super"
 
 def superenv?
-  if OS.linux?
-    ARGV.env == "super" || ARGV.homebrew_developer? && ARGV.env != "std"
-  else
-    ARGV.env != "std" && Superenv.bin
-  end
+  ARGV.env != "std" && Superenv.bin
 end
 
 module EnvActivation
@@ -29,6 +25,13 @@ module EnvActivation
     yield
   ensure
     replace(old_env)
+  end
+
+  def clear_sensitive_environment!
+    ENV.keys.each do |key|
+      next unless /(cookie|key|token)/i =~ key
+      ENV.delete key
+    end
   end
 end
 

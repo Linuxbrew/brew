@@ -38,7 +38,7 @@ module Hbc
     def _check_response_status
       ok = OK_RESPONSES[cask.url.scheme]
       return if ok.include?(@response_status)
-      add_error "unexpected http response, expecting #{ok.map(&:utf8_inspect).join(" or ")}, got #{@response_status.utf8_inspect}"
+      add_error "unexpected http response, expecting #{ok.map(&:to_s).join(" or ")}, got #{@response_status}"
     end
 
     def _get_data_from_request

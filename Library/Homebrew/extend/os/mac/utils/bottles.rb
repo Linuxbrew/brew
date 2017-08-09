@@ -32,7 +32,7 @@ module Utils
       # :tiger_g4, :tiger_g5, etc.
       def find_altivec_tag(tag)
         return unless tag.to_s =~ /(\w+)_(g4|g4e|g5)$/
-        altivec_tag = "#{$1}_altivec".to_sym
+        altivec_tag = "#{Regexp.last_match(1)}_altivec".to_sym
         altivec_tag if key?(altivec_tag)
       end
 

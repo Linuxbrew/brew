@@ -39,7 +39,7 @@ module Homebrew
       ```
 
       ## Documentation
-      `brew help`, `man brew` or check [Homebrew's documentation](https://github.com/Homebrew/brew/tree/master/docs#readme).
+      `brew help`, `man brew` or check [Homebrew's documentation](https://docs.brew.sh).
     EOS
     write_path(tap, "README.md", readme)
 
@@ -47,8 +47,12 @@ module Homebrew
       language: ruby
       os: osx
       env: OSX=10.12
-      osx_image: xcode8.1
+      osx_image: xcode8.3
       rvm: system
+      cache:
+        directories:
+          - $HOME/.gem/ruby
+          - Library/Homebrew/vendor/bundle
 
       before_install:
         - export TRAVIS_COMMIT="$(git rev-parse --verify -q HEAD)"
@@ -60,6 +64,7 @@ module Homebrew
         - git -C "$HOMEBREW_REPOSITORY" reset --hard origin/master
         - brew update || brew update
         - HOMEBREW_TAP_DIR="$(brew --repo "$TRAVIS_REPO_SLUG")"
+        - mkdir -p "$HOMEBREW_TAP_DIR"
         - rm -rf "$HOMEBREW_TAP_DIR"
         - ln -s "$PWD" "$HOMEBREW_TAP_DIR"
         - export HOMEBREW_DEVELOPER="1"

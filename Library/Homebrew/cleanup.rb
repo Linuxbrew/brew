@@ -6,7 +6,9 @@ module Homebrew
   module Cleanup
     @disk_cleanup_size = 0
 
-    def self.cleanup
+    module_function
+
+    def cleanup
       cleanup_cellar
       cleanup_cache
       cleanup_logs
@@ -15,34 +17,41 @@ module Homebrew
       rm_ds_store
     end
 
-    def self.update_disk_cleanup_size(path_size)
+    def update_disk_cleanup_size(path_size)
       @disk_cleanup_size += path_size
     end
 
-    def self.disk_cleanup_size
+    def disk_cleanup_size
       @disk_cleanup_size
     end
 
-    def self.cleanup_formula(formula)
-      formula.eligible_kegs_for_cleanup.each do |keg|
-        cleanup_path(keg) { keg.uninstall }
-      end
+    def unremovable_kegs
+      @unremovable_kegs ||= []
     end
 
-    def self.cleanup_logs
+    def cleanup_cellar(formulae = Formula.installed)
+      formulae.each(&method(:cleanup_formula))
+    end
+
+    def cleanup_formula(formula)
+      formula.eligible_kegs_for_cleanup.each(&method(:cleanup_keg))
+    end
+
+    def cleanup_keg(keg)
+      cleanup_path(keg) { keg.uninstall }
+    rescue Errno::EACCES => e
+      opoo e.message
+      unremovable_kegs << keg
+    end
+
+    def cleanup_logs
       return unless HOMEBREW_LOGS.directory?
       HOMEBREW_LOGS.subdirs.each do |dir|
         cleanup_path(dir) { dir.rmtree } if prune?(dir, days_default: 14)
       end
     end
 
-    def self.cleanup_cellar
-      Formula.installed.each do |formula|
-        cleanup_formula formula
-      end
-    end
-
-    def self.cleanup_cache(cache = HOMEBREW_CACHE)
+    def cleanup_cache(cache = HOMEBREW_CACHE)
       return unless cache.directory?
       cache.children.each do |path|
         if path.to_s.end_with? ".incomplete"
@@ -97,7 +106,7 @@ module Homebrew
       end
     end
 
-    def self.cleanup_path(path)
+    def cleanup_path(path)
       if ARGV.dry_run?
         puts "Would remove: #{path} (#{path.abv})"
       else
@@ -108,7 +117,7 @@ module Homebrew
       update_disk_cleanup_size(path.disk_usage)
     end
 
-    def self.cleanup_lockfiles
+    def cleanup_lockfiles
       return unless HOMEBREW_LOCK_DIR.directory?
       candidates = HOMEBREW_LOCK_DIR.children
       lockfiles  = candidates.select(&:file?)
@@ -118,7 +127,7 @@ module Homebrew
       end
     end
 
-    def self.rm_ds_store
+    def rm_ds_store
       paths = Queue.new
       %w[Cellar Frameworks Library bin etc include lib opt sbin share var]
         .map { |p| HOMEBREW_PREFIX/p }.each { |p| paths << p if p.exist? }
@@ -136,7 +145,7 @@ module Homebrew
       workers.map(&:join)
     end
 
-    def self.prune?(path, options = {})
+    def prune?(path, options = {})
       @time ||= Time.now
 
       path_modified_time = path.mtime

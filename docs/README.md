@@ -1,6 +1,7 @@
 # Documentation
 
 ## Users
+- [`brew` man-page (command documentation)](Manpage.md)
 - [Troubleshooting](Troubleshooting.md)
 - [Installation](Installation.md)
 - [Frequently Asked Questions](FAQ.md)
@@ -9,7 +10,7 @@
 - [Tips and Tricks](Tips-N'-Tricks.md)
 - [Bottles (binary packages)](Bottles.md)
 - [Taps (third-party repositories)](brew-tap.md)
-- [Interesting Taps and Forks](Interesting-Taps-&-Forks.md)
+- [Interesting Taps and Forks](Interesting-Taps-and-Forks.md)
 - [Anonymous Aggregate User Behaviour Analytics](Analytics.md)
 
 - [Querying `brew`](Querying-Brew.md)
@@ -38,7 +39,7 @@
 
 ## Maintainers
 - [New Maintainer Checklist](New-Maintainer-Checklist.md)
-- [Maintainers Avoiding Burnout](Maintainers-Avoiding-Burnout.md)
+- [Maintainers: Avoiding Burnout](Maintainers-Avoiding-Burnout.md)
 - [Maintainer Guidelines](Maintainer-Guidelines.md)
 - [Brew Test Bot For Maintainers](Brew-Test-Bot-For-Core-Contributors.md)
 - [Common Issues for Maintainers](Common-Issues-for-Core-Contributors.md)

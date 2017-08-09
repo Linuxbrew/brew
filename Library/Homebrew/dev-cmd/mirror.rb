@@ -8,10 +8,10 @@ module Homebrew
   def mirror
     odie "This command requires at least formula argument!" if ARGV.named.empty?
 
-    bintray_user = ENV["BINTRAY_USER"]
-    bintray_key = ENV["BINTRAY_KEY"]
+    bintray_user = ENV["HOMEBREW_BINTRAY_USER"]
+    bintray_key = ENV["HOMEBREW_BINTRAY_KEY"]
     if !bintray_user || !bintray_key
-      raise "Missing BINTRAY_USER or BINTRAY_KEY variables!"
+      raise "Missing HOMEBREW_BINTRAY_USER or HOMEBREW_BINTRAY_KEY variables!"
     end
 
     ARGV.formulae.each do |f|

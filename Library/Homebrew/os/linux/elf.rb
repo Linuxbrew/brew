@@ -36,24 +36,61 @@ module ELF
 
     def initialize(path)
       @path = path
-
-      @dylib_id = if path.dylib?
-        command = ["patchelf", "--print-soname", path.expand_path.to_s]
-        id = Utils.popen_read(*command).split("\n")
-        raise ErrorDuringExecution, command unless $?.success?
-        id
+      @dylib_id, needed = if DevelopmentTools.locate "readelf"
+        elf_soname_needed_readelf path
+      elsif DevelopmentTools.locate "patchelf"
+        elf_soname_needed_patchelf path
+      else
+        odie "patchelf must be installed: brew install patchelf"
       end
-
-      command = ["patchelf", "--print-needed", path.expand_path.to_s]
-      needed = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $?.success?
-
-      command = ["ldd", path.expand_path.to_s]
+      if needed.empty? || path.arch != Hardware::CPU.arch
+        @dylibs = []
+        return
+      end
+      begin
+        ldd = Formula["glibc"].bin/"ldd"
+        ldd = "ldd" unless ldd.executable?
+      rescue FormulaUnavailableError
+        ldd = "ldd"
+      end
+      command = [ldd, path.expand_path.to_s]
       libs = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $?.success?
+      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
       needed << "not found"
       libs.select! { |lib| needed.any? { |soname| lib.include? soname } }
       @dylibs = libs.map { |lib| lib[LDD_RX, 1] || lib[LDD_RX, 2] }.compact
+    end
+
+    private
+
+    def elf_soname_needed_patchelf(path)
+      patchelf = DevelopmentTools.locate "patchelf"
+      if path.dylib?
+        command = [patchelf, "--print-soname", path.expand_path.to_s]
+        soname = Utils.popen_read(*command).chomp
+        raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+      end
+      command = [patchelf, "--print-needed", path.expand_path.to_s]
+      needed = Utils.popen_read(*command).split("\n")
+      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+      [soname, needed]
+    end
+
+    def elf_soname_needed_readelf(path)
+      soname = nil
+      needed = []
+      command = ["readelf", "-d", path.expand_path.to_s]
+      lines = Utils.popen_read(*command).split("\n")
+      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+      lines.each do |s|
+        case s
+        when /\(SONAME\)/
+          soname = s[/\[(.*)\]/, 1]
+        when /\(NEEDED\)/
+          needed << s[/\[(.*)\]/, 1]
+        end
+      end
+      [soname, needed]
     end
   end
 
@@ -84,7 +121,7 @@ module ELF
   end
 
   def arch
-    archs.length == 1 ? archs.first : :dunno
+    (archs.length == 1) ? archs.first : :dunno
   end
 
   def universal?

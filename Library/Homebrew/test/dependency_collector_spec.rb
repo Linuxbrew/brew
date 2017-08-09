@@ -1,8 +1,8 @@
 require "dependency_collector"
 
-RSpec::Matchers.alias_matcher :be_a_build_requirement, :be_build
-
 describe DependencyCollector do
+  alias_matcher :be_a_build_requirement, :be_build
+
   def find_dependency(name)
     subject.deps.find { |dep| dep.name == name }
   end

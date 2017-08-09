@@ -12,12 +12,12 @@ describe "Satisfy Dependencies and Requirements", :cask do
   describe "depends_on cask" do
     context "when depends_on cask is cyclic" do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-cyclic.rb") }
-      it { is_expected.to raise_error(Hbc::CaskCyclicCaskDependencyError) }
+      it { is_expected.to raise_error(Hbc::CaskCyclicDependencyError) }
     end
 
     context do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask.rb") }
-      let(:dependency) { Hbc.load(cask.depends_on.cask.first) }
+      let(:dependency) { Hbc::CaskLoader.load(cask.depends_on.cask.first) }
 
       it "installs the dependency of a Cask and the Cask itself" do
         expect(subject).not_to raise_error

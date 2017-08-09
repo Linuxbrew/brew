@@ -6,7 +6,7 @@
 #:    If `--patch` is passed, patches for <formulae> will be applied to the
 #:    unpacked source.
 #:
-#:    If `--git` is passed, a Git repository will be initialized in the unpacked
+#:    If `--git` (or `-g`) is passed, a Git repository will be initialized in the unpacked
 #:    source. This is useful for creating patches for the software.
 
 require "stringio"
@@ -29,7 +29,7 @@ module Homebrew
     raise "Cannot write to #{unpack_dir}" unless unpack_dir.writable_real?
 
     formulae.each do |f|
-      stage_dir = unpack_dir.join("#{f.name}-#{f.version}")
+      stage_dir = unpack_dir/"#{f.name}-#{f.version}"
 
       if stage_dir.exist?
         raise "Destination #{stage_dir} already exists!" unless ARGV.force?

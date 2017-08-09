@@ -7,7 +7,7 @@
 #:    If `--quiet` is passed, list only the names of outdated brews (takes
 #:    precedence over `--verbose`).
 #:
-#:    If `--verbose` is passed, display detailed version information.
+#:    If `--verbose` (or `-v`) is passed, display detailed version information.
 #:
 #:    If `--json=`<version> is passed, the output will be in JSON format. The only
 #:    valid version is `v1`.
@@ -64,7 +64,9 @@ module Homebrew
           "#{full_name} (#{kegs.map(&:version).join(", ")})"
         end.join(", ")
 
-        puts "#{outdated_versions} < #{current_version}"
+        pinned_version = " [pinned at #{f.pinned_version}]" if f.pinned?
+
+        puts "#{outdated_versions} < #{current_version}#{pinned_version}"
       else
         puts f.full_installed_specified_name
       end
@@ -86,7 +88,9 @@ module Homebrew
 
       json << { name: f.full_name,
                 installed_versions: outdated_versions.collect(&:to_s),
-                current_version: current_version }
+                current_version: current_version,
+                pinned: f.pinned?,
+                pinned_version: f.pinned_version }
     end
     puts JSON.generate(json)
 

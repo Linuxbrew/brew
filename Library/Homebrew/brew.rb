@@ -10,22 +10,17 @@ raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
 
 require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
-$:.unshift(HOMEBREW_LIBRARY_PATH.to_s)
+require "English"
+unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
+  $LOAD_PATH.unshift(HOMEBREW_LIBRARY_PATH.to_s)
+end
 require "global"
+require "tap"
 
 if ARGV == %w[--version] || ARGV == %w[-v]
-  require "tap"
   puts "Homebrew #{HOMEBREW_VERSION}"
   puts "Homebrew/homebrew-core #{CoreTap.instance.version_string}"
   exit 0
-end
-
-def require?(path)
-  require path
-rescue LoadError => e
-  # HACK: ( because we should raise on syntax errors but
-  # not if the file doesn't exist. TODO make robust!
-  raise unless e.to_s.include? path
 end
 
 begin
@@ -48,19 +43,25 @@ begin
     end
   end
 
+  path = PATH.new(ENV["PATH"])
+  homebrew_path = PATH.new(ENV["HOMEBREW_PATH"])
+
   # Add contributed commands to PATH before checking.
-  Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/cmd"].each do |tap_cmd_dir|
-    ENV["PATH"] += "#{File::PATH_SEPARATOR}#{tap_cmd_dir}"
-  end
+  tap_cmds = Pathname.glob(Tap::TAP_DIRECTORY/"*/*/cmd")
+  path.append(tap_cmds)
+  homebrew_path.append(tap_cmds)
 
   # Add SCM wrappers.
-  ENV["PATH"] += "#{File::PATH_SEPARATOR}#{HOMEBREW_SHIMS_PATH}/scm"
+  path.append(HOMEBREW_SHIMS_PATH/"scm")
+  homebrew_path.append(HOMEBREW_SHIMS_PATH/"scm")
+
+  ENV["PATH"] = path
 
   if cmd
-    internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("cmd", cmd)
+    internal_cmd = require? HOMEBREW_LIBRARY_PATH/"cmd"/cmd
 
     unless internal_cmd
-      internal_cmd = require? HOMEBREW_LIBRARY_PATH.join("dev-cmd", cmd)
+      internal_cmd = require? HOMEBREW_LIBRARY_PATH/"dev-cmd"/cmd
       if internal_cmd && !ARGV.homebrew_developer?
         system "git", "config", "--file=#{HOMEBREW_REPOSITORY}/.git/config",
                                 "--replace-all", "homebrew.devcmdrun", "true"
@@ -86,6 +87,9 @@ begin
   if cmd == "cask" && (HOMEBREW_CELLAR/"brew-cask").exist?
     system(HOMEBREW_BREW_FILE, "uninstall", "--force", "brew-cask")
   end
+
+  # External commands expect a normal PATH
+  ENV["PATH"] = homebrew_path unless internal_cmd
 
   if internal_cmd
     Homebrew.send cmd.to_s.tr("-", "_").downcase
@@ -114,7 +118,6 @@ begin
       odie "Unknown command: #{cmd}"
     end
   end
-
 rescue UsageError => e
   require "cmd/help"
   Homebrew.help cmd, usage_error: e.message
@@ -122,21 +125,19 @@ rescue SystemExit => e
   onoe "Kernel.exit" if ARGV.verbose? && !e.success?
   $stderr.puts e.backtrace if ARGV.debug?
   raise
-rescue Interrupt => e
+rescue Interrupt
   $stderr.puts # seemingly a newline is typical
   exit 130
 rescue BuildError => e
-  Utils::Analytics.report_exception(e)
+  Utils::Analytics.report_build_error(e)
   e.dump
   exit 1
 rescue RuntimeError, SystemCallError => e
-  Utils::Analytics.report_exception(e)
   raise if e.message.empty?
   onoe e
   $stderr.puts e.backtrace if ARGV.debug?
   exit 1
 rescue MethodDeprecatedError => e
-  Utils::Analytics.report_exception(e)
   onoe e
   if e.issues_url
     $stderr.puts "If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):"
@@ -144,9 +145,9 @@ rescue MethodDeprecatedError => e
   end
   exit 1
 rescue Exception => e
-  Utils::Analytics.report_exception(e)
   onoe e
-  if internal_cmd && defined?(OS::ISSUES_URL)
+  if internal_cmd && defined?(OS::ISSUES_URL) &&
+     !ENV["HOMEBREW_NO_AUTO_UPDATE"]
     $stderr.puts "#{Tty.bold}Please report this bug:#{Tty.reset}"
     $stderr.puts "  #{Formatter.url(OS::ISSUES_URL)}"
   end

@@ -23,7 +23,7 @@ describe "brew install", :integration_test do
       .and be_a_success
 
     expect { brew "install", "testball1" }
-      .to output(/testball1\-0\.1 already installed/).to_stderr
+      .to output(/testball1\ 0\.1 is already installed/).to_stderr
       .and not_to_output.to_stdout
       .and be_a_success
 
@@ -51,7 +51,7 @@ describe "brew install", :integration_test do
     install_and_rename_coretap_formula "testball1", "testball2"
     expect { brew "install", "testball2" }
       .to output(/testball1 already installed, it's just not migrated/).to_stderr
-      .and output(/You can migrate formula with `brew migrate testball2`/).to_stdout
+      .and not_to_output.to_stdout
       .and be_a_success
   end
 
@@ -71,13 +71,13 @@ describe "brew install", :integration_test do
 
       devel do
         url "#{Formulary.factory("testball1").stable.url}"
-        sha256 "#{TESTBALL_SHA256}"
+        sha256 "#{OS.linux? ? LINUX_TESTBALL_SHA256 : TESTBALL_SHA256}"
         version "3.0"
       end
     EOS
 
     expect { brew "install", "testball1" }
-      .to output(/first `brew unlink testball1`/).to_stderr
+      .to output(/`brew upgrade testball1`/).to_stderr
       .and not_to_output.to_stdout
       .and be_a_failure
 
@@ -86,39 +86,39 @@ describe "brew install", :integration_test do
       .and not_to_output.to_stderr
       .and be_a_success
 
-    # expect { brew "install", "testball1", "--devel" }
-    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
-    #   .and not_to_output.to_stderr
-    # #   .and be_a_success
-    #
-    # expect { brew "unlink", "testball1" }
-    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
-    #   .and not_to_output.to_stderr
-    #   .and be_a_success
-    #
-    # expect { brew "install", "testball1" }
-    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/2\.0}).to_stdout
-    #   .and not_to_output.to_stderr
-    #   .and be_a_success
-    #
-    # shutup do
-    #   expect { brew "switch", "testball1", "3.0" }.to be_a_success
-    # end
-    #
-    # expect { brew "install", "testball1" }
-    #   .to output(/already installed, however linked version is/).to_stderr
-    #   .and output(/`brew switch testball1 2.0`/).to_stdout
-    #   .and be_a_success
-    #
-    # expect { brew "unlink", "testball1" }
-    #   .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
-    #   .and not_to_output.to_stderr
-    #   .and be_a_success
-    #
-    # expect { brew "install", "testball1" }
-    #   .to output(/just not linked/).to_stderr
-    #   .and not_to_output.to_stdout
-    #   .and be_a_success
+    expect { brew "install", "testball1", "--devel" }
+      .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
+      .and not_to_output.to_stderr
+      .and be_a_success
+
+    expect { brew "unlink", "testball1" }
+      .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
+      .and not_to_output.to_stderr
+      .and be_a_success
+
+    expect { brew "install", "testball1" }
+      .to output(%r{#{HOMEBREW_CELLAR}/testball1/2\.0}).to_stdout
+      .and not_to_output.to_stderr
+      .and be_a_success
+
+    shutup do
+      expect { brew "switch", "testball1", "3.0" }.to be_a_success
+    end
+
+    expect { brew "install", "testball1" }
+      .to output(/2.0 is already installed/).to_stderr
+      .and not_to_output.to_stdout
+      .and be_a_success
+
+    expect { brew "unlink", "testball1" }
+      .to output(%r{#{HOMEBREW_CELLAR}/testball1/3\.0}).to_stdout
+      .and not_to_output.to_stderr
+      .and be_a_success
+
+    expect { brew "install", "testball1" }
+      .to output(/just not linked/).to_stderr
+      .and not_to_output.to_stdout
+      .and be_a_success
   end
 
   it "can install keg-only Formulae" do
@@ -141,8 +141,8 @@ describe "brew install", :integration_test do
     EOS
 
     expect { brew "install", "testball1" }
-      .to output(/keg-only and another version is linked to opt/).to_stderr
-      .and output(/Use `brew install --force`/).to_stdout
+      .to output(/testball1 1.0 is already installed/).to_stderr
+      .and not_to_output.to_stdout
       .and be_a_success
 
     expect { brew "install", "testball1", "--force" }
@@ -185,7 +185,7 @@ describe "brew install", :integration_test do
       .and be_a_success
 
     expect { brew "install", "testball1", "--HEAD", "--ignore-dependencies" }
-      .to output(/testball1\-HEAD\-d5eb689 already installed/).to_stderr
+      .to output(/testball1 HEAD\-d5eb689 is already installed/).to_stderr
       .and not_to_output.to_stdout
       .and be_a_success
 
@@ -217,10 +217,9 @@ describe "brew install", :integration_test do
       depends_on NonFatalRequirement
     EOS
 
-    # FIXME: This should output to STDERR.
     expect { brew "install", "testball1" }
-      .to output(/NonFatalRequirement unsatisfied!/).to_stdout
-      .and not_to_output.to_stderr
+      .to output(/NonFatalRequirement unsatisfied!/).to_stderr
+      .and output(/built in/).to_stdout
       .and be_a_success
   end
 
@@ -234,10 +233,9 @@ describe "brew install", :integration_test do
       depends_on FatalRequirement
     EOS
 
-    # FIXME: This should output to STDERR.
     expect { brew "install", "testball1" }
-      .to output(/FatalRequirement unsatisfied!/).to_stdout
-      .and output(/An unsatisfied requirement failed this build./).to_stderr
+      .to output(/FatalRequirement unsatisfied!/).to_stderr
+      .and not_to_output.to_stdout
       .and be_a_failure
   end
 end

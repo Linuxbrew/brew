@@ -1,9 +1,9 @@
 require "tab"
 require "formula"
 
-RSpec::Matchers.alias_matcher :be_built_with, :be_with
-
 describe Tab do
+  alias_matcher :be_built_with, :be_with
+
   matcher :be_poured_from_bottle do
     match do |actual|
       actual.poured_from_bottle == true
@@ -18,7 +18,7 @@ describe Tab do
 
   subject {
     described_class.new(
-      "homebrew_version" => HOMEBREW_VERSION,
+      "homebrew_version"     => HOMEBREW_VERSION,
       "used_options"         => used_options.as_flags,
       "unused_options"       => unused_options.as_flags,
       "built_as_bottle"      => false,
@@ -51,6 +51,9 @@ describe Tab do
   let(:f_tab_content) { (TEST_FIXTURE_DIR/"receipt.json").read }
 
   specify "defaults" do
+    # < 1.1.7 runtime_dependencies were wrong so are ignored
+    stub_const("HOMEBREW_VERSION", "1.1.7")
+
     tab = described_class.empty
 
     expect(tab.homebrew_version).to eq(HOMEBREW_VERSION)
@@ -199,6 +202,9 @@ describe Tab do
 
   describe "::create" do
     it "creates a Tab" do
+      # < 1.1.7 runtime dependencies were wrong so are ignored
+      stub_const("HOMEBREW_VERSION", "1.1.7")
+
       f = formula do
         url "foo-1.0"
         depends_on "bar"
@@ -223,8 +229,8 @@ describe Tab do
         { "full_name" => "bar", "version" => "2.0" },
         { "full_name" => "user/repo/from_tap", "version" => "1.0" },
       ]
-
       expect(tab.runtime_dependencies).to eq(runtime_dependencies)
+
       expect(tab.source["path"]).to eq(f.path.to_s)
     end
 
@@ -252,7 +258,7 @@ describe Tab do
     it "can create a Tab for a non-existant Keg" do
       f.prefix.mkpath
 
-      expect(subject.tabfile).to be nil
+      expect(subject.tabfile).to eq(f_tab_path)
     end
   end
 

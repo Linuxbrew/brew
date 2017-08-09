@@ -7,7 +7,7 @@
 #:    To test the development or head version of a formula, use `--devel` or
 #:    `--HEAD`.
 #:
-#:    If `--debug` is passed and the test fails, an interactive debugger will be
+#:    If `--debug` (or `-d`) is passed and the test fails, an interactive debugger will be
 #:    launched with access to IRB or a shell inside the temporary test directory.
 #:
 #:    If `--keep-tmp` is passed, the temporary files created for the test are
@@ -36,6 +36,12 @@ module Homebrew
       # Cannot test formulae without a test method
       unless f.test_defined?
         ofail "#{f.full_name} defines no test"
+        next
+      end
+
+      # Don't test unlinked formulae
+      if !ARGV.force? && !f.keg_only? && !f.linked?
+        ofail "#{f.full_name} is not linked"
         next
       end
 
@@ -77,7 +83,7 @@ module Homebrew
             exec(*args)
           end
         end
-      rescue Assertions::FailedAssertion => e
+      rescue ::Test::Unit::AssertionFailedError => e
         ofail "#{f.full_name}: failed"
         puts e.message
       rescue Exception => e

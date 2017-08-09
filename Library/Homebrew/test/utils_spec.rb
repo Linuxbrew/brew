@@ -188,8 +188,14 @@ describe "globally-scoped helper methods" do
   end
 
   specify "#which_editor" do
-    ENV["HOMEBREW_EDITOR"] = "vemate"
-    expect(which_editor).to eq("vemate")
+    ENV["HOMEBREW_EDITOR"] = "vemate -w"
+    ENV["HOMEBREW_PATH"] = dir
+
+    editor = "#{dir}/vemate"
+    FileUtils.touch editor
+    FileUtils.chmod 0755, editor
+
+    expect(which_editor).to eq("vemate -w")
   end
 
   specify "#gzip" do
@@ -217,13 +223,6 @@ describe "globally-scoped helper methods" do
       expect(pretty_duration(240)).to eq("4 minutes")
       expect(pretty_duration(252.45)).to eq("4 minutes 12 seconds")
     end
-  end
-
-  specify "#plural" do
-    expect(plural(1)).to eq("")
-    expect(plural(0)).to eq("s")
-    expect(plural(42)).to eq("s")
-    expect(plural(42, "")).to eq("")
   end
 
   specify "#disk_usage_readable" do
@@ -269,6 +268,32 @@ describe "globally-scoped helper methods" do
           disable: true
         )
       }.to raise_error(MethodDeprecatedError, %r{method.*replacement.*homebrew/homebrew-core.*homebrew/core}m)
+    end
+  end
+
+  describe "#with_env" do
+    it "sets environment variables within the block" do
+      expect(ENV["PATH"]).not_to eq("/bin")
+      with_env "PATH" => "/bin" do
+        expect(ENV["PATH"]).to eq("/bin")
+      end
+    end
+
+    it "restores ENV after the block" do
+      with_env "PATH" => "/bin" do
+        expect(ENV["PATH"]).to eq("/bin")
+      end
+      expect(ENV["PATH"]).not_to eq("/bin")
+    end
+
+    it "restores ENV if an exception is raised" do
+      expect {
+        with_env "PATH" => "/bin" do
+          raise StandardError, "boom"
+        end
+      }.to raise_error(StandardError)
+
+      expect(ENV["PATH"]).not_to eq("/bin")
     end
   end
 end

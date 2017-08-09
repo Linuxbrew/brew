@@ -77,34 +77,10 @@ class FormulaUnavailableError < RuntimeError
   end
 end
 
-class TapFormulaUnavailableError < FormulaUnavailableError
-  attr_reader :tap, :user, :repo
-
-  def initialize(tap, name)
-    @tap = tap
-    @user = tap.user
-    @repo = tap.repo
-    super "#{tap}/#{name}"
-  end
-
-  def to_s
-    s = super
-    s += "\nPlease tap it and then try again: brew tap #{tap}" unless tap.installed?
-    s
-  end
-end
-
-class FormulaClassUnavailableError < FormulaUnavailableError
+module FormulaClassUnavailableErrorModule
   attr_reader :path
   attr_reader :class_name
   attr_reader :class_list
-
-  def initialize(name, path, class_name, class_list)
-    @path = path
-    @class_name = class_name
-    @class_list = class_list
-    super name
-  end
 
   def to_s
     s = super
@@ -131,16 +107,70 @@ class FormulaClassUnavailableError < FormulaUnavailableError
   end
 end
 
-class FormulaUnreadableError < FormulaUnavailableError
+class FormulaClassUnavailableError < FormulaUnavailableError
+  include FormulaClassUnavailableErrorModule
+
+  def initialize(name, path, class_name, class_list)
+    @path = path
+    @class_name = class_name
+    @class_list = class_list
+    super name
+  end
+end
+
+module FormulaUnreadableErrorModule
   attr_reader :formula_error
+
+  def to_s
+    "#{name}: " + formula_error.to_s
+  end
+end
+
+class FormulaUnreadableError < FormulaUnavailableError
+  include FormulaUnreadableErrorModule
 
   def initialize(name, error)
     super(name)
     @formula_error = error
   end
+end
+
+class TapFormulaUnavailableError < FormulaUnavailableError
+  attr_reader :tap, :user, :repo
+
+  def initialize(tap, name)
+    @tap = tap
+    @user = tap.user
+    @repo = tap.repo
+    super "#{tap}/#{name}"
+  end
 
   def to_s
-    "#{name}: " + formula_error.to_s
+    s = super
+    s += "\nPlease tap it and then try again: brew tap #{tap}" unless tap.installed?
+    s
+  end
+end
+
+class TapFormulaClassUnavailableError < TapFormulaUnavailableError
+  include FormulaClassUnavailableErrorModule
+
+  attr_reader :tap
+
+  def initialize(tap, name, path, class_name, class_list)
+    @path = path
+    @class_name = class_name
+    @class_list = class_list
+    super tap, name
+  end
+end
+
+class TapFormulaUnreadableError < TapFormulaUnavailableError
+  include FormulaUnreadableErrorModule
+
+  def initialize(tap, name, error)
+    super(tap, name)
+    @formula_error = error
   end
 end
 
@@ -152,7 +182,7 @@ class TapFormulaAmbiguityError < RuntimeError
     @paths = paths
     @formulae = paths.map do |path|
       path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-      "#{Tap.fetch($1, $2)}/#{path.basename(".rb")}"
+      "#{Tap.fetch(Regexp.last_match(1), Regexp.last_match(2))}/#{path.basename(".rb")}"
     end
 
     super <<-EOS.undent
@@ -172,7 +202,7 @@ class TapFormulaWithOldnameAmbiguityError < RuntimeError
 
     @taps = possible_tap_newname_formulae.map do |newname|
       newname =~ HOMEBREW_TAP_FORMULA_REGEX
-      "#{$1}/#{$2}"
+      "#{Regexp.last_match(1)}/#{Regexp.last_match(2)}"
     end
 
     super <<-EOS.undent
@@ -295,10 +325,10 @@ class FormulaConflictError < RuntimeError
 
   def message
     message = []
-    message << "Cannot install #{formula.full_name} because conflicting formulae are installed.\n"
+    message << "Cannot install #{formula.full_name} because conflicting formulae are installed."
     message.concat conflicts.map { |c| conflict_message(c) } << ""
     message << <<-EOS.undent
-      Please `brew unlink #{conflicts.map(&:name)*" "}` before continuing.
+      Please `brew unlink #{conflicts.map(&:name) * " "}` before continuing.
 
       Unlinking removes a formula's symlinks from #{HOMEBREW_PREFIX}. You can
       link the formula again after the install finishes. You can --force this
@@ -322,6 +352,7 @@ end
 
 class BuildError < RuntimeError
   attr_reader :formula, :env
+  attr_accessor :options
 
   def initialize(formula, cmd, args, env)
     @formula = formula
@@ -363,17 +394,10 @@ class BuildError < RuntimeError
       end
     end
 
-    if formula.tap && formula.tap.name == "homebrew/boneyard"
-      onoe <<-EOS.undent
-        #{formula} was moved to homebrew-boneyard because it has unfixable issues.
-        Please do not file any issues about this. Sorry!
-      EOS
-      return
-    end
-
     if formula.tap && defined?(OS::ISSUES_URL)
       if formula.tap.official?
         puts Formatter.error(Formatter.url(OS::ISSUES_URL), label: "READ THIS")
+        puts "Please do not report this issue to Homebrew/brew or Homebrew/core, which support macOS only." unless OS.mac?
       elsif issues_url = formula.tap.issues_url
         puts <<-EOS.undent
           If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):
@@ -481,7 +505,7 @@ class CurlDownloadStrategyError < RuntimeError
   def initialize(url)
     case url
     when %r{^file://(.+)}
-      super "File does not exist: #{$1}"
+      super "File does not exist: #{Regexp.last_match(1)}"
     else
       super "Download failed: #{url}"
     end

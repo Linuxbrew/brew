@@ -1,5 +1,5 @@
-#!/usr/bin/env ruby
-#
+# encoding: utf-8
+
 # = plist
 #
 # This is the main file for plist. Everything interesting happens in
@@ -15,7 +15,7 @@ require 'stringio'
 
 require_relative 'plist/generator'
 require_relative 'plist/parser'
+require_relative 'plist/version'
 
 module Plist
-  VERSION = '3.1.0'
 end

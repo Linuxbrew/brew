@@ -63,9 +63,9 @@ class Keg
   # expensive recursive search if possible.
   def fixed_name(file, bad_name)
     if bad_name.start_with? PREFIX_PLACEHOLDER
-      bad_name.sub(PREFIX_PLACEHOLDER, HOMEBREW_PREFIX.to_s)
+      bad_name.sub(PREFIX_PLACEHOLDER, HOMEBREW_PREFIX)
     elsif bad_name.start_with? CELLAR_PLACEHOLDER
-      bad_name.sub(CELLAR_PLACEHOLDER, HOMEBREW_CELLAR.to_s)
+      bad_name.sub(CELLAR_PLACEHOLDER, HOMEBREW_CELLAR)
     elsif (file.dylib? || file.mach_o_bundle?) && (file.parent + bad_name).exist?
       "@loader_path/#{bad_name}"
     elsif file.mach_o_executable? && (lib + bad_name).exist?
@@ -89,7 +89,7 @@ class Keg
     # the basename of the file itself.
     basename = File.basename(file.dylib_id)
     relative_dirname = file.dirname.relative_path_from(path)
-    opt_record.join(relative_dirname, basename).to_s
+    (opt_record/relative_dirname/basename).to_s
   end
 
   # Matches framework references like `XXX.framework/Versions/YYY/XXX` and
@@ -123,6 +123,12 @@ class Keg
     end
 
     mach_o_files
+  end
+
+  def recursive_fgrep_args
+    # Don't recurse into symlinks; the man page says this is the default, but
+    # it's wrong. -O is a BSD-grep-only option.
+    "-lrO"
   end
 
   def self.file_linked_libraries(file, string)

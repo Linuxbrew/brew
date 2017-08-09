@@ -6,7 +6,7 @@
 #:    generated DSL. Passing `--keep-old` will attempt to keep it at its
 #:    original value, while `--no-rebuild` will remove it.
 #:
-#:    If `--verbose` is passed, print the bottling commands and any warnings
+#:    If `--verbose` (or `-v`) is passed, print the bottling commands and any warnings
 #:    encountered.
 #:
 #:    If `--skip-relocation` is passed, do not check if the bottle can be marked
@@ -248,7 +248,7 @@ module Homebrew
           mv "#{relocatable_tar_path}.gz", bottle_path
         end
 
-        if bottle_path.size > 1*1024*1024
+        if bottle_path.size > 1 * 1024 * 1024
           ohai "Detecting if #{filename} is relocatable..."
         end
 
@@ -314,8 +314,8 @@ module Homebrew
 
     old_spec = f.bottle_specification
     if ARGV.include?("--keep-old") && !old_spec.checksums.empty?
-      mismatches = [:root_url, :prefix, :cellar, :rebuild].select do |key|
-        old_spec.send(key) != bottle.send(key)
+      mismatches = [:root_url, :prefix, :cellar, :rebuild].reject do |key|
+        old_spec.send(key) == bottle.send(key)
       end
       mismatches.delete(:cellar) if old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
       bottle.cellar :any if OS.linux? && old_spec.cellar == :any && bottle.cellar == :any_skip_relocation
@@ -389,9 +389,7 @@ module Homebrew
       bottle = BottleSpecification.new
       bottle.root_url bottle_hash["bottle"]["root_url"]
       cellar = bottle_hash["bottle"]["cellar"]
-      if cellar == "any" || cellar == "any_skip_relocation"
-        cellar = cellar.to_sym
-      end
+      cellar = cellar.to_sym if ["any", "any_skip_relocation"].include?(cellar)
       bottle.cellar cellar
       bottle.prefix bottle_hash["bottle"]["prefix"]
       bottle.rebuild bottle_hash["bottle"]["rebuild"]

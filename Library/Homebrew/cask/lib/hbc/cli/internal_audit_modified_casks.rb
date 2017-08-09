@@ -1,26 +1,33 @@
 module Hbc
   class CLI
-    class InternalAuditModifiedCasks < InternalUseBase
+    class InternalAuditModifiedCasks < AbstractInternalCommand
       RELEVANT_STANZAS = [:version, :sha256, :url, :appcast].freeze
+
+      option "--cleanup", :cleanup, false
 
       def self.needs_init?
         true
       end
 
-      def self.run(*args)
-        commit_range = commit_range(args)
-        cleanup = args.any? { |a| a =~ /^-+c(leanup)?$/i }
-        new(commit_range, cleanup: cleanup).run
+      attr_accessor :commit_range
+      private :commit_range=
+
+      def initialize(*)
+        super
+
+        if args.count != 1
+          raise ArgumentError, <<-EOS.undent
+            This command requires exactly one argument.
+
+            #{self.class.usage}
+          EOS
+        end
+
+        @commit_range = args.first
       end
 
-      def self.commit_range(args)
-        posargs = args.reject { |a| a.empty? || a.chars.first == "-" }
-        odie usage unless posargs.size == 1
-        posargs.first
-      end
-
-      def self.posargs(args)
-        args.reject { |a| a.empty? || a.chars.first == "-" }
+      def self.help
+        "audit all modified Casks in a given commit range"
       end
 
       def self.usage
@@ -35,17 +42,6 @@ module Hbc
             -c, --cleanup
               Remove all cached downloads. Use with care.
         EOS
-      end
-
-      def initialize(commit_range, cleanup: false)
-        @commit_range = commit_range
-        @cleanup = cleanup
-      end
-
-      attr_reader :commit_range
-
-      def cleanup?
-        @cleanup
       end
 
       def run
@@ -80,10 +76,10 @@ module Hbc
 
       def modified_casks
         return @modified_casks if defined? @modified_casks
-        @modified_casks = modified_cask_files.map { |f| Hbc.load(f) }
+        @modified_casks = modified_cask_files.map { |f| CaskLoader.load(f) }
         if @modified_casks.any?
           num_modified = @modified_casks.size
-          ohai "#{num_modified} modified cask#{plural(num_modified)}: " \
+          ohai "#{Formatter.pluralize(num_modified, "modified cask")}: " \
             "#{@modified_casks.join(" ")}"
         end
         @modified_casks
@@ -93,7 +89,8 @@ module Hbc
         audit_download = audit_download?(cask, cask_file)
         check_token_conflicts = added_cask_files.include?(cask_file)
         success = Auditor.audit(cask, audit_download:        audit_download,
-                                      check_token_conflicts: check_token_conflicts)
+                                      check_token_conflicts: check_token_conflicts,
+                                      commit_range: commit_range)
         failed_casks << cask unless success
       end
 
@@ -120,7 +117,7 @@ module Hbc
       def report_failures
         return if failed_casks.empty?
         num_failed = failed_casks.size
-        odie "audit failed for #{num_failed} cask#{plural(num_failed)}: " \
+        odie "audit failed for #{Formatter.pluralize(num_failed, "cask")}: " \
           "#{failed_casks.join(" ")}"
       end
 

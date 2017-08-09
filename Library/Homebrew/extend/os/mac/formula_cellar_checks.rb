@@ -67,7 +67,7 @@ module FormulaCellarChecks
     checker = LinkageChecker.new(keg, formula)
 
     return unless checker.broken_dylibs?
-    audit_check_output <<-EOS.undent
+    problem_if_output <<-EOS.undent
       The installation was broken.
       Broken dylib links found:
         #{checker.broken_dylibs.to_a * "\n          "}
@@ -76,9 +76,9 @@ module FormulaCellarChecks
 
   def audit_installed
     generic_audit_installed
-    audit_check_output(check_shadowed_headers)
-    audit_check_output(check_openssl_links)
-    audit_check_output(check_python_framework_links(formula.lib))
+    problem_if_output(check_shadowed_headers)
+    problem_if_output(check_openssl_links)
+    problem_if_output(check_python_framework_links(formula.lib))
     check_linkage
   end
 end

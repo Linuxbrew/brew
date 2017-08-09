@@ -3,7 +3,7 @@
 #:    `--only=`<test_script> runs only <test_script>_spec.rb, and `--seed`
 #:    randomizes tests with the provided value instead of a random seed.
 #:
-#:    If `--verbose` is passed, print the command that runs the tests.
+#:    If `--verbose` (or `-v`) is passed, print the command that runs the tests.
 #:
 #:    If `--coverage` is passed, also generate code coverage reports.
 #:
@@ -12,10 +12,8 @@
 #:    If `--no-compat` is passed, do not load the compatibility layer when
 #:    running tests.
 #:
-#:    If `--online` is passed, include tests that use the GitHub API.
-#:
-#:    If `--official-cmd-taps` is passed, include tests that use any of the
-#:    taps for official external commands.
+#:    If `--online` is passed, include tests that use the GitHub API and tests
+#:    that use any of the taps for official external commands.
 
 require "fileutils"
 require "tap"
@@ -28,14 +26,16 @@ module Homebrew
       ENV.delete("HOMEBREW_VERBOSE")
       ENV.delete("VERBOSE")
       ENV.delete("HOMEBREW_CASK_OPTS")
+      ENV.delete("HOMEBREW_TEMP")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["HOMEBREW_NO_COMPAT"] = "1" if ARGV.include? "--no-compat"
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if ARGV.include? "--generic"
-      ENV["HOMEBREW_NO_GITHUB_API"] = "1" unless ARGV.include? "--online"
 
-      if ARGV.include? "--official-cmd-taps"
-        ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"] = "1"
+      if ARGV.include? "--online"
+        ENV["HOMEBREW_TEST_ONLINE"] = "1"
+      else
+        ENV["HOMEBREW_NO_GITHUB_API"] = "1"
       end
 
       if ARGV.include? "--coverage"
@@ -54,9 +54,7 @@ module Homebrew
       end
 
       Homebrew.install_gem_setup_path! "bundler"
-      unless quiet_system("bundle", "check")
-        system "bundle", "install"
-      end
+      system "bundle", "install" unless quiet_system("bundle", "check")
 
       parallel = true
 
@@ -73,20 +71,24 @@ module Homebrew
         Dir.glob("test/**/*_spec.rb").reject { |p| p =~ %r{^test/vendor/bundle/} }
       end
 
-      opts = []
-
-      if ENV["CI"]
-        opts << "--combine-stderr"
-        opts << "--serialize-stdout"
+      opts = if ENV["CI"]
+        %w[
+          --combine-stderr
+          --serialize-stdout
+        ]
+      else
+        %w[
+          --nice
+        ]
       end
 
-      args = [
-        "--color",
-        "-I", HOMEBREW_LIBRARY_PATH/"test",
-        "--require", "spec_helper",
-        "--format", "progress",
-        "--format", "ParallelTests::RSpec::RuntimeLogger",
-        "--out", "tmp/parallel_runtime_rspec.log"
+      args = ["-I", HOMEBREW_LIBRARY_PATH/"test"]
+      args += %W[
+        --color
+        --require spec_helper
+        --format progress
+        --format ParallelTests::RSpec::RuntimeLogger
+        --out #{HOMEBREW_CACHE}/tests/parallel_runtime_rspec.log
       ]
 
       args << "--seed" << ARGV.next if ARGV.include? "--seed"
@@ -96,13 +98,17 @@ module Homebrew
         files = files.reject { |p| p =~ %r{^test/(os/mac|cask)(/.*|_spec\.rb)$} }
       end
 
+      unless OS.linux?
+        files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
+      end
+
       if parallel
         system "bundle", "exec", "parallel_rspec", *opts, "--", *args, "--", *files
       else
         system "bundle", "exec", "rspec", *args, "--", *files
       end
 
-      return if $?.success?
+      return if $CHILD_STATUS.success?
       Homebrew.failed = true
     end
   end

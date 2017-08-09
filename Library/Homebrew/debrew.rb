@@ -50,7 +50,7 @@ module Debrew
 
       choice = nil
       while choice.nil?
-        menu.entries.each_with_index { |e, i| puts "#{i+1}. #{e.name}" }
+        menu.entries.each_with_index { |e, i| puts "#{i + 1}. #{e.name}" }
         print menu.prompt unless menu.prompt.nil?
 
         input = $stdin.gets || exit
@@ -58,7 +58,7 @@ module Debrew
 
         i = input.to_i
         if i > 0
-          choice = menu.entries[i-1]
+          choice = menu.entries[i - 1]
         else
           possible = menu.entries.find_all { |e| e.name.start_with?(input) }
 
@@ -74,18 +74,13 @@ module Debrew
     end
   end
 
-  class << self
-    alias original_raise raise
-  end
-
   @active = false
   @debugged_exceptions = Set.new
 
-  def self.active?
-    @active
-  end
-
   class << self
+    extend Predicable
+    alias original_raise raise
+    attr_predicate :active?
     attr_reader :debugged_exceptions
   end
 

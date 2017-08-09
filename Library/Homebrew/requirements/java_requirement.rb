@@ -2,7 +2,7 @@ require "language/java"
 
 class JavaRequirement < Requirement
   fatal true
-  download "http://www.oracle.com/technetwork/java/javase/downloads/index.html"
+  download "https://www.oracle.com/technetwork/java/javase/downloads/index.html"
 
   satisfy build_env: false do
     setup_java
@@ -18,7 +18,7 @@ class JavaRequirement < Requirement
   def message
     version_string = " #{@version}" if @version
 
-    s = "Java#{version_string} is required to install this formula."
+    s = "Java#{version_string} is required to install this formula.\n"
     s += super
     s
   end
@@ -46,7 +46,7 @@ class JavaRequirement < Requirement
     if exact_version?
       @version
     else
-      @version[0, @version.length-1]
+      @version[0, @version.length - 1]
     end
   end
 

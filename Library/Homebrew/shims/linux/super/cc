@@ -150,6 +150,8 @@ class Cmd
       /^-O[0-9zs]?$/, "-fast", "-no-cpp-precomp",
       "-pedantic", "-pedantic-errors", "-Wno-long-double",
       "-Wno-unused-but-set-variable"
+    when "-liconv", "-lintl"
+      # Not needed on Linux.
     when "-fopenmp", "-lgomp", "-mno-fused-madd", "-fforce-addr", "-fno-defer-pop",
       "-mno-dynamic-no-pic", "-fearly-inlining", /^-f(?:no-)?inline-functions-called-once/,
       /^-finline-limit/, /^-f(?:no-)?check-new/, "-fno-delete-null-pointer-checks",
@@ -184,6 +186,11 @@ class Cmd
       val  = chuzzle($1) || enum.next
       path = canonical_path(val)
       args << "-L#{val}" if keep?(path) && @lset.add?(path)
+    when /^-R(.+)?/
+      # -R is not the correct way to pass rpaths to the linker
+      val  = chuzzle($1) || enum.next
+      wl = "-Wl," unless mode == :ld
+      args << "#{wl}-rpath=" if keep?(path)
     else
       args << arg
     end
@@ -242,7 +249,8 @@ class Cmd
 
   def ldflags
     wl = "-Wl," unless mode == :ld
-    args = ["#{wl}--dynamic-linker=#{prefix}/lib/ld.so"]
+    args = []
+    args += ["#{wl}--dynamic-linker=#{dynamic_linker_path}"] if dynamic_linker_path
     args += path_flags("-L", library_paths)
     args += path_flags("#{wl}-rpath=", rpath_paths)
   end
@@ -261,6 +269,10 @@ class Cmd
 
   def rpath_paths
     path_split("HOMEBREW_RPATH_PATHS")
+  end
+
+  def dynamic_linker_path
+    chuzzle(ENV["HOMEBREW_DYNAMIC_LINKER"])
   end
 
   def configure?
@@ -347,6 +359,7 @@ if __FILE__ == $PROGRAM_NAME
     path = Pathname.new(x)
     path.directory? && path.realpath == superbin
   end
+  paths.unshift "#{ENV["HOMEBREW_PREFIX"]}/bin"
   ENV["PATH"] = paths.join(":")
   args << { :close_others => false }
   exec tool, *args

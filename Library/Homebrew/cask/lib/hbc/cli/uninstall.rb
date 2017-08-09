@@ -1,37 +1,37 @@
 module Hbc
   class CLI
-    class Uninstall < Base
-      def self.run(*args)
-        cask_tokens = cask_tokens_from(args)
-        raise CaskUnspecifiedError if cask_tokens.empty?
-        force = args.include? "--force"
+    class Uninstall < AbstractCommand
+      option "--force", :force, false
 
-        cask_tokens.each do |cask_token|
-          odebug "Uninstalling Cask #{cask_token}"
-          cask = Hbc.load(cask_token)
+      def initialize(*)
+        super
+        raise CaskUnspecifiedError if args.empty?
+      end
 
-          raise CaskNotInstalledError, cask unless cask.installed? || force
+      def run
+        raise CaskError, "Uninstall incomplete." if uninstall_casks == :incomplete
+      end
 
-          latest_installed_version = cask.timestamped_versions.last
+      def uninstall_casks
+        casks.each do |cask|
+          odebug "Uninstalling Cask #{cask}"
 
-          unless latest_installed_version.nil?
-            latest_installed_cask_file = cask.metadata_master_container_path
-                                             .join(latest_installed_version.join(File::Separator),
-                                                   "Casks", "#{cask_token}.rb")
+          raise CaskNotInstalledError, cask unless cask.installed? || force?
 
+          if cask.installed? && !cask.installed_caskfile.nil?
             # use the same cask file that was used for installation, if possible
-            cask = CaskLoader.load_from_file(latest_installed_cask_file) if latest_installed_cask_file.exist?
+            cask = CaskLoader.load_from_file(cask.installed_caskfile) if cask.installed_caskfile.exist?
           end
 
-          Installer.new(cask, force: force).uninstall
+          Installer.new(cask, binaries: binaries?, verbose: verbose?, force: force?).uninstall
 
           next if (versions = cask.versions).empty?
 
           single = versions.count == 1
 
           puts <<-EOS.undent
-            #{cask_token} #{versions.join(", ")} #{single ? "is" : "are"} still installed.
-            Remove #{single ? "it" : "them all"} with `brew cask uninstall --force #{cask_token}`.
+            #{cask} #{versions.join(", ")} #{single ? "is" : "are"} still installed.
+            Remove #{single ? "it" : "them all"} with `brew cask uninstall --force #{cask}`.
           EOS
         end
       end

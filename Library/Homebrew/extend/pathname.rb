@@ -248,7 +248,7 @@ class Pathname
     rmdir
     true
   rescue Errno::ENOTEMPTY
-    if (ds_store = self+".DS_Store").exist? && children.length == 1
+    if (ds_store = join(".DS_Store")).exist? && children.length == 1
       ds_store.unlink
       retry
     else
@@ -307,8 +307,7 @@ class Pathname
 
   # @private
   def elf?
-    @which_file ||= which("file")
-    !@which_file.nil? && `#{@which_file} -b #{self}` =~ /^ELF/
+    read(4) == "\x7fELF"
   end
 
   # @private
@@ -336,7 +335,7 @@ class Pathname
 
   def sha256
     require "digest/sha2"
-    incremental_hash(Digest::SHA2)
+    incremental_hash(Digest::SHA256)
   end
 
   def verify_checksum(expected)
@@ -345,7 +344,6 @@ class Pathname
     raise ChecksumMismatchError.new(self, expected, actual) unless expected == actual
   end
 
-  # FIXME: eliminate the places where we rely on this method
   alias to_str to_s unless method_defined?(:to_str)
 
   def cd
@@ -358,7 +356,7 @@ class Pathname
 
   # @private
   def resolved_path
-    symlink? ? dirname+readlink : self
+    symlink? ? dirname.join(readlink) : self
   end
 
   # @private
@@ -368,7 +366,7 @@ class Pathname
     # The link target contains NUL bytes
     false
   else
-    (dirname+link).exist?
+    dirname.join(link).exist?
   end
 
   # @private
@@ -379,11 +377,10 @@ class Pathname
 
   unless method_defined?(:/)
     def /(other)
-      unless other.respond_to?(:to_str) || other.respond_to?(:to_path)
-        opoo "Pathname#/ called on #{inspect} with #{other.inspect} as an argument"
-        puts "This behavior is deprecated, please pass either a String or a Pathname"
+      if !other.respond_to?(:to_str) && !other.respond_to?(:to_path)
+        odeprecated "Pathname#/ with #{other.class}", "a String or a Pathname"
       end
-      self + other.to_s
+      join(other.to_s)
     end
   end
 
@@ -419,7 +416,7 @@ class Pathname
     mkpath
     targets.each do |target|
       target = Pathname.new(target) # allow pathnames or strings
-      (self+target.basename).write <<-EOS.undent
+      join(target.basename).write <<-EOS.undent
         #!/bin/bash
         exec "#{target}" "$@"
       EOS
@@ -443,7 +440,7 @@ class Pathname
     Pathname.glob("#{self}/*") do |file|
       next if file.directory?
       dst.install(file)
-      new_file = dst+file.basename
+      new_file = dst.join(file.basename)
       file.write_env_script(new_file, env)
     end
   end
@@ -451,7 +448,7 @@ class Pathname
   # Writes an exec script that invokes a java jar
   def write_jar_script(target_jar, script_name, java_opts = "")
     mkpath
-    (self+script_name).write <<-EOS.undent
+    join(script_name).write <<-EOS.undent
       #!/bin/bash
       exec java #{java_opts} -jar #{target_jar} "$@"
     EOS

@@ -93,7 +93,7 @@ module OS
       @locator ||= SDKLocator.new
       begin
         sdk = if v.nil?
-          Xcode.version.to_i >= 7 ? @locator.latest_sdk : @locator.sdk_for(version)
+          (Xcode.version.to_i >= 7) ? @locator.latest_sdk : @locator.sdk_for(version)
         else
           @locator.sdk_for v
         end
@@ -206,6 +206,14 @@ module OS
       "7.3"   => { clang: "7.3", clang_build: 703 },
       "7.3.1" => { clang: "7.3", clang_build: 703 },
       "8.0"   => { clang: "8.0", clang_build: 800 },
+      "8.1"   => { clang: "8.0", clang_build: 800 },
+      "8.2"   => { clang: "8.0", clang_build: 800 },
+      "8.2.1" => { clang: "8.0", clang_build: 800 },
+      "8.3"   => { clang: "8.1", clang_build: 802 },
+      "8.3.1" => { clang: "8.1", clang_build: 802 },
+      "8.3.2" => { clang: "8.1", clang_build: 802 },
+      "8.3.3" => { clang: "8.1", clang_build: 802 },
+      "9.0"   => { clang: "9.0", clang_build: 900 },
     }.freeze
 
     def compilers_standard?
