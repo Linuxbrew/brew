@@ -38,7 +38,7 @@ def curl(*args)
 end
 
 def curl_download(*args, to: nil, **options)
-  curl(*args, "--location", "--remote-time", "--continue-at", "-", "--output", to, **options)
+  curl("--location", "--remote-time", "--continue-at", "-", "--output", to, *args, **options)
 end
 
 def curl_output(*args, **options)

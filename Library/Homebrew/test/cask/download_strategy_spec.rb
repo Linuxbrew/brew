@@ -26,11 +26,11 @@ describe "download strategies", :cask do
       downloader.fetch
 
       expect(downloader).to have_received(:curl).with(
-        cask.url.to_s,
         "--location",
         "--remote-time",
         "--continue-at", "-",
         "--output", kind_of(Pathname),
+        cask.url.to_s,
         user_agent: :default
       )
     end
