@@ -849,22 +849,7 @@ class FormulaAuditor
       problem "#{Regexp.last_match(2)} modules should be vendored rather than use deprecated `depends_on \"#{Regexp.last_match(1)}\" => :#{Regexp.last_match(2)}#{Regexp.last_match(3)}`"
     end
 
-    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+(.*)/
-      dep = Regexp.last_match(1)
-      Regexp.last_match(2).split(" ").map do |o|
-        break if ["if", "unless"].include?(o)
-        next unless o =~ /^\[?['"](.*)['"]/
-        problem "Dependency #{dep} should not use option #{Regexp.last_match(1)}"
-      end
-    end
-
-    if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
-      problem "Use \"if build.#{Regexp.last_match(1).downcase}?\" instead"
-    end
-
     problem "Use separate make calls" if line.include?("make && make")
-
-    problem "Use spaces instead of tabs for indentation" if line =~ /^[ ]*\t/
 
     # Avoid hard-coding compilers
     if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?(gcc|llvm-gcc|clang)['" ]}
@@ -879,72 +864,12 @@ class FormulaAuditor
       problem "Use ENV instead of invoking '#{Regexp.last_match(1)}' to modify the environment"
     end
 
-    if line =~ /version == ['"]HEAD['"]/
-      problem "Use 'build.head?' instead of inspecting 'version'"
-    end
-
-    if line =~ /build\.include\?[\s\(]+['"]\-\-(.*)['"]/
-      problem "Reference '#{Regexp.last_match(1)}' without dashes"
-    end
-
-    if line =~ /build\.include\?[\s\(]+['"]with(out)?-(.*)['"]/
-      problem "Use build.with#{Regexp.last_match(1)}? \"#{Regexp.last_match(2)}\" instead of build.include? 'with#{Regexp.last_match(1)}-#{Regexp.last_match(2)}'"
-    end
-
-    if line =~ /build\.with\?[\s\(]+['"]-?-?with-(.*)['"]/
-      problem "Don't duplicate 'with': Use `build.with? \"#{Regexp.last_match(1)}\"` to check for \"--with-#{Regexp.last_match(1)}\""
-    end
-
-    if line =~ /build\.without\?[\s\(]+['"]-?-?without-(.*)['"]/
-      problem "Don't duplicate 'without': Use `build.without? \"#{Regexp.last_match(1)}\"` to check for \"--without-#{Regexp.last_match(1)}\""
-    end
-
-    if line =~ /unless build\.with\?(.*)/
-      problem "Use if build.without?#{Regexp.last_match(1)} instead of unless build.with?#{Regexp.last_match(1)}"
-    end
-
-    if line =~ /unless build\.without\?(.*)/
-      problem "Use if build.with?#{Regexp.last_match(1)} instead of unless build.without?#{Regexp.last_match(1)}"
-    end
-
-    if line =~ /(not\s|!)\s*build\.with?\?/
-      problem "Don't negate 'build.with?': use 'build.without?'"
-    end
-
-    if line =~ /(not\s|!)\s*build\.without?\?/
-      problem "Don't negate 'build.without?': use 'build.with?'"
-    end
-
     if line =~ /ARGV\.(?!(debug\?|verbose\?|value[\(\s]))/
       problem "Use build instead of ARGV to check options"
     end
 
-    if line.include?("MACOS_VERSION")
-      problem "Use MacOS.version instead of MACOS_VERSION"
-    end
-
-    if line.include?("MACOS_FULL_VERSION")
-      problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
-    end
-
-    if line =~ /^def (\w+).*$/
-      problem "Define method #{Regexp.last_match(1).inspect} in the class body, not at the top-level"
-    end
-
-    if line.include?("ENV.fortran") && !formula.requirements.map(&:class).include?(FortranRequirement)
-      problem "Use `depends_on :fortran` instead of `ENV.fortran`"
-    end
-
     if line =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaRequirement)
       problem "Use `depends_on :java` to set JAVA_HOME"
-    end
-
-    if line =~ /depends_on :(.+) (if.+|unless.+)$/
-      conditional_dep_problems(Regexp.last_match(1).to_sym, Regexp.last_match(2), $&)
-    end
-
-    if line =~ /depends_on ['"](.+)['"] (if.+|unless.+)$/
-      conditional_dep_problems(Regexp.last_match(1), Regexp.last_match(2), $&)
     end
 
     return unless @strict
@@ -991,18 +916,6 @@ class FormulaAuditor
       is set correctly and expected files are installed.
       The prefix configure/make argument may be case-sensitive.
     EOS
-  end
-
-  def conditional_dep_problems(dep, condition, line)
-    quoted_dep = quote_dep(dep)
-    dep = Regexp.escape(dep.to_s)
-
-    case condition
-    when /if build\.include\? ['"]with-#{dep}['"]$/, /if build\.with\? ['"]#{dep}['"]$/
-      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :optional")
-    when /unless build\.include\? ['"]without-#{dep}['"]$/, /unless build\.without\? ['"]#{dep}['"]$/
-      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :recommended")
-    end
   end
 
   def quote_dep(dep)

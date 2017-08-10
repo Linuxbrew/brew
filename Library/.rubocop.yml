@@ -118,6 +118,10 @@ Style/Documentation:
 Style/Encoding:
   Enabled: true
 
+# use spaces for indentation; detect tabs
+Style/Tab:
+  Enabled: true
+
 # dashes in filenames are typical
 Style/FileName:
   Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/

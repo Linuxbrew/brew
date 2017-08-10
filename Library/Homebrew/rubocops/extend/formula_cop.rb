@@ -55,6 +55,7 @@ module RuboCop
       # Returns all string nodes among the descendants of given node
       def find_strings(node)
         return [] if node.nil?
+        return node if node.str_type?
         node.each_descendant(:str)
       end
 
@@ -100,7 +101,9 @@ module RuboCop
       def find_method_with_args(node, method_name, *args)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          yield method if parameters_passed?(method, *args)
+          next unless parameters_passed?(method, *args)
+          return true unless block_given?
+          yield method
         end
       end
 
@@ -114,6 +117,7 @@ module RuboCop
           next unless method.receiver && (method.receiver.const_name == instance || method.receiver.method_name == instance)
           @offense_source_range = method.source_range
           @offensive_node = method
+          return true unless block_given?
           yield method
         end
       end
@@ -165,6 +169,20 @@ module RuboCop
         type_match && name_match
       end
 
+      # Find CONSTANTs in the source
+      # if block given, yield matching nodes
+      def find_const(node, const_name)
+        return if node.nil?
+        node.each_child_node(:const) do |const_node|
+          next if const_node.const_name != const_name
+          @offensive_node = const_node
+          @offense_source_range = const_node.source_range
+          yield const_node if block_given?
+          return true
+        end
+        nil
+      end
+
       # To compare node with appropriate Ruby variable
       def node_equals?(node, var)
         node == Parser::CurrentRuby.parse(var.inspect)
@@ -204,11 +222,12 @@ module RuboCop
       end
 
       # Returns a method definition node with method_name
-      def find_method_def(node, method_name)
+      # Returns first method def if method_name is nil
+      def find_method_def(node, method_name = nil)
         return if node.nil?
         node.each_child_node(:def) do |def_node|
           def_method_name = method_name(def_node)
-          next unless method_name == def_method_name
+          next unless method_name == def_method_name || method_name.nil?
           @offensive_node = def_node
           @offense_source_range = def_node.source_range
           return def_node

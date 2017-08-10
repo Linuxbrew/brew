@@ -88,6 +88,59 @@ module RuboCop
             end
           end
 
+          find_every_method_call_by_name(body_node, :depends_on).each do |m|
+            next unless modifier?(m)
+            dep, option = hash_dep(m)
+            next if dep.nil? || option.nil?
+            problem "Dependency #{string_content(dep)} should not use option #{string_content(option)}"
+          end
+
+          find_instance_method_call(body_node, :version, :==) do |m|
+            next unless parameters_passed?(m, "HEAD")
+            problem "Use 'build.head?' instead of inspecting 'version'"
+          end
+
+          find_instance_method_call(body_node, :ENV, :fortran) do
+            next if depends_on?(:fortran)
+            problem "Use `depends_on :fortran` instead of `ENV.fortran`"
+          end
+
+          find_instance_method_call(body_node, :ARGV, :include?) do |m|
+            param = parameters(m).first
+            next unless match = regex_match_group(param, %r{--(HEAD|devel)})
+            problem "Use \"if build.#{match[1].downcase}?\" instead"
+          end
+
+          find_const(body_node, :MACOS_VERSION) do
+            problem "Use MacOS.version instead of MACOS_VERSION"
+          end
+
+          find_const(body_node, :MACOS_FULL_VERSION) do
+            problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
+          end
+
+          dependency(body_node) do |m|
+            # handle symbols and shit: WIP
+            next unless modifier?(m.parent)
+            dep = parameters(m).first
+            condition = m.parent.condition
+            if (condition.if? && condition.method_name == :include? && parameters_passed(condition, /with-#{string_content(dep)}$/))||
+                (condition.if? && condition.method_name == :with? && parameters_passed?(condition, /#{string_content(dep)}$/))
+              problem "Replace #{m.parent.source} with #{dep.source} => :optional"
+            end
+            if (condition.unless? && condition.method_name == :include? && parameters_passed?(condition, /without-#{string_content(dep)}$/))||
+                (condition.unless? && condition.method_name == :without? && parameters_passed?(condition, /#{string_content(dep)}$/))
+              problem "Replace #{m.parent.source} with #{dep.source} => :recommended"
+            end
+          end
+
+          find_every_method_call_by_name(body_node, :depends_on).each do |m|
+            next unless modifier?(m.parent)
+            dep = parameters(m).first
+            next if dep.hash_type?
+            condition = m.parent.node_parts
+          end
+
           find_method_with_args(body_node, :fails_with, :llvm) do
             problem "'fails_with :llvm' is now a no-op so should be removed"
           end
@@ -154,9 +207,81 @@ module RuboCop
             problem "Use the `#{method}` Ruby method instead of `#{m.source}`"
           end
 
+          if find_method_def(@processed_source.ast)
+            problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
+          end
+
+          find_instance_method_call(body_node, :build, :without?) do |m|
+            next unless unless_modifier?(m.parent)
+            correct = m.source.gsub("out?", "?").gsub("unless", "if")
+            problem "Use #{correct} instead of unless #{m.source}"
+          end
+
+          find_instance_method_call(body_node, :build, :with?) do |m|
+            next unless unless_modifier?(m.parent)
+            correct = m.source.gsub("?", "out?").gsub("unless", "if")
+            problem "Use #{correct} instead of unless #{m.source}"
+          end
+
+          find_instance_method_call(body_node, :build, :with?) do |m|
+            next unless negation?(m)
+            problem "Don't negate 'build.with?': use 'build.without?'"
+          end
+
+          find_instance_method_call(body_node, :build, :without?) do |m|
+            next unless negation?(m)
+            problem "Don't negate 'build.without?': use 'build.with?'"
+          end
+
+          find_instance_method_call(body_node, :build, :without?) do |m|
+            arg = parameters(m).first
+            next unless match = regex_match_group(arg, %r{-?-?without-(.*)})
+            problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
+          end
+
+          find_instance_method_call(body_node, :build, :with?) do |m|
+            arg = parameters(m).first
+            next unless match = regex_match_group(arg, %r{-?-?with-(.*)})
+            problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
+          end
+
+          find_instance_method_call(body_node, :build, :include?) do |m|
+            arg = parameters(m).first
+            next unless match = regex_match_group(arg, %r{with(out)?-(.*)})
+            problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
+          end
+
+          find_instance_method_call(body_node, :build, :include?) do |m|
+            arg = parameters(m).first
+            next unless match = regex_match_group(arg, %r{\-\-(.*)})
+            problem "Reference '#{match[1]}' without dashes"
+          end
 
         end
 
+        def unless_modifier?(node)
+          node.modifier_form? && node.unless?
+        end
+
+        def modifier?(node)
+          node.modifier_form?
+        end
+
+        def_node_search :condition, <<-EOS.undent
+          (send (send nil :build) $_ $({str sym} _))
+        EOS
+
+        def_node_search :dependency, <<-EOS.undent
+          (send nil :depends_on ({str sym} _))
+        EOS
+
+        # Match depends_on with hash as argument
+        def_node_search :hash_dep, <<-EOS.undent
+          {$(hash (pair $(str _) $(str _)))
+           $(hash (pair $(str _) (array $(str _) ...)))}
+        EOS
+
+        def_node_matcher :negation?, '(send ... :!)'
         # This is Pattern Matching method for AST
         # Takes the AST node as argument and yields matching node if block given
         # Else returns boolean for the match
