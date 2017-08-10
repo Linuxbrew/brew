@@ -5,12 +5,6 @@ class GlibcRequirement < Requirement
   default_formula "glibc"
   @system_version = nil
 
-  def initialize
-    # Bottles for Linuxbrew are built using glibc 2.19.
-    @version = "2.19"
-    super
-  end
-
   def self.system_version
     return @system_version if @system_version
     libc = ["/lib/x86_64-linux-gnu/libc.so.6", "/lib64/libc.so.6", "/usr/lib64/libc.so.6", "/lib/libc.so.6", "/usr/lib/libc.so.6", "/lib/i386-linux-gnu/libc.so.6", "/lib/arm-linux-gnueabihf/libc.so.6"].find do |s|
@@ -25,11 +19,11 @@ class GlibcRequirement < Requirement
   satisfy(build_env: false) do
     next true unless OS.linux?
     begin
-      next true if to_dependency.installed?
+      # The minimum version of glibc required to use Linuxbrew bottles.
+      to_dependency.installed? ||
+        Version.new(self.class.system_version.to_s) >= Version.new(to_dependency.to_formula.version)
     rescue FormulaUnavailableError
-      # Fix for brew tests, which uses NullLoader.
       true
     end
-    Version.new(self.class.system_version.to_s) >= Version.new(@version)
   end
 end
