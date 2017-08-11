@@ -4,7 +4,7 @@ module Git
   module_function
 
   def last_revision_commit_of_file(repo, file, before_commit: nil)
-    args = ["--skip=#{before_commit.nil? ? 1 : before_commit.split("..").first}"]
+    args = [before_commit.nil? ? "--skip=1" : before_commit.split("..").first]
 
     out, = Open3.capture3(
       HOMEBREW_SHIMS_PATH/"scm/git", "-C", repo,
