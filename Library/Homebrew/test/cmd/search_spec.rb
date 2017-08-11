@@ -1,7 +1,7 @@
 describe "brew search", :integration_test do
   before(:each) do
     setup_test_formula "testball"
-    setup_remote_tap "caskroom/cask/test"
+    setup_remote_tap "caskroom/cask"
   end
 
   it "lists all available Formulae when no argument is given" do
