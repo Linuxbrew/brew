@@ -11,7 +11,6 @@ end
 def curl_args(*extra_args, show_output: false, user_agent: :default)
   args = [
     curl_executable.to_s,
-    "--fail",
     "--show-error",
   ]
 
@@ -25,6 +24,7 @@ def curl_args(*extra_args, show_output: false, user_agent: :default)
   end
 
   unless show_output
+    args << "--fail"
     args << "--progress-bar" unless ARGV.verbose?
     args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
     args << "--silent" if !$stdout.tty? || ENV["TRAVIS"]
