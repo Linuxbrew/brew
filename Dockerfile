@@ -13,7 +13,7 @@ ADD . /home/linuxbrew/.linuxbrew/Homebrew
 RUN chown -R linuxbrew: /home/linuxbrew/.linuxbrew \
 	&& mkdir /home/linuxbrew/.linuxbrew/bin \
 	&& ln -s ../Homebrew/bin/brew /home/linuxbrew/.linuxbrew/bin/ \
-	&& cd /home/linuxbrew/.linuxbrew \
+	&& cd /home/linuxbrew/.linuxbrew/Homebrew \
 	&& git remote set-url origin https://github.com/Linuxbrew/brew.git
 
 USER linuxbrew
