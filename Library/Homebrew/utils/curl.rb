@@ -11,7 +11,6 @@ end
 def curl_args(*extra_args, show_output: false, user_agent: :default)
   args = [
     curl_executable.to_s,
-    "--fail",
     "--show-error",
   ]
 
@@ -25,6 +24,7 @@ def curl_args(*extra_args, show_output: false, user_agent: :default)
   end
 
   unless show_output
+    args << "--fail"
     args << "--progress-bar" unless ARGV.verbose?
     args << "--verbose" if ENV["HOMEBREW_CURL_VERBOSE"]
     args << "--silent" if !$stdout.tty? || ENV["TRAVIS"]
@@ -38,7 +38,16 @@ def curl(*args)
 end
 
 def curl_download(*args, to: nil, **options)
-  curl("--location", "--remote-time", "--continue-at", "-", "--output", to, *args, **options)
+  continue_at ||= "-"
+  curl("--location", "--remote-time", "--continue-at", continue_at, "--output", to, *args, **options)
+rescue ErrorDuringExecution
+  # `curl` error 33: HTTP server doesn't seem to support byte ranges. Cannot resume.
+  if $CHILD_STATUS.exitstatus == 33 && continue_at == "-"
+    continue_at = "0"
+    retry
+  end
+
+  raise
 end
 
 def curl_output(*args, **options)
