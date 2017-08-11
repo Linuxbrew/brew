@@ -1,6 +1,6 @@
 sut:
   build: .
-  command: sh -c 'git -C /home/linuxbrew/.linuxbrew fetch --unshallow && brew test-bot'
+  command: sh -c 'git -C /home/linuxbrew/.linuxbrew/Homebrew fetch --unshallow && brew test-bot'
   environment:
     - GIT_BRANCH
     - GIT_SHA1
