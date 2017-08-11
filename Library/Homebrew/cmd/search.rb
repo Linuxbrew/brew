@@ -48,7 +48,7 @@ module Homebrew
         result = Formulary.factory(query).name
         results = Array(result)
       rescue FormulaUnavailableError
-        results = search_taps(query)
+        results = search_taps(query.split('/')[-1])
       end
 
       puts Formatter.columns(results) unless results.empty?
