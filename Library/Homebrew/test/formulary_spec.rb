@@ -27,6 +27,16 @@ describe Formulary do
   let(:bottle_dir) { Pathname.new("#{TEST_FIXTURE_DIR}/bottles") }
   let(:bottle) { bottle_dir/"testball_bottle-0.1.#{Utils::Bottles.tag}.bottle.tar.gz" }
 
+  describe "::load_formula" do
+    it "does not allow namespace repetition" do |example|
+      definition = "Foo = Class.new(Formula)"
+      namespace = "Test#{example.description.hash.abs}"
+      subject.load_formula("foo", "bar", definition, namespace)
+      expect { subject.load_formula("foo", "bar", definition, namespace) }
+        .to raise_error RuntimeError, /already.* loaded/
+    end
+  end
+
   describe "::class_s" do
     it "replaces '+' with 'x'" do
       expect(subject.class_s("foo++")).to eq("Fooxx")
