@@ -1,6 +1,7 @@
 #:  * `pin` <formulae>:
 #:    Pin the specified <formulae>, preventing them from being upgraded when
-#:    issuing the `brew upgrade` command. See also `unpin`.
+#:    issuing the `brew upgrade <formulae>` command (but can still be upgraded
+#:    as dependencies for other formulae). See also `unpin`.
 
 require "formula"
 

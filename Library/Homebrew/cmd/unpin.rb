@@ -1,6 +1,6 @@
 #:  * `unpin` <formulae>:
-#:    Unpin <formulae>, allowing them to be upgraded by `brew upgrade`. See also
-#:    `pin`.
+#:    Unpin <formulae>, allowing them to be upgraded by `brew upgrade <formulae>`.
+#:    See also `pin`.
 
 require "formula"
 

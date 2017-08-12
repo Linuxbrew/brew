@@ -26,6 +26,8 @@ To allow that formulae to update again:
 
     brew unpin <formula>
 
+Note that pinned, outdated formulae that are depended on by another formula will be upgraded when required as we do not allow formulae to be built against non-latest versions.
+
 ## How do I uninstall old versions of a formula?
 By default, Homebrew does not uninstall old versions of a formula, so
 over time you will accumulate old versions. To remove them, simply use:

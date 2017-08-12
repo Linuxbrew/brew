@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "July 2017" "Homebrew" "brew"
+.TH "BREW" "1" "August 2017" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -378,7 +378,7 @@ If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if t
 .
 .TP
 \fBpin\fR \fIformulae\fR
-Pin the specified \fIformulae\fR, preventing them from being upgraded when issuing the \fBbrew upgrade\fR command\. See also \fBunpin\fR\.
+Pin the specified \fIformulae\fR, preventing them from being upgraded when issuing the \fBbrew upgrade <formulae>\fR command (but can still be upgraded as dependencies for other formulae)\. See also \fBunpin\fR\.
 .
 .TP
 \fBpostinstall\fR \fIformula\fR
@@ -549,7 +549,7 @@ If \fB\-\-git\fR (or \fB\-g\fR) is passed, a Git repository will be initialized 
 .
 .TP
 \fBunpin\fR \fIformulae\fR
-Unpin \fIformulae\fR, allowing them to be upgraded by \fBbrew upgrade\fR\. See also \fBpin\fR\.
+Unpin \fIformulae\fR, allowing them to be upgraded by \fBbrew upgrade <formulae>\fR\. See also \fBpin\fR\.
 .
 .TP
 \fBuntap\fR \fItap\fR

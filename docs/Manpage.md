@@ -364,7 +364,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `pin` `formulae`:
     Pin the specified `formulae`, preventing them from being upgraded when
-    issuing the `brew upgrade` command. See also `unpin`.
+    issuing the `brew upgrade `formulae`` command (but can still be upgraded
+    as dependencies for other formulae). See also `unpin`.
 
   * `postinstall` `formula`:
     Rerun the post-install steps for `formula`.
@@ -529,8 +530,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     source. This is useful for creating patches for the software.
 
   * `unpin` `formulae`:
-    Unpin `formulae`, allowing them to be upgraded by `brew upgrade`. See also
-    `pin`.
+    Unpin `formulae`, allowing them to be upgraded by `brew upgrade `formulae``.
+    See also `pin`.
 
   * `untap` `tap`:
     Remove a tapped repository.
