@@ -63,11 +63,6 @@ describe Homebrew::Cleanup do
     end
   end
 
-  specify "::disk_cleanup_size" do
-    disk_cleanup_size = described_class.instance_variable_get(:@disk_cleanup_size)
-    expect(described_class.disk_cleanup_size).to eq(disk_cleanup_size)
-  end
-
   specify "::cleanup_formula" do
     f1 = Class.new(Testball) do
       version "1.0"
@@ -109,14 +104,30 @@ describe Homebrew::Cleanup do
     expect(f4).to be_installed
   end
 
-  specify "::cleanup_logs" do
-    path = (HOMEBREW_LOGS/"delete_me")
-    path.mkpath
-    ARGV << "--prune=all"
+  describe "::cleanup_logs" do
+    before do
+      path.mkpath
+    end
 
-    described_class.cleanup_logs
+    let(:path) { (HOMEBREW_LOGS/"delete_me") }
 
-    expect(path).not_to exist
+    it "cleans all logs if prune all" do
+      ARGV << "--prune=all"
+      described_class.cleanup_logs
+      expect(path).not_to exist
+    end
+
+    it "cleans up logs if older than 14 days" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 15)
+      described_class.cleanup_logs
+      expect(path).not_to exist
+    end
+
+    it "does not clean up logs less than 14 days old" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
+      described_class.cleanup_logs
+      expect(path).to exist
+    end
   end
 
   describe "::cleanup_cache" do
@@ -127,6 +138,15 @@ describe Homebrew::Cleanup do
       described_class.cleanup_cache
 
       expect(incomplete).not_to exist
+    end
+
+    it "cleans up 'glide_home'" do
+      glide_home = (HOMEBREW_CACHE/"glide_home")
+      glide_home.mkpath
+
+      described_class.cleanup_cache
+
+      expect(glide_home).not_to exist
     end
 
     it "cleans up 'java_cache'" do
@@ -151,20 +171,28 @@ describe Homebrew::Cleanup do
       git = (HOMEBREW_CACHE/"gist--git")
       gist = (HOMEBREW_CACHE/"gist")
       svn = (HOMEBREW_CACHE/"gist--svn")
+
       git.mkpath
       gist.mkpath
       FileUtils.touch svn
+
       allow(ARGV).to receive(:value).with("prune").and_return("all")
-      begin
-        described_class.cleanup_cache
-        expect(git).not_to exist
-        expect(gist).to exist
-        expect(svn).not_to exist
-      ensure
-        FileUtils.rm_rf(git)
-        FileUtils.rm_rf(gist)
-        FileUtils.rm_rf(svn)
-      end
+
+      described_class.cleanup_cache
+
+      expect(git).not_to exist
+      expect(gist).to exist
+      expect(svn).not_to exist
+    end
+
+    it "does not clean up directories that are not VCS checkouts" do
+      git = (HOMEBREW_CACHE/"git")
+      git.mkpath
+      allow(ARGV).to receive(:value).with("prune").and_return("all")
+
+      described_class.cleanup_cache
+
+      expect(git).to exist
     end
 
     it "cleans up VCS checkout directories with modified time < prune time" do
@@ -172,12 +200,16 @@ describe Homebrew::Cleanup do
       foo.mkpath
       allow(ARGV).to receive(:value).with("prune").and_return("1")
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
-      begin
-        described_class.cleanup_cache
-        expect(foo).not_to exist
-      ensure
-        FileUtils.rm_rf(foo)
-      end
+      described_class.cleanup_cache
+      expect(foo).not_to exist
+    end
+
+    it "does not clean up VCS checkout directories with modified time >= prune time" do
+      foo = (HOMEBREW_CACHE/"--foo")
+      foo.mkpath
+      allow(ARGV).to receive(:value).with("prune").and_return("1")
+      described_class.cleanup_cache
+      expect(foo).to exist
     end
 
     context "cleans old files in HOMEBREW_CACHE" do
@@ -213,21 +245,27 @@ describe Homebrew::Cleanup do
       end
 
       it "cleans up file if stale" do
-        puts described_class.cleanup_cache
+        described_class.cleanup_cache
         expect(bottle).not_to exist
         expect(testball).not_to exist
       end
     end
   end
 
-  specify "::prune?" do
-    foo = mktmpdir/"foo.rb"
-    foo.mkpath
-    allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
-    begin
+  describe "::prune?" do
+    before do
+      foo.mkpath
+    end
+
+    let(:foo) { mktmpdir/"foo.rb" }
+
+    it "returns true when path_modified_time < days_default" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
       expect(described_class.prune?(foo, days_default: "1")).to be_truthy
-    ensure
-      FileUtils.rm_rf(foo)
+    end
+
+    it "returns true when path_modified_time >= days_default" do
+      expect(described_class.prune?(foo, days_default: "2")).to be_falsey
     end
   end
 end
