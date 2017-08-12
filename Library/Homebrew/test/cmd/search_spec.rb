@@ -1,6 +1,7 @@
 describe "brew search", :integration_test do
   before(:each) do
     setup_test_formula "testball"
+    setup_remote_tap "caskroom/cask"
   end
 
   it "lists all available Formulae when no argument is given" do
@@ -20,6 +21,13 @@ describe "brew search", :integration_test do
   it "supports searching a fully-qualified name " do
     expect { brew "search", "homebrew/homebrew-core/testball" }
       .to output(/testball/).to_stdout
+      .and not_to_output.to_stderr
+      .and be_a_success
+  end
+
+  it "falls back to a tap search when no formula is found" do
+    expect { brew "search", "caskroom/cask/firefox" }
+      .to output(/firefox/).to_stdout
       .and not_to_output.to_stderr
       .and be_a_success
   end

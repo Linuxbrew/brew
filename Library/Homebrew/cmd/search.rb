@@ -43,15 +43,15 @@ module Homebrew
       Descriptions.search(regex, :desc).print
     elsif ARGV.first =~ HOMEBREW_TAP_FORMULA_REGEX
       query = ARGV.first
-      user, repo, name = query.split("/", 3)
 
       begin
         result = Formulary.factory(query).name
+        results = Array(result)
       rescue FormulaUnavailableError
-        result = search_tap(user, repo, name)
+        _, _, name = query.split("/", 3)
+        results = search_taps(name)
       end
 
-      results = Array(result)
       puts Formatter.columns(results) unless results.empty?
     else
       query = ARGV.first
