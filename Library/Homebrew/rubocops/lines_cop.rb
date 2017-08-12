@@ -88,118 +88,118 @@ module RuboCop
             end
           end
 
-          [:debug?, :verbose?, :value].each do |m|
-            find_instance_method_call(body_node, :ARGV, m) do
-              problem "Use build instead of ARGV to check options"
-            end
-          end
-
-          find_instance_method_call(body_node, :man, :+) do |m|
-            next unless match = regex_match_group(parameters(m).first, %r{man[1-8]})
-            problem "\"#{m.source}\" should be \"#{match[1]}\""
-          end
-
-          # Avoid hard-coding compilers
-          find_every_method_call_by_name(body_node, :system).each do |m|
-            param = parameters(m).first
-            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
-              problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
-            elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
-              problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
-            end
-          end
-
-          find_instance_method_call(body_node, :ENV, :[]=) do |m|
-            param = parameters(m)[1]
-            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
-              problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
-            elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
-              problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
-            end
-          end
-
-          # Prefer formula path shortcuts in strings
-          formula_path_strings(body_node, :prefix) do |p|
-            next unless match = regex_match_group(p, %r{(/(man))[/'"]})
-            problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
-          end
-
-          formula_path_strings(body_node, :share) do |p|
-            if match = regex_match_group(p, %r{/(bin|include|libexec|lib|sbin|share|Frameworks)}i)
-              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[1].downcase}}\""
-            end
-            if match = regex_match_group(p, %r{((/share/man/|\#\{man\}/)(man[1-8]))})
-              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
-            end
-            if match = regex_match_group(p, %r{(/share/(info|man))})
-              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2]}}\""
-            end
-          end
-
-          find_every_method_call_by_name(body_node, :depends_on) do |m|
-            key, value = destructure_hash(paramters(m).first)
-            next unless key.str_type?
-            next unless match = regex_match_group(value, %r{(lua|perl|python|ruby)(\d*)})
-            problem "#{match[1]} modules should be vendored rather than use deprecated #{m.source}`"
-          end
-
-          find_every_method_call_by_name(body_node, :system).each do |m|
-            next unless match = regex_match_group(parameters(m).first, %r{(env|export)(\s+)?})
-            problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
-          end
-
-          find_every_method_call_by_name(body_node, :depends_on).each do |m|
-            next unless modifier?(m)
-            dep, option = hash_dep(m)
-            next if dep.nil? || option.nil?
-            problem "Dependency #{string_content(dep)} should not use option #{string_content(option)}"
-          end
-
-          find_instance_method_call(body_node, :version, :==) do |m|
-            next unless parameters_passed?(m, "HEAD")
-            problem "Use 'build.head?' instead of inspecting 'version'"
-          end
-
-          find_instance_method_call(body_node, :ENV, :fortran) do
-            next if depends_on?(:fortran)
-            problem "Use `depends_on :fortran` instead of `ENV.fortran`"
-          end
-
-          find_instance_method_call(body_node, :ARGV, :include?) do |m|
-            param = parameters(m).first
-            next unless match = regex_match_group(param, %r{--(HEAD|devel)})
-            problem "Use \"if build.#{match[1].downcase}?\" instead"
-          end
-
-          find_const(body_node, :MACOS_VERSION) do
-            problem "Use MacOS.version instead of MACOS_VERSION"
-          end
-
-          find_const(body_node, :MACOS_FULL_VERSION) do
-            problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
-          end
-
-          dependency(body_node) do |m|
-            # handle symbols and shit: WIP
-            next unless modifier?(m.parent)
-            dep = parameters(m).first
-            condition = m.parent.condition
-            if (condition.if? && condition.method_name == :include? && parameters_passed(condition, /with-#{string_content(dep)}$/))||
-                (condition.if? && condition.method_name == :with? && parameters_passed?(condition, /#{string_content(dep)}$/))
-              problem "Replace #{m.parent.source} with #{dep.source} => :optional"
-            end
-            if (condition.unless? && condition.method_name == :include? && parameters_passed?(condition, /without-#{string_content(dep)}$/))||
-                (condition.unless? && condition.method_name == :without? && parameters_passed?(condition, /#{string_content(dep)}$/))
-              problem "Replace #{m.parent.source} with #{dep.source} => :recommended"
-            end
-          end
-
-          find_every_method_call_by_name(body_node, :depends_on).each do |m|
-            next unless modifier?(m.parent)
-            dep = parameters(m).first
-            next if dep.hash_type?
-            condition = m.parent.node_parts
-          end
+          # [:debug?, :verbose?, :value].each do |m|
+          #   find_instance_method_call(body_node, :ARGV, m) do
+          #     problem "Use build instead of ARGV to check options"
+          #   end
+          # end
+          #
+          # find_instance_method_call(body_node, :man, :+) do |m|
+          #   next unless match = regex_match_group(parameters(m).first, %r{man[1-8]})
+          #   problem "\"#{m.source}\" should be \"#{match[1]}\""
+          # end
+          #
+          # # Avoid hard-coding compilers
+          # find_every_method_call_by_name(body_node, :system).each do |m|
+          #   param = parameters(m).first
+          #   if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+          #     problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
+          #   elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
+          #     problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
+          #   end
+          # end
+          #
+          # find_instance_method_call(body_node, :ENV, :[]=) do |m|
+          #   param = parameters(m)[1]
+          #   if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+          #     problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
+          #   elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
+          #     problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
+          #   end
+          # end
+          #
+          # # Prefer formula path shortcuts in strings
+          # formula_path_strings(body_node, :prefix) do |p|
+          #   next unless match = regex_match_group(p, %r{(/(man))[/'"]})
+          #   problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
+          # end
+          #
+          # formula_path_strings(body_node, :share) do |p|
+          #   if match = regex_match_group(p, %r{/(bin|include|libexec|lib|sbin|share|Frameworks)}i)
+          #     problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[1].downcase}}\""
+          #   end
+          #   if match = regex_match_group(p, %r{((/share/man/|\#\{man\}/)(man[1-8]))})
+          #     problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
+          #   end
+          #   if match = regex_match_group(p, %r{(/share/(info|man))})
+          #     problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2]}}\""
+          #   end
+          # end
+          #
+          # find_every_method_call_by_name(body_node, :depends_on) do |m|
+          #   key, value = destructure_hash(paramters(m).first)
+          #   next unless key.str_type?
+          #   next unless match = regex_match_group(value, %r{(lua|perl|python|ruby)(\d*)})
+          #   problem "#{match[1]} modules should be vendored rather than use deprecated #{m.source}`"
+          # end
+          #
+          # find_every_method_call_by_name(body_node, :system).each do |m|
+          #   next unless match = regex_match_group(parameters(m).first, %r{(env|export)(\s+)?})
+          #   problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
+          # end
+          #
+          # find_every_method_call_by_name(body_node, :depends_on).each do |m|
+          #   next unless modifier?(m)
+          #   dep, option = hash_dep(m)
+          #   next if dep.nil? || option.nil?
+          #   problem "Dependency #{string_content(dep)} should not use option #{string_content(option)}"
+          # end
+          #
+          # find_instance_method_call(body_node, :version, :==) do |m|
+          #   next unless parameters_passed?(m, "HEAD")
+          #   problem "Use 'build.head?' instead of inspecting 'version'"
+          # end
+          #
+          # find_instance_method_call(body_node, :ENV, :fortran) do
+          #   next if depends_on?(:fortran)
+          #   problem "Use `depends_on :fortran` instead of `ENV.fortran`"
+          # end
+          #
+          # find_instance_method_call(body_node, :ARGV, :include?) do |m|
+          #   param = parameters(m).first
+          #   next unless match = regex_match_group(param, %r{--(HEAD|devel)})
+          #   problem "Use \"if build.#{match[1].downcase}?\" instead"
+          # end
+          #
+          # find_const(body_node, :MACOS_VERSION) do
+          #   problem "Use MacOS.version instead of MACOS_VERSION"
+          # end
+          #
+          # find_const(body_node, :MACOS_FULL_VERSION) do
+          #   problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
+          # end
+          #
+          # dependency(body_node) do |m|
+          #   # handle symbols and shit: WIP
+          #   next unless modifier?(m.parent)
+          #   dep = parameters(m).first
+          #   condition = m.parent.condition
+          #   if (condition.if? && condition.method_name == :include? && parameters_passed(condition, /with-#{string_content(dep)}$/))||
+          #       (condition.if? && condition.method_name == :with? && parameters_passed?(condition, /#{string_content(dep)}$/))
+          #     problem "Replace #{m.parent.source} with #{dep.source} => :optional"
+          #   end
+          #   if (condition.unless? && condition.method_name == :include? && parameters_passed?(condition, /without-#{string_content(dep)}$/))||
+          #       (condition.unless? && condition.method_name == :without? && parameters_passed?(condition, /#{string_content(dep)}$/))
+          #     problem "Replace #{m.parent.source} with #{dep.source} => :recommended"
+          #   end
+          # end
+          #
+          # find_every_method_call_by_name(body_node, :depends_on).each do |m|
+          #   next unless modifier?(m.parent)
+          #   dep = parameters(m).first
+          #   next if dep.hash_type?
+          #   condition = m.parent.node_parts
+          # end
 
           find_method_with_args(body_node, :fails_with, :llvm) do
             problem "'fails_with :llvm' is now a no-op so should be removed"
@@ -248,74 +248,74 @@ module RuboCop
             next unless method_called?(m, :new)
             problem "`depends_on` can take requirement classes instead of instances"
           end
-
-          os = [:leopard?, :snow_leopard?, :lion?, :mountain_lion?]
-          os.each do |version|
-            find_instance_method_call(body_node, :MacOS, version) do |m|
-              problem "\"#{m.source}\" is deprecated, use a comparison to MacOS.version instead"
-            end
-          end
-
-          dirPattern(body_node) do |m|
-            next unless m =~ /\[("[^\*{},]+")\]/
-            problem "Dir(#{Regexp.last_match(1)}) is unnecessary; just use #{Regexp.last_match(1)}"
-          end
-
-          fileUtils_methods= FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
-          find_method_with_args(body_node, :system, /fileUtils_methods/) do |m|
-            method = string_content(@offensive_node)
-            problem "Use the `#{method}` Ruby method instead of `#{m.source}`"
-          end
-
-          if find_method_def(@processed_source.ast)
-            problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
-          end
-
-          find_instance_method_call(body_node, :build, :without?) do |m|
-            next unless unless_modifier?(m.parent)
-            correct = m.source.gsub("out?", "?").gsub("unless", "if")
-            problem "Use #{correct} instead of unless #{m.source}"
-          end
-
-          find_instance_method_call(body_node, :build, :with?) do |m|
-            next unless unless_modifier?(m.parent)
-            correct = m.source.gsub("?", "out?").gsub("unless", "if")
-            problem "Use #{correct} instead of unless #{m.source}"
-          end
-
-          find_instance_method_call(body_node, :build, :with?) do |m|
-            next unless negation?(m)
-            problem "Don't negate 'build.with?': use 'build.without?'"
-          end
-
-          find_instance_method_call(body_node, :build, :without?) do |m|
-            next unless negation?(m)
-            problem "Don't negate 'build.without?': use 'build.with?'"
-          end
-
-          find_instance_method_call(body_node, :build, :without?) do |m|
-            arg = parameters(m).first
-            next unless match = regex_match_group(arg, %r{-?-?without-(.*)})
-            problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
-          end
-
-          find_instance_method_call(body_node, :build, :with?) do |m|
-            arg = parameters(m).first
-            next unless match = regex_match_group(arg, %r{-?-?with-(.*)})
-            problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
-          end
-
-          find_instance_method_call(body_node, :build, :include?) do |m|
-            arg = parameters(m).first
-            next unless match = regex_match_group(arg, %r{with(out)?-(.*)})
-            problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
-          end
-
-          find_instance_method_call(body_node, :build, :include?) do |m|
-            arg = parameters(m).first
-            next unless match = regex_match_group(arg, %r{\-\-(.*)})
-            problem "Reference '#{match[1]}' without dashes"
-          end
+          #
+          # os = [:leopard?, :snow_leopard?, :lion?, :mountain_lion?]
+          # os.each do |version|
+          #   find_instance_method_call(body_node, :MacOS, version) do |m|
+          #     problem "\"#{m.source}\" is deprecated, use a comparison to MacOS.version instead"
+          #   end
+          # end
+          #
+          # dirPattern(body_node) do |m|
+          #   next unless m =~ /\[("[^\*{},]+")\]/
+          #   problem "Dir(#{Regexp.last_match(1)}) is unnecessary; just use #{Regexp.last_match(1)}"
+          # end
+          #
+          # fileUtils_methods= FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
+          # find_method_with_args(body_node, :system, /fileUtils_methods/) do |m|
+          #   method = string_content(@offensive_node)
+          #   problem "Use the `#{method}` Ruby method instead of `#{m.source}`"
+          # end
+          #
+          # if find_method_def(@processed_source.ast)
+          #   problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :without?) do |m|
+          #   next unless unless_modifier?(m.parent)
+          #   correct = m.source.gsub("out?", "?").gsub("unless", "if")
+          #   problem "Use #{correct} instead of unless #{m.source}"
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :with?) do |m|
+          #   next unless unless_modifier?(m.parent)
+          #   correct = m.source.gsub("?", "out?").gsub("unless", "if")
+          #   problem "Use #{correct} instead of unless #{m.source}"
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :with?) do |m|
+          #   next unless negation?(m)
+          #   problem "Don't negate 'build.with?': use 'build.without?'"
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :without?) do |m|
+          #   next unless negation?(m)
+          #   problem "Don't negate 'build.without?': use 'build.with?'"
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :without?) do |m|
+          #   arg = parameters(m).first
+          #   next unless match = regex_match_group(arg, %r{-?-?without-(.*)})
+          #   problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :with?) do |m|
+          #   arg = parameters(m).first
+          #   next unless match = regex_match_group(arg, %r{-?-?with-(.*)})
+          #   problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :include?) do |m|
+          #   arg = parameters(m).first
+          #   next unless match = regex_match_group(arg, %r{with(out)?-(.*)})
+          #   problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
+          # end
+          #
+          # find_instance_method_call(body_node, :build, :include?) do |m|
+          #   arg = parameters(m).first
+          #   next unless match = regex_match_group(arg, %r{\-\-(.*)})
+          #   problem "Reference '#{match[1]}' without dashes"
+          # end
 
         end
 

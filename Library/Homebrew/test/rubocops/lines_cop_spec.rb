@@ -50,6 +50,12 @@ describe RuboCop::Cop::FormulaAudit::Lines do
       end
     end
   end
+  def expect_offense(expected, actual)
+    expect(actual.message).to eq(expected[:message])
+    expect(actual.severity).to eq(expected[:severity])
+    expect(actual.line).to eq(expected[:line])
+    expect(actual.column).to eq(expected[:column])
+  end
 end
 
 describe RuboCop::Cop::FormulaAudit::ClassInheritance do
@@ -76,6 +82,12 @@ describe RuboCop::Cop::FormulaAudit::ClassInheritance do
         expect_offense(expected, actual)
       end
     end
+  end
+  def expect_offense(expected, actual)
+    expect(actual.message).to eq(expected[:message])
+    expect(actual.severity).to eq(expected[:severity])
+    expect(actual.line).to eq(expected[:line])
+    expect(actual.column).to eq(expected[:column])
   end
 end
 
@@ -148,6 +160,12 @@ describe RuboCop::Cop::FormulaAudit::Comments do
         expect_offense(expected, actual)
       end
     end
+  end
+  def expect_offense(expected, actual)
+    expect(actual.message).to eq(expected[:message])
+    expect(actual.severity).to eq(expected[:severity])
+    expect(actual.line).to eq(expected[:line])
+    expect(actual.column).to eq(expected[:column])
   end
 end
 
@@ -469,5 +487,55 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with assert include" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          assert File.read("inbox").include?("Sample message 1")
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use `assert_match` instead of `assert ...include?`",
+                              severity: :convention,
+                              line: 4,
+                              column: 9,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "depends_on with an instance as an argument" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on FOO::BAR.new
+        end
+      EOS
+
+      expected_offenses = [{  message: "`depends_on` can take requirement classes instead of instances",
+                              severity: :convention,
+                              line: 4,
+                              column: 13,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+  end
+  def expect_offense(expected, actual)
+    expect(actual.message).to eq(expected[:message])
+    expect(actual.severity).to eq(expected[:severity])
+    expect(actual.line).to eq(expected[:line])
+    expect(actual.column).to eq(expected[:column])
   end
 end
