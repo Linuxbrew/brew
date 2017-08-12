@@ -10,33 +10,7 @@ Bindings are a special case of libraries that allow Python code to interact with
 
 Homebrew is happy to accept applications that are built in Python, whether the apps are available from PyPI or not. Homebrew generally won't accept libraries that can be installed correctly with `pip install foo`. Bindings may be installed for packages that provide them, especially if equivalent functionality isn't available through pip.
 
-## Running `setup.py`
-
-Homebrew provides a helper method, `Language::Python.setup_install_args`, which returns arguments for invoking `setup.py`. Your formula should use this instead of invoking `setup.py` explicitly. The syntax is:
-
-```ruby
-system "python", *Language::Python.setup_install_args(prefix)
-```
-
-where `prefix` is the destination prefix (usually `libexec` or `prefix`).
-
-## Python module dependencies
-
-In general, applications should unconditionally bundle all of their dependencies and libraries and should install any unsatisfied dependencies; these strategies are discussed in depth in the following sections.
-
-In the rare instance that this proves impractical, you can specify a Python module as an external dependency using this syntax:
-
-```ruby
-depends_on "numpy" => :python
-```
-
-Or if the import name is different from the module name:
-
-```ruby
-depends_on "MacFSEvents" => [:python, "fsevents"]
-```
-
-If you submit a formula with this syntax to core, you may be asked to rewrite it as a `Requirement`.
+In general, applications should unconditionally bundle all of their Python-language dependencies and libraries and should install any unsatisfied dependencies; these strategies are discussed in depth in the following sections.
 
 ## Applications
 
@@ -147,9 +121,9 @@ in case you need to do different things for different resources.
 
 ## Bindings
 
-To add an option to a formula to build Python bindings, use `depends_on :python => :recommended` and install the bindings conditionally on `build.with? "python"` in your `install` method.
+It should be okay to build bindings with system Python and use them with any binary-compatible Python. If that's the case, go ahead and build and install Python 2 bindings and don't add an option. If that isn't the case, it's an upstream bug; [here's some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
 
-Python bindings should be optional because if the formula is bottled, any `:recommended` or mandatory dependencies on `:python` are always resolved by installing the Homebrew `python` formula, which will upset users that prefer to use the system Python. This is because we cannot generally create a binary package that works against both versions of Python.
+If you'd like to add bindings for Python 3, please add `depends_on :python3 => :optional` and make the bindings conditional on `build.with?("python3")`.
 
 ### Dependencies
 
@@ -179,9 +153,7 @@ Sometimes we have to `inreplace` a `Makefile` to use our prefix for the Python b
 
 ### Python declarations
 
-Libraries **should** declare a dependency on `:python` or `:python3` as appropriate, which will respectively cause the formula to use the first python or python3 discovered in `PATH` at install time. If a library supports both Python 2.x and Python 3.x, the `:python` dependency **should** be `:recommended` (i.e. built by default) and the `:python3` dependency should be `:optional`. Python 2.x libraries **must** function when they are installed against either the system Python or Homebrew Python.
-
-Formulae that declare a dependency on `:python` will always be bottled against Homebrew's python, since we cannot in general build binary packages that can be imported from both Pythons. Users can add `--build-from-source` after `brew install` to compile against whichever python is in `PATH`.
+Python 2 libraries probably do not need a `depends_on :python` declaration; this way, they will be built with system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/). Libraries built for Python 3 should include `depends_on :python3`, which will bottle against Homebrew's python3, and use the first python3 discovered in `PATH` at build time when installing from source with `brew install --build-from-source`. If a library supports both Python 2.x and Python 3.x, the `:python3` dependency may be `:optional`. Python 2.x libraries must function when they are installed against either the system Python or Homebrew Python.
 
 ### Installing
 
@@ -191,7 +163,7 @@ Most formulae presently just install to `prefix`.
 
 ### Dependencies
 
-The dependencies of libraries must be installed so that they are importable. The principle of minimum surprise suggests that installing a Homebrew library should not alter the other libraries in a user's `sys.path`. The best way to achieve this is to only install dependencies if they are not already installed. To minimize the potential for linking conflicts, dependencies should be installed to `libexec/"vendor"` and added to `sys.path` by writing a second .pth file (named like "homebrew-foo-dependencies.pth") to the `prefix` site-packages.
+The dependencies of libraries must be installed so that they are importable. To minimize the potential for linking conflicts, dependencies should be installed to `libexec/"vendor"` and added to `sys.path` by writing a second .pth file (named like "homebrew-foo-dependencies.pth") to the `prefix` site-packages.
 
 The [matplotlib](https://github.com/Homebrew/homebrew-science/blob/master/matplotlib.rb) formula in [homebrew/science](https://github.com/Homebrew/homebrew-science) deploys this strategy.
 
@@ -208,6 +180,16 @@ Setuptools provides the `easy_install` command, which is an end-user package man
 Distutils and pip use a "flat" installation hierarchy that installs modules as individual files under site-packages while `easy_install` installs zipped eggs to site-packages instead.
 
 Distribute (not to be confused with distutils) is an obsolete fork of setuptools. Distlib is a package maintained outside the standard library which is used by pip for some low-level packaging operations and is not relevant to most `setup.py` users.
+
+### Running `setup.py`
+
+In the  event that a formula needs to interact with `setup.py` instead of calling `pip`, Homebrew provides a helper method, `Language::Python.setup_install_args`, which returns useful arguments for invoking `setup.py`. Your formula should use this instead of invoking `setup.py` explicitly. The syntax is:
+
+```ruby
+system "python", *Language::Python.setup_install_args(prefix)
+```
+
+where `prefix` is the destination prefix (usually `libexec` or `prefix`).
 
 ### What is `--single-version-externally-managed`?
 
