@@ -88,6 +88,66 @@ module RuboCop
             end
           end
 
+          [:debug?, :verbose?, :value].each do |m|
+            find_instance_method_call(body_node, :ARGV, m) do
+              problem "Use build instead of ARGV to check options"
+            end
+          end
+
+          find_instance_method_call(body_node, :man, :+) do |m|
+            next unless match = regex_match_group(parameters(m).first, %r{man[1-8]})
+            problem "\"#{m.source}\" should be \"#{match[1]}\""
+          end
+
+          # Avoid hard-coding compilers
+          find_every_method_call_by_name(body_node, :system).each do |m|
+            param = parameters(m).first
+            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+              problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
+            elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
+              problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
+            end
+          end
+
+          find_instance_method_call(body_node, :ENV, :[]=) do |m|
+            param = parameters(m)[1]
+            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+              problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
+            elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
+              problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
+            end
+          end
+
+          # Prefer formula path shortcuts in strings
+          formula_path_strings(body_node, :prefix) do |p|
+            next unless match = regex_match_group(p, %r{(/(man))[/'"]})
+            problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
+          end
+
+          formula_path_strings(body_node, :share) do |p|
+            if match = regex_match_group(p, %r{/(bin|include|libexec|lib|sbin|share|Frameworks)}i)
+              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[1].downcase}}\""
+            end
+            if match = regex_match_group(p, %r{((/share/man/|\#\{man\}/)(man[1-8]))})
+              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
+            end
+            if match = regex_match_group(p, %r{(/share/(info|man))})
+              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2]}}\""
+            end
+          end
+
+          find_every_method_call_by_name(body_node, :depends_on) do |m|
+            key, value = destructure_hash(paramters(m).first)
+            next unless key.str_type?
+            next unless match = regex_match_group(value, %r{(lua|perl|python|ruby)(\d*)})
+            problem "#{match[1]} modules should be vendored rather than use deprecated #{m.source}`"
+          end
+
+          find_every_method_call_by_name(body_node, :system).each do |m|
+            next unless match = regex_match_group(parameters(m).first, %r{(env|export)(\s+)?})
+            problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
+          end
+
           find_every_method_call_by_name(body_node, :depends_on).each do |m|
             next unless modifier?(m)
             dep, option = hash_dep(m)
@@ -279,6 +339,14 @@ module RuboCop
         def_node_search :hash_dep, <<-EOS.undent
           {$(hash (pair $(str _) $(str _)))
            $(hash (pair $(str _) (array $(str _) ...)))}
+        EOS
+
+        def_node_search :destructure_hash, <<-EOS.undent
+          (hash (pair $_ $_))
+        EOS
+
+        def_node_matcher :formula_path_strings, <<-EOS.undent
+          (dstr (begin (send nil %1)) $(str _ ))
         EOS
 
         def_node_matcher :negation?, '(send ... :!)'

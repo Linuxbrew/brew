@@ -824,49 +824,7 @@ class FormulaAuditor
       problem "\"(#{Regexp.last_match(1)}...#{Regexp.last_match(2)})\" should be \"(#{Regexp.last_match(3).downcase}+...)\""
     end
 
-    if line =~ /((man)\s*\+\s*(['"])(man[1-8])(['"]))/
-      problem "\"#{Regexp.last_match(1)}\" should be \"#{Regexp.last_match(4)}\""
-    end
-
-    # Prefer formula path shortcuts in strings
-    if line =~ %r[(\#\{prefix\}/(bin|include|libexec|lib|sbin|share|Frameworks))]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2).downcase}}\""
-    end
-
-    if line =~ %r[((\#\{prefix\}/share/man/|\#\{man\}/)(man[1-8]))]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(3)}}\""
-    end
-
-    if line =~ %r[((\#\{share\}/(man)))[/'"]]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(3)}}\""
-    end
-
-    if line =~ %r[(\#\{prefix\}/share/(info|man))]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2)}}\""
-    end
-
-    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
-      problem "#{Regexp.last_match(2)} modules should be vendored rather than use deprecated `depends_on \"#{Regexp.last_match(1)}\" => :#{Regexp.last_match(2)}#{Regexp.last_match(3)}`"
-    end
-
     problem "Use separate make calls" if line.include?("make && make")
-
-    # Avoid hard-coding compilers
-    if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?(gcc|llvm-gcc|clang)['" ]}
-      problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
-    end
-
-    if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?((g|llvm-g|clang)\+\+)['" ]}
-      problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
-    end
-
-    if line =~ /system\s+['"](env|export)(\s+|['"])/
-      problem "Use ENV instead of invoking '#{Regexp.last_match(1)}' to modify the environment"
-    end
-
-    if line =~ /ARGV\.(?!(debug\?|verbose\?|value[\(\s]))/
-      problem "Use build instead of ARGV to check options"
-    end
 
     if line =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaRequirement)
       problem "Use `depends_on :java` to set JAVA_HOME"
