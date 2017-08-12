@@ -20,8 +20,6 @@ module Formulary
       raise "Formula loading disabled by HOMEBREW_DISABLE_LOAD_FORMULA!"
     end
 
-    raise "Formula #{name} has already been loaded" if const_defined?(namespace)
-
     mod = Module.new
     const_set(namespace, mod)
     begin
