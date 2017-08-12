@@ -10,7 +10,7 @@ Bindings are a special case of libraries that allow Python code to interact with
 
 Homebrew is happy to accept applications that are built in Python, whether the apps are available from PyPI or not. Homebrew generally won't accept libraries that can be installed correctly with `pip install foo`. Bindings may be installed for packages that provide them, especially if equivalent functionality isn't available through pip.
 
-In general, applications should unconditionally bundle all of their Python-language dependencies and libraries and should install any unsatisfied dependencies; these strategies are discussed in depth in the following sections.
+Applications should unconditionally bundle all of their Python-language dependencies and libraries and should install any unsatisfied dependencies; these strategies are discussed in depth in the following sections.
 
 ## Applications
 
@@ -121,9 +121,9 @@ in case you need to do different things for different resources.
 
 ## Bindings
 
-It should be okay to build bindings with system Python and use them with any binary-compatible Python. If that's the case, go ahead and build and install Python 2 bindings and don't add an option. If that isn't the case, it's an upstream bug; [here's some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
+Build bindings with system Python by default (don't add an option) and they should be usable with any binary-compatible Python. If that isn't the case, it's an upstream bug; [here's some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/).
 
-If you'd like to add bindings for Python 3, please add `depends_on :python3 => :optional` and make the bindings conditional on `build.with?("python3")`.
+To add bindings for Python 3, please add `depends_on :python3 => :optional` and make the bindings conditional on `build.with?("python3")`.
 
 ### Dependencies
 
@@ -153,7 +153,7 @@ Sometimes we have to `inreplace` a `Makefile` to use our prefix for the Python b
 
 ### Python declarations
 
-Python 2 libraries probably do not need a `depends_on :python` declaration; this way, they will be built with system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/). Libraries built for Python 3 should include `depends_on :python3`, which will bottle against Homebrew's python3, and use the first python3 discovered in `PATH` at build time when installing from source with `brew install --build-from-source`. If a library supports both Python 2.x and Python 3.x, the `:python3` dependency may be `:optional`. Python 2.x libraries must function when they are installed against either the system Python or Homebrew Python.
+Python 2 libraries do not need a `depends_on :python` declaration; they will be built with system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/). Libraries built for Python 3 should include `depends_on :python3`, which will bottle against Homebrew's python3, and use the first python3 discovered in `PATH` at build time when installing from source with `brew install --build-from-source`. If a library supports both Python 2.x and Python 3.x, the `:python3` dependency should be `:optional`. Python 2.x libraries must function when they are installed against either the system Python or Homebrew Python.
 
 ### Installing
 
@@ -183,7 +183,7 @@ Distribute (not to be confused with distutils) is an obsolete fork of setuptools
 
 ### Running `setup.py`
 
-In the  event that a formula needs to interact with `setup.py` instead of calling `pip`, Homebrew provides a helper method, `Language::Python.setup_install_args`, which returns useful arguments for invoking `setup.py`. Your formula should use this instead of invoking `setup.py` explicitly. The syntax is:
+In the event that a formula needs to interact with `setup.py` instead of calling `pip`, Homebrew provides a helper method, `Language::Python.setup_install_args`, which returns useful arguments for invoking `setup.py`. Your formula should use this instead of invoking `setup.py` explicitly. The syntax is:
 
 ```ruby
 system "python", *Language::Python.setup_install_args(prefix)
