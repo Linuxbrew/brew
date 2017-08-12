@@ -56,7 +56,7 @@
 !/.travis.yml
 !/.codecov.yml
 !/.yardopts
-!/circle.yml
+!/.circleci/config.yml
 !/CODEOFCONDUCT.md
 !/CONTRIBUTING.md
 !/LICENSE.txt
