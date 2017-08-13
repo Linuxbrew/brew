@@ -297,12 +297,12 @@ module RuboCop
             problem "Don't negate 'build.without?': use 'build.with?'"
           end
 
-          # find_instance_method_call(body_node, :build, :without?) do |m|
-          #   arg = parameters(m).first
-          #   next unless match = regex_match_group(arg, %r{-?-?without-(.*)})
-          #   problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
-          # end
-          #
+          find_instance_method_call(body_node, :build, :without?) do |m|
+            arg = parameters(m).first
+            next unless match = regex_match_group(arg, %r{-?-?without-(.*)})
+            problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
+          end
+
           # find_instance_method_call(body_node, :build, :with?) do |m|
           #   arg = parameters(m).first
           #   next unless match = regex_match_group(arg, %r{-?-?with-(.*)})
