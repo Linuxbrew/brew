@@ -291,7 +291,7 @@ module GitHub
     "q=#{uri_escape(params_list.join(" "))}&per_page=100"
   end
 
-  def format_paramater(key, value)
+  def format_parameter(key, value)
     "#{key}:#{value}"
   end
 
