@@ -255,11 +255,14 @@ module RuboCop
               problem "\"#{m.source}\" is deprecated, use a comparison to MacOS.version instead"
             end
           end
-          #
-          # dirPattern(body_node) do |m|
-          #   next unless m =~ /\[("[^\*{},]+")\]/
-          #   problem "Dir(#{Regexp.last_match(1)}) is unnecessary; just use #{Regexp.last_match(1)}"
-          # end
+
+          find_instance_method_call(body_node, "Dir", :[]) do |m|
+            path = parameters(m).first
+            next if !path.str_type?
+            next unless match = regex_match_group(path, /^[^\*{},]+$/)
+            problem "Dir([\"#{string_content(path)}\"]) is unnecessary; just use \"#{match[0]}\""
+          end
+
           #
           # fileUtils_methods= FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
           # find_method_with_args(body_node, :system, /fileUtils_methods/) do |m|

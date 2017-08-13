@@ -552,6 +552,29 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with non glob DIR" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          rm_rf Dir["src/{llvm,test,librustdoc,etc/snapshot.pyc}"]
+          rm_rf Dir["src/snapshot.pyc"]
+        end
+      EOS
+
+      expected_offenses = [{  message: "Dir([\"src/snapshot.pyc\"]) is unnecessary; just use \"src/snapshot.pyc\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 13,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
