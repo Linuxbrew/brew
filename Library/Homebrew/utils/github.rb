@@ -228,34 +228,15 @@ module GitHub
   end
 
   def issues_matching(query, qualifiers = {})
-    uri = URI.parse("#{API_URL}/search/issues")
-    uri.query = build_query_string(query, qualifiers)
-    open(uri) { |json| json["items"] }
+    search("issues", query, **qualifiers)
   end
 
   def repository(user, repo)
-    open(URI.parse("#{API_URL}/repos/#{user}/#{repo}"))
+    open(path_to("repos", user, repo))
   end
 
-  def search_code(*params)
-    uri = URI.parse("#{API_URL}/search/code")
-    uri.query = "q=#{uri_escape(params.join(" "))}"
-    open(uri) { |json| json["items"] }
-  end
-
-  def build_query_string(query, qualifiers)
-    s = "q=#{uri_escape(query)}+"
-    s << build_search_qualifier_string(qualifiers)
-    s << "&per_page=100"
-  end
-
-  def build_search_qualifier_string(qualifiers)
-    {
-      repo: "Homebrew/homebrew-core",
-      in: "title",
-    }.update(qualifiers).map do |qualifier, value|
-      "#{qualifier}:#{value}"
-    end.join("+")
+  def search_code(**params)
+    search("code", **params)
   end
 
   def uri_escape(query)
@@ -292,7 +273,35 @@ module GitHub
   end
 
   def private_repo?(full_name)
-    uri = URI.parse("#{API_URL}/repos/#{full_name}")
+    uri = path_to "repos", full_name
     open(uri) { |json| json["private"] }
+  end
+
+  def query_string(*main_params, **qualifiers)
+    params_list = main_params
+
+    qualifiers.each do |key, value|
+      if value.is_a? Array
+        value.each { |v| params_list << format_parameter(key, v) }
+      else
+        params_list << format_parameter(key, v)
+      end
+    end
+
+    "q=#{uri_escape(params_list.join(" "))}&per_page=100"
+  end
+
+  def format_paramater(key, value)
+    "#{key}:#{value}"
+  end
+
+  def path_to(*subroutes)
+    URI.parse(File.join(API_URL, *subroutes))
+  end
+
+  def search(entity, *queries, **qualifiers)
+    uri = path_to "search", entity
+    uri.query = query_string(*queries, **qualifiers)
+    open(uri) { |json| json["items"] }
   end
 end
