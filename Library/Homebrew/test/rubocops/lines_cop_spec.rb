@@ -667,6 +667,30 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with negated build.with?" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def post_install
+            return if !build.with? "bar"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Don't negate 'build.with?': use 'build.without?'",
+                              severity: :convention,
+                              line: 5,
+                              column: 14,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])

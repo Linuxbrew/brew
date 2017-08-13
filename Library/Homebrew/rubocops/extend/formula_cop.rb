@@ -252,11 +252,15 @@ module RuboCop
       end
 
       # Check if method_name is called among the direct children nodes in the given node
+      # Check if the node itself is the method
       def method_called?(node, method_name)
+        if node.send_type? && node.method_name == method_name
+          offending_node(node)
+          return true
+        end
         node.each_child_node(:send) do |call_node|
           next unless call_node.method_name == method_name
-          @offensive_node = call_node
-          @offense_source_range = call_node.source_range
+          offending_node(call_node)
           return true
         end
         false
