@@ -596,6 +596,29 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+    it "with a top-level function def " do
+      source = <<-EOS.undent
+        def test
+           nil
+        end
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+        end
+      EOS
+
+      expected_offenses = [{  message: "Define method test in the class body, not at the top-level",
+                              severity: :convention,
+                              line: 1,
+                              column: 0,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])

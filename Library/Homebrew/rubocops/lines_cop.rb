@@ -271,9 +271,9 @@ module RuboCop
             problem "Use the `#{match}` Ruby method instead of `#{m.source}`"
           end
 
-          # if find_method_def(@processed_source.ast)
-          #   problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
-          # end
+          if find_method_def(@processed_source.ast)
+            problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
+          end
           #
           # find_instance_method_call(body_node, :build, :without?) do |m|
           #   next unless unless_modifier?(m.parent)

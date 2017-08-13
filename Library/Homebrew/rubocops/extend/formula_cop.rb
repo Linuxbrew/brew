@@ -232,6 +232,7 @@ module RuboCop
           @offense_source_range = def_node.source_range
           return def_node
         end
+        return if node.parent.nil?
         # If not found then, parent node becomes the offensive node
         @offensive_node = node.parent
         @offense_source_range = node.parent.source_range
