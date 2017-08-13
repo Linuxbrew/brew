@@ -248,13 +248,13 @@ module RuboCop
             next unless method_called?(m, :new)
             problem "`depends_on` can take requirement classes instead of instances"
           end
-          #
-          # os = [:leopard?, :snow_leopard?, :lion?, :mountain_lion?]
-          # os.each do |version|
-          #   find_instance_method_call(body_node, :MacOS, version) do |m|
-          #     problem "\"#{m.source}\" is deprecated, use a comparison to MacOS.version instead"
-          #   end
-          # end
+
+          os = [:leopard?, :snow_leopard?, :lion?, :mountain_lion?]
+          os.each do |version|
+            find_instance_method_call(body_node, "MacOS", version) do |m|
+              problem "\"#{m.source}\" is deprecated, use a comparison to MacOS.version instead"
+            end
+          end
           #
           # dirPattern(body_node) do |m|
           #   next unless m =~ /\[("[^\*{},]+")\]/

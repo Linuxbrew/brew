@@ -531,6 +531,27 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+    it "with old style OS check" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on :foo if MacOS.snow_leopard?
+        end
+      EOS
+
+      expected_offenses = [{  message: "\"MacOS.snow_leopard?\" is deprecated, use a comparison to MacOS.version instead",
+                              severity: :convention,
+                              line: 4,
+                              column: 21,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
