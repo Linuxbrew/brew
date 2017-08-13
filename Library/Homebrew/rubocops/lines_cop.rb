@@ -309,11 +309,11 @@ module RuboCop
             problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
           end
 
-          # find_instance_method_call(body_node, :build, :include?) do |m|
-          #   arg = parameters(m).first
-          #   next unless match = regex_match_group(arg, %r{with(out)?-(.*)})
-          #   problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
-          # end
+          find_instance_method_call(body_node, :build, :include?) do |m|
+            arg = parameters(m).first
+            next unless match = regex_match_group(arg, %r{with(out)?-(.*)})
+            problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
+          end
           #
           # find_instance_method_call(body_node, :build, :include?) do |m|
           #   arg = parameters(m).first

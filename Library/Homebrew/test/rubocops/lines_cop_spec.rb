@@ -763,6 +763,30 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with build.include?" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def post_install
+            return if build.include? "without-bar"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use build.without? \"bar\" instead of build.include? 'without-bar'",
+                              severity: :convention,
+                              line: 5,
+                              column: 30,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
