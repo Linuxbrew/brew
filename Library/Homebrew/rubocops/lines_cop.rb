@@ -274,13 +274,13 @@ module RuboCop
           if find_method_def(@processed_source.ast)
             problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
           end
-          #
-          # find_instance_method_call(body_node, :build, :without?) do |m|
-          #   next unless unless_modifier?(m.parent)
-          #   correct = m.source.gsub("out?", "?").gsub("unless", "if")
-          #   problem "Use #{correct} instead of unless #{m.source}"
-          # end
-          #
+
+          find_instance_method_call(body_node, :build, :without?) do |m|
+            next unless unless_modifier?(m.parent)
+            correct = m.source.gsub("out?", "?")
+            problem "Use if #{correct} instead of unless #{m.source}"
+          end
+
           # find_instance_method_call(body_node, :build, :with?) do |m|
           #   next unless unless_modifier?(m.parent)
           #   correct = m.source.gsub("?", "out?").gsub("unless", "if")
