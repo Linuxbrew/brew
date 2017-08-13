@@ -284,7 +284,7 @@ module GitHub
       if value.is_a? Array
         value.each { |v| params_list << format_parameter(key, v) }
       else
-        params_list << format_parameter(key, v)
+        params_list << format_parameter(key, value)
       end
     end
 
