@@ -263,13 +263,14 @@ module RuboCop
             problem "Dir([\"#{string_content(path)}\"]) is unnecessary; just use \"#{match[0]}\""
           end
 
-          #
-          # fileUtils_methods= FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|"
-          # find_method_with_args(body_node, :system, /fileUtils_methods/) do |m|
-          #   method = string_content(@offensive_node)
-          #   problem "Use the `#{method}` Ruby method instead of `#{m.source}`"
-          # end
-          #
+
+          fileUtils_methods= Regexp.new(FileUtils.singleton_methods(false).map { |m| Regexp.escape(m) }.join "|")
+          find_every_method_call_by_name(body_node, :system).each do |m|
+            param = parameters(m).first
+            next unless match = regex_match_group(param, fileUtils_methods)
+            problem "Use the `#{match}` Ruby method instead of `#{m.source}`"
+          end
+
           # if find_method_def(@processed_source.ast)
           #   problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
           # end
