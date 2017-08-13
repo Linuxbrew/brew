@@ -297,6 +297,11 @@ module RuboCop
         true
       end
 
+      # Check if negation is present in the given node
+      def negated?(node)
+        method_called?(node, :!)
+      end
+
       # Return all the caveats' string nodes in an array
       def caveats_strings
         find_strings(find_method_def(@body, :caveats))

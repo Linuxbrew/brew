@@ -288,15 +288,15 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, :build, :with?) do |m|
-            next unless method_called?(m.parent, :!)
+            next unless negated?(m.parent)
             problem "Don't negate 'build.with?': use 'build.without?'"
           end
 
-          # find_instance_method_call(body_node, :build, :without?) do |m|
-          #   next unless negation?(m)
-          #   problem "Don't negate 'build.without?': use 'build.with?'"
-          # end
-          #
+          find_instance_method_call(body_node, :build, :without?) do |m|
+            next unless negated?(m.parent)
+            problem "Don't negate 'build.without?': use 'build.with?'"
+          end
+
           # find_instance_method_call(body_node, :build, :without?) do |m|
           #   arg = parameters(m).first
           #   next unless match = regex_match_group(arg, %r{-?-?without-(.*)})
