@@ -232,7 +232,7 @@ module GitHub
   end
 
   def repository(user, repo)
-    open(path_to("repos", user, repo))
+    open(url_to("repos", user, repo))
   end
 
   def search_code(**params)
@@ -273,7 +273,7 @@ module GitHub
   end
 
   def private_repo?(full_name)
-    uri = path_to "repos", full_name
+    uri = url_to "repos", full_name
     open(uri) { |json| json["private"] }
   end
 
@@ -295,12 +295,12 @@ module GitHub
     "#{key}:#{value}"
   end
 
-  def path_to(*subroutes)
+  def url_to(*subroutes)
     URI.parse(File.join(API_URL, *subroutes))
   end
 
   def search(entity, *queries, **qualifiers)
-    uri = path_to "search", entity
+    uri = url_to "search", entity
     uri.query = query_string(*queries, **qualifiers)
     open(uri) { |json| json["items"] }
   end
