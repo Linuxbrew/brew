@@ -281,12 +281,12 @@ module RuboCop
             problem "Use if #{correct} instead of unless #{m.source}"
           end
 
-          # find_instance_method_call(body_node, :build, :with?) do |m|
-          #   next unless unless_modifier?(m.parent)
-          #   correct = m.source.gsub("?", "out?").gsub("unless", "if")
-          #   problem "Use #{correct} instead of unless #{m.source}"
-          # end
-          #
+          find_instance_method_call(body_node, :build, :with?) do |m|
+            next unless unless_modifier?(m.parent)
+            correct = m.source.gsub("?", "out?")
+            problem "Use if #{correct} instead of unless #{m.source}"
+          end
+
           # find_instance_method_call(body_node, :build, :with?) do |m|
           #   next unless negation?(m)
           #   problem "Don't negate 'build.with?': use 'build.without?'"
