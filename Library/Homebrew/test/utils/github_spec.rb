@@ -14,8 +14,8 @@ describe GitHub do
 
   describe "::query_string" do
     it "builds a query with the given hash parameters formatted as key:value" do
-      query = subject.query_string(user: "Homebrew", repo: "Brew")
-      expect(query).to eq("q=user%3AHomebrew+repo%3ABrew&per_page=100")
+      query = subject.query_string(user: "Homebrew", repo: "brew")
+      expect(query).to eq("q=user%3AHomebrew+repo%3Abrew&per_page=100")
     end
 
     it "adds a variable number of top-level string parameters to the query when provided" do

@@ -17,7 +17,7 @@ module Hbc
       def self.search_remote(query)
         matches = GitHub.search_code(user: "caskroom", path: "Casks",
                                      filename: query, extension: "rb")
-        Array(matches).map do |match|
+        matches.map do |match|
           tap = Tap.fetch(match["repository"]["full_name"])
           next if tap.installed?
           "#{tap.name}/#{File.basename(match["path"], ".rb")}"

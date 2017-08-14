@@ -104,7 +104,7 @@ module Homebrew
     valid_dirnames = ["Formula", "HomebrewFormula", "Casks", "."].freeze
     matches = GitHub.search_code(user: ["Homebrew", "caskroom"], filename: query, extension: "rb")
 
-    Array(matches).map do |match|
+    matches.map do |match|
       dirname, filename = File.split(match["path"])
       next unless valid_dirnames.include?(dirname)
       tap = Tap.fetch(match["repository"]["full_name"])

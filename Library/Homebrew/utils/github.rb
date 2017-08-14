@@ -296,12 +296,12 @@ module GitHub
   end
 
   def url_to(*subroutes)
-    URI.parse(File.join(API_URL, *subroutes))
+    URI.parse([API_URL, *subroutes].join("/"))
   end
 
   def search(entity, *queries, **qualifiers)
     uri = url_to "search", entity
     uri.query = query_string(*queries, **qualifiers)
-    open(uri) { |json| json["items"] }
+    open(uri) { |json| Array(json["items"]) }
   end
 end
