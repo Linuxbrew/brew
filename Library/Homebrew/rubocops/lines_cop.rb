@@ -173,14 +173,14 @@ module RuboCop
             problem "Use \"if build.#{match[1].downcase}?\" instead"
           end
 
-          # find_const(body_node, :MACOS_VERSION) do
-          #   problem "Use MacOS.version instead of MACOS_VERSION"
-          # end
-          #
-          # find_const(body_node, :MACOS_FULL_VERSION) do
-          #   problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
-          # end
-          #
+          find_const(body_node, "MACOS_VERSION") do
+            problem "Use MacOS.version instead of MACOS_VERSION"
+          end
+
+          find_const(body_node, "MACOS_FULL_VERSION") do
+            problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
+          end
+
           # dependency(body_node) do |m|
           #   # handle symbols and shit: WIP
           #   next unless modifier?(m.parent)

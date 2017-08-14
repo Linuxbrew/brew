@@ -173,8 +173,8 @@ module RuboCop
       # if block given, yield matching nodes
       def find_const(node, const_name)
         return if node.nil?
-        node.each_child_node(:const) do |const_node|
-          next if const_node.const_name != const_name
+        node.each_descendant(:const) do |const_node|
+          next unless const_node.const_name == const_name
           @offensive_node = const_node
           @offense_source_range = const_node.source_range
           yield const_node if block_given?

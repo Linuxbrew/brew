@@ -1189,6 +1189,30 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "with MACOS_VERSION const" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          test do
+            version = MACOS_VERSION
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use MacOS.version instead of MACOS_VERSION",
+                              severity: :convention,
+                              line: 5,
+                              column: 14,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
