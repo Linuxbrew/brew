@@ -135,14 +135,13 @@ module RuboCop
               problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2].downcase}}\""
             end
           end
+          find_every_method_call_by_name(body_node, :depends_on).each do |m|
+            key, value = destructure_hash(parameters(m).first)
+            next if (key.nil? || value.nil?)
+            next unless match = regex_match_group(value, %r{(lua|perl|python|ruby)(\d*)})
+            problem "#{match[1]} modules should be vendored rather than use deprecated #{m.source}`"
+          end
 
-          # find_every_method_call_by_name(body_node, :depends_on) do |m|
-          #   key, value = destructure_hash(paramters(m).first)
-          #   next unless key.str_type?
-          #   next unless match = regex_match_group(value, %r{(lua|perl|python|ruby)(\d*)})
-          #   problem "#{match[1]} modules should be vendored rather than use deprecated #{m.source}`"
-          # end
-          #
           # find_every_method_call_by_name(body_node, :system).each do |m|
           #   next unless match = regex_match_group(parameters(m).first, %r{(env|export)(\s+)?})
           #   problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
@@ -345,8 +344,8 @@ module RuboCop
            $(hash (pair $(str _) (array $(str _) ...)))}
         EOS
 
-        def_node_search :destructure_hash, <<-EOS.undent
-          (hash (pair $_ $_))
+        def_node_matcher :destructure_hash, <<-EOS.undent
+          (hash (pair $(str _) $(sym _)))
         EOS
 
         def_node_search :formula_path_strings, <<-EOS.undent
