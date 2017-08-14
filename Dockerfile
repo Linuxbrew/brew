@@ -1,5 +1,5 @@
 FROM ubuntu:trusty
-MAINTAINER Shaun Jackman <sjackman@gmail.com>
+LABEL maintainer="Shaun Jackman <sjackman@gmail.com>"
 
 RUN apt-get update \
 	&& apt-get install -y curl file g++ git make ruby2.0 ruby2.0-dev uuid-runtime \
