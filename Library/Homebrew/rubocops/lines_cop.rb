@@ -93,12 +93,12 @@ module RuboCop
               problem "Use build instead of ARGV to check options"
             end
           end
-          #
-          # find_instance_method_call(body_node, :man, :+) do |m|
-          #   next unless match = regex_match_group(parameters(m).first, %r{man[1-8]})
-          #   problem "\"#{m.source}\" should be \"#{match[1]}\""
-          # end
-          #
+
+          find_instance_method_call(body_node, :man, :+) do |m|
+            next unless match = regex_match_group(parameters(m).first, %r{man[1-8]})
+            problem "\"#{m.source}\" should be \"#{match[0]}\""
+          end
+
           # # Avoid hard-coding compilers
           # find_every_method_call_by_name(body_node, :system).each do |m|
           #   param = parameters(m).first

@@ -835,6 +835,30 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with man+ " do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def test
+            man1.install man+"man8" => "faad.1"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "\"man+\"man8\"\" should be \"man8\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 22,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
