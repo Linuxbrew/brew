@@ -118,24 +118,24 @@ module RuboCop
             end
           end
 
-          # # Prefer formula path shortcuts in strings
-          # formula_path_strings(body_node, :prefix) do |p|
-          #   next unless match = regex_match_group(p, %r{(/(man))[/'"]})
-          #   problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
-          # end
-          #
-          # formula_path_strings(body_node, :share) do |p|
-          #   if match = regex_match_group(p, %r{/(bin|include|libexec|lib|sbin|share|Frameworks)}i)
-          #     problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[1].downcase}}\""
-          #   end
-          #   if match = regex_match_group(p, %r{((/share/man/|\#\{man\}/)(man[1-8]))})
-          #     problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
-          #   end
-          #   if match = regex_match_group(p, %r{(/share/(info|man))})
-          #     problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2]}}\""
-          #   end
-          # end
-          #
+          # Prefer formula path shortcuts in strings
+          formula_path_strings(body_node, :share) do |p|
+            next unless match = regex_match_group(p, %r{(/(man))/?})
+            problem "\"\#\{share}#{match[1]}\" should be \"\#{#{match[2]}}\""
+          end
+
+          formula_path_strings(body_node, :share) do |p|
+            if match = regex_match_group(p, %r{/(bin|include|libexec|lib|sbin|share|Frameworks)}i)
+              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[1].downcase}}\""
+            end
+            if match = regex_match_group(p, %r{((/share/man/|\#\{man\}/)(man[1-8]))})
+              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
+            end
+            if match = regex_match_group(p, %r{(/share/(info|man))})
+              problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2]}}\""
+            end
+          end
+
           # find_every_method_call_by_name(body_node, :depends_on) do |m|
           #   key, value = destructure_hash(paramters(m).first)
           #   next unless key.str_type?
@@ -349,7 +349,7 @@ module RuboCop
           (hash (pair $_ $_))
         EOS
 
-        def_node_matcher :formula_path_strings, <<-EOS.undent
+        def_node_search :formula_path_strings, <<-EOS.undent
           (dstr (begin (send nil %1)) $(str _ ))
         EOS
 
