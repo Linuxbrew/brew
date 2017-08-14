@@ -266,7 +266,7 @@ module GitHub
       puts "Closed pull requests:"
       prs = open_or_closed_prs
     else
-      return
+      return []
     end
 
     prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
