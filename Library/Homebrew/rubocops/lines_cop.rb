@@ -88,11 +88,11 @@ module RuboCop
             end
           end
 
-          # [:debug?, :verbose?, :value].each do |m|
-          #   find_instance_method_call(body_node, :ARGV, m) do
-          #     problem "Use build instead of ARGV to check options"
-          #   end
-          # end
+          [:debug?, :verbose?, :value].each do |m|
+            find_instance_method_call(body_node, "ARGV", m) do
+              problem "Use build instead of ARGV to check options"
+            end
+          end
           #
           # find_instance_method_call(body_node, :man, :+) do |m|
           #   next unless match = regex_match_group(parameters(m).first, %r{man[1-8]})
@@ -320,7 +320,6 @@ module RuboCop
             next unless match = regex_match_group(arg, %r{\-\-(.*)})
             problem "Reference '#{match[1]}' without dashes"
           end
-
         end
 
         def unless_modifier?(node)
