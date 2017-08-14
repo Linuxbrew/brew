@@ -148,13 +148,15 @@ module RuboCop
             problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
           end
 
-          # find_every_method_call_by_name(body_node, :depends_on).each do |m|
-          #   next unless modifier?(m)
-          #   dep, option = hash_dep(m)
-          #   next if dep.nil? || option.nil?
-          #   problem "Dependency #{string_content(dep)} should not use option #{string_content(option)}"
-          # end
-          #
+          find_every_method_call_by_name(body_node, :depends_on).each do |m|
+            next if modifier?(m.parent)
+            param = parameters(m).first
+            dep, option = hash_dep(param)
+            next if dep.nil? || option.nil?
+            offending_node(param)
+            problem "Dependency #{string_content(dep)} should not use option #{string_content(option)}"
+          end
+
           # find_instance_method_call(body_node, :version, :==) do |m|
           #   next unless parameters_passed?(m, "HEAD")
           #   problem "Use 'build.head?' instead of inspecting 'version'"
@@ -328,6 +330,7 @@ module RuboCop
         end
 
         def modifier?(node)
+          return false unless node.if_type?
           node.modifier_form?
         end
 
@@ -340,9 +343,9 @@ module RuboCop
         EOS
 
         # Match depends_on with hash as argument
-        def_node_search :hash_dep, <<-EOS.undent
-          {$(hash (pair $(str _) $(str _)))
-           $(hash (pair $(str _) (array $(str _) ...)))}
+        def_node_matcher :hash_dep, <<-EOS.undent
+          {(hash (pair $(str _) $(str _)))
+           (hash (pair $(str _) (array $(str _) ...)))}
         EOS
 
         def_node_matcher :destructure_hash, <<-EOS.undent

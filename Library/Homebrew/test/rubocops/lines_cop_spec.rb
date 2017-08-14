@@ -1095,6 +1095,28 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "with dependencies with invalid options" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on "foo" => "with-bar"
+        end
+      EOS
+
+      expected_offenses = [{  message: "Dependency foo should not use option with-bar",
+                              severity: :convention,
+                              line: 4,
+                              column: 13,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
