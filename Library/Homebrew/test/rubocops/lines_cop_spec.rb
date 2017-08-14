@@ -859,6 +859,54 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with hardcoded compiler 1 " do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def test
+            system "/usr/bin/gcc", "foo"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use \"\#{ENV.cc}\" instead of hard-coding \"gcc\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 12,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with hardcoded compiler 2 " do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def test
+            system "/usr/bin/g++", "-o", "foo", "foo.cc"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use \"\#{ENV.cxx}\" instead of hard-coding \"g++\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 12,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])

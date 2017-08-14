@@ -99,15 +99,15 @@ module RuboCop
             problem "\"#{m.source}\" should be \"#{match[0]}\""
           end
 
-          # # Avoid hard-coding compilers
-          # find_every_method_call_by_name(body_node, :system).each do |m|
-          #   param = parameters(m).first
-          #   if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
-          #     problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
-          #   elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
-          #     problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
-          #   end
-          # end
+          # Avoid hard-coding compilers
+          find_every_method_call_by_name(body_node, :system).each do |m|
+            param = parameters(m).first
+            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+              problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[2]}\""
+            elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
+              problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[2]}\""
+            end
+          end
           #
           # find_instance_method_call(body_node, :ENV, :[]=) do |m|
           #   param = parameters(m)[1]
