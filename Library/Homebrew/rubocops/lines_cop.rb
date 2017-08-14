@@ -162,11 +162,11 @@ module RuboCop
             problem "Use 'build.head?' instead of inspecting 'version'"
           end
 
-          # find_instance_method_call(body_node, :ENV, :fortran) do
-          #   next if depends_on?(:fortran)
-          #   problem "Use `depends_on :fortran` instead of `ENV.fortran`"
-          # end
-          #
+          find_instance_method_call(body_node, "ENV", :fortran) do
+            next if depends_on?(:fortran)
+            problem "Use `depends_on :fortran` instead of `ENV.fortran`"
+          end
+
           # find_instance_method_call(body_node, :ARGV, :include?) do |m|
           #   param = parameters(m).first
           #   next unless match = regex_match_group(param, %r{--(HEAD|devel)})

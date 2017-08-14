@@ -1141,6 +1141,30 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "with ENV.fortran" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          test do
+            ENV.fortran
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use `depends_on :fortran` instead of `ENV.fortran`",
+                              severity: :convention,
+                              line: 5,
+                              column: 4,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
