@@ -167,12 +167,12 @@ module RuboCop
             problem "Use `depends_on :fortran` instead of `ENV.fortran`"
           end
 
-          # find_instance_method_call(body_node, :ARGV, :include?) do |m|
-          #   param = parameters(m).first
-          #   next unless match = regex_match_group(param, %r{--(HEAD|devel)})
-          #   problem "Use \"if build.#{match[1].downcase}?\" instead"
-          # end
-          #
+          find_instance_method_call(body_node, "ARGV", :include?) do |m|
+            param = parameters(m).first
+            next unless match = regex_match_group(param, %r{--(HEAD|devel)})
+            problem "Use \"if build.#{match[1].downcase}?\" instead"
+          end
+
           # find_const(body_node, :MACOS_VERSION) do
           #   problem "Use MacOS.version instead of MACOS_VERSION"
           # end
