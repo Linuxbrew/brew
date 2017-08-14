@@ -979,6 +979,78 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         expect_offense(expected, actual)
       end
     end
+
+    it "with formula path shortcut long form 1" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            mv "\#{prefix}/libexec", share
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "\"\#\{prefix}/libexec\" should be \"\#{libexec}\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 18,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with formula path shortcut long form 2" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            system "./configure", "--INFODIR=\#{prefix}/share/info"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "\"\#\{prefix}/share/info\" should be \"\#{info}\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 47,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+    it "with formula path shortcut long form 3" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            system "./configure", "--MANDIR=\#{prefix}/share/man/man8"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "\"\#\{prefix}/share/man/man8\" should be \"\#{man8}\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 46,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])
