@@ -157,11 +157,11 @@ module RuboCop
             problem "Dependency #{string_content(dep)} should not use option #{string_content(option)}"
           end
 
-          # find_instance_method_call(body_node, :version, :==) do |m|
-          #   next unless parameters_passed?(m, "HEAD")
-          #   problem "Use 'build.head?' instead of inspecting 'version'"
-          # end
-          #
+          find_instance_method_call(body_node, :version, :==) do |m|
+            next unless parameters_passed?(m, "HEAD")
+            problem "Use 'build.head?' instead of inspecting 'version'"
+          end
+
           # find_instance_method_call(body_node, :ENV, :fortran) do
           #   next if depends_on?(:fortran)
           #   problem "Use `depends_on :fortran` instead of `ENV.fortran`"
