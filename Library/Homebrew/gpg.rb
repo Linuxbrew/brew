@@ -38,6 +38,7 @@ class Gpg
       Key-Length: 2048
       Subkey-Type: RSA
       Subkey-Length: 2048
+      Passphrase: ''
       Name-Real: Testing
       Name-Email: testing@foo.bar
       Expire-Date: 1d
