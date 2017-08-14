@@ -817,7 +817,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
-          def test
+          def install
             verbose = ARGV.verbose?
           end
         end
@@ -841,7 +841,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
-          def test
+          def install
             man1.install man+"man8" => "faad.1"
           end
         end
@@ -865,7 +865,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
-          def test
+          def install
             system "/usr/bin/gcc", "foo"
           end
         end
@@ -889,7 +889,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
-          def test
+          def install
             system "/usr/bin/g++", "-o", "foo", "foo.cc"
           end
         end
@@ -899,6 +899,54 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               severity: :convention,
                               line: 5,
                               column: 12,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with hardcoded compiler 3 " do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            ENV["COMPILER_PATH"] = "/usr/bin/llvm-g++"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use \"\#{ENV.cxx}\" instead of hard-coding \"llvm-g++\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 28,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with hardcoded compiler 4 " do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            ENV["COMPILER_PATH"] = "/usr/bin/gcc"
+          end
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use \"\#{ENV.cc}\" instead of hard-coding \"gcc\"",
+                              severity: :convention,
+                              line: 5,
+                              column: 28,
                               source: source }]
 
       inspect_source(cop, source)

@@ -108,16 +108,16 @@ module RuboCop
               problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[2]}\""
             end
           end
-          #
-          # find_instance_method_call(body_node, :ENV, :[]=) do |m|
-          #   param = parameters(m)[1]
-          #   if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
-          #     problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[3]}\""
-          #   elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
-          #     problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[3]}\""
-          #   end
-          # end
-          #
+
+          find_instance_method_call(body_node, "ENV", :[]=) do |m|
+            param = parameters(m)[1]
+            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+              problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[2]}\""
+            elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
+              problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[2]}\""
+            end
+          end
+
           # # Prefer formula path shortcuts in strings
           # formula_path_strings(body_node, :prefix) do |p|
           #   next unless match = regex_match_group(p, %r{(/(man))[/'"]})
