@@ -1073,6 +1073,28 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "with setting env manually" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "export", "var=value"
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use ENV instead of invoking 'export' to modify the environment",
+                              severity: :convention,
+                              line: 4,
+                              column: 10,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])

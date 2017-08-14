@@ -135,6 +135,7 @@ module RuboCop
               problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2].downcase}}\""
             end
           end
+
           find_every_method_call_by_name(body_node, :depends_on).each do |m|
             key, value = destructure_hash(parameters(m).first)
             next if (key.nil? || value.nil?)
@@ -142,11 +143,11 @@ module RuboCop
             problem "#{match[1]} modules should be vendored rather than use deprecated #{m.source}`"
           end
 
-          # find_every_method_call_by_name(body_node, :system).each do |m|
-          #   next unless match = regex_match_group(parameters(m).first, %r{(env|export)(\s+)?})
-          #   problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
-          # end
-          #
+          find_every_method_call_by_name(body_node, :system).each do |m|
+            next unless match = regex_match_group(parameters(m).first, %r{(env|export)(\s+)?})
+            problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
+          end
+
           # find_every_method_call_by_name(body_node, :depends_on).each do |m|
           #   next unless modifier?(m)
           #   dep, option = hash_dep(m)
