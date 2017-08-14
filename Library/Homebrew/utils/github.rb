@@ -227,7 +227,7 @@ module GitHub
     end
   end
 
-  def issues_matching(query, qualifiers = {})
+  def search_issues(query, **qualifiers)
     search("issues", query, **qualifiers)
   end
 
@@ -235,38 +235,27 @@ module GitHub
     open(url_to("repos", user, repo))
   end
 
-  def search_code(**params)
-    search("code", **params)
-  end
-
-  def uri_escape(query)
-    if URI.respond_to?(:encode_www_form_component)
-      URI.encode_www_form_component(query)
-    else
-      require "erb"
-      ERB::Util.url_encode(query)
-    end
+  def search_code(**qualifiers)
+    search("code", **qualifiers)
   end
 
   def issues_for_formula(name, options = {})
     tap = options[:tap] || CoreTap.instance
-    issues_matching(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
+    search_issues(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
   end
 
   def print_pull_requests_matching(query)
     return [] if ENV["HOMEBREW_NO_GITHUB_API"]
 
-    open_or_closed_prs = issues_matching(query, type: "pr")
+    open_or_closed_prs = search_issues(query, type: "pr")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
-    if !open_prs.empty?
+    prs = if !open_prs.empty?
       puts "Open pull requests:"
-      prs = open_prs
-    elsif !open_or_closed_prs.empty?
-      puts "Closed pull requests:"
-      prs = open_or_closed_prs
+      open_prs
     else
-      return []
+      puts "Closed pull requests:" unless open_or_closed_prs.empty?
+      open_or_closed_prs
     end
 
     prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
@@ -280,19 +269,11 @@ module GitHub
   def query_string(*main_params, **qualifiers)
     params_list = main_params
 
-    qualifiers.each do |key, value|
-      if value.is_a? Array
-        value.each { |v| params_list << format_parameter(key, v) }
-      else
-        params_list << format_parameter(key, value)
-      end
+    params_list += qualifiers.flat_map do |key, value|
+      Array(value).map { |v| "#{key}:#{v}" }
     end
 
-    "q=#{uri_escape(params_list.join(" "))}&per_page=100"
-  end
-
-  def format_parameter(key, value)
-    "#{key}:#{value}"
+    "q=#{URI.encode_www_form_component(params_list.join(" "))}&per_page=100"
   end
 
   def url_to(*subroutes)
