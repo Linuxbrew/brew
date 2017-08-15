@@ -1213,6 +1213,72 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "with if conditional dep" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on "foo" if build.with? "with-foo"
+        end
+      EOS
+
+      expected_offenses = [{  message: 'Replace depends_on "foo" if build.with? "with-foo" with depends_on "foo" => :optional',
+                              severity: :convention,
+                              line: 4,
+                              column: 2,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with unless conditional dep and symbol" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on :foo unless build.without? "foo"
+        end
+      EOS
+
+      expected_offenses = [{  message: 'Replace depends_on :foo unless build.without? "foo" with depends_on :foo => :recommended',
+                              severity: :convention,
+                              line: 4,
+                              column: 2,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "with unless conditional dep with build.include?" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on :foo unless build.include? "without-foo"
+        end
+      EOS
+
+      expected_offenses = [{  message: 'Replace depends_on :foo unless build.include? "without-foo" with depends_on :foo => :recommended',
+                              severity: :convention,
+                              line: 4,
+                              column: 2,
+                              source: source }]
+
+      inspect_source(cop, source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
   end
   def expect_offense(expected, actual)
     expect(actual.message).to eq(expected[:message])

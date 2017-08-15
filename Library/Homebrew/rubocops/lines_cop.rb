@@ -181,27 +181,22 @@ module RuboCop
             problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
           end
 
-          # dependency(body_node) do |m|
-          #   # handle symbols and shit: WIP
-          #   next unless modifier?(m.parent)
-          #   dep = parameters(m).first
-          #   condition = m.parent.condition
-          #   if (condition.if? && condition.method_name == :include? && parameters_passed(condition, /with-#{string_content(dep)}$/))||
-          #       (condition.if? && condition.method_name == :with? && parameters_passed?(condition, /#{string_content(dep)}$/))
-          #     problem "Replace #{m.parent.source} with #{dep.source} => :optional"
-          #   end
-          #   if (condition.unless? && condition.method_name == :include? && parameters_passed?(condition, /without-#{string_content(dep)}$/))||
-          #       (condition.unless? && condition.method_name == :without? && parameters_passed?(condition, /#{string_content(dep)}$/))
-          #     problem "Replace #{m.parent.source} with #{dep.source} => :recommended"
-          #   end
-          # end
-          #
-          # find_every_method_call_by_name(body_node, :depends_on).each do |m|
-          #   next unless modifier?(m.parent)
-          #   dep = parameters(m).first
-          #   next if dep.hash_type?
-          #   condition = m.parent.node_parts
-          # end
+          conditional_dependencies(body_node) do |node, method, param, dep_node|
+            dep = string_content(dep_node)
+            if node.if?
+              if (method == :include? && regex_match_group(param, /with-#{dep}$/)) ||
+                 (method == :with? && regex_match_group(param, /#{dep}$/))
+                offending_node(dep_node.parent)
+                problem "Replace #{node.source} with #{dep_node.parent.source} => :optional"
+              end
+            elsif node.unless?
+              if (method == :include? && regex_match_group(param, /without-#{dep}$/)) ||
+                 (method == :without? && regex_match_group(param, /#{dep}$/))
+                offending_node(dep_node.parent)
+                problem "Replace #{node.source} with #{dep_node.parent.source} => :recommended"
+              end
+            end
+          end
 
           find_method_with_args(body_node, :fails_with, :llvm) do
             problem "'fails_with :llvm' is now a no-op so should be removed"
@@ -334,12 +329,12 @@ module RuboCop
           node.modifier_form?
         end
 
-        def_node_search :condition, <<-EOS.undent
-          (send (send nil :build) $_ $({str sym} _))
-        EOS
+        def_node_search :conditional_dependencies, <<-EOS.undent
+          {$(if (send (send nil :build) ${:include? :with? :without?} $(str _))
+              (send nil :depends_on $({str sym} _)) nil)
 
-        def_node_search :dependency, <<-EOS.undent
-          (send nil :depends_on ({str sym} _))
+           $(if (send (send nil :build) ${:include? :with? :without?} $(str _)) nil
+              (send nil :depends_on $({str sym} _)))}
         EOS
 
         # Match depends_on with hash as argument
@@ -357,7 +352,6 @@ module RuboCop
            (dstr _ (begin (send nil %1)) $(str _ ))}
         EOS
 
-        def_node_matcher :negation?, '(send ... :!)'
         # This is Pattern Matching method for AST
         # Takes the AST node as argument and yields matching node if block given
         # Else returns boolean for the match
@@ -365,9 +359,6 @@ module RuboCop
           (const (const nil :Language) :Node)
         PATTERN
 
-        def_node_search :dirPattern, <<-PATTERN
-          (send (const nil :Dir) :[] (str $_))
-        PATTERN
       end
     end
   end
