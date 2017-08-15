@@ -88,7 +88,7 @@ If \fB\-\-quiet\fR is passed, list only the names of commands without the header
 Show Homebrew and system configuration useful for debugging\. If you file a bug report, you will likely be asked for this information if you do not provide it\.
 .
 .TP
-\fBdeps\fR [\fB\-\-1\fR] [\fB\-n\fR] [\fB\-\-union\fR] [\fB\-\-full\-name\fR] [\fB\-\-installed\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] \fIformulae\fR
+\fBdeps\fR [\fB\-\-1\fR] [\fB\-n\fR] [\fB\-\-union\fR] [\fB\-\-full\-name\fR] [\fB\-\-installed\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] [\fB\-\-include\-requirements\fR] \fIformulae\fR
 Show dependencies for \fIformulae\fR\. When given multiple formula arguments, show the intersection of dependencies for \fIformulae\fR\.
 .
 .IP
@@ -107,17 +107,23 @@ If \fB\-\-full\-name\fR is passed, list dependencies by their full name\.
 If \fB\-\-installed\fR is passed, only list those dependencies that are currently installed\.
 .
 .IP
-By default, \fBdeps\fR shows required and recommended dependencies for \fIformulae\fR\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\.
+By default, \fBdeps\fR shows required and recommended dependencies for \fIformulae\fR\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\. To include requirements in addition to dependencies, pass \fB\-\-include\-requirements\fR\.
 .
 .TP
-\fBdeps\fR \fB\-\-tree\fR [\fIfilters\fR] (\fIformulae\fR|\fB\-\-installed\fR)
+\fBdeps\fR \fB\-\-tree\fR [\fB\-\-1\fR] [\fIfilters\fR] [\fB\-\-annotate\fR] (\fIformulae\fR|\fB\-\-installed\fR)
 Show dependencies as a tree\. When given multiple formula arguments, output individual trees for every formula\.
+.
+.IP
+If \fB\-\-1\fR is passed, only one level of children is displayed\.
 .
 .IP
 If \fB\-\-installed\fR is passed, output a tree for every installed formula\.
 .
 .IP
-The \fIfilters\fR placeholder is any combination of options \fB\-\-include\-build\fR, \fB\-\-include\-optional\fR, and \fB\-\-skip\-recommended\fR as documented above\.
+The \fIfilters\fR placeholder is any combination of options \fB\-\-include\-build\fR, \fB\-\-include\-optional\fR, \fB\-\-skip\-recommended\fR, and \fB\-\-include\-requirements\fR as documented above\.
+.
+.IP
+If \fB\-\-annotate\fR is passed, the build, optional, and recommended dependencies are marked as such in the output\.
 .
 .TP
 \fBdeps\fR [\fIfilters\fR] (\fB\-\-installed\fR|\fB\-\-all\fR)
