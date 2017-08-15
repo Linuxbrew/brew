@@ -14,7 +14,7 @@ describe "brew search", :integration_test do
   it "supports searching by name" do
     expect { brew "search", "testball" }
       .to output(/testball/).to_stdout
-      .and not_to_output.to_stderr
+      .and output(/Searching/).to_stderr
       .and be_a_success
   end
 
@@ -25,10 +25,10 @@ describe "brew search", :integration_test do
       .and be_a_success
   end
 
-  it "falls back to a tap search when no formula is found" do
+  it "falls back to a GitHub tap search when no formula is found", :needs_network do
     expect { brew "search", "caskroom/cask/firefox" }
       .to output(/firefox/).to_stdout
-      .and not_to_output.to_stderr
+      .and output(/Searching/).to_stderr
       .and be_a_success
   end
 
