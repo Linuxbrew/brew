@@ -25,15 +25,6 @@ describe Utils::Analytics do
         expect(described_class.os_prefix_ci).not_to include("non-/usr/local")
       end
     end
-
-    context "when anonymous_os_prefix_ci is set" do
-      let(:anonymous_os_prefix_ci) { "macOS 10.11.6, non-/usr/local, CI" }
-
-      it "returns anonymous_os_prefix_ci" do
-        described_class.instance_variable_set(:@anonymous_os_prefix_ci, anonymous_os_prefix_ci)
-        expect(described_class.os_prefix_ci).to eq(anonymous_os_prefix_ci)
-      end
-    end
   end
 
   describe "::report_event" do
@@ -66,8 +57,44 @@ describe Utils::Analytics do
         ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = nil
       end
 
-      it "returns nil when HOMEBREW_ANALYTICS_DEBUG is not set" do
+      it "returns waiting thread when HOMEBREW_ANALYTICS_DEBUG is not set" do
         expect(described_class.report_event("install", action)).to be_an_instance_of(Thread)
+      end
+    end
+  end
+
+  describe "::report_build_error" do
+    context "when tap is installed" do
+      let(:err) { BuildError.new(f, "badprg", %w[arg1 arg2], {}) }
+      let(:f) { formula { url "foo-1.0" } }
+
+      it "reports event if BuildError raised for a formula with a public remote repository" do
+        allow_any_instance_of(Tap).to receive(:custom_remote?).and_return(false)
+        expect(described_class).to respond_to(:report_event)
+        described_class.report_build_error(err)
+      end
+
+      it "does not report event if BuildError raised for a formula with a private remote repository" do
+        expect(described_class.report_build_error(err)).to be_nil
+      end
+    end
+
+    context "when formula does not have a tap" do
+      let(:err) { BuildError.new(f, "badprg", %w[arg1 arg2], {}) }
+      let(:f) { double(Formula, name: "foo", path: "blah", tap: nil) }
+
+      it "does not report event if BuildError is raised" do
+        expect(described_class.report_build_error(err)).to be_nil
+      end
+    end
+
+    context "when tap for a formula is not installed" do
+      let(:err) { BuildError.new(f, "badprg", %w[arg1 arg2], {}) }
+      let(:f) { double(Formula, name: "foo", path: "blah", tap: CoreTap.instance) }
+
+      it "does not report event if BuildError is raised" do
+        allow_any_instance_of(Pathname).to receive(:directory?).and_return(false)
+        expect(described_class.report_build_error(err)).to be_nil
       end
     end
   end
