@@ -32,8 +32,8 @@ describe GitHub do
   describe "::search_issues", :needs_network do
     it "queries GitHub issues with the passed parameters" do
       results = subject.search_issues("brew search", repo: "Homebrew/brew", author: "avetamine", is: "closed")
-      expect(results.count).to eq(1)
-      expect(results.first["title"]).to eq("brew search : 422 Unprocessable Entity")
+      expect(results.count).to be > 1
+      expect(results.last["title"]).to eq("brew search : 422 Unprocessable Entity")
     end
   end
 end
