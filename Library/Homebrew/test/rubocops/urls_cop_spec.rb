@@ -54,8 +54,10 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://prdownloads.sourceforge.net/foo/foo-1.tar.gz",
-        "msg" => "Don't use prdownloads in SourceForge urls (url is http://prdownloads.sourceforge.net/foo/foo-1.tar.gz).\n" \
-                "\tSee: http://librelist.com/browser/homebrew/2011/1/12/prdownloads-is-bad/",
+        "msg" => <<-EOS.undent.chomp,
+          Don't use prdownloads in SourceForge urls (url is http://prdownloads.sourceforge.net/foo/foo-1.tar.gz).
+                  See: http://librelist.com/browser/homebrew/2011/1/12/prdownloads-is-bad/
+        EOS
         "col" => 2,
       }, {
         "url" => "http://foo.dl.sourceforge.net/sourceforge/foozip/foozip_1.0.tar.bz2",
@@ -67,8 +69,11 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://http.debian.net/debian/dists/foo/",
-        "msg" => "Please use a secure mirror for Debian URLs.\nWe recommend:\n"\
-                 "  https://mirrors.ocf.berkeley.edu/debian/dists/foo/\n",
+        "msg" => <<-EOS.undent,
+          Please use a secure mirror for Debian URLs.
+          We recommend:
+            https://mirrors.ocf.berkeley.edu/debian/dists/foo/
+        EOS
         "col" => 2,
       }, {
         "url" => "http://foo.googlecode.com/files/foo-1.0.zip",
@@ -96,8 +101,12 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "https://codeload.github.com/foo/bar/tar.gz/v0.1.1",
-        "msg" => "Use GitHub archive URLs:\n  https://github.com/foo/bar/archive/v0.1.1.tar.gz\n"\
-                 "Rather than codeload:\n  https://codeload.github.com/foo/bar/tar.gz/v0.1.1\n",
+        "msg" => <<-EOS.undent,
+          Use GitHub archive URLs:
+            https://github.com/foo/bar/archive/v0.1.1.tar.gz
+          Rather than codeload:
+            https://codeload.github.com/foo/bar/tar.gz/v0.1.1
+        EOS
         "col" => 2,
       }, {
         "url" => "https://central.maven.org/maven2/com/bar/foo/1.1/foo-1.1.jar",
