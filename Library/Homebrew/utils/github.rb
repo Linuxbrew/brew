@@ -267,13 +267,13 @@ module GitHub
   end
 
   def query_string(*main_params, **qualifiers)
-    params_list = main_params
+    params = main_params
 
-    params_list += qualifiers.flat_map do |key, value|
+    params += qualifiers.flat_map do |key, value|
       Array(value).map { |v| "#{key}:#{v}" }
     end
 
-    "q=#{URI.encode_www_form_component(params_list.join(" "))}&per_page=100"
+    "q=#{URI.encode_www_form_component(params.join(" "))}&per_page=100"
   end
 
   def url_to(*subroutes)
