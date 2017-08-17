@@ -1070,7 +1070,7 @@ Homebrew Documentation: <https://docs.brew.sh>
 
 ## AUTHORS
 
-Linuxbrew is maintained by Shaun Jackman, Bob W. Hogg, Piotr Gaczkowski, Maxim Belkin, Jonathan Chang, and Michka Popoff.
+Linuxbrew is maintained by Shaun Jackman, Bob W. Hogg, Piotr Gaczkowski, Maxim Belkin, Jonathan Chang, Michka Popoff, and Alyssa Ross.
 
 ## BUGS
 
