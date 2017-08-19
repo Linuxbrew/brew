@@ -105,11 +105,11 @@ describe Homebrew::Cleanup do
   end
 
   describe "::cleanup_logs" do
+    let(:path) { (HOMEBREW_LOGS/"delete_me") }
+
     before do
       path.mkpath
     end
-
-    let(:path) { (HOMEBREW_LOGS/"delete_me") }
 
     it "cleans all logs if prune all" do
       ARGV << "--prune=all"
@@ -264,7 +264,7 @@ describe Homebrew::Cleanup do
       expect(described_class.prune?(foo, days_default: "1")).to be_truthy
     end
 
-    it "returns true when path_modified_time >= days_default" do
+    it "returns false when path_modified_time >= days_default" do
       expect(described_class.prune?(foo, days_default: "2")).to be_falsey
     end
   end
