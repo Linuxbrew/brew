@@ -133,7 +133,7 @@ module GitHub
 
   def open(url, data: nil, scopes: [].freeze)
     # This is a no-op if the user is opting out of using the GitHub API.
-    return if ENV["HOMEBREW_NO_GITHUB_API"]
+    return block_given? ? yield({}) : {} if ENV["HOMEBREW_NO_GITHUB_API"]
 
     args = %W[--header application/vnd.github.v3+json --write-out \n%{http_code}]
     args += curl_args
@@ -245,8 +245,6 @@ module GitHub
   end
 
   def print_pull_requests_matching(query)
-    return [] if ENV["HOMEBREW_NO_GITHUB_API"]
-
     open_or_closed_prs = search_issues(query, type: "pr")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
@@ -283,6 +281,6 @@ module GitHub
   def search(entity, *queries, **qualifiers)
     uri = url_to "search", entity
     uri.query = query_string(*queries, **qualifiers)
-    open(uri) { |json| Array(json["items"]) }
+    open(uri) { |json| json.fetch("items", []) }
   end
 end

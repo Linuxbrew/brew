@@ -15,7 +15,6 @@ module Hbc
       end
 
       def self.search_remote(query)
-        return [] if ENV["HOMEBREW_NO_GITHUB_API"]
         matches = GitHub.search_code(user: "caskroom", path: "Casks",
                                      filename: query, extension: "rb")
         matches.map do |match|
