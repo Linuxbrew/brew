@@ -44,8 +44,8 @@ describe Utils::Analytics do
       end
 
       it "returns nil when HOMEBREW_ANALYTICS_DEBUG is true" do
-        ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = nil
-        ENV["HOMEBREW_NO_ANALYTICS"] = nil
+        ENV.delete("HOMEBREW_NO_ANALYTICS_THIS_RUN")
+        ENV.delete("HOMEBREW_NO_ANALYTICS")
         ENV["HOMEBREW_ANALYTICS_DEBUG"] = "true"
         expect(described_class.report_event("install", action)).to be_nil
       end
@@ -53,8 +53,8 @@ describe Utils::Analytics do
 
     context "when ENV vars are nil" do
       before do
-        ENV["HOMEBREW_NO_ANALYTICS"] = nil
-        ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = nil
+        ENV.delete("HOMEBREW_NO_ANALYTICS_THIS_RUN")
+        ENV.delete("HOMEBREW_NO_ANALYTICS")
       end
 
       it "returns waiting thread when HOMEBREW_ANALYTICS_DEBUG is not set" do
