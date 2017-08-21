@@ -104,8 +104,10 @@ module RuboCop
             end
 
             if url =~ %r{^https?://prdownloads\.}
-              problem "Don't use prdownloads in SourceForge urls (url is #{url}).\n" \
-                "\tSee: http://librelist.com/browser/homebrew/2011/1/12/prdownloads-is-bad/"
+              problem <<-EOS.undent.chomp
+                Don't use prdownloads in SourceForge urls (url is #{url}).
+                        See: http://librelist.com/browser/homebrew/2011/1/12/prdownloads-is-bad/
+              EOS
             end
 
             if url =~ %r{^http://\w+\.dl\.}
