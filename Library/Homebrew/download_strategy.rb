@@ -381,7 +381,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
   # Curl options to be always passed to curl,
   # with raw head calls (`curl --head`) or with actual `fetch`.
   def _curl_opts
-    return ["--user" << meta.fetch(:user)] if meta.key?(:user)
+    return ["--user", meta.fetch(:user)] if meta.key?(:user)
     []
   end
 
