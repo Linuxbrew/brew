@@ -53,7 +53,7 @@ describe "brew search", :integration_test do
     "debian" => "https://packages.debian.org/search?keywords=testball&searchon=names&suite=all&section=all",
     "opensuse" => "https://software.opensuse.org/search?q=testball",
     "fedora" => "https://apps.fedoraproject.org/packages/s/testball",
-    "ubuntu" => "http://packages.ubuntu.com/search?keywords=testball&searchon=names&suite=all&section=all",
+    "ubuntu" => "https://packages.ubuntu.com/search?keywords=testball&searchon=names&suite=all&section=all",
   }.each do |flag, url|
     specify "--#{flag}" do
       expect { brew "search", "--#{flag}", "testball", "HOMEBREW_BROWSER" => "echo" }

@@ -36,7 +36,7 @@ module Homebrew
     elsif ARGV.include? "--fedora"
       exec_browser "https://apps.fedoraproject.org/packages/s/#{ARGV.next}"
     elsif ARGV.include? "--ubuntu"
-      exec_browser "http://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
+      exec_browser "https://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
     elsif ARGV.include? "--desc"
       query = ARGV.next
       regex = query_regexp(query)
