@@ -204,10 +204,10 @@ describe CurlDownloadStrategy do
   subject { described_class.new(name, resource) }
   let(:name) { "foo" }
   let(:url) { "http://example.com/foo.tar.gz" }
-  let(:resource) { double(Resource, url: url, mirrors: [], specs: {user: "download:123456"}, version: nil) }
+  let(:resource) { double(Resource, url: url, mirrors: [], specs: { user: "download:123456" }, version: nil) }
 
   it "parses the opts and sets the corresponding args" do
-    expect(subject.send(:_curl_opts)).to eq(["--user","download:123456"])
+    expect(subject.send(:_curl_opts)).to eq(["--user", "download:123456"])
   end
 end
 
