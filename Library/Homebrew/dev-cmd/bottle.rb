@@ -432,6 +432,15 @@ module Homebrew
                 value = value_original.to_s
                 next if key == "cellar" && old_value == "any" && value == "any_skip_relocation"
                 next unless old_value.empty? || value != old_value
+
+                if key == "cellar" &&
+                   (old_value == "any" || old_value == "any_skip_relocation") &&
+                   value == "/home/linuxbrew/.linuxbrew/Cellar"
+                  opoo "#{formula_name}: #{key}: old: #{old_value}, new: #{value}"
+                  bottle.cellar old_value.to_sym
+                  next
+                end
+
                 old_value = old_value_original.inspect
                 value = value_original.inspect
                 mismatches << "#{key}: old: #{old_value}, new: #{value}"
