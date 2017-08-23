@@ -2,8 +2,12 @@ module Hbc
   class CLI
     class Search < AbstractCommand
       def run
-        results = self.class.search(*args)
-        self.class.render_results(*results)
+        if args.empty?
+          puts Formatter.columns(CLI.nice_listing(Hbc.all_tokens))
+        else
+          results = self.class.search(*args)
+          self.class.render_results(*results)
+        end
       end
 
       def self.extract_regexp(string)
