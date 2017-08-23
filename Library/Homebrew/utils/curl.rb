@@ -37,13 +37,12 @@ def curl(*args)
   safe_system(*curl_args(*args))
 end
 
-def curl_download(*args, to: nil, **options)
-  continue_at ||= "-"
-  curl("--location", "--remote-time", "--continue-at", continue_at, "--output", to, *args, **options)
+def curl_download(*args, to: nil, continue_at: "-", **options)
+  curl("--location", "--remote-time", "--continue-at", continue_at.to_s, "--output", to, *args, **options)
 rescue ErrorDuringExecution
   # `curl` error 33: HTTP server doesn't seem to support byte ranges. Cannot resume.
   if $CHILD_STATUS.exitstatus == 33 && continue_at == "-"
-    continue_at = "0"
+    continue_at = 0
     retry
   end
 
