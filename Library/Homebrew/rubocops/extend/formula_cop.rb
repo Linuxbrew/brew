@@ -86,9 +86,13 @@ module RuboCop
       end
 
       # Returns an array of method call nodes matching method_name in every descendant of node
-      def find_every_method_call_by_name(node, method_name)
+      # Returns every method call if no method_name is passed
+      def find_every_method_call_by_name(node, method_name = nil)
         return if node.nil?
-        node.each_descendant(:send).select { |method_node| method_name == method_node.method_name }
+        node.each_descendant(:send).select do |method_node|
+          method_name.nil? ||
+            method_name == method_node.method_name
+        end
       end
 
       # Given a method_name and arguments, yields to a block with
@@ -108,7 +112,7 @@ module RuboCop
       def find_instance_method_call(node, instance, method_name)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          next unless method.receiver.const_name == instance
+          next unless method.receiver && method.receiver.const_name == instance
           @offense_source_range = method.source_range
           @offensive_node = method
           yield method
@@ -202,9 +206,15 @@ module RuboCop
       end
 
       # Returns an array of block nodes of any depth below node in AST
+      # If a block is given then yields matching block node to the block!
       def find_all_blocks(node, block_name)
         return if node.nil?
-        node.each_descendant(:block).select { |block_node| block_name == block_node.method_name }
+        blocks = node.each_descendant(:block).select { |block_node| block_name == block_node.method_name }
+        return blocks unless block_given?
+        blocks.each do |block_node|
+          offending_node(block_node)
+          yield block_node
+        end
       end
 
       # Returns a method definition node with method_name
@@ -316,6 +326,15 @@ module RuboCop
         end
       end
 
+      # Yields to a block with comment text as parameter
+      def audit_comments
+        @processed_source.comments.each do |comment_node|
+          @offensive_node = comment_node
+          @offense_source_range = :expression
+          yield comment_node.text
+        end
+      end
+
       # Returns the begin position of the node's line in source code
       def line_start_column(node)
         node.source_range.source_buffer.line_range(node.loc.line).begin_pos
@@ -324,6 +343,11 @@ module RuboCop
       # Returns the begin position of the node in source code
       def start_column(node)
         node.source_range.begin_pos
+      end
+
+      # Returns the ending position of the node in source code
+      def end_column(node)
+        node.source_range.end_pos
       end
 
       # Returns the line number of the node
