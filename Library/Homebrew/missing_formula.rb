@@ -55,15 +55,6 @@ module Homebrew
         when "gsutil" then <<-EOS.undent
           Install gsutil with `pip install gsutil`
           EOS
-        when "clojure" then <<-EOS.undent
-          Clojure isn't really a program but a library managed as part of a
-          project and Leiningen is the user interface to that library.
-
-          To install Clojure you should install Leiningen:
-            brew install leiningen
-          and then follow the tutorial:
-            #{Formatter.url("https://github.com/technomancy/leiningen/blob/stable/doc/TUTORIAL.md")}
-          EOS
         when "gfortran" then <<-EOS.undent
           GNU Fortran is now provided as part of GCC, and can be installed with:
             brew install gcc
