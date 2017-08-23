@@ -71,9 +71,8 @@ Which is usually: `~/Library/Caches/Homebrew`
 GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by
 default.  If you’re on Mountain Lion or later, you can fix this by
 running `sudo launchctl config user path "/usr/local/bin:$PATH"` and
-then rebooting. Note that this sets the launchctl PATH for _all users_
-([more details here](https://apple.stackexchange.com/a/198282)). For
-earlier versions of macOS, see
+then rebooting, as documented in `man launchctl`. Note that this sets
+the launchctl PATH for _all users_. For earlier versions of macOS, see
 [this page](https://developer.apple.com/legacy/library/qa/qa1067/_index.html).
 
 ## How do I contribute to Homebrew?
