@@ -5,9 +5,7 @@ describe Utils::Analytics do
   describe "::os_prefix_ci" do
     context "when anonymous_os_prefix_ci is not set" do
       before(:each) do
-        if described_class.instance_variable_defined?(:@anonymous_os_prefix_ci)
-          described_class.send(:remove_instance_variable, :@anonymous_os_prefix_ci)
-        end
+        described_class.clear_anonymous_os_prefix_ci_cache
       end
 
       it "returns OS_VERSION and prefix when HOMEBREW_PREFIX is not /usr/local" do
@@ -20,7 +18,7 @@ describe Utils::Analytics do
         expect(described_class.os_prefix_ci).to include("CI")
       end
 
-      it "does not include prefix when HOMEBREW_PREFIX is usr/local" do
+      it "does not include prefix when HOMEBREW_PREFIX is /usr/local" do
         stub_const("HOMEBREW_PREFIX", "/usr/local")
         expect(described_class.os_prefix_ci).not_to include("non-/usr/local")
       end
@@ -48,17 +46,6 @@ describe Utils::Analytics do
         ENV.delete("HOMEBREW_NO_ANALYTICS")
         ENV["HOMEBREW_ANALYTICS_DEBUG"] = "true"
         expect(described_class.report_event("install", action)).to be_nil
-      end
-    end
-
-    context "when ENV vars are nil" do
-      before do
-        ENV.delete("HOMEBREW_NO_ANALYTICS_THIS_RUN")
-        ENV.delete("HOMEBREW_NO_ANALYTICS")
-      end
-
-      it "returns waiting thread when HOMEBREW_ANALYTICS_DEBUG is not set" do
-        expect(described_class.report_event("install", action)).to be_an_instance_of(Thread)
       end
     end
   end
