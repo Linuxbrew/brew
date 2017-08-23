@@ -26,7 +26,7 @@ module Hbc
             filename: query,
             extension: "rb",
           )
-        rescue StandardError => e
+        rescue GitHub::Error => e
           onoe e
           $stderr.puts e.backtrace
           []
