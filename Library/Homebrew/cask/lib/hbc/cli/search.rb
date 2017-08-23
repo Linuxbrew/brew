@@ -23,14 +23,13 @@ module Hbc
           user: "caskroom",
           path: "Casks",
           filename: query,
-          extension: "rb"
+          extension: "rb",
         )
-        rescue Exception => e
+        rescue StandardError => e
           onoe e
           $stderr.puts e.backtrace
           []
         end
-        
         matches.map do |match|
           tap = Tap.fetch(match["repository"]["full_name"])
           next if tap.installed?
