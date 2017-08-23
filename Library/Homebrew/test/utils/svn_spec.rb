@@ -3,9 +3,7 @@ require "utils/svn"
 describe Utils do
   describe "#self.svn_available?" do
     before(:each) do
-      if described_class.instance_variable_defined?(:@svn)
-        described_class.send(:remove_instance_variable, :@svn)
-      end
+      described_class.clear_svn_version_cache
     end
 
     it "returns svn version if svn available" do
