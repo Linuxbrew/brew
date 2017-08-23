@@ -19,12 +19,13 @@ module Hbc
       end
 
       def self.search_remote(query)
-        matches = begin GitHub.search_code(
-          user: "caskroom",
-          path: "Casks",
-          filename: query,
-          extension: "rb",
-        )
+        matches = begin
+          GitHub.search_code(
+            user: "caskroom",
+            path: "Casks",
+            filename: query,
+            extension: "rb",
+          )
         rescue StandardError => e
           onoe e
           $stderr.puts e.backtrace
