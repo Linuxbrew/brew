@@ -69,7 +69,7 @@ Which is usually: `~/Library/Caches/Homebrew`
 
 ## My Mac `.app`s don’t find `/usr/local/bin` utilities!
 GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by
-default.  If you're on Mountain Lion or later, you can fix this by
+default.  If you’re on Mountain Lion or later, you can fix this by
 running `sudo launchctl config user path "/usr/local/bin:$PATH"` and
 then rebooting. Note that this sets the launchctl PATH for _all users_
 ([more details here](https://apple.stackexchange.com/a/198282)). For
