@@ -55,7 +55,7 @@ module ELF
       end
       command = [ldd, path.expand_path.to_s]
       libs = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+      raise ErrorDuringExecution, "#{command.join(" ")}\n#{libs.join("\n")}" unless $CHILD_STATUS.success?
       needed << "not found"
       libs.select! { |lib| needed.any? { |soname| lib.include? soname } }
       @dylibs = libs.map { |lib| lib[LDD_RX, 1] || lib[LDD_RX, 2] }.compact
