@@ -412,7 +412,7 @@ class FormulaAuditor
     same_name_tap_formulae = @@local_official_taps_name_map[name] || []
 
     if @online
-      Homebrew.search_taps(name).each do |tap_formula_full_name|
+      Homebrew.search_taps(name, silent: true).each do |tap_formula_full_name|
         tap_formula_name = tap_formula_full_name.split("/").last
         next if tap_formula_name != name
         same_name_tap_formulae << tap_formula_full_name
