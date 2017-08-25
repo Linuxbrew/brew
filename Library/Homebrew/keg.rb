@@ -410,7 +410,7 @@ class Keg
   def link(mode = OpenStruct.new)
     if OS.linux? && name == "glibc"
       # Symlink ld.so before libc.so.6
-      ld_so = prefix/"lib/ld-linux-x86-64.so.2"
+      ld_so = path/"lib/ld-linux-x86-64.so.2"
       FileUtils.ln_sf ld_so, HOMEBREW_PREFIX/"lib/ld.so" if ld_so.readable?
     end
 
