@@ -20,11 +20,9 @@ class SystemConfig
       `#{gcc} --version 2>/dev/null`[/ (\d+\.\d+\.\d+)/, 1]
     end
 
-    def formula_version(formula)
+    def formula_linked_version(formula)
       return "N/A" unless CoreTap.instance.installed?
-      f = Formulary.factory formula
-      return "N/A" unless f.installed?
-      f.version
+      Formulary.factory(formula).linked_version || "N/A"
     rescue FormulaUnavailableError
       return "N/A"
     end
@@ -35,7 +33,7 @@ class SystemConfig
       out.puts "OS: #{host_os_version}"
       out.puts "/usr/bin/gcc: #{host_gcc_version}"
       ["glibc", "gcc", "xorg"].each do |f|
-        out.puts "#{f}: #{formula_version f}"
+        out.puts "#{f}: #{formula_linked_version f}"
       end
     end
   end
