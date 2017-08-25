@@ -5,6 +5,7 @@ require "pathname"
 
 describe Homebrew::Cleanup do
   let(:ds_store) { Pathname.new("#{HOMEBREW_PREFIX}/Library/.DS_Store") }
+  let(:sec_in_a_day) { 60 * 60 * 24 }
 
   around(:each) do |example|
     begin
@@ -118,13 +119,13 @@ describe Homebrew::Cleanup do
     end
 
     it "cleans up logs if older than 14 days" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 15)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 15)
       described_class.cleanup_logs
       expect(path).not_to exist
     end
 
     it "does not clean up logs less than 14 days old" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
       described_class.cleanup_logs
       expect(path).to exist
     end
@@ -199,7 +200,7 @@ describe Homebrew::Cleanup do
       foo = (HOMEBREW_CACHE/"--foo")
       foo.mkpath
       allow(ARGV).to receive(:value).with("prune").and_return("1")
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
       described_class.cleanup_cache
       expect(foo).not_to exist
     end
@@ -221,13 +222,6 @@ describe Homebrew::Cleanup do
         FileUtils.touch(testball)
         (HOMEBREW_CELLAR/"testball"/"0.0.1").mkpath
         FileUtils.touch(CoreTap.instance.formula_dir/"testball.rb")
-      end
-
-      after(:each) do
-        FileUtils.rm_rf(bottle)
-        FileUtils.rm_rf(testball)
-        FileUtils.rm_rf(HOMEBREW_CELLAR/"testball")
-        FileUtils.rm_rf(CoreTap.instance.formula_dir/"testball.rb")
       end
 
       it "cleans up file if outdated" do
@@ -257,10 +251,10 @@ describe Homebrew::Cleanup do
       foo.mkpath
     end
 
-    let(:foo) { mktmpdir/"foo.rb" }
+    let(:foo) { HOMEBREW_CACHE/"foo" }
 
     it "returns true when path_modified_time < days_default" do
-      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - 60 * 60 * 24 * 2)
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
       expect(described_class.prune?(foo, days_default: "1")).to be_truthy
     end
 
