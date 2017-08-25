@@ -5,11 +5,7 @@ module Utils
   class Bottles
     class << self
       def tag
-        @bottle_tag ||= if ENV["HOMEBREW_SYSTEM"] == "Linux"
-          "#{ENV["HOMEBREW_PROCESSOR"]}_#{ENV["HOMEBREW_SYSTEM"]}"
-        else
-          "#{ENV["HOMEBREW_SYSTEM"]}_#{ENV["HOMEBREW_PROCESSOR"]}"
-        end.downcase.to_sym
+        @bottle_tag ||= "#{ENV["HOMEBREW_SYSTEM"]}_#{ENV["HOMEBREW_PROCESSOR"]}".downcase.to_sym
       end
 
       def built_as?(f)
