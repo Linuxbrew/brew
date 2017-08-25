@@ -19,13 +19,17 @@ module Git
     commit_hash = last_revision_commit_of_file(repo, relative_file, before_commit: before_commit)
     out, = Open3.capture3(
       HOMEBREW_SHIMS_PATH/"scm/git", "-C", repo,
-      "show", "#{commit_hash}:#{file}"
+      "show", "#{commit_hash}:#{relative_file}"
     )
     out
   end
 end
 
 module Utils
+  def self.clear_git_version_cache
+    remove_instance_variable(:@git) if instance_variable_defined?(:@git)
+  end
+
   def self.git_available?
     return @git if instance_variable_defined?(:@git)
     @git = quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
