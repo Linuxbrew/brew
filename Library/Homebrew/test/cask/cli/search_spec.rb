@@ -22,16 +22,29 @@ describe Hbc::CLI::Search, :cask do
     EOS
   end
 
+  it "returns matches even when online search failed" do
+    allow(GitHub).to receive(:search_code).and_raise(GitHub::Error.new("reason"))
+    expect {
+      Hbc::CLI::Search.run("local")
+    }.to output(<<-EOS.undent).to_stdout
+      local-caffeine
+      local-transmission
+    EOS
+    .and output(/^Error: reason\n/).to_stderr
+  end
+
   it "shows that there are no Casks matching a search term that did not result in anything" do
     expect {
       Hbc::CLI::Search.run("foo-bar-baz")
     }.to output("No Cask found for \"foo-bar-baz\".\n").to_stdout.as_tty
   end
 
-  it "lists all available Casks with no search term" do
+  it "lists all Casks available offline with no search term" do
+    allow(GitHub).to receive(:search_code).and_raise(GitHub::Error.new("reason"))
     expect {
       Hbc::CLI::Search.run
     }.to output(/local-caffeine/).to_stdout.as_tty
+    .and not_to_output.to_stderr
   end
 
   it "ignores hyphens in search terms" do
