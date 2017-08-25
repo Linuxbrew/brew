@@ -26,10 +26,6 @@ module Git
 end
 
 module Utils
-  def self.clear_git_version_cache
-    remove_instance_variable(:@git) if instance_variable_defined?(:@git)
-  end
-
   def self.git_available?
     return @git if instance_variable_defined?(:@git)
     @git = quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"

@@ -4,37 +4,36 @@ describe Git do
   before(:each) do
     git = HOMEBREW_SHIMS_PATH/"scm/git"
 
-    @file = "blah.rb"
-
     HOMEBREW_CACHE.cd do
       system git, "init"
 
-      File.open(@file, "w") { |f| f.write("blah") }
-      system git, "add", HOMEBREW_CACHE/@file
+      File.open(file, "w") { |f| f.write("blah") }
+      system git, "add", HOMEBREW_CACHE/file
       system git, "commit", "-m", "'File added'"
       @h1 = `git rev-parse HEAD`
 
-      File.open(@file, "w") { |f| f.write("brew") }
-      system git, "add", HOMEBREW_CACHE/@file
+      File.open(file, "w") { |f| f.write("brew") }
+      system git, "add", HOMEBREW_CACHE/file
       system git, "commit", "-m", "'written to File'"
       @h2 = `git rev-parse HEAD`
     end
   end
 
+  let(:file) { "blah.rb" }
   let(:hash1) { @h1[0..6] }
   let(:hash2) { @h2[0..6] }
 
   describe "#last_revision_commit_of_file" do
     it "gives last revision commit when before_commit is nil" do
       expect(
-        described_class.last_revision_commit_of_file(HOMEBREW_CACHE, @file),
+        described_class.last_revision_commit_of_file(HOMEBREW_CACHE, file),
       ).to eq(hash1)
     end
 
     it "gives revision commit based on before_commit when it is not nil" do
       expect(
         described_class.last_revision_commit_of_file(HOMEBREW_CACHE,
-                                                    @file,
+                                                    file,
                                                     before_commit: hash2),
       ).to eq(hash2)
     end
@@ -44,13 +43,13 @@ describe Git do
     it "returns last revision of file" do
       expect(
         described_class.last_revision_of_file(HOMEBREW_CACHE,
-                                              HOMEBREW_CACHE/@file),
+                                              HOMEBREW_CACHE/file),
       ).to eq("blah")
     end
 
     it "returns last revision of file based on before_commit" do
       expect(
-        described_class.last_revision_of_file(HOMEBREW_CACHE, HOMEBREW_CACHE/@file,
+        described_class.last_revision_of_file(HOMEBREW_CACHE, HOMEBREW_CACHE/file,
                                               before_commit: "0..3"),
       ).to eq("brew")
     end
@@ -59,7 +58,7 @@ end
 
 describe Utils do
   before(:each) do
-    described_class.clear_git_version_cache
+    described_class.clear_git_available_cache
   end
 
   describe "::git_available?" do
@@ -146,22 +145,6 @@ describe Utils do
       it "returns false when git remote does not exist" do
         expect(described_class.git_remote_exists("blah")).to be_falsey
       end
-    end
-  end
-
-  describe "::clear_git_available_cache" do
-    it "removes @git_path and @git_version if defined" do
-      described_class.clear_git_available_cache
-
-      expect(described_class.instance_variable_get(:@git_path)).to be_nil
-      expect(described_class.instance_variable_get(:@git_version)).to be_nil
-    end
-
-    it "removes @git if defined" do
-      described_class.git_available?
-      described_class.clear_git_available_cache
-
-      expect(described_class.instance_variable_get(:@git)).to be_nil
     end
   end
 end
