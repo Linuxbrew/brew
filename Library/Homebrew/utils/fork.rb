@@ -38,7 +38,7 @@ module Utils
           Process.wait(pid) unless socket.nil?
           raise Marshal.load(data) unless data.nil? || data.empty?
           raise Interrupt if $CHILD_STATUS.exitstatus == 130
-          raise "Suspicious failure" unless $CHILD_STATUS.success?
+          raise "Forked child process failed: #{$CHILD_STATUS}" unless $CHILD_STATUS.success?
         end
       end
     end
