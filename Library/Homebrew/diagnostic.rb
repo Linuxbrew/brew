@@ -786,7 +786,7 @@ module Homebrew
           EOS
         end
 
-        return if ENV["CI"]
+        return if ENV["CI"] || ENV["JENKINS_HOME"]
         head = coretap_path.git_head
         return if head.nil? || head =~ %r{refs/heads/master}
 
