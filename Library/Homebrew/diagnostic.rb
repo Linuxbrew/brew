@@ -786,7 +786,6 @@ module Homebrew
           EOS
         end
 
-        return if ENV["CI"]
         head = coretap_path.git_head
         return if head.nil? || head =~ %r{refs/heads/master}
 
