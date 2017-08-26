@@ -756,7 +756,7 @@ module Homebrew
         end
       end
 
-      def check_coretap_git_origin
+      def check_coretap_git_config
         coretap_path = CoreTap.instance.path
         return if !Utils.git_available? || !(coretap_path/".git").exist?
 
@@ -785,6 +785,16 @@ module Homebrew
               git -C "#{coretap_path}" remote set-url origin #{Formatter.url("https://github.com/Homebrew/homebrew-core.git")}
           EOS
         end
+
+        head = coretap_path.git_head
+        return if head.nil? || head =~ %r{refs/heads/master}
+
+        <<-EOS.undent
+          Homebrew/homebrew-core is not on the master branch
+
+          Check out the master branch by running:
+            git -C "$(brew --repo homebrew/core)" checkout master
+        EOS
       end
 
       def __check_linked_brew(f)
