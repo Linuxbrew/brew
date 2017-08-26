@@ -756,7 +756,7 @@ module Homebrew
         end
       end
 
-      def check_coretap_git_origin
+      def check_coretap_git_config
         coretap_path = CoreTap.instance.path
         return if !Utils.git_available? || !(coretap_path/".git").exist?
 
@@ -785,6 +785,22 @@ module Homebrew
               git -C "#{coretap_path}" remote set-url origin #{Formatter.url("https://github.com/Homebrew/homebrew-core.git")}
           EOS
         end
+
+        head = coretap_path.head
+        return unless head && head !~ %r{refs/heads/master}
+
+        <<-EOS.undent
+          Suspicious #{CoreTap.instance} git head found.
+
+          With a non-standard head, your local version of Homebrew might not
+          have all of the changes intended for the most recent release. The
+          current git head is:
+            #{head}
+
+          Unless you have compelling reasons, consider setting the head to
+          point at the master branch by running:
+            git checkout master
+        EOS
       end
 
       def __check_linked_brew(f)
