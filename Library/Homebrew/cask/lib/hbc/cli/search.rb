@@ -26,9 +26,8 @@ module Hbc
             filename: query,
             extension: "rb",
           )
-        rescue GitHub::Error => e
-          onoe e
-          $stderr.puts e.backtrace
+        rescue GitHub::Error => error
+          opoo "Online search failed: #{error}\n"
           []
         end
         matches.map do |match|
