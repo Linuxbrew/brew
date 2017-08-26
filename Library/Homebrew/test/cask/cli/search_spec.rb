@@ -41,6 +41,13 @@ describe Hbc::CLI::Search, :cask do
     EOS
   end
 
+  it "doesn't output anything to non-TTY stdout when there are no matches" do
+    expect {
+      Hbc::CLI::Search.run("foo-bar-baz")
+    }.to not_to_output.to_stdout
+    .and not_to_output.to_stderr
+  end
+
   it "lists all Casks available offline with no search term" do
     allow(GitHub).to receive(:search_code).and_raise(GitHub::Error.new("reason"))
     expect {
