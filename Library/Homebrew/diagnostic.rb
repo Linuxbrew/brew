@@ -787,19 +787,13 @@ module Homebrew
         end
 
         head = coretap_path.git_head
-        return unless head && head !~ %r{refs/heads/master}
+        return if head.nil? || head =~ %r{refs/heads/master}
 
         <<-EOS.undent
-          Suspicious #{CoreTap.instance} git head found.
+          Homebrew/homebrew-core is not on the master branch
 
-          With a non-standard head, your local version of Homebrew might not
-          have all of the changes intended for the most recent release. The
-          current git head is:
-            #{head}
-
-          Unless you have compelling reasons, consider setting the head to
-          point at the master branch by running:
-            git checkout master
+          Check out the master branch by running:
+            git -C "$(brew --repo homebrew/core)" checkout master
         EOS
       end
 
