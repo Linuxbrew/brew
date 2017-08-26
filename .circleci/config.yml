@@ -21,4 +21,9 @@ jobs:
       - run: |
           umask 022
           PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+          mkdir /home/linuxbrew/test-bot
+          cd /home/linuxbrew/test-bot
           brew test-bot
+      - run: ls /home/linuxbrew/test-bot
+      - store_test_results:
+          path: /home/linuxbrew/test-bot
