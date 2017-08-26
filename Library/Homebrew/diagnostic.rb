@@ -786,7 +786,7 @@ module Homebrew
           EOS
         end
 
-        head = coretap_path.head
+        head = coretap_path.git_head
         return unless head && head !~ %r{refs/heads/master}
 
         <<-EOS.undent
