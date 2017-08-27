@@ -201,7 +201,7 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, name, user_agents: [:default])
+  def self.check_http_content(type, url, name, user_agents: [:default])
     return unless url.start_with? "http"
 
     details = nil
@@ -236,8 +236,31 @@ class FormulaAuditor
       details[:content_length] == secure_details[:content_length]
     file_match = details[:file_hash] == secure_details[:file_hash]
 
-    return if !etag_match && !content_length_match && !file_match
-    "The URL #{url} could use HTTPS rather than HTTP"
+    if etag_match || content_length_match || file_match
+      return "The URL #{url} could use HTTPS rather than HTTP"
+    end
+
+    if type == "homepage"
+
+      details[:file] = details[:file].gsub(/https?:\\?\/\\?\//, '/')
+      secure_details[:file] = secure_details[:file].gsub(/https?:\\?\/\\?\//, '/')
+
+      # Same content after normalization
+      if details[:file] == secure_details[:file]
+        return "The URL #{url} could use HTTPS rather than HTTP"
+      end
+
+      # Same size, different content after normalization
+      # (typical causes: Generated ID, Timestamp, Unix time)
+      if details[:file].length == secure_details[:file].length
+        return "The URL #{url} could use HTTPS rather than HTTP"
+      end
+
+      lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
+      if lenratio >= 90 && lenratio <= 120
+        return "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
+      end
+    end
   end
 
   def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
@@ -260,6 +283,7 @@ class FormulaAuditor
       etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
       content_length: headers[/Content-Length: (\d+)/, 1],
       file_hash: output_hash,
+      file: output,
     }
   end
 
@@ -564,7 +588,8 @@ class FormulaAuditor
     return unless @online
 
     return unless DevelopmentTools.curl_handles_most_https_homepages?
-    if http_content_problem = FormulaAuditor.check_http_content(homepage,
+    if http_content_problem = FormulaAuditor.check_http_content("homepage",
+                                               homepage,
                                                formula.name,
                                                user_agents: [:browser, :default])
       problem http_content_problem
@@ -1219,7 +1244,8 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url, name)
+        if http_content_problem = FormulaAuditor.check_http_content("url",
+                                                                    url, name)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy
