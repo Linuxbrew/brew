@@ -240,26 +240,25 @@ class FormulaAuditor
       return "The URL #{url} could use HTTPS rather than HTTP"
     end
 
-    if type == "homepage"
+    return if type != "homepage"
 
-      details[:file] = details[:file].gsub(/https?:\\?\/\\?\//, '/')
-      secure_details[:file] = secure_details[:file].gsub(/https?:\\?\/\\?\//, '/')
+    details[:file] = details[:file].gsub(%r{https?:\\?\/\\?\/}, "/")
+    secure_details[:file] = secure_details[:file].gsub(%r{https?:\\?\/\\?\/}, "/")
 
-      # Same content after normalization
-      if details[:file] == secure_details[:file]
-        return "The URL #{url} could use HTTPS rather than HTTP"
-      end
+    # Same content after normalization
+    if details[:file] == secure_details[:file]
+      return "The URL #{url} could use HTTPS rather than HTTP"
+    end
 
-      # Same size, different content after normalization
-      # (typical causes: Generated ID, Timestamp, Unix time)
-      if details[:file].length == secure_details[:file].length
-        return "The URL #{url} could use HTTPS rather than HTTP"
-      end
+    # Same size, different content after normalization
+    # (typical causes: Generated ID, Timestamp, Unix time)
+    if details[:file].length == secure_details[:file].length
+      return "The URL #{url} could use HTTPS rather than HTTP"
+    end
 
-      lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
-      if lenratio >= 90 && lenratio <= 120
-        return "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
-      end
+    lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
+    if lenratio >= 90 && lenratio <= 120
+      return "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
     end
   end
 
