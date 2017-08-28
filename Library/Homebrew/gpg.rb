@@ -37,12 +37,21 @@ class Gpg
       Key-Length: 2048
       Subkey-Type: RSA
       Subkey-Length: 2048
-      Passphrase: ''
       Name-Real: Testing
       Name-Email: testing@foo.bar
       Expire-Date: 1d
+      %no-protection
       %commit
     EOS
     system GPG_EXECUTABLE, "--batch", "--gen-key", "batch.gpg"
+  end
+
+  def self.cleanup_test_processes!
+    odie "No GPG present to test against!" unless available?
+    gpgconf = Pathname.new(GPG_EXECUTABLE).parent/"gpgconf"
+
+    system gpgconf, "--kill", "gpg-agent"
+    system gpgconf, "--homedir", "keyrings/live", "--kill",
+                                 "gpg-agent"
   end
 end
