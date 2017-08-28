@@ -47,6 +47,8 @@ module ELF
         @dylibs = []
         return
       end
+      # ldd requires that the file be executable, and all ELF files should be executable.
+      path.chmod path.stat.mode | 0111 unless path.executable?
       begin
         ldd = Formula["glibc"].bin/"ldd"
         ldd = "ldd" unless ldd.executable?
