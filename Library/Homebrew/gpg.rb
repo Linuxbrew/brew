@@ -7,8 +7,7 @@ class Gpg
       next unless gpg_short_version
       gpg_version = Version.create(gpg_short_version.to_s)
       @version = gpg_version
-      gpg_version == Version.create("2.1") ||
-        gpg_version == Version.create("2.0")
+      gpg_version >= Version.create("2.0")
     end
   end
 
