@@ -1,10 +1,8 @@
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 LABEL maintainer="Shaun Jackman <sjackman@gmail.com>"
 
 RUN apt-get update \
-	&& apt-get install -y curl file g++ git make ruby2.0 ruby2.0-dev uuid-runtime \
-	&& ln -sf ruby2.0 /usr/bin/ruby \
-	&& ln -sf gem2.0 /usr/bin/gem
+	&& apt-get install -y curl file g++ git locales make uuid-runtime
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8 \
 	&& useradd -m -s /bin/bash linuxbrew \
