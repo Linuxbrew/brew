@@ -54,7 +54,7 @@ module ELF
         ldd = "ldd"
       end
       command = [ldd, path.expand_path.to_s]
-      libs = Utils.popen_read(*command).split("\n")
+      libs = IO.popen command, "rb", err: [:child, :out], &:readlines
       raise ErrorDuringExecution, "#{command.join(" ")}\n#{libs.join("\n")}" unless $CHILD_STATUS.success?
       needed << "not found"
       libs.select! { |lib| needed.any? { |soname| lib.include? soname } }
