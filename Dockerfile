@@ -2,7 +2,7 @@ FROM ubuntu:xenial
 LABEL maintainer="Shaun Jackman <sjackman@gmail.com>"
 
 RUN apt-get update \
-	&& apt-get install -y curl file g++ git locales make uuid-runtime
+	&& apt-get install -y bzip2 curl file g++ git locales make ruby-dev sudo uuid-runtime
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8 \
 	&& useradd -m -s /bin/bash linuxbrew \
