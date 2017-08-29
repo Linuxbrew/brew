@@ -201,7 +201,7 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, name, user_agents: [:default], check_content: false)
+  def self.check_http_content(url, name, user_agents: [:default], check_content: false, strict: false)
     return unless url.start_with? "http"
 
     details = nil
@@ -250,6 +250,8 @@ class FormulaAuditor
     if details[:file] == secure_details[:file]
       return "The URL #{url} should use HTTPS rather than HTTP"
     end
+
+    return unless strict
 
     # Same size, different content after normalization
     # (typical causes: Generated ID, Timestamp, Unix time)
@@ -590,7 +592,8 @@ class FormulaAuditor
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
                                                formula.name,
                                                user_agents: [:browser, :default],
-                                               check_content: true)
+                                               check_content: true,
+                                               strict: @strict)
       problem http_content_problem
     end
   end
