@@ -80,7 +80,7 @@ class LinkageChecker
     end
     extraneous_deps = declared_dep_names.reject do |full_name|
       name = full_name.split("/").last
-      @brewed_dylibs.keys.map { |x| x.split("/").last }.include? name
+      Formula[name].bin.directory? || @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
     [undeclared_deps, extraneous_deps]
   end
