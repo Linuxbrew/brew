@@ -260,7 +260,7 @@ class FormulaAuditor
     end
 
     lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
-    return if lenratio < 90 || lenratio > 120
+    return if lenratio < 90 || lenratio > 110
     "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
   end
 
