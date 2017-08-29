@@ -79,10 +79,10 @@ class LinkageChecker
       end
     end
     extraneous_deps = declared_dep_names.reject do |full_name|
-        name = full_name.split("/").last
-        @brewed_dylibs.keys.map{ |x| x.split("/").last }.include? name
+      name = full_name.split("/").last
+      @brewed_dylibs.keys.map { |x| x.split("/").last }.include? name
     end
-    return undeclared_deps, extraneous_deps
+    [undeclared_deps, extraneous_deps]
   end
 
   def display_normal_output
