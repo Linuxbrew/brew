@@ -85,7 +85,7 @@ class FormulaInstaller
     return false if @pour_failed
 
     bottle = formula.bottle
-    return false unless bottle
+    return false if !bottle && !formula.local_bottle_path
     return true  if force_bottle?
     return false if build_from_source? || build_bottle? || interactive?
     return false if ARGV.cc
