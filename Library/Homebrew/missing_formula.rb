@@ -31,7 +31,7 @@ module Homebrew
             #{Formatter.url("https://pip.readthedocs.io/en/stable/installing/")}
           EOS
         when "pil" then <<-EOS.undent
-          Instead of PIL, consider `pip install pillow` or `brew install Homebrew/science/pillow`.
+          Instead of PIL, consider `pip install pillow`.
           EOS
         when "macruby" then <<-EOS.undent
           MacRuby is not packaged and is on an indefinite development hiatus.
