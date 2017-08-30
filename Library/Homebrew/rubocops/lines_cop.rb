@@ -21,7 +21,7 @@ module RuboCop
           begin_pos = start_column(parent_class_node)
           end_pos = end_column(class_node)
           return unless begin_pos-end_pos != 3
-          problem "Use a space in class inheritance: class #{@formula_name} < #{class_name(parent_class_node)}"
+          problem "Use a space in class inheritance: class #{class_name(class_node)} < #{class_name(parent_class_node)}"
         end
       end
 
@@ -86,12 +86,13 @@ module RuboCop
           end
 
           find_method_with_args(body_node, :system, /^(otool|install_name_tool|lipo)$/) do
-            next if @formula_name == "Cctools"
+            next if @formula_name == "cctools"
             problem "Use ruby-macho instead of calling #{@offensive_node.source}"
           end
 
           find_every_method_call_by_name(body_node, :system).each do |method_node|
-            next if @formula_name =~ /^Kibana(\@\d+(\.\d+)?)?$/
+            # Skip Kibana: npm cache edge (see formula for more details)
+            next if @formula_name =~ /^kibana(\@\d+(\.\d+)?)?$/
             first_param, second_param = parameters(method_node)
             next if !node_equals?(first_param, "npm") ||
                     !node_equals?(second_param, "install")
@@ -115,8 +116,8 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, :build, :universal?) do
-            next if @formula_name == "Wine"
-            problem "macOS has been 64-bit only so build.universal? is deprecated."
+            next if @formula_name == "wine"
+            problem "macOS has been 64-bit only since 10.6 so build.universal? is deprecated."
           end
 
           find_instance_method_call(body_node, "ENV", :universal_binary) do

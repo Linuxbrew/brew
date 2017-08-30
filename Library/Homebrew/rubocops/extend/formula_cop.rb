@@ -14,7 +14,7 @@ module RuboCop
         return unless formula_class?(node)
         return unless respond_to?(:audit_formula)
         class_node, parent_class_node, @body = *node
-        @formula_name = class_name(class_node)
+        @formula_name = Pathname.new(@file_path).basename(".rb").to_s
         audit_formula(node, class_node, parent_class_node, @body)
       end
 
@@ -404,12 +404,7 @@ module RuboCop
 
       # Returns true if the formula is versioned
       def versioned_formula?
-        formula_file_name.include?("@") || @formula_name.match(/AT\d+/)
-      end
-
-      # Returns filename of the formula without the extension
-      def formula_file_name
-        File.basename(processed_source.buffer.name, ".rb")
+        @formula_name.include?("@")
       end
 
       # Returns printable component name

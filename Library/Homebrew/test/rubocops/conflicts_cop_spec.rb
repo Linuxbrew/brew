@@ -22,7 +22,7 @@ describe RuboCop::Cop::FormulaAudit::Conflicts do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(cop, source, "/homebrew-core/Formula/foo@2.0.rb")
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -36,7 +36,7 @@ describe RuboCop::Cop::FormulaAudit::Conflicts do
           desc 'Bar'
         end
       EOS
-      inspect_source(cop, source)
+      inspect_source(cop, source, "/homebrew-core/Formula/foo@2.0.rb")
       expect(cop.offenses).to eq([])
     end
   end
