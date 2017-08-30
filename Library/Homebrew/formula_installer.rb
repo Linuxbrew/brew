@@ -91,7 +91,6 @@ class FormulaInstaller
     return false if ARGV.cc
     return false unless options.empty?
     return false if formula.bottle_disabled?
-    return true  if formula.local_bottle_path
     unless formula.pour_bottle?
       if install_bottle_options[:warn] && formula.pour_bottle_check_unsatisfied_reason
         opoo <<-EOS.undent
