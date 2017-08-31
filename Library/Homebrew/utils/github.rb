@@ -245,7 +245,7 @@ module GitHub
   end
 
   def print_pull_requests_matching(query)
-    open_or_closed_prs = search_issues(query, type: "pr")
+    open_or_closed_prs = search_issues(query, type: "pr", user: "Homebrew")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
     prs = if !open_prs.empty?
