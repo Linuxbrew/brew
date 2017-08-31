@@ -869,6 +869,10 @@ class FormulaAuditor
       problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
     end
 
+    if line.include?("ENV.java_cache")
+      problem "In-formula ENV.java_cache usage has been deprecated & should be removed."
+    end
+
     # Avoid hard-coding compilers
     if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?(gcc|llvm-gcc|clang)['" ]}
       problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
