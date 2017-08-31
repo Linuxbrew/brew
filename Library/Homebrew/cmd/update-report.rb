@@ -203,6 +203,7 @@ module Homebrew
     end
 
     new_homebrew_repository = Pathname.new "/usr/local/Homebrew"
+    new_homebrew_repository.rmdir_if_possible
     if new_homebrew_repository.exist?
       ofail <<-EOS.undent
         #{new_homebrew_repository} already exists.
