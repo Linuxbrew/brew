@@ -27,7 +27,7 @@ module Hbc
             extension: "rb",
           )
         rescue GitHub::Error => error
-          opoo "Online search failed: #{error}\n"
+          opoo "Error searching on GitHub: #{error}\n"
           []
         end
         matches.map do |match|

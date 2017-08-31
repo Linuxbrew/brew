@@ -30,7 +30,7 @@ describe Hbc::CLI::Search, :cask do
       local-caffeine
       local-transmission
     EOS
-    .and output(/^Warning: Online search failed: reason/).to_stderr
+    .and output(/^Warning: Error searching on GitHub: reason/).to_stderr
   end
 
   it "shows that there are no Casks matching a search term that did not result in anything" do
