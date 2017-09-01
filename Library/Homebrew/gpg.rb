@@ -54,4 +54,13 @@ class Gpg
     system gpgconf, "--homedir", "keyrings/live", "--kill",
                                  "gpg-agent"
   end
+
+  def self.test(path)
+    create_test_key(path)
+    begin
+      yield
+    ensure
+      cleanup_test_processes!
+    end
+  end
 end
