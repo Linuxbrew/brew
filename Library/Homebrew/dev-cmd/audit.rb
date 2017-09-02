@@ -54,6 +54,7 @@ module Homebrew
 
   def audit
     Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
+    Homebrew.auditing = true
 
     formula_count = 0
     problem_count = 0

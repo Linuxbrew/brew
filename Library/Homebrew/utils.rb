@@ -102,7 +102,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   if ARGV.homebrew_developer? || disable ||
      Homebrew.raise_deprecation_exceptions?
     raise MethodDeprecatedError, message
-  else
+  elsif !Homebrew.auditing?
     opoo "#{message}\n"
   end
 end
