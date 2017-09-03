@@ -201,7 +201,7 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, name, user_agents: [:default])
+  def self.check_http_content(url, name, user_agents: [:default], check_content: false, strict: false)
     return unless url.start_with? "http"
 
     details = nil
@@ -236,8 +236,32 @@ class FormulaAuditor
       details[:content_length] == secure_details[:content_length]
     file_match = details[:file_hash] == secure_details[:file_hash]
 
-    return if !etag_match && !content_length_match && !file_match
-    "The URL #{url} could use HTTPS rather than HTTP"
+    if etag_match || content_length_match || file_match
+      return "The URL #{url} should use HTTPS rather than HTTP"
+    end
+
+    return unless check_content
+
+    no_protocol_file_contents = %r{https?:\\?/\\?/}
+    details[:file] = details[:file].gsub(no_protocol_file_contents, "/")
+    secure_details[:file] = secure_details[:file].gsub(no_protocol_file_contents, "/")
+
+    # Check for the same content after removing all protocols
+    if details[:file] == secure_details[:file]
+      return "The URL #{url} should use HTTPS rather than HTTP"
+    end
+
+    return unless strict
+
+    # Same size, different content after normalization
+    # (typical causes: Generated ID, Timestamp, Unix time)
+    if details[:file].length == secure_details[:file].length
+      return "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
+    end
+
+    lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
+    return unless (90..110).cover?(lenratio)
+    "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
   end
 
   def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
@@ -260,6 +284,7 @@ class FormulaAuditor
       etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
       content_length: headers[/Content-Length: (\d+)/, 1],
       file_hash: output_hash,
+      file: output,
     }
   end
 
@@ -566,7 +591,9 @@ class FormulaAuditor
     return unless DevelopmentTools.curl_handles_most_https_homepages?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
                                                formula.name,
-                                               user_agents: [:browser, :default])
+                                               user_agents: [:browser, :default],
+                                               check_content: true,
+                                               strict: @strict)
       problem http_content_problem
     end
   end
