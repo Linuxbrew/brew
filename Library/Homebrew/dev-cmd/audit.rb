@@ -1233,7 +1233,7 @@ class ResourceAuditor
       elsif strategy <= SubversionDownloadStrategy
         next unless DevelopmentTools.subversion_handles_most_https_certificates?
         next unless Utils.svn_available?
-        if Utils.svn_remote_exists url
+        unless Utils.svn_remote_exists url
           problem "The URL #{url} is not a valid svn URL"
         end
       end
