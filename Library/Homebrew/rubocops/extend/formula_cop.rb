@@ -37,6 +37,20 @@ module RuboCop
         match_object
       end
 
+      # Yields to block when there is a match
+      # Parameters: urls : Array of url/mirror method call nodes
+      #             regex: regex pattern to match urls
+      def audit_urls(urls, regex)
+        urls.each do |url_node|
+          url_string_node = parameters(url_node).first
+          url_string = string_content(url_string_node)
+          match_object = regex_match_group(url_string_node, regex)
+          next unless match_object
+          offending_node(url_string_node.parent)
+          yield match_object, url_string
+        end
+      end
+
       # Returns all string nodes among the descendants of given node
       def find_strings(node)
         return [] if node.nil?
@@ -124,7 +138,8 @@ module RuboCop
 
         case type
         when :required
-          type_match = !node.method_args.nil? && node.method_args.first.str_type?
+          type_match = !node.method_args.nil? &&
+                       (node.method_args.first.str_type? || node.method_args.first.sym_type?)
           if type_match && !name_match
             name_match = node_equals?(node.method_args.first, name)
           end

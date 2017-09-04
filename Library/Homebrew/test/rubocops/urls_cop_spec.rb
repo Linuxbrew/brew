@@ -182,3 +182,46 @@ describe RuboCop::Cop::FormulaAudit::Urls do
     end
   end
 end
+
+describe RuboCop::Cop::FormulaAuditStrict::PyPiUrls do
+  subject(:cop) { described_class.new }
+
+  context "When auditing urls" do
+    it "with pypi offenses" do
+      formulas = [{
+        "url" => "https://pypi.python.org/packages/source/foo/foo-0.1.tar.gz",
+        "msg" => "https://pypi.python.org/packages/source/foo/foo-0.1.tar.gz should be `https://files.pythonhosted.org/packages/source/foo/foo-0.1.tar.gz`",
+        "col" => 2,
+        "corrected_url" =>"https://files.pythonhosted.org/packages/source/foo/foo-0.1.tar.gz",
+      }]
+      formulas.each do |formula|
+        source = <<-EOS.undent
+          class Foo < Formula
+            desc "foo"
+            url "#{formula["url"]}"
+          end
+        EOS
+        corrected_source = <<-EOS.undent
+          class Foo < Formula
+            desc "foo"
+            url "#{formula["corrected_url"]}"
+          end
+        EOS
+        expected_offenses = [{ message: formula["msg"],
+                               severity: :convention,
+                               line: 3,
+                               column: formula["col"],
+                               source: source }]
+
+        inspect_source(cop, source)
+        # Check for expected offenses
+        expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
+          expect_offense(expected, actual)
+        end
+        # Check for expected auto corrected source
+        new_source = autocorrect_source(cop, source)
+        expect(new_source).to eq(corrected_source)
+      end
+    end
+  end
+end

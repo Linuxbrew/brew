@@ -4,7 +4,9 @@ cache:
     - $HOME/.gem/ruby
     - $HOME/Library/Caches/Homebrew/style
     - $HOME/Library/Caches/Homebrew/tests
-
+branches:
+  only:
+    - master
 matrix:
   fast_finish: true
   include:

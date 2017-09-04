@@ -7,9 +7,16 @@ module Hbc
     include Metadata
 
     attr_reader :token, :sourcefile_path
-    def initialize(token, sourcefile_path: nil, &block)
+
+    def tap
+      return super if block_given? # Object#tap
+      @tap
+    end
+
+    def initialize(token, sourcefile_path: nil, tap: nil, &block)
       @token = token
       @sourcefile_path = sourcefile_path
+      @tap = tap
       @dsl = DSL.new(@token)
       return unless block_given?
       @dsl.instance_eval(&block)
