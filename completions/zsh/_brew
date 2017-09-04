@@ -592,8 +592,14 @@ _brew_style() {
 
 # brew switch name version:
 _brew_switch() {
-  _message "name version"
-  return 1
+  local -a versions
+  if [[ -n ${words[2]} ]]; then
+    versions=(${$(brew ls "${words[2]}" --versions)#${words[2]}})
+  fi
+  _arguments -S \
+    '1::formula:__brew_formulae' \
+    "2:: :(${versions[*]})" \
+    && ret=0
 }
 
 # brew tap:
