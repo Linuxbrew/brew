@@ -5,7 +5,7 @@ require "formula"
 class LinkageChecker
   attr_reader :keg, :formula
   attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :variable_dylibs
-  attr_reader :undeclared_deps, :extraneous_deps, :reverse_links
+  attr_reader :undeclared_deps, :unnecessary_deps, :reverse_links
 
   def initialize(keg, formula = nil)
     @keg = keg
@@ -16,7 +16,7 @@ class LinkageChecker
     @variable_dylibs = Set.new
     @undeclared_deps = []
     @reverse_links = Hash.new { |h, k| h[k] = Set.new }
-    @extraneous_deps = []
+    @unnecessary_deps = []
     check_dylibs
   end
 
@@ -52,7 +52,7 @@ class LinkageChecker
       end
     end
 
-    @undeclared_deps, @extraneous_deps = check_undeclared_deps if formula
+    @undeclared_deps, @unnecessary_deps = check_undeclared_deps if formula
   end
 
   def check_undeclared_deps
@@ -78,11 +78,12 @@ class LinkageChecker
         a <=> b
       end
     end
-    extraneous_deps = declared_dep_names.reject do |full_name|
+    unnecessary_deps = declared_dep_names.reject do |full_name|
       name = full_name.split("/").last
-      Formula[name].bin.directory? || @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
+      next true if Formula[name].bin.directory?
+      @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
-    [undeclared_deps, extraneous_deps]
+    [undeclared_deps, unnecessary_deps]
   end
 
   def display_normal_output
@@ -91,7 +92,7 @@ class LinkageChecker
     display_items "Variable-referenced libraries", @variable_dylibs
     display_items "Missing libraries", @broken_dylibs
     display_items "Possible undeclared dependencies", @undeclared_deps
-    display_items "Possible extraneous dependencies", @extraneous_deps
+    display_items "Possible unnecessary dependencies", @unnecessary_deps
   end
 
   def display_reverse_output
@@ -109,6 +110,7 @@ class LinkageChecker
 
   def display_test_output
     display_items "Missing libraries", @broken_dylibs
+    display_items "Possible unnecessary dependencies", @unnecessary_deps
     puts "No broken dylib links" if @broken_dylibs.empty?
   end
 
@@ -120,8 +122,8 @@ class LinkageChecker
     !@undeclared_deps.empty?
   end
 
-  def extraneous_deps?
-    !@extraneous_deps.empty?
+  def unnecessary_deps?
+    !@unnecessary_deps.empty?
   end
 
   private
