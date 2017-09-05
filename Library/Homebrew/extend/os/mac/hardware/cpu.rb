@@ -50,6 +50,8 @@ module Hardware
             :broadwell
           when 0x37fc219f # Skylake
             :skylake
+          when 0x0f817246 # Kaby Lake
+            :kabylake
           else
             :dunno
           end
