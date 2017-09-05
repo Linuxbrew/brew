@@ -54,6 +54,7 @@ module Homebrew
 
   def audit
     Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
+    Homebrew.auditing = true
 
     formula_count = 0
     problem_count = 0
@@ -379,21 +380,6 @@ class FormulaAuditor
         EOS
       end
     end
-  end
-
-  def audit_class
-    if @strict
-      unless formula.test_defined?
-        problem "A `test do` test block should be added"
-      end
-    end
-
-    classes = %w[GithubGistFormula ScriptFileFormula AmazonWebServicesFormula]
-    klass = classes.find do |c|
-      Object.const_defined?(c) && formula.class < Object.const_get(c)
-    end
-
-    problem "#{klass} is deprecated, use Formula instead" if klass
   end
 
   # core aliases + tap alias names + tap alias full name

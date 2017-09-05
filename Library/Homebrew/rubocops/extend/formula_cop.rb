@@ -422,7 +422,14 @@ module RuboCop
 
       def formula_class?(node)
         _, class_node, = *node
-        class_node && string_content(class_node) == "Formula"
+        class_names = %w[
+          Formula
+          GithubGistFormula
+          ScriptFileFormula
+          AmazonWebServicesFormula
+        ]
+
+        class_node && class_names.include?(string_content(class_node))
       end
 
       def file_path_allowed?(file_path)
