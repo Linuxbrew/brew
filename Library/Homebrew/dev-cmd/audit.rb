@@ -1237,7 +1237,7 @@ class ResourceAuditor
   def audit_urls
     urls = [url] + mirrors
 
-    if name == "curl" && !urls.find { |u| u.start_with?("http://") }
+    if name == "curl" && !urls.find { |u| u.start_with?("http://") } && url != Formula["curl"].head.url
       problem "should always include at least one HTTP url"
     end
 
