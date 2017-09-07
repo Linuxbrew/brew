@@ -1070,7 +1070,11 @@ Homebrew Documentation: <https://docs.brew.sh>
 
 ## AUTHORS
 
-Linuxbrew is maintained by Shaun Jackman, Bob W. Hogg, Piotr Gaczkowski, Maxim Belkin, Jonathan Chang, Michka Popoff, and Alyssa Ross.
+Linuxbrew's lead maintainer is Shaun Jackman.
+
+Linuxbrew/homebrew-core's lead maintainer is Michka Popoff.
+
+Linuxbrew's other current maintainers are Bob W. Hogg, Piotr Gaczkowski, Maxim Belkin, Jonathan Chang, and Alyssa Ross.
 
 ## BUGS
 
