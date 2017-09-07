@@ -25,5 +25,7 @@ jobs:
           cd /home/linuxbrew/test-bot
           brew test-bot
       - run: ls /home/linuxbrew/test-bot
+      - store_artifacts:
+          path: /home/linuxbrew/test-bot
       - store_test_results:
           path: /home/linuxbrew/test-bot
