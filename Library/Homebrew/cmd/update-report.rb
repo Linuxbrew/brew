@@ -124,7 +124,7 @@ module Homebrew
     return if ENV["HOMEBREW_UPDATE_TEST"]
     core_tap = CoreTap.instance
     return if core_tap.installed?
-    CoreTap.ensure_installed! quiet: false
+    CoreTap.ensure_installed!
     revision = core_tap.git_head
     ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
     ENV["HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE"] = revision
