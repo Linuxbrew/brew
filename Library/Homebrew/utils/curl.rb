@@ -38,11 +38,14 @@ def curl(*args)
 end
 
 def curl_download(*args, to: nil, continue_at: "-", **options)
+  had_incomplete_download ||= File.exist?(to)
   curl("--location", "--remote-time", "--continue-at", continue_at.to_s, "--output", to, *args, **options)
 rescue ErrorDuringExecution
   # `curl` error 33: HTTP server doesn't seem to support byte ranges. Cannot resume.
-  if $CHILD_STATUS.exitstatus == 33 && continue_at == "-"
+  # HTTP status 416: Requested range not satisfiable
+  if ($CHILD_STATUS.exitstatus == 33 || had_incomplete_download) && continue_at == "-"
     continue_at = 0
+    had_incomplete_download = false
     retry
   end
 
