@@ -69,7 +69,7 @@ describe Dependency do
     end
   end
 
-  it "merges dependencies and perserves env_proc" do
+  it "merges dependencies and preserves env_proc" do
     env_proc = double
     dep = described_class.new("foo", [], env_proc)
     allow(dep).to receive(:to_formula).and_return(double(deps: [], name: "foo"))
