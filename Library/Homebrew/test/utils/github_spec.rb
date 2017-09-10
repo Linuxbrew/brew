@@ -2,7 +2,7 @@ require "utils/github"
 
 describe GitHub do
   describe "::search_code", :needs_network do
-    it "queries GitHub code with the passed paramaters" do
+    it "queries GitHub code with the passed parameters" do
       results = subject.search_code(repo: "Homebrew/brew", path: "/",
                                     filename: "readme", language: "markdown")
 
