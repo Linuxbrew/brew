@@ -130,7 +130,7 @@ module OS
       end
 
       # Finally, some users make their MacPorts or Fink directories
-      # read-only in order to try out Homebrew, but this doens't work as
+      # read-only in order to try out Homebrew, but this doesn't work as
       # some build scripts error out when trying to read from these now
       # unreadable paths.
       %w[/sw /opt/local].map { |p| Pathname.new(p) }.each do |path|
