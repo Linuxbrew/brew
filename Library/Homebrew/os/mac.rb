@@ -129,7 +129,7 @@ module OS
         paths << path if path.exist?
       end
 
-      # Finally, some users make their MacPorts or Fink directorie
+      # Finally, some users make their MacPorts or Fink directories
       # read-only in order to try out Homebrew, but this doens't work as
       # some build scripts error out when trying to read from these now
       # unreadable paths.
