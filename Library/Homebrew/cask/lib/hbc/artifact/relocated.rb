@@ -34,7 +34,7 @@ module Hbc
         altnames.concat(%Q("#{altname}"))
         altnames = "(#{altnames})"
 
-        # Some packges are shipped as u=rx (e.g. Bitcoin Core)
+        # Some packages are shipped as u=rx (e.g. Bitcoin Core)
         @command.run!("/bin/chmod", args: ["--", "u+rw", file, file.realpath])
 
         @command.run!("/usr/bin/xattr",
