@@ -147,7 +147,7 @@ module HomebrewArgvExtension
     flag_with_value.strip_prefix(arg_prefix) if flag_with_value
   end
 
-  # Returns an array of values that were given as a comma-seperated list.
+  # Returns an array of values that were given as a comma-separated list.
   # @see value
   def values(name)
     return unless val = value(name)
