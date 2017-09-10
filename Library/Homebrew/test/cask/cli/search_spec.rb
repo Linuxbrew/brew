@@ -4,6 +4,8 @@ describe Hbc::CLI::Search, :cask do
   end
 
   it "lists the available Casks that match the search term" do
+    allow(GitHub).to receive(:search_code).and_return([])
+
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<-EOS.undent).to_stdout.as_tty
@@ -14,6 +16,8 @@ describe Hbc::CLI::Search, :cask do
   end
 
   it "outputs a plain list when stdout is not a TTY" do
+    allow(GitHub).to receive(:search_code).and_return([])
+
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<-EOS.undent).to_stdout
@@ -24,6 +28,7 @@ describe Hbc::CLI::Search, :cask do
 
   it "returns matches even when online search failed" do
     allow(GitHub).to receive(:search_code).and_raise(GitHub::Error.new("reason"))
+
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<-EOS.undent).to_stdout
