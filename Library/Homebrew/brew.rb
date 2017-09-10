@@ -18,7 +18,7 @@ require "global"
 require "tap"
 
 if ARGV == %w[--version] || ARGV == %w[-v]
-  puts "Homebrew #{HOMEBREW_VERSION}"
+  puts "This is a test #{HOMEBREW_VERSION}"
   puts "Homebrew/homebrew-core #{CoreTap.instance.version_string}"
   exit 0
 end
