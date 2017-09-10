@@ -129,8 +129,8 @@ module OS
         paths << path if path.exist?
       end
 
-      # Finally, some users make their MacPorts or Fink directorie
-      # read-only in order to try out Homebrew, but this doens't work as
+      # Finally, some users make their MacPorts or Fink directories
+      # read-only in order to try out Homebrew, but this doesn't work as
       # some build scripts error out when trying to read from these now
       # unreadable paths.
       %w[/sw /opt/local].map { |p| Pathname.new(p) }.each do |path|
