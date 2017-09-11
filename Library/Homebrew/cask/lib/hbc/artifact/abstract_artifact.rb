@@ -1,33 +1,27 @@
 module Hbc
   module Artifact
-    class Base
+    class AbstractArtifact
       extend Predicable
 
-      def self.artifact_name
-        @artifact_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase
+      def self.english_name
+        @english_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1 \2')
       end
 
-      def self.artifact_english_name
-        @artifact_english_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1 \2')
+      def self.english_article
+        @english_article ||= (english_name =~ /^[aeiou]/i) ? "an" : "a"
       end
 
-      def self.artifact_english_article
-        @artifact_english_article ||= (artifact_english_name =~ /^[aeiou]/i) ? "an" : "a"
+      def self.dsl_key
+        @dsl_key ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase.to_sym
       end
 
-      def self.artifact_dsl_key
-        @artifact_dsl_key ||= artifact_name.to_sym
+      def self.dirmethod
+        @dirmethod ||= "#{dsl_key}dir".to_sym
       end
 
-      def self.artifact_dirmethod
-        @artifact_dirmethod ||= "#{artifact_name}dir".to_sym
+      def self.for_cask(cask)
+        cask.artifacts[dsl_key].to_a
       end
-
-      def self.me?(cask)
-        cask.artifacts[artifact_dsl_key].any?
-      end
-
-      attr_reader :force
 
       # TODO: this sort of logic would make more sense in dsl.rb, or a
       #       constructor called from dsl.rb, so long as that isn't slow.
@@ -63,17 +57,14 @@ module Hbc
         [executable, arguments]
       end
 
-      def summary
-        {}
+      attr_reader :cask
+
+      def initialize(cask)
+        @cask = cask
       end
 
-      attr_predicate :force?, :verbose?
-
-      def initialize(cask, command: SystemCommand, force: false, verbose: false)
-        @cask = cask
-        @command = command
-        @force = force
-        @verbose = verbose
+      def to_s
+        "#{summarize} (#{self.class.english_name})"
       end
     end
   end

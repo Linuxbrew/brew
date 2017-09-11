@@ -69,13 +69,11 @@ module Hbc
 
       def self.artifact_info(cask)
         ohai "Artifacts"
-        DSL::ORDINARY_ARTIFACT_TYPES.each do |type|
-          next if cask.artifacts[type].empty?
-          cask.artifacts[type].each do |artifact|
-            activatable_item = (type == :stage_only) ? "<none>" : artifact.first
-            puts "#{activatable_item} (#{type})"
-          end
-        end
+        DSL::ORDINARY_ARTIFACT_CLASSES.flat_map { |klass| klass.for_cask(cask) }
+                                      .select { |artifact| artifact.respond_to?(:install_phase) }
+                                      .each do |artifact|
+                                        puts artifact.to_s
+                                      end
       end
     end
   end

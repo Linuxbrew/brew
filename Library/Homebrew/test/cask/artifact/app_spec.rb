@@ -2,13 +2,13 @@ describe Hbc::Artifact::App, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb") }
   let(:command) { Hbc::SystemCommand }
   let(:force) { false }
-  let(:app) { Hbc::Artifact::App.new(cask, command: command, force: force) }
+  let(:app) { described_class.for_cask(cask).first }
 
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
   let(:target_path) { Hbc.appdir.join("Caffeine.app") }
 
-  let(:install_phase) { app.install_phase }
-  let(:uninstall_phase) { app.uninstall_phase }
+  let(:install_phase) { app.install_phase(command: command, force: force) }
+  let(:uninstall_phase) { app.uninstall_phase(command: command, force: force) }
 
   before(:each) do
     InstallHelper.install_without_artifacts(cask)
@@ -105,8 +105,8 @@ describe Hbc::Artifact::App, :cask do
 
         describe "target is user-owned but contains read-only files" do
           before(:each) do
-            system "/usr/bin/touch", "--", "#{target_path}/foo"
-            system "/bin/chmod", "--", "0555", target_path
+            FileUtils.touch "#{target_path}/foo"
+            FileUtils.chmod 0555, target_path
           end
 
           it "overwrites the existing app" do
@@ -138,7 +138,7 @@ describe Hbc::Artifact::App, :cask do
           end
 
           after(:each) do
-            system "/bin/chmod", "--", "0755", target_path
+            FileUtils.chmod 0755, target_path
           end
         end
       end
@@ -206,8 +206,8 @@ describe Hbc::Artifact::App, :cask do
   end
 
   describe "summary" do
-    let(:description) { app.summary[:english_description] }
-    let(:contents) { app.summary[:contents] }
+    let(:description) { app.class.english_description }
+    let(:contents) { app.summarize_installed }
 
     it "returns the correct english_description" do
       expect(description).to eq("Apps")
@@ -217,14 +217,13 @@ describe Hbc::Artifact::App, :cask do
       it "returns the path to the app" do
         install_phase
 
-        expect(contents).to eq(["#{target_path} (#{target_path.abv})"])
+        expect(contents).to eq("#{target_path} (#{target_path.abv})")
       end
     end
 
     describe "app is missing" do
       it "returns a warning and the supposed path to the app" do
-        expect(contents.size).to eq(1)
-        expect(contents[0]).to match(/.*Missing App.*: #{target_path}/)
+        expect(contents).to match(/.*Missing App.*: #{target_path}/)
       end
     end
   end
