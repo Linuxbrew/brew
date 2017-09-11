@@ -1,8 +1,7 @@
 describe Hbc::CLI::Zap, :cask do
   it "shows an error when a bad Cask is provided" do
     expect { Hbc::CLI::Zap.run("notacask") }
-      .to output(/is unavailable/).to_stderr
-      .and raise_error(Hbc::CaskError, "Zap incomplete.")
+      .to raise_error(Hbc::CaskUnavailableError, /is unavailable/)
   end
 
   it "can zap and unlink multiple Casks at once" do

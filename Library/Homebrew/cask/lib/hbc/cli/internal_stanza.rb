@@ -46,12 +46,6 @@ module Hbc
       end
 
       def run
-        return unless print_stanzas == :incomplete
-        exit 1 if quiet?
-        raise CaskError, "Print incomplete."
-      end
-
-      def print_stanzas
         if ARTIFACTS.include?(stanza)
           artifact_name = stanza
           @stanza = :artifacts

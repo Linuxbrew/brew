@@ -56,27 +56,19 @@ describe Hbc::CLI::Install, :cask do
   it "properly handles Casks that are not present" do
     expect {
       Hbc::CLI::Install.run("notacask")
-    }.to raise_error(Hbc::CaskError, "Install incomplete.")
+    }.to raise_error(Hbc::CaskUnavailableError)
   end
 
   it "returns a suggestion for a misspelled Cask" do
     expect {
-      begin
-        Hbc::CLI::Install.run("localcaffeine")
-      rescue Hbc::CaskError
-        nil
-      end
-    }.to output(/Cask 'localcaffeine' is unavailable: No Cask with this name exists\. Did you mean:\nlocal-caffeine/).to_stderr
+      Hbc::CLI::Install.run("localcaffeine")
+    }.to raise_error(Hbc::CaskUnavailableError, /Cask 'localcaffeine' is unavailable: No Cask with this name exists\. Did you mean “local-caffeine”?/)
   end
 
   it "returns multiple suggestions for a Cask fragment" do
     expect {
-      begin
-        Hbc::CLI::Install.run("local-caf")
-      rescue Hbc::CaskError
-        nil
-      end
-    }.to output(/Cask 'local-caf' is unavailable: No Cask with this name exists\. Did you mean one of:\nlocal-caffeine/).to_stderr
+      Hbc::CLI::Install.run("local")
+    }.to raise_error(Hbc::CaskUnavailableError, /Cask 'local' is unavailable: No Cask with this name exists\. Did you mean one of these\?\nlocal-caffeine\nlocal-transmission/)
   end
 
   describe "when no Cask is specified" do

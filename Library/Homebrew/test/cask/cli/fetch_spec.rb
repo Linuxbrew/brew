@@ -42,7 +42,7 @@ describe Hbc::CLI::Fetch, :cask do
   it "properly handles Casks that are not present" do
     expect {
       Hbc::CLI::Fetch.run("notacask")
-    }.to raise_error(Hbc::CaskError, "Fetch incomplete.")
+    }.to raise_error(Hbc::CaskUnavailableError)
   end
 
   describe "when no Cask is specified" do

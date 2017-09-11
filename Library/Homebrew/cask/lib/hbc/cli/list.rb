@@ -10,8 +10,7 @@ module Hbc
       end)
 
       def run
-        retval = args.any? ? list : list_installed
-        raise CaskError, "Listing incomplete." if retval == :incomplete
+        args.any? ? list : list_installed
       end
 
       def list
@@ -46,8 +45,6 @@ module Hbc
         elsif !installed_casks.empty?
           puts Formatter.columns(installed_casks.map(&:to_s))
         end
-
-        installed_casks.empty? ? :empty : :complete
       end
 
       def self.format_versioned(cask)

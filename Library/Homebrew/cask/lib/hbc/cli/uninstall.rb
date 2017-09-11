@@ -9,10 +9,6 @@ module Hbc
       end
 
       def run
-        raise CaskError, "Uninstall incomplete." if uninstall_casks == :incomplete
-      end
-
-      def uninstall_casks
         casks.each do |cask|
           odebug "Uninstalling Cask #{cask}"
 
