@@ -118,7 +118,12 @@ We'd love you to contribute to Linuxbrew. First, please read our [Contribution G
 We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
 
 ## Who Are You?
-Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), [Michka Popoff](https://github.com/iMichka), and [Alyssa Ross](https://github.com/alyssais).
+
+Linuxbrew's lead maintainer is [Shaun Jackman](http://sjackman.ca).
+
+Linuxbrew/homebrew-core's lead maintainer is [Michka Popoff](https://github.com/iMichka).
+
+Linuxbrew's other current maintainers are [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Alyssa Ross](https://github.com/alyssais).
 
 ## Linuxbrew Community
 - [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)
