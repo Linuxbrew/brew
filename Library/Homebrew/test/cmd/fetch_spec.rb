@@ -4,9 +4,7 @@ describe "brew fetch", :integration_test do
 
     expect(HOMEBREW_CACHE/"testball-0.1.tbz").not_to exist
 
-    shutup do
-      expect { brew "fetch", "testball" }.to be_a_success
-    end
+    expect { brew "fetch", "testball" }.to be_a_success
 
     expect(HOMEBREW_CACHE/"testball-0.1.tbz").to exist
   end

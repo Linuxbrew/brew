@@ -171,22 +171,20 @@ RSpec.shared_context "integration test" do
   end
 
   def install_and_rename_coretap_formula(old_name, new_name)
-    shutup do
-      CoreTap.instance.path.cd do |tap_path|
-        system "git", "init"
-        system "git", "add", "--all"
-        system "git", "commit", "-m",
-          "#{old_name.capitalize} has not yet been renamed"
+    CoreTap.instance.path.cd do |tap_path|
+      system "git", "init"
+      system "git", "add", "--all"
+      system "git", "commit", "-m",
+        "#{old_name.capitalize} has not yet been renamed"
 
-        brew "install", old_name
+      brew "install", old_name
 
-        (tap_path/"Formula/#{old_name}.rb").unlink
-        (tap_path/"formula_renames.json").write JSON.generate(old_name => new_name)
+      (tap_path/"Formula/#{old_name}.rb").unlink
+      (tap_path/"formula_renames.json").write JSON.generate(old_name => new_name)
 
-        system "git", "add", "--all"
-        system "git", "commit", "-m",
-          "#{old_name.capitalize} has been renamed to #{new_name.capitalize}"
-      end
+      system "git", "add", "--all"
+      system "git", "commit", "-m",
+        "#{old_name.capitalize} has been renamed to #{new_name.capitalize}"
     end
   end
 

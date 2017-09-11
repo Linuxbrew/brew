@@ -1,9 +1,7 @@
 describe "brew analytics", :integration_test do
   before(:each) do
     HOMEBREW_REPOSITORY.cd do
-      shutup do
-        system "git", "init"
-      end
+      system "git", "init"
     end
   end
 

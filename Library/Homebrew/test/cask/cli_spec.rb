@@ -17,7 +17,7 @@ describe Hbc::CLI, :cask do
     cli = described_class.new("--language=en")
     expect(cli).to receive(:detect_command_and_arguments).with(no_args)
     expect(cli).to receive(:exit).with(1)
-    shutup { cli.run }
+    cli.run
   end
 
   context "when no option is specified" do
@@ -34,10 +34,6 @@ describe Hbc::CLI, :cask do
       allow(Hbc).to receive(:init)
       allow(described_class).to receive(:lookup_command).with("noop").and_return(noop_command)
       allow(noop_command).to receive(:run)
-    end
-
-    around do |example|
-      shutup { example.run }
     end
 
     it "passes `--version` along to the subcommand" do

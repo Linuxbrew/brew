@@ -13,7 +13,7 @@ but the command isn't limited to any one location.
 $ brew tap
 homebrew/core
 mistydemeo/tigerbrew
-edavis/emacs
+dunn/emacs
 ```
 
 * `brew tap <user/repo>` makes a shallow clone of the repository at

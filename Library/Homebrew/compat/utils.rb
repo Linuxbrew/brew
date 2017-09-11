@@ -1,8 +1,3 @@
-def shell_profile
-  # odeprecated "shell_profile", "Utils::Shell.profile"
-  Utils::Shell.profile
-end
-
 module Tty
   module_function
 

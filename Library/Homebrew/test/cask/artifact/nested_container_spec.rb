@@ -5,9 +5,7 @@ describe Hbc::Artifact::NestedContainer, :cask do
         InstallHelper.install_without_artifacts(c)
       end
 
-      shutup do
-        Hbc::Artifact::NestedContainer.new(cask).install_phase
-      end
+      Hbc::Artifact::NestedContainer.new(cask).install_phase
 
       expect(cask.staged_path.join("MyNestedApp.app")).to be_a_directory
     end

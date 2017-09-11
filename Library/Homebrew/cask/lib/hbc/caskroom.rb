@@ -5,10 +5,10 @@ module Hbc
     def ensure_caskroom_exists
       return if Hbc.caskroom.exist?
 
-      ohai "Creating Caskroom at #{Hbc.caskroom}"
+      ohai "Creating Caskroom at #{Hbc.caskroom}" if $stdout.tty?
       sudo = !Hbc.caskroom.parent.writable?
 
-      ohai "We'll set permissions properly so we won't need sudo in the future" if sudo
+      ohai "We'll set permissions properly so we won't need sudo in the future" if $stdout.tty? && sudo
 
       SystemCommand.run("/bin/mkdir", args: ["-p", Hbc.caskroom], sudo: sudo)
       SystemCommand.run("/bin/chmod", args: ["g+rwx", Hbc.caskroom], sudo: sudo)

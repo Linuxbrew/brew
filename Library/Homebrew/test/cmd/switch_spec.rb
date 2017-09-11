@@ -14,9 +14,7 @@ describe "brew switch", :integration_test do
       keg_only "just because"
     EOS
 
-    shutup do
-      expect { brew "install", "testball" }.to be_a_success
-    end
+    expect { brew "install", "testball" }.to be_a_success
 
     testball_rack = HOMEBREW_CELLAR/"testball"
     FileUtils.cp_r testball_rack/"0.1", testball_rack/"0.2"

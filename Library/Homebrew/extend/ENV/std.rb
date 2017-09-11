@@ -57,15 +57,20 @@ module Stdenv
         # See https://github.com/Linuxbrew/linuxbrew/issues/841
         prepend_path "LD_LIBRARY_PATH", formula.opt_lib
         prepend_create_path "LD_LIBRARY_PATH", formula.prefix
-        prepend "LD_LIBRARY_PATH", formula.lib, File::PATH_SEPARATOR
+        prepend_path "LD_LIBRARY_PATH", formula.lib
       end
 
       # Set the search path for header files.
       prepend_path "CPATH", HOMEBREW_PREFIX/"include"
       # Set the dynamic linker and library search path.
-      append "LDFLAGS", "-Wl,--dynamic-linker=#{HOMEBREW_PREFIX}/lib/ld.so -Wl,-rpath,#{HOMEBREW_PREFIX}/lib"
       prepend_path "LIBRARY_PATH", HOMEBREW_PREFIX/"lib"
+      prepend "LDFLAGS", "-Wl,-rpath=#{HOMEBREW_PREFIX}/lib"
       prepend_path "LD_RUN_PATH", HOMEBREW_PREFIX/"lib"
+      unless formula.nil?
+        prepend "LDFLAGS", "-Wl,-rpath=#{formula.lib}"
+        prepend_path "LD_RUN_PATH", formula.lib
+      end
+      prepend "LDFLAGS", "-Wl,--dynamic-linker=#{HOMEBREW_PREFIX}/lib/ld.so"
     end
 
     if inherit?

@@ -13,9 +13,7 @@ describe Hbc::Container::Naked, :cask do
     container = Hbc::Container::Naked.new(cask, path, Hbc::FakeSystemCommand)
 
     expect {
-      shutup do
-        container.extract
-      end
+      container.extract
     }.not_to raise_error
 
     expect(Hbc::FakeSystemCommand.system_calls[expected_command]).to eq(1)

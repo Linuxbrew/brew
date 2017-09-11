@@ -1,9 +1,7 @@
 describe "brew edit", :integration_test do
   it "opens a given Formula in an editor" do
     HOMEBREW_REPOSITORY.cd do
-      shutup do
-        system "git", "init"
-      end
+      system "git", "init"
     end
 
     setup_test_formula "testball"

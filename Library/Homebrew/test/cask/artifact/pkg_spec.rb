@@ -3,9 +3,7 @@ describe Hbc::Artifact::Pkg, :cask do
   let(:fake_system_command) { class_double(Hbc::SystemCommand) }
 
   before(:each) do
-    shutup do
-      InstallHelper.install_without_artifacts(cask)
-    end
+    InstallHelper.install_without_artifacts(cask)
   end
 
   describe "install_phase" do
@@ -19,9 +17,7 @@ describe Hbc::Artifact::Pkg, :cask do
         print_stdout: true,
       )
 
-      shutup do
-        pkg.install_phase
-      end
+      pkg.install_phase
     end
   end
 
@@ -61,9 +57,7 @@ describe Hbc::Artifact::Pkg, :cask do
         print_stdout: true,
       )
 
-      shutup do
-        pkg.install_phase
-      end
+      pkg.install_phase
     end
   end
 end

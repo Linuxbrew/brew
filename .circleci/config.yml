@@ -1,0 +1,31 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: linuxbrew/linuxbrew
+    environment:
+      CIRCLE_REPOSITORY_URL: https://github.com/Linuxbrew/brew
+      HOMEBREW_DEVELOPER: 1
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_VERBOSE: 1
+      HOMEBREW_VERBOSE_USING_DOTS: 1
+    steps:
+      - checkout
+      - run: |
+          git remote set-url origin $CIRCLE_REPOSITORY_URL
+          if [ -e .git/shallow ]; then echo git fetch --unshallow; fi
+          git config --global user.name LinuxbrewTestBot
+          git config --global user.email testbot@linuxbrew.sh
+          rm -rf /home/linuxbrew/.linuxbrew/Homebrew
+          cp -a . /home/linuxbrew/.linuxbrew/Homebrew
+      - run: |
+          umask 022
+          PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+          mkdir /home/linuxbrew/test-bot
+          cd /home/linuxbrew/test-bot
+          brew test-bot
+      - run: ls /home/linuxbrew/test-bot
+      - store_artifacts:
+          path: /home/linuxbrew/test-bot
+      - store_test_results:
+          path: /home/linuxbrew/test-bot

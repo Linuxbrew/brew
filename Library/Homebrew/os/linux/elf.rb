@@ -47,6 +47,8 @@ module ELF
         @dylibs = []
         return
       end
+      # ldd requires that the file be executable, and all ELF files should be executable.
+      path.chmod path.stat.mode | 0111 unless path.executable?
       begin
         ldd = Formula["glibc"].bin/"ldd"
         ldd = "ldd" unless ldd.executable?
@@ -54,8 +56,8 @@ module ELF
         ldd = "ldd"
       end
       command = [ldd, path.expand_path.to_s]
-      libs = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+      libs = IO.popen command, "rb", err: [:child, :out], &:readlines
+      raise ErrorDuringExecution, "#{command.join(" ")}\n#{libs.join("\n")}" unless $CHILD_STATUS.success?
       needed << "not found"
       libs.select! { |lib| needed.any? { |soname| lib.include? soname } }
       @dylibs = libs.map { |lib| lib[LDD_RX, 1] || lib[LDD_RX, 2] }.compact

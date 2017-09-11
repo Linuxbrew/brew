@@ -17,9 +17,7 @@ describe Hbc::Artifact::App, :cask do
     end
 
     it "installs both apps using the proper target directory" do
-      shutup do
-        install_phase.call
-      end
+      install_phase.call
 
       expect(target_path_mini).to be_a_directory
       expect(source_path_mini).not_to exist
@@ -32,9 +30,7 @@ describe Hbc::Artifact::App, :cask do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-two-apps-subdir.rb") }
 
       it "installs both apps using the proper target directory" do
-        shutup do
-          install_phase.call
-        end
+        install_phase.call
 
         expect(target_path_mini).to be_a_directory
         expect(source_path_mini).not_to exist
@@ -47,9 +43,7 @@ describe Hbc::Artifact::App, :cask do
     it "only uses apps when they are specified" do
       FileUtils.cp_r source_path_mini, source_path_mini.sub("Caffeine Mini.app", "Caffeine Deluxe.app")
 
-      shutup do
-        install_phase.call
-      end
+      install_phase.call
 
       expect(target_path_mini).to be_a_directory
       expect(source_path_mini).not_to exist

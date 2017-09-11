@@ -3,11 +3,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
   let(:artifact) { described_class.new(cask, command: fake_system_command) }
   let(:fake_system_command) { Hbc::FakeSystemCommand }
 
-  subject do
-    shutup do
-      artifact.public_send(:"#{artifact_name}_phase")
-    end
-  end
+  subject { artifact.public_send(:"#{artifact_name}_phase") }
 
   context "using :launchctl" do
     let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-#{artifact_name}-launchctl.rb") }

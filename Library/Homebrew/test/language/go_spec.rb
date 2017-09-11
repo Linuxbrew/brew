@@ -7,9 +7,7 @@ describe Language::Go do
     expect(described_class).to receive(:opoo).once
 
     mktmpdir do |path|
-      shutup do
-        described_class.stage_deps [], path
-      end
+      described_class.stage_deps [], path
     end
   end
 end

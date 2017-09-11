@@ -177,8 +177,8 @@ class Formula
 
     @tap = if path == Formulary.core_path(name)
       CoreTap.instance
-    elsif path.to_s =~ HOMEBREW_TAP_PATH_REGEX
-      Tap.fetch(Regexp.last_match(1), Regexp.last_match(2))
+    elsif match = path.to_s.match(HOMEBREW_TAP_PATH_REGEX)
+      Tap.fetch(match[:user], match[:repo])
     end
 
     @full_name = full_name_with_optional_tap(name)
@@ -383,7 +383,9 @@ class Formula
   # All of aliases for the formula
   def aliases
     @aliases ||= if tap
-      tap.alias_reverse_table[full_name] || []
+      tap.alias_reverse_table[full_name].to_a.map do |a|
+        a.split("/")[-1]
+      end
     else
       []
     end
@@ -2070,8 +2072,8 @@ class Formula
     #
     # If you maintain your own repository, you can add your own bottle links.
     # https://docs.brew.sh/Bottles.html
-    # You can ignore this block entirely if submitting to Homebrew/Homebrew, It'll be
-    # handled for you by the Brew Test Bot.
+    # You can ignore this block entirely if submitting to Homebrew/homebrew-core.
+    # It'll be handled for you by the Brew Test Bot.
     #
     # <pre>bottle do
     #   root_url "https://example.com" # Optional root to calculate bottle URLs
@@ -2211,7 +2213,7 @@ class Formula
     # depends_on :arch => :x86_64 # If this formula only builds on Intel x86 64-bit.
     # depends_on :arch => :ppc # Only builds on PowerPC?
     # depends_on :ld64 # Sometimes ld fails on `MacOS.version < :leopard`. Then use this.
-    # depends_on :x11 # X11/XQuartz components. Non-optional X11 deps should go in Homebrew/Homebrew-x11
+    # depends_on :x11 # X11/XQuartz components.
     # depends_on :osxfuse # Permits the use of the upstream signed binary or our source package.
     # depends_on :tuntap # Does the same thing as above. This is vital for Yosemite and above.
     # depends_on :mysql => :recommended</pre>
@@ -2368,7 +2370,7 @@ class Formula
     #   version '4.8.1'
     # end</pre>
     def fails_with(compiler, &block)
-      # odeprecated "fails_with :llvm" if compiler == :llvm
+      odeprecated "fails_with :llvm" if compiler == :llvm
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
 

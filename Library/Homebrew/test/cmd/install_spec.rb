@@ -101,9 +101,7 @@ describe "brew install", :integration_test do
       .and not_to_output.to_stderr
       .and be_a_success
 
-    shutup do
-      expect { brew "switch", "testball1", "3.0" }.to be_a_success
-    end
+    expect { brew "switch", "testball1", "3.0" }.to be_a_success
 
     expect { brew "install", "testball1" }
       .to output(/2.0 is already installed/).to_stderr
@@ -156,14 +154,12 @@ describe "brew install", :integration_test do
     repo_path.join("bin").mkpath
 
     repo_path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        FileUtils.touch "bin/something.bin"
-        FileUtils.touch "README"
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "Initial repo commit"
-      end
+      system "git", "init"
+      system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+      FileUtils.touch "bin/something.bin"
+      FileUtils.touch "README"
+      system "git", "add", "--all"
+      system "git", "commit", "-m", "Initial repo commit"
     end
 
     setup_test_formula "testball1", <<-EOS.undent

@@ -3,29 +3,19 @@ require "tempfile"
 
 class Sandbox
   SANDBOX_EXEC = "/usr/bin/sandbox-exec".freeze
-  SANDBOXED_TAPS = %w[
-    homebrew/core
-  ].freeze
 
   def self.available?
     OS.mac? && OS::Mac.version >= "10.6" && File.executable?(SANDBOX_EXEC)
   end
 
-  def self.formula?(formula)
+  def self.formula?(_formula)
     return false unless available?
-    return false if ARGV.no_sandbox?
-    ARGV.sandbox? || SANDBOXED_TAPS.include?(formula.tap.to_s)
+    !ARGV.no_sandbox?
   end
 
   def self.test?
     return false unless available?
     !ARGV.no_sandbox?
-  end
-
-  def self.print_sandbox_message
-    return if @printed_sandbox_message
-    ohai "Using the sandbox"
-    @printed_sandbox_message = true
   end
 
   def initialize

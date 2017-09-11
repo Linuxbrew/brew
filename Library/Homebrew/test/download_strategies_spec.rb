@@ -147,18 +147,14 @@ describe GitDownloadStrategy do
   end
 
   def git_commit_all
-    shutup do
-      system "git", "add", "--all"
-      system "git", "commit", "-m", "commit number #{@commit_id}"
-      @commit_id += 1
-    end
+    system "git", "add", "--all"
+    system "git", "commit", "-m", "commit number #{@commit_id}"
+    @commit_id += 1
   end
 
   def setup_git_repo
-    shutup do
-      system "git", "init"
-      system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-    end
+    system "git", "init"
+    system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
     FileUtils.touch "README"
     git_commit_all
   end

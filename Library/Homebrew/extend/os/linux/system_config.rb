@@ -22,9 +22,7 @@ class SystemConfig
 
     def formula_version(formula)
       return "N/A" unless CoreTap.instance.installed?
-      f = Formulary.factory formula
-      return "N/A" unless f.installed?
-      f.version
+      Formulary.factory(formula).linked_version || "N/A"
     rescue FormulaUnavailableError
       return "N/A"
     end

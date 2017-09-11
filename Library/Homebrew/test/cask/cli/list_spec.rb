@@ -48,9 +48,7 @@ describe Hbc::CLI::List, :cask do
     it "lists the installed files for those Casks" do
       casks.each(&InstallHelper.method(:install_without_artifacts_with_caskfile))
 
-      shutup do
-        Hbc::Artifact::App.new(transmission).install_phase
-      end
+      Hbc::Artifact::App.new(transmission).install_phase
 
       expect {
         Hbc::CLI::List.run("local-transmission", "local-caffeine")

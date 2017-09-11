@@ -148,13 +148,11 @@ describe Homebrew::MissingFormula do
       (tap_path/"deleted-formula.rb").write "placeholder"
 
       tap_path.cd do
-        shutup do
-          system "git", "init"
-          system "git", "add", "--all"
-          system "git", "commit", "-m", "initial state"
-          system "git", "rm", "deleted-formula.rb"
-          system "git", "commit", "-m", "delete formula 'deleted-formula'"
-        end
+        system "git", "init"
+        system "git", "add", "--all"
+        system "git", "commit", "-m", "initial state"
+        system "git", "rm", "deleted-formula.rb"
+        system "git", "commit", "-m", "delete formula 'deleted-formula'"
       end
     end
 

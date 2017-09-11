@@ -16,9 +16,7 @@ describe Hbc::Artifact::App, :cask do
 
   describe "install_phase" do
     it "installs the given app using the proper target directory" do
-      shutup do
-        install_phase
-      end
+      install_phase
 
       expect(target_path).to be_a_directory
       expect(source_path).not_to exist
@@ -39,9 +37,7 @@ describe Hbc::Artifact::App, :cask do
         appsubdir = cask.staged_path.join("subdir").tap(&:mkpath)
         FileUtils.mv(source_path, appsubdir)
 
-        shutup do
-          install_phase
-        end
+        install_phase
 
         expect(target_path).to be_a_directory
         expect(appsubdir.join("Caffeine.app")).not_to exist
@@ -52,9 +48,7 @@ describe Hbc::Artifact::App, :cask do
       staged_app_copy = source_path.sub("Caffeine.app", "Caffeine Deluxe.app")
       FileUtils.cp_r source_path, staged_app_copy
 
-      shutup do
-        install_phase
-      end
+      install_phase
 
       expect(target_path).to be_a_directory
       expect(source_path).not_to exist
@@ -201,15 +195,11 @@ describe Hbc::Artifact::App, :cask do
 
   describe "uninstall_phase" do
     it "deletes managed apps" do
-      shutup do
-        install_phase
-      end
+      install_phase
 
       expect(target_path).to exist
 
-      shutup do
-        uninstall_phase
-      end
+      uninstall_phase
 
       expect(target_path).not_to exist
     end
@@ -225,9 +215,7 @@ describe Hbc::Artifact::App, :cask do
 
     describe "app is correctly installed" do
       it "returns the path to the app" do
-        shutup do
-          install_phase
-        end
+        install_phase
 
         expect(contents).to eq(["#{target_path} (#{target_path.abv})"])
       end

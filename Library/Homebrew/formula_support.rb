@@ -13,7 +13,8 @@ class KegOnlyReason
 
   def valid?
     case @reason
-    when :provided_by_osx, :shadowed_by_osx
+    when :provided_by_macos, :provided_by_osx,
+         :shadowed_by_macos, :shadowed_by_osx
       OS.mac?
     when :provided_pre_mountain_lion
       OS.mac? && MacOS.version < :mountain_lion
@@ -21,6 +22,8 @@ class KegOnlyReason
       OS.mac? && MacOS.version < :mavericks
     when :provided_pre_el_capitan
       OS.mac? && MacOS.version < :el_capitan
+    when :provided_pre_high_sierra
+      OS.mac? && MacOS.version < :high_sierra
     when :provided_until_xcode43
       OS.mac? && MacOS::Xcode.installed? && MacOS::Xcode.version < "4.3"
     when :provided_until_xcode5
@@ -52,6 +55,9 @@ class KegOnlyReason
     EOS
     when :provided_pre_el_capitan then <<-EOS.undent
       macOS already provides this software in versions before El Capitan
+    EOS
+    when :provided_pre_high_sierra then <<-EOS.undent
+      macOS already provides this software in versions before High Sierra
     EOS
     when :provided_until_xcode43 then <<-EOS.undent
       Xcode provides this software prior to version 4.3

@@ -2,9 +2,7 @@ describe Hbc::CLI::Reinstall, :cask do
   it "displays the reinstallation progress" do
     caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
 
-    shutup do
-      Hbc::Installer.new(caffeine).install
-    end
+    Hbc::Installer.new(caffeine).install
 
     output = Regexp.new <<-EOS.undent
       ==> Downloading file:.*caffeine.zip
@@ -23,23 +21,18 @@ describe Hbc::CLI::Reinstall, :cask do
   end
 
   it "allows reinstalling a Cask" do
-    shutup do
-      Hbc::CLI::Install.run("local-transmission")
-    end
+    Hbc::CLI::Install.run("local-transmission")
+
     expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
 
-    shutup do
-      Hbc::CLI::Reinstall.run("local-transmission")
-    end
+    Hbc::CLI::Reinstall.run("local-transmission")
     expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
   end
 
   it "allows reinstalling a non installed Cask" do
     expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).not_to be_installed
 
-    shutup do
-      Hbc::CLI::Reinstall.run("local-transmission")
-    end
+    Hbc::CLI::Reinstall.run("local-transmission")
     expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
   end
 end

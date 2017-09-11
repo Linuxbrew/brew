@@ -18,9 +18,7 @@ shared_examples Hbc::Staged do
       ["echo", "homebrew-cask", "rocks!"],
     )
 
-    shutup do
-      staged.system_command("echo", args: ["homebrew-cask", "rocks!"])
-    end
+    staged.system_command("echo", args: ["homebrew-cask", "rocks!"])
   end
 
   it "can get the Info.plist file for the primary app" do
@@ -34,9 +32,7 @@ shared_examples Hbc::Staged do
       ["/usr/libexec/PlistBuddy", "-c", "Print CFBundleIdentifier", staged.info_plist_file],
     )
 
-    shutup do
-      staged.plist_exec("Print CFBundleIdentifier")
-    end
+    staged.plist_exec("Print CFBundleIdentifier")
   end
 
   it "can set a key in the Info.plist file" do
@@ -46,9 +42,7 @@ shared_examples Hbc::Staged do
       ["/usr/libexec/PlistBuddy", "-c", "Set :JVMOptions:JVMVersion 1.6+", staged.info_plist_file],
     )
 
-    shutup do
-      staged.plist_set(":JVMOptions:JVMVersion", "1.6+")
-    end
+    staged.plist_set(":JVMOptions:JVMVersion", "1.6+")
   end
 
   it "can set the permissions of a file" do
@@ -59,9 +53,7 @@ shared_examples Hbc::Staged do
       ["/bin/chmod", "-R", "--", "777", fake_pathname],
     )
 
-    shutup do
-      staged.set_permissions(fake_pathname.to_s, "777")
-    end
+    staged.set_permissions(fake_pathname.to_s, "777")
   end
 
   it "can set the permissions of multiple files" do
@@ -72,9 +64,7 @@ shared_examples Hbc::Staged do
       ["/bin/chmod", "-R", "--", "777", fake_pathname, fake_pathname],
     )
 
-    shutup do
-      staged.set_permissions([fake_pathname.to_s, fake_pathname.to_s], "777")
-    end
+    staged.set_permissions([fake_pathname.to_s, fake_pathname.to_s], "777")
   end
 
   it "cannot set the permissions of a file that does not exist" do
@@ -93,9 +83,7 @@ shared_examples Hbc::Staged do
       ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname],
     )
 
-    shutup do
-      staged.set_ownership(fake_pathname.to_s)
-    end
+    staged.set_ownership(fake_pathname.to_s)
   end
 
   it "can set the ownership of multiple files" do
@@ -108,9 +96,7 @@ shared_examples Hbc::Staged do
       ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname, fake_pathname],
     )
 
-    shutup do
-      staged.set_ownership([fake_pathname.to_s, fake_pathname.to_s])
-    end
+    staged.set_ownership([fake_pathname.to_s, fake_pathname.to_s])
   end
 
   it "can set the ownership of a file with a different user and group" do
@@ -122,9 +108,7 @@ shared_examples Hbc::Staged do
       ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "other_user:other_group", fake_pathname],
     )
 
-    shutup do
-      staged.set_ownership(fake_pathname.to_s, user: "other_user", group: "other_group")
-    end
+    staged.set_ownership(fake_pathname.to_s, user: "other_user", group: "other_group")
   end
 
   it "cannot set the ownership of a file that does not exist" do
@@ -132,8 +116,6 @@ shared_examples Hbc::Staged do
     fake_pathname = non_existent_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
-    shutup do
-      staged.set_ownership(fake_pathname.to_s)
-    end
+    staged.set_ownership(fake_pathname.to_s)
   end
 end

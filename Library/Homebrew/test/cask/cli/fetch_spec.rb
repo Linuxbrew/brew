@@ -8,9 +8,7 @@ describe Hbc::CLI::Fetch, :cask do
   }
 
   it "allows download the installer of a Cask" do
-    shutup do
-      Hbc::CLI::Fetch.run("local-transmission", "local-caffeine")
-    end
+    Hbc::CLI::Fetch.run("local-transmission", "local-caffeine")
     expect(Hbc::CurlDownloadStrategy.new(local_transmission).cached_location).to exist
     expect(Hbc::CurlDownloadStrategy.new(local_caffeine).cached_location).to exist
   end
@@ -18,31 +16,23 @@ describe Hbc::CLI::Fetch, :cask do
   it "prevents double fetch (without nuking existing installation)" do
     download_stategy = Hbc::CurlDownloadStrategy.new(local_transmission)
 
-    shutup do
-      Hbc::Download.new(local_transmission).perform
-    end
+    Hbc::Download.new(local_transmission).perform
     old_ctime = File.stat(download_stategy.cached_location).ctime
 
-    shutup do
-      Hbc::CLI::Fetch.run("local-transmission")
-    end
+    Hbc::CLI::Fetch.run("local-transmission")
     new_ctime = File.stat(download_stategy.cached_location).ctime
 
     expect(old_ctime.to_i).to eq(new_ctime.to_i)
   end
 
   it "allows double fetch with --force" do
-    shutup do
-      Hbc::Download.new(local_transmission).perform
-    end
+    Hbc::Download.new(local_transmission).perform
 
     download_stategy = Hbc::CurlDownloadStrategy.new(local_transmission)
     old_ctime = File.stat(download_stategy.cached_location).ctime
     sleep(1)
 
-    shutup do
-      Hbc::CLI::Fetch.run("local-transmission", "--force")
-    end
+    Hbc::CLI::Fetch.run("local-transmission", "--force")
     download_stategy = Hbc::CurlDownloadStrategy.new(local_transmission)
     new_ctime = File.stat(download_stategy.cached_location).ctime
 
@@ -51,9 +41,7 @@ describe Hbc::CLI::Fetch, :cask do
 
   it "properly handles Casks that are not present" do
     expect {
-      shutup do
-        Hbc::CLI::Fetch.run("notacask")
-      end
+      Hbc::CLI::Fetch.run("notacask")
     }.to raise_error(Hbc::CaskError, "Fetch incomplete.")
   end
 

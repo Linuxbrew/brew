@@ -3,10 +3,8 @@ describe "brew unpack", :integration_test do
     setup_test_formula "testball"
 
     mktmpdir do |path|
-      shutup do
-        expect { brew "unpack", "testball", "--destdir=#{path}" }
-          .to be_a_success
-      end
+      expect { brew "unpack", "testball", "--destdir=#{path}" }
+        .to be_a_success
 
       expect(path/"testball-0.1").to be_a_directory
     end

@@ -17,9 +17,7 @@ describe FormulaInstaller do
     expect(formula).to be_bottled
     expect(formula).to pour_bottle
 
-    shutup do
-      described_class.new(formula).install
-    end
+    described_class.new(formula).install
 
     keg = Keg.new(formula.prefix)
 

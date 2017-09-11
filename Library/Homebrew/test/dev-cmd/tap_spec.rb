@@ -3,13 +3,11 @@ describe "brew tap", :integration_test do
     path = Tap::TAP_DIRECTORY/"homebrew/homebrew-foo"
     path.mkpath
     path.cd do
-      shutup do
-        system "git", "init"
-        system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
-        FileUtils.touch "readme"
-        system "git", "add", "--all"
-        system "git", "commit", "-m", "init"
-      end
+      system "git", "init"
+      system "git", "remote", "add", "origin", "https://github.com/Homebrew/homebrew-foo"
+      FileUtils.touch "readme"
+      system "git", "add", "--all"
+      system "git", "commit", "-m", "init"
     end
 
     expect { brew "tap" }

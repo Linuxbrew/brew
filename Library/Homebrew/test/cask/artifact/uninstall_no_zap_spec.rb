@@ -5,10 +5,8 @@ describe Hbc::Artifact::Zap, :cask do
     Hbc::Artifact::Zap.new(cask)
   }
 
-  before do
-    shutup do
-      InstallHelper.install_without_artifacts(cask)
-    end
+  before(:each) do
+    InstallHelper.install_without_artifacts(cask)
   end
 
   describe "#uninstall_phase" do

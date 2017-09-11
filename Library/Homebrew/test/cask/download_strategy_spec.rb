@@ -23,9 +23,7 @@ describe "download strategies", :cask do
     it "calls curl with default arguments for a simple Cask" do
       allow(downloader).to receive(:curl)
 
-      shutup do
-        downloader.fetch
-      end
+      downloader.fetch
 
       expect(downloader).to have_received(:curl).with(
         cask.url.to_s,
@@ -41,9 +39,7 @@ describe "download strategies", :cask do
         curl_args = []
         allow(downloader).to receive(:curl) { |*args| curl_args = args }
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/25.0.1"])
       end
@@ -56,9 +52,7 @@ describe "download strategies", :cask do
         curl_args = []
         allow(downloader).to receive(:curl) { |*args| curl_args = args }
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(curl_args.each_cons(2)).to include(["-A", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) https://caskroom.github.io"])
       end
@@ -78,9 +72,7 @@ describe "download strategies", :cask do
         curl_args = []
         allow(downloader).to receive(:curl) { |*args| curl_args = args }
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(curl_args.each_cons(2)).to include(["-b", "coo=kie;mon=ster"])
       end
@@ -93,9 +85,7 @@ describe "download strategies", :cask do
         curl_args = []
         allow(downloader).to receive(:curl) { |*args| curl_args = args }
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(curl_args.each_cons(2)).to include(["-e", "http://somehost/also"])
       end
@@ -124,9 +114,7 @@ describe "download strategies", :cask do
         curl_args = []
         allow(downloader).to receive(:curl) { |*args| curl_args = args }
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(curl_args.each_cons(2)).to include(["-d", "form=data"])
         expect(curl_args.each_cons(2)).to include(["-d", "is=good"])
@@ -140,9 +128,7 @@ describe "download strategies", :cask do
         curl_args = []
         allow(downloader).to receive(:curl) { |*args| curl_args = args }
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(curl_args.each_cons(2)).to include(["-X", "POST"])
       end
@@ -161,18 +147,14 @@ describe "download strategies", :cask do
       allow(downloader).to receive(:compress)
       allow(downloader).to receive(:fetch_repo)
 
-      retval = shutup { downloader.fetch }
-
-      expect(retval).to equal(downloader.tarball_path)
+      expect(downloader.fetch).to equal(downloader.tarball_path)
     end
 
     it "calls fetch_repo with default arguments for a simple Cask" do
       allow(downloader).to receive(:compress)
       allow(downloader).to receive(:fetch_repo)
 
-      shutup do
-        downloader.fetch
-      end
+      downloader.fetch
 
       expect(downloader).to have_received(:fetch_repo).with(
         downloader.cached_location,
@@ -183,9 +165,7 @@ describe "download strategies", :cask do
     it "calls svn with default arguments for a simple Cask" do
       allow(downloader).to receive(:compress)
 
-      shutup do
-        downloader.fetch
-      end
+      downloader.fetch
 
       expect(fake_system_command).to have_received(:run!).with(
         "/usr/bin/svn",
@@ -211,9 +191,7 @@ describe "download strategies", :cask do
       it "adds svn arguments for :trust_cert" do
         allow(downloader).to receive(:compress)
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(fake_system_command).to have_received(:run!).with(
           "/usr/bin/svn",
@@ -242,9 +220,7 @@ describe "download strategies", :cask do
       it "adds svn arguments for :revision" do
         allow(downloader).to receive(:compress)
 
-        shutup do
-          downloader.fetch
-        end
+        downloader.fetch
 
         expect(fake_system_command).to have_received(:run!).with(
           "/usr/bin/svn",
@@ -269,9 +245,7 @@ describe "download strategies", :cask do
         downloader.cached_location.mkdir
       }
 
-      shutup do
-        downloader.fetch
-      end
+      downloader.fetch
 
       expect(fake_system_command).to have_received(:run!).with(
         "/usr/bin/tar",
@@ -299,7 +273,7 @@ describe "download strategies", :cask do
   #     FileUtils.touch(target.join('empty_file.txt'))
   #     File.utime(1000,1000,target.join('empty_file.txt'))
   #   end
-  #   expect(shutup { downloader.fetch }).to equal(downloader.tarball_path)
+  #   expect(downloader.fetch).to equal(downloader.tarball_path)
   #   d = Hbc::Download.new(cask)
   #   d.send(:_check_sums, downloader.tarball_path, cask.sums)
   # end

@@ -30,9 +30,7 @@ describe "brew desc", :integration_test do
     it "creates a description cache" do
       expect(desc_cache).not_to exist
 
-      shutup do
-        expect { brew "desc", "--description", "testball" }.to be_a_success
-      end
+      expect { brew "desc", "--description", "testball" }.to be_a_success
 
       expect(desc_cache).to exist
     end

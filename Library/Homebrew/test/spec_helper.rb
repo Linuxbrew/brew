@@ -19,7 +19,6 @@ $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/test/su
 require "global"
 require "tap"
 
-require "test/support/helper/shutup"
 require "test/support/helper/fixtures"
 require "test/support/helper/formula"
 require "test/support/helper/mktmpdir"
@@ -44,7 +43,6 @@ RSpec.configure do |config|
 
   config.filter_run_when_matching :focus
 
-  config.include(Test::Helper::Shutup)
   config.include(Test::Helper::Fixtures)
   config.include(Test::Helper::Formula)
   config.include(Test::Helper::MkTmpDir)
@@ -88,10 +86,24 @@ RSpec.configure do |config|
       @__argv = ARGV.dup
       @__env = ENV.to_hash # dup doesn't work on ENV
 
+      unless example.metadata.key?(:focus) || ENV.key?("VERBOSE_TESTS")
+        @__stdout = $stdout.clone
+        @__stderr = $stderr.clone
+        $stdout.reopen(File::NULL)
+        $stderr.reopen(File::NULL)
+      end
+
       example.run
     ensure
       ARGV.replace(@__argv)
       ENV.replace(@__env)
+
+      unless example.metadata.key?(:focus) || ENV.key?("VERBOSE_TESTS")
+        $stdout.reopen(@__stdout)
+        $stderr.reopen(@__stderr)
+        @__stdout.close
+        @__stderr.close
+      end
 
       Tab.clear_cache
 

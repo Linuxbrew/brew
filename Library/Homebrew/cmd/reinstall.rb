@@ -23,6 +23,8 @@ module Homebrew
   def reinstall_formula(f)
     if f.opt_prefix.directory?
       keg = Keg.new(f.opt_prefix.resolved_path)
+      keg_had_linked_opt = true
+      keg_was_linked = keg.linked?
       backup keg
     end
 
@@ -35,12 +37,9 @@ module Homebrew
     fi.options              = options
     fi.invalid_option_names = build_options.invalid_option_names
     fi.build_bottle         = ARGV.build_bottle? || (!f.bottled? && f.build.bottle?)
-    fi.build_from_source    = ARGV.build_from_source? || ARGV.build_all_from_source?
-    fi.force_bottle         = ARGV.force_bottle?
     fi.interactive          = ARGV.interactive?
     fi.git                  = ARGV.git?
-    fi.verbose              = ARGV.verbose?
-    fi.debug                = ARGV.debug?
+    fi.link_keg             = keg_was_linked if keg_had_linked_opt
     fi.prelude
 
     oh1 "Reinstalling #{f.full_name} #{options.to_a.join " "}"
@@ -50,7 +49,7 @@ module Homebrew
   rescue FormulaInstallationAlreadyAttemptedError
     # next
   rescue Exception
-    ignore_interrupts { restore_backup(keg, f) }
+    ignore_interrupts { restore_backup(keg, keg_was_linked) }
     raise
   else
     backup_path(keg).rmtree if backup_path(keg).exist?
@@ -61,7 +60,7 @@ module Homebrew
     keg.rename backup_path(keg)
   end
 
-  def restore_backup(keg, formula)
+  def restore_backup(keg, keg_was_linked)
     path = backup_path(keg)
 
     return unless path.directory?
@@ -69,7 +68,7 @@ module Homebrew
     Pathname.new(keg).rmtree if keg.exist?
 
     path.rename keg
-    keg.link unless formula.keg_only?
+    keg.link if keg_was_linked
   end
 
   def backup_path(path)

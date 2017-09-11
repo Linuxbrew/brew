@@ -62,7 +62,7 @@ module Superenv
     self["HOMEBREW_ISYSTEM_PATHS"] = determine_isystem_paths
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
-    self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths
+    self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths(formula)
     self["HOMEBREW_DYNAMIC_LINKER"] = determine_dynamic_linker_path(formula)
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
     self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix unless formula.nil?
@@ -141,7 +141,6 @@ module Superenv
 
   def determine_pkg_config_libdir
     PATH.new(
-      "/usr/lib/pkgconfig",
       homebrew_extra_pkg_config_paths,
     ).existing
   end
@@ -189,8 +188,11 @@ module Superenv
     []
   end
 
-  def determine_rpath_paths
-    PATH.new(determine_extra_rpath_paths).existing
+  def determine_rpath_paths(formula)
+    PATH.new(
+      (formula.lib unless formula.nil?),
+      PATH.new(determine_extra_rpath_paths).existing,
+    )
   end
 
   def determine_dynamic_linker_path(_formula)

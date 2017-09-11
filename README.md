@@ -9,7 +9,7 @@ Features, usage and installation instructions are summarised below.
 Features, usage and installation instructions are summarised on the below. Terminology (e.g. the difference between a Cellar, Tap, Cask and so forth) is [explained here](docs/Formula-Cookbook.md#homebrew-terminology).
 
 Cadfaelbrew follows upstream linuxbrew/brew with some lag depending on production requirements.
-Merges typically happen on 1 month cycles. To receive updates of major changes to Linuxbrew subscribe
+Merges typically happen on new Linuxbrew tags. To receive updates of major changes to Linuxbrew subscribe
 to the [Linuxbrew Updates](https://github.com/linuxbrew/brew/issues/1) issue on GitHub.
 
 If you require an update that's in linuxbrew and not yet merged into Cadfaelbrew, please raise an issue.
@@ -176,7 +176,7 @@ This is our PGP key which is valid until May 24, 2017.
 ## Who Are You?
 SuperNEMO-DBD's fork of brew is maintained by [Ben Morgan](https://github.com/drbenmorgan).
 
-Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Michka Popoff](https://github.com/iMichka).
+Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), [Michka Popoff](https://github.com/iMichka), and [Alyssa Ross](https://github.com/alyssais).
 
 ## Linuxbrew Community
 - [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)
@@ -184,3 +184,9 @@ Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](ht
 ## License
 Code is under the [BSD 2-clause "Simplified" License](https://github.com/SuperNEMO-DBD/brew/tree/master/LICENSE.txt).
 Documentation is under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/).
+
+## Donate
+
+Linuxbrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for continuous integration and the computer resources used to build precompiled binary bottles of your favourite formulae. Every donation will be spent on making Linuxbrew better for our users. Please consider [donating regularly to Linuxbrew through Patreon](https://www.patreon.com/linuxbrew). We appreciate your support and contribution, no matter the level.
+
+[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew on Patreon](https://www.patreon.com/homebrew) as well if you use Homebrew on macOS.

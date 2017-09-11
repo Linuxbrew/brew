@@ -1,6 +1,8 @@
 module Hbc
   class CLI
     class Zap < AbstractCommand
+      option "--force", :force, false
+
       def initialize(*)
         super
         raise CaskUnspecifiedError if args.empty?
@@ -13,7 +15,7 @@ module Hbc
       def zap_casks
         casks.each do |cask|
           odebug "Zapping Cask #{cask}"
-          Installer.new(cask, verbose: verbose?).zap
+          Installer.new(cask, verbose: verbose?, force: force?).zap
         end
       end
 

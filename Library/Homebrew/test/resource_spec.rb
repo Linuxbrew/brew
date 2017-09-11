@@ -126,9 +126,7 @@ describe Resource do
     expect(fn).to receive(:verify_checksum).and_raise(ChecksumMissingError)
     expect(fn).to receive(:sha256)
 
-    shutup do
-      subject.verify_download_integrity(fn)
-    end
+    subject.verify_download_integrity(fn)
   end
 
   specify "#verify_download_integrity_mismatch" do
@@ -138,10 +136,8 @@ describe Resource do
     expect(fn).to receive(:verify_checksum).with(checksum)
       .and_raise(ChecksumMismatchError.new(fn, checksum, Object.new))
 
-    shutup do
-      expect {
-        subject.verify_download_integrity(fn)
-      }.to raise_error(ChecksumMismatchError)
-    end
+    expect {
+      subject.verify_download_integrity(fn)
+    }.to raise_error(ChecksumMismatchError)
   end
 end

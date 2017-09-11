@@ -2,9 +2,7 @@ describe Hbc::CLI::Uninstall, :cask do
   it "displays the uninstallation progress" do
     caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
 
-    shutup do
-      Hbc::Installer.new(caffeine).install
-    end
+    Hbc::Installer.new(caffeine).install
 
     output = Regexp.new <<-EOS.undent
       ==> Uninstalling Cask local-caffeine
@@ -30,9 +28,7 @@ describe Hbc::CLI::Uninstall, :cask do
 
   it "tries anyway on a non-present Cask when --force is given" do
     expect {
-      shutup do
-        Hbc::CLI::Uninstall.run("local-caffeine", "--force")
-      end
+      Hbc::CLI::Uninstall.run("local-caffeine", "--force")
     }.not_to raise_error
   end
 
@@ -40,17 +36,13 @@ describe Hbc::CLI::Uninstall, :cask do
     caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
     transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
 
-    shutup do
-      Hbc::Installer.new(caffeine).install
-      Hbc::Installer.new(transmission).install
-    end
+    Hbc::Installer.new(caffeine).install
+    Hbc::Installer.new(transmission).install
 
     expect(caffeine).to be_installed
     expect(transmission).to be_installed
 
-    shutup do
-      Hbc::CLI::Uninstall.run("local-caffeine", "local-transmission")
-    end
+    Hbc::CLI::Uninstall.run("local-caffeine", "local-transmission")
 
     expect(caffeine).not_to be_installed
     expect(Hbc.appdir.join("Transmission.app")).not_to exist
@@ -61,17 +53,13 @@ describe Hbc::CLI::Uninstall, :cask do
   it "calls `uninstall` before removing artifacts" do
     cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-uninstall-script-app.rb")
 
-    shutup do
-      Hbc::Installer.new(cask).install
-    end
+    Hbc::Installer.new(cask).install
 
     expect(cask).to be_installed
     expect(Hbc.appdir.join("MyFancyApp.app")).to exist
 
     expect {
-      shutup do
-        Hbc::CLI::Uninstall.run("with-uninstall-script-app")
-      end
+      Hbc::CLI::Uninstall.run("with-uninstall-script-app")
     }.not_to raise_error
 
     expect(cask).not_to be_installed
@@ -81,24 +69,20 @@ describe Hbc::CLI::Uninstall, :cask do
   it "can uninstall Casks when the uninstall script is missing, but only when using `--force`" do
     cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-uninstall-script-app.rb")
 
-    shutup do
-      Hbc::Installer.new(cask).install
-    end
+    Hbc::Installer.new(cask).install
 
     expect(cask).to be_installed
 
     Hbc.appdir.join("MyFancyApp.app").rmtree
 
-    expect { shutup { Hbc::CLI::Uninstall.run("with-uninstall-script-app") } }
+    expect { Hbc::CLI::Uninstall.run("with-uninstall-script-app") }
     .to output(/does not exist/).to_stderr
     .and raise_error(Hbc::CaskError, "Uninstall incomplete.")
 
     expect(cask).to be_installed
 
     expect {
-      shutup do
-        Hbc::CLI::Uninstall.run("with-uninstall-script-app", "--force")
-      end
+      Hbc::CLI::Uninstall.run("with-uninstall-script-app", "--force")
     }.not_to raise_error
 
     expect(cask).not_to be_installed
@@ -131,17 +115,13 @@ describe Hbc::CLI::Uninstall, :cask do
     end
 
     it "uninstalls one version at a time" do
-      shutup do
-        Hbc::CLI::Uninstall.run("versioned-cask")
-      end
+      Hbc::CLI::Uninstall.run("versioned-cask")
 
       expect(caskroom_path.join(first_installed_version)).to exist
       expect(caskroom_path.join(last_installed_version)).not_to exist
       expect(caskroom_path).to exist
 
-      shutup do
-        Hbc::CLI::Uninstall.run("versioned-cask")
-      end
+      Hbc::CLI::Uninstall.run("versioned-cask")
 
       expect(caskroom_path.join(first_installed_version)).not_to exist
       expect(caskroom_path).not_to exist
@@ -180,9 +160,7 @@ describe Hbc::CLI::Uninstall, :cask do
     end
 
     it "can still uninstall those Casks" do
-      shutup do
-        Hbc::CLI::Uninstall.run("ive-been-renamed")
-      end
+      Hbc::CLI::Uninstall.run("ive-been-renamed")
 
       expect(app).not_to exist
       expect(caskroom_path).not_to exist

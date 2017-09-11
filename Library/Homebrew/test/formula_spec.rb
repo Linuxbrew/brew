@@ -582,11 +582,9 @@ describe Formula do
     cached_location.cd do
       FileUtils.touch "LICENSE"
 
-      shutup do
-        system("git", "init")
-        system("git", "add", "--all")
-        system("git", "commit", "-m", "Initial commit")
-      end
+      system("git", "init")
+      system("git", "add", "--all")
+      system("git", "commit", "-m", "Initial commit")
     end
 
     f.update_head_version
@@ -786,11 +784,9 @@ describe Formula do
         version_scheme(2)
       end.new
 
-      shutup do
-        [f1, f2, f3, f4].each do |f|
-          f.brew { f.install }
-          Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
-        end
+      [f1, f2, f3, f4].each do |f|
+        f.brew { f.install }
+        Tab.create(f, DevelopmentTools.default_compiler, :libcxx).write
       end
 
       expect(f1).to be_installed
@@ -806,18 +802,16 @@ describe Formula do
       f2 = Class.new(Testball) { version("0.2") }.new
       f3 = Class.new(Testball) { version("0.3") }.new
 
-      shutup do
-        f1.brew { f1.install }
-        f1.pin
-        f2.brew { f2.install }
-        f3.brew { f3.install }
-      end
+      f1.brew { f1.install }
+      f1.pin
+      f2.brew { f2.install }
+      f3.brew { f3.install }
 
       expect(f1.prefix).to eq((HOMEBREW_PINNED_KEGS/f1.name).resolved_path)
       expect(f1).to be_installed
       expect(f2).to be_installed
       expect(f3).to be_installed
-      expect(shutup { f3.eligible_kegs_for_cleanup }).to eq([Keg.new(f2.prefix)])
+      expect(f3.eligible_kegs_for_cleanup).to eq([Keg.new(f2.prefix)])
     end
 
     specify "with HEAD installed" do
@@ -1204,11 +1198,9 @@ describe Formula do
           testball_repo.cd do
             FileUtils.touch "LICENSE"
 
-            shutup do
-              system("git", "init")
-              system("git", "add", "--all")
-              system("git", "commit", "-m", "Initial commit")
-            end
+            system("git", "init")
+            system("git", "add", "--all")
+            system("git", "commit", "-m", "Initial commit")
           end
 
           expect(f.outdated_kegs(fetch_head: true)).not_to be_empty

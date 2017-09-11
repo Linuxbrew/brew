@@ -56,7 +56,7 @@ describe Hbc::SystemCommand, :cask do
 
     shared_examples "it returns '1 2 3 4 5 6'" do
       describe "its result" do
-        subject { shutup { described_class.run(command, options) } }
+        subject { described_class.run(command, options) }
 
         it { is_expected.to be_a_success }
         its(:stdout) { is_expected.to eq([1, 3, 5, nil].join("\n")) }
@@ -132,7 +132,7 @@ describe Hbc::SystemCommand, :cask do
 
     it "returns without deadlocking" do
       wait(15).for {
-        shutup { described_class.run(command, options) }
+        described_class.run(command, options)
       }.to be_a_success
     end
   end

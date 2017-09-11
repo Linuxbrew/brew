@@ -59,7 +59,7 @@ describe Caveats do
           plist_options startup: true
         end
         f_obj = described_class.new(f)
-        plist_path = Pathname.new("plist")
+        plist_path = mktmpdir/"plist"
         FileUtils.touch plist_path
         allow(f_obj).to receive(:plist_path).and_return(plist_path)
         allow(plist_path).to receive(:symlink?).and_return(true)
@@ -78,7 +78,7 @@ describe Caveats do
         }
         let(:f_obj) { described_class.new(f) }
         let(:caveats) { f_obj.caveats }
-        let(:plist_path) { Pathname.new("plist") }
+        let(:plist_path) { mktmpdir/"plist" }
 
         before do
           FileUtils.touch plist_path
