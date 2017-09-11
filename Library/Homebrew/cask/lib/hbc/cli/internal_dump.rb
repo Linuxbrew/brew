@@ -7,10 +7,6 @@ module Hbc
       end
 
       def run
-        raise CaskError, "Dump incomplete." if dump_casks == :incomplete
-      end
-
-      def dump_casks
         casks.each(&:dumpcask)
       end
 

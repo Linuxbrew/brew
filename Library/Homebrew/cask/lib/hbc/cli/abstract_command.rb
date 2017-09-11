@@ -42,41 +42,32 @@ module Hbc
         @args = process_arguments(*args)
       end
 
-      def self.warn_unavailable_with_suggestion(cask_token, e)
-        exact_match, partial_matches = Search.search(cask_token)
-        error_message = e.message
-        if exact_match
-          error_message.concat(" Did you mean:\n#{exact_match}")
-        elsif !partial_matches.empty?
-          error_message.concat(" Did you mean one of:\n")
-                       .concat(Formatter.columns(partial_matches.take(20)))
-        end
-        onoe error_message
-      end
-
       private
 
       def casks(alternative: -> { [] })
-        return to_enum(:casks, alternative: alternative) unless block_given?
-
-        count = 0
-
+        return @casks if defined?(@casks)
         casks = args.empty? ? alternative.call : args
+        @casks = casks.map { |cask| CaskLoader.load(cask) }
+      rescue CaskUnavailableError => e
+        reason = [e.reason, suggestion_message(e.token)].join(" ")
+        raise e.class.new(e.token, reason)
+      end
 
-        casks.each do |cask_or_token|
-          begin
-            yield cask_or_token.respond_to?(:token) ? cask_or_token : CaskLoader.load(cask_or_token)
-            count += 1
-          rescue CaskUnavailableError => e
-            cask_token = cask_or_token
-            self.class.warn_unavailable_with_suggestion cask_token, e
-          rescue CaskError => e
-            onoe e.message
-          end
+      def suggestion_message(cask_token)
+        exact_match, partial_matches = Search.search(cask_token)
+
+        if exact_match.nil? && partial_matches.count == 1
+          exact_match = partial_matches.first
         end
 
-        return :empty if casks.length.zero?
-        (count == casks.length) ? :complete : :incomplete
+        if exact_match
+          "Did you mean “#{exact_match}”?"
+        elsif !partial_matches.empty?
+          "Did you mean one of these?\n"
+            .concat(Formatter.columns(partial_matches.take(20)))
+        else
+          ""
+        end
       end
     end
   end

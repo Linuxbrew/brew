@@ -12,7 +12,7 @@ describe Hbc::CLI::Edit, :cask do
   it "raises an error when given more than one argument" do
     expect {
       described_class.new("local-caffeine", "local-transmission")
-    }.to raise_error(/Only one Cask can be created at a time./)
+    }.to raise_error(/Only one Cask can be edited at a time\./)
   end
 
   it "raises an exception when the Cask doesnt exist" do

@@ -10,10 +10,6 @@ module Hbc
       end
 
       def run
-        raise CaskError, "Install incomplete." if install_casks == :incomplete
-      end
-
-      def install_casks
         casks.each do |cask|
           begin
             Installer.new(cask, binaries:       binaries?,

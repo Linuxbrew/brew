@@ -1,8 +1,10 @@
 describe Hbc::CLI::Audit, :cask do
-  let(:cask) { double("cask", token: nil) }
+  let(:cask) { Hbc::Cask.new(nil) }
 
   describe "selection of Casks to audit" do
     it "audits all Casks if no tokens are given" do
+      expect(cask).to be_a Hbc::Cask
+
       allow(Hbc).to receive(:all).and_return([cask, cask])
 
       expect(Hbc::Auditor).to receive(:audit).twice.and_return(true)

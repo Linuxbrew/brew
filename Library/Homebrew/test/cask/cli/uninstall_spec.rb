@@ -16,14 +16,12 @@ describe Hbc::CLI::Uninstall, :cask do
 
   it "shows an error when a bad Cask is provided" do
     expect { Hbc::CLI::Uninstall.run("notacask") }
-      .to output(/is unavailable/).to_stderr
-      .and raise_error(Hbc::CaskError, "Uninstall incomplete.")
+      .to raise_error(Hbc::CaskUnavailableError, /is unavailable/)
   end
 
   it "shows an error when a Cask is provided that's not installed" do
     expect { Hbc::CLI::Uninstall.run("local-caffeine") }
-    .to output(/is not installed/).to_stderr
-    .and raise_error(Hbc::CaskError, "Uninstall incomplete.")
+    .to raise_error(Hbc::CaskNotInstalledError, /is not installed/)
   end
 
   it "tries anyway on a non-present Cask when --force is given" do
@@ -76,8 +74,7 @@ describe Hbc::CLI::Uninstall, :cask do
     Hbc.appdir.join("MyFancyApp.app").rmtree
 
     expect { Hbc::CLI::Uninstall.run("with-uninstall-script-app") }
-    .to output(/does not exist/).to_stderr
-    .and raise_error(Hbc::CaskError, "Uninstall incomplete.")
+    .to raise_error(Hbc::CaskError, /uninstall script .* does not exist/)
 
     expect(cask).to be_installed
 
