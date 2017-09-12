@@ -28,11 +28,16 @@ module Hbc
 
       def initialize(cask, directives)
         super(cask)
+        directives[:signal] = [*directives[:signal]].flatten.each_slice(2).to_a
         @directives = directives
       end
 
       def to_h
         directives.to_h
+      end
+
+      def summarize
+        to_h.map { |key, val| [*val].map { |v| "#{key.inspect} => #{v.inspect}" }.join(", ") }.join(", ")
       end
 
       private
@@ -122,15 +127,15 @@ module Hbc
       end
 
       # :signal should come after :quit so it can be used as a backup when :quit fails
-      def uninstall_signal(*signals, **options)
-        signals.flatten.each_slice(2) do |pair|
+      def uninstall_signal(*signals, command: nil, **_)
+        signals.each do |pair|
           unless pair.size == 2
             raise CaskInvalidError.new(cask, "Each #{stanza} :signal must consist of 2 elements.")
           end
 
           signal, bundle_id = pair
           ohai "Signalling '#{signal}' to application ID '#{bundle_id}'"
-          pids = running_processes(bundle_id, **options).map(&:first)
+          pids = running_processes(bundle_id, command: command).map(&:first)
           next unless pids.any?
           # Note that unlike :quit, signals are sent from the current user (not
           # upgraded to the superuser). This is a todo item for the future, but
