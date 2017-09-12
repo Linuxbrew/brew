@@ -82,12 +82,6 @@ describe Homebrew::MissingFormula do
       it { is_expected.to be_blacklisted }
     end
 
-    context "clojure" do
-      subject { "clojure" }
-
-      it { is_expected.to be_blacklisted }
-    end
-
     context "gfortran" do
       subject { "gfortran" }
 

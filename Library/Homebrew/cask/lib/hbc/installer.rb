@@ -86,6 +86,8 @@ module Hbc
         raise CaskAlreadyInstalledError, @cask
       end
 
+      check_conflicts
+
       print_caveats
       fetch
       uninstall_existing_cask if @reinstall
@@ -96,6 +98,21 @@ module Hbc
       enable_accessibility_access
 
       puts summary
+    end
+
+    def check_conflicts
+      return unless @cask.conflicts_with
+
+      @cask.conflicts_with.cask.each do |conflicting_cask|
+        begin
+          conflicting_cask = CaskLoader.load(conflicting_cask)
+          if conflicting_cask.installed?
+            raise CaskConflictError.new(@cask, conflicting_cask)
+          end
+        rescue CaskUnavailableError
+          next # Ignore conflicting Casks that do not exist.
+        end
+      end
     end
 
     def reinstall

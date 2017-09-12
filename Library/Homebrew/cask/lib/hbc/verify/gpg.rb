@@ -33,7 +33,7 @@ module Hbc
         meta_dir = cached || cask.metadata_subdir("gpg", :now, true)
         sig_path = meta_dir.join("signature.asc")
 
-        curl(cask.gpg.signature, "-o", sig_path.to_s) unless cached || force
+        curl_download cask.gpg.signature, to: sig_path unless cached || force
 
         sig_path
       end

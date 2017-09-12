@@ -1,8 +1,6 @@
 module Hbc
   class URL
-    FAKE_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10) https://caskroom.github.io".freeze
-
-    attr_reader :using, :revision, :trust_cert, :uri, :cookies, :referer, :data
+    attr_reader :using, :revision, :trust_cert, :uri, :cookies, :referer, :data, :user_agent
 
     extend Forwardable
     def_delegators :uri, :path, :scheme, :to_s
@@ -17,18 +15,13 @@ module Hbc
 
     def initialize(uri, options = {})
       @uri        = Hbc::UnderscoreSupportingURI.parse(uri)
-      @user_agent = options[:user_agent]
+      @user_agent = options.fetch(:user_agent, :default)
       @cookies    = options[:cookies]
       @referer    = options[:referer]
       @using      = options[:using]
       @revision   = options[:revision]
       @trust_cert = options[:trust_cert]
       @data       = options[:data]
-    end
-
-    def user_agent
-      return FAKE_USER_AGENT if @user_agent == :fake
-      @user_agent
     end
   end
 end

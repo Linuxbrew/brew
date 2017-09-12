@@ -16,8 +16,7 @@ module Git
   def last_revision_of_file(repo, file, before_commit: nil)
     relative_file = Pathname(file).relative_path_from(repo)
 
-    commit_hash = last_revision_commit_of_file(repo, file, before_commit: before_commit)
-
+    commit_hash = last_revision_commit_of_file(repo, relative_file, before_commit: before_commit)
     out, = Open3.capture3(
       HOMEBREW_SHIMS_PATH/"scm/git", "-C", repo,
       "show", "#{commit_hash}:#{relative_file}"

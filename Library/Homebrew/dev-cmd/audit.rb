@@ -201,7 +201,7 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, name, user_agents: [:default])
+  def self.check_http_content(url, name, user_agents: [:default], check_content: false, strict: false)
     return unless url.start_with? "http"
 
     details = nil
@@ -236,18 +236,40 @@ class FormulaAuditor
       details[:content_length] == secure_details[:content_length]
     file_match = details[:file_hash] == secure_details[:file_hash]
 
-    return if !etag_match && !content_length_match && !file_match
-    "The URL #{url} could use HTTPS rather than HTTP"
+    if etag_match || content_length_match || file_match
+      return "The URL #{url} should use HTTPS rather than HTTP"
+    end
+
+    return unless check_content
+
+    no_protocol_file_contents = %r{https?:\\?/\\?/}
+    details[:file] = details[:file].gsub(no_protocol_file_contents, "/")
+    secure_details[:file] = secure_details[:file].gsub(no_protocol_file_contents, "/")
+
+    # Check for the same content after removing all protocols
+    if details[:file] == secure_details[:file]
+      return "The URL #{url} should use HTTPS rather than HTTP"
+    end
+
+    return unless strict
+
+    # Same size, different content after normalization
+    # (typical causes: Generated ID, Timestamp, Unix time)
+    if details[:file].length == secure_details[:file].length
+      return "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
+    end
+
+    lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
+    return unless (90..110).cover?(lenratio)
+    "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
   end
 
   def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
     max_time = hash_needed ? "600" : "25"
-    args = curl_args(
-      extra_args: ["--connect-timeout", "15", "--include", "--max-time", max_time, url],
-      show_output: true,
-      user_agent: user_agent,
+    output, = curl_output(
+      "--connect-timeout", "15", "--include", "--max-time", max_time, "--location", url,
+      user_agent: user_agent
     )
-    output = Open3.popen3(*args) { |_, stdout, _, _| stdout.read }
 
     status_code = :unknown
     while status_code == :unknown || status_code.to_s.start_with?("3")
@@ -262,6 +284,7 @@ class FormulaAuditor
       etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
       content_length: headers[/Content-Length: (\d+)/, 1],
       file_hash: output_hash,
+      file: output,
     }
   end
 
@@ -330,6 +353,7 @@ class FormulaAuditor
       valid_alias_names = [alias_name_major, alias_name_major_minor]
 
       if formula.tap && !formula.tap.core_tap?
+        versioned_aliases.map! { |a| "#{formula.tap}/#{a}" }
         valid_alias_names.map! { |a| "#{formula.tap}/#{a}" }
       end
 
@@ -413,7 +437,7 @@ class FormulaAuditor
     same_name_tap_formulae = @@local_official_taps_name_map[name] || []
 
     if @online
-      Homebrew.search_taps(name).each do |tap_formula_full_name|
+      Homebrew.search_taps(name, silent: true).each do |tap_formula_full_name|
         tap_formula_name = tap_formula_full_name.split("/").last
         next if tap_formula_name != name
         same_name_tap_formulae << tap_formula_full_name
@@ -567,7 +591,9 @@ class FormulaAuditor
     return unless DevelopmentTools.curl_handles_most_https_homepages?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
                                                formula.name,
-                                               user_agents: [:browser, :default])
+                                               user_agents: [:browser, :default],
+                                               check_content: true,
+                                               strict: @strict)
       problem http_content_problem
     end
   end
@@ -809,39 +835,6 @@ class FormulaAuditor
   end
 
   def line_problems(line, _lineno)
-    if line =~ /<(Formula|AmazonWebServicesFormula|ScriptFileFormula|GithubGistFormula)/
-      problem "Use a space in class inheritance: class Foo < #{Regexp.last_match(1)}"
-    end
-
-    # Commented-out cmake support from default template
-    problem "Commented cmake call found" if line.include?('# system "cmake')
-
-    # Comments from default template
-    [
-      "# PLEASE REMOVE",
-      "# Documentation:",
-      "# if this fails, try separate make/make install steps",
-      "# The URL of the archive",
-      "## Naming --",
-      "# if your formula requires any X11/XQuartz components",
-      "# if your formula fails when building in parallel",
-      "# Remove unrecognized options if warned by configure",
-    ].each do |comment|
-      next unless line.include?(comment)
-      problem "Please remove default template comments"
-    end
-
-    # FileUtils is included in Formula
-    # encfs modifies a file with this name, so check for some leading characters
-    if line =~ %r{[^'"/]FileUtils\.(\w+)}
-      problem "Don't need 'FileUtils.' before #{Regexp.last_match(1)}."
-    end
-
-    # Check for long inreplace block vars
-    if line =~ /inreplace .* do \|(.{2,})\|/
-      problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{Regexp.last_match(1)}|\"."
-    end
-
     # Check for string interpolation of single values.
     if line =~ /(system|inreplace|gsub!|change_make_var!).*[ ,]"#\{([\w.]+)\}"/
       problem "Don't need to interpolate \"#{Regexp.last_match(2)}\" with #{Regexp.last_match(1)}"
@@ -891,9 +884,6 @@ class FormulaAuditor
       end
     end
 
-    # Commented-out depends_on
-    problem "Commented-out dep #{Regexp.last_match(1)}" if line =~ /#\s*depends_on\s+(.+)\s*$/
-
     if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
       problem "Use \"if build.#{Regexp.last_match(1).downcase}?\" instead"
     end
@@ -904,6 +894,10 @@ class FormulaAuditor
 
     if line.include?("ENV.x11")
       problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
+    end
+
+    if line.include?("ENV.java_cache")
+      problem "In-formula ENV.java_cache usage has been deprecated & should be removed."
     end
 
     # Avoid hard-coding compilers
@@ -1265,6 +1259,7 @@ class ResourceAuditor
         end
       elsif strategy <= SubversionDownloadStrategy
         next unless DevelopmentTools.subversion_handles_most_https_certificates?
+        next unless Utils.svn_available?
         unless Utils.svn_remote_exists url
           problem "The URL #{url} is not a valid svn URL"
         end
