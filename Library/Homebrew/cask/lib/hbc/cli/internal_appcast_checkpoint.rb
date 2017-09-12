@@ -12,7 +12,7 @@ module Hbc
         if args.all? { |t| t =~ %r{^https?://} && t !~ /\.rb$/ }
           self.class.appcask_checkpoint_for_url(args)
         else
-          self.class.appcask_checkpoint(load_casks, calculate?)
+          self.class.appcask_checkpoint(casks, calculate?)
         end
       end
 
