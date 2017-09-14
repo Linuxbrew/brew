@@ -202,12 +202,12 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, name, user_agents: [:default], check_content: false, strict: false)
+  def self.check_http_content(url, user_agents: [:default], check_content: false, strict: false, require_http: false)
     return unless url.start_with? "http"
 
     details = nil
     user_agent = nil
-    hash_needed = url.start_with?("http:") && name != "curl"
+    hash_needed = url.start_with?("http:") && !require_http
     user_agents.each do |ua|
       details = http_content_headers_and_checksum(url, hash_needed: hash_needed, user_agent: ua)
       user_agent = ua
@@ -576,7 +576,6 @@ class FormulaAuditor
 
     return unless DevelopmentTools.curl_handles_most_https_homepages?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
-                                               formula.name,
                                                user_agents: [:browser, :default],
                                                check_content: true,
                                                strict: @strict)
@@ -629,13 +628,14 @@ class FormulaAuditor
     end
 
     %w[Stable Devel HEAD].each do |name|
-      next unless spec = formula.send(name.downcase)
+      spec_name = name.downcase.to_sym
+      next unless spec = formula.send(spec_name)
 
-      ra = ResourceAuditor.new(spec, online: @online, strict: @strict).audit
+      ra = ResourceAuditor.new(spec, spec_name, online: @online, strict: @strict).audit
       problems.concat ra.problems.map { |problem| "#{name}: #{problem}" }
 
       spec.resources.each_value do |resource|
-        ra = ResourceAuditor.new(resource, online: @online, strict: @strict).audit
+        ra = ResourceAuditor.new(resource, spec_name, online: @online, strict: @strict).audit
         problems.concat ra.problems.map { |problem|
           "#{name} resource #{resource.name.inspect}: #{problem}"
         }
@@ -1086,10 +1086,10 @@ class FormulaAuditor
 end
 
 class ResourceAuditor
-  attr_reader :problems
-  attr_reader :version, :checksum, :using, :specs, :url, :mirrors, :name
+  attr_reader :name, :version, :checksum, :url, :mirrors, :using, :specs, :owner
+  attr_reader :spec_name, :problems
 
-  def initialize(resource, options = {})
+  def initialize(resource, spec_name, options = {})
     @name     = resource.name
     @version  = resource.version
     @checksum = resource.checksum
@@ -1097,9 +1097,11 @@ class ResourceAuditor
     @mirrors  = resource.mirrors
     @using    = resource.using
     @specs    = resource.specs
-    @online   = options[:online]
-    @strict   = options[:strict]
-    @problems = []
+    @owner    = resource.owner
+    @spec_name = spec_name
+    @online    = options[:online]
+    @strict    = options[:strict]
+    @problems  = []
   end
 
   def audit
@@ -1173,11 +1175,26 @@ class ResourceAuditor
     problem "Redundant :using value in URL"
   end
 
+  def self.curl_git_openssl_and_deps
+    @curl_git_openssl_and_deps ||= begin
+      formulae_names = ["curl", "git", "openssl"]
+      formulae_names += formulae_names.flat_map do |f|
+        Formula[f].recursive_dependencies.map(&:name)
+      end
+      formulae_names.uniq
+    rescue FormulaUnavailableError
+      []
+    end
+  end
+
   def audit_urls
     urls = [url] + mirrors
 
-    if name == "curl" && !urls.find { |u| u.start_with?("http://") } && url != Formula["curl"].head.url
-      problem "should always include at least one HTTP url"
+    require_http = ResourceAuditor.curl_git_openssl_and_deps.include?(owner.name)
+
+    if spec_name == :stable && require_http &&
+       !urls.find { |u| u.start_with?("http://") }
+      problem "should always include at least one HTTP mirror"
     end
 
     return unless @online
@@ -1189,7 +1206,7 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url, name)
+        if http_content_problem = FormulaAuditor.check_http_content(url, name, require_http: require_http)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy
