@@ -11,25 +11,26 @@
 #   $ ./cadfaelbrew/bin/brew doctor
 #   $ ./cadfaelbrew/bin/brew cadfael-bootstrap
 #   $ ./cadfaelbrew/bin/brew install falaise
+# ```
 #
 # The bootstrap operation:
 #
-# - If ``cadfael`` formula already installed, exit as already bootstrapped
 # - Runs basic ``brew doctor`` sanity check
 #   - If ``brew doctor`` exist with error, warn, but continue
 # - Determines the current OS/Version
 #   - If OS/Version is supported
-#     - Check that required packages are installed
+#     - Check that required system packages are installed
 #       - If any are missing, error out with instructions on adding them
 #   - If OS/Version isn't supported
 #     - Warn, but continue
 # - Prepare repository
-#   - On Linux, 
+#   - On Linux,
 #     - create gcc-<MAJOR>.<MINOR> soft links if needed
+#     - On RHEL 6, install brewed gcc
 #     - brew install ruby (If system Ruby < 1.9)
 #     - brew install git  (If system git < 1.7.10)
 #     - NB: currently can run these on older Rubies (1.8),
-#       but now clear if this is universal. May still need
+#       but not clear if this is universal. May still need
 #       a bootstrapping of Ruby....
 
 #-----------------------------------------------------------------------
@@ -626,11 +627,29 @@ doBootstrapCadfael() {
 }
 
 #-----------------------------------------------------------------------
+# Bootstrap compiler
+#-----------------------------------------------------------------------
+doBootstrapCompiler() {
+  # Create ggc-<version> links if needed
+  doCreateCompilerLinks "$HOMEBREW_PREFIX/bin"
+
+  # Bootstrapping Cadfael's toolchain needs GCC > 4.5
+  # This requirement isn't met on RHEL 6, so pre-install our GCC
+  if isRedHatFamily ; then
+    if [ `getRedHatMajorVersion` == "6" ] ; then
+      _echo_info "Bootstrapping brewed GCC compiler"
+      brew update || _echo_exit "Failed to update brew"
+      brew install supernemo-dbd/cadfael/gcc49 || _echo_exit "Failed to install brewed gcc"
+    fi
+  fi
+}
+
+#-----------------------------------------------------------------------
 # Bootstrap Interface
 #-----------------------------------------------------------------------
 doBrewBootstrap() {
-  _echo_info "bootstrapping brew"
-  doCreateCompilerLinks "$HOMEBREW_PREFIX/bin"
+  _echo_info "Bootstrapping brew"
+  doBootstrapCompiler || _echo_exit "Unable to bootstrap compiler"
   doBootstrapRuby || _echo_exit "Unable to bootstrap ruby"
   doBootstrapGit || _echo_exit "Unable to bootstrap git"
 
