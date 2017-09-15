@@ -1206,7 +1206,7 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url, name, require_http: require_http)
+        if http_content_problem = FormulaAuditor.check_http_content(url, require_http: require_http)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy
