@@ -574,7 +574,7 @@ class FormulaAuditor
 
     return unless @online
 
-    return unless DevelopmentTools.curl_handles_most_https_homepages?
+    return unless DevelopmentTools.curl_handles_most_https_certificates?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
                                                user_agents: [:browser, :default],
                                                check_content: true,
@@ -1175,9 +1175,9 @@ class ResourceAuditor
     problem "Redundant :using value in URL"
   end
 
-  def self.curl_git_openssl_and_deps
-    @curl_git_openssl_and_deps ||= begin
-      formulae_names = ["curl", "git", "openssl"]
+  def self.curl_openssl_and_deps
+    @curl_openssl_and_deps ||= begin
+      formulae_names = ["curl", "openssl"]
       formulae_names += formulae_names.flat_map do |f|
         Formula[f].recursive_dependencies.map(&:name)
       end
@@ -1190,11 +1190,14 @@ class ResourceAuditor
   def audit_urls
     urls = [url] + mirrors
 
-    require_http = ResourceAuditor.curl_git_openssl_and_deps.include?(owner.name)
+    curl_openssl_or_deps = ResourceAuditor.curl_openssl_and_deps.include?(owner.name)
 
-    if spec_name == :stable && require_http &&
-       !urls.find { |u| u.start_with?("http://") }
-      problem "should always include at least one HTTP mirror"
+    if spec_name == :stable && curl_openssl_or_deps
+      problem "should not use xz tarballs" if url.end_with?(".xz")
+
+      unless urls.find { |u| u.start_with?("http://") }
+        problem "should always include at least one HTTP mirror"
+      end
     end
 
     return unless @online
@@ -1206,7 +1209,7 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url, require_http: require_http)
+        if http_content_problem = FormulaAuditor.check_http_content(url, require_http: curl_openssl_or_deps)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy

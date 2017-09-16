@@ -603,6 +603,12 @@ class FormulaInstaller
 
     # let's reset Utils.git_available? if we just installed git
     Utils.clear_git_available_cache if formula.name == "git"
+
+    # use installed curl when it's needed and available
+    if formula.name == "curl" &&
+       !DevelopmentTools.curl_handles_most_https_certificates?
+      ENV["HOMEBREW_CURL"] = formula.opt_bin/"curl"
+    end
   ensure
     unlock
   end
