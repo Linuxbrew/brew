@@ -3,6 +3,7 @@ module Hbc
     class List < AbstractCommand
       option "-1", :one, false
       option "--versions", :versions, false
+      option "--full-name", :full_name, false
 
       option "-l", (lambda do |*|
         one = true # rubocop:disable Lint/UselessAssignment
@@ -42,6 +43,8 @@ module Hbc
           puts installed_casks.map(&:to_s)
         elsif versions?
           puts installed_casks.map(&self.class.method(:format_versioned))
+        elsif full_name?
+          puts installed_casks.map(&:full_name).sort &tap_and_name_comparison
         elsif !installed_casks.empty?
           puts Formatter.columns(installed_casks.map(&:to_s))
         end
