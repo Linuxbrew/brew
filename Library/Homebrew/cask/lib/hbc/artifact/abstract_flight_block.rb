@@ -43,6 +43,10 @@ module Hbc
         return if (block = directives[dsl_key]).nil?
         class_for_dsl_key(dsl_key).new(cask).instance_eval(&block)
       end
+
+      def summarize
+        directives.keys.map(&:to_s).join(", ")
+      end
     end
   end
 end
