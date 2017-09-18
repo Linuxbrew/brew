@@ -13,7 +13,7 @@ module Utils
         return pipe.read unless block_given?
         yield pipe
       else
-        $stderr.reopen("/dev/null", "w")
+        $stderr.reopen("/dev/null", "w") if !ARGV.debug? && !ARGV.verbose?
         exec(*args)
       end
     end
