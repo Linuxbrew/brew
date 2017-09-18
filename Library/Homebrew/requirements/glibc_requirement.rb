@@ -10,10 +10,10 @@ class GlibcRequirement < Requirement
     libc = ["/lib/x86_64-linux-gnu/libc.so.6", "/lib64/libc.so.6", "/usr/lib64/libc.so.6", "/lib/libc.so.6", "/usr/lib/libc.so.6", "/lib/i386-linux-gnu/libc.so.6", "/lib/arm-linux-gnueabihf/libc.so.6"].find do |s|
       Pathname.new(s).executable?
     end
-    raise "Unable to locate the system's glibc" unless libc
+    return Version::NULL unless libc
     version = Utils.popen_read("#{libc} 2>&1")[/[Vv]ersion (\d\.\d+)/, 1]
-    raise "Unable to determine the system's glibc version" unless version
-    @system_version = version
+    return Version::NULL unless version
+    @system_version = Version.new version
   end
 
   satisfy(build_env: false) do
