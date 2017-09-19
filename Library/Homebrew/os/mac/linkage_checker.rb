@@ -91,8 +91,8 @@ class LinkageChecker
     display_items "Homebrew libraries", @brewed_dylibs
     display_items "Variable-referenced libraries", @variable_dylibs
     display_items "Missing libraries", @broken_dylibs
-    display_items "Possible undeclared dependencies", @undeclared_deps
-    display_items "Possible unnecessary dependencies", @unnecessary_deps
+    display_items "Undeclared dependencies with linkage", @undeclared_deps
+    display_items "Dependencies with no linkage", @unnecessary_deps
   end
 
   def display_reverse_output
