@@ -13,7 +13,7 @@ module Utils
         return pipe.read unless block_given?
         yield pipe
       else
-        options[:err] ||= :close
+        options[:err] ||= :close unless ENV["HOMEBREW_STDERR"]
         exec(*args, options)
       end
     end
