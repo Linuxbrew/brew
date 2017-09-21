@@ -15,7 +15,7 @@ matrix:
       rvm: system
     - os: linux
       sudo: false
-      rvm: 2.0.0
+      rvm: 2.3.3
 
 before_install:
   - export HOMEBREW_NO_AUTO_UPDATE=1
