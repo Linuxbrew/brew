@@ -241,8 +241,18 @@ describe Version do
 
   describe "::detect" do
     matcher :be_detected_from do |url, specs = {}|
-      match do |version|
-        Version.detect(url, specs) == version
+      detected = Version.detect(url, specs)
+
+      match do |expected|
+        detected == expected
+      end
+
+      failure_message do |expected|
+        format = <<-EOS
+        expected: %s
+        detected: %s
+        EOS
+        format % [expected, detected]
       end
     end
 
