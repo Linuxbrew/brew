@@ -167,12 +167,12 @@ end
 module Homebrew
   module_function
 
-  def _system(cmd, *args)
+  def _system(cmd, *args, **options)
     pid = fork do
       yield if block_given?
       args.collect!(&:to_s)
       begin
-        exec(cmd, *args)
+        exec(cmd, *args, **options)
       rescue
         nil
       end
@@ -182,9 +182,9 @@ module Homebrew
     $CHILD_STATUS.success?
   end
 
-  def system(cmd, *args)
+  def system(cmd, *args, **options)
     puts "#{cmd} #{args * " "}" if ARGV.verbose?
-    _system(cmd, *args)
+    _system(cmd, *args, **options)
   end
 
   def install_gem_setup_path!(name, version = nil, executable = name)
