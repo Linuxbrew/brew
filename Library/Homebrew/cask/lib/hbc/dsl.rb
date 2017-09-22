@@ -105,7 +105,9 @@ module Hbc
     end
 
     def language(*args, default: false, &block)
-      if !args.empty? && block_given?
+      if args.empty?
+        language_eval
+      elsif block_given?
         @language_blocks ||= {}
         @language_blocks[args] = block
 
@@ -117,7 +119,7 @@ module Hbc
 
         @language_blocks.default = block
       else
-        language_eval
+        raise CaskInvalidError.new(cask, "No block given to language stanza.")
       end
     end
 
@@ -125,6 +127,10 @@ module Hbc
       return @language if instance_variable_defined?(:@language)
 
       return @language = nil if @language_blocks.nil? || @language_blocks.empty?
+
+      if @language_blocks.default.nil?
+        raise CaskInvalidError.new(cask, "No default language specified.")
+      end
 
       MacOS.languages.map(&Locale.method(:parse)).each do |locale|
         key = @language_blocks.keys.detect do |strings|
