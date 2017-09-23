@@ -85,7 +85,7 @@ class DevelopmentTools
     def curl_handles_most_https_certificates?
       # The system Curl is too old for some modern HTTPS certificates on
       # older macOS versions.
-      !ENV["HOMEBREW_SYSTEM_CURL_TOO_OLD"].nil?
+      ENV["HOMEBREW_SYSTEM_CURL_TOO_OLD"].nil?
     end
 
     def subversion_handles_most_https_certificates?
