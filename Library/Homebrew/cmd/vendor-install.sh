@@ -135,7 +135,7 @@ install() {
   fi
 
   safe_cd "$VENDOR_DIR"
-  [[ -n "$HOMEBREW_QUIET" ]] || echo "==> Unpacking $(basename "$VENDOR_URL")"
+  [[ -n "$HOMEBREW_QUIET" ]] || echo "==> Pouring $(basename "$VENDOR_URL")"
   tar "$tar_args" "$CACHED_LOCATION"
   safe_cd "$VENDOR_DIR/portable-$VENDOR_NAME"
 
