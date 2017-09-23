@@ -214,7 +214,12 @@ class FormulaAuditor
       break if details[:status].to_s.start_with?("2")
     end
 
-    return "The URL #{url} is not reachable" unless details[:status]
+    unless details[:status]
+      # Hack around https://github.com/Homebrew/brew/issues/3199
+      return if MacOS.version == :el_capitan
+      return "The URL #{url} is not reachable"
+    end
+
     unless details[:status].start_with? "2"
       return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
     end
