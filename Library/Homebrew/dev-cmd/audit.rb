@@ -430,6 +430,7 @@ class FormulaAuditor
 
     if @online
       Homebrew.search_taps(name, silent: true).each do |tap_formula_full_name|
+        next if tap_formula_full_name.start_with?("homebrew/science/")
         tap_formula_name = tap_formula_full_name.split("/").last
         next if tap_formula_name != name
         same_name_tap_formulae << tap_formula_full_name
