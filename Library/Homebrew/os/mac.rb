@@ -11,7 +11,7 @@ module OS
   module Mac
     module_function
 
-    ::MacOS = self # rubocop:disable Style/ConstantName
+    ::MacOS = self # rubocop:disable Naming/ConstantName
 
     raise "Loaded OS::Mac on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
 
