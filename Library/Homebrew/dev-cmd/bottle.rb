@@ -283,7 +283,7 @@ module Homebrew
         raise
       ensure
         ignore_interrupts do
-          original_tab.write if original_tab
+          original_tab&.write
           unless ARGV.include? "--skip-relocation"
             keg.replace_placeholders_with_locations changed_files
           end

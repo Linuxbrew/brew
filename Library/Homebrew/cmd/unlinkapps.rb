@@ -77,7 +77,7 @@ module Homebrew
   def unlinkapps_unlink?(target_app, opts = {})
     # Skip non-symlinks and symlinks that don't point into the Homebrew prefix.
     app = target_app.readlink.to_s if target_app.symlink?
-    return false unless app && app.start_with?(*UNLINKAPPS_PREFIXES)
+    return false unless app&.start_with?(*UNLINKAPPS_PREFIXES)
 
     if opts.fetch(:prune, false)
       !File.exist?(app) # Remove only broken symlinks in prune mode.

@@ -124,7 +124,7 @@ module Homebrew
       Formula.each do |f|
         if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
           guesses << f
-        elsif f.stable && f.stable.url && f.stable.url.match(base_url)
+        elsif f.stable&.url && f.stable.url.match(base_url)
           guesses << f
         end
       end

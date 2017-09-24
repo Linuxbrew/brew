@@ -69,14 +69,14 @@ class JavaRequirement < Requirement
     rescue FormulaUnavailableError
       nil
     end
-    javas << jdk.bin/"java" if jdk && jdk.installed?
+    javas << jdk.bin/"java" if jdk&.installed?
     javas << which("java")
     javas
   end
 
   def preferred_java
     possible_javas.detect do |java|
-      next false unless java && java.executable?
+      next false unless java&.executable?
       next true unless @version
       next true if satisfies_version(java)
     end

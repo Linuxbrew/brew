@@ -707,7 +707,7 @@ class FormulaAuditor
     end
 
     stable = formula.stable
-    case stable && stable.url
+    case stable&.url
     when /[\d\._-](alpha|beta|rc\d)/
       matched = Regexp.last_match(1)
       version_prefix = stable.version.to_s.sub(/\d+$/, "")
@@ -1018,7 +1018,7 @@ class FormulaAuditor
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
-    return unless formula.tap && formula.tap.official?
+    return unless formula.tap&.official?
     return unless formula.tap.tap_migrations.key?(formula.name)
 
     problem <<-EOS.undent

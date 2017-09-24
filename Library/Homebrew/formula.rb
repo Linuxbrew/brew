@@ -472,7 +472,7 @@ class Formula
     return true if devel && tab.devel_version && tab.devel_version < devel.version
 
     if options[:fetch_head]
-      return false unless head && head.downloader.is_a?(VCSDownloadStrategy)
+      return false unless head&.downloader.is_a?(VCSDownloadStrategy)
       downloader = head.downloader
       downloader.shutup! unless ARGV.verbose?
       downloader.commit_outdated?(version.version.commit)
@@ -1115,8 +1115,8 @@ class Formula
 
   # @private
   def unlock
-    @lock.unlock unless @lock.nil?
-    @oldname_lock.unlock unless @oldname_lock.nil?
+    @lock&.unlock
+    @oldname_lock&.unlock
   end
 
   def migration_needed?
@@ -1440,7 +1440,7 @@ class Formula
   # True if this formula is provided by Homebrew itself
   # @private
   def core_formula?
-    tap && tap.core_tap?
+    tap&.core_tap?
   end
 
   # True if this formula is provided by external Tap
@@ -1525,10 +1525,10 @@ class Formula
       "oldname" => oldname,
       "aliases" => aliases,
       "versions" => {
-        "stable" => (stable.version.to_s if stable),
+        "stable" => stable&.version.to_s,
         "bottle" => bottle ? true : false,
-        "devel" => (devel.version.to_s if devel),
-        "head" => (head.version.to_s if head),
+        "devel" => devel&.version.to_s,
+        "head" => head&.version.to_s,
       },
       "revision" => revision,
       "version_scheme" => version_scheme,

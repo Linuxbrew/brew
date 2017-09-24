@@ -560,7 +560,7 @@ class FormulaInstaller
     end
     raise
   else
-    ignore_interrupts { tmp_keg.rmtree if tmp_keg && tmp_keg.directory? }
+    ignore_interrupts { tmp_keg.rmtree if tmp_keg&.directory? }
   end
 
   def caveats
