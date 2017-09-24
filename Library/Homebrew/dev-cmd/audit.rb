@@ -358,7 +358,7 @@ class FormulaAuditor
       end
       valid_alias_names = [alias_name_major, alias_name_major_minor]
 
-      if formula.tap && !formula.tap.core_tap?
+      unless formula.tap&.core_tap?
         versioned_aliases.map! { |a| "#{formula.tap}/#{a}" }
         valid_alias_names.map! { |a| "#{formula.tap}/#{a}" }
       end

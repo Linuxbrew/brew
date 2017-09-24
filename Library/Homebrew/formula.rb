@@ -1182,7 +1182,8 @@ class Formula
   # Returns false if the formula wasn't installed with an alias.
   def installed_alias_target_changed?
     target = current_installed_alias_target
-    target && target.name != name
+    return false unless target
+    target.name != name
   end
 
   # Is this formula the target of an alias used to install an old formula?
@@ -1446,7 +1447,8 @@ class Formula
   # True if this formula is provided by external Tap
   # @private
   def tap?
-    tap && !tap.core_tap?
+    return false unless tap
+    !tap.core_tap?
   end
 
   # @private
@@ -1570,7 +1572,7 @@ class Formula
         "root_url" => bottle_spec.root_url,
       }
       bottle_info["files"] = {}
-      bottle_spec.collector.keys.each do |os|
+      bottle_spec.collector.keys.each do |os| # rubocop:disable Performance/HashEachMethods
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
           "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",

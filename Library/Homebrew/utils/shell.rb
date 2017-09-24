@@ -51,8 +51,6 @@ module Utils
       end
     end
 
-    private
-
     SHELL_PROFILE_MAP = {
       bash: "~/.bash_profile",
       csh: "~/.cshrc",
@@ -64,8 +62,6 @@ module Utils
     }.freeze
 
     UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:/@\n])}
-
-    module_function
 
     def csh_quote(str)
       # ruby's implementation of shell_escape

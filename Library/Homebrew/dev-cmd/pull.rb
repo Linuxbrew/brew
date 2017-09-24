@@ -69,7 +69,7 @@ module Homebrew
     tap = nil
 
     ARGV.named.each do |arg|
-      if arg.to_i > 0
+      if arg.to_i.positive?
         issue = arg
         url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
         tap = CoreTap.instance

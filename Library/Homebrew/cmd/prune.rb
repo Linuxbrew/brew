@@ -55,7 +55,7 @@ module Homebrew
       else
         n, d = ObserverPathnameExtension.counts
         print "Pruned #{n} symbolic links "
-        print "and #{d} directories " if d > 0
+        print "and #{d} directories " if d.positive?
         puts "from #{HOMEBREW_PREFIX}"
       end
     end

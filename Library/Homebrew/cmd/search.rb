@@ -67,7 +67,7 @@ module Homebrew
 
         ohai "Searching blacklisted, migrated and deleted formulae..."
         if reason = Homebrew::MissingFormula.reason(query, silent: true)
-          if count > 0
+          if count.positive?
             puts
             puts "If you meant #{query.inspect} specifically:"
           end

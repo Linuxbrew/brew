@@ -87,8 +87,8 @@ module RuboCop
           # preceding_comp_arr: array containing components of same type
           order_idx, curr_p_idx, preceding_comp_arr = get_state(node1)
 
-          # curr_p_idx > 0 means node1 needs to be grouped with its own kind
-          if curr_p_idx > 0
+          # curr_p_idx.positive? means node1 needs to be grouped with its own kind
+          if curr_p_idx.positive?
             node2 = preceding_comp_arr[curr_p_idx - 1]
             indentation = " " * (start_column(node2) - line_start_column(node2))
             line_breaks = node2.multiline? ? "\n\n" : "\n"

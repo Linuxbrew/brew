@@ -86,15 +86,9 @@ module GitHub
 
   def api_credentials_type
     token, username = api_credentials
-    if token && !token.empty?
-      if username && !username.empty?
-        :keychain
-      else
-        :environment
-      end
-    else
-      :none
-    end
+    return :none if !token || token.empty?
+    return :keychain if !username || username.empty?
+    :environment
   end
 
   def api_credentials_error_message(response_headers, needed_scopes)
