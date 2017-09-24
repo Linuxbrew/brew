@@ -27,8 +27,7 @@ end
 
 module Utils
   def self.git_available?
-    return @git if instance_variable_defined?(:@git)
-    @git = quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
+    @git ||= quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
   end
 
   def self.git_path
@@ -58,12 +57,11 @@ module Utils
       end
     end
 
-    clear_git_available_cache
     raise "Git is unavailable" unless git_available?
   end
 
   def self.clear_git_available_cache
-    remove_instance_variable(:@git) if instance_variable_defined?(:@git)
+    @git = nil
     @git_path = nil
     @git_version = nil
   end
