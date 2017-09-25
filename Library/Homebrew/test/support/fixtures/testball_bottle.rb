@@ -6,7 +6,7 @@ class TestballBottle < Formula
       stable.bottle do
         cellar :any_skip_relocation
         root_url "file://#{TEST_FIXTURE_DIR}/bottles"
-        sha256 "9abc8ce779067e26556002c4ca6b9427b9874d25f0cafa7028e05b5c5c410cb4" => Utils::Bottles.tag
+        sha256 "d48bbbe583dcfbfa608579724fc6f0328b3cd316935c6ea22f134610aaf2952f" => Utils::Bottles.tag
       end
       cxxstdlib_check :skip
     end
