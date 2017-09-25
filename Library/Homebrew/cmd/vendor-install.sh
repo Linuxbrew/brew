@@ -13,8 +13,8 @@ if [[ -n "$HOMEBREW_MACOS" ]]
 then
   if [[ "$HOMEBREW_PROCESSOR" = "Intel" ]]
   then
-    ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.leopard_64.bottle.tar.gz"
-    ruby_SHA="9060cdddbc5b5a0cc7188a251c40b2845e9d8b8ce346c83c585a965a111cab54"
+    ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.leopard_64.bottle.1.tar.gz"
+    ruby_SHA="34ce9e4c9c1be28db564d744165aa29291426f8a3d2ef806ba4f0b9175aedb2b"
   else
     ruby_URL=""
     ruby_SHA=""
@@ -43,6 +43,11 @@ fetch() {
   elif [[ -z "$HOMEBREW_VERBOSE" ]]
   then
     curl_args[${#curl_args[*]}]="--progress-bar"
+  fi
+
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100600" ]]
+  then
+    curl_args[${#curl_args[*]}]="--insecure"
   fi
 
   temporary_path="$CACHED_LOCATION.incomplete"
