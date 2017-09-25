@@ -45,6 +45,11 @@ fetch() {
     curl_args[${#curl_args[*]}]="--progress-bar"
   fi
 
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100600" ]]
+  then
+    curl_args[${#curl_args[*]}]="--insecure"
+  fi
+
   temporary_path="$CACHED_LOCATION.incomplete"
 
   mkdir -p "$HOMEBREW_CACHE"
