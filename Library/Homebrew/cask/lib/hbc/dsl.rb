@@ -161,7 +161,7 @@ module Hbc
         begin
           DSL::Container.new(*args).tap do |container|
             # TODO: remove this backward-compatibility section after removing nested_container
-            if container && container.nested
+            if container&.nested
               artifacts[:nested_container] << Artifact::NestedContainer.new(cask, container.nested)
             end
           end

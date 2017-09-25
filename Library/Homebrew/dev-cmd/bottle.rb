@@ -47,7 +47,7 @@ BOTTLE_ERB = <<-EOS.freeze
     <% elsif cellar != BottleSpecification::DEFAULT_CELLAR %>
     cellar "<%= cellar %>"
     <% end %>
-    <% if rebuild > 0 %>
+    <% if rebuild.positive? %>
     rebuild <%= rebuild %>
     <% end %>
     <% checksums.each do |checksum_type, checksum_values| %>
@@ -186,7 +186,7 @@ module Homebrew
       ohai "Determining #{f.full_name} bottle rebuild..."
       versions = FormulaVersions.new(f)
       rebuilds = versions.bottle_version_map("origin/master")[f.pkg_version]
-      rebuilds.pop if rebuilds.last.to_i > 0
+      rebuilds.pop if rebuilds.last.to_i.positive?
       rebuild = rebuilds.empty? ? 0 : rebuilds.max.to_i + 1
     end
 
@@ -283,7 +283,7 @@ module Homebrew
         raise
       ensure
         ignore_interrupts do
-          original_tab.write if original_tab
+          original_tab&.write
           unless ARGV.include? "--skip-relocation"
             keg.replace_placeholders_with_locations changed_files
           end

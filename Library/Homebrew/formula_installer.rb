@@ -269,7 +269,7 @@ class FormulaInstaller
       oh1 "Installing #{Formatter.identifier(formula.full_name)} #{options}".strip
     end
 
-    if formula.tap && !formula.tap.private?
+    unless formula.tap&.private?
       action = "#{formula.full_name} #{options}".strip
       Utils::Analytics.report_event("install", action)
 
@@ -560,7 +560,7 @@ class FormulaInstaller
     end
     raise
   else
-    ignore_interrupts { tmp_keg.rmtree if tmp_keg && tmp_keg.directory? }
+    ignore_interrupts { tmp_keg.rmtree if tmp_keg&.directory? }
   end
 
   def caveats

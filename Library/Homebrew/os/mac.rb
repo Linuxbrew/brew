@@ -11,7 +11,7 @@ module OS
   module Mac
     module_function
 
-    ::MacOS = self # rubocop:disable Style/ConstantName
+    ::MacOS = self # rubocop:disable Naming/ConstantName
 
     raise "Loaded OS::Mac on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
 
@@ -104,7 +104,7 @@ module OS
     # Returns the path to an SDK or nil, following the rules set by #sdk.
     def sdk_path(v = nil)
       s = sdk(v)
-      s.path unless s.nil?
+      s&.path
     end
 
     # See these issues for some history:

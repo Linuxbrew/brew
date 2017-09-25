@@ -56,7 +56,7 @@ module Hbc
 
     class FromURILoader < FromPathLoader
       def self.can_load?(ref)
-        ref.to_s.match?(::URI.regexp)
+        ref.to_s.match?(::URI::DEFAULT_PARSER.make_regexp)
       end
 
       attr_reader :url

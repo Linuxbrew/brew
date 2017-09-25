@@ -233,8 +233,8 @@ module Stdenv
 
   def make_jobs
     # '-j' requires a positive integral argument
-    if self["HOMEBREW_MAKE_JOBS"].to_i > 0
-      self["HOMEBREW_MAKE_JOBS"].to_i
+    if (jobs = self["HOMEBREW_MAKE_JOBS"].to_i).positive?
+      jobs
     else
       Hardware::CPU.cores
     end

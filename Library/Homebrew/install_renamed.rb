@@ -16,12 +16,12 @@ module InstallRenamed
     end
   end
 
-  def +(path)
-    super(path).extend(InstallRenamed)
+  def +(other)
+    super(other).extend(InstallRenamed)
   end
 
-  def /(path)
-    super(path).extend(InstallRenamed)
+  def /(other)
+    super(other).extend(InstallRenamed)
   end
 
   private

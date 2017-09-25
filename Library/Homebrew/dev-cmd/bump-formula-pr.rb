@@ -89,7 +89,7 @@ module Homebrew
 
   def check_for_duplicate_pull_requests(formula)
     pull_requests = fetch_pull_requests(formula)
-    return unless pull_requests && !pull_requests.empty?
+    return unless pull_requests&.empty?
     duplicates_message = <<-EOS.undent
       These open pull requests may be duplicates:
       #{pull_requests.map { |pr| "#{pr["title"]} #{pr["html_url"]}" }.join("\n")}
@@ -124,7 +124,7 @@ module Homebrew
       Formula.each do |f|
         if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
           guesses << f
-        elsif f.stable && f.stable.url && f.stable.url.match(base_url)
+        elsif f.stable&.url && f.stable.url.match(base_url)
           guesses << f
         end
       end

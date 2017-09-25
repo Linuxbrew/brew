@@ -159,7 +159,7 @@ module Hbc
       odebug "Extracting primary container"
 
       FileUtils.mkdir_p @cask.staged_path
-      container = if @cask.container && @cask.container.type
+      container = if @cask.container&.type
         Container.from_type(@cask.container.type)
       else
         Container.for_path(@downloaded_path, @command)
@@ -361,7 +361,7 @@ module Hbc
 
       savedir = @cask.metadata_subdir("Casks", timestamp: :now, create: true)
       FileUtils.copy @cask.sourcefile_path, savedir
-      old_savedir.rmtree unless old_savedir.nil?
+      old_savedir&.rmtree
     end
 
     def uninstall

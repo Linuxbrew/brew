@@ -57,7 +57,7 @@ module Debrew
         input.chomp!
 
         i = input.to_i
-        if i > 0
+        if i.positive?
           choice = menu.entries[i - 1]
         else
           possible = menu.entries.find_all { |e| e.name.start_with?(input) }
