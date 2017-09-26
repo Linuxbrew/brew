@@ -10,7 +10,8 @@ describe Utils::Analytics do
 
       it "returns OS_VERSION and prefix when HOMEBREW_PREFIX is not /usr/local" do
         stub_const("HOMEBREW_PREFIX", "blah")
-        expect(described_class.os_prefix_ci).to include("#{OS_VERSION}, non-/usr/local")
+        custom_prefix = OS.mac? ? "non-/usr/local" : "custom-prefix"
+        expect(described_class.os_prefix_ci).to include("#{OS_VERSION}, #{custom_prefix}")
       end
 
       it "includes CI when ENV['CI'] is set" do
