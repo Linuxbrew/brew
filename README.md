@@ -18,7 +18,7 @@ The installation script installs Linuxbrew to `/home/linuxbrew/.linuxbrew` if po
 Paste at a Terminal prompt:
 
 ```sh
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
 ```
 
 Follow the *Next steps* instructions to add Linuxbrew to your `PATH` and to your bash shell profile script, either `~/.profile` on Debian/Ubuntu or `~/.bash_profile` on CentOS/Fedora/RedHat.
@@ -60,13 +60,13 @@ Paste at a Terminal prompt:
 ### Debian or Ubuntu
 
 ```sh
-sudo apt-get install build-essential curl file git python-setuptools ruby
+sudo apt-get install build-essential curl file git python-setuptools
 ```
 
 ### Fedora, CentOS or Red Hat
 
 ```sh
-sudo yum groupinstall 'Development Tools' && sudo yum install curl file git irb python-setuptools ruby
+sudo yum groupinstall 'Development Tools' && sudo yum install curl file git python-setuptools
 ```
 
 ### 32-bit x86 platforms
