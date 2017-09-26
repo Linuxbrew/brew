@@ -308,7 +308,12 @@ class FormulaInstaller
       clean
 
       # Store the formula used to build the keg in the keg.
-      s = formula.path.read.gsub(/  bottle do.+?end\n\n?/m, "")
+      formula_contents = if formula.local_bottle_path
+        Utils::Bottles.formula_contents formula.local_bottle_path, name: formula.name
+      else
+        formula.path.read
+      end
+      s = formula_contents.gsub(/  bottle do.+?end\n\n?/m, "")
       brew_prefix = formula.prefix/".brew"
       brew_prefix.mkdir
       Pathname(brew_prefix/"#{formula.name}.rb").atomic_write(s)
