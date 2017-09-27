@@ -14,6 +14,26 @@ describe Hbc::CLI::List, :cask do
     EOS
   end
 
+  it "lists full names" do
+    casks = %w[
+      local-caffeine
+      third-party/tap/third-party-cask
+      local-transmission
+    ].map { |c| Hbc::CaskLoader.load(c) }
+
+    casks.each do |c|
+      InstallHelper.install_with_caskfile(c)
+    end
+
+    expect {
+      Hbc::CLI::List.run("--full-name")
+    }.to output(<<-EOS.undent).to_stdout
+      local-caffeine
+      local-transmission
+      third-party/tap/third-party-cask
+    EOS
+  end
+
   describe "lists versions" do
     let(:casks) { ["local-caffeine", "local-transmission"] }
     let(:expected_output) {
@@ -48,7 +68,8 @@ describe Hbc::CLI::List, :cask do
     it "lists the installed files for those Casks" do
       casks.each(&InstallHelper.method(:install_without_artifacts_with_caskfile))
 
-      Hbc::Artifact::App.new(transmission).install_phase
+      Hbc::Artifact::App.for_cask(transmission)
+        .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect {
         Hbc::CLI::List.run("local-transmission", "local-caffeine")

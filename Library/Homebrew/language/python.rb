@@ -23,7 +23,7 @@ module Language
         else
           homebrew_site_packages(version)
         end
-        block.call python, version if block
+        block&.call python, version
       end
       ENV["PYTHONPATH"] = original_pythonpath
     end

@@ -6,6 +6,10 @@ module Homebrew
   module Cleanup
     @disk_cleanup_size = 0
 
+    class << self
+      attr_reader :disk_cleanup_size
+    end
+
     module_function
 
     def cleanup
@@ -19,10 +23,6 @@ module Homebrew
 
     def update_disk_cleanup_size(path_size)
       @disk_cleanup_size += path_size
-    end
-
-    def disk_cleanup_size
-      @disk_cleanup_size
     end
 
     def unremovable_kegs

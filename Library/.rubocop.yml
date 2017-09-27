@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.3
   Exclude:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
@@ -119,7 +119,7 @@ Style/Encoding:
   Enabled: true
 
 # dashes in filenames are typical
-Style/FileName:
+Naming/FileName:
   Regex: !ruby/regexp /^[\w\@\-\+\.]+(\.rb)?$/
 
 # falsely flags e.g. curl formatting arguments as format strings
@@ -189,8 +189,25 @@ Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
 
 # we have too many variables like sha256 where this harms readability
-Style/VariableNumber:
+Naming/VariableNumber:
   Enabled: false
 
 Style/WordArray:
   MinSize: 4
+
+# we want to add this slowly and manually
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# generally rescuing StandardError is fine
+Lint/RescueWithoutErrorClass:
+  Enabled: false
+
+# implicitly allow EOS as we use it everywhere
+Naming/HeredocDelimiterNaming:
+  Blacklist:
+    - END, EOD, EOF
+
+# we output how to use interpolated strings too often
+Lint/InterpolationCheck:
+  Enabled: false

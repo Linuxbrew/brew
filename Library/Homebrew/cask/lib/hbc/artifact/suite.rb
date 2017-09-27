@@ -3,11 +3,11 @@ require "hbc/artifact/moved"
 module Hbc
   module Artifact
     class Suite < Moved
-      def self.artifact_english_name
+      def self.english_name
         "App Suite"
       end
 
-      def self.artifact_dirmethod
+      def self.dirmethod
         :appdir
       end
     end

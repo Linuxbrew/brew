@@ -5,6 +5,7 @@ require "pathname"
 
 describe Homebrew::Cleanup do
   let(:ds_store) { Pathname.new("#{HOMEBREW_PREFIX}/Library/.DS_Store") }
+  let(:sec_in_a_day) { 60 * 60 * 24 }
 
   around(:each) do |example|
     begin
@@ -104,14 +105,30 @@ describe Homebrew::Cleanup do
     expect(f4).to be_installed
   end
 
-  specify "::cleanup_logs" do
-    path = (HOMEBREW_LOGS/"delete_me")
-    path.mkpath
-    ARGV << "--prune=all"
+  describe "::cleanup_logs" do
+    let(:path) { (HOMEBREW_LOGS/"delete_me") }
 
-    described_class.cleanup_logs
+    before do
+      path.mkpath
+    end
 
-    expect(path).not_to exist
+    it "cleans all logs if prune all" do
+      ARGV << "--prune=all"
+      described_class.cleanup_logs
+      expect(path).not_to exist
+    end
+
+    it "cleans up logs if older than 14 days" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 15)
+      described_class.cleanup_logs
+      expect(path).not_to exist
+    end
+
+    it "does not clean up logs less than 14 days old" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
+      described_class.cleanup_logs
+      expect(path).to exist
+    end
   end
 
   describe "::cleanup_cache" do
@@ -122,6 +139,15 @@ describe Homebrew::Cleanup do
       described_class.cleanup_cache
 
       expect(incomplete).not_to exist
+    end
+
+    it "cleans up 'glide_home'" do
+      glide_home = (HOMEBREW_CACHE/"glide_home")
+      glide_home.mkpath
+
+      described_class.cleanup_cache
+
+      expect(glide_home).not_to exist
     end
 
     it "cleans up 'java_cache'" do
@@ -140,6 +166,100 @@ describe Homebrew::Cleanup do
       described_class.cleanup_cache
 
       expect(npm_cache).not_to exist
+    end
+
+    it "cleans up all files and directories" do
+      git = (HOMEBREW_CACHE/"gist--git")
+      gist = (HOMEBREW_CACHE/"gist")
+      svn = (HOMEBREW_CACHE/"gist--svn")
+
+      git.mkpath
+      gist.mkpath
+      FileUtils.touch svn
+
+      allow(ARGV).to receive(:value).with("prune").and_return("all")
+
+      described_class.cleanup_cache
+
+      expect(git).not_to exist
+      expect(gist).to exist
+      expect(svn).not_to exist
+    end
+
+    it "does not clean up directories that are not VCS checkouts" do
+      git = (HOMEBREW_CACHE/"git")
+      git.mkpath
+      allow(ARGV).to receive(:value).with("prune").and_return("all")
+
+      described_class.cleanup_cache
+
+      expect(git).to exist
+    end
+
+    it "cleans up VCS checkout directories with modified time < prune time" do
+      foo = (HOMEBREW_CACHE/"--foo")
+      foo.mkpath
+      allow(ARGV).to receive(:value).with("prune").and_return("1")
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
+      described_class.cleanup_cache
+      expect(foo).not_to exist
+    end
+
+    it "does not clean up VCS checkout directories with modified time >= prune time" do
+      foo = (HOMEBREW_CACHE/"--foo")
+      foo.mkpath
+      allow(ARGV).to receive(:value).with("prune").and_return("1")
+      described_class.cleanup_cache
+      expect(foo).to exist
+    end
+
+    context "cleans old files in HOMEBREW_CACHE" do
+      let(:bottle) { (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz") }
+      let(:testball) { (HOMEBREW_CACHE/"testball-0.0.1") }
+
+      before(:each) do
+        FileUtils.touch(bottle)
+        FileUtils.touch(testball)
+        (HOMEBREW_CELLAR/"testball"/"0.0.1").mkpath
+        FileUtils.touch(CoreTap.instance.formula_dir/"testball.rb")
+      end
+
+      it "cleans up file if outdated" do
+        allow(Utils::Bottles).to receive(:file_outdated?).with(any_args).and_return(true)
+        described_class.cleanup_cache
+        expect(bottle).not_to exist
+        expect(testball).not_to exist
+      end
+
+      it "cleans up file if ARGV has -s and formula not installed" do
+        ARGV << "-s"
+        described_class.cleanup_cache
+        expect(bottle).not_to exist
+        expect(testball).not_to exist
+      end
+
+      it "cleans up file if stale" do
+        described_class.cleanup_cache
+        expect(bottle).not_to exist
+        expect(testball).not_to exist
+      end
+    end
+  end
+
+  describe "::prune?" do
+    before do
+      foo.mkpath
+    end
+
+    let(:foo) { HOMEBREW_CACHE/"foo" }
+
+    it "returns true when path_modified_time < days_default" do
+      allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
+      expect(described_class.prune?(foo, days_default: "1")).to be_truthy
+    end
+
+    it "returns false when path_modified_time >= days_default" do
+      expect(described_class.prune?(foo, days_default: "2")).to be_falsey
     end
   end
 end

@@ -10,7 +10,7 @@ describe Hbc::CLI::Info, :cask do
       ==> Name
       None
       ==> Artifacts
-      Caffeine.app (app)
+      Caffeine.app (App)
     EOS
   end
 
@@ -24,7 +24,7 @@ describe Hbc::CLI::Info, :cask do
         ==> Name
         None
         ==> Artifacts
-        Caffeine.app (app)
+        Caffeine.app (App)
         local-transmission: 2.61
         http://example.com/local-transmission
         Not installed
@@ -32,7 +32,7 @@ describe Hbc::CLI::Info, :cask do
         ==> Name
         None
         ==> Artifacts
-        Transmission.app (app)
+        Transmission.app (App)
       EOS
     }
 
@@ -60,7 +60,7 @@ describe Hbc::CLI::Info, :cask do
       ==> Name
       None
       ==> Artifacts
-      Caffeine.app (app)
+      Caffeine.app (App)
       ==> Caveats
       Here are some things you might want to know.
 
@@ -86,7 +86,7 @@ describe Hbc::CLI::Info, :cask do
       ==> Name
       None
       ==> Artifacts
-      Caffeine.app (app)
+      Caffeine.app (App)
     EOS
   end
 

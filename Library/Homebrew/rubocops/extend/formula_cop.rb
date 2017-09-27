@@ -4,16 +4,17 @@ require_relative "../../extend/string"
 module RuboCop
   module Cop
     class FormulaCop < Cop
+      attr_accessor :file_path
       @registry = Cop.registry
 
       # This method is called by RuboCop and is the main entry point
       def on_class(node)
-        file_path = processed_source.buffer.name
-        return unless file_path_allowed?(file_path)
+        @file_path = processed_source.buffer.name
+        return unless file_path_allowed?
         return unless formula_class?(node)
         return unless respond_to?(:audit_formula)
         class_node, parent_class_node, @body = *node
-        @formula_name = class_name(class_node)
+        @formula_name = Pathname.new(@file_path).basename(".rb").to_s
         audit_formula(node, class_node, parent_class_node, @body)
       end
 
@@ -100,19 +101,22 @@ module RuboCop
       def find_method_with_args(node, method_name, *args)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          next unless parameters_passed?(method, *args)
-          yield method
+          yield method if parameters_passed?(method, *args)
         end
       end
 
       # Matches a method with a receiver,
       # EX: to match `Formula.factory(name)`
       # call `find_instance_method_call(node, "Formula", :factory)`
+      # EX: to match `build.head?`
+      # call `find_instance_method_call(node, :build, :head?)`
       # yields to a block with matching method node
       def find_instance_method_call(node, instance, method_name)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          next unless method.receiver && method.receiver.const_name == instance
+          next if method.receiver.nil?
+          next if method.receiver.const_name != instance &&
+                  method.receiver.method_name != instance
           @offense_source_range = method.source_range
           @offensive_node = method
           yield method
@@ -400,18 +404,19 @@ module RuboCop
 
       # Returns true if the formula is versioned
       def versioned_formula?
-        formula_file_name.include?("@") || @formula_name.match(/AT\d+/)
-      end
-
-      # Returns filename of the formula without the extension
-      def formula_file_name
-        File.basename(processed_source.buffer.name, ".rb")
+        @formula_name.include?("@")
       end
 
       # Returns printable component name
       def format_component(component_node)
         return component_node.method_name if component_node.send_type? || component_node.block_type?
         method_name(component_node) if component_node.def_type?
+      end
+
+      # Returns the formula tap
+      def formula_tap
+        return unless match_obj = @file_path.match(%r{/(homebrew-\w+)/})
+        match_obj[1]
       end
 
       def problem(msg)
@@ -422,14 +427,21 @@ module RuboCop
 
       def formula_class?(node)
         _, class_node, = *node
-        class_node && string_content(class_node) == "Formula"
+        class_names = %w[
+          Formula
+          GithubGistFormula
+          ScriptFileFormula
+          AmazonWebServicesFormula
+        ]
+
+        class_node && class_names.include?(string_content(class_node))
       end
 
-      def file_path_allowed?(file_path)
+      def file_path_allowed?
         paths_to_exclude = [%r{/Library/Homebrew/compat/},
                             %r{/Library/Homebrew/test/}]
-        return true if file_path.nil? # file_path is nil when source is directly passed to the cop eg., in specs
-        file_path !~ Regexp.union(paths_to_exclude)
+        return true if @file_path.nil? # file_path is nil when source is directly passed to the cop eg., in specs
+        @file_path !~ Regexp.union(paths_to_exclude)
       end
     end
   end

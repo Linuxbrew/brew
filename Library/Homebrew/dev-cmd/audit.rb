@@ -54,6 +54,7 @@ module Homebrew
 
   def audit
     Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
+    Homebrew.auditing = true
 
     formula_count = 0
     problem_count = 0
@@ -201,19 +202,24 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, name, user_agents: [:default])
+  def self.check_http_content(url, user_agents: [:default], check_content: false, strict: false, require_http: false)
     return unless url.start_with? "http"
 
     details = nil
     user_agent = nil
-    hash_needed = url.start_with?("http:") && name != "curl"
+    hash_needed = url.start_with?("http:") && !require_http
     user_agents.each do |ua|
       details = http_content_headers_and_checksum(url, hash_needed: hash_needed, user_agent: ua)
       user_agent = ua
       break if details[:status].to_s.start_with?("2")
     end
 
-    return "The URL #{url} is not reachable" unless details[:status]
+    unless details[:status]
+      # Hack around https://github.com/Homebrew/brew/issues/3199
+      return if MacOS.version == :el_capitan
+      return "The URL #{url} is not reachable"
+    end
+
     unless details[:status].start_with? "2"
       return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
     end
@@ -236,8 +242,32 @@ class FormulaAuditor
       details[:content_length] == secure_details[:content_length]
     file_match = details[:file_hash] == secure_details[:file_hash]
 
-    return if !etag_match && !content_length_match && !file_match
-    "The URL #{url} could use HTTPS rather than HTTP"
+    if etag_match || content_length_match || file_match
+      return "The URL #{url} should use HTTPS rather than HTTP"
+    end
+
+    return unless check_content
+
+    no_protocol_file_contents = %r{https?:\\?/\\?/}
+    details[:file] = details[:file].gsub(no_protocol_file_contents, "/")
+    secure_details[:file] = secure_details[:file].gsub(no_protocol_file_contents, "/")
+
+    # Check for the same content after removing all protocols
+    if details[:file] == secure_details[:file]
+      return "The URL #{url} should use HTTPS rather than HTTP"
+    end
+
+    return unless strict
+
+    # Same size, different content after normalization
+    # (typical causes: Generated ID, Timestamp, Unix time)
+    if details[:file].length == secure_details[:file].length
+      return "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
+    end
+
+    lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
+    return unless (90..110).cover?(lenratio)
+    "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
   end
 
   def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
@@ -260,6 +290,7 @@ class FormulaAuditor
       etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
       content_length: headers[/Content-Length: (\d+)/, 1],
       file_hash: output_hash,
+      file: output,
     }
   end
 
@@ -327,7 +358,7 @@ class FormulaAuditor
       end
       valid_alias_names = [alias_name_major, alias_name_major_minor]
 
-      if formula.tap && !formula.tap.core_tap?
+      unless formula.tap&.core_tap?
         versioned_aliases.map! { |a| "#{formula.tap}/#{a}" }
         valid_alias_names.map! { |a| "#{formula.tap}/#{a}" }
       end
@@ -354,21 +385,6 @@ class FormulaAuditor
         EOS
       end
     end
-  end
-
-  def audit_class
-    if @strict
-      unless formula.test_defined?
-        problem "A `test do` test block should be added"
-      end
-    end
-
-    classes = %w[GithubGistFormula ScriptFileFormula AmazonWebServicesFormula]
-    klass = classes.find do |c|
-      Object.const_defined?(c) && formula.class < Object.const_get(c)
-    end
-
-    problem "#{klass} is deprecated, use Formula instead" if klass
   end
 
   # core aliases + tap alias names + tap alias full name
@@ -403,6 +419,7 @@ class FormulaAuditor
 
     @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names)
                                           .each_with_object({}) do |tap_formula_full_name, name_map|
+      next if tap_formula_full_name.start_with?("homebrew/science/")
       tap_formula_name = tap_formula_full_name.split("/").last
       name_map[tap_formula_name] ||= []
       name_map[tap_formula_name] << tap_formula_full_name
@@ -413,6 +430,7 @@ class FormulaAuditor
 
     if @online
       Homebrew.search_taps(name, silent: true).each do |tap_formula_full_name|
+        next if tap_formula_full_name.start_with?("homebrew/science/")
         tap_formula_name = tap_formula_full_name.split("/").last
         next if tap_formula_name != name
         same_name_tap_formulae << tap_formula_full_name
@@ -563,10 +581,11 @@ class FormulaAuditor
 
     return unless @online
 
-    return unless DevelopmentTools.curl_handles_most_https_homepages?
+    return unless DevelopmentTools.curl_handles_most_https_certificates?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
-                                               formula.name,
-                                               user_agents: [:browser, :default])
+                                               user_agents: [:browser, :default],
+                                               check_content: true,
+                                               strict: @strict)
       problem http_content_problem
     end
   end
@@ -616,13 +635,14 @@ class FormulaAuditor
     end
 
     %w[Stable Devel HEAD].each do |name|
-      next unless spec = formula.send(name.downcase)
+      spec_name = name.downcase.to_sym
+      next unless spec = formula.send(spec_name)
 
-      ra = ResourceAuditor.new(spec, online: @online, strict: @strict).audit
+      ra = ResourceAuditor.new(spec, spec_name, online: @online, strict: @strict).audit
       problems.concat ra.problems.map { |problem| "#{name}: #{problem}" }
 
       spec.resources.each_value do |resource|
-        ra = ResourceAuditor.new(resource, online: @online, strict: @strict).audit
+        ra = ResourceAuditor.new(resource, spec_name, online: @online, strict: @strict).audit
         problems.concat ra.problems.map { |problem|
           "#{name} resource #{resource.name.inspect}: #{problem}"
         }
@@ -687,7 +707,7 @@ class FormulaAuditor
     end
 
     stable = formula.stable
-    case stable && stable.url
+    case stable&.url
     when /[\d\._-](alpha|beta|rc\d)/
       matched = Regexp.last_match(1)
       version_prefix = stable.version.to_s.sub(/\d+$/, "")
@@ -865,8 +885,8 @@ class FormulaAuditor
 
     problem "Use spaces instead of tabs for indentation" if line =~ /^[ ]*\t/
 
-    if line.include?("ENV.x11")
-      problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
+    if line.include?("ENV.java_cache")
+      problem "In-formula ENV.java_cache usage has been deprecated & should be removed."
     end
 
     # Avoid hard-coding compilers
@@ -880,14 +900,6 @@ class FormulaAuditor
 
     if line =~ /system\s+['"](env|export)(\s+|['"])/
       problem "Use ENV instead of invoking '#{Regexp.last_match(1)}' to modify the environment"
-    end
-
-    if formula.name != "wine" && line =~ /ENV\.universal_binary/
-      problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
-    end
-
-    if line =~ /build\.universal\?/
-      problem "macOS has been 64-bit only so build.universal? is deprecated."
     end
 
     if line =~ /version == ['"]HEAD['"]/
@@ -930,12 +942,6 @@ class FormulaAuditor
       problem "Use build instead of ARGV to check options"
     end
 
-    problem "Use new-style option definitions" if line.include?("def options")
-
-    if line.end_with?("def test")
-      problem "Use new-style test definitions (test do)"
-    end
-
     if line.include?("MACOS_VERSION")
       problem "Use MacOS.version instead of MACOS_VERSION"
     end
@@ -947,11 +953,6 @@ class FormulaAuditor
     cats = %w[leopard snow_leopard lion mountain_lion].join("|")
     if line =~ /MacOS\.(?:#{cats})\?/
       problem "\"#{$&}\" is deprecated, use a comparison to MacOS.version instead"
-    end
-
-    if line =~ /skip_clean\s+:all/
-      problem "`skip_clean :all` is deprecated; brew no longer strips symbols\n" \
-              "\tPass explicit paths to prevent Homebrew from removing empty folders."
     end
 
     if line =~ /depends_on [A-Z][\w:]+\.new$/
@@ -992,30 +993,6 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
-    if line.include?('system "npm", "install"') && !line.include?("Language::Node") &&
-       formula.name !~ /^kibana(\@\d+(\.\d+)?)?$/
-      problem "Use Language::Node for npm install args"
-    end
-
-    if line.include?("fails_with :llvm")
-      problem "'fails_with :llvm' is now a no-op so should be removed"
-    end
-
-    if line =~ /system\s+['"](otool|install_name_tool|lipo)/ && formula.name != "cctools"
-      problem "Use ruby-macho instead of calling #{Regexp.last_match(1)}"
-    end
-
-    if formula.tap.to_s == "homebrew/core"
-      ["OS.mac?", "OS.linux?"].each do |check|
-        next unless line.include?(check)
-        problem "Don't use #{check}; Homebrew/core only supports macOS"
-      end
-    end
-
-    if line =~ /((revision|version_scheme)\s+0)/
-      problem "'#{Regexp.last_match(1)}' should be removed"
-    end
-
     return unless @strict
 
     problem "`#{Regexp.last_match(1)}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
@@ -1041,7 +1018,7 @@ class FormulaAuditor
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
-    return unless formula.tap && formula.tap.official?
+    return unless formula.tap&.official?
     return unless formula.tap.tap_migrations.key?(formula.name)
 
     problem <<-EOS.undent
@@ -1116,10 +1093,10 @@ class FormulaAuditor
 end
 
 class ResourceAuditor
-  attr_reader :problems
-  attr_reader :version, :checksum, :using, :specs, :url, :mirrors, :name
+  attr_reader :name, :version, :checksum, :url, :mirrors, :using, :specs, :owner
+  attr_reader :spec_name, :problems
 
-  def initialize(resource, options = {})
+  def initialize(resource, spec_name, options = {})
     @name     = resource.name
     @version  = resource.version
     @checksum = resource.checksum
@@ -1127,9 +1104,11 @@ class ResourceAuditor
     @mirrors  = resource.mirrors
     @using    = resource.using
     @specs    = resource.specs
-    @online   = options[:online]
-    @strict   = options[:strict]
-    @problems = []
+    @owner    = resource.owner
+    @spec_name = spec_name
+    @online    = options[:online]
+    @strict    = options[:strict]
+    @problems  = []
   end
 
   def audit
@@ -1203,11 +1182,29 @@ class ResourceAuditor
     problem "Redundant :using value in URL"
   end
 
+  def self.curl_openssl_and_deps
+    @curl_openssl_and_deps ||= begin
+      formulae_names = ["curl", "openssl"]
+      formulae_names += formulae_names.flat_map do |f|
+        Formula[f].recursive_dependencies.map(&:name)
+      end
+      formulae_names.uniq
+    rescue FormulaUnavailableError
+      []
+    end
+  end
+
   def audit_urls
     urls = [url] + mirrors
 
-    if name == "curl" && !urls.find { |u| u.start_with?("http://") }
-      problem "should always include at least one HTTP url"
+    curl_openssl_or_deps = ResourceAuditor.curl_openssl_and_deps.include?(owner.name)
+
+    if spec_name == :stable && curl_openssl_or_deps
+      problem "should not use xz tarballs" if url.end_with?(".xz")
+
+      unless urls.find { |u| u.start_with?("http://") }
+        problem "should always include at least one HTTP mirror"
+      end
     end
 
     return unless @online
@@ -1219,7 +1216,7 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url, name)
+        if http_content_problem = FormulaAuditor.check_http_content(url, require_http: curl_openssl_or_deps)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy
@@ -1228,6 +1225,7 @@ class ResourceAuditor
         end
       elsif strategy <= SubversionDownloadStrategy
         next unless DevelopmentTools.subversion_handles_most_https_certificates?
+        next unless Utils.svn_available?
         unless Utils.svn_remote_exists url
           problem "The URL #{url} is not a valid svn URL"
         end

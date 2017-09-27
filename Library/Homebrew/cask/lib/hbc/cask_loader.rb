@@ -56,7 +56,7 @@ module Hbc
 
     class FromURILoader < FromPathLoader
       def self.can_load?(ref)
-        ref.to_s.match?(::URI.regexp)
+        ref.to_s.match?(::URI::DEFAULT_PARSER.make_regexp)
       end
 
       attr_reader :url
@@ -116,6 +116,22 @@ module Hbc
       end
     end
 
+    class FromInstanceLoader
+      attr_reader :cask
+
+      def self.can_load?(ref)
+        ref.is_a?(Cask)
+      end
+
+      def initialize(cask)
+        @cask = cask
+      end
+
+      def load
+        cask
+      end
+    end
+
     class NullLoader < FromPathLoader
       def self.can_load?(*)
         true
@@ -149,6 +165,7 @@ module Hbc
 
     def self.for(ref)
       [
+        FromInstanceLoader,
         FromURILoader,
         FromTapLoader,
         FromTapPathLoader,

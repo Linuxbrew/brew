@@ -472,7 +472,7 @@ class Formula
     return true if devel && tab.devel_version && tab.devel_version < devel.version
 
     if options[:fetch_head]
-      return false unless head && head.downloader.is_a?(VCSDownloadStrategy)
+      return false unless head&.downloader.is_a?(VCSDownloadStrategy)
       downloader = head.downloader
       downloader.shutup! unless ARGV.verbose?
       downloader.commit_outdated?(version.version.commit)
@@ -1115,8 +1115,8 @@ class Formula
 
   # @private
   def unlock
-    @lock.unlock unless @lock.nil?
-    @oldname_lock.unlock unless @oldname_lock.nil?
+    @lock&.unlock
+    @oldname_lock&.unlock
   end
 
   def migration_needed?
@@ -1182,7 +1182,8 @@ class Formula
   # Returns false if the formula wasn't installed with an alias.
   def installed_alias_target_changed?
     target = current_installed_alias_target
-    target && target.name != name
+    return false unless target
+    target.name != name
   end
 
   # Is this formula the target of an alias used to install an old formula?
@@ -1440,13 +1441,14 @@ class Formula
   # True if this formula is provided by Homebrew itself
   # @private
   def core_formula?
-    tap && tap.core_tap?
+    tap&.core_tap?
   end
 
   # True if this formula is provided by external Tap
   # @private
   def tap?
-    tap && !tap.core_tap?
+    return false unless tap
+    !tap.core_tap?
   end
 
   # @private
@@ -1525,10 +1527,10 @@ class Formula
       "oldname" => oldname,
       "aliases" => aliases,
       "versions" => {
-        "stable" => (stable.version.to_s if stable),
+        "stable" => stable&.version.to_s,
         "bottle" => bottle ? true : false,
-        "devel" => (devel.version.to_s if devel),
-        "head" => (head.version.to_s if head),
+        "devel" => devel&.version.to_s,
+        "head" => head&.version.to_s,
       },
       "revision" => revision,
       "version_scheme" => version_scheme,
@@ -1570,7 +1572,7 @@ class Formula
         "root_url" => bottle_spec.root_url,
       }
       bottle_info["files"] = {}
-      bottle_spec.collector.keys.each do |os|
+      bottle_spec.collector.keys.each do |os| # rubocop:disable Performance/HashEachMethods
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
           "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",
@@ -1613,6 +1615,7 @@ class Formula
   def run_test
     @prefix_returns_versioned_prefix = true
     old_home = ENV["HOME"]
+    old_java_opts = ENV["_JAVA_OPTIONS"]
     old_curl_home = ENV["CURL_HOME"]
     old_tmpdir = ENV["TMPDIR"]
     old_temp = ENV["TEMP"]
@@ -1626,6 +1629,7 @@ class Formula
     ENV["TERM"] = "dumb"
     ENV["PATH"] = PATH.new(old_path).append(HOMEBREW_PREFIX/"bin")
     ENV["HOMEBREW_PATH"] = nil
+    ENV["_JAVA_OPTIONS"] = "#{old_java_opts} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
 
     ENV.clear_sensitive_environment!
 
@@ -1646,6 +1650,7 @@ class Formula
   ensure
     @testpath = nil
     ENV["HOME"] = old_home
+    ENV["_JAVA_OPTIONS"] = old_java_opts
     ENV["CURL_HOME"] = old_curl_home
     ENV["TMPDIR"] = old_tmpdir
     ENV["TEMP"] = old_temp
@@ -1888,11 +1893,13 @@ class Formula
       mkdir_p env_home
 
       old_home = ENV["HOME"]
+      old_java_opts = ENV["_JAVA_OPTIONS"]
       old_curl_home = ENV["CURL_HOME"]
       old_path = ENV["HOMEBREW_PATH"]
 
       unless ARGV.interactive?
         ENV["HOME"] = env_home
+        ENV["_JAVA_OPTIONS"] = "#{old_java_opts} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
         ENV["CURL_HOME"] = old_curl_home || old_home
       end
       ENV["HOMEBREW_PATH"] = nil
@@ -1907,6 +1914,7 @@ class Formula
         @buildpath = nil
         unless ARGV.interactive?
           ENV["HOME"] = old_home
+          ENV["_JAVA_OPTIONS"] = old_java_opts
           ENV["CURL_HOME"] = old_curl_home
         end
         ENV["HOMEBREW_PATH"] = old_path

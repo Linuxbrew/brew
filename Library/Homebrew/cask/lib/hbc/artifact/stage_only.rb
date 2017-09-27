@@ -1,10 +1,22 @@
-require "hbc/artifact/base"
+require "hbc/artifact/abstract_artifact"
 
 module Hbc
   module Artifact
-    class StageOnly < Base
-      def self.artifact_dsl_key
-        :stage_only
+    class StageOnly < AbstractArtifact
+      def self.from_args(cask, *args)
+        if args != [true]
+          raise CaskInvalidError.new(cask.token, "'stage_only' takes only a single argument: true")
+        end
+
+        new(cask)
+      end
+
+      def initialize(cask)
+        super(cask)
+      end
+
+      def to_a
+        [true]
       end
     end
   end

@@ -44,8 +44,6 @@ class Locale
       raise ParserError, "'#{value}' does not match #{regex}" unless value =~ regex
       instance_variable_set(:"@#{key}", value)
     end
-
-    self
   end
 
   def include?(other)

@@ -13,16 +13,16 @@ if [[ -n "$HOMEBREW_MACOS" ]]
 then
   if [[ "$HOMEBREW_PROCESSOR" = "Intel" ]]
   then
-    ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.0.0-p648.leopard_64.bottle.tar.gz"
-    ruby_SHA="5c1240abe4be91c9774a0089c2a38a8ccfff87c009e8e5786730c659d5e633f7"
+    ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.leopard_64.bottle.1.tar.gz"
+    ruby_SHA="34ce9e4c9c1be28db564d744165aa29291426f8a3d2ef806ba4f0b9175aedb2b"
   else
     ruby_URL=""
     ruby_SHA=""
   fi
 elif [[ -n "$HOMEBREW_LINUX" ]]
 then
-  ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.0.0-p648.x86_64_linux.bottle.tar.gz"
-  ruby_SHA="dbb5118a22a6a75cc77e62544a3d8786d383fab1bdaf8c154951268807357bf0"
+  ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.x86_64_linux.bottle.tar.gz"
+  ruby_SHA="543c18bd33a300e6c16671437b1e0f17b03bb64e6a485fc15ff7de1eb1a0bc2a"
 fi
 
 fetch() {
@@ -45,20 +45,25 @@ fetch() {
     curl_args[${#curl_args[*]}]="--progress-bar"
   fi
 
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100600" ]]
+  then
+    curl_args[${#curl_args[*]}]="--insecure"
+  fi
+
   temporary_path="$CACHED_LOCATION.incomplete"
 
   mkdir -p "$HOMEBREW_CACHE"
-  [[ -n "$HOMEBREW_QUIET" ]] || echo "==> Downloading $VENDOR_URL"
+  [[ -n "$HOMEBREW_QUIET" ]] || echo "==> Downloading $VENDOR_URL" >&2
   if [[ -f "$CACHED_LOCATION" ]]
   then
-    [[ -n "$HOMEBREW_QUIET" ]] || echo "Already downloaded: $CACHED_LOCATION"
+    [[ -n "$HOMEBREW_QUIET" ]] || echo "Already downloaded: $CACHED_LOCATION" >&2
   else
     if [[ -f "$temporary_path" ]]
     then
       "$HOMEBREW_CURL" "${curl_args[@]}" -C - "$VENDOR_URL" -o "$temporary_path"
       if [[ $? -eq 33 ]]
       then
-        [[ -n "$HOMEBREW_QUIET" ]] || echo "Trying a full download"
+        [[ -n "$HOMEBREW_QUIET" ]] || echo "Trying a full download" >&2
         rm -f "$temporary_path"
         "$HOMEBREW_CURL" "${curl_args[@]}" "$VENDOR_URL" -o "$temporary_path"
       fi
@@ -135,7 +140,7 @@ install() {
   fi
 
   safe_cd "$VENDOR_DIR"
-  [[ -n "$HOMEBREW_QUIET" ]] || echo "==> Unpacking $(basename "$VENDOR_URL")"
+  [[ -n "$HOMEBREW_QUIET" ]] || echo "==> Pouring $(basename "$VENDOR_URL")" >&2
   tar "$tar_args" "$CACHED_LOCATION"
   safe_cd "$VENDOR_DIR/portable-$VENDOR_NAME"
 

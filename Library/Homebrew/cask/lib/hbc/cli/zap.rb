@@ -9,10 +9,6 @@ module Hbc
       end
 
       def run
-        raise CaskError, "Zap incomplete." if zap_casks == :incomplete
-      end
-
-      def zap_casks
         casks.each do |cask|
           odebug "Zapping Cask #{cask}"
           Installer.new(cask, verbose: verbose?, force: force?).zap

@@ -41,9 +41,7 @@ class RubyRequirement < Requirement
   def rubies
     rubies = which_all("ruby")
     ruby_formula = Formula["ruby"]
-    if ruby_formula && ruby_formula.installed?
-      rubies.unshift ruby_formula.bin/"ruby"
-    end
+    rubies.unshift ruby_formula.bin/"ruby" if ruby_formula&.installed?
     rubies.uniq
   end
 

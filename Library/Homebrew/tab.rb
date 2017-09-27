@@ -324,7 +324,7 @@ class Tab < OpenStruct
       "poured_from_bottle" => poured_from_bottle,
       "installed_as_dependency" => installed_as_dependency,
       "installed_on_request" => installed_on_request,
-      "changed_files" => changed_files && changed_files.map(&:to_s),
+      "changed_files" => changed_files&.map(&:to_s),
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,

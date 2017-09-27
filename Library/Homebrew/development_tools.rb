@@ -114,7 +114,7 @@ class DevelopmentTools
       @non_apple_gcc_version = {}
     end
 
-    def curl_handles_most_https_homepages?
+    def curl_handles_most_https_certificates?
       true
     end
 

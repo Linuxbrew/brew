@@ -3,6 +3,7 @@ module Hbc
     class List < AbstractCommand
       option "-1", :one, false
       option "--versions", :versions, false
+      option "--full-name", :full_name, false
 
       option "-l", (lambda do |*|
         one = true # rubocop:disable Lint/UselessAssignment
@@ -10,8 +11,7 @@ module Hbc
       end)
 
       def run
-        retval = args.any? ? list : list_installed
-        raise CaskError, "Listing incomplete." if retval == :incomplete
+        args.any? ? list : list_installed
       end
 
       def list
@@ -30,9 +30,9 @@ module Hbc
       end
 
       def self.list_artifacts(cask)
-        Artifact.for_cask(cask).each do |artifact|
-          summary = artifact.summary
-          ohai summary[:english_description], summary[:contents] unless summary.empty?
+        Artifact.for_cask(cask).group_by(&:class).each do |klass, artifacts|
+          next unless klass.respond_to?(:english_description)
+          ohai klass.english_description, artifacts.map(&:summarize_installed)
         end
       end
 
@@ -43,11 +43,11 @@ module Hbc
           puts installed_casks.map(&:to_s)
         elsif versions?
           puts installed_casks.map(&self.class.method(:format_versioned))
+        elsif full_name?
+          puts installed_casks.map(&:full_name).sort &tap_and_name_comparison
         elsif !installed_casks.empty?
           puts Formatter.columns(installed_casks.map(&:to_s))
         end
-
-        installed_casks.empty? ? :empty : :complete
       end
 
       def self.format_versioned(cask)

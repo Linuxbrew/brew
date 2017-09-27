@@ -16,7 +16,7 @@ end
 # This formula serves as the base class for several very similar
 # formulae for Amazon Web Services related tools.
 class AmazonWebServicesFormula < Formula
-  # Use this method to peform a standard install for Java-based tools,
+  # Use this method to perform a standard install for Java-based tools,
   # keeping the .jars out of HOMEBREW_PREFIX/lib
   def install
     odeprecated "AmazonWebServicesFormula#install", "Formula#install"

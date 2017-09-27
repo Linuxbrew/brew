@@ -2,6 +2,9 @@ require "cmd/search"
 
 describe Homebrew do
   specify "#search_taps" do
+    # Otherwise the tested method returns [], regardless of our stub
+    ENV.delete("HOMEBREW_NO_GITHUB_API")
+
     json_response = {
       "items" => [
         {

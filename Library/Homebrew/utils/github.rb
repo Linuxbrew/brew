@@ -86,15 +86,9 @@ module GitHub
 
   def api_credentials_type
     token, username = api_credentials
-    if token && !token.empty?
-      if username && !username.empty?
-        :keychain
-      else
-        :environment
-      end
-    else
-      :none
-    end
+    return :none if !token || token.empty?
+    return :keychain if !username || username.empty?
+    :environment
   end
 
   def api_credentials_error_message(response_headers, needed_scopes)
@@ -245,7 +239,7 @@ module GitHub
   end
 
   def print_pull_requests_matching(query)
-    open_or_closed_prs = search_issues(query, type: "pr")
+    open_or_closed_prs = search_issues(query, type: "pr", user: "Homebrew")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
     prs = if !open_prs.empty?

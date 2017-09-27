@@ -11,7 +11,8 @@ describe Hbc::Artifact::PostflightBlock, :cask do
         end
       end
 
-      described_class.new(cask).install_phase
+      described_class.for_cask(cask)
+        .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect(called).to be true
       expect(yielded_arg).to be_kind_of(Hbc::DSL::Postflight)
@@ -30,7 +31,8 @@ describe Hbc::Artifact::PostflightBlock, :cask do
         end
       end
 
-      described_class.new(cask).uninstall_phase
+      described_class.for_cask(cask)
+        .each { |artifact| artifact.uninstall_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect(called).to be true
       expect(yielded_arg).to be_kind_of(Hbc::DSL::UninstallPostflight)

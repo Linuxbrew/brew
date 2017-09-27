@@ -331,20 +331,10 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     if cached_location.exist?
       puts "Already downloaded: #{cached_location}"
     else
-      had_incomplete_download = temporary_path.exist?
       begin
         _fetch
       rescue ErrorDuringExecution
-        # 33 == range not supported
-        # try wiping the incomplete download and retrying once
-        unless $CHILD_STATUS.exitstatus == 33 && had_incomplete_download
-          raise CurlDownloadStrategyError, @url
-        end
-
-        ohai "Trying a full download"
-        temporary_path.unlink
-        had_incomplete_download = false
-        retry
+        raise CurlDownloadStrategyError, @url
       end
       ignore_interrupts { temporary_path.rename(cached_location) }
     end

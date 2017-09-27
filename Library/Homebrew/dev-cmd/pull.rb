@@ -69,13 +69,13 @@ module Homebrew
     tap = nil
 
     ARGV.named.each do |arg|
-      if arg.to_i > 0
+      if arg.to_i.positive?
         issue = arg
         url = "https://github.com/Homebrew/homebrew-core/pull/#{arg}"
         tap = CoreTap.instance
       elsif (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = ARGV.value("tap")
-        tap = if tap && tap.start_with?("homebrew/")
+        tap = if tap&.start_with?("homebrew/")
           Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
         elsif tap
           odie "Tap option did not start with \"homebrew/\": #{tap}"
@@ -350,7 +350,7 @@ module Homebrew
       files << Regexp.last_match(1) if line =~ %r{^\+\+\+ b/(.*)}
     end
     files.each do |file|
-      if tap && tap.formula_file?(file)
+      if tap&.formula_file?(file)
         formula_name = File.basename(file, ".rb")
         formulae << formula_name unless formulae.include?(formula_name)
       else

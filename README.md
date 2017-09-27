@@ -65,6 +65,10 @@ Our Jenkins CI installation is hosted by [DigitalOcean](https://m.do.co/c/7e39c3
 
 ![DigitalOcean](https://cloud.githubusercontent.com/assets/125011/26827038/4b7b5ade-4ab3-11e7-811b-fed3ab0e934d.png)
 
+Our physical hardware is hosted by [Commsworld](https://www.commsworld.com).
+
+![Commsworld powered by Fluency](https://user-images.githubusercontent.com/125011/30822845-1716bc2c-a222-11e7-843e-ea7c7b6a1503.png)
+
 Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/homebrew).
 
 [![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/homebrew)

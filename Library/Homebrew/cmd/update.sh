@@ -385,6 +385,12 @@ EOS
 
   if ! git --version >/dev/null 2>&1
   then
+    # we need a new enough curl to install git
+    if [[ -n "$HOMEBREW_SYSTEM_CURL_TOO_OLD" &&
+        ! -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
+    then
+      brew install curl
+    fi
     # we cannot install brewed git if homebrew/core is unavailable.
     [[ -d "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && brew install git
     unset GIT_EXECUTABLE

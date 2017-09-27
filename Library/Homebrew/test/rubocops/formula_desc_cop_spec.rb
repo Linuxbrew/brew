@@ -37,7 +37,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
 
       msg = <<-EOS.undent
         Description is too long. "name: desc" should be less than 80 characters.
-        Length is calculated as Foo + desc. (currently 95)
+        Length is calculated as foo + desc. (currently 95)
       EOS
       expected_offenses = [{ message: msg,
                              severity: :convention,
@@ -45,7 +45,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
                              column: 2,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(cop, source, "/homebrew-core/Formula/foo.rb")
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -62,7 +62,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
 
       msg = <<-EOS.undent
         Description is too long. "name: desc" should be less than 80 characters.
-        Length is calculated as Foo + desc. (currently 98)
+        Length is calculated as foo + desc. (currently 98)
       EOS
       expected_offenses = [{ message: msg,
                              severity: :convention,
@@ -70,7 +70,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
                              column: 2,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(cop, source, "/homebrew-core/Formula/foo.rb")
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -156,7 +156,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
                              column: 8,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(cop, source, "/homebrew-core/Formula/foo.rb")
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -176,7 +176,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
         end
       EOS
 
-      corrected_source = autocorrect_source(cop, source)
+      corrected_source = autocorrect_source(cop, source, "/homebrew-core/Formula/foo.rb")
       expect(corrected_source).to eq(correct_source)
     end
   end

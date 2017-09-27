@@ -105,18 +105,16 @@ begin
     possible_tap = OFFICIAL_CMD_TAPS.find { |_, cmds| cmds.include?(cmd) }
     possible_tap = Tap.fetch(possible_tap.first) if possible_tap
 
-    if possible_tap && !possible_tap.installed?
-      brew_uid = HOMEBREW_BREW_FILE.stat.uid
-      tap_commands = []
-      if Process.uid.zero? && !brew_uid.zero?
-        tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
-      end
-      tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
-      safe_system(*tap_commands)
-      exec HOMEBREW_BREW_FILE, cmd, *ARGV
-    else
-      odie "Unknown command: #{cmd}"
+    odie "Unknown command: #{cmd}" if !possible_tap || possible_tap.installed?
+
+    brew_uid = HOMEBREW_BREW_FILE.stat.uid
+    tap_commands = []
+    if Process.uid.zero? && !brew_uid.zero?
+      tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
     end
+    tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
+    safe_system(*tap_commands)
+    exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
 rescue UsageError => e
   require "cmd/help"

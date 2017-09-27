@@ -159,7 +159,7 @@ module Hbc
       odebug "Extracting primary container"
 
       FileUtils.mkdir_p @cask.staged_path
-      container = if @cask.container && @cask.container.type
+      container = if @cask.container&.type
         Container.from_type(@cask.container.type)
       else
         Container.for_path(@downloaded_path, @command)
@@ -177,7 +177,7 @@ module Hbc
       already_installed_artifacts = []
 
       odebug "Installing artifacts"
-      artifacts = Artifact.for_cask(@cask, command: @command, verbose: verbose?, force: force?)
+      artifacts = Artifact.for_cask(@cask)
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
@@ -188,7 +188,7 @@ module Hbc
           next unless binaries?
         end
 
-        artifact.install_phase
+        artifact.install_phase(command: @command, verbose: verbose?, force: force?)
         already_installed_artifacts.unshift(artifact)
       end
     rescue StandardError => e
@@ -196,7 +196,7 @@ module Hbc
         already_installed_artifacts.each do |artifact|
           next unless artifact.respond_to?(:uninstall_phase)
           odebug "Reverting installation of artifact of class #{artifact.class}"
-          artifact.uninstall_phase
+          artifact.uninstall_phase(command: @command, verbose: verbose?, force: force?)
         end
       ensure
         purge_versioned_files
@@ -361,7 +361,7 @@ module Hbc
 
       savedir = @cask.metadata_subdir("Casks", timestamp: :now, create: true)
       FileUtils.copy @cask.sourcefile_path, savedir
-      old_savedir.rmtree unless old_savedir.nil?
+      old_savedir&.rmtree
     end
 
     def uninstall
@@ -374,25 +374,27 @@ module Hbc
 
     def uninstall_artifacts
       odebug "Un-installing artifacts"
-      artifacts = Artifact.for_cask(@cask, command: @command, verbose: verbose?, force: force?)
+      artifacts = Artifact.for_cask(@cask)
 
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
         next unless artifact.respond_to?(:uninstall_phase)
         odebug "Un-installing artifact of class #{artifact.class}"
-        artifact.uninstall_phase
+        artifact.uninstall_phase(command: @command, verbose: verbose?, force: force?)
       end
     end
 
     def zap
       ohai %Q(Implied "brew cask uninstall #{@cask}")
       uninstall_artifacts
-      if Artifact::Zap.me?(@cask)
-        ohai "Dispatching zap stanza"
-        Artifact::Zap.new(@cask, command: @command).zap_phase
-      else
+      if (zap_stanzas = Artifact::Zap.for_cask(@cask)).empty?
         opoo "No zap stanza present for Cask '#{@cask}'"
+      else
+        ohai "Dispatching zap stanza"
+        zap_stanzas.each do |stanza|
+          stanza.zap_phase(command: @command, verbose: verbose?, force: force?)
+        end
       end
       ohai "Removing all staged versions of Cask '#{@cask}'"
       purge_caskroom_path

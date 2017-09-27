@@ -61,7 +61,7 @@ module Hbc
     end
 
     def assert_success
-      return if processed_status && processed_status.success?
+      return if processed_status&.success?
       raise CaskCommandFailedError.new(command, processed_output[:stdout], processed_output[:stderr], processed_status)
     end
 

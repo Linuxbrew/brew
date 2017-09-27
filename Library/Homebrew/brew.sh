@@ -23,7 +23,7 @@ HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty --abbr
 HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
-  HOMEBREW_VERSION=">1.2.0 (no git repository)"
+  HOMEBREW_VERSION=">1.2.0 (shallow or no git repository)"
   HOMEBREW_USER_AGENT_VERSION="1.X.Y"
 fi
 
@@ -105,7 +105,14 @@ then
   HOMEBREW_OS_USER_AGENT_VERSION="Mac OS X $HOMEBREW_MACOS_VERSION"
 
   printf -v HOMEBREW_MACOS_VERSION_NUMERIC "%02d%02d%02d" ${HOMEBREW_MACOS_VERSION//./ }
-  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" &&
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "101000" ]]
+  then
+    HOMEBREW_SYSTEM_CURL_TOO_OLD="1"
+  fi
+
+  # The system Curl is too old for some modern HTTPS certificates on
+  # older macOS versions.
+  if [[ -n "$HOMEBREW_SYSTEM_CURL_TOO_OLD" &&
         -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
   then
     HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"

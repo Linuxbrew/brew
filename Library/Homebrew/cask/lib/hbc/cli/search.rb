@@ -2,8 +2,12 @@ module Hbc
   class CLI
     class Search < AbstractCommand
       def run
-        results = self.class.search(*args)
-        self.class.render_results(*results)
+        if args.empty?
+          puts Formatter.columns(CLI.nice_listing(Hbc.all_tokens))
+        else
+          results = self.class.search(*args)
+          self.class.render_results(*results)
+        end
       end
 
       def self.extract_regexp(string)
@@ -15,8 +19,17 @@ module Hbc
       end
 
       def self.search_remote(query)
-        matches = GitHub.search_code(user: "caskroom", path: "Casks",
-                                     filename: query, extension: "rb")
+        matches = begin
+          GitHub.search_code(
+            user: "caskroom",
+            path: "Casks",
+            filename: query,
+            extension: "rb",
+          )
+        rescue GitHub::Error => error
+          opoo "Error searching on GitHub: #{error}\n"
+          []
+        end
         matches.map do |match|
           tap = Tap.fetch(match["repository"]["full_name"])
           next if tap.installed?

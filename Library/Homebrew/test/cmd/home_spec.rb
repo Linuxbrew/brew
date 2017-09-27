@@ -7,10 +7,10 @@ describe "brew home", :integration_test do
   end
 
   it "opens the homepage for a given Formula" do
-    setup_test_formula "testball"
+    setup_test_formula "testballhome"
 
-    expect { brew "home", "testball", "HOMEBREW_BROWSER" => "echo" }
-      .to output("#{Formula["testball"].homepage}\n").to_stdout
+    expect { brew "home", "testballhome", "HOMEBREW_BROWSER" => "echo" }
+      .to output("#{Formula["testballhome"].homepage}\n").to_stdout
       .and not_to_output.to_stderr
       .and be_a_success
   end
