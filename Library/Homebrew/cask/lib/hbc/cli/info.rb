@@ -23,6 +23,7 @@ module Hbc
         installation_info(cask)
         repo_info(cask)
         name_info(cask)
+        language_info(cask)
         artifact_info(cask)
         Installer.print_caveats(cask)
       end
@@ -49,6 +50,13 @@ module Hbc
       def self.name_info(cask)
         ohai((cask.name.size > 1) ? "Names" : "Name")
         puts cask.name.empty? ? Formatter.error("None") : cask.name
+      end
+
+      def self.language_info(cask)
+        return if cask.languages.empty?
+
+        ohai "Languages"
+        puts cask.languages.join(", ")
       end
 
       def self.repo_info(cask)
