@@ -16,7 +16,7 @@ class Keg
           new_name = fixed_name(file, bad_name)
 
           @require_relocation = true
-          file.change_install_name(bad_name, new_name, file)
+          file.change_install_name(bad_name, new_name)
         end
       end
     end
