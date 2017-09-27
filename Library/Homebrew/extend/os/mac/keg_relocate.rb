@@ -2,10 +2,7 @@ class Keg
   def fix_dynamic_linkage
     mach_o_files.each do |file|
       file.ensure_writable do
-        if file.dylib?
-          @require_relocation = true
-          file.change_dylib_id(dylib_id_for(file))
-        end
+        change_dylib_id(dylib_id_for(file), file) if file.dylib?
 
         each_install_name_for(file) do |bad_name|
           # Don't fix absolute paths unless they are rooted in the build directory
@@ -14,9 +11,7 @@ class Keg
                   !bad_name.start_with?(HOMEBREW_TEMP.realpath.to_s)
 
           new_name = fixed_name(file, bad_name)
-
-          @require_relocation = true
-          file.change_install_name(bad_name, new_name, file)
+          change_install_name(bad_name, new_name, file) unless new_name == bad_name
         end
       end
     end
@@ -28,9 +23,8 @@ class Keg
     mach_o_files.each do |file|
       file.ensure_writable do
         if file.dylib?
-          @require_relocation = true
           id = dylib_id_for(file).sub(relocation.old_prefix, relocation.new_prefix)
-          file.change_dylib_id(id)
+          change_dylib_id(id, file)
         end
 
         each_install_name_for(file) do |old_name|
@@ -40,8 +34,7 @@ class Keg
             new_name = old_name.sub(relocation.old_prefix, relocation.new_prefix)
           end
 
-          @require_relocation = true
-          file.change_install_name(old_name, new_name) if new_name
+          change_install_name(old_name, new_name, file) if new_name
         end
       end
     end

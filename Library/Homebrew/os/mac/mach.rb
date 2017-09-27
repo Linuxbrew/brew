@@ -61,34 +61,6 @@ module MachOShim
     macho.dylib_id
   end
 
-  def change_dylib_id(id)
-    return if dylib_id == id
-    puts "Changing dylib ID of #{self}\n  from #{dylib_id}\n    to #{id}" if ARGV.debug?
-    macho.change_dylib_id(id, strict: false)
-    macho.write!
-  rescue MachO::MachOError
-    odie <<-EOS.undent
-      Failed changing dylib ID of #{self}
-        from #{file.dylib_id}
-          to #{id}
-    EOS
-    raise
-  end
-
-  def change_install_name(old, new)
-    return if old == new
-    puts "Changing install name in #{self}\n  from #{old}\n    to #{new}" if ARGV.debug?
-    macho.change_install_name(old, new, strict: false)
-    macho.write!
-  rescue MachO::MachOError
-    odie <<-EOS.undent
-      Failed changing install name in #{self}
-        from #{old}
-          to #{new}
-    EOS
-    raise
-  end
-
   def archs
     mach_data.map { |m| m.fetch :arch }.extend(ArchitectureListExtension)
   end
