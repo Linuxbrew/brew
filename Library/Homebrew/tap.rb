@@ -118,6 +118,12 @@ class Tap
     path.git?
   end
 
+  # git branch for this {Tap}.
+  def git_branch
+    raise TapUnavailableError, name unless installed?
+    path.git_branch
+  end
+
   # git HEAD for this {Tap}.
   def git_head
     raise TapUnavailableError, name unless installed?
