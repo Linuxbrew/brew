@@ -235,6 +235,15 @@ class FormulaInstaller
       raise CannotInstallFormulaError, message
     end
 
+    # Warn if a more recent version of this formula is available in the tap.
+    begin
+      if formula.pkg_version < (v = Formulary.factory(formula.full_name).pkg_version)
+        opoo "#{formula.full_name} #{v} is available and more recent than version #{formula.pkg_version}."
+      end
+    rescue FormulaUnavailableError
+      nil
+    end
+
     check_conflicts
 
     if !pour_bottle? && !formula.bottle_unneeded? && !DevelopmentTools.installed?
