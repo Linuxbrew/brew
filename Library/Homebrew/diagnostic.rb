@@ -789,7 +789,7 @@ module Homebrew
         return if ENV["CI"] || ENV["JENKINS_HOME"]
 
         branch = coretap_path.git_branch
-        return if branch.nil? || branch =~ %r{master}
+        return if branch.nil? || branch =~ /master/
 
 
         <<-EOS.undent
