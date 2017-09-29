@@ -5,8 +5,12 @@ end
 std_trap = trap("INT") { exit! 130 } # no backtrace thanks
 
 # check ruby version before requiring any modules.
-RUBY_TWO = RUBY_VERSION.split(".").first.to_i >= 2
-raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
+RUBY_VERSION_SPLIT = RUBY_VERSION.split "."
+RUBY_X = RUBY_VERSION_SPLIT[0].to_i
+RUBY_Y = RUBY_VERSION_SPLIT[1].to_i
+if RUBY_X < 2 || (RUBY_X == 2 && RUBY_Y < 3)
+  raise "Homebrew must be run under Ruby 2.3!"
+end
 
 require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
