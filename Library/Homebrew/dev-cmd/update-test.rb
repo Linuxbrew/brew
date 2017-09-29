@@ -81,7 +81,7 @@ module Homebrew
       safe_system "git", "reset", "--hard", start_commit
 
       # update ENV["PATH"]
-      ENV["PATH"] = "#{curdir}/bin:/usr/local/bin:/usr/bin:/bin"
+      ENV["PATH"] = "#{curdir}/bin:#{ENV["PATH"]}"
 
       # run brew update
       oh1 "Running brew update..."

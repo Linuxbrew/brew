@@ -570,6 +570,7 @@ EOS
         -d "$HOMEBREW_LIBRARY/LinkedKegs" ||
         (-n "$HOMEBREW_DEVELOPER" && -z "$HOMEBREW_UPDATE_PREINSTALL") ]]
   then
+    unset HOMEBREW_RUBY_PATH
     brew update-report "$@"
     return $?
   elif [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]]
