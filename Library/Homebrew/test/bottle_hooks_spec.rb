@@ -8,7 +8,7 @@ describe Homebrew::Hooks::Bottles do
 
   let(:formula) do
     double(
-      bottle: nil,
+      bottled?: false,
       local_bottle_path: nil,
       bottle_disabled?: false,
       some_random_method: true,
