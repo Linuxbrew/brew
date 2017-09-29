@@ -19,7 +19,7 @@ names, and other aspects of this manual are still subject to change.
 
 ## FREQUENTLY USED COMMANDS
 
-  * `install` [--force] [--skip-cask-deps] [--require-sha] <token> [ <token> ... ]:
+  * `install` [--force] [--skip-cask-deps] [--require-sha] [--language=<iso-language>[,<iso-language> ... ]] <token> [ <token> ... ]:
     Install Cask identified by <token>.
 
   * `uninstall` [--force] <token> [ <token> ... ]:
@@ -34,7 +34,7 @@ names, and other aspects of this manual are still subject to change.
 
 ## COMMANDS
 
-  * `audit` [ <token> ... ]:
+  * `audit` [--language=<iso-language>[,<iso-language> ... ]] [ <token> ... ]:
     Check the given Casks for installability.
     If no tokens are given on the command line, all Casks are audited.
 
@@ -166,6 +166,9 @@ in a future version.
 
   * `--appdir=<path>`:
     Target location for Applications. The default value is `/Applications`.
+
+  * `--language=<iso-language>[,<iso-language> ... ]]`:
+    Set language of the Cask to install. The first matching language is used, otherwise the default language on the Cask. The default value is the `language of your system`.
 
   * `--colorpickerdir=<path>`:
     Target location for Color Pickers. The default value is `~/Library/ColorPickers`.
