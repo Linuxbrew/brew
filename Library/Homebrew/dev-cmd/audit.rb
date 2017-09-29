@@ -396,7 +396,6 @@ class FormulaAuditor
     return if formula.tap.nil? || !formula.tap.official?
 
     name = formula.name
-    full_name = formula.full_name
 
     if Homebrew::MissingFormula.blacklisted_reason(name)
       problem "'#{name}' is blacklisted."
@@ -412,35 +411,10 @@ class FormulaAuditor
       return
     end
 
-    if !formula.core_formula? && Formula.core_names.include?(name)
-      problem "Formula name conflicts with existing core formula."
-      return
-    end
+    return if formula.core_formula?
+    return unless Formula.core_names.include?(name)
 
-    @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names)
-                                          .each_with_object({}) do |tap_formula_full_name, name_map|
-      next if tap_formula_full_name.start_with?("homebrew/science/")
-      tap_formula_name = tap_formula_full_name.split("/").last
-      name_map[tap_formula_name] ||= []
-      name_map[tap_formula_name] << tap_formula_full_name
-      name_map
-    end
-
-    same_name_tap_formulae = @@local_official_taps_name_map[name] || []
-
-    if @online
-      Homebrew.search_taps(name, silent: true).each do |tap_formula_full_name|
-        next if tap_formula_full_name.start_with?("homebrew/science/")
-        tap_formula_name = tap_formula_full_name.split("/").last
-        next if tap_formula_name != name
-        same_name_tap_formulae << tap_formula_full_name
-      end
-    end
-
-    same_name_tap_formulae.delete(full_name)
-
-    return if same_name_tap_formulae.empty?
-    problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
+    problem "Formula name conflicts with existing core formula."
   end
 
   def audit_deps
