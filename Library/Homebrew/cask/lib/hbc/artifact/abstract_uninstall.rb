@@ -253,7 +253,7 @@ module Hbc
       end
 
       def trash_paths(*paths, command: nil, **_)
-        command.run!("/usr/bin/osascript", args: ["-e", <<-'EOS'.undent, *paths])
+        result = command.run!("/usr/bin/osascript", args: ["-e", <<-'EOS'.undent, *paths])
           on run argv
             repeat with i from 1 to (count argv)
               set item i of argv to (item i of argv as POSIX file)
@@ -267,7 +267,7 @@ module Hbc
                 set trashedItem to POSIX path of (item i of trashedItems as string)
                 set output to output & trashedItem
                 if i < count trashedItems then
-                  set output to output & (do shell script "printf \"\\0\"")
+                  set output to output & character id 0
                 end if
               end repeat
 
@@ -275,6 +275,9 @@ module Hbc
             end tell
           end run
         EOS
+
+        # Remove AppleScript's automatic newline.
+        result.tap { |r| r.stdout.sub!(/\n$/, "") }
       end
 
       def uninstall_rmdir(*directories, command: nil, **_)
