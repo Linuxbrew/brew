@@ -21,19 +21,19 @@ before_install:
   - export HOMEBREW_NO_AUTO_UPDATE=1
   - export HOMEBREW_DEVELOPER=1
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
-      git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot;
       HOMEBREW_REPOSITORY="$(brew --repo)";
       sudo chown -R "$USER" "$HOMEBREW_REPOSITORY/Library/Taps";
       mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
+      git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot;
     else
       umask 022;
-      git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot;
       git fetch --unshallow;
       export PATH="$PWD/bin:$PATH";
       HOMEBREW_CORE_TAP_DIR="$(brew --repo "homebrew/core")";
       mkdir -p "$HOMEBREW_CORE_TAP_DIR";
+      git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot;
       HOMEBREW_TEST_BOT_TAP_DIR="$(brew --repo "homebrew/test-bot")";
       ln -s "$HOMEBREW_TEST_BOT_TAP_DIR/.git" "$HOMEBREW_TEST_BOT_TAP_DIR/Formula" "$HOMEBREW_CORE_TAP_DIR";
     fi
