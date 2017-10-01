@@ -791,7 +791,6 @@ module Homebrew
         branch = coretap_path.git_branch
         return if branch.nil? || branch =~ /master/
 
-
         <<-EOS.undent
           Homebrew/homebrew-core is not on the master branch
 
