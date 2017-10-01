@@ -16,6 +16,10 @@ module Hbc
 
       private
 
+      def summarize
+        path.relative_path_from(cask.staged_path).to_s
+      end
+
       def extract(command: nil, verbose: nil, **_)
         container = Container.for_path(path, command)
 

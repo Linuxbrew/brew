@@ -37,7 +37,7 @@ module Hbc
       end
 
       def summarize
-        to_h.map { |key, val| [*val].map { |v| "#{key.inspect} => #{v.inspect}" }.join(", ") }.join(", ")
+        to_h.flat_map { |key, val| [*val].map { |v| "#{key.inspect} => #{v.inspect}" } }.join(", ")
       end
 
       private
