@@ -9,17 +9,19 @@ module Hbc
     class Pkg < AbstractArtifact
       attr_reader :pkg_relative_path
 
-      def self.from_args(cask, path, **options)
-        options.extend(HashValidator).assert_valid_keys(:allow_untrusted, :choices)
-        new(cask, path, **options)
+      def self.from_args(cask, path, **stanza_options)
+        stanza_options.extend(HashValidator).assert_valid_keys(
+          :allow_untrusted, :choices
+        )
+        new(cask, path, **stanza_options)
       end
 
-      attr_reader :path, :options
+      attr_reader :path, :stanza_options
 
-      def initialize(cask, path, **options)
+      def initialize(cask, path, **stanza_options)
         super(cask)
         @path = cask.staged_path.join(path)
-        @options = options
+        @stanza_options = stanza_options
       end
 
       def summarize
@@ -32,7 +34,7 @@ module Hbc
 
       private
 
-      def run_installer(command: nil, verbose: false, **options)
+      def run_installer(command: nil, verbose: false, **_options)
         ohai "Running installer for #{cask}; your password may be necessary."
         ohai "Package installers may write to any location; options such as --appdir are ignored."
         unless path.exist?
@@ -43,7 +45,9 @@ module Hbc
           "-target", "/"
         ]
         args << "-verboseR" if verbose
-        args << "-allowUntrusted" if options.fetch(:allow_untrusted, false)
+        if stanza_options.fetch(:allow_untrusted, false)
+          args << "-allowUntrusted"
+        end
         with_choices_file do |choices_path|
           args << "-applyChoiceChangesXML" << choices_path if choices_path
           command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true)
@@ -51,7 +55,7 @@ module Hbc
       end
 
       def with_choices_file
-        choices = options.fetch(:choices, {})
+        choices = stanza_options.fetch(:choices, {})
         return yield nil if choices.empty?
 
         Tempfile.open(["choices", ".xml"]) do |file|
