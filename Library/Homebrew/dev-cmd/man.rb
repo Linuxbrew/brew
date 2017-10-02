@@ -69,8 +69,7 @@ module Homebrew
                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:maintainers] = readme.read[/(Linuxbrew's other current maintainers are .*\.)/, 1]
                                     .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-
-	variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
+    variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
                                            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
     ERB.new(template, nil, ">").result(variables.instance_eval { binding })
