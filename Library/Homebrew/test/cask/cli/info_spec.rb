@@ -90,7 +90,7 @@ describe Hbc::CLI::Info, :cask do
     EOS
   end
 
-  it "should print languages if the Cask provided any" do
+  it "prints languages specified in the Cask" do
     expect {
       Hbc::CLI::Info.run("with-languages")
     }.to output(<<-EOS.undent).to_stdout
@@ -107,14 +107,14 @@ describe Hbc::CLI::Info, :cask do
     EOS
   end
 
-  it 'should not print "Languages" section divider if the languages block has no output' do
+  it 'does not print "Languages" section divider if the languages block has no output' do
     expect {
-      Hbc::CLI::Info.run("with-conditional-languages")
+      Hbc::CLI::Info.run("without-languages")
     }.to output(<<-EOS.undent).to_stdout
-      with-conditional-languages: 1.2.3
+      without-languages: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/with-conditional-languages.rb
+      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/without-languages.rb
       ==> Name
       None
       ==> Artifacts

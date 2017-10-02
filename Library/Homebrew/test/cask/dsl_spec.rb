@@ -178,7 +178,7 @@ describe Hbc::DSL, :cask do
       expect(cask.call.url.to_s).to eq("https://example.org/en-US.zip")
     end
 
-    it "returns empty array if no languages specified" do
+    it "returns an empty array if no languages are specified" do
       cask = lambda do
         Hbc::Cask.new("cask-with-apps") do
           url "https://example.org/file.zip"
