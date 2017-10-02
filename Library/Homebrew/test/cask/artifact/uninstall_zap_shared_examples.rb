@@ -149,6 +149,8 @@ shared_examples "#uninstall_phase or #zap_phase" do
   end
 
   [:delete, :trash].each do |directive|
+    next if directive == :trash && ENV["HOMEBREW_TESTS_COVERAGE"].nil?
+
     context "using :#{directive}" do
       let(:dir) { TEST_TMPDIR }
       let(:absolute_path) { Pathname.new("#{dir}/absolute_path") }
