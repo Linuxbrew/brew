@@ -123,7 +123,9 @@ Linuxbrew's lead maintainer is [Shaun Jackman](http://sjackman.ca).
 
 Linuxbrew/homebrew-core's lead maintainer is [Michka Popoff](https://github.com/iMichka).
 
-Linuxbrew's other current maintainers are [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Alyssa Ross](https://github.com/alyssais).
+Linuxbrew's other current maintainers are [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Alyssa Ross](https://github.com/alyssais).
+
+Former maintainers with significant contributions include [Bob W. Hogg](https://github.com/rwhogg).
 
 ## Linuxbrew Community
 - [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)
