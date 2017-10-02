@@ -124,6 +124,7 @@ class Keg
         next true if pn.symlink?
         next true if pn.directory?
         next false if pn.basename.to_s == "orig-prefix.txt" # for python virtualenvs
+        next true if pn == self/".brew/#{name}.rb"
         next true if Metafiles::EXTENSIONS.include?(pn.extname)
         if pn.text_executable?
           text_files << pn
