@@ -1,7 +1,11 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Search, :cask do
   before(:each) do
     allow(Tty).to receive(:width).and_return(0)
   end
+
+  it_behaves_like "a command that handles invalid options"
 
   it "lists the available Casks that match the search term" do
     allow(GitHub).to receive(:search_code).and_return([])

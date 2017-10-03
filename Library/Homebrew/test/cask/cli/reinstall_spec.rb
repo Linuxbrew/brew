@@ -1,4 +1,8 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Reinstall, :cask do
+  it_behaves_like "a command that handles invalid options"
+
   it "displays the reinstallation progress" do
     caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
 

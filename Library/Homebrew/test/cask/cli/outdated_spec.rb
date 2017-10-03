@@ -1,3 +1,5 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Outdated, :cask do
   let(:installed) do
     [
@@ -14,6 +16,8 @@ describe Hbc::CLI::Outdated, :cask do
 
     allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
   end
+
+  it_behaves_like "a command that handles invalid options"
 
   describe 'without --greedy it ignores the Casks with "vesion latest" or "auto_updates true"' do
     it "checks all the installed Casks when no token is provided" do

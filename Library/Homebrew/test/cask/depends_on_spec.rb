@@ -10,7 +10,10 @@ describe "Satisfy Dependencies and Requirements", :cask do
   describe "depends_on cask" do
     context "when depends_on cask is cyclic" do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-cyclic.rb") }
-      it { is_expected.to raise_error(Hbc::CaskCyclicDependencyError) }
+      it {
+        is_expected.to raise_error(Hbc::CaskCyclicDependencyError,
+        "Cask 'with-depends-on-cask-cyclic' includes cyclic dependencies on other Casks: with-depends-on-cask-cyclic-helper")
+      }
     end
 
     context do

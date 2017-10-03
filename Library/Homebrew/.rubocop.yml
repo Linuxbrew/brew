@@ -32,6 +32,7 @@ Metrics/ParameterLists:
 Style/BlockDelimiters:
   Exclude:
     - '**/*_spec.rb'
+    - '**/shared_examples/**/*.rb'
 
 # so many of these in formulae but none in here
 Style/GuardClause:
