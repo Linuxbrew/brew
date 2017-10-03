@@ -4,7 +4,7 @@ describe Hbc::DSL::Appcast do
   subject { described_class.new(url, params) }
 
   let(:url) { "http://example.com" }
-  let(:uri) { Hbc::UnderscoreSupportingURI.parse(url) }
+  let(:uri) { URI(url) }
   let(:params) { {} }
 
   describe "#to_s" do

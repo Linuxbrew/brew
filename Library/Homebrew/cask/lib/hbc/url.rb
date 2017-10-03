@@ -14,7 +14,7 @@ module Hbc
     end
 
     def initialize(uri, options = {})
-      @uri        = Hbc::UnderscoreSupportingURI.parse(uri)
+      @uri        = URI(uri)
       @user_agent = options.fetch(:user_agent, :default)
       @cookies    = options[:cookies]
       @referer    = options[:referer]
