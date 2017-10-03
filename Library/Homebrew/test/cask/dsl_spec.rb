@@ -177,6 +177,36 @@ describe Hbc::DSL, :cask do
       expect(cask.call.sha256).to eq("xyz789")
       expect(cask.call.url.to_s).to eq("https://example.org/en-US.zip")
     end
+
+    it "returns an empty array if no languages are specified" do
+      cask = lambda do
+        Hbc::Cask.new("cask-with-apps") do
+          url "https://example.org/file.zip"
+        end
+      end
+
+      expect(cask.call.languages).to be_empty
+    end
+
+    it "returns an array of available languages" do
+      cask = lambda do
+        Hbc::Cask.new("cask-with-apps") do
+          language "zh" do
+            sha256 "abc123"
+            "zh-CN"
+          end
+
+          language "en-US", default: true do
+            sha256 "xyz789"
+            "en-US"
+          end
+
+          url "https://example.org/file.zip"
+        end
+      end
+
+      expect(cask.call.languages).to eq(["zh", "en-US"])
+    end
   end
 
   describe "app stanza" do

@@ -63,6 +63,7 @@ module Hbc
       :gpg,
       :homepage,
       :language,
+      :languages,
       :name,
       :sha256,
       :staged_path,
@@ -143,6 +144,12 @@ module Hbc
       end
 
       @language = @language_blocks.default.call
+    end
+
+    def languages
+      return [] if @language_blocks.nil?
+
+      @language_blocks.keys.flatten
     end
 
     def url(*args, &block)
