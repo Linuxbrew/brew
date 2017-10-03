@@ -43,6 +43,10 @@ module Hbc
         @stanza = args.shift.to_sym
 
         @format = :to_yaml if yaml?
+
+        unless DSL::DSL_METHODS.include?(stanza)
+          raise ArgumentError, "Illegal stanza: '#{stanza}'"
+        end
       end
 
       def run
