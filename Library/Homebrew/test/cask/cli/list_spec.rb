@@ -1,4 +1,8 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::List, :cask do
+  it_behaves_like "a command that handles invalid options"
+
   it "lists the installed Casks in a pretty fashion" do
     casks = %w[local-caffeine local-transmission].map { |c| Hbc::CaskLoader.load(c) }
 
@@ -7,7 +11,7 @@ describe Hbc::CLI::List, :cask do
     end
 
     expect {
-      Hbc::CLI::List.run
+      described_class.run
     }.to output(<<-EOS.undent).to_stdout
       local-caffeine
       local-transmission
@@ -26,7 +30,7 @@ describe Hbc::CLI::List, :cask do
     end
 
     expect {
-      Hbc::CLI::List.run("--full-name")
+      described_class.run("--full-name")
     }.to output(<<-EOS.undent).to_stdout
       local-caffeine
       local-transmission
@@ -49,13 +53,13 @@ describe Hbc::CLI::List, :cask do
 
     it "of all installed Casks" do
       expect {
-        Hbc::CLI::List.run("--versions")
+        described_class.run("--versions")
       }.to output(expected_output).to_stdout
     end
 
     it "of given Casks" do
       expect {
-        Hbc::CLI::List.run("--versions", "local-caffeine", "local-transmission")
+        described_class.run("--versions", "local-caffeine", "local-transmission")
       }.to output(expected_output).to_stdout
     end
   end
@@ -72,7 +76,7 @@ describe Hbc::CLI::List, :cask do
         .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect {
-        Hbc::CLI::List.run("local-transmission", "local-caffeine")
+        described_class.run("local-transmission", "local-caffeine")
       }.to output(<<-EOS.undent).to_stdout
         ==> Apps
         #{Hbc.appdir.join("Transmission.app")} (#{Hbc.appdir.join("Transmission.app").abv})

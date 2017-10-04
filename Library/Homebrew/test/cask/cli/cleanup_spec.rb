@@ -1,3 +1,5 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Cleanup, :cask do
   let(:cache_location) { Pathname.new(Dir.mktmpdir).realpath }
   let(:outdated_only) { false }
@@ -11,6 +13,8 @@ describe Hbc::CLI::Cleanup, :cask do
   after do
     cache_location.rmtree
   end
+
+  it_behaves_like "a command that handles invalid options"
 
   describe "cleanup" do
     let(:cask_token) { "caffeine" }
