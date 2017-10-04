@@ -124,7 +124,15 @@ module Formulary
 
     def get_formula(spec, **)
       contents = Utils::Bottles.formula_contents @bottle_filename, name: name
-      formula = Formulary.from_contents name, @bottle_filename, contents, spec
+      formula = begin
+        Formulary.from_contents name, @bottle_filename, contents, spec
+      rescue FormulaUnreadableError => e
+        opoo <<-EOS.undent
+          Unreadable formula in #{@bottle_filename}:
+          #{e}
+        EOS
+        super
+      end
       formula.local_bottle_path = @bottle_filename
       formula
     end
