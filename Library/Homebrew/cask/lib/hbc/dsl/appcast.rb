@@ -7,7 +7,7 @@ module Hbc
 
       def initialize(uri, parameters = {})
         @parameters     = parameters
-        @uri            = UnderscoreSupportingURI.parse(uri)
+        @uri            = URI(uri)
         @checkpoint     = @parameters[:checkpoint]
       end
 
