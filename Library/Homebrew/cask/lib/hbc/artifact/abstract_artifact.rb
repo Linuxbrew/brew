@@ -20,7 +20,7 @@ module Hbc
       end
 
       def self.for_cask(cask)
-        cask.artifacts[dsl_key].to_a
+        cask.artifacts[self].to_a
       end
 
       # TODO: this sort of logic would make more sense in dsl.rb, or a

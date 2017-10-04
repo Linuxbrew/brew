@@ -43,7 +43,7 @@ module Hbc
       Artifact::Zap,
     ].freeze
 
-    ACTIVATABLE_ARTIFACT_TYPES = (ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key) - [:stage_only]).freeze
+    ACTIVATABLE_ARTIFACT_CLASSES = ORDINARY_ARTIFACT_CLASSES - [Artifact::StageOnly]
 
     ARTIFACT_BLOCK_CLASSES = [
       Artifact::PreflightBlock,
@@ -71,11 +71,12 @@ module Hbc
       :version,
       :appdir,
       *ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key),
-      *ACTIVATABLE_ARTIFACT_TYPES,
+      *ACTIVATABLE_ARTIFACT_CLASSES.map(&:dsl_key),
       *ARTIFACT_BLOCK_CLASSES.flat_map { |klass| [klass.dsl_key, klass.uninstall_dsl_key] },
     ].freeze
 
-    attr_reader :token, :cask
+    attr_reader :cask, :token
+
     def initialize(cask)
       @cask = cask
       @token = cask.token
@@ -175,7 +176,7 @@ module Hbc
           DSL::Container.new(*args).tap do |container|
             # TODO: remove this backward-compatibility section after removing nested_container
             if container&.nested
-              artifacts[:nested_container] << Artifact::NestedContainer.new(cask, container.nested)
+              artifacts[Artifact::NestedContainer] << Artifact::NestedContainer.new(cask, container.nested)
             end
           end
         end
@@ -250,15 +251,13 @@ module Hbc
     end
 
     ORDINARY_ARTIFACT_CLASSES.each do |klass|
-      type = klass.dsl_key
-
-      define_method(type) do |*args|
+      define_method(klass.dsl_key) do |*args|
         begin
-          if [*artifacts.keys, type].include?(:stage_only) && (artifacts.keys & ACTIVATABLE_ARTIFACT_TYPES).any?
+          if [*artifacts.keys, klass].include?(Artifact::StageOnly) && (artifacts.keys & ACTIVATABLE_ARTIFACT_CLASSES).any?
             raise CaskInvalidError.new(cask, "'stage_only' must be the only activatable artifact.")
           end
 
-          artifacts[type].add(klass.from_args(cask, *args))
+          artifacts[klass].add(klass.from_args(cask, *args))
         rescue CaskInvalidError
           raise
         rescue StandardError => e
@@ -270,7 +269,7 @@ module Hbc
     ARTIFACT_BLOCK_CLASSES.each do |klass|
       [klass.dsl_key, klass.uninstall_dsl_key].each do |dsl_key|
         define_method(dsl_key) do |&block|
-          artifacts[dsl_key] << block
+          artifacts[klass] << klass.new(cask, dsl_key => block)
         end
       end
     end

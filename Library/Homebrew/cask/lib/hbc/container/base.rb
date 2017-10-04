@@ -20,7 +20,7 @@ module Hbc
 
         unless children.count == 1 &&
                !nested_container.directory? &&
-               @cask.artifacts[:nested_container].empty? &&
+               Artifact::NestedContainer.for_cask(@cask).none? &&
                extract_nested_container(nested_container)
 
           children.each do |src|
