@@ -72,7 +72,7 @@ describe Hbc::CLI::List, :cask do
     it "lists the installed files for those Casks" do
       casks.each(&InstallHelper.method(:install_without_artifacts_with_caskfile))
 
-      Hbc::Artifact::App.for_cask(transmission)
+      transmission.artifacts.select { |a| a.is_a?(Hbc::Artifact::App) }
         .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect {

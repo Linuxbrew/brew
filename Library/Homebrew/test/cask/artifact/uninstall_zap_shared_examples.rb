@@ -1,6 +1,6 @@
 shared_examples "#uninstall_phase or #zap_phase" do
   let(:artifact_dsl_key) { described_class.dsl_key }
-  let(:artifact) { described_class.for_cask(cask).first }
+  let(:artifact) { cask.artifacts.select { |a| a.is_a?(described_class) }.first }
   let(:fake_system_command) { Hbc::FakeSystemCommand }
 
   subject { artifact.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command) }

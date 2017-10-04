@@ -59,10 +59,5 @@ module Hbc
       PostflightBlock,
       Zap,
     ].freeze
-
-    def self.for_cask(cask)
-      odebug "Determining which artifacts are present in Cask #{cask}"
-      CLASSES.flat_map { |klass| klass.for_cask(cask) }
-    end
   end
 end

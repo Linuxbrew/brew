@@ -1,6 +1,7 @@
 module Hbc
   module Artifact
     class AbstractArtifact
+      include Comparable
       extend Predicable
 
       def self.english_name
@@ -19,8 +20,35 @@ module Hbc
         @dirmethod ||= "#{dsl_key}dir".to_sym
       end
 
-      def self.for_cask(cask)
-        cask.artifacts[self].to_a
+      def <=>(other)
+        @@sort_order ||= [ # rubocop:disable Style/ClassVars
+          PreflightBlock,
+          Uninstall,
+          NestedContainer,
+          Installer,
+          App,
+          Suite,
+          Artifact,        # generic 'artifact' stanza
+          Colorpicker,
+          Pkg,
+          Prefpane,
+          Qlplugin,
+          Dictionary,
+          Font,
+          Service,
+          StageOnly,
+          Binary,
+          InputMethod,
+          InternetPlugin,
+          AudioUnitPlugin,
+          VstPlugin,
+          Vst3Plugin,
+          ScreenSaver,
+          PostflightBlock,
+          Zap,
+        ]
+
+        (@@sort_order.index(self.class) <=> @@sort_order.index(other.class)).to_i
       end
 
       # TODO: this sort of logic would make more sense in dsl.rb, or a

@@ -216,12 +216,12 @@ describe Hbc::DSL, :cask do
         app "Bar.app"
       end
 
-      expect(cask.artifacts[Hbc::Artifact::App].map(&:to_s)).to eq(["Foo.app (App)", "Bar.app (App)"])
+      expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::App) }.map(&:to_s)).to eq(["Foo.app (App)", "Bar.app (App)"])
     end
 
     it "allow app stanzas to be empty" do
       cask = Hbc::Cask.new("cask-with-no-apps")
-      expect(cask.artifacts[Hbc::Artifact::App]).to be_empty
+      expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::App) }).to be_empty
     end
   end
 
@@ -249,7 +249,7 @@ describe Hbc::DSL, :cask do
         pkg "Bar.pkg"
       end
 
-      expect(cask.artifacts[Hbc::Artifact::Pkg].map(&:to_s)).to eq(["Foo.pkg (Pkg)", "Bar.pkg (Pkg)"])
+      expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Pkg) }.map(&:to_s)).to eq(["Foo.pkg (Pkg)", "Bar.pkg (Pkg)"])
     end
   end
 
@@ -501,10 +501,10 @@ describe Hbc::DSL, :cask do
       let(:token) { "with-installer-script" }
 
       it "allows installer script to be specified" do
-        expect(cask.artifacts[Hbc::Artifact::Installer].first.path).to eq(Pathname("/usr/bin/true"))
-        expect(cask.artifacts[Hbc::Artifact::Installer].first.args[:args]).to eq(["--flag"])
-        expect(cask.artifacts[Hbc::Artifact::Installer].to_a[1].path).to eq(Pathname("/usr/bin/false"))
-        expect(cask.artifacts[Hbc::Artifact::Installer].to_a[1].args[:args]).to eq(["--flag"])
+        expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Installer) }.first.path).to eq(Pathname("/usr/bin/true"))
+        expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Installer) }.first.args[:args]).to eq(["--flag"])
+        expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Installer) }.to_a[1].path).to eq(Pathname("/usr/bin/false"))
+        expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Installer) }.to_a[1].args[:args]).to eq(["--flag"])
       end
     end
 
@@ -512,7 +512,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "with-installer-manual" }
 
       it "allows installer manual to be specified" do
-        installer = cask.artifacts[Hbc::Artifact::Installer].first
+        installer = cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Installer) }.first
         expect(installer).to be_a(Hbc::Artifact::Installer::ManualInstaller)
         expect(installer.path).to eq(cask.staged_path.join("Caffeine.app"))
       end
@@ -524,7 +524,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "stage-only" }
 
       it "allows stage_only stanza to be specified" do
-        expect(cask.artifacts[Hbc::Artifact::StageOnly]).not_to be_empty
+        expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::StageOnly) }).not_to be_empty
       end
     end
 
@@ -545,12 +545,12 @@ describe Hbc::DSL, :cask do
     end
   end
 
-  describe "appdir" do
+  describe "#appdir" do
     context "interpolation of the appdir in stanzas" do
       let(:token) { "appdir-interpolation" }
 
       it "is allowed" do
-        expect(cask.artifacts[Hbc::Artifact::Binary].first.source).to eq(Hbc.appdir/"some/path")
+        expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Binary) }.first.source).to eq(Hbc.appdir/"some/path")
       end
     end
 
@@ -563,10 +563,35 @@ describe Hbc::DSL, :cask do
           binary "#{appdir}/some/path"
         end
 
-        expect(cask.artifacts[Hbc::Artifact::Binary].first.source).to eq(original_appdir/"some/path")
+        expect(cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Binary) }.first.source).to eq(original_appdir/"some/path")
       ensure
         Hbc.appdir = original_appdir
       end
+    end
+  end
+
+  describe "#artifacts" do
+    it "sorts artifacts according to the preferable installation order" do
+      cask = Hbc::Cask.new("appdir-trailing-slash") do
+        postflight do
+          next
+        end
+
+        preflight do
+          next
+        end
+
+        binary "binary"
+
+        app "App.app"
+      end
+
+      expect(cask.artifacts.map(&:class).map(&:dsl_key)).to eq [
+        :preflight,
+        :app,
+        :binary,
+        :postflight,
+      ]
     end
   end
 end

@@ -3,7 +3,7 @@ describe Hbc::Artifact::App, :cask do
     let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-alt-target.rb") }
 
     let(:install_phase) {
-      -> { described_class.for_cask(cask).each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) } }
+      -> { cask.artifacts.select { |a| a.is_a?(described_class) }.each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) } }
     }
 
     let(:source_path) { cask.staged_path.join("Caffeine.app") }

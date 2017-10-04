@@ -26,7 +26,7 @@ describe Hbc::Artifact::Binary, :cask do
   end
 
   it "links the binary to the proper directory" do
-    described_class.for_cask(cask)
+    cask.artifacts.select { |a| a.is_a?(described_class) }
       .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
     expect(expected_path).to be_a_symlink
@@ -46,7 +46,7 @@ describe Hbc::Artifact::Binary, :cask do
       expect(FileUtils).to receive(:chmod)
         .with("+x", cask.staged_path.join("naked_non_executable")).and_call_original
 
-      described_class.for_cask(cask)
+      cask.artifacts.select { |a| a.is_a?(described_class) }
       .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect(expected_path).to be_a_symlink
@@ -58,7 +58,7 @@ describe Hbc::Artifact::Binary, :cask do
     FileUtils.touch expected_path
 
     expect {
-      described_class.for_cask(cask)
+      cask.artifacts.select { |a| a.is_a?(described_class) }
         .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
     }.to raise_error(Hbc::CaskError)
 
@@ -68,7 +68,7 @@ describe Hbc::Artifact::Binary, :cask do
   it "clobbers an existing symlink" do
     expected_path.make_symlink("/tmp")
 
-    described_class.for_cask(cask)
+    cask.artifacts.select { |a| a.is_a?(described_class) }
       .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
     expect(File.readlink(expected_path)).not_to eq("/tmp")
@@ -77,7 +77,7 @@ describe Hbc::Artifact::Binary, :cask do
   it "creates parent directory if it doesn't exist" do
     FileUtils.rmdir Hbc.binarydir
 
-    described_class.for_cask(cask)
+    cask.artifacts.select { |a| a.is_a?(described_class) }
       .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
     expect(expected_path.exist?).to be true
@@ -91,9 +91,9 @@ describe Hbc::Artifact::Binary, :cask do
     }
 
     it "links the binary to the proper directory" do
-      Hbc::Artifact::App.for_cask(cask)
+      cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::App) }
         .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
-      described_class.for_cask(cask)
+      cask.artifacts.select { |a| a.is_a?(described_class) }
         .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
 
       expect(expected_path).to be_a_symlink

@@ -177,7 +177,7 @@ module Hbc
       already_installed_artifacts = []
 
       odebug "Installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = @cask.artifacts
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
@@ -374,7 +374,7 @@ module Hbc
 
     def uninstall_artifacts
       odebug "Un-installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = @cask.artifacts
 
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
@@ -388,7 +388,7 @@ module Hbc
     def zap
       ohai %Q(Implied "brew cask uninstall #{@cask}")
       uninstall_artifacts
-      if (zap_stanzas = Artifact::Zap.for_cask(@cask)).empty?
+      if (zap_stanzas = @cask.artifacts.select { |a| a.is_a?(Artifact::Zap) }).empty?
         opoo "No zap stanza present for Cask '#{@cask}'"
       else
         ohai "Dispatching zap stanza"

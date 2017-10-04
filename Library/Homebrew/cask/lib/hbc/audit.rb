@@ -218,7 +218,7 @@ module Hbc
     end
 
     def check_generic_artifacts
-      cask.artifacts[Hbc::Artifact::Artifact].each do |artifact|
+      cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Artifact) }.each do |artifact|
         unless artifact.target.absolute?
           add_error "target must be absolute path for #{artifact.class.english_name} #{artifact.source}"
         end
