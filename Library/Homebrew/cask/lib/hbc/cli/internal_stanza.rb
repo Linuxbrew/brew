@@ -44,9 +44,8 @@ module Hbc
 
         @format = :to_yaml if yaml?
 
-        unless DSL::DSL_METHODS.include?(stanza)
-          raise ArgumentError, "Illegal stanza: '#{stanza}'"
-        end
+        return if DSL::DSL_METHODS.include?(stanza)
+        raise ArgumentError, "Illegal stanza: '#{stanza}'"
       end
 
       def run
