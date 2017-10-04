@@ -2,7 +2,7 @@ describe Hbc::Artifact::Zap, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb") }
 
   let(:zap_artifact) {
-    cask.artifacts.select { |a| a.is_a?(described_class) }.first
+    cask.artifacts.find { |a| a.is_a?(described_class) }
   }
 
   before(:each) do
