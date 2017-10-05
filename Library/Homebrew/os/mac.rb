@@ -229,7 +229,9 @@ module OS
     end
 
     def app_with_bundle_id(*ids)
-      path = mdfind(*ids).first
+      path = mdfind(*ids)
+             .reject { |p| p.include?("/Backups.backupdb/") }
+             .first
       Pathname.new(path) unless path.nil? || path.empty?
     end
 
