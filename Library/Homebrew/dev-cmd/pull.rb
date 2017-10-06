@@ -1,4 +1,4 @@
-#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=`<bintray-org>] <patch-source> [<patch-source>]:
+#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=`<bintray-org>] [`--test-bot-user=`<test-bot-user>] <patch-source> [<patch-source>]:
 #:
 #:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 #:    Optionally, installs the formulae changed by the patch.
@@ -44,6 +44,9 @@
 #:
 #:    If `--bintray-org=`<bintray-org> is passed, publish at the given Bintray
 #:    organisation.
+#:
+#:    If `--test-bot-user=`<test-bot-user> is passed, pull the bottle block
+#:    commit from the specified user on GitHub.
 
 require "net/http"
 require "net/https"
@@ -228,7 +231,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          "https://github.com/BrewTestBot/homebrew-#{tap.repo}/compare/homebrew:master...pr-#{issue}"
+          "https://github.com/#{test_bot_user user}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
         curl "--silent", "--fail", "--output", "/dev/null", "--head", bottle_commit_url
@@ -254,6 +257,13 @@ module Homebrew
     # Verify bintray publishing after all patches have been applied
     bintray_published_formulae.uniq!
     verify_bintray_published(bintray_published_formulae)
+  end
+
+  def test_bot_user(user)
+    test_bot = ARGV.value "test-bot-user"
+    return test_bot if test_bot
+    return "BrewTestBot" if user.casecmp("homebrew").zero?
+    "#{user.capitalize}TestBot"
   end
 
   def force_utf8!(str)
