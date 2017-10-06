@@ -154,8 +154,8 @@ module Homebrew
 
         begin
           f = Formula[name]
-        # Make sure we catch syntax errors.
-        rescue Exception
+        rescue Exception # rubocop:disable Lint/RescueException
+          # Make sure we catch syntax errors.
           next
         end
 

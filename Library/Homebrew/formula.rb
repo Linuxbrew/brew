@@ -1041,14 +1041,14 @@ class Formula
     # keg's formula is deleted.
     begin
       keg = Keg.for(path)
-    rescue NotAKegError, Errno::ENOENT
+    rescue NotAKegError, Errno::ENOENT # rubocop:disable Lint/HandleExceptions
       # file doesn't belong to any keg.
     else
       tab_tap = Tab.for_keg(keg).tap
       return false if tab_tap.nil? # this keg doesn't below to any core/tap formula, most likely coming from a DIY install.
       begin
         Formulary.factory(keg.name)
-      rescue FormulaUnavailableError
+      rescue FormulaUnavailableError # rubocop:disable Lint/HandleExceptions
         # formula for this keg is deleted, so defer to whitelist
       rescue TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
         return false # this keg belongs to another formula
@@ -1379,12 +1379,13 @@ class Formula
   # An array of all installed {Formula}
   # @private
   def self.installed
-    @installed ||= racks.map do |rack|
+    @installed ||= racks.flat_map do |rack|
       begin
         Formulary.from_rack(rack)
       rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
+        []
       end
-    end.compact.uniq(&:name)
+    end.uniq(&:name)
   end
 
   def self.installed_with_alias_path(alias_path)
@@ -1642,7 +1643,7 @@ class Formula
         with_logging("test") do
           test
         end
-      rescue Exception
+      rescue Exception # rubocop:disable Lint/RescueException
         staging.retain! if ARGV.debug?
         raise
       end
@@ -1667,8 +1668,7 @@ class Formula
   end
 
   # @private
-  def test
-  end
+  def test; end
 
   # @private
   def test_fixtures(file)
@@ -1683,8 +1683,7 @@ class Formula
   #   system "./configure", "--prefix=#{prefix}"
   #   system "make", "install"
   # end</pre>
-  def install
-  end
+  def install; end
 
   protected
 
@@ -1932,28 +1931,28 @@ class Formula
     end
   end
 
-  def self.method_added(method)
-    case method
-    when :brew
-      raise "You cannot override Formula#brew in class #{name}"
-    when :test
-      define_method(:test_defined?) { true }
-    when :options
-      instance = allocate
-
-      specs.each do |spec|
-        instance.options.each do |opt, desc|
-          spec.option(opt[/^--(.+)$/, 1], desc)
-        end
-      end
-
-      remove_method(:options)
-    end
-  end
-
   # The methods below define the formula DSL.
   class << self
     include BuildEnvironment::DSL
+
+    def method_added(method)
+      case method
+      when :brew
+        raise "You cannot override Formula#brew in class #{name}"
+      when :test
+        define_method(:test_defined?) { true }
+      when :options
+        instance = allocate
+
+        specs.each do |spec|
+          instance.options.each do |opt, desc|
+            spec.option(opt[/^--(.+)$/, 1], desc)
+          end
+        end
+
+        remove_method(:options)
+      end
+    end
 
     # The reason for why this software is not linked (by default) to
     # {::HOMEBREW_PREFIX}.

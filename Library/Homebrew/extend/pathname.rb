@@ -186,7 +186,7 @@ class Pathname
       begin
         tf.chown(uid, gid)
         tf.chmod(old_stat.mode)
-      rescue Errno::EPERM
+      rescue Errno::EPERM # rubocop:disable Lint/HandleExceptions
       end
 
       File.rename(tf.path, self)

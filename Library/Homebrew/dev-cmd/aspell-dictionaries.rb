@@ -27,13 +27,12 @@ module Homebrew
       end
     end
 
-    languages.inject([]) do |resources, (lang, path)|
+    languages.each do |lang, path|
       r = Resource.new(lang)
       r.owner = Formulary.factory("aspell")
       r.url "#{dict_url}/#{path}"
       r.mirror "#{dict_mirror}/#{path}"
-      resources << r
-    end.each(&:fetch).each do |r|
+      r.fetch
       puts <<-EOS
         option "with-lang-#{r.name}", "Install #{r.name} dictionary"
         resource "#{r.name}" do

@@ -75,7 +75,7 @@ module Homebrew
 
       @put_filenames ||= []
 
-      return if @put_filenames.include? filename
+      return if @put_filenames.include?(filename)
 
       puts Formatter.error(filename.to_s)
       @put_filenames << filename
@@ -84,8 +84,7 @@ module Homebrew
     result = false
 
     keg.each_unique_file_matching(string) do |file|
-      # skip document file.
-      next if Metafiles::EXTENSIONS.include? file.extname
+      next if Metafiles::EXTENSIONS.include?(file.extname) # Skip document files.
 
       linked_libraries = Keg.file_linked_libraries(file, string)
       result ||= !linked_libraries.empty?
@@ -156,9 +155,7 @@ module Homebrew
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
 
-    tap = f.tap
-
-    unless tap
+    unless tap = f.tap
       unless ARGV.include?("--force-core-tap")
         return ofail "Formula not from core or any taps: #{f.full_name}"
       end
