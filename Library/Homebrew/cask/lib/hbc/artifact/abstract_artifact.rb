@@ -1,6 +1,7 @@
 module Hbc
   module Artifact
     class AbstractArtifact
+      include Comparable
       extend Predicable
 
       def self.english_name
@@ -19,8 +20,43 @@ module Hbc
         @dirmethod ||= "#{dsl_key}dir".to_sym
       end
 
-      def self.for_cask(cask)
-        cask.artifacts[dsl_key].to_a
+      def <=>(other)
+        return unless other.class < AbstractArtifact
+        return 0 if self.class == other.class
+
+        @@sort_order ||= [ # rubocop:disable Style/ClassVars
+          PreflightBlock,
+          # The `uninstall` stanza should be run first, as it may
+          # depend on other artifacts still being installed.
+          Uninstall,
+          # We want to extract nested containers before we
+          # handle any other artifacts.
+          NestedContainer,
+          Installer,
+          [
+            App,
+            Suite,
+            Artifact,
+            Colorpicker,
+            Prefpane,
+            Qlplugin,
+            Dictionary,
+            Font,
+            Service,
+            InputMethod,
+            InternetPlugin,
+            AudioUnitPlugin,
+            VstPlugin,
+            Vst3Plugin,
+            ScreenSaver,
+          ],
+          Binary,
+          Pkg,
+          PostflightBlock,
+          Zap,
+        ].each_with_index.flat_map { |classes, i| [*classes].map { |c| [c, i] } }.to_h
+
+        (@@sort_order[self.class] <=> @@sort_order[other.class]).to_i
       end
 
       # TODO: this sort of logic would make more sense in dsl.rb, or a

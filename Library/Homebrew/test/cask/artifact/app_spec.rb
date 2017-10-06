@@ -2,7 +2,7 @@ describe Hbc::Artifact::App, :cask do
   let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb") }
   let(:command) { Hbc::SystemCommand }
   let(:force) { false }
-  let(:app) { described_class.for_cask(cask).first }
+  let(:app) { cask.artifacts.find { |a| a.is_a?(described_class) } }
 
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
   let(:target_path) { Hbc.appdir.join("Caffeine.app") }

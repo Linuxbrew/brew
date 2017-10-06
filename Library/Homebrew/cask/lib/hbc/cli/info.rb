@@ -77,11 +77,11 @@ module Hbc
 
       def self.artifact_info(cask)
         ohai "Artifacts"
-        DSL::ORDINARY_ARTIFACT_CLASSES.flat_map { |klass| klass.for_cask(cask) }
-                                      .select { |artifact| artifact.respond_to?(:install_phase) }
-                                      .each do |artifact|
-                                        puts artifact.to_s
-                                      end
+        cask.artifacts.each do |artifact|
+          next unless artifact.respond_to?(:install_phase)
+          next unless DSL::ORDINARY_ARTIFACT_CLASSES.include?(artifact.class)
+          puts artifact.to_s
+        end
       end
     end
   end

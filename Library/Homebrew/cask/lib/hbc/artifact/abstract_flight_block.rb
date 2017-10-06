@@ -11,12 +11,6 @@ module Hbc
         dsl_key.to_s.prepend("uninstall_").to_sym
       end
 
-      def self.for_cask(cask)
-        [dsl_key, uninstall_dsl_key].flat_map do |key|
-          [*cask.artifacts[key]].map { |block| new(cask, key => block) }
-        end
-      end
-
       attr_reader :directives
 
       def initialize(cask, **directives)
