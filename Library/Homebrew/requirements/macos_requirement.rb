@@ -1,6 +1,6 @@
 require "requirement"
 
-class MinimumMacOSRequirement < Requirement
+class MacOSRequirement < Requirement
   fatal true
 
   def initialize(tags = [])

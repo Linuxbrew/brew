@@ -1,5 +1,5 @@
 require "requirements/linux_requirement"
-require "requirements/minimum_macos_requirement"
+require "requirements/macos_requirement"
 
 describe LinuxRequirement do
   describe "#satisfied?" do
@@ -9,7 +9,7 @@ describe LinuxRequirement do
   end
 end
 
-describe MinimumMacOSRequirement do
+describe MacOSRequirement do
   describe "#satisfied?" do
     it "returns true if OS is macOS" do
       expect(subject.satisfied?).to eq(OS.mac?)
