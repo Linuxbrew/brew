@@ -1,4 +1,4 @@
-#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] <patch-source> [<patch-source>]:
+#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=`<bintray-org>] <patch-source> [<patch-source>]:
 #:
 #:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 #:    Optionally, installs the formulae changed by the patch.
@@ -41,6 +41,9 @@
 #:
 #:    If `--warn-on-publish-failure` was passed, do not exit if there's a
 #:    failure publishing bottles on Bintray.
+#:
+#:    If `--bintray-org=`<bintray-org> is passed, publish at the given Bintray
+#:    organisation.
 
 require "net/http"
 require "net/https"
@@ -257,7 +260,7 @@ module Homebrew
     str.force_encoding("UTF-8") if str.respond_to?(:force_encoding)
   end
 
-  def publish_changed_formula_bottles(_tap, changed_formulae_names)
+  def publish_changed_formula_bottles(tap, changed_formulae_names)
     if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
       raise "Need to load formulae to publish them!"
     end
@@ -268,7 +271,8 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        next unless publish_bottle_file_on_bintray(f, bintray_creds)
+        bintray_org = ARGV.value("bintray-org") || tap.user.downcase
+        next unless publish_bottle_file_on_bintray(f, bintray_org, bintray_creds)
         published << f.full_name
       end
     else
@@ -420,7 +424,7 @@ module Homebrew
   end
 
   # Publishes the current bottle files for a given formula to Bintray
-  def publish_bottle_file_on_bintray(f, creds)
+  def publish_bottle_file_on_bintray(f, bintray_org, creds)
     repo = Utils::Bottles::Bintray.repository(f.tap)
     package = Utils::Bottles::Bintray.package(f.name)
     info = FormulaInfoFromJson.lookup(f.name)
@@ -437,7 +441,7 @@ module Homebrew
          "--user", "#{creds[:user]}:#{creds[:key]}", "--request", "POST",
          "--header", "Content-Type: application/json",
          "--data", '{"publish_wait_for_secs": 0}',
-         "https://api.bintray.com/content/homebrew/#{repo}/#{package}/#{version}/publish"
+         "https://api.bintray.com/content/#{bintray_org}/#{repo}/#{package}/#{version}/publish"
     true
   rescue => e
     raise unless ARGV.include?("--warn-on-publish-failure")
