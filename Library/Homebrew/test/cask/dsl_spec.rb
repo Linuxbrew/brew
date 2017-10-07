@@ -1,5 +1,5 @@
 describe Hbc::DSL, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/#{token}.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path(token.to_s)) }
   let(:token) { "basic-cask" }
 
   context "stanzas" do

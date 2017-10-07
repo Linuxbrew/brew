@@ -11,8 +11,8 @@ describe Hbc::CLI::Zap, :cask do
   end
 
   it "can zap and unlink multiple Casks at once" do
-    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
-    transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
+    caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
+    transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
 
     Hbc::Installer.new(caffeine).install
     Hbc::Installer.new(transmission).install

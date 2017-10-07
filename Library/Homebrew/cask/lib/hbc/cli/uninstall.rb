@@ -16,7 +16,7 @@ module Hbc
 
           if cask.installed? && !cask.installed_caskfile.nil?
             # use the same cask file that was used for installation, if possible
-            cask = CaskLoader.load_from_file(cask.installed_caskfile) if cask.installed_caskfile.exist?
+            cask = CaskLoader.load(cask.installed_caskfile) if cask.installed_caskfile.exist?
           end
 
           Installer.new(cask, binaries: binaries?, verbose: verbose?, force: force?).uninstall

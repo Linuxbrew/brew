@@ -1,5 +1,5 @@
 describe Hbc::Artifact::Zap, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path("with-installable")) }
 
   let(:zap_artifact) {
     described_class.for_cask(cask).first

@@ -147,14 +147,6 @@ module Hbc
       end
     end
 
-    def self.load_from_file(path)
-      FromPathLoader.new(path).load
-    end
-
-    def self.load_from_string(content)
-      FromContentLoader.new(content).load
-    end
-
     def self.path(ref)
       self.for(ref).path
     end
@@ -164,6 +156,13 @@ module Hbc
     end
 
     def self.for(ref)
+      if ref.respond_to?(:to_str)
+        content = ref.to_str
+        if content.match?(/\A\s*cask\s+(?:"[^"]*"|'[^']*')\s+do(?:\s+.*\s+|;?\s+)end\s*\Z/)
+          return FromContentLoader.new(content)
+        end
+      end
+
       [
         FromInstanceLoader,
         FromURILoader,

@@ -1,6 +1,6 @@
 describe Hbc::Artifact::Binary, :cask do
   let(:cask) {
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb").tap do |cask|
+    Hbc::CaskLoader.load(cask_path("with-binary")).tap do |cask|
       InstallHelper.install_without_artifacts(cask)
     end
   }
@@ -16,7 +16,7 @@ describe Hbc::Artifact::Binary, :cask do
 
   context "when --no-binaries is specified" do
     let(:cask) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb")
+      Hbc::CaskLoader.load(cask_path("with-binary"))
     }
 
     it "doesn't link the binary when --no-binaries is specified" do
@@ -35,7 +35,7 @@ describe Hbc::Artifact::Binary, :cask do
 
   context "when the binary is not executable" do
     let(:cask) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-non-executable-binary.rb").tap do |cask|
+      Hbc::CaskLoader.load(cask_path("with-non-executable-binary")).tap do |cask|
         InstallHelper.install_without_artifacts(cask)
       end
     }
@@ -85,7 +85,7 @@ describe Hbc::Artifact::Binary, :cask do
 
   context "binary is inside an app package" do
     let(:cask) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-embedded-binary.rb").tap do |cask|
+      Hbc::CaskLoader.load(cask_path("with-embedded-binary")).tap do |cask|
         InstallHelper.install_without_artifacts(cask)
       end
     }

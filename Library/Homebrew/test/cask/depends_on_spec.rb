@@ -9,7 +9,7 @@ describe "Satisfy Dependencies and Requirements", :cask do
 
   describe "depends_on cask" do
     context "when depends_on cask is cyclic" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-cyclic.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-cask-cyclic")) }
       it {
         is_expected.to raise_error(Hbc::CaskCyclicDependencyError,
         "Cask 'with-depends-on-cask-cyclic' includes cyclic dependencies on other Casks: with-depends-on-cask-cyclic-helper")
@@ -17,7 +17,7 @@ describe "Satisfy Dependencies and Requirements", :cask do
     end
 
     context do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-cask")) }
       let(:dependency) { Hbc::CaskLoader.load(cask.depends_on.cask.first) }
 
       it "installs the dependency of a Cask and the Cask itself" do
@@ -30,34 +30,34 @@ describe "Satisfy Dependencies and Requirements", :cask do
 
   describe "depends_on macos" do
     context "given an array" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-array.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-array")) }
       it { is_expected.not_to raise_error }
     end
 
     context "given a comparison" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-comparison.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-comparison")) }
       it { is_expected.not_to raise_error }
     end
 
     context "given a string" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-string.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-string")) }
       it { is_expected.not_to raise_error }
     end
 
     context "given a symbol" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-symbol.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-symbol")) }
       it { is_expected.not_to raise_error }
     end
 
     context "when not satisfied" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-failure.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-failure")) }
       it { is_expected.to raise_error(Hbc::CaskError) }
     end
   end
 
   describe "depends_on arch" do
     context "when satisfied" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-arch.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-arch")) }
       it { is_expected.not_to raise_error }
     end
   end
@@ -68,21 +68,21 @@ describe "Satisfy Dependencies and Requirements", :cask do
     end
 
     context "when satisfied" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-x11.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-x11")) }
       let(:x11_installed) { true }
 
       it { is_expected.not_to raise_error }
     end
 
     context "when not satisfied" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-x11.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-x11")) }
       let(:x11_installed) { false }
 
       it { is_expected.to raise_error(Hbc::CaskX11DependencyError) }
     end
 
     context "when depends_on x11: false" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-x11-false.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-x11-false")) }
       let(:x11_installed) { false }
 
       it { is_expected.not_to raise_error }

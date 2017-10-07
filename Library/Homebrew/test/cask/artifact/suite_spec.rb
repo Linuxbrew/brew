@@ -1,5 +1,5 @@
 describe Hbc::Artifact::Suite, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-suite.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path("with-suite")) }
 
   let(:install_phase) {
     -> { described_class.for_cask(cask).each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) } }

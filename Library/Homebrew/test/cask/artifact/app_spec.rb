@@ -1,5 +1,5 @@
 describe Hbc::Artifact::App, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path("local-caffeine")) }
   let(:command) { Hbc::SystemCommand }
   let(:force) { false }
   let(:app) { described_class.for_cask(cask).first }

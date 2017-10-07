@@ -3,7 +3,7 @@
 #       to be invoking bundle_identifier off of the installer instance.
 describe "Operations on staged Casks", :cask do
   describe "bundle ID" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb") }
+    let(:cask) { Hbc::CaskLoader.load(cask_path("local-transmission")) }
     let(:installer) { Hbc::Installer.new(cask) }
     it "fetches the bundle ID from a staged cask" do
       installer.install
