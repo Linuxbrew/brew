@@ -3,4 +3,8 @@ module SharedEnvExtension
     odeprecated "ENV.j1", "ENV.deparallelize"
     deparallelize
   end
+
+  def java_cache
+    # odeprecated "ENV.java_cache"
+  end
 end

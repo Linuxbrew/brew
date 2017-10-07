@@ -176,7 +176,10 @@ module Homebrew
       rsrc.version = forced_version if forced_version
       odie "No version specified!" unless rsrc.version
       rsrc_path = rsrc.fetch
-      if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ %r{/.*\.}
+      gnu_tar_gtar_path = HOMEBREW_PREFIX/"opt/gnu-tar/bin/gtar"
+      gnu_tar_gtar = gnu_tar_gtar_path if gnu_tar_gtar_path.executable?
+      tar = which("gtar") || gnu_tar_gtar || which("tar")
+      if Utils.popen_read(tar, "-tf", rsrc_path) =~ %r{/.*\.}
         new_hash = rsrc_path.sha256
       elsif new_url.include? ".tar"
         odie "#{formula}: no url/#{hash_type} specified!"
