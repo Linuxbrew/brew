@@ -71,10 +71,16 @@ module Hbc
             next
           end
 
+          if value == nil || (value.kind_of?(Array) && value.empty?)
+            opoo "no such stanza '#{stanza}' on Cask '#{cask}'" unless quiet?
+            puts ""
+            raise ArgumentError, "no such stanza '#{stanza}' on Cask '#{cask}'"
+          end
+
           if artifact_name && !value.key?(artifact_name)
             opoo "no such stanza '#{artifact_name}' on Cask '#{cask}'" unless quiet?
             puts ""
-            next
+            raise ArgumentError, "no such stanza '#{artifact_name}' on Cask '#{cask}'"
           end
 
           if stanza == :artifacts
