@@ -50,6 +50,8 @@ module Hbc
             Vst3Plugin,
             ScreenSaver,
           ],
+          # `pkg` should be run before `binary`, so
+          # targets are created prior to linking.
           Pkg,
           Binary,
           PostflightBlock,
