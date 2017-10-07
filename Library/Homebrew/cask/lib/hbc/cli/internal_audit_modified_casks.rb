@@ -59,7 +59,7 @@ module Hbc
       end
 
       def modified_cask_files
-        @modified_cask_files ||= git_filter_cask_files("AM")
+        @modified_cask_files ||= git_filter_cask_files("AMR")
       end
 
       def added_cask_files
