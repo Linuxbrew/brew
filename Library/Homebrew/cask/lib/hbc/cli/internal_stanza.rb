@@ -71,7 +71,7 @@ module Hbc
             next
           end
 
-          if value == nil || (value.kind_of?(Array) && value.empty?)
+          if value.nil? || (value.is_a?(Array) && value.empty?)
             opoo "no such stanza '#{stanza}' on Cask '#{cask}'" unless quiet?
             puts ""
             raise ArgumentError, "no such stanza '#{stanza}' on Cask '#{cask}'"
