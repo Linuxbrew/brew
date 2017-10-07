@@ -18,16 +18,16 @@ The installation script installs Linuxbrew to `/home/linuxbrew/.linuxbrew` if po
 Paste at a Terminal prompt:
 
 ```sh
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
 ```
 
 Follow the *Next steps* instructions to add Linuxbrew to your `PATH` and to your bash shell profile script, either `~/.profile` on Debian/Ubuntu or `~/.bash_profile` on CentOS/Fedora/RedHat.
 
 ```sh
-test -d ~/.linuxbrew && PATH="$HOME/.linuxbrew/bin:$PATH"
-test -d /home/linuxbrew/.linuxbrew && PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-test -r ~/.bash_profile && echo 'export PATH="$(brew --prefix)/bin:$PATH"' >>~/.bash_profile
-echo 'export PATH="$(brew --prefix)/bin:$PATH"' >>~/.profile
+test -d ~/.linuxbrew && PATH="$HOME/.linuxbrew/bin:$HOME/.linuxbrew/sbin:$PATH"
+test -d /home/linuxbrew/.linuxbrew && PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+test -r ~/.bash_profile && echo 'export PATH="$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH"' >>~/.bash_profile
+echo 'export PATH="$(brew --prefix)/bin:$(brew --prefix)/sbin:$PATH"' >>~/.profile
 ```
 
 You're done! Try installing a package:
@@ -60,13 +60,13 @@ Paste at a Terminal prompt:
 ### Debian or Ubuntu
 
 ```sh
-sudo apt-get install build-essential curl file git python-setuptools ruby
+sudo apt-get install build-essential curl file git python-setuptools
 ```
 
 ### Fedora, CentOS or Red Hat
 
 ```sh
-sudo yum groupinstall 'Development Tools' && sudo yum install curl file git irb python-setuptools ruby
+sudo yum groupinstall 'Development Tools' && sudo yum install curl file git python-setuptools
 ```
 
 ### 32-bit x86 platforms
