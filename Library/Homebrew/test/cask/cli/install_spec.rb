@@ -22,16 +22,16 @@ describe Hbc::CLI::Install, :cask do
   it "allows staging and activation of multiple Casks at once" do
     described_class.run("local-transmission", "local-caffeine")
 
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
     expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")).to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-caffeine"))).to be_installed
     expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
   end
 
   it "skips double install (without nuking existing installation)" do
     described_class.run("local-transmission")
     described_class.run("local-transmission")
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
   end
 
   it "prints a warning message on double install" do
@@ -54,9 +54,9 @@ describe Hbc::CLI::Install, :cask do
 
   it "skips dependencies with --skip-cask-deps" do
     described_class.run("with-depends-on-cask-multiple", "--skip-cask-deps")
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-cask-multiple.rb")).to be_installed
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")).not_to be_installed
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).not_to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("with-depends-on-cask-multiple"))).to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-caffeine"))).not_to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).not_to be_installed
   end
 
   it "properly handles Casks that are not present" do

@@ -1,11 +1,11 @@
 describe "conflicts_with", :cask do
   describe "conflicts_with cask" do
     let(:local_caffeine) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+      Hbc::CaskLoader.load(cask_path("local-caffeine"))
     }
 
     let(:with_conflicts_with) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-conflicts-with.rb")
+      Hbc::CaskLoader.load(cask_path("with-conflicts-with"))
     }
 
     it "installs the dependency of a Cask and the Cask itself" do

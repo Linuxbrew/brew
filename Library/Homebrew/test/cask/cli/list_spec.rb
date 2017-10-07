@@ -65,8 +65,8 @@ describe Hbc::CLI::List, :cask do
   end
 
   describe "given a set of installed Casks" do
-    let(:caffeine) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb") }
-    let(:transmission) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb") }
+    let(:caffeine) { Hbc::CaskLoader.load(cask_path("local-caffeine")) }
+    let(:transmission) { Hbc::CaskLoader.load(cask_path("local-transmission")) }
     let(:casks) { [caffeine, transmission] }
 
     it "lists the installed files for those Casks" do

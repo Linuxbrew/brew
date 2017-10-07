@@ -71,7 +71,7 @@ module Hbc
       return if previous_cask_contents.empty?
 
       begin
-        previous_cask = CaskLoader.load_from_string(previous_cask_contents)
+        previous_cask = CaskLoader.load(previous_cask_contents)
 
         return unless previous_cask.version == cask.version
         return if previous_cask.sha256 == cask.sha256

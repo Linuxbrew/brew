@@ -3,11 +3,11 @@ require_relative "shared_examples/invalid_option"
 
 describe Hbc::CLI::Fetch, :cask do
   let(:local_transmission) {
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
+    Hbc::CaskLoader.load(cask_path("local-transmission"))
   }
 
   let(:local_caffeine) {
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+    Hbc::CaskLoader.load(cask_path("local-caffeine"))
   }
 
   it_behaves_like "a command that requires a Cask token"

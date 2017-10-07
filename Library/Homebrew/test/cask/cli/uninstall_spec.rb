@@ -6,7 +6,7 @@ describe Hbc::CLI::Uninstall, :cask do
   it_behaves_like "a command that handles invalid options"
 
   it "displays the uninstallation progress" do
-    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+    caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
 
     Hbc::Installer.new(caffeine).install
 
@@ -37,8 +37,8 @@ describe Hbc::CLI::Uninstall, :cask do
   end
 
   it "can uninstall and unlink multiple Casks at once" do
-    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
-    transmission = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")
+    caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
+    transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
 
     Hbc::Installer.new(caffeine).install
     Hbc::Installer.new(transmission).install
@@ -55,7 +55,7 @@ describe Hbc::CLI::Uninstall, :cask do
   end
 
   it "calls `uninstall` before removing artifacts" do
-    cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-uninstall-script-app.rb")
+    cask = Hbc::CaskLoader.load(cask_path("with-uninstall-script-app"))
 
     Hbc::Installer.new(cask).install
 
@@ -71,7 +71,7 @@ describe Hbc::CLI::Uninstall, :cask do
   end
 
   it "can uninstall Casks when the uninstall script is missing, but only when using `--force`" do
-    cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-uninstall-script-app.rb")
+    cask = Hbc::CaskLoader.load(cask_path("with-uninstall-script-app"))
 
     Hbc::Installer.new(cask).install
 

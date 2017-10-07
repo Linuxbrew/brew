@@ -1,6 +1,6 @@
 describe Hbc::Artifact::App, :cask do
   describe "activate to alternate target" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-alt-target.rb") }
+    let(:cask) { Hbc::CaskLoader.load(cask_path("with-alt-target")) }
 
     let(:install_phase) {
       lambda do

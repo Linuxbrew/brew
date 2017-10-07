@@ -1,5 +1,5 @@
 describe Hbc::Artifact::Pkg, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path("with-installable")) }
   let(:fake_system_command) { class_double(Hbc::SystemCommand) }
 
   before(:each) do
@@ -22,7 +22,7 @@ describe Hbc::Artifact::Pkg, :cask do
   end
 
   describe "choices" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-choices.rb") }
+    let(:cask) { Hbc::CaskLoader.load(cask_path("with-choices")) }
 
     it "passes the choice changes xml to the system installer" do
       pkg = cask.artifacts.find { |a| a.is_a?(described_class) }

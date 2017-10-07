@@ -23,7 +23,7 @@ module Hbc
           elsif versions?
             puts self.class.format_versioned(cask)
           else
-            cask = CaskLoader.load_from_file(cask.installed_caskfile)
+            cask = CaskLoader.load(cask.installed_caskfile)
             self.class.list_artifacts(cask)
           end
         end
