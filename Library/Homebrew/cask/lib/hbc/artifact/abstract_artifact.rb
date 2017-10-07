@@ -50,8 +50,8 @@ module Hbc
             Vst3Plugin,
             ScreenSaver,
           ],
-          Binary,
           Pkg,
+          Binary,
           PostflightBlock,
           Zap,
         ].each_with_index.flat_map { |classes, i| [*classes].map { |c| [c, i] } }.to_h
