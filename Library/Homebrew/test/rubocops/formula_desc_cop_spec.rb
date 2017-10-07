@@ -20,7 +20,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
                               column: 0,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -45,7 +45,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
                              column: 2,
                              source: source }]
 
-      inspect_source(cop, source, "/homebrew-core/Formula/foo.rb")
+      inspect_source(source, "/homebrew-core/Formula/foo.rb")
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -70,7 +70,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
                              column: 2,
                              source: source }]
 
-      inspect_source(cop, source, "/homebrew-core/Formula/foo.rb")
+      inspect_source(source, "/homebrew-core/Formula/foo.rb")
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -96,7 +96,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
                              column: 8,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -116,7 +116,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
                              column: 8,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -136,7 +136,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
                              column: 8,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -156,7 +156,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
                              column: 8,
                              source: source }]
 
-      inspect_source(cop, source, "/homebrew-core/Formula/foo.rb")
+      inspect_source(source, "/homebrew-core/Formula/foo.rb")
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
@@ -176,7 +176,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
         end
       EOS
 
-      corrected_source = autocorrect_source(cop, source, "/homebrew-core/Formula/foo.rb")
+      corrected_source = autocorrect_source(source, "/homebrew-core/Formula/foo.rb")
       expect(corrected_source).to eq(correct_source)
     end
   end

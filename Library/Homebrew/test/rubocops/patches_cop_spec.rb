@@ -13,7 +13,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
           url 'http://example.com/foo-1.0.tgz'
         end
       EOS
-      inspect_source(cop, source)
+      inspect_source(source)
       expect(cop.offenses).to eq([])
     end
 
@@ -34,7 +34,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
                              column: 2,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -61,7 +61,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
           end
         EOS
 
-        inspect_source(cop, source)
+        inspect_source(source)
         expected_offense = if patch_url =~ %r{/raw\.github\.com/}
           [{ message: <<-EOS.undent.chomp,
                GitHub/Gist patches should specify a revision:
@@ -154,7 +154,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
                              column: 26,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -183,7 +183,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
           end
         EOS
 
-        inspect_source(cop, source)
+        inspect_source(source)
         expected_offense = if patch_url =~ %r{/raw\.github\.com/}
           [{ message: <<-EOS.undent.chomp,
                GitHub/Gist patches should specify a revision:

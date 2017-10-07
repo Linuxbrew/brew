@@ -1,10 +1,12 @@
 source "https://rubygems.org"
 
+require_relative "../constants"
+
 gem "parallel_tests"
 gem "rspec"
 gem "rspec-its", require: false
 gem "rspec-wait", require: false
-gem "rubocop"
+gem "rubocop", HOMEBREW_RUBOCOP_VERSION
 
 group :coverage do
   gem "codecov", require: false
