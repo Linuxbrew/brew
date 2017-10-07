@@ -139,3 +139,13 @@ Documentation is under the [Creative Commons Attribution license](https://creati
 Linuxbrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for continuous integration and the computer resources used to build precompiled binary bottles of your favourite formulae. Every donation will be spent on making Linuxbrew better for our users. Please consider [donating regularly to Linuxbrew through Patreon](https://www.patreon.com/linuxbrew). We appreciate your support and contribution, no matter the level.
 
 [Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew on Patreon](https://www.patreon.com/homebrew) as well if you use Homebrew on macOS.
+
+# Sponsors
+
+Our bottles (binary packages) are built on [CircleCI](https://circleci.com/).
+
+[<img alt="CircleCI logo" style="height:1in" src="https://assets.brandfolder.com/otz6k5-cj8pew-e4rk9u/original/circle-logo-horizontal-black.png">](https://circleci.com/)
+
+Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/linuxbrew).
+
+[![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/linuxbrew)
