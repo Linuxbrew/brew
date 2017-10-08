@@ -1,8 +1,9 @@
 describe Hbc::CLI::InternalStanza, :cask do
   it "shows stanza of the Specified Cask" do
     command = described_class.new("gpg", "with-gpg")
-    command.run
-    # TODO: check result
+    expect do
+      command.run
+    end.to output("http://example.com/gpg-signature.asc\n").to_stdout
   end
 
   it "raises an exception when stanza is invalid" do
