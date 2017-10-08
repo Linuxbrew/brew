@@ -1,35 +1,42 @@
 describe Hbc::CLI::InternalStanza, :cask do
   it "shows stanza of the Specified Cask" do
     command = described_class.new("gpg", "with-gpg")
-    expect do
+    expect {
       command.run
-    end.to output("http://example.com/gpg-signature.asc\n").to_stdout
+    }.to output("http://example.com/gpg-signature.asc\n").to_stdout
   end
 
   it "raises an exception when stanza is invalid" do
-    expect do
+    expect {
       described_class.new("invalid_stanza", "with-gpg")
-    end.to raise_error(/Illegal stanza/)
+    }.to raise_error(/Illegal stanza/)
   end
 
   it "raises an exception when normal stanza is not present on cask" do
     command = described_class.new("caveats", "with-gpg")
-    expect do
+    expect {
       command.run
-    end.to raise_error(/no such stanza/)
+    }.to raise_error(/no such stanza/)
   end
 
   it "raises an exception when artifact stanza is not present on cask" do
     command = described_class.new("zap", "with-gpg")
-    expect do
+    expect {
       command.run
-    end.to raise_error(/no such stanza/)
+    }.to raise_error(/no such stanza/)
+  end
+
+  it "raises an exception when 'depends_on' stanza is not present on cask" do
+    command = described_class.new("depends_on", "with-gpg")
+    expect {
+      command.run
+    }.to raise_error(/no such stanza/)
   end
 
   it "shows all artifact stanzas when using 'artifacts' keyword" do
     command = described_class.new("artifacts", "with-gpg")
-    expect do
+    expect {
       command.run
-    end.to output("{:app=>[[\"Caffeine.app\"]]}\n").to_stdout
+    }.to output("{:app=>[[\"Caffeine.app\"]]}\n").to_stdout
   end
 end

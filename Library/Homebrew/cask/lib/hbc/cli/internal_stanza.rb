@@ -57,12 +57,6 @@ module Hbc
         casks(alternative: -> { Hbc.all }).each do |cask|
           print "#{cask}\t" if table?
 
-          unless cask.respond_to?(stanza)
-            opoo "no such stanza '#{stanza}' on Cask '#{cask}'" unless quiet?
-            puts ""
-            next
-          end
-
           begin
             value = cask.send(stanza)
           rescue StandardError
@@ -71,7 +65,9 @@ module Hbc
             next
           end
 
-          if (value.nil? || value.is_a?(Array) && value.empty?) ||
+          if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?) ||
+             (value.respond_to?(:to_h) && value.to_h.empty?) ||
+             (value.respond_to?(:to_s) && value.to_s == "{}") ||
              (artifact_name && !value.key?(artifact_name))
 
             if artifact_name
