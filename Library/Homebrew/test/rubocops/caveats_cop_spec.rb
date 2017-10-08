@@ -25,7 +25,7 @@ describe RuboCop::Cop::FormulaAudit::Caveats do
                               column: 5,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
