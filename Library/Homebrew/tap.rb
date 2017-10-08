@@ -1,4 +1,5 @@
 require "extend/string"
+require "extend/cachable"
 require "readall"
 
 # a {Tap} is used to extend the formulae provided by Homebrew core.
@@ -8,13 +9,9 @@ require "readall"
 # {#user} represents Github username and {#repo} represents repository
 # name without leading `homebrew-`.
 class Tap
+  extend Cachable
+
   TAP_DIRECTORY = HOMEBREW_LIBRARY/"Taps"
-
-  CACHE = {}
-
-  def self.clear_cache
-    CACHE.clear
-  end
 
   def self.fetch(*args)
     case args.length
@@ -38,7 +35,7 @@ class Tap
     end
 
     cache_key = "#{user}/#{repo}".downcase
-    CACHE.fetch(cache_key) { |key| CACHE[key] = Tap.new(user, repo) }
+    cache.fetch(cache_key) { |key| cache[key] = Tap.new(user, repo) }
   end
 
   def self.from_path(path)

@@ -183,7 +183,7 @@ module OS
     end
 
     module CLT
-      extend self
+      module_function
 
       STANDALONE_PKG_ID = "com.apple.pkg.DeveloperToolsCLILeo".freeze
       FROM_XCODE_PKG_ID = "com.apple.pkg.DeveloperToolsCLI".freeze

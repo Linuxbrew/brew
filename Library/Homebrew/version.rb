@@ -213,110 +213,6 @@ class Version
     end
   end
 
-  def initialize(val)
-    unless val.respond_to?(:to_str)
-      raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
-    end
-    @version = val.to_str
-  end
-
-  def detected_from_url?
-    false
-  end
-
-  def head?
-    false
-  end
-
-  def null?
-    false
-  end
-
-  def <=>(other)
-    # Needed to retain API compatibility with older string comparisons
-    # for compiler versions, etc.
-    other = Version.new(other) if other.is_a? String
-    # Used by the *_build_version comparisons, which formerly returned Fixnum
-    other = Version.new(other.to_s) if other.is_a? Integer
-    return 1 if other.nil?
-
-    return unless other.is_a?(Version)
-    return 0 if version == other.version
-    return 1 if head? && !other.head?
-    return -1 if !head? && other.head?
-    return 0 if head? && other.head?
-
-    ltokens = tokens
-    rtokens = other.tokens
-    max = max(ltokens.length, rtokens.length)
-    l = r = 0
-
-    while l < max
-      a = ltokens[l] || NULL_TOKEN
-      b = rtokens[r] || NULL_TOKEN
-
-      if a == b
-        l += 1
-        r += 1
-        next
-      elsif a.numeric? && b.numeric?
-        return a <=> b
-      elsif a.numeric?
-        return 1 if a > NULL_TOKEN
-        l += 1
-      elsif b.numeric?
-        return -1 if b > NULL_TOKEN
-        r += 1
-      else
-        return a <=> b
-      end
-    end
-
-    0
-  end
-  alias eql? ==
-
-  def hash
-    version.hash
-  end
-
-  def to_f
-    version.to_f
-  end
-
-  def to_s
-    version.dup
-  end
-  alias to_str to_s
-
-  protected
-
-  attr_reader :version
-
-  def tokens
-    @tokens ||= tokenize
-  end
-
-  private
-
-  def max(a, b)
-    (a > b) ? a : b
-  end
-
-  def tokenize
-    version.scan(SCAN_PATTERN).map! do |token|
-      case token
-      when /\A#{AlphaToken::PATTERN}\z/o   then AlphaToken
-      when /\A#{BetaToken::PATTERN}\z/o    then BetaToken
-      when /\A#{RCToken::PATTERN}\z/o      then RCToken
-      when /\A#{PreToken::PATTERN}\z/o     then PreToken
-      when /\A#{PatchToken::PATTERN}\z/o   then PatchToken
-      when /\A#{NumericToken::PATTERN}\z/o then NumericToken
-      when /\A#{StringToken::PATTERN}\z/o  then StringToken
-      end.new(token)
-    end
-  end
-
   def self.parse(spec)
     version = _parse(spec)
     version.nil? ? NULL : new(version)
@@ -460,6 +356,112 @@ class Version
     # e.g. https://secure.php.net/get/php-7.1.10.tar.bz2/from/this/mirror
     m = /[-.vV]?((?:\d+\.)+\d+(?:[-_.]?(?i:alpha|beta|pre|rc)\.?\d{,2})?)/.match(spec_s)
     return m.captures.first unless m.nil?
+  end
+
+  private_class_method :_parse
+
+  def initialize(val)
+    unless val.respond_to?(:to_str)
+      raise TypeError, "Version value must be a string; got a #{val.class} (#{val})"
+    end
+    @version = val.to_str
+  end
+
+  def detected_from_url?
+    false
+  end
+
+  def head?
+    false
+  end
+
+  def null?
+    false
+  end
+
+  def <=>(other)
+    # Needed to retain API compatibility with older string comparisons
+    # for compiler versions, etc.
+    other = Version.new(other) if other.is_a? String
+    # Used by the *_build_version comparisons, which formerly returned Fixnum
+    other = Version.new(other.to_s) if other.is_a? Integer
+    return 1 if other.nil?
+
+    return unless other.is_a?(Version)
+    return 0 if version == other.version
+    return 1 if head? && !other.head?
+    return -1 if !head? && other.head?
+    return 0 if head? && other.head?
+
+    ltokens = tokens
+    rtokens = other.tokens
+    max = max(ltokens.length, rtokens.length)
+    l = r = 0
+
+    while l < max
+      a = ltokens[l] || NULL_TOKEN
+      b = rtokens[r] || NULL_TOKEN
+
+      if a == b
+        l += 1
+        r += 1
+        next
+      elsif a.numeric? && b.numeric?
+        return a <=> b
+      elsif a.numeric?
+        return 1 if a > NULL_TOKEN
+        l += 1
+      elsif b.numeric?
+        return -1 if b > NULL_TOKEN
+        r += 1
+      else
+        return a <=> b
+      end
+    end
+
+    0
+  end
+  alias eql? ==
+
+  def hash
+    version.hash
+  end
+
+  def to_f
+    version.to_f
+  end
+
+  def to_s
+    version.dup
+  end
+  alias to_str to_s
+
+  protected
+
+  attr_reader :version
+
+  def tokens
+    @tokens ||= tokenize
+  end
+
+  private
+
+  def max(a, b)
+    (a > b) ? a : b
+  end
+
+  def tokenize
+    version.scan(SCAN_PATTERN).map! do |token|
+      case token
+      when /\A#{AlphaToken::PATTERN}\z/o   then AlphaToken
+      when /\A#{BetaToken::PATTERN}\z/o    then BetaToken
+      when /\A#{RCToken::PATTERN}\z/o      then RCToken
+      when /\A#{PreToken::PATTERN}\z/o     then PreToken
+      when /\A#{PatchToken::PATTERN}\z/o   then PatchToken
+      when /\A#{NumericToken::PATTERN}\z/o then NumericToken
+      when /\A#{StringToken::PATTERN}\z/o  then StringToken
+      end.new(token)
+    end
   end
 end
 

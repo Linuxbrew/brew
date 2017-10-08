@@ -18,8 +18,7 @@ class AbstractDownloadStrategy
   end
 
   # Download and cache the resource as {#cached_location}.
-  def fetch
-  end
+  def fetch; end
 
   # Suppress output
   def shutup!
@@ -37,13 +36,11 @@ class AbstractDownloadStrategy
   # Unpack {#cached_location} into the current working directory, and possibly
   # chdir into the newly-unpacked directory.
   # Unlike {Resource#stage}, this does not take a block.
-  def stage
-  end
+  def stage; end
 
   # @!attribute [r] cached_location
   # The path to the cached file or directory associated with the resource.
-  def cached_location
-  end
+  def cached_location; end
 
   # @!attribute [r]
   # return most recent modified time for all files in the current working directory after stage.
@@ -204,14 +201,11 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     true
   end
 
-  def clone_repo
-  end
+  def clone_repo; end
 
-  def update
-  end
+  def update; end
 
-  def current_revision
-  end
+  def current_revision; end
 
   def extract_ref(specs)
     key = REF_TYPES.find { |type| specs.key?(type) }

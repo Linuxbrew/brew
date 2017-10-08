@@ -1,18 +1,19 @@
 require "digest/md5"
 require "tap"
+require "extend/cachable"
 
 # The Formulary is responsible for creating instances of Formula.
 # It is not meant to be used directly from formulae.
 
 module Formulary
-  FORMULAE = {}
+  extend Cachable
 
   def self.formula_class_defined?(path)
-    FORMULAE.key?(path)
+    cache.key?(path)
   end
 
   def self.formula_class_get(path)
-    FORMULAE.fetch(path)
+    cache.fetch(path)
   end
 
   def self.load_formula(name, path, contents, namespace)
@@ -44,7 +45,7 @@ module Formulary
     contents = path.open("r") { |f| ensure_utf8_encoding(f).read }
     namespace = "FormulaNamespace#{Digest::MD5.hexdigest(path.to_s)}"
     klass = load_formula(name, path, contents, namespace)
-    FORMULAE[path] = klass
+    cache[path] = klass
   end
 
   if IO.method_defined?(:set_encoding)

@@ -58,11 +58,12 @@ class FormulaInstaller
     @options = Options.new
     @invalid_option_names = []
     @requirement_messages = []
-
-    @@attempted ||= Set.new
-
     @poured_bottle = false
     @pour_failed   = false
+  end
+
+  def self.attempted
+    @attempted ||= Set.new
   end
 
   # When no build tools are available and build flags are passed through ARGV,
@@ -145,7 +146,7 @@ class FormulaInstaller
   end
 
   def check_install_sanity
-    raise FormulaInstallationAlreadyAttemptedError, formula if @@attempted.include?(formula)
+    raise FormulaInstallationAlreadyAttemptedError, formula if self.class.attempted.include?(formula)
 
     return if ignore_deps?
 
@@ -287,12 +288,12 @@ class FormulaInstaller
       end
     end
 
-    @@attempted << formula
+    self.class.attempted << formula
 
     if pour_bottle?(warn: true)
       begin
         pour
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         # any exceptions must leave us with nothing installed
         ignore_interrupts do
           formula.prefix.rmtree if formula.prefix.directory?
@@ -567,7 +568,7 @@ class FormulaInstaller
     oh1 "Installing #{formula.full_name} dependency: #{Formatter.identifier(dep.name)}"
     fi.install
     fi.finish
-  rescue Exception
+  rescue Exception # rubocop:disable Lint/RescueException
     ignore_interrupts do
       tmp_keg.rename(installed_keg) if tmp_keg && !installed_keg.directory?
       linked_keg.link if keg_was_linked
@@ -723,7 +724,7 @@ class FormulaInstaller
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     e.options = display_options(formula) if e.is_a?(BuildError)
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
@@ -784,7 +785,7 @@ class FormulaInstaller
       puts "  brew link #{formula.name}"
       @show_summary_heading = true
       Homebrew.failed = true
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       onoe "An unexpected error occurred during the `brew link` step"
       puts "The formula built, but is not symlinked into #{HOMEBREW_PREFIX}"
       puts e
@@ -815,7 +816,7 @@ class FormulaInstaller
     formula.plist_path.chmod 0644
     log = formula.var/"log"
     log.mkpath if formula.plist.include? log.to_s
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     onoe "Failed to install plist file"
     ohai e, e.backtrace if debug?
     Homebrew.failed = true
@@ -823,7 +824,7 @@ class FormulaInstaller
 
   def fix_dynamic_linkage(keg)
     keg.fix_dynamic_linkage
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     onoe "Failed to fix install linkage"
     puts "The formula built, but you may encounter issues using it or linking other"
     puts "formula against it."
@@ -835,7 +836,7 @@ class FormulaInstaller
   def clean
     ohai "Cleaning" if verbose?
     Cleaner.new(formula).clean
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     opoo "The cleaning step did not complete successfully"
     puts "Still, the installation was successful, so we will link it into your prefix"
     ohai e, e.backtrace if debug?
@@ -845,7 +846,7 @@ class FormulaInstaller
 
   def post_install
     Homebrew.run_post_install(formula)
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     opoo "The post-install step did not complete successfully"
     puts "You can try again using `brew postinstall #{formula.full_name}`"
     ohai e, e.backtrace if debug?
@@ -905,27 +906,31 @@ class FormulaInstaller
     super
   end
 
+  def self.locked
+    @locked ||= []
+  end
+
   private
 
   attr_predicate :hold_locks?
 
   def lock
-    return unless (@@locked ||= []).empty?
+    return unless self.class.locked.empty?
     unless ignore_deps?
       formula.recursive_dependencies.each do |dep|
-        @@locked << dep.to_formula
+        self.class.locked << dep.to_formula
       end
     end
-    @@locked.unshift(formula)
-    @@locked.uniq!
-    @@locked.each(&:lock)
+    self.class.locked.unshift(formula)
+    self.class.locked.uniq!
+    self.class.locked.each(&:lock)
     @hold_locks = true
   end
 
   def unlock
     return unless hold_locks?
-    @@locked.each(&:unlock)
-    @@locked.clear
+    self.class.locked.each(&:unlock)
+    self.class.locked.clear
     @hold_locks = false
   end
 

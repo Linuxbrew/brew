@@ -190,7 +190,7 @@ begin
   options = Options.create(ARGV.flags_only)
   build   = Build.new(formula, options)
   build.install
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   Marshal.dump(e, error_pipe)
   error_pipe.close
   exit! 1

@@ -4,8 +4,7 @@ module IRB
   @setup_done = false
 
   extend Module.new {
-    def parse_opts
-    end
+    def parse_opts; end
 
     def start_within(binding)
       unless @setup_done

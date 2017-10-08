@@ -49,8 +49,10 @@ module Homebrew
       if fetch_bottle?(f)
         begin
           fetch_formula(f.bottle)
-        rescue Exception => e
-          raise if ARGV.homebrew_developer? || e.is_a?(Interrupt)
+        rescue Interrupt
+          raise
+        rescue => e
+          raise if ARGV.homebrew_developer?
           fetched_bottle = false
           onoe e.message
           opoo "Bottle fetch failed: fetching the source."

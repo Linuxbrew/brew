@@ -146,7 +146,7 @@ rescue MethodDeprecatedError => e
     $stderr.puts "  #{Formatter.url(e.issues_url)}"
   end
   exit 1
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   onoe e
   if internal_cmd && defined?(OS::ISSUES_URL) &&
      !ENV["HOMEBREW_NO_AUTO_UPDATE"]

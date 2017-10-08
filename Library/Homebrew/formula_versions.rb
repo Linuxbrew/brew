@@ -44,7 +44,7 @@ class FormulaVersions
     # continue walking the history
     ohai "#{e} in #{name} at revision #{rev}", e.backtrace if ARGV.debug?
   rescue FormulaUnavailableError
-    # Suppress this error
+    return
   ensure
     Homebrew.raise_deprecation_exceptions = false
   end
