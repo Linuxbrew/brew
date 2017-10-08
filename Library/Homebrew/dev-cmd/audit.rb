@@ -967,12 +967,12 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
-    if line =~ /(assert File\.exist\?|File\.exist\?)/
+    if line =~ /(assert File\.exist\?|assert \(.*\)\.exist\?)/
       problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
     end
 
-    if line =~ /(assert !File\.exist\?|!File\.exist\?)/
-      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
+    if line =~ /assert !File\.exist\?/
+      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?`"
     end
 
     return unless @strict
