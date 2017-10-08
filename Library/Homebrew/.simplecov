@@ -28,13 +28,13 @@ SimpleCov.start do
     end
   else
     command_name "#{command_name} (#{$PROCESS_ID})"
-    # Not using this during integration tests makes the tests 4x times faster
-    # without changing the coverage.
 
     subdirs = Dir.chdir(SimpleCov.root) { Dir.glob("*") }
                  .reject { |d| d.end_with?(".rb") || ["test", "vendor"].include?(d) }
                  .map { |d| "#{d}/**/*.rb" }.join(",")
 
+    # Not using this during integration tests makes the tests 4x times faster
+    # without changing the coverage.
     track_files "#{SimpleCov.root}/{#{subdirs},*.rb}"
   end
 
