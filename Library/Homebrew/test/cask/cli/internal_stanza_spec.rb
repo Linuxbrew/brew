@@ -25,4 +25,11 @@ describe Hbc::CLI::InternalStanza, :cask do
       command.run
     end.to raise_error(/no such stanza/)
   end
+
+  it "shows all artifact stanzas when using 'artifacts' keyword" do
+    command = described_class.new("artifacts", "with-gpg")
+    expect do
+      command.run
+    end.to output("{:app=>[[\"Caffeine.app\"]]}\n").to_stdout
+  end
 end
