@@ -3,6 +3,18 @@ module Hbc
     class FromContentLoader
       attr_reader :content
 
+      def self.can_load?(ref)
+        return false unless ref.respond_to?(:to_str)
+        content = ref.to_str
+
+        token  = /(?:"[^"]*"|'[^']*')/
+        curly  = /\(\s*#{token}\s*\)\s*\{.*\}/
+        do_end = /\s+#{token}\s+do(?:\s*;\s*|\s+).*end/
+        regex  = /\A\s*cask(?:#{curly.source}|#{do_end.source})\s*\Z/m
+
+        content.match?(regex)
+      end
+
       def initialize(content)
         @content = content
       end
@@ -56,7 +68,8 @@ module Hbc
 
     class FromURILoader < FromPathLoader
       def self.can_load?(ref)
-        ref.to_s.match?(::URI::DEFAULT_PARSER.make_regexp)
+        uri_regex = ::URI::DEFAULT_PARSER.make_regexp
+        ref.to_s.match?(Regexp.new('\A' + uri_regex.source + '\Z', uri_regex.options))
       end
 
       attr_reader :url
@@ -156,15 +169,9 @@ module Hbc
     end
 
     def self.for(ref)
-      if ref.respond_to?(:to_str)
-        content = ref.to_str
-        if content.match?(/\A\s*cask\s+(?:"[^"]*"|'[^']*')\s+do(?:\s+.*\s+|;?\s+)end\s*\Z/)
-          return FromContentLoader.new(content)
-        end
-      end
-
       [
         FromInstanceLoader,
+        FromContentLoader,
         FromURILoader,
         FromTapLoader,
         FromTapPathLoader,
