@@ -978,6 +978,10 @@ class FormulaAuditor
       problem "Use `refute_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
     end
 
+    if line =~ /(assert File\.executable\?|assert \(.*\)\.executable\?)/
+      problem "Use `assert_predicate <path_to_file>, :executable?` instead of `#{Regexp.last_match(1)}`"
+    end
+
     return unless @strict
 
     problem "`#{Regexp.last_match(1)}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
