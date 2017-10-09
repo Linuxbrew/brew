@@ -18,8 +18,14 @@ module RuboCop
             return
           end
 
-          # Check if a formula's desc is too long
+          # Check the formula's desc length. Should be >0 and <80 characters.
           desc = parameters(desc_call).first
+          pure_desc_length = string_content(desc).length
+          if pure_desc_length.zero?
+            problem "The desc (description) should not be an empty string."
+            return
+          end
+
           desc_length = "#{@formula_name}: #{string_content(desc)}".length
           max_desc_length = 80
           return if desc_length <= max_desc_length
