@@ -121,6 +121,7 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, "ENV", :universal_binary) do
+            next if @formula_name == "wine"
             problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
           end
 
