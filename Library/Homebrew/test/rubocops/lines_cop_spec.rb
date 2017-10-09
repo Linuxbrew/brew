@@ -419,7 +419,22 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
-    it "with ENV.universal_binary" do
+    it "with ENV.universal_binary exempted formula" do
+      source = <<-EOS.undent
+        class Wine < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build?
+             ENV.universal_binary
+          end
+        end
+      EOS
+
+      inspect_source(source, "/homebrew-core/Formula/wine.rb")
+      expect(cop.offenses).to eq([])
+    end
+
+    it "with ENV.x11" do
       source = <<-EOS.undent
         class Foo < Formula
           desc "foo"
