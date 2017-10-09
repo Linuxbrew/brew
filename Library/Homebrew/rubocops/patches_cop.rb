@@ -25,13 +25,26 @@ module RuboCop
 
         def patch_problems(patch)
           patch_url = string_content(patch)
+          gh_patch_param_pattern = %r{https?://github\.com/.+/.+/(?:commit|pull)/[a-fA-F0-9]*.(?:patch|diff)}
+          if regex_match_group(patch, gh_patch_param_pattern)
+            if patch_url !~ /\?full_index=\w+$/
+              problem <<-EOS.undent
+                GitHub patches should use the full_index parameter:
+                  #{patch_url}?full_index=1
+              EOS
+            end
+          end
+
           gh_patch_patterns = Regexp.union([%r{/raw\.github\.com/},
                                             %r{gist\.github\.com/raw},
                                             %r{gist\.github\.com/.+/raw},
                                             %r{gist\.githubusercontent\.com/.+/raw}])
           if regex_match_group(patch, gh_patch_patterns)
-            unless patch_url =~ /[a-fA-F0-9]{40}/
-              problem "GitHub/Gist patches should specify a revision:\n#{patch_url}"
+            if patch_url !~ /[a-fA-F0-9]{40}/
+              problem <<-EOS.undent.chomp
+                GitHub/Gist patches should specify a revision:
+                #{patch_url}
+              EOS
             end
           end
 
@@ -46,15 +59,24 @@ module RuboCop
           end
 
           if regex_match_group(patch, %r{macports/trunk})
-            problem "MacPorts patches should specify a revision instead of trunk:\n#{patch_url}"
+            problem <<-EOS.undent.chomp
+              MacPorts patches should specify a revision instead of trunk:
+              #{patch_url}
+            EOS
           end
 
           if regex_match_group(patch, %r{^http://trac\.macports\.org})
-            problem "Patches from MacPorts Trac should be https://, not http:\n#{patch_url}"
+            problem <<-EOS.undent.chomp
+              Patches from MacPorts Trac should be https://, not http:
+              #{patch_url}
+            EOS
           end
 
           return unless regex_match_group(patch, %r{^http://bugs\.debian\.org})
-          problem "Patches from Debian should be https://, not http:\n#{patch_url}"
+          problem <<-EOS.undent.chomp
+            Patches from Debian should be https://, not http:
+            #{patch_url}
+          EOS
         end
       end
     end

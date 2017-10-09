@@ -563,10 +563,10 @@ _brew() {
 
   if [[ "$i" -eq "$COMP_CWORD" ]]
   then
-    # Do not auto-complete "instal" abbreviation for "install" command.
+    # Do not auto-complete "*instal" or "*uninstal" aliases for "*install" commands.
     # Prefix newline to prevent not checking the first command.
-    local cmds=$'\n'"$(brew commands --quiet --include-aliases)"
-    __brewcomp "${cmds/$'\n'instal$'\n'/$'\n'}"
+    local cmds=$'\n'"$(brew commands --quiet --include-aliases | grep -v instal$)"
+    __brewcomp "${cmds}"
     return
   fi
 

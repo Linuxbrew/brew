@@ -1613,6 +1613,7 @@ class Formula
   def run_test
     @prefix_returns_versioned_prefix = true
     old_home = ENV["HOME"]
+    old_java_opts = ENV["_JAVA_OPTIONS"]
     old_curl_home = ENV["CURL_HOME"]
     old_tmpdir = ENV["TMPDIR"]
     old_temp = ENV["TEMP"]
@@ -1626,6 +1627,7 @@ class Formula
     ENV["TERM"] = "dumb"
     ENV["PATH"] = PATH.new(old_path).append(HOMEBREW_PREFIX/"bin")
     ENV["HOMEBREW_PATH"] = nil
+    ENV["_JAVA_OPTIONS"] = "#{old_java_opts} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
 
     ENV.clear_sensitive_environment!
 
@@ -1646,6 +1648,7 @@ class Formula
   ensure
     @testpath = nil
     ENV["HOME"] = old_home
+    ENV["_JAVA_OPTIONS"] = old_java_opts
     ENV["CURL_HOME"] = old_curl_home
     ENV["TMPDIR"] = old_tmpdir
     ENV["TEMP"] = old_temp
@@ -1888,11 +1891,13 @@ class Formula
       mkdir_p env_home
 
       old_home = ENV["HOME"]
+      old_java_opts = ENV["_JAVA_OPTIONS"]
       old_curl_home = ENV["CURL_HOME"]
       old_path = ENV["HOMEBREW_PATH"]
 
       unless ARGV.interactive?
         ENV["HOME"] = env_home
+        ENV["_JAVA_OPTIONS"] = "#{old_java_opts} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
         ENV["CURL_HOME"] = old_curl_home || old_home
       end
       ENV["HOMEBREW_PATH"] = nil
@@ -1907,6 +1912,7 @@ class Formula
         @buildpath = nil
         unless ARGV.interactive?
           ENV["HOME"] = old_home
+          ENV["_JAVA_OPTIONS"] = old_java_opts
           ENV["CURL_HOME"] = old_curl_home
         end
         ENV["HOMEBREW_PATH"] = old_path
