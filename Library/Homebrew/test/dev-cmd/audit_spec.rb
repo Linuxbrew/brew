@@ -217,6 +217,74 @@ describe FormulaAuditor do
     end
   end
 
+  describe "#audit_deps" do
+    describe "a dependency on a macOS-provided keg-only formula" do
+      describe "which is whitelisted" do
+        let(:fa) do
+          formula_auditor "foo", <<-EOS.undent, new_formula: true
+            class Foo < Formula
+              url "http://example.com/foo-1.0.tgz"
+              homepage "http://example.com"
+
+              depends_on "openssl"
+            end
+          EOS
+        end
+
+        let(:f_openssl) do
+          formula do
+            url "http://example.com/openssl-1.0.tgz"
+            homepage "http://example.com"
+
+            keg_only :provided_by_macos
+          end
+        end
+
+        before do
+          allow(fa.formula.deps.first)
+            .to receive(:to_formula).and_return(f_openssl)
+          fa.audit_deps
+        end
+
+        subject { fa }
+
+        its(:problems) { are_expected.to be_empty }
+      end
+
+      describe "which is not whitelisted" do
+        let(:fa) do
+          formula_auditor "foo", <<-EOS.undent, new_formula: true
+            class Foo < Formula
+              url "http://example.com/foo-1.0.tgz"
+              homepage "http://example.com"
+
+              depends_on "bc"
+            end
+          EOS
+        end
+
+        let(:f_bc) do
+          formula do
+            url "http://example.com/bc-1.0.tgz"
+            homepage "http://example.com"
+
+            keg_only :provided_by_macos
+          end
+        end
+
+        before do
+          allow(fa.formula.deps.first)
+            .to receive(:to_formula).and_return(f_bc)
+          fa.audit_deps
+        end
+
+        subject { fa }
+
+        its(:problems) { are_expected.to match([/unnecessary/]) }
+      end
+    end
+  end
+
   describe "#audit_keg_only_style" do
     specify "keg_only_needs_downcasing" do
       fa = formula_auditor "foo", <<-EOS.undent, strict: true
