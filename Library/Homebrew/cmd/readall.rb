@@ -31,7 +31,7 @@ module Homebrew
     taps = if ARGV.named.empty?
       Tap
     else
-      [Tap.fetch(ARGV.named.first)]
+      ARGV.named.map { |t| Tap.fetch(t) }
     end
     taps.each do |tap|
       Homebrew.failed = true unless Readall.valid_tap?(tap, options)
