@@ -770,7 +770,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Additionally, the date used in new manpages will match those in the existing
     manpages (to allow comparison without factoring in the date).
 
-  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] `patch-source` [`patch-source`]:
+  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=``bintray-org`] [`--test-bot-user=``test-bot-user`] `patch-source` [`patch-source`]:
 
     Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
     Optionally, installs the formulae changed by the patch.
@@ -813,6 +813,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--warn-on-publish-failure` was passed, do not exit if there's a
     failure publishing bottles on Bintray.
+
+    If `--bintray-org=``bintray-org` is passed, publish at the given Bintray
+    organisation.
+
+    If `--test-bot-user=``test-bot-user` is passed, pull the bottle block
+    commit from the specified user on GitHub.
 
   * `release-notes` [`--markdown`] [`previous_tag`] [`end_ref`]:
     Output the merged pull requests on Homebrew/brew between two Git refs.
