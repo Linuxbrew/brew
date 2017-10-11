@@ -13,16 +13,8 @@ module Homebrew
 
   def readall
     if ARGV.include?("--syntax")
-      ruby_files = []
-      scan_files = %W[
-        #{HOMEBREW_LIBRARY}/*.rb
-        #{HOMEBREW_LIBRARY}/Homebrew/**/*.rb
-      ]
-      Dir.glob(scan_files).each do |rb|
-        next if rb.include?("/vendor/")
-        next if rb.include?("/cask/")
-        ruby_files << rb
-      end
+      scan_files = "#{HOMEBREW_LIBRARY}/Homebrew/**/*.rb"
+      ruby_files = Dir.glob(scan_files).reject{|file| file =~ /vendor|cask/ }
 
       Homebrew.failed = true unless Readall.valid_ruby_syntax?(ruby_files)
     end
