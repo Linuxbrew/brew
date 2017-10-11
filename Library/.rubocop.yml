@@ -94,6 +94,9 @@ Performance/Caller:
 Style/Alias:
   EnforcedStyle: prefer_alias
 
+Style/AsciiComments:
+  Enabled: false
+
 Style/AutoResourceCleanup:
   Enabled: true
 
