@@ -1,7 +1,11 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Home, :cask do
   before do
     allow(described_class).to receive(:open_url)
   end
+
+  it_behaves_like "a command that handles invalid options"
 
   it "opens the homepage for the specified Cask" do
     expect(described_class).to receive(:open_url).with("http://example.com/local-caffeine")

@@ -1,6 +1,8 @@
 require "set"
 require "locale"
 
+require "hbc/artifact"
+
 require "hbc/dsl/appcast"
 require "hbc/dsl/base"
 require "hbc/dsl/caveats"
@@ -8,7 +10,6 @@ require "hbc/dsl/conflicts_with"
 require "hbc/dsl/container"
 require "hbc/dsl/depends_on"
 require "hbc/dsl/gpg"
-require "hbc/dsl/installer"
 require "hbc/dsl/postflight"
 require "hbc/dsl/preflight"
 require "hbc/dsl/stanza_proxy"
@@ -18,39 +19,35 @@ require "hbc/dsl/version"
 
 module Hbc
   class DSL
-    ORDINARY_ARTIFACT_TYPES = [
-      :app,
-      :artifact,
-      :audio_unit_plugin,
-      :binary,
-      :colorpicker,
-      :dictionary,
-      :font,
-      :input_method,
-      :internet_plugin,
-      :pkg,
-      :prefpane,
-      :qlplugin,
-      :screen_saver,
-      :service,
-      :stage_only,
-      :suite,
-      :vst_plugin,
-      :vst3_plugin,
+    ORDINARY_ARTIFACT_CLASSES = [
+      Artifact::Installer,
+      Artifact::App,
+      Artifact::Artifact,
+      Artifact::AudioUnitPlugin,
+      Artifact::Binary,
+      Artifact::Colorpicker,
+      Artifact::Dictionary,
+      Artifact::Font,
+      Artifact::InputMethod,
+      Artifact::InternetPlugin,
+      Artifact::Pkg,
+      Artifact::Prefpane,
+      Artifact::Qlplugin,
+      Artifact::ScreenSaver,
+      Artifact::Service,
+      Artifact::StageOnly,
+      Artifact::Suite,
+      Artifact::VstPlugin,
+      Artifact::Vst3Plugin,
+      Artifact::Uninstall,
+      Artifact::Zap,
     ].freeze
 
-    ACTIVATABLE_ARTIFACT_TYPES = ([:installer, *ORDINARY_ARTIFACT_TYPES] - [:stage_only]).freeze
+    ACTIVATABLE_ARTIFACT_CLASSES = ORDINARY_ARTIFACT_CLASSES - [Artifact::StageOnly]
 
-    SPECIAL_ARTIFACT_TYPES = [
-      :uninstall,
-      :zap,
-    ].freeze
-
-    ARTIFACT_BLOCK_TYPES = [
-      :preflight,
-      :postflight,
-      :uninstall_preflight,
-      :uninstall_postflight,
+    ARTIFACT_BLOCK_CLASSES = [
+      Artifact::PreflightBlock,
+      Artifact::PostflightBlock,
     ].freeze
 
     DSL_METHODS = Set.new [
@@ -66,21 +63,23 @@ module Hbc
       :gpg,
       :homepage,
       :language,
+      :languages,
       :name,
       :sha256,
       :staged_path,
       :url,
       :version,
       :appdir,
-      *ORDINARY_ARTIFACT_TYPES,
-      *ACTIVATABLE_ARTIFACT_TYPES,
-      *SPECIAL_ARTIFACT_TYPES,
-      *ARTIFACT_BLOCK_TYPES,
+      *ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key),
+      *ACTIVATABLE_ARTIFACT_CLASSES.map(&:dsl_key),
+      *ARTIFACT_BLOCK_CLASSES.flat_map { |klass| [klass.dsl_key, klass.uninstall_dsl_key] },
     ].freeze
 
-    attr_reader :token
-    def initialize(token)
-      @token = token
+    attr_reader :cask, :token
+
+    def initialize(cask)
+      @cask = cask
+      @token = cask.token
     end
 
     def name(*args)
@@ -93,12 +92,14 @@ module Hbc
       return instance_variable_get("@#{stanza}") if should_return
 
       if instance_variable_defined?("@#{stanza}")
-        raise CaskInvalidError.new(token, "'#{stanza}' stanza may only appear once")
+        raise CaskInvalidError.new(cask, "'#{stanza}' stanza may only appear once.")
       end
 
       instance_variable_set("@#{stanza}", yield)
+    rescue CaskInvalidError
+      raise
     rescue StandardError => e
-      raise CaskInvalidError.new(token, "'#{stanza}' stanza failed with: #{e}")
+      raise CaskInvalidError.new(cask, "'#{stanza}' stanza failed with: #{e}")
     end
 
     def homepage(homepage = nil)
@@ -106,19 +107,21 @@ module Hbc
     end
 
     def language(*args, default: false, &block)
-      if !args.empty? && block_given?
+      if args.empty?
+        language_eval
+      elsif block_given?
         @language_blocks ||= {}
         @language_blocks[args] = block
 
         return unless default
 
         unless @language_blocks.default.nil?
-          raise CaskInvalidError.new(token, "Only one default language may be defined")
+          raise CaskInvalidError.new(cask, "Only one default language may be defined.")
         end
 
         @language_blocks.default = block
       else
-        language_eval
+        raise CaskInvalidError.new(cask, "No block given to language stanza.")
       end
     end
 
@@ -126,6 +129,10 @@ module Hbc
       return @language if instance_variable_defined?(:@language)
 
       return @language = nil if @language_blocks.nil? || @language_blocks.empty?
+
+      if @language_blocks.default.nil?
+        raise CaskInvalidError.new(cask, "No default language specified.")
+      end
 
       MacOS.languages.map(&Locale.method(:parse)).each do |locale|
         key = @language_blocks.keys.detect do |strings|
@@ -138,6 +145,12 @@ module Hbc
       end
 
       @language = @language_blocks.default.call
+    end
+
+    def languages
+      return [] if @language_blocks.nil?
+
+      @language_blocks.keys.flatten
     end
 
     def url(*args, &block)
@@ -162,8 +175,8 @@ module Hbc
         begin
           DSL::Container.new(*args).tap do |container|
             # TODO: remove this backward-compatibility section after removing nested_container
-            if container && container.nested
-              artifacts[:nested_container] << container.nested
+            if container&.nested
+              artifacts.add(Artifact::NestedContainer.new(cask, container.nested))
             end
           end
         end
@@ -173,7 +186,7 @@ module Hbc
     def version(arg = nil)
       set_unique_stanza(:version, arg.nil?) do
         if !arg.is_a?(String) && arg != :latest
-          raise CaskInvalidError.new(token, "invalid 'version' value: '#{arg.inspect}'")
+          raise CaskInvalidError.new(cask, "invalid 'version' value: '#{arg.inspect}'")
         end
         DSL::Version.new(arg)
       end
@@ -182,7 +195,7 @@ module Hbc
     def sha256(arg = nil)
       set_unique_stanza(:sha256, arg.nil?) do
         if !arg.is_a?(String) && arg != :no_check
-          raise CaskInvalidError.new(token, "invalid 'sha256' value: '#{arg.inspect}'")
+          raise CaskInvalidError.new(cask, "invalid 'sha256' value: '#{arg.inspect}'")
         end
         arg
       end
@@ -195,7 +208,7 @@ module Hbc
       begin
         @depends_on.load(*args)
       rescue RuntimeError => e
-        raise CaskInvalidError.new(token, e)
+        raise CaskInvalidError.new(cask, e)
       end
       @depends_on
     end
@@ -206,7 +219,7 @@ module Hbc
     end
 
     def artifacts
-      @artifacts ||= Hash.new { |hash, key| hash[key] = Set.new }
+      @artifacts ||= SortedSet.new
     end
 
     def caskroom_path
@@ -237,39 +250,27 @@ module Hbc
       set_unique_stanza(:auto_updates, auto_updates.nil?) { auto_updates }
     end
 
-    ORDINARY_ARTIFACT_TYPES.each do |type|
-      define_method(type) do |*args|
-        if type == :stage_only
-          if args != [true]
-            raise CaskInvalidError.new(token, "'stage_only' takes a single argument: true")
+    ORDINARY_ARTIFACT_CLASSES.each do |klass|
+      define_method(klass.dsl_key) do |*args|
+        begin
+          if [*artifacts.map(&:class), klass].include?(Artifact::StageOnly) && (artifacts.map(&:class) & ACTIVATABLE_ARTIFACT_CLASSES).any?
+            raise CaskInvalidError.new(cask, "'stage_only' must be the only activatable artifact.")
           end
 
-          unless (artifacts.keys & ACTIVATABLE_ARTIFACT_TYPES).empty?
-            raise CaskInvalidError.new(token, "'stage_only' must be the only activatable artifact")
-          end
+          artifacts.add(klass.from_args(cask, *args))
+        rescue CaskInvalidError
+          raise
+        rescue StandardError => e
+          raise CaskInvalidError.new(cask, "invalid '#{klass.dsl_key}' stanza: #{e}")
         end
-
-        artifacts[type].add(args)
       end
     end
 
-    def installer(*args)
-      return artifacts[:installer] if args.empty?
-      artifacts[:installer] << DSL::Installer.new(*args)
-      raise "'stage_only' must be the only activatable artifact" if artifacts.key?(:stage_only)
-    rescue StandardError => e
-      raise CaskInvalidError.new(token, e)
-    end
-
-    SPECIAL_ARTIFACT_TYPES.each do |type|
-      define_method(type) do |*args|
-        artifacts[type].merge(args)
-      end
-    end
-
-    ARTIFACT_BLOCK_TYPES.each do |type|
-      define_method(type) do |&block|
-        artifacts[type] << block
+    ARTIFACT_BLOCK_CLASSES.each do |klass|
+      [klass.dsl_key, klass.uninstall_dsl_key].each do |dsl_key|
+        define_method(dsl_key) do |&block|
+          artifacts.add(klass.new(cask, dsl_key => block))
+        end
       end
     end
 

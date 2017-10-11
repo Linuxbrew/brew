@@ -14,11 +14,11 @@ module Hbc
 
       def initialize(signature, parameters = {})
         @parameters = parameters
-        @signature = UnderscoreSupportingURI.parse(signature)
+        @signature = URI(signature)
         parameters.each do |hkey, hvalue|
           raise "invalid 'gpg' parameter: '#{hkey.inspect}'" unless VALID_PARAMETERS.include?(hkey)
           writer_method = "#{hkey}=".to_sym
-          hvalue = UnderscoreSupportingURI.parse(hvalue) if hkey == :key_url
+          hvalue = URI(hvalue) if hkey == :key_url
           valid_id?(hvalue) if hkey == :key_id
           send(writer_method, hvalue)
         end
@@ -35,7 +35,7 @@ module Hbc
       end
 
       def to_yaml
-        # bug, :key_url value is not represented as an instance of Hbc::UnderscoreSupportingURI
+        # bug, :key_url value is not represented as an instance of URI
         [@signature, @parameters].to_yaml
       end
 

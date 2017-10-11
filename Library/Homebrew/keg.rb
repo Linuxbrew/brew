@@ -253,6 +253,11 @@ class Keg
       FileUtils.rm_rf bad_tap_opt if bad_tap_opt.directory?
     end
 
+    aliases.each do |a|
+      alias_symlink = opt/a
+      alias_symlink.delete if alias_symlink.symlink? || alias_symlink.exist?
+    end
+
     Pathname.glob("#{opt_record}@*").each do |a|
       a = a.basename
       next if aliases.include?(a)
@@ -333,7 +338,7 @@ class Keg
       dir if dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
     when :fish then path/"share/fish/vendor_completions.d"
     end
-    dir && dir.directory? && !dir.children.empty?
+    dir&.directory? && !dir.children.empty?
   end
 
   def functions_installed?(shell)

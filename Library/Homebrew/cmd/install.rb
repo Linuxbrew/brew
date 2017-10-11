@@ -219,6 +219,7 @@ module Homebrew
         end
       end
 
+      return if formulae.empty?
       perform_preinstall_checks
 
       formulae.each do |f|
@@ -338,6 +339,7 @@ module Homebrew
   rescue FormulaInstallationAlreadyAttemptedError
     # We already attempted to install f as part of the dependency tree of
     # another formula. In that case, don't generate an error, just move on.
+    return
   rescue CannotInstallFormulaError => e
     ofail e.message
   end

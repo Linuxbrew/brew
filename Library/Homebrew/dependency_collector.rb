@@ -4,6 +4,7 @@ require "ld64_dependency"
 require "requirement"
 require "requirements"
 require "set"
+require "extend/cachable"
 
 ## A dependency is a formula that another formula needs to install.
 ## A requirement is something other than a formula that another formula
@@ -16,16 +17,12 @@ require "set"
 # This class is used by `depends_on` in the formula DSL to turn dependency
 # specifications into the proper kinds of dependencies and requirements.
 class DependencyCollector
+  extend Cachable
+
   # Define the languages that we can handle as external dependencies.
   LANGUAGE_MODULES = Set[
     :lua, :lua51, :perl, :python, :python3, :ruby
   ].freeze
-
-  CACHE = {}
-
-  def self.clear_cache
-    CACHE.clear
-  end
 
   attr_reader :deps, :requirements
 
@@ -45,7 +42,7 @@ class DependencyCollector
   end
 
   def fetch(spec)
-    CACHE.fetch(cache_key(spec)) { |key| CACHE[key] = build(spec) }
+    self.class.cache.fetch(cache_key(spec)) { |key| self.class.cache[key] = build(spec) }
   end
 
   def cache_key(spec)

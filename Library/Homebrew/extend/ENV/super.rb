@@ -24,8 +24,7 @@ module Superenv
   end
 
   # @private
-  def self.bin
-  end
+  def self.bin; end
 
   def reset
     super
@@ -138,7 +137,6 @@ module Superenv
 
   def determine_pkg_config_libdir
     PATH.new(
-      "/usr/lib/pkgconfig",
       homebrew_extra_pkg_config_paths,
     ).existing
   end
@@ -325,11 +323,9 @@ module Superenv
     end
   end
 
-  def set_x11_env_if_installed
-  end
+  def set_x11_env_if_installed; end
 
-  def set_cpu_flags(*)
-  end
+  def set_cpu_flags(_, _ = "", _ = {}); end
 end
 
 require "extend/os/extend/ENV/super"

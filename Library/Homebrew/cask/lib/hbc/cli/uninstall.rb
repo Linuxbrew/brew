@@ -9,10 +9,6 @@ module Hbc
       end
 
       def run
-        raise CaskError, "Uninstall incomplete." if uninstall_casks == :incomplete
-      end
-
-      def uninstall_casks
         casks.each do |cask|
           odebug "Uninstalling Cask #{cask}"
 
@@ -20,7 +16,7 @@ module Hbc
 
           if cask.installed? && !cask.installed_caskfile.nil?
             # use the same cask file that was used for installation, if possible
-            cask = CaskLoader.load_from_file(cask.installed_caskfile) if cask.installed_caskfile.exist?
+            cask = CaskLoader.load(cask.installed_caskfile) if cask.installed_caskfile.exist?
           end
 
           Installer.new(cask, binaries: binaries?, verbose: verbose?, force: force?).uninstall

@@ -49,7 +49,7 @@ module Hbc
         end
       end
 
-      DIVIDERS.keys.each do |divider|
+      DIVIDERS.each_key do |divider|
         define_divider_methods(divider)
       end
 

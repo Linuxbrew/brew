@@ -51,7 +51,7 @@ class Dependency
   end
 
   def modify_build_environment
-    env_proc.call unless env_proc.nil?
+    env_proc&.call
   end
 
   def inspect
@@ -64,7 +64,7 @@ class Dependency
   end
 
   def self._load(marshaled)
-    new(*Marshal.load(marshaled))
+    new(*Marshal.load(marshaled)) # rubocop:disable Security/MarshalLoad
   end
 
   class << self

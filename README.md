@@ -22,7 +22,7 @@ Second, read the [Troubleshooting Checklist](https://docs.brew.sh/Troubleshootin
 [![Travis](https://img.shields.io/travis/Homebrew/brew.svg)](https://travis-ci.org/Homebrew/brew)
 [![Codecov](https://img.shields.io/codecov/c/github/Homebrew/brew.svg)](https://codecov.io/gh/Homebrew/brew)
 
-We'd love you to contribute to Homebrew. First, please read our [Contribution Guide](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md) and [Code of Conduct](https://github.com/Homebrew/brew/blob/master/CODEOFCONDUCT.md#code-of-conduct).
+We'd love you to contribute to Homebrew. First, please read our [Contribution Guide](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md) and [Code of Conduct](https://github.com/Homebrew/brew/blob/master/CODE_OF_CONDUCT.md#code-of-conduct).
 
 We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
 
@@ -64,6 +64,10 @@ Our Xserve ESXi boxes for CI are hosted by [MacStadium](https://www.macstadium.c
 Our Jenkins CI installation is hosted by [DigitalOcean](https://m.do.co/c/7e39c35d5581).
 
 ![DigitalOcean](https://cloud.githubusercontent.com/assets/125011/26827038/4b7b5ade-4ab3-11e7-811b-fed3ab0e934d.png)
+
+Our physical hardware is hosted by [Commsworld](https://www.commsworld.com).
+
+![Commsworld powered by Fluency](https://user-images.githubusercontent.com/125011/30822845-1716bc2c-a222-11e7-843e-ea7c7b6a1503.png)
 
 Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/homebrew).
 

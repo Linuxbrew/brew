@@ -65,8 +65,6 @@ module Homebrew
           args << "--devel"
         end
 
-        Sandbox.print_sandbox_message if Sandbox.test?
-
         Utils.safe_fork do
           if Sandbox.test?
             sandbox = Sandbox.new
@@ -86,7 +84,7 @@ module Homebrew
       rescue ::Test::Unit::AssertionFailedError => e
         ofail "#{f.full_name}: failed"
         puts e.message
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         ofail "#{f.full_name}: failed"
         puts e, e.backtrace
       ensure

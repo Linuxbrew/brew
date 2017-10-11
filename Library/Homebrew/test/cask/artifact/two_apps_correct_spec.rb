@@ -1,9 +1,13 @@
 describe Hbc::Artifact::App, :cask do
   describe "multiple apps" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-two-apps-correct.rb") }
+    let(:cask) { Hbc::CaskLoader.load(cask_path("with-two-apps-correct")) }
 
     let(:install_phase) {
-      -> { Hbc::Artifact::App.new(cask).install_phase }
+      lambda do
+        cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
+          artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        end
+      end
     }
 
     let(:source_path_mini) { cask.staged_path.join("Caffeine Mini.app") }
@@ -27,7 +31,7 @@ describe Hbc::Artifact::App, :cask do
     end
 
     describe "when apps are in a subdirectory" do
-      let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-two-apps-subdir.rb") }
+      let(:cask) { Hbc::CaskLoader.load(cask_path("with-two-apps-subdir")) }
 
       it "installs both apps using the proper target directory" do
         install_phase.call

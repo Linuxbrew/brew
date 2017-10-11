@@ -5,8 +5,12 @@ end
 std_trap = trap("INT") { exit! 130 } # no backtrace thanks
 
 # check ruby version before requiring any modules.
-RUBY_TWO = RUBY_VERSION.split(".").first.to_i >= 2
-raise "Homebrew must be run under Ruby 2!" unless RUBY_TWO
+RUBY_VERSION_SPLIT = RUBY_VERSION.split "."
+RUBY_X = RUBY_VERSION_SPLIT[0].to_i
+RUBY_Y = RUBY_VERSION_SPLIT[1].to_i
+if RUBY_X < 2 || (RUBY_X == 2 && RUBY_Y < 3)
+  raise "Homebrew must be run under Ruby 2.3!"
+end
 
 require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
@@ -105,18 +109,16 @@ begin
     possible_tap = OFFICIAL_CMD_TAPS.find { |_, cmds| cmds.include?(cmd) }
     possible_tap = Tap.fetch(possible_tap.first) if possible_tap
 
-    if possible_tap && !possible_tap.installed?
-      brew_uid = HOMEBREW_BREW_FILE.stat.uid
-      tap_commands = []
-      if Process.uid.zero? && !brew_uid.zero?
-        tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
-      end
-      tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
-      safe_system(*tap_commands)
-      exec HOMEBREW_BREW_FILE, cmd, *ARGV
-    else
-      odie "Unknown command: #{cmd}"
+    odie "Unknown command: #{cmd}" if !possible_tap || possible_tap.installed?
+
+    brew_uid = HOMEBREW_BREW_FILE.stat.uid
+    tap_commands = []
+    if Process.uid.zero? && !brew_uid.zero?
+      tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
     end
+    tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
+    safe_system(*tap_commands)
+    exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
 rescue UsageError => e
   require "cmd/help"
@@ -144,7 +146,7 @@ rescue MethodDeprecatedError => e
     $stderr.puts "  #{Formatter.url(e.issues_url)}"
   end
   exit 1
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   onoe e
   if internal_cmd && defined?(OS::ISSUES_URL) &&
      !ENV["HOMEBREW_NO_AUTO_UPDATE"]

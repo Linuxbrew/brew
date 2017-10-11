@@ -284,8 +284,8 @@ _brew_create() {
     ':url:_urls'
 }
 
-# brew deps [--1] [-n] [--union] [--full-name] [--installed] [--include-build] [--include-optional] [--skip-recommended] formulae
-# brew deps --tree [filters] (formulae|--installed)
+# brew deps [--1] [-n] [--union] [--full-name] [--installed] [--include-build] [--include-optional] [--skip-recommended] [--include-requirements] formulae
+# brew deps --tree [--1] [filters] (formulae|--installed)
 # brew deps [filters] (--installed|--all)
 # The filters placeholder is any combination of options --include-build, --include-optional, and --skip-recommended as documented above.
 _brew_deps() {
@@ -294,6 +294,7 @@ _brew_deps() {
       '--include-build[include \:build dependencies]' \
       '--include-optional[include \:optional dependencies]' \
       '--skip-recommended[skip \:recommended type dependencies]' \
+      '--include-requirements[include requirements]' \
       '--1[only show dependencies one level down, instead of recursing]' \
       '-n[show dependencies in topological order]' \
       '--union[show the union of dependencies for formulae, instead of the intersection]' \
@@ -303,6 +304,11 @@ _brew_deps() {
     - tree-deps \
       '--tree[show dependencies as a tree]' \
       '(*)--installed[show dependencies for all installed formulae]' \
+      '--include-build[include \:build dependencies]' \
+      '--include-optional[include \:optional dependencies]' \
+      '--skip-recommended[skip \:recommended type dependencies]' \
+      '--include-requirements[include requirements]' \
+      '--1[only show dependencies one level down, instead of recursing]' \
       '(--installed)*:formulae:__brew_formulae' \
     - installed-all \
       '--include-build[include \:build dependencies]' \
@@ -586,8 +592,14 @@ _brew_style() {
 
 # brew switch name version:
 _brew_switch() {
-  _message "name version"
-  return 1
+  local -a versions
+  if [[ -n ${words[2]} ]]; then
+    versions=(${$(brew ls "${words[2]}" --versions)#${words[2]}})
+  fi
+  _arguments -S \
+    '1::formula:__brew_formulae' \
+    "2:: :(${versions[*]})" \
+    && ret=0
 }
 
 # brew tap:

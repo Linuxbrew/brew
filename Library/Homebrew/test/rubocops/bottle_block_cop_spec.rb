@@ -24,7 +24,7 @@ describe RuboCop::Cop::FormulaAuditStrict::BottleBlock do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -60,7 +60,7 @@ describe RuboCop::Cop::FormulaAuditStrict::BottleBlock do
         end
       EOS
 
-      new_source = autocorrect_source(cop, source)
+      new_source = autocorrect_source(source)
       expect(new_source).to eq(corrected_source)
     end
   end

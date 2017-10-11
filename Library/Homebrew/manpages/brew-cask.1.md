@@ -1,5 +1,5 @@
 brew-cask(1) - a friendly binary installer for macOS
-========================================================
+====================================================
 
 ## SYNOPSIS
 
@@ -19,7 +19,7 @@ names, and other aspects of this manual are still subject to change.
 
 ## FREQUENTLY USED COMMANDS
 
-  * `install` [--force] [--skip-cask-deps] [--require-sha] <token> [ <token> ... ]:
+  * `install` [--force] [--skip-cask-deps] [--require-sha] [--language=<iso-language>[,<iso-language> ... ]] <token> [ <token> ... ]:
     Install Cask identified by <token>.
 
   * `uninstall` [--force] <token> [ <token> ... ]:
@@ -34,7 +34,7 @@ names, and other aspects of this manual are still subject to change.
 
 ## COMMANDS
 
-  * `audit` [ <token> ... ]:
+  * `audit` [--language=<iso-language>[,<iso-language> ... ]] [ <token> ... ]:
     Check the given Casks for installability.
     If no tokens are given on the command line, all Casks are audited.
 
@@ -85,7 +85,7 @@ names, and other aspects of this manual are still subject to change.
 
     If <token> is given, summarize the staged files associated with the
     given Cask.
-    
+
   * `outdated` [--greedy] [--verbose|--quiet] [ <token> ...]:
     Without token arguments, display all the installed Casks that have newer
     versions available in the tap; otherwise check only the tokens given
@@ -101,9 +101,10 @@ names, and other aspects of this manual are still subject to change.
     Reinstall the given Cask.
 
   * `search` or `-S` [<text> | /<regexp>/]:
-    Without an argument, display all Casks available for install; otherwise
-    perform a substring search of known Cask tokens for <text> or, if the
-    text is delimited by slashes (/<regexp>/), it is interpreted as a
+    Without an argument, display all locally available Casks for install; no
+    online search is performed.
+    Otherwise perform a substring search of known Cask tokens for <text> or,
+    if the text is delimited by slashes (/<regexp>/), it is interpreted as a
     Ruby regular expression.
 
   * `style` [--fix] [ <token> ... ]:
@@ -165,6 +166,9 @@ in a future version.
 
   * `--appdir=<path>`:
     Target location for Applications. The default value is `/Applications`.
+
+  * `--language=<iso-language>[,<iso-language> ... ]]`:
+    Set language of the Cask to install. The first matching language is used, otherwise the default language on the Cask. The default value is the `language of your system`.
 
   * `--colorpickerdir=<path>`:
     Target location for Color Pickers. The default value is `~/Library/ColorPickers`.
@@ -255,7 +259,7 @@ Environment variables specific to Homebrew-Cask:
                export HOMEBREW_CASK_OPTS='--appdir=~/Applications --fontdir=/Library/Fonts'
 
 Other environment variables:
-           
+
   * `SUDO_ASKPASS`:
     When this variable is set, Homebrew-Cask will call `sudo`(8) with the `-A` option.
 

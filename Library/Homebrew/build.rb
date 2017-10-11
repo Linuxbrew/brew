@@ -112,6 +112,10 @@ class Build
       formula.extend(Debrew::Formula) if ARGV.debug?
 
       formula.brew do |_formula, staging|
+        # For head builds, HOMEBREW_FORMULA_PREFIX should include the commit,
+        # which is not known until after the formula has been staged.
+        ENV["HOMEBREW_FORMULA_PREFIX"] = formula.prefix
+
         staging.retain! if ARGV.keep_tmp?
         formula.patch
 
@@ -186,7 +190,7 @@ begin
   options = Options.create(ARGV.flags_only)
   build   = Build.new(formula, options)
   build.install
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   Marshal.dump(e, error_pipe)
   error_pipe.close
   exit! 1

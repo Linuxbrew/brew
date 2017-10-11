@@ -5,11 +5,9 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 
 ## Main taps
 
-*   [homebrew/apache](https://github.com/Homebrew/homebrew-apache): A tap for Apache modules, extending macOS's built-in Apache. These brews may require unconventional additional setup, as explained in the caveats.
+*   [homebrew/nginx](https://github.com/Homebrew/homebrew-nginx): A tap for NGINX modules, intended for its `nginx-full` formula which includes more module options.
 
-*   [homebrew/nginx](https://github.com/Homebrew/homebrew-nginx): Feature rich Nginx tap for modules.
-
-*   [homebrew/php](https://github.com/Homebrew/homebrew-php): Repository for php-related formulae.
+*   [homebrew/php](https://github.com/Homebrew/homebrew-php): Repository for PHP-related formulae.
 
 *   [homebrew/science](https://github.com/Homebrew/homebrew-science): A collection of scientific libraries and tools.
 
@@ -21,8 +19,6 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 *   [InstantClientTap/instantclient](https://github.com/InstantClientTap/homebrew-instantclient): A tap for Oracle Instant Client. The packages need to be downloaded manually.
 
-*   [besport/ocaml](https://github.com/besport/homebrew-ocaml): A tap for Ocaml libraries, though with caveats, it requires you install its customized ocaml formula. Perhaps a template for more work.
-
 *   [osx-cross/avr](https://github.com/osx-cross/homebrew-avr): GNU AVR toolchain (Libc, compilers and other tools for Atmel MCUs, useful for Arduino hackers and AVR programmers).
 
 *   [petere/postgresql](https://github.com/petere/homebrew-postgresql): Allows installing multiple PostgreSQL versions in parallel.
@@ -30,6 +26,10 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 *   [titanous/gnuradio](https://github.com/titanous/homebrew-gnuradio):  GNU Radio and friends running on macOS.
 
 *   [dunn/emacs](https://github.com/dunn/homebrew-emacs): A tap for Emacs packages.
+
+*   [sidaf/pentest](https://github.com/sidaf/homebrew-pentest): Tools for penetration testing.
+
+*   [osrf/simulation](https://github.com/osrf/homebrew-simulation): Tools for robotics simulation.
 
 ## Interesting forks
 

@@ -77,7 +77,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     a bug report, you will likely be asked for this information if you do not
     provide it.
 
-  * `deps` [`--1`] [`-n`] [`--union`] [`--full-name`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] `formulae`:
+  * `deps` [`--1`] [`-n`] [`--union`] [`--full-name`] [`--installed`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--include-requirements`] `formulae`:
     Show dependencies for `formulae`. When given multiple formula arguments,
     show the intersection of dependencies for `formulae`.
 
@@ -98,15 +98,22 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     `formulae`. To include the `:build` type dependencies, pass `--include-build`.
     Similarly, pass `--include-optional` to include `:optional` dependencies.
     To skip `:recommended` type dependencies, pass `--skip-recommended`.
+    To include requirements in addition to dependencies, pass `--include-requirements`.
 
-  * `deps` `--tree` [`filters`] (`formulae`|`--installed`):
+  * `deps` `--tree` [`--1`] [`filters`] [`--annotate`] (`formulae`|`--installed`):
     Show dependencies as a tree. When given multiple formula arguments, output
     individual trees for every formula.
+
+    If `--1` is passed, only one level of children is displayed.
 
     If `--installed` is passed, output a tree for every installed formula.
 
     The `filters` placeholder is any combination of options `--include-build`,
-    `--include-optional`, and `--skip-recommended` as documented above.
+    `--include-optional`, `--skip-recommended`, and `--include-requirements` as
+    documented above.
+
+    If `--annotate` is passed, the build, optional, and recommended dependencies
+    are marked as such in the output.
 
   * `deps` [`filters`] (`--installed`|`--all`):
     Show dependencies for installed or all available formulae. Every line of
@@ -364,7 +371,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `pin` `formulae`:
     Pin the specified `formulae`, preventing them from being upgraded when
-    issuing the `brew upgrade` command. See also `unpin`.
+    issuing the `brew upgrade `formulae`` command (but can still be upgraded
+    as dependencies for other formulae). See also `unpin`.
 
   * `postinstall` `formula`:
     Rerun the post-install steps for `formula`.
@@ -529,8 +537,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     source. This is useful for creating patches for the software.
 
   * `unpin` `formulae`:
-    Unpin `formulae`, allowing them to be upgraded by `brew upgrade`. See also
-    `pin`.
+    Unpin `formulae`, allowing them to be upgraded by `brew upgrade `formulae``.
+    See also `pin`.
 
   * `untap` `tap`:
     Remove a tapped repository.

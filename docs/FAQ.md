@@ -26,6 +26,8 @@ To allow that formulae to update again:
 
     brew unpin <formula>
 
+Note that pinned, outdated formulae that are depended on by another formula will be upgraded when required as we do not allow formulae to be built against non-latest versions.
+
 ## How do I uninstall old versions of a formula?
 By default, Homebrew does not uninstall old versions of a formula, so
 over time you will accumulate old versions. To remove them, simply use:
@@ -66,13 +68,12 @@ Be careful as this is a destructive operation.
 Which is usually: `~/Library/Caches/Homebrew`
 
 ## My Mac `.app`s don’t find `/usr/local/bin` utilities!
-GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by default.
-If you’re on Mountain Lion, you can fix this by running
-`launchctl setenv PATH "/usr/local/bin:$PATH"`. [More details
-here](https://stackoverflow.com/questions/135688/setting-environment-variables-in-os-x/5444960#5444960),
-including how to set this across reboots. If you’re pre-Mountain Lion,
-[here’s an official
-alternative](https://developer.apple.com/legacy/library/qa/qa1067/_index.html).
+GUI apps on macOS don’t have `/usr/local/bin` in their `PATH` by
+default.  If you’re on Mountain Lion or later, you can fix this by
+running `sudo launchctl config user path "/usr/local/bin:$PATH"` and
+then rebooting, as documented in `man launchctl`. Note that this sets
+the launchctl PATH for _all users_. For earlier versions of macOS, see
+[this page](https://developer.apple.com/legacy/library/qa/qa1067/_index.html).
 
 ## How do I contribute to Homebrew?
 Read [CONTRIBUTING.md](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md).

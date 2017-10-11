@@ -102,7 +102,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   if ARGV.homebrew_developer? || disable ||
      Homebrew.raise_deprecation_exceptions?
     raise MethodDeprecatedError, message
-  else
+  elsif !Homebrew.auditing?
     opoo "#{message}\n"
   end
 end
@@ -229,10 +229,9 @@ module Homebrew
     EOS
   end
 
-  # Hash of Module => Set(method_names)
-  @injected_dump_stat_modules = {}
-
+  # rubocop:disable Style/GlobalVars
   def inject_dump_stats!(the_module, pattern)
+    @injected_dump_stat_modules ||= {}
     @injected_dump_stat_modules[the_module] ||= []
     injected_methods = @injected_dump_stat_modules[the_module]
     the_module.module_eval do
@@ -260,11 +259,12 @@ module Homebrew
       end
     end
   end
+  # rubocop:enable Style/GlobalVars
 end
 
 def with_system_path
   old_path = ENV["PATH"]
-  ENV["PATH"] = "/usr/bin:/bin"
+  ENV["PATH"] = PATH.new("/usr/bin", "/bin")
   yield
 ensure
   ENV["PATH"] = old_path
@@ -559,4 +559,16 @@ end
 
 def shell_profile
   Utils::Shell.profile
+end
+
+def tap_and_name_comparison
+  proc do |a, b|
+    if a.include?("/") && !b.include?("/")
+      1
+    elsif !a.include?("/") && b.include?("/")
+      -1
+    else
+      a <=> b
+    end
+  end
 end

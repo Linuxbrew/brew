@@ -48,7 +48,7 @@ describe Requirement do
       it { is_expected.to be_fatal }
     end
 
-    context "#fatal is ommitted" do
+    context "#fatal is omitted" do
       it { is_expected.not_to be_fatal }
     end
   end
@@ -184,7 +184,7 @@ describe Requirement do
       it { is_expected.to have_a_default_formula }
     end
 
-    context "#default_formula ommitted" do
+    context "#default_formula omitted" do
       it { is_expected.not_to have_a_default_formula }
     end
   end

@@ -18,12 +18,6 @@ class Sandbox
     !ARGV.no_sandbox?
   end
 
-  def self.print_sandbox_message
-    return if @printed_sandbox_message
-    ohai "Using the sandbox"
-    @printed_sandbox_message = true
-  end
-
   def initialize
     @profile = SandboxProfile.new
   end
@@ -173,7 +167,7 @@ class Sandbox
 
     def add_rule(rule)
       s = "("
-      s << ((rule[:allow]) ? "allow" : "deny")
+      s << (rule[:allow] ? "allow" : "deny")
       s << " #{rule[:operation]}"
       s << " (#{rule[:filter]})" if rule[:filter]
       s << " (with #{rule[:modifier]})" if rule[:modifier]

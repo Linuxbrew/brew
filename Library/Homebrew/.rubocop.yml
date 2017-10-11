@@ -1,6 +1,5 @@
 inherit_from:
   - ../.rubocop.yml
-  - .rubocop_todo.yml
 
 AllCops:
   Include:
@@ -26,12 +25,30 @@ Lint/NestedMethodDefinition:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: true
 
+Metrics/BlockNesting:
+  Max: 5
+
+Metrics/ModuleLength:
+  Max: 360
+
 Metrics/ParameterLists:
   CountKeywordArgs: false
+
+# we won't change backward compatible method names
+Naming/MethodName:
+  Exclude:
+    - 'compat/**/*'
+
+# we won't change backward compatible predicate names
+Naming/PredicateName:
+  Exclude:
+    - 'compat/**/*'
+  NameWhitelist: is_32_bit?, is_64_bit?
 
 Style/BlockDelimiters:
   Exclude:
     - '**/*_spec.rb'
+    - '**/shared_examples/**/*.rb'
 
 # so many of these in formulae but none in here
 Style/GuardClause:
@@ -40,14 +57,3 @@ Style/GuardClause:
 # hash-rockets preferred for formulae, a: 1 preferred elsewhere
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
-
-# we won't change backward compatible method names
-Style/MethodName:
-  Exclude:
-    - 'compat/**/*'
-
-# we won't change backward compatible predicate names
-Style/PredicateName:
-  Exclude:
-    - 'compat/**/*'
-  NameWhitelist: is_32_bit?, is_64_bit?

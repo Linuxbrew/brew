@@ -1,11 +1,13 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Outdated, :cask do
   let(:installed) do
     [
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/basic-cask.rb"),
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/outdated/local-caffeine.rb"),
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/outdated/local-transmission.rb"),
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/version-latest-string.rb"),
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/outdated/auto-updates.rb"),
+      Hbc::CaskLoader.load(cask_path("basic-cask")),
+      Hbc::CaskLoader.load(cask_path("outdated/local-caffeine")),
+      Hbc::CaskLoader.load(cask_path("outdated/local-transmission")),
+      Hbc::CaskLoader.load(cask_path("version-latest-string")),
+      Hbc::CaskLoader.load(cask_path("outdated/auto-updates")),
     ]
   end
 
@@ -14,6 +16,8 @@ describe Hbc::CLI::Outdated, :cask do
 
     allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
   end
+
+  it_behaves_like "a command that handles invalid options"
 
   describe 'without --greedy it ignores the Casks with "vesion latest" or "auto_updates true"' do
     it "checks all the installed Casks when no token is provided" do
@@ -70,7 +74,7 @@ describe Hbc::CLI::Outdated, :cask do
     end
 
     it 'does not include the Casks with "auto_updates true" when the version did not change' do
-      cask = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/auto-updates.rb")
+      cask = Hbc::CaskLoader.load(cask_path("auto-updates"))
       InstallHelper.install_with_caskfile(cask)
 
       expect {

@@ -1,9 +1,13 @@
 describe Hbc::Artifact::App, :cask do
   describe "activate to alternate target" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-alt-target.rb") }
+    let(:cask) { Hbc::CaskLoader.load(cask_path("with-alt-target")) }
 
     let(:install_phase) {
-      -> { Hbc::Artifact::App.new(cask).install_phase }
+      lambda do
+        cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
+          artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        end
+      end
     }
 
     let(:source_path) { cask.staged_path.join("Caffeine.app") }

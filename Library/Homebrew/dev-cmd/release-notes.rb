@@ -10,10 +10,8 @@ module Homebrew
 
   def release_notes
     previous_tag = ARGV.named.first
-    unless previous_tag
-      previous_tag = Utils.popen_read("git tag --list --sort=-version:refname")
+    previous_tag ||= Utils.popen_read("git tag --list --sort=-version:refname")
                           .lines.first.chomp
-    end
     odie "Could not find any previous tags!" unless previous_tag
 
     end_ref = ARGV.named[1] || "origin/master"

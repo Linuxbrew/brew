@@ -59,7 +59,7 @@ module DiskUsageExtension
 end
 
 # Homebrew extends Ruby's `Pathname` to make our code more readable.
-# @see http://ruby-doc.org/stdlib-1.8.7/libdoc/pathname/rdoc/Pathname.html  Ruby's Pathname API
+# @see https://ruby-doc.org/stdlib-1.8.7/libdoc/pathname/rdoc/Pathname.html  Ruby's Pathname API
 class Pathname
   include DiskUsageExtension
 
@@ -186,7 +186,7 @@ class Pathname
       begin
         tf.chown(uid, gid)
         tf.chmod(old_stat.mode)
-      rescue Errno::EPERM
+      rescue Errno::EPERM # rubocop:disable Lint/HandleExceptions
       end
 
       File.rename(tf.path, self)

@@ -34,38 +34,40 @@ module Homebrew
     elsif ARGV.include? "--opensuse"
       exec_browser "https://software.opensuse.org/search?q=#{ARGV.next}"
     elsif ARGV.include? "--fedora"
-      exec_browser "https://admin.fedoraproject.org/pkgdb/packages/%2A#{ARGV.next}%2A/"
+      exec_browser "https://apps.fedoraproject.org/packages/s/#{ARGV.next}"
     elsif ARGV.include? "--ubuntu"
-      exec_browser "http://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
+      exec_browser "https://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
     elsif ARGV.include? "--desc"
       query = ARGV.next
       regex = query_regexp(query)
       Descriptions.search(regex, :desc).print
     elsif ARGV.first =~ HOMEBREW_TAP_FORMULA_REGEX
       query = ARGV.first
-      user, repo, name = query.split("/", 3)
 
       begin
         result = Formulary.factory(query).name
+        results = Array(result)
       rescue FormulaUnavailableError
-        result = search_tap(user, repo, name)
+        _, _, name = query.split("/", 3)
+        results = search_taps(name)
       end
 
-      results = Array(result)
       puts Formatter.columns(results) unless results.empty?
     else
       query = ARGV.first
       regex = query_regexp(query)
       local_results = search_formulae(regex)
       puts Formatter.columns(local_results) unless local_results.empty?
+
       tap_results = search_taps(query)
       puts Formatter.columns(tap_results) unless tap_results.empty?
 
       if $stdout.tty?
         count = local_results.length + tap_results.length
 
+        ohai "Searching blacklisted, migrated and deleted formulae..."
         if reason = Homebrew::MissingFormula.reason(query, silent: true)
-          if count > 0
+          if count.positive?
             puts
             puts "If you meant #{query.inspect} specifically:"
           end
@@ -100,10 +102,18 @@ module Homebrew
     odie "#{query} is not a valid regex"
   end
 
-  def search_taps(query)
+  def search_taps(query, silent: false)
+    return [] if ENV["HOMEBREW_NO_GITHUB_API"]
+
+    # Use stderr to avoid breaking parsed output
+    unless silent
+      $stderr.puts Formatter.headline("Searching taps on GitHub...", color: :blue)
+    end
+
     valid_dirnames = ["Formula", "HomebrewFormula", "Casks", "."].freeze
-    matches = GitHub.search_code("user:Homebrew", "user:caskroom", "filename:#{query}", "extension:rb")
-    [*matches].map do |match|
+    matches = GitHub.search_code(user: ["Homebrew", "caskroom"], filename: query, extension: "rb")
+
+    matches.map do |match|
       dirname, filename = File.split(match["path"])
       next unless valid_dirnames.include?(dirname)
       tap = Tap.fetch(match["repository"]["full_name"])
@@ -113,6 +123,9 @@ module Homebrew
   end
 
   def search_formulae(regex)
+    # Use stderr to avoid breaking parsed output
+    $stderr.puts Formatter.headline("Searching local taps...", color: :blue)
+
     aliases = Formula.alias_full_names
     results = (Formula.full_names + aliases).grep(regex).sort
 

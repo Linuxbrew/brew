@@ -86,6 +86,8 @@ module Hbc
         raise CaskAlreadyInstalledError, @cask
       end
 
+      check_conflicts
+
       print_caveats
       fetch
       uninstall_existing_cask if @reinstall
@@ -96,6 +98,21 @@ module Hbc
       enable_accessibility_access
 
       puts summary
+    end
+
+    def check_conflicts
+      return unless @cask.conflicts_with
+
+      @cask.conflicts_with.cask.each do |conflicting_cask|
+        begin
+          conflicting_cask = CaskLoader.load(conflicting_cask)
+          if conflicting_cask.installed?
+            raise CaskConflictError.new(@cask, conflicting_cask)
+          end
+        rescue CaskUnavailableError
+          next # Ignore conflicting Casks that do not exist.
+        end
+      end
     end
 
     def reinstall
@@ -109,7 +126,7 @@ module Hbc
 
       # use the same cask file that was used for installation, if possible
       installed_caskfile = @cask.installed_caskfile
-      installed_cask = installed_caskfile.exist? ? CaskLoader.load_from_file(installed_caskfile) : @cask
+      installed_cask = installed_caskfile.exist? ? CaskLoader.load(installed_caskfile) : @cask
 
       # Always force uninstallation, ignore method parameter
       Installer.new(installed_cask, binaries: binaries?, verbose: verbose?, force: true).uninstall
@@ -142,7 +159,7 @@ module Hbc
       odebug "Extracting primary container"
 
       FileUtils.mkdir_p @cask.staged_path
-      container = if @cask.container && @cask.container.type
+      container = if @cask.container&.type
         Container.from_type(@cask.container.type)
       else
         Container.for_path(@downloaded_path, @command)
@@ -160,7 +177,7 @@ module Hbc
       already_installed_artifacts = []
 
       odebug "Installing artifacts"
-      artifacts = Artifact.for_cask(@cask, command: @command, verbose: verbose?, force: force?)
+      artifacts = @cask.artifacts
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
@@ -171,7 +188,7 @@ module Hbc
           next unless binaries?
         end
 
-        artifact.install_phase
+        artifact.install_phase(command: @command, verbose: verbose?, force: force?)
         already_installed_artifacts.unshift(artifact)
       end
     rescue StandardError => e
@@ -179,7 +196,7 @@ module Hbc
         already_installed_artifacts.each do |artifact|
           next unless artifact.respond_to?(:uninstall_phase)
           odebug "Reverting installation of artifact of class #{artifact.class}"
-          artifact.uninstall_phase
+          artifact.uninstall_phase(command: @command, verbose: verbose?, force: force?)
         end
       ensure
         purge_versioned_files
@@ -344,7 +361,7 @@ module Hbc
 
       savedir = @cask.metadata_subdir("Casks", timestamp: :now, create: true)
       FileUtils.copy @cask.sourcefile_path, savedir
-      old_savedir.rmtree unless old_savedir.nil?
+      old_savedir&.rmtree
     end
 
     def uninstall
@@ -357,25 +374,27 @@ module Hbc
 
     def uninstall_artifacts
       odebug "Un-installing artifacts"
-      artifacts = Artifact.for_cask(@cask, command: @command, verbose: verbose?, force: force?)
+      artifacts = @cask.artifacts
 
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
         next unless artifact.respond_to?(:uninstall_phase)
         odebug "Un-installing artifact of class #{artifact.class}"
-        artifact.uninstall_phase
+        artifact.uninstall_phase(command: @command, verbose: verbose?, force: force?)
       end
     end
 
     def zap
       ohai %Q(Implied "brew cask uninstall #{@cask}")
       uninstall_artifacts
-      if Artifact::Zap.me?(@cask)
-        ohai "Dispatching zap stanza"
-        Artifact::Zap.new(@cask, command: @command).zap_phase
-      else
+      if (zap_stanzas = @cask.artifacts.select { |a| a.is_a?(Artifact::Zap) }).empty?
         opoo "No zap stanza present for Cask '#{@cask}'"
+      else
+        ohai "Dispatching zap stanza"
+        zap_stanzas.each do |stanza|
+          stanza.zap_phase(command: @command, verbose: verbose?, force: force?)
+        end
       end
       ohai "Removing all staged versions of Cask '#{@cask}'"
       purge_caskroom_path

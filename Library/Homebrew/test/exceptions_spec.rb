@@ -181,8 +181,8 @@ describe DuplicateResourceError do
   its(:to_s) { is_expected.to eq("Resource <resource foo> is defined more than once") }
 end
 
-describe BottleVersionMismatchError do
-  subject { described_class.new("/foo.bottle.tar.gz", "1.0", formula, "1.1") }
+describe BottleFormulaUnavailableError do
+  subject { described_class.new("/foo.bottle.tar.gz", "foo/1.0/.brew/foo.rb") }
   let(:formula) { double(Formula, full_name: "foo") }
-  its(:to_s) { is_expected.to match(/Bottle version mismatch/) }
+  its(:to_s) { is_expected.to match(/This bottle does not contain the formula file/) }
 end

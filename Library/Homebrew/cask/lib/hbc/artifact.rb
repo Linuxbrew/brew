@@ -25,47 +25,5 @@ require "hbc/artifact/zap"
 
 module Hbc
   module Artifact
-    # NOTE: Order is important here!
-    #
-    # The `uninstall` stanza should be run first, as it may
-    # depend on other artifacts still being installed.
-    #
-    # We want to extract nested containers before we
-    # handle any other artifacts.
-    #
-    TYPES = [
-      PreflightBlock,
-      Uninstall,
-      NestedContainer,
-      Installer,
-      App,
-      Suite,
-      Artifact, # generic 'artifact' stanza
-      Colorpicker,
-      Pkg,
-      Prefpane,
-      Qlplugin,
-      Dictionary,
-      Font,
-      Service,
-      StageOnly,
-      Binary,
-      InputMethod,
-      InternetPlugin,
-      AudioUnitPlugin,
-      VstPlugin,
-      Vst3Plugin,
-      ScreenSaver,
-      PostflightBlock,
-      Zap,
-    ].freeze
-
-    def self.for_cask(cask, options = {})
-      odebug "Determining which artifacts are present in Cask #{cask}"
-
-      TYPES
-        .select { |klass| klass.me?(cask) }
-        .map { |klass| klass.new(cask, options) }
-    end
   end
 end

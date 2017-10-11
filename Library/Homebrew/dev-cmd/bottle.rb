@@ -47,7 +47,7 @@ BOTTLE_ERB = <<-EOS.freeze
     <% elsif cellar != BottleSpecification::DEFAULT_CELLAR %>
     cellar "<%= cellar %>"
     <% end %>
-    <% if rebuild > 0 %>
+    <% if rebuild.positive? %>
     rebuild <%= rebuild %>
     <% end %>
     <% checksums.each do |checksum_type, checksum_values| %>
@@ -75,7 +75,7 @@ module Homebrew
 
       @put_filenames ||= []
 
-      return if @put_filenames.include? filename
+      return if @put_filenames.include?(filename)
 
       puts Formatter.error(filename.to_s)
       @put_filenames << filename
@@ -84,8 +84,7 @@ module Homebrew
     result = false
 
     keg.each_unique_file_matching(string) do |file|
-      # skip document file.
-      next if Metafiles::EXTENSIONS.include? file.extname
+      next if Metafiles::EXTENSIONS.include?(file.extname) # Skip document files.
 
       linked_libraries = Keg.file_linked_libraries(file, string)
       result ||= !linked_libraries.empty?
@@ -156,9 +155,7 @@ module Homebrew
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
 
-    tap = f.tap
-
-    unless tap
+    unless tap = f.tap
       unless ARGV.include?("--force-core-tap")
         return ofail "Formula not from core or any taps: #{f.full_name}"
       end
@@ -186,7 +183,7 @@ module Homebrew
       ohai "Determining #{f.full_name} bottle rebuild..."
       versions = FormulaVersions.new(f)
       rebuilds = versions.bottle_version_map("origin/master")[f.pkg_version]
-      rebuilds.pop if rebuilds.last.to_i > 0
+      rebuilds.pop if rebuilds.last.to_i.positive?
       rebuild = rebuilds.empty? ? 0 : rebuilds.max.to_i + 1
     end
 
@@ -283,7 +280,7 @@ module Homebrew
         raise
       ensure
         ignore_interrupts do
-          original_tab.write if original_tab
+          original_tab&.write
           unless ARGV.include? "--skip-relocation"
             keg.replace_placeholders_with_locations changed_files
           end

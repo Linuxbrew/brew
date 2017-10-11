@@ -45,10 +45,14 @@ module Homebrew
       @failed == true
     end
 
-    attr_writer :raise_deprecation_exceptions
+    attr_writer :raise_deprecation_exceptions, :auditing
 
     def raise_deprecation_exceptions?
       @raise_deprecation_exceptions == true
+    end
+
+    def auditing?
+      @auditing == true
     end
   end
 end

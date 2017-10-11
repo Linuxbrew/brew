@@ -124,7 +124,7 @@ module Homebrew
     return if ENV["HOMEBREW_UPDATE_TEST"]
     core_tap = CoreTap.instance
     return if core_tap.installed?
-    CoreTap.ensure_installed! quiet: false
+    CoreTap.ensure_installed!
     revision = core_tap.git_head
     ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
     ENV["HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE"] = revision
@@ -203,6 +203,7 @@ module Homebrew
     end
 
     new_homebrew_repository = Pathname.new "/usr/local/Homebrew"
+    new_homebrew_repository.rmdir_if_possible
     if new_homebrew_repository.exist?
       ofail <<-EOS.undent
         #{new_homebrew_repository} already exists.
@@ -371,7 +372,7 @@ class Reporter
           new_version = formula.pkg_version
           old_version = FormulaVersions.new(formula).formula_at_revision(@initial_revision, &:pkg_version)
           next if new_version == old_version
-        rescue Exception => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
           onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         end
         @report[:M] << tap.formula_file_to_name(src)
@@ -459,7 +460,7 @@ class Reporter
           unless Formulary.factory(new_full_name).keg_only?
             system HOMEBREW_BREW_FILE, "link", new_full_name, "--overwrite"
           end
-        rescue Exception => e
+        rescue Exception => e # rubocop:disable Lint/RescueException
           onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         end
         next
@@ -520,7 +521,7 @@ class Reporter
 
       begin
         f = Formulary.factory(new_full_name)
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         onoe "#{e.message}\n#{e.backtrace.join "\n"}" if ARGV.homebrew_developer?
         next
       end

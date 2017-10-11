@@ -67,11 +67,19 @@ module FormulaCellarChecks
     checker = LinkageChecker.new(keg, formula)
 
     return unless checker.broken_dylibs?
-    problem_if_output <<-EOS.undent
-      The installation was broken.
-      Broken dylib links found:
-        #{checker.broken_dylibs.to_a * "\n          "}
+    output = <<-EOS.undent
+      #{formula} has broken dynamic library links:
+        #{checker.broken_dylibs.to_a * "\n  "}
     EOS
+    tab = Tab.for_keg(keg)
+    if tab.poured_from_bottle
+      output += <<-EOS.undent
+        Rebuild this from source with:
+          brew reinstall --build-from-source #{formula}
+        If that's successful, file an issue#{formula.tap ? " here:\n  #{formula.tap.issues_url}" : "."}
+      EOS
+    end
+    problem_if_output output
   end
 
   def audit_installed

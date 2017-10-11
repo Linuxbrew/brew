@@ -42,19 +42,13 @@ describe RuboCop::Cop::FormulaAudit::Lines do
                                 column: 2,
                                 source: source }]
 
-        inspect_source(cop, source)
+        inspect_source(source)
 
         expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
           expect_offense(expected, actual)
         end
       end
     end
-  end
-  def expect_offense(expected, actual)
-    expect(actual.message).to eq(expected[:message])
-    expect(actual.severity).to eq(expected[:severity])
-    expect(actual.line).to eq(expected[:line])
-    expect(actual.column).to eq(expected[:column])
   end
 end
 
@@ -76,18 +70,12 @@ describe RuboCop::Cop::FormulaAudit::ClassInheritance do
                               column: 10,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source, '/homebrew-core/Formula/foo.rb')
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
-  end
-  def expect_offense(expected, actual)
-    expect(actual.message).to eq(expected[:message])
-    expect(actual.severity).to eq(expected[:severity])
-    expect(actual.line).to eq(expected[:line])
-    expect(actual.column).to eq(expected[:column])
   end
 end
 
@@ -104,13 +92,13 @@ describe RuboCop::Cop::FormulaAudit::Comments do
         end
       EOS
 
-      expected_offenses = [{  message: "Commented cmake call found",
+      expected_offenses = [{  message: "Please remove default template comments",
                               severity: :convention,
                               line: 4,
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -132,7 +120,7 @@ describe RuboCop::Cop::FormulaAudit::Comments do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -148,24 +136,18 @@ describe RuboCop::Cop::FormulaAudit::Comments do
         end
       EOS
 
-      expected_offenses = [{  message: 'Commented-out dep "foo"',
+      expected_offenses = [{  message: 'Commented-out dependency "foo"',
                               severity: :convention,
                               line: 4,
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
-  end
-  def expect_offense(expected, actual)
-    expect(actual.message).to eq(expected[:message])
-    expect(actual.severity).to eq(expected[:severity])
-    expect(actual.line).to eq(expected[:line])
-    expect(actual.column).to eq(expected[:column])
   end
 end
 
@@ -188,7 +170,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -212,7 +194,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -237,7 +219,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -264,7 +246,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 7,
                               source: source }]
 
-      inspect_source(cop, source, "/homebrew-core/")
+      inspect_source(source, "/homebrew-core/")
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -292,7 +274,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -317,7 +299,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -342,7 +324,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -358,14 +340,16 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         end
       EOS
 
-      expected_offenses = [{ message: "`skip_clean :all` is deprecated; brew no longer strips symbols\n" \
-                                      "\tPass explicit paths to prevent Homebrew from removing empty folders.",
+      expected_offenses = [{ message: <<-EOS.undent.chomp,
+                              `skip_clean :all` is deprecated; brew no longer strips symbols
+                                      Pass explicit paths to prevent Homebrew from removing empty folders.
+                             EOS
                              severity: :convention,
                              line: 4,
                              column: 2,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -383,17 +367,32 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         end
       EOS
 
-      expected_offenses = [{  message: "macOS has been 64-bit only so build.universal? is deprecated.",
+      expected_offenses = [{  message: "macOS has been 64-bit only since 10.6 so build.universal? is deprecated.",
                               severity: :convention,
                               line: 4,
                               column: 5,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
+    end
+
+    it "with build.universal? exempted formula" do
+      source = <<-EOS.undent
+        class Wine < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build.universal?
+             "foo"
+          end
+        end
+      EOS
+
+      inspect_source(source, "/homebrew-core/Formula/wine.rb")
+      expect(cop.offenses).to eq([])
     end
 
     it "with ENV.universal_binary" do
@@ -413,14 +412,14 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 5,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
 
-    it "with ENV.universal_binary" do
+    it "with ENV.universal_binary 2" do
       source = <<-EOS.undent
         class Foo < Formula
           desc "foo"
@@ -437,7 +436,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 5,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -459,11 +458,24 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 10,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
+    end
+
+    it "with ruby-macho alternatives audit exempted formula" do
+      source = <<-EOS.undent
+        class Cctools < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "install_name_tool", "-id"
+        end
+      EOS
+
+      inspect_source(source, "/homebrew-core/Formula/cctools.rb")
+      expect(cop.offenses).to eq([])
     end
 
     it "with npm install without language::Node args" do
@@ -478,14 +490,27 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       expected_offenses = [{  message: "Use Language::Node for npm install args",
                               severity: :convention,
                               line: 4,
-                              column: 17,
+                              column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
+    end
+
+    it "with npm install without language::Node args in kibana" do
+      source = <<-EOS.undent
+        class KibanaAT44 < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "npm", "install"
+        end
+      EOS
+
+      inspect_source(source, "/homebrew-core/Formula/kibana@4.4.rb")
+      expect(cop.offenses).to eq([])
     end
 
     it "with assert include" do
@@ -503,7 +528,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 9,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -525,12 +550,13 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 13,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
+
     it "with old style OS check" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -546,7 +572,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 21,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -569,12 +595,13 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 13,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
+
     it "with system call to fileUtils Method" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -590,12 +617,13 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 10,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
+
     it "with a top-level function def " do
       source = <<-EOS.undent
         def test
@@ -613,7 +641,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 0,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -637,7 +665,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 18,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -661,7 +689,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 18,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -685,7 +713,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 14,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -709,7 +737,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 14,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -733,7 +761,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 30,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -757,7 +785,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 27,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -781,7 +809,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 30,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -805,7 +833,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 30,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -829,7 +857,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 14,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -853,7 +881,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 22,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -877,7 +905,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 12,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -901,7 +929,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 12,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -925,7 +953,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 28,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -949,7 +977,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 28,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -973,7 +1001,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 17,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -997,7 +1025,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 18,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1021,12 +1049,13 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 47,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
+
     it "with formula path shortcut long form 3" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -1044,7 +1073,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 46,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1066,7 +1095,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 24,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1088,7 +1117,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 10,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1110,7 +1139,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 13,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1134,7 +1163,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 5,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1158,7 +1187,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1182,7 +1211,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 26,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1206,7 +1235,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 14,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1228,7 +1257,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1250,7 +1279,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -1272,18 +1301,11 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
     end
-
-  end
-  def expect_offense(expected, actual)
-    expect(actual.message).to eq(expected[:message])
-    expect(actual.severity).to eq(expected[:severity])
-    expect(actual.line).to eq(expected[:line])
-    expect(actual.column).to eq(expected[:column])
   end
 end

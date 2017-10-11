@@ -1,9 +1,10 @@
 describe Hbc::Artifact::Binary, :cask do
   let(:cask) {
-    Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb").tap do |cask|
+    Hbc::CaskLoader.load(cask_path("with-binary")).tap do |cask|
       InstallHelper.install_without_artifacts(cask)
     end
   }
+  let(:artifacts) { cask.artifacts.select { |a| a.is_a?(described_class) } }
   let(:expected_path) { Hbc.binarydir.join("binary") }
 
   before(:each) do
@@ -16,7 +17,7 @@ describe Hbc::Artifact::Binary, :cask do
 
   context "when --no-binaries is specified" do
     let(:cask) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-binary.rb")
+      Hbc::CaskLoader.load(cask_path("with-binary"))
     }
 
     it "doesn't link the binary when --no-binaries is specified" do
@@ -26,7 +27,9 @@ describe Hbc::Artifact::Binary, :cask do
   end
 
   it "links the binary to the proper directory" do
-    Hbc::Artifact::Binary.new(cask).install_phase
+    artifacts.each do |artifact|
+      artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+    end
 
     expect(expected_path).to be_a_symlink
     expect(expected_path.readlink).to exist
@@ -34,7 +37,7 @@ describe Hbc::Artifact::Binary, :cask do
 
   context "when the binary is not executable" do
     let(:cask) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-non-executable-binary.rb").tap do |cask|
+      Hbc::CaskLoader.load(cask_path("with-non-executable-binary")).tap do |cask|
         InstallHelper.install_without_artifacts(cask)
       end
     }
@@ -45,7 +48,9 @@ describe Hbc::Artifact::Binary, :cask do
       expect(FileUtils).to receive(:chmod)
         .with("+x", cask.staged_path.join("naked_non_executable")).and_call_original
 
-      Hbc::Artifact::Binary.new(cask).install_phase
+      artifacts.each do |artifact|
+        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
 
       expect(expected_path).to be_a_symlink
       expect(expected_path.readlink).to be_executable
@@ -56,7 +61,9 @@ describe Hbc::Artifact::Binary, :cask do
     FileUtils.touch expected_path
 
     expect {
-      Hbc::Artifact::Binary.new(cask).install_phase
+      artifacts.each do |artifact|
+        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
     }.to raise_error(Hbc::CaskError)
 
     expect(expected_path).not_to be :symlink?
@@ -65,7 +72,9 @@ describe Hbc::Artifact::Binary, :cask do
   it "clobbers an existing symlink" do
     expected_path.make_symlink("/tmp")
 
-    Hbc::Artifact::Binary.new(cask).install_phase
+    artifacts.each do |artifact|
+      artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+    end
 
     expect(File.readlink(expected_path)).not_to eq("/tmp")
   end
@@ -73,21 +82,27 @@ describe Hbc::Artifact::Binary, :cask do
   it "creates parent directory if it doesn't exist" do
     FileUtils.rmdir Hbc.binarydir
 
-    Hbc::Artifact::Binary.new(cask).install_phase
+    artifacts.each do |artifact|
+      artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+    end
 
     expect(expected_path.exist?).to be true
   end
 
   context "binary is inside an app package" do
     let(:cask) {
-      Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-embedded-binary.rb").tap do |cask|
+      Hbc::CaskLoader.load(cask_path("with-embedded-binary")).tap do |cask|
         InstallHelper.install_without_artifacts(cask)
       end
     }
 
     it "links the binary to the proper directory" do
-      Hbc::Artifact::App.new(cask).install_phase
-      Hbc::Artifact::Binary.new(cask).install_phase
+      cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::App) }.each do |artifact|
+        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
+      artifacts.each do |artifact|
+        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
 
       expect(expected_path).to be_a_symlink
       expect(expected_path.readlink).to exist

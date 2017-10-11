@@ -416,7 +416,7 @@ class BuildError < RuntimeError
 
     puts
 
-    if issues && !issues.empty?
+    unless issues&.empty?
       puts "These open issues may also help:"
       puts issues.map { |i| "#{i["title"]} #{i["html_url"]}" }.join("\n")
     end
@@ -555,12 +555,12 @@ end
 # raised when a single patch file is not found and apply hasn't been specified
 class MissingApplyError < RuntimeError; end
 
-class BottleVersionMismatchError < RuntimeError
-  def initialize(bottle_file, bottle_version, formula, formula_version)
+class BottleFormulaUnavailableError < RuntimeError
+  def initialize(bottle_path, formula_path)
     super <<-EOS.undent
-      Bottle version mismatch
-      Bottle: #{bottle_file} (#{bottle_version})
-      Formula: #{formula.full_name} (#{formula_version})
+      This bottle does not contain the formula file:
+        #{bottle_path}
+        #{formula_path}
     EOS
   end
 end

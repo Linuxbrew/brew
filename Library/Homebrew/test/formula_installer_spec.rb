@@ -107,7 +107,7 @@ describe FormulaInstaller do
       end
     EOS
 
-    Formulary::FORMULAE.delete(dep_path)
+    Formulary.cache.delete(dep_path)
     dependency = Formulary.factory(dep_name)
 
     dependent = formula do

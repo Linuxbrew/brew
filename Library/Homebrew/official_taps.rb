@@ -1,5 +1,4 @@
 OFFICIAL_TAPS = %w[
-  apache
   nginx
   php
   science
@@ -17,6 +16,7 @@ OFFICIAL_CMD_TAPS = {
 }.freeze
 
 DEPRECATED_OFFICIAL_TAPS = %w[
+  apache
   binary
   completions
   devel-only

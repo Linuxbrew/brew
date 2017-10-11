@@ -1,9 +1,15 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Search, :cask do
   before(:each) do
     allow(Tty).to receive(:width).and_return(0)
   end
 
+  it_behaves_like "a command that handles invalid options"
+
   it "lists the available Casks that match the search term" do
+    allow(GitHub).to receive(:search_code).and_return([])
+
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<-EOS.undent).to_stdout.as_tty
@@ -14,6 +20,8 @@ describe Hbc::CLI::Search, :cask do
   end
 
   it "outputs a plain list when stdout is not a TTY" do
+    allow(GitHub).to receive(:search_code).and_return([])
+
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<-EOS.undent).to_stdout
@@ -22,16 +30,37 @@ describe Hbc::CLI::Search, :cask do
     EOS
   end
 
+  it "returns matches even when online search failed" do
+    allow(GitHub).to receive(:search_code).and_raise(GitHub::Error.new("reason"))
+
+    expect {
+      Hbc::CLI::Search.run("local")
+    }.to output(<<-EOS.undent).to_stdout
+      local-caffeine
+      local-transmission
+    EOS
+    .and output(/^Warning: Error searching on GitHub: reason/).to_stderr
+  end
+
   it "shows that there are no Casks matching a search term that did not result in anything" do
     expect {
       Hbc::CLI::Search.run("foo-bar-baz")
-    }.to output("No Cask found for \"foo-bar-baz\".\n").to_stdout.as_tty
+    }.to output(<<-EOS.undent).to_stdout.as_tty
+      No Cask found for "foo-bar-baz".
+    EOS
   end
 
-  it "lists all available Casks with no search term" do
-    expect {
-      Hbc::CLI::Search.run
-    }.to output(/local-caffeine/).to_stdout.as_tty
+  it "doesn't output anything to non-TTY stdout when there are no matches" do
+    expect { Hbc::CLI::Search.run("foo-bar-baz") }
+      .to not_to_output.to_stdout
+      .and not_to_output.to_stderr
+  end
+
+  it "lists all Casks available offline with no search term" do
+    allow(GitHub).to receive(:search_code).and_raise(GitHub::Error.new("reason"))
+    expect { Hbc::CLI::Search.run }
+      .to output(/local-caffeine/).to_stdout.as_tty
+      .and not_to_output.to_stderr
   end
 
   it "ignores hyphens in search terms" do
@@ -55,19 +84,29 @@ describe Hbc::CLI::Search, :cask do
   it "accepts a regexp argument" do
     expect {
       Hbc::CLI::Search.run("/^local-c[a-z]ffeine$/")
-    }.to output("==> Regexp Matches\nlocal-caffeine\n").to_stdout.as_tty
+    }.to output(<<-EOS.undent).to_stdout.as_tty
+      ==> Regexp Matches
+      local-caffeine
+    EOS
   end
 
-  it "Returns both exact and partial matches" do
+  it "returns both exact and partial matches" do
     expect {
       Hbc::CLI::Search.run("test-opera")
-    }.to output(/^==> Exact Match\ntest-opera\n==> Partial Matches\ntest-opera-mail/).to_stdout.as_tty
+    }.to output(<<-EOS.undent).to_stdout.as_tty
+      ==> Exact Match
+      test-opera
+      ==> Partial Matches
+      test-opera-mail
+    EOS
   end
 
   it "does not search the Tap name" do
     expect {
       Hbc::CLI::Search.run("caskroom")
-    }.to output(/^No Cask found for "caskroom"\.\n/).to_stdout.as_tty
+    }.to output(<<-EOS.undent).to_stdout.as_tty
+      No Cask found for "caskroom".
+    EOS
   end
 
   it "doesn't highlight packages that aren't installed" do

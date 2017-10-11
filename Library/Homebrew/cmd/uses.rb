@@ -74,12 +74,13 @@ module Homebrew
               end
             end
 
-            dep_formulae = deps.map do |dep|
+            dep_formulae = deps.flat_map do |dep|
               begin
                 dep.to_formula
               rescue
+                []
               end
-            end.compact
+            end
 
             reqs_by_formula = ([f] + dep_formulae).flat_map do |formula|
               formula.requirements.map { |req| [formula, req] }
@@ -118,6 +119,7 @@ module Homebrew
         rescue FormulaUnavailableError
           # Silently ignore this case as we don't care about things used in
           # taps that aren't currently tapped.
+          next
         end
       end
     end

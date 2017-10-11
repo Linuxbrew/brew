@@ -1,4 +1,5 @@
 require "parser/current"
+require_relative "../../extend/string"
 
 module RuboCop
   module Cop
@@ -13,7 +14,7 @@ module RuboCop
         return unless formula_class?(node)
         return unless respond_to?(:audit_formula)
         class_node, parent_class_node, @body = *node
-        @formula_name = class_name(class_node)
+        @formula_name = Pathname.new(@file_path).basename(".rb").to_s
         audit_formula(node, class_node, parent_class_node, @body)
       end
 
@@ -110,11 +111,15 @@ module RuboCop
       # Matches a method with a receiver,
       # EX: to match `Formula.factory(name)`
       # call `find_instance_method_call(node, "Formula", :factory)`
+      # EX: to match `build.head?`
+      # call `find_instance_method_call(node, :build, :head?)`
       # yields to a block with matching method node
       def find_instance_method_call(node, instance, method_name)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          next unless method.receiver && (method.receiver.const_name == instance || method.receiver.method_name == instance)
+          next if method.receiver.nil?
+          next if method.receiver.const_name != instance &&
+                  method.receiver.method_name != instance
           @offense_source_range = method.source_range
           @offensive_node = method
           return true unless block_given?
@@ -146,17 +151,14 @@ module RuboCop
 
         case type
         when :required
-          type_match = !node.method_args.nil? &&
-                       (node.method_args.first.str_type? || node.method_args.first.sym_type?)
+          type_match = required_dependency?(node)
           if type_match && !name_match
-            name_match = node_equals?(node.method_args.first, name)
+            name_match = required_dependency_name?(node, name)
           end
         when :build, :optional, :recommended, :run
-          type_match = !node.method_args.nil? &&
-                       node.method_args.first.hash_type? &&
-                       node.method_args.first.values.first.children.first == type
+          type_match = dependency_type_hash_match?(node, type)
           if type_match && !name_match
-            name_match = node_equals?(node.method_args.first.keys.first.children.first, name)
+            name_match = dependency_name_hash_match?(node, name)
           end
         else
           type_match = false
@@ -182,6 +184,22 @@ module RuboCop
         end
         nil
       end
+
+      def_node_search :required_dependency?, <<-EOS.undent
+        (send nil :depends_on ({str sym} _))
+      EOS
+
+      def_node_search :required_dependency_name?, <<-EOS.undent
+        (send nil :depends_on ({str sym} %1))
+      EOS
+
+      def_node_search :dependency_type_hash_match?, <<-EOS.undent
+        (hash (pair ({str sym} _) ({str sym} %1)))
+      EOS
+
+      def_node_search :dependency_name_hash_match?, <<-EOS.undent
+        (hash (pair ({str sym} %1) ({str sym} _)))
+      EOS
 
       # To compare node with appropriate Ruby variable
       def node_equals?(node, var)
@@ -309,7 +327,7 @@ module RuboCop
 
       # Returns the array of arguments of the method_node
       def parameters(method_node)
-        method_node.method_args if method_node.send_type? || method_node.block_type?
+        method_node.arguments if method_node.send_type? || method_node.block_type?
       end
 
       # Returns true if the given parameters are present in method call
@@ -415,12 +433,7 @@ module RuboCop
 
       # Returns true if the formula is versioned
       def versioned_formula?
-        formula_file_name.include?("@") || @formula_name.match(/AT\d+/)
-      end
-
-      # Returns filename of the formula without the extension
-      def formula_file_name
-        File.basename(processed_source.buffer.name, ".rb")
+        @formula_name.include?("@")
       end
 
       # Returns printable component name
@@ -443,7 +456,14 @@ module RuboCop
 
       def formula_class?(node)
         _, class_node, = *node
-        class_node && string_content(class_node) == "Formula"
+        class_names = %w[
+          Formula
+          GithubGistFormula
+          ScriptFileFormula
+          AmazonWebServicesFormula
+        ]
+
+        class_node && class_names.include?(string_content(class_node))
       end
 
       def file_path_allowed?

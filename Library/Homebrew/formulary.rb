@@ -1,18 +1,19 @@
 require "digest/md5"
 require "tap"
+require "extend/cachable"
 
 # The Formulary is responsible for creating instances of Formula.
 # It is not meant to be used directly from formulae.
 
 module Formulary
-  FORMULAE = {}
+  extend Cachable
 
   def self.formula_class_defined?(path)
-    FORMULAE.key?(path)
+    cache.key?(path)
   end
 
   def self.formula_class_get(path)
-    FORMULAE.fetch(path)
+    cache.fetch(path)
   end
 
   def self.load_formula(name, path, contents, namespace)
@@ -44,7 +45,7 @@ module Formulary
     contents = path.open("r") { |f| ensure_utf8_encoding(f).read }
     namespace = "FormulaNamespace#{Digest::MD5.hexdigest(path.to_s)}"
     klass = load_formula(name, path, contents, namespace)
-    FORMULAE[path] = klass
+    cache[path] = klass
   end
 
   if IO.method_defined?(:set_encoding)
@@ -122,14 +123,18 @@ module Formulary
       super name, Formulary.path(full_name)
     end
 
-    def get_formula(spec, alias_path: nil)
-      formula = super
-      formula.local_bottle_path = @bottle_filename
-      formula_version = formula.pkg_version
-      bottle_version =  Utils::Bottles.resolve_version(@bottle_filename)
-      unless formula_version == bottle_version
-        raise BottleVersionMismatchError.new(@bottle_filename, bottle_version, formula, formula_version)
+    def get_formula(spec, **)
+      contents = Utils::Bottles.formula_contents @bottle_filename, name: name
+      formula = begin
+        Formulary.from_contents name, @bottle_filename, contents, spec
+      rescue FormulaUnreadableError => e
+        opoo <<-EOS.undent
+          Unreadable formula in #{@bottle_filename}:
+          #{e}
+        EOS
+        super
       end
+      formula.local_bottle_path = @bottle_filename
       formula
     end
   end
@@ -165,7 +170,7 @@ module Formulary
     def load_file
       HOMEBREW_CACHE_FORMULA.mkpath
       FileUtils.rm_f(path)
-      curl url, "-o", path
+      curl_download url, to: path
       super
     rescue MethodDeprecatedError => e
       if url =~ %r{github.com/([\w-]+)/homebrew-([\w-]+)/}

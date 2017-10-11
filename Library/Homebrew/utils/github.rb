@@ -86,15 +86,9 @@ module GitHub
 
   def api_credentials_type
     token, username = api_credentials
-    if token && !token.empty?
-      if username && !username.empty?
-        :keychain
-      else
-        :environment
-      end
-    else
-      :none
-    end
+    return :none if !token || token.empty?
+    return :keychain if !username || username.empty?
+    :environment
   end
 
   def api_credentials_error_message(response_headers, needed_scopes)
@@ -133,7 +127,7 @@ module GitHub
 
   def open(url, data: nil, scopes: [].freeze)
     # This is a no-op if the user is opting out of using the GitHub API.
-    return if ENV["HOMEBREW_NO_GITHUB_API"]
+    return block_given? ? yield({}) : {} if ENV["HOMEBREW_NO_GITHUB_API"]
 
     args = %W[--header application/vnd.github.v3+json --write-out \n%{http_code}]
     args += curl_args
@@ -166,7 +160,7 @@ module GitHub
 
       args += ["--dump-header", headers_tmpfile.path]
 
-      output, errors, status = curl_output(url.to_s, *args)
+      output, errors, status = curl_output(url.to_s, "--location", *args)
       output, _, http_code = output.rpartition("\n")
       output, _, http_code = output.rpartition("\n") if http_code == "000"
       headers = headers_tmpfile.read
@@ -227,72 +221,60 @@ module GitHub
     end
   end
 
-  def issues_matching(query, qualifiers = {})
-    uri = URI.parse("#{API_URL}/search/issues")
-    uri.query = build_query_string(query, qualifiers)
-    open(uri) { |json| json["items"] }
+  def search_issues(query, **qualifiers)
+    search("issues", query, **qualifiers)
   end
 
   def repository(user, repo)
-    open(URI.parse("#{API_URL}/repos/#{user}/#{repo}"))
+    open(url_to("repos", user, repo))
   end
 
-  def search_code(*params)
-    uri = URI.parse("#{API_URL}/search/code")
-    uri.query = "q=#{uri_escape(params.join(" "))}"
-    open(uri) { |json| json["items"] }
-  end
-
-  def build_query_string(query, qualifiers)
-    s = "q=#{uri_escape(query)}+"
-    s << build_search_qualifier_string(qualifiers)
-    s << "&per_page=100"
-  end
-
-  def build_search_qualifier_string(qualifiers)
-    {
-      repo: "Homebrew/homebrew-core",
-      in: "title",
-    }.update(qualifiers).map do |qualifier, value|
-      "#{qualifier}:#{value}"
-    end.join("+")
-  end
-
-  def uri_escape(query)
-    if URI.respond_to?(:encode_www_form_component)
-      URI.encode_www_form_component(query)
-    else
-      require "erb"
-      ERB::Util.url_encode(query)
-    end
+  def search_code(**qualifiers)
+    search("code", **qualifiers)
   end
 
   def issues_for_formula(name, options = {})
     tap = options[:tap] || CoreTap.instance
-    issues_matching(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
+    search_issues(name, state: "open", repo: "#{tap.user}/homebrew-#{tap.repo}")
   end
 
   def print_pull_requests_matching(query)
-    return [] if ENV["HOMEBREW_NO_GITHUB_API"]
-
-    open_or_closed_prs = issues_matching(query, type: "pr")
+    open_or_closed_prs = search_issues(query, type: "pr", user: "Homebrew")
 
     open_prs = open_or_closed_prs.select { |i| i["state"] == "open" }
-    if !open_prs.empty?
+    prs = if !open_prs.empty?
       puts "Open pull requests:"
-      prs = open_prs
-    elsif !open_or_closed_prs.empty?
-      puts "Closed pull requests:"
-      prs = open_or_closed_prs
+      open_prs
     else
-      return
+      puts "Closed pull requests:" unless open_or_closed_prs.empty?
+      open_or_closed_prs
     end
 
     prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
   end
 
   def private_repo?(full_name)
-    uri = URI.parse("#{API_URL}/repos/#{full_name}")
+    uri = url_to "repos", full_name
     open(uri) { |json| json["private"] }
+  end
+
+  def query_string(*main_params, **qualifiers)
+    params = main_params
+
+    params += qualifiers.flat_map do |key, value|
+      Array(value).map { |v| "#{key}:#{v}" }
+    end
+
+    "q=#{URI.encode_www_form_component(params.join(" "))}&per_page=100"
+  end
+
+  def url_to(*subroutes)
+    URI.parse([API_URL, *subroutes].join("/"))
+  end
+
+  def search(entity, *queries, **qualifiers)
+    uri = url_to "search", entity
+    uri.query = query_string(*queries, **qualifiers)
+    open(uri) { |json| json.fetch("items", []) }
   end
 end

@@ -3,18 +3,16 @@ require "ostruct"
 require "options"
 require "json"
 require "development_tools"
+require "extend/cachable"
 
 # Inherit from OpenStruct to gain a generic initialization method that takes a
 # hash and creates an attribute for each key and value. `Tab.new` probably
 # should not be called directly, instead use one of the class methods like
 # `Tab.create`.
 class Tab < OpenStruct
-  FILENAME = "INSTALL_RECEIPT.json".freeze
-  CACHE = {}
+  extend Cachable
 
-  def self.clear_cache
-    CACHE.clear
-  end
+  FILENAME = "INSTALL_RECEIPT.json".freeze
 
   # Instantiates a Tab for a new installation of a formula.
   def self.create(formula, compiler, stdlib)
@@ -57,7 +55,7 @@ class Tab < OpenStruct
   # Returns the Tab for an install receipt at `path`.
   # Results are cached.
   def self.from_file(path)
-    CACHE.fetch(path) { |p| CACHE[p] = from_file_content(File.read(p), p) }
+    cache.fetch(path) { |p| cache[p] = from_file_content(File.read(p), p) }
   end
 
   # Like Tab.from_file, but bypass the cache.
@@ -324,7 +322,7 @@ class Tab < OpenStruct
       "poured_from_bottle" => poured_from_bottle,
       "installed_as_dependency" => installed_as_dependency,
       "installed_on_request" => installed_on_request,
-      "changed_files" => changed_files && changed_files.map(&:to_s),
+      "changed_files" => changed_files&.map(&:to_s),
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,
       "HEAD" => self.HEAD,
@@ -343,7 +341,7 @@ class Tab < OpenStruct
     # will no longer be valid.
     Formula.clear_installed_formulae_cache unless tabfile.exist?
 
-    CACHE[tabfile] = self
+    self.class.cache[tabfile] = self
     tabfile.atomic_write(to_json)
   end
 

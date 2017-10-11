@@ -78,10 +78,10 @@ class Descriptions
 
     formula_names.each do |name|
       begin
-        desc = Formulary.factory(name).desc
+        @cache[name] = Formulary.factory(name).desc
       rescue FormulaUnavailableError, *FormulaVersions::IGNORED_EXCEPTIONS
+        @cache.delete(name)
       end
-      @cache[name] = desc
     end
     save_cache if options[:save]
   end

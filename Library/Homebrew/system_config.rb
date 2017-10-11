@@ -134,7 +134,7 @@ class SystemConfig
       # java_home doesn't exist on all macOSs; it might be missing on older versions.
       return "N/A" unless File.executable? "/usr/libexec/java_home"
 
-      java_xml = Utils.popen_read("/usr/libexec/java_home", "--xml", "--failfast")
+      java_xml = Utils.popen_read("/usr/libexec/java_home", "--xml", "--failfast", err: :close)
       return "N/A" unless $CHILD_STATUS.success?
       javas = []
       REXML::XPath.each(REXML::Document.new(java_xml), "//key[text()='JVMVersion']/following-sibling::string") do |item|
