@@ -63,26 +63,26 @@ Metrics/AbcSize:
   Max: 250
 
 Metrics/BlockLength:
-  Max: 1250
+  Max: 144
 
 Metrics/ClassLength:
-  Max: 1500
+  Max: 589
 
 Metrics/CyclomaticComplexity:
   Max: 75
 
 Metrics/LineLength:
-  Max: 400
+  Max: 324
 
 Metrics/MethodLength:
-  Max: 250
+  Max: 222
 
 Metrics/ModuleLength:
   CountComments: false
-  Exclude:
-    - '**/bin/**/*'
-    - '**/cmd/**/*'
-    - '**/lib/**/*'
+  Max: 367
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
 
 Metrics/PerceivedComplexity:
   Max: 100

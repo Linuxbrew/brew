@@ -25,14 +25,20 @@ Lint/NestedMethodDefinition:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: true
 
+Metrics/BlockLength:
+  Max: 1250
+
 Metrics/BlockNesting:
   Max: 5
 
-Metrics/ModuleLength:
-  Max: 360
+Metrics/ClassLength:
+  Max: 1226
 
-Metrics/ParameterLists:
-  CountKeywordArgs: false
+Metrics/LineLength:
+  Max: 244
+
+Metrics/MethodLength:
+  Max: 195
 
 # we won't change backward compatible method names
 Naming/MethodName:
