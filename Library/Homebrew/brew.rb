@@ -32,7 +32,7 @@ begin
 
   empty_argv = ARGV.empty?
   help_flag_list = %w[-h --help --usage -?]
-  help_flag = !ENV["HOMEBREW_HELP"].nil?
+  help_flag = false
   internal_cmd = true
   cmd = nil
 
@@ -44,6 +44,9 @@ begin
       help_flag = true
     elsif !cmd && !help_flag_list.include?(arg)
       cmd = ARGV.delete_at(i)
+    elsif help_flag_list.include?(arg) & cmd
+      # cmd determined, and it needs help
+      help_flag = true
     end
   end
 
