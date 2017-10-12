@@ -67,7 +67,7 @@ module Hbc
 
           if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?) ||
              (value.respond_to?(:to_s) && value.to_s == "{}") ||
-             (artifact_name && !value.key?(artifact_name))
+             (artifact_name && !value.include?(artifact_name))
 
             if artifact_name
               thing = artifact_name
