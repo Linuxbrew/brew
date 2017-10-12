@@ -8,14 +8,14 @@ require "hbc/utils/hash_validator"
 
 module Hbc
   class SystemCommand
-    attr_reader :command
+    extend Predicable
 
     def self.run(executable, **options)
       new(executable, **options).run!
     end
 
     def self.run!(command, **options)
-      run(command, **options.merge(must_succeed: true))
+      run(command, **options, must_succeed: true)
     end
 
     def run!
@@ -26,38 +26,49 @@ module Hbc
         case type
         when :stdout
           processed_output[:stdout] << line
-          ohai line.chomp if options[:print_stdout]
+          ohai line.chomp if print_stdout?
         when :stderr
           processed_output[:stderr] << line
-          ohai line.chomp if options[:print_stderr]
+          ohai line.chomp if print_stderr?
         end
       end
 
-      assert_success if options[:must_succeed]
+      assert_success if must_succeed?
       result
     end
 
-    def initialize(executable, **options)
+    def initialize(executable, args: [], sudo: false, input: [], print_stdout: false, print_stderr: true, must_succeed: false, **options)
+      executable, *args = Shellwords.shellescape(executable) if args.empty?
+
       @executable = executable
+      @args = args
+      @sudo = sudo
+      @input = input
+      @print_stdout = print_stdout
+      @print_stderr = print_stderr
+      @must_succeed = must_succeed
+      options.extend(HashValidator).assert_valid_keys(:chdir)
       @options = options
-      process_options!
+    end
+
+    def command
+      @command ||= [
+        *sudo_prefix,
+        executable,
+        *args,
+      ].freeze
     end
 
     private
 
-    attr_reader :executable, :options, :processed_output, :processed_status
+    attr_reader :executable, :args, :input, :options, :processed_output, :processed_status
 
-    def process_options!
-      options.extend(HashValidator)
-             .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo, :chdir
-      sudo_prefix = %w[/usr/bin/sudo -E --]
-      sudo_prefix = sudo_prefix.insert(1, "-A") unless ENV["SUDO_ASKPASS"].nil?
-      @command = [executable]
-      options[:print_stderr] = true    unless options.key?(:print_stderr)
-      @command.unshift(*sudo_prefix)   if  options[:sudo]
-      @command.concat(options[:args])  if  options.key?(:args) && !options[:args].empty?
-      @command[0] = Shellwords.shellescape(@command[0]) if @command.size == 1
-      nil
+    attr_predicate :sudo?, :print_stdout?, :print_stderr?, :must_succeed?
+
+    def sudo_prefix
+      return [] unless sudo?
+      askpass_flags = ENV.key?("SUDO_ASKPASS") ? ["-A"] : []
+      ["/usr/bin/sudo", *askpass_flags, "-E", "--"]
     end
 
     def assert_success
@@ -76,11 +87,8 @@ module Hbc
     end
 
     def each_output_line(&b)
-      opts = {}
-      opts[:chdir] = options[:chdir] if options[:chdir]
-
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
-        Open3.popen3(*expanded_command, **opts)
+        Open3.popen3(*expanded_command, **options)
 
       write_input_to(raw_stdin)
       raw_stdin.close_write
@@ -90,7 +98,7 @@ module Hbc
     end
 
     def write_input_to(raw_stdin)
-      [*options[:input]].each { |line| raw_stdin.print line }
+      [*input].each(&raw_stdin.method(:print))
     end
 
     def each_line_from(sources)
