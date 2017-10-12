@@ -44,7 +44,7 @@ begin
       help_flag = true
     elsif !cmd && !help_flag_list.include?(arg)
       cmd = ARGV.delete_at(i)
-    elsif help_flag_list.include?(arg) & cmd
+    elsif help_flag_list.include?(arg) && cmd
       # cmd determined, and it needs help
       help_flag = true
     end
