@@ -10,12 +10,12 @@ module Hbc
   class SystemCommand
     attr_reader :command
 
-    def self.run(executable, options = {})
-      new(executable, options).run!
+    def self.run(executable, **options)
+      new(executable, **options).run!
     end
 
-    def self.run!(command, options = {})
-      run(command, options.merge(must_succeed: true))
+    def self.run!(command, **options)
+      run(command, **options.merge(must_succeed: true))
     end
 
     def run!
@@ -37,7 +37,7 @@ module Hbc
       result
     end
 
-    def initialize(executable, options)
+    def initialize(executable, **options)
       @executable = executable
       @options = options
       process_options!
@@ -49,7 +49,7 @@ module Hbc
 
     def process_options!
       options.extend(HashValidator)
-             .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo
+             .assert_valid_keys :input, :print_stdout, :print_stderr, :args, :must_succeed, :sudo, :chdir
       sudo_prefix = %w[/usr/bin/sudo -E --]
       sudo_prefix = sudo_prefix.insert(1, "-A") unless ENV["SUDO_ASKPASS"].nil?
       @command = [executable]
@@ -76,8 +76,11 @@ module Hbc
     end
 
     def each_output_line(&b)
+      opts = {}
+      opts[:chdir] = options[:chdir] if options[:chdir]
+
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
-        Open3.popen3(*expanded_command)
+        Open3.popen3(*expanded_command, **opts)
 
       write_input_to(raw_stdin)
       raw_stdin.close_write
