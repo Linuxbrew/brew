@@ -101,11 +101,6 @@ module FileUtils
     system Formulary.factory("scons").opt_bin/"scons", *args
   end
 
-  # Run the `rake` from the `ruby` Homebrew is using rather than whatever is in the `PATH`.
-  def rake(*args)
-    system RUBY_BIN/"rake", *args
-  end
-
   # Run `make` 3.81 or newer.
   # Uses the system make on Leopard and newer, and the
   # path to the actually-installed make on Tiger or older.
