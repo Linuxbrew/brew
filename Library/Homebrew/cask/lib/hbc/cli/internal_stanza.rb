@@ -24,9 +24,6 @@ module Hbc
       ARTIFACTS =
         DSL::ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key) +
         DSL::ARTIFACT_BLOCK_CLASSES.map(&:dsl_key)
-      ARTIFACTS_CLASSES =
-        DSL::ORDINARY_ARTIFACT_CLASSES +
-        DSL::ARTIFACT_BLOCK_CLASSES
 
       option "--table",   :table,   false
       option "--quiet",   :quiet,   false
@@ -69,27 +66,12 @@ module Hbc
           end
 
           if stanza == :artifacts
-            result = {}
-            value.each do |e|
-              result[e.class.dsl_key] = e.summarize
-            end
-            value = result
-          end
-
-          if artifact_name
-            result = nil
-            value.each do |k, v|
-              if k == artifact_name
-                result = v
-                break
-              end
-            end
-            value = result
+            value = Hash[value.map { |v| [v.class.dsl_key, v] }]
+            value = value[artifact_name] if artifact_name
           end
 
           if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?) ||
-             (value.respond_to?(:to_s) && value.to_s == "{}") # ||
-
+             (value.respond_to?(:to_s) && value.to_s == "{}")
             raise CaskError, "no such stanza '#{artifact_name ? artifact_name : stanza}' on Cask '#{cask}'"
           end
 
