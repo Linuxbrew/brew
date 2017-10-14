@@ -24,6 +24,9 @@ module Hbc
       ARTIFACTS =
         DSL::ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key) +
         DSL::ARTIFACT_BLOCK_CLASSES.map(&:dsl_key)
+      ARTIFACTS_CLASSES =
+        DSL::ORDINARY_ARTIFACT_CLASSES +
+        DSL::ARTIFACT_BLOCK_CLASSES
 
       option "--table",   :table,   false
       option "--quiet",   :quiet,   false
@@ -65,33 +68,29 @@ module Hbc
             next
           end
 
-          if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?) ||
-             (value.respond_to?(:to_s) && value.to_s == "{}") ||
-             (artifact_name && !value.include?(artifact_name))
-
-            if artifact_name
-              thing = artifact_name
-            else
-              thing = stanza
+          if stanza == :artifacts
+            result = {}
+            value.each do |e|
+              result[e.class.dsl_key] = e.summarize
             end
-
-            raise CaskError, "no such stanza '#{thing}' on Cask '#{cask}'"
+            value = result
           end
 
-          if stanza == :artifacts
-            value = Hash[
-              value.map do |k, v|
-                v = v.map do |a|
-                  next a.to_a if a.respond_to?(:to_a)
-                  next a.to_h if a.respond_to?(:to_h)
-                  a
-                end
-
-                [k, v]
+          if artifact_name
+            result = nil
+            value.each do |k, v|
+              if k == artifact_name
+                result = v
+                break
               end
-            ]
+            end
+            value = result
+          end
 
-            value = value.fetch(artifact_name) if artifact_name
+          if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?) ||
+             (value.respond_to?(:to_s) && value.to_s == "{}") # ||
+
+            raise CaskError, "no such stanza '#{artifact_name ? artifact_name : stanza}' on Cask '#{cask}'"
           end
 
           if format
