@@ -494,7 +494,7 @@ class Tap
 
   # an array of all installed {Tap} names.
   def self.names
-    map(&:name)
+    map(&:name).sort
   end
 
   # @private
