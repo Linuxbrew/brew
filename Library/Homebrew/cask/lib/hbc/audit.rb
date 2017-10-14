@@ -318,7 +318,7 @@ module Hbc
       curl_executable, *args = curl_args(
         "--compressed", "--location", "--fail",
         "--write-out", "%{http_code} %{url_effective}",
-        "--output", "/dev/null",
+        "--output", "/dev/null", "--head",
         url_to_access,
         user_agent: :fake
       )
