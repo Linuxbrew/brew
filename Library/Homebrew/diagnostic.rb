@@ -804,7 +804,7 @@ module Homebrew
       def check_for_linked_keg_only_brews
         return unless HOMEBREW_CELLAR.exist?
 
-        linked = Formula.installed.select do |f|
+        linked = Formula.installed.sort.select do |f|
           f.keg_only? && __check_linked_brew(f)
         end
         return if linked.empty?
