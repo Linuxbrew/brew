@@ -16,12 +16,12 @@ module Homebrew
     else
       # Find commands in Homebrew/cmd
       puts "Built-in commands"
-      puts Formatter.columns(internal_commands)
+      puts Formatter.columns(internal_commands.sort)
 
       # Find commands in Homebrew/dev-cmd
       puts
       puts "Built-in developer commands"
-      puts Formatter.columns(internal_developer_commands)
+      puts Formatter.columns(internal_developer_commands.sort)
 
       # Find commands in the path
       unless (exts = external_commands).empty?
