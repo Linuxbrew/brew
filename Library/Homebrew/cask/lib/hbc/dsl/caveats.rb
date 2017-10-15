@@ -9,22 +9,22 @@ module Hbc
   class DSL
     class Caveats < Base
       def path_environment_variable(path)
-        puts <<-EOS.undent
-        To use #{@cask}, you may need to add the #{path} directory
-        to your PATH environment variable, eg (for bash shell):
+        puts <<~EOS
+          To use #{@cask}, you may need to add the #{path} directory
+          to your PATH environment variable, eg (for bash shell):
 
-          export PATH=#{path}:"$PATH"
+            export PATH=#{path}:"$PATH"
 
         EOS
       end
 
       def zsh_path_helper(path)
-        puts <<-EOS.undent
-        To use #{@cask}, zsh users may need to add the following line to their
-        ~/.zprofile.  (Among other effects, #{path} will be added to the
-        PATH environment variable):
+        puts <<~EOS
+          To use #{@cask}, zsh users may need to add the following line to their
+          ~/.zprofile.  (Among other effects, #{path} will be added to the
+          PATH environment variable):
 
-          eval `/usr/libexec/path_helper -s`
+            eval `/usr/libexec/path_helper -s`
 
         EOS
       end
@@ -32,7 +32,7 @@ module Hbc
       def files_in_usr_local
         localpath = "/usr/local"
         return unless HOMEBREW_PREFIX.to_s.downcase.start_with?(localpath)
-        puts <<-EOS.undent
+        puts <<~EOS
           Cask #{@cask} installs files under "#{localpath}". The presence of such
           files can cause warnings when running "brew doctor", which is considered
           to be a bug in Homebrew-Cask.
@@ -42,72 +42,72 @@ module Hbc
 
       def depends_on_java(java_version = "any")
         if java_version == "any"
-          puts <<-EOS.undent
-          #{@cask} requires Java. You can install the latest version with
+          puts <<~EOS
+            #{@cask} requires Java. You can install the latest version with
 
-            brew cask install java
+              brew cask install java
 
           EOS
         elsif java_version.include?("9") || java_version.include?("+")
-          puts <<-EOS.undent
-          #{@cask} requires Java #{java_version}. You can install the latest version with
+          puts <<~EOS
+            #{@cask} requires Java #{java_version}. You can install the latest version with
 
-            brew cask install java
+              brew cask install java
 
           EOS
         else
-          puts <<-EOS.undent
-          #{@cask} requires Java #{java_version}. You can install it with
+          puts <<~EOS
+            #{@cask} requires Java #{java_version}. You can install it with
 
-            brew cask install caskroom/versions/java#{java_version}
+              brew cask install caskroom/versions/java#{java_version}
 
           EOS
         end
       end
 
       def logout
-        puts <<-EOS.undent
-        You must log out and log back in for the installation of #{@cask}
-        to take effect.
+        puts <<~EOS
+          You must log out and log back in for the installation of #{@cask}
+          to take effect.
 
         EOS
       end
 
       def reboot
-        puts <<-EOS.undent
-        You must reboot for the installation of #{@cask} to take effect.
+        puts <<~EOS
+          You must reboot for the installation of #{@cask} to take effect.
 
         EOS
       end
 
       def discontinued
-        puts <<-EOS.undent
-        #{@cask} has been officially discontinued upstream.
-        It may stop working correctly (or at all) in recent versions of macOS.
+        puts <<~EOS
+          #{@cask} has been officially discontinued upstream.
+          It may stop working correctly (or at all) in recent versions of macOS.
 
         EOS
       end
 
       def free_license(web_page)
-        puts <<-EOS.undent
-        The vendor offers a free license for #{@cask} at
-          #{web_page}
+        puts <<~EOS
+          The vendor offers a free license for #{@cask} at
+            #{web_page}
 
         EOS
       end
 
       def malware(radar_number)
-        puts <<-EOS.undent
-        #{@cask} has been reported to bundle malware. Like with any app, use at your own risk.
+        puts <<~EOS
+          #{@cask} has been reported to bundle malware. Like with any app, use at your own risk.
 
-        A report has been made to Apple about this app. Their certificate will hopefully be revoked.
-        See the public report at
-          #{Formatter.url("https://openradar.appspot.com/#{radar_number}")}
+          A report has been made to Apple about this app. Their certificate will hopefully be revoked.
+          See the public report at
+            #{Formatter.url("https://openradar.appspot.com/#{radar_number}")}
 
-        If this report is accurate, please duplicate it at
-          #{Formatter.url("https://bugreport.apple.com/")}
-        If this report is a mistake, please let us know by opening an issue at
-          #{Formatter.url("https://github.com/caskroom/homebrew-cask/issues/new")}
+          If this report is accurate, please duplicate it at
+            #{Formatter.url("https://bugreport.apple.com/")}
+          If this report is a mistake, please let us know by opening an issue at
+            #{Formatter.url("https://github.com/caskroom/homebrew-cask/issues/new")}
 
         EOS
       end

@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAuditStrict::BottleBlock do
 
   context "When auditing Bottle Block" do
     it "When there is revision in bottle block" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           bottle do
@@ -41,7 +41,7 @@ describe RuboCop::Cop::FormulaAuditStrict::BottleBlock do
 
   context "When auditing Bottle Block with auto correct" do
     it "When there is revision in bottle block" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           bottle do
@@ -50,7 +50,7 @@ describe RuboCop::Cop::FormulaAuditStrict::BottleBlock do
           end
         end
       EOS
-      corrected_source = <<-EOS.undent
+      corrected_source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           bottle do

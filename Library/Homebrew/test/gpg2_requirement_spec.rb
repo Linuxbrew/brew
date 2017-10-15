@@ -7,7 +7,7 @@ describe GPG2Requirement do
   describe "#satisfied?" do
     it "returns true if GPG2 is installed" do
       ENV["PATH"] = dir/"bin"
-      (dir/"bin/gpg").write <<-EOS.undent
+      (dir/"bin/gpg").write <<~EOS
         #!/bin/bash
         echo 2.1.20
       EOS

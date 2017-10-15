@@ -19,7 +19,7 @@ describe "brew style" do
     it "returns RubocopResults when RuboCop reports offenses" do
       formula = dir/"my-formula.rb"
 
-      formula.write <<-'EOS'.undent
+      formula.write <<~'EOS'
         class MyFormula < Formula
 
         end

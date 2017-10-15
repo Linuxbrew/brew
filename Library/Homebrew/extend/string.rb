@@ -8,7 +8,7 @@ class String
   alias unindent undent
 
   # eg:
-  #   if foo then <<-EOS.undent_________________________________________________________72
+  #   if foo then <<~EOS_________________________________________________________72
   #               Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
   #               eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
   #               minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip

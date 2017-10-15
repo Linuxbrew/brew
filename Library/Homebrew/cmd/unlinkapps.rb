@@ -20,7 +20,7 @@ module Homebrew
   module_function
 
   def unlinkapps
-    opoo <<-EOS.undent
+    opoo <<~EOS
       `brew unlinkapps` has been deprecated and will eventually be removed!
 
       Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" `.app` bundles that can be relocated. Instead, please consider using `brew cask` and migrate formulae using `.app`s to casks.

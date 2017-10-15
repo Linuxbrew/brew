@@ -235,7 +235,7 @@ module Hbc
       end
 
       def purpose
-        puts <<-EOS.undent
+        puts <<~EOS
           brew-cask provides a friendly homebrew-style CLI workflow for the
           administration of macOS applications distributed as binaries.
 

@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAudit::Options do
 
   context "When auditing options" do
     it "32-bit" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option "32-bit", "with 32-bit"
@@ -35,7 +35,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Options do
 
   context "When auditing options strictly" do
     it "with universal" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option :universal
@@ -56,7 +56,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Options do
     end
 
     it "with deprecated options" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option :cxx11
@@ -80,7 +80,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Options do
     end
 
     it "with misc deprecated options" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option "without-check"
@@ -109,7 +109,7 @@ describe RuboCop::Cop::NewFormulaAudit::Options do
 
   context "When auditing options for a new formula" do
     it "with deprecated options" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           deprecated_option "examples" => "with-examples"

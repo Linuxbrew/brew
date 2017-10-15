@@ -44,7 +44,7 @@ module Hbc
 
   class CaskAlreadyInstalledError < AbstractCaskErrorWithToken
     def to_s
-      <<-EOS.undent
+      <<~EOS
         Cask '#{token}' is already installed.
 
         To re-install #{token}, run:
@@ -80,7 +80,7 @@ module Hbc
 
   class CaskX11DependencyError < AbstractCaskErrorWithToken
     def to_s
-      <<-EOS.undent
+      <<~EOS
         Cask '#{token}' requires XQuartz/X11, which can be installed using Homebrew-Cask by running
           #{Formatter.identifier("brew cask install xquartz")}
 
@@ -132,7 +132,7 @@ module Hbc
 
   class CaskSha256MissingError < CaskSha256Error
     def to_s
-      <<-EOS.undent
+      <<~EOS
         Cask '#{token}' requires a checksum:
           #{Formatter.identifier("sha256 '#{actual}'")}
       EOS
@@ -148,7 +148,7 @@ module Hbc
     end
 
     def to_s
-      <<-EOS.undent
+      <<~EOS
         Checksum for Cask '#{token}' does not match.
 
         Expected: #{Formatter.success(expected.to_s)}
@@ -162,7 +162,7 @@ module Hbc
 
   class CaskNoShasumError < CaskSha256Error
     def to_s
-      <<-EOS.undent
+      <<~EOS
         Cask '#{token}' does not have a sha256 checksum defined and was not installed.
         This means you have the #{Formatter.identifier("--require-sha")} option set, perhaps in your HOMEBREW_CASK_OPTS.
       EOS

@@ -22,11 +22,11 @@ describe String do
     end
 
     it "can be nested" do
-      nested_string = <<-EOS.undent
+      nested_string = <<~EOS
         goodbye
       EOS
 
-      string = <<-EOS.undent
+      string = <<~EOS
         hello
         #{nested_string}
       EOS

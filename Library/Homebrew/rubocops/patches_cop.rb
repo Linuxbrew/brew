@@ -28,7 +28,7 @@ module RuboCop
           gh_patch_param_pattern = %r{https?://github\.com/.+/.+/(?:commit|pull)/[a-fA-F0-9]*.(?:patch|diff)}
           if regex_match_group(patch, gh_patch_param_pattern)
             if patch_url !~ /\?full_index=\w+$/
-              problem <<-EOS.undent
+              problem <<~EOS
                 GitHub patches should use the full_index parameter:
                   #{patch_url}?full_index=1
               EOS
@@ -41,7 +41,7 @@ module RuboCop
                                             %r{gist\.githubusercontent\.com/.+/raw}])
           if regex_match_group(patch, gh_patch_patterns)
             if patch_url !~ /[a-fA-F0-9]{40}/
-              problem <<-EOS.undent.chomp
+              problem <<~EOS.chomp
                 GitHub/Gist patches should specify a revision:
                 #{patch_url}
               EOS
@@ -50,7 +50,7 @@ module RuboCop
 
           gh_patch_diff_pattern = %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
           if match_obj = regex_match_group(patch, gh_patch_diff_pattern)
-            problem <<-EOS.undent
+            problem <<~EOS
               use GitHub pull request URLs:
                 https://github.com/#{match_obj[1]}/#{match_obj[2]}/pull/#{match_obj[3]}.patch
               Rather than patch-diff:
@@ -59,21 +59,21 @@ module RuboCop
           end
 
           if regex_match_group(patch, %r{macports/trunk})
-            problem <<-EOS.undent.chomp
+            problem <<~EOS.chomp
               MacPorts patches should specify a revision instead of trunk:
               #{patch_url}
             EOS
           end
 
           if regex_match_group(patch, %r{^http://trac\.macports\.org})
-            problem <<-EOS.undent.chomp
+            problem <<~EOS.chomp
               Patches from MacPorts Trac should be https://, not http:
               #{patch_url}
             EOS
           end
 
           return unless regex_match_group(patch, %r{^http://bugs\.debian\.org})
-          problem <<-EOS.undent.chomp
+          problem <<~EOS.chomp
             Patches from Debian should be https://, not http:
             #{patch_url}
           EOS

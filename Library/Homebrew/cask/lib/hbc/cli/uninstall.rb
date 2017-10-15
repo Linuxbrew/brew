@@ -25,7 +25,7 @@ module Hbc
 
           single = versions.count == 1
 
-          puts <<-EOS.undent
+          puts <<~EOS
             #{cask} #{versions.join(", ")} #{single ? "is" : "are"} still installed.
             Remove #{single ? "it" : "them all"} with `brew cask uninstall --force #{cask}`.
           EOS

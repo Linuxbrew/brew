@@ -208,7 +208,7 @@ module OS
         send(:"#{method}_version") == build
       end
     rescue IndexError
-      onoe <<-EOS.undent
+      onoe <<~EOS
         Homebrew doesn't know what compiler versions ship with your version
         of Xcode (#{Xcode.version}). Please `brew update` and if that doesn't
         help, file an issue with the output of `brew --config`:

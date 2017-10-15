@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
 
   context "When auditing formula desc" do
     it "When there is no desc" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
         end
@@ -28,7 +28,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
     end
 
     it "reports an offense when desc is an empty string" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc ''
@@ -49,14 +49,14 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
     end
 
     it "When desc is too long" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'Bar#{"bar" * 29}'
         end
       EOS
 
-      msg = <<-EOS.undent
+      msg = <<~EOS
         Description is too long. "name: desc" should be less than 80 characters.
         Length is calculated as foo + desc. (currently 95)
       EOS
@@ -73,7 +73,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
     end
 
     it "When desc is multiline string" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'Bar#{"bar" * 9}'\
@@ -81,7 +81,7 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
         end
       EOS
 
-      msg = <<-EOS.undent
+      msg = <<~EOS
         Description is too long. "name: desc" should be less than 80 characters.
         Length is calculated as foo + desc. (currently 98)
       EOS
@@ -104,7 +104,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
 
   context "When auditing formula desc" do
     it "When wrong \"command-line\" usage in desc" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'command line'
@@ -124,7 +124,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     end
 
     it "When an article is used in desc" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'An '
@@ -144,7 +144,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     end
 
     it "When an lowercase letter starts a desc" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'bar'
@@ -164,7 +164,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     end
 
     it "When formula name is in desc" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'Foo is a foobar'
@@ -184,13 +184,13 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     end
 
     it "autocorrects all rules" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc ' an bar: commandline foo '
         end
       EOS
-      correct_source = <<-EOS.undent
+      correct_source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'an bar: command-line'

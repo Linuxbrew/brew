@@ -190,7 +190,7 @@ module Hbc
       when 2..Float::INFINITY
         loaders = possible_tap_casks.map(&FromTapPathLoader.method(:new))
 
-        raise CaskError, <<-EOS.undent
+        raise CaskError, <<~EOS
           Cask #{ref} exists in multiple taps:
           #{loaders.map { |loader| "  #{loader.tap}/#{loader.token}" }.join("\n")}
         EOS

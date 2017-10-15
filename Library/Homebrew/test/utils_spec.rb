@@ -98,7 +98,7 @@ describe "globally-scoped helper methods" do
     let(:shell) { dir/"myshell" }
 
     it "starts an interactive shell session" do
-      IO.write shell, <<-EOS.undent
+      IO.write shell, <<~EOS
         #!/bin/sh
         echo called > "#{dir}/called"
       EOS

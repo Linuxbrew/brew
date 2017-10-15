@@ -9,7 +9,7 @@ describe StringInreplaceExtension do
     context "flag" do
       context "with spaces" do
         let(:string) do
-          <<-EOS.undent
+          <<~EOS
             OTHER=def
             FLAG = abc
             FLAG2=abc
@@ -18,7 +18,7 @@ describe StringInreplaceExtension do
 
         it "is successfully replaced" do
           subject.change_make_var! "FLAG", "def"
-          expect(subject).to eq <<-EOS.undent
+          expect(subject).to eq <<~EOS
             OTHER=def
             FLAG=def
             FLAG2=abc
@@ -27,7 +27,7 @@ describe StringInreplaceExtension do
 
         it "is successfully appended" do
           subject.change_make_var! "FLAG", "\\1 def"
-          expect(subject).to eq <<-EOS.undent
+          expect(subject).to eq <<~EOS
             OTHER=def
             FLAG=abc def
             FLAG2=abc
@@ -37,7 +37,7 @@ describe StringInreplaceExtension do
 
       context "with tabs" do
         let(:string) do
-          <<-EOS.undent
+          <<~EOS
             CFLAGS\t=\t-Wall -O2
             LDFLAGS\t=\t-lcrypto -lssl
           EOS
@@ -45,7 +45,7 @@ describe StringInreplaceExtension do
 
         it "is successfully replaced" do
           subject.change_make_var! "CFLAGS", "-O3"
-          expect(subject).to eq <<-EOS.undent
+          expect(subject).to eq <<~EOS
             CFLAGS=-O3
             LDFLAGS\t=\t-lcrypto -lssl
           EOS
@@ -55,7 +55,7 @@ describe StringInreplaceExtension do
 
     context "empty flag between other flags" do
       let(:string) do
-        <<-EOS.undent
+        <<~EOS
           OTHER=def
           FLAG =
           FLAG2=abc
@@ -64,7 +64,7 @@ describe StringInreplaceExtension do
 
       it "is successfully replaced" do
         subject.change_make_var! "FLAG", "def"
-        expect(subject).to eq <<-EOS.undent
+        expect(subject).to eq <<~EOS
           OTHER=def
           FLAG=def
           FLAG2=abc
@@ -74,7 +74,7 @@ describe StringInreplaceExtension do
 
     context "empty flag" do
       let(:string) do
-        <<-EOS.undent
+        <<~EOS
           FLAG =
           mv file_a file_b
         EOS
@@ -82,7 +82,7 @@ describe StringInreplaceExtension do
 
       it "is successfully replaced" do
         subject.change_make_var! "FLAG", "def"
-        expect(subject).to eq <<-EOS.undent
+        expect(subject).to eq <<~EOS
           FLAG=def
           mv file_a file_b
         EOS
@@ -91,7 +91,7 @@ describe StringInreplaceExtension do
 
     context "shell-style variable" do
       let(:string) do
-        <<-EOS.undent
+        <<~EOS
           OTHER=def
           FLAG=abc
           FLAG2=abc
@@ -100,7 +100,7 @@ describe StringInreplaceExtension do
 
       it "is successfully replaced" do
         subject.change_make_var! "FLAG", "def"
-        expect(subject).to eq <<-EOS.undent
+        expect(subject).to eq <<~EOS
           OTHER=def
           FLAG=def
           FLAG2=abc
@@ -113,7 +113,7 @@ describe StringInreplaceExtension do
     context "flag" do
       context "with spaces" do
         let(:string) do
-          <<-EOS.undent
+          <<~EOS
             OTHER=def
             FLAG = abc
             FLAG2 = def
@@ -122,7 +122,7 @@ describe StringInreplaceExtension do
 
         it "is successfully removed" do
           subject.remove_make_var! "FLAG"
-          expect(subject).to eq <<-EOS.undent
+          expect(subject).to eq <<~EOS
             OTHER=def
             FLAG2 = def
           EOS
@@ -131,7 +131,7 @@ describe StringInreplaceExtension do
 
       context "with tabs" do
         let(:string) do
-          <<-EOS.undent
+          <<~EOS
             CFLAGS\t=\t-Wall -O2
             LDFLAGS\t=\t-lcrypto -lssl
           EOS
@@ -139,7 +139,7 @@ describe StringInreplaceExtension do
 
         it "is successfully removed" do
           subject.remove_make_var! "LDFLAGS"
-          expect(subject).to eq <<-EOS.undent
+          expect(subject).to eq <<~EOS
             CFLAGS\t=\t-Wall -O2
           EOS
         end
@@ -148,7 +148,7 @@ describe StringInreplaceExtension do
 
     context "multiple flags" do
       let(:string) do
-        <<-EOS.undent
+        <<~EOS
           OTHER=def
           FLAG = abc
           FLAG2 = def
@@ -158,7 +158,7 @@ describe StringInreplaceExtension do
 
       specify "are be successfully removed" do
         subject.remove_make_var! ["FLAG", "FLAG2"]
-        expect(subject).to eq <<-EOS.undent
+        expect(subject).to eq <<~EOS
           OTHER=def
           OTHER2=def
         EOS
@@ -169,7 +169,7 @@ describe StringInreplaceExtension do
   describe "#get_make_var" do
     context "with spaces" do
       let(:string) do
-        <<-EOS.undent
+        <<~EOS
           CFLAGS = -Wall -O2
           LDFLAGS = -lcrypto -lssl
         EOS
@@ -182,7 +182,7 @@ describe StringInreplaceExtension do
 
     context "with tabs" do
       let(:string) do
-        <<-EOS.undent
+        <<~EOS
           CFLAGS\t=\t-Wall -O2
           LDFLAGS\t=\t-lcrypto -lssl
         EOS
@@ -217,7 +217,7 @@ describe Utils::Inreplace do
   let(:file) { Tempfile.new("test") }
 
   before(:each) do
-    file.write <<-EOS.undent
+    file.write <<~EOS
       a
       b
       c

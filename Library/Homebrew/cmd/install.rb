@@ -110,17 +110,17 @@ module Homebrew
       ARGV.formulae.each do |f|
         # head-only without --HEAD is an error
         if !ARGV.build_head? && f.stable.nil? && f.devel.nil?
-          raise <<-EOS.undent
-          #{f.full_name} is a head-only formula
-          Install with `brew install --HEAD #{f.full_name}`
+          raise <<~EOS
+            #{f.full_name} is a head-only formula
+            Install with `brew install --HEAD #{f.full_name}`
           EOS
         end
 
         # devel-only without --devel is an error
         if !ARGV.build_devel? && f.stable.nil? && f.head.nil?
-          raise <<-EOS.undent
-          #{f.full_name} is a devel-only formula
-          Install with `brew install --devel #{f.full_name}`
+          raise <<~EOS
+            #{f.full_name} is a devel-only formula
+            Install with `brew install --devel #{f.full_name}`
           EOS
         end
 
@@ -150,12 +150,12 @@ module Homebrew
           # sure --force flag is passed.
           if f.outdated?
             optlinked_version = Keg.for(f.opt_prefix).version
-            onoe <<-EOS.undent
+            onoe <<~EOS
               #{f.full_name} #{optlinked_version} is already installed
               To upgrade to #{f.version}, run `brew upgrade #{f.name}`
             EOS
           else
-            opoo <<-EOS.undent
+            opoo <<~EOS
               #{f.full_name} #{f.pkg_version} is already installed
             EOS
           end
@@ -173,13 +173,13 @@ module Homebrew
           msg = "#{f.full_name} #{installed_version} is already installed"
           linked_not_equals_installed = f.linked_version != installed_version
           if f.linked? && linked_not_equals_installed
-            msg = <<-EOS.undent
+            msg = <<~EOS
               #{msg}
               The currently linked version is #{f.linked_version}
               You can use `brew switch #{f} #{installed_version}` to link this version.
             EOS
           elsif !f.linked? || f.keg_only?
-            msg = <<-EOS.undent
+            msg = <<~EOS
               #{msg}, it's just not linked.
               You can use `brew link #{f}` to link this version.
             EOS
@@ -188,7 +188,7 @@ module Homebrew
         elsif !f.any_version_installed? && old_formula = f.old_installed_formulae.first
           msg = "#{old_formula.full_name} #{old_formula.installed_version} already installed"
           if !old_formula.linked? && !old_formula.keg_only?
-            msg = <<-EOS.undent
+            msg = <<~EOS
               #{msg}, it's just not linked.
               You can use `brew link #{old_formula.full_name}` to link this version.
             EOS
@@ -197,7 +197,7 @@ module Homebrew
         elsif f.migration_needed? && !ARGV.force?
           # Check if the formula we try to install is the same as installed
           # but not migrated one. If --force passed then install anyway.
-          opoo <<-EOS.undent
+          opoo <<~EOS
             #{f.oldname} already installed, it's just not migrated
             You can migrate formula with `brew migrate #{f}`
             Or you can force install it with `brew install #{f} --force`
@@ -283,7 +283,7 @@ module Homebrew
   def check_ppc
     case Hardware::CPU.type
     when :ppc
-      abort <<-EOS.undent
+      abort <<~EOS
         Sorry, Homebrew does not support your computer's CPU architecture.
         For PPC support, see: https://github.com/mistydemeo/tigerbrew
       EOS
@@ -308,7 +308,7 @@ module Homebrew
   def check_cellar
     FileUtils.mkdir_p HOMEBREW_CELLAR unless File.exist? HOMEBREW_CELLAR
   rescue
-    raise <<-EOS.undent
+    raise <<~EOS
       Could not create #{HOMEBREW_CELLAR}
       Check you have permission to write to #{HOMEBREW_CELLAR.parent}
     EOS

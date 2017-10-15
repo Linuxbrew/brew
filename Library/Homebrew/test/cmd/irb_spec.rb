@@ -3,7 +3,7 @@ describe "brew irb", :integration_test do
     setup_test_formula "testball"
 
     irb_test = HOMEBREW_TEMP/"irb-test.rb"
-    irb_test.write <<-EOS.undent
+    irb_test.write <<~EOS
       "testball".f
       :testball.f
       exit

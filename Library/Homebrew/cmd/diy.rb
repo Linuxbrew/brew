@@ -43,7 +43,7 @@ module Homebrew
     detected_name = basename[/(.*?)-?#{Regexp.escape(version)}/, 1] || basename
     canonical_name = Formulary.canonical_name(detected_name)
 
-    odie <<-EOS.undent if detected_name != canonical_name
+    odie <<~EOS if detected_name != canonical_name
       The detected name #{detected_name.inspect} exists in Homebrew as an alias
       of #{canonical_name.inspect}. Consider using the canonical name instead:
         brew diy --name=#{canonical_name}

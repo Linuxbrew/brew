@@ -29,7 +29,7 @@ Layout/IndentArray:
   EnforcedStyle: special_inside_parentheses
 
 Layout/IndentHeredoc:
-  EnforcedStyle: unindent
+  EnforcedStyle: squiggly
 
 # conflicts with DSL-style path concatenation with `/`
 Layout/SpaceAroundOperators:

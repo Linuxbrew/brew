@@ -100,7 +100,7 @@ describe FormulaInstaller do
   specify "check installation sanity pinned dependency" do
     dep_name = "dependency"
     dep_path = CoreTap.new.formula_dir/"#{dep_name}.rb"
-    dep_path.write <<-EOS.undent
+    dep_path.write <<~EOS
       class #{Formulary.class_s(dep_name)} < Formula
         url "foo"
         version "0.2"

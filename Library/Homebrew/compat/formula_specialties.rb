@@ -31,7 +31,7 @@ class AmazonWebServicesFormula < Formula
   def standard_instructions(home_name, home_value = libexec)
     odeprecated "AmazonWebServicesFormula#standard_instructions", "Formula#caveats"
 
-    <<-EOS.undent
+    <<~EOS
       Before you can use these tools you must export some variables to your $SHELL.
 
       To export the needed variables, add them to your dotfiles.

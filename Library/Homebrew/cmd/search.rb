@@ -87,7 +87,7 @@ module Homebrew
         arg.include?(char) && !arg.start_with?("/")
       end
     end
-    ohai <<-EOS.undent
+    ohai <<~EOS
       Did you mean to perform a regular expression search?
       Surround your query with /slashes/ to search locally by regex.
     EOS

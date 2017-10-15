@@ -25,11 +25,11 @@ describe RuboCop::Cop::FormulaAudit::Lines do
       }]
 
       formulae.each do |formula|
-        source = <<-EOS.undent
-        class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
-          depends_on :#{formula["dependency"]}
-        end
+        source = <<~EOS
+          class Foo < Formula
+            url 'http://example.com/foo-1.0.tgz'
+            depends_on :#{formula["dependency"]}
+          end
         EOS
         if formula.key?("correct")
           offense = ":#{formula["dependency"]} is deprecated. Usage should be \"#{formula["correct"]}\""
@@ -57,7 +57,7 @@ describe RuboCop::Cop::FormulaAudit::ClassInheritance do
 
   context "When auditing lines" do
     it "with no space in class inheritance" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo<Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -84,7 +84,7 @@ describe RuboCop::Cop::FormulaAudit::Comments do
 
   context "When auditing formulae" do
     it "with commented cmake call" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -106,7 +106,7 @@ describe RuboCop::Cop::FormulaAudit::Comments do
     end
 
     it "with default template comments" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           # PLEASE REMOVE
           desc "foo"
@@ -128,7 +128,7 @@ describe RuboCop::Cop::FormulaAudit::Comments do
     end
 
     it "with commented out depends_on" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -156,7 +156,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
 
   context "When auditing formulae" do
     it "with FileUtils" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -178,7 +178,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with long inreplace block vars" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -202,7 +202,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with invalid rebuild" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -227,7 +227,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with OS.linux? check" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -254,7 +254,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with fails_with :llvm" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -282,7 +282,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with def test" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -307,7 +307,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with def options" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -332,7 +332,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with deprecated skip_clean call" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -340,9 +340,9 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         end
       EOS
 
-      expected_offenses = [{ message: <<-EOS.undent.chomp,
-                              `skip_clean :all` is deprecated; brew no longer strips symbols
-                                      Pass explicit paths to prevent Homebrew from removing empty folders.
+      expected_offenses = [{ message: <<~EOS.chomp,
+        `skip_clean :all` is deprecated; brew no longer strips symbols
+                Pass explicit paths to prevent Homebrew from removing empty folders.
                              EOS
                              severity: :convention,
                              line: 4,
@@ -357,7 +357,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with build.universal?" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -381,7 +381,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with a build.universal? exemption reports no offenses" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Wine < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -396,7 +396,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with ENV.universal_binary" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -420,7 +420,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with an ENV.universal_binary exemption reports no offenses" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Wine < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -435,7 +435,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with ENV.x11" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -459,7 +459,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with ruby-macho alternatives" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -481,7 +481,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with ruby-macho alternatives audit exempted formula" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Cctools < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -494,7 +494,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with npm install without language::Node args" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -516,7 +516,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "with npm install without language::Node args in kibana" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class KibanaAT44 < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'

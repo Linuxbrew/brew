@@ -248,9 +248,9 @@ describe Version do
       end
 
       failure_message do |expected|
-        message = <<-EOS
-        expected: %s
-        detected: %s
+        message = <<~EOS
+          expected: %s
+          detected: %s
         EOS
         format(message, expected, detected)
       end

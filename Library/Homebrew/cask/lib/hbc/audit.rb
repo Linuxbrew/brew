@@ -174,7 +174,7 @@ module Hbc
         add_warning "error retrieving appcast: #{result[:command_result].stderr}"
       else
         expected = cask.appcast.checkpoint
-        add_warning <<-EOS.undent unless expected == actual_checkpoint
+        add_warning <<~EOS unless expected == actual_checkpoint
           appcast checkpoint mismatch
           Expected: #{expected}
           Actual: #{actual_checkpoint}

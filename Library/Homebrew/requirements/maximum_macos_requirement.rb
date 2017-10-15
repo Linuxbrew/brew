@@ -11,7 +11,7 @@ class MaximumMacOSRequirement < Requirement
   satisfy(build_env: false) { MacOS.version <= @version }
 
   def message
-    <<-EOS.undent
+    <<~EOS
       This formula either does not compile or function as expected on macOS
       versions newer than #{@version.pretty_name} due to an upstream incompatibility.
     EOS

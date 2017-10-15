@@ -124,7 +124,7 @@ module HomebrewArgvExtension
           Keg.new(prefix)
         end
       rescue FormulaUnavailableError
-        raise <<-EOS.undent
+        raise <<~EOS
           Multiple kegs installed to #{rack}
           However we don't know which one you refer to.
           Please delete (with rm -rf!) all but one and then try again.

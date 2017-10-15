@@ -10,7 +10,7 @@ describe "brew switch", :integration_test do
       .and not_to_output.to_stdout
       .and be_a_failure
 
-    setup_test_formula "testball", <<-EOS.undent
+    setup_test_formula "testball", <<~EOS
       keg_only "just because"
     EOS
 
