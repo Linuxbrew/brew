@@ -33,7 +33,7 @@ module Hbc
     # We want to extract nested containers before we
     # handle any other artifacts.
     #
-    TYPES = [
+    CLASSES = [
       PreflightBlock,
       Uninstall,
       NestedContainer,
@@ -60,12 +60,9 @@ module Hbc
       Zap,
     ].freeze
 
-    def self.for_cask(cask, options = {})
+    def self.for_cask(cask)
       odebug "Determining which artifacts are present in Cask #{cask}"
-
-      TYPES
-        .select { |klass| klass.me?(cask) }
-        .map { |klass| klass.new(cask, options) }
+      CLASSES.flat_map { |klass| klass.for_cask(cask) }
     end
   end
 end

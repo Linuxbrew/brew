@@ -68,7 +68,7 @@ describe Homebrew do
 
       expect(cmds).to include("t1"), "Executable files should be included"
       expect(cmds).to include("t2"), "Executable Ruby files should be included"
-      expect(cmds).not_to include("t3"), "Executable files with a non Ruby extension shoudn't be included"
+      expect(cmds).not_to include("t3"), "Executable files with a non Ruby extension shouldn't be included"
       expect(cmds).not_to include("t4"), "Non-executable files shouldn't be included"
     end
   end

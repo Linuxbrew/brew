@@ -54,6 +54,7 @@ module Homebrew
 
   def audit
     Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
+    Homebrew.auditing = true
 
     formula_count = 0
     problem_count = 0
@@ -201,12 +202,12 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, name, user_agents: [:default], check_content: false, strict: false)
+  def self.check_http_content(url, user_agents: [:default], check_content: false, strict: false, require_http: false)
     return unless url.start_with? "http"
 
     details = nil
     user_agent = nil
-    hash_needed = url.start_with?("http:") && name != "curl"
+    hash_needed = url.start_with?("http:") && !require_http
     user_agents.each do |ua|
       details = http_content_headers_and_checksum(url, hash_needed: hash_needed, user_agent: ua)
       user_agent = ua
@@ -379,21 +380,6 @@ class FormulaAuditor
         EOS
       end
     end
-  end
-
-  def audit_class
-    if @strict
-      unless formula.test_defined?
-        problem "A `test do` test block should be added"
-      end
-    end
-
-    classes = %w[GithubGistFormula ScriptFileFormula AmazonWebServicesFormula]
-    klass = classes.find do |c|
-      Object.const_defined?(c) && formula.class < Object.const_get(c)
-    end
-
-    problem "#{klass} is deprecated, use Formula instead" if klass
   end
 
   # core aliases + tap alias names + tap alias full name
@@ -588,9 +574,8 @@ class FormulaAuditor
 
     return unless @online
 
-    return unless DevelopmentTools.curl_handles_most_https_homepages?
+    return unless DevelopmentTools.curl_handles_most_https_certificates?
     if http_content_problem = FormulaAuditor.check_http_content(homepage,
-                                               formula.name,
                                                user_agents: [:browser, :default],
                                                check_content: true,
                                                strict: @strict)
@@ -644,13 +629,14 @@ class FormulaAuditor
     end
 
     %w[Stable Devel HEAD].each do |name|
-      next unless spec = formula.send(name.downcase)
+      spec_name = name.downcase.to_sym
+      next unless spec = formula.send(spec_name)
 
-      ra = ResourceAuditor.new(spec, online: @online, strict: @strict).audit
+      ra = ResourceAuditor.new(spec, spec_name, online: @online, strict: @strict).audit
       problems.concat ra.problems.map { |problem| "#{name}: #{problem}" }
 
       spec.resources.each_value do |resource|
-        ra = ResourceAuditor.new(resource, online: @online, strict: @strict).audit
+        ra = ResourceAuditor.new(resource, spec_name, online: @online, strict: @strict).audit
         problems.concat ra.problems.map { |problem|
           "#{name} resource #{resource.name.inspect}: #{problem}"
         }
@@ -893,10 +879,6 @@ class FormulaAuditor
 
     problem "Use spaces instead of tabs for indentation" if line =~ /^[ ]*\t/
 
-    if line.include?("ENV.x11")
-      problem "Use \"depends_on :x11\" instead of \"ENV.x11\""
-    end
-
     if line.include?("ENV.java_cache")
       problem "In-formula ENV.java_cache usage has been deprecated & should be removed."
     end
@@ -912,14 +894,6 @@ class FormulaAuditor
 
     if line =~ /system\s+['"](env|export)(\s+|['"])/
       problem "Use ENV instead of invoking '#{Regexp.last_match(1)}' to modify the environment"
-    end
-
-    if formula.name != "wine" && line =~ /ENV\.universal_binary/
-      problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
-    end
-
-    if line =~ /build\.universal\?/
-      problem "macOS has been 64-bit only so build.universal? is deprecated."
     end
 
     if line =~ /version == ['"]HEAD['"]/
@@ -962,12 +936,6 @@ class FormulaAuditor
       problem "Use build instead of ARGV to check options"
     end
 
-    problem "Use new-style option definitions" if line.include?("def options")
-
-    if line.end_with?("def test")
-      problem "Use new-style test definitions (test do)"
-    end
-
     if line.include?("MACOS_VERSION")
       problem "Use MacOS.version instead of MACOS_VERSION"
     end
@@ -979,11 +947,6 @@ class FormulaAuditor
     cats = %w[leopard snow_leopard lion mountain_lion].join("|")
     if line =~ /MacOS\.(?:#{cats})\?/
       problem "\"#{$&}\" is deprecated, use a comparison to MacOS.version instead"
-    end
-
-    if line =~ /skip_clean\s+:all/
-      problem "`skip_clean :all` is deprecated; brew no longer strips symbols\n" \
-              "\tPass explicit paths to prevent Homebrew from removing empty folders."
     end
 
     if line =~ /depends_on [A-Z][\w:]+\.new$/
@@ -1022,30 +985,6 @@ class FormulaAuditor
 
     if line =~ /assert [^!]+\.include?/
       problem "Use `assert_match` instead of `assert ...include?`"
-    end
-
-    if line.include?('system "npm", "install"') && !line.include?("Language::Node") &&
-       formula.name !~ /^kibana(\@\d+(\.\d+)?)?$/
-      problem "Use Language::Node for npm install args"
-    end
-
-    if line.include?("fails_with :llvm")
-      problem "'fails_with :llvm' is now a no-op so should be removed"
-    end
-
-    if line =~ /system\s+['"](otool|install_name_tool|lipo)/ && formula.name != "cctools"
-      problem "Use ruby-macho instead of calling #{Regexp.last_match(1)}"
-    end
-
-    if formula.tap.to_s == "homebrew/core" && !formula.tap.remote[/linuxbrew/i]
-      ["OS.mac?", "OS.linux?"].each do |check|
-        next unless line.include?(check)
-        problem "Don't use #{check}; Homebrew/core only supports macOS"
-      end
-    end
-
-    if line =~ /((revision|version_scheme)\s+0)/
-      problem "'#{Regexp.last_match(1)}' should be removed"
     end
 
     return unless @strict
@@ -1148,10 +1087,10 @@ class FormulaAuditor
 end
 
 class ResourceAuditor
-  attr_reader :problems
-  attr_reader :version, :checksum, :using, :specs, :url, :mirrors, :name
+  attr_reader :name, :version, :checksum, :url, :mirrors, :using, :specs, :owner
+  attr_reader :spec_name, :problems
 
-  def initialize(resource, options = {})
+  def initialize(resource, spec_name, options = {})
     @name     = resource.name
     @version  = resource.version
     @checksum = resource.checksum
@@ -1159,9 +1098,11 @@ class ResourceAuditor
     @mirrors  = resource.mirrors
     @using    = resource.using
     @specs    = resource.specs
-    @online   = options[:online]
-    @strict   = options[:strict]
-    @problems = []
+    @owner    = resource.owner
+    @spec_name = spec_name
+    @online    = options[:online]
+    @strict    = options[:strict]
+    @problems  = []
   end
 
   def audit
@@ -1235,11 +1176,29 @@ class ResourceAuditor
     problem "Redundant :using value in URL"
   end
 
+  def self.curl_openssl_and_deps
+    @curl_openssl_and_deps ||= begin
+      formulae_names = ["curl", "openssl"]
+      formulae_names += formulae_names.flat_map do |f|
+        Formula[f].recursive_dependencies.map(&:name)
+      end
+      formulae_names.uniq
+    rescue FormulaUnavailableError
+      []
+    end
+  end
+
   def audit_urls
     urls = [url] + mirrors
 
-    if name == "curl" && !urls.find { |u| u.start_with?("http://") }
-      problem "should always include at least one HTTP url"
+    curl_openssl_or_deps = ResourceAuditor.curl_openssl_and_deps.include?(owner.name)
+
+    if spec_name == :stable && curl_openssl_or_deps
+      problem "should not use xz tarballs" if url.end_with?(".xz")
+
+      unless urls.find { |u| u.start_with?("http://") }
+        problem "should always include at least one HTTP mirror"
+      end
     end
 
     return unless @online
@@ -1251,7 +1210,7 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url, name)
+        if http_content_problem = FormulaAuditor.check_http_content(url, require_http: curl_openssl_or_deps)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy

@@ -102,7 +102,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   if ARGV.homebrew_developer? || disable ||
      Homebrew.raise_deprecation_exceptions?
     raise MethodDeprecatedError, message
-  else
+  elsif !Homebrew.auditing?
     opoo "#{message}\n"
   end
 end
@@ -561,4 +561,16 @@ end
 
 def shell_profile
   Utils::Shell.profile
+end
+
+def tap_and_name_comparison
+  proc do |a, b|
+    if a.include?("/") && !b.include?("/")
+      1
+    elsif !a.include?("/") && b.include?("/")
+      -1
+    else
+      a <=> b
+    end
+  end
 end

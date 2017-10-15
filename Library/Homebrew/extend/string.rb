@@ -60,7 +60,7 @@ module StringInreplaceExtension
     result
   end
 
-  # Looks for Makefile style variable defintions and replaces the
+  # Looks for Makefile style variable definitions and replaces the
   # value with "new_value", or removes the definition entirely.
   def change_make_var!(flag, new_value)
     return if gsub!(/^#{Regexp.escape(flag)}[ \t]*=[ \t]*(.*)$/, "#{flag}=#{new_value}", false)

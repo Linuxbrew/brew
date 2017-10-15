@@ -31,7 +31,7 @@ describe "Satisfy Dependencies and Requirements", :cask do
       it { is_expected.not_to raise_error }
     end
 
-    context "given a comparisson" do
+    context "given a comparison" do
       let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-depends-on-macos-comparison.rb") }
       it { is_expected.not_to raise_error }
     end

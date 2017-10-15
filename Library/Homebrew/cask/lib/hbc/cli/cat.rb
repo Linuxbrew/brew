@@ -7,10 +7,6 @@ module Hbc
       end
 
       def run
-        raise CaskError, "Cat incomplete." if cat_casks == :incomplete
-      end
-
-      def cat_casks
         casks.each do |cask|
           puts File.open(cask.sourcefile_path, &:read)
         end

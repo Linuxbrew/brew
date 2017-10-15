@@ -47,7 +47,7 @@ PowerPC and Tiger branches from other users in the fork network. See
 [Interesting Taps and Forks](Interesting-Taps-and-Forks.md).
 
 <a name="2"><sup>2</sup></a> 10.10 or higher is recommended. 10.5–10.9 are
-supported on a best-effort basis. For 10.4 and 10.5, see
+supported on a best-effort basis. For 10.4 see
 [Tigerbrew](https://github.com/mistydemeo/tigerbrew).
 
 <a name="3"><sup>3</sup></a> Most formulae require a compiler. A handful

@@ -3,7 +3,7 @@ module Hbc
     class InternalStanza < AbstractInternalCommand
       # Syntax
       #
-      #     brew cask _stanza <stanza_name> [ --table | --yaml | --inspect | --quiet ] [ <cask_token> ... ]
+      #     brew cask _stanza <stanza_name> [ --quiet ] [ --table | --yaml ] [ <cask_token> ... ]
       #
       # If no tokens are given, then data for all Casks is returned.
       #
@@ -14,41 +14,16 @@ module Hbc
       # Examples
       #
       #     brew cask _stanza appcast   --table
-      #     brew cask _stanza app       --table alfred google-chrome adium voicemac logisim vagrant
-      #     brew cask _stanza url       --table alfred google-chrome adium voicemac logisim vagrant
-      #     brew cask _stanza version   --table alfred google-chrome adium voicemac logisim vagrant
-      #     brew cask _stanza artifacts --table --inspect alfred google-chrome adium voicemac logisim vagrant
-      #     brew cask _stanza artifacts --table --yaml    alfred google-chrome adium voicemac logisim vagrant
+      #     brew cask _stanza app       --table           alfred google-chrome adium vagrant
+      #     brew cask _stanza url       --table           alfred google-chrome adium vagrant
+      #     brew cask _stanza version   --table           alfred google-chrome adium vagrant
+      #     brew cask _stanza artifacts --table           alfred google-chrome adium vagrant
+      #     brew cask _stanza artifacts --table --yaml    alfred google-chrome adium vagrant
       #
 
-      # TODO: this should be retrievable from Hbc::DSL
-      ARTIFACTS = Set.new [
-        :app,
-        :suite,
-        :artifact,
-        :prefpane,
-        :qlplugin,
-        :dictionary,
-        :font,
-        :service,
-        :colorpicker,
-        :binary,
-        :input_method,
-        :internet_plugin,
-        :audio_unit_plugin,
-        :vst_plugin,
-        :vst3_plugin,
-        :screen_saver,
-        :pkg,
-        :installer,
-        :stage_only,
-        :nested_container,
-        :uninstall,
-        :preflight,
-        :postflight,
-        :uninstall_preflight,
-        :uninstall_postflight,
-      ]
+      ARTIFACTS =
+        DSL::ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key) +
+        DSL::ARTIFACT_BLOCK_CLASSES.map(&:dsl_key)
 
       option "--table",   :table,   false
       option "--quiet",   :quiet,   false
@@ -68,16 +43,9 @@ module Hbc
         @stanza = args.shift.to_sym
 
         @format = :to_yaml if yaml?
-        @format = :inspect if inspect?
       end
 
       def run
-        return unless print_stanzas == :incomplete
-        exit 1 if quiet?
-        raise CaskError, "Print incomplete."
-      end
-
-      def print_stanzas
         if ARTIFACTS.include?(stanza)
           artifact_name = stanza
           @stanza = :artifacts
@@ -93,7 +61,7 @@ module Hbc
           end
 
           begin
-            value = cask.send(@stanza)
+            value = cask.send(stanza)
           rescue StandardError
             opoo "failure calling '#{stanza}' on Cask '#{cask}'" unless quiet?
             puts ""
@@ -106,11 +74,25 @@ module Hbc
             next
           end
 
-          value = value.fetch(artifact_name).to_a.flatten if artifact_name
+          if stanza == :artifacts
+            value = Hash[
+              value.map do |k, v|
+                v = v.map do |a|
+                  next a.to_a if a.respond_to?(:to_a)
+                  next a.to_h if a.respond_to?(:to_h)
+                  a
+                end
 
-          if @format
-            puts value.send(@format)
-          elsif artifact_name || value.is_a?(Symbol)
+                [k, v]
+              end
+            ]
+
+            value = value.fetch(artifact_name) if artifact_name
+          end
+
+          if format
+            puts value.send(format)
+          elsif value.is_a?(Symbol)
             puts value.inspect
           else
             puts value.to_s

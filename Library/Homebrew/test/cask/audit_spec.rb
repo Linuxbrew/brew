@@ -265,19 +265,14 @@ describe Hbc::Audit, :cask do
     end
 
     describe "generic artifact checks" do
-      context "with no target" do
-        let(:cask_token) { "generic-artifact-no-target" }
-        it { is_expected.to fail_with(/target required for generic artifact/) }
-      end
-
       context "with relative target" do
         let(:cask_token) { "generic-artifact-relative-target" }
-        it { is_expected.to fail_with(/target must be absolute path for generic artifact/) }
+        it { is_expected.to fail_with(/target must be absolute path for Generic Artifact/) }
       end
 
       context "with absolute target" do
         let(:cask_token) { "generic-artifact-absolute-target" }
-        it { should_not fail_with(/target required for generic artifact/) }
+        it { should_not fail_with(/target required for Generic Artifact/) }
       end
     end
 

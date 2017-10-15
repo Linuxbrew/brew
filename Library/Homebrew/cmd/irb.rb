@@ -19,15 +19,13 @@ class String
   end
 end
 
-def cask
-  $LOAD_PATH.unshift("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
-  require "hbc"
-end
-
 module Homebrew
   module_function
 
   def irb
+    $LOAD_PATH.unshift("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+    require "hbc"
+
     if ARGV.include? "--examples"
       puts "'v8'.f # => instance of the v8 formula"
       puts ":hub.f.installed?"

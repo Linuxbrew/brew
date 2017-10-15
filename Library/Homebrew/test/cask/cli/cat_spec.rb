@@ -35,8 +35,7 @@ describe Hbc::CLI::Cat, :cask do
 
   it "raises an exception when the Cask does not exist" do
     expect { Hbc::CLI::Cat.run("notacask") }
-      .to output(/is unavailable/).to_stderr
-      .and raise_error(Hbc::CaskError, "Cat incomplete.")
+      .to raise_error(Hbc::CaskUnavailableError, /is unavailable/)
   end
 
   describe "when no Cask is specified" do
