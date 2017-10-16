@@ -42,5 +42,4 @@ class Caveats
     end
     s.join("\n") + "\n" unless s.empty?
   end
-
 end
