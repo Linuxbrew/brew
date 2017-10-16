@@ -251,7 +251,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
-    end
+    end if OS.mac?
 
     it "with fails_with :llvm" do
       source = <<-EOS.undent

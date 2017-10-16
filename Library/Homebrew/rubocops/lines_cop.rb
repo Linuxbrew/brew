@@ -79,7 +79,7 @@ module RuboCop
             find_instance_method_call(body_node, "OS", method_name) do |check|
               problem "Don't use #{check.source}; Homebrew/core only supports macOS"
             end
-          end
+          end if OS.mac?
 
           find_method_with_args(body_node, :fails_with, :llvm) do
             problem "'fails_with :llvm' is now a no-op so should be removed"
