@@ -134,11 +134,17 @@ Former maintainers with significant contributions include [Bob W. Hogg](https://
 Code is under the [BSD 2-clause "Simplified" License](https://github.com/Linuxbrew/brew/tree/master/LICENSE.txt).
 Documentation is under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/).
 
-## Donate
+## Donations
 
-Linuxbrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for continuous integration and the computer resources used to build precompiled binary bottles of your favourite formulae. Every donation will be spent on making Linuxbrew better for our users. Please consider [donating regularly to Linuxbrew through Patreon](https://www.patreon.com/linuxbrew). We appreciate your support and contribution, no matter the level.
+Linuxbrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for continuous integration and the computer resources used to build precompiled binary bottles of your favourite formulae. Every donation will be spent on making Linuxbrew better for our users.
+
+Please consider [donating regularly to Linuxbrew through Patreon](https://www.patreon.com/linuxbrew). We appreciate your support and contribution, no matter the level.
+
+[![Donate with Patreon](https://img.shields.io/badge/Patreon-Linuxbrew-green.svg)](https://www.patreon.com/linuxbrew)
 
 [Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew on Patreon](https://www.patreon.com/homebrew) as well if you use Homebrew on macOS.
+
+[![Donate with Patreon](https://img.shields.io/badge/Patreon-Homebrew-green.svg)](https://www.patreon.com/homebrew)
 
 # Sponsors
 

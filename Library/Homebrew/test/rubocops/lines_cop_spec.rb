@@ -380,6 +380,21 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "with build.universal? exempted formula" do
+      source = <<-EOS.undent
+        class Wine < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build.universal?
+             "foo"
+          end
+        end
+      EOS
+
+      inspect_source(cop, source, "/homebrew-core/Formula/wine.rb")
+      expect(cop.offenses).to eq([])
+    end
+
     it "with ENV.universal_binary" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -450,6 +465,19 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "with ruby-macho alternatives audit exempted formula" do
+      source = <<-EOS.undent
+        class Cctools < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "install_name_tool", "-id"
+        end
+      EOS
+
+      inspect_source(cop, source, "/homebrew-core/Formula/cctools.rb")
+      expect(cop.offenses).to eq([])
+    end
+
     it "with npm install without language::Node args" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -470,6 +498,19 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
       end
+    end
+
+    it "with npm install without language::Node args in kibana" do
+      source = <<-EOS.undent
+        class KibanaAT44 < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "npm", "install"
+        end
+      EOS
+
+      inspect_source(cop, source, "/homebrew-core/Formula/kibana@4.4.rb")
+      expect(cop.offenses).to eq([])
     end
   end
 end

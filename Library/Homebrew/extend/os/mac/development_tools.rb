@@ -9,7 +9,7 @@ class DevelopmentTools
         @locate[key] = if (located_tool = original_locate(tool))
           located_tool
         elsif MacOS.version > :tiger
-          path = Utils.popen_read("/usr/bin/xcrun", "-no-cache", "-find", tool).chomp
+          path = Utils.popen_read("/usr/bin/xcrun", "-no-cache", "-find", tool, err: :close).chomp
           Pathname.new(path) if File.executable?(path)
         end
       end
@@ -85,7 +85,7 @@ class DevelopmentTools
     def curl_handles_most_https_certificates?
       # The system Curl is too old for some modern HTTPS certificates on
       # older macOS versions.
-      !ENV["HOMEBREW_SYSTEM_CURL_TOO_OLD"].nil?
+      ENV["HOMEBREW_SYSTEM_CURL_TOO_OLD"].nil?
     end
 
     def subversion_handles_most_https_certificates?

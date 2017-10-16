@@ -214,7 +214,12 @@ class FormulaAuditor
       break if details[:status].to_s.start_with?("2")
     end
 
-    return "The URL #{url} is not reachable" unless details[:status]
+    unless details[:status]
+      # Hack around https://github.com/Homebrew/brew/issues/3199
+      return if MacOS.version == :el_capitan
+      return "The URL #{url} is not reachable"
+    end
+
     unless details[:status].start_with? "2"
       return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
     end
@@ -414,6 +419,7 @@ class FormulaAuditor
 
     @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names)
                                           .each_with_object({}) do |tap_formula_full_name, name_map|
+      next if tap_formula_full_name.start_with?("homebrew/science/")
       tap_formula_name = tap_formula_full_name.split("/").last
       name_map[tap_formula_name] ||= []
       name_map[tap_formula_name] << tap_formula_full_name
@@ -424,6 +430,7 @@ class FormulaAuditor
 
     if @online
       Homebrew.search_taps(name, silent: true).each do |tap_formula_full_name|
+        next if tap_formula_full_name.start_with?("homebrew/science/")
         tap_formula_name = tap_formula_full_name.split("/").last
         next if tap_formula_name != name
         same_name_tap_formulae << tap_formula_full_name

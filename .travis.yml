@@ -15,7 +15,7 @@ matrix:
       rvm: system
     - os: linux
       sudo: false
-      rvm: 2.0.0
+      rvm: 2.3.3
 
 before_install:
   - git fetch --tags --unshallow
