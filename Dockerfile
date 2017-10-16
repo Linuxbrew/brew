@@ -2,9 +2,7 @@ FROM ubuntu:xenial
 LABEL maintainer="Shaun Jackman <sjackman@gmail.com>"
 
 RUN apt-get update \
-	&& apt-get install -y bzip2 curl file g++ git locales make ruby-dev sudo uuid-runtime
-RUN mkdir -p /usr/share/rubygems-integration/all/gems/rake-10.5.0/bin \
-	&& ln -s /usr/bin/rake /usr/share/rubygems-integration/all/gems/rake-10.5.0/bin/
+	&& apt-get install -y bzip2 curl file g++ git locales make sudo uuid-runtime
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8 \
 	&& useradd -m -s /bin/bash linuxbrew \
