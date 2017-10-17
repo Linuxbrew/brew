@@ -974,8 +974,12 @@ class FormulaAuditor
       problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
     end
 
-    if line =~ /assert !File\.exist\?/
-      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?`"
+    if line =~ /(assert !File\.exist\?|assert !\(.*\)\.exist\?)/
+      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
+    end
+
+    if line =~ /(assert File\.executable\?|assert \(.*\)\.executable\?)/
+      problem "Use `assert_predicate <path_to_file>, :executable?` instead of `#{Regexp.last_match(1)}`"
     end
 
     return unless @strict
