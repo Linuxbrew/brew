@@ -226,7 +226,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
-    it "with OS.linux? check" do
+    it "with OS.linux? check", :needs_macos do
       source = <<-EOS.undent
         class Foo < Formula
           desc "foo"
