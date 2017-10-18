@@ -58,6 +58,18 @@ require "tap"
 require "version"
 require "pkg_version"
 
+module GitHub
+  module_function
+
+  # Return the corresponding test-bot user name for the given GitHub organization.
+  def test_bot_user(user)
+    test_bot = ARGV.value "test-bot-user"
+    return test_bot if test_bot
+    return "BrewTestBot" if user.casecmp("homebrew").zero?
+    "#{user.capitalize}TestBot"
+  end
+end
+
 module Homebrew
   module_function
 
@@ -231,7 +243,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          "https://github.com/#{test_bot_user user}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
+          "https://github.com/#{GitHub.test_bot_user user}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
         curl "--silent", "--fail", "--output", "/dev/null", "--head", bottle_commit_url
@@ -257,13 +269,6 @@ module Homebrew
     # Verify bintray publishing after all patches have been applied
     bintray_published_formulae.uniq!
     verify_bintray_published(bintray_published_formulae)
-  end
-
-  def test_bot_user(user)
-    test_bot = ARGV.value "test-bot-user"
-    return test_bot if test_bot
-    return "BrewTestBot" if user.casecmp("homebrew").zero?
-    "#{user.capitalize}TestBot"
   end
 
   def force_utf8!(str)
