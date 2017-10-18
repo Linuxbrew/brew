@@ -358,7 +358,7 @@ class FormulaAuditor
       end
       valid_alias_names = [alias_name_major, alias_name_major_minor]
 
-      if formula.tap && !formula.tap.core_tap?
+      unless formula.tap&.core_tap?
         versioned_aliases.map! { |a| "#{formula.tap}/#{a}" }
         valid_alias_names.map! { |a| "#{formula.tap}/#{a}" }
       end
@@ -396,7 +396,6 @@ class FormulaAuditor
     return if formula.tap.nil? || !formula.tap.official?
 
     name = formula.name
-    full_name = formula.full_name
 
     if Homebrew::MissingFormula.blacklisted_reason(name)
       problem "'#{name}' is blacklisted."
@@ -412,35 +411,10 @@ class FormulaAuditor
       return
     end
 
-    if !formula.core_formula? && Formula.core_names.include?(name)
-      problem "Formula name conflicts with existing core formula."
-      return
-    end
+    return if formula.core_formula?
+    return unless Formula.core_names.include?(name)
 
-    @@local_official_taps_name_map ||= Tap.select(&:official?).flat_map(&:formula_names)
-                                          .each_with_object({}) do |tap_formula_full_name, name_map|
-      next if tap_formula_full_name.start_with?("homebrew/science/")
-      tap_formula_name = tap_formula_full_name.split("/").last
-      name_map[tap_formula_name] ||= []
-      name_map[tap_formula_name] << tap_formula_full_name
-      name_map
-    end
-
-    same_name_tap_formulae = @@local_official_taps_name_map[name] || []
-
-    if @online
-      Homebrew.search_taps(name, silent: true).each do |tap_formula_full_name|
-        next if tap_formula_full_name.start_with?("homebrew/science/")
-        tap_formula_name = tap_formula_full_name.split("/").last
-        next if tap_formula_name != name
-        same_name_tap_formulae << tap_formula_full_name
-      end
-    end
-
-    same_name_tap_formulae.delete(full_name)
-
-    return if same_name_tap_formulae.empty?
-    problem "Formula name conflicts with #{same_name_tap_formulae.join ", "}"
+    problem "Formula name conflicts with existing core formula."
   end
 
   def audit_deps
@@ -708,7 +682,7 @@ class FormulaAuditor
     end
 
     stable = formula.stable
-    case stable && stable.url
+    case stable&.url
     when /[\d\._-](alpha|beta|rc\d)/
       matched = Regexp.last_match(1)
       version_prefix = stable.version.to_s.sub(/\d+$/, "")
@@ -994,6 +968,14 @@ class FormulaAuditor
       problem "Use `assert_match` instead of `assert ...include?`"
     end
 
+    if line =~ /(assert File\.exist\?|assert \(.*\)\.exist\?)/
+      problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
+    end
+
+    if line =~ /assert !File\.exist\?/
+      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?`"
+    end
+
     return unless @strict
 
     problem "`#{Regexp.last_match(1)}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
@@ -1019,7 +1001,7 @@ class FormulaAuditor
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
-    return unless formula.tap && formula.tap.official?
+    return unless formula.tap&.official?
     return unless formula.tap.tap_migrations.key?(formula.name)
 
     problem <<-EOS.undent

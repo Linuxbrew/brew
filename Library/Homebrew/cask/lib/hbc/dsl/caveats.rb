@@ -48,7 +48,7 @@ module Hbc
             brew cask install java
 
           EOS
-        elsif java_version.include?("8") || java_version.include?("+")
+        elsif java_version.include?("9") || java_version.include?("+")
           puts <<-EOS.undent
           #{@cask} requires Java #{java_version}. You can install the latest version with
 

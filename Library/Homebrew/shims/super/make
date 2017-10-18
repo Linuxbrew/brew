@@ -1,5 +1,10 @@
 #!/bin/bash
 
-export MAKE=${HOMEBREW_MAKE:-make}
+if [[ -n "$HOMEBREW_MAKE" && "$HOMEBREW_MAKE" != "make" ]]
+then
+  export MAKE="$HOMEBREW_MAKE"
+else
+  MAKE="make"
+fi
 export HOMEBREW_CCCFG="O$HOMEBREW_CCCFG"
-exec xcrun $MAKE "$@"
+exec xcrun "$MAKE" "$@"

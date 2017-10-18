@@ -20,7 +20,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
                               column: 0,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -41,7 +41,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -72,7 +72,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
           end
         EOS
 
-        inspect_source(cop, source)
+        inspect_source(source)
         if homepage =~ %r{http:\/\/www\.freedesktop\.org}
           if homepage =~ /Software/
             expected_offenses = [{  message: "#{homepage} should be styled " \

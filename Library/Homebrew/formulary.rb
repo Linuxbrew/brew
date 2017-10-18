@@ -122,14 +122,18 @@ module Formulary
       super name, Formulary.path(full_name)
     end
 
-    def get_formula(spec, alias_path: nil)
-      formula = super
-      formula.local_bottle_path = @bottle_filename
-      formula_version = formula.pkg_version
-      bottle_version =  Utils::Bottles.resolve_version(@bottle_filename)
-      unless formula_version == bottle_version
-        raise BottleVersionMismatchError.new(@bottle_filename, bottle_version, formula, formula_version)
+    def get_formula(spec, **)
+      contents = Utils::Bottles.formula_contents @bottle_filename, name: name
+      formula = begin
+        Formulary.from_contents name, @bottle_filename, contents, spec
+      rescue FormulaUnreadableError => e
+        opoo <<-EOS.undent
+          Unreadable formula in #{@bottle_filename}:
+          #{e}
+        EOS
+        super
       end
+      formula.local_bottle_path = @bottle_filename
       formula
     end
   end

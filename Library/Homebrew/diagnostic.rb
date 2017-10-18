@@ -542,7 +542,7 @@ module Homebrew
         homebrew_owned = @found.all? do |path|
           Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
         end
-        return if gettext && gettext.linked_keg.directory? && homebrew_owned
+        return if gettext&.linked_keg&.directory? && homebrew_owned
 
         inject_file_list @found, <<-EOS.undent
           gettext files detected at a system prefix.
@@ -561,7 +561,7 @@ module Homebrew
         rescue
           nil
         end
-        if libiconv && libiconv.linked_keg.directory?
+        if libiconv&.linked_keg&.directory?
           unless libiconv.keg_only?
             <<-EOS.undent
               A libiconv formula is installed and linked.

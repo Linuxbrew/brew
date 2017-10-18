@@ -32,6 +32,7 @@ Metrics/ParameterLists:
 Style/BlockDelimiters:
   Exclude:
     - '**/*_spec.rb'
+    - '**/shared_examples/**/*.rb'
 
 # so many of these in formulae but none in here
 Style/GuardClause:
@@ -42,12 +43,12 @@ Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
 
 # we won't change backward compatible method names
-Style/MethodName:
+Naming/MethodName:
   Exclude:
     - 'compat/**/*'
 
 # we won't change backward compatible predicate names
-Style/PredicateName:
+Naming/PredicateName:
   Exclude:
     - 'compat/**/*'
   NameWhitelist: is_32_bit?, is_64_bit?

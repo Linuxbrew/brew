@@ -24,7 +24,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -48,7 +48,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -73,7 +73,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -98,7 +98,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -123,7 +123,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -148,7 +148,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -173,7 +173,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -210,7 +210,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -237,7 +237,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 0,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -267,7 +267,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -292,7 +292,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
                               column: 4,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)

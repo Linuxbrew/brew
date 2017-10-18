@@ -298,7 +298,7 @@ module RuboCop
 
       # Returns the array of arguments of the method_node
       def parameters(method_node)
-        method_node.method_args if method_node.send_type? || method_node.block_type?
+        method_node.arguments if method_node.send_type? || method_node.block_type?
       end
 
       # Returns true if the given parameters are present in method call

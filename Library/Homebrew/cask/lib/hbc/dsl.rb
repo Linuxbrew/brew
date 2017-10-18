@@ -43,7 +43,7 @@ module Hbc
       Artifact::Zap,
     ].freeze
 
-    ACTIVATABLE_ARTIFACT_TYPES = (ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key) - [:stage_only]).freeze
+    ACTIVATABLE_ARTIFACT_CLASSES = ORDINARY_ARTIFACT_CLASSES - [Artifact::StageOnly]
 
     ARTIFACT_BLOCK_CLASSES = [
       Artifact::PreflightBlock,
@@ -63,6 +63,7 @@ module Hbc
       :gpg,
       :homepage,
       :language,
+      :languages,
       :name,
       :sha256,
       :staged_path,
@@ -70,11 +71,12 @@ module Hbc
       :version,
       :appdir,
       *ORDINARY_ARTIFACT_CLASSES.map(&:dsl_key),
-      *ACTIVATABLE_ARTIFACT_TYPES,
+      *ACTIVATABLE_ARTIFACT_CLASSES.map(&:dsl_key),
       *ARTIFACT_BLOCK_CLASSES.flat_map { |klass| [klass.dsl_key, klass.uninstall_dsl_key] },
     ].freeze
 
-    attr_reader :token, :cask
+    attr_reader :cask, :token
+
     def initialize(cask)
       @cask = cask
       @token = cask.token
@@ -105,7 +107,9 @@ module Hbc
     end
 
     def language(*args, default: false, &block)
-      if !args.empty? && block_given?
+      if args.empty?
+        language_eval
+      elsif block_given?
         @language_blocks ||= {}
         @language_blocks[args] = block
 
@@ -117,7 +121,7 @@ module Hbc
 
         @language_blocks.default = block
       else
-        language_eval
+        raise CaskInvalidError.new(cask, "No block given to language stanza.")
       end
     end
 
@@ -125,6 +129,10 @@ module Hbc
       return @language if instance_variable_defined?(:@language)
 
       return @language = nil if @language_blocks.nil? || @language_blocks.empty?
+
+      if @language_blocks.default.nil?
+        raise CaskInvalidError.new(cask, "No default language specified.")
+      end
 
       MacOS.languages.map(&Locale.method(:parse)).each do |locale|
         key = @language_blocks.keys.detect do |strings|
@@ -137,6 +145,12 @@ module Hbc
       end
 
       @language = @language_blocks.default.call
+    end
+
+    def languages
+      return [] if @language_blocks.nil?
+
+      @language_blocks.keys.flatten
     end
 
     def url(*args, &block)
@@ -161,8 +175,8 @@ module Hbc
         begin
           DSL::Container.new(*args).tap do |container|
             # TODO: remove this backward-compatibility section after removing nested_container
-            if container && container.nested
-              artifacts[:nested_container] << Artifact::NestedContainer.new(cask, container.nested)
+            if container&.nested
+              artifacts.add(Artifact::NestedContainer.new(cask, container.nested))
             end
           end
         end
@@ -205,7 +219,7 @@ module Hbc
     end
 
     def artifacts
-      @artifacts ||= Hash.new { |hash, key| hash[key] = Set.new }
+      @artifacts ||= SortedSet.new
     end
 
     def caskroom_path
@@ -237,15 +251,13 @@ module Hbc
     end
 
     ORDINARY_ARTIFACT_CLASSES.each do |klass|
-      type = klass.dsl_key
-
-      define_method(type) do |*args|
+      define_method(klass.dsl_key) do |*args|
         begin
-          if [*artifacts.keys, type].include?(:stage_only) && (artifacts.keys & ACTIVATABLE_ARTIFACT_TYPES).any?
+          if [*artifacts.map(&:class), klass].include?(Artifact::StageOnly) && (artifacts.map(&:class) & ACTIVATABLE_ARTIFACT_CLASSES).any?
             raise CaskInvalidError.new(cask, "'stage_only' must be the only activatable artifact.")
           end
 
-          artifacts[type].add(klass.from_args(cask, *args))
+          artifacts.add(klass.from_args(cask, *args))
         rescue CaskInvalidError
           raise
         rescue StandardError => e
@@ -257,7 +269,7 @@ module Hbc
     ARTIFACT_BLOCK_CLASSES.each do |klass|
       [klass.dsl_key, klass.uninstall_dsl_key].each do |dsl_key|
         define_method(dsl_key) do |&block|
-          artifacts[dsl_key] << block
+          artifacts.add(klass.new(cask, dsl_key => block))
         end
       end
     end

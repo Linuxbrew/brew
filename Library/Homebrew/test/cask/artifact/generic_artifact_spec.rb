@@ -1,8 +1,12 @@
 describe Hbc::Artifact::Artifact, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-generic-artifact.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path("with-generic-artifact")) }
 
   let(:install_phase) {
-    -> { described_class.for_cask(cask).each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) } }
+    lambda do
+      cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
+        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
+    end
   }
 
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
@@ -15,7 +19,7 @@ describe Hbc::Artifact::Artifact, :cask do
   context "without target" do
     it "fails to load" do
       expect {
-        Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-generic-artifact-no-target.rb")
+        Hbc::CaskLoader.load(cask_path("with-generic-artifact-no-target"))
       }.to raise_error(Hbc::CaskInvalidError, /target required for Generic Artifact/)
     end
   end

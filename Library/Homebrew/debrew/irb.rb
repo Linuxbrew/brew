@@ -16,7 +16,7 @@ module IRB
       workspace = WorkSpace.new(binding)
       irb = Irb.new(workspace)
 
-      @CONF[:IRB_RC].call(irb.context) if @CONF[:IRB_RC]
+      @CONF[:IRB_RC]&.call(irb.context)
       @CONF[:MAIN_CONTEXT] = irb.context
 
       trap("SIGINT") do

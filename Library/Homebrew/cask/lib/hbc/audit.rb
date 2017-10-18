@@ -70,12 +70,16 @@ module Hbc
       previous_cask_contents = Git.last_revision_of_file(tap.path, @cask.sourcefile_path, before_commit: commit_range)
       return if previous_cask_contents.empty?
 
-      previous_cask = CaskLoader.load_from_string(previous_cask_contents)
+      begin
+        previous_cask = CaskLoader.load(previous_cask_contents)
 
-      return unless previous_cask.version == cask.version
-      return if previous_cask.sha256 == cask.sha256
+        return unless previous_cask.version == cask.version
+        return if previous_cask.sha256 == cask.sha256
 
-      add_error "only sha256 changed (see: https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
+        add_error "only sha256 changed (see: https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
+      rescue CaskError => e
+        add_warning "Skipped version and checksum comparison. Reading previous version failed: #{e}"
+      end
     end
 
     def check_version
@@ -214,7 +218,7 @@ module Hbc
     end
 
     def check_generic_artifacts
-      cask.artifacts[:artifact].each do |artifact|
+      cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Artifact) }.each do |artifact|
         unless artifact.target.absolute?
           add_error "target must be absolute path for #{artifact.class.english_name} #{artifact.source}"
         end

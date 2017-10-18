@@ -144,7 +144,7 @@ module HomebrewArgvExtension
   def value(name)
     arg_prefix = "--#{name}="
     flag_with_value = find { |arg| arg.start_with?(arg_prefix) }
-    flag_with_value.strip_prefix(arg_prefix) if flag_with_value
+    flag_with_value&.strip_prefix(arg_prefix)
   end
 
   # Returns an array of values that were given as a comma-separated list.
@@ -236,7 +236,7 @@ module HomebrewArgvExtension
 
   def bottle_arch
     arch = value "bottle-arch"
-    arch.to_sym if arch
+    arch&.to_sym
   end
 
   def build_from_source?

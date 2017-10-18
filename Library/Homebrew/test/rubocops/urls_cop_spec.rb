@@ -126,7 +126,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
                                column: formula["col"],
                                source: source }]
 
-        inspect_source(cop, source)
+        inspect_source(source)
 
         expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
           expect_offense(expected, actual)
@@ -160,7 +160,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
                                column: formula["col"],
                                source: source }]
 
-        inspect_source(cop, source)
+        inspect_source(source)
 
         expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
           expect_offense(expected, actual)
@@ -183,7 +183,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
                              column: 2,
                              source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
         expect_offense(expected, actual)
@@ -222,13 +222,13 @@ describe RuboCop::Cop::FormulaAuditStrict::PyPiUrls do
                                column: formula["col"],
                                source: source }]
 
-        inspect_source(cop, source)
+        inspect_source(source)
         # Check for expected offenses
         expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
           expect_offense(expected, actual)
         end
         # Check for expected auto corrected source
-        new_source = autocorrect_source(cop, source)
+        new_source = autocorrect_source(source)
         expect(new_source).to eq(corrected_source)
       end
     end

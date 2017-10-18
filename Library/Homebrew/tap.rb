@@ -682,6 +682,5 @@ class TapConfig
     tap.path.cd do
       safe_system "git", "config", "--replace-all", "homebrew.#{key}", value.to_s
     end
-    value
   end
 end

@@ -219,6 +219,7 @@ module Homebrew
         end
       end
 
+      return if formulae.empty?
       perform_preinstall_checks
 
       formulae.each do |f|

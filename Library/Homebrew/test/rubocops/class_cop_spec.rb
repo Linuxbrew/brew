@@ -29,7 +29,7 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
                                 column: 12,
                                 source: source }]
 
-        inspect_source(cop, source)
+        inspect_source(source)
 
         expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
           expect_offense(expected, actual)
@@ -49,7 +49,7 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
         end
       EOS
 
-      new_source = autocorrect_source(cop, source)
+      new_source = autocorrect_source(source)
       expect(new_source).to eq(corrected_source)
     end
   end
@@ -71,7 +71,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Test do
                               column: 0,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)

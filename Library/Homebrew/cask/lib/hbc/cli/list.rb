@@ -23,14 +23,14 @@ module Hbc
           elsif versions?
             puts self.class.format_versioned(cask)
           else
-            cask = CaskLoader.load_from_file(cask.installed_caskfile)
+            cask = CaskLoader.load(cask.installed_caskfile)
             self.class.list_artifacts(cask)
           end
         end
       end
 
       def self.list_artifacts(cask)
-        Artifact.for_cask(cask).group_by(&:class).each do |klass, artifacts|
+        cask.artifacts.group_by(&:class).each do |klass, artifacts|
           next unless klass.respond_to?(:english_description)
           ohai klass.english_description, artifacts.map(&:summarize_installed)
         end

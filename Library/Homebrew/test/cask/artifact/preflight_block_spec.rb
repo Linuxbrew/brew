@@ -11,8 +11,9 @@ describe Hbc::Artifact::PreflightBlock, :cask do
         end
       end
 
-      described_class.for_cask(cask)
-        .each { |artifact| artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
+      cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
+        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
 
       expect(called).to be true
       expect(yielded_arg).to be_kind_of Hbc::DSL::Preflight
@@ -31,8 +32,9 @@ describe Hbc::Artifact::PreflightBlock, :cask do
         end
       end
 
-      described_class.for_cask(cask)
-        .each { |artifact| artifact.uninstall_phase(command: Hbc::NeverSudoSystemCommand, force: false) }
+      cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
+        artifact.uninstall_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
 
       expect(called).to be true
       expect(yielded_arg).to be_kind_of Hbc::DSL::UninstallPreflight

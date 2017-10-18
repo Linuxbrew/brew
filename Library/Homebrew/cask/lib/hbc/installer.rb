@@ -126,7 +126,7 @@ module Hbc
 
       # use the same cask file that was used for installation, if possible
       installed_caskfile = @cask.installed_caskfile
-      installed_cask = installed_caskfile.exist? ? CaskLoader.load_from_file(installed_caskfile) : @cask
+      installed_cask = installed_caskfile.exist? ? CaskLoader.load(installed_caskfile) : @cask
 
       # Always force uninstallation, ignore method parameter
       Installer.new(installed_cask, binaries: binaries?, verbose: verbose?, force: true).uninstall
@@ -159,7 +159,7 @@ module Hbc
       odebug "Extracting primary container"
 
       FileUtils.mkdir_p @cask.staged_path
-      container = if @cask.container && @cask.container.type
+      container = if @cask.container&.type
         Container.from_type(@cask.container.type)
       else
         Container.for_path(@downloaded_path, @command)
@@ -177,7 +177,7 @@ module Hbc
       already_installed_artifacts = []
 
       odebug "Installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = @cask.artifacts
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
       artifacts.each do |artifact|
@@ -361,7 +361,7 @@ module Hbc
 
       savedir = @cask.metadata_subdir("Casks", timestamp: :now, create: true)
       FileUtils.copy @cask.sourcefile_path, savedir
-      old_savedir.rmtree unless old_savedir.nil?
+      old_savedir&.rmtree
     end
 
     def uninstall
@@ -374,7 +374,7 @@ module Hbc
 
     def uninstall_artifacts
       odebug "Un-installing artifacts"
-      artifacts = Artifact.for_cask(@cask)
+      artifacts = @cask.artifacts
 
       odebug "#{artifacts.length} artifact/s defined", artifacts
 
@@ -388,7 +388,7 @@ module Hbc
     def zap
       ohai %Q(Implied "brew cask uninstall #{@cask}")
       uninstall_artifacts
-      if (zap_stanzas = Artifact::Zap.for_cask(@cask)).empty?
+      if (zap_stanzas = @cask.artifacts.select { |a| a.is_a?(Artifact::Zap) }).empty?
         opoo "No zap stanza present for Cask '#{@cask}'"
       else
         ohai "Dispatching zap stanza"

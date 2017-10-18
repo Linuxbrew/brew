@@ -1,5 +1,5 @@
 describe Hbc::Artifact::Pkg, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-installable.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path("with-installable")) }
   let(:fake_system_command) { class_double(Hbc::SystemCommand) }
 
   before(:each) do
@@ -8,7 +8,7 @@ describe Hbc::Artifact::Pkg, :cask do
 
   describe "install_phase" do
     it "runs the system installer on the specified pkgs" do
-      pkg = described_class.for_cask(cask).first
+      pkg = cask.artifacts.find { |a| a.is_a?(described_class) }
 
       expect(fake_system_command).to receive(:run!).with(
         "/usr/sbin/installer",
@@ -22,10 +22,10 @@ describe Hbc::Artifact::Pkg, :cask do
   end
 
   describe "choices" do
-    let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-choices.rb") }
+    let(:cask) { Hbc::CaskLoader.load(cask_path("with-choices")) }
 
     it "passes the choice changes xml to the system installer" do
-      pkg = described_class.for_cask(cask).first
+      pkg = cask.artifacts.find { |a| a.is_a?(described_class) }
 
       file = double(path: Pathname.new("/tmp/choices.xml"))
 

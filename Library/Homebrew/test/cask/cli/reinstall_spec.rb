@@ -1,6 +1,10 @@
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Reinstall, :cask do
+  it_behaves_like "a command that handles invalid options"
+
   it "displays the reinstallation progress" do
-    caffeine = Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-caffeine.rb")
+    caffeine = Hbc::CaskLoader.load(cask_path("local-caffeine"))
 
     Hbc::Installer.new(caffeine).install
 
@@ -23,16 +27,16 @@ describe Hbc::CLI::Reinstall, :cask do
   it "allows reinstalling a Cask" do
     Hbc::CLI::Install.run("local-transmission")
 
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
 
     Hbc::CLI::Reinstall.run("local-transmission")
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
   end
 
   it "allows reinstalling a non installed Cask" do
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).not_to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).not_to be_installed
 
     Hbc::CLI::Reinstall.run("local-transmission")
-    expect(Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/local-transmission.rb")).to be_installed
+    expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
   end
 end
