@@ -32,7 +32,7 @@ begin
 
   empty_argv = ARGV.empty?
   help_flag_list = %w[-h --help --usage -?]
-  help_flag = false
+  help_flag = !ENV["HOMEBREW_HELP"].nil?
   internal_cmd = true
   cmd = nil
 
@@ -119,8 +119,16 @@ begin
     if Process.uid.zero? && !brew_uid.zero?
       tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
     end
+    if help_flag
+      # Unset HOMEBREW_HELP to avoid confusing the tap
+      ENV["HOMEBREW_HELP"] = nil
+    end
     tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
     safe_system(*tap_commands)
+    if help_flag
+      # Restore HOMEBREW_HELP after the tap
+      ENV["HOMEBREW_HELP"] = 1
+    end
     exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
 rescue UsageError => e
