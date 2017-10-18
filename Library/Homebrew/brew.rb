@@ -44,9 +44,6 @@ begin
       help_flag = true
     elsif !cmd && !help_flag_list.include?(arg)
       cmd = ARGV.delete_at(i)
-    elsif help_flag_list.include?(arg) && cmd
-      # cmd determined, and it needs help
-      help_flag = true
     end
   end
 
@@ -121,13 +118,13 @@ begin
     end
     if help_flag
       # Unset HOMEBREW_HELP to avoid confusing the tap
-      ENV["HOMEBREW_HELP"] = nil
+      ENV.delete("HOMEBREW_HELP")
     end
     tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
     safe_system(*tap_commands)
     if help_flag
       # Restore HOMEBREW_HELP after the tap
-      ENV["HOMEBREW_HELP"] = 1
+      ENV["HOMEBREW_HELP"] = "1"
     end
     exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
