@@ -63,7 +63,13 @@ Paste at a Terminal prompt:
 sudo apt-get install build-essential curl file git python-setuptools
 ```
 
-### Fedora, CentOS or Red Hat
+### Fedora
+
+```sh
+sudo dnf groupinstall 'Development Tools' && sudo dnf install curl file git python-setuptools
+```
+
+### CentOS or Red Hat
 
 ```sh
 sudo yum groupinstall 'Development Tools' && sudo yum install curl file git python-setuptools
