@@ -1,6 +1,7 @@
 #: @hide_from_man_page
 #:  * `readall` [tap]:
-#:    Import all formulae in a tap (defaults to core tap).
+#:    Import all formulae from specified taps (defaults to
+#:    all installed taps).
 #:
 #:    This can be useful for debugging issues across all formulae
 #:    when making significant changes to `formula.rb`,
