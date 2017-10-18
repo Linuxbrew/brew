@@ -39,7 +39,7 @@ module Homebrew
       filtered_list
     elsif ARGV.named.empty?
       if ARGV.include? "--full-name"
-        full_names = Formula.installed.map(&:full_name).sort &tap_and_name_comparison
+        full_names = Formula.installed.map(&:full_name).sort(&tap_and_name_comparison)
         return if full_names.empty?
         puts Formatter.columns(full_names)
       else

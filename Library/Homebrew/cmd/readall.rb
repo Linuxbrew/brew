@@ -14,7 +14,7 @@ module Homebrew
   def readall
     if ARGV.include?("--syntax")
       scan_files = "#{HOMEBREW_LIBRARY_PATH}/**/*.rb"
-      ruby_files = Dir.glob(scan_files).reject{|file| file =~ /vendor|cask/ }
+      ruby_files = Dir.glob(scan_files).reject { |file| file =~ /vendor|cask/ }
 
       Homebrew.failed = true unless Readall.valid_ruby_syntax?(ruby_files)
     end
