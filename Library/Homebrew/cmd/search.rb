@@ -24,7 +24,7 @@ module Homebrew
 
   def search
     if ARGV.empty?
-      puts Formatter.columns(Formula.full_names)
+      puts Formatter.columns(Formula.full_names.sort)
     elsif ARGV.include? "--macports"
       exec_browser "https://www.macports.org/ports.php?by=name&substr=#{ARGV.next}"
     elsif ARGV.include? "--fink"
@@ -52,15 +52,15 @@ module Homebrew
         results = search_taps(name)
       end
 
-      puts Formatter.columns(results) unless results.empty?
+      puts Formatter.columns(results.sort) unless results.empty?
     else
       query = ARGV.first
       regex = query_regexp(query)
       local_results = search_formulae(regex)
-      puts Formatter.columns(local_results) unless local_results.empty?
+      puts Formatter.columns(local_results.sort) unless local_results.empty?
 
       tap_results = search_taps(query)
-      puts Formatter.columns(tap_results) unless tap_results.empty?
+      puts Formatter.columns(tap_results.sort) unless tap_results.empty?
 
       if $stdout.tty?
         count = local_results.length + tap_results.length
