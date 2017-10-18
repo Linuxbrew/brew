@@ -60,19 +60,19 @@ Paste at a Terminal prompt:
 ### Debian or Ubuntu
 
 ```sh
-sudo apt-get install build-essential curl file git python-setuptools
+sudo apt-get install build-essential curl file git
 ```
 
 ### Fedora
 
 ```sh
-sudo dnf groupinstall 'Development Tools' && sudo dnf install curl file git python-setuptools
+sudo dnf groupinstall 'Development Tools' && sudo dnf install curl file git
 ```
 
 ### CentOS or Red Hat
 
 ```sh
-sudo yum groupinstall 'Development Tools' && sudo yum install curl file git python-setuptools
+sudo yum groupinstall 'Development Tools' && sudo yum install curl file git
 ```
 
 ### 32-bit x86 platforms
