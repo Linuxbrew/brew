@@ -116,16 +116,11 @@ begin
     if Process.uid.zero? && !brew_uid.zero?
       tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
     end
-    if help_flag
-      # Unset HOMEBREW_HELP to avoid confusing the tap
-      ENV.delete("HOMEBREW_HELP")
-    end
+    # Unset HOMEBREW_HELP to avoid confusing the tap
+    ENV.delete("HOMEBREW_HELP") if help_flag
     tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
     safe_system(*tap_commands)
-    if help_flag
-      # Restore HOMEBREW_HELP after the tap
-      ENV["HOMEBREW_HELP"] = "1"
-    end
+    ENV["HOMEBREW_HELP"] = "1" if help_flag
     exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
 rescue UsageError => e
