@@ -45,7 +45,7 @@ module Stdenv
 
     append "LDFLAGS", "-Wl,-headerpad_max_install_names" if OS.mac?
 
-    if OS.linux? && !["glibc", "glibc25"].include?(formula && formula.name)
+    if OS.linux? && !["glibc", "glibc25"].include?(formula&.name)
       if formula
         # Upgrading a package with a shared library can fail if that
         # library is a dependency of a core package, like curl for

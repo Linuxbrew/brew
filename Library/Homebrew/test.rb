@@ -22,7 +22,7 @@ begin
     ENV.setup_build_environment(formula)
     # Add the python executable to the PATH.
     req = formula.recursive_requirements.grep(PythonRequirement).first
-    req.modify_build_environment unless req.nil?
+    req&.modify_build_environment
   end
 
   trap("INT", old_trap)
