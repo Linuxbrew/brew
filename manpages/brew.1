@@ -797,7 +797,7 @@ Generate Homebrew\'s manpages\.
 If \fB\-\-fail\-if\-changed\fR is passed, the command will return a failing status code if changes are detected in the manpage outputs\. This can be used for CI to be notified when the manpages are out of date\. Additionally, the date used in new manpages will match those in the existing manpages (to allow comparison without factoring in the date)\.
 .
 .TP
-\fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] [\fB\-\-warn\-on\-publish\-failure\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]:
+\fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] [\fB\-\-warn\-on\-publish\-failure\fR] [\fB\-\-bintray\-org=\fR\fIbintray\-org\fR] [\fB\-\-test\-bot\-user=\fR\fItest\-bot\-user\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]:
 .
 .IP
 Gets a patch from a GitHub commit or pull request and applies it to Homebrew\. Optionally, installs the formulae changed by the patch\.
@@ -843,6 +843,12 @@ If \fB\-\-no\-publish\fR is passed, do not publish bottles to Bintray\.
 .
 .IP
 If \fB\-\-warn\-on\-publish\-failure\fR was passed, do not exit if there\'s a failure publishing bottles on Bintray\.
+.
+.IP
+If \fB\-\-bintray\-org=\fR\fIbintray\-org\fR is passed, publish at the given Bintray organisation\.
+.
+.IP
+If \fB\-\-test\-bot\-user=\fR\fItest\-bot\-user\fR is passed, pull the bottle block commit from the specified user on GitHub\.
 .
 .TP
 \fBrelease\-notes\fR [\fB\-\-markdown\fR] [\fIprevious_tag\fR] [\fIend_ref\fR]
