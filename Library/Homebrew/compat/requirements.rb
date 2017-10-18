@@ -17,3 +17,4 @@ PythonDependency           = PythonRequirement
 TuntapDependency           = TuntapRequirement
 X11Dependency              = X11Requirement
 ConflictsWithBinaryOsxfuse = NonBinaryOsxfuseRequirement
+MinimumMacOSRequirement    = MacOSRequirement
