@@ -46,6 +46,7 @@ module Homebrew
       HOMEBREW_SDKROOT HOMEBREW_BUILD_FROM_SOURCE
       MAKE GIT CPP
       ACLOCAL_PATH PATH CPATH
+      LD_LIBRARY_PATH LD_RUN_PATH LD_PRELOAD LIBRARY_PATH
     ].select { |key| env.key?(key) }
   end
 
