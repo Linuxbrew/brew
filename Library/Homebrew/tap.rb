@@ -26,11 +26,11 @@ class Tap
       raise "Invalid tap name '#{args.join("/")}'"
     end
 
-    # we special case homebrew so users don't have to shift in a terminal
-    user = "Homebrew" if user == "homebrew"
+    # We special case homebrew and linuxbrew so that users don't have to shift in a terminal.
+    user = user.capitalize if ["homebrew", "linuxbrew"].include? user
     repo = repo.strip_prefix "homebrew-"
 
-    if user == "Homebrew" && (repo == "homebrew" || repo == "core")
+    if ["Homebrew", "Linuxbrew"].include?(user) && ["core", "homebrew"].include?(repo)
       return CoreTap.instance
     end
 
