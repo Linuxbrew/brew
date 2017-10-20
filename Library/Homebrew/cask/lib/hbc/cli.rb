@@ -230,7 +230,7 @@ module Hbc
 
         return if @command == "help" && @args.empty?
 
-        unknown_command = @command == "help" ? @args.first : @command
+        unknown_command = (@command == "help") ? @args.first : @command
         raise ArgumentError, "Unknown command: #{unknown_command}"
       end
 
