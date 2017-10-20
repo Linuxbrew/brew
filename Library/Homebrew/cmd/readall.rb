@@ -1,6 +1,7 @@
 #: @hide_from_man_page
 #:  * `readall` [tap]:
-#:    Import all formulae in a tap (defaults to core tap).
+#:    Import all formulae from specified taps (defaults to
+#:    all installed taps).
 #:
 #:    This can be useful for debugging issues across all formulae
 #:    when making significant changes to `formula.rb`,
@@ -31,7 +32,7 @@ module Homebrew
     taps = if ARGV.named.empty?
       Tap
     else
-      [Tap.fetch(ARGV.named.first)]
+      ARGV.named.map { |t| Tap.fetch(t) }
     end
     taps.each do |tap|
       Homebrew.failed = true unless Readall.valid_tap?(tap, options)
