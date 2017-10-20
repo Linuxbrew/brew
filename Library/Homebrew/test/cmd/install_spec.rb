@@ -56,7 +56,7 @@ describe "brew install", :integration_test do
   end
 
   specify "install failures" do
-    path = setup_test_formula "testball1", <<-EOS.undent
+    path = setup_test_formula "testball1", <<~EOS
       version "1.0"
     EOS
 
@@ -66,7 +66,7 @@ describe "brew install", :integration_test do
       .and be_a_success
 
     FileUtils.rm path
-    setup_test_formula "testball1", <<-EOS.undent
+    setup_test_formula "testball1", <<~EOS
       version "2.0"
 
       devel do
@@ -120,7 +120,7 @@ describe "brew install", :integration_test do
   end
 
   it "can install keg-only Formulae" do
-    path_keg_only = setup_test_formula "testball1", <<-EOS.undent
+    path_keg_only = setup_test_formula "testball1", <<~EOS
       version "1.0"
 
       keg_only "test reason"
@@ -132,7 +132,7 @@ describe "brew install", :integration_test do
       .and be_a_success
 
     FileUtils.rm path_keg_only
-    setup_test_formula "testball1", <<-EOS.undent
+    setup_test_formula "testball1", <<~EOS
       version "2.0"
 
       keg_only "test reason"
@@ -162,7 +162,7 @@ describe "brew install", :integration_test do
       system "git", "commit", "-m", "Initial repo commit"
     end
 
-    setup_test_formula "testball1", <<-EOS.undent
+    setup_test_formula "testball1", <<~EOS
       version "1.0"
 
       head "file://#{repo_path}", :using => :git
@@ -205,7 +205,7 @@ describe "brew install", :integration_test do
   end
 
   it "succeeds when a non-fatal requirement isn't satisfied" do
-    setup_test_formula "testball1", <<-EOS.undent
+    setup_test_formula "testball1", <<~EOS
       class NonFatalRequirement < Requirement
         satisfy { false }
       end
@@ -220,7 +220,7 @@ describe "brew install", :integration_test do
   end
 
   it "fails when a fatal requirement isn't satisfied" do
-    setup_test_formula "testball1", <<-EOS.undent
+    setup_test_formula "testball1", <<~EOS
       class FatalRequirement < Requirement
         fatal true
         satisfy { false }

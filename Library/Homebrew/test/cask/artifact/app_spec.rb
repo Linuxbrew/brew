@@ -82,12 +82,12 @@ describe Hbc::Artifact::App, :cask do
 
         describe "target is both writable and user-owned" do
           it "overwrites the existing app" do
-            stdout = <<-EOS.undent
+            stdout = <<~EOS
               ==> Removing App '#{target_path}'.
               ==> Moving App 'Caffeine.app' to '#{target_path}'.
             EOS
 
-            stderr = <<-EOS.undent
+            stderr = <<~EOS
               Warning: It seems there is already an App at '#{target_path}'; overwriting.
             EOS
 
@@ -117,12 +117,12 @@ describe Hbc::Artifact::App, :cask do
             expect(command).to receive(:run).with("/usr/bin/chflags", args: ["-R", "--", "000", target_path], must_succeed: false)
               .and_call_original
 
-            stdout = <<-EOS.undent
+            stdout = <<~EOS
               ==> Removing App '#{target_path}'.
               ==> Moving App 'Caffeine.app' to '#{target_path}'.
             EOS
 
-            stderr = <<-EOS.undent
+            stderr = <<~EOS
               Warning: It seems there is already an App at '#{target_path}'; overwriting.
             EOS
 
@@ -162,12 +162,12 @@ describe Hbc::Artifact::App, :cask do
         let(:force) { true }
 
         it "overwrites the existing app" do
-          stdout = <<-EOS.undent
+          stdout = <<~EOS
             ==> Removing App '#{target_path}'.
             ==> Moving App 'Caffeine.app' to '#{target_path}'.
           EOS
 
-          stderr = <<-EOS.undent
+          stderr = <<~EOS
             Warning: It seems there is already an App at '#{target_path}'; overwriting.
           EOS
 

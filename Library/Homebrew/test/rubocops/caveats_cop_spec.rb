@@ -8,20 +8,19 @@ describe RuboCop::Cop::FormulaAudit::Caveats do
 
   context "When auditing caveats" do
     it "When there is setuid mentioned in caveats" do
-      source = <<-EOS.undent
-      class Foo < Formula
-        homepage "http://example.com/foo"
-        url "http://example.com/foo-1.0.tgz"
-
-        def caveats
-          "setuid"
+      source = <<~EOS
+        class Foo < Formula
+          homepage "http://example.com/foo"
+          url "http://example.com/foo-1.0.tgz"
+           def caveats
+            "setuid"
+          end
         end
-      end
       EOS
 
       expected_offenses = [{  message: "Don't recommend setuid in the caveats, suggest sudo instead.",
                               severity: :convention,
-                              line: 6,
+                              line: 5,
                               column: 5,
                               source: source }]
 

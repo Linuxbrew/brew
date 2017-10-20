@@ -167,19 +167,19 @@ module RuboCop
         type_match && name_match
       end
 
-      def_node_search :required_dependency?, <<-EOS.undent
+      def_node_search :required_dependency?, <<~EOS
         (send nil :depends_on ({str sym} _))
       EOS
 
-      def_node_search :required_dependency_name?, <<-EOS.undent
+      def_node_search :required_dependency_name?, <<~EOS
         (send nil :depends_on ({str sym} %1))
       EOS
 
-      def_node_search :dependency_type_hash_match?, <<-EOS.undent
+      def_node_search :dependency_type_hash_match?, <<~EOS
         (hash (pair ({str sym} _) ({str sym} %1)))
       EOS
 
-      def_node_search :dependency_name_hash_match?, <<-EOS.undent
+      def_node_search :dependency_name_hash_match?, <<~EOS
         (hash (pair ({str sym} %1) ({str sym} _)))
       EOS
 

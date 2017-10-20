@@ -5,7 +5,7 @@ module Hbc
     include Options
 
     option "--binarydir=PATH", (lambda do |*|
-      opoo <<-EOS.undent
+      opoo <<~EOS
         Option --binarydir is obsolete!
         Homebrew-Cask now uses the same location as your Homebrew installation for executable links.
       EOS

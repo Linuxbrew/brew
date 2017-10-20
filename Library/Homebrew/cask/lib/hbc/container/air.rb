@@ -13,7 +13,7 @@ module Hbc
 
       def self.installer_cmd
         return @installer_cmd ||= INSTALLER_PATHNAME if installer_exist?
-        raise CaskError, <<-EOS.undent
+        raise CaskError, <<~EOS
           Adobe AIR runtime not present, try installing it via
 
               brew cask install adobe-air

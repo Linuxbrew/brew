@@ -6,7 +6,7 @@ require "tab"
 class Migrator
   class MigrationNeededError < RuntimeError
     def initialize(formula)
-      super <<-EOS.undent
+      super <<~EOS
         #{formula.oldname} was renamed to #{formula.name} and needs to be migrated.
         Please run `brew migrate #{formula.oldname}`
       EOS
@@ -33,10 +33,9 @@ class Migrator
         "Please try to use fully-qualified #{tap}/#{formula.oldname} to refer the formula.\n"
       end
 
-      super <<-EOS.undent
-      #{formula.name} from #{formula.tap} is given, but old name #{formula.oldname} was installed from #{tap ? tap : "path or url"}.
-
-      #{msg}To force migrate use `brew migrate --force #{formula.oldname}`.
+      super <<~EOS
+        #{formula.name} from #{formula.tap} is given, but old name #{formula.oldname} was installed from #{tap ? tap : "path or url"}.
+         #{msg}To force migrate use `brew migrate --force #{formula.oldname}`.
       EOS
     end
   end

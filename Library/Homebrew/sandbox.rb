@@ -138,7 +138,7 @@ class Sandbox
   end
 
   class SandboxProfile
-    SEATBELT_ERB = <<-EOS.undent
+    SEATBELT_ERB = <<~EOS.freeze
       (version 1)
       (debug deny) ; log all denied operations to /var/log/system.log
       <%= rules.join("\n") %>

@@ -12,7 +12,7 @@ describe Hbc::CLI::List, :cask do
 
     expect {
       described_class.run
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       local-caffeine
       local-transmission
     EOS
@@ -31,7 +31,7 @@ describe Hbc::CLI::List, :cask do
 
     expect {
       described_class.run("--full-name")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       local-caffeine
       local-transmission
       third-party/tap/third-party-cask
@@ -41,7 +41,7 @@ describe Hbc::CLI::List, :cask do
   describe "lists versions" do
     let(:casks) { ["local-caffeine", "local-transmission"] }
     let(:expected_output) {
-      <<-EOS.undent
+      <<~EOS
         local-caffeine 1.2.3
         local-transmission 2.61
       EOS
@@ -78,7 +78,7 @@ describe Hbc::CLI::List, :cask do
 
       expect {
         described_class.run("local-transmission", "local-caffeine")
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         ==> Apps
         #{Hbc.appdir.join("Transmission.app")} (#{Hbc.appdir.join("Transmission.app").abv})
         ==> Apps

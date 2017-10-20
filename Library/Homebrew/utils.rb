@@ -93,7 +93,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   end
   caller_message ||= backtrace[1]
 
-  message = <<-EOS.undent
+  message = <<~EOS
     Calling #{method} is #{verb}!
     #{replacement_message}
     #{caller_message}#{tap_message}
@@ -223,7 +223,7 @@ module Homebrew
     end
 
     return if which(executable)
-    odie <<-EOS.undent
+    odie <<~EOS
       The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
       #{ENV["PATH"]}
     EOS
@@ -347,7 +347,7 @@ def which_editor
   end
   editor ||= "/usr/bin/vim"
 
-  opoo <<-EOS.undent
+  opoo <<~EOS
     Using #{editor} because no editor was set in the environment.
     This may change in the future, so we recommend setting EDITOR,
     or HOMEBREW_EDITOR to your preferred text editor.

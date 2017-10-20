@@ -8,7 +8,7 @@ describe Hbc::CLI::Reinstall, :cask do
 
     Hbc::Installer.new(caffeine).install
 
-    output = Regexp.new <<-EOS.undent
+    output = Regexp.new <<~EOS
       ==> Downloading file:.*caffeine.zip
       Already downloaded: .*local-caffeine--1.2.3.zip
       ==> Verifying checksum for Cask local-caffeine

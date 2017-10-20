@@ -29,7 +29,7 @@ module Homebrew
       keg_only = keg_only?(keg.rack)
       if HOMEBREW_PREFIX.to_s == "/usr/local" && keg_only &&
          keg.name.start_with?("openssl", "libressl")
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Refusing to link: #{keg.name}
           Linking keg-only #{keg.name} means you may end up linking against the insecure,
           deprecated system OpenSSL while using the headers from Homebrew's #{keg.name}.

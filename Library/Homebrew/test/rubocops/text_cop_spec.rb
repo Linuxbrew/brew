@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
 
   context "When auditing formula text" do
     it "with both openssl and libressl optional dependencies" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -32,7 +32,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "with both openssl and libressl dependencies" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -56,7 +56,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When xcodebuild is called without SYMROOT" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -81,7 +81,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When xcodebuild is called without any args" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -106,7 +106,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When go get is executed" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -131,7 +131,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When xcodebuild is executed" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -156,7 +156,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When scons is executed" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -180,8 +180,8 @@ describe RuboCop::Cop::FormulaAudit::Text do
       end
     end
 
-    it "When plist_options are not defined when using a formula-defined plist" do
-      source = <<-EOS.undent
+    it "When plist_options are not defined when using a formula-defined plist", :ruby23 do
+      source = <<~RUBY
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -190,19 +190,20 @@ describe RuboCop::Cop::FormulaAudit::Text do
             system "xcodebuild", "foo", "bar"
           end
 
-          def plist; <<-EOS.undent
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0">
-            <dict>
-              <key>Label</key>
-              <string>org.nrpe.agent</string>
-            </dict>
-            </plist>
-            \EOS
+          def plist
+            <<~XML
+              <?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+              <plist version="1.0">
+              <dict>
+                <key>Label</key>
+                <string>org.nrpe.agent</string>
+              </dict>
+              </plist>
+            XML
           end
         end
-      EOS
+      RUBY
 
       expected_offenses = [{  message: "Please set plist_options when using a formula-defined plist.",
                               severity: :convention,
@@ -218,7 +219,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When language/go is require'd" do
-      source = <<-EOS.undent
+      source = <<~EOS
         require "language/go"
 
         class Foo < Formula
@@ -245,7 +246,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When formula uses virtualenv and also `setuptools` resource" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -275,7 +276,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
     end
 
     it "When Formula.factory(name) is used" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"

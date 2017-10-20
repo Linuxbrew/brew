@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsRedundancy do
 
   context "When auditing formula components common errors" do
     it "When url outside stable block" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           stable do
@@ -31,7 +31,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsRedundancy do
     end
 
     it "When both `head` and `head do` are present" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           head "http://example.com/foo.git"
           head do
@@ -54,7 +54,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsRedundancy do
     end
 
     it "When both `bottle :modifier` and `bottle do` are present" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           bottle do

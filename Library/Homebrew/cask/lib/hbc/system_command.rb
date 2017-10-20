@@ -166,12 +166,12 @@ module Hbc
         _warn_plist_garbage(command, Regexp.last_match[2])
         xml = Plist.parse_xml(output)
         unless xml.respond_to?(:keys) && !xml.keys.empty?
-          raise CaskError, <<-EOS
-    Empty result parsing plist output from command.
-      command was:
-      #{command}
-      output we attempted to parse:
-      #{output}
+          raise CaskError, <<~EOS
+            Empty result parsing plist output from command.
+              command was:
+              #{command}
+              output we attempted to parse:
+              #{output}
           EOS
         end
         xml

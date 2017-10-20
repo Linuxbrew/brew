@@ -326,7 +326,7 @@ module Hbc
                       ],
                       sudo: true)
       else
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Accessibility access cannot be enabled automatically on this version of macOS.
           See System Preferences to enable it manually.
         EOS
@@ -347,7 +347,7 @@ module Hbc
                       ],
                       sudo: true)
       else
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Accessibility access cannot be disabled automatically on this version of macOS.
           See System Preferences to disable it manually.
         EOS

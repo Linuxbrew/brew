@@ -233,7 +233,7 @@ module SharedEnvExtension
       if ARGV.include? "--default-fortran-flags"
         flags = FC_FLAG_VARS.reject { |key| self[key] }
       elsif values_at(*FC_FLAG_VARS).compact.empty?
-        opoo <<-EOS.undent
+        opoo <<~EOS
           No Fortran optimization information was provided.  You may want to consider
           setting FCFLAGS and FFLAGS or pass the `--default-fortran-flags` option to
           `brew install` if your compiler is compatible with GCC.
@@ -286,15 +286,15 @@ module SharedEnvExtension
     begin
       gcc_formula = gcc_version_formula(name)
     rescue FormulaUnavailableError => e
-      raise <<-EOS.undent
-      Homebrew GCC requested, but formula #{e.name} not found!
+      raise <<~EOS
+        Homebrew GCC requested, but formula #{e.name} not found!
       EOS
     end
 
     return if gcc_formula.opt_prefix.exist?
-    raise <<-EOS.undent
-    The requested Homebrew GCC was not installed. You must:
-      brew install #{gcc_formula.full_name}
+    raise <<~EOS
+      The requested Homebrew GCC was not installed. You must:
+        brew install #{gcc_formula.full_name}
     EOS
   end
 

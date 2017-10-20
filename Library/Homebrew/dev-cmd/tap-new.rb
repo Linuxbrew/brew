@@ -24,7 +24,7 @@ module Homebrew
 
     (tap.path/"Formula").mkpath
 
-    readme = <<-EOS.undent
+    readme = <<~EOS
       # #{titleized_user} #{titleized_repo}
 
       ## How do I install these formulae?
@@ -43,7 +43,7 @@ module Homebrew
     EOS
     write_path(tap, "README.md", readme)
 
-    travis = <<-EOS.undent
+    travis = <<~EOS
       language: ruby
       os: osx
       env: OSX=10.12

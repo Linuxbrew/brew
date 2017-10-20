@@ -26,7 +26,7 @@ class NonBinaryOsxfuseRequirement < Requirement
   satisfy(build_env: false) { HOMEBREW_PREFIX.to_s != "/usr/local" || !OsxfuseRequirement.binary_osxfuse_installed? }
 
   def message
-    <<-EOS.undent
+    <<~EOS
       osxfuse is already installed from the binary distribution and
       conflicts with this formula.
     EOS

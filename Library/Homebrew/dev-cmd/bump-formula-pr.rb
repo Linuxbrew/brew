@@ -91,7 +91,7 @@ module Homebrew
     pull_requests = fetch_pull_requests(formula)
     return unless pull_requests
     return if pull_requests.empty?
-    duplicates_message = <<-EOS.undent
+    duplicates_message = <<~EOS
       These open pull requests may be duplicates:
       #{pull_requests.map { |pr| "#{pr["title"]} #{pr["html_url"]}" }.join("\n")}
     EOS
@@ -101,7 +101,7 @@ module Homebrew
     elsif !ARGV.force? && ARGV.flag?("--quiet")
       odie error_message
     elsif !ARGV.force?
-      odie <<-EOS.undent
+      odie <<~EOS
         #{duplicates_message.chomp}
         #{error_message}
       EOS
@@ -247,13 +247,13 @@ module Homebrew
 
     if new_formula_version < old_formula_version
       formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-      odie <<-EOS.undent
+      odie <<~EOS
         You probably need to bump this formula manually since changing the
         version from #{old_formula_version} to #{new_formula_version} would be a downgrade.
       EOS
     elsif new_formula_version == old_formula_version
       formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-      odie <<-EOS.undent
+      odie <<~EOS
         You probably need to bump this formula manually since the new version
         and old version are both #{new_formula_version}.
       EOS
@@ -312,17 +312,15 @@ module Homebrew
         remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1] if remote.to_s.empty?
         odie "cannot get remote from 'hub'!" if remote.to_s.empty?
         safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
-        pr_message = <<-EOS.undent
+        pr_message = <<~EOS
           #{formula.name} #{new_formula_version}#{devel_message}
 
           Created with `brew bump-formula-pr`.
         EOS
         user_message = ARGV.value("message")
         if user_message
-          pr_message += <<-EOS.undent
-
+          pr_message += <<~EOS
             ---
-
             #{user_message}
           EOS
         end

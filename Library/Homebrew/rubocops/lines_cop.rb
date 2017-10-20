@@ -109,7 +109,7 @@ module RuboCop
           end
 
           find_method_with_args(body_node, :skip_clean, :all) do
-            problem <<-EOS.undent.chomp
+            problem <<~EOS.chomp
               `skip_clean :all` is deprecated; brew no longer strips symbols
                       Pass explicit paths to prevent Homebrew from removing empty folders.
             EOS
@@ -131,7 +131,7 @@ module RuboCop
         end
 
         # Node Pattern search for Language::Node
-        def_node_search :languageNodeModule?, <<-EOS.undent
+        def_node_search :languageNodeModule?, <<~EOS
           (const (const nil :Language) :Node)
         EOS
       end

@@ -54,7 +54,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://prdownloads.sourceforge.net/foo/foo-1.tar.gz",
-        "msg" => <<-EOS.undent.chomp,
+        "msg" => <<~EOS.chomp,
           Don't use prdownloads in SourceForge urls (url is http://prdownloads.sourceforge.net/foo/foo-1.tar.gz).
                   See: http://librelist.com/browser/homebrew/2011/1/12/prdownloads-is-bad/
         EOS
@@ -69,7 +69,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://http.debian.net/debian/dists/foo/",
-        "msg" => <<-EOS.undent,
+        "msg" => <<~EOS,
           Please use a secure mirror for Debian URLs.
           We recommend:
             https://mirrors.ocf.berkeley.edu/debian/dists/foo/
@@ -101,7 +101,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "https://codeload.github.com/foo/bar/tar.gz/v0.1.1",
-        "msg" => <<-EOS.undent,
+        "msg" => <<~EOS,
           Use GitHub archive URLs:
             https://github.com/foo/bar/archive/v0.1.1.tar.gz
           Rather than codeload:
@@ -114,7 +114,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }]
       formulas.each do |formula|
-        source = <<-EOS.undent
+        source = <<~EOS
           class Foo < Formula
             desc "foo"
             url "#{formula["url"]}"
@@ -141,7 +141,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 4,
       }]
       formulas.each do |formula|
-        source = <<-EOS.undent
+        source = <<~EOS
           class Foo < Formula
             desc "foo"
             url "https://foo.com"
@@ -169,12 +169,12 @@ describe RuboCop::Cop::FormulaAudit::Urls do
     end
 
     it "with duplicate mirror" do
-      source = <<-EOS.undent
-          class Foo < Formula
-            desc "foo"
-            url "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
-            mirror "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
-          end
+      source = <<~EOS
+        class Foo < Formula
+          desc "foo"
+          url "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
+          mirror "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
+        end
       EOS
 
       expected_offenses = [{ message: "URL should not be duplicated as a mirror: https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz",
@@ -204,13 +204,13 @@ describe RuboCop::Cop::FormulaAuditStrict::PyPiUrls do
         "corrected_url" =>"https://files.pythonhosted.org/packages/source/foo/foo-0.1.tar.gz",
       }]
       formulas.each do |formula|
-        source = <<-EOS.undent
+        source = <<~EOS
           class Foo < Formula
             desc "foo"
             url "#{formula["url"]}"
           end
         EOS
-        corrected_source = <<-EOS.undent
+        corrected_source = <<~EOS
           class Foo < Formula
             desc "foo"
             url "#{formula["corrected_url"]}"

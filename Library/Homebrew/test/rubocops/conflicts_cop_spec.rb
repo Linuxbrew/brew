@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAudit::Conflicts do
 
   context "When auditing formula for conflicts with" do
     it "multiple conflicts_with" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class FooAT20 < Formula
           url 'http://example.com/foo-2.0.tgz'
           conflicts_with "mysql", "mariadb", "percona-server",
@@ -30,7 +30,7 @@ describe RuboCop::Cop::FormulaAudit::Conflicts do
     end
 
     it "no conflicts_with" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class FooAT20 < Formula
           url 'http://example.com/foo-2.0.tgz'
           desc 'Bar'

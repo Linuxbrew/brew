@@ -253,7 +253,7 @@ module Hbc
       end
 
       def trash_paths(*paths, command: nil, **_)
-        result = command.run!("/usr/bin/osascript", args: ["-e", <<-'EOS'.undent, *paths])
+        result = command.run!("/usr/bin/osascript", args: ["-e", <<~'EOS', *paths])
           on run argv
             repeat with i from 1 to (count argv)
               set item i of argv to (item i of argv as POSIX file)

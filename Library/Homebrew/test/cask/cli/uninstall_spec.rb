@@ -10,7 +10,7 @@ describe Hbc::CLI::Uninstall, :cask do
 
     Hbc::Installer.new(caffeine).install
 
-    output = Regexp.new <<-EOS.undent
+    output = Regexp.new <<~EOS
       ==> Uninstalling Cask local-caffeine
       ==> Removing App '.*Caffeine.app'.
     EOS
@@ -107,7 +107,7 @@ describe Hbc::CLI::Uninstall, :cask do
       timestamped_versions.each do |timestamped_version|
         caskroom_path.join(".metadata", *timestamped_version, "Casks").tap(&:mkpath)
                      .join("#{token}.rb").open("w") do |caskfile|
-                       caskfile.puts <<-EOS.undent
+                       caskfile.puts <<~EOS
                          cask '#{token}' do
                            version '#{timestamped_version[0]}'
                          end
@@ -153,7 +153,7 @@ describe Hbc::CLI::Uninstall, :cask do
 
       saved_caskfile.dirname.mkpath
 
-      IO.write saved_caskfile, <<-EOS.undent
+      IO.write saved_caskfile, <<~EOS
         cask 'ive-been-renamed' do
           version :latest
 

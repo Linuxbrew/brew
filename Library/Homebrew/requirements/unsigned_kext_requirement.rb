@@ -6,7 +6,7 @@ class UnsignedKextRequirement < Requirement
   satisfy(build_env: false) { MacOS.version < :yosemite }
 
   def message
-    s = <<-EOS.undent
+    s = <<~EOS
       Building this formula from source isn't possible due to OS X
       Yosemite (10.10) and above's strict unsigned kext ban.
     EOS

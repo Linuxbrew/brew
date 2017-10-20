@@ -88,7 +88,7 @@ module Homebrew
       safe_system "brew", "update", "--verbose"
       actual_end_commit = Utils.popen_read("git", "rev-parse", branch).chomp
       if start_commit != end_commit && start_commit == actual_end_commit
-        raise <<-EOS.undent
+        raise <<~EOS
           brew update didn't update #{branch}!
           Start commit:        #{start_commit}
           Expected end commit: #{end_commit}

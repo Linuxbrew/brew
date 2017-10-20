@@ -22,7 +22,7 @@ module Utils
       end
 
       return if conflicts.empty?
-      onoe <<-EOS.undent
+      onoe <<~EOS
         Could not link:
         #{conflicts.join("\n")}
 

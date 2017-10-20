@@ -185,7 +185,7 @@ class TapFormulaAmbiguityError < RuntimeError
       "#{Tap.fetch(match[:user], match[:repo])}/#{path.basename(".rb")}"
     end
 
-    super <<-EOS.undent
+    super <<~EOS
       Formulae found in multiple taps: #{formulae.map { |f| "\n       * #{f}" }.join}
 
       Please use the fully-qualified name e.g. #{formulae.first} to refer the formula.
@@ -205,7 +205,7 @@ class TapFormulaWithOldnameAmbiguityError < RuntimeError
       "#{Regexp.last_match(1)}/#{Regexp.last_match(2)}"
     end
 
-    super <<-EOS.undent
+    super <<~EOS
       Formulae with '#{name}' old name found in multiple taps: #{taps.map { |t| "\n       * #{t}" }.join}
 
       Please use the fully-qualified name e.g. #{taps.first}/#{name} to refer the formula or use its new name.
@@ -219,7 +219,7 @@ class TapUnavailableError < RuntimeError
   def initialize(name)
     @name = name
 
-    super <<-EOS.undent
+    super <<~EOS
       No available tap #{name}.
     EOS
   end
@@ -235,7 +235,7 @@ class TapRemoteMismatchError < RuntimeError
     @expected_remote = expected_remote
     @actual_remote = actual_remote
 
-    super <<-EOS.undent
+    super <<~EOS
       Tap #{name} remote mismatch.
       #{expected_remote} != #{actual_remote}
     EOS
@@ -248,7 +248,7 @@ class TapAlreadyTappedError < RuntimeError
   def initialize(name)
     @name = name
 
-    super <<-EOS.undent
+    super <<~EOS
       Tap #{name} already tapped.
     EOS
   end
@@ -260,7 +260,7 @@ class TapAlreadyUnshallowError < RuntimeError
   def initialize(name)
     @name = name
 
-    super <<-EOS.undent
+    super <<~EOS
       Tap #{name} already a full clone.
     EOS
   end
@@ -279,7 +279,7 @@ end
 
 class OperationInProgressError < RuntimeError
   def initialize(name)
-    message = <<-EOS.undent
+    message = <<~EOS
       Operation already in progress for #{name}
       Another active Homebrew process is already using #{name}.
       Please wait for it to finish or terminate it to continue.
@@ -327,7 +327,7 @@ class FormulaConflictError < RuntimeError
     message = []
     message << "Cannot install #{formula.full_name} because conflicting formulae are installed."
     message.concat conflicts.map { |c| conflict_message(c) } << ""
-    message << <<-EOS.undent
+    message << <<~EOS
       Please `brew unlink #{conflicts.map(&:name) * " "}` before continuing.
 
       Unlinking removes a formula's symlinks from #{HOMEBREW_PREFIX}. You can
@@ -341,7 +341,7 @@ end
 
 class FormulaAmbiguousPythonError < RuntimeError
   def initialize(formula)
-    super <<-EOS.undent
+    super <<~EOS
       The version of python to use with the virtualenv in the `#{formula.full_name}` formula
       cannot be guessed automatically. If the simultaneous use of python and python3
       is intentional, please add `:using => "python"` or `:using => "python3"` to
@@ -398,18 +398,18 @@ class BuildError < RuntimeError
       if formula.tap.official?
         puts Formatter.error(Formatter.url(OS::ISSUES_URL), label: "READ THIS")
       elsif issues_url = formula.tap.issues_url
-        puts <<-EOS.undent
+        puts <<~EOS
           If reporting this issue please do so at (not Homebrew/brew or Homebrew/core):
           #{Formatter.url(issues_url)}
         EOS
       else
-        puts <<-EOS.undent
+        puts <<~EOS
           If reporting this issue please do so to (not Homebrew/brew or Homebrew/core):
           #{formula.tap}
         EOS
       end
     else
-      puts <<-EOS.undent
+      puts <<~EOS
         Do not report this issue to Homebrew/brew or Homebrew/core!
       EOS
     end
@@ -445,7 +445,7 @@ class BuildToolsError < RuntimeError
       package_text = "a binary package"
     end
 
-    super <<-EOS.undent
+    super <<~EOS
       The following #{formula_text}:
         #{formulae.join(", ")}
       cannot be installed as #{package_text} and must be built from source.
@@ -467,7 +467,7 @@ class BuildFlagsError < RuntimeError
       require_text = "requires"
     end
 
-    super <<-EOS.undent
+    super <<~EOS
       The following #{flag_text}:
         #{flags.join(", ")}
       #{require_text} building tools, but none are installed.
@@ -481,7 +481,7 @@ end
 # the compilers available on the user's system
 class CompilerSelectionError < RuntimeError
   def initialize(formula)
-    super <<-EOS.undent
+    super <<~EOS
       #{formula.full_name} cannot be built with any available compilers.
       #{DevelopmentTools.custom_installation_instructions}
     EOS
@@ -491,7 +491,7 @@ end
 # Raised in Resource.fetch
 class DownloadError < RuntimeError
   def initialize(resource, cause)
-    super <<-EOS.undent
+    super <<~EOS
       Failed to download resource #{resource.download_name.inspect}
       #{cause.message}
       EOS
@@ -530,7 +530,7 @@ class ChecksumMismatchError < RuntimeError
     @expected = expected
     @hash_type = expected.hash_type.to_s.upcase
 
-    super <<-EOS.undent
+    super <<~EOS
       #{@hash_type} mismatch
       Expected: #{expected}
       Actual: #{actual}
@@ -557,7 +557,7 @@ class MissingApplyError < RuntimeError; end
 
 class BottleFormulaUnavailableError < RuntimeError
   def initialize(bottle_path, formula_path)
-    super <<-EOS.undent
+    super <<~EOS
       This bottle does not contain the formula file:
         #{bottle_path}
         #{formula_path}

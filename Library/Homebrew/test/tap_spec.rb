@@ -19,7 +19,7 @@ describe Tap do
   end
 
   def setup_tap_files
-    formula_file.write <<-EOS.undent
+    formula_file.write <<~EOS
       class Foo < Formula
         url "https://example.com/foo-1.0.tar.gz"
       end
@@ -28,11 +28,11 @@ describe Tap do
     alias_file.parent.mkpath
     ln_s formula_file, alias_file
 
-    (path/"formula_renames.json").write <<-EOS.undent
+    (path/"formula_renames.json").write <<~EOS
       { "oldname": "foo" }
     EOS
 
-    (path/"tap_migrations.json").write <<-EOS.undent
+    (path/"tap_migrations.json").write <<~EOS
       { "removed-formula": "homebrew/foo" }
     EOS
 
@@ -327,7 +327,7 @@ describe CoreTap do
 
   specify "files" do
     formula_file = subject.formula_dir/"foo.rb"
-    formula_file.write <<-EOS.undent
+    formula_file.write <<~EOS
       class Foo < Formula
         url "https://example.com/foo-1.0.tar.gz"
       end

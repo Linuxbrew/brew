@@ -41,7 +41,7 @@ module Homebrew
           return
         end
 
-        <<-EOS.undent
+        <<~EOS
           You are using macOS #{MacOS.version}.
           #{who} do not provide support for this #{what}.
           You may encounter build failures or other breakages.
@@ -59,7 +59,7 @@ module Homebrew
         # Homebrew/brew is currently using.
         return if ENV["TRAVIS"]
 
-        message = <<-EOS.undent
+        message = <<~EOS
           Your Xcode (#{MacOS::Xcode.version}) is outdated.
           Please update to Xcode #{MacOS::Xcode.latest_version} (or delete it).
           #{MacOS::Xcode.update_instructions}
@@ -67,7 +67,7 @@ module Homebrew
 
         if OS::Mac.prerelease?
           current_path = Utils.popen_read("/usr/bin/xcode-select", "-p")
-          message += <<-EOS.undent
+          message += <<~EOS
             If #{MacOS::Xcode.latest_version} is installed, you may need to:
               sudo xcode-select --switch /Applications/Xcode.app
             Current developer directory is:
@@ -87,7 +87,7 @@ module Homebrew
         # Homebrew/brew is currently using.
         return if ENV["TRAVIS"]
 
-        <<-EOS.undent
+        <<~EOS
           A newer Command Line Tools release is available.
           #{MacOS::CLT.update_instructions}
         EOS
@@ -99,7 +99,7 @@ module Homebrew
         return unless MacOS.version == :el_capitan
         return unless MacOS::Xcode.version >= "8"
 
-        <<-EOS.undent
+        <<~EOS
           You have Xcode 8 installed without the CLT;
           this causes certain builds to fail on OS X El Capitan (10.11).
           Please install the CLT via:
@@ -111,7 +111,7 @@ module Homebrew
         return unless MacOS::Xcode.installed?
         return unless MacOS::Xcode.below_minimum_version?
 
-        <<-EOS.undent
+        <<~EOS
           Your Xcode (#{MacOS::Xcode.version}) is too outdated.
           Please update to Xcode #{MacOS::Xcode.latest_version} (or delete it).
           #{MacOS::Xcode.update_instructions}
@@ -122,7 +122,7 @@ module Homebrew
         return unless MacOS::CLT.installed?
         return unless MacOS::CLT.below_minimum_version?
 
-        <<-EOS.undent
+        <<~EOS
           Your Command Line Tools are too outdated.
           #{MacOS::CLT.update_instructions}
         EOS
@@ -140,7 +140,7 @@ module Homebrew
           "Please install Xcode #{MacOS::Xcode.latest_version}."
         end
 
-        <<-EOS.undent
+        <<~EOS
           You seem to have osx-gcc-installer installed.
           Homebrew doesn't support osx-gcc-installer. It causes many builds to fail and
           is an unlicensed distribution of really old Xcode files.
@@ -154,7 +154,7 @@ module Homebrew
         uninstaller = Pathname.new("/Developer/Library/uninstall-developer-folder")
         return unless ((MacOS::Xcode.version || "0") >= "4.3") && uninstaller.exist?
 
-        <<-EOS.undent
+        <<~EOS
           You have leftover files from an older version of Xcode.
           You should delete them using:
             #{uninstaller}
@@ -170,7 +170,7 @@ module Homebrew
         return if libs.empty?
         return if libs.include? "/usr/lib/libxcselect.dylib"
 
-        <<-EOS.undent
+        <<~EOS
           You have an outdated version of /usr/bin/install_name_tool installed.
           This will cause binary package installations to fail.
           This can happen if you install osx-gcc-installer or RailsInstaller.
@@ -183,7 +183,7 @@ module Homebrew
         ponk = MacOS.macports_or_fink
         return if ponk.empty?
 
-        <<-EOS.undent
+        <<~EOS
           You have MacPorts or Fink installed:
             #{ponk.join(", ")}
 
@@ -199,7 +199,7 @@ module Homebrew
         return if RUBY_VERSION == ruby_version
         return if ARGV.homebrew_developer? && OS::Mac.prerelease?
 
-        <<-EOS.undent
+        <<~EOS
           Ruby version #{RUBY_VERSION} is unsupported on #{MacOS.version}. Homebrew
           is developed and tested on Ruby #{ruby_version}, and may not work correctly
           on other Rubies. Patches are accepted as long as they don't cause breakage
@@ -212,7 +212,7 @@ module Homebrew
         return if prefix.nil?
         return unless prefix.to_s.include?(" ")
 
-        <<-EOS.undent
+        <<~EOS
           Xcode is installed to a directory with a space in the name.
           This will cause some formulae to fail to build.
         EOS
@@ -222,7 +222,7 @@ module Homebrew
         prefix = MacOS::Xcode.prefix
         return if prefix.nil? || prefix.exist?
 
-        <<-EOS.undent
+        <<~EOS
           The directory Xcode is reportedly installed to doesn't exist:
             #{prefix}
           You may need to `xcode-select` the proper path if you have moved Xcode.
@@ -236,7 +236,7 @@ module Homebrew
 
         path = MacOS::Xcode.bundle_path
         path = "/Developer" if path.nil? || !path.directory?
-        <<-EOS.undent
+        <<~EOS
           Your Xcode is configured with an invalid path.
           You should change it to the correct path:
             sudo xcode-select -switch #{path}
@@ -247,7 +247,7 @@ module Homebrew
         return unless MacOS.version <= "10.8"
         return if Formula["curl"].installed?
 
-        <<-EOS.undent
+        <<~EOS
           The system curl on 10.8 and below is often incapable of supporting
           modern secure connections & will fail on fetching formulae.
 
@@ -261,7 +261,7 @@ module Homebrew
         return unless MacOS.version >= :yosemite
         return if ENV["SSL_CERT_DIR"].nil?
 
-        <<-EOS.undent
+        <<~EOS
           SSL_CERT_DIR support was removed from Apple's curl.
           If fetching formulae fails you should:
             unset SSL_CERT_DIR
@@ -274,7 +274,7 @@ module Homebrew
         # license or no "xc*" tool will work.
         return unless `/usr/bin/xcrun clang 2>&1` =~ /license/ && !$CHILD_STATUS.success?
 
-        <<-EOS.undent
+        <<~EOS
           You have not agreed to the Xcode license.
           Builds will fail! Agree to the license by opening Xcode.app or running:
             sudo xcodebuild -license
@@ -289,7 +289,7 @@ module Homebrew
         latest_version = Version.create(MacOS::XQuartz.latest_version)
         return if installed_version >= latest_version
 
-        <<-EOS.undent
+        <<~EOS
           Your XQuartz (#{installed_version}) is outdated.
           Please install XQuartz #{latest_version} (or delete the current version).
           XQuartz can be updated using Homebrew-Cask by running
@@ -301,7 +301,7 @@ module Homebrew
         return unless MacOS::XQuartz.version
         return unless MacOS::XQuartz.version.include? "beta"
 
-        <<-EOS.undent
+        <<~EOS
           The following beta release of XQuartz is installed: #{MacOS::XQuartz.version}
 
           XQuartz beta releases include address sanitization, and do not work with
@@ -337,7 +337,7 @@ module Homebrew
         end
         case_sensitive_vols.uniq!
 
-        <<-EOS.undent
+        <<~EOS
           The filesystem on #{case_sensitive_vols.join(",")} appears to be case-sensitive.
           The default macOS filesystem is case-insensitive. Please report any apparent problems.
         EOS
@@ -346,7 +346,7 @@ module Homebrew
       def check_homebrew_prefix
         return if HOMEBREW_PREFIX.to_s == "/usr/local"
 
-        <<-EOS.undent
+        <<~EOS
           Your Homebrew's prefix is not /usr/local.
           You can install Homebrew anywhere you want but some bottles (binary packages)
           can only be used with a /usr/local prefix and some formulae (packages)
@@ -360,7 +360,7 @@ module Homebrew
 
         mono_config = Pathname.new("/usr/bin/pkg-config")
         if mono_config.exist? && mono_config.realpath.to_s.include?("Mono.framework")
-          <<-EOS.undent
+          <<~EOS
             You have a non-Homebrew 'pkg-config' in your PATH:
               /usr/bin/pkg-config => #{mono_config.realpath}
 
@@ -371,7 +371,7 @@ module Homebrew
             `sudo rm /usr/bin/pkg-config` and upgrade to the latest version of Mono.
           EOS
         elsif binary.to_s != "#{HOMEBREW_PREFIX}/bin/pkg-config"
-          <<-EOS.undent
+          <<~EOS
             You have a non-Homebrew 'pkg-config' in your PATH:
               #{binary}
 

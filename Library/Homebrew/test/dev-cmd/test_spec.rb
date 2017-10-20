@@ -23,7 +23,7 @@ describe "brew test", :integration_test do
   end
 
   it "tests a given Formula" do
-    setup_test_formula "testball", <<-EOS.undent
+    setup_test_formula "testball", <<~EOS
       head "https://github.com/example/testball2.git"
 
       devel do

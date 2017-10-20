@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
 
   context "When auditing formula components order" do
     it "When url precedes homepage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -29,7 +29,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
     end
 
     it "When `resource` precedes `depends_on`" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "https://example.com/foo-1.0.tgz"
 
@@ -55,7 +55,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
     end
 
     it "When `test` precedes `plist`" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "https://example.com/foo-1.0.tgz"
 
@@ -82,7 +82,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
     end
 
     it "When only one of many `depends_on` precedes `conflicts_with`" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           depends_on "autoconf" => :build
           conflicts_with "visionmedia-watch"
@@ -116,13 +116,13 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
 
   context "When auditing formula components order with autocorrect" do
     it "When url precedes homepage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
         end
       EOS
-      correct_source = <<-EOS.undent
+      correct_source = <<~EOS
         class Foo < Formula
           homepage "http://example.com"
           url "http://example.com/foo-1.0.tgz"
@@ -134,7 +134,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
     end
 
     it "When `resource` precedes `depends_on`" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url "https://example.com/foo-1.0.tgz"
 
@@ -145,7 +145,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
           depends_on "openssl"
         end
       EOS
-      correct_source = <<-EOS.undent
+      correct_source = <<~EOS
         class Foo < Formula
           url "https://example.com/foo-1.0.tgz"
 
