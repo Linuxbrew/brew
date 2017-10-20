@@ -54,14 +54,11 @@ module Homebrew
     end
     ignores << "recommended?" if ARGV.include? "--skip-recommended"
 
-    memo = {}
     uses = formulae.select do |f|
       used_formulae.all? do |ff|
         begin
           if recursive
             deps = f.recursive_dependencies do |dependent, dep|
-              memo_key = [dependent, dep].to_s
-              next if memo[memo_key]
               if dep.recommended?
                 Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
               elsif dep.optional?
@@ -75,7 +72,6 @@ module Homebrew
               if dep.is_a?(TapDependency) && !dep.tap.installed?
                 Dependency.keep_but_prune_recursive_deps
               end
-              memo[memo_key] = true
             end
 
             dep_formulae = deps.flat_map do |dep|
