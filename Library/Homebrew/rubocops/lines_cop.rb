@@ -1,4 +1,4 @@
-require 'FileUtils'
+require "FileUtils"
 require_relative "./extend/formula_cop"
 
 module RuboCop
@@ -89,7 +89,7 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, :man, :+) do |method|
-            next unless match = regex_match_group(parameters(method).first, %r{man[1-8]})
+            next unless match = regex_match_group(parameters(method).first, /man[1-8]/)
             problem "\"#{method.source}\" should be \"#{match[0]}\""
           end
 
@@ -132,13 +132,13 @@ module RuboCop
 
           find_every_method_call_by_name(body_node, :depends_on).each do |method|
             key, value = destructure_hash(parameters(method).first)
-            next if (key.nil? || value.nil?)
-            next unless match = regex_match_group(value, %r{(lua|perl|python|ruby)(\d*)})
+            next if key.nil? || value.nil?
+            next unless match = regex_match_group(value, /(lua|perl|python|ruby)(\d*)/)
             problem "#{match[1]} modules should be vendored rather than use deprecated #{method.source}`"
           end
 
           find_every_method_call_by_name(body_node, :system).each do |method|
-            next unless match = regex_match_group(parameters(method).first, %r{(env|export)(\s+)?})
+            next unless match = regex_match_group(parameters(method).first, /(env|export)(\s+)?/)
             problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
           end
 
@@ -163,7 +163,7 @@ module RuboCop
 
           find_instance_method_call(body_node, "ARGV", :include?) do |method|
             param = parameters(method).first
-            next unless match = regex_match_group(param, %r{--(HEAD|devel)})
+            next unless match = regex_match_group(param, /--(HEAD|devel)/)
             problem "Use \"if build.#{match[1].downcase}?\" instead"
           end
 
@@ -240,8 +240,20 @@ module RuboCop
           end
 
           find_every_method_call_by_name(body_node, :assert).each do |method|
-            if method_called?(method, :include?) && !method_called?(method, :!)
+            if method_called_ever?(method, :include?) && !method_called_ever?(method, :!)
               problem "Use `assert_match` instead of `assert ...include?`"
+            end
+
+            if method_called_ever?(method, :exist?) && !method_called_ever?(method, :!)
+              problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{method.source}`"
+            end
+
+            if method_called_ever?(method, :exist?) && method_called_ever?(method, :!)
+              problem "Use `refute_predicate <path_to_file>, :exist?` instead of `#{method.source}`"
+            end
+
+            if method_called_ever?(method, :executable?) && !method_called_ever?(method, :!)
+              problem "Use `assert_predicate <path_to_file>, :executable?` instead of `#{method.source}`"
             end
           end
 
@@ -259,16 +271,15 @@ module RuboCop
 
           find_instance_method_call(body_node, "Dir", :[]) do |method|
             path = parameters(method).first
-            next if !path.str_type?
+            next unless path.str_type?
             next unless match = regex_match_group(path, /^[^\*{},]+$/)
             problem "Dir([\"#{string_content(path)}\"]) is unnecessary; just use \"#{match[0]}\""
           end
 
-
-          fileUtils_methods= Regexp.new(FileUtils.singleton_methods(false).map { |m| '(?-mix:^'+Regexp.escape(m)+'$)' }.join '|')
+          fileutils_methods = Regexp.new(FileUtils.singleton_methods(false).map { |m| "(?-mix:^" + Regexp.escape(m) + "$)" }.join("|"))
           find_every_method_call_by_name(body_node, :system).each do |method|
             param = parameters(method).first
-            next unless match = regex_match_group(param, fileUtils_methods)
+            next unless match = regex_match_group(param, fileutils_methods)
             problem "Use the `#{match}` Ruby method instead of `#{method.source}`"
           end
 
@@ -300,25 +311,25 @@ module RuboCop
 
           find_instance_method_call(body_node, :build, :without?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, %r{-?-?without-(.*)})
+            next unless match = regex_match_group(arg, /-?-?without-(.*)/)
             problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
           end
 
           find_instance_method_call(body_node, :build, :with?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, %r{-?-?with-(.*)})
+            next unless match = regex_match_group(arg, /-?-?with-(.*)/)
             problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
           end
 
           find_instance_method_call(body_node, :build, :include?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, %r{with(out)?-(.*)})
+            next unless match = regex_match_group(arg, /with(out)?-(.*)/)
             problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
           end
 
           find_instance_method_call(body_node, :build, :include?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, %r{\-\-(.*)})
+            next unless match = regex_match_group(arg, /\-\-(.*)/)
             problem "Reference '#{match[1]}' without dashes"
           end
         end

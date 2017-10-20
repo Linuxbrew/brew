@@ -88,7 +88,7 @@ module Hbc
           bomfile.close
 
           Tempfile.open(["", ".list"]) do |filelist|
-            filelist.write(bom_filelist_from_path(mount))
+            filelist.puts(bom_filelist_from_path(mount))
             filelist.close
 
             @command.run!("/usr/bin/mkbom", args: ["-s", "-i", filelist.path, "--", bomfile.path])
@@ -98,16 +98,17 @@ module Hbc
       end
 
       def bom_filelist_from_path(mount)
-        Dir.chdir(mount) do
-          Dir.glob("**/*", File::FNM_DOTMATCH).map do |path|
-            next if skip_path?(Pathname(path))
-            (path == ".") ? path : path.prepend("./")
-          end.compact.join("\n").concat("\n")
-        end
+        # We need to use `find` here instead of Ruby in order to properly handle
+        # file names containing special characters, such as “e” + “´” vs. “é”.
+        @command.run("/usr/bin/find", args: [".", "-print0"], chdir: mount, print_stderr: false).stdout
+                .split("\0")
+                .reject { |path| skip_path?(mount, path) }
+                .join("\n")
       end
 
-      def skip_path?(path)
-        dmg_metadata?(path) || system_dir_symlink?(path)
+      def skip_path?(mount, path)
+        path = Pathname(path.sub(%r{^\./}, ""))
+        dmg_metadata?(path) || system_dir_symlink?(mount, path)
       end
 
       # unnecessary DMG metadata
@@ -130,9 +131,10 @@ module Hbc
         DMG_METADATA_FILES.include?(relative_root.basename.to_s)
       end
 
-      def system_dir_symlink?(path)
+      def system_dir_symlink?(mount, path)
+        full_path = Pathname(mount).join(path)
         # symlinks to system directories (commonly to /Applications)
-        path.symlink? && MacOS.system_dir?(path.readlink)
+        full_path.symlink? && MacOS.system_dir?(full_path.readlink)
       end
 
       def mounts_from_plist(plist)

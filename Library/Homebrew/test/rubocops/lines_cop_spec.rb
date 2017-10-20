@@ -70,7 +70,7 @@ describe RuboCop::Cop::FormulaAudit::ClassInheritance do
                               column: 10,
                               source: source }]
 
-      inspect_source(source, '/homebrew-core/Formula/foo.rb')
+      inspect_source(source, "/homebrew-core/Formula/foo.rb")
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -523,6 +523,72 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       EOS
 
       expected_offenses = [{  message: "Use `assert_match` instead of `assert ...include?`",
+                              severity: :convention,
+                              line: 4,
+                              column: 9,
+                              source: source }]
+
+      inspect_source(source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "assert ...exist? without a negation" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          assert File.exist? "default.ini"
+        end
+      EOS
+
+      expected_offenses = [{  message: 'Use `assert_predicate <path_to_file>, :exist?` instead of `assert File.exist? "default.ini"`',
+                              severity: :convention,
+                              line: 4,
+                              column: 9,
+                              source: source }]
+
+      inspect_source(source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "assert ...exist? with a negation" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          assert !File.exist?("default.ini")
+        end
+      EOS
+
+      expected_offenses = [{  message: 'Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?("default.ini")`',
+                              severity: :convention,
+                              line: 4,
+                              column: 9,
+                              source: source }]
+
+      inspect_source(source)
+
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
+    it "assert ...executable? without a negation" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          assert File.executable? f
+        end
+      EOS
+
+      expected_offenses = [{  message: "Use `assert_predicate <path_to_file>, :executable?` instead of `assert File.executable? f`",
                               severity: :convention,
                               line: 4,
                               column: 9,

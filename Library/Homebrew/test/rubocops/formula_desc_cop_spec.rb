@@ -27,6 +27,27 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
       end
     end
 
+    it "reports an offense when desc is an empty string" do
+      source = <<-EOS.undent
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          desc ''
+        end
+      EOS
+
+      msg = "The desc (description) should not be an empty string."
+      expected_offenses = [{ message: msg,
+                             severity: :convention,
+                             line: 3,
+                             column: 2,
+                             source: source }]
+
+      inspect_source(source, "/homebrew-core/Formula/foo.rb")
+      expected_offenses.zip(cop.offenses).each do |expected, actual|
+        expect_offense(expected, actual)
+      end
+    end
+
     it "When desc is too long" do
       source = <<-EOS.undent
         class Foo < Formula

@@ -9,7 +9,7 @@ RUBY_VERSION_SPLIT = RUBY_VERSION.split "."
 RUBY_X = RUBY_VERSION_SPLIT[0].to_i
 RUBY_Y = RUBY_VERSION_SPLIT[1].to_i
 if RUBY_X < 2 || (RUBY_X == 2 && RUBY_Y < 3)
-  raise "Homebrew must be run under Ruby 2.3!"
+  raise "Homebrew must be run under Ruby 2.3! You're running #{RUBY_VERSION}."
 end
 
 require "pathname"
