@@ -157,7 +157,7 @@ module Homebrew
         end
         return if files.empty?
 
-        inject_file_list(files, message)
+        inject_file_list(files.sort, message)
       end
 
       def check_for_stray_dylibs
