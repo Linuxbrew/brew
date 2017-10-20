@@ -51,8 +51,8 @@ module Homebrew
   end
 
   def find_internal_commands(directory)
-    directory.children.each_with_object([]) do |f, cmds|
-      cmds << f.basename.to_s.sub(/\.(?:rb|sh)$/, "") if f.file?
-    end
+    Pathname.glob(directory/"*")
+            .select(&:file?)
+            .map { |f| f.basename.to_s.sub(/\.(?:rb|sh)$/, "") }
   end
 end
