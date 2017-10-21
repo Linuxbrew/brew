@@ -11,7 +11,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:launchctl_remove_cmd) { %w[/bin/launchctl remove my.fancy.package.service] }
     let(:unknown_response) { "launchctl list returned unknown response\n" }
     let(:service_info) do
-      <<-EOS.undent
+      <<~EOS
         {
                 "LimitLoadToSessionType" = "Aqua";
                 "Label" = "my.fancy.package.service";

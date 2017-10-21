@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
 
   context "When auditing homepage" do
     it "When there is no homepage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
         end
@@ -28,7 +28,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
     end
 
     it "Homepage with ftp" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           homepage "ftp://example.com/foo"
           url "http://example.com/foo-1.0.tgz"
@@ -65,7 +65,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
       }
 
       formula_homepages.each do |name, homepage|
-        source = <<-EOS.undent
+        source = <<~EOS
           class #{name.capitalize} < Formula
             homepage "#{homepage}"
             url "http://example.com/#{name}-1.0.tgz"

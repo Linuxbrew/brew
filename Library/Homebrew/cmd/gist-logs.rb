@@ -29,7 +29,7 @@ module Homebrew
     files["00.config.out"] = { content: s.string }
     files["00.doctor.out"] = { content: `brew doctor 2>&1` }
     unless f.core_formula?
-      tap = <<-EOS.undent
+      tap = <<~EOS
         Formula: #{f.name}
         Tap: #{f.tap}
         Path: #{f.path}
@@ -47,7 +47,7 @@ module Homebrew
 
     if ARGV.include?("--new-issue") || ARGV.switch?("n")
       if GitHub.api_credentials_type == :none
-        puts <<-EOS.undent
+        puts <<~EOS
           You can create a new personal access token:
            #{GitHub::ALL_SCOPES_URL}
           and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method.
@@ -64,7 +64,7 @@ module Homebrew
 
   def brief_build_info(f)
     build_time_str = f.logs.ctime.strftime("%Y-%m-%d %H:%M:%S")
-    s = <<-EOS.undent
+    s = <<~EOS
       Homebrew build logs for #{f.full_name} on #{OS_VERSION}
     EOS
     if ARGV.include?("--with-hostname")

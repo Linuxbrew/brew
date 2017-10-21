@@ -1,4 +1,3 @@
-require "FileUtils"
 require_relative "./extend/formula_cop"
 
 module RuboCop
@@ -297,7 +296,7 @@ module RuboCop
           end
 
           find_method_with_args(body_node, :skip_clean, :all) do
-            problem <<-EOS.undent.chomp
+            problem <<~EOS.chomp
               `skip_clean :all` is deprecated; brew no longer strips symbols
                       Pass explicit paths to prevent Homebrew from removing empty folders.
             EOS
@@ -313,6 +312,7 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, "ENV", :universal_binary) do
+            next if @formula_name == "wine"
             problem "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated."
           end
 
@@ -352,7 +352,7 @@ module RuboCop
           node.modifier_form?
         end
 
-        def_node_search :conditional_dependencies, <<-EOS.undent
+        def_node_search :conditional_dependencies, <<~EOS
           {$(if (send (send nil :build) ${:include? :with? :without?} $(str _))
               (send nil :depends_on $({str sym} _)) nil)
 
@@ -361,22 +361,22 @@ module RuboCop
         EOS
 
         # Match depends_on with hash as argument
-        def_node_matcher :hash_dep, <<-EOS.undent
+        def_node_matcher :hash_dep, <<~EOS
           {(hash (pair $(str _) $(str _)))
            (hash (pair $(str _) (array $(str _) ...)))}
         EOS
 
-        def_node_matcher :destructure_hash, <<-EOS.undent
+        def_node_matcher :destructure_hash, <<~EOS
           (hash (pair $(str _) $(sym _)))
         EOS
 
-        def_node_search :formula_path_strings, <<-EOS.undent
+        def_node_search :formula_path_strings, <<~EOS
           {(dstr (begin (send nil %1)) $(str _ ))
            (dstr _ (begin (send nil %1)) $(str _ ))}
         EOS
 
         # Node Pattern search for Language::Node
-        def_node_search :languageNodeModule?, <<-EOS.undent
+        def_node_search :languageNodeModule?, <<~EOS
           (const (const nil :Language) :Node)
         EOS
       end

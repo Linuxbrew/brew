@@ -29,7 +29,7 @@ Layout/IndentArray:
   EnforcedStyle: special_inside_parentheses
 
 Layout/IndentHeredoc:
-  EnforcedStyle: unindent
+  EnforcedStyle: squiggly
 
 # conflicts with DSL-style path concatenation with `/`
 Layout/SpaceAroundOperators:
@@ -73,6 +73,8 @@ Metrics/CyclomaticComplexity:
 
 Metrics/LineLength:
   Max: 324
+  # ignore manpage comments
+  IgnoredPatterns: ['#: ']
 
 Metrics/MethodLength:
   Max: 222

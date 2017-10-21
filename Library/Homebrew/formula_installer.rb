@@ -93,7 +93,7 @@ class FormulaInstaller
     return false if formula.bottle_disabled?
     unless formula.pour_bottle?
       if install_bottle_options[:warn] && formula.pour_bottle_check_unsatisfied_reason
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Building #{formula.full_name} from source:
             #{formula.pour_bottle_check_unsatisfied_reason}
         EOS
@@ -104,7 +104,7 @@ class FormulaInstaller
     bottle = formula.bottle_specification
     unless bottle.compatible_cellar?
       if install_bottle_options[:warn]
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Building #{formula.full_name} from source:
             The bottle needs a #{bottle.cellar} Cellar (yours is #{HOMEBREW_CELLAR}).
         EOS
@@ -165,14 +165,14 @@ class FormulaInstaller
     end
 
     unless recursive_dependencies.empty?
-      raise CannotInstallFormulaError, <<-EOS.undent
+      raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains a recursive dependency on itself:
           #{recursive_dependencies.join("\n  ")}
       EOS
     end
 
     if recursive_formulae.flat_map(&:recursive_dependencies).map(&:to_s).include?(formula.name)
-      raise CannotInstallFormulaError, <<-EOS.undent
+      raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains a recursive dependency on itself!
       EOS
     end
@@ -188,7 +188,7 @@ class FormulaInstaller
       version_conflicts += version_hash[unversioned_name]
     end
     unless version_conflicts.empty?
-      raise CannotInstallFormulaError, <<-EOS.undent
+      raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains conflicting version recursive dependencies:
           #{version_conflicts.to_a.join ", "}
         View these with `brew deps --tree #{formula.full_name}`.
@@ -221,16 +221,16 @@ class FormulaInstaller
     # function but after instantiating this class so that it can avoid having to
     # relink the active keg if possible (because it is slow).
     if formula.linked_keg.directory?
-      message = <<-EOS.undent
+      message = <<~EOS
         #{formula.name} #{formula.linked_version} is already installed
       EOS
       message += if formula.outdated? && !formula.head?
-        <<-EOS.undent
+        <<~EOS
           To upgrade to #{formula.pkg_version}, run `brew upgrade #{formula.name}`
         EOS
       else
         # some other version is already installed *and* linked
-        <<-EOS.undent
+        <<~EOS
           To install #{formula.pkg_version}, first run `brew unlink #{formula.name}`
         EOS
       end
@@ -355,7 +355,7 @@ class FormulaInstaller
       rescue FormulaUnavailableError => e
         # If the formula name doesn't exist any more then complain but don't
         # stop installation from continuing.
-        opoo <<-EOS.undent
+        opoo <<~EOS
           #{formula}: #{e.message}
           'conflicts_with \"#{c.name}\"' should be removed from #{formula.path.basename}.
         EOS

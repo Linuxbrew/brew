@@ -21,10 +21,11 @@ module Homebrew
   module_function
 
   def tap_info
+    # TODO: This still returns a non-alphabetised list on APFS.
     if ARGV.include? "--installed"
       taps = Tap
     else
-      taps = ARGV.named.map do |name|
+      taps = ARGV.named.sort.map do |name|
         Tap.fetch(name)
       end
     end

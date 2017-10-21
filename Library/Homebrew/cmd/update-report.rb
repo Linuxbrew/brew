@@ -33,7 +33,7 @@ module Homebrew
 
         # Use an extra newline and bold to avoid this being missed.
         ohai "Homebrew has enabled anonymous aggregate user behaviour analytics."
-        puts <<-EOS.undent
+        puts <<~EOS
           #{Tty.bold}Read the analytics documentation (and how to opt-out) here:
             #{Formatter.url("https://docs.brew.sh/Analytics.html")}#{Tty.reset}
 
@@ -167,7 +167,7 @@ module Homebrew
     end
 
     if @migration_failed
-      opoo <<-EOS.undent
+      opoo <<~EOS
         Failed to migrate #{legacy_cache} to
         #{HOMEBREW_CACHE}. Please do so manually.
       EOS
@@ -176,7 +176,7 @@ module Homebrew
       FileUtils.rm_rf legacy_cache
       if legacy_cache.exist?
         FileUtils.touch migration_attempted_file
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Failed to delete #{legacy_cache}.
           Please do so manually.
         EOS
@@ -191,7 +191,7 @@ module Homebrew
     ohai "Migrating HOMEBREW_REPOSITORY (please wait)..."
 
     unless HOMEBREW_PREFIX.writable_real?
-      ofail <<-EOS.undent
+      ofail <<~EOS
         #{HOMEBREW_PREFIX} is not writable.
 
         You should change the ownership and permissions of #{HOMEBREW_PREFIX}
@@ -205,7 +205,7 @@ module Homebrew
     new_homebrew_repository = Pathname.new "/usr/local/Homebrew"
     new_homebrew_repository.rmdir_if_possible
     if new_homebrew_repository.exist?
-      ofail <<-EOS.undent
+      ofail <<~EOS
         #{new_homebrew_repository} already exists.
         Please remove it manually or uninstall and reinstall Homebrew into a new
         location as the migration cannot be done automatically.
@@ -258,7 +258,7 @@ module Homebrew
     end
 
     unless unremovable_paths.empty?
-      ofail <<-EOS.undent
+      ofail <<~EOS
         Could not remove old HOMEBREW_REPOSITORY paths!
         Please do this manually with:
           sudo rm -rf #{unremovable_paths.join " "}
@@ -274,7 +274,7 @@ module Homebrew
     begin
       FileUtils.ln_s(src.relative_path_from(dst.parent), dst)
     rescue Errno::EACCES, Errno::ENOENT
-      ofail <<-EOS.undent
+      ofail <<~EOS
         Could not create symlink at #{dst}!
         Please do this manually with:
           sudo ln -sf #{src} #{dst}
@@ -285,13 +285,13 @@ module Homebrew
     link_completions_manpages_and_docs(new_homebrew_repository)
 
     ohai "Migrated HOMEBREW_REPOSITORY to #{new_homebrew_repository}!"
-    puts <<-EOS.undent
+    puts <<~EOS
       Homebrew no longer needs to have ownership of /usr/local. If you wish you can
       return /usr/local to its default ownership with:
         sudo chown root:wheel #{HOMEBREW_PREFIX}
     EOS
   rescue => e
-    ofail <<-EOS.undent
+    ofail <<~EOS
       #{Tty.bold}Failed to migrate HOMEBREW_REPOSITORY to #{new_homebrew_repository}!#{Tty.reset}
       The error was:
         #{e}
@@ -309,7 +309,7 @@ module Homebrew
     Utils::Link.link_manpages(repository, command)
     Utils::Link.link_docs(repository, command)
   rescue => e
-    ofail <<-EOS.undent
+    ofail <<~EOS
       Failed to link all completions, docs and manpages:
         #{e}
     EOS
@@ -449,7 +449,7 @@ class Reporter
         next unless (HOMEBREW_PREFIX/"Caskroom"/new_name).exist?
         new_tap = Tap.fetch(new_tap_name)
         new_tap.install unless new_tap.installed?
-        ohai "#{name} has been moved to Homebrew.", <<-EOS.undent
+        ohai "#{name} has been moved to Homebrew.", <<~EOS
           To uninstall the cask run:
             brew cask uninstall --force #{name}
         EOS
@@ -480,14 +480,14 @@ class Reporter
           system HOMEBREW_BREW_FILE, "prune"
           ohai "brew cask install #{new_name}"
           system HOMEBREW_BREW_FILE, "cask", "install", new_name
-          ohai <<-EOS.undent
+          ohai <<~EOS
             #{name} has been moved to Homebrew-Cask.
             The existing keg has been unlinked.
             Please uninstall the formula when convenient by running:
               brew uninstall --force #{name}
           EOS
         else
-          ohai "#{name} has been moved to Homebrew-Cask.", <<-EOS.undent
+          ohai "#{name} has been moved to Homebrew-Cask.", <<~EOS
             To uninstall the formula and install the cask run:
               brew uninstall --force #{name}
               brew cask install #{new_name}
@@ -598,7 +598,7 @@ class ReporterHub
     return if formulae.empty?
     # Dump formula list.
     ohai title
-    puts Formatter.columns(formulae)
+    puts Formatter.columns(formulae.sort)
   end
 
   def installed?(formula)

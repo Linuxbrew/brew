@@ -10,7 +10,7 @@ module Hbc
 
       module ManualInstaller
         def install_phase(**)
-          puts <<-EOS.undent
+          puts <<~EOS
             To complete the installation of Cask #{cask}, you must also
             run the installer at
 

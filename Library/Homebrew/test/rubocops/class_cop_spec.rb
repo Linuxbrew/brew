@@ -17,10 +17,10 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
       }]
 
       formulas.each do |formula|
-        source = <<-EOS.undent
-        class Foo < #{formula["class"]}
-          url 'http://example.com/foo-1.0.tgz'
-        end
+        source = <<~EOS
+          class Foo < #{formula["class"]}
+            url 'http://example.com/foo-1.0.tgz'
+          end
         EOS
 
         expected_offenses = [{  message: "#{formula["class"]} is deprecated, use Formula instead",
@@ -38,12 +38,12 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
     end
 
     it "with deprecated inheritance and autocorrect" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < AmazonWebServicesFormula
           url 'http://example.com/foo-1.0.tgz'
         end
       EOS
-      corrected_source = <<-EOS.undent
+      corrected_source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
         end
@@ -60,7 +60,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Test do
 
   context "When auditing formula" do
     it "without a test block" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
         end

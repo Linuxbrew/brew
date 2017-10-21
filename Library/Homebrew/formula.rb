@@ -839,7 +839,7 @@ class Formula
   # This method can be overridden to provide a plist.
   # For more examples read Apple's handy manpage:
   # https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man5/plist.5.html
-  # <pre>def plist; <<-EOS.undent
+  # <pre>def plist; <<~EOS
   #  <?xml version="1.0" encoding="UTF-8"?>
   #  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
   #  <plist version="1.0">
@@ -986,13 +986,13 @@ class Formula
   # to installation through a different package manager on a different OS.
   # @return [String]
   # <pre>def caveats
-  #   <<-EOS.undent
+  #   <<~EOS
   #     Are optional. Something the user should know?
   #   EOS
   # end</pre>
   #
   # <pre>def caveats
-  #   s = <<-EOS.undent
+  #   s = <<~EOS
   #     Print some important notice to the user when `brew info <formula>` is
   #     called or when brewing a formula.
   #     This is optional. You can use all the vars like #{version} here.
@@ -1691,7 +1691,7 @@ class Formula
     # keep Homebrew's site-packages in sys.path when using system Python
     user_site_packages = home/"Library/Python/2.7/lib/python/site-packages"
     user_site_packages.mkpath
-    (user_site_packages/"homebrew.pth").write <<-EOS.undent
+    (user_site_packages/"homebrew.pth").write <<~EOS
       import site; site.addsitedir("#{HOMEBREW_PREFIX}/lib/python2.7/site-packages")
       import sys, os; sys.path = (os.environ["PYTHONPATH"].split(os.pathsep) if "PYTHONPATH" in os.environ else []) + ["#{HOMEBREW_PREFIX}/lib/python2.7/site-packages"] + sys.path
     EOS
@@ -2394,7 +2394,7 @@ class Formula
     # and building the software was ok.
     # <pre>system bin/"foobar", "--version"</pre>
     #
-    # <pre>(testpath/"test.file").write <<-EOS.undent
+    # <pre>(testpath/"test.file").write <<~EOS
     #   writing some test file, if you need to
     # EOS
     # assert_equal "OK", shell_output("test_command test.file").strip</pre>

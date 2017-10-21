@@ -5,7 +5,7 @@ class Keg
     puts "Changing dylib ID of #{file}\n  from #{file.dylib_id}\n    to #{id}" if ARGV.debug?
     MachO::Tools.change_dylib_id(file, id, strict: false)
   rescue MachO::MachOError
-    onoe <<-EOS.undent
+    onoe <<~EOS
       Failed changing dylib ID of #{file}
         from #{file.dylib_id}
           to #{id}
@@ -19,7 +19,7 @@ class Keg
     puts "Changing install name in #{file}\n  from #{old}\n    to #{new}" if ARGV.debug?
     MachO::Tools.change_install_name(file, old, new, strict: false)
   rescue MachO::MachOError
-    onoe <<-EOS.undent
+    onoe <<~EOS
       Failed changing install name in #{file}
         from #{old}
           to #{new}

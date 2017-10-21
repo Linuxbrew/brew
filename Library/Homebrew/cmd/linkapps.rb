@@ -19,7 +19,7 @@ module Homebrew
   module_function
 
   def linkapps
-    opoo <<-EOS.undent
+    opoo <<~EOS
       `brew linkapps` has been deprecated and will eventually be removed!
 
       Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using

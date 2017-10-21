@@ -9,7 +9,7 @@ module Homebrew
   module_function
 
   def leaves
-    installed = Formula.installed
+    installed = Formula.installed.sort
     deps_of_installed = Set.new
 
     installed.each do |f|

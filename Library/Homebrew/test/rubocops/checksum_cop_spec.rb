@@ -8,7 +8,7 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
 
   context "When auditing spec checksums" do
     it "When the checksum is empty" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do
@@ -42,7 +42,7 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
     end
 
     it "When the checksum is not 64 characters" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do
@@ -76,7 +76,7 @@ describe RuboCop::Cop::FormulaAudit::Checksum do
     end
 
     it "When the checksum has invalid chars" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do
@@ -116,7 +116,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
 
   context "When auditing spec checksums" do
     it "When the checksum has upper case characters" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do
@@ -150,7 +150,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
     end
 
     it "When auditing stable blocks outside spec blocks" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           resource "foo-outside" do
@@ -185,7 +185,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
 
   context "When auditing checksum with autocorrect" do
     it "When there is uppercase sha256" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do
@@ -200,7 +200,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
         end
       EOS
 
-      corrected_source = <<-EOS.undent
+      corrected_source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do

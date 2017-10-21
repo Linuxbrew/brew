@@ -39,7 +39,7 @@ module Homebrew
       filtered_list
     elsif ARGV.named.empty?
       if ARGV.include? "--full-name"
-        full_names = Formula.installed.map(&:full_name).sort &tap_and_name_comparison
+        full_names = Formula.installed.map(&:full_name).sort(&tap_and_name_comparison)
         return if full_names.empty?
         puts Formatter.columns(full_names)
       else
@@ -87,7 +87,7 @@ module Homebrew
     dirs.delete "etc"
     dirs.delete "var"
 
-    args = dirs + %w[-type f (]
+    args = dirs.sort + %w[-type f (]
     args.concat UNBREWED_EXCLUDE_FILES.flat_map { |f| %W[! -name #{f}] }
     args.concat UNBREWED_EXCLUDE_PATHS.flat_map { |d| %W[! -path #{d}] }
     args.concat %w[)]

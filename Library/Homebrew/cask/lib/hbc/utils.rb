@@ -90,7 +90,7 @@ module Hbc
     end
 
     def self.error_message_with_suggestions
-      <<-EOS.undent
+      <<~EOS
         Follow the instructions here:
           #{Formatter.url(BUG_REPORTS_URL)}
       EOS

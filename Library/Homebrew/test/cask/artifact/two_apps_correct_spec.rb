@@ -61,7 +61,7 @@ describe Hbc::Artifact::App, :cask do
         target_path_mini.mkpath
 
         expect {
-          expect(install_phase).to output(<<-EOS.undent).to_stdout
+          expect(install_phase).to output(<<~EOS).to_stdout
             ==> Moving App 'Caffeine Pro.app' to '#{target_path_pro}'
           EOS
         }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path_mini}'.")
@@ -75,7 +75,7 @@ describe Hbc::Artifact::App, :cask do
         target_path_pro.mkpath
 
         expect {
-          expect(install_phase).to output(<<-EOS.undent).to_stdout
+          expect(install_phase).to output(<<~EOS).to_stdout
             ==> Moving App 'Caffeine Mini.app' to '#{target_path_mini}'
           EOS
         }.to raise_error(Hbc::CaskError, "It seems there is already an App at '#{target_path_pro}'.")

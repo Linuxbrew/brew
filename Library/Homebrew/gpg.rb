@@ -32,7 +32,7 @@ class Gpg
   def self.create_test_key(path)
     odie "No GPG present to test against!" unless available?
 
-    (path/"batch.gpg").write <<-EOS.undent
+    (path/"batch.gpg").write <<~EOS
       Key-Type: RSA
       Key-Length: 2048
       Subkey-Type: RSA

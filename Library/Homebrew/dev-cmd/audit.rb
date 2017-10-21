@@ -368,7 +368,7 @@ class FormulaAuditor
 
       if valid_versioned_aliases.empty?
         if formula.tap
-          problem <<-EOS.undent
+          problem <<~EOS
             Formula has other versions so create a versioned alias:
               cd #{formula.tap.alias_dir}
               ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
@@ -379,7 +379,7 @@ class FormulaAuditor
       end
 
       unless invalid_versioned_aliases.empty?
-        problem <<-EOS.undent
+        problem <<~EOS
           Formula has invalid versioned aliases:
             #{invalid_versioned_aliases.join("\n  ")}
         EOS
@@ -476,7 +476,7 @@ class FormulaAuditor
         when "gfortran"
           problem "Use `depends_on :fortran` instead of `depends_on 'gfortran'`"
         when "ruby"
-          problem <<-EOS.undent
+          problem <<~EOS
             Don't use "ruby" as a dependency. If this formula requires a
             minimum Ruby version not provided by the system you should
             use the RubyRequirement:
@@ -484,7 +484,7 @@ class FormulaAuditor
             where "1.8" is the minimum version of Ruby required.
           EOS
         when "open-mpi", "mpich"
-          problem <<-EOS.undent
+          problem <<~EOS
             There are multiple conflicting ways to install MPI. Use an MPIRequirement:
               depends_on :mpi => [<lang list>]
             Where <lang list> is a comma delimited list that can include:
@@ -492,7 +492,7 @@ class FormulaAuditor
             EOS
         when *BUILD_TIME_DEPS
           next if dep.build? || dep.run?
-          problem <<-EOS.undent
+          problem <<~EOS
             #{dep} dependency should be
               depends_on "#{dep}" => :build
             Or if it is indeed a runtime dependency
@@ -541,7 +541,7 @@ class FormulaAuditor
     first_word = reason.split[0]
 
     if reason =~ /\A[A-Z]/ && !reason.start_with?(*whitelist)
-      problem <<-EOS.undent
+      problem <<~EOS
         '#{first_word}' from the keg_only reason should be '#{first_word.downcase}'.
       EOS
     end
@@ -854,7 +854,7 @@ class FormulaAuditor
     return unless formula.tap&.official?
     return unless formula.tap.tap_migrations.key?(formula.name)
 
-    problem <<-EOS.undent
+    problem <<~EOS
       #{formula.name} seems to be listed in tap_migrations.json!
       Please remove #{formula.name} from present tap & tap_migrations.json
       before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
@@ -865,7 +865,7 @@ class FormulaAuditor
     return unless formula.prefix.directory?
     return unless Keg.new(formula.prefix).empty_installation?
 
-    problem <<-EOS.undent
+    problem <<~EOS
       The installation seems to be empty. Please ensure the prefix
       is set correctly and expected files are installed.
       The prefix configure/make argument may be case-sensitive.

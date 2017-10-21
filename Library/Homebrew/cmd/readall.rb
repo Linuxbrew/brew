@@ -1,6 +1,7 @@
 #: @hide_from_man_page
 #:  * `readall` [tap]:
-#:    Import all formulae in a tap (defaults to core tap).
+#:    Import all formulae from specified taps (defaults to
+#:    all installed taps).
 #:
 #:    This can be useful for debugging issues across all formulae
 #:    when making significant changes to `formula.rb`,
@@ -13,16 +14,8 @@ module Homebrew
 
   def readall
     if ARGV.include?("--syntax")
-      ruby_files = []
-      scan_files = %W[
-        #{HOMEBREW_LIBRARY}/*.rb
-        #{HOMEBREW_LIBRARY}/Homebrew/**/*.rb
-      ]
-      Dir.glob(scan_files).each do |rb|
-        next if rb.include?("/vendor/")
-        next if rb.include?("/cask/")
-        ruby_files << rb
-      end
+      scan_files = "#{HOMEBREW_LIBRARY_PATH}/**/*.rb"
+      ruby_files = Dir.glob(scan_files).reject { |file| file =~ %r{/(vendor|cask)/} }
 
       Homebrew.failed = true unless Readall.valid_ruby_syntax?(ruby_files)
     end
@@ -31,7 +24,7 @@ module Homebrew
     taps = if ARGV.named.empty?
       Tap
     else
-      [Tap.fetch(ARGV.named.first)]
+      ARGV.named.map { |t| Tap.fetch(t) }
     end
     taps.each do |tap|
       Homebrew.failed = true unless Readall.valid_tap?(tap, options)

@@ -17,13 +17,13 @@ module OS
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
         when "10.11" then "8.2.1"
-        when "10.12" then "8.3.3"
-        when "10.13" then "9.0"
+        when "10.12" then "9.0.1"
+        when "10.13" then "9.0.1"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "9.0"
+          "9.0.1"
         end
       end
 
@@ -86,11 +86,11 @@ module OS
 
       def update_instructions
         if MacOS.version >= "10.9" && !OS::Mac.prerelease?
-          <<-EOS.undent
+          <<~EOS
             Xcode can be updated from the App Store.
           EOS
         else
-          <<-EOS.undent
+          <<~EOS
             Xcode can be updated from
               https://developer.apple.com/download/more/
           EOS
@@ -199,11 +199,11 @@ module OS
 
       def update_instructions
         if MacOS.version >= "10.9"
-          <<-EOS.undent
+          <<~EOS
             Update them from Software Update in the App Store.
           EOS
         elsif MacOS.version == "10.8" || MacOS.version == "10.7"
-          <<-EOS.undent
+          <<~EOS
             The standalone package can be obtained from
               https://developer.apple.com/download/more/
             or it can be installed via Xcode's preferences.
@@ -216,8 +216,8 @@ module OS
         # on the older supported platform for that Xcode release, i.e there's no
         # CLT package for 10.11 that contains the Clang version from Xcode 8.
         case MacOS.version
-        when "10.13" then "900.0.37"
-        when "10.12" then "802.0.42"
+        when "10.13" then "900.0.38"
+        when "10.12" then "900.0.38"
         when "10.11" then "800.0.42.1"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"

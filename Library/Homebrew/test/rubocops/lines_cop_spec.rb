@@ -25,11 +25,11 @@ describe RuboCop::Cop::FormulaAudit::Lines do
       }]
 
       formulae.each do |formula|
-        source = <<-EOS.undent
-        class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
-          depends_on :#{formula["dependency"]}
-        end
+        source = <<~EOS
+          class Foo < Formula
+            url 'http://example.com/foo-1.0.tgz'
+            depends_on :#{formula["dependency"]}
+          end
         EOS
         if formula.key?("correct")
           offense = ":#{formula["dependency"]} is deprecated. Usage should be \"#{formula["correct"]}\""
@@ -57,7 +57,7 @@ describe RuboCop::Cop::FormulaAudit::ClassInheritance do
 
   context "When auditing lines" do
     it "inconsistent space in class inheritance" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo<Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -84,7 +84,7 @@ describe RuboCop::Cop::FormulaAudit::Comments do
 
   context "When auditing formula" do
     it "commented cmake call" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -106,7 +106,7 @@ describe RuboCop::Cop::FormulaAudit::Comments do
     end
 
     it "default template comments" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           # PLEASE REMOVE
           desc "foo"
@@ -128,7 +128,7 @@ describe RuboCop::Cop::FormulaAudit::Comments do
     end
 
     it "commented out depends_on" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -155,12 +155,12 @@ describe RuboCop::Cop::FormulaAudit::AssertStatements do
   subject(:cop) { described_class.new }
 
   it "assert ...include usage" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          assert File.read("inbox").include?("Sample message 1")
-        end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert File.read("inbox").include?("Sample message 1")
+      end
     EOS
 
     expected_offenses = [{ message: "Use `assert_match` instead of `assert ...include?`",
@@ -177,12 +177,12 @@ describe RuboCop::Cop::FormulaAudit::AssertStatements do
   end
 
   it "assert ...exist? without a negation" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          assert File.exist? "default.ini"
-        end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert File.exist? "default.ini"
+      end
     EOS
 
     expected_offenses = [{ message: 'Use `assert_predicate <path_to_file>, :exist?` instead of `assert File.exist? "default.ini"`',
@@ -199,12 +199,12 @@ describe RuboCop::Cop::FormulaAudit::AssertStatements do
   end
 
   it "assert ...exist? with a negation" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          assert !File.exist?("default.ini")
-        end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert !File.exist?("default.ini")
+      end
     EOS
 
     expected_offenses = [{ message: 'Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?("default.ini")`',
@@ -221,12 +221,12 @@ describe RuboCop::Cop::FormulaAudit::AssertStatements do
   end
 
   it "assert ...executable? without a negation" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          assert File.executable? f
-        end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert File.executable? f
+      end
     EOS
 
     expected_offenses = [{ message: "Use `assert_predicate <path_to_file>, :executable?` instead of `assert File.executable? f`",
@@ -247,14 +247,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   subject(:cop) { described_class.new }
 
   it "unless build.without? conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return unless build.without? "bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return unless build.without? "bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: 'Use if build.with? "bar" instead of unless build.without? "bar"',
@@ -271,14 +271,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "unless build.with? conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return unless build.with? "bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return unless build.with? "bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: 'Use if build.without? "bar" instead of unless build.with? "bar"',
@@ -295,14 +295,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "negated build.with? conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return if !build.with? "bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if !build.with? "bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: "Don't negate 'build.with?': use 'build.without?'",
@@ -319,14 +319,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "negated build.without? conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return if !build.without? "bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if !build.without? "bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: "Don't negate 'build.without?': use 'build.with?'",
@@ -343,14 +343,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "unnecessary build.without? conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return if build.without? "--without-bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.without? "--without-bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: "Don't duplicate 'without': Use `build.without? \"bar\"` to check for \"--without-bar\"",
@@ -367,14 +367,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "unnecessary build.with? conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return if build.with? "--with-bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.with? "--with-bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: "Don't duplicate 'with': Use `build.with? \"bar\"` to check for \"--with-bar\"",
@@ -391,14 +391,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "build.include? conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return if build.include? "without-bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.include? "without-bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: "Use build.without? \"bar\" instead of build.include? 'without-bar'",
@@ -415,14 +415,14 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "build.include? with dashed args conditional" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          def post_install
-            return if build.include? "--bar"
-          end
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.include? "--bar"
         end
+      end
     EOS
 
     expected_offenses = [{ message: "Reference 'bar' without dashes",
@@ -439,15 +439,15 @@ describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
   end
 
   it "def options usage" do
-    source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
+    source = <<~EOS
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
 
-          def options
-            [["--bar", "desc"]]
-          end
+        def options
+          [["--bar", "desc"]]
         end
+      end
     EOS
 
     expected_offenses = [{ message: "Use new-style option definitions",
@@ -469,7 +469,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
 
   context "When auditing formula" do
     it "FileUtils usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -491,7 +491,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "long inreplace block vars" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -514,8 +514,8 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
-    it "invalid rebuild statement" do
-      source = <<-EOS.undent
+    it "an invalid rebuild statement" do
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -540,7 +540,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "OS.linux? check" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -567,7 +567,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "fails_with :llvm block" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -594,8 +594,8 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
-    it "def test deprecated usage" do
-      source = <<-EOS.undent
+    it "def test's deprecated usage" do
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -620,7 +620,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "deprecated skip_clean call" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -628,9 +628,9 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         end
       EOS
 
-      expected_offenses = [{ message: <<-EOS.undent.chomp,
-                              `skip_clean :all` is deprecated; brew no longer strips symbols
-                                      Pass explicit paths to prevent Homebrew from removing empty folders.
+      expected_offenses = [{ message: <<~EOS.chomp,
+        `skip_clean :all` is deprecated; brew no longer strips symbols
+                Pass explicit paths to prevent Homebrew from removing empty folders.
                              EOS
                              severity: :convention,
                              line: 4,
@@ -645,7 +645,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "build.universal? deprecated usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -669,7 +669,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "build.universal? deprecation exempted formula" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Wine < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -680,11 +680,11 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       EOS
 
       inspect_source(source, "/homebrew-core/Formula/wine.rb")
-      expect(cop.offenses).to eq([])
+      expect(cop.offenses).to be_empty
     end
 
     it "deprecated ENV.universal_binary usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -707,8 +707,23 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
+    it "ENV.universal_binary deprecation exempted formula" do
+      source = <<~EOS
+        class Wine < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build?
+            ENV.universal_binary
+          end
+        end
+      EOS
+
+      inspect_source(source, "/homebrew-core/Formula/wine.rb")
+      expect(cop.offenses).to be_empty
+    end
+
     it "deprecated ENV.x11 usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -731,8 +746,8 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
-    it "ruby-macho alternative to install_name_tool usage" do
-      source = <<-EOS.undent
+    it "install_name_tool usage instead of ruby-macho" do
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -754,7 +769,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "ruby-macho alternatives audit exempted formula" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Cctools < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -763,11 +778,11 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       EOS
 
       inspect_source(source, "/homebrew-core/Formula/cctools.rb")
-      expect(cop.offenses).to eq([])
+      expect(cop.offenses).to be_empty
     end
 
     it "npm install without language::Node args" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -789,7 +804,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "npm install without language::Node args in kibana(exempted formula)" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class KibanaAT44 < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -798,11 +813,11 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       EOS
 
       inspect_source(source, "/homebrew-core/Formula/kibana@4.4.rb")
-      expect(cop.offenses).to eq([])
+      expect(cop.offenses).to be_empty
     end
 
     it "depends_on with an instance as argument" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -824,7 +839,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "old style OS check" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -846,7 +861,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "non glob DIR usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -869,7 +884,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "system call to fileUtils Method" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -891,7 +906,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "top-level function def outside class body" do
-      source = <<-EOS.undent
+      source = <<~EOS
         def test
            nil
         end
@@ -915,7 +930,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "Using ARGV to check options" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -939,7 +954,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it 'man+"man8" usage' do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -963,7 +978,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "hardcoded gcc compiler" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -987,7 +1002,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "hardcoded g++ compiler" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1011,7 +1026,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "hardcoded llvm-g++ compiler" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1035,7 +1050,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "hardcoded gcc compiler" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1059,7 +1074,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "formula path shortcut : man" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1083,7 +1098,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "formula path shortcut : libexec" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1107,7 +1122,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "formula path shortcut : info" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1131,7 +1146,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "formula path shortcut : man8" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1155,7 +1170,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "dependecies which have to vendored" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1177,7 +1192,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "manually setting env" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1199,7 +1214,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "dependencies with invalid options" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1221,7 +1236,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "inspecting version manually" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1245,7 +1260,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "deprecated ENV.fortran usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1269,7 +1284,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "deprecated ARGV.include? (--HEAD) usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1293,7 +1308,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "deprecated MACOS_VERSION const usage" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1317,7 +1332,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "deprecated if build.with? conditional dependency" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1339,7 +1354,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "unless conditional dependency with build.without?" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -1361,7 +1376,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "unless conditional dependency with build.include?" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'

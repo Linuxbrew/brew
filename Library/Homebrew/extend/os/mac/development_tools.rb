@@ -24,18 +24,18 @@ class DevelopmentTools
 
     def installation_instructions
       if MacOS.version >= "10.9"
-        <<-EOS.undent
+        <<~EOS
           Install the Command Line Tools:
             xcode-select --install
         EOS
       elsif MacOS.version == "10.8" || MacOS.version == "10.7"
-        <<-EOS.undent
+        <<~EOS
           Install the Command Line Tools from
             https://developer.apple.com/download/more/
           or via Xcode's preferences.
         EOS
       else
-        <<-EOS.undent
+        <<~EOS
           Install Xcode from
             https://developer.apple.com/download/more/
         EOS
@@ -44,19 +44,19 @@ class DevelopmentTools
 
     def custom_installation_instructions
       if MacOS.version > :leopard
-        <<-EOS.undent
+        <<~EOS
           Install GNU's GCC
             brew install gcc
         EOS
       elsif MacOS.version > :tiger
-        <<-EOS.undent
+        <<~EOS
           Install GNU's GCC
             brew install gcc@4.6
         EOS
       else
         # Tiger doesn't ship with apple-gcc42, and this is required to build
         # some software that doesn't build properly with FSF GCC.
-        <<-EOS.undent
+        <<~EOS
           Install Apple's GCC
             brew install apple-gcc42
           or GNU's GCC

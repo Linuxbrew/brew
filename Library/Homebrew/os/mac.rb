@@ -201,6 +201,7 @@ module OS
       "8.3.2" => { clang: "8.1", clang_build: 802 },
       "8.3.3" => { clang: "8.1", clang_build: 802 },
       "9.0"   => { clang: "9.0", clang_build: 900 },
+      "9.0.1" => { clang: "9.0", clang_build: 900 },
     }.freeze
 
     def compilers_standard?
@@ -208,7 +209,7 @@ module OS
         send(:"#{method}_version") == build
       end
     rescue IndexError
-      onoe <<-EOS.undent
+      onoe <<~EOS
         Homebrew doesn't know what compiler versions ship with your version
         of Xcode (#{Xcode.version}). Please `brew update` and if that doesn't
         help, file an issue with the output of `brew --config`:

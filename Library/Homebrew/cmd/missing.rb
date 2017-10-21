@@ -16,9 +16,9 @@ module Homebrew
     return unless HOMEBREW_CELLAR.exist?
 
     ff = if ARGV.named.empty?
-      Formula.installed
+      Formula.installed.sort
     else
-      ARGV.resolved_formulae
+      ARGV.resolved_formulae.sort
     end
 
     ff.each do |f|

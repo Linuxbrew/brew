@@ -4,7 +4,7 @@ describe "brew custom-external-command", :integration_test do
       cmd = "custom-external-command-#{rand}"
       file = path/"brew-#{cmd}"
 
-      file.write <<-EOS.undent
+      file.write <<~EOS
         #!/bin/sh
         echo 'I am #{cmd}.'
       EOS

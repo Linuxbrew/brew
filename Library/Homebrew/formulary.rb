@@ -128,7 +128,7 @@ module Formulary
       formula = begin
         Formulary.from_contents name, @bottle_filename, contents, spec
       rescue FormulaUnreadableError => e
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Unreadable formula in #{@bottle_filename}:
           #{e}
         EOS
@@ -443,7 +443,7 @@ module Formulary
     if possible_pinned_tap_formulae.size == 1
       selected_formula = factory(possible_pinned_tap_formulae.first, spec)
       if core_path(ref).file?
-        opoo <<-EOS.undent
+        opoo <<~EOS
           #{ref} is provided by core, but is now shadowed by #{selected_formula.full_name}.
           To refer to the core formula, use Homebrew/core/#{ref} instead.
         EOS

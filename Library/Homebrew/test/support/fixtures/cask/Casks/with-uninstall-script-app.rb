@@ -8,7 +8,7 @@ cask 'with-uninstall-script-app' do
   app 'MyFancyApp/MyFancyApp.app'
 
   postflight do
-    IO.write "#{appdir}/MyFancyApp.app/uninstall.sh", <<-EOS.undent
+    IO.write "#{appdir}/MyFancyApp.app/uninstall.sh", <<~EOS
       #!/bin/sh
       /bin/rm -r "#{appdir}/MyFancyApp.app"
     EOS

@@ -324,7 +324,7 @@ module Homebrew
           "#{key}: old: #{old_value}, new: #{value}"
         end
 
-        odie <<-EOS.undent
+        odie <<~EOS
           --keep-old was passed but there are changes in:
           #{mismatches.join("\n")}
         EOS
@@ -428,7 +428,7 @@ module Homebrew
               end
 
               unless mismatches.empty?
-                odie <<-EOS.undent
+                odie <<~EOS
                   --keep-old was passed but there are changes in:
                   #{mismatches.join("\n")}
                 EOS

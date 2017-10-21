@@ -2,7 +2,7 @@ describe "brew deps", :integration_test do
   before(:each) do
     setup_test_formula "foo"
     setup_test_formula "bar"
-    setup_test_formula "baz", <<-EOS.undent
+    setup_test_formula "baz", <<~EOS
       url "https://example.com/baz-1.0"
       depends_on "bar"
     EOS

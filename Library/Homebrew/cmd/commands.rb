@@ -16,12 +16,12 @@ module Homebrew
     else
       # Find commands in Homebrew/cmd
       puts "Built-in commands"
-      puts Formatter.columns(internal_commands)
+      puts Formatter.columns(internal_commands.sort)
 
       # Find commands in Homebrew/dev-cmd
       puts
       puts "Built-in developer commands"
-      puts Formatter.columns(internal_developer_commands)
+      puts Formatter.columns(internal_developer_commands.sort)
 
       # Find commands in the path
       unless (exts = external_commands).empty?
@@ -51,8 +51,8 @@ module Homebrew
   end
 
   def find_internal_commands(directory)
-    directory.children.each_with_object([]) do |f, cmds|
-      cmds << f.basename.to_s.sub(/\.(?:rb|sh)$/, "") if f.file?
-    end
+    Pathname.glob(directory/"*")
+            .select(&:file?)
+            .map { |f| f.basename.to_s.sub(/\.(?:rb|sh)$/, "") }
   end
 end

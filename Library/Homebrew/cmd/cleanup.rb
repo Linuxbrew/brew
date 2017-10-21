@@ -38,7 +38,7 @@ module Homebrew
   end
 
   def report_unremovable_kegs
-    ofail <<-EOS.undent
+    ofail <<~EOS
       Could not cleanup old kegs! Fix your permissions on:
         #{Cleanup.unremovable_kegs.join "\n  "}
     EOS

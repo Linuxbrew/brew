@@ -35,18 +35,16 @@ class Requirement
     _, _, class_name = self.class.to_s.rpartition "::"
     s = "#{class_name} unsatisfied!\n"
     if cask
-      s += <<-EOS.undent
-
+      s += <<~EOS
         You can install with Homebrew-Cask:
-          brew cask install #{cask}
+         brew cask install #{cask}
       EOS
     end
 
     if download
-      s += <<-EOS.undent
-
+      s += <<~EOS
         You can download from:
-          #{download}
+         #{download}
       EOS
     end
     s

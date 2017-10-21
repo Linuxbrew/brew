@@ -12,7 +12,7 @@ describe Hbc::CLI::Search, :cask do
 
     expect {
       Hbc::CLI::Search.run("local")
-    }.to output(<<-EOS.undent).to_stdout.as_tty
+    }.to output(<<~EOS).to_stdout.as_tty
       ==> Partial Matches
       local-caffeine
       local-transmission
@@ -24,7 +24,7 @@ describe Hbc::CLI::Search, :cask do
 
     expect {
       Hbc::CLI::Search.run("local")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       local-caffeine
       local-transmission
     EOS
@@ -35,7 +35,7 @@ describe Hbc::CLI::Search, :cask do
 
     expect {
       Hbc::CLI::Search.run("local")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       local-caffeine
       local-transmission
     EOS
@@ -45,7 +45,7 @@ describe Hbc::CLI::Search, :cask do
   it "shows that there are no Casks matching a search term that did not result in anything" do
     expect {
       Hbc::CLI::Search.run("foo-bar-baz")
-    }.to output(<<-EOS.undent).to_stdout.as_tty
+    }.to output(<<~EOS).to_stdout.as_tty
       No Cask found for "foo-bar-baz".
     EOS
   end
@@ -84,7 +84,7 @@ describe Hbc::CLI::Search, :cask do
   it "accepts a regexp argument" do
     expect {
       Hbc::CLI::Search.run("/^local-c[a-z]ffeine$/")
-    }.to output(<<-EOS.undent).to_stdout.as_tty
+    }.to output(<<~EOS).to_stdout.as_tty
       ==> Regexp Matches
       local-caffeine
     EOS
@@ -93,7 +93,7 @@ describe Hbc::CLI::Search, :cask do
   it "returns both exact and partial matches" do
     expect {
       Hbc::CLI::Search.run("test-opera")
-    }.to output(<<-EOS.undent).to_stdout.as_tty
+    }.to output(<<~EOS).to_stdout.as_tty
       ==> Exact Match
       test-opera
       ==> Partial Matches
@@ -104,7 +104,7 @@ describe Hbc::CLI::Search, :cask do
   it "does not search the Tap name" do
     expect {
       Hbc::CLI::Search.run("caskroom")
-    }.to output(<<-EOS.undent).to_stdout.as_tty
+    }.to output(<<~EOS).to_stdout.as_tty
       No Cask found for "caskroom".
     EOS
   end

@@ -2,7 +2,8 @@ require "requirement"
 require "requirements/fortran_requirement"
 require "requirements/gpg2_requirement"
 require "requirements/language_module_requirement"
-require "requirements/minimum_macos_requirement"
+require "requirements/linux_requirement"
+require "requirements/macos_requirement"
 require "requirements/maximum_macos_requirement"
 require "requirements/mpi_requirement"
 require "requirements/osxfuse_requirement"
@@ -33,16 +34,16 @@ class XcodeRequirement < Requirement
 
   def message
     version = " #{@version}" if @version
-    message = <<-EOS.undent
+    message = <<~EOS
       A full installation of Xcode.app#{version} is required to compile this software.
       Installing just the Command Line Tools is not sufficient.
     EOS
     if MacOS.version >= :lion
-      message + <<-EOS.undent
+      message + <<~EOS
         Xcode can be installed from the App Store.
       EOS
     else
-      message + <<-EOS.undent
+      message + <<~EOS
         Xcode can be installed from #{Formatter.url("https://developer.apple.com/download/more/")}.
       EOS
     end
@@ -82,7 +83,7 @@ class TeXRequirement < Requirement
   satisfy { which("tex") || which("latex") }
 
   def message
-    s = <<-EOS.undent
+    s = <<~EOS
       A LaTeX distribution is required for Homebrew to install this formula.
 
       Make sure that "/usr/texbin", or the location you installed it to, is in

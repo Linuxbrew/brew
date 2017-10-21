@@ -1,4 +1,4 @@
-HOMEBREW_HELP = <<-EOS.unindent.freeze
+HOMEBREW_HELP = <<~EOS.freeze
   Example usage:
     brew search [TEXT|/REGEX/]
     brew (info|home|options) [FORMULA...]

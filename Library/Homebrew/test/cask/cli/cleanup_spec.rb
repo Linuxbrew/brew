@@ -32,7 +32,7 @@ describe Hbc::CLI::Cleanup, :cask do
 
       expect {
         subject.run
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         ==> Removing cached downloads for #{cask_token}
         #{cached_downloads[0]}
         ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
@@ -52,7 +52,7 @@ describe Hbc::CLI::Cleanup, :cask do
 
         expect {
           subject.run
-        }.to output(<<-EOS.undent).to_stdout
+        }.to output(<<~EOS).to_stdout
           ==> Removing cached downloads
           #{cached_download}
           ==> This operation has freed approximately #{disk_usage_readable(cleanup_size)} of disk space.
@@ -70,7 +70,7 @@ describe Hbc::CLI::Cleanup, :cask do
 
           expect {
             subject.run
-          }.to output(<<-EOS.undent).to_stdout
+          }.to output(<<~EOS).to_stdout
             ==> Removing cached downloads older than 10 days old
             Nothing to do
           EOS

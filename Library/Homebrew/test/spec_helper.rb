@@ -131,7 +131,7 @@ RSpec.configure do |config|
       files_after_test = find_files
 
       diff = Set.new(@__files_before_test) ^ Set.new(files_after_test)
-      expect(diff).to be_empty, <<-EOS.undent
+      expect(diff).to be_empty, <<~EOS
         file leak detected:
         #{diff.map { |f| "  #{f}" }.join("\n")}
       EOS
