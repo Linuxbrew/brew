@@ -54,6 +54,87 @@ module RuboCop
         end
       end
 
+      class AssertStatements < FormulaCop
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          find_every_method_call_by_name(body_node, :assert).each do |method|
+            if method_called_ever?(method, :include?) && !method_called_ever?(method, :!)
+              problem "Use `assert_match` instead of `assert ...include?`"
+            end
+
+            if method_called_ever?(method, :exist?) && !method_called_ever?(method, :!)
+              problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{method.source}`"
+            end
+
+            if method_called_ever?(method, :exist?) && method_called_ever?(method, :!)
+              problem "Use `refute_predicate <path_to_file>, :exist?` instead of `#{method.source}`"
+            end
+
+            if method_called_ever?(method, :executable?) && !method_called_ever?(method, :!)
+              problem "Use `assert_predicate <path_to_file>, :executable?` instead of `#{method.source}`"
+            end
+          end
+        end
+      end
+
+      class OptionDeclarations < FormulaCop
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          if find_method_def(body_node, :options)
+            problem "Use new-style option definitions"
+          end
+
+          find_instance_method_call(body_node, :build, :without?) do |method|
+            next unless unless_modifier?(method.parent)
+            correct = method.source.gsub("out?", "?")
+            problem "Use if #{correct} instead of unless #{method.source}"
+          end
+
+          find_instance_method_call(body_node, :build, :with?) do |method|
+            next unless unless_modifier?(method.parent)
+            correct = method.source.gsub("?", "out?")
+            problem "Use if #{correct} instead of unless #{method.source}"
+          end
+
+          find_instance_method_call(body_node, :build, :with?) do |method|
+            next unless negated?(method.parent)
+            problem "Don't negate 'build.with?': use 'build.without?'"
+          end
+
+          find_instance_method_call(body_node, :build, :without?) do |method|
+            next unless negated?(method.parent)
+            problem "Don't negate 'build.without?': use 'build.with?'"
+          end
+
+          find_instance_method_call(body_node, :build, :without?) do |method|
+            arg = parameters(method).first
+            next unless match = regex_match_group(arg, /-?-?without-(.*)/)
+            problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
+          end
+
+          find_instance_method_call(body_node, :build, :with?) do |method|
+            arg = parameters(method).first
+            next unless match = regex_match_group(arg, /-?-?with-(.*)/)
+            problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
+          end
+
+          find_instance_method_call(body_node, :build, :include?) do |method|
+            arg = parameters(method).first
+            next unless match = regex_match_group(arg, /with(out)?-(.*)/)
+            problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
+          end
+
+          find_instance_method_call(body_node, :build, :include?) do |method|
+            arg = parameters(method).first
+            next unless match = regex_match_group(arg, /\-\-(.*)/)
+            problem "Reference '#{match[1]}' without dashes"
+          end
+        end
+
+        def unless_modifier?(node)
+          return false unless node.if_type?
+          node.modifier_form? && node.unless?
+        end
+      end
+
       class Miscellaneous < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           # FileUtils is included in Formula
@@ -115,7 +196,7 @@ module RuboCop
           # Prefer formula path shortcuts in strings
           formula_path_strings(body_node, :share) do |p|
             next unless match = regex_match_group(p, %r{(/(man))/?})
-            problem "\"\#\{share}#{match[1]}\" should be \"\#{#{match[2]}}\""
+            problem "\"\#{share}#{match[1]}\" should be \"\#{#{match[2]}}\""
           end
 
           formula_path_strings(body_node, :prefix) do |p|
@@ -215,15 +296,15 @@ module RuboCop
             problem "Use new-style test definitions (test do)"
           end
 
-          if find_method_def(body_node, :options)
-            problem "Use new-style option definitions"
-          end
-
           find_method_with_args(body_node, :skip_clean, :all) do
             problem <<-EOS.undent.chomp
               `skip_clean :all` is deprecated; brew no longer strips symbols
                       Pass explicit paths to prevent Homebrew from removing empty folders.
             EOS
+          end
+
+          if find_method_def(@processed_source.ast)
+            problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
           end
 
           find_instance_method_call(body_node, :build, :universal?) do
@@ -237,24 +318,6 @@ module RuboCop
 
           find_instance_method_call(body_node, "ENV", :x11) do
             problem 'Use "depends_on :x11" instead of "ENV.x11"'
-          end
-
-          find_every_method_call_by_name(body_node, :assert).each do |method|
-            if method_called_ever?(method, :include?) && !method_called_ever?(method, :!)
-              problem "Use `assert_match` instead of `assert ...include?`"
-            end
-
-            if method_called_ever?(method, :exist?) && !method_called_ever?(method, :!)
-              problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{method.source}`"
-            end
-
-            if method_called_ever?(method, :exist?) && method_called_ever?(method, :!)
-              problem "Use `refute_predicate <path_to_file>, :exist?` instead of `#{method.source}`"
-            end
-
-            if method_called_ever?(method, :executable?) && !method_called_ever?(method, :!)
-              problem "Use `assert_predicate <path_to_file>, :executable?` instead of `#{method.source}`"
-            end
           end
 
           find_every_method_call_by_name(body_node, :depends_on).each do |method|
@@ -282,61 +345,6 @@ module RuboCop
             next unless match = regex_match_group(param, fileutils_methods)
             problem "Use the `#{match}` Ruby method instead of `#{method.source}`"
           end
-
-          if find_method_def(@processed_source.ast)
-            problem "Define method #{method_name(@offensive_node)} in the class body, not at the top-level"
-          end
-
-          find_instance_method_call(body_node, :build, :without?) do |method|
-            next unless unless_modifier?(method.parent)
-            correct = method.source.gsub("out?", "?")
-            problem "Use if #{correct} instead of unless #{method.source}"
-          end
-
-          find_instance_method_call(body_node, :build, :with?) do |method|
-            next unless unless_modifier?(method.parent)
-            correct = method.source.gsub("?", "out?")
-            problem "Use if #{correct} instead of unless #{method.source}"
-          end
-
-          find_instance_method_call(body_node, :build, :with?) do |method|
-            next unless negated?(method.parent)
-            problem "Don't negate 'build.with?': use 'build.without?'"
-          end
-
-          find_instance_method_call(body_node, :build, :without?) do |method|
-            next unless negated?(method.parent)
-            problem "Don't negate 'build.without?': use 'build.with?'"
-          end
-
-          find_instance_method_call(body_node, :build, :without?) do |method|
-            arg = parameters(method).first
-            next unless match = regex_match_group(arg, /-?-?without-(.*)/)
-            problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
-          end
-
-          find_instance_method_call(body_node, :build, :with?) do |method|
-            arg = parameters(method).first
-            next unless match = regex_match_group(arg, /-?-?with-(.*)/)
-            problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
-          end
-
-          find_instance_method_call(body_node, :build, :include?) do |method|
-            arg = parameters(method).first
-            next unless match = regex_match_group(arg, /with(out)?-(.*)/)
-            problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
-          end
-
-          find_instance_method_call(body_node, :build, :include?) do |method|
-            arg = parameters(method).first
-            next unless match = regex_match_group(arg, /\-\-(.*)/)
-            problem "Reference '#{match[1]}' without dashes"
-          end
-        end
-
-        def unless_modifier?(node)
-          return false unless node.if_type?
-          node.modifier_form? && node.unless?
         end
 
         def modifier?(node)
