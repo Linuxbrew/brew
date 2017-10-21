@@ -44,6 +44,8 @@ RSpec.configure do |config|
 
   config.filter_run_when_matching :focus
 
+  config.include(FileUtils)
+
   config.include(RuboCop::RSpec::ExpectOffense)
 
   config.include(Test::Helper::Fixtures)
