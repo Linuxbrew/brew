@@ -1,32 +1,16 @@
-require "rubocop"
-require "rubocop/rspec/support"
-require_relative "../../extend/string"
 require_relative "../../rubocops/options_cop"
 
 describe RuboCop::Cop::FormulaAudit::Options do
   subject(:cop) { described_class.new }
 
-  context "When auditing options" do
-    it "32-bit" do
-      source = <<~EOS
-        class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
-          option "32-bit", "with 32-bit"
-        end
-      EOS
-
-      expected_offenses = [{  message: described_class::DEPRECATION_MSG,
-                              severity: :convention,
-                              line: 3,
-                              column: 10,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
+  it "reports an offense when using the 32-bit option" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'http://example.com/foo-1.0.tgz'
+        option "32-bit", "with 32-bit"
+                ^^^^^^ macOS has been 64-bit only since 10.6 so 32-bit options are deprecated.
       end
-    end
+    RUBY
   end
 end
 
@@ -35,71 +19,34 @@ describe RuboCop::Cop::FormulaAuditStrict::Options do
 
   context "When auditing options strictly" do
     it "with universal" do
-      source = <<~EOS
+      expect_offense(<<~RUBY)
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option :universal
+          ^^^^^^^^^^^^^^^^^ macOS has been 64-bit only since 10.6 so universal options are deprecated.
         end
-      EOS
-
-      expected_offenses = [{  message: described_class::DEPRECATION_MSG,
-                              severity: :convention,
-                              line: 3,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "with deprecated options" do
-      source = <<~EOS
+      expect_offense(<<~RUBY)
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option :cxx11
           option "examples", "with-examples"
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Options should begin with with/without. Migrate '--examples' with `deprecated_option`.
         end
-      EOS
-
-      MSG_1 = "Options should begin with with/without."\
-              " Migrate '--examples' with `deprecated_option`.".freeze
-      expected_offenses = [{  message: MSG_1,
-                              severity: :convention,
-                              line: 4,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "with misc deprecated options" do
-      source = <<~EOS
+      expect_offense(<<~RUBY)
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option "without-check"
+          ^^^^^^^^^^^^^^^^^^^^^^ Use '--without-test' instead of '--without-check'. Migrate '--without-check' with `deprecated_option`.
         end
-      EOS
-
-      MSG_2 = "Use '--without-test' instead of '--without-check'."\
-              " Migrate '--without-check' with `deprecated_option`.".freeze
-      expected_offenses = [{  message: MSG_2,
-                              severity: :convention,
-                              line: 3,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
   end
 end
@@ -109,24 +56,13 @@ describe RuboCop::Cop::NewFormulaAudit::Options do
 
   context "When auditing options for a new formula" do
     it "with deprecated options" do
-      source = <<~EOS
+      expect_offense(<<~RUBY)
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           deprecated_option "examples" => "with-examples"
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ New Formula should not use `deprecated_option`
         end
-      EOS
-
-      expected_offenses = [{  message: described_class::MSG,
-                              severity: :convention,
-                              line: 3,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
   end
 end

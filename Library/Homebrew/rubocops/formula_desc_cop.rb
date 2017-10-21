@@ -29,10 +29,8 @@ module RuboCop
           desc_length = "#{@formula_name}: #{string_content(desc)}".length
           max_desc_length = 80
           return if desc_length <= max_desc_length
-          problem <<~EOS
-            Description is too long. "name: desc" should be less than #{max_desc_length} characters.
-            Length is calculated as #{@formula_name} + desc. (currently #{desc_length})
-          EOS
+          problem "Description is too long. \"name: desc\" should be less than #{max_desc_length} characters. " \
+                  "Length is calculated as #{@formula_name} + desc. (currently #{desc_length})"
         end
       end
 

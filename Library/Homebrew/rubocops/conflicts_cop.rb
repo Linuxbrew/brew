@@ -6,10 +6,8 @@ module RuboCop
     module FormulaAudit
       # This cop audits versioned Formulae for `conflicts_with`
       class Conflicts < FormulaCop
-        MSG = <<~EOS.freeze
-          Versioned formulae should not use `conflicts_with`.
-          Use `keg_only :versioned_formula` instead.
-        EOS
+        MSG = "Versioned formulae should not use `conflicts_with`. " \
+              "Use `keg_only :versioned_formula` instead.".freeze
 
         WHITELIST = %w[
           node@

@@ -1,6 +1,3 @@
-require "rubocop"
-require "rubocop/rspec/support"
-require_relative "../../extend/string"
 require_relative "../../rubocops/homepage_cop"
 
 describe RuboCop::Cop::FormulaAudit::Homepage do

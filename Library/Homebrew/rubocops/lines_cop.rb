@@ -8,11 +8,11 @@ module RuboCop
         def audit_formula(_node, _class_node, _parent_class_node, _body_node)
           [:automake, :autoconf, :libtool].each do |dependency|
             next unless depends_on?(dependency)
-            problem ":#{dependency} is deprecated. Usage should be \"#{dependency}\""
+            problem ":#{dependency} is deprecated. Usage should be \"#{dependency}\"."
           end
 
-          problem ':apr is deprecated. Usage should be "apr-util"' if depends_on?(:apr)
-          problem ":tex is deprecated" if depends_on?(:tex)
+          problem ':apr is deprecated. Usage should be "apr-util".' if depends_on?(:apr)
+          problem ":tex is deprecated." if depends_on?(:tex)
         end
       end
 
@@ -296,10 +296,8 @@ module RuboCop
           end
 
           find_method_with_args(body_node, :skip_clean, :all) do
-            problem <<~EOS.chomp
-              `skip_clean :all` is deprecated; brew no longer strips symbols
-                      Pass explicit paths to prevent Homebrew from removing empty folders.
-            EOS
+            problem "`skip_clean :all` is deprecated; brew no longer strips symbols. " \
+                    "Pass explicit paths to prevent Homebrew from removing empty folders."
           end
 
           if find_method_def(@processed_source.ast)
@@ -353,11 +351,11 @@ module RuboCop
         end
 
         def_node_search :conditional_dependencies, <<~EOS
-          {$(if (send (send nil :build) ${:include? :with? :without?} $(str _))
-              (send nil :depends_on $({str sym} _)) nil)
+          {$(if (send (send nil? :build) ${:include? :with? :without?} $(str _))
+              (send nil? :depends_on $({str sym} _)) nil?)
 
-           $(if (send (send nil :build) ${:include? :with? :without?} $(str _)) nil
-              (send nil :depends_on $({str sym} _)))}
+           $(if (send (send nil? :build) ${:include? :with? :without?} $(str _)) nil?
+              (send nil? :depends_on $({str sym} _)))}
         EOS
 
         # Match depends_on with hash as argument
@@ -371,13 +369,13 @@ module RuboCop
         EOS
 
         def_node_search :formula_path_strings, <<~EOS
-          {(dstr (begin (send nil %1)) $(str _ ))
-           (dstr _ (begin (send nil %1)) $(str _ ))}
+          {(dstr (begin (send nil? %1)) $(str _ ))
+           (dstr _ (begin (send nil? %1)) $(str _ ))}
         EOS
 
         # Node Pattern search for Language::Node
         def_node_search :languageNodeModule?, <<~EOS
-          (const (const nil :Language) :Node)
+          (const (const nil? :Language) :Node)
         EOS
       end
     end
