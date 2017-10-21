@@ -1,3 +1,5 @@
+require "forwardable"
+
 class Caveats
   extend Forwardable
 
