@@ -46,7 +46,8 @@ module Hbc
 
         return if DSL::DSL_METHODS.include?(stanza)
         raise ArgumentError,
-          "Unknown/unsupported stanza: '#{stanza}' Check cask reference for supported stanzas."
+          "Unknown/unsupported stanza: '#{stanza}' Check cask reference"\
+          " for supported stanzas."
       end
 
       def run
