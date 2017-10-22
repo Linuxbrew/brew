@@ -11,18 +11,12 @@ class Gpg
     end
   end
 
-  def self.gpg
-    find_gpg("gpg")
+  def self.executable
+    find_gpg("gpg") || find_gpg("gpg2")
   end
-
-  def self.gpg2
-    find_gpg("gpg2")
-  end
-
-  GPG_EXECUTABLE = gpg || gpg2
 
   def self.available?
-    File.executable?(GPG_EXECUTABLE.to_s)
+    File.executable?(executable.to_s)
   end
 
   def self.version
@@ -43,12 +37,12 @@ class Gpg
       %no-protection
       %commit
     EOS
-    system GPG_EXECUTABLE, "--batch", "--gen-key", "batch.gpg"
+    system executable, "--batch", "--gen-key", "batch.gpg"
   end
 
   def self.cleanup_test_processes!
     odie "No GPG present to test against!" unless available?
-    gpgconf = Pathname.new(GPG_EXECUTABLE).parent/"gpgconf"
+    gpgconf = Pathname.new(executable).parent/"gpgconf"
 
     system gpgconf, "--kill", "gpg-agent"
     system gpgconf, "--homedir", "keyrings/live", "--kill",
