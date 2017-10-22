@@ -2,6 +2,7 @@ require "hbc/checkable"
 require "hbc/download"
 require "digest"
 require "utils/git"
+require "dev-cmd/audit"
 
 module Hbc
   class Audit
@@ -277,75 +278,14 @@ module Hbc
     end
 
     def check_https_availability
-      check_url_for_https_availability(cask.homepage) unless cask.url.to_s.empty?
+      check_url_for_https_availability(cask.url) unless cask.url.to_s.empty?
       check_url_for_https_availability(cask.appcast) unless cask.appcast.to_s.empty?
       check_url_for_https_availability(cask.homepage) unless cask.homepage.to_s.empty?
     end
 
     def check_url_for_https_availability(url_to_check)
-      if schema_http?(url_to_check)
-        result, effective_url = access_url(url_to_check.sub(/^http:/, 'https:'))
-        if schema_https?(effective_url) && result == 1
-          add_error "Change #{url_to_check} to #{url_to_check.sub(/^http:/, 'https:')}"
-        else
-          result, effective_url = access_url(url_to_check)
-
-          if result == 0
-            add_error "URL is not reachable #{url_to_check}"
-          end
-        end
-      else
-        result, effective_url = access_url(url_to_check)
-        if result == 1 && schema_https?(effective_url)
-          return
-        else
-          result, effective_url = access_url(url_to_check.sub(/^https:/, 'http:'))
-          if result == 1 && schema_http?(effective_url)
-            add_error "Change #{url_to_check} to #{url_to_check.sub(/^https:/, 'http:')}"
-          else
-            add_error "URL is not reachable #{url_to_check}"
-          end
-        end
-      end
-    end
-
-    def access_url(url_to_access)
-      # return values:
-      #   1, effective URL : URL reachable, no schema change
-      #   0, nil           : URL unreachable
-      #  -1, effective URL : URL reachable, but schema changed
-
-      curl_executable, *args = curl_args(
-        "--compressed", "--location", "--fail",
-        "--write-out", "%{http_code} %{url_effective}",
-        "--output", "/dev/null", "--head",
-        url_to_access,
-        user_agent: :fake
-      )
-      result = @command.run(curl_executable, args: args, print_stderr: false)
-      if result.success?
-        http_code, url_effective = result.stdout.chomp.split(' ')
-        odebug "input: #{url_to_access} effective: #{url_effective} code: #{http_code}"
-
-        # Fail if return code not 2XX or 3XX
-        return 0, nil if http_code.to_i < 200 && http_code.to_i > 300
-
-        # Fail if URL schema changed
-        # ([4] is either http[s]:// or http[:]// )
-        return -1, url_effective if url_to_access[4] != url_effective[4]
-
-        return 1, url_effective
-      else
-        return 0, nil
-      end
-    end
-
-    def schema_http?(url)
-      url[/^http:/] ? 1 : nil
-    end
-
-    def schema_https?(url)
-      url[/^https:/] ? 1 : nil
+      problem = FormulaAuditor.check_http_content(url_to_check.to_s)
+      add_error problem unless problem.nil?
     end
 
     def check_download
