@@ -45,7 +45,8 @@ module Hbc
         @format = :to_yaml if yaml?
 
         return if DSL::DSL_METHODS.include?(stanza)
-        raise ArgumentError, "Illegal stanza: '#{stanza}'"
+        raise ArgumentError,
+          "Unknown/unsupported stanza: '#{stanza}' Check cask reference for supported stanzas."
       end
 
       def run
@@ -72,7 +73,8 @@ module Hbc
 
           if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?) ||
              (value.respond_to?(:to_s) && value.to_s == "{}")
-            raise CaskError, "no such stanza '#{artifact_name ? artifact_name : stanza}' on Cask '#{cask}'"
+            stanza_name = artifact_name ? artifact_name : stanza
+            raise CaskError, "no such stanza '#{stanza_name}' on Cask '#{cask}'"
           end
 
           if format

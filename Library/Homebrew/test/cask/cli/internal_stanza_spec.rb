@@ -6,10 +6,10 @@ describe Hbc::CLI::InternalStanza, :cask do
     }.to output("http://example.com/gpg-signature.asc\n").to_stdout
   end
 
-  it "raises an exception when stanza is invalid" do
+  it "raises an exception when stanza is unknown/unsupported" do
     expect {
-      described_class.new("invalid_stanza", "with-gpg")
-    }.to raise_error(/Illegal stanza/)
+      described_class.new("this_stanza_does_not_exist", "with-gpg")
+    }.to raise_error(/Unknown\/unsupported stanza/)
   end
 
   it "raises an exception when normal stanza is not present on cask" do
@@ -37,6 +37,6 @@ describe Hbc::CLI::InternalStanza, :cask do
     command = described_class.new("artifacts", "with-gpg")
     expect {
       command.run
-    }.to output("{:app=>[[\"Caffeine.app\"]]}\n").to_stdout
+    }.to output(/Caffeine\.app/).to_stdout
   end
 end
