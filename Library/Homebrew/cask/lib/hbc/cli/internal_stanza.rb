@@ -66,7 +66,7 @@ module Hbc
           end
 
           if stanza == :artifacts
-            value = Hash[value.map { |v| [v.class.dsl_key, v] }]
+            value = Hash[value.map { |v| [v.class.dsl_key, v.to_s] }]
             value = value[artifact_name] if artifact_name
           end
 
