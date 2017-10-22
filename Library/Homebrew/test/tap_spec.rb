@@ -61,6 +61,7 @@ describe Tap do
 
   specify "::fetch" do
     begin
+      expect(described_class.fetch("Homebrew", "core")).to be_kind_of(CoreTap)
       expect(described_class.fetch("Homebrew", "homebrew")).to be_kind_of(CoreTap)
       tap = described_class.fetch("Homebrew", "foo")
       expect(tap).to be_kind_of(Tap)
