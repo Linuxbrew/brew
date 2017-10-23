@@ -24,13 +24,13 @@ The Python formulae install [pip](http://www.pip-installer.org) (as `pip2` or `p
 Setuptools can be updated via pip, without having to re-brew Python:
 
 ```sh
-pip install --upgrade setuptools
+python2 -m pip --upgrade setuptools
 ```
 
 Similarly, pip can be used to upgrade itself via:
 
 ```sh
-pip install --upgrade pip
+python2 -m pip install --upgrade pip
 ```
 
 ### Note on `pip install --user`
@@ -39,7 +39,7 @@ The normal `pip install --user` is disabled for brewed Python. This is because o
 A possible workaround (which puts executable scripts in `~/Library/Python/<X>.<Y>/bin`) is:
 
 ```sh
-pip install --user --install-option="--prefix=" <package-name>
+python2 -m pip install --user --install-option="--prefix=" <package-name>
 ```
 
 ## `site-packages` and the `PYTHONPATH`
@@ -86,7 +86,7 @@ CFLAGS=-I$(brew --prefix)/include LDFLAGS=-L$(brew --prefix)/lib pip install <pa
 Activate the virtualenv *after* you've brewed, or brew in a fresh Terminal window.
 Homebrew will still install Python modules into Homebrew's `site-packages` and *not* into the virtual environment's site-package.
 
-Virtualenv has a switch to allow "global" (i.e. Homebrew's) `site-packages` to be accessible from within the virtualenv.
+Virtualenv has a `--system-site-packages` switch to allow "global" (i.e. Homebrew's) `site-packages` to be accessible from within the virtualenv.
 
 ## Why is Homebrew's Python being installed as a dependency?
 Formulae that depend on the special `:python` target are bottled against the Homebrew Python and require it to be installed. You can avoid installing Homebrew's Python by building these formulae with `--build-from-source`.

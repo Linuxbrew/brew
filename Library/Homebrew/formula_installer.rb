@@ -85,14 +85,12 @@ class FormulaInstaller
 
     return false if @pour_failed
 
-    bottle = formula.bottle
-    return false unless bottle
+    return false if !formula.bottled? && !formula.local_bottle_path
     return true  if force_bottle?
     return false if build_from_source? || build_bottle? || interactive?
     return false if ARGV.cc
     return false unless options.empty?
     return false if formula.bottle_disabled?
-    return true  if formula.local_bottle_path
     unless formula.pour_bottle?
       if install_bottle_options[:warn] && formula.pour_bottle_check_unsatisfied_reason
         opoo <<-EOS.undent
@@ -103,6 +101,7 @@ class FormulaInstaller
       return false
     end
 
+    bottle = formula.bottle_specification
     unless bottle.compatible_cellar?
       if install_bottle_options[:warn]
         opoo <<-EOS.undent
@@ -238,6 +237,15 @@ class FormulaInstaller
       raise CannotInstallFormulaError, message
     end
 
+    # Warn if a more recent version of this formula is available in the tap.
+    begin
+      if formula.pkg_version < (v = Formulary.factory(formula.full_name).pkg_version)
+        opoo "#{formula.full_name} #{v} is available and more recent than version #{formula.pkg_version}."
+      end
+    rescue FormulaUnavailableError
+      nil
+    end
+
     check_conflicts
 
     if !pour_bottle? && !formula.bottle_unneeded? && !DevelopmentTools.installed?
@@ -271,7 +279,7 @@ class FormulaInstaller
       oh1 "Installing #{Formatter.identifier(formula.full_name)} #{options}".strip
     end
 
-    if formula.tap && !formula.tap.private?
+    unless formula.tap&.private?
       action = "#{formula.full_name} #{options}".strip
       Utils::Analytics.report_event("install", action)
 
@@ -311,7 +319,12 @@ class FormulaInstaller
       clean
 
       # Store the formula used to build the keg in the keg.
-      s = formula.path.read.gsub(/  bottle do.+?end\n\n?/m, "")
+      formula_contents = if formula.local_bottle_path
+        Utils::Bottles.formula_contents formula.local_bottle_path, name: formula.name
+      else
+        formula.path.read
+      end
+      s = formula_contents.gsub(/  bottle do.+?end\n\n?/m, "")
       brew_prefix = formula.prefix/".brew"
       brew_prefix.mkdir
       Pathname(brew_prefix/"#{formula.name}.rb").atomic_write(s)
@@ -598,7 +611,7 @@ class FormulaInstaller
     end
     raise
   else
-    ignore_interrupts { tmp_keg.rmtree if tmp_keg && tmp_keg.directory? }
+    ignore_interrupts { tmp_keg.rmtree if tmp_keg&.directory? }
   end
 
   def caveats
@@ -641,6 +654,12 @@ class FormulaInstaller
 
     # let's reset Utils.git_available? if we just installed git
     Utils.clear_git_available_cache if formula.name == "git"
+
+    # use installed curl when it's needed and available
+    if formula.name == "curl" &&
+       !DevelopmentTools.curl_handles_most_https_certificates?
+      ENV["HOMEBREW_CURL"] = formula.opt_bin/"curl"
+    end
   ensure
     unlock
   end

@@ -338,7 +338,7 @@ class Keg
       dir if dir.directory? && dir.children.any? { |f| f.basename.to_s.start_with?("_") }
     when :fish then path/"share/fish/vendor_completions.d"
     end
-    dir && dir.directory? && !dir.children.empty?
+    dir&.directory? && !dir.children.empty?
   end
 
   def functions_installed?(shell)

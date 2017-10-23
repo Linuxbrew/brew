@@ -21,7 +21,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -47,7 +47,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -74,7 +74,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -99,7 +99,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
                               column: 2,
                               source: source }]
 
-      inspect_source(cop, source)
+      inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
         expect_offense(expected, actual)
@@ -129,7 +129,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
         end
       EOS
 
-      corrected_source = autocorrect_source(cop, source)
+      corrected_source = autocorrect_source(source)
       expect(corrected_source).to eq(correct_source)
     end
 
@@ -156,7 +156,7 @@ describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
           end
         end
       EOS
-      corrected_source = autocorrect_source(cop, source)
+      corrected_source = autocorrect_source(source)
       expect(corrected_source).to eq(correct_source)
     end
   end

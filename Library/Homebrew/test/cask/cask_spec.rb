@@ -171,4 +171,38 @@ describe Hbc::Cask, :cask do
       end
     end
   end
+
+  describe "full_name" do
+    context "when it is a core cask" do
+      it "is the cask token" do
+        c = Hbc::CaskLoader.load("local-caffeine")
+        expect(c.full_name).to eq("local-caffeine")
+      end
+    end
+
+    context "when it is from a non-core tap" do
+      it "returns the fully-qualified name of the cask" do
+        c = Hbc::CaskLoader.load("third-party/tap/third-party-cask")
+        expect(c.full_name).to eq("third-party/tap/third-party-cask")
+      end
+    end
+
+    context "when it is from no known tap" do
+      it "retuns the cask token" do
+        file = Tempfile.new(%w[tapless-cask .rb])
+
+        begin
+          cask_name = File.basename(file.path, ".rb")
+          file.write "cask '#{cask_name}'"
+          file.close
+
+          c = Hbc::CaskLoader.load(file.path)
+          expect(c.full_name).to eq(cask_name)
+        ensure
+          file.close
+          file.unlink
+        end
+      end
+    end
+  end
 end

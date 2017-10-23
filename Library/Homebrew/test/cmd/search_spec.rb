@@ -1,6 +1,7 @@
 describe "brew search", :integration_test do
   before(:each) do
     setup_test_formula "testball"
+    setup_remote_tap "caskroom/cask"
   end
 
   it "lists all available Formulae when no argument is given" do
@@ -13,7 +14,7 @@ describe "brew search", :integration_test do
   it "supports searching by name" do
     expect { brew "search", "testball" }
       .to output(/testball/).to_stdout
-      .and not_to_output.to_stderr
+      .and output(/Searching/).to_stderr
       .and be_a_success
   end
 
@@ -21,6 +22,13 @@ describe "brew search", :integration_test do
     expect { brew "search", "homebrew/homebrew-core/testball" }
       .to output(/testball/).to_stdout
       .and not_to_output.to_stderr
+      .and be_a_success
+  end
+
+  it "falls back to a GitHub tap search when no formula is found", :needs_network do
+    expect { brew "search", "caskroom/cask/firefox" }
+      .to output(/firefox/).to_stdout
+      .and output(/Searching/).to_stderr
       .and be_a_success
   end
 
@@ -44,8 +52,8 @@ describe "brew search", :integration_test do
     "fink" => "http://pdb.finkproject.org/pdb/browse.php?summary=testball",
     "debian" => "https://packages.debian.org/search?keywords=testball&searchon=names&suite=all&section=all",
     "opensuse" => "https://software.opensuse.org/search?q=testball",
-    "fedora" => "https://admin.fedoraproject.org/pkgdb/packages/%2Atestball%2A/",
-    "ubuntu" => "http://packages.ubuntu.com/search?keywords=testball&searchon=names&suite=all&section=all",
+    "fedora" => "https://apps.fedoraproject.org/packages/s/testball",
+    "ubuntu" => "https://packages.ubuntu.com/search?keywords=testball&searchon=names&suite=all&section=all",
   }.each do |flag, url|
     specify "--#{flag}" do
       expect { brew "search", "--#{flag}", "testball", "HOMEBREW_BROWSER" => "echo" }

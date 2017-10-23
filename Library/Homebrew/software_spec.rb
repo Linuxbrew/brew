@@ -268,7 +268,7 @@ class Bottle
     end
 
     def suffix
-      s = (rebuild > 0) ? ".#{rebuild}" : ""
+      s = rebuild.positive? ? ".#{rebuild}" : ""
       ".bottle#{s}.tar.gz"
     end
   end
@@ -338,7 +338,7 @@ class BottleSpecification
 
   def root_url(var = nil)
     if var.nil?
-      default_domain = (!OS.mac? || tap && tap.linux?) ? DEFAULT_DOMAIN_LINUX : DEFAULT_DOMAIN_MAC
+      default_domain = (!OS.mac? || tap&.linux?) ? DEFAULT_DOMAIN_LINUX : DEFAULT_DOMAIN_MAC
       domain = ENV["HOMEBREW_BOTTLE_DOMAIN"] || default_domain
       @root_url ||= "#{domain}/#{Utils::Bottles::Bintray.repository(tap)}"
     else

@@ -51,7 +51,7 @@ class Dependency
   end
 
   def modify_build_environment
-    env_proc.call unless env_proc.nil?
+    env_proc&.call
   end
 
   def inspect

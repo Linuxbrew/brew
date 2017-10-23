@@ -73,13 +73,13 @@ module Homebrew
     tap = nil
 
     ARGV.named.each do |arg|
-      if arg.to_i > 0
+      if arg.to_i.positive?
         issue = arg
         tap = ARGV.value("tap") ? Tap.fetch(ARGV.value("tap")) : CoreTap.instance
         url = "https://github.com/#{tap.slug}/pull/#{arg}"
       elsif (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = ARGV.value("tap")
-        tap = if tap && tap.start_with?("homebrew/")
+        tap = if tap&.start_with?("homebrew/")
           Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
         elsif tap
           odie "Tap option did not start with \"homebrew/\": #{tap}"
@@ -238,7 +238,7 @@ module Homebrew
           "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
-        curl "--silent", "--fail", "-o", "/dev/null", "-I", bottle_commit_url
+        curl "--silent", "--fail", "--output", "/dev/null", "--head", bottle_commit_url
 
         pr_head = Utils.popen_read("git", "rev-parse", "HEAD").chomp
         safe_system "git", "checkout", "--quiet", "-B", bottle_branch, orig_revision
@@ -331,7 +331,7 @@ module Homebrew
       extra_msg = @description ? "(#{@description})" : nil
       ohai "Fetching patch #{extra_msg}"
       puts "Patch: #{patch_url}"
-      curl patch_url, "-s", "-o", patchpath
+      curl_download patch_url, to: patchpath
     end
 
     def apply_patch
@@ -393,7 +393,7 @@ module Homebrew
       files << Regexp.last_match(1) if line =~ %r{^\+\+\+ b/(.*)}
     end
     files.each do |file|
-      if tap && tap.formula_file?(file)
+      if tap&.formula_file?(file)
         formula_name = File.basename(file, ".rb")
         formulae << formula_name unless formulae.include?(formula_name)
       else
@@ -477,10 +477,10 @@ module Homebrew
     end
     version = info.pkg_version
     ohai "Publishing on Bintray: #{package} #{version}"
-    curl "-w", '\n', "--silent", "--fail",
-         "-u#{creds[:user]}:#{creds[:key]}", "-X", "POST",
-         "-H", "Content-Type: application/json",
-         "-d", '{"publish_wait_for_secs": 0}',
+    curl "--write-out", '\n', "--silent", "--fail",
+         "--user", "#{creds[:user]}:#{creds[:key]}", "--request", "POST",
+         "--header", "Content-Type: application/json",
+         "--data", '{"publish_wait_for_secs": 0}',
          "https://api.bintray.com/content/#{bintray_project}/#{repo}/#{package}/#{version}/publish"
     true
   rescue => e
@@ -637,7 +637,7 @@ module Homebrew
         # We're in the cache; make sure to force re-download
         loop do
           begin
-            curl url, "-o", filename
+            curl_download url, continue_at: 0, to: filename
             break
           rescue
             if retry_count >= max_curl_retries
@@ -656,7 +656,7 @@ module Homebrew
   end
 
   def check_bintray_mirror(name, url)
-    headers = curl_output("--connect-timeout", "15", "--head", url)[0]
+    headers, = curl_output("--connect-timeout", "15", "--location", "--head", url)
     status_code = headers.scan(%r{^HTTP\/.* (\d+)}).last.first
     return if status_code.start_with?("2")
     opoo "The Bintray mirror #{url} is not reachable (HTTP status code #{status_code})."

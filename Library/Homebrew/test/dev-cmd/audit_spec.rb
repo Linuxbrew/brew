@@ -150,70 +150,6 @@ describe FormulaAuditor do
     end
   end
 
-  describe "#audit_class" do
-    specify "missing test" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-        end
-      EOS
-
-      fa.audit_class
-      expect(fa.problems).to eq([])
-
-      fa = formula_auditor "foo", <<-EOS.undent, strict: true
-        class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-        end
-      EOS
-
-      fa.audit_class
-      expect(fa.problems).to eq(["A `test do` test block should be added"])
-    end
-
-    specify "GithubGistFormula", :needs_compat do
-      ENV.delete("HOMEBREW_DEVELOPER")
-
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < GithubGistFormula
-          url "http://example.com/foo-1.0.tgz"
-        end
-      EOS
-
-      fa.audit_class
-      expect(fa.problems)
-        .to eq(["GithubGistFormula is deprecated, use Formula instead"])
-    end
-
-    specify "ScriptFileFormula", :needs_compat do
-      ENV.delete("HOMEBREW_DEVELOPER")
-
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < ScriptFileFormula
-          url "http://example.com/foo-1.0.tgz"
-        end
-      EOS
-
-      fa.audit_class
-      expect(fa.problems)
-        .to eq(["ScriptFileFormula is deprecated, use Formula instead"])
-    end
-
-    specify "AmazonWebServicesFormula", :needs_compat do
-      ENV.delete("HOMEBREW_DEVELOPER")
-
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo < AmazonWebServicesFormula
-          url "http://example.com/foo-1.0.tgz"
-        end
-      EOS
-
-      fa.audit_class
-      expect(fa.problems)
-        .to eq(["AmazonWebServicesFormula is deprecated, use Formula instead"])
-    end
-  end
-
   describe "#line_problems" do
     specify "pkgshare" do
       fa = formula_auditor "foo", <<-EOS.undent, strict: true
@@ -262,28 +198,6 @@ describe FormulaAuditor do
       fa.line_problems 'ohai share/"foolibc++"', 3
       expect(fa.problems.shift)
         .to eq('Use pkgshare instead of (share/"foolibc++")')
-    end
-
-    specify "no space in class inheritance" do
-      fa = formula_auditor "foo", <<-EOS.undent
-        class Foo<Formula
-          url '/foo-1.0.tgz'
-        end
-      EOS
-
-      fa.line_problems "class Foo<Formula", 1
-      expect(fa.problems.shift)
-        .to eq("Use a space in class inheritance: class Foo < Formula")
-    end
-
-    specify "default template" do
-      fa = formula_auditor "foo", "class Foo < Formula; url '/foo-1.0.tgz'; end"
-
-      fa.line_problems '# system "cmake", ".", *std_cmake_args', 3
-      expect(fa.problems.shift).to eq("Commented cmake call found")
-
-      fa.line_problems "# PLEASE REMOVE", 3
-      expect(fa.problems.shift).to eq("Please remove default template comments")
     end
   end
 

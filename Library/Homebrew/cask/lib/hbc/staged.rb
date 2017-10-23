@@ -4,7 +4,7 @@ module Hbc
       index =  0 if index == :first
       index =  1 if index == :second
       index = -1 if index == :last
-      Hbc.appdir.join(@cask.artifacts[:app].to_a.at(index).first, "Contents", "Info.plist")
+      @cask.artifacts.select { |a| a.is_a?(Artifact::App) }.at(index).target.join("Contents", "Info.plist")
     end
 
     def plist_exec(cmd)

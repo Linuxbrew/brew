@@ -23,6 +23,7 @@ module Hbc
         installation_info(cask)
         repo_info(cask)
         name_info(cask)
+        language_info(cask)
         artifact_info(cask)
         Installer.print_caveats(cask)
       end
@@ -51,6 +52,13 @@ module Hbc
         puts cask.name.empty? ? Formatter.error("None") : cask.name
       end
 
+      def self.language_info(cask)
+        return if cask.languages.empty?
+
+        ohai "Languages"
+        puts cask.languages.join(", ")
+      end
+
       def self.repo_info(cask)
         user, repo, token = QualifiedToken.parse(Hbc.all_tokens.detect { |t| t.split("/").last == cask.token })
 
@@ -69,12 +77,10 @@ module Hbc
 
       def self.artifact_info(cask)
         ohai "Artifacts"
-        DSL::ORDINARY_ARTIFACT_TYPES.each do |type|
-          next if cask.artifacts[type].empty?
-          cask.artifacts[type].each do |artifact|
-            activatable_item = (type == :stage_only) ? "<none>" : artifact.first
-            puts "#{activatable_item} (#{type})"
-          end
+        cask.artifacts.each do |artifact|
+          next unless artifact.respond_to?(:install_phase)
+          next unless DSL::ORDINARY_ARTIFACT_CLASSES.include?(artifact.class)
+          puts artifact.to_s
         end
       end
     end

@@ -81,7 +81,7 @@ Security/MarshalLoad:
     - 'utils/fork.rb'
 
 # Offense count: 1
-Style/AccessorMethodName:
+Naming/AccessorMethodName:
   Exclude:
     - 'extend/ENV/super.rb'
 
@@ -136,10 +136,3 @@ Style/MutableConstant:
     - 'formulary.rb'
     - 'tab.rb'
     - 'tap.rb'
-
-# Offense count: 8
-Style/OpMethod:
-  Exclude:
-    - 'dependencies.rb'
-    - 'install_renamed.rb'
-    - 'options.rb'

@@ -11,11 +11,6 @@ SimpleCov.start do
   # tests to be dropped. This causes random fluctuations in test coverage.
   merge_timeout 86400
 
-  add_filter "/Homebrew/compat/"
-  add_filter "/Homebrew/dev-cmd/tests.rb"
-  add_filter "/Homebrew/test/"
-  add_filter "/Homebrew/vendor/"
-
   if ENV["HOMEBREW_INTEGRATION_TEST"]
     command_name "#{ENV["HOMEBREW_INTEGRATION_TEST"]} (#{$PROCESS_ID})"
 
@@ -33,22 +28,32 @@ SimpleCov.start do
     end
   else
     command_name "#{command_name} (#{$PROCESS_ID})"
+
+    subdirs = Dir.chdir(SimpleCov.root) { Dir.glob("*") }
+                 .reject { |d| d.end_with?(".rb") || ["test", "vendor"].include?(d) }
+                 .map { |d| "#{d}/**/*.rb" }.join(",")
+
     # Not using this during integration tests makes the tests 4x times faster
     # without changing the coverage.
-    track_files "#{SimpleCov.root}/**/*.rb"
+    track_files "#{SimpleCov.root}/{#{subdirs},*.rb}"
   end
+
+  add_filter %r{^/compat/}
+  add_filter %r{^/dev-cmd/tests.rb$}
+  add_filter %r{^/test/}
+  add_filter %r{^/vendor/}
 
   # Add groups and the proper project name to the output.
   project_name "Homebrew"
-  add_group "Cask", "/Homebrew/cask/"
-  add_group "Commands", %w[/Homebrew/cmd/ /Homebrew/dev-cmd/]
-  add_group "Extensions", "/Homebrew/extend/"
-  add_group "OS", %w[/Homebrew/extend/os/ /Homebrew/os/]
-  add_group "Requirements", "/Homebrew/requirements/"
-  add_group "Scripts", %w[
-    /Homebrew/brew.rb
-    /Homebrew/build.rb
-    /Homebrew/postinstall.rb
-    /Homebrew/test.rb
+  add_group "Cask", %r{^/cask/}
+  add_group "Commands", [%r{/cmd/}, %r{^/dev-cmd/}]
+  add_group "Extensions", %r{^/extend/}
+  add_group "OS", [%r{^/extend/os/}, %r{^/os/}]
+  add_group "Requirements", %r{^/requirements/}
+  add_group "Scripts", [
+    %r{^/brew.rb$},
+    %r{^/build.rb$},
+    %r{^/postinstall.rb$},
+    %r{^/test.rb$},
   ]
 end

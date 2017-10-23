@@ -1,11 +1,13 @@
 require "open3"
 require "rubygems"
 
+require_relative "shared_examples/invalid_option"
+
 describe Hbc::CLI::Style, :cask do
   let(:args) { [] }
   let(:cli) { described_class.new(*args) }
 
-  around(&:run)
+  it_behaves_like "a command that handles invalid options"
 
   describe "#run" do
     subject { cli.run }

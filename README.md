@@ -176,7 +176,13 @@ This is our PGP key which is valid until May 24, 2017.
 ## Who Are You?
 SuperNEMO-DBD's fork of brew is maintained by [Ben Morgan](https://github.com/drbenmorgan).
 
-Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](https://github.com/rwhogg), [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), [Michka Popoff](https://github.com/iMichka), and [Alyssa Ross](https://github.com/alyssais).
+Linuxbrew's lead maintainer is [Shaun Jackman](http://sjackman.ca).
+
+Linuxbrew/homebrew-core's lead maintainer is [Michka Popoff](https://github.com/iMichka).
+
+Linuxbrew's other current maintainers are [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Alyssa Ross](https://github.com/alyssais).
+
+Former maintainers with significant contributions include [Bob W. Hogg](https://github.com/rwhogg).
 
 ## Linuxbrew Community
 - [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)
@@ -185,8 +191,24 @@ Linuxbrew is maintained by [Shaun Jackman](http://sjackman.ca), [Bob W. Hogg](ht
 Code is under the [BSD 2-clause "Simplified" License](https://github.com/SuperNEMO-DBD/brew/tree/master/LICENSE.txt).
 Documentation is under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/).
 
-## Donate
+## Donations
 
-Linuxbrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for continuous integration and the computer resources used to build precompiled binary bottles of your favourite formulae. Every donation will be spent on making Linuxbrew better for our users. Please consider [donating regularly to Linuxbrew through Patreon](https://www.patreon.com/linuxbrew). We appreciate your support and contribution, no matter the level.
+Linuxbrew is a non-profit project run entirely by unpaid volunteers. We need your funds to pay for continuous integration and the computer resources used to build precompiled binary bottles of your favourite formulae. Every donation will be spent on making Linuxbrew better for our users.
+
+Please consider [donating regularly to Linuxbrew through Patreon](https://www.patreon.com/linuxbrew). We appreciate your support and contribution, no matter the level.
+
+[![Donate with Patreon](https://img.shields.io/badge/Patreon-Linuxbrew-green.svg)](https://www.patreon.com/linuxbrew)
 
 [Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew on Patreon](https://www.patreon.com/homebrew) as well if you use Homebrew on macOS.
+
+[![Donate with Patreon](https://img.shields.io/badge/Patreon-Homebrew-green.svg)](https://www.patreon.com/homebrew)
+
+# Sponsors
+
+Our bottles (binary packages) are built on [CircleCI](https://circleci.com/).
+
+[<img alt="CircleCI logo" style="height:1in" src="https://assets.brandfolder.com/otz6k5-cj8pew-e4rk9u/original/circle-logo-horizontal-black.png">](https://circleci.com/)
+
+Our bottles (binary packages) are hosted by [Bintray](https://bintray.com/linuxbrew).
+
+[![Downloads by Bintray](https://bintray.com/docs/images/downloads_by_bintray_96.png)](https://bintray.com/linuxbrew)

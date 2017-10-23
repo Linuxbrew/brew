@@ -28,7 +28,7 @@ module EnvActivation
   end
 
   def clear_sensitive_environment!
-    ENV.keys.each do |key|
+    ENV.each_key do |key|
       next unless /(cookie|key|token)/i =~ key
       ENV.delete key
     end

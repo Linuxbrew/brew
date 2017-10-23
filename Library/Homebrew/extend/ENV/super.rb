@@ -190,7 +190,7 @@ module Superenv
 
   def determine_rpath_paths(formula)
     PATH.new(
-      (formula.lib unless formula.nil?),
+      formula&.lib,
       PATH.new(determine_extra_rpath_paths).existing,
     )
   end

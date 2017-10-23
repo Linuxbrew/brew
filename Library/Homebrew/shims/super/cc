@@ -43,6 +43,8 @@ class Cmd
       else
         :cc
       end
+    elsif @args.include?("-xc++-header") || @args.each_cons(2).include?(["-x", "c++-header"])
+      :cxx
     elsif @args.include? "-E"
       :ccE
     else

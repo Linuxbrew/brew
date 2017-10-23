@@ -9,6 +9,10 @@ describe Locale do
       expect(described_class.parse("zh-CN-Hans")).to eql(described_class.new("zh", "CN", "Hans"))
     end
 
+    it "correctly parses a string with a UN M.49 region code" do
+      expect(described_class.parse("es-419")).to eql(described_class.new("es", "419", nil))
+    end
+
     context "raises a ParserError when given" do
       it "an empty string" do
         expect { described_class.parse("") }.to raise_error(Locale::ParserError)

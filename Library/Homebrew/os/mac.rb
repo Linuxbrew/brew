@@ -11,7 +11,7 @@ module OS
   module Mac
     module_function
 
-    ::MacOS = self # rubocop:disable Style/ConstantName
+    ::MacOS = self # rubocop:disable Naming/ConstantName
 
     raise "Loaded OS::Mac on generic OS!" if ENV["HOMEBREW_TEST_GENERIC_OS"]
 
@@ -35,12 +35,12 @@ module OS
 
     def prerelease?
       # TODO: bump version when new OS is released
-      version >= "10.13"
+      version >= "10.14"
     end
 
     def outdated_release?
       # TODO: bump version when new OS is released
-      version < "10.10"
+      version < "10.11"
     end
 
     def cat
@@ -107,7 +107,7 @@ module OS
     # Returns the path to an SDK or nil, following the rules set by #sdk.
     def sdk_path(v = nil)
       s = sdk(v)
-      s.path unless s.nil?
+      s&.path
     end
 
     # See these issues for some history:
@@ -132,8 +132,8 @@ module OS
         paths << path if path.exist?
       end
 
-      # Finally, some users make their MacPorts or Fink directorie
-      # read-only in order to try out Homebrew, but this doens't work as
+      # Finally, some users make their MacPorts or Fink directories
+      # read-only in order to try out Homebrew, but this doesn't work as
       # some build scripts error out when trying to read from these now
       # unreadable paths.
       %w[/sw /opt/local].map { |p| Pathname.new(p) }.each do |path|
@@ -235,7 +235,9 @@ module OS
     end
 
     def app_with_bundle_id(*ids)
-      path = mdfind(*ids).first
+      path = mdfind(*ids)
+             .reject { |p| p.include?("/Backups.backupdb/") }
+             .first
       Pathname.new(path) unless path.nil? || path.empty?
     end
 

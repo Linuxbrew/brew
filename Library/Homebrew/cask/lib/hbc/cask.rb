@@ -17,7 +17,7 @@ module Hbc
       @token = token
       @sourcefile_path = sourcefile_path
       @tap = tap
-      @dsl = DSL.new(@token)
+      @dsl = DSL.new(self)
       return unless block_given?
       @dsl.instance_eval(&block)
       @dsl.language_eval
@@ -39,6 +39,14 @@ module Hbc
                           .reverse
                           .uniq
                           .reverse
+    end
+
+    def full_name
+      if @tap.nil? || @tap == Hbc.default_tap
+        token
+      else
+        "#{@tap}/#{token}"
+      end
     end
 
     def installed?

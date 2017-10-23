@@ -3,16 +3,20 @@ require "hbc/system_command"
 module Hbc
   class DSL
     class Appcast
-      attr_reader :parameters, :checkpoint
+      attr_reader :uri, :checkpoint, :parameters
 
-      def initialize(uri, parameters = {})
-        @parameters     = parameters
-        @uri            = UnderscoreSupportingURI.parse(uri)
-        @checkpoint     = @parameters[:checkpoint]
+      def initialize(uri, **parameters)
+        @uri        = URI(uri)
+        @parameters = parameters
+        @checkpoint = parameters[:checkpoint]
       end
 
       def calculate_checkpoint
-        result = SystemCommand.run("/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", URL::FAKE_USER_AGENT, "--fail", @uri], print_stderr: false)
+        curl_executable, *args = curl_args(
+          "--compressed", "--location", "--fail", uri,
+          user_agent: :fake
+        )
+        result = SystemCommand.run(curl_executable, args: args, print_stderr: false)
 
         checkpoint = if result.success?
           processed_appcast_text = result.stdout.gsub(%r{<pubDate>[^<]*</pubDate>}m, "")
@@ -26,11 +30,11 @@ module Hbc
       end
 
       def to_yaml
-        [@uri, @parameters].to_yaml
+        [uri, parameters].to_yaml
       end
 
       def to_s
-        @uri.to_s
+        uri.to_s
       end
     end
   end

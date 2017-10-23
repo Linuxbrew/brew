@@ -124,7 +124,7 @@ module Homebrew
     return if ENV["HOMEBREW_UPDATE_TEST"]
     core_tap = CoreTap.instance
     return if core_tap.installed?
-    CoreTap.ensure_installed! quiet: false
+    CoreTap.ensure_installed!
     revision = core_tap.git_head
     ENV["HOMEBREW_UPDATE_BEFORE_HOMEBREW_HOMEBREW_CORE"] = revision
     ENV["HOMEBREW_UPDATE_AFTER_HOMEBREW_HOMEBREW_CORE"] = revision
@@ -203,6 +203,7 @@ module Homebrew
     end
 
     new_homebrew_repository = Pathname.new "/usr/local/Homebrew"
+    new_homebrew_repository.rmdir_if_possible
     if new_homebrew_repository.exist?
       ofail <<-EOS.undent
         #{new_homebrew_repository} already exists.

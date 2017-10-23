@@ -31,7 +31,7 @@ module Homebrew
             #{Formatter.url("https://pip.readthedocs.io/en/stable/installing/")}
           EOS
         when "pil" then <<-EOS.undent
-          Instead of PIL, consider `pip install pillow` or `brew install Homebrew/science/pillow`.
+          Instead of PIL, consider `pip2 install pillow`.
           EOS
         when "macruby" then <<-EOS.undent
           MacRuby is not packaged and is on an indefinite development hiatus.
@@ -53,16 +53,7 @@ module Homebrew
           ruin SSH's security.
           EOS
         when "gsutil" then <<-EOS.undent
-          Install gsutil with `pip install gsutil`
-          EOS
-        when "clojure" then <<-EOS.undent
-          Clojure isn't really a program but a library managed as part of a
-          project and Leiningen is the user interface to that library.
-
-          To install Clojure you should install Leiningen:
-            brew install leiningen
-          and then follow the tutorial:
-            #{Formatter.url("https://github.com/technomancy/leiningen/blob/stable/doc/TUTORIAL.md")}
+          Install gsutil with `pip2 install gsutil`
           EOS
         when "gfortran" then <<-EOS.undent
           GNU Fortran is now provided as part of GCC, and can be installed with:

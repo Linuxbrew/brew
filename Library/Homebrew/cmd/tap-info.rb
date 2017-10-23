@@ -64,10 +64,10 @@ module Homebrew
         if tap.installed?
           info += tap.pinned? ? "pinned" : "unpinned"
           info += ", private" if tap.private?
-          if (formula_count = tap.formula_files.size) > 0
+          if (formula_count = tap.formula_files.size).positive?
             info += ", #{Formatter.pluralize(formula_count, "formula")}"
           end
-          if (command_count = tap.command_files.size) > 0
+          if (command_count = tap.command_files.size).positive?
             info += ", #{Formatter.pluralize(command_count, "command")}"
           end
           info += ", no formulae/commands" if (formula_count + command_count).zero?

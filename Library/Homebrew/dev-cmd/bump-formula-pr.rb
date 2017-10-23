@@ -89,7 +89,8 @@ module Homebrew
 
   def check_for_duplicate_pull_requests(formula)
     pull_requests = fetch_pull_requests(formula)
-    return unless pull_requests && !pull_requests.empty?
+    return unless pull_requests
+    return if pull_requests.empty?
     duplicates_message = <<-EOS.undent
       These open pull requests may be duplicates:
       #{pull_requests.map { |pr| "#{pr["title"]} #{pr["html_url"]}" }.join("\n")}
@@ -124,7 +125,7 @@ module Homebrew
       Formula.each do |f|
         if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
           guesses << f
-        elsif f.stable && f.stable.url && f.stable.url.match(base_url)
+        elsif f.stable&.url && f.stable.url.match(base_url)
           guesses << f
         end
       end
@@ -176,7 +177,10 @@ module Homebrew
       rsrc.version = forced_version if forced_version
       odie "No version specified!" unless rsrc.version
       rsrc_path = rsrc.fetch
-      if Utils.popen_read("/usr/bin/tar", "-tf", rsrc_path) =~ %r{/.*\.}
+      gnu_tar_gtar_path = HOMEBREW_PREFIX/"opt/gnu-tar/bin/gtar"
+      gnu_tar_gtar = gnu_tar_gtar_path if gnu_tar_gtar_path.executable?
+      tar = which("gtar") || gnu_tar_gtar || which("tar")
+      if Utils.popen_read(tar, "-tf", rsrc_path) =~ %r{/.*\.}
         new_hash = rsrc_path.sha256
       elsif new_url.include? ".tar"
         odie "#{formula}: no url/#{hash_type} specified!"
@@ -293,9 +297,7 @@ module Homebrew
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
-        ohai "hub fork --no-remote"
-        ohai "hub fork"
-        ohai "hub fork (to read $HUB_REMOTE)"
+        ohai "hub fork # read $HUB_REMOTE"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
         ohai "hub pull-request --browse -m '#{formula.name} #{new_formula_version}#{devel_message}'"
         ohai "git checkout -"
@@ -305,9 +307,9 @@ module Homebrew
         safe_system "git", "commit", "--no-edit", "--verbose",
           "--message=#{formula.name} #{new_formula_version}#{devel_message}",
           "--", formula.path
-        safe_system "hub", "fork", "--no-remote"
-        quiet_system "hub", "fork"
-        remote = Utils.popen_read("hub fork 2>&1")[/fatal: remote (.+) already exists\./, 1]
+        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1]
+        # repeat for hub 2.2 backwards compatibility:
+        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1] if remote.to_s.empty?
         odie "cannot get remote from 'hub'!" if remote.to_s.empty?
         safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
         pr_message = <<-EOS.undent

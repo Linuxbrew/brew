@@ -1,7 +1,13 @@
 describe Hbc::Artifact::Suite, :cask do
-  let(:cask) { Hbc::CaskLoader.load_from_file(TEST_FIXTURE_DIR/"cask/Casks/with-suite.rb") }
+  let(:cask) { Hbc::CaskLoader.load(cask_path("with-suite")) }
 
-  let(:install_phase) { -> { Hbc::Artifact::Suite.new(cask).install_phase } }
+  let(:install_phase) {
+    lambda do
+      cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
+        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      end
+    end
+  }
 
   let(:target_path) { Hbc.appdir.join("Caffeine") }
   let(:source_path) { cask.staged_path.join("Caffeine") }

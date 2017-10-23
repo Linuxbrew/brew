@@ -456,6 +456,10 @@ class Version
     # e.g. http://www.ijg.org/files/jpegsrc.v8d.tar.gz
     m = /\.v(\d+[a-z]?)/.match(stem)
     return m.captures.first unless m.nil?
+
+    # e.g. https://secure.php.net/get/php-7.1.10.tar.bz2/from/this/mirror
+    m = /[-.vV]?((?:\d+\.)+\d+(?:[-_.]?(?i:alpha|beta|pre|rc)\.?\d{,2})?)/.match(spec_s)
+    return m.captures.first unless m.nil?
   end
 end
 

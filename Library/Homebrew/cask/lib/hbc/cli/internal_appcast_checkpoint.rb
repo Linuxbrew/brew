@@ -12,7 +12,7 @@ module Hbc
         if args.all? { |t| t =~ %r{^https?://} && t !~ /\.rb$/ }
           self.class.appcask_checkpoint_for_url(args)
         else
-          self.class.appcask_checkpoint(args, calculate?)
+          self.class.appcask_checkpoint(casks, calculate?)
         end
       end
 
@@ -23,33 +23,27 @@ module Hbc
         end
       end
 
-      def self.appcask_checkpoint(cask_tokens, calculate)
-        count = 0
-
-        cask_tokens.each do |cask_token|
-          cask = CaskLoader.load(cask_token)
-
+      def self.appcask_checkpoint(casks, calculate)
+        casks.each do |cask|
           if cask.appcast.nil?
             opoo "Cask '#{cask}' is missing an `appcast` stanza."
           else
-            if calculate
+            checkpoint = if calculate
               result = cask.appcast.calculate_checkpoint
-
-              checkpoint = result[:checkpoint]
+              result[:checkpoint]
             else
-              checkpoint = cask.appcast.checkpoint
+              cask.appcast.checkpoint
             end
 
-            if checkpoint.nil?
+            if calculate && checkpoint.nil?
               onoe "Could not retrieve `appcast` checkpoint for cask '#{cask}': #{result[:command_result].stderr}"
+            elsif casks.count > 1
+              puts "#{checkpoint}  #{cask}"
             else
-              puts((cask_tokens.count > 1) ? "#{checkpoint}  #{cask}" : checkpoint)
-              count += 1
+              puts checkpoint
             end
           end
         end
-
-        count == cask_tokens.count
       end
 
       def self.help

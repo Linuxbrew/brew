@@ -70,12 +70,16 @@ module Hbc
       previous_cask_contents = Git.last_revision_of_file(tap.path, @cask.sourcefile_path, before_commit: commit_range)
       return if previous_cask_contents.empty?
 
-      previous_cask = CaskLoader.load_from_string(previous_cask_contents)
+      begin
+        previous_cask = CaskLoader.load(previous_cask_contents)
 
-      return unless previous_cask.version == cask.version
-      return if previous_cask.sha256 == cask.sha256
+        return unless previous_cask.version == cask.version
+        return if previous_cask.sha256 == cask.sha256
 
-      add_error "only sha256 changed (see: https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
+        add_error "only sha256 changed (see: https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
+      rescue CaskError => e
+        add_warning "Skipped version and checksum comparison. Reading previous version failed: #{e}"
+      end
     end
 
     def check_version
@@ -143,7 +147,15 @@ module Hbc
 
     def check_appcast_http_code
       odebug "Verifying appcast returns 200 HTTP response code"
-      result = @command.run("/usr/bin/curl", args: ["--compressed", "--location", "--user-agent", URL::FAKE_USER_AGENT, "--output", "/dev/null", "--write-out", "%{http_code}", cask.appcast], print_stderr: false)
+
+      curl_executable, *args = curl_args(
+        "--compressed", "--location", "--fail",
+        "--write-out", "%{http_code}",
+        "--output", "/dev/null",
+        cask.appcast,
+        user_agent: :fake
+      )
+      result = @command.run(curl_executable, args: args, print_stderr: false)
       if result.success?
         http_code = result.stdout.chomp
         add_warning "unexpected HTTP response code retrieving appcast: #{http_code}" unless http_code == "200"
@@ -206,12 +218,10 @@ module Hbc
     end
 
     def check_generic_artifacts
-      cask.artifacts[:artifact].each do |source, target_hash|
-        unless target_hash.is_a?(Hash) && target_hash[:target]
-          add_error "target required for generic artifact #{source}"
-          next
+      cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::Artifact) }.each do |artifact|
+        unless artifact.target.absolute?
+          add_error "target must be absolute path for #{artifact.class.english_name} #{artifact.source}"
         end
-        add_error "target must be absolute path for generic artifact #{source}" unless Pathname.new(target_hash[:target]).absolute?
       end
     end
 

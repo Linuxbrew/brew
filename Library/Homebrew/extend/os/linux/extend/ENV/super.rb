@@ -32,11 +32,8 @@ module Superenv
   end
 
   def determine_dynamic_linker_path(formula)
-    if formula && formula.name == "glibc"
-      ""
-    else
-      "#{HOMEBREW_PREFIX}/lib/ld.so"
-    end
+    return "" if formula&.name == "glibc"
+    "#{HOMEBREW_PREFIX}/lib/ld.so"
   end
 
   # @private

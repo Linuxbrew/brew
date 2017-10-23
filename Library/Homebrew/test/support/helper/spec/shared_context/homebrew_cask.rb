@@ -18,6 +18,7 @@ HOMEBREW_CASK_DIRS = [
 
 RSpec.shared_context "Homebrew-Cask" do
   around(:each) do |example|
+    third_party_tap = Tap.fetch("third-party", "tap")
     begin
       dirs = HOMEBREW_CASK_DIRS.map do |dir|
         Pathname.new(TEST_TMPDIR).join("cask-#{dir}").tap do |path|
@@ -31,11 +32,18 @@ RSpec.shared_context "Homebrew-Cask" do
         FileUtils.ln_sf TEST_FIXTURE_DIR.join("cask"), tap.path
       end
 
+      third_party_tap.tap do |tap|
+        FileUtils.mkdir_p tap.path.dirname
+        FileUtils.ln_sf TEST_FIXTURE_DIR.join("third-party"), tap.path
+      end
+
       example.run
     ensure
       FileUtils.rm_rf dirs
       Hbc.default_tap.path.unlink
       FileUtils.rm_rf Hbc.default_tap.path.parent
+      third_party_tap.path.unlink
+      FileUtils.rm_rf third_party_tap.path.parent
     end
   end
 end

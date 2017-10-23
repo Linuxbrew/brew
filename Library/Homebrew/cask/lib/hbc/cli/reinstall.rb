@@ -1,7 +1,7 @@
 module Hbc
   class CLI
     class Reinstall < Install
-      def install_casks
+      def run
         casks.each do |cask|
           Installer.new(cask, binaries:       binaries?,
                               verbose:        verbose?,

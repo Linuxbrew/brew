@@ -693,7 +693,7 @@ Note that [`option`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula
 
 ### File level operations
 
-You can use the file utilities provided by Ruby's [`FileUtils`](http://www.ruby-doc.org/stdlib/libdoc/fileutils/rdoc/index.html). These are included in the `Formula` class, so you do not need the `FileUtils.` prefix to use them.
+You can use the file utilities provided by Ruby's [`FileUtils`](https://www.ruby-doc.org/stdlib/libdoc/fileutils/rdoc/index.html). These are included in the `Formula` class, so you do not need the `FileUtils.` prefix to use them.
 
 When creating symlinks, take special care to ensure they are *relative* symlinks. This makes it easier to create a relocatable bottle. For example, to create a symlink in `bin` to an executable in `libexec`, use
 
