@@ -9,7 +9,7 @@ describe Hbc::CLI::InternalStanza, :cask do
   it "raises an exception when stanza is unknown/unsupported" do
     expect {
       described_class.new("this_stanza_does_not_exist", "with-gpg")
-    }.to raise_error(/Unknown\/unsupported stanza/)
+    }.to raise_error(%r{Unknown/unsupported stanza})
   end
 
   it "raises an exception when normal stanza is not present on cask" do
