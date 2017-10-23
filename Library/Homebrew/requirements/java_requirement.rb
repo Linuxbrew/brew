@@ -11,7 +11,7 @@ class JavaRequirement < Requirement
   end
 
   def initialize(tags)
-    @version = tags.shift if /(\d\.)+\d/ =~ tags.first
+    @version = tags.shift if /(\d+\.)+\d/ =~ tags.first
     super
   end
 
@@ -103,7 +103,7 @@ class JavaRequirement < Requirement
   end
 
   def satisfies_version(java)
-    java_version_s = Utils.popen_read("#{java} -version 2>&1")[/1.\d/]
+    java_version_s = Utils.popen_read("#{java} -version 2>&1")[/\d+.\d/]
     return false unless java_version_s
     java_version = Version.create(java_version_s)
     needed_version = Version.create(version_without_plus)

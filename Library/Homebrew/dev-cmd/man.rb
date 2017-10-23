@@ -48,12 +48,9 @@ module Homebrew
   def path_glob_commands(glob)
     Pathname.glob(glob)
             .sort_by { |source_file| sort_key_for_path(source_file) }
-            .map do |source_file|
-      source_file.read.lines
-                 .grep(/^#:/)
-                 .map { |line| line.slice(2..-1) }
-                 .join
-    end.reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
+            .map(&:read).map(&:lines)
+            .map { |lines| lines.grep(/^#:/).map { |line| line.slice(2..-1) }.join }
+            .reject { |s| s.strip.empty? || s.include?("@hide_from_man_page") }
   end
 
   def build_man_page

@@ -152,8 +152,10 @@ module Homebrew
         return unless File.directory?(dir)
 
         files = Dir.chdir(dir) do
-          Dir[pattern].select { |f| File.file?(f) && !File.symlink?(f) } - Dir.glob(white_list)
-        end.map { |file| File.join(dir, file) }
+          (Dir.glob(pattern) - Dir.glob(white_list))
+            .select { |f| File.file?(f) && !File.symlink?(f) }
+            .map { |f| File.join(dir, f) }
+        end
         return if files.empty?
 
         inject_file_list(files, message)
@@ -431,15 +433,15 @@ module Homebrew
       end
 
       def check_user_path_1
-        $seen_prefix_bin = false
-        $seen_prefix_sbin = false
+        @seen_prefix_bin = false
+        @seen_prefix_sbin = false
 
         message = ""
 
         paths(ENV["HOMEBREW_PATH"]).each do |p|
           case p
           when "/usr/bin"
-            unless $seen_prefix_bin
+            unless @seen_prefix_bin
               # only show the doctor message if there are any conflicts
               # rationale: a default install should not trigger any brew doctor messages
               conflicts = Dir["#{HOMEBREW_PREFIX}/bin/*"]
@@ -462,9 +464,9 @@ module Homebrew
               end
             end
           when "#{HOMEBREW_PREFIX}/bin"
-            $seen_prefix_bin = true
+            @seen_prefix_bin = true
           when "#{HOMEBREW_PREFIX}/sbin"
-            $seen_prefix_sbin = true
+            @seen_prefix_sbin = true
           end
         end
 
@@ -472,7 +474,7 @@ module Homebrew
       end
 
       def check_user_path_2
-        return if $seen_prefix_bin
+        return if @seen_prefix_bin
 
         <<-EOS.undent
           Homebrew's bin was not found in your PATH.
@@ -482,7 +484,7 @@ module Homebrew
       end
 
       def check_user_path_3
-        return if $seen_prefix_sbin
+        return if @seen_prefix_sbin
 
         # Don't complain about sbin not being in the path if it doesn't exist
         sbin = HOMEBREW_PREFIX/"sbin"
@@ -811,6 +813,18 @@ module Homebrew
               git -C "#{coretap_path}" remote set-url origin #{Formatter.url(remote)}
           EOS
         end
+
+        return if ENV["CI"] || ENV["JENKINS_HOME"]
+
+        branch = coretap_path.git_branch
+        return if branch.nil? || branch =~ /master/
+
+        <<-EOS.undent
+          Homebrew/homebrew-core is not on the master branch
+
+          Check out the master branch by running:
+            git -C "$(brew --repo homebrew/core)" checkout master
+        EOS
       end
 
       def __check_linked_brew(f)
@@ -828,7 +842,7 @@ module Homebrew
       def check_for_linked_keg_only_brews
         return unless HOMEBREW_CELLAR.exist?
 
-        linked = Formula.installed.select do |f|
+        linked = Formula.installed.sort.select do |f|
           f.keg_only? && __check_linked_brew(f)
         end
         return if linked.empty?
@@ -995,6 +1009,7 @@ module Homebrew
           Putting non-prefixed coreutils in your path can cause gmp builds to fail.
         EOS
       rescue FormulaUnavailableError
+        return
       end
 
       def check_for_non_prefixed_findutils
@@ -1010,6 +1025,7 @@ module Homebrew
           Putting non-prefixed findutils in your path can cause python builds to fail.
         EOS
       rescue FormulaUnavailableError
+        return
       end
 
       def check_for_pydistutils_cfg_in_home

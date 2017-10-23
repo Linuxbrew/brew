@@ -9,7 +9,7 @@ RUBY_VERSION_SPLIT = RUBY_VERSION.split "."
 RUBY_X = RUBY_VERSION_SPLIT[0].to_i
 RUBY_Y = RUBY_VERSION_SPLIT[1].to_i
 if RUBY_X < 2 || (RUBY_X == 2 && RUBY_Y < 3)
-  raise "Homebrew must be run under Ruby 2.3!"
+  raise "Homebrew must be run under Ruby 2.3! You're running #{RUBY_VERSION}."
 end
 
 require "pathname"
@@ -146,7 +146,7 @@ rescue MethodDeprecatedError => e
     $stderr.puts "  #{Formatter.url(e.issues_url)}"
   end
   exit 1
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   onoe e
   if internal_cmd && defined?(OS::ISSUES_URL) &&
      !ENV["HOMEBREW_NO_AUTO_UPDATE"]

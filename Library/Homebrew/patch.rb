@@ -60,8 +60,7 @@ class EmbeddedPatch
     false
   end
 
-  def contents
-  end
+  def contents; end
 
   def apply
     data = contents.gsub("HOMEBREW_PREFIX", HOMEBREW_PREFIX)
@@ -87,10 +86,13 @@ class DATAPatch < EmbeddedPatch
   def contents
     data = ""
     path.open("rb") do |f|
-      begin
+      loop do
         line = f.gets
-      end until line.nil? || line =~ /^__END__$/
-      data << line while line = f.gets
+        break if line.nil? || line =~ /^__END__$/
+      end
+      while line = f.gets
+        data << line
+      end
     end
     data
   end

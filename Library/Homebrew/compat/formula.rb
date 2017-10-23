@@ -78,4 +78,9 @@ class Formula
   def startup_plist
     odeprecated "Formula#startup_plist", "Formula#plist"
   end
+
+  def rake(*args)
+    # odeprecated "FileUtils#rake", "system \"rake\""
+    system "rake", *args
+  end
 end

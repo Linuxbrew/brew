@@ -53,7 +53,7 @@ module Homebrew
   module_function
 
   def audit
-    Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
+    inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
     Homebrew.auditing = true
 
     formula_count = 0
@@ -387,8 +387,10 @@ class FormulaAuditor
     end
   end
 
-  # core aliases + tap alias names + tap alias full name
-  @@aliases ||= Formula.aliases + Formula.tap_aliases
+  def self.aliases
+    # core aliases + tap alias names + tap alias full name
+    @aliases ||= Formula.aliases + Formula.tap_aliases
+  end
 
   def audit_formula_name
     return unless @strict
@@ -442,7 +444,7 @@ class FormulaAuditor
           problem "Dependency '#{dep.name}' was renamed; use new name '#{dep_f.name}'."
         end
 
-        if @@aliases.include?(dep.name) &&
+        if self.class.aliases.include?(dep.name) &&
            (dep_f.core_formula? || !dep_f.versioned_formula?)
           problem "Dependency '#{dep.name}' is an alias; use the canonical name '#{dep.to_formula.full_name}'."
         end
@@ -453,16 +455,16 @@ class FormulaAuditor
           problem "Dependency '#{dep.name}' may be unnecessary as it is provided by macOS; try to build this formula without it."
         end
 
-        dep.options.reject do |opt|
-          next true if dep_f.option_defined?(opt)
-          dep_f.requirements.detect do |r|
+        dep.options.each do |opt|
+          next if dep_f.option_defined?(opt)
+          next if dep_f.requirements.detect do |r|
             if r.recommended?
               opt.name == "with-#{r.name}"
             elsif r.optional?
               opt.name == "without-#{r.name}"
             end
           end
-        end.each do |opt|
+
           problem "Dependency #{dep} does not define option #{opt.name.inspect}"
         end
 
@@ -590,7 +592,7 @@ class FormulaAuditor
     return if metadata.nil?
 
     problem "GitHub fork (not canonical repository)" if metadata["fork"]
-    if user.casecmp("homebrew").zero? &&
+    if formula&.tap&.core_tap? &&
        (metadata["forks_count"] < 20) && (metadata["subscribers_count"] < 20) &&
        (metadata["stargazers_count"] < 50)
       problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
@@ -972,8 +974,12 @@ class FormulaAuditor
       problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
     end
 
-    if line =~ /assert !File\.exist\?/
-      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?`"
+    if line =~ /(assert !File\.exist\?|assert !\(.*\)\.exist\?)/
+      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
+    end
+
+    if line =~ /(assert File\.executable\?|assert \(.*\)\.executable\?)/
+      problem "Use `assert_predicate <path_to_file>, :executable?` instead of `#{Regexp.last_match(1)}`"
     end
 
     return unless @strict

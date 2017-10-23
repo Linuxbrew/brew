@@ -328,7 +328,7 @@ module Homebrew
     mkdir_p HOMEBREW_PREFIX/"lib"
     FileUtils.ln_sf interpreter, ld_so
   rescue FormulaUnavailableError
-    # Fix for brew tests, which uses NullLoader.
+    return
   end
 
   # Symlink the host's compiler
@@ -374,6 +374,7 @@ module Homebrew
   rescue FormulaInstallationAlreadyAttemptedError
     # We already attempted to install f as part of the dependency tree of
     # another formula. In that case, don't generate an error, just move on.
+    return
   rescue CannotInstallFormulaError => e
     ofail e.message
   end

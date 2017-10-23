@@ -82,7 +82,7 @@ end
 describe RuboCop::Cop::FormulaAudit::Comments do
   subject(:cop) { described_class.new }
 
-  context "When auditing formula" do
+  context "When auditing formulae" do
     it "with commented cmake call" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -154,7 +154,7 @@ end
 describe RuboCop::Cop::FormulaAudit::Miscellaneous do
   subject(:cop) { described_class.new }
 
-  context "When auditing formula" do
+  context "When auditing formulae" do
     it "with FileUtils" do
       source = <<-EOS.undent
         class Foo < Formula
@@ -380,7 +380,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
-    it "with build.universal? exempted formula" do
+    it "with a build.universal? exemption reports no offenses" do
       source = <<-EOS.undent
         class Wine < Formula
           desc "foo"
@@ -392,7 +392,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       EOS
 
       inspect_source(source, "/homebrew-core/Formula/wine.rb")
-      expect(cop.offenses).to eq([])
+      expect(cop.offenses).to be_empty
     end
 
     it "with ENV.universal_binary" do
@@ -419,7 +419,22 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       end
     end
 
-    it "with ENV.universal_binary" do
+    it "with an ENV.universal_binary exemption reports no offenses" do
+      source = <<-EOS.undent
+        class Wine < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build?
+             ENV.universal_binary
+          end
+        end
+      EOS
+
+      inspect_source(source, "/homebrew-core/Formula/wine.rb")
+      expect(cop.offenses).to be_empty
+    end
+
+    it "with ENV.x11" do
       source = <<-EOS.undent
         class Foo < Formula
           desc "foo"

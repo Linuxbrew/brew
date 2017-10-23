@@ -21,8 +21,8 @@ then
   fi
 elif [[ -n "$HOMEBREW_LINUX" ]]
 then
-  ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.x86_64_linux.bottle.tar.gz"
-  ruby_SHA="543c18bd33a300e6c16671437b1e0f17b03bb64e6a485fc15ff7de1eb1a0bc2a"
+  ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.x86_64_linux.bottle.1.tar.gz"
+  ruby_SHA="33643b1ca6f860d6df01686636326785763e5e81cf0cef37d8a7ab96a6ca1fa1"
 fi
 
 fetch() {
@@ -81,9 +81,9 @@ fetch() {
     trap - SIGINT
   fi
 
-  if [[ -x "$(which shasum)" ]]
+  if [[ -x "/usr/bin/shasum" ]]
   then
-    sha="$(shasum -a 256 "$CACHED_LOCATION" | cut -d' ' -f1)"
+    sha="$(/usr/bin/shasum -a 256 "$CACHED_LOCATION" | cut -d' ' -f1)"
   elif [[ -x "$(which sha256sum)" ]]
   then
     sha="$(sha256sum "$CACHED_LOCATION" | cut -d' ' -f1)"

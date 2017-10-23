@@ -64,7 +64,7 @@ class Dependency
   end
 
   def self._load(marshaled)
-    new(*Marshal.load(marshaled))
+    new(*Marshal.load(marshaled)) # rubocop:disable Security/MarshalLoad
   end
 
   class << self

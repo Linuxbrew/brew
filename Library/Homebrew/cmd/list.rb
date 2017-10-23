@@ -87,7 +87,7 @@ module Homebrew
     dirs.delete "etc"
     dirs.delete "var"
 
-    args = dirs + %w[-type f (]
+    args = dirs.sort + %w[-type f (]
     args.concat UNBREWED_EXCLUDE_FILES.flat_map { |f| %W[! -name #{f}] }
     args.concat UNBREWED_EXCLUDE_PATHS.flat_map { |d| %W[! -path #{d}] }
     args.concat %w[)]

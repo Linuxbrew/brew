@@ -4,6 +4,7 @@ require "ld64_dependency"
 require "requirement"
 require "requirements"
 require "set"
+require "extend/cachable"
 
 ## A dependency is a formula that another formula needs to install.
 ## A requirement is something other than a formula that another formula
@@ -16,16 +17,12 @@ require "set"
 # This class is used by `depends_on` in the formula DSL to turn dependency
 # specifications into the proper kinds of dependencies and requirements.
 class DependencyCollector
+  extend Cachable
+
   # Define the languages that we can handle as external dependencies.
   LANGUAGE_MODULES = Set[
     :lua, :lua51, :perl, :python, :python3, :ruby
   ].freeze
-
-  CACHE = {}
-
-  def self.clear_cache
-    CACHE.clear
-  end
 
   attr_reader :deps, :requirements
 
@@ -45,7 +42,7 @@ class DependencyCollector
   end
 
   def fetch(spec)
-    CACHE.fetch(cache_key(spec)) { |key| CACHE[key] = build(spec) }
+    self.class.cache.fetch(cache_key(spec)) { |key| self.class.cache[key] = build(spec) }
   end
 
   def cache_key(spec)
@@ -108,7 +105,8 @@ class DependencyCollector
     case spec
     when :x11        then OS.mac? ? X11Requirement.new(spec.to_s, tags) : XorgRequirement.new(spec.to_s, tags)
     when :xcode      then XcodeRequirement.new(tags)
-    when :macos      then tags.empty? ? MacOSRequirement.new : MinimumMacOSRequirement.new(tags)
+    when :linux      then LinuxRequirement.new(tags)
+    when :macos      then MacOSRequirement.new(tags)
     when :mysql      then MysqlRequirement.new(tags)
     when :postgresql then PostgresqlRequirement.new(tags)
     when :gpg        then GPG2Requirement.new(tags)

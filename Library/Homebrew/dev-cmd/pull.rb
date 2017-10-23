@@ -159,8 +159,8 @@ module Homebrew
 
         begin
           f = Formula[name]
-        # Make sure we catch syntax errors.
-        rescue Exception
+        rescue Exception # rubocop:disable Lint/RescueException
+          # Make sure we catch syntax errors.
           next
         end
 
@@ -610,7 +610,7 @@ module Homebrew
             req = Net::HTTP::Head.new bottle_info.url
             req.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
             res = http.request req
-            break if res.is_a?(Net::HTTPSuccess)
+            break if res.is_a?(Net::HTTPSuccess) || res.code == "302"
 
             unless res.is_a?(Net::HTTPClientError)
               raise "Failed to find published #{f} bottle at #{url} (#{res.code} #{res.message})!"
