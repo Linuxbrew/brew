@@ -127,12 +127,7 @@ class Tap
     if OS.mac?
       "https://github.com/#{full_name}"
     else
-      case "#{user}/#{repo}"
-      when "Homebrew/dupes"
-        "https://github.com/Linuxbrew/homebrew-#{repo}"
-      else
-        "https://github.com/#{user}/homebrew-#{repo}"
-      end
+      "https://github.com/#{user}/homebrew-#{repo}"
     end
   end
 
