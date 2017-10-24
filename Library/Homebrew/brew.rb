@@ -78,8 +78,8 @@ begin
   # - a help flag is passed AND a command is matched
   # - a help flag is passed AND there is no command specified
   # - no arguments are passed
-  # - if cmd is Cask, let Cask handle the help command instead
-  if (empty_argv || help_flag ) && cmd != "cask"
+  # - if cmd is Cask, let Cask handle the help command instead
+  if (empty_argv || help_flag) && cmd != "cask"
     require "cmd/help"
     Homebrew.help cmd, empty_argv: empty_argv
     # `Homebrew.help` never returns, except for external/unknown commands.
