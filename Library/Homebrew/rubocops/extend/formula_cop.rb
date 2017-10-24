@@ -56,6 +56,7 @@ module RuboCop
       # Returns all string nodes among the descendants of given node
       def find_strings(node)
         return [] if node.nil?
+        return node if node.str_type?
         node.each_descendant(:str)
       end
 
@@ -101,7 +102,9 @@ module RuboCop
       def find_method_with_args(node, method_name, *args)
         methods = find_every_method_call_by_name(node, method_name)
         methods.each do |method|
-          yield method if parameters_passed?(method, *args)
+          next unless parameters_passed?(method, *args)
+          return true unless block_given?
+          yield method
         end
       end
 
@@ -119,6 +122,7 @@ module RuboCop
                   method.receiver.method_name != instance
           @offense_source_range = method.source_range
           @offensive_node = method
+          return true unless block_given?
           yield method
         end
       end
@@ -165,6 +169,20 @@ module RuboCop
           @offense_source_range = node.source_range
         end
         type_match && name_match
+      end
+
+      # Find CONSTANTs in the source
+      # if block given, yield matching nodes
+      def find_const(node, const_name)
+        return if node.nil?
+        node.each_descendant(:const) do |const_node|
+          next unless const_node.const_name == const_name
+          @offensive_node = const_node
+          @offense_source_range = const_node.source_range
+          yield const_node if block_given?
+          return true
+        end
+        nil
       end
 
       def_node_search :required_dependency?, <<~EOS
@@ -222,15 +240,17 @@ module RuboCop
       end
 
       # Returns a method definition node with method_name
-      def find_method_def(node, method_name)
+      # Returns first method def if method_name is nil
+      def find_method_def(node, method_name = nil)
         return if node.nil?
         node.each_child_node(:def) do |def_node|
           def_method_name = method_name(def_node)
-          next unless method_name == def_method_name
+          next unless method_name == def_method_name || method_name.nil?
           @offensive_node = def_node
           @offense_source_range = def_node.source_range
           return def_node
         end
+        return if node.parent.nil?
         # If not found then, parent node becomes the offensive node
         @offensive_node = node.parent
         @offense_source_range = node.parent.source_range
@@ -250,11 +270,15 @@ module RuboCop
       end
 
       # Check if method_name is called among the direct children nodes in the given node
+      # Check if the node itself is the method
       def method_called?(node, method_name)
+        if node.send_type? && node.method_name == method_name
+          offending_node(node)
+          return true
+        end
         node.each_child_node(:send) do |call_node|
           next unless call_node.method_name == method_name
-          @offensive_node = call_node
-          @offense_source_range = call_node.source_range
+          offending_node(call_node)
           return true
         end
         false
@@ -289,6 +313,11 @@ module RuboCop
         @offense_source_range = first_node.source_range
         @offensive_node = first_node
         true
+      end
+
+      # Check if negation is present in the given node
+      def negated?(node)
+        method_called?(node, :!)
       end
 
       # Return all the caveats' string nodes in an array
