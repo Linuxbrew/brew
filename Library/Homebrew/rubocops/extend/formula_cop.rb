@@ -186,11 +186,11 @@ module RuboCop
       end
 
       def_node_search :required_dependency?, <<~EOS
-        (send nil :depends_on ({str sym} _))
+        (send nil? :depends_on ({str sym} _))
       EOS
 
       def_node_search :required_dependency_name?, <<~EOS
-        (send nil :depends_on ({str sym} %1))
+        (send nil? :depends_on ({str sym} %1))
       EOS
 
       def_node_search :dependency_type_hash_match?, <<~EOS

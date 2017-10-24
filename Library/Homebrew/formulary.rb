@@ -422,7 +422,7 @@ module Formulary
     CoreTap.instance.formula_dir/"#{name.to_s.downcase}.rb"
   end
 
-  def self.tap_paths(name, taps = Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/"])
+  def self.tap_paths(name, taps = Dir[HOMEBREW_LIBRARY/"Taps/*/*/"])
     name = name.to_s.downcase
     taps.map do |tap|
       Pathname.glob([

@@ -1,6 +1,3 @@
-require "rubocop"
-require "rubocop/rspec/support"
-require_relative "../../extend/string"
 require_relative "../../rubocops/patches_cop"
 
 describe RuboCop::Cop::FormulaAudit::Patches do
@@ -8,37 +5,24 @@ describe RuboCop::Cop::FormulaAudit::Patches do
 
   context "When auditing legacy patches" do
     it "When there is no legacy patch" do
-      source = <<~EOS
+      expect_no_offenses(<<~RUBY)
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
         end
-      EOS
-      inspect_source(source)
-      expect(cop.offenses).to eq([])
+      RUBY
     end
 
     it "Formula with `def patches`" do
-      source = <<~EOS
+      expect_offense(<<~RUBY)
         class Foo < Formula
           homepage "ftp://example.com/foo"
           url "http://example.com/foo-1.0.tgz"
           def patches
+          ^^^^^^^^^^^ Use the patch DSL instead of defining a 'patches' method
             DATA
           end
         end
-      EOS
-
-      expected_offenses = [{ message: "Use the patch DSL instead of defining a 'patches' method",
-                             severity: :convention,
-                             line: 4,
-                             column: 2,
-                             source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "Patch URLs" do
@@ -120,7 +104,10 @@ describe RuboCop::Cop::FormulaAudit::Patches do
              source: source }]
         end
         expected_offense.zip([cop.offenses.last]).each do |expected, actual|
-          expect_offense(expected, actual)
+          expect(actual.message).to eq(expected[:message])
+          expect(actual.severity).to eq(expected[:severity])
+          expect(actual.line).to eq(expected[:line])
+          expect(actual.column).to eq(expected[:column])
         end
       end
     end
@@ -157,7 +144,10 @@ describe RuboCop::Cop::FormulaAudit::Patches do
       inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
+        expect(actual.message).to eq(expected[:message])
+        expect(actual.severity).to eq(expected[:severity])
+        expect(actual.line).to eq(expected[:line])
+        expect(actual.column).to eq(expected[:column])
       end
     end
   end
@@ -233,7 +223,10 @@ describe RuboCop::Cop::FormulaAudit::Patches do
              source: source }]
         end
         expected_offense.zip([cop.offenses.last]).each do |expected, actual|
-          expect_offense(expected, actual)
+          expect(actual.message).to eq(expected[:message])
+          expect(actual.severity).to eq(expected[:severity])
+          expect(actual.line).to eq(expected[:line])
+          expect(actual.column).to eq(expected[:column])
         end
       end
     end

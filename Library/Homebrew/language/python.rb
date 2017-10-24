@@ -245,7 +245,7 @@ module Language
                           "-v", "--no-deps", "--no-binary", ":all:",
                           "--ignore-installed", *targets
         end
-      end # class Virtualenv
-    end # module Virtualenv
-  end # module Python
-end # module Language
+      end
+    end
+  end
+end

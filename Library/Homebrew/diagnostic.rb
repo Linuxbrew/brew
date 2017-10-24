@@ -1097,7 +1097,7 @@ module Homebrew
       def all
         methods.map(&:to_s).grep(/^check_/)
       end
-    end # end class Checks
+    end
   end
 end
 

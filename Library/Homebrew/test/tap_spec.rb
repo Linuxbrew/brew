@@ -1,6 +1,4 @@
 describe Tap do
-  include FileUtils
-
   alias_matcher :have_formula_file, :be_formula_file
   alias_matcher :have_custom_remote, :be_custom_remote
 
@@ -307,8 +305,6 @@ describe Tap do
 end
 
 describe CoreTap do
-  include FileUtils
-
   specify "attributes" do
     expect(subject.user).to eq("Homebrew")
     expect(subject.repo).to eq("core")
