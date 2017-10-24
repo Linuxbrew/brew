@@ -13,16 +13,7 @@ module Homebrew
     deps_of_installed = Set.new
 
     installed.each do |f|
-      deps = []
-
-      f.deps.each do |dep|
-        if dep.optional? || dep.recommended?
-          deps << dep.to_formula.full_name if f.build.with?(dep)
-        else
-          deps << dep.to_formula.full_name
-        end
-      end
-
+      deps = f.runtime_dependencies.map { |d| d.to_formula.full_name }
       deps_of_installed.merge(deps)
     end
 
