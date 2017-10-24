@@ -78,7 +78,8 @@ begin
   # - a help flag is passed AND a command is matched
   # - a help flag is passed AND there is no command specified
   # - no arguments are passed
-  if empty_argv || help_flag
+  # - if cmd is Cask, let Cask handle the help command instead
+  if (empty_argv || help_flag) && cmd != "cask"
     require "cmd/help"
     Homebrew.help cmd, empty_argv: empty_argv
     # `Homebrew.help` never returns, except for external/unknown commands.
@@ -116,8 +117,11 @@ begin
     if Process.uid.zero? && !brew_uid.zero?
       tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
     end
+    # Unset HOMEBREW_HELP to avoid confusing the tap
+    ENV.delete("HOMEBREW_HELP") if help_flag
     tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
     safe_system(*tap_commands)
+    ENV["HOMEBREW_HELP"] = "1" if help_flag
     exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
 rescue UsageError => e

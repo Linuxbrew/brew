@@ -154,7 +154,7 @@ module Hbc
     def run
       command_name, *args = detect_command_and_arguments(*@args)
       command = if help?
-        args.unshift(command_name)
+        args.unshift(command_name) unless command_name.nil?
         "help"
       else
         self.class.lookup_command(command_name)
@@ -230,8 +230,7 @@ module Hbc
 
         return if @command == "help" && @args.empty?
 
-        unknown_command = @args.empty? ? @command : @args.first
-        raise ArgumentError, "Unknown command: #{unknown_command}"
+        raise ArgumentError, "help does not take arguments."
       end
 
       def purpose
