@@ -1,5 +1,4 @@
 require "open3"
-require "shellwords"
 require "vendor/plist/plist"
 
 require "extend/io"
@@ -38,8 +37,6 @@ module Hbc
     end
 
     def initialize(executable, args: [], sudo: false, input: [], print_stdout: false, print_stderr: true, must_succeed: false, **options)
-      executable, *args = Shellwords.shellescape(executable) if args.empty?
-
       @executable = executable
       @args = args
       @sudo = sudo
