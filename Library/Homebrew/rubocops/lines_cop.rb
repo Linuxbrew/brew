@@ -94,12 +94,12 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, :build, :with?) do |method|
-            next unless negated?(method.parent)
+            next unless expression_negated?(method)
             problem "Don't negate 'build.with?': use 'build.without?'"
           end
 
           find_instance_method_call(body_node, :build, :without?) do |method|
-            next unless negated?(method.parent)
+            next unless expression_negated?(method)
             problem "Don't negate 'build.without?': use 'build.with?'"
           end
 

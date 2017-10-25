@@ -316,8 +316,10 @@ module RuboCop
       end
 
       # Check if negation is present in the given node
-      def negated?(node)
-        method_called?(node, :!)
+      def expression_negated?(node)
+        return false if node.parent.nil?
+        return false unless node.parent.method_name.equal?(:!)
+        offending_node(node.parent)
       end
 
       # Return all the caveats' string nodes in an array
