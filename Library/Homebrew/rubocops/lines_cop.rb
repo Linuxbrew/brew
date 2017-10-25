@@ -176,7 +176,7 @@ module RuboCop
           # Avoid hard-coding compilers
           find_every_method_call_by_name(body_node, :system).each do |method|
             param = parameters(method).first
-            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+            if match = regex_match_group(param, %r{^(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
               problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[2]}\""
             elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
               problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[2]}\""
@@ -185,9 +185,9 @@ module RuboCop
 
           find_instance_method_call(body_node, "ENV", :[]=) do |method|
             param = parameters(method)[1]
-            if match = regex_match_group(param, %r{(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
+            if match = regex_match_group(param, %r{^(/usr/bin/)?(gcc|llvm-gcc|clang)\s?})
               problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{match[2]}\""
-            elsif match = regex_match_group(param, %r{(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
+            elsif match = regex_match_group(param, %r{^(/usr/bin/)?((g|llvm-g|clang)\+\+)\s?})
               problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{match[2]}\""
             end
           end
