@@ -386,6 +386,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
 
+  * `readall` [tap]:
+    Import all formulae from specified taps (defaults to all installed taps).
+
+    This can be useful for debugging issues across all formulae when making
+    significant changes to `formula.rb`, testing the performance of loading
+    all formulae or to determine if any current formulae have Ruby issues.
+
   * `reinstall` `formula`:
     Uninstall and then install `formula`.
 
@@ -552,6 +559,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--force` (or `-f`) is specified then always do a slower, full update check even
     if unnecessary.
+
+  * `update-reset`:
+    Fetches and resets Homebrew and all tap repositories using `git`(1) to
+    their latest `origin/master`. Note this will destroy all your uncommitted
+    or committed changes.
 
   * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`formulae`]:
     Upgrade outdated, unpinned brews.
