@@ -31,6 +31,7 @@ module Hbc
       check_generic_artifacts
       check_token_conflicts
       check_download
+      check_single_uninstall_zap
       self
     rescue StandardError => e
       odebug "#{e.message}\n#{e.backtrace.join("\n")}"
@@ -47,6 +48,22 @@ module Hbc
     end
 
     private
+
+    def check_single_uninstall_zap
+      odebug "Auditing single uninstall_* and zap stanzas"
+
+      uninstalls = cask.artifacts.find_all { |k| k.is_a?(Hbc::Artifact::Uninstall) }
+      add_warning "there should be a single uninstall stanza" unless uninstalls.size <= 1
+
+      uninstalls_preflight = cask.artifacts.find_all { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.keys.include?("uninstall_preflight") }
+      add_warning "there should be a single uninstall_preflight stanza" unless uninstalls_preflight.size <= 1
+
+      uninstalls_postflight = cask.artifacts.find_all { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.keys.include?("uninstall_postflight") }
+      add_warning "there should be a single uninstall_postflight stanza" unless uninstalls_postflight.size <= 1
+
+      zaps = cask.artifacts.find_all { |k| k.is_a?(Hbc::Artifact::Zap) }
+      add_warning "there should be a single zap stanza" unless zaps.size <= 1
+    end
 
     def check_required_stanzas
       odebug "Auditing required stanzas"
