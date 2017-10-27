@@ -60,16 +60,16 @@ Lint/ParenthesesAsGroupedExpression:
 
 # TODO: try to bring down all metrics maximums
 Metrics/AbcSize:
-  Max: 250
+  Enabled: false
 
 Metrics/BlockLength:
-  Max: 144
+  Enabled: false
 
 Metrics/ClassLength:
-  Max: 589
+  Enabled: false
 
 Metrics/CyclomaticComplexity:
-  Max: 75
+  Enabled: false
 
 Metrics/LineLength:
   Max: 324
@@ -77,17 +77,16 @@ Metrics/LineLength:
   IgnoredPatterns: ['#: ']
 
 Metrics/MethodLength:
-  Max: 222
+  Enabled: false
 
 Metrics/ModuleLength:
-  CountComments: false
-  Max: 367
+  Enabled: false
 
 Metrics/ParameterLists:
   CountKeywordArgs: false
 
 Metrics/PerceivedComplexity:
-  Max: 100
+  Enabled: false
 
 # makes code less readable for minor performance increases
 Performance/Caller:
