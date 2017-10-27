@@ -25,6 +25,10 @@ Lint/NestedMethodDefinition:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: true
 
+# TODO: try to bring down all metrics maximums
+Metrics/AbcSize:
+  Max: 250
+
 Metrics/BlockLength:
   Max: 1250
 
@@ -34,11 +38,23 @@ Metrics/BlockNesting:
 Metrics/ClassLength:
   Max: 1226
 
+Metrics/CyclomaticComplexity:
+  Max: 75
+
 Metrics/LineLength:
+  # 124 is the goal as GitHub diff UI wraps beyond that
   Max: 244
+  # ignore manpage comments
+  IgnoredPatterns: ['#: ']
 
 Metrics/MethodLength:
   Max: 195
+
+Metrics/ModuleLength:
+  Max: 222
+
+Metrics/PerceivedComplexity:
+  Max: 100
 
 # we won't change backward compatible method names
 Naming/MethodName:

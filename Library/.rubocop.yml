@@ -58,7 +58,7 @@ Lint/EndAlignment:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false
 
-# TODO: try to bring down all metrics maximums
+# most metrics don't make sense to apply for formulae/taps
 Metrics/AbcSize:
   Enabled: false
 
@@ -72,9 +72,10 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 
 Metrics/LineLength:
-  Max: 324
-  # ignore manpage comments
-  IgnoredPatterns: ['#: ']
+  # 124 is the goal as GitHub diff UI wraps beyond that
+  Max: 190
+  # ignore manpage comments and long single-line strings
+  IgnoredPatterns: ['#: ', ' url "', ' mirror "', ' plist_options :']
 
 Metrics/MethodLength:
   Enabled: false
