@@ -45,7 +45,7 @@ _create_lock() {
   if [[ -x "$ruby" ]] && "$ruby" -e "exit(RUBY_VERSION >= '1.8.7')"
   then
     "$ruby" -e "File.new($lock_fd).flock(File::LOCK_EX | File::LOCK_NB) || exit(1)"
-  elif [[ -x "$(which flock)" ]]
+  elif [[ -x "$(which flock 2>/dev/null)" ]]
   then
     flock -n "$lock_fd"
   elif [[ -x "$python" ]]
