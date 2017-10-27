@@ -21,7 +21,6 @@ module Homebrew
   module_function
 
   def tap_info
-    # TODO: This still returns a non-alphabetised list on APFS.
     if ARGV.include? "--installed"
       taps = Tap
     else
@@ -31,9 +30,9 @@ module Homebrew
     end
 
     if ARGV.json == "v1"
-      print_tap_json(taps)
+      print_tap_json(taps.sort_by {|tap| tap.to_s})
     else
-      print_tap_info(taps)
+      print_tap_info(taps.sort_by {|tap| tap.to_s})
     end
   end
 
