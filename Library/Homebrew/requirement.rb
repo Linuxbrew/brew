@@ -95,7 +95,7 @@ class Requirement
     parent = satisfied_result_parent
     return unless parent
     return if PATH.new(ENV["PATH"]).include?(parent.to_s)
-    ENV.append_path("PATH", parent)
+    ENV.prepend_path("PATH", parent)
   end
 
   def env
