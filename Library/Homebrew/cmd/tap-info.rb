@@ -30,9 +30,9 @@ module Homebrew
     end
 
     if ARGV.json == "v1"
-      print_tap_json(taps.sort_by {|tap| tap.to_s})
+      print_tap_json(taps.sort_by(&:to_s))
     else
-      print_tap_info(taps.sort_by {|tap| tap.to_s})
+      print_tap_info(taps.sort_by(&:to_s))
     end
   end
 
