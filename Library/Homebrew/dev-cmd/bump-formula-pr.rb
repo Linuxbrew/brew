@@ -109,6 +109,10 @@ module Homebrew
   end
 
   def bump_formula_pr
+    # As this command is simplifying user run commands then let's just use a
+    # user path, too.
+    ENV["PATH"] = ENV["HOMEBREW_PATH"]
+
     formula = ARGV.formulae.first
 
     if formula
