@@ -91,6 +91,16 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
       RUBY
     end
 
+    it "When the description ends with a full stop" do
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          desc 'Description with a full stop at the end.'
+                                                       ^ Description shouldn\'t end with a full stop
+        end
+      RUBY
+    end
+
     it "autocorrects all rules" do
       source = <<~EOS
         class Foo < Formula
