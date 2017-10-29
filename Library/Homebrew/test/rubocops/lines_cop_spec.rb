@@ -762,8 +762,8 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
-          depends_on "foo" if build.with? "with-foo"
-          ^^^^^^^^^^^^^^^^ Replace depends_on "foo" if build.with? "with-foo" with depends_on "foo" => :optional
+          depends_on "foo" if build.with? "foo"
+          ^^^^^^^^^^^^^^^^ Replace depends_on "foo" if build.with? "foo" with depends_on "foo" => :optional
         end
       RUBY
     end

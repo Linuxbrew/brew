@@ -105,25 +105,25 @@ module RuboCop
 
           find_instance_method_call(body_node, :build, :without?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, /-?-?without-(.*)/)
+            next unless match = regex_match_group(arg, /^-?-?without-(.*)/)
             problem "Don't duplicate 'without': Use `build.without? \"#{match[1]}\"` to check for \"--without-#{match[1]}\""
           end
 
           find_instance_method_call(body_node, :build, :with?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, /-?-?with-(.*)/)
+            next unless match = regex_match_group(arg, /^-?-?with-(.*)/)
             problem "Don't duplicate 'with': Use `build.with? \"#{match[1]}\"` to check for \"--with-#{match[1]}\""
           end
 
           find_instance_method_call(body_node, :build, :include?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, /with(out)?-(.*)/)
+            next unless match = regex_match_group(arg, /^with(out)?-(.*)/)
             problem "Use build.with#{match[1]}? \"#{match[2]}\" instead of build.include? 'with#{match[1]}-#{match[2]}'"
           end
 
           find_instance_method_call(body_node, :build, :include?) do |method|
             arg = parameters(method).first
-            next unless match = regex_match_group(arg, /\-\-(.*)/)
+            next unless match = regex_match_group(arg, /^\-\-(.*)$/)
             problem "Reference '#{match[1]}' without dashes"
           end
         end
@@ -145,7 +145,7 @@ module RuboCop
           # Check for long inreplace block vars
           find_all_blocks(body_node, :inreplace) do |node|
             block_arg = node.arguments.children.first
-            next unless block_arg.source.size>1
+            next unless block_arg.source.size > 1
             problem "\"inreplace <filenames> do |s|\" is preferred over \"|#{block_arg.source}|\"."
           end
 
@@ -169,7 +169,7 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, :man, :+) do |method|
-            next unless match = regex_match_group(parameters(method).first, /man[1-8]/)
+            next unless match = regex_match_group(parameters(method).first, /^man[1-8]$/)
             problem "\"#{method.source}\" should be \"#{match[0]}\""
           end
 
@@ -194,18 +194,18 @@ module RuboCop
 
           # Prefer formula path shortcuts in strings
           formula_path_strings(body_node, :share) do |p|
-            next unless match = regex_match_group(p, %r{(/(man))/?})
+            next unless match = regex_match_group(p, %r{^(/(man))/?})
             problem "\"\#{share}#{match[1]}\" should be \"\#{#{match[2]}}\""
           end
 
           formula_path_strings(body_node, :prefix) do |p|
-            if match = regex_match_group(p, %r{(/share/(info|man))$})
+            if match = regex_match_group(p, %r{^(/share/(info|man))$})
               problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2]}}\""
             end
-            if match = regex_match_group(p, %r{((/share/man/)(man[1-8]))})
+            if match = regex_match_group(p, %r{^((/share/man/)(man[1-8]))})
               problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[3]}}\""
             end
-            if match = regex_match_group(p, %r{(/(bin|include|libexec|lib|sbin|share|Frameworks))}i)
+            if match = regex_match_group(p, %r{^(/(bin|include|libexec|lib|sbin|share|Frameworks))}i)
               problem "\"\#\{prefix}#{match[1]}\" should be \"\#{#{match[2].downcase}}\""
             end
           end
@@ -213,12 +213,12 @@ module RuboCop
           find_every_method_call_by_name(body_node, :depends_on).each do |method|
             key, value = destructure_hash(parameters(method).first)
             next if key.nil? || value.nil?
-            next unless match = regex_match_group(value, /(lua|perl|python|ruby)(\d*)/)
+            next unless match = regex_match_group(value, /^(lua|perl|python|ruby)(\d*)/)
             problem "#{match[1]} modules should be vendored rather than use deprecated #{method.source}`"
           end
 
           find_every_method_call_by_name(body_node, :system).each do |method|
-            next unless match = regex_match_group(parameters(method).first, /(env|export)(\s+)?/)
+            next unless match = regex_match_group(parameters(method).first, /^(env|export)(\s+)?/)
             problem "Use ENV instead of invoking '#{match[1]}' to modify the environment"
           end
 
@@ -243,7 +243,7 @@ module RuboCop
 
           find_instance_method_call(body_node, "ARGV", :include?) do |method|
             param = parameters(method).first
-            next unless match = regex_match_group(param, /--(HEAD|devel)/)
+            next unless match = regex_match_group(param, /^--(HEAD|devel)/)
             problem "Use \"if build.#{match[1].downcase}?\" instead"
           end
 
@@ -258,14 +258,14 @@ module RuboCop
           conditional_dependencies(body_node) do |node, method, param, dep_node|
             dep = string_content(dep_node)
             if node.if?
-              if (method == :include? && regex_match_group(param, /with-#{dep}$/)) ||
-                 (method == :with? && regex_match_group(param, /#{dep}$/))
+              if (method == :include? && regex_match_group(param, /^with-#{dep}$/)) ||
+                 (method == :with? && regex_match_group(param, /^#{dep}$/))
                 offending_node(dep_node.parent)
                 problem "Replace #{node.source} with #{dep_node.parent.source} => :optional"
               end
             elsif node.unless?
-              if (method == :include? && regex_match_group(param, /without-#{dep}$/)) ||
-                 (method == :without? && regex_match_group(param, /#{dep}$/))
+              if (method == :include? && regex_match_group(param, /^without-#{dep}$/)) ||
+                 (method == :without? && regex_match_group(param, /^#{dep}$/))
                 offending_node(dep_node.parent)
                 problem "Replace #{node.source} with #{dep_node.parent.source} => :recommended"
               end
@@ -276,7 +276,7 @@ module RuboCop
             problem "'fails_with :llvm' is now a no-op so should be removed"
           end
 
-          find_method_with_args(body_node, :system, /(otool|install_name_tool|lipo)/) do
+          find_method_with_args(body_node, :system, /^(otool|install_name_tool|lipo)/) do
             next if @formula_name == "cctools"
             problem "Use ruby-macho instead of calling #{@offensive_node.source}"
           end
