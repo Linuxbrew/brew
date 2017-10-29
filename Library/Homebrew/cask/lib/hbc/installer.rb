@@ -19,7 +19,7 @@ module Hbc
 
     PERSISTENT_METADATA_SUBDIRS = ["gpg"].freeze
 
-    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, binaries: true, verbose: false, require_sha: false)
+    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, binaries: true, verbose: false, require_sha: false, upgrade: false)
       @cask = cask
       @command = command
       @force = force
@@ -28,6 +28,7 @@ module Hbc
       @verbose = verbose
       @require_sha = require_sha
       @reinstall = false
+      @upgrade = upgrade
     end
 
     attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :verbose?
@@ -82,7 +83,7 @@ module Hbc
     def install
       odebug "Hbc::Installer#install"
 
-      if @cask.installed? && !force? && !@reinstall
+      if @cask.installed? && !force? && !@reinstall && !@upgrade
         raise CaskAlreadyInstalledError, @cask
       end
 
@@ -129,7 +130,7 @@ module Hbc
       installed_cask = installed_caskfile.exist? ? CaskLoader.load(installed_caskfile) : @cask
 
       # Always force uninstallation, ignore method parameter
-      Installer.new(installed_cask, binaries: binaries?, verbose: verbose?, force: true).uninstall
+      Installer.new(installed_cask, binaries: binaries?, verbose: verbose?, force: true, upgrade: @upgrade).uninstall
     end
 
     def summary
@@ -368,6 +369,15 @@ module Hbc
       oh1 "Uninstalling Cask #{@cask}"
       disable_accessibility_access
       uninstall_artifacts
+      return if @upgrade
+
+      purge_versioned_files
+      purge_caskroom_path if force?
+    end
+
+    def finalize_upgrade
+      return unless @upgrade
+
       purge_versioned_files
       purge_caskroom_path if force?
     end
