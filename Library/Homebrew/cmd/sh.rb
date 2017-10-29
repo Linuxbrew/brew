@@ -25,7 +25,11 @@ module Homebrew
       # superenv stopped adding brew's bin but generally users will want it
       ENV["PATH"] = PATH.new(ENV["PATH"]).insert(1, HOMEBREW_PREFIX/"bin")
     end
-    ENV["PS1"] = 'brew \[\033[1;32m\]\w\[\033[0m\]$ '
+    if ENV["SHELL"].include?("zsh")
+      ENV["PS1"] = "brew %B%F{green}~%f%b$ "
+    else
+      ENV["PS1"] = 'brew \[\033[1;32m\]\w\[\033[0m\]$ '
+    end
     ENV["VERBOSE"] = "1"
     puts <<~EOS
       Your shell has been configured to use Homebrew's build environment;
