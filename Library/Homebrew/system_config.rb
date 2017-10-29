@@ -73,7 +73,7 @@ class SystemConfig
     end
 
     def describe_perl
-      describe_path(which("perl"))
+      describe_path(which("perl", ENV["HOMEBREW_PATH"]))
     end
 
     def describe_python
@@ -96,7 +96,7 @@ class SystemConfig
     end
 
     def describe_ruby
-      ruby = which "ruby"
+      ruby = which "ruby", ENV["HOMEBREW_PATH"]
       return "N/A" if ruby.nil?
       ruby_binary = Utils.popen_read ruby, "-rrbconfig", "-e", \
         'include RbConfig;print"#{CONFIG["bindir"]}/#{CONFIG["ruby_install_name"]}#{CONFIG["EXEEXT"]}"'
