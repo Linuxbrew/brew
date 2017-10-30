@@ -726,6 +726,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--message=``message` is passed, append `message` to the default PR
     message.
 
+    If `--no-browse` is passed, don't pass the `--browse` argument to `hub`
+    which opens the pull request URL in a browser. Instead, output it to the
+    command line.
+
     Note that this command cannot be used to transition a formula from a
     URL-and-sha256 style specification into a tag-and-revision style
     specification, nor vice versa. It must use whichever style specification

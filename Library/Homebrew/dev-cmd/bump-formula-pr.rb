@@ -29,6 +29,10 @@
 #:    If `--message=`<message> is passed, append <message> to the default PR
 #:    message.
 #:
+#:    If `--no-browse` is passed, don't pass the `--browse` argument to `hub`
+#:    which opens the pull request URL in a browser. Instead, output it to the
+#:    command line.
+#:
 #:    Note that this command cannot be used to transition a formula from a
 #:    URL-and-sha256 style specification into a tag-and-revision style
 #:    specification, nor vice versa. It must use whichever style specification
@@ -297,13 +301,21 @@ module Homebrew
       git_dir = Utils.popen_read("git rev-parse --git-dir").chomp
       shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
 
+      hub_args = []
+      git_final_checkout_args = []
+      if ARGV.include?("--no-browse")
+        git_final_checkout_args << "--quiet"
+      else
+        hub_args << "--browse"
+      end
+
       if ARGV.dry_run?
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
         ohai "hub fork # read $HUB_REMOTE"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
-        ohai "hub pull-request --browse -m '#{formula.name} #{new_formula_version}#{devel_message}'"
+        ohai "hub pull-request #{hub_args.join(" ")} -m '#{formula.name} #{new_formula_version}#{devel_message}'"
         ohai "git checkout -"
       else
         safe_system "git", "fetch", "--unshallow", "origin" if shallow
@@ -328,8 +340,8 @@ module Homebrew
             #{user_message}
           EOS
         end
-        safe_system "hub", "pull-request", "--browse", "-m", pr_message
-        safe_system "git", "checkout", "-"
+        safe_system "hub", "pull-request", *hub_args, "-m", pr_message
+        safe_system "git", "checkout", *git_final_checkout_args, "-"
       end
     end
   end
