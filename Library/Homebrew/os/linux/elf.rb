@@ -11,17 +11,25 @@ module ELF
       header = read(8).unpack("N2")
       case header[0]
       when 0x7f454c46 # ELF
+        # Instruction set architecture
         arch = case read(2, 18).unpack("v")[0]
         when 3 then :i386
         when 62 then :x86_64
         else :dunno
         end
+        # Operating system ABI
+        os = case read(1, 7).unpack("C")[0]
+        when 0 then :linux # "System V" is often used to mean Linux.
+        when 3 then :linux
+        else :dunno
+        end
+        # Type of file (executable, shared library, core)
         type = case read(2, 16).unpack("v")[0]
         when 2 then :executable
         when 3 then :dylib
         else :dunno
         end
-        [{ arch: arch, type: type }]
+        [{ arch: arch, os: os, type: type }]
       else
         raise "Not an ELF binary."
       end
@@ -119,6 +127,7 @@ module ELF
   end
 
   def archs
+    return :dunno if elf_data.first[:os] != :linux
     elf_data.map { |m| m.fetch :arch }.extend(ArchitectureListExtension)
   end
 
