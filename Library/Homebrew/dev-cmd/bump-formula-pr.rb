@@ -335,8 +335,9 @@ module Homebrew
         EOS
         user_message = ARGV.value("message")
         if user_message
-          pr_message += <<~EOS
+          pr_message += "\n" + <<~EOS
             ---
+
             #{user_message}
           EOS
         end
