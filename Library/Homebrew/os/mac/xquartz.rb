@@ -26,6 +26,8 @@ module OS
         "2.7.73" => "2.7.7",
         "2.7.86" => "2.7.8",
         "2.7.94" => "2.7.9",
+        "2.7.108" => "2.7.10",
+        "2.7.112" => "2.7.11",
       }.freeze
 
       # This returns the version number of XQuartz, not of the upstream X.org.
