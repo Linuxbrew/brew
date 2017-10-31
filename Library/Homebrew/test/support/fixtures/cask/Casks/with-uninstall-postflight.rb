@@ -7,5 +7,6 @@ cask 'with-uninstall-postflight' do
 
   pkg 'MyFancyPkg/Fancy.pkg'
 
-  uninstall_postflight do end
+  uninstall_postflight do
+  end
 end

@@ -7,7 +7,9 @@ cask 'with-preflight-multi' do
 
   pkg 'MyFancyPkg/Fancy.pkg'
 
-  preflight do end
+  preflight do
+  end
 
-  preflight do end
+  preflight do
+  end
 end
