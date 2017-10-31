@@ -83,8 +83,8 @@ module Hbc
     def install
       odebug "Hbc::Installer#install"
 
-      if @cask.installed? && !force? && !@reinstall && !@upgrade
-        raise CaskAlreadyInstalledError, @cask
+      if @cask.installed? && !force? && !@reinstall
+        raise CaskAlreadyInstalledError, @cask unless @upgrade
       end
 
       check_conflicts
@@ -369,17 +369,28 @@ module Hbc
       oh1 "Uninstalling Cask #{@cask}"
       disable_accessibility_access
       uninstall_artifacts
-      return if @upgrade
-
       purge_versioned_files
       purge_caskroom_path if force?
     end
 
+    def start_upgrade
+      return unless @upgrade
+      oh1 "Starting upgrade for Cask #{@cask}"
+
+      disable_accessibility_access
+      uninstall_artifacts
+    end
+
+    def revert_upgrade
+      return unless @upgrade
+      opoo "Reverting upgrade for Cask #{@cask}"
+      reinstall
+    end
+
     def finalize_upgrade
       return unless @upgrade
-
-      purge_versioned_files
-      purge_caskroom_path if force?
+      purge_versioned_files(upgrade: true)
+      oh1 "Cask #{@cask} was successfully upgraded!"
     end
 
     def uninstall_artifacts
@@ -414,7 +425,7 @@ module Hbc
       Utils.gain_permissions_remove(path, command: @command)
     end
 
-    def purge_versioned_files
+    def purge_versioned_files(upgrade: false)
       odebug "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
@@ -430,10 +441,10 @@ module Hbc
         end
       end
       @cask.metadata_versioned_path.rmdir_if_possible
-      @cask.metadata_master_container_path.rmdir_if_possible
+      @cask.metadata_master_container_path.rmdir_if_possible unless upgrade
 
       # toplevel staged distribution
-      @cask.caskroom_path.rmdir_if_possible
+      @cask.caskroom_path.rmdir_if_possible unless upgrade
     end
 
     def purge_caskroom_path

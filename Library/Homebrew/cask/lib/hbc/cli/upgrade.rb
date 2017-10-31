@@ -34,25 +34,29 @@ module Hbc
 
           old_cask_installer = Installer.new(old_cask, binaries: binaries?, verbose: verbose?, force: force?, upgrade: true)
 
-          old_cask_installer.uninstall
+          new_cask = CaskLoader.load(old_cask.to_s)
 
-          begin
-            odebug "Installing new version of Cask #{old_cask}"
-
-            new_cask = CaskLoader.load(old_cask.to_s)
-
+          new_cask_installer =
             Installer.new(new_cask, binaries:       binaries?,
                                     verbose:        verbose?,
                                     force:          force?,
                                     skip_cask_deps: skip_cask_deps?,
                                     require_sha:    require_sha?,
-                                    upgrade: true).install
+                                    upgrade: true)
 
+          begin
+            # purge artifacts BUT keep metadata aside
+            old_cask_installer.start_upgrade
+
+            # install BUT do not yet save metadata
+
+            new_cask_installer.install
+
+            # if successful, remove old metadata and install new
             old_cask_installer.finalize_upgrade
-          rescue CaskUnavailableError => e
+          rescue CaskError => e
             opoo e.message
-          rescue CaskAlreadyInstalledError => e
-            opoo e.message
+            old_cask_installer.revert_upgrade
           end
         end
       end
