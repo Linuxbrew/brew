@@ -51,5 +51,14 @@ module RuboCop
         end
       end
     end
+    module FormulaAuditStrict
+      class Text < FormulaCop
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          find_method_with_args(body_node, :go_resource) do
+            problem "`go_resource`s are deprecated. Please ask upstream to implement Go vendoring"
+          end
+        end
+      end
+    end
   end
 end
