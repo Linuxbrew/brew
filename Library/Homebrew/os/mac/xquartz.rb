@@ -54,7 +54,7 @@ module OS
         when "10.5"
           "2.6.3"
         else
-          "2.7.9"
+          "2.7.11"
         end
       end
 
