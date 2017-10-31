@@ -46,7 +46,7 @@ module RuboCop
           end
 
           find_method_with_args(body_node, :system, "go", "get") do
-            problem "Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s."
+            problem "Do not use `go get`. Please ask upstream to implement Go vendoring"
           end
         end
       end
