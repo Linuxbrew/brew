@@ -40,7 +40,7 @@ module RuboCop
       # - Checks for correct usage of `command-line` in `desc`
       # - Checks description starts with a capital letter
       # - Checks if `desc` contains the formula name
-      # - Checks if `desc` ends with a full stop
+      # - Checks if `desc` ends with a full stop (apart from in the case of "etc.")
       class Desc < FormulaCop
         VALID_LOWERCASE_WORDS = %w[
           ex
@@ -83,8 +83,8 @@ module RuboCop
             problem "Description shouldn't start with the formula name"
           end
 
-          # Check if a full stop is used at the end of a formula's desc
-          return unless regex_match_group(desc, /\.$/)
+          # Check if a full stop is used at the end of a formula's desc (apart from in the case of "etc.")
+          return unless regex_match_group(desc, /\.$/) && !string_content(desc).end_with?("etc.")
           problem "Description shouldn't end with a full stop"
         end
 
