@@ -103,7 +103,7 @@ module RuboCop
             correction.gsub!(/(^|[^a-z])#{@formula_name}([^a-z]|$)/i, "\\1\\2")
             correction.gsub!(/^(['"]?)\s+/, "\\1")
             correction.gsub!(/\s+(['"]?)$/, "\\1")
-            correction.gsub!(/\.$/, "")
+            correction.gsub!(/\.(['"]?)$/, "\\1")
             corrector.insert_before(node.source_range, correction)
             corrector.remove(node.source_range)
           end
