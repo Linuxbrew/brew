@@ -53,21 +53,33 @@ module Hbc
     def check_single_pre_postflight
       odebug "Auditing preflight and postflight stanzas"
 
-      add_warning "only a single preflight stanza is allowed" if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.key?(:preflight) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.key?(:preflight) } > 1
+        add_warning "only a single preflight stanza is allowed"
+      end
 
-      add_warning "only a single postflight stanza is allowed" if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:postflight) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:postflight) } > 1
+        add_warning "only a single postflight stanza is allowed"
+      end
     end
 
     def check_single_uninstall_zap
       odebug "Auditing single uninstall_* and zap stanzas"
 
-      add_warning "only a single uninstall stanza is allowed" if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Uninstall) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Uninstall) } > 1
+        add_warning "only a single uninstall stanza is allowed"
+      end
 
-      add_warning "only a single uninstall_preflight stanza is allowed" if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.key?(:uninstall_preflight) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.key?(:uninstall_preflight) } > 1
+        add_warning "only a single uninstall_preflight stanza is allowed"
+      end
 
-      add_warning "only a single uninstall_postflight stanza is allowed" if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:uninstall_postflight) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:uninstall_postflight) } > 1
+        add_warning "only a single uninstall_postflight stanza is allowed"
+      end
 
-      add_warning "only a single zap stanza is allowed" if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Zap) } > 1
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Zap) } > 1
+        add_warning "only a single zap stanza is allowed"
+      end
     end
 
     def check_required_stanzas
