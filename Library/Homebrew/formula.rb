@@ -1528,10 +1528,10 @@ class Formula
       "oldname" => oldname,
       "aliases" => aliases,
       "versions" => {
-        "stable" => stable&.version.to_s,
+        "stable" => stable&.version&.to_s,
         "bottle" => bottle ? true : false,
-        "devel" => devel&.version.to_s,
-        "head" => head&.version.to_s,
+        "devel" => devel&.version&.to_s,
+        "head" => head&.version&.to_s,
       },
       "revision" => revision,
       "version_scheme" => version_scheme,
