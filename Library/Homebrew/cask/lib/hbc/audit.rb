@@ -57,9 +57,8 @@ module Hbc
         add_warning "only a single preflight stanza is allowed"
       end
 
-      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:postflight) } > 1
-        add_warning "only a single postflight stanza is allowed"
-      end
+      return unless cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:postflight) } > 1
+      add_warning "only a single postflight stanza is allowed"
     end
 
     def check_single_uninstall_zap
@@ -77,9 +76,8 @@ module Hbc
         add_warning "only a single uninstall_postflight stanza is allowed"
       end
 
-      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Zap) } > 1
-        add_warning "only a single zap stanza is allowed"
-      end
+      return unless cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Zap) } > 1
+      add_warning "only a single zap stanza is allowed"
     end
 
     def check_required_stanzas
