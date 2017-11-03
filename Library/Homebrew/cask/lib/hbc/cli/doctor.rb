@@ -3,6 +3,8 @@ require "system_config"
 module Hbc
   class CLI
     class Doctor < AbstractCommand
+      attr_accessor :failed
+
       def initialize(*)
         super
         return if args.empty?
@@ -35,6 +37,8 @@ module Hbc
         ]
 
         (self.class.locale_variables + environment_variables).sort.each(&self.class.method(:render_env_var))
+
+        raise CaskError, "One or more checks failed." if @failed
       end
 
       def self.locale_variables
@@ -61,6 +65,7 @@ module Hbc
       def self.cask_count_for_tap(tap)
         Formatter.pluralize(tap.cask_files.count, "cask")
       rescue StandardError
+        @failed = true
         "0 #{error_string "error reading #{tap.path}"}"
       end
 
@@ -92,6 +97,7 @@ module Hbc
         if locations.empty?
           none_string
         else
+          @failed = true
           locations.collect do |l|
             "#{l} #{error_string 'error: legacy install. Run "brew uninstall --force brew-cask".'}"
           end
@@ -101,8 +107,10 @@ module Hbc
       def self.render_staging_location(path)
         path = Pathname.new(user_tilde(path.to_s))
         if !path.exist?
+          @failed = true
           "#{path} #{error_string "error: path does not exist"}"
         elsif !path.writable?
+          @failed = true
           "#{path} #{error_string "error: not writable by current user"}"
         else
           path
