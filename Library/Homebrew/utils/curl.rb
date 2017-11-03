@@ -34,7 +34,11 @@ def curl_args(*extra_args, show_output: false, user_agent: :default)
 end
 
 def curl(*args)
-  safe_system(*curl_args(*args))
+  # SSL_CERT_FILE can be incorrectly set by users or portable-ruby and screw
+  # with SSL downloads so unset it here.
+  with_env SSL_CERT_FILE: nil do
+    safe_system(*curl_args(*args))
+  end
 end
 
 def curl_download(*args, to: nil, continue_at: "-", **options)
