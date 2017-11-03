@@ -31,6 +31,8 @@ module Hbc
       check_generic_artifacts
       check_token_conflicts
       check_download
+      check_single_pre_postflight
+      check_single_uninstall_zap
       self
     rescue StandardError => e
       odebug "#{e.message}\n#{e.backtrace.join("\n")}"
@@ -47,6 +49,36 @@ module Hbc
     end
 
     private
+
+    def check_single_pre_postflight
+      odebug "Auditing preflight and postflight stanzas"
+
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.key?(:preflight) } > 1
+        add_warning "only a single preflight stanza is allowed"
+      end
+
+      return unless cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:postflight) } > 1
+      add_warning "only a single postflight stanza is allowed"
+    end
+
+    def check_single_uninstall_zap
+      odebug "Auditing single uninstall_* and zap stanzas"
+
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Uninstall) } > 1
+        add_warning "only a single uninstall stanza is allowed"
+      end
+
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PreflightBlock) && k.directives.key?(:uninstall_preflight) } > 1
+        add_warning "only a single uninstall_preflight stanza is allowed"
+      end
+
+      if cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::PostflightBlock) && k.directives.key?(:uninstall_postflight) } > 1
+        add_warning "only a single uninstall_postflight stanza is allowed"
+      end
+
+      return unless cask.artifacts.count { |k| k.is_a?(Hbc::Artifact::Zap) } > 1
+      add_warning "only a single zap stanza is allowed"
+    end
 
     def check_required_stanzas
       odebug "Auditing required stanzas"
