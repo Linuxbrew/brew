@@ -77,7 +77,11 @@ class Requirement
 
   def satisfied_result_parent
     return unless @satisfied_result.is_a?(Pathname)
-    @satisfied_result.resolved_path.parent
+    parent = @satisfied_result.resolved_path.parent
+    if parent.to_s =~ %r{^#{Regexp.escape(HOMEBREW_CELLAR)}/([\w+-.@]+)/[^/]+/(s?bin)/?$}
+      parent = HOMEBREW_PREFIX/"opt/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}"
+    end
+    parent
   end
 
   # Overriding #modify_build_environment is deprecated.
@@ -94,8 +98,9 @@ class Requirement
     # PATH.
     parent = satisfied_result_parent
     return unless parent
+    return if ["#{HOMEBREW_PREFIX}/bin", "#{HOMEBREW_PREFIX}/bin"].include?(parent.to_s)
     return if PATH.new(ENV["PATH"]).include?(parent.to_s)
-    ENV.append_path("PATH", parent)
+    ENV.prepend_path("PATH", parent)
   end
 
   def env
