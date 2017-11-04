@@ -148,6 +148,15 @@ class SystemConfig
       "#{Utils.git_version} => #{Utils.git_path}"
     end
 
+    def describe_curl
+      curl_version_output = Utils.popen_read("#{curl_executable} --version", err: :close)
+      curl_version_output =~ /^curl ([\d\.]+)/
+      curl_version = Regexp.last_match(1)
+      "#{curl_version} => #{curl_executable}"
+    rescue
+      "N/A"
+    end
+
     def dump_verbose_config(f = $stdout)
       f.puts "HOMEBREW_VERSION: #{HOMEBREW_VERSION}"
       f.puts "ORIGIN: #{origin}"
@@ -170,6 +179,7 @@ class SystemConfig
       f.puts "GCC-4.2: build #{gcc_4_2}" unless gcc_4_2.null?
       f.puts "Clang: #{clang.null? ? "N/A" : "#{clang} build #{clang_build}"}"
       f.puts "Git: #{describe_git}"
+      f.puts "Curl: #{describe_curl}"
       f.puts "Perl: #{describe_perl}"
       f.puts "Python: #{describe_python}"
       f.puts "Ruby: #{describe_ruby}"
