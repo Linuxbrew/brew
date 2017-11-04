@@ -189,8 +189,11 @@ module Homebrew
 
   def install_gem_setup_path!(name, version = nil, executable = name)
     # Respect user's preferences for where gems should be installed.
-    ENV["GEM_HOME"] = ENV["HOMEBREW_GEM_HOME"].to_s
-    ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
+    ENV["GEM_HOME"] = if ENV["HOMEBREW_GEM_HOME"].to_s.empty?
+      Gem.user_dir
+    else
+      ENV["HOMEBREW_GEM_HOME"]
+    end
     unless ENV["HOMEBREW_GEM_PATH"].to_s.empty?
       ENV["GEM_PATH"] = ENV["HOMEBREW_GEM_PATH"]
     end
