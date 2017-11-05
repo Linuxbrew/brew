@@ -1,4 +1,5 @@
 language: ruby
+rvm: system
 cache:
   directories:
     - $HOME/.gem/ruby
@@ -12,14 +13,13 @@ matrix:
   include:
     - os: osx
       osx_image: xcode9
-      rvm: system
     - os: linux
       sudo: false
-      rvm: 2.3.3
 
 before_install:
   - export HOMEBREW_NO_AUTO_UPDATE=1
   - export HOMEBREW_DEVELOPER=1
+  - export HOMEBREW_FORCE_VENDOR_RUBY=1
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       HOMEBREW_REPOSITORY="$(brew --repo)";
       sudo chown -R "$USER" "$HOMEBREW_REPOSITORY/Library/Taps";
