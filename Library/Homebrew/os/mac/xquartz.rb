@@ -34,7 +34,11 @@ module OS
       # The X11.app distributed by Apple is also XQuartz, and therefore covered
       # by this method.
       def version
-        @version ||= detect_version
+        if @version ||= detect_version
+          ::Version.new @version
+        else
+          ::Version::NULL
+        end
       end
 
       def detect_version
@@ -115,7 +119,13 @@ module OS
       end
 
       def installed?
-        !version.nil? && !prefix.nil?
+        !version.null? && !prefix.nil?
+      end
+
+      def outdated?
+        return false unless installed?
+        return false if provided_by_apple?
+        version < latest_version
       end
 
       # If XQuartz and/or the CLT are installed, headers will be found under
