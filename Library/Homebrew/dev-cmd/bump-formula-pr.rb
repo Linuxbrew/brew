@@ -117,6 +117,14 @@ module Homebrew
     # user path, too.
     ENV["PATH"] = ENV["HOMEBREW_PATH"]
 
+    # Setup GitHub environment variables
+    %w[GITHUB_USER GITHUB_PASSWORD GITHUB_TOKEN].each do |env|
+      homebrew_env = ENV["HOMEBREW_#{env}"]
+      next unless homebrew_env
+      next if homebrew_env.empty?
+      ENV[env] = homebrew_env
+    end
+
     formula = ARGV.formulae.first
 
     if formula
