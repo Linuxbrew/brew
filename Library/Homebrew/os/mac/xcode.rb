@@ -36,15 +36,17 @@ module OS
       end
 
       def below_minimum_version?
+        return false unless installed?
         version < minimum_version
       end
 
       def outdated?
-        Version.new(version) < latest_version
+        return false unless installed?
+        version < latest_version
       end
 
       def without_clt?
-        installed? && Version.new(version) >= "4.3" && !MacOS::CLT.installed?
+        version >= "4.3" && !MacOS::CLT.installed?
       end
 
       # Returns a Pathname object corresponding to Xcode.app's Developer
@@ -65,8 +67,7 @@ module OS
       end
 
       def toolchain_path
-        return unless installed?
-        return if Version.new(version) < "4.3"
+        return if version < "4.3"
         Pathname.new("#{prefix}/Toolchains/XcodeDefault.xctoolchain")
       end
 
@@ -101,16 +102,17 @@ module OS
         # may return a version string
         # that is guessed based on the compiler, so do not
         # use it in order to check if Xcode is installed.
-        @version ||= uncached_version
+        if @version ||= detect_version
+          ::Version.new @version
+        else
+          ::Version::NULL
+        end
       end
 
-      def uncached_version
+      def detect_version
         # This is a separate function as you can't cache the value out of a block
         # if return is used in the middle, which we do many times in here.
-
-        return "0" unless OS.mac?
-
-        return nil if !MacOS::Xcode.installed? && !MacOS::CLT.installed?
+        return if !MacOS::Xcode.installed? && !MacOS::CLT.installed?
 
         %W[
           #{prefix}/usr/bin/xcodebuild
@@ -160,24 +162,18 @@ module OS
       end
 
       def provides_gcc?
-        installed? && Version.new(version) < "4.3"
+        version < "4.3"
       end
 
       def provides_cvs?
-        installed? && Version.new(version) < "5.0"
+        version < "5.0"
       end
 
       def default_prefix?
-        if Version.new(version) < "4.3"
+        if version < "4.3"
           prefix.to_s.start_with? "/Developer"
         else
           prefix.to_s == "/Applications/Xcode.app/Contents/Developer"
-        end
-      end
-
-      class Version < ::Version
-        def <=>(other)
-          super(Version.new(other))
         end
       end
     end
@@ -194,7 +190,7 @@ module OS
       # Returns true even if outdated tools are installed, e.g.
       # tools from Xcode 4.x on 10.9
       def installed?
-        !detect_version.nil?
+        !version.null?
       end
 
       def update_instructions
@@ -238,43 +234,55 @@ module OS
       def below_minimum_version?
         # Lion was the first version of OS X to ship with a CLT
         return false if MacOS.version < :lion
+        return false unless installed?
         version < minimum_version
       end
 
       def outdated?
-        # Lion was the first version of OS X to ship with a CLT
-        return false if MacOS.version < :lion
+        clang_version = detect_clang_version
+        return false unless clang_version
+        ::Version.new(clang_version) < latest_version
+      end
 
-        if MacOS.version >= :mavericks
-          version = Utils.popen_read("#{PKG_PATH}/usr/bin/clang --version")
+      def detect_clang_version
+        # Lion was the first version of OS X to ship with a CLT
+        return if MacOS.version < :lion
+
+        path = if MacOS.version >= :mavericks
+          "#{PKG_PATH}/usr/bin/clang"
         else
-          version = Utils.popen_read("/usr/bin/clang --version")
+          "/usr/bin/clang"
         end
-        version = version[/clang-(\d+\.\d+\.\d+(\.\d+)?)/, 1] || "0"
-        Xcode::Version.new(version) < latest_version
+
+        version_output = Utils.popen_read("#{path} --version")
+        version_output[/clang-(\d+\.\d+\.\d+(\.\d+)?)/, 1]
       end
 
       # Version string (a pretty long one) of the CLT package.
       # Note, that different ways to install the CLTs lead to different
       # version numbers.
       def version
-        @version ||= detect_version
+        if @version ||= detect_version
+          ::Version.new @version
+        else
+          ::Version::NULL
+        end
       end
 
       def detect_version
         # CLT isn't a distinct entity pre-4.3, and pkgutil doesn't exist
         # at all on Tiger, so just count it as installed if Xcode is installed
-        if MacOS::Xcode.installed? && Xcode::Version.new(MacOS::Xcode.version) < "3.0"
-          return MacOS::Xcode.version
-        end
+        return MacOS::Xcode.version if MacOS::Xcode.version < "3.0"
 
-        [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].find do |id|
+        version = nil
+        [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].each do |id|
           if MacOS.version >= :mavericks
             next unless File.exist?("#{PKG_PATH}/usr/bin/clang")
           end
           version = MacOS.pkgutil_info(id)[/version: (.+)$/, 1]
-          return version if version
+          break if version
         end
+        version
       end
     end
   end
