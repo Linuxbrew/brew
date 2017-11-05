@@ -148,6 +148,15 @@ class SystemConfig
       "#{Utils.git_version} => #{Utils.git_path}"
     end
 
+    def describe_curl
+      curl_version_output = Utils.popen_read("#{curl_executable} --version", err: :close)
+      curl_version_output =~ /^curl ([\d\.]+)/
+      curl_version = Regexp.last_match(1)
+      "#{curl_version} => #{curl_executable}"
+    rescue
+      "N/A"
+    end
+
     def dump_verbose_config(f = $stdout)
       f.puts "HOMEBREW_VERSION: #{HOMEBREW_VERSION}"
       f.puts "ORIGIN: #{origin}"
@@ -160,16 +169,54 @@ class SystemConfig
       else
         f.puts "Core tap: N/A"
       end
+      defaults_hash = {
+        HOMEBREW_PREFIX: "/usr/local",
+        HOMEBREW_REPOSITORY: "/usr/local/Homebrew",
+        HOMEBREW_CELLAR: "/usr/local/Cellar",
+        HOMEBREW_CACHE: "#{ENV["HOME"]}/Library/Caches/Homebrew",
+      }.freeze
+      boring_keys = %w[
+        HOMEBREW_BROWSER
+        HOMEBREW_EDITOR
+
+        HOMEBREW_ANALYTICS_ID
+        HOMEBREW_ANALYTICS_USER_UUID
+        HOMEBREW_BREW_FILE
+        HOMEBREW_COMMAND_DEPTH
+        HOMEBREW_CURL
+        HOMEBREW_LIBRARY
+        HOMEBREW_MACOS_VERSION
+        HOMEBREW_RUBY_PATH
+        HOMEBREW_SYSTEM
+        HOMEBREW_OS_VERSION
+        HOMEBREW_PATH
+        HOMEBREW_PROCESSOR
+        HOMEBREW_PRODUCT
+        HOMEBREW_USER_AGENT
+        HOMEBREW_USER_AGENT_CURL
+        HOMEBREW_VERSION
+      ].freeze
       f.puts "HOMEBREW_PREFIX: #{HOMEBREW_PREFIX}"
-      f.puts "HOMEBREW_REPOSITORY: #{HOMEBREW_REPOSITORY}"
-      f.puts "HOMEBREW_CELLAR: #{HOMEBREW_CELLAR}"
-      f.puts "HOMEBREW_BOTTLE_DOMAIN: #{BottleSpecification::DEFAULT_DOMAIN}"
+      if defaults_hash[:HOMEBREW_REPOSITORY] != HOMEBREW_REPOSITORY.to_s
+        f.puts "HOMEBREW_REPOSITORY: #{HOMEBREW_REPOSITORY}"
+      end
+      if defaults_hash[:HOMEBREW_CELLAR] != HOMEBREW_CELLAR.to_s
+        f.puts "HOMEBREW_CELLAR: #{HOMEBREW_CELLAR}"
+      end
+      ENV.sort.each do |key, value|
+        next unless key.start_with?("HOMEBREW_")
+        next if boring_keys.include?(key)
+        next if defaults_hash[key.to_sym] == value
+        value = "set" if key =~ /(cookie|key|token)/i
+        f.puts "#{key}: #{value}"
+      end
       f.puts hardware if hardware
       f.puts "Homebrew Ruby: #{describe_homebrew_ruby}"
       f.puts "GCC-4.0: build #{gcc_4_0}" unless gcc_4_0.null?
       f.puts "GCC-4.2: build #{gcc_4_2}" unless gcc_4_2.null?
       f.puts "Clang: #{clang.null? ? "N/A" : "#{clang} build #{clang_build}"}"
       f.puts "Git: #{describe_git}"
+      f.puts "Curl: #{describe_curl}"
       f.puts "Perl: #{describe_perl}"
       f.puts "Python: #{describe_python}"
       f.puts "Ruby: #{describe_ruby}"

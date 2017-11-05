@@ -69,9 +69,15 @@ then
   odie "Cowardly refusing to continue at this prefix: $HOMEBREW_PREFIX"
 fi
 
-# Save value to use for installing gems
-export HOMEBREW_GEM_HOME="$GEM_HOME"
-export HOMEBREW_GEM_PATH="$GEM_PATH"
+# Save values to use for installing gems
+if [[ -n "$GEM_HOME" ]]
+then
+  export HOMEBREW_GEM_HOME="$GEM_HOME"
+fi
+if [[ -n "$GEM_PATH" ]]
+then
+  export HOMEBREW_GEM_PATH="$GEM_PATH"
+fi
 
 # Users may have these set, pointing the system Ruby
 # at non-system gem paths
@@ -308,9 +314,6 @@ update-preinstall() {
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
-  # Allow auto-update migration now we have a fix in place (below in this function).
-  export HOMEBREW_ENABLE_AUTO_UPDATE_MIGRATION="1"
-
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ]]
   then
     if [[ -z "$HOMEBREW_VERBOSE" ]]
@@ -318,6 +321,9 @@ update-preinstall() {
       update-preinstall-timer &
       timer_pid=$!
     fi
+
+    # Allow auto-update migration now we have a fix in place (below in this function).
+    export HOMEBREW_ENABLE_AUTO_UPDATE_MIGRATION="1"
 
     brew update --preinstall
 
