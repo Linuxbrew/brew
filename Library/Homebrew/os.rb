@@ -20,9 +20,6 @@ module OS
       ISSUES_URL = "https://docs.brew.sh/Troubleshooting.html".freeze
     end
     PATH_OPEN = "/usr/bin/open".freeze
-    # compatibility
-    ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
-    ::MACOS_VERSION = OS::Mac.version.to_s.freeze
   elsif OS.linux?
     ISSUES_URL = "https://github.com/Linuxbrew/brew/wiki/troubleshooting".freeze
     PATH_OPEN = "xdg-open".freeze

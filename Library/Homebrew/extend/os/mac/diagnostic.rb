@@ -50,7 +50,6 @@ module Homebrew
       end
 
       def check_xcode_up_to_date
-        return unless MacOS::Xcode.installed?
         return unless MacOS::Xcode.outdated?
 
         # Travis CI images are going to end up outdated so don't complain when
@@ -78,7 +77,6 @@ module Homebrew
       end
 
       def check_clt_up_to_date
-        return unless MacOS::CLT.installed?
         return unless MacOS::CLT.outdated?
 
         # Travis CI images are going to end up outdated so don't complain when
@@ -108,7 +106,6 @@ module Homebrew
       end
 
       def check_xcode_minimum_version
-        return unless MacOS::Xcode.installed?
         return unless MacOS::Xcode.below_minimum_version?
 
         <<~EOS
@@ -119,7 +116,6 @@ module Homebrew
       end
 
       def check_clt_minimum_version
-        return unless MacOS::CLT.installed?
         return unless MacOS::CLT.below_minimum_version?
 
         <<~EOS
@@ -281,13 +277,8 @@ module Homebrew
         EOS
       end
 
-      def check_for_latest_xquartz
-        return unless MacOS::XQuartz.version
-        return if MacOS::XQuartz.provided_by_apple?
-
-        installed_version = Version.create(MacOS::XQuartz.version)
-        latest_version = Version.create(MacOS::XQuartz.latest_version)
-        return if installed_version >= latest_version
+      def check_xquartz_up_to_date
+        return unless MacOS::XQuartz.outdated?
 
         <<~EOS
           Your XQuartz (#{installed_version}) is outdated.
@@ -298,8 +289,7 @@ module Homebrew
       end
 
       def check_for_beta_xquartz
-        return unless MacOS::XQuartz.version
-        return unless MacOS::XQuartz.version.include? "beta"
+        return unless MacOS::XQuartz.version.to_s.include?("beta")
 
         <<~EOS
           The following beta release of XQuartz is installed: #{MacOS::XQuartz.version}

@@ -431,6 +431,10 @@ class Version
     version.to_f
   end
 
+  def to_i
+    version.to_i
+  end
+
   def to_s
     version.dup
   end
