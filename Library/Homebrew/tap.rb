@@ -503,6 +503,11 @@ class Tap
     map(&:name).sort
   end
 
+  # an array of all tap cmd directory {Pathname}s
+  def self.cmd_directories
+    Pathname.glob TAP_DIRECTORY/"*/*/cmd"
+  end
+
   # @private
   def formula_file_to_name(file)
     "#{name}/#{file.basename(".rb")}"
