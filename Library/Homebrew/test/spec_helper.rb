@@ -117,6 +117,7 @@ RSpec.configure do |config|
         HOMEBREW_PINNED_KEGS,
         HOMEBREW_PREFIX/".git",
         HOMEBREW_PREFIX/"bin",
+        HOMEBREW_PREFIX/"etc",
         HOMEBREW_PREFIX/"share",
         HOMEBREW_PREFIX/"opt",
         HOMEBREW_PREFIX/"Caskroom",
