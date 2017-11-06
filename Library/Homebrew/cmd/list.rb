@@ -118,7 +118,7 @@ module Homebrew
         puts d.basename.to_s.concat(ARGV.include?("--versions") ? " #{version}" : "")
       end
     else # --versions without --pinned
-      names.each do |d|
+      names.sort.each do |d|
         versions = d.subdirs.map { |pn| pn.basename.to_s }
         next if ARGV.include?("--multiple") && versions.length < 2
         puts "#{d.basename} #{versions * " "}"
