@@ -31,7 +31,7 @@ module Hbc
       @upgrade = upgrade
     end
 
-    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :verbose?
+    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
@@ -84,7 +84,7 @@ module Hbc
       odebug "Hbc::Installer#install"
 
       if @cask.installed? && !force? && !@reinstall
-        raise CaskAlreadyInstalledError, @cask unless @upgrade
+        raise CaskAlreadyInstalledError, @cask unless upgrade?
       end
 
       check_conflicts
@@ -130,7 +130,7 @@ module Hbc
       installed_cask = installed_caskfile.exist? ? CaskLoader.load(installed_caskfile) : @cask
 
       # Always force uninstallation, ignore method parameter
-      Installer.new(installed_cask, binaries: binaries?, verbose: verbose?, force: true, upgrade: @upgrade).uninstall
+      Installer.new(installed_cask, binaries: binaries?, verbose: verbose?, force: true, upgrade: upgrade?).uninstall
     end
 
     def summary
@@ -374,7 +374,7 @@ module Hbc
     end
 
     def start_upgrade
-      return unless @upgrade
+      return unless upgrade?
       oh1 "Starting upgrade for Cask #{@cask}"
 
       disable_accessibility_access
@@ -382,13 +382,13 @@ module Hbc
     end
 
     def revert_upgrade
-      return unless @upgrade
+      return unless upgrade?
       opoo "Reverting upgrade for Cask #{@cask}"
       reinstall
     end
 
     def finalize_upgrade
-      return unless @upgrade
+      return unless upgrade?
       purge_versioned_files(upgrade: true)
       oh1 "Cask #{@cask} was successfully upgraded!"
     end

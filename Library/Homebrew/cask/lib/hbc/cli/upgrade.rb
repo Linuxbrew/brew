@@ -13,14 +13,12 @@ module Hbc
       end
 
       def run
-        outdated_casks = casks(alternative: -> { Hbc.installed }).find_all { |cask| cask.outdated?(greedy?) }
+        outdated_casks = casks(alternative: -> { Hbc.installed }).select { |cask| cask.outdated?(greedy?) }
 
-        if outdated_casks.empty?
-          oh1 "No packages to upgrade"
-        else
-          oh1 "Upgrading #{Formatter.pluralize(outdated_casks.length, "outdated package")}, with result:"
-          puts outdated_casks.map { |f| "#{f.full_name} #{f.version}" } * ", "
-        end
+        return if outdated_casks.empty?
+
+        oh1 "Upgrading #{Formatter.pluralize(outdated_casks.length, "outdated package")}, with result:"
+        puts outdated_casks.map { |f| "#{f.full_name} #{f.version}" } * ", "
 
         outdated_casks.each do |old_cask|
           odebug "Uninstalling Cask #{old_cask}"
