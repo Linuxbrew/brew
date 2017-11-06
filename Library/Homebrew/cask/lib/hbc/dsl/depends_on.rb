@@ -2,7 +2,7 @@ require "rubygems"
 
 module Hbc
   class DSL
-    class DependsOn
+    class DependsOn < DelegateClass(Hash)
       VALID_KEYS = Set.new [
         :formula,
         :cask,
@@ -19,19 +19,18 @@ module Hbc
       }.freeze
 
       attr_accessor :java
-      attr_accessor :pairs
       attr_reader :arch, :cask, :formula, :macos, :x11
 
       def initialize
-        @pairs ||= {}
+        super({})
         @cask ||= []
         @formula ||= []
       end
 
-      def load(pairs = {})
+      def load(**pairs)
         pairs.each do |key, value|
           raise "invalid depends_on key: '#{key.inspect}'" unless VALID_KEYS.include?(key)
-          @pairs[key] = send(:"#{key}=", *value)
+          self[key] = send(:"#{key}=", *value)
         end
       end
 
@@ -89,14 +88,6 @@ module Hbc
       def x11=(arg)
         raise "invalid 'depends_on x11' value: #{arg.inspect}" unless [true, false].include?(arg)
         @x11 = arg
-      end
-
-      def to_yaml
-        @pairs.to_yaml
-      end
-
-      def to_s
-        @pairs.inspect
       end
     end
   end
