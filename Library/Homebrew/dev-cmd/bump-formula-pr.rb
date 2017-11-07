@@ -117,6 +117,9 @@ module Homebrew
     # user path, too.
     ENV["PATH"] = ENV["HOMEBREW_PATH"]
 
+    # Use the user's browser, too.
+    ENV["BROWSER"] = ENV["HOMEBREW_BROWSER"]
+
     # Setup GitHub environment variables
     %w[GITHUB_USER GITHUB_PASSWORD GITHUB_TOKEN].each do |env|
       homebrew_env = ENV["HOMEBREW_#{env}"]
