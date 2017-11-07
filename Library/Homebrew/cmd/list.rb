@@ -108,7 +108,7 @@ module Homebrew
     end
     if ARGV.include? "--pinned"
       pinned_versions = {}
-      names.each do |d|
+      names.sort.each do |d|
         keg_pin = (HOMEBREW_PINNED_KEGS/d.basename.to_s)
         if keg_pin.exist? || keg_pin.symlink?
           pinned_versions[d] = keg_pin.readlink.basename.to_s
@@ -118,7 +118,7 @@ module Homebrew
         puts d.basename.to_s.concat(ARGV.include?("--versions") ? " #{version}" : "")
       end
     else # --versions without --pinned
-      names.each do |d|
+      names.sort.each do |d|
         versions = d.subdirs.map { |pn| pn.basename.to_s }
         next if ARGV.include?("--multiple") && versions.length < 2
         puts "#{d.basename} #{versions * " "}"
