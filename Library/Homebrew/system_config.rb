@@ -207,7 +207,7 @@ class SystemConfig
         next unless key.start_with?("HOMEBREW_")
         next if boring_keys.include?(key)
         next if defaults_hash[key.to_sym] == value
-        value = "set" if key =~ /(cookie|key|token)/i
+        value = "set" if key =~ /(cookie|key|token|password)/i
         f.puts "#{key}: #{value}"
       end
       f.puts hardware if hardware
