@@ -312,6 +312,7 @@ update-preinstall-timer() {
 update-preinstall() {
   [[ -z "$HOMEBREW_HELP" ]] || return
   [[ -z "$HOMEBREW_NO_AUTO_UPDATE" ]] || return
+  [[ -z "$HOMEBREW_AUTO_UPDATE_CHECKED" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
   if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ]]
@@ -346,7 +347,7 @@ update-preinstall() {
   fi
 
   # If we've checked for updates, we don't need to check again.
-  export HOMEBREW_NO_AUTO_UPDATE="1"
+  export HOMEBREW_AUTO_UPDATE_CHECKED="1"
 }
 
 if [[ -n "$HOMEBREW_BASH_COMMAND" ]]
