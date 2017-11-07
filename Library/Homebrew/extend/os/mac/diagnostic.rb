@@ -281,8 +281,8 @@ module Homebrew
         return unless MacOS::XQuartz.outdated?
 
         <<~EOS
-          Your XQuartz (#{installed_version}) is outdated.
-          Please install XQuartz #{latest_version} (or delete the current version).
+          Your XQuartz (#{MacOS::XQuartz.version}) is outdated.
+          Please install XQuartz #{MacOS::XQuartz.latest_version} (or delete the current version).
           XQuartz can be updated using Homebrew-Cask by running
             brew cask reinstall xquartz
         EOS
