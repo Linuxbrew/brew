@@ -136,7 +136,7 @@ module Hbc
     def summary
       s = ""
       s << "#{Emoji.install_badge}  " if Emoji.enabled?
-      s << "#{@cask} was successfully installed!"
+      s << "#{@cask} was successfully #{upgrade? ? "upgraded" : "installed"}!"
     end
 
     def download
@@ -384,13 +384,13 @@ module Hbc
     def revert_upgrade
       return unless upgrade?
       opoo "Reverting upgrade for Cask #{@cask}"
-      reinstall
+      install_artifacts
+      enable_accessibility_access
     end
 
     def finalize_upgrade
       return unless upgrade?
       purge_versioned_files(upgrade: true)
-      oh1 "Cask #{@cask} was successfully upgraded!"
     end
 
     def uninstall_artifacts
@@ -426,7 +426,7 @@ module Hbc
     end
 
     def purge_versioned_files(upgrade: false)
-      odebug "Purging files for version #{@cask.version} of Cask #{@cask}"
+      ohai "Purging files for version #{@cask.version} of Cask #{@cask}" unless upgrade?
 
       # versioned staged distribution
       gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?

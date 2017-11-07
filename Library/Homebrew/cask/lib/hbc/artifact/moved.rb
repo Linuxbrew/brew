@@ -8,11 +8,11 @@ module Hbc
       end
 
       def install_phase(**options)
-        move(**options)
+        move(source, target, **options)
       end
 
       def uninstall_phase(**options)
-        delete(**options)
+        move(target, source, **options)
       end
 
       def summarize_installed
@@ -25,12 +25,12 @@ module Hbc
 
       private
 
-      def move(force: false, command: nil, **options)
+      def move(source, target, force: false, command: nil, **options)
         if Utils.path_occupied?(target)
           message = "It seems there is already #{self.class.english_article} #{self.class.english_name} at '#{target}'"
           raise CaskError, "#{message}." unless force
           opoo "#{message}; overwriting."
-          delete(force: force, command: command, **options)
+          delete(target, force: force, command: command, **options)
         end
 
         unless source.exist?
@@ -49,7 +49,7 @@ module Hbc
         add_altname_metadata(target, source.basename, command: command)
       end
 
-      def delete(force: false, command: nil, **_)
+      def delete(target, force: false, command: nil, **_)
         ohai "Removing #{self.class.english_name} '#{target}'."
         raise CaskError, "Cannot remove undeletable #{self.class.english_name}." if MacOS.undeletable?(target)
 
