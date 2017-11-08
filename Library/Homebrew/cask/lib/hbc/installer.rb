@@ -426,7 +426,7 @@ module Hbc
     end
 
     def purge_versioned_files(upgrade: false)
-      ohai "Purging files for version #{@cask.version} of Cask #{@cask}" unless upgrade?
+      odebug "Purging files for version #{@cask.version} of Cask #{@cask}" unless upgrade?
 
       # versioned staged distribution
       gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
@@ -441,10 +441,10 @@ module Hbc
         end
       end
       @cask.metadata_versioned_path.rmdir_if_possible
-      @cask.metadata_master_container_path.rmdir_if_possible unless upgrade
+      @cask.metadata_master_container_path.rmdir_if_possible unless upgrade?
 
       # toplevel staged distribution
-      @cask.caskroom_path.rmdir_if_possible unless upgrade
+      @cask.caskroom_path.rmdir_if_possible unless upgrade?
     end
 
     def purge_caskroom_path
