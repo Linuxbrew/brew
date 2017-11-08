@@ -3,10 +3,10 @@ First time contributing to Homebrew? Read our [Code of Conduct](https://github.c
 
 ### Report a bug
 
-* Run `brew update` (twice)
-* Run and read `brew doctor`
-* Read [the Troubleshooting Checklist](https://docs.brew.sh/Troubleshooting.html)
-* Open an issue on the formula's repository or on Homebrew/brew if it's not a formula-specific issue
+* Run `brew update` (twice).
+* Run and read `brew doctor`.
+* Read [the Troubleshooting Checklist](https://docs.brew.sh/Troubleshooting.html).
+* Open an issue on the formula's repository or on Homebrew/brew if it's not a formula-specific issue.
 
 ### Propose a feature
 
