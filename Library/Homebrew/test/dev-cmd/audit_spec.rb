@@ -221,7 +221,7 @@ describe FormulaAuditor do
     describe "a dependency on a macOS-provided keg-only formula" do
       describe "which is whitelisted" do
         let(:fa) do
-          formula_auditor "foo", <<-EOS.undent, new_formula: true
+          formula_auditor "foo", <<~EOS, new_formula: true
             class Foo < Formula
               url "http://example.com/foo-1.0.tgz"
               homepage "http://example.com"
@@ -253,7 +253,7 @@ describe FormulaAuditor do
 
       describe "which is not whitelisted" do
         let(:fa) do
-          formula_auditor "foo", <<-EOS.undent, new_formula: true
+          formula_auditor "foo", <<~EOS, new_formula: true
             class Foo < Formula
               url "http://example.com/foo-1.0.tgz"
               homepage "http://example.com"
