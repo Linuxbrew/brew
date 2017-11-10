@@ -25,7 +25,7 @@ module Hbc
 
       private
 
-      def move(source, target, force: false, command: nil, **options)
+      def move(source, target, skip: false, force: false, command: nil, **options)
         if Utils.path_occupied?(target)
           message = "It seems there is already #{self.class.english_article} #{self.class.english_name} at '#{target}'"
           raise CaskError, "#{message}." unless force
@@ -34,6 +34,8 @@ module Hbc
         end
 
         unless source.exist?
+          return if skip
+
           raise CaskError, "It seems the #{self.class.english_name} source '#{source}' is not there."
         end
 

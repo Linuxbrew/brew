@@ -368,7 +368,7 @@ module Hbc
     def uninstall
       oh1 "Uninstalling Cask #{@cask}"
       disable_accessibility_access
-      uninstall_artifacts
+      uninstall_artifacts(clear: true)
       purge_versioned_files
       purge_caskroom_path if force?
     end
@@ -390,10 +390,10 @@ module Hbc
 
     def finalize_upgrade
       return unless upgrade?
-      purge_versioned_files(upgrade: true)
+      purge_versioned_files
     end
 
-    def uninstall_artifacts
+    def uninstall_artifacts(clear: false)
       odebug "Un-installing artifacts"
       artifacts = @cask.artifacts
 
@@ -402,7 +402,7 @@ module Hbc
       artifacts.each do |artifact|
         next unless artifact.respond_to?(:uninstall_phase)
         odebug "Un-installing artifact of class #{artifact.class}"
-        artifact.uninstall_phase(command: @command, verbose: verbose?, force: force?)
+        artifact.uninstall_phase(command: @command, verbose: verbose?, skip: clear, force: force?)
       end
     end
 
@@ -425,8 +425,8 @@ module Hbc
       Utils.gain_permissions_remove(path, command: @command)
     end
 
-    def purge_versioned_files(upgrade: false)
-      odebug "Purging files for version #{@cask.version} of Cask #{@cask}" unless upgrade?
+    def purge_versioned_files
+      ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
       gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
