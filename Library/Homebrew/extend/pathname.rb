@@ -189,6 +189,9 @@ class Pathname
       rescue Errno::EPERM # rubocop:disable Lint/HandleExceptions
       end
 
+      # Close the file before renaming to prevent the error: Device or resource busy
+      # Affects primarily NFS.
+      tf.close
       File.rename(tf.path, self)
     ensure
       tf.close!
@@ -376,7 +379,7 @@ class Pathname
     saved_perms = nil
     unless writable_real?
       saved_perms = stat.mode
-      chmod 0644
+      FileUtils.chmod "u+rw", to_path
     end
     yield
   ensure
@@ -468,6 +471,8 @@ class Pathname
     }
   end
 end
+
+require "extend/os/pathname"
 
 # @private
 module ObserverPathnameExtension

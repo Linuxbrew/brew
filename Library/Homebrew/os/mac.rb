@@ -3,7 +3,6 @@ require "development_tools"
 require "os/mac/version"
 require "os/mac/xcode"
 require "os/mac/xquartz"
-require "os/mac/pathname"
 require "os/mac/sdk"
 require "os/mac/keg"
 
