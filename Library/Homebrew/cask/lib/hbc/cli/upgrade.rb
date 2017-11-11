@@ -21,8 +21,7 @@ module Hbc
         puts outdated_casks.map { |f| "#{f.full_name} #{f.version}" } * ", "
 
         outdated_casks.each do |old_cask|
-          odebug "Uninstalling Cask #{old_cask}"
-
+          odebug "Started upgrade process for Cask #{old_cask}"
           raise CaskNotInstalledError, old_cask unless old_cask.installed? || force?
 
           unless old_cask.installed_caskfile.nil?
@@ -43,17 +42,26 @@ module Hbc
                                     upgrade: true)
 
           begin
-            # purge artifacts BUT keep metadata aside
+            # Start new Cask's installation steps
+            new_cask_installer.check_conflicts
+
+            new_cask_installer.fetch
+
+            new_cask_installer.stage
+
+            # Move the old Cask's artifacts back to staging
             old_cask_installer.start_upgrade
 
-            # install BUT do not yet save metadata
+            # Install the new Cask
+            new_cask_installer.install_artifacts
 
-            new_cask_installer.install
+            new_cask_installer.enable_accessibility_access
 
-            # if successful, remove old metadata and install new
+            # If successful, wipe the old Cask from staging
             old_cask_installer.finalize_upgrade
           rescue CaskError => e
             opoo e.message
+            new_cask_installer.uninstall
             old_cask_installer.revert_upgrade
           end
         end

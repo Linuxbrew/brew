@@ -391,6 +391,8 @@ module Hbc
     def finalize_upgrade
       return unless upgrade?
       purge_versioned_files
+
+      puts summary
     end
 
     def uninstall_artifacts(clear: false)
