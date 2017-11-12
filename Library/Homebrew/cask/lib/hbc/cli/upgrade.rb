@@ -41,6 +41,9 @@ module Hbc
                                     require_sha:    require_sha?,
                                     upgrade: true)
 
+          started_upgrade = false
+          new_artifacts_installed = false
+
           begin
             # Start new Cask's installation steps
             new_cask_installer.check_conflicts
@@ -51,9 +54,12 @@ module Hbc
 
             # Move the old Cask's artifacts back to staging
             old_cask_installer.start_upgrade
+            # And flag it so in case of error
+            started_upgrade = true
 
             # Install the new Cask
             new_cask_installer.install_artifacts
+            new_artifacts_installed = true
 
             new_cask_installer.enable_accessibility_access
 
@@ -61,8 +67,9 @@ module Hbc
             old_cask_installer.finalize_upgrade
           rescue CaskError => e
             opoo e.message
-            new_cask_installer.uninstall
-            old_cask_installer.revert_upgrade
+            new_cask_installer.uninstall_artifacts if new_artifacts_installed
+            new_cask_installer.purge_versioned_files
+            old_cask_installer.revert_upgrade if started_upgrade
           end
         end
       end
