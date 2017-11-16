@@ -40,6 +40,8 @@ __brew_cask_commands() {
     'info:displays information about the given Cask'
     'install:installs the given Cask'
     'list:with no args, lists installed Casks; given installed Casks, lists staged files'
+    'outdated:list the outdated installed Casks'
+    'reinstall:reinstalls the given Cask'
     'search:searches all known Casks'
     'style:checks Cask style using RuboCop'
     'uninstall:uninstalls the given Cask'
