@@ -12,7 +12,7 @@ describe Hbc::CLI::Uninstall, :cask do
 
     output = Regexp.new <<~EOS
       ==> Uninstalling Cask local-caffeine
-      ==> Moving App 'Caffeine.app' to '.*Caffeine.app'.
+      ==> Moving App 'Caffeine.app' back to '.*Caffeine.app'.
       ==> Purging files for version 1.2.3 of Cask local-caffeine
     EOS
 

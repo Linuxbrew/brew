@@ -4,7 +4,6 @@ module Hbc
       option "--greedy", :greedy, false
       option "--quiet",  :quiet, false
       option "--force", :force, false
-      option "--force-update", :force_update, false
       option "--skip-cask-deps", :skip_cask_deps, false
 
       def initialize(*)
@@ -24,10 +23,9 @@ module Hbc
           odebug "Started upgrade process for Cask #{old_cask}"
           raise CaskNotInstalledError, old_cask unless old_cask.installed? || force?
 
-          unless old_cask.installed_caskfile.nil?
-            # use the same cask file that was used for installation, if possible
-            old_cask = CaskLoader.load(old_cask.installed_caskfile) if old_cask.installed_caskfile.exist?
-          end
+          raise CaskUnavailableError.new(old_cask, "The Caskfile is missing!") if old_cask.installed_caskfile.nil?
+
+          old_cask = CaskLoader.load(old_cask.installed_caskfile)
 
           old_cask_installer = Installer.new(old_cask, binaries: binaries?, verbose: verbose?, force: force?, upgrade: true)
 
@@ -66,10 +64,10 @@ module Hbc
             # If successful, wipe the old Cask from staging
             old_cask_installer.finalize_upgrade
           rescue CaskError => e
-            opoo e.message
             new_cask_installer.uninstall_artifacts if new_artifacts_installed
             new_cask_installer.purge_versioned_files
             old_cask_installer.revert_upgrade if started_upgrade
+            raise e
           end
         end
       end

@@ -158,7 +158,9 @@ describe Hbc::CLI::Upgrade, :cask do
       expect(Hbc::CaskLoader.load("will-fail-if-upgraded").versions).to include("1.2.2")
 
       expect {
-        described_class.run("will-fail-if-upgraded")
+        expect {
+          described_class.run("will-fail-if-upgraded")
+        }.to raise_error(Hbc::CaskError)
       }.to output(output_reverted).to_stderr
 
       expect(Hbc::CaskLoader.load("will-fail-if-upgraded")).to be_installed
@@ -173,7 +175,9 @@ describe Hbc::CLI::Upgrade, :cask do
       expect(Hbc::CaskLoader.load("bad-checksum").versions).to include("1.2.2")
 
       expect {
-        described_class.run("bad-checksum")
+        expect {
+          described_class.run("bad-checksum")
+        }.to raise_error(Hbc::CaskSha256MismatchError)
       }.to_not output(output_reverted).to_stderr
 
       expect(Hbc::CaskLoader.load("bad-checksum")).to be_installed

@@ -83,8 +83,8 @@ module Hbc
     def install
       odebug "Hbc::Installer#install"
 
-      if @cask.installed? && !force? && !@reinstall
-        raise CaskAlreadyInstalledError, @cask unless upgrade?
+      if @cask.installed? && !force? && !@reinstall && !upgrade?
+        raise CaskAlreadyInstalledError, @cask
       end
 
       check_conflicts
@@ -374,7 +374,6 @@ module Hbc
     end
 
     def start_upgrade
-      return unless upgrade?
       oh1 "Starting upgrade for Cask #{@cask}"
 
       disable_accessibility_access
@@ -382,14 +381,12 @@ module Hbc
     end
 
     def revert_upgrade
-      return unless upgrade?
       opoo "Reverting upgrade for Cask #{@cask}"
       install_artifacts
       enable_accessibility_access
     end
 
     def finalize_upgrade
-      return unless upgrade?
       purge_versioned_files
 
       puts summary
