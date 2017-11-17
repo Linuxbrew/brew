@@ -37,6 +37,8 @@ module Hardware
           :intel
         when /^arm/
           :arm
+        when /^ppc/
+          :ppc
         else
           :dunno
         end
@@ -44,6 +46,7 @@ module Hardware
 
       def family
         return :arm if arm?
+        return :ppc if ppc?
         return :dunno unless intel?
         # See https://software.intel.com/en-us/articles/intel-architecture-and-processor-identification-with-cpuid-model-and-family-numbers
         cpu_family = cpuinfo[/^cpu family\s*: ([0-9]+)/, 1].to_i
@@ -98,7 +101,7 @@ module Hardware
       end
 
       def flags
-        @flags ||= cpuinfo[/^(flags|Features).*/, 0].split
+        @flags ||= cpuinfo[/^(flags|Features).*/, 0]&.split || []
       end
 
       # Compatibility with Mac method, which returns lowercase symbols
