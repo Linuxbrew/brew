@@ -59,7 +59,8 @@ do
   export "$VAR_NEW"="${!VAR}"
 done
 
-if [[ -n "$HOMEBREW_ENV_FILTERING" ]]
+# test-bot sets environment filtering itself
+if [[ -n "$HOMEBREW_ENV_FILTERING" && "$1" != "test-bot" ]]
 then
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
