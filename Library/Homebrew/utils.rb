@@ -420,8 +420,8 @@ def nostdout
   end
 end
 
-def paths(env_path = ENV["PATH"])
-  @paths ||= PATH.new(env_path).collect do |p|
+def paths
+  @paths ||= PATH.new(ENV["HOMEBREW_PATH"]).collect do |p|
     begin
       File.expand_path(p).chomp("/")
     rescue ArgumentError

@@ -434,7 +434,7 @@ module Homebrew
 
         message = ""
 
-        paths(ENV["HOMEBREW_PATH"]).each do |p|
+        paths.each do |p|
           case p
           when "/usr/bin"
             unless @seen_prefix_bin
@@ -577,7 +577,7 @@ module Homebrew
           /Applications/Server.app/Contents/ServerRoot/usr/sbin
         ].map(&:downcase)
 
-        paths(ENV["HOMEBREW_PATH"]).each do |p|
+        paths.each do |p|
           next if whitelist.include?(p.downcase) || !File.directory?(p)
 
           realpath = Pathname.new(p).realpath.to_s
@@ -1045,7 +1045,7 @@ module Homebrew
       end
 
       def check_for_external_cmd_name_conflict
-        cmds = paths.flat_map { |p| Dir["#{p}/brew-*"] }.uniq
+        cmds = Tap.cmd_directories.flat_map { |p| Dir["#{p}/brew-*"] }.uniq
         cmds = cmds.select { |cmd| File.file?(cmd) && File.executable?(cmd) }
         cmd_map = {}
         cmds.each do |cmd|
