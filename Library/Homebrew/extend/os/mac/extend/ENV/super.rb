@@ -9,7 +9,7 @@ module Superenv
   end
 
   def effective_sysroot
-    MacOS::Xcode.without_clt? ? MacOS.sdk_path.to_s : nil
+    MacOS.sdk_path.to_s if MacOS::Xcode.without_clt?
   end
 
   def homebrew_extra_paths
@@ -91,10 +91,8 @@ module Superenv
     generic_setup_build_environment(formula)
     self["HOMEBREW_SDKROOT"] = effective_sysroot
 
-    if MacOS::Xcode.without_clt? || MacOS::Xcode.version.to_i >= 7
-      self["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s
-      self["SDKROOT"] = MacOS.sdk_path
-    end
+    self["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s
+    self["SDKROOT"] = MacOS.sdk_path if MacOS::Xcode.without_clt?
 
     # Filter out symbols known not to be defined since GNU Autotools can't
     # reliably figure this out with Xcode 8 and above.
