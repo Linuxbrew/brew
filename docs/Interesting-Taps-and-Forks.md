@@ -5,8 +5,6 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 
 ## Main taps
 
-*   [homebrew/nginx](https://github.com/Homebrew/homebrew-nginx): A tap for NGINX modules, intended for its `nginx-full` formula which includes more module options.
-
 *   [homebrew/php](https://github.com/Homebrew/homebrew-php): Repository for PHP-related formulae.
 
 *   [homebrew/science](https://github.com/Homebrew/homebrew-science): A collection of scientific libraries and tools.
@@ -16,6 +14,8 @@ Homebrew has the capability to add (and remove) multiple taps to your local inst
 You can be added as a maintainer for one of the Homebrew organization taps and aid the project! If you are interested please feel free to ask in an issue or pull request after submitting multiple high-quality pull requests. We want your help!
 
 ## Other interesting taps
+
+*   [denji/nginx](https://github.com/denji/homebrew-nginx): A tap for NGINX modules, intended for its `nginx-full` formula which includes more module options.
 
 *   [InstantClientTap/instantclient](https://github.com/InstantClientTap/homebrew-instantclient): A tap for Oracle Instant Client. The packages need to be downloaded manually.
 
