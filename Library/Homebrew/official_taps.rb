@@ -1,5 +1,4 @@
 OFFICIAL_TAPS = %w[
-  nginx
   php
   science
 ].freeze
@@ -26,6 +25,7 @@ DEPRECATED_OFFICIAL_TAPS = %w[
   games
   gui
   head-only
+  nginx
   python
   tex
   versions
