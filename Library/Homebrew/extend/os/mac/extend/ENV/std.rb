@@ -60,7 +60,6 @@ module Stdenv
     # previously added by macosxsdk
     version = version.to_s
     remove_from_cflags(/ ?-mmacosx-version-min=10\.\d+/)
-    delete("MACOSX_DEPLOYMENT_TARGET")
     delete("CPATH")
     remove "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
@@ -83,7 +82,6 @@ module Stdenv
     remove_macosxsdk
     version = version.to_s
     append_to_cflags("-mmacosx-version-min=#{version}")
-    self["MACOSX_DEPLOYMENT_TARGET"] = version
     self["CPATH"] = "#{HOMEBREW_PREFIX}/include"
     prepend "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
