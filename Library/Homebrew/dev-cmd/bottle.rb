@@ -469,6 +469,17 @@ module Homebrew
         end
 
         unless ARGV.include? "--no-commit"
+          if ENV["HOMEBREW_GIT_NAME"]
+            ENV["GIT_AUTHOR_NAME"] =
+              ENV["GIT_COMMITTER_NAME"] =
+                ENV["HOMEBREW_GIT_NAME"]
+          end
+          if ENV["HOMEBREW_GIT_EMAIL"]
+            ENV["GIT_AUTHOR_EMAIL"] =
+              ENV["GIT_COMMITTER_EMAIL"] =
+                ENV["HOMEBREW_GIT_EMAIL"]
+          end
+
           short_name = formula_name.split("/", -1).last
           pkg_version = bottle_hash["formula"]["pkg_version"]
 
