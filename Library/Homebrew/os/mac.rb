@@ -31,14 +31,23 @@ module OS
       @version = nil
     end
 
-    def prerelease?
-      # TODO: bump version when new OS is released
-      version >= "10.14"
+    def latest_sdk_version
+      # TODO: bump version when new Xcode macOS SDK is released
+      Version.new "10.13"
+    end
+
+    def latest_stable_version
+      # TODO: bump version when new macOS is released
+      Version.new "10.13"
     end
 
     def outdated_release?
-      # TODO: bump version when new OS is released
+      # TODO: bump version when new macOS is released
       version < "10.11"
+    end
+
+    def prerelease?
+      version > latest_stable_version
     end
 
     def cat
