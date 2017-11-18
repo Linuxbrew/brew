@@ -159,7 +159,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     return unless @ref_type == :tag
     return unless @revision && current_revision
     return if current_revision == @revision
-    raise <<-EOS.undent
+    raise <<~EOS
       #{@ref} tag should be #{@revision}
       but is actually #{current_revision}
     EOS
@@ -553,9 +553,9 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   rescue GitHub::HTTPNotFoundError
     # We only handle HTTPNotFoundError here,
     # becase AuthenticationFailedError is handled within util/github.
-    message = <<-EOS.undent
-        HOMEBREW_GITHUB_API_TOKEN can not access the repository: #{@owner}/#{@repo}
-        This token may not have permission to access the repository or the url of formula may be incorrect.
+    message = <<~EOS
+      HOMEBREW_GITHUB_API_TOKEN can not access the repository: #{@owner}/#{@repo}
+      This token may not have permission to access the repository or the url of formula may be incorrect.
     EOS
     raise CurlDownloadStrategyError, message
   end

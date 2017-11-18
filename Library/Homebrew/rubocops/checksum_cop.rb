@@ -24,6 +24,7 @@ module RuboCop
         def audit_sha256(checksum)
           return if checksum.nil?
           if regex_match_group(checksum, /^$/)
+            @offense_source_range = @offensive_node.source_range
             problem "sha256 is empty"
             return
           end

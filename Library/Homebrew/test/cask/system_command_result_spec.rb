@@ -5,7 +5,7 @@ describe Hbc::SystemCommand::Result, :cask do
     subject { described_class._parse_plist(command, input) }
     let(:command) { Hbc::SystemCommand.new("/usr/bin/true", {}) }
     let(:plist) {
-      <<-EOS.undent
+      <<~EOS
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0">
@@ -54,7 +54,7 @@ describe Hbc::SystemCommand::Result, :cask do
 
     context "when output contains garbage" do
       let(:input) {
-        <<-EOS.undent
+        <<~EOS
           Hello there! I am in no way XML am I?!?!
 
             That's a little silly... you were expexting XML here!

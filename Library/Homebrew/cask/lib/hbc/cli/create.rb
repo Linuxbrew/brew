@@ -21,7 +21,7 @@ module Hbc
       end
 
       def self.template(cask_token)
-        <<-EOS.undent
+        <<~EOS
           cask '#{cask_token}' do
             version ''
             sha256 ''

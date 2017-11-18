@@ -18,7 +18,7 @@ describe FormulaText do
   def formula_text(name, body = nil, options = {})
     path = dir/"#{name}.rb"
 
-    path.write <<-EOS.undent
+    path.write <<~EOS
       class #{Formulary.class_s(name)} < Formula
         #{body}
       end
@@ -29,7 +29,7 @@ describe FormulaText do
   end
 
   specify "simple valid Formula" do
-    ft = formula_text "valid", <<-EOS.undent
+    ft = formula_text "valid", <<~EOS
       url "http://www.example.com/valid-1.0.tar.gz"
     EOS
 
@@ -49,7 +49,7 @@ describe FormulaText do
   end
 
   specify "#data?" do
-    ft = formula_text "data", <<-EOS.undent
+    ft = formula_text "data", <<~EOS
       patch :DATA
     EOS
 
@@ -77,7 +77,7 @@ describe FormulaAuditor do
 
   describe "#problems" do
     it "is empty by default" do
-      fa = formula_auditor "foo", <<-EOS.undent
+      fa = formula_auditor "foo", <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
         end
@@ -91,7 +91,7 @@ describe FormulaAuditor do
     specify "file permissions" do
       allow(File).to receive(:umask).and_return(022)
 
-      fa = formula_auditor "foo", <<-EOS.undent
+      fa = formula_auditor "foo", <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
         end
@@ -106,7 +106,7 @@ describe FormulaAuditor do
     end
 
     specify "DATA but no __END__" do
-      fa = formula_auditor "foo", <<-EOS.undent
+      fa = formula_auditor "foo", <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           patch :DATA
@@ -118,7 +118,7 @@ describe FormulaAuditor do
     end
 
     specify "__END__ but no DATA" do
-      fa = formula_auditor "foo", <<-EOS.undent
+      fa = formula_auditor "foo", <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
         end
@@ -138,7 +138,7 @@ describe FormulaAuditor do
     end
 
     specify "no issue" do
-      fa = formula_auditor "foo", <<-EOS.undent
+      fa = formula_auditor "foo", <<~EOS
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
           homepage "http://example.com"
@@ -152,7 +152,7 @@ describe FormulaAuditor do
 
   describe "#line_problems" do
     specify "pkgshare" do
-      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+      fa = formula_auditor "foo", <<~EOS, strict: true
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
         end
@@ -184,7 +184,7 @@ describe FormulaAuditor do
     # Formulae with "++" in their name would break various audit regexps:
     #   Error: nested *?+ in regexp: /^libxml++3\s/
     specify "++ in name" do
-      fa = formula_auditor "foolibc++", <<-EOS.undent, strict: true
+      fa = formula_auditor "foolibc++", <<~EOS, strict: true
         class Foolibcxx < Formula
           desc "foolibc++ is a test"
           url "http://example.com/foo-1.0.tgz"
@@ -205,7 +205,7 @@ describe FormulaAuditor do
     specify "#audit_github_repository when HOMEBREW_NO_GITHUB_API is set" do
       ENV["HOMEBREW_NO_GITHUB_API"] = "1"
 
-      fa = formula_auditor "foo", <<-EOS.undent, strict: true, online: true
+      fa = formula_auditor "foo", <<~EOS, strict: true, online: true
         class Foo < Formula
           homepage "https://github.com/example/example"
           url "http://example.com/foo-1.0.tgz"
@@ -217,9 +217,77 @@ describe FormulaAuditor do
     end
   end
 
+  describe "#audit_deps" do
+    describe "a dependency on a macOS-provided keg-only formula" do
+      describe "which is whitelisted" do
+        let(:fa) do
+          formula_auditor "foo", <<~EOS, new_formula: true
+            class Foo < Formula
+              url "http://example.com/foo-1.0.tgz"
+              homepage "http://example.com"
+
+              depends_on "openssl"
+            end
+          EOS
+        end
+
+        let(:f_openssl) do
+          formula do
+            url "http://example.com/openssl-1.0.tgz"
+            homepage "http://example.com"
+
+            keg_only :provided_by_macos
+          end
+        end
+
+        before do
+          allow(fa.formula.deps.first)
+            .to receive(:to_formula).and_return(f_openssl)
+          fa.audit_deps
+        end
+
+        subject { fa }
+
+        its(:problems) { are_expected.to be_empty }
+      end
+
+      describe "which is not whitelisted" do
+        let(:fa) do
+          formula_auditor "foo", <<~EOS, new_formula: true
+            class Foo < Formula
+              url "http://example.com/foo-1.0.tgz"
+              homepage "http://example.com"
+
+              depends_on "bc"
+            end
+          EOS
+        end
+
+        let(:f_bc) do
+          formula do
+            url "http://example.com/bc-1.0.tgz"
+            homepage "http://example.com"
+
+            keg_only :provided_by_macos
+          end
+        end
+
+        before do
+          allow(fa.formula.deps.first)
+            .to receive(:to_formula).and_return(f_bc)
+          fa.audit_deps
+        end
+
+        subject { fa }
+
+        its(:problems) { are_expected.to match([/unnecessary/]) }
+      end
+    end
+  end
+
   describe "#audit_keg_only_style" do
     specify "keg_only_needs_downcasing" do
-      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+      fa = formula_auditor "foo", <<~EOS, strict: true
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
 
@@ -233,7 +301,7 @@ describe FormulaAuditor do
     end
 
     specify "keg_only_redundant_period" do
-      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+      fa = formula_auditor "foo", <<~EOS, strict: true
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
 
@@ -247,11 +315,11 @@ describe FormulaAuditor do
     end
 
     specify "keg_only_handles_block_correctly" do
-      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+      fa = formula_auditor "foo", <<~EOS, strict: true
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
 
-          keg_only <<-EOF.undent
+          keg_only <<~EOF
             this line starts with a lowercase word.
 
             This line does not but that shouldn't be a
@@ -266,7 +334,7 @@ describe FormulaAuditor do
     end
 
     specify "keg_only_handles_whitelist_correctly" do
-      fa = formula_auditor "foo", <<-EOS.undent, strict: true
+      fa = formula_auditor "foo", <<~EOS, strict: true
         class Foo < Formula
           url "http://example.com/foo-1.0.tgz"
 
@@ -290,7 +358,7 @@ describe FormulaAuditor do
     before(:each) do
       @foo_version = Count.increment
 
-      origin_formula_path.write <<-EOS.undent
+      origin_formula_path.write <<~EOS
         class Foo#{@foo_version} < Formula
           url "https://example.com/foo-1.0.tar.gz"
           revision 2

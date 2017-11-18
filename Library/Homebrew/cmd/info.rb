@@ -128,7 +128,7 @@ module Homebrew
       "#{c.name}#{reason}"
     end.sort!
     unless conflicts.empty?
-      puts <<-EOS.undent
+      puts <<~EOS
         Conflicts with:
           #{conflicts.join("\n  ")}
       EOS

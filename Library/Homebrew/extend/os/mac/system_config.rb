@@ -4,7 +4,7 @@ class SystemConfig
       if instance_variable_defined?(:@xcode)
         @xcode
       elsif MacOS::Xcode.installed?
-        @xcode = MacOS::Xcode.version
+        @xcode = MacOS::Xcode.version.to_s
         @xcode += " => #{MacOS::Xcode.prefix}" unless MacOS::Xcode.default_prefix?
         @xcode
       end

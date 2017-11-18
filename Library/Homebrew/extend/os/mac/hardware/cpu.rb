@@ -1,5 +1,3 @@
-require "os/mac/pathname"
-
 module Hardware
   class CPU
     class << self

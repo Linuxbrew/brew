@@ -386,6 +386,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
 
+  * `readall` [tap]:
+    Import all formulae from specified taps (defaults to all installed taps).
+
+    This can be useful for debugging issues across all formulae when making
+    significant changes to `formula.rb`, testing the performance of loading
+    all formulae or to determine if any current formulae have Ruby issues.
+
   * `reinstall` `formula`:
     Uninstall and then install `formula`.
 
@@ -553,6 +560,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--force` (or `-f`) is specified then always do a slower, full update check even
     if unnecessary.
 
+  * `update-reset`:
+    Fetches and resets Homebrew and all tap repositories using `git`(1) to
+    their latest `origin/master`. Note this will destroy all your uncommitted
+    or committed changes.
+
   * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`formulae`]:
     Upgrade outdated, unpinned brews.
 
@@ -714,6 +726,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--message=``message` is passed, append `message` to the default PR
     message.
 
+    If `--no-browse` is passed, don't pass the `--browse` argument to `hub`
+    which opens the pull request URL in a browser. Instead, output it to the
+    command line.
+
     Note that this command cannot be used to transition a formula from a
     URL-and-sha256 style specification into a tag-and-revision style
     specification, nor vice versa. It must use whichever style specification
@@ -770,7 +786,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Additionally, the date used in new manpages will match those in the existing
     manpages (to allow comparison without factoring in the date).
 
-  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] `patch-source` [`patch-source`]:
+  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=``bintray-org`] [`--test-bot-user=``test-bot-user`] `patch-source` [`patch-source`]:
 
     Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
     Optionally, installs the formulae changed by the patch.
@@ -813,6 +829,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--warn-on-publish-failure` was passed, do not exit if there's a
     failure publishing bottles on Bintray.
+
+    If `--bintray-org=``bintray-org` is passed, publish at the given Bintray
+    organisation.
+
+    If `--test-bot-user=``test-bot-user` is passed, pull the bottle block
+    commit from the specified user on GitHub.
 
   * `release-notes` [`--markdown`] [`previous_tag`] [`end_ref`]:
     Output the merged pull requests on Homebrew/brew between two Git refs.

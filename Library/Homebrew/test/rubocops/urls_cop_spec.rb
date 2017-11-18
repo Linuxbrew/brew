@@ -1,6 +1,3 @@
-require "rubocop"
-require "rubocop/rspec/support"
-require_relative "../../extend/string"
 require_relative "../../rubocops/urls_cop"
 
 describe RuboCop::Cop::FormulaAudit::Urls do
@@ -54,7 +51,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://prdownloads.sourceforge.net/foo/foo-1.tar.gz",
-        "msg" => <<-EOS.undent.chomp,
+        "msg" => <<~EOS.chomp,
           Don't use prdownloads in SourceForge urls (url is http://prdownloads.sourceforge.net/foo/foo-1.tar.gz).
                   See: http://librelist.com/browser/homebrew/2011/1/12/prdownloads-is-bad/
         EOS
@@ -69,7 +66,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "http://http.debian.net/debian/dists/foo/",
-        "msg" => <<-EOS.undent,
+        "msg" => <<~EOS,
           Please use a secure mirror for Debian URLs.
           We recommend:
             https://mirrors.ocf.berkeley.edu/debian/dists/foo/
@@ -101,7 +98,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }, {
         "url" => "https://codeload.github.com/foo/bar/tar.gz/v0.1.1",
-        "msg" => <<-EOS.undent,
+        "msg" => <<~EOS,
           Use GitHub archive URLs:
             https://github.com/foo/bar/archive/v0.1.1.tar.gz
           Rather than codeload:
@@ -114,7 +111,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }]
       formulas.each do |formula|
-        source = <<-EOS.undent
+        source = <<~EOS
           class Foo < Formula
             desc "foo"
             url "#{formula["url"]}"
@@ -129,65 +126,40 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         inspect_source(source)
 
         expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
-          expect_offense(expected, actual)
+          expect(actual.message).to eq(expected[:message])
+          expect(actual.severity).to eq(expected[:severity])
+          expect(actual.line).to eq(expected[:line])
+          expect(actual.column).to eq(expected[:column])
         end
       end
     end
 
     it "with offenses in stable/devel/head block" do
-      formulas = [{
-        "url" => "git://github.com/foo.git",
-        "msg" => "Please use https:// for git://github.com/foo.git",
-        "col" => 4,
-      }]
-      formulas.each do |formula|
-        source = <<-EOS.undent
-          class Foo < Formula
-            desc "foo"
-            url "https://foo.com"
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url "https://foo.com"
 
-            devel do
-              url "#{formula["url"]}",
-                  :tag => "v1.0.0-alpha.1",
-                  :revision => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-              version "1.0.0-alpha.1"
-            end
+          devel do
+            url "git://github.com/foo.git",
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Please use https:// for git://github.com/foo.git
+                :tag => "v1.0.0-alpha.1",
+                :revision => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            version "1.0.0-alpha.1"
           end
-        EOS
-        expected_offenses = [{ message: formula["msg"],
-                               severity: :convention,
-                               line: 6,
-                               column: formula["col"],
-                               source: source }]
-
-        inspect_source(source)
-
-        expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
-          expect_offense(expected, actual)
         end
-      end
+      RUBY
     end
 
     it "with duplicate mirror" do
-      source = <<-EOS.undent
-          class Foo < Formula
-            desc "foo"
-            url "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
-            mirror "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
-          end
-      EOS
-
-      expected_offenses = [{ message: "URL should not be duplicated as a mirror: https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz",
-                             severity: :convention,
-                             line: 4,
-                             column: 2,
-                             source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
+          mirror "https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz"
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ URL should not be duplicated as a mirror: https://ftpmirror.fnu.org/foo/foo-1.0.tar.gz
+        end
+      RUBY
     end
   end
 end
@@ -195,42 +167,31 @@ end
 describe RuboCop::Cop::FormulaAuditStrict::PyPiUrls do
   subject(:cop) { described_class.new }
 
-  context "When auditing urls" do
-    it "with pypi offenses" do
-      formulas = [{
-        "url" => "https://pypi.python.org/packages/source/foo/foo-0.1.tar.gz",
-        "msg" => "https://pypi.python.org/packages/source/foo/foo-0.1.tar.gz should be `https://files.pythonhosted.org/packages/source/foo/foo-0.1.tar.gz`",
-        "col" => 2,
-        "corrected_url" =>"https://files.pythonhosted.org/packages/source/foo/foo-0.1.tar.gz",
-      }]
-      formulas.each do |formula|
-        source = <<-EOS.undent
-          class Foo < Formula
-            desc "foo"
-            url "#{formula["url"]}"
-          end
-        EOS
-        corrected_source = <<-EOS.undent
-          class Foo < Formula
-            desc "foo"
-            url "#{formula["corrected_url"]}"
-          end
-        EOS
-        expected_offenses = [{ message: formula["msg"],
-                               severity: :convention,
-                               line: 3,
-                               column: formula["col"],
-                               source: source }]
-
-        inspect_source(source)
-        # Check for expected offenses
-        expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
-          expect_offense(expected, actual)
+  context "when a pypi.python.org URL is used" do
+    it "reports an offense" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url "https://pypi.python.org/packages/source/foo/foo-0.1.tar.gz"
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ https://pypi.python.org/packages/source/foo/foo-0.1.tar.gz should be `https://files.pythonhosted.org/packages/source/foo/foo-0.1.tar.gz`
         end
-        # Check for expected auto corrected source
-        new_source = autocorrect_source(source)
-        expect(new_source).to eq(corrected_source)
-      end
+      RUBY
+    end
+
+    it "support auto-correction" do
+      corrected = autocorrect_source(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url "https://pypi.python.org/packages/source/foo/foo-0.1.tar.gz"
+        end
+      RUBY
+
+      expect(corrected).to eq <<~RUBY
+        class Foo < Formula
+          desc "foo"
+          url "https://files.pythonhosted.org/packages/source/foo/foo-0.1.tar.gz"
+        end
+      RUBY
     end
   end
 end

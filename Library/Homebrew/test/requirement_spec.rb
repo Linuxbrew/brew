@@ -138,7 +138,7 @@ describe Requirement do
       end
 
       it "infers path from #satisfy result" do
-        expect(ENV).to receive(:append_path).with("PATH", Pathname.new("/foo/bar"))
+        expect(ENV).to receive(:prepend_path).with("PATH", Pathname.new("/foo/bar"))
         subject.satisfied?
         subject.modify_build_environment
       end

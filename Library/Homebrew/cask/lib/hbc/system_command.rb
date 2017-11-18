@@ -1,5 +1,4 @@
 require "open3"
-require "shellwords"
 require "vendor/plist/plist"
 
 require "extend/io"
@@ -38,8 +37,6 @@ module Hbc
     end
 
     def initialize(executable, args: [], sudo: false, input: [], print_stdout: false, print_stderr: true, must_succeed: false, **options)
-      executable, *args = Shellwords.shellescape(executable) if args.empty?
-
       @executable = executable
       @args = args
       @sudo = sudo
@@ -166,12 +163,12 @@ module Hbc
         _warn_plist_garbage(command, Regexp.last_match[2])
         xml = Plist.parse_xml(output)
         unless xml.respond_to?(:keys) && !xml.keys.empty?
-          raise CaskError, <<-EOS
-    Empty result parsing plist output from command.
-      command was:
-      #{command}
-      output we attempted to parse:
-      #{output}
+          raise CaskError, <<~EOS
+            Empty result parsing plist output from command.
+              command was:
+              #{command}
+              output we attempted to parse:
+              #{output}
           EOS
         end
         xml

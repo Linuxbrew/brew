@@ -29,10 +29,8 @@ module RuboCop
           desc_length = "#{@formula_name}: #{string_content(desc)}".length
           max_desc_length = 80
           return if desc_length <= max_desc_length
-          problem <<-EOS.undent
-            Description is too long. "name: desc" should be less than #{max_desc_length} characters.
-            Length is calculated as #{@formula_name} + desc. (currently #{desc_length})
-          EOS
+          problem "Description is too long. \"name: desc\" should be less than #{max_desc_length} characters. " \
+                  "Length is calculated as #{@formula_name} + desc. (currently #{desc_length})"
         end
       end
 
@@ -42,6 +40,7 @@ module RuboCop
       # - Checks for correct usage of `command-line` in `desc`
       # - Checks description starts with a capital letter
       # - Checks if `desc` contains the formula name
+      # - Checks if `desc` ends with a full stop
       class Desc < FormulaCop
         VALID_LOWERCASE_WORDS = %w[
           ex
@@ -80,8 +79,13 @@ module RuboCop
           end
 
           # Check if formula's desc starts with formula's name
-          return unless regex_match_group(desc, /^#{@formula_name} /i)
-          problem "Description shouldn't start with the formula name"
+          if regex_match_group(desc, /^#{@formula_name} /i)
+            problem "Description shouldn't start with the formula name"
+          end
+
+          # Check if a full stop is used at the end of a formula's desc
+          return unless regex_match_group(desc, /\.$/)
+          problem "Description shouldn't end with a full stop"
         end
 
         private
@@ -99,6 +103,7 @@ module RuboCop
             correction.gsub!(/(^|[^a-z])#{@formula_name}([^a-z]|$)/i, "\\1\\2")
             correction.gsub!(/^(['"]?)\s+/, "\\1")
             correction.gsub!(/\s+(['"]?)$/, "\\1")
+            correction.gsub!(/\.$/, "")
             corrector.insert_before(node.source_range, correction)
             corrector.remove(node.source_range)
           end

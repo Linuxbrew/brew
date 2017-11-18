@@ -26,13 +26,11 @@ class Tap
       raise "Invalid tap name '#{args.join("/")}'"
     end
 
-    # we special case homebrew so users don't have to shift in a terminal
-    user = "Homebrew" if user == "homebrew"
-    user = "Linuxbrew" if user == "linuxbrew"
+    # We special case homebrew and linuxbrew so that users don't have to shift in a terminal.
+    user = user.capitalize if ["homebrew", "linuxbrew"].include? user
     repo = repo.strip_prefix "homebrew-"
 
-    if user == "Homebrew" && (repo == "homebrew" || repo == "core") ||
-       user == "Linuxbrew" && (repo == "linuxbrew" || repo == "core")
+    if ["Homebrew", "Linuxbrew"].include?(user) && ["core", "homebrew"].include?(repo)
       return CoreTap.instance
     end
 
@@ -292,7 +290,7 @@ class Tap
     return if options[:clone_target]
     return unless private?
     return if quiet
-    puts <<-EOS.undent
+    puts <<~EOS
       It looks like you tapped a private repository. To avoid entering your
       credentials each time you update, you can use git HTTP credential
       caching or issue the following command:
@@ -526,6 +524,11 @@ class Tap
   # an array of all installed {Tap} names.
   def self.names
     map(&:name).sort
+  end
+
+  # an array of all tap cmd directory {Pathname}s
+  def self.cmd_directories
+    Pathname.glob TAP_DIRECTORY/"*/*/cmd"
   end
 
   # @private

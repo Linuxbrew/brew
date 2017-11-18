@@ -10,14 +10,11 @@ module Stdenv
   HOMEBREW_ARCH = (ENV["HOMEBREW_ARCH"] || "native").freeze
   DEFAULT_FLAGS = (OS.mac? ? "-march=core2 -msse4" : "-march=#{HOMEBREW_ARCH}").freeze
 
-  def self.extended(base)
-    return if ORIGINAL_PATHS.include? HOMEBREW_PREFIX/"bin"
-    base.prepend_path "PATH", "#{HOMEBREW_PREFIX}/bin"
-  end
-
   # @private
   def setup_build_environment(formula = nil)
     super
+
+    PATH.new(ENV["HOMEBREW_PATH"]).each { |p| prepend_path "PATH", p }
 
     # Set the default pkg-config search path, overriding the built-in paths
     # Anything in PKG_CONFIG_PATH is searched before paths in this variable

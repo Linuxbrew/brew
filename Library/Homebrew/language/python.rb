@@ -46,7 +46,7 @@ module Language
     end
 
     def self.in_sys_path?(python, path)
-      script = <<-EOS.undent
+      script = <<~EOS
         import os, sys
         [os.path.realpath(p) for p in sys.path].index(os.path.realpath("#{path}"))
       EOS
@@ -54,7 +54,7 @@ module Language
     end
 
     def self.setup_install_args(prefix)
-      shim = <<-EOS.undent
+      shim = <<~EOS
         import setuptools, tokenize
         __file__ = 'setup.py'
         exec(compile(getattr(tokenize, 'open', open)(__file__).read()
@@ -245,7 +245,7 @@ module Language
                           "-v", "--no-deps", "--no-binary", ":all:",
                           "--ignore-installed", *targets
         end
-      end # class Virtualenv
-    end # module Virtualenv
-  end # module Python
-end # module Language
+      end
+    end
+  end
+end

@@ -23,9 +23,6 @@ module OS
     end
     PATH_OPEN = "/usr/bin/open".freeze
     PATH_PATCH = "/usr/bin/patch".freeze
-    # compatibility
-    ::MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
-    ::MACOS_VERSION = OS::Mac.version.to_s.freeze
   elsif OS.linux?
     require "os/mac"
     NAME = "linux".freeze
@@ -33,8 +30,6 @@ module OS
     ISSUES_URL = "https://github.com/Linuxbrew/brew/blob/master/docs/Troubleshooting.md#troubleshooting".freeze
     PATH_OPEN = "xdg-open".freeze
     PATH_PATCH = "patch".freeze
-    # compatibility
-    ::MACOS_FULL_VERSION = ::MACOS_VERSION = "0".freeze
   else
     PATH_PATCH = "patch".freeze
   end

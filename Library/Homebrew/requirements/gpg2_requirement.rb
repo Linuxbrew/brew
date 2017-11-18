@@ -8,5 +8,5 @@ class GPG2Requirement < Requirement
   # GPGTools installs GnuPG 2.0.x as a `gpg` symlink pointing
   # to `gpg2`. Our `gnupg` installs only a non-symlink `gpg`.
   # The aim is to retain support for any version above 2.0.
-  satisfy(build_env: false) { Gpg.gpg || Gpg.gpg2 }
+  satisfy(build_env: false) { Gpg.available? }
 end

@@ -139,7 +139,7 @@ class ExternalPatch
       if patch_files.empty?
         children = patch_dir.children
         if children.length != 1 || !children.first.file?
-          raise MissingApplyError, <<-EOS.undent
+          raise MissingApplyError, <<~EOS
             There should be exactly one patch file in the staging directory unless
             the "apply" method was used one or more times in the patch-do block.
           EOS

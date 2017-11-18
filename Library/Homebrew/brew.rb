@@ -33,7 +33,6 @@ begin
   empty_argv = ARGV.empty?
   help_flag_list = %w[-h --help --usage -?]
   help_flag = !ENV["HOMEBREW_HELP"].nil?
-  internal_cmd = true
   cmd = nil
 
   ARGV.dup.each_with_index do |arg, i|
@@ -50,11 +49,6 @@ begin
   path = PATH.new(ENV["PATH"])
   homebrew_path = PATH.new(ENV["HOMEBREW_PATH"])
 
-  # Add contributed commands to PATH before checking.
-  tap_cmds = Pathname.glob(Tap::TAP_DIRECTORY/"*/*/cmd")
-  path.append(tap_cmds)
-  homebrew_path.append(tap_cmds)
-
   # Add SCM wrappers.
   path.append(HOMEBREW_SHIMS_PATH/"scm")
   homebrew_path.append(HOMEBREW_SHIMS_PATH/"scm")
@@ -65,8 +59,9 @@ begin
     internal_cmd = require? HOMEBREW_LIBRARY_PATH/"cmd"/cmd
 
     unless internal_cmd
-      internal_cmd = require? HOMEBREW_LIBRARY_PATH/"dev-cmd"/cmd
-      if internal_cmd && !ARGV.homebrew_developer?
+      internal_dev_cmd = require? HOMEBREW_LIBRARY_PATH/"dev-cmd"/cmd
+      internal_cmd = internal_dev_cmd
+      if internal_dev_cmd && !ARGV.homebrew_developer?
         system "git", "config", "--file=#{HOMEBREW_REPOSITORY}/.git/config",
                                 "--replace-all", "homebrew.devcmdrun", "true"
         ENV["HOMEBREW_DEV_CMD_RUN"] = "1"
@@ -78,7 +73,8 @@ begin
   # - a help flag is passed AND a command is matched
   # - a help flag is passed AND there is no command specified
   # - no arguments are passed
-  if empty_argv || help_flag
+  # - if cmd is Cask, let Cask handle the help command instead
+  if (empty_argv || help_flag) && cmd != "cask"
     require "cmd/help"
     Homebrew.help cmd, empty_argv: empty_argv
     # `Homebrew.help` never returns, except for external/unknown commands.
@@ -92,20 +88,24 @@ begin
     system(HOMEBREW_BREW_FILE, "uninstall", "--force", "brew-cask")
   end
 
-  # External commands expect a normal PATH
-  ENV["PATH"] = homebrew_path unless internal_cmd
+  unless internal_cmd
+    # Add contributed commands to PATH before checking.
+    homebrew_path.append(Tap.cmd_directories)
+
+    # External commands expect a normal PATH
+    ENV["PATH"] = homebrew_path
+  end
 
   if internal_cmd
     Homebrew.send cmd.to_s.tr("-", "_").downcase
   elsif which "brew-#{cmd}"
-    %w[CACHE LIBRARY_PATH].each do |e|
-      ENV["HOMEBREW_#{e}"] = Object.const_get("HOMEBREW_#{e}").to_s
+    %w[CACHE LIBRARY_PATH].each do |env|
+      ENV["HOMEBREW_#{env}"] = Object.const_get("HOMEBREW_#{env}").to_s
     end
     exec "brew-#{cmd}", *ARGV
   elsif (path = which("brew-#{cmd}.rb")) && require?(path)
     exit Homebrew.failed? ? 1 : 0
   else
-    require "tap"
     possible_tap = OFFICIAL_CMD_TAPS.find { |_, cmds| cmds.include?(cmd) }
     possible_tap = Tap.fetch(possible_tap.first) if possible_tap
 
@@ -116,8 +116,11 @@ begin
     if Process.uid.zero? && !brew_uid.zero?
       tap_commands += %W[/usr/bin/sudo -u ##{brew_uid}]
     end
+    # Unset HOMEBREW_HELP to avoid confusing the tap
+    ENV.delete("HOMEBREW_HELP") if help_flag
     tap_commands += %W[#{HOMEBREW_BREW_FILE} tap #{possible_tap}]
     safe_system(*tap_commands)
+    ENV["HOMEBREW_HELP"] = "1" if help_flag
     exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
 rescue UsageError => e

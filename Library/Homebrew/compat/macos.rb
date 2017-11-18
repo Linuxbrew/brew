@@ -1,5 +1,13 @@
 require "development_tools"
 
+if OS.mac?
+  MACOS_FULL_VERSION = OS::Mac.full_version.to_s.freeze
+  MACOS_VERSION = OS::Mac.version.to_s.freeze
+elsif OS.linux?
+  MACOS_FULL_VERSION = "0".freeze
+  MACOS_VERSION = "0".freeze
+end
+
 module OS
   module Mac
     module_function

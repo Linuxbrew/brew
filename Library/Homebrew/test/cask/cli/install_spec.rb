@@ -6,7 +6,7 @@ describe Hbc::CLI::Install, :cask do
   it_behaves_like "a command that handles invalid options"
 
   it "displays the installation progress" do
-    output = Regexp.new <<-EOS.undent
+    output = Regexp.new <<~EOS
       ==> Downloading file:.*caffeine.zip
       ==> Verifying checksum for Cask local-caffeine
       ==> Installing Cask local-caffeine

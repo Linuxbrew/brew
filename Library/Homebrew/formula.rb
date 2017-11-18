@@ -839,7 +839,7 @@ class Formula
   # This method can be overridden to provide a plist.
   # For more examples read Apple's handy manpage:
   # https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man5/plist.5.html
-  # <pre>def plist; <<-EOS.undent
+  # <pre>def plist; <<~EOS
   #  <?xml version="1.0" encoding="UTF-8"?>
   #  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
   #  <plist version="1.0">
@@ -986,13 +986,13 @@ class Formula
   # to installation through a different package manager on a different OS.
   # @return [String]
   # <pre>def caveats
-  #   <<-EOS.undent
+  #   <<~EOS
   #     Are optional. Something the user should know?
   #   EOS
   # end</pre>
   #
   # <pre>def caveats
-  #   s = <<-EOS.undent
+  #   s = <<~EOS
   #     Print some important notice to the user when `brew info <formula>` is
   #     called or when brewing a formula.
   #     This is optional. You can use all the vars like #{version} here.
@@ -1528,10 +1528,10 @@ class Formula
       "oldname" => oldname,
       "aliases" => aliases,
       "versions" => {
-        "stable" => stable&.version.to_s,
+        "stable" => stable&.version&.to_s,
         "bottle" => bottle ? true : false,
-        "devel" => devel&.version.to_s,
-        "head" => head&.version.to_s,
+        "devel" => devel&.version&.to_s,
+        "head" => head&.version&.to_s,
       },
       "revision" => revision,
       "version_scheme" => version_scheme,
@@ -1615,33 +1615,30 @@ class Formula
   # @private
   def run_test
     @prefix_returns_versioned_prefix = true
-    old_home = ENV["HOME"]
-    old_java_opts = ENV["_JAVA_OPTIONS"]
-    old_curl_home = ENV["CURL_HOME"]
-    old_tmpdir = ENV["TMPDIR"]
-    old_temp = ENV["TEMP"]
-    old_tmp = ENV["TMP"]
-    old_term = ENV["TERM"]
-    old_path = ENV["PATH"]
-    old_homebrew_path = ENV["HOMEBREW_PATH"]
 
-    ENV["CURL_HOME"] = old_curl_home || old_home
-    ENV["TMPDIR"] = ENV["TEMP"] = ENV["TMP"] = HOMEBREW_TEMP
-    ENV["TERM"] = "dumb"
-    ENV["PATH"] = PATH.new(old_path).append(HOMEBREW_PREFIX/"bin")
-    ENV["HOMEBREW_PATH"] = nil
-    ENV["_JAVA_OPTIONS"] = "#{old_java_opts} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
+    test_env = {
+      CURL_HOME: ENV["CURL_HOME"] || ENV["HOME"],
+      TMPDIR: HOMEBREW_TEMP,
+      TEMP: HOMEBREW_TEMP,
+      TMP: HOMEBREW_TEMP,
+      TERM: "dumb",
+      PATH: PATH.new(ENV["PATH"]).append(HOMEBREW_PREFIX/"bin"),
+      HOMEBREW_PATH: nil,
+      _JAVA_OPTIONS: "#{ENV["_JAVA_OPTIONS"]} -Duser.home=#{HOMEBREW_CACHE}/java_cache",
+    }
 
     ENV.clear_sensitive_environment!
 
     mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
-      ENV["HOME"] = @testpath
+      test_env[:HOME] = @testpath
       setup_home @testpath
       begin
         with_logging("test") do
-          test
+          with_env(test_env) do
+            test
+          end
         end
       rescue Exception # rubocop:disable Lint/RescueException
         staging.retain! if ARGV.debug?
@@ -1650,15 +1647,6 @@ class Formula
     end
   ensure
     @testpath = nil
-    ENV["HOME"] = old_home
-    ENV["_JAVA_OPTIONS"] = old_java_opts
-    ENV["CURL_HOME"] = old_curl_home
-    ENV["TMPDIR"] = old_tmpdir
-    ENV["TEMP"] = old_temp
-    ENV["TMP"] = old_tmp
-    ENV["TERM"] = old_term
-    ENV["PATH"] = old_path
-    ENV["HOMEBREW_PATH"] = old_homebrew_path
     @prefix_returns_versioned_prefix = false
   end
 
@@ -1691,7 +1679,7 @@ class Formula
     # keep Homebrew's site-packages in sys.path when using system Python
     user_site_packages = home/"Library/Python/2.7/lib/python/site-packages"
     user_site_packages.mkpath
-    (user_site_packages/"homebrew.pth").write <<-EOS.undent
+    (user_site_packages/"homebrew.pth").write <<~EOS
       import site; site.addsitedir("#{HOMEBREW_PREFIX}/lib/python2.7/site-packages")
       import sys, os; sys.path = (os.environ["PYTHONPATH"].split(os.pathsep) if "PYTHONPATH" in os.environ else []) + ["#{HOMEBREW_PREFIX}/lib/python2.7/site-packages"] + sys.path
     EOS
@@ -1891,32 +1879,27 @@ class Formula
       env_home = buildpath/".brew_home"
       mkdir_p env_home
 
-      old_home = ENV["HOME"]
-      old_java_opts = ENV["_JAVA_OPTIONS"]
-      old_curl_home = ENV["CURL_HOME"]
-      old_path = ENV["HOMEBREW_PATH"]
+      stage_env = {
+        HOMEBREW_PATH: nil,
+      }
 
       unless ARGV.interactive?
-        ENV["HOME"] = env_home
-        ENV["_JAVA_OPTIONS"] = "#{old_java_opts} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
-        ENV["CURL_HOME"] = old_curl_home || old_home
+        stage_env[:HOME] = env_home
+        stage_env[:_JAVA_OPTIONS] =
+          "#{ENV["_JAVA_OPTIONS"]} -Duser.home=#{HOMEBREW_CACHE}/java_cache"
+        stage_env[:CURL_HOME] = ENV["CURL_HOME"] || ENV["HOME"]
       end
-      ENV["HOMEBREW_PATH"] = nil
 
       setup_home env_home
 
       ENV.clear_sensitive_environment!
 
       begin
-        yield staging
+        with_env(stage_env) do
+          yield staging
+        end
       ensure
         @buildpath = nil
-        unless ARGV.interactive?
-          ENV["HOME"] = old_home
-          ENV["_JAVA_OPTIONS"] = old_java_opts
-          ENV["CURL_HOME"] = old_curl_home
-        end
-        ENV["HOMEBREW_PATH"] = old_path
       end
     end
   end
@@ -2394,7 +2377,7 @@ class Formula
     # and building the software was ok.
     # <pre>system bin/"foobar", "--version"</pre>
     #
-    # <pre>(testpath/"test.file").write <<-EOS.undent
+    # <pre>(testpath/"test.file").write <<~EOS
     #   writing some test file, if you need to
     # EOS
     # assert_equal "OK", shell_output("test_command test.file").strip</pre>

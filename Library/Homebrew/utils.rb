@@ -93,7 +93,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   end
   caller_message ||= backtrace[1]
 
-  message = <<-EOS.undent
+  message = <<~EOS
     Calling #{method} is #{verb}!
     #{replacement_message}
     #{caller_message}#{tap_message}
@@ -190,9 +190,14 @@ module Homebrew
   def install_gem_setup_path!(name, version = nil, executable = name)
     require "rubygems" unless OS.mac?
     # Respect user's preferences for where gems should be installed.
-    ENV["GEM_HOME"] = ENV["GEM_OLD_HOME"].to_s
-    ENV["GEM_HOME"] = Gem.user_dir if ENV["GEM_HOME"].empty?
-    ENV["GEM_PATH"] = ENV["GEM_OLD_PATH"] unless ENV["GEM_OLD_PATH"].to_s.empty?
+    ENV["GEM_HOME"] = if ENV["HOMEBREW_GEM_HOME"].to_s.empty?
+      Gem.user_dir
+    else
+      ENV["HOMEBREW_GEM_HOME"]
+    end
+    unless ENV["HOMEBREW_GEM_PATH"].to_s.empty?
+      ENV["GEM_PATH"] = ENV["HOMEBREW_GEM_PATH"]
+    end
 
     # Make rubygems notice env changes.
     Gem.clear_paths
@@ -224,7 +229,7 @@ module Homebrew
     end
 
     return if which(executable)
-    odie <<-EOS.undent
+    odie <<~EOS
       The '#{name}' gem is installed but couldn't find '#{executable}' in the PATH:
       #{ENV["PATH"]}
     EOS
@@ -264,33 +269,27 @@ module Homebrew
 end
 
 def with_system_path
-  old_path = ENV["PATH"]
   path = PATH.new("/usr/bin", "/bin")
   path.prepend HOMEBREW_PREFIX/"bin" unless OS.mac?
-  ENV["PATH"] = path
-  yield
-ensure
-  ENV["PATH"] = old_path
+  with_env(PATH: path) do
+    yield
+  end
 end
 
 def with_homebrew_path
-  old_path = ENV["PATH"]
-  ENV["PATH"] = ENV["HOMEBREW_PATH"]
-  yield
-ensure
-  ENV["PATH"] = old_path
+  with_env(PATH: PATH.new(ENV["HOMEBREW_PATH"])) do
+    yield
+  end
 end
 
 def with_custom_locale(locale)
-  old_locale = ENV["LC_ALL"]
-  ENV["LC_ALL"] = locale
-  yield
-ensure
-  ENV["LC_ALL"] = old_locale
+  with_env(LC_ALL: locale) do
+    yield
+  end
 end
 
-def run_as_not_developer(&_block)
-  with_env "HOMEBREW_DEVELOPER" => nil do
+def run_as_not_developer
+  with_env(HOMEBREW_DEVELOPER: nil) do
     yield
   end
 end
@@ -350,7 +349,7 @@ def which_editor
   end
   editor ||= "/usr/bin/vim"
 
-  opoo <<-EOS.undent
+  opoo <<~EOS
     Using #{editor} because no editor was set in the environment.
     This may change in the future, so we recommend setting EDITOR,
     or HOMEBREW_EDITOR to your preferred text editor.
@@ -539,7 +538,7 @@ end
 # Calls the given block with the passed environment variables
 # added to ENV, then restores ENV afterwards.
 # Example:
-# with_env "PATH" => "/bin" do
+# with_env(PATH: "/bin") do
 #   system "echo $PATH"
 # end
 #
@@ -550,6 +549,7 @@ def with_env(hash)
   old_values = {}
   begin
     hash.each do |key, value|
+      key = key.to_s
       old_values[key] = ENV.delete(key)
       ENV[key] = value
     end
