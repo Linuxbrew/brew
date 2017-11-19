@@ -24,7 +24,7 @@ The Python formulae install [pip](http://www.pip-installer.org) (as `pip2` or `p
 Setuptools can be updated via pip, without having to re-brew Python:
 
 ```sh
-python2 -m pip --upgrade setuptools
+python2 -m pip install --upgrade setuptools
 ```
 
 Similarly, pip can be used to upgrade itself via:
