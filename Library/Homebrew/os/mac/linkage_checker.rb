@@ -25,7 +25,7 @@ class LinkageChecker
   def check_dylibs
     @keg.find do |file|
       next if file.symlink? || file.directory?
-      next if file.elf? && !file.dynamic?
+      next if file.elf? && !file.dynamic_elf?
       next unless file.dylib? || file.mach_o_executable? || file.mach_o_bundle?
 
       # weakly loaded dylibs may not actually exist on disk, so skip them

@@ -307,17 +307,6 @@ class Pathname
   end
 
   # @private
-  def elf?
-    read(4) == "\x7fELF"
-  end
-
-  # @private
-  def dynamic?
-    @which_file ||= which("file")
-    !@which_file.nil? && `#{@which_file} -b #{self}` =~ /dynamic|shared/
-  end
-
-  # @private
   def text_executable?
     /^#!\s*\S+/ =~ open("r") { |f| f.read(1024) }
   end

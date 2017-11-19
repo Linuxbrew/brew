@@ -1,4 +1,8 @@
+require "os/linux/elf"
+
 class Pathname
+  include ELF
+
   # @private
   def elf?
     # See: https://en.wikipedia.org/wiki/Executable_and_Linkable_Format#File_header

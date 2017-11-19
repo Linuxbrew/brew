@@ -11,7 +11,7 @@ class Keg
   end
 
   def change_rpath(file, old_prefix, new_prefix)
-    return unless file.elf? && file.dynamic?
+    return unless file.elf? && file.dynamic_elf?
 
     begin
       patchelf = Formula["patchelf"].bin/"patchelf"
@@ -54,7 +54,7 @@ class Keg
     results = Set.new
 
     elf_files.each do |file|
-      next if !file.dynamic? || file.mach_o_executable? && skip_executables
+      next if !file.dynamic_elf? || file.mach_o_executable? && skip_executables
       dylibs = file.dynamically_linked_libraries
       results << :libcxx if dylibs.any? { |s| s.include? "libc++.so" }
       results << :libstdcxx if dylibs.any? { |s| s.include? "libstdc++.so" }
