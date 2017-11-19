@@ -64,10 +64,9 @@ class EmbeddedPatch
 
   def apply
     data = contents.gsub("HOMEBREW_PREFIX", HOMEBREW_PREFIX)
-    cmd = "/usr/bin/patch"
     args = %W[-g 0 -f -#{strip}]
-    IO.popen("#{cmd} #{args.join(" ")}", "w") { |p| p.write(data) }
-    raise ErrorDuringExecution.new(cmd, args) unless $CHILD_STATUS.success?
+    Utils.popen_write("patch", *args) { |p| p.write(data) }
+    raise ErrorDuringExecution.new("patch", args) unless $CHILD_STATUS.success?
   end
 
   def inspect
@@ -150,7 +149,7 @@ class ExternalPatch
         patch_files.each do |patch_file|
           ohai "Applying #{patch_file}"
           patch_file = patch_dir/patch_file
-          safe_system "/usr/bin/patch", "-g", "0", "-f", "-#{strip}", "-i", patch_file
+          safe_system "patch", "-g", "0", "-f", "-#{strip}", "-i", patch_file
         end
       end
     end
