@@ -69,6 +69,14 @@ begin
     end
   end
 
+  unless internal_cmd
+    # Add contributed commands to PATH before checking.
+    homebrew_path.append(Tap.cmd_directories)
+
+    # External commands expect a normal PATH
+    ENV["PATH"] = homebrew_path
+  end
+
   # Usage instructions should be displayed if and only if one of:
   # - a help flag is passed AND a command is matched
   # - a help flag is passed AND there is no command specified
@@ -86,14 +94,6 @@ begin
   # Uninstall old brew-cask if it's still around; we just use the tap now.
   if cmd == "cask" && (HOMEBREW_CELLAR/"brew-cask").exist?
     system(HOMEBREW_BREW_FILE, "uninstall", "--force", "brew-cask")
-  end
-
-  unless internal_cmd
-    # Add contributed commands to PATH before checking.
-    homebrew_path.append(Tap.cmd_directories)
-
-    # External commands expect a normal PATH
-    ENV["PATH"] = homebrew_path
   end
 
   if internal_cmd
