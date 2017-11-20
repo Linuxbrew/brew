@@ -90,8 +90,6 @@ module Superenv
   def setup_build_environment(formula = nil)
     generic_setup_build_environment(formula)
     self["HOMEBREW_SDKROOT"] = effective_sysroot
-
-    self["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version.to_s
     self["SDKROOT"] = MacOS.sdk_path if MacOS::Xcode.without_clt?
 
     # Filter out symbols known not to be defined since GNU Autotools can't
