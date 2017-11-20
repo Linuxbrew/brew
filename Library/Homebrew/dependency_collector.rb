@@ -162,7 +162,7 @@ class DependencyCollector
       Dependency.new("cvs", tags) if !OS.mac? || MacOS.version >= :mavericks || !MacOS::Xcode.provides_cvs?
     elsif strategy <= SubversionDownloadStrategy
       SubversionRequirement.new(tags)
-    elsif strategy <= AbstractDownloadStrategy
+    elsif strategy < AbstractDownloadStrategy
       # allow unknown strategies to pass through
     else
       raise TypeError,
