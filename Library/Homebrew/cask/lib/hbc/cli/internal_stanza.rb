@@ -43,6 +43,13 @@ module Hbc
         @stanza = args.shift.to_sym
 
         @format = :to_yaml if yaml?
+
+        return if DSL::DSL_METHODS.include?(stanza)
+        raise ArgumentError,
+          <<~EOS
+            Unknown/unsupported stanza: '#{stanza}'
+            Check Cask reference for supported stanzas.
+          EOS
       end
 
       def run
@@ -54,12 +61,6 @@ module Hbc
         casks(alternative: -> { Hbc.all }).each do |cask|
           print "#{cask}\t" if table?
 
-          unless cask.respond_to?(stanza)
-            opoo "no such stanza '#{stanza}' on Cask '#{cask}'" unless quiet?
-            puts ""
-            next
-          end
-
           begin
             value = cask.send(stanza)
           rescue StandardError
@@ -68,26 +69,14 @@ module Hbc
             next
           end
 
-          if artifact_name && !value.key?(artifact_name)
-            opoo "no such stanza '#{artifact_name}' on Cask '#{cask}'" unless quiet?
-            puts ""
-            next
+          if stanza == :artifacts
+            value = Hash[value.map { |v| [v.class.dsl_key, v.to_s] }]
+            value = value[artifact_name] if artifact_name
           end
 
-          if stanza == :artifacts
-            value = Hash[
-              value.map do |k, v|
-                v = v.map do |a|
-                  next a.to_a if a.respond_to?(:to_a)
-                  next a.to_h if a.respond_to?(:to_h)
-                  a
-                end
-
-                [k, v]
-              end
-            ]
-
-            value = value.fetch(artifact_name) if artifact_name
+          if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?)
+            stanza_name = artifact_name ? artifact_name : stanza
+            raise CaskError, "no such stanza '#{stanza_name}' on Cask '#{cask}'"
           end
 
           if format
