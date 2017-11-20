@@ -280,7 +280,7 @@ describe FormulaAuditor do
 
         subject { fa }
 
-        its(:problems) { are_expected.to match([/unnecessary/]) }
+        its(:problems, :needs_macos) { are_expected.to match([/unnecessary/]) }
       end
     end
   end
