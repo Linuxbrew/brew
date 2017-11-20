@@ -12,9 +12,9 @@ class Pathname
   # @private
   def dynamic_elf?
     if which "readelf"
-      popen_read("readelf", "-l", to_path).include?(" DYNAMIC ")
+      Utils.popen_read("readelf", "-l", to_path).include?(" DYNAMIC ")
     elsif which "file"
-      !popen_read("file", "-L", "-b", to_path)[/dynamic|shared/].nil?
+      !Utils.popen_read("file", "-L", "-b", to_path)[/dynamic|shared/].nil?
     else
       raise StandardError, "Neither `readelf` nor `file` is available "\
         "to determine whether '#{self}' is dynamically or statically linked."
