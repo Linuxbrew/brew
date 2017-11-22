@@ -40,6 +40,15 @@ module OS
         version < minimum_version
       end
 
+      def latest_sdk_version?
+        OS::Mac.version == OS::Mac.latest_sdk_version
+      end
+
+      def needs_clt_installed?
+        return false if latest_sdk_version?
+        without_clt?
+      end
+
       def outdated?
         return false unless installed?
         version < latest_version

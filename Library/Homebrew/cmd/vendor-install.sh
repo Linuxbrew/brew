@@ -25,6 +25,15 @@ then
   ruby_SHA="33643b1ca6f860d6df01686636326785763e5e81cf0cef37d8a7ab96a6ca1fa1"
 fi
 
+# Execute the specified command, and suppress stderr unless HOMEBREW_STDERR is set.
+quiet_stderr() {
+  if [[ -z "$HOMEBREW_STDERR" ]]; then
+    command "$@" 2>/dev/null
+  else
+    command "$@"
+  fi
+}
+
 fetch() {
   local -a curl_args
   local sha
@@ -144,7 +153,7 @@ install() {
   tar "$tar_args" "$CACHED_LOCATION"
   safe_cd "$VENDOR_DIR/portable-$VENDOR_NAME"
 
-  if "./$VENDOR_VERSION/bin/$VENDOR_NAME" --version >/dev/null 2>&1
+  if quiet_stderr "./$VENDOR_VERSION/bin/$VENDOR_NAME" --version >/dev/null
   then
     ln -sfn "$VENDOR_VERSION" current
     # remove old vendor installations by sorting files with modified time.

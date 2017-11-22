@@ -19,6 +19,7 @@ module Homebrew
         %w[
           check_xcode_minimum_version
           check_clt_minimum_version
+          check_if_xcode_needs_clt_installed
         ].freeze
       end
 
@@ -56,7 +57,7 @@ module Homebrew
         # `brew test-bot` runs `brew doctor` in the CI for the Homebrew/brew
         # repository. This only needs to support whatever CI provider
         # Homebrew/brew is currently using.
-        return if ENV["TRAVIS"]
+        return if ENV["HOMEBREW_TRAVIS"]
 
         message = <<~EOS
           Your Xcode (#{MacOS::Xcode.version}) is outdated.
@@ -83,7 +84,7 @@ module Homebrew
         # `brew test-bot` runs `brew doctor` in the CI for the Homebrew/brew
         # repository. This only needs to support whatever CI provider
         # Homebrew/brew is currently using.
-        return if ENV["TRAVIS"]
+        return if ENV["HOMEBREW_TRAVIS"]
 
         <<~EOS
           A newer Command Line Tools release is available.
@@ -121,6 +122,15 @@ module Homebrew
         <<~EOS
           Your Command Line Tools are too outdated.
           #{MacOS::CLT.update_instructions}
+        EOS
+      end
+
+      def check_if_xcode_needs_clt_installed
+        return unless MacOS::Xcode.needs_clt_installed?
+
+        <<~EOS
+          Xcode alone is not sufficient on #{MacOS.version.pretty_name}.
+          #{DevelopmentTools.installation_instructions}
         EOS
       end
 
