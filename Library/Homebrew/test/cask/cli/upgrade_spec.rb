@@ -76,7 +76,7 @@ describe Hbc::CLI::Upgrade, :cask do
       expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.60")
     end
 
-    it 'and ignores "auto_updates" and "latest" Casks even when their tokens are provided in the command line' do
+    it 'but updates "auto_updates" and "latest" Casks when their tokens are provided in the command line' do
       expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
       expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
       expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.2")
@@ -93,7 +93,7 @@ describe Hbc::CLI::Upgrade, :cask do
 
       expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
       expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.57")
+      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.61")
     end
   end
 
