@@ -10,6 +10,7 @@ module Hbc
       end
 
       def run
+        odie "Installing casks is supported only on macOS" unless OS.mac?
         casks.each do |cask|
           begin
             Installer.new(cask, binaries:       binaries?,
