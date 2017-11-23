@@ -1,5 +1,6 @@
 require "open3"
 require "vendor/plist/plist"
+require "shellwords"
 
 require "extend/io"
 
@@ -49,11 +50,11 @@ module Hbc
     end
 
     def command
-      @command ||= [
-        *sudo_prefix,
-        executable,
-        *args,
-      ].freeze
+      @command ||= if sudo?
+        [*sudo_prefix, executable, *args]
+      else
+        [Shellwords.shellescape(executable), *args]
+      end
     end
 
     private
