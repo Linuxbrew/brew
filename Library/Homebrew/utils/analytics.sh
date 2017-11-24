@@ -35,12 +35,12 @@ setup-analytics() {
   HOMEBREW_ANALYTICS_USER_UUID="$(git config --file="$git_config_file" --get homebrew.analyticsuuid 2>/dev/null)"
   if [[ -z "$HOMEBREW_ANALYTICS_USER_UUID" ]]
   then
-    if [[ -n "$HOMEBREW_LINUX" ]]
-    then
-      HOMEBREW_ANALYTICS_USER_UUID="$(tr a-f A-F </proc/sys/kernel/random/uuid)"
-    elif [[ -n "$HOMEBREW_MACOS" ]]
+    if [[ -x /usr/bin/uuidgen ]]
     then
       HOMEBREW_ANALYTICS_USER_UUID="$(/usr/bin/uuidgen)"
+    elif [[ -r /proc/sys/kernel/random/uuid ]]
+    then
+      HOMEBREW_ANALYTICS_USER_UUID="$(tr a-f A-F </proc/sys/kernel/random/uuid)"
     else
       HOMEBREW_ANALYTICS_USER_UUID="$(uuidgen)"
     fi
