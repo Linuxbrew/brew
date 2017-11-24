@@ -35,30 +35,12 @@ module Hbc
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
-      return if cask.caveats.empty?
 
-      output = capture_output do
-        cask.caveats.each do |caveat|
-          if caveat.respond_to?(:eval_and_print)
-            caveat.eval_and_print(cask)
-          else
-            puts caveat
-          end
-        end
-      end
+      caveats = cask.caveats
+      return if caveats.empty?
 
-      return if output.empty?
       ohai "Caveats"
-      puts output
-    end
-
-    def self.capture_output(&block)
-      old_stdout = $stdout
-      $stdout = Buffer.new($stdout.tty?)
-      block.call
-      output = $stdout.string
-      $stdout = old_stdout
-      output
+      puts caveats + "\n"
     end
 
     def fetch
