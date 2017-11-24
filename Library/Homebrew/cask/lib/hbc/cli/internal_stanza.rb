@@ -74,7 +74,7 @@ module Hbc
             value = value[artifact_name] if artifact_name
           end
 
-          if value.nil? || (value.respond_to?(:to_a) && value.to_a.empty?)
+          if value.nil? || (value.respond_to?(:empty?) && value.empty?)
             stanza_name = artifact_name ? artifact_name : stanza
             raise CaskError, "no such stanza '#{stanza_name}' on Cask '#{cask}'"
           end
