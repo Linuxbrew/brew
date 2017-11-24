@@ -4,14 +4,15 @@ describe Hbc::CLI::Upgrade, :cask do
   it_behaves_like "a command that handles invalid options"
 
   shared_context "Proper Casks" do
-    before(:example) do
-      installed =
-        [
-          "outdated/local-caffeine",
-          "outdated/local-transmission",
-          "outdated/auto-updates",
-        ]
+    let(:installed) {
+      [
+        "outdated/local-caffeine",
+        "outdated/local-transmission",
+        "outdated/auto-updates",
+      ]
+    }
 
+    before(:example) do
       installed.each { |cask| Hbc::CLI::Install.run(cask) }
 
       allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
@@ -19,13 +20,14 @@ describe Hbc::CLI::Upgrade, :cask do
   end
 
   shared_context "Casks that will fail upon upgrade" do
-    before(:example) do
-      installed =
-        [
-          "outdated/bad-checksum",
-          "outdated/will-fail-if-upgraded",
-        ]
+    let(:installed) {
+      [
+        "outdated/bad-checksum",
+        "outdated/will-fail-if-upgraded",
+      ]
+    }
 
+    before(:example) do
       installed.each { |cask| Hbc::CLI::Install.run(cask) }
 
       allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
@@ -76,7 +78,7 @@ describe Hbc::CLI::Upgrade, :cask do
       expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.60")
     end
 
-    it 'but updates "auto_updates" and "latest" Casks when their tokens are provided in the command line' do
+    it 'updates "auto_updates" and "latest" Casks when their tokens are provided in the command line' do
       expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
       expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
       expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.2")
@@ -152,16 +154,14 @@ describe Hbc::CLI::Upgrade, :cask do
       Warning: Reverting upgrade for Cask .*
     EOS
 
-    it "by restoring the old Cask if the upgrade's install failed" do
+    it "restores the old Cask if the upgrade failed" do
       expect(Hbc::CaskLoader.load("will-fail-if-upgraded")).to be_installed
       expect(Hbc.appdir.join("container")).to be_a_file
       expect(Hbc::CaskLoader.load("will-fail-if-upgraded").versions).to include("1.2.2")
 
       expect {
-        expect {
-          described_class.run("will-fail-if-upgraded")
-        }.to raise_error(Hbc::CaskError)
-      }.to output(output_reverted).to_stderr
+        described_class.run("will-fail-if-upgraded")
+      }.to raise_error(Hbc::CaskError).and output(output_reverted).to_stderr
 
       expect(Hbc::CaskLoader.load("will-fail-if-upgraded")).to be_installed
       expect(Hbc.appdir.join("container")).to be_a_file
@@ -175,10 +175,8 @@ describe Hbc::CLI::Upgrade, :cask do
       expect(Hbc::CaskLoader.load("bad-checksum").versions).to include("1.2.2")
 
       expect {
-        expect {
-          described_class.run("bad-checksum")
-        }.to raise_error(Hbc::CaskSha256MismatchError)
-      }.to_not output(output_reverted).to_stderr
+        described_class.run("bad-checksum")
+      }.to raise_error(Hbc::CaskSha256MismatchError).and (not_to_output output_reverted).to_stderr
 
       expect(Hbc::CaskLoader.load("bad-checksum")).to be_installed
       expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
