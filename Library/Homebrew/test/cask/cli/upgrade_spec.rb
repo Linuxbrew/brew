@@ -38,64 +38,78 @@ describe Hbc::CLI::Upgrade, :cask do
     include_context "Proper Casks"
 
     it "and updates all the installed Casks when no token is provided" do
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.2")
+      local_caffeine = Hbc::CaskLoader.load("local-caffeine")
+      local_caffeine_route = Hbc.appdir.join("Caffeine.app")
+      local_transmission = Hbc::CaskLoader.load("local-transmission")
+      local_transmission_route = Hbc.appdir.join("Transmission.app")
 
-      expect(Hbc::CaskLoader.load("local-transmission")).to be_installed
-      expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.60")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.2")
+
+      expect(local_transmission).to be_installed
+      expect(local_transmission_route).to be_a_directory
+      expect(local_transmission.versions).to include("2.60")
 
       described_class.run
 
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.3")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.3")
 
-      expect(Hbc::CaskLoader.load("local-transmission")).to be_installed
-      expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.61")
+      expect(local_transmission).to be_installed
+      expect(local_transmission_route).to be_a_directory
+      expect(local_transmission.versions).to include("2.61")
     end
 
     it "and updates only the Casks specified in the command line" do
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.2")
+      local_caffeine = Hbc::CaskLoader.load("local-caffeine")
+      local_caffeine_route = Hbc.appdir.join("Caffeine.app")
+      local_transmission = Hbc::CaskLoader.load("local-transmission")
+      local_transmission_route = Hbc.appdir.join("Transmission.app")
 
-      expect(Hbc::CaskLoader.load("local-transmission")).to be_installed
-      expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.60")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.2")
+
+      expect(local_transmission).to be_installed
+      expect(local_transmission_route).to be_a_directory
+      expect(local_transmission.versions).to include("2.60")
 
       described_class.run("local-caffeine")
 
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.3")
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to_not include("1.2.2")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.3")
 
-      expect(Hbc::CaskLoader.load("local-transmission")).to be_installed
-      expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.60")
+      expect(local_transmission).to be_installed
+      expect(local_transmission_route).to be_a_directory
+      expect(local_transmission.versions).to include("2.60")
     end
 
     it 'updates "auto_updates" and "latest" Casks when their tokens are provided in the command line' do
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.2")
+      local_caffeine = Hbc::CaskLoader.load("local-caffeine")
+      local_caffeine_route = Hbc.appdir.join("Caffeine.app")
+      auto_updates = Hbc::CaskLoader.load("auto-updates")
+      auto_updates_path = Hbc.appdir.join("MyFancyApp.app")
 
-      expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
-      expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.57")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.2")
+
+      expect(auto_updates).to be_installed
+      expect(auto_updates_path).to be_a_directory
+      expect(auto_updates.versions).to include("2.57")
 
       described_class.run("local-caffeine", "auto-updates")
 
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.3")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.3")
 
-      expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
-      expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.61")
+      expect(auto_updates).to be_installed
+      expect(auto_updates_path).to be_a_directory
+      expect(auto_updates.versions).to include("2.61")
     end
   end
 
@@ -103,47 +117,59 @@ describe Hbc::CLI::Upgrade, :cask do
     include_context "Proper Casks"
 
     it 'includes the Casks with "auto_updates true" or "version latest" with --greedy' do
-      expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
-      expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.57")
+      local_caffeine = Hbc::CaskLoader.load("local-caffeine")
+      local_caffeine_route = Hbc.appdir.join("Caffeine.app")
+      auto_updates = Hbc::CaskLoader.load("auto-updates")
+      auto_updates_path = Hbc.appdir.join("MyFancyApp.app")
+      local_transmission = Hbc::CaskLoader.load("local-transmission")
+      local_transmission_route = Hbc.appdir.join("Transmission.app")
 
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.2")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.2")
 
-      expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.60")
+      expect(auto_updates).to be_installed
+      expect(auto_updates_path).to be_a_directory
+      expect(auto_updates.versions).to include("2.57")
+
+      expect(local_transmission).to be_installed
+      expect(local_transmission_route).to be_a_directory
+      expect(local_transmission.versions).to include("2.60")
 
       described_class.run("--greedy")
 
-      expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
-      expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.61")
+      expect(local_caffeine).to be_installed
+      expect(local_caffeine_route).to be_a_directory
+      expect(local_caffeine.versions).to include("1.2.3")
 
-      expect(Hbc::CaskLoader.load("local-caffeine")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-caffeine").versions).to include("1.2.3")
+      expect(auto_updates).to be_installed
+      expect(auto_updates_path).to be_a_directory
+      expect(auto_updates.versions).to include("2.61")
 
-      expect(Hbc::CaskLoader.load("local-transmission")).to be_installed
-      expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("local-transmission").versions).to include("2.61")
+      expect(local_transmission).to be_installed
+      expect(local_transmission_route).to be_a_directory
+      expect(local_transmission.versions).to include("2.61")
     end
 
     it 'does not include the Casks with "auto_updates true" when the version did not change' do
-      expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
-      expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.57")
+      auto_updates = Hbc::CaskLoader.load("auto-updates")
+      auto_updates_path = Hbc.appdir.join("MyFancyApp.app")
+
+      expect(auto_updates).to be_installed
+      expect(auto_updates_path).to be_a_directory
+      expect(auto_updates.versions).to include("2.57")
 
       described_class.run("auto-updates", "--greedy")
 
-      expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
-      expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.61")
+      expect(auto_updates).to be_installed
+      expect(auto_updates_path).to be_a_directory
+      expect(auto_updates.versions).to include("2.61")
 
       described_class.run("auto-updates", "--greedy")
 
-      expect(Hbc::CaskLoader.load("auto-updates")).to be_installed
-      expect(Hbc.appdir.join("MyFancyApp.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("auto-updates").versions).to include("2.61")
+      expect(auto_updates).to be_installed
+      expect(auto_updates_path).to be_a_directory
+      expect(auto_updates.versions).to include("2.61")
     end
   end
 
@@ -155,33 +181,39 @@ describe Hbc::CLI::Upgrade, :cask do
     EOS
 
     it "restores the old Cask if the upgrade failed" do
-      expect(Hbc::CaskLoader.load("will-fail-if-upgraded")).to be_installed
-      expect(Hbc.appdir.join("container")).to be_a_file
-      expect(Hbc::CaskLoader.load("will-fail-if-upgraded").versions).to include("1.2.2")
+      will_fail_if_upgraded = Hbc::CaskLoader.load("will-fail-if-upgraded")
+      will_fail_if_upgraded_path = Hbc.appdir.join("container")
+
+      expect(will_fail_if_upgraded).to be_installed
+      expect(will_fail_if_upgraded_path).to be_a_file
+      expect(will_fail_if_upgraded.versions).to include("1.2.2")
 
       expect {
         described_class.run("will-fail-if-upgraded")
       }.to raise_error(Hbc::CaskError).and output(output_reverted).to_stderr
 
-      expect(Hbc::CaskLoader.load("will-fail-if-upgraded")).to be_installed
-      expect(Hbc.appdir.join("container")).to be_a_file
-      expect(Hbc::CaskLoader.load("will-fail-if-upgraded").versions).to include("1.2.2")
-      expect(Hbc::CaskLoader.load("will-fail-if-upgraded").staged_path).to_not exist
+      expect(will_fail_if_upgraded).to be_installed
+      expect(will_fail_if_upgraded_path).to be_a_file
+      expect(will_fail_if_upgraded.versions).to include("1.2.2")
+      expect(will_fail_if_upgraded.staged_path).to_not exist
     end
 
     it "by not restoring the old Cask if the upgrade failed pre-install" do
-      expect(Hbc::CaskLoader.load("bad-checksum")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("bad-checksum").versions).to include("1.2.2")
+      bad_checksum = Hbc::CaskLoader.load("bad-checksum")
+      bad_checksum_path = Hbc.appdir.join("Caffeine.app")
+
+      expect(bad_checksum).to be_installed
+      expect(bad_checksum_path).to be_a_directory
+      expect(bad_checksum.versions).to include("1.2.2")
 
       expect {
         described_class.run("bad-checksum")
-      }.to raise_error(Hbc::CaskSha256MismatchError).and (not_to_output output_reverted).to_stderr
+      }.to raise_error(Hbc::CaskSha256MismatchError).and(not_to_output(output_reverted).to_stderr)
 
-      expect(Hbc::CaskLoader.load("bad-checksum")).to be_installed
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
-      expect(Hbc::CaskLoader.load("bad-checksum").versions).to include("1.2.2")
-      expect(Hbc::CaskLoader.load("bad-checksum").staged_path).to_not exist
+      expect(bad_checksum).to be_installed
+      expect(bad_checksum_path).to be_a_directory
+      expect(bad_checksum.versions).to include("1.2.2")
+      expect(bad_checksum.staged_path).to_not exist
     end
   end
 end

@@ -12,8 +12,11 @@ module Hbc
       end
 
       def run
-        outdated_casks = casks(alternative: -> { Hbc.installed.select { |cask|
-          cask.outdated?(greedy?) } }).select { |cask| cask.outdated?(true) }
+        outdated_casks = casks(alternative: lambda {
+          Hbc.installed.select do |cask|
+            cask.outdated?(greedy?)
+          end
+        }).select { |cask| cask.outdated?(true) }
 
         if outdated_casks.empty?
           oh1 "No Casks to upgrade"
