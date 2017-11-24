@@ -331,6 +331,7 @@ module RuboCop
           end
 
           find_instance_method_call(body_node, "Dir", :[]) do |method|
+            next unless parameters(method).size == 1
             path = parameters(method).first
             next unless path.str_type?
             next unless match = regex_match_group(path, /^[^\*{},]+$/)
