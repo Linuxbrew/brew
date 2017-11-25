@@ -103,7 +103,7 @@ class DependencyCollector
 
   def parse_symbol_spec(spec, tags)
     case spec
-    when :x11        then OS.mac? ? X11Requirement.new(spec.to_s, tags) : XorgRequirement.new(spec.to_s, tags)
+    when :x11        then X11Requirement.new(spec.to_s, tags)
     when :xcode      then XcodeRequirement.new(tags)
     when :linux      then LinuxRequirement.new(tags)
     when :macos      then MacOSRequirement.new(tags)

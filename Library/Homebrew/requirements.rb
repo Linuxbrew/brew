@@ -14,7 +14,6 @@ require "requirements/ruby_requirement"
 require "requirements/tuntap_requirement"
 require "requirements/unsigned_kext_requirement"
 require "requirements/x11_requirement"
-require "requirements/xorg_requirement"
 require "requirements/emacs_requirement"
 require "requirements/glibc_requirement"
 

@@ -45,3 +45,5 @@ class X11Requirement < Requirement
     "#<#{self.class.name}: #{name.inspect} #{tags.inspect} min_version=#{min_version}>"
   end
 end
+
+require "extend/os/requirements/x11_requirement.rb"

@@ -20,7 +20,7 @@ describe X11Requirement do
       expect(subject).not_to eql(other)
     end
 
-    it "returns false if the minimum version differs" do
+    it "returns false if the minimum version differs", :needs_macos do
       other = described_class.new(default_name, ["2.5"])
       expect(subject).not_to eql(other)
     end

@@ -718,7 +718,7 @@ describe Formula do
     stub_formula_loader(f1)
 
     python = PythonRequirement.new
-    x11 = (OS.mac? ? X11Requirement : XorgRequirement).new("x11", [:recommended])
+    x11 = X11Requirement.new("x11", [:recommended])
     xcode = XcodeRequirement.new(["1.0", :optional])
 
     expect(Set.new(f1.recursive_requirements)).to eq(Set[python, x11])
