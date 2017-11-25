@@ -1,5 +1,5 @@
 module Stdenv
-  # needed by XorgRequirement
+  # needed by X11Requirement
   def x11; end
 
   def libxml2
