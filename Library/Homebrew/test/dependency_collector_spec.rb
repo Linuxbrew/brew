@@ -84,6 +84,18 @@ describe DependencyCollector do
       expect(subject.add(resource)).to be_an_instance_of(GitRequirement)
     end
 
+    it "creates a resource dependency from a CVS URL" do
+      resource = Resource.new
+      resource.url(":pserver:anonymous:@example.com:/cvsroot/foo/bar", using: :cvs)
+      expect(subject.add(resource)).to be_an_instance_of(CVSRequirement)
+    end
+
+    it "creates a resource dependency from a Subversion URL" do
+      resource = Resource.new
+      resource.url("svn://example.com/foo/bar")
+      expect(subject.add(resource)).to be_an_instance_of(SubversionRequirement)
+    end
+
     it "creates a resource dependency from a '.7z' URL" do
       resource = Resource.new
       resource.url("http://example.com/foo.7z")
