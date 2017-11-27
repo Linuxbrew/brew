@@ -80,6 +80,14 @@ module Homebrew
       odie "This command requires at least one argument containing a URL or pull request number"
     end
 
+    # Passthrough Git environment variables for e.g. git am
+    if ENV["HOMEBREW_GIT_NAME"]
+      ENV["GIT_COMMITTER_NAME"] = ENV["HOMEBREW_GIT_NAME"]
+    end
+    if ENV["HOMEBREW_GIT_EMAIL"]
+      ENV["GIT_COMMITTER_EMAIL"] = ENV["HOMEBREW_GIT_EMAIL"]
+    end
+
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
 
     # Formulae with affected bottles that were published
