@@ -9,7 +9,7 @@ require "set"
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
 
-  if ENV["CODECOV_TOKEN"] || ENV["HOMEBREW_TRAVIS"]
+  if ENV["CODECOV_TOKEN"] || ENV["TRAVIS"]
     require "codecov"
     SimpleCov.formatter = SimpleCov::Formatter::Codecov
   end
