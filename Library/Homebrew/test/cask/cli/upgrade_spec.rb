@@ -96,7 +96,7 @@ describe Hbc::CLI::Upgrade, :cask do
     end
 
     describe "with --greedy it checks additional Casks" do
-      it 'includes the Casks with "auto_updates true" or "version latest" with --greedy' do
+      it 'includes the Casks with "auto_updates true" or "version latest"' do
         local_caffeine = Hbc::CaskLoader.load("local-caffeine")
         local_caffeine_path = Hbc.appdir.join("Caffeine.app")
         auto_updates = Hbc::CaskLoader.load("auto-updates")
