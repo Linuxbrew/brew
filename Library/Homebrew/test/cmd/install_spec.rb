@@ -71,7 +71,7 @@ describe "brew install", :integration_test do
 
       devel do
         url "#{Formulary.factory("testball1").stable.url}"
-        sha256 "#{TESTBALL_SHA256}"
+        sha256 "#{Formulary.factory("testball1").stable.checksum.hexdigest}"
         version "3.0"
       end
     EOS
