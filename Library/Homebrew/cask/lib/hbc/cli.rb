@@ -21,6 +21,7 @@ require "hbc/cli/reinstall"
 require "hbc/cli/search"
 require "hbc/cli/style"
 require "hbc/cli/uninstall"
+require "hbc/cli/upgrade"
 require "hbc/cli/--version"
 require "hbc/cli/zap"
 

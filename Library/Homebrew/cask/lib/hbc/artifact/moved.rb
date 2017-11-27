@@ -12,7 +12,7 @@ module Hbc
       end
 
       def uninstall_phase(**options)
-        delete(**options)
+        move_back(**options)
       end
 
       def summarize_installed
@@ -30,7 +30,7 @@ module Hbc
           message = "It seems there is already #{self.class.english_article} #{self.class.english_name} at '#{target}'"
           raise CaskError, "#{message}." unless force
           opoo "#{message}; overwriting."
-          delete(force: force, command: command, **options)
+          delete(target, force: force, command: command, **options)
         end
 
         unless source.exist?
@@ -49,7 +49,32 @@ module Hbc
         add_altname_metadata(target, source.basename, command: command)
       end
 
-      def delete(force: false, command: nil, **_)
+      def move_back(skip: false, force: false, command: nil, **options)
+        if Utils.path_occupied?(source)
+          message = "It seems there is already #{self.class.english_article} #{self.class.english_name} at '#{source}'"
+          raise CaskError, "#{message}." unless force
+          opoo "#{message}; overwriting."
+          delete(source, force: force, command: command, **options)
+        end
+
+        unless target.exist?
+          return if skip
+          raise CaskError, "It seems the #{self.class.english_name} source '#{target}' is not there."
+        end
+
+        ohai "Moving #{self.class.english_name} '#{target.basename}' back to '#{source}'."
+        source.dirname.mkpath
+
+        if source.parent.writable?
+          FileUtils.move(target, source)
+        else
+          command.run("/bin/mv", args: [target, source], sudo: true)
+        end
+
+        add_altname_metadata(target, source.basename, command: command)
+      end
+
+      def delete(target, force: false, command: nil, **_)
         ohai "Removing #{self.class.english_name} '#{target}'."
         raise CaskError, "Cannot remove undeletable #{self.class.english_name}." if MacOS.undeletable?(target)
 
