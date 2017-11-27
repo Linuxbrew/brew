@@ -59,6 +59,29 @@ do
   export "$VAR_NEW"="${!VAR}"
 done
 
+# Set HOMEBREW_DEVELOPER for users who have run a development command
+if [[ -z "$HOMEBREW_DEVELOPER" ]]
+then
+  export HOMEBREW_GIT_CONFIG_FILE="$HOMEBREW_REPOSITORY/.git/config"
+  HOMEBREW_GIT_CONFIG_DEVELOPERMODE="$(git config --file="$HOMEBREW_GIT_CONFIG_FILE" --get homebrew.devcmdrun 2>/dev/null)"
+  if [[ "$HOMEBREW_GIT_CONFIG_DEVELOPERMODE" = "true" ]]
+  then
+    export HOMEBREW_DEV_CMD_RUN="1"
+  fi
+fi
+
+if [[ -z "$HOMEBREW_NO_ENV_FILTERING" ]]
+then
+  if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
+  then
+    # Use env filtering by default for users who have run a development command
+    # This will be enabled by default for all users in future.
+    export HOMEBREW_ENV_FILTERING="1"
+  fi
+else
+  unset HOMEBREW_ENV_FILTERING
+fi
+
 # test-bot sets environment filtering itself
 if [[ -n "$HOMEBREW_ENV_FILTERING" && "$1" != "test-bot" ]]
 then

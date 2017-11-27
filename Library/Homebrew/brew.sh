@@ -246,16 +246,6 @@ case "$HOMEBREW_COMMAND" in
   --config)    HOMEBREW_COMMAND="config" ;;
 esac
 
-if [[ -z "$HOMEBREW_DEVELOPER" ]]
-then
-  export HOMEBREW_GIT_CONFIG_FILE="$HOMEBREW_REPOSITORY/.git/config"
-  HOMEBREW_GIT_CONFIG_DEVELOPERMODE="$(git config --file="$HOMEBREW_GIT_CONFIG_FILE" --get homebrew.devcmdrun 2>/dev/null)"
-  if [[ "$HOMEBREW_GIT_CONFIG_DEVELOPERMODE" = "true" ]]
-  then
-    export HOMEBREW_DEV_CMD_RUN="1"
-  fi
-fi
-
 if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]
 then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh"
