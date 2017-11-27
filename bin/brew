@@ -91,6 +91,9 @@ then
   for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS \
              "${!HOMEBREW_@}" "${!TRAVIS_@}"
   do
+    # Skip if variable value is empty.
+    [[ -z "${!VAR}" ]] && continue
+
     FILTERED_ENV+=( "${VAR}=${!VAR}" )
   done
 
