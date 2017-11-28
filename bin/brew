@@ -97,7 +97,7 @@ then
     FILTERED_ENV+=( "${VAR}=${!VAR}" )
   done
 
-  /usr/bin/env -i "${FILTERED_ENV[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
+  exec /usr/bin/env -i "${FILTERED_ENV[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
 else
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi
