@@ -31,7 +31,6 @@ module Hbc
         directives[:signal] = [*directives[:signal]].flatten.each_slice(2).to_a
         @directives = directives
 
-        return if MacOS.version < :high_sierra
         return unless directives.key?(:kext)
 
         cask.caveats do
