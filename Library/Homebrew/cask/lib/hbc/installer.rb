@@ -452,8 +452,11 @@ module Hbc
       ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
-      staged_path = version_is_latest? ?
-        backup_path(@cask.staged_path) : @cask.staged_path
+      if version_is_latest?
+        staged_path = backup_path(@cask.staged_path)
+      else
+        staged_path = @cask.staged_path
+      end
 
       gain_permissions_remove(staged_path) if !staged_path.nil? && staged_path.exist?
 

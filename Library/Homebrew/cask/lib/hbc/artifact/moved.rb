@@ -71,7 +71,7 @@ module Hbc
           command.run("/bin/mv", args: [target, source], sudo: true)
         end
 
-        add_altname_metadata(target, source.basename, command: command)
+        add_altname_metadata(source, target.basename, command: command)
       end
 
       def delete(target, force: false, command: nil, **_)
