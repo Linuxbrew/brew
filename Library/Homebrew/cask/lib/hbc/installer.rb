@@ -452,7 +452,7 @@ module Hbc
       ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
-      if version_is_latest?
+      if upgrade? && version_is_latest?
         staged_path = backup_path(@cask.staged_path)
       else
         staged_path = @cask.staged_path
@@ -463,7 +463,7 @@ module Hbc
       # Homebrew-Cask metadata
       if @cask.metadata_versioned_path.respond_to?(:children) &&
          @cask.metadata_versioned_path.exist? &&
-         !version_is_latest?
+         !(upgrade? && version_is_latest?)
         @cask.metadata_versioned_path.children.each do |subdir|
           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
             gain_permissions_remove(subdir)
