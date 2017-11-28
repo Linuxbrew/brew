@@ -17,7 +17,8 @@ module Hbc
       def self.caveat(name, &block)
         define_method(name) do |*args|
           key = [name, *args]
-          @built_in_caveats[key] = instance_exec(*args, &block)
+          text = instance_exec(*args, &block)
+          @built_in_caveats[key] = text if text
           :built_in_caveat
         end
       end
@@ -42,6 +43,7 @@ module Hbc
       end
 
       caveat :kext do
+        next if MacOS.version < :high_sierra
         <<~EOS
           To install and/or use #{@cask} you may need to enable their kernel extension in
 
