@@ -29,7 +29,6 @@ module Hbc
       @require_sha = require_sha
       @reinstall = false
       @upgrade = upgrade
-      @backed_up = false
     end
 
     attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?, :backed_up?
@@ -383,7 +382,6 @@ module Hbc
     end
 
     def backup
-      @backed_up = true
       @cask.staged_path.rename backup_path
     end
 
@@ -393,7 +391,6 @@ module Hbc
       Pathname.new(@cask.staged_path).rmtree if @cask.staged_path.exist?
 
       backup_path.rename @cask.staged_path
-      @backed_up = false
     end
 
     def revert_upgrade
@@ -404,7 +401,7 @@ module Hbc
     end
 
     def finalize_upgrade
-      purge_versioned_files
+      purge_backed_versioned_files
 
       puts summary
     end
@@ -439,11 +436,7 @@ module Hbc
 
     def backup_path
       return nil if @cask.staged_path.nil?
-      if backed_up?
-        Pathname.new "#{@cask.staged_path}.upgrading"
-      else
-        @cask.staged_path
-      end
+      Pathname.new "#{@cask.staged_path}.upgrading"
     end
 
     def version_is_latest?
@@ -454,19 +447,27 @@ module Hbc
       Utils.gain_permissions_remove(path, command: @command)
     end
 
+    def purge_backed_versioned_files
+      ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
+
+      # versioned staged distribution
+      gain_permissions_remove(backup_path) if !backup_path.nil? && backup_path.exist?
+
+      # Homebrew-Cask metadata
+      purge_metadata
+    end
+
     def purge_versioned_files
       ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
-      if upgrade?
-        staged_path = backup_path
-      else
-        staged_path = @cask.staged_path
-      end
-
-      gain_permissions_remove(staged_path) if !staged_path.nil? && staged_path.exist?
+      gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
 
       # Homebrew-Cask metadata
+      purge_metadata
+    end
+
+    def purge_metadata
       if @cask.metadata_versioned_path.respond_to?(:children) &&
          @cask.metadata_versioned_path.exist? &&
          !(upgrade? && version_is_latest?)
