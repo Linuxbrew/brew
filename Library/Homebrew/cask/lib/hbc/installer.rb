@@ -383,14 +383,17 @@ module Hbc
 
     def backup
       @cask.staged_path.rename backup_path
+      @cask.metadata_versioned_path.rename backup_metadata_path
     end
 
     def restore_backup
-      return unless backup_path.directory?
+      return unless backup_path.directory? && backup_metadata_path.directory?
 
       Pathname.new(@cask.staged_path).rmtree if @cask.staged_path.exist?
+      Pathname.new(@cask.metadata_versioned_path).rmtree if @cask.metadata_versioned_path.exist?
 
       backup_path.rename @cask.staged_path
+      backup_metadata_path.rename @cask.metadata_versioned_path
     end
 
     def revert_upgrade
@@ -439,6 +442,11 @@ module Hbc
       Pathname.new "#{@cask.staged_path}.upgrading"
     end
 
+    def backup_metadata_path
+      return nil if @cask.metadata_versioned_path.nil?
+      Pathname.new "#{@cask.metadata_versioned_path}.upgrading"
+    end
+
     def version_is_latest?
       @cask.versions.include?("latest")
     end
@@ -454,7 +462,19 @@ module Hbc
       gain_permissions_remove(backup_path) if !backup_path.nil? && backup_path.exist?
 
       # Homebrew-Cask metadata
-      purge_metadata
+      if backup_metadata_path.respond_to?(:children) &&
+         backup_metadata_path.exist? &&
+         backup_metadata_path.children.each do |subdir|
+           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
+             gain_permissions_remove(subdir)
+           end
+         end
+      end
+      backup_metadata_path.rmdir_if_possible
+      @cask.metadata_master_container_path.rmdir_if_possible unless upgrade?
+
+      # toplevel staged distribution
+      @cask.caskroom_path.rmdir_if_possible unless upgrade?
     end
 
     def purge_versioned_files
@@ -464,13 +484,8 @@ module Hbc
       gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
 
       # Homebrew-Cask metadata
-      purge_metadata
-    end
-
-    def purge_metadata
       if @cask.metadata_versioned_path.respond_to?(:children) &&
-         @cask.metadata_versioned_path.exist? &&
-         !(upgrade? && version_is_latest?)
+         @cask.metadata_versioned_path.exist?
         @cask.metadata_versioned_path.children.each do |subdir|
           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
             gain_permissions_remove(subdir)
