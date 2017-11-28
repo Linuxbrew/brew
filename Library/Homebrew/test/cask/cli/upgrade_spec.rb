@@ -9,6 +9,7 @@ describe Hbc::CLI::Upgrade, :cask do
         "outdated/local-caffeine",
         "outdated/local-transmission",
         "outdated/auto-updates",
+        "outdated/version-latest",
       ]
     }
 
@@ -103,6 +104,9 @@ describe Hbc::CLI::Upgrade, :cask do
         auto_updates_path = Hbc.appdir.join("MyFancyApp.app")
         local_transmission = Hbc::CaskLoader.load("local-transmission")
         local_transmission_path = Hbc.appdir.join("Transmission.app")
+        version_latest = Hbc::CaskLoader.load("version-latest")
+        version_latest_path_1 = Hbc.appdir.join("Caffeine Mini.app")
+        version_latest_path_2 = Hbc.appdir.join("Caffeine Pro.app")
 
         expect(local_caffeine).to be_installed
         expect(local_caffeine_path).to be_a_directory
@@ -115,6 +119,11 @@ describe Hbc::CLI::Upgrade, :cask do
         expect(local_transmission).to be_installed
         expect(local_transmission_path).to be_a_directory
         expect(local_transmission.versions).to include("2.60")
+
+        expect(version_latest).to be_installed
+        expect(version_latest_path_1).to be_a_directory
+        expect(version_latest_path_2).to be_a_directory
+        expect(version_latest.versions).to include("latest")
 
         described_class.run("--greedy")
 
@@ -129,6 +138,11 @@ describe Hbc::CLI::Upgrade, :cask do
         expect(local_transmission).to be_installed
         expect(local_transmission_path).to be_a_directory
         expect(local_transmission.versions).to include("2.61")
+
+        expect(version_latest).to be_installed
+        expect(version_latest_path_1).to be_a_directory
+        expect(version_latest_path_2).to be_a_directory
+        expect(version_latest.versions).to include("latest")
       end
 
       it 'does not include the Casks with "auto_updates true" when the version did not change' do
