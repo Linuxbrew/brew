@@ -31,7 +31,7 @@ module Hbc
       @upgrade = upgrade
     end
 
-    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?, :backed_up?
+    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
@@ -447,10 +447,6 @@ module Hbc
       Pathname.new "#{@cask.metadata_versioned_path}.upgrading"
     end
 
-    def version_is_latest?
-      @cask.versions.include?("latest")
-    end
-
     def gain_permissions_remove(path)
       Utils.gain_permissions_remove(path, command: @command)
     end
@@ -471,10 +467,6 @@ module Hbc
          end
       end
       backup_metadata_path.rmdir_if_possible
-      @cask.metadata_master_container_path.rmdir_if_possible unless upgrade?
-
-      # toplevel staged distribution
-      @cask.caskroom_path.rmdir_if_possible unless upgrade?
     end
 
     def purge_versioned_files
