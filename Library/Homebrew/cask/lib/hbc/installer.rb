@@ -29,9 +29,10 @@ module Hbc
       @require_sha = require_sha
       @reinstall = false
       @upgrade = upgrade
+      @backed_up = false
     end
 
-    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?
+    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?, :backed_up?
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
@@ -378,26 +379,26 @@ module Hbc
 
       disable_accessibility_access
       uninstall_artifacts
-      backup if version_is_latest?
+      backup
     end
 
     def backup
-      @cask.staged_path.rename backup_path(@cask.staged_path)
+      @backed_up = true
+      @cask.staged_path.rename backup_path
     end
 
     def restore_backup
-      path = backup_path(@cask.staged_path)
-
-      return unless path.directory?
+      return unless backup_path.directory?
 
       Pathname.new(@cask.staged_path).rmtree if @cask.staged_path.exist?
 
-      path.rename @cask.staged_path
+      backup_path.rename @cask.staged_path
+      @backed_up = false
     end
 
     def revert_upgrade
       opoo "Reverting upgrade for Cask #{@cask}"
-      restore_backup if version_is_latest?
+      restore_backup
       install_artifacts
       enable_accessibility_access
     end
@@ -436,8 +437,13 @@ module Hbc
       purge_caskroom_path
     end
 
-    def backup_path(path)
-      Pathname.new "#{path}.upgrading" unless path.nil?
+    def backup_path
+      return nil if @cask.staged_path.nil?
+      if backed_up?
+        Pathname.new "#{@cask.staged_path}.upgrading"
+      else
+        @cask.staged_path
+      end
     end
 
     def version_is_latest?
@@ -452,8 +458,8 @@ module Hbc
       ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
-      if upgrade? && version_is_latest?
-        staged_path = backup_path(@cask.staged_path)
+      if upgrade?
+        staged_path = backup_path
       else
         staged_path = @cask.staged_path
       end
