@@ -88,7 +88,7 @@ then
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
   FILTERED_ENV=()
-  for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS SUDO_ASKPASS \
+  for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS SSH_AUTH_SOCK SUDO_ASKPASS \
              http_proxy https_proxy ftp_proxy HTTPS_PROXY FTP_PROXY \
              "${!HOMEBREW_@}" "${!TRAVIS_@}" "${!JENKINS_@}"
   do
