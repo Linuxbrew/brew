@@ -401,7 +401,7 @@ module Hbc
     end
 
     def finalize_upgrade
-      purge_backed_versioned_files
+      purge_backed_up_versioned_files
 
       puts summary
     end
@@ -447,7 +447,7 @@ module Hbc
       Utils.gain_permissions_remove(path, command: @command)
     end
 
-    def purge_backed_versioned_files
+    def purge_backed_up_versioned_files
       ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
