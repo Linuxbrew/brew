@@ -378,10 +378,26 @@ module Hbc
 
       disable_accessibility_access
       uninstall_artifacts
+      backup if version_is_latest?
+    end
+
+    def backup
+      @cask.staged_path.rename backup_path(@cask.staged_path)
+    end
+
+    def restore_backup
+      path = backup_path(@cask.staged_path)
+
+      return unless path.directory?
+
+      Pathname.new(@cask.staged_path).rmtree if @cask.staged_path.exist?
+
+      path.rename @cask.staged_path
     end
 
     def revert_upgrade
       opoo "Reverting upgrade for Cask #{@cask}"
+      restore_backup if version_is_latest?
       install_artifacts
       enable_accessibility_access
     end
@@ -420,6 +436,14 @@ module Hbc
       purge_caskroom_path
     end
 
+    def backup_path(path)
+      Pathname.new "#{path}.upgrading" unless path.nil?
+    end
+
+    def version_is_latest?
+      @cask.versions.include?("latest")
+    end
+
     def gain_permissions_remove(path)
       Utils.gain_permissions_remove(path, command: @command)
     end
@@ -428,11 +452,15 @@ module Hbc
       ohai "Purging files for version #{@cask.version} of Cask #{@cask}"
 
       # versioned staged distribution
-      gain_permissions_remove(@cask.staged_path) if !@cask.staged_path.nil? && @cask.staged_path.exist?
+      staged_path = version_is_latest? ?
+        backup_path(@cask.staged_path) : @cask.staged_path
+
+      gain_permissions_remove(staged_path) if !staged_path.nil? && staged_path.exist?
 
       # Homebrew-Cask metadata
       if @cask.metadata_versioned_path.respond_to?(:children) &&
-         @cask.metadata_versioned_path.exist?
+         @cask.metadata_versioned_path.exist? &&
+         !version_is_latest?
         @cask.metadata_versioned_path.children.each do |subdir|
           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
             gain_permissions_remove(subdir)

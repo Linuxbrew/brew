@@ -55,14 +55,14 @@ module Hbc
 
             new_cask_installer.fetch
 
-            new_cask_installer.stage
-
             # Move the old Cask's artifacts back to staging
             old_cask_installer.start_upgrade
             # And flag it so in case of error
             started_upgrade = true
 
             # Install the new Cask
+            new_cask_installer.stage
+
             new_cask_installer.install_artifacts
             new_artifacts_installed = true
 
