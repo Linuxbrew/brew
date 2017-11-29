@@ -1,26 +1,13 @@
 module Hardware
   class CPU
     class << self
-      def universal_archs
-        [].extend ArchitectureListExtension
-      end
-
       def cpuinfo
         @cpuinfo ||= File.read("/proc/cpuinfo")
       end
 
-      def type
-        @type ||= if cpuinfo =~ /Intel|AMD/
-          :intel
-        elsif cpuinfo =~ /ARM|Marvell/
-          :arm
-        else
-          :dunno
-        end
-      end
-
       def family
         return :arm if arm?
+        return :ppc if ppc?
         return :dunno unless intel?
         # See https://software.intel.com/en-us/articles/intel-architecture-and-processor-identification-with-cpuid-model-and-family-numbers
         cpu_family = cpuinfo[/^cpu family\s*: ([0-9]+)/, 1].to_i
@@ -70,12 +57,9 @@ module Hardware
         end
       end
 
-      def cores
-        cpuinfo.scan(/^processor/).size
-      end
-
       def flags
-        @flags ||= cpuinfo[/^(flags|Features).*/, 0].split
+        @flags ||= cpuinfo[/^(flags|Features).*/, 0]&.split
+        @flags ||= []
       end
 
       # Compatibility with Mac method, which returns lowercase symbols
@@ -94,12 +78,6 @@ module Hardware
 
       def sse4?
         flags.include? "sse4_1"
-      end
-
-      alias is_64_bit? lm?
-
-      def bits
-        is_64_bit? ? 64 : 32
       end
     end
   end

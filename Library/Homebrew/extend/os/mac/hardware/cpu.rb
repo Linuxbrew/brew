@@ -75,22 +75,6 @@ module Hardware
         sysctl_int("machdep.cpu.extmodel")
       end
 
-      def cores
-        sysctl_int("hw.ncpu")
-      end
-
-      def bits
-        sysctl_bool("hw.cpu64bit_capable") ? 64 : 32
-      end
-
-      def arch_32_bit
-        intel? ? :i386 : :ppc
-      end
-
-      def arch_64_bit
-        intel? ? :x86_64 : :ppc64
-      end
-
       # Returns an array that's been extended with ArchitectureListExtension,
       # which provides helpers like #as_arch_flags and #as_cmake_arch_flags.
       def universal_archs
