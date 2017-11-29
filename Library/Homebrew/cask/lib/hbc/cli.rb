@@ -113,9 +113,9 @@ module Hbc
           # other Ruby libraries must do everything via "require"
           klass.run(*args)
         end
-      elsif which("brewcask-#{command}")
+      elsif external_command = which("brewcask-#{command}", ENV["HOMEBREW_PATH"])
         # arbitrary external executable on PATH, Homebrew-style
-        exec "brewcask-#{command}", *ARGV[1..-1]
+        exec external_command, *ARGV[1..-1]
       elsif Pathname.new(command.to_s).executable? &&
             command.to_s.include?("/") &&
             !command.to_s.match(/\.rb$/)
