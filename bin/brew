@@ -88,8 +88,8 @@ then
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
   FILTERED_ENV=()
-  for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS \
-             http_proxy https_proxy ftp_proxy no_proxy \
+  for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS SUDO_ASKPASS
+             http_proxy HTTPS_PROXY FTP_PROXY \
              "${!HOMEBREW_@}" "${!TRAVIS_@}" "${!JENKINS_@}"
   do
     # Skip if variable value is empty.

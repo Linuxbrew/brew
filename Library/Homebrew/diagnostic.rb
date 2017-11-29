@@ -180,6 +180,7 @@ module Homebrew
           "libecomlodr.dylib", # Symantec Endpoint Protection
           "libsymsea*.dylib", # Symantec Endpoint Protection
           "sentinel.dylib", # SentinelOne
+          "sentinel-*.dylib", # SentinelOne
         ]
 
         __check_stray_files "/usr/local/lib", "*.dylib", white_list, <<~EOS
