@@ -458,8 +458,7 @@ module Hbc
       gain_permissions_remove(backup_path) if !backup_path.nil? && backup_path.exist?
 
       # Homebrew-Cask metadata
-      if backup_metadata_path.respond_to?(:children) &&
-         backup_metadata_path.exist?
+      if backup_metadata_path.directory?
         backup_metadata_path.children.each do |subdir|
           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
             gain_permissions_remove(subdir)
