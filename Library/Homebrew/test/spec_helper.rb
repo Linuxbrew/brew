@@ -61,10 +61,6 @@ RSpec.configure do |config|
     skip "Needs official command Taps." unless ENV["HOMEBREW_TEST_OFFICIAL_CMD_TAPS"]
   end
 
-  config.before(:each, :needs_linux) do
-    skip "Not on Linux." unless OS.linux?
-  end
-
   config.before(:each, :needs_macos) do
     skip "Not on macOS." unless OS.mac?
   end
