@@ -459,12 +459,12 @@ module Hbc
 
       # Homebrew-Cask metadata
       if backup_metadata_path.respond_to?(:children) &&
-         backup_metadata_path.exist? &&
-         backup_metadata_path.children.each do |subdir|
-           unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
-             gain_permissions_remove(subdir)
-           end
-         end
+         backup_metadata_path.exist?
+        backup_metadata_path.children.each do |subdir|
+          unless PERSISTENT_METADATA_SUBDIRS.include?(subdir.basename)
+            gain_permissions_remove(subdir)
+          end
+        end
       end
       backup_metadata_path.rmdir_if_possible
     end
