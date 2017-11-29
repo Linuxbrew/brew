@@ -21,8 +21,16 @@ then
   fi
 elif [[ -n "$HOMEBREW_LINUX" ]]
 then
-  ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.x86_64_linux.bottle.1.tar.gz"
-  ruby_SHA="33643b1ca6f860d6df01686636326785763e5e81cf0cef37d8a7ab96a6ca1fa1"
+  case "$HOMEBREW_PROCESSOR" in
+    armv7l)
+      ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.armv7l_linux.bottle.1.tar.gz"
+      ruby_SHA="d26affe6f6ac299557a9044b311b4066b554874fc828ebc323d2705d3f4a8249"
+      ;;
+    x86_64)
+      ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.x86_64_linux.bottle.1.tar.gz"
+      ruby_SHA="33643b1ca6f860d6df01686636326785763e5e81cf0cef37d8a7ab96a6ca1fa1"
+      ;;
+  esac
 fi
 
 # Execute the specified command, and suppress stderr unless HOMEBREW_STDERR is set.
