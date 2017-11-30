@@ -30,6 +30,10 @@ class Version
       Float::NAN
     end
 
+    def to_i
+      0
+    end
+
     def to_s
       ""
     end
