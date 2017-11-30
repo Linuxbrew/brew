@@ -235,20 +235,26 @@ can take several different forms:
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.
 
+  * `http_proxy`:
+    Sets the HTTP proxy to be used by `curl`, `git` and `svn` when downloading
+    through Homebrew.
+
+  * `https_proxy`:
+    Sets the HTTPS proxy to be used by `curl`, `git` and `svn` when downloading
+    through Homebrew.
+
+  * `ftp_proxy`:
+    Sets the FTP proxy to be used by `curl`, `git` and `svn` when downloading
+    through Homebrew.
+
 ## USING HOMEBREW BEHIND A PROXY
+Use the `http_proxy`, `https_proxy` and/or `ftp_proxy` documented above. For example for an unauthenticated HTTP proxy:
 
-Homebrew uses several commands for downloading files (e.g. `curl`, `git`, `svn`).
-Many of these tools can download via a proxy. It's common for these tools
-to read proxy parameters from environment variables.
+    export http_proxy=http://<host>:<port>
 
-For the majority of cases setting `http_proxy` is enough. You can set this in
-your shell profile, or you can use it before a brew command:
+And for an authenticated HTTP proxy:
 
-    http_proxy=http://<host>:<port> brew install foo
-
-If your proxy requires authentication:
-
-    http_proxy=http://<user>:<password>@<host>:<port> brew install foo
+    export http_proxy=http://<user>:<password>@<host>:<port>
 
 ## SEE ALSO
 
