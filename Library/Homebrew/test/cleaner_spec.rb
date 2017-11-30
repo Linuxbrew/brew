@@ -12,30 +12,29 @@ describe Cleaner do
   end
 
   describe "#clean" do
-    it "cleans files", :needs_macos do
+    it "cleans files" do
       f.bin.mkpath
       f.lib.mkpath
-      cp "#{TEST_FIXTURE_DIR}/mach/a.out", f.bin
-      cp Dir["#{TEST_FIXTURE_DIR}/mach/*.dylib"], f.lib
+
+      if OS.mac?
+        cp "#{TEST_FIXTURE_DIR}/mach/a.out", f.bin
+        cp Dir["#{TEST_FIXTURE_DIR}/mach/*.dylib"], f.lib
+      elsif OS.linux?
+        cp "#{TEST_FIXTURE_DIR}/elf/hello", f.bin
+        cp Dir["#{TEST_FIXTURE_DIR}/elf/libhello.so.0"], f.lib
+      end
 
       subject.clean
 
-      expect((f.bin/"a.out").stat.mode).to eq(0100555)
-      expect((f.lib/"fat.dylib").stat.mode).to eq(0100444)
-      expect((f.lib/"x86_64.dylib").stat.mode).to eq(0100444)
-      expect((f.lib/"i386.dylib").stat.mode).to eq(0100444)
-    end
-
-    it "cleans files", :needs_linux do
-      f.bin.mkpath
-      f.lib.mkpath
-      cp "#{TEST_FIXTURE_DIR}/elf/hello", f.bin
-      cp Dir["#{TEST_FIXTURE_DIR}/elf/libhello.so.0"], f.lib
-
-      subject.clean
-
-      expect((f.bin/"hello").stat.mode).to eq(0100555)
-      expect((f.lib/"libhello.so.0").stat.mode).to eq(0100555)
+      if OS.mac?
+        expect((f.bin/"a.out").stat.mode).to eq(0100555)
+        expect((f.lib/"fat.dylib").stat.mode).to eq(0100444)
+        expect((f.lib/"x86_64.dylib").stat.mode).to eq(0100444)
+        expect((f.lib/"i386.dylib").stat.mode).to eq(0100444)
+      elsif OS.linux?
+        expect((f.bin/"hello").stat.mode).to eq(0100555)
+        expect((f.lib/"libhello.so.0").stat.mode).to eq(0100555)
+      end
     end
 
     it "prunes the prefix if it is empty" do
