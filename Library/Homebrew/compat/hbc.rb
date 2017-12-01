@@ -4,7 +4,6 @@ require "compat/hbc/cache"
 require "compat/hbc/caskroom"
 require "compat/hbc/cli"
 require "compat/hbc/dsl"
-require "compat/hbc/system_command"
 
 module Hbc
   class << self

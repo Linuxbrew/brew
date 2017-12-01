@@ -83,6 +83,10 @@ module Hbc
     def each_output_line(&b)
       executable, *args = expanded_command
 
+      unless File.exist?(executable)
+        executable = which(executable, PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
+      end
+
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
         Open3.popen3([executable, executable], *args, **options)
 
