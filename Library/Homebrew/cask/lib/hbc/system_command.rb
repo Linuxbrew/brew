@@ -50,11 +50,7 @@ module Hbc
     end
 
     def command
-      @command ||= if sudo?
-        [*sudo_prefix, executable, *args]
-      else
-        [Shellwords.shellescape(executable), *args]
-      end
+      [*sudo_prefix, executable, *args]
     end
 
     private
@@ -85,8 +81,10 @@ module Hbc
     end
 
     def each_output_line(&b)
+      executable, *args = expanded_command
+
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
-        Open3.popen3(*expanded_command, **options)
+        Open3.popen3([executable, executable], *args, **options)
 
       write_input_to(raw_stdin)
       raw_stdin.close_write
