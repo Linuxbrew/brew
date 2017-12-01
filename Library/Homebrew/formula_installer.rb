@@ -9,7 +9,6 @@ require "cleaner"
 require "formula_cellar_checks"
 require "install_renamed"
 require "cmd/postinstall"
-require "hooks/bottles"
 require "debrew"
 require "sandbox"
 require "emoji"
@@ -81,8 +80,6 @@ class FormulaInstaller
   end
 
   def pour_bottle?(install_bottle_options = { warn: false })
-    return true if Homebrew::Hooks::Bottles.formula_has_bottle?(formula)
-
     return false if @pour_failed
 
     return false if !formula.bottled? && !formula.local_bottle_path
@@ -855,10 +852,6 @@ class FormulaInstaller
   end
 
   def pour
-    if Homebrew::Hooks::Bottles.formula_has_bottle?(formula)
-      return if Homebrew::Hooks::Bottles.pour_formula_bottle(formula)
-    end
-
     if (bottle_path = formula.local_bottle_path)
       downloader = LocalBottleDownloadStrategy.new(bottle_path)
     else
