@@ -119,8 +119,11 @@ module Homebrew
       tab = Tab.for_keg(keg)
     end
 
+    new_build_options = BuildOptions.new(Options.create(ARGV.flags_only), f.options)
+
     fi = FormulaInstaller.new(f)
-    fi.options  = f.build.used_options
+    fi.options = new_build_options.used_options
+    fi.options |= f.build.used_options
     fi.options &= f.options
     fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
     fi.installed_on_request = !ARGV.named.empty?
