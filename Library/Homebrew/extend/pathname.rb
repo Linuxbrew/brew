@@ -470,6 +470,10 @@ class Pathname
       end
     }
   end
+
+  def mach_o_bundle?
+    false
+  end
 end
 
 require "extend/os/pathname"
