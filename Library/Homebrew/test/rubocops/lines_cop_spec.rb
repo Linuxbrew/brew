@@ -541,13 +541,12 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
     end
 
     it "Using ARGV to check options" do
-      expect_offense(<<~RUBY)
+      expect_no_offenses(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           def install
             verbose = ARGV.verbose?
-                      ^^^^^^^^^^^^^ Use build instead of ARGV to check options
           end
         end
       RUBY
@@ -739,6 +738,7 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
           test do
             head = ARGV.include? "--HEAD"
                                   ^^^^^^ Use "if build.head?" instead
+                   ^^^^ Use build instead of ARGV to check options
           end
         end
       RUBY
