@@ -19,7 +19,6 @@ class Tab < OpenStruct
     build = formula.build
     attributes = {
       "homebrew_version" => HOMEBREW_VERSION,
-      "ignored_dependencies" => false,
       "used_options" => build.used_options.as_flags,
       "unused_options" => build.unused_options.as_flags,
       "tabfile" => formula.prefix/FILENAME,
@@ -178,7 +177,6 @@ class Tab < OpenStruct
       "unused_options" => [],
       "built_as_bottle" => false,
       "installed_as_dependency" => false,
-      "ignored_dependencies" => false,
       "installed_on_request" => true,
       "poured_from_bottle" => false,
       "time" => nil,
@@ -324,7 +322,6 @@ class Tab < OpenStruct
       "poured_from_bottle" => poured_from_bottle,
       "installed_as_dependency" => installed_as_dependency,
       "installed_on_request" => installed_on_request,
-      "ignored_dependencies" => ignored_dependencies,
       "changed_files" => changed_files&.map(&:to_s),
       "time" => time,
       "source_modified_time" => source_modified_time.to_i,

@@ -328,7 +328,6 @@ module Homebrew
     fi = FormulaInstaller.new(f)
     fi.options              = build_options.used_options
     fi.invalid_option_names = build_options.invalid_option_names
-    fi.ignore_deps          = ARGV.ignore_deps?
     fi.only_deps            = ARGV.only_deps?
     fi.build_bottle         = ARGV.build_bottle?
     fi.interactive          = ARGV.interactive?
