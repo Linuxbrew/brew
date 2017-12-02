@@ -128,6 +128,7 @@ module Homebrew
     if tab
       fi.installed_as_dependency = tab.installed_as_dependency
       fi.installed_on_request  ||= tab.installed_on_request
+      fi.ignore_deps = tab.ignored_dependencies
     end
     fi.prelude
 
