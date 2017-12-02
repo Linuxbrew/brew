@@ -127,6 +127,22 @@ module RuboCop
         end
       end
 
+      # Matches receiver part of method,
+      # EX: to match `ARGV.<whatever>()`
+      # call `find_instance_call(node, "ARGV")`
+      # yields to a block with parent node of receiver
+      def find_instance_call(node, name)
+        node.each_descendant(:send) do |method_node|
+          next if method_node.receiver.nil?
+          next if method_node.receiver.const_name != name &&
+                  method_node.receiver.method_name != name
+          @offense_source_range = method_node.receiver.source_range
+          @offensive_node = method_node.receiver
+          return true unless block_given?
+          yield method_node
+        end
+      end
+
       # Returns nil if does not depend on dependency_name
       # args: node - dependency_name - dependency's name
       def depends_on?(dependency_name, *types)
