@@ -19,11 +19,6 @@ describe X11Requirement do
       other = described_class.new("foo")
       expect(subject).not_to eql(other)
     end
-
-    it "returns false if the minimum version differs" do
-      other = described_class.new(default_name, ["2.5"])
-      expect(subject).not_to eql(other)
-    end
   end
 
   describe "#modify_build_environment" do
