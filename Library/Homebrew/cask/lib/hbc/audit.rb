@@ -2,7 +2,7 @@ require "hbc/checkable"
 require "hbc/download"
 require "digest"
 require "utils/git"
-require "dev-cmd/audit"
+require "utils/curl"
 
 module Hbc
   class Audit
@@ -284,7 +284,7 @@ module Hbc
     end
 
     def check_url_for_https_availability(url_to_check)
-      problem = FormulaAuditor.check_http_content(url_to_check.to_s)
+      problem = curl_check_http_content(url_to_check.to_s)
       add_error problem unless problem.nil?
     end
 
