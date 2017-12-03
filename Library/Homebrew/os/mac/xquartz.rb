@@ -51,6 +51,15 @@ module OS
         end
       end
 
+      def minimum_version
+        version = guess_system_version
+        return version unless version == "dunno"
+
+        # Update this a little later than latest_version to give people
+        # time to upgrade.
+        "2.7.11"
+      end
+
       # https://xquartz.macosforge.org/trac/wiki
       # https://xquartz.macosforge.org/trac/wiki/Releases
       def latest_version
