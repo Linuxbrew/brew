@@ -10,7 +10,7 @@ module Hbc
       end
 
       def extract
-        if (cabextract = which("cabextract")).nil?
+        unless cabextract = which("cabextract", PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
           raise CaskError, "Expected to find cabextract executable. Cask '#{@cask}' must add: depends_on formula: 'cabextract'"
         end
 
