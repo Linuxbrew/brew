@@ -7,13 +7,9 @@ module Hbc
     end
 
     module ClassMethods
-      attr_writer :caskroom
-
       def caskroom
         @caskroom ||= HOMEBREW_PREFIX.join("Caskroom")
       end
-
-      attr_writer :cache
 
       def cache
         @cache ||= HOMEBREW_CACHE.join("Cask")

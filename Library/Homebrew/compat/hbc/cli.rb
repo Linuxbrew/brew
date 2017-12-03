@@ -12,8 +12,7 @@ module Hbc
     end)
 
     option "--caskroom=PATH", (lambda do |value|
-      Hbc.caskroom = value
-      odeprecated "`brew cask` with the `--caskroom` flag", disable_on: Time.utc(2017, 10, 31)
+      odisabled "`brew cask` with the `--caskroom` flag"
     end)
   end
 end

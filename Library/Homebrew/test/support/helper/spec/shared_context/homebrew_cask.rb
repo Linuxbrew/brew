@@ -8,8 +8,6 @@ require "test/support/helper/cask/never_sudo_system_command"
 
 HOMEBREW_CASK_DIRS = [
   :appdir,
-  :caskroom,
-  :cache,
   :prefpanedir,
   :qlplugindir,
   :servicedir,
@@ -20,6 +18,8 @@ RSpec.shared_context "Homebrew-Cask" do
   around(:each) do |example|
     third_party_tap = Tap.fetch("third-party", "tap")
     begin
+      [Hbc.caskroom, Hbc.cache].each(&:mkpath)
+
       dirs = HOMEBREW_CASK_DIRS.map do |dir|
         Pathname.new(TEST_TMPDIR).join("cask-#{dir}").tap do |path|
           path.mkpath
@@ -40,6 +40,7 @@ RSpec.shared_context "Homebrew-Cask" do
       example.run
     ensure
       FileUtils.rm_rf dirs
+      FileUtils.rm_rf Hbc.caskroom, Hbc.cache
       Hbc.default_tap.path.unlink
       FileUtils.rm_rf Hbc.default_tap.path.parent
       third_party_tap.path.unlink
