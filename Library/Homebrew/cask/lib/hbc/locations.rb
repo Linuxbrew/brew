@@ -57,8 +57,6 @@ module Hbc
         @servicedir ||= Pathname.new("~/Library/Services").expand_path
       end
 
-      attr_writer :binarydir
-
       def binarydir
         @binarydir ||= HOMEBREW_PREFIX.join("bin")
       end
