@@ -18,8 +18,8 @@ module Hbc
         new(cask, source_string, **target_hash)
       end
 
-      def self.resolve_target(target)
-        Config.global.public_send(dirmethod).join(target)
+      def resolve_target(target)
+        config.public_send(self.class.dirmethod).join(target)
       end
 
       attr_reader :source, :target
@@ -32,7 +32,7 @@ module Hbc
         source = cask.staged_path.join(source)
         @source = source
         target ||= source.basename
-        @target = self.class.resolve_target(target)
+        @target = resolve_target(target)
       end
 
       def to_a

@@ -292,7 +292,7 @@ module Hbc
     end
 
     def appdir
-      Config.global.appdir
+      cask.config.appdir
     end
   end
 end

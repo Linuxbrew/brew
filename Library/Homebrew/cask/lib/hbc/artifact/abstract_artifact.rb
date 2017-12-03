@@ -95,10 +95,11 @@ module Hbc
         [executable, arguments]
       end
 
-      attr_reader :cask
+      attr_reader :cask, :config
 
       def initialize(cask)
         @cask = cask
+        @config = cask.config
       end
 
       def to_s
