@@ -5,7 +5,7 @@ describe Hbc::Artifact::Binary, :cask do
     end
   }
   let(:artifacts) { cask.artifacts.select { |a| a.is_a?(described_class) } }
-  let(:expected_path) { Hbc.binarydir.join("binary") }
+  let(:expected_path) { Hbc::Config.global.binarydir.join("binary") }
 
   after(:each) do
     FileUtils.rm expected_path if expected_path.exist?
@@ -38,7 +38,7 @@ describe Hbc::Artifact::Binary, :cask do
       end
     }
 
-    let(:expected_path) { Hbc.binarydir.join("naked_non_executable") }
+    let(:expected_path) { Hbc::Config.global.binarydir.join("naked_non_executable") }
 
     it "makes the binary executable" do
       expect(FileUtils).to receive(:chmod)
@@ -76,7 +76,7 @@ describe Hbc::Artifact::Binary, :cask do
   end
 
   it "creates parent directory if it doesn't exist" do
-    FileUtils.rmdir Hbc.binarydir
+    FileUtils.rmdir Hbc::Config.global.binarydir
 
     artifacts.each do |artifact|
       artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)

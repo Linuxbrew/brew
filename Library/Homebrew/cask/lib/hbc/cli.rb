@@ -49,19 +49,19 @@ module Hbc
 
     include Options
 
-    option "--appdir=PATH",               ->(value) { Hbc.appdir               = value }
-    option "--colorpickerdir=PATH",       ->(value) { Hbc.colorpickerdir       = value }
-    option "--prefpanedir=PATH",          ->(value) { Hbc.prefpanedir          = value }
-    option "--qlplugindir=PATH",          ->(value) { Hbc.qlplugindir          = value }
-    option "--dictionarydir=PATH",        ->(value) { Hbc.dictionarydir        = value }
-    option "--fontdir=PATH",              ->(value) { Hbc.fontdir              = value }
-    option "--servicedir=PATH",           ->(value) { Hbc.servicedir           = value }
-    option "--input_methoddir=PATH",      ->(value) { Hbc.input_methoddir      = value }
-    option "--internet_plugindir=PATH",   ->(value) { Hbc.internet_plugindir   = value }
-    option "--audio_unit_plugindir=PATH", ->(value) { Hbc.audio_unit_plugindir = value }
-    option "--vst_plugindir=PATH",        ->(value) { Hbc.vst_plugindir        = value }
-    option "--vst3_plugindir=PATH",       ->(value) { Hbc.vst3_plugindir       = value }
-    option "--screen_saverdir=PATH",      ->(value) { Hbc.screen_saverdir      = value }
+    option "--appdir=PATH",               ->(value) { Config.global.appdir               = value }
+    option "--colorpickerdir=PATH",       ->(value) { Config.global.colorpickerdir       = value }
+    option "--prefpanedir=PATH",          ->(value) { Config.global.prefpanedir          = value }
+    option "--qlplugindir=PATH",          ->(value) { Config.global.qlplugindir          = value }
+    option "--dictionarydir=PATH",        ->(value) { Config.global.dictionarydir        = value }
+    option "--fontdir=PATH",              ->(value) { Config.global.fontdir              = value }
+    option "--servicedir=PATH",           ->(value) { Config.global.servicedir           = value }
+    option "--input_methoddir=PATH",      ->(value) { Config.global.input_methoddir      = value }
+    option "--internet_plugindir=PATH",   ->(value) { Config.global.internet_plugindir   = value }
+    option "--audio_unit_plugindir=PATH", ->(value) { Config.global.audio_unit_plugindir = value }
+    option "--vst_plugindir=PATH",        ->(value) { Config.global.vst_plugindir        = value }
+    option "--vst3_plugindir=PATH",       ->(value) { Config.global.vst3_plugindir       = value }
+    option "--screen_saverdir=PATH",      ->(value) { Config.global.screen_saverdir      = value }
 
     option "--help", :help, false
 

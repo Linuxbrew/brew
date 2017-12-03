@@ -10,7 +10,7 @@ describe Hbc::Installer, :cask do
       Hbc::Installer.new(caffeine).install
 
       expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).to be_a_directory
-      expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
+      expect(Hbc::Config.global.appdir.join("Caffeine.app")).to be_a_directory
     end
 
     it "works with dmg-based Casks" do
@@ -19,7 +19,7 @@ describe Hbc::Installer, :cask do
       Hbc::Installer.new(asset).install
 
       expect(Hbc.caskroom.join("container-dmg", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
+      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with tar-gz-based Casks" do
@@ -28,7 +28,7 @@ describe Hbc::Installer, :cask do
       Hbc::Installer.new(asset).install
 
       expect(Hbc.caskroom.join("container-tar-gz", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
+      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with xar-based Casks" do
@@ -37,7 +37,7 @@ describe Hbc::Installer, :cask do
       Hbc::Installer.new(asset).install
 
       expect(Hbc.caskroom.join("container-xar", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
+      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with pure bzip2-based Casks" do
@@ -46,7 +46,7 @@ describe Hbc::Installer, :cask do
       Hbc::Installer.new(asset).install
 
       expect(Hbc.caskroom.join("container-bzip2", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container-bzip2--#{asset.version}")).to be_a_file
+      expect(Hbc::Config.global.appdir.join("container-bzip2--#{asset.version}")).to be_a_file
     end
 
     it "works with pure gzip-based Casks" do
@@ -55,7 +55,7 @@ describe Hbc::Installer, :cask do
       Hbc::Installer.new(asset).install
 
       expect(Hbc.caskroom.join("container-gzip", asset.version)).to be_a_directory
-      expect(Hbc.appdir.join("container")).to be_a_file
+      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "blows up on a bad checksum" do
@@ -183,7 +183,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(nested_app).install
 
-      expect(Hbc.appdir.join("MyNestedApp.app")).to be_a_directory
+      expect(Hbc::Config.global.appdir.join("MyNestedApp.app")).to be_a_directory
     end
 
     it "generates and finds a timestamped metadata directory for an installed Cask" do

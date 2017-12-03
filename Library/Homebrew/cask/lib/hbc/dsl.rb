@@ -292,11 +292,7 @@ module Hbc
     end
 
     def appdir
-      self.class.appdir
-    end
-
-    def self.appdir
-      Hbc.appdir.sub(%r{\/$}, "")
+      Config.global.appdir
     end
   end
 end

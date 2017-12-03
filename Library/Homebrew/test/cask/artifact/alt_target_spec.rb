@@ -11,7 +11,7 @@ describe Hbc::Artifact::App, :cask do
     }
 
     let(:source_path) { cask.staged_path.join("Caffeine.app") }
-    let(:target_path) { Hbc.appdir.join("AnotherName.app") }
+    let(:target_path) { Hbc::Config.global.appdir.join("AnotherName.app") }
 
     before do
       InstallHelper.install_without_artifacts(cask)
@@ -58,7 +58,7 @@ describe Hbc::Artifact::App, :cask do
       expect(target_path).to be_a_directory
       expect(source_path).not_to exist
 
-      expect(Hbc.appdir.join("Caffeine Deluxe.app")).not_to exist
+      expect(Hbc::Config.global.appdir.join("Caffeine Deluxe.app")).not_to exist
       expect(cask.staged_path.join("Caffeine Deluxe.app")).to be_a_directory
     end
 

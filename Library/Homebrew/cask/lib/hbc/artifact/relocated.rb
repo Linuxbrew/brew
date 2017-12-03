@@ -19,7 +19,7 @@ module Hbc
       end
 
       def self.resolve_target(target)
-        Hbc.public_send(dirmethod).join(target)
+        Config.global.public_send(dirmethod).join(target)
       end
 
       attr_reader :source, :target

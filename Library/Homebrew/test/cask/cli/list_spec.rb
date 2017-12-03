@@ -80,9 +80,9 @@ describe Hbc::CLI::List, :cask do
         described_class.run("local-transmission", "local-caffeine")
       }.to output(<<~EOS).to_stdout
         ==> Apps
-        #{Hbc.appdir.join("Transmission.app")} (#{Hbc.appdir.join("Transmission.app").abv})
+        #{Hbc::Config.global.appdir.join("Transmission.app")} (#{Hbc::Config.global.appdir.join("Transmission.app").abv})
         ==> Apps
-        Missing App: #{Hbc.appdir.join("Caffeine.app")}
+        Missing App: #{Hbc::Config.global.appdir.join("Caffeine.app")}
       EOS
     end
   end

@@ -6,25 +6,26 @@ require "test/support/helper/cask/fake_system_command"
 require "test/support/helper/cask/install_helper"
 require "test/support/helper/cask/never_sudo_system_command"
 
-HOMEBREW_CASK_DIRS = [
-  :appdir,
-  :prefpanedir,
-  :qlplugindir,
-  :servicedir,
-].freeze
+HOMEBREW_CASK_DIRS = {
+  :appdir      => Pathname.new(TEST_TMPDIR).join("cask-appdir"),
+  :prefpanedir => Pathname.new(TEST_TMPDIR).join("cask-prefpanedir"),
+  :qlplugindir => Pathname.new(TEST_TMPDIR).join("cask-qlplugindir"),
+  :servicedir  => Pathname.new(TEST_TMPDIR).join("cask-servicedir"),
+}.freeze
 
 RSpec.shared_context "Homebrew-Cask" do
+  before(:each) do
+    HOMEBREW_CASK_DIRS.each do |method, path|
+      allow(Hbc::Config.global).to receive(method).and_return(path)
+    end
+  end
+
   around(:each) do |example|
     third_party_tap = Tap.fetch("third-party", "tap")
     begin
-      [Hbc.binarydir, Hbc.caskroom, Hbc.cache].each(&:mkpath)
+      HOMEBREW_CASK_DIRS.values.each(&:mkpath)
 
-      dirs = HOMEBREW_CASK_DIRS.map do |dir|
-        Pathname.new(TEST_TMPDIR).join("cask-#{dir}").tap do |path|
-          path.mkpath
-          Hbc.public_send("#{dir}=", path)
-        end
-      end
+      [Hbc::Config.global.binarydir, Hbc.caskroom, Hbc.cache].each(&:mkpath)
 
       Hbc.default_tap = Tap.fetch("caskroom", "spec").tap do |tap|
         FileUtils.mkdir_p tap.path.dirname
@@ -38,8 +39,8 @@ RSpec.shared_context "Homebrew-Cask" do
 
       example.run
     ensure
-      FileUtils.rm_rf dirs
-      FileUtils.rm_rf [Hbc.binarydir, Hbc.caskroom, Hbc.cache]
+      FileUtils.rm_rf HOMEBREW_CASK_DIRS.values
+      FileUtils.rm_rf [Hbc::Config.global.binarydir, Hbc.caskroom, Hbc.cache]
       Hbc.default_tap.path.unlink
       FileUtils.rm_rf Hbc.default_tap.path.parent
       third_party_tap.path.unlink

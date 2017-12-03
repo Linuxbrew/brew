@@ -23,9 +23,9 @@ describe Hbc::CLI::Zap, :cask do
     described_class.run("local-caffeine", "local-transmission")
 
     expect(caffeine).not_to be_installed
-    expect(Hbc.appdir.join("Caffeine.app")).not_to be_a_symlink
+    expect(Hbc::Config.global.appdir.join("Caffeine.app")).not_to be_a_symlink
     expect(transmission).not_to be_installed
-    expect(Hbc.appdir.join("Transmission.app")).not_to be_a_symlink
+    expect(Hbc::Config.global.appdir.join("Transmission.app")).not_to be_a_symlink
   end
 
   # TODO: Explicit test that both zap and uninstall directives get dispatched.
