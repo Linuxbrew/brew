@@ -11,7 +11,7 @@ module Hbc
       EOS
     end)
 
-    option "--caskroom=PATH", (lambda do |value|
+    option "--caskroom=PATH", (lambda do |*|
       odisabled "`brew cask` with the `--caskroom` flag"
     end)
   end
