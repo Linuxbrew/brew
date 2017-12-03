@@ -7,10 +7,6 @@ describe Hbc::Artifact::Binary, :cask do
   let(:artifacts) { cask.artifacts.select { |a| a.is_a?(described_class) } }
   let(:expected_path) { Hbc.binarydir.join("binary") }
 
-  before(:each) do
-    Hbc.binarydir.mkpath
-  end
-
   after(:each) do
     FileUtils.rm expected_path if expected_path.exist?
   end
