@@ -278,13 +278,13 @@ module Hbc
     end
 
     def check_https_availability
-      check_url_for_https_availability(cask.url) unless cask.url.to_s.empty?
+      check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent]) unless cask.url.to_s.empty?
       check_url_for_https_availability(cask.appcast) unless cask.appcast.to_s.empty?
       check_url_for_https_availability(cask.homepage) unless cask.homepage.to_s.empty?
     end
 
-    def check_url_for_https_availability(url_to_check)
-      problem = curl_check_http_content(url_to_check.to_s)
+    def check_url_for_https_availability(url_to_check, user_agents: [:default])
+      problem = curl_check_http_content(url_to_check.to_s, user_agents: user_agents)
       add_error problem unless problem.nil?
     end
 
