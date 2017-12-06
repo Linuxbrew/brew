@@ -1002,6 +1002,10 @@ can take several different forms:
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
 
+  * `HOMEBREW_FORCE_BREWED_CURL`:
+    If set, Homebrew will use a Homebrew-installed `curl` rather than the
+    system version.
+
   * `HOMEBREW_FORCE_VENDOR_RUBY`:
     If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
     even if the system version of Ruby is >=2.0.
