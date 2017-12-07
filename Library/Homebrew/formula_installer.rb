@@ -449,7 +449,7 @@ class FormulaInstaller
 
         if (req.optional? || req.recommended?) && build.without?(req)
           Requirement.prune
-        elsif req.build? && use_default_formula && req_dependency.installed?
+        elsif req.build? && use_default_formula && req_dependency&.installed?
           Requirement.prune
         elsif install_requirement_formula?(req_dependency, req, install_bottle_for_dependent)
           deps.unshift(req_dependency)
