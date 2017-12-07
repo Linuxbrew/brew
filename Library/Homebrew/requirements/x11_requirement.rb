@@ -4,8 +4,6 @@ class X11Requirement < Requirement
   include Comparable
 
   fatal true
-  cask "xquartz"
-  download "https://xquartz.macosforge.org"
 
   env { ENV.x11 }
 
@@ -17,24 +15,33 @@ class X11Requirement < Requirement
   end
 
   def min_version
-    # TODO: remove in https://github.com/Homebrew/brew/pull/3483
-    return Version::NULL unless OS.mac?
+    "1.12.2"
+  end
 
-    MacOS::XQuartz.minimum_version
+  def min_xdpyinfo_version
+    "1.3.0"
   end
 
   satisfy build_env: false do
-    # TODO: remove in https://github.com/Homebrew/brew/pull/3483
-    next false unless OS.mac?
-
-    next false unless MacOS::XQuartz.installed?
-    min_version <= MacOS::XQuartz.version
+    if which_xorg = which("Xorg")
+      version = Utils.popen_read which_xorg, "-version", err: :out
+      next false unless $CHILD_STATUS.success?
+      version = version[/X Server (\d+\.\d+\.\d+)/, 1]
+      next false unless version
+      Version.new(version) >= min_version
+    elsif which_xdpyinfo = which("xdpyinfo")
+      version = Utils.popen_read which_xdpyinfo, "-version"
+      next false unless $CHILD_STATUS.success?
+      version = version[/^xdpyinfo (\d+\.\d+\.\d+)/, 1]
+      next false unless version
+      Version.new(version) >= min_xdpyinfo_version
+    else
+      false
+    end
   end
 
   def message
-    s = "XQuartz #{min_version} (or newer) is required to install this formula."
-    s += super
-    s
+    "X11 is required to install this formula, either Xorg #{min_version} or xdpyinfo #{min_xdpyinfo_version}, or newer. #{super}"
   end
 
   def <=>(other)
@@ -46,3 +53,5 @@ class X11Requirement < Requirement
     "#<#{self.class.name}: #{name.inspect} #{tags.inspect}>"
   end
 end
+
+require "extend/os/requirements/x11_requirement"
