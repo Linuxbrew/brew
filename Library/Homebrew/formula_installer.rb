@@ -417,8 +417,9 @@ class FormulaInstaller
     raise UnsatisfiedRequirements, fatals
   end
 
-  def install_requirement_formula?(req_dependency, req, install_bottle_for_dependent)
+  def install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
     return false unless req_dependency
+    return false if req.build? && dependent.installed?
     return true unless req.satisfied?
     return false if req.run?
     return true if build_bottle?
@@ -451,7 +452,7 @@ class FormulaInstaller
           Requirement.prune
         elsif req.build? && use_default_formula && req_dependency.installed?
           Requirement.prune
-        elsif install_requirement_formula?(req_dependency, req, install_bottle_for_dependent)
+        elsif install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
           deps.unshift(req_dependency)
           formulae.unshift(req_dependency.to_formula)
           Requirement.prune
@@ -484,6 +485,8 @@ class FormulaInstaller
       if (dep.optional? || dep.recommended?) && build.without?(dep)
         Dependency.prune
       elsif dep.build? && install_bottle_for?(dependent, build)
+        Dependency.prune
+      elsif dep.build? && dependent.installed?
         Dependency.prune
       elsif dep.satisfied?(inherited_options[dep.name])
         Dependency.skip
