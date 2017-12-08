@@ -79,18 +79,6 @@ then
   export HOMEBREW_GEM_PATH="$GEM_PATH"
 fi
 
-# Users may have these set, pointing the system Ruby
-# at non-system gem paths
-unset GEM_HOME
-unset GEM_PATH
-
-# Users may have this set, injecting arbitrary environment changes into
-# bash processes inside builds
-unset BASH_ENV
-
-# Users may have this set, breaking grep's output.
-unset GREP_OPTIONS
-
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_MACOS="1" ;;
