@@ -17,13 +17,13 @@ module OS
         when "10.9"  then "6.2"
         when "10.10" then "7.2.1"
         when "10.11" then "8.2.1"
-        when "10.12" then "9.1"
-        when "10.13" then "9.1"
+        when "10.12" then "9.2"
+        when "10.13" then "9.2"
         else
           raise "macOS '#{MacOS.version}' is invalid" unless OS::Mac.prerelease?
 
           # Default to newest known version of Xcode for unreleased macOS versions.
-          "9.1"
+          "9.2"
         end
       end
 
@@ -141,7 +141,11 @@ module OS
           end
         end
 
-        # The remaining logic provides a fake Xcode version based on the
+        detect_version_from_clang_version
+      end
+
+      def detect_version_from_clang_version
+        # This logic provides a fake Xcode version based on the
         # installed CLT version. This is useful as they are packaged
         # simultaneously so workarounds need to apply to both based on their
         # comparable version.
@@ -166,7 +170,7 @@ module OS
         when 80      then "8.0"
         when 81      then "8.3"
         when 90      then "9.0"
-        else "9.0"
+        else              "9.0"
         end
       end
 
@@ -217,14 +221,13 @@ module OS
         # on the older supported platform for that Xcode release, i.e there's no
         # CLT package for 10.11 that contains the Clang version from Xcode 8.
         case MacOS.version
-        when "10.13" then "900.0.38"
-        when "10.12" then "900.0.38"
+        when "10.13" then "900.0.39.2"
+        when "10.12" then "900.0.39.2"
         when "10.11" then "800.0.42.1"
         when "10.10" then "700.1.81"
         when "10.9"  then "600.0.57"
         when "10.8"  then "503.0.40"
-        else
-          "425.0.28"
+        else              "425.0.28"
         end
       end
 
@@ -232,7 +235,7 @@ module OS
         case MacOS.version
         when "10.13" then "9.0.0"
         when "10.12" then "8.0.0"
-        else "1.0.0"
+        else              "1.0.0"
         end
       end
 
