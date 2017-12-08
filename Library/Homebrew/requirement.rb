@@ -170,8 +170,10 @@ class Requirement
     attr_rw :fatal, :default_formula
     attr_rw :cask, :download
 
-    def satisfy(options = {}, &block)
-      @satisfied ||= Requirement::Satisfier.new(options, &block)
+    def satisfy(options = nil, &block)
+      return @satisfied if options.nil? && !block_given?
+      options = {} if options.nil?
+      @satisfied = Requirement::Satisfier.new(options, &block)
     end
 
     def env(*settings, &block)
