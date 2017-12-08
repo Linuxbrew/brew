@@ -1,4 +1,5 @@
 require "formula"
+require "os/linux/glibc"
 
 class SystemConfig
   class << self
@@ -12,6 +13,12 @@ class SystemConfig
       else
         "N/A"
       end
+    end
+
+    def host_glibc_version
+      version = OS::Linux::Glibc.system_version
+      return "N/A" if version.null?
+      version
     end
 
     def host_gcc_version
@@ -31,6 +38,7 @@ class SystemConfig
       dump_generic_verbose_config(out)
       out.puts "Kernel: #{`uname -mors`.chomp}"
       out.puts "OS: #{host_os_version}"
+      out.puts "Host glibc: #{host_glibc_version}"
       out.puts "/usr/bin/gcc: #{host_gcc_version}"
       ["glibc", "gcc", "xorg"].each do |f|
         out.puts "#{f}: #{formula_linked_version f}"
