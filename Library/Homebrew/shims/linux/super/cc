@@ -253,6 +253,7 @@ class Cmd
     wl = "-Wl," unless mode == :ld
     args = []
     args += ["#{wl}--dynamic-linker=#{dynamic_linker_path}"] if dynamic_linker_path
+    args << "-B#{@opt}/glibc/lib"
     args += path_flags("-L", library_paths)
     args += rpath_flags("#{wl}-rpath=", rpath_paths)
   end
