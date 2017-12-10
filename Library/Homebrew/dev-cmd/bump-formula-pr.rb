@@ -338,7 +338,7 @@ module Homebrew
 
         if reply.to_s.include? "username:"
           formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-          odie "You need to configure hub"
+          odie "Please authentify with hub (eg. by typing 'cd $(brew --repo) && hub issue') and try again."
         end
 
         remote = reply[/remote:? (\S+)/, 1]
