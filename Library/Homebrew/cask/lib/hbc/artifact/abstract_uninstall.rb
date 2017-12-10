@@ -30,6 +30,12 @@ module Hbc
         super(cask)
         directives[:signal] = [*directives[:signal]].flatten.each_slice(2).to_a
         @directives = directives
+
+        return unless directives.key?(:kext)
+
+        cask.caveats do
+          kext
+        end
       end
 
       def to_h

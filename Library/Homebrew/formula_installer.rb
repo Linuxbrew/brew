@@ -450,7 +450,7 @@ class FormulaInstaller
 
         if (req.optional? || req.recommended?) && build.without?(req)
           Requirement.prune
-        elsif req.build? && install_bottle_for_dependent
+        elsif req.build? && use_default_formula
           Requirement.prune
         elsif install_requirement_formula?(req_dependency, req, install_bottle_for_dependent)
           deps.unshift(req_dependency)
@@ -739,7 +739,7 @@ class FormulaInstaller
     Utils.safe_fork do
       # Invalidate the current sudo timestamp in case a build script calls sudo.
       # Travis CI's Linux sudoless workers have a weird sudo that fails here.
-      system "/usr/bin/sudo", "-k" unless ENV["HOMEBREW_TRAVIS_SUDO"] == "false"
+      system "/usr/bin/sudo", "-k" unless ENV["TRAVIS_SUDO"] == "false"
 
       if Sandbox.formula?(formula)
         sandbox = Sandbox.new

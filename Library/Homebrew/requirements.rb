@@ -116,10 +116,15 @@ class ArchRequirement < Requirement
   end
 end
 
+class CVSRequirement < Requirement
+  fatal true
+  default_formula "cvs"
+  satisfy { which "cvs" }
+end
+
 class MercurialRequirement < Requirement
   fatal true
   default_formula "mercurial"
-
   satisfy { which("hg") }
 end
 
@@ -132,5 +137,5 @@ end
 class SubversionRequirement < Requirement
   fatal true
   default_formula "subversion"
-  satisfy { which "svn" }
+  satisfy { Utils.svn_available? }
 end

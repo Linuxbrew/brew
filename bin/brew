@@ -51,7 +51,7 @@ HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 # Whitelist and copy to HOMEBREW_* all variables previously mentioned in
 # manpage or used elsewhere by Homebrew.
 for VAR in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY BINTRAY_USER BINTRAY_KEY \
-           BROWSER EDITOR GIT PATH VISUAL TRAVIS TRAVIS_SUDO \
+           BROWSER EDITOR GIT PATH VISUAL \
            GITHUB_USER GITHUB_PASSWORD GITHUB_TOKEN
 do
   # Skip if variable value is empty.
@@ -63,18 +63,46 @@ do
   export "$VAR_NEW"="${!VAR}"
 done
 
+# Set HOMEBREW_DEVELOPER for users who have run a development command
+if [[ -z "$HOMEBREW_DEVELOPER" ]]
+then
+  export HOMEBREW_GIT_CONFIG_FILE="$HOMEBREW_REPOSITORY/.git/config"
+  HOMEBREW_GIT_CONFIG_DEVELOPERMODE="$(git config --file="$HOMEBREW_GIT_CONFIG_FILE" --get homebrew.devcmdrun 2>/dev/null)"
+  if [[ "$HOMEBREW_GIT_CONFIG_DEVELOPERMODE" = "true" ]]
+  then
+    export HOMEBREW_DEV_CMD_RUN="1"
+  fi
+fi
+
+if [[ -z "$HOMEBREW_NO_ENV_FILTERING" ]]
+then
+  if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
+  then
+    # Use env filtering by default for users who have run a development command
+    # This will be enabled by default for all users in future.
+    export HOMEBREW_ENV_FILTERING="1"
+  fi
+else
+  unset HOMEBREW_ENV_FILTERING
+fi
+
 # test-bot sets environment filtering itself
 if [[ -n "$HOMEBREW_ENV_FILTERING" && "$1" != "test-bot" ]]
 then
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
   FILTERED_ENV=()
-  for VAR in HOME SHELL PATH TERM LOGNAME USER CI "${!HOMEBREW_@}"
+  for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS SSH_AUTH_SOCK SUDO_ASKPASS \
+             http_proxy https_proxy ftp_proxy HTTPS_PROXY FTP_PROXY \
+             "${!HOMEBREW_@}" "${!TRAVIS_@}" "${!JENKINS_@}"
   do
+    # Skip if variable value is empty.
+    [[ -z "${!VAR}" ]] && continue
+
     FILTERED_ENV+=( "${VAR}=${!VAR}" )
   done
 
-  /usr/bin/env -i "${FILTERED_ENV[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
+  exec /usr/bin/env -i "${FILTERED_ENV[@]}" /bin/bash "$HOMEBREW_LIBRARY/Homebrew/brew.sh" "$@"
 else
   source "$HOMEBREW_LIBRARY/Homebrew/brew.sh"
 fi

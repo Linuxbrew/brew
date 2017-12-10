@@ -10,7 +10,7 @@ module Hbc
       end
 
       def extract
-        if (unxz = which("unxz")).nil?
+        unless unxz = which("unxz", PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
           raise CaskError, "Expected to find unxz executable. Cask '#{@cask}' must add: depends_on formula: 'xz'"
         end
 

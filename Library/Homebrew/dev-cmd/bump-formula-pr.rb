@@ -321,23 +321,41 @@ module Homebrew
       end
 
       if ARGV.dry_run?
+        ohai "hub fork # read $HUB_REMOTE"
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
-        ohai "hub fork # read $HUB_REMOTE"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
         ohai "hub pull-request #{hub_args.join(" ")} -m '#{formula.name} #{new_formula_version}#{devel_message}'"
         ohai "git checkout -"
       else
+        reply = IO.popen(["hub", "fork"], "r+", err: "/dev/null") do |io|
+          reader = Thread.new { io.read }
+          sleep 1
+          io.close_write
+          reader.value
+        end
+
+        if reply.to_s.include? "username:"
+          formula.path.atomic_write(backup_file) unless ARGV.dry_run?
+          odie "You need to configure hub"
+        end
+
+        remote = reply[/remote:? (\S+)/, 1]
+
+        # repeat for hub 2.2 backwards compatibility:
+        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1] if remote.to_s.empty?
+
+        if remote.to_s.empty?
+          formula.path.atomic_write(backup_file) unless ARGV.dry_run?
+          odie "cannot get remote from 'hub'!"
+        end
+
         safe_system "git", "fetch", "--unshallow", "origin" if shallow
         safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
         safe_system "git", "commit", "--no-edit", "--verbose",
           "--message=#{formula.name} #{new_formula_version}#{devel_message}",
           "--", formula.path
-        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1]
-        # repeat for hub 2.2 backwards compatibility:
-        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1] if remote.to_s.empty?
-        odie "cannot get remote from 'hub'!" if remote.to_s.empty?
         safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
         pr_message = <<~EOS
           #{formula.name} #{new_formula_version}#{devel_message}

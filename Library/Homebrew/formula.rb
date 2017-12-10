@@ -1622,7 +1622,7 @@ class Formula
       TEMP: HOMEBREW_TEMP,
       TMP: HOMEBREW_TEMP,
       TERM: "dumb",
-      PATH: PATH.new(ENV["PATH"]).append(HOMEBREW_PREFIX/"bin"),
+      PATH: PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"),
       HOMEBREW_PATH: nil,
       _JAVA_OPTIONS: "#{ENV["_JAVA_OPTIONS"]} -Duser.home=#{HOMEBREW_CACHE}/java_cache",
     }

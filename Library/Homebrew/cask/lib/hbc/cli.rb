@@ -21,6 +21,7 @@ require "hbc/cli/reinstall"
 require "hbc/cli/search"
 require "hbc/cli/style"
 require "hbc/cli/uninstall"
+require "hbc/cli/upgrade"
 require "hbc/cli/--version"
 require "hbc/cli/zap"
 
@@ -95,7 +96,7 @@ module Hbc
       if command.respond_to?(:run)
         # usual case: built-in command verb
         command.run(*args)
-      elsif require?(which("brewcask-#{command}.rb"))
+      elsif require?(which("brewcask-#{command}.rb"), ENV["HOMEBREW_PATH"])
         # external command as Ruby library on PATH, Homebrew-style
       elsif command.to_s.include?("/") && require?(command.to_s)
         # external command as Ruby library with literal path, useful
@@ -112,9 +113,9 @@ module Hbc
           # other Ruby libraries must do everything via "require"
           klass.run(*args)
         end
-      elsif which("brewcask-#{command}")
+      elsif external_command = which("brewcask-#{command}", ENV["HOMEBREW_PATH"])
         # arbitrary external executable on PATH, Homebrew-style
-        exec "brewcask-#{command}", *ARGV[1..-1]
+        exec external_command, *ARGV[1..-1]
       elsif Pathname.new(command.to_s).executable? &&
             command.to_s.include?("/") &&
             !command.to_s.match(/\.rb$/)

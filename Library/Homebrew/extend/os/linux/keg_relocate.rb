@@ -33,7 +33,7 @@ class Keg
     new_rpath = rpath.join(":")
     cmd = [patchelf, "--set-rpath", new_rpath]
 
-    if file.mach_o_executable?
+    if file.binary_executable?
       cmd_interpreter = [patchelf, "--print-interpreter", file]
       old_interpreter = Utils.popen_read(*cmd_interpreter).strip
       raise ErrorDuringExecution, cmd_interpreter unless $CHILD_STATUS.success?
@@ -54,7 +54,7 @@ class Keg
     results = Set.new
 
     elf_files.each do |file|
-      next if !file.dynamic_elf? || file.mach_o_executable? && skip_executables
+      next if !file.dynamic_elf? || file.binary_executable? && skip_executables
       dylibs = file.dynamically_linked_libraries
       results << :libcxx if dylibs.any? { |s| s.include? "libc++.so" }
       results << :libstdcxx if dylibs.any? { |s| s.include? "libstdc++.so" }
@@ -68,7 +68,7 @@ class Keg
     elf_files = []
     path.find do |pn|
       next if pn.symlink? || pn.directory?
-      next unless pn.dylib? || pn.mach_o_executable?
+      next unless pn.dylib? || pn.binary_executable?
       # If we've already processed a file, ignore its hardlinks (which have the
       # same dev ID and inode). This prevents relocations from being performed
       # on a binary more than once.
@@ -78,7 +78,4 @@ class Keg
 
     elf_files
   end
-
-  # For test/test_keg.rb
-  alias mach_o_files elf_files
 end

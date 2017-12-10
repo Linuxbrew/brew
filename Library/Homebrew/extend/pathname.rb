@@ -470,6 +470,10 @@ class Pathname
       end
     }
   end
+
+  def mach_o_bundle?
+    false
+  end
 end
 
 require "extend/os/pathname"
@@ -495,7 +499,7 @@ module ObserverPathnameExtension
     MAXIMUM_VERBOSE_OUTPUT = 100
 
     def verbose?
-      return ARGV.verbose? unless ENV["CIRCLECI"] || ENV["HOMEBREW_TRAVIS"]
+      return ARGV.verbose? unless ENV["CIRCLECI"] || ENV["TRAVIS"]
       return false unless ARGV.verbose?
 
       if total < MAXIMUM_VERBOSE_OUTPUT

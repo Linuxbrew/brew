@@ -13,7 +13,8 @@ describe Hbc::CLI::Reinstall, :cask do
       Already downloaded: .*local-caffeine--1.2.3.zip
       ==> Verifying checksum for Cask local-caffeine
       ==> Uninstalling Cask local-caffeine
-      ==> Removing App '.*Caffeine.app'.
+      ==> Moving App 'Caffeine.app' back to '.*Caffeine.app'.
+      ==> Purging files for version 1.2.3 of Cask local-caffeine
       ==> Installing Cask local-caffeine
       ==> Moving App 'Caffeine.app' to '.*Caffeine.app'.
       .*local-caffeine was successfully installed!
