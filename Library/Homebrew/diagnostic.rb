@@ -1017,16 +1017,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_old_env_vars
-        return unless ENV["HOMEBREW_KEEP_INFO"]
-
-        <<~EOS
-          `HOMEBREW_KEEP_INFO` is no longer used
-          info files are no longer deleted by default; you may
-          remove this environment variable.
-        EOS
-      end
-
       def check_for_pth_support
         homebrew_site_packages = Language::Python.homebrew_site_packages
         return unless homebrew_site_packages.directory?

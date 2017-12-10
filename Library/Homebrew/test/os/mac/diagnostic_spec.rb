@@ -15,14 +15,6 @@ describe Homebrew::Diagnostic::Checks do
       .to match("We do not provide support for this pre-release version.")
   end
 
-  specify "#check_for_unsupported_curl_vars" do
-    allow(MacOS).to receive(:version).and_return(OS::Mac::Version.new("10.10"))
-    ENV["SSL_CERT_DIR"] = "/some/path"
-
-    expect(subject.check_for_unsupported_curl_vars)
-      .to match("SSL_CERT_DIR support was removed from Apple's curl.")
-  end
-
   specify "#check_for_beta_xquartz" do
     allow(MacOS::XQuartz).to receive(:version).and_return("2.7.10_beta2")
 
