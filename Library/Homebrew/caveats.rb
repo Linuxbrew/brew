@@ -76,7 +76,7 @@ class Caveats
 
   def function_completion_caveats(shell)
     return unless keg
-    return unless which(shell.to_s)
+    return unless which(shell.to_s, ENV["HOMEBREW_PATH"])
 
     completion_installed = keg.completion_installed?(shell)
     functions_installed = keg.functions_installed?(shell)
