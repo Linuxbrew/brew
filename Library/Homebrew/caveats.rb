@@ -64,7 +64,7 @@ class Caveats
       s << "\nFor compilers to find this software you may need to set:\n"
       s << "    LDFLAGS:  -L#{f.opt_lib}\n" if f.lib.directory?
       s << "    CPPFLAGS: -I#{f.opt_include}\n" if f.include.directory?
-      if which("pkg-config") &&
+      if which("pkg-config", ENV["HOMEBREW_PATH"]) &&
          ((f.lib/"pkgconfig").directory? || (f.share/"pkgconfig").directory?)
         s << "For pkg-config to find this software you may need to set:\n"
         s << "    PKG_CONFIG_PATH: #{f.opt_lib}/pkgconfig\n" if (f.lib/"pkgconfig").directory?
