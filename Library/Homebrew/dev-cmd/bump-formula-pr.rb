@@ -180,9 +180,9 @@ module Homebrew
     elsif new_tag && new_revision
       false
     elsif !hash_type
-      odie "#{formula}: no tag/revision specified!"
+      odie "#{formula}: no --tag=/--revision= arguments specified!"
     elsif !new_url
-      odie "#{formula}: no url specified!"
+      odie "#{formula}: no --url= argument specified!"
     else
       rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
         new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
@@ -194,7 +194,7 @@ module Homebrew
       rsrc.download_strategy = CurlDownloadStrategy
       rsrc.owner = Resource.new(formula.name)
       rsrc.version = forced_version if forced_version
-      odie "No version specified!" unless rsrc.version
+      odie "No --version= argument specified!" unless rsrc.version
       rsrc_path = rsrc.fetch
       gnu_tar_gtar_path = HOMEBREW_PREFIX/"opt/gnu-tar/bin/gtar"
       gnu_tar_gtar = gnu_tar_gtar_path if gnu_tar_gtar_path.executable?
@@ -202,7 +202,7 @@ module Homebrew
       if Utils.popen_read(tar, "-tf", rsrc_path) =~ %r{/.*\.}
         new_hash = rsrc_path.sha256
       elsif new_url.include? ".tar"
-        odie "#{formula}: no url/#{hash_type} specified!"
+        odie "#{formula}: no --url=/--#{hash_type}= arguments specified!"
       end
     end
 
@@ -338,7 +338,13 @@ module Homebrew
 
         if reply.to_s.include? "username:"
           formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-          odie "Please authentify with hub (eg. by typing 'cd $(brew --repo) && hub issue') and try again."
+          git_path = "$(brew --repo #{formula.tap})" if formula.tap
+          git_path ||= formula.path.parent
+          odie <<~EOS
+            Retry after configuring hub by running:
+              hub -C "#{git_path}" fork
+            Or setting HOMEBREW_GITHUB_TOKEN with at least 'public_repo' scope.
+          EOS
         end
 
         remote = reply[/remote:? (\S+)/, 1]
