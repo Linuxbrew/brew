@@ -1,6 +1,9 @@
 #:  * `doctor`:
 #:    Check your system for potential problems. Doctor exits with a non-zero status
-#:    if any problems are found.
+#:    if any potential problems are found. Please note that these warnings are just
+#:    used to help the Homebrew maintainers with debugging if you file an issue. If
+#:    everything you use Homebrew for is working fine: please don't worry or file
+#:    an issue; just ignore this.
 
 # Undocumented options:
 #     -D activates debugging and profiling of the audit methods (not the same as --debug)
@@ -46,7 +49,7 @@ module Homebrew
         $stderr.puts <<~EOS
           #{Tty.bold}Please note that these warnings are just used to help the Homebrew maintainers
           with debugging if you file an issue. If everything you use Homebrew for is
-          working fine: please don't worry and just ignore them. Thanks!#{Tty.reset}
+          working fine: please don't worry or file an issue; just ignore this. Thanks!#{Tty.reset}
         EOS
       end
 
