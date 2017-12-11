@@ -344,7 +344,7 @@ def which_editor
   editor = %w[atom subl mate edit vim].find do |candidate|
     candidate if which(candidate, ENV["HOMEBREW_PATH"])
   end
-  editor ||= "/usr/bin/vim"
+  editor ||= "vim"
 
   opoo <<~EOS
     Using #{editor} because no editor was set in the environment.
