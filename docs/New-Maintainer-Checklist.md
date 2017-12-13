@@ -2,7 +2,7 @@
 
 **This is a guide used by existing maintainers to invite new maintainers. You might find it interesting but there's nothing here users should have to know.**
 
-So, there's someone who has been making consistently high-quality contributions to Homebrew for a long time and shown themselves able to make slightly more advanced contributions than just e.g. formula updates? Let's invite them to be a maintainer!
+There's someone who has been making consistently high-quality contributions to Homebrew for a long time and shown themselves able to make slightly more advanced contributions than just e.g. formula updates? Let's invite them to be a maintainer!
 
 First, send them the invitation email:
 
@@ -10,11 +10,16 @@ First, send them the invitation email:
 The Homebrew team and I really appreciate your help on issues, pull requests and
 your contributions around $THEIR_CONTRIBUTIONS.
 
-We would like to invite you to have commit access. There are no obligations,
-but we'd appreciate your continuing help in keeping on top of contributions.
-The easiest way to do this is to watch the Homebrew/brew and
-Homebrew/homebrew-core repositories on GitHub to provide help and code review
-and to pull suitable changes.
+We would like to invite you to have commit access and be a Homebrew maintainer.
+If you agree to be a maintainer, you should spend a significant proportion of
+the time you are working on Homebrew fixing user-reported issues, resolving any
+issues that arise from your code in a timely fashion and reviewing user
+contributions. You should also be making contributions to Homebrew every month
+unless you are ill or on vacation (and please let another maintainer know if
+that's the case so we're aware you won't be able to help while you are out).
+You will need to watch Homebrew/brew and/or Homebrew/homebrew-core. If you're
+no longer able to perform all of these tasks, please continue to contribute to
+Homebrew, but we will ask you to step down as a maintainer.
 
 A few requests:
 
@@ -36,7 +41,7 @@ A few requests:
 - please read:
     - https://docs.brew.sh/Brew-Test-Bot-For-Core-Contributors.html
     - https://docs.brew.sh/Maintainer-Guidelines.html
-    - possibly everything else on https://docs.brew.sh
+    - anything else you haven't read on https://docs.brew.sh
 
 How does that sound?
 
@@ -53,8 +58,7 @@ If they accept, follow a few steps to get them set up:
 - Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites)
 - Invite them to the [`homebrew` private maintainers 1Password](https://homebrew.1password.com/signin)
 - Invite them to [Google Analytics](https://analytics.google.com/analytics/web/?authuser=1#management/Settings/a76679469w115400090p120682403/%3Fm.page%3DAccountUsers/)
-- Add them to [Homebrew's README](https://github.com/Homebrew/brew/edit/master/README.md)
 
-After a few weeks/months with no problems consider making them [owners on the Homebrew GitHub organisation](https://github.com/orgs/Homebrew/people).
+After a month-long trial period with no problems make them [owners on the Homebrew GitHub organisation](https://github.com/orgs/Homebrew/people) and add them to [Homebrew's README](https://github.com/Homebrew/brew/edit/master/README.md). If there are problems, ask them to step down as a maintainer and revoke their access to the above.
 
 Now sit back, relax and let the new maintainers handle more of our contributions.
