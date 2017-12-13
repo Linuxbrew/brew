@@ -71,10 +71,6 @@ module Language
       ]
     end
 
-    def self.package_available?(python, module_name)
-      quiet_system python, "-c", "import #{module_name}"
-    end
-
     # Mixin module for {Formula} adding virtualenv support features.
     module Virtualenv
       def self.included(base)
