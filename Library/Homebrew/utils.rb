@@ -267,12 +267,6 @@ module Homebrew
   # rubocop:enable Style/GlobalVars
 end
 
-def with_system_path
-  with_env(PATH: PATH.new("/usr/bin", "/bin")) do
-    yield
-  end
-end
-
 def with_homebrew_path
   with_env(PATH: PATH.new(ENV["HOMEBREW_PATH"])) do
     yield
@@ -344,7 +338,7 @@ def which_editor
   editor = %w[atom subl mate edit vim].find do |candidate|
     candidate if which(candidate, ENV["HOMEBREW_PATH"])
   end
-  editor ||= "/usr/bin/vim"
+  editor ||= "vim"
 
   opoo <<~EOS
     Using #{editor} because no editor was set in the environment.
@@ -376,7 +370,7 @@ end
 # GZips the given paths, and returns the gzipped paths
 def gzip(*paths)
   paths.collect do |path|
-    with_system_path { safe_system "gzip", path }
+    safe_system "gzip", path
     Pathname.new("#{path}.gz")
   end
 end

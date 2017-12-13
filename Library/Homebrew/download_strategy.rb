@@ -217,12 +217,12 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
     case type = cached_location.compression_type
     when :zip
-      with_system_path { quiet_safe_system "unzip", "-qq", cached_location }
+      quiet_safe_system "unzip", "-qq", cached_location
       chdir
     when :gzip_only
-      with_system_path { buffered_write("gunzip") }
+      buffered_write "gunzip"
     when :bzip2_only
-      with_system_path { buffered_write("bunzip2") }
+      buffered_write "bunzip2"
     when :gzip, :bzip2, :xz, :compress, :tar
       tar_flags = "x"
       if type == :gzip
@@ -233,16 +233,14 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
         tar_flags << "J"
       end
       tar_flags << "f"
-      with_system_path do
-        if type == :xz && DependencyCollector.tar_needs_xz_dependency?
-          pipe_to_tar(xzpath)
-        else
-          safe_system "tar", tar_flags, cached_location
-        end
+      if type == :xz && DependencyCollector.tar_needs_xz_dependency?
+        pipe_to_tar xzpath
+      else
+        safe_system "tar", tar_flags, cached_location
       end
       chdir
     when :lzip
-      with_system_path { pipe_to_tar(lzippath) }
+      pipe_to_tar lzippath
       chdir
     when :lha
       safe_system lhapath, "x", cached_location

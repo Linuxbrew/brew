@@ -3,7 +3,7 @@ require "open3"
 
 def curl_executable
   curl = Pathname.new ENV["HOMEBREW_CURL"]
-  curl = Pathname.new "/usr/bin/curl" unless curl.exist?
+  curl = which("curl") unless curl.exist?
   return curl if curl.executable?
   raise "#{curl} is not executable"
 end
