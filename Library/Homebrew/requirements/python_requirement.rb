@@ -7,15 +7,12 @@ class PythonRequirement < Requirement
   satisfy build_env: false do
     python = which_python
     next unless python
-    version = python_short_version
-    next unless version
+    next unless short_version
     # Always use Python 2.7 for consistency on older versions of Mac OS X.
-    version == Version.create("2.7")
+    short_version == Version.create("2.7")
   end
 
   env do
-    short_version = python_short_version
-
     if !system_python? && short_version == Version.create("2.7")
       ENV.prepend_path "PATH", which_python.dirname
     end
@@ -24,10 +21,14 @@ class PythonRequirement < Requirement
     ENV.prepend_path "PATH", Formula["python"].opt_bin
     ENV.prepend_path "PATH", Formula["python"].opt_libexec/"bin"
 
-    ENV["PYTHONPATH"] = "#{HOMEBREW_PREFIX}/lib/python#{short_version}/site-packages"
+    if system_python?
+      ENV["PYTHONPATH"] = "#{HOMEBREW_PREFIX}/lib/python#{short_version}/site-packages"
+    end
   end
 
-  def python_short_version
+  private
+
+  def short_version
     @short_version ||= Language::Python.major_minor_version which_python
   end
 
@@ -46,7 +47,7 @@ class PythonRequirement < Requirement
   end
 
   def python_binary
-    "python"
+    "python2.7"
   end
 
   # Deprecated
@@ -58,6 +59,8 @@ class Python3Requirement < PythonRequirement
   default_formula "python3"
 
   satisfy(build_env: false) { which_python }
+
+  private
 
   def python_binary
     "python3"
