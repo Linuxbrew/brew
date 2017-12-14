@@ -103,7 +103,7 @@ class JavaRequirement < Requirement
   end
 
   def satisfies_version(java)
-    java_version_s = Utils.popen_read("#{java} -version 2>&1")[/\d+.\d/]
+    java_version_s = Utils.popen_read(java, "-version", err: :out)[/\d+.\d/]
     return false unless java_version_s
     java_version = Version.create(java_version_s)
     needed_version = Version.create(version_without_plus)
