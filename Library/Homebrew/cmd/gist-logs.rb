@@ -27,7 +27,7 @@ module Homebrew
     # Dummy summary file, asciibetically first, to control display title of gist
     files["# #{f.name} - #{timestamp}.txt"] = { content: brief_build_info(f) }
     files["00.config.out"] = { content: s.string }
-    files["00.doctor.out"] = { content: `brew doctor 2>&1` }
+    files["00.doctor.out"] = { content: Utils.popen_read("#{HOMEBREW_PREFIX}/bin/brew", "doctor", err: :out) }
     unless f.core_formula?
       tap = <<~EOS
         Formula: #{f.name}

@@ -350,7 +350,7 @@ module Homebrew
         remote = reply[/remote:? (\S+)/, 1]
 
         # repeat for hub 2.2 backwards compatibility:
-        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1] if remote.to_s.empty?
+        remote = Utils.popen_read("hub", "fork", err: :out)[/remote:? (\S+)/, 1] if remote.to_s.empty?
 
         if remote.to_s.empty?
           formula.path.atomic_write(backup_file) unless ARGV.dry_run?
