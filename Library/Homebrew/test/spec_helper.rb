@@ -5,6 +5,7 @@ require "rspec/wait"
 require "rubocop"
 require "rubocop/rspec/support"
 require "set"
+require "support/no_seed_progress_formatter"
 
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
