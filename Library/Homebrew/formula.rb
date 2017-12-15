@@ -956,16 +956,13 @@ class Formula
     @prefix_returns_versioned_prefix = true
     build = self.build
     self.build = Tab.for_formula(self)
-    path_with_prefix = PATH.new(ENV["PATH"])
-                           .append(HOMEBREW_PREFIX/"bin")
-                           .append(HOMEBREW_PREFIX/"sbin")
 
     new_env = {
       "TMPDIR" => HOMEBREW_TEMP,
       "TEMP" => HOMEBREW_TEMP,
       "TMP" => HOMEBREW_TEMP,
       "HOMEBREW_PATH" => nil,
-      "PATH" => path_with_prefix,
+      "PATH" => ENV["HOMEBREW_PATH"],
     }
 
     with_env(new_env) do
