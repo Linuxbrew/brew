@@ -1120,8 +1120,15 @@ Sets the HTTPS proxy to be used by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when down
 \fBftp_proxy\fR
 Sets the FTP proxy to be used by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downloading through Homebrew\.
 .
+.TP
+\fBno_proxy\fR
+Sets the comma\-separated list of hostnames and domain names that should be excluded from proxying by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downloading through Homebrew\.
+.
 .SH "USING HOMEBREW BEHIND A PROXY"
-Use the \fBhttp_proxy\fR, \fBhttps_proxy\fR and/or \fBftp_proxy\fR documented above\. For example for an unauthenticated HTTP proxy:
+Use the \fBhttp_proxy\fR, \fBhttps_proxy\fR, \fBno_proxy\fR and/or \fBftp_proxy\fR documented above\.
+.
+.P
+For example for an unauthenticated HTTP proxy:
 .
 .IP "" 4
 .

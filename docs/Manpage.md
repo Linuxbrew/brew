@@ -1096,8 +1096,14 @@ can take several different forms:
     Sets the FTP proxy to be used by `curl`, `git` and `svn` when downloading
     through Homebrew.
 
+  * `no_proxy`:
+    Sets the comma-separated list of hostnames and domain names that should be excluded from proxying
+    by `curl`, `git` and `svn` when downloading through Homebrew.
+
 ## USING HOMEBREW BEHIND A PROXY
-Use the `http_proxy`, `https_proxy` and/or `ftp_proxy` documented above. For example for an unauthenticated HTTP proxy:
+Use the `http_proxy`, `https_proxy`, `no_proxy` and/or `ftp_proxy` documented above.
+
+For example for an unauthenticated HTTP proxy:
 
     export http_proxy=http://`host`:`port`
 
