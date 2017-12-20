@@ -92,6 +92,9 @@ case "$(lowercase "$SCM_FILE")" in
     ;;
 esac
 
+brew_version="$(quiet_safe_cd "$SCM_DIR/../../../../../bin" && pwd -P)/$SCM_FILE"
+safe_exec "$brew_version" "$@"
+
 brew_version="$(quiet_safe_cd "$SCM_DIR/../../../../bin" && pwd -P)/$SCM_FILE"
 safe_exec "$brew_version" "$@"
 
