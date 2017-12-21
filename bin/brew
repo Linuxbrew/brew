@@ -89,7 +89,11 @@ fi
 # test-bot sets environment filtering itself
 if [[ -n "$HOMEBREW_ENV_FILTERING" && "$1" != "test-bot" ]]
 then
-  PATH="/usr/bin:/bin:/usr/sbin:/sbin"
+  if [[ "$(uname -s)" == Darwin ]]; then
+    PATH="/usr/bin:/bin:/usr/sbin:/sbin"
+  else
+    PATH="$HOMEBREW_PREFIX/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  fi
 
   FILTERED_ENV=()
   for VAR in HOME SHELL PATH TERM LOGNAME USER CI CIRCLECI TRAVIS SSH_AUTH_SOCK SUDO_ASKPASS \
