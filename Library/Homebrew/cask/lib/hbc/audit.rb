@@ -2,6 +2,7 @@ require "hbc/checkable"
 require "hbc/download"
 require "digest"
 require "utils/git"
+require "utils/curl"
 
 module Hbc
   class Audit
@@ -30,6 +31,7 @@ module Hbc
       check_url
       check_generic_artifacts
       check_token_conflicts
+      check_https_availability
       check_download
       check_single_pre_postflight
       check_single_uninstall_zap
@@ -273,6 +275,17 @@ module Hbc
 
     def core_formula_url
       "#{core_tap.default_remote}/blob/master/Formula/#{cask.token}.rb"
+    end
+
+    def check_https_availability
+      check_url_for_https_availability(cask.url, user_agents: [cask.url.user_agent]) unless cask.url.to_s.empty?
+      check_url_for_https_availability(cask.appcast) unless cask.appcast.to_s.empty?
+      check_url_for_https_availability(cask.homepage) unless cask.homepage.to_s.empty?
+    end
+
+    def check_url_for_https_availability(url_to_check, user_agents: [:default])
+      problem = curl_check_http_content(url_to_check.to_s, user_agents: user_agents)
+      add_error problem unless problem.nil?
     end
 
     def check_download

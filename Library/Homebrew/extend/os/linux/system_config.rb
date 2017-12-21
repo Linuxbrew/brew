@@ -1,4 +1,5 @@
 require "formula"
+require "os/linux/glibc"
 
 class SystemConfig
   class << self
@@ -15,7 +16,7 @@ class SystemConfig
     end
 
     def host_glibc_version
-      version = GlibcRequirement.system_version
+      version = OS::Linux::Glibc.system_version
       return "N/A" if version.null?
       version
     end

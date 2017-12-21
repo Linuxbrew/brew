@@ -59,7 +59,7 @@ HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty --abbr
 HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
 if [[ -z "$HOMEBREW_VERSION" ]]
 then
-  HOMEBREW_VERSION=">1.2.0 (shallow or no git repository)"
+  HOMEBREW_VERSION=">=1.4.0 (shallow or no git repository)"
   HOMEBREW_USER_AGENT_VERSION="1.X.Y"
 fi
 
@@ -78,18 +78,6 @@ if [[ -n "$GEM_PATH" ]]
 then
   export HOMEBREW_GEM_PATH="$GEM_PATH"
 fi
-
-# Users may have these set, pointing the system Ruby
-# at non-system gem paths
-unset GEM_HOME
-unset GEM_PATH
-
-# Users may have this set, injecting arbitrary environment changes into
-# bash processes inside builds
-unset BASH_ENV
-
-# Users may have this set, breaking grep's output.
-unset GREP_OPTIONS
 
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
@@ -252,6 +240,18 @@ case "$HOMEBREW_COMMAND" in
   environment) HOMEBREW_COMMAND="--env" ;;
   --config)    HOMEBREW_COMMAND="config" ;;
 esac
+
+# Set HOMEBREW_DEV_CMD_RUN for users who have run a development command.
+# This makes them behave like HOMEBREW_DEVELOPERs for brew update.
+if [[ -z "$HOMEBREW_DEVELOPER" ]]
+then
+  export HOMEBREW_GIT_CONFIG_FILE="$HOMEBREW_REPOSITORY/.git/config"
+  HOMEBREW_GIT_CONFIG_DEVELOPERMODE="$(git config --file="$HOMEBREW_GIT_CONFIG_FILE" --get homebrew.devcmdrun 2>/dev/null)"
+  if [[ "$HOMEBREW_GIT_CONFIG_DEVELOPERMODE" = "true" ]]
+  then
+    export HOMEBREW_DEV_CMD_RUN="1"
+  fi
+fi
 
 if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]
 then

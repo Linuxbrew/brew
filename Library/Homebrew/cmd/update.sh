@@ -410,9 +410,6 @@ EOS
     QUIET_ARGS=()
   fi
 
-  # ensure GIT_CONFIG is unset as we need to operate on .git/config
-  unset GIT_CONFIG
-
   # only allow one instance of brew update
   lock update
 

@@ -144,7 +144,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `doctor`:
     Check your system for potential problems. Doctor exits with a non-zero status
-    if any problems are found.
+    if any potential problems are found. Please note that these warnings are just
+    used to help the Homebrew maintainers with debugging if you file an issue. If
+    everything you use Homebrew for is working fine: please don't worry or file
+    an issue; just ignore this.
 
   * `fetch` [`--force`] [`--retry`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] `formulae`:
     Download the source packages for the given `formulae`.
@@ -1002,9 +1005,13 @@ can take several different forms:
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
 
+  * `HOMEBREW_FORCE_BREWED_CURL`:
+    If set, Homebrew will use a Homebrew-installed `curl` rather than the
+    system version.
+
   * `HOMEBREW_FORCE_VENDOR_RUBY`:
-    If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
-    even if the system version of Ruby is >=2.0.
+    If set, Homebrew will always use its vendored, relocatable Ruby version
+    even if the system version of Ruby is new enough.
 
   * `HOMEBREW_GIT`:
     When using Git, Homebrew will use `GIT` if set,

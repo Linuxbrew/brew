@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "November 2017" "Homebrew" "brew"
+.TH "BREW" "1" "December 2017" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -152,7 +152,7 @@ The options \fB\-\-name=\fR\fIname\fR and \fB\-\-version=\fR\fIversion\fR each t
 .
 .TP
 \fBdoctor\fR
-Check your system for potential problems\. Doctor exits with a non\-zero status if any problems are found\.
+Check your system for potential problems\. Doctor exits with a non\-zero status if any potential problems are found\. Please note that these warnings are just used to help the Homebrew maintainers with debugging if you file an issue\. If everything you use Homebrew for is working fine: please don\'t worry or file an issue; just ignore this\.
 .
 .TP
 \fBfetch\fR [\fB\-\-force\fR] [\fB\-\-retry\fR] [\fB\-v\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-deps\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] \fIformulae\fR
@@ -1028,8 +1028,12 @@ If set, Homebrew will use this editor when editing a single formula, or several 
 \fINote:\fR \fBbrew edit\fR will open all of Homebrew as discontinuous files and directories\. TextMate can handle this correctly in project mode, but many editors will do strange things in this case\.
 .
 .TP
+\fBHOMEBREW_FORCE_BREWED_CURL\fR
+If set, Homebrew will use a Homebrew\-installed \fBcurl\fR rather than the system version\.
+.
+.TP
 \fBHOMEBREW_FORCE_VENDOR_RUBY\fR
-If set, Homebrew will always use its vendored, relocatable Ruby 2\.0 version even if the system version of Ruby is >=2\.0\.
+If set, Homebrew will always use its vendored, relocatable Ruby version even if the system version of Ruby is new enough\.
 .
 .TP
 \fBHOMEBREW_GIT\fR

@@ -262,19 +262,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_unsupported_curl_vars
-        # Support for SSL_CERT_DIR seemed to be removed in the 10.10.5 update.
-        return unless MacOS.version >= :yosemite
-        return if ENV["SSL_CERT_DIR"].nil?
-
-        <<~EOS
-          SSL_CERT_DIR support was removed from Apple's curl.
-          If fetching formulae fails you should:
-            unset SSL_CERT_DIR
-          and remove it from #{Utils::Shell.profile} if present.
-        EOS
-      end
-
       def check_xcode_license_approved
         # If the user installs Xcode-only, they have to approve the
         # license or no "xc*" tool will work.
