@@ -19,14 +19,6 @@ case "$*" in
   --repository|--repo) echo "$HOMEBREW_REPOSITORY"; exit 0 ;;
 esac
 
-HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty --abbrev=7 2>/dev/null)"
-HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
-if [[ -z "$HOMEBREW_VERSION" ]]
-then
-  HOMEBREW_VERSION=">=1.4.0 (shallow or no git repository)"
-  HOMEBREW_USER_AGENT_VERSION="1.X.Y"
-fi
-
 # A depth of 1 means this command was directly invoked by a user.
 # Higher depths mean this command was invoked by another Homebrew command.
 export HOMEBREW_COMMAND_DEPTH=$((HOMEBREW_COMMAND_DEPTH + 1))
@@ -62,6 +54,14 @@ brew() {
 git() {
   "$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" "$@"
 }
+
+HOMEBREW_VERSION="$(git -C "$HOMEBREW_REPOSITORY" describe --tags --dirty --abbrev=7 2>/dev/null)"
+HOMEBREW_USER_AGENT_VERSION="$HOMEBREW_VERSION"
+if [[ -z "$HOMEBREW_VERSION" ]]
+then
+  HOMEBREW_VERSION=">=1.4.0 (shallow or no git repository)"
+  HOMEBREW_USER_AGENT_VERSION="1.X.Y"
+fi
 
 if [[ "$HOMEBREW_PREFIX" = "/" || "$HOMEBREW_PREFIX" = "/usr" ]]
 then
