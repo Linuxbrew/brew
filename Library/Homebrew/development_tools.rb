@@ -18,7 +18,7 @@ class DevelopmentTools
     end
 
     def installed?
-      which("clang") || which("gcc")
+      locate("clang") || locate("gcc")
     end
 
     def installation_instructions
