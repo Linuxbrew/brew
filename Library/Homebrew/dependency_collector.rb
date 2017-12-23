@@ -19,11 +19,6 @@ require "extend/cachable"
 class DependencyCollector
   extend Cachable
 
-  # Define the languages that we can handle as external dependencies.
-  LANGUAGE_MODULES = Set[
-    :lua, :lua51, :perl, :python, :python3, :ruby
-  ].freeze
-
   attr_reader :deps, :requirements
 
   def initialize
@@ -60,6 +55,10 @@ class DependencyCollector
 
   def ant_dep_if_needed(tags)
     Dependency.new("ant", tags)
+  end
+
+  def cvs_dep_if_needed(tags)
+    Dependency.new("cvs", tags)
   end
 
   def xz_dep_if_needed(tags)
@@ -102,8 +101,6 @@ class DependencyCollector
       TapDependency.new(spec, tags)
     elsif tags.empty?
       Dependency.new(spec, tags)
-    elsif (tag = tags.first) && LANGUAGE_MODULES.include?(tag)
-      LanguageModuleRequirement.new(tag, spec, tags[1])
     else
       Dependency.new(spec, tags)
     end
@@ -115,9 +112,6 @@ class DependencyCollector
     when :xcode      then XcodeRequirement.new(tags)
     when :linux      then LinuxRequirement.new(tags)
     when :macos      then MacOSRequirement.new(tags)
-    when :mysql      then MysqlRequirement.new(tags)
-    when :postgresql then PostgresqlRequirement.new(tags)
-    when :gpg        then GPG2Requirement.new(tags)
     when :fortran    then FortranRequirement.new(tags)
     when :mpi        then MPIRequirement.new(*tags)
     when :tex        then TeXRequirement.new(tags)
@@ -156,16 +150,16 @@ class DependencyCollector
       parse_url_spec(spec.url, tags)
     elsif strategy <= GitDownloadStrategy
       GitRequirement.new(tags)
+    elsif strategy <= SubversionDownloadStrategy
+      SubversionRequirement.new(tags)
     elsif strategy <= MercurialDownloadStrategy
-      MercurialRequirement.new(tags)
+      Dependency.new("hg", tags)
     elsif strategy <= FossilDownloadStrategy
       Dependency.new("fossil", tags)
     elsif strategy <= BazaarDownloadStrategy
       Dependency.new("bazaar", tags)
     elsif strategy <= CVSDownloadStrategy
-      CVSRequirement.new(tags)
-    elsif strategy <= SubversionDownloadStrategy
-      SubversionRequirement.new(tags)
+      cvs_dep_if_needed(tags)
     elsif strategy < AbstractDownloadStrategy
       # allow unknown strategies to pass through
     else

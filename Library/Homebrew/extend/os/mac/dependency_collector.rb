@@ -4,6 +4,11 @@ class DependencyCollector
     Dependency.new("ant", tags)
   end
 
+  def cvs_dep_if_needed(tags)
+    return if MacOS.version < :lion
+    Dependency.new("cvs", tags)
+  end
+
   def xz_dep_if_needed(tags)
     return if MacOS.version >= :mavericks
     Dependency.new("xz", tags)
