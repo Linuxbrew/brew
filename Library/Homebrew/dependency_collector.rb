@@ -58,16 +58,24 @@ class DependencyCollector
     parse_spec(spec, Array(tags))
   end
 
-  def ant_dep(tags)
+  def ant_dep_if_needed(tags)
     Dependency.new("ant", tags)
   end
 
-  def xz_dep(tags)
+  def xz_dep_if_needed(tags)
     Dependency.new("xz", tags)
   end
 
+  def expat_dep_if_needed(tags)
+    Dependency.new("expat", tags)
+  end
+
+  def ld64_dep_if_needed(*)
+    LD64Dependency.new
+  end
+
   def self.tar_needs_xz_dependency?
-    !new.xz_dep([]).nil?
+    !new.xz_dep_if_needed([]).nil?
   end
 
   private
@@ -116,21 +124,17 @@ class DependencyCollector
     when :arch       then ArchRequirement.new(tags)
     when :hg         then MercurialRequirement.new(tags)
     when :python     then PythonRequirement.new(tags)
+    when :python2    then PythonRequirement.new(tags)
     when :python3    then Python3Requirement.new(tags)
     when :java       then JavaRequirement.new(tags)
-    when :rbenv      then RbenvRequirement.new(tags)
     when :ruby       then RubyRequirement.new(tags)
     when :osxfuse    then OsxfuseRequirement.new(tags)
     when :perl       then PerlRequirement.new(tags)
     when :tuntap     then TuntapRequirement.new(tags)
-    when :ant        then ant_dep(tags)
+    when :ant        then ant_dep_if_needed(tags)
     when :emacs      then EmacsRequirement.new(tags)
-    # Tiger's ld is too old to properly link some software
-    when :ld64       then LD64Dependency.new if MacOS.version < :leopard
-    # Tiger doesn't ship expat in /usr/lib
-    when :expat      then Dependency.new("expat", tag) if MacOS.version < :leopard
-    when :python2
-      PythonRequirement.new(tags)
+    when :ld64       then ld64_dep_if_needed(tags)
+    when :expat      then expat_dep_if_needed(tags)
     else
       raise ArgumentError, "Unsupported special dependency #{spec.inspect}"
     end
@@ -172,7 +176,7 @@ class DependencyCollector
 
   def parse_url_spec(url, tags)
     case File.extname(url)
-    when ".xz"          then xz_dep(tags)
+    when ".xz"          then xz_dep_if_needed(tags)
     when ".lha", ".lzh" then Dependency.new("lha", tags)
     when ".lz"          then Dependency.new("lzip", tags)
     when ".rar"         then Dependency.new("unrar", tags)
