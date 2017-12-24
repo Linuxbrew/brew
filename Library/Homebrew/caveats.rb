@@ -86,21 +86,23 @@ class Caveats
     installed << "completions" if completion_installed
     installed << "functions" if functions_installed
 
+    root_dir = f.keg_only? ? f.opt_prefix : HOMEBREW_PREFIX
+
     case shell
     when :bash
       <<~EOS
         Bash completion has been installed to:
-          #{HOMEBREW_PREFIX}/etc/bash_completion.d
+          #{root_dir}/etc/bash_completion.d
       EOS
     when :zsh
       <<~EOS
         zsh #{installed.join(" and ")} have been installed to:
-          #{HOMEBREW_PREFIX}/share/zsh/site-functions
+          #{root_dir}/share/zsh/site-functions
       EOS
     when :fish
       fish_caveats = "fish #{installed.join(" and ")} have been installed to:"
-      fish_caveats << "\n  #{HOMEBREW_PREFIX}/share/fish/vendor_completions.d" if completion_installed
-      fish_caveats << "\n  #{HOMEBREW_PREFIX}/share/fish/vendor_functions.d" if functions_installed
+      fish_caveats << "\n  #{root_dir}/share/fish/vendor_completions.d" if completion_installed
+      fish_caveats << "\n  #{root_dir}/share/fish/vendor_functions.d" if functions_installed
       fish_caveats
     end
   end
