@@ -154,6 +154,7 @@ def interactive_shell(f = nil)
   end
 
   if ENV["SHELL"].include?("zsh") && ENV["HOME"].start_with?(HOMEBREW_TEMP.resolved_path.to_s)
+    FileUtils.mkdir_p ENV["HOME"]
     FileUtils.touch "#{ENV["HOME"]}/.zshrc"
   end
 
