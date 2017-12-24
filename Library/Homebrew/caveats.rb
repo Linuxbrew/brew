@@ -86,11 +86,7 @@ class Caveats
     installed << "completions" if completion_installed
     installed << "functions" if functions_installed
 
-    if f.keg_only?
-      root_dir = f.opt_prefix
-    else
-      root_dir = HOMEBREW_PREFIX
-    end
+    root_dir = f.keg_only? ? f.opt_prefix : HOMEBREW_PREFIX
 
     case shell
     when :bash
