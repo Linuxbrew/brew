@@ -13,6 +13,7 @@ require "pkg_version"
 require "tap"
 require "keg"
 require "migrator"
+require "gpg"
 require "extend/ENV"
 
 # A formula provides instructions and metadata for Homebrew to install a piece

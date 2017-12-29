@@ -1,6 +1,6 @@
 require "utils"
 
-class Gpg
+module Gpg
   module_function
 
   def executable
