@@ -153,7 +153,7 @@ class DependencyCollector
     elsif strategy <= SubversionDownloadStrategy
       SubversionRequirement.new(tags)
     elsif strategy <= MercurialDownloadStrategy
-      Dependency.new("hg", tags)
+      Dependency.new("mercurial", tags)
     elsif strategy <= FossilDownloadStrategy
       Dependency.new("fossil", tags)
     elsif strategy <= BazaarDownloadStrategy
