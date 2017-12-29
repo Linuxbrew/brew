@@ -380,8 +380,6 @@ class FormulaAuditor
         case dep.name
         when "git"
           problem "Don't use git as a dependency"
-        when "mercurial"
-          problem "Use `depends_on :hg` instead of `depends_on 'mercurial'`"
         when "gfortran"
           problem "Use `depends_on :fortran` instead of `depends_on 'gfortran'`"
         when "ruby"
