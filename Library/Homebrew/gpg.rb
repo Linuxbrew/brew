@@ -1,29 +1,17 @@
 require "utils"
 
 class Gpg
-  def self.find_gpg(executable)
-    which_all(executable).detect do |gpg|
-      gpg_short_version = Utils.popen_read(gpg, "--version")[/\d\.\d/, 0]
-      next unless gpg_short_version
-      gpg_version = Version.create(gpg_short_version.to_s)
-      @version = gpg_version
-      gpg_version >= Version.create("2.0")
-    end
+  module_function
+
+  def executable
+    which "gpg"
   end
 
-  def self.executable
-    find_gpg("gpg") || find_gpg("gpg2")
-  end
-
-  def self.available?
+  def available?
     File.executable?(executable.to_s)
   end
 
-  def self.version
-    @version if available?
-  end
-
-  def self.create_test_key(path)
+  def create_test_key(path)
     odie "No GPG present to test against!" unless available?
 
     (path/"batch.gpg").write <<~EOS
@@ -40,8 +28,9 @@ class Gpg
     system executable, "--batch", "--gen-key", "batch.gpg"
   end
 
-  def self.cleanup_test_processes!
+  def cleanup_test_processes!
     odie "No GPG present to test against!" unless available?
+
     gpgconf = Pathname.new(executable).parent/"gpgconf"
 
     system gpgconf, "--kill", "gpg-agent"
@@ -49,7 +38,7 @@ class Gpg
                                  "gpg-agent"
   end
 
-  def self.test(path)
+  def test(path)
     create_test_key(path)
     begin
       yield

@@ -6,12 +6,16 @@ module RuboCop
       # This cop checks for various miscellaneous Homebrew coding styles
       class Lines < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, _body_node)
-          [:automake, :autoconf, :libtool].each do |dependency|
+          [:automake, :autoconf, :libtool, :mysql, :postgresql, :rbenv].each do |dependency|
             next unless depends_on?(dependency)
             problem ":#{dependency} is deprecated. Usage should be \"#{dependency}\"."
           end
 
-          problem ':apr is deprecated. Usage should be "apr-util".' if depends_on?(:apr)
+          { apr: "apr-util", gpg: "gnupg" }.each do |requirement, dependency|
+            next unless depends_on?(requirement)
+            problem ":#{requirement} is deprecated. Usage should be \"#{dependency}\"."
+          end
+
           problem ":tex is deprecated." if depends_on?(:tex)
         end
       end

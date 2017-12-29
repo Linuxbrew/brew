@@ -1,6 +1,21 @@
 require "dependency_collector"
 
 class DependencyCollector
+  alias _parse_string_spec parse_string_spec
+
+  # Define the languages that we can handle as external dependencies.
+  LANGUAGE_MODULES = Set[
+    :lua, :lua51, :perl, :python, :python3, :ruby
+  ].freeze
+
+  def parse_string_spec(spec, tags)
+    if (tag = tags.first) && LANGUAGE_MODULES.include?(tag)
+      LanguageModuleRequirement.new(tag, spec, tags[1])
+    else
+      _parse_string_spec(spec, tags)
+    end
+  end
+
   alias _parse_symbol_spec parse_symbol_spec
 
   def parse_symbol_spec(spec, tags)
@@ -20,6 +35,18 @@ class DependencyCollector
       tags << :run
       output_deprecation("libtool", tags)
       Dependency.new("libtool", tags)
+    when :mysql
+      # output_deprecation("mysql", tags)
+      MysqlRequirement.new(tags)
+    when :postgresql
+      # output_deprecation("postgresql", tags)
+      PostgresqlRequirement.new(tags)
+    when :gpg
+      # output_deprecation("gnupg", tags)
+      GPG2Requirement.new(tags)
+    when :rbenv
+      # output_deprecation("rbenv", tags)
+      RbenvRequirement.new(tags)
     else
       _parse_symbol_spec(spec, tags)
     end

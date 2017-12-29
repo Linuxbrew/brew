@@ -19,11 +19,6 @@ require "extend/cachable"
 class DependencyCollector
   extend Cachable
 
-  # Define the languages that we can handle as external dependencies.
-  LANGUAGE_MODULES = Set[
-    :lua, :lua51, :perl, :python, :python3, :ruby
-  ].freeze
-
   attr_reader :deps, :requirements
 
   def initialize
@@ -58,16 +53,28 @@ class DependencyCollector
     parse_spec(spec, Array(tags))
   end
 
-  def ant_dep(tags)
+  def ant_dep_if_needed(tags)
     Dependency.new("ant", tags)
   end
 
-  def xz_dep(tags)
+  def cvs_dep_if_needed(tags)
+    Dependency.new("cvs", tags)
+  end
+
+  def xz_dep_if_needed(tags)
     Dependency.new("xz", tags)
   end
 
+  def expat_dep_if_needed(tags)
+    Dependency.new("expat", tags)
+  end
+
+  def ld64_dep_if_needed(*)
+    LD64Dependency.new
+  end
+
   def self.tar_needs_xz_dependency?
-    !new.xz_dep([]).nil?
+    !new.xz_dep_if_needed([]).nil?
   end
 
   private
@@ -94,8 +101,6 @@ class DependencyCollector
       TapDependency.new(spec, tags)
     elsif tags.empty?
       Dependency.new(spec, tags)
-    elsif (tag = tags.first) && LANGUAGE_MODULES.include?(tag)
-      LanguageModuleRequirement.new(tag, spec, tags[1])
     else
       Dependency.new(spec, tags)
     end
@@ -107,30 +112,23 @@ class DependencyCollector
     when :xcode      then XcodeRequirement.new(tags)
     when :linux      then LinuxRequirement.new(tags)
     when :macos      then MacOSRequirement.new(tags)
-    when :mysql      then MysqlRequirement.new(tags)
-    when :postgresql then PostgresqlRequirement.new(tags)
-    when :gpg        then GPG2Requirement.new(tags)
     when :fortran    then FortranRequirement.new(tags)
     when :mpi        then MPIRequirement.new(*tags)
     when :tex        then TeXRequirement.new(tags)
     when :arch       then ArchRequirement.new(tags)
     when :hg         then MercurialRequirement.new(tags)
     when :python     then PythonRequirement.new(tags)
+    when :python2    then PythonRequirement.new(tags)
     when :python3    then Python3Requirement.new(tags)
     when :java       then JavaRequirement.new(tags)
-    when :rbenv      then RbenvRequirement.new(tags)
     when :ruby       then RubyRequirement.new(tags)
     when :osxfuse    then OsxfuseRequirement.new(tags)
     when :perl       then PerlRequirement.new(tags)
     when :tuntap     then TuntapRequirement.new(tags)
-    when :ant        then ant_dep(tags)
+    when :ant        then ant_dep_if_needed(tags)
     when :emacs      then EmacsRequirement.new(tags)
-    # Tiger's ld is too old to properly link some software
-    when :ld64       then LD64Dependency.new if MacOS.version < :leopard
-    # Tiger doesn't ship expat in /usr/lib
-    when :expat      then Dependency.new("expat", tag) if MacOS.version < :leopard
-    when :python2
-      PythonRequirement.new(tags)
+    when :ld64       then ld64_dep_if_needed(tags)
+    when :expat      then expat_dep_if_needed(tags)
     else
       raise ArgumentError, "Unsupported special dependency #{spec.inspect}"
     end
@@ -152,16 +150,16 @@ class DependencyCollector
       parse_url_spec(spec.url, tags)
     elsif strategy <= GitDownloadStrategy
       GitRequirement.new(tags)
+    elsif strategy <= SubversionDownloadStrategy
+      SubversionRequirement.new(tags)
     elsif strategy <= MercurialDownloadStrategy
-      MercurialRequirement.new(tags)
+      Dependency.new("hg", tags)
     elsif strategy <= FossilDownloadStrategy
       Dependency.new("fossil", tags)
     elsif strategy <= BazaarDownloadStrategy
       Dependency.new("bazaar", tags)
     elsif strategy <= CVSDownloadStrategy
-      CVSRequirement.new(tags)
-    elsif strategy <= SubversionDownloadStrategy
-      SubversionRequirement.new(tags)
+      cvs_dep_if_needed(tags)
     elsif strategy < AbstractDownloadStrategy
       # allow unknown strategies to pass through
     else
@@ -172,7 +170,7 @@ class DependencyCollector
 
   def parse_url_spec(url, tags)
     case File.extname(url)
-    when ".xz"          then xz_dep(tags)
+    when ".xz"          then xz_dep_if_needed(tags)
     when ".lha", ".lzh" then Dependency.new("lha", tags)
     when ".lz"          then Dependency.new("lzip", tags)
     when ".rar"         then Dependency.new("unrar", tags)
