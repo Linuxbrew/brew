@@ -182,6 +182,7 @@ class FormulaInstaller
     recursive_runtime_formulae.each do |f|
       name = f.name
       unversioned_name, = name.split("@")
+      next if unversioned_name == "python"
       version_hash[unversioned_name] ||= Set.new
       version_hash[unversioned_name] << name
       next if version_hash[unversioned_name].length < 2
