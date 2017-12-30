@@ -1,5 +1,11 @@
 require "requirements"
+require "compat/requirements/emacs_requirement"
+require "compat/requirements/fortran_requirement"
 require "compat/requirements/language_module_requirement"
+require "compat/requirements/mpi_requirement"
+require "compat/requirements/perl_requirement"
+require "compat/requirements/python_requirement"
+require "compat/requirements/ruby_requirement"
 require "compat/requirements/tex_requirement"
 
 class MysqlRequirement < Requirement

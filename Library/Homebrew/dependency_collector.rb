@@ -53,20 +53,12 @@ class DependencyCollector
     parse_spec(spec, Array(tags))
   end
 
-  def ant_dep_if_needed(tags)
-    Dependency.new("ant", tags)
-  end
-
   def cvs_dep_if_needed(tags)
     Dependency.new("cvs", tags)
   end
 
   def xz_dep_if_needed(tags)
     Dependency.new("xz", tags)
-  end
-
-  def expat_dep_if_needed(tags)
-    Dependency.new("expat", tags)
   end
 
   def ld64_dep_if_needed(*)
@@ -112,23 +104,11 @@ class DependencyCollector
     when :xcode      then XcodeRequirement.new(tags)
     when :linux      then LinuxRequirement.new(tags)
     when :macos      then MacOSRequirement.new(tags)
-    when :fortran    then FortranRequirement.new(tags)
-    when :mpi        then MPIRequirement.new(*tags)
-    when :tex        then TeXRequirement.new(tags)
     when :arch       then ArchRequirement.new(tags)
-    when :hg         then MercurialRequirement.new(tags)
-    when :python     then PythonRequirement.new(tags)
-    when :python2    then PythonRequirement.new(tags)
-    when :python3    then Python3Requirement.new(tags)
     when :java       then JavaRequirement.new(tags)
-    when :ruby       then RubyRequirement.new(tags)
     when :osxfuse    then OsxfuseRequirement.new(tags)
-    when :perl       then PerlRequirement.new(tags)
     when :tuntap     then TuntapRequirement.new(tags)
-    when :ant        then ant_dep_if_needed(tags)
-    when :emacs      then EmacsRequirement.new(tags)
     when :ld64       then ld64_dep_if_needed(tags)
-    when :expat      then expat_dep_if_needed(tags)
     else
       raise ArgumentError, "Unsupported special dependency #{spec.inspect}"
     end

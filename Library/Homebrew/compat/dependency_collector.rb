@@ -22,31 +22,61 @@ class DependencyCollector
     case spec
     when :clt
       odeprecated "'depends_on :clt'"
+    when :tex
+      # odeprecated "'depends_on :tex'"
+      TeXRequirement.new(tags)
     when :autoconf, :automake, :bsdmake, :libtool
       output_deprecation(spec, tags)
       autotools_dep(spec, tags)
     when :cairo, :fontconfig, :freetype, :libpng, :pixman
       output_deprecation(spec, tags)
       Dependency.new(spec.to_s, tags)
-    when :apr
-      # output_deprecation(spec, tags, "apr-util")
-      Dependency.new("apr-util", tags)
+    when :ant, :expat
+      # output_deprecation(spec, tags)
+      Dependency.new(spec.to_s, tags)
     when :libltdl
       tags << :run
       output_deprecation("libtool", tags)
       Dependency.new("libtool", tags)
-    when :mysql
-      # output_deprecation("mysql", tags)
-      MysqlRequirement.new(tags)
-    when :postgresql
-      # output_deprecation("postgresql", tags)
-      PostgresqlRequirement.new(tags)
+    when :apr
+      # output_deprecation(spec, tags, "apr-util")
+      Dependency.new("apr-util", tags)
+    when :fortran
+      # output_deprecation(spec, tags, "gcc")
+      FortranRequirement.new(tags)
     when :gpg
-      # output_deprecation("gnupg", tags)
+      # output_deprecation(spec, tags, "gnupg")
       GPG2Requirement.new(tags)
+    when :hg
+      # output_deprecation(spec, tags, "mercurial")
+      MercurialRequirement.new(tags)
+    when :mpi
+      # output_deprecation(spec, tags, "open-mpi")
+      MPIRequirement.new(*tags)
+    when :emacs
+      # output_deprecation(spec, tags)
+      EmacsRequirement.new(tags)
+    when :mysql
+      # output_deprecation(spec, tags)
+      MysqlRequirement.new(tags)
+    when :perl
+      # output_deprecation(spec, tags)
+      PerlRequirement.new(tags)
+    when :postgresql
+      # output_deprecation(spec, tags)
+      PostgresqlRequirement.new(tags)
+    when :python, :python2
+      # output_deprecation(spec, tags)
+      PythonRequirement.new(tags)
+    when :python3
+      # output_deprecation(spec, tags)
+      Python3Requirement.new(tags)
     when :rbenv
-      # output_deprecation("rbenv", tags)
+      # output_deprecation(spec, tags)
       RbenvRequirement.new(tags)
+    when :ruby
+      # output_deprecation(spec, tags)
+      RubyRequirement.new(tags)
     else
       _parse_symbol_spec(spec, tags)
     end

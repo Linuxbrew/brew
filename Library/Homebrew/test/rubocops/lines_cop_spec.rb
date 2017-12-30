@@ -717,19 +717,6 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
-    it "deprecated ENV.fortran usage" do
-      expect_offense(<<~RUBY)
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-          test do
-            ENV.fortran
-            ^^^^^^^^^^^ Use `depends_on :fortran` instead of `ENV.fortran`
-          end
-        end
-      RUBY
-    end
-
     it "deprecated ARGV.include? (--HEAD) usage" do
       expect_offense(<<~RUBY)
         class Foo < Formula

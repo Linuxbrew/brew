@@ -10,7 +10,7 @@ class JavaRequirement < Requirement
     next true
   end
 
-  def initialize(tags)
+  def initialize(tags = [])
     @version = tags.shift if /(\d+\.)+\d/ =~ tags.first
     super
   end
