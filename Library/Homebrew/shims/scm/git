@@ -92,11 +92,11 @@ case "$(lowercase "$SCM_FILE")" in
     ;;
 esac
 
-brew_version="$(quiet_safe_cd "$SCM_DIR/../../../../../bin" && pwd -P)/$SCM_FILE"
-safe_exec "$brew_version" "$@"
+brew_prefix_version="$(quiet_safe_cd "$SCM_DIR/../../../../../bin" 2>/dev/null && pwd -P)/$SCM_FILE"
+safe_exec "$brew_prefix_version" "$@"
 
-brew_version="$(quiet_safe_cd "$SCM_DIR/../../../../bin" && pwd -P)/$SCM_FILE"
-safe_exec "$brew_version" "$@"
+brew_repo_version="$(quiet_safe_cd "$SCM_DIR/../../../../bin" && pwd -P)/$SCM_FILE"
+safe_exec "$brew_repo_version" "$@"
 
 IFS=$'\n'
 for path in $(/usr/bin/which -a "$SCM_FILE" 2>/dev/null)
