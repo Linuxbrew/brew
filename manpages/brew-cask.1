@@ -88,7 +88,7 @@ Without any arguments, list all installed Casks\. With \fB\-1\fR, always format 
 If \fItoken\fR is given, summarize the staged files associated with the given Cask\.
 .
 .TP
-\fBoutdated\fR [\-\-greedy] [\-\-verbose|\-\-quiet] [ \fItoken\fR \.\.\.]
+\fBoutdated\fR [\-\-greedy] [\-\-verbose|\-\-quiet] [ \fItoken\fR \.\.\. ]
 Without token arguments, display all the installed Casks that have newer versions available in the tap; otherwise check only the tokens given in the command line\. If \fB\-\-greedy\fR is given then also include in the output the Casks having \fBauto_updates true\fR or \fBversion :latest\fR\. Otherwise they are skipped because there is no reliable way to know when updates are available for them\.
 .
 .br
@@ -114,8 +114,8 @@ Check the given Casks for correct style using RuboCop Cask \fIhttps://github\.co
 Uninstall the given Cask\. With \fB\-\-force\fR, uninstall even if the Cask does not appear to be present\.
 .
 .TP
-\fBupgrade\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
-Upgrades the given Cask if outdated\.
+\fBupgrade\fR [\-\-force] [\-\-greedy] \fItoken\fR [ \fItoken\fR \.\.\. ]
+Without token arguments, upgrade all the installed Casks that have newer versions available in the tap; otherwise update the tokens given in the command line\. If \fB\-\-greedy\fR is given then also upgrade the Casks having \fBauto_updates true\fR or \fBversion :latest\fR\.
 .
 .TP
 \fBzap\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
