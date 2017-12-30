@@ -731,6 +731,17 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
+    it "deprecated needs :openmp usage" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          needs :openmp
+          ^^^^^^^^^^^^^ 'needs :openmp' should be replaced with 'depends_on \"gcc\"'
+        end
+      RUBY
+    end
+
     it "deprecated MACOS_VERSION const usage" do
       expect_offense(<<~RUBY)
         class Foo < Formula

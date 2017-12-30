@@ -276,6 +276,10 @@ module RuboCop
             problem "'fails_with :llvm' is now a no-op so should be removed"
           end
 
+          find_method_with_args(body_node, :needs, :openmp) do
+            problem "'needs :openmp' should be replaced with 'depends_on \"gcc\"'"
+          end
+
           find_method_with_args(body_node, :system, /^(otool|install_name_tool|lipo)/) do
             next if @formula_name == "cctools"
             problem "Use ruby-macho instead of calling #{@offensive_node.source}"
