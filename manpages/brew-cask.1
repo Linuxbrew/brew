@@ -114,6 +114,10 @@ Check the given Casks for correct style using RuboCop Cask \fIhttps://github\.co
 Uninstall the given Cask\. With \fB\-\-force\fR, uninstall even if the Cask does not appear to be present\.
 .
 .TP
+\fBupgrade\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
+Upgrades the given Cask if outdated\.
+.
+.TP
 \fBzap\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
 Unconditionally remove \fIall\fR files associated with the given Cask\.
 .
@@ -235,7 +239,7 @@ Homebrew\-Cask is implemented as a external command for Homebrew\. That means th
 .
 .nf
 
-brew update; brew cleanup; brew cask cleanup
+brew update; brew cask upgrade; brew cleanup; brew cask cleanup
 .
 .fi
 .
