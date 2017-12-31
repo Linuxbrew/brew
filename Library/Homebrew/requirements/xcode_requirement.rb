@@ -5,7 +5,7 @@ class XcodeRequirement < Requirement
 
   satisfy(build_env: false) { xcode_installed_version }
 
-  def initialize(tags)
+  def initialize(tags = [])
     @version = tags.find { |tag| tags.delete(tag) if tag =~ /(\d\.)+\d/ }
     super
   end

@@ -1,4 +1,5 @@
 require "forwardable"
+require "language/python"
 
 class Caveats
   extend Forwardable

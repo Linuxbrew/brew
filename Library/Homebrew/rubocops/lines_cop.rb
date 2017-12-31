@@ -6,12 +6,14 @@ module RuboCop
       # This cop checks for various miscellaneous Homebrew coding styles
       class Lines < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, _body_node)
-          [:automake, :autoconf, :libtool, :mysql, :postgresql, :rbenv].each do |dependency|
+          [:automake, :ant, :autoconf, :emacs, :expat, :libtool, :mysql, :perl,
+           :postgresql, :python, :python3, :rbenv, :ruby].each do |dependency|
             next unless depends_on?(dependency)
             problem ":#{dependency} is deprecated. Usage should be \"#{dependency}\"."
           end
 
-          { apr: "apr-util", gpg: "gnupg" }.each do |requirement, dependency|
+          { apr: "apr-util", fortran: "gcc", gpg: "gnupg", hg: "mercurial",
+            mpi: "open-mpi", python2: "python" }.each do |requirement, dependency|
             next unless depends_on?(requirement)
             problem ":#{requirement} is deprecated. Usage should be \"#{dependency}\"."
           end
@@ -239,11 +241,6 @@ module RuboCop
             problem "Use 'build.head?' instead of inspecting 'version'"
           end
 
-          find_instance_method_call(body_node, "ENV", :fortran) do
-            next if depends_on?(:fortran)
-            problem "Use `depends_on :fortran` instead of `ENV.fortran`"
-          end
-
           find_instance_method_call(body_node, "ARGV", :include?) do |method|
             param = parameters(method).first
             next unless match = regex_match_group(param, /^--(HEAD|devel)/)
@@ -277,6 +274,10 @@ module RuboCop
 
           find_method_with_args(body_node, :fails_with, :llvm) do
             problem "'fails_with :llvm' is now a no-op so should be removed"
+          end
+
+          find_method_with_args(body_node, :needs, :openmp) do
+            problem "'needs :openmp' should be replaced with 'depends_on \"gcc\"'"
           end
 
           find_method_with_args(body_node, :system, /^(otool|install_name_tool|lipo)/) do
