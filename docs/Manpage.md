@@ -397,7 +397,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     all formulae or to determine if any current formulae have Ruby issues.
 
   * `reinstall` `formula`:
-    Uninstall and then install `formula`.
+    Uninstall and then install `formula` (with existing install options).
 
   * `search`, `-S`:
     Display all locally available formulae for brewing (including tapped ones).
@@ -569,7 +569,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     or committed changes.
 
   * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`formulae`]:
-    Upgrade outdated, unpinned brews.
+    Upgrade outdated, unpinned brews (with existing install options).
 
     Options for the `install` command are also valid here.
 

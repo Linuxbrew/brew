@@ -1,5 +1,5 @@
 #:  * `reinstall` <formula>:
-#:    Uninstall and then install <formula>.
+#:    Uninstall and then install <formula> (with existing install options).
 
 require "formula_installer"
 require "development_tools"
