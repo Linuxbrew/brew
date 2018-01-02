@@ -120,6 +120,15 @@ We'd love you to contribute to Linuxbrew. First, please read our [Contribution G
 
 We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
 
+A good starting point for contributing is running `brew audit --strict` with some of the packages you use (e.g. `brew audit --strict wget` if you use `wget`) and then read through the warnings, try to fix them until `brew audit --strict` shows no results and [submit a pull request](https://docs.brew.sh/How-To-Open-a-Homebrew-Pull-Request.html). If no formulae you use have warnings you can run `brew audit --strict` without arguments to have it run on all packages and pick one.
+
+Alternatively, for something more substantial, check out one of the issues labeled `help wanted` in [Homebrew/brew](https://github.com/homebrew/brew/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) or [Homebrew/homebrew-core](https://github.com/homebrew/homebrew-core/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).
+
+Good luck!
+
+## Security
+Please report security issues to our [HackerOne](https://hackerone.com/homebrew/).
+
 ## Who Are You?
 
 Linuxbrew's lead maintainer is [Shaun Jackman](http://sjackman.ca).
@@ -145,7 +154,7 @@ Please consider [donating regularly to Linuxbrew through Patreon](https://www.pa
 
 [![Donate with Patreon](https://img.shields.io/badge/Patreon-Linuxbrew-green.svg)](https://www.patreon.com/linuxbrew)
 
-[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew on Patreon](https://www.patreon.com/homebrew) as well if you use Homebrew on macOS.
+[Linuxbrew](http://linuxbrew.sh) is a fork of [Homebrew](http://brew.sh), the macOS package manager, for Linux. Please consider [donating to Homebrew](https://github.com/Homebrew/brew#donations) as well if you use Homebrew on macOS.
 
 [![Donate with Patreon](https://img.shields.io/badge/Patreon-Homebrew-green.svg)](https://www.patreon.com/homebrew)
 

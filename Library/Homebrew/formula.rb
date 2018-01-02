@@ -962,6 +962,7 @@ class Formula
       "TEMP" => HOMEBREW_TEMP,
       "TMP" => HOMEBREW_TEMP,
       "HOMEBREW_PATH" => nil,
+      "PATH" => ENV["HOMEBREW_PATH"],
     }
 
     with_env(new_env) do

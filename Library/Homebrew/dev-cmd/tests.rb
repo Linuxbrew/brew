@@ -82,16 +82,19 @@ module Homebrew
         ]
       end
 
+      # Generate seed ourselves and output later to avoid multiple different
+      # seeds being output when running parallel tests.
+      seed = ARGV.include?("--seed") ? ARGV.next : rand(0xFFFF).to_i
+
       args = ["-I", HOMEBREW_LIBRARY_PATH/"test"]
       args += %W[
+        --seed #{seed}
         --color
         --require spec_helper
-        --format progress
+        --format NoSeedProgressFormatter
         --format ParallelTests::RSpec::RuntimeLogger
         --out #{HOMEBREW_CACHE}/tests/parallel_runtime_rspec.log
       ]
-
-      args << "--seed" << ARGV.next if ARGV.include? "--seed"
 
       unless OS.mac?
         args << "--tag" << "~needs_macos"
@@ -101,6 +104,8 @@ module Homebrew
       unless OS.linux?
         files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
       end
+
+      puts "Randomized with seed #{seed}"
 
       if parallel
         system "bundle", "exec", "parallel_rspec", *opts, "--", *args, "--", *files

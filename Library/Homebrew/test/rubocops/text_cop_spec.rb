@@ -66,7 +66,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
 
           def install
             system "go", "get", "bar"
-            ^^^^^^^^^^^^^^^^^^^^^^^^^ Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `go get`. Please ask upstream to implement Go vendoring
           end
         end
       RUBY
@@ -139,7 +139,7 @@ describe RuboCop::Cop::FormulaAudit::Text do
 
           def install
             system "go", "get", "bar"
-            ^^^^^^^^^^^^^^^^^^^^^^^^^ Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `go get`. Please ask upstream to implement Go vendoring
           end
         end
       RUBY

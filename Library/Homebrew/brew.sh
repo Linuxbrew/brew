@@ -85,9 +85,9 @@ case "$HOMEBREW_SYSTEM" in
   Linux)  HOMEBREW_LINUX="1" ;;
 esac
 
+HOMEBREW_CURL="curl"
 if [[ -n "$HOMEBREW_MACOS" ]]
 then
-  HOMEBREW_CURL="/usr/bin/curl"
   HOMEBREW_PROCESSOR="$(uname -p)"
   HOMEBREW_PRODUCT="Homebrew"
   HOMEBREW_SYSTEM="Macintosh"
@@ -119,7 +119,6 @@ then
     HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
   fi
 else
-  HOMEBREW_CURL="curl"
   HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
   HOMEBREW_MACOS_VERSION=0
