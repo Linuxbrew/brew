@@ -137,6 +137,7 @@ module Language
           wanted = %w[python python3].select { |py| needs_python?(py) }
           raise FormulaAmbiguousPythonError, self if wanted.size > 1
           python = wanted.first || "python"
+          python = "python2" if python == "python" && !OS.mac?
         end
         venv = virtualenv_create(libexec, python)
         venv.pip_install resources
