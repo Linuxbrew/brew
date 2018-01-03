@@ -1,3 +1,5 @@
+require "os/mac/ld64_dependency"
+
 class DependencyCollector
   def cvs_dep_if_needed(tags)
     return if MacOS.version < :lion

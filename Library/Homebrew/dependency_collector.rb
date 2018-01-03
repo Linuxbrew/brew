@@ -1,6 +1,5 @@
 require "dependency"
 require "dependencies"
-require "ld64_dependency"
 require "requirement"
 require "requirements"
 require "set"
@@ -61,9 +60,7 @@ class DependencyCollector
     Dependency.new("xz", tags)
   end
 
-  def ld64_dep_if_needed(*)
-    LD64Dependency.new
-  end
+  def ld64_dep_if_needed(*); end
 
   def self.tar_needs_xz_dependency?
     !new.xz_dep_if_needed([]).nil?
