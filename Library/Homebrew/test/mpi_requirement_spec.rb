@@ -1,6 +1,6 @@
-require "requirements/mpi_requirement"
+require "compat/requirements/mpi_requirement"
 
-describe MPIRequirement do
+describe MPIRequirement, :needs_compat do
   describe "::new" do
     subject { described_class.new(*(wrappers + tags)) }
     let(:wrappers) { [:cc, :cxx, :f77] }

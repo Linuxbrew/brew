@@ -16,7 +16,7 @@ describe "brew tap", :integration_test do
       .and be_a_success
 
     expect { brew "tap", "--list-official" }
-      .to output(%r{homebrew/science}).to_stdout
+      .to output(%r{homebrew/php}).to_stdout
       .and not_to_output.to_stderr
       .and be_a_success
 

@@ -1,5 +1,5 @@
 #:  * `upgrade` [<install-options>] [`--cleanup`] [`--fetch-HEAD`] [<formulae>]:
-#:    Upgrade outdated, unpinned brews.
+#:    Upgrade outdated, unpinned brews (with existing install options).
 #:
 #:    Options for the `install` command are also valid here.
 #:

@@ -229,6 +229,7 @@ module Hbc
         purpose
         usage
 
+        return if @command.nil?
         return if @command == "help" && @args.empty?
 
         raise ArgumentError, "help does not take arguments."

@@ -397,7 +397,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     all formulae or to determine if any current formulae have Ruby issues.
 
   * `reinstall` `formula`:
-    Uninstall and then install `formula`.
+    Uninstall and then install `formula` (with existing install options).
 
   * `search`, `-S`:
     Display all locally available formulae for brewing (including tapped ones).
@@ -569,7 +569,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     or committed changes.
 
   * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`formulae`]:
-    Upgrade outdated, unpinned brews.
+    Upgrade outdated, unpinned brews (with existing install options).
 
     Options for the `install` command are also valid here.
 
@@ -1096,8 +1096,14 @@ can take several different forms:
     Sets the FTP proxy to be used by `curl`, `git` and `svn` when downloading
     through Homebrew.
 
+  * `no_proxy`:
+    Sets the comma-separated list of hostnames and domain names that should be excluded from proxying
+    by `curl`, `git` and `svn` when downloading through Homebrew.
+
 ## USING HOMEBREW BEHIND A PROXY
-Use the `http_proxy`, `https_proxy` and/or `ftp_proxy` documented above. For example for an unauthenticated HTTP proxy:
+Use the `http_proxy`, `https_proxy`, `no_proxy` and/or `ftp_proxy` documented above.
+
+For example for an unauthenticated HTTP proxy:
 
     export http_proxy=http://`host`:`port`
 

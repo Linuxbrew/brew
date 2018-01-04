@@ -66,7 +66,7 @@ describe DependencyCollector do
       expect(dep).to be_optional
     end
 
-    specify "ant dependency" do
+    specify "ant dependency", :needs_compat do
       subject.add ant: :build
       expect(find_dependency("ant")).to eq(Dependency.new("ant", [:build]))
     end
@@ -87,7 +87,7 @@ describe DependencyCollector do
     it "creates a resource dependency from a CVS URL" do
       resource = Resource.new
       resource.url(":pserver:anonymous:@example.com:/cvsroot/foo/bar", using: :cvs)
-      expect(subject.add(resource)).to be_an_instance_of(CVSRequirement)
+      expect(subject.add(resource)).to eq(Dependency.new("cvs", [:build]))
     end
 
     it "creates a resource dependency from a Subversion URL" do
