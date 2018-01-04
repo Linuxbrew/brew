@@ -149,7 +149,9 @@ module OS
         # installed CLT version. This is useful as they are packaged
         # simultaneously so workarounds need to apply to both based on their
         # comparable version.
-        case (DevelopmentTools.clang_version.to_f * 10).to_i
+        clang_version = DevelopmentTools.clang_version
+        return nil if clang_version.null?
+        case (clang_version.to_f * 10).to_i
         when 0       then "dunno"
         when 1..14   then "3.2.2"
         when 15      then "3.2.4"
