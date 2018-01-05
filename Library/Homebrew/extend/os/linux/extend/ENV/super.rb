@@ -15,6 +15,7 @@ module Superenv
 
   def homebrew_extra_paths
     paths = []
+
     paths += %w[binutils make].map do |f|
       begin
         bin = Formula[f].opt_bin
@@ -23,6 +24,16 @@ module Superenv
         nil
       end
     end.compact
+
+    paths += %w[python].map do |f|
+      begin
+        libexec_bin = Formula[f].opt_libexec/"bin"
+        libexec_bin if libexec_bin.directory?
+      rescue FormulaUnavailableError
+        nil
+      end
+    end.compact
+
     paths += xorg_recursive_deps.map(&:opt_bin) if x11?
     paths
   end
