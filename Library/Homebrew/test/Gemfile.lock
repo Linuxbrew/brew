@@ -58,6 +58,7 @@ PLATFORMS
 DEPENDENCIES
   codecov
   parallel_tests
+  parser (= 2.4.0.0)
   rspec
   rspec-its
   rspec-wait
@@ -65,4 +66,4 @@ DEPENDENCIES
   simplecov
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
