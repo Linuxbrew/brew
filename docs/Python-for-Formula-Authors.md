@@ -51,7 +51,7 @@ poet some_package
 deactivate
 ```
 
-Homebrew provides helper methods for instantiating and populating virtualenvs. You can use them by putting `include Language::Python::Virtualenv` on the `Formula` class definition, above `def install`.
+Homebrew provides helper methods for instantiating and populating virtualenvs. You can use them by putting `include Language::Python::Virtualenv` at the top of the `Formula` class definition.
 
 For most applications, all you will need to write is:
 
@@ -85,6 +85,8 @@ Installing a formula with dependencies will look like this:
 
 ```ruby
 class Foo < Formula
+  include Language::Python::Virtualenv
+
   url "..."
 
   resource "six" do
@@ -96,8 +98,6 @@ class Foo < Formula
     url "https://pypi.python.org/packages/source/p/parsedatetime/parsedatetime-1.4.tar.gz"
     sha256 "09bfcd8f3c239c75e77b3ff05d782ab2c1aed0892f250ce2adf948d4308fe9dc"
   end
-
-  include Language::Python::Virtualenv
 
   def install
     virtualenv_install_with_resources
