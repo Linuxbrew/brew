@@ -88,8 +88,6 @@ module RuboCop
           problem "Description shouldn't end with a full stop"
         end
 
-        private
-
         def autocorrect(node)
           lambda do |corrector|
             correction = node.source

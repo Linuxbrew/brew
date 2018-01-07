@@ -12,12 +12,10 @@ GEM
     parallel (1.12.0)
     parallel_tests (2.17.0)
       parallel
-    parser (2.4.0.0)
-      ast (~> 2.2)
+    parser (2.4.0.2)
+      ast (~> 2.3)
     powerpack (0.1.1)
-    rainbow (2.2.2)
-      rake
-    rake (12.1.0)
+    rainbow (3.0.0)
     rspec (3.6.0)
       rspec-core (~> 3.6.0)
       rspec-expectations (~> 3.6.0)
@@ -36,11 +34,11 @@ GEM
     rspec-support (3.6.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
-    rubocop (0.51.0)
+    rubocop (0.52.1)
       parallel (~> 1.10)
-      parser (>= 2.3.3.1, < 3.0)
+      parser (>= 2.4.0.2, < 3.0)
       powerpack (~> 0.1)
-      rainbow (>= 2.2.2, < 3.0)
+      rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.9.0)
@@ -58,11 +56,10 @@ PLATFORMS
 DEPENDENCIES
   codecov
   parallel_tests
-  parser (= 2.4.0.0)
   rspec
   rspec-its
   rspec-wait
-  rubocop (= 0.51.0)
+  rubocop (= 0.52.1)
   simplecov
 
 BUNDLED WITH

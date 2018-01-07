@@ -425,7 +425,7 @@ module RuboCop
 
       # Returns the block length of the block node
       def block_size(block)
-        block_length(block)
+        block.loc.end.line - block.loc.begin.line
       end
 
       # Source buffer is required as an argument to report style violations

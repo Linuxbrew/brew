@@ -206,8 +206,6 @@ module RuboCop
           end
         end
 
-        private
-
         def autocorrect(node)
           lambda do |corrector|
             url_string_node = parameters(node).first

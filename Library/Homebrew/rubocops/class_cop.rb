@@ -16,8 +16,6 @@ module RuboCop
           problem "#{parent_class} is deprecated, use Formula instead"
         end
 
-        private
-
         def autocorrect(node)
           lambda do |corrector|
             corrector.replace(node.source_range, "Formula")

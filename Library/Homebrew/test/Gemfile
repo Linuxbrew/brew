@@ -3,7 +3,6 @@ source "https://rubygems.org"
 require_relative "../constants"
 
 gem "parallel_tests"
-gem "parser", HOMEBREW_RUBOCOP_PARSER_VERSION
 gem "rspec"
 gem "rspec-its", require: false
 gem "rspec-wait", require: false
