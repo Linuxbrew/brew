@@ -102,7 +102,7 @@ module Homebrew
     # Check style in a single batch run up front for performance
     style_results = check_style_json(files, options)
 
-    ff.each do |f|
+    ff.sort.each do |f|
       options = { new_formula: new_formula, strict: strict, online: online }
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
