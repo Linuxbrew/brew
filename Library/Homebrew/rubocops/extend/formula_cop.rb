@@ -467,7 +467,7 @@ module RuboCop
       end
 
       def problem(msg)
-        add_offense(@offensive_node, @offense_source_range, msg)
+        add_offense(@offensive_node, location: @offense_source_range, message: msg)
       end
 
       private
