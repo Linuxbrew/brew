@@ -5,7 +5,7 @@ Features, usage and installation instructions are [summarised on the homepage](h
 
 ## What Packages Are Available?
 1. Type `brew search` for a list.
-2. Or visit [braumeister.org](http://braumeister.org) to browse packages online.
+2. Or visit [formulae.brew.sh](http://formulae.brew.sh) to browse packages online.
 3. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
