@@ -42,6 +42,9 @@ module Language
     end
 
     def self.user_site_packages(python)
+      if !OS.mac? && which(python).nil?
+        return Pathname.new("#{ENV["HOME"]}/.local/lib/python2.7/site-packages")
+      end
       Pathname.new(`#{python} -c "import site; print(site.getusersitepackages())"`.chomp)
     end
 
