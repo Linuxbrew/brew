@@ -553,18 +553,18 @@ class FormulaInstaller
     end
 
     fi = FormulaInstaller.new(df)
-    fi.options           |= tab.used_options
-    fi.options           |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
-    fi.options           |= inherited_options
-    fi.options           &= df.options
-    fi.build_from_source  = ARGV.build_formula_from_source?(df)
-    fi.force_bottle       = false
-    fi.verbose            = verbose?
-    fi.quieter            = quieter?
-    fi.debug              = debug?
-    fi.link_keg           = keg_was_linked if keg_had_linked_keg
+    fi.options                |= tab.used_options
+    fi.options                |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
+    fi.options                |= inherited_options
+    fi.options                &= df.options
+    fi.build_from_source       = ARGV.build_formula_from_source?(df)
+    fi.force_bottle            = false
+    fi.verbose                 = verbose?
+    fi.quieter                 = quieter?
+    fi.debug                   = debug?
+    fi.link_keg                = keg_was_linked if keg_had_linked_keg
     fi.installed_as_dependency = true
-    fi.installed_on_request = false
+    fi.installed_on_request    = df.any_version_installed? && tab.installed_on_request
     fi.prelude
     oh1 "Installing #{formula.full_name} dependency: #{Formatter.identifier(dep.name)}"
     fi.install
