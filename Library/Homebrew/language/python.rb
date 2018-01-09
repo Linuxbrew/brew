@@ -42,10 +42,11 @@ module Language
     end
 
     def self.user_site_packages(python)
-      if !OS.mac? && which(python).nil?
+      output = Utils.popen_read(python, "-c", "import site; print(site.getusersitepackages())").chomp
+      if !$CHILD_STATUS.success? || output.empty?
         return Pathname.new("#{ENV["HOME"]}/.local/lib/python2.7/site-packages")
       end
-      Pathname.new(`#{python} -c "import site; print(site.getusersitepackages())"`.chomp)
+      Pathname.new(output)
     end
 
     def self.in_sys_path?(python, path)
