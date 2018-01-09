@@ -146,7 +146,7 @@ module RuboCop
       # Returns nil if does not depend on dependency_name
       # args: node - dependency_name - dependency's name
       def depends_on?(dependency_name, *types)
-        types = [:required, :build, :optional, :recommended, :run] if types.empty?
+        types = [:any] if types.empty?
         dependency_nodes = find_every_method_call_by_name(@body, :depends_on)
         idx = dependency_nodes.index do |n|
           types.any? { |type| depends_on_name_type?(n, dependency_name, type) }
@@ -168,14 +168,14 @@ module RuboCop
         case type
         when :required
           type_match = required_dependency?(node)
-          if type_match && !name_match
-            name_match = required_dependency_name?(node, name)
-          end
+          name_match ||= required_dependency_name?(node, name) if type_match
         when :build, :optional, :recommended, :run
           type_match = dependency_type_hash_match?(node, type)
-          if type_match && !name_match
-            name_match = dependency_name_hash_match?(node, name)
-          end
+          name_match ||= dependency_name_hash_match?(node, name) if type_match
+        when :any
+          type_match = true
+          name_match ||= required_dependency_name?(node, name)
+          name_match ||= dependency_name_hash_match?(node, name)
         else
           type_match = false
         end
@@ -214,7 +214,7 @@ module RuboCop
       EOS
 
       def_node_search :dependency_name_hash_match?, <<~EOS
-        (hash (pair ({str sym} %1) ({str sym} _)))
+        (hash (pair ({str sym} %1) ({str sym array} _)))
       EOS
 
       # To compare node with appropriate Ruby variable
@@ -467,7 +467,7 @@ module RuboCop
       end
 
       def problem(msg)
-        add_offense(@offensive_node, @offense_source_range, msg)
+        add_offense(@offensive_node, location: @offense_source_range, message: msg)
       end
 
       private

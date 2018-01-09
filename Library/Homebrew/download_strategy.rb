@@ -1005,11 +1005,11 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    Time.parse Utils.popen_read("hg", "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
+    Time.parse Utils.popen_read(hgpath, "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
   end
 
   def last_commit
-    Utils.popen_read("hg", "parent", "--template", "{node|short}", "-R", cached_location.to_s)
+    Utils.popen_read(hgpath, "parent", "--template", "{node|short}", "-R", cached_location.to_s)
   end
 
   private

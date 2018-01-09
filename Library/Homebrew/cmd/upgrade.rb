@@ -89,10 +89,14 @@ module Homebrew
 
     formulae_to_install.each do |f|
       Migrator.migrate_if_needed(f)
-      upgrade_formula(f)
-      next unless ARGV.include?("--cleanup")
-      next unless f.installed?
-      Homebrew::Cleanup.cleanup_formula f
+      begin
+        upgrade_formula(f)
+        next unless ARGV.include?("--cleanup")
+        next unless f.installed?
+        Homebrew::Cleanup.cleanup_formula f
+      rescue UnsatisfiedRequirements => e
+        onoe "#{f}: #{e}"
+      end
     end
   end
 
