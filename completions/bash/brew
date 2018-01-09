@@ -1,5 +1,10 @@
 # Bash completion script for brew(1)
 
+# Indicates there are no completions
+__brewcomp_null() {
+  COMPREPLY=""
+}
+
 __brewcomp_words_include() {
   local i=1
   while [[ "$i" -lt "$COMP_CWORD" ]]
@@ -399,6 +404,7 @@ _brew_search() {
       return
       ;;
   esac
+  __brewcomp_null
 }
 
 _brew_style() {
