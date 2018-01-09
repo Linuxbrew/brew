@@ -4,46 +4,24 @@ module Gpg
   module_function
 
   def executable
+    odeprecated "Gpg.executable", 'which "gpg"'
     which "gpg"
   end
 
   def available?
+    odeprecated "Gpg.available?", 'which "gpg"'
     File.executable?(executable.to_s)
   end
 
-  def create_test_key(path)
-    odie "No GPG present to test against!" unless available?
-
-    (path/"batch.gpg").write <<~EOS
-      Key-Type: RSA
-      Key-Length: 2048
-      Subkey-Type: RSA
-      Subkey-Length: 2048
-      Name-Real: Testing
-      Name-Email: testing@foo.bar
-      Expire-Date: 1d
-      %no-protection
-      %commit
-    EOS
-    system executable, "--batch", "--gen-key", "batch.gpg"
+  def create_test_key(_)
+    odeprecated "Gpg.create_test_key"
   end
 
   def cleanup_test_processes!
-    odie "No GPG present to test against!" unless available?
-
-    gpgconf = Pathname.new(executable).parent/"gpgconf"
-
-    system gpgconf, "--kill", "gpg-agent"
-    system gpgconf, "--homedir", "keyrings/live", "--kill",
-                                 "gpg-agent"
+    odeprecated "Gpg.cleanup_test_processes!"
   end
 
-  def test(path)
-    create_test_key(path)
-    begin
-      yield
-    ensure
-      cleanup_test_processes!
-    end
+  def test(_)
+    odeprecated "Gpg.test"
   end
 end

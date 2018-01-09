@@ -1,11 +1,9 @@
 class BuildOptions
   def build_32_bit?
-    odeprecated "build.build_32_bit?"
-    include?("32-bit") && option_defined?("32-bit")
+    odisabled "build.build_32_bit?"
   end
 
   def build_bottle?
-    odeprecated "build.build_bottle?", "build.bottle?"
-    bottle?
+    odisabled "build.build_bottle?", "build.bottle?"
   end
 end

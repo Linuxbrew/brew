@@ -2,17 +2,14 @@ module Tty
   module_function
 
   def white
-    odeprecated "Tty.white", "Tty.reset.bold"
-    reset.bold
+    odisabled "Tty.white", "Tty.reset.bold"
   end
 end
 
-def puts_columns(items)
-  odeprecated "puts_columns", "puts Formatter.columns"
-  puts Formatter.columns(items)
+def puts_columns(_)
+  odisabled "puts_columns", "puts Formatter.columns"
 end
 
-def plural(n, s = "s")
-  odeprecated "#plural", "Formatter.pluralize"
-  (n == 1) ? "" : s
+def plural(_, _)
+  odisabled "#plural", "Formatter.pluralize"
 end

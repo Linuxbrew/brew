@@ -3,8 +3,7 @@ module Homebrew
 
   def method_missing(method, *args, &block)
     if instance_methods.include?(method)
-      odeprecated "#{self}##{method}", "'module_function' or 'def self.#{method}' to convert it to a class method"
-      return instance_method(method).bind(self).call(*args, &block)
+      odisabled "#{self}##{method}", "'module_function' or 'def self.#{method}' to convert it to a class method"
     end
     super
   end
