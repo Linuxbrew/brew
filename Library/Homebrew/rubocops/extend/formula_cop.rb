@@ -214,7 +214,7 @@ module RuboCop
       EOS
 
       def_node_search :dependency_name_hash_match?, <<~EOS
-        (hash (pair ({str sym} %1) ({str sym array} _)))
+        (hash (pair ({str sym} %1) (...)))
       EOS
 
       # To compare node with appropriate Ruby variable
