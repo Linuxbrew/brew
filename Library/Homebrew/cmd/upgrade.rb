@@ -95,6 +95,7 @@ module Homebrew
         next unless f.installed?
         Homebrew::Cleanup.cleanup_formula f
       rescue UnsatisfiedRequirements => e
+        Homebrew.failed = true
         onoe "#{f}: #{e}"
       end
     end
