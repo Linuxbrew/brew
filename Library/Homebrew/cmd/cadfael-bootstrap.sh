@@ -547,31 +547,15 @@ isSystemRubySuitable () {
   return 1;
 }
 
-# - Bootstrap a temporary Ruby install to update brew, then brew install
-# ruby
-# - Temporarily use postmodern's ruby-install 
+# - Bootstrap Ruby using brew's vendored version
 doBootstrapRuby () {
   if ! isSystemRubySuitable ; then
-    brew install ruby
+    brew vendor-install ruby
     return $?
   fi
 
   _echo_info "System ruby o.k."
   return 0
-
-  # - Legacy ruby bootstrap, currently all supported platforms can 
-  #   brew ruby from their system installs
-  #local rubyBSDir="$1"
-  #local rubySrcDir="$rubyBSDir/src"
-  #git clone https://github.com/postmodern/ruby-install.git "$rubyBSDir"
-  #"$rubyBSDir"/bin/ruby-install \
-  #  -j4 \
-  #  -i "$rubyBSDir" \
-  #  -s "$rubySrcDir" \
-  #  --no-install-deps \
-  #  ruby 2.0 -- \
-  #  --disable-install-doc || return 1
-  #return 0
 }
 
 #-----------------------------------------------------------------------
@@ -613,9 +597,6 @@ doBootstrapGit () {
 doCreateCompilerLinks () {
   if isRedHatFamily ; then 
     _echo_info "Creating system compiler softlinks for bootstrapping"
-    if [ `getRedHatMajorVersion` == "5" ] ; then
-      gcc_suffix="44";
-    fi
 
     ln -s /usr/bin/gcc${gcc_suffix} "$1/gcc-$(/usr/bin/gcc${gcc_suffix} -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system gcc"
     ln -s /usr/bin/g++${gcc_suffix} "$1/g++-$(/usr/bin/g++${gcc_suffix} -dumpversion | cut -d. -f1,2)" || _echo_warning "Failed to create softlink to system g++"
@@ -636,7 +617,7 @@ doBootstrapCadfael() {
 # Bootstrap compiler
 #-----------------------------------------------------------------------
 doBootstrapCompiler() {
-  # Create ggc-<version> links if needed
+  # Create gcc-<version> links if needed
   doCreateCompilerLinks "$HOMEBREW_PREFIX/bin"
 
   # Bootstrapping Cadfael's toolchain needs GCC > 4.5
@@ -655,8 +636,9 @@ doBootstrapCompiler() {
 #-----------------------------------------------------------------------
 doBrewBootstrap() {
   _echo_info "Bootstrapping brew"
-  doBootstrapCompiler || _echo_exit "Unable to bootstrap compiler"
+  # Ruby first otherwise brew won't work
   doBootstrapRuby || _echo_exit "Unable to bootstrap ruby"
+  doBootstrapCompiler || _echo_exit "Unable to bootstrap compiler"
   doBootstrapGit || _echo_exit "Unable to bootstrap git"
 
   # Must update after bootstrapping ruby/git
@@ -750,10 +732,10 @@ main() {
   doInit
   _echo_info "Detected '$kOS' Operating System"
   _echo_info "Distribution '$kOSDISTRO ($kOSVERSION)'"
-  brew doctor || _echo_warning "doctor issued warnings, but bootstrapping will continue as these are generally benign"
 
   doCheckSystemSoftware || _echo_exit "System software check failed"
   doBrewBootstrap || _echo_exit "Bootstrap of brew system failed"
+  brew doctor || _echo_warning "doctor issued warnings, but bootstrapping will continue as these are generally benign"
   doHelpSetup
 }
 
