@@ -32,11 +32,11 @@ class FormulaInstaller
 
   attr_reader :formula
   attr_accessor :options, :build_bottle, :invalid_option_names
-  attr_accessor :installed_as_dependency, :installed_on_request
+  attr_accessor :installed_as_dependency, :installed_on_request, :link_keg
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :force_bottle
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
-  mode_attr_accessor :verbose, :debug, :quieter, :link_keg
+  mode_attr_accessor :verbose, :debug, :quieter
 
   def initialize(formula)
     @formula = formula
@@ -562,7 +562,7 @@ class FormulaInstaller
     fi.verbose                 = verbose?
     fi.quieter                 = quieter?
     fi.debug                   = debug?
-    fi.link_keg                = keg_was_linked if keg_had_linked_keg
+    fi.link_keg              ||= keg_was_linked if keg_had_linked_keg
     fi.installed_as_dependency = true
     fi.installed_on_request    = df.any_version_installed? && tab.installed_on_request
     fi.prelude
