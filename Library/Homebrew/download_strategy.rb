@@ -304,7 +304,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     #   https://example.com/download.php?file=foo-1.0.tar.gz
     # the extension we want is ".tar.gz", not ".php".
     url_pathname = Pathname.new(@url)
-    while !ext = url_pathname.extname[/[^?]+/]
+    until ext = url_pathname.extname[/[^?]+/]
       url_pathname = url_pathname.dirname
     end
     ext
