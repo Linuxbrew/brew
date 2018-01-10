@@ -131,7 +131,7 @@ module Homebrew
 
   class DeveloperDependentsMessage < DependentsMessage
     def output
-      opoo <<-EOS.undent
+      opoo <<~EOS
         #{list reqs} #{are_required_by_deps}.
         You can silence this warning with:
           #{sample_command}
@@ -141,7 +141,7 @@ module Homebrew
 
   class NondeveloperDependentsMessage < DependentsMessage
     def output
-      ofail <<-EOS.undent
+      ofail <<~EOS
         Refusing to uninstall #{list reqs}
         because #{they reqs} #{are_required_by_deps}.
         You can override this and force removal with:

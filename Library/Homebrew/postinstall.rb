@@ -14,7 +14,7 @@ begin
   formula = ARGV.resolved_formulae.first
   formula.extend(Debrew::Formula) if ARGV.debug?
   formula.run_post_install
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   Marshal.dump(e, error_pipe)
   error_pipe.close
   exit! 1

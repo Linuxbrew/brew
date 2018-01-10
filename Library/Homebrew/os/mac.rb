@@ -3,7 +3,6 @@ require "development_tools"
 require "os/mac/version"
 require "os/mac/xcode"
 require "os/mac/xquartz"
-require "os/mac/pathname"
 require "os/mac/sdk"
 require "os/mac/keg"
 
@@ -33,14 +32,23 @@ module OS
       @version = nil
     end
 
-    def prerelease?
-      # TODO: bump version when new OS is released
-      version >= "10.14"
+    def latest_sdk_version
+      # TODO: bump version when new Xcode macOS SDK is released
+      Version.new "10.13"
+    end
+
+    def latest_stable_version
+      # TODO: bump version when new macOS is released
+      Version.new "10.13"
     end
 
     def outdated_release?
-      # TODO: bump version when new OS is released
+      # TODO: bump version when new macOS is released
       version < "10.11"
+    end
+
+    def prerelease?
+      version > latest_stable_version
     end
 
     def cat
@@ -48,19 +56,11 @@ module OS
     end
 
     def languages
-      return @languages unless @languages.nil?
-
-      @languages = Utils.popen_read("defaults", "read", ".GlobalPreferences", "AppleLanguages").scan(/[^ \n"(),]+/)
-
-      if ENV["HOMEBREW_LANGUAGES"]
-        @languages = ENV["HOMEBREW_LANGUAGES"].split(",") + @languages
-      end
-
-      if ARGV.value("language")
-        @languages = ARGV.value("language").split(",") + @languages
-      end
-
-      @languages = @languages.uniq
+      @languages ||= [
+        *ARGV.value("language")&.split(","),
+        *ENV["HOMEBREW_LANGUAGES"]&.split(","),
+        *Open3.capture2("defaults", "read", "-g", "AppleLanguages")[0].scan(/[^ \n"(),]+/),
+      ].uniq
     end
 
     def language
@@ -214,6 +214,8 @@ module OS
       "8.3.2" => { clang: "8.1", clang_build: 802 },
       "8.3.3" => { clang: "8.1", clang_build: 802 },
       "9.0"   => { clang: "9.0", clang_build: 900 },
+      "9.0.1" => { clang: "9.0", clang_build: 900 },
+      "9.1"   => { clang: "9.0", clang_build: 900 },
     }.freeze
 
     def compilers_standard?
@@ -222,7 +224,7 @@ module OS
         send(:"#{method}_version") == build
       end
     rescue IndexError
-      onoe <<-EOS.undent
+      onoe <<~EOS
         Homebrew doesn't know what compiler versions ship with your version
         of Xcode (#{Xcode.version}). Please `brew update` and if that doesn't
         help, file an issue with the output of `brew --config`:

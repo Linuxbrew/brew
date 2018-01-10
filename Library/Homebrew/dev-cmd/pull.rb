@@ -1,4 +1,4 @@
-#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] <patch-source> [<patch-source>]:
+#:  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=`<bintray-org>] [`--test-bot-user=`<test-bot-user>] <patch-source> [<patch-source>]:
 #:
 #:    Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
 #:    Optionally, installs the formulae changed by the patch.
@@ -41,6 +41,12 @@
 #:
 #:    If `--warn-on-publish-failure` was passed, do not exit if there's a
 #:    failure publishing bottles on Bintray.
+#:
+#:    If `--bintray-org=`<bintray-org> is passed, publish at the given Bintray
+#:    organisation.
+#:
+#:    If `--test-bot-user=`<test-bot-user> is passed, pull the bottle block
+#:    commit from the specified user on GitHub.
 
 require "net/http"
 require "net/https"
@@ -52,6 +58,18 @@ require "tap"
 require "version"
 require "pkg_version"
 
+module GitHub
+  module_function
+
+  # Return the corresponding test-bot user name for the given GitHub organization.
+  def test_bot_user(user)
+    test_bot = ARGV.value "test-bot-user"
+    return test_bot if test_bot
+    return "BrewTestBot" if user.casecmp("homebrew").zero?
+    "#{user.capitalize}TestBot"
+  end
+end
+
 module Homebrew
   module_function
 
@@ -62,8 +80,12 @@ module Homebrew
       odie "This command requires at least one argument containing a URL or pull request number"
     end
 
-    if ARGV.include?("--linux")
-      ENV["HOMEBREW_BOTTLE_DOMAIN"] ||= BottleSpecification::DEFAULT_DOMAIN_LINUX
+    # Passthrough Git environment variables for e.g. git am
+    if ENV["HOMEBREW_GIT_NAME"]
+      ENV["GIT_COMMITTER_NAME"] = ENV["HOMEBREW_GIT_NAME"]
+    end
+    if ENV["HOMEBREW_GIT_EMAIL"]
+      ENV["GIT_COMMITTER_EMAIL"] = ENV["HOMEBREW_GIT_EMAIL"]
     end
 
     do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
@@ -73,11 +95,8 @@ module Homebrew
     tap = nil
 
     ARGV.named.each do |arg|
-      if arg.to_i.positive?
-        issue = arg
-        tap = ARGV.value("tap") ? Tap.fetch(ARGV.value("tap")) : CoreTap.instance
-        url = "https://github.com/#{tap.slug}/pull/#{arg}"
-      elsif (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
+      arg = "#{CoreTap.instance.default_remote}/pull/#{arg}" if arg.to_i.positive?
+      if (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
         tap = ARGV.value("tap")
         tap = if tap&.start_with?("homebrew/")
           Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
@@ -159,8 +178,8 @@ module Homebrew
 
         begin
           f = Formula[name]
-        # Make sure we catch syntax errors.
-        rescue Exception
+        rescue Exception # rubocop:disable Lint/RescueException
+          # Make sure we catch syntax errors.
           next
         end
 
@@ -234,8 +253,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          testbot = (ARGV.include?("--linux") || tap.linux?) ? "LinuxbrewTestBot" : "BrewTestBot"
-          "https://github.com/#{testbot}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
+          "https://github.com/#{GitHub.test_bot_user user}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
         curl "--silent", "--fail", "--output", "/dev/null", "--head", bottle_commit_url
@@ -285,7 +303,7 @@ module Homebrew
     str.force_encoding("UTF-8") if str.respond_to?(:force_encoding)
   end
 
-  def publish_changed_formula_bottles(_tap, changed_formulae_names)
+  def publish_changed_formula_bottles(tap, changed_formulae_names)
     if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
       raise "Need to load formulae to publish them!"
     end
@@ -296,7 +314,8 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        next unless publish_bottle_file_on_bintray(f, bintray_creds)
+        bintray_org = ARGV.value("bintray-org") || tap.user.downcase
+        next unless publish_bottle_file_on_bintray(f, bintray_org, bintray_creds)
         published << f.full_name
       end
     else
@@ -463,8 +482,7 @@ module Homebrew
   end
 
   # Publishes the current bottle files for a given formula to Bintray
-  def publish_bottle_file_on_bintray(f, creds)
-    bintray_project = (ARGV.include?("--linux") || f.tap.linux?) ? "linuxbrew" : "homebrew"
+  def publish_bottle_file_on_bintray(f, bintray_org, creds)
     repo = Utils::Bottles::Bintray.repository(f.tap)
     package = Utils::Bottles::Bintray.package(f.name)
     info = FormulaInfoFromJson.lookup(f.full_name)
@@ -481,7 +499,7 @@ module Homebrew
          "--user", "#{creds[:user]}:#{creds[:key]}", "--request", "POST",
          "--header", "Content-Type: application/json",
          "--data", '{"publish_wait_for_secs": 0}',
-         "https://api.bintray.com/content/#{bintray_project}/#{repo}/#{package}/#{version}/publish"
+         "https://api.bintray.com/content/#{bintray_org}/#{repo}/#{package}/#{version}/publish"
     true
   rescue => e
     raise unless ARGV.include?("--warn-on-publish-failure")
@@ -610,7 +628,7 @@ module Homebrew
             req = Net::HTTP::Head.new bottle_info.url
             req.initialize_http_header "User-Agent" => HOMEBREW_USER_AGENT_RUBY
             res = http.request req
-            break if res.is_a?(Net::HTTPSuccess)
+            break if res.is_a?(Net::HTTPSuccess) || res.code == "302"
 
             unless res.is_a?(Net::HTTPClientError)
               raise "Failed to find published #{f} bottle at #{url} (#{res.code} #{res.message})!"

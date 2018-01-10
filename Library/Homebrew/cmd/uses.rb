@@ -84,12 +84,13 @@ module Homebrew
               end
             end
 
-            dep_formulae = deps.map do |dep|
+            dep_formulae = deps.flat_map do |dep|
               begin
                 dep.to_formula
               rescue
+                []
               end
-            end.compact
+            end
 
             reqs_by_formula = ([f] + dep_formulae).flat_map do |formula|
               formula.requirements.map { |req| [formula, req] }
@@ -128,13 +129,14 @@ module Homebrew
         rescue FormulaUnavailableError
           # Silently ignore this case as we don't care about things used in
           # taps that aren't currently tapped.
+          next
         end
       end
     end
     $stderr.puts if verbose_using_dots
 
     return if uses.empty?
-    puts Formatter.columns(uses.map(&:full_name))
+    puts Formatter.columns(uses.map(&:full_name).sort)
     odie "Missing formulae should not have dependents!" if used_formulae_missing
   end
 end

@@ -40,6 +40,7 @@
 require "formula"
 require "formula_versions"
 require "utils"
+require "utils/curl"
 require "extend/ENV"
 require "formula_cellar_checks"
 require "official_taps"
@@ -53,7 +54,7 @@ module Homebrew
   module_function
 
   def audit
-    Homebrew.inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
+    inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
     Homebrew.auditing = true
 
     formula_count = 0
@@ -202,98 +203,6 @@ class FormulaAuditor
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
   end
 
-  def self.check_http_content(url, user_agents: [:default], check_content: false, strict: false, require_http: false)
-    return unless url.start_with? "http"
-
-    details = nil
-    user_agent = nil
-    hash_needed = url.start_with?("http:") && !require_http
-    user_agents.each do |ua|
-      details = http_content_headers_and_checksum(url, hash_needed: hash_needed, user_agent: ua)
-      user_agent = ua
-      break if details[:status].to_s.start_with?("2")
-    end
-
-    unless details[:status]
-      # Hack around https://github.com/Homebrew/brew/issues/3199
-      return if MacOS.version == :el_capitan
-      return "The URL #{url} is not reachable"
-    end
-
-    unless details[:status].start_with? "2"
-      return "The URL #{url} is not reachable (HTTP status code #{details[:status]})"
-    end
-
-    return unless hash_needed
-
-    secure_url = url.sub "http", "https"
-    secure_details =
-      http_content_headers_and_checksum(secure_url, hash_needed: true, user_agent: user_agent)
-
-    if !details[:status].to_s.start_with?("2") ||
-       !secure_details[:status].to_s.start_with?("2")
-      return
-    end
-
-    etag_match = details[:etag] &&
-                 details[:etag] == secure_details[:etag]
-    content_length_match =
-      details[:content_length] &&
-      details[:content_length] == secure_details[:content_length]
-    file_match = details[:file_hash] == secure_details[:file_hash]
-
-    if etag_match || content_length_match || file_match
-      return "The URL #{url} should use HTTPS rather than HTTP"
-    end
-
-    return unless check_content
-
-    no_protocol_file_contents = %r{https?:\\?/\\?/}
-    details[:file] = details[:file].gsub(no_protocol_file_contents, "/")
-    secure_details[:file] = secure_details[:file].gsub(no_protocol_file_contents, "/")
-
-    # Check for the same content after removing all protocols
-    if details[:file] == secure_details[:file]
-      return "The URL #{url} should use HTTPS rather than HTTP"
-    end
-
-    return unless strict
-
-    # Same size, different content after normalization
-    # (typical causes: Generated ID, Timestamp, Unix time)
-    if details[:file].length == secure_details[:file].length
-      return "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
-    end
-
-    lenratio = (100 * secure_details[:file].length / details[:file].length).to_i
-    return unless (90..110).cover?(lenratio)
-    "The URL #{url} may be able to use HTTPS rather than HTTP. Please verify it in a browser."
-  end
-
-  def self.http_content_headers_and_checksum(url, hash_needed: false, user_agent: :default)
-    max_time = hash_needed ? "600" : "25"
-    output, = curl_output(
-      "--connect-timeout", "15", "--include", "--max-time", max_time, "--location", url,
-      user_agent: user_agent
-    )
-
-    status_code = :unknown
-    while status_code == :unknown || status_code.to_s.start_with?("3")
-      headers, _, output = output.partition("\r\n\r\n")
-      status_code = headers[%r{HTTP\/.* (\d+)}, 1]
-    end
-
-    output_hash = Digest::SHA256.digest(output) if hash_needed
-
-    {
-      status: status_code,
-      etag: headers[%r{ETag: ([wW]\/)?"(([^"]|\\")*)"}, 2],
-      content_length: headers[/Content-Length: (\d+)/, 1],
-      file_hash: output_hash,
-      file: output,
-    }
-  end
-
   def audit_style
     return unless @style_offenses
     display_cop_names = ARGV.include?("--display-cop-names")
@@ -368,7 +277,7 @@ class FormulaAuditor
 
       if valid_versioned_aliases.empty?
         if formula.tap
-          problem <<-EOS.undent
+          problem <<~EOS
             Formula has other versions so create a versioned alias:
               cd #{formula.tap.alias_dir}
               ln -s #{formula.path.to_s.gsub(formula.tap.path, "..")} #{alias_name}
@@ -379,7 +288,7 @@ class FormulaAuditor
       end
 
       unless invalid_versioned_aliases.empty?
-        problem <<-EOS.undent
+        problem <<~EOS
           Formula has invalid versioned aliases:
             #{invalid_versioned_aliases.join("\n  ")}
         EOS
@@ -387,8 +296,10 @@ class FormulaAuditor
     end
   end
 
-  # core aliases + tap alias names + tap alias full name
-  @@aliases ||= Formula.aliases + Formula.tap_aliases
+  def self.aliases
+    # core aliases + tap alias names + tap alias full name
+    @aliases ||= Formula.aliases + Formula.tap_aliases
+  end
 
   def audit_formula_name
     return unless @strict
@@ -442,7 +353,7 @@ class FormulaAuditor
           problem "Dependency '#{dep.name}' was renamed; use new name '#{dep_f.name}'."
         end
 
-        if @@aliases.include?(dep.name) &&
+        if self.class.aliases.include?(dep.name) &&
            (dep_f.core_formula? || !dep_f.versioned_formula?)
           problem "Dependency '#{dep.name}' is an alias; use the canonical name '#{dep.to_formula.full_name}'."
         end
@@ -453,44 +364,25 @@ class FormulaAuditor
           problem "Dependency '#{dep.name}' may be unnecessary as it is provided by macOS; try to build this formula without it."
         end
 
-        dep.options.reject do |opt|
-          next true if dep_f.option_defined?(opt)
-          dep_f.requirements.detect do |r|
+        dep.options.each do |opt|
+          next if dep_f.option_defined?(opt)
+          next if dep_f.requirements.detect do |r|
             if r.recommended?
               opt.name == "with-#{r.name}"
             elsif r.optional?
               opt.name == "without-#{r.name}"
             end
           end
-        end.each do |opt|
+
           problem "Dependency #{dep} does not define option #{opt.name.inspect}"
         end
 
         case dep.name
         when "git"
-          problem "Don't use git as a dependency"
-        when "mercurial"
-          problem "Use `depends_on :hg` instead of `depends_on 'mercurial'`"
-        when "gfortran"
-          problem "Use `depends_on :fortran` instead of `depends_on 'gfortran'`"
-        when "ruby"
-          problem <<-EOS.undent
-            Don't use "ruby" as a dependency. If this formula requires a
-            minimum Ruby version not provided by the system you should
-            use the RubyRequirement:
-              depends_on :ruby => "1.8"
-            where "1.8" is the minimum version of Ruby required.
-          EOS
-        when "open-mpi", "mpich"
-          problem <<-EOS.undent
-            There are multiple conflicting ways to install MPI. Use an MPIRequirement:
-              depends_on :mpi => [<lang list>]
-            Where <lang list> is a comma delimited list that can include:
-              :cc, :cxx, :f77, :f90
-            EOS
+          problem "Don't use git as a dependency (it's always available)"
         when *BUILD_TIME_DEPS
           next if dep.build? || dep.run?
-          problem <<-EOS.undent
+          problem <<~EOS
             #{dep} dependency should be
               depends_on "#{dep}" => :build
             Or if it is indeed a runtime dependency
@@ -539,7 +431,7 @@ class FormulaAuditor
     first_word = reason.split[0]
 
     if reason =~ /\A[A-Z]/ && !reason.start_with?(*whitelist)
-      problem <<-EOS.undent
+      problem <<~EOS
         '#{first_word}' from the keg_only reason should be '#{first_word.downcase}'.
       EOS
     end
@@ -556,10 +448,10 @@ class FormulaAuditor
     return unless @online
 
     return unless DevelopmentTools.curl_handles_most_https_certificates?
-    if http_content_problem = FormulaAuditor.check_http_content(homepage,
-                                               user_agents: [:browser, :default],
-                                               check_content: true,
-                                               strict: @strict)
+    if http_content_problem = curl_check_http_content(homepage,
+                                user_agents: [:browser, :default],
+                                check_content: true,
+                                strict: @strict)
       problem http_content_problem
     end
   end
@@ -590,7 +482,7 @@ class FormulaAuditor
     return if metadata.nil?
 
     problem "GitHub fork (not canonical repository)" if metadata["fork"]
-    if user.casecmp("homebrew").zero? &&
+    if formula&.tap&.core_tap? &&
        (metadata["forks_count"] < 20) && (metadata["subscribers_count"] < 20) &&
        (metadata["stargazers_count"] < 50)
       problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
@@ -818,162 +710,10 @@ class FormulaAuditor
       problem "\"(#{Regexp.last_match(1)}...#{Regexp.last_match(2)})\" should be \"(#{Regexp.last_match(3).downcase}+...)\""
     end
 
-    if line =~ /((man)\s*\+\s*(['"])(man[1-8])(['"]))/
-      problem "\"#{Regexp.last_match(1)}\" should be \"#{Regexp.last_match(4)}\""
-    end
-
-    # Prefer formula path shortcuts in strings
-    if line =~ %r[(\#\{prefix\}/(bin|include|libexec|lib|sbin|share|Frameworks))]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2).downcase}}\""
-    end
-
-    if line =~ %r[((\#\{prefix\}/share/man/|\#\{man\}/)(man[1-8]))]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(3)}}\""
-    end
-
-    if line =~ %r[((\#\{share\}/(man)))[/'"]]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(3)}}\""
-    end
-
-    if line =~ %r[(\#\{prefix\}/share/(info|man))]
-      problem "\"#{Regexp.last_match(1)}\" should be \"\#{#{Regexp.last_match(2)}}\""
-    end
-
-    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+:(lua|perl|python|ruby)(\d*)/
-      problem "#{Regexp.last_match(2)} modules should be vendored rather than use deprecated `depends_on \"#{Regexp.last_match(1)}\" => :#{Regexp.last_match(2)}#{Regexp.last_match(3)}`"
-    end
-
-    if line =~ /depends_on\s+['"](.+)['"]\s+=>\s+(.*)/
-      dep = Regexp.last_match(1)
-      Regexp.last_match(2).split(" ").map do |o|
-        break if ["if", "unless"].include?(o)
-        next unless o =~ /^\[?['"](.*)['"]/
-        problem "Dependency #{dep} should not use option #{Regexp.last_match(1)}"
-      end
-    end
-
-    if line =~ /if\s+ARGV\.include\?\s+'--(HEAD|devel)'/
-      problem "Use \"if build.#{Regexp.last_match(1).downcase}?\" instead"
-    end
-
     problem "Use separate make calls" if line.include?("make && make")
-
-    problem "Use spaces instead of tabs for indentation" if line =~ /^[ ]*\t/
-
-    if line.include?("ENV.java_cache")
-      problem "In-formula ENV.java_cache usage has been deprecated & should be removed."
-    end
-
-    # Avoid hard-coding compilers
-    if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?(gcc|llvm-gcc|clang)['" ]}
-      problem "Use \"\#{ENV.cc}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
-    end
-
-    if line =~ %r{(system|ENV\[.+\]\s?=)\s?['"](/usr/bin/)?((g|llvm-g|clang)\+\+)['" ]}
-      problem "Use \"\#{ENV.cxx}\" instead of hard-coding \"#{Regexp.last_match(3)}\""
-    end
-
-    if line =~ /system\s+['"](env|export)(\s+|['"])/
-      problem "Use ENV instead of invoking '#{Regexp.last_match(1)}' to modify the environment"
-    end
-
-    if line =~ /version == ['"]HEAD['"]/
-      problem "Use 'build.head?' instead of inspecting 'version'"
-    end
-
-    if line =~ /build\.include\?[\s\(]+['"]\-\-(.*)['"]/
-      problem "Reference '#{Regexp.last_match(1)}' without dashes"
-    end
-
-    if line =~ /build\.include\?[\s\(]+['"]with(out)?-(.*)['"]/
-      problem "Use build.with#{Regexp.last_match(1)}? \"#{Regexp.last_match(2)}\" instead of build.include? 'with#{Regexp.last_match(1)}-#{Regexp.last_match(2)}'"
-    end
-
-    if line =~ /build\.with\?[\s\(]+['"]-?-?with-(.*)['"]/
-      problem "Don't duplicate 'with': Use `build.with? \"#{Regexp.last_match(1)}\"` to check for \"--with-#{Regexp.last_match(1)}\""
-    end
-
-    if line =~ /build\.without\?[\s\(]+['"]-?-?without-(.*)['"]/
-      problem "Don't duplicate 'without': Use `build.without? \"#{Regexp.last_match(1)}\"` to check for \"--without-#{Regexp.last_match(1)}\""
-    end
-
-    if line =~ /unless build\.with\?(.*)/
-      problem "Use if build.without?#{Regexp.last_match(1)} instead of unless build.with?#{Regexp.last_match(1)}"
-    end
-
-    if line =~ /unless build\.without\?(.*)/
-      problem "Use if build.with?#{Regexp.last_match(1)} instead of unless build.without?#{Regexp.last_match(1)}"
-    end
-
-    if line =~ /(not\s|!)\s*build\.with?\?/
-      problem "Don't negate 'build.with?': use 'build.without?'"
-    end
-
-    if line =~ /(not\s|!)\s*build\.without?\?/
-      problem "Don't negate 'build.without?': use 'build.with?'"
-    end
-
-    if line =~ /ARGV\.(?!(debug\?|verbose\?|value[\(\s]))/
-      problem "Use build instead of ARGV to check options"
-    end
-
-    if line.include?("MACOS_VERSION")
-      problem "Use MacOS.version instead of MACOS_VERSION"
-    end
-
-    if line.include?("MACOS_FULL_VERSION")
-      problem "Use MacOS.full_version instead of MACOS_FULL_VERSION"
-    end
-
-    cats = %w[leopard snow_leopard lion mountain_lion].join("|")
-    if line =~ /MacOS\.(?:#{cats})\?/
-      problem "\"#{$&}\" is deprecated, use a comparison to MacOS.version instead"
-    end
-
-    if line =~ /depends_on [A-Z][\w:]+\.new$/
-      problem "`depends_on` can take requirement classes instead of instances"
-    end
-
-    if line =~ /^def (\w+).*$/
-      problem "Define method #{Regexp.last_match(1).inspect} in the class body, not at the top-level"
-    end
-
-    if line.include?("ENV.fortran") && !formula.requirements.map(&:class).include?(FortranRequirement)
-      problem "Use `depends_on :fortran` instead of `ENV.fortran`"
-    end
 
     if line =~ /JAVA_HOME/i && !formula.requirements.map(&:class).include?(JavaRequirement)
       problem "Use `depends_on :java` to set JAVA_HOME"
-    end
-
-    if line =~ /depends_on :(.+) (if.+|unless.+)$/
-      conditional_dep_problems(Regexp.last_match(1).to_sym, Regexp.last_match(2), $&)
-    end
-
-    if line =~ /depends_on ['"](.+)['"] (if.+|unless.+)$/
-      conditional_dep_problems(Regexp.last_match(1), Regexp.last_match(2), $&)
-    end
-
-    if line =~ /(Dir\[("[^\*{},]+")\])/
-      problem "#{Regexp.last_match(1)} is unnecessary; just use #{Regexp.last_match(2)}"
-    end
-
-    if line =~ /system (["'](#{FILEUTILS_METHODS})["' ])/o
-      system = Regexp.last_match(1)
-      method = Regexp.last_match(2)
-      problem "Use the `#{method}` Ruby method instead of `system #{system}`"
-    end
-
-    if line =~ /assert [^!]+\.include?/
-      problem "Use `assert_match` instead of `assert ...include?`"
-    end
-
-    if line =~ /(assert File\.exist\?|assert \(.*\)\.exist\?)/
-      problem "Use `assert_predicate <path_to_file>, :exist?` instead of `#{Regexp.last_match(1)}`"
-    end
-
-    if line =~ /assert !File\.exist\?/
-      problem "Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?`"
     end
 
     return unless @strict
@@ -1004,7 +744,7 @@ class FormulaAuditor
     return unless formula.tap&.official?
     return unless formula.tap.tap_migrations.key?(formula.name)
 
-    problem <<-EOS.undent
+    problem <<~EOS
       #{formula.name} seems to be listed in tap_migrations.json!
       Please remove #{formula.name} from present tap & tap_migrations.json
       before submitting it to Homebrew/homebrew-#{formula.tap.repo}.
@@ -1015,23 +755,11 @@ class FormulaAuditor
     return unless formula.prefix.directory?
     return unless Keg.new(formula.prefix).empty_installation?
 
-    problem <<-EOS.undent
+    problem <<~EOS
       The installation seems to be empty. Please ensure the prefix
       is set correctly and expected files are installed.
       The prefix configure/make argument may be case-sensitive.
     EOS
-  end
-
-  def conditional_dep_problems(dep, condition, line)
-    quoted_dep = quote_dep(dep)
-    dep = Regexp.escape(dep.to_s)
-
-    case condition
-    when /if build\.include\? ['"]with-#{dep}['"]$/, /if build\.with\? ['"]#{dep}['"]$/
-      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :optional")
-    when /unless build\.include\? ['"]without-#{dep}['"]$/, /unless build\.without\? ['"]#{dep}['"]$/
-      problem %Q(Replace #{line.inspect} with "depends_on #{quoted_dep} => :recommended")
-    end
   end
 
   def quote_dep(dep)
@@ -1199,7 +927,7 @@ class ResourceAuditor
         # A `brew mirror`'ed URL is usually not yet reachable at the time of
         # pull request.
         next if url =~ %r{^https://dl.bintray.com/homebrew/mirror/}
-        if http_content_problem = FormulaAuditor.check_http_content(url, require_http: curl_openssl_or_deps)
+        if http_content_problem = curl_check_http_content(url, require_http: curl_openssl_or_deps)
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy

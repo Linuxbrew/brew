@@ -1,9 +1,31 @@
+require "requirement"
+
 class MacOSRequirement < Requirement
   fatal true
 
-  satisfy(build_env: false) { OS.mac? }
+  def initialize(tags = [])
+    @version = MacOS::Version.from_symbol(tags.first) unless tags.empty?
+    super
+  end
+
+  def minimum_version_specified?
+    OS.mac? && @version
+  end
+
+  satisfy(build_env: false) do
+    next MacOS.version >= @version if minimum_version_specified?
+    next true if OS.mac?
+    next true if @version
+    false
+  end
 
   def message
-    "macOS is required."
+    return "macOS is required." unless minimum_version_specified?
+    "macOS #{@version.pretty_name} or newer is required."
+  end
+
+  def display_s
+    return "macOS is required" unless minimum_version_specified?
+    "macOS >= #{@version}"
   end
 end

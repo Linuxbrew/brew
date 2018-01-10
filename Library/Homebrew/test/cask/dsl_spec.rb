@@ -20,7 +20,7 @@ describe Hbc::DSL, :cask do
     }
 
     it "prints a warning that it has encountered an unexpected method" do
-      expected = Regexp.compile(<<-EOS.undent.lines.map(&:chomp).join(""))
+      expected = Regexp.compile(<<~EOS.lines.map(&:chomp).join(""))
         (?m)
         Warning:
         .*
@@ -232,7 +232,7 @@ describe Hbc::DSL, :cask do
       expect(cask.caveats).to be_empty
 
       cask = Hbc::Cask.new("cask-with-caveats") do
-        def caveats; <<-EOS.undent
+        def caveats; <<~EOS
           When you install this Cask, you probably want to know this.
           EOS
         end

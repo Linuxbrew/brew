@@ -35,18 +35,16 @@ class Requirement
     _, _, class_name = self.class.to_s.rpartition "::"
     s = "#{class_name} unsatisfied!\n"
     if OS.mac? && cask
-      s += <<-EOS.undent
-
+      s += <<~EOS
         You can install with Homebrew-Cask:
-          brew cask install #{cask}
+         brew cask install #{cask}
       EOS
     end
 
     if download
-      s += <<-EOS.undent
-
+      s += <<~EOS
         You can download from:
-          #{download}
+         #{download}
       EOS
     end
     s
@@ -79,7 +77,11 @@ class Requirement
 
   def satisfied_result_parent
     return unless @satisfied_result.is_a?(Pathname)
-    @satisfied_result.resolved_path.parent
+    parent = @satisfied_result.resolved_path.parent
+    if parent.to_s =~ %r{^#{Regexp.escape(HOMEBREW_CELLAR)}/([\w+-.@]+)/[^/]+/(s?bin)/?$}
+      parent = HOMEBREW_PREFIX/"opt/#{Regexp.last_match(1)}/#{Regexp.last_match(2)}"
+    end
+    parent
   end
 
   # Overriding #modify_build_environment is deprecated.
@@ -96,8 +98,9 @@ class Requirement
     # PATH.
     parent = satisfied_result_parent
     return unless parent
+    return if ["#{HOMEBREW_PREFIX}/bin", "#{HOMEBREW_PREFIX}/bin"].include?(parent.to_s)
     return if PATH.new(ENV["PATH"]).include?(parent.to_s)
-    ENV.append_path("PATH", parent)
+    ENV.prepend_path("PATH", parent)
   end
 
   def env
@@ -167,8 +170,10 @@ class Requirement
     attr_rw :fatal, :default_formula
     attr_rw :cask, :download
 
-    def satisfy(options = {}, &block)
-      @satisfied ||= Requirement::Satisfier.new(options, &block)
+    def satisfy(options = nil, &block)
+      return @satisfied if options.nil? && !block_given?
+      options = {} if options.nil?
+      @satisfied = Requirement::Satisfier.new(options, &block)
     end
 
     def env(*settings, &block)

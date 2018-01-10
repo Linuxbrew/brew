@@ -144,7 +144,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `doctor`:
     Check your system for potential problems. Doctor exits with a non-zero status
-    if any problems are found.
+    if any potential problems are found. Please note that these warnings are just
+    used to help the Homebrew maintainers with debugging if you file an issue. If
+    everything you use Homebrew for is working fine: please don't worry or file
+    an issue; just ignore this.
 
   * `fetch` [`--force`] [`--retry`] [`-v`] [`--devel`|`--HEAD`] [`--deps`] [`--build-from-source`|`--force-bottle`] `formulae`:
     Download the source packages for the given `formulae`.
@@ -386,8 +389,15 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
 
+  * `readall` [tap]:
+    Import all formulae from specified taps (defaults to all installed taps).
+
+    This can be useful for debugging issues across all formulae when making
+    significant changes to `formula.rb`, testing the performance of loading
+    all formulae or to determine if any current formulae have Ruby issues.
+
   * `reinstall` `formula`:
-    Uninstall and then install `formula`.
+    Uninstall and then install `formula` (with existing install options).
 
   * `search`, `-S`:
     Display all locally available formulae for brewing (including tapped ones).
@@ -553,8 +563,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--force` (or `-f`) is specified then always do a slower, full update check even
     if unnecessary.
 
+  * `update-reset`:
+    Fetches and resets Homebrew and all tap repositories using `git`(1) to
+    their latest `origin/master`. Note this will destroy all your uncommitted
+    or committed changes.
+
   * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`formulae`]:
-    Upgrade outdated, unpinned brews.
+    Upgrade outdated, unpinned brews (with existing install options).
 
     Options for the `install` command are also valid here.
 
@@ -714,6 +729,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--message=``message` is passed, append `message` to the default PR
     message.
 
+    If `--no-browse` is passed, don't pass the `--browse` argument to `hub`
+    which opens the pull request URL in a browser. Instead, output it to the
+    command line.
+
     Note that this command cannot be used to transition a formula from a
     URL-and-sha256 style specification into a tag-and-revision style
     specification, nor vice versa. It must use whichever style specification
@@ -770,7 +789,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Additionally, the date used in new manpages will match those in the existing
     manpages (to allow comparison without factoring in the date).
 
-  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] `patch-source` [`patch-source`]:
+  * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=``bintray-org`] [`--test-bot-user=``test-bot-user`] `patch-source` [`patch-source`]:
 
     Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
     Optionally, installs the formulae changed by the patch.
@@ -813,6 +832,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--warn-on-publish-failure` was passed, do not exit if there's a
     failure publishing bottles on Bintray.
+
+    If `--bintray-org=``bintray-org` is passed, publish at the given Bintray
+    organisation.
+
+    If `--test-bot-user=``test-bot-user` is passed, pull the bottle block
+    commit from the specified user on GitHub.
 
   * `release-notes` [`--markdown`] [`previous_tag`] [`end_ref`]:
     Output the merged pull requests on Homebrew/brew between two Git refs.
@@ -980,9 +1005,13 @@ can take several different forms:
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
 
+  * `HOMEBREW_FORCE_BREWED_CURL`:
+    If set, Homebrew will use a Homebrew-installed `curl` rather than the
+    system version.
+
   * `HOMEBREW_FORCE_VENDOR_RUBY`:
-    If set, Homebrew will always use its vendored, relocatable Ruby 2.0 version
-    even if the system version of Ruby is >=2.0.
+    If set, Homebrew will always use its vendored, relocatable Ruby version
+    even if the system version of Ruby is new enough.
 
   * `HOMEBREW_GIT`:
     When using Git, Homebrew will use `GIT` if set,
@@ -1055,20 +1084,32 @@ can take several different forms:
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.
 
+  * `http_proxy`:
+    Sets the HTTP proxy to be used by `curl`, `git` and `svn` when downloading
+    through Homebrew.
+
+  * `https_proxy`:
+    Sets the HTTPS proxy to be used by `curl`, `git` and `svn` when downloading
+    through Homebrew.
+
+  * `ftp_proxy`:
+    Sets the FTP proxy to be used by `curl`, `git` and `svn` when downloading
+    through Homebrew.
+
+  * `no_proxy`:
+    Sets the comma-separated list of hostnames and domain names that should be excluded from proxying
+    by `curl`, `git` and `svn` when downloading through Homebrew.
+
 ## USING HOMEBREW BEHIND A PROXY
+Use the `http_proxy`, `https_proxy`, `no_proxy` and/or `ftp_proxy` documented above.
 
-Homebrew uses several commands for downloading files (e.g. `curl`, `git`, `svn`).
-Many of these tools can download via a proxy. It's common for these tools
-to read proxy parameters from environment variables.
+For example for an unauthenticated HTTP proxy:
 
-For the majority of cases setting `http_proxy` is enough. You can set this in
-your shell profile, or you can use it before a brew command:
+    export http_proxy=http://`host`:`port`
 
-    http_proxy=http://`host`:`port` brew install foo
+And for an authenticated HTTP proxy:
 
-If your proxy requires authentication:
-
-    http_proxy=http://`user`:`password`@`host`:`port` brew install foo
+    export http_proxy=http://`user`:`password`@`host`:`port`
 
 ## SEE ALSO
 

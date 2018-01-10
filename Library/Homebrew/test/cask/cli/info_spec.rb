@@ -8,7 +8,7 @@ describe Hbc::CLI::Info, :cask do
   it "displays some nice info about the specified Cask" do
     expect {
       described_class.run("local-caffeine")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       local-caffeine: 1.2.3
       http://example.com/local-caffeine
       Not installed
@@ -22,7 +22,7 @@ describe Hbc::CLI::Info, :cask do
 
   describe "given multiple Casks" do
     let(:expected_output) {
-      <<-EOS.undent
+      <<~EOS
         local-caffeine: 1.2.3
         http://example.com/local-caffeine
         Not installed
@@ -52,7 +52,7 @@ describe Hbc::CLI::Info, :cask do
   it "should print caveats if the Cask provided one" do
     expect {
       described_class.run("with-caveats")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       with-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
@@ -78,7 +78,7 @@ describe Hbc::CLI::Info, :cask do
   it 'should not print "Caveats" section divider if the caveats block has no output' do
     expect {
       described_class.run("with-conditional-caveats")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       with-conditional-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
@@ -93,7 +93,7 @@ describe Hbc::CLI::Info, :cask do
   it "prints languages specified in the Cask" do
     expect {
       described_class.run("with-languages")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       with-languages: 1.2.3
       http://example.com/local-caffeine
       Not installed
@@ -110,7 +110,7 @@ describe Hbc::CLI::Info, :cask do
   it 'does not print "Languages" section divider if the languages block has no output' do
     expect {
       described_class.run("without-languages")
-    }.to output(<<-EOS.undent).to_stdout
+    }.to output(<<~EOS).to_stdout
       without-languages: 1.2.3
       http://example.com/local-caffeine
       Not installed

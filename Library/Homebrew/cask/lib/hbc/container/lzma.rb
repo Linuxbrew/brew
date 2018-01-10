@@ -10,7 +10,7 @@ module Hbc
       end
 
       def extract
-        if (unlzma = which("unlzma")).nil?
+        unless unlzma = which("unlzma", PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
           raise CaskError, "Expected to find unlzma executable. Cask '#{@cask}' must add: depends_on formula: 'lzma'"
         end
 

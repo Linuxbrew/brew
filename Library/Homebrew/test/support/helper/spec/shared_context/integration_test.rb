@@ -123,11 +123,16 @@ RSpec.shared_context "integration test" do
   def setup_test_formula(name, content = nil)
     case name
     when /^testball/
-      content = <<-EOS.undent
+      tarball = if OS.linux?
+        TEST_FIXTURE_DIR/"tarballs/testball-0.1-linux.tbz"
+      else
+        TEST_FIXTURE_DIR/"tarballs/testball-0.1.tbz"
+      end
+      content = <<~EOS
         desc "Some test"
         homepage "https://example.com/#{name}"
-        url "file://#{TEST_FIXTURE_DIR}/tarballs/#{OS.linux? ? "testball-0.1-linux.tbz" : "testball-0.1.tbz"}"
-        sha256 "#{OS.linux? ? LINUX_TESTBALL_SHA256 : TESTBALL_SHA256}"
+        url "file://#{tarball}"
+        sha256 "#{tarball.sha256}"
 
         option "with-foo", "Build with foo"
 
@@ -145,18 +150,18 @@ RSpec.shared_context "integration test" do
         # something here
       EOS
     when "foo"
-      content = <<-EOS.undent
+      content = <<~EOS
         url "https://example.com/#{name}-1.0"
       EOS
     when "bar"
-      content = <<-EOS.undent
+      content = <<~EOS
         url "https://example.com/#{name}-1.0"
         depends_on "foo"
       EOS
     end
 
     Formulary.core_path(name).tap do |formula_path|
-      formula_path.write <<-EOS.undent
+      formula_path.write <<~EOS
         class #{Formulary.class_s(name)} < Formula
           #{content}
         end

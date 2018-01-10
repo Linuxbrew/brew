@@ -1,6 +1,5 @@
 require "utils/bottles"
 require "formula"
-require "thread"
 
 module Homebrew
   module Cleanup

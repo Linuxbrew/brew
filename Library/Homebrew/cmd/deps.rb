@@ -68,16 +68,16 @@ module Homebrew
 
     if mode.tree?
       if mode.installed?
-        puts_deps_tree Formula.installed, !ARGV.one?
+        puts_deps_tree Formula.installed.sort, !ARGV.one?
       else
         raise FormulaUnspecifiedError if ARGV.named.empty?
         puts_deps_tree ARGV.formulae, !ARGV.one?
       end
     elsif mode.all?
-      puts_deps Formula
+      puts_deps Formula.sort
     elsif ARGV.named.empty?
       raise FormulaUnspecifiedError unless mode.installed?
-      puts_deps Formula.installed
+      puts_deps Formula.installed.sort
     elsif mode.for_each?
       puts_deps ARGV.formulae
     else

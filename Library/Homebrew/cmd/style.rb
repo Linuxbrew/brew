@@ -109,7 +109,7 @@ module Homebrew
       args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
       args << HOMEBREW_LIBRARY_PATH
     else
-      args << "--config" << HOMEBREW_LIBRARY/".auditcops.yml"
+      args << "--config" << HOMEBREW_LIBRARY/".rubocop_audit.yml"
       args += files
     end
 
@@ -117,6 +117,7 @@ module Homebrew
 
     case output_type
     when :print
+      args << "--debug" if ARGV.debug?
       args << "--display-cop-names" if ARGV.include? "--display-cop-names"
       args << "--format" << "simple" if files
       system(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", *args)

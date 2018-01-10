@@ -6,7 +6,7 @@ require "tab"
 class Migrator
   class MigrationNeededError < RuntimeError
     def initialize(formula)
-      super <<-EOS.undent
+      super <<~EOS
         #{formula.oldname} was renamed to #{formula.name} and needs to be migrated.
         Please run `brew migrate #{formula.oldname}`
       EOS
@@ -33,10 +33,9 @@ class Migrator
         "Please try to use fully-qualified #{tap}/#{formula.oldname} to refer the formula.\n"
       end
 
-      super <<-EOS.undent
-      #{formula.name} from #{formula.tap} is given, but old name #{formula.oldname} was installed from #{tap ? tap : "path or url"}.
-
-      #{msg}To force migrate use `brew migrate --force #{formula.oldname}`.
+      super <<~EOS
+        #{formula.name} from #{formula.tap} is given, but old name #{formula.oldname} was installed from #{tap ? tap : "path or url"}.
+         #{msg}To force migrate use `brew migrate --force #{formula.oldname}`.
       EOS
     end
   end
@@ -100,7 +99,7 @@ class Migrator
     begin
       migrator = Migrator.new(formula)
       migrator.migrate
-    rescue Exception => e
+    rescue => e
       onoe e
     end
   end
@@ -196,7 +195,7 @@ class Migrator
     update_tabs
   rescue Interrupt
     ignore_interrupts { backup_oldname }
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     onoe "Error occurred while migrating."
     puts e
     puts e.backtrace if ARGV.debug?
@@ -304,7 +303,7 @@ class Migrator
       puts
       puts "You can try again using:"
       puts "  brew link #{formula.name}"
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       onoe "An unexpected error occurred during linking"
       puts e
       puts e.backtrace if ARGV.debug?

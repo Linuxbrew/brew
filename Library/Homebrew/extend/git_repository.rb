@@ -36,6 +36,15 @@ module GitRepositoryExtension
     end
   end
 
+  def git_branch
+    return unless git? && Utils.git_available?
+    cd do
+      Utils.popen_read(
+        "git", "rev-parse", "--abbrev-ref", "HEAD"
+      ).chuzzle
+    end
+  end
+
   def git_last_commit_date
     return unless git? && Utils.git_available?
     cd do

@@ -21,9 +21,26 @@ then
   fi
 elif [[ -n "$HOMEBREW_LINUX" ]]
 then
-  ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.x86_64_linux.bottle.tar.gz"
-  ruby_SHA="543c18bd33a300e6c16671437b1e0f17b03bb64e6a485fc15ff7de1eb1a0bc2a"
+  case "$HOMEBREW_PROCESSOR" in
+    armv7l)
+      ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.armv7l_linux.bottle.1.tar.gz"
+      ruby_SHA="d26affe6f6ac299557a9044b311b4066b554874fc828ebc323d2705d3f4a8249"
+      ;;
+    x86_64)
+      ruby_URL="https://homebrew.bintray.com/bottles-portable/portable-ruby-2.3.3.x86_64_linux.bottle.1.tar.gz"
+      ruby_SHA="33643b1ca6f860d6df01686636326785763e5e81cf0cef37d8a7ab96a6ca1fa1"
+      ;;
+  esac
 fi
+
+# Execute the specified command, and suppress stderr unless HOMEBREW_STDERR is set.
+quiet_stderr() {
+  if [[ -z "$HOMEBREW_STDERR" ]]; then
+    command "$@" 2>/dev/null
+  else
+    command "$@"
+  fi
+}
 
 fetch() {
   local -a curl_args
@@ -81,9 +98,9 @@ fetch() {
     trap - SIGINT
   fi
 
-  if [[ -x "$(which shasum)" ]]
+  if [[ -x "/usr/bin/shasum" ]]
   then
-    sha="$(shasum -a 256 "$CACHED_LOCATION" | cut -d' ' -f1)"
+    sha="$(/usr/bin/shasum -a 256 "$CACHED_LOCATION" | cut -d' ' -f1)"
   elif [[ -x "$(which sha256sum)" ]]
   then
     sha="$(sha256sum "$CACHED_LOCATION" | cut -d' ' -f1)"
@@ -144,7 +161,7 @@ install() {
   tar "$tar_args" "$CACHED_LOCATION"
   safe_cd "$VENDOR_DIR/portable-$VENDOR_NAME"
 
-  if "./$VENDOR_VERSION/bin/$VENDOR_NAME" --version >/dev/null 2>&1
+  if quiet_stderr "./$VENDOR_VERSION/bin/$VENDOR_NAME" --version >/dev/null
   then
     ln -sfn "$VENDOR_VERSION" current
     # remove old vendor installations by sorting files with modified time.

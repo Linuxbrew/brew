@@ -103,6 +103,8 @@ module MachOShim
     mach_data.any? { |m| m.fetch(:type) == :executable }
   end
 
+  alias binary_executable? mach_o_executable?
+
   # @private
   def mach_o_bundle?
     mach_data.any? { |m| m.fetch(:type) == :bundle }

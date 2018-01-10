@@ -383,14 +383,15 @@ user account:
 EOS
   fi
 
+  # we may want to use a Homebrew curl
+  if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
+      ! -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
+  then
+    brew install curl
+  fi
+
   if ! git --version >/dev/null 2>&1
   then
-    # we need a new enough curl to install git
-    if [[ -n "$HOMEBREW_SYSTEM_CURL_TOO_OLD" &&
-        ! -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
-    then
-      brew install curl
-    fi
     # we cannot install brewed git if homebrew/core is unavailable.
     [[ -d "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && brew install git
     unset GIT_EXECUTABLE
@@ -408,9 +409,6 @@ EOS
   else
     QUIET_ARGS=()
   fi
-
-  # ensure GIT_CONFIG is unset as we need to operate on .git/config
-  unset GIT_CONFIG
 
   # only allow one instance of brew update
   lock update

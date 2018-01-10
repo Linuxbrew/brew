@@ -36,7 +36,7 @@ describe "brew link", :integration_test do
   end
 
   it "refuses to link keg-only Formulae" do
-    setup_test_formula "testball1", <<-EOS.undent
+    setup_test_formula "testball1", <<~EOS
       keg_only "just because"
     EOS
 

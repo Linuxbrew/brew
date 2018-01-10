@@ -16,8 +16,14 @@ describe Hbc::CLI, :cask do
   it "ignores the `--language` option, which is handled in `OS::Mac`" do
     cli = described_class.new("--language=en")
     expect(cli).to receive(:detect_command_and_arguments).with(no_args)
-    expect(cli).to receive(:exit).with(1)
     cli.run
+  end
+
+  context "when given no arguments" do
+    it "exits successfully" do
+      expect(subject).not_to receive(:exit).with(be_nonzero)
+      subject.run
+    end
   end
 
   context "when no option is specified" do

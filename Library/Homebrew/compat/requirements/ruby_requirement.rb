@@ -47,7 +47,6 @@ class RubyRequirement < Requirement
     rubies = which_all("ruby")
     ruby_formula = Formula["ruby"]
     rubies.unshift ruby_formula.bin/"ruby" if ruby_formula&.installed?
-    rubies.push RUBY_PATH unless rubies.include? RUBY_PATH
     rubies.uniq
   end
 

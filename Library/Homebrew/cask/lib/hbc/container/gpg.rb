@@ -24,7 +24,7 @@ module Hbc
       end
 
       def extract
-        if (gpg = which("gpg")).nil?
+        unless gpg = which("gpg", PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
           raise CaskError, "Expected to find gpg executable. Cask '#{@cask}' must add: depends_on formula: 'gpg'"
         end
 

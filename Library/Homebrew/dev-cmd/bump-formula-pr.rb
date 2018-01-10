@@ -29,6 +29,10 @@
 #:    If `--message=`<message> is passed, append <message> to the default PR
 #:    message.
 #:
+#:    If `--no-browse` is passed, don't pass the `--browse` argument to `hub`
+#:    which opens the pull request URL in a browser. Instead, output it to the
+#:    command line.
+#:
 #:    Note that this command cannot be used to transition a formula from a
 #:    URL-and-sha256 style specification into a tag-and-revision style
 #:    specification, nor vice versa. It must use whichever style specification
@@ -91,7 +95,7 @@ module Homebrew
     pull_requests = fetch_pull_requests(formula)
     return unless pull_requests
     return if pull_requests.empty?
-    duplicates_message = <<-EOS.undent
+    duplicates_message = <<~EOS
       These open pull requests may be duplicates:
       #{pull_requests.map { |pr| "#{pr["title"]} #{pr["html_url"]}" }.join("\n")}
     EOS
@@ -101,7 +105,7 @@ module Homebrew
     elsif !ARGV.force? && ARGV.flag?("--quiet")
       odie error_message
     elsif !ARGV.force?
-      odie <<-EOS.undent
+      odie <<~EOS
         #{duplicates_message.chomp}
         #{error_message}
       EOS
@@ -109,6 +113,21 @@ module Homebrew
   end
 
   def bump_formula_pr
+    # As this command is simplifying user run commands then let's just use a
+    # user path, too.
+    ENV["PATH"] = ENV["HOMEBREW_PATH"]
+
+    # Use the user's browser, too.
+    ENV["BROWSER"] = ENV["HOMEBREW_BROWSER"]
+
+    # Setup GitHub environment variables
+    %w[GITHUB_USER GITHUB_PASSWORD GITHUB_TOKEN].each do |env|
+      homebrew_env = ENV["HOMEBREW_#{env}"]
+      next unless homebrew_env
+      next if homebrew_env.empty?
+      ENV[env] = homebrew_env
+    end
+
     formula = ARGV.formulae.first
 
     if formula
@@ -161,9 +180,9 @@ module Homebrew
     elsif new_tag && new_revision
       false
     elsif !hash_type
-      odie "#{formula}: no tag/revision specified!"
+      odie "#{formula}: no --tag=/--revision= arguments specified!"
     elsif !new_url
-      odie "#{formula}: no url specified!"
+      odie "#{formula}: no --url= argument specified!"
     else
       rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
         new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
@@ -175,7 +194,7 @@ module Homebrew
       rsrc.download_strategy = CurlDownloadStrategy
       rsrc.owner = Resource.new(formula.name)
       rsrc.version = forced_version if forced_version
-      odie "No version specified!" unless rsrc.version
+      odie "No --version= argument specified!" unless rsrc.version
       rsrc_path = rsrc.fetch
       gnu_tar_gtar_path = HOMEBREW_PREFIX/"opt/gnu-tar/bin/gtar"
       gnu_tar_gtar = gnu_tar_gtar_path if gnu_tar_gtar_path.executable?
@@ -183,7 +202,7 @@ module Homebrew
       if Utils.popen_read(tar, "-tf", rsrc_path) =~ %r{/.*\.}
         new_hash = rsrc_path.sha256
       elsif new_url.include? ".tar"
-        odie "#{formula}: no url/#{hash_type} specified!"
+        odie "#{formula}: no --url=/--#{hash_type}= arguments specified!"
       end
     end
 
@@ -247,13 +266,13 @@ module Homebrew
 
     if new_formula_version < old_formula_version
       formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-      odie <<-EOS.undent
+      odie <<~EOS
         You probably need to bump this formula manually since changing the
         version from #{old_formula_version} to #{new_formula_version} would be a downgrade.
       EOS
     elsif new_formula_version == old_formula_version
       formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-      odie <<-EOS.undent
+      odie <<~EOS
         You probably need to bump this formula manually since the new version
         and old version are both #{new_formula_version}.
       EOS
@@ -293,41 +312,72 @@ module Homebrew
       git_dir = Utils.popen_read("git rev-parse --git-dir").chomp
       shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
 
+      hub_args = []
+      git_final_checkout_args = []
+      if ARGV.include?("--no-browse")
+        git_final_checkout_args << "--quiet"
+      else
+        hub_args << "--browse"
+      end
+
       if ARGV.dry_run?
+        ohai "hub fork # read $HUB_REMOTE"
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
-        ohai "hub fork # read $HUB_REMOTE"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
-        ohai "hub pull-request --browse -m '#{formula.name} #{new_formula_version}#{devel_message}'"
+        ohai "hub pull-request #{hub_args.join(" ")} -m '#{formula.name} #{new_formula_version}#{devel_message}'"
         ohai "git checkout -"
       else
+        reply = IO.popen(["hub", "fork"], "r+", err: "/dev/null") do |io|
+          reader = Thread.new { io.read }
+          sleep 1
+          io.close_write
+          reader.value
+        end
+
+        if reply.to_s.include? "username:"
+          formula.path.atomic_write(backup_file) unless ARGV.dry_run?
+          git_path = "$(brew --repo #{formula.tap})" if formula.tap
+          git_path ||= formula.path.parent
+          odie <<~EOS
+            Retry after configuring hub by running:
+              hub -C "#{git_path}" fork
+            Or setting HOMEBREW_GITHUB_TOKEN with at least 'public_repo' scope.
+          EOS
+        end
+
+        remote = reply[/remote:? (\S+)/, 1]
+
+        # repeat for hub 2.2 backwards compatibility:
+        remote = Utils.popen_read("hub", "fork", err: :out)[/remote:? (\S+)/, 1] if remote.to_s.empty?
+
+        if remote.to_s.empty?
+          formula.path.atomic_write(backup_file) unless ARGV.dry_run?
+          odie "cannot get remote from 'hub'!"
+        end
+
         safe_system "git", "fetch", "--unshallow", "origin" if shallow
         safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
         safe_system "git", "commit", "--no-edit", "--verbose",
           "--message=#{formula.name} #{new_formula_version}#{devel_message}",
           "--", formula.path
-        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1]
-        # repeat for hub 2.2 backwards compatibility:
-        remote = Utils.popen_read("hub fork 2>&1")[/remote:? (\S+)/, 1] if remote.to_s.empty?
-        odie "cannot get remote from 'hub'!" if remote.to_s.empty?
         safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
-        pr_message = <<-EOS.undent
+        pr_message = <<~EOS
           #{formula.name} #{new_formula_version}#{devel_message}
 
           Created with `brew bump-formula-pr`.
         EOS
         user_message = ARGV.value("message")
         if user_message
-          pr_message += <<-EOS.undent
-
+          pr_message += "\n" + <<~EOS
             ---
 
             #{user_message}
           EOS
         end
-        safe_system "hub", "pull-request", "--browse", "-m", pr_message
-        safe_system "git", "checkout", "-"
+        safe_system "hub", "pull-request", *hub_args, "-m", pr_message
+        safe_system "git", "checkout", *git_final_checkout_args, "-"
       end
     end
   end

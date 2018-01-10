@@ -15,13 +15,27 @@ module Superenv
 
   def homebrew_extra_paths
     paths = []
-    binutils = Formula["binutils"]
-    paths << binutils.opt_bin if binutils.installed?
+
+    paths += %w[binutils make].map do |f|
+      begin
+        bin = Formula[f].opt_bin
+        bin if bin.directory?
+      rescue FormulaUnavailableError
+        nil
+      end
+    end.compact
+
+    paths += %w[python].map do |f|
+      begin
+        libexec_bin = Formula[f].opt_libexec/"bin"
+        libexec_bin if libexec_bin.directory?
+      rescue FormulaUnavailableError
+        nil
+      end
+    end.compact
+
     paths += xorg_recursive_deps.map(&:opt_bin) if x11?
     paths
-  rescue FormulaUnavailableError
-    # Fix for brew tests, which uses NullLoader.
-    []
   end
 
   def determine_extra_rpath_paths

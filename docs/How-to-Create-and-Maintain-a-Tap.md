@@ -27,7 +27,7 @@ If it’s on GitHub, users can install any of your formulae with
 file here.
 
 If they want to get your tap without installing any formula at the same time,
-users can add it with the [`brew tap` command](brew-tap.md).
+users can add it with the [`brew tap` command](Taps.md).
 
 If it’s on GitHub, they can use `brew tap user/repo`, where `user` is your
 GitHub username and `homebrew-repo` your repository.

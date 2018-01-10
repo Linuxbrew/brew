@@ -16,7 +16,7 @@ module Hbc
         super
 
         if args.count != 1
-          raise ArgumentError, <<-EOS.undent
+          raise ArgumentError, <<~EOS
             This command requires exactly one argument.
 
             #{self.class.usage}
@@ -31,7 +31,7 @@ module Hbc
       end
 
       def self.usage
-        <<-EOS.undent
+        <<~EOS
           Usage: brew cask _audit_modified_casks [options...] <commit range>
 
           Given a range of Git commits, find any Casks that were modified and run `brew

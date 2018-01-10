@@ -108,8 +108,7 @@ class Keg
   alias generic_recursive_fgrep_args recursive_fgrep_args
 
   def each_unique_file_matching(string)
-    fgrep = OS.mac? ? "/usr/bin/fgrep" : "fgrep"
-    Utils.popen_read(fgrep, recursive_fgrep_args, string, to_s) do |io|
+    Utils.popen_read("fgrep", recursive_fgrep_args, string, to_s) do |io|
       hardlinks = Set.new
 
       until io.eof?
@@ -126,9 +125,7 @@ class Keg
 
   def text_files
     text_files = []
-    which_file = OS.mac? ? "/usr/bin/file" : which("file")
-    which_xargs = OS.mac? ? "/usr/bin/xargs" : which("xargs")
-    return text_files unless which_file && File.exist?(which_file) && which_xargs && File.exist?(which_xargs)
+    return text_files unless which("file") && which("xargs")
 
     # file has known issues with reading files on other locales. Has
     # been fixed upstream for some time, but a sufficiently new enough
@@ -147,7 +144,7 @@ class Keg
         end
         false
       }
-      output, _status = Open3.capture2("#{which_xargs} -0 #{which_file} --no-dereference --print0",
+      output, _status = Open3.capture2("xargs -0 file --no-dereference --print0",
                                        stdin_data: files.to_a.join("\0"))
       # `file` output sometimes contains data from the file, which may include
       # invalid UTF-8 entities, so tell Ruby this is just a bytestring

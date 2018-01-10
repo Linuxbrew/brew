@@ -553,7 +553,7 @@ Sometimes a package fails to build when using a certain compiler. Since recent [
 ```ruby
 fails_with :llvm do
   build 2335
-  cause <<-EOS.undent
+  cause <<~EOS
     The "cause" field should include a short summary of the error. Include
     the URLs of any relevant information, such as upstream bug reports. Wrap
     the text at a sensible boundary (~72-80 characters), but do not break

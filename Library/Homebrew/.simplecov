@@ -38,10 +38,21 @@ SimpleCov.start do
     track_files "#{SimpleCov.root}/{#{subdirs},*.rb}"
   end
 
+  add_filter %r{^/build.rb$}
+  add_filter %r{^/config.rb$}
+  add_filter %r{^/constants.rb$}
+  add_filter %r{^/postinstall.rb$}
+  add_filter %r{^/test.rb$}
   add_filter %r{^/compat/}
   add_filter %r{^/dev-cmd/tests.rb$}
   add_filter %r{^/test/}
   add_filter %r{^/vendor/}
+
+  require "rbconfig"
+  add_filter %r{^/os/mac/} unless RbConfig::CONFIG["host_os"].include?("darwin")
+  unless RbConfig::CONFIG["host_os"].include?("linux")
+    add_filter %r{^/os/linux/}
+  end
 
   # Add groups and the proper project name to the output.
   project_name "Homebrew"

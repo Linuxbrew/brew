@@ -35,18 +35,21 @@ module Language
       probe_file = homebrew_site_packages(version)/"homebrew-pth-probe.pth"
       begin
         probe_file.atomic_write("import site; site.homebrew_was_here = True")
-        quiet_system python, "-c", "import site; assert(site.homebrew_was_here)"
+        with_homebrew_path { quiet_system python, "-c", "import site; assert(site.homebrew_was_here)" }
       ensure
         probe_file.unlink if probe_file.exist?
       end
     end
 
     def self.user_site_packages(python)
+      if !OS.mac? && which(python).nil?
+        return Pathname.new("#{ENV["HOME"]}/.local/lib/python2.7/site-packages")
+      end
       Pathname.new(`#{python} -c "import site; print(site.getusersitepackages())"`.chomp)
     end
 
     def self.in_sys_path?(python, path)
-      script = <<-EOS.undent
+      script = <<~EOS
         import os, sys
         [os.path.realpath(p) for p in sys.path].index(os.path.realpath("#{path}"))
       EOS
@@ -54,7 +57,7 @@ module Language
     end
 
     def self.setup_install_args(prefix)
-      shim = <<-EOS.undent
+      shim = <<~EOS
         import setuptools, tokenize
         __file__ = 'setup.py'
         exec(compile(getattr(tokenize, 'open', open)(__file__).read()
@@ -69,10 +72,6 @@ module Language
         --single-version-externally-managed
         --record=installed.txt
       ]
-    end
-
-    def self.package_available?(python, module_name)
-      quiet_system python, "-c", "import #{module_name}"
     end
 
     # Mixin module for {Formula} adding virtualenv support features.
@@ -138,11 +137,12 @@ module Language
       def virtualenv_install_with_resources(options = {})
         python = options[:using]
         if python.nil?
-          wanted = %w[python python3].select { |py| needs_python?(py) }
+          wanted = %w[python python@2 python@3 python3].select { |py| needs_python?(py) }
           raise FormulaAmbiguousPythonError, self if wanted.size > 1
-          python = wanted.first || "python"
+          python = wanted.first || "python2.7"
+          python = "python2" if python == "python" && !OS.mac?
         end
-        venv = virtualenv_create(libexec, python)
+        venv = virtualenv_create(libexec, python.delete("@"))
         venv.pip_install resources
         venv.pip_install_and_link buildpath
         venv
@@ -245,7 +245,7 @@ module Language
                           "-v", "--no-deps", "--no-binary", ":all:",
                           "--ignore-installed", *targets
         end
-      end # class Virtualenv
-    end # module Virtualenv
-  end # module Python
-end # module Language
+      end
+    end
+  end
+end

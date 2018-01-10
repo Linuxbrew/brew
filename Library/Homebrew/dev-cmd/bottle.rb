@@ -75,7 +75,7 @@ module Homebrew
 
       @put_filenames ||= []
 
-      return if @put_filenames.include? filename
+      return if @put_filenames.include?(filename)
 
       puts Formatter.error(filename.to_s)
       @put_filenames << filename
@@ -84,8 +84,7 @@ module Homebrew
     result = false
 
     keg.each_unique_file_matching(string) do |file|
-      # skip document file.
-      next if Metafiles::EXTENSIONS.include? file.extname
+      next if Metafiles::EXTENSIONS.include?(file.extname) # Skip document files.
 
       linked_libraries = Keg.file_linked_libraries(file, string)
       result ||= !linked_libraries.empty?
@@ -156,9 +155,7 @@ module Homebrew
       return ofail "Formula not installed or up-to-date: #{f.full_name}"
     end
 
-    tap = f.tap
-
-    unless tap
+    unless tap = f.tap
       unless ARGV.include?("--force-core-tap")
         return ofail "Formula not from core or any taps: #{f.full_name}"
       end
@@ -333,7 +330,7 @@ module Homebrew
             "#{key}: old: #{old_value}, new: #{value}"
           end
 
-          odie <<-EOS.undent
+          odie <<~EOS
             --keep-old was passed but there are changes in:
             #{mismatches.join("\n")}
           EOS
@@ -447,7 +444,7 @@ module Homebrew
               end
 
               unless mismatches.empty?
-                message = <<-EOS.undent
+                message = <<~EOS
                   --keep-old was passed but there are changes in:
                   #{mismatches.join("\n")}
                 EOS
@@ -495,6 +492,17 @@ module Homebrew
         end
 
         unless ARGV.include?("--no-commit") || update_or_add.nil?
+          if ENV["HOMEBREW_GIT_NAME"]
+            ENV["GIT_AUTHOR_NAME"] =
+              ENV["GIT_COMMITTER_NAME"] =
+                ENV["HOMEBREW_GIT_NAME"]
+          end
+          if ENV["HOMEBREW_GIT_EMAIL"]
+            ENV["GIT_AUTHOR_EMAIL"] =
+              ENV["GIT_COMMITTER_EMAIL"] =
+                ENV["HOMEBREW_GIT_EMAIL"]
+          end
+
           short_name = formula_name.split("/", -1).last
           pkg_version = bottle_hash["formula"]["pkg_version"]
 

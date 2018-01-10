@@ -1,6 +1,6 @@
 describe "brew options", :integration_test do
   it "prints a given Formula's options" do
-    setup_test_formula "testball", <<-EOS.undent
+    setup_test_formula "testball", <<~EOS
       depends_on "bar" => :recommended
     EOS
 

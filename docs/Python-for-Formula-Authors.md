@@ -165,8 +165,6 @@ Most formulae presently just install to `prefix`.
 
 The dependencies of libraries must be installed so that they are importable. To minimize the potential for linking conflicts, dependencies should be installed to `libexec/"vendor"` and added to `sys.path` by writing a second .pth file (named like "homebrew-foo-dependencies.pth") to the `prefix` site-packages.
 
-The [matplotlib](https://github.com/Homebrew/homebrew-science/blob/master/matplotlib.rb) formula in [homebrew/science](https://github.com/Homebrew/homebrew-science) deploys this strategy.
-
 ## Further down the rabbit hole
 
 Additional commentary that explains why Homebrew does some of the things it does.

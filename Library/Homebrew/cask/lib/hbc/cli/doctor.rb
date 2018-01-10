@@ -1,3 +1,5 @@
+require "system_config"
+
 module Hbc
   class CLI
     class Doctor < AbstractCommand
@@ -9,6 +11,8 @@ module Hbc
 
       def run
         ohai "Homebrew-Cask Version", Hbc.full_version
+        ohai "macOS", MacOS.full_version
+        ohai "Java", SystemConfig.describe_java
         ohai "Homebrew-Cask Install Location", self.class.render_install_location
         ohai "Homebrew-Cask Staging Location", self.class.render_staging_location(Hbc.caskroom)
         ohai "Homebrew-Cask Cached Downloads", self.class.render_cached_downloads

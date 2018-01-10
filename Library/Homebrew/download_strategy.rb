@@ -18,8 +18,7 @@ class AbstractDownloadStrategy
   end
 
   # Download and cache the resource as {#cached_location}.
-  def fetch
-  end
+  def fetch; end
 
   # Suppress output
   def shutup!
@@ -37,13 +36,11 @@ class AbstractDownloadStrategy
   # Unpack {#cached_location} into the current working directory, and possibly
   # chdir into the newly-unpacked directory.
   # Unlike {Resource#stage}, this does not take a block.
-  def stage
-  end
+  def stage; end
 
   # @!attribute [r] cached_location
   # The path to the cached file or directory associated with the resource.
-  def cached_location
-  end
+  def cached_location; end
 
   # @!attribute [r]
   # return most recent modified time for all files in the current working directory after stage.
@@ -162,7 +159,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     return unless @ref_type == :tag
     return unless @revision && current_revision
     return if current_revision == @revision
-    raise <<-EOS.undent
+    raise <<~EOS
       #{@ref} tag should be #{@revision}
       but is actually #{current_revision}
     EOS
@@ -204,14 +201,11 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     true
   end
 
-  def clone_repo
-  end
+  def clone_repo; end
 
-  def update
-  end
+  def update; end
 
-  def current_revision
-  end
+  def current_revision; end
 
   def extract_ref(specs)
     key = REF_TYPES.find { |type| specs.key?(type) }
@@ -223,12 +217,12 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
     case type = cached_location.compression_type
     when :zip
-      with_system_path { quiet_safe_system "unzip", "-qq", cached_location }
+      quiet_safe_system "unzip", "-qq", cached_location
       chdir
     when :gzip_only
-      with_system_path { buffered_write("gunzip") }
+      buffered_write "gunzip"
     when :bzip2_only
-      with_system_path { buffered_write("bunzip2") }
+      buffered_write "bunzip2"
     when :gzip, :bzip2, :xz, :compress, :tar
       tar_flags = "x"
       if type == :gzip
@@ -239,16 +233,14 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
         tar_flags << "J"
       end
       tar_flags << "f"
-      with_system_path do
-        if type == :xz && DependencyCollector.tar_needs_xz_dependency?
-          pipe_to_tar(xzpath)
-        else
-          safe_system "tar", tar_flags, cached_location
-        end
+      if type == :xz && DependencyCollector.tar_needs_xz_dependency?
+        pipe_to_tar xzpath
+      else
+        safe_system "tar", tar_flags, cached_location
       end
       chdir
     when :lzip
-      with_system_path { pipe_to_tar(lzippath) }
+      pipe_to_tar lzippath
       chdir
     when :lha
       safe_system lhapath, "x", cached_location
@@ -559,9 +551,9 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   rescue GitHub::HTTPNotFoundError
     # We only handle HTTPNotFoundError here,
     # becase AuthenticationFailedError is handled within util/github.
-    message = <<-EOS.undent
-        HOMEBREW_GITHUB_API_TOKEN can not access the repository: #{@owner}/#{@repo}
-        This token may not have permission to access the repository or the url of formula may be incorrect.
+    message = <<~EOS
+      HOMEBREW_GITHUB_API_TOKEN can not access the repository: #{@owner}/#{@repo}
+      This token may not have permission to access the repository or the url of formula may be incorrect.
     EOS
     raise CurlDownloadStrategyError, message
   end
