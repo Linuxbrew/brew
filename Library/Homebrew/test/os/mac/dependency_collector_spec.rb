@@ -35,4 +35,16 @@ describe DependencyCollector do
     resource.url("http://example.com/foo.tar.xz")
     expect(subject.add(resource)).to be nil
   end
+
+  specify "Resource dependency from a '.git' URL" do
+    resource = Resource.new
+    resource.url("git://example.com/foo/bar.git")
+    expect(subject.add(resource)).to be nil
+  end
+
+  specify "Resource dependency from a Subversion URL" do
+    resource = Resource.new
+    resource.url("svn://example.com/foo/bar")
+    expect(subject.add(resource)).to be nil
+  end
 end
