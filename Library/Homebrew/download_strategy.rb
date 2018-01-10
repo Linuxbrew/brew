@@ -303,7 +303,11 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     # We can't use basename_without_params, because given a URL like
     #   https://example.com/download.php?file=foo-1.0.tar.gz
     # the extension we want is ".tar.gz", not ".php".
-    Pathname.new(@url).extname[/[^?]+/]
+    url_pathname = Pathname.new(@url)
+    while !ext = url_pathname.extname[/[^?]+/]
+      url_pathname = url_pathname.dirname
+    end
+    ext
   end
 end
 
