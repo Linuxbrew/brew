@@ -44,6 +44,18 @@ class GPG2Requirement < Requirement
   satisfy { which "gpg" }
 end
 
+class GitRequirement < Requirement
+  fatal true
+  default_formula "git"
+  satisfy { Utils.git_available? }
+end
+
+class SubversionRequirement < Requirement
+  fatal true
+  default_formula "subversion"
+  satisfy { Utils.svn_available? }
+end
+
 XcodeDependency            = XcodeRequirement
 MysqlDependency            = MysqlRequirement
 PostgresqlDependency       = PostgresqlRequirement

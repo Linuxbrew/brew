@@ -1,6 +1,13 @@
 require "os/mac/ld64_dependency"
 
 class DependencyCollector
+  def git_dep_if_needed(tags)
+    return if MacOS.version >= :lion
+    Dependency.new("git", tags)
+  end
+
+  def subversion_dep_if_needed(tags); end
+
   def cvs_dep_if_needed(tags)
     return if MacOS.version < :lion
     Dependency.new("cvs", tags)

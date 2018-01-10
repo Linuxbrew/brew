@@ -52,6 +52,16 @@ class DependencyCollector
     parse_spec(spec, Array(tags))
   end
 
+  def git_dep_if_needed(tags)
+    return if Utils.git_available?
+    Dependency.new("git", tags)
+  end
+
+  def subversion_dep_if_needed(tags)
+    return if Utils.svn_available?
+    Dependency.new("subversion", tags)
+  end
+
   def cvs_dep_if_needed(tags)
     Dependency.new("cvs", tags)
   end
@@ -126,9 +136,9 @@ class DependencyCollector
     if strategy <= CurlDownloadStrategy
       parse_url_spec(spec.url, tags)
     elsif strategy <= GitDownloadStrategy
-      GitRequirement.new(tags)
+      git_dep_if_needed(tags)
     elsif strategy <= SubversionDownloadStrategy
-      SubversionRequirement.new(tags)
+      subversion_dep_if_needed(tags)
     elsif strategy <= MercurialDownloadStrategy
       Dependency.new("mercurial", tags)
     elsif strategy <= FossilDownloadStrategy
