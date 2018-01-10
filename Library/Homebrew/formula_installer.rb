@@ -149,7 +149,7 @@ class FormulaInstaller
 
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
-    recursive_runtime_deps = formula.recursive_dependencies.reject(&:build?)
+    recursive_runtime_deps = formula.runtime_dependencies
     recursive_runtime_formulae = recursive_runtime_deps.map(&:to_formula)
 
     recursive_dependencies = []
