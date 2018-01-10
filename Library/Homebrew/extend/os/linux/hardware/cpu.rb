@@ -1,49 +1,13 @@
 module Hardware
   class CPU
     class << self
-      OPTIMIZATION_FLAGS_LINUX = {
-        core2: "-march=core2",
-        core: "-march=prescott",
-        arm: "-march=armv6",
-        dunno: "-march=native",
-      }.freeze
-
-      def optimization_flags
-        OPTIMIZATION_FLAGS_LINUX
-      end
-
-      def arch
-        case bits
-        when 32
-          arch_32_bit
-        when 64
-          arch_64_bit
-        else
-          :dunno
-        end
-      end
-
-      def universal_archs
-        [arch].extend ArchitectureListExtension
-      end
-
       def cpuinfo
         @cpuinfo ||= File.read("/proc/cpuinfo")
       end
 
-      def type
-        @type ||= case Utils.popen_read("uname", "-m").chomp
-        when "x86_64", "amd64", /^i\d86$/
-          :intel
-        when /^arm/
-          :arm
-        else
-          :dunno
-        end
-      end
-
       def family
         return :arm if arm?
+        return :ppc if ppc?
         return :dunno unless intel?
         # See https://software.intel.com/en-us/articles/intel-architecture-and-processor-identification-with-cpuid-model-and-family-numbers
         cpu_family = cpuinfo[/^cpu family\s*: ([0-9]+)/, 1].to_i
@@ -93,12 +57,9 @@ module Hardware
         end
       end
 
-      def cores
-        cpuinfo.scan(/^processor/).size
-      end
-
       def flags
-        @flags ||= cpuinfo[/^(flags|Features).*/, 0].split
+        @flags ||= cpuinfo[/^(flags|Features).*/, 0]&.split
+        @flags ||= []
       end
 
       # Compatibility with Mac method, which returns lowercase symbols
@@ -117,20 +78,6 @@ module Hardware
 
       def sse4?
         flags.include? "sse4_1"
-      end
-
-      alias is_64_bit? lm?
-
-      def bits
-        @bits ||= Utils.popen_read("getconf", "LONG_BIT").chomp.to_i
-      end
-
-      def arch_32_bit
-        intel? ? :i386 : :arm
-      end
-
-      def arch_64_bit
-        intel? ? :x86_64 : :arm64
       end
     end
   end

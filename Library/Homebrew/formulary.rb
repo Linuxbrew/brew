@@ -1,18 +1,19 @@
 require "digest/md5"
 require "tap"
+require "extend/cachable"
 
 # The Formulary is responsible for creating instances of Formula.
 # It is not meant to be used directly from formulae.
 
 module Formulary
-  FORMULAE = {}
+  extend Cachable
 
   def self.formula_class_defined?(path)
-    FORMULAE.key?(path)
+    cache.key?(path)
   end
 
   def self.formula_class_get(path)
-    FORMULAE.fetch(path)
+    cache.fetch(path)
   end
 
   def self.load_formula(name, path, contents, namespace)
@@ -44,7 +45,7 @@ module Formulary
     contents = path.open("r") { |f| ensure_utf8_encoding(f).read }
     namespace = "FormulaNamespace#{Digest::MD5.hexdigest(path.to_s)}"
     klass = load_formula(name, path, contents, namespace)
-    FORMULAE[path] = klass
+    cache[path] = klass
   end
 
   if IO.method_defined?(:set_encoding)
@@ -127,7 +128,7 @@ module Formulary
       formula = begin
         Formulary.from_contents name, @bottle_filename, contents, spec
       rescue FormulaUnreadableError => e
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Unreadable formula in #{@bottle_filename}:
           #{e}
         EOS
@@ -421,7 +422,7 @@ module Formulary
     CoreTap.instance.formula_dir/"#{name.to_s.downcase}.rb"
   end
 
-  def self.tap_paths(name, taps = Dir["#{HOMEBREW_LIBRARY}/Taps/*/*/"])
+  def self.tap_paths(name, taps = Dir[HOMEBREW_LIBRARY/"Taps/*/*/"])
     name = name.to_s.downcase
     taps.map do |tap|
       Pathname.glob([
@@ -442,7 +443,7 @@ module Formulary
     if possible_pinned_tap_formulae.size == 1
       selected_formula = factory(possible_pinned_tap_formulae.first, spec)
       if core_path(ref).file?
-        opoo <<-EOS.undent
+        opoo <<~EOS
           #{ref} is provided by core, but is now shadowed by #{selected_formula.full_name}.
           To refer to the core formula, use Homebrew/core/#{ref} instead.
         EOS

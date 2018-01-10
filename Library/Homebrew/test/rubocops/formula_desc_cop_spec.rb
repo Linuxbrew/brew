@@ -1,6 +1,3 @@
-require "rubocop"
-require "rubocop/rspec/support"
-require_relative "../../extend/string"
 require_relative "../../rubocops/formula_desc_cop"
 
 describe RuboCop::Cop::FormulaAuditStrict::DescLength do
@@ -8,72 +5,43 @@ describe RuboCop::Cop::FormulaAuditStrict::DescLength do
 
   context "When auditing formula desc" do
     it "When there is no desc" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY)
         class Foo < Formula
+        ^^^^^^^^^^^^^^^^^^^ Formula should have a desc (Description).
           url 'http://example.com/foo-1.0.tgz'
         end
-      EOS
+      RUBY
+    end
 
-      expected_offenses = [{  message: "Formula should have a desc (Description).",
-                              severity: :convention,
-                              line: 1,
-                              column: 0,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+    it "reports an offense when desc is an empty string" do
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          desc ''
+          ^^^^^^^ The desc (description) should not be an empty string.
+        end
+      RUBY
     end
 
     it "When desc is too long" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'Bar#{"bar" * 29}'
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Description is too long. "name: desc" should be less than 80 characters. Length is calculated as foo + desc. (currently 95)
         end
-      EOS
-
-      msg = <<-EOS.undent
-        Description is too long. "name: desc" should be less than 80 characters.
-        Length is calculated as foo + desc. (currently 95)
-      EOS
-      expected_offenses = [{ message: msg,
-                             severity: :convention,
-                             line: 3,
-                             column: 2,
-                             source: source }]
-
-      inspect_source(source, "/homebrew-core/Formula/foo.rb")
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "When desc is multiline string" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'Bar#{"bar" * 9}'\
             '#{"foo" * 21}'
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Description is too long. "name: desc" should be less than 80 characters. Length is calculated as foo + desc. (currently 98)
         end
-      EOS
-
-      msg = <<-EOS.undent
-        Description is too long. "name: desc" should be less than 80 characters.
-        Length is calculated as foo + desc. (currently 98)
-      EOS
-      expected_offenses = [{ message: msg,
-                             severity: :convention,
-                             line: 3,
-                             column: 2,
-                             source: source }]
-
-      inspect_source(source, "/homebrew-core/Formula/foo.rb")
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
   end
 end
@@ -83,93 +51,65 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
 
   context "When auditing formula desc" do
     it "When wrong \"command-line\" usage in desc" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'command line'
+                ^ Description should start with a capital letter
+                ^^^^^^^^^^^^ Description should use \"command-line\" instead of \"command line\"
         end
-      EOS
-
-      expected_offenses = [{ message: "Description should use \"command-line\" instead of \"command line\"",
-                             severity: :convention,
-                             line: 3,
-                             column: 8,
-                             source: source }]
-
-      inspect_source(source)
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "When an article is used in desc" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'An '
+                ^^^ Description shouldn\'t start with an indefinite article i.e. \"An\"
         end
-      EOS
-
-      expected_offenses = [{ message: "Description shouldn't start with an indefinite article i.e. \"An\"",
-                             severity: :convention,
-                             line: 3,
-                             column: 8,
-                             source: source }]
-
-      inspect_source(source)
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "When an lowercase letter starts a desc" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'bar'
+                ^ Description should start with a capital letter
         end
-      EOS
-
-      expected_offenses = [{ message: "Description should start with a capital letter",
-                             severity: :convention,
-                             line: 3,
-                             column: 8,
-                             source: source }]
-
-      inspect_source(source)
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "When formula name is in desc" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'Foo is a foobar'
+                ^^^^ Description shouldn\'t start with the formula name
         end
-      EOS
+      RUBY
+    end
 
-      expected_offenses = [{ message: "Description shouldn't start with the formula name",
-                             severity: :convention,
-                             line: 3,
-                             column: 8,
-                             source: source }]
-
-      inspect_source(source, "/homebrew-core/Formula/foo.rb")
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+    it "When the description ends with a full stop" do
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          desc 'Description with a full stop at the end.'
+                                                       ^ Description shouldn\'t end with a full stop
+        end
+      RUBY
     end
 
     it "autocorrects all rules" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc ' an bar: commandline foo '
         end
       EOS
-      correct_source = <<-EOS.undent
+
+      correct_source = <<~EOS
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'an bar: command-line'

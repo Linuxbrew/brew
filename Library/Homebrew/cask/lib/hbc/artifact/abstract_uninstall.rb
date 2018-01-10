@@ -30,6 +30,12 @@ module Hbc
         super(cask)
         directives[:signal] = [*directives[:signal]].flatten.each_slice(2).to_a
         @directives = directives
+
+        return unless directives.key?(:kext)
+
+        cask.caveats do
+          kext
+        end
       end
 
       def to_h
@@ -216,7 +222,7 @@ module Hbc
         paths.each do |path|
           resolved_path = Pathname.new(path)
 
-          resolved_path = resolved_path.expand_path if path.start_with?("~")
+          resolved_path = resolved_path.expand_path if path.to_s.start_with?("~")
 
           if resolved_path.relative? || resolved_path.split.any? { |part| part.to_s == ".." }
             opoo "Skipping #{Formatter.identifier(action)} for relative path '#{path}'."
@@ -253,7 +259,7 @@ module Hbc
       end
 
       def trash_paths(*paths, command: nil, **_)
-        result = command.run!("/usr/bin/osascript", args: ["-e", <<-'EOS'.undent, *paths])
+        result = command.run!("/usr/bin/osascript", args: ["-e", <<~'EOS', *paths])
           on run argv
             repeat with i from 1 to (count argv)
               set item i of argv to (item i of argv as POSIX file)

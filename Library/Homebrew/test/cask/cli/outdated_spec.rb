@@ -23,7 +23,7 @@ describe Hbc::CLI::Outdated, :cask do
     it "checks all the installed Casks when no token is provided" do
       expect {
         described_class.run
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         local-caffeine (1.2.2) != 1.2.3
         local-transmission (2.60) != 2.61
       EOS
@@ -32,7 +32,7 @@ describe Hbc::CLI::Outdated, :cask do
     it "checks only the tokens specified in the command line" do
       expect {
         described_class.run("local-caffeine")
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         local-caffeine (1.2.2) != 1.2.3
       EOS
     end
@@ -40,7 +40,7 @@ describe Hbc::CLI::Outdated, :cask do
     it 'ignores "auto_updates" and "latest" Casks even when their tokens are provided in the command line' do
       expect {
         described_class.run("local-caffeine", "auto-updates", "version-latest-string")
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         local-caffeine (1.2.2) != 1.2.3
       EOS
     end
@@ -54,7 +54,7 @@ describe Hbc::CLI::Outdated, :cask do
     it "lists only the names (no versions) of the outdated Casks with --quiet" do
       expect {
         described_class.run("--verbose", "--quiet")
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         local-caffeine
         local-transmission
       EOS
@@ -65,7 +65,7 @@ describe Hbc::CLI::Outdated, :cask do
     it 'includes the Casks with "auto_updates true" or "version latest" with --greedy' do
       expect {
         described_class.run("--greedy")
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         auto-updates (2.57) != 2.61
         local-caffeine (1.2.2) != 1.2.3
         local-transmission (2.60) != 2.61
@@ -79,7 +79,7 @@ describe Hbc::CLI::Outdated, :cask do
 
       expect {
         described_class.run("--greedy")
-      }.to output(<<-EOS.undent).to_stdout
+      }.to output(<<~EOS).to_stdout
         local-caffeine (1.2.2) != 1.2.3
         local-transmission (2.60) != 2.61
         version-latest-string (latest) != latest

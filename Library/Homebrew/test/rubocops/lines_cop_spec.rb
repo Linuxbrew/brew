@@ -1,81 +1,70 @@
-require "rubocop"
-require "rubocop/rspec/support"
-require_relative "../../extend/string"
 require_relative "../../rubocops/lines_cop"
 
 describe RuboCop::Cop::FormulaAudit::Lines do
   subject(:cop) { described_class.new }
 
-  context "When auditing lines" do
-    it "with correctable deprecated dependencies" do
-      formulae = [{
-        "dependency" => :automake,
-        "correct"    => "automake",
-      }, {
-        "dependency" => :autoconf,
-        "correct"    => "autoconf",
-      }, {
-        "dependency" => :libtool,
-        "correct"    => "libtool",
-      }, {
-        "dependency" => :apr,
-        "correct"    => "apr-util",
-      }, {
-        "dependency" => :tex,
-      }]
-
-      formulae.each do |formula|
-        source = <<-EOS.undent
-        class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
-          depends_on :#{formula["dependency"]}
-        end
-        EOS
-        if formula.key?("correct")
-          offense = ":#{formula["dependency"]} is deprecated. Usage should be \"#{formula["correct"]}\""
-        else
-          offense = ":#{formula["dependency"]} is deprecated"
-        end
-        expected_offenses = [{  message: offense,
-                                severity: :convention,
-                                line: 3,
-                                column: 2,
-                                source: source }]
-
-        inspect_source(source)
-
-        expected_offenses.zip(cop.offenses.reverse).each do |expected, actual|
-          expect_offense(expected, actual)
-        end
+  it "reports an offense when using depends_on :automake" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'http://example.com/foo-1.0.tgz'
+        depends_on :automake
+        ^^^^^^^^^^^^^^^^^^^^ :automake is deprecated. Usage should be \"automake\".
       end
-    end
+    RUBY
+  end
+
+  it "reports an offense when using depends_on :autoconf" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'http://example.com/foo-1.0.tgz'
+        depends_on :autoconf
+        ^^^^^^^^^^^^^^^^^^^^ :autoconf is deprecated. Usage should be \"autoconf\".
+      end
+    RUBY
+  end
+
+  it "reports an offense when using depends_on :libtool" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'http://example.com/foo-1.0.tgz'
+        depends_on :libtool
+        ^^^^^^^^^^^^^^^^^^^ :libtool is deprecated. Usage should be \"libtool\".
+      end
+    RUBY
+  end
+
+  it "reports an offense when using depends_on :apr" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'http://example.com/foo-1.0.tgz'
+        depends_on :apr
+        ^^^^^^^^^^^^^^^ :apr is deprecated. Usage should be \"apr-util\".
+      end
+    RUBY
+  end
+
+  it "reports an offense when using depends_on :tex" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'http://example.com/foo-1.0.tgz'
+        depends_on :tex
+        ^^^^^^^^^^^^^^^ :tex is deprecated.
+      end
+    RUBY
   end
 end
 
 describe RuboCop::Cop::FormulaAudit::ClassInheritance do
   subject(:cop) { described_class.new }
 
-  context "When auditing lines" do
-    it "with no space in class inheritance" do
-      source = <<-EOS.undent
-        class Foo<Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-        end
-      EOS
-
-      expected_offenses = [{  message: "Use a space in class inheritance: class Foo < Formula",
-                              severity: :convention,
-                              line: 1,
-                              column: 10,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
+  it "reports an offense when not using spaces for class inheritance" do
+    expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
+      class Foo<Formula
+                ^^^^^^^ Use a space in class inheritance: class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
       end
-    end
+    RUBY
   end
 end
 
@@ -83,71 +72,208 @@ describe RuboCop::Cop::FormulaAudit::Comments do
   subject(:cop) { described_class.new }
 
   context "When auditing formula" do
-    it "with commented cmake call" do
-      source = <<-EOS.undent
+    it "commented cmake call" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           # system "cmake", ".", *std_cmake_args
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Please remove default template comments
         end
-      EOS
-
-      expected_offenses = [{  message: "Please remove default template comments",
-                              severity: :convention,
-                              line: 4,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with default template comments" do
-      source = <<-EOS.undent
+    it "default template comments" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           # PLEASE REMOVE
+          ^^^^^^^^^^^^^^^ Please remove default template comments
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
         end
-      EOS
-
-      expected_offenses = [{  message: "Please remove default template comments",
-                              severity: :convention,
-                              line: 2,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with commented out depends_on" do
-      source = <<-EOS.undent
+    it "commented out depends_on" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           # depends_on "foo"
+          ^^^^^^^^^^^^^^^^^^ Commented-out dependency "foo"
         end
-      EOS
-
-      expected_offenses = [{  message: 'Commented-out dependency "foo"',
-                              severity: :convention,
-                              line: 4,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
+  end
+end
+
+describe RuboCop::Cop::FormulaAudit::AssertStatements do
+  subject(:cop) { described_class.new }
+
+  it "assert ...include usage" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert File.read("inbox").include?("Sample message 1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `assert_match` instead of `assert ...include?`
+      end
+    RUBY
+  end
+
+  it "assert ...exist? without a negation" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert File.exist? "default.ini"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^ Use `assert_predicate <path_to_file>, :exist?` instead of `assert File.exist? "default.ini"`
+      end
+    RUBY
+  end
+
+  it "assert ...exist? with a negation" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert !File.exist?("default.ini")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use `refute_predicate <path_to_file>, :exist?` instead of `assert !File.exist?("default.ini")`
+      end
+    RUBY
+  end
+
+  it "assert ...executable? without a negation" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        assert File.executable? f
+               ^^^^^^^^^^^^^^^^^^ Use `assert_predicate <path_to_file>, :executable?` instead of `assert File.executable? f`
+      end
+    RUBY
+  end
+end
+
+describe RuboCop::Cop::FormulaAudit::OptionDeclarations do
+  subject(:cop) { described_class.new }
+
+  it "unless build.without? conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return unless build.without? "bar"
+                        ^^^^^^^^^^^^^^^^^^^^ Use if build.with? "bar" instead of unless build.without? "bar"
+        end
+      end
+    RUBY
+  end
+
+  it "unless build.with? conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return unless build.with? "bar"
+                        ^^^^^^^^^^^^^^^^^ Use if build.without? "bar" instead of unless build.with? "bar"
+        end
+      end
+    RUBY
+  end
+
+  it "negated build.with? conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if !build.with? "bar"
+                    ^^^^^^^^^^^^^^^^^^ Don't negate 'build.with?': use 'build.without?'
+        end
+      end
+    RUBY
+  end
+
+  it "negated build.without? conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if !build.without? "bar"
+                    ^^^^^^^^^^^^^^^^^^^^^ Don't negate 'build.without?': use 'build.with?'
+        end
+      end
+    RUBY
+  end
+
+  it "unnecessary build.without? conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.without? "--without-bar"
+                                    ^^^^^^^^^^^^^ Don't duplicate 'without': Use `build.without? \"bar\"` to check for \"--without-bar\"
+        end
+      end
+    RUBY
+  end
+
+  it "unnecessary build.with? conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.with? "--with-bar"
+                                 ^^^^^^^^^^ Don't duplicate 'with': Use `build.with? \"bar\"` to check for \"--with-bar\"
+        end
+      end
+    RUBY
+  end
+
+  it "build.include? conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.include? "without-bar"
+                                    ^^^^^^^^^^^ Use build.without? \"bar\" instead of build.include? 'without-bar'
+        end
+      end
+    RUBY
+  end
+
+  it "build.include? with dashed args conditional" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+        def post_install
+          return if build.include? "--bar"
+                                    ^^^^^ Reference 'bar' without dashes
+        end
+      end
+    RUBY
+  end
+
+  it "def options usage" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        desc "foo"
+        url 'http://example.com/foo-1.0.tgz'
+
+        def options
+        ^^^^^^^^^^^ Use new-style option definitions
+          [["--bar", "desc"]]
+        end
+      end
+    RUBY
   end
 end
 
@@ -155,106 +281,62 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
   subject(:cop) { described_class.new }
 
   context "When auditing formula" do
-    it "with FileUtils" do
-      source = <<-EOS.undent
+    it "FileUtils usage" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           FileUtils.mv "hello"
+          ^^^^^^^^^^^^^^^^^^^^ Don\'t need \'FileUtils.\' before mv
         end
-      EOS
-
-      expected_offenses = [{  message: "Don't need 'FileUtils.' before mv",
-                              severity: :convention,
-                              line: 4,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with long inreplace block vars" do
-      source = <<-EOS.undent
+    it "long inreplace block vars" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           inreplace "foo" do |longvar|
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ \"inreplace <filenames> do |s|\" is preferred over \"|longvar|\".
             somerandomCall(longvar)
           end
         end
-      EOS
-
-      expected_offenses = [{  message: "\"inreplace <filenames> do |s|\" is preferred over \"|longvar|\".",
-                              severity: :convention,
-                              line: 4,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with invalid rebuild" do
-      source = <<-EOS.undent
+    it "an invalid rebuild statement" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           bottle do
             rebuild 0
+            ^^^^^^^^^ 'rebuild 0' should be removed
             sha256 "fe0679b932dd43a87fd415b609a7fbac7a069d117642ae8ebaac46ae1fb9f0b3" => :sierra
           end
         end
-      EOS
-
-      expected_offenses = [{  message: "'rebuild 0' should be removed",
-                              severity: :convention,
-                              line: 5,
-                              column: 4,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with OS.linux? check", :needs_macos do
-      source = <<-EOS.undent
+    it "OS.linux? check", :needs_macos do
+      expect_offense(<<~RUBY, "/homebrew-core/")
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           bottle do
             if OS.linux?
+               ^^^^^^^^^ Don\'t use OS.linux?; Homebrew/core only supports macOS
               nil
             end
             sha256 "fe0679b932dd43a87fd415b609a7fbac7a069d117642ae8ebaac46ae1fb9f0b3" => :sierra
           end
         end
-      EOS
-
-      expected_offenses = [{  message: "Don't use OS.linux?; Homebrew/core only supports macOS",
-                              severity: :convention,
-                              line: 5,
-                              column: 7,
-                              source: source }]
-
-      inspect_source(source, "/homebrew-core/")
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with fails_with :llvm" do
-      source = <<-EOS.undent
+    it "fails_with :llvm block" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -262,126 +344,54 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
             sha256 "fe0679b932dd43a87fd415b609a7fbac7a069d117642ae8ebaac46ae1fb9f0b3" => :sierra
           end
           fails_with :llvm do
+          ^^^^^^^^^^^^^^^^ 'fails_with :llvm' is now a no-op so should be removed
             build 2335
             cause "foo"
           end
         end
-      EOS
-
-      expected_offenses = [{  message: "'fails_with :llvm' is now a no-op so should be removed",
-                              severity: :convention,
-                              line: 7,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with def test" do
-      source = <<-EOS.undent
+    it "def test's deprecated usage" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
 
           def test
+          ^^^^^^^^ Use new-style test definitions (test do)
             assert_equals "1", "1"
           end
         end
-      EOS
-
-      expected_offenses = [{  message: "Use new-style test definitions (test do)",
-                              severity: :convention,
-                              line: 5,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
-    end
-
-    it "with def options" do
-      source = <<-EOS.undent
-        class Foo < Formula
-          desc "foo"
-          url 'http://example.com/foo-1.0.tgz'
-
-          def options
-            [["--bar", "desc"]]
-          end
-        end
-      EOS
-
-      expected_offenses = [{  message: "Use new-style option definitions",
-                              severity: :convention,
-                              line: 5,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "with deprecated skip_clean call" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           skip_clean :all
+          ^^^^^^^^^^^^^^^ `skip_clean :all` is deprecated; brew no longer strips symbols. Pass explicit paths to prevent Homebrew from removing empty folders.
         end
-      EOS
-
-      expected_offenses = [{ message: <<-EOS.undent.chomp,
-                              `skip_clean :all` is deprecated; brew no longer strips symbols
-                                      Pass explicit paths to prevent Homebrew from removing empty folders.
-                             EOS
-                             severity: :convention,
-                             line: 4,
-                             column: 2,
-                             source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with build.universal?" do
-      source = <<-EOS.undent
+    it "build.universal? deprecated usage" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           if build.universal?
+             ^^^^^^^^^^^^^^^^ macOS has been 64-bit only since 10.6 so build.universal? is deprecated.
              "foo"
           end
         end
-      EOS
-
-      expected_offenses = [{  message: "macOS has been 64-bit only since 10.6 so build.universal? is deprecated.",
-                              severity: :convention,
-                              line: 4,
-                              column: 5,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with build.universal? exempted formula" do
-      source = <<-EOS.undent
+    it "build.universal? deprecation exempted formula" do
+      expect_no_offenses(<<~RUBY, "/homebrew-core/Formula/wine.rb")
         class Wine < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
@@ -389,128 +399,393 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
              "foo"
           end
         end
-      EOS
-
-      inspect_source(source, "/homebrew-core/Formula/wine.rb")
-      expect(cop.offenses).to eq([])
+      RUBY
     end
 
-    it "with ENV.universal_binary" do
-      source = <<-EOS.undent
+    it "deprecated ENV.universal_binary usage" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           if build?
              ENV.universal_binary
+             ^^^^^^^^^^^^^^^^^^^^ macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated.
           end
         end
-      EOS
-
-      expected_offenses = [{  message: "macOS has been 64-bit only since 10.6 so ENV.universal_binary is deprecated.",
-                              severity: :convention,
-                              line: 5,
-                              column: 5,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with ENV.universal_binary" do
-      source = <<-EOS.undent
+    it "ENV.universal_binary deprecation exempted formula" do
+      expect_no_offenses(<<~RUBY, "/homebrew-core/Formula/wine.rb")
+        class Wine < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if build?
+            ENV.universal_binary
+          end
+        end
+      RUBY
+    end
+
+    it "deprecated ENV.x11 usage" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           if build?
              ENV.x11
+             ^^^^^^^ Use "depends_on :x11" instead of "ENV.x11"
           end
         end
-      EOS
-
-      expected_offenses = [{  message: 'Use "depends_on :x11" instead of "ENV.x11"',
-                              severity: :convention,
-                              line: 5,
-                              column: 5,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with ruby-macho alternatives" do
-      source = <<-EOS.undent
+    it "install_name_tool usage instead of ruby-macho" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           system "install_name_tool", "-id"
+                  ^^^^^^^^^^^^^^^^^ Use ruby-macho instead of calling "install_name_tool"
         end
-      EOS
-
-      expected_offenses = [{  message: 'Use ruby-macho instead of calling "install_name_tool"',
-                              severity: :convention,
-                              line: 4,
-                              column: 10,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with ruby-macho alternatives audit exempted formula" do
-      source = <<-EOS.undent
+    it "ruby-macho alternatives audit exempted formula" do
+      expect_no_offenses(<<~RUBY, "/homebrew-core/Formula/cctools.rb")
         class Cctools < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           system "install_name_tool", "-id"
         end
-      EOS
-
-      inspect_source(source, "/homebrew-core/Formula/cctools.rb")
-      expect(cop.offenses).to eq([])
+      RUBY
     end
 
-    it "with npm install without language::Node args" do
-      source = <<-EOS.undent
+    it "npm install without language::Node args" do
+      expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           system "npm", "install"
+          ^^^^^^^^^^^^^^^^^^^^^^^ Use Language::Node for npm install args
         end
-      EOS
-
-      expected_offenses = [{  message: "Use Language::Node for npm install args",
-                              severity: :convention,
-                              line: 4,
-                              column: 2,
-                              source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
-    it "with npm install without language::Node args in kibana" do
-      source = <<-EOS.undent
+    it "npm install without language::Node args in kibana(exempted formula)" do
+      expect_no_offenses(<<~RUBY, "/homebrew-core/Formula/kibana@4.4.rb")
         class KibanaAT44 < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           system "npm", "install"
         end
-      EOS
+      RUBY
+    end
 
-      inspect_source(source, "/homebrew-core/Formula/kibana@4.4.rb")
-      expect(cop.offenses).to eq([])
+    it "depends_on with an instance as argument" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on FOO::BAR.new
+                     ^^^^^^^^^^^^ `depends_on` can take requirement classes instead of instances
+        end
+      RUBY
+    end
+
+    it "old style OS check" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on :foo if MacOS.snow_leopard?
+                             ^^^^^^^^^^^^^^^^^^^ \"MacOS.snow_leopard?\" is deprecated, use a comparison to MacOS.version instead
+        end
+      RUBY
+    end
+
+    it "non glob DIR usage" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          rm_rf Dir["src/{llvm,test,librustdoc,etc/snapshot.pyc}"]
+          rm_rf Dir["src/snapshot.pyc"]
+                     ^^^^^^^^^^^^^^^^ Dir(["src/snapshot.pyc"]) is unnecessary; just use "src/snapshot.pyc"
+        end
+      RUBY
+    end
+
+    it "system call to fileUtils Method" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "mkdir", "foo"
+                  ^^^^^ Use the `mkdir` Ruby method instead of `system "mkdir", "foo"`
+        end
+      RUBY
+    end
+
+    it "top-level function def outside class body" do
+      expect_offense(<<~RUBY)
+        def test
+        ^^^^^^^^ Define method test in the class body, not at the top-level
+           nil
+        end
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+        end
+      RUBY
+    end
+
+    it "Using ARGV to check options" do
+      expect_no_offenses(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            verbose = ARGV.verbose?
+          end
+        end
+      RUBY
+    end
+
+    it 'man+"man8" usage' do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            man1.install man+"man8" => "faad.1"
+                              ^^^^ "man+"man8"" should be "man8"
+          end
+        end
+      RUBY
+    end
+
+    it "hardcoded gcc compiler" do
+      expect_offense(<<~'RUBY')
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            system "/usr/bin/gcc", "foo"
+                    ^^^^^^^^^^^^ Use "#{ENV.cc}" instead of hard-coding "gcc"
+          end
+        end
+      RUBY
+    end
+
+    it "hardcoded g++ compiler" do
+      expect_offense(<<~'RUBY')
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            system "/usr/bin/g++", "-o", "foo", "foo.cc"
+                    ^^^^^^^^^^^^ Use "#{ENV.cxx}" instead of hard-coding "g++"
+          end
+        end
+      RUBY
+    end
+
+    it "hardcoded llvm-g++ compiler" do
+      expect_offense(<<~'RUBY')
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            ENV["COMPILER_PATH"] = "/usr/bin/llvm-g++"
+                                    ^^^^^^^^^^^^^^^^^ Use "#{ENV.cxx}" instead of hard-coding "llvm-g++"
+          end
+        end
+      RUBY
+    end
+
+    it "hardcoded gcc compiler" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            ENV["COMPILER_PATH"] = "/usr/bin/gcc"
+                                    ^^^^^^^^^^^^ Use \"\#{ENV.cc}\" instead of hard-coding \"gcc\"
+          end
+        end
+      RUBY
+    end
+
+    it "formula path shortcut : man" do
+      expect_offense(<<~'RUBY')
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            mv "#{share}/man", share
+                         ^^^^ "#{share}/man" should be "#{man}"
+          end
+        end
+      RUBY
+    end
+
+    it "formula path shortcut : libexec" do
+      expect_offense(<<~'RUBY')
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            mv "#{prefix}/libexec", share
+                          ^^^^^^^^ "#{prefix}/libexec" should be "#{libexec}"
+          end
+        end
+      RUBY
+    end
+
+    it "formula path shortcut : info" do
+      expect_offense(<<~'RUBY')
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            system "./configure", "--INFODIR=#{prefix}/share/info"
+                                                       ^^^^^^ "#{prefix}/share" should be "#{share}"
+                                                       ^^^^^^^^^^^ "#{prefix}/share/info" should be "#{info}"
+          end
+        end
+      RUBY
+    end
+
+    it "formula path shortcut : man8" do
+      expect_offense(<<~'RUBY')
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          def install
+            system "./configure", "--MANDIR=#{prefix}/share/man/man8"
+                                                      ^^^^^^ "#{prefix}/share" should be "#{share}"
+                                                      ^^^^^^^^^^^^^^^ "#{prefix}/share/man/man8" should be "#{man8}"
+          end
+        end
+      RUBY
+    end
+
+    it "dependecies which have to vendored" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on "lpeg" => :lua51
+                                ^^^^^ lua modules should be vendored rather than use deprecated depends_on \"lpeg\" => :lua51`
+        end
+      RUBY
+    end
+
+    it "manually setting env" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          system "export", "var=value"
+                  ^^^^^^ Use ENV instead of invoking 'export' to modify the environment
+        end
+      RUBY
+    end
+
+    it "dependencies with invalid options" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on "foo" => "with-bar"
+                     ^^^^^^^^^^^^^^^^^^^ Dependency foo should not use option with-bar
+        end
+      RUBY
+    end
+
+    it "inspecting version manually" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          if version == "HEAD"
+             ^^^^^^^^^^^^^^^^^ Use 'build.head?' instead of inspecting 'version'
+            foo()
+          end
+        end
+      RUBY
+    end
+
+    it "deprecated ARGV.include? (--HEAD) usage" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          test do
+            head = ARGV.include? "--HEAD"
+                                  ^^^^^^ Use "if build.head?" instead
+                   ^^^^ Use build instead of ARGV to check options
+          end
+        end
+      RUBY
+    end
+
+    it "deprecated needs :openmp usage" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          needs :openmp
+          ^^^^^^^^^^^^^ 'needs :openmp' should be replaced with 'depends_on \"gcc\"'
+        end
+      RUBY
+    end
+
+    it "deprecated MACOS_VERSION const usage" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          test do
+            version = MACOS_VERSION
+                      ^^^^^^^^^^^^^ Use MacOS.version instead of MACOS_VERSION
+          end
+        end
+      RUBY
+    end
+
+    it "deprecated if build.with? conditional dependency" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on "foo" if build.with? "foo"
+          ^^^^^^^^^^^^^^^^ Replace depends_on "foo" if build.with? "foo" with depends_on "foo" => :optional
+        end
+      RUBY
+    end
+
+    it "unless conditional dependency with build.without?" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on :foo unless build.without? "foo"
+          ^^^^^^^^^^^^^^^ Replace depends_on :foo unless build.without? "foo" with depends_on :foo => :recommended
+        end
+      RUBY
+    end
+
+    it "unless conditional dependency with build.include?" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on :foo unless build.include? "without-foo"
+          ^^^^^^^^^^^^^^^ Replace depends_on :foo unless build.include? "without-foo" with depends_on :foo => :recommended
+        end
+      RUBY
     end
   end
 end

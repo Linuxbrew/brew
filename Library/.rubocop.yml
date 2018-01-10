@@ -29,7 +29,7 @@ Layout/IndentArray:
   EnforcedStyle: special_inside_parentheses
 
 Layout/IndentHeredoc:
-  EnforcedStyle: unindent
+  EnforcedStyle: squiggly
 
 # conflicts with DSL-style path concatenation with `/`
 Layout/SpaceAroundOperators:
@@ -58,34 +58,36 @@ Lint/EndAlignment:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false
 
-# TODO: try to bring down all metrics maximums
+# most metrics don't make sense to apply for formulae/taps
 Metrics/AbcSize:
-  Max: 254
+  Enabled: false
 
 Metrics/BlockLength:
-  Max: 1250
+  Enabled: false
 
 Metrics/ClassLength:
-  Max: 1500
+  Enabled: false
 
 Metrics/CyclomaticComplexity:
-  Max: 76
+  Enabled: false
 
 Metrics/LineLength:
-  Max: 400
+  # 124 is the goal as GitHub diff UI wraps beyond that
+  Max: 190
+  # ignore manpage comments and long single-line strings
+  IgnoredPatterns: ['#: ', ' url "', ' mirror "', ' plist_options :']
 
 Metrics/MethodLength:
-  Max: 250
+  Enabled: false
 
 Metrics/ModuleLength:
-  CountComments: false
-  Exclude:
-    - '**/bin/**/*'
-    - '**/cmd/**/*'
-    - '**/lib/**/*'
+  Enabled: false
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false
 
 Metrics/PerceivedComplexity:
-  Max: 100
+  Enabled: false
 
 # makes code less readable for minor performance increases
 Performance/Caller:
@@ -93,6 +95,9 @@ Performance/Caller:
 
 Style/Alias:
   EnforcedStyle: prefer_alias
+
+Style/AsciiComments:
+  Enabled: false
 
 Style/AutoResourceCleanup:
   Enabled: true
@@ -117,6 +122,15 @@ Style/Documentation:
 
 Style/Encoding:
   Enabled: true
+
+# use spaces for indentation; detect tabs
+Layout/Tab:
+  Enabled: true
+
+# We have no use for using `warn` because we are
+# calling Ruby with warnings disabled ourselves.
+Style/StderrPuts:
+  Enabled: false
 
 # dashes in filenames are typical
 Naming/FileName:

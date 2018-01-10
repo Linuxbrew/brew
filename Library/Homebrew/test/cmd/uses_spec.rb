@@ -2,7 +2,7 @@ describe "brew uses", :integration_test do
   it "prints the Formulae a given Formula is used by" do
     setup_test_formula "foo"
     setup_test_formula "bar"
-    setup_test_formula "baz", <<-EOS.undent
+    setup_test_formula "baz", <<~EOS
       url "https://example.com/baz-1.0"
       depends_on "bar"
     EOS

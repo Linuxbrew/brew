@@ -71,7 +71,7 @@ module Homebrew
 
       if Formula.aliases.include? fc.name
         realname = Formulary.canonical_name(fc.name)
-        raise <<-EOS.undent
+        raise <<~EOS
           The formula #{realname} is already aliased to #{fc.name}
           Please check that you are not creating a duplicate.
           To force creation use --force.
@@ -165,7 +165,7 @@ class FormulaCreator
     path.write ERB.new(template, nil, ">").result(binding)
   end
 
-  def template; <<-EOS.undent
+  def template; <<~EOS
     # Documentation: https://docs.brew.sh/Formula-Cookbook.html
     #                http://www.rubydoc.info/github/Homebrew/brew/master/Formula
     # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!

@@ -8,15 +8,16 @@ module Homebrew
 
   def command
     abort "This command requires a command argument" if ARGV.empty?
-    cmd = ARGV.first
-    cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
 
-    if (path = Commands.path(cmd))
-      puts path
-    elsif (path = which("brew-#{cmd}") || which("brew-#{cmd}.rb"))
-      puts path
-    else
-      odie "Unknown command: #{cmd}"
-    end
+    cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(ARGV.first, ARGV.first)
+
+    path = Commands.path(cmd)
+
+    cmd_paths = PATH.new(ENV["PATH"]).append(Tap.cmd_directories) unless path
+    path ||= which("brew-#{cmd}", cmd_paths)
+    path ||= which("brew-#{cmd}.rb", cmd_paths)
+
+    odie "Unknown command: #{cmd}" unless path
+    puts path
   end
 end

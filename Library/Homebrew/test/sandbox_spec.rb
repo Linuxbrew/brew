@@ -49,7 +49,7 @@ describe Sandbox do
     it "ignores bogus Python error" do
       ENV["HOMEBREW_VERBOSE"] = "1"
 
-      with_bogus_error = <<-EOS.undent
+      with_bogus_error = <<~EOS
         foo
         Mar 17 02:55:06 sandboxd[342]: Python(49765) deny file-write-unlink /System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/distutils/errors.pyc
         bar

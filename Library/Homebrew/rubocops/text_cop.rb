@@ -46,7 +46,16 @@ module RuboCop
           end
 
           find_method_with_args(body_node, :system, "go", "get") do
-            problem "Formulae should not use `go get`. If non-vendored resources are required use `go_resource`s."
+            problem "Do not use `go get`. Please ask upstream to implement Go vendoring"
+          end
+        end
+      end
+    end
+    module FormulaAuditStrict
+      class Text < FormulaCop
+        def audit_formula(_node, _class_node, _parent_class_node, body_node)
+          find_method_with_args(body_node, :go_resource) do
+            problem "`go_resource`s are deprecated. Please ask upstream to implement Go vendoring"
           end
         end
       end

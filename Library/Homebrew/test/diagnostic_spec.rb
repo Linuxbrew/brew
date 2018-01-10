@@ -194,7 +194,7 @@ describe Homebrew::Diagnostic::Checks do
           FileUtils.chmod 0755, cmd
         end
 
-        ENV["PATH"] = [path1, path2, ENV["PATH"]].join File::PATH_SEPARATOR
+        allow(Tap).to receive(:cmd_directories).and_return([path1, path2])
 
         expect(subject.check_for_external_cmd_name_conflict)
           .to match("brew-foo")

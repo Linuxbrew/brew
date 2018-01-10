@@ -26,13 +26,19 @@ module OS
         "2.7.73" => "2.7.7",
         "2.7.86" => "2.7.8",
         "2.7.94" => "2.7.9",
+        "2.7.108" => "2.7.10",
+        "2.7.112" => "2.7.11",
       }.freeze
 
       # This returns the version number of XQuartz, not of the upstream X.org.
       # The X11.app distributed by Apple is also XQuartz, and therefore covered
       # by this method.
       def version
-        @version ||= detect_version
+        if @version ||= detect_version
+          ::Version.new @version
+        else
+          ::Version::NULL
+        end
       end
 
       def detect_version
@@ -45,6 +51,15 @@ module OS
         end
       end
 
+      def minimum_version
+        version = guess_system_version
+        return version unless version == "dunno"
+
+        # Update this a little later than latest_version to give people
+        # time to upgrade.
+        "2.7.11"
+      end
+
       # https://xquartz.macosforge.org/trac/wiki
       # https://xquartz.macosforge.org/trac/wiki/Releases
       def latest_version
@@ -52,7 +67,7 @@ module OS
         when "10.5"
           "2.6.3"
         else
-          "2.7.9"
+          "2.7.11"
         end
       end
 
@@ -115,7 +130,13 @@ module OS
       end
 
       def installed?
-        !version.nil? && !prefix.nil?
+        !version.null? && !prefix.nil?
+      end
+
+      def outdated?
+        return false unless installed?
+        return false if provided_by_apple?
+        version < latest_version
       end
 
       # If XQuartz and/or the CLT are installed, headers will be found under

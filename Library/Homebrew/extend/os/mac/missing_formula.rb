@@ -5,12 +5,12 @@ module Homebrew
         case name.downcase
         when "xcode"
           if MacOS.version >= :lion
-            <<-EOS.undent
-            Xcode can be installed from the App Store.
+            <<~EOS
+              Xcode can be installed from the App Store.
             EOS
           else
-            <<-EOS.undent
-            Xcode can be installed from #{Formatter.url("https://developer.apple.com/download/more/")}.
+            <<~EOS
+              Xcode can be installed from #{Formatter.url("https://developer.apple.com/download/more/")}.
             EOS
           end
         else

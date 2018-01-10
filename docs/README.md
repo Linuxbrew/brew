@@ -9,7 +9,7 @@
 
 - [Tips and Tricks](Tips-N'-Tricks.md)
 - [Bottles (binary packages)](Bottles.md)
-- [Taps (third-party repositories)](brew-tap.md)
+- [Taps (third-party repositories)](Taps.md)
 - [Interesting Taps and Forks](Interesting-Taps-and-Forks.md)
 - [Anonymous Aggregate User Behaviour Analytics](Analytics.md)
 

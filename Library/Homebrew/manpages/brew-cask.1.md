@@ -86,7 +86,7 @@ names, and other aspects of this manual are still subject to change.
     If <token> is given, summarize the staged files associated with the
     given Cask.
 
-  * `outdated` [--greedy] [--verbose|--quiet] [ <token> ...]:
+  * `outdated` [--greedy] [--verbose|--quiet] [ <token> ... ]:
     Without token arguments, display all the installed Casks that have newer
     versions available in the tap; otherwise check only the tokens given
     in the command line.
@@ -115,6 +115,13 @@ names, and other aspects of this manual are still subject to change.
   * `uninstall` or `rm` or `remove` [--force] <token> [ <token> ... ]:
     Uninstall the given Cask. With `--force`, uninstall even if the Cask
     does not appear to be present.
+
+  * `upgrade` [--force] [--greedy] <token> [ <token> ... ]:
+    Without token arguments, upgrade all the installed Casks that have newer
+    versions available in the tap; otherwise update the tokens given
+    in the command line.
+    If `--greedy` is given then also upgrade the Casks having `auto_updates true`
+    or `version :latest`.
 
   * `zap` <token> [ <token> ... ]:
     Unconditionally remove _all_ files associated with the given Cask.
@@ -218,7 +225,7 @@ Homebrew-Cask is implemented as a external command for Homebrew. That means
 this project is entirely built upon the Homebrew infrastructure. For
 example, upgrades to the Homebrew-Cask tool are received through Homebrew:
 
-    brew update; brew cleanup; brew cask cleanup
+    brew update; brew cask upgrade; brew cleanup; brew cask cleanup
 
 And updates to individual Cask definitions are received whenever you issue
 the Homebrew command:

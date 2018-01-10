@@ -9,7 +9,6 @@ require "cleaner"
 require "formula_cellar_checks"
 require "install_renamed"
 require "cmd/postinstall"
-require "hooks/bottles"
 require "debrew"
 require "sandbox"
 require "requirements/glibc_requirement"
@@ -59,11 +58,12 @@ class FormulaInstaller
     @options = Options.new
     @invalid_option_names = []
     @requirement_messages = []
-
-    @@attempted ||= Set.new
-
     @poured_bottle = false
     @pour_failed   = false
+  end
+
+  def self.attempted
+    @attempted ||= Set.new
   end
 
   # When no build tools are available and build flags are passed through ARGV,
@@ -81,8 +81,6 @@ class FormulaInstaller
   end
 
   def pour_bottle?(install_bottle_options = { warn: false })
-    return true if Homebrew::Hooks::Bottles.formula_has_bottle?(formula)
-
     return false if @pour_failed
 
     return false if !formula.bottled? && !formula.local_bottle_path
@@ -93,7 +91,7 @@ class FormulaInstaller
     return false if formula.bottle_disabled?
     unless formula.pour_bottle?
       if install_bottle_options[:warn] && formula.pour_bottle_check_unsatisfied_reason
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Building #{formula.full_name} from source:
             #{formula.pour_bottle_check_unsatisfied_reason}
         EOS
@@ -104,7 +102,7 @@ class FormulaInstaller
     bottle = formula.bottle_specification
     unless bottle.compatible_cellar?
       if install_bottle_options[:warn]
-        opoo <<-EOS.undent
+        opoo <<~EOS
           Building #{formula.full_name} from source:
             The bottle needs a #{bottle.cellar} Cellar (yours is #{HOMEBREW_CELLAR}).
         EOS
@@ -146,13 +144,13 @@ class FormulaInstaller
   end
 
   def check_install_sanity
-    raise FormulaInstallationAlreadyAttemptedError, formula if @@attempted.include?(formula)
+    raise FormulaInstallationAlreadyAttemptedError, formula if self.class.attempted.include?(formula)
 
     return if ignore_deps?
 
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
-    recursive_runtime_deps = formula.recursive_dependencies.reject(&:build?)
+    recursive_runtime_deps = formula.runtime_dependencies
     recursive_runtime_formulae = recursive_runtime_deps.map(&:to_formula)
 
     recursive_dependencies = []
@@ -165,14 +163,14 @@ class FormulaInstaller
     end
 
     unless recursive_dependencies.empty?
-      raise CannotInstallFormulaError, <<-EOS.undent
+      raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains a recursive dependency on itself:
           #{recursive_dependencies.join("\n  ")}
       EOS
     end
 
     if recursive_formulae.flat_map(&:recursive_dependencies).map(&:to_s).include?(formula.name)
-      raise CannotInstallFormulaError, <<-EOS.undent
+      raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains a recursive dependency on itself!
       EOS
     end
@@ -182,13 +180,14 @@ class FormulaInstaller
     recursive_runtime_formulae.each do |f|
       name = f.name
       unversioned_name, = name.split("@")
+      next if unversioned_name == "python"
       version_hash[unversioned_name] ||= Set.new
       version_hash[unversioned_name] << name
       next if version_hash[unversioned_name].length < 2
       version_conflicts += version_hash[unversioned_name]
     end
     unless version_conflicts.empty?
-      raise CannotInstallFormulaError, <<-EOS.undent
+      raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains conflicting version recursive dependencies:
           #{version_conflicts.to_a.join ", "}
         View these with `brew deps --tree #{formula.full_name}`.
@@ -221,16 +220,16 @@ class FormulaInstaller
     # function but after instantiating this class so that it can avoid having to
     # relink the active keg if possible (because it is slow).
     if formula.linked_keg.directory?
-      message = <<-EOS.undent
+      message = <<~EOS
         #{formula.name} #{formula.linked_version} is already installed
       EOS
       message += if formula.outdated? && !formula.head?
-        <<-EOS.undent
+        <<~EOS
           To upgrade to #{formula.pkg_version}, run `brew upgrade #{formula.name}`
         EOS
       else
         # some other version is already installed *and* linked
-        <<-EOS.undent
+        <<~EOS
           To install #{formula.pkg_version}, first run `brew unlink #{formula.name}`
         EOS
       end
@@ -288,12 +287,12 @@ class FormulaInstaller
       end
     end
 
-    @@attempted << formula
+    self.class.attempted << formula
 
     if pour_bottle?(warn: true)
       begin
         pour
-      rescue Exception => e
+      rescue Exception => e # rubocop:disable Lint/RescueException
         # any exceptions must leave us with nothing installed
         ignore_interrupts do
           formula.prefix.rmtree if formula.prefix.directory?
@@ -355,7 +354,7 @@ class FormulaInstaller
       rescue FormulaUnavailableError => e
         # If the formula name doesn't exist any more then complain but don't
         # stop installation from continuing.
-        opoo <<-EOS.undent
+        opoo <<~EOS
           #{formula}: #{e.message}
           'conflicts_with \"#{c.name}\"' should be removed from #{formula.path.basename}.
         EOS
@@ -404,8 +403,8 @@ class FormulaInstaller
     fatals = []
 
     req_map.each_pair do |dependent, reqs|
-      next if dependent.installed?
       reqs.each do |req|
+        next if dependent.installed? && req.name == "maximummacos"
         @requirement_messages << "#{dependent}: #{req.message}"
         fatals << req if req.fatal?
       end
@@ -417,8 +416,9 @@ class FormulaInstaller
     raise UnsatisfiedRequirements, fatals
   end
 
-  def install_requirement_formula?(req_dependency, req, install_bottle_for_dependent)
+  def install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
     return false unless req_dependency
+    return false if req.build? && dependent.installed?
     return true unless req.satisfied?
     return false if req.run?
     return true if build_bottle?
@@ -449,9 +449,9 @@ class FormulaInstaller
 
         if (req.optional? || req.recommended?) && build.without?(req)
           Requirement.prune
-        elsif req.build? && install_bottle_for_dependent
+        elsif req.build? && use_default_formula && req_dependency&.installed?
           Requirement.prune
-        elsif install_requirement_formula?(req_dependency, req, install_bottle_for_dependent)
+        elsif install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
           deps.unshift(req_dependency)
           formulae.unshift(req_dependency.to_formula)
           Requirement.prune
@@ -518,6 +518,8 @@ class FormulaInstaller
       if (dep.optional? || dep.recommended?) && build.without?(dep)
         Dependency.prune
       elsif dep.build? && install_bottle_for?(dependent, build)
+        Dependency.prune
+      elsif dep.build? && dependent.installed?
         Dependency.prune
       elsif dep.satisfied?(inherited_options[dep.name])
         Dependency.skip
@@ -604,7 +606,7 @@ class FormulaInstaller
     oh1 "Installing #{formula.full_name} dependency: #{Formatter.identifier(dep.name)}"
     fi.install
     fi.finish
-  rescue Exception
+  rescue Exception # rubocop:disable Lint/RescueException
     ignore_interrupts do
       tmp_keg.rename(installed_keg) if tmp_keg && !installed_keg.directory?
       linked_keg.link if keg_was_linked
@@ -760,7 +762,7 @@ class FormulaInstaller
     if !formula.prefix.directory? || Keg.new(formula.prefix).empty_installation?
       raise "Empty installation"
     end
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     e.options = display_options(formula) if e.is_a?(BuildError)
     ignore_interrupts do
       # any exceptions must leave us with nothing installed
@@ -821,7 +823,7 @@ class FormulaInstaller
       puts "  brew link #{formula.name}"
       @show_summary_heading = true
       Homebrew.failed = true
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       onoe "An unexpected error occurred during the `brew link` step"
       puts "The formula built, but is not symlinked into #{HOMEBREW_PREFIX}"
       puts e
@@ -852,7 +854,7 @@ class FormulaInstaller
     formula.plist_path.chmod 0644
     log = formula.var/"log"
     log.mkpath if formula.plist.include? log.to_s
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     onoe "Failed to install plist file"
     ohai e, e.backtrace if debug?
     Homebrew.failed = true
@@ -860,7 +862,7 @@ class FormulaInstaller
 
   def fix_dynamic_linkage(keg)
     keg.fix_dynamic_linkage
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     onoe "Failed to fix install linkage"
     puts "The formula built, but you may encounter issues using it or linking other"
     puts "formula against it."
@@ -872,7 +874,7 @@ class FormulaInstaller
   def clean
     ohai "Cleaning" if verbose?
     Cleaner.new(formula).clean
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     opoo "The cleaning step did not complete successfully"
     puts "Still, the installation was successful, so we will link it into your prefix"
     ohai e, e.backtrace if debug?
@@ -882,7 +884,7 @@ class FormulaInstaller
 
   def post_install
     Homebrew.run_post_install(formula)
-  rescue Exception => e
+  rescue Exception => e # rubocop:disable Lint/RescueException
     opoo "The post-install step did not complete successfully"
     puts "You can try again using `brew postinstall #{formula.full_name}`"
     ohai e, e.backtrace if debug?
@@ -891,10 +893,6 @@ class FormulaInstaller
   end
 
   def pour
-    if Homebrew::Hooks::Bottles.formula_has_bottle?(formula)
-      return if Homebrew::Hooks::Bottles.pour_formula_bottle(formula)
-    end
-
     if (bottle_path = formula.local_bottle_path)
       downloader = LocalBottleDownloadStrategy.new(bottle_path)
     else
@@ -942,27 +940,31 @@ class FormulaInstaller
     super
   end
 
+  def self.locked
+    @locked ||= []
+  end
+
   private
 
   attr_predicate :hold_locks?
 
   def lock
-    return unless (@@locked ||= []).empty?
+    return unless self.class.locked.empty?
     unless ignore_deps?
       formula.recursive_dependencies.each do |dep|
-        @@locked << dep.to_formula
+        self.class.locked << dep.to_formula
       end
     end
-    @@locked.unshift(formula)
-    @@locked.uniq!
-    @@locked.each(&:lock)
+    self.class.locked.unshift(formula)
+    self.class.locked.uniq!
+    self.class.locked.each(&:lock)
     @hold_locks = true
   end
 
   def unlock
     return unless hold_locks?
-    @@locked.each(&:unlock)
-    @@locked.clear
+    self.class.locked.each(&:unlock)
+    self.class.locked.clear
     @hold_locks = false
   end
 

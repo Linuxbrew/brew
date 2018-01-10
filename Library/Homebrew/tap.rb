@@ -1,4 +1,5 @@
 require "extend/string"
+require "extend/cachable"
 require "readall"
 
 # a {Tap} is used to extend the formulae provided by Homebrew core.
@@ -8,13 +9,9 @@ require "readall"
 # {#user} represents Github username and {#repo} represents repository
 # name without leading `homebrew-`.
 class Tap
+  extend Cachable
+
   TAP_DIRECTORY = HOMEBREW_LIBRARY/"Taps"
-
-  CACHE = {}
-
-  def self.clear_cache
-    CACHE.clear
-  end
 
   def self.fetch(*args)
     case args.length
@@ -29,18 +26,16 @@ class Tap
       raise "Invalid tap name '#{args.join("/")}'"
     end
 
-    # we special case homebrew so users don't have to shift in a terminal
-    user = "Homebrew" if user == "homebrew"
-    user = "Linuxbrew" if user == "linuxbrew"
+    # We special case homebrew and linuxbrew so that users don't have to shift in a terminal.
+    user = user.capitalize if ["homebrew", "linuxbrew"].include? user
     repo = repo.strip_prefix "homebrew-"
 
-    if user == "Homebrew" && (repo == "homebrew" || repo == "core") ||
-       user == "Linuxbrew" && (repo == "linuxbrew" || repo == "core")
+    if ["Homebrew", "Linuxbrew"].include?(user) && ["core", "homebrew"].include?(repo)
       return CoreTap.instance
     end
 
     cache_key = "#{user}/#{repo}".downcase
-    CACHE.fetch(cache_key) { |key| CACHE[key] = Tap.new(user, repo) }
+    cache.fetch(cache_key) { |key| cache[key] = Tap.new(user, repo) }
   end
 
   def self.from_path(path)
@@ -124,21 +119,18 @@ class Tap
 
   # The default remote path to this {Tap}.
   def default_remote
-    if OS.mac?
-      "https://github.com/#{full_name}"
-    else
-      case "#{user}/#{repo}"
-      when "Homebrew/dupes"
-        "https://github.com/Linuxbrew/homebrew-#{repo}"
-      else
-        "https://github.com/#{user}/homebrew-#{repo}"
-      end
-    end
+    "https://github.com/#{full_name}"
   end
 
   # True if this {Tap} is a git repository.
   def git?
     path.git?
+  end
+
+  # git branch for this {Tap}.
+  def git_branch
+    raise TapUnavailableError, name unless installed?
+    path.git_branch
   end
 
   # git HEAD for this {Tap}.
@@ -298,7 +290,7 @@ class Tap
     return if options[:clone_target]
     return unless private?
     return if quiet
-    puts <<-EOS.undent
+    puts <<~EOS
       It looks like you tapped a private repository. To avoid entering your
       credentials each time you update, you can use git HTTP credential
       caching or issue the following command:
@@ -531,7 +523,12 @@ class Tap
 
   # an array of all installed {Tap} names.
   def self.names
-    map(&:name)
+    map(&:name).sort
+  end
+
+  # an array of all tap cmd directory {Pathname}s
+  def self.cmd_directories
+    Pathname.glob TAP_DIRECTORY/"*/*/cmd"
   end
 
   # @private

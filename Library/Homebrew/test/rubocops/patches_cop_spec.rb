@@ -1,6 +1,3 @@
-require "rubocop"
-require "rubocop/rspec/support"
-require_relative "../../extend/string"
 require_relative "../../rubocops/patches_cop"
 
 describe RuboCop::Cop::FormulaAudit::Patches do
@@ -8,37 +5,24 @@ describe RuboCop::Cop::FormulaAudit::Patches do
 
   context "When auditing legacy patches" do
     it "When there is no legacy patch" do
-      source = <<-EOS.undent
+      expect_no_offenses(<<~RUBY)
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
         end
-      EOS
-      inspect_source(source)
-      expect(cop.offenses).to eq([])
+      RUBY
     end
 
     it "Formula with `def patches`" do
-      source = <<-EOS.undent
+      expect_offense(<<~RUBY)
         class Foo < Formula
           homepage "ftp://example.com/foo"
           url "http://example.com/foo-1.0.tgz"
           def patches
+          ^^^^^^^^^^^ Use the patch DSL instead of defining a 'patches' method
             DATA
           end
         end
-      EOS
-
-      expected_offenses = [{ message: "Use the patch DSL instead of defining a 'patches' method",
-                             severity: :convention,
-                             line: 4,
-                             column: 2,
-                             source: source }]
-
-      inspect_source(source)
-
-      expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
-      end
+      RUBY
     end
 
     it "Patch URLs" do
@@ -51,7 +35,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
         "https://github.com/dlang/dub/pull/1221.patch",
       ]
       patch_urls.each do |patch_url|
-        source = <<-EOS.undent
+        source = <<~EOS
           class Foo < Formula
             homepage "ftp://example.com/foo"
             url "http://example.com/foo-1.0.tgz"
@@ -63,56 +47,56 @@ describe RuboCop::Cop::FormulaAudit::Patches do
 
         inspect_source(source)
         expected_offense = if patch_url =~ %r{/raw\.github\.com/}
-          [{ message: <<-EOS.undent.chomp,
-               GitHub/Gist patches should specify a revision:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            GitHub/Gist patches should specify a revision:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 12,
              source: source }]
         elsif patch_url =~ %r{macports/trunk}
-          [{ message: <<-EOS.undent.chomp,
-               MacPorts patches should specify a revision instead of trunk:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            MacPorts patches should specify a revision instead of trunk:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 33,
              source: source }]
         elsif patch_url =~ %r{^http://trac\.macports\.org}
-          [{ message: <<-EOS.undent.chomp,
-               Patches from MacPorts Trac should be https://, not http:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            Patches from MacPorts Trac should be https://, not http:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 5,
              source: source }]
         elsif patch_url =~ %r{^http://bugs\.debian\.org}
-          [{ message: <<-EOS.undent.chomp,
-               Patches from Debian should be https://, not http:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            Patches from Debian should be https://, not http:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 5,
              source: source }]
         elsif patch_url =~ %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
-          [{ message: <<-EOS.undent,
-               use GitHub pull request URLs:
-                 https://github.com/foo/foo-bar/pull/100.patch
-               Rather than patch-diff:
-                 https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch
+          [{ message: <<~EOS,
+            use GitHub pull request URLs:
+              https://github.com/foo/foo-bar/pull/100.patch
+            Rather than patch-diff:
+              https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch
              EOS
              severity: :convention,
              line: 5,
              column: 5,
              source: source }]
         elsif patch_url =~ %r{https?://github\.com/.+/.+/(?:commit|pull)/[a-fA-F0-9]*.(?:patch|diff)}
-          [{ message: <<-EOS.undent,
-               GitHub patches should use the full_index parameter:
-                 #{patch_url}?full_index=1
+          [{ message: <<~EOS,
+            GitHub patches should use the full_index parameter:
+              #{patch_url}?full_index=1
              EOS
              severity: :convention,
              line: 5,
@@ -120,13 +104,16 @@ describe RuboCop::Cop::FormulaAudit::Patches do
              source: source }]
         end
         expected_offense.zip([cop.offenses.last]).each do |expected, actual|
-          expect_offense(expected, actual)
+          expect(actual.message).to eq(expected[:message])
+          expect(actual.severity).to eq(expected[:severity])
+          expect(actual.line).to eq(expected[:line])
+          expect(actual.column).to eq(expected[:column])
         end
       end
     end
 
     it "Formula with nested `def patches`" do
-      source = <<-EOS.undent
+      source = <<~EOS
         class Foo < Formula
           homepage "ftp://example.com/foo"
           url "http://example.com/foo-1.0.tgz"
@@ -145,9 +132,9 @@ describe RuboCop::Cop::FormulaAudit::Patches do
                              line: 4,
                              column: 2,
                              source: source },
-                           { message: <<-EOS.undent.chomp,
-                               Patches from MacPorts Trac should be https://, not http:
-                               http://trac.macports.org/export/68507/trunk/dports/net/trafshow/files/
+                           { message: <<~EOS.chomp,
+                             Patches from MacPorts Trac should be https://, not http:
+                             http://trac.macports.org/export/68507/trunk/dports/net/trafshow/files/
                              EOS
                              severity: :convention,
                              line: 8,
@@ -157,7 +144,10 @@ describe RuboCop::Cop::FormulaAudit::Patches do
       inspect_source(source)
 
       expected_offenses.zip(cop.offenses).each do |expected, actual|
-        expect_offense(expected, actual)
+        expect(actual.message).to eq(expected[:message])
+        expect(actual.severity).to eq(expected[:severity])
+        expect(actual.line).to eq(expected[:line])
+        expect(actual.column).to eq(expected[:column])
       end
     end
   end
@@ -172,7 +162,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
         "https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch",
       ]
       patch_urls.each do |patch_url|
-        source = <<-EOS.undent
+        source = <<~EOS
           class Foo < Formula
             homepage "ftp://example.com/foo"
             url "http://example.com/foo-1.0.tgz"
@@ -185,47 +175,47 @@ describe RuboCop::Cop::FormulaAudit::Patches do
 
         inspect_source(source)
         expected_offense = if patch_url =~ %r{/raw\.github\.com/}
-          [{ message: <<-EOS.undent.chomp,
-               GitHub/Gist patches should specify a revision:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            GitHub/Gist patches should specify a revision:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 16,
              source: source }]
         elsif patch_url =~ %r{macports/trunk}
-          [{ message: <<-EOS.undent.chomp,
-               MacPorts patches should specify a revision instead of trunk:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            MacPorts patches should specify a revision instead of trunk:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 37,
              source: source }]
         elsif patch_url =~ %r{^http://trac\.macports\.org}
-          [{ message: <<-EOS.undent.chomp,
-               Patches from MacPorts Trac should be https://, not http:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            Patches from MacPorts Trac should be https://, not http:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 9,
              source: source }]
         elsif patch_url =~ %r{^http://bugs\.debian\.org}
-          [{ message: <<-EOS.undent.chomp,
-               Patches from Debian should be https://, not http:
-               #{patch_url}
+          [{ message: <<~EOS.chomp,
+            Patches from Debian should be https://, not http:
+            #{patch_url}
              EOS
              severity: :convention,
              line: 5,
              column: 9,
              source: source }]
         elsif patch_url =~ %r{https?://patch-diff\.githubusercontent\.com/raw/(.+)/(.+)/pull/(.+)\.(?:diff|patch)}
-          [{ message: <<-EOS.undent,
-               use GitHub pull request URLs:
-                 https://github.com/foo/foo-bar/pull/100.patch
-               Rather than patch-diff:
-                 https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch
+          [{ message: <<~EOS,
+            use GitHub pull request URLs:
+              https://github.com/foo/foo-bar/pull/100.patch
+            Rather than patch-diff:
+              https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch
              EOS
              severity: :convention,
              line: 5,
@@ -233,7 +223,10 @@ describe RuboCop::Cop::FormulaAudit::Patches do
              source: source }]
         end
         expected_offense.zip([cop.offenses.last]).each do |expected, actual|
-          expect_offense(expected, actual)
+          expect(actual.message).to eq(expected[:message])
+          expect(actual.severity).to eq(expected[:severity])
+          expect(actual.line).to eq(expected[:line])
+          expect(actual.column).to eq(expected[:column])
         end
       end
     end

@@ -19,16 +19,48 @@ module Hardware
       end
 
       def arch_32_bit
-        :i386
+        if arm?
+          :arm
+        elsif intel?
+          :i386
+        elsif ppc?
+          :ppc32
+        else
+          :dunno
+        end
       end
 
       def arch_64_bit
-        :x86_64
+        if arm?
+          :arm64
+        elsif intel?
+          :x86_64
+        elsif ppc?
+          :ppc64
+        else
+          :dunno
+        end
+      end
+
+      def arch
+        case bits
+        when 32
+          arch_32_bit
+        when 64
+          arch_64_bit
+        else
+          :dunno
+        end
+      end
+
+      def universal_archs
+        [arch].extend ArchitectureListExtension
       end
 
       def type
         case RUBY_PLATFORM
         when /x86_64/, /i\d86/ then :intel
+        when /arm/ then :arm
         when /ppc\d+/ then :ppc
         else :dunno
         end
@@ -39,13 +71,16 @@ module Hardware
       end
 
       def cores
-        1
+        return @cores if @cores
+        @cores = Utils.popen_read("getconf", "_NPROCESSORS_ONLN").chomp.to_i
+        @cores = 1 unless $CHILD_STATUS.success?
+        @cores
       end
 
       def bits
-        case RUBY_PLATFORM
-        when /x86_64/, /ppc64/ then 64
-        when /i\d86/, /ppc/ then 32
+        @bits ||= case RUBY_PLATFORM
+        when /x86_64/, /ppc64/, /aarch64|arm64/ then 64
+        when /i\d86/, /ppc/, /arm/ then 32
         end
       end
 

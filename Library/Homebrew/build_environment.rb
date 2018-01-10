@@ -35,7 +35,7 @@ module Homebrew
   module_function
 
   def build_env_keys(env)
-    keys = %w[
+    %w[
       CC CXX LD OBJC OBJCXX
       HOMEBREW_CC HOMEBREW_CXX
       CFLAGS CXXFLAGS CPPFLAGS LDFLAGS SDKROOT MAKEFLAGS
@@ -46,9 +46,8 @@ module Homebrew
       HOMEBREW_SDKROOT HOMEBREW_BUILD_FROM_SOURCE
       MAKE GIT CPP
       ACLOCAL_PATH PATH CPATH
-    ]
-    keys += %w[LD_LIBRARY_PATH LD_RUN_PATH LD_PRELOAD LIBRARY_PATH] if OS.linux?
-    keys.select { |key| env.key?(key) }
+      LD_LIBRARY_PATH LD_RUN_PATH LD_PRELOAD LIBRARY_PATH
+    ].select { |key| env.key?(key) }
   end
 
   def dump_build_env(env, f = $stdout)

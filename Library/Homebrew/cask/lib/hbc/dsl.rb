@@ -232,12 +232,16 @@ module Hbc
       @staged_path = caskroom_path.join(cask_version.to_s)
     end
 
-    def caveats(*string, &block)
-      @caveats ||= []
+    def caveats(*strings, &block)
+      @caveats ||= DSL::Caveats.new(cask)
       if block_given?
-        @caveats << Hbc::Caveats.new(block)
-      elsif string.any?
-        @caveats << string.map { |s| s.to_s.sub(/[\r\n \t]*\Z/, "\n\n") }
+        @caveats.eval_caveats(&block)
+      elsif strings.any?
+        strings.each do |string|
+          @caveats.eval_caveats { string }
+        end
+      else
+        return @caveats.to_s
       end
       @caveats
     end

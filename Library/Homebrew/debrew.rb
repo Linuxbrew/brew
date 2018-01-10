@@ -9,7 +9,7 @@ module Debrew
   module Raise
     def raise(*)
       super
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       e.extend(Ignorable)
       super(e) unless Debrew.debug(e) == :ignore
     end
@@ -92,7 +92,7 @@ module Debrew
       yield
     rescue SystemExit
       original_raise
-    rescue Exception => e
+    rescue Exception => e # rubocop:disable Lint/RescueException
       debug(e)
     ensure
       @active = false
@@ -119,7 +119,7 @@ module Debrew
           if e.is_a?(Ignorable)
             menu.choice(:irb) do
               puts "When you exit this IRB session, execution will continue."
-              set_trace_func proc { |event, _, _, id, binding, klass|
+              set_trace_func proc { |event, _, _, id, binding, klass| # rubocop:disable Metrics/ParameterLists
                 if klass == Raise && id == :raise && event == "return"
                   set_trace_func(nil)
                   synchronize { IRB.start_within(binding) }

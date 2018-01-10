@@ -11,14 +11,6 @@ describe DependencyCollector do
     subject.requirements.find { |req| req.is_a? klass }
   end
 
-  def x_requirement
-    if OS.mac?
-      X11Requirement
-    else
-      XorgRequirement
-    end
-  end
-
   after(:each) do
     described_class.clear_cache
   end
@@ -37,8 +29,7 @@ describe DependencyCollector do
 
     specify "requirement creation" do
       subject.add :x11
-      req = x_requirement
-      expect(find_requirement(req)).to be_an_instance_of(req)
+      expect(find_requirement(X11Requirement)).to be_an_instance_of(X11Requirement)
     end
 
     it "deduplicates requirements" do
@@ -49,33 +40,33 @@ describe DependencyCollector do
     specify "requirement tags" do
       subject.add x11: "2.5.1"
       subject.add xcode: :build
-      expect(find_requirement(x_requirement).tags).to be_empty
+      expect(find_requirement(X11Requirement).tags).to be_empty
       expect(find_requirement(XcodeRequirement)).to be_a_build_requirement
     end
 
     specify "x11 without tag" do
       subject.add :x11
-      expect(find_requirement(x_requirement).tags).to be_empty
+      expect(find_requirement(X11Requirement).tags).to be_empty
     end
 
-    specify "x11 with minimum version", :needs_macos do
+    specify "x11 with (ignored) minimum version" do
       subject.add x11: "2.5.1"
-      expect(find_requirement(X11Requirement).min_version.to_s).to eq("2.5.1")
+      expect(find_requirement(X11Requirement).min_version.to_s).to_not eq("2.5.1")
     end
 
     specify "x11 with tag" do
       subject.add x11: :optional
-      expect(find_requirement(x_requirement)).to be_optional
+      expect(find_requirement(X11Requirement)).to be_optional
     end
 
-    specify "x11 with minimum version and tag", :needs_macos do
+    specify "x11 with (ignored) minimum version and tag" do
       subject.add x11: ["2.5.1", :optional]
       dep = find_requirement(X11Requirement)
-      expect(dep.min_version.to_s).to eq("2.5.1")
+      expect(dep.min_version.to_s).to_not eq("2.5.1")
       expect(dep).to be_optional
     end
 
-    specify "ant dependency" do
+    specify "ant dependency", :needs_compat do
       subject.add ant: :build
       expect(find_dependency("ant")).to eq(Dependency.new("ant", [:build]))
     end
@@ -91,6 +82,18 @@ describe DependencyCollector do
       resource = Resource.new
       resource.url("git://example.com/foo/bar.git")
       expect(subject.add(resource)).to be_an_instance_of(GitRequirement)
+    end
+
+    it "creates a resource dependency from a CVS URL" do
+      resource = Resource.new
+      resource.url(":pserver:anonymous:@example.com:/cvsroot/foo/bar", using: :cvs)
+      expect(subject.add(resource)).to eq(Dependency.new("cvs", [:build]))
+    end
+
+    it "creates a resource dependency from a Subversion URL" do
+      resource = Resource.new
+      resource.url("svn://example.com/foo/bar")
+      expect(subject.add(resource)).to be_an_instance_of(SubversionRequirement)
     end
 
     it "creates a resource dependency from a '.7z' URL" do

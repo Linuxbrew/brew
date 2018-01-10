@@ -6,7 +6,7 @@ describe Formulary do
   let(:formula_name) { "testball_bottle" }
   let(:formula_path) { CoreTap.new.formula_dir/"#{formula_name}.rb" }
   let(:formula_content) do
-    <<-EOS.undent
+    <<~EOS
       class #{subject.class_s(formula_name)} < Formula
         url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
         sha256 TESTBALL_SHA256
@@ -66,7 +66,7 @@ describe Formulary do
     context "if the Formula has the wrong class" do
       let(:formula_name) { "giraffe" }
       let(:formula_content) do
-        <<-EOS.undent
+        <<~EOS
           class Wrong#{subject.class_s(formula_name)} < Formula
           end
         EOS

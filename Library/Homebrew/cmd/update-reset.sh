@@ -1,7 +1,7 @@
-#: @hide_from_man_page
 #:  * `update-reset`:
 #:    Fetches and resets Homebrew and all tap repositories using `git`(1) to
-#:    their latest `origin/master`.
+#:    their latest `origin/master`. Note this will destroy all your uncommitted
+#:    or committed changes.
 
 homebrew-update-reset() {
   local DIR

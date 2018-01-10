@@ -24,15 +24,15 @@ module Homebrew
     if ARGV.include? "--installed"
       taps = Tap
     else
-      taps = ARGV.named.map do |name|
+      taps = ARGV.named.sort.map do |name|
         Tap.fetch(name)
       end
     end
 
     if ARGV.json == "v1"
-      print_tap_json(taps)
+      print_tap_json(taps.sort_by(&:to_s))
     else
-      print_tap_info(taps)
+      print_tap_info(taps.sort_by(&:to_s))
     end
   end
 

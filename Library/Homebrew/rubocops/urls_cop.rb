@@ -104,7 +104,7 @@ module RuboCop
             end
 
             if url =~ %r{^https?://prdownloads\.}
-              problem <<-EOS.undent.chomp
+              problem <<~EOS.chomp
                 Don't use prdownloads in SourceForge urls (url is #{url}).
                         See: http://librelist.com/browser/homebrew/2011/1/12/prdownloads-is-bad/
               EOS
@@ -121,7 +121,7 @@ module RuboCop
           # one out of the grab bag.
           unsecure_deb_pattern = %r{^http://http\.debian\.net/debian/(.*)}i
           audit_urls(urls, unsecure_deb_pattern) do |match, _|
-            problem <<-EOS.undent
+            problem <<~EOS
               Please use a secure mirror for Debian URLs.
               We recommend:
                 https://mirrors.ocf.berkeley.edu/debian/#{match[1]}
@@ -176,7 +176,7 @@ module RuboCop
           # Don't use GitHub codeload URLs
           codeload_gh_pattern = %r{https?://codeload\.github\.com/(.+)/(.+)/(?:tar\.gz|zip)/(.+)}
           audit_urls(urls, codeload_gh_pattern) do |match, url|
-            problem <<-EOS.undent
+            problem <<~EOS
               Use GitHub archive URLs:
                 https://github.com/#{match[1]}/#{match[2]}/archive/#{match[3]}.tar.gz
               Rather than codeload:

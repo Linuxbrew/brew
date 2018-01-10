@@ -5,15 +5,14 @@ module Hbc
     include Options
 
     option "--binarydir=PATH", (lambda do |*|
-      opoo <<-EOS.undent
+      opoo <<~EOS
         Option --binarydir is obsolete!
         Homebrew-Cask now uses the same location as your Homebrew installation for executable links.
       EOS
     end)
 
-    option "--caskroom=PATH", (lambda do |value|
-      Hbc.caskroom = value
-      odeprecated "`brew cask` with the `--caskroom` flag", disable_on: Time.utc(2017, 10, 31)
+    option "--caskroom=PATH", (lambda do |*|
+      odisabled "`brew cask` with the `--caskroom` flag"
     end)
   end
 end

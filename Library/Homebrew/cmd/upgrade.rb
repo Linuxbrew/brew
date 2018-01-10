@@ -1,5 +1,5 @@
 #:  * `upgrade` [<install-options>] [`--cleanup`] [`--fetch-HEAD`] [<formulae>]:
-#:    Upgrade outdated, unpinned brews.
+#:    Upgrade outdated, unpinned brews (with existing install options).
 #:
 #:    Options for the `install` command are also valid here.
 #:
@@ -26,7 +26,7 @@ module Homebrew
     Homebrew.perform_preinstall_checks
 
     if ARGV.include?("--all")
-      opoo <<-EOS.undent
+      opoo <<~EOS
         We decided to not change the behaviour of `brew upgrade` so
         `brew upgrade --all` is equivalent to `brew upgrade` without any other
         arguments (so the `--all` is a no-op and can be removed).
@@ -119,9 +119,13 @@ module Homebrew
       tab = Tab.for_keg(keg)
     end
 
+    build_options = BuildOptions.new(Options.create(ARGV.flags_only), f.options)
+    options = build_options.used_options
+    options |= f.build.used_options
+    options &= f.options
+
     fi = FormulaInstaller.new(f)
-    fi.options  = f.build.used_options
-    fi.options &= f.options
+    fi.options = options
     fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
     fi.installed_on_request = !ARGV.named.empty?
     fi.link_keg             = keg_was_linked if keg_had_linked_opt
@@ -150,6 +154,7 @@ module Homebrew
   rescue FormulaInstallationAlreadyAttemptedError
     # We already attempted to upgrade f as part of the dependency tree of
     # another formula. In that case, don't generate an error, just move on.
+    return
   rescue CannotInstallFormulaError => e
     ofail e
   rescue BuildError => e

@@ -35,7 +35,7 @@ begin
   Timeout.timeout TEST_TIMEOUT_SECONDS do
     raise "test returned false" if formula.run_test == false
   end
-rescue Exception => e
+rescue Exception => e # rubocop:disable Lint/RescueException
   Marshal.dump(e, error_pipe)
   error_pipe.close
   exit! 1

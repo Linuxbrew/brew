@@ -6,14 +6,14 @@ module Hbc
   class Container
     class GenericUnar < Base
       def self.me?(criteria)
-        !(lsar = which("lsar")).nil? &&
-          criteria.command.run(lsar,
-                               args:         ["-l", "-t", "--", criteria.path],
-                               print_stderr: false).stdout.chomp.end_with?("passed, 0 failed.")
+        return false unless lsar = which("lsar", PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
+        criteria.command.run(lsar,
+                             args:         ["-l", "-t", "--", criteria.path],
+                             print_stderr: false).stdout.chomp.end_with?("passed, 0 failed.")
       end
 
       def extract
-        if (unar = which("unar")).nil?
+        unless unar = which("unar", PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
           raise CaskError, "Expected to find unar executable. Cask #{@cask} must add: depends_on formula: 'unar'"
         end
 

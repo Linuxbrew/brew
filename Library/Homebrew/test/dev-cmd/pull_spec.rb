@@ -22,7 +22,7 @@ describe "brew pull", :integration_test do
       .and output(/Current branch is new\-branch/).to_stderr
       .and be_a_failure
 
-    expect { brew "pull", "--bump", "8" }
+    expect { brew "pull", "--bump", "https://github.com/Homebrew/homebrew-core/pull/8" }
       .to output(/Fetching patch/).to_stdout
       .and output(/No changed formulae found to bump/).to_stderr
       .and be_a_failure

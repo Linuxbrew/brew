@@ -67,9 +67,9 @@ module Homebrew
 
   def print_json
     ff = if ARGV.include? "--all"
-      Formula
+      Formula.sort
     elsif ARGV.include? "--installed"
-      Formula.installed
+      Formula.installed.sort
     else
       ARGV.formulae
     end
@@ -128,7 +128,7 @@ module Homebrew
       "#{c.name}#{reason}"
     end.sort!
     unless conflicts.empty?
-      puts <<-EOS.undent
+      puts <<~EOS
         Conflicts with:
           #{conflicts.join("\n  ")}
       EOS

@@ -186,10 +186,11 @@ class Pathname
       begin
         tf.chown(uid, gid)
         tf.chmod(old_stat.mode)
-      rescue Errno::EPERM
+      rescue Errno::EPERM # rubocop:disable Lint/HandleExceptions
       end
 
-      # Close the file before rename to prevent the error: Device or resource busy
+      # Close the file before renaming to prevent the error: Device or resource busy
+      # Affects primarily NFS.
       tf.close
       File.rename(tf.path, self)
     ensure
@@ -306,17 +307,6 @@ class Pathname
   end
 
   # @private
-  def elf?
-    read(4) == "\x7fELF"
-  end
-
-  # @private
-  def dynamic?
-    @which_file ||= which("file")
-    !@which_file.nil? && `#{@which_file} -b #{self}` =~ /dynamic|shared/
-  end
-
-  # @private
   def text_executable?
     /^#!\s*\S+/ =~ open("r") { |f| f.read(1024) }
   end
@@ -389,7 +379,7 @@ class Pathname
     saved_perms = nil
     unless writable_real?
       saved_perms = stat.mode
-      chmod 0644 | saved_perms
+      FileUtils.chmod "u+rw", to_path
     end
     yield
   ensure
@@ -416,7 +406,7 @@ class Pathname
     mkpath
     targets.each do |target|
       target = Pathname.new(target) # allow pathnames or strings
-      join(target.basename).write <<-EOS.undent
+      join(target.basename).write <<~EOS
         #!/bin/bash
         exec "#{target}" "$@"
       EOS
@@ -428,9 +418,9 @@ class Pathname
     env_export = ""
     env.each { |key, value| env_export += "#{key}=\"#{value}\" " }
     dirname.mkpath
-    write <<-EOS.undent
-    #!/bin/bash
-    #{env_export}exec "#{target}" "$@"
+    write <<~EOS
+      #!/bin/bash
+      #{env_export}exec "#{target}" "$@"
     EOS
   end
 
@@ -448,7 +438,7 @@ class Pathname
   # Writes an exec script that invokes a java jar
   def write_jar_script(target_jar, script_name, java_opts = "")
     mkpath
-    join(script_name).write <<-EOS.undent
+    join(script_name).write <<~EOS
       #!/bin/bash
       exec java #{java_opts} -jar #{target_jar} "$@"
     EOS
@@ -480,7 +470,13 @@ class Pathname
       end
     }
   end
+
+  def mach_o_bundle?
+    false
+  end
 end
+
+require "extend/os/pathname"
 
 # @private
 module ObserverPathnameExtension
