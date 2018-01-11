@@ -2194,29 +2194,21 @@ class Formula
     # <pre># If a dependency is only needed in certain cases:
     # depends_on "sqlite" if MacOS.version == :leopard
     # depends_on :xcode # If the formula really needs full Xcode.
-    # depends_on :tex # Homebrew does not provide a Tex Distribution.
-    # depends_on :fortran # Checks that `gfortran` is available or `FC` is set.
-    # depends_on :mpi => :cc # Needs MPI with `cc`
-    # depends_on :mpi => [:cc, :cxx, :optional] # Is optional. MPI with `cc` and `cxx`.
     # depends_on :macos => :lion # Needs at least OS X Lion (10.7).
-    # depends_on :apr # If a formula requires the CLT-provided apr library to exist.
     # depends_on :arch => :intel # If this formula only builds on Intel architecture.
     # depends_on :arch => :x86_64 # If this formula only builds on Intel x86 64-bit.
     # depends_on :arch => :ppc # Only builds on PowerPC?
     # depends_on :ld64 # Sometimes ld fails on `MacOS.version < :leopard`. Then use this.
-    # depends_on :x11 # X11/XQuartz components.
+    # depends_on :x11 => :optional # X11/XQuartz components.
     # depends_on :osxfuse # Permits the use of the upstream signed binary or our source package.
     # depends_on :tuntap # Does the same thing as above. This is vital for Yosemite and above.
-    # depends_on "mysql" => :recommended</pre>
     # <pre># It is possible to only depend on something if
     # # `build.with?` or `build.without? "another_formula"`:
-    # depends_on "mysql" # allows brewed or external mysql to be used
     # depends_on "postgresql" if build.without? "sqlite"
-    # depends_on "hg" # Mercurial (external or brewed) is needed</pre>
     #
-    # <pre># If any Python >= 2.7 < 3.x is okay (either from macOS or brewed):
+    # <pre># Python 2.7:
     # depends_on "python"</pre>
-    # <pre># to depend on Python >= 2.7 but use system Python where possible
+    # <pre># Python 2.7 but use system Python where possible
     # depends_on "python" if MacOS.version <= :snow_leopard</pre>
     # <pre># Python 3.x if the `--with-python3` is given to `brew install example`
     # depends_on "python3" => :optional</pre>
