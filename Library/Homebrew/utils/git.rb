@@ -60,6 +60,12 @@ module Utils
     raise "Git is unavailable" unless git_available?
   end
 
+  def self.with_homebrew_gitconfig
+    with_env(HOME: HOMEBREW_LIBRARY/"Homebrew/gitconfig") do
+      yield if block_given?
+    end
+  end
+
   def self.clear_git_available_cache
     @git = nil
     @git_path = nil
