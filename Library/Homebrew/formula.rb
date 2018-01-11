@@ -2207,19 +2207,19 @@ class Formula
     # depends_on :x11 # X11/XQuartz components.
     # depends_on :osxfuse # Permits the use of the upstream signed binary or our source package.
     # depends_on :tuntap # Does the same thing as above. This is vital for Yosemite and above.
-    # depends_on :mysql => :recommended</pre>
+    # depends_on "mysql" => :recommended</pre>
     # <pre># It is possible to only depend on something if
     # # `build.with?` or `build.without? "another_formula"`:
-    # depends_on :mysql # allows brewed or external mysql to be used
-    # depends_on :postgresql if build.without? "sqlite"
-    # depends_on :hg # Mercurial (external or brewed) is needed</pre>
+    # depends_on "mysql" # allows brewed or external mysql to be used
+    # depends_on "postgresql" if build.without? "sqlite"
+    # depends_on "hg" # Mercurial (external or brewed) is needed</pre>
     #
     # <pre># If any Python >= 2.7 < 3.x is okay (either from macOS or brewed):
-    # depends_on :python</pre>
+    # depends_on "python"</pre>
     # <pre># to depend on Python >= 2.7 but use system Python where possible
-    # depends_on :python if MacOS.version <= :snow_leopard</pre>
+    # depends_on "python" if MacOS.version <= :snow_leopard</pre>
     # <pre># Python 3.x if the `--with-python3` is given to `brew install example`
-    # depends_on :python3 => :optional</pre>
+    # depends_on "python3" => :optional</pre>
     def depends_on(dep)
       specs.each { |spec| spec.depends_on(dep) }
     end
