@@ -2,10 +2,13 @@ require "pathname"
 require "open3"
 
 def curl_executable
-  curl = Pathname.new ENV["HOMEBREW_CURL"]
-  curl = which("curl") unless curl.exist?
-  return curl if curl.executable?
-  raise "#{curl} is not executable"
+  @curl ||= [
+    ENV["HOMEBREW_CURL"],
+    which("curl"),
+    "/usr/bin/curl",
+  ].map { |c| Pathname(c) }.find(&:executable?)
+  raise "curl is not executable" unless @curl
+  @curl
 end
 
 def curl_args(*extra_args, show_output: false, user_agent: :default)
