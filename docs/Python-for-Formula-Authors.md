@@ -24,7 +24,7 @@ depends_on "python" if MacOS.version <= :snow_leopard
 
 No explicit Python dependency is needed on recent OS versions since `/usr/bin` is always in `PATH` for Homebrew formulae; on Leopard and older, the `python` in `PATH` is used if it's at least version 2.7, or else Homebrew's Python 2.7.x is installed.
 
-Formulae for apps that require Python 3 **should** declare an unconditional dependency on `"python3"`, which will cause the formula to use the first `python3` discovered in `PATH` at install time (or install Homebrew's if there isn't one). These apps **must** work with the current Homebrew Python 3.x formula.
+Formulae for apps that require Python 3 **should** declare an unconditional dependency on `"python3"`. These apps **must** work with the current Homebrew Python 3.x formula.
 
 ### Installing
 
@@ -153,7 +153,7 @@ Sometimes we have to `inreplace` a `Makefile` to use our prefix for the Python b
 
 ### Python declarations
 
-Python 2 libraries do not need a `depends_on "python"` declaration; they will be built with the system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/). Libraries built for Python 3 should include `depends_on "python3"`, which will bottle against Homebrew's Python 3.x, and use the first `python3` discovered in `PATH` at build time when installing from source with `brew install --build-from-source`. If a library supports both Python 2.x and Python 3.x, the `"python3"` dependency should be `:optional`. Python 2.x libraries must function when they are installed against either the system Python or brewed Python.
+Python 2 libraries do not need a `depends_on "python"` declaration; they will be built with the system Python, but should still be usable with any other Python 2.7. If this is not the case, it is an upstream bug; [here is some advice for resolving it](http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/). Libraries built for Python 3 should include `depends_on "python3"`, which will bottle against Homebrew's Python 3.x. If a library supports both Python 2.x and Python 3.x, the `"python3"` dependency should be `:optional`. Python 2.x libraries must function when they are installed against either the system Python or brewed Python.
 
 ### Installing
 
