@@ -89,4 +89,4 @@ Homebrew will still install Python modules into Homebrew's `site-packages` and *
 Virtualenv has a `--system-site-packages` switch to allow "global" (i.e. Homebrew's) `site-packages` to be accessible from within the virtualenv.
 
 ## Why is Homebrew's Python being installed as a dependency?
-Formulae that declare an unconditional dependency on the `"python"` or `"python3"` formulae are bottled against Homebrew's Python 2.7.x or 3.x and require it to be installed. You can avoid installing Homebrew's Python by running `brew install --build-from-source <formula>`.
+Formulae that declare an unconditional dependency on the `"python"` or `"python3"` formulae are bottled against Homebrew's Python 2.7.x or 3.x and require it to be installed.
