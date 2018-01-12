@@ -51,7 +51,7 @@ __brewcomp() {
 __brew_complete_formulae() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local formulas="$(brew search)"
-  local shortnames="$(echo "$formulas" | grep / | cut -d / -f 3)"
+  local shortnames="$(echo "$formulas" | \grep / | \cut -d / -f 3)"
   COMPREPLY=($(compgen -W "$formulas $shortnames" -- "$cur"))
 }
 
@@ -593,7 +593,7 @@ __brew_cask_complete_formulae ()
     local lib=$(brew --repository)/Library
     local taps=${lib}/Taps
     local casks=${lib}/Taps/caskroom/homebrew-cask/Casks
-    local ff=$(\ls ${casks} 2>/dev/null | sed 's/\.rb//g')
+    local ff=$(\ls ${casks} 2>/dev/null | \sed 's/\.rb//g')
 
     COMPREPLY=($(compgen -W "$ff" -- "$cur"))
 }
@@ -738,7 +738,7 @@ _brew() {
   then
     # Do not auto-complete "*instal" or "*uninstal" aliases for "*install" commands.
     # Prefix newline to prevent not checking the first command.
-    local cmds=$'\n'"$(brew commands --quiet --include-aliases | grep -v instal$)"
+    local cmds=$'\n'"$(brew commands --quiet --include-aliases | \grep -v instal$)"
     __brewcomp "${cmds}"
     return
   fi
