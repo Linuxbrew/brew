@@ -638,17 +638,53 @@ _brew_cask_fetch ()
     __brew_cask_complete_formulae
 }
 
+_brew_cask_install ()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local prv=$(__brew_caskcomp_prev)
+    case "$cur" in
+    -*)
+        __brew_caskcomp "--force --skip-cask-deps --require-sha --language"
+        return
+        ;;
+    esac
+    __brew_cask_complete_formulae
+}
+
 _brew_cask_list ()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
-
     case "$cur" in
     -*)
-        __brew_caskcomp "-1 -l --versions"
+        __brew_caskcomp "-1 --versions"
         return
         ;;
     esac
 
+    __brew_cask_complete_installed
+}
+
+_brew_cask_outdated ()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    case "$cur" in
+    -*)
+        __brew_caskcomp "--greedy --verbose --quiet"
+        return
+        ;;
+    esac
+    __brew_cask_complete_installed
+}
+
+_brew_cask_style ()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    case "$cur" in
+    -*)
+        __brew_caskcomp "--fix"
+        return
+        ;;
+    esac
     __brew_cask_complete_installed
 }
 
@@ -662,6 +698,18 @@ _brew_cask_uninstall ()
         ;;
     esac
     __brew_cask_complete_installed
+}
+
+_brew_cask_upgrade ()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    case "$cur" in
+    -*)
+        __brew_caskcomp "--force --greedy"
+        return
+        ;;
+    esac
+    __brew_cask_complete_installed    
 }
 
 _brew_cask ()
@@ -689,24 +737,30 @@ _brew_cask ()
     done
 
     if [[ $i -eq $COMP_CWORD ]]; then
-        __brew_caskcomp "abv audit cat cleanup create doctor edit fetch home info install list ls remove rm search uninstall zap -S --force --caskroom --verbose --appdir --colorpickerdir --prefpanedir --qlplugindir --fontdir --servicedir --input_methoddir --internet_plugindir --screen_saverdir --no-binaries --binarydir --debug"
+        __brew_caskcomp "abv audit cat cleanup create doctor edit fetch home info install list ls outdated reinstall remove rm search style uninstall upgrade zap -S --force --caskroom --verbose --appdir --colorpickerdir --prefpanedir --qlplugindir --fontdir --servicedir --input_methoddir --internet_plugindir --screen_saverdir --no-binaries --debug --version"
         return
     fi
 
     # subcommands have their own completion functions
     case "$cmd" in
+      --version)              __brewcomp_null ;;
       audit)                  __brew_cask_complete_formulae ;;
       cat)                    __brew_cask_complete_formulae ;;
       cleanup)                _brew_cask_cleanup ;;
-      doctor)                 ;;
+      create)                 ;;
+      doctor)                 __brewcomp_null ;;
       edit)                   __brew_cask_complete_formulae ;;
       fetch)                  _brew_cask_fetch ;;
       home)                   __brew_cask_complete_formulae ;;
       info|abv)               __brew_cask_complete_formulae ;;
-      install|instal)         __brew_cask_complete_formulae ;;
+      install|instal)         _brew_cask_install ;;
       list|ls)                _brew_cask_list ;;
-      search)                 ;;
+      outdated)               _brew_cask_outdated ;;
+      reinstall)              __brew_cask_complete_installed ;;
+      search)                 __brewcomp_null ;;
+      style)                  _brew_cask_style ;;
       uninstall|remove|rm)    _brew_cask_uninstall ;;
+      upgrade)                _brew_cask_upgrade ;;
       zap)                    __brew_cask_complete_caskroom ;;
       *)                      ;;
     esac
