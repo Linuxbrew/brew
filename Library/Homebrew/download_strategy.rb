@@ -306,6 +306,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     url_pathname = Pathname.new(@url)
     until ext = url_pathname.extname[/[^?]+/]
       url_pathname = url_pathname.dirname
+      return if url_pathname.to_s == "."
     end
     ext
   end
