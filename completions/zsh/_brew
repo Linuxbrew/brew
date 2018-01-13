@@ -711,7 +711,7 @@ _brew_uninstall() {
 # brew unlink [--dry-run] formula:
 _brew_unlink() {
   _arguments \
-    '(--dry-run =n)'{--dry-run,=n}'[don''t unlink or delete any files]' \
+    '(--dry-run -n)'{--dry-run,-n}'[don''t unlink or delete any files]' \
     ':formula:__brew_installed_formulae'
 }
 
@@ -719,7 +719,7 @@ _brew_unlink() {
 _brew_unlinkapps() {
   _arguments \
     '(--local)--local[remove symlinks from ~/Applications instead of the system directory]' \
-    '(--dry-run =n)'{--dry-run,-n}'[don''t unlink or delete any files]' \
+    '(--dry-run -n)'{--dry-run,-n}'[don''t unlink or delete any files]' \
     ':formula:__brew_installed_formulae'
 }
 
