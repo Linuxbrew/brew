@@ -62,8 +62,7 @@ class LinkageChecker
       formula.build.without?(dep)
     end
     declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
-    declared_requirement_deps = formula.requirements.reject { |req| filter_out.call(req) }.map(&:default_formula).compact
-    declared_dep_names = (declared_deps + declared_requirement_deps).map { |dep| dep.split("/").last }
+    declared_dep_names = declared_deps.map { |dep| dep.split("/").last }
     undeclared_deps = @brewed_dylibs.keys.reject do |full_name|
       name = full_name.split("/").last
       next true if name == formula.name

@@ -1486,15 +1486,10 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    runtime_dependencies = recursive_dependencies do |_, dependency|
+    recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
       Dependency.prune if !dependency.required? && build.without?(dependency)
     end
-    runtime_requirement_deps = recursive_requirements do |_, requirement|
-      Requirement.prune if requirement.build?
-      Requirement.prune if !requirement.required? && build.without?(requirement)
-    end.map(&:to_dependency).compact
-    runtime_dependencies + runtime_requirement_deps
   end
 
   # Returns a list of formulae depended on by this formula that aren't
@@ -1552,7 +1547,6 @@ class Formula
     hsh["requirements"] = requirements.map do |req|
       {
         "name" => req.name,
-        "default_formula" => req.default_formula,
         "cask" => req.cask,
         "download" => req.download,
       }
