@@ -28,6 +28,8 @@ EOS
     set -x
   fi
 
+  export HOME="$HOMEBREW_LIBRARY/Homebrew/gitconfig"
+
   for DIR in "$HOMEBREW_REPOSITORY" "$HOMEBREW_LIBRARY"/Taps/*/*
   do
     [[ -d "$DIR/.git" ]] || continue
