@@ -613,6 +613,13 @@ __brew_cask_complete_caskroom ()
     COMPREPLY=($(compgen -W "$files" -- "$cur"))
 }
 
+__brew_cask_complete_outdated ()
+{
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local outdated=$(brew cask outdated --quiet)
+    COMPREPLY=($(compgen -W "$outdated" -- "$cur"))
+}
+
 _brew_cask_cleanup ()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -709,7 +716,7 @@ _brew_cask_upgrade ()
         return
         ;;
     esac
-    __brew_cask_complete_installed    
+    __brew_cask_complete_outdated    
 }
 
 _brew_cask ()
