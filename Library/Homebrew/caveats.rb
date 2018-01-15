@@ -108,13 +108,23 @@ class Caveats
     end
   end
 
+  def python
+    @python ||= if OS.mac?
+      "python"
+    else
+      which("#{HOMEBREW_PREFIX}/opt/python/bin/python2") ||
+        which("python") || which("python2") || which("python2.7")
+    end
+  end
+
   def python_caveats
     return unless keg
     return unless keg.python_site_packages_installed?
+    return unless python&.executable?
 
     s = nil
     homebrew_site_packages = Language::Python.homebrew_site_packages
-    user_site_packages = Language::Python.user_site_packages "python"
+    user_site_packages = Language::Python.user_site_packages python
     pth_file = user_site_packages/"homebrew.pth"
     instructions = <<~EOS.gsub(/^/, "  ")
       mkdir -p #{user_site_packages}
@@ -123,19 +133,19 @@ class Caveats
 
     if f.keg_only?
       keg_site_packages = f.opt_prefix/"lib/python2.7/site-packages"
-      unless Language::Python.in_sys_path?("python", keg_site_packages)
+      unless Language::Python.in_sys_path?(python, keg_site_packages)
         s = <<~EOS
           If you need Python to find bindings for this keg-only formula, run:
             echo #{keg_site_packages} >> #{homebrew_site_packages/f.name}.pth
         EOS
-        s += instructions unless Language::Python.reads_brewed_pth_files?("python")
+        s += instructions unless Language::Python.reads_brewed_pth_files?(python)
       end
       return s
     end
 
-    return if Language::Python.reads_brewed_pth_files?("python")
+    return if Language::Python.reads_brewed_pth_files?(python)
 
-    if !Language::Python.in_sys_path?("python", homebrew_site_packages)
+    if !Language::Python.in_sys_path?(python, homebrew_site_packages)
       s = <<~EOS
         Python modules have been installed and Homebrew's site-packages is not
         in your Python sys.path, so you will not be able to import the modules
