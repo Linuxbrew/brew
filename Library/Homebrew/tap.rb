@@ -230,7 +230,7 @@ class Tap
       ohai "Unshallowing #{name}" unless quiet
       args = %w[fetch --unshallow]
       args << "-q" if quiet
-      Utils.with_homebrew_gitconfig { path.cd { safe_system "git", *args } }
+      path.cd { safe_system "git", *args }
       return
     end
 
@@ -242,7 +242,7 @@ class Tap
     args << "-q" if quiet
 
     begin
-      Utils.with_homebrew_gitconfig { safe_system "git", *args }
+      safe_system "git", *args
       unless Readall.valid_tap?(self, aliases: true)
         unless ARGV.homebrew_developer?
           raise "Cannot tap #{name}: invalid syntax in tap!"
