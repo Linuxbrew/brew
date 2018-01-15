@@ -19,11 +19,7 @@ git() {
   then
     GIT_EXECUTABLE="$("$HOMEBREW_LIBRARY/Homebrew/shims/scm/git" --homebrew=print-path)"
   fi
-  OLDHOME="$HOME"
-  export HOME="$HOMEBREW_LIBRARY/Homebrew/gitconfig"
   "$GIT_EXECUTABLE" "$@"
-  export HOME="$OLDHOME"
-  unset OLDHOME
 }
 
 git_init_if_necessary() {

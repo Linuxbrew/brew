@@ -39,6 +39,6 @@ module Homebrew
     end
     args = ARGV.options_only
     args += ["--follow", "--", path] unless path.nil?
-    Utils.with_homebrew_gitconfig { exec "git", "log", *args }
+    exec "git", "log", *args
   end
 end

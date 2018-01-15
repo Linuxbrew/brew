@@ -793,19 +793,15 @@ class GitDownloadStrategy < VCSDownloadStrategy
   def update_repo
     return unless @ref_type == :branch || !ref?
 
-    Utils.with_homebrew_gitconfig do
-      if !shallow_clone? && shallow_dir?
-        quiet_safe_system "git", "fetch", "origin", "--unshallow"
-      else
-        quiet_safe_system "git", "fetch", "origin"
-      end
+    if !shallow_clone? && shallow_dir?
+      quiet_safe_system "git", "fetch", "origin", "--unshallow"
+    else
+      quiet_safe_system "git", "fetch", "origin"
     end
   end
 
   def clone_repo
-    Utils.with_homebrew_gitconfig do
-      safe_system "git", *clone_args
-    end
+    safe_system "git", *clone_args
     cached_location.cd do
       safe_system "git", "config", "homebrew.cacheversion", cache_version
       checkout
@@ -815,9 +811,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def checkout
     ohai "Checking out #{@ref_type} #{@ref}" if @ref_type && @ref
-    Utils.with_homebrew_gitconfig do
-      quiet_safe_system "git", "checkout", "-f", @ref, "--"
-    end
+    quiet_safe_system "git", "checkout", "-f", @ref, "--"
   end
 
   def reset_args
@@ -836,10 +830,8 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def update_submodules
-    Utils.with_homebrew_gitconfig do
-      quiet_safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
-      quiet_safe_system "git", "submodule", "update", "--init", "--recursive"
-    end
+    quiet_safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
+    quiet_safe_system "git", "submodule", "update", "--init", "--recursive"
     fix_absolute_submodule_gitdir_references!
   end
 
