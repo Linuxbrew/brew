@@ -1,27 +1,56 @@
 require "set"
 require "keg"
 require "formula"
+require "os/mac/cache_store"
 
 class LinkageChecker
-  attr_reader :keg, :formula
-  attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :variable_dylibs
-  attr_reader :undeclared_deps, :unnecessary_deps, :reverse_links
+  attr_reader :keg, :formula, :store
 
-  def initialize(keg, formula = nil)
+  def initialize(keg, db, formula = nil)
     @keg = keg
     @formula = formula || resolve_formula(keg)
-    @brewed_dylibs = Hash.new { |h, k| h[k] = Set.new }
-    @system_dylibs = Set.new
-    @broken_dylibs = Set.new
-    @variable_dylibs = Set.new
-    @indirect_deps = []
-    @undeclared_deps = []
-    @reverse_links = Hash.new { |h, k| h[k] = Set.new }
-    @unnecessary_deps = []
-    check_dylibs
+    @store = LinkageStore.new(keg.name, db)
   end
 
-  def check_dylibs
+  # 'Hash-type' cache values
+
+  def brewed_dylibs
+    @brewed_dylibs ||= store.fetch(type: "brewed_dylibs")
+  end
+
+  def reverse_links
+    @reverse_links ||= store.fetch(type: "reverse_links")
+  end
+
+  # 'Path-type' cached values
+
+  def system_dylibs
+    @system_dylibs ||= store.fetch(type: "system_dylibs")
+  end
+
+  def broken_dylibs
+    @broken_dylibs ||= store.fetch(type: "broken_dylibs")
+  end
+
+  def variable_dylibs
+    @variable_dylibs ||= store.fetch(type: "variable_dylibs")
+  end
+
+  def undeclared_deps
+    @undeclared_deps ||= store.fetch(type: "undeclared_deps")
+  end
+
+  def indirect_deps
+    @indirect_deps ||= store.fetch(type: "indirect_deps")
+  end
+
+  def unnecessary_deps
+    @unnecessary_deps ||= store.fetch(type: "unnecessary_deps")
+  end
+
+  def flush_cache_and_check_dylibs
+    reset_dylibs!
+
     @keg.find do |file|
       next if file.symlink? || file.directory?
       next unless file.dylib? || file.binary_executable? || file.mach_o_bundle?
@@ -54,6 +83,7 @@ class LinkageChecker
     end
 
     @indirect_deps, @undeclared_deps, @unnecessary_deps = check_undeclared_deps if formula
+    store_dylibs!
   end
 
   def check_undeclared_deps
@@ -99,18 +129,18 @@ class LinkageChecker
   end
 
   def display_normal_output
-    display_items "System libraries", @system_dylibs
-    display_items "Homebrew libraries", @brewed_dylibs
-    display_items "Indirect dependencies with linkage", @indirect_deps
-    display_items "Variable-referenced libraries", @variable_dylibs
-    display_items "Missing libraries", @broken_dylibs
-    display_items "Undeclared dependencies with linkage", @undeclared_deps
-    display_items "Dependencies with no linkage", @unnecessary_deps
+    display_items "System libraries", system_dylibs
+    display_items "Homebrew libraries", brewed_dylibs
+    display_items "Indirect dependencies with linkage", indirect_deps
+    display_items "Variable-referenced libraries", variable_dylibs
+    display_items "Missing libraries", broken_dylibs
+    display_items "Undeclared dependencies with linkage", undeclared_deps
+    display_items "Dependencies with no linkage", unnecessary_deps
   end
 
   def display_reverse_output
-    return if @reverse_links.empty?
-    sorted = @reverse_links.sort
+    return if reverse_links.empty?
+    sorted = reverse_links.sort
     sorted.each do |dylib, files|
       puts dylib
       files.each do |f|
@@ -122,21 +152,21 @@ class LinkageChecker
   end
 
   def display_test_output
-    display_items "Missing libraries", @broken_dylibs
-    display_items "Possible unnecessary dependencies", @unnecessary_deps
-    puts "No broken dylib links" if @broken_dylibs.empty?
+    display_items "Missing libraries", broken_dylibs
+    display_items "Possible unnecessary dependencies", unnecessary_deps
+    puts "No broken dylib links" if broken_dylibs.empty?
   end
 
   def broken_dylibs?
-    !@broken_dylibs.empty?
+    !broken_dylibs.empty?
   end
 
   def undeclared_deps?
-    !@undeclared_deps.empty?
+    !undeclared_deps.empty?
   end
 
   def unnecessary_deps?
-    !@unnecessary_deps.empty?
+    !unnecessary_deps.empty?
   end
 
   private
@@ -174,5 +204,40 @@ class LinkageChecker
     Formulary.from_keg(keg)
   rescue FormulaUnavailableError
     opoo "Formula unavailable: #{keg.name}"
+  end
+
+  # Helper function to reset dylib values when building cache
+  #
+  # @return [nil]
+  def reset_dylibs!
+    store.flush_cache!
+    @system_dylibs    = Set.new
+    @broken_dylibs    = Set.new
+    @variable_dylibs  = Set.new
+    @brewed_dylibs    = Hash.new { |h, k| h[k] = Set.new }
+    @reverse_links    = Hash.new { |h, k| h[k] = Set.new }
+    @indirect_deps    = []
+    @undeclared_deps  = []
+    @unnecessary_deps = []
+  end
+
+  # Updates data store with package path values
+  #
+  # @return [nil]
+  def store_dylibs!
+    store.update!(
+      path_values: {
+        "system_dylibs"    => @system_dylibs,
+        "variable_dylibs"  => @variable_dylibs,
+        "broken_dylibs"    => @broken_dylibs,
+        "indirect_deps"    => @indirect_deps,
+        "undeclared_deps"  => @undeclared_deps,
+        "unnecessary_deps" => @unnecessary_deps,
+      },
+      hash_values: {
+        "brewed_dylibs"    => @brewed_dylibs,
+        "reverse_links"    => @reverse_links,
+      },
+    )
   end
 end

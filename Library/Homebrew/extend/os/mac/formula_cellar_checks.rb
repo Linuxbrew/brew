@@ -64,7 +64,10 @@ module FormulaCellarChecks
   def check_linkage
     return unless formula.prefix.directory?
     keg = Keg.new(formula.prefix)
-    checker = LinkageChecker.new(keg, formula)
+    database_cache = DatabaseCache.new("linkage")
+    checker = LinkageChecker.new(keg, database_cache, formula)
+    checker.flush_cache_and_check_dylibs
+    database_cache.close
 
     return unless checker.broken_dylibs?
     output = <<~EOS
