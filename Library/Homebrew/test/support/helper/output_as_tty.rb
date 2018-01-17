@@ -19,7 +19,7 @@ module Test
           return super(block) unless @tty
 
           colored_tty_block = lambda do
-            instance_eval("$#{@output}").extend(Module.new do
+            instance_eval("$#{@output}", __FILE__, __LINE__).extend(Module.new do
               def tty?
                 true
               end
@@ -32,7 +32,7 @@ module Test
           return super(colored_tty_block) if @colors
 
           uncolored_tty_block = lambda do
-            instance_eval <<-EOS
+            instance_eval <<-EOS, __FILE__, __LINE__ + 1
               begin
                 captured_stream = StringIO.new
 

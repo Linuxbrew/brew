@@ -232,8 +232,9 @@ describe Hbc::DSL, :cask do
       expect(cask.caveats).to be_empty
 
       cask = Hbc::Cask.new("cask-with-caveats") do
-        def caveats; <<~EOS
-          When you install this Cask, you probably want to know this.
+        def caveats
+          <<~EOS
+            When you install this Cask, you probably want to know this.
           EOS
         end
       end
