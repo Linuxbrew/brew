@@ -14,6 +14,7 @@ require "tap"
 require "keg"
 require "migrator"
 require "extend/ENV"
+require "language/python"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.

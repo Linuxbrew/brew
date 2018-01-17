@@ -1,76 +1,134 @@
 require "requirements"
-require "compat/requirements/emacs_requirement"
-require "compat/requirements/fortran_requirement"
 require "compat/requirements/language_module_requirement"
-require "compat/requirements/mpi_requirement"
-require "compat/requirements/perl_requirement"
-require "compat/requirements/python_requirement"
-require "compat/requirements/ruby_requirement"
-require "compat/requirements/tex_requirement"
-
-class MysqlRequirement < Requirement
-  fatal true
-  default_formula "mysql"
-  satisfy { which "mysql_config" }
-end
-
-class PostgresqlRequirement < Requirement
-  fatal true
-  default_formula "postgresql"
-  satisfy { which "pg_config" }
-end
-
-class RbenvRequirement < Requirement
-  fatal true
-  default_formula "rbenv"
-  satisfy { which "rbenv" }
-end
 
 class CVSRequirement < Requirement
   fatal true
-  default_formula "cvs"
-  satisfy { which "cvs" }
+  satisfy do
+    odeprecated("CVSRequirement", "'depends_on \"cvs\"'")
+    which "cvs"
+  end
 end
 
-class MercurialRequirement < Requirement
+class EmacsRequirement < Requirement
   fatal true
-  default_formula "mercurial"
-  satisfy { which "hg" }
+  satisfy do
+    odeprecated("EmacsRequirement", "'depends_on \"cvs\"'")
+    which "emacs"
+  end
 end
 
-class GPG2Requirement < Requirement
+class FortranRequirement < Requirement
   fatal true
-  default_formula "gnupg"
-  satisfy { which "gpg" }
+  satisfy do
+    odeprecated("FortranRequirement", "'depends_on \"cvs\"'")
+    which "gfortran"
+  end
 end
 
 class GitRequirement < Requirement
   fatal true
-  default_formula "git"
-  satisfy { Utils.git_available? }
+  satisfy do
+    odeprecated("GitRequirement", "'depends_on \"cvs\"'")
+    which "git"
+  end
+end
+
+class GPG2Requirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("GPG2Requirement", "'depends_on \"cvs\"'")
+    which "gpg"
+  end
+end
+
+class MercurialRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("MercurialRequirement", "'depends_on \"cvs\"'")
+    which "hg"
+  end
+end
+
+class MPIRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("MPIRequirement", "'depends_on \"cvs\"'")
+    which "mpicc"
+  end
+end
+
+class MysqlRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("MysqlRequirement", "'depends_on \"cvs\"'")
+    which "mysql_config"
+  end
+end
+
+class PerlRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("PerlRequirement", "'depends_on \"cvs\"'")
+    which "perl"
+  end
+end
+
+class PostgresqlRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("PostgresqlRequirement", "'depends_on \"cvs\"'")
+    which "pg_config"
+  end
+end
+
+class PythonRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("PythonRequirement", "'depends_on \"cvs\"'")
+    which "python"
+  end
+end
+
+class Python3Requirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("Python3Requirement", "'depends_on \"cvs\"'")
+    which "python3"
+  end
+end
+
+class RbenvRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("RbenvRequirement", "'depends_on \"cvs\"'")
+    which "rbenv"
+  end
+end
+
+class RubyRequirement < Requirement
+  fatal true
+  satisfy do
+    odeprecated("RubyRequirement", "'depends_on \"cvs\"'")
+    which "ruby"
+  end
 end
 
 class SubversionRequirement < Requirement
   fatal true
-  default_formula "subversion"
-  satisfy { Utils.svn_available? }
+  satisfy do
+    odeprecated("SubversionRequirement", "'depends_on \"cvs\"'")
+    which "svn"
+  end
 end
 
-XcodeDependency            = XcodeRequirement
-MysqlDependency            = MysqlRequirement
-PostgresqlDependency       = PostgresqlRequirement
-GPGDependency              = GPG2Requirement
-GPGRequirement             = GPG2Requirement
-TeXDependency              = TeXRequirement
-MercurialDependency        = MercurialRequirement
-GitDependency              = GitRequirement
-FortranDependency          = FortranRequirement
-JavaDependency             = JavaRequirement
-LanguageModuleDependency   = LanguageModuleRequirement
-MPIDependency              = MPIRequirement
-OsxfuseDependency          = OsxfuseRequirement
-PythonDependency           = PythonRequirement
-TuntapDependency           = TuntapRequirement
-X11Dependency              = X11Requirement
-ConflictsWithBinaryOsxfuse = NonBinaryOsxfuseRequirement
-MinimumMacOSRequirement    = MacOSRequirement
+class TeXRequirement < Requirement
+  fatal true
+  cask "mactex"
+  download "https://www.tug.org/mactex/"
+  satisfy do
+    odeprecated("TeXRequirement", "'depends_on \"cvs\"'")
+    which("tex") || which("latex")
+  end
+end
+
+MinimumMacOSRequirement = MacOSRequirement

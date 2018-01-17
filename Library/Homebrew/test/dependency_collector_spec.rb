@@ -66,11 +66,6 @@ describe DependencyCollector do
       expect(dep).to be_optional
     end
 
-    specify "ant dependency", :needs_compat do
-      subject.add ant: :build
-      expect(find_dependency("ant")).to eq(Dependency.new("ant", [:build]))
-    end
-
     it "doesn't mutate the dependency spec" do
       spec = { "foo" => :optional }
       copy = spec.dup
