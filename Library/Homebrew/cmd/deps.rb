@@ -94,26 +94,14 @@ module Homebrew
     if ARGV.include?("--include-requirements")
       deps
     else
-      deps.map do |dep|
-        if dep.is_a? Dependency
-          dep
-        elsif dep.default_formula?
-          dep.to_dependency
-        end
-      end.compact
+      deps.select { |dep| dep.is_a? Dependency }
     end
   end
 
   def dep_display_name(dep)
     str = if dep.is_a? Requirement
       if ARGV.include?("--include-requirements")
-        if dep.default_formula?
-          ":#{dep.display_s} (#{dep_display_name(dep.to_dependency)})"
-        else
-          ":#{dep.display_s}"
-        end
-      elsif dep.default_formula?
-        dep_display_name(dep.to_dependency)
+        ":#{dep.display_s}"
       else
         # This shouldn't happen, but we'll put something here to help debugging
         "::#{dep.name}"
@@ -207,7 +195,7 @@ module Homebrew
     max = dependables.length - 1
     @dep_stack.push f.name
     dependables.each_with_index do |dep, i|
-      next if !ARGV.include?("--include-requirements") && dep.is_a?(Requirement) && !dep.default_formula?
+      next if !ARGV.include?("--include-requirements") && dep.is_a?(Requirement)
       tree_lines = if i == max
         "└──"
       else
@@ -222,9 +210,6 @@ module Homebrew
         "    "
       else
         "│   "
-      end
-      if dep.is_a?(Requirement) && dep.default_formula?
-        recursive_deps_tree(Formulary.factory(dep.to_dependency.name), prefix + prefix_addition, true)
       end
       if dep.is_a? Dependency
         recursive_deps_tree(Formulary.factory(dep.name), prefix + prefix_addition, true)

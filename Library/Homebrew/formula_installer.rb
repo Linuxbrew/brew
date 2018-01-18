@@ -415,16 +415,6 @@ class FormulaInstaller
     raise UnsatisfiedRequirements, fatals
   end
 
-  def install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
-    return false unless req_dependency
-    return false if req.build? && dependent.installed?
-    return true unless req.satisfied?
-    return false if req.run?
-    return true if build_bottle?
-    return true if req.satisfied_by_formula?
-    install_bottle_for_dependent
-  end
-
   def runtime_requirements(formula)
     runtime_deps = formula.runtime_dependencies.map(&:to_formula)
     recursive_requirements = formula.recursive_requirements do |dependent, _|
@@ -443,16 +433,8 @@ class FormulaInstaller
       f.recursive_requirements do |dependent, req|
         build = effective_build_options_for(dependent)
         install_bottle_for_dependent = install_bottle_for?(dependent, build)
-        use_default_formula = install_bottle_for_dependent || build_bottle?
-        req_dependency = req.to_dependency(use_default_formula: use_default_formula)
 
         if (req.optional? || req.recommended?) && build.without?(req)
-          Requirement.prune
-        elsif req.build? && use_default_formula && req_dependency&.installed?
-          Requirement.prune
-        elsif install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
-          deps.unshift(req_dependency)
-          formulae.unshift(req_dependency.to_formula)
           Requirement.prune
         elsif req.satisfied?
           Requirement.prune
