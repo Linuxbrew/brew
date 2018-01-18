@@ -1,6 +1,5 @@
 class BottleSpecification
-  def revision(*args)
-    odeprecated "BottleSpecification.revision", "BottleSpecification.rebuild"
-    rebuild(*args)
+  def revision(*)
+    odisabled "BottleSpecification.revision", "BottleSpecification.rebuild"
   end
 end

@@ -10,6 +10,7 @@ class DependencyCollector
 
   def parse_string_spec(spec, tags)
     if (tag = tags.first) && LANGUAGE_MODULES.include?(tag)
+      odeprecated "'depends_on :#{tag}'"
       LanguageModuleRequirement.new(tag, spec, tags[1])
     else
       _parse_string_spec(spec, tags)
@@ -23,7 +24,7 @@ class DependencyCollector
     when :clt
       odeprecated "'depends_on :clt'"
     when :tex
-      # odeprecated "'depends_on :tex'"
+      odeprecated "'depends_on :tex'"
       TeXRequirement.new(tags)
     when :autoconf, :automake, :bsdmake, :libtool
       output_deprecation(spec, tags)
@@ -39,7 +40,7 @@ class DependencyCollector
       output_deprecation("libtool", tags)
       Dependency.new("libtool", tags)
     when :apr
-      # output_deprecation(spec, tags, "apr-util")
+      output_deprecation(spec, tags, "apr-util")
       Dependency.new("apr-util", tags)
     when :fortran
       # output_deprecation(spec, tags, "gcc")
