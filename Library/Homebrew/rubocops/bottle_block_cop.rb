@@ -16,8 +16,6 @@ module RuboCop
           problem "Use rebuild instead of revision in bottle block" if method_called_in_block?(bottle, :revision)
         end
 
-        private
-
         def autocorrect(node)
           lambda do |corrector|
             correction = node.source.sub("revision", "rebuild")
