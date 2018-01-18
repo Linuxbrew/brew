@@ -447,7 +447,7 @@ module Homebrew
   def publish_bottle_file_on_bintray(f, bintray_org, creds)
     repo = Utils::Bottles::Bintray.repository(f.tap)
     package = Utils::Bottles::Bintray.package(f.name)
-    info = FormulaInfoFromJson.lookup(f.name)
+    info = FormulaInfoFromJson.lookup(f.full_name)
     if info.nil?
       raise "Failed publishing bottle: failed reading formula info for #{f.full_name}"
     end
