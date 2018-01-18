@@ -9,7 +9,7 @@ class DependencyCollector
 
     def parse_string_spec(spec, tags)
       if (tag = tags.first) && LANGUAGE_MODULES.include?(tag)
-        odeprecated "'depends_on :#{tag}'"
+        odeprecated "'depends_on ... => #{tag.inspect}'"
         LanguageModuleRequirement.new(tag, spec, tags[1])
       else
         super
