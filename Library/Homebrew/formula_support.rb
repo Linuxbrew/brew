@@ -32,15 +32,25 @@ class KegOnlyReason
 
   def to_s
     return @explanation unless @explanation.empty?
+
+    case @reason
+    when :provided_by_osx
+      odeprecated "keg_only :provided_by_osx", "keg_only :provided_by_macos"
+      @reason = :provided_by_macos
+    when :shadowed_by_osx
+      odeprecated "keg_only :shadowed_by_osx", "keg_only :shadowed_by_macos"
+      @reason = :shadowed_by_macos
+    end
+
     case @reason
     when :versioned_formula then <<~EOS
       this is an alternate version of another formula
     EOS
-    when :provided_by_macos, :provided_by_osx then <<~EOS
+    when :provided_by_macos then <<~EOS
       macOS already provides this software and installing another version in
       parallel can cause all kinds of trouble
     EOS
-    when :shadowed_by_macos, :shadowed_by_osx then <<~EOS
+    when :shadowed_by_macos then <<~EOS
       macOS provides similar software and installing this software in
       parallel can cause all kinds of trouble
     EOS
