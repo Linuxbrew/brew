@@ -64,8 +64,10 @@ module Homebrew
                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:core_maintainer] = readme.read[%r{(Linuxbrew/homebrew-core's lead maintainer .*\.)}, 1]
                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:maintainers] = readme.read[/(Linuxbrew's other current maintainers are .*\.)/, 1]
-                                    .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:brew_maintainers] = readme.read[/(Linuxbrew's other current maintainers are .*\.)/, 1]
+                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
+    variables[:core_maintainers] = readme.read[%r{(Linuxbrew/homebrew-core's other current maintainers .*\.)}, 1]
+                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
                                            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
