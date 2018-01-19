@@ -29,6 +29,10 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 *   [osrf/simulation](https://github.com/osrf/homebrew-simulation): Tools for robotics simulation.
 
+*   [brewsci/bio](https://github.com/brewsci/homebrew-bio): Bioinformatics formulae.
+
+*   [brewsci/science](https://github.com/brewsci/homebrew-science): Software tailored to scientific endeavours.
+
 ## Interesting forks
 
 *   [mistydemeo/tigerbrew](https://github.com/mistydemeo/tigerbrew): Experimental Tiger PowerPC version

@@ -48,9 +48,6 @@ class Build
         Requirement.prune
       elsif req.build? && dependent != formula
         Requirement.prune
-      elsif req.satisfied? && (dep = req.to_dependency) && dep.installed?
-        deps << dep
-        Requirement.prune
       end
     end
   end

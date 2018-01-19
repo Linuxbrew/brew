@@ -54,9 +54,10 @@ class Keg
   end
 
   class DirectoryNotWritableError < LinkError
-    def to_s; <<~EOS
-      Could not symlink #{src}
-      #{dst.dirname} is not writable.
+    def to_s
+      <<~EOS
+        Could not symlink #{src}
+        #{dst.dirname} is not writable.
       EOS
     end
   end

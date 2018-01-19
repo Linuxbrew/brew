@@ -3,13 +3,19 @@ require "formula_support"
 describe KegOnlyReason do
   describe "#to_s" do
     it "returns the reason provided" do
-      r = KegOnlyReason.new :provided_by_osx, "test"
+      r = KegOnlyReason.new :provided_by_macos, "test"
       expect(r.to_s).to eq("test")
     end
 
     it "returns a default message when no reason is provided" do
       r = KegOnlyReason.new :provided_by_macos, ""
       expect(r.to_s).to match(/^macOS already provides/)
+    end
+
+    it "is deprecated when reason mentions 'osx'", :needs_compat do
+      r = KegOnlyReason.new :provided_by_osx, "test"
+      expect(r).to receive(:odeprecated)
+      r.to_s
     end
   end
 end

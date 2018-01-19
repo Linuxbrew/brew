@@ -95,6 +95,7 @@ module Homebrew
         next unless f.installed?
         Homebrew::Cleanup.cleanup_formula f
       rescue UnsatisfiedRequirements => e
+        Homebrew.failed = true
         onoe "#{f}: #{e}"
       end
     end
@@ -132,7 +133,7 @@ module Homebrew
     fi.options = options
     fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
     fi.installed_on_request = !ARGV.named.empty?
-    fi.link_keg             = keg_was_linked if keg_had_linked_opt
+    fi.link_keg           ||= keg_was_linked if keg_had_linked_opt
     if tab
       fi.installed_as_dependency = tab.installed_as_dependency
       fi.installed_on_request  ||= tab.installed_on_request

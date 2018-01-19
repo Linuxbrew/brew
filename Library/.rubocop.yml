@@ -123,6 +123,14 @@ Style/Documentation:
 Style/Encoding:
   Enabled: true
 
+# disabled until we get the Metrics/LineLength down to 80.
+Style/IfUnlessModifier:
+  Enabled: false
+
+# messes with existing plist/caveats style
+Style/TrailingBodyOnMethodDefinition:
+  Enabled: false
+
 # use spaces for indentation; detect tabs
 Layout/Tab:
   Enabled: true
@@ -214,7 +222,7 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 
 # generally rescuing StandardError is fine
-Lint/RescueWithoutErrorClass:
+Style/RescueStandardError:
   Enabled: false
 
 # implicitly allow EOS as we use it everywhere

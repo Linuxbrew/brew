@@ -14,6 +14,7 @@ require "tap"
 require "keg"
 require "migrator"
 require "extend/ENV"
+require "language/python"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.
@@ -1486,15 +1487,10 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    runtime_dependencies = recursive_dependencies do |_, dependency|
+    recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
       Dependency.prune if !dependency.required? && build.without?(dependency)
     end
-    runtime_requirement_deps = recursive_requirements do |_, requirement|
-      Requirement.prune if requirement.build?
-      Requirement.prune if !requirement.required? && build.without?(requirement)
-    end.map(&:to_dependency).compact
-    runtime_dependencies + runtime_requirement_deps
   end
 
   # Returns a list of formulae depended on by this formula that aren't
@@ -1552,7 +1548,6 @@ class Formula
     hsh["requirements"] = requirements.map do |req|
       {
         "name" => req.name,
-        "default_formula" => req.default_formula,
         "cask" => req.cask,
         "download" => req.download,
       }
@@ -2194,32 +2189,24 @@ class Formula
     # <pre># If a dependency is only needed in certain cases:
     # depends_on "sqlite" if MacOS.version == :leopard
     # depends_on :xcode # If the formula really needs full Xcode.
-    # depends_on :tex # Homebrew does not provide a Tex Distribution.
-    # depends_on :fortran # Checks that `gfortran` is available or `FC` is set.
-    # depends_on :mpi => :cc # Needs MPI with `cc`
-    # depends_on :mpi => [:cc, :cxx, :optional] # Is optional. MPI with `cc` and `cxx`.
     # depends_on :macos => :lion # Needs at least OS X Lion (10.7).
-    # depends_on :apr # If a formula requires the CLT-provided apr library to exist.
     # depends_on :arch => :intel # If this formula only builds on Intel architecture.
     # depends_on :arch => :x86_64 # If this formula only builds on Intel x86 64-bit.
     # depends_on :arch => :ppc # Only builds on PowerPC?
     # depends_on :ld64 # Sometimes ld fails on `MacOS.version < :leopard`. Then use this.
-    # depends_on :x11 # X11/XQuartz components.
+    # depends_on :x11 => :optional # X11/XQuartz components.
     # depends_on :osxfuse # Permits the use of the upstream signed binary or our source package.
     # depends_on :tuntap # Does the same thing as above. This is vital for Yosemite and above.
-    # depends_on :mysql => :recommended</pre>
     # <pre># It is possible to only depend on something if
     # # `build.with?` or `build.without? "another_formula"`:
-    # depends_on :mysql # allows brewed or external mysql to be used
-    # depends_on :postgresql if build.without? "sqlite"
-    # depends_on :hg # Mercurial (external or brewed) is needed</pre>
+    # depends_on "postgresql" if build.without? "sqlite"
     #
-    # <pre># If any Python >= 2.7 < 3.x is okay (either from macOS or brewed):
-    # depends_on :python</pre>
-    # <pre># to depend on Python >= 2.7 but use system Python where possible
-    # depends_on :python if MacOS.version <= :snow_leopard</pre>
+    # <pre># Python 2.7:
+    # depends_on "python"</pre>
+    # <pre># Python 2.7 but use system Python where possible
+    # depends_on "python" if MacOS.version <= :snow_leopard</pre>
     # <pre># Python 3.x if the `--with-python3` is given to `brew install example`
-    # depends_on :python3 => :optional</pre>
+    # depends_on "python3" => :optional</pre>
     def depends_on(dep)
       specs.each { |spec| spec.depends_on(dep) }
     end

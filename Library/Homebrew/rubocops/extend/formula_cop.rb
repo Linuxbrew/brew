@@ -214,7 +214,7 @@ module RuboCop
       EOS
 
       def_node_search :dependency_name_hash_match?, <<~EOS
-        (hash (pair ({str sym} %1) ({str sym array} _)))
+        (hash (pair ({str sym} %1) (...)))
       EOS
 
       # To compare node with appropriate Ruby variable
@@ -425,7 +425,7 @@ module RuboCop
 
       # Returns the block length of the block node
       def block_size(block)
-        block_length(block)
+        block.loc.end.line - block.loc.begin.line
       end
 
       # Source buffer is required as an argument to report style violations

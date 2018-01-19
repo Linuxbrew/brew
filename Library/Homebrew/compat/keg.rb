@@ -1,6 +1,5 @@
 class Keg
   def fname
-    odeprecated "Keg#fname", "Keg#name"
-    name
+    odisabled "Keg#fname", "Keg#name"
   end
 end

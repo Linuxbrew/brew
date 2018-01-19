@@ -12,6 +12,7 @@ module Hbc
       def run
         ohai "Homebrew-Cask Version", Hbc.full_version
         ohai "macOS", MacOS.full_version
+        ohai "SIP", self.class.check_sip
         ohai "Java", SystemConfig.describe_java
         ohai "Homebrew-Cask Install Location", self.class.render_install_location
         ohai "Homebrew-Cask Staging Location", self.class.render_staging_location(Hbc.caskroom)
@@ -35,6 +36,15 @@ module Hbc
         ]
 
         (self.class.locale_variables + environment_variables).sort.each(&self.class.method(:render_env_var))
+      end
+
+      def self.check_sip
+        csrutil = "/usr/bin/csrutil"
+        return "N/A" unless File.executable?(csrutil)
+        Open3.capture2(csrutil, "status")[0]
+             .gsub("This is an unsupported configuration, likely to break in the future and leave your machine in an unknown state.", "")
+             .gsub("System Integrity Protection status: ", "")
+             .delete("\t\.").capitalize.strip
       end
 
       def self.locale_variables
