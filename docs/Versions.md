@@ -7,6 +7,7 @@ In [homebrew/versions](https://github.com/homebrew/homebrew-versions) the formul
 ## Acceptable versioned formulae
 Versioned formulae we include in [homebrew/core](https://github.com/homebrew/homebrew-core) must meet the following standards:
 
+* Versioned software should build on all Homebrew's supported versions of macOS.
 * Versioned formulae should differ in major/minor (not patch) versions from the current stable release. This is because patch versions indicate bug or security updates and we want to ensure you apply security updates.
 * Upstream should have a release branch for the versioned formulae version and still make security updates for that version, when necessary. For example, [PHP 5.5 was not a supported version but PHP 7.2 was](http://php.net/supported-versions.php) in January 2018
 * Formulae that depend on versioned formulae must not depend on the same formulae at two different versions twice in their recursive dependencies. For example, if you depend on `openssl@1.0` and `foo`, and `foo` depends on `openssl` then you must instead use `openssl`.
