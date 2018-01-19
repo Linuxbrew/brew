@@ -1125,6 +1125,8 @@ Linuxbrew/homebrew-core's lead maintainer is Michka Popoff.
 
 Linuxbrew's other current maintainers are Piotr Gaczkowski, Maxim Belkin, Jonathan Chang, and Alyssa Ross.
 
+Linuxbrew/homebrew-core's other current maintainers are Shaun Jackman.
+
 Former maintainers with significant contributions include Bob W. Hogg.
 
 ## BUGS
