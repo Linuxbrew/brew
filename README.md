@@ -72,7 +72,7 @@ Alternatively, if you'd rather make a one-off payment:
       BROOKLYN, NY 11201             USA
 - Donate by wire transfer: contact accounting@sfconservancy.org for wire transfer details.
 
-Homebrew is a member of the [Software Freedom Conservancy](http://sfconservancy.org) which provides us with an ability to receive tax-deductible, Homebrew earmarked donations (and [many other services](http://sfconservancy.org/members/services/)). Software Freedom Conservancy, Inc. is a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law.
+Homebrew is a member of the [Software Freedom Conservancy](https://sfconservancy.org) which provides us with an ability to receive tax-deductible, Homebrew earmarked donations (and [many other services](https://sfconservancy.org/members/services/)). Software Freedom Conservancy, Inc. is a 501(c)(3) organization incorporated in New York, and donations made to it are fully tax-deductible to the extent permitted by law.
 
 ## Sponsors
 Our Xserve ESXi boxes for CI are hosted by [MacStadium](https://www.macstadium.com).
