@@ -1371,7 +1371,7 @@ class Formula
   def self.racks
     @racks ||= if HOMEBREW_CELLAR.directory?
       HOMEBREW_CELLAR.subdirs.reject do |rack|
-        rack.symlink? || rack.subdirs.empty?
+        rack.symlink? || rack.basename.to_s.start_with?(".") || rack.subdirs.empty?
       end
     else
       []
