@@ -3,6 +3,7 @@ AllCops:
   Exclude:
     - '**/Casks/**/*'
     - '**/vendor/**/*'
+  DisplayCopNames: false
 
 require: ./Homebrew/rubocops.rb
 
