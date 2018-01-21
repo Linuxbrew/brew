@@ -119,6 +119,31 @@ describe Resource do
     end
   end
 
+  describe "#owner" do
+    it "sets the owner" do
+      owner = Object.new
+      subject.owner = owner
+      expect(subject.owner).to eq(owner)
+    end
+
+    it "sets its owner to be the patches' owner" do
+      subject.patch(:p1) { url "file:///my.patch" }
+      owner = Object.new
+      subject.owner = owner
+      subject.patches.each do |p|
+        expect(p.resource.owner).to eq(owner)
+      end
+    end
+  end
+
+  describe "#patch" do
+    it "adds a patch" do
+      subject.patch(:p1, :DATA)
+      expect(subject.patches.count).to eq(1)
+      expect(subject.patches.first.strip).to eq(:p1)
+    end
+  end
+
   specify "#verify_download_integrity_missing" do
     fn = Pathname.new("test")
 
