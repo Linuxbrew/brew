@@ -339,8 +339,7 @@ module Homebrew
           by Homebrew. If a formula tries to write a file to this directory, the
           install will fail during the link step.
 
-          You should change the ownership and permissions of these directories.
-          back to your user account.
+          You should change the ownership of these directories to your account.
             sudo chown -R $(whoami) #{not_writable_dirs.join(" ")}
         EOS
       end
