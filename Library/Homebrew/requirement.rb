@@ -139,8 +139,8 @@ class Requirement
     attr_reader :env_proc, :build
     attr_rw :fatal, :cask, :download
 
-    def default_formula(val = nil)
-      # odeprecated "Requirement.default_formula"
+    def default_formula(_val = nil)
+      odeprecated "Requirement.default_formula"
     end
 
     def satisfy(options = nil, &block)
