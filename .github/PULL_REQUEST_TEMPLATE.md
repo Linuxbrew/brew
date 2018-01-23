@@ -3,7 +3,6 @@
 - [ ] Have you added an explanation of what your changes do and why you'd like us to include them?
 - [ ] Have you written new tests for your changes? [Here's an example](https://github.com/Homebrew/homebrew/pull/49031).
 - [ ] Have you successfully run `brew style` with your changes locally?
-- [ ] Have you successfully run `brew doctor` with your changes locally?
 - [ ] Have you successfully run `brew tests` with your changes locally?
 
 -----
