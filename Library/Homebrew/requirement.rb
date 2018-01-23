@@ -48,16 +48,17 @@ class Requirement
     s
   end
 
-  # Overriding #satisfied? is deprecated.
+  # Overriding #satisfied? is unsupported.
   # Pass a block or boolean to the satisfy DSL method instead.
   def satisfied?
-    result = self.class.satisfy.yielder { |p| instance_eval(&p) }
-    @satisfied_result = result
-    return false unless result
+    satisfy = self.class.satisfy
+    return true unless satisfy
+    @satisfied_result = satisfy.yielder { |p| instance_eval(&p) }
+    return false unless @satisfied_result
     true
   end
 
-  # Overriding #fatal? is deprecated.
+  # Overriding #fatal? is unsupported.
   # Pass a boolean to the fatal DSL method instead.
   def fatal?
     self.class.fatal || false
@@ -72,11 +73,10 @@ class Requirement
     parent
   end
 
-  # Overriding #modify_build_environment is deprecated.
+  # Overriding #modify_build_environment is unsupported.
   # Pass a block to the env DSL method instead.
-  # Note: #satisfied? should be called before invoking this method
-  # as the env modifications may depend on its side effects.
   def modify_build_environment
+    satisfied?
     instance_eval(&env_proc) if env_proc
 
     # XXX If the satisfy block returns a Pathname, then make sure that it
@@ -139,8 +139,8 @@ class Requirement
     attr_reader :env_proc, :build
     attr_rw :fatal, :cask, :download
 
-    def default_formula(val = nil)
-      # odeprecated "Requirement.default_formula"
+    def default_formula(_val = nil)
+      odeprecated "Requirement.default_formula"
     end
 
     def satisfy(options = nil, &block)
