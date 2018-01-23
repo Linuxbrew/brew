@@ -81,10 +81,12 @@ class Build
       ENV.x11 = reqs.any? { |rq| rq.is_a?(X11Requirement) }
       ENV.setup_build_environment(formula)
       post_superenv_hacks
+      reqs.each(&:satisfied?)
       reqs.each(&:modify_build_environment)
       deps.each(&:modify_build_environment)
     else
       ENV.setup_build_environment(formula)
+      reqs.each(&:satisfied?)
       reqs.each(&:modify_build_environment)
       deps.each(&:modify_build_environment)
 
