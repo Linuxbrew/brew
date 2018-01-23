@@ -51,9 +51,10 @@ class Requirement
   # Overriding #satisfied? is deprecated.
   # Pass a block or boolean to the satisfy DSL method instead.
   def satisfied?
-    result = self.class.satisfy.yielder { |p| instance_eval(&p) }
-    @satisfied_result = result
-    return false unless result
+    satisfy = self.class.satisfy
+    return true unless satisfy
+    @satisfied_result = satisfy.yielder { |p| instance_eval(&p) }
+    return false unless @satisfied_result
     true
   end
 
@@ -74,9 +75,8 @@ class Requirement
 
   # Overriding #modify_build_environment is deprecated.
   # Pass a block to the env DSL method instead.
-  # Note: #satisfied? should be called before invoking this method
-  # as the env modifications may depend on its side effects.
   def modify_build_environment
+    satisfied?
     instance_eval(&env_proc) if env_proc
 
     # XXX If the satisfy block returns a Pathname, then make sure that it
