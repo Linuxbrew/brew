@@ -198,7 +198,7 @@ module Homebrew
         new_url.sub "mirrors.ocf.berkeley.edu/debian", "mirrorservice.org/sites/ftp.debian.org/debian"
       end
       resource = Resource.new { @url = new_url }
-      resource.download_strategy = CurlDownloadStrategy
+      resource.download_strategy = DownloadStrategyDetector.detect_from_url(new_url)
       resource.owner = Resource.new(formula.name)
       resource.version = forced_version if forced_version
       odie "No --version= argument specified!" unless resource.version
