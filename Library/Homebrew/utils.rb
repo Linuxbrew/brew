@@ -89,6 +89,9 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
     true
   end
   caller_message ||= backtrace.detect do |line|
+    # Don't throw deprecations at all for cached or .brew formulae.
+    next false if line.include?(HOMEBREW_CACHE)
+    next false if line.include?("/.brew/")
     !line.start_with?("#{HOMEBREW_LIBRARY_PATH}/compat/")
   end
   caller_message ||= backtrace[1]

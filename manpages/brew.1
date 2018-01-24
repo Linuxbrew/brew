@@ -302,19 +302,6 @@ If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all files which
 If \fB\-\-force\fR (or \fB\-f\fR) is passed, Homebrew will allow keg\-only formulae to be linked\.
 .
 .TP
-\fBlinkapps\fR [\fB\-\-local\fR] [\fIformulae\fR]
-Find installed formulae that provide \fB\.app\fR\-style macOS apps and symlink them into \fB/Applications\fR, allowing for easier access (deprecated)\.
-.
-.IP
-Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
-.
-.IP
-If no \fIformulae\fR are provided, all of them will have their apps symlinked\.
-.
-.IP
-If provided, \fB\-\-local\fR will symlink them into the user\'s \fB~/Applications\fR directory instead of the system directory\.
-.
-.TP
 \fBlist\fR, \fBls\fR [\fB\-\-full\-name\fR]
 List all installed formulae\. If \fB\-\-full\-name\fR is passed, print formulae with fully\-qualified names\. If \fB\-\-full\-name\fR is not passed, any other options (e\.g\. \fB\-t\fR) are passed to \fBls\fR which produces the actual output\.
 .
@@ -533,22 +520,6 @@ Remove symlinks for \fIformula\fR from the Homebrew prefix\. This can be useful 
 .
 .IP
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all files which would be unlinked, but will not actually unlink or delete any files\.
-.
-.TP
-\fBunlinkapps\fR [\fB\-\-local\fR] [\fB\-\-dry\-run\fR] [\fIformulae\fR]
-Remove symlinks created by \fBbrew linkapps\fR from \fB/Applications\fR (deprecated)\.
-.
-.IP
-Unfortunately \fBbrew linkapps\fR cannot behave nicely with e\.g\. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" \fB\.app\fR bundles that can be relocated\. Instead, please consider using \fBbrew cask\fR and migrate formulae using \fB\.app\fRs to casks\.
-.
-.IP
-If no \fIformulae\fR are provided, all linked apps will be removed\.
-.
-.IP
-If provided, \fB\-\-local\fR will remove symlinks from the user\'s \fB~/Applications\fR directory instead of the system directory\.
-.
-.IP
-If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, Homebrew will list all symlinks which would be removed, but will not actually delete any files\.
 .
 .TP
 \fBunpack\fR [\fB\-\-git\fR|\fB\-\-patch\fR] [\fB\-\-destdir=\fR\fIpath\fR] \fIformulae\fR

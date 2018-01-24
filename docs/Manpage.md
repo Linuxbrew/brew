@@ -291,20 +291,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--force` (or `-f`) is passed, Homebrew will allow keg-only formulae to be linked.
 
-  * `linkapps` [`--local`] [`formulae`]:
-    Find installed formulae that provide `.app`-style macOS apps and symlink them
-    into `/Applications`, allowing for easier access (deprecated).
-
-    Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using
-    either aliases or symlinks and Homebrew formulae do not build "proper" `.app`
-    bundles that can be relocated. Instead, please consider using `brew cask` and
-    migrate formulae using `.app`s to casks.
-
-    If no `formulae` are provided, all of them will have their apps symlinked.
-
-    If provided, `--local` will symlink them into the user's `~/Applications`
-    directory instead of the system directory.
-
   * `list`, `ls` [`--full-name`]:
     List all installed formulae. If `--full-name` is passed, print formulae
     with fully-qualified names. If `--full-name` is not passed, any other
@@ -518,22 +504,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--dry-run` or `-n` is passed, Homebrew will list all files which would
     be unlinked, but will not actually unlink or delete any files.
-
-  * `unlinkapps` [`--local`] [`--dry-run`] [`formulae`]:
-    Remove symlinks created by `brew linkapps` from `/Applications` (deprecated).
-
-    Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using
-    either aliases or symlinks and Homebrew formulae do not build "proper" `.app`
-    bundles that can be relocated. Instead, please consider using `brew cask` and
-    migrate formulae using `.app`s to casks.
-
-    If no `formulae` are provided, all linked apps will be removed.
-
-    If provided, `--local` will remove symlinks from the user's `~/Applications`
-    directory instead of the system directory.
-
-    If `--dry-run` or `-n` is passed, Homebrew will list all symlinks which
-    would be removed, but will not actually delete any files.
 
   * `unpack` [`--git`|`--patch`] [`--destdir=``path`] `formulae`:
     Unpack the source files for `formulae` into subdirectories of the current

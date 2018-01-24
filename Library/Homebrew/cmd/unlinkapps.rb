@@ -1,3 +1,4 @@
+#: @hide_from_man_page
 #:  * `unlinkapps` [`--local`] [`--dry-run`] [<formulae>]:
 #:    Remove symlinks created by `brew linkapps` from `/Applications` (deprecated).
 #:
@@ -5,14 +6,6 @@
 #:    either aliases or symlinks and Homebrew formulae do not build "proper" `.app`
 #:    bundles that can be relocated. Instead, please consider using `brew cask` and
 #:    migrate formulae using `.app`s to casks.
-#:
-#:    If no <formulae> are provided, all linked apps will be removed.
-#:
-#:    If provided, `--local` will remove symlinks from the user's `~/Applications`
-#:    directory instead of the system directory.
-#:
-#:    If `--dry-run` or `-n` is passed, Homebrew will list all symlinks which
-#:    would be removed, but will not actually delete any files.
 
 require "cmd/linkapps"
 
@@ -20,11 +13,7 @@ module Homebrew
   module_function
 
   def unlinkapps
-    opoo <<~EOS
-      `brew unlinkapps` has been deprecated and will eventually be removed!
-
-      Unfortunately `brew linkapps` cannot behave nicely with e.g. Spotlight using either aliases or symlinks and Homebrew formulae do not build "proper" `.app` bundles that can be relocated. Instead, please consider using `brew cask` and migrate formulae using `.app`s to casks.
-    EOS
+    odeprecated "'brew unlinkapps'"
 
     target_dir = linkapps_target(local: ARGV.include?("--local"))
 
