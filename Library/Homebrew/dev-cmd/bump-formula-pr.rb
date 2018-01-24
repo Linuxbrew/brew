@@ -137,9 +137,16 @@ module Homebrew
 
     new_url = ARGV.value("url")
     if new_url && !formula
-      is_devel = ARGV.include?("--devel")
-      base_url = new_url.split("/")[0..4].join("/")
+      # Split the new URL on / and find any formulae that have the same URL
+      # except for the last component, but don't try to match any more than the
+      # first five components since sometimes the last component isn't the only
+      # one to change.
+      new_url_split = new_url.split("/")
+      maximum_url_components_to_match = 5
+      components_to_match = [new_url_split.count - 1, maximum_url_components_to_match].min
+      base_url = new_url_split.first(components_to_match).join("/")
       base_url = /#{Regexp.escape(base_url)}/
+      is_devel = ARGV.include?("--devel")
       guesses = []
       Formula.each do |f|
         if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
