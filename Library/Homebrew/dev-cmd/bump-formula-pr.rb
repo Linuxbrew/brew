@@ -232,12 +232,12 @@ module Homebrew
     end
 
     replacement_pairs += formula_spec.mirrors.map do |mirror|
-      [/ +mirror \"#{mirror}\"\n/m, ""]
+      [/ +mirror \"#{Regexp.escape(mirror)}\"\n/m, ""]
     end
 
     replacement_pairs += if new_url_hash
       [
-        [formula_spec.url, new_url],
+        [/#{Regexp.escape(formula_spec.url)}/, new_url],
         [old_hash, new_hash],
       ]
     else
@@ -250,7 +250,7 @@ module Homebrew
     backup_file = File.read(formula.path) unless ARGV.dry_run?
 
     if new_mirror
-      replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
+      replacement_pairs << [/^( +)(url \"#{Regexp.escape(new_url)}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
     end
 
     if forced_version && forced_version != "0"
