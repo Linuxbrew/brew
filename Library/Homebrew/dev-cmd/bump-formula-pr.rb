@@ -191,13 +191,10 @@ module Homebrew
     elsif !new_url
       odie "#{formula}: no --url= argument specified!"
     else
-      resource_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
-        new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
-        new_mirror
-      else
-        new_url
+      new_mirror = if requested_spec != :devel && new_url =~ %r{.*ftp.gnu.org/gnu.*}
+        new_url.sub "ftp.gnu.org/gnu", "ftpmirror.gnu.org"
       end
-      resource = Resource.new { @url = resource_url }
+      resource = Resource.new { @url = new_url }
       resource.download_strategy = CurlDownloadStrategy
       resource.owner = Resource.new(formula.name)
       resource.version = forced_version if forced_version
