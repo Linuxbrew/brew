@@ -267,7 +267,7 @@ module Homebrew
       end
     elsif forced_version && forced_version == "0"
       if requested_spec == :stable
-        replacement_pairs << [/^  version \"[a-z\d+\.]+\"\n/m, ""]
+        replacement_pairs << [/^  version \"[\w\.\-\+]+\"\n/m, ""]
       elsif requested_spec == :devel
         replacement_pairs << [/(  devel do.+?)^ +version \"[^\n]+\"\n(.+?end\n)/m, "\\1\\2"]
       end
