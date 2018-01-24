@@ -184,23 +184,23 @@ module Homebrew
     elsif !new_url
       odie "#{formula}: no --url= argument specified!"
     else
-      rsrc_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
+      resource_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
         new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
         new_mirror
       else
         new_url
       end
-      rsrc = Resource.new { @url = rsrc_url }
-      rsrc.download_strategy = CurlDownloadStrategy
-      rsrc.owner = Resource.new(formula.name)
-      rsrc.version = forced_version if forced_version
-      odie "No --version= argument specified!" unless rsrc.version
-      rsrc_path = rsrc.fetch
+      resource = Resource.new { @url = resource_url }
+      resource.download_strategy = CurlDownloadStrategy
+      resource.owner = Resource.new(formula.name)
+      resource.version = forced_version if forced_version
+      odie "No --version= argument specified!" unless resource.version
+      resource_path = resource.fetch
       gnu_tar_gtar_path = HOMEBREW_PREFIX/"opt/gnu-tar/bin/gtar"
       gnu_tar_gtar = gnu_tar_gtar_path if gnu_tar_gtar_path.executable?
       tar = which("gtar") || gnu_tar_gtar || which("tar")
-      if Utils.popen_read(tar, "-tf", rsrc_path) =~ %r{/.*\.}
-        new_hash = rsrc_path.sha256
+      if Utils.popen_read(tar, "-tf", resource_path) =~ %r{/.*\.}
+        new_hash = resource_path.sha256
       elsif new_url.include? ".tar"
         odie "#{formula}: no --url=/--#{hash_type}= arguments specified!"
       end
