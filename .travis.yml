@@ -1,7 +1,6 @@
 language: c
 cache:
   directories:
-    - $HOME/.gem/ruby
     - $HOME/Library/Caches/Homebrew/style
     - $HOME/Library/Caches/Homebrew/tests
     - $HOME/Library/Homebrew/vendor/bundle
