@@ -196,15 +196,8 @@ module Homebrew
   end
 
   def install_gem_setup_path!(name, version = nil, executable = name)
-    # Respect user's preferences for where gems should be installed.
-    ENV["GEM_HOME"] = if ENV["HOMEBREW_GEM_HOME"].to_s.empty?
-      Gem.user_dir
-    else
-      ENV["HOMEBREW_GEM_HOME"]
-    end
-    unless ENV["HOMEBREW_GEM_PATH"].to_s.empty?
-      ENV["GEM_PATH"] = ENV["HOMEBREW_GEM_PATH"]
-    end
+    # Match where our bundler gems are.
+    ENV["GEM_HOME"] = "#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/vendor/bundle/ruby/#{RbConfig::CONFIG["ruby_version"]}"
 
     # Make rubygems notice env changes.
     Gem.clear_paths

@@ -69,16 +69,6 @@ then
   odie "Cowardly refusing to continue at this prefix: $HOMEBREW_PREFIX"
 fi
 
-# Save values to use for installing gems
-if [[ -n "$GEM_HOME" ]]
-then
-  export HOMEBREW_GEM_HOME="$GEM_HOME"
-fi
-if [[ -n "$GEM_PATH" ]]
-then
-  export HOMEBREW_GEM_PATH="$GEM_PATH"
-fi
-
 HOMEBREW_SYSTEM="$(uname -s)"
 case "$HOMEBREW_SYSTEM" in
   Darwin) HOMEBREW_MACOS="1" ;;
