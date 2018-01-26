@@ -23,10 +23,9 @@ before_install:
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
       HOMEBREW_REPOSITORY="$(brew --repo)";
       sudo chown -R "$USER" "$HOMEBREW_REPOSITORY/Library/Taps";
-      mkdir -p "$PWD/Library/Taps/homebrew"
-      mv "$HOMEBREW_REPOSITORY/Library/Taps/homebrew/homebrew-core" "$PWD/Library/homebrew/homebrew-core";
-      git -C "$PWD/Library/homebrew/homebrew-core" fetch --tags --force origin
-      git -C "$PWD/Library/homebrew/homebrew-core" checkout --force -B master origin/master
+      mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
+      git -C Library/homebrew/homebrew-core fetch --force origin
+      git -C Library/homebrew/homebrew-core checkout --force -B master origin/master
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
       git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot;
