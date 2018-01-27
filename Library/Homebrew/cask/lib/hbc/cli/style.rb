@@ -10,9 +10,9 @@ module Hbc
       def run
         install_rubocop
         cache_env = { "XDG_CACHE_HOME" => "#{HOMEBREW_CACHE}/style" }
-        system(cache_env, "rubocop", *rubocop_args, "--", *cask_paths)
+        hide_warnings = debug? ? [] : [ENV["HOMEBREW_RUBY_PATH"], "-W0", "-S"]
+        system(cache_env, *hide_warnings, "rubocop", *rubocop_args, "--", *cask_paths)
         raise CaskError, "style check failed" unless $CHILD_STATUS.success?
-        true
       end
 
       def install_rubocop
@@ -43,8 +43,8 @@ module Hbc
         [
           "--require", "rubocop-cask",
           "--force-default-config",
-          "--force-exclusion",
-          "--format", "simple"
+          "--format", "simple",
+          "--parallel"
         ]
       end
 
