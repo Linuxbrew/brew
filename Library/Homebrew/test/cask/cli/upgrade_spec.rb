@@ -22,9 +22,9 @@ describe Hbc::CLI::Upgrade, :cask do
     describe 'without --greedy it ignores the Casks with "version latest" or "auto_updates true"' do
       it "updates all the installed Casks when no token is provided" do
         local_caffeine = Hbc::CaskLoader.load("local-caffeine")
-        local_caffeine_path = Hbc.appdir.join("Caffeine.app")
+        local_caffeine_path = Hbc::Config.global.appdir.join("Caffeine.app")
         local_transmission = Hbc::CaskLoader.load("local-transmission")
-        local_transmission_path = Hbc.appdir.join("Transmission.app")
+        local_transmission_path = Hbc::Config.global.appdir.join("Transmission.app")
 
         expect(local_caffeine).to be_installed
         expect(local_caffeine_path).to be_a_directory
@@ -47,9 +47,9 @@ describe Hbc::CLI::Upgrade, :cask do
 
       it "updates only the Casks specified in the command line" do
         local_caffeine = Hbc::CaskLoader.load("local-caffeine")
-        local_caffeine_path = Hbc.appdir.join("Caffeine.app")
+        local_caffeine_path = Hbc::Config.global.appdir.join("Caffeine.app")
         local_transmission = Hbc::CaskLoader.load("local-transmission")
-        local_transmission_path = Hbc.appdir.join("Transmission.app")
+        local_transmission_path = Hbc::Config.global.appdir.join("Transmission.app")
 
         expect(local_caffeine).to be_installed
         expect(local_caffeine_path).to be_a_directory
@@ -72,9 +72,9 @@ describe Hbc::CLI::Upgrade, :cask do
 
       it 'updates "auto_updates" and "latest" Casks when their tokens are provided in the command line' do
         local_caffeine = Hbc::CaskLoader.load("local-caffeine")
-        local_caffeine_path = Hbc.appdir.join("Caffeine.app")
+        local_caffeine_path = Hbc::Config.global.appdir.join("Caffeine.app")
         auto_updates = Hbc::CaskLoader.load("auto-updates")
-        auto_updates_path = Hbc.appdir.join("MyFancyApp.app")
+        auto_updates_path = Hbc::Config.global.appdir.join("MyFancyApp.app")
 
         expect(local_caffeine).to be_installed
         expect(local_caffeine_path).to be_a_directory
@@ -99,14 +99,14 @@ describe Hbc::CLI::Upgrade, :cask do
     describe "with --greedy it checks additional Casks" do
       it 'includes the Casks with "auto_updates true" or "version latest"' do
         local_caffeine = Hbc::CaskLoader.load("local-caffeine")
-        local_caffeine_path = Hbc.appdir.join("Caffeine.app")
+        local_caffeine_path = Hbc::Config.global.appdir.join("Caffeine.app")
         auto_updates = Hbc::CaskLoader.load("auto-updates")
-        auto_updates_path = Hbc.appdir.join("MyFancyApp.app")
+        auto_updates_path = Hbc::Config.global.appdir.join("MyFancyApp.app")
         local_transmission = Hbc::CaskLoader.load("local-transmission")
-        local_transmission_path = Hbc.appdir.join("Transmission.app")
+        local_transmission_path = Hbc::Config.global.appdir.join("Transmission.app")
         version_latest = Hbc::CaskLoader.load("version-latest")
-        version_latest_path_1 = Hbc.appdir.join("Caffeine Mini.app")
-        version_latest_path_2 = Hbc.appdir.join("Caffeine Pro.app")
+        version_latest_path_1 = Hbc::Config.global.appdir.join("Caffeine Mini.app")
+        version_latest_path_2 = Hbc::Config.global.appdir.join("Caffeine Pro.app")
 
         expect(local_caffeine).to be_installed
         expect(local_caffeine_path).to be_a_directory
@@ -147,7 +147,7 @@ describe Hbc::CLI::Upgrade, :cask do
 
       it 'does not include the Casks with "auto_updates true" when the version did not change' do
         cask = Hbc::CaskLoader.load("auto-updates")
-        cask_path = Hbc.appdir.join("MyFancyApp.app")
+        cask_path = Hbc::Config.global.appdir.join("MyFancyApp.app")
 
         expect(cask).to be_installed
         expect(cask_path).to be_a_directory
@@ -188,7 +188,7 @@ describe Hbc::CLI::Upgrade, :cask do
 
     it "restores the old Cask if the upgrade failed" do
       will_fail_if_upgraded = Hbc::CaskLoader.load("will-fail-if-upgraded")
-      will_fail_if_upgraded_path = Hbc.appdir.join("container")
+      will_fail_if_upgraded_path = Hbc::Config.global.appdir.join("container")
 
       expect(will_fail_if_upgraded).to be_installed
       expect(will_fail_if_upgraded_path).to be_a_file
@@ -206,7 +206,7 @@ describe Hbc::CLI::Upgrade, :cask do
 
     it "does not restore the old Cask if the upgrade failed pre-install" do
       bad_checksum = Hbc::CaskLoader.load("bad-checksum")
-      bad_checksum_path = Hbc.appdir.join("Caffeine.app")
+      bad_checksum_path = Hbc::Config.global.appdir.join("Caffeine.app")
 
       expect(bad_checksum).to be_installed
       expect(bad_checksum_path).to be_a_directory

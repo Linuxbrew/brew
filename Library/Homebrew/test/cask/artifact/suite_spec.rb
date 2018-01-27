@@ -9,7 +9,7 @@ describe Hbc::Artifact::Suite, :cask do
     end
   }
 
-  let(:target_path) { Hbc.appdir.join("Caffeine") }
+  let(:target_path) { Hbc::Config.global.appdir.join("Caffeine") }
   let(:source_path) { cask.staged_path.join("Caffeine") }
 
   before(:each) do
