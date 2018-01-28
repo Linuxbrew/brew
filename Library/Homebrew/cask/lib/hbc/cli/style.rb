@@ -36,16 +36,19 @@ module Hbc
       end
 
       def rubocop_args
-        fix? ? autocorrect_args : default_args
+        fix? ? autocorrect_args : normal_args
       end
 
       def default_args
         [
           "--require", "rubocop-cask",
           "--force-default-config",
-          "--format", "simple",
-          "--parallel"
+          "--format", "simple"
         ]
+      end
+
+      def normal_args
+        default_args + ["--parallel"]
       end
 
       def autocorrect_args
