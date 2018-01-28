@@ -70,8 +70,10 @@ class FormulaInstaller
   # can proceed. Only invoked when the user has no developer tools.
   def self.prevent_build_flags
     build_flags = ARGV.collect_build_flags
+    return if build_flags.empty?
 
-    raise BuildFlagsError, build_flags unless build_flags.empty?
+    all_bottled = ARGV.formulae.all?(&:bottled?)
+    raise BuildFlagsError.new(build_flags, bottled: all_bottled)
   end
 
   def build_bottle?

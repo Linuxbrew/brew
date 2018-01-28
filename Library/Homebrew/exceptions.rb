@@ -458,7 +458,7 @@ end
 # if the user passes any flags/environment that would case a bottle-only
 # installation on a system without build tools to fail
 class BuildFlagsError < RuntimeError
-  def initialize(flags)
+  def initialize(flags, bottled: true)
     if flags.length > 1
       flag_text = "flags"
       require_text = "require"
@@ -467,13 +467,18 @@ class BuildFlagsError < RuntimeError
       require_text = "requires"
     end
 
-    super <<~EOS
+    message = <<~EOS.chomp!
       The following #{flag_text}:
         #{flags.join(", ")}
       #{require_text} building tools, but none are installed.
       #{DevelopmentTools.installation_instructions}
+    EOS
+
+    message << <<~EOS.chomp! if bottled
       Alternatively, remove the #{flag_text} to attempt bottle installation.
     EOS
+
+    super message
   end
 end
 
