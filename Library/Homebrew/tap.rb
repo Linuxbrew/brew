@@ -211,7 +211,7 @@ class Tap
     requested_remote = options[:clone_target] || default_remote
 
     if official? && DEPRECATED_OFFICIAL_TAPS.include?(repo)
-      opoo "#{name} was deprecated. This tap is now empty as all its formulae were migrated."
+      odie "#{name} was deprecated. This tap is now empty as all its formulae were migrated."
     end
 
     if installed?
