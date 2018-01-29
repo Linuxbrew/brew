@@ -62,8 +62,6 @@ module RuboCop
           end
         end
 
-        private
-
         # Method to format message for reporting component precedence violations
         def component_problem(c1, c2)
           problem "`#{format_component(c1)}` (line #{line_number(c1)}) should be put before `#{format_component(c2)}` (line #{line_number(c2)})"
@@ -99,7 +97,7 @@ module RuboCop
             line_breaks = (order_idx > 8) ? "\n\n" : "\n"
             corrector.insert_before(node2.source_range, node1.source + line_breaks + indentation)
           end
-          corrector.remove(range_with_surrounding_space(node1.source_range, :left))
+          corrector.remove(range_with_surrounding_space(range: node1.source_range, side: :left))
         end
 
         # Returns precedence index and component's index to properly reorder and group during autocorrect

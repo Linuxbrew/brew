@@ -69,7 +69,7 @@ Homebrew builds bindings against the first `python` (and `python-config`) in you
 **Warning!** Python may crash (see [Common Issues](Common-Issues.md)) if you `import <module>` from a brewed Python if you ran `brew install <formula_with_python_bindings>` against the system Python. If you decide to switch to the brewed Python, then reinstall all formulae with Python bindings (e.g. `pyside`, `wxwidgets`, `pygtk`, `pygobject`, `opencv`, `vtk` and `boost-python`).
 
 ## Policy for non-brewed Python bindings
-These should be installed via `pip install <package>`. To discover, you can use `pip search` or <https://pypi.python.org/pypi>. (**Note:** System Python does not provide `pip`. Follow the instructions at <https://pip.readthedocs.io/en/stable/installing/#install-pip> to install it for your system Python if you would like it.)
+These should be installed via `pip install <package>`. To discover, you can use `pip search` or <https://pypi.python.org/pypi>. (**Note:** System Python does not provide `pip`. Follow the [pip documentation](https://pip.readthedocs.io/en/stable/installing/#install-pip) to install it for your system Python if you would like it.)
 
 ## Brewed Python modules
 For brewed Python, modules installed with `pip` or `python setup.py install` will be installed to the `$(brew --prefix)/lib/pythonX.Y/site-packages` directory (explained above). Executable Python scripts will be in `$(brew --prefix)/bin`.
@@ -89,4 +89,4 @@ Homebrew will still install Python modules into Homebrew's `site-packages` and *
 Virtualenv has a `--system-site-packages` switch to allow "global" (i.e. Homebrew's) `site-packages` to be accessible from within the virtualenv.
 
 ## Why is Homebrew's Python being installed as a dependency?
-Formulae that depend on the special `:python` target are bottled against the Homebrew Python and require it to be installed. You can avoid installing Homebrew's Python by building these formulae with `--build-from-source`.
+Formulae that declare an unconditional dependency on the `"python"` or `"python3"` formulae are bottled against Homebrew's Python 2.7.x or 3.x and require it to be installed.

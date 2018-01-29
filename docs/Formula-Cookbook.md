@@ -106,8 +106,8 @@ The `README` probably tells you about dependencies and Homebrew or macOS probabl
 * `libiconv`
 * `libpcap`
 * `libxml2`
-* `Python`
-* `Ruby`
+* `python`
+* `ruby`
 
 There are plenty of others; check `/usr/lib` for them.
 
@@ -132,7 +132,6 @@ to favour finding `keg_only` formulae first.
 class Foo < Formula
   depends_on "pkg-config" => :run
   depends_on "jpeg"
-  depends_on "boost" => "with-icu"
   depends_on "readline" => :recommended
   depends_on "gtk+" => :optional
   depends_on :x11 => :optional
@@ -164,19 +163,6 @@ A Hash (e.g. `=>`) specifies a formula dependency with some additional informati
       option "with-foo", "Compile with foo bindings" # This overrides the generated description if you want to
       depends_on "foo" => :optional # Generated description is "Build with foo support"
       ```
-
-*   a String or an Array
-
-    String values are interpreted as options to be passed to the dependency.
-    You can also pass an array of strings, or an array of symbols and strings,
-    in which case the symbols are interpreted as described above, and the
-    strings are passed to the dependency as options.
-
-    ```ruby
-    depends_on "foo" => "with-bar"
-    depends_on "foo" => %w{with-bar with-baz}
-    depends_on "foo" => [:optional, "with-bar"]
-    ```
 
 ### Specifying conflicts with other formulae
 
@@ -426,7 +412,7 @@ Note that values *can* contain unescaped spaces if you use the multiple-argument
 
 ## Patches
 
-While [`patch`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#patch-class_method)es should generally be avoided, sometimes they are necessary.
+While [`patch`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#patch-class_method)es should generally be avoided, sometimes they are temporarily necessary.
 
 When [`patch`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#patch-class_method)ing (i.e. fixing header file inclusion, fixing compiler warnings, etc.) the first thing to do is check whether or not the upstream project is aware of the issue. If not, file a bug report and/or submit your patch for inclusion. We may sometimes still accept your patch before it was submitted upstream but by getting the ball rolling on fixing the upstream issue you reduce the length of time we have to carry the patch around.
 
@@ -551,14 +537,9 @@ end
 Sometimes a package fails to build when using a certain compiler. Since recent [Xcode versions](Xcode.md) no longer include a GCC compiler we cannot simply force the use of GCC. Instead, the correct way to declare this is the [`fails_with` DSL method](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#fails_with-class_method). A properly constructed [`fails_with`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#fails_with-class_method) block documents the latest compiler build version known to cause compilation to fail, and the cause of the failure. For example:
 
 ```ruby
-fails_with :llvm do
-  build 2335
-  cause <<~EOS
-    The "cause" field should include a short summary of the error. Include
-    the URLs of any relevant information, such as upstream bug reports. Wrap
-    the text at a sensible boundary (~72-80 characters), but do not break
-    URLs over multiple lines.
-  EOS
+fails_with :clang do
+  build 211
+  cause "Miscompilation resulting in segfault on queries"
 end
 ```
 
@@ -767,13 +748,7 @@ brew -S --fink foo
 
 ## Fortran
 
-Some software requires a Fortran compiler. This can be declared by adding `depends_on :fortran` to a formula. `:fortran` is a `Requirement` that does several things.
-
-First, it looks to see if you have set the `FC` environment variable. If it is set, Homebrew will use this value during compilation. If it is not set, it will check to see if `gfortran` is found in `PATH`. If it is, Homebrew will use its location as the value of `FC`. Otherwise, the `gcc` formula will be treated as a dependency and installed prior to compilation.
-
-If you have set `FC` to a custom Fortran compiler, you may additionally set `FCFLAGS` and `FFLAGS`. Alternatively, you can pass `--default-fortran-flags` to `brew install` to use Homebrew's standard `CFLAGS`.
-
-When using Homebrew's `gfortran` compiler, the standard `CFLAGS` are used and user-supplied values of `FCFLAGS` and `FFLAGS` are ignored for consistency and reproducibility reasons.
+Some software requires a Fortran compiler. This can be declared by adding `depends_on "gcc"` to a formula.
 
 ## How to start over (reset to upstream `master`)
 

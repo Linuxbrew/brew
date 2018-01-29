@@ -2,7 +2,6 @@ require "extend/ENV"
 require "requirement"
 
 describe Requirement do
-  alias_matcher :have_a_default_formula, :be_a_default_formula
   alias_matcher :be_a_build_requirement, :be_a_build
 
   subject { klass.new }
@@ -171,60 +170,6 @@ describe Requirement do
 
     its(:name) { is_expected.to eq("foo") }
     its(:option_names) { are_expected.to eq(["foo"]) }
-  end
-
-  describe "#default_formula?" do
-    context "#default_formula specified" do
-      let(:klass) do
-        Class.new(described_class) do
-          default_formula "foo"
-        end
-      end
-
-      it { is_expected.to have_a_default_formula }
-    end
-
-    context "#default_formula omitted" do
-      it { is_expected.not_to have_a_default_formula }
-    end
-  end
-
-  describe "#to_dependency" do
-    let(:klass) do
-      Class.new(described_class) do
-        default_formula "foo"
-      end
-    end
-
-    it "returns a Dependency for its default Formula" do
-      expect(subject.to_dependency).to eq(Dependency.new("foo"))
-    end
-
-    context "#modify_build_environment" do
-      context "with error" do
-        let(:klass) do
-          Class.new(described_class) do
-            class ModifyBuildEnvironmentError < StandardError; end
-
-            default_formula "foo"
-
-            satisfy do
-              true
-            end
-
-            env do
-              raise ModifyBuildEnvironmentError
-            end
-          end
-        end
-
-        it "raises an error" do
-          expect {
-            subject.to_dependency.modify_build_environment
-          }.to raise_error(klass.const_get(:ModifyBuildEnvironmentError))
-        end
-      end
-    end
   end
 
   describe "#modify_build_environment" do

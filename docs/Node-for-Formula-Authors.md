@@ -34,10 +34,10 @@ If your formula requires being executed with an older Node version you should us
 
 ### Special requirements for native addons
 
-If your Node module is a native addon or has a native addon somewhere in its dependency tree you have to declare an additional dependency. Since the compilation of the native addon results in an invocation of `node-gyp` we need an additional build time dependency on `:python` (because gyp depends on Python 2.7).
+If your Node module is a native addon or has a native addon somewhere in its dependency tree you have to declare an additional dependency. Since the compilation of the native addon results in an invocation of `node-gyp` we need an additional build time dependency on `"python"` (because GYP depends on Python 2.7).
 
 ```ruby
-depends_on :python => :build
+depends_on "python" => :build
 ```
 
 Also note that such a formula would only be compatible with the same Node major version it originally was compiled with. This means that we need to revision every formula with a Node native addon with every major version bump of the `node` formula. To make sure we don't overlook your formula on a Node major version bump, write a meaningful test which would fail in such a case (invoked with an ABI-incompatible Node version).
@@ -99,7 +99,7 @@ class Foo < Formula
 
   depends_on "node"
   # uncomment if there is a native addon inside the dependency tree
-  # depends_on :python => :build
+  # depends_on "python" => :build
 
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)

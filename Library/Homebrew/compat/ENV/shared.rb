@@ -5,6 +5,6 @@ module SharedEnvExtension
   end
 
   def java_cache
-    # odeprecated "ENV.java_cache"
+    odeprecated "ENV.java_cache"
   end
 end

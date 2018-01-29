@@ -30,6 +30,17 @@ describe "patching" do
     end
   end
 
+  matcher :have_its_resource_patched do
+    match do |formula|
+      formula.brew do
+        formula.resources.first.stage Pathname.pwd/"resource_dir"
+        s = File.read("resource_dir/libexec/NOOP")
+        expect(s).not_to include("NOOP"), "libexec/NOOP was not patched as expected"
+        expect(s).to include("ABCD"), "libexec/NOOP was not patched as expected"
+      end
+    end
+  end
+
   matcher :be_sequentially_patched do
     match do |formula|
       formula.brew do
@@ -71,6 +82,22 @@ describe "patching" do
         end
       end,
     ).to be_patched
+  end
+
+  specify "single_patch_dsl_for_resource" do
+    expect(
+      formula do
+        resource "some_resource" do
+          url TESTBALL_URL
+          sha256 TESTBALL_SHA256
+
+          patch do
+            url PATCH_URL_A
+            sha256 PATCH_A_SHA256
+          end
+        end
+      end,
+    ).to have_its_resource_patched
   end
 
   specify "single_patch_dsl_with_apply" do

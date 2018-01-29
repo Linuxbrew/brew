@@ -10,15 +10,3 @@ require "requirements/x11_requirement"
 require "requirements/arch_requirement"
 require "requirements/xcode_requirement"
 require "requirements/glibc_requirement"
-
-class GitRequirement < Requirement
-  fatal true
-  default_formula "git"
-  satisfy { Utils.git_available? }
-end
-
-class SubversionRequirement < Requirement
-  fatal true
-  default_formula "subversion"
-  satisfy { Utils.svn_available? }
-end

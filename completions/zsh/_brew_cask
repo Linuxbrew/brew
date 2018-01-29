@@ -12,17 +12,21 @@
 zstyle -T ':completion:*:*:*:brew-cask:*' tag-order && \
 	zstyle ':completion:*:*:*:brew-cask:*' tag-order 'commands'
 
+__brew_cask() {
+  [ -d "$(brew --repo caskroom/cask)" ] && brew cask $@
+}
+
 __brew_all_casks() {
   local -a list
   local expl
-  list=( $(brew cask search) )
+  list=( $(__brew_cask search) )
   _wanted list expl 'all casks' compadd -a list
 }
 
 __brew_installed_casks() {
   local -a list
   local expl
-  list=( $(brew cask list|sed 's/(!)//') )
+  list=( $(__brew_cask list|sed 's/(!)//') )
   _wanted list expl 'installed casks' compadd -a list
 }
 

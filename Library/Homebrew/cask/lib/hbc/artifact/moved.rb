@@ -65,7 +65,7 @@ module Hbc
         ohai "Moving #{self.class.english_name} '#{target.basename}' back to '#{source}'."
         source.dirname.mkpath
 
-        if source.parent.writable?
+        if target.parent.writable?
           FileUtils.move(target, source)
         else
           command.run("/bin/mv", args: [target, source], sudo: true)

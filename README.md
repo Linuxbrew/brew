@@ -142,7 +142,8 @@ $ brew install hello
 
 ## What Packages Are Available?
 1. Type `brew search` for a list.
-2. Or use `brew search --desc <keyword>` to browse packages from the command line.
+2. Or visit [formulae.brew.sh](http://formulae.brew.sh) to browse packages online.
+3. Or use `brew search --desc <keyword>` to browse packages from the command line.
 
 ## More Documentation
 `brew help`, `man brew` or check [our documentation](https://github.com/SuperNEMO-DBD/brew/tree/master/docs#readme).
@@ -180,6 +181,8 @@ Linuxbrew's lead maintainer is [Shaun Jackman](http://sjackman.ca).
 Linuxbrew/homebrew-core's lead maintainer is [Michka Popoff](https://github.com/iMichka).
 
 Linuxbrew's other current maintainers are [Piotr Gaczkowski](https://github.com/DoomHammer), [Maxim Belkin](https://github.com/maxim-belkin), [Jonathan Chang](https://github.com/jonchang), and [Alyssa Ross](https://github.com/alyssais).
+
+Linuxbrew/homebrew-core's other current maintainers are [Shaun Jackman](http://sjackman.ca).
 
 Former maintainers with significant contributions include [Bob W. Hogg](https://github.com/rwhogg).
 

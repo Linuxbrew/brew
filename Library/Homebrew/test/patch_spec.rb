@@ -48,7 +48,7 @@ describe Patch do
     subject { described_class.create(:p2, nil) }
 
     context "empty patch" do
-      its(:resource) { is_expected.to be_kind_of Resource::Patch }
+      its(:resource) { is_expected.to be_kind_of Resource::PatchResource }
       its(:patch_files) { is_expected.to eq(subject.resource.patch_files) }
       its(:patch_files) { is_expected.to eq([]) }
     end

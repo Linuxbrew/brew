@@ -119,7 +119,7 @@ class ExternalPatch
 
   def initialize(strip, &block)
     @strip    = strip
-    @resource = Resource::Patch.new(&block)
+    @resource = Resource::PatchResource.new(&block)
   end
 
   def external?

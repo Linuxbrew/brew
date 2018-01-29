@@ -33,11 +33,11 @@ class FormulaInstaller
 
   attr_reader :formula
   attr_accessor :options, :build_bottle, :invalid_option_names
-  attr_accessor :installed_as_dependency, :installed_on_request
+  attr_accessor :installed_as_dependency, :installed_on_request, :link_keg
   mode_attr_accessor :show_summary_heading, :show_header
   mode_attr_accessor :build_from_source, :force_bottle
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
-  mode_attr_accessor :verbose, :debug, :quieter, :link_keg
+  mode_attr_accessor :verbose, :debug, :quieter
 
   def initialize(formula)
     @formula = formula
@@ -416,16 +416,6 @@ class FormulaInstaller
     raise UnsatisfiedRequirements, fatals
   end
 
-  def install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
-    return false unless req_dependency
-    return false if req.build? && dependent.installed?
-    return true unless req.satisfied?
-    return false if req.run?
-    return true if build_bottle?
-    return true if req.satisfied_by_formula?
-    install_bottle_for_dependent
-  end
-
   def runtime_requirements(formula)
     runtime_deps = formula.runtime_dependencies.map(&:to_formula)
     recursive_requirements = formula.recursive_requirements do |dependent, _|
@@ -444,16 +434,8 @@ class FormulaInstaller
       f.recursive_requirements do |dependent, req|
         build = effective_build_options_for(dependent)
         install_bottle_for_dependent = install_bottle_for?(dependent, build)
-        use_default_formula = install_bottle_for_dependent || build_bottle?
-        req_dependency = req.to_dependency(use_default_formula: use_default_formula)
 
         if (req.optional? || req.recommended?) && build.without?(req)
-          Requirement.prune
-        elsif req.build? && use_default_formula && req_dependency&.installed?
-          Requirement.prune
-        elsif install_requirement_formula?(req_dependency, req, dependent, install_bottle_for_dependent)
-          deps.unshift(req_dependency)
-          formulae.unshift(req_dependency.to_formula)
           Requirement.prune
         elsif req.satisfied?
           Requirement.prune
@@ -589,19 +571,18 @@ class FormulaInstaller
     end
 
     fi = FormulaInstaller.new(df)
-    fi.options           |= tab.used_options
-    fi.options           |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
-    fi.options           |= inherited_options
-    fi.options           &= df.options
-    fi.build_bottle       = build_bottle? && ENV["HOMEBREW_BUILD_BOTTLE"] == "dependencies"
-    fi.build_from_source  = ARGV.build_formula_from_source?(df)
-    fi.force_bottle       = false
-    fi.verbose            = verbose?
-    fi.quieter            = quieter?
-    fi.debug              = debug?
-    fi.link_keg           = keg_was_linked if keg_had_linked_keg
+    fi.options                |= tab.used_options
+    fi.options                |= Tab.remap_deprecated_options(df.deprecated_options, dep.options)
+    fi.options                |= inherited_options
+    fi.options                &= df.options
+    fi.build_from_source       = ARGV.build_formula_from_source?(df)
+    fi.force_bottle            = false
+    fi.verbose                 = verbose?
+    fi.quieter                 = quieter?
+    fi.debug                   = debug?
+    fi.link_keg              ||= keg_was_linked if keg_had_linked_keg
     fi.installed_as_dependency = true
-    fi.installed_on_request = false
+    fi.installed_on_request    = df.any_version_installed? && tab.installed_on_request
     fi.prelude
     oh1 "Installing #{formula.full_name} dependency: #{Formatter.identifier(dep.name)}"
     fi.install

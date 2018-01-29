@@ -129,7 +129,7 @@ module GitHub
     # This is a no-op if the user is opting out of using the GitHub API.
     return block_given? ? yield({}) : {} if ENV["HOMEBREW_NO_GITHUB_API"]
 
-    args = %W[--header application/vnd.github.v3+json --write-out \n%{http_code}]
+    args = %W[--header application/vnd.github.v3+json --write-out \n%{http_code}] # rubocop:disable Lint/NestedPercentLiteral
     args += curl_args
 
     token, username = api_credentials

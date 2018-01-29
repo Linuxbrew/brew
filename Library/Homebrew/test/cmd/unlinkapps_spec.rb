@@ -12,9 +12,11 @@ describe "brew unlinkapps", :integration_test do
 
     FileUtils.ln_s source_app, apps_dir/"TestBall.app"
 
+    ENV.delete "HOMEBREW_DEVELOPER"
+
     expect { brew "unlinkapps", "--local", "HOME" => home_dir }
       .to output(%r{Unlinking: #{Regexp.escape(apps_dir)}/TestBall.app}).to_stdout
-      .and output(/`brew unlinkapps` has been deprecated/).to_stderr
+      .and output(/'brew unlinkapps' is deprecated/).to_stderr
       .and be_a_success
   end
 end

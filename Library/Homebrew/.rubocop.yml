@@ -5,6 +5,7 @@ AllCops:
   Include:
     - '**/.simplecov'
   Exclude:
+    - 'bin/*'
     - '**/Casks/**/*'
     - '**/vendor/**/*'
 
@@ -79,3 +80,7 @@ Style/GuardClause:
 # hash-rockets preferred for formulae, a: 1 preferred elsewhere
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
+
+# so many of these in formulae but none in here
+Style/TrailingBodyOnMethodDefinition:
+  Enabled: true

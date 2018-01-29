@@ -9,13 +9,11 @@ require "build_environment"
 class Requirement
   include Dependable
 
-  attr_reader :tags, :name, :cask, :download, :default_formula
+  attr_reader :tags, :name, :cask, :download
 
   def initialize(tags = [])
-    @default_formula = self.class.default_formula
     @cask ||= self.class.cask
     @download ||= self.class.download
-    @formula = nil
     tags.each do |tag|
       next unless tag.is_a? Hash
       @cask ||= tag[:cask]
@@ -56,12 +54,6 @@ class Requirement
     result = self.class.satisfy.yielder { |p| instance_eval(&p) }
     @satisfied_result = result
     return false unless result
-
-    if parent = satisfied_result_parent
-      parent.to_s =~ %r{(#{Regexp.escape(HOMEBREW_CELLAR)}|#{Regexp.escape(HOMEBREW_PREFIX)}/opt)/([\w+-.@]+)}
-      @formula = Regexp.last_match(2)
-    end
-
     true
   end
 
@@ -69,10 +61,6 @@ class Requirement
   # Pass a boolean to the fatal DSL method instead.
   def fatal?
     self.class.fatal || false
-  end
-
-  def default_formula?
-    self.class.default_formula || false
   end
 
   def satisfied_result_parent
@@ -124,24 +112,6 @@ class Requirement
     "#<#{self.class.name}: #{name.inspect} #{tags.inspect}>"
   end
 
-  def formula
-    @formula || self.class.default_formula
-  end
-
-  def satisfied_by_formula?
-    !@formula.nil?
-  end
-
-  def to_dependency(use_default_formula: false)
-    if use_default_formula && default_formula?
-      Dependency.new(self.class.default_formula, tags, method(:modify_build_environment), name)
-    elsif formula =~ HOMEBREW_TAP_FORMULA_REGEX
-      TapDependency.new(formula, tags, method(:modify_build_environment), name)
-    elsif formula
-      Dependency.new(formula, tags, method(:modify_build_environment), name)
-    end
-  end
-
   def display_s
     name
   end
@@ -167,8 +137,11 @@ class Requirement
     include BuildEnvironment::DSL
 
     attr_reader :env_proc, :build
-    attr_rw :fatal, :default_formula
-    attr_rw :cask, :download
+    attr_rw :fatal, :cask, :download
+
+    def default_formula(val = nil)
+      # odeprecated "Requirement.default_formula"
+    end
 
     def satisfy(options = nil, &block)
       return @satisfied if options.nil? && !block_given?

@@ -33,6 +33,7 @@
 - [Python for Formula Authors](Python-for-Formula-Authors.md)
 - [Migrating A Formula To A Tap](Migrating-A-Formula-To-A-Tap.md)
 - [Rename A Formula](Rename-A-Formula.md)
+- [Building Against Non-Homebrew Dependencies](Building-Against-Non-Homebrew-Dependencies.md)
 - [How To Create (And Maintain) A Tap](How-to-Create-and-Maintain-a-Tap.md)
 - [Brew Test Bot](Brew-Test-Bot.md)
 - [Prose Style Guidelines](Prose-Style-Guidelines.md)

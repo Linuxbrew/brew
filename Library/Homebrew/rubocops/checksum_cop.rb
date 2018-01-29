@@ -50,8 +50,6 @@ module RuboCop
           end
         end
 
-        private
-
         def autocorrect(node)
           lambda do |corrector|
             correction = node.source.downcase

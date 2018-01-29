@@ -7,7 +7,6 @@ gem "rspec"
 gem "rspec-its", require: false
 gem "rspec-wait", require: false
 gem "rubocop", HOMEBREW_RUBOCOP_VERSION
-gem "test-unit"
 
 group :coverage do
   gem "codecov", require: false

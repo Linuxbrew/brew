@@ -11,7 +11,7 @@ class GlibcRequirement < Requirement
 
   # The minimum version of glibc required to use Linuxbrew bottles.
   def min_version
-    to_dependency.to_formula.version
+    Formula["glibc"].version
   rescue FormulaUnavailableError
     Version::NULL
   end
@@ -19,6 +19,6 @@ class GlibcRequirement < Requirement
   satisfy(build_env: false) do
     next true unless OS.linux?
     next true if min_version.null?
-    to_dependency.installed? || OS::Linux::Glibc.system_version >= min_version
+    Formula["glibc"].installed? || OS::Linux::Glibc.system_version >= min_version
   end
 end

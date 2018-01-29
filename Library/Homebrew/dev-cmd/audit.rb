@@ -102,7 +102,7 @@ module Homebrew
     # Check style in a single batch run up front for performance
     style_results = check_style_json(files, options)
 
-    ff.each do |f|
+    ff.sort.each do |f|
       options = { new_formula: new_formula, strict: strict, online: online }
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
@@ -304,7 +304,7 @@ class FormulaAuditor
   def audit_formula_name
     return unless @strict
     # skip for non-official taps
-    return if formula.tap.nil? || !formula.tap.official?
+    return unless formula.tap&.official?
 
     name = formula.name
 
@@ -718,7 +718,13 @@ class FormulaAuditor
 
     return unless @strict
 
-    problem "`#{Regexp.last_match(1)}` in formulae is deprecated" if line =~ /(env :(std|userpaths))/
+    if formula.tap&.official? && line.include?("env :std")
+      problem "`env :std` in official tap formulae is deprecated"
+    end
+
+    if line.include?("env :userpaths")
+      problem "`env :userpaths` in formulae is deprecated"
+    end
 
     if line =~ /system ((["'])[^"' ]*(?:\s[^"' ]*)+\2)/
       bad_system = Regexp.last_match(1)

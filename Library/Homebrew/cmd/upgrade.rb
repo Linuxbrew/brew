@@ -25,13 +25,7 @@ module Homebrew
 
     Homebrew.perform_preinstall_checks
 
-    if ARGV.include?("--all")
-      opoo <<~EOS
-        We decided to not change the behaviour of `brew upgrade` so
-        `brew upgrade --all` is equivalent to `brew upgrade` without any other
-        arguments (so the `--all` is a no-op and can be removed).
-      EOS
-    end
+    odeprecated "'brew upgrade --all'", "'brew upgrade'" if ARGV.include?("--all")
 
     if ARGV.named.empty?
       outdated = Formula.installed.select do |f|
@@ -89,10 +83,15 @@ module Homebrew
 
     formulae_to_install.each do |f|
       Migrator.migrate_if_needed(f)
-      upgrade_formula(f)
-      next unless ARGV.include?("--cleanup")
-      next unless f.installed?
-      Homebrew::Cleanup.cleanup_formula f
+      begin
+        upgrade_formula(f)
+        next unless ARGV.include?("--cleanup")
+        next unless f.installed?
+        Homebrew::Cleanup.cleanup_formula f
+      rescue UnsatisfiedRequirements => e
+        Homebrew.failed = true
+        onoe "#{f}: #{e}"
+      end
     end
   end
 
@@ -128,7 +127,7 @@ module Homebrew
     fi.options = options
     fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
     fi.installed_on_request = !ARGV.named.empty?
-    fi.link_keg             = keg_was_linked if keg_had_linked_opt
+    fi.link_keg           ||= keg_was_linked if keg_had_linked_opt
     if tab
       fi.installed_as_dependency = tab.installed_as_dependency
       fi.installed_on_request  ||= tab.installed_on_request

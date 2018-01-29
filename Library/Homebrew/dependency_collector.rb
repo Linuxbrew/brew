@@ -1,6 +1,5 @@
 require "dependency"
 require "dependencies"
-require "ld64_dependency"
 require "requirement"
 require "requirements"
 require "set"
@@ -51,6 +50,16 @@ class DependencyCollector
   def build(spec)
     spec, tags = spec.is_a?(Hash) ? spec.first : spec
     parse_spec(spec, Array(tags))
+  end
+
+  def git_dep_if_needed(tags)
+    return if Utils.git_available?
+    Dependency.new("git", tags)
+  end
+
+  def subversion_dep_if_needed(tags)
+    return if Utils.svn_available?
+    Dependency.new("subversion", tags)
   end
 
   def cvs_dep_if_needed(tags)
@@ -127,9 +136,9 @@ class DependencyCollector
     if strategy <= CurlDownloadStrategy
       parse_url_spec(spec.url, tags)
     elsif strategy <= GitDownloadStrategy
-      GitRequirement.new(tags)
+      git_dep_if_needed(tags)
     elsif strategy <= SubversionDownloadStrategy
-      SubversionRequirement.new(tags)
+      subversion_dep_if_needed(tags)
     elsif strategy <= MercurialDownloadStrategy
       Dependency.new("mercurial", tags)
     elsif strategy <= FossilDownloadStrategy
