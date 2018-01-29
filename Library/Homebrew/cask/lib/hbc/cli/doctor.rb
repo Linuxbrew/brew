@@ -17,7 +17,7 @@ module Hbc
       end
 
       def summary_header
-        "Cask's Doctor checkup"
+        "Cask's Doctor Checkup"
       end
 
       def run
@@ -29,7 +29,7 @@ module Hbc
         check_environment_variables
 
         puts summary unless success?
-        raise CaskError, "Your system is not ready for Cask." unless success?
+        raise CaskError, "There are some problems with your setup." unless success?
       end
 
       def check_software_versions
