@@ -767,7 +767,7 @@ module Homebrew
             properly. You can solve this by adding the Homebrew remote:
               git -C "#{HOMEBREW_REPOSITORY}" remote add origin #{Formatter.url(remote)}
           EOS
-        elsif origin !~ %r{(Homebrew|Linuxbrew)/brew(\.git)?$}
+        elsif origin !~ /(?i:#{OS::GITHUB_USER})\/brew(\.git)?$/
           <<~EOS
             Suspicious Homebrew/brew git origin remote found.
 
@@ -1126,6 +1126,20 @@ module Homebrew
               #{bad_tap_files[tap].join("\n  ")}
           EOS
         end.join("\n")
+      end
+
+      def check_supernemo_taps
+        tap = Tap.new "supernemo-dbd", "cadfael"
+        unless tap.installed? and tap.pinned?
+          <<-EOS.undent
+          SuperNEMO-DBD Formula taps are untapped/pinned
+          It's possible you updated cadfaelbrew before running doctor, so simply run
+
+            brew update
+
+          to both update brew and automatically tap and pin any needed Formula repos.
+          EOS
+        end
       end
 
       def all

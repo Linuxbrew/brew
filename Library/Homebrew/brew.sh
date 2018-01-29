@@ -203,6 +203,12 @@ then
   odie "The current working directory doesn't exist, cannot proceed."
 fi
 
+# At present, we always want to build from source on Linux
+if [[ -n "$HOMEBREW_LINUX" ]]
+then
+  export HOMEBREW_BUILD_FROM_SOURCE=1
+fi
+
 if [[ "$1" = -v ]]
 then
   # Shift the -v to the end of the parameter list
@@ -281,6 +287,9 @@ build scripts full access to your system.
 EOS
 }
 check-run-command-as-root
+
+# Disable analytics
+export HOMEBREW_NO_ANALYTICS=1
 
 if [[ "$HOMEBREW_PREFIX" = "/usr/local" &&
       "$HOMEBREW_PREFIX" != "$HOMEBREW_REPOSITORY" &&

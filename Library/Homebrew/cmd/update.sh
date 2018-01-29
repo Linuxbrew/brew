@@ -25,11 +25,11 @@ git() {
 git_init_if_necessary() {
   if [[ -n "$HOMEBREW_MACOS" ]] || [[ -n "$HOMEBREW_FORCE_HOMEBREW_ORG" ]]
   then
-    BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
+    BREW_OFFICIAL_REMOTE="https://github.com/SuperNEMO-DBD/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
   elif [[ -n "$HOMEBREW_LINUX" ]]
   then
-    BREW_OFFICIAL_REMOTE="https://github.com/Linuxbrew/brew"
+    BREW_OFFICIAL_REMOTE="https://github.com/SuperNEMO-DBD/brew"
     CORE_OFFICIAL_REMOTE="https://github.com/Linuxbrew/homebrew-core"
   fi
 
@@ -417,6 +417,16 @@ EOS
   # rename Taps directories
   # this procedure will be removed in the future if it seems unnecessary
   rename_taps_dir_if_necessary
+
+  # Always tap and pin cadfael
+  if [[ ! -d "$HOMEBREW_LIBRARY/Taps/supernemo-dbd/homebrew-cadfael" ]]
+  then
+    brew tap --full supernemo-dbd/cadfael || odie "Could not Tap supernemo-dbd/cadfael"
+  fi
+  if [[ ! -d "$HOMEBREW_LIBRARY/PinnedTaps/supernemo-dbd/cadfael" ]]
+  then
+    brew tap-pin supernemo-dbd/cadfael || odie "Could not Pin supernemo-dbd/cadfael Tap"
+  fi
 
   safe_cd "$HOMEBREW_REPOSITORY"
 

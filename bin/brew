@@ -28,6 +28,9 @@ fi
 
 HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX"
 
+# In case we use brewed Ruby, ensure PATH contains our bin dir
+PATH="$BREW_FILE_DIRECTORY":"$PATH"
+
 # Resolve the bin/brew symlink to find Homebrew's repository
 if [[ -L "$HOMEBREW_BREW_FILE" ]]
 then

@@ -12,11 +12,13 @@ module OS
   end
 
   ::OS_VERSION = ENV["HOMEBREW_OS_VERSION"]
+  
+  GITHUB_USER = "SuperNEMO-DBD".freeze
+  ISSUES_URL = "https://github.com/#{GITHUB_USER}/brew/blob/master/share/doc/homebrew/Troubleshooting.md#troubleshooting".freeze
 
   if OS.mac?
     require "os/mac"
     NAME = "darwin".freeze
-    GITHUB_USER = "Homebrew".freeze
     # Don't tell people to report issues on unsupported versions of macOS.
     if !OS::Mac.prerelease? && !OS::Mac.outdated_release?
       ISSUES_URL = "https://docs.brew.sh/Troubleshooting.html".freeze
@@ -26,8 +28,6 @@ module OS
   elsif OS.linux?
     require "os/mac"
     NAME = "linux".freeze
-    GITHUB_USER = "Linuxbrew".freeze
-    ISSUES_URL = "https://github.com/Linuxbrew/brew/blob/master/docs/Troubleshooting.md#troubleshooting".freeze
     PATH_OPEN = "xdg-open".freeze
     PATH_PATCH = "patch".freeze
   else
