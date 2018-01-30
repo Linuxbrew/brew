@@ -137,9 +137,16 @@ module Homebrew
 
     new_url = ARGV.value("url")
     if new_url && !formula
-      is_devel = ARGV.include?("--devel")
-      base_url = new_url.split("/")[0..4].join("/")
+      # Split the new URL on / and find any formulae that have the same URL
+      # except for the last component, but don't try to match any more than the
+      # first five components since sometimes the last component isn't the only
+      # one to change.
+      new_url_split = new_url.split("/")
+      maximum_url_components_to_match = 5
+      components_to_match = [new_url_split.count - 1, maximum_url_components_to_match].min
+      base_url = new_url_split.first(components_to_match).join("/")
       base_url = /#{Regexp.escape(base_url)}/
+      is_devel = ARGV.include?("--devel")
       guesses = []
       Formula.each do |f|
         if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
@@ -184,14 +191,14 @@ module Homebrew
     elsif !new_url
       odie "#{formula}: no --url= argument specified!"
     else
-      resource_url = if requested_spec != :devel && new_url =~ /.*ftpmirror.gnu.*/
-        new_mirror = new_url.sub "ftpmirror.gnu.org", "ftp.gnu.org/gnu"
-        new_mirror
-      else
-        new_url
+      new_mirror = case new_url
+      when requested_spec != :devel && %r{.*ftp.gnu.org/gnu.*}
+        new_url.sub "ftp.gnu.org/gnu", "ftpmirror.gnu.org"
+      when %r{.*mirrors.ocf.berkeley.edu/debian.*}
+        new_url.sub "mirrors.ocf.berkeley.edu/debian", "mirrorservice.org/sites/ftp.debian.org/debian"
       end
-      resource = Resource.new { @url = resource_url }
-      resource.download_strategy = CurlDownloadStrategy
+      resource = Resource.new { @url = new_url }
+      resource.download_strategy = DownloadStrategyDetector.detect_from_url(new_url)
       resource.owner = Resource.new(formula.name)
       resource.version = forced_version if forced_version
       odie "No --version= argument specified!" unless resource.version
@@ -225,12 +232,12 @@ module Homebrew
     end
 
     replacement_pairs += formula_spec.mirrors.map do |mirror|
-      [/ +mirror \"#{mirror}\"\n/m, ""]
+      [/ +mirror \"#{Regexp.escape(mirror)}\"\n/m, ""]
     end
 
     replacement_pairs += if new_url_hash
       [
-        [formula_spec.url, new_url],
+        [/#{Regexp.escape(formula_spec.url)}/, new_url],
         [old_hash, new_hash],
       ]
     else
@@ -243,7 +250,7 @@ module Homebrew
     backup_file = File.read(formula.path) unless ARGV.dry_run?
 
     if new_mirror
-      replacement_pairs << [/^( +)(url \"#{new_url}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
+      replacement_pairs << [/^( +)(url \"#{Regexp.escape(new_url)}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
     end
 
     if forced_version && forced_version != "0"
@@ -260,7 +267,7 @@ module Homebrew
       end
     elsif forced_version && forced_version == "0"
       if requested_spec == :stable
-        replacement_pairs << [/^  version \"[a-z\d+\.]+\"\n/m, ""]
+        replacement_pairs << [/^  version \"[\w\.\-\+]+\"\n/m, ""]
       elsif requested_spec == :devel
         replacement_pairs << [/(  devel do.+?)^ +version \"[^\n]+\"\n(.+?end\n)/m, "\\1\\2"]
       end
