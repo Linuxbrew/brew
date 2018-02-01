@@ -126,11 +126,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `desc` `formula`:
     Display `formula`'s name and one-line description.
 
-  * `desc` [`-s`|`-n`|`-d`] (`text`|`/``text``/`):
-    Search both name and description (`-s`), just the names (`-n`), or just  the
-    descriptions (`-d`) for `text`. If `text` is flanked by slashes, it is interpreted
-    as a regular expression. Formula descriptions are cached; the cache is created on
-    the first search, making that search slower than subsequent ones.
+  * `desc` [`--search`|`--name`|`--description`] (`text`|`/``text``/`):
+    Search both name and description (`--search` or `-s`), just the names
+    (`--name` or `-n`), or just the descriptions (`--description` or `-d`) for
+    `text`. If `text` is flanked by slashes, it is interpreted as a regular
+    expression. Formula descriptions are cached; the cache is created on the
+    first search, making that search slower than subsequent ones.
 
   * `diy` [`--name=``name`] [`--version=``version`]:
     Automatically determine the installation prefix for non-Homebrew software.
@@ -179,6 +180,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     `formula` is usually the name of the formula to install, but it can be specified
     in several different ways. See [SPECIFYING FORMULAE](#specifying-formulae).
 
+    If `--with-hostname` is passed, include the hostname in the Gist.
+
     If `--new-issue` is passed, automatically create a new issue in the appropriate
     GitHub repository as well as creating the Gist.
 
@@ -190,11 +193,14 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `home` `formula`:
     Open `formula`'s homepage in a browser.
 
+  * `info`:
+    Display brief statistics for your Homebrew installation.
+
   * `info` `formula`:
     Display information about `formula`.
 
   * `info` `--github` `formula`:
-    Open a browser to the GitHub History page for formula `formula`.
+    Open a browser to the GitHub History page for `formula`.
 
     To view formula history locally: `brew log -p `formula``
 
@@ -208,7 +214,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     See the docs for examples of using the JSON output:
     <https://docs.brew.sh/Querying-Brew.html>
 
-  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] `formula` [`options` ...]:
+  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] `formula` [`options` ...]:
     Install `formula`.
 
     `formula` is usually the name of the formula to install, but it can be specified
@@ -257,6 +263,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--build-bottle` is passed, prepare the formula for eventual bottling
     during installation.
 
+    If `--force` (or `-f`) is passed, install without checking for previously
+    installed keg-only or non-migrated versions
+
+    If `--verbose` (or `-v`) is passed, print the verification and postinstall steps.
+
     Installation options specific to `formula` may be appended to the command,
     and can be listed with `brew options` `formula`.
 
@@ -299,7 +310,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `list`, `ls` `--unbrewed`:
     List all files in the Homebrew prefix not installed by Homebrew.
 
-  * `list`, `ls` [`--versions` [`--multiple`]] [`--pinned`] [`formulae`]:
+  * `list`, `ls` [`--verbose`] [`--versions` [`--multiple`]] [`--pinned`] [`formulae`]:
     List the installed files for `formulae`. Combined with `--verbose`, recursively
     list the contents of all subdirectories in each `formula`'s keg.
 
@@ -350,8 +361,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--verbose` (or `-v`) is passed, display detailed version information.
 
-    If `--json=``version` is passed, the output will be in JSON format. The only
-    valid version is `v1`.
+    If `--json=``version` is passed, the output will be in JSON format.
+    Currently the only accepted value for `version` is `v1`.
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
     the HEAD installation of the formula is outdated. Otherwise, the
@@ -375,12 +386,16 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
 
-  * `readall` [tap]:
-    Import all formulae from specified taps (defaults to all installed taps).
+  * `readall` [`--aliases`] [`--syntax`] [`taps`]:
+    Import all formulae from specified `taps` (defaults to all installed taps).
 
     This can be useful for debugging issues across all formulae when making
     significant changes to `formula.rb`, testing the performance of loading
     all formulae or to determine if any current formulae have Ruby issues.
+
+    If `--aliases` is passed, also verify any alias symlinks in each tap.
+
+    If `--syntax` is passed, also syntax-check all of Homebrew's Ruby files.
 
   * `reinstall` `formula`:
     Uninstall and then install `formula` (with existing install options).
@@ -409,22 +424,22 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--env=std` is passed, use the standard `PATH` instead of superenv's.
 
-  * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [`files`|`taps`|`formulae`]:
+  * `style` [`--fix`] [`--display-cop-names`] [`--only-cops=``cops`|`--except-cops=``cops`] [`files`|`taps`|`formulae`]:
     Check formulae or files for conformance to Homebrew style guidelines.
 
-    `formulae` and `files` may not be combined. If both are omitted, style will run
-    style checks on the whole Homebrew `Library`, including core code and all
-    formulae.
+    Lists of `files`, `taps` and `formulae` may not be combined. If none are
+    provided, `style` will run style checks on the whole Homebrew library,
+    including core code and all formulae.
 
-    If `--fix` is passed, style violations will be automatically fixed using
-    RuboCop's `--auto-correct` feature.
+    If `--fix` is passed, automatically fix style violations using RuboCop's
+    auto-correct feature.
 
-    If `--display-cop-names` is passed, the RuboCop cop name for each violation
-    is included in the output.
+    If `--display-cop-names` is passed, include the RuboCop cop name for each
+    violation in the output.
 
-    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
-
-    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
+    Passing `--only-cops=``cops` will check for violations of only the listed
+    RuboCop `cops`, while `--except-cops=``cops` will skip checking the listed
+    `cops`. For either option `cops` should be a comma-separated list of cop names.
 
     Exits with a non-zero status if any style violations are found.
 
@@ -585,8 +600,14 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Display the location in the cellar where `formula` would be installed,
     without any sort of versioned directory as the last path.
 
-  * `--env`:
-    Show a summary of the Homebrew build environment.
+  * `--env` [`--shell=`(`shell`|`auto`)|`--plain`]:
+    Show a summary of the Homebrew build environment as a plain list.
+
+    Pass `--shell=``shell` to generate a list of environment variables for the
+    specified shell, or `--shell=auto` to detect the current shell.
+
+    If the command's output is sent through a pipe and no shell is specified,
+    the list is formatted for export to `bash`(1) unless `--plain` is passed.
 
   * `--prefix`:
     Display Homebrew's install path. *Default:* `/usr/local`
@@ -605,7 +626,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## DEVELOPER COMMANDS
 
-  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=``method`|`--except=``method`] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [`formulae`]:
+  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=``method`|`--except=``method`] [`--only-cops=``cops`|`--except-cops=``cops`] [`formulae`]:
     Check `formulae` for Homebrew coding style violations. This should be
     run before submitting a new formula.
 
@@ -615,7 +636,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     style checks.
 
     If `--fix` is passed, style violations will be
-    automatically fixed using RuboCop's `--auto-correct` feature.
+    automatically fixed using RuboCop's auto-correct feature.
 
     If `--online` is passed, additional slower checks that require a network
     connection are run.
@@ -630,13 +651,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--display-filename` is passed, every line of output is prefixed with the
     name of the file or formula being audited, to make the output easy to grep.
 
-    If `--only` is passed, only the methods named `audit_`method`` will be run.
+    Passing `--only=``method` will run only the methods named `audit_`method``,
+    while `--except=``method` will skip the methods named `audit_`method``.
+    For either option `method` should be a comma-separated list.
 
-    If `--except` is passed, the methods named `audit_`method`` will not be run.
-
-    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
-
-    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
+    Passing `--only-cops=``cops` will check for violations of only the listed
+    RuboCop `cops`, while `--except-cops=``cops` will skip checking the listed
+    `cops`. For either option `cops` should be a comma-separated list of cop names.
 
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.
@@ -703,6 +724,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     which opens the pull request URL in a browser. Instead, output it to the
     command line.
 
+    If `--quiet` is passed, don't output replacement messages or warn about
+    duplicate pull requests.
+
     Note that this command cannot be used to transition a formula from a
     URL-and-sha256 style specification into a tag-and-revision style
     specification, nor vice versa. It must use whichever style specification
@@ -738,7 +762,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `formula` `formula`:
     Display the path where `formula` is located.
 
-  * `linkage` [`--test`] [`--reverse`]  `formula`:
+  * `linkage` [`--test`] [`--reverse`] `formula`:
     Checks the library links of an installed formula.
 
     Only works on installed formulae. An error is raised if it is run on

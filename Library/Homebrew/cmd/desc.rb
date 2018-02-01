@@ -1,11 +1,12 @@
 #:  * `desc` <formula>:
 #:    Display <formula>'s name and one-line description.
 #:
-#:  * `desc` [`-s`|`-n`|`-d`] (<text>|`/`<text>`/`):
-#:    Search both name and description (`-s`), just the names (`-n`), or just  the
-#:    descriptions (`-d`) for <text>. If <text> is flanked by slashes, it is interpreted
-#:    as a regular expression. Formula descriptions are cached; the cache is created on
-#:    the first search, making that search slower than subsequent ones.
+#:  * `desc` [`--search`|`--name`|`--description`] (<text>|`/`<text>`/`):
+#:    Search both name and description (`--search` or `-s`), just the names
+#:    (`--name` or `-n`), or just the descriptions (`--description` or `-d`) for
+#:    <text>. If <text> is flanked by slashes, it is interpreted as a regular
+#:    expression. Formula descriptions are cached; the cache is created on the
+#:    first search, making that search slower than subsequent ones.
 
 require "descriptions"
 require "cmd/search"

@@ -1,8 +1,11 @@
+#:  * `info`:
+#:    Display brief statistics for your Homebrew installation.
+#:
 #:  * `info` <formula>:
 #:    Display information about <formula>.
 #:
 #:  * `info` `--github` <formula>:
-#:    Open a browser to the GitHub History page for formula <formula>.
+#:    Open a browser to the GitHub History page for <formula>.
 #:
 #:    To view formula history locally: `brew log -p <formula>`
 #:

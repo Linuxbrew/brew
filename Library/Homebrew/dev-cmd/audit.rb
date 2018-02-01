@@ -1,4 +1,4 @@
-#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method>] [`--only-cops=`[COP1,COP2..]|`--except-cops=`[COP1,COP2..]] [<formulae>]:
+#:  * `audit` [`--strict`] [`--fix`] [`--online`] [`--new-formula`] [`--display-cop-names`] [`--display-filename`] [`--only=`<method>|`--except=`<method>] [`--only-cops=`<cops>|`--except-cops=`<cops>] [<formulae>]:
 #:    Check <formulae> for Homebrew coding style violations. This should be
 #:    run before submitting a new formula.
 #:
@@ -8,7 +8,7 @@
 #:    style checks.
 #:
 #:    If `--fix` is passed, style violations will be
-#:    automatically fixed using RuboCop's `--auto-correct` feature.
+#:    automatically fixed using RuboCop's auto-correct feature.
 #:
 #:    If `--online` is passed, additional slower checks that require a network
 #:    connection are run.
@@ -23,19 +23,19 @@
 #:    If `--display-filename` is passed, every line of output is prefixed with the
 #:    name of the file or formula being audited, to make the output easy to grep.
 #:
-#:    If `--only` is passed, only the methods named `audit_<method>` will be run.
+#:    Passing `--only=`<method> will run only the methods named `audit_<method>`,
+#:    while `--except=`<method> will skip the methods named `audit_<method>`.
+#:    For either option <method> should be a comma-separated list.
 #:
-#:    If `--except` is passed, the methods named `audit_<method>` will not be run.
-#:
-#:    If `--only-cops` is passed, only the given Rubocop cop(s)' violations would be checked.
-#:
-#:    If `--except-cops` is passed, the given Rubocop cop(s)' checks would be skipped.
+#:    Passing `--only-cops=`<cops> will check for violations of only the listed
+#:    RuboCop <cops>, while `--except-cops=`<cops> will skip checking the listed
+#:    <cops>. For either option <cops> should be a comma-separated list of cop names.
 #:
 #:    `audit` exits with a non-zero status if any errors are found. This is useful,
 #:    for instance, for implementing pre-commit hooks.
 
 # Undocumented options:
-#     -D activates debugging and profiling of the audit methods (not the same as --debug)
+#     `-D` activates debugging and profiling of the audit methods (not the same as `--debug`)
 
 require "formula"
 require "formula_versions"

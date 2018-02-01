@@ -25,6 +25,10 @@
 #:    If `--write` is passed, write the changes to the formula file. A new
 #:    commit will then be generated unless `--no-commit` is passed.
 
+# Undocumented options:
+#     `--json` writes bottle information to a JSON file, which can be used as
+#     the argument for `--merge`.
+
 require "formula"
 require "utils/bottles"
 require "tab"

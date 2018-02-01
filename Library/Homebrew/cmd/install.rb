@@ -1,4 +1,4 @@
-#:  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] <formula> [<options> ...]:
+#:  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] <formula> [<options> ...]:
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -46,6 +46,11 @@
 #:
 #:    If `--build-bottle` is passed, prepare the formula for eventual bottling
 #:    during installation.
+#:
+#:    If `--force` (or `-f`) is passed, install without checking for previously
+#:    installed keg-only or non-migrated versions
+#:
+#:    If `--verbose` (or `-v`) is passed, print the verification and postinstall steps.
 #:
 #:    Installation options specific to <formula> may be appended to the command,
 #:    and can be listed with `brew options` <formula>.
