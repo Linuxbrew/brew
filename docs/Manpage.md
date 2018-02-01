@@ -202,7 +202,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `info` `--github` `formula`:
     Open a browser to the GitHub History page for `formula`.
 
-    To view formula history locally: `brew log -p `formula``
+    To view formula history locally: `brew log -p `formula
 
   * `info` `--json=``version` (`--all`|`--installed`|`formulae`):
     Print a JSON representation of `formulae`. Currently the only accepted value
@@ -371,7 +371,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `pin` `formulae`:
     Pin the specified `formulae`, preventing them from being upgraded when
-    issuing the `brew upgrade `formulae`` command (but can still be upgraded
+    issuing the `brew upgrade `formulae command (but can still be upgraded
     as dependencies for other formulae). See also `unpin`.
 
   * `postinstall` `formula`:
@@ -454,7 +454,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     With `URL` unspecified, taps a formula repository from GitHub using HTTPS.
     Since so many taps are hosted on GitHub, this command is a shortcut for
-    `tap `user`/`repo` https://github.com/`user`/homebrew-`repo``.
+    `tap `user`/`repo` https://github.com/`user`/homebrew-`repo.
 
     With `URL` specified, taps a formula repository from anywhere, using
     any transport protocol that `git` handles. The one-argument form of `tap`
@@ -515,7 +515,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `unlink` [`--dry-run`] `formula`:
     Remove symlinks for `formula` from the Homebrew prefix. This can be useful
     for temporarily disabling a formula:
-    `brew unlink `formula` && `commands` && brew link `formula``
+    `brew unlink `formula` && `commands` && brew link `formula
 
     If `--dry-run` or `-n` is passed, Homebrew will list all files which would
     be unlinked, but will not actually unlink or delete any files.
@@ -532,7 +532,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     source. This is useful for creating patches for the software.
 
   * `unpin` `formulae`:
-    Unpin `formulae`, allowing them to be upgraded by `brew upgrade `formulae``.
+    Unpin `formulae`, allowing them to be upgraded by `brew upgrade `formulae.
     See also `pin`.
 
   * `untap` `tap`:
@@ -651,8 +651,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--display-filename` is passed, every line of output is prefixed with the
     name of the file or formula being audited, to make the output easy to grep.
 
-    Passing `--only=``method` will run only the methods named `audit_`method``,
-    while `--except=``method` will skip the methods named `audit_`method``.
+    Passing `--only=``method` will run only the methods named `audit_`method,
+    while `--except=``method` will skip the methods named `audit_`method.
     For either option `method` should be a comma-separated list.
 
     Passing `--only-cops=``cops` will check for violations of only the listed
