@@ -1062,6 +1062,10 @@ can take several different forms:
     Sets the HTTPS proxy to be used by `curl`, `git` and `svn` when downloading
     through Homebrew.
 
+  * `all_proxy`:
+    Sets the SOCKS5 proxy to be used by `curl`, `git` and `svn` when downloading
+    through Homebrew.
+
   * `ftp_proxy`:
     Sets the FTP proxy to be used by `curl`, `git` and `svn` when downloading
     through Homebrew.
@@ -1071,11 +1075,13 @@ can take several different forms:
     by `curl`, `git` and `svn` when downloading through Homebrew.
 
 ## USING HOMEBREW BEHIND A PROXY
-Use the `http_proxy`, `https_proxy`, `no_proxy` and/or `ftp_proxy` documented above.
+Use the `http_proxy`, `https_proxy`, `all_proxy`, `no_proxy` and/or `ftp_proxy` documented above.
 
-For example for an unauthenticated HTTP proxy:
+For example for an unauthenticated HTTP or SOCKS5 proxy:
 
     export http_proxy=http://`host`:`port`
+
+    export all_proxy=socks5://`host`:`port`
 
 And for an authenticated HTTP proxy:
 

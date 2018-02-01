@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "January 2018" "Homebrew" "brew"
+.TH "BREW" "1" "February 2018" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -1088,6 +1088,10 @@ Sets the HTTP proxy to be used by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downl
 Sets the HTTPS proxy to be used by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downloading through Homebrew\.
 .
 .TP
+\fBall_proxy\fR
+Sets the SOCKS5 proxy to be used by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downloading through Homebrew\.
+.
+.TP
 \fBftp_proxy\fR
 Sets the FTP proxy to be used by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downloading through Homebrew\.
 .
@@ -1096,16 +1100,18 @@ Sets the FTP proxy to be used by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downlo
 Sets the comma\-separated list of hostnames and domain names that should be excluded from proxying by \fBcurl\fR, \fBgit\fR and \fBsvn\fR when downloading through Homebrew\.
 .
 .SH "USING HOMEBREW BEHIND A PROXY"
-Use the \fBhttp_proxy\fR, \fBhttps_proxy\fR, \fBno_proxy\fR and/or \fBftp_proxy\fR documented above\.
+Use the \fBhttp_proxy\fR, \fBhttps_proxy\fR, \fBall_proxy\fR, \fBno_proxy\fR and/or \fBftp_proxy\fR documented above\.
 .
 .P
-For example for an unauthenticated HTTP proxy:
+For example for an unauthenticated HTTP or SOCKS5 proxy:
 .
 .IP "" 4
 .
 .nf
 
 export http_proxy=http://<host>:<port>
+
+export all_proxy=socks5://<host>:<port>
 .
 .fi
 .

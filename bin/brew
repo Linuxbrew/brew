@@ -67,7 +67,7 @@ then
   FILTERED_ENV=()
   # Filter all but the specific variables.
   for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS SSH_AUTH_SOCK SUDO_ASKPASS \
-             http_proxy https_proxy ftp_proxy no_proxy HTTPS_PROXY FTP_PROXY ALL_PROXY \
+             http_proxy https_proxy ftp_proxy no_proxy all_proxy HTTPS_PROXY FTP_PROXY ALL_PROXY \
              "${!HOMEBREW_@}" "${!TRAVIS_@}" "${!JENKINS_@}"
   do
     # Skip if variable value is empty.
