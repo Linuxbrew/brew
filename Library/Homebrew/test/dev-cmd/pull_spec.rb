@@ -12,6 +12,8 @@ describe "brew pull", :integration_test do
       system "git", "checkout", "-b", "new-branch"
     end
 
+    HOMEBREW_REPOSITORY = OS.mac? ? "Homebrew" : "Linuxbrew"
+
     expect { brew "pull", "https://jenkins.brew.sh/job/Homebrew\%20Testing/1028/" }
       .to output(/Testing URLs require `\-\-bottle`!/).to_stderr
       .and not_to_output.to_stdout
@@ -22,17 +24,17 @@ describe "brew pull", :integration_test do
       .and output(/Current branch is new\-branch/).to_stderr
       .and be_a_failure
 
-    expect { brew "pull", "--bump", "https://github.com/Homebrew/homebrew-core/pull/8" }
+    expect { brew "pull", "--bump", "https://github.com/#{HOMEBREW_REPOSITORY}/homebrew-core/pull/8" }
       .to output(/Fetching patch/).to_stdout
       .and output(/No changed formulae found to bump/).to_stderr
       .and be_a_failure
 
-    expect { brew "pull", "--bump", "https://api.github.com/repos/Homebrew/homebrew-core/pulls/122" }
+    expect { brew "pull", "--bump", "https://api.github.com/repos/#{HOMEBREW_REPOSITORY}/homebrew-core/pulls/122" }
       .to output(/Fetching patch/).to_stdout
       .and output(/Can only bump one changed formula/).to_stderr
       .and be_a_failure
 
-    expect { brew "pull", "https://github.com/Homebrew/brew/pull/1249" }
+    expect { brew "pull", "https://github.com/#{HOMEBREW_REPOSITORY}/brew/pull/1249" }
       .to output(/Fetching patch/).to_stdout
       .and output(/Patch failed to apply/).to_stderr
       .and be_a_failure
