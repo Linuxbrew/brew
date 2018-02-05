@@ -33,11 +33,15 @@ You can be added as a maintainer for one of the Homebrew organization taps and a
 
 *   [brewsci/science](https://github.com/brewsci/homebrew-science): Software tailored to scientific endeavours.
 
+*   [davidchall/hep](https://github.com/davidchall/homebrew-hep): High energy physics formulae.
+
+*   [lifepillar/appleii](https://github.com/lifepillar/homebrew-appleii): Formulae for vintage Apple emulation.
+
 ## Interesting forks
 
-*   [mistydemeo/tigerbrew](https://github.com/mistydemeo/tigerbrew): Experimental Tiger PowerPC version
+*   [mistydemeo/tigerbrew](https://github.com/mistydemeo/tigerbrew): Experimental Tiger PowerPC version.
 
-*   [Linuxbrew/brew](https://github.com/Linuxbrew/brew): Experimental Linux version
+*   [Linuxbrew/brew](https://github.com/Linuxbrew/brew): Experimental Linux version.
 
 ## Technical details
 

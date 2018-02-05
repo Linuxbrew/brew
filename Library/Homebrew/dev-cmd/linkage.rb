@@ -1,4 +1,4 @@
-#:  * `linkage` [`--test`] [`--reverse`]  <formula>:
+#:  * `linkage` [`--test`] [`--reverse`] <formula>:
 #:    Checks the library links of an installed formula.
 #:
 #:    Only works on installed formulae. An error is raised if it is run on

@@ -108,7 +108,7 @@ module Homebrew
       ronn.write markup
       ronn.close_write
       ronn_output = ronn.read
-      ronn_output.gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
+      ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
       target.atomic_write ronn_output
     end
   end

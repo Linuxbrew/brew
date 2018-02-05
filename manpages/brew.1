@@ -137,8 +137,8 @@ The \fIfilters\fR placeholder is any combination of options \fB\-\-include\-buil
 Display \fIformula\fR\'s name and one\-line description\.
 .
 .TP
-\fBdesc\fR [\fB\-s\fR|\fB\-n\fR|\fB\-d\fR] (\fItext\fR|\fB/\fR\fItext\fR\fB/\fR)
-Search both name and description (\fB\-s\fR), just the names (\fB\-n\fR), or just the descriptions (\fB\-d\fR) for \fItext\fR\. If \fItext\fR is flanked by slashes, it is interpreted as a regular expression\. Formula descriptions are cached; the cache is created on the first search, making that search slower than subsequent ones\.
+\fBdesc\fR [\fB\-\-search\fR|\fB\-\-name\fR|\fB\-\-description\fR] (\fItext\fR|\fB/\fR\fItext\fR\fB/\fR)
+Search both name and description (\fB\-\-search\fR or \fB\-s\fR), just the names (\fB\-\-name\fR or \fB\-n\fR), or just the descriptions (\fB\-\-description\fR or \fB\-d\fR) for \fItext\fR\. If \fItext\fR is flanked by slashes, it is interpreted as a regular expression\. Formula descriptions are cached; the cache is created on the first search, making that search slower than subsequent ones\.
 .
 .TP
 \fBdiy\fR [\fB\-\-name=\fR\fIname\fR] [\fB\-\-version=\fR\fIversion\fR]
@@ -187,6 +187,9 @@ Upload logs for a failed build of \fIformula\fR to a new Gist\.
 \fIformula\fR is usually the name of the formula to install, but it can be specified in several different ways\. See \fISPECIFYING FORMULAE\fR\.
 .
 .IP
+If \fB\-\-with\-hostname\fR is passed, include the hostname in the Gist\.
+.
+.IP
 If \fB\-\-new\-issue\fR is passed, automatically create a new issue in the appropriate GitHub repository as well as creating the Gist\.
 .
 .IP
@@ -201,12 +204,16 @@ Open Homebrew\'s own homepage in a browser\.
 Open \fIformula\fR\'s homepage in a browser\.
 .
 .TP
+\fBinfo\fR
+Display brief statistics for your Homebrew installation\.
+.
+.TP
 \fBinfo\fR \fIformula\fR
 Display information about \fIformula\fR\.
 .
 .TP
 \fBinfo\fR \fB\-\-github\fR \fIformula\fR
-Open a browser to the GitHub History page for formula \fIformula\fR\.
+Open a browser to the GitHub History page for \fIformula\fR\.
 .
 .IP
 To view formula history locally: \fBbrew log \-p <formula>\fR
@@ -222,7 +229,7 @@ Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to
 See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\.html\fR
 .
 .TP
-\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] \fIformula\fR [\fIoptions\fR \.\.\.]
+\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] [\fB\-\-force\fR] [\fB\-\-verbose\fR] \fIformula\fR [\fIoptions\fR \.\.\.]
 Install \fIformula\fR\.
 .
 .IP
@@ -268,6 +275,12 @@ If \fB\-\-keep\-tmp\fR is passed, the temporary files created during installatio
 If \fB\-\-build\-bottle\fR is passed, prepare the formula for eventual bottling during installation\.
 .
 .IP
+If \fB\-\-force\fR (or \fB\-f\fR) is passed, install without checking for previously installed keg\-only or non\-migrated versions
+.
+.IP
+If \fB\-\-verbose\fR (or \fB\-v\fR) is passed, print the verification and postinstall steps\.
+.
+.IP
 Installation options specific to \fIformula\fR may be appended to the command, and can be listed with \fBbrew options\fR \fIformula\fR\.
 .
 .TP
@@ -310,7 +323,7 @@ List all installed formulae\. If \fB\-\-full\-name\fR is passed, print formulae 
 List all files in the Homebrew prefix not installed by Homebrew\.
 .
 .TP
-\fBlist\fR, \fBls\fR [\fB\-\-versions\fR [\fB\-\-multiple\fR]] [\fB\-\-pinned\fR] [\fIformulae\fR]
+\fBlist\fR, \fBls\fR [\fB\-\-verbose\fR] [\fB\-\-versions\fR [\fB\-\-multiple\fR]] [\fB\-\-pinned\fR] [\fIformulae\fR]
 List the installed files for \fIformulae\fR\. Combined with \fB\-\-verbose\fR, recursively list the contents of all subdirectories in each \fIformula\fR\'s keg\.
 .
 .IP
@@ -364,7 +377,7 @@ If \fB\-\-quiet\fR is passed, list only the names of outdated brews (takes prece
 If \fB\-\-verbose\fR (or \fB\-v\fR) is passed, display detailed version information\.
 .
 .IP
-If \fB\-\-json=\fR\fIversion\fR is passed, the output will be in JSON format\. The only valid version is \fBv1\fR\.
+If \fB\-\-json=\fR\fIversion\fR is passed, the output will be in JSON format\. Currently the only accepted value for \fIversion\fR is \fBv1\fR\.
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.
@@ -385,11 +398,17 @@ Remove dead symlinks from the Homebrew prefix\. This is generally not needed, bu
 If \fB\-\-dry\-run\fR or \fB\-n\fR is passed, show what would be removed, but do not actually remove anything\.
 .
 .TP
-\fBreadall\fR [tap]
-Import all formulae from specified taps (defaults to all installed taps)\.
+\fBreadall\fR [\fB\-\-aliases\fR] [\fB\-\-syntax\fR] [\fItaps\fR]
+Import all formulae from specified \fItaps\fR (defaults to all installed taps)\.
 .
 .IP
 This can be useful for debugging issues across all formulae when making significant changes to \fBformula\.rb\fR, testing the performance of loading all formulae or to determine if any current formulae have Ruby issues\.
+.
+.IP
+If \fB\-\-aliases\fR is passed, also verify any alias symlinks in each tap\.
+.
+.IP
+If \fB\-\-syntax\fR is passed, also syntax\-check all of Homebrew\'s Ruby files\.
 .
 .TP
 \fBreinstall\fR \fIformula\fR
@@ -418,23 +437,20 @@ Start a Homebrew build environment shell\. Uses our years\-battle\-hardened Home
 If \fB\-\-env=std\fR is passed, use the standard \fBPATH\fR instead of superenv\'s\.
 .
 .TP
-\fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-only\-cops=\fR[COP1,COP2\.\.]|\fB\-\-except\-cops=\fR[COP1,COP2\.\.]] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]
+\fBstyle\fR [\fB\-\-fix\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-only\-cops=\fR\fIcops\fR|\fB\-\-except\-cops=\fR\fIcops\fR] [\fIfiles\fR|\fItaps\fR|\fIformulae\fR]
 Check formulae or files for conformance to Homebrew style guidelines\.
 .
 .IP
-\fIformulae\fR and \fIfiles\fR may not be combined\. If both are omitted, style will run style checks on the whole Homebrew \fBLibrary\fR, including core code and all formulae\.
+Lists of \fIfiles\fR, \fItaps\fR and \fIformulae\fR may not be combined\. If none are provided, \fBstyle\fR will run style checks on the whole Homebrew library, including core code and all formulae\.
 .
 .IP
-If \fB\-\-fix\fR is passed, style violations will be automatically fixed using RuboCop\'s \fB\-\-auto\-correct\fR feature\.
+If \fB\-\-fix\fR is passed, automatically fix style violations using RuboCop\'s auto\-correct feature\.
 .
 .IP
-If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violation is included in the output\.
+If \fB\-\-display\-cop\-names\fR is passed, include the RuboCop cop name for each violation in the output\.
 .
 .IP
-If \fB\-\-only\-cops\fR is passed, only the given Rubocop cop(s)\' violations would be checked\.
-.
-.IP
-If \fB\-\-except\-cops\fR is passed, the given Rubocop cop(s)\' checks would be skipped\.
+Passing \fB\-\-only\-cops=\fR\fIcops\fR will check for violations of only the listed RuboCop \fIcops\fR, while \fB\-\-except\-cops=\fR\fIcops\fR will skip checking the listed \fIcops\fR\. For either option \fIcops\fR should be a comma\-separated list of cop names\.
 .
 .IP
 Exits with a non\-zero status if any style violations are found\.
@@ -602,8 +618,14 @@ Display Homebrew\'s Cellar path\. \fIDefault:\fR \fB$(brew \-\-prefix)/Cellar\fR
 Display the location in the cellar where \fIformula\fR would be installed, without any sort of versioned directory as the last path\.
 .
 .TP
-\fB\-\-env\fR
-Show a summary of the Homebrew build environment\.
+\fB\-\-env\fR [\fB\-\-shell=\fR(\fIshell\fR|\fBauto\fR)|\fB\-\-plain\fR]
+Show a summary of the Homebrew build environment as a plain list\.
+.
+.IP
+Pass \fB\-\-shell=\fR\fIshell\fR to generate a list of environment variables for the specified shell, or \fB\-\-shell=auto\fR to detect the current shell\.
+.
+.IP
+If the command\'s output is sent through a pipe and no shell is specified, the list is formatted for export to \fBbash\fR(1) unless \fB\-\-plain\fR is passed\.
 .
 .TP
 \fB\-\-prefix\fR
@@ -628,7 +650,7 @@ Print the version number of Homebrew to standard output and exit\.
 .SH "DEVELOPER COMMANDS"
 .
 .TP
-\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-fix\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fB\-\-only=\fR\fImethod\fR|\fB\-\-except=\fR\fImethod\fR] [\fB\-\-only\-cops=\fR[COP1,COP2\.\.]|\fB\-\-except\-cops=\fR[COP1,COP2\.\.]] [\fIformulae\fR]
+\fBaudit\fR [\fB\-\-strict\fR] [\fB\-\-fix\fR] [\fB\-\-online\fR] [\fB\-\-new\-formula\fR] [\fB\-\-display\-cop\-names\fR] [\fB\-\-display\-filename\fR] [\fB\-\-only=\fR\fImethod\fR|\fB\-\-except=\fR\fImethod\fR] [\fB\-\-only\-cops=\fR\fIcops\fR|\fB\-\-except\-cops=\fR\fIcops\fR] [\fIformulae\fR]
 Check \fIformulae\fR for Homebrew coding style violations\. This should be run before submitting a new formula\.
 .
 .IP
@@ -638,7 +660,7 @@ If no \fIformulae\fR are provided, all of them are checked\.
 If \fB\-\-strict\fR is passed, additional checks are run, including RuboCop style checks\.
 .
 .IP
-If \fB\-\-fix\fR is passed, style violations will be automatically fixed using RuboCop\'s \fB\-\-auto\-correct\fR feature\.
+If \fB\-\-fix\fR is passed, style violations will be automatically fixed using RuboCop\'s auto\-correct feature\.
 .
 .IP
 If \fB\-\-online\fR is passed, additional slower checks that require a network connection are run\.
@@ -653,16 +675,10 @@ If \fB\-\-display\-cop\-names\fR is passed, the RuboCop cop name for each violat
 If \fB\-\-display\-filename\fR is passed, every line of output is prefixed with the name of the file or formula being audited, to make the output easy to grep\.
 .
 .IP
-If \fB\-\-only\fR is passed, only the methods named \fBaudit_<method>\fR will be run\.
+Passing \fB\-\-only=\fR\fImethod\fR will run only the methods named \fBaudit_<method>\fR, while \fB\-\-except=\fR\fImethod\fR will skip the methods named \fBaudit_<method>\fR\. For either option \fImethod\fR should be a comma\-separated list\.
 .
 .IP
-If \fB\-\-except\fR is passed, the methods named \fBaudit_<method>\fR will not be run\.
-.
-.IP
-If \fB\-\-only\-cops\fR is passed, only the given Rubocop cop(s)\' violations would be checked\.
-.
-.IP
-If \fB\-\-except\-cops\fR is passed, the given Rubocop cop(s)\' checks would be skipped\.
+Passing \fB\-\-only\-cops=\fR\fIcops\fR will check for violations of only the listed RuboCop \fIcops\fR, while \fB\-\-except\-cops=\fR\fIcops\fR will skip checking the listed \fIcops\fR\. For either option \fIcops\fR should be a comma\-separated list of cop names\.
 .
 .IP
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
@@ -729,6 +745,9 @@ If \fB\-\-message=\fR\fImessage\fR is passed, append \fImessage\fR to the defaul
 .
 .IP
 If \fB\-\-no\-browse\fR is passed, don\'t pass the \fB\-\-browse\fR argument to \fBhub\fR which opens the pull request URL in a browser\. Instead, output it to the command line\.
+.
+.IP
+If \fB\-\-quiet\fR is passed, don\'t output replacement messages or warn about duplicate pull requests\.
 .
 .IP
 Note that this command cannot be used to transition a formula from a URL\-and\-sha256 style specification into a tag\-and\-revision style specification, nor vice versa\. It must use whichever style specification the preexisting formula already uses\.

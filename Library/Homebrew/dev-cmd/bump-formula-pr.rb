@@ -33,6 +33,9 @@
 #:    which opens the pull request URL in a browser. Instead, output it to the
 #:    command line.
 #:
+#:    If `--quiet` is passed, don't output replacement messages or warn about
+#:    duplicate pull requests.
+#:
 #:    Note that this command cannot be used to transition a formula from a
 #:    URL-and-sha256 style specification into a tag-and-revision style
 #:    specification, nor vice versa. It must use whichever style specification
