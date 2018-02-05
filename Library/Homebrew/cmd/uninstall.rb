@@ -46,6 +46,16 @@ module Homebrew
         rm_pin rack
       else
         kegs.each do |keg|
+          begin
+            f = Formulary.from_rack(rack)
+            if f.pinned?
+              onoe "#{f.full_name} is pinned. You must unpin it to uninstall."
+              next
+            end
+          rescue
+            nil
+          end
+
           keg.lock do
             puts "Uninstalling #{keg}... (#{keg.abv})"
             keg.unlink

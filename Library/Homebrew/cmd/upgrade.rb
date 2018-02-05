@@ -50,11 +50,8 @@ module Homebrew
       exit 1 if outdated.empty?
     end
 
-    unless upgrade_pinned?
-      pinned = outdated.select(&:pinned?)
-      outdated -= pinned
-    end
-
+    pinned = outdated.select(&:pinned?)
+    outdated -= pinned
     formulae_to_install = outdated.map(&:latest_formula)
 
     if formulae_to_install.empty?
@@ -64,8 +61,8 @@ module Homebrew
       puts formulae_to_install.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
-    unless upgrade_pinned? || pinned.empty?
-      oh1 "Not upgrading #{Formatter.pluralize(pinned.length, "pinned package")}:"
+    unless pinned.empty?
+      onoe "Not upgrading #{Formatter.pluralize(pinned.length, "pinned package")}:"
       puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
@@ -93,10 +90,6 @@ module Homebrew
         onoe "#{f}: #{e}"
       end
     end
-  end
-
-  def upgrade_pinned?
-    !ARGV.named.empty?
   end
 
   def upgrade_formula(f)
@@ -143,13 +136,6 @@ module Homebrew
 
     fi.install
     fi.finish
-
-    # If the formula was pinned, and we were force-upgrading it, unpin and
-    # pin it again to get a symlink pointing to the correct keg.
-    if f.pinned?
-      f.unpin
-      f.pin
-    end
   rescue FormulaInstallationAlreadyAttemptedError
     # We already attempted to upgrade f as part of the dependency tree of
     # another formula. In that case, don't generate an error, just move on.
