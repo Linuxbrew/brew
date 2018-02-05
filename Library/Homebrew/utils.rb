@@ -83,9 +83,11 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
   backtrace = caller
   tap_message = nil
 
-  # Don't throw deprecations at all for cached or .brew formulae.
+  # Don't throw deprecations at all for cached, .brew or .metadata files.
   return if backtrace.any? do |line|
-    line.include?(HOMEBREW_CACHE) || line.include?("/.brew/")
+    line.include?(HOMEBREW_CACHE) ||
+    line.include?("/.brew/") ||
+    line.include?("/.metadata/")
   end
 
   caller_message = backtrace.detect do |line|
