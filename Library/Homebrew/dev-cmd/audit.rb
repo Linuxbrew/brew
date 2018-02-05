@@ -198,6 +198,8 @@ class FormulaAuditor
     @online = options[:online]
     # Accept precomputed style offense results, for efficiency
     @style_offenses = options[:style_offenses]
+    # Allow the actual official-ness of a formula to be overridden, for testing purposes
+    @official_tap = formula.tap&.official? || options[:official_tap]
     @problems = []
     @text = FormulaText.new(formula.path)
     @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
@@ -304,7 +306,7 @@ class FormulaAuditor
   def audit_formula_name
     return unless @strict
     # skip for non-official taps
-    return unless formula.tap&.official?
+    return unless @official_tap
 
     name = formula.name
 
@@ -718,7 +720,7 @@ class FormulaAuditor
 
     return unless @strict
 
-    if formula.tap&.official? && line.include?("env :std")
+    if @official_tap && line.include?("env :std")
       problem "`env :std` in official tap formulae is deprecated"
     end
 
@@ -747,7 +749,7 @@ class FormulaAuditor
   def audit_reverse_migration
     # Only enforce for new formula being re-added to core and official taps
     return unless @strict
-    return unless formula.tap&.official?
+    return unless @official_tap
     return unless formula.tap.tap_migrations.key?(formula.name)
 
     problem <<~EOS
@@ -766,6 +768,18 @@ class FormulaAuditor
       is set correctly and expected files are installed.
       The prefix configure/make argument may be case-sensitive.
     EOS
+  end
+
+  def audit_url_is_not_binary
+    return unless @official_tap
+
+    urls = @specs.map(&:url)
+
+    urls.each do |url|
+      if url =~ /darwin/i && (url =~ /x86_64/i || url =~ /amd64/i)
+        problem "#{url} looks like a binary package, not a source archive. Official taps are source-only."
+      end
+    end
   end
 
   def quote_dep(dep)
