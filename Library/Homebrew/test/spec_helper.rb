@@ -75,6 +75,10 @@ RSpec.configure do |config|
     skip "Requires network connection." unless ENV["HOMEBREW_TEST_ONLINE"]
   end
 
+  config.before(:each, :needs_svn) do
+    skip "Requires subversion." unless which "svn"
+  end
+
   config.around(:each) do |example|
     def find_files
       Find.find(TEST_TMPDIR)
