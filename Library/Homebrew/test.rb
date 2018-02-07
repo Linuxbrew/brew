@@ -21,8 +21,9 @@ begin
   else
     ENV.setup_build_environment(formula)
     # Add the python executable to the PATH.
-    req = formula.recursive_requirements.grep(PythonRequirement).first
-    req&.modify_build_environment
+    if formula.deps.map(&:name).include? "python"
+      ENV.append_path "PATH", "#{HOMEBREW_PREFIX}/opt/python/libexec/bin"
+    end
   end
 
   trap("INT", old_trap)
