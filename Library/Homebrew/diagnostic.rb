@@ -822,7 +822,7 @@ module Homebrew
         return if linked.empty?
 
         inject_file_list linked.map(&:full_name), <<~EOS
-          Some keg-only formula are linked into the Cellar.
+          Some keg-only formulae are linked into the Cellar.
           Linking a keg-only formula, such as gettext, into the cellar with
           `brew link <formula>` will cause other formulae to detect them during
           the `./configure` step. This may cause problems when compiling those
@@ -872,7 +872,7 @@ module Homebrew
         return if missing.empty?
 
         <<~EOS
-          Some installed formula are missing dependencies.
+          Some installed formulae are missing dependencies.
           You should `brew install` the missing dependencies:
             brew install #{missing.sort_by(&:full_name) * " "}
 
