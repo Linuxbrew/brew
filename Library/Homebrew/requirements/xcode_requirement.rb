@@ -22,7 +22,7 @@ class XcodeRequirement < Requirement
       A full installation of Xcode.app#{version} is required to compile this software.
       Installing just the Command Line Tools is not sufficient.
     EOS
-    if Version.new(MacOS::Xcode.latest_version) < Version.new(@version)
+    if @version && Version.new(MacOS::Xcode.latest_version) < Version.new(@version)
       message + <<~EOS
         Xcode#{version} cannot be installed on macOS #{MacOS.version}.
         You must upgrade your version of macOS.
