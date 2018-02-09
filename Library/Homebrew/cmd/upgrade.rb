@@ -127,7 +127,7 @@ module Homebrew
     end
     fi.prelude
 
-    oh1 "Upgrading #{f.full_specified_name} #{fi.options.to_a.join " "}"
+    oh1 "Upgrading #{Formatter.identifier(f.full_specified_name)} #{fi.options.to_a.join " "}"
 
     # first we unlink the currently active keg for this formula otherwise it is
     # possible for the existing build to interfere with the build we are about to
