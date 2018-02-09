@@ -50,7 +50,7 @@ module Utils
     # we cannot install brewed git if homebrew/core is unavailable.
     if CoreTap.instance.installed?
       begin
-        oh1 "Installing git"
+        oh1 "Installing #{Formatter.identifier("git")}"
         safe_system HOMEBREW_BREW_FILE, "install", "git"
       rescue
         raise "Git is unavailable"

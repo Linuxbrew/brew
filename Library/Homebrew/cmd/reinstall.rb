@@ -42,7 +42,7 @@ module Homebrew
     fi.link_keg           ||= keg_was_linked if keg_had_linked_opt
     fi.prelude
 
-    oh1 "Reinstalling #{f.full_name} #{options.to_a.join " "}"
+    oh1 "Reinstalling #{Formatter.identifier(f.full_name)} #{options.to_a.join " "}"
 
     fi.install
     fi.finish
