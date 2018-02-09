@@ -31,7 +31,7 @@ class Keg
     lib_path = "#{new_prefix}/lib"
     rpath << lib_path unless rpath.include? lib_path
     new_rpath = rpath.join(":")
-    cmd = [patchelf, "--set-rpath", new_rpath]
+    cmd = [patchelf, "--force-rpath", "--set-rpath", new_rpath]
 
     if file.binary_executable?
       cmd_interpreter = [patchelf, "--print-interpreter", file]
