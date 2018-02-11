@@ -1487,10 +1487,7 @@ class Formula
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies
-    recursive_dependencies do |_, dependency|
-      Dependency.prune if dependency.build?
-      Dependency.prune if !dependency.required? && build.without?(dependency)
-    end
+    declared_runtime_dependencies | undeclared_runtime_dependencies
   end
 
   # Returns a list of formulae depended on by this formula that aren't
@@ -1834,6 +1831,23 @@ class Formula
   end
 
   private
+
+  def declared_runtime_dependencies
+    recursive_dependencies do |_, dependency|
+      Dependency.prune if dependency.build?
+      Dependency.prune if !dependency.required? && build.without?(dependency)
+    end
+  end
+
+  def undeclared_runtime_dependencies
+    return [] unless optlinked?
+
+    keg = Keg.new(opt_prefix)
+    linkage_checker = LinkageChecker.new(keg, self)
+    dylib_formula_names = linkage_checker.brewed_dylibs.keys
+    linked_formulae_names = dylib_formula_names - [name]
+    linked_formulae_names.map { |n| Dependency.new(n) }
+  end
 
   # Returns the prefix for a given formula version number.
   # @private
