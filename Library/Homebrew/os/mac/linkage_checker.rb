@@ -14,6 +14,7 @@ class LinkageChecker
     @system_dylibs = Set.new
     @broken_dylibs = Set.new
     @variable_dylibs = Set.new
+    @indirect_deps = []
     @undeclared_deps = []
     @reverse_links = Hash.new { |h, k| h[k] = Set.new }
     @unnecessary_deps = []
@@ -52,7 +53,7 @@ class LinkageChecker
       end
     end
 
-    @undeclared_deps, @unnecessary_deps = check_undeclared_deps if formula
+    @indirect_deps, @undeclared_deps, @unnecessary_deps = check_undeclared_deps if formula
   end
 
   def check_undeclared_deps
@@ -62,13 +63,31 @@ class LinkageChecker
       formula.build.without?(dep)
     end
     declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
+    recursive_deps = keg.to_formula.runtime_dependencies.map { |dep| dep.to_formula.full_name }
     declared_dep_names = declared_deps.map { |dep| dep.split("/").last }
-    undeclared_deps = @brewed_dylibs.keys.reject do |full_name|
+    indirect_deps = []
+    undeclared_deps = []
+    @brewed_dylibs.each_key do |full_name|
       name = full_name.split("/").last
-      next true if name == formula.name
-      declared_dep_names.include?(name)
+      next if name == formula.name
+      if recursive_deps.include?(name)
+        indirect_deps << full_name unless declared_dep_names.include?(name)
+      else
+        undeclared_deps << full_name
+      end
     end
-    undeclared_deps.sort do |a, b|
+    sort_by_formula_full_name!(indirect_deps)
+    sort_by_formula_full_name!(undeclared_deps)
+    unnecessary_deps = declared_dep_names.reject do |full_name|
+      name = full_name.split("/").last
+      next true if Formula[name].bin.directory?
+      @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
+    end
+    [indirect_deps, undeclared_deps, unnecessary_deps]
+  end
+
+  def sort_by_formula_full_name!(arr)
+    arr.sort! do |a, b|
       if a.include?("/") && !b.include?("/")
         1
       elsif !a.include?("/") && b.include?("/")
@@ -77,17 +96,12 @@ class LinkageChecker
         a <=> b
       end
     end
-    unnecessary_deps = declared_dep_names.reject do |full_name|
-      name = full_name.split("/").last
-      next true if Formula[name].bin.directory?
-      @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
-    end
-    [undeclared_deps, unnecessary_deps]
   end
 
   def display_normal_output
     display_items "System libraries", @system_dylibs
     display_items "Homebrew libraries", @brewed_dylibs
+    display_items "Indirect dependencies with linkage", @indirect_deps
     display_items "Variable-referenced libraries", @variable_dylibs
     display_items "Missing libraries", @broken_dylibs
     display_items "Undeclared dependencies with linkage", @undeclared_deps
