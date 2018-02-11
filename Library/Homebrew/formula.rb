@@ -1850,9 +1850,7 @@ class Formula
     end
 
     linkage_checker = LinkageChecker.new(keg, self)
-    dylib_formula_names = linkage_checker.brewed_dylibs.keys
-    linked_formulae_names = dylib_formula_names - [name]
-    linked_formulae_names.map { |n| Dependency.new(n) }
+    linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
   end
 
   # Returns the prefix for a given formula version number.
