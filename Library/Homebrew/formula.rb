@@ -13,6 +13,7 @@ require "pkg_version"
 require "tap"
 require "keg"
 require "migrator"
+require "os/mac/linkage_checker"
 require "extend/ENV"
 require "language/python"
 
@@ -1840,9 +1841,14 @@ class Formula
   end
 
   def undeclared_runtime_dependencies
-    return [] unless optlinked?
+    if optlinked?
+      keg = Keg.new(opt_prefix)
+    elsif prefix.directory?
+      keg = Keg.new(prefix)
+    else
+      return []
+    end
 
-    keg = Keg.new(opt_prefix)
     linkage_checker = LinkageChecker.new(keg, self)
     dylib_formula_names = linkage_checker.brewed_dylibs.keys
     linked_formulae_names = dylib_formula_names - [name]
