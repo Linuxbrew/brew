@@ -837,7 +837,8 @@ module Homebrew
 
       def check_for_large_cache
         return unless HOMEBREW_CACHE.exist?
-        return if ENV["CI"] # CI can be expected to have a large cache.
+        # CI can be expected to have a large cache.
+        return if ENV["CI"] || ENV["JENKINS_HOME"]
         cache_size = HOMEBREW_CACHE.disk_usage
         return unless cache_size > 2_147_483_648
         <<~EOS
