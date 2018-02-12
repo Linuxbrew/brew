@@ -1037,6 +1037,9 @@ can take several different forms:
     If set, Homebrew will not auto-update before running `brew install`,
     `brew upgrade` or `brew tap`.
 
+  * `HOMEBREW_NO_COLOR`:
+    If set, Homebrew will not print text with color added.
+
   * `HOMEBREW_NO_EMOJI`:
     If set, Homebrew will not print the `HOMEBREW_INSTALL_BADGE` on a
     successful build.
