@@ -47,7 +47,7 @@ HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 # Whitelist and copy to HOMEBREW_* all variables previously mentioned in
 # manpage or used elsewhere by Homebrew.
 for VAR in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY BINTRAY_USER BINTRAY_KEY \
-           BROWSER EDITOR GIT PATH VISUAL \
+           BROWSER EDITOR GIT NO_COLOR PATH VISUAL \
            GITHUB_USER GITHUB_PASSWORD GITHUB_TOKEN
 do
   # Skip if variable value is empty.
