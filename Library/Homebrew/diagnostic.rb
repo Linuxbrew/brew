@@ -788,7 +788,7 @@ module Homebrew
           EOS
         end
 
-        return if ENV["CI"] || ENV["JENKINS_HOME"]
+        return if ENV["CI"]
 
         branch = coretap_path.git_branch
         return if branch.nil? || branch =~ /master/
@@ -838,7 +838,7 @@ module Homebrew
       def check_for_large_cache
         return unless HOMEBREW_CACHE.exist?
         # CI can be expected to have a large cache.
-        return if ENV["CI"] || ENV["JENKINS_HOME"]
+        return if ENV["CI"]
         cache_size = HOMEBREW_CACHE.disk_usage
         return unless cache_size > 2_147_483_648
         <<~EOS
