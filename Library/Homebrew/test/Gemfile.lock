@@ -31,6 +31,8 @@ GEM
     rspec-mocks (3.6.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.6.0)
+    rspec-retry (0.5.6)
+      rspec-core (> 3.3, < 3.8)
     rspec-support (3.6.0)
     rspec-wait (0.0.9)
       rspec (>= 3, < 4)
@@ -58,9 +60,10 @@ DEPENDENCIES
   parallel_tests
   rspec
   rspec-its
+  rspec-retry
   rspec-wait
   rubocop (= 0.52.1)
   simplecov
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
