@@ -835,18 +835,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_large_cache
-        return unless HOMEBREW_CACHE.exist?
-        # CI can be expected to have a large cache.
-        return if ENV["CI"]
-        cache_size = HOMEBREW_CACHE.disk_usage
-        return unless cache_size > 2_147_483_648
-        <<~EOS
-          Your HOMEBREW_CACHE is using #{disk_usage_readable(cache_size)} of disk space.
-          You may wish to consider running `brew cleanup`.
-        EOS
-      end
-
       def check_for_other_frameworks
         # Other frameworks that are known to cause problems when present
         frameworks_to_check = %w[
