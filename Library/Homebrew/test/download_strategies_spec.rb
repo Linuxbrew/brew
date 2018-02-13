@@ -209,6 +209,19 @@ describe CurlDownloadStrategy do
   it "parses the opts and sets the corresponding args" do
     expect(subject.send(:_curl_opts)).to eq(["--user", "download:123456"])
   end
+
+  describe "#tarball_path" do
+    subject { described_class.new(name, resource).tarball_path }
+
+    context "when URL ends with file" do
+      it { is_expected.to eq(HOMEBREW_CACHE/"foo-.tar.gz") }
+    end
+
+    context "when URL file is in middle" do
+      let(:url) { "http://example.com/foo.tar.gz/from/this/mirror" }
+      it { is_expected.to eq(HOMEBREW_CACHE/"foo-.tar.gz") }
+    end
+  end
 end
 
 describe DownloadStrategyDetector do
