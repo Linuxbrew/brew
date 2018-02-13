@@ -24,6 +24,7 @@ module Hbc
         check_software_versions
         check_install_location
         check_staging_location
+        check_cached_downloads
         check_taps
         check_load_path
         check_environment_variables
