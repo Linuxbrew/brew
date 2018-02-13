@@ -62,7 +62,7 @@ module Hbc
           raise CaskError, "It seems the #{self.class.english_name} source '#{target}' is not there."
         end
 
-        ohai "Copying #{self.class.english_name} '#{target.basename}' back to '#{source}'."
+        ohai "Backing #{self.class.english_name} '#{target.basename}' up to '#{source}'."
         source.dirname.mkpath
 
         if target.parent.writable?
