@@ -224,6 +224,15 @@ case "$HOMEBREW_COMMAND" in
   --config)    HOMEBREW_COMMAND="config" ;;
 esac
 
+if [[ "$HOMEBREW_COMMAND" = "cask" ]]
+then
+  HOMEBREW_CASK_COMMAND="$1"
+
+  case "$HOMEBREW_CASK_COMMAND" in
+    instal) HOMEBREW_CASK_COMMAND="install" ;; # gem does the same
+  esac
+fi
+
 # Set HOMEBREW_DEV_CMD_RUN for users who have run a development command.
 # This makes them behave like HOMEBREW_DEVELOPERs for brew update.
 if [[ -z "$HOMEBREW_DEVELOPER" ]]
@@ -297,7 +306,8 @@ update-preinstall() {
   [[ -z "$HOMEBREW_AUTO_UPDATE_CHECKED" ]] || return
   [[ -z "$HOMEBREW_UPDATE_PREINSTALL" ]] || return
 
-  if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ]]
+  if [[ "$HOMEBREW_COMMAND" = "install" || "$HOMEBREW_COMMAND" = "upgrade" || "$HOMEBREW_COMMAND" = "tap" ||
+        "$HOMEBREW_CASK_COMMAND" = "install" || "$HOMEBREW_CASK_COMMAND" = "upgrade" ]]
   then
     if [[ -z "$HOMEBREW_VERBOSE" ]]
     then
