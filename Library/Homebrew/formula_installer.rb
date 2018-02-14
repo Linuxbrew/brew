@@ -566,7 +566,7 @@ class FormulaInstaller
   def caveats
     return if only_deps?
 
-    audit_installed if ARGV.homebrew_developer? && !formula.keg_only?
+    audit_installed if ARGV.homebrew_developer?
 
     caveats = Caveats.new(formula)
 
@@ -882,8 +882,10 @@ class FormulaInstaller
   end
 
   def audit_installed
-    problem_if_output(check_env_path(formula.bin))
-    problem_if_output(check_env_path(formula.sbin))
+    unless formula.keg_only?
+      problem_if_output(check_env_path(formula.bin))
+      problem_if_output(check_env_path(formula.sbin))
+    end
     super
   end
 
