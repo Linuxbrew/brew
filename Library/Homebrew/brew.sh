@@ -97,13 +97,6 @@ then
     HOMEBREW_FORCE_BREWED_CURL="1"
   fi
 
-  if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
-        -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]] &&
-           "$HOMEBREW_PREFIX/opt/curl/bin/curl" --version >/dev/null
-  then
-    HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
-  fi
-
   if [[ -z "$HOMEBREW_CACHE" ]]
   then
     HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
@@ -114,11 +107,7 @@ else
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
-
-  if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
-  then
-    HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
-  fi
+  HOMEBREW_FORCE_BREWED_CURL=1
 
   if [[ -z "$HOMEBREW_CACHE" ]]
   then
@@ -130,6 +119,14 @@ else
     fi
   fi
 fi
+
+if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
+      -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]] &&
+         "$HOMEBREW_PREFIX/opt/curl/bin/curl" --version >/dev/null
+then
+  HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
+fi
+
 HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_USER_AGENT_VERSION)"
 HOMEBREW_CURL_VERSION="$("$HOMEBREW_CURL" --version 2>/dev/null | head -n1 | awk '{print $1"/"$2}')"
 HOMEBREW_USER_AGENT_CURL="$HOMEBREW_USER_AGENT $HOMEBREW_CURL_VERSION"
