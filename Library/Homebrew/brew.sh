@@ -111,9 +111,15 @@ then
 else
   HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
+  HOMEBREW_MACOS_VERSION=0
   [[ -n "$HOMEBREW_LINUX" ]] && HOMEBREW_OS_VERSION="$(lsb_release -sd 2>/dev/null)"
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
+
+  if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
+  then
+    HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
+  fi
 
   if [[ -z "$HOMEBREW_CACHE" ]]
   then
