@@ -24,7 +24,7 @@ class DependencyCollector
     LD64Dependency.new
   end
 
-  def zip_dep_if_needed(tags); end
+  def zip_dep_if_needed(*); end
 
-  def bzip2_dep_if_needed(tags); end
+  def bzip2_dep_if_needed(*); end
 end
