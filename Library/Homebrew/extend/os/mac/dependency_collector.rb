@@ -27,5 +27,4 @@ class DependencyCollector
   def zip_dep_if_needed(tags); end
 
   def bzip2_dep_if_needed(tags); end
-
 end

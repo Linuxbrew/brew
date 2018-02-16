@@ -1,5 +1,4 @@
 class DependencyCollector
-
   def git_dep_if_needed(tags)
     Dependency.new("git", tags)
   end
@@ -12,9 +11,7 @@ class DependencyCollector
     Dependency.new("xz", tags)
   end
 
-  def ld64_dep_if_needed(*)
-    return
-  end
+  def ld64_dep_if_needed(*); end
 
   def zip_dep_if_needed(tags)
     Dependency.new("zip", tags)
@@ -23,5 +20,4 @@ class DependencyCollector
   def bzip2_dep_if_needed(tags)
     Dependency.new("bzip2", tags)
   end
-
 end
