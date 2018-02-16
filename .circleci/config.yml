@@ -7,8 +7,6 @@ jobs:
       CIRCLE_REPOSITORY_URL: https://github.com/Linuxbrew/brew
       HOMEBREW_DEVELOPER: 1
       HOMEBREW_NO_AUTO_UPDATE: 1
-      HOMEBREW_VERBOSE: 1
-      HOMEBREW_VERBOSE_USING_DOTS: 1
     steps:
       - checkout
       - run: |
