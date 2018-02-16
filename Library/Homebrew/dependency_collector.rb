@@ -72,6 +72,14 @@ class DependencyCollector
 
   def ld64_dep_if_needed(*); end
 
+  def zip_dep_if_needed(tags)
+    return
+  end
+
+  def bzip2_dep_if_needed(tags)
+    return
+  end
+
   def self.tar_needs_xz_dependency?
     !new.xz_dep_if_needed([]).nil?
   end
@@ -162,6 +170,8 @@ class DependencyCollector
     when ".lz"          then Dependency.new("lzip", tags)
     when ".rar"         then Dependency.new("unrar", tags)
     when ".7z"          then Dependency.new("p7zip", tags)
+    when ".zip"         then zip_dep_if_needed(tags)
+    when ".bz2"         then bzip2_dep_if_needed(tags)
     end
   end
 end

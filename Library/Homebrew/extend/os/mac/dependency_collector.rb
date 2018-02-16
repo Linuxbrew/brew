@@ -23,4 +23,9 @@ class DependencyCollector
     return if MacOS.version > :tiger
     LD64Dependency.new
   end
+
+  def zip_dep_if_needed(tags); end
+
+  def bzip2_dep_if_needed(tags); end
+
 end
