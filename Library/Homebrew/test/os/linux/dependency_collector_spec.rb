@@ -14,9 +14,9 @@ describe DependencyCollector do
       expect(subject.add(resource)).to eq(Dependency.new("zip", [:build]))
     end
 
-    it "creates a resource dependency from a '.bzip2' URL" do
+    it "creates a resource dependency from a '.bz2' URL" do
       resource = Resource.new
-      resource.url("http://example.com/foo.tar.bzip2")
+      resource.url("http://example.com/foo.tar.bz2")
       expect(subject.add(resource)).to eq(Dependency.new("bzip2", [:build]))
     end
   end
