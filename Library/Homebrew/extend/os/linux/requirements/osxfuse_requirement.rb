@@ -1,7 +1,6 @@
 require "requirement"
 
 class OsxfuseRequirement < Requirement
-  default_formula "libfuse"
   download "https://github.com/libfuse/libfuse"
 
   satisfy(build_env: false) do
@@ -20,7 +19,8 @@ class OsxfuseRequirement < Requirement
     msg = "libfuse is required to install this formula.\n"
     if libfuse_formula_exists?
       msg + <<~EOS
-        Run "brew install libfuse" to install it.
+        To install it, run:
+          brew install libfuse
       EOS
     else
       msg + super

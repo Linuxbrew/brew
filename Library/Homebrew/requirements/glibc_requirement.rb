@@ -3,7 +3,6 @@ require "requirement"
 
 class GlibcRequirement < Requirement
   fatal true
-  default_formula "glibc"
 
   def self.system_version
     OS::Linux::Glibc.system_version
@@ -20,5 +19,12 @@ class GlibcRequirement < Requirement
     next true unless OS.linux?
     next true if min_version.null?
     Formula["glibc"].installed? || OS::Linux::Glibc.system_version >= min_version
+  end
+
+  def message
+    <<~EOS
+      glibc #{min_version} is required to install this formula. To install it, run:
+        brew install glibc
+    EOS
   end
 end
