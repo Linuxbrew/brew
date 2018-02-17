@@ -506,7 +506,7 @@ module Homebrew
           short_name = formula_name.split("/", -1).last
           pkg_version = bottle_hash["formula"]["pkg_version"]
 
-          for_linuxbrew = " for Linuxbrew" if OS.linux? && formula_name.start_with?("homebrew/core")
+          for_linuxbrew = " for Linuxbrew" if OS.linux? && !formula_name.include?("/")
           path.parent.cd do
             safe_system "git", "commit", "--no-edit", "--verbose",
               "--message=#{short_name}: #{update_or_add} #{pkg_version} bottle#{for_linuxbrew}.",
