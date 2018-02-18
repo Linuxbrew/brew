@@ -1,5 +1,11 @@
-#:  * `--env`:
-#:    Show a summary of the Homebrew build environment.
+#:  * `--env` [`--shell=`(<shell>|`auto`)|`--plain`]:
+#:    Show a summary of the Homebrew build environment as a plain list.
+#:
+#:    Pass `--shell=`<shell> to generate a list of environment variables for the
+#:    specified shell, or `--shell=auto` to detect the current shell.
+#:
+#:    If the command's output is sent through a pipe and no shell is specified,
+#:    the list is formatted for export to `bash`(1) unless `--plain` is passed.
 
 require "extend/ENV"
 require "build_environment"

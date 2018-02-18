@@ -3,7 +3,7 @@
 `brew test-bot` is the name for the automated review and testing system funded
 by [our Kickstarter in 2013](https://www.kickstarter.com/projects/homebrew/brew-test-bot).
 
-It comprises four Mac Minis running in a data centre in England which host
+It comprises four Mac Minis and three Xserves running in two data centres which host
 [a Jenkins instance at https://jenkins.brew.sh](https://jenkins.brew.sh) and run the
 [`brew-test-bot.rb`](https://github.com/Homebrew/homebrew-test-bot/blob/master/cmd/brew-test-bot.rb)
 Ruby script to perform automated testing of commits to the master branch, pull
@@ -35,8 +35,6 @@ A passed build looks like this:
 
 On failed or passed builds you can click the "Details" link to view the result
 in Jenkins.
-
-When you click this you'll see the results.
 
 A passed build looks like this:
 

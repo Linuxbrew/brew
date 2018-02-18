@@ -5,7 +5,7 @@ describe Hbc::Artifact::App, :cask do
   let(:app) { cask.artifacts.find { |a| a.is_a?(described_class) } }
 
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
-  let(:target_path) { Hbc.appdir.join("Caffeine.app") }
+  let(:target_path) { Hbc::Config.global.appdir.join("Caffeine.app") }
 
   let(:install_phase) { app.install_phase(command: command, force: force) }
   let(:uninstall_phase) { app.uninstall_phase(command: command, force: force) }
@@ -53,7 +53,7 @@ describe Hbc::Artifact::App, :cask do
       expect(target_path).to be_a_directory
       expect(source_path).not_to exist
 
-      expect(Hbc.appdir.join("Caffeine Deluxe.app")).not_to exist
+      expect(Hbc::Config.global.appdir.join("Caffeine Deluxe.app")).not_to exist
       expect(cask.staged_path.join("Caffeine Deluxe.app")).to exist
     end
 

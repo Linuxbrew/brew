@@ -25,7 +25,7 @@ module Hbc
         new(cask, source_string, **target_hash)
       end
 
-      def self.resolve_target(target)
+      def resolve_target(target)
         Pathname(target)
       end
 

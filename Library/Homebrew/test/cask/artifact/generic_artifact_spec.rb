@@ -10,7 +10,7 @@ describe Hbc::Artifact::Artifact, :cask do
   }
 
   let(:source_path) { cask.staged_path.join("Caffeine.app") }
-  let(:target_path) { Hbc.appdir.join("Caffeine.app") }
+  let(:target_path) { Hbc::Config.global.appdir.join("Caffeine.app") }
 
   before do
     InstallHelper.install_without_artifacts(cask)

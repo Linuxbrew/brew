@@ -1,10 +1,9 @@
-language: ruby
-rvm: system
+language: c
 cache:
   directories:
-    - $HOME/.gem/ruby
     - $HOME/Library/Caches/Homebrew/style
     - $HOME/Library/Caches/Homebrew/tests
+    - $HOME/Library/Homebrew/vendor/bundle
 branches:
   only:
     - master
@@ -12,31 +11,41 @@ matrix:
   fast_finish: true
   include:
     - os: osx
-      osx_image: xcode9
+      compiler: clang
+      osx_image: xcode9.2
     - os: linux
+      compiler: gcc
       sudo: false
 
 before_install:
-  - git fetch --tags --unshallow
-  - export HOMEBREW_NO_AUTO_UPDATE=1
-  - export HOMEBREW_DEVELOPER=1
-  - export HOMEBREW_FORCE_VENDOR_RUBY=1
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+      MACOS="1";
       HOMEBREW_REPOSITORY="$(brew --repo)";
-      sudo chown -R "$USER" "$HOMEBREW_REPOSITORY/Library/Taps";
+      sudo chown -R "$USER" "$HOMEBREW_REPOSITORY";
+    else
+      LINUX="1";
+      export PATH="$PWD/bin:$PATH";
+    fi
+  # umask 022 fixes Linux `brew tests` failures;
+  - if [ "$LINUX" ]; then
+      umask 022;
+    fi
+  # trigger vendored ruby installation
+  - brew help
+  - if [ "$MACOS" ]; then
       mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
       git clone --depth=1 https://github.com/Linuxbrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot;
     else
-      umask 022;
-      git fetch --unshallow;
-      export PATH="$PWD/bin:$PATH";
       HOMEBREW_CORE_TAP_DIR="$(brew --repo "homebrew/core")";
       mkdir -p "$HOMEBREW_CORE_TAP_DIR";
       git clone --depth=1 https://github.com/Linuxbrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot;
-      HOMEBREW_TEST_BOT_TAP_DIR="$(brew --repo "homebrew/test-bot")";
-      ln -s "$HOMEBREW_TEST_BOT_TAP_DIR/.git" "$HOMEBREW_TEST_BOT_TAP_DIR/Formula" "$HOMEBREW_CORE_TAP_DIR";
+    fi
+  - travis_retry git -C Library/Taps/homebrew/homebrew-core fetch --depth=1 origin;
+  # can be removed after 1.5.3 is tagged
+  - if [ "$LINUX" ]; then
+      export HOMEBREW_FORCE_VENDOR_RUBY=1;
     fi
 
 script:

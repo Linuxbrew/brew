@@ -9,8 +9,8 @@
 #:
 #:    If `--verbose` (or `-v`) is passed, display detailed version information.
 #:
-#:    If `--json=`<version> is passed, the output will be in JSON format. The only
-#:    valid version is `v1`.
+#:    If `--json=`<version> is passed, the output will be in JSON format.
+#:    Currently the only accepted value for <version> is `v1`.
 #:
 #:    If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
 #:    the HEAD installation of the formula is outdated. Otherwise, the

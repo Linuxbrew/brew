@@ -1,9 +1,13 @@
-#:  * `readall` [tap]:
-#:    Import all formulae from specified taps (defaults to all installed taps).
+#:  * `readall` [`--aliases`] [`--syntax`] [<taps>]:
+#:    Import all formulae from specified <taps> (defaults to all installed taps).
 #:
 #:    This can be useful for debugging issues across all formulae when making
 #:    significant changes to `formula.rb`, testing the performance of loading
 #:    all formulae or to determine if any current formulae have Ruby issues.
+#:
+#:    If `--aliases` is passed, also verify any alias symlinks in each tap.
+#:
+#:    If `--syntax` is passed, also syntax-check all of Homebrew's Ruby files.
 
 require "readall"
 

@@ -1,5 +1,5 @@
 #: @hide_from_man_page
-#:  * `update_report`:
+#:  * `update_report` [`--preinstall`]:
 #:    The Ruby implementation of `brew update`. Never called manually.
 
 require "formula_versions"

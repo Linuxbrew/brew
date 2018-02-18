@@ -6,7 +6,8 @@
 #:    an issue; just ignore this.
 
 # Undocumented options:
-#     -D activates debugging and profiling of the audit methods (not the same as --debug)
+#     `-D` activates debugging and profiling of the audit methods (not the same as `--debug`)
+#     `--list-checks` lists all audit methods
 
 require "diagnostic"
 

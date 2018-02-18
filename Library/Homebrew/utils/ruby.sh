@@ -2,7 +2,7 @@ setup-ruby-path() {
   local vendor_dir
   local vendor_ruby_current_version
   local vendor_ruby_path
-  local ruby_old_version
+  local ruby_version_new_enough
   local minimum_ruby_version="2.3.3"
 
   vendor_dir="$HOMEBREW_LIBRARY/Homebrew/vendor"
@@ -35,12 +35,12 @@ setup-ruby-path() {
         HOMEBREW_RUBY_PATH="$(which ruby)"
       fi
 
-      if [[ -n "$HOMEBREW_RUBY_PATH" ]]
+      if [[ -n "$HOMEBREW_RUBY_PATH" && -z "$HOMEBREW_FORCE_VENDOR_RUBY" ]]
       then
-        ruby_old_version="$("$HOMEBREW_RUBY_PATH" -rrubygems -e "puts Gem::Version.new('$minimum_ruby_version') > Gem::Version.new(RUBY_VERSION)")"
+        ruby_version_new_enough="$("$HOMEBREW_RUBY_PATH" -rrubygems -e "puts Gem::Version.new(RUBY_VERSION.to_s.dup) >= Gem::Version.new('$minimum_ruby_version')")"
       fi
 
-      if [[ -z "$HOMEBREW_RUBY_PATH" || "$ruby_old_version" == "true" || -n "$HOMEBREW_FORCE_VENDOR_RUBY" ]]
+      if [[ -z "$HOMEBREW_RUBY_PATH" || -n "$HOMEBREW_FORCE_VENDOR_RUBY" || "$ruby_version_new_enough" != "true" ]]
       then
         brew vendor-install ruby
         if [[ ! -x "$vendor_ruby_path" ]]

@@ -22,7 +22,10 @@ describe Hbc::CLI::Style, :cask do
 
     context "when rubocop succeeds" do
       let(:success) { true }
-      it { is_expected.to be_truthy }
+
+      it "does not raise an error" do
+        expect { subject }.not_to raise_error
+      end
     end
 
     context "when rubocop fails" do
@@ -132,7 +135,7 @@ describe Hbc::CLI::Style, :cask do
   describe "#default_args" do
     subject { cli.default_args }
 
-    it { is_expected.to include("--require", "rubocop-cask", "--format", "simple", "--force-exclusion") }
+    it { is_expected.to include("--require", "rubocop-cask", "--format", "simple") }
   end
 
   describe "#autocorrect_args" do

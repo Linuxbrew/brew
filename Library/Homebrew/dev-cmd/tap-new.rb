@@ -44,39 +44,28 @@ module Homebrew
     write_path(tap, "README.md", readme)
 
     travis = <<~EOS
-      language: ruby
+      language: c
       os: osx
-      env: OSX=10.12
-      osx_image: xcode8.3
-      rvm: system
+      compiler: clang
+      osx_image: xcode9.2
       cache:
         directories:
           - $HOME/.gem/ruby
           - Library/Homebrew/vendor/bundle
+      branches:
+        only:
+          - master
 
       before_install:
-        - export TRAVIS_COMMIT="$(git rev-parse --verify -q HEAD)"
-        - if [ -f ".git/shallow" ]; then
-            travis_retry git fetch --unshallow;
-          fi
-        - HOMEBREW_REPOSITORY="$(brew --repo)"
-        - sudo chown -R "$USER" "$HOMEBREW_REPOSITORY"
-        - git -C "$HOMEBREW_REPOSITORY" reset --hard origin/master
-        - brew update || brew update
+        - sudo chown -R "$USER" "$(brew --repo)"
+        - travis_retry brew update
         - HOMEBREW_TAP_DIR="$(brew --repo "$TRAVIS_REPO_SLUG")"
         - mkdir -p "$HOMEBREW_TAP_DIR"
         - rm -rf "$HOMEBREW_TAP_DIR"
         - ln -s "$PWD" "$HOMEBREW_TAP_DIR"
-        - export HOMEBREW_DEVELOPER="1"
-        - ulimit -n 1024
 
       script:
         - brew test-bot
-
-      notifications:
-        email:
-          on_success: never
-          on_failure: always
     EOS
     write_path(tap, ".travis.yml", travis)
   end

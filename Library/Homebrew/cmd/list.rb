@@ -6,7 +6,7 @@
 #:  * `list`, `ls` `--unbrewed`:
 #:    List all files in the Homebrew prefix not installed by Homebrew.
 #:
-#:  * `list`, `ls` [`--versions` [`--multiple`]] [`--pinned`] [<formulae>]:
+#:  * `list`, `ls` [`--verbose`] [`--versions` [`--multiple`]] [`--pinned`] [<formulae>]:
 #:    List the installed files for <formulae>. Combined with `--verbose`, recursively
 #:    list the contents of all subdirectories in each <formula>'s keg.
 #:

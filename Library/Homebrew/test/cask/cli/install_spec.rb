@@ -23,9 +23,9 @@ describe Hbc::CLI::Install, :cask do
     described_class.run("local-transmission", "local-caffeine")
 
     expect(Hbc::CaskLoader.load(cask_path("local-transmission"))).to be_installed
-    expect(Hbc.appdir.join("Transmission.app")).to be_a_directory
+    expect(Hbc::Config.global.appdir.join("Transmission.app")).to be_a_directory
     expect(Hbc::CaskLoader.load(cask_path("local-caffeine"))).to be_installed
-    expect(Hbc.appdir.join("Caffeine.app")).to be_a_directory
+    expect(Hbc::Config.global.appdir.join("Caffeine.app")).to be_a_directory
   end
 
   it "skips double install (without nuking existing installation)" do
