@@ -39,6 +39,16 @@ module Homebrew
       files["00.tap.out"] = { content: tap }
     end
 
+    if GitHub.api_credentials_type == :none
+      puts <<~EOS
+        You can create a new personal access token:
+         #{GitHub::ALL_SCOPES_URL}
+        and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method.
+
+      EOS
+      login!
+    end
+
     # Description formatted to work well as page title when viewing gist
     if f.core_formula?
       descr = "#{f.name} on #{OS_VERSION} - Homebrew build logs"
@@ -48,16 +58,6 @@ module Homebrew
     url = create_gist(files, descr)
 
     if ARGV.include?("--new-issue") || ARGV.switch?("n")
-      if GitHub.api_credentials_type == :none
-        puts <<~EOS
-          You can create a new personal access token:
-           #{GitHub::ALL_SCOPES_URL}
-          and then set the new HOMEBREW_GITHUB_API_TOKEN as the authentication method.
-
-        EOS
-        login!
-      end
-
       url = create_issue(f.tap, "#{f.name} failed to build on #{MacOS.full_version}", url)
     end
 
