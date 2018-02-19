@@ -1,1 +1,1 @@
-require "test/os/linux/dependency_collector" if OS.linux?
+require "test/dependency_collector"

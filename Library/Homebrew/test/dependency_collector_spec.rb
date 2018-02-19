@@ -140,4 +140,3 @@ describe DependencyCollector do
     end
   end
 end
-require "test/os/dependency_collector_spec"
