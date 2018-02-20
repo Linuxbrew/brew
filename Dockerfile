@@ -2,7 +2,7 @@ FROM ubuntu:xenial
 LABEL maintainer="Shaun Jackman <sjackman@gmail.com>"
 
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends bzip2 ca-certificates curl file g++ git locales make sudo uuid-runtime \
+	&& apt-get install -y --no-install-recommends bzip2 ca-certificates curl file g++ git locales make patch sudo uuid-runtime \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8 \
