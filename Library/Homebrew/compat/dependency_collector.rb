@@ -59,7 +59,7 @@ class DependencyCollector
         Dependency.new("python3", tags)
       when :emacs, :mysql, :perl, :postgresql, :rbenv, :ruby
         output_deprecation(spec)
-        Dependency.new(spec, tags)
+        Dependency.new(spec.to_s, tags)
       else
         super
       end
