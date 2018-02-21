@@ -67,7 +67,7 @@ class DependencyCollector
   end
 
   def xz_dep_if_needed(tags)
-    Dependency.new("xz", tags)
+    Dependency.new("xz", tags) unless which("xz")
   end
 
   def ld64_dep_if_needed(*); end
@@ -162,8 +162,8 @@ class DependencyCollector
     when ".lz"          then Dependency.new("lzip", tags)
     when ".rar"         then Dependency.new("unrar", tags)
     when ".7z"          then Dependency.new("p7zip", tags)
-    when ".zip"         then Dependency.new("unzip", tags) unless OS.mac?
-    when ".bz2"         then Dependency.new("bzip2", tags) unless OS.mac?
+    when ".bz2"         then Dependency.new("bzip2", tags) unless which("bzip2")
+    when ".zip"         then Dependency.new("unzip", tags) unless which("unzip")
     end
   end
 end
