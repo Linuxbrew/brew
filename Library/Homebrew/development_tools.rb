@@ -10,6 +10,9 @@ class DevelopmentTools
           path
         elsif File.executable?(path = "/usr/bin/#{tool}")
           Pathname.new path
+        # IF ANDROID
+        elsif File.executable?(path = "/data/data/com.termux/files/usr/bin/#{tool}")
+          Pathname.new path
         # Homebrew GCCs most frequently; much faster to check this before xcrun
         elsif (path = HOMEBREW_PREFIX/"bin/#{tool}").executable?
           path
