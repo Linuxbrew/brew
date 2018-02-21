@@ -75,7 +75,7 @@ module Hbc
       fetch
       uninstall_existing_cask if @reinstall
 
-      oh1 "Installing Cask #{@cask}"
+      oh1 "Installing Cask #{Formatter.identifier(@cask)}"
       stage
       install_artifacts
       enable_accessibility_access
@@ -348,7 +348,7 @@ module Hbc
     end
 
     def uninstall
-      oh1 "Uninstalling Cask #{@cask}"
+      oh1 "Uninstalling Cask #{Formatter.identifier(@cask)}"
       disable_accessibility_access
       uninstall_artifacts(clear: true)
       purge_versioned_files
@@ -356,7 +356,7 @@ module Hbc
     end
 
     def start_upgrade
-      oh1 "Starting upgrade for Cask #{@cask}"
+      oh1 "Starting upgrade for Cask #{Formatter.identifier(@cask)}"
 
       disable_accessibility_access
       uninstall_artifacts
