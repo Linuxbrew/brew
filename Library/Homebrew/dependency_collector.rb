@@ -63,11 +63,11 @@ class DependencyCollector
   end
 
   def cvs_dep_if_needed(tags)
-    Dependency.new("cvs", tags)
+    Dependency.new("cvs", tags) unless which("cvs")
   end
 
   def xz_dep_if_needed(tags)
-    Dependency.new("xz", tags)
+    Dependency.new("xz", tags) unless which("xz")
   end
 
   def zip_dep_if_needed(tags)
