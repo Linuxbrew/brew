@@ -79,6 +79,9 @@ class DevelopmentTools
         if (path = locate("clang")) &&
            build_version = `#{path} --version`[/clang-(\d{2,})/, 1]
           Version.new build_version
+        elsif (path = locate("clang")) &&
+          build_version = `#{path} --version`[/clang version (\d\.\d\.\d)/, 1]
+          Version.new build_version
         else
           Version::NULL
         end
