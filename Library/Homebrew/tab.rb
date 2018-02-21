@@ -75,13 +75,6 @@ class Tab < OpenStruct
       attributes["source"]["tap"] = "homebrew/core"
     end
 
-    case attributes["source"]["tap"]
-    when "linuxbrew/dupes"
-      attributes["source"]["tap"] = "homebrew/dupes"
-    when "linuxbrew/science"
-      attributes["source"]["tap"] = "homebrew/science"
-    end
-
     if attributes["source"]["spec"].nil?
       version = PkgVersion.parse path.to_s.split("/")[-2]
       if version.head?
