@@ -36,22 +36,13 @@ before_install:
       mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
-    else
-      HOMEBREW_CORE_TAP_DIR="$(brew --repo "homebrew/core")";
-      mkdir -p "$HOMEBREW_CORE_TAP_DIR";
     fi
   - if [ "$MACOS" ]; then
       travis_retry git -C Library/Taps/homebrew/homebrew-core fetch --depth=1 origin;
+    else
+      travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-core Library/Taps/homebrew/homebrew-core;
     fi
   - travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
-  - if [ "$LINUX" ]; then
-      HOMEBREW_TEST_BOT_TAP_DIR="$(brew --repo "homebrew/test-bot")";
-      ln -s "$HOMEBREW_TEST_BOT_TAP_DIR/.git" "$HOMEBREW_TEST_BOT_TAP_DIR/Formula" "$HOMEBREW_CORE_TAP_DIR";
-    fi
-  # can be removed after 1.5.3 is tagged
-  - if [ "$LINUX" ]; then
-      export HOMEBREW_FORCE_VENDOR_RUBY=1;
-    fi
 
 script:
   - brew test-bot
