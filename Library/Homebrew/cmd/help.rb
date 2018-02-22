@@ -16,7 +16,7 @@ HOMEBREW_HELP = <<~EOS.freeze
   Developers:
     brew create [URL [--no-fetch]]
     brew edit [FORMULA...]
-    https://docs.brew.sh/Formula-Cookbook.html
+    https://docs.brew.sh/Formula-Cookbook
 
   Further help:
     man brew

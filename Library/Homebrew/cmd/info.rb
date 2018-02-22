@@ -17,7 +17,7 @@
 #:    information on all installed formulae.
 #:
 #:    See the docs for examples of using the JSON output:
-#:    <https://docs.brew.sh/Querying-Brew.html>
+#:    <https://docs.brew.sh/Querying-Brew>
 
 require "missing_formula"
 require "caveats"

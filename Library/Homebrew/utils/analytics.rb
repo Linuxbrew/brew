@@ -40,7 +40,7 @@ module Utils
         end
 
         # Send analytics. Don't send or store any personally identifiable information.
-        # https://docs.brew.sh/Analytics.html
+        # https://docs.brew.sh/Analytics
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
         # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
         if ENV["HOMEBREW_ANALYTICS_DEBUG"]

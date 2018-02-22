@@ -28,7 +28,7 @@ require "language/python"
 # @see SharedEnvExtension
 # @see FileUtils
 # @see Pathname
-# @see https://docs.brew.sh/Formula-Cookbook.html Formula Cookbook
+# @see https://docs.brew.sh/Formula-Cookbook Formula Cookbook
 # @see https://github.com/styleguide/ruby Ruby Style Guide
 #
 # <pre>class Wget < Formula
@@ -2057,7 +2057,7 @@ class Formula
     # and you haven't passed or previously used any options on this formula.
     #
     # If you maintain your own repository, you can add your own bottle links.
-    # https://docs.brew.sh/Bottles.html
+    # https://docs.brew.sh/Bottles
     # You can ignore this block entirely if submitting to Homebrew/homebrew-core.
     # It'll be handled for you by the Brew Test Bot.
     #

@@ -167,7 +167,7 @@ class FormulaCreator
 
   def template
     <<~EOS
-      # Documentation: https://docs.brew.sh/Formula-Cookbook.html
+      # Documentation: https://docs.brew.sh/Formula-Cookbook
       #                http://www.rubydoc.info/github/Homebrew/brew/master/Formula
       # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
        class #{Formulary.class_s(name)} < Formula
