@@ -131,16 +131,10 @@ class SystemConfig
     end
 
     def describe_java
-      # java_home doesn't exist on all macOSs; it might be missing on older versions.
-      return "N/A" unless File.executable? "/usr/libexec/java_home"
-
-      java_xml = Utils.popen_read("/usr/libexec/java_home", "--xml", "--failfast", err: :close)
+      return "N/A" unless which "java"
+      java_version = Utils.popen_read("java", "-version")
       return "N/A" unless $CHILD_STATUS.success?
-      javas = []
-      REXML::XPath.each(REXML::Document.new(java_xml), "//key[text()='JVMVersion']/following-sibling::string") do |item|
-        javas << item.text
-      end
-      javas.uniq.join(", ")
+      java_version[/java version "([0-9\._]+)"/, 1] || "N/A"
     end
 
     def describe_git
