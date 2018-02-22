@@ -134,7 +134,7 @@ class SystemConfig
       return "N/A" unless which "java"
       java_version = Utils.popen_read("java", "-version")
       return "N/A" unless $CHILD_STATUS.success?
-      java_version[/java version "([0-9\._]+)"/, 1] || "N/A"
+      java_version[/java version "([\d\._]+)"/, 1] || "N/A"
     end
 
     def describe_git
