@@ -39,7 +39,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `analytics` [`state`]:
     Display anonymous user behaviour analytics state.
-    Read more at <https://docs.brew.sh/Analytics.html>.
+    Read more at <https://docs.brew.sh/Analytics>.
 
   * `analytics` (`on`|`off`):
     Turn on/off Homebrew's analytics.
@@ -212,7 +212,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     information on all installed formulae.
 
     See the docs for examples of using the JSON output:
-    <https://docs.brew.sh/Querying-Brew.html>
+    <https://docs.brew.sh/Querying-Brew>
 
   * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] `formula` [`options` ...]:
     Install `formula`.
@@ -493,7 +493,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Pass `--installed` to get information on installed taps.
 
     See the docs for examples of using the JSON output:
-    <https://docs.brew.sh/Querying-Brew.html>
+    <https://docs.brew.sh/Querying-Brew>
 
   * `tap-pin` `tap`:
     Pin `tap`, prioritizing its formulae over core when formula names are supplied
@@ -914,7 +914,7 @@ scripts that reside somewhere in the `PATH`, named `brew-``cmdname` or
 to create your own commands without modifying Homebrew's internals.
 
 Instructions for creating your own commands can be found in the docs:
-<https://docs.brew.sh/External-Commands.html>
+<https://docs.brew.sh/External-Commands>
 
 ## SPECIFYING FORMULAE
 
@@ -1031,7 +1031,7 @@ can take several different forms:
     *Default:* the number of available CPU cores.
 
   * `HOMEBREW_NO_ANALYTICS`:
-    If set, Homebrew will not send analytics. See: <https://docs.brew.sh/Analytics.html>
+    If set, Homebrew will not send analytics. See: <https://docs.brew.sh/Analytics>
 
   * `HOMEBREW_NO_AUTO_UPDATE`:
     If set, Homebrew will not auto-update before running `brew install`,
