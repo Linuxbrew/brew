@@ -44,7 +44,7 @@ Note they are largely untested, and as always, be careful about running untested
 
 ### brew-livecheck
 Check if there is a new upstream version of a formula.
-See the [`README`](https://github.com/Homebrew/homebrew-livecheck/blob/master/README.md) for more info and usage.
+See the [`README`](https://github.com/Homebrew/homebrew-livecheck/blob/master/README) for more info and usage.
 
 Install using:
 

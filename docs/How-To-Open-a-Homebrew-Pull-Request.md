@@ -34,7 +34,7 @@ To make a new branch and submit it for review, create a GitHub pull request with
 1. Check out the `master` branch with `git checkout master`.
 2. Retrieve new changes to the `master` branch with `brew update`.
 3. Create a new branch from the latest `master` branch with `git checkout -b <YOUR_BRANCH_NAME> origin/master`.
-4. Make your changes. For formulae, use `brew edit` or your favorite text editor, following all the guidelines in the [Formula Cookbook](Formula-Cookbook.md).
+4. Make your changes. For formulae, use `brew edit` or your favorite text editor, following all the guidelines in the [Formula Cookbook](Formula-Cookbook).
   * If there's a `bottle do` block in the formula, don't remove or change it; we'll update it when we pull your PR.
 5. Test your changes by doing the following, and ensure they all pass without issue. For changed formulae, make sure you do the `brew audit` step while your changed formula is installed.
   * `brew tests`

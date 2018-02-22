@@ -29,7 +29,7 @@ Make sure you run `brew update` before you start. This turns your Homebrew insta
 
 Before submitting a new formula make sure your package:
 
-*   meets all our [Acceptable Formulae](Acceptable-Formulae.md) requirements
+*   meets all our [Acceptable Formulae](Acceptable-Formulae) requirements
 *   isn't already in Homebrew (check `brew search <formula>`)
 *   isn't in another official [Homebrew tap](https://github.com/Homebrew)
 *   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
@@ -37,7 +37,7 @@ Before submitting a new formula make sure your package:
 *   has a stable, tagged version (i.e. not just a GitHub repository with no versions)
 *   passes all `brew audit --new-formula <formula>` tests.
 
-Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md).
+Before submitting a new formula make sure you read over our [contribution guidelines](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING).
 
 ### Grab the URL
 
@@ -251,7 +251,7 @@ Check the top of the e.g. `./configure` output. Some configure scripts do not re
 
 ### Add a test to the formula
 
-Add a valid test to the [`test do`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula&num;test-class_method) block of the formula. This will be run by `brew test foo` and the [Brew Test Bot](Brew-Test-Bot.md).
+Add a valid test to the [`test do`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula&num;test-class_method) block of the formula. This will be run by `brew test foo` and the [Brew Test Bot](Brew-Test-Bot).
 
 The
 [`test do`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#test-class_method)
@@ -534,7 +534,7 @@ end
 
 ### Compiler selection
 
-Sometimes a package fails to build when using a certain compiler. Since recent [Xcode versions](Xcode.md) no longer include a GCC compiler we cannot simply force the use of GCC. Instead, the correct way to declare this is the [`fails_with` DSL method](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#fails_with-class_method). A properly constructed [`fails_with`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#fails_with-class_method) block documents the latest compiler build version known to cause compilation to fail, and the cause of the failure. For example:
+Sometimes a package fails to build when using a certain compiler. Since recent [Xcode versions](Xcode) no longer include a GCC compiler we cannot simply force the use of GCC. Instead, the correct way to declare this is the [`fails_with` DSL method](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#fails_with-class_method). A properly constructed [`fails_with`](http://www.rubydoc.info/github/Homebrew/brew/master/Formula#fails_with-class_method) block documents the latest compiler build version known to cause compilation to fail, and the cause of the failure. For example:
 
 ```ruby
 fails_with :clang do

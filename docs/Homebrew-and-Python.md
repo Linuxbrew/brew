@@ -1,6 +1,6 @@
 # Python
 
-This page describes how Python is handled in Homebrew for users. See [Python for Formula Authors](Python-for-Formula-Authors.md) for advice on writing formulae to install packages written in Python.
+This page describes how Python is handled in Homebrew for users. See [Python for Formula Authors](Python-for-Formula-Authors) for advice on writing formulae to install packages written in Python.
 
 Homebrew should work with any [CPython](https://stackoverflow.com/questions/2324208/is-there-any-difference-between-cpython-and-python) and defaults to the macOS system Python.
 
@@ -66,7 +66,7 @@ Some formulae provide Python bindings. Sometimes a `--with-python` or `--with-py
 
 Homebrew builds bindings against the first `python` (and `python-config`) in your `PATH`. (Check with `which python`).
 
-**Warning!** Python may crash (see [Common Issues](Common-Issues.md)) if you `import <module>` from a brewed Python if you ran `brew install <formula_with_python_bindings>` against the system Python. If you decide to switch to the brewed Python, then reinstall all formulae with Python bindings (e.g. `pyside`, `wxwidgets`, `pygtk`, `pygobject`, `opencv`, `vtk` and `boost-python`).
+**Warning!** Python may crash (see [Common Issues](Common-Issues)) if you `import <module>` from a brewed Python if you ran `brew install <formula_with_python_bindings>` against the system Python. If you decide to switch to the brewed Python, then reinstall all formulae with Python bindings (e.g. `pyside`, `wxwidgets`, `pygtk`, `pygobject`, `opencv`, `vtk` and `boost-python`).
 
 ## Policy for non-brewed Python bindings
 These should be installed via `pip install <package>`. To discover, you can use `pip search` or <https://pypi.python.org/pypi>. (**Note:** System Python does not provide `pip`. Follow the [pip documentation](https://pip.readthedocs.io/en/stable/installing/#install-pip) to install it for your system Python if you would like it.)

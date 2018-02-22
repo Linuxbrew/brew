@@ -2,14 +2,14 @@
 
 Some formulae should not go in
 [homebrew/core](https://github.com/Homebrew/homebrew-core). But there are
-additional [Interesting Taps and Forks](Interesting-Taps-and-Forks.md) and anyone can start their
+additional [Interesting Taps and Forks](Interesting-Taps-and-Forks) and anyone can start their
 own!
 
 ### Dupes in `homebrew/core`
 We now accept stuff that comes with macOS as long as it uses `keg_only :provided_by_macos` to be keg-only by default.
 
 ### Versioned formulae in `homebrew/core`
-We now accept versioned formulae as long as they [meet the requirements](Versions.md).
+We now accept versioned formulae as long as they [meet the requirements](Versions).
 
 ### We don’t like tools that upgrade themselves
 Software that can upgrade itself does not integrate well with Homebrew's own
@@ -36,7 +36,7 @@ the upstream project. Tarballs are preferred to Git checkouts, and
 tarballs should include the version in the filename whenever possible.
 
 We don’t accept software without a tagged version because they regularly break
-due to upstream changes and we can’t provide [bottles](Bottles.md) for them.
+due to upstream changes and we can’t provide [bottles](Bottles) for them.
 
 ### Bindings
 First check that there is not already a binding available via
@@ -62,7 +62,7 @@ get maintained and partly because we have to draw the line somewhere.
 We frown on authors submitting their own work unless it is very popular.
 
 Don’t forget Homebrew is all Git underneath!
-[Maintain your own tap](How-to-Create-and-Maintain-a-Tap.md) if you have to!
+[Maintain your own tap](How-to-Create-and-Maintain-a-Tap) if you have to!
 
 There may be exceptions to these rules in the main repository; we may
 include things that don't meet these criteria or reject things that do.

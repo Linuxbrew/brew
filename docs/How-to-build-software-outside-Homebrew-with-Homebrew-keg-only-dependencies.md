@@ -2,7 +2,7 @@
 
 ## What does "keg-only" mean?
 
-The [FAQ](FAQ.md) briefly explains this.
+The [FAQ](FAQ) briefly explains this.
 
 As an example:
 

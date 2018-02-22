@@ -5,7 +5,7 @@ access** to Homebrew’s repository and help merge the contributions of
 others. You may find what is written here interesting, but it’s
 definitely not a beginner’s guide.
 
-Maybe you were looking for the [Formula Cookbook](Formula-Cookbook.md)?
+Maybe you were looking for the [Formula Cookbook](Formula-Cookbook)?
 
 ## Quick checklist
 
@@ -45,7 +45,7 @@ Add other names as aliases as symlinks in `Aliases` in the tap root. Ensure the
 name referenced on the homepage is one of these, as it may be different and have
 underscores and hyphens and so on.
 
-We now accept versioned formulae as long as they [meet the requirements](Versions.md).
+We now accept versioned formulae as long as they [meet the requirements](Versions).
 
 ### Merging, rebasing, cherry-picking
 Merging should be done in the `Homebrew/brew` repository to preserve history & GPG commit signing,
@@ -64,7 +64,7 @@ the commits. Our main branch history should be useful to other people,
 not confusing.
 
 ### Testing
-We need to at least check that it builds. Use the [Brew Test Bot](Brew-Test-Bot.md) for this.
+We need to at least check that it builds. Use the [Brew Test Bot](Brew-Test-Bot) for this.
 
 Verify the formula works if possible. If you can’t tell (e.g. if it’s a
 library) trust the original contributor, it worked for them, so chances are it

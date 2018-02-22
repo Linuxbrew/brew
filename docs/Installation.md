@@ -4,7 +4,7 @@ The suggested and easiest way to install Homebrew is on the
 [homepage](https://brew.sh).
 
 The standard script installs Homebrew to `/usr/local` so that
-[you don’t need sudo](FAQ.md) when you
+[you don’t need sudo](FAQ) when you
 `brew install`. It is a careful script; it can be run even if you have stuff
 installed to `/usr/local` already. It tells you exactly what it will do before
 it does it too. And you have to confirm everything it will do before it starts.
@@ -39,12 +39,12 @@ mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar 
 Create a Homebrew installation wherever you extract the tarball. Whichever `brew` command is called is where the packages will be installed. You can use this as you see fit, e.g. a system set of libs in `/usr/local` and tweaked formulae for development in `~/homebrew`.
 
 ## Uninstallation
-Uninstallation is documented in the [FAQ](FAQ.md).
+Uninstallation is documented in the [FAQ](FAQ).
 
 <a name="1"><sup>1</sup></a> Not all formulae have CPU or OS requirements, but
 you can assume you will have trouble if you don’t conform. Also, you can find
 PowerPC and Tiger branches from other users in the fork network. See
-[Interesting Taps and Forks](Interesting-Taps-and-Forks.md).
+[Interesting Taps and Forks](Interesting-Taps-and-Forks).
 
 <a name="2"><sup>2</sup></a> 10.10 or higher is recommended. 10.5–10.9 are
 supported on a best-effort basis. For 10.4 see
