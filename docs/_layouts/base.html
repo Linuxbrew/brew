@@ -1,21 +1,29 @@
+{% assign t = site.data.locales[page.lang][page.lang] %}
 <!DOCTYPE html>
 <html {% if page.direction == "rtl" %}dir="rtl" {% endif %}lang="{{ page.lang }}">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     {% if page.title %}
-    <title>{{ page.title }} — Homebrew</title>
-    {% elsif page.direction == "rtl" %}
-    <title>{{ page.subtitle }} — Homebrew</title>
+    <title>{{ page.title }} — {{ site.title }}</title>
+    {% elsif t.subtitle %}
+    {% if page.direction == "rtl" %}
+    <title>{{ site.title }} — {{ t.subtitle }}</title>
     {% else %}
-    <title>Homebrew — {{ page.subtitle }}</title>
+    <title>{{ t.subtitle }} — {{ t.subtitle }}</title>
+    {% endif %}
+    {% else %}
+    <title>{{ site.title }}</title>
     {% endif %}
     {% seo title=false %}
     {% feed_meta %}
     <meta name="viewport" content="width=device-width">
     <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
-    <link rel="apple-touch-icon"href="/img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
     <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen">
     <link rel="stylesheet" href="/css/pygments.css" type="text/css" media="screen">
+    {% if site.url == "http://localhost:4000" %}
+    <script src="https://github.com/Khan/tota11y/releases/download/0.1.3/tota11y.min.js"></script>
+    {% endif %}
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -27,31 +35,37 @@
       ga('send', 'pageview');
 
     </script>
-    {% for lang in site.langs %}
-      {% if lang.langcode == "en" %}
+    {% if site.data.locales %}
+    {% assign locales = site.data.locales | sort %}
+    {% for locale in locales %}
+      {% assign lang = locale[0] %}
+      {% if lang == "en" %}
       <link rel="alternate" hreflang="en" href="{{ site.url }}" />
       <link rel="alternate" hreflang="x-default" href="{{ site.url }}" />
       {% else %}
-      <link rel="alternate" hreflang="{{ lang.langcode }}" href="{{ lang.langcode | downcase | append: '.html' | prepend: '/index_' | prepend: site.url }}" />
+      <link rel="alternate" hreflang="{{ lang }}" href="{{ lang | prepend: '/index_' | prepend: site.url }}" />
       {% endif %}
     {% endfor %}
+    {% endif %}
   </head>
   <body>
     <div id="wrap">
       <div id="header" class="{{ page.header-class }}">
         <img alt="Homebrew logo" src="/img/homebrew-256x256.png" width="128" height="128">
         <h1><a href="/">Homebrew</a></h1>
-        {% if page.subtitle %}
-        <p id="subtitle"><strong>{{ page.subtitle }}</strong></p>
+        {% if t.subtitle %}
+        <p id="subtitle"><strong>{{ t.subtitle }}</strong></p>
         {% endif %}
 
         {% if page.lang %}
         <select id="language" onchange="loadLanguage(this.options[this.selectedIndex].value)">
-          {% for lang in site.langs %}
-            {% if page.lang == lang.langcode %}
-            <option value="{{ lang.langcode | downcase }}" selected="selected">{{ lang.lang_string }}</option>
+          {% for locale in locales %}
+            {% assign lang = locale[0] %}
+            {% assign locale_name = locale[1][lang].locale_name %}
+            {% if page.lang == lang %}
+            <option value="{{ lang }}" selected="selected">{{ locale_name }}</option>
             {% else %}
-            <option value="{{ lang.langcode | downcase }}">{{ lang.lang_string }}</option>
+            <option value="{{ lang }}">{{ locale_name }}</option>
             {% endif %}
           {% endfor %}
         </select>
@@ -80,9 +94,9 @@
         if (lang === {{ page.lang | jsonify }}) {
             return;
         } else if (lang === "en") {
-            window.location.replace("/");
+            window.location.assign("/");
         } else {
-            window.location.replace("/index_" + lang + ".html");
+            window.location.assign("/index_" + lang);
         }
       }
     </script>
