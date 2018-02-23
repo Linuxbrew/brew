@@ -12,6 +12,8 @@ plugins:
   - jekyll-sitemap
   - jekyll-seo-tag
 
+permalink: :title
+
 defaults:
   - scope:
       path: ""
