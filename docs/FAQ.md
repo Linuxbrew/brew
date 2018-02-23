@@ -76,11 +76,11 @@ the launchctl PATH for _all users_. For earlier versions of macOS, see
 [this page](https://developer.apple.com/legacy/library/qa/qa1067/_index.html).
 
 ## How do I contribute to Homebrew?
-Read [CONTRIBUTING.md](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING).
+Read [CONTRIBUTING.md](https://github.com/Homebrew/brew/blob/master/CONTRIBUTING.md).
 
 ## Why do you compile everything?
 Homebrew provides pre-compiled versions for many formulae. These
-pre-compiled versions are referred to as [bottles](Bottles) and are available
+pre-compiled versions are referred to as [bottles](Bottles.md) and are available
 at <https://bintray.com/homebrew/bottles>.
 
 If available, bottled binaries will be used by default except under the
@@ -163,7 +163,7 @@ creating a separate user account especially for use of Homebrew.
 
 ## Why isn’t a particular command documented?
 
-If it’s not in `man brew`, it’s probably an external command. These are documented [here](External-Commands).
+If it’s not in `man brew`, it’s probably an external command. These are documented [here](External-Commands.md).
 
 ## Why haven’t you pulled my pull request?
 If it’s been a while, bump it with a “bump” comment. Sometimes we miss requests and there are plenty of them. Maybe we were thinking on something. It will encourage consideration. In the meantime if you could rebase the pull request so that it can be cherry-picked more easily we will love you for a long time.
@@ -179,7 +179,7 @@ install <formula>`. If you encounter any issues, run the command with the
 into a debugging shell.
 
 If you want your new formula to be part of `homebrew/core` or want
-to learn more about writing formulae, then please read the [Formula Cookbook](Formula-Cookbook).
+to learn more about writing formulae, then please read the [Formula Cookbook](Formula-Cookbook.md).
 
 ## Can I install my own stuff to `/usr/local`?
 Yes, `brew` is designed to not get in your way so you can use it how you

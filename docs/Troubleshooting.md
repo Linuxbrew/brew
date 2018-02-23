@@ -12,7 +12,7 @@ Follow these steps to fix common problems:
 * Run `brew doctor` and fix all the warnings (**outdated Xcode/CLT and unbrewed dylibs are very likely to cause problems**).
 * Check that **Command Line Tools for Xcode (CLT)** and **Xcode** are up to date.
 * If commands fail with permissions errors, check the permissions of `/usr/local`'s subdirectories. If you’re unsure what to do, you can run `cd /usr/local && sudo chown -R $(whoami) bin etc include lib sbin share var Frameworks`.
-* Read through the [Common Issues](Common-Issues).
+* Read through the [Common Issues](Common-Issues.md).
 
 ## Check to see if the issue has been reported
 

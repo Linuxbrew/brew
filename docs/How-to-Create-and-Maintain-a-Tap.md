@@ -27,7 +27,7 @@ If it’s on GitHub, users can install any of your formulae with
 file here.
 
 If they want to get your tap without installing any formula at the same time,
-users can add it with the [`brew tap` command](Taps).
+users can add it with the [`brew tap` command](Taps.md).
 
 If it’s on GitHub, they can use `brew tap user/repo`, where `user` is your
 GitHub username and `homebrew-repo` your repository.
@@ -51,7 +51,7 @@ Once your tap is installed, Homebrew will update it each time a user runs
 
 ## External commands
 You can provide your tap users with custom `brew` commands by adding them in a
-`cmd` subdirectory. [Read more on external commands](External-Commands).
+`cmd` subdirectory. [Read more on external commands](External-Commands.md).
 
 See [homebrew/aliases](https://github.com/Homebrew/homebrew-aliases) for an
 example of a tap with external commands.

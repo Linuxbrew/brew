@@ -121,7 +121,7 @@ To list all files that would be deleted:
 
 Don't follow the advice here but fix by using
 `Language::Python.setup_install_args` in the formula as described in
-[Python for Formula Authors](Python-for-Formula-Authors).
+[Python for Formula Authors](Python-for-Formula-Authors.md).
 
 ### Upgrading macOS
 
