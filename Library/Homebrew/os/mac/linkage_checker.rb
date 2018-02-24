@@ -15,37 +15,37 @@ class LinkageChecker
   # 'Hash-type' cache values
 
   def brewed_dylibs
-    @brewed_dylibs ||= store.fetch(type: "brewed_dylibs")
+    @brewed_dylibs ||= store.fetch_type(:brewed_dylibs)
   end
 
   def reverse_links
-    @reverse_links ||= store.fetch(type: "reverse_links")
+    @reverse_links ||= store.fetch_type(:reverse_links)
   end
 
   # 'Path-type' cached values
 
   def system_dylibs
-    @system_dylibs ||= store.fetch(type: "system_dylibs")
+    @system_dylibs ||= store.fetch_type(:system_dylibs)
   end
 
   def broken_dylibs
-    @broken_dylibs ||= store.fetch(type: "broken_dylibs")
+    @broken_dylibs ||= store.fetch_type(:broken_dylibs)
   end
 
   def variable_dylibs
-    @variable_dylibs ||= store.fetch(type: "variable_dylibs")
+    @variable_dylibs ||= store.fetch_type(:variable_dylibs)
   end
 
   def undeclared_deps
-    @undeclared_deps ||= store.fetch(type: "undeclared_deps")
+    @undeclared_deps ||= store.fetch_type(:undeclared_deps)
   end
 
   def indirect_deps
-    @indirect_deps ||= store.fetch(type: "indirect_deps")
+    @indirect_deps ||= store.fetch_type(:indirect_deps)
   end
 
   def unnecessary_deps
-    @unnecessary_deps ||= store.fetch(type: "unnecessary_deps")
+    @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
   end
 
   def flush_cache_and_check_dylibs
@@ -207,8 +207,6 @@ class LinkageChecker
   end
 
   # Helper function to reset dylib values when building cache
-  #
-  # @return [nil]
   def reset_dylibs!
     store.flush_cache!
     @system_dylibs    = Set.new
@@ -222,21 +220,19 @@ class LinkageChecker
   end
 
   # Updates data store with package path values
-  #
-  # @return [nil]
   def store_dylibs!
     store.update!(
       path_values: {
-        "system_dylibs"    => @system_dylibs,
-        "variable_dylibs"  => @variable_dylibs,
-        "broken_dylibs"    => @broken_dylibs,
-        "indirect_deps"    => @indirect_deps,
-        "undeclared_deps"  => @undeclared_deps,
-        "unnecessary_deps" => @unnecessary_deps,
+        system_dylibs: @system_dylibs,
+        variable_dylibs: @variable_dylibs,
+        broken_dylibs: @broken_dylibs,
+        indirect_deps: @indirect_deps,
+        undeclared_deps: @undeclared_deps,
+        unnecessary_deps: @unnecessary_deps,
       },
       hash_values: {
-        "brewed_dylibs"    => @brewed_dylibs,
-        "reverse_links"    => @reverse_links,
+        brewed_dylibs: @brewed_dylibs,
+        reverse_links: @reverse_links,
       },
     )
   end

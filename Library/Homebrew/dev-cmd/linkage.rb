@@ -19,22 +19,22 @@ module Homebrew
   module_function
 
   def linkage
-    ARGV.kegs.each do |keg|
-      ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
-      database_cache = DatabaseCache.new("linkage")
-      result = LinkageChecker.new(keg, database_cache)
-      result.flush_cache_and_check_dylibs if ARGV.include?("--rebuild")
+    DatabaseCache.new(:linkage) do |database_cache|
+      ARGV.kegs.each do |keg|
+        ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
 
-      if ARGV.include?("--test")
-        result.display_test_output
-        Homebrew.failed = true if result.broken_dylibs?
-      elsif ARGV.include?("--reverse")
-        result.display_reverse_output
-      else
-        result.display_normal_output
+        result = LinkageChecker.new(keg, database_cache)
+        result.flush_cache_and_check_dylibs if ARGV.include?("--rebuild")
+
+        if ARGV.include?("--test")
+          result.display_test_output
+          Homebrew.failed = true if result.broken_dylibs?
+        elsif ARGV.include?("--reverse")
+          result.display_reverse_output
+        else
+          result.display_normal_output
+        end
       end
-
-      database_cache.close
     end
   end
 end
