@@ -176,6 +176,8 @@ module Superenv
     PATH.new(
       keg_only_deps.map(&:opt_lib),
       HOMEBREW_PREFIX/"lib",
+      "#{MacOS.sdk_path}/usr/lib",
+      (compiler == :llvm_clang ? Formula["llvm"].opt_lib.to_s : ""),
       homebrew_extra_library_paths,
     ).existing
   end
