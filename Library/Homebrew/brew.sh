@@ -96,6 +96,14 @@ then
     HOMEBREW_FORCE_BREWED_CURL="1"
   fi
 
+  # The system Git is too old for some GitHub's SSL ciphers on older
+  # macOS versions.
+  # https://github.com/blog/2507-weak-cryptographic-standards-removed
+  if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" ]]
+  then
+    HOMEBREW_SYSTEM_GIT_TOO_OLD="1"
+  fi
+
   if [[ -z "$HOMEBREW_CACHE" ]]
   then
     HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
