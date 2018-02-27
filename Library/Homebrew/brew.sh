@@ -253,6 +253,14 @@ then
   then
     export HOMEBREW_DEV_CMD_RUN="1"
   fi
+
+  # Don't allow non-developers to customise Ruby warnings.
+  unset HOMEBREW_RUBY_WARNINGS
+fi
+
+if [[ -z "$HOMEBREW_RUBY_WARNINGS" ]]
+then
+  export HOMEBREW_RUBY_WARNINGS="-W0"
 fi
 
 if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]
@@ -371,5 +379,5 @@ else
 
   # Unshift command back into argument list (unless argument list was empty).
   [[ "$HOMEBREW_ARG_COUNT" -gt 0 ]] && set -- "$HOMEBREW_COMMAND" "$@"
-  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" -W0 "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
+  { update-preinstall; exec "$HOMEBREW_RUBY_PATH" $HOMEBREW_RUBY_WARNINGS "$HOMEBREW_LIBRARY/Homebrew/brew.rb" "$@"; }
 fi
