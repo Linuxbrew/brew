@@ -37,11 +37,6 @@ before_install:
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
     fi
-  - if [ "$MACOS" ]; then
-      travis_retry git -C Library/Taps/homebrew/homebrew-core fetch --depth=1 origin;
-    else
-      travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-core Library/Taps/homebrew/homebrew-core;
-    fi
   - travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
 
 script:
