@@ -3,7 +3,7 @@ cache:
   directories:
     - $HOME/Library/Caches/Homebrew/style
     - $HOME/Library/Caches/Homebrew/tests
-    - $HOME/Library/Homebrew/vendor/bundle
+    - Library/Homebrew/vendor/bundle
 branches:
   only:
     - master
