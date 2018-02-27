@@ -801,6 +801,10 @@ Generate Homebrew\'s manpages\.
 If \fB\-\-fail\-if\-changed\fR is passed, the command will return a failing status code if changes are detected in the manpage outputs\. This can be used for CI to be notified when the manpages are out of date\. Additionally, the date used in new manpages will match those in the existing manpages (to allow comparison without factoring in the date)\.
 .
 .TP
+\fBprof\fR [\fIruby options\fR]
+Run Homebrew with the Ruby profiler\. For example:
+.
+.TP
 \fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] [\fB\-\-warn\-on\-publish\-failure\fR] [\fB\-\-bintray\-org=\fR\fIbintray\-org\fR] [\fB\-\-test\-bot\-user=\fR\fItest\-bot\-user\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]:
 .
 .IP
@@ -860,6 +864,10 @@ Output the merged pull requests on Homebrew/brew between two Git refs\. If no \f
 .
 .IP
 If \fB\-\-markdown\fR is passed, output as a Markdown list\.
+.
+.TP
+\fBruby\fR [\fIruby options\fR]
+Run a Ruby instance with Homebrew\'s libraries loaded\. For example:
 .
 .TP
 \fBtap\-new\fR \fIuser\fR\fB/\fR\fIrepo\fR

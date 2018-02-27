@@ -782,6 +782,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Additionally, the date used in new manpages will match those in the existing
     manpages (to allow comparison without factoring in the date).
 
+  * `prof` [`ruby options`]:
+    Run Homebrew with the Ruby profiler.
+    For example:
+
   * `pull` [`--bottle`] [`--bump`] [`--clean`] [`--ignore-whitespace`] [`--resolve`] [`--branch-okay`] [`--no-pbcopy`] [`--no-publish`] [`--warn-on-publish-failure`] [`--bintray-org=``bintray-org`] [`--test-bot-user=``test-bot-user`] `patch-source` [`patch-source`]:
 
     Gets a patch from a GitHub commit or pull request and applies it to Homebrew.
@@ -838,6 +842,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If no `end_ref` is provided it defaults to `origin/master`.
 
     If `--markdown` is passed, output as a Markdown list.
+
+  * `ruby` [`ruby options`]:
+    Run a Ruby instance with Homebrew's libraries loaded.
+    For example:
 
   * `tap-new` `user``/``repo`:
     Generate the template files for a new tap.
