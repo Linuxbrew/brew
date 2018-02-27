@@ -65,10 +65,7 @@ module FormulaCellarChecks
     return unless formula.prefix.directory?
     keg = Keg.new(formula.prefix)
 
-    DatabaseCache.new(:linkage) do |database_cache|
-      checker = LinkageChecker.new(keg, database_cache, formula)
-      checker.flush_cache_and_check_dylibs
-    end
+    DatabaseCache.new(:linkage) { |database_cache| LinkageChecker.new(keg, database_cache, true, formula) }
 
     return unless checker.broken_dylibs?
     output = <<~EOS

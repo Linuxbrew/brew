@@ -6,10 +6,11 @@ require "os/mac/cache_store"
 class LinkageChecker
   attr_reader :keg, :formula, :store
 
-  def initialize(keg, db, formula = nil)
+  def initialize(keg, db, rebuild_cache = false, formula = nil)
     @keg = keg
     @formula = formula || resolve_formula(keg)
     @store = LinkageStore.new(keg.name, db)
+    flush_cache_and_check_dylibs if rebuild_cache
   end
 
   # 'Hash-type' cache values
@@ -222,7 +223,7 @@ class LinkageChecker
   # Updates data store with package path values
   def store_dylibs!
     store.update!(
-      path_values: {
+      array_values: {
         system_dylibs: @system_dylibs,
         variable_dylibs: @variable_dylibs,
         broken_dylibs: @broken_dylibs,

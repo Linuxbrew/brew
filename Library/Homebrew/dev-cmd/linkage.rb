@@ -23,8 +23,7 @@ module Homebrew
       ARGV.kegs.each do |keg|
         ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
 
-        result = LinkageChecker.new(keg, database_cache)
-        result.flush_cache_and_check_dylibs if ARGV.include?("--rebuild")
+        result = LinkageChecker.new(keg, database_cache, ARGV.include?("--rebuild"))
 
         if ARGV.include?("--test")
           result.display_test_output

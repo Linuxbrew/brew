@@ -6,13 +6,13 @@ require "json"
 # residing in the `HOMEBREW_CACHE`
 #
 class DatabaseCache
-  # Users have read and write, but not execute permissions
-  DATABASE_MODE = 0666
+  # The mode of any created files will be 0664 (that is, readable and writable
+  # by the owner and the group, and readable by everyone else)
+  DATABASE_MODE = 0664
 
   # Opens and yields a database in read/write mode
-  #
-  # DBM::WRCREAT: Creates the database if it does not already exist
   def initialize(name)
+    # DBM::WRCREAT: Creates the database if it does not already exist
     @db = DBM.open("#{HOMEBREW_CACHE}/#{name}.db", DATABASE_MODE, DBM::WRCREAT)
     yield(@db)
     @db.close
@@ -47,16 +47,24 @@ class CacheStore
 
   protected
 
+  # @return [DBM]
   attr_reader :database_cache
 
-  # Parses `DBM` stored `String` into ruby `Hash`
-  #
   # DBM stores ruby objects as a ruby `String`. Hence, when fetching the data,
   # to convert the ruby string back into a ruby `Hash`, the string is converted
-  # into a JSON compatible string, where it may be parsed by the JSON.parse
-  # function
-  def string_to_hash(string)
-    JSON.parse(string.gsub("=>", ":"))
+  # into a JSON compatible string in `ruby_hash_to_json_string`, where it may
+  # later be parsed by `JSON.parse` in the `json_string_to_ruby_hash` method
+  #
+  # @param  [Hash]
+  # @return [String]
+  def ruby_hash_to_json_string(hash)
+    hash.to_json
+  end
+
+  # @param  [String]
+  # @return [Hash]
+  def json_string_to_ruby_hash(string)
+    JSON.parse(string)
   end
 end
 
@@ -73,7 +81,7 @@ class LinkageStore < CacheStore
   end
 
   def update!(
-    path_values: {
+    array_values: {
       system_dylibs: %w[],
       variable_dylibs: %w[],
       broken_dylibs: %w[],
@@ -86,17 +94,17 @@ class LinkageStore < CacheStore
       reverse_links: {},
     }
   )
-    database_cache[keg_name] = {
-      "path_values" => format_path_values(path_values),
-      "hash_values" => format_hash_values(hash_values),
-    }
+    database_cache[keg_name] = ruby_hash_to_json_string(
+      array_values: format_array_values(array_values),
+      hash_values: format_hash_values(hash_values),
+    )
   end
 
   def fetch_type(type)
     if HASH_LINKAGE_TYPES.include?(type)
       fetch_hash_values(type: type)
     else
-      fetch_path_values(type: type)
+      fetch_array_values(type: type)
     end
   end
 
@@ -108,28 +116,33 @@ class LinkageStore < CacheStore
 
   attr_reader :keg_name
 
-  def fetch_path_values(type:)
-    return [] if !database_cache.key?(keg_name) || database_cache[keg_name].nil?
-    string_to_hash(database_cache[keg_name])["path_values"][type.to_s]
+  def fetch_array_values(type:)
+    return [] unless database_cache.key?(keg_name)
+    json_string_to_ruby_hash(database_cache[keg_name])["array_values"][type.to_s]
   end
 
   def fetch_hash_values(type:)
-    return {} if !database_cache.key?(keg_name) || database_cache[keg_name].nil?
-    string_to_hash(database_cache[keg_name])["hash_values"][type.to_s]
+    return {} unless database_cache.key?(keg_name)
+    json_string_to_ruby_hash(database_cache[keg_name])["hash_values"][type.to_s]
   end
 
-  # Formats the linkage data for `path_values` into a kind which can be parsed
-  # by the `string_to_hash` method. Converts ruby `Set`s to `Array`s
-  def format_path_values(hash)
-    hash.each_with_object({}) { |(k, v), h| h[k.to_s] = v.to_a }
+  # Formats the linkage data for `array_values` into a kind which can be parsed
+  # by the `json_string_to_ruby_hash` method. Internally converts ruby `Set`s to
+  # `Array`s
+  #
+  # @return [String]
+  def format_array_values(hash)
+    hash.each_with_object({}) { |(k, v), h| h[k] = v.to_a }
   end
 
   # Formats the linkage data for `hash_values` into a kind which can be parsed
-  # by the `string_to_hash` method. Converts ruby `Set`s to `Array`s, and
+  # by the `json_string_to_ruby_hash` method. Converts ruby `Set`s to `Array`s, and
   # converts ruby `Pathname`s to `String`s
+  #
+  # @return [String]
   def format_hash_values(hash)
     hash.each_with_object({}) do |(outer_key, outer_values), outer_hash|
-      outer_hash[outer_key.to_s] = outer_values.each_with_object({}) do |(k, v), h|
+      outer_hash[outer_key] = outer_values.each_with_object({}) do |(k, v), h|
         h[k] = v.to_a.map(&:to_s)
       end
     end
