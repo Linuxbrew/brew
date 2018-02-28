@@ -173,13 +173,31 @@ module Superenv
   end
 
   def determine_library_paths
-    PATH.new(
-      keg_only_deps.map(&:opt_lib),
-      HOMEBREW_PREFIX/"lib",
-      "#{MacOS.sdk_path}/usr/lib",
-      (compiler == :llvm_clang ? Formula["llvm"].opt_lib.to_s : ""),
-      homebrew_extra_library_paths,
-    ).existing
+    if compiler == :llvm_clang
+      if MacOS::CLT.installed?
+        PATH.new(
+          keg_only_deps.map(&:opt_lib),
+          HOMEBREW_PREFIX/"lib",
+          "/usr/lib",
+          Formula["llvm"].opt_lib.to_s,
+          homebrew_extra_library_paths,
+        ).existing
+      else
+        PATH.new(
+          keg_only_deps.map(&:opt_lib),
+          HOMEBREW_PREFIX/"lib",
+          "#{MacOS.sdk_path}/usr/lib",
+          Formula["llvm"].opt_lib.to_s,
+          homebrew_extra_library_paths,
+        ).existing
+      end
+    else
+      PATH.new(
+        keg_only_deps.map(&:opt_lib),
+        HOMEBREW_PREFIX/"lib",
+        homebrew_extra_library_paths,
+      ).existing
+    end
   end
 
   def determine_dependencies
