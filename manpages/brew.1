@@ -291,13 +291,6 @@ If \fB\-\-interactive\fR (or \fB\-i\fR) is passed, download and patch \fIformula
 If \fB\-\-git\fR (or \fB\-g\fR) is passed, Homebrew will create a Git repository, useful for creating patches to the software\.
 .
 .TP
-\fBirb\fR [\fB\-\-examples\fR]
-Enter the interactive Homebrew Ruby shell\.
-.
-.IP
-If \fB\-\-examples\fR is passed, several examples will be shown\.
-.
-.TP
 \fBleaves\fR
 Show installed formulae that are not dependencies of another installed formula\.
 .
@@ -781,6 +774,13 @@ Open \fIformula\fR in the editor\.
 Display the path where \fIformula\fR is located\.
 .
 .TP
+\fBirb\fR [\fB\-\-examples\fR] [\fB\-\-pry\fR]
+Enter the interactive Homebrew Ruby shell\.
+.
+.IP
+If \fB\-\-examples\fR is passed, several examples will be shown\. If \fB\-\-pry\fR is passed or HOMEBREW_PRY is set, pry will be used instead of irb\.
+.
+.TP
 \fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] \fIformula\fR
 Checks the library links of an installed formula\.
 .
@@ -1048,6 +1048,10 @@ A personal access token for the GitHub API, which you can create at \fIhttps://g
 \fINote:\fR Homebrew doesn\'t require permissions for any of the scopes\.
 .
 .TP
+\fBHOMEBREW_INSTALL_BADGE\fR
+Text printed before the installation summary of each successful build\. Defaults to the beer emoji\.
+.
+.TP
 \fBHOMEBREW_LOGS\fR
 If set, Homebrew will use the given directory to store log files\.
 .
@@ -1089,8 +1093,8 @@ While ensuring your downloads are fully secure, this is likely to cause from\-so
 If set, Homebrew will not use the GitHub API for e\.g searches or fetching relevant issues on a failed install\.
 .
 .TP
-\fBHOMEBREW_INSTALL_BADGE\fR
-Text printed before the installation summary of each successful build\. Defaults to the beer emoji\.
+\fBHOMEBREW_PRY\fR
+If set, Homebrew will use \fBpry\fR for the \fBbrew irb\fR command\.
 .
 .TP
 \fBHOMEBREW_SVN\fR
