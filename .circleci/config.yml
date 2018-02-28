@@ -10,6 +10,10 @@ jobs:
       - run: |
           cd /home/linuxbrew/.linuxbrew/Homebrew
           git pull --ff-only
+          if [ -n "$CIRCLE_PR_NUMBER" ]; then
+              git fetch origin pull/$CIRCLE_PR_NUMBER/head
+          fi
+          git reset --hard $CIRCLE_SHA1
           git config --global user.name LinuxbrewTestBot
           git config --global user.email testbot@linuxbrew.sh
       - run: |
