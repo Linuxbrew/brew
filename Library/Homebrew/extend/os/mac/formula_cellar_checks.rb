@@ -1,3 +1,4 @@
+require "cache_store"
 require "os/mac/linkage_checker"
 
 module FormulaCellarChecks

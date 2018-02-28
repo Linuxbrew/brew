@@ -1,7 +1,7 @@
 require "set"
 require "keg"
 require "formula"
-require "os/mac/cache_store"
+require "os/mac/linkage_cache_store"
 
 class LinkageChecker
   attr_reader :keg, :formula, :store
@@ -223,18 +223,14 @@ class LinkageChecker
   # Updates data store with package path values
   def store_dylibs!
     store.update!(
-      array_values: {
-        system_dylibs: @system_dylibs,
-        variable_dylibs: @variable_dylibs,
-        broken_dylibs: @broken_dylibs,
-        indirect_deps: @indirect_deps,
-        undeclared_deps: @undeclared_deps,
-        unnecessary_deps: @unnecessary_deps,
-      },
-      hash_values: {
-        brewed_dylibs: @brewed_dylibs,
-        reverse_links: @reverse_links,
-      },
+      system_dylibs: @system_dylibs,
+      variable_dylibs: @variable_dylibs,
+      broken_dylibs: @broken_dylibs,
+      indirect_deps: @indirect_deps,
+      undeclared_deps: @undeclared_deps,
+      unnecessary_deps: @unnecessary_deps,
+      brewed_dylibs: @brewed_dylibs,
+      reverse_links: @reverse_links,
     )
   end
 end

@@ -13,6 +13,7 @@
 #:    If `--rebuild` is passed, flushes the `LinkageStore` cache for each
 #:    'keg.name' and forces a check on the dylibs.
 
+require "cache_store"
 require "os/mac/linkage_checker"
 
 module Homebrew
