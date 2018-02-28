@@ -4,18 +4,14 @@ jobs:
     docker:
       - image: linuxbrew/linuxbrew
     environment:
-      CIRCLE_REPOSITORY_URL: https://github.com/Linuxbrew/brew
       HOMEBREW_DEVELOPER: 1
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
-      - checkout
       - run: |
-          git remote set-url origin $CIRCLE_REPOSITORY_URL
-          if [ -e .git/shallow ]; then echo git fetch --unshallow; fi
+          cd /home/linuxbrew/.linuxbrew/Homebrew
+          git pull --ff-only
           git config --global user.name LinuxbrewTestBot
           git config --global user.email testbot@linuxbrew.sh
-          rm -rf /home/linuxbrew/.linuxbrew/Homebrew
-          cp -a . /home/linuxbrew/.linuxbrew/Homebrew
       - run: |
           umask 022
           PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
