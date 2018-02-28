@@ -183,6 +183,10 @@ can take several different forms:
 
     *Note:* Homebrew doesn't require permissions for any of the scopes.
 
+  * `HOMEBREW_INSTALL_BADGE`:
+    Text printed before the installation summary of each successful build.
+    Defaults to the beer emoji.
+
   * `HOMEBREW_LOGS`:
     If set, Homebrew will use the given directory to store log files.
 
@@ -220,9 +224,8 @@ can take several different forms:
     If set, Homebrew will not use the GitHub API for e.g searches or
     fetching relevant issues on a failed install.
 
-  * `HOMEBREW_INSTALL_BADGE`:
-    Text printed before the installation summary of each successful build.
-    Defaults to the beer emoji.
+  * `HOMEBREW_PRY`:
+    If set, Homebrew will use `pry` for the `brew irb` command.
 
   * `HOMEBREW_SVN`:
     When exporting from Subversion, Homebrew will use `HOMEBREW_SVN` if set,

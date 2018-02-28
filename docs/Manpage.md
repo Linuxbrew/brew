@@ -280,11 +280,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--git` (or `-g`) is passed, Homebrew will create a Git repository, useful for
     creating patches to the software.
 
-  * `irb` [`--examples`]:
-    Enter the interactive Homebrew Ruby shell.
-
-    If `--examples` is passed, several examples will be shown.
-
   * `leaves`:
     Show installed formulae that are not dependencies of another installed formula.
 
@@ -761,6 +756,13 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `formula` `formula`:
     Display the path where `formula` is located.
 
+  * `irb` [`--examples`] [`--pry`]:
+    Enter the interactive Homebrew Ruby shell.
+
+    If `--examples` is passed, several examples will be shown.
+    If `--pry` is passed or HOMEBREW_PRY is set, pry will be
+    used instead of irb.
+
   * `linkage` [`--test`] [`--reverse`] `formula`:
     Checks the library links of an installed formula.
 
@@ -1029,6 +1031,10 @@ can take several different forms:
 
     *Note:* Homebrew doesn't require permissions for any of the scopes.
 
+  * `HOMEBREW_INSTALL_BADGE`:
+    Text printed before the installation summary of each successful build.
+    Defaults to the beer emoji.
+
   * `HOMEBREW_LOGS`:
     If set, Homebrew will use the given directory to store log files.
 
@@ -1066,9 +1072,8 @@ can take several different forms:
     If set, Homebrew will not use the GitHub API for e.g searches or
     fetching relevant issues on a failed install.
 
-  * `HOMEBREW_INSTALL_BADGE`:
-    Text printed before the installation summary of each successful build.
-    Defaults to the beer emoji.
+  * `HOMEBREW_PRY`:
+    If set, Homebrew will use `pry` for the `brew irb` command.
 
   * `HOMEBREW_SVN`:
     When exporting from Subversion, Homebrew will use `HOMEBREW_SVN` if set,
