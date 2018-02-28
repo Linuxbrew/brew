@@ -390,7 +390,7 @@ EOS
     brew install curl
   fi
 
-  if ! git --version >/dev/null 2>&1
+  if [[ -n "$HOMEBREW_SYSTEM_GIT_TOO_OLD" ]] || ! git --version >/dev/null 2>&1
   then
     # we cannot install brewed git if homebrew/core is unavailable.
     [[ -d "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && brew install git

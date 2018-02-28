@@ -2,6 +2,7 @@ require "find"
 require "pathname"
 require "rspec/its"
 require "rspec/wait"
+require "rspec/retry"
 require "rubocop"
 require "rubocop/rspec/support"
 require "set"
@@ -72,6 +73,10 @@ RSpec.configure do |config|
 
   config.before(:each, :needs_network) do
     skip "Requires network connection." unless ENV["HOMEBREW_TEST_ONLINE"]
+  end
+
+  config.before(:each, :needs_svn) do
+    skip "Requires subversion." unless which "svn"
   end
 
   config.around(:each) do |example|

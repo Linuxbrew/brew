@@ -18,6 +18,10 @@ class DependencyCollector
     Dependency.new("xz", tags)
   end
 
+  def zip_dep_if_needed(tags); end
+
+  def bzip2_dep_if_needed(tags); end
+
   def ld64_dep_if_needed(*)
     # Tiger's ld is too old to properly link some software
     return if MacOS.version > :tiger

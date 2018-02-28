@@ -39,12 +39,10 @@ before_install:
     fi
   - if [ "$MACOS" ]; then
       travis_retry git -C Library/Taps/homebrew/homebrew-core fetch --depth=1 origin;
+    else
+      travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-core Library/Taps/homebrew/homebrew-core;
     fi
   - travis_retry git clone --depth=1 https://github.com/Linuxbrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
-  # can be removed after 1.5.3 is tagged
-  - if [ "$LINUX" ]; then
-      export HOMEBREW_FORCE_VENDOR_RUBY=1;
-    fi
 
 script:
   - brew test-bot
