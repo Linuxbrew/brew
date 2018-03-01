@@ -36,6 +36,18 @@ describe DependencyCollector do
     expect(subject.add(resource)).to be nil
   end
 
+  specify "Resource dependency from a '.zip' URL" do
+    resource = Resource.new
+    resource.url("http://example.com/foo.zip")
+    expect(subject.add(resource)).to be nil
+  end
+
+  specify "Resource dependency from a '.bz2' URL" do
+    resource = Resource.new
+    resource.url("http://example.com/foo.tar.bz2")
+    expect(subject.add(resource)).to be nil
+  end
+
   specify "Resource dependency from a '.git' URL" do
     resource = Resource.new
     resource.url("git://example.com/foo/bar.git")

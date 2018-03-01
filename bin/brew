@@ -47,7 +47,7 @@ HOMEBREW_LIBRARY="$HOMEBREW_REPOSITORY/Library"
 # Whitelist and copy to HOMEBREW_* all variables previously mentioned in
 # manpage or used elsewhere by Homebrew.
 for VAR in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY BINTRAY_USER BINTRAY_KEY \
-           BROWSER EDITOR GIT PATH VISUAL \
+           BROWSER EDITOR GIT NO_COLOR PATH VISUAL \
            GITHUB_USER GITHUB_PASSWORD GITHUB_TOKEN
 do
   # Skip if variable value is empty.
@@ -66,9 +66,9 @@ then
 
   FILTERED_ENV=()
   # Filter all but the specific variables.
-  for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS SSH_AUTH_SOCK SUDO_ASKPASS \
+  for VAR in HOME SHELL PATH TERM LOGNAME USER CI TRAVIS TRAVIS_SUDO SSH_AUTH_SOCK SUDO_ASKPASS \
              http_proxy https_proxy ftp_proxy no_proxy all_proxy HTTPS_PROXY FTP_PROXY ALL_PROXY \
-             "${!HOMEBREW_@}" "${!TRAVIS_@}" "${!JENKINS_@}"
+             "${!HOMEBREW_@}"
   do
     # Skip if variable value is empty.
     [[ -z "${!VAR}" ]] && continue

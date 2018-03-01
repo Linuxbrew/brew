@@ -1,4 +1,4 @@
-require "os/mac/linkage_checker"
+require "linkage_checker"
 
 module FormulaCellarChecks
   def check_shadowed_headers

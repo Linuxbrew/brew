@@ -10,7 +10,7 @@
 #:    If `--reverse` is passed, print the dylib followed by the binaries
 #:    which link to it for each library the keg references.
 
-require "os/mac/linkage_checker"
+require "linkage_checker"
 
 module Homebrew
   module_function

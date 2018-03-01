@@ -62,14 +62,16 @@ module Hbc
           raise CaskError, "It seems the #{self.class.english_name} source '#{target}' is not there."
         end
 
-        ohai "Moving #{self.class.english_name} '#{target.basename}' back to '#{source}'."
+        ohai "Backing #{self.class.english_name} '#{target.basename}' up to '#{source}'."
         source.dirname.mkpath
 
         if target.parent.writable?
-          FileUtils.move(target, source)
+          FileUtils.cp_r(target, source)
         else
-          command.run("/bin/mv", args: [target, source], sudo: true)
+          command.run("/bin/cp", args: ["-r", target, source], sudo: true)
         end
+
+        delete(target, force: force, command: command, **options)
       end
 
       def delete(target, force: false, command: nil, **_)

@@ -1,28 +1,29 @@
 ---
 layout: base
 ---
+{% assign t = site.data.locales[page.lang][page.lang] %}
 <div id="information">
   <ul>
     <li>
       <div class="group row">
-        <h2 id="install">{{ page.pagecontent.install.install }}</h2>
+        <h2 id="install">{{ t.pagecontent.install.install }}</h2>
         <br>
         <pre style='clear:both;text-align:center;margin-bottom:0.9em'><code id='selectable' onclick="selectText(this)">/usr/bin/ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</code></pre>
         <div class="col-1">
-          <p>{{ page.pagecontent.install.paste }}</p>
+          <p>{{ t.pagecontent.install.paste }}</p>
         </div>
         <div class="col-2">
-          <p>{{ page.pagecontent.install.what }}</p>
+          <p>{{ t.pagecontent.install.what }}</p>
         </div>
       </div>
     </li>
 
     <li>
       <div class="group row">
-       <h2 id="question">{{ page.pagecontent.question }}</h2>
+       <h2 id="question">{{ t.pagecontent.question }}</h2>
        <br>
         <div class="col-1">
-          <p>{{ page.pagecontent.what }}</p>
+          <p>{{ t.pagecontent.what }}</p>
         </div>
         <div class="col-2">
 {% highlight bash %}
@@ -34,7 +35,7 @@ $ brew install wget
     <li>
       <div class="group row">
         <div class="col-1">
-          <p>{{ page.pagecontent.how }}</p>
+          <p>{{ t.pagecontent.how }}</p>
         </div>
         <div class="col-2">
 {% highlight bash %}
@@ -53,14 +54,14 @@ bin/wget -> ../Cellar/wget/1.16.1/bin/wget
     <li>
       <div class="group row">
         <div class="col-1">
-          <p>{{ page.pagecontent.prefix }}</p>
+          <p>{{ t.pagecontent.prefix }}</p>
         </div>
       </div>
     </li>
     <li>
       <div class="group row">
         <div class="col-1">
-          <p>{{ page.pagecontent.createpackages }}</p>
+          <p>{{ t.pagecontent.createpackages }}</p>
         </div>
         <div class="col-2">
 {% highlight bash %}
@@ -73,11 +74,11 @@ Created /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/bar.rb
     <li>
       <div class="group row">
         <div class="col-1">
-          <p>{{ page.pagecontent.hack }}</p>
+          <p>{{ t.pagecontent.hack }}</p>
         </div>
         <div class="col-2">
 {% highlight bash %}
-$ brew edit wget # {{ page.pagecontent.editor }}
+$ brew edit wget # {{ t.pagecontent.editor }}
 {% endhighlight %}
         </div>
       </div>
@@ -85,7 +86,7 @@ $ brew edit wget # {{ page.pagecontent.editor }}
     <li>
       <div class="group row">
         <div class="col-1">
-          <p>{{ page.pagecontent.formula }}</p>
+          <p>{{ t.pagecontent.formula }}</p>
         </div>
         <div class="col-2">
 {% highlight ruby %}
@@ -106,41 +107,68 @@ end
     <li>
       <div class="group row">
         <div class="col-1">
-          <p>{{ page.pagecontent.complement }}</p>
+          <p>{{ t.pagecontent.complement }}</p>
         </div>
       </div>
     </li>
 
     <li>
       <div class="group row">
-        <h2 id="further-doc">{{ page.pagecontent.doc.further }}</h2>
+        <h2 id="further-doc">{{ t.pagecontent.doc.further }}</h2>
         <div class="button">
-          <p><a href="https://docs.brew.sh/">docs.brew.sh</a></p>
+          <p><a href="https://docs.brew.sh">docs.brew.sh</a></p>
         </div>
       </div>
     </li>
 
     <li>
       <div class="group row">
-        <h2 id="homebrew-community">{{ page.pagecontent.doc.community }}</h2>
+        <h2 id="homebrew-patreon">{{ t.pagecontent.doc.patreon }}</h2>
         <div class="button">
-          <p><a href="https://discourse.brew.sh/">discourse.brew.sh</a></p>
+          <p><a href="https://www.patreon.com/homebrew">patreon.com/homebrew</a></p>
         </div>
       </div>
     </li>
 
     <li>
       <div class="group row">
-        <h2 id="homebrew-blog">{{ page.pagecontent.doc.blog }}</h2>
+        <h2 id="homebrew-community">{{ t.pagecontent.doc.community }}</h2>
         <div class="button">
-          <p><a href="/blog">brew.sh/blog</a></p>
+          <p><a href="https://discourse.brew.sh">discourse.brew.sh</a></p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row">
+        <h2 id="homebrew-blog">{{ t.pagecontent.doc.blog }}</h2>
+        <div class="button">
+          <p><a href="/blog/">brew.sh/blog</a></p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row">
+        <h2 id="homebrew-formulae">{{ t.pagecontent.doc.formulae }}</h2>
+        <div class="button">
+          <p><a href="http://formulae.brew.sh">formulae.brew.sh</a></p>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="group row">
+        <h2 id="analytics-data">{{ t.pagecontent.doc.analytics }}</h2>
+        <div class="button">
+          <p><a href="/analytics/">brew.sh/analytics</a></p>
         </div>
       </div>
     </li>
 
     <li>
       <div class="group row credits">
-        <p>{{ page.pagecontent.foot.code }} {{ page.pagecontent.foot.page }} {{ page.pagecontent.foot.translation }}</p>
+        <p>{{ t.pagecontent.foot.code }} {{ t.pagecontent.foot.page }} {{ t.pagecontent.foot.translation }}</p>
       </div>
     </li>
   </ul>
