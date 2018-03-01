@@ -76,7 +76,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each, :needs_svn) do
-    skip "Requires subversion." unless which "svn"
+    skip "Requires subversion." unless File.executable? "/usr/bin/svn"
   end
 
   config.around(:each) do |example|
