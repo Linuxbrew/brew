@@ -15,6 +15,8 @@ module Superenv
 
   def homebrew_extra_paths
     paths = []
+    # IF ANDROID
+    paths += ["/data/data/com.termux/files/usr/bin", "/data/data/com.termux/files/usr/bin/applets"]
 
     paths += %w[binutils make].map do |f|
       begin
@@ -39,7 +41,8 @@ module Superenv
   end
 
   def determine_extra_rpath_paths
-    paths = ["#{HOMEBREW_PREFIX}/lib"]
+    paths = ["/data/data/com.termux/files/usr/lib"]
+    paths += ["#{HOMEBREW_PREFIX}/lib"]
     paths += run_time_deps.map { |d| d.opt_lib.to_s }
     paths += homebrew_extra_library_paths
     paths
@@ -47,7 +50,7 @@ module Superenv
 
   def determine_dynamic_linker_path(formula)
     return "" if formula&.name == "glibc"
-    "#{HOMEBREW_PREFIX}/lib/ld.so"
+    "/system/bin/linker"
   end
 
   # @private
@@ -93,12 +96,14 @@ module Superenv
 
   def homebrew_extra_library_paths
     paths = []
+    paths += ["/data/data/com.termux/files/usr/lib"]
     paths += xorg_lib_paths if x11?
     paths
   end
 
   def homebrew_extra_cmake_include_paths
     paths = []
+    paths += ["/data/data/com.termux/files/usr/include"]
     paths += xorg_include_paths if x11?
     paths
   end

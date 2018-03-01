@@ -10,6 +10,9 @@ class DevelopmentTools
           path
         elsif File.executable?(path = "/usr/bin/#{tool}")
           Pathname.new path
+        # IF ANDROID
+        elsif File.executable?(path = "/data/data/com.termux/files/usr/bin/#{tool}")
+          Pathname.new path
         # Homebrew GCCs most frequently; much faster to check this before xcrun
         elsif (path = HOMEBREW_PREFIX/"bin/#{tool}").executable?
           path
@@ -78,6 +81,9 @@ class DevelopmentTools
       @clang_build_version ||= begin
         if (path = locate("clang")) &&
            build_version = `#{path} --version`[/clang-(\d{2,})/, 1]
+          Version.new build_version
+        elsif (path = locate("clang")) &&
+          build_version = `#{path} --version`[/clang version (\d\.\d\.\d)/, 1]
           Version.new build_version
         else
           Version::NULL

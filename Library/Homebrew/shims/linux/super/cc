@@ -192,7 +192,10 @@ class Cmd
       # -R is not the correct way to pass rpaths to the linker
       path = chuzzle($1) || enum.next
       wl = "-Wl," unless mode == :ld
-      args << "#{wl}-rpath=" if keep?(path)
+      if keep?(path)
+        args << "#{wl}--enable-new-dtags"
+        args << "#{wl}-rpath="
+      end
     else
       args << arg
     end
@@ -255,6 +258,7 @@ class Cmd
     args += ["#{wl}--dynamic-linker=#{dynamic_linker_path}"] if dynamic_linker_path
     args << "-B#{@opt}/glibc/lib" unless mode == :ld
     args += path_flags("-L", library_paths)
+    args << "#{wl}--enable-new-dtags"
     args += rpath_flags("#{wl}-rpath=", rpath_paths)
   end
 

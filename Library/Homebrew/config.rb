@@ -42,7 +42,8 @@ HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"] ||
   (OS.mac? ? "~/Library/Logs/Homebrew/" : "~/.cache/Homebrew/Logs")).expand_path
 
 # Must use /tmp instead of $TMPDIR because long paths break Unix domain sockets
-HOMEBREW_TEMP = Pathname.new(ENV.fetch("HOMEBREW_TEMP", "/tmp"))
+# IF ANDROID
+HOMEBREW_TEMP = Pathname.new(ENV.fetch("HOMEBREW_TEMP", "/data/data/com.termux/files/usr/tmp"))
 
 unless defined? HOMEBREW_LIBRARY_PATH
   # Root of the Homebrew code base

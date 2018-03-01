@@ -66,11 +66,12 @@ done
 # test-bot does environment filtering itself
 if [[ -z "$HOMEBREW_NO_ENV_FILTERING" && "$1" != "test-bot" ]]
 then
-  PATH="/usr/bin:/bin:/usr/sbin:/sbin"
+  PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/bin/applets"
 
   FILTERED_ENV=()
   # Filter all but the specific variables.
   for VAR in HOME SHELL PATH TERM LOGNAME USER CI CIRCLECI TRAVIS SSH_AUTH_SOCK SUDO_ASKPASS \
+             LD_LIBRARY_PATH ANDROID_ROOT ANDROID_DATA \
              http_proxy https_proxy ftp_proxy no_proxy all_proxy HTTPS_PROXY FTP_PROXY ALL_PROXY \
              "${!HOMEBREW_@}" "${!TRAVIS_@}" "${!JENKINS_@}"
   do

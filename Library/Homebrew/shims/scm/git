@@ -99,7 +99,7 @@ brew_repo_version="$(quiet_safe_cd "$SCM_DIR/../../../../bin" && pwd -P)/$SCM_FI
 safe_exec "$brew_repo_version" "$@"
 
 IFS=$'\n'
-for path in $(/usr/bin/which -a "$SCM_FILE" 2>/dev/null)
+for path in $(command -v "$SCM_FILE" 2>/dev/null)
 do
   if [[ "$path" != "/usr/bin/$SCM_FILE" ]]
   then
