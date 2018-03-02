@@ -109,7 +109,11 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
 
   if ARGV.homebrew_developer? || disable ||
      Homebrew.raise_deprecation_exceptions?
-    developer_message = message + "Or, even better, submit a PR to fix it!"
+    if replacement_message != "There is no replacement."
+      developer_message = message + "Or, even better, submit a PR to fix it!"
+    else
+      developer_message = message
+    end
     raise MethodDeprecatedError, developer_message
   elsif !Homebrew.auditing?
     opoo "#{message}\n"
