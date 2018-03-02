@@ -288,7 +288,8 @@ class Migrator
     new_keg.remove_linked_keg_record if new_keg.linked?
 
     begin
-      new_keg.link
+      mode = OpenStruct.new(overwrite: true)
+      new_keg.link(mode)
     rescue Keg::ConflictError => e
       onoe "Error while executing `brew link` step on #{newname}"
       puts e
