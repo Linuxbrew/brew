@@ -328,12 +328,14 @@ module Homebrew
       Pathname.new(s).executable?
     end
     raise "Unable to locate the system's ld.so" unless sys_interpreter
-    glibc = Formula["glibc"]
-    interpreter = glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2" : sys_interpreter
+    interpreter = begin
+      glibc = Formula["glibc"]
+      glibc.installed? ? glibc.lib/"ld-linux-x86-64.so.2" : sys_interpreter
+    rescue FormulaUnavailableError
+      sys_interpreter
+    end
     mkdir_p HOMEBREW_PREFIX/"lib"
     FileUtils.ln_sf interpreter, ld_so
-  rescue FormulaUnavailableError
-    return
   end
 
   # Symlink the host's compiler

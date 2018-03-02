@@ -139,6 +139,11 @@ RSpec.configure do |config|
         CoreTap.instance.path/"formula_renames.json",
       ]
 
+      if File.readable? HOMEBREW_PREFIX/"lib/ld.so"
+        FileUtils.rm_f HOMEBREW_PREFIX/"lib/ld.so"
+        FileUtils.rmdir HOMEBREW_PREFIX/"lib"
+      end
+
       files_after_test = find_files
 
       diff = Set.new(@__files_before_test) ^ Set.new(files_after_test)
