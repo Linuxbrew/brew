@@ -390,12 +390,14 @@ EOS
     brew install curl
   fi
 
-  if [[ -n "$HOMEBREW_SYSTEM_GIT_TOO_OLD" ]] || ! git --version >/dev/null 2>&1
+  if ! git --version &>/dev/null ||
+       [[ -n "$HOMEBREW_SYSTEM_GIT_TOO_OLD" &&
+        ! -x "$HOMEBREW_PREFIX/opt/git/bin/git" ]]
   then
     # we cannot install brewed git if homebrew/core is unavailable.
     [[ -d "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && brew install git
     unset GIT_EXECUTABLE
-    if ! git --version >/dev/null 2>&1
+    if ! git --version &>/dev/null
     then
       odie "Git must be installed and in your PATH!"
     fi

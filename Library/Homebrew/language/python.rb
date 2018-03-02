@@ -15,10 +15,11 @@ module Language
 
     def self.each_python(build, &block)
       original_pythonpath = ENV["PYTHONPATH"]
-      ["python", "python3"].each do |python|
-        next if build.without? python
+      { "python@3" => "python3", "python@2" => "python2.7" }.each do |python_formula, python|
+        python_formula = Formulary.factory(python_formula)
+        next if build.without? python_formula.to_s
         version = major_minor_version python
-        ENV["PYTHONPATH"] = if Formulary.factory(python).installed?
+        ENV["PYTHONPATH"] = if python_formula.installed?
           nil
         else
           homebrew_site_packages(version)

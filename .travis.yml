@@ -3,7 +3,7 @@ cache:
   directories:
     - $HOME/Library/Caches/Homebrew/style
     - $HOME/Library/Caches/Homebrew/tests
-    - $HOME/Library/Homebrew/vendor/bundle
+    - Library/Homebrew/vendor/bundle
 branches:
   only:
     - master
@@ -36,11 +36,6 @@ before_install:
       mv "$HOMEBREW_REPOSITORY/Library/Taps" "$PWD/Library";
       sudo rm -rf "$HOMEBREW_REPOSITORY";
       sudo ln -s "$PWD" "$HOMEBREW_REPOSITORY";
-    fi
-  - if [ "$MACOS" ]; then
-      travis_retry git -C Library/Taps/homebrew/homebrew-core fetch --depth=1 origin;
-    else
-      travis_retry git clone --depth=1 https://github.com/Homebrew/homebrew-core Library/Taps/homebrew/homebrew-core;
     fi
   - travis_retry git clone --depth=1 https://github.com/Linuxbrew/homebrew-test-bot Library/Taps/homebrew/homebrew-test-bot
 
