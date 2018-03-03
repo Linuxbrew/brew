@@ -131,6 +131,9 @@ module Homebrew
       ENV[env] = homebrew_env
     end
 
+    gh_api_errors = [GitHub::AuthenticationFailedError, GitHub::HTTPNotFoundError,
+                     GitHub::RateLimitExceededError, GitHub::Error, JSON::ParserError].freeze
+
     formula = ARGV.formulae.first
 
     if formula
@@ -314,73 +317,39 @@ module Homebrew
       end
     end
 
-    unless Formula["hub"].any_version_installed?
-      if ARGV.dry_run?
-        ohai "brew install hub"
-      else
-        safe_system "brew", "install", "hub"
-      end
-    end
-
     formula.path.parent.cd do
       branch = "#{formula.name}-#{new_formula_version}"
       git_dir = Utils.popen_read("git rev-parse --git-dir").chomp
       shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
 
-      hub_args = []
-      git_final_checkout_args = []
-      if ARGV.include?("--no-browse")
-        git_final_checkout_args << "--quiet"
-      else
-        hub_args << "--browse"
-      end
-
       if ARGV.dry_run?
-        ohai "hub fork # read $HUB_REMOTE"
+        ohai "fork repository with GitHub API"
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
         ohai "git commit --no-edit --verbose --message='#{formula.name} #{new_formula_version}#{devel_message}' -- #{formula.path}"
         ohai "git push --set-upstream $HUB_REMOTE #{branch}:#{branch}"
-        ohai "hub pull-request #{hub_args.join(" ")} -m '#{formula.name} #{new_formula_version}#{devel_message}'"
+        ohai "create pull request with GitHub API"
         ohai "git checkout -"
       else
-        reply = IO.popen(["hub", "fork"], "r+", err: "/dev/null") do |io|
-          reader = Thread.new { io.read }
-          sleep 1
-          io.close_write
-          reader.value
-        end
 
-        if reply.to_s.include? "username:"
+        begin
+          response = GitHub.create_fork(formula.tap.full_name)
+        rescue *gh_api_errors => e
           formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-          git_path = "$(brew --repo #{formula.tap})" if formula.tap
-          git_path ||= formula.path.parent
-          odie <<~EOS
-            Retry after configuring hub by running:
-              hub -C "#{git_path}" fork
-            Or setting HOMEBREW_GITHUB_TOKEN with at least 'public_repo' scope.
-          EOS
+          odie "Unable to fork: #{e.message}!"
         end
 
-        remote = reply[/remote:? (\S+)/, 1]
-
-        # repeat for hub 2.2 backwards compatibility:
-        remote = Utils.popen_read("hub", "fork", err: :out)[/remote:? (\S+)/, 1] if remote.to_s.empty?
-
-        if remote.to_s.empty?
-          formula.path.atomic_write(backup_file) unless ARGV.dry_run?
-          odie "cannot get remote from 'hub'!"
-        end
+        remote_url = response.fetch("clone_url")
+        username = response.fetch("owner").fetch("login")
 
         safe_system "git", "fetch", "--unshallow", "origin" if shallow
         safe_system "git", "checkout", "--no-track", "-b", branch, "origin/master"
         safe_system "git", "commit", "--no-edit", "--verbose",
           "--message=#{formula.name} #{new_formula_version}#{devel_message}",
           "--", formula.path
-        safe_system "git", "push", "--set-upstream", remote, "#{branch}:#{branch}"
+        safe_system "git", "push", "--set-upstream", remote_url, "#{branch}:#{branch}"
+        safe_system "git", "checkout", "--quiet", "-"
         pr_message = <<~EOS
-          #{formula.name} #{new_formula_version}#{devel_message}
-
           Created with `brew bump-formula-pr`.
         EOS
         user_message = ARGV.value("message")
@@ -391,8 +360,19 @@ module Homebrew
             #{user_message}
           EOS
         end
-        safe_system "hub", "pull-request", *hub_args, "-m", pr_message
-        safe_system "git", "checkout", *git_final_checkout_args, "-"
+        pr_title = "#{formula.name} #{new_formula_version}#{devel_message}"
+
+        begin
+          url = GitHub.create_pull_request(formula.tap.full_name, pr_title,
+                                           "#{username}:#{branch}", "master", pr_message)["html_url"]
+          if ARGV.include?("--no-browse")
+            puts url
+          else
+            exec_browser url
+          end
+        rescue *gh_api_errors => e
+          odie "Unable to open pull request: #{e.message}!"
+        end
       end
     end
   end
