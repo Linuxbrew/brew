@@ -934,7 +934,7 @@ module Homebrew
             from your PATH variable.
             Python scripts will now install into #{HOMEBREW_PREFIX}/bin.
             You can delete anything, except 'Extras', from the #{HOMEBREW_PREFIX}/share/python
-            (and #{HOMEBREW_PREFIX}/share/python3) dir and install affected Python packages
+            (and #{HOMEBREW_PREFIX}/share/python@2) dir and install affected Python packages
             anew with `pip install --upgrade`.
           EOS
         end

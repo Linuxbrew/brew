@@ -38,9 +38,9 @@ class LanguageModuleRequirement < Requirement
     when :perl
       ["/usr/bin/env", "perl", "-e", "use #{@import_name}"]
     when :python
-      ["/usr/bin/env", "python", "-c", "import #{@import_name}"]
+      ["/usr/bin/env", "python2", "-c", "import #{@import_name}"]
     when :python3
-      ["/usr/bin/env", "python3", "-c", "import #{@import_name}"]
+      ["/usr/bin/env", "python", "-c", "import #{@import_name}"]
     when :ruby
       ["/usr/bin/env", "ruby", "-rubygems", "-e", "require '#{@import_name}'"]
     end
@@ -51,8 +51,8 @@ class LanguageModuleRequirement < Requirement
     when :lua     then "luarocks-5.2 install"
     when :lua51   then "luarocks-5.1 install"
     when :perl    then "cpan -i"
-    when :python  then "pip install"
-    when :python3 then "pip3 install"
+    when :python  then "pip3 install"
+    when :python3 then "pip install"
     when :ruby    then "gem install"
     end
   end
