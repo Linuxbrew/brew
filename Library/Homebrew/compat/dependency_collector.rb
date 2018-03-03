@@ -52,11 +52,11 @@ class DependencyCollector
         output_deprecation(spec, "open-mpi")
         Dependency.new("open-mpi", tags)
       when :python, :python2
+        output_deprecation(spec, "python@2")
+        Dependency.new("python@2", tags)
+      when :python3
         output_deprecation(spec, "python")
         Dependency.new("python", tags)
-      when :python3
-        output_deprecation(spec, "python3")
-        Dependency.new("python3", tags)
       when :emacs, :mysql, :perl, :postgresql, :rbenv, :ruby
         output_deprecation(spec)
         Dependency.new(spec.to_s, tags)

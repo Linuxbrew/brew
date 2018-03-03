@@ -84,16 +84,16 @@ end
 class PythonRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("PythonRequirement", "'depends_on \"python\"'")
-    which "python"
+    odeprecated("PythonRequirement", "'depends_on \"python@2\"'")
+    which "python2"
   end
 end
 
 class Python3Requirement < Requirement
   fatal true
   satisfy do
-    odeprecated("Python3Requirement", "'depends_on \"python3\"'")
-    which "python3"
+    odeprecated("Python3Requirement", "'depends_on \"python\"'")
+    which "python"
   end
 end
 

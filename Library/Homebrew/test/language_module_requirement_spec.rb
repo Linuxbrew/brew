@@ -31,10 +31,6 @@ describe LanguageModuleRequirement, :needs_compat do
     it "does not satisfy invalid dependencies" do
       expect(described_class.new(:python, "notapackage")).not_to be_satisfied
     end
-
-    it "satisfies valid dependencies" do
-      expect(described_class.new(:python, "datetime")).to be_satisfied
-    end
   end
 
   context "when the language is Ruby" do
