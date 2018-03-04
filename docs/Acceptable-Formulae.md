@@ -38,15 +38,6 @@ tarballs should include the version in the filename whenever possible.
 We don’t accept software without a tagged version because they regularly break
 due to upstream changes and we can’t provide [bottles](Bottles.md) for them.
 
-### Bindings
-First check that there is not already a binding available via
-[`gem`](https://rubygems.org/) or [`pip`](http://www.pip-installer.org/)
-etc.
-
-If not, then put bindings in the formula they bind to. This is more
-useful to people. Just install the stuff! Having to faff around with
-foo-ruby, foo-perl etc. is a bad user experience.
-
 ### Niche (or self-submitted) stuff
 The software in question must:
 
