@@ -10,7 +10,7 @@ describe DependencyCollector do
   describe "#add" do
     resource = Resource.new
 
-    context "when xz, zip, and bzip2 are not available" do
+    context "when xz, unzip, and bzip2 are not available" do
       it "creates a resource dependency from a '.xz' URL" do
         resource.url("http://example.com/foo.xz")
         allow_any_instance_of(Object).to receive(:which).with("xz")
@@ -19,8 +19,8 @@ describe DependencyCollector do
 
       it "creates a resource dependency from a '.zip' URL" do
         resource.url("http://example.com/foo.zip")
-        allow_any_instance_of(Object).to receive(:which).with("zip")
-        expect(subject.add(resource)).to eq(Dependency.new("zip", [:build]))
+        allow_any_instance_of(Object).to receive(:which).with("unzip")
+        expect(subject.add(resource)).to eq(Dependency.new("unzip", [:build]))
       end
 
       it "creates a resource dependency from a '.bz2' URL" do
@@ -39,7 +39,7 @@ describe DependencyCollector do
 
       it "does not create a resource dependency from a '.zip' URL" do
         resource.url("http://example.com/foo.zip")
-        allow_any_instance_of(Object).to receive(:which).with("zip").and_return(Pathname.new("foo"))
+        allow_any_instance_of(Object).to receive(:which).with("unzip").and_return(Pathname.new("foo"))
         expect(subject.add(resource)).to be nil
       end
 
