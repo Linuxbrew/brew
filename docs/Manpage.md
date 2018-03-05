@@ -96,7 +96,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     By default, `deps` shows required and recommended dependencies for
     `formulae`. To include the `:build` type dependencies, pass `--include-build`.
-    Similarly, pass `--include-optional` to include `:optional` dependencies.
+    Similarly, pass `--include-optional` to include `:optional` dependencies or
+    `--include-test` to include `:test` dependencies.
     To skip `:recommended` type dependencies, pass `--skip-recommended`.
     To include requirements in addition to dependencies, pass `--include-requirements`.
 
@@ -109,8 +110,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--installed` is passed, output a tree for every installed formula.
 
     The `filters` placeholder is any combination of options `--include-build`,
-    `--include-optional`, `--skip-recommended`, and `--include-requirements` as
-    documented above.
+    `--include-optional`, `--include-test`, `--skip-recommended`, and
+    `--include-requirements` as documented above.
 
     If `--annotate` is passed, the build, optional, and recommended dependencies
     are marked as such in the output.
@@ -121,7 +122,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     dependencies of that formula.
 
     The `filters` placeholder is any combination of options `--include-build`,
-    `--include-optional`, and `--skip-recommended` as documented above.
+    `--include-optional`, `--include-test`, and `--skip-recommended` as
+    documented above.
 
   * `desc` `formula`:
     Display `formula`'s name and one-line description.
