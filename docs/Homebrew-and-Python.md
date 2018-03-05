@@ -9,24 +9,7 @@ Homebrew provides formulae to brew 3.x and a more up-to-date Python 2.7.x.
 **Important:** If you choose to install a Python which isn't either of these two (system Python or brewed Python), the Homebrew team cannot support any breakage that may occur.
 
 ## Python 3.x or Python 2.x
-Homebrew provides one formula for Python 2.7.x and another for Python 3.x. 
-
-To install Python 3.X with Homebrew:
-
-`brew install python` 
-or 
-`brew install python3`
-
-To (optionally) install Python 2.X with Homebrew:
-
-`brew install python2` 
-or
-`brew install python@2`
-
-For Python 2.X only: if you want to be able to call `python2` from the path, add the following line to your `~/.bash_profile` (or equivalent). For more information, see the formula's caveats.
-
-`export PATH="/usr/local/opt/python@2/libexec/bin:$PATH"`
-
+Homebrew provides one formula for Python 3.x (`python`) and another for Python 2.7.x (`python@2`)
 
 The executables are organized as follows so that Python 2 and Python 3 can both be installed without conflict:
 * `python` and `python3` point to Homebrew's Python 3.x (if installed) otherwise the macOS system Python
