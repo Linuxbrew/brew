@@ -183,7 +183,7 @@ class Migrator
   end
 
   def migrate
-    oh1 "Migrating #{Formatter.identifier(oldname)} to #{Formatter.identifier(newname)}"
+    oh1 "Processing #{Formatter.identifier(oldname)} formula rename to #{Formatter.identifier(newname)}"
     lock
     unlink_oldname
     unlink_newname if new_cellar.exist?
@@ -195,7 +195,10 @@ class Migrator
     update_tabs
     return unless formula.outdated?
     opoo <<~EOS
-      #{Formatter.identifier(newname)} is outdated! Please run as soon as possible:
+      #{Formatter.identifier(newname)} is outdated!
+      To avoid broken installations, as soon as possible please run:
+        brew upgrade
+      Or, if you're OK with a less reliable fix:
         brew upgrade #{newname}
     EOS
   rescue Interrupt
@@ -231,7 +234,7 @@ class Migrator
       end
     end
 
-    oh1 "Moving #{Formatter.identifier(oldname)} children"
+    oh1 "Moving #{Formatter.identifier(oldname)} versions to #{new_cellar}"
     if new_cellar.exist?
       FileUtils.mv(old_cellar.children, new_cellar)
     else
@@ -266,7 +269,7 @@ class Migrator
   end
 
   def unlink_newname
-    oh1 "Unlinking #{Formatter.identifier(newname)}"
+    oh1 "Temporarily unlinking #{Formatter.identifier(newname)}"
     new_cellar.subdirs.each do |d|
       keg = Keg.new(d)
       keg.unlink
@@ -274,7 +277,7 @@ class Migrator
   end
 
   def link_newname
-    oh1 "Linking #{Formatter.identifier(newname)}"
+    oh1 "Relinking #{Formatter.identifier(newname)}"
     new_keg = Keg.new(new_linked_keg_record)
 
     # If old_keg wasn't linked then we just optlink a keg.
