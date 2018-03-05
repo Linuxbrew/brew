@@ -68,6 +68,10 @@ Naming/PredicateName:
     - 'compat/**/*'
   NameWhitelist: is_32_bit?, is_64_bit?
 
+# f meaning formulae is pretty standard
+Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
 Style/BlockDelimiters:
   Exclude:
     - '**/*_spec.rb'
