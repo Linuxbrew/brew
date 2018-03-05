@@ -193,6 +193,11 @@ class Migrator
     link_oldname_opt
     link_newname unless old_linked_keg.nil?
     update_tabs
+    return unless formula.outdated?
+    opoo <<~EOS
+      #{Formatter.identifier(newname)} is outdated! Please run as soon as possible:
+        brew upgrade #{newname}
+    EOS
   rescue Interrupt
     ignore_interrupts { backup_oldname }
   rescue Exception => e # rubocop:disable Lint/RescueException
