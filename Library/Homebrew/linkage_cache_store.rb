@@ -21,10 +21,10 @@ class LinkageStore < CacheStore
   # Inserts dylib-related information into the cache if it does not exist or
   # updates data into the linkage cache if it does exist
   #
-  # @param  [Hash]        array_values
-  # @param  [Hash]        hash_values
+  # @param  [Hash] array_values: hash containing KVPs of { :type => Array | Set }
+  # @param  [Hash] hash_values:  hash containing KVPs of { :type => Hash }
   # @param  [Array[Hash]] values
-  # @raise  [TypeError]
+  # @raise  [TypeError] error if the values are not `Arary`, `Set`, or `Hash`
   # @return [nil]
   def update!(array_values: {}, hash_values: {}, **values)
     values.each do |key, value|
@@ -33,7 +33,10 @@ class LinkageStore < CacheStore
       elsif value.is_a?(Array) || value.is_a?(Set)
         array_values[key] = value
       else
-        raise TypeError, "Can't store types that are not `Array` or `Hash` in the linkage store."
+        raise TypeError, <<~EOS
+          Can't store types that are not `Array`, `Set` or `Hash` in the
+          linkage store.
+        EOS
       end
     end
 
@@ -44,7 +47,8 @@ class LinkageStore < CacheStore
   end
 
   # @param  [Symbol] the type to fetch from the `LinkageStore`
-  # @raise  [TypeError]
+  # @raise  [TypeError] error if the type is not in `HASH_LINKAGE_TYPES` or
+  #   `ARRAY_LINKAGE_TYPES`
   # @return [Hash | Array]
   def fetch_type(type)
     if HASH_LINKAGE_TYPES.include?(type)
@@ -52,7 +56,9 @@ class LinkageStore < CacheStore
     elsif ARRAY_LINKAGE_TYPES.include?(type)
       fetch_array_values(type)
     else
-      raise TypeError, "Can't fetch types that are not defined for the linkage store."
+      raise TypeError, <<~EOS
+        Can't fetch types that are not defined for the linkage store
+      EOS
     end
   end
 
@@ -63,10 +69,10 @@ class LinkageStore < CacheStore
 
   private
 
-  # @return [String]
+  # @return [String] the key to lookup items in the `CacheStore`
   attr_reader :keg_name
 
-  # @param  [Symbol] type
+  # @param  [Symbol] the type to fetch from the `LinkageStore`
   # @return [Array]
   def fetch_array_values(type)
     return [] unless database_cache.key?(keg_name)

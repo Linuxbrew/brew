@@ -7,7 +7,9 @@ require "json"
 #
 class DatabaseCache
   # The mode of any created files will be 0664 (that is, readable and writable
-  # by the owner and the group, and readable by everyone else)
+  # by the owner and the group, and readable by everyone else). Files created
+  # will also be modified by the process' umask value at the time of creation:
+  #   https://docs.oracle.com/cd/E17276_01/html/api_reference/C/envopen.html
   DATABASE_MODE = 0664
 
   # Opens and yields a database in read/write mode. Closes the database after use
@@ -66,13 +68,13 @@ class CacheStore
   # into a JSON compatible string in `ruby_hash_to_json_string`, where it may
   # later be parsed by `JSON.parse` in the `json_string_to_ruby_hash` method
   #
-  # @param  [Hash]
+  # @param  [Hash] ruby `Hash` to be converted to `JSON` string
   # @return [String]
   def ruby_hash_to_json_string(hash)
     hash.to_json
   end
 
-  # @param  [String]
+  # @param  [String] `JSON` string to be converted to ruby `Hash`
   # @return [Hash]
   def json_string_to_ruby_hash(string)
     JSON.parse(string)
