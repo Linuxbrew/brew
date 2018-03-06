@@ -5,7 +5,9 @@ require "cache_store"
 # by the `brew linkage` command
 #
 class LinkageStore < CacheStore
-  HASH_LINKAGE_TYPES = [:brewed_dylibs, :reverse_links].freeze
+  ARRAY_LINKAGE_TYPES = [:system_dylibs, :variable_dylibs, :broken_dylibs,
+                         :indirect_deps, :undeclared_deps, :unnecessary_deps].freeze
+  HASH_LINKAGE_TYPES  = [:brewed_dylibs, :reverse_links].freeze
 
   # @param  [String] keg_name
   # @param  [DBM]    database_cache
@@ -21,13 +23,16 @@ class LinkageStore < CacheStore
   # @param  [Hash]        array_values
   # @param  [Hash]        hash_values
   # @param  [Array[Hash]] values
+  # @raise  [TypeError]
   # @return [nil]
   def update!(array_values: {}, hash_values: {}, **values)
     values.each do |key, value|
       if value.is_a? Hash
         hash_values[key] = value
-      else
+      elsif value.is_a? Array
         array_values[key] = value
+      else
+        raise TypeError, "Can't store types that are not `Array` or `Hash` in the linkage store."
       end
     end
 
@@ -37,13 +42,16 @@ class LinkageStore < CacheStore
     )
   end
 
-  # @param  [Symbol] type
+  # @param  [Symbol] the type to fetch from the `LinkageStore`
+  # @raise  [TypeError]
   # @return [Hash | Array]
   def fetch_type(type)
     if HASH_LINKAGE_TYPES.include?(type)
       fetch_hash_values(type)
-    else
+    elsif ARRAY_LINKAGE_TYPES.include?(type)
       fetch_array_values(type)
+    else
+      raise TypeError, "Can't fetch types that are not defined for the linkage store."
     end
   end
 

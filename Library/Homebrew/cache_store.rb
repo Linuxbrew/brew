@@ -12,7 +12,7 @@ class DatabaseCache
 
   # Opens and yields a database in read/write mode. Closes the database after use
   #
-  # @yield [DBM]
+  # @yield  [DBM] db
   # @return [nil]
   def initialize(name)
     # DBM::WRCREAT: Creates the database if it does not already exist
