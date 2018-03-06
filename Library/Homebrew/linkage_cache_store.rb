@@ -1,3 +1,4 @@
+require "set"
 require "cache_store"
 
 #
@@ -27,9 +28,9 @@ class LinkageStore < CacheStore
   # @return [nil]
   def update!(array_values: {}, hash_values: {}, **values)
     values.each do |key, value|
-      if value.is_a? Hash
+      if value.is_a?(Hash)
         hash_values[key] = value
-      elsif value.is_a? Array
+      elsif value.is_a?(Array) || value.is_a?(Set)
         array_values[key] = value
       else
         raise TypeError, "Can't store types that are not `Array` or `Hash` in the linkage store."

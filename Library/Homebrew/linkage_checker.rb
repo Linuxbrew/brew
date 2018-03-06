@@ -1,7 +1,7 @@
 require "set"
 require "keg"
 require "formula"
-require "os/mac/linkage_cache_store"
+require "linkage_cache_store"
 
 class LinkageChecker
   attr_reader :keg, :formula, :store
