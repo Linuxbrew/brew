@@ -139,7 +139,7 @@ module Homebrew
   rescue FormulaInstallationAlreadyAttemptedError
     # We already attempted to upgrade f as part of the dependency tree of
     # another formula. In that case, don't generate an error, just move on.
-    return
+    nil
   rescue CannotInstallFormulaError => e
     ofail e
   rescue BuildError => e

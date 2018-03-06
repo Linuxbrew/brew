@@ -31,7 +31,7 @@ class SystemConfig
       return "N/A" unless CoreTap.instance.installed?
       Formulary.factory(formula).linked_version || "N/A"
     rescue FormulaUnavailableError
-      return "N/A"
+      "N/A"
     end
 
     def dump_verbose_config(out = $stdout)
