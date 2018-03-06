@@ -17,7 +17,7 @@
 #:    information on all installed formulae.
 #:
 #:    See the docs for examples of using the JSON output:
-#:    <https://docs.brew.sh/Querying-Brew.html>
+#:    <https://docs.brew.sh/Querying-Brew>
 
 require "missing_formula"
 require "caveats"
@@ -137,7 +137,12 @@ module Homebrew
       EOS
     end
 
-    kegs = f.installed_kegs.sort_by(&:version)
+    kegs = f.installed_kegs
+    heads, versioned = kegs.partition { |k| k.version.head? }
+    kegs = [
+      *heads.sort_by { |k| -Tab.for_keg(k).time.to_i },
+      *versioned.sort_by(&:version),
+    ]
     if kegs.empty?
       puts "Not installed"
     else

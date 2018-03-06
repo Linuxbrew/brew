@@ -788,7 +788,7 @@ module Homebrew
           EOS
         end
 
-        return if ENV["CI"] || ENV["JENKINS_HOME"]
+        return if ENV["CI"]
 
         branch = coretap_path.git_branch
         return if branch.nil? || branch =~ /master/
@@ -822,7 +822,7 @@ module Homebrew
         return if linked.empty?
 
         inject_file_list linked.map(&:full_name), <<~EOS
-          Some keg-only formula are linked into the Cellar.
+          Some keg-only formulae are linked into the Cellar.
           Linking a keg-only formula, such as gettext, into the cellar with
           `brew link <formula>` will cause other formulae to detect them during
           the `./configure` step. This may cause problems when compiling those
@@ -832,18 +832,6 @@ module Homebrew
           with other strange results.
 
           You may wish to `brew unlink` these brews:
-        EOS
-      end
-
-      def check_for_large_cache
-        return unless HOMEBREW_CACHE.exist?
-        # CI can be expected to have a large cache.
-        return if ENV["CI"] || ENV["JENKINS_HOME"]
-        cache_size = HOMEBREW_CACHE.disk_usage
-        return unless cache_size > 2_147_483_648
-        <<~EOS
-          Your HOMEBREW_CACHE is using #{disk_usage_readable(cache_size)} of disk space.
-          You may wish to consider running `brew cleanup`.
         EOS
       end
 
@@ -884,7 +872,7 @@ module Homebrew
         return if missing.empty?
 
         <<~EOS
-          Some installed formula are missing dependencies.
+          Some installed formulae are missing dependencies.
           You should `brew install` the missing dependencies:
             brew install #{missing.sort_by(&:full_name) * " "}
 
@@ -946,7 +934,7 @@ module Homebrew
             from your PATH variable.
             Python scripts will now install into #{HOMEBREW_PREFIX}/bin.
             You can delete anything, except 'Extras', from the #{HOMEBREW_PREFIX}/share/python
-            (and #{HOMEBREW_PREFIX}/share/python3) dir and install affected Python packages
+            (and #{HOMEBREW_PREFIX}/share/python@2) dir and install affected Python packages
             anew with `pip install --upgrade`.
           EOS
         end

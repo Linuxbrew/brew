@@ -9,16 +9,17 @@ module Language
       Version.create(version.to_s)
     end
 
-    def self.homebrew_site_packages(version = "2.7")
+    def self.homebrew_site_packages(version = "3.6")
       HOMEBREW_PREFIX/"lib/python#{version}/site-packages"
     end
 
     def self.each_python(build, &block)
       original_pythonpath = ENV["PYTHONPATH"]
-      ["python", "python3"].each do |python|
-        next if build.without? python
+      { "python@3" => "python3", "python@2" => "python2.7" }.each do |python_formula, python|
+        python_formula = Formulary.factory(python_formula)
+        next if build.without? python_formula.to_s
         version = major_minor_version python
-        ENV["PYTHONPATH"] = if Formulary.factory(python).installed?
+        ENV["PYTHONPATH"] = if python_formula.installed?
           nil
         else
           homebrew_site_packages(version)
@@ -88,7 +89,7 @@ module Language
       # @param venv_root [Pathname, String] the path to the root of the virtualenv
       #   (often `libexec/"venv"`)
       # @param python [String] which interpreter to use (e.g. "python"
-      #   or "python3")
+      #   or "python2")
       # @param formula [Formula] the active Formula
       # @return [Virtualenv] a {Virtualenv} instance
       def virtualenv_create(venv_root, python = "python", formula = self)
@@ -114,8 +115,8 @@ module Language
 
       # Returns true if a formula option for the specified python is currently
       # active or if the specified python is required by the formula. Valid
-      # inputs are "python", "python3", :python, and :python3. Note that
-      # "with-python", "without-python", "with-python3", and "without-python3"
+      # inputs are "python", "python2", :python, and :python2. Note that
+      # "with-python", "without-python", "with-python@2", and "without-python@2"
       # formula options are handled correctly even if not associated with any
       # corresponding depends_on statement.
       # @api private
@@ -127,16 +128,16 @@ module Language
       # Helper method for the common case of installing a Python application.
       # Creates a virtualenv in `libexec`, installs all `resource`s defined
       # on the formula, and then installs the formula. An options hash may be
-      # passed (e.g., :using => "python3") to override the default, guessed
-      # formula preference for python or python3, or to resolve an ambiguous
-      # case where it's not clear whether python or python3 should be the
+      # passed (e.g., :using => "python") to override the default, guessed
+      # formula preference for python or python2, or to resolve an ambiguous
+      # case where it's not clear whether python or python2 should be the
       # default guess.
       def virtualenv_install_with_resources(options = {})
         python = options[:using]
         if python.nil?
-          wanted = %w[python python@2 python@3 python3].select { |py| needs_python?(py) }
+          wanted = %w[python python@2 python2 python3].select { |py| needs_python?(py) }
           raise FormulaAmbiguousPythonError, self if wanted.size > 1
-          python = wanted.first || "python2.7"
+          python = wanted.first || "python"
         end
         venv = virtualenv_create(libexec, python.delete("@"))
         venv.pip_install resources
@@ -153,7 +154,7 @@ module Language
         # @param venv_root [Pathname, String] the path to the root of the
         #   virtualenv
         # @param python [String] which interpreter to use; i.e. "python" or
-        #   "python3"
+        #   "python2"
         def initialize(formula, venv_root, python)
           @formula = formula
           @venv_root = Pathname.new(venv_root)
@@ -179,11 +180,11 @@ module Language
             end
           end
 
-          # Robustify symlinks to survive python3 patch upgrades
+          # Robustify symlinks to survive python patch upgrades
           @venv_root.find do |f|
             next unless f.symlink?
             next unless (rp = f.realpath.to_s).start_with? HOMEBREW_CELLAR
-            python = rp.include?("python3") ? "python3" : "python"
+            python = rp.include?("python2") ? "python2" : "python"
             new_target = rp.sub %r{#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
             f.unlink
             f.make_symlink new_target
@@ -191,7 +192,7 @@ module Language
 
           Pathname.glob(@venv_root/"lib/python*/orig-prefix.txt").each do |prefix_file|
             prefix_path = prefix_file.read
-            python = prefix_path.include?("python3") ? "python3" : "python"
+            python = prefix_path.include?("python2") ? "python2" : "python"
             prefix_path.sub! %r{^#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
             prefix_file.atomic_write prefix_path
           end

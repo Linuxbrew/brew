@@ -76,7 +76,7 @@ scripts that reside somewhere in the `PATH`, named `brew-`<cmdname> or
 to create your own commands without modifying Homebrew's internals.
 
 Instructions for creating your own commands can be found in the docs:
-<https://docs.brew.sh/External-Commands.html>
+<https://docs.brew.sh/External-Commands>
 
 ## SPECIFYING FORMULAE
 
@@ -183,6 +183,10 @@ can take several different forms:
 
     *Note:* Homebrew doesn't require permissions for any of the scopes.
 
+  * `HOMEBREW_INSTALL_BADGE`:
+    Text printed before the installation summary of each successful build.
+    Defaults to the beer emoji.
+
   * `HOMEBREW_LOGS`:
     If set, Homebrew will use the given directory to store log files.
 
@@ -193,11 +197,14 @@ can take several different forms:
     *Default:* the number of available CPU cores.
 
   * `HOMEBREW_NO_ANALYTICS`:
-    If set, Homebrew will not send analytics. See: <https://docs.brew.sh/Analytics.html>
+    If set, Homebrew will not send analytics. See: <https://docs.brew.sh/Analytics>
 
   * `HOMEBREW_NO_AUTO_UPDATE`:
     If set, Homebrew will not auto-update before running `brew install`,
     `brew upgrade` or `brew tap`.
+
+  * `HOMEBREW_NO_COLOR`:
+    If set, Homebrew will not print text with color added.
 
   * `HOMEBREW_NO_EMOJI`:
     If set, Homebrew will not print the `HOMEBREW_INSTALL_BADGE` on a
@@ -217,9 +224,8 @@ can take several different forms:
     If set, Homebrew will not use the GitHub API for e.g searches or
     fetching relevant issues on a failed install.
 
-  * `HOMEBREW_INSTALL_BADGE`:
-    Text printed before the installation summary of each successful build.
-    Defaults to the beer emoji.
+  * `HOMEBREW_PRY`:
+    If set, Homebrew will use `pry` for the `brew irb` command.
 
   * `HOMEBREW_SVN`:
     When exporting from Subversion, Homebrew will use `HOMEBREW_SVN` if set,

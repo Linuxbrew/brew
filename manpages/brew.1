@@ -45,7 +45,7 @@ Perform a substring search of formula names for \fItext\fR\. If \fItext\fR is su
 .
 .TP
 \fBanalytics\fR [\fBstate\fR]
-Display anonymous user behaviour analytics state\. Read more at \fIhttps://docs\.brew\.sh/Analytics\.html\fR\.
+Display anonymous user behaviour analytics state\. Read more at \fIhttps://docs\.brew\.sh/Analytics\fR\.
 .
 .TP
 \fBanalytics\fR (\fBon\fR|\fBoff\fR)
@@ -226,7 +226,7 @@ Print a JSON representation of \fIformulae\fR\. Currently the only accepted valu
 Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to get information on all installed formulae\.
 .
 .IP
-See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\.html\fR
+See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\fR
 .
 .TP
 \fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] [\fB\-\-force\fR] [\fB\-\-verbose\fR] \fIformula\fR [\fIoptions\fR \.\.\.]
@@ -289,13 +289,6 @@ If \fB\-\-interactive\fR (or \fB\-i\fR) is passed, download and patch \fIformula
 .
 .IP
 If \fB\-\-git\fR (or \fB\-g\fR) is passed, Homebrew will create a Git repository, useful for creating patches to the software\.
-.
-.TP
-\fBirb\fR [\fB\-\-examples\fR]
-Enter the interactive Homebrew Ruby shell\.
-.
-.IP
-If \fB\-\-examples\fR is passed, several examples will be shown\.
 .
 .TP
 \fBleaves\fR
@@ -510,7 +503,7 @@ Print a JSON representation of \fItaps\fR\. Currently the only accepted value fo
 Pass \fB\-\-installed\fR to get information on installed taps\.
 .
 .IP
-See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\.html\fR
+See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\fR
 .
 .TP
 \fBtap\-pin\fR \fItap\fR
@@ -781,6 +774,13 @@ Open \fIformula\fR in the editor\.
 Display the path where \fIformula\fR is located\.
 .
 .TP
+\fBirb\fR [\fB\-\-examples\fR] [\fB\-\-pry\fR]
+Enter the interactive Homebrew Ruby shell\.
+.
+.IP
+If \fB\-\-examples\fR is passed, several examples will be shown\. If \fB\-\-pry\fR is passed or HOMEBREW_PRY is set, pry will be used instead of irb\.
+.
+.TP
 \fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] \fIformula\fR
 Checks the library links of an installed formula\.
 .
@@ -799,6 +799,10 @@ Generate Homebrew\'s manpages\.
 .
 .IP
 If \fB\-\-fail\-if\-changed\fR is passed, the command will return a failing status code if changes are detected in the manpage outputs\. This can be used for CI to be notified when the manpages are out of date\. Additionally, the date used in new manpages will match those in the existing manpages (to allow comparison without factoring in the date)\.
+.
+.TP
+\fBprof\fR [\fIruby options\fR]
+Run Homebrew with the Ruby profiler\. For example:
 .
 .TP
 \fBpull\fR [\fB\-\-bottle\fR] [\fB\-\-bump\fR] [\fB\-\-clean\fR] [\fB\-\-ignore\-whitespace\fR] [\fB\-\-resolve\fR] [\fB\-\-branch\-okay\fR] [\fB\-\-no\-pbcopy\fR] [\fB\-\-no\-publish\fR] [\fB\-\-warn\-on\-publish\-failure\fR] [\fB\-\-bintray\-org=\fR\fIbintray\-org\fR] [\fB\-\-test\-bot\-user=\fR\fItest\-bot\-user\fR] \fIpatch\-source\fR [\fIpatch\-source\fR]:
@@ -860,6 +864,10 @@ Output the merged pull requests on Homebrew/brew between two Git refs\. If no \f
 .
 .IP
 If \fB\-\-markdown\fR is passed, output as a Markdown list\.
+.
+.TP
+\fBruby\fR [\fIruby options\fR]
+Run a Ruby instance with Homebrew\'s libraries loaded\. For example:
 .
 .TP
 \fBtap\-new\fR \fIuser\fR\fB/\fR\fIrepo\fR
@@ -937,7 +945,7 @@ Integrates Homebrew formulae with macOS\'s \fBlaunchctl\fR(1) manager: \fIhttps:
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
 .
 .P
-Instructions for creating your own commands can be found in the docs: \fIhttps://docs\.brew\.sh/External\-Commands\.html\fR
+Instructions for creating your own commands can be found in the docs: \fIhttps://docs\.brew\.sh/External\-Commands\fR
 .
 .SH "SPECIFYING FORMULAE"
 Many Homebrew commands accept one or more \fIformula\fR arguments\. These arguments can take several different forms:
@@ -1040,6 +1048,10 @@ A personal access token for the GitHub API, which you can create at \fIhttps://g
 \fINote:\fR Homebrew doesn\'t require permissions for any of the scopes\.
 .
 .TP
+\fBHOMEBREW_INSTALL_BADGE\fR
+Text printed before the installation summary of each successful build\. Defaults to the beer emoji\.
+.
+.TP
 \fBHOMEBREW_LOGS\fR
 If set, Homebrew will use the given directory to store log files\.
 .
@@ -1052,11 +1064,15 @@ If set, instructs Homebrew to use the value of \fBHOMEBREW_MAKE_JOBS\fR as the n
 .
 .TP
 \fBHOMEBREW_NO_ANALYTICS\fR
-If set, Homebrew will not send analytics\. See: \fIhttps://docs\.brew\.sh/Analytics\.html\fR
+If set, Homebrew will not send analytics\. See: \fIhttps://docs\.brew\.sh/Analytics\fR
 .
 .TP
 \fBHOMEBREW_NO_AUTO_UPDATE\fR
 If set, Homebrew will not auto\-update before running \fBbrew install\fR, \fBbrew upgrade\fR or \fBbrew tap\fR\.
+.
+.TP
+\fBHOMEBREW_NO_COLOR\fR
+If set, Homebrew will not print text with color added\.
 .
 .TP
 \fBHOMEBREW_NO_EMOJI\fR
@@ -1077,8 +1093,8 @@ While ensuring your downloads are fully secure, this is likely to cause from\-so
 If set, Homebrew will not use the GitHub API for e\.g searches or fetching relevant issues on a failed install\.
 .
 .TP
-\fBHOMEBREW_INSTALL_BADGE\fR
-Text printed before the installation summary of each successful build\. Defaults to the beer emoji\.
+\fBHOMEBREW_PRY\fR
+If set, Homebrew will use \fBpry\fR for the \fBbrew irb\fR command\.
 .
 .TP
 \fBHOMEBREW_SVN\fR

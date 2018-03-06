@@ -14,7 +14,7 @@
 #:    'keg.name' and forces a check on the dylibs.
 
 require "cache_store"
-require "os/mac/linkage_checker"
+require "linkage_checker"
 
 module Homebrew
   module_function

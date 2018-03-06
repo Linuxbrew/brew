@@ -25,7 +25,7 @@ describe "brew search", :integration_test do
       .and be_a_success
   end
 
-  it "falls back to a GitHub tap search when no formula is found", :needs_network do
+  it "falls back to a GitHub tap search when no formula is found", :needs_network, retry: 3 do
     expect { brew "search", "caskroom/cask/firefox" }
       .to output(/firefox/).to_stdout
       .and output(/Searching/).to_stderr

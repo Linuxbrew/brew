@@ -131,7 +131,7 @@ module OS
           xcodebuild_output = Utils.popen_read(xcodebuild_path, "-version")
           next unless $CHILD_STATUS.success?
 
-          xcode_version = xcodebuild_output[/Xcode (\d(\.\d)*)/, 1]
+          xcode_version = xcodebuild_output[/Xcode (\d+(\.\d+)*)/, 1]
           return xcode_version if xcode_version
 
           # Xcode 2.x's xcodebuild has a different version string

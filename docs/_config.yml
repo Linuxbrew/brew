@@ -1,17 +1,32 @@
-include: [.well-known]
-exclude: [bin, vendor, CNAME, Gemfile, Gemfile.lock]
+title: Homebrew Documentation
+description: Documentation for the missing package manager for macOS.
 
-# Same as GitHub Pages
-# https://help.github.com/articles/using-jekyll-with-pages#troubleshooting
-# Disable despite enabled on GitHub Pages for supported plugins to work.
-# safe: true
-kramdown:
-  input: GFM
-  hard_wrap: false
-lsi: false
-highlighter: rouge
+exclude:
+  - bin
+  - CNAME
+  - Gemfile*
+  - vendor
 
-gems:
+plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
+
+permalink: :title
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      image: /img/homebrew-256x256.png
+
+logo: /img/homebrew-256x256.png
+
+github:
+  repository_nwo: Homebrew/brew
+
+twitter:
+  username: MacHomebrew
+
+facebook:
+  publisher: https://www.facebook.com/machomebrew/

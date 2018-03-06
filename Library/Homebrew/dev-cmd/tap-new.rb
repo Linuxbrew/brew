@@ -50,8 +50,7 @@ module Homebrew
       osx_image: xcode9.2
       cache:
         directories:
-          - $HOME/.gem/ruby
-          - Library/Homebrew/vendor/bundle
+          - /usr/local/Homebrew/Library/Homebrew/vendor/bundle
       branches:
         only:
           - master
