@@ -5,8 +5,8 @@ class JavaRequirement < Requirement
   end
 
   # A strict Java 8 requirement (1.8) should prompt the user to install
-  # the legacy java8 cask because the current version, Java 9, is not
-  # completely backwards compatible, and contains breaking changes such as
+  # the legacy java8 cask because versions newer than Java 8 are not
+  # completely backwards compatible, and contain breaking changes such as
   # strong encapsulation of JDK-internal APIs and a modified version scheme
   # (9.0 not 1.9).
   def cask
@@ -22,7 +22,7 @@ class JavaRequirement < Requirement
 
   JAVA_CASK_MAP = {
     "1.8" => "caskroom/versions/java8",
-    "9.0" => "java",
+    "10.0" => "java",
   }.freeze
 
   def possible_javas
