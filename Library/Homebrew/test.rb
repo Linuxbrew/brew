@@ -16,11 +16,7 @@ begin
 
   ENV.extend(Stdenv)
   formula = ARGV.formulae.first
-  if OS.mac?
-    ENV.setup_build_environment
-  else
-    ENV.setup_build_environment(formula)
-  end
+  ENV.setup_build_environment
 
   trap("INT", old_trap)
 
