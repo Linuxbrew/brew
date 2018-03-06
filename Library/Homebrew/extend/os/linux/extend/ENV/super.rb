@@ -25,15 +25,6 @@ module Superenv
       end
     end.compact
 
-    paths += %w[python].map do |f|
-      begin
-        libexec_bin = Formula[f].opt_libexec/"bin"
-        libexec_bin if libexec_bin.directory?
-      rescue FormulaUnavailableError
-        nil
-      end
-    end.compact
-
     paths += xorg_recursive_deps.map(&:opt_bin) if x11?
     paths
   end
