@@ -20,10 +20,6 @@ begin
     ENV.setup_build_environment
   else
     ENV.setup_build_environment(formula)
-    # Add the python executable to the PATH.
-    if formula.deps.map(&:name).include? "python"
-      ENV.append_path "PATH", "#{HOMEBREW_PREFIX}/opt/python/libexec/bin"
-    end
   end
 
   trap("INT", old_trap)
