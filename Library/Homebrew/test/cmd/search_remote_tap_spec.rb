@@ -16,7 +16,7 @@ describe Homebrew do
       ],
     }
 
-    allow(GitHub).to receive(:open).and_yield(json_response)
+    allow(GitHub).to receive(:open_api).and_yield(json_response)
 
     expect(described_class.search_taps("some-formula"))
       .to match(["homebrew/foo/some-formula"])

@@ -4,6 +4,8 @@ require_relative "../../extend/string"
 module RuboCop
   module Cop
     class FormulaCop < Cop
+      include RangeHelp
+
       attr_accessor :file_path
       @registry = Cop.registry
 

@@ -5,7 +5,7 @@ module Utils
   class Bottles
     class << self
       def tag
-        @bottle_tag ||= "#{ENV["HOMEBREW_PROCESSOR"]}_#{ENV["HOMEBREW_SYSTEM"]}".downcase.to_sym
+        @tag ||= "#{ENV["HOMEBREW_PROCESSOR"]}_#{ENV["HOMEBREW_SYSTEM"]}".downcase.to_sym
       end
 
       def built_as?(f)
