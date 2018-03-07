@@ -187,7 +187,7 @@ module Superenv
       paths << Formula["llvm"].opt_lib.to_s
     end
 
-    paths << homebrew_extra_library_paths
+    paths += homebrew_extra_library_paths
     PATH.new(paths).existing
   end
 
