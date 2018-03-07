@@ -8,7 +8,7 @@ class JavaRequirement < Requirement
   # the legacy java8 cask because versions newer than Java 8 are not
   # completely backwards compatible, and contain breaking changes such as
   # strong encapsulation of JDK-internal APIs and a modified version scheme
-  # (9.0 not 1.9).
+  # (*.0 not 1.*).
   def cask
     if @version.nil? || @version.to_s.end_with?("+") ||
        @version.to_f >= JAVA_CASK_MAP.keys.max.to_f
