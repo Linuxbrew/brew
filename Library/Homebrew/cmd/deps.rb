@@ -203,7 +203,7 @@ module Homebrew
     dependables = reqs + deps
     dependables = dependables.reject(&:optional?) unless ARGV.include?("--include-optional")
     dependables = dependables.reject(&:build?) unless ARGV.include?("--include-build")
-    dependables = dependables.reject(&:test) unless ARGV.include?("--include-test")
+    dependables = dependables.reject(&:test?) unless ARGV.include?("--include-test")
     dependables = dependables.reject(&:recommended?) if ARGV.include?("--skip-recommended")
     max = dependables.length - 1
     @dep_stack.push f.name
