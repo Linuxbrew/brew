@@ -522,7 +522,11 @@ class Keg
   end
 
   def delete_pyc_files!
-    find { |pn| pn.delete if %w[.pyc .pyo].include?(pn.extname) }
+    find do |path|
+      if %w[.pyc .pyo].include?(path.extname) || path.basename.to_s == "__pycache__"
+        path.delete
+      end
+    end
   end
 
   private
