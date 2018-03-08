@@ -144,23 +144,25 @@ module Homebrew
       deps = f.recursive_dependencies do |dependent, dep|
         if dep.recommended?
           Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
+        elsif dep.test?
+          next if includes.include?("test?")
+          Dependency.prune
         elsif dep.optional?
           Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
         elsif dep.build?
           Dependency.prune unless includes.include?("build?")
-        elsif dep.test?
-          Dependency.prune unless includes.include?("test?")
         end
       end
       reqs = f.recursive_requirements do |dependent, req|
         if req.recommended?
           Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
+        elsif req.test?
+          next if includes.include?("test?")
+          Requirement.prune
         elsif req.optional?
           Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
         elsif req.build?
           Requirement.prune unless includes.include?("build?")
-        elsif req.test?
-          Requirement.prune unless includes.include?("test?")
         end
       end
     else
