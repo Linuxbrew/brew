@@ -966,7 +966,7 @@ module Homebrew
           Putting non-prefixed coreutils in your path can cause gmp builds to fail.
         EOS
       rescue FormulaUnavailableError
-        return
+        nil
       end
 
       def check_for_non_prefixed_findutils
@@ -981,7 +981,7 @@ module Homebrew
           Putting non-prefixed findutils in your path can cause python builds to fail.
         EOS
       rescue FormulaUnavailableError
-        return
+        nil
       end
 
       def check_for_pydistutils_cfg_in_home
