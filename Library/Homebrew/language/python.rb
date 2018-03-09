@@ -135,9 +135,10 @@ module Language
       def virtualenv_install_with_resources(options = {})
         python = options[:using]
         if python.nil?
-          wanted = %w[python python@2 python2 python3].select { |py| needs_python?(py) }
+          wanted = %w[python python@2 python2 python3 python@3].select { |py| needs_python?(py) }
           raise FormulaAmbiguousPythonError, self if wanted.size > 1
-          python = wanted.first || "python"
+          python = wanted.first || "python2.7"
+          python = "python3" if python == "python"
         end
         venv = virtualenv_create(libexec, python.delete("@"))
         venv.pip_install resources
