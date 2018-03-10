@@ -12,10 +12,11 @@ Homebrew provides formulae to brew 3.x and a more up-to-date Python 2.7.x.
 Homebrew provides one formula for Python 3.x (`python`) and another for Python 2.7.x (`python@2`).
 
 The executables are organized as follows so that Python 2 and Python 3 can both be installed without conflict:
-* `python` and `python3` point to Homebrew's Python 3.x (if installed) otherwise the macOS system Python
+* `python3` points to Homebrew's Python 3.x (if installed)
 * `python2` points to Homebrew's Python 2.7.x (if installed)
-* `pip` and `pip3` point to Homebrew's Python 3.x's pip (if installed)
-* `pip2` points to Homebrew's Python 2.7.x's pip (if installed)
+* `python` points to Homebrew's Python 2.7.x (if installed) otherwise the macOS system Python. Check out `brew info python` if you wish to add Homebrew's 3.x `python` to your `PATH`.
+* `pip3` points to Homebrew's Python 3.x's pip (if installed)
+* `pip` and `pip2` point to Homebrew's Python 2.7.x's pip (if installed)
 
 ([Wondering which one to choose?](https://wiki.python.org/moin/Python2orPython3))
 
