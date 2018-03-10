@@ -561,8 +561,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     repository's HEAD will be checked for updates when a new stable or devel
     version has been released.
 
-    If `formulae` are given, upgrade only the specified brews (but do so even
-    if they are pinned; see `pin`, `unpin`).
+    If `formulae` are given, upgrade only the specified brews (unless they
+    are pinned; see `pin`, `unpin`).
 
   * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] `formulae`:
     Show the formulae that specify `formulae` as a dependency. When given

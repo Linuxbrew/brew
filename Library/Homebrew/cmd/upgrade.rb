@@ -10,8 +10,8 @@
 #:    repository's HEAD will be checked for updates when a new stable or devel
 #:    version has been released.
 #:
-#:    If <formulae> are given, upgrade only the specified brews (but do so even
-#:    if they are pinned; see `pin`, `unpin`).
+#:    If <formulae> are given, upgrade only the specified brews (unless they
+#:    are pinned; see `pin`, `unpin`).
 
 require "cmd/install"
 require "cleanup"
