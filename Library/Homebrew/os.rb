@@ -24,7 +24,7 @@ module OS
     PATH_OPEN = "/usr/bin/open".freeze
     PATH_PATCH = "/usr/bin/patch".freeze
   elsif OS.linux?
-    require "os/mac"
+    require "os/linux"
     NAME = "linux".freeze
     GITHUB_USER = "Linuxbrew".freeze
     ISSUES_URL = "https://github.com/Linuxbrew/brew/wiki/troubleshooting".freeze
