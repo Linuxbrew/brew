@@ -70,9 +70,7 @@ module Stdenv
       prepend "LDFLAGS", "-Wl,--dynamic-linker=#{HOMEBREW_PREFIX}/lib/ld.so"
     end
 
-    if inherit?
-      # Inherit CC, CXX and compiler flags from the parent environment.
-    elsif respond_to?(compiler)
+    if respond_to?(compiler)
       send(compiler)
     else
       self.cc = determine_cc
@@ -80,7 +78,6 @@ module Stdenv
       set_cpu_cflags
     end
 
-    return if inherit?
     return unless cc =~ GNU_GCC_REGEXP
     gcc_formula = gcc_version_formula($&)
     append_path "PATH", gcc_formula.opt_bin.to_s
