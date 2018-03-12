@@ -63,7 +63,8 @@ class LinkageChecker
       formula.build.without?(dep)
     end
     declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
-    recursive_deps = keg.to_formula.runtime_dependencies.map { |dep| dep.to_formula.full_name }
+    recursive_deps = keg.to_formula.declared_runtime_dependencies
+      .map { |dep| dep.to_formula.full_name }
     declared_dep_names = declared_deps.map { |dep| dep.split("/").last }
     indirect_deps = []
     undeclared_deps = []

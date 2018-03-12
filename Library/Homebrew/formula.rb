@@ -1491,6 +1491,26 @@ class Formula
     declared_runtime_dependencies | undeclared_runtime_dependencies
   end
 
+  def declared_runtime_dependencies
+    recursive_dependencies do |_, dependency|
+      Dependency.prune if dependency.build?
+      Dependency.prune if !dependency.required? && build.without?(dependency)
+    end
+  end
+
+  def undeclared_runtime_dependencies
+    if optlinked?
+      keg = Keg.new(opt_prefix)
+    elsif prefix.directory?
+      keg = Keg.new(prefix)
+    else
+      return []
+    end
+
+    linkage_checker = LinkageChecker.new(keg, self)
+    linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
+  end
+
   # Returns a list of formulae depended on by this formula that aren't
   # installed
   def missing_dependencies(hide: nil)
@@ -1832,26 +1852,6 @@ class Formula
   end
 
   private
-
-  def declared_runtime_dependencies
-    recursive_dependencies do |_, dependency|
-      Dependency.prune if dependency.build?
-      Dependency.prune if !dependency.required? && build.without?(dependency)
-    end
-  end
-
-  def undeclared_runtime_dependencies
-    if optlinked?
-      keg = Keg.new(opt_prefix)
-    elsif prefix.directory?
-      keg = Keg.new(prefix)
-    else
-      return []
-    end
-
-    linkage_checker = LinkageChecker.new(keg, self)
-    linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
-  end
 
   # Returns the prefix for a given formula version number.
   # @private
