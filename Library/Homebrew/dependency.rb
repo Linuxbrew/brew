@@ -143,8 +143,9 @@ class Dependency
     private
 
     def merge_tags(deps)
-      options = deps.flat_map(&:option_tags).uniq
-      merge_necessity(deps) + merge_temporality(deps) + options
+      other_tags = deps.flat_map(&:option_tags).uniq
+      other_tags << :test if deps.flat_map(&:tags).include?(:test)
+      merge_necessity(deps) + merge_temporality(deps) + other_tags
     end
 
     def merge_necessity(deps)

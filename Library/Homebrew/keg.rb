@@ -256,7 +256,11 @@ class Keg
 
     aliases.each do |a|
       alias_symlink = opt/a
-      alias_symlink.delete if alias_symlink.symlink? || alias_symlink.exist?
+      if alias_symlink.symlink? && alias_symlink.exist?
+        alias_symlink.delete if alias_symlink.realpath == opt_record.realpath
+      elsif alias_symlink.symlink? || alias_symlink.exist?
+        alias_symlink.delete
+      end
     end
 
     Pathname.glob("#{opt_record}@*").each do |a|
@@ -519,6 +523,7 @@ class Keg
 
   def delete_pyc_files!
     find { |pn| pn.delete if %w[.pyc .pyo].include?(pn.extname) }
+    find { |pn| pn.delete if pn.basename.to_s == "__pycache__" }
   end
 
   private

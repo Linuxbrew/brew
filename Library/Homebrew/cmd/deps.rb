@@ -17,7 +17,8 @@
 #:
 #:    By default, `deps` shows required and recommended dependencies for
 #:    <formulae>. To include the `:build` type dependencies, pass `--include-build`.
-#:    Similarly, pass `--include-optional` to include `:optional` dependencies.
+#:    Similarly, pass `--include-optional` to include `:optional` dependencies or
+#:    `--include-test` to include `:test` dependencies.
 #:    To skip `:recommended` type dependencies, pass `--skip-recommended`.
 #:    To include requirements in addition to dependencies, pass `--include-requirements`.
 #:
@@ -30,8 +31,8 @@
 #:    If `--installed` is passed, output a tree for every installed formula.
 #:
 #:    The <filters> placeholder is any combination of options `--include-build`,
-#:    `--include-optional`, `--skip-recommended`, and `--include-requirements` as
-#:    documented above.
+#:    `--include-optional`, `--include-test`, `--skip-recommended`, and
+#:    `--include-requirements` as documented above.
 #:
 #:    If `--annotate` is passed, the build, optional, and recommended dependencies
 #:    are marked as such in the output.
@@ -42,7 +43,8 @@
 #:    dependencies of that formula.
 #:
 #:    The <filters> placeholder is any combination of options `--include-build`,
-#:    `--include-optional`, and `--skip-recommended` as documented above.
+#:    `--include-optional`, `--include-test`, and `--skip-recommended` as
+#:    documented above.
 
 # The undocumented `--for-each` option will switch into the mode used by `deps --all`,
 # but only list dependencies for specified formula, one specified formula per line.
@@ -111,6 +113,7 @@ module Homebrew
     end
     if ARGV.include?("--annotate")
       str = "#{str}  [build]" if dep.build?
+      str = "#{str}  [test]" if dep.test?
       str = "#{str}  [optional" if dep.optional?
       str = "#{str}  [recommended]" if dep.recommended?
     end
@@ -125,6 +128,11 @@ module Homebrew
     else
       ignores << "build?"
     end
+    if ARGV.include?("--include-test")
+      includes << "test?"
+    else
+      ignores << "test?"
+    end
     if ARGV.include?("--include-optional")
       includes << "optional?"
     else
@@ -136,6 +144,9 @@ module Homebrew
       deps = f.recursive_dependencies do |dependent, dep|
         if dep.recommended?
           Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
+        elsif dep.test?
+          next if includes.include?("test?")
+          Dependency.prune
         elsif dep.optional?
           Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
         elsif dep.build?
@@ -145,6 +156,9 @@ module Homebrew
       reqs = f.recursive_requirements do |dependent, req|
         if req.recommended?
           Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
+        elsif req.test?
+          next if includes.include?("test?")
+          Requirement.prune
         elsif req.optional?
           Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
         elsif req.build?
@@ -191,6 +205,7 @@ module Homebrew
     dependables = reqs + deps
     dependables = dependables.reject(&:optional?) unless ARGV.include?("--include-optional")
     dependables = dependables.reject(&:build?) unless ARGV.include?("--include-build")
+    dependables = dependables.reject(&:test?) unless ARGV.include?("--include-test")
     dependables = dependables.reject(&:recommended?) if ARGV.include?("--skip-recommended")
     max = dependables.length - 1
     @dep_stack.push f.name

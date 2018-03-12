@@ -10,8 +10,8 @@
 #:    repository's HEAD will be checked for updates when a new stable or devel
 #:    version has been released.
 #:
-#:    If <formulae> are given, upgrade only the specified brews (but do so even
-#:    if they are pinned; see `pin`, `unpin`).
+#:    If <formulae> are given, upgrade only the specified brews (unless they
+#:    are pinned; see `pin`, `unpin`).
 
 require "cmd/install"
 require "cleanup"
@@ -118,7 +118,7 @@ module Homebrew
 
     fi = FormulaInstaller.new(f)
     fi.options = options
-    fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.build_bottle?)
+    fi.build_bottle = ARGV.build_bottle? || (!f.bottled? && f.build.bottle?)
     fi.installed_on_request = !ARGV.named.empty?
     fi.link_keg           ||= keg_was_linked if keg_had_linked_opt
     if tab
@@ -139,7 +139,7 @@ module Homebrew
   rescue FormulaInstallationAlreadyAttemptedError
     # We already attempted to upgrade f as part of the dependency tree of
     # another formula. In that case, don't generate an error, just move on.
-    return
+    nil
   rescue CannotInstallFormulaError => e
     ofail e
   rescue BuildError => e

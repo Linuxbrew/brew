@@ -1,3 +1,5 @@
+require "uri"
+
 module Hbc
   module CaskLoader
     class FromContentLoader

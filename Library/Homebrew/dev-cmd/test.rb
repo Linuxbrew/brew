@@ -45,6 +45,18 @@ module Homebrew
         next
       end
 
+      # Don't test formulae missing test dependencies
+      missing_test_deps = f.recursive_dependencies do |_, dependency|
+        Dependency.prune if dependency.installed?
+        next if dependency.test?
+        Dependency.prune if dependency.optional?
+        Dependency.prune if dependency.build?
+      end.map(&:to_s)
+      unless missing_test_deps.empty?
+        ofail "#{f.full_name} is missing test dependencies: #{missing_test_deps.join(" ")}"
+        next
+      end
+
       puts "Testing #{f.full_name}"
 
       env = ENV.to_hash

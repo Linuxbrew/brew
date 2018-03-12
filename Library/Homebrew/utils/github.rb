@@ -94,7 +94,7 @@ module GitHub
   def api_credentials_error_message(response_headers, needed_scopes)
     return if response_headers.empty?
 
-    @api_credentials_error_message_printed ||= begin
+    @api_credentials_error_message ||= begin
       unauthorized = (response_headers["http/1.1"] == "401 Unauthorized")
       scopes = response_headers["x-accepted-oauth-scopes"].to_s.split(", ")
       needed_human_scopes = needed_scopes.join(", ")
@@ -125,7 +125,7 @@ module GitHub
     end
   end
 
-  def open(url, data: nil, scopes: [].freeze)
+  def open_api(url, data: nil, scopes: [].freeze)
     # This is a no-op if the user is opting out of using the GitHub API.
     return block_given? ? yield({}) : {} if ENV["HOMEBREW_NO_GITHUB_API"]
 
@@ -226,7 +226,7 @@ module GitHub
   end
 
   def repository(user, repo)
-    open(url_to("repos", user, repo))
+    open_api(url_to("repos", user, repo))
   end
 
   def search_code(**qualifiers)
@@ -255,7 +255,7 @@ module GitHub
 
   def private_repo?(full_name)
     uri = url_to "repos", full_name
-    open(uri) { |json| json["private"] }
+    open_api(uri) { |json| json["private"] }
   end
 
   def query_string(*main_params, **qualifiers)
@@ -275,6 +275,6 @@ module GitHub
   def search(entity, *queries, **qualifiers)
     uri = url_to "search", entity
     uri.query = query_string(*queries, **qualifiers)
-    open(uri) { |json| json.fetch("items", []) }
+    open_api(uri) { |json| json.fetch("items", []) }
   end
 end
