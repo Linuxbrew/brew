@@ -554,7 +554,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     Options for the `install` command are also valid here.
 
-    If `--cleanup` is specified then remove previously installed `formula` version(s).
+    If `--cleanup` is specified or `HOMEBREW_UPGRADE_CLEANUP` is set then remove
+    previously installed `formula` version(s).
 
     If `--fetch-HEAD` is passed, fetch the upstream repository to detect if
     the HEAD installation of the formula is outdated. Otherwise, the
@@ -1091,6 +1092,9 @@ can take several different forms:
 
     This issue typically occurs when using FileVault or custom SSD
     configurations.
+
+  * `HOMEBREW_UPGRADE_CLEANUP`:
+    If set, `brew upgrade` always assumes `--cleanup` has been passed.
 
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.
