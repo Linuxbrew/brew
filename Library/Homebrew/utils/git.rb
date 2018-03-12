@@ -8,9 +8,10 @@ module Git
 
     out, = Open3.capture3(
       HOMEBREW_SHIMS_PATH/"scm/git", "-C", repo,
-      "log", "--oneline", "--max-count=1", *args, "--", file
+      "log", "--format=%h", "--abbrev=7", "--max-count=1",
+      *args, "--", file
     )
-    out.split(" ").first
+    out.chomp
   end
 
   def last_revision_of_file(repo, file, before_commit: nil)
