@@ -170,7 +170,7 @@ class FormulaCreator
       # Documentation: https://docs.brew.sh/Formula-Cookbook
       #                http://www.rubydoc.info/github/Homebrew/brew/master/Formula
       # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
-       class #{Formulary.class_s(name)} < Formula
+      class #{Formulary.class_s(name)} < Formula
         desc "#{desc}"
         homepage "#{homepage}"
       <% if head? %>
@@ -182,7 +182,7 @@ class FormulaCreator
       <% end %>
         sha256 "#{sha256}"
       <% end %>
-       <% if mode == :cmake %>
+      <% if mode == :cmake %>
         depends_on "cmake" => :build
       <% elsif mode == :meson %>
         depends_on "meson" => :build
@@ -190,9 +190,10 @@ class FormulaCreator
       <% elsif mode.nil? %>
         # depends_on "cmake" => :build
       <% end %>
-         def install
+
+        def install
           # ENV.deparallelize  # if your formula fails when building in parallel
-       <% if mode == :cmake %>
+      <% if mode == :cmake %>
           system "cmake", ".", *std_cmake_args
       <% elsif mode == :autotools %>
           # Remove unrecognized options if warned by configure
@@ -219,7 +220,8 @@ class FormulaCreator
           system "make", "install" # if this fails, try separate make/make install steps
       <% end %>
         end
-         test do
+
+        test do
           # `test do` will create, run in and delete a temporary directory.
           #
           # This test will fail and we won't accept that! For Homebrew/homebrew-core
