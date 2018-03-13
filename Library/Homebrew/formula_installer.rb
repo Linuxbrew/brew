@@ -224,17 +224,19 @@ class FormulaInstaller
       message = <<~EOS
         #{formula.name} #{formula.linked_version} is already installed
       EOS
-      message += if formula.outdated? && !formula.head?
-        <<~EOS
+      if formula.outdated? && !formula.head?
+        message += <<~EOS
           To upgrade to #{formula.pkg_version}, run `brew upgrade #{formula.name}`
         EOS
+      elsif only_deps?
+        message = nil
       else
         # some other version is already installed *and* linked
-        <<~EOS
+        message += <<~EOS
           To install #{formula.pkg_version}, first run `brew unlink #{formula.name}`
         EOS
       end
-      raise CannotInstallFormulaError, message
+      raise CannotInstallFormulaError, message if message
     end
 
     # Warn if a more recent version of this formula is available in the tap.

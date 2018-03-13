@@ -159,6 +159,8 @@ module Homebrew
               #{f.full_name} #{optlinked_version} is already installed
               To upgrade to #{f.version}, run `brew upgrade #{f.name}`
             EOS
+          elsif ARGV.only_deps?
+            formulae << f
           else
             opoo <<~EOS
               #{f.full_name} #{f.pkg_version} is already installed
@@ -188,8 +190,11 @@ module Homebrew
               #{msg}, it's just not linked.
               You can use `brew link #{f}` to link this version.
             EOS
+          elsif ARGV.only_deps?
+            msg = nil
+            formulae << f
           end
-          opoo msg
+          opoo msg if msg
         elsif !f.any_version_installed? && old_formula = f.old_installed_formulae.first
           msg = "#{old_formula.full_name} #{old_formula.installed_version} already installed"
           if !old_formula.linked? && !old_formula.keg_only?
