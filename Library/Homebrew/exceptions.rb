@@ -515,6 +515,13 @@ class CurlDownloadStrategyError < RuntimeError
   end
 end
 
+# raised in ScpDownloadStrategy.fetch
+class ScpDownloadStrategyError < RuntimeError
+  def initialize(cause)
+    super "Download failed: #{cause}"
+  end
+end
+
 # raised by safe_system in utils.rb
 class ErrorDuringExecution < RuntimeError
   def initialize(cmd, args = [])
