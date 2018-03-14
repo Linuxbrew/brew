@@ -97,7 +97,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     By default, `deps` shows required and recommended dependencies for
     `formulae`. To include the `:build` type dependencies, pass `--include-build`.
     Similarly, pass `--include-optional` to include `:optional` dependencies or
-    `--include-test` to include `:test` dependencies.
+    `--include-test` to include (non-recursive) `:test` dependencies.
     To skip `:recommended` type dependencies, pass `--skip-recommended`.
     To include requirements in addition to dependencies, pass `--include-requirements`.
 

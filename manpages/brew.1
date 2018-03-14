@@ -107,7 +107,7 @@ If \fB\-\-full\-name\fR is passed, list dependencies by their full name\.
 If \fB\-\-installed\fR is passed, only list those dependencies that are currently installed\.
 .
 .IP
-By default, \fBdeps\fR shows required and recommended dependencies for \fIformulae\fR\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies or \fB\-\-include\-test\fR to include \fB:test\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\. To include requirements in addition to dependencies, pass \fB\-\-include\-requirements\fR\.
+By default, \fBdeps\fR shows required and recommended dependencies for \fIformulae\fR\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies or \fB\-\-include\-test\fR to include (non\-recursive) \fB:test\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\. To include requirements in addition to dependencies, pass \fB\-\-include\-requirements\fR\.
 .
 .TP
 \fBdeps\fR \fB\-\-tree\fR [\fB\-\-1\fR] [\fIfilters\fR] [\fB\-\-annotate\fR] (\fIformulae\fR|\fB\-\-installed\fR)

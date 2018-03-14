@@ -18,7 +18,7 @@
 #:    By default, `deps` shows required and recommended dependencies for
 #:    <formulae>. To include the `:build` type dependencies, pass `--include-build`.
 #:    Similarly, pass `--include-optional` to include `:optional` dependencies or
-#:    `--include-test` to include `:test` dependencies.
+#:    `--include-test` to include (non-recursive) `:test` dependencies.
 #:    To skip `:recommended` type dependencies, pass `--skip-recommended`.
 #:    To include requirements in addition to dependencies, pass `--include-requirements`.
 #:
@@ -145,8 +145,11 @@ module Homebrew
         if dep.recommended?
           Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
         elsif dep.test?
-          next if includes.include?("test?")
-          Dependency.prune
+          if includes.include?("test?")
+            Dependency.keep_but_prune_recursive_deps
+          else
+            Dependency.prune
+          end
         elsif dep.optional?
           Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
         elsif dep.build?
@@ -157,8 +160,7 @@ module Homebrew
         if req.recommended?
           Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
         elsif req.test?
-          next if includes.include?("test?")
-          Requirement.prune
+          Requirement.prune unless includes.include?("test?")
         elsif req.optional?
           Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
         elsif req.build?
