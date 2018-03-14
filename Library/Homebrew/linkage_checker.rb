@@ -6,11 +6,11 @@ require "linkage_cache_store"
 class LinkageChecker
   attr_reader :keg, :formula, :store
 
-  def initialize(keg, db, rebuild_cache = false, formula = nil)
+  def initialize(keg, db, use_cache = false, formula = nil)
     @keg = keg
     @formula = formula || resolve_formula(keg)
     @store = LinkageStore.new(keg.name, db)
-    flush_cache_and_check_dylibs if rebuild_cache
+    flush_cache_and_check_dylibs unless use_cache
   end
 
   # 'Hash-type' cache values
