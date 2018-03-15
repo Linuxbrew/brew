@@ -216,7 +216,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     See the docs for examples of using the JSON output:
     <https://docs.brew.sh/Querying-Brew>
 
-  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] `formula` [`options` ...]:
+  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--include-test`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] `formula` [`options` ...]:
     Install `formula`.
 
     `formula` is usually the name of the formula to install, but it can be specified
@@ -253,6 +253,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--force-bottle` is passed, install from a bottle if it exists for the
     current or newest version of macOS, even if it would not normally be used
     for installation.
+
+    If `--include-test` is passed, install testing dependencies. These are only
+    needed by formulae maintainers to run `brew test`.
 
     If `--devel` is passed, and `formula` defines it, install the development version.
 
