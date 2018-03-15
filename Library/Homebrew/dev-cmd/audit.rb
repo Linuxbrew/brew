@@ -949,7 +949,7 @@ class ResourceAuditor
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy
-        unless Utils.git_remote_exists url
+        unless Utils.git_remote_exists? url
           problem "The URL #{url} is not a valid git URL"
         end
       elsif strategy <= SubversionDownloadStrategy

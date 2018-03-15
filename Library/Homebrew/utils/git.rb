@@ -67,7 +67,7 @@ module Utils
     @git_version = nil
   end
 
-  def self.git_remote_exists(url)
+  def self.git_remote_exists?(url)
     return true unless git_available?
     quiet_system "git", "ls-remote", url
   end
