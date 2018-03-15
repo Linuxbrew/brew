@@ -930,16 +930,140 @@ If \fB\-\-keep\-tmp\fR is passed, retain the temporary directory containing the 
 .SH "OFFICIAL EXTERNAL COMMANDS"
 .
 .TP
-\fBbundle\fR
-Bundler for non\-Ruby dependencies from Homebrew: \fIhttps://github\.com/Homebrew/homebrew\-bundle\fR
+\fBbundle\fR \fIcommand\fR:
+.
+.IP
+Bundler for non\-Ruby dependencies from Homebrew\.
+.
+.IP
+\fBbundle\fR [\fBinstall\fR] [\fB\-v\fR|\fB\-\-verbose\fR] [\fB\-\-no\-upgrade\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]:
+.
+.IP
+Install or upgrade all dependencies in a Brewfile\.
+.
+.IP
+\fBbrew bundle dump\fR [\fB\-\-force\fR] [\fB\-\-describe\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]
+.
+.IP
+Write all installed casks/formulae/taps into a Brewfile\.
+.
+.IP
+\fBbrew bundle cleanup\fR [\fB\-\-force\fR] [\fB\-\-zap\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]
+.
+.IP
+Uninstall all dependencies not listed in a Brewfile\.
+.
+.IP
+\fBbrew bundle check\fR [\fB\-\-no\-upgrade\fR] [\fB\-\-file\fR=\fIpath\fR|\fB\-\-global\fR]
+.
+.IP
+Check if all dependencies are installed in a Brewfile\.
+.
+.IP
+\fBbrew bundle exec\fR \fIcommand\fR
+.
+.IP
+Run an external command in an isolated build environment\.
+.
+.IP
+\fBbrew bundle list\fR [\fB\-\-all\fR|\fB\-\-brews\fR|\fB\-\-casks\fR|\fB\-\-taps\fR|\fB\-\-mas\fR] [\fB\-\-file=\fR\fIpath\fR|\fB\-\-global\fR]
+.
+.IP
+List all dependencies present in a Brewfile, optionally limiting by types\.
+.
+.IP
+By default, only brew dependencies are output\.
+.
+.IP
+If \fB\-v\fR or \fB\-\-verbose\fR are passed, print verbose output\.
+.
+.IP
+If \fB\-\-no\-upgrade\fR is passed, don\'t run \fBbrew upgrade\fR outdated dependencies\.
+.
+.IP
+Note they may still be upgraded by \fBbrew install\fR if needed\.
+.
+.IP
+If \fB\-\-force\fR is passed, uninstall dependencies or overwrite an existing Brewfile\.
+.
+.IP
+If \fB\-\-file=<path>\fR is passed, the Brewfile path is set accordingly
+.
+.IP
+Use \fB\-\-file=\-\fR to output to console\.
+.
+.IP
+If \fB\-\-global\fR is passed, set Brewfile path to \fB$HOME/\.Brewfile\fR\.
+.
+.IP
+If \fB\-\-describe\fR is passed, output a description comment above each line\.
+.
+.IP
+This comment will not be output if the dependency does not have a description\.
+.
+.IP
+If \fB\-h\fR or \fB\-\-help\fR are passed, print this help message and exit\.
+.
+.P
+Homebrew/homebrew\-bundle \fIhttps://github\.com/Homebrew/homebrew\-bundle\fR
 .
 .TP
-\fBcask\fR
-Install macOS applications distributed as binaries: \fIhttps://github\.com/caskroom/homebrew\-cask\fR
+\fBcask\fR [\fB\-\-version\fR | \fBaudit\fR | \fBcat\fR | \fBcleanup\fR | \fBcreate\fR | \fBdoctor\fR | \fBedit\fR | \fBfetch\fR | \fBhome\fR | \fBinfo\fR]
+Install macOS applications distributed as binaries\.
+.
+.P
+Caskroom/homebrew\-cask \fIhttps://github\.com/caskroom/homebrew\-cask\fR
 .
 .TP
-\fBservices\fR
-Integrates Homebrew formulae with macOS\'s \fBlaunchctl\fR(1) manager: \fIhttps://github\.com/Homebrew/homebrew\-services\fR
+\fBservices\fR \fIcommand\fR:
+.
+.IP
+Integrates Homebrew formulae with macOS\' \fBlaunchctl\fR manager\.
+.
+.IP
+[\fIsudo\fR] \fBbrew services list\fR
+.
+.IP
+List all running services for the current user (or \fIroot\fR)
+.
+.IP
+[\fIsudo\fR] \fBbrew services run\fR \fIformula|\-\-all\fR
+.
+.IP
+Run the service \fIformula\fR without starting at login (or boot)\.
+.
+.IP
+[\fIsudo\fR] \fBbrew services\fR \fBstart\fR \fIformula|\-\-all\fR
+.
+.IP
+Start the service \fIformula\fR immediately and register it to launch at login (or \fIboot\fR)\.
+.
+.IP
+[\fIsudo\fR] \fBbrew services\fR \fBstop\fR \fIformula|\-\-all\fR
+.
+.IP
+Stop the service \fIformula\fR immediately and unregister it from launching at login (or \fIboot\fR)\.
+.
+.IP
+[\fIsudo\fR] \fBbrew services\fR \fBrestart\fR \fIformula|\-\-all\fR
+.
+.IP
+Stop (if necessary) and start the service immediately and register it to launch at login (or \fIboot\fR)\.
+.
+.IP
+[\fIsudo\fR] \fBbrew services\fR \fBcleanup\fR
+.
+.IP
+Remove all unused services\.
+.
+.IP
+If \fBsudo\fR is passed, operate on \fB/Library/LaunchDaemons\fR (started at boot)\.
+.
+.IP
+Otherwise, operate on \fB~/Library/LaunchAgents (started at login)\fR\.
+.
+.P
+Homebrew/homebrew\-services \fIhttps://github\.com/Homebrew/homebrew\-services\fR
 .
 .SH "CUSTOM EXTERNAL COMMANDS"
 Homebrew, like \fBgit\fR(1), supports external commands\. These are executable scripts that reside somewhere in the \fBPATH\fR, named \fBbrew\-\fR\fIcmdname\fR or \fBbrew\-\fR\fIcmdname\fR\fB\.rb\fR, which can be invoked like \fBbrew\fR \fIcmdname\fR\. This allows you to create your own commands without modifying Homebrew\'s internals\.
