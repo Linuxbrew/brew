@@ -107,7 +107,7 @@ If \fB\-\-full\-name\fR is passed, list dependencies by their full name\.
 If \fB\-\-installed\fR is passed, only list those dependencies that are currently installed\.
 .
 .IP
-By default, \fBdeps\fR shows required and recommended dependencies for \fIformulae\fR\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies or \fB\-\-include\-test\fR to include \fB:test\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\. To include requirements in addition to dependencies, pass \fB\-\-include\-requirements\fR\.
+By default, \fBdeps\fR shows required and recommended dependencies for \fIformulae\fR\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies or \fB\-\-include\-test\fR to include (non\-recursive) \fB:test\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\. To include requirements in addition to dependencies, pass \fB\-\-include\-requirements\fR\.
 .
 .TP
 \fBdeps\fR \fB\-\-tree\fR [\fB\-\-1\fR] [\fIfilters\fR] [\fB\-\-annotate\fR] (\fIformulae\fR|\fB\-\-installed\fR)
@@ -579,7 +579,7 @@ If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if t
 If \fIformulae\fR are given, upgrade only the specified brews (unless they are pinned; see \fBpin\fR, \fBunpin\fR)\.
 .
 .TP
-\fBuses\fR [\fB\-\-installed\fR] [\fB\-\-recursive\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] \fIformulae\fR
+\fBuses\fR [\fB\-\-installed\fR] [\fB\-\-recursive\fR] [\fB\-\-include\-build\fR] [\fB\-\-include\-test\fR] [\fB\-\-include\-optional\fR] [\fB\-\-skip\-recommended\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] \fIformulae\fR
 Show the formulae that specify \fIformulae\fR as a dependency\. When given multiple formula arguments, show the intersection of formulae that use \fIformulae\fR\.
 .
 .IP
@@ -589,10 +589,10 @@ Use \fB\-\-recursive\fR to resolve more than one level of dependencies\.
 If \fB\-\-installed\fR is passed, only list installed formulae\.
 .
 .IP
-By default, \fBuses\fR shows all formulae that specify \fIformulae\fR as a required or recommended dependency\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR\. Similarly, pass \fB\-\-include\-optional\fR to include \fB:optional\fR dependencies\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\.
+By default, \fBuses\fR shows all formulae that specify \fIformulae\fR as a required or recommended dependency\. To include the \fB:build\fR type dependencies, pass \fB\-\-include\-build\fR, to include the \fB:test\fR type dependencies, pass \fB\-\-include\-test\fR and to include \fB:optional\fR dependencies pass \fB\-\-include\-optional\fR\. To skip \fB:recommended\fR type dependencies, pass \fB\-\-skip\-recommended\fR\.
 .
 .IP
-By default, \fBuses\fR shows usages of \fIformulae\fR by stable builds\. To find cases where \fIformulae\fR is used by development or HEAD build, pass \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
+By default, \fBuses\fR shows usage of \fIformulae\fR by stable builds\. To find cases where \fIformulae\fR is used by development or HEAD build, pass \fB\-\-devel\fR or \fB\-\-HEAD\fR\.
 .
 .TP
 \fB\-\-cache\fR

@@ -1,4 +1,4 @@
-#:  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] <formulae>:
+#:  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-test`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] <formulae>:
 #:    Show the formulae that specify <formulae> as a dependency. When given
 #:    multiple formula arguments, show the intersection of formulae that use
 #:    <formulae>.
@@ -9,10 +9,12 @@
 #:
 #:    By default, `uses` shows all formulae that specify <formulae> as a required
 #:    or recommended dependency. To include the `:build` type dependencies, pass
-#:    `--include-build`. Similarly, pass `--include-optional` to include `:optional`
-#:    dependencies. To skip `:recommended` type dependencies, pass `--skip-recommended`.
+#:    `--include-build`, to include the `:test` type dependencies, pass
+#:    `--include-test` and to include `:optional` dependencies pass
+#:    `--include-optional`. To skip `:recommended` type dependencies, pass
+#:    `--skip-recommended`.
 #:
-#:    By default, `uses` shows usages of <formulae> by stable builds. To find
+#:    By default, `uses` shows usage of <formulae> by stable builds. To find
 #:    cases where <formulae> is used by development or HEAD build, pass
 #:    `--devel` or `--HEAD`.
 
@@ -47,6 +49,11 @@ module Homebrew
     else
       ignores << "build?"
     end
+    if ARGV.include? "--include-test"
+      includes << "test?"
+    else
+      ignores << "test?"
+    end
     if ARGV.include? "--include-optional"
       includes << "optional?"
     else
@@ -61,6 +68,12 @@ module Homebrew
             deps = f.recursive_dependencies do |dependent, dep|
               if dep.recommended?
                 Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
+              elsif dep.test?
+                if includes.include?("test?")
+                  Dependency.keep_but_prune_recursive_deps
+                else
+                  Dependency.prune
+                end
               elsif dep.optional?
                 Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
               elsif dep.build?
@@ -89,6 +102,8 @@ module Homebrew
             reqs_by_formula.reject! do |dependent, req|
               if req.recommended?
                 ignores.include?("recommended?") || dependent.build.without?(req)
+              elsif req.test?
+                Requirement.prune unless includes.include?("test?")
               elsif req.optional?
                 !includes.include?("optional?") && !dependent.build.with?(req)
               elsif req.build?

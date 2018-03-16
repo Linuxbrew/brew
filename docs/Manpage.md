@@ -97,7 +97,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     By default, `deps` shows required and recommended dependencies for
     `formulae`. To include the `:build` type dependencies, pass `--include-build`.
     Similarly, pass `--include-optional` to include `:optional` dependencies or
-    `--include-test` to include `:test` dependencies.
+    `--include-test` to include (non-recursive) `:test` dependencies.
     To skip `:recommended` type dependencies, pass `--skip-recommended`.
     To include requirements in addition to dependencies, pass `--include-requirements`.
 
@@ -565,7 +565,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `formulae` are given, upgrade only the specified brews (unless they
     are pinned; see `pin`, `unpin`).
 
-  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] `formulae`:
+  * `uses` [`--installed`] [`--recursive`] [`--include-build`] [`--include-test`] [`--include-optional`] [`--skip-recommended`] [`--devel`|`--HEAD`] `formulae`:
     Show the formulae that specify `formulae` as a dependency. When given
     multiple formula arguments, show the intersection of formulae that use
     `formulae`.
@@ -576,10 +576,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     By default, `uses` shows all formulae that specify `formulae` as a required
     or recommended dependency. To include the `:build` type dependencies, pass
-    `--include-build`. Similarly, pass `--include-optional` to include `:optional`
-    dependencies. To skip `:recommended` type dependencies, pass `--skip-recommended`.
+    `--include-build`, to include the `:test` type dependencies, pass
+    `--include-test` and to include `:optional` dependencies pass
+    `--include-optional`. To skip `:recommended` type dependencies, pass
+    `--skip-recommended`.
 
-    By default, `uses` shows usages of `formulae` by stable builds. To find
+    By default, `uses` shows usage of `formulae` by stable builds. To find
     cases where `formulae` is used by development or HEAD build, pass
     `--devel` or `--HEAD`.
 

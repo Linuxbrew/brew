@@ -102,12 +102,12 @@ describe Dependency do
   end
 
   it "keeps dependency but prunes recursive dependencies with ::keep_but_prune_recursive_deps" do
-    foo = build_dep(:foo, [:build], bar)
-    baz = build_dep(:baz, [:build])
+    foo = build_dep(:foo, [:test], bar)
+    baz = build_dep(:baz, [:test])
     f = double(name: "f", deps: [foo, baz])
 
     deps = described_class.expand(f) do |_dependent, dep|
-      described_class.keep_but_prune_recursive_deps if dep.build?
+      described_class.keep_but_prune_recursive_deps if dep.test?
     end
 
     expect(deps).to eq([foo, baz])
