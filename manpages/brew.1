@@ -229,7 +229,7 @@ Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to
 See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\fR
 .
 .TP
-\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] [\fB\-\-force\fR] [\fB\-\-verbose\fR] \fIformula\fR [\fIoptions\fR \.\.\.]
+\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-include\-test\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] [\fB\-\-force\fR] [\fB\-\-verbose\fR] \fIformula\fR [\fIoptions\fR \.\.\.]
 Install \fIformula\fR\.
 .
 .IP
@@ -261,6 +261,9 @@ If \fBHOMEBREW_BUILD_FROM_SOURCE\fR is set, regardless of whether \fB\-\-build\-
 .
 .IP
 If \fB\-\-force\-bottle\fR is passed, install from a bottle if it exists for the current or newest version of macOS, even if it would not normally be used for installation\.
+.
+.IP
+If \fB\-\-include\-test\fR is passed, install testing dependencies\. These are only needed by formulae maintainers to run \fBbrew test\fR\.
 .
 .IP
 If \fB\-\-devel\fR is passed, and \fIformula\fR defines it, install the development version\.
