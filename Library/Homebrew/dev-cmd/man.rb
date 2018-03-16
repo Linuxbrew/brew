@@ -71,6 +71,9 @@ module Homebrew
     variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
                                            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
+    variables[:homebrew_bundle] = help_output(:bundle)
+    variables[:homebrew_services] = help_output(:services)
+
     ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end
 
@@ -111,6 +114,12 @@ module Homebrew
       ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
       target.atomic_write ronn_output
     end
+  end
+
+  def help_output(command)
+    tap = Tap.fetch("Homebrew/homebrew-#{command}")
+    tap.install unless tap.installed?
+    command_help_lines(which("brew-#{command}.rb", Tap.cmd_directories))
   end
 
   def target_path_to_format(target)
