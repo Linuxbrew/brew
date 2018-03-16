@@ -552,7 +552,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     their latest `origin/master`. Note this will destroy all your uncommitted
     or committed changes.
 
-  * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`formulae`]:
+  * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`formulae`]:
     Upgrade outdated, unpinned brews (with existing install options).
 
     Options for the `install` command are also valid here.
@@ -564,6 +564,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     the HEAD installation of the formula is outdated. Otherwise, the
     repository's HEAD will be checked for updates when a new stable or devel
     version has been released.
+
+    If `--ignore-pinned` is passed, set a 0 exit code even if pinned formulae
+    are not upgraded.
 
     If `formulae` are given, upgrade only the specified brews (unless they
     are pinned; see `pin`, `unpin`).
