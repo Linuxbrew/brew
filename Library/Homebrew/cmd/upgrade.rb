@@ -1,4 +1,4 @@
-#:  * `upgrade` [<install-options>] [`--cleanup`] [`--fetch-HEAD`] [<formulae>]:
+#:  * `upgrade` [<install-options>] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [<formulae>]:
 #:    Upgrade outdated, unpinned brews (with existing install options).
 #:
 #:    Options for the `install` command are also valid here.
@@ -10,6 +10,9 @@
 #:    the HEAD installation of the formula is outdated. Otherwise, the
 #:    repository's HEAD will be checked for updates when a new stable or devel
 #:    version has been released.
+#:
+#:    If `--ignore-pinned` is passed, set a 0 exit code even if pinned formulae
+#:    are not upgraded.
 #:
 #:    If <formulae> are given, upgrade only the specified brews (unless they
 #:    are pinned; see `pin`, `unpin`).
@@ -55,16 +58,16 @@ module Homebrew
     outdated -= pinned
     formulae_to_install = outdated.map(&:latest_formula)
 
+    if !pinned.empty? && !ARGV.include?("--ignore-pinned")
+      ofail "Not upgrading #{Formatter.pluralize(pinned.length, "pinned package")}:"
+      puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
+    end
+
     if formulae_to_install.empty?
       oh1 "No packages to upgrade"
     else
       oh1 "Upgrading #{Formatter.pluralize(formulae_to_install.length, "outdated package")}, with result:"
       puts formulae_to_install.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
-    end
-
-    unless pinned.empty?
-      onoe "Not upgrading #{Formatter.pluralize(pinned.length, "pinned package")}:"
-      puts pinned.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
     end
 
     # Sort keg_only before non-keg_only formulae to avoid any needless conflicts

@@ -566,7 +566,7 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 Fetches and resets Homebrew and all tap repositories using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
 .
 .TP
-\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fIformulae\fR]
+\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fIformulae\fR]
 Upgrade outdated, unpinned brews (with existing install options)\.
 .
 .IP
@@ -577,6 +577,9 @@ If \fB\-\-cleanup\fR is specified or \fBHOMEBREW_UPGRADE_CLEANUP\fR is set then 
 .
 .IP
 If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if the HEAD installation of the formula is outdated\. Otherwise, the repository\'s HEAD will be checked for updates when a new stable or devel version has been released\.
+.
+.IP
+If \fB\-\-ignore\-pinned\fR is passed, set a 0 exit code even if pinned formulae are not upgraded\.
 .
 .IP
 If \fIformulae\fR are given, upgrade only the specified brews (unless they are pinned; see \fBpin\fR, \fBunpin\fR)\.
