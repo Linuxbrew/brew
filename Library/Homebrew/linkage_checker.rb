@@ -22,6 +22,7 @@ class LinkageChecker
   end
 
   def check_dylibs
+    checked_dylibs = Set.new
     @keg.find do |file|
       next if file.symlink? || file.directory?
       next unless file.dylib? || file.binary_executable? || file.mach_o_bundle?
@@ -30,6 +31,7 @@ class LinkageChecker
       # when checking for broken linkage
       file.dynamically_linked_libraries(except: :LC_LOAD_WEAK_DYLIB).each do |dylib|
         @reverse_links[dylib] << file
+        next if checked_dylibs.include? dylib
         if dylib.start_with? "@"
           @variable_dylibs << dylib
         else
@@ -50,6 +52,7 @@ class LinkageChecker
             @brewed_dylibs[f] << dylib
           end
         end
+        checked_dylibs << dylib
       end
     end
 
@@ -83,6 +86,12 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
+    missing = []
+    @broken_dylibs.each do |str|
+      next unless str.start_with? "#{HOMEBREW_PREFIX}/opt"
+      missing << str.sub("#{HOMEBREW_PREFIX}/opt/", "").split("/")[0]
+    end
+    unnecessary_deps -= missing
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 
@@ -123,7 +132,7 @@ class LinkageChecker
 
   def display_test_output
     display_items "Missing libraries", @broken_dylibs
-    display_items "Possible unnecessary dependencies", @unnecessary_deps
+    display_items "Dependencies with no linkage", @unnecessary_deps
     puts "No broken dylib links" if @broken_dylibs.empty?
   end
 
