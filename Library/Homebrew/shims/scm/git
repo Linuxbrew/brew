@@ -85,10 +85,10 @@ fi
 
 case "$(lowercase "$SCM_FILE")" in
   git)
-    [[ -n "$HOMEBREW_GIT" ]] && safe_exec "$(which "$HOMEBREW_GIT")" "$@"
+    [[ -n "$HOMEBREW_GIT" ]] && safe_exec "$(type -P "$HOMEBREW_GIT")" "$@"
     ;;
   svn)
-    [[ -n "$HOMEBREW_SVN" ]] && safe_exec "$(which "$HOMEBREW_SVN")" "$@"
+    [[ -n "$HOMEBREW_SVN" ]] && safe_exec "$(type -P "$HOMEBREW_SVN")" "$@"
     ;;
 esac
 
@@ -99,7 +99,7 @@ brew_repo_version="$(quiet_safe_cd "$SCM_DIR/../../../../bin" && pwd -P)/$SCM_FI
 safe_exec "$brew_repo_version" "$@"
 
 IFS=$'\n'
-for path in $(/usr/bin/which -a "$SCM_FILE" 2>/dev/null)
+for path in $(type -aP "$SCM_FILE")
 do
   if [[ "$path" != "/usr/bin/$SCM_FILE" ]]
   then

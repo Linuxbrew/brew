@@ -32,7 +32,7 @@ setup-ruby-path() {
       then
         HOMEBREW_RUBY_PATH="/System/Library/Frameworks/Ruby.framework/Versions/Current/usr/bin/ruby"
       else
-        HOMEBREW_RUBY_PATH="$(which ruby)"
+        HOMEBREW_RUBY_PATH="$(type -P ruby)"
       fi
 
       if [[ -n "$HOMEBREW_RUBY_PATH" && -z "$HOMEBREW_FORCE_VENDOR_RUBY" ]]
