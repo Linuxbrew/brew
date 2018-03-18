@@ -88,8 +88,8 @@ class LinkageChecker
     end
     missing = []
     @broken_dylibs.each do |str|
-      next unless str.start_with? "#{HOMEBREW_PREFIX}/opt"
-      missing << str.sub("#{HOMEBREW_PREFIX}/opt/", "").split("/")[0]
+      next unless str.start_with?("#{HOMEBREW_PREFIX}/opt", HOMEBREW_CELLAR)
+      missing << str.sub("#{HOMEBREW_PREFIX}/opt/", "").sub("#{HOMEBREW_CELLAR}/", "").split("/")[0]
     end
     unnecessary_deps -= missing
     [indirect_deps, undeclared_deps, unnecessary_deps]
