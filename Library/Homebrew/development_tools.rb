@@ -74,7 +74,7 @@ class DevelopmentTools
     def clang_build_version
       @clang_build_version ||= begin
         if (path = locate("clang")) &&
-           build_version = `#{path} --version`[/clang-(\d{2,})/, 1]
+           build_version = `#{path} --version`[%r{clang(-| version [^ ]+ \(tags/RELEASE_)(\d{2,})}, 2]
           Version.new build_version
         else
           Version::NULL

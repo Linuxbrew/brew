@@ -210,7 +210,18 @@ class SystemConfig
       f.puts "Homebrew Ruby: #{describe_homebrew_ruby}"
       f.puts "GCC-4.0: build #{gcc_4_0}" unless gcc_4_0.null?
       f.puts "GCC-4.2: build #{gcc_4_2}" unless gcc_4_2.null?
-      f.puts "Clang: #{clang.null? ? "N/A" : "#{clang} build #{clang_build}"}"
+      f.print "Clang: "
+      if clang.null?
+        f.print "N/A"
+      else
+        f.print "#{clang} build "
+        if clang_build.null?
+          f.print "(parse error)"
+        else
+          f.print clang_build
+        end
+      end
+      f.print "\n"
       f.puts "Git: #{describe_git}"
       f.puts "Curl: #{describe_curl}"
       f.puts "Perl: #{describe_perl}"
