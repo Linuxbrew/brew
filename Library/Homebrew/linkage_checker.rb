@@ -12,13 +12,17 @@ class LinkageChecker
     @formula = formula || resolve_formula(keg)
     @brewed_dylibs = Hash.new { |h, k| h[k] = Set.new }
     @system_dylibs = Set.new
-    @broken_dylibs = Set.new
+    @broken_dylibs = Hash.new { |h, k| h[k] = Set.new }
     @variable_dylibs = Set.new
     @indirect_deps = []
     @undeclared_deps = []
     @reverse_links = Hash.new { |h, k| h[k] = Set.new }
     @unnecessary_deps = []
     check_dylibs
+  end
+
+  def dylib_to_dep(dylib)
+    dylib.sub("#{HOMEBREW_PREFIX}/opt/", "").sub("#{HOMEBREW_CELLAR}/", "").split("/")[0]
   end
 
   def check_dylibs
@@ -41,7 +45,7 @@ class LinkageChecker
             @system_dylibs << dylib
           rescue Errno::ENOENT
             next if harmless_broken_link?(dylib)
-            @broken_dylibs << dylib
+            @broken_dylibs[dylib_to_dep(dylib)] << dylib
           else
             tap = Tab.for_keg(owner).tap
             f = if tap.nil? || tap.core_tap?
@@ -86,12 +90,14 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
-    missing = []
-    @broken_dylibs.each do |str|
+    missing = Set.new
+    @broken_dylibs.each do |key, value|
+    value.each do |str|
       next unless str.start_with?("#{HOMEBREW_PREFIX}/opt", HOMEBREW_CELLAR)
-      missing << str.sub("#{HOMEBREW_PREFIX}/opt/", "").sub("#{HOMEBREW_CELLAR}/", "").split("/")[0]
+      missing << dylib_to_dep(str)
     end
-    unnecessary_deps -= missing
+    end
+    unnecessary_deps -= missing.to_a
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 
