@@ -27,7 +27,7 @@ end
 
 module Utils
   def self.git_available?
-    @git ||= quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
+    @git_available ||= quiet_system HOMEBREW_SHIMS_PATH/"scm/git", "--version"
   end
 
   def self.git_path
@@ -61,7 +61,7 @@ module Utils
   end
 
   def self.clear_git_available_cache
-    @git = nil
+    @git_available = nil
     @git_path = nil
     @git_version = nil
   end

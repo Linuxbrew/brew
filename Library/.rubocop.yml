@@ -26,6 +26,9 @@ Layout/CaseIndentation:
 Layout/EmptyLineBetweenDefs:
   AllowAdjacentOneLineDefs: true
 
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
 Layout/IndentArray:
   EnforcedStyle: special_inside_parentheses
 
@@ -51,9 +54,6 @@ Lint/AmbiguousBlockAssociation:
 # assignment in conditions are useful sometimes
 Lint/AssignmentInCondition:
   Enabled: false
-
-Lint/EndAlignment:
-  EnforcedStyleAlignWith: variable
 
 # so many of these in formulae and can't be autocorrected
 Lint/ParenthesesAsGroupedExpression:
@@ -205,7 +205,10 @@ Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
 
 # makes diffs nicer
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 
 Style/TrailingCommaInArguments:
@@ -214,6 +217,10 @@ Style/TrailingCommaInArguments:
 # we have too many variables like sha256 where this harms readability
 Naming/VariableNumber:
   Enabled: false
+
+# doesn't make sense for Homebrew/brew but does for taps
+Naming/UncommunicativeMethodParamName:
+  Enabled: true
 
 Style/WordArray:
   MinSize: 4

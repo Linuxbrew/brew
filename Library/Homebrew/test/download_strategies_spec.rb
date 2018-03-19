@@ -116,7 +116,7 @@ describe GitHubPrivateRepositoryReleaseDownloadStrategy do
   describe "#fetch_release_metadata" do
     it "fetches release metadata from GitHub" do
       expected_release_url = "https://api.github.com/repos/owner/repo/releases/tags/tag"
-      expect(GitHub).to receive(:open).with(expected_release_url).and_return({})
+      expect(GitHub).to receive(:open_api).with(expected_release_url).and_return({})
       subject.send(:fetch_release_metadata)
     end
   end

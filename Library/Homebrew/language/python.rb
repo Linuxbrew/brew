@@ -139,9 +139,10 @@ module Language
       def virtualenv_install_with_resources(options = {})
         python = options[:using]
         if python.nil?
-          wanted = %w[python python@2 python2 python3].select { |py| needs_python?(py) }
+          wanted = %w[python python@2 python2 python3 python@3].select { |py| needs_python?(py) }
           raise FormulaAmbiguousPythonError, self if wanted.size > 1
-          python = wanted.first || "python"
+          python = wanted.first || "python2.7"
+          python = "python3" if python == "python"
         end
         venv = virtualenv_create(libexec, python.delete("@"))
         venv.pip_install resources
@@ -188,7 +189,7 @@ module Language
           @venv_root.find do |f|
             next unless f.symlink?
             next unless (rp = f.realpath.to_s).start_with? HOMEBREW_CELLAR
-            python = rp.include?("python2") ? "python2" : "python"
+            python = rp.include?("python@2") ? "python@2" : "python"
             new_target = rp.sub %r{#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
             f.unlink
             f.make_symlink new_target
@@ -196,7 +197,7 @@ module Language
 
           Pathname.glob(@venv_root/"lib/python*/orig-prefix.txt").each do |prefix_file|
             prefix_path = prefix_file.read
-            python = prefix_path.include?("python2") ? "python2" : "python"
+            python = prefix_path.include?("python@2") ? "python@2" : "python"
             prefix_path.sub! %r{^#{HOMEBREW_CELLAR}/#{python}/[^/]+}, Formula[python].opt_prefix
             prefix_file.atomic_write prefix_path
           end
