@@ -124,8 +124,6 @@ module OS
         # X11 doesn't include libpng on Tiger
         elsif Pathname.new("/usr/X11R6/lib/libX11.dylib").exist?
           Pathname.new("/usr/X11R6")
-        elsif OS.linux?
-          HOMEBREW_PREFIX
         end
       end
 

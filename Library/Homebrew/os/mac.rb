@@ -17,7 +17,6 @@ module OS
     # This can be compared to numerics, strings, or symbols
     # using the standard Ruby Comparable methods.
     def version
-      return @version ||= Version.new("0") unless OS.mac?
       @version ||= Version.new(full_version.to_s[/10\.\d+/])
     end
 
@@ -68,7 +67,6 @@ module OS
     end
 
     def active_developer_dir
-      return "" unless OS.mac?
       @active_developer_dir ||= Utils.popen_read("/usr/bin/xcode-select", "-print-path").strip
     end
 
@@ -89,7 +87,6 @@ module OS
     #      specifically been requested according to the rules above.
 
     def sdk(v = nil)
-      return nil unless OS.mac?
       @locator ||= SDKLocator.new
       begin
         sdk = if v.nil?
@@ -144,9 +141,7 @@ module OS
     end
 
     def prefer_64_bit?
-      if OS.linux?
-        Hardware::CPU.is_64_bit?
-      elsif ENV["HOMEBREW_PREFER_64_BIT"] && version == :leopard
+      if ENV["HOMEBREW_PREFER_64_BIT"] && version == :leopard
         Hardware::CPU.is_64_bit?
       else
         Hardware::CPU.is_64_bit? && version > :leopard
@@ -219,7 +214,6 @@ module OS
     }.freeze
 
     def compilers_standard?
-      return true unless OS.mac?
       STANDARD_COMPILERS.fetch(Xcode.version.to_s).all? do |method, build|
         send(:"#{method}_version") == build
       end
@@ -244,14 +238,12 @@ module OS
     end
 
     def mdfind(*ids)
-      return [] unless OS.mac?
       (@mdfind ||= {}).fetch(ids) do
         @mdfind[ids] = Utils.popen_read("/usr/bin/mdfind", mdfind_query(*ids)).split("\n")
       end
     end
 
     def pkgutil_info(id)
-      return "" unless OS.mac?
       (@pkginfo ||= {}).fetch(id) do |key|
         @pkginfo[key] = Utils.popen_read("/usr/sbin/pkgutil", "--pkg-info", key).strip
       end

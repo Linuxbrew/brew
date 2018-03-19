@@ -149,9 +149,7 @@ module OS
         # installed CLT version. This is useful as they are packaged
         # simultaneously so workarounds need to apply to both based on their
         # comparable version.
-        clang_version = DevelopmentTools.clang_version
-        return nil if clang_version.null?
-        case (clang_version.to_f * 10).to_i
+        case (DevelopmentTools.clang_version.to_f * 10).to_i
         when 0       then "dunno"
         when 1..14   then "3.2.2"
         when 15      then "3.2.4"
@@ -201,7 +199,6 @@ module OS
       # Returns true even if outdated tools are installed, e.g.
       # tools from Xcode 4.x on 10.9
       def installed?
-        return true unless OS.mac?
         !version.null?
       end
 
