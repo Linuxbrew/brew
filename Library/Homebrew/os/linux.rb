@@ -20,6 +20,8 @@ module OS
     end
 
     module CLT
+      module_function
+
       def installed?
         true
       end
