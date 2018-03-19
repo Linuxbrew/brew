@@ -163,13 +163,9 @@ class Dependency
     end
 
     def merge_temporality(deps)
-      if deps.all?(&:build?)
-        [:build]
-      elsif deps.all?(&:run?)
-        [:run]
-      else
-        [] # Means both build and runtime dependency.
-      end
+      # Means both build and runtime dependency.
+      return [] unless deps.all?(&:build?)
+      [:build]
     end
   end
 end

@@ -172,23 +172,6 @@ class FormulaAuditor
 
   attr_reader :formula, :text, :problems
 
-  BUILD_TIME_DEPS = %w[
-    autoconf
-    automake
-    boost-build
-    bsdmake
-    cmake
-    godep
-    imake
-    intltool
-    libtool
-    pkg-config
-    scons
-    smake
-    sphinx-doc
-    swig
-  ].freeze
-
   def initialize(formula, options = {})
     @formula = formula
     @new_formula = options[:new_formula]
@@ -377,17 +360,12 @@ class FormulaAuditor
           problem "Dependency #{dep} does not define option #{opt.name.inspect}"
         end
 
-        case dep.name
-        when "git"
+        if dep.name == "git"
           problem "Don't use git as a dependency (it's always available)"
-        when *BUILD_TIME_DEPS
-          next if dep.build? || dep.run?
-          problem <<~EOS
-            #{dep} dependency should be
-              depends_on "#{dep}" => :build
-            Or if it is indeed a runtime dependency
-              depends_on "#{dep}" => :run
-          EOS
+        end
+
+        if dep.tags.include?(:run)
+          problem "Dependency '#{dep.name}' is marked as :run. Remove :run; it is a no-op."
         end
       end
     end
