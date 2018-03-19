@@ -28,14 +28,9 @@ module SharedEnvExtension
     LIBRARY_PATH LD_LIBRARY_PATH LD_PRELOAD LD_RUN_PATH
   ].freeze
 
-  def inherit?
-    ARGV.env == "inherit"
-  end
-
   # @private
   def setup_build_environment(formula = nil)
     @formula = formula
-    reset unless inherit?
   end
 
   # @private
@@ -172,7 +167,7 @@ module SharedEnvExtension
       end
 
       compiler
-    elsif @formula && !inherit?
+    elsif @formula
       CompilerSelector.select_for(@formula)
     else
       DevelopmentTools.default_compiler
