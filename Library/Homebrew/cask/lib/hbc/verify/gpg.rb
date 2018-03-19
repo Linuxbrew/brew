@@ -49,7 +49,7 @@ module Hbc
       end
 
       def verify
-        return unless available?
+        return unless available? && cask.gpg.signature != :embedded
         import_key
         sig = fetch_sig
 
