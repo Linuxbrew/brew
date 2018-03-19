@@ -19,6 +19,12 @@ module OS
       Version::NULL
     end
 
+    module CLT
+      def installed?
+        true
+      end
+    end
+
     module Xcode
       module_function
 
