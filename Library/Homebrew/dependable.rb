@@ -1,7 +1,7 @@
 require "options"
 
 module Dependable
-  RESERVED_TAGS = [:build, :optional, :recommended, :run, :linked].freeze
+  RESERVED_TAGS = [:build, :optional, :recommended, :run, :test, :linked].freeze
 
   def build?
     tags.include? :build
@@ -19,8 +19,12 @@ module Dependable
     tags.include? :run
   end
 
+  def test?
+    tags.include? :test
+  end
+
   def required?
-    !build? && !optional? && !recommended?
+    !build? && !test? && !optional? && !recommended?
   end
 
   def option_tags

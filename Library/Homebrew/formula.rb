@@ -2201,12 +2201,12 @@ class Formula
     # # `build.with?` or `build.without? "another_formula"`:
     # depends_on "postgresql" if build.without? "sqlite"
     #
-    # <pre># Python 2.7:
-    # depends_on "python"</pre>
-    # <pre># Python 2.7 but use system Python where possible
-    # depends_on "python" if MacOS.version <= :snow_leopard</pre>
-    # <pre># Python 3.x if the `--with-python3` is given to `brew install example`
+    # <pre># Python 3.x if the `--with-python` is given to `brew install example`
     # depends_on "python3" => :optional</pre>
+    # <pre># Python 2.7:
+    # depends_on "python@2"</pre>
+    # <pre># Python 2.7 but use system Python where possible
+    # depends_on "python@2" if MacOS.version <= :snow_leopard</pre>
     def depends_on(dep)
       specs.each { |spec| spec.depends_on(dep) }
     end

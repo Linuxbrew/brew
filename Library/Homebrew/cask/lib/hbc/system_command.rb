@@ -85,7 +85,7 @@ module Hbc
       executable, *args = expanded_command
 
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
-        Open3.popen3({ "PATH" => path }, executable, *args, **options)
+        Open3.popen3({ "PATH" => path }, [executable, executable], *args, **options)
 
       write_input_to(raw_stdin)
       raw_stdin.close_write

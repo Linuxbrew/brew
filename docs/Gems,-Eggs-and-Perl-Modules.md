@@ -11,8 +11,8 @@ Starting with OS X Lion (10.7), you need `sudo` to install to these like
 so: `sudo gem install`, `sudo easy_install` or `sudo cpan -i`.
 
 An option to avoid sudo is to use an access control list:
-`chmod +a 'user:YOUR_NAME_HERE allow add_subdirectory,add_file,delete_child,directory_inherit' /Library/Python/2.7/site-packages`,
-for example, will let you add packages to Python 2.7 as yourself. That
+`chmod +a 'user:YOUR_NAME_HERE allow add_subdirectory,add_file,delete_child,directory_inherit' /Library/Python/3.6/site-packages`,
+for example, will let you add packages to Python 3.6 as yourself. That
 is probably safer than changing the group ownership of the directory.
 
 ### So why was I using sudo?
@@ -29,14 +29,14 @@ Rather than changing the rights on `/Library/Python`, we recommend the
 following options:
 
 ### With a brewed Python
-Note, `easy_install` is deprecated. We install `pip` (or `pip3` for
-Python 3) along with python/python3.
+Note, `easy_install` is deprecated. We install `pip` (or `pip2` for
+Python 2) along with python/python2.
 
 We set up distutils such that `pip install` will always put modules in
 `$(brew --prefix)/lib/pythonX.Y/site-packages` and scripts in
 `$(brew --prefix)/share/python`. Therefore, you won’t need sudo!
 
-Do `brew info python` or `brew info python3` for precise information
+Do `brew info python` or `brew info python@2` for precise information
 about the paths. Note, a brewed Python still searches for modules in
 `/Library/Python/X.Y/site-packages` and also in
 `~/Library/Python/X.Y/lib/python/site-packages`.
