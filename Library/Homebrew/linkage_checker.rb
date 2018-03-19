@@ -91,11 +91,10 @@ class LinkageChecker
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
     missing = Set.new
-    @broken_dylibs.each do |key, value|
-    value.each do |str|
-      next unless str.start_with?("#{HOMEBREW_PREFIX}/opt", HOMEBREW_CELLAR)
-      missing << dylib_to_dep(str)
-    end
+    @broken_dylibs.each_value do |value|
+      value.each do |str|
+        missing << dylib_to_dep(str) if str.start_with?("#{HOMEBREW_PREFIX}/opt", HOMEBREW_CELLAR)
+      end
     end
     unnecessary_deps -= missing.to_a
     [indirect_deps, undeclared_deps, unnecessary_deps]
