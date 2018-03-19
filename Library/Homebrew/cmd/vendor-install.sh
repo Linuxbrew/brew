@@ -114,10 +114,10 @@ EOS
   if [[ -x "/usr/bin/shasum" ]]
   then
     sha="$(/usr/bin/shasum -a 256 "$CACHED_LOCATION" | cut -d' ' -f1)"
-  elif [[ -x "$(which sha256sum)" ]]
+  elif [[ -x "$(type -P sha256sum)" ]]
   then
     sha="$(sha256sum "$CACHED_LOCATION" | cut -d' ' -f1)"
-  elif [[ -x "$(which ruby)" ]]
+  elif [[ -x "$(type -P ruby)" ]]
   then
     sha="$(ruby <<EOSCRIPT
             require 'digest/sha2'

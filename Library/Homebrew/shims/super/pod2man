@@ -1,8 +1,8 @@
 #!/bin/bash
 
-POD2MAN="$(/usr/bin/which pod2man5.18 ||
-           /usr/bin/which pod2man5.16 ||
-           /usr/bin/which pod2man5.12 ||
-           /usr/bin/which "$HOMEBREW_PREFIX/opt/pod2man/bin/pod2man" ||
+POD2MAN="$(type -P pod2man5.18 ||
+           type -P pod2man5.16 ||
+           type -P pod2man5.12 ||
+           type -P "$HOMEBREW_PREFIX/opt/pod2man/bin/pod2man" ||
            echo /usr/bin/pod2man)"
 exec "$POD2MAN" "$@"
