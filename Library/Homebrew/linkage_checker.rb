@@ -22,11 +22,8 @@ class LinkageChecker
   end
 
   def dylib_to_dep(dylib)
-    if dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
-      Regexp.last_match(2)
-    else
-      "Not a Homebrew library"
-    end
+    dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
+    Regexp.last_match(2)
   end
 
   def check_dylibs
@@ -170,7 +167,7 @@ class LinkageChecker
     return if things.empty?
     puts "#{label}:"
     if things.is_a? Hash
-      things.sort.each do |list_label, list|
+      things.sort_by { |k, _| k.to_s }.each do |list_label, list|
         list.sort.each do |item|
           puts "  #{item} (#{list_label})"
         end
