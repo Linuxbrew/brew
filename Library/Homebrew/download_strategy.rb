@@ -473,7 +473,8 @@ end
 # distribution.  (It will work for public buckets as well.)
 class S3DownloadStrategy < CurlDownloadStrategy
   def _fetch
-    if @url !~ %r{^https?://([^.].*)\.s3\.amazonaws\.com/(.+)$}
+    if @url !~ %r{^https?://([^.].*)\.s3\.amazonaws\.com/(.+)$} &&
+       @url !~ %r{^s3://([^.].*?)/(.+)$}
       raise "Bad S3 URL: " + @url
     end
     bucket = Regexp.last_match(1)
@@ -1141,6 +1142,9 @@ class DownloadStrategyDetector
       SubversionDownloadStrategy
     when %r{^https?://(.+?\.)?sourceforge\.net/hgweb/}
       MercurialDownloadStrategy
+    when %r{^s3://}
+      require_aws_sdk
+      S3DownloadStrategy
     else
       CurlDownloadStrategy
     end
