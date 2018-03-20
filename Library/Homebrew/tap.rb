@@ -566,7 +566,11 @@ end
 # A specialized {Tap} class for the core formulae
 class CoreTap < Tap
   def default_remote
-    "https://github.com/Homebrew/homebrew-core".freeze
+    if OS.mac? || ENV["HOMEBREW_FORCE_HOMEBREW_ORG"]
+      "https://github.com/Homebrew/homebrew-core".freeze
+    else
+      "https://github.com/Linuxbrew/homebrew-core".freeze
+    end
   end
 
   # @private
