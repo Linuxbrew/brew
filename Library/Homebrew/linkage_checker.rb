@@ -22,7 +22,11 @@ class LinkageChecker
   end
 
   def dylib_to_dep(dylib)
-    dylib.sub("#{HOMEBREW_PREFIX}/opt/", "").sub("#{HOMEBREW_CELLAR}/", "").split("/")[0]
+    if dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
+      Regexp.last_match(2)
+    else
+      "Not a Homebrew library"
+    end
   end
 
   def check_dylibs
@@ -90,13 +94,7 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
-    missing = Set.new
-    @broken_dylibs.each_value do |value|
-      value.each do |str|
-        missing << dylib_to_dep(str) if str.start_with?("#{HOMEBREW_PREFIX}/opt", HOMEBREW_CELLAR)
-      end
-    end
-    unnecessary_deps -= missing.to_a
+    unnecessary_deps -= @broken_dylibs.map { |_, v| v.map { |d| dylib_to_dep(d) } }.flatten
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 
