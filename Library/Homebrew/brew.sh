@@ -32,7 +32,7 @@ onoe() {
   fi
   if [[ $# -eq 0 ]]
   then
-    /bin/cat >&2
+    cat >&2
   else
     echo "$*" >&2
   fi

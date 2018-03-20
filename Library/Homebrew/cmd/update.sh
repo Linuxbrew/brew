@@ -23,15 +23,8 @@ git() {
 }
 
 git_init_if_necessary() {
-  if [[ -n "$HOMEBREW_MACOS" ]] || [[ -n "$HOMEBREW_FORCE_HOMEBREW_ORG" ]]
-  then
-    BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
-    CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
-  elif [[ -n "$HOMEBREW_LINUX" ]]
-  then
-    BREW_OFFICIAL_REMOTE="https://github.com/Linuxbrew/brew"
-    CORE_OFFICIAL_REMOTE="https://github.com/Linuxbrew/homebrew-core"
-  fi
+  BREW_OFFICIAL_REMOTE="https://github.com/Homebrew/brew"
+  CORE_OFFICIAL_REMOTE="https://github.com/Homebrew/homebrew-core"
 
   safe_cd "$HOMEBREW_REPOSITORY"
   if [[ ! -d ".git" ]]

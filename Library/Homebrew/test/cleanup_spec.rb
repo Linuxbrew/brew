@@ -5,23 +5,27 @@ require "pathname"
 
 describe Homebrew::Cleanup do
   let(:ds_store) { Pathname.new("#{HOMEBREW_PREFIX}/Library/.DS_Store") }
+  let(:lock_file) { Pathname.new("#{HOMEBREW_LOCK_DIR}/foo") }
   let(:sec_in_a_day) { 60 * 60 * 24 }
 
   around(:each) do |example|
     begin
       FileUtils.touch ds_store
+      FileUtils.touch lock_file
 
       example.run
     ensure
       FileUtils.rm_f ds_store
+      FileUtils.rm_f lock_file
     end
   end
 
   describe "::cleanup" do
-    it "removes .DS_Store files" do
+    it "removes .DS_Store and lock files" do
       described_class.cleanup
 
       expect(ds_store).not_to exist
+      expect(lock_file).not_to exist
     end
 
     it "doesn't remove anything if `--dry-run` is specified" do
@@ -30,6 +34,15 @@ describe Homebrew::Cleanup do
       described_class.cleanup
 
       expect(ds_store).to exist
+      expect(lock_file).to exist
+    end
+
+    it "doesn't remove the lock file if it is locked" do
+      lock_file.open(File::RDWR | File::CREAT).flock(File::LOCK_EX | File::LOCK_NB)
+
+      described_class.cleanup
+
+      expect(lock_file).to exist
     end
 
     context "when it can't remove a keg" do

@@ -171,7 +171,7 @@ module RuboCop
         when :required
           type_match = required_dependency?(node)
           name_match ||= required_dependency_name?(node, name) if type_match
-        when :build, :optional, :recommended, :run
+        when :build, :test, :optional, :recommended
           type_match = dependency_type_hash_match?(node, type)
           name_match ||= dependency_name_hash_match?(node, name) if type_match
         when :any

@@ -15,6 +15,7 @@ module HomebrewArgvExtension
       --no-sandbox
       --build-bottle
       --force-bottle
+      --include-test
       --verbose
       --force
       -i

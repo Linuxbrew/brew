@@ -74,14 +74,13 @@ module Homebrew
   end
 
   def command_help(path)
-    help_lines = path.read.lines.grep(/^#:/)
+    help_lines = command_help_lines(path)
     if help_lines.empty?
       opoo "No help text in: #{path}" if ARGV.homebrew_developer?
       HOMEBREW_HELP
     else
       help_lines.map do |line|
-        line.slice(2..-1)
-            .sub(/^  \* /, "#{Tty.bold}brew#{Tty.reset} ")
+        line.sub(/^  \* /, "#{Tty.bold}brew#{Tty.reset} ")
             .gsub(/`(.*?)`/, "#{Tty.bold}\\1#{Tty.reset}")
             .gsub(%r{<([^\s]+?://[^\s]+?)>}) { |url| Formatter.url(url) }
             .gsub(/<(.*?)>/, "#{Tty.underline}\\1#{Tty.reset}")

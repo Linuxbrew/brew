@@ -33,7 +33,6 @@ class DependencyCollector
         output_deprecation(spec)
         Dependency.new(spec.to_s, tags)
       when :libltdl
-        tags << :run
         output_deprecation("libtool")
         Dependency.new("libtool", tags)
       when :apr
@@ -68,7 +67,7 @@ class DependencyCollector
     private
 
     def autotools_dep(spec, tags)
-      tags << :build unless tags.include? :run
+      tags << :build
       Dependency.new(spec.to_s, tags)
     end
 

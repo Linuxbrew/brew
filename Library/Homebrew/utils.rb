@@ -109,7 +109,7 @@ def odeprecated(method, replacement = nil, disable: false, disable_on: nil, call
 
   if ARGV.homebrew_developer? || disable ||
      Homebrew.raise_deprecation_exceptions?
-    if replacement || tap
+    if replacement || tap_message
       developer_message = message + "Or, even better, submit a PR to fix it!"
     end
     raise MethodDeprecatedError, developer_message
@@ -571,4 +571,8 @@ def tap_and_name_comparison
       a <=> b
     end
   end
+end
+
+def command_help_lines(path)
+  path.read.lines.grep(/^#:/).map { |line| line.slice(2..-1) }
 end

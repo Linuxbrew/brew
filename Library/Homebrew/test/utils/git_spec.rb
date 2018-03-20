@@ -121,10 +121,10 @@ describe Utils do
     end
   end
 
-  describe "::git_remote_exists" do
+  describe "::git_remote_exists?" do
     it "returns true when git is not available" do
       stub_const("HOMEBREW_SHIMS_PATH", HOMEBREW_PREFIX/"bin/shim")
-      expect(described_class.git_remote_exists("blah")).to be_truthy
+      expect(described_class.git_remote_exists?("blah")).to be_truthy
     end
 
     context "when git is available" do
@@ -139,11 +139,11 @@ describe Utils do
           system git, "remote", "add", "origin", url
         end
 
-        expect(described_class.git_remote_exists(url)).to be_truthy
+        expect(described_class.git_remote_exists?(url)).to be_truthy
       end
 
       it "returns false when git remote does not exist" do
-        expect(described_class.git_remote_exists("blah")).to be_falsey
+        expect(described_class.git_remote_exists?("blah")).to be_falsey
       end
     end
   end

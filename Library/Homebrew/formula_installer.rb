@@ -35,7 +35,7 @@ class FormulaInstaller
   attr_accessor :options, :build_bottle, :invalid_option_names
   attr_accessor :installed_as_dependency, :installed_on_request, :link_keg
   mode_attr_accessor :show_summary_heading, :show_header
-  mode_attr_accessor :build_from_source, :force_bottle
+  mode_attr_accessor :build_from_source, :force_bottle, :include_test
   mode_attr_accessor :ignore_deps, :only_deps, :interactive, :git
   mode_attr_accessor :verbose, :debug, :quieter
 
@@ -48,6 +48,7 @@ class FormulaInstaller
     @build_from_source = ARGV.build_from_source? || ARGV.build_all_from_source?
     @build_bottle = false
     @force_bottle = ARGV.force_bottle?
+    @include_test = ARGV.include?("--include-test")
     @interactive = false
     @git = false
     @verbose = ARGV.verbose?
@@ -225,17 +226,19 @@ class FormulaInstaller
       message = <<~EOS
         #{formula.name} #{formula.linked_version} is already installed
       EOS
-      message += if formula.outdated? && !formula.head?
-        <<~EOS
+      if formula.outdated? && !formula.head?
+        message += <<~EOS
           To upgrade to #{formula.pkg_version}, run `brew upgrade #{formula.name}`
         EOS
+      elsif only_deps?
+        message = nil
       else
         # some other version is already installed *and* linked
-        <<~EOS
+        message += <<~EOS
           To install #{formula.pkg_version}, first run `brew unlink #{formula.name}`
         EOS
       end
-      raise CannotInstallFormulaError, message
+      raise CannotInstallFormulaError, message if message
     end
 
     # Warn if a more recent version of this formula is available in the tap.
@@ -441,6 +444,8 @@ class FormulaInstaller
           Requirement.prune
         elsif req.satisfied?
           Requirement.prune
+        elsif include_test? && req.test?
+          next
         elsif !runtime_requirements.include?(req) && install_bottle_for_dependent
           Requirement.prune
         else
@@ -501,6 +506,8 @@ class FormulaInstaller
 
       if (dep.optional? || dep.recommended?) && build.without?(dep)
         Dependency.prune
+      elsif include_test? && dep.test? && !dep.installed?
+        Dependency.keep_but_prune_recursive_deps
       elsif dep.build? && install_bottle_for?(dependent, build)
         Dependency.prune
       elsif dep.build? && dependent.installed?
