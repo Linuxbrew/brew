@@ -6,8 +6,8 @@ def curl_executable
     ENV["HOMEBREW_CURL"],
     which("curl"),
     "/usr/bin/curl",
-  ].map { |c| Pathname(c) }.find(&:executable?)
-  raise "curl is not executable" unless @curl
+  ].compact.map { |c| Pathname(c) }.find(&:executable?)
+  raise "no executable curl was found" unless @curl
   @curl
 end
 

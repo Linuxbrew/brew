@@ -93,6 +93,66 @@ describe "download strategies", :cask do
         expect(curl_args.each_cons(2)).to include(["-e", "http://somehost/also"])
       end
     end
+
+    context "with a file name trailing the URL path" do
+      describe "#tarball_path" do
+        subject { downloader.tarball_path }
+        its(:extname) { is_expected.to eq(".dmg") }
+      end
+    end
+
+    context "with no discernible file name in it" do
+      let(:url) { "http://example.com/download" }
+
+      describe "#tarball_path" do
+        subject { downloader.tarball_path }
+        its(:to_path) { is_expected.to end_with("some-cask--1.2.3.4") }
+      end
+    end
+
+    context "with a file name trailing the first query parameter" do
+      let(:url) { "http://example.com/download?file=cask.zip&a=1" }
+
+      describe "#tarball_path" do
+        subject { downloader.tarball_path }
+        its(:extname) { is_expected.to eq(".zip") }
+      end
+    end
+
+    context "with a file name trailing the second query parameter" do
+      let(:url) { "http://example.com/dl?a=1&file=cask.zip&b=2" }
+
+      describe "#tarball_path" do
+        subject { downloader.tarball_path }
+        its(:extname) { is_expected.to eq(".zip") }
+      end
+    end
+
+    context "with an unusually long query string" do
+      let(:url) do
+        [
+          "https://node49152.ssl.fancycdn.example.com",
+          "/fancycdn/node/49152/file/upload/download",
+          "?cask_class=zf920df",
+          "&cask_group=2348779087242312",
+          "&cask_archive_file_name=cask.zip",
+          "&signature=CGmDulxL8pmutKTlCleNTUY%2FyO9Xyl5u9yVZUE0",
+          "uWrjadjuz67Jp7zx3H7NEOhSyOhu8nzicEHRBjr3uSoOJzwkLC8L",
+          "BLKnz%2B2X%2Biq5m6IdwSVFcLp2Q1Hr2kR7ETn3rF1DIq5o0lHC",
+          "yzMmyNe5giEKJNW8WF0KXriULhzLTWLSA3ZTLCIofAdRiiGje1kN",
+          "YY3C0SBqymQB8CG3ONn5kj7CIGbxrDOq5xI2ZSJdIyPysSX7SLvE",
+          "DBw2KdR24q9t1wfjS9LUzelf5TWk6ojj8p9%2FHjl%2Fi%2FVCXN",
+          "N4o1mW%2FMayy2tTY1qcC%2FTmqI1ulZS8SNuaSgr9Iys9oDF1%2",
+          "BPK%2B4Sg==",
+        ].join("")
+      end
+
+      describe "#tarball_path" do
+        subject { downloader.tarball_path }
+        its(:extname) { is_expected.to eq(".zip") }
+        its("to_path.length") { is_expected.to be_between(0, 255) }
+      end
+    end
   end
 
   describe Hbc::CurlPostDownloadStrategy do
