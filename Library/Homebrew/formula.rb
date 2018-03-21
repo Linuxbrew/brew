@@ -1517,6 +1517,8 @@ class Formula
 
   # @private
   def to_hash
+    dependencies = deps
+
     hsh = {
       "name" => name,
       "full_name" => full_name,
@@ -1526,21 +1528,21 @@ class Formula
       "aliases" => aliases,
       "versions" => {
         "stable" => stable&.version&.to_s,
-        "bottle" => bottle ? true : false,
+        "bottle" => !bottle.nil?,
         "devel" => devel&.version&.to_s,
         "head" => head&.version&.to_s,
       },
       "revision" => revision,
       "version_scheme" => version_scheme,
       "installed" => [],
-      "linked_keg" => (linked_version.to_s if linked_keg.exist?),
+      "linked_keg" => linked_version&.to_s,
       "pinned" => pinned?,
       "outdated" => outdated?,
       "keg_only" => keg_only?,
-      "dependencies" => deps.map(&:name).uniq,
-      "recommended_dependencies" => deps.select(&:recommended?).map(&:name).uniq,
-      "optional_dependencies" => deps.select(&:optional?).map(&:name).uniq,
-      "build_dependencies" => deps.select(&:build?).map(&:name).uniq,
+      "dependencies" => dependencies.map(&:name).uniq,
+      "recommended_dependencies" => dependencies.select(&:recommended?).map(&:name).uniq,
+      "optional_dependencies" => dependencies.select(&:optional?).map(&:name).uniq,
+      "build_dependencies" => dependencies.select(&:build?).map(&:name).uniq,
       "conflicts_with" => conflicts.map(&:name),
       "caveats" => caveats,
     }
@@ -1569,7 +1571,7 @@ class Formula
         "root_url" => bottle_spec.root_url,
       }
       bottle_info["files"] = {}
-      bottle_spec.collector.keys.each do |os| # rubocop:disable Performance/HashEachMethods
+      bottle_spec.collector.keys.each do |os|
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
           "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",
