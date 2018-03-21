@@ -91,7 +91,12 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
-    unnecessary_deps -= @broken_dylibs.map { |_, v| v.map { |d| dylib_to_dep(d) } }.flatten
+    missing_deps = @broken_dylibs.values.map do |v|
+      v.map do |d|
+        dylib_to_dep(d)
+      end
+    end.flatten.compact
+    unnecessary_deps -= missing_deps
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 
@@ -167,7 +172,7 @@ class LinkageChecker
     return if things.empty?
     puts "#{label}:"
     if things.is_a? Hash
-      things.sort_by { |k, _| k.to_s }.each do |list_label, list|
+      things.sort_by { |k, | k.to_s }.each do |list_label, list|
         list.sort.each do |item|
           puts "  #{item} (#{list_label})"
         end
