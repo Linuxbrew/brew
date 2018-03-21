@@ -182,10 +182,12 @@ module Superenv
     ]
 
     if compiler == :llvm_clang
-      if MacOS::CLT.installed?
-        paths << "/usr/lib"
-      else
-        paths << "#{MacOS.sdk_path}/usr/lib"
+      if OS.mac?
+        if MacOS::CLT.installed?
+          paths << "/usr/lib"
+        else
+          paths << "#{MacOS.sdk_path}/usr/lib"
+        end
       end
       paths << Formula["llvm"].opt_lib.to_s
     end
