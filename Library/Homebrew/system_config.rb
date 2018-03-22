@@ -212,16 +212,15 @@ class SystemConfig
       f.puts "GCC-4.2: build #{gcc_4_2}" unless gcc_4_2.null?
       f.print "Clang: "
       if clang.null?
-        f.print "N/A"
+        f.puts "N/A"
       else
         f.print "#{clang} build "
         if clang_build.null?
-          f.print "(parse error)"
+          f.puts "(parse error)"
         else
-          f.print clang_build
+          f.puts clang_build
         end
       end
-      f.print "\n"
       f.puts "Git: #{describe_git}"
       f.puts "Curl: #{describe_curl}"
       f.puts "Perl: #{describe_perl}"
