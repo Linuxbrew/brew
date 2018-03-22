@@ -199,7 +199,7 @@ module Homebrew
     _system(cmd, *args)
   end
 
-  def install_gem_setup_path!(name, version = nil, executable = name)
+  def install_gem!(name, version = nil)
     # Match where our bundler gems are.
     ENV["GEM_HOME"] = "#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/vendor/bundle/ruby/#{RbConfig::CONFIG["ruby_version"]}"
     ENV["GEM_PATH"] = ENV["GEM_HOME"]
@@ -214,24 +214,28 @@ module Homebrew
     path.prepend(Gem.bindir)
     ENV["PATH"] = path
 
-    if Gem::Specification.find_all_by_name(name, version).empty?
-      ohai "Installing or updating '#{name}' gem"
-      install_args = %W[--no-ri --no-rdoc #{name}]
-      install_args << "--version" << version if version
+    return unless Gem::Specification.find_all_by_name(name, version).empty?
 
-      # Do `gem install [...]` without having to spawn a separate process or
-      # having to find the right `gem` binary for the running Ruby interpreter.
-      require "rubygems/commands/install_command"
-      install_cmd = Gem::Commands::InstallCommand.new
-      install_cmd.handle_options(install_args)
-      exit_code = 1 # Should not matter as `install_cmd.execute` always throws.
-      begin
-        install_cmd.execute
-      rescue Gem::SystemExitException => e
-        exit_code = e.exit_code
-      end
-      odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
+    ohai "Installing or updating '#{name}' gem"
+    install_args = %W[--no-ri --no-rdoc #{name}]
+    install_args << "--version" << version if version
+
+    # Do `gem install [...]` without having to spawn a separate process or
+    # having to find the right `gem` binary for the running Ruby interpreter.
+    require "rubygems/commands/install_command"
+    install_cmd = Gem::Commands::InstallCommand.new
+    install_cmd.handle_options(install_args)
+    exit_code = 1 # Should not matter as `install_cmd.execute` always throws.
+    begin
+      install_cmd.execute
+    rescue Gem::SystemExitException => e
+      exit_code = e.exit_code
     end
+    odie "Failed to install/update the '#{name}' gem." if exit_code.nonzero?
+  end
+
+  def install_gem_setup_path!(name, version = nil, executable = name)
+    install_gem!(name, version)
 
     return if which(executable)
     odie <<~EOS
