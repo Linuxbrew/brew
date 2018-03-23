@@ -200,6 +200,26 @@ describe GitDownloadStrategy do
   end
 end
 
+describe S3DownloadStrategy do
+  subject { described_class.new(name, resource) }
+  let(:name) { "foo" }
+  let(:url) { "http://bucket.s3.amazonaws.com/foo.tar.gz" }
+  let(:resource) { double(Resource, url: url, mirrors: [], specs: {}, version: nil) }
+
+  describe "#_fetch" do
+    subject { described_class.new(name, resource)._fetch }
+
+    context "when given Bad S3 URL" do
+      let(:url) { "http://example.com/foo.tar.gz" }
+      it "should raise Bad S3 URL error" do
+        expect {
+          subject._fetch
+        }.to raise_error(RuntimeError)
+      end
+    end
+  end
+end
+
 describe CurlDownloadStrategy do
   subject { described_class.new(name, resource) }
   let(:name) { "foo" }
@@ -226,8 +246,9 @@ end
 
 describe DownloadStrategyDetector do
   describe "::detect" do
-    subject { described_class.detect(url) }
+    subject { described_class.detect(url, strategy) }
     let(:url) { Object.new }
+    let(:strategy) { nil }
 
     context "when given Git URL" do
       let(:url) { "git://example.com/foo.git" }
@@ -237,6 +258,15 @@ describe DownloadStrategyDetector do
     context "when given a GitHub Git URL" do
       let(:url) { "https://github.com/homebrew/brew.git" }
       it { is_expected.to eq(GitHubGitDownloadStrategy) }
+    end
+
+    context "when given strategy = S3DownloadStrategy" do
+      let(:url) { "https://bkt.s3.amazonaws.com/key.tar.gz" }
+      let(:strategy) { S3DownloadStrategy }
+      it "requires aws-sdk-s3" do
+        allow(DownloadStrategyDetector).to receive(:require_aws_sdk).and_return(true)
+        is_expected.to eq(S3DownloadStrategy)
+      end
     end
 
     it "defaults to cURL" do
