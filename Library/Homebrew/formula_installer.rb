@@ -439,7 +439,7 @@ class FormulaInstaller
         build = effective_build_options_for(dependent)
         install_bottle_for_dependent = install_bottle_for?(dependent, build)
 
-        if (req.optional? || req.recommended?) && build.without?(req)
+        if req.prune_from_option?(build)
           Requirement.prune
         elsif req.satisfied?
           Requirement.prune
@@ -469,13 +469,13 @@ class FormulaInstaller
         inherited_options.fetch(dependent.name, []),
       )
 
-      if (dep.optional? || dep.recommended?) && build.without?(dep)
+      if dep.prune_from_option?(build)
         Dependency.prune
       elsif include_test? && dep.test? && !dep.installed?
         Dependency.keep_but_prune_recursive_deps
       elsif dep.build? && install_bottle_for?(dependent, build)
         Dependency.prune
-      elsif dep.build? && dependent.installed?
+      elsif dep.prune_if_build_and_not_dependent?(dependent)
         Dependency.prune
       elsif dep.satisfied?(inherited_options[dep.name])
         Dependency.skip
