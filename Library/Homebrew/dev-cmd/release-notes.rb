@@ -5,10 +5,16 @@
 #:
 #:    If `--markdown` is passed, output as a Markdown list.
 
+require "cli_parser"
+
 module Homebrew
   module_function
 
   def release_notes
+    args = Homebrew::CLI::Parser.new do
+      switch "--markdown"
+    end.parse
+
     previous_tag = ARGV.named.first
     previous_tag ||= Utils.popen_read("git tag --list --sort=-version:refname")
                           .lines.first.chomp
@@ -28,7 +34,7 @@ module Homebrew
       s.gsub(%r{.*Merge pull request #(\d+) from ([^/]+)/[^>]*(>>)*},
              "https://github.com/Homebrew/brew/pull/\\1 (@\\2)")
     end
-    if ARGV.include?("--markdown")
+    if args.markdown?
       output.map! do |s|
         /(.*\d)+ \(@(.+)\) - (.*)/ =~ s
         "- [#{Regexp.last_match(3)}](#{Regexp.last_match(1)}) (@#{Regexp.last_match(2)})"
