@@ -13,6 +13,6 @@ class Checksum
   delegate [:empty?, :to_s] => :@hexdigest
 
   def ==(other)
-    hash_type == other.hash_type && hexdigest == other.hexdigest
+    hash_type == other&.hash_type && hexdigest == other.hexdigest
   end
 end
