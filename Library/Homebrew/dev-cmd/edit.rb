@@ -5,11 +5,16 @@
 #:    Open <formula> in the editor.
 
 require "formula"
+require "cli_parser"
 
 module Homebrew
   module_function
 
   def edit
+    args = Homebrew::CLI::Parser.new do
+      switch "--force"
+    end.parse
+
     unless (HOMEBREW_REPOSITORY/".git").directory?
       raise <<~EOS
         Changes will be lost!
@@ -36,7 +41,7 @@ module Homebrew
       paths = ARGV.named.map do |name|
         path = Formulary.path(name)
 
-        raise FormulaUnavailableError, name unless path.file? || ARGV.force?
+        raise FormulaUnavailableError, name unless path.file? || args.force?
 
         path
       end
