@@ -318,7 +318,7 @@ class Bottle
   end
 
   def select_download_strategy(specs)
-    specs[:using] ||= CurlDownloadStrategy
+    specs[:using] ||= DownloadStrategyDetector.detect(@spec.root_url)
     specs
   end
 end
