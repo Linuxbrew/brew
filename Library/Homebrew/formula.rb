@@ -15,6 +15,7 @@ require "keg"
 require "migrator"
 require "extend/ENV"
 require "language/python"
+require "tab"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.
@@ -438,7 +439,6 @@ class Formula
   # If at least one version of {Formula} is installed.
   # @private
   def any_version_installed?
-    require "tab"
     installed_prefixes.any? { |keg| (keg/Tab::FILENAME).file? }
   end
 
