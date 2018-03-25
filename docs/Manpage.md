@@ -880,7 +880,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     Example: `brew install jruby && brew test jruby`
 
-  * `tests` [`--verbose`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=``test_script`[`:``line_number`]] [`--seed` `seed`] [`--online`] [`--official-cmd-taps`]:
+  * `tests` [`--verbose`] [`--coverage`] [`--generic`] [`--no-compat`] [`--only=``test_script`[`:``line_number`]] [`--seed=``seed`] [`--online`] [`--official-cmd-taps`]:
     Run Homebrew's unit and integration tests. If provided,
     `--only=``test_script` runs only `test_script`_spec.rb, and `--seed`
     randomizes tests with the provided value instead of a random seed.
