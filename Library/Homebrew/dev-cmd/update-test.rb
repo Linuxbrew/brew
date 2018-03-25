@@ -14,13 +14,22 @@
 #:    If `--keep-tmp` is passed, retain the temporary directory containing
 #:    the new repository clone.
 
+require "cli_parser"
+
 module Homebrew
   module_function
 
   def update_test
+    args = Homebrew::CLI::Parser.parse do
+      switch "--to-tag"
+      switch "--keep-tmp"
+      flag   "--commit", required: true
+      flag   "--before", required: true
+    end
+
     ENV["HOMEBREW_UPDATE_TEST"] = "1"
 
-    if ARGV.include?("--to-tag")
+    if args.to_tag?
       ENV["HOMEBREW_UPDATE_TO_TAG"] = "1"
       branch = "stable"
     else
@@ -28,11 +37,11 @@ module Homebrew
     end
 
     cd HOMEBREW_REPOSITORY
-    start_commit = if commit = ARGV.value("commit")
+    start_commit = if commit = args.commit
       commit
-    elsif date = ARGV.value("before")
+    elsif date = args.before
       Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
-    elsif ARGV.include?("--to-tag")
+    elsif args.to_tag?
       tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
       previous_tag = tags.lines[1]
       previous_tag ||= begin
@@ -62,7 +71,7 @@ module Homebrew
     puts "End   commit: #{end_commit}"
 
     mktemp("update-test") do |staging|
-      staging.retain! if ARGV.keep_tmp?
+      staging.retain! if args.keep_tmp?
       curdir = Pathname.new(Dir.pwd)
 
       oh1 "Setup test environment..."
