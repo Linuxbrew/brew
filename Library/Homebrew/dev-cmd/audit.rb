@@ -564,6 +564,7 @@ class FormulaAuditor
       gtk-doc 1.25
       libart 2.3.21
       pygtkglext 1.1.0
+      libepoxy 1.5.0
     ].each_slice(2).to_a.map do |formula, version|
       [formula, version.split(".")[0..1].join(".")]
     end
