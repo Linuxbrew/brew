@@ -42,14 +42,21 @@ module Homebrew
 
     formulae = ARGV.include?("--installed") ? Formula.installed : Formula
     recursive = ARGV.flag? "--recursive"
+    only_installed_arg = ARGV.include?("--installed") &&
+                         !ARGV.include?("--include-build") &&
+                         !ARGV.include?("--include-test") &&
+                         !ARGV.include?("--include-optional") &&
+                         !ARGV.include?("--skip-recommended")
 
     includes, ignores = argv_includes_ignores(ARGV)
 
     uses = formulae.select do |f|
       used_formulae.all? do |ff|
         begin
+          deps = f.runtime_dependencies if only_installed_arg
           if recursive
-            deps = recursive_includes(Dependency, f, includes, ignores)
+            deps ||= recursive_includes(Dependency, f, includes, ignores)
+
             dep_formulae = deps.flat_map do |dep|
               begin
                 dep.to_formula
@@ -76,8 +83,8 @@ module Homebrew
 
             reqs = reqs_by_formula.map(&:last)
           else
-            deps = reject_ignores(f.deps, ignores, includes)
-            reqs = reject_ignores(f.requirements, ignores, includes)
+            deps ||= reject_ignores(f.deps, ignores, includes)
+            reqs   = reject_ignores(f.requirements, ignores, includes)
           end
 
           next true if deps.any? do |dep|
