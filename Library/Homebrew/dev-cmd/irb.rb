@@ -6,7 +6,6 @@
 #:    used instead of irb.
 
 require "cli_parser"
-require "utils/env"
 
 class Symbol
   def f(*args)
@@ -26,7 +25,7 @@ module Homebrew
   def irb
     args = Homebrew::CLI::Parser.new do
       switch "--examples"
-      switch "--pry"
+      switch "--pry", env: :pry
     end.parse
 
     if args.examples?
@@ -37,7 +36,7 @@ module Homebrew
       return
     end
 
-    if args.pry? || Utils::EnvVars.pry?
+    if args.pry?
       Homebrew.install_gem_setup_path! "pry"
       require "pry"
       Pry.config.prompt_name = "brew"
@@ -53,7 +52,7 @@ module Homebrew
 
     ohai "Interactive Homebrew Shell"
     puts "Example commands available with: brew irb --examples"
-    if args.pry? || Utils::EnvVars.pry?
+    if args.pry?
       Pry.start
     else
       IRB.start

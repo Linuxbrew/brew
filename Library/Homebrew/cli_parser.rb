@@ -10,13 +10,12 @@ module Homebrew
         instance_eval(&block)
       end
 
-      def switch(*names, description: nil)
+      def switch(*names, description: nil, env: nil)
         description = option_to_description(*names) if description.nil?
         @parser.on(*names, description) do
-          names.each do |name|
-            @parsed_args["#{option_to_name(name)}?"] = true
-          end
+          enable_switch(*names)
         end
+        enable_switch(*names) if !env.nil? && !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
       end
 
       def comma_array(name, description: nil)
@@ -49,6 +48,14 @@ module Homebrew
       def parse(cmdline_args = ARGV)
         @parser.parse!(cmdline_args)
         @parsed_args
+      end
+
+      private
+
+      def enable_switch(*names)
+        names.each do |name|
+          @parsed_args["#{option_to_name(name)}?"] = true
+        end
       end
     end
   end
