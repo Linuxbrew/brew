@@ -11,9 +11,9 @@ module Homebrew
   module_function
 
   def edit
-    args = Homebrew::CLI::Parser.new do
+    args = Homebrew::CLI::Parser.parse do
       switch "--force"
-    end.parse
+    end
 
     unless (HOMEBREW_REPOSITORY/".git").directory?
       raise <<~EOS

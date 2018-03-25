@@ -55,7 +55,7 @@ module Homebrew
   module_function
 
   def audit
-    args = Homebrew::CLI::Parser.new do
+    args = Homebrew::CLI::Parser.parse do
       switch      "--strict"
       switch      "--online"
       switch      "--new-formula"
@@ -67,7 +67,7 @@ module Homebrew
       comma_array "--except"
       comma_array "--only-cops"
       comma_array "--except-cops"
-    end.parse
+    end
 
     Homebrew.auditing = true
     inject_dump_stats!(FormulaAuditor, /^audit_/) if args.audit_debug?

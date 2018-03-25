@@ -11,9 +11,9 @@ module Homebrew
   module_function
 
   def release_notes
-    args = Homebrew::CLI::Parser.new do
+    args = Homebrew::CLI::Parser.parse do
       switch "--markdown"
-    end.parse
+    end
 
     previous_tag = ARGV.named.first
     previous_tag ||= Utils.popen_read("git tag --list --sort=-version:refname")

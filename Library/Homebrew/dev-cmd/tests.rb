@@ -23,7 +23,7 @@ module Homebrew
   module_function
 
   def tests
-    args = Homebrew::CLI::Parser.new do
+    args = Homebrew::CLI::Parser.parse do
       switch "--no-compat"
       switch "--generic"
       switch "-v", "--verbose"
@@ -31,7 +31,7 @@ module Homebrew
       switch "--online"
       flag   "--only", required: true
       flag   "--seed", required: true
-    end.parse
+    end
 
     HOMEBREW_LIBRARY_PATH.cd do
       ENV.delete("HOMEBREW_VERBOSE")

@@ -23,10 +23,10 @@ module Homebrew
   module_function
 
   def irb
-    args = Homebrew::CLI::Parser.new do
+    args = Homebrew::CLI::Parser.parse do
       switch "--examples"
       switch "--pry", env: :pry
-    end.parse
+    end
 
     if args.examples?
       puts "'v8'.f # => instance of the v8 formula"
