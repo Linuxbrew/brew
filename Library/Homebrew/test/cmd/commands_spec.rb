@@ -23,7 +23,7 @@ RSpec.shared_context "custom internal commands" do
     ]
   end
 
-  around(:each) do |example|
+  around do |example|
     begin
       cmds.each do |f|
         FileUtils.touch f

@@ -17,7 +17,7 @@ describe Keg do
     keg
   end
 
-  around(:each) do |example|
+  around do |example|
     begin
       @old_stdout = $stdout
       $stdout = StringIO.new
@@ -34,12 +34,12 @@ describe Keg do
   let!(:keg) { setup_test_keg("foo", "1.0") }
   let(:kegs) { [] }
 
-  before(:each) do
+  before do
     (HOMEBREW_PREFIX/"bin").mkpath
     (HOMEBREW_PREFIX/"lib").mkpath
   end
 
-  after(:each) do
+  after do
     kegs.each(&:unlink)
     rmtree HOMEBREW_PREFIX/"lib"
   end
@@ -345,7 +345,7 @@ describe Keg do
       keg
     end
 
-    before(:each) do
+    before do
       keg.link
     end
 

@@ -2,14 +2,14 @@ require "formula"
 require "cxxstdlib"
 
 describe CxxStdlib do
-  let(:clang) { CxxStdlib.create(:libstdcxx, :clang) }
-  let(:gcc) { CxxStdlib.create(:libstdcxx, :gcc) }
-  let(:gcc40) { CxxStdlib.create(:libstdcxx, :gcc_4_0) }
-  let(:gcc42) { CxxStdlib.create(:libstdcxx, :gcc_4_2) }
-  let(:gcc48) { CxxStdlib.create(:libstdcxx, "gcc-4.8") }
-  let(:gcc49) { CxxStdlib.create(:libstdcxx, "gcc-4.9") }
-  let(:lcxx) { CxxStdlib.create(:libcxx, :clang) }
-  let(:purec) { CxxStdlib.create(nil, :clang) }
+  let(:clang) { described_class.create(:libstdcxx, :clang) }
+  let(:gcc) { described_class.create(:libstdcxx, :gcc) }
+  let(:gcc40) { described_class.create(:libstdcxx, :gcc_4_0) }
+  let(:gcc42) { described_class.create(:libstdcxx, :gcc_4_2) }
+  let(:gcc48) { described_class.create(:libstdcxx, "gcc-4.8") }
+  let(:gcc49) { described_class.create(:libstdcxx, "gcc-4.9") }
+  let(:lcxx) { described_class.create(:libcxx, :clang) }
+  let(:purec) { described_class.create(nil, :clang) }
 
   describe "#compatible_with?" do
     specify "Apple libstdcxx intercompatibility" do

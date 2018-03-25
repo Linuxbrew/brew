@@ -126,7 +126,7 @@ describe FormulaInstaller do
     expect(dependency_keg).to be_linked
     expect(dependency).to be_pinned
 
-    fi = FormulaInstaller.new(dependent)
+    fi = described_class.new(dependent)
 
     expect {
       fi.check_install_sanity

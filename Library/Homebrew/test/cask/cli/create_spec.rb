@@ -2,7 +2,7 @@ require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
 describe Hbc::CLI::Create, :cask do
-  around(:each) do |example|
+  around do |example|
     begin
       example.run
     ensure
@@ -12,7 +12,7 @@ describe Hbc::CLI::Create, :cask do
     end
   end
 
-  before(:each) do
+  before do
     allow_any_instance_of(described_class).to receive(:exec_editor)
   end
 

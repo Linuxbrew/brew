@@ -5,6 +5,7 @@ describe "Operations on staged Casks", :cask do
   describe "bundle ID" do
     let(:cask) { Hbc::CaskLoader.load(cask_path("local-transmission")) }
     let(:installer) { Hbc::Installer.new(cask) }
+
     it "fetches the bundle ID from a staged cask" do
       installer.install
       expect(installer.bundle_identifier).to eq("org.m0k.transmission")

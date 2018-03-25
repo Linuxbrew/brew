@@ -8,7 +8,7 @@ describe Homebrew::Cleanup do
   let(:lock_file) { Pathname.new("#{HOMEBREW_LOCK_DIR}/foo") }
   let(:sec_in_a_day) { 60 * 60 * 24 }
 
-  around(:each) do |example|
+  around do |example|
     begin
       FileUtils.touch ds_store
       FileUtils.touch lock_file
@@ -50,7 +50,7 @@ describe Homebrew::Cleanup do
       let(:f2) { Class.new(Testball) { version "0.2" }.new }
       let(:unremovable_kegs) { [] }
 
-      before(:each) do
+      before do
         described_class.instance_variable_set(:@unremovable_kegs, [])
         [f1, f2].each do |f|
           f.brew do
@@ -230,7 +230,7 @@ describe Homebrew::Cleanup do
       let(:bottle) { (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz") }
       let(:testball) { (HOMEBREW_CACHE/"testball-0.0.1") }
 
-      before(:each) do
+      before do
         FileUtils.touch(bottle)
         FileUtils.touch(testball)
         (HOMEBREW_CELLAR/"testball"/"0.0.1").mkpath
@@ -268,11 +268,11 @@ describe Homebrew::Cleanup do
 
     it "returns true when path_modified_time < days_default" do
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
-      expect(described_class.prune?(foo, days_default: "1")).to be_truthy
+      expect(described_class).to be_prune(foo, days_default: "1")
     end
 
     it "returns false when path_modified_time >= days_default" do
-      expect(described_class.prune?(foo, days_default: "2")).to be_falsey
+      expect(described_class).not_to be_prune(foo, days_default: "2")
     end
   end
 end

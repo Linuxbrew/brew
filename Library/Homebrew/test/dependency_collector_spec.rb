@@ -11,7 +11,7 @@ describe DependencyCollector do
     subject.requirements.find { |req| req.is_a? klass }
   end
 
-  after(:each) do
+  after do
     described_class.clear_cache
   end
 
@@ -51,7 +51,7 @@ describe DependencyCollector do
 
     specify "x11 with (ignored) minimum version" do
       subject.add x11: "2.5.1"
-      expect(find_requirement(X11Requirement).min_version.to_s).to_not eq("2.5.1")
+      expect(find_requirement(X11Requirement).min_version.to_s).not_to eq("2.5.1")
     end
 
     specify "x11 with tag" do
@@ -62,7 +62,7 @@ describe DependencyCollector do
     specify "x11 with (ignored) minimum version and tag" do
       subject.add x11: ["2.5.1", :optional]
       dep = find_requirement(X11Requirement)
-      expect(dep.min_version.to_s).to_not eq("2.5.1")
+      expect(dep.min_version.to_s).not_to eq("2.5.1")
       expect(dep).to be_optional
     end
 

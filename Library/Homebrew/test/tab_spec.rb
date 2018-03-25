@@ -42,6 +42,7 @@ describe Tab do
       },
     )
   }
+
   let(:time) { Time.now.to_i }
   let(:unused_options) { Options.create(%w[--with-baz --without-qux]) }
   let(:used_options) { Options.create(%w[--with-foo --without-bar]) }

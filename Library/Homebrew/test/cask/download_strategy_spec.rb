@@ -97,6 +97,7 @@ describe "download strategies", :cask do
     context "with a file name trailing the URL path" do
       describe "#tarball_path" do
         subject { downloader.tarball_path }
+
         its(:extname) { is_expected.to eq(".dmg") }
       end
     end
@@ -106,6 +107,7 @@ describe "download strategies", :cask do
 
       describe "#tarball_path" do
         subject { downloader.tarball_path }
+
         its(:to_path) { is_expected.to end_with("some-cask--1.2.3.4") }
       end
     end
@@ -115,6 +117,7 @@ describe "download strategies", :cask do
 
       describe "#tarball_path" do
         subject { downloader.tarball_path }
+
         its(:extname) { is_expected.to eq(".zip") }
       end
     end
@@ -124,6 +127,7 @@ describe "download strategies", :cask do
 
       describe "#tarball_path" do
         subject { downloader.tarball_path }
+
         its(:extname) { is_expected.to eq(".zip") }
       end
     end
@@ -149,6 +153,7 @@ describe "download strategies", :cask do
 
       describe "#tarball_path" do
         subject { downloader.tarball_path }
+
         its(:extname) { is_expected.to eq(".zip") }
         its("to_path.length") { is_expected.to be_between(0, 255) }
       end
@@ -202,6 +207,7 @@ describe "download strategies", :cask do
     let(:url_options) { { using: :svn } }
     let(:fake_system_command) { class_double(Hbc::SystemCommand) }
     let(:downloader) { Hbc::SubversionDownloadStrategy.new(cask, command: fake_system_command) }
+
     before do
       allow(fake_system_command).to receive(:run!)
     end

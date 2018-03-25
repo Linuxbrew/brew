@@ -71,7 +71,7 @@ describe FormulaInstaller do
     expect(formula).not_to be_bottled
 
     expect {
-      FormulaInstaller.new(formula).install
+      described_class.new(formula).install
     }.to raise_error(BuildToolsError)
 
     expect(formula).not_to be_installed

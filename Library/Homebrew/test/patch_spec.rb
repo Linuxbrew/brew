@@ -4,6 +4,7 @@ describe Patch do
   describe "#create" do
     context "simple patch" do
       subject { described_class.create(:p2, nil) }
+
       it { is_expected.to be_kind_of ExternalPatch }
       it { is_expected.to be_external }
       its(:strip) { is_expected.to eq(:p2) }
@@ -11,24 +12,28 @@ describe Patch do
 
     context "string patch" do
       subject { described_class.create(:p0, "foo") }
+
       it { is_expected.to be_kind_of StringPatch }
       its(:strip) { is_expected.to eq(:p0) }
     end
 
     context "string patch without strip" do
       subject { described_class.create("foo", nil) }
+
       it { is_expected.to be_kind_of StringPatch }
       its(:strip) { is_expected.to eq(:p1) }
     end
 
     context "data patch" do
       subject { described_class.create(:p0, :DATA) }
+
       it { is_expected.to be_kind_of DATAPatch }
       its(:strip) { is_expected.to eq(:p0) }
     end
 
     context "data patch without strip" do
       subject { described_class.create(:DATA, nil) }
+
       it { is_expected.to be_kind_of DATAPatch }
       its(:strip) { is_expected.to eq(:p1) }
     end
@@ -86,7 +91,7 @@ describe Patch do
     end
 
     it "can create patches from a :p0 hash" do
-      patches = Patch.normalize_legacy_patches(
+      patches = described_class.normalize_legacy_patches(
         p0: "http://example.com/patch.diff",
       )
 
@@ -95,7 +100,7 @@ describe Patch do
     end
 
     it "can create patches from a :p1 hash" do
-      patches = Patch.normalize_legacy_patches(
+      patches = described_class.normalize_legacy_patches(
         p1: "http://example.com/patch.diff",
       )
 
@@ -104,7 +109,7 @@ describe Patch do
     end
 
     it "can create patches from a mixed hash" do
-      patches = Patch.normalize_legacy_patches(
+      patches = described_class.normalize_legacy_patches(
         p1: "http://example.com/patch1.diff",
         p0: "http://example.com/patch0.diff",
       )
@@ -115,7 +120,7 @@ describe Patch do
     end
 
     it "can create patches from a mixed hash with array" do
-      patches = Patch.normalize_legacy_patches(
+      patches = described_class.normalize_legacy_patches(
         p1: [
           "http://example.com/patch10.diff",
           "http://example.com/patch11.diff",
@@ -132,7 +137,7 @@ describe Patch do
     end
 
     it "returns an empty array if given nil" do
-      expect(Patch.normalize_legacy_patches(nil)).to be_empty
+      expect(described_class.normalize_legacy_patches(nil)).to be_empty
     end
   end
 end
@@ -140,6 +145,7 @@ end
 describe EmbeddedPatch do
   describe "#new" do
     subject { described_class.new(:p1) }
+
     its(:inspect) { is_expected.to eq("#<EmbeddedPatch: :p1>") }
   end
 end
@@ -156,7 +162,7 @@ describe ExternalPatch do
   end
 
   describe "#cached_download" do
-    before(:each) do
+    before do
       allow(subject.resource).to receive(:cached_download).and_return("/tmp/foo.tar.gz")
     end
 

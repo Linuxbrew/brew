@@ -53,8 +53,8 @@ describe Dependencies do
   end
 
   specify "equality" do
-    a = Dependencies.new
-    b = Dependencies.new
+    a = described_class.new
+    b = described_class.new
 
     dep = Dependency.new("foo")
 
