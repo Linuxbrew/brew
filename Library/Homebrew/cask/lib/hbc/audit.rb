@@ -33,6 +33,7 @@ module Hbc
       check_download
       check_single_pre_postflight
       check_single_uninstall_zap
+      check_untrusted_pkg
       self
     rescue StandardError => e
       odebug "#{e.message}\n#{e.backtrace.join("\n")}"
@@ -49,6 +50,18 @@ module Hbc
     end
 
     private
+
+    def check_untrusted_pkg
+      odebug "Auditing pkg stanza: allow_untrusted"
+
+      return if @cask.sourcefile_path.nil?
+
+      tap = @cask.tap
+      return if tap.nil? || tap.user != "caskroom"
+
+      return unless cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
+      add_warning "allow_untrusted is not permitted in official Homebrew-Cask taps"
+    end
 
     def check_single_pre_postflight
       odebug "Auditing preflight and postflight stanzas"

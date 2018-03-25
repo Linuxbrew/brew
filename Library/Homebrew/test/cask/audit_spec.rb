@@ -91,6 +91,25 @@ describe Hbc::Audit, :cask do
       end
     end
 
+    describe "pkg allow_untrusted checks" do
+      let(:error_msg) { "allow_untrusted is not permitted in official Homebrew-Cask taps" }
+
+      context "when the Cask has no pkg stanza" do
+        let(:cask_token) { "basic-cask" }
+        it { should_not warn_with(error_msg) }
+      end
+
+      context "when the Cask does not have allow_untrusted" do
+        let(:cask_token) { "with-uninstall-pkgutil" }
+        it { should_not warn_with(error_msg) }
+      end
+
+      context "when the Cask has allow_untrusted" do
+        let(:cask_token) { "with-allow-untrusted" }
+        it { is_expected.to warn_with(error_msg) }
+      end
+    end
+
     describe "preflight stanza checks" do
       let(:error_msg) { "only a single preflight stanza is allowed" }
 
