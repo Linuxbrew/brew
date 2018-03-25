@@ -20,10 +20,10 @@ module Homebrew
   TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
 
   def man
-    @args = Homebrew::CLI::Parser.new do
+    @args = Homebrew::CLI::Parser.parse do
       switch "--fail-if-changed"
       switch "--link"
-    end.parse
+    end
 
     raise UsageError unless ARGV.named.empty?
 

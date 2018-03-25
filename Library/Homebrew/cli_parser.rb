@@ -4,6 +4,10 @@ require "ostruct"
 module Homebrew
   module CLI
     class Parser
+      def self.parse(&block)
+        new(&block).parse
+      end
+
       def initialize(&block)
         @parser = OptionParser.new
         @parsed_args = OpenStruct.new
