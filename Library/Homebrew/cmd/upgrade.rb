@@ -29,7 +29,7 @@ module Homebrew
 
     Homebrew.perform_preinstall_checks
 
-    odeprecated "'brew upgrade --all'", "'brew upgrade'" if ARGV.include?("--all")
+    odisabled "'brew upgrade --all'", "'brew upgrade'" if ARGV.include?("--all")
 
     if ARGV.named.empty?
       outdated = Formula.installed.select do |f|
