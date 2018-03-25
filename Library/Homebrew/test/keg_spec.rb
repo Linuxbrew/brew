@@ -373,28 +373,12 @@ describe Keg do
 
     let(:dependent) { setup_test_keg("bar", "1.0") }
 
-    # Test with a keg whose formula isn't known.
-    # This can happen if e.g. a formula is installed
-    # from a file path or URL.
-    specify "unknown Formula" do
-      allow(Formulary).to receive(:loader_for).and_call_original
-      alter_tab(keg) do |t|
-        t.source["tap"] = "some/tap"
-        t.source["path"] = nil
-      end
-
-      dependencies [{ "full_name" => "some/tap/foo", "version" => "1.0" }]
-      expect(keg.installed_dependents).to eq([dependent])
-      expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar 1.0"]])
-
-      dependencies nil
-      # It doesn't make sense for a keg with no formula to have any dependents,
-      # so that can't really be tested.
-      expect(described_class.find_some_installed_dependents([keg])).to be nil
-    end
-
     specify "a dependency with no Tap in Tab" do
       tap_dep = setup_test_keg("baz", "1.0")
+
+      # allow tap_dep to be linked too
+      FileUtils.rm_r tap_dep/"bin"
+      tap_dep.link
 
       alter_tab(keg) { |t| t.source["tap"] = nil }
 
@@ -408,21 +392,18 @@ describe Keg do
 
     specify "no dependencies anywhere" do
       dependencies nil
-      expect(keg.installed_dependents).to be_empty
       expect(described_class.find_some_installed_dependents([keg])).to be nil
     end
 
     specify "missing Formula dependency" do
       dependencies nil
       Formula["bar"].class.depends_on "foo"
-      expect(keg.installed_dependents).to be_empty
       expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar"]])
     end
 
     specify "uninstalling dependent and dependency" do
       dependencies nil
       Formula["bar"].class.depends_on "foo"
-      expect(keg.installed_dependents).to be_empty
       expect(described_class.find_some_installed_dependents([keg, dependent])).to be nil
     end
 
@@ -442,40 +423,34 @@ describe Keg do
 
     specify "empty dependencies in Tab" do
       dependencies []
-      expect(keg.installed_dependents).to be_empty
       expect(described_class.find_some_installed_dependents([keg])).to be nil
     end
 
     specify "same name but different version in Tab" do
       dependencies [{ "full_name" => "foo", "version" => "1.1" }]
-      expect(keg.installed_dependents).to eq([dependent])
-      expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar 1.0"]])
+      expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar"]])
     end
 
     specify "different name and same version in Tab" do
       stub_formula_name("baz")
       dependencies [{ "full_name" => "baz", "version" => keg.version.to_s }]
-      expect(keg.installed_dependents).to be_empty
       expect(described_class.find_some_installed_dependents([keg])).to be nil
     end
 
     specify "same name and version in Tab" do
       dependencies [{ "full_name" => "foo", "version" => "1.0" }]
-      expect(keg.installed_dependents).to eq([dependent])
-      expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar 1.0"]])
+      expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar"]])
     end
 
     specify "fallback for old versions" do
       unreliable_dependencies [{ "full_name" => "baz", "version" => "1.0" }]
       Formula["bar"].class.depends_on "foo"
-      expect(keg.installed_dependents).to be_empty
       expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar"]])
     end
 
     specify "non-opt-linked" do
       keg.remove_opt_record
       dependencies [{ "full_name" => "foo", "version" => "1.0" }]
-      expect(keg.installed_dependents).to be_empty
       expect(described_class.find_some_installed_dependents([keg])).to be nil
     end
 
@@ -483,8 +458,7 @@ describe Keg do
       keg.unlink
       Formula["foo"].class.keg_only "a good reason"
       dependencies [{ "full_name" => "foo", "version" => "1.1" }] # different version
-      expect(keg.installed_dependents).to eq([dependent])
-      expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar 1.0"]])
+      expect(described_class.find_some_installed_dependents([keg])).to eq([[keg], ["bar"]])
     end
   end
 end
