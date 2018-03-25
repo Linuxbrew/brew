@@ -503,8 +503,16 @@ class Keg
     @oldname_opt_record = nil
   end
 
+  def tab
+    Tab.for_keg(self)
+  end
+
+  def runtime_dependencies
+    tab.runtime_dependencies
+  end
+
   def aliases
-    Tab.for_keg(self).aliases || []
+    tab.aliases || []
   end
 
   def optlink(mode = OpenStruct.new)
