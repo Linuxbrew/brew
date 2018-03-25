@@ -1497,20 +1497,9 @@ class Formula
   # installed
   def missing_dependencies(hide: nil)
     hide ||= []
-    missing_dependencies = recursive_dependencies do |dependent, dep|
-      if dep.build?
-        Dependency.prune
-      elsif dep.optional? || dep.recommended?
-        tab = Tab.for_formula(dependent)
-        Dependency.prune unless tab.with?(dep)
-      end
-    end
-
-    missing_dependencies.map!(&:to_formula)
-    missing_dependencies.select! do |d|
+    runtime_dependencies.map(&:to_formula).select do |d|
       hide.include?(d.name) || d.installed_prefixes.empty?
     end
-    missing_dependencies
   rescue FormulaUnavailableError
     []
   end
