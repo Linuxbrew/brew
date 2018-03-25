@@ -1486,7 +1486,14 @@ class Formula
 
   # Returns a list of Dependency objects that are required at runtime.
   # @private
-  def runtime_dependencies
+  def runtime_dependencies(read_from_tab: true)
+    if read_from_tab &&
+       installed_prefix.directory? &&
+       (keg = Keg.new(installed_prefix)) &&
+       (tab_deps = keg.runtime_dependencies)
+      return tab_deps.map { |d| Dependency.new d["full_name"] }.compact
+    end
+
     recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
       Dependency.prune if !dependency.required? && build.without?(dependency)

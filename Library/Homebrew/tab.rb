@@ -17,6 +17,7 @@ class Tab < OpenStruct
   # Instantiates a Tab for a new installation of a formula.
   def self.create(formula, compiler, stdlib)
     build = formula.build
+    runtime_deps = formula.runtime_dependencies(read_from_tab: false)
     attributes = {
       "homebrew_version" => HOMEBREW_VERSION,
       "used_options" => build.used_options.as_flags,
@@ -32,7 +33,7 @@ class Tab < OpenStruct
       "compiler" => compiler,
       "stdlib" => stdlib,
       "aliases" => formula.aliases,
-      "runtime_dependencies" => formula.runtime_dependencies.map do |dep|
+      "runtime_dependencies" => runtime_deps.map do |dep|
         f = dep.to_formula
         { "full_name" => f.full_name, "version" => f.version.to_s }
       end,
