@@ -68,7 +68,7 @@ describe Tab do
     expect(tab.tap).to be nil
     expect(tab.time).to be nil
     expect(tab.HEAD).to be nil
-    expect(tab.runtime_dependencies).to be_empty
+    expect(tab.runtime_dependencies).to be nil
     expect(tab.stable_version).to be nil
     expect(tab.devel_version).to be nil
     expect(tab.head_version).to be nil

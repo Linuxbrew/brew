@@ -185,7 +185,7 @@ class Tab < OpenStruct
       "stdlib" => nil,
       "compiler" => DevelopmentTools.default_compiler,
       "aliases" => [],
-      "runtime_dependencies" => [],
+      "runtime_dependencies" => nil,
       "source" => {
         "path" => nil,
         "tap" => nil,
