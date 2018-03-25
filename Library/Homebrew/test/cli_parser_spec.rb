@@ -6,6 +6,7 @@ describe Homebrew::CLI::Parser do
       described_class.new do
         switch "-v", "--verbose", description: "Flag for verbosity"
         switch "--more-verbose",  description: "Flag for higher verbosity"
+        switch "--pry", env: :pry
       end
     }
 
@@ -33,6 +34,12 @@ describe Homebrew::CLI::Parser do
 
     it "raises an exception when an invalid option is passed" do
       expect { parser.parse(["--random"]) }.to raise_error(OptionParser::InvalidOption, /--random/)
+    end
+
+    it "maps environment var to an option" do
+      allow(ENV).to receive(:[]).with("HOMEBREW_PRY").and_return("1")
+      args = parser.parse([])
+      expect(args.pry?).to be true
     end
   end
 

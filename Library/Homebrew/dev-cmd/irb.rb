@@ -5,6 +5,8 @@
 #:    If `--pry` is passed or HOMEBREW_PRY is set, pry will be
 #:    used instead of irb.
 
+require "cli_parser"
+
 class Symbol
   def f(*args)
     Formulary.factory(to_s, *args)
@@ -21,7 +23,12 @@ module Homebrew
   module_function
 
   def irb
-    if ARGV.include? "--examples"
+    args = Homebrew::CLI::Parser.new do
+      switch "--examples"
+      switch "--pry", env: :pry
+    end.parse
+
+    if args.examples?
       puts "'v8'.f # => instance of the v8 formula"
       puts ":hub.f.installed?"
       puts ":lua.f.methods - 1.methods"
@@ -29,7 +36,7 @@ module Homebrew
       return
     end
 
-    if ARGV.pry?
+    if args.pry?
       Homebrew.install_gem_setup_path! "pry"
       require "pry"
       Pry.config.prompt_name = "brew"
@@ -45,7 +52,7 @@ module Homebrew
 
     ohai "Interactive Homebrew Shell"
     puts "Example commands available with: brew irb --examples"
-    if ARGV.pry?
+    if args.pry?
       Pry.start
     else
       IRB.start
