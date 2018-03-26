@@ -368,6 +368,25 @@ describe Hbc::Audit, :cask do
       end
     end
 
+    describe "GitHub releases appcast check" do
+      let(:error_msg) { /Cask uses GitHub releases/ }
+
+      context "when the Cask does not use GitHub releases" do
+        let(:cask_token) { "basic-cask" }
+        it { should_not warn_with(error_msg) }
+      end
+
+      context "when the Cask uses GitHub releases and has an appcast" do
+        let(:cask_token) { "github-with-appcast" }
+        it { should_not warn_with(error_msg) }
+      end
+
+      context "when the Cask uses GitHub releases and does not have an appcast" do
+        let(:cask_token) { "github-without-appcast" }
+        it { is_expected.to warn_with(error_msg) }
+      end
+    end
+
     describe "preferred download URL formats" do
       let(:warning_msg) { /URL format incorrect/ }
 
