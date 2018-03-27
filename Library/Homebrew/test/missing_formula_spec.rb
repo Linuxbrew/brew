@@ -9,7 +9,9 @@ describe Homebrew::MissingFormula do
 
   context "::blacklisted_reason" do
     matcher(:be_blacklisted) do
-      match(&described_class.method(:blacklisted_reason))
+      match do |expected|
+        described_class.blacklisted_reason(expected)
+      end
     end
 
     context "rubygems" do
