@@ -95,7 +95,7 @@ module Hbc
     def check_version_and_checksum
       return if @cask.sourcefile_path.nil?
 
-      tap = Tap.select { |t| t.cask_file?(@cask.sourcefile_path) }.first
+      tap = @cask.tap
       return if tap.nil?
 
       return if commit_range.nil?
