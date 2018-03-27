@@ -387,6 +387,25 @@ describe Hbc::Audit, :cask do
       end
     end
 
+    describe "latest with appcast checks" do
+      let(:error_msg) { "Casks with an appcast should not use version :latest" }
+
+      context "when the Cask is :latest and does not have an appcast" do
+        let(:cask_token) { "version-latest" }
+        it { should_not warn_with(error_msg) }
+      end
+
+      context "when the Cask is versioned and has an appcast" do
+        let(:cask_token) { "with-appcast" }
+        it { should_not warn_with(error_msg) }
+      end
+
+      context "when the Cask is :latest and has an appcast" do
+        let(:cask_token) { "latest-with-appcast" }
+        it { is_expected.to warn_with(error_msg) }
+      end
+    end
+
     describe "preferred download URL formats" do
       let(:warning_msg) { /URL format incorrect/ }
 
