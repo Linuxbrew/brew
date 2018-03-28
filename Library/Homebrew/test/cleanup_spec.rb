@@ -260,6 +260,8 @@ describe Homebrew::Cleanup do
   end
 
   describe "::prune?" do
+    alias_matcher :be_pruned, :be_prune
+
     before do
       foo.mkpath
     end
@@ -268,11 +270,11 @@ describe Homebrew::Cleanup do
 
     it "returns true when path_modified_time < days_default" do
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
-      expect(described_class).to be_prune(foo, days_default: "1")
+      expect(described_class).to be_pruned(foo, days_default: "1")
     end
 
     it "returns false when path_modified_time >= days_default" do
-      expect(described_class).not_to be_prune(foo, days_default: "2")
+      expect(described_class).not_to be_pruned(foo, days_default: "2")
     end
   end
 end
