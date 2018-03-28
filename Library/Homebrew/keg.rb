@@ -102,47 +102,30 @@ class Keg
   #
   # For efficiency, we don't bother trying to get complete data.
   def self.find_some_installed_dependents(kegs)
-    # First, check in the tabs of installed Formulae.
-    kegs.each do |keg|
-      # Don't include dependencies of kegs that were in the given array.
-      dependents = keg.installed_dependents - kegs
-      dependents.map! { |d| "#{d.name} #{d.version}" }
-      return [keg], dependents if dependents.any?
-    end
-
-    # Some kegs won't have modern Tabs with the dependencies listed.
-    # In this case, fall back to Formula#missing_dependencies.
-
-    # Find formulae that didn't have dependencies saved in all of their kegs,
-    # so need them to be calculated now.
-    #
-    # This happens after the initial dependency check because it's sloooow.
-    remaining_formulae = Formula.installed.select do |f|
-      installed_kegs = f.installed_kegs
-
-      # Don't include dependencies of kegs that were in the given array.
-      next false if (installed_kegs - kegs).empty?
-
-      installed_kegs.any? { |k| Tab.for_keg(k).runtime_dependencies.nil? }
-    end
-
-    keg_names = kegs.map(&:name)
+    keg_names = kegs.select(&:optlinked?).map(&:name)
+    keg_formulae = []
     kegs_by_source = kegs.group_by do |keg|
       begin
         # First, attempt to resolve the keg to a formula
         # to get up-to-date name and tap information.
         f = keg.to_formula
+        keg_formulae << f
         [f.name, f.tap]
       rescue FormulaUnavailableError
         # If the formula for the keg can't be found,
         # fall back to the information in the tab.
-        [keg.name, Tab.for_keg(keg).tap]
+        [keg.name, keg.tab.tap]
       end
     end
 
-    remaining_formulae.each do |dependent|
-      required = dependent.missing_dependencies(hide: keg_names)
+    all_required_kegs = Set.new
+    all_dependents = []
 
+    # Don't include dependencies of kegs that were in the given array.
+    formulae_to_check = Formula.installed - keg_formulae
+
+    formulae_to_check.each do |dependent|
+      required = dependent.missing_dependencies(hide: keg_names)
       required_kegs = required.map do |f|
         f_kegs = kegs_by_source[[f.name, f.tap]]
         next unless f_kegs
@@ -150,12 +133,16 @@ class Keg
         f_kegs.sort_by(&:version).last
       end.compact
 
-      next unless required_kegs.any?
+      next if required_kegs.empty?
 
-      return required_kegs, [dependent.to_s]
+      all_required_kegs += required_kegs
+      all_dependents << dependent.to_s
     end
 
-    nil
+    return if all_required_kegs.empty?
+    return if all_dependents.empty?
+
+    [all_required_kegs.to_a, all_dependents.sort]
   end
 
   # if path is a file in a keg then this will return the containing Keg object
@@ -390,25 +377,6 @@ class Keg
     Formulary.from_keg(self)
   end
 
-  def installed_dependents
-    return [] unless optlinked?
-    tap = Tab.for_keg(self).source["tap"]
-    Keg.all.select do |keg|
-      tab = Tab.for_keg(keg)
-      next if tab.runtime_dependencies.nil?
-      tab.runtime_dependencies.any? do |dep|
-        # Resolve formula rather than directly comparing names
-        # in case of conflicts between formulae from different taps.
-        begin
-          dep_formula = Formulary.factory(dep["full_name"])
-          dep_formula == to_formula
-        rescue FormulaUnavailableError
-          next dep["full_name"] == "#{tap}/#{name}"
-        end
-      end
-    end
-  end
-
   def oldname_opt_record
     @oldname_opt_record ||= if (opt_dir = HOMEBREW_PREFIX/"opt").directory?
       opt_dir.subdirs.detect do |dir|
@@ -503,8 +471,16 @@ class Keg
     @oldname_opt_record = nil
   end
 
+  def tab
+    Tab.for_keg(self)
+  end
+
+  def runtime_dependencies
+    tab.runtime_dependencies
+  end
+
   def aliases
-    Tab.for_keg(self).aliases || []
+    tab.aliases || []
   end
 
   def optlink(mode = OpenStruct.new)

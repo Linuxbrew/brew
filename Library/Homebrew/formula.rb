@@ -15,6 +15,7 @@ require "keg"
 require "migrator"
 require "extend/ENV"
 require "language/python"
+require "tab"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.
@@ -438,7 +439,6 @@ class Formula
   # If at least one version of {Formula} is installed.
   # @private
   def any_version_installed?
-    require "tab"
     installed_prefixes.any? { |keg| (keg/Tab::FILENAME).file? }
   end
 
@@ -1486,7 +1486,14 @@ class Formula
 
   # Returns a list of Dependency objects that are required at runtime.
   # @private
-  def runtime_dependencies
+  def runtime_dependencies(read_from_tab: true)
+    if read_from_tab &&
+       installed_prefix.directory? &&
+       (keg = Keg.new(installed_prefix)) &&
+       (tab_deps = keg.runtime_dependencies)
+      return tab_deps.map { |d| Dependency.new d["full_name"] }.compact
+    end
+
     recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
       Dependency.prune if !dependency.required? && build.without?(dependency)
@@ -1497,20 +1504,9 @@ class Formula
   # installed
   def missing_dependencies(hide: nil)
     hide ||= []
-    missing_dependencies = recursive_dependencies do |dependent, dep|
-      if dep.build?
-        Dependency.prune
-      elsif dep.optional? || dep.recommended?
-        tab = Tab.for_formula(dependent)
-        Dependency.prune unless tab.with?(dep)
-      end
-    end
-
-    missing_dependencies.map!(&:to_formula)
-    missing_dependencies.select! do |d|
+    runtime_dependencies.map(&:to_formula).select do |d|
       hide.include?(d.name) || d.installed_prefixes.empty?
     end
-    missing_dependencies
   rescue FormulaUnavailableError
     []
   end
