@@ -1,9 +1,10 @@
 describe Hbc::DSL::StanzaProxy, :cask do
+  subject { stanza_proxy }
+
   let(:stanza_proxy) {
     described_class.new(Array) { [:foo, :bar, :cake] }
   }
 
-  subject { stanza_proxy }
   it { is_expected.to be_a_proxy }
   it { is_expected.to respond_to(:pop) }
   its(:pop) { is_expected.to eq(:cake) }

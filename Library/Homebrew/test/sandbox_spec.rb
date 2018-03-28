@@ -6,7 +6,7 @@ describe Sandbox do
   let(:dir) { mktmpdir }
   let(:file) { dir/"foo" }
 
-  before(:each) do
+  before do
     skip "Sandbox not implemented." unless described_class.available?
   end
 

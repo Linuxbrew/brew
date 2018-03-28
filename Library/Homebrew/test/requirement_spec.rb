@@ -160,11 +160,11 @@ describe Requirement do
     let(:const) { :FooRequirement }
     let(:klass) { self.class.const_get(const) }
 
-    before(:each) do
+    before do
       self.class.const_set(const, Class.new(described_class))
     end
 
-    after(:each) do
+    after do
       self.class.send(:remove_const, const)
     end
 

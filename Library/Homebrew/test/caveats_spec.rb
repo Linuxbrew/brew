@@ -3,6 +3,7 @@ require "caveats"
 
 describe Caveats do
   subject { described_class.new(f) }
+
   let(:f) { formula { url "foo-1.0" } }
 
   specify "#f" do

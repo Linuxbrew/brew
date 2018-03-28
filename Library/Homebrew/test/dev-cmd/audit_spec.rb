@@ -220,6 +220,8 @@ describe FormulaAuditor do
   describe "#audit_deps" do
     describe "a dependency on a macOS-provided keg-only formula" do
       describe "which is whitelisted" do
+        subject { fa }
+
         let(:fa) do
           formula_auditor "foo", <<~EOS, new_formula: true
             class Foo < Formula
@@ -246,12 +248,12 @@ describe FormulaAuditor do
           fa.audit_deps
         end
 
-        subject { fa }
-
         its(:problems) { are_expected.to be_empty }
       end
 
       describe "which is not whitelisted" do
+        subject { fa }
+
         let(:fa) do
           formula_auditor "foo", <<~EOS, new_formula: true
             class Foo < Formula
@@ -277,8 +279,6 @@ describe FormulaAuditor do
             .to receive(:to_formula).and_return(f_bc)
           fa.audit_deps
         end
-
-        subject { fa }
 
         its(:problems) { are_expected.to match([/unnecessary/]) }
       end
@@ -349,13 +349,19 @@ describe FormulaAuditor do
   end
 
   describe "#audit_revision_and_version_scheme" do
+    subject do
+      fa = described_class.new(Formulary.factory(formula_path))
+      fa.audit_revision_and_version_scheme
+      fa.problems.first
+    end
+
     let(:origin_tap_path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-foo" }
     let(:formula_subpath) { "Formula/foo#{@foo_version}.rb" }
     let(:origin_formula_path) { origin_tap_path/formula_subpath }
     let(:tap_path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-bar" }
     let(:formula_path) { tap_path/formula_subpath }
 
-    before(:each) do
+    before do
       @foo_version = Count.increment
 
       origin_formula_path.write <<~EOS
@@ -377,12 +383,6 @@ describe FormulaAuditor do
       tap_path.cd do
         system "git", "clone", origin_tap_path, "."
       end
-    end
-
-    subject do
-      fa = described_class.new(Formulary.factory(formula_path))
-      fa.audit_revision_and_version_scheme
-      fa.problems.first
     end
 
     def formula_gsub(before, after = "")

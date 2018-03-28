@@ -43,7 +43,7 @@ describe BuildEnvironment do
     subject { double.extend(described_class) }
 
     context "single argument" do
-      before(:each) do
+      before do
         subject.instance_eval do
           env :userpaths
         end
@@ -53,7 +53,7 @@ describe BuildEnvironment do
     end
 
     context "multiple arguments" do
-      before(:each) do
+      before do
         subject.instance_eval do
           env :userpaths, :std
         end

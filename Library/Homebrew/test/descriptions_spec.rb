@@ -2,6 +2,7 @@ require "descriptions"
 
 describe Descriptions do
   subject { described_class.new(descriptions_hash) }
+
   let(:descriptions_hash) { {} }
 
   it "can print description for a core Formula" do

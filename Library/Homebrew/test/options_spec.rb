@@ -8,8 +8,8 @@ describe Option do
   end
 
   specify "equality" do
-    foo = Option.new("foo")
-    bar = Option.new("bar")
+    foo = described_class.new("foo")
+    bar = described_class.new("bar")
     expect(subject).to eq(foo)
     expect(subject).not_to eq(bar)
     expect(subject).to eql(foo)
@@ -18,7 +18,7 @@ describe Option do
 
   specify "#description" do
     expect(subject.description).to be_empty
-    expect(Option.new("foo", "foo").description).to eq("foo")
+    expect(described_class.new("foo", "foo").description).to eq("foo")
   end
 
   specify "#inspect" do
@@ -46,8 +46,8 @@ describe DeprecatedOption do
   end
 
   specify "equality" do
-    foobar = DeprecatedOption.new("foo", "bar")
-    boofar = DeprecatedOption.new("boo", "far")
+    foobar = described_class.new("foo", "bar")
+    boofar = described_class.new("boo", "far")
     expect(foobar).to eq(subject)
     expect(subject).to eq(foobar)
     expect(boofar).not_to eq(subject)
@@ -81,26 +81,26 @@ describe Options do
 
   describe "#+" do
     it "returns options" do
-      expect(subject + Options.new).to be_an_instance_of(Options)
+      expect(subject + described_class.new).to be_an_instance_of(described_class)
     end
   end
 
   describe "#-" do
     it "returns options" do
-      expect(subject - Options.new).to be_an_instance_of(Options)
+      expect(subject - described_class.new).to be_an_instance_of(described_class)
     end
   end
 
   specify "#&" do
     foo, bar, baz = %w[foo bar baz].map { |o| Option.new(o) }
-    options = Options.new << foo << bar
+    options = described_class.new << foo << bar
     subject << foo << baz
     expect((subject & options).to_a).to eq([foo])
   end
 
   specify "#|" do
     foo, bar, baz = %w[foo bar baz].map { |o| Option.new(o) }
-    options = Options.new << foo << bar
+    options = described_class.new << foo << bar
     subject << foo << baz
     expect((subject | options).sort).to eq([foo, bar, baz].sort)
   end
@@ -137,7 +137,7 @@ describe Options do
     array = %w[--foo --bar]
     option1 = Option.new("foo")
     option2 = Option.new("bar")
-    expect(Options.create(array).sort).to eq([option1, option2].sort)
+    expect(described_class.create(array).sort).to eq([option1, option2].sort)
   end
 
   specify "#inspect" do

@@ -1,7 +1,7 @@
 require "extend/ENV"
 
 describe "brew reinstall", :integration_test do
-  before(:each) do
+  before do
     setup_test_formula "testball"
 
     expect { brew "install", "testball", "--with-foo" }.to be_a_success

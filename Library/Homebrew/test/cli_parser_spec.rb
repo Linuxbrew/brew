@@ -50,6 +50,7 @@ describe Homebrew::CLI::Parser do
         comma_array "--files",    description: "Comma separated filenames"
       end
     }
+
     it "parses a long flag option with its argument" do
       args = parser.parse(["--filename=random.txt"])
       expect(args.filename).to eq "random.txt"

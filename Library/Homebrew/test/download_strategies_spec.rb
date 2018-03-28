@@ -2,6 +2,7 @@ require "download_strategy"
 
 describe AbstractDownloadStrategy do
   subject { described_class.new(name, resource) }
+
   let(:specs) { {} }
   let(:name) { "foo" }
   let(:url) { "http://example.com/foo.tar.gz" }
@@ -46,7 +47,7 @@ describe AbstractDownloadStrategy do
 
   context "without specs[:bottle]" do
     it "is does not extend Pourable" do
-      expect(subject).to_not be_a_kind_of(AbstractDownloadStrategy::Pourable)
+      expect(subject).not_to be_a_kind_of(AbstractDownloadStrategy::Pourable)
     end
   end
 end
@@ -66,10 +67,11 @@ end
 
 describe GitHubPrivateRepositoryDownloadStrategy do
   subject { described_class.new("foo", resource) }
+
   let(:url) { "https://github.com/owner/repo/archive/1.1.5.tar.gz" }
   let(:resource) { double(Resource, url: url, mirrors: [], specs: {}, version: nil) }
 
-  before(:each) do
+  before do
     ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
     allow(GitHub).to receive(:repository).and_return({})
   end
@@ -89,10 +91,11 @@ end
 
 describe GitHubPrivateRepositoryReleaseDownloadStrategy do
   subject { described_class.new("foo", resource) }
+
   let(:url) { "https://github.com/owner/repo/releases/download/tag/foo_v0.1.0_darwin_amd64.tar.gz" }
   let(:resource) { double(Resource, url: url, mirrors: [], specs: {}, version: nil) }
 
-  before(:each) do
+  before do
     ENV["HOMEBREW_GITHUB_API_TOKEN"] = "token"
     allow(GitHub).to receive(:repository).and_return({})
   end
@@ -139,6 +142,7 @@ end
 
 describe GitHubGitDownloadStrategy do
   subject { described_class.new(name, resource) }
+
   let(:name) { "brew" }
   let(:url) { "https://github.com/homebrew/brew.git" }
   let(:resource) { double(Resource, url: url, mirrors: [], specs: {}, version: nil) }
@@ -151,12 +155,13 @@ end
 
 describe GitDownloadStrategy do
   subject { described_class.new(name, resource) }
+
   let(:name) { "baz" }
   let(:url) { "https://github.com/homebrew/foo" }
   let(:resource) { double(Resource, url: url, mirrors: [], specs: {}, version: nil) }
   let(:cached_location) { subject.cached_location }
 
-  before(:each) do
+  before do
     @commit_id = 1
     FileUtils.mkpath cached_location
   end
@@ -198,9 +203,9 @@ describe GitDownloadStrategy do
     let(:resource) { double(Resource, url: url, mirrors: [], specs: {}, version: version) }
     let(:remote_repo) { HOMEBREW_PREFIX/"remote_repo" }
 
-    before(:each) { remote_repo.mkpath }
+    before { remote_repo.mkpath }
 
-    after(:each) { FileUtils.rm_rf remote_repo }
+    after { FileUtils.rm_rf remote_repo }
 
     it "fetches the hash of the last commit" do
       remote_repo.cd do
@@ -217,6 +222,7 @@ end
 
 describe S3DownloadStrategy do
   subject { described_class.new(name, resource) }
+
   let(:name) { "foo" }
   let(:url) { "http://bucket.s3.amazonaws.com/foo.tar.gz" }
   let(:resource) { double(Resource, url: url, mirrors: [], specs: {}, version: nil) }
@@ -226,7 +232,8 @@ describe S3DownloadStrategy do
 
     context "when given Bad S3 URL" do
       let(:url) { "http://example.com/foo.tar.gz" }
-      it "should raise Bad S3 URL error" do
+
+      it "raises Bad S3 URL error" do
         expect {
           subject._fetch
         }.to raise_error(RuntimeError)
@@ -237,6 +244,7 @@ end
 
 describe CurlDownloadStrategy do
   subject { described_class.new(name, resource) }
+
   let(:name) { "foo" }
   let(:url) { "http://example.com/foo.tar.gz" }
   let(:resource) { double(Resource, url: url, mirrors: [], specs: { user: "download:123456" }, version: nil) }
@@ -254,6 +262,7 @@ describe CurlDownloadStrategy do
 
     context "when URL file is in middle" do
       let(:url) { "http://example.com/foo.tar.gz/from/this/mirror" }
+
       it { is_expected.to eq(HOMEBREW_CACHE/"foo-.tar.gz") }
     end
   end
@@ -262,23 +271,27 @@ end
 describe DownloadStrategyDetector do
   describe "::detect" do
     subject { described_class.detect(url, strategy) }
+
     let(:url) { Object.new }
     let(:strategy) { nil }
 
     context "when given Git URL" do
       let(:url) { "git://example.com/foo.git" }
+
       it { is_expected.to eq(GitDownloadStrategy) }
     end
 
     context "when given a GitHub Git URL" do
       let(:url) { "https://github.com/homebrew/brew.git" }
+
       it { is_expected.to eq(GitHubGitDownloadStrategy) }
     end
 
     context "when given an S3 URL" do
       let(:url) { "s3://bucket/homebrew/brew.tar.gz" }
+
       it "returns S3DownloadStrategy" do
-        allow(DownloadStrategyDetector).to receive(:require_aws_sdk).and_return(true)
+        allow(described_class).to receive(:require_aws_sdk).and_return(true)
         is_expected.to eq(S3DownloadStrategy)
       end
     end
@@ -286,8 +299,9 @@ describe DownloadStrategyDetector do
     context "when given strategy = S3DownloadStrategy" do
       let(:url) { "https://bkt.s3.amazonaws.com/key.tar.gz" }
       let(:strategy) { S3DownloadStrategy }
+
       it "requires aws-sdk-s3" do
-        allow(DownloadStrategyDetector).to receive(:require_aws_sdk).and_return(true)
+        allow(described_class).to receive(:require_aws_sdk).and_return(true)
         is_expected.to eq(S3DownloadStrategy)
       end
     end

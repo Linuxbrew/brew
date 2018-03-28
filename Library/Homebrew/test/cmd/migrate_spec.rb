@@ -1,5 +1,5 @@
 describe "brew migrate", :integration_test do
-  before(:each) do
+  before do
     setup_test_formula "testball1"
     setup_test_formula "testball2"
   end

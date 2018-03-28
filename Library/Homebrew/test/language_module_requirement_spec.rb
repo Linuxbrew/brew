@@ -10,6 +10,7 @@ describe LanguageModuleRequirement, :needs_compat do
 
   context "when module and import name differ" do
     subject { described_class.new(:python, mod_name, import_name) }
+
     let(:mod_name) { "foo" }
     let(:import_name) { "bar" }
 
