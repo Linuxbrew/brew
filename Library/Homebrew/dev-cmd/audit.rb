@@ -63,6 +63,8 @@ module Homebrew
       switch      "--display-cop-names"
       switch      "--display-filename"
       switch      "-D", "--audit-debug", description: "Activates debugging and profiling"
+      switch      :verbose
+      switch      :debug
       comma_array "--only"
       comma_array "--except"
       comma_array "--only-cops"
