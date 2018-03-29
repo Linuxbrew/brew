@@ -86,6 +86,7 @@ module Homebrew
       switch "--no-pbcopy"
       switch "--no-publish"
       switch "--warn-on-publish-failure"
+      flag   "--tap",           required: false
       flag   "--bintray-org",   required: true
       flag   "--test-bot-user", required: true
     end
@@ -111,7 +112,7 @@ module Homebrew
     ARGV.named.each do |arg|
       arg = "#{CoreTap.instance.default_remote}/pull/#{arg}" if arg.to_i.positive?
       if (testing_match = arg.match %r{/job/Homebrew.*Testing/(\d+)/})
-        tap = ARGV.value("tap")
+        tap = @args[:tap]
         tap = if tap&.start_with?("homebrew/")
           Tap.fetch("homebrew", tap.strip_prefix("homebrew/"))
         elsif tap
