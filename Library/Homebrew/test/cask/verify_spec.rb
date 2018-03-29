@@ -41,11 +41,11 @@ describe Hbc::Verify, :cask do
   end
 
   describe ".all" do
+    subject { described_class.all(cask, downloaded_path) }
+
     let(:downloaded_path) { double("downloaded_path") }
     let(:applicable_verification) { double("applicable_verification") }
     let(:inapplicable_verification) { double("inapplicable_verification") }
-
-    subject { described_class.all(cask, downloaded_path) }
 
     before do
       allow(applicable_verification_class).to receive(:new)

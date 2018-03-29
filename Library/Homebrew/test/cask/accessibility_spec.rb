@@ -5,7 +5,7 @@ describe "Accessibility Access", :cask do
   let(:fake_system_command) { class_double(Hbc::SystemCommand) }
   let(:installer) { Hbc::Installer.new(cask, command: fake_system_command) }
 
-  before(:each) do
+  before do
     allow(MacOS).to receive(:version).and_return(MacOS::Version.new(macos_version))
     allow(installer).to receive(:bundle_identifier).and_return("com.example.BasicCask")
   end

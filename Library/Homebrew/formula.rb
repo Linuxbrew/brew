@@ -15,6 +15,7 @@ require "keg"
 require "migrator"
 require "extend/ENV"
 require "language/python"
+require "tab"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.
@@ -438,7 +439,6 @@ class Formula
   # If at least one version of {Formula} is installed.
   # @private
   def any_version_installed?
-    require "tab"
     installed_prefixes.any? { |keg| (keg/Tab::FILENAME).file? }
   end
 
@@ -1486,7 +1486,14 @@ class Formula
 
   # Returns a list of Dependency objects that are required at runtime.
   # @private
-  def runtime_dependencies
+  def runtime_dependencies(read_from_tab: true)
+    if read_from_tab &&
+       installed_prefix.directory? &&
+       (keg = Keg.new(installed_prefix)) &&
+       (tab_deps = keg.runtime_dependencies)
+      return tab_deps.map { |d| Dependency.new d["full_name"] }.compact
+    end
+
     recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
       Dependency.prune if !dependency.required? && build.without?(dependency)
@@ -1497,26 +1504,17 @@ class Formula
   # installed
   def missing_dependencies(hide: nil)
     hide ||= []
-    missing_dependencies = recursive_dependencies do |dependent, dep|
-      if dep.build?
-        Dependency.prune
-      elsif dep.optional? || dep.recommended?
-        tab = Tab.for_formula(dependent)
-        Dependency.prune unless tab.with?(dep)
-      end
-    end
-
-    missing_dependencies.map!(&:to_formula)
-    missing_dependencies.select! do |d|
+    runtime_dependencies.map(&:to_formula).select do |d|
       hide.include?(d.name) || d.installed_prefixes.empty?
     end
-    missing_dependencies
   rescue FormulaUnavailableError
     []
   end
 
   # @private
   def to_hash
+    dependencies = deps
+
     hsh = {
       "name" => name,
       "full_name" => full_name,
@@ -1526,21 +1524,21 @@ class Formula
       "aliases" => aliases,
       "versions" => {
         "stable" => stable&.version&.to_s,
-        "bottle" => bottle ? true : false,
+        "bottle" => !bottle.nil?,
         "devel" => devel&.version&.to_s,
         "head" => head&.version&.to_s,
       },
       "revision" => revision,
       "version_scheme" => version_scheme,
       "installed" => [],
-      "linked_keg" => (linked_version.to_s if linked_keg.exist?),
+      "linked_keg" => linked_version&.to_s,
       "pinned" => pinned?,
       "outdated" => outdated?,
       "keg_only" => keg_only?,
-      "dependencies" => deps.map(&:name).uniq,
-      "recommended_dependencies" => deps.select(&:recommended?).map(&:name).uniq,
-      "optional_dependencies" => deps.select(&:optional?).map(&:name).uniq,
-      "build_dependencies" => deps.select(&:build?).map(&:name).uniq,
+      "dependencies" => dependencies.map(&:name).uniq,
+      "recommended_dependencies" => dependencies.select(&:recommended?).map(&:name).uniq,
+      "optional_dependencies" => dependencies.select(&:optional?).map(&:name).uniq,
+      "build_dependencies" => dependencies.select(&:build?).map(&:name).uniq,
       "conflicts_with" => conflicts.map(&:name),
       "caveats" => caveats,
     }
@@ -1569,7 +1567,7 @@ class Formula
         "root_url" => bottle_spec.root_url,
       }
       bottle_info["files"] = {}
-      bottle_spec.collector.keys.each do |os| # rubocop:disable Performance/HashEachMethods
+      bottle_spec.collector.keys.each do |os|
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
           "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",

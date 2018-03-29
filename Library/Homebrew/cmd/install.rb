@@ -257,10 +257,10 @@ module Homebrew
         return
       end
 
-      query = query_regexp(e.name)
+      regex = query_regexp(e.name)
 
       ohai "Searching for similarly named formulae..."
-      formulae_search_results = search_formulae(query)
+      formulae_search_results = search_formulae(regex)
       case formulae_search_results.length
       when 0
         ofail "No similarly named formulae found."
@@ -277,7 +277,7 @@ module Homebrew
       # Do not search taps if the formula name is qualified
       return if e.name.include?("/")
       ohai "Searching taps..."
-      taps_search_results = search_taps(query)
+      taps_search_results = search_taps(e.name)
       case taps_search_results.length
       when 0
         ofail "No formulae found in taps."

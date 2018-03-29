@@ -105,7 +105,7 @@ describe Hbc::CLI::Uninstall, :cask do
     }
     let(:caskroom_path) { Hbc.caskroom.join(token).tap(&:mkpath) }
 
-    before(:each) do
+    before do
       timestamped_versions.each do |timestamped_version|
         caskroom_path.join(".metadata", *timestamped_version, "Casks").tap(&:mkpath)
                      .join("#{token}.rb").open("w") do |caskfile|

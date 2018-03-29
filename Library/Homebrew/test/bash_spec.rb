@@ -17,6 +17,7 @@ describe "Bash" do
 
   context "brew" do
     subject { HOMEBREW_LIBRARY_PATH.parent.parent/"bin/brew" }
+
     it { is_expected.to have_valid_bash_syntax }
   end
 
@@ -33,6 +34,7 @@ describe "Bash" do
 
   context "Bash completion" do
     subject { HOMEBREW_LIBRARY_PATH.parent.parent/"completions/bash/brew" }
+
     it { is_expected.to have_valid_bash_syntax }
   end
 

@@ -10,7 +10,7 @@ describe Hbc::Artifact::App, :cask do
   let(:install_phase) { app.install_phase(command: command, force: force) }
   let(:uninstall_phase) { app.uninstall_phase(command: command, force: force) }
 
-  before(:each) do
+  before do
     InstallHelper.install_without_artifacts(cask)
   end
 
@@ -58,7 +58,7 @@ describe Hbc::Artifact::App, :cask do
     end
 
     describe "when the target already exists" do
-      before(:each) do
+      before do
         target_path.mkpath
       end
 
@@ -76,7 +76,7 @@ describe Hbc::Artifact::App, :cask do
       describe "given the force option" do
         let(:force) { true }
 
-        before(:each) do
+        before do
           allow(Hbc::Utils).to receive(:current_user).and_return("fake_user")
         end
 
@@ -104,7 +104,7 @@ describe Hbc::Artifact::App, :cask do
         end
 
         describe "target is user-owned but contains read-only files" do
-          before(:each) do
+          before do
             FileUtils.touch "#{target_path}/foo"
             FileUtils.chmod 0555, target_path
           end
@@ -137,7 +137,7 @@ describe Hbc::Artifact::App, :cask do
             expect(contents_path).to exist
           end
 
-          after(:each) do
+          after do
             FileUtils.chmod 0755, target_path
           end
         end
@@ -147,7 +147,7 @@ describe Hbc::Artifact::App, :cask do
     describe "when the target is a broken symlink" do
       let(:deleted_path) { cask.staged_path.join("Deleted.app") }
 
-      before(:each) do
+      before do
         deleted_path.mkdir
         File.symlink(deleted_path, target_path)
         deleted_path.rmdir

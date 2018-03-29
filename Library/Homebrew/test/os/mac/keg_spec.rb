@@ -8,9 +8,9 @@ describe Keg do
   describe "#mach_o_files" do
     let(:keg_path) { HOMEBREW_CELLAR/"a/1.0" }
 
-    before(:each) { (keg_path/"lib").mkpath }
+    before { (keg_path/"lib").mkpath }
 
-    after(:each) { subject.unlink }
+    after { subject.unlink }
 
     it "skips hardlinks" do
       cp dylib_path("i386"), keg_path/"lib/i386.dylib"

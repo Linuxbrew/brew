@@ -17,6 +17,7 @@ class Tab < OpenStruct
   # Instantiates a Tab for a new installation of a formula.
   def self.create(formula, compiler, stdlib)
     build = formula.build
+    runtime_deps = formula.runtime_dependencies(read_from_tab: false)
     attributes = {
       "homebrew_version" => HOMEBREW_VERSION,
       "used_options" => build.used_options.as_flags,
@@ -32,18 +33,18 @@ class Tab < OpenStruct
       "compiler" => compiler,
       "stdlib" => stdlib,
       "aliases" => formula.aliases,
-      "runtime_dependencies" => formula.runtime_dependencies.map do |dep|
+      "runtime_dependencies" => runtime_deps.map do |dep|
         f = dep.to_formula
         { "full_name" => f.full_name, "version" => f.version.to_s }
       end,
       "source" => {
         "path" => formula.specified_path.to_s,
-        "tap" => formula.tap ? formula.tap.name : nil,
+        "tap" => formula.tap&.name,
         "spec" => formula.active_spec_sym.to_s,
         "versions" => {
-          "stable" => formula.stable ? formula.stable.version.to_s : nil,
-          "devel" => formula.devel ? formula.devel.version.to_s : nil,
-          "head" => formula.head ? formula.head.version.to_s : nil,
+          "stable" => formula.stable&.version.to_s,
+          "devel" => formula.devel&.version.to_s,
+          "head" => formula.head&.version.to_s,
           "version_scheme" => formula.version_scheme,
         },
       },
@@ -66,7 +67,7 @@ class Tab < OpenStruct
     attributes["source"] ||= {}
 
     tapped_from = attributes["tapped_from"]
-    unless tapped_from.nil? || tapped_from == "path or URL"
+    if !tapped_from.nil? && tapped_from != "path or URL"
       attributes["source"]["tap"] = attributes.delete("tapped_from")
     end
 
@@ -156,12 +157,12 @@ class Tab < OpenStruct
       tab.unused_options = f.options.as_flags
       tab.source = {
         "path" => f.specified_path.to_s,
-        "tap" => f.tap ? f.tap.name : f.tap,
+        "tap" => f.tap&.name,
         "spec" => f.active_spec_sym.to_s,
         "versions" => {
-          "stable" => f.stable ? f.stable.version.to_s : nil,
-          "devel" => f.devel ? f.devel.version.to_s : nil,
-          "head" => f.head ? f.head.version.to_s : nil,
+          "stable" => f.stable&.version.to_s,
+          "devel" => f.devel&.version.to_s,
+          "head" => f.head&.version.to_s,
           "version_scheme" => f.version_scheme,
         },
       }
@@ -185,7 +186,7 @@ class Tab < OpenStruct
       "stdlib" => nil,
       "compiler" => DevelopmentTools.default_compiler,
       "aliases" => [],
-      "runtime_dependencies" => [],
+      "runtime_dependencies" => nil,
       "source" => {
         "path" => nil,
         "tap" => nil,

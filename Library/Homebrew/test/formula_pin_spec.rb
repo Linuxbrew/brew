@@ -2,10 +2,11 @@ require "formula_pin"
 
 describe FormulaPin do
   subject { described_class.new(formula) }
+
   let(:name) { "double" }
   let(:formula) { double(Formula, name: name, rack: HOMEBREW_CELLAR/name) }
 
-  before(:each) do
+  before do
     formula.rack.mkpath
 
     allow(formula).to receive(:installed_prefixes) do

@@ -3,6 +3,7 @@ describe Hbc::DSL::Version, :cask do
     expectations.each do |input_value, expected_output|
       context "when #{input_name} is #{input_value.inspect}" do
         let(input_name.to_sym) { input_value }
+
         it { is_expected.to eq expected_output }
       end
     end
@@ -13,17 +14,20 @@ describe Hbc::DSL::Version, :cask do
 
     context "when other is nil" do
       let(:other) { nil }
+
       it { is_expected.to be false }
     end
 
     context "when other is a String" do
       context "when other == self.raw_version" do
         let(:other) { "1.2.3" }
+
         it { is_expected.to be true }
       end
 
       context "when other != self.raw_version" do
         let(:other) { "1.2.3.4" }
+
         it { is_expected.to be false }
       end
     end
@@ -31,11 +35,13 @@ describe Hbc::DSL::Version, :cask do
     context "when other is a #{described_class}" do
       context "when other.raw_version == self.raw_version" do
         let(:other) { described_class.new("1.2.3") }
+
         it { is_expected.to be true }
       end
 
       context "when other.raw_version != self.raw_version" do
         let(:other) { described_class.new("1.2.3.4") }
+
         it { is_expected.to be false }
       end
     end
@@ -45,16 +51,19 @@ describe Hbc::DSL::Version, :cask do
 
   describe "#==" do
     subject { version == other }
+
     include_examples "version equality"
   end
 
   describe "#eql?" do
     subject { version.eql?(other) }
+
     include_examples "version equality"
   end
 
   shared_examples "version expectations hash" do |method, hash|
     subject { version.send(method) }
+
     include_examples "expectations hash", :raw_version,
                      { :latest  => "latest",
                        "latest" => "latest",

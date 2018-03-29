@@ -4,7 +4,7 @@ require "formula_installer"
 describe Utils::Analytics do
   describe "::os_prefix_ci" do
     context "when os_prefix_ci is not set" do
-      before(:each) do
+      before do
         described_class.clear_os_prefix_ci
       end
 

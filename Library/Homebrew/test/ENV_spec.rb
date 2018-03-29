@@ -2,6 +2,7 @@ require "extend/ENV"
 
 shared_examples EnvActivation do
   subject { env.extend(described_class) }
+
   let(:env) { {}.extend(EnvActivation) }
 
   it "supports switching compilers" do

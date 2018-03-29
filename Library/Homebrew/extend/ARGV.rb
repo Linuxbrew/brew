@@ -268,10 +268,6 @@ module HomebrewArgvExtension
     include? "--fetch-HEAD"
   end
 
-  def pry?
-    include?("--pry") || !ENV["HOMEBREW_PRY"].nil?
-  end
-
   # eg. `foo -ns -i --bar` has three switches, n, s and i
   def switch?(char)
     return false if char.length > 1

@@ -3,7 +3,7 @@ require "dependency_collector"
 describe DependencyCollector do
   alias_matcher :be_a_build_requirement, :be_build
 
-  after(:each) do
+  after do
     described_class.clear_cache
   end
 

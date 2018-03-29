@@ -22,7 +22,7 @@ describe Homebrew do
 
   let(:opts) { { dependency.rack => [Keg.new(dependency.installed_prefix)] } }
 
-  before(:each) do
+  before do
     [dependency, dependent].each do |f|
       f.installed_prefix.mkpath
       Keg.new(f.installed_prefix).optlink

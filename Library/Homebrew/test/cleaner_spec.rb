@@ -5,9 +5,10 @@ describe Cleaner do
   include FileUtils
 
   subject { described_class.new(f) }
+
   let(:f) { formula("cleaner_test") { url "foo-1.0" } }
 
-  before(:each) do
+  before do
     f.prefix.mkpath
   end
 
