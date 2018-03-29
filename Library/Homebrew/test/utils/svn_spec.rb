@@ -2,32 +2,32 @@ require "utils/svn"
 
 describe Utils do
   describe "#self.svn_available?" do
-    before(:each) do
+    before do
       described_class.clear_svn_version_cache
     end
 
     it "returns svn version if svn available" do
       if File.executable? "/usr/bin/svn"
-        expect(described_class.svn_available?).to be_truthy
+        expect(described_class).to be_svn_available
       else
-        expect(described_class.svn_available?).to be_falsey
+        expect(described_class).not_to be_svn_available
       end
     end
   end
 
   describe "#self.svn_remote_exists?" do
     it "returns true when svn is not available" do
-      allow(Utils).to receive(:svn_available?).and_return(false)
-      expect(described_class.svn_remote_exists?("blah")).to be_truthy
+      allow(described_class).to receive(:svn_available?).and_return(false)
+      expect(described_class).to be_svn_remote_exists("blah")
     end
 
     context "when svn is available" do
       before do
-        allow(Utils).to receive(:svn_available?).and_return(true)
+        allow(described_class).to receive(:svn_available?).and_return(true)
       end
 
       it "returns false when remote does not exist" do
-        expect(described_class.svn_remote_exists?(HOMEBREW_CACHE/"install")).to be_falsey
+        expect(described_class).not_to be_svn_remote_exists(HOMEBREW_CACHE/"install")
       end
 
       it "returns true when remote exists", :needs_network, :needs_svn do
@@ -36,7 +36,7 @@ describe Utils do
 
         HOMEBREW_CACHE.cd { system svn, "checkout", remote }
 
-        expect(described_class.svn_remote_exists?(HOMEBREW_CACHE/"install")).to be_truthy
+        expect(described_class).to be_svn_remote_exists(HOMEBREW_CACHE/"install")
       end
     end
   end

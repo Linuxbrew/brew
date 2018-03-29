@@ -55,7 +55,7 @@ module Homebrew
   module_function
 
   def audit
-    args = Homebrew::CLI::Parser.new do
+    args = Homebrew::CLI::Parser.parse do
       switch      "--strict"
       switch      "--online"
       switch      "--new-formula"
@@ -67,7 +67,7 @@ module Homebrew
       comma_array "--except"
       comma_array "--only-cops"
       comma_array "--except-cops"
-    end.parse
+    end
 
     Homebrew.auditing = true
     inject_dump_stats!(FormulaAuditor, /^audit_/) if args.audit_debug?
@@ -564,6 +564,7 @@ class FormulaAuditor
       gtk-doc 1.25
       libart 2.3.21
       pygtkglext 1.1.0
+      libepoxy 1.5.0
     ].each_slice(2).to_a.map do |formula, version|
       [formula, version.split(".")[0..1].join(".")]
     end

@@ -13,6 +13,8 @@ describe Reporter do
     hub.add(subject) if subject.updated?
   end
 
+  subject { reporter_class.new(tap) }
+
   let(:reporter_class) do
     Class.new(described_class) do
       def initialize(tap)
@@ -25,7 +27,7 @@ describe Reporter do
       end
     end
   end
-  subject { reporter_class.new(tap) }
+
   let(:tap) { CoreTap.new }
   let(:hub) { ReporterHub.new }
 
@@ -83,11 +85,11 @@ describe Reporter do
   context "when updating a Tap other than the core Tap" do
     let(:tap) { Tap.new("foo", "bar") }
 
-    before(:each) do
+    before do
       (tap.path/"Formula").mkpath
     end
 
-    after(:each) do
+    after do
       tap.path.parent.rmtree
     end
 

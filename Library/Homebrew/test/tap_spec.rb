@@ -3,6 +3,7 @@ describe Tap do
   alias_matcher :have_custom_remote, :be_custom_remote
 
   subject { described_class.new("Homebrew", "foo") }
+
   let(:path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-foo" }
   let(:formula_file) { path/"Formula/foo.rb" }
   let(:alias_file) { path/"Aliases/bar" }
@@ -12,7 +13,7 @@ describe Tap do
   let(:zsh_completion_file) { path/"completions/zsh/_brew-tap-cmd" }
   let(:fish_completion_file) { path/"completions/fish/brew-tap-cmd.fish" }
 
-  before(:each) do
+  before do
     path.mkpath
   end
 
@@ -62,7 +63,7 @@ describe Tap do
       expect(described_class.fetch("Homebrew", "core")).to be_kind_of(CoreTap)
       expect(described_class.fetch("Homebrew", "homebrew")).to be_kind_of(CoreTap)
       tap = described_class.fetch("Homebrew", "foo")
-      expect(tap).to be_kind_of(Tap)
+      expect(tap).to be_kind_of(described_class)
       expect(tap.name).to eq("homebrew/foo")
 
       expect {
@@ -232,7 +233,7 @@ describe Tap do
       setup_tap_files
       setup_git_repo
 
-      tap = Tap.new("Homebrew", "bar")
+      tap = described_class.new("Homebrew", "bar")
 
       tap.install clone_target: subject.path/".git"
 
@@ -259,7 +260,7 @@ describe Tap do
     begin
       setup_tap_files
       setup_git_repo
-      tap = Tap.new("Homebrew", "baz")
+      tap = described_class.new("Homebrew", "baz")
       tap.install clone_target: subject.path/".git"
       (HOMEBREW_PREFIX/"share/man/man1/brew-tap-cmd.1").delete
       (HOMEBREW_PREFIX/"etc/bash_completion.d/brew-tap-cmd").delete

@@ -2,7 +2,7 @@ describe Hbc::Artifact::Pkg, :cask do
   let(:cask) { Hbc::CaskLoader.load(cask_path("with-installable")) }
   let(:fake_system_command) { class_double(Hbc::SystemCommand) }
 
-  before(:each) do
+  before do
     InstallHelper.install_without_artifacts(cask)
   end
 

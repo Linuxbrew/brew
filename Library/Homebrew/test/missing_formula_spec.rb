@@ -4,12 +4,14 @@ describe Homebrew::MissingFormula do
   context "::reason" do
     subject { described_class.reason("gem") }
 
-    it { is_expected.to_not be_nil }
+    it { is_expected.not_to be_nil }
   end
 
   context "::blacklisted_reason" do
     matcher(:be_blacklisted) do
-      match(&Homebrew::MissingFormula.method(:blacklisted_reason))
+      match do |expected|
+        described_class.blacklisted_reason(expected)
+      end
     end
 
     context "rubygems" do
@@ -123,11 +125,13 @@ describe Homebrew::MissingFormula do
 
     context "with a migrated formula" do
       let(:formula) { "migrated-formula" }
-      it { is_expected.to_not be_nil }
+
+      it { is_expected.not_to be_nil }
     end
 
     context "with a missing formula" do
       let(:formula) { "missing-formula" }
+
       it { is_expected.to be_nil }
     end
   end
@@ -154,11 +158,13 @@ describe Homebrew::MissingFormula do
 
     context "with a deleted formula" do
       let(:formula) { "homebrew/foo/deleted-formula" }
-      it { is_expected.to_not be_nil }
+
+      it { is_expected.not_to be_nil }
     end
 
     context "with a formula that never existed" do
       let(:formula) { "homebrew/foo/missing-formula" }
+
       it { is_expected.to be_nil }
     end
   end

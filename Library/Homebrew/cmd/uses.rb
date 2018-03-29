@@ -42,24 +42,13 @@ module Homebrew
 
     formulae = ARGV.include?("--installed") ? Formula.installed : Formula
     recursive = ARGV.flag? "--recursive"
-    includes = []
-    ignores = []
-    if ARGV.include? "--include-build"
-      includes << "build?"
-    else
-      ignores << "build?"
-    end
-    if ARGV.include? "--include-test"
-      includes << "test?"
-    else
-      ignores << "test?"
-    end
-    if ARGV.include? "--include-optional"
-      includes << "optional?"
-    else
-      ignores << "optional?"
-    end
-    ignores << "recommended?" if ARGV.include? "--skip-recommended"
+    only_installed_arg = ARGV.include?("--installed") &&
+                         !ARGV.include?("--include-build") &&
+                         !ARGV.include?("--include-test") &&
+                         !ARGV.include?("--include-optional") &&
+                         !ARGV.include?("--skip-recommended")
+
+    includes, ignores = argv_includes_ignores(ARGV)
 
     verbose_using_dots = !ENV["HOMEBREW_VERBOSE_USING_DOTS"].nil?
     last_dot = Time.at(0)
@@ -74,28 +63,9 @@ module Homebrew
 
       used_formulae.all? do |ff|
         begin
+          deps = f.runtime_dependencies if only_installed_arg
           if recursive
-            deps = f.recursive_dependencies do |dependent, dep|
-              if dep.recommended?
-                Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
-              elsif dep.test?
-                if includes.include?("test?")
-                  Dependency.keep_but_prune_recursive_deps
-                else
-                  Dependency.prune
-                end
-              elsif dep.optional?
-                Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
-              elsif dep.build?
-                Dependency.prune unless includes.include?("build?")
-              end
-
-              # If a tap isn't installed, we can't find the dependencies of one
-              # its formulae, and an exception will be thrown if we try.
-              if dep.is_a?(TapDependency) && !dep.tap.installed?
-                Dependency.keep_but_prune_recursive_deps
-              end
-            end
+            deps ||= recursive_includes(Dependency, f, includes, ignores)
 
             dep_formulae = deps.flat_map do |dep|
               begin
@@ -113,7 +83,7 @@ module Homebrew
               if req.recommended?
                 ignores.include?("recommended?") || dependent.build.without?(req)
               elsif req.test?
-                Requirement.prune unless includes.include?("test?")
+                !includes.include?("test?")
               elsif req.optional?
                 !includes.include?("optional?") && !dependent.build.with?(req)
               elsif req.build?
@@ -123,13 +93,10 @@ module Homebrew
 
             reqs = reqs_by_formula.map(&:last)
           else
-            deps = f.deps.reject do |dep|
-              ignores.any? { |ignore| dep.send(ignore) } && includes.none? { |include| dep.send(include) }
-            end
-            reqs = f.requirements.reject do |req|
-              ignores.any? { |ignore| req.send(ignore) } && includes.none? { |include| req.send(include) }
-            end
+            deps ||= reject_ignores(f.deps, ignores, includes)
+            reqs   = reject_ignores(f.requirements, ignores, includes)
           end
+
           next true if deps.any? do |dep|
             begin
               dep.to_formula.full_name == ff.full_name

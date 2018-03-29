@@ -32,4 +32,15 @@ module Dependable
   def options
     Options.create(option_tags)
   end
+
+  def prune_from_option?(build)
+    return if !optional? && !recommended?
+    build.without?(self)
+  end
+
+  def prune_if_build_and_not_dependent?(dependent, formula = nil)
+    return false unless build?
+    return dependent.installed? unless formula
+    dependent != formula
+  end
 end

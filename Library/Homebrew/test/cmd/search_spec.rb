@@ -1,5 +1,5 @@
 describe "brew search", :integration_test do
-  before(:each) do
+  before do
     setup_test_formula "testball"
     setup_remote_tap "caskroom/cask"
   end

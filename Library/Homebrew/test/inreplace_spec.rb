@@ -216,7 +216,7 @@ end
 describe Utils::Inreplace do
   let(:file) { Tempfile.new("test") }
 
-  before(:each) do
+  before do
     file.write <<~EOS
       a
       b
@@ -224,7 +224,7 @@ describe Utils::Inreplace do
     EOS
   end
 
-  after(:each) { file.unlink }
+  after { file.unlink }
 
   it "raises error if there is nothing to replace" do
     expect {

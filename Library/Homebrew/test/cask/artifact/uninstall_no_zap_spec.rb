@@ -5,7 +5,7 @@ describe Hbc::Artifact::Zap, :cask do
     cask.artifacts.find { |a| a.is_a?(described_class) }
   }
 
-  before(:each) do
+  before do
     InstallHelper.install_without_artifacts(cask)
   end
 

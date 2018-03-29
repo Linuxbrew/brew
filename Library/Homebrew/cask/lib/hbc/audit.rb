@@ -33,6 +33,9 @@ module Hbc
       check_download
       check_single_pre_postflight
       check_single_uninstall_zap
+      check_untrusted_pkg
+      check_github_releases_appcast
+      check_latest_with_appcast
       self
     rescue StandardError => e
       odebug "#{e.message}\n#{e.backtrace.join("\n")}"
@@ -49,6 +52,18 @@ module Hbc
     end
 
     private
+
+    def check_untrusted_pkg
+      odebug "Auditing pkg stanza: allow_untrusted"
+
+      return if @cask.sourcefile_path.nil?
+
+      tap = @cask.tap
+      return if tap.nil? || tap.user != "caskroom"
+
+      return unless cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
+      add_warning "allow_untrusted is not permitted in official Homebrew-Cask taps"
+    end
 
     def check_single_pre_postflight
       odebug "Auditing preflight and postflight stanzas"
@@ -95,7 +110,7 @@ module Hbc
     def check_version_and_checksum
       return if @cask.sourcefile_path.nil?
 
-      tap = Tap.select { |t| t.cask_file?(@cask.sourcefile_path) }.first
+      tap = @cask.tap
       return if tap.nil?
 
       return if commit_range.nil?
@@ -212,6 +227,20 @@ module Hbc
           Actual: #{actual_checkpoint}
         EOS
       end
+    end
+
+    def check_latest_with_appcast
+      return unless cask.version.latest?
+      return unless cask.appcast
+
+      add_warning "Casks with an appcast should not use version :latest"
+    end
+
+    def check_github_releases_appcast
+      return if cask.appcast
+      return unless cask.url.to_s =~ %r{github.com/([^/]+)/([^/]+)/releases/download/(\S+)}
+
+      add_warning "Cask uses GitHub releases, please add an appcast. See https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
     end
 
     def check_url

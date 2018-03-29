@@ -49,7 +49,7 @@ describe Hbc::CLI::Info, :cask do
     end
   end
 
-  it "should print caveats if the Cask provided one" do
+  it "prints caveats if the Cask provided one" do
     expect {
       described_class.run("with-caveats")
     }.to output(<<~EOS).to_stdout
@@ -75,7 +75,7 @@ describe Hbc::CLI::Info, :cask do
     EOS
   end
 
-  it 'should not print "Caveats" section divider if the caveats block has no output' do
+  it 'does not print "Caveats" section divider if the caveats block has no output' do
     expect {
       described_class.run("with-conditional-caveats")
     }.to output(<<~EOS).to_stdout

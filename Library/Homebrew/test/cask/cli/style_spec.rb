@@ -92,6 +92,7 @@ describe Hbc::CLI::Style, :cask do
 
     context "when at least one cask token is a path that exists" do
       let(:tokens) { ["adium", "Casks/dropbox.rb"] }
+
       before do
         allow(File).to receive(:exist?).and_return(false, true)
       end
@@ -103,6 +104,7 @@ describe Hbc::CLI::Style, :cask do
 
     context "when no cask tokens are paths that exist" do
       let(:tokens) { %w[adium dropbox] }
+
       before do
         allow(File).to receive(:exist?).and_return(false)
       end
@@ -123,11 +125,13 @@ describe Hbc::CLI::Style, :cask do
 
     context "when fix? is true" do
       let(:fix) { true }
+
       it { is_expected.to include("--auto-correct") }
     end
 
     context "when fix? is false" do
       let(:fix) { false }
+
       it { is_expected.not_to include("--auto-correct") }
     end
   end
@@ -140,9 +144,10 @@ describe Hbc::CLI::Style, :cask do
 
   describe "#autocorrect_args" do
     subject { cli.autocorrect_args }
+
     let(:default_args) { ["--format", "simple"] }
 
-    it "should add --auto-correct to default args" do
+    it "adds --auto-correct to default args" do
       allow(cli).to receive(:default_args).and_return(default_args)
       expect(subject).to include("--auto-correct", *default_args)
     end
