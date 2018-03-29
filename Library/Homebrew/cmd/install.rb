@@ -332,7 +332,14 @@ module Homebrew
   def symlink_ld_so
     ld_so = HOMEBREW_PREFIX/"lib/ld.so"
     return if ld_so.readable?
-    sys_interpreter = ["/lib64/ld-linux-x86-64.so.2", "/lib/ld-linux.so.3", "/lib/ld-linux.so.2", "/lib/ld-linux-armhf.so.3", "/system/bin/linker"].find do |s|
+    sys_interpreter = [
+      "/lib64/ld-linux-x86-64.so.2",
+      "/lib/ld-linux.so.3",
+      "/lib/ld-linux.so.2",
+      "/lib/ld-linux-armhf.so.3",
+      "/lib/ld-linux-aarch64.so.1",
+      "/system/bin/linker",
+    ].find do |s|
       Pathname.new(s).executable?
     end
     raise "Unable to locate the system's ld.so" unless sys_interpreter
