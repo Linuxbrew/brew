@@ -181,8 +181,7 @@ class TapFormulaAmbiguityError < RuntimeError
     @name = name
     @paths = paths
     @formulae = paths.map do |path|
-      match = path.to_s.match(HOMEBREW_TAP_PATH_REGEX)
-      "#{Tap.fetch(match[:user], match[:repo])}/#{path.basename(".rb")}"
+      "#{Tap.from_path(path).name}/#{path.basename(".rb")}"
     end
 
     super <<~EOS
