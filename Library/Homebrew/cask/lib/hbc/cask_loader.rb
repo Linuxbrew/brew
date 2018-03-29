@@ -97,13 +97,13 @@ module Hbc
 
     class FromTapPathLoader < FromPathLoader
       def self.can_load?(ref)
-        ref.to_s.match?(HOMEBREW_TAP_PATH_REGEX) && super
+        File.expand_path(ref).match?(HOMEBREW_TAP_PATH_REGEX) && super
       end
 
       attr_reader :tap
 
       def initialize(tap_path)
-        @tap = Tap.from_path(tap_path)
+        @tap = Tap.from_path(File.expand_path(tap_path))
         super tap_path
       end
 
