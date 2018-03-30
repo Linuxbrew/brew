@@ -83,6 +83,9 @@ class Dependency
       deps.each do |dep|
         next if dependent.name == dep.name
 
+        # we only care about one level of test dependencies.
+        next if dep.test? && @expand_stack.length > 1
+
         case action(dependent, dep, &block)
         when :prune
           next
@@ -160,13 +163,9 @@ class Dependency
     end
 
     def merge_temporality(deps)
-      if deps.all?(&:build?)
-        [:build]
-      elsif deps.all?(&:run?)
-        [:run]
-      else
-        [] # Means both build and runtime dependency.
-      end
+      # Means both build and runtime dependency.
+      return [] unless deps.all?(&:build?)
+      [:build]
     end
   end
 end

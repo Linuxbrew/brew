@@ -10,6 +10,7 @@
 require "formula"
 require "erb"
 require "ostruct"
+require "cli_parser"
 
 module Homebrew
   module_function
@@ -19,9 +20,14 @@ module Homebrew
   TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
 
   def man
+    @args = Homebrew::CLI::Parser.parse do
+      switch "--fail-if-changed"
+      switch "--link"
+    end
+
     raise UsageError unless ARGV.named.empty?
 
-    if ARGV.flag? "--link"
+    if @args.link?
       odie "`brew man --link` is now done automatically by `brew update`."
     end
 
@@ -29,7 +35,7 @@ module Homebrew
 
     if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/Manpage.md", "manpages"
       puts "No changes to manpage output detected."
-    elsif ARGV.include?("--fail-if-changed")
+    elsif @args.fail_if_changed?
       Homebrew.failed = true
     end
   end
@@ -71,6 +77,9 @@ module Homebrew
     variables[:former_maintainers] = readme.read[/(Former maintainers .*\.)/, 1]
                                            .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
 
+    variables[:homebrew_bundle] = help_output(:bundle)
+    variables[:homebrew_services] = help_output(:services)
+
     ERB.new(template, nil, ">").result(variables.instance_eval { binding })
   end
 
@@ -85,7 +94,7 @@ module Homebrew
 
     # Set the manpage date to the existing one if we're checking for changes.
     # This avoids the only change being e.g. a new date.
-    date = if ARGV.include?("--fail-if-changed") &&
+    date = if @args.fail_if_changed? &&
               target.extname == ".1" && target.exist?
       /"(\d{1,2})" "([A-Z][a-z]+) (\d{4})" "#{organisation}" "#{manual}"/ =~ target.read
       Date.parse("#{Regexp.last_match(1)} #{Regexp.last_match(2)} #{Regexp.last_match(3)}")
@@ -111,6 +120,12 @@ module Homebrew
       ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
       target.atomic_write ronn_output
     end
+  end
+
+  def help_output(command)
+    tap = Tap.fetch("Homebrew/homebrew-#{command}")
+    tap.install unless tap.installed?
+    command_help_lines(which("brew-#{command}.rb", Tap.cmd_directories))
   end
 
   def target_path_to_format(target)

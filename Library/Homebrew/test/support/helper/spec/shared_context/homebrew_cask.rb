@@ -14,13 +14,13 @@ HOMEBREW_CASK_DIRS = {
 }.freeze
 
 RSpec.shared_context "Homebrew-Cask" do
-  before(:each) do
+  before do
     HOMEBREW_CASK_DIRS.each do |method, path|
       allow(Hbc::Config.global).to receive(method).and_return(path)
     end
   end
 
-  around(:each) do |example|
+  around do |example|
     third_party_tap = Tap.fetch("third-party", "tap")
     begin
       HOMEBREW_CASK_DIRS.values.each(&:mkpath)

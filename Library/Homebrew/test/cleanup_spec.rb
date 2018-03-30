@@ -5,23 +5,27 @@ require "pathname"
 
 describe Homebrew::Cleanup do
   let(:ds_store) { Pathname.new("#{HOMEBREW_PREFIX}/Library/.DS_Store") }
+  let(:lock_file) { Pathname.new("#{HOMEBREW_LOCK_DIR}/foo") }
   let(:sec_in_a_day) { 60 * 60 * 24 }
 
-  around(:each) do |example|
+  around do |example|
     begin
       FileUtils.touch ds_store
+      FileUtils.touch lock_file
 
       example.run
     ensure
       FileUtils.rm_f ds_store
+      FileUtils.rm_f lock_file
     end
   end
 
   describe "::cleanup" do
-    it "removes .DS_Store files" do
+    it "removes .DS_Store and lock files" do
       described_class.cleanup
 
       expect(ds_store).not_to exist
+      expect(lock_file).not_to exist
     end
 
     it "doesn't remove anything if `--dry-run` is specified" do
@@ -30,6 +34,15 @@ describe Homebrew::Cleanup do
       described_class.cleanup
 
       expect(ds_store).to exist
+      expect(lock_file).to exist
+    end
+
+    it "doesn't remove the lock file if it is locked" do
+      lock_file.open(File::RDWR | File::CREAT).flock(File::LOCK_EX | File::LOCK_NB)
+
+      described_class.cleanup
+
+      expect(lock_file).to exist
     end
 
     context "when it can't remove a keg" do
@@ -37,7 +50,7 @@ describe Homebrew::Cleanup do
       let(:f2) { Class.new(Testball) { version "0.2" }.new }
       let(:unremovable_kegs) { [] }
 
-      before(:each) do
+      before do
         described_class.instance_variable_set(:@unremovable_kegs, [])
         [f1, f2].each do |f|
           f.brew do
@@ -217,7 +230,7 @@ describe Homebrew::Cleanup do
       let(:bottle) { (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz") }
       let(:testball) { (HOMEBREW_CACHE/"testball-0.0.1") }
 
-      before(:each) do
+      before do
         FileUtils.touch(bottle)
         FileUtils.touch(testball)
         (HOMEBREW_CELLAR/"testball"/"0.0.1").mkpath
@@ -247,6 +260,8 @@ describe Homebrew::Cleanup do
   end
 
   describe "::prune?" do
+    alias_matcher :be_pruned, :be_prune
+
     before do
       foo.mkpath
     end
@@ -255,11 +270,11 @@ describe Homebrew::Cleanup do
 
     it "returns true when path_modified_time < days_default" do
       allow_any_instance_of(Pathname).to receive(:mtime).and_return(Time.now - sec_in_a_day * 2)
-      expect(described_class.prune?(foo, days_default: "1")).to be_truthy
+      expect(described_class).to be_pruned(foo, days_default: "1")
     end
 
     it "returns false when path_modified_time >= days_default" do
-      expect(described_class.prune?(foo, days_default: "2")).to be_falsey
+      expect(described_class).not_to be_pruned(foo, days_default: "2")
     end
   end
 end

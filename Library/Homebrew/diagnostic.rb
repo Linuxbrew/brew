@@ -11,11 +11,9 @@ module Homebrew
       missing = {}
       ff.each do |f|
         missing_dependencies = f.missing_dependencies(hide: hide)
-
-        unless missing_dependencies.empty?
-          yield f.full_name, missing_dependencies if block_given?
-          missing[f.full_name] = missing_dependencies
-        end
+        next if missing_dependencies.empty?
+        yield f.full_name, missing_dependencies if block_given?
+        missing[f.full_name] = missing_dependencies
       end
       missing
     end

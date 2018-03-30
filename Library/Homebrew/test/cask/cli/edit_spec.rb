@@ -2,7 +2,7 @@ require_relative "shared_examples/requires_cask_token"
 require_relative "shared_examples/invalid_option"
 
 describe Hbc::CLI::Edit, :cask do
-  before(:each) do
+  before do
     allow_any_instance_of(described_class).to receive(:exec_editor)
   end
 

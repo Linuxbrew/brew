@@ -923,7 +923,7 @@ describe Formula do
     let(:tab) { Tab.empty }
     let(:alias_path) { "#{CoreTap.instance.alias_dir}/bar" }
 
-    before(:each) do
+    before do
       allow(described_class).to receive(:installed).and_return([f])
 
       f.build = tab

@@ -47,7 +47,7 @@ describe Hbc::CLI::List, :cask do
       EOS
     }
 
-    before(:each) do
+    before do
       casks.map(&Hbc::CaskLoader.method(:load)).each(&InstallHelper.method(:install_with_caskfile))
     end
 

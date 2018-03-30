@@ -2,7 +2,6 @@ require "dependency"
 
 describe Dependency do
   alias_matcher :be_a_build_dependency, :be_build
-  alias_matcher :be_a_runtime_dependency, :be_run
 
   describe "::new" do
     it "accepts a single tag" do
@@ -73,22 +72,10 @@ describe Dependency do
     it "merges temporality tags" do
       normal_dep = described_class.new("foo")
       build_dep = described_class.new("foo", [:build])
-      run_dep = described_class.new("foo", [:run])
 
       deps = described_class.merge_repeats([normal_dep, build_dep])
       expect(deps.count).to eq(1)
       expect(deps.first).not_to be_a_build_dependency
-      expect(deps.first).not_to be_a_runtime_dependency
-
-      deps = described_class.merge_repeats([normal_dep, run_dep])
-      expect(deps.count).to eq(1)
-      expect(deps.first).not_to be_a_build_dependency
-      expect(deps.first).not_to be_a_runtime_dependency
-
-      deps = described_class.merge_repeats([build_dep, run_dep])
-      expect(deps.count).to eq(1)
-      expect(deps.first).not_to be_a_build_dependency
-      expect(deps.first).not_to be_a_runtime_dependency
     end
   end
 

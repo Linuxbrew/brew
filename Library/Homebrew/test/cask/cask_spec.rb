@@ -101,8 +101,9 @@ describe Hbc::Cask, :cask do
     end
 
     describe "versioned casks" do
-      let(:cask) { described_class.new("basic-cask") }
       subject { cask.outdated_versions }
+
+      let(:cask) { described_class.new("basic-cask") }
 
       shared_examples "versioned casks" do |tap_version, expectations|
         expectations.each do |installed_versions, expected_output|
@@ -139,6 +140,7 @@ describe Hbc::Cask, :cask do
         expectations.each do |installed_version, expected_output|
           context "when versions #{installed_version} are installed and the tap version is #{tap_version}, #{greedy ? "" : "not"} greedy" do
             subject { cask.outdated_versions greedy }
+
             it {
               allow(cask).to receive(:versions).and_return(installed_version)
               allow(cask).to receive(:version).and_return(Hbc::DSL::Version.new(tap_version))

@@ -17,7 +17,7 @@ describe Migrator do
   let(:keg) { Keg.new(old_keg_record) }
   let(:old_pin) { HOMEBREW_PINNED_KEGS/"oldname" }
 
-  before(:each) do |example|
+  before do |example|
     allow(new_formula).to receive(:oldname).and_return("oldname")
 
     # do not create directories for error tests
@@ -43,7 +43,7 @@ describe Migrator do
     (HOMEBREW_PREFIX/"bin").mkpath
   end
 
-  after(:each) do
+  after do
     keg.unlink if !old_keg_record.parent.symlink? && old_keg_record.directory?
 
     if new_keg_record.directory?
@@ -210,14 +210,14 @@ describe Migrator do
     tab.tabfile = HOMEBREW_CELLAR/"oldname/0.1/INSTALL_RECEIPT.json"
     tab.source["path"] = "/should/be/the/same"
     tab.write
-    migrator = Migrator.new(new_formula)
+    migrator = described_class.new(new_formula)
     tab.tabfile.delete
     migrator.backup_old_tabs
     expect(Tab.for_keg(old_keg_record).source["path"]).to eq("/should/be/the/same")
   end
 
   describe "#backup_oldname" do
-    after(:each) do
+    after do
       expect(old_keg_record.parent).to be_a_directory
       expect(old_keg_record.parent.subdirs).not_to be_empty
       expect(HOMEBREW_LINKED_KEGS/"oldname").to exist

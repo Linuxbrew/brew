@@ -3,7 +3,7 @@ require "requirements/java_requirement"
 describe JavaRequirement do
   subject { described_class.new([]) }
 
-  before(:each) do
+  before do
     ENV["JAVA_HOME"] = nil
   end
 
@@ -13,6 +13,7 @@ describe JavaRequirement do
 
   describe "#inspect" do
     subject { described_class.new(%w[1.7+]) }
+
     its(:inspect) { is_expected.to eq('#<JavaRequirement: "java" [] version="1.7+">') }
   end
 
@@ -23,11 +24,13 @@ describe JavaRequirement do
 
     context "with version 1.8" do
       subject { described_class.new(%w[1.8]) }
+
       its(:display_s) { is_expected.to eq("java = 1.8") }
     end
 
     context "with version 1.8+" do
       subject { described_class.new(%w[1.8+]) }
+
       its(:display_s) { is_expected.to eq("java >= 1.8") }
     end
   end
@@ -57,7 +60,7 @@ describe JavaRequirement do
         FileUtils.chmod "+x", java
       end
 
-      before(:each) do
+      before do
         allow(subject).to receive(:possible_javas).and_return([java])
       end
 

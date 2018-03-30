@@ -45,7 +45,7 @@ describe Formulary do
   end
 
   describe "::factory" do
-    before(:each) do
+    before do
       formula_path.write formula_content
     end
 
@@ -185,7 +185,7 @@ describe Formulary do
     let(:tap) { Tap.new("homebrew", "foo") }
     let(:tap_path) { tap.path/"#{formula_name}.rb" }
 
-    before(:each) do
+    before do
       core_path.write formula_content
       tap_path.write formula_content
     end

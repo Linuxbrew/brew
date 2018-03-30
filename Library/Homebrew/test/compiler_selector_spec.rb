@@ -3,6 +3,7 @@ require "software_spec"
 
 describe CompilerSelector do
   subject { described_class.new(software_spec, versions, compilers) }
+
   let(:compilers) { [:clang, :gcc, :gnu] }
   let(:software_spec) { SoftwareSpec.new }
   let(:cc) { :clang }
@@ -15,7 +16,7 @@ describe CompilerSelector do
     )
   end
 
-  before(:each) do
+  before do
     allow(versions).to receive(:non_apple_gcc_version) do |name|
       case name
       when "gcc-4.8" then Version.create("4.8.1")

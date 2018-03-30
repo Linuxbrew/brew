@@ -1,7 +1,7 @@
 require "utils/git"
 
 describe Git do
-  before(:each) do
+  before do
     git = HOMEBREW_SHIMS_PATH/"scm/git"
 
     HOMEBREW_CACHE.cd do
@@ -57,18 +57,18 @@ describe Git do
 end
 
 describe Utils do
-  before(:each) do
+  before do
     described_class.clear_git_available_cache
   end
 
   describe "::git_available?" do
     it "returns true if git --version command succeeds" do
-      expect(described_class.git_available?).to be_truthy
+      expect(described_class).to be_git_available
     end
 
     it "returns false if git --version command does not succeed" do
       stub_const("HOMEBREW_SHIMS_PATH", HOMEBREW_PREFIX/"bin/shim")
-      expect(described_class.git_available?).to be_falsey
+      expect(described_class).not_to be_git_available
     end
   end
 
@@ -121,10 +121,10 @@ describe Utils do
     end
   end
 
-  describe "::git_remote_exists" do
+  describe "::git_remote_exists?" do
     it "returns true when git is not available" do
       stub_const("HOMEBREW_SHIMS_PATH", HOMEBREW_PREFIX/"bin/shim")
-      expect(described_class.git_remote_exists("blah")).to be_truthy
+      expect(described_class).to be_git_remote_exists("blah")
     end
 
     context "when git is available" do
@@ -139,11 +139,11 @@ describe Utils do
           system git, "remote", "add", "origin", url
         end
 
-        expect(described_class.git_remote_exists(url)).to be_truthy
+        expect(described_class).to be_git_remote_exists(url)
       end
 
       it "returns false when git remote does not exist" do
-        expect(described_class.git_remote_exists("blah")).to be_falsey
+        expect(described_class).not_to be_git_remote_exists("blah")
       end
     end
   end

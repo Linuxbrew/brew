@@ -39,13 +39,13 @@ _create_lock() {
   local name="$2"
   local ruby="/usr/bin/ruby"
   local python="/usr/bin/python"
-  [[ -x "$ruby" ]] || ruby="$(which ruby 2>/dev/null)"
-  [[ -x "$python" ]] || python="$(which python 2>/dev/null)"
+  [[ -x "$ruby" ]] || ruby="$(type -P ruby)"
+  [[ -x "$python" ]] || python="$(type -P python)"
 
   if [[ -x "$ruby" ]] && "$ruby" -e "exit(RUBY_VERSION >= '1.8.7')"
   then
     "$ruby" -e "File.new($lock_fd).flock(File::LOCK_EX | File::LOCK_NB) || exit(1)"
-  elif [[ -x "$(which flock 2>/dev/null)" ]]
+  elif [[ -x "$(type -P flock)" ]]
   then
     flock -n "$lock_fd"
   elif [[ -x "$python" ]]

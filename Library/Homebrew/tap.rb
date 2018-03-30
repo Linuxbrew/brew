@@ -39,7 +39,7 @@ class Tap
   end
 
   def self.from_path(path)
-    match = path.to_s.match(HOMEBREW_TAP_PATH_REGEX)
+    match = File.expand_path(path).match(HOMEBREW_TAP_PATH_REGEX)
     raise "Invalid tap path '#{path}'" unless match
     fetch(match[:user], match[:repo])
   rescue
@@ -543,11 +543,7 @@ end
 # A specialized {Tap} class for the core formulae
 class CoreTap < Tap
   def default_remote
-    if OS.mac? || ENV["HOMEBREW_FORCE_HOMEBREW_ORG"]
-      "https://github.com/Homebrew/homebrew-core".freeze
-    else
-      "https://github.com/Linuxbrew/homebrew-core".freeze
-    end
+    "https://github.com/Homebrew/homebrew-core".freeze
   end
 
   # @private

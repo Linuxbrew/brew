@@ -60,11 +60,11 @@ describe Locale do
     end
 
     context "only some parts match" do
-      it { is_expected.to_not eql("zh") }
-      it { is_expected.to_not eql("zh-CN") }
-      it { is_expected.to_not eql("CN") }
-      it { is_expected.to_not eql("CN-Hans") }
-      it { is_expected.to_not eql("Hans") }
+      it { is_expected.not_to eql("zh") }
+      it { is_expected.not_to eql("zh-CN") }
+      it { is_expected.not_to eql("CN") }
+      it { is_expected.not_to eql("CN-Hans") }
+      it { is_expected.not_to eql("Hans") }
     end
 
     it "does not raise if 'other' cannot be parsed" do

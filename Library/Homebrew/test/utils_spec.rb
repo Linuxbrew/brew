@@ -30,10 +30,10 @@ describe "globally-scoped helper methods" do
     subject { pretty_installed("foo") }
 
     context "when $stdout is a TTY" do
-      before(:each) { allow($stdout).to receive(:tty?).and_return(true) }
+      before { allow($stdout).to receive(:tty?).and_return(true) }
 
       context "with HOMEBREW_NO_EMOJI unset" do
-        before(:each) { ENV.delete("HOMEBREW_NO_EMOJI") }
+        before { ENV.delete("HOMEBREW_NO_EMOJI") }
 
         it "returns a string with a colored checkmark" do
           expect(subject)
@@ -42,7 +42,7 @@ describe "globally-scoped helper methods" do
       end
 
       context "with HOMEBREW_NO_EMOJI set" do
-        before(:each) { ENV["HOMEBREW_NO_EMOJI"] = "1" }
+        before { ENV["HOMEBREW_NO_EMOJI"] = "1" }
 
         it "returns a string with colored info" do
           expect(subject)
@@ -52,7 +52,7 @@ describe "globally-scoped helper methods" do
     end
 
     context "when $stdout is not a TTY" do
-      before(:each) { allow($stdout).to receive(:tty?).and_return(false) }
+      before { allow($stdout).to receive(:tty?).and_return(false) }
 
       it "returns plain text" do
         expect(subject).to eq("foo")
@@ -64,10 +64,10 @@ describe "globally-scoped helper methods" do
     subject { pretty_uninstalled("foo") }
 
     context "when $stdout is a TTY" do
-      before(:each) { allow($stdout).to receive(:tty?).and_return(true) }
+      before { allow($stdout).to receive(:tty?).and_return(true) }
 
       context "with HOMEBREW_NO_EMOJI unset" do
-        before(:each) { ENV.delete("HOMEBREW_NO_EMOJI") }
+        before { ENV.delete("HOMEBREW_NO_EMOJI") }
 
         it "returns a string with a colored checkmark" do
           expect(subject)
@@ -76,7 +76,7 @@ describe "globally-scoped helper methods" do
       end
 
       context "with HOMEBREW_NO_EMOJI set" do
-        before(:each) { ENV["HOMEBREW_NO_EMOJI"] = "1" }
+        before { ENV["HOMEBREW_NO_EMOJI"] = "1" }
 
         it "returns a string with colored info" do
           expect(subject)
@@ -86,7 +86,7 @@ describe "globally-scoped helper methods" do
     end
 
     context "when $stdout is not a TTY" do
-      before(:each) { allow($stdout).to receive(:tty?).and_return(false) }
+      before { allow($stdout).to receive(:tty?).and_return(false) }
 
       it "returns plain text" do
         expect(subject).to eq("foo")
@@ -139,7 +139,7 @@ describe "globally-scoped helper methods" do
   describe "#which" do
     let(:cmd) { dir/"foo" }
 
-    before(:each) { FileUtils.touch cmd }
+    before { FileUtils.touch cmd }
 
     it "returns the first executable that is found" do
       cmd.chmod 0744
@@ -166,7 +166,7 @@ describe "globally-scoped helper methods" do
     let(:cmd2) { dir/"bar/foo" }
     let(:cmd3) { dir/"bar/baz/foo" }
 
-    before(:each) do
+    before do
       (dir/"bar/baz").mkpath
 
       FileUtils.touch cmd2

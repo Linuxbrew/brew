@@ -2,6 +2,7 @@ require "extend/ARGV"
 
 describe HomebrewArgvExtension do
   subject { argv.extend(described_class) }
+
   let(:argv) { ["mxcl"] }
 
   describe "#formulae" do
@@ -26,7 +27,7 @@ describe HomebrewArgvExtension do
 
   describe "#kegs" do
     context "when there are matching Kegs" do
-      before(:each) do
+      before do
         keg = HOMEBREW_CELLAR + "mxcl/10.0"
         keg.mkpath
       end

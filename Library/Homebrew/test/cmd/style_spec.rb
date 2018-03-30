@@ -1,7 +1,7 @@
 require "cmd/style"
 
 describe "brew style" do
-  around(:each) do |example|
+  around do |example|
     begin
       FileUtils.ln_s HOMEBREW_LIBRARY_PATH, HOMEBREW_LIBRARY/"Homebrew"
       FileUtils.ln_s HOMEBREW_LIBRARY_PATH.parent/".rubocop.yml", HOMEBREW_LIBRARY/".rubocop_audit.yml"

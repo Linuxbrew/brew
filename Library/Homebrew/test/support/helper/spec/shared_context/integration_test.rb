@@ -36,7 +36,7 @@ RSpec.shared_context "integration test" do
     end
   end
 
-  around(:each) do |example|
+  around do |example|
     begin
       (HOMEBREW_PREFIX/"bin").mkpath
       FileUtils.touch HOMEBREW_PREFIX/"bin/brew"

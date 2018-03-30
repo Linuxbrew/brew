@@ -124,6 +124,7 @@ module Hbc
           BUNDLE_PATH
           PATH
           SHELL
+          HOMEBREW_CASK_OPTS
         ]
 
         locale_variables = ENV.keys.grep(/^(?:LC_\S+|LANG|LANGUAGE)\Z/).sort
