@@ -1,7 +1,7 @@
 HOMEBREW_HELP = <<~EOS.freeze
   Example usage:
     brew search [TEXT|/REGEX/]
-    brew (info|home|options) [FORMULA...]
+    brew info [FORMULA...]
     brew install FORMULA...
     brew update
     brew upgrade [FORMULA...]
@@ -11,17 +11,17 @@ HOMEBREW_HELP = <<~EOS.freeze
   Troubleshooting:
     brew config
     brew doctor
-    brew install -vd FORMULA
+    brew install --verbose --debug FORMULA
 
-  Developers:
+  Contributing:
     brew create [URL [--no-fetch]]
     brew edit [FORMULA...]
-    https://docs.brew.sh/Formula-Cookbook
 
   Further help:
-    man brew
+    brew commands
     brew help [COMMAND]
-    brew home
+    man brew
+    https://docs.brew.sh
 EOS
 
 # NOTE Keep the lenth of vanilla --help less than 25 lines!
