@@ -4,7 +4,7 @@ require "formula"
 
 class LinkageChecker
   attr_reader :keg, :formula
-  attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :variable_dylibs
+  attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :broken_deps, :variable_dylibs
   attr_reader :undeclared_deps, :unnecessary_deps, :reverse_links
 
   def initialize(keg, formula = nil)
@@ -12,7 +12,8 @@ class LinkageChecker
     @formula = formula || resolve_formula(keg)
     @brewed_dylibs = Hash.new { |h, k| h[k] = Set.new }
     @system_dylibs = Set.new
-    @broken_dylibs = Hash.new { |h, k| h[k] = Set.new }
+    @broken_dylibs = []
+    @broken_deps = Hash.new { |h, k| h[k] = Set.new }
     @variable_dylibs = Set.new
     @indirect_deps = []
     @undeclared_deps = []
@@ -46,7 +47,12 @@ class LinkageChecker
             @system_dylibs << dylib
           rescue Errno::ENOENT
             next if harmless_broken_link?(dylib)
-            @broken_dylibs[dylib_to_dep(dylib)] << dylib
+            dep = dylib_to_dep(dylib)
+            if dep.nil?
+              @broken_dylibs << dylib
+            else
+              @broken_deps[dep] << dylib
+            end
           else
             tap = Tab.for_keg(owner).tap
             f = if tap.nil? || tap.core_tap?
@@ -91,7 +97,7 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
-    missing_deps = @broken_dylibs.values.map do |v|
+    missing_deps = @broken_deps.values.map do |v|
       v.map do |d|
         dylib_to_dep(d)
       end
@@ -118,6 +124,7 @@ class LinkageChecker
     display_items "Indirect dependencies with linkage", @indirect_deps
     display_items "Variable-referenced libraries", @variable_dylibs
     display_items "Missing libraries", @broken_dylibs
+    display_items "Missing dependencies", @broken_deps
     display_items "Undeclared dependencies with linkage", @undeclared_deps
     display_items "Dependencies with no linkage", @unnecessary_deps
   end
@@ -137,6 +144,7 @@ class LinkageChecker
 
   def display_test_output
     display_items "Missing libraries", @broken_dylibs
+    display_items "Missing dependencies", @broken_deps
     display_items "Dependencies with no linkage", @unnecessary_deps
     puts "No broken dylib links" if @broken_dylibs.empty?
   end
