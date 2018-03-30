@@ -67,7 +67,14 @@ module Homebrew
       oh1 "No packages to upgrade"
     else
       oh1 "Upgrading #{Formatter.pluralize(formulae_to_install.length, "outdated package")}, with result:"
-      puts formulae_to_install.map { |f| "#{f.full_specified_name} #{f.pkg_version}" } * ", "
+      formulae_upgrades = formulae_to_install.map do |f|
+        if f.optlinked?
+          "#{f.full_specified_name} #{Keg.new(f.opt_prefix).version} -> #{f.pkg_version}"
+        else
+          "#{f.full_specified_name} #{f.pkg_version}"
+        end
+      end
+      puts formulae_upgrades.join(", ")
     end
 
     # Sort keg_only before non-keg_only formulae to avoid any needless conflicts
