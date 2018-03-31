@@ -430,11 +430,10 @@ _brew_tap() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   case "$cur" in
     --*)
-      __brewcomp "--repair --list-official --list-pinned"
+      __brewcomp "--repair --list-pinned"
       return
       ;;
   esac
-  __brewcomp "$(brew tap --list-official)"
 }
 
 _brew_tap_info() {
@@ -716,7 +715,7 @@ _brew_cask_upgrade ()
         return
         ;;
     esac
-    __brew_cask_complete_outdated    
+    __brew_cask_complete_outdated
 }
 
 _brew_cask ()
