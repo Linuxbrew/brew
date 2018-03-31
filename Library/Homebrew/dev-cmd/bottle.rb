@@ -58,7 +58,7 @@ BOTTLE_ERB = <<-EOS.freeze
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
     <% checksum, macos = checksum_value.shift %>
-    <%= checksum_type %> "<%= checksum %>" => :<%= macos %>
+    <%= checksum_type %> "<%= checksum %>" => :<%= macos %><%= "_or_later" if Homebrew.args.or_later? %>
     <% end %>
     <% end %>
   end
@@ -68,6 +68,9 @@ MAXIMUM_STRING_MATCHES = 100
 
 module Homebrew
   module_function
+
+  attr_reader :args
+  module_function :args
 
   def bottle
     @args = Homebrew::CLI::Parser.parse do
@@ -80,6 +83,7 @@ module Homebrew
       switch "--write"
       switch "--no-commit"
       switch "--json"
+      switch "--or-later"
       flag   "--root-url"
     end
 
