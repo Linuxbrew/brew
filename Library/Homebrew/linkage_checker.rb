@@ -180,7 +180,7 @@ class LinkageChecker
     return if things.empty?
     puts "#{label}:"
     if things.is_a? Hash
-      things.sort_by { |k, | k.to_s }.each do |list_label, list|
+      things.sort_by(&:to_s).each do |list_label, list|
         list.sort.each do |item|
           puts "  #{item} (#{list_label})"
         end
