@@ -23,6 +23,8 @@ module Homebrew
     args = Homebrew::CLI::Parser.parse do
       switch "--to-tag"
       switch "--keep-tmp"
+      switch :verbose
+      switch :debug
       flag   "--commit", required: true
       flag   "--before", required: true
     end
