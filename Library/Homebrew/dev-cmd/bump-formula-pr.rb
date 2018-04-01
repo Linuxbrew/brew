@@ -57,6 +57,7 @@ module Homebrew
       switch "--no-browse"
       switch :quiet
       switch :force
+      switch :verbose
       switch :debug
       flag   "--url",      required: true
       flag   "--sha256",   required: true
@@ -65,6 +66,9 @@ module Homebrew
       flag   "--revision", required: true
       flag   "--version",  required: true
       flag   "--message",  required: true
+      depends :url, :sha256
+      depends :tag, :revision, mandatory: true
+      conflicts :url, :tag
     end
 
     # As this command is simplifying user run commands then let's just use a

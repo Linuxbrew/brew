@@ -70,4 +70,41 @@ describe Homebrew::CLI::Parser do
       expect(args.files).to eq %w[random1.txt random2.txt]
     end
   end
+
+  describe "test constraints" do
+    subject(:parser) {
+      described_class.new do
+        flag "--flag1"
+        flag "--flag2"
+        flag "--flag3"
+        flag "--flag4"
+        depends :flag1, :flag2, mandatory: true
+        depends :flag3, :flag4
+        conflicts :flag1, :flag3
+      end
+    }
+
+    it "raises exception on depends mandatory constraint violation" do
+      expect { parser.parse(["--flag1"]) }.to raise_error(Homebrew::CLI::OptionDependencyError)
+    end
+
+    it "raises exception on depends constraint violation" do
+      expect { parser.parse(["--flag2"]) }.to raise_error(Homebrew::CLI::OptionDependencyError)
+    end
+
+    it "raises exception for conflict violation" do
+      expect { parser.parse(["--flag1", "--flag3"]) }.to raise_error(Homebrew::CLI::OptionConflictError)
+    end
+
+    it "raises no exception" do
+      args = parser.parse(["--flag1", "--flag2"])
+      expect(args.flag1).to be true
+      expect(args.flag2).to be true
+    end
+
+    it "raises no exception for optional dependency" do
+      args = parser.parse(["--flag3"])
+      expect(args.flag3).to be true
+    end
+  end
 end

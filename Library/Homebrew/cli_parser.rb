@@ -13,6 +13,8 @@ module Homebrew
         @parsed_args = OpenStruct.new
         # undefine tap to allow --tap argument
         @parsed_args.instance_eval { undef tap }
+        @depends = []
+        @conflicts = []
         instance_eval(&block)
       end
 
@@ -47,6 +49,14 @@ module Homebrew
         end
       end
 
+      def depends(primary, secondary, mandatory: false)
+        @depends << [primary, secondary, mandatory]
+      end
+
+      def conflicts(primary, secondary)
+        @conflicts << [primary, secondary]
+      end
+
       def option_to_name(name)
         name.sub(/\A--?/, "").tr("-", "_")
       end
@@ -57,6 +67,7 @@ module Homebrew
 
       def parse(cmdline_args = ARGV)
         @parser.parse(cmdline_args)
+        check_constraint_violations
         @parsed_args
       end
 
@@ -81,6 +92,57 @@ module Homebrew
         when :force   then [["-f", "--force"], :force]
         else name
         end
+      end
+
+      def option_passed?(name)
+        @parsed_args.respond_to?(name) || @parsed_args.respond_to?("#{name}?")
+      end
+
+      def check_depends
+        @depends.each do |primary, secondary, required|
+          primary_passed = option_passed?(primary)
+          secondary_passed = option_passed?(secondary)
+          raise OptionDependencyError.new(primary, secondary) if required && primary_passed &&
+                                                                 !secondary_passed
+          raise OptionDependencyError.new(primary, secondary, missing: true) if secondary_passed &&
+                                                                                !primary_passed
+        end
+      end
+
+      def check_conflicts
+        @conflicts.each do |primary, secondary|
+          primary_passed = option_passed?(primary)
+          secondary_passed = option_passed?(secondary)
+          raise OptionConflictError.new(primary, secondary) if primary_passed && secondary_passed
+        end
+      end
+
+      def check_constraint_violations
+        check_conflicts
+        check_depends
+      end
+    end
+
+    class OptionDependencyError < RuntimeError
+      def initialize(arg1, arg2, missing: false)
+        if !missing
+          message = <<~EOS
+            `#{arg1}` and `#{arg2}` should be passed together
+          EOS
+        else
+          message = <<~EOS
+            `#{arg2}` cannot be passed without `#{arg1}`
+          EOS
+        end
+        super message
+      end
+    end
+
+    class OptionConflictError < RuntimeError
+      def initialize(arg1, arg2)
+        super <<~EOS
+          `#{arg1}` and `#{arg2}` should not be passed together
+        EOS
       end
     end
   end
