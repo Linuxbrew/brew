@@ -13,6 +13,8 @@ module Stdenv
   def setup_build_environment(formula = nil)
     super
 
+    self["HOMEBREW_ENV"] = "std"
+
     PATH.new(ENV["HOMEBREW_PATH"]).each { |p| prepend_path "PATH", p }
 
     # Set the default pkg-config search path, overriding the built-in paths

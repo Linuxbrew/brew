@@ -151,12 +151,14 @@ class SystemConfig
       if defaults_hash[:HOMEBREW_CACHE] != HOMEBREW_CACHE.to_s
         f.puts "HOMEBREW_CACHE: #{HOMEBREW_CACHE}"
       end
-      ENV.sort.each do |key, value|
-        next unless key.start_with?("HOMEBREW_")
-        next if boring_keys.include?(key)
-        next if defaults_hash[key.to_sym]
-        value = "set" if key =~ /(cookie|key|token|password)/i
-        f.puts "#{key}: #{value}"
+      unless ENV["HOMEBREW_ENV"]
+        ENV.sort.each do |key, value|
+          next unless key.start_with?("HOMEBREW_")
+          next if boring_keys.include?(key)
+          next if defaults_hash[key.to_sym]
+          value = "set" if key =~ /(cookie|key|token|password)/i
+          f.puts "#{key}: #{value}"
+        end
       end
       f.puts hardware if hardware
       f.puts "Homebrew Ruby: #{describe_homebrew_ruby}"
