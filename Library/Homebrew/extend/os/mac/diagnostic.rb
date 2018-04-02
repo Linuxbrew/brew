@@ -7,8 +7,6 @@ module Homebrew
           check_for_bad_install_name_tool
           check_for_installed_developer_tools
           check_xcode_license_approved
-          check_for_osx_gcc_installer
-          check_xcode_8_without_clt_on_el_capitan
           check_xcode_up_to_date
           check_clt_up_to_date
           check_for_other_package_managers
@@ -92,20 +90,6 @@ module Homebrew
         EOS
       end
 
-      def check_xcode_8_without_clt_on_el_capitan
-        return unless MacOS::Xcode.without_clt?
-        # Scope this to Xcode 8 on El Cap for now
-        return unless MacOS.version == :el_capitan
-        return unless MacOS::Xcode.version >= "8"
-
-        <<~EOS
-          You have Xcode 8 installed without the CLT;
-          this causes certain builds to fail on OS X El Capitan (10.11).
-          Please install the CLT via:
-            sudo xcode-select --install
-        EOS
-      end
-
       def check_xcode_minimum_version
         return unless MacOS::Xcode.below_minimum_version?
 
@@ -131,57 +115,6 @@ module Homebrew
         <<~EOS
           Xcode alone is not sufficient on #{MacOS.version.pretty_name}.
           #{DevelopmentTools.installation_instructions}
-        EOS
-      end
-
-      def check_for_osx_gcc_installer
-        return unless MacOS.version < "10.7" || ((MacOS::Xcode.version || "0") > "4.1")
-        return unless DevelopmentTools.clang_version == "2.1"
-
-        fix_advice = if MacOS.version >= :mavericks
-          "Please run `xcode-select --install` to install the CLT."
-        elsif MacOS.version >= :lion
-          "Please install the CLT or Xcode #{MacOS::Xcode.latest_version}."
-        else
-          "Please install Xcode #{MacOS::Xcode.latest_version}."
-        end
-
-        <<~EOS
-          You seem to have osx-gcc-installer installed.
-          Homebrew doesn't support osx-gcc-installer. It causes many builds to fail and
-          is an unlicensed distribution of really old Xcode files.
-          #{fix_advice}
-        EOS
-      end
-
-      def check_for_stray_developer_directory
-        # if the uninstaller script isn't there, it's a good guess neither are
-        # any troublesome leftover Xcode files
-        uninstaller = Pathname.new("/Developer/Library/uninstall-developer-folder")
-        return unless ((MacOS::Xcode.version || "0") >= "4.3") && uninstaller.exist?
-
-        <<~EOS
-          You have leftover files from an older version of Xcode.
-          You should delete them using:
-            #{uninstaller}
-        EOS
-      end
-
-      def check_for_bad_install_name_tool
-        return if MacOS.version < "10.9"
-
-        libs = Pathname.new("/usr/bin/install_name_tool").dynamically_linked_libraries
-
-        # otool may not work, for example if the Xcode license hasn't been accepted yet
-        return if libs.empty?
-        return if libs.include? "/usr/lib/libxcselect.dylib"
-
-        <<~EOS
-          You have an outdated version of /usr/bin/install_name_tool installed.
-          This will cause binary package installations to fail.
-          This can happen if you install osx-gcc-installer or RailsInstaller.
-          To restore it, you must reinstall macOS or restore the binary from
-          the OS packages.
         EOS
       end
 
@@ -339,33 +272,6 @@ module Homebrew
           can only be used with a /usr/local prefix and some formulae (packages)
           may not build correctly with a non-/usr/local prefix.
         EOS
-      end
-
-      def check_which_pkg_config
-        binary = which "pkg-config"
-        return if binary.nil?
-
-        mono_config = Pathname.new("/usr/bin/pkg-config")
-        if mono_config.exist? && mono_config.realpath.to_s.include?("Mono.framework")
-          <<~EOS
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              /usr/bin/pkg-config => #{mono_config.realpath}
-
-            This was most likely created by the Mono installer. `./configure` may
-            have problems finding brew-installed packages using this other pkg-config.
-
-            Mono no longer installs this file as of 3.0.4. You should
-            `sudo rm /usr/bin/pkg-config` and upgrade to the latest version of Mono.
-          EOS
-        elsif binary.to_s != "#{HOMEBREW_PREFIX}/bin/pkg-config"
-          <<~EOS
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              #{binary}
-
-            `./configure` may have problems finding brew-installed packages using
-            this other pkg-config.
-          EOS
-        end
       end
     end
   end
