@@ -4,7 +4,6 @@ module Homebrew
       def development_tools_checks
         %w[
           check_for_unsupported_macos
-          check_for_bad_install_name_tool
           check_for_installed_developer_tools
           check_xcode_license_approved
           check_xcode_up_to_date
