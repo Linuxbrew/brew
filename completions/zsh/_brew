@@ -56,12 +56,6 @@ __brew_installed_taps() {
   _describe -t installed-taps 'installed taps' taps
 }
 
-__brew_official_taps() {
-  local -a taps
-  taps=($(brew tap --list-official))
-  _describe -t official-taps 'official taps' taps
-}
-
 __brew_pinned_taps() {
   local -a taps
   taps=($(brew tap --list-pinned))
@@ -70,8 +64,7 @@ __brew_pinned_taps() {
 
 __brew_any_tap() {
   _alternative \
-    'installed-taps:installed taps:__brew_installed_taps' \
-    'official-taps:official taps:__brew_official_taps'
+    'installed-taps:installed taps:__brew_installed_taps'
 }
 
 __brew_common_commands() {
@@ -605,19 +598,15 @@ _brew_switch() {
 # brew tap:
 # brew tap [--full] user/repo [URL]:
 # brew tap --repair:
-# brew tap --list-official:
 # brew tap --list-pinned:
 _brew_tap() {
   _arguments \
     - empty-args \
     - repo-args \
       '(--full)--full[perform a full clone]' \
-      ':repo:__brew_official_taps' \
       '::url:_urls' \
     - repair-args \
       '(--repair)--repair' \
-    - list-official \
-      '(--list-official)--list-official[list all official taps]' \
     - list-pinned \
       '(--list-pinned)--list-pinned[list all pinned taps]'
 }

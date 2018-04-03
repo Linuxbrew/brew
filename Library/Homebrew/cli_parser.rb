@@ -16,6 +16,7 @@ module Homebrew
 
       def switch(*names, description: nil, env: nil)
         description = option_to_description(*names) if description.nil?
+        names, env = common_switch(*names) if names.first.is_a?(Symbol)
         @parser.on(*names, description) do
           enable_switch(*names)
         end
@@ -46,7 +47,7 @@ module Homebrew
       end
 
       def option_to_description(*names)
-        names.map { |name| name.sub(/\A--?/, "").tr("-", " ") }.sort.last
+        names.map { |name| name.to_s.sub(/\A--?/, "").tr("-", " ") }.sort.last
       end
 
       def parse(cmdline_args = ARGV)
@@ -59,6 +60,15 @@ module Homebrew
       def enable_switch(*names)
         names.each do |name|
           @parsed_args["#{option_to_name(name)}?"] = true
+        end
+      end
+
+      def common_switch(name)
+        case name
+        when :quiet   then [["-q", "--quiet"], :quiet]
+        when :verbose then [["-v", "--verbose"], :verbose]
+        when :debug   then [["-d", "--debug"], :debug]
+        else name
         end
       end
     end

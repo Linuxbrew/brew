@@ -6,12 +6,6 @@ describe Homebrew::Diagnostic::Checks do
     expect(subject.inject_file_list(%w[/a /b], "foo:\n")).to eq("foo:\n  /a\n  /b\n")
   end
 
-  specify "#check_path_for_trailing_slashes" do
-    ENV["HOMEBREW_PATH"] += File::PATH_SEPARATOR + "/foo/bar/"
-    expect(subject.check_path_for_trailing_slashes)
-      .to match("Some directories in your path end in a slash")
-  end
-
   specify "#check_build_from_source" do
     ENV["HOMEBREW_BUILD_FROM_SOURCE"] = "1"
     expect(subject.check_build_from_source)

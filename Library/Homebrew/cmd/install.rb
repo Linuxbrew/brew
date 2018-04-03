@@ -166,7 +166,8 @@ module Homebrew
             formulae << f
           else
             opoo <<~EOS
-              #{f.full_name} #{f.pkg_version} is already installed
+              #{f.full_name} #{f.pkg_version} is already installed and up-to-date
+              To reinstall #{f.pkg_version}, run `brew reinstall #{f.name}`
             EOS
           end
         elsif (ARGV.build_head? && new_head_installed) || prefix_installed
@@ -190,12 +191,17 @@ module Homebrew
             EOS
           elsif !f.linked? || f.keg_only?
             msg = <<~EOS
-              #{msg}, it's just not linked.
+              #{msg}, it's just not linked
               You can use `brew link #{f}` to link this version.
             EOS
           elsif ARGV.only_deps?
             msg = nil
             formulae << f
+          else
+            msg = <<~EOS
+              #{msg} and up-to-date
+              To reinstall #{f.pkg_version}, run `brew reinstall #{f.name}`
+            EOS
           end
           opoo msg if msg
         elsif !f.any_version_installed? && old_formula = f.old_installed_formulae.first

@@ -444,8 +444,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     Exits with a non-zero status if any style violations are found.
 
-  * `switch` `name` `version`:
-    Symlink all of the specific `version` of `name`'s install to Homebrew prefix.
+  * `switch` `formula` `version`:
+    Symlink all of the specific `version` of `formula`'s install to Homebrew prefix.
 
   * `tap`:
     List all installed taps.
@@ -473,9 +473,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `tap` `--repair`:
     Migrate tapped formulae from symlink-based to directory-based structure.
-
-  * `tap` `--list-official`:
-    List all official taps.
 
   * `tap` `--list-pinned`:
     List all pinned taps.

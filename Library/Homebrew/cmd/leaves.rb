@@ -12,7 +12,13 @@ module Homebrew
     installed = Formula.installed.sort
 
     deps_of_installed = installed.flat_map do |f|
-      f.runtime_dependencies.map(&:to_formula).map(&:full_name)
+      f.runtime_dependencies.map do |dep|
+        begin
+          dep.to_formula.full_name
+        rescue FormulaUnavailableError
+          dep.name
+        end
+      end
     end
 
     leaves = installed.map(&:full_name) - deps_of_installed

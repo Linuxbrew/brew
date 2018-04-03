@@ -238,7 +238,9 @@ class Keg
 
     if tap
       bad_tap_opt = opt/tap.user
-      FileUtils.rm_rf bad_tap_opt if bad_tap_opt.directory?
+      if !bad_tap_opt.symlink? && bad_tap_opt.directory?
+        FileUtils.rm_rf bad_tap_opt
+      end
     end
 
     aliases.each do |a|

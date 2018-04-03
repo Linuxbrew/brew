@@ -25,9 +25,6 @@
 #:  * `tap` `--repair`:
 #:    Migrate tapped formulae from symlink-based to directory-based structure.
 #:
-#:  * `tap` `--list-official`:
-#:    List all official taps.
-#:
 #:  * `tap` `--list-pinned`:
 #:    List all pinned taps.
 
@@ -40,8 +37,7 @@ module Homebrew
     if ARGV.include? "--repair"
       Tap.each(&:link_completions_and_manpages)
     elsif ARGV.include? "--list-official"
-      require "official_taps"
-      puts OFFICIAL_TAPS.map { |t| "homebrew/#{t}" }
+      odeprecated("brew tap --list-official")
     elsif ARGV.include? "--list-pinned"
       puts Tap.select(&:pinned?).map(&:name)
     elsif ARGV.named.empty?

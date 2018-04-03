@@ -75,7 +75,6 @@ module Homebrew
   def bottle
     @args = Homebrew::CLI::Parser.parse do
       switch "--merge"
-      switch "-v", "--verbose"
       switch "--skip-relocation"
       switch "--force-core-tap"
       switch "--no-rebuild"
@@ -84,6 +83,7 @@ module Homebrew
       switch "--no-commit"
       switch "--json"
       switch "--or-later"
+      switch :verbose
       flag   "--root-url"
     end
 

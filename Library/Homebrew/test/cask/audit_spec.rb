@@ -98,16 +98,19 @@ describe Hbc::Audit, :cask do
 
       context "when the Cask has no pkg stanza" do
         let(:cask_token) { "basic-cask" }
-        it { should_not warn_with(error_msg) }
+
+        it { is_expected.not_to warn_with(error_msg) }
       end
 
       context "when the Cask does not have allow_untrusted" do
         let(:cask_token) { "with-uninstall-pkgutil" }
-        it { should_not warn_with(error_msg) }
+
+        it { is_expected.not_to warn_with(error_msg) }
       end
 
       context "when the Cask has allow_untrusted" do
         let(:cask_token) { "with-allow-untrusted" }
+
         it { is_expected.to warn_with(error_msg) }
       end
     end
@@ -406,16 +409,19 @@ describe Hbc::Audit, :cask do
 
       context "when the Cask does not use GitHub releases" do
         let(:cask_token) { "basic-cask" }
-        it { should_not warn_with(error_msg) }
+
+        it { is_expected.not_to warn_with(error_msg) }
       end
 
       context "when the Cask uses GitHub releases and has an appcast" do
         let(:cask_token) { "github-with-appcast" }
-        it { should_not warn_with(error_msg) }
+
+        it { is_expected.not_to warn_with(error_msg) }
       end
 
       context "when the Cask uses GitHub releases and does not have an appcast" do
         let(:cask_token) { "github-without-appcast" }
+
         it { is_expected.to warn_with(error_msg) }
       end
     end
@@ -425,16 +431,19 @@ describe Hbc::Audit, :cask do
 
       context "when the Cask is :latest and does not have an appcast" do
         let(:cask_token) { "version-latest" }
-        it { should_not warn_with(error_msg) }
+
+        it { is_expected.not_to warn_with(error_msg) }
       end
 
       context "when the Cask is versioned and has an appcast" do
         let(:cask_token) { "with-appcast" }
-        it { should_not warn_with(error_msg) }
+
+        it { is_expected.not_to warn_with(error_msg) }
       end
 
       context "when the Cask is :latest and has an appcast" do
         let(:cask_token) { "latest-with-appcast" }
+
         it { is_expected.to warn_with(error_msg) }
       end
     end

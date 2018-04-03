@@ -22,14 +22,14 @@ describe Homebrew::Diagnostic::Checks do
       .to match("The following beta release of XQuartz is installed: 2.7.10_beta2")
   end
 
-  specify "#check_xcode_8_without_clt_on_el_capitan" do
+  specify "#check_if_xcode_needs_clt_installed" do
     allow(MacOS).to receive(:version).and_return(OS::Mac::Version.new("10.11"))
     allow(MacOS::Xcode).to receive(:installed?).and_return(true)
     allow(MacOS::Xcode).to receive(:version).and_return("8.0")
     allow(MacOS::Xcode).to receive(:without_clt?).and_return(true)
 
-    expect(subject.check_xcode_8_without_clt_on_el_capitan)
-      .to match("You have Xcode 8 installed without the CLT")
+    expect(subject.check_if_xcode_needs_clt_installed)
+      .to match("Xcode alone is not sufficient on El Capitan")
   end
 
   specify "#check_homebrew_prefix" do
