@@ -21,6 +21,6 @@ ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
 	SHELL=/bin/bash \
 	USER=linuxbrew
 
-# Install portable-ruby.
-RUN brew config \
+# Install portable-ruby and tap homebrew/core.
+RUN HOMEBREW_NO_ANALYTICS=1 brew tap homebrew/core \
 	&& rm -rf ~/.cache
