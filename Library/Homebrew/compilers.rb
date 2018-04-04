@@ -8,6 +8,7 @@ module CompilerConstants
     "clang"      => :clang,
     "llvm_clang" => :llvm_clang,
     "cc"         => :c_compiler,
+    "gcc"        => :brew_gcc,
   }.freeze
 
   COMPILERS = COMPILER_SYMBOL_MAP.values +
@@ -102,7 +103,7 @@ class CompilerSelector
     clang: [:clang, :gcc_4_2, :gnu, :gcc_4_0, :llvm_clang],
     gcc_4_2: [:gcc_4_2, :gnu, :clang, :gcc_4_0],
     gcc_4_0: [:gcc_4_0, :gcc_4_2, :gnu, :clang],
-    c_compiler: [:gnu, :clang, :gcc_4_2, :gcc_4_0, :llvm_clang],
+    c_compiler: [:brew_gcc, :gnu, :clang, :gcc_4_2, :gcc_4_0, :llvm_clang],
   }.freeze
 
   def self.select_for(formula, compilers = self.compilers)
