@@ -16,6 +16,15 @@ module Superenv
   def homebrew_extra_paths
     paths = []
 
+    if compiler == :brew_gcc
+      bin = begin
+        Formula["gcc"].opt_bin
+      rescue FormulaUnavailableError
+        nil
+      end
+      paths << bin if bin&.directory?
+    end
+
     paths += %w[binutils make].map do |f|
       begin
         bin = Formula[f].opt_bin

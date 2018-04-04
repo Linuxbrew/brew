@@ -118,10 +118,25 @@ class DevelopmentTools
       non_apple_gcc_version "cc"
     end
 
+    def brew_gcc_build_version
+      @brew_gcc_build_version ||= begin
+        path = Formulary.factory("gcc").opt_bin/"gcc"
+        if path.executable? &&
+           build_version = `#{path} --version`[/g?cc(?:(?:-\d(?:\.\d)?)? \(.+\))? (\d\.\d\.\d)/, 1]
+          Version.new build_version
+        else
+          Version::NULL
+        end
+      rescue FormulaUnavailableError
+        Version::NULL
+      end
+    end
+
     def clear_version_cache
       @gcc_4_0_build_version = @gcc_4_2_build_version = nil
       @clang_version = @clang_build_version = nil
       @non_apple_gcc_version = {}
+      @brew_gcc_build_version = nil
     end
 
     def curl_handles_most_https_certificates?
