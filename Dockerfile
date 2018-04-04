@@ -20,4 +20,7 @@ WORKDIR /home/linuxbrew
 ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH \
 	SHELL=/bin/bash \
 	USER=linuxbrew
-RUN brew config # install portable-ruby
+
+# Install portable-ruby.
+RUN brew config \
+	&& rm -rf ~/.cache
