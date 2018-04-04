@@ -9,6 +9,7 @@ jobs:
     steps:
       - run: |
           cd /home/linuxbrew/.linuxbrew/Homebrew
+          git fetch --unshallow
           git pull --ff-only
           if [ -n "$CIRCLE_PR_NUMBER" ]; then
               git fetch origin pull/$CIRCLE_PR_NUMBER/head
