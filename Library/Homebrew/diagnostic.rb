@@ -291,9 +291,6 @@ module Homebrew
         <<~EOS
           #{HOMEBREW_TEMP} is world-writable but does not have the sticky bit set.
           Please execute `sudo chmod +t #{HOMEBREW_TEMP}` in your Terminal.
-          Alternatively, if you don't have administrative privileges on this
-          machine, point the HOMEBREW_TEMP environment variable to a directory
-          you control, e.g. `mkdir ~/tmp; chmod 755 ~/tmp; export HOMEBREW_TEMP=~/tmp`.
         EOS
       end
 
@@ -514,62 +511,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_gettext
-        return unless OS.mac?
-        find_relative_paths("lib/libgettextlib.dylib",
-                            "lib/libintl.dylib",
-                            "include/libintl.h")
-        return if @found.empty?
-
-        # Our gettext formula will be caught by check_linked_keg_only_brews
-        gettext = begin
-          Formulary.factory("gettext")
-        rescue
-          nil
-        end
-        homebrew_owned = @found.all? do |path|
-          Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
-        end
-        return if gettext&.linked_keg&.directory? && homebrew_owned
-
-        inject_file_list @found, <<~EOS
-          gettext files detected at a system prefix.
-          These files can cause compilation and link failures, especially if they
-          are compiled with improper architectures. Consider removing these files:
-        EOS
-      end
-
-      def check_for_iconv
-        return unless OS.mac?
-        find_relative_paths("lib/libiconv.dylib", "include/iconv.h")
-        return if @found.empty?
-
-        libiconv = begin
-          Formulary.factory("libiconv")
-        rescue
-          nil
-        end
-        if libiconv&.linked_keg&.directory?
-          unless libiconv.keg_only?
-            <<~EOS
-              A libiconv formula is installed and linked.
-              This will break stuff. For serious. Unlink it.
-            EOS
-          end
-        else
-          inject_file_list @found, <<~EOS
-            libiconv files detected at a system prefix other than /usr.
-            Homebrew doesn't provide a libiconv formula, and expects to link against
-            the system version in /usr. libiconv in other prefixes can cause
-            compile or link failure, especially if compiled with improper
-            architectures. macOS itself never installs anything to /usr/local so
-            it was either installed by a user or some other third party software.
-
-            tl;dr: delete these files:
-          EOS
-        end
-      end
-
       def check_for_config_scripts
         return unless HOMEBREW_CELLAR.exist?
         real_cellar = HOMEBREW_CELLAR.realpath
@@ -607,29 +548,6 @@ module Homebrew
         EOS
       end
 
-      def check_dyld_vars
-        dyld = OS.mac? ? "DYLD" : "LD"
-        dyld_vars = ENV.keys.grep(/^#{dyld}_/)
-        return if dyld_vars.empty?
-
-        values = dyld_vars.map { |var| "#{var}: #{ENV.fetch(var)}" }
-        message = inject_file_list values, <<~EOS
-          Setting #{dyld}_* vars can break dynamic linking.
-          Set variables:
-        EOS
-
-        if dyld_vars.include? "DYLD_INSERT_LIBRARIES"
-          message += <<~EOS
-
-            Setting DYLD_INSERT_LIBRARIES can cause Go builds to fail.
-            Having this set is common if you use this software:
-              #{Formatter.url("https://asepsis.binaryage.com/")}
-          EOS
-        end
-
-        message
-      end
-
       def check_for_symlinked_cellar
         return unless HOMEBREW_CELLAR.exist?
         return unless HOMEBREW_CELLAR.symlink?
@@ -646,39 +564,6 @@ module Homebrew
           Older installations of Homebrew may have created a symlinked Cellar, but this can
           cause problems when two formula install to locations that are mapped on top of each
           other during the linking step.
-        EOS
-      end
-
-      def check_for_multiple_volumes
-        return unless OS.mac?
-        return unless HOMEBREW_CELLAR.exist?
-        volumes = Volumes.new
-
-        # Find the volumes for the TMP folder & HOMEBREW_CELLAR
-        real_cellar = HOMEBREW_CELLAR.realpath
-        where_cellar = volumes.which real_cellar
-
-        begin
-          tmp = Pathname.new(Dir.mktmpdir("doctor", HOMEBREW_TEMP))
-          begin
-            real_tmp = tmp.realpath.parent
-            where_tmp = volumes.which real_tmp
-          ensure
-            Dir.delete tmp
-          end
-        rescue
-          return
-        end
-
-        return if where_cellar == where_tmp
-
-        <<~EOS
-          Your Cellar and TEMP directories are on different volumes.
-          macOS won't move relative symlinks across volumes unless the target file already
-          exists. Brews known to be affected by this are Git and Narwhal.
-
-          You should set the "HOMEBREW_TEMP" environmental variable to a suitable
-          directory on the same volume as your Cellar.
         EOS
       end
 
