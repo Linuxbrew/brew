@@ -14,6 +14,7 @@ end
 def curl_args(*extra_args, show_output: false, user_agent: :default)
   args = [
     curl_executable.to_s,
+    "-q", # do not load .curlrc (must be the first argument)
     "--show-error",
   ]
 

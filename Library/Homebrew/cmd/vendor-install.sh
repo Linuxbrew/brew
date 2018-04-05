@@ -48,6 +48,7 @@ fetch() {
   local temporary_path
 
   curl_args=(
+    -q # do not load .curlrc (must be the first argument)
     --fail
     --remote-time
     --location
