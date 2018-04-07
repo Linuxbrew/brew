@@ -13,7 +13,7 @@ class LinkageChecker
     @brewed_dylibs = Hash.new { |h, k| h[k] = Set.new }
     @system_dylibs = Set.new
     @broken_dylibs = []
-    @broken_deps = Hash.new { |h, k| h[k] = Set.new }
+    @broken_deps = Hash.new { |h, k| h[k] = [] }
     @variable_dylibs = Set.new
     @indirect_deps = []
     @undeclared_deps = []
@@ -48,7 +48,7 @@ class LinkageChecker
           rescue Errno::ENOENT
             next if harmless_broken_link?(dylib)
             if (dep = dylib_to_dep(dylib))
-              @broken_deps[dep] << dylib
+              @broken_deps[dep] |= [dylib]
             else
               @broken_dylibs << dylib
             end
@@ -96,7 +96,7 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
-    missing_deps = @broken_deps.values.flat_map { |d| dylib_to_dep(d) }.compact
+    missing_deps = @broken_deps.values.flatten.map { |d| dylib_to_dep(d) }
     unnecessary_deps -= missing_deps
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
