@@ -48,9 +48,9 @@ class LinkageChecker
           rescue Errno::ENOENT
             next if harmless_broken_link?(dylib)
             if (dep = dylib_to_dep(dylib))
-              @broken_dylibs << dylib
-            else
               @broken_deps[dep] << dylib
+            else
+              @broken_dylibs << dylib
             end
           else
             tap = Tab.for_keg(owner).tap
