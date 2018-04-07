@@ -110,10 +110,10 @@ module Homebrew
       $stderr.puts Formatter.headline("Searching taps on GitHub...", color: :blue)
     end
 
-    valid_dirnames = ["Formula", "HomebrewFormula", "Casks", "."].freeze
     matches = begin
       GitHub.search_code(
         user: ["Homebrew", "caskroom"],
+        path: ["Formula", "HomebrewFormula", "Casks", "."],
         filename: query,
         extension: "rb",
       )
@@ -122,11 +122,10 @@ module Homebrew
       []
     end
     matches.map do |match|
-      dirname, filename = File.split(match["path"])
-      next unless valid_dirnames.include?(dirname)
+      filename = File.basename(match["path"], ".rb")
       tap = Tap.fetch(match["repository"]["full_name"])
       next if tap.installed? && match["repository"]["owner"]["login"] != "caskroom"
-      "#{tap.name}/#{File.basename(filename, ".rb")}"
+      "#{tap.name}/#{filename}"
     end.compact
   end
 
