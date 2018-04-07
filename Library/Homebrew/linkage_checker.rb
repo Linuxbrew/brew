@@ -47,8 +47,7 @@ class LinkageChecker
             @system_dylibs << dylib
           rescue Errno::ENOENT
             next if harmless_broken_link?(dylib)
-            dep = dylib_to_dep(dylib)
-            if dep.nil?
+            if (dep = dylib_to_dep(dylib))
               @broken_dylibs << dylib
             else
               @broken_deps[dep] << dylib
@@ -97,11 +96,7 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
-    missing_deps = @broken_deps.values.map do |v|
-      v.map do |d|
-        dylib_to_dep(d)
-      end
-    end.flatten.compact
+    missing_deps = @broken_deps.values.flat_map { |d| dylib_to_dep(d) }.compact
     unnecessary_deps -= missing_deps
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
@@ -124,7 +119,7 @@ class LinkageChecker
     display_items "Indirect dependencies with linkage", @indirect_deps
     display_items "Variable-referenced libraries", @variable_dylibs
     display_items "Missing libraries", @broken_dylibs
-    display_items "Missing dependencies", @broken_deps
+    display_items "Broken dependencies", @broken_deps
     display_items "Undeclared dependencies with linkage", @undeclared_deps
     display_items "Dependencies with no linkage", @unnecessary_deps
   end
@@ -144,7 +139,7 @@ class LinkageChecker
 
   def display_test_output
     display_items "Missing libraries", @broken_dylibs
-    display_items "Missing dependencies", @broken_deps
+    display_items "Broken dependencies", @broken_deps
     display_items "Dependencies with no linkage", @unnecessary_deps
     puts "No broken dylib links" if @broken_dylibs.empty?
   end
