@@ -1,5 +1,4 @@
 require "hardware"
-require "utils"
 
 require "hbc/artifact"
 require "hbc/audit"

@@ -1,4 +1,3 @@
-require "tap"
 
 class Tap
   def core_formula_repository?

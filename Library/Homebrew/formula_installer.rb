@@ -1,5 +1,4 @@
 require "cxxstdlib"
-require "exceptions"
 require "formula"
 require "keg"
 require "tab"
@@ -59,7 +58,8 @@ class FormulaInstaller
     @invalid_option_names = []
     @requirement_messages = []
     @poured_bottle = false
-    @pour_failed   = false
+    @pour_failed = false
+    @start_time = nil
   end
 
   def self.attempted

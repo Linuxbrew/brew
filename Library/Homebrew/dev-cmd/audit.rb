@@ -39,11 +39,9 @@
 
 require "formula"
 require "formula_versions"
-require "utils"
 require "utils/curl"
 require "extend/ENV"
 require "formula_cellar_checks"
-require "official_taps"
 require "cmd/search"
 require "cmd/style"
 require "date"

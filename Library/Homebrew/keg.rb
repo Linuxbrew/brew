@@ -1,4 +1,3 @@
-require "extend/pathname"
 require "keg_relocate"
 require "lock_file"
 require "ostruct"

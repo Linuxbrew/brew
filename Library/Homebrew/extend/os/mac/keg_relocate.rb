@@ -1,23 +1,19 @@
 class Keg
-  def fix_dynamic_linkage
-    mach_o_files.each do |file|
-      file.ensure_writable do
-        change_dylib_id(dylib_id_for(file), file) if file.dylib?
+  class << self
+    undef file_linked_libraries
 
-        each_install_name_for(file) do |bad_name|
-          # Don't fix absolute paths unless they are rooted in the build directory
-          next if bad_name.start_with?("/") &&
-                  !bad_name.start_with?(HOMEBREW_TEMP.to_s) &&
-                  !bad_name.start_with?(HOMEBREW_TEMP.realpath.to_s)
-
-          new_name = fixed_name(file, bad_name)
-          change_install_name(bad_name, new_name, file) unless new_name == bad_name
-        end
+    def file_linked_libraries(file, string)
+      # Check dynamic library linkage. Importantly, do not perform for static
+      # libraries, which will falsely report "linkage" to themselves.
+      if file.mach_o_executable? || file.dylib? || file.mach_o_bundle?
+        file.dynamically_linked_libraries.select { |lib| lib.include? string }
+      else
+        []
       end
     end
-
-    generic_fix_dynamic_linkage
   end
+
+  undef relocate_dynamic_linkage, detect_cxx_stdlibs
 
   def relocate_dynamic_linkage(relocation)
     mach_o_files.each do |file|
@@ -56,6 +52,26 @@ class Keg
     end
 
     results.to_a
+  end
+
+  def fix_dynamic_linkage
+    mach_o_files.each do |file|
+      file.ensure_writable do
+        change_dylib_id(dylib_id_for(file), file) if file.dylib?
+
+        each_install_name_for(file) do |bad_name|
+          # Don't fix absolute paths unless they are rooted in the build directory
+          next if bad_name.start_with?("/") &&
+                  !bad_name.start_with?(HOMEBREW_TEMP.to_s) &&
+                  !bad_name.start_with?(HOMEBREW_TEMP.realpath.to_s)
+
+          new_name = fixed_name(file, bad_name)
+          change_install_name(bad_name, new_name, file) unless new_name == bad_name
+        end
+      end
+    end
+
+    generic_fix_dynamic_linkage
   end
 
   # If file is a dylib or bundle itself, look for the dylib named by
@@ -129,15 +145,5 @@ class Keg
     # Don't recurse into symlinks; the man page says this is the default, but
     # it's wrong. -O is a BSD-grep-only option.
     "-lrO"
-  end
-
-  def self.file_linked_libraries(file, string)
-    # Check dynamic library linkage. Importantly, do not perform for static
-    # libraries, which will falsely report "linkage" to themselves.
-    if file.mach_o_executable? || file.dylib? || file.mach_o_bundle?
-      file.dynamically_linked_libraries.select { |lib| lib.include? string }
-    else
-      []
-    end
   end
 end

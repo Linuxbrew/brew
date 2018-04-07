@@ -1,5 +1,4 @@
 require "fileutils"
-require "tmpdir"
 require "etc"
 
 # Homebrew extends Ruby's `FileUtils` to make our code more readable.

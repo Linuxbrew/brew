@@ -1,4 +1,3 @@
-require "utils"
 
 module Gpg
   module_function

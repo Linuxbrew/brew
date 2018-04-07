@@ -1,24 +1,6 @@
 class SystemConfig
   class << self
-    def xcode
-      @xcode ||= if MacOS::Xcode.installed?
-        xcode = MacOS::Xcode.version.to_s
-        xcode += " => #{MacOS::Xcode.prefix}" unless MacOS::Xcode.default_prefix?
-        xcode
-      end
-    end
-
-    def clt
-      @clt ||= if MacOS::CLT.installed? && MacOS::Xcode.version >= "4.3"
-        MacOS::CLT.version
-      end
-    end
-
-    def xquartz
-      @xquartz ||= if MacOS::XQuartz.installed?
-        "#{MacOS::XQuartz.version} => #{describe_path(MacOS::XQuartz.prefix)}"
-      end
-    end
+    undef describe_java, describe_homebrew_ruby
 
     def describe_java
       # java_home doesn't exist on all macOSs; it might be missing on older versions.
@@ -40,6 +22,26 @@ class SystemConfig
         "#{s} => #{RUBY_PATH}"
       else
         s
+      end
+    end
+
+    def xcode
+      @xcode ||= if MacOS::Xcode.installed?
+        xcode = MacOS::Xcode.version.to_s
+        xcode += " => #{MacOS::Xcode.prefix}" unless MacOS::Xcode.default_prefix?
+        xcode
+      end
+    end
+
+    def clt
+      @clt ||= if MacOS::CLT.installed? && MacOS::Xcode.version >= "4.3"
+        MacOS::CLT.version
+      end
+    end
+
+    def xquartz
+      @xquartz ||= if MacOS::XQuartz.installed?
+        "#{MacOS::XQuartz.version} => #{describe_path(MacOS::XQuartz.prefix)}"
       end
     end
 

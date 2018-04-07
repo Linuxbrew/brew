@@ -1,7 +1,5 @@
-require "pathname"
 require "resource"
 require "metafiles"
-require "utils"
 
 module DiskUsageExtension
   def disk_usage

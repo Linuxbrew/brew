@@ -2,9 +2,6 @@ unless ENV["HOMEBREW_BREW_FILE"]
   raise "HOMEBREW_BREW_FILE was not exported! Please call bin/brew directly!"
 end
 
-require "constants"
-
-require "tmpdir"
 require "pathname"
 
 HOMEBREW_BREW_FILE = Pathname.new(ENV["HOMEBREW_BREW_FILE"])

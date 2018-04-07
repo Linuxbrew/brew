@@ -1,6 +1,4 @@
-require "pathname"
 require "emoji"
-require "exceptions"
 require "utils/analytics"
 require "utils/curl"
 require "utils/fork"
