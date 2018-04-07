@@ -716,8 +716,7 @@ describe Formula do
       keg = Keg.for(formula.prefix)
       keg.link
 
-      brewed_dylibs = { dependency.name => Set["some.dylib"] }
-      linkage_checker = double("linkage checker", brewed_dylibs: brewed_dylibs)
+      linkage_checker = double("linkage checker", undeclared_deps: [dependency.name])
       allow(LinkageChecker).to receive(:new).with(keg, any_args)
         .and_return(linkage_checker)
 
