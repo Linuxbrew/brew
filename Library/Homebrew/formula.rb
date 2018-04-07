@@ -1498,6 +1498,13 @@ class Formula
     declared_runtime_dependencies | undeclared_runtime_dependencies
   end
 
+  def declared_runtime_dependencies
+    recursive_dependencies do |_, dependency|
+      Dependency.prune if dependency.build?
+      Dependency.prune if !dependency.required? && build.without?(dependency)
+    end
+  end
+
   def undeclared_runtime_dependencies
     if optlinked?
       keg = Keg.new(opt_prefix)
