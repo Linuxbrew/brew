@@ -111,8 +111,16 @@ module Homebrew
     end
 
     valid_dirnames = ["Formula", "HomebrewFormula", "Casks", "."].freeze
-    matches = GitHub.search_code(user: ["Homebrew", "caskroom"], filename: query, extension: "rb")
-
+    matches = begin
+      GitHub.search_code(
+        user: ["Homebrew", "caskroom"],
+        filename: query,
+        extension: "rb",
+      )
+    rescue GitHub::Error => error
+      opoo "Error searching on GitHub: #{error}\n"
+      []
+    end
     matches.map do |match|
       dirname, filename = File.split(match["path"])
       next unless valid_dirnames.include?(dirname)
