@@ -738,6 +738,10 @@ class FormulaAuditor
       problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
     end
 
+    if line =~ /depends_on .+ if build\.with(out)?\?\(?["']\w+["']\)?/
+      problem "`Use :optional` or `:recommended` instead of `#{Regexp.last_match(0)}`"
+    end
+
     return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
     problem "Use pkgshare instead of (share#{Regexp.last_match(1)}\"#{formula.name}\")"
   end
