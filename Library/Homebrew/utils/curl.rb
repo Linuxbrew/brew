@@ -12,11 +12,14 @@ def curl_executable
 end
 
 def curl_args(*extra_args, show_output: false, user_agent: :default)
-  args = [
-    curl_executable.to_s,
-    "-q", # do not load .curlrc (must be the first argument)
-    "--show-error",
-  ]
+  args = [curl_executable.to_s]
+
+  # do not load .curlrc unless requested (must be the first argument)
+  if ENV["HOMEBREW_CURLRC"]
+    args << "-q"
+  end
+
+  args << "--show-error"
 
   args << "--user-agent" << case user_agent
   when :browser, :fake
