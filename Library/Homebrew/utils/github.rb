@@ -7,8 +7,8 @@ module GitHub
   API_URL = "https://api.github.com".freeze
 
   CREATE_GIST_SCOPES = ["gist"].freeze
-  CREATE_ISSUE_SCOPES = ["public_repo"].freeze
-  ALL_SCOPES = (CREATE_GIST_SCOPES + CREATE_ISSUE_SCOPES).freeze
+  CREATE_ISSUE_FORK_OR_PR_SCOPES = ["public_repo"].freeze
+  ALL_SCOPES = (CREATE_GIST_SCOPES + CREATE_ISSUE_FORK_OR_PR_SCOPES).freeze
   ALL_SCOPES_URL = Formatter.url("https://github.com/settings/tokens/new?scopes=#{ALL_SCOPES.join(",")}&description=Homebrew").freeze
 
   Error = Class.new(RuntimeError)
@@ -251,6 +251,20 @@ module GitHub
     end
 
     prs.each { |i| puts "#{i["title"]} (#{i["html_url"]})" }
+  end
+
+  def create_fork(repo)
+    url = "https://api.github.com/repos/#{repo}/forks"
+    data = {}
+    scopes = CREATE_ISSUE_FORK_OR_PR_SCOPES
+    open_api(url, data: data, scopes: scopes)
+  end
+
+  def create_pull_request(repo, title, head, base, body)
+    url = "https://api.github.com/repos/#{repo}/pulls"
+    data = { title: title, head: head, base: base, body: body }
+    scopes = CREATE_ISSUE_FORK_OR_PR_SCOPES
+    open_api(url, data: data, scopes: scopes)
   end
 
   def private_repo?(full_name)
