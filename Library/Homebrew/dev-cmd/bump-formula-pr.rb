@@ -334,6 +334,8 @@ module Homebrew
 
         begin
           response = GitHub.create_fork(formula.tap.full_name)
+          # GitHub API responds immediately but fork takes a few seconds to be ready.
+          sleep 3
         rescue *gh_api_errors => e
           formula.path.atomic_write(backup_file) unless ARGV.dry_run?
           odie "Unable to fork: #{e.message}!"
