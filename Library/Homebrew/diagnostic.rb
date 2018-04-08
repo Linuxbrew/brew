@@ -1,7 +1,6 @@
 require "keg"
 require "language/python"
 require "formula"
-require "tempfile"
 require "version"
 require "development_tools"
 require "utils/shell"
@@ -481,21 +480,6 @@ module Homebrew
         EOS
       end
 
-      def check_xdg_data_dirs
-        share = "#{HOMEBREW_PREFIX}/share"
-        homebrew_in_xdg_data_dirs =
-          !ENV["XDG_DATA_DIRS"] || ENV["XDG_DATA_DIRS"] == "" ||
-          ENV["XDG_DATA_DIRS"].split(File::PATH_SEPARATOR).include?(share)
-        return if homebrew_in_xdg_data_dirs
-        <<-EOS.undent
-          Homebrew's share was not found in your XDG_DATA_DIRS but you have
-          this variable set to include other locations.
-          Some programs like `vapigen` may not work correctly.
-          Consider setting the XDG_DATA_DIRS for example like so
-              echo 'export XDG_DATA_DIRS="#{share}:$XDG_DATA_DIRS"' >> #{Utils::Shell.profile}
-        EOS
-      end
-
       def check_user_curlrc
         curlrc_found = %w[CURL_HOME HOME].any? do |var|
           ENV[var] && File.exist?("#{ENV[var]}/.curlrc")
@@ -726,23 +710,6 @@ module Homebrew
         EOS
       end
 
-      def check_tmpdir_executable
-        Tempfile.open("homebrew_check_tmpdir_executable", HOMEBREW_TEMP) do |f|
-          f.write "#!/bin/sh\n"
-          f.chmod 0700
-          f.close
-          unless system f.path
-            <<-EOS.undent
-              The directory #{HOMEBREW_TEMP} does not permit executing
-              programs. It is likely mounted "noexec". Please set HOMEBREW_TEMP
-              in your #{shell_profile} to a different directory.
-                export HOMEBREW_TEMP=~/tmp
-                echo 'export HOMEBREW_TEMP=~/tmp' >> #{shell_profile}
-            EOS
-          end
-        end
-      end
-
       def check_missing_deps
         return unless HOMEBREW_CELLAR.exist?
         missing = Set.new
@@ -797,22 +764,6 @@ module Homebrew
 
         <<~EOS
           Putting non-prefixed coreutils in your path can cause gmp builds to fail.
-        EOS
-      rescue FormulaUnavailableError
-        nil
-      end
-
-      def check_for_non_prefixed_findutils
-        return unless OS.mac?
-        findutils = Formula["findutils"]
-        return unless findutils.any_version_installed?
-
-        gnubin = %W[#{findutils.opt_libexec}/gnubin #{findutils.libexec}/gnubin]
-        default_names = Tab.for_name("findutils").with? "default-names"
-        return if !default_names && (paths & gnubin).empty?
-
-        <<~EOS
-          Putting non-prefixed findutils in your path can cause python builds to fail.
         EOS
       rescue FormulaUnavailableError
         nil

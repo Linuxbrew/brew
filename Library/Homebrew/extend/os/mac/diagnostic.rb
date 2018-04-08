@@ -27,6 +27,21 @@ module Homebrew
         ]).freeze
       end
 
+      def check_for_non_prefixed_findutils
+        findutils = Formula["findutils"]
+        return unless findutils.any_version_installed?
+
+        gnubin = %W[#{findutils.opt_libexec}/gnubin #{findutils.libexec}/gnubin]
+        default_names = Tab.for_name("findutils").with? "default-names"
+        return if !default_names && (paths & gnubin).empty?
+
+        <<~EOS
+          Putting non-prefixed findutils in your path can cause python builds to fail.
+        EOS
+      rescue FormulaUnavailableError
+        nil
+      end
+
       def check_for_unsupported_macos
         return if ARGV.homebrew_developer?
 
