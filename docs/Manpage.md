@@ -1110,6 +1110,10 @@ Note that environment variables must have a value set to be detected. For exampl
 
     *Default:* `~/Library/Caches/Homebrew`.
 
+  * `HOMEBREW_CURLRC`:
+    If set, Homebrew will not pass `-q` when invoking `curl`(1) (which disables
+    the use of `curlrc`).
+
   * `HOMEBREW_CURL_VERBOSE`:
     If set, Homebrew will pass `--verbose` when invoking `curl`(1).
 

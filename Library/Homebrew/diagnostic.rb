@@ -480,21 +480,6 @@ module Homebrew
         EOS
       end
 
-      def check_user_curlrc
-        curlrc_found = %w[CURL_HOME HOME].any? do |var|
-          ENV[var] && File.exist?("#{ENV[var]}/.curlrc")
-        end
-        return unless curlrc_found
-
-        <<~EOS
-          You have a curlrc file
-          If you have trouble downloading packages with Homebrew, then maybe this
-          is the problem? If the following command doesn't work, then try removing
-          your curlrc:
-            curl #{Formatter.url("https://github.com")}
-        EOS
-      end
-
       def check_for_gettext
         find_relative_paths("lib/libgettextlib.dylib",
                             "lib/libintl.dylib",
