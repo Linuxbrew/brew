@@ -378,9 +378,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `prune` [`--dry-run`]:
     Remove dead symlinks from the Homebrew prefix. This is generally not
-    needed, but can be useful when doing DIY installations. Also remove broken
-    app symlinks from `/Applications` and `~/Applications` that were previously
-    created by `brew linkapps`.
+    needed, but can be useful when doing DIY installations.
 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.

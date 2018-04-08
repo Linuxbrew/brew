@@ -366,7 +366,7 @@ class Pathname
   unless method_defined?(:/)
     def /(other)
       if !other.respond_to?(:to_str) && !other.respond_to?(:to_path)
-        odeprecated "Pathname#/ with #{other.class}", "a String or a Pathname"
+        odisabled "Pathname#/ with #{other.class}", "a String or a Pathname"
       end
       join(other.to_s)
     end

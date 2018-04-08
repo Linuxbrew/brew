@@ -1,10 +1,9 @@
 module SharedEnvExtension
   def j1
-    odeprecated "ENV.j1", "ENV.deparallelize"
-    deparallelize
+    odisabled "ENV.j1", "ENV.deparallelize"
   end
 
   def java_cache
-    odeprecated "ENV.java_cache"
+    odisabled "ENV.java_cache"
   end
 end
