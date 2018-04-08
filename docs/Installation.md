@@ -19,6 +19,10 @@ it does it too. And you have to confirm everything it will do before it starts.
 
 ## Alternative Installs
 
+### OS X Lion 10.7 and below
+
+Using the instructions on https://brew.sh or below whenever you call `curl` you must pass `--insecure` as an argument. This is because your system `curl` is too old to speak to GitHub using HTTPS. Don't worry, on the first `brew update` Homebrew will install a newer, more secure `curl` for your machine.
+
 ### Untar anywhere
 Just extract (or `git clone`) Homebrew wherever you want. Just
 avoid:
