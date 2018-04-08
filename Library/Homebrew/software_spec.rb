@@ -42,6 +42,7 @@ class SoftwareSpec
     @deprecated_options = []
     @build = BuildOptions.new(Options.create(@flags), options)
     @compiler_failures = []
+    @bottle_disable_reason = nil
   end
 
   def owner=(owner)

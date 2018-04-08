@@ -1,4 +1,3 @@
-require "tmpdir"
 require "extend/pathname"
 require "install_renamed"
 

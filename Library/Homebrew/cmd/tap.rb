@@ -28,8 +28,6 @@
 #:  * `tap` `--list-pinned`:
 #:    List all pinned taps.
 
-require "tap"
-
 module Homebrew
   module_function
 

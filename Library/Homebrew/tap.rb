@@ -1,4 +1,3 @@
-require "extend/string"
 require "extend/cachable"
 require "readall"
 
@@ -78,6 +77,8 @@ class Tap
     @full_name = "#{@user}/homebrew-#{@repo}"
     @path = TAP_DIRECTORY/@full_name.downcase
     @path.extend(GitRepositoryExtension)
+    @alias_table = nil
+    @alias_reverse_table = nil
   end
 
   # clear internal cache

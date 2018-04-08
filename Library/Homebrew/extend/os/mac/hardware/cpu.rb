@@ -1,6 +1,9 @@
 module Hardware
   class CPU
     class << self
+      undef optimization_flags, type, family, universal_archs, can_run?,
+            features, sse4?
+
       PPC_OPTIMIZATION_FLAGS = {
         g3: "-mcpu=750",
         g4: "-mcpu=7400",
@@ -8,6 +11,7 @@ module Hardware
         g5: "-mcpu=970",
         g5_64: "-mcpu=970 -arch ppc64",
       }.freeze
+
       def optimization_flags
         OPTIMIZATION_FLAGS.merge(PPC_OPTIMIZATION_FLAGS)
       end
@@ -71,10 +75,6 @@ module Hardware
         end
       end
 
-      def extmodel
-        sysctl_int("machdep.cpu.extmodel")
-      end
-
       # Returns an array that's been extended with ArchitectureListExtension,
       # which provides helpers like #as_arch_flags and #as_cmake_arch_flags.
       def universal_archs
@@ -113,6 +113,14 @@ module Hardware
         ).split(" ").map { |s| s.downcase.to_sym }
       end
 
+      def sse4?
+        sysctl_bool("hw.optional.sse4_1")
+      end
+
+      def extmodel
+        sysctl_int("machdep.cpu.extmodel")
+      end
+
       def aes?
         sysctl_bool("hw.optional.aes")
       end
@@ -135,10 +143,6 @@ module Hardware
 
       def ssse3?
         sysctl_bool("hw.optional.supplementalsse3")
-      end
-
-      def sse4?
-        sysctl_bool("hw.optional.sse4_1")
       end
 
       def sse4_2?

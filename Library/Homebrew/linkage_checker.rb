@@ -1,4 +1,3 @@
-require "set"
 require "keg"
 require "formula"
 

@@ -7,7 +7,6 @@ require "migrator"
 require "formulary"
 require "descriptions"
 require "cleanup"
-require "utils"
 
 module Homebrew
   module_function

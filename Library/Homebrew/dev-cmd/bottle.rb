@@ -37,7 +37,6 @@ require "formula_versions"
 require "cli_parser"
 require "utils/inreplace"
 require "erb"
-require "extend/pathname"
 
 BOTTLE_ERB = <<-EOS.freeze
   bottle do

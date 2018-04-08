@@ -10,7 +10,6 @@ require "formulary"
 require "software_spec"
 require "install_renamed"
 require "pkg_version"
-require "tap"
 require "keg"
 require "migrator"
 require "extend/ENV"
@@ -173,7 +172,9 @@ class Formula
     @name = name
     @path = path
     @alias_path = alias_path
-    @alias_name = File.basename(alias_path) if alias_path
+    @alias_name = if alias_path
+      File.basename(alias_path)
+    end
     @revision = self.class.revision || 0
     @version_scheme = self.class.version_scheme || 0
 
@@ -203,6 +204,7 @@ class Formula
     @pin = FormulaPin.new(self)
     @follow_installed_alias = true
     @prefix_returns_versioned_prefix = false
+    @oldname_lock = nil
   end
 
   # @private

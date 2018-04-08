@@ -1,5 +1,3 @@
-require "os"
-
 module Hardware
   class CPU
     INTEL_32BIT_ARCHS = [:i386].freeze

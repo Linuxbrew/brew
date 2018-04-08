@@ -1,6 +1,9 @@
 module Homebrew
   module Diagnostic
     class Checks
+      undef development_tools_checks, fatal_development_tools_checks,
+            build_error_checks
+
       def development_tools_checks
         %w[
           check_for_unsupported_macos

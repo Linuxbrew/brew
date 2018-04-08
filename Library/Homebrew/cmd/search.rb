@@ -15,8 +15,6 @@
 
 require "formula"
 require "missing_formula"
-require "utils"
-require "official_taps"
 require "descriptions"
 
 module Homebrew

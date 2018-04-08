@@ -1,4 +1,3 @@
-require "set"
 
 class Option
   attr_reader :name, :description, :flag

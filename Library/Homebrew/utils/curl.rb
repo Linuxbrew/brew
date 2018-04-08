@@ -1,4 +1,3 @@
-require "pathname"
 require "open3"
 
 def curl_executable

@@ -17,7 +17,6 @@
 
 require "cli_parser"
 require "fileutils"
-require "tap"
 
 module Homebrew
   module_function

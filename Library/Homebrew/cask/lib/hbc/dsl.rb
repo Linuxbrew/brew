@@ -1,4 +1,3 @@
-require "set"
 require "locale"
 
 require "hbc/artifact"

@@ -1,4 +1,3 @@
-require "utils"
 
 describe Tty do
   describe "::strip_ansi" do

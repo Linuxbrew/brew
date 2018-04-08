@@ -20,6 +20,8 @@ class JavaRequirement < Requirement
 
   private
 
+  undef possible_javas, oracle_java_os
+
   JAVA_CASK_MAP = {
     "1.8" => "caskroom/versions/java8",
     "10.0" => "java",
@@ -35,6 +37,10 @@ class JavaRequirement < Requirement
     javas
   end
 
+  def oracle_java_os
+    :darwin
+  end
+
   def java_home_cmd
     return nil unless File.executable?("/usr/libexec/java_home")
     args = %w[--failfast]
@@ -46,9 +52,5 @@ class JavaRequirement < Requirement
 
   def env_apple
     ENV.append_to_cflags "-I/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers/"
-  end
-
-  def oracle_java_os
-    :darwin
   end
 end

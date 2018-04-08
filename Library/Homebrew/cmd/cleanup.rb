@@ -12,7 +12,6 @@
 #:    deleted. If you want to delete those too: `rm -rf $(brew --cache)`
 
 require "cleanup"
-require "utils"
 
 module Homebrew
   module_function

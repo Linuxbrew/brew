@@ -22,6 +22,7 @@ class AbstractDownloadStrategy
     @url = resource.url
     @version = resource.version
     @meta = resource.specs
+    @shutup = false
     extend Pourable if meta[:bottle]
   end
 

@@ -50,12 +50,10 @@
 
 require "net/http"
 require "net/https"
-require "utils"
 require "json"
 require "cli_parser"
 require "formula"
 require "formulary"
-require "tap"
 require "version"
 require "pkg_version"
 
