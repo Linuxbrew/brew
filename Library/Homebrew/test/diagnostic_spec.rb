@@ -131,15 +131,6 @@ describe Homebrew::Diagnostic::Checks do
     end
   end
 
-  specify "#check_user_curlrc" do
-    mktmpdir do |path|
-      FileUtils.touch "#{path}/.curlrc"
-      ENV["CURL_HOME"] = path
-
-      expect(subject.check_user_curlrc).to match("You have a curlrc file")
-    end
-  end
-
   specify "#check_for_config_scripts" do
     mktmpdir do |path|
       file = "#{path}/foo-config"
