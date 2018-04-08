@@ -11,6 +11,8 @@ module Homebrew
       def initialize(&block)
         @parser = OptionParser.new
         @parsed_args = OpenStruct.new
+        # undefine tap to allow --tap argument
+        @parsed_args.instance_eval { undef tap }
         instance_eval(&block)
       end
 
