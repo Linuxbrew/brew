@@ -3,22 +3,24 @@
 
 require "formula"
 require "tab"
-require "set"
 
 module Homebrew
   module_function
 
   def leaves
     installed = Formula.installed.sort
-    deps_of_installed = Set.new
 
-    installed.each do |f|
-      deps = f.runtime_dependencies.map { |d| d.to_formula.full_name }
-      deps_of_installed.merge(deps)
+    deps_of_installed = installed.flat_map do |f|
+      f.runtime_dependencies.map do |dep|
+        begin
+          dep.to_formula.full_name
+        rescue FormulaUnavailableError
+          dep.name
+        end
+      end
     end
 
-    installed.each do |f|
-      puts f.full_name unless deps_of_installed.include? f.full_name
-    end
+    leaves = installed.map(&:full_name) - deps_of_installed
+    leaves.each(&method(:puts))
   end
 end

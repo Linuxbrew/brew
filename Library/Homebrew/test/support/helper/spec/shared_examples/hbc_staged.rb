@@ -4,7 +4,7 @@ shared_examples Hbc::Staged do
   let(:existing_path) { Pathname.new("/path/to/file/that/exists") }
   let(:non_existent_path) { Pathname.new("/path/to/file/that/does/not/exist") }
 
-  before(:each) do
+  before do
     allow(existing_path).to receive(:exist?).and_return(true)
     allow(existing_path).to receive(:expand_path)
       .and_return(existing_path)

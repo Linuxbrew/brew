@@ -7,13 +7,12 @@ require "migrator"
 require "formulary"
 require "descriptions"
 require "cleanup"
-require "utils"
 
 module Homebrew
   module_function
 
   def update_preinstall_header
-    @header_already_printed ||= begin
+    @update_preinstall_header ||= begin
       ohai "Auto-updated Homebrew!" if ARGV.include?("--preinstall")
       true
     end

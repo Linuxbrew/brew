@@ -42,6 +42,7 @@ class SoftwareSpec
     @deprecated_options = []
     @build = BuildOptions.new(Options.create(@flags), options)
     @compiler_failures = []
+    @bottle_disable_reason = nil
   end
 
   def owner=(owner)
@@ -127,9 +128,9 @@ class SoftwareSpec
   def option(name, description = "")
     opt = PREDEFINED_OPTIONS.fetch(name) do
       if name.is_a?(Symbol)
-        odeprecated "passing arbitrary symbols (i.e. #{name.inspect}) to `option`"
-        name = name.to_s
+        odisabled "passing arbitrary symbols (i.e. #{name.inspect}) to `option`"
       end
+
       unless name.is_a?(String)
         raise ArgumentError, "option name must be string or symbol; got a #{name.class}: #{name}"
       end
@@ -204,7 +205,7 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
-    odeprecated "fails_with :llvm" if compiler == :llvm
+    odisabled "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
 
@@ -283,13 +284,14 @@ class Bottle
     @name = formula.name
     @resource = Resource.new
     @resource.owner = formula
+    @resource.specs[:bottle] = true
     @spec = spec
 
     checksum, tag = spec.checksum_for(Utils::Bottles.tag)
 
     filename = Filename.create(formula, tag, spec.rebuild)
-    @resource.url(build_url(spec.root_url, filename))
-    @resource.download_strategy = CurlBottleDownloadStrategy
+    @resource.url(build_url(spec.root_url, filename),
+                  select_download_strategy(spec.root_url_specs))
     @resource.version = formula.pkg_version
     @resource.checksum = checksum
     @prefix = spec.prefix
@@ -315,6 +317,11 @@ class Bottle
   def build_url(root_url, filename)
     "#{root_url}/#{filename}"
   end
+
+  def select_download_strategy(specs)
+    specs[:using] ||= DownloadStrategyDetector.detect(@spec.root_url)
+    specs
+  end
 end
 
 class BottleSpecification
@@ -324,20 +331,22 @@ class BottleSpecification
 
   attr_rw :prefix, :cellar, :rebuild
   attr_accessor :tap
-  attr_reader :checksum, :collector
+  attr_reader :checksum, :collector, :root_url_specs
 
   def initialize
     @rebuild = 0
     @prefix = DEFAULT_PREFIX
     @cellar = DEFAULT_CELLAR
     @collector = Utils::Bottles::Collector.new
+    @root_url_specs = {}
   end
 
-  def root_url(var = nil)
+  def root_url(var = nil, specs = {})
     if var.nil?
       @root_url ||= "#{DEFAULT_DOMAIN}/#{Utils::Bottles::Bintray.repository(tap)}"
     else
       @root_url = var
+      @root_url_specs.merge!(specs)
     end
   end
 

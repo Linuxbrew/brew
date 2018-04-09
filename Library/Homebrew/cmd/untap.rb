@@ -1,8 +1,6 @@
 #:  * `untap` <tap>:
 #:    Remove a tapped repository.
 
-require "tap"
-
 module Homebrew
   module_function
 

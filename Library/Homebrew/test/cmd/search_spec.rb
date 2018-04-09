@@ -1,7 +1,6 @@
 describe "brew search", :integration_test do
-  before(:each) do
+  before do
     setup_test_formula "testball"
-    setup_remote_tap "caskroom/cask"
   end
 
   it "lists all available Formulae when no argument is given" do
@@ -26,6 +25,8 @@ describe "brew search", :integration_test do
   end
 
   it "falls back to a GitHub tap search when no formula is found", :needs_network, retry: 3 do
+    setup_remote_tap "caskroom/cask"
+
     expect { brew "search", "caskroom/cask/firefox" }
       .to output(/firefox/).to_stdout
       .and output(/Searching/).to_stderr

@@ -39,30 +39,44 @@
 
 require "formula"
 require "formula_versions"
-require "utils"
 require "utils/curl"
 require "extend/ENV"
 require "formula_cellar_checks"
-require "official_taps"
 require "cmd/search"
 require "cmd/style"
 require "date"
 require "missing_formula"
 require "digest"
+require "cli_parser"
 
 module Homebrew
   module_function
 
   def audit
-    inject_dump_stats!(FormulaAuditor, /^audit_/) if ARGV.switch? "D"
+    args = Homebrew::CLI::Parser.parse do
+      switch      "--strict"
+      switch      "--online"
+      switch      "--new-formula"
+      switch      "--fix"
+      switch      "--display-cop-names"
+      switch      "--display-filename"
+      switch      "-D", "--audit-debug", description: "Activates debugging and profiling"
+      switch      :verbose
+      switch      :debug
+      comma_array "--only"
+      comma_array "--except"
+      comma_array "--only-cops"
+      comma_array "--except-cops"
+    end
+
     Homebrew.auditing = true
+    inject_dump_stats!(FormulaAuditor, /^audit_/) if args.audit_debug?
 
     formula_count = 0
     problem_count = 0
-
-    new_formula = ARGV.include? "--new-formula"
-    strict = new_formula || ARGV.include?("--strict")
-    online = new_formula || ARGV.include?("--online")
+    new_formula = args.new_formula?
+    strict = new_formula || args.strict?
+    online = new_formula || args.online?
 
     ENV.activate_extensions!
     ENV.setup_build_environment
@@ -75,35 +89,36 @@ module Homebrew
       files = ARGV.resolved_formulae.map(&:path)
     end
 
-    only_cops = ARGV.value("only-cops").to_s.split(",")
-    except_cops = ARGV.value("except-cops").to_s.split(",")
+    only_cops = args.only_cops
+    except_cops = args.except_cops
 
-    if !only_cops.empty? && !except_cops.empty?
+    if only_cops && except_cops
       odie "--only-cops and --except-cops cannot be used simultaneously!"
-    elsif (!only_cops.empty? || !except_cops.empty?) && (strict || ARGV.value("only"))
+    elsif (only_cops || except_cops) && (strict || args.only)
       odie "--only-cops/--except-cops and --strict/--only cannot be used simultaneously"
     end
 
-    options = { fix: ARGV.flag?("--fix"), realpath: true }
+    options = { fix: args.fix?, realpath: true }
 
-    if !only_cops.empty?
+    if only_cops
       options[:only_cops] = only_cops
-      ARGV.push("--only=style")
-    elsif new_formula
+      args.only = ["style"]
+    elsif args.new_formula?
       nil
     elsif strict
       options[:except_cops] = [:NewFormulaAudit]
-    elsif !except_cops.empty?
+    elsif except_cops
       options[:except_cops] = except_cops
     elsif !strict
       options[:only_cops] = [:FormulaAudit]
     end
 
+    options[:display_cop_names] = args.display_cop_names?
     # Check style in a single batch run up front for performance
     style_results = check_style_json(files, options)
 
     ff.sort.each do |f|
-      options = { new_formula: new_formula, strict: strict, online: online }
+      options = { new_formula: new_formula, strict: strict, online: online, only: args.only, except: args.except }
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
@@ -113,7 +128,7 @@ module Homebrew
       formula_count += 1
       problem_count += fa.problems.size
       problem_lines = fa.problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
-      if ARGV.include? "--display-filename"
+      if args.display_filename?
         puts problem_lines.map { |s| "#{f.path}: #{s}" }
       else
         puts "#{f.full_name}:", problem_lines.map { |s| "  #{s}" }
@@ -172,28 +187,14 @@ class FormulaAuditor
 
   attr_reader :formula, :text, :problems
 
-  BUILD_TIME_DEPS = %w[
-    autoconf
-    automake
-    boost-build
-    bsdmake
-    cmake
-    godep
-    imake
-    intltool
-    libtool
-    pkg-config
-    scons
-    smake
-    sphinx-doc
-    swig
-  ].freeze
-
   def initialize(formula, options = {})
     @formula = formula
     @new_formula = options[:new_formula]
     @strict = options[:strict]
     @online = options[:online]
+    @display_cop_names = options[:display_cop_names]
+    @only = options[:only]
+    @except = options[:except]
     # Accept precomputed style offense results, for efficiency
     @style_offenses = options[:style_offenses]
     # Allow the actual official-ness of a formula to be overridden, for testing purposes
@@ -205,9 +206,8 @@ class FormulaAuditor
 
   def audit_style
     return unless @style_offenses
-    display_cop_names = ARGV.include?("--display-cop-names")
     @style_offenses.each do |offense|
-      problem offense.to_s(display_cop_name: display_cop_names)
+      problem offense.to_s(display_cop_name: @display_cop_names)
     end
   end
 
@@ -377,17 +377,12 @@ class FormulaAuditor
           problem "Dependency #{dep} does not define option #{opt.name.inspect}"
         end
 
-        case dep.name
-        when "git"
+        if dep.name == "git"
           problem "Don't use git as a dependency (it's always available)"
-        when *BUILD_TIME_DEPS
-          next if dep.build? || dep.run?
-          problem <<~EOS
-            #{dep} dependency should be
-              depends_on "#{dep}" => :build
-            Or if it is indeed a runtime dependency
-              depends_on "#{dep}" => :run
-          EOS
+        end
+
+        if dep.tags.include?(:run)
+          problem "Dependency '#{dep.name}' is marked as :run. Remove :run; it is a no-op."
         end
       end
     end
@@ -569,6 +564,7 @@ class FormulaAuditor
       gtk-doc 1.25
       libart 2.3.21
       pygtkglext 1.1.0
+      libepoxy 1.5.0
     ].each_slice(2).to_a.map do |formula, version|
       [formula, version.split(".")[0..1].join(".")]
     end
@@ -740,6 +736,10 @@ class FormulaAuditor
       problem "Use \#{pkgshare} instead of \#{share}/#{formula.name}"
     end
 
+    if line =~ /depends_on .+ if build\.with(out)?\?\(?["']\w+["']\)?/
+      problem "`Use :optional` or `:recommended` instead of `#{Regexp.last_match(0)}`"
+    end
+
     return unless line =~ %r{share(\s*[/+]\s*)(['"])#{Regexp.escape(formula.name)}(?:\2|/)}
     problem "Use pkgshare instead of (share#{Regexp.last_match(1)}\"#{formula.name}\")"
   end
@@ -789,17 +789,17 @@ class FormulaAuditor
   end
 
   def audit
-    only_audits = ARGV.value("only").to_s.split(",")
-    except_audits = ARGV.value("except").to_s.split(",")
-    if !only_audits.empty? && !except_audits.empty?
+    only_audits = @only
+    except_audits = @except
+    if only_audits && except_audits
       odie "--only and --except cannot be used simultaneously!"
     end
 
     methods.map(&:to_s).grep(/^audit_/).each do |audit_method_name|
       name = audit_method_name.gsub(/^audit_/, "")
-      if !only_audits.empty?
+      if only_audits
         next unless only_audits.include?(name)
-      elsif !except_audits.empty?
+      elsif except_audits
         next if except_audits.include?(name)
       end
       send(audit_method_name)
@@ -949,13 +949,13 @@ class ResourceAuditor
           problem http_content_problem
         end
       elsif strategy <= GitDownloadStrategy
-        unless Utils.git_remote_exists url
+        unless Utils.git_remote_exists? url
           problem "The URL #{url} is not a valid git URL"
         end
       elsif strategy <= SubversionDownloadStrategy
         next unless DevelopmentTools.subversion_handles_most_https_certificates?
         next unless Utils.svn_available?
-        unless Utils.svn_remote_exists url
+        unless Utils.svn_remote_exists? url
           problem "The URL #{url} is not a valid svn URL"
         end
       end

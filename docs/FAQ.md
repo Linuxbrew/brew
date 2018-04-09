@@ -26,7 +26,7 @@ To allow that formulae to update again:
 
     brew unpin <formula>
 
-Note that pinned, outdated formulae that are depended on by another formula will be upgraded when required as we do not allow formulae to be built against non-latest versions.
+Note that pinned, outdated formulae that are depended on by another formula need to be upgraded when required as we do not allow formulae to be built against non-latest versions.
 
 ## How do I uninstall old versions of a formula?
 By default, Homebrew does not uninstall old versions of a formula, so
@@ -55,7 +55,7 @@ and run `./uninstall --help` to view more uninstall options.
 ## How do I uninstall a formula?
 If you do not uninstall all of the versions that Homebrew has installed,
 Homebrew will continue to attempt to install the newest version it knows
-about when you run `brew upgrade --all`. This can be surprising.
+about when you run `brew upgrade`. This can be surprising.
 
 To remove a formula entirely, you may run `brew uninstall formula_name --force`.
 
@@ -125,9 +125,9 @@ Or:
     fix this for Homebrew formulae (although we don’t always test for
     it), but you’ll find that many RubyGems and Python setup scripts
     break which is something outside our control.
-3.  **It’s safe**<br>Apple has left this directory for us. Which means
-    there is no `/usr/local` directory by default, so there
-    is no need to worry about messing up existing tools.
+3.  **It’s safe**<br>Apple has assigned this directory for non-system utilities. Which means
+    there is no files in `/usr/local` by default, so there
+    is no need to worry about messing up existing or system tools.
 
 **If you plan to install gems that depend on
 brews then save yourself a bunch of hassle and install to
@@ -139,21 +139,16 @@ It is not always straightforward to tell `gem` to look in non-standard directori
 **tl;dr** Sudo is dangerous, and you installed TextMate.app without sudo
 anyway.
 
-Homebrew is designed to work without using sudo. You can decide to use
-it but we strongly recommend not to do so. If you have used sudo and run
-into a bug then this is likely to be the cause. Please don’t file a bug
-report unless you can reproduce it after reinstalling Homebrew from
-scratch without using sudo.
+Homebrew refuses to work using sudo.
 
-You should only ever sudo a tool you trust. Of course, you can trust
-Homebrew ;) But do you trust the multi-megabyte Makefile that Homebrew
-runs? Developers often understand C++ far better than they understand
-make syntax. It’s too high a risk to sudo such stuff. It could break
-your base system, or alter it subtly.
+You should only ever sudo a tool you trust. Of course, you can trust Homebrew
+;) But do you trust the multi-megabyte Makefile that Homebrew runs? Developers
+often understand C++ far better than they understand make syntax. It’s too high
+a risk to sudo such stuff. It could modify (or upload) any files on your
+system.And indeed, we’ve seen some build scripts try to modify `/usr` even when
+the prefix was specified as something else entirely.
 
-And indeed, we’ve seen some build scripts try to modify
-`/usr` even when the prefix was specified as something else
-entirely.
+We use the macOS sandbox to stop this but this doesn't work when run as the `root` user (which also has read and write access to almost everything on the system).
 
 Did you `chown root /Applications/TextMate.app`? Probably
 not. So is it that important to `chown root wget`?

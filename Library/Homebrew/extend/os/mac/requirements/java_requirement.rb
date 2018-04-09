@@ -5,10 +5,10 @@ class JavaRequirement < Requirement
   end
 
   # A strict Java 8 requirement (1.8) should prompt the user to install
-  # the legacy java8 cask because the current version, Java 9, is not
-  # completely backwards compatible, and contains breaking changes such as
+  # the legacy java8 cask because versions newer than Java 8 are not
+  # completely backwards compatible, and contain breaking changes such as
   # strong encapsulation of JDK-internal APIs and a modified version scheme
-  # (9.0 not 1.9).
+  # (*.0 not 1.*).
   def cask
     if @version.nil? || @version.to_s.end_with?("+") ||
        @version.to_f >= JAVA_CASK_MAP.keys.max.to_f
@@ -20,9 +20,11 @@ class JavaRequirement < Requirement
 
   private
 
+  undef possible_javas, oracle_java_os
+
   JAVA_CASK_MAP = {
     "1.8" => "caskroom/versions/java8",
-    "9.0" => "java",
+    "10.0" => "java",
   }.freeze
 
   def possible_javas
@@ -33,6 +35,10 @@ class JavaRequirement < Requirement
     # /usr/bin/java is a stub on macOS
     javas << which_java if which_java.to_s != "/usr/bin/java"
     javas
+  end
+
+  def oracle_java_os
+    :darwin
   end
 
   def java_home_cmd
@@ -46,9 +52,5 @@ class JavaRequirement < Requirement
 
   def env_apple
     ENV.append_to_cflags "-I/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers/"
-  end
-
-  def oracle_java_os
-    :darwin
   end
 end

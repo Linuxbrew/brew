@@ -10,6 +10,7 @@ describe "Satisfy Dependencies and Requirements", :cask do
   describe "depends_on cask" do
     context "when depends_on cask is cyclic" do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-cask-cyclic")) }
+
       it {
         is_expected.to raise_error(Hbc::CaskCyclicDependencyError,
         "Cask 'with-depends-on-cask-cyclic' includes cyclic dependencies on other Casks: with-depends-on-cask-cyclic-helper")
@@ -31,26 +32,31 @@ describe "Satisfy Dependencies and Requirements", :cask do
   describe "depends_on macos" do
     context "given an array" do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-array")) }
+
       it { is_expected.not_to raise_error }
     end
 
     context "given a comparison" do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-comparison")) }
+
       it { is_expected.not_to raise_error }
     end
 
     context "given a string" do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-string")) }
+
       it { is_expected.not_to raise_error }
     end
 
     context "given a symbol" do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-symbol")) }
+
       it { is_expected.not_to raise_error }
     end
 
     context "when not satisfied" do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-macos-failure")) }
+
       it { is_expected.to raise_error(Hbc::CaskError) }
     end
   end
@@ -58,12 +64,13 @@ describe "Satisfy Dependencies and Requirements", :cask do
   describe "depends_on arch" do
     context "when satisfied" do
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-depends-on-arch")) }
+
       it { is_expected.not_to raise_error }
     end
   end
 
   describe "depends_on x11" do
-    before(:each) do
+    before do
       allow(MacOS::X11).to receive(:installed?).and_return(x11_installed)
     end
 

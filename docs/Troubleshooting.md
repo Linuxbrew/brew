@@ -17,7 +17,7 @@ Follow these steps to fix common problems:
 ## Check to see if the issue has been reported
 
 * Search the [issue tracker](https://github.com/Homebrew/homebrew-core/issues) to see if someone else has already reported the same issue.
-* Make sure you search issues on the correct repository. If a formula that has failed to build is part of a tap like [homebrew/php](https://github.com/Homebrew/homebrew-php/issues) or a cask is part of [caskroom/cask](https://github.com/caskroom/homebrew-cask/issues) check those issue trackers instead.
+* Make sure you search issues on the correct repository. If a formula that has failed to build is part of a non-homebrew-core tap or a cask is part of [caskroom/cask](https://github.com/caskroom/homebrew-cask/issues) check those issue trackers instead.
 
 ## Create an issue
 

@@ -56,17 +56,21 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
 ## OFFICIAL EXTERNAL COMMANDS
 
-  * `bundle`:
-    Bundler for non-Ruby dependencies from Homebrew:
-    <https://github.com/Homebrew/homebrew-bundle>
+  <%= homebrew_bundle.join("\n  ").strip %>
 
-  * `cask`:
-    Install macOS applications distributed as binaries:
-    <https://github.com/caskroom/homebrew-cask>
 
-  * `services`:
-    Integrates Homebrew formulae with macOS's `launchctl`(1) manager:
-    <https://github.com/Homebrew/homebrew-services>
+  Homebrew/homebrew-bundle <https://github.com/Homebrew/homebrew-bundle>
+
+  * `cask` [`--version` | `audit` | `cat` | `cleanup` | `create` | `doctor` | `edit` | `fetch` | `home` | `info`]:
+    Install macOS applications distributed as binaries.
+
+
+  Caskroom/homebrew-cask <https://github.com/caskroom/homebrew-cask>
+
+  <%= homebrew_services.join("\n  ").strip %>
+
+
+  Homebrew/homebrew-services <https://github.com/Homebrew/homebrew-services>
 
 ## CUSTOM EXTERNAL COMMANDS
 
@@ -98,6 +102,8 @@ can take several different forms:
     The formula file will be cached for later use.
 
 ## ENVIRONMENT
+Note that environment variables must have a value set to be detected. For example, `export HOMEBREW_NO_INSECURE_REDIRECT=1` rather than just `export HOMEBREW_NO_INSECURE_REDIRECT`.
+
   * `HOMEBREW_ARTIFACT_DOMAIN`:
     If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
 
@@ -131,6 +137,10 @@ can take several different forms:
     If set, instructs Homebrew to use the given directory as the download cache.
 
     *Default:* `~/Library/Caches/Homebrew`.
+
+  * `HOMEBREW_CURLRC`:
+    If set, Homebrew will not pass `-q` when invoking `curl`(1) (which disables
+    the use of `curlrc`).
 
   * `HOMEBREW_CURL_VERBOSE`:
     If set, Homebrew will pass `--verbose` when invoking `curl`(1).
@@ -241,6 +251,9 @@ can take several different forms:
 
     This issue typically occurs when using FileVault or custom SSD
     configurations.
+
+  * `HOMEBREW_UPGRADE_CLEANUP`:
+    If set, `brew upgrade` always assumes `--cleanup` has been passed.
 
   * `HOMEBREW_VERBOSE`:
     If set, Homebrew always assumes `--verbose` when running commands.

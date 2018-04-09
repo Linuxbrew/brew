@@ -113,14 +113,14 @@ module Homebrew
     url = "https://api.github.com/gists"
     data = { "public" => true, "files" => files, "description" => description }
     scopes = GitHub::CREATE_GIST_SCOPES
-    GitHub.open(url, data: data, scopes: scopes)["html_url"]
+    GitHub.open_api(url, data: data, scopes: scopes)["html_url"]
   end
 
   def create_issue(repo, title, body)
     url = "https://api.github.com/repos/#{repo}/issues"
     data = { "title" => title, "body" => body }
-    scopes = GitHub::CREATE_ISSUE_SCOPES
-    GitHub.open(url, data: data, scopes: scopes)["html_url"]
+    scopes = GitHub::CREATE_ISSUE_FORK_OR_PR_SCOPES
+    GitHub.open_api(url, data: data, scopes: scopes)["html_url"]
   end
 
   def gist_logs

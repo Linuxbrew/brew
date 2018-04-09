@@ -38,6 +38,7 @@ module Superenv
     super
     send(compiler)
 
+    self["HOMEBREW_ENV"] = "super"
     self["MAKEFLAGS"] ||= "-j#{determine_make_jobs}"
     self["PATH"] = determine_path
     self["PKG_CONFIG_PATH"] = determine_pkg_config_path
@@ -173,11 +174,22 @@ module Superenv
   end
 
   def determine_library_paths
-    PATH.new(
+    paths = [
       keg_only_deps.map(&:opt_lib),
       HOMEBREW_PREFIX/"lib",
-      homebrew_extra_library_paths,
-    ).existing
+    ]
+
+    if compiler == :llvm_clang
+      if MacOS::CLT.installed?
+        paths << "/usr/lib"
+      else
+        paths << "#{MacOS.sdk_path}/usr/lib"
+      end
+      paths << Formula["llvm"].opt_lib.to_s
+    end
+
+    paths += homebrew_extra_library_paths
+    PATH.new(paths).existing
   end
 
   def determine_dependencies

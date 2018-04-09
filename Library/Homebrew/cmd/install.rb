@@ -1,4 +1,4 @@
-#:  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] <formula> [<options> ...]:
+#:  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--include-test`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] <formula> [<options> ...]:
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -36,6 +36,9 @@
 #:    current or newest version of macOS, even if it would not normally be used
 #:    for installation.
 #:
+#:    If `--include-test` is passed, install testing dependencies. These are only
+#:    needed by formulae maintainers to run `brew test`.
+#:
 #:    If `--devel` is passed, and <formula> defines it, install the development version.
 #:
 #:    If `--HEAD` is passed, and <formula> defines it, install the HEAD version,
@@ -68,7 +71,6 @@ require "missing_formula"
 require "diagnostic"
 require "cmd/search"
 require "formula_installer"
-require "tap"
 require "hardware"
 require "development_tools"
 
@@ -159,9 +161,12 @@ module Homebrew
               #{f.full_name} #{optlinked_version} is already installed
               To upgrade to #{f.version}, run `brew upgrade #{f.name}`
             EOS
+          elsif ARGV.only_deps?
+            formulae << f
           else
             opoo <<~EOS
-              #{f.full_name} #{f.pkg_version} is already installed
+              #{f.full_name} #{f.pkg_version} is already installed and up-to-date
+              To reinstall #{f.pkg_version}, run `brew reinstall #{f.name}`
             EOS
           end
         elsif (ARGV.build_head? && new_head_installed) || prefix_installed
@@ -185,11 +190,19 @@ module Homebrew
             EOS
           elsif !f.linked? || f.keg_only?
             msg = <<~EOS
-              #{msg}, it's just not linked.
+              #{msg}, it's just not linked
               You can use `brew link #{f}` to link this version.
             EOS
+          elsif ARGV.only_deps?
+            msg = nil
+            formulae << f
+          else
+            msg = <<~EOS
+              #{msg} and up-to-date
+              To reinstall #{f.pkg_version}, run `brew reinstall #{f.name}`
+            EOS
           end
-          opoo msg
+          opoo msg if msg
         elsif !f.any_version_installed? && old_formula = f.old_installed_formulae.first
           msg = "#{old_formula.full_name} #{old_formula.installed_version} already installed"
           if !old_formula.linked? && !old_formula.keg_only?
@@ -249,10 +262,10 @@ module Homebrew
         return
       end
 
-      query = query_regexp(e.name)
+      regex = query_regexp(e.name)
 
       ohai "Searching for similarly named formulae..."
-      formulae_search_results = search_formulae(query)
+      formulae_search_results = search_formulae(regex)
       case formulae_search_results.length
       when 0
         ofail "No similarly named formulae found."
@@ -269,7 +282,7 @@ module Homebrew
       # Do not search taps if the formula name is qualified
       return if e.name.include?("/")
       ohai "Searching taps..."
-      taps_search_results = search_taps(query)
+      taps_search_results = search_taps(e.name)
       case taps_search_results.length
       when 0
         ofail "No formulae found in taps."
@@ -344,7 +357,7 @@ module Homebrew
   rescue FormulaInstallationAlreadyAttemptedError
     # We already attempted to install f as part of the dependency tree of
     # another formula. In that case, don't generate an error, just move on.
-    return
+    nil
   rescue CannotInstallFormulaError => e
     ofail e.message
   end

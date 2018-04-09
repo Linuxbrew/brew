@@ -1,4 +1,3 @@
-require "utils"
 
 describe Tty do
   describe "::strip_ansi" do
@@ -32,7 +31,7 @@ describe Tty do
   end
 
   context "when $stdout is not a TTY" do
-    before(:each) do
+    before do
       allow($stdout).to receive(:tty?).and_return(false)
     end
 
@@ -49,7 +48,7 @@ describe Tty do
   end
 
   context "when $stdout is a TTY" do
-    before(:each) do
+    before do
       allow($stdout).to receive(:tty?).and_return(true)
     end
 

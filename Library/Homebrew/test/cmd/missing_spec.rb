@@ -1,5 +1,5 @@
 describe "brew missing", :integration_test do
-  before(:each) do
+  before do
     setup_test_formula "foo"
     setup_test_formula "bar"
   end

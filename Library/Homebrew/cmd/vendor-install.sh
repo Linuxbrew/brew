@@ -47,7 +47,15 @@ fetch() {
   local sha
   local temporary_path
 
-  curl_args=(
+  curl_args=()
+
+  # do not load .curlrc unless requested (must be the first argument)
+  if [[ -n "$HOMEBREW_CURLRC" ]]
+  then
+    curl_args[${#curl_args[*]}]="-q"
+  fi
+
+  curl_args+=(
     --fail
     --remote-time
     --location
@@ -114,10 +122,10 @@ EOS
   if [[ -x "/usr/bin/shasum" ]]
   then
     sha="$(/usr/bin/shasum -a 256 "$CACHED_LOCATION" | cut -d' ' -f1)"
-  elif [[ -x "$(which sha256sum)" ]]
+  elif [[ -x "$(type -P sha256sum)" ]]
   then
     sha="$(sha256sum "$CACHED_LOCATION" | cut -d' ' -f1)"
-  elif [[ -x "$(which ruby)" ]]
+  elif [[ -x "$(type -P ruby)" ]]
   then
     sha="$(ruby <<EOSCRIPT
             require 'digest/sha2'

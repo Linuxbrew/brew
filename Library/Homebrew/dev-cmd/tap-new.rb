@@ -1,8 +1,6 @@
 #:  * `tap-new` <user>`/`<repo>:
 #:    Generate the template files for a new tap.
 
-require "tap"
-
 module Homebrew
   module_function
 

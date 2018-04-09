@@ -6,6 +6,7 @@ describe BuildOptions do
   alias_matcher :be_built_without, :be_without
 
   subject { described_class.new(args, opts) }
+
   let(:bad_build) { described_class.new(bad_args, opts) }
   let(:args) { Options.create(%w[--with-foo --with-bar --without-qux]) }
   let(:opts) { Options.create(%w[--with-foo --with-bar --without-baz --without-qux]) }

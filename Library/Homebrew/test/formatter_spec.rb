@@ -3,6 +3,8 @@ require "utils/tty"
 
 describe Formatter do
   describe "::columns" do
+    subject { described_class.columns(input) }
+
     let(:input) {
       %w[
         aa
@@ -11,7 +13,6 @@ describe Formatter do
         dd
       ]
     }
-    subject { described_class.columns(input) }
 
     it "doesn't output columns if $stdout is not a TTY." do
       allow_any_instance_of(IO).to receive(:tty?).and_return(false)

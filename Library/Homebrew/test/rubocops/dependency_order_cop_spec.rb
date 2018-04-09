@@ -46,6 +46,18 @@ describe RuboCop::Cop::NewFormulaAudit::DependencyOrder do
         end
       RUBY
     end
+
+    it "correct depends_on order for multiple tags" do
+      expect_no_offenses(<<~RUBY)
+        class Foo < Formula
+          homepage "http://example.com"
+          url "http://example.com/foo-1.0.tgz"
+          depends_on "bar" => [:build, :test]
+          depends_on "foo" => :build
+          depends_on "apple"
+        end
+      RUBY
+    end
   end
 
   context "autocorrect" do

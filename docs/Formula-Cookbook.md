@@ -31,7 +31,6 @@ Before submitting a new formula make sure your package:
 
 *   meets all our [Acceptable Formulae](Acceptable-Formulae.md) requirements
 *   isn't already in Homebrew (check `brew search <formula>`)
-*   isn't in another official [Homebrew tap](https://github.com/Homebrew)
 *   isn't already waiting to be merged (check the [issue tracker](https://github.com/Homebrew/homebrew-core/pulls))
 *   is still supported by upstream (i.e. doesn't require extensive patching)
 *   has a stable, tagged version (i.e. not just a GitHub repository with no versions)
@@ -130,7 +129,7 @@ to favour finding `keg_only` formulae first.
 
 ```ruby
 class Foo < Formula
-  depends_on "pkg-config" => :run
+  depends_on "pkg-config"
   depends_on "jpeg"
   depends_on "readline" => :recommended
   depends_on "gtk+" => :optional
@@ -144,16 +143,13 @@ A Symbol (e.g. `:x11`) specifies a [`Requirement`](http://www.rubydoc.info/githu
 
 A Hash (e.g. `=>`) specifies a formula dependency with some additional information. Given a single string key, the value can take several forms:
 
-*   a Symbol (currently one of `:build`, `:optional`, `:run` or `:recommended`)
+*   a Symbol (currently one of `:build`, `:test`, `:optional` or `:recommended`)
     - `:build` means that dependency is a build-time only dependency so it can
       be skipped when installing from a bottle or when listing missing
       dependencies using `brew missing`.
+      - `:test` means that dependency is only required when running `brew test`.
     - `:optional` generates an implicit `with-foo` option for the formula.
       This means that, given `depends_on "foo" => :optional`, the user must pass `--with-foo` in order to use the dependency.
-    - `:run` can mean the dependency is only required at runtime, or it can be used
-      to declare build dependencies such as `pkg-config` that are needed at
-      runtime as well, which will silence the audit warning. `:run` dependencies
-      are currently available at build time.
     - `:recommended` generates an implicit `without-foo` option, meaning that
       the dependency is enabled by default and the user must pass
       `--without-foo` to disable this dependency. The default

@@ -50,11 +50,10 @@
 
 require "net/http"
 require "net/https"
-require "utils"
 require "json"
+require "cli_parser"
 require "formula"
 require "formulary"
-require "tap"
 require "version"
 require "pkg_version"
 
@@ -62,8 +61,7 @@ module GitHub
   module_function
 
   # Return the corresponding test-bot user name for the given GitHub organization.
-  def test_bot_user(user)
-    test_bot = ARGV.value "test-bot-user"
+  def test_bot_user(user, test_bot)
     return test_bot if test_bot
     return "BrewTestBot" if user.casecmp("homebrew").zero?
     "#{user.capitalize}TestBot"
@@ -75,6 +73,20 @@ module Homebrew
 
   def pull
     odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
+
+    @args = Homebrew::CLI::Parser.parse do
+      switch "--bottle"
+      switch "--bump"
+      switch "--clean"
+      switch "--ignore-whitespace"
+      switch "--resolve"
+      switch "--branch-okay"
+      switch "--no-pbcopy"
+      switch "--no-publish"
+      switch "--warn-on-publish-failure"
+      flag   "--bintray-org",   required: true
+      flag   "--test-bot-user", required: true
+    end
 
     if ARGV.named.empty?
       odie "This command requires at least one argument containing a URL or pull request number"
@@ -88,7 +100,7 @@ module Homebrew
       ENV["GIT_COMMITTER_EMAIL"] = ENV["HOMEBREW_GIT_EMAIL"]
     end
 
-    do_bump = ARGV.include?("--bump") && !ARGV.include?("--clean")
+    do_bump = @args.bump? && !@args.clean?
 
     # Formulae with affected bottles that were published
     bintray_published_formulae = []
@@ -107,7 +119,7 @@ module Homebrew
         end
         _, testing_job = *testing_match
         url = "https://github.com/Homebrew/homebrew-#{tap.repo}/compare/master...BrewTestBot:testing-#{testing_job}"
-        odie "Testing URLs require `--bottle`!" unless ARGV.include?("--bottle")
+        odie "Testing URLs require `--bottle`!" unless @args.bottle?
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/#{repo}/pull/#{issue}"
@@ -119,7 +131,7 @@ module Homebrew
         odie "Not a GitHub pull request or commit: #{arg}"
       end
 
-      if !testing_job && ARGV.include?("--bottle") && issue.nil?
+      if !testing_job && @args.bottle? && issue.nil?
         odie "No pull request detected!"
       end
 
@@ -137,11 +149,11 @@ module Homebrew
       orig_revision = `git rev-parse --short HEAD`.strip
       branch = `git symbolic-ref --short HEAD`.strip
 
-      unless branch == "master" || ARGV.include?("--clean") || ARGV.include?("--branch-okay")
+      unless branch == "master" || @args.clean? || @args.branch_okay?
         opoo "Current branch is #{branch}: do you need to pull inside master?"
       end
 
-      patch_puller = PatchPuller.new(url)
+      patch_puller = PatchPuller.new(url, @args)
       patch_puller.fetch_patch
       patch_changes = files_changed_in_patch(patch_puller.patchpath, tap)
 
@@ -189,7 +201,7 @@ module Homebrew
           end
         end
 
-        if ARGV.include? "--bottle"
+        if @args.bottle?
           if f.bottle_unneeded?
             ohai "#{f}: skipping unneeded bottle."
           elsif f.bottle_disabled?
@@ -204,7 +216,7 @@ module Homebrew
       end
 
       orig_message = message = `git log HEAD^.. --format=%B`
-      if issue && !ARGV.include?("--clean")
+      if issue && !@args.clean?
         ohai "Patch closes issue ##{issue}"
         close_message = "Closes ##{issue}."
         # If this is a pull request, append a close message.
@@ -216,7 +228,7 @@ module Homebrew
         is_bumpable = false
       end
 
-      is_bumpable = false if ARGV.include?("--clean")
+      is_bumpable = false if @args.clean?
       is_bumpable = false if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
 
       if is_bumpable
@@ -228,7 +240,7 @@ module Homebrew
           odie "No version changes found for #{formula.name}" if bump_subject.nil?
           unless orig_subject == bump_subject
             ohai "New bump commit subject: #{bump_subject}"
-            pbcopy bump_subject unless ARGV.include? "--no-pbcopy"
+            pbcopy bump_subject unless @args.no_pbcopy?
             message = "#{bump_subject}\n\n#{message}"
           end
         elsif bump_subject != orig_subject && !bump_subject.nil?
@@ -237,7 +249,7 @@ module Homebrew
         end
       end
 
-      if message != orig_message && !ARGV.include?("--clean")
+      if message != orig_message && !@args.clean?
         safe_system "git", "commit", "--amend", "--signoff", "--allow-empty", "-q", "-m", message
       end
 
@@ -248,7 +260,8 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          "https://github.com/#{GitHub.test_bot_user user}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
+          bot_username = GitHub.test_bot_user(user, @args.test_bot_user)
+          "https://github.com/#{bot_username}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
         curl "--silent", "--fail", "--output", "/dev/null", "--head", bottle_commit_url
@@ -261,7 +274,7 @@ module Homebrew
         safe_system "git", "branch", "--quiet", "-D", bottle_branch
 
         # Publish bottles on Bintray
-        unless ARGV.include? "--no-publish"
+        unless @args.no_publish?
           published = publish_changed_formula_bottles(tap, changed_formulae_names)
           bintray_published_formulae.concat(published)
         end
@@ -291,7 +304,7 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        bintray_org = ARGV.value("bintray-org") || tap.user.downcase
+        bintray_org = @args.bintray_org || tap.user.downcase
         next unless publish_bottle_file_on_bintray(f, bintray_org, bintray_creds)
         published << f.full_name
       end
@@ -302,7 +315,7 @@ module Homebrew
   end
 
   def pull_patch(url, description = nil)
-    PatchPuller.new(url, description).pull_patch
+    PatchPuller.new(url, @args, description).pull_patch
   end
 
   class PatchPuller
@@ -310,12 +323,13 @@ module Homebrew
     attr_reader :patch_url
     attr_reader :patchpath
 
-    def initialize(url, description = nil)
+    def initialize(url, args, description = nil)
       @base_url = url
       # GitHub provides commits/pull-requests raw patches using this URL.
       @patch_url = url + ".patch"
       @patchpath = HOMEBREW_CACHE + File.basename(patch_url)
       @description = description
+      @args = args
     end
 
     def pull_patch
@@ -338,7 +352,7 @@ module Homebrew
       patch_args = []
       # Normally we don't want whitespace errors, but squashing them can break
       # patches so an option is provided to skip this step.
-      if ARGV.include?("--ignore-whitespace") || ARGV.include?("--clean")
+      if @args.ignore_whitespace? || @args.clean?
         patch_args << "--whitespace=nowarn"
       else
         patch_args << "--whitespace=fix"
@@ -351,7 +365,7 @@ module Homebrew
       begin
         safe_system "git", "am", *patch_args
       rescue ErrorDuringExecution
-        if ARGV.include? "--resolve"
+        if @args.resolve?
           odie "Patch failed to apply: try to resolve it."
         else
           system "git", "am", "--abort"
@@ -464,7 +478,7 @@ module Homebrew
          "https://api.bintray.com/content/#{bintray_org}/#{repo}/#{package}/#{version}/publish"
     true
   rescue => e
-    raise unless ARGV.include?("--warn-on-publish-failure")
+    raise unless @args.warn_on_publish_failure?
     onoe e
     false
   end

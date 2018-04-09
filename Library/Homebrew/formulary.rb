@@ -1,5 +1,4 @@
 require "digest/md5"
-require "tap"
 require "extend/cachable"
 
 # The Formulary is responsible for creating instances of Formula.
@@ -111,7 +110,8 @@ module Formulary
         # The name of the formula is found between the last slash and the last hyphen.
         formula_name = File.basename(bottle_name)[/(.+)-/, 1]
         resource = Resource.new(formula_name) { url bottle_name }
-        downloader = CurlBottleDownloadStrategy.new resource.name, resource
+        resource.specs[:bottle] = true
+        downloader = CurlDownloadStrategy.new resource.name, resource
         @bottle_filename = downloader.cached_location
         cached = @bottle_filename.exist?
         downloader.fetch

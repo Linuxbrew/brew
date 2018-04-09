@@ -1,7 +1,3 @@
-OFFICIAL_TAPS = %w[
-  php
-].freeze
-
 OFFICIAL_CASK_TAPS = %w[
   cask
   versions
@@ -25,6 +21,7 @@ DEPRECATED_OFFICIAL_TAPS = %w[
   gui
   head-only
   nginx
+  php
   python
   science
   tex

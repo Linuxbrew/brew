@@ -108,10 +108,10 @@ class Sandbox
 
     unless logs.empty?
       if @logfile
-        log = open(@logfile, "w")
-        log.write logs
-        log.write "\nWe use time to filter sandbox log. Therefore, unrelated logs may be recorded.\n"
-        log.close
+        File.open(@logfile, "w") do |log|
+          log.write logs
+          log.write "\nWe use time to filter sandbox log. Therefore, unrelated logs may be recorded.\n"
+        end
       end
 
       if @failed && ARGV.verbose?

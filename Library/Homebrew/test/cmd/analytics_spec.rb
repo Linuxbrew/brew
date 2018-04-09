@@ -1,5 +1,5 @@
 describe "brew analytics", :integration_test do
-  before(:each) do
+  before do
     HOMEBREW_REPOSITORY.cd do
       system "git", "init"
     end

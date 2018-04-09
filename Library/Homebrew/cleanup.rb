@@ -122,7 +122,7 @@ module Homebrew
       lockfiles  = candidates.select(&:file?)
       lockfiles.each do |file|
         next unless file.readable?
-        file.open.flock(File::LOCK_EX | File::LOCK_NB) && file.unlink
+        file.open(File::RDWR).flock(File::LOCK_EX | File::LOCK_NB) && file.unlink
       end
     end
 

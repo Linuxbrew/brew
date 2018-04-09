@@ -1,4 +1,3 @@
-require "pathname"
 require "open3"
 
 def curl_executable
@@ -6,16 +5,20 @@ def curl_executable
     ENV["HOMEBREW_CURL"],
     which("curl"),
     "/usr/bin/curl",
-  ].map { |c| Pathname(c) }.find(&:executable?)
-  raise "curl is not executable" unless @curl
+  ].compact.map { |c| Pathname(c) }.find(&:executable?)
+  raise "no executable curl was found" unless @curl
   @curl
 end
 
 def curl_args(*extra_args, show_output: false, user_agent: :default)
-  args = [
-    curl_executable.to_s,
-    "--show-error",
-  ]
+  args = [curl_executable.to_s]
+
+  # do not load .curlrc unless requested (must be the first argument)
+  if ENV["HOMEBREW_CURLRC"]
+    args << "-q"
+  end
+
+  args << "--show-error"
 
   args << "--user-agent" << case user_agent
   when :browser, :fake

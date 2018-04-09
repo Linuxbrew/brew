@@ -1,4 +1,4 @@
-require "extend/os/hardware"
+require "hardware"
 
 module ArchitectureListExtension
   # @private

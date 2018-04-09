@@ -152,7 +152,7 @@ end
 describe "text executables" do
   let(:pn) { HOMEBREW_PREFIX/"an_executable" }
 
-  after(:each) { pn.unlink }
+  after { pn.unlink }
 
   specify "simple shebang" do
     pn.write "#!/bin/sh"

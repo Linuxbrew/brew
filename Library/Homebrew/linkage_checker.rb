@@ -1,4 +1,3 @@
-require "set"
 require "keg"
 require "formula"
 require "linkage_cache_store"
@@ -49,9 +48,15 @@ class LinkageChecker
     @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
   end
 
+  def dylib_to_dep(dylib)
+    dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
+    Regexp.last_match(2)
+  end
+
   def flush_cache_and_check_dylibs
     reset_dylibs!
 
+    checked_dylibs = Set.new
     @keg.find do |file|
       next if file.symlink? || file.directory?
       next unless file.dylib? || file.binary_executable? || file.mach_o_bundle?
@@ -60,6 +65,7 @@ class LinkageChecker
       # when checking for broken linkage
       file.dynamically_linked_libraries(except: :LC_LOAD_WEAK_DYLIB).each do |dylib|
         @reverse_links[dylib] << file
+        next if checked_dylibs.include? dylib
         if dylib.start_with? "@"
           @variable_dylibs << dylib
         else
@@ -69,7 +75,11 @@ class LinkageChecker
             @system_dylibs << dylib
           rescue Errno::ENOENT
             next if harmless_broken_link?(dylib)
-            @broken_dylibs << dylib
+            if (dep = dylib_to_dep(dylib))
+              @broken_deps[dep] |= [dylib]
+            else
+              @broken_dylibs << dylib
+            end
           else
             tap = Tab.for_keg(owner).tap
             f = if tap.nil? || tap.core_tap?
@@ -80,6 +90,7 @@ class LinkageChecker
             @brewed_dylibs[f] << dylib
           end
         end
+        checked_dylibs << dylib
       end
     end
 
@@ -94,7 +105,8 @@ class LinkageChecker
       formula.build.without?(dep)
     end
     declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
-    recursive_deps = keg.to_formula.runtime_dependencies.map { |dep| dep.to_formula.name }
+    runtime_deps = keg.to_formula.runtime_dependencies(read_from_tab: false)
+    recursive_deps = runtime_deps.map { |dep| dep.to_formula.name }
     declared_dep_names = declared_deps.map { |dep| dep.split("/").last }
     indirect_deps = []
     undeclared_deps = []
@@ -114,6 +126,8 @@ class LinkageChecker
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
+    missing_deps = @broken_deps.values.flatten.map { |d| dylib_to_dep(d) }
+    unnecessary_deps -= missing_deps
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 
@@ -189,8 +203,8 @@ class LinkageChecker
     return if things.empty?
     puts "#{label}:"
     if things.is_a? Hash
-      things.sort.each do |list_label, list|
-        list.sort.each do |item|
+      things.keys.sort.each do |list_label|
+        things[list_label].sort.each do |item|
           puts "  #{item} (#{list_label})"
         end
       end
@@ -223,14 +237,14 @@ class LinkageChecker
   # Updates data store with package path values
   def store_dylibs!
     store.update!(
-      system_dylibs: @system_dylibs,
-      variable_dylibs: @variable_dylibs,
-      broken_dylibs: @broken_dylibs,
-      indirect_deps: @indirect_deps,
-      undeclared_deps: @undeclared_deps,
-      unnecessary_deps: @unnecessary_deps,
-      brewed_dylibs: @brewed_dylibs,
-      reverse_links: @reverse_links,
+      system_dylibs: system_dylibs,
+      variable_dylibs: variable_dylibs,
+      broken_dylibs: broken_dylibs,
+      indirect_deps: indirect_deps,
+      undeclared_deps: undeclared_deps,
+      unnecessary_deps: unnecessary_deps,
+      brewed_dylibs: brewed_dylibs,
+      reverse_links: reverse_links,
     )
   end
 end

@@ -44,6 +44,7 @@ describe Hbc::DSL, :cask do
   describe "header line" do
     context "when invalid" do
       let(:token) { "invalid/invalid-header-format" }
+
       it "raises an error" do
         expect { cask }.to raise_error(SyntaxError)
       end
@@ -273,6 +274,7 @@ describe Hbc::DSL, :cask do
 
   describe "version stanza" do
     let(:token) { "invalid/invalid-two-version" }
+
     it "prevents defining multiple versions" do
       expect { cask }.to raise_error(Hbc::CaskInvalidError, /'version' stanza may only appear once/)
     end
@@ -313,6 +315,7 @@ describe Hbc::DSL, :cask do
 
     context "with :key_url" do
       let(:token) { "with-gpg-key-url" }
+
       it "is allowed to be specified" do
         expect(cask.gpg.to_s).to match(/\S/)
       end
@@ -404,6 +407,7 @@ describe Hbc::DSL, :cask do
   describe "depends_on cask" do
     context "specifying one" do
       let(:token) { "with-depends-on-cask" }
+
       it "is allowed" do
         expect(cask.depends_on.cask).not_to be nil
       end

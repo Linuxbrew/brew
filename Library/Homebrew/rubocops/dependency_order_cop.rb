@@ -44,14 +44,19 @@ module RuboCop
         end
 
         # Separate dependencies according to precedence order:
-        # build-time > run-time > normal > recommended > optional
+        # build-time > test > normal > recommended > optional
         def sort_dependencies_by_type(dependency_nodes)
+          unsorted_deps = dependency_nodes.to_a
           ordered = []
-          ordered.concat(dependency_nodes.select { |dep| buildtime_dependency? dep }.to_a)
-          ordered.concat(dependency_nodes.select { |dep| runtime_dependency? dep }.to_a)
-          ordered.concat(dependency_nodes.reject { |dep| negate_normal_dependency? dep }.to_a)
-          ordered.concat(dependency_nodes.select { |dep| recommended_dependency? dep }.to_a)
-          ordered.concat(dependency_nodes.select { |dep| optional_dependency? dep }.to_a)
+          ordered.concat(unsorted_deps.select { |dep| buildtime_dependency? dep })
+          unsorted_deps -= ordered
+          ordered.concat(unsorted_deps.select { |dep| test_dependency? dep })
+          unsorted_deps -= ordered
+          ordered.concat(unsorted_deps.reject { |dep| negate_normal_dependency? dep })
+          unsorted_deps -= ordered
+          ordered.concat(unsorted_deps.select { |dep| recommended_dependency? dep })
+          unsorted_deps -= ordered
+          ordered.concat(unsorted_deps.select { |dep| optional_dependency? dep })
         end
 
         # `depends_on :apple if build.with? "foo"` should always be defined
@@ -106,11 +111,11 @@ module RuboCop
 
         def_node_search :recommended_dependency?, "(sym :recommended)"
 
-        def_node_search :runtime_dependency?, "(sym :run)"
+        def_node_search :test_dependency?, "(sym :test)"
 
         def_node_search :optional_dependency?, "(sym :optional)"
 
-        def_node_search :negate_normal_dependency?, "(sym {:build :recommended :run :optional})"
+        def_node_search :negate_normal_dependency?, "(sym {:build :recommended :test :optional})"
 
         # Node pattern method to extract `name` in `depends_on :name`
         def_node_search :dependency_name_node, <<~EOS

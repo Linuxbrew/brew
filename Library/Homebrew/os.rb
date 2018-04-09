@@ -1,5 +1,3 @@
-require "rbconfig"
-
 module OS
   def self.mac?
     return false if ENV["HOMEBREW_TEST_GENERIC_OS"]

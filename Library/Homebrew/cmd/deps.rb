@@ -17,7 +17,8 @@
 #:
 #:    By default, `deps` shows required and recommended dependencies for
 #:    <formulae>. To include the `:build` type dependencies, pass `--include-build`.
-#:    Similarly, pass `--include-optional` to include `:optional` dependencies.
+#:    Similarly, pass `--include-optional` to include `:optional` dependencies or
+#:    `--include-test` to include (non-recursive) `:test` dependencies.
 #:    To skip `:recommended` type dependencies, pass `--skip-recommended`.
 #:    To include requirements in addition to dependencies, pass `--include-requirements`.
 #:
@@ -30,8 +31,8 @@
 #:    If `--installed` is passed, output a tree for every installed formula.
 #:
 #:    The <filters> placeholder is any combination of options `--include-build`,
-#:    `--include-optional`, `--skip-recommended`, and `--include-requirements` as
-#:    documented above.
+#:    `--include-optional`, `--include-test`, `--skip-recommended`, and
+#:    `--include-requirements` as documented above.
 #:
 #:    If `--annotate` is passed, the build, optional, and recommended dependencies
 #:    are marked as such in the output.
@@ -42,7 +43,8 @@
 #:    dependencies of that formula.
 #:
 #:    The <filters> placeholder is any combination of options `--include-build`,
-#:    `--include-optional`, and `--skip-recommended` as documented above.
+#:    `--include-optional`, `--include-test`, and `--skip-recommended` as
+#:    documented above.
 
 # The undocumented `--for-each` option will switch into the mode used by `deps --all`,
 # but only list dependencies for specified formula, one specified formula per line.
@@ -73,29 +75,39 @@ module Homebrew
         raise FormulaUnspecifiedError if ARGV.named.empty?
         puts_deps_tree ARGV.formulae, !ARGV.one?
       end
+      return
     elsif mode.all?
       puts_deps Formula.sort
-    elsif ARGV.named.empty?
+      return
+    elsif !ARGV.named.empty? && mode.for_each?
+      puts_deps ARGV.formulae
+      return
+    end
+
+    @only_installed_arg = ARGV.include?("--installed") &&
+                          !ARGV.include?("--include-build") &&
+                          !ARGV.include?("--include-test") &&
+                          !ARGV.include?("--include-optional") &&
+                          !ARGV.include?("--skip-recommended")
+
+    if ARGV.named.empty?
       raise FormulaUnspecifiedError unless mode.installed?
       puts_deps Formula.installed.sort
-    elsif mode.for_each?
-      puts_deps ARGV.formulae
-    else
-      all_deps = deps_for_formulae(ARGV.formulae, !ARGV.one?, &(mode.union? ? :| : :&))
-      all_deps = condense_requirements(all_deps)
-      all_deps = all_deps.select(&:installed?) if mode.installed?
-      all_deps = all_deps.map(&method(:dep_display_name)).uniq
-      all_deps.sort! unless mode.topo_order?
-      puts all_deps
+      return
     end
+
+    all_deps = deps_for_formulae(ARGV.formulae, !ARGV.one?, &(mode.union? ? :| : :&))
+    all_deps = condense_requirements(all_deps)
+    all_deps.select!(&:installed?) if mode.installed?
+    all_deps.map!(&method(:dep_display_name))
+    all_deps.uniq!
+    all_deps.sort! unless mode.topo_order?
+    puts all_deps
   end
 
   def condense_requirements(deps)
-    if ARGV.include?("--include-requirements")
-      deps
-    else
-      deps.select { |dep| dep.is_a? Dependency }
-    end
+    return deps if ARGV.include?("--include-requirements")
+    deps.select { |dep| dep.is_a? Dependency }
   end
 
   def dep_display_name(dep)
@@ -106,58 +118,33 @@ module Homebrew
         # This shouldn't happen, but we'll put something here to help debugging
         "::#{dep.name}"
       end
+    elsif ARGV.include?("--full-name")
+      dep.to_formula.full_name
     else
-      ARGV.include?("--full-name") ? dep.to_formula.full_name : dep.name
+      dep.name
     end
+
     if ARGV.include?("--annotate")
       str = "#{str}  [build]" if dep.build?
+      str = "#{str}  [test]" if dep.test?
       str = "#{str}  [optional" if dep.optional?
       str = "#{str}  [recommended]" if dep.recommended?
     end
+
     str
   end
 
   def deps_for_formula(f, recursive = false)
-    includes = []
-    ignores = []
-    if ARGV.include?("--include-build")
-      includes << "build?"
-    else
-      ignores << "build?"
-    end
-    if ARGV.include?("--include-optional")
-      includes << "optional?"
-    else
-      ignores << "optional?"
-    end
-    ignores << "recommended?" if ARGV.include?("--skip-recommended")
+    includes, ignores = argv_includes_ignores(ARGV)
+
+    deps = f.runtime_dependencies if @only_installed_arg
 
     if recursive
-      deps = f.recursive_dependencies do |dependent, dep|
-        if dep.recommended?
-          Dependency.prune if ignores.include?("recommended?") || dependent.build.without?(dep)
-        elsif dep.optional?
-          Dependency.prune if !includes.include?("optional?") && !dependent.build.with?(dep)
-        elsif dep.build?
-          Dependency.prune unless includes.include?("build?")
-        end
-      end
-      reqs = f.recursive_requirements do |dependent, req|
-        if req.recommended?
-          Requirement.prune if ignores.include?("recommended?") || dependent.build.without?(req)
-        elsif req.optional?
-          Requirement.prune if !includes.include?("optional?") && !dependent.build.with?(req)
-        elsif req.build?
-          Requirement.prune unless includes.include?("build?")
-        end
-      end
+      deps ||= recursive_includes(Dependency,  f, includes, ignores)
+      reqs   = recursive_includes(Requirement, f, includes, ignores)
     else
-      deps = f.deps.reject do |dep|
-        ignores.any? { |ignore| dep.send(ignore) } && includes.none? { |include| dep.send(include) }
-      end
-      reqs = f.requirements.reject do |req|
-        ignores.any? { |ignore| req.send(ignore) } && includes.none? { |include| req.send(include) }
-      end
+      deps ||= reject_ignores(f.deps, ignores, includes)
+      reqs   = reject_ignores(f.requirements, ignores, includes)
     end
 
     deps + reqs.to_a
@@ -171,7 +158,8 @@ module Homebrew
     formulae.each do |f|
       deps = deps_for_formula(f)
       deps = condense_requirements(deps)
-      deps = deps.sort_by(&:name).map(&method(:dep_display_name))
+      deps.sort_by!(&:name)
+      deps.map!(&method(:dep_display_name))
       puts "#{f.full_name}: #{deps.join(" ")}"
     end
   end
@@ -189,32 +177,39 @@ module Homebrew
     reqs = f.requirements
     deps = f.deps
     dependables = reqs + deps
-    dependables = dependables.reject(&:optional?) unless ARGV.include?("--include-optional")
-    dependables = dependables.reject(&:build?) unless ARGV.include?("--include-build")
-    dependables = dependables.reject(&:recommended?) if ARGV.include?("--skip-recommended")
+    dependables.reject!(&:optional?) unless ARGV.include?("--include-optional")
+    dependables.reject!(&:build?) unless ARGV.include?("--include-build")
+    dependables.reject!(&:test?) unless ARGV.include?("--include-test")
+    dependables.reject!(&:recommended?) if ARGV.include?("--skip-recommended")
     max = dependables.length - 1
     @dep_stack.push f.name
     dependables.each_with_index do |dep, i|
       next if !ARGV.include?("--include-requirements") && dep.is_a?(Requirement)
+
       tree_lines = if i == max
         "└──"
       else
         "├──"
       end
+
       display_s = "#{tree_lines} #{dep_display_name(dep)}"
       is_circular = @dep_stack.include?(dep.name)
       display_s = "#{display_s} (CIRCULAR DEPENDENCY)" if is_circular
       puts "#{prefix}#{display_s}"
+
       next if !recursive || is_circular
+
       prefix_addition = if i == max
         "    "
       else
         "│   "
       end
+
       if dep.is_a? Dependency
         recursive_deps_tree(Formulary.factory(dep.name), prefix + prefix_addition, true)
       end
     end
+
     @dep_stack.pop
   end
 end

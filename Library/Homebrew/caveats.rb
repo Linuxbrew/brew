@@ -1,4 +1,3 @@
-require "forwardable"
 require "language/python"
 
 class Caveats
@@ -25,7 +24,6 @@ class Caveats
     caveats << function_completion_caveats(:zsh)
     caveats << function_completion_caveats(:fish)
     caveats << plist_caveats
-    caveats << python_caveats
     caveats << elisp_caveats
     caveats.compact.join("\n")
   end
@@ -106,53 +104,6 @@ class Caveats
       fish_caveats << "\n  #{root_dir}/share/fish/vendor_functions.d" if functions_installed
       fish_caveats
     end
-  end
-
-  def python_caveats
-    return unless keg
-    return unless keg.python_site_packages_installed?
-
-    s = nil
-    homebrew_site_packages = Language::Python.homebrew_site_packages
-    user_site_packages = Language::Python.user_site_packages "python"
-    pth_file = user_site_packages/"homebrew.pth"
-    instructions = <<~EOS.gsub(/^/, "  ")
-      mkdir -p #{user_site_packages}
-      echo 'import site; site.addsitedir("#{homebrew_site_packages}")' >> #{pth_file}
-    EOS
-
-    if f.keg_only?
-      keg_site_packages = f.opt_prefix/"lib/python2.7/site-packages"
-      unless Language::Python.in_sys_path?("python", keg_site_packages)
-        s = <<~EOS
-          If you need Python to find bindings for this keg-only formula, run:
-            echo #{keg_site_packages} >> #{homebrew_site_packages/f.name}.pth
-        EOS
-        s += instructions unless Language::Python.reads_brewed_pth_files?("python")
-      end
-      return s
-    end
-
-    return if Language::Python.reads_brewed_pth_files?("python")
-
-    if !Language::Python.in_sys_path?("python", homebrew_site_packages)
-      s = <<~EOS
-        Python modules have been installed and Homebrew's site-packages is not
-        in your Python sys.path, so you will not be able to import the modules
-        this formula installed. If you plan to develop with these modules,
-        please run:
-      EOS
-      s += instructions
-    elsif keg.python_pth_files_installed?
-      s = <<~EOS
-        This formula installed .pth files to Homebrew's site-packages and your
-        Python isn't configured to process them, so you will not be able to
-        import the modules this formula installed. If you plan to develop
-        with these modules, please run:
-      EOS
-      s += instructions
-    end
-    s
   end
 
   def elisp_caveats

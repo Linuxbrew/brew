@@ -4,7 +4,7 @@ describe Emoji do
   describe "#install_badge" do
     subject { described_class.install_badge }
 
-    before(:each) do
+    before do
       ENV.delete("HOMEBREW_NO_EMOJI")
       ENV.delete("HOMEBREW_INSTALL_BADGE")
     end

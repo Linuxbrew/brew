@@ -9,57 +9,42 @@ class DependencyCollector
 
     def parse_string_spec(spec, tags)
       if (tag = tags.first) && LANGUAGE_MODULES.include?(tag)
-        odeprecated "'depends_on ... => #{tag.inspect}'"
-        LanguageModuleRequirement.new(tag, spec, tags[1])
-      else
-        super
+        odisabled "'depends_on ... => #{tag.inspect}'"
       end
+
+      if tags.include?(:run)
+        odeprecated "'depends_on ... => :run'"
+      end
+
+      super
     end
 
     def parse_symbol_spec(spec, tags)
       case spec
       when :clt
-        odeprecated "'depends_on :clt'"
+        odisabled "'depends_on :clt'"
       when :tex
-        odeprecated "'depends_on :tex'"
-        TeXRequirement.new(tags)
-      when :autoconf, :automake, :bsdmake, :libtool
-        output_deprecation(spec)
-        autotools_dep(spec, tags)
-      when :cairo, :fontconfig, :freetype, :libpng, :pixman
-        output_deprecation(spec)
-        Dependency.new(spec.to_s, tags)
-      when :ant, :expat
-        output_deprecation(spec)
-        Dependency.new(spec.to_s, tags)
+        odisabled "'depends_on :tex'"
       when :libltdl
-        tags << :run
-        output_deprecation("libtool")
-        Dependency.new("libtool", tags)
+        output_disabled(spec, "libtool")
       when :apr
-        output_deprecation(spec, "apr-util")
-        Dependency.new("apr-util", tags)
+        output_disabled(spec, "apr-util")
       when :fortran
-        output_deprecation(spec, "gcc")
-        Dependency.new("gcc", tags)
+        output_disabled(spec, "gcc")
       when :gpg
-        output_deprecation(spec, "gnupg")
-        Dependency.new("gnupg", tags)
+        output_disabled(spec, "gnupg")
       when :hg
-        output_deprecation(spec, "mercurial")
-        Dependency.new("mercurial", tags)
+        output_disabled(spec, "mercurial")
       when :mpi
-        output_deprecation(spec, "open-mpi")
-        Dependency.new("open-mpi", tags)
+        output_disabled(spec, "open-mpi")
       when :python, :python2
-        output_deprecation(spec, "python@2")
-        Dependency.new("python@2", tags)
+        output_disabled(spec, "python@2")
       when :python3
-        output_deprecation(spec, "python")
-        Dependency.new("python", tags)
-      when :emacs, :mysql, :perl, :postgresql, :rbenv, :ruby
-        output_deprecation(spec)
-        Dependency.new(spec.to_s, tags)
+        output_disabled(spec, "python")
+      when :ant, :autoconf, :automake, :bsdmake, :cairo, :emacs, :expat,
+           :fontconfig, :freetype, :libtool, :libpng, :mysql, :perl, :pixman,
+           :postgresql, :rbenv, :ruby
+        output_disabled(spec)
       else
         super
       end
@@ -67,14 +52,9 @@ class DependencyCollector
 
     private
 
-    def autotools_dep(spec, tags)
-      tags << :build unless tags.include? :run
-      Dependency.new(spec.to_s, tags)
-    end
-
-    def output_deprecation(dependency, new_dependency = dependency)
-      odeprecated "'depends_on :#{dependency}'",
-                  "'depends_on \"#{new_dependency}\"'"
+    def output_disabled(dependency, new_dependency = dependency)
+      odisabled "'depends_on :#{dependency}'",
+                "'depends_on \"#{new_dependency}\"'"
     end
   end
 

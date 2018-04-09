@@ -1,6 +1,4 @@
 require "formulary"
-require "tap"
-require "utils"
 
 module Homebrew
   module MissingFormula

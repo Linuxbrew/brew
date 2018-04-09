@@ -1,7 +1,9 @@
 require "options"
 
 module Dependable
-  RESERVED_TAGS = [:build, :optional, :recommended, :run, :linked].freeze
+  # :run and :linked are no longer used but keep them here to avoid them being
+  # misused in future.
+  RESERVED_TAGS = [:build, :optional, :recommended, :run, :test, :linked].freeze
 
   def build?
     tags.include? :build
@@ -15,12 +17,12 @@ module Dependable
     tags.include? :recommended
   end
 
-  def run?
-    tags.include? :run
+  def test?
+    tags.include? :test
   end
 
   def required?
-    !build? && !optional? && !recommended?
+    !build? && !test? && !optional? && !recommended?
   end
 
   def option_tags
@@ -29,5 +31,16 @@ module Dependable
 
   def options
     Options.create(option_tags)
+  end
+
+  def prune_from_option?(build)
+    return if !optional? && !recommended?
+    build.without?(self)
+  end
+
+  def prune_if_build_and_not_dependent?(dependent, formula = nil)
+    return false unless build?
+    return dependent.installed? unless formula
+    dependent != formula
   end
 end

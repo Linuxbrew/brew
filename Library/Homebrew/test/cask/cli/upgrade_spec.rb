@@ -13,7 +13,7 @@ describe Hbc::CLI::Upgrade, :cask do
       ]
     }
 
-    before(:example) do
+    before do
       installed.each { |cask| Hbc::CLI::Install.run(cask) }
 
       allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
@@ -176,7 +176,7 @@ describe Hbc::CLI::Upgrade, :cask do
       ]
     }
 
-    before(:example) do
+    before do
       installed.each { |cask| Hbc::CLI::Install.run(cask) }
 
       allow_any_instance_of(described_class).to receive(:verbose?).and_return(true)
@@ -201,7 +201,7 @@ describe Hbc::CLI::Upgrade, :cask do
       expect(will_fail_if_upgraded).to be_installed
       expect(will_fail_if_upgraded_path).to be_a_file
       expect(will_fail_if_upgraded.versions).to include("1.2.2")
-      expect(will_fail_if_upgraded.staged_path).to_not exist
+      expect(will_fail_if_upgraded.staged_path).not_to exist
     end
 
     it "does not restore the old Cask if the upgrade failed pre-install" do
@@ -219,7 +219,7 @@ describe Hbc::CLI::Upgrade, :cask do
       expect(bad_checksum).to be_installed
       expect(bad_checksum_path).to be_a_directory
       expect(bad_checksum.versions).to include("1.2.2")
-      expect(bad_checksum.staged_path).to_not exist
+      expect(bad_checksum.staged_path).not_to exist
     end
   end
 end

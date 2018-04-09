@@ -1,4 +1,6 @@
 class Caveats
+  undef plist_caveats
+
   def plist_caveats
     s = []
     if f.plist || (keg&.plist_installed?)

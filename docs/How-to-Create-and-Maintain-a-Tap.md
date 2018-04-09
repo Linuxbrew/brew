@@ -16,7 +16,7 @@ repository’s root, or under `Formula` or `HomebrewFormula` subdirectories. We
 recommend the latter options because it makes the repository organisation
 easier to grasp, and top-level files are not mixed with formulae.
 
-See [homebrew/php](https://github.com/Homebrew/homebrew-php) for an example of
+See [homebrew/core](https://github.com/Homebrew/homebrew-core) for an example of
 a tap with a `Formula` subdirectory.
 
 ### Installing

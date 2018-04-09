@@ -11,11 +11,9 @@ module Homebrew
       missing = {}
       ff.each do |f|
         missing_dependencies = f.missing_dependencies(hide: hide)
-
-        unless missing_dependencies.empty?
-          yield f.full_name, missing_dependencies if block_given?
-          missing[f.full_name] = missing_dependencies
-        end
+        next if missing_dependencies.empty?
+        yield f.full_name, missing_dependencies if block_given?
+        missing[f.full_name] = missing_dependencies
       end
       missing
     end
@@ -106,18 +104,6 @@ module Homebrew
           intended for use by Homebrew developers. If you are encountering errors,
           please try unsetting this. Please do not file issues if you encounter
           errors when using this environment variable.
-        EOS
-      end
-
-      # See https://github.com/Homebrew/legacy-homebrew/pull/9986
-      def check_path_for_trailing_slashes
-        bad_paths = PATH.new(ENV["HOMEBREW_PATH"]).select { |p| p.end_with?("/") }
-        return if bad_paths.empty?
-
-        inject_file_list bad_paths, <<~EOS
-          Some directories in your path end in a slash.
-          Directories in your path should not end in a slash. This can break other
-          doctor checks. The following directories should be edited:
         EOS
       end
 
@@ -494,21 +480,6 @@ module Homebrew
         EOS
       end
 
-      def check_user_curlrc
-        curlrc_found = %w[CURL_HOME HOME].any? do |var|
-          ENV[var] && File.exist?("#{ENV[var]}/.curlrc")
-        end
-        return unless curlrc_found
-
-        <<~EOS
-          You have a curlrc file
-          If you have trouble downloading packages with Homebrew, then maybe this
-          is the problem? If the following command doesn't work, then try removing
-          your curlrc:
-            curl #{Formatter.url("https://github.com")}
-        EOS
-      end
-
       def check_for_gettext
         find_relative_paths("lib/libgettextlib.dylib",
                             "lib/libintl.dylib",
@@ -620,18 +591,6 @@ module Homebrew
         end
 
         message
-      end
-
-      def check_ssl_cert_file
-        return unless ENV.key?("SSL_CERT_FILE")
-        <<~EOS
-          Setting SSL_CERT_FILE can break downloading files; if that happens
-          you should unset it before running Homebrew.
-
-          Homebrew uses the system curl which uses system certificates by
-          default. Setting SSL_CERT_FILE makes it use an outdated OpenSSL, which
-          does not support modern OpenSSL certificate stores.
-        EOS
       end
 
       def check_for_symlinked_cellar
@@ -813,28 +772,6 @@ module Homebrew
         false
       end
 
-      def check_for_linked_keg_only_brews
-        return unless HOMEBREW_CELLAR.exist?
-
-        linked = Formula.installed.sort.select do |f|
-          f.keg_only? && __check_linked_brew(f)
-        end
-        return if linked.empty?
-
-        inject_file_list linked.map(&:full_name), <<~EOS
-          Some keg-only formulae are linked into the Cellar.
-          Linking a keg-only formula, such as gettext, into the cellar with
-          `brew link <formula>` will cause other formulae to detect them during
-          the `./configure` step. This may cause problems when compiling those
-          other formulae.
-
-          Binaries provided by keg-only formulae may override system binaries
-          with other strange results.
-
-          You may wish to `brew unlink` these brews:
-        EOS
-      end
-
       def check_for_other_frameworks
         # Other frameworks that are known to cause problems when present
         frameworks_to_check = %w[
@@ -895,53 +832,6 @@ module Homebrew
         EOS
       end
 
-      def check_for_enthought_python
-        return unless which "enpkg"
-
-        <<~EOS
-          Enthought Python was found in your PATH.
-          This can cause build problems, as this software installs its own
-          copies of iconv and libxml2 into directories that are picked up by
-          other build systems.
-        EOS
-      end
-
-      def check_for_library_python
-        return unless File.exist?("/Library/Frameworks/Python.framework")
-
-        <<~EOS
-          Python is installed at /Library/Frameworks/Python.framework
-
-          Homebrew only supports building against the System-provided Python or a
-          brewed Python. In particular, Pythons installed to /Library can interfere
-          with other software installs.
-        EOS
-      end
-
-      def check_for_old_homebrew_share_python_in_path
-        message = ""
-        ["", "3"].map do |suffix|
-          next unless paths.include?((HOMEBREW_PREFIX/"share/python#{suffix}").to_s)
-          message += <<~EOS
-            #{HOMEBREW_PREFIX}/share/python#{suffix} is not needed in PATH.
-          EOS
-        end
-        unless message.empty?
-          message += <<~EOS
-
-            Formerly homebrew put Python scripts you installed via `pip` or `pip3`
-            (or `easy_install`) into that directory above but now it can be removed
-            from your PATH variable.
-            Python scripts will now install into #{HOMEBREW_PREFIX}/bin.
-            You can delete anything, except 'Extras', from the #{HOMEBREW_PREFIX}/share/python
-            (and #{HOMEBREW_PREFIX}/share/python@2) dir and install affected Python packages
-            anew with `pip install --upgrade`.
-          EOS
-        end
-
-        message unless message.empty?
-      end
-
       def check_for_bad_python_symlink
         return unless which "python"
         `python -V 2>&1` =~ /Python (\d+)\./
@@ -966,7 +856,7 @@ module Homebrew
           Putting non-prefixed coreutils in your path can cause gmp builds to fail.
         EOS
       rescue FormulaUnavailableError
-        return
+        nil
       end
 
       def check_for_non_prefixed_findutils
@@ -981,7 +871,7 @@ module Homebrew
           Putting non-prefixed findutils in your path can cause python builds to fail.
         EOS
       rescue FormulaUnavailableError
-        return
+        nil
       end
 
       def check_for_pydistutils_cfg_in_home
@@ -1013,24 +903,6 @@ module Homebrew
           You have unlinked kegs in your Cellar
           Leaving kegs unlinked can lead to build-trouble and cause brews that depend on
           those kegs to fail to run properly once built. Run `brew link` on these:
-        EOS
-      end
-
-      def check_for_pth_support
-        homebrew_site_packages = Language::Python.homebrew_site_packages
-        return unless homebrew_site_packages.directory?
-        return if Language::Python.reads_brewed_pth_files?("python") != false
-        return unless Language::Python.in_sys_path?("python", homebrew_site_packages)
-
-        user_site_packages = Language::Python.user_site_packages "python"
-        <<~EOS
-          Your default Python does not recognize the Homebrew site-packages
-          directory as a special site-packages directory, which means that .pth
-          files will not be followed. This means you will not be able to import
-          some modules after installing them with Homebrew, like wxpython. To fix
-          this for the current user, you can run:
-            mkdir -p #{user_site_packages}
-            echo 'import site; site.addsitedir("#{homebrew_site_packages}")' >> #{user_site_packages}/homebrew.pth
         EOS
       end
 

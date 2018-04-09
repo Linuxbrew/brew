@@ -28,7 +28,6 @@ module Homebrew
       slow_checks = %w[
         check_for_broken_symlinks
         check_missing_deps
-        check_for_linked_keg_only_brews
       ]
       methods = (checks.all.sort - slow_checks) + slow_checks
     else

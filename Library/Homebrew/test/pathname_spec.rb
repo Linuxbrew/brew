@@ -1,4 +1,3 @@
-require "tmpdir"
 require "extend/pathname"
 require "install_renamed"
 
@@ -11,7 +10,7 @@ describe Pathname do
   let(:dir) { src/"bar" }
 
   describe DiskUsageExtension do
-    before(:each) do
+    before do
       mkdir_p dir/"a-directory"
       touch [dir/".DS_Store", dir/"a-file"]
       File.truncate(dir/"a-file", 1_048_576)
@@ -41,7 +40,7 @@ describe Pathname do
   end
 
   describe "#rmdir_if_possible" do
-    before(:each) { mkdir_p dir }
+    before { mkdir_p dir }
 
     it "returns true and removes a directory if it doesn't contain files" do
       expect(dir.rmdir_if_possible).to be true
@@ -131,8 +130,8 @@ describe Pathname do
 
   describe "#extname" do
     it "supports common multi-level archives" do
-      expect(Pathname.new("foo-0.1.tar.gz").extname).to eq(".tar.gz")
-      expect(Pathname.new("foo-0.1.cpio.gz").extname).to eq(".cpio.gz")
+      expect(described_class.new("foo-0.1.tar.gz").extname).to eq(".tar.gz")
+      expect(described_class.new("foo-0.1.cpio.gz").extname).to eq(".cpio.gz")
     end
   end
 
@@ -144,7 +143,7 @@ describe Pathname do
   end
 
   describe "#install" do
-    before(:each) do
+    before do
       (src/"a.txt").write "This is sample file a."
       (src/"b.txt").write "This is sample file b."
     end
@@ -233,12 +232,12 @@ describe Pathname do
 
     it "can install relative paths as symlinks" do
       dst.install_symlink "foo" => "bar"
-      expect((dst/"bar").readlink).to eq(Pathname.new("foo"))
+      expect((dst/"bar").readlink).to eq(described_class.new("foo"))
     end
   end
 
   describe InstallRenamed do
-    before(:each) do
+    before do
       dst.extend(InstallRenamed)
     end
 

@@ -1,6 +1,8 @@
 module Utils
   class Bottles
     class << self
+      undef tag
+
       def tag
         if MacOS.version >= :lion
           MacOS.cat
@@ -21,9 +23,10 @@ module Utils
     class Collector
       private
 
-      alias original_find_matching_tag find_matching_tag
+      alias generic_find_matching_tag find_matching_tag
+
       def find_matching_tag(tag)
-        original_find_matching_tag(tag) || find_altivec_tag(tag) || find_or_later_tag(tag)
+        generic_find_matching_tag(tag) || find_altivec_tag(tag) || find_or_later_tag(tag)
       end
 
       # This allows generic Altivec PPC bottles to be supported in some

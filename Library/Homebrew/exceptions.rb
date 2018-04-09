@@ -181,8 +181,7 @@ class TapFormulaAmbiguityError < RuntimeError
     @name = name
     @paths = paths
     @formulae = paths.map do |path|
-      match = path.to_s.match(HOMEBREW_TAP_PATH_REGEX)
-      "#{Tap.fetch(match[:user], match[:repo])}/#{path.basename(".rb")}"
+      "#{Tap.from_path(path).name}/#{path.basename(".rb")}"
     end
 
     super <<~EOS
@@ -513,6 +512,13 @@ class CurlDownloadStrategyError < RuntimeError
     else
       super "Download failed: #{url}"
     end
+  end
+end
+
+# raised in ScpDownloadStrategy.fetch
+class ScpDownloadStrategyError < RuntimeError
+  def initialize(cause)
+    super "Download failed: #{cause}"
   end
 end
 

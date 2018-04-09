@@ -6,12 +6,6 @@ describe Homebrew::Diagnostic::Checks do
     expect(subject.inject_file_list(%w[/a /b], "foo:\n")).to eq("foo:\n  /a\n  /b\n")
   end
 
-  specify "#check_path_for_trailing_slashes" do
-    ENV["HOMEBREW_PATH"] += File::PATH_SEPARATOR + "/foo/bar/"
-    expect(subject.check_path_for_trailing_slashes)
-      .to match("Some directories in your path end in a slash")
-  end
-
   specify "#check_build_from_source" do
     ENV["HOMEBREW_BUILD_FROM_SOURCE"] = "1"
     expect(subject.check_build_from_source)
@@ -134,15 +128,6 @@ describe Homebrew::Diagnostic::Checks do
         .to match("Homebrew's sbin was not found in your PATH")
     ensure
       sbin.rmtree
-    end
-  end
-
-  specify "#check_user_curlrc" do
-    mktmpdir do |path|
-      FileUtils.touch "#{path}/.curlrc"
-      ENV["CURL_HOME"] = path
-
-      expect(subject.check_user_curlrc).to match("You have a curlrc file")
     end
   end
 

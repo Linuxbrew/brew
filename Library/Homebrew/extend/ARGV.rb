@@ -15,6 +15,7 @@ module HomebrewArgvExtension
       --no-sandbox
       --build-bottle
       --force-bottle
+      --include-test
       --verbose
       --force
       -i
@@ -265,10 +266,6 @@ module HomebrewArgvExtension
 
   def fetch_head?
     include? "--fetch-HEAD"
-  end
-
-  def pry?
-    include?("--pry") || !ENV["HOMEBREW_PRY"].nil?
   end
 
   # eg. `foo -ns -i --bar` has three switches, n, s and i
