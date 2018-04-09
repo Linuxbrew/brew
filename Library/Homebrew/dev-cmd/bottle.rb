@@ -79,6 +79,7 @@ module Homebrew
       switch "--no-commit"
       switch "--json"
       switch :verbose
+      switch :debug
       flag   "--root-url"
     end
 
@@ -113,7 +114,7 @@ module Homebrew
       linked_libraries = Keg.file_linked_libraries(file, string)
       result ||= !linked_libraries.empty?
 
-      if @args.verbose?
+      if Homebrew.args.verbose?
         print_filename.call(string, file) unless linked_libraries.empty?
         linked_libraries.each do |lib|
           puts " #{Tty.bold}-->#{Tty.reset} links to #{lib}"
@@ -136,7 +137,7 @@ module Homebrew
         end
       end
 
-      next unless @args.verbose? && !text_matches.empty?
+      next unless Homebrew.args.verbose? && !text_matches.empty?
       print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
         puts " #{Tty.bold}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
@@ -157,7 +158,7 @@ module Homebrew
       absolute_symlinks_start_with_string << pn if link.to_s.start_with?(string)
     end
 
-    if @args.verbose?
+    if Homebrew.args.verbose?
       unless absolute_symlinks_start_with_string.empty?
         opoo "Absolute symlink starting with #{string}:"
         absolute_symlinks_start_with_string.each do |pn|
@@ -298,7 +299,7 @@ module Homebrew
           end
           skip_relocation = relocatable && !keg.require_relocation?
         end
-        puts if !relocatable && @args.verbose?
+        puts if !relocatable && Homebrew.args.verbose?
       rescue Interrupt
         ignore_interrupts { bottle_path.unlink if bottle_path.exist? }
         raise

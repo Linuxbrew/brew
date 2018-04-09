@@ -6,6 +6,11 @@ module Homebrew
   module_function
 
   def mirror
+    Homebrew::CLI::Parser.parse do
+      switch :debug
+      switch :verbose
+    end
+
     odie "This command requires at least formula argument!" if ARGV.named.empty?
 
     bintray_user = ENV["HOMEBREW_BINTRAY_USER"]
