@@ -66,22 +66,25 @@ module FormulaCellarChecks
     return unless formula.prefix.directory?
     keg = Keg.new(formula.prefix)
 
-    DatabaseCache.new(:linkage) { |database_cache| LinkageChecker.new(keg, database_cache, false, formula) }
+    DatabaseCache.new(:linkage) do |database_cache|
+      checker = LinkageChecker.new(keg, database_cache, false, formula)
 
-    return unless checker.broken_dylibs?
-    output = <<~EOS
-      #{formula} has broken dynamic library links:
-        #{checker.broken_dylibs.to_a * "\n  "}
-    EOS
-    tab = Tab.for_keg(keg)
-    if tab.poured_from_bottle
-      output += <<~EOS
-        Rebuild this from source with:
-          brew reinstall --build-from-source #{formula}
-        If that's successful, file an issue#{formula.tap ? " here:\n  #{formula.tap.issues_url}" : "."}
+      return unless checker.broken_dylibs?
+      output = <<~EOS
+        #{formula} has broken dynamic library links:
+          #{checker.broken_dylibs.to_a * "\n  "}
       EOS
+
+      tab = Tab.for_keg(keg)
+      if tab.poured_from_bottle
+        output += <<~EOS
+          Rebuild this from source with:
+            brew reinstall --build-from-source #{formula}
+          If that's successful, file an issue#{formula.tap ? " here:\n  #{formula.tap.issues_url}" : "."}
+        EOS
+      end
+      problem_if_output output
     end
-    problem_if_output output
   end
 
   def audit_installed
