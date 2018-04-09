@@ -22,6 +22,10 @@ class LinkageChecker
     @reverse_links ||= store.fetch_type(:reverse_links)
   end
 
+  def broken_deps
+    @broken_deps ||= store.fetch_type(:broken_deps)
+  end
+
   # 'Path-type' cached values
 
   def system_dylibs
@@ -229,6 +233,7 @@ class LinkageChecker
     @variable_dylibs  = Set.new
     @brewed_dylibs    = Hash.new { |h, k| h[k] = Set.new }
     @reverse_links    = Hash.new { |h, k| h[k] = Set.new }
+    @broken_deps      = Hash.new { |h, k| h[k] = [] }
     @indirect_deps    = []
     @undeclared_deps  = []
     @unnecessary_deps = []
@@ -241,6 +246,7 @@ class LinkageChecker
       variable_dylibs: variable_dylibs,
       broken_dylibs: broken_dylibs,
       indirect_deps: indirect_deps,
+      broken_deps: broken_deps,
       undeclared_deps: undeclared_deps,
       unnecessary_deps: unnecessary_deps,
       brewed_dylibs: brewed_dylibs,

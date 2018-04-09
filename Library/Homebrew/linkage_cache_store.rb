@@ -8,7 +8,7 @@ require "cache_store"
 class LinkageStore < CacheStore
   ARRAY_LINKAGE_TYPES = [:system_dylibs, :variable_dylibs, :broken_dylibs,
                          :indirect_deps, :undeclared_deps, :unnecessary_deps].freeze
-  HASH_LINKAGE_TYPES  = [:brewed_dylibs, :reverse_links].freeze
+  HASH_LINKAGE_TYPES  = [:brewed_dylibs, :reverse_links, :broken_deps].freeze
 
   # @param  [String] keg_name
   # @param  [DBM]    database_cache
