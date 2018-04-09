@@ -14,9 +14,7 @@ def curl_args(*extra_args, show_output: false, user_agent: :default)
   args = [curl_executable.to_s]
 
   # do not load .curlrc unless requested (must be the first argument)
-  if ENV["HOMEBREW_CURLRC"]
-    args << "-q"
-  end
+  args << "-q" unless ENV["HOMEBREW_CURLRC"]
 
   args << "--show-error"
 
