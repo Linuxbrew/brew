@@ -1,4 +1,4 @@
-#:  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--root-url=`<URL>] [`--force-core-tap`] <formulae>:
+#:  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--or-later`] [`--root-url=`<URL>] [`--force-core-tap`] <formulae>:
 #:    Generate a bottle (binary package) from a formula installed with
 #:    `--build-bottle`.
 #:
@@ -14,6 +14,8 @@
 #:
 #:    If `--root-url` is passed, use the specified <URL> as the root of the
 #:    bottle's URL instead of Homebrew's default.
+#:
+#:    If `--or-later` is passed, append _or_later to the bottle tag.
 #:
 #:    If `--force-core-tap` is passed, build a bottle even if <formula> is not
 #:    in homebrew/core or any installed taps.
@@ -57,7 +59,7 @@ BOTTLE_ERB = <<-EOS.freeze
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
     <% checksum, macos = checksum_value.shift %>
-    <%= checksum_type %> "<%= checksum %>" => :<%= macos %>
+    <%= checksum_type %> "<%= checksum %>" => :<%= macos %><%= "_or_later" if Homebrew.args.or_later? %>
     <% end %>
     <% end %>
   end
@@ -78,6 +80,7 @@ module Homebrew
       switch "--write"
       switch "--no-commit"
       switch "--json"
+      switch "--or-later"
       switch :verbose
       switch :debug
       flag   "--root-url"
@@ -360,6 +363,8 @@ module Homebrew
     puts output
 
     return unless @args.json?
+    tag = Utils::Bottles.tag.to_s
+    tag += "_or_later" if args.or_later?
     json = {
       f.full_name => {
         "formula" => {
@@ -372,7 +377,7 @@ module Homebrew
           "cellar" => bottle.cellar.to_s,
           "rebuild" => bottle.rebuild,
           "tags" => {
-            Utils::Bottles.tag.to_s => {
+            tag => {
               "filename" => filename.to_s,
               "sha256" => sha256,
             },
