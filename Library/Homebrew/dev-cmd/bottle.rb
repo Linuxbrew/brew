@@ -57,7 +57,7 @@ BOTTLE_ERB = <<-EOS.freeze
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
     <% checksum, macos = checksum_value.shift %>
-    <%= checksum_type %> "<%= checksum %>" => :<%= macos %><%= "_or_later" if Homebrew.args.or_later? %>
+    <%= checksum_type %> "<%= checksum %>" => :<%= macos %>
     <% end %>
     <% end %>
   end
@@ -78,7 +78,6 @@ module Homebrew
       switch "--write"
       switch "--no-commit"
       switch "--json"
-      switch "--or-later"
       switch :verbose
       switch :debug
       flag   "--root-url"
