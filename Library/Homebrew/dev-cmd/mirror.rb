@@ -1,6 +1,8 @@
 #: @hide_from_man_page
-#:  * `mirror` [`--test`] <formulae>:
+#:  * `mirror` <formulae>:
 #:    Reuploads the stable URL for a formula to Bintray to use it as a mirror.
+
+require "cli_parser"
 
 module Homebrew
   module_function
