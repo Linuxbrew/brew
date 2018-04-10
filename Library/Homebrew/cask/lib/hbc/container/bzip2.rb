@@ -1,5 +1,3 @@
-require "tmpdir"
-
 require "hbc/container/base"
 
 module Hbc

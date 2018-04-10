@@ -480,19 +480,60 @@ module Homebrew
         EOS
       end
 
-      def check_user_curlrc
-        curlrc_found = %w[CURL_HOME HOME].any? do |var|
-          ENV[var] && File.exist?("#{ENV[var]}/.curlrc")
-        end
-        return unless curlrc_found
+      def check_for_gettext
+        return unless OS.mac?
+        find_relative_paths("lib/libgettextlib.dylib",
+                            "lib/libintl.dylib",
+                            "include/libintl.h")
+        return if @found.empty?
 
-        <<~EOS
-          You have a curlrc file
-          If you have trouble downloading packages with Homebrew, then maybe this
-          is the problem? If the following command doesn't work, then try removing
-          your curlrc:
-            curl #{Formatter.url("https://github.com")}
+        # Our gettext formula will be caught by check_linked_keg_only_brews
+        gettext = begin
+          Formulary.factory("gettext")
+        rescue
+          nil
+        end
+        homebrew_owned = @found.all? do |path|
+          Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
+        end
+        return if gettext&.linked_keg&.directory? && homebrew_owned
+
+        inject_file_list @found, <<~EOS
+          gettext files detected at a system prefix.
+          These files can cause compilation and link failures, especially if they
+          are compiled with improper architectures. Consider removing these files:
         EOS
+      end
+
+      def check_for_iconv
+        return unless OS.mac?
+        find_relative_paths("lib/libiconv.dylib", "include/iconv.h")
+        return if @found.empty?
+
+        libiconv = begin
+          Formulary.factory("libiconv")
+        rescue
+          nil
+        end
+        if libiconv&.linked_keg&.directory?
+          unless libiconv.keg_only?
+            <<~EOS
+              A libiconv formula is installed and linked.
+              This will break stuff. For serious. Unlink it.
+            EOS
+          end
+        else
+          inject_file_list @found, <<~EOS
+            libiconv files detected at a system prefix other than /usr.
+            Homebrew doesn't provide a libiconv formula, and expects to link against
+            the system version in /usr. libiconv in other prefixes can cause
+            compile or link failure, especially if compiled with improper
+            architectures. macOS itself never installs anything to /usr/local so
+            it was either installed by a user or some other third party software.
+
+            tl;dr: delete these files:
+          EOS
+        end
       end
 
       def check_for_config_scripts

@@ -1,4 +1,3 @@
-require "formula"
 require "lock_file"
 require "keg"
 require "tab"

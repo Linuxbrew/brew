@@ -1,5 +1,3 @@
-require "hardware"
-require "development_tools"
 require "os/mac/version"
 require "os/mac/xcode"
 require "os/mac/xquartz"

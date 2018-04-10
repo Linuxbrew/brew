@@ -1,5 +1,4 @@
 require "digest/md5"
-require "tap"
 require "extend/cachable"
 
 # The Formulary is responsible for creating instances of Formula.

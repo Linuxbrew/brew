@@ -1,4 +1,3 @@
-require "set"
 require "tempfile"
 
 require "hbc/container/base"

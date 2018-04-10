@@ -1,10 +1,12 @@
 module Homebrew
   module Diagnostic
     class Checks
+      undef development_tools_checks, fatal_development_tools_checks,
+            build_error_checks
+
       def development_tools_checks
         %w[
           check_for_unsupported_macos
-          check_for_bad_install_name_tool
           check_for_installed_developer_tools
           check_xcode_license_approved
           check_xcode_up_to_date
@@ -312,60 +314,6 @@ module Homebrew
 
             `./configure` may have problems finding brew-installed packages using
             this other pkg-config.
-          EOS
-        end
-      end
-
-      def check_for_gettext
-        find_relative_paths("lib/libgettextlib.dylib",
-                            "lib/libintl.dylib",
-                            "include/libintl.h")
-        return if @found.empty?
-
-        # Our gettext formula will be caught by check_linked_keg_only_brews
-        gettext = begin
-                    Formulary.factory("gettext")
-                  rescue
-                    nil
-                  end
-        homebrew_owned = @found.all? do |path|
-          Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
-        end
-        return if gettext&.linked_keg&.directory? && homebrew_owned
-
-        inject_file_list @found, <<~EOS
-          gettext files detected at a system prefix.
-          These files can cause compilation and link failures, especially if they
-          are compiled with improper architectures. Consider removing these files:
-        EOS
-      end
-
-      def check_for_iconv
-        find_relative_paths("lib/libiconv.dylib", "include/iconv.h")
-        return if @found.empty?
-
-        libiconv = begin
-                    Formulary.factory("libiconv")
-                  rescue
-                    nil
-                  end
-        if libiconv&.linked_keg&.directory?
-          unless libiconv.keg_only?
-            <<~EOS
-              A libiconv formula is installed and linked.
-              This will break stuff. For serious. Unlink it.
-            EOS
-          end
-        else
-          inject_file_list @found, <<~EOS
-            libiconv files detected at a system prefix other than /usr.
-            Homebrew doesn't provide a libiconv formula, and expects to link against
-            the system version in /usr. libiconv in other prefixes can cause
-            compile or link failure, especially if compiled with improper
-            architectures. macOS itself never installs anything to /usr/local so
-            it was either installed by a user or some other third party software.
-
-            tl;dr: delete these files:
           EOS
         end
       end

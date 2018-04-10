@@ -1,123 +1,107 @@
 require "requirements"
-require "compat/requirements/language_module_requirement"
 
 class CVSRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("CVSRequirement", "'depends_on \"cvs\"'")
-    which "cvs"
+    odisabled("CVSRequirement", "'depends_on \"cvs\"'")
   end
 end
 
 class EmacsRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("EmacsRequirement", "'depends_on \"emacs\"'")
-    which "emacs"
+    odisabled("EmacsRequirement", "'depends_on \"emacs\"'")
   end
 end
 
 class FortranRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("FortranRequirement", "'depends_on \"gcc\"'")
-    which "gfortran"
+    odisabled("FortranRequirement", "'depends_on \"gcc\"'")
   end
 end
 
 class GitRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("GitRequirement", "'depends_on \"git\"'")
-    which "git"
+    odisabled("GitRequirement", "'depends_on \"git\"'")
   end
 end
 
 class GPG2Requirement < Requirement
   fatal true
   satisfy do
-    odeprecated("GPG2Requirement", "'depends_on \"gnupg\"'")
-    which "gpg"
+    odisabled("GPG2Requirement", "'depends_on \"gnupg\"'")
   end
 end
 
 class MercurialRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("MercurialRequirement", "'depends_on \"mercurial\"'")
-    which "hg"
+    odisabled("MercurialRequirement", "'depends_on \"mercurial\"'")
   end
 end
 
 class MPIRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("MPIRequirement", "'depends_on \"open-mpi\"'")
-    which "mpicc"
+    odisabled("MPIRequirement", "'depends_on \"open-mpi\"'")
   end
 end
 
 class MysqlRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("MysqlRequirement", "'depends_on \"mysql\"'")
-    which "mysql_config"
+    odisabled("MysqlRequirement", "'depends_on \"mysql\"'")
   end
 end
 
 class PerlRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("PerlRequirement", "'depends_on \"perl\"'")
-    which "perl"
+    odisabled("PerlRequirement", "'depends_on \"perl\"'")
   end
 end
 
 class PostgresqlRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("PostgresqlRequirement", "'depends_on \"postgresql\"'")
-    which "pg_config"
+    odisabled("PostgresqlRequirement", "'depends_on \"postgresql\"'")
   end
 end
 
 class PythonRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("PythonRequirement", "'depends_on \"python@2\"'")
-    which "python2"
+    odisabled("PythonRequirement", "'depends_on \"python@2\"'")
   end
 end
 
 class Python3Requirement < Requirement
   fatal true
   satisfy do
-    odeprecated("Python3Requirement", "'depends_on \"python\"'")
-    which "python"
+    odisabled("Python3Requirement", "'depends_on \"python\"'")
   end
 end
 
 class RbenvRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("RbenvRequirement", "'depends_on \"rbenv\"'")
-    which "rbenv"
+    odisabled("RbenvRequirement", "'depends_on \"rbenv\"'")
   end
 end
 
 class RubyRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("RubyRequirement", "'depends_on \"ruby\"'")
-    which "ruby"
+    odisabled("RubyRequirement", "'depends_on \"ruby\"'")
   end
 end
 
 class SubversionRequirement < Requirement
   fatal true
   satisfy do
-    odeprecated("SubversionRequirement", "'depends_on \"subversion\"'")
-    which "svn"
+    odisabled("SubversionRequirement", "'depends_on \"subversion\"'")
   end
 end
 
@@ -126,8 +110,7 @@ class TeXRequirement < Requirement
   cask "mactex"
   download "https://www.tug.org/mactex/"
   satisfy do
-    odeprecated("TeXRequirement")
-    which("tex") || which("latex")
+    odisabled("TeXRequirement")
   end
 end
 

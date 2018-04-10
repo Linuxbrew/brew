@@ -1,7 +1,6 @@
 require "hardware"
 require "software_spec"
 require "rexml/document"
-require "tap"
 require "development_tools"
 
 class SystemConfig
@@ -116,6 +115,7 @@ class SystemConfig
         HOMEBREW_REPOSITORY: "/usr/local/Homebrew",
         HOMEBREW_CELLAR: "/usr/local/Cellar",
         HOMEBREW_CACHE: "#{ENV["HOME"]}/Library/Caches/Homebrew",
+        HOMEBREW_RUBY_WARNINGS: "-W0",
       }.freeze
       boring_keys = %w[
         HOMEBREW_BROWSER
@@ -131,7 +131,6 @@ class SystemConfig
         HOMEBREW_LIBRARY
         HOMEBREW_MACOS_VERSION
         HOMEBREW_RUBY_PATH
-        HOMEBREW_RUBY_WARNINGS
         HOMEBREW_SYSTEM
         HOMEBREW_OS_VERSION
         HOMEBREW_PATH
@@ -150,6 +149,9 @@ class SystemConfig
       end
       if defaults_hash[:HOMEBREW_CACHE] != HOMEBREW_CACHE.to_s
         f.puts "HOMEBREW_CACHE: #{HOMEBREW_CACHE}"
+      end
+      if defaults_hash[:HOMEBREW_RUBY_WARNINGS] != ENV["HOMEBREW_RUBY_WARNINGS"].to_s
+        f.puts "HOMEBREW_RUBY_WARNINGS: #{ENV["HOMEBREW_RUBY_WARNINGS"]}"
       end
       unless ENV["HOMEBREW_ENV"]
         ENV.sort.each do |key, value|

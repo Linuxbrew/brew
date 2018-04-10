@@ -1,27 +1,24 @@
-require "utils"
 
 module Gpg
   module_function
 
   def executable
-    odeprecated "Gpg.executable", 'which "gpg"'
-    which "gpg"
+    odisabled "Gpg.executable", 'which "gpg"'
   end
 
   def available?
-    odeprecated "Gpg.available?", 'which "gpg"'
-    File.executable?(executable.to_s)
+    odisabled "Gpg.available?", 'which "gpg"'
   end
 
   def create_test_key(_)
-    odeprecated "Gpg.create_test_key"
+    odisabled "Gpg.create_test_key"
   end
 
   def cleanup_test_processes!
-    odeprecated "Gpg.cleanup_test_processes!"
+    odisabled "Gpg.cleanup_test_processes!"
   end
 
   def test(_)
-    odeprecated "Gpg.test"
+    odisabled "Gpg.test"
   end
 end

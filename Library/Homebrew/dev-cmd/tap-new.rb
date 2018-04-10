@@ -2,6 +2,7 @@
 #:    Generate the template files for a new tap.
 
 require "tap"
+require "cli_parser"
 
 module Homebrew
   module_function
@@ -14,6 +15,11 @@ module Homebrew
   end
 
   def tap_new
+    Homebrew::CLI::Parser.parse do
+      switch :debug
+      switch :verbose
+    end
+
     raise "A tap argument is required" if ARGV.named.empty?
 
     tap = Tap.fetch(ARGV.named.first)

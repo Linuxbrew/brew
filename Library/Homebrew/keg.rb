@@ -1,4 +1,3 @@
-require "extend/pathname"
 require "keg_relocate"
 require "lock_file"
 require "ostruct"
@@ -244,6 +243,8 @@ class Keg
     end
 
     aliases.each do |a|
+      # versioned aliases are handled below
+      next if a =~ /.+@./
       alias_symlink = opt/a
       if alias_symlink.symlink? && alias_symlink.exist?
         alias_symlink.delete if alias_symlink.realpath == opt_record.realpath
@@ -253,7 +254,7 @@ class Keg
     end
 
     Pathname.glob("#{opt_record}@*").each do |a|
-      a = a.basename
+      a = a.basename.to_s
       next if aliases.include?(a)
 
       alias_symlink = opt/a

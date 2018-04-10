@@ -1,5 +1,39 @@
 module Stdenv
   # @private
+
+  undef homebrew_extra_pkg_config_paths, x11
+
+  def homebrew_extra_pkg_config_paths
+    ["#{HOMEBREW_LIBRARY}/Homebrew/os/mac/pkgconfig/#{MacOS.version}"]
+  end
+
+  def x11
+    # There are some config scripts here that should go in the PATH
+    append_path "PATH", MacOS::X11.bin.to_s
+
+    # Append these to PKG_CONFIG_LIBDIR so they are searched
+    # *after* our own pkgconfig directories, as we dupe some of the
+    # libs in XQuartz.
+    append_path "PKG_CONFIG_LIBDIR", "#{MacOS::X11.lib}/pkgconfig"
+    append_path "PKG_CONFIG_LIBDIR", "#{MacOS::X11.share}/pkgconfig"
+
+    append "LDFLAGS", "-L#{MacOS::X11.lib}"
+    append_path "CMAKE_PREFIX_PATH", MacOS::X11.prefix.to_s
+    append_path "CMAKE_INCLUDE_PATH", MacOS::X11.include.to_s
+    append_path "CMAKE_INCLUDE_PATH", "#{MacOS::X11.include}/freetype2"
+
+    append "CPPFLAGS", "-I#{MacOS::X11.include}"
+    append "CPPFLAGS", "-I#{MacOS::X11.include}/freetype2"
+
+    append_path "ACLOCAL_PATH", "#{MacOS::X11.share}/aclocal"
+
+    if MacOS::XQuartz.provided_by_apple? && !MacOS::CLT.installed?
+      append_path "CMAKE_PREFIX_PATH", "#{MacOS.sdk_path}/usr/X11"
+    end
+
+    append "CFLAGS", "-I#{MacOS::X11.include}" unless MacOS::CLT.installed?
+  end
+
   def setup_build_environment(formula = nil)
     generic_setup_build_environment formula
 
@@ -27,10 +61,6 @@ module Stdenv
     # Our ld64 fixes many of those builds, though of course we can't
     # depend on it already being installed to build itself.
     ld64 if Formula["ld64"].installed?
-  end
-
-  def homebrew_extra_pkg_config_paths
-    ["#{HOMEBREW_LIBRARY}/Homebrew/os/mac/pkgconfig/#{MacOS.version}"]
   end
 
   # Sets architecture-specific flags for every environment variable
@@ -108,33 +138,6 @@ module Stdenv
       # Use the includes form the sdk
       append "CPPFLAGS", "-I#{MacOS.sdk_path}/usr/include/libxml2"
     end
-  end
-
-  def x11
-    # There are some config scripts here that should go in the PATH
-    append_path "PATH", MacOS::X11.bin.to_s
-
-    # Append these to PKG_CONFIG_LIBDIR so they are searched
-    # *after* our own pkgconfig directories, as we dupe some of the
-    # libs in XQuartz.
-    append_path "PKG_CONFIG_LIBDIR", "#{MacOS::X11.lib}/pkgconfig"
-    append_path "PKG_CONFIG_LIBDIR", "#{MacOS::X11.share}/pkgconfig"
-
-    append "LDFLAGS", "-L#{MacOS::X11.lib}"
-    append_path "CMAKE_PREFIX_PATH", MacOS::X11.prefix.to_s
-    append_path "CMAKE_INCLUDE_PATH", MacOS::X11.include.to_s
-    append_path "CMAKE_INCLUDE_PATH", "#{MacOS::X11.include}/freetype2"
-
-    append "CPPFLAGS", "-I#{MacOS::X11.include}"
-    append "CPPFLAGS", "-I#{MacOS::X11.include}/freetype2"
-
-    append_path "ACLOCAL_PATH", "#{MacOS::X11.share}/aclocal"
-
-    if MacOS::XQuartz.provided_by_apple? && !MacOS::CLT.installed?
-      append_path "CMAKE_PREFIX_PATH", "#{MacOS.sdk_path}/usr/X11"
-    end
-
-    append "CFLAGS", "-I#{MacOS::X11.include}" unless MacOS::CLT.installed?
   end
 
   def no_weak_imports

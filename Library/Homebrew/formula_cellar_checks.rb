@@ -154,6 +154,8 @@ module FormulaCellarChecks
   end
 
   def audit_installed
+    @new_formula ||= false
+
     problem_if_output(check_manpages)
     problem_if_output(check_infopages)
     problem_if_output(check_jars)

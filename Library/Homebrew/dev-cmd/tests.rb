@@ -17,7 +17,6 @@
 
 require "cli_parser"
 require "fileutils"
-require "tap"
 
 module Homebrew
   module_function
@@ -26,9 +25,10 @@ module Homebrew
     args = Homebrew::CLI::Parser.parse do
       switch "--no-compat"
       switch "--generic"
-      switch "-v", "--verbose"
       switch "--coverage"
       switch "--online"
+      switch :debug
+      switch :verbose
       flag   "--only", required: true
       flag   "--seed", required: true
     end

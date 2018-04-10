@@ -1,4 +1,3 @@
-require "tap"
 
 module Hbc
   module Locations

@@ -1,5 +1,4 @@
 require "formula"
-require "tap"
 
 module Readall
   class << self

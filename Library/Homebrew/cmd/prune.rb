@@ -1,15 +1,12 @@
 #:  * `prune` [`--dry-run`]:
 #:    Remove dead symlinks from the Homebrew prefix. This is generally not
-#:    needed, but can be useful when doing DIY installations. Also remove broken
-#:    app symlinks from `/Applications` and `~/Applications` that were previously
-#:    created by `brew linkapps`.
+#:    needed, but can be useful when doing DIY installations.
 #:
 #:    If `--dry-run` or `-n` is passed, show what would be removed, but do not
 #:    actually remove anything.
 
 require "keg"
 require "cmd/tap"
-require "cmd/unlinkapps"
 
 module Homebrew
   module_function
@@ -49,17 +46,15 @@ module Homebrew
       end
     end
 
-    unless ARGV.dry_run?
-      if ObserverPathnameExtension.total.zero?
-        puts "Nothing pruned" if ARGV.verbose?
-      else
-        n, d = ObserverPathnameExtension.counts
-        print "Pruned #{n} symbolic links "
-        print "and #{d} directories " if d.positive?
-        puts "from #{HOMEBREW_PREFIX}"
-      end
-    end
+    return if ARGV.dry_run?
 
-    unlinkapps_prune(dry_run: ARGV.dry_run?, quiet: true)
+    if ObserverPathnameExtension.total.zero?
+      puts "Nothing pruned" if ARGV.verbose?
+    else
+      n, d = ObserverPathnameExtension.counts
+      print "Pruned #{n} symbolic links "
+      print "and #{d} directories " if d.positive?
+      puts "from #{HOMEBREW_PREFIX}"
+    end
   end
 end

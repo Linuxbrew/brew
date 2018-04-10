@@ -4,8 +4,6 @@
 #:  * `--repository` <user>`/`<repo>:
 #:    Display where tap <user>`/`<repo>'s directory is located.
 
-require "tap"
-
 module Homebrew
   module_function
 

@@ -378,9 +378,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `prune` [`--dry-run`]:
     Remove dead symlinks from the Homebrew prefix. This is generally not
-    needed, but can be useful when doing DIY installations. Also remove broken
-    app symlinks from `/Applications` and `~/Applications` that were previously
-    created by `brew linkapps`.
+    needed, but can be useful when doing DIY installations.
 
     If `--dry-run` or `-n` is passed, show what would be removed, but do not
     actually remove anything.
@@ -1076,6 +1074,8 @@ can take several different forms:
     The formula file will be cached for later use.
 
 ## ENVIRONMENT
+Note that environment variables must have a value set to be detected. For example, `export HOMEBREW_NO_INSECURE_REDIRECT=1` rather than just `export HOMEBREW_NO_INSECURE_REDIRECT`.
+
   * `HOMEBREW_ARTIFACT_DOMAIN`:
     If set, instructs Homebrew to use the given URL as a download mirror for bottles and binaries.
 
@@ -1109,6 +1109,10 @@ can take several different forms:
     If set, instructs Homebrew to use the given directory as the download cache.
 
     *Default:* `~/Library/Caches/Homebrew`.
+
+  * `HOMEBREW_CURLRC`:
+    If set, Homebrew will not pass `-q` when invoking `curl`(1) (which disables
+    the use of `curlrc`).
 
   * `HOMEBREW_CURL_VERBOSE`:
     If set, Homebrew will pass `--verbose` when invoking `curl`(1).

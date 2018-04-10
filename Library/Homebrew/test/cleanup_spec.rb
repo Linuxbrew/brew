@@ -1,7 +1,6 @@
 require "test/support/fixtures/testball"
 require "cleanup"
 require "fileutils"
-require "pathname"
 
 describe Homebrew::Cleanup do
   let(:ds_store) { Pathname.new("#{HOMEBREW_PREFIX}/Library/.DS_Store") }

@@ -1,16 +1,24 @@
 module Superenv
+  class << self
+    undef bin
+
+    # @private
+    def bin
+      return unless DevelopmentTools.installed?
+
+      (HOMEBREW_SHIMS_PATH/"super").realpath
+    end
+  end
+
   alias x11? x11
 
-  # @private
-  def self.bin
-    return unless DevelopmentTools.installed?
-
-    (HOMEBREW_SHIMS_PATH/"super").realpath
-  end
-
-  def effective_sysroot
-    MacOS.sdk_path.to_s if MacOS::Xcode.without_clt?
-  end
+  undef homebrew_extra_paths,
+        homebrew_extra_pkg_config_paths, homebrew_extra_aclocal_paths,
+        homebrew_extra_isystem_paths, homebrew_extra_library_paths,
+        homebrew_extra_cmake_include_paths,
+        homebrew_extra_cmake_library_paths,
+        homebrew_extra_cmake_frameworks_paths,
+        determine_cccfg, set_x11_env_if_installed
 
   def homebrew_extra_paths
     paths = []
@@ -86,6 +94,14 @@ module Superenv
     s
   end
 
+  def effective_sysroot
+    MacOS.sdk_path.to_s if MacOS::Xcode.without_clt?
+  end
+
+  def set_x11_env_if_installed
+    ENV.x11 = MacOS::X11.installed?
+  end
+
   # @private
   def setup_build_environment(formula = nil)
     generic_setup_build_environment(formula)
@@ -113,10 +129,6 @@ module Superenv
     # On 10.9, the tools in /usr/bin proxy to the active developer directory.
     # This means we can use them for any combination of CLT and Xcode.
     self["HOMEBREW_PREFER_CLT_PROXIES"] = "1" if MacOS.version >= "10.9"
-  end
-
-  def set_x11_env_if_installed
-    ENV.x11 = MacOS::X11.installed?
   end
 
   def no_weak_imports

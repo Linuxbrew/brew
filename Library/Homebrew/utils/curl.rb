@@ -1,4 +1,3 @@
-require "pathname"
 require "open3"
 
 def curl_executable
@@ -12,10 +11,12 @@ def curl_executable
 end
 
 def curl_args(*extra_args, show_output: false, user_agent: :default)
-  args = [
-    curl_executable.to_s,
-    "--show-error",
-  ]
+  args = [curl_executable.to_s]
+
+  # do not load .curlrc unless requested (must be the first argument)
+  args << "-q" unless ENV["HOMEBREW_CURLRC"]
+
+  args << "--show-error"
 
   args << "--user-agent" << case user_agent
   when :browser, :fake

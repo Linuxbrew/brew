@@ -1,13 +1,3 @@
-require "find"
-require "pathname"
-require "rspec/its"
-require "rspec/wait"
-require "rspec/retry"
-require "rubocop"
-require "rubocop/rspec/support"
-require "set"
-require "support/no_seed_progress_formatter"
-
 if ENV["HOMEBREW_TESTS_COVERAGE"]
   require "simplecov"
 
@@ -17,12 +7,19 @@ if ENV["HOMEBREW_TESTS_COVERAGE"]
   end
 end
 
+require "rspec/its"
+require "rspec/wait"
+require "rspec/retry"
+require "rubocop"
+require "rubocop/rspec/support"
+require "find"
+
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew"))
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/test/support/lib"))
 
 require "global"
-require "tap"
 
+require "test/support/no_seed_progress_formatter"
 require "test/support/helper/fixtures"
 require "test/support/helper/formula"
 require "test/support/helper/mktmpdir"
