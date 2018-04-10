@@ -364,7 +364,7 @@ module Homebrew
 
     return unless @args.json?
     tag = Utils::Bottles.tag.to_s
-    tag += "_or_later" if args.or_later?
+    tag += "_or_later" if @args.or_later?
     json = {
       f.full_name => {
         "formula" => {
