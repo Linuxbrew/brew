@@ -850,7 +850,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `release-notes` [`--markdown`] [`previous_tag`] [`end_ref`]:
     Output the merged pull requests on Homebrew/brew between two Git refs.
-    If no `previous_tag` is provided it defaults to the newest tag.
+    If no `previous_tag` is provided it defaults to the latest tag.
     If no `end_ref` is provided it defaults to `origin/master`.
 
     If `--markdown` is passed, output as a Markdown list.
