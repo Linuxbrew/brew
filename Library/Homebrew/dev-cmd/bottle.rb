@@ -40,7 +40,7 @@ require "erb"
 
 BOTTLE_ERB = <<-EOS.freeze
   bottle do
-    <% if !root_url.start_with?(BottleSpecification::DEFAULT_DOMAIN) %>
+    <% if root_url != "#{BottleSpecification::DEFAULT_DOMAIN}/bottles" %>
     root_url "<%= root_url %>"
     <% end %>
     <% if prefix != BottleSpecification::DEFAULT_PREFIX %>
