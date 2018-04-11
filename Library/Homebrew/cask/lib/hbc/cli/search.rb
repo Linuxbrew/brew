@@ -30,6 +30,7 @@ module Hbc
           opoo "Error searching on GitHub: #{error}\n"
           []
         end
+
         matches.map do |match|
           tap = Tap.fetch(match["repository"]["full_name"])
           next if tap.installed?
@@ -65,7 +66,7 @@ module Hbc
           return
         end
 
-        if !exact_match && partial_matches.empty?
+        if !exact_match && partial_matches.empty? && remote_matches.empty?
           puts "No Cask found for \"#{search_term}\"."
           return
         end
