@@ -448,7 +448,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `tap`:
     List all installed taps.
 
-  * `tap` [`--full`] `user``/``repo` [`URL`]:
+  * `tap` [`--full`] [`--force-auto-update`] `user``/``repo` [`URL`]:
     Tap a formula repository.
 
     With `URL` unspecified, taps a formula repository from GitHub using HTTPS.
@@ -464,6 +464,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     By default, the repository is cloned as a shallow copy (`--depth=1`), but
     if `--full` is passed, a full clone will be used. To convert a shallow copy
     to a full copy, you can retap passing `--full` without first untapping.
+
+    By default, only taps hosted on GitHub are auto-updated (for performance
+    reasons). If `--force-auto-update` is passed, this tap will be auto-updated
+    even if it is not hosted on GitHub.
 
     `tap` is re-runnable and exits successfully if there's nothing to do.
     However, retapping with a different `URL` will cause an exception, so first

@@ -493,8 +493,12 @@ EOS
         [[ -z "$HOMEBREW_UPDATE_FORCE" ]] && [[ "$UPSTREAM_SHA_HTTP_CODE" = "304" ]] && exit
       elif [[ -n "$HOMEBREW_UPDATE_PREINSTALL" ]]
       then
-        # Don't try to do a `git fetch` that may take longer than expected.
-        exit
+        FORCE_AUTO_UPDATE="$(git config homebrew.forceautoupdate 2>/dev/null || echo "false")"
+        if [[ "$FORCE_AUTO_UPDATE" != "true" ]]
+        then
+          # Don't try to do a `git fetch` that may take longer than expected.
+          exit
+        fi
       fi
 
       if [[ -n "$HOMEBREW_VERBOSE" ]]
