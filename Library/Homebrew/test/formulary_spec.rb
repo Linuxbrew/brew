@@ -32,10 +32,19 @@ describe Formulary do
       expect(described_class.class_s("foo++")).to eq("Fooxx")
     end
 
-    it "converts a string to PascalCase" do
+    it "converts a string with dots to PascalCase" do
       expect(described_class.class_s("shell.fm")).to eq("ShellFm")
-      expect(described_class.class_s("s-lang")).to eq("SLang")
+    end
+
+    it "converts a string with hyphens to PascalCase" do
       expect(described_class.class_s("pkg-config")).to eq("PkgConfig")
+    end
+
+    it "converts a string with a single letter separated by a hyphen to PascalCase" do
+      expect(described_class.class_s("s-lang")).to eq("SLang")
+    end
+
+    it "converts a string with underscores to PascalCase" do
       expect(described_class.class_s("foo_bar")).to eq("FooBar")
     end
 
@@ -63,7 +72,7 @@ describe Formulary do
       }.to raise_error(FormulaUnavailableError)
     end
 
-    context "if the Formula has the wrong class" do
+    context "when the Formula has the wrong class" do
       let(:formula_name) { "giraffe" }
       let(:formula_content) do
         <<~EOS
@@ -88,20 +97,36 @@ describe Formulary do
       expect(formula).to be_kind_of(Formula)
     end
 
-    it "returns a Formula when given a bottle" do
-      formula = described_class.factory(bottle)
-      expect(formula).to be_kind_of(Formula)
-      expect(formula.local_bottle_path).to eq(bottle.realpath)
+    context "when given a bottle" do
+      subject(:formula) { described_class.factory(bottle) }
+
+      it "returns a Formula" do
+        expect(formula).to be_kind_of(Formula)
+      end
+
+      it "calling #local_bottle_path on the returned Formula returns the bottle path" do
+        expect(formula.local_bottle_path).to eq(bottle.realpath)
+      end
     end
 
-    it "returns a Formula when given an alias" do
-      alias_dir = CoreTap.instance.alias_dir
-      alias_dir.mkpath
-      alias_path = alias_dir/"foo"
-      FileUtils.ln_s formula_path, alias_path
-      result = described_class.factory("foo")
-      expect(result).to be_kind_of(Formula)
-      expect(result.alias_path).to eq(alias_path.to_s)
+    context "when given an alias" do
+      subject(:formula) { described_class.factory("foo") }
+
+      let(:alias_dir) { CoreTap.instance.alias_dir.tap(&:mkpath) }
+      let(:alias_path) { alias_dir/"foo" }
+
+      before do
+        alias_dir.mkpath
+        FileUtils.ln_s formula_path, alias_path
+      end
+
+      it "returns a Formula" do
+        expect(formula).to be_kind_of(Formula)
+      end
+
+      it "calling #alias_path on the returned Formula returns the alias path" do
+        expect(formula.alias_path).to eq(alias_path.to_s)
+      end
     end
 
     context "with installed Formula" do
@@ -113,7 +138,6 @@ describe Formulary do
 
         f = described_class.from_rack(formula.rack)
         expect(f).to be_kind_of(Formula)
-        expect(f.build).to be_kind_of(Tab)
       end
 
       it "returns a Formula when given a Keg" do
@@ -122,12 +146,12 @@ describe Formulary do
         keg = Keg.new(formula.prefix)
         f = described_class.from_keg(keg)
         expect(f).to be_kind_of(Formula)
-        expect(f.build).to be_kind_of(Tab)
       end
     end
 
-    context "from Tap" do
+    context "when loading from Tap" do
       let(:tap) { Tap.new("homebrew", "foo") }
+      let(:another_tap) { Tap.new("homebrew", "bar") }
       let(:formula_path) { tap.path/"#{formula_name}.rb" }
 
       it "returns a Formula when given a name" do
@@ -152,15 +176,11 @@ describe Formulary do
       end
 
       it "raises an error if a Formula is in multiple Taps" do
-        begin
-          another_tap = Tap.new("homebrew", "bar")
-          (another_tap.path/"#{formula_name}.rb").write formula_content
-          expect {
-            described_class.factory(formula_name)
-          }.to raise_error(TapFormulaAmbiguityError)
-        ensure
-          another_tap.path.rmtree
-        end
+        (another_tap.path/"#{formula_name}.rb").write formula_content
+
+        expect {
+          described_class.factory(formula_name)
+        }.to raise_error(TapFormulaAmbiguityError)
       end
     end
   end
@@ -169,15 +189,32 @@ describe Formulary do
     expect(described_class.from_contents(formula_name, formula_path, formula_content)).to be_kind_of(Formula)
   end
 
-  specify "::to_rack" do
-    expect(described_class.to_rack(formula_name)).to eq(HOMEBREW_CELLAR/formula_name)
+  describe "::to_rack" do
+    alias_matcher :exist, :be_exist
 
-    (HOMEBREW_CELLAR/formula_name).mkpath
-    expect(described_class.to_rack(formula_name)).to eq(HOMEBREW_CELLAR/formula_name)
+    let(:rack_path) { HOMEBREW_CELLAR/formula_name }
 
-    expect {
-      described_class.to_rack("a/b/#{formula_name}")
-    }.to raise_error(TapFormulaUnavailableError)
+    context "when the Rack does not exist" do
+      it "returns the Rack" do
+        expect(described_class.to_rack(formula_name)).to eq(rack_path)
+      end
+    end
+
+    context "when the Rack exists" do
+      before do
+        rack_path.mkpath
+      end
+
+      it "returns the Rack" do
+        expect(described_class.to_rack(formula_name)).to eq(rack_path)
+      end
+    end
+
+    it "raises an error if the Formula is not available" do
+      expect {
+        described_class.to_rack("a/b/#{formula_name}")
+      }.to raise_error(TapFormulaUnavailableError)
+    end
   end
 
   describe "::find_with_priority" do
@@ -192,19 +229,13 @@ describe Formulary do
 
     it "prioritizes core Formulae" do
       formula = described_class.find_with_priority(formula_name)
-      expect(formula).to be_kind_of(Formula)
       expect(formula.path).to eq(core_path)
     end
 
     it "prioritizes Formulae from pinned Taps" do
-      begin
-        tap.pin
-        formula = described_class.find_with_priority(formula_name)
-        expect(formula).to be_kind_of(Formula)
-        expect(formula.path).to eq(tap_path.realpath)
-      ensure
-        tap.pinned_symlink_path.parent.parent.rmtree
-      end
+      tap.pin
+      formula = described_class.find_with_priority(formula_name)
+      expect(formula.path).to eq(tap_path.realpath)
     end
   end
 
