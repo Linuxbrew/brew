@@ -340,6 +340,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--hide=``hidden` is passed, act as if none of `hidden` are installed.
     `hidden` should be a comma-separated list of formulae.
 
+    `missing` exits with a non-zero status if any formulae are missing dependencies.
+
   * `options` [`--compact`] (`--all`|`--installed`|`formulae`):
     Display install options specific to `formulae`.
 
