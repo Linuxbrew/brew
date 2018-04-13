@@ -7,7 +7,7 @@ describe Formulary do
   let(:formula_path) { CoreTap.new.formula_dir/"#{formula_name}.rb" }
   let(:formula_content) do
     <<~EOS
-      class #{subject.class_s(formula_name)} < Formula
+      class #{described_class.class_s(formula_name)} < Formula
         url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
         sha256 TESTBALL_SHA256
 
@@ -29,18 +29,18 @@ describe Formulary do
 
   describe "::class_s" do
     it "replaces '+' with 'x'" do
-      expect(subject.class_s("foo++")).to eq("Fooxx")
+      expect(described_class.class_s("foo++")).to eq("Fooxx")
     end
 
     it "converts a string to PascalCase" do
-      expect(subject.class_s("shell.fm")).to eq("ShellFm")
-      expect(subject.class_s("s-lang")).to eq("SLang")
-      expect(subject.class_s("pkg-config")).to eq("PkgConfig")
-      expect(subject.class_s("foo_bar")).to eq("FooBar")
+      expect(described_class.class_s("shell.fm")).to eq("ShellFm")
+      expect(described_class.class_s("s-lang")).to eq("SLang")
+      expect(described_class.class_s("pkg-config")).to eq("PkgConfig")
+      expect(described_class.class_s("foo_bar")).to eq("FooBar")
     end
 
     it "replaces '@' with 'AT'" do
-      expect(subject.class_s("openssl@1.1")).to eq("OpensslAT11")
+      expect(described_class.class_s("openssl@1.1")).to eq("OpensslAT11")
     end
   end
 
@@ -50,16 +50,16 @@ describe Formulary do
     end
 
     it "returns a Formula" do
-      expect(subject.factory(formula_name)).to be_kind_of(Formula)
+      expect(described_class.factory(formula_name)).to be_kind_of(Formula)
     end
 
     it "returns a Formula when given a fully qualified name" do
-      expect(subject.factory("homebrew/core/#{formula_name}")).to be_kind_of(Formula)
+      expect(described_class.factory("homebrew/core/#{formula_name}")).to be_kind_of(Formula)
     end
 
     it "raises an error if the Formula cannot be found" do
       expect {
-        subject.factory("not_existed_formula")
+        described_class.factory("not_existed_formula")
       }.to raise_error(FormulaUnavailableError)
     end
 
@@ -67,29 +67,29 @@ describe Formulary do
       let(:formula_name) { "giraffe" }
       let(:formula_content) do
         <<~EOS
-          class Wrong#{subject.class_s(formula_name)} < Formula
+          class Wrong#{described_class.class_s(formula_name)} < Formula
           end
         EOS
       end
 
       it "raises an error" do
         expect {
-          subject.factory(formula_name)
+          described_class.factory(formula_name)
         }.to raise_error(FormulaClassUnavailableError)
       end
     end
 
     it "returns a Formula when given a path" do
-      expect(subject.factory(formula_path)).to be_kind_of(Formula)
+      expect(described_class.factory(formula_path)).to be_kind_of(Formula)
     end
 
     it "returns a Formula when given a URL" do
-      formula = subject.factory("file://#{formula_path}")
+      formula = described_class.factory("file://#{formula_path}")
       expect(formula).to be_kind_of(Formula)
     end
 
     it "returns a Formula when given a bottle" do
-      formula = subject.factory(bottle)
+      formula = described_class.factory(bottle)
       expect(formula).to be_kind_of(Formula)
       expect(formula.local_bottle_path).to eq(bottle.realpath)
     end
@@ -99,19 +99,19 @@ describe Formulary do
       alias_dir.mkpath
       alias_path = alias_dir/"foo"
       FileUtils.ln_s formula_path, alias_path
-      result = subject.factory("foo")
+      result = described_class.factory("foo")
       expect(result).to be_kind_of(Formula)
       expect(result.alias_path).to eq(alias_path.to_s)
     end
 
     context "with installed Formula" do
-      let(:formula) { subject.factory(formula_path) }
+      let(:formula) { described_class.factory(formula_path) }
       let(:installer) { FormulaInstaller.new(formula) }
 
       it "returns a Formula when given a rack" do
         installer.install
 
-        f = subject.from_rack(formula.rack)
+        f = described_class.from_rack(formula.rack)
         expect(f).to be_kind_of(Formula)
         expect(f.build).to be_kind_of(Tab)
       end
@@ -120,7 +120,7 @@ describe Formulary do
         installer.install
 
         keg = Keg.new(formula.prefix)
-        f = subject.from_keg(keg)
+        f = described_class.from_keg(keg)
         expect(f).to be_kind_of(Formula)
         expect(f.build).to be_kind_of(Tab)
       end
@@ -131,24 +131,24 @@ describe Formulary do
       let(:formula_path) { tap.path/"#{formula_name}.rb" }
 
       it "returns a Formula when given a name" do
-        expect(subject.factory(formula_name)).to be_kind_of(Formula)
+        expect(described_class.factory(formula_name)).to be_kind_of(Formula)
       end
 
       it "returns a Formula from an Alias path" do
         alias_dir = tap.path/"Aliases"
         alias_dir.mkpath
         FileUtils.ln_s formula_path, alias_dir/"bar"
-        expect(subject.factory("bar")).to be_kind_of(Formula)
+        expect(described_class.factory("bar")).to be_kind_of(Formula)
       end
 
       it "raises an error when the Formula cannot be found" do
         expect {
-          subject.factory("#{tap}/not_existed_formula")
+          described_class.factory("#{tap}/not_existed_formula")
         }.to raise_error(TapFormulaUnavailableError)
       end
 
       it "returns a Formula when given a fully qualified name" do
-        expect(subject.factory("#{tap}/#{formula_name}")).to be_kind_of(Formula)
+        expect(described_class.factory("#{tap}/#{formula_name}")).to be_kind_of(Formula)
       end
 
       it "raises an error if a Formula is in multiple Taps" do
@@ -156,7 +156,7 @@ describe Formulary do
           another_tap = Tap.new("homebrew", "bar")
           (another_tap.path/"#{formula_name}.rb").write formula_content
           expect {
-            subject.factory(formula_name)
+            described_class.factory(formula_name)
           }.to raise_error(TapFormulaAmbiguityError)
         ensure
           another_tap.path.rmtree
@@ -166,17 +166,17 @@ describe Formulary do
   end
 
   specify "::from_contents" do
-    expect(subject.from_contents(formula_name, formula_path, formula_content)).to be_kind_of(Formula)
+    expect(described_class.from_contents(formula_name, formula_path, formula_content)).to be_kind_of(Formula)
   end
 
   specify "::to_rack" do
-    expect(subject.to_rack(formula_name)).to eq(HOMEBREW_CELLAR/formula_name)
+    expect(described_class.to_rack(formula_name)).to eq(HOMEBREW_CELLAR/formula_name)
 
     (HOMEBREW_CELLAR/formula_name).mkpath
-    expect(subject.to_rack(formula_name)).to eq(HOMEBREW_CELLAR/formula_name)
+    expect(described_class.to_rack(formula_name)).to eq(HOMEBREW_CELLAR/formula_name)
 
     expect {
-      subject.to_rack("a/b/#{formula_name}")
+      described_class.to_rack("a/b/#{formula_name}")
     }.to raise_error(TapFormulaUnavailableError)
   end
 
@@ -191,7 +191,7 @@ describe Formulary do
     end
 
     it "prioritizes core Formulae" do
-      formula = subject.find_with_priority(formula_name)
+      formula = described_class.find_with_priority(formula_name)
       expect(formula).to be_kind_of(Formula)
       expect(formula.path).to eq(core_path)
     end
@@ -199,7 +199,7 @@ describe Formulary do
     it "prioritizes Formulae from pinned Taps" do
       begin
         tap.pin
-        formula = subject.find_with_priority(formula_name)
+        formula = described_class.find_with_priority(formula_name)
         expect(formula).to be_kind_of(Formula)
         expect(formula.path).to eq(tap_path.realpath)
       ensure
@@ -211,7 +211,7 @@ describe Formulary do
   describe "::core_path" do
     it "returns the path to a Formula in the core tap" do
       name = "foo-bar"
-      expect(subject.core_path(name))
+      expect(described_class.core_path(name))
         .to eq(Pathname.new("#{HOMEBREW_LIBRARY}/Taps/homebrew/homebrew-core/Formula/#{name}.rb"))
     end
   end
