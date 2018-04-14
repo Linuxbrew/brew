@@ -49,26 +49,26 @@ module Homebrew
 
   def bump_formula_pr
     @args = Homebrew::CLI::Parser.parse do
-      switch "--devel"
-      switch "-n", "--dry-run"
-      switch "--write"
-      switch "--audit"
-      switch "--strict"
-      switch "--no-browse"
-      switch :quiet
-      switch :force
-      switch :verbose
-      switch :debug
-      flag   "--url",      required: true
-      flag   "--sha256",   required: true
-      flag   "--mirror",   required: true
-      flag   "--tag",      required: true
-      flag   "--revision", required: true
-      flag   "--version",  required: true
-      flag   "--message",  required: true
-      depends :url, :sha256
-      depends :tag, :revision, mandatory: true
-      conflicts :url, :tag
+      switch    "--devel"
+      switch    "-n", "--dry-run"
+      switch    "--write"
+      switch    "--audit"
+      switch    "--strict"
+      switch    "--no-browse"
+      switch    :quiet
+      switch    :force
+      switch    :verbose
+      switch    :debug
+
+      flag      "--url="
+      flag      "--revision="
+      flag      "--tag=",         required_for: "--revision="
+      flag      "--sha256=",      depends_on: "--url="
+      flag      "--mirror="
+      flag      "--version="
+      flag      "--message="
+
+      conflicts "--url", "--tag"
     end
 
     # As this command is simplifying user run commands then let's just use a

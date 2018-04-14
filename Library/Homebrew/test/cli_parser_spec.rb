@@ -74,22 +74,21 @@ describe Homebrew::CLI::Parser do
   describe "test constraints" do
     subject(:parser) {
       described_class.new do
-        flag "--flag1"
-        flag "--flag2"
-        flag "--flag3"
-        flag "--flag4"
-        depends :flag1, :flag2, mandatory: true
-        depends :flag3, :flag4
-        conflicts :flag1, :flag3
+        flag      "--flag1"
+        flag      "--flag3"
+        flag      "--flag2", required_for: "--flag1"
+        flag      "--flag4", depends_on: "--flag3"
+
+        conflicts "--flag1", "--flag3"
       end
     }
 
     it "raises exception on depends mandatory constraint violation" do
-      expect { parser.parse(["--flag1"]) }.to raise_error(Homebrew::CLI::OptionDependencyError)
+      expect { parser.parse(["--flag1"]) }.to raise_error(Homebrew::CLI::OptionConstraintError)
     end
 
     it "raises exception on depends constraint violation" do
-      expect { parser.parse(["--flag2"]) }.to raise_error(Homebrew::CLI::OptionDependencyError)
+      expect { parser.parse(["--flag2"]) }.to raise_error(Homebrew::CLI::OptionConstraintError)
     end
 
     it "raises exception for conflict violation" do
@@ -105,6 +104,20 @@ describe Homebrew::CLI::Parser do
     it "raises no exception for optional dependency" do
       args = parser.parse(["--flag3"])
       expect(args.flag3).to be true
+    end
+  end
+
+  describe "test invalid constraints" do
+    subject(:parser) {
+      described_class.new do
+        flag      "--flag1"
+        flag      "--flag2", depends_on: "--flag1"
+        conflicts "--flag1", "--flag2"
+      end
+    }
+
+    it "raises exception due to invalid constraints" do
+      expect { parser.parse([]) }.to raise_error(Homebrew::CLI::InvalidConstraintError)
     end
   end
 end
