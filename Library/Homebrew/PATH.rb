@@ -32,7 +32,7 @@ class PATH
   end
 
   def to_ary
-    @paths
+    @paths.dup.to_ary
   end
   alias to_a to_ary
 
