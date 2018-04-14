@@ -72,7 +72,7 @@ describe Hbc::DSL, :cask do
     end
 
     context "when it contains a deprecated DSL version", :needs_compat do
-      let(:token) { "with-dsl-version" }
+      let(:token) { "compat/with-dsl-version" }
 
       it "may use deprecated DSL version hash syntax" do
         allow(ENV).to receive(:[]).with("HOMEBREW_DEVELOPER").and_return(nil)
