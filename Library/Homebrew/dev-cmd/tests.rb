@@ -29,8 +29,8 @@ module Homebrew
       switch "--online"
       switch :debug
       switch :verbose
-      flag   "--only", required: true
-      flag   "--seed", required: true
+      flag   "--only="
+      flag   "--seed="
     end
 
     HOMEBREW_LIBRARY_PATH.cd do
