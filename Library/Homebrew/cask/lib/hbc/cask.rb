@@ -3,10 +3,19 @@ require "hbc/metadata"
 
 module Hbc
   class Cask
+    extend Enumerable
     extend Forwardable
     include Metadata
 
     attr_reader :token, :sourcefile_path, :config
+
+    def self.each
+      return to_enum unless block_given?
+
+      Tap.flat_map(&:cask_files).each do |f|
+        yield CaskLoader::FromTapPathLoader.new(f).load
+      end
+    end
 
     def tap
       return super if block_given? # Object#tap
@@ -43,10 +52,10 @@ module Hbc
     end
 
     def full_name
-      if @tap.nil? || @tap == Hbc.default_tap
+      if tap.nil? || tap == Hbc.default_tap
         token
       else
-        "#{@tap}/#{token}"
+        "#{tap.name}/#{token}"
       end
     end
 
