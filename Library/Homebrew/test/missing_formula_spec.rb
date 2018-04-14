@@ -66,6 +66,14 @@ describe Homebrew::MissingFormula do
       expect("haskell-platform").to be_blacklisted
     end
 
+    specify "mysqldump-secure is blacklisted" do
+      expect("mysqldump-secure").to be_blacklisted
+    end
+
+    specify "ngrok is blacklisted" do
+      expect("ngrok").to be_blacklisted
+    end
+
     specify "Xcode is blacklisted", :needs_macos do
       expect(%w[xcode Xcode]).to all be_blacklisted
     end
