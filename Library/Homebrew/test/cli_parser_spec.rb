@@ -51,8 +51,8 @@ describe Homebrew::CLI::Parser do
   describe "test long flag options" do
     subject(:parser) {
       described_class.new do
-        flag        "--filename", description: "Name of the file", required: true
-        comma_array "--files",    description: "Comma separated filenames"
+        flag        "--filename=", description: "Name of the file"
+        comma_array "--files",     description: "Comma separated filenames"
       end
     }
 
@@ -61,7 +61,7 @@ describe Homebrew::CLI::Parser do
       expect(args.filename).to eq "random.txt"
     end
 
-    it "raises an exception when a flag's required arg is not passed" do
+    it "raises an exception when a flag's required value is not passed" do
       expect { parser.parse(["--filename"]) }.to raise_error(OptionParser::MissingArgument, /--filename/)
     end
 
