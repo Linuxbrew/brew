@@ -70,14 +70,6 @@ describe Hbc::Cask, :cask do
     end
   end
 
-  describe "all_tokens" do
-    it "returns a token for every Cask" do
-      all_cask_tokens = Hbc.all_tokens
-      expect(all_cask_tokens.count).to be > 20
-      all_cask_tokens.each { |token| expect(token).to be_kind_of(String) }
-    end
-  end
-
   describe "metadata" do
     it "proposes a versioned metadata directory name for each instance" do
       cask_token = "local-caffeine"

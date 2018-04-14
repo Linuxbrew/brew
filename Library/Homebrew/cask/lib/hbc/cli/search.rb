@@ -3,7 +3,7 @@ module Hbc
     class Search < AbstractCommand
       def run
         if args.empty?
-          puts Formatter.columns(CLI.nice_listing(Hbc.all_tokens))
+          puts Formatter.columns(CLI.nice_listing(Cask.map(&:qualified_token)))
         else
           results = self.class.search(*args)
           self.class.render_results(*results)
@@ -43,7 +43,7 @@ module Hbc
         partial_matches = []
         search_term = arguments.join(" ")
         search_regexp = extract_regexp arguments.first
-        all_tokens = CLI.nice_listing(Hbc.all_tokens)
+        all_tokens = CLI.nice_listing(Cask.map(&:qualified_token))
         if search_regexp
           search_term = arguments.first
           partial_matches = all_tokens.grep(/#{search_regexp}/i)

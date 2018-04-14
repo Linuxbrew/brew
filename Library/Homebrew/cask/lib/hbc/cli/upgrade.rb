@@ -13,7 +13,7 @@ module Hbc
 
       def run
         outdated_casks = casks(alternative: lambda {
-          Hbc.installed.select do |cask|
+          Caskroom.casks.select do |cask|
             cask.outdated?(greedy?)
           end
         }).select { |cask| cask.outdated?(true) }

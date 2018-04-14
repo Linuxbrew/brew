@@ -52,11 +52,13 @@ module Hbc
     end
 
     def full_name
-      if tap.nil? || tap == Hbc.default_tap
-        token
-      else
-        "#{tap.name}/#{token}"
-      end
+      return token if tap == Hbc.default_tap
+      qualified_token
+    end
+
+    def qualified_token
+      return token if tap.nil?
+      "#{tap.name}/#{token}"
     end
 
     def installed?
