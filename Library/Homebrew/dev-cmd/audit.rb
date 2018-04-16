@@ -534,6 +534,10 @@ class FormulaAuditor
       end
     end
 
+    if @new_formula && formula.head
+      problem "New formulae should not have a HEAD spec"
+    end
+
     unstable_whitelist = %w[
       aalib 1.4rc5
       angolmois 2.0.0alpha2
