@@ -37,7 +37,7 @@ module Hbc
       end
 
       def list_installed
-        installed_casks = Hbc.installed
+        installed_casks = Caskroom.casks
 
         if one?
           puts installed_casks.map(&:to_s)

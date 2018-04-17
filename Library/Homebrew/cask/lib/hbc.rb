@@ -19,8 +19,6 @@ require "hbc/locations"
 require "hbc/config"
 require "hbc/macos"
 require "hbc/pkg"
-require "hbc/qualified_token"
-require "hbc/scopes"
 require "hbc/staged"
 require "hbc/system_command"
 require "hbc/topological_hash"
@@ -31,7 +29,6 @@ require "hbc/version"
 
 module Hbc
   include Locations
-  include Scopes
   include Utils
 
   def self.init

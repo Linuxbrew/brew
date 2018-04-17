@@ -60,16 +60,12 @@ module Hbc
       end
 
       def self.repo_info(cask)
-        user, repo, token = QualifiedToken.parse(Hbc.all_tokens.detect { |t| t.split("/").last == cask.token })
+        return if cask.tap.nil?
 
-        return if user.nil? || repo.nil?
-
-        remote_tap = Tap.fetch(user, repo)
-
-        url = if remote_tap.custom_remote? && !remote_tap.remote.nil?
-          remote_tap.remote
+        url = if cask.tap.custom_remote? && !cask.tap.remote.nil?
+          cask.tap.remote
         else
-          "#{remote_tap.default_remote}/blob/master/Casks/#{token}.rb"
+          "#{cask.tap.default_remote}/blob/master/Casks/#{cask.token}.rb"
         end
 
         puts "From: #{Formatter.url(url)}"

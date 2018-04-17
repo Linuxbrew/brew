@@ -9,7 +9,7 @@ module Hbc
       end
 
       def run
-        failed_casks = casks(alternative: -> { Hbc.all })
+        failed_casks = casks(alternative: -> { Cask.to_a })
                        .reject { |cask| audit(cask) }
 
         return if failed_casks.empty?
