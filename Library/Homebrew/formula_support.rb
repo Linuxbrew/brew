@@ -22,9 +22,9 @@ class KegOnlyReason
     when :provided_pre_high_sierra
       MacOS.version < :high_sierra
     when :provided_until_xcode43
-      MacOS::Xcode.installed? && MacOS::Xcode.version < "4.3"
+      MacOS::Xcode.version < "4.3"
     when :provided_until_xcode5
-      MacOS::Xcode.installed? && MacOS::Xcode.version < "5.0"
+      MacOS::Xcode.version < "5.0"
     else
       true
     end
