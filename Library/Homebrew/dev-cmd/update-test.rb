@@ -25,8 +25,8 @@ module Homebrew
       switch "--keep-tmp"
       switch :verbose
       switch :debug
-      flag   "--commit", required: true
-      flag   "--before", required: true
+      flag   "--commit="
+      flag   "--before="
     end
 
     ENV["HOMEBREW_UPDATE_TEST"] = "1"

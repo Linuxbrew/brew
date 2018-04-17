@@ -340,6 +340,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--hide=``hidden` is passed, act as if none of `hidden` are installed.
     `hidden` should be a comma-separated list of formulae.
 
+    `missing` exits with a non-zero status if any formulae are missing dependencies.
+
   * `options` [`--compact`] (`--all`|`--installed`|`formulae`):
     Display install options specific to `formulae`.
 
@@ -664,7 +666,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.
 
-  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--root-url=``URL`] [`--force-core-tap`] `formulae`:
+  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--or-later`] [`--root-url=``URL`] [`--force-core-tap`] `formulae`:
     Generate a bottle (binary package) from a formula installed with
     `--build-bottle`.
 
@@ -680,6 +682,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--root-url` is passed, use the specified `URL` as the root of the
     bottle's URL instead of Homebrew's default.
+
+    If `--or-later` is passed, append _or_later to the bottle tag.
 
     If `--force-core-tap` is passed, build a bottle even if `formula` is not
     in homebrew/core or any installed taps.
@@ -848,7 +852,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
   * `release-notes` [`--markdown`] [`previous_tag`] [`end_ref`]:
     Output the merged pull requests on Homebrew/brew between two Git refs.
-    If no `previous_tag` is provided it defaults to the newest tag.
+    If no `previous_tag` is provided it defaults to the latest tag.
     If no `end_ref` is provided it defaults to `origin/master`.
 
     If `--markdown` is passed, output as a Markdown list.

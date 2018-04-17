@@ -8,6 +8,9 @@ Homebrew is provided free of charge and run entirely by volunteers in their spar
 - If a formula is widely used and is failing often it will enable us to prioritise fixing that formula over others.
 - Collecting the OS version allows us to decide what versions of macOS to prioritise and support and identify build failures that occur only on single versions.
 
+## How Long?
+Homebrew's anonymous user and event data have a 14 month retention period. This is the [lowest possible value for Google Analytics](https://support.google.com/analytics/answer/7667196).
+
 ## What?
 Homebrew's analytics record some shared information for every event:
 

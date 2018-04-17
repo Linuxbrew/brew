@@ -34,14 +34,15 @@ module Homebrew
         end
       end
 
-      def flag(name, description: nil, required: false)
-        if required
-          option_required = OptionParser::REQUIRED_ARGUMENT
+      def flag(name, description: nil)
+        if name.end_with? "="
+          required = OptionParser::REQUIRED_ARGUMENT
+          name.chomp! "="
         else
-          option_required = OptionParser::OPTIONAL_ARGUMENT
+          required = OptionParser::OPTIONAL_ARGUMENT
         end
         description = option_to_description(name) if description.nil?
-        @parser.on(name, description, option_required) do |option_value|
+        @parser.on(name, description, required) do |option_value|
           @parsed_args[option_to_name(name)] = option_value
         end
       end

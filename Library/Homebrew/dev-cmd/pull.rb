@@ -86,9 +86,9 @@ module Homebrew
       switch "--warn-on-publish-failure"
       switch :verbose
       switch :debug
-      flag   "--tap",           required: true
-      flag   "--bintray-org",   required: true
-      flag   "--test-bot-user", required: true
+      flag   "--tap="
+      flag   "--bintray-org="
+      flag   "--test-bot-user="
     end
 
     if ARGV.named.empty?

@@ -1,6 +1,7 @@
 class String
   def undent
     odisabled "<<-EOS.undent", "<<~EOS"
+    self
   end
   alias unindent undent
 

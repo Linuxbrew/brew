@@ -4,6 +4,8 @@
 #:
 #:    If `--hide=`<hidden> is passed, act as if none of <hidden> are installed.
 #:    <hidden> should be a comma-separated list of formulae.
+#:
+#:    `missing` exits with a non-zero status if any formulae are missing dependencies.
 
 require "formula"
 require "tab"
@@ -25,6 +27,7 @@ module Homebrew
       missing = f.missing_dependencies(hide: ARGV.values("hide"))
       next if missing.empty?
 
+      Homebrew.failed = true
       print "#{f}: " if ff.size > 1
       puts missing.join(" ")
     end
