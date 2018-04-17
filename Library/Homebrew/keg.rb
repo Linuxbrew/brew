@@ -129,7 +129,7 @@ class Keg
         f_kegs = kegs_by_source[[f.name, f.tap]]
         next unless f_kegs
 
-        f_kegs.sort_by(&:version).last
+        f_kegs.max_by(&:version)
       end.compact
 
       next if required_kegs.empty?

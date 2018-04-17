@@ -52,7 +52,7 @@ module Homebrew
       end
 
       def option_to_description(*names)
-        names.map { |name| name.to_s.sub(/\A--?/, "").tr("-", " ") }.sort.last
+        names.map { |name| name.to_s.sub(/\A--?/, "").tr("-", " ") }.max
       end
 
       def parse(cmdline_args = ARGV)
