@@ -1523,7 +1523,7 @@ class Formula
       "desc" => desc,
       "homepage" => homepage,
       "oldname" => oldname,
-      "aliases" => aliases,
+      "aliases" => aliases.sort,
       "versions" => {
         "stable" => stable&.version&.to_s,
         "bottle" => !bottle_specification.checksums.empty?,
