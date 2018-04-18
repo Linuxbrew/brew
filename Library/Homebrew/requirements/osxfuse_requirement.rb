@@ -1,6 +1,7 @@
 require "requirement"
 
 class OsxfuseRequirement < Requirement
+  cask "osxfuse"
   fatal true
 end
 
