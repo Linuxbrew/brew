@@ -1,7 +1,6 @@
 require "requirement"
 
 class X11Requirement < Requirement
-  cask "xquartz"
   download "https://xquartz.macosforge.org"
 
   satisfy build_env: false do

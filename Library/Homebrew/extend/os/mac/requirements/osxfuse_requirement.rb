@@ -1,7 +1,6 @@
 require "requirement"
 
 class OsxfuseRequirement < Requirement
-  cask "osxfuse"
   download "https://osxfuse.github.io/"
 
   satisfy(build_env: false) { self.class.binary_osxfuse_installed? }

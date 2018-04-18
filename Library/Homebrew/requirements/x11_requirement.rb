@@ -5,6 +5,7 @@ class X11Requirement < Requirement
 
   fatal true
 
+  cask "xquartz"
   env { ENV.x11 }
 
   def initialize(name = "x11", tags = [])
