@@ -1526,7 +1526,7 @@ class Formula
       "aliases" => aliases,
       "versions" => {
         "stable" => stable&.version&.to_s,
-        "bottle" => !bottle.nil?,
+        "bottle" => !bottle_specification.checksums.empty?,
         "devel" => devel&.version&.to_s,
         "head" => head&.version&.to_s,
       },
