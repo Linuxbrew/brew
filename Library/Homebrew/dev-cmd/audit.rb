@@ -308,7 +308,7 @@ class FormulaAuditor
 
     name = formula.name
 
-    if Homebrew::MissingFormula.blacklisted_reason(name)
+    if MissingFormula.blacklisted_reason(name)
       problem "'#{name}' is blacklisted."
     end
 
