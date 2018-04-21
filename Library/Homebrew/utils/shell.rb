@@ -72,7 +72,7 @@ module Utils
       zsh: "~/.zshrc",
     }.freeze
 
-    UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:/@\n])}
+    UNSAFE_SHELL_CHAR = %r{([^A-Za-z0-9_\-.,:/@~\n])}
 
     def csh_quote(str)
       # ruby's implementation of shell_escape
