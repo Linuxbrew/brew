@@ -22,7 +22,7 @@ module Hbc
       end
 
       path = if timestamp == :latest
-        Pathname.glob(metadata_versioned_path(version: version).join("*")).sort.last
+        Pathname.glob(metadata_versioned_path(version: version).join("*")).max
       else
         timestamp = new_timestamp if timestamp == :now
         metadata_versioned_path(version: version).join(timestamp)

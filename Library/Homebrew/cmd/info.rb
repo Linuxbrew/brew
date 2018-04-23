@@ -60,7 +60,7 @@ module Homebrew
         rescue FormulaUnavailableError => e
           ofail e.message
           # No formula with this name, try a missing formula lookup
-          if (reason = Homebrew::MissingFormula.reason(f))
+          if (reason = MissingFormula.reason(f))
             $stderr.puts reason
           end
         end

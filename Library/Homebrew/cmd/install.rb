@@ -257,7 +257,7 @@ module Homebrew
       end
 
       ofail e.message
-      if (reason = Homebrew::MissingFormula.reason(e.name))
+      if (reason = MissingFormula.reason(e.name))
         $stderr.puts reason
         return
       end

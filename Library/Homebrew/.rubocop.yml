@@ -88,3 +88,7 @@ Style/HashSyntax:
 # so many of these in formulae but none in here
 Style/TrailingBodyOnMethodDefinition:
   Enabled: true
+
+Rspec/ExpectActual:
+  Exclude:
+    - 'test/missing_formula_spec.rb'

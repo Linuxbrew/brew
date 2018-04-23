@@ -238,26 +238,35 @@ module OS
 
     # TODO: There should be a way to specify a containing
     #       directory under which nothing can be deleted.
-    UNDELETABLE_DIRS = [
+    UNDELETABLE_PATHS = [
       "~/",
       "~/Applications",
+      "~/Applications/.localized",
       "~/Desktop",
+      "~/Desktop/.localized",
       "~/Documents",
+      "~/Documents/.localized",
       "~/Downloads",
+      "~/Downloads/.localized",
       "~/Mail",
       "~/Movies",
+      "~/Movies/.localized",
       "~/Music",
+      "~/Music/.localized",
       "~/Music/iTunes",
       "~/Music/iTunes/iTunes Music",
       "~/Music/iTunes/Album Artwork",
       "~/News",
       "~/Pictures",
+      "~/Pictures/.localized",
       "~/Pictures/Desktops",
       "~/Pictures/Photo Booth",
       "~/Pictures/iChat Icons",
       "~/Pictures/iPhoto Library",
       "~/Public",
+      "~/Public/.localized",
       "~/Sites",
+      "~/Sites/.localized",
       "~/Library",
       "~/Library/.localized",
       "~/Library/Accessibility",
@@ -364,17 +373,17 @@ module OS
       "~/Library/Widgets",
       "~/Library/Workflows",
     ]
-                       .map { |x| Pathname(x.sub(%r{^~(?=(/|$))}, Dir.home)).expand_path }
-                       .to_set
-                       .union(SYSTEM_DIRS)
-                       .freeze
+                        .map { |path| Pathname(path.sub(%r{^~(?=(/|$))}, Dir.home)).expand_path }
+                        .to_set
+                        .union(SYSTEM_DIRS)
+                        .freeze
 
     def system_dir?(dir)
       SYSTEM_DIRS.include?(Pathname.new(dir).expand_path)
     end
 
-    def undeletable?(dir)
-      UNDELETABLE_DIRS.include?(Pathname.new(dir).expand_path)
+    def undeletable?(path)
+      UNDELETABLE_PATHS.include?(Pathname.new(path).expand_path)
     end
   end
 end

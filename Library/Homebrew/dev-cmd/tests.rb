@@ -113,6 +113,7 @@ module Homebrew
       end
 
       unless OS.linux?
+        args << "--tag" << "~needs_linux"
         files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
       end
 

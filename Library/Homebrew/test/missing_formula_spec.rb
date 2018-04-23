@@ -1,117 +1,85 @@
 require "missing_formula"
 
 describe Homebrew::MissingFormula do
-  context "::reason" do
+  describe "::reason" do
     subject { described_class.reason("gem") }
 
     it { is_expected.not_to be_nil }
   end
 
-  context "::blacklisted_reason" do
-    matcher(:be_blacklisted) do
+  describe "::blacklisted_reason" do
+    matcher :be_blacklisted do
       match do |expected|
         described_class.blacklisted_reason(expected)
       end
     end
 
-    context "rubygems" do
-      %w[gem rubygem rubygems].each do |s|
-        subject { s }
-
-        it { is_expected.to be_blacklisted }
-      end
+    specify "RubyGems is blacklisted" do
+      expect(%w[gem rubygem rubygems]).to all be_blacklisted
     end
 
-    context "latex" do
-      %w[latex tex tex-live texlive TexLive].each do |s|
-        subject { s }
-
-        it { is_expected.to be_blacklisted }
-      end
+    specify "LaTeX is blacklisted" do
+      expect(%w[latex tex tex-live texlive TexLive]).to all be_blacklisted
     end
 
-    context "pip" do
-      subject { "pip" }
-
-      it { is_expected.to be_blacklisted }
+    specify "pip is blacklisted" do
+      expect("pip").to be_blacklisted
     end
 
-    context "pil" do
-      subject { "pil" }
-
-      it { is_expected.to be_blacklisted }
+    specify "PIL is blacklisted" do
+      expect("pil").to be_blacklisted
     end
 
-    context "macruby" do
-      subject { "MacRuby" }
-
-      it { is_expected.to be_blacklisted }
+    specify "MacRuby is blacklisted" do
+      expect("MacRuby").to be_blacklisted
     end
 
-    context "lzma" do
-      %w[lzma liblzma].each do |s|
-        subject { s }
-
-        it { is_expected.to be_blacklisted }
-      end
+    specify "lzma is blacklisted" do
+      expect(%w[lzma liblzma]).to all be_blacklisted
     end
 
-    context "gtest" do
-      %w[gtest googletest google-test].each do |s|
-        subject { s }
-
-        it { is_expected.to be_blacklisted }
-      end
+    specify "gtest is blacklisted" do
+      expect(%w[gtest googletest google-test]).to all be_blacklisted
     end
 
-    context "gmock" do
-      %w[gmock googlemock google-mock].each do |s|
-        subject { s }
-
-        it { is_expected.to be_blacklisted }
-      end
+    specify "gmock is blacklisted" do
+      expect(%w[gmock googlemock google-mock]).to all be_blacklisted
     end
 
-    context "sshpass" do
-      subject { "sshpass" }
-
-      it { is_expected.to be_blacklisted }
+    specify "sshpass is blacklisted" do
+      expect("sshpass").to be_blacklisted
     end
 
-    context "gsutil" do
-      subject { "gsutil" }
-
-      it { is_expected.to be_blacklisted }
+    specify "gsutil is blacklisted" do
+      expect("gsutil").to be_blacklisted
     end
 
-    context "gfortran" do
-      subject { "gfortran" }
-
-      it { is_expected.to be_blacklisted }
+    specify "gfortran is blacklisted" do
+      expect("gfortran").to be_blacklisted
     end
 
-    context "play" do
-      subject { "play" }
-
-      it { is_expected.to be_blacklisted }
+    specify "play is blacklisted" do
+      expect("play").to be_blacklisted
     end
 
-    context "haskell-platform" do
-      subject { "haskell-platform" }
-
-      it { is_expected.to be_blacklisted }
+    specify "haskell-platform is blacklisted" do
+      expect("haskell-platform").to be_blacklisted
     end
 
-    context "xcode", :needs_macos do
-      %w[xcode Xcode].each do |s|
-        subject { s }
+    specify "mysqldump-secure is blacklisted" do
+      expect("mysqldump-secure").to be_blacklisted
+    end
 
-        it { is_expected.to be_blacklisted }
-      end
+    specify "ngrok is blacklisted" do
+      expect("ngrok").to be_blacklisted
+    end
+
+    specify "Xcode is blacklisted", :needs_macos do
+      expect(%w[xcode Xcode]).to all be_blacklisted
     end
   end
 
-  context "::tap_migration_reason" do
+  describe "::tap_migration_reason" do
     subject { described_class.tap_migration_reason(formula) }
 
     before do
@@ -136,7 +104,7 @@ describe Homebrew::MissingFormula do
     end
   end
 
-  context "::deleted_reason" do
+  describe "::deleted_reason" do
     subject { described_class.deleted_reason(formula, silent: true) }
 
     before do

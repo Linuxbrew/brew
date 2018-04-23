@@ -130,6 +130,7 @@ RSpec.configure do |config|
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-foo",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-services",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-shallow",
+        HOMEBREW_LIBRARY/"PinnedTaps",
         HOMEBREW_REPOSITORY/".git",
         CoreTap.instance.path/".git",
         CoreTap.instance.alias_dir,
