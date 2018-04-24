@@ -2,10 +2,6 @@ require "keg"
 require "formula"
 
 class LinkageChecker
-  attr_reader :keg, :formula
-  attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :broken_deps, :variable_dylibs
-  attr_reader :undeclared_deps, :unnecessary_deps, :reverse_links
-
   def initialize(keg, formula = nil)
     @keg = keg
     @formula = formula || resolve_formula(keg)
@@ -20,6 +16,44 @@ class LinkageChecker
     @unnecessary_deps = []
     check_dylibs
   end
+
+  def display_normal_output
+    display_items "System libraries", @system_dylibs
+    display_items "Homebrew libraries", @brewed_dylibs
+    display_items "Indirect dependencies with linkage", @indirect_deps
+    display_items "Variable-referenced libraries", @variable_dylibs
+    display_items "Missing libraries", @broken_dylibs
+    display_items "Broken dependencies", @broken_deps
+    display_items "Undeclared dependencies with linkage", @undeclared_deps
+    display_items "Dependencies with no linkage", @unnecessary_deps
+  end
+
+  def display_reverse_output
+    return if @reverse_links.empty?
+    sorted = @reverse_links.sort
+    sorted.each do |dylib, files|
+      puts dylib
+      files.each do |f|
+        unprefixed = f.to_s.strip_prefix "#{@keg}/"
+        puts "  #{unprefixed}"
+      end
+      puts unless dylib == sorted.last[0]
+    end
+  end
+
+  def display_test_output(puts_output: true)
+    display_items "Missing libraries", @broken_dylibs, puts_output: puts_output
+    display_items "Broken dependencies", @broken_deps, puts_output: puts_output
+    puts "No broken library linkage" unless broken_library_linkage?
+  end
+
+  def broken_library_linkage?
+    !@broken_dylibs.empty? || !@broken_deps.empty?
+  end
+
+  private
+
+  attr_reader :keg, :formula
 
   def dylib_to_dep(dylib)
     dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
@@ -113,51 +147,6 @@ class LinkageChecker
     end
   end
 
-  def display_normal_output
-    display_items "System libraries", @system_dylibs
-    display_items "Homebrew libraries", @brewed_dylibs
-    display_items "Indirect dependencies with linkage", @indirect_deps
-    display_items "Variable-referenced libraries", @variable_dylibs
-    display_items "Missing libraries", @broken_dylibs
-    display_items "Broken dependencies", @broken_deps
-    display_items "Undeclared dependencies with linkage", @undeclared_deps
-    display_items "Dependencies with no linkage", @unnecessary_deps
-  end
-
-  def display_reverse_output
-    return if @reverse_links.empty?
-    sorted = @reverse_links.sort
-    sorted.each do |dylib, files|
-      puts dylib
-      files.each do |f|
-        unprefixed = f.to_s.strip_prefix "#{@keg}/"
-        puts "  #{unprefixed}"
-      end
-      puts unless dylib == sorted.last[0]
-    end
-  end
-
-  def display_test_output
-    display_items "Missing libraries", @broken_dylibs
-    display_items "Broken dependencies", @broken_deps
-    display_items "Dependencies with no linkage", @unnecessary_deps
-    puts "No broken dylib links" if @broken_dylibs.empty?
-  end
-
-  def broken_dylibs?
-    !@broken_dylibs.empty?
-  end
-
-  def undeclared_deps?
-    !@undeclared_deps.empty?
-  end
-
-  def unnecessary_deps?
-    !@unnecessary_deps.empty?
-  end
-
-  private
-
   # Whether or not dylib is a harmless broken link, meaning that it's
   # okay to skip (and not report) as broken.
   def harmless_broken_link?(dylib)
@@ -171,20 +160,22 @@ class LinkageChecker
 
   # Display a list of things.
   # Things may either be an array, or a hash of (label -> array)
-  def display_items(label, things)
+  def display_items(label, things, puts_output: true)
     return if things.empty?
-    puts "#{label}:"
+    output = "#{label}:"
     if things.is_a? Hash
       things.keys.sort.each do |list_label|
         things[list_label].sort.each do |item|
-          puts "  #{item} (#{list_label})"
+          output += "\n  #{item} (#{list_label})"
         end
       end
     else
       things.sort.each do |item|
-        puts "  #{item}"
+        output += "\n  #{item}"
       end
     end
+    puts output if puts_output
+    output
   end
 
   def resolve_formula(keg)
