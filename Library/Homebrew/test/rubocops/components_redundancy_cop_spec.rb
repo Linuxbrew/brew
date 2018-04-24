@@ -1,6 +1,6 @@
 require_relative "../../rubocops/components_redundancy_cop"
 
-describe RuboCop::Cop::FormulaAuditStrict::ComponentsRedundancy do
+describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
   subject(:cop) { described_class.new }
 
   context "When auditing formula components common errors" do
