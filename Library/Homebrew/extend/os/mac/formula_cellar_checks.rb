@@ -66,10 +66,10 @@ module FormulaCellarChecks
     keg = Keg.new(formula.prefix)
     checker = LinkageChecker.new(keg, formula)
 
-    return unless checker.broken_dylibs?
+    return unless checker.broken_library_linkage?
     output = <<~EOS
       #{formula} has broken dynamic library links:
-        #{checker.broken_dylibs.to_a * "\n  "}
+        #{checker.display_test_output}
     EOS
     tab = Tab.for_keg(keg)
     if tab.poured_from_bottle
