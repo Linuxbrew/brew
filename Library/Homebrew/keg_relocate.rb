@@ -68,7 +68,7 @@ class Keg
         relocation.old_cellar => relocation.new_cellar,
         relocation.old_repository => relocation.new_repository,
       }
-      changed = s.gsub!(Regexp.union(replacements.keys), replacements)
+      changed = s.gsub!(Regexp.union(replacements.keys.sort_by(&:length).reverse), replacements)
       next unless changed
       changed_files += [first, *rest].map { |file| file.relative_path_from(path) }
 

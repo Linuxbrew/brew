@@ -29,7 +29,7 @@ module Homebrew
 
         if ARGV.include?("--test")
           result.display_test_output
-          Homebrew.failed = true if result.broken_dylibs?
+          Homebrew.failed = true if result.broken_library_linkage?
         elsif ARGV.include?("--reverse")
           result.display_reverse_output
         else

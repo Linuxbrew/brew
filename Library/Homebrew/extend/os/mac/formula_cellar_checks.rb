@@ -69,10 +69,10 @@ module FormulaCellarChecks
     DatabaseCache.new(:linkage) do |database_cache|
       checker = LinkageChecker.new(keg, database_cache, false, formula)
 
-      return unless checker.broken_dylibs?
+      return unless checker.broken_library_linkage?
       output = <<~EOS
         #{formula} has broken dynamic library links:
-          #{checker.broken_dylibs.to_a * "\n  "}
+          #{checker.display_test_output}
       EOS
 
       tab = Tab.for_keg(keg)

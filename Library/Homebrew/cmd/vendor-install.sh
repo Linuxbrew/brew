@@ -50,7 +50,7 @@ fetch() {
   curl_args=()
 
   # do not load .curlrc unless requested (must be the first argument)
-  if [[ -n "$HOMEBREW_CURLRC" ]]
+  if [[ -z "$HOMEBREW_CURLRC" ]]
   then
     curl_args[${#curl_args[*]}]="-q"
   fi

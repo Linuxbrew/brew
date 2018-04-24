@@ -1,5 +1,6 @@
 require "pathname"
 require "English"
+require "ostruct"
 
 require "pp"
 require "extend/ARGV"
@@ -30,14 +31,16 @@ module Homebrew
   extend FileUtils
 
   class << self
-    attr_writer :failed
+    attr_writer :failed, :raise_deprecation_exceptions, :auditing, :args
 
     def failed?
       @failed ||= false
       @failed == true
     end
 
-    attr_writer :raise_deprecation_exceptions, :auditing
+    def args
+      @args ||= OpenStruct.new
+    end
 
     def raise_deprecation_exceptions?
       @raise_deprecation_exceptions == true

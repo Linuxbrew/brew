@@ -11,8 +11,10 @@ module Homebrew
   module_function
 
   def edit
-    args = Homebrew::CLI::Parser.parse do
-      switch "--force"
+    Homebrew::CLI::Parser.parse do
+      switch :force
+      switch :verbose
+      switch :debug
     end
 
     unless (HOMEBREW_REPOSITORY/".git").directory?
@@ -41,7 +43,7 @@ module Homebrew
       paths = ARGV.named.map do |name|
         path = Formulary.path(name)
 
-        raise FormulaUnavailableError, name unless path.file? || args.force?
+        raise FormulaUnavailableError, name unless path.file? || Homebrew.args.force?
 
         path
       end

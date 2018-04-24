@@ -1131,7 +1131,7 @@ class Formula
     return false unless old_rack.directory?
     return false if old_rack.subdirs.empty?
 
-    tap == Tab.for_keg(old_rack.subdirs.sort.first).tap
+    tap == Tab.for_keg(old_rack.subdirs.min).tap
   end
 
   # @private
@@ -1294,7 +1294,7 @@ class Formula
 
     # Avoid false positives for clock_gettime support on 10.11.
     # CMake cache entries for other weak symbols may be added here as needed.
-    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+    if MacOS.version == "10.11" && MacOS::Xcode.version >= "8.0"
       args << "-DHAVE_CLOCK_GETTIME:INTERNAL=0"
     end
 
@@ -1523,10 +1523,10 @@ class Formula
       "desc" => desc,
       "homepage" => homepage,
       "oldname" => oldname,
-      "aliases" => aliases,
+      "aliases" => aliases.sort,
       "versions" => {
         "stable" => stable&.version&.to_s,
-        "bottle" => !bottle.nil?,
+        "bottle" => !bottle_specification.checksums.empty?,
         "devel" => devel&.version&.to_s,
         "head" => head&.version&.to_s,
       },

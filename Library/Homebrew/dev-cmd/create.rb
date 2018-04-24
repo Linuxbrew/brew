@@ -65,7 +65,7 @@ module Homebrew
     # Don't allow blacklisted formula, or names that shadow aliases,
     # unless --force is specified.
     unless ARGV.force?
-      if reason = Homebrew::MissingFormula.blacklisted_reason(fc.name)
+      if reason = MissingFormula.blacklisted_reason(fc.name)
         raise "#{fc.name} is blacklisted for creation.\n#{reason}\nIf you really want to create this formula use --force."
       end
 

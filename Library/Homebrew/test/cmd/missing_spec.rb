@@ -14,7 +14,7 @@ describe "brew missing", :integration_test do
     expect { brew "missing" }
       .to output("foo\n").to_stdout
       .and not_to_output.to_stderr
-      .and be_a_success
+      .and be_a_failure
   end
 
   it "prints nothing if all dependencies are installed" do
@@ -35,7 +35,7 @@ describe "brew missing", :integration_test do
       expect { brew "missing", "--hide=foo" }
         .to output("bar: foo\n").to_stdout
         .and not_to_output.to_stderr
-        .and be_a_success
+        .and be_a_failure
     end
   end
 end

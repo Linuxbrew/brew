@@ -84,8 +84,10 @@ module Homebrew
       switch "--no-pbcopy"
       switch "--no-publish"
       switch "--warn-on-publish-failure"
-      flag   "--bintray-org",   required: true
-      flag   "--test-bot-user", required: true
+      switch :verbose
+      switch :debug
+      flag   "--bintray-org="
+      flag   "--test-bot-user="
     end
 
     if ARGV.named.empty?

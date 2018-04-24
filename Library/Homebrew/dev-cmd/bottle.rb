@@ -1,4 +1,4 @@
-#:  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--root-url=`<URL>] [`--force-core-tap`] <formulae>:
+#:  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--or-later`] [`--root-url=`<URL>] [`--force-core-tap`] <formulae>:
 #:    Generate a bottle (binary package) from a formula installed with
 #:    `--build-bottle`.
 #:
@@ -14,6 +14,8 @@
 #:
 #:    If `--root-url` is passed, use the specified <URL> as the root of the
 #:    bottle's URL instead of Homebrew's default.
+#:
+#:    If `--or-later` is passed, append _or_later to the bottle tag.
 #:
 #:    If `--force-core-tap` is passed, build a bottle even if <formula> is not
 #:    in homebrew/core or any installed taps.
@@ -57,7 +59,7 @@ BOTTLE_ERB = <<-EOS.freeze
     <% checksums.each do |checksum_type, checksum_values| %>
     <% checksum_values.each do |checksum_value| %>
     <% checksum, macos = checksum_value.shift %>
-    <%= checksum_type %> "<%= checksum %>" => :<%= macos %>
+    <%= checksum_type %> "<%= checksum %>" => :<%= macos %><%= "_or_later" if Homebrew.args.or_later? %>
     <% end %>
     <% end %>
   end
@@ -78,7 +80,9 @@ module Homebrew
       switch "--write"
       switch "--no-commit"
       switch "--json"
+      switch "--or-later"
       switch :verbose
+      switch :debug
       flag   "--root-url"
     end
 
@@ -113,7 +117,7 @@ module Homebrew
       linked_libraries = Keg.file_linked_libraries(file, string)
       result ||= !linked_libraries.empty?
 
-      if @args.verbose?
+      if Homebrew.args.verbose?
         print_filename.call(string, file) unless linked_libraries.empty?
         linked_libraries.each do |lib|
           puts " #{Tty.bold}-->#{Tty.reset} links to #{lib}"
@@ -136,7 +140,7 @@ module Homebrew
         end
       end
 
-      next unless @args.verbose? && !text_matches.empty?
+      next unless Homebrew.args.verbose? && !text_matches.empty?
       print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
         puts " #{Tty.bold}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
@@ -157,7 +161,7 @@ module Homebrew
       absolute_symlinks_start_with_string << pn if link.to_s.start_with?(string)
     end
 
-    if @args.verbose?
+    if Homebrew.args.verbose?
       unless absolute_symlinks_start_with_string.empty?
         opoo "Absolute symlink starting with #{string}:"
         absolute_symlinks_start_with_string.each do |pn|
@@ -298,7 +302,7 @@ module Homebrew
           end
           skip_relocation = relocatable && !keg.require_relocation?
         end
-        puts if !relocatable && @args.verbose?
+        puts if !relocatable && Homebrew.args.verbose?
       rescue Interrupt
         ignore_interrupts { bottle_path.unlink if bottle_path.exist? }
         raise
@@ -359,6 +363,8 @@ module Homebrew
     puts output
 
     return unless @args.json?
+    tag = Utils::Bottles.tag.to_s
+    tag += "_or_later" if @args.or_later?
     json = {
       f.full_name => {
         "formula" => {
@@ -371,7 +377,7 @@ module Homebrew
           "cellar" => bottle.cellar.to_s,
           "rebuild" => bottle.rebuild,
           "tags" => {
-            Utils::Bottles.tag.to_s => {
+            tag => {
               "filename" => filename.to_s,
               "sha256" => sha256,
             },

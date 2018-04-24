@@ -99,6 +99,17 @@ module RuboCop
         end
       end
 
+      # Returns array of function call nodes matching func_name in every descendant of node
+      #           Ex. function call:  foo(*args, **kwargs)
+      # Does not match method calls:  foo.bar(*args, **kwargs)
+      # Returns every function calls if no func_name is passed
+      def find_every_func_call_by_name(node, func_name = nil)
+        return if node.nil?
+        node.each_descendant(:send).select do |func_node|
+          func_node.receiver.nil? && (func_name.nil? || func_name == func_node.method_name)
+        end
+      end
+
       # Given a method_name and arguments, yields to a block with
       # matching method passed as a parameter to the block
       def find_method_with_args(node, method_name, *args)

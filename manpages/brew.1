@@ -346,6 +346,9 @@ Check the given \fIformulae\fR for missing dependencies\. If no \fIformulae\fR a
 .IP
 If \fB\-\-hide=\fR\fIhidden\fR is passed, act as if none of \fIhidden\fR are installed\. \fIhidden\fR should be a comma\-separated list of formulae\.
 .
+.IP
+\fBmissing\fR exits with a non\-zero status if any formulae are missing dependencies\.
+.
 .TP
 \fBoptions\fR [\fB\-\-compact\fR] (\fB\-\-all\fR|\fB\-\-installed\fR|\fIformulae\fR)
 Display install options specific to \fIformulae\fR\.
@@ -463,7 +466,7 @@ Symlink all of the specific \fIversion\fR of \fIformula\fR\'s install to Homebre
 List all installed taps\.
 .
 .TP
-\fBtap\fR [\fB\-\-full\fR] \fIuser\fR\fB/\fR\fIrepo\fR [\fIURL\fR]
+\fBtap\fR [\fB\-\-full\fR] [\fB\-\-force\-auto\-update\fR] \fIuser\fR\fB/\fR\fIrepo\fR [\fIURL\fR]
 Tap a formula repository\.
 .
 .IP
@@ -474,6 +477,9 @@ With \fIURL\fR specified, taps a formula repository from anywhere, using any tra
 .
 .IP
 By default, the repository is cloned as a shallow copy (\fB\-\-depth=1\fR), but if \fB\-\-full\fR is passed, a full clone will be used\. To convert a shallow copy to a full copy, you can retap passing \fB\-\-full\fR without first untapping\.
+.
+.IP
+By default, only taps hosted on GitHub are auto\-updated (for performance reasons)\. If \fB\-\-force\-auto\-update\fR is passed, this tap will be auto\-updated even if it is not hosted on GitHub\.
 .
 .IP
 \fBtap\fR is re\-runnable and exits successfully if there\'s nothing to do\. However, retapping with a different \fIURL\fR will cause an exception, so first \fBuntap\fR if you need to modify the \fIURL\fR\.
@@ -682,7 +688,7 @@ Passing \fB\-\-only\-cops=\fR\fIcops\fR will check for violations of only the li
 \fBaudit\fR exits with a non\-zero status if any errors are found\. This is useful, for instance, for implementing pre\-commit hooks\.
 .
 .TP
-\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR|\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-root\-url=\fR\fIURL\fR] [\fB\-\-force\-core\-tap\fR] \fIformulae\fR
+\fBbottle\fR [\fB\-\-verbose\fR] [\fB\-\-no\-rebuild\fR|\fB\-\-keep\-old\fR] [\fB\-\-skip\-relocation\fR] [\fB\-\-or\-later\fR] [\fB\-\-root\-url=\fR\fIURL\fR] [\fB\-\-force\-core\-tap\fR] \fIformulae\fR
 Generate a bottle (binary package) from a formula installed with \fB\-\-build\-bottle\fR\.
 .
 .IP
@@ -696,6 +702,9 @@ If \fB\-\-skip\-relocation\fR is passed, do not check if the bottle can be marke
 .
 .IP
 If \fB\-\-root\-url\fR is passed, use the specified \fIURL\fR as the root of the bottle\'s URL instead of Homebrew\'s default\.
+.
+.IP
+If \fB\-\-or\-later\fR is passed, append _or_later to the bottle tag\.
 .
 .IP
 If \fB\-\-force\-core\-tap\fR is passed, build a bottle even if \fIformula\fR is not in homebrew/core or any installed taps\.
@@ -865,7 +874,7 @@ If \fB\-\-test\-bot\-user=\fR\fItest\-bot\-user\fR is passed, pull the bottle bl
 .
 .TP
 \fBrelease\-notes\fR [\fB\-\-markdown\fR] [\fIprevious_tag\fR] [\fIend_ref\fR]
-Output the merged pull requests on Homebrew/brew between two Git refs\. If no \fIprevious_tag\fR is provided it defaults to the newest tag\. If no \fIend_ref\fR is provided it defaults to \fBorigin/master\fR\.
+Output the merged pull requests on Homebrew/brew between two Git refs\. If no \fIprevious_tag\fR is provided it defaults to the latest tag\. If no \fIend_ref\fR is provided it defaults to \fBorigin/master\fR\.
 .
 .IP
 If \fB\-\-markdown\fR is passed, output as a Markdown list\.

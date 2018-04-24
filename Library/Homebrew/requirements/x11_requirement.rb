@@ -5,6 +5,9 @@ class X11Requirement < Requirement
 
   fatal true
 
+  cask "xquartz"
+  download "https://xquartz.macosforge.org"
+
   env { ENV.x11 }
 
   def initialize(name = "x11", tags = [])

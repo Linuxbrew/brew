@@ -23,8 +23,10 @@ module Homebrew
     args = Homebrew::CLI::Parser.parse do
       switch "--to-tag"
       switch "--keep-tmp"
-      flag   "--commit", required: true
-      flag   "--before", required: true
+      switch :verbose
+      switch :debug
+      flag   "--commit="
+      flag   "--before="
     end
 
     ENV["HOMEBREW_UPDATE_TEST"] = "1"

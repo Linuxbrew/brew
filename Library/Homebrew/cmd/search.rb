@@ -64,7 +64,7 @@ module Homebrew
         count = local_results.length + tap_results.length
 
         ohai "Searching blacklisted, migrated and deleted formulae..."
-        if reason = Homebrew::MissingFormula.reason(query, silent: true)
+        if reason = MissingFormula.reason(query, silent: true)
           if count.positive?
             puts
             puts "If you meant #{query.inspect} specifically:"

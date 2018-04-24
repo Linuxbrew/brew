@@ -18,11 +18,13 @@ module Homebrew
 
       def switch(*names, description: nil, env: nil)
         description = option_to_description(*names) if description.nil?
-        names, env = common_switch(*names) if names.first.is_a?(Symbol)
+        global_switch = names.first.is_a?(Symbol)
+        names, env = common_switch(*names) if global_switch
         @parser.on(*names, description) do
-          enable_switch(*names)
+          enable_switch(*names, global_switch)
         end
-        enable_switch(*names) if !env.nil? && !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
+        enable_switch(*names, global_switch) if !env.nil? &&
+                                                !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
       end
 
       def comma_array(name, description: nil)
@@ -32,14 +34,15 @@ module Homebrew
         end
       end
 
-      def flag(name, description: nil, required: false)
-        if required
-          option_required = OptionParser::REQUIRED_ARGUMENT
+      def flag(name, description: nil)
+        if name.end_with? "="
+          required = OptionParser::REQUIRED_ARGUMENT
+          name.chomp! "="
         else
-          option_required = OptionParser::OPTIONAL_ARGUMENT
+          required = OptionParser::OPTIONAL_ARGUMENT
         end
         description = option_to_description(name) if description.nil?
-        @parser.on(name, description, option_required) do |option_value|
+        @parser.on(name, description, required) do |option_value|
           @parsed_args[option_to_name(name)] = option_value
         end
       end
@@ -49,27 +52,33 @@ module Homebrew
       end
 
       def option_to_description(*names)
-        names.map { |name| name.to_s.sub(/\A--?/, "").tr("-", " ") }.sort.last
+        names.map { |name| name.to_s.sub(/\A--?/, "").tr("-", " ") }.max
       end
 
       def parse(cmdline_args = ARGV)
-        @parser.parse!(cmdline_args)
+        @parser.parse(cmdline_args)
         @parsed_args
       end
 
       private
 
-      def enable_switch(*names)
+      def enable_switch(*names, global_switch)
         names.each do |name|
+          if global_switch
+            Homebrew.args["#{option_to_name(name)}?"] = true
+            next
+          end
           @parsed_args["#{option_to_name(name)}?"] = true
         end
       end
 
+      # These are common/global switches accessible throughout Homebrew
       def common_switch(name)
         case name
         when :quiet   then [["-q", "--quiet"], :quiet]
         when :verbose then [["-v", "--verbose"], :verbose]
         when :debug   then [["-d", "--debug"], :debug]
+        when :force   then [["-f", "--force"], :force]
         else name
         end
       end

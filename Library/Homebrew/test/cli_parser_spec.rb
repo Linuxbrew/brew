@@ -16,24 +16,25 @@ describe Homebrew::CLI::Parser do
     }
 
     it "parses short option" do
-      args = parser.parse(["-v"])
-      expect(args).to be_verbose
+      parser.parse(["-v"])
+      expect(Homebrew.args).to be_verbose
     end
 
     it "parses a single valid option" do
-      args = parser.parse(["--verbose"])
-      expect(args).to be_verbose
+      parser.parse(["--verbose"])
+      expect(Homebrew.args).to be_verbose
     end
 
     it "parses a valid option along with few unnamed args" do
       args = %w[--verbose unnamed args]
       parser.parse(args)
-      expect(args).to eq %w[unnamed args]
+      expect(Homebrew.args).to be_verbose
+      expect(args).to eq %w[--verbose unnamed args]
     end
 
     it "parses a single option and checks other options to be nil" do
       args = parser.parse(["--verbose"])
-      expect(args).to be_verbose
+      expect(Homebrew.args).to be_verbose
       expect(args.more_verbose?).to be nil
     end
 
@@ -50,8 +51,8 @@ describe Homebrew::CLI::Parser do
   describe "test long flag options" do
     subject(:parser) {
       described_class.new do
-        flag        "--filename", description: "Name of the file", required: true
-        comma_array "--files",    description: "Comma separated filenames"
+        flag        "--filename=", description: "Name of the file"
+        comma_array "--files",     description: "Comma separated filenames"
       end
     }
 
@@ -60,7 +61,7 @@ describe Homebrew::CLI::Parser do
       expect(args.filename).to eq "random.txt"
     end
 
-    it "raises an exception when a flag's required arg is not passed" do
+    it "raises an exception when a flag's required value is not passed" do
       expect { parser.parse(["--filename"]) }.to raise_error(OptionParser::MissingArgument, /--filename/)
     end
 
