@@ -685,26 +685,42 @@ describe Formula do
     expect(f5.runtime_dependencies.map(&:name)).to eq(["f1", "f4"])
   end
 
-  specify "runtime dependencies with optional deps from tap" do
-    tap_loader = double
+  describe "#runtime_dependencies" do
+    specify "runtime dependencies with optional deps from tap" do
+      tap_loader = double
 
-    allow(tap_loader).to receive(:get_formula).and_raise(RuntimeError, "tried resolving tap formula")
-    allow(Formulary).to receive(:loader_for).with("foo/bar/f1", from: nil).and_return(tap_loader)
-    stub_formula_loader(formula("f2") { url("f2-1.0") }, "baz/qux/f2")
+      allow(tap_loader).to receive(:get_formula).and_raise(RuntimeError, "tried resolving tap formula")
+      allow(Formulary).to receive(:loader_for).with("foo/bar/f1", from: nil).and_return(tap_loader)
+      stub_formula_loader(formula("f2") { url("f2-1.0") }, "baz/qux/f2")
 
-    f3 = formula "f3" do
-      url "f3-1.0"
+      f3 = formula "f3" do
+        url "f3-1.0"
 
-      depends_on "foo/bar/f1" => :optional
-      depends_on "baz/qux/f2"
+        depends_on "foo/bar/f1" => :optional
+        depends_on "baz/qux/f2"
+      end
+
+      expect(f3.runtime_dependencies.map(&:name)).to eq(["baz/qux/f2"])
+
+      stub_formula_loader(formula("f1") { url("f1-1.0") }, "foo/bar/f1")
+      f3.build = BuildOptions.new(Options.create(["--with-f1"]), f3.options)
+
+      expect(f3.runtime_dependencies.map(&:name)).to eq(["foo/bar/f1", "baz/qux/f2"])
     end
 
-    expect(f3.runtime_dependencies.map(&:name)).to eq(["baz/qux/f2"])
+    it "includes non-declared direct dependencies", :focus do
+      formula = Class.new(Testball).new
+      dependency = formula("dependency") { url "f-1.0" }
 
-    stub_formula_loader(formula("f1") { url("f1-1.0") }, "foo/bar/f1")
-    f3.build = BuildOptions.new(Options.create(["--with-f1"]), f3.options)
+      formula.brew { formula.install }
+      keg = Keg.for(formula.installed_prefix)
+      keg.link
 
-    expect(f3.runtime_dependencies.map(&:name)).to eq(["foo/bar/f1", "baz/qux/f2"])
+      linkage_checker = double("linkage checker", undeclared_deps: [dependency.name])
+      allow(LinkageChecker).to receive(:new).and_return(linkage_checker)
+
+      expect(formula.runtime_dependencies.map(&:name)).to eq [dependency.name]
+    end
   end
 
   specify "requirements" do
