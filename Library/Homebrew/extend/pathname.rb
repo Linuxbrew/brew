@@ -472,7 +472,15 @@ class Pathname
     }
   end
 
+  def binary_executable?
+    false
+  end
+
   def mach_o_bundle?
+    false
+  end
+
+  def dylib?
     false
   end
 end
