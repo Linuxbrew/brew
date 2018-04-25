@@ -2,6 +2,8 @@ require "keg"
 require "formula"
 
 class LinkageChecker
+  attr_reader :undeclared_deps
+
   def initialize(keg, formula = nil)
     @keg = keg
     @formula = formula || resolve_formula(keg)
@@ -142,7 +144,7 @@ class LinkageChecker
 
     missing_deps = @broken_deps.values.flatten.map { |d| dylib_to_dep(d) }
     unnecessary_deps -= missing_deps
-    
+
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 

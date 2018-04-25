@@ -708,19 +708,18 @@ describe Formula do
       expect(f3.runtime_dependencies.map(&:name)).to eq(["foo/bar/f1", "baz/qux/f2"])
     end
 
-    it "includes non-declared direct dependencies" do
+    it "includes non-declared direct dependencies", :focus do
       formula = Class.new(Testball).new
       dependency = formula("dependency") { url "f-1.0" }
 
       formula.brew { formula.install }
-      keg = Keg.for(formula.prefix)
+      keg = Keg.for(formula.installed_prefix)
       keg.link
 
       linkage_checker = double("linkage checker", undeclared_deps: [dependency.name])
-      allow(LinkageChecker).to receive(:new).with(keg, any_args)
-        .and_return(linkage_checker)
+      allow(LinkageChecker).to receive(:new).and_return(linkage_checker)
 
-      expect(formula.runtime_dependencies).to include an_object_having_attributes(name: dependency.name)
+      expect(formula.runtime_dependencies.map(&:name)).to eq [dependency.name]
     end
   end
 

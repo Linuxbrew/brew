@@ -1487,12 +1487,23 @@ class Formula
     Requirement.expand(self, &block)
   end
 
+  # Returns a Keg for the opt_prefix or installed_prefix if they exist.
+  # If not, return nil.
+  # @private
+  def opt_or_installed_prefix_keg
+    if optlinked? && opt_prefix.exist?
+      Keg.new(opt_prefix)
+    elsif installed_prefix.directory?
+      Keg.new(installed_prefix)
+    end
+  end
+
   # Returns a list of Dependency objects that are required at runtime.
   # @private
   def runtime_dependencies(read_from_tab: true)
     if read_from_tab &&
        installed_prefix.directory? &&
-       (keg = Keg.new(installed_prefix)) &&
+       (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
       return tab_deps.map { |d| Dependency.new d["full_name"] }.compact
     end
@@ -1500,6 +1511,8 @@ class Formula
     declared_runtime_dependencies | undeclared_runtime_dependencies
   end
 
+  # Returns a list of Dependency objects that are declared in the formula.
+  # @private
   def declared_runtime_dependencies
     recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
@@ -1507,14 +1520,12 @@ class Formula
     end
   end
 
+  # Returns a list of Dependency objects that are not declared in the formula
+  # but the formula links to.
+  # @private
   def undeclared_runtime_dependencies
-    if optlinked?
-      keg = Keg.new(opt_prefix)
-    elsif prefix.directory?
-      keg = Keg.new(prefix)
-    else
-      return []
-    end
+    keg = opt_or_installed_prefix_keg
+    return [] unless keg
 
     linkage_checker = LinkageChecker.new(keg, self)
     linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
