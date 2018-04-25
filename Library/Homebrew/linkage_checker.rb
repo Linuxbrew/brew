@@ -50,7 +50,6 @@ class LinkageChecker
     @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
   end
 
-
   def display_normal_output
     display_items "System libraries", system_dylibs
     display_items "Homebrew libraries", brewed_dylibs
