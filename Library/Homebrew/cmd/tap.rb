@@ -1,7 +1,7 @@
 #:  * `tap`:
 #:    List all installed taps.
 #:
-#:  * `tap` [`--full`] <user>`/`<repo> [<URL>]:
+#:  * `tap` [`--full`] [`--force-auto-update`] <user>`/`<repo> [<URL>]:
 #:    Tap a formula repository.
 #:
 #:    With <URL> unspecified, taps a formula repository from GitHub using HTTPS.
@@ -18,6 +18,10 @@
 #:    if `--full` is passed, a full clone will be used. To convert a shallow copy
 #:    to a full copy, you can retap passing `--full` without first untapping.
 #:
+#:    By default, only taps hosted on GitHub are auto-updated (for performance
+#:    reasons). If `--force-auto-update` is passed, this tap will be auto-updated
+#:    even if it is not hosted on GitHub.
+#:
 #:    `tap` is re-runnable and exits successfully if there's nothing to do.
 #:    However, retapping with a different <URL> will cause an exception, so first
 #:    `untap` if you need to modify the <URL>.
@@ -25,13 +29,8 @@
 #:  * `tap` `--repair`:
 #:    Migrate tapped formulae from symlink-based to directory-based structure.
 #:
-#:  * `tap` `--list-official`:
-#:    List all official taps.
-#:
 #:  * `tap` `--list-pinned`:
 #:    List all pinned taps.
-
-require "tap"
 
 module Homebrew
   module_function
@@ -40,8 +39,7 @@ module Homebrew
     if ARGV.include? "--repair"
       Tap.each(&:link_completions_and_manpages)
     elsif ARGV.include? "--list-official"
-      require "official_taps"
-      puts OFFICIAL_TAPS.map { |t| "homebrew/#{t}" }
+      odeprecated("brew tap --list-official")
     elsif ARGV.include? "--list-pinned"
       puts Tap.select(&:pinned?).map(&:name)
     elsif ARGV.named.empty?
@@ -50,6 +48,7 @@ module Homebrew
       tap = Tap.fetch(ARGV.named[0])
       begin
         tap.install clone_target: ARGV.named[1],
+                    force_auto_update: force_auto_update?,
                     full_clone: full_clone?,
                     quiet: ARGV.quieter?
       rescue TapRemoteMismatchError => e
@@ -61,5 +60,10 @@ module Homebrew
 
   def full_clone?
     ARGV.include?("--full") || ARGV.homebrew_developer?
+  end
+
+  def force_auto_update?
+    # if no relevant flag is present, return nil, meaning "no change"
+    true if ARGV.include?("--force-auto-update")
   end
 end

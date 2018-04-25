@@ -17,6 +17,8 @@ module Patch
       else
         ExternalPatch.new(strip, &block)
       end
+    when nil
+      raise ArgumentError, "nil value for strip"
     else
       raise ArgumentError, "unexpected value #{strip.inspect} for strip"
     end

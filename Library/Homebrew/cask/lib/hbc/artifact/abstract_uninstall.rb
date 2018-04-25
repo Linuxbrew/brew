@@ -1,4 +1,3 @@
-require "pathname"
 require "timeout"
 
 require "hbc/artifact/abstract_artifact"

@@ -55,7 +55,7 @@ If they accept, follow a few steps to get them set up:
 - Add them to the [Jenkins' GitHub Authorization Settings admin user names](https://jenkins.brew.sh/configureSecurity/) so they can adjust settings and restart jobs
 - Add them to the [Jenkins' GitHub Pull Request Builder admin list](https://jenkins.brew.sh/configure) to enable `@BrewTestBot test this please` for them
 - Invite them to the [`homebrew-maintainers` private maintainers mailing list](https://lists.sfconservancy.org/mailman/admin/homebrew-maintainers/members/add)
-- Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites)
+- Invite them to the [`machomebrew` private maintainers Slack](https://machomebrew.slack.com/admin/invites) (and ensure they've read the [communication guidelines](Maintainer-Guidelines.md#communication))
 - Invite them to the [`homebrew` private maintainers 1Password](https://homebrew.1password.com/signin)
 - Invite them to [Google Analytics](https://analytics.google.com/analytics/web/?authuser=1#management/Settings/a76679469w115400090p120682403/%3Fm.page%3DAccountUsers/)
 

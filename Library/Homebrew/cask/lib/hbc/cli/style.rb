@@ -27,7 +27,7 @@ module Hbc
 
       def cask_paths
         @cask_paths ||= if args.empty?
-          Hbc.all_tapped_cask_dirs
+          Tap.map(&:cask_dir).select(&:directory?)
         elsif args.any? { |file| File.exist?(file) }
           args
         else

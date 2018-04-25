@@ -1,16 +1,15 @@
 require "requirement"
 
 class X11Requirement < Requirement
-  cask "xquartz"
-  download "https://xquartz.macosforge.org"
-
-  def min_version
-    MacOS::XQuartz.minimum_version
-  end
-
   satisfy build_env: false do
     next false unless MacOS::XQuartz.installed?
     min_version <= MacOS::XQuartz.version
+  end
+
+  undef min_version, message
+
+  def min_version
+    MacOS::XQuartz.minimum_version
   end
 
   def message

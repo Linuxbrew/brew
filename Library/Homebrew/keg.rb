@@ -1,4 +1,3 @@
-require "extend/pathname"
 require "keg_relocate"
 require "lock_file"
 require "ostruct"
@@ -130,7 +129,7 @@ class Keg
         f_kegs = kegs_by_source[[f.name, f.tap]]
         next unless f_kegs
 
-        f_kegs.sort_by(&:version).last
+        f_kegs.max_by(&:version)
       end.compact
 
       next if required_kegs.empty?
@@ -238,10 +237,14 @@ class Keg
 
     if tap
       bad_tap_opt = opt/tap.user
-      FileUtils.rm_rf bad_tap_opt if bad_tap_opt.directory?
+      if !bad_tap_opt.symlink? && bad_tap_opt.directory?
+        FileUtils.rm_rf bad_tap_opt
+      end
     end
 
     aliases.each do |a|
+      # versioned aliases are handled below
+      next if a =~ /.+@./
       alias_symlink = opt/a
       if alias_symlink.symlink? && alias_symlink.exist?
         alias_symlink.delete if alias_symlink.realpath == opt_record.realpath
@@ -251,7 +254,7 @@ class Keg
     end
 
     Pathname.glob("#{opt_record}@*").each do |a|
-      a = a.basename
+      a = a.basename.to_s
       next if aliases.include?(a)
 
       alias_symlink = opt/a

@@ -19,7 +19,7 @@ describe Hbc::Artifact::Artifact, :cask do
   context "without target" do
     it "fails to load" do
       expect {
-        Hbc::CaskLoader.load(cask_path("with-generic-artifact-no-target"))
+        Hbc::CaskLoader.load(cask_path("invalid/invalid-generic-artifact-no-target"))
       }.to raise_error(Hbc::CaskInvalidError, /target required for Generic Artifact/)
     end
   end

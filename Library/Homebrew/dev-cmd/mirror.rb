@@ -1,11 +1,18 @@
 #: @hide_from_man_page
-#:  * `mirror` [`--test`] <formulae>:
+#:  * `mirror` <formulae>:
 #:    Reuploads the stable URL for a formula to Bintray to use it as a mirror.
+
+require "cli_parser"
 
 module Homebrew
   module_function
 
   def mirror
+    Homebrew::CLI::Parser.parse do
+      switch :debug
+      switch :verbose
+    end
+
     odie "This command requires at least formula argument!" if ARGV.named.empty?
 
     bintray_user = ENV["HOMEBREW_BINTRAY_USER"]

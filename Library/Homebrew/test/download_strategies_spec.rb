@@ -268,6 +268,90 @@ describe CurlDownloadStrategy do
   end
 end
 
+describe ScpDownloadStrategy do
+  def resource_for(url)
+    double(Resource, url: url, mirrors: [], specs: {}, version: nil)
+  end
+
+  subject { described_class.new(name, resource) }
+  let(:name) { "foo" }
+  let(:url) { "scp://example.com/foo.tar.gz" }
+  let(:resource) { resource_for(url) }
+
+  describe "#initialize" do
+    invalid_urls = %w[
+      http://example.com/foo.tar.gz
+      scp://@example.com/foo.tar.gz
+      scp://example.com:/foo.tar.gz
+      scp://example.com
+    ]
+
+    invalid_urls.each do |invalid_url|
+      context "with invalid URL #{invalid_url}" do
+        it "raises ScpDownloadStrategyError" do
+          expect {
+            described_class.new(name, resource_for(invalid_url))
+          }.to raise_error(ScpDownloadStrategyError)
+        end
+      end
+    end
+  end
+
+  describe "#fetch" do
+    before do
+      expect(subject.temporary_path).to receive(:rename).and_return(true)
+    end
+
+    context "when given a valid URL" do
+      let(:url) { "scp://example.com/foo.tar.gz" }
+      it "copies the file via scp" do
+        expect(subject)
+          .to receive(:safe_system)
+          .with("scp", "example.com:/foo.tar.gz", anything)
+          .and_return(true)
+
+        subject.fetch
+      end
+    end
+
+    context "when given a URL with a username" do
+      let(:url) { "scp://user@example.com/foo.tar.gz" }
+      it "copies the file via scp" do
+        expect(subject)
+          .to receive(:safe_system)
+          .with("scp", "user@example.com:/foo.tar.gz", anything)
+          .and_return(true)
+
+        subject.fetch
+      end
+    end
+
+    context "when given a URL with a port" do
+      let(:url) { "scp://example.com:1234/foo.tar.gz" }
+      it "copies the file via scp" do
+        expect(subject)
+          .to receive(:safe_system)
+          .with("scp", "-P 1234 example.com:/foo.tar.gz", anything)
+          .and_return(true)
+
+        subject.fetch
+      end
+    end
+
+    context "when given a URL with /~/" do
+      let(:url) { "scp://example.com/~/foo.tar.gz" }
+      it "treats the path as relative to the home directory" do
+        expect(subject)
+          .to receive(:safe_system)
+          .with("scp", "example.com:~/foo.tar.gz", anything)
+          .and_return(true)
+
+        subject.fetch
+      end
+    end
+  end
+end
+
 describe DownloadStrategyDetector do
   describe "::detect" do
     subject { described_class.detect(url, strategy) }
@@ -304,6 +388,11 @@ describe DownloadStrategyDetector do
         allow(described_class).to receive(:require_aws_sdk).and_return(true)
         is_expected.to eq(S3DownloadStrategy)
       end
+    end
+
+    context "when given an scp URL" do
+      let(:url) { "scp://example.com/brew.tar.gz" }
+      it { is_expected.to eq(ScpDownloadStrategy) }
     end
 
     it "defaults to cURL" do

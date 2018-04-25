@@ -1,4 +1,3 @@
-require "set"
 
 module Metafiles
   # https://github.com/github/markup#markups

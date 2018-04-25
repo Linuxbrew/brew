@@ -107,18 +107,6 @@ module Homebrew
         EOS
       end
 
-      # See https://github.com/Homebrew/legacy-homebrew/pull/9986
-      def check_path_for_trailing_slashes
-        bad_paths = PATH.new(ENV["HOMEBREW_PATH"]).select { |p| p.end_with?("/") }
-        return if bad_paths.empty?
-
-        inject_file_list bad_paths, <<~EOS
-          Some directories in your path end in a slash.
-          Directories in your path should not end in a slash. This can break other
-          doctor checks. The following directories should be edited:
-        EOS
-      end
-
       # Anaconda installs multiple system & brew dupes, including OpenSSL, Python,
       # sqlite, libpng, Qt, etc. Regularly breaks compile on Vim, MacVim and others.
       # Is flagged as part of the *-config script checks below, but people seem
@@ -492,21 +480,6 @@ module Homebrew
         EOS
       end
 
-      def check_user_curlrc
-        curlrc_found = %w[CURL_HOME HOME].any? do |var|
-          ENV[var] && File.exist?("#{ENV[var]}/.curlrc")
-        end
-        return unless curlrc_found
-
-        <<~EOS
-          You have a curlrc file
-          If you have trouble downloading packages with Homebrew, then maybe this
-          is the problem? If the following command doesn't work, then try removing
-          your curlrc:
-            curl #{Formatter.url("https://github.com")}
-        EOS
-      end
-
       def check_for_gettext
         find_relative_paths("lib/libgettextlib.dylib",
                             "lib/libintl.dylib",
@@ -618,18 +591,6 @@ module Homebrew
         end
 
         message
-      end
-
-      def check_ssl_cert_file
-        return unless ENV.key?("SSL_CERT_FILE")
-        <<~EOS
-          Setting SSL_CERT_FILE can break downloading files; if that happens
-          you should unset it before running Homebrew.
-
-          Homebrew uses the system curl which uses system certificates by
-          default. Setting SSL_CERT_FILE makes it use an outdated OpenSSL, which
-          does not support modern OpenSSL certificate stores.
-        EOS
       end
 
       def check_for_symlinked_cellar
@@ -811,28 +772,6 @@ module Homebrew
         false
       end
 
-      def check_for_linked_keg_only_brews
-        return unless HOMEBREW_CELLAR.exist?
-
-        linked = Formula.installed.sort.select do |f|
-          f.keg_only? && __check_linked_brew(f)
-        end
-        return if linked.empty?
-
-        inject_file_list linked.map(&:full_name), <<~EOS
-          Some keg-only formulae are linked into the Cellar.
-          Linking a keg-only formula, such as gettext, into the cellar with
-          `brew link <formula>` will cause other formulae to detect them during
-          the `./configure` step. This may cause problems when compiling those
-          other formulae.
-
-          Binaries provided by keg-only formulae may override system binaries
-          with other strange results.
-
-          You may wish to `brew unlink` these brews:
-        EOS
-      end
-
       def check_for_other_frameworks
         # Other frameworks that are known to cause problems when present
         frameworks_to_check = %w[
@@ -891,53 +830,6 @@ module Homebrew
           should you later need to do so for some reason.
             cd #{HOMEBREW_LIBRARY} && git stash && git clean -d -f
         EOS
-      end
-
-      def check_for_enthought_python
-        return unless which "enpkg"
-
-        <<~EOS
-          Enthought Python was found in your PATH.
-          This can cause build problems, as this software installs its own
-          copies of iconv and libxml2 into directories that are picked up by
-          other build systems.
-        EOS
-      end
-
-      def check_for_library_python
-        return unless File.exist?("/Library/Frameworks/Python.framework")
-
-        <<~EOS
-          Python is installed at /Library/Frameworks/Python.framework
-
-          Homebrew only supports building against the System-provided Python or a
-          brewed Python. In particular, Pythons installed to /Library can interfere
-          with other software installs.
-        EOS
-      end
-
-      def check_for_old_homebrew_share_python_in_path
-        message = ""
-        ["", "3"].map do |suffix|
-          next unless paths.include?((HOMEBREW_PREFIX/"share/python#{suffix}").to_s)
-          message += <<~EOS
-            #{HOMEBREW_PREFIX}/share/python#{suffix} is not needed in PATH.
-          EOS
-        end
-        unless message.empty?
-          message += <<~EOS
-
-            Formerly homebrew put Python scripts you installed via `pip` or `pip3`
-            (or `easy_install`) into that directory above but now it can be removed
-            from your PATH variable.
-            Python scripts will now install into #{HOMEBREW_PREFIX}/bin.
-            You can delete anything, except 'Extras', from the #{HOMEBREW_PREFIX}/share/python
-            (and #{HOMEBREW_PREFIX}/share/python@2) dir and install affected Python packages
-            anew with `pip install --upgrade`.
-          EOS
-        end
-
-        message unless message.empty?
       end
 
       def check_for_bad_python_symlink

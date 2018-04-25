@@ -10,7 +10,7 @@ module Hbc
       end
 
       def run
-        casks(alternative: -> { Hbc.installed }).each do |cask|
+        casks(alternative: -> { Caskroom.casks }).each do |cask|
           odebug "Checking update info of Cask #{cask}"
           self.class.list_if_outdated(cask, greedy?, verbose?)
         end

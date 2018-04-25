@@ -10,7 +10,6 @@ require "formulary"
 require "software_spec"
 require "install_renamed"
 require "pkg_version"
-require "tap"
 require "keg"
 require "migrator"
 require "linkage_checker"
@@ -174,7 +173,9 @@ class Formula
     @name = name
     @path = path
     @alias_path = alias_path
-    @alias_name = File.basename(alias_path) if alias_path
+    @alias_name = if alias_path
+      File.basename(alias_path)
+    end
     @revision = self.class.revision || 0
     @version_scheme = self.class.version_scheme || 0
 
@@ -204,6 +205,7 @@ class Formula
     @pin = FormulaPin.new(self)
     @follow_installed_alias = true
     @prefix_returns_versioned_prefix = false
+    @oldname_lock = nil
   end
 
   # @private
@@ -1130,7 +1132,7 @@ class Formula
     return false unless old_rack.directory?
     return false if old_rack.subdirs.empty?
 
-    tap == Tab.for_keg(old_rack.subdirs.sort.first).tap
+    tap == Tab.for_keg(old_rack.subdirs.min).tap
   end
 
   # @private
@@ -1293,7 +1295,7 @@ class Formula
 
     # Avoid false positives for clock_gettime support on 10.11.
     # CMake cache entries for other weak symbols may be added here as needed.
-    if MacOS.version == "10.11" && MacOS::Xcode.installed? && MacOS::Xcode.version >= "8.0"
+    if MacOS.version == "10.11" && MacOS::Xcode.version >= "8.0"
       args << "-DHAVE_CLOCK_GETTIME:INTERNAL=0"
     end
 
@@ -1539,10 +1541,10 @@ class Formula
       "desc" => desc,
       "homepage" => homepage,
       "oldname" => oldname,
-      "aliases" => aliases,
+      "aliases" => aliases.sort,
       "versions" => {
         "stable" => stable&.version&.to_s,
-        "bottle" => !bottle.nil?,
+        "bottle" => !bottle_specification.checksums.empty?,
         "devel" => devel&.version&.to_s,
         "head" => head&.version&.to_s,
       },
@@ -2364,7 +2366,7 @@ class Formula
     #   version '4.8.1'
     # end</pre>
     def fails_with(compiler, &block)
-      odeprecated "fails_with :llvm" if compiler == :llvm
+      odisabled "fails_with :llvm" if compiler == :llvm
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
 

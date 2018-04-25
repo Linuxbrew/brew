@@ -17,17 +17,6 @@ describe Keg do
     keg
   end
 
-  around do |example|
-    begin
-      @old_stdout = $stdout
-      $stdout = StringIO.new
-
-      example.run
-    ensure
-      $stdout = @old_stdout
-    end
-  end
-
   let(:dst) { HOMEBREW_PREFIX/"bin"/"helloworld" }
   let(:nonexistent) { Pathname.new("/some/nonexistent/path") }
   let(:mode) { OpenStruct.new }
@@ -96,13 +85,15 @@ describe Keg do
       it "only prints what would be done" do
         mode.dry_run = true
 
-        expect(keg.link(mode)).to eq(0)
-        expect(keg).not_to be_linked
+        expect {
+          expect(keg.link(mode)).to eq(0)
+        }.to output(<<~EOF).to_stdout
+          #{HOMEBREW_PREFIX}/bin/goodbye_cruel_world
+          #{HOMEBREW_PREFIX}/bin/helloworld
+          #{HOMEBREW_PREFIX}/bin/hiworld
+        EOF
 
-        ["hiworld", "helloworld", "goodbye_cruel_world"].each do |file|
-          expect($stdout.string).to match("#{HOMEBREW_PREFIX}/bin/#{file}")
-        end
-        expect($stdout.string.lines.count).to eq(3)
+        expect(keg).not_to be_linked
       end
     end
 
@@ -145,10 +136,13 @@ describe Keg do
         mode.overwrite = true
         mode.dry_run = true
 
-        expect(keg.link(mode)).to eq(0)
-        expect(keg).not_to be_linked
+        expect {
+          expect(keg.link(mode)).to eq(0)
+        }.to output(<<~EOF).to_stdout
+          #{dst}
+        EOF
 
-        expect($stdout.string).to eq("#{dst}\n")
+        expect(keg).not_to be_linked
       end
     end
 

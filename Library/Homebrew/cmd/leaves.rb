@@ -3,7 +3,6 @@
 
 require "formula"
 require "tab"
-require "set"
 
 module Homebrew
   module_function

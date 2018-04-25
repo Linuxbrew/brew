@@ -104,3 +104,14 @@ Whitespace corrections (to Ruby standard etc.) are allowed (in fact this
 is a good opportunity to do it) provided the line itself has some kind
 of modification that is not whitespace in it. But be careful about
 making changes to inline patches—make sure they still apply.
+
+## Communication
+Maintainers have a variety of ways to communicate with each other:
+
+- Homebrew's public repositories on GitHub
+- Homebrew's group communications between more than two maintainers on private channels (e.g. GitHub/Slack/Discourse)
+- Homebrew's direct 1:1 messages between two maintainers on private channels (e.g. iMessage/Slack/Discourse/IRC/carrier pigeon)
+
+All communication should ideally occur in public on GitHub. Where this is not possible or appropriate (e.g. a security disclosure, interpersonal issue between two maintainers, urgent breakage that needs to be resolved) this can move to maintainers' private group communication and, if necessary, 1:1 communication. Technical decisions should not happen in 1:1 communications but if they do (or did in the past) they must end up back as something linkable on GitHub. For example, if a technical decision was made a year ago on Slack and another maintainer/contributor/user asks about it on GitHub, that's a good chance to explain it to them and have something that can be linked to in the future.
+
+This makes it easier for other maintainers, contributors and users to follow along with what we're doing (and, more importantly, why we're doing it) and means that decisions have a linkable URL.

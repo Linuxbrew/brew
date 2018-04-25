@@ -1,4 +1,3 @@
-require "utils"
 require "language/python_virtualenv_constants"
 
 module Language

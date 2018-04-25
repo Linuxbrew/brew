@@ -140,7 +140,7 @@ class Requirement
     attr_rw :fatal, :cask, :download
 
     def default_formula(_val = nil)
-      odeprecated "Requirement.default_formula"
+      odisabled "Requirement.default_formula"
     end
 
     def satisfy(options = nil, &block)

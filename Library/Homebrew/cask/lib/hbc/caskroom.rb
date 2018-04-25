@@ -15,5 +15,17 @@ module Hbc
       SystemCommand.run("/usr/sbin/chown", args: [Utils.current_user, Hbc.caskroom], sudo: sudo)
       SystemCommand.run("/usr/bin/chgrp", args: ["admin", Hbc.caskroom], sudo: sudo)
     end
+
+    def casks
+      Pathname.glob(Hbc.caskroom.join("*")).sort.select(&:directory?).map do |path|
+        token = path.basename.to_s
+
+        if tap_path = CaskLoader.tap_paths(token).first
+          next CaskLoader::FromTapPathLoader.new(tap_path).load
+        end
+
+        CaskLoader::FromPathLoader.new(Pathname.glob(path.join(".metadata/*/*/*/*.rb")).first).load
+      end
+    end
   end
 end

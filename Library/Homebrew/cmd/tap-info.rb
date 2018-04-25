@@ -15,8 +15,6 @@
 #:    See the docs for examples of using the JSON output:
 #:    <https://docs.brew.sh/Querying-Brew>
 
-require "tap"
-
 module Homebrew
   module_function
 

@@ -42,6 +42,7 @@ class SoftwareSpec
     @deprecated_options = []
     @build = BuildOptions.new(Options.create(@flags), options)
     @compiler_failures = []
+    @bottle_disable_reason = nil
   end
 
   def owner=(owner)
@@ -127,9 +128,9 @@ class SoftwareSpec
   def option(name, description = "")
     opt = PREDEFINED_OPTIONS.fetch(name) do
       if name.is_a?(Symbol)
-        odeprecated "passing arbitrary symbols (i.e. #{name.inspect}) to `option`"
-        name = name.to_s
+        odisabled "passing arbitrary symbols (i.e. #{name.inspect}) to `option`"
       end
+
       unless name.is_a?(String)
         raise ArgumentError, "option name must be string or symbol; got a #{name.class}: #{name}"
       end
@@ -204,7 +205,7 @@ class SoftwareSpec
   end
 
   def fails_with(compiler, &block)
-    odeprecated "fails_with :llvm" if compiler == :llvm
+    odisabled "fails_with :llvm" if compiler == :llvm
     compiler_failures << CompilerFailure.create(compiler, &block)
   end
 

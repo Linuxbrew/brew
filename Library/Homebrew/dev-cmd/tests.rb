@@ -17,7 +17,6 @@
 
 require "cli_parser"
 require "fileutils"
-require "tap"
 
 module Homebrew
   module_function
@@ -26,11 +25,12 @@ module Homebrew
     args = Homebrew::CLI::Parser.parse do
       switch "--no-compat"
       switch "--generic"
-      switch "-v", "--verbose"
       switch "--coverage"
       switch "--online"
-      flag   "--only", required: true
-      flag   "--seed", required: true
+      switch :debug
+      switch :verbose
+      flag   "--only="
+      flag   "--seed="
     end
 
     HOMEBREW_LIBRARY_PATH.cd do
@@ -113,6 +113,7 @@ module Homebrew
       end
 
       unless OS.linux?
+        args << "--tag" << "~needs_linux"
         files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
       end
 

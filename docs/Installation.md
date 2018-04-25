@@ -11,7 +11,7 @@ it does it too. And you have to confirm everything it will do before it starts.
 
 ## Requirements
 * An Intel CPU <sup>[1](#1)</sup>
-* OS X 10.10 or higher <sup>[2](#2)</sup>
+* OS X 10.11 or higher <sup>[2](#2)</sup>
 * Command Line Tools (CLT) for Xcode: `xcode-select --install`,
   [developer.apple.com/downloads](https://developer.apple.com/downloads) or
   [Xcode](https://itunes.apple.com/us/app/xcode/id497799835) <sup>[3](#3)</sup>
@@ -19,11 +19,16 @@ it does it too. And you have to confirm everything it will do before it starts.
 
 ## Alternative Installs
 
+### OS X Lion 10.7 and below
+
+Using the instructions on https://brew.sh or below whenever you call `curl` you must pass `--insecure` as an argument. This is because your system `curl` is too old to speak to GitHub using HTTPS. Don't worry, on the first `brew update` Homebrew will install a newer, more secure `curl` for your machine.
+
 ### Untar anywhere
 Just extract (or `git clone`) Homebrew wherever you want. Just
 avoid:
 
 * Directories with names that contain spaces. Homebrew itself can handle spaces, but many build scripts cannot.
+* `/tmp` subdirectories because Homebrew gets upset
 * `/sw` and `/opt/local` because build scripts get confused when Homebrew is there instead of Fink or MacPorts, respectively.
 
 However do yourself a favor and install to `/usr/local`. Some things may
@@ -46,7 +51,7 @@ you can assume you will have trouble if you don’t conform. Also, you can find
 PowerPC and Tiger branches from other users in the fork network. See
 [Interesting Taps and Forks](Interesting-Taps-and-Forks.md).
 
-<a name="2"><sup>2</sup></a> 10.10 or higher is recommended. 10.5–10.9 are
+<a name="2"><sup>2</sup></a> 10.11 or higher is recommended. 10.5–10.10 are
 supported on a best-effort basis. For 10.4 see
 [Tigerbrew](https://github.com/mistydemeo/tigerbrew).
 

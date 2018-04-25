@@ -1,7 +1,6 @@
 require "requirement"
 
 class OsxfuseRequirement < Requirement
-  cask "osxfuse"
   download "https://osxfuse.github.io/"
 
   satisfy(build_env: false) { self.class.binary_osxfuse_installed? }
@@ -18,17 +17,5 @@ class OsxfuseRequirement < Requirement
       ENV.append_path "HOMEBREW_LIBRARY_PATHS", "/usr/local/lib"
       ENV.append_path "HOMEBREW_INCLUDE_PATHS", "/usr/local/include/osxfuse"
     end
-  end
-end
-
-class NonBinaryOsxfuseRequirement < Requirement
-  fatal true
-  satisfy(build_env: false) { HOMEBREW_PREFIX.to_s != "/usr/local" || !OsxfuseRequirement.binary_osxfuse_installed? }
-
-  def message
-    <<~EOS
-      osxfuse is already installed from the binary distribution and
-      conflicts with this formula.
-    EOS
   end
 end

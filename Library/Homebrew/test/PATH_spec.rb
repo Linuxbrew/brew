@@ -23,6 +23,13 @@ describe PATH do
     it "returns a PATH array" do
       expect(described_class.new("/path1", "/path2").to_ary).to eq(["/path1", "/path2"])
     end
+
+    it "does not allow mutating the original" do
+      path = described_class.new("/path1", "/path2")
+      path.to_ary << "/path3"
+
+      expect(path).not_to include("/path3")
+    end
   end
 
   describe "#to_str" do
@@ -58,6 +65,12 @@ describe PATH do
 
     it "can insert multiple paths" do
       expect(described_class.new("/path1").insert(0, "/path2", "/path3")).to eq("/path2:/path3:/path1")
+    end
+  end
+
+  describe "#==" do
+    it "always returns false when comparing against something which does not respons to `#to_ary` or `#to_str`" do
+      expect(described_class.new).not_to eq Object.new
     end
   end
 

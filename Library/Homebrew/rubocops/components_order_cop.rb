@@ -2,7 +2,7 @@ require_relative "./extend/formula_cop"
 
 module RuboCop
   module Cop
-    module FormulaAuditStrict
+    module FormulaAudit
       # This cop checks for correct order of components in a Formula
       #
       # - component_precedence_list has component hierarchy in a nested list
@@ -62,8 +62,14 @@ module RuboCop
           end
         end
 
+        # `aspell`: options and resources should be grouped by language
+        WHITELIST = %w[
+          aspell
+        ].freeze
+
         # Method to format message for reporting component precedence violations
         def component_problem(c1, c2)
+          return if WHITELIST.include?(@formula_name)
           problem "`#{format_component(c1)}` (line #{line_number(c1)}) should be put before `#{format_component(c2)}` (line #{line_number(c2)})"
         end
 

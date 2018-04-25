@@ -164,7 +164,7 @@ describe RuboCop::Cop::FormulaAudit::Urls do
   end
 end
 
-describe RuboCop::Cop::FormulaAuditStrict::PyPiUrls do
+describe RuboCop::Cop::FormulaAudit::PyPiUrls do
   subject(:cop) { described_class.new }
 
   context "when a pypi.python.org URL is used" do

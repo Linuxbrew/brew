@@ -1,27 +1,6 @@
 class SystemConfig
   class << self
-    def xcode
-      if instance_variable_defined?(:@xcode)
-        @xcode
-      elsif MacOS::Xcode.installed?
-        @xcode = MacOS::Xcode.version.to_s
-        @xcode += " => #{MacOS::Xcode.prefix}" unless MacOS::Xcode.default_prefix?
-        @xcode
-      end
-    end
-
-    def clt
-      if instance_variable_defined?(:@clt)
-        @clt
-      elsif MacOS::CLT.installed? && MacOS::Xcode.version >= "4.3"
-        @clt = MacOS::CLT.version
-      end
-    end
-
-    def macports_or_fink
-      @ponk ||= MacOS.macports_or_fink
-      @ponk.join(", ") unless @ponk.empty?
-    end
+    undef describe_java, describe_homebrew_ruby
 
     def describe_java
       # java_home doesn't exist on all macOSs; it might be missing on older versions.
@@ -36,11 +15,6 @@ class SystemConfig
       javas.uniq.join(", ")
     end
 
-    def describe_xquartz
-      return "N/A" unless MacOS::XQuartz.installed?
-      "#{MacOS::XQuartz.version} => #{describe_path(MacOS::XQuartz.prefix)}"
-    end
-
     def describe_homebrew_ruby
       s = describe_homebrew_ruby_version
 
@@ -51,13 +25,32 @@ class SystemConfig
       end
     end
 
+    def xcode
+      @xcode ||= if MacOS::Xcode.installed?
+        xcode = MacOS::Xcode.version.to_s
+        xcode += " => #{MacOS::Xcode.prefix}" unless MacOS::Xcode.default_prefix?
+        xcode
+      end
+    end
+
+    def clt
+      @clt ||= if MacOS::CLT.installed? && MacOS::Xcode.version >= "4.3"
+        MacOS::CLT.version
+      end
+    end
+
+    def xquartz
+      @xquartz ||= if MacOS::XQuartz.installed?
+        "#{MacOS::XQuartz.version} => #{describe_path(MacOS::XQuartz.prefix)}"
+      end
+    end
+
     def dump_verbose_config(f = $stdout)
       dump_generic_verbose_config(f)
       f.puts "macOS: #{MacOS.full_version}-#{kernel}"
-      f.puts "Xcode: #{xcode ? xcode : "N/A"}"
       f.puts "CLT: #{clt ? clt : "N/A"}"
-      f.puts "X11: #{describe_xquartz}"
-      f.puts "MacPorts/Fink: #{macports_or_fink}" if macports_or_fink
+      f.puts "Xcode: #{xcode ? xcode : "N/A"}"
+      f.puts "XQuartz: #{xquartz ? xquartz : "N/A"}"
     end
   end
 end

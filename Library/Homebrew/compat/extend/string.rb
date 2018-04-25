@@ -1,7 +1,7 @@
 class String
   def undent
-    odeprecated "<<-EOS.undent", "<<~EOS"
-    gsub(/^[ \t]{#{(slice(/^[ \t]+/) || '').length}}/, "")
+    odisabled "<<-EOS.undent", "<<~EOS"
+    self
   end
   alias unindent undent
 

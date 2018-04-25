@@ -22,6 +22,7 @@ class AbstractDownloadStrategy
     @url = resource.url
     @version = resource.version
     @meta = resource.specs
+    @shutup = false
     extend Pourable if meta[:bottle]
   end
 
@@ -80,7 +81,7 @@ class AbstractDownloadStrategy
 
   def safe_system(*args)
     if @shutup
-      quiet_system(*args) || raise(ErrorDuringExecution.new(args.shift, *args))
+      quiet_system(*args) || raise(ErrorDuringExecution.new(args.shift, args))
     else
       super(*args)
     end
@@ -591,6 +592,70 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
   def fetch_release_metadata
     release_url = "https://api.github.com/repos/#{@owner}/#{@repo}/releases/tags/#{@tag}"
     GitHub.open_api(release_url)
+  end
+end
+
+# ScpDownloadStrategy downloads files using ssh via scp. To use it, add
+# ":using => ScpDownloadStrategy" to the URL section of your formula or
+# provide a URL starting with scp://. This strategy uses ssh credentials for
+# authentication. If a public/private keypair is configured, it will not
+# prompt for a password.
+#
+# Usage:
+#
+#   class Abc < Formula
+#     url "scp://example.com/src/abc.1.0.tar.gz"
+#     ...
+class ScpDownloadStrategy < AbstractFileDownloadStrategy
+  attr_reader :tarball_path, :temporary_path
+
+  def initialize(name, resource)
+    super
+    @tarball_path = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
+    @temporary_path = Pathname.new("#{cached_location}.incomplete")
+    parse_url_pattern
+  end
+
+  def parse_url_pattern
+    url_pattern = %r{scp://([^@]+@)?([^@:/]+)(:\d+)?/(\S+)}
+    if @url !~ url_pattern
+      raise ScpDownloadStrategyError, "Invalid URL for scp: #{@url}"
+    end
+
+    _, @user, @host, @port, @path = *@url.match(url_pattern)
+  end
+
+  def fetch
+    ohai "Downloading #{@url}"
+
+    if cached_location.exist?
+      puts "Already downloaded: #{cached_location}"
+    else
+      begin
+        safe_system "scp", scp_source, temporary_path.to_s
+      rescue ErrorDuringExecution
+        raise ScpDownloadStrategyError, "Failed to run scp #{scp_source}"
+      end
+
+      ignore_interrupts { temporary_path.rename(cached_location) }
+    end
+  end
+
+  def cached_location
+    tarball_path
+  end
+
+  def clear_cache
+    super
+    rm_rf(temporary_path)
+  end
+
+  private
+
+  def scp_source
+    path_prefix = "/" unless @path.start_with?("~")
+    port_arg = "-P #{@port[1..-1]} " if @port
+    "#{port_arg}#{@user}#{@host}:#{path_prefix}#{@path}"
   end
 end
 
@@ -1140,6 +1205,8 @@ class DownloadStrategyDetector
     when %r{^s3://}
       require_aws_sdk
       S3DownloadStrategy
+    when %r{^scp://}
+      ScpDownloadStrategy
     else
       CurlDownloadStrategy
     end

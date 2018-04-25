@@ -83,11 +83,13 @@ describe Hbc::CLI::Style, :cask do
     context "when no cask tokens are given" do
       let(:tokens) { [] }
 
-      before do
-        allow(Hbc).to receive(:all_tapped_cask_dirs).and_return(%w[Casks MoreCasks])
+      matcher :a_path_ending_with do |end_string|
+        match do |actual|
+          expect(actual.to_s).to end_with(end_string)
+        end
       end
 
-      it { is_expected.to eq(%w[Casks MoreCasks]) }
+      it { is_expected.to contain_exactly(a_path_ending_with("/caskroom/homebrew-spec/Casks"), a_path_ending_with("/third-party/homebrew-tap/Casks")) }
     end
 
     context "when at least one cask token is a path that exists" do

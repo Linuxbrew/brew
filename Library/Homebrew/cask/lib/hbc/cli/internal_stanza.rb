@@ -58,7 +58,7 @@ module Hbc
           @stanza = :artifacts
         end
 
-        casks(alternative: -> { Hbc.all }).each do |cask|
+        casks(alternative: -> { Cask.to_a }).each do |cask|
           print "#{cask}\t" if table?
 
           begin

@@ -19,7 +19,6 @@
 #:
 #:    Exits with a non-zero status if any style violations are found.
 
-require "utils"
 require "json"
 require "open3"
 

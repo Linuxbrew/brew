@@ -54,48 +54,19 @@ module Homebrew
       used_formulae.all? do |ff|
         begin
           deps = f.runtime_dependencies if only_installed_arg
-          if recursive
-            deps ||= recursive_includes(Dependency, f, includes, ignores)
-
-            dep_formulae = deps.flat_map do |dep|
-              begin
-                dep.to_formula
-              rescue
-                []
-              end
-            end
-
-            reqs_by_formula = ([f] + dep_formulae).flat_map do |formula|
-              formula.requirements.map { |req| [formula, req] }
-            end
-
-            reqs_by_formula.reject! do |dependent, req|
-              if req.recommended?
-                ignores.include?("recommended?") || dependent.build.without?(req)
-              elsif req.test?
-                !includes.include?("test?")
-              elsif req.optional?
-                !includes.include?("optional?") && !dependent.build.with?(req)
-              elsif req.build?
-                !includes.include?("build?")
-              end
-            end
-
-            reqs = reqs_by_formula.map(&:last)
+          deps ||= if recursive
+            recursive_includes(Dependency, f, includes, ignores)
           else
-            deps ||= reject_ignores(f.deps, ignores, includes)
-            reqs   = reject_ignores(f.requirements, ignores, includes)
+            reject_ignores(f.deps, ignores, includes)
           end
 
-          next true if deps.any? do |dep|
+          deps.any? do |dep|
             begin
               dep.to_formula.full_name == ff.full_name
             rescue
               dep.name == ff.name
             end
           end
-
-          reqs.any? { |req| req.name == ff.name }
         rescue FormulaUnavailableError
           # Silently ignore this case as we don't care about things used in
           # taps that aren't currently tapped.
