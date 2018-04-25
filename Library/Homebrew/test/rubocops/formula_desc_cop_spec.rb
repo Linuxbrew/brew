@@ -1,6 +1,6 @@
 require_relative "../../rubocops/formula_desc_cop"
 
-describe RuboCop::Cop::FormulaAuditStrict::DescLength do
+describe RuboCop::Cop::FormulaAudit::DescLength do
   subject(:cop) { described_class.new }
 
   context "When auditing formula desc" do

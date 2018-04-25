@@ -1,6 +1,6 @@
 require_relative "../../rubocops/components_order_cop"
 
-describe RuboCop::Cop::FormulaAuditStrict::ComponentsOrder do
+describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
   subject(:cop) { described_class.new }
 
   context "When auditing formula components order" do
