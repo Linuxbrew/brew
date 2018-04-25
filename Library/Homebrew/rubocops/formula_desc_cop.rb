@@ -3,7 +3,7 @@ require_relative "../extend/string"
 
 module RuboCop
   module Cop
-    module FormulaAuditStrict
+    module FormulaAudit
       # This cop audits `desc` in Formulae
       #
       # - Checks for existence of `desc`
@@ -33,7 +33,9 @@ module RuboCop
                   "Length is calculated as #{@formula_name} + desc. (currently #{desc_length})"
         end
       end
+    end
 
+    module FormulaAuditStrict
       # This cop audits `desc` in Formulae
       #
       # - Checks if `desc` begins with an article
