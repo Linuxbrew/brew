@@ -62,10 +62,17 @@ class LinkageChecker
       next false unless dep.optional? || dep.recommended?
       formula.build.without?(dep)
     end
+
     declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
-    runtime_deps = keg.to_formula.declared_runtime_dependencies
-    recursive_deps = runtime_deps.map { |dep| dep.to_formula.name }
     declared_dep_names = declared_deps.map { |dep| dep.split("/").last }
+    recursive_deps = formula.declared_runtime_dependencies.map do |dep|
+      begin
+        dep.to_formula.name
+      rescue FormulaUnavailableError
+        nil
+      end
+    end.compact
+
     indirect_deps = []
     undeclared_deps = []
     @brewed_dylibs.each_key do |full_name|
@@ -77,13 +84,16 @@ class LinkageChecker
         undeclared_deps << full_name
       end
     end
+
     sort_by_formula_full_name!(indirect_deps)
     sort_by_formula_full_name!(undeclared_deps)
+
     unnecessary_deps = declared_dep_names.reject do |full_name|
       name = full_name.split("/").last
       next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
+
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 
