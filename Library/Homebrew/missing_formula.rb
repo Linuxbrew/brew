@@ -93,7 +93,7 @@ module Homebrew
           new_tap = old_tap.tap_migrations[name]
           next unless new_tap
 
-          new_tap_user, new_tap_repo, = new_tap.split("/")
+          new_tap_user, new_tap_repo, new_tap_new_name = new_tap.split("/")
           new_tap_name = "#{new_tap_user}/#{new_tap_repo}"
 
           message = <<~EOS
@@ -101,9 +101,18 @@ module Homebrew
           EOS
           break if new_tap_name == CoreTap.instance.name
 
+          install_cmd = if new_tap_user == "caskroom"
+            "cask install"
+          else
+            "install"
+          end
+          new_tap_new_name ||= name
+
           message += <<~EOS
             You can access it again by running:
               brew tap #{new_tap_name}
+            And then you can install it by running:
+              brew #{install_cmd} #{new_tap_new_name}
           EOS
           break
         end
