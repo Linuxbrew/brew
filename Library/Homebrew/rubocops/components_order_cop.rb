@@ -31,6 +31,7 @@ module RuboCop
             [{ name: :conflicts_with, type: :method_call }],
             [{ name: :go_resource, type: :block_call }, { name: :resource, type: :block_call }],
             [{ name: :install, type: :method_definition }],
+            [{ name: :post_install, type: :method_definition }],
             [{ name: :caveats, type: :method_definition }],
             [{ name: :plist_options, type: :method_call }, { name: :plist, type: :method_definition }],
             [{ name: :test, type: :block_call }],
