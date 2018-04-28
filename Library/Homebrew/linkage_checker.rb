@@ -111,8 +111,12 @@ class LinkageChecker
       formula.build.without?(dep)
     end
 
-    declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
-    declared_dep_names = declared_deps.map { |dep| dep.split("/").last }
+    declared_deps_full_names = formula.deps
+                                      .reject { |dep| filter_out.call(dep) }
+                                      .map(&:name)
+    declared_deps_names = declared_deps_full_names.map do |dep|
+      dep.split("/").last
+    end
     recursive_deps = formula.declared_runtime_dependencies.map do |dep|
       begin
         dep.to_formula.name
@@ -127,7 +131,7 @@ class LinkageChecker
       name = full_name.split("/").last
       next if name == formula.name
       if recursive_deps.include?(name)
-        indirect_deps << full_name unless declared_dep_names.include?(name)
+        indirect_deps << full_name unless declared_deps_names.include?(name)
       else
         undeclared_deps << full_name
       end
@@ -136,9 +140,9 @@ class LinkageChecker
     sort_by_formula_full_name!(indirect_deps)
     sort_by_formula_full_name!(undeclared_deps)
 
-    unnecessary_deps = declared_dep_names.reject do |full_name|
+    unnecessary_deps = declared_deps_full_names.reject do |full_name|
+      next true if Formula[full_name].bin.directory?
       name = full_name.split("/").last
-      next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
 
