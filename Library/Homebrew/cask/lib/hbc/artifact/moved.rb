@@ -58,7 +58,7 @@ module Hbc
         end
 
         unless target.exist?
-          return if skip
+          return if skip || force
           raise CaskError, "It seems the #{self.class.english_name} source '#{target}' is not there."
         end
 
