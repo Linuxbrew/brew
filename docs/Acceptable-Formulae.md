@@ -13,10 +13,10 @@ We now accept versioned formulae as long as they [meet the requirements](Version
 
 ### We don’t like tools that upgrade themselves
 Software that can upgrade itself does not integrate well with Homebrew's own
-upgrade functionality. The self-update functionality should be disabled if at all possible.
+upgrade functionality. The self-update functionality should be disabled (if possible without complicating the formula).
 
 ### We don’t like install-scripts that download unversioned things
-We don't like install scripts that are pulling from the `master` branch of Git repositories or unversioned, unchecksummed tarballs. These should use `resource` blocks instead. Note that we now allow tools like `pip`, `cargo`, `gem` to download things during installation.
+We don't like install scripts that are pulling from the `master` branch of Git repositories or unversioned, unchecksummed tarballs. These should use `resource` blocks with specific revisions or checksummed tarballs instead. Note that we now allow tools like `cargo`, `gem` and `pip` to download things during installation.
 
 ### We don’t like binary formulae
 Our policy is that formulae in the core tap
@@ -36,7 +36,7 @@ due to upstream changes and we can’t provide [bottles](Bottles.md) for them.
 ### Niche (or self-submitted) stuff
 The software in question must:
 
-* be maintained (e.g. it works without patching on all supported macOS releases and has no outstanding, unpatched security vulnerabilites)
+* be maintained (i.e. the last release wasn't ages ago, it works without patching on all supported macOS releases and has no outstanding, unpatched security vulnerabilites)
 * be known
 * be stable (e.g. not declared "unstable" or "beta" by upstream)
 * be used
