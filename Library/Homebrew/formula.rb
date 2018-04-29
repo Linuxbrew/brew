@@ -1502,7 +1502,6 @@ class Formula
   # @private
   def runtime_dependencies(read_from_tab: true)
     if read_from_tab &&
-       installed_prefix.directory? &&
        (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
       return tab_deps.map { |d| Dependency.new d["full_name"] }.compact
