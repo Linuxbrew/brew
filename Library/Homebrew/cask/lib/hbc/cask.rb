@@ -132,7 +132,6 @@ module Hbc
         "depends_on" => depends_on,
         "conflicts_with" => conflicts_with.to_a,
         "container" => container,
-        "gpg" => gpg,
         "accessibility_access" => accessibility_access,
         "auto_updates" => auto_updates,
       }
