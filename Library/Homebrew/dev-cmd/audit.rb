@@ -117,6 +117,7 @@ module Homebrew
     # Check style in a single batch run up front for performance
     style_results = check_style_json(files, options)
 
+    new_formula_problem_lines = []
     ff.sort.each do |f|
       options = { new_formula: new_formula, strict: strict, online: online, only: args.only, except: args.except }
       options[:style_offenses] = style_results.file_offenses(f.path)
@@ -127,7 +128,8 @@ module Homebrew
       fa.problems
       formula_count += 1
       problem_count += fa.problems.size
-      problem_lines = fa.problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
+      problem_lines = format_problem_lines(fa.problems)
+      new_formula_problem_lines = format_problem_lines(fa.new_formula_problems)
       if args.display_filename?
         puts problem_lines.map { |s| "#{f.path}: #{s}" }
       else
@@ -135,9 +137,27 @@ module Homebrew
       end
     end
 
-    return if problem_count.zero?
+    create_issue_failed = false
+    if new_formula && !new_formula_problem_lines.size.zero? && !GitHub.create_issue_no_op?
+      begin
+        GitHub.create_issue_comment(new_formula_problem_lines.join("\n"))
+      rescue *GitHub.api_errors
+        create_issue_failed = true
+      end
+    end
 
-    ofail "#{Formatter.pluralize(problem_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
+    if GitHub.create_issue_no_op? || create_issue_failed
+      problem_count += new_formula_problem_lines.size
+      puts new_formula_problem_lines.map { |s| "  #{s}" }
+    end
+
+    errors_summary = "#{Formatter.pluralize(problem_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
+    return if problem_count.zero?
+    ofail errors_summary unless strict
+  end
+
+  def format_problem_lines(problems)
+    problems.map { |p| "* #{p.chomp.gsub("\n", "\n    ")}" }
   end
 
   class FormulaText
@@ -184,7 +204,7 @@ module Homebrew
   class FormulaAuditor
     include FormulaCellarChecks
 
-    attr_reader :formula, :text, :problems
+    attr_reader :formula, :text, :problems, :new_formula_problems
 
     def initialize(formula, options = {})
       @formula = formula
@@ -199,6 +219,7 @@ module Homebrew
       # Allow the actual official-ness of a formula to be overridden, for testing purposes
       @official_tap = formula.tap&.official? || options[:official_tap]
       @problems = []
+      @new_formula_problems = []
       @text = FormulaText.new(formula.path)
       @specs = %w[stable devel head].map { |s| formula.send(s) }.compact
     end
@@ -206,6 +227,10 @@ module Homebrew
     def audit_style
       return unless @style_offenses
       @style_offenses.each do |offense|
+        if offense.cop_name.start_with?("NewFormulaAudit")
+          new_formula_problem offense.to_s(display_cop_name: @display_cop_names)
+          next
+        end
         problem offense.to_s(display_cop_name: @display_cop_names)
       end
     end
@@ -360,7 +385,7 @@ module Homebrew
           if @new_formula && dep_f.keg_only_reason &&
              !["openssl", "apr", "apr-util"].include?(dep.name) &&
              [:provided_by_macos, :provided_by_osx].include?(dep_f.keg_only_reason.reason)
-            problem "Dependency '#{dep.name}' may be unnecessary as it is provided by macOS; try to build this formula without it."
+            new_formula_problem "Dependency '#{dep.name}' may be unnecessary as it is provided by macOS; try to build this formula without it."
           end
 
           dep.options.each do |opt|
@@ -475,15 +500,15 @@ module Homebrew
 
       return if metadata.nil?
 
-      problem "GitHub fork (not canonical repository)" if metadata["fork"]
+      new_formula_problem "GitHub fork (not canonical repository)" if metadata["fork"]
       if formula&.tap&.core_tap? &&
          (metadata["forks_count"] < 20) && (metadata["subscribers_count"] < 20) &&
          (metadata["stargazers_count"] < 50)
-        problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
+        new_formula_problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
       end
 
       return if Date.parse(metadata["created_at"]) <= (Date.today - 30)
-      problem "GitHub repository too new (<30 days old)"
+      new_formula_problem "GitHub repository too new (<30 days old)"
     end
 
     def audit_specs
@@ -510,8 +535,7 @@ module Homebrew
         end
 
         next if spec.patches.empty?
-        next unless @new_formula
-        problem "New formulae should not require patches to build. Patches should be submitted and accepted upstream first."
+        new_formula_problem "New formulae should not require patches to build. Patches should be submitted and accepted upstream first."
       end
 
       %w[Stable Devel].each do |name|
@@ -534,7 +558,7 @@ module Homebrew
       end
 
       if @new_formula && formula.head
-        problem "New formulae should not have a HEAD spec"
+        new_formula_problem "New formulae should not have a HEAD spec"
       end
 
       unstable_whitelist = %w[
@@ -813,6 +837,10 @@ module Homebrew
 
     def problem(p)
       @problems << p
+    end
+
+    def new_formula_problem(p)
+      @new_formula_problems << p
     end
 
     def head_only?(formula)

@@ -291,4 +291,35 @@ module GitHub
     uri.query = query_string(*queries, **qualifiers)
     open_api(uri) { |json| json.fetch("items", []) }
   end
+
+  def create_issue_no_op?
+    !ENV.key?("HOMEBREW_GH_REPO") || !ENV.key?("HOMEBREW_NEW_FORMULA_PULL_REQUEST_URL")
+  end
+
+  def create_issue_comment(body)
+    repo = ENV["HOMEBREW_GH_REPO"]
+    pull_request = extract_pull_request_number
+    url = "https://api.github.com/repos/Homebrew/#{repo}/issues/#{pull_request}/comments"
+    data = { "body" => body }
+    return if issue_comment_exists?(repo, pr_number, body)
+    scopes = CREATE_ISSUE_SCOPES
+    open_api(url, data: data, scopes: scopes)
+  end
+
+  def extract_pull_request_number
+    pattern = /#(\d+)$/
+    ENV["HOMEBREW_NEW_FORMULA_PULL_REQUEST_URL"].match(pattern)[1]
+  end
+
+  def issue_comment_exists?(repo, pull_reqest, body)
+    url = "https://api.github.com/repos/Homebrew/#{repo}/issues/#{pull_reqest}/comments"
+    comments = open_api(url)
+    return unless comments
+    comments.any? { |comment| comment["body"].eql?(body) }
+  end
+
+  def api_errors
+    [GitHub::AuthenticationFailedError, GitHub::HTTPNotFoundError,
+     GitHub::RateLimitExceededError, GitHub::Error, JSON::ParserError].freeze
+  end
 end
