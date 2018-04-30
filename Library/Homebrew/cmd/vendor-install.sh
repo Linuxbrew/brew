@@ -13,22 +13,17 @@ if [[ -n "$HOMEBREW_MACOS" ]]
 then
   if [[ "$HOMEBREW_PROCESSOR" = "Intel" ]]
   then
-    ruby_URL="https://homebrew.bintray.com/bottles-portable-ruby/portable-ruby-2.3.3.leopard_64.bottle.1.tar.gz"
-    ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3/portable-ruby-2.3.3.leopard_64.bottle.1.tar.gz"
-    ruby_SHA="34ce9e4c9c1be28db564d744165aa29291426f8a3d2ef806ba4f0b9175aedb2b"
+    ruby_URL="https://homebrew.bintray.com/bottles-portable-ruby/portable-ruby-2.3.3_1.leopard_64.bottle.tar.gz"
+    ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3_1/portable-ruby-2.3.3_1.leopard_64.bottle.tar.gz"
+    ruby_SHA="a7f8ebcae0a3d88b3f1d9fd1ff77330b64a52a4fb5cbf25e3e02bec0211cbe23"
   fi
 elif [[ -n "$HOMEBREW_LINUX" ]]
 then
   case "$HOMEBREW_PROCESSOR" in
-    armv7l)
-      ruby_URL="https://homebrew.bintray.com/bottles-portable-ruby/portable-ruby-2.3.3.armv7l_linux.bottle.1.tar.gz"
-      ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3/portable-ruby-2.3.3.armv7l_linux.bottle.1.tar.gz"
-      ruby_SHA="d26affe6f6ac299557a9044b311b4066b554874fc828ebc323d2705d3f4a8249"
-      ;;
     x86_64)
-      ruby_URL="https://homebrew.bintray.com/bottles-portable-ruby/portable-ruby-2.3.3.x86_64_linux.bottle.1.tar.gz"
-      ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3/portable-ruby-2.3.3.x86_64_linux.bottle.1.tar.gz"
-      ruby_SHA="33643b1ca6f860d6df01686636326785763e5e81cf0cef37d8a7ab96a6ca1fa1"
+      ruby_URL="https://homebrew.bintray.com/bottles-portable-ruby/portable-ruby-2.3.3_1.x86_64_linux.bottle.tar.gz"
+      ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3_1/portable-ruby-2.3.3.x86_64_linux.bottle.tar.gz"
+      ruby_SHA="1615136f44b2b8c0106f28ef1cae95f3abb7c083a7e42300fd2a3de021601f7b"
       ;;
   esac
 fi
