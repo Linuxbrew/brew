@@ -89,7 +89,6 @@ __brew_common_commands() {
     'reinstall:install a formula anew; re-using its current options'
     'leaves:show installed formulae that are not dependencies of another installed formula'
     'link:link a formula'
-    'linkapps:symlink .app bundles provided by formulae into /Applications'
     'list:list files in a formula or not-installed formulae'
     'log:git commit log for a formula'
     'missing:check all installed formuale for missing dependencies.'
@@ -108,7 +107,6 @@ __brew_common_commands() {
     'test-bot:test a formula and build a bottle'
     'uninstall:uninstall a formula'
     'unlink:unlink a formula'
-    'unlinkapps:remove symlinked .app bundles provided by formulae from /Applications'
     'unpin:unpin specified formulae'
     'untap:remove a tapped repository'
     'update:fetch latest version of Homebrew and all formulae'
@@ -448,13 +446,6 @@ _brew_linkage() {
     ':formula:__brew_installed_formulae'
 }
 
-# brew linkapps [--local] [formulae]:
-_brew_linkapps() {
-  _arguments \
-    '(--local)--local[symlink into ~/Application instead of the system directory]' \
-    '::formula:__brew_installed_formulae'
-}
-
 # brew list, ls [--full-name]:
 # brew list, ls --unbrewed:
 # brew list, ls [--versions [--multiple]] [--pinned] [formulae]:
@@ -700,14 +691,6 @@ _brew_uninstall() {
 # brew unlink [--dry-run] formula:
 _brew_unlink() {
   _arguments \
-    '(--dry-run -n)'{--dry-run,-n}'[don''t unlink or delete any files]' \
-    ':formula:__brew_installed_formulae'
-}
-
-# brew unlinkapps [--local] [--dry-run] [formulae]:
-_brew_unlinkapps() {
-  _arguments \
-    '(--local)--local[remove symlinks from ~/Applications instead of the system directory]' \
     '(--dry-run -n)'{--dry-run,-n}'[don''t unlink or delete any files]' \
     ':formula:__brew_installed_formulae'
 }
