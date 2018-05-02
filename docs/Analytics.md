@@ -32,7 +32,7 @@ You can also view all the information that is sent by Homebrew's analytics by se
 
 It is impossible for the Homebrew developers to match any particular event to any particular user, even if we had access to the Homebrew analytics user ID (which we do not). An example of the most user-specific information we can see from Google Analytics:
 
-![Aggregate user analytics](img/docs/analytics.png)
+![Aggregate user analytics](assets/img/docs/analytics.png)
 
 As far as we can tell it would be impossible for Google to match the randomly generated Homebrew-only analytics user ID to any other Google Analytics user ID. If Google turned evil the only thing they could do would be to lie about anonymising IP addresses and attempt to match users based on IP addresses.
 

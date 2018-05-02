@@ -1,6 +1,8 @@
 title: Homebrew Documentation
 description: Documentation for the missing package manager for macOS.
 
+theme: jekyll-theme-homebrew
+
 exclude:
   - bin
   - CNAME
@@ -10,7 +12,6 @@ exclude:
 plugins:
   - jekyll-feed
   - jekyll-sitemap
-  - jekyll-seo-tag
 
 permalink: :title
 
