@@ -138,7 +138,7 @@ module Homebrew
       [checksum.hash_type, checksum.hexdigest]
     end
 
-    new_hash = @args[hash_type]
+    new_hash = @args[hash_type] if hash_type
     new_tag = @args.tag
     new_revision = @args.revision
     new_mirror = @args.mirror
