@@ -156,10 +156,6 @@ GEM
     jekyll-theme-hacker (0.1.1)
       jekyll (~> 3.5)
       jekyll-seo-tag (~> 2.0)
-    jekyll-theme-homebrew (1.0.0)
-      jekyll (~> 3)
-      jekyll-feed (~> 0)
-      jekyll-seo-tag (~> 2)
     jekyll-theme-leap-day (0.1.1)
       jekyll (~> 3.5)
       jekyll-seo-tag (~> 2.0)
@@ -249,7 +245,6 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
-  jekyll-theme-homebrew
 
 BUNDLED WITH
    1.16.1
