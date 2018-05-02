@@ -13,20 +13,15 @@ We now accept versioned formulae as long as they [meet the requirements](Version
 
 ### We don’t like tools that upgrade themselves
 Software that can upgrade itself does not integrate well with Homebrew's own
-upgrade functionality.
+upgrade functionality. The self-update functionality should be disabled (if possible without complicating the formula).
 
-### We don’t like install-scripts that download things
-Because that circumvents our hash-checks, makes finding/fixing bugs
-harder, often breaks patches and disables the caching. Almost always you
-can add a resource to the formula file to handle the
-separate download and then the installer script will not attempt to load
-that stuff on demand. Or there is a command-line switch where you can
-point it to the downloaded archive in order to avoid loading.
+### We don’t like install-scripts that download unversioned things
+We don't like install scripts that are pulling from the `master` branch of Git repositories or unversioned, unchecksummed tarballs. These should use `resource` blocks with specific revisions or checksummed tarballs instead. Note that we now allow tools like `cargo`, `gem` and `pip` to download things during installation.
 
 ### We don’t like binary formulae
 Our policy is that formulae in the core tap
 ([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be open-source
-and either built from source or produce cross-platform binaries (e.g. Java).
+and either built from source or produce cross-platform binaries (e.g. Java, Mono).
 Binary-only formulae should go to
 [Homebrew Cask](https://github.com/caskroom/homebrew-cask).
 
@@ -41,7 +36,7 @@ due to upstream changes and we can’t provide [bottles](Bottles.md) for them.
 ### Niche (or self-submitted) stuff
 The software in question must:
 
-* be maintained (e.g. upstream is still making new releases)
+* be maintained (i.e. the last release wasn't ages ago, it works without patching on all supported macOS releases and has no outstanding, unpatched security vulnerabilites)
 * be known
 * be stable (e.g. not declared "unstable" or "beta" by upstream)
 * be used
