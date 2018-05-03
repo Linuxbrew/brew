@@ -2,10 +2,7 @@ require "keg"
 require "formula"
 
 class LinkageChecker
-  attr_reader :keg, :formula
-  attr_reader :brewed_dylibs, :system_dylibs, :broken_dylibs, :broken_deps, :variable_dylibs
-  attr_reader :undeclared_deps, :unnecessary_deps, :reverse_links
-  attr_reader :unwanted_system_dylibs
+  attr_reader :undeclared_deps
 
   def initialize(keg, formula = nil)
     @keg = keg
@@ -23,6 +20,46 @@ class LinkageChecker
     check_dylibs
   end
 
+  def display_normal_output
+    display_items "System libraries", @system_dylibs
+    display_items "Homebrew libraries", @brewed_dylibs
+    display_items "Indirect dependencies with linkage", @indirect_deps
+    display_items "Variable-referenced libraries", @variable_dylibs
+    display_items "Missing libraries", @broken_dylibs
+    display_items "Broken dependencies", @broken_deps
+    display_items "Undeclared dependencies with linkage", @undeclared_deps
+    display_items "Dependencies with no linkage", @unnecessary_deps
+    display_items "Unwanted system libraries", @unwanted_system_dylibs
+  end
+
+  def display_reverse_output
+    return if @reverse_links.empty?
+    sorted = @reverse_links.sort
+    sorted.each do |dylib, files|
+      puts dylib
+      files.each do |f|
+        unprefixed = f.to_s.strip_prefix "#{@keg}/"
+        puts "  #{unprefixed}"
+      end
+      puts unless dylib == sorted.last[0]
+    end
+  end
+
+  def display_test_output(puts_output: true)
+    display_items "Missing libraries", @broken_dylibs, puts_output: puts_output
+    display_items "Broken dependencies", @broken_deps, puts_output: puts_output
+    display_items "Unwanted system libraries", @unwanted_system_dylibs
+    puts "No broken library linkage" unless broken_library_linkage?
+  end
+
+  def broken_library_linkage?
+    !@broken_dylibs.empty? || !@broken_deps.empty? || !@unwanted_system_dylibs.empty?
+  end
+
+  private
+
+  attr_reader :keg, :formula
+
   def dylib_to_dep(dylib)
     dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
     Regexp.last_match(2)
@@ -32,7 +69,7 @@ class LinkageChecker
     checked_dylibs = Set.new
     @keg.find do |file|
       next if file.symlink? || file.directory?
-      next unless file.dylib? || file.binary_executable? || file.mach_o_bundle?
+      next if !file.dylib? && !file.binary_executable? && !file.mach_o_bundle?
 
       # weakly loaded dylibs may not actually exist on disk, so skip them
       # when checking for broken linkage
@@ -66,7 +103,7 @@ class LinkageChecker
         checked_dylibs << dylib
       end
 
-      next unless OS.linux?
+      next if OS.mac?
       system_whitelist = %w[
         ld-linux-x86-64.so.2
         libc.so.6
@@ -88,7 +125,7 @@ class LinkageChecker
     end
 
     @indirect_deps, @undeclared_deps, @unnecessary_deps = check_undeclared_deps if formula
-    @undeclared_deps -= ["gcc", "glibc"] if OS.linux?
+    @undeclared_deps -= ["gcc", "glibc"] unless OS.mac?
   end
 
   def check_undeclared_deps
@@ -97,30 +134,45 @@ class LinkageChecker
       next false unless dep.optional? || dep.recommended?
       formula.build.without?(dep)
     end
-    declared_deps = formula.deps.reject { |dep| filter_out.call(dep) }.map(&:name)
-    runtime_deps = keg.to_formula.runtime_dependencies(read_from_tab: false)
-    recursive_deps = runtime_deps.map { |dep| dep.to_formula.name }
-    declared_dep_names = declared_deps.map { |dep| dep.split("/").last }
+
+    declared_deps_full_names = formula.deps
+                                      .reject { |dep| filter_out.call(dep) }
+                                      .map(&:name)
+    declared_deps_names = declared_deps_full_names.map do |dep|
+      dep.split("/").last
+    end
+    recursive_deps = formula.declared_runtime_dependencies.map do |dep|
+      begin
+        dep.to_formula.name
+      rescue FormulaUnavailableError
+        nil
+      end
+    end.compact
+
     indirect_deps = []
     undeclared_deps = []
     @brewed_dylibs.each_key do |full_name|
       name = full_name.split("/").last
       next if name == formula.name
       if recursive_deps.include?(name)
-        indirect_deps << full_name unless declared_dep_names.include?(name)
+        indirect_deps << full_name unless declared_deps_names.include?(name)
       else
         undeclared_deps << full_name
       end
     end
+
     sort_by_formula_full_name!(indirect_deps)
     sort_by_formula_full_name!(undeclared_deps)
-    unnecessary_deps = declared_dep_names.reject do |full_name|
+
+    unnecessary_deps = declared_deps_full_names.reject do |full_name|
+      next true if Formula[full_name].bin.directory?
       name = full_name.split("/").last
-      next true if Formula[name].bin.directory?
       @brewed_dylibs.keys.map { |x| x.split("/").last }.include?(name)
     end
+
     missing_deps = @broken_deps.values.flatten.map { |d| dylib_to_dep(d) }
     unnecessary_deps -= missing_deps
+
     [indirect_deps, undeclared_deps, unnecessary_deps]
   end
 
@@ -136,59 +188,6 @@ class LinkageChecker
     end
   end
 
-  def display_normal_output
-    display_items "System libraries", @system_dylibs
-    display_items "Homebrew libraries", @brewed_dylibs
-    display_items "Indirect dependencies with linkage", @indirect_deps
-    display_items "Variable-referenced libraries", @variable_dylibs
-    display_items "Missing libraries", @broken_dylibs
-    display_items "Broken dependencies", @broken_deps
-    display_items "Undeclared dependencies with linkage", @undeclared_deps
-    display_items "Dependencies with no linkage", @unnecessary_deps
-  end
-
-  def display_reverse_output
-    return if @reverse_links.empty?
-    sorted = @reverse_links.sort
-    sorted.each do |dylib, files|
-      puts dylib
-      files.each do |f|
-        unprefixed = f.to_s.strip_prefix "#{@keg}/"
-        puts "  #{unprefixed}"
-      end
-      puts unless dylib == sorted.last[0]
-    end
-  end
-
-  def display_test_output
-    display_items "System libraries", @system_dylibs if OS.linux?
-    display_items "Missing libraries", @broken_dylibs
-    display_items "Broken dependencies", @broken_deps
-    display_items "Dependencies with no linkage", @unnecessary_deps
-    puts "No broken dylib links" if @broken_dylibs.empty?
-    return unless OS.linux?
-    display_items "Unwanted system libraries", @unwanted_system_dylibs
-    puts "No unwanted system libraries" if @unwanted_system_dylibs.empty?
-  end
-
-  def broken_dylibs?
-    !@broken_dylibs.empty?
-  end
-
-  def undeclared_deps?
-    !@undeclared_deps.empty?
-  end
-
-  def unnecessary_deps?
-    !@unnecessary_deps.empty?
-  end
-
-  def unwanted_system_dylibs?
-    !@unwanted_system_dylibs.empty?
-  end
-
-  private
-
   # Whether or not dylib is a harmless broken link, meaning that it's
   # okay to skip (and not report) as broken.
   def harmless_broken_link?(dylib)
@@ -202,20 +201,22 @@ class LinkageChecker
 
   # Display a list of things.
   # Things may either be an array, or a hash of (label -> array)
-  def display_items(label, things)
+  def display_items(label, things, puts_output: true)
     return if things.empty?
-    puts "#{label}:"
+    output = "#{label}:"
     if things.is_a? Hash
       things.keys.sort.each do |list_label|
         things[list_label].sort.each do |item|
-          puts "  #{item} (#{list_label})"
+          output += "\n  #{item} (#{list_label})"
         end
       end
     else
       things.sort.each do |item|
-        puts "  #{item}"
+        output += "\n  #{item}"
       end
     end
+    puts output if puts_output
+    output
   end
 
   def resolve_formula(keg)

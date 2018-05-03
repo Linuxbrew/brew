@@ -1,5 +1,6 @@
 require "optparse"
 require "ostruct"
+require "set"
 
 module Homebrew
   module CLI
@@ -13,6 +14,8 @@ module Homebrew
         @parsed_args = OpenStruct.new
         # undefine tap to allow --tap argument
         @parsed_args.instance_eval { undef tap }
+        @constraints = []
+        @conflicts = []
         instance_eval(&block)
       end
 
@@ -34,7 +37,7 @@ module Homebrew
         end
       end
 
-      def flag(name, description: nil)
+      def flag(name, description: nil, required_for: nil, depends_on: nil)
         if name.end_with? "="
           required = OptionParser::REQUIRED_ARGUMENT
           name.chomp! "="
@@ -45,10 +48,16 @@ module Homebrew
         @parser.on(name, description, required) do |option_value|
           @parsed_args[option_to_name(name)] = option_value
         end
+
+        set_constraints(name, required_for: required_for, depends_on: depends_on)
+      end
+
+      def conflicts(*options)
+        @conflicts << options.map { |option| option_to_name(option) }
       end
 
       def option_to_name(name)
-        name.sub(/\A--?/, "").tr("-", "_")
+        name.sub(/\A--?/, "").tr("-", "_").delete("=")
       end
 
       def option_to_description(*names)
@@ -57,6 +66,7 @@ module Homebrew
 
       def parse(cmdline_args = ARGV)
         @parser.parse(cmdline_args)
+        check_constraint_violations
         @parsed_args
       end
 
@@ -81,6 +91,91 @@ module Homebrew
         when :force   then [["-f", "--force"], :force]
         else name
         end
+      end
+
+      def option_passed?(name)
+        @parsed_args.respond_to?(name) || @parsed_args.respond_to?("#{name}?")
+      end
+
+      def set_constraints(name, depends_on:, required_for:)
+        secondary = option_to_name(name)
+        unless required_for.nil?
+          primary = option_to_name(required_for)
+          @constraints << [primary, secondary, :mandatory]
+        end
+
+        return if depends_on.nil?
+        primary = option_to_name(depends_on)
+        @constraints << [primary, secondary, :optional]
+      end
+
+      def check_constraints
+        @constraints.each do |primary, secondary, constraint_type|
+          primary_passed = option_passed?(primary)
+          secondary_passed = option_passed?(secondary)
+          if :mandatory.equal?(constraint_type) && primary_passed && !secondary_passed
+            raise OptionConstraintError.new(primary, secondary)
+          end
+          if secondary_passed && !primary_passed
+            raise OptionConstraintError.new(primary, secondary, missing: true)
+          end
+        end
+      end
+
+      def check_conflicts
+        @conflicts.each do |mutually_exclusive_options_group|
+          violations = mutually_exclusive_options_group.select do |option|
+            option_passed? option
+          end
+          raise OptionConflictError, violations if violations.length > 1
+        end
+      end
+
+      def check_invalid_constraints
+        @conflicts.each do |mutually_exclusive_options_group|
+          @constraints.each do |p, s|
+            next unless Set[p, s].subset?(Set[*mutually_exclusive_options_group])
+            raise InvalidConstraintError.new(p, s)
+          end
+        end
+      end
+
+      def check_constraint_violations
+        check_invalid_constraints
+        check_conflicts
+        check_constraints
+      end
+    end
+
+    class OptionConstraintError < RuntimeError
+      def initialize(arg1, arg2, missing: false)
+        if !missing
+          message = <<~EOS
+            `#{arg1}` and `#{arg2}` should be passed together
+          EOS
+        else
+          message = <<~EOS
+            `#{arg2}` cannot be passed without `#{arg1}`
+          EOS
+        end
+        super message
+      end
+    end
+
+    class OptionConflictError < RuntimeError
+      def initialize(args)
+        args_list = args.join("` and `")
+        super <<~EOS
+          `#{args_list}` are mutually exclusive
+        EOS
+      end
+    end
+
+    class InvalidConstraintError < RuntimeError
+      def initialize(arg1, arg2)
+        super <<~EOS
+          `#{arg1}` and `#{arg2}` cannot be mutually exclusive and mutually dependent simultaneously
+        EOS
       end
     end
   end

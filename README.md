@@ -117,7 +117,7 @@ Second, read the [Troubleshooting Checklist](https://docs.brew.sh/Troubleshootin
 
 ## Contributing
 
-We'd love you to contribute to Linuxbrew. First, please read our [Contribution Guide](https://github.com/Linuxbrew/brew/blob/master/CONTRIBUTING.md) and [Code of Conduct](https://github.com/Linuxbrew/brew/blob/master/CODE_OF_CONDUCT.md#code-of-conduct). Please see our [guidelines](https://github.com/Linuxbrew/brew/blob/master/CONTRIBUTING.md#contributing-to-linuxbrew) on whether to send pull requests to Linuxbrew or Homebrew.
+We'd love you to contribute to Linuxbrew. First, please read our [Contribution Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md#code-of-conduct). Please see our [guidelines](CONTRIBUTING.md#contributing-to-linuxbrew) on whether to send pull requests to Linuxbrew or Homebrew.
 
 We explicitly welcome contributions from people who have never contributed to open-source before: we were all beginners once! We can help build on a partially working pull request with the aim of getting it merged. We are also actively seeking to diversify our contributors and especially welcome contributions from women from all backgrounds and people of colour.
 
@@ -146,7 +146,7 @@ Former maintainers with significant contributions include [Bob W. Hogg](https://
 - [@Linuxbrew (Twitter)](https://twitter.com/Linuxbrew)
 
 ## License
-Code is under the [BSD 2-clause "Simplified" License](https://github.com/Linuxbrew/brew/tree/master/LICENSE.txt).
+Code is under the [BSD 2-clause "Simplified" License](LICENSE.txt).
 Documentation is under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/).
 
 ## Donations

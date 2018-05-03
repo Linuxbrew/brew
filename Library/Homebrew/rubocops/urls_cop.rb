@@ -191,8 +191,7 @@ module RuboCop
           end
         end
       end
-    end
-    module FormulaAuditStrict
+
       class PyPiUrls < FormulaCop
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           urls = find_every_func_call_by_name(body_node, :url)

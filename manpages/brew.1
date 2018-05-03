@@ -466,7 +466,7 @@ Symlink all of the specific \fIversion\fR of \fIformula\fR\'s install to Homebre
 List all installed taps\.
 .
 .TP
-\fBtap\fR [\fB\-\-full\fR] \fIuser\fR\fB/\fR\fIrepo\fR [\fIURL\fR]
+\fBtap\fR [\fB\-\-full\fR] [\fB\-\-force\-auto\-update\fR] \fIuser\fR\fB/\fR\fIrepo\fR [\fIURL\fR]
 Tap a formula repository\.
 .
 .IP
@@ -477,6 +477,9 @@ With \fIURL\fR specified, taps a formula repository from anywhere, using any tra
 .
 .IP
 By default, the repository is cloned as a shallow copy (\fB\-\-depth=1\fR), but if \fB\-\-full\fR is passed, a full clone will be used\. To convert a shallow copy to a full copy, you can retap passing \fB\-\-full\fR without first untapping\.
+.
+.IP
+By default, only taps hosted on GitHub are auto\-updated (for performance reasons)\. If \fB\-\-force\-auto\-update\fR is passed, this tap will be auto\-updated even if it is not hosted on GitHub\.
 .
 .IP
 \fBtap\fR is re\-runnable and exits successfully if there\'s nothing to do\. However, retapping with a different \fIURL\fR will cause an exception, so first \fBuntap\fR if you need to modify the \fIURL\fR\.

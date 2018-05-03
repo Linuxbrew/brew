@@ -17,19 +17,19 @@ on the result of the job.
 For example, a job which has been queued but not yet completed will have a
 section in the pull request that looks like this:
 
-![Triggered Pull Request](img/docs/brew-test-bot-triggered-pr.png)
+![Triggered Pull Request](assets/img/docs/brew-test-bot-triggered-pr.png)
 
 ---
 
 A failed build looks like this:
 
-![Failed Pull Request](img/docs/brew-test-bot-failed-pr.png)
+![Failed Pull Request](assets/img/docs/brew-test-bot-failed-pr.png)
 
 ---
 
 A passed build looks like this:
 
-![Passed Pull Request](img/docs/brew-test-bot-passed-pr.png)
+![Passed Pull Request](assets/img/docs/brew-test-bot-passed-pr.png)
 
 ---
 
@@ -38,13 +38,13 @@ in Jenkins.
 
 A passed build looks like this:
 
-![Passed Jenkins Build](img/docs/brew-test-bot-passed-jenkins.png)
+![Passed Jenkins Build](assets/img/docs/brew-test-bot-passed-jenkins.png)
 
 ---
 
 A failed build looks like this:
 
-![Failed Jenkins Build](img/docs/brew-test-bot-failed-jenkins.png)
+![Failed Jenkins Build](assets/img/docs/brew-test-bot-failed-jenkins.png)
 
 ---
 
@@ -52,6 +52,6 @@ You can click the test results link
 (e.g. `brew-test-bot.el_capitan.install openssl`) to
 view the failed test output:
 
-![Failed Test](img/docs/brew-test-bot-failed-test.png)
+![Failed Test](assets/img/docs/brew-test-bot-failed-test.png)
 
 ---

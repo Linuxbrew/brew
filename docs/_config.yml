@@ -1,6 +1,8 @@
 title: Homebrew Documentation
 description: Documentation for the missing package manager for macOS.
 
+remote_theme: Homebrew/brew-sh
+
 exclude:
   - bin
   - CNAME
@@ -9,8 +11,9 @@ exclude:
 
 plugins:
   - jekyll-feed
-  - jekyll-sitemap
+  - jekyll-remote-theme
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 permalink: :title
 
@@ -18,12 +21,9 @@ defaults:
   - scope:
       path: ""
     values:
-      image: /img/homebrew-256x256.png
+      image: /assets/img/homebrew-256x256.png
 
-logo: /img/homebrew-256x256.png
-
-github:
-  repository_nwo: Homebrew/brew
+logo: /assets/img/homebrew-256x256.png
 
 twitter:
   username: MacHomebrew
