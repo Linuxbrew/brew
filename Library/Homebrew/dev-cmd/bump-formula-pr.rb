@@ -48,7 +48,7 @@ module Homebrew
   module_function
 
   def bump_formula_pr
-    @args = Homebrew::CLI::Parser.parse do
+    @bump_args = Homebrew::CLI::Parser.parse do
       switch    "--devel"
       switch    "-n", "--dry-run"
       switch    "--write"
@@ -96,7 +96,7 @@ module Homebrew
       checked_for_duplicates = true
     end
 
-    new_url = @args.url
+    new_url = @bump_args.url
     if new_url && !formula
       # Split the new URL on / and find any formulae that have the same URL
       # except for the last component, but don't try to match any more than the
@@ -107,7 +107,7 @@ module Homebrew
       components_to_match = [new_url_split.count - 1, maximum_url_components_to_match].min
       base_url = new_url_split.first(components_to_match).join("/")
       base_url = /#{Regexp.escape(base_url)}/
-      is_devel = @args.devel?
+      is_devel = @bump_args.devel?
       guesses = []
       Formula.each do |f|
         if is_devel && f.devel && f.devel.url && f.devel.url.match(base_url)
@@ -126,7 +126,7 @@ module Homebrew
 
     check_for_duplicate_pull_requests(formula) unless checked_for_duplicates
 
-    requested_spec, formula_spec = if @args.devel?
+    requested_spec, formula_spec = if @bump_args.devel?
       devel_message = " (devel)"
       [:devel, formula.devel]
     else
@@ -138,11 +138,11 @@ module Homebrew
       [checksum.hash_type, checksum.hexdigest]
     end
 
-    new_hash = @args[hash_type] if hash_type
-    new_tag = @args.tag
-    new_revision = @args.revision
-    new_mirror = @args.mirror
-    forced_version = @args.version
+    new_hash = @bump_args[hash_type] if hash_type
+    new_tag = @bump_args.tag
+    new_revision = @bump_args.revision
+    new_mirror = @bump_args.mirror
+    forced_version = @bump_args.version
     new_url_hash = if new_url && new_hash
       true
     elsif new_tag && new_revision
@@ -179,7 +179,7 @@ module Homebrew
       end
     end
 
-    if @args.dry_run?
+    if @bump_args.dry_run?
       ohai "brew update"
     else
       safe_system "brew", "update"
@@ -208,7 +208,7 @@ module Homebrew
       ]
     end
 
-    backup_file = File.read(formula.path) unless @args.dry_run?
+    backup_file = File.read(formula.path) unless @bump_args.dry_run?
 
     if new_mirror
       replacement_pairs << [/^( +)(url \"#{Regexp.escape(new_url)}\"\n)/m, "\\1\\2\\1mirror \"#{new_mirror}\"\n"]
@@ -238,31 +238,31 @@ module Homebrew
     new_formula_version = formula_version(formula, requested_spec, new_contents)
 
     if new_formula_version < old_formula_version
-      formula.path.atomic_write(backup_file) unless @args.dry_run?
+      formula.path.atomic_write(backup_file) unless @bump_args.dry_run?
       odie <<~EOS
         You probably need to bump this formula manually since changing the
         version from #{old_formula_version} to #{new_formula_version} would be a downgrade.
       EOS
     elsif new_formula_version == old_formula_version
-      formula.path.atomic_write(backup_file) unless @args.dry_run?
+      formula.path.atomic_write(backup_file) unless @bump_args.dry_run?
       odie <<~EOS
         You probably need to bump this formula manually since the new version
         and old version are both #{new_formula_version}.
       EOS
     end
 
-    if @args.dry_run?
-      if @args.strict?
+    if @bump_args.dry_run?
+      if @bump_args.strict?
         ohai "brew audit --strict #{formula.path.basename}"
-      elsif @args.audit?
+      elsif @bump_args.audit?
         ohai "brew audit #{formula.path.basename}"
       end
     else
       failed_audit = false
-      if @args.strict?
+      if @bump_args.strict?
         system HOMEBREW_BREW_FILE, "audit", "--strict", formula.path
         failed_audit = !$CHILD_STATUS.success?
-      elsif @args.audit?
+      elsif @bump_args.audit?
         system HOMEBREW_BREW_FILE, "audit", formula.path
         failed_audit = !$CHILD_STATUS.success?
       end
@@ -277,7 +277,7 @@ module Homebrew
       git_dir = Utils.popen_read("git rev-parse --git-dir").chomp
       shallow = !git_dir.empty? && File.exist?("#{git_dir}/shallow")
 
-      if @args.dry_run?
+      if @bump_args.dry_run?
         ohai "fork repository with GitHub API"
         ohai "git fetch --unshallow origin" if shallow
         ohai "git checkout --no-track -b #{branch} origin/master"
@@ -292,7 +292,7 @@ module Homebrew
           # GitHub API responds immediately but fork takes a few seconds to be ready.
           sleep 3
         rescue *gh_api_errors => e
-          formula.path.atomic_write(backup_file) unless @args.dry_run?
+          formula.path.atomic_write(backup_file) unless @bump_args.dry_run?
           odie "Unable to fork: #{e.message}!"
         end
 
@@ -309,7 +309,7 @@ module Homebrew
         pr_message = <<~EOS
           Created with `brew bump-formula-pr`.
         EOS
-        user_message = @args.message
+        user_message = @bump_args.message
         if user_message
           pr_message += "\n" + <<~EOS
             ---
@@ -322,7 +322,7 @@ module Homebrew
         begin
           url = GitHub.create_pull_request(formula.tap.full_name, pr_title,
                                            "#{username}:#{branch}", "master", pr_message)["html_url"]
-          if @args.no_browse?
+          if @bump_args.no_browse?
             puts url
           else
             exec_browser url
@@ -335,7 +335,7 @@ module Homebrew
   end
 
   def inreplace_pairs(path, replacement_pairs)
-    if @args.dry_run?
+    if @bump_args.dry_run?
       contents = path.open("r") { |f| Formulary.ensure_utf8_encoding(f).read }
       contents.extend(StringInreplaceExtension)
       replacement_pairs.each do |old, new|
@@ -347,7 +347,7 @@ module Homebrew
       unless contents.errors.empty?
         raise Utils::InreplaceError, path => contents.errors
       end
-      path.atomic_write(contents) if @args.write?
+      path.atomic_write(contents) if @bump_args.write?
       contents
     else
       Utils::Inreplace.inreplace(path) do |s|
