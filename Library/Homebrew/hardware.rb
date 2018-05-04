@@ -10,6 +10,7 @@ module Hardware
         core2: "-march=core2",
         core: "-march=prescott",
         armv6: "-march=armv6",
+        armv8: "-march=armv8-a",
         dunno: "-march=native",
       }.freeze
 
@@ -149,7 +150,11 @@ module Hardware
         :core
       end
     elsif Hardware::CPU.arm?
-      :armv6
+      if Hardware::CPU.is_64_bit?
+        :armv8
+      else
+        :armv6
+      end
     else
       Hardware::CPU.family
     end
