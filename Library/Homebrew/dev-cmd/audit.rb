@@ -53,7 +53,7 @@ module Homebrew
   module_function
 
   def audit
-    args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch      "--strict"
       switch      "--online"
       switch      "--new-formula"

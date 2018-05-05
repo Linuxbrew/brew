@@ -22,7 +22,7 @@ module Homebrew
   module_function
 
   def tests
-    args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--no-compat"
       switch "--generic"
       switch "--coverage"
@@ -98,8 +98,8 @@ module Homebrew
       # seeds being output when running parallel tests.
       seed = args.seed ? args.seed : rand(0xFFFF).to_i
 
-      args = ["-I", HOMEBREW_LIBRARY_PATH/"test"]
-      args += %W[
+      bundle_args = ["-I", HOMEBREW_LIBRARY_PATH/"test"]
+      bundle_args += %W[
         --seed #{seed}
         --color
         --require spec_helper
@@ -109,21 +109,21 @@ module Homebrew
       ]
 
       unless OS.mac?
-        args << "--tag" << "~needs_macos"
+        bundle_args << "--tag" << "~needs_macos"
         files = files.reject { |p| p =~ %r{^test/(os/mac|cask)(/.*|_spec\.rb)$} }
       end
 
       unless OS.linux?
-        args << "--tag" << "~needs_linux"
+        bundle_args << "--tag" << "~needs_linux"
         files = files.reject { |p| p =~ %r{^test/os/linux(/.*|_spec\.rb)$} }
       end
 
       puts "Randomized with seed #{seed}"
 
       if parallel
-        system "bundle", "exec", "parallel_rspec", *opts, "--", *args, "--", *files
+        system "bundle", "exec", "parallel_rspec", *opts, "--", *bundle_args, "--", *files
       else
-        system "bundle", "exec", "rspec", *args, "--", *files
+        system "bundle", "exec", "rspec", *bundle_args, "--", *files
       end
 
       return if $CHILD_STATUS.success?

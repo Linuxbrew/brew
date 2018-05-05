@@ -20,7 +20,7 @@ module Homebrew
   module_function
 
   def update_test
-    args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--to-tag"
       switch "--keep-tmp"
       switch :verbose

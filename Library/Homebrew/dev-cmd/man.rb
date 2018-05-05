@@ -20,14 +20,14 @@ module Homebrew
   TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
 
   def man
-    @args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--fail-if-changed"
       switch "--link"
     end
 
     raise UsageError unless ARGV.named.empty?
 
-    if @args.link?
+    if args.link?
       odie "`brew man --link` is now done automatically by `brew update`."
     end
 
@@ -35,7 +35,7 @@ module Homebrew
 
     if system "git", "-C", HOMEBREW_REPOSITORY, "diff", "--quiet", "docs/Manpage.md", "manpages"
       puts "No changes to manpage output detected."
-    elsif @args.fail_if_changed?
+    elsif args.fail_if_changed?
       Homebrew.failed = true
     end
   end
@@ -94,7 +94,7 @@ module Homebrew
 
     # Set the manpage date to the existing one if we're checking for changes.
     # This avoids the only change being e.g. a new date.
-    date = if @args.fail_if_changed? &&
+    date = if args.fail_if_changed? &&
               target.extname == ".1" && target.exist?
       /"(\d{1,2})" "([A-Z][a-z]+) (\d{4})" "#{organisation}" "#{manual}"/ =~ target.read
       Date.parse("#{Regexp.last_match(1)} #{Regexp.last_match(2)} #{Regexp.last_match(3)}")

@@ -26,7 +26,7 @@ module Homebrew
   module_function
 
   def list
-    @args = CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--unbrewed"
       switch "--pinned"
       switch "--versions"
@@ -41,7 +41,7 @@ module Homebrew
     end
 
     # Use of exec means we don't explicitly exit
-    list_unbrewed if @args.unbrewed?
+    list_unbrewed if args.unbrewed?
 
     # Unbrewed uses the PREFIX, which will exist
     # Things below use the CELLAR, which doesn't until the first formula is installed.
@@ -50,10 +50,10 @@ module Homebrew
       return
     end
 
-    if @args.pinned? || @args.versions?
+    if args.pinned? || args.versions?
       filtered_list
     elsif ARGV.named.empty?
-      if @args.full_name?
+      if args.full_name?
         full_names = Formula.installed.map(&:full_name).sort(&tap_and_name_comparison)
         return if full_names.empty?
         puts Formatter.columns(full_names)
@@ -61,7 +61,7 @@ module Homebrew
         ENV["CLICOLOR"] = nil
         exec "ls", *ARGV.options_only << HOMEBREW_CELLAR
       end
-    elsif Homebrew.args.verbose? || !$stdout.tty?
+    elsif args.verbose? || !$stdout.tty?
       exec "find", *ARGV.kegs.map(&:to_s) + %w[-not -type d -print]
     else
       ARGV.kegs.each { |keg| PrettyListing.new keg }
@@ -121,7 +121,7 @@ module Homebrew
         rack.exist?
       end
     end
-    if @args.pinned?
+    if args.pinned?
       pinned_versions = {}
       names.sort.each do |d|
         keg_pin = (HOMEBREW_PINNED_KEGS/d.basename.to_s)
@@ -130,12 +130,12 @@ module Homebrew
         end
       end
       pinned_versions.each do |d, version|
-        puts d.basename.to_s.concat(@args.versions? ? " #{version}" : "")
+        puts d.basename.to_s.concat(args.versions? ? " #{version}" : "")
       end
     else # --versions without --pinned
       names.sort.each do |d|
         versions = d.subdirs.map { |pn| pn.basename.to_s }
-        next if @args.multiple? && versions.length < 2
+        next if args.multiple? && versions.length < 2
         puts "#{d.basename} #{versions * " "}"
       end
     end

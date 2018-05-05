@@ -74,7 +74,7 @@ module Homebrew
   def pull
     odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
 
-    @args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--bottle"
       switch "--bump"
       switch "--clean"
@@ -116,7 +116,7 @@ module Homebrew
       end
     end
 
-    do_bump = @args.bump? && !@args.clean?
+    do_bump = args.bump? && !args.clean?
 
     # Formulae with affected bottles that were published
     bintray_published_formulae = []
@@ -135,7 +135,7 @@ module Homebrew
         end
         _, testing_job = *testing_match
         url = "https://github.com/Homebrew/homebrew-#{tap.repo}/compare/master...BrewTestBot:testing-#{testing_job}"
-        odie "Testing URLs require `--bottle`!" unless @args.bottle?
+        odie "Testing URLs require `--bottle`!" unless args.bottle?
       elsif (api_match = arg.match HOMEBREW_PULL_API_REGEX)
         _, user, repo, issue = *api_match
         url = "https://github.com/#{user}/#{repo}/pull/#{issue}"
@@ -147,7 +147,7 @@ module Homebrew
         odie "Not a GitHub pull request or commit: #{arg}"
       end
 
-      if !testing_job && @args.bottle? && issue.nil?
+      if !testing_job && args.bottle? && issue.nil?
         odie "No pull request detected!"
       end
 
@@ -165,11 +165,11 @@ module Homebrew
       orig_revision = `git rev-parse --short HEAD`.strip
       branch = `git symbolic-ref --short HEAD`.strip
 
-      unless branch == "master" || @args.clean? || @args.branch_okay?
+      unless branch == "master" || args.clean? || args.branch_okay?
         opoo "Current branch is #{branch}: do you need to pull inside master?"
       end
 
-      patch_puller = PatchPuller.new(url, @args)
+      patch_puller = PatchPuller.new(url, args)
       patch_puller.fetch_patch
       patch_changes = files_changed_in_patch(patch_puller.patchpath, tap)
 
@@ -217,7 +217,7 @@ module Homebrew
           end
         end
 
-        if @args.bottle?
+        if args.bottle?
           if f.bottle_unneeded?
             ohai "#{f}: skipping unneeded bottle."
           elsif f.bottle_disabled?
@@ -232,7 +232,7 @@ module Homebrew
       end
 
       orig_message = message = `git log HEAD^.. --format=%B`
-      if issue && !@args.clean?
+      if issue && !args.clean?
         ohai "Patch closes issue ##{issue}"
         close_message = "Closes ##{issue}."
         # If this is a pull request, append a close message.
@@ -244,7 +244,7 @@ module Homebrew
         is_bumpable = false
       end
 
-      is_bumpable = false if @args.clean?
+      is_bumpable = false if args.clean?
       is_bumpable = false if ENV["HOMEBREW_DISABLE_LOAD_FORMULA"]
 
       if is_bumpable
@@ -256,7 +256,7 @@ module Homebrew
           odie "No version changes found for #{formula.name}" if bump_subject.nil?
           unless orig_subject == bump_subject
             ohai "New bump commit subject: #{bump_subject}"
-            pbcopy bump_subject unless @args.no_pbcopy?
+            pbcopy bump_subject unless args.no_pbcopy?
             message = "#{bump_subject}\n\n#{message}"
           end
         elsif bump_subject != orig_subject && !bump_subject.nil?
@@ -265,7 +265,7 @@ module Homebrew
         end
       end
 
-      if message != orig_message && !@args.clean?
+      if message != orig_message && !args.clean?
         safe_system "git", "commit", "--amend", "--signoff", "--allow-empty", "-q", "-m", message
       end
 
@@ -276,7 +276,7 @@ module Homebrew
           url
         else
           bottle_branch = "pull-bottle-#{issue}"
-          bot_username = GitHub.test_bot_user(user, @args.test_bot_user)
+          bot_username = GitHub.test_bot_user(user, args.test_bot_user)
           "https://github.com/#{bot_username}/homebrew-#{tap.repo}/compare/#{user}:master...pr-#{issue}"
         end
 
@@ -290,7 +290,7 @@ module Homebrew
         safe_system "git", "branch", "--quiet", "-D", bottle_branch
 
         # Publish bottles on Bintray
-        unless @args.no_publish?
+        unless args.no_publish?
           published = publish_changed_formula_bottles(tap, changed_formulae_names)
           bintray_published_formulae.concat(published)
         end
@@ -320,7 +320,7 @@ module Homebrew
       changed_formulae_names.each do |name|
         f = Formula[name]
         next if f.bottle_unneeded? || f.bottle_disabled?
-        bintray_org = @args.bintray_org || tap.user.downcase
+        bintray_org = args.bintray_org || tap.user.downcase
         next unless publish_bottle_file_on_bintray(f, bintray_org, bintray_creds)
         published << f.full_name
       end
@@ -331,7 +331,7 @@ module Homebrew
   end
 
   def pull_patch(url, description = nil)
-    PatchPuller.new(url, @args, description).pull_patch
+    PatchPuller.new(url, args, description).pull_patch
   end
 
   class PatchPuller
