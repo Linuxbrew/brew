@@ -693,13 +693,27 @@ describe RuboCop::Cop::FormulaAudit::Miscellaneous do
       RUBY
     end
 
-    it "dependencies with invalid options" do
+    it "dependencies with invalid options which lead to force rebuild" do
       expect_offense(<<~RUBY)
         class Foo < Formula
           desc "foo"
           url 'http://example.com/foo-1.0.tgz'
           depends_on "foo" => "with-bar"
-                     ^^^^^^^^^^^^^^^^^^^ Dependency foo should not use option with-bar
+                               ^^^^^^^^ Dependency foo should not use option with-bar
+        end
+      RUBY
+    end
+
+    it "dependencies with invalid options in array value which lead to force rebuild" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          desc "foo"
+          url 'http://example.com/foo-1.0.tgz'
+          depends_on "httpd" => [:build, :test]
+          depends_on "foo" => [:optional, "with-bar"]
+                                           ^^^^^^^^ Dependency foo should not use option with-bar
+          depends_on "icu4c" => [:optional, "c++11"]
+                                             ^^^^^ Dependency icu4c should not use option c++11
         end
       RUBY
     end
