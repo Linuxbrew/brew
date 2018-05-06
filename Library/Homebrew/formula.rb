@@ -1528,7 +1528,8 @@ class Formula
     return [] unless keg
 
     DatabaseCache.new(:linkage) do |database_cache|
-      linkage_checker = LinkageChecker.new(keg, database_cache, false, self)
+      use_cache = !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
+      linkage_checker = LinkageChecker.new(keg, database_cache, use_cache, self)
       break linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
     end
   end

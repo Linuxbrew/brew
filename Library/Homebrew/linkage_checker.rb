@@ -10,46 +10,6 @@ class LinkageChecker
     flush_cache_and_check_dylibs unless use_cache
   end
 
-  # 'Hash-type' cache values
-
-  def brewed_dylibs
-    @brewed_dylibs ||= store.fetch_type(:brewed_dylibs)
-  end
-
-  def reverse_links
-    @reverse_links ||= store.fetch_type(:reverse_links)
-  end
-
-  def broken_deps
-    @broken_deps ||= store.fetch_type(:broken_deps)
-  end
-
-  # 'Path-type' cached values
-
-  def system_dylibs
-    @system_dylibs ||= store.fetch_type(:system_dylibs)
-  end
-
-  def broken_dylibs
-    @broken_dylibs ||= store.fetch_type(:broken_dylibs)
-  end
-
-  def variable_dylibs
-    @variable_dylibs ||= store.fetch_type(:variable_dylibs)
-  end
-
-  def undeclared_deps
-    @undeclared_deps ||= store.fetch_type(:undeclared_deps)
-  end
-
-  def indirect_deps
-    @indirect_deps ||= store.fetch_type(:indirect_deps)
-  end
-
-  def unnecessary_deps
-    @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
-  end
-
   def display_normal_output
     display_items "System libraries", system_dylibs
     display_items "Homebrew libraries", brewed_dylibs
@@ -84,9 +44,49 @@ class LinkageChecker
     !@broken_dylibs.empty? || !@broken_deps.empty?
   end
 
+  def undeclared_deps
+    @undeclared_deps ||= store.fetch_type(:undeclared_deps)
+  end
+
   private
 
   attr_reader :keg, :formula, :store
+
+  # 'Hash-type' cache values
+
+  def brewed_dylibs
+    @brewed_dylibs ||= store.fetch_type(:brewed_dylibs)
+  end
+
+  def reverse_links
+    @reverse_links ||= store.fetch_type(:reverse_links)
+  end
+
+  def broken_deps
+    @broken_deps ||= store.fetch_type(:broken_deps)
+  end
+
+  # 'Path-type' cached values
+
+  def system_dylibs
+    @system_dylibs ||= store.fetch_type(:system_dylibs)
+  end
+
+  def broken_dylibs
+    @broken_dylibs ||= store.fetch_type(:broken_dylibs)
+  end
+
+  def variable_dylibs
+    @variable_dylibs ||= store.fetch_type(:variable_dylibs)
+  end
+
+  def indirect_deps
+    @indirect_deps ||= store.fetch_type(:indirect_deps)
+  end
+
+  def unnecessary_deps
+    @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
+  end
 
   def dylib_to_dep(dylib)
     dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
