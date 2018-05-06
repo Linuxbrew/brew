@@ -22,8 +22,13 @@ then
   case "$HOMEBREW_PROCESSOR" in
     x86_64)
       ruby_URL="https://homebrew.bintray.com/bottles-portable-ruby/portable-ruby-2.3.3_2.x86_64_linux.bottle.tar.gz"
-      ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3_2/portable-ruby-2.3.3.x86_64_linux.bottle.tar.gz"
+      ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3_2/portable-ruby-2.3.3_2.x86_64_linux.bottle.tar.gz"
       ruby_SHA="b5c320c1bc2c4d42d4674643855c582ba2772fc951689d298ee079b74bac29a7"
+      ;;
+    armv[67]*)
+      ruby_URL="https://homebrew.bintray.com/bottles-portable-ruby/portable-ruby-2.3.3_2.armv6_linux.bottle.tar.gz"
+      ruby_URL2="https://github.com/Homebrew/homebrew-portable-ruby/releases/download/2.3.3_2/portable-ruby-2.3.3_2.armv6_linux.bottle.tar.gz"
+      ruby_SHA="6ac992c4620912b50b3c74f2d4447d541bac4f1839e557c3edcfdebb141c9802"
       ;;
   esac
 fi
