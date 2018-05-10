@@ -11,6 +11,9 @@ module Hbc
       def run
         casks.each do |cask|
           odebug "Zapping Cask #{cask}"
+
+          raise CaskNotInstalledError, cask unless cask.installed? || force?
+
           Installer.new(cask, verbose: verbose?, force: force?).zap
         end
       end
