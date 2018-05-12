@@ -6,7 +6,6 @@
 #:    actually remove anything.
 
 require "keg"
-require "cmd/tap"
 
 module Homebrew
   module_function
