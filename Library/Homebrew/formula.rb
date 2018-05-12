@@ -370,6 +370,15 @@ class Formula
     name.include?("@")
   end
 
+  # Returns any `@`-versioned formulae for an non-`@`-versioned formula.
+  def versioned_formulae
+    return [] if versioned_formula?
+
+    Pathname.glob(path.to_s.gsub(/\.rb$/, "@*.rb")).map do |path|
+      Formula[path.basename(".rb").to_s]
+    end.sort
+  end
+
   # A named Resource for the currently active {SoftwareSpec}.
   # Additional downloads can be defined as {#resource}s.
   # {Resource#stage} will create a temporary directory and yield to a block.
