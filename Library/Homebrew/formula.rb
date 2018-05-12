@@ -1559,6 +1559,7 @@ class Formula
       "full_name" => full_name,
       "oldname" => oldname,
       "aliases" => aliases.sort,
+      "versioned_formulae" => versioned_formulae.map(&:name),
       "desc" => desc,
       "homepage" => homepage,
       "versions" => {
