@@ -107,6 +107,56 @@ describe Formula do
     end
   end
 
+  describe "#versioned_formula?" do
+    let(:f) do
+      formula "foo" do
+        url "foo-1.0"
+      end
+    end
+
+    let(:f2) do
+      formula "foo@2.0" do
+        url "foo-2.0"
+      end
+    end
+
+    it "returns true for @-versioned formulae" do
+      expect(f2.versioned_formula?).to be true
+    end
+
+    it "returns false for non-@-versioned formulae" do
+      expect(f.versioned_formula?).to be false
+    end
+  end
+
+  describe "#versioned_formulae" do
+    let(:f) do
+      formula "foo" do
+        url "foo-1.0"
+      end
+    end
+
+    let(:f2) do
+      formula "foo@2.0" do
+        url "foo-2.0"
+      end
+    end
+
+    it "returns true by default" do
+      FileUtils.touch f.path
+      FileUtils.touch f2.path
+      allow(Formulary).to receive(:load_formula_from_path).with(f2.name, f2.path).and_return(f2)
+      allow(Formulary).to receive(:factory).with(f2.name).and_return(f2)
+      expect(f.versioned_formulae).to eq [f2]
+    end
+
+    it "returns empty array for non-@-versioned formulae" do
+      FileUtils.touch f.path
+      FileUtils.touch f2.path
+      expect(f2.versioned_formulae).to be_empty
+    end
+  end
+
   example "installed alias with core" do
     f = formula do
       url "foo-1.0"
@@ -708,7 +758,7 @@ describe Formula do
       expect(f3.runtime_dependencies.map(&:name)).to eq(["foo/bar/f1", "baz/qux/f2"])
     end
 
-    it "includes non-declared direct dependencies", :focus do
+    it "includes non-declared direct dependencies" do
       formula = Class.new(Testball).new
       dependency = formula("dependency") { url "f-1.0" }
 
