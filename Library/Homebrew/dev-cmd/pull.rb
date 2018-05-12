@@ -102,6 +102,18 @@ module Homebrew
       ENV["GIT_COMMITTER_EMAIL"] = ENV["HOMEBREW_GIT_EMAIL"]
     end
 
+    # Depending on user configuration, git may try to invoke gpg.
+    begin
+      gnupg = Formula["gnupg"]
+    rescue FormulaUnavailableError # rubocop:disable Lint/HandleExceptions
+    else
+      if gnupg.installed?
+        path = PATH.new(ENV.fetch("PATH"))
+        path.prepend(gnupg.installed_prefix/"bin")
+        ENV["PATH"] = path
+      end
+    end
+
     do_bump = @args.bump? && !@args.clean?
 
     # Formulae with affected bottles that were published
