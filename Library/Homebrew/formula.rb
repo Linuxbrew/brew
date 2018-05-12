@@ -1564,7 +1564,7 @@ class Formula
       "keg_only" => keg_only?,
       "options" => [],
       "build_dependencies" => dependencies.select(&:build?).map(&:name).uniq,
-      "dependencies" => dependencies.map(&:name).uniq,
+      "dependencies" => dependencies.reject(&:optional?).reject(&:recommended?).reject(&:build?).map(&:name).uniq,
       "recommended_dependencies" => dependencies.select(&:recommended?).map(&:name).uniq,
       "optional_dependencies" => dependencies.select(&:optional?).map(&:name).uniq,
       "requirements" => [],
