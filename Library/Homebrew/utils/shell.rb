@@ -40,6 +40,17 @@ module Utils
       SHELL_PROFILE_MAP.fetch(preferred, "~/.bash_profile")
     end
 
+    def set_variable_in_profile(variable, value)
+      case preferred
+      when :bash, :ksh, :sh, :zsh, nil
+        "echo 'export #{variable}=#{sh_quote(value)}' >> #{profile}"
+      when :csh, :tcsh
+        "echo 'setenv #{variable} #{csh_quote(value)}' >> #{profile}"
+      when :fish
+        "echo 'set -gx #{variable} #{sh_quote(value)}' >> #{profile}"
+      end
+    end
+
     def prepend_path_in_profile(path)
       case preferred
       when :bash, :ksh, :sh, :zsh, nil
