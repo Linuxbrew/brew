@@ -75,19 +75,20 @@ describe Utils::Shell do
     it "supports Tcsh" do
       ENV["SHELL"] = "/bin/tcsh"
       expect(subject.prepend_path_in_profile(path))
-        .to start_with("echo 'setenv PATH #{path}:$")
+        .to eq("echo 'setenv PATH #{path}:$PATH' >> #{shell_profile}")
     end
 
     it "supports Bash" do
       ENV["SHELL"] = "/bin/bash"
       expect(subject.prepend_path_in_profile(path))
-        .to start_with("echo 'export PATH=\"#{path}:$")
+        .to eq("echo 'export PATH=\"#{path}:$PATH\"' >> #{shell_profile}")
     end
 
     it "supports Fish" do
       ENV["SHELL"] = "/usr/local/bin/fish"
+      ENV["fish_user_paths"] = "/some/path"
       expect(subject.prepend_path_in_profile(path))
-        .to start_with("echo 'set -g fish_user_paths \"#{path}\" $fish_user_paths' >>")
+        .to eq("echo 'set -g fish_user_paths \"#{path}\" $fish_user_paths' >> #{shell_profile}")
     end
   end
 end

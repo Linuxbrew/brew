@@ -145,11 +145,6 @@ describe Homebrew::Diagnostic::Checks do
     end
   end
 
-  specify "#check_dyld_vars" do
-    ENV["DYLD_INSERT_LIBRARIES"] = "foo"
-    expect(subject.check_dyld_vars).to match("Setting DYLD_INSERT_LIBRARIES")
-  end
-
   specify "#check_for_symlinked_cellar" do
     begin
       HOMEBREW_CELLAR.rmtree
@@ -163,6 +158,26 @@ describe Homebrew::Diagnostic::Checks do
       HOMEBREW_CELLAR.unlink
       HOMEBREW_CELLAR.mkpath
     end
+  end
+
+  specify "#check_ld_vars catches LD vars" do
+    ENV["LD_LIBRARY_PATH"] = "foo"
+    expect(subject.check_ld_vars).to match("Setting DYLD_\\* or LD_\\* variables")
+  end
+
+  specify "#check_ld_vars catches DYLD vars" do
+    ENV["DYLD_LIBRARY_PATH"] = "foo"
+    expect(subject.check_ld_vars).to match("Setting DYLD_\\* or LD_\\* variables")
+  end
+
+  specify "#check_ld_vars catches LD and DYLD vars" do
+    ENV["LD_LIBRARY_PATH"] = "foo"
+    ENV["DYLD_LIBRARY_PATH"] = "foo"
+    expect(subject.check_ld_vars).to match("Setting DYLD_\\* or LD_\\* variables")
+  end
+
+  specify "#check_ld_vars returns success when neither LD nor DYLD vars are set" do
+    expect(subject.check_ld_vars).to be nil
   end
 
   specify "#check_tmpdir" do

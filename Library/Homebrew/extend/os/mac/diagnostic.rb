@@ -29,6 +29,21 @@ module Homebrew
         ]).freeze
       end
 
+      def check_for_non_prefixed_findutils
+        findutils = Formula["findutils"]
+        return unless findutils.any_version_installed?
+
+        gnubin = %W[#{findutils.opt_libexec}/gnubin #{findutils.libexec}/gnubin]
+        default_names = Tab.for_name("findutils").with? "default-names"
+        return if !default_names && (paths & gnubin).empty?
+
+        <<~EOS
+          Putting non-prefixed findutils in your path can cause python builds to fail.
+        EOS
+      rescue FormulaUnavailableError
+        nil
+      end
+
       def check_for_unsupported_macos
         return if ARGV.homebrew_developer?
 
@@ -273,6 +288,95 @@ module Homebrew
           You can install Homebrew anywhere you want but some bottles (binary packages)
           can only be used with a /usr/local prefix and some formulae (packages)
           may not build correctly with a non-/usr/local prefix.
+        EOS
+      end
+
+      def check_for_gettext
+        find_relative_paths("lib/libgettextlib.dylib",
+                            "lib/libintl.dylib",
+                            "include/libintl.h")
+        return if @found.empty?
+
+        # Our gettext formula will be caught by check_linked_keg_only_brews
+        gettext = begin
+          Formulary.factory("gettext")
+        rescue
+          nil
+        end
+
+        if gettext&.linked_keg&.directory?
+          homebrew_owned = @found.all? do |path|
+            Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
+          end
+          return if homebrew_owned
+        end
+
+        inject_file_list @found, <<~EOS
+          gettext files detected at a system prefix.
+          These files can cause compilation and link failures, especially if they
+          are compiled with improper architectures. Consider removing these files:
+        EOS
+      end
+
+      def check_for_iconv
+        find_relative_paths("lib/libiconv.dylib", "include/iconv.h")
+        return if @found.empty?
+
+        libiconv = begin
+          Formulary.factory("libiconv")
+        rescue
+          nil
+        end
+        if libiconv&.linked_keg&.directory?
+          unless libiconv.keg_only?
+            <<~EOS
+              A libiconv formula is installed and linked.
+              This will break stuff. For serious. Unlink it.
+            EOS
+          end
+        else
+          inject_file_list @found, <<~EOS
+            libiconv files detected at a system prefix other than /usr.
+            Homebrew doesn't provide a libiconv formula, and expects to link against
+            the system version in /usr. libiconv in other prefixes can cause
+            compile or link failure, especially if compiled with improper
+            architectures. macOS itself never installs anything to /usr/local so
+            it was either installed by a user or some other third party software.
+
+            tl;dr: delete these files:
+          EOS
+        end
+      end
+
+      def check_for_multiple_volumes
+        return unless HOMEBREW_CELLAR.exist?
+        volumes = Volumes.new
+
+        # Find the volumes for the TMP folder & HOMEBREW_CELLAR
+        real_cellar = HOMEBREW_CELLAR.realpath
+        where_cellar = volumes.which real_cellar
+
+        begin
+          tmp = Pathname.new(Dir.mktmpdir("doctor", HOMEBREW_TEMP))
+          begin
+            real_tmp = tmp.realpath.parent
+            where_tmp = volumes.which real_tmp
+          ensure
+            Dir.delete tmp
+          end
+        rescue
+          return
+        end
+
+        return if where_cellar == where_tmp
+
+        <<~EOS
+          Your Cellar and TEMP directories are on different volumes.
+          macOS won't move relative symlinks across volumes unless the target file already
+          exists. Brews known to be affected by this are Git and Narwhal.
+
+          You should set the "HOMEBREW_TEMP" environmental variable to a suitable
+          directory on the same volume as your Cellar.
         EOS
       end
     end
