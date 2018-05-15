@@ -1527,11 +1527,13 @@ class Formula
     keg = opt_or_installed_prefix_keg
     return [] unless keg
 
-    DatabaseCache.new(:linkage) do |database_cache|
+    cache = DatabaseCache.new(:linkage) do |database_cache|
       use_cache = !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
       linkage_checker = LinkageChecker.new(keg, database_cache, use_cache, self)
-      break linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
+      linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
     end
+
+    cache.return_value
   end
 
   # Returns a list of formulae depended on by this formula that aren't
