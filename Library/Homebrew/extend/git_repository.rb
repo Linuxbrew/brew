@@ -16,7 +16,7 @@ module GitRepositoryExtension
   def git_origin=(origin)
     return unless git? && Utils.git_available?
     cd do
-      Utils.popen_read("git", "remote", "set-url", "origin", origin).chuzzle
+      safe_system "git", "remote", "set-url", "origin", origin
     end
   end
 
