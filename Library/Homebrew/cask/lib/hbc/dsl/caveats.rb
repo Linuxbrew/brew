@@ -125,6 +125,13 @@ module Hbc
         EOS
       end
 
+      caveat :license do |web_page|
+        <<~EOS
+          Installing #{@cask} means you have AGREED to the license at
+            #{web_page}
+        EOS
+      end
+
       caveat :free_license do |web_page|
         <<~EOS
           The vendor offers a free license for #{@cask} at
