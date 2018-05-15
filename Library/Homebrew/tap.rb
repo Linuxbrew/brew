@@ -12,7 +12,7 @@ class Tap
 
   TAP_DIRECTORY = HOMEBREW_LIBRARY/"Taps"
 
-  def self.fetch(*args)
+  def self.parse_user_repo(*args)
     case args.length
     when 1
       user, repo = args.first.split("/", 2)
@@ -28,6 +28,13 @@ class Tap
     # We special case homebrew and linuxbrew so that users don't have to shift in a terminal.
     user = user.capitalize if ["homebrew", "linuxbrew"].include? user
     repo = repo.strip_prefix "homebrew-"
+
+    [user, repo]
+  end
+  private_class_method :parse_user_repo
+
+  def self.fetch(*args)
+    user, repo = parse_user_repo(*args)
 
     if ["Homebrew", "Linuxbrew"].include?(user) && ["core", "homebrew"].include?(repo)
       return CoreTap.instance
