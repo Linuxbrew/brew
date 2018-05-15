@@ -1,18 +1,38 @@
-module CaskTapMigrationExtension
-  def parse_user_repo(*args)
-    user, repo = super
+module CaskTapMigration
+  def initialize(user, repo)
+    super
 
-    if user == "caskroom"
-      user = "Homebrew"
-      repo = "cask-#{repo}" unless repo == "cask"
-    end
+    return unless user == "caskroom"
 
-    [user, repo]
+    # TODO: Remove this check after migration.
+    return unless repo == "tap-migration-test"
+
+    new_user = "Homebrew"
+    new_repo = (repo == "cask") ? repo : "cask-#{repo}"
+
+    old_name = name
+    old_path = path
+    old_remote = path.git_origin
+
+    super(new_user, new_repo)
+
+    return unless old_path.git?
+
+    new_name = name
+    new_path = path
+    new_remote = default_remote
+
+    ohai "Migrating Tap #{old_name} to #{new_name} …"
+
+    puts "Moving #{old_path} to #{new_path} …"
+    path.dirname.mkpath
+    FileUtils.mv old_path, new_path
+
+    puts "Changing remote from #{old_remote} to #{new_remote} …"
+    new_path.git_origin = new_remote
   end
 end
 
 class Tap
-  class << self
-    prepend CaskTapMigrationExtension
-  end
+  prepend CaskTapMigration
 end

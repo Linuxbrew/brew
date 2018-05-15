@@ -13,6 +13,13 @@ module GitRepositoryExtension
     end
   end
 
+  def git_origin=(origin)
+    return unless git? && Utils.git_available?
+    cd do
+      Utils.popen_read("git", "remote", "set-url", "origin", origin).chuzzle
+    end
+  end
+
   def git_head
     return unless git? && Utils.git_available?
     cd do
