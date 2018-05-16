@@ -108,7 +108,7 @@ names, and other aspects of this manual are still subject to change.
     Ruby regular expression.
 
   * `style` [--fix] [ <token> ... ]:
-    Check the given Casks for correct style using [RuboCop Cask](https://github.com/caskroom/rubocop-cask).
+    Check the given Casks for correct style using [RuboCop Cask](https://github.com/Homebrew/rubocop-cask).
     If no tokens are given on the command line, all Casks are checked.
     With `--fix`, auto-correct any style errors if possible.
 
