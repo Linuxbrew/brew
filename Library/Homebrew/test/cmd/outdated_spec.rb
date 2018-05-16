@@ -4,8 +4,11 @@ describe "brew outdated", :integration_test do
       setup_test_formula "testball"
       (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
 
+      setup_test_formula "foo"
+      (HOMEBREW_CELLAR/"foo/0.0.1/foo").mkpath
+
       expect { brew "outdated" }
-        .to output("testball\n").to_stdout
+        .to output("foo\ntestball\n").to_stdout
         .and not_to_output.to_stderr
         .and be_a_success
     end
