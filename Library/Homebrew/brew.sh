@@ -232,6 +232,7 @@ case "$HOMEBREW_COMMAND" in
   --repo)      HOMEBREW_COMMAND="--repository" ;;
   environment) HOMEBREW_COMMAND="--env" ;;
   --config)    HOMEBREW_COMMAND="config" ;;
+  -v)          HOMEBREW_COMMAND="--version" ;;
 esac
 
 if [[ "$HOMEBREW_COMMAND" = "cask" ]]
