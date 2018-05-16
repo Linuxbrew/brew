@@ -41,9 +41,8 @@ module Homebrew
     verbose = ($stdout.tty? || ARGV.verbose?) && !ARGV.flag?("--quiet")
     fetch_head = ARGV.fetch_head?
 
-    outdated_formulae = formulae
-                        .select { |f| f.outdated?(fetch_head: fetch_head) }
-                        .sort
+    outdated_formulae = formulae.select { |f| f.outdated?(fetch_head: fetch_head) }
+                                .sort
 
     outdated_formulae.each do |f|
       if verbose
