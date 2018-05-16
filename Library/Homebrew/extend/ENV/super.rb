@@ -15,12 +15,13 @@ module Superenv
   include SharedEnvExtension
 
   # @private
-  attr_accessor :keg_only_deps, :deps
+  attr_accessor :keg_only_deps, :deps, :run_time_deps
   attr_accessor :x11
 
   def self.extended(base)
     base.keg_only_deps = []
     base.deps = []
+    base.run_time_deps = []
   end
 
   # @private
@@ -61,6 +62,8 @@ module Superenv
     self["HOMEBREW_ISYSTEM_PATHS"] = determine_isystem_paths
     self["HOMEBREW_INCLUDE_PATHS"] = determine_include_paths
     self["HOMEBREW_LIBRARY_PATHS"] = determine_library_paths
+    self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths(formula)
+    self["HOMEBREW_DYNAMIC_LINKER"] = determine_dynamic_linker_path
     self["HOMEBREW_DEPENDENCIES"] = determine_dependencies
     self["HOMEBREW_FORMULA_PREFIX"] = formula.prefix unless formula.nil?
 
@@ -178,18 +181,20 @@ module Superenv
       keg_only_deps.map(&:opt_lib),
       HOMEBREW_PREFIX/"lib",
     ]
-
-    if compiler == :llvm_clang
-      if MacOS::CLT.installed?
-        paths << "/usr/lib"
-      else
-        paths << "#{MacOS.sdk_path}/usr/lib"
-      end
-      paths << Formula["llvm"].opt_lib.to_s
-    end
-
     paths += homebrew_extra_library_paths
     PATH.new(paths).existing
+  end
+
+  def determine_extra_rpath_paths(_formula)
+    []
+  end
+
+  def determine_rpath_paths(formula)
+    PATH.new(determine_extra_rpath_paths(formula))
+  end
+
+  def determine_dynamic_linker_path
+    nil
   end
 
   def determine_dependencies
