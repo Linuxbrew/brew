@@ -341,7 +341,11 @@ module SharedEnvExtension
   end
 
   def gcc_with_cxx11_support?(cc)
-    version = cc[/^gcc-(\d+(?:\.\d+)?)$/, 1]
+    if cc == :c_compiler
+      version = DevelopmentTools.c_compiler_build_version
+    else
+      version = cc[/^gcc-(\d+(?:\.\d+)?)$/, 1]
+    end
     version && Version.create(version) >= Version.create("4.8")
   end
 end
