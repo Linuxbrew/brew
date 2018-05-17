@@ -1,10 +1,10 @@
 module OS
   module Mac
-    class << self
-      def release
-        odeprecated "MacOS.release", "MacOS.version"
-        version
-      end
+    module_function
+
+    def release
+      odeprecated "MacOS.release", "MacOS.version"
+      version
     end
   end
 end
