@@ -22,13 +22,13 @@ module CaskTapMigration
     new_path = path
     new_remote = default_remote
 
-    ohai "Migrating Tap #{old_name} to #{new_name} …"
+    ohai "Migrating tap #{old_name} to #{new_name}..." if $stdout.tty?
 
-    puts "Moving #{old_path} to #{new_path} …"
+    puts "Moving #{old_path} to #{new_path}..." if $stdout.tty?
     path.dirname.mkpath
     FileUtils.mv old_path, new_path
 
-    puts "Changing remote from #{old_remote} to #{new_remote} …"
+    puts "Changing remote from #{old_remote} to #{new_remote}..." if $stdout.tty?
     new_path.git_origin = new_remote
   end
 end
