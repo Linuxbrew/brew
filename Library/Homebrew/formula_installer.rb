@@ -612,7 +612,7 @@ class FormulaInstaller
 
     # Updates the cache for a particular formula after doing an install
     DatabaseCache.new(:linkage) do |database_cache|
-      LinkageChecker.new(keg, database_cache, false, formula)
+      LinkageChecker.new(keg, database_cache, false, formula) unless database_cache.empty?
     end
 
     # let's reset Utils.git_available? if we just installed git
