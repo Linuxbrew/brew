@@ -25,6 +25,12 @@ class DatabaseCache
     @return_value = yield(@db)
     @db.close
   end
+
+  def self.use(type)
+    return_value = nil
+    DatabaseCache.new(type) { |db| return_value = yield(db) }
+    return_value
+  end
 end
 
 #
