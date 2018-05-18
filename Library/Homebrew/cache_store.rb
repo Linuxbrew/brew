@@ -14,21 +14,51 @@ class DatabaseCache
 
   def self.use(type)
     return_value = nil
-    DatabaseCache.new(type) { |db| return_value = yield(db) }
+
+    DatabaseCache.new(type) do |database_cache|
+      return_value = yield(database_cache)
+    end
+
     return_value
+  end
+
+  # Lazily loaded database in read/write mode. If this method is called, a
+  # database file with be created in the `HOMEBREW_CACHE` with name
+  # corresponding to the `@type` instance variable
+  #
+  # @return [DBM] db
+  def db
+    # DBM::WRCREAT: Creates the database if it does not already exist
+    @db ||= DBM.open(cache_path, DATABASE_MODE, DBM::WRCREAT)
+  end
+
+  # Returns `true` if the cache is empty for the given `@type`
+  #
+  # @return [Boolean]
+  def empty?
+    !File.exist?(cache_path)
   end
 
   private
 
-  # Opens and yields a database in read/write mode. Closes the database after use
+  # Opens and yields the cache. Closes the database after use if it has been
+  # loaded
   #
-  # @yield  [DBM] db
+  # @param  [Symbol] type
+  # @yield  [DatabaseCache] self
   # @return [nil]
-  def initialize(name)
-    # DBM::WRCREAT: Creates the database if it does not already exist
-    @db = DBM.open("#{HOMEBREW_CACHE}/#{name}.db", DATABASE_MODE, DBM::WRCREAT)
-    yield(@db)
-    @db.close
+  def initialize(type)
+    @type = type
+    yield(self)
+    @db&.close
+  end
+
+  # The path where the database resides in the `HOMEBREW_CACHE` for the given
+  # `@type`
+  #
+  # @return [String]
+  def cache_path
+    File.join(HOMEBREW_CACHE, "#{@type}.db")
   end
 end
 
@@ -37,10 +67,10 @@ end
 # storage mechanism
 #
 class CacheStore
-  # @param  [DBM] database_cache
+  # @param  [DBM] db
   # @return [nil]
-  def initialize(database_cache)
-    @database_cache = database_cache
+  def initialize(db)
+    @db = db
   end
 
   # Inserts new values or updates existing cached values to persistent storage
@@ -69,7 +99,7 @@ class CacheStore
   protected
 
   # @return [DBM]
-  attr_reader :database_cache
+  attr_reader :db
 
   # DBM stores ruby objects as a ruby `String`. Hence, when fetching the data,
   # to convert the ruby string back into a ruby `Hash`, the string is converted

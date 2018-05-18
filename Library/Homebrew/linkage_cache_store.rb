@@ -11,11 +11,11 @@ class LinkageStore < CacheStore
   HASH_LINKAGE_TYPES  = [:brewed_dylibs, :reverse_links, :broken_deps].freeze
 
   # @param  [String] keg_name
-  # @param  [DBM]    database_cache
+  # @param  [DBM]    db
   # @return [nil]
-  def initialize(keg_name, database_cache)
+  def initialize(keg_name, db)
     @keg_name = keg_name
-    super(database_cache)
+    super(db)
   end
 
   # Inserts dylib-related information into the cache if it does not exist or
@@ -40,7 +40,7 @@ class LinkageStore < CacheStore
       end
     end
 
-    database_cache[keg_name] = ruby_hash_to_json_string(
+    db[keg_name] = ruby_hash_to_json_string(
       array_values: format_array_values(array_values),
       hash_values: format_hash_values(hash_values),
     )
@@ -64,7 +64,7 @@ class LinkageStore < CacheStore
 
   # @return [nil]
   def flush_cache!
-    database_cache.delete(keg_name)
+    db.delete(keg_name)
   end
 
   private
@@ -75,15 +75,15 @@ class LinkageStore < CacheStore
   # @param  [Symbol] the type to fetch from the `LinkageStore`
   # @return [Array]
   def fetch_array_values(type)
-    return [] unless database_cache.key?(keg_name)
-    json_string_to_ruby_hash(database_cache[keg_name])["array_values"][type.to_s]
+    return [] unless db.key?(keg_name)
+    json_string_to_ruby_hash(db[keg_name])["array_values"][type.to_s]
   end
 
   # @param  [Symbol] type
   # @return [Hash]
   def fetch_hash_values(type)
-    return {} unless database_cache.key?(keg_name)
-    json_string_to_ruby_hash(database_cache[keg_name])["hash_values"][type.to_s]
+    return {} unless db.key?(keg_name)
+    json_string_to_ruby_hash(db[keg_name])["hash_values"][type.to_s]
   end
 
   # Formats the linkage data for `array_values` into a kind which can be parsed

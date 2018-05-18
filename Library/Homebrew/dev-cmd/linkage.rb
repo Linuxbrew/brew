@@ -25,7 +25,7 @@ module Homebrew
         ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
 
         use_cache = ARGV.include?("--cached") || ENV["HOMEBREW_LINKAGE_CACHE"]
-        result = LinkageChecker.new(keg, database_cache, use_cache)
+        result = LinkageChecker.new(keg, database_cache.db, use_cache)
 
         if ARGV.include?("--test")
           result.display_test_output
