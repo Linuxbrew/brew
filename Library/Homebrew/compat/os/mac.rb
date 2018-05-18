@@ -1,10 +1,14 @@
 module OS
   module Mac
-    module_function
+    class << self
+      module Compat
+        def release
+          odeprecated "MacOS.release", "MacOS.version"
+          version
+        end
+      end
 
-    def release
-      odeprecated "MacOS.release", "MacOS.version"
-      version
+      prepend Compat
     end
   end
 end
