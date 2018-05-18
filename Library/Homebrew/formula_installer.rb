@@ -611,7 +611,7 @@ class FormulaInstaller
     puts summary
 
     # Updates the cache for a particular formula after doing an install
-    DatabaseCache.new(:linkage) do |database_cache|
+    DatabaseCache.use(:linkage) do |database_cache|
       break if database_cache.empty?
       LinkageChecker.new(keg, database_cache, false, formula)
     end

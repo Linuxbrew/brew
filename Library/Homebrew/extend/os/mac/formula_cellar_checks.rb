@@ -66,7 +66,7 @@ module FormulaCellarChecks
     return unless formula.prefix.directory?
     keg = Keg.new(formula.prefix)
 
-    DatabaseCache.new(:linkage) do |database_cache|
+    DatabaseCache.use(:linkage) do |database_cache|
       use_cache = !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
       checker = LinkageChecker.new(keg, database_cache, use_cache, formula)
 

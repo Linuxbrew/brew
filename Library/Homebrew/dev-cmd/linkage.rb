@@ -20,7 +20,7 @@ module Homebrew
   module_function
 
   def linkage
-    DatabaseCache.new(:linkage) do |database_cache|
+    DatabaseCache.use(:linkage) do |database_cache|
       ARGV.kegs.each do |keg|
         ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
 

@@ -12,8 +12,13 @@ class DatabaseCache
   #   https://docs.oracle.com/cd/E17276_01/html/api_reference/C/envopen.html
   DATABASE_MODE = 0664
 
-  # Returned value from `initialize` block
-  attr_reader :return_value
+  def self.use(type)
+    return_value = nil
+    DatabaseCache.new(type) { |db| return_value = yield(db) }
+    return_value
+  end
+
+  private
 
   # Opens and yields a database in read/write mode. Closes the database after use
   #
@@ -22,14 +27,8 @@ class DatabaseCache
   def initialize(name)
     # DBM::WRCREAT: Creates the database if it does not already exist
     @db = DBM.open("#{HOMEBREW_CACHE}/#{name}.db", DATABASE_MODE, DBM::WRCREAT)
-    @return_value = yield(@db)
+    yield(@db)
     @db.close
-  end
-
-  def self.use(type)
-    return_value = nil
-    DatabaseCache.new(type) { |db| return_value = yield(db) }
-    return_value
   end
 end
 
