@@ -60,7 +60,8 @@ module Hbc
       return if @cask.sourcefile_path.nil?
 
       tap = @cask.tap
-      return if tap.nil? || tap.user != "caskroom"
+      return if tap.nil?
+      return unless ["Homebrew", "caskroom"].include?(tap.user)
 
       return unless cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
       add_warning "allow_untrusted is not permitted in official Homebrew-Cask taps"
