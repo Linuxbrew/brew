@@ -31,13 +31,8 @@ module Homebrew
       switch "--pinned"
       switch "--versions"
       switch "--full-name"
-      switch "--multiple"
+      switch "--multiple", required_for: "--versions"
       switch :verbose
-    end
-
-    if @args.multiple? && !@args.versions?
-      opoo "--multiple requires --versions"
-      @args.send("versions?=", true)
     end
 
     # Use of exec means we don't explicitly exit
