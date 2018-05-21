@@ -1529,7 +1529,7 @@ class Formula
 
     undeclared_deps = DatabaseCache.use(:linkage) do |database_cache|
       use_cache = !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
-      linkage_checker = LinkageChecker.new(keg, database_cache.db, use_cache, self)
+      linkage_checker = LinkageChecker.new(keg, database_cache, use_cache, self)
       linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
     end
 

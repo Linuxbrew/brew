@@ -3,11 +3,16 @@ require "formula"
 require "linkage_cache_store"
 
 class LinkageChecker
-  def initialize(keg, db, use_cache = false, formula = nil)
+  def initialize(keg, database_cache, use_cache = false, formula = nil)
     @keg = keg
     @formula = formula || resolve_formula(keg)
-    @store = LinkageStore.new(keg.name, db)
-    flush_cache_and_check_dylibs unless use_cache
+
+    if use_cache
+      @store = LinkageStore.new(keg.name, database_cache.db)
+      flush_cache_and_check_dylibs unless database_cache.db.key?(keg.name)
+    else
+      flush_cache_and_check_dylibs
+    end
   end
 
   def display_normal_output
@@ -45,7 +50,7 @@ class LinkageChecker
   end
 
   def undeclared_deps
-    @undeclared_deps ||= store.fetch_type(:undeclared_deps)
+    @undeclared_deps ||= store.nil? ? [] : store.fetch_type(:undeclared_deps)
   end
 
   private
@@ -55,37 +60,37 @@ class LinkageChecker
   # 'Hash-type' cache values
 
   def brewed_dylibs
-    @brewed_dylibs ||= store.fetch_type(:brewed_dylibs)
+    @brewed_dylibs ||= store.nil? ? {} : store.fetch_type(:brewed_dylibs)
   end
 
   def reverse_links
-    @reverse_links ||= store.fetch_type(:reverse_links)
+    @reverse_links ||= store.nil? ? {} : store.fetch_type(:reverse_links)
   end
 
   def broken_deps
-    @broken_deps ||= store.fetch_type(:broken_deps)
+    @broken_deps ||= store.nil? ? {} : store.fetch_type(:broken_deps)
   end
 
   # 'Path-type' cached values
 
   def system_dylibs
-    @system_dylibs ||= store.fetch_type(:system_dylibs)
+    @system_dylibs ||= store.nil? ? [] : store.fetch_type(:system_dylibs)
   end
 
   def broken_dylibs
-    @broken_dylibs ||= store.fetch_type(:broken_dylibs)
+    @broken_dylibs ||= store.nil? ? [] : store.fetch_type(:broken_dylibs)
   end
 
   def variable_dylibs
-    @variable_dylibs ||= store.fetch_type(:variable_dylibs)
+    @variable_dylibs ||= store.nil? ? [] : store.fetch_type(:variable_dylibs)
   end
 
   def indirect_deps
-    @indirect_deps ||= store.fetch_type(:indirect_deps)
+    @indirect_deps ||= store.nil? ? [] : store.fetch_type(:indirect_deps)
   end
 
   def unnecessary_deps
-    @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
+    @unnecessary_deps ||= store.nil? ? [] : store.fetch_type(:unnecessary_deps)
   end
 
   def dylib_to_dep(dylib)
@@ -235,9 +240,9 @@ class LinkageChecker
     opoo "Formula unavailable: #{keg.name}"
   end
 
-  # Helper function to reset dylib values when building cache
+  # Helper function to reset dylib values
   def reset_dylibs!
-    store.flush_cache!
+    store&.flush_cache!
     @system_dylibs    = Set.new
     @broken_dylibs    = Set.new
     @variable_dylibs  = Set.new
@@ -251,7 +256,7 @@ class LinkageChecker
 
   # Updates data store with package path values
   def store_dylibs!
-    store.update!(
+    store&.update!(
       system_dylibs: system_dylibs,
       variable_dylibs: variable_dylibs,
       broken_dylibs: broken_dylibs,
