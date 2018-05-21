@@ -31,7 +31,7 @@ module Homebrew
       switch "--pinned"
       switch "--versions"
       switch "--full-name"
-      switch "--multiple", required_for: "--versions"
+      switch "--multiple", depends_on: "--versions"
       switch :verbose
     end
 
