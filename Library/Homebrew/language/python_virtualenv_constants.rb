@@ -1,2 +1,2 @@
-PYTHON_VIRTUALENV_URL = "https://files.pythonhosted.org/packages/b1/72/2d70c5a1de409ceb3a27ff2ec007ecdd5cc52239e7c74990e32af57affe9/virtualenv-15.2.0.tar.gz".freeze
-PYTHON_VIRTUALENV_SHA256 = "1d7e241b431e7afce47e77f8843a276f652699d1fa4f93b9d8ce0076fd7b0b54".freeze
+PYTHON_VIRTUALENV_URL = "https://files.pythonhosted.org/packages/33/bc/fa0b5347139cd9564f0d44ebd2b147ac97c36b2403943dbee8a25fd74012/virtualenv-16.0.0.tar.gz".freeze
+PYTHON_VIRTUALENV_SHA256 = "ca07b4c0b54e14a91af9f34d0919790b016923d157afda5efdde55c96718f752".freeze
