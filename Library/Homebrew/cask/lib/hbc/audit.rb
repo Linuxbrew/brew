@@ -36,6 +36,7 @@ module Hbc
       check_untrusted_pkg
       check_github_releases_appcast
       check_latest_with_appcast
+      check_stanza_requires_uninstall
       self
     rescue StandardError => e
       odebug "#{e.message}\n#{e.backtrace.join("\n")}"
@@ -63,6 +64,14 @@ module Hbc
 
       return unless cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
       add_warning "allow_untrusted is not permitted in official Homebrew-Cask taps"
+    end
+
+    def check_stanza_requires_uninstall
+      odebug "Auditing stanzas which require an uninstall"
+
+      return if cask.artifacts.none? { |k| k.is_a?(Hbc::Artifact::Pkg) || k.is_a?(Hbc::Artifact::Installer) }
+      return if cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Uninstall) }
+      add_warning "installer and pkg stanzas require an uninstall stanza"
     end
 
     def check_single_pre_postflight
