@@ -29,7 +29,7 @@ class DatabaseCache
   # @return [DBM] db
   def db
     # DBM::WRCREAT: Creates the database if it does not already exist
-    @db ||= DBM.open(cache_path, DATABASE_MODE, DBM::WRCREAT)
+    @db ||= DBM.open(dbm_file_path, DATABASE_MODE, DBM::WRCREAT)
   end
 
   # Returns `true` if the cache is empty for the given `@type`
@@ -53,12 +53,20 @@ class DatabaseCache
     @db&.close
   end
 
+  # `DBM` appends `.db` file extension to the path provided, which is why it's
+  # not included
+  #
+  # @return [String]
+  def dbm_file_path
+    File.join(HOMEBREW_CACHE, @type.to_s)
+  end
+
   # The path where the database resides in the `HOMEBREW_CACHE` for the given
   # `@type`
   #
   # @return [String]
   def cache_path
-    File.join(HOMEBREW_CACHE, "#{@type}.db")
+    "#{dbm_file_path}.db"
   end
 end
 
