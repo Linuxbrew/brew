@@ -1283,11 +1283,11 @@ Homebrew's lead maintainer is Mike McQuaid.
 
 Homebrew/homebrew-core's lead maintainer is ilovezfs.
 
-Homebrew/brew's other current maintainers are ilovezfs, Alyssa Ross, JCount, Misty De Meo, Gautham Goli, Markus Reiter and William Woodruff.
+Homebrew/brew's other current maintainers are ilovezfs, JCount, Misty De Meo, Gautham Goli, Markus Reiter and William Woodruff.
 
 Homebrew/homebrew-core's other current maintainers are FX Coudert, JCount, Misty De Meo and Tom Schoonjans.
 
-Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski and Homebrew's creator: Max Howell.
+Former maintainers with significant contributions include Tim Smith, Baptiste Fontaine, Xu Cheng, Martin Afanasjew, Dominyk Tiller, Brett Koonce, Charlie Sharpsteen, Jack Nagel, Adam Vandenberg, Andrew Janke, Alex Dunn, neutric, Tomasz Pajor, Uladzislau Shablinski, Alyssa Ross,  and Homebrew's creator: Max Howell.
 
 ## BUGS
 

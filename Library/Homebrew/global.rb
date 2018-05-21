@@ -83,6 +83,7 @@ HOMEBREW_INTERNAL_COMMAND_ALIASES = {
   "--repo" => "--repository",
   "environment" => "--env",
   "--config" => "config",
+  "-v" => "--version",
 }.freeze
 
 require "set"

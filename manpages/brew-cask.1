@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW\-CASK" "1" "April 2018" "Homebrew" "brew-cask"
+.TH "BREW\-CASK" "1" "May 2018" "Homebrew" "brew-cask"
 .
 .SH "NAME"
 \fBbrew\-cask\fR \- a friendly binary installer for macOS
@@ -107,7 +107,7 @@ Without an argument, display all locally available Casks for install; no online 
 .
 .TP
 \fBstyle\fR [\-\-fix] [ \fItoken\fR \.\.\. ]
-Check the given Casks for correct style using RuboCop Cask \fIhttps://github\.com/caskroom/rubocop\-cask\fR\. If no tokens are given on the command line, all Casks are checked\. With \fB\-\-fix\fR, auto\-correct any style errors if possible\.
+Check the given Casks for correct style using RuboCop Cask \fIhttps://github\.com/Homebrew/rubocop\-cask\fR\. If no tokens are given on the command line, all Casks are checked\. With \fB\-\-fix\fR, auto\-correct any style errors if possible\.
 .
 .TP
 \fBuninstall\fR or \fBrm\fR or \fBremove\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]
@@ -118,11 +118,11 @@ Uninstall the given Cask\. With \fB\-\-force\fR, uninstall even if the Cask does
 Without token arguments, upgrade all the installed Casks that have newer versions available in the tap; otherwise update the tokens given in the command line\. If \fB\-\-greedy\fR is given then also upgrade the Casks having \fBauto_updates true\fR or \fBversion :latest\fR\.
 .
 .TP
-\fBzap\fR \fItoken\fR [ \fItoken\fR \.\.\. ]
-Unconditionally remove \fIall\fR files associated with the given Cask\.
+\fBzap\fR [\-\-force] \fItoken\fR [ \fItoken\fR \.\.\. ]
+Unconditionally remove \fIall\fR files associated with the given Cask\. With \fB\-\-force\fR, zap even if the Cask does not appear to be currently installed\.
 .
 .IP
-Implicitly performs all actions associated with \fBuninstall\fR, even if the Cask does not appear to be currently installed\.
+Implicitly performs all actions associated with \fBuninstall\fR\.
 .
 .IP
 Removes all staged versions of the Cask distribution found under \fB<Caskroom_path>/\fR\fItoken\fR\.

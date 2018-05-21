@@ -38,7 +38,7 @@ module Hbc
 
   class CaskAlreadyCreatedError < AbstractCaskErrorWithToken
     def to_s
-      %Q(Cask '#{token}' already exists. Run #{Formatter.identifier("brew cask cat #{token}")} to edit it.)
+      %Q(Cask '#{token}' already exists. Run #{Formatter.identifier("brew cask edit #{token}")} to edit it.)
     end
   end
 

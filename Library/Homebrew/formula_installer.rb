@@ -7,7 +7,6 @@ require "caveats"
 require "cleaner"
 require "formula_cellar_checks"
 require "install_renamed"
-require "cmd/postinstall"
 require "debrew"
 require "sandbox"
 require "emoji"
@@ -837,7 +836,39 @@ class FormulaInstaller
   end
 
   def post_install
-    Homebrew.run_post_install(formula)
+    args = %W[
+      nice #{RUBY_PATH}
+      -W0
+      -I #{HOMEBREW_LOAD_PATH}
+      --
+      #{HOMEBREW_LIBRARY_PATH}/postinstall.rb
+      #{formula.path}
+    ].concat(ARGV.options_only)
+
+    if formula.head?
+      args << "--HEAD"
+    elsif formula.devel?
+      args << "--devel"
+    end
+
+    Utils.safe_fork do
+      if Sandbox.formula?(formula)
+        sandbox = Sandbox.new
+        formula.logs.mkpath
+        sandbox.record_log(formula.logs/"postinstall.sandbox.log")
+        sandbox.allow_write_temp_and_cache
+        sandbox.allow_write_log(formula)
+        sandbox.allow_write_xcode
+        sandbox.deny_write_homebrew_repository
+        sandbox.allow_write_cellar(formula)
+        Keg::TOP_LEVEL_DIRECTORIES.each do |dir|
+          sandbox.allow_write_path "#{HOMEBREW_PREFIX}/#{dir}"
+        end
+        sandbox.exec(*args)
+      else
+        exec(*args)
+      end
+    end
   rescue Exception => e # rubocop:disable Lint/RescueException
     opoo "The post-install step did not complete successfully"
     puts "You can try again using `brew postinstall #{formula.full_name}`"

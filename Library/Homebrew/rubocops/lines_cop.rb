@@ -228,12 +228,15 @@ module RuboCop
           end
 
           find_every_method_call_by_name(body_node, :depends_on).each do |method|
-            next if modifier?(method.parent)
             param = parameters(method).first
-            dep, option = hash_dep(param)
-            next if dep.nil? || option.nil?
-            offending_node(param)
-            problem "Dependency #{string_content(dep)} should not use option #{string_content(option)}"
+            dep, option_child_nodes = hash_dep(param)
+            next if dep.nil? || option_child_nodes.empty?
+            option_child_nodes.each do |option|
+              find_strings(option).each do |dependency|
+                next unless match = regex_match_group(dependency, /(with(out)?-\w+|c\+\+11)/)
+                problem "Dependency #{string_content(dep)} should not use option #{match[0]}"
+              end
+            end
           end
 
           find_instance_method_call(body_node, :version, :==) do |method|
@@ -363,10 +366,8 @@ module RuboCop
               (send nil? :depends_on $({str sym} _)))}
         EOS
 
-        # Match depends_on with hash as argument
         def_node_matcher :hash_dep, <<~EOS
-          {(hash (pair $(str _) $(str _)))
-           (hash (pair $(str _) (array $(str _) ...)))}
+          (hash (pair $(str _) $...))
         EOS
 
         def_node_matcher :destructure_hash, <<~EOS

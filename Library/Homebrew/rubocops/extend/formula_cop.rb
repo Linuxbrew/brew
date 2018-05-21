@@ -58,7 +58,7 @@ module RuboCop
       # Returns all string nodes among the descendants of given node
       def find_strings(node)
         return [] if node.nil?
-        return node if node.str_type?
+        return [node] if node.str_type?
         node.each_descendant(:str)
       end
 

@@ -251,17 +251,6 @@ _brew_link() {
   __brew_complete_installed
 }
 
-_brew_linkapps() {
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  case "$cur" in
-    --*)
-      __brewcomp "--local"
-      return
-      ;;
-  esac
-  __brew_complete_installed
-}
-
 _brew_list() {
   local allopts="--unbrewed --verbose --pinned --versions --multiple"
   local cur="${COMP_WORDS[COMP_CWORD]}"
@@ -476,17 +465,6 @@ _brew_uninstall() {
   case "$cur" in
     --*)
       __brewcomp "--force"
-      return
-      ;;
-  esac
-  __brew_complete_installed
-}
-
-_brew_unlinkapps() {
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  case "$cur" in
-    --*)
-      __brewcomp "--dry-run --local"
       return
       ;;
   esac
@@ -827,7 +805,6 @@ _brew() {
     install|instal)             _brew_install ;;
     irb)                        _brew_irb ;;
     link|ln)                    _brew_link ;;
-    linkapps)                   _brew_linkapps ;;
     list|ls)                    _brew_list ;;
     log)                        _brew_log ;;
     man)                        _brew_man ;;
@@ -852,7 +829,6 @@ _brew() {
     tests)                      _brew_tests ;;
     uninstall|remove|rm)        _brew_uninstall ;;
     unlink)                     __brew_complete_installed ;;
-    unlinkapps)                 _brew_unlinkapps ;;
     unpack)                     _brew_unpack ;;
     unpin)                      __brew_complete_formulae ;;
     untap)                      __brew_complete_tapped ;;

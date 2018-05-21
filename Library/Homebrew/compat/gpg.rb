@@ -1,24 +1,27 @@
-
 module Gpg
-  module_function
+  class << self
+    module Compat
+      def executable
+        odisabled "Gpg.executable", 'which "gpg"'
+      end
 
-  def executable
-    odisabled "Gpg.executable", 'which "gpg"'
-  end
+      def available?
+        odisabled "Gpg.available?", 'which "gpg"'
+      end
 
-  def available?
-    odisabled "Gpg.available?", 'which "gpg"'
-  end
+      def create_test_key(*)
+        odisabled "Gpg.create_test_key"
+      end
 
-  def create_test_key(_)
-    odisabled "Gpg.create_test_key"
-  end
+      def cleanup_test_processes!
+        odisabled "Gpg.cleanup_test_processes!"
+      end
 
-  def cleanup_test_processes!
-    odisabled "Gpg.cleanup_test_processes!"
-  end
+      def test(*)
+        odisabled "Gpg.test"
+      end
+    end
 
-  def test(_)
-    odisabled "Gpg.test"
+    prepend Compat
   end
 end
