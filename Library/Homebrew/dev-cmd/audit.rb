@@ -137,16 +137,18 @@ module Homebrew
       end
     end
 
-    create_issue_failed = false
-    if new_formula && !new_formula_problem_lines.size.zero? && !GitHub.create_issue_no_op?
+    created_pr_comment = false
+    if new_formula && !new_formula_problem_lines.empty?
       begin
-        GitHub.create_issue_comment(new_formula_problem_lines.join("\n"))
+        if GitHub.create_issue_comment(new_formula_problem_lines.join("\n"))
+          created_pr_comment = true
+        end
       rescue *GitHub.api_errors
-        create_issue_failed = true
+        nil
       end
     end
 
-    if GitHub.create_issue_no_op? || create_issue_failed
+    unless created_pr_comment
       problem_count += new_formula_problem_lines.size
       puts new_formula_problem_lines.map { |s| "  #{s}" }
     end

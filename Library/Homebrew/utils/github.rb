@@ -10,6 +10,8 @@ module GitHub
   CREATE_ISSUE_FORK_OR_PR_SCOPES = ["public_repo"].freeze
   ALL_SCOPES = (CREATE_GIST_SCOPES + CREATE_ISSUE_FORK_OR_PR_SCOPES).freeze
   ALL_SCOPES_URL = Formatter.url("https://github.com/settings/tokens/new?scopes=#{ALL_SCOPES.join(",")}&description=Homebrew").freeze
+  PR_ENV_KEY = "HOMEBREW_NEW_FORMULA_PULL_REQUEST_URL".freeze
+  PR_ENV = ENV[PR_ENV_KEY]
 
   Error = Class.new(RuntimeError)
   HTTPNotFoundError = Class.new(Error)
@@ -254,14 +256,14 @@ module GitHub
   end
 
   def create_fork(repo)
-    url = "https://api.github.com/repos/#{repo}/forks"
+    url = "#{API_URL}/repos/#{repo}/forks"
     data = {}
     scopes = CREATE_ISSUE_FORK_OR_PR_SCOPES
     open_api(url, data: data, scopes: scopes)
   end
 
   def create_pull_request(repo, title, head, base, body)
-    url = "https://api.github.com/repos/#{repo}/pulls"
+    url = "#{API_URL}/repos/#{repo}/pulls"
     data = { title: title, head: head, base: base, body: body }
     scopes = CREATE_ISSUE_FORK_OR_PR_SCOPES
     open_api(url, data: data, scopes: scopes)
@@ -292,27 +294,30 @@ module GitHub
     open_api(uri) { |json| json.fetch("items", []) }
   end
 
-  def create_issue_no_op?
-    !ENV.key?("HOMEBREW_GH_REPO") || !ENV.key?("HOMEBREW_NEW_FORMULA_PULL_REQUEST_URL")
-  end
-
   def create_issue_comment(body)
-    repo = ENV["HOMEBREW_GH_REPO"]
-    pull_request = extract_pull_request_number
-    url = "https://api.github.com/repos/Homebrew/#{repo}/issues/#{pull_request}/comments"
+    return false unless PR_ENV
+    _, user, repo, pr = *PR_ENV.match(HOMEBREW_PULL_OR_COMMIT_URL_REGEX)
+    if !user || !repo || !pr
+      opoo <<-EOS.undent
+        #{PR_ENV_KEY} set but regex matched:
+        user: #{user.inspect}, repo: #{repo.inspect}, pr: #{pr.inspect}
+      EOS
+      return false
+    end
+
+    url = "#{API_URL}/repos/#{user}/#{repo}/issues/#{pr}/comments"
     data = { "body" => body }
-    return if issue_comment_exists?(repo, pr_number, body)
-    scopes = CREATE_ISSUE_SCOPES
+    if issue_comment_exists?(user, repo, pr, body)
+      ohai "Skipping: identical comment exists on #{PR_ENV}."
+      return true
+    end
+
+    scopes = CREATE_ISSUE_FORK_OR_PR_SCOPES
     open_api(url, data: data, scopes: scopes)
   end
 
-  def extract_pull_request_number
-    pattern = /#(\d+)$/
-    ENV["HOMEBREW_NEW_FORMULA_PULL_REQUEST_URL"].match(pattern)[1]
-  end
-
-  def issue_comment_exists?(repo, pull_reqest, body)
-    url = "https://api.github.com/repos/Homebrew/#{repo}/issues/#{pull_reqest}/comments"
+  def issue_comment_exists?(user, repo, pr, body)
+    url = "#{API_URL}/repos/#{user}/#{repo}/issues/#{pr}/comments"
     comments = open_api(url)
     return unless comments
     comments.any? { |comment| comment["body"].eql?(body) }
