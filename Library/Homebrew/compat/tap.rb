@@ -5,9 +5,6 @@ class Tap
 
       return unless user == "caskroom"
 
-      # TODO: Remove this check after migration.
-      return unless repo == "tap-migration-test"
-
       new_user = "Homebrew"
       new_repo = (repo == "cask") ? repo : "cask-#{repo}"
 
