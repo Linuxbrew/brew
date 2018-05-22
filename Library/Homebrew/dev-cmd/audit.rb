@@ -541,6 +541,7 @@ module Homebrew
         end
 
         next if spec.patches.empty?
+        next unless @new_formula
         new_formula_problem "Formulae should not require patches to build. Patches should be submitted and accepted upstream first."
       end
 
