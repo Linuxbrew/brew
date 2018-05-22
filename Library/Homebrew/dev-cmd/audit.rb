@@ -123,8 +123,7 @@ module Homebrew
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
-
-      next if fa.problems.empty?
+      next if fa.problems.empty? && fa.new_formula_problems.empty?
       fa.problems
       formula_count += 1
       problem_count += fa.problems.size
@@ -155,7 +154,7 @@ module Homebrew
 
     errors_summary = "#{Formatter.pluralize(problem_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
     return if problem_count.zero?
-    ofail errors_summary unless strict
+    ofail errors_summary unless created_pr_comment
   end
 
   def format_problem_lines(problems)
