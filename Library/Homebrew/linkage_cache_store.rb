@@ -2,20 +2,23 @@ require "set"
 require "cache_store"
 
 #
-# `LinkageStore` provides methods to fetch and mutate linkage-specific data used
+# `LinkageCacheStore` provides methods to fetch and mutate linkage-specific data used
 # by the `brew linkage` command
 #
-class LinkageStore < CacheStore
-  ARRAY_LINKAGE_TYPES = [:system_dylibs, :variable_dylibs, :broken_dylibs,
-                         :indirect_deps, :undeclared_deps, :unnecessary_deps].freeze
-  HASH_LINKAGE_TYPES  = [:brewed_dylibs, :reverse_links, :broken_deps].freeze
-
+class LinkageCacheStore < CacheStore
   # @param  [String] keg_name
-  # @param  [DBM]    db
+  # @param  [CacheStoreDatabase] database
   # @return [nil]
-  def initialize(keg_name, db)
+  def initialize(keg_name, database)
     @keg_name = keg_name
-    super(db)
+    super(database)
+  end
+
+  # Returns `true` if the database has any value for the current `keg_name`
+  #
+  # @return [Boolean]
+  def has_keg_name?
+    !database.get(keg_name).nil?
   end
 
   # Inserts dylib-related information into the cache if it does not exist or
@@ -40,13 +43,13 @@ class LinkageStore < CacheStore
       end
     end
 
-    db[keg_name] = ruby_hash_to_json_string(
+    database.set keg_name, ruby_hash_to_json_string(
       array_values: format_array_values(array_values),
       hash_values: format_hash_values(hash_values),
     )
   end
 
-  # @param  [Symbol] the type to fetch from the `LinkageStore`
+  # @param  [Symbol] the type to fetch from the `LinkageCacheStore`
   # @raise  [TypeError] error if the type is not in `HASH_LINKAGE_TYPES` or
   #   `ARRAY_LINKAGE_TYPES`
   # @return [Hash | Array]
@@ -64,26 +67,32 @@ class LinkageStore < CacheStore
 
   # @return [nil]
   def flush_cache!
-    db.delete(keg_name)
+    database.delete(keg_name)
   end
 
   private
 
+  ARRAY_LINKAGE_TYPES = [:system_dylibs, :variable_dylibs, :broken_dylibs,
+    :indirect_deps, :undeclared_deps, :unnecessary_deps].freeze
+  HASH_LINKAGE_TYPES  = [:brewed_dylibs, :reverse_links, :broken_deps].freeze
+
   # @return [String] the key to lookup items in the `CacheStore`
   attr_reader :keg_name
 
-  # @param  [Symbol] the type to fetch from the `LinkageStore`
+  # @param  [Symbol] the type to fetch from the `LinkageCacheStore`
   # @return [Array]
   def fetch_array_values(type)
-    return [] unless db.key?(keg_name)
-    json_string_to_ruby_hash(db[keg_name])["array_values"][type.to_s]
+    keg_cache = database.get(keg_name)
+    return [] unless keg_cache
+    json_string_to_ruby_hash(keg_cache)["array_values"][type.to_s]
   end
 
   # @param  [Symbol] type
   # @return [Hash]
   def fetch_hash_values(type)
-    return {} unless db.key?(keg_name)
-    json_string_to_ruby_hash(db[keg_name])["hash_values"][type.to_s]
+    keg_cache = database.get(keg_name)
+    return {} unless keg_cache
+    json_string_to_ruby_hash(keg_cache)["hash_values"][type.to_s]
   end
 
   # Formats the linkage data for `array_values` into a kind which can be parsed

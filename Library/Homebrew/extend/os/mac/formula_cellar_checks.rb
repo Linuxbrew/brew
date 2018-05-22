@@ -66,11 +66,11 @@ module FormulaCellarChecks
     return unless formula.prefix.directory?
     keg = Keg.new(formula.prefix)
 
-    DatabaseCache.use(:linkage) do |database_cache|
-      use_cache = !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
-      checker = LinkageChecker.new(keg, database_cache, use_cache, formula)
-
+    CacheStoreDatabase.use(:linkage) do |db|
+      checker = LinkageChecker.new keg, formula, cache_db: db,
+        use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
       next unless checker.broken_library_linkage?
+
       output = <<~EOS
         #{formula} has broken dynamic library links:
           #{checker.display_test_output}

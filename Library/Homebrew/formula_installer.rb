@@ -611,9 +611,9 @@ class FormulaInstaller
     puts summary
 
     # Updates the cache for a particular formula after doing an install
-    DatabaseCache.use(:linkage) do |database_cache|
-      break if database_cache.empty?
-      LinkageChecker.new(keg, database_cache, false, formula)
+    CacheStoreDatabase.use(:linkage) do |db|
+      break unless db.created?
+      LinkageChecker.new(keg, formula, cache_db: db)
     end
 
     # let's reset Utils.git_available? if we just installed git

@@ -20,12 +20,12 @@ module Homebrew
   module_function
 
   def linkage
-    DatabaseCache.use(:linkage) do |database_cache|
+    CacheStoreDatabase.use(:linkage) do |db|
       ARGV.kegs.each do |keg|
         ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
 
         use_cache = ARGV.include?("--cached") || ENV["HOMEBREW_LINKAGE_CACHE"]
-        result = LinkageChecker.new(keg, database_cache, use_cache)
+        result = LinkageChecker.new(keg, use_cache: use_cache, cache_db: db)
 
         if ARGV.include?("--test")
           result.display_test_output

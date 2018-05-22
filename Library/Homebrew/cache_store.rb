@@ -2,25 +2,58 @@ require "dbm"
 require "json"
 
 #
-# `DatabaseCache` acts as an interface to a persistent storage mechanism
+# `CacheStoreDatabase` acts as an interface to a persistent storage mechanism
 # residing in the `HOMEBREW_CACHE`
 #
-class DatabaseCache
+class CacheStoreDatabase
+  # Yields the cache store database.
+  # Closes the database after use if it has been loaded.
+  #
+  # @param  [Symbol] type
+  # @yield  [CacheStoreDatabase] self
+  def self.use(type)
+    database = CacheStoreDatabase.new(type)
+    return_value = yield(database)
+    database.close_if_open!
+    return_value
+  end
+
+  # Sets a value in the underlying database (and creates it if necessary).
+  def set(key, value)
+    db[key] = value
+  end
+
+  # Gets a value from the underlying database (if it already exists).
+  def get(key)
+    return unless created?
+    db[key]
+  end
+
+  # Gets a value from the underlying database (if it already exists).
+  def delete(key)
+    return unless created?
+    db.delete(key)
+  end
+
+  # Closes the underlying database (if it created and open).
+  def close_if_open!
+    @db&.close
+  end
+
+  # Returns `true` if the cache file has been created for the given `@type`
+  #
+  # @return [Boolean]
+  def created?
+    File.exist?(cache_path)
+  end
+
+  private
+
   # The mode of any created files will be 0664 (that is, readable and writable
   # by the owner and the group, and readable by everyone else). Files created
   # will also be modified by the process' umask value at the time of creation:
   #   https://docs.oracle.com/cd/E17276_01/html/api_reference/C/envopen.html
   DATABASE_MODE = 0664
-
-  def self.use(type)
-    return_value = nil
-
-    DatabaseCache.new(type) do |database_cache|
-      return_value = yield(database_cache)
-    end
-
-    return_value
-  end
 
   # Lazily loaded database in read/write mode. If this method is called, a
   # database file with be created in the `HOMEBREW_CACHE` with name
@@ -32,25 +65,12 @@ class DatabaseCache
     @db ||= DBM.open(dbm_file_path, DATABASE_MODE, DBM::WRCREAT)
   end
 
-  # Returns `true` if the cache is empty for the given `@type`
-  #
-  # @return [Boolean]
-  def empty?
-    !File.exist?(cache_path)
-  end
-
-  private
-
-  # Opens and yields the cache. Closes the database after use if it has been
-  # loaded
+  # Creates a CacheStoreDatabase
   #
   # @param  [Symbol] type
-  # @yield  [DatabaseCache] self
   # @return [nil]
   def initialize(type)
     @type = type
-    yield(self)
-    @db&.close
   end
 
   # `DBM` appends `.db` file extension to the path provided, which is why it's
@@ -75,10 +95,10 @@ end
 # storage mechanism
 #
 class CacheStore
-  # @param  [DBM] db
+  # @param  [CacheStoreDatabase] database
   # @return [nil]
-  def initialize(db)
-    @db = db
+  def initialize(database)
+    @database = database
   end
 
   # Inserts new values or updates existing cached values to persistent storage
@@ -106,8 +126,8 @@ class CacheStore
 
   protected
 
-  # @return [DBM]
-  attr_reader :db
+  # @return [CacheStoreDatabase]
+  attr_reader :database
 
   # DBM stores ruby objects as a ruby `String`. Hence, when fetching the data,
   # to convert the ruby string back into a ruby `Hash`, the string is converted

@@ -3,13 +3,13 @@ require "formula"
 require "linkage_cache_store"
 
 class LinkageChecker
-  def initialize(keg, database_cache, use_cache = false, formula = nil)
+  def initialize(keg, formula = nil, use_cache: false, cache_db:)
     @keg = keg
     @formula = formula || resolve_formula(keg)
 
     if use_cache
-      @store = LinkageStore.new(keg.name, database_cache.db)
-      flush_cache_and_check_dylibs unless database_cache.db.key?(keg.name)
+      @store = LinkageCacheStore.new(keg.name, cache_db)
+      flush_cache_and_check_dylibs unless @store.has_keg_name?
     else
       flush_cache_and_check_dylibs
     end
@@ -50,7 +50,7 @@ class LinkageChecker
   end
 
   def undeclared_deps
-    @undeclared_deps ||= store.nil? ? [] : store.fetch_type(:undeclared_deps)
+    @undeclared_deps ||= store.fetch_type(:undeclared_deps)
   end
 
   private
@@ -60,37 +60,37 @@ class LinkageChecker
   # 'Hash-type' cache values
 
   def brewed_dylibs
-    @brewed_dylibs ||= store.nil? ? {} : store.fetch_type(:brewed_dylibs)
+    @brewed_dylibs ||= store.fetch_type(:brewed_dylibs)
   end
 
   def reverse_links
-    @reverse_links ||= store.nil? ? {} : store.fetch_type(:reverse_links)
+    @reverse_links ||= store.fetch_type(:reverse_links)
   end
 
   def broken_deps
-    @broken_deps ||= store.nil? ? {} : store.fetch_type(:broken_deps)
+    @broken_deps ||= store.fetch_type(:broken_deps)
   end
 
   # 'Path-type' cached values
 
   def system_dylibs
-    @system_dylibs ||= store.nil? ? [] : store.fetch_type(:system_dylibs)
+    @system_dylibs ||= store.fetch_type(:system_dylibs)
   end
 
   def broken_dylibs
-    @broken_dylibs ||= store.nil? ? [] : store.fetch_type(:broken_dylibs)
+    @broken_dylibs ||= store.fetch_type(:broken_dylibs)
   end
 
   def variable_dylibs
-    @variable_dylibs ||= store.nil? ? [] : store.fetch_type(:variable_dylibs)
+    @variable_dylibs ||= store.fetch_type(:variable_dylibs)
   end
 
   def indirect_deps
-    @indirect_deps ||= store.nil? ? [] : store.fetch_type(:indirect_deps)
+    @indirect_deps ||= store.fetch_type(:indirect_deps)
   end
 
   def unnecessary_deps
-    @unnecessary_deps ||= store.nil? ? [] : store.fetch_type(:unnecessary_deps)
+    @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
   end
 
   def dylib_to_dep(dylib)
@@ -108,7 +108,8 @@ class LinkageChecker
 
       # weakly loaded dylibs may not actually exist on disk, so skip them
       # when checking for broken linkage
-      file.dynamically_linked_libraries(except: :LC_LOAD_WEAK_DYLIB).each do |dylib|
+      file.dynamically_linked_libraries(except: :LC_LOAD_WEAK_DYLIB)
+          .each do |dylib|
         @reverse_links[dylib] << file
         next if checked_dylibs.include? dylib
         if dylib.start_with? "@"
@@ -139,7 +140,10 @@ class LinkageChecker
       end
     end
 
-    @indirect_deps, @undeclared_deps, @unnecessary_deps = check_undeclared_deps if formula
+    if formula
+      @indirect_deps, @undeclared_deps, @unnecessary_deps =
+        check_undeclared_deps
+    end
     store_dylibs!
   end
 
