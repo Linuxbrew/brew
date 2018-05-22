@@ -6,6 +6,7 @@
 - [Installation](Installation.md)
 - [Frequently Asked Questions](FAQ.md)
 - [Common Issues](Common-Issues.md)
+- [`brew` Shell Completion](Shell-Completion.md)
 
 - [Tips and Tricks](Tips-N'-Tricks.md)
 - [Bottles (binary packages)](Bottles.md)
