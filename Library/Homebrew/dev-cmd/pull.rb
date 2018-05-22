@@ -103,14 +103,16 @@ module Homebrew
     end
 
     # Depending on user configuration, git may try to invoke gpg.
-    begin
-      gnupg = Formula["gnupg"]
-    rescue FormulaUnavailableError # rubocop:disable Lint/HandleExceptions
-    else
-      if gnupg.installed?
-        path = PATH.new(ENV.fetch("PATH"))
-        path.prepend(gnupg.installed_prefix/"bin")
-        ENV["PATH"] = path
+    if Utils.popen_read("git config --get --bool commit.gpgsign").chomp == "true"
+      begin
+        gnupg = Formula["gnupg"]
+      rescue FormulaUnavailableError # rubocop:disable Lint/HandleExceptions
+      else
+        if gnupg.installed?
+          path = PATH.new(ENV.fetch("PATH"))
+          path.prepend(gnupg.installed_prefix/"bin")
+          ENV["PATH"] = path
+        end
       end
     end
 
