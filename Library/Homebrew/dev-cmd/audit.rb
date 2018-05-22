@@ -154,9 +154,14 @@ module Homebrew
     end
 
     total_problems_count = problem_count + new_formula_problem_count
-    errors_summary = "#{Formatter.pluralize(total_problems_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
+    problem_plural = Formatter.pluralize(total_problems_count, "problem")
+    formula_plural = Formatter.pluralize(formula_count, "formula")
+    errors_summary = "#{problem_plural} in #{formula_plural}"
 
-    ofail errors_summary if problem_count.positive? || (new_formula_problem_count.positive? && !created_pr_comment)
+    if problem_count.positive? ||
+       (new_formula_problem_count.positive? && !created_pr_comment)
+      ofail errors_summary
+    end
   end
 
   def format_problem_lines(problems)
