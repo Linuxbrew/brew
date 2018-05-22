@@ -74,6 +74,7 @@ module Homebrew
 
     formula_count = 0
     problem_count = 0
+    new_formula_problem_count = 0
     new_formula = args.new_formula?
     strict = new_formula || args.strict?
     online = new_formula || args.online?
@@ -123,8 +124,7 @@ module Homebrew
       options[:style_offenses] = style_results.file_offenses(f.path)
       fa = FormulaAuditor.new(f, options)
       fa.audit
-
-      next if fa.problems.empty?
+      next if fa.problems.empty? && fa.new_formula_problems.empty?
       fa.problems
       formula_count += 1
       problem_count += fa.problems.size
@@ -149,13 +149,19 @@ module Homebrew
     end
 
     unless created_pr_comment
-      problem_count += new_formula_problem_lines.size
+      new_formula_problem_count += new_formula_problem_lines.size
       puts new_formula_problem_lines.map { |s| "  #{s}" }
     end
 
-    errors_summary = "#{Formatter.pluralize(problem_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
-    return if problem_count.zero?
-    ofail errors_summary unless strict
+    total_problems_count = problem_count + new_formula_problem_count
+    problem_plural = Formatter.pluralize(total_problems_count, "problem")
+    formula_plural = Formatter.pluralize(formula_count, "formula")
+    errors_summary = "#{problem_plural} in #{formula_plural}"
+
+    if problem_count.positive? ||
+       (new_formula_problem_count.positive? && !created_pr_comment)
+      ofail errors_summary
+    end
   end
 
   def format_problem_lines(problems)
