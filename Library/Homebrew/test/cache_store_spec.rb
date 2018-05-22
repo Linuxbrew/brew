@@ -6,10 +6,11 @@ describe CacheStoreDatabase do
   describe "self.use" do
     let(:type) { :test }
 
-    it "creates a new `DatabaseCache` instance and yields it" do
+    it "creates a new `DatabaseCache` instance" do
       cache_store = double("cache_store", close_if_open!: nil)
       expect(CacheStoreDatabase).to receive(:new).with(type).and_return(cache_store)
-      expect(CacheStoreDatabase).to receive(:call).with(cache_store)
+      expect(cache_store).to receive(:close_if_open!)
+      CacheStoreDatabase.use(type) { |_db| }
     end
   end
 
@@ -41,7 +42,7 @@ describe CacheStoreDatabase do
 
       it "gets value in the `CacheStoreDatabase` corresponding to the key" do
         expect(db).to have_key(:foo)
-        expect(subject.get(:foo)).to equal("bar")
+        expect(subject.get(:foo)).to eq("bar")
       end
     end
 

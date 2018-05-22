@@ -1,4 +1,3 @@
-require "test/support/fixtures/testball"
 require "linkage_cache_store"
 
 describe LinkageCacheStore do
