@@ -408,6 +408,13 @@ module Homebrew
           if dep.tags.include?(:run)
             problem "Dependency '#{dep.name}' is marked as :run. Remove :run; it is a no-op."
           end
+
+          next unless @new_formula
+          next if formula.versioned_formula?
+          next unless @official_tap
+          if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
+            new_formula_problem "Formulae should not have #{dep.tags} dependencies."
+          end
         end
       end
     end
