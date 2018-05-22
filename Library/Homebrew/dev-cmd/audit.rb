@@ -74,6 +74,7 @@ module Homebrew
 
     formula_count = 0
     problem_count = 0
+    new_formula_problem_count = 0
     new_formula = args.new_formula?
     strict = new_formula || args.strict?
     online = new_formula || args.online?
@@ -148,13 +149,14 @@ module Homebrew
     end
 
     unless created_pr_comment
-      problem_count += new_formula_problem_lines.size
+      new_formula_problem_count += new_formula_problem_lines.size
       puts new_formula_problem_lines.map { |s| "  #{s}" }
     end
 
-    errors_summary = "#{Formatter.pluralize(problem_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
-    return if problem_count.zero?
-    ofail errors_summary unless created_pr_comment
+    total_problems_count = problem_count + new_formula_problem_count
+    errors_summary = "#{Formatter.pluralize(total_problems_count, "problem")} in #{Formatter.pluralize(formula_count, "formula")}"
+
+    ofail errors_summary if problem_count.positive? || (new_formula_problem_count.positive? && !created_pr_comment)
   end
 
   def format_problem_lines(problems)
