@@ -9,7 +9,7 @@ class LinkageChecker
 
     if use_cache
       @store = LinkageCacheStore.new(keg.name, cache_db)
-      flush_cache_and_check_dylibs unless @store.has_keg_name?
+      flush_cache_and_check_dylibs unless @store.keg_exists?
     else
       flush_cache_and_check_dylibs
     end

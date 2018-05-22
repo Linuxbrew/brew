@@ -1528,8 +1528,9 @@ class Formula
     return [] unless keg
 
     undeclared_deps = CacheStoreDatabase.use(:linkage) do |db|
-      linkage_checker = LinkageChecker.new keg, self, cache_db: db,
-        use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
+      linkage_checker = LinkageChecker.new(
+        keg, self, cache_db: db, use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
+      )
       linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
     end
 

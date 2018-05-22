@@ -17,7 +17,7 @@ class LinkageCacheStore < CacheStore
   # Returns `true` if the database has any value for the current `keg_name`
   #
   # @return [Boolean]
-  def has_keg_name?
+  def keg_exists?
     !database.get(keg_name).nil?
   end
 
@@ -72,9 +72,11 @@ class LinkageCacheStore < CacheStore
 
   private
 
-  ARRAY_LINKAGE_TYPES = [:system_dylibs, :variable_dylibs, :broken_dylibs,
-    :indirect_deps, :undeclared_deps, :unnecessary_deps].freeze
-  HASH_LINKAGE_TYPES  = [:brewed_dylibs, :reverse_links, :broken_deps].freeze
+  ARRAY_LINKAGE_TYPES = [
+    :system_dylibs, :variable_dylibs, :broken_dylibs, :indirect_deps,
+    :undeclared_deps, :unnecessary_deps
+  ].freeze
+  HASH_LINKAGE_TYPES = [:brewed_dylibs, :reverse_links, :broken_deps].freeze
 
   # @return [String] the key to lookup items in the `CacheStore`
   attr_reader :keg_name
