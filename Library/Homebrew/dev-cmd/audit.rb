@@ -535,7 +535,7 @@ module Homebrew
         end
 
         next if spec.patches.empty?
-        new_formula_problem "New formulae should not require patches to build. Patches should be submitted and accepted upstream first."
+        new_formula_problem "Formulae should not require patches to build. Patches should be submitted and accepted upstream first."
       end
 
       %w[Stable Devel].each do |name|
@@ -558,7 +558,7 @@ module Homebrew
       end
 
       if @new_formula && formula.head
-        new_formula_problem "New formulae should not have a HEAD spec"
+        new_formula_problem "Formulae should not have a HEAD spec"
       end
 
       unstable_whitelist = %w[
