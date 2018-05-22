@@ -281,7 +281,7 @@ module Homebrew
             fa.audit_deps
           end
 
-          its(:problems) { are_expected.to match([/unnecessary/]) }
+          its(:new_formula_problems) { are_expected.to match([/unnecessary/]) }
         end
       end
     end

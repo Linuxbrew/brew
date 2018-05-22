@@ -86,9 +86,6 @@ module Homebrew
       ENV[env] = homebrew_env
     end
 
-    gh_api_errors = [GitHub::AuthenticationFailedError, GitHub::HTTPNotFoundError,
-                     GitHub::RateLimitExceededError, GitHub::Error, JSON::ParserError].freeze
-
     formula = ARGV.formulae.first
 
     if formula
@@ -291,7 +288,7 @@ module Homebrew
           response = GitHub.create_fork(formula.tap.full_name)
           # GitHub API responds immediately but fork takes a few seconds to be ready.
           sleep 3
-        rescue *gh_api_errors => e
+        rescue *GitHub.api_errors => e
           formula.path.atomic_write(backup_file) unless @bump_args.dry_run?
           odie "Unable to fork: #{e.message}!"
         end
@@ -327,7 +324,7 @@ module Homebrew
           else
             exec_browser url
           end
-        rescue *gh_api_errors => e
+        rescue *GitHub.api_errors => e
           odie "Unable to open pull request: #{e.message}!"
         end
       end
