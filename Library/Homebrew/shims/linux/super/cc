@@ -331,6 +331,14 @@ def log(basename, argv, tool, args)
   File.open("#{ENV["HOMEBREW_CC_LOG_PATH"]}.cc", "a+") { |f| f.write(s) }
 end
 
+def remove_superbin_from_path(paths)
+  superbin = Pathname.new(__FILE__).dirname.realpath
+  paths.reject do |x|
+    path = Pathname.new(x)
+    path.directory? && path.realpath == superbin
+  end
+end
+
 if __FILE__ == $PROGRAM_NAME
   ##################################################################### sanity
 
@@ -349,11 +357,8 @@ if __FILE__ == $PROGRAM_NAME
 
   log(basename, ARGV, tool, args)
 
-  superbin = Pathname.new(__FILE__).dirname.realpath
-  paths = ENV["PATH"].split(":").reject do |x|
-    path = Pathname.new(x)
-    path.directory? && path.realpath == superbin
-  end
+  paths = ENV["PATH"].split(":")
+  paths = remove_superbin_from_path(paths)
   paths.unshift "#{ENV["HOMEBREW_PREFIX"]}/bin"
   ENV["PATH"] = paths.join(":")
   args << { :close_others => false }
