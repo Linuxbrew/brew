@@ -64,5 +64,15 @@ describe RuboCop::Cop::NewFormulaAudit::Options do
         end
       RUBY
     end
+
+    it "with options" do
+      expect_offense(<<~RUBY, "/homebrew-core/")
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          option "with-examples"
+          ^^^^^^^^^^^^^^^^^^^^^^ Formula should not have an `option`
+        end
+      RUBY
+    end
   end
 end
