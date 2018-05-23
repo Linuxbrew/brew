@@ -69,15 +69,5 @@ describe "brew tap", :integration_test do
       .to be_a_success
       .and not_to_output.to_stdout
       .and not_to_output.to_stderr
-
-    expect { brew "tap", "--force-auto-update", "homebrew/bar" }
-      .to be_a_success
-      .and not_to_output.to_stdout
-      .and not_to_output.to_stderr
-
-    expect { brew "untap", "homebrew/bar" }
-      .to output(/Untapped/).to_stdout
-      .and not_to_output.to_stderr
-      .and be_a_success
   end
 end
