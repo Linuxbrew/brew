@@ -2,21 +2,6 @@ describe "brew install", :integration_test do
   it "installs Formulae" do
     setup_test_formula "testball1"
 
-    expect { brew "install", "testball1", "--head" }
-      .to output(/Specify `\-\-HEAD`/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_failure
-
-    expect { brew "install", "testball1", "--HEAD" }
-      .to output(/No head is defined/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_failure
-
-    expect { brew "install", "testball1", "--devel" }
-      .to output(/No devel block/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_failure
-
     expect { brew "install", "testball1" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/0\.1}).to_stdout
       .and not_to_output.to_stderr
@@ -27,27 +12,12 @@ describe "brew install", :integration_test do
       .and not_to_output.to_stdout
       .and be_a_success
 
-    expect { brew "install", "macruby" }
-      .to output(/MacRuby is not packaged/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_failure
-
     expect { brew "install", "formula" }
       .to output(/No available formula/).to_stderr
       .and output(/Searching for similarly named formulae/).to_stdout
       .and be_a_failure
 
-    expect { brew "install", "testball" }
-      .to output(/This similarly named formula was found/).to_stdout
-      .and output(/No available formula/).to_stderr
-      .and be_a_failure
-
     setup_test_formula "testball2"
-    expect { brew "install", "testball" }
-      .to output(/These similarly named formulae were found/).to_stdout
-      .and output(/No available formula/).to_stderr
-      .and be_a_failure
-
     install_and_rename_coretap_formula "testball1", "testball2"
     expect { brew "install", "testball2" }
       .to output(/testball1 already installed, it's just not migrated/).to_stderr
