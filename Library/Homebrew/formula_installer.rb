@@ -11,6 +11,8 @@ require "debrew"
 require "sandbox"
 require "emoji"
 require "development_tools"
+require "cache_store"
+require "linkage_checker"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -606,6 +608,12 @@ class FormulaInstaller
 
     ohai "Summary" if verbose? || show_summary_heading?
     puts summary
+
+    # Updates the cache for a particular formula after doing an install
+    CacheStoreDatabase.use(:linkage) do |db|
+      break unless db.created?
+      LinkageChecker.new(keg, formula, cache_db: db)
+    end
 
     # let's reset Utils.git_available? if we just installed git
     Utils.clear_git_available_cache if formula.name == "git"

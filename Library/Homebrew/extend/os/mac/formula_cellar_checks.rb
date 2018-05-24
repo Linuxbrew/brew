@@ -1,3 +1,4 @@
+require "cache_store"
 require "linkage_checker"
 
 module FormulaCellarChecks
@@ -64,22 +65,28 @@ module FormulaCellarChecks
   def check_linkage
     return unless formula.prefix.directory?
     keg = Keg.new(formula.prefix)
-    checker = LinkageChecker.new(keg, formula)
 
-    return unless checker.broken_library_linkage?
-    output = <<~EOS
-      #{formula} has broken dynamic library links:
-        #{checker.display_test_output}
-    EOS
-    tab = Tab.for_keg(keg)
-    if tab.poured_from_bottle
-      output += <<~EOS
-        Rebuild this from source with:
-          brew reinstall --build-from-source #{formula}
-        If that's successful, file an issue#{formula.tap ? " here:\n  #{formula.tap.issues_url}" : "."}
+    CacheStoreDatabase.use(:linkage) do |db|
+      checker = LinkageChecker.new(
+        keg, formula, cache_db: db, use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
+      )
+      next unless checker.broken_library_linkage?
+
+      output = <<~EOS
+        #{formula} has broken dynamic library links:
+          #{checker.display_test_output}
       EOS
+
+      tab = Tab.for_keg(keg)
+      if tab.poured_from_bottle
+        output += <<~EOS
+          Rebuild this from source with:
+            brew reinstall --build-from-source #{formula}
+          If that's successful, file an issue#{formula.tap ? " here:\n  #{formula.tap.issues_url}" : "."}
+        EOS
+      end
+      problem_if_output output
     end
-    problem_if_output output
   end
 
   def audit_installed
