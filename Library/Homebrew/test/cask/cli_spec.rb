@@ -74,8 +74,8 @@ describe Hbc::CLI, :cask do
     end
   end
 
-  it "provides a help message for all commands" do
-    described_class.command_classes.each do |command_class|
+  it "provides a help message for all visible commands" do
+    described_class.command_classes.select(&:visible).each do |command_class|
       expect(command_class.help).to match(/\w+/), command_class.name
     end
   end

@@ -115,6 +115,40 @@ describe Hbc::Audit, :cask do
       end
     end
 
+    describe "when the Cask stanza requires uninstall" do
+      let(:error_msg) { "installer and pkg stanzas require an uninstall stanza" }
+
+      context "when the Cask does not require an uninstall" do
+        let(:cask_token) { "basic-cask" }
+
+        it { is_expected.not_to warn_with(error_msg) }
+      end
+
+      context "when the pkg Cask has an uninstall" do
+        let(:cask_token) { "with-uninstall-pkgutil" }
+
+        it { is_expected.not_to warn_with(error_msg) }
+      end
+
+      context "when the installer Cask has an uninstall" do
+        let(:cask_token) { "installer-with-uninstall" }
+
+        it { is_expected.not_to warn_with(error_msg) }
+      end
+
+      context "when the installer Cask does not have an uninstall" do
+        let(:cask_token) { "with-installer-manual" }
+
+        it { is_expected.to warn_with(error_msg) }
+      end
+
+      context "when the pkg Cask does not have an uninstall" do
+        let(:cask_token) { "pkg-without-uninstall" }
+
+        it { is_expected.to warn_with(error_msg) }
+      end
+    end
+
     describe "preflight stanza checks" do
       let(:error_msg) { "only a single preflight stanza is allowed" }
 

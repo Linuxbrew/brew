@@ -251,11 +251,9 @@ module Homebrew
           problem "#{formula} is versioned but no #{unversioned_name} formula exists"
         end
       elsif ARGV.build_stable? && formula.stable? &&
-            !(versioned_formulae = Dir[formula.path.to_s.gsub(/\.rb$/, "@*.rb")]).empty?
+            !(versioned_formulae = formula.versioned_formulae).empty?
         versioned_aliases = formula.aliases.grep(/.@\d/)
-        _, last_alias_version =
-          File.basename(versioned_formulae.sort.reverse.first)
-              .gsub(/\.rb$/, "").split("@")
+        _, last_alias_version = versioned_formulae.map(&:name).last.split("@")
         major, minor, = formula.version.to_s.split(".")
         alias_name_major = "#{formula.name}@#{major}"
         alias_name_major_minor = "#{alias_name_major}.#{minor}"

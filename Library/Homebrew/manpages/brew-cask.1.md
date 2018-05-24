@@ -108,7 +108,7 @@ names, and other aspects of this manual are still subject to change.
     Ruby regular expression.
 
   * `style` [--fix] [ <token> ... ]:
-    Check the given Casks for correct style using [RuboCop Cask](https://github.com/caskroom/rubocop-cask).
+    Check the given Casks for correct style using [RuboCop Cask](https://github.com/Homebrew/rubocop-cask).
     If no tokens are given on the command line, all Casks are checked.
     With `--fix`, auto-correct any style errors if possible.
 
@@ -123,11 +123,11 @@ names, and other aspects of this manual are still subject to change.
     If `--greedy` is given then also upgrade the Casks having `auto_updates true`
     or `version :latest`.
 
-  * `zap` <token> [ <token> ... ]:
+  * `zap` [--force] <token> [ <token> ... ]:
     Unconditionally remove _all_ files associated with the given Cask.
+    With `--force`, zap even if the Cask does not appear to be currently installed.
 
-    Implicitly performs all actions associated with `uninstall`, even if
-    the Cask does not appear to be currently installed.
+    Implicitly performs all actions associated with `uninstall`.
 
     Removes all staged versions of the Cask distribution found under
     `<Caskroom_path>/`<token>.

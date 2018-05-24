@@ -29,7 +29,6 @@ require "hbc/version"
 
 module Hbc
   include Locations
-  include Utils
 
   def self.init
     Cache.ensure_cache_exists

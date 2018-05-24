@@ -84,7 +84,7 @@ module FormulaCellarChecks
     <<~EOS
       Non-executables were installed to "#{bin}"
       The offending files are:
-        #{non_exes * "\n        "}
+        #{non_exes * "\n  "}
     EOS
   end
 

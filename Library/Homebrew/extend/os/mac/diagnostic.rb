@@ -291,29 +291,59 @@ module Homebrew
         EOS
       end
 
-      def check_which_pkg_config
-        binary = which "pkg-config"
-        return if binary.nil?
+      def check_for_gettext
+        find_relative_paths("lib/libgettextlib.dylib",
+                            "lib/libintl.dylib",
+                            "include/libintl.h")
+        return if @found.empty?
 
-        mono_config = Pathname.new("/usr/bin/pkg-config")
-        if mono_config.exist? && mono_config.realpath.to_s.include?("Mono.framework")
-          <<~EOS
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              /usr/bin/pkg-config => #{mono_config.realpath}
+        # Our gettext formula will be caught by check_linked_keg_only_brews
+        gettext = begin
+          Formulary.factory("gettext")
+        rescue
+          nil
+        end
 
-            This was most likely created by the Mono installer. `./configure` may
-            have problems finding brew-installed packages using this other pkg-config.
+        if gettext&.linked_keg&.directory?
+          homebrew_owned = @found.all? do |path|
+            Pathname.new(path).realpath.to_s.start_with? "#{HOMEBREW_CELLAR}/gettext"
+          end
+          return if homebrew_owned
+        end
 
-            Mono no longer installs this file as of 3.0.4. You should
-            `sudo rm /usr/bin/pkg-config` and upgrade to the latest version of Mono.
-          EOS
-        elsif binary.to_s != "#{HOMEBREW_PREFIX}/bin/pkg-config"
-          <<~EOS
-            You have a non-Homebrew 'pkg-config' in your PATH:
-              #{binary}
+        inject_file_list @found, <<~EOS
+          gettext files detected at a system prefix.
+          These files can cause compilation and link failures, especially if they
+          are compiled with improper architectures. Consider removing these files:
+        EOS
+      end
 
-            `./configure` may have problems finding brew-installed packages using
-            this other pkg-config.
+      def check_for_iconv
+        find_relative_paths("lib/libiconv.dylib", "include/iconv.h")
+        return if @found.empty?
+
+        libiconv = begin
+          Formulary.factory("libiconv")
+        rescue
+          nil
+        end
+        if libiconv&.linked_keg&.directory?
+          unless libiconv.keg_only?
+            <<~EOS
+              A libiconv formula is installed and linked.
+              This will break stuff. For serious. Unlink it.
+            EOS
+          end
+        else
+          inject_file_list @found, <<~EOS
+            libiconv files detected at a system prefix other than /usr.
+            Homebrew doesn't provide a libiconv formula, and expects to link against
+            the system version in /usr. libiconv in other prefixes can cause
+            compile or link failure, especially if compiled with improper
+            architectures. macOS itself never installs anything to /usr/local so
+            it was either installed by a user or some other third party software.
+
+            tl;dr: delete these files:
           EOS
         end
       end
@@ -348,28 +378,6 @@ module Homebrew
           You should set the "HOMEBREW_TEMP" environmental variable to a suitable
           directory on the same volume as your Cellar.
         EOS
-      end
-
-      def check_dyld_vars
-        dyld_vars = ENV.keys.grep(/^DYLD_/)
-        return if dyld_vars.empty?
-
-        values = dyld_vars.map { |var| "#{var}: #{ENV.fetch(var)}" }
-        message = inject_file_list values, <<~EOS
-          Setting DYLD_* vars can break dynamic linking.
-          Set variables:
-        EOS
-
-        if dyld_vars.include? "DYLD_INSERT_LIBRARIES"
-          message += <<~EOS
-
-            Setting DYLD_INSERT_LIBRARIES can cause Go builds to fail.
-            Having this set is common if you use this software:
-              #{Formatter.url("https://asepsis.binaryage.com/")}
-          EOS
-        end
-
-        message
       end
     end
   end

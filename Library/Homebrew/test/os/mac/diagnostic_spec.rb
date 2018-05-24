@@ -46,8 +46,8 @@ describe Homebrew::Diagnostic::Checks do
       .to match "Ruby version 1.8.6 is unsupported on 10.12"
   end
 
-  specify "#check_dyld_vars" do
+  specify "#check_dyld_insert" do
     ENV["DYLD_INSERT_LIBRARIES"] = "foo"
-    expect(subject.check_dyld_vars).to match("Setting DYLD_INSERT_LIBRARIES")
+    expect(subject.check_ld_vars).to match("Setting DYLD_INSERT_LIBRARIES")
   end
 end

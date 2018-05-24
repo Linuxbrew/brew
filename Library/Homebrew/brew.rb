@@ -22,12 +22,6 @@ end
 
 require "global"
 
-if ARGV == %w[--version] || ARGV == %w[-v]
-  puts "Homebrew #{HOMEBREW_VERSION}"
-  puts "Homebrew/homebrew-core #{CoreTap.instance.version_string}"
-  exit 0
-end
-
 begin
   trap("INT", std_trap) # restore default CTRL-C handler
 

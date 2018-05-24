@@ -1,7 +1,11 @@
 module Hbc
   class DSL
-    def license(*)
-      odeprecated "Hbc::DSL#license"
+    module Compat
+      def license(*)
+        odeprecated "Hbc::DSL#license"
+      end
     end
+
+    prepend Compat
   end
 end

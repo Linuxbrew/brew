@@ -160,6 +160,26 @@ describe Homebrew::Diagnostic::Checks do
     end
   end
 
+  specify "#check_ld_vars catches LD vars" do
+    ENV["LD_LIBRARY_PATH"] = "foo"
+    expect(subject.check_ld_vars).to match("Setting DYLD_\\* or LD_\\* variables")
+  end
+
+  specify "#check_ld_vars catches DYLD vars" do
+    ENV["DYLD_LIBRARY_PATH"] = "foo"
+    expect(subject.check_ld_vars).to match("Setting DYLD_\\* or LD_\\* variables")
+  end
+
+  specify "#check_ld_vars catches LD and DYLD vars" do
+    ENV["LD_LIBRARY_PATH"] = "foo"
+    ENV["DYLD_LIBRARY_PATH"] = "foo"
+    expect(subject.check_ld_vars).to match("Setting DYLD_\\* or LD_\\* variables")
+  end
+
+  specify "#check_ld_vars returns success when neither LD nor DYLD vars are set" do
+    expect(subject.check_ld_vars).to be nil
+  end
+
   specify "#check_tmpdir" do
     ENV["TMPDIR"] = "/i/don/t/exis/t"
     expect(subject.check_tmpdir).to match("doesn't exist")

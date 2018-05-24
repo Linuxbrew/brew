@@ -21,7 +21,7 @@ module Hbc
       def self.search_remote(query)
         matches = begin
           GitHub.search_code(
-            user: "caskroom",
+            user: ["Homebrew", "caskroom"],
             path: "Casks",
             filename: query,
             extension: "rb",

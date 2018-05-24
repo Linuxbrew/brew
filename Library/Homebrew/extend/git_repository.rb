@@ -13,6 +13,13 @@ module GitRepositoryExtension
     end
   end
 
+  def git_origin=(origin)
+    return unless git? && Utils.git_available?
+    cd do
+      safe_system "git", "remote", "set-url", "origin", origin
+    end
+  end
+
   def git_head
     return unless git? && Utils.git_available?
     cd do

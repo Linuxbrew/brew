@@ -89,7 +89,7 @@ describe Hbc::CLI::Style, :cask do
         end
       end
 
-      it { is_expected.to contain_exactly(a_path_ending_with("/caskroom/homebrew-spec/Casks"), a_path_ending_with("/third-party/homebrew-tap/Casks")) }
+      it { is_expected.to contain_exactly(a_path_ending_with("/homebrew/homebrew-cask-spec/Casks"), a_path_ending_with("/third-party/homebrew-tap/Casks")) }
     end
 
     context "when at least one cask token is a path that exists" do

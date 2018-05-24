@@ -12,7 +12,7 @@ describe Hbc::CLI::Info, :cask do
       local-caffeine: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/local-caffeine.rb
+      From: https://github.com/Homebrew/homebrew-cask-spec/blob/master/Casks/local-caffeine.rb
       ==> Name
       None
       ==> Artifacts
@@ -26,7 +26,7 @@ describe Hbc::CLI::Info, :cask do
         local-caffeine: 1.2.3
         http://example.com/local-caffeine
         Not installed
-        From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/local-caffeine.rb
+        From: https://github.com/Homebrew/homebrew-cask-spec/blob/master/Casks/local-caffeine.rb
         ==> Name
         None
         ==> Artifacts
@@ -34,7 +34,7 @@ describe Hbc::CLI::Info, :cask do
         local-transmission: 2.61
         http://example.com/local-transmission
         Not installed
-        From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/local-transmission.rb
+        From: https://github.com/Homebrew/homebrew-cask-spec/blob/master/Casks/local-transmission.rb
         ==> Name
         None
         ==> Artifacts
@@ -56,7 +56,7 @@ describe Hbc::CLI::Info, :cask do
       with-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/with-caveats.rb
+      From: https://github.com/Homebrew/homebrew-cask-spec/blob/master/Casks/with-caveats.rb
       ==> Name
       None
       ==> Artifacts
@@ -82,7 +82,7 @@ describe Hbc::CLI::Info, :cask do
       with-conditional-caveats: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/with-conditional-caveats.rb
+      From: https://github.com/Homebrew/homebrew-cask-spec/blob/master/Casks/with-conditional-caveats.rb
       ==> Name
       None
       ==> Artifacts
@@ -97,7 +97,7 @@ describe Hbc::CLI::Info, :cask do
       with-languages: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/with-languages.rb
+      From: https://github.com/Homebrew/homebrew-cask-spec/blob/master/Casks/with-languages.rb
       ==> Name
       None
       ==> Languages
@@ -114,7 +114,7 @@ describe Hbc::CLI::Info, :cask do
       without-languages: 1.2.3
       http://example.com/local-caffeine
       Not installed
-      From: https://github.com/caskroom/homebrew-spec/blob/master/Casks/without-languages.rb
+      From: https://github.com/Homebrew/homebrew-cask-spec/blob/master/Casks/without-languages.rb
       ==> Name
       None
       ==> Artifacts
