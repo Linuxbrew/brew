@@ -40,13 +40,13 @@ class LinkageChecker
   end
 
   def display_test_output(puts_output: true)
-    display_items "Missing libraries", @broken_dylibs, puts_output: puts_output
-    display_items "Broken dependencies", @broken_deps, puts_output: puts_output
+    display_items "Missing libraries", broken_dylibs, puts_output: puts_output
+    display_items "Broken dependencies", broken_deps, puts_output: puts_output
     puts "No broken library linkage" unless broken_library_linkage?
   end
 
   def broken_library_linkage?
-    !@broken_dylibs.empty? || !@broken_deps.empty?
+    !broken_dylibs.empty? || !broken_deps.empty?
   end
 
   def undeclared_deps
