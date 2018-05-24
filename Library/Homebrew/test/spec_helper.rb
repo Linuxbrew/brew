@@ -43,6 +43,10 @@ RSpec.configure do |config|
 
   config.filter_run_when_matching :focus
 
+  config.expect_with :rspec do |c|
+    c.max_formatted_output_length = nil
+  end
+
   config.include(FileUtils)
 
   config.include(RuboCop::RSpec::ExpectOffense)
