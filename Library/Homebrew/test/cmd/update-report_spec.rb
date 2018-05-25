@@ -20,8 +20,8 @@ describe Reporter do
       def initialize(tap)
         @tap = tap
 
-        ENV["HOMEBREW_UPDATE_BEFORE#{repo_var}"] = "12345678"
-        ENV["HOMEBREW_UPDATE_AFTER#{repo_var}"] = "abcdef00"
+        ENV["HOMEBREW_UPDATE_BEFORE#{tap.repo_var}"] = "12345678"
+        ENV["HOMEBREW_UPDATE_AFTER#{tap.repo_var}"] = "abcdef00"
 
         super(tap)
       end

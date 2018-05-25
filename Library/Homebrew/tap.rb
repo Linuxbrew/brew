@@ -111,6 +111,13 @@ class Tap
     "https://github.com/#{full_name}"
   end
 
+  def repo_var
+    @repo_var ||= path.to_s
+                      .strip_prefix(TAP_DIRECTORY.to_s)
+                      .tr("^A-Za-z0-9", "_")
+                      .upcase
+  end
+
   # True if this {Tap} is a git repository.
   def git?
     path.git?
