@@ -17,6 +17,8 @@ class Tap
 
       super(new_user, new_repo)
 
+      @repo_var = nil
+
       new_initial_revision_var = "HOMEBREW_UPDATE_BEFORE#{repo_var}"
       new_current_revision_var = "HOMEBREW_UPDATE_AFTER#{repo_var}"
 
