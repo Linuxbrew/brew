@@ -13,7 +13,7 @@ class Tap
 
       old_name = name
       old_path = path
-      old_remote = path.git_origin
+      old_remote = remote
 
       clear_cache
       super(new_user, new_repo)
@@ -24,8 +24,6 @@ class Tap
       ENV[new_initial_revision_var] ||= ENV[old_initial_revision_var]
       ENV[new_current_revision_var] ||= ENV[old_current_revision_var]
 
-      return unless old_path.git?
-
       new_name = name
       new_path = path
       new_remote = default_remote
@@ -35,6 +33,8 @@ class Tap
       puts "Moving #{old_path} to #{new_path}..." if $stdout.tty?
       path.dirname.mkpath
       FileUtils.mv old_path, new_path
+
+      return unless old_path.git?
 
       puts "Changing remote from #{old_remote} to #{new_remote}..." if $stdout.tty?
       new_path.git_origin = new_remote
