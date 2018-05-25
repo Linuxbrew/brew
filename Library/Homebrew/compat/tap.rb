@@ -5,6 +5,9 @@ class Tap
 
       return unless user == "caskroom"
 
+      old_initial_revision_var = "HOMEBREW_UPDATE_BEFORE#{repo_var}"
+      old_current_revision_var = "HOMEBREW_UPDATE_AFTER#{repo_var}"
+
       new_user = "Homebrew"
       new_repo = (repo == "cask") ? repo : "cask-#{repo}"
 
@@ -13,6 +16,12 @@ class Tap
       old_remote = path.git_origin
 
       super(new_user, new_repo)
+
+      new_initial_revision_var = "HOMEBREW_UPDATE_BEFORE#{repo_var}"
+      new_current_revision_var = "HOMEBREW_UPDATE_AFTER#{repo_var}"
+
+      ENV[new_initial_revision_var] ||= ENV[old_initial_revision_var]
+      ENV[new_current_revision_var] ||= ENV[old_current_revision_var]
 
       return unless old_path.git?
 
