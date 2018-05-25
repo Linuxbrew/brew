@@ -569,7 +569,7 @@ __brew_cask_complete_formulae ()
     local cur="${COMP_WORDS[COMP_CWORD]}"
     local lib=$(brew --repository)/Library
     local taps=${lib}/Taps
-    local casks=${lib}/Taps/caskroom/homebrew-cask/Casks
+    local casks=${lib}/Taps/homebrew/homebrew-cask/Casks
     local ff=$(\ls ${casks} 2>/dev/null | \sed 's/\.rb//g')
 
     COMPREPLY=($(compgen -W "$ff" -- "$cur"))
@@ -585,7 +585,7 @@ __brew_cask_complete_installed ()
 __brew_cask_complete_caskroom ()
 {
     local cur="${COMP_WORDS[COMP_CWORD]}"
-    local caskroom_dir=/opt/homebrew-cask/Caskroom/
+    local caskroom_dir="$(brew --prefix)/Caskroom/"
     local files=$(\ls ${caskroom_dir} 2>/dev/null)
     COMPREPLY=($(compgen -W "$files" -- "$cur"))
 }
@@ -721,7 +721,7 @@ _brew_cask ()
     done
 
     if [[ $i -eq $COMP_CWORD ]]; then
-        __brew_caskcomp "abv audit cat cleanup create doctor edit fetch home info install list ls outdated reinstall remove rm search style uninstall upgrade zap -S --force --caskroom --verbose --appdir --colorpickerdir --prefpanedir --qlplugindir --fontdir --servicedir --input_methoddir --internet_plugindir --screen_saverdir --no-binaries --debug --version"
+        __brew_caskcomp "abv audit cat cleanup create doctor edit fetch home info install list ls outdated reinstall remove rm search style uninstall upgrade zap -S --force --verbose --appdir --colorpickerdir --prefpanedir --qlplugindir --fontdir --servicedir --input_methoddir --internet_plugindir --screen_saverdir --no-binaries --debug --version"
         return
     fi
 
