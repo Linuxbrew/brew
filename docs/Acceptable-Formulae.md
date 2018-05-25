@@ -23,7 +23,7 @@ Our policy is that formulae in the core tap
 ([homebrew/core](https://github.com/Homebrew/homebrew-core)) must be open-source
 and either built from source or produce cross-platform binaries (e.g. Java, Mono).
 Binary-only formulae should go to
-[Homebrew Cask](https://github.com/caskroom/homebrew-cask).
+[Homebrew Cask](https://github.com/Homebrew/homebrew-cask).
 
 ### Stable versions
 Formulae in the core repository must have a stable version tagged by
@@ -57,7 +57,7 @@ running a package manager.
 
 ### Stuff that builds an `.app`
 Don’t make your formula build an `.app` (native macOS Application); we
-don’t want those things in Homebrew. Encourage upstream projects to build and support a `.app` that can be distributed by [Homebrew Cask](https://github.com/caskroom/homebrew-cask) (and used without it, too).
+don’t want those things in Homebrew. Encourage upstream projects to build and support a `.app` that can be distributed by [Homebrew Cask](https://github.com/Homebrew/homebrew-cask) (and used without it, too).
 
 ### Stuff that builds a GUI by default (but doesn't have to)
 Make it build a command-line tool or a library by default and, if the GUI is useful and would be widely used, add an option to build the GUI. Don't offer an option for multiple GUI backends e.g. X11 is a bad user experience for GUIs on macOS.
