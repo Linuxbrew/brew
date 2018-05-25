@@ -133,7 +133,6 @@ RSpec.configure do |config|
         HOMEBREW_PREFIX/"share",
         HOMEBREW_PREFIX/"opt",
         HOMEBREW_PREFIX/"Caskroom",
-        HOMEBREW_LIBRARY/"Taps/caskroom",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-cask",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bar",
         HOMEBREW_LIBRARY/"Taps/homebrew/homebrew-bundle",
