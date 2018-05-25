@@ -327,11 +327,11 @@ class Reporter
   def initialize(tap)
     @tap = tap
 
-    initial_revision_var = "HOMEBREW_UPDATE_BEFORE#{repo_var}"
+    initial_revision_var = "HOMEBREW_UPDATE_BEFORE#{tap.repo_var}"
     @initial_revision = ENV[initial_revision_var].to_s
     raise ReporterRevisionUnsetError, initial_revision_var if @initial_revision.empty?
 
-    current_revision_var = "HOMEBREW_UPDATE_AFTER#{repo_var}"
+    current_revision_var = "HOMEBREW_UPDATE_AFTER#{tap.repo_var}"
     @current_revision = ENV[current_revision_var].to_s
     raise ReporterRevisionUnsetError, current_revision_var if @current_revision.empty?
   end
@@ -530,13 +530,6 @@ class Reporter
   end
 
   private
-
-  def repo_var
-    @repo_var ||= tap.path.to_s
-                     .strip_prefix(Tap::TAP_DIRECTORY.to_s)
-                     .tr("^A-Za-z0-9", "_")
-                     .upcase
-  end
 
   def diff
     Utils.popen_read(
