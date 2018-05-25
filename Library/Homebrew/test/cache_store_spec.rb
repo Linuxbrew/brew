@@ -21,7 +21,7 @@ describe CacheStoreDatabase do
       allow(File).to receive(:write)
       allow(subject).to receive(:created?).and_return(true)
       expect(db).to receive(:has_key?).with(:foo).and_return(false)
-      subject.stub(:db).and_return(db)
+      allow(subject).to receive(:db).and_return(db)
     end
 
     it "sets the value in the `CacheStoreDatabase`" do
@@ -37,7 +37,7 @@ describe CacheStoreDatabase do
       before(:each) do
         allow(subject).to receive(:created?).and_return(true)
         expect(db).to receive(:has_key?).with(:foo).and_return(true)
-        subject.stub(:db).and_return(db)
+        allow(subject).to receive(:db).and_return(db)
       end
 
       it "gets value in the `CacheStoreDatabase` corresponding to the key" do
@@ -51,7 +51,7 @@ describe CacheStoreDatabase do
 
       before(:each) do
         allow(subject).to receive(:created?).and_return(false)
-        subject.stub(:db).and_return(db)
+        allow(subject).to receive(:db).and_return(db)
       end
 
       it "does not get value in the `CacheStoreDatabase` corresponding to key" do
@@ -71,7 +71,7 @@ describe CacheStoreDatabase do
 
       before(:each) do
         allow(subject).to receive(:created?).and_return(true)
-        subject.stub(:db).and_return(db)
+        allow(subject).to receive(:db).and_return(db)
       end
 
       it "deletes value in the `CacheStoreDatabase` corresponding to the key" do
@@ -85,7 +85,7 @@ describe CacheStoreDatabase do
 
       before(:each) do
         allow(subject).to receive(:created?).and_return(false)
-        subject.stub(:db).and_return(db)
+        allow(subject).to receive(:db).and_return(db)
       end
 
       it "does not call `db.delete` if `CacheStoreDatabase.created?` is `false`" do
@@ -121,7 +121,7 @@ describe CacheStoreDatabase do
     let(:cache_path) { "path/to/homebrew/cache/sample.db" }
 
     before(:each) do
-      subject.stub(:cache_path).and_return(cache_path)
+      allow(subject).to receive(:cache_path).and_return(cache_path)
     end
 
     context "`File.exist?(cache_path)` returns `true`" do
