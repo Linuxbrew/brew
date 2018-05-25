@@ -1005,7 +1005,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Install macOS applications distributed as binaries.
 
 
-  Homebrew/homebrew-cask <https://github.com/Homebrew/homebrew-cask>
+  Caskroom/homebrew-cask <https://github.com/caskroom/homebrew-cask>
 
   * `services` `command`:
 

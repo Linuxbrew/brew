@@ -1,14 +1,14 @@
 describe Hbc::CLI, :cask do
   it "lists the taps for Casks that show up in two taps" do
     listing = described_class.nice_listing(%w[
-                                             homebrew/cask/adium
-                                             homebrew/cask/google-chrome
+                                             caskroom/cask/adium
+                                             caskroom/cask/google-chrome
                                              passcod/homebrew-cask/adium
                                            ])
 
     expect(listing).to eq(%w[
+                            caskroom/cask/adium
                             google-chrome
-                            homebrew/cask/adium
                             passcod/cask/adium
                           ])
   end

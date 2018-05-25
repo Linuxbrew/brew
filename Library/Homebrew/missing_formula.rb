@@ -101,7 +101,7 @@ module Homebrew
           EOS
           break if new_tap_name == CoreTap.instance.name
 
-          install_cmd = if new_tap_name.start_with?("homebrew/cask")
+          install_cmd = if new_tap_user == "caskroom" || (new_tap_user == "homebrew" && new_tap_repo.start_with?("cask"))
             "cask install"
           else
             "install"

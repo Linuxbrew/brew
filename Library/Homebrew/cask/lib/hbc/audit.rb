@@ -61,7 +61,7 @@ module Hbc
 
       tap = @cask.tap
       return if tap.nil?
-      return if tap.user != "Homebrew"
+      return unless ["Homebrew", "caskroom"].include?(tap.user)
 
       return unless cask.artifacts.any? { |k| k.is_a?(Hbc::Artifact::Pkg) && k.stanza_options.key?(:allow_untrusted) }
       add_warning "allow_untrusted is not permitted in official Homebrew-Cask taps"
@@ -133,7 +133,7 @@ module Hbc
         return unless previous_cask.version == cask.version
         return if previous_cask.sha256 == cask.sha256
 
-        add_error "only sha256 changed (see: https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
+        add_error "only sha256 changed (see: https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/sha256.md)"
       rescue CaskError => e
         add_warning "Skipped version and checksum comparison. Reading previous version failed: #{e}"
       end
@@ -250,7 +250,7 @@ module Hbc
       return if cask.appcast
       return unless cask.url.to_s =~ %r{github.com/([^/]+)/([^/]+)/releases/download/(\S+)}
 
-      add_warning "Cask uses GitHub releases, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
+      add_warning "Cask uses GitHub releases, please add an appcast. See https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
     end
 
     def check_url
@@ -261,9 +261,9 @@ module Hbc
     def check_download_url_format
       odebug "Auditing URL format"
       if bad_sourceforge_url?
-        add_warning "SourceForge URL format incorrect. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/url.md#sourceforgeosdn-urls"
+        add_warning "SourceForge URL format incorrect. See https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/url.md#sourceforgeosdn-urls"
       elsif bad_osdn_url?
-        add_warning "OSDN URL format incorrect. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/url.md#sourceforgeosdn-urls"
+        add_warning "OSDN URL format incorrect. See https://github.com/caskroom/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/url.md#sourceforgeosdn-urls"
       end
     end
 

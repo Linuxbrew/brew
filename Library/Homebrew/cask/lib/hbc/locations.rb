@@ -17,7 +17,7 @@ module Hbc
       attr_writer :default_tap
 
       def default_tap
-        @default_tap ||= Tap.fetch("homebrew", "homebrew-cask")
+        @default_tap ||= Tap.fetch("caskroom", "homebrew-cask")
       end
 
       def tcc_db

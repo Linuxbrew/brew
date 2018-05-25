@@ -13,7 +13,7 @@ zstyle -T ':completion:*:*:*:brew-cask:*' tag-order && \
 	zstyle ':completion:*:*:*:brew-cask:*' tag-order 'commands'
 
 __brew_cask() {
-  [ -d "$(brew --repo homebrew/cask)" ] && brew cask $@
+  [ -d "$(brew --repo caskroom/cask)" ] && brew cask $@
 }
 
 __brew_all_casks() {

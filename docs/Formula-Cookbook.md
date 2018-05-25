@@ -12,7 +12,7 @@ A formula is a package definition written in Ruby. It can be created with `brew 
 | **Cellar**     | All **Kegs** are installed here                            | `/usr/local/Cellar`                                             |
 | **Tap**        | A Git repository of **Formulae** and/or commands | `/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core`   |
 | **Bottle**     | Pre-built **Keg** used instead of building from source     | `qt-4.8.4.mavericks.bottle.tar.gz`                              |
-| **Cask**       | An [extension of homebrew](https://github.com/Homebrew/homebrew-cask) to install macOS native apps  | `/Applications/MacDown.app/Contents/SharedSupport/bin/macdown` |
+| **Cask**       | An [extension of homebrew](https://github.com/caskroom/homebrew-cask) to install macOS native apps  | `/Applications/MacDown.app/Contents/SharedSupport/bin/macdown` |
 | **Brew Bundle**| An [extension of homebrew](https://github.com/Homebrew/homebrew-bundle) to describe dependencies    | `brew 'myservice', restart_service: true` |
 
 ## An introduction

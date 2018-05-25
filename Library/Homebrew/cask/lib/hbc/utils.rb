@@ -2,7 +2,7 @@ require "yaml"
 require "open3"
 require "stringio"
 
-BUG_REPORTS_URL = "https://github.com/Homebrew/homebrew-cask#reporting-bugs".freeze
+BUG_REPORTS_URL = "https://github.com/caskroom/homebrew-cask#reporting-bugs".freeze
 
 # global methods
 
