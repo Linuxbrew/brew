@@ -122,7 +122,7 @@ module Homebrew
     matches.map do |match|
       filename = File.basename(match["path"], ".rb")
       tap = Tap.fetch(match["repository"]["full_name"])
-      next if tap.installed? && !(tap.user == "Homebrew" && tap.repo.start_with?("cask"))
+      next if tap.installed? && !tap.name.start_with?("homebrew/cask")
       "#{tap.name}/#{filename}"
     end.compact
   end
