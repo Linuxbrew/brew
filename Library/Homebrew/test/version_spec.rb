@@ -144,6 +144,10 @@ describe Version do
     expect(described_class.create("2.1.0-p194")).to be > nil
   end
 
+  it "can be compared against Version::NULL" do
+    expect(described_class.create("2.1.0-p194")).to be > Version::NULL
+  end
+
   it "can be compared against strings" do
     expect(described_class.create("2.1.0-p194")).to be == "2.1.0-p194"
     expect(described_class.create("1")).to be == 1
