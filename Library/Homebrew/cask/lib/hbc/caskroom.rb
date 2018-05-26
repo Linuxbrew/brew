@@ -21,10 +21,12 @@ module Hbc
         token = path.basename.to_s
 
         if tap_path = CaskLoader.tap_paths(token).first
-          next CaskLoader::FromTapPathLoader.new(tap_path).load
+          CaskLoader::FromTapPathLoader.new(tap_path).load
+        elsif caskroom_path = Pathname.glob(path.join(".metadata/*/*/*/*.rb")).first
+          CaskLoader::FromPathLoader.new(caskroom_path).load
+        else
+          CaskLoader.load(token)
         end
-
-        CaskLoader::FromPathLoader.new(Pathname.glob(path.join(".metadata/*/*/*/*.rb")).first).load
       end
     end
   end
