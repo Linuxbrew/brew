@@ -1,6 +1,12 @@
 #!/bin/bash
 set +o posix
 
+# Fail fast with concise message when cwd does not exist
+if ! [[ -d "$PWD" ]]; then
+  echo "Error: The current working directory doesn't exist, cannot proceed." >&2
+  exit 1
+fi
+
 quiet_cd() {
   cd "$@" >/dev/null
 }
