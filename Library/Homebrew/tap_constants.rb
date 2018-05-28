@@ -6,5 +6,5 @@ HOMEBREW_TAP_CASK_REGEX = %r{^([\w-]+)/([\w-]+)/([a-z0-9\-]+)$}
 HOMEBREW_TAP_DIR_REGEX = %r{#{Regexp.escape(HOMEBREW_LIBRARY)}/Taps/(?<user>[\w-]+)/(?<repo>[\w-]+)}
 # match taps' formula paths, e.g. HOMEBREW_LIBRARY/Taps/someuser/sometap/someformula
 HOMEBREW_TAP_PATH_REGEX = Regexp.new(HOMEBREW_TAP_DIR_REGEX.source + %r{/(.*)}.source)
-# match the default and the versions brew-cask tap e.g. Caskroom/cask or Caskroom/versions
-HOMEBREW_CASK_TAP_CASK_REGEX = %r{^([Cc]askroom)/(cask|versions)/([\w+-.]+)$}
+# match official taps' casks, e.g. homebrew/cask/somecask or homebrew/cask-versions/somecask
+HOMEBREW_CASK_TAP_CASK_REGEX = %r{^(?:([Cc]askroom)/(cask|versions)|(homebrew)/(cask|cask-[\w-]+))/([\w+-.]+)$}
