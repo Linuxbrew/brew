@@ -68,6 +68,11 @@ class Locale
   end
   alias == eql?
 
+  def detect(locale_groups)
+    locale_groups.detect { |locales| locales.any? { |locale| eql?(locale) } } ||
+      locale_groups.detect { |locales| locales.any? { |locale| include?(locale) } }
+  end
+
   def to_s
     [@language, @region, @script].compact.join("-")
   end
