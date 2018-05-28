@@ -25,9 +25,9 @@ describe "brew search", :integration_test do
   end
 
   it "falls back to a GitHub tap search when no formula is found", :needs_network, retry: 3 do
-    setup_remote_tap "caskroom/cask"
+    setup_remote_tap "homebrew/cask"
 
-    expect { brew "search", "caskroom/cask/firefox" }
+    expect { brew "search", "homebrew/cask/firefox" }
       .to output(/firefox/).to_stdout
       .and output(/Searching/).to_stderr
       .and be_a_success

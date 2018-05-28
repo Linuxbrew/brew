@@ -19,7 +19,7 @@ module Homebrew
         instance_eval(&block)
       end
 
-      def switch(*names, description: nil, env: nil)
+      def switch(*names, description: nil, env: nil, required_for: nil, depends_on: nil)
         description = option_to_description(*names) if description.nil?
         global_switch = names.first.is_a?(Symbol)
         names, env = common_switch(*names) if global_switch
@@ -28,6 +28,10 @@ module Homebrew
         end
         enable_switch(*names, global_switch) if !env.nil? &&
                                                 !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
+
+        names.each do |name|
+          set_constraints(name, required_for: required_for, depends_on: depends_on)
+        end
       end
 
       def comma_array(name, description: nil)

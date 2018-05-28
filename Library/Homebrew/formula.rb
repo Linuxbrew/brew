@@ -1,3 +1,4 @@
+require "cache_store"
 require "formula_support"
 require "lock_file"
 require "formula_pin"
@@ -1535,8 +1536,14 @@ class Formula
     keg = opt_or_installed_prefix_keg
     return [] unless keg
 
-    linkage_checker = LinkageChecker.new(keg, self)
-    linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
+    undeclared_deps = CacheStoreDatabase.use(:linkage) do |db|
+      linkage_checker = LinkageChecker.new(
+        keg, self, cache_db: db, use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
+      )
+      linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
+    end
+
+    undeclared_deps
   end
 
   # Returns a list of formulae depended on by this formula that aren't

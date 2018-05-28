@@ -309,12 +309,12 @@ _brew_deps() {
       '(--installed)--all[show dependencies for all available formulae]'
 }
 
-# brew desc formula
+# brew desc formulae
 # brew desc [-s|-n|-d] pattern
 _brew_desc() {
   _arguments \
     - desc-formula \
-      ': : __brew_formulae' \
+      '*: : __brew_formulae' \
     - desc-pattern \
       '(-s -n -d)-s[search both name and description]' \
       '(-s -n -d)-n[search only name]' \
@@ -336,10 +336,10 @@ _brew_doctor() {
 }
 
 # brew edit
-# brew edit formula
+# brew edit formulae
 _brew_edit() {
   _arguments \
-    ':: :__brew_formulae'
+    '*:: :__brew_formulae'
 }
 
 # brew fetch [--force] [--retry] [-v] [--devel|--HEAD] [--deps] [--build-from-source|--force-bottle] formulae
@@ -379,13 +379,13 @@ _brew_home() {
   __brew_formulae
 }
 
-# brew info formula
+# brew info formulae
 # brew info --github formula
 # brew info --json=version (--all|--installed|formulae)
 _brew_info() {
   _arguments \
     - formulae-opts \
-      ': :__brew_formulae' \
+      '*: :__brew_formulae' \
     - github-opts \
       '--github[open a browser to the GitHub History page for formula]' \
       ': :__brew_formulae' \
@@ -393,12 +393,12 @@ _brew_info() {
       '--json=-[print a JSON representation of formulae]:version:(v1)' \
       '(--all --installed :)--all[get information on all formulae]' \
       '(--all --installed :)--installed[get information on installed formulae]' \
-      '(--all --installed): :__brew_formulae'
+      '(--all --installed)*: :__brew_formulae'
 }
 
 # brew install [--debug] [--env=std|super] [--ignore-dependencies]
 #   [--only-dependencies] [--cc=compiler] [--build-from-source]
-#   [--devel|--HEAD] [--keep-tmp] formula
+#   [--devel|--HEAD] [--keep-tmp] formulae
 # brew install --interactive [--git] formula
 _brew_install() {
   local state
@@ -429,21 +429,21 @@ _brew_leaves() {
   return 1
 }
 
-# brew ln, link [--overwrite] [--dry-run] [--force] formula
+# brew ln, link [--overwrite] [--dry-run] [--force] formulae
 _brew_link() {
   _arguments \
     '(--overwrite)--overwrite[delete files which already exist in the prefix]' \
     '(--dry-run -n)'{--dry-run,-n}'[list files that would be linked or deleted]' \
     '(--force)--force[allow keg-only formulae to be linked]' \
-    ':formula:__brew_installed_formulae'
+    '*:formula:__brew_installed_formulae'
 }
 
-# brew linkage [--test] [--reverse]  formula-name
+# brew linkage [--test] [--reverse] formulae
 _brew_linkage() {
   _arguments \
     '(--test)--test[only display missing libraries]' \
     '(--reverse)--reverse[print the dylib followed by the binaries which link to it]' \
-    ':formula:__brew_installed_formulae'
+    '*:formula:__brew_installed_formulae'
 }
 
 # brew list, ls [--full-name]:
@@ -459,6 +459,7 @@ _brew_list() {
     '(--multiple)--multiple[only show formulae with multiple versions installed]' \
     '*:: :__brew_installed_formulae'
 }
+
 # brew log [git-log-options] formula ...:
 _brew_log() {
   __brew_formulae
@@ -543,10 +544,10 @@ _brew_readall() {
   __brew_installed_taps
 }
 
-# brew reinstall formula:
+# brew reinstall formulae:
 _brew_reinstall() {
   _arguments \
-    '::formula:__brew_installed_formulae'
+    '*::formula:__brew_installed_formulae'
 }
 
 # brew search, -S:
@@ -570,7 +571,7 @@ _brew_style() {
   _arguments \
     '(--fix)--fix[fix style violations automatically]' \
     '(--display-cop-names)--display-cop-names[include RuboCop name for each violation in output]' \
-    '::formula:__brew_formulae'
+    '*::formula:__brew_formulae'
     # TODO add files to completion
 }
 
@@ -630,13 +631,13 @@ _brew_tap_unpin() {
   __brew_pinned_taps
 }
 
-# brew test [--devel|--HEAD] [--debug] [--keep-tmp] formula:
+# brew test [--devel|--HEAD] [--debug] [--keep-tmp] formulae:
 _brew_test() {
   _arguments \
     '(--devel --HEAD)'{--devel,--HEAD}'[use the development / head version of the formula]' \
     '(--debug)--debug[launch an interactive debugger if test fails]' \
     '(--keep-tmp)--keep-tmp[don''t delete temporary files]' \
-    ':formula:__brew_formulae'
+    '*:formula:__brew_formulae'
 }
 
 # brew test-bot [options]  url|formula:
@@ -681,18 +682,18 @@ _brew_tests() {
   '(--online)--online'
 }
 
-# brew uninstall, rm, remove [--force] formula:
+# brew uninstall, rm, remove [--force] formulae:
 _brew_uninstall() {
   _arguments \
     '(--force)--force[delete all installed versions of formula]' \
-    ':formula:__brew_installed_formulae'
+    '*:formula:__brew_installed_formulae'
 }
 
-# brew unlink [--dry-run] formula:
+# brew unlink [--dry-run] formulae:
 _brew_unlink() {
   _arguments \
     '(--dry-run -n)'{--dry-run,-n}'[don''t unlink or delete any files]' \
-    ':formula:__brew_installed_formulae'
+    '*:formula:__brew_installed_formulae'
 }
 
 # brew unpack [--git|--patch] [--destdir=path] formulae:
@@ -701,13 +702,13 @@ _brew_unpack() {
     '(--git --patch)--git[initialize a Git repository in the unpacked source]' \
     '(--git --patch)--patch[apply patches for formula]' \
     '(--destdir)--destdir=-[create subdirectories under path]:path:_directories' \
-    ':formula:__brew_formulae'
+    '*:formula:__brew_formulae'
 }
 
 # brew unpin formulae:
 _brew_unpin() {
   _arguments \
-    ':formula:__brew_formulae'
+    '*:formula:__brew_formulae'
 }
 
 # brew update [--merge] [--force]:

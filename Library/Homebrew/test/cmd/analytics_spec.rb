@@ -30,20 +30,6 @@ describe "brew analytics", :integration_test do
     end
   end
 
-  it "fails when running `brew analytics on off`" do
-    expect { brew "analytics", "on", "off" }
-      .to output(/Invalid usage/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_failure
-  end
-
-  it "fails when running `brew analytics testball`" do
-    expect { brew "analytics", "testball" }
-      .to output(/Invalid usage/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_failure
-  end
-
   it "can generate a new UUID" do
     expect { brew "analytics", "regenerate-uuid" }.to be_a_success
   end

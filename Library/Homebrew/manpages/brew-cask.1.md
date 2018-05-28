@@ -242,13 +242,13 @@ described above, the argument can take the form of:
 Homebrew-Cask also accepts three other forms in place of plain tokens:
 
   * A fully-qualified token which includes the Tap name, e.g.
-    `caskroom/fonts/font-symbola`
+    `homebrew/cask-fonts/font-symbola`
 
   * A fully-qualified pathname to a Cask file, e.g.
-    `/usr/local/Library/Taps/caskroom/homebrew-cask/Casks/google-chrome.rb`
+    `/usr/local/Library/Taps/homebrew/homebrew-cask/Casks/google-chrome.rb`
 
   * A `curl`-retrievable URI to a Cask file, e.g.
-    `https://raw.githubusercontent.com/caskroom/homebrew-cask/f25b6babcd398abf48e33af3d887b2d00de1d661/Casks/google-chrome.rb`
+    `https://raw.githubusercontent.com/Homebrew/homebrew-cask/f25b6babcd398abf48e33af3d887b2d00de1d661/Casks/google-chrome.rb`
 
 ## ENVIRONMENT
 
@@ -275,7 +275,7 @@ Other environment variables:
 
 The Homebrew-Cask home page: <https://caskroom.github.io/>
 
-The Homebrew-Cask GitHub page: <https://github.com/caskroom/homebrew-cask>
+The Homebrew-Cask GitHub page: <https://github.com/Homebrew/homebrew-cask>
 
 `brew`(1), `curl`(1)
 
@@ -288,7 +288,7 @@ Man page format based on `brew.1.md` from Homebrew.
 ## BUGS
 
 We still have bugs - and we are busy fixing them!  If you have a problem, don't
-be shy about reporting it on our [GitHub issues page](https://github.com/caskroom/homebrew-cask/issues?state=open).
+be shy about reporting it on our [GitHub issues page](https://github.com/Homebrew/homebrew-cask/issues?state=open).
 
 When reporting bugs, remember that Homebrew-Cask is an independent project from
 Homebrew. Do your best to direct bug reports to the appropriate project. If

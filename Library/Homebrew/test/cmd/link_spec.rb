@@ -1,11 +1,4 @@
 describe "brew link", :integration_test do
-  it "fails when no argument is given" do
-    expect { brew "link" }
-      .to output(/This command requires a keg argument/).to_stderr
-      .and not_to_output.to_stdout
-      .and be_a_failure
-  end
-
   it "does not fail if the given Formula is already linked" do
     setup_test_formula "testball1"
 

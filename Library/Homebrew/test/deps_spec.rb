@@ -15,13 +15,6 @@ describe "brew deps", :integration_test do
       .and not_to_output.to_stderr
   end
 
-  it "outputs a dependency for a Formula that has one dependency" do
-    expect { brew "deps", "bar" }
-      .to be_a_success
-      .and output("foo\n").to_stdout
-      .and not_to_output.to_stderr
-  end
-
   it "outputs all of a Formula's dependencies and their dependencies on separate lines" do
     expect { brew "deps", "baz" }
       .to be_a_success
