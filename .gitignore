@@ -55,7 +55,8 @@
 !/.travis.yml
 !/.codecov.yml
 !/.yardopts
-!/CODEOFCONDUCT.md
+!/CHANGELOG.md
+!/CODE_OF_CONDUCT.md
 !/CONTRIBUTING.md
 !/LICENSE.txt
 !/README.md
