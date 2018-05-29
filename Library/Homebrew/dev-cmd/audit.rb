@@ -606,6 +606,7 @@ module Homebrew
         libart 2.3.21
         pygtkglext 1.1.0
         libepoxy 1.5.0
+        gtk-mac-integration 2.1.2
       ].each_slice(2).to_a.map do |formula, version|
         [formula, version.split(".")[0..1].join(".")]
       end
