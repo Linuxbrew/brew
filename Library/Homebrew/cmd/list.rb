@@ -1,7 +1,7 @@
-#:  * `list`, `ls` [`--full-name`]:
+#:  * `list`, `ls` [`--full-name`] [`-1`] [`-l`] [`-t`] [`-r`]:
 #:    List all installed formulae. If `--full-name` is passed, print formulae
-#:    with fully-qualified names. If `--full-name` is not passed, any other
-#:    options (e.g. `-t`) are passed to `ls` which produces the actual output.
+#:    with fully-qualified names. If `--full-name` is not passed, other
+#:    options (i.e. `-1`, `-l`, `-t` and `-r`) are passed to `ls` which produces the actual output.
 #:
 #:  * `list`, `ls` `--unbrewed`:
 #:    List all files in the Homebrew prefix not installed by Homebrew.
@@ -33,6 +33,11 @@ module Homebrew
       switch "--full-name"
       switch "--multiple", depends_on: "--versions"
       switch :verbose
+      # passed through to ls
+      switch "-1"
+      switch "-l"
+      switch "-t"
+      switch "-r"
     end
 
     # Use of exec means we don't explicitly exit

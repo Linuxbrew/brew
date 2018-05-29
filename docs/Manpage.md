@@ -302,10 +302,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--force` (or `-f`) is passed, Homebrew will allow keg-only formulae to be linked.
 
-  * `list`, `ls` [`--full-name`]:
+  * `list`, `ls` [`--full-name`] [`-1`] [`-l`] [`-t`] [`-r`]:
     List all installed formulae. If `--full-name` is passed, print formulae
-    with fully-qualified names. If `--full-name` is not passed, any other
-    options (e.g. `-t`) are passed to `ls` which produces the actual output.
+    with fully-qualified names. If `--full-name` is not passed, other
+    options (i.e. `-1`, `-l`, `-t` and `-r`) are passed to `ls` which produces the actual output.
 
   * `list`, `ls` `--unbrewed`:
     List all files in the Homebrew prefix not installed by Homebrew.
