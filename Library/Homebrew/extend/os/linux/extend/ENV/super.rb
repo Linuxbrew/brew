@@ -4,6 +4,13 @@ module Superenv
     (HOMEBREW_SHIMS_PATH/"linux/super").realpath
   end
 
+  # @private
+  def setup_build_environment(formula = nil)
+    generic_setup_build_environment(formula)
+    self["HOMEBREW_DYNAMIC_LINKER"] = determine_dynamic_linker_path
+    self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths(formula)
+  end
+
   def homebrew_extra_paths
     paths = []
     paths += %w[binutils make].map do |f|
@@ -17,7 +24,7 @@ module Superenv
     paths
   end
 
-  def determine_extra_rpath_paths(formula)
+  def determine_rpath_paths(formula)
     PATH.new(
       formula&.lib,
       "#{HOMEBREW_PREFIX}/lib",
