@@ -339,6 +339,9 @@ module Homebrew
         unless Homebrew.args.quiet?
           ohai "replace #{old.inspect} with #{new.inspect}"
         end
+        unless old
+          raise "No old value for new value #{new}! Did you pass the wrong arguments?"
+        end
         contents.gsub!(old, new)
       end
       unless contents.errors.empty?
@@ -351,6 +354,9 @@ module Homebrew
         replacement_pairs.each do |old, new|
           unless Homebrew.args.quiet?
             ohai "replace #{old.inspect} with #{new.inspect}"
+          end
+          unless old
+            raise "No old value for new value #{new}! Did you pass the wrong arguments?"
           end
           s.gsub!(old, new)
         end
