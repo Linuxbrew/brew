@@ -15,12 +15,13 @@ module Superenv
   include SharedEnvExtension
 
   # @private
-  attr_accessor :keg_only_deps, :deps
+  attr_accessor :keg_only_deps, :deps, :run_time_deps
   attr_accessor :x11
 
   def self.extended(base)
     base.keg_only_deps = []
     base.deps = []
+    base.run_time_deps = []
   end
 
   # @private
@@ -178,16 +179,6 @@ module Superenv
       keg_only_deps.map(&:opt_lib),
       HOMEBREW_PREFIX/"lib",
     ]
-
-    if compiler == :llvm_clang
-      if MacOS::CLT.installed?
-        paths << "/usr/lib"
-      else
-        paths << "#{MacOS.sdk_path}/usr/lib"
-      end
-      paths << Formula["llvm"].opt_lib.to_s
-    end
-
     paths += homebrew_extra_library_paths
     PATH.new(paths).existing
   end
