@@ -1,5 +1,5 @@
 def sudo(*args)
-  %w[/usr/bin/sudo -E --] + args.flatten
+  ["/usr/bin/sudo", "-E", "PATH=#{ENV["PATH"]}", "--"] + args.flatten
 end
 
 module Hbc
