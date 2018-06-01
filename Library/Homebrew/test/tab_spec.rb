@@ -138,6 +138,18 @@ describe Tab do
     expect(tab.runtime_dependencies).not_to be nil
   end
 
+  specify "::runtime_deps_hash" do
+    runtime_deps = [Dependency.new("foo")]
+    stub_formula_loader formula("foo") { url "foo-1.0" }
+    runtime_deps_hash = described_class.runtime_deps_hash(runtime_deps)
+    tab = described_class.new
+    tab.homebrew_version = "1.1.6"
+    tab.runtime_dependencies = runtime_deps_hash
+    expect(tab.runtime_dependencies).to eql(
+      [{ "full_name" => "foo", "version" => "1.0" }],
+    )
+  end
+
   specify "#cxxstdlib" do
     expect(subject.cxxstdlib.compiler).to eq(:clang)
     expect(subject.cxxstdlib.type).to eq(:libcxx)
