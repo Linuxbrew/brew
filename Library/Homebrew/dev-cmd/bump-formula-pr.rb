@@ -289,7 +289,7 @@ module Homebrew
           # GitHub API responds immediately but fork takes a few seconds to be ready.
           sleep 3
         rescue *GitHub.api_errors => e
-          formula.path.atomic_write(backup_file) unless @bump_args.dry_run?
+          formula.path.atomic_write(backup_file) unless args.dry_run?
           odie "Unable to fork: #{e.message}!"
         end
 
