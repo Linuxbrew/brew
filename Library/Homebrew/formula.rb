@@ -358,7 +358,15 @@ class Formula
     return unless head.downloader.is_a?(VCSDownloadStrategy)
     return unless head.downloader.cached_location.exist?
 
-    head.version.update_commit(head.downloader.last_commit)
+    path = if ENV["HOMEBREW_ENV"]
+      ENV["PATH"]
+    else
+      ENV["HOMEBREW_PATH"]
+    end
+
+    with_env(PATH: path) do
+      head.version.update_commit(head.downloader.last_commit)
+    end
   end
 
   # The {PkgVersion} for this formula with {version} and {#revision} information.
