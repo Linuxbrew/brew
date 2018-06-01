@@ -43,7 +43,7 @@ module Hbc
         if target.parent.writable?
           FileUtils.move(source, target)
         else
-          command.run("/bin/mv", args: [source, target], sudo: true)
+          command.run!("/bin/mv", args: [source, target], sudo: true)
         end
 
         add_altname_metadata(target, source.basename, command: command)
@@ -68,7 +68,7 @@ module Hbc
         if target.parent.writable?
           FileUtils.cp_r(target, source)
         else
-          command.run("/bin/cp", args: ["-r", target, source], sudo: true)
+          command.run!("/bin/cp", args: ["-r", target, source], sudo: true)
         end
 
         delete(target, force: force, command: command, **options)
