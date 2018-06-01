@@ -23,6 +23,10 @@ describe Dependency do
       dep = described_class.new("foo", [:build, "bar"])
       expect(dep.tags).to eq([:build, "bar"])
     end
+
+    it "rejects nil names" do
+      expect { described_class.new(nil) }.to raise_error(ArgumentError)
+    end
   end
 
   describe "::merge_repeats" do

@@ -266,10 +266,6 @@ class Tab < OpenStruct
     super unless parsed_homebrew_version < "1.1.6"
   end
 
-  def runtime_dependency_objects=(deps)
-    source["runtime_dependencies"] = Tab.runtime_deps_hash(deps)
-  end
-
   def cxxstdlib
     # Older tabs won't have these values, so provide sensible defaults
     lib = stdlib.to_sym if stdlib
