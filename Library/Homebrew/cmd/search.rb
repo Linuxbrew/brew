@@ -106,12 +106,13 @@ module Homebrew
   end
 
   def query_regexp(query)
-    case query
-    when %r{^/(.*)/$} then Regexp.new(Regexp.last_match(1))
-    else /.*#{Regexp.escape(query)}.*/i
+    if m = query.match(%r{^/(.*)/$})
+      Regexp.new(m[1])
+    else
+      /.*#{Regexp.escape(query)}.*/i
     end
   rescue RegexpError
-    odie "#{query} is not a valid regex"
+    raise "#{query} is not a valid regex."
   end
 
   def search_taps(query, silent: false)
