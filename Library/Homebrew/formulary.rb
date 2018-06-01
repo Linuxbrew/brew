@@ -277,6 +277,7 @@ module Formulary
   # * a formula URL
   # * a local bottle reference
   def self.factory(ref, spec = :stable, alias_path: nil, from: nil)
+    raise ArgumentError, "Formulae must have a ref!" unless ref
     loader_for(ref, from: from).get_formula(spec, alias_path: alias_path)
   end
 

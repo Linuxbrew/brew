@@ -1522,7 +1522,10 @@ class Formula
     if read_from_tab &&
        (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
-      return tab_deps.map { |d| Dependency.new d["full_name"] }.compact
+      return tab_deps.map do |d|
+        next unless d["full_name"]
+        Dependency.new d["full_name"]
+      end.compact
     end
 
     declared_runtime_dependencies | undeclared_runtime_dependencies
