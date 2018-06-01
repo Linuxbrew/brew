@@ -61,18 +61,18 @@ module Homebrew
         results = Array(result)
       rescue FormulaUnavailableError
         _, _, name = query.split("/", 3)
-        results = search_taps(name)
+        results = search_taps(name).flatten.sort
       end
 
-      puts Formatter.columns(results.sort) unless results.empty?
+      puts Formatter.columns(results) unless results.empty?
     else
       query = args.remaining.first
       regex = query_regexp(query)
       local_results = search_formulae(regex)
       puts Formatter.columns(local_results.sort) unless local_results.empty?
 
-      tap_results = search_taps(query)
-      puts Formatter.columns(tap_results.sort) unless tap_results.empty?
+      tap_results = search_taps(query).flatten.sort
+      puts Formatter.columns(tap_results) unless tap_results.empty?
 
       if $stdout.tty?
         count = local_results.length + tap_results.length
@@ -116,30 +116,36 @@ module Homebrew
   end
 
   def search_taps(query, silent: false)
-    return [] if ENV["HOMEBREW_NO_GITHUB_API"]
+    return [], [] if ENV["HOMEBREW_NO_GITHUB_API"]
 
-    # Use stderr to avoid breaking parsed output
     unless silent
+      # Use stderr to avoid breaking parsed output
       $stderr.puts Formatter.headline("Searching taps on GitHub...", color: :blue)
     end
 
-    matches = begin
-      GitHub.search_code(
-        user: "Homebrew",
-        path: ["Formula", "HomebrewFormula", "Casks", "."],
-        filename: query,
-        extension: "rb",
-      )
-    rescue GitHub::Error => error
-      opoo "Error searching on GitHub: #{error}\n"
-      []
-    end
-    matches.map do |match|
-      filename = File.basename(match["path"], ".rb")
+    matches = GitHub.search_code(
+      user: "Homebrew",
+      path: ["Formula", "Casks", "."],
+      filename: query,
+      extension: "rb",
+    )
+
+    matches.inject([[], []]) do |(formulae, casks), match|
+      name = File.basename(match["path"], ".rb")
       tap = Tap.fetch(match["repository"]["full_name"])
-      next if tap.installed? && !tap.name.start_with?("homebrew/cask")
-      "#{tap.name}/#{filename}"
-    end.compact
+      full_name = "#{tap.name}/#{name}"
+
+      if tap.installed?
+        [formulae, casks]
+      elsif match["path"].start_with?("Casks/")
+        [formulae, [*casks, full_name].sort]
+      else
+        [[*formulae, full_name].sort, casks]
+      end
+    end
+  rescue GitHub::Error => error
+    opoo "Error searching on GitHub: #{error}\n"
+    [[], []]
   end
 
   def search_formulae(regex)
