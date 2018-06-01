@@ -1523,8 +1523,9 @@ class Formula
        (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
       return tab_deps.map do |d|
-        next unless d["full_name"]
-        Dependency.new d["full_name"]
+        full_name = d["full_name"]
+        next unless full_name
+        Dependency.new full_name
       end.compact
     end
 
