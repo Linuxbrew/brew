@@ -15,6 +15,10 @@ module Formatter
     "#{Tty.green}#{string}#{Tty.default}"
   end
 
+  def option(string)
+    "#{Tty.bold}#{string}#{Tty.reset}"
+  end
+
   def success(string, label: nil)
     label(label, string, :green)
   end

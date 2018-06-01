@@ -16,31 +16,45 @@
 require "formula"
 require "missing_formula"
 require "descriptions"
+require "cli_parser"
 
 module Homebrew
   module_function
 
-  def search
-    if ARGV.empty?
+  PACKAGE_MANAGERS = {
+    macports: ->(query) { "https://www.macports.org/ports.php?by=name&substr=#{query}" },
+    fink:     ->(query) { "http://pdb.finkproject.org/pdb/browse.php?summary=#{query}" },
+    debian:   ->(query) { "https://packages.debian.org/search?keywords=#{query}&searchon=names&suite=all&section=all" },
+    opensuse: ->(query) { "https://software.opensuse.org/search?q=#{query}" },
+    fedora:   ->(query) { "https://apps.fedoraproject.org/packages/s/#{query}" },
+    ubuntu:   ->(query) { "https://packages.ubuntu.com/search?keywords=#{query}&searchon=names&suite=all&section=all" },
+  }.freeze
+
+  def search(argv = ARGV)
+    CLI::Parser.parse(argv) do
+      switch "--desc"
+
+      package_manager_switches = PACKAGE_MANAGERS.keys.map { |name| "--#{name}" }
+
+      package_manager_switches.each do |s|
+        switch s
+      end
+
+      conflicts(*package_manager_switches)
+    end
+
+    PACKAGE_MANAGERS.each do |name, url|
+      exec_browser url.call(URI.encode_www_form_component(args.remaining.join(" "))) if args[:"#{name}?"]
+    end
+
+    if args.remaining.empty?
       puts Formatter.columns(Formula.full_names.sort)
-    elsif ARGV.include? "--macports"
-      exec_browser "https://www.macports.org/ports.php?by=name&substr=#{ARGV.next}"
-    elsif ARGV.include? "--fink"
-      exec_browser "http://pdb.finkproject.org/pdb/browse.php?summary=#{ARGV.next}"
-    elsif ARGV.include? "--debian"
-      exec_browser "https://packages.debian.org/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
-    elsif ARGV.include? "--opensuse"
-      exec_browser "https://software.opensuse.org/search?q=#{ARGV.next}"
-    elsif ARGV.include? "--fedora"
-      exec_browser "https://apps.fedoraproject.org/packages/s/#{ARGV.next}"
-    elsif ARGV.include? "--ubuntu"
-      exec_browser "https://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
-    elsif ARGV.include? "--desc"
-      query = ARGV.next
+    elsif args.desc?
+      query = args.remaining.first
       regex = query_regexp(query)
       Descriptions.search(regex, :desc).print
-    elsif ARGV.first =~ HOMEBREW_TAP_FORMULA_REGEX
-      query = ARGV.first
+    elsif args.remaining.first =~ HOMEBREW_TAP_FORMULA_REGEX
+      query = args.remaining.first
 
       begin
         result = Formulary.factory(query).name
@@ -52,7 +66,7 @@ module Homebrew
 
       puts Formatter.columns(results.sort) unless results.empty?
     else
-      query = ARGV.first
+      query = args.remaining.first
       regex = query_regexp(query)
       local_results = search_formulae(regex)
       puts Formatter.columns(local_results.sort) unless local_results.empty?
@@ -78,10 +92,10 @@ module Homebrew
     end
 
     return unless $stdout.tty?
-    return if ARGV.empty?
+    return if args.remaining.empty?
     metacharacters = %w[\\ | ( ) [ ] { } ^ $ * + ?].freeze
     return unless metacharacters.any? do |char|
-      ARGV.any? do |arg|
+      args.remaining.any? do |arg|
         arg.include?(char) && !arg.start_with?("/")
       end
     end
