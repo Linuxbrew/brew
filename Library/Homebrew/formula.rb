@@ -1525,7 +1525,12 @@ class Formula
   def declared_runtime_dependencies
     recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
-      Dependency.prune if !dependency.required? && build.without?(dependency)
+      next if dependency.required?
+      if build.any_args_or_options?
+        Dependency.prune if build.without?(dependency)
+      elsif !dependency.recommended?
+        Dependency.prune
+      end
     end
   end
 
