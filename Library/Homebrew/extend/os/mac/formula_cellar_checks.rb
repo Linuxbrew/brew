@@ -67,9 +67,7 @@ module FormulaCellarChecks
     keg = Keg.new(formula.prefix)
 
     CacheStoreDatabase.use(:linkage) do |db|
-      checker = LinkageChecker.new(
-        keg, formula, cache_db: db, use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
-      )
+      checker = LinkageChecker.new(keg, formula, cache_db: db)
       next unless checker.broken_library_linkage?
 
       output = <<~EOS

@@ -3,140 +3,119 @@ require "formula"
 require "linkage_cache_store"
 
 class LinkageChecker
-  def initialize(keg, formula = nil, use_cache: false, cache_db:)
+  attr_reader :undeclared_deps
+
+  def initialize(keg, formula = nil, cache_db:,
+                 use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?)
     @keg = keg
     @formula = formula || resolve_formula(keg)
+    @store = LinkageCacheStore.new(keg.name, cache_db) if use_cache
 
-    if use_cache
-      @store = LinkageCacheStore.new(keg.name, cache_db)
-      flush_cache_and_check_dylibs unless @store.keg_exists?
-    else
-      flush_cache_and_check_dylibs
-    end
+    @system_dylibs    = Set.new
+    @broken_dylibs    = Set.new
+    @variable_dylibs  = Set.new
+    @brewed_dylibs    = Hash.new { |h, k| h[k] = Set.new }
+    @reverse_links    = Hash.new { |h, k| h[k] = Set.new }
+    @broken_deps      = Hash.new { |h, k| h[k] = [] }
+    @indirect_deps    = []
+    @undeclared_deps  = []
+    @unnecessary_deps = []
+
+    check_dylibs
   end
 
   def display_normal_output
-    display_items "System libraries", system_dylibs
-    display_items "Homebrew libraries", brewed_dylibs
-    display_items "Indirect dependencies with linkage", indirect_deps
-    display_items "Variable-referenced libraries", variable_dylibs
-    display_items "Missing libraries", broken_dylibs
-    display_items "Broken dependencies", broken_deps
-    display_items "Undeclared dependencies with linkage", undeclared_deps
-    display_items "Dependencies with no linkage", unnecessary_deps
+    display_items "System libraries", @system_dylibs
+    display_items "Homebrew libraries", @brewed_dylibs
+    display_items "Indirect dependencies with linkage", @indirect_deps
+    display_items "Variable-referenced libraries", @variable_dylibs
+    display_items "Missing libraries", @broken_dylibs
+    display_items "Broken dependencies", @broken_deps
+    display_items "Undeclared dependencies with linkage", @undeclared_deps
+    display_items "Dependencies with no linkage", @unnecessary_deps
   end
 
   def display_reverse_output
-    return if reverse_links.empty?
-    sorted = reverse_links.sort
-    sorted.each do |dylib, files|
+    return if @reverse_links.empty?
+    @reverse_links.sort.each do |dylib, files|
       puts dylib
       files.each do |f|
         unprefixed = f.to_s.strip_prefix "#{keg}/"
         puts "  #{unprefixed}"
       end
-      puts unless dylib == sorted.last[0]
+      puts if dylib != sorted.last.first
     end
   end
 
   def display_test_output(puts_output: true)
-    display_items "Missing libraries", broken_dylibs, puts_output: puts_output
-    display_items "Broken dependencies", broken_deps, puts_output: puts_output
+    display_items "Missing libraries", @broken_dylibs, puts_output: puts_output
+    display_items "Broken dependencies", @broken_deps, puts_output: puts_output
     puts "No broken library linkage" unless broken_library_linkage?
   end
 
   def broken_library_linkage?
-    !broken_dylibs.empty? || !broken_deps.empty?
-  end
-
-  def undeclared_deps
-    @undeclared_deps ||= store.fetch_type(:undeclared_deps)
+    !@broken_dylibs.empty? || !@broken_deps.empty?
   end
 
   private
 
   attr_reader :keg, :formula, :store
 
-  # 'Hash-type' cache values
-
-  def brewed_dylibs
-    @brewed_dylibs ||= store.fetch_type(:brewed_dylibs)
-  end
-
-  def reverse_links
-    @reverse_links ||= store.fetch_type(:reverse_links)
-  end
-
-  def broken_deps
-    @broken_deps ||= store.fetch_type(:broken_deps)
-  end
-
-  # 'Path-type' cached values
-
-  def system_dylibs
-    @system_dylibs ||= store.fetch_type(:system_dylibs)
-  end
-
-  def broken_dylibs
-    @broken_dylibs ||= store.fetch_type(:broken_dylibs)
-  end
-
-  def variable_dylibs
-    @variable_dylibs ||= store.fetch_type(:variable_dylibs)
-  end
-
-  def indirect_deps
-    @indirect_deps ||= store.fetch_type(:indirect_deps)
-  end
-
-  def unnecessary_deps
-    @unnecessary_deps ||= store.fetch_type(:unnecessary_deps)
-  end
-
   def dylib_to_dep(dylib)
     dylib =~ %r{#{Regexp.escape(HOMEBREW_PREFIX)}/(opt|Cellar)/([\w+-.@]+)/}
     Regexp.last_match(2)
   end
 
-  def flush_cache_and_check_dylibs
-    reset_dylibs!
+  def check_dylibs
+    keg_files_dylibs_was_empty = false
+    keg_files_dylibs = store&.fetch_type(:keg_files_dylibs)
+    keg_files_dylibs ||= {}
+    if keg_files_dylibs.empty?
+      keg_files_dylibs_was_empty = true
+      @keg.find do |file|
+        next if file.symlink? || file.directory?
+        next if !file.dylib? && !file.binary_executable? && !file.mach_o_bundle?
+        # weakly loaded dylibs may not actually exist on disk, so skip them
+        # when checking for broken linkage
+        keg_files_dylibs[file] =
+          file.dynamically_linked_libraries(except: :LC_LOAD_WEAK_DYLIB)
+      end
+    end
 
     checked_dylibs = Set.new
-    @keg.find do |file|
-      next if file.symlink? || file.directory?
-      next if !file.dylib? && !file.binary_executable? && !file.mach_o_bundle?
 
-      # weakly loaded dylibs may not actually exist on disk, so skip them
-      # when checking for broken linkage
-      file.dynamically_linked_libraries(except: :LC_LOAD_WEAK_DYLIB)
-          .each do |dylib|
+    keg_files_dylibs.each do |file, dylibs|
+      dylibs.each do |dylib|
         @reverse_links[dylib] << file
+
         next if checked_dylibs.include? dylib
+        checked_dylibs << dylib
+
         if dylib.start_with? "@"
           @variable_dylibs << dylib
-        else
-          begin
-            owner = Keg.for Pathname.new(dylib)
-          rescue NotAKegError
-            @system_dylibs << dylib
-          rescue Errno::ENOENT
-            next if harmless_broken_link?(dylib)
-            if (dep = dylib_to_dep(dylib))
-              @broken_deps[dep] |= [dylib]
-            else
-              @broken_dylibs << dylib
-            end
-          else
-            tap = Tab.for_keg(owner).tap
-            f = if tap.nil? || tap.core_tap?
-              owner.name
-            else
-              "#{tap}/#{owner.name}"
-            end
-            @brewed_dylibs[f] << dylib
-          end
+          next
         end
-        checked_dylibs << dylib
+
+        begin
+          owner = Keg.for Pathname.new(dylib)
+        rescue NotAKegError
+          @system_dylibs << dylib
+        rescue Errno::ENOENT
+          next if harmless_broken_link?(dylib)
+          if (dep = dylib_to_dep(dylib))
+            @broken_deps[dep] |= [dylib]
+          else
+            @broken_dylibs << dylib
+          end
+        else
+          tap = Tab.for_keg(owner).tap
+          f = if tap.nil? || tap.core_tap?
+            owner.name
+          else
+            "#{tap}/#{owner.name}"
+          end
+          @brewed_dylibs[f] << dylib
+        end
       end
     end
 
@@ -144,7 +123,10 @@ class LinkageChecker
       @indirect_deps, @undeclared_deps, @unnecessary_deps =
         check_undeclared_deps
     end
-    store_dylibs!
+
+    return unless keg_files_dylibs_was_empty
+
+    store&.update!(keg_files_dylibs: keg_files_dylibs)
   end
 
   def check_undeclared_deps
@@ -242,34 +224,5 @@ class LinkageChecker
     Formulary.from_keg(keg)
   rescue FormulaUnavailableError
     opoo "Formula unavailable: #{keg.name}"
-  end
-
-  # Helper function to reset dylib values
-  def reset_dylibs!
-    store&.flush_cache!
-    @system_dylibs    = Set.new
-    @broken_dylibs    = Set.new
-    @variable_dylibs  = Set.new
-    @brewed_dylibs    = Hash.new { |h, k| h[k] = Set.new }
-    @reverse_links    = Hash.new { |h, k| h[k] = Set.new }
-    @broken_deps      = Hash.new { |h, k| h[k] = [] }
-    @indirect_deps    = []
-    @undeclared_deps  = []
-    @unnecessary_deps = []
-  end
-
-  # Updates data store with package path values
-  def store_dylibs!
-    store&.update!(
-      system_dylibs: system_dylibs,
-      variable_dylibs: variable_dylibs,
-      broken_dylibs: broken_dylibs,
-      indirect_deps: indirect_deps,
-      broken_deps: broken_deps,
-      undeclared_deps: undeclared_deps,
-      unnecessary_deps: unnecessary_deps,
-      brewed_dylibs: brewed_dylibs,
-      reverse_links: reverse_links,
-    )
   end
 end
