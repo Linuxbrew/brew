@@ -613,8 +613,8 @@ class FormulaInstaller
     # Update tab with actual runtime dependencies
     tab = Tab.for_keg(keg)
     Tab.clear_cache
-    tab.runtime_dependency_objects =
-      formula.runtime_dependencies(read_from_tab: false)
+    f_runtime_deps = formula.runtime_dependencies(read_from_tab: false)
+    tab.runtime_dependencies = Tab.runtime_deps_hash(f_runtime_deps)
     tab.write
 
     # let's reset Utils.git_available? if we just installed git
