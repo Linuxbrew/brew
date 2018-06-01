@@ -613,7 +613,7 @@ class FormulaInstaller
     # Update tab with actual runtime dependencies
     tab = Tab.for_keg(keg)
     Tab.clear_cache
-    tab.runtime_dependencies =
+    tab.runtime_dependency_objects =
       formula.runtime_dependencies(read_from_tab: false)
     tab.write
 

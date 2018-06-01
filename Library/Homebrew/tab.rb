@@ -33,10 +33,7 @@ class Tab < OpenStruct
       "compiler" => compiler,
       "stdlib" => stdlib,
       "aliases" => formula.aliases,
-      "runtime_dependencies" => runtime_deps.map do |dep|
-        f = dep.to_formula
-        { "full_name" => f.full_name, "version" => f.version.to_s }
-      end,
+      "runtime_dependencies" => Tab.runtime_deps_hash(runtime_deps),
       "source" => {
         "path" => formula.specified_path.to_s,
         "tap" => formula.tap&.name,
@@ -203,6 +200,13 @@ class Tab < OpenStruct
     new(attributes)
   end
 
+  def self.runtime_deps_hash(deps)
+    deps.map do |dep|
+      f = dep.to_formula
+      { "full_name" => f.full_name, "version" => f.version.to_s }
+    end
+  end
+
   def with?(val)
     option_names = val.respond_to?(:option_names) ? val.option_names : [val]
 
@@ -260,6 +264,10 @@ class Tab < OpenStruct
     # Homebrew versions prior to 1.1.6 generated incorrect runtime dependency
     # lists.
     super unless parsed_homebrew_version < "1.1.6"
+  end
+
+  def runtime_dependency_objects=(deps)
+    source["runtime_dependencies"] = Tab.runtime_deps_hash(deps)
   end
 
   def cxxstdlib
