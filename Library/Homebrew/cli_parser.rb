@@ -11,9 +11,9 @@ module Homebrew
 
       def initialize(&block)
         @parser = OptionParser.new
-        @parsed_args = OpenStruct.new
+        Homebrew.args = OpenStruct.new
         # undefine tap to allow --tap argument
-        @parsed_args.instance_eval { undef tap }
+        Homebrew.args.instance_eval { undef tap }
         @constraints = []
         @conflicts = []
         instance_eval(&block)
@@ -24,20 +24,20 @@ module Homebrew
         global_switch = names.first.is_a?(Symbol)
         names, env = common_switch(*names) if global_switch
         @parser.on(*names, description) do
-          enable_switch(*names, global_switch)
+          enable_switch(*names)
         end
-        enable_switch(*names, global_switch) if !env.nil? &&
-                                                !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
 
         names.each do |name|
           set_constraints(name, required_for: required_for, depends_on: depends_on)
         end
+
+        enable_switch(*names) if !env.nil? && !ENV["HOMEBREW_#{env.to_s.upcase}"].nil?
       end
 
       def comma_array(name, description: nil)
         description = option_to_description(name) if description.nil?
         @parser.on(name, OptionParser::REQUIRED_ARGUMENT, Array, description) do |list|
-          @parsed_args[option_to_name(name)] = list
+          Homebrew.args[option_to_name(name)] = list
         end
       end
 
@@ -50,7 +50,7 @@ module Homebrew
         end
         description = option_to_description(name) if description.nil?
         @parser.on(name, description, required) do |option_value|
-          @parsed_args[option_to_name(name)] = option_value
+          Homebrew.args[option_to_name(name)] = option_value
         end
 
         set_constraints(name, required_for: required_for, depends_on: depends_on)
@@ -71,18 +71,13 @@ module Homebrew
       def parse(cmdline_args = ARGV)
         @parser.parse(cmdline_args)
         check_constraint_violations
-        @parsed_args
       end
 
       private
 
-      def enable_switch(*names, global_switch)
+      def enable_switch(*names)
         names.each do |name|
-          if global_switch
-            Homebrew.args["#{option_to_name(name)}?"] = true
-            next
-          end
-          @parsed_args["#{option_to_name(name)}?"] = true
+          Homebrew.args["#{option_to_name(name)}?"] = true
         end
       end
 
@@ -98,7 +93,7 @@ module Homebrew
       end
 
       def option_passed?(name)
-        @parsed_args.respond_to?(name) || @parsed_args.respond_to?("#{name}?")
+        Homebrew.args.respond_to?(name) || Homebrew.args.respond_to?("#{name}?")
       end
 
       def set_constraints(name, depends_on:, required_for:)

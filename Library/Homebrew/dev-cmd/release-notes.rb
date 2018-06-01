@@ -11,7 +11,7 @@ module Homebrew
   module_function
 
   def release_notes
-    args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--markdown"
     end
 
