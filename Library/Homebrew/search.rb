@@ -4,7 +4,7 @@ module Homebrew
       if m = query.match(%r{^/(.*)/$})
         Regexp.new(m[1])
       else
-        /.*#{Regexp.escape(query)}.*/i
+        Regexp.new(query.chars.join('[^a-z\d]*'), Regexp::IGNORECASE)
       end
     rescue RegexpError
       raise "#{query} is not a valid regex."

@@ -55,11 +55,26 @@ describe Homebrew::Search do
     end
 
     it "correctly converts a query string to a regex" do
-      expect(mod.query_regexp("query")).to eq(/.*query.*/i)
+      expect(mod.query_regexp("query")).to eq(/q[^a-z\d]*u[^a-z\d]*e[^a-z\d]*r[^a-z\d]*y/i)
     end
 
     it "raises an error if the query is an invalid regex" do
       expect { mod.query_regexp("/+/") }.to raise_error(/not a valid regex/)
+    end
+
+    it "correctly matches with special symbols" do
+      regex = mod.query_regexp("oo-ba")
+      expect(regex).to match("foo-bar")
+    end
+
+    it "correctly matches without special symbols" do
+      regex = mod.query_regexp("ooba")
+      expect(regex).to match("foo-bar")
+    end
+
+    it "keeps special symbols" do
+      regex = mod.query_regexp("foo-bar")
+      expect(regex).not_to match("foobar")
     end
   end
 end
