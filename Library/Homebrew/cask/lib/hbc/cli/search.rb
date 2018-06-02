@@ -1,8 +1,10 @@
-require "cmd/search"
+require "search"
 
 module Hbc
   class CLI
     class Search < AbstractCommand
+      extend Homebrew::Search
+
       def run
         if args.empty?
           puts Formatter.columns(CLI.nice_listing(Cask.map(&:qualified_token)))
@@ -34,7 +36,7 @@ module Hbc
           partial_matches = simplified_tokens.grep(/#{simplified_search_term}/i) { |t| all_tokens[simplified_tokens.index(t)] }
         end
 
-        _, remote_matches = Homebrew.search_taps(search_term, silent: true)
+        _, remote_matches = search_taps(search_term, silent: true)
 
         [partial_matches, remote_matches, search_term]
       end

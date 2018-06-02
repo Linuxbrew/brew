@@ -65,18 +65,4 @@ describe "brew search", :integration_test do
         .and be_a_success
     end
   end
-
-  describe "::query_regexp" do
-    it "correctly parses a regex query" do
-      expect(Homebrew.query_regexp("/^query$/")).to eq(/^query$/)
-    end
-
-    it "correctly converts a query string to a regex" do
-      expect(Homebrew.query_regexp("query")).to eq(/.*query.*/i)
-    end
-
-    it "raises an error if the query is an invalid regex" do
-      expect { Homebrew.query_regexp("/+/") }.to raise_error(/not a valid regex/)
-    end
-  end
 end

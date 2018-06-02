@@ -1,6 +1,12 @@
-require "cmd/search"
+require "search"
 
-describe Homebrew do
+describe Homebrew::Search do
+  subject(:mod) { Object.new }
+
+  before do
+    mod.extend(described_class)
+  end
+
   describe "#search_taps" do
     before do
       ENV.delete("HOMEBREW_NO_GITHUB_API")
@@ -8,13 +14,13 @@ describe Homebrew do
 
     it "does not raise if `HOMEBREW_NO_GITHUB_API` is set" do
       ENV["HOMEBREW_NO_GITHUB_API"] = "1"
-      expect(described_class.search_taps("some-formula")).to match([[], []])
+      expect(mod.search_taps("some-formula")).to match([[], []])
     end
 
     it "does not raise if the network fails" do
       allow(GitHub).to receive(:open_api).and_raise(GitHub::Error)
 
-      expect(described_class.search_taps("some-formula"))
+      expect(mod.search_taps("some-formula"))
         .to match([[], []])
     end
 
@@ -38,8 +44,22 @@ describe Homebrew do
 
       allow(GitHub).to receive(:open_api).and_yield(json_response)
 
-      expect(described_class.search_taps("some-formula"))
+      expect(mod.search_taps("some-formula"))
         .to match([["homebrew/foo/some-formula"], ["homebrew/bar/some-cask"]])
+    end
+  end
+
+  describe "#query_regexp" do
+    it "correctly parses a regex query" do
+      expect(mod.query_regexp("/^query$/")).to eq(/^query$/)
+    end
+
+    it "correctly converts a query string to a regex" do
+      expect(mod.query_regexp("query")).to eq(/.*query.*/i)
+    end
+
+    it "raises an error if the query is an invalid regex" do
+      expect { mod.query_regexp("/+/") }.to raise_error(/not a valid regex/)
     end
   end
 end
