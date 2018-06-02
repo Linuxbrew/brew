@@ -13,7 +13,7 @@ describe Hbc::CLI::Search, :cask do
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<~EOS).to_stdout.as_tty
-      ==> Partial Matches
+      ==> Matches
       local-caffeine
       local-transmission
     EOS
@@ -94,9 +94,8 @@ describe Hbc::CLI::Search, :cask do
     expect {
       Hbc::CLI::Search.run("test-opera")
     }.to output(<<~EOS).to_stdout.as_tty
-      ==> Exact Match
+      ==> Matches
       test-opera
-      ==> Partial Matches
       test-opera-mail
     EOS
   end
