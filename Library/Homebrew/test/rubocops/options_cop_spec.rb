@@ -60,7 +60,7 @@ describe RuboCop::Cop::NewFormulaAudit::Options do
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           deprecated_option "examples" => "with-examples"
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ New Formula should not use `deprecated_option`
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ New formulae should not use `deprecated_option`
         end
       RUBY
     end
@@ -70,7 +70,7 @@ describe RuboCop::Cop::NewFormulaAudit::Options do
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           option "with-examples"
-          ^^^^^^^^^^^^^^^^^^^^^^ Formula should not have an `option`
+          ^^^^^^^^^^^^^^^^^^^^^^ Formulae should not have an `option`
         end
       RUBY
     end
