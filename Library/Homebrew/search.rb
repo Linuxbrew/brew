@@ -30,7 +30,7 @@ module Homebrew
         tap = Tap.fetch(match["repository"]["full_name"])
         full_name = "#{tap.name}/#{name}"
 
-        if tap.installed?
+        if tap.installed? && !match["path"].start_with?("Casks/")
           [formulae, casks]
         elsif match["path"].start_with?("Casks/")
           [formulae, [*casks, full_name].sort]
