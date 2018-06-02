@@ -1,3 +1,5 @@
+require "cmd/search"
+
 module Hbc
   class CLI
     class Search < AbstractCommand
@@ -18,26 +20,6 @@ module Hbc
         end
       end
 
-      def self.search_remote(query)
-        matches = begin
-          GitHub.search_code(
-            user: "Homebrew",
-            path: "Casks",
-            filename: query,
-            extension: "rb",
-          )
-        rescue GitHub::Error => error
-          opoo "Error searching on GitHub: #{error}\n"
-          []
-        end
-
-        matches.map do |match|
-          tap = Tap.fetch(match["repository"]["full_name"])
-          next if tap.installed?
-          "#{tap.name}/#{File.basename(match["path"], ".rb")}"
-        end.compact
-      end
-
       def self.search(*arguments)
         exact_match = nil
         partial_matches = []
@@ -55,7 +37,7 @@ module Hbc
           partial_matches.delete(exact_match)
         end
 
-        remote_matches = search_remote(search_term)
+        _, remote_matches = Homebrew.search_taps(search_term, silent: true)
 
         [exact_match, partial_matches, remote_matches, search_term]
       end
