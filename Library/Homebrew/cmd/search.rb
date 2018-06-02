@@ -43,8 +43,10 @@ module Homebrew
       conflicts(*package_manager_switches)
     end
 
-    PACKAGE_MANAGERS.each do |name, url|
-      exec_browser url.call(URI.encode_www_form_component(args.remaining.join(" "))) if args[:"#{name}?"]
+    if package_manager = PACKAGE_MANAGERS.detect { |name,| args[:"#{name}?"] }
+      _, url = package_manager
+      exec_browser url.call(URI.encode_www_form_component(args.remaining.join(" ")))
+      return
     end
 
     if args.remaining.empty?
