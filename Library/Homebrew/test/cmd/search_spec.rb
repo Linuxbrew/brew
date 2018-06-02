@@ -1,3 +1,5 @@
+require "cmd/search"
+
 describe "brew search", :integration_test do
   before do
     setup_test_formula "testball"
@@ -61,6 +63,20 @@ describe "brew search", :integration_test do
         .to output("#{url}\n").to_stdout
         .and not_to_output.to_stderr
         .and be_a_success
+    end
+  end
+
+  describe "::query_regexp" do
+    it "correctly parses a regex query" do
+      expect(Homebrew.query_regexp("/^query$/")).to eq(/^query$/)
+    end
+
+    it "correctly converts a query string to a regex" do
+      expect(Homebrew.query_regexp("query")).to eq(/.*query.*/i)
+    end
+
+    it "raises an error if the query is an invalid regex" do
+      expect { Homebrew.query_regexp("/+/") }.to raise_error(/not a valid regex/)
     end
   end
 end
