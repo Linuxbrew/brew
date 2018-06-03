@@ -72,4 +72,14 @@ describe Locale do
       expect(subject.eql?("zh_CN_Hans")).to be false
     end
   end
+
+  describe "#detect" do
+    let(:locale_groups) { [["zh"], ["zh-TW"]] }
+
+    it "finds best matching language code, independent of order" do
+      expect(described_class.new("zh", "TW", nil).detect(locale_groups)).to eql(["zh-TW"])
+      expect(described_class.new("zh", "TW", nil).detect(locale_groups.reverse)).to eql(["zh-TW"])
+      expect(described_class.new("zh", "CN", "Hans").detect(locale_groups)).to eql(["zh"])
+    end
+  end
 end
