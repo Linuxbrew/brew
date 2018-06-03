@@ -37,7 +37,8 @@ class LinkageChecker
 
   def display_reverse_output
     return if @reverse_links.empty?
-    @reverse_links.sort.each do |dylib, files|
+    sorted = @reverse_links.sort
+    sorted.each do |dylib, files|
       puts dylib
       files.each do |f|
         unprefixed = f.to_s.strip_prefix "#{keg}/"
