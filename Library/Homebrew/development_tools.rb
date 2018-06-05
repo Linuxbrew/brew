@@ -63,7 +63,7 @@ class DevelopmentTools
     def clang_version
       @clang_version ||= begin
         if (path = locate("clang")) &&
-           build_version = `#{path} --version`[/(?:clang|LLVM) version (\d\.\d)/, 1]
+           build_version = `#{path} --version`[/(?:clang|LLVM) version (\d+\.\d)/, 1]
           Version.new build_version
         else
           Version::NULL
