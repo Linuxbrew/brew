@@ -281,7 +281,7 @@ module Homebrew
       # Do not search taps if the formula name is qualified
       return if e.name.include?("/")
       ohai "Searching taps..."
-      taps_search_results = search_taps(e.name)
+      taps_search_results, = search_taps(e.name)
       case taps_search_results.length
       when 0
         ofail "No formulae found in taps."
