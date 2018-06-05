@@ -55,9 +55,9 @@ module Homebrew
     if args.remaining.empty?
       puts Formatter.columns(Formula.full_names.sort)
     elsif args.desc?
-      query = args.remaining.first
-      regex = query_regexp(query)
-      Descriptions.search(regex, :desc).print
+      query = args.remaining.join(" ")
+      string_or_regex = query_regexp(query)
+      Descriptions.search(string_or_regex, :desc).print
     elsif args.remaining.first =~ HOMEBREW_TAP_FORMULA_REGEX
       query = args.remaining.first
 
@@ -71,9 +71,9 @@ module Homebrew
 
       puts Formatter.columns(results) unless results.empty?
     else
-      query = args.remaining.first
-      regex = query_regexp(query)
-      local_results = search_formulae(regex)
+      query = args.remaining.join(" ")
+      string_or_regex = query_regexp(query)
+      local_results = search_formulae(string_or_regex)
       puts Formatter.columns(local_results.sort) unless local_results.empty?
 
       tap_results = search_taps(query).flatten.sort

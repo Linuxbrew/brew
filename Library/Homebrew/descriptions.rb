@@ -1,6 +1,7 @@
 require "formula"
 require "formula_versions"
 require "search"
+require "searchable"
 
 class Descriptions
   extend Homebrew::Search
@@ -97,16 +98,18 @@ class Descriptions
   end
 
   # Given a regex, find all formulae whose specified fields contain a match.
-  def self.search(regex, field = :either)
+  def self.search(string_or_regex, field = :either)
     ensure_cache
+
+    @cache.extend(Searchable)
 
     results = case field
     when :name
-      @cache.select { |name, _| simplify_string(name).match?(regex) }
+      @cache.search(string_or_regex) { |name, _| name }
     when :desc
-      @cache.select { |_, desc| simplify_string(desc).match?(regex) }
+      @cache.search(string_or_regex) { |_, desc| desc }
     when :either
-      @cache.select { |name, desc| simplify_string(name).match?(regex) || simplify_string(desc).match?(regex) }
+      @cache.search(string_or_regex)
     end
 
     new(results)

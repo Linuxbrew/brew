@@ -68,13 +68,15 @@
 #:    creating patches to the software.
 
 require "missing_formula"
-require "cmd/search"
 require "formula_installer"
 require "development_tools"
 require "install"
+require "search"
 
 module Homebrew
   module_function
+
+  extend Search
 
   def install
     raise FormulaUnspecifiedError if ARGV.named.empty?
@@ -261,10 +263,8 @@ module Homebrew
         return
       end
 
-      regex = query_regexp(e.name)
-
       ohai "Searching for similarly named formulae..."
-      formulae_search_results = search_formulae(regex)
+      formulae_search_results = search_formulae(e.name)
       case formulae_search_results.length
       when 0
         ofail "No similarly named formulae found."

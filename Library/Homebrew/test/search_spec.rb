@@ -49,27 +49,13 @@ describe Homebrew::Search do
     end
   end
 
-  describe "#simplify_string" do
-    it "simplifies a query with dashes" do
-      expect(mod.query_regexp("que-ry")).to eq(/query/i)
-    end
-
-    it "simplifies a query with @ symbols" do
-      expect(mod.query_regexp("query@1")).to eq(/query1/i)
-    end
-  end
-
   describe "#query_regexp" do
     it "correctly parses a regex query" do
       expect(mod.query_regexp("/^query$/")).to eq(/^query$/)
     end
 
-    it "correctly converts a query string to a regex" do
-      expect(mod.query_regexp("query")).to eq(/query/i)
-    end
-
-    it "simplifies a query with special symbols" do
-      expect(mod.query_regexp("que-ry")).to eq(/query/i)
+    it "returns the original string if it is not a regex query" do
+      expect(mod.query_regexp("query")).to eq("query")
     end
 
     it "raises an error if the query is an invalid regex" do

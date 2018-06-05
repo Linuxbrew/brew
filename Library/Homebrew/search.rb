@@ -1,14 +1,12 @@
+require "searchable"
+
 module Homebrew
   module Search
-    def simplify_string(string)
-      string.downcase.gsub(/[^a-z\d]/i, "")
-    end
-
     def query_regexp(query)
       if m = query.match(%r{^/(.*)/$})
         Regexp.new(m[1])
       else
-        Regexp.new(simplify_string(query), Regexp::IGNORECASE)
+        query
       end
     rescue RegexpError
       raise "#{query} is not a valid regex."
@@ -47,13 +45,14 @@ module Homebrew
       [[], []]
     end
 
-    def search_formulae(regex)
+    def search_formulae(string_or_regex)
       # Use stderr to avoid breaking parsed output
       $stderr.puts Formatter.headline("Searching local taps...", color: :blue)
 
       aliases = Formula.alias_full_names
       results = (Formula.full_names + aliases)
-                .select { |name| simplify_string(name).match?(regex) }
+                .extend(Searchable)
+                .search(string_or_regex)
                 .sort
 
       results.map do |name|
