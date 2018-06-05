@@ -460,6 +460,28 @@ describe Hbc::Audit, :cask do
       end
     end
 
+    describe "SourceForge appcast check" do
+      let(:error_msg) { /Cask hosted on SourceForge/ }
+
+      context "when the Cask is not hosted on SourceForge" do
+        let(:cask_token) { "basic-cask" }
+
+        it { is_expected.not_to warn_with(error_msg) }
+      end
+
+      context "when the Cask is hosted on SourceForge and has an appcast" do
+        let(:cask_token) { "sourceforge-with-appcast" }
+
+        it { is_expected.not_to warn_with(error_msg) }
+      end
+
+      context "when the Cask is hosted on SourceForge and does not have an appcast" do
+        let(:cask_token) { "sourceforge-correct-url-format" }
+
+        it { is_expected.to warn_with(error_msg) }
+      end
+    end
+
     describe "latest with appcast checks" do
       let(:error_msg) { "Casks with an appcast should not use version :latest" }
 
