@@ -1,7 +1,10 @@
 require "formula"
 require "formula_versions"
+require "search"
 
 class Descriptions
+  extend Homebrew::Search
+
   CACHE_FILE = HOMEBREW_CACHE + "desc_cache.json"
 
   def self.cache
@@ -99,11 +102,11 @@ class Descriptions
 
     results = case field
     when :name
-      @cache.select { |name, _| name =~ regex }
+      @cache.select { |name, _| simplify_string(name).match?(regex) }
     when :desc
-      @cache.select { |_, desc| desc =~ regex }
+      @cache.select { |_, desc| simplify_string(desc).match?(regex) }
     when :either
-      @cache.select { |name, desc| (name =~ regex) || (desc =~ regex) }
+      @cache.select { |name, desc| simplify_string(name).match?(regex) || simplify_string(desc).match?(regex) }
     end
 
     new(results)

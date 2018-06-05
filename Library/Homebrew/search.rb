@@ -1,10 +1,14 @@
 module Homebrew
   module Search
+    def simplify_string(string)
+      string.downcase.gsub(/[^a-z\d]/i, "")
+    end
+
     def query_regexp(query)
       if m = query.match(%r{^/(.*)/$})
         Regexp.new(m[1])
       else
-        Regexp.new(query.chars.join('[^a-z\d]*'), Regexp::IGNORECASE)
+        Regexp.new(simplify_string(query), Regexp::IGNORECASE)
       end
     rescue RegexpError
       raise "#{query} is not a valid regex."
@@ -48,7 +52,9 @@ module Homebrew
       $stderr.puts Formatter.headline("Searching local taps...", color: :blue)
 
       aliases = Formula.alias_full_names
-      results = (Formula.full_names + aliases).grep(regex).sort
+      results = (Formula.full_names + aliases)
+                .select { |name| simplify_string(name).match?(regex) }
+                .sort
 
       results.map do |name|
         begin

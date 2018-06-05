@@ -9,10 +9,12 @@
 #:    first search, making that search slower than subsequent ones.
 
 require "descriptions"
-require "cmd/search"
+require "search"
 
 module Homebrew
   module_function
+
+  extend Search
 
   def desc
     search_type = []
@@ -28,8 +30,8 @@ module Homebrew
       results.print
     elsif search_type.size > 1
       odie "Pick one, and only one, of -s/--search, -n/--name, or -d/--description."
-    elsif arg = ARGV.named.first
-      regex = Homebrew.query_regexp(arg)
+    elsif arg = ARGV.named.join(" ")
+      regex = query_regexp(arg)
       results = Descriptions.search(regex, search_type.first)
       results.print
     else
