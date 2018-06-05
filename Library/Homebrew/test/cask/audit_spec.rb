@@ -94,190 +94,190 @@ describe Hbc::Audit, :cask do
     end
 
     describe "pkg allow_untrusted checks" do
-      let(:error_msg) { "allow_untrusted is not permitted in official Homebrew-Cask taps" }
+      let(:warning_msg) { "allow_untrusted is not permitted in official Homebrew-Cask taps" }
 
       context "when the Cask has no pkg stanza" do
         let(:cask_token) { "basic-cask" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask does not have allow_untrusted" do
         let(:cask_token) { "with-uninstall-pkgutil" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has allow_untrusted" do
         let(:cask_token) { "with-allow-untrusted" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
     describe "when the Cask stanza requires uninstall" do
-      let(:error_msg) { "installer and pkg stanzas require an uninstall stanza" }
+      let(:warning_msg) { "installer and pkg stanzas require an uninstall stanza" }
 
       context "when the Cask does not require an uninstall" do
         let(:cask_token) { "basic-cask" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the pkg Cask has an uninstall" do
         let(:cask_token) { "with-uninstall-pkgutil" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the installer Cask has an uninstall" do
         let(:cask_token) { "installer-with-uninstall" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the installer Cask does not have an uninstall" do
         let(:cask_token) { "with-installer-manual" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
 
       context "when the pkg Cask does not have an uninstall" do
         let(:cask_token) { "pkg-without-uninstall" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
     describe "preflight stanza checks" do
-      let(:error_msg) { "only a single preflight stanza is allowed" }
+      let(:warning_msg) { "only a single preflight stanza is allowed" }
 
       context "when the Cask has no preflight stanza" do
         let(:cask_token) { "with-zap-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has only one preflight stanza" do
         let(:cask_token) { "with-preflight" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has multiple preflight stanzas" do
         let(:cask_token) { "with-preflight-multi" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
     describe "uninstall_postflight stanza checks" do
-      let(:error_msg) { "only a single postflight stanza is allowed" }
+      let(:warning_msg) { "only a single postflight stanza is allowed" }
 
       context "when the Cask has no postflight stanza" do
         let(:cask_token) { "with-zap-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has only one postflight stanza" do
         let(:cask_token) { "with-postflight" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has multiple postflight stanzas" do
         let(:cask_token) { "with-postflight-multi" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
     describe "uninstall stanza checks" do
-      let(:error_msg) { "only a single uninstall stanza is allowed" }
+      let(:warning_msg) { "only a single uninstall stanza is allowed" }
 
       context "when the Cask has no uninstall stanza" do
         let(:cask_token) { "with-zap-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has only one uninstall stanza" do
         let(:cask_token) { "with-uninstall-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has multiple uninstall stanzas" do
         let(:cask_token) { "with-uninstall-multi" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
     describe "uninstall_preflight stanza checks" do
-      let(:error_msg) { "only a single uninstall_preflight stanza is allowed" }
+      let(:warning_msg) { "only a single uninstall_preflight stanza is allowed" }
 
       context "when the Cask has no uninstall_preflight stanza" do
         let(:cask_token) { "with-zap-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has only one uninstall_preflight stanza" do
         let(:cask_token) { "with-uninstall-preflight" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has multiple uninstall_preflight stanzas" do
         let(:cask_token) { "with-uninstall-preflight-multi" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
     describe "uninstall_postflight stanza checks" do
-      let(:error_msg) { "only a single uninstall_postflight stanza is allowed" }
+      let(:warning_msg) { "only a single uninstall_postflight stanza is allowed" }
 
       context "when the Cask has no uninstall_postflight stanza" do
         let(:cask_token) { "with-zap-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has only one uninstall_postflight stanza" do
         let(:cask_token) { "with-uninstall-postflight" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has multiple uninstall_postflight stanzas" do
         let(:cask_token) { "with-uninstall-postflight-multi" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
     describe "zap stanza checks" do
-      let(:error_msg) { "only a single zap stanza is allowed" }
+      let(:warning_msg) { "only a single zap stanza is allowed" }
 
       context "when the Cask has no zap stanza" do
         let(:cask_token) { "with-uninstall-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has only one zap stanza" do
         let(:cask_token) { "with-zap-rmdir" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask has multiple zap stanzas" do
         let(:cask_token) { "with-zap-multi" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
@@ -483,24 +483,24 @@ describe Hbc::Audit, :cask do
     end
 
     describe "latest with appcast checks" do
-      let(:error_msg) { "Casks with an appcast should not use version :latest" }
+      let(:warning_msg) { "Casks with an appcast should not use version :latest" }
 
       context "when the Cask is :latest and does not have an appcast" do
         let(:cask_token) { "version-latest" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask is versioned and has an appcast" do
         let(:cask_token) { "with-appcast" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(warning_msg) }
       end
 
       context "when the Cask is :latest and has an appcast" do
         let(:cask_token) { "latest-with-appcast" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(warning_msg) }
       end
     end
 
