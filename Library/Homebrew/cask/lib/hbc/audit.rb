@@ -255,14 +255,14 @@ module Hbc
     def check_github_releases_appcast
       return unless cask.url.to_s =~ %r{github.com/([^/]+)/([^/]+)/releases/download/(\S+)}
 
-      add_warning "Cask uses GitHub releases, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
+      add_warning "Download uses GitHub releases, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
     end
 
     def check_sourceforge_appcast
       return if cask.version.latest?
       return unless cask.url.to_s =~ %r{sourceforge.net/(\S+)}
 
-      add_warning "Cask hosted on SourceForge, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
+      add_warning "Download is hosted on SourceForge, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
     end
 
     def check_url

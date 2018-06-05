@@ -439,46 +439,46 @@ describe Hbc::Audit, :cask do
     end
 
     describe "GitHub releases appcast check" do
-      let(:error_msg) { /Cask uses GitHub releases/ }
+      let(:appcast_warning) { /Download uses GitHub releases/ }
 
-      context "when the Cask does not use GitHub releases" do
+      context "when the download does not use GitHub releases" do
         let(:cask_token) { "basic-cask" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(appcast_warning) }
       end
 
-      context "when the Cask uses GitHub releases and has an appcast" do
+      context "when the download uses GitHub releases and has an appcast" do
         let(:cask_token) { "github-with-appcast" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(appcast_warning) }
       end
 
-      context "when the Cask uses GitHub releases and does not have an appcast" do
+      context "when the download uses GitHub releases and does not have an appcast" do
         let(:cask_token) { "github-without-appcast" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(appcast_warning) }
       end
     end
 
     describe "SourceForge appcast check" do
-      let(:error_msg) { /Cask hosted on SourceForge/ }
+      let(:appcast_warning) { /Download is hosted on SourceForge/ }
 
-      context "when the Cask is not hosted on SourceForge" do
+      context "when the download is not hosted on SourceForge" do
         let(:cask_token) { "basic-cask" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(appcast_warning) }
       end
 
-      context "when the Cask is hosted on SourceForge and has an appcast" do
+      context "when the download is hosted on SourceForge and has an appcast" do
         let(:cask_token) { "sourceforge-with-appcast" }
 
-        it { is_expected.not_to warn_with(error_msg) }
+        it { is_expected.not_to warn_with(appcast_warning) }
       end
 
-      context "when the Cask is hosted on SourceForge and does not have an appcast" do
+      context "when the download is hosted on SourceForge and does not have an appcast" do
         let(:cask_token) { "sourceforge-correct-url-format" }
 
-        it { is_expected.to warn_with(error_msg) }
+        it { is_expected.to warn_with(appcast_warning) }
       end
     end
 
