@@ -607,7 +607,7 @@ class FormulaInstaller
     # Updates the cache for a particular formula after doing an install
     CacheStoreDatabase.use(:linkage) do |db|
       break unless db.created?
-      LinkageChecker.new(keg, formula, cache_db: db)
+      LinkageChecker.new(keg, formula, cache_db: db, rebuild_cache: true)
     end
 
     # Update tab with actual runtime dependencies

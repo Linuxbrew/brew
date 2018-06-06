@@ -6,19 +6,19 @@ require "cache_store"
 # by the `brew linkage` command
 #
 class LinkageCacheStore < CacheStore
-  # @param  [String] keg_name
+  # @param  [String] keg_path
   # @param  [CacheStoreDatabase] database
   # @return [nil]
-  def initialize(keg_name, database)
-    @keg_name = keg_name
+  def initialize(keg_path, database)
+    @keg_path = keg_path
     super(database)
   end
 
-  # Returns `true` if the database has any value for the current `keg_name`
+  # Returns `true` if the database has any value for the current `keg_path`
   #
   # @return [Boolean]
   def keg_exists?
-    !database.get(@keg_name).nil?
+    !database.get(@keg_path).nil?
   end
 
   # Inserts dylib-related information into the cache if it does not exist or
@@ -35,7 +35,7 @@ class LinkageCacheStore < CacheStore
       EOS
     end
 
-    database.set @keg_name, ruby_hash_to_json_string(hash_values)
+    database.set @keg_path, ruby_hash_to_json_string(hash_values)
   end
 
   # @param  [Symbol] the type to fetch from the `LinkageCacheStore`
@@ -55,7 +55,7 @@ class LinkageCacheStore < CacheStore
 
   # @return [nil]
   def flush_cache!
-    database.delete(@keg_name)
+    database.delete(@keg_path)
   end
 
   private
@@ -65,7 +65,7 @@ class LinkageCacheStore < CacheStore
   # @param  [Symbol] type
   # @return [Hash]
   def fetch_hash_values(type)
-    keg_cache = database.get(@keg_name)
+    keg_cache = database.get(@keg_path)
     return {} unless keg_cache
     json_string_to_ruby_hash(keg_cache)[type.to_s]
   end
