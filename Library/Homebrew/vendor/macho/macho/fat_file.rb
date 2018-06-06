@@ -261,11 +261,8 @@ module MachO
     # @raise [MachOError] if the instance was initialized without a file
     # @note Overwrites all data in the file!
     def write!
-      if filename.nil?
-        raise MachOError, "cannot write to a default file when initialized from a binary string"
-      else
-        File.open(@filename, "wb") { |f| f.write(@raw_data) }
-      end
+      raise MachOError, "no initial file to write to" if filename.nil?
+      File.open(@filename, "wb") { |f| f.write(@raw_data) }
     end
 
     private

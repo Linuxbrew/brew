@@ -8,11 +8,11 @@ module MachO
     FORMAT = "".freeze
 
     # The size of the data structure, in bytes.
-    # @return [Fixnum] the size, in bytes
+    # @return [Integer] the size, in bytes
     # @api private
     SIZEOF = 0
 
-    # @return [Fixnum] the size, in bytes, of the represented structure.
+    # @return [Integer] the size, in bytes, of the represented structure.
     def self.bytesize
       self::SIZEOF
     end

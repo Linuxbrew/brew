@@ -76,25 +76,25 @@ module MachO
       #  pad bytes
       attr_reader :segname
 
-      # @return [Fixnum] the memory address of the section
+      # @return [Integer] the memory address of the section
       attr_reader :addr
 
-      # @return [Fixnum] the size, in bytes, of the section
+      # @return [Integer] the size, in bytes, of the section
       attr_reader :size
 
-      # @return [Fixnum] the file offset of the section
+      # @return [Integer] the file offset of the section
       attr_reader :offset
 
-      # @return [Fixnum] the section alignment (power of 2) of the section
+      # @return [Integer] the section alignment (power of 2) of the section
       attr_reader :align
 
-      # @return [Fixnum] the file offset of the section's relocation entries
+      # @return [Integer] the file offset of the section's relocation entries
       attr_reader :reloff
 
-      # @return [Fixnum] the number of relocation entries
+      # @return [Integer] the number of relocation entries
       attr_reader :nreloc
 
-      # @return [Fixnum] flags for type and attributes of the section
+      # @return [Integer] flags for type and attributes of the section
       attr_reader :flags
 
       # @return [void] reserved (for offset or index)
