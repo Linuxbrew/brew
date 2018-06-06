@@ -6,10 +6,11 @@ class LinkageChecker
   attr_reader :undeclared_deps
 
   def initialize(keg, formula = nil, cache_db:,
-                 use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?)
+                 use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?,
+                 rebuild_cache: false)
     @keg = keg
     @formula = formula || resolve_formula(keg)
-    @store = LinkageCacheStore.new(keg.name, cache_db) if use_cache
+    @store = LinkageCacheStore.new(keg.to_s, cache_db) if use_cache
 
     @system_dylibs    = Set.new
     @broken_dylibs    = Set.new
@@ -21,7 +22,7 @@ class LinkageChecker
     @undeclared_deps  = []
     @unnecessary_deps = []
 
-    check_dylibs
+    check_dylibs(rebuild_cache: rebuild_cache)
   end
 
   def display_normal_output
@@ -67,9 +68,16 @@ class LinkageChecker
     Regexp.last_match(2)
   end
 
-  def check_dylibs
+  def check_dylibs(rebuild_cache:)
+    keg_files_dylibs = nil
+
+    if rebuild_cache
+      store&.flush_cache!
+    else
+      keg_files_dylibs = store&.fetch_type(:keg_files_dylibs)
+    end
+
     keg_files_dylibs_was_empty = false
-    keg_files_dylibs = store&.fetch_type(:keg_files_dylibs)
     keg_files_dylibs ||= {}
     if keg_files_dylibs.empty?
       keg_files_dylibs_was_empty = true
