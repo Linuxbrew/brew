@@ -14,14 +14,14 @@ describe Homebrew::Search do
 
     it "does not raise if `HOMEBREW_NO_GITHUB_API` is set" do
       ENV["HOMEBREW_NO_GITHUB_API"] = "1"
-      expect(mod.search_taps("some-formula")).to match([[], []])
+      expect(mod.search_taps("some-formula")).to match(formulae: [], casks: [])
     end
 
     it "does not raise if the network fails" do
       allow(GitHub).to receive(:open_api).and_raise(GitHub::Error)
 
       expect(mod.search_taps("some-formula"))
-        .to match([[], []])
+        .to match(formulae: [], casks: [])
     end
 
     it "returns Formulae and Casks separately" do
@@ -45,7 +45,7 @@ describe Homebrew::Search do
       allow(GitHub).to receive(:open_api).and_yield(json_response)
 
       expect(mod.search_taps("some-formula"))
-        .to match([["homebrew/foo/some-formula"], ["homebrew/bar/some-cask"]])
+        .to match(formulae: ["homebrew/foo/some-formula"], casks: ["homebrew/bar/some-cask"])
     end
   end
 

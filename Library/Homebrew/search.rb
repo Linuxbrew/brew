@@ -13,36 +13,42 @@ module Homebrew
     end
 
     def search_taps(query, silent: false)
-      return [], [] if ENV["HOMEBREW_NO_GITHUB_API"]
+      results = { formulae: [], casks: [] }
+
+      return results if ENV["HOMEBREW_NO_GITHUB_API"]
 
       unless silent
         # Use stderr to avoid breaking parsed output
         $stderr.puts Formatter.headline("Searching taps on GitHub...", color: :blue)
       end
 
-      matches = GitHub.search_code(
-        user: "Homebrew",
-        path: ["Formula", "Casks", "."],
-        filename: query,
-        extension: "rb",
-      )
+      matches = begin
+        GitHub.search_code(
+          user: "Homebrew",
+          path: ["Formula", "Casks", "."],
+          filename: query,
+          extension: "rb",
+        )
+      rescue GitHub::Error => error
+        opoo "Error searching on GitHub: #{error}\n"
+        return results
+      end
 
-      matches.inject([[], []]) do |(formulae, casks), match|
+      matches.each do |match|
         name = File.basename(match["path"], ".rb")
         tap = Tap.fetch(match["repository"]["full_name"])
         full_name = "#{tap.name}/#{name}"
 
-        if tap.installed? && !match["path"].start_with?("Casks/")
-          [formulae, casks]
-        elsif match["path"].start_with?("Casks/")
-          [formulae, [*casks, full_name].sort]
+        next if tap.installed? && !match["path"].start_with?("Casks/")
+
+        if match["path"].start_with?("Casks/")
+          results[:casks] = [*results[:casks], full_name].sort
         else
-          [[*formulae, full_name].sort, casks]
+          results[:formulae] = [*results[:formulae], full_name].sort
         end
       end
-    rescue GitHub::Error => error
-      opoo "Error searching on GitHub: #{error}\n"
-      [[], []]
+
+      results
     end
 
     def search_formulae(string_or_regex)

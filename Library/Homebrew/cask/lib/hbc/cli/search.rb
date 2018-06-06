@@ -36,7 +36,7 @@ module Hbc
           partial_matches = simplified_tokens.grep(/#{simplified_search_term}/i) { |t| all_tokens[simplified_tokens.index(t)] }
         end
 
-        _, remote_matches = search_taps(search_term, silent: true)
+        remote_matches = search_taps(search_term, silent: true)[:casks]
 
         [partial_matches, remote_matches, search_term]
       end

@@ -61,12 +61,12 @@ module Homebrew
     elsif args.remaining.first =~ HOMEBREW_TAP_FORMULA_REGEX
       query = args.remaining.first
 
-      begin
-        result = Formulary.factory(query).name
-        results = Array(result)
+      results = begin
+        [Formulary.factory(query).name]
       rescue FormulaUnavailableError
         _, _, name = query.split("/", 3)
-        results = search_taps(name).flatten.sort
+        remote_results = search_taps(name)
+        [*remote_results[:formulae], *remote_results[:casks]].sort
       end
 
       puts Formatter.columns(results) unless results.empty?
@@ -76,7 +76,8 @@ module Homebrew
       local_results = search_formulae(string_or_regex)
       puts Formatter.columns(local_results.sort) unless local_results.empty?
 
-      tap_results = search_taps(query).flatten.sort
+      remote_results = search_taps(query)
+      tap_results = [*remote_results[:formulae], *remote_results[:casks]].sort
       puts Formatter.columns(tap_results) unless tap_results.empty?
 
       if $stdout.tty?
