@@ -10,7 +10,7 @@ module MachO
   # Raised when a Mach-O file modification fails but can be recovered when
   # operating on multiple Mach-O slices of a fat binary in non-strict mode.
   class RecoverableModificationError < ModificationError
-    # @return [Fixnum, nil] The index of the Mach-O slice of a fat binary for
+    # @return [Integer, nil] The index of the Mach-O slice of a fat binary for
     #   which modification failed or `nil` if not a fat binary. This is used to
     #   make the error message more useful.
     attr_accessor :macho_slice
@@ -40,7 +40,7 @@ module MachO
 
   # Raised when a file's magic bytes are not valid Mach-O magic.
   class MagicError < NotAMachOError
-    # @param num [Fixnum] the unknown number
+    # @param num [Integer] the unknown number
     def initialize(num)
       super "Unrecognized Mach-O magic: 0x#{"%02x" % num}"
     end
@@ -69,7 +69,7 @@ module MachO
 
   # Raised when the CPU type is unknown.
   class CPUTypeError < MachOError
-    # @param cputype [Fixnum] the unknown CPU type
+    # @param cputype [Integer] the unknown CPU type
     def initialize(cputype)
       super "Unrecognized CPU type: 0x#{"%08x" % cputype}"
     end
@@ -77,8 +77,8 @@ module MachO
 
   # Raised when the CPU type/sub-type pair is unknown.
   class CPUSubtypeError < MachOError
-    # @param cputype [Fixnum] the CPU type of the unknown pair
-    # @param cpusubtype [Fixnum] the CPU sub-type of the unknown pair
+    # @param cputype [Integer] the CPU type of the unknown pair
+    # @param cpusubtype [Integer] the CPU sub-type of the unknown pair
     def initialize(cputype, cpusubtype)
       super "Unrecognized CPU sub-type: 0x#{"%08x" % cpusubtype}" \
         " (for CPU type: 0x#{"%08x" % cputype})"
@@ -87,7 +87,7 @@ module MachO
 
   # Raised when a mach-o file's filetype field is unknown.
   class FiletypeError < MachOError
-    # @param num [Fixnum] the unknown number
+    # @param num [Integer] the unknown number
     def initialize(num)
       super "Unrecognized Mach-O filetype code: 0x#{"%02x" % num}"
     end
@@ -95,7 +95,7 @@ module MachO
 
   # Raised when an unknown load command is encountered.
   class LoadCommandError < MachOError
-    # @param num [Fixnum] the unknown number
+    # @param num [Integer] the unknown number
     def initialize(num)
       super "Unrecognized Mach-O load command: 0x#{"%02x" % num}"
     end
@@ -113,8 +113,8 @@ module MachO
   # is wrong.
   class LoadCommandCreationArityError < MachOError
     # @param cmd_sym [Symbol] the load command's symbol
-    # @param expected_arity [Fixnum] the number of arguments expected
-    # @param actual_arity [Fixnum] the number of arguments received
+    # @param expected_arity [Integer] the number of arguments expected
+    # @param actual_arity [Integer] the number of arguments received
     def initialize(cmd_sym, expected_arity, actual_arity)
       super "Expected #{expected_arity} arguments for #{cmd_sym} creation," \
         " got #{actual_arity}"
@@ -140,7 +140,7 @@ module MachO
 
   # Raised when a change at an offset is not valid.
   class OffsetInsertionError < ModificationError
-    # @param offset [Fixnum] the invalid offset
+    # @param offset [Integer] the invalid offset
     def initialize(offset)
       super "Insertion at offset #{offset} is not valid"
     end
