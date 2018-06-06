@@ -26,7 +26,7 @@ module Homebrew
     mode.dry_run = true if ARGV.dry_run?
 
     ARGV.kegs.each do |keg|
-      keg_only = keg_only?(keg.rack)
+      keg_only = Formulary.keg_only?(keg.rack)
       if HOMEBREW_PREFIX.to_s == "/usr/local" && keg_only &&
          keg.name.start_with?("openssl", "libressl")
         opoo <<~EOS
@@ -86,11 +86,5 @@ module Homebrew
     puts "\nIf you need to have this software first in your PATH instead consider running:"
     puts "  #{Utils::Shell.prepend_path_in_profile(opt/"bin")}"  if bin.directory?
     puts "  #{Utils::Shell.prepend_path_in_profile(opt/"sbin")}" if sbin.directory?
-  end
-
-  def keg_only?(rack)
-    Formulary.from_rack(rack).keg_only?
-  rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
-    false
   end
 end

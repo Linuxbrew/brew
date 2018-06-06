@@ -25,7 +25,7 @@ describe "brew style" do
         end
       EOS
 
-      rubocop_result = Homebrew.check_style_json([formula])
+      rubocop_result = Homebrew::Style.check_style_json([formula])
 
       expect(rubocop_result.file_offenses(formula.realpath.to_s).map(&:message))
         .to include("Extra empty line detected at class body beginning.")

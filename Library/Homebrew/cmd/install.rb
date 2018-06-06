@@ -68,11 +68,10 @@
 #:    creating patches to the software.
 
 require "missing_formula"
-require "diagnostic"
 require "cmd/search"
 require "formula_installer"
-require "hardware"
 require "development_tools"
+require "install"
 
 module Homebrew
   module_function
@@ -238,7 +237,7 @@ module Homebrew
       end
 
       return if formulae.empty?
-      perform_preinstall_checks
+      Install.perform_preinstall_checks
 
       formulae.each do |f|
         Migrator.migrate_if_needed(f)
@@ -296,47 +295,6 @@ module Homebrew
         puts "To install one of them, run (for example):\n  brew install #{taps_search_results.first}"
       end
     end
-  end
-
-  def check_ppc
-    case Hardware::CPU.type
-    when :ppc
-      abort <<~EOS
-        Sorry, Homebrew does not support your computer's CPU architecture.
-        For PPC support, see: https://github.com/mistydemeo/tigerbrew
-      EOS
-    end
-  end
-
-  def check_writable_install_location
-    raise "Cannot write to #{HOMEBREW_CELLAR}" if HOMEBREW_CELLAR.exist? && !HOMEBREW_CELLAR.writable_real?
-    raise "Cannot write to #{HOMEBREW_PREFIX}" unless HOMEBREW_PREFIX.writable_real? || HOMEBREW_PREFIX.to_s == "/usr/local"
-  end
-
-  def check_development_tools
-    checks = Diagnostic::Checks.new
-    checks.fatal_development_tools_checks.each do |check|
-      out = checks.send(check)
-      next if out.nil?
-      ofail out
-    end
-    exit 1 if Homebrew.failed?
-  end
-
-  def check_cellar
-    FileUtils.mkdir_p HOMEBREW_CELLAR unless File.exist? HOMEBREW_CELLAR
-  rescue
-    raise <<~EOS
-      Could not create #{HOMEBREW_CELLAR}
-      Check you have permission to write to #{HOMEBREW_CELLAR.parent}
-    EOS
-  end
-
-  def perform_preinstall_checks
-    check_ppc
-    check_writable_install_location
-    check_development_tools if DevelopmentTools.installed?
-    check_cellar
   end
 
   def install_formula(f)
