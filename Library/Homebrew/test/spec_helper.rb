@@ -45,6 +45,8 @@ RSpec.configure do |config|
 
   config.filter_run_when_matching :focus
 
+  config.silence_filter_announcements = true
+
   # TODO: when https://github.com/rspec/rspec-expectations/pull/1056
   #       makes it into a stable release:
   # config.expect_with :rspec do |c|
