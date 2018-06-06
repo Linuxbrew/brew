@@ -3,7 +3,6 @@ require_relative "shared_examples/invalid_option"
 describe Hbc::CLI::Search, :cask do
   before do
     allow(Tty).to receive(:width).and_return(0)
-    ENV.delete("HOMEBREW_NO_GITHUB_API")
   end
 
   it_behaves_like "a command that handles invalid options"
