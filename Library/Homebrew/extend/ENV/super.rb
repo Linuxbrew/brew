@@ -181,18 +181,6 @@ module Superenv
       keg_only_deps.map(&:opt_lib),
       HOMEBREW_PREFIX/"lib",
     ]
-
-    if compiler == :llvm_clang
-      if OS.mac?
-        if MacOS::CLT.installed?
-          paths << "/usr/lib"
-        else
-          paths << "#{MacOS.sdk_path}/usr/lib"
-        end
-      end
-      paths << Formula["llvm"].opt_lib.to_s
-    end
-
     paths += homebrew_extra_library_paths
     PATH.new(paths).existing
   end

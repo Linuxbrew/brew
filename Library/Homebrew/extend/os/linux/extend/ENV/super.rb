@@ -6,16 +6,15 @@ module Superenv
     (HOMEBREW_SHIMS_PATH/"linux/super").realpath
   end
 
-  def xorg_recursive_deps
-    return [] unless xorg_installed?
-    @xorg_deps ||= Formula["linuxbrew/xorg/xorg"].recursive_dependencies.map(&:to_formula)
-  rescue FormulaUnavailableError
-    []
+  # @private
+  def setup_build_environment(formula = nil)
+    generic_setup_build_environment(formula)
+    self["HOMEBREW_DYNAMIC_LINKER"] = determine_dynamic_linker_path
+    self["HOMEBREW_RPATH_PATHS"] = determine_rpath_paths(formula)
   end
 
   def homebrew_extra_paths
     paths = []
-
     paths += %w[binutils make].map do |f|
       begin
         bin = Formula[f].opt_bin
@@ -24,20 +23,28 @@ module Superenv
         nil
       end
     end.compact
-
     paths += xorg_recursive_deps.map(&:opt_bin) if x11?
     paths
   end
 
-  def determine_extra_rpath_paths
-    paths = ["#{HOMEBREW_PREFIX}/lib"]
-    paths += run_time_deps.map { |d| d.opt_lib.to_s }
-    paths += homebrew_extra_library_paths
-    paths
+  def determine_rpath_paths(formula)
+    PATH.new(
+      formula&.lib,
+      "#{HOMEBREW_PREFIX}/lib",
+      PATH.new(run_time_deps.map { |dep| dep.opt_lib.to_s }).existing,
+    )
   end
 
   def determine_dynamic_linker_path
     "#{HOMEBREW_PREFIX}/lib/ld.so"
+  end
+
+  # @private
+  def xorg_recursive_deps
+    return [] unless xorg_installed?
+    @xorg_deps ||= Formula["linuxbrew/xorg/xorg"].recursive_dependencies.map(&:to_formula)
+  rescue FormulaUnavailableError
+    []
   end
 
   # @private

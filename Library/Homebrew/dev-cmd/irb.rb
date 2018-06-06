@@ -23,7 +23,7 @@ module Homebrew
   module_function
 
   def irb
-    args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--examples"
       switch "--pry", env: :pry
     end

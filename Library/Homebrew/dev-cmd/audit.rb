@@ -53,7 +53,7 @@ module Homebrew
   module_function
 
   def audit
-    args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch      "--strict"
       switch      "--online"
       switch      "--new-formula"
@@ -515,9 +515,9 @@ module Homebrew
 
       new_formula_problem "GitHub fork (not canonical repository)" if metadata["fork"]
       if formula&.tap&.core_tap? &&
-         (metadata["forks_count"] < 20) && (metadata["subscribers_count"] < 20) &&
-         (metadata["stargazers_count"] < 50)
-        new_formula_problem "GitHub repository not notable enough (<20 forks, <20 watchers and <50 stars)"
+         (metadata["forks_count"] < 30) && (metadata["subscribers_count"] < 30) &&
+         (metadata["stargazers_count"] < 75)
+        new_formula_problem "GitHub repository not notable enough (<30 forks, <30 watchers and <75 stars)"
       end
 
       return if Date.parse(metadata["created_at"]) <= (Date.today - 30)
@@ -606,6 +606,7 @@ module Homebrew
         libart 2.3.21
         pygtkglext 1.1.0
         libepoxy 1.5.0
+        gtk-mac-integration 2.1.2
       ].each_slice(2).to_a.map do |formula, version|
         [formula, version.split(".")[0..1].join(".")]
       end

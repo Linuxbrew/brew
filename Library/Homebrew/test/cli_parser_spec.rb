@@ -33,9 +33,9 @@ describe Homebrew::CLI::Parser do
     end
 
     it "parses a single option and checks other options to be nil" do
-      args = parser.parse(["--verbose"])
+      parser.parse(["--verbose"])
       expect(Homebrew.args).to be_verbose
-      expect(args.more_verbose?).to be nil
+      expect(Homebrew.args.more_verbose?).to be nil
     end
 
     it "raises an exception when an invalid option is passed" do
@@ -43,8 +43,8 @@ describe Homebrew::CLI::Parser do
     end
 
     it "maps environment var to an option" do
-      args = parser.parse([])
-      expect(args.pry?).to be true
+      parser.parse([])
+      expect(Homebrew.args.pry?).to be true
     end
   end
 
@@ -57,8 +57,8 @@ describe Homebrew::CLI::Parser do
     }
 
     it "parses a long flag option with its argument" do
-      args = parser.parse(["--filename=random.txt"])
-      expect(args.filename).to eq "random.txt"
+      parser.parse(["--filename=random.txt"])
+      expect(Homebrew.args.filename).to eq "random.txt"
     end
 
     it "raises an exception when a flag's required value is not passed" do
@@ -66,8 +66,8 @@ describe Homebrew::CLI::Parser do
     end
 
     it "parses a comma array flag option" do
-      args = parser.parse(["--files=random1.txt,random2.txt"])
-      expect(args.files).to eq %w[random1.txt random2.txt]
+      parser.parse(["--files=random1.txt,random2.txt"])
+      expect(Homebrew.args.files).to eq %w[random1.txt random2.txt]
     end
   end
 
@@ -96,14 +96,14 @@ describe Homebrew::CLI::Parser do
     end
 
     it "raises no exception" do
-      args = parser.parse(["--flag1=flag1", "--flag2=flag2"])
-      expect(args.flag1).to eq "flag1"
-      expect(args.flag2).to eq "flag2"
+      parser.parse(["--flag1=flag1", "--flag2=flag2"])
+      expect(Homebrew.args.flag1).to eq "flag1"
+      expect(Homebrew.args.flag2).to eq "flag2"
     end
 
     it "raises no exception for optional dependency" do
-      args = parser.parse(["--flag3=flag3"])
-      expect(args.flag3).to eq "flag3"
+      parser.parse(["--flag3=flag3"])
+      expect(Homebrew.args.flag3).to eq "flag3"
     end
   end
 
@@ -146,14 +146,14 @@ describe Homebrew::CLI::Parser do
     end
 
     it "raises no exception" do
-      args = parser.parse(["--switch-a", "--switch-c"])
-      expect(args.switch_a?).to be true
-      expect(args.switch_c?).to be true
+      parser.parse(["--switch-a", "--switch-c"])
+      expect(Homebrew.args.switch_a?).to be true
+      expect(Homebrew.args.switch_c?).to be true
     end
 
     it "raises no exception for optional dependency" do
-      args = parser.parse(["--switch-b"])
-      expect(args.switch_b?).to be true
+      parser.parse(["--switch-b"])
+      expect(Homebrew.args.switch_b?).to be true
     end
   end
 end

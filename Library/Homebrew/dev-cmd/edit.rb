@@ -43,7 +43,7 @@ module Homebrew
       paths = ARGV.named.map do |name|
         path = Formulary.path(name)
 
-        raise FormulaUnavailableError, name unless path.file? || Homebrew.args.force?
+        raise FormulaUnavailableError, name unless path.file? || args.force?
 
         path
       end

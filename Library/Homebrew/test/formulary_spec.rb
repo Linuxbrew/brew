@@ -72,6 +72,12 @@ describe Formulary do
       }.to raise_error(FormulaUnavailableError)
     end
 
+    it "raises an error if ref is nil" do
+      expect {
+        described_class.factory(nil)
+      }.to raise_error(ArgumentError)
+    end
+
     context "when the Formula has the wrong class" do
       let(:formula_name) { "giraffe" }
       let(:formula_content) do

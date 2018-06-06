@@ -387,6 +387,7 @@ class Version
     other = Version.new(other.to_s) if other.is_a? Integer
     return 1 if other.nil?
 
+    return 1 if other.respond_to?(:null?) && other.null?
     return unless other.is_a?(Version)
     return 0 if version == other.version
     return 1 if head? && !other.head?

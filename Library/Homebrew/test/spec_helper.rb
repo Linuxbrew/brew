@@ -41,6 +41,8 @@ TEST_DIRECTORIES = [
 RSpec.configure do |config|
   config.order = :random
 
+  config.raise_errors_for_deprecations!
+
   config.filter_run_when_matching :focus
 
   # TODO: when https://github.com/rspec/rspec-expectations/pull/1056

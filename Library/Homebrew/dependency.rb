@@ -10,6 +10,8 @@ class Dependency
   DEFAULT_ENV_PROC = proc {}
 
   def initialize(name, tags = [], env_proc = DEFAULT_ENV_PROC, option_names = [name])
+    raise ArgumentError, "Dependency must have a name!" unless name
+
     @name = name
     @tags = tags
     @env_proc = env_proc

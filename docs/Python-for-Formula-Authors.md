@@ -66,7 +66,7 @@ This is exactly the same as writing:
 ```ruby
 def install
   # Create a virtualenv in `libexec`. If your app needs Python 3, make sure that
-  # `depends_on "python"` is declared, and use `virtualenv_create(libexec, "python")`.
+  # `depends_on "python"` is declared, and use `virtualenv_create(libexec, "python3")`.
   venv = virtualenv_create(libexec)
   # Install all of the resources declared on the formula into the virtualenv.
   venv.pip_install resources

@@ -52,11 +52,12 @@
 
 # Unignore our root-level metadata files.
 !/.gitignore
+!/.circleci/config.yml
 !/.travis.yml
 !/.codecov.yml
 !/.yardopts
-!/.circleci/config.yml
-!/CODEOFCONDUCT.md
+!/CHANGELOG.md
+!/CODE_OF_CONDUCT.md
 !/CONTRIBUTING.md
 !/LICENSE.txt
 !/README.md

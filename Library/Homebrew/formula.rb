@@ -358,7 +358,15 @@ class Formula
     return unless head.downloader.is_a?(VCSDownloadStrategy)
     return unless head.downloader.cached_location.exist?
 
-    head.version.update_commit(head.downloader.last_commit)
+    path = if ENV["HOMEBREW_ENV"]
+      ENV["PATH"]
+    else
+      ENV["HOMEBREW_PATH"]
+    end
+
+    with_env(PATH: path) do
+      head.version.update_commit(head.downloader.last_commit)
+    end
   end
 
   # The {PkgVersion} for this formula with {version} and {#revision} information.
@@ -1514,7 +1522,11 @@ class Formula
     if read_from_tab &&
        (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
-      return tab_deps.map { |d| Dependency.new d["full_name"] }.compact
+      return tab_deps.map do |d|
+        full_name = d["full_name"]
+        next unless full_name
+        Dependency.new full_name
+      end.compact
     end
 
     declared_runtime_dependencies | undeclared_runtime_dependencies
@@ -1525,7 +1537,12 @@ class Formula
   def declared_runtime_dependencies
     recursive_dependencies do |_, dependency|
       Dependency.prune if dependency.build?
-      Dependency.prune if !dependency.required? && build.without?(dependency)
+      next if dependency.required?
+      if build.any_args_or_options?
+        Dependency.prune if build.without?(dependency)
+      elsif !dependency.recommended?
+        Dependency.prune
+      end
     end
   end
 
@@ -1537,9 +1554,7 @@ class Formula
     return [] unless keg
 
     undeclared_deps = CacheStoreDatabase.use(:linkage) do |db|
-      linkage_checker = LinkageChecker.new(
-        keg, self, cache_db: db, use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?
-      )
+      linkage_checker = LinkageChecker.new(keg, self, cache_db: db)
       linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
     end
 

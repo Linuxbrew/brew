@@ -179,7 +179,7 @@ describe "brew install", :integration_test do
   it "succeeds when a non-fatal requirement isn't satisfied", :needs_macos do
     setup_test_formula "testball1", <<~EOS
       class NonFatalRequirement < Requirement
-        satisfy { false }
+        satisfy(build_env: false) { false }
       end
 
       depends_on NonFatalRequirement

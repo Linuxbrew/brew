@@ -46,8 +46,8 @@ module RuboCop
 
     module NewFormulaAudit
       class Options < FormulaCop
-        DEP_OPTION = "New Formula should not use `deprecated_option`".freeze
-        OPTION = "Formula should not have an `option`".freeze
+        DEP_OPTION = "New formulae should not use `deprecated_option`".freeze
+        OPTION = "Formulae should not have an `option`".freeze
 
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
           return if versioned_formula?

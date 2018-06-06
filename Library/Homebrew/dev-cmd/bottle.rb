@@ -71,7 +71,7 @@ module Homebrew
   module_function
 
   def bottle
-    @args = Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch "--merge"
       switch "--skip-relocation"
       switch "--force-core-tap"
@@ -86,7 +86,7 @@ module Homebrew
       flag   "--root-url"
     end
 
-    return merge if @args.merge?
+    return merge if args.merge?
     ensure_formula_installed! "patchelf" unless OS.mac?
     ARGV.resolved_formulae.each do |f|
       bottle_formula f
@@ -126,7 +126,7 @@ module Homebrew
       linked_libraries = Keg.file_linked_libraries(file, string)
       result ||= !linked_libraries.empty?
 
-      if Homebrew.args.verbose?
+      if args.verbose?
         print_filename.call(string, file) unless linked_libraries.empty?
         linked_libraries.each do |lib|
           puts " #{Tty.bold}-->#{Tty.reset} links to #{lib}"
@@ -149,7 +149,7 @@ module Homebrew
         end
       end
 
-      next unless Homebrew.args.verbose? && !text_matches.empty?
+      next unless args.verbose? && !text_matches.empty?
       print_filename.call(string, file)
       text_matches.first(MAXIMUM_STRING_MATCHES).each do |match, offset|
         puts " #{Tty.bold}-->#{Tty.reset} match '#{match}' at offset #{Tty.bold}0x#{offset}#{Tty.reset}"
@@ -170,7 +170,7 @@ module Homebrew
       absolute_symlinks_start_with_string << pn if link.to_s.start_with?(string)
     end
 
-    if Homebrew.args.verbose?
+    if args.verbose?
       unless absolute_symlinks_start_with_string.empty?
         opoo "Absolute symlink starting with #{string}:"
         absolute_symlinks_start_with_string.each do |pn|
@@ -193,7 +193,7 @@ module Homebrew
     end
 
     unless tap = f.tap
-      unless @args.force_core_tap?
+      unless args.force_core_tap?
         return ofail "Formula not from core or any taps: #{f.full_name}"
       end
 
@@ -212,9 +212,9 @@ module Homebrew
 
     return ofail "Formula has no stable version: #{f.full_name}" unless f.stable
 
-    if @args.no_rebuild? || !f.tap
+    if args.no_rebuild? || !f.tap
       rebuild = 0
-    elsif @args.keep_old?
+    elsif args.keep_old?
       rebuild = f.bottle_specification.rebuild
     else
       ohai "Determining #{f.full_name} bottle rebuild..."
@@ -247,7 +247,7 @@ module Homebrew
       begin
         keg.delete_pyc_files!
 
-        unless @args.skip_relocation?
+        unless args.skip_relocation?
           changed_files = keg.replace_locations_with_placeholders
         end
 
@@ -298,7 +298,7 @@ module Homebrew
         end
 
         relocatable = true
-        if @args.skip_relocation?
+        if args.skip_relocation?
           skip_relocation = true
         else
           relocatable = false if keg_contain?(prefix_check, keg, ignores)
@@ -311,21 +311,21 @@ module Homebrew
           end
           skip_relocation = relocatable && !keg.require_relocation?
         end
-        puts if !relocatable && Homebrew.args.verbose?
+        puts if !relocatable && args.verbose?
       rescue Interrupt
         ignore_interrupts { bottle_path.unlink if bottle_path.exist? }
         raise
       ensure
         ignore_interrupts do
           original_tab&.write
-          unless @args.skip_relocation?
+          unless args.skip_relocation?
             keg.replace_placeholders_with_locations changed_files
           end
         end
       end
     end
 
-    root_url = @args.root_url
+    root_url = args.root_url
 
     bottle = BottleSpecification.new
     bottle.tap = tap
@@ -345,7 +345,7 @@ module Homebrew
     bottle.sha256 sha256 => Utils::Bottles.tag
 
     old_spec = f.bottle_specification
-    if @args.keep_old? && !old_spec.checksums.empty?
+    if args.keep_old? && !old_spec.checksums.empty?
       mismatches = [:root_url, :prefix, :cellar, :rebuild].reject do |key|
         old_spec.send(key) == bottle.send(key)
       end
@@ -378,9 +378,9 @@ module Homebrew
     puts "./#{filename}"
     puts output
 
-    return unless @args.json?
+    return unless args.json?
     tag = Utils::Bottles.tag.to_s
-    tag += "_or_later" if @args.or_later?
+    tag += "_or_later" if args.or_later?
     json = {
       f.full_name => {
         "formula" => {
@@ -411,7 +411,7 @@ module Homebrew
   end
 
   def merge
-    write = @args.write?
+    write = args.write?
 
     bottles_hash = ARGV.named.reduce({}) do |hash, json_file|
       deep_merge_hashes hash, JSON.parse(IO.read(json_file))
@@ -440,7 +440,7 @@ module Homebrew
         Utils::Inreplace.inreplace(path) do |s|
           if s.include? "bottle do"
             update_or_add = "update"
-            if @args.keep_old?
+            if args.keep_old?
               mismatches = []
               bottle_block_contents = s[/  bottle do(.+?)end\n/m, 1]
               bottle_block_contents.lines.each do |line|
@@ -499,7 +499,7 @@ module Homebrew
             string = s.sub!(/  bottle do.+?end\n/m, output)
             odie "Bottle block update failed!" unless string
           else
-            if @args.keep_old?
+            if args.keep_old?
               odie "--keep-old was passed but there was no existing bottle block!"
             end
             puts output
@@ -528,7 +528,7 @@ module Homebrew
           end
         end
 
-        unless @args.no_commit? || update_or_add.nil?
+        unless args.no_commit? || update_or_add.nil?
           if ENV["HOMEBREW_GIT_NAME"]
             ENV["GIT_AUTHOR_NAME"] =
               ENV["GIT_COMMITTER_NAME"] =

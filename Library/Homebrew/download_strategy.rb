@@ -1089,7 +1089,8 @@ end
 class BazaarDownloadStrategy < VCSDownloadStrategy
   def initialize(name, resource)
     super
-    @url = @url.sub(%r{^bzr://}, "")
+    @url.sub!(%r{^bzr://}, "")
+    ENV["BZR_HOME"] = HOMEBREW_TEMP
   end
 
   def stage
@@ -1100,7 +1101,9 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    Time.parse Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+    timestamp = Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+    raise "Could not get any timestamps from bzr!" if timestamp.to_s.empty?
+    Time.parse timestamp
   end
 
   def last_commit

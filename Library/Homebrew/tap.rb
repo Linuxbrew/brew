@@ -84,6 +84,7 @@ class Tap
   # clear internal cache
   def clear_cache
     @remote = nil
+    @repo_var = nil
     @formula_dir = nil
     @cask_dir = nil
     @formula_files = nil

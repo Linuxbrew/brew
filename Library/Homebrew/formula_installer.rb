@@ -640,16 +640,18 @@ class FormulaInstaller
       post_install
     end
 
-    caveats
-
-    ohai "Summary" if verbose? || show_summary_heading?
-    puts summary
-
     # Updates the cache for a particular formula after doing an install
     CacheStoreDatabase.use(:linkage) do |db|
       break unless db.created?
       LinkageChecker.new(keg, formula, cache_db: db)
     end
+
+    # Update tab with actual runtime dependencies
+    tab = Tab.for_keg(keg)
+    Tab.clear_cache
+    f_runtime_deps = formula.runtime_dependencies(read_from_tab: false)
+    tab.runtime_dependencies = Tab.runtime_deps_hash(f_runtime_deps)
+    tab.write
 
     # let's reset Utils.git_available? if we just installed git
     Utils.clear_git_available_cache if formula.name == "git"
@@ -659,6 +661,11 @@ class FormulaInstaller
        !DevelopmentTools.curl_handles_most_https_certificates?
       ENV["HOMEBREW_CURL"] = formula.opt_bin/"curl"
     end
+
+    caveats
+
+    ohai "Summary" if verbose? || show_summary_heading?
+    puts summary
   ensure
     unlock
   end

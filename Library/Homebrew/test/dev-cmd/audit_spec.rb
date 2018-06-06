@@ -4,7 +4,7 @@ require "formulary"
 module Count
   def self.increment
     @count ||= 0
-    @count  += 1
+    @count += 1
   end
 end
 
@@ -350,23 +350,22 @@ module Homebrew
     end
 
     describe "#audit_revision_and_version_scheme" do
-      subject do
+      subject {
         fa = described_class.new(Formulary.factory(formula_path))
         fa.audit_revision_and_version_scheme
         fa.problems.first
-      end
+      }
 
       let(:origin_tap_path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-foo" }
-      let(:formula_subpath) { "Formula/foo#{@foo_version}.rb" }
+      let(:foo_version) { Count.increment }
+      let(:formula_subpath) { "Formula/foo#{foo_version}.rb" }
       let(:origin_formula_path) { origin_tap_path/formula_subpath }
       let(:tap_path) { Tap::TAP_DIRECTORY/"homebrew/homebrew-bar" }
       let(:formula_path) { tap_path/formula_subpath }
 
       before do
-        @foo_version = Count.increment
-
         origin_formula_path.write <<~EOS
-          class Foo#{@foo_version} < Formula
+          class Foo#{foo_version} < Formula
             url "https://example.com/foo-1.0.tar.gz"
             revision 2
             version_scheme 1
