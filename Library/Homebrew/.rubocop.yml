@@ -3,6 +3,7 @@ inherit_from:
 
 AllCops:
   Include:
+    - '**/*.rb'
     - 'Library/Homebrew/.simplecov'
   Exclude:
     - 'bin/*'
@@ -12,6 +13,10 @@ AllCops:
 Layout/MultilineMethodCallIndentation:
   Exclude:
     - '**/*_spec.rb'
+
+# Gets false positives with our heredocs nested inside arrays
+Layout/ClosingHeredocIndentation:
+  Enabled: false
 
 # so many of these in formulae but none in here
 Lint/AmbiguousRegexpLiteral:
@@ -70,6 +75,11 @@ Naming/PredicateName:
 
 # f meaning formulae is pretty standard
 Naming/UncommunicativeMethodParamName:
+  Enabled: false
+
+# I'm not sure how to correct these, and seems to get false positives on
+# modifiers used on symbols of methods
+Style/AccessModifierDeclarations:
   Enabled: false
 
 Style/BlockDelimiters:
