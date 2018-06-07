@@ -66,12 +66,9 @@ module Homebrew
             #{Formatter.url("https://www.playframework.com/documentation/2.3.x/Highlights23")}
           EOS
         when "haskell-platform" then <<~EOS
-          We no longer package haskell-platform. Consider installing ghc
-          and cabal-install instead:
-            brew install ghc cabal-install
-
-          You can install with Homebrew-Cask:
-            brew cask install haskell-platform
+          We no longer package haskell-platform. Consider installing ghc,
+          cabal-install and stack instead:
+            brew install ghc cabal-install stack
           EOS
         when "mysqldump-secure" then <<~EOS
           The creator of mysqldump-secure tried to game our popularity metrics.
