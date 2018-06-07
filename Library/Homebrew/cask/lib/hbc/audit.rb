@@ -34,7 +34,7 @@ module Hbc
       check_single_pre_postflight
       check_single_uninstall_zap
       check_untrusted_pkg
-      check_github_releases_appcast
+      check_hosting_with_appcast
       check_latest_with_appcast
       check_stanza_requires_uninstall
       self
@@ -246,11 +246,23 @@ module Hbc
       add_warning "Casks with an appcast should not use version :latest"
     end
 
-    def check_github_releases_appcast
+    def check_hosting_with_appcast
       return if cask.appcast
+      check_github_releases_appcast
+      check_sourceforge_appcast
+    end
+
+    def check_github_releases_appcast
       return unless cask.url.to_s =~ %r{github.com/([^/]+)/([^/]+)/releases/download/(\S+)}
 
-      add_warning "Cask uses GitHub releases, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
+      add_warning "Download uses GitHub releases, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
+    end
+
+    def check_sourceforge_appcast
+      return if cask.version.latest?
+      return unless cask.url.to_s =~ %r{sourceforge.net/(\S+)}
+
+      add_warning "Download is hosted on SourceForge, please add an appcast. See https://github.com/Homebrew/homebrew-cask/blob/master/doc/cask_language_reference/stanzas/appcast.md"
     end
 
     def check_url
