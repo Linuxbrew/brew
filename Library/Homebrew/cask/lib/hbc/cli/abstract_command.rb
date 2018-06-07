@@ -9,7 +9,7 @@ module Hbc
       option "--debug",         :debug,         false
       option "--verbose",       :verbose,       false
       option "--outdated",      :outdated_only, false
-      option "--require-sha",   :require_sha, false
+      option "--require-sha",   :require_sha,   false
 
       def self.command_name
         @command_name ||= name.sub(/^.*:/, "").gsub(/(.)([A-Z])/, '\1_\2').downcase
@@ -49,24 +49,18 @@ module Hbc
         casks = args.empty? ? alternative.call : args
         @casks = casks.map { |cask| CaskLoader.load(cask) }
       rescue CaskUnavailableError => e
-        reason = [e.reason, suggestion_message(e.token)].join(" ")
+        reason = [e.reason, *suggestion_message(e.token)].join(" ")
         raise e.class.new(e.token, reason)
       end
 
       def suggestion_message(cask_token)
-        exact_match, partial_matches = Search.search(cask_token)
+        matches, = Search.search(cask_token)
 
-        if exact_match.nil? && partial_matches.count == 1
-          exact_match = partial_matches.first
-        end
-
-        if exact_match
-          "Did you mean “#{exact_match}”?"
-        elsif !partial_matches.empty?
+        if matches.one?
+          "Did you mean “#{matches.first}”?"
+        elsif !matches.empty?
           "Did you mean one of these?\n"
-            .concat(Formatter.columns(partial_matches.take(20)))
-        else
-          ""
+            .concat(Formatter.columns(matches.take(20)))
         end
       end
     end

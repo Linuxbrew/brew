@@ -5,8 +5,8 @@ require "set"
 module Homebrew
   module CLI
     class Parser
-      def self.parse(&block)
-        new(&block).parse
+      def self.parse(args = ARGV, &block)
+        new(&block).parse(args)
       end
 
       def initialize(&block)
@@ -60,17 +60,28 @@ module Homebrew
         @conflicts << options.map { |option| option_to_name(option) }
       end
 
-      def option_to_name(name)
-        name.sub(/\A--?/, "").tr("-", "_").delete("=")
+      def option_to_name(option)
+        option.sub(/\A--?/, "")
+              .tr("-", "_")
+              .delete("=")
+      end
+
+      def name_to_option(name)
+        if name.length == 1
+          "-#{name}"
+        else
+          "--#{name}"
+        end
       end
 
       def option_to_description(*names)
         names.map { |name| name.to_s.sub(/\A--?/, "").tr("-", " ") }.max
       end
 
-      def parse(cmdline_args = ARGV)
-        @parser.parse(cmdline_args)
+      def parse(cmdline_args)
+        remaining_args = @parser.parse(cmdline_args)
         check_constraint_violations
+        Homebrew.args[:remaining] = remaining_args
       end
 
       private
@@ -126,7 +137,9 @@ module Homebrew
           violations = mutually_exclusive_options_group.select do |option|
             option_passed? option
           end
-          raise OptionConflictError, violations if violations.length > 1
+
+          next if violations.count < 2
+          raise OptionConflictError, violations.map(&method(:name_to_option))
         end
       end
 
@@ -163,9 +176,10 @@ module Homebrew
 
     class OptionConflictError < RuntimeError
       def initialize(args)
-        args_list = args.join("` and `")
+        args_list = args.map(&Formatter.public_method(:option))
+                        .join(" and ")
         super <<~EOS
-          `#{args_list}` are mutually exclusive
+          Options #{args_list} are mutually exclusive.
         EOS
       end
     end

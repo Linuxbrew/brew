@@ -16,49 +16,69 @@
 require "formula"
 require "missing_formula"
 require "descriptions"
+require "cli_parser"
+require "search"
 
 module Homebrew
   module_function
 
-  def search
-    if ARGV.empty?
-      puts Formatter.columns(Formula.full_names.sort)
-    elsif ARGV.include? "--macports"
-      exec_browser "https://www.macports.org/ports.php?by=name&substr=#{ARGV.next}"
-    elsif ARGV.include? "--fink"
-      exec_browser "http://pdb.finkproject.org/pdb/browse.php?summary=#{ARGV.next}"
-    elsif ARGV.include? "--debian"
-      exec_browser "https://packages.debian.org/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
-    elsif ARGV.include? "--opensuse"
-      exec_browser "https://software.opensuse.org/search?q=#{ARGV.next}"
-    elsif ARGV.include? "--fedora"
-      exec_browser "https://apps.fedoraproject.org/packages/s/#{ARGV.next}"
-    elsif ARGV.include? "--ubuntu"
-      exec_browser "https://packages.ubuntu.com/search?keywords=#{ARGV.next}&searchon=names&suite=all&section=all"
-    elsif ARGV.include? "--desc"
-      query = ARGV.next
-      regex = query_regexp(query)
-      Descriptions.search(regex, :desc).print
-    elsif ARGV.first =~ HOMEBREW_TAP_FORMULA_REGEX
-      query = ARGV.first
+  extend Search
 
-      begin
-        result = Formulary.factory(query).name
-        results = Array(result)
-      rescue FormulaUnavailableError
-        _, _, name = query.split("/", 3)
-        results = search_taps(name)
+  PACKAGE_MANAGERS = {
+    macports: ->(query) { "https://www.macports.org/ports.php?by=name&substr=#{query}" },
+    fink:     ->(query) { "http://pdb.finkproject.org/pdb/browse.php?summary=#{query}" },
+    debian:   ->(query) { "https://packages.debian.org/search?keywords=#{query}&searchon=names&suite=all&section=all" },
+    opensuse: ->(query) { "https://software.opensuse.org/search?q=#{query}" },
+    fedora:   ->(query) { "https://apps.fedoraproject.org/packages/s/#{query}" },
+    ubuntu:   ->(query) { "https://packages.ubuntu.com/search?keywords=#{query}&searchon=names&suite=all&section=all" },
+  }.freeze
+
+  def search(argv = ARGV)
+    CLI::Parser.parse(argv) do
+      switch "--desc"
+
+      package_manager_switches = PACKAGE_MANAGERS.keys.map { |name| "--#{name}" }
+
+      package_manager_switches.each do |s|
+        switch s
       end
 
-      puts Formatter.columns(results.sort) unless results.empty?
+      conflicts(*package_manager_switches)
+    end
+
+    if package_manager = PACKAGE_MANAGERS.detect { |name,| args[:"#{name}?"] }
+      _, url = package_manager
+      exec_browser url.call(URI.encode_www_form_component(args.remaining.join(" ")))
+      return
+    end
+
+    if args.remaining.empty?
+      puts Formatter.columns(Formula.full_names.sort)
+    elsif args.desc?
+      query = args.remaining.join(" ")
+      string_or_regex = query_regexp(query)
+      Descriptions.search(string_or_regex, :desc).print
+    elsif args.remaining.first =~ HOMEBREW_TAP_FORMULA_REGEX
+      query = args.remaining.first
+
+      results = begin
+        [Formulary.factory(query).name]
+      rescue FormulaUnavailableError
+        _, _, name = query.split("/", 3)
+        remote_results = search_taps(name)
+        [*remote_results[:formulae], *remote_results[:casks]].sort
+      end
+
+      puts Formatter.columns(results) unless results.empty?
     else
-      query = ARGV.first
-      regex = query_regexp(query)
-      local_results = search_formulae(regex)
+      query = args.remaining.join(" ")
+      string_or_regex = query_regexp(query)
+      local_results = search_formulae(string_or_regex)
       puts Formatter.columns(local_results.sort) unless local_results.empty?
 
-      tap_results = search_taps(query)
-      puts Formatter.columns(tap_results.sort) unless tap_results.empty?
+      remote_results = search_taps(query)
+      tap_results = [*remote_results[:formulae], *remote_results[:casks]].sort
+      puts Formatter.columns(tap_results) unless tap_results.empty?
 
       if $stdout.tty?
         count = local_results.length + tap_results.length
@@ -78,10 +98,10 @@ module Homebrew
     end
 
     return unless $stdout.tty?
-    return if ARGV.empty?
+    return if args.remaining.empty?
     metacharacters = %w[\\ | ( ) [ ] { } ^ $ * + ?].freeze
     return unless metacharacters.any? do |char|
-      ARGV.any? do |arg|
+      args.remaining.any? do |arg|
         arg.include?(char) && !arg.start_with?("/")
       end
     end
@@ -89,68 +109,5 @@ module Homebrew
       Did you mean to perform a regular expression search?
       Surround your query with /slashes/ to search locally by regex.
     EOS
-  end
-
-  def query_regexp(query)
-    case query
-    when %r{^/(.*)/$} then Regexp.new(Regexp.last_match(1))
-    else /.*#{Regexp.escape(query)}.*/i
-    end
-  rescue RegexpError
-    odie "#{query} is not a valid regex"
-  end
-
-  def search_taps(query, silent: false)
-    return [] if ENV["HOMEBREW_NO_GITHUB_API"]
-
-    # Use stderr to avoid breaking parsed output
-    unless silent
-      $stderr.puts Formatter.headline("Searching taps on GitHub...", color: :blue)
-    end
-
-    matches = begin
-      GitHub.search_code(
-        user: "Homebrew",
-        path: ["Formula", "HomebrewFormula", "Casks", "."],
-        filename: query,
-        extension: "rb",
-      )
-    rescue GitHub::Error => error
-      opoo "Error searching on GitHub: #{error}\n"
-      []
-    end
-    matches.map do |match|
-      filename = File.basename(match["path"], ".rb")
-      tap = Tap.fetch(match["repository"]["full_name"])
-      next if tap.installed? && !tap.name.start_with?("homebrew/cask")
-      "#{tap.name}/#{filename}"
-    end.compact
-  end
-
-  def search_formulae(regex)
-    # Use stderr to avoid breaking parsed output
-    $stderr.puts Formatter.headline("Searching local taps...", color: :blue)
-
-    aliases = Formula.alias_full_names
-    results = (Formula.full_names + aliases).grep(regex).sort
-
-    results.map do |name|
-      begin
-        formula = Formulary.factory(name)
-        canonical_name = formula.name
-        canonical_full_name = formula.full_name
-      rescue
-        canonical_name = canonical_full_name = name
-      end
-
-      # Ignore aliases from results when the full name was also found
-      next if aliases.include?(name) && results.include?(canonical_full_name)
-
-      if (HOMEBREW_CELLAR/canonical_name).directory?
-        pretty_installed(name)
-      else
-        name
-      end
-    end.compact
   end
 end

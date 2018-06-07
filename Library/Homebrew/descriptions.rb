@@ -1,7 +1,11 @@
 require "formula"
 require "formula_versions"
+require "search"
+require "searchable"
 
 class Descriptions
+  extend Homebrew::Search
+
   CACHE_FILE = HOMEBREW_CACHE + "desc_cache.json"
 
   def self.cache
@@ -94,16 +98,18 @@ class Descriptions
   end
 
   # Given a regex, find all formulae whose specified fields contain a match.
-  def self.search(regex, field = :either)
+  def self.search(string_or_regex, field = :either)
     ensure_cache
+
+    @cache.extend(Searchable)
 
     results = case field
     when :name
-      @cache.select { |name, _| name =~ regex }
+      @cache.search(string_or_regex) { |name, _| name }
     when :desc
-      @cache.select { |_, desc| desc =~ regex }
+      @cache.search(string_or_regex) { |_, desc| desc }
     when :either
-      @cache.select { |name, desc| (name =~ regex) || (desc =~ regex) }
+      @cache.search(string_or_regex)
     end
 
     new(results)

@@ -1,3 +1,5 @@
+require "cmd/search"
+
 describe "brew search", :integration_test do
   before do
     setup_test_formula "testball"

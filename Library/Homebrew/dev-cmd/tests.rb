@@ -39,16 +39,12 @@ module Homebrew
       ENV.delete("HOMEBREW_CASK_OPTS")
       ENV.delete("HOMEBREW_TEMP")
       ENV.delete("HOMEBREW_LINKAGE_CACHE")
+      ENV.delete("HOMEBREW_NO_GITHUB_API")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["HOMEBREW_NO_COMPAT"] = "1" if args.no_compat?
       ENV["HOMEBREW_TEST_GENERIC_OS"] = "1" if args.generic?
-
-      if args.online?
-        ENV["HOMEBREW_TEST_ONLINE"] = "1"
-      else
-        ENV["HOMEBREW_NO_GITHUB_API"] = "1"
-      end
+      ENV["HOMEBREW_TEST_ONLINE"] = "1" if args.online?
 
       if args.coverage?
         ENV["HOMEBREW_TESTS_COVERAGE"] = "1"
