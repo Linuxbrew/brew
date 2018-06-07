@@ -77,8 +77,8 @@ Naming/PredicateName:
 Naming/UncommunicativeMethodParamName:
   Enabled: false
 
-# I'm not sure how to correct these, and seems to get false positives on
-# modifiers used on symbols of methods
+# Avoid false positives on modifiers used on symbols of methods
+# See https://github.com/rubocop-hq/rubocop/issues/5953
 Style/AccessModifierDeclarations:
   Enabled: false
 

@@ -1,4 +1,3 @@
-
 describe "globally-scoped helper methods" do
   let(:dir) { mktmpdir }
 

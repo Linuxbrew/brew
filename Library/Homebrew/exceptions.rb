@@ -282,7 +282,7 @@ class OperationInProgressError < RuntimeError
       Operation already in progress for #{name}
       Another active Homebrew process is already using #{name}.
       Please wait for it to finish or terminate it to continue.
-      EOS
+    EOS
 
     super message
   end
@@ -333,7 +333,7 @@ class FormulaConflictError < RuntimeError
       link the formula again after the install finishes. You can --force this
       install, but the build may fail or cause obscure side-effects in the
       resulting software.
-      EOS
+    EOS
     message.join("\n")
   end
 end
@@ -498,7 +498,7 @@ class DownloadError < RuntimeError
     super <<~EOS
       Failed to download resource #{resource.download_name.inspect}
       #{cause.message}
-      EOS
+    EOS
     set_backtrace(cause.backtrace)
   end
 end
@@ -547,7 +547,7 @@ class ChecksumMismatchError < RuntimeError
       Actual: #{actual}
       Archive: #{fn}
       To retry an incomplete download, remove the file above.
-      EOS
+    EOS
   end
 end
 
