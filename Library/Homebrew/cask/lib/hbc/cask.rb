@@ -1,10 +1,13 @@
+require "hbc/cask_loader"
 require "hbc/dsl"
 require "hbc/metadata"
+require "searchable"
 
 module Hbc
   class Cask
     extend Enumerable
     extend Forwardable
+    extend Searchable
     include Metadata
 
     attr_reader :token, :sourcefile_path, :config
