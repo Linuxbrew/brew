@@ -177,5 +177,19 @@ describe RuboCop::Cop::FormulaAudit::Text do
         end
       RUBY
     end
+
+    it "When dep ensure is used without `-vendor-only`" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+          homepage "http://example.com"
+
+          def install
+            system "dep", "ensure"
+            ^^^^^^^^^^^^^^^^^^^^^^ use \"dep\", \"ensure\", \"-vendor-only\"
+          end
+        end
+      RUBY
+    end
   end
 end

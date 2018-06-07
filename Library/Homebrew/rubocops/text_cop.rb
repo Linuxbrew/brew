@@ -48,6 +48,11 @@ module RuboCop
           find_method_with_args(body_node, :system, "go", "get") do
             problem "Do not use `go get`. Please ask upstream to implement Go vendoring"
           end
+
+          find_method_with_args(body_node, :system, "dep", "ensure") do |d|
+            next if parameters_passed?(d, /vendor-only/)
+            problem "use \"dep\", \"ensure\", \"-vendor-only\""
+          end
         end
       end
     end
