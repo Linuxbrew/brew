@@ -112,7 +112,8 @@ module Homebrew
     end
 
     if files.nil?
-      args << "--config" << HOMEBREW_LIBRARY_PATH/".rubocop.yml"
+      config_file = ARGV.include?("--rspec") ? ".rubocop-rspec.yml" : ".rubocop.yml"
+      args << "--config" << HOMEBREW_LIBRARY_PATH/config_file
       args << HOMEBREW_LIBRARY_PATH
     else
       args << "--config" << HOMEBREW_LIBRARY/".rubocop_audit.yml"
