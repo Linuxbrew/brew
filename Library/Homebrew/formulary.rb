@@ -298,6 +298,13 @@ module Formulary
     end
   end
 
+  # Return whether given rack is keg-only
+  def self.keg_only?(rack)
+    Formulary.from_rack(rack).keg_only?
+  rescue FormulaUnavailableError, TapFormulaAmbiguityError, TapFormulaWithOldnameAmbiguityError
+    false
+  end
+
   # Return a Formula instance for the given keg.
   # It will auto resolve formula's spec when requested spec is nil
   def self.from_keg(keg, spec = nil, alias_path: nil)

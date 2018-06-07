@@ -43,7 +43,7 @@ require "utils/curl"
 require "extend/ENV"
 require "formula_cellar_checks"
 require "cmd/search"
-require "cmd/style"
+require "style"
 require "date"
 require "missing_formula"
 require "digest"
@@ -116,7 +116,7 @@ module Homebrew
 
     options[:display_cop_names] = args.display_cop_names?
     # Check style in a single batch run up front for performance
-    style_results = check_style_json(files, options)
+    style_results = Style.check_style_json(files, options)
 
     new_formula_problem_lines = []
     ff.sort.each do |f|

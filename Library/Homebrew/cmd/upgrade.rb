@@ -17,7 +17,8 @@
 #:    If <formulae> are given, upgrade only the specified brews (unless they
 #:    are pinned; see `pin`, `unpin`).
 
-require "cmd/install"
+require "install"
+require "formula_installer"
 require "cleanup"
 require "development_tools"
 
@@ -27,7 +28,7 @@ module Homebrew
   def upgrade
     FormulaInstaller.prevent_build_flags unless DevelopmentTools.installed?
 
-    Homebrew.perform_preinstall_checks
+    Install.perform_preinstall_checks
 
     odisabled "'brew upgrade --all'", "'brew upgrade'" if ARGV.include?("--all")
 

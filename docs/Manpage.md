@@ -597,7 +597,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
   * `--cache`:
     Display Homebrew's download cache. See also `HOMEBREW_CACHE`.
 
-  * `--cache` `formula`:
+  * `--cache` [`--build-from-source`|`-s`] [`--force-bottle`] `formula`:
     Display the file or directory used to cache `formula`.
 
   * `--cellar`:
