@@ -40,6 +40,7 @@ module Homebrew
       ENV.delete("HOMEBREW_TEMP")
       ENV.delete("HOMEBREW_LINKAGE_CACHE")
       ENV.delete("HOMEBREW_NO_GITHUB_API")
+      ENV.delete("HOMEBREW_NO_EMOJI")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
       ENV["HOMEBREW_DEVELOPER"] = "1"
       ENV["HOMEBREW_NO_COMPAT"] = "1" if args.no_compat?
