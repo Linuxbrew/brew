@@ -20,6 +20,10 @@ unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
   $LOAD_PATH.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 end
 
+unless $LOAD_PATH.include?("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+  $LOAD_PATH.unshift("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+end
+
 require "global"
 
 begin
