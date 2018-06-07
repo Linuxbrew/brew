@@ -62,18 +62,17 @@ module Homebrew
                 .sort
 
       results.map do |name|
-        begin
-          formula = Formulary.factory(name)
-          canonical_name = formula.name
-          canonical_full_name = formula.full_name
+        formula, canonical_full_name = begin
+          f = Formulary.factory(name)
+          [f, f.full_name]
         rescue
-          canonical_name = canonical_full_name = name
+          [nil, name]
         end
 
         # Ignore aliases from results when the full name was also found
         next if aliases.include?(name) && results.include?(canonical_full_name)
 
-        if (HOMEBREW_CELLAR/canonical_name).directory?
+        if formula&.any_version_installed?
           pretty_installed(name)
         else
           name
