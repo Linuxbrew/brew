@@ -575,7 +575,7 @@ module Homebrew
         new_formula_problem "Formulae should not have a HEAD spec"
       end
 
-      thottled = %w[
+      throttled = %w[
         aws-sdk-cpp 10
         awscli 10
         heroku 10
@@ -583,7 +583,7 @@ module Homebrew
         vim 50
       ]
 
-      thottled.each_slice(2).to_a.map do |a, b|
+      throttled.each_slice(2).to_a.map do |a, b|
         version = formula.stable.version.to_s.split(".").last.to_i
         if @strict && a.include?(formula.name) && version.modulo(b.to_i).nonzero?
           problem "should only be updated every #{b} releases on multiples of #{b}"
