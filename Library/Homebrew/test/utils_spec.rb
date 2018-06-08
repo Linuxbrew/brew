@@ -32,8 +32,6 @@ describe "globally-scoped helper methods" do
       before { allow($stdout).to receive(:tty?).and_return(true) }
 
       context "with HOMEBREW_NO_EMOJI unset" do
-        before { ENV.delete("HOMEBREW_NO_EMOJI") }
-
         it "returns a string with a colored checkmark" do
           expect(subject)
             .to match(/#{esc 1}foo #{esc 32}✔#{esc 0}/)
@@ -66,8 +64,6 @@ describe "globally-scoped helper methods" do
       before { allow($stdout).to receive(:tty?).and_return(true) }
 
       context "with HOMEBREW_NO_EMOJI unset" do
-        before { ENV.delete("HOMEBREW_NO_EMOJI") }
-
         it "returns a string with a colored checkmark" do
           expect(subject)
             .to match(/#{esc 1}foo #{esc 31}✘#{esc 0}/)

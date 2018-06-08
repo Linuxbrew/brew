@@ -1,5 +1,3 @@
-$LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.join("cask", "lib").to_s)
-
 require "hbc"
 
 require "test/support/helper/cask/fake_system_command"

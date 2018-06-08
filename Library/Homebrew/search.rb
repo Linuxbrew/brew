@@ -1,4 +1,5 @@
 require "searchable"
+require "hbc/cask"
 
 module Homebrew
   module Search
@@ -78,6 +79,18 @@ module Homebrew
           name
         end
       end.compact
+    end
+
+    def search_casks(string_or_regex)
+      results = Hbc::Cask.search(string_or_regex, &:token).sort_by(&:token)
+
+      results.map do |cask|
+        if cask.installed?
+          pretty_installed(cask.token)
+        else
+          cask.token
+        end
+      end
     end
   end
 end

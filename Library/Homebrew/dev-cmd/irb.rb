@@ -47,7 +47,6 @@ module Homebrew
     require "formula"
     require "keg"
 
-    $LOAD_PATH.unshift("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
     require "hbc"
 
     ohai "Interactive Homebrew Shell"

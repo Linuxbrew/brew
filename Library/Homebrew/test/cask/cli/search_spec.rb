@@ -87,7 +87,7 @@ describe Hbc::CLI::Search, :cask do
     expect {
       Hbc::CLI::Search.run("/^local-c[a-z]ffeine$/")
     }.to output(<<~EOS).to_stdout.as_tty
-      ==> Regexp Matches
+      ==> Matches
       local-caffeine
     EOS
   end
@@ -110,13 +110,14 @@ describe Hbc::CLI::Search, :cask do
     EOS
   end
 
-  it "doesn't highlight packages that aren't installed" do
-    expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq("local-caffeine")
-  end
-
   it "highlights installed packages" do
     Hbc::CLI::Install.run("local-caffeine")
 
-    expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq(pretty_installed("local-caffeine"))
+    expect {
+      Hbc::CLI::Search.run("local-caffeine")
+    }.to output(<<~EOS).to_stdout.as_tty
+      ==> Matches
+      local-caffeine ✔
+    EOS
   end
 end
