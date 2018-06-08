@@ -191,5 +191,19 @@ describe RuboCop::Cop::FormulaAudit::Text do
         end
       RUBY
     end
+
+    it "When cargo build is executed" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          url "http://example.com/foo-1.0.tgz"
+          homepage "http://example.com"
+
+          def install
+            system "cargo", "build"
+            ^^^^^^^^^^^^^^^^^^^^^^^ use \"cargo\", \"install\", \"--root\", prefix
+          end
+        end
+      RUBY
+    end
   end
 end
