@@ -15,7 +15,6 @@ require "hbc/download"
 require "hbc/download_strategy"
 require "hbc/exceptions"
 require "hbc/installer"
-require "hbc/locations"
 require "hbc/config"
 require "hbc/macos"
 require "hbc/pkg"
@@ -28,8 +27,6 @@ require "hbc/verify"
 require "hbc/version"
 
 module Hbc
-  include Locations
-
   def self.init
     Cache.ensure_cache_exists
     Caskroom.ensure_caskroom_exists
