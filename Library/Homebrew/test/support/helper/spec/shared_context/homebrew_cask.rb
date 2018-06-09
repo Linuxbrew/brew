@@ -25,7 +25,7 @@ RSpec.shared_context "Homebrew-Cask" do
 
       [Hbc::Config.global.binarydir, Hbc::Caskroom.path, Hbc::Cache.path].each(&:mkpath)
 
-      Hbc.default_tap = Tap.fetch("Homebrew", "cask-spec").tap do |tap|
+      Hbc.default_tap.tap do |tap|
         FileUtils.mkdir_p tap.path.dirname
         FileUtils.ln_sf TEST_FIXTURE_DIR.join("cask"), tap.path
       end
