@@ -27,10 +27,6 @@ module Hbc
       def self.help
         "installs the given Cask"
       end
-
-      def self.needs_init?
-        true
-      end
     end
   end
 end

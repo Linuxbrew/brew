@@ -25,9 +25,3 @@ require "hbc/url"
 require "hbc/utils"
 require "hbc/verify"
 require "hbc/version"
-
-module Hbc
-  def self.init
-    Caskroom.ensure_caskroom_exists
-  end
-end

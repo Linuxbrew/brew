@@ -21,6 +21,8 @@ module Hbc
     end
 
     def casks
+      return [] unless path.exist?
+
       Pathname.glob(path.join("*")).sort.select(&:directory?).map do |path|
         token = path.basename.to_s
 

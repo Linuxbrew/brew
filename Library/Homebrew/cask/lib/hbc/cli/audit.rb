@@ -20,10 +20,6 @@ module Hbc
         odebug "Auditing Cask #{cask}"
         Auditor.audit(cask, audit_download: download?, check_token_conflicts: token_conflicts?)
       end
-
-      def self.needs_init?
-        true
-      end
     end
   end
 end

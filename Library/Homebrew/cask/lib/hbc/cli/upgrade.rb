@@ -82,10 +82,6 @@ module Hbc
       def self.help
         "upgrades all outdated casks"
       end
-
-      def self.needs_init?
-        true
-      end
     end
   end
 end
