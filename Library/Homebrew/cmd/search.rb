@@ -18,6 +18,7 @@ require "missing_formula"
 require "descriptions"
 require "cli_parser"
 require "search"
+require "hbc/cask_loader"
 
 module Homebrew
   module_function
@@ -58,32 +59,57 @@ module Homebrew
       query = args.remaining.join(" ")
       string_or_regex = query_regexp(query)
       Descriptions.search(string_or_regex, :desc).print
-    elsif args.remaining.first =~ HOMEBREW_TAP_FORMULA_REGEX
-      query = args.remaining.first
-
-      results = begin
-        [Formulary.factory(query).name]
-      rescue FormulaUnavailableError
-        _, _, name = query.split("/", 3)
-        remote_results = search_taps(name)
-        [*remote_results[:formulae], *remote_results[:casks]].sort
-      end
-
-      puts Formatter.columns(results) unless results.empty?
     else
       query = args.remaining.join(" ")
       string_or_regex = query_regexp(query)
-      local_results = search_formulae(string_or_regex)
-      puts Formatter.columns(local_results.sort) unless local_results.empty?
 
-      remote_results = search_taps(query)
-      tap_results = [*remote_results[:formulae], *remote_results[:casks]].sort
-      puts Formatter.columns(tap_results) unless tap_results.empty?
+      remote_results = if query.match?(HOMEBREW_TAP_FORMULA_REGEX) || query.match?(HOMEBREW_TAP_CASK_REGEX)
+        _, _, name = query.split("/", 3)
+        search_taps(name, silent: true)
+      else
+        search_taps(query, silent: true)
+      end
+
+      local_formulae = if query.match?(HOMEBREW_TAP_FORMULA_REGEX)
+        begin
+          [Formulary.factory(query).name]
+        rescue FormulaUnavailableError
+          []
+        end
+      else
+        search_formulae(string_or_regex)
+      end
+
+      remote_formulae = remote_results[:formulae]
+      all_formulae = local_formulae + remote_formulae
+
+      local_casks = if query.match?(HOMEBREW_TAP_CASK_REGEX)
+        begin
+          [Hbc::CaskLoader.load(query).token]
+        rescue Hbc::CaskUnavailableError
+          []
+        end
+      else
+        search_casks(string_or_regex)
+      end
+
+      remote_casks = remote_results[:casks]
+      all_casks = local_casks + remote_casks
+
+      if all_formulae.any?
+        ohai "Formulae"
+        puts Formatter.columns(all_formulae)
+      end
+
+      if all_casks.any?
+        puts if all_formulae.any?
+        ohai "Casks"
+        puts Formatter.columns(all_casks)
+      end
 
       if $stdout.tty?
-        count = local_results.length + tap_results.length
+        count = all_formulae.count + all_casks.count
 
-        ohai "Searching blacklisted, migrated and deleted formulae..."
         if reason = MissingFormula.reason(query, silent: true)
           if count.positive?
             puts
@@ -91,7 +117,7 @@ module Homebrew
           end
           puts reason
         elsif count.zero?
-          puts "No formula found for #{query.inspect}."
+          puts "No formula or cask found for #{query.inspect}."
           GitHub.print_pull_requests_matching(query)
         end
       end

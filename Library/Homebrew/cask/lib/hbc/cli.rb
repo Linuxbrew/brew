@@ -2,6 +2,9 @@ require "optparse"
 require "shellwords"
 
 require "extend/optparse"
+
+require "hbc/config"
+
 require "hbc/cli/options"
 
 require "hbc/cli/abstract_command"

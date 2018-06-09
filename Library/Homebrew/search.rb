@@ -40,7 +40,7 @@ module Homebrew
         tap = Tap.fetch(match["repository"]["full_name"])
         full_name = "#{tap.name}/#{name}"
 
-        next if tap.installed? && !match["path"].start_with?("Casks/")
+        next if tap.installed?
 
         if match["path"].start_with?("Casks/")
           results[:casks] = [*results[:casks], full_name].sort
@@ -53,9 +53,6 @@ module Homebrew
     end
 
     def search_formulae(string_or_regex)
-      # Use stderr to avoid breaking parsed output
-      $stderr.puts Formatter.headline("Searching local taps...", color: :blue)
-
       aliases = Formula.alias_full_names
       results = (Formula.full_names + aliases)
                 .extend(Searchable)
