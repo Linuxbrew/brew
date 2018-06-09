@@ -255,5 +255,13 @@ module OS
     def mdfind_query(*ids)
       ids.map! { |id| "kMDItemCFBundleIdentifier == #{id}" }.join(" || ")
     end
+
+    def tcc_db
+      @tcc_db ||= Pathname.new("/Library/Application Support/com.apple.TCC/TCC.db")
+    end
+
+    def pre_mavericks_accessibility_dotfile
+      @pre_mavericks_accessibility_dotfile ||= Pathname.new("/private/var/db/.AccessibilityAPIEnabled")
+    end
   end
 end

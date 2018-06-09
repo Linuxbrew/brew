@@ -292,19 +292,19 @@ module Hbc
       ohai "Enabling accessibility access"
       if MacOS.version <= :mountain_lion
         @command.run!("/usr/bin/touch",
-                      args: [Hbc.pre_mavericks_accessibility_dotfile],
+                      args: [MacOS.pre_mavericks_accessibility_dotfile],
                       sudo: true)
       elsif MacOS.version <= :yosemite
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                        Hbc.tcc_db,
+                        MacOS.tcc_db,
                         "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL);",
                       ],
                       sudo: true)
       elsif MacOS.version <= :el_capitan
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                        Hbc.tcc_db,
+                        MacOS.tcc_db,
                         "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','#{bundle_identifier}',0,1,1,NULL,NULL);",
                       ],
                       sudo: true)
@@ -325,7 +325,7 @@ module Hbc
         ohai "Disabling accessibility access"
         @command.run!("/usr/bin/sqlite3",
                       args: [
-                        Hbc.tcc_db,
+                        MacOS.tcc_db,
                         "DELETE FROM access WHERE client='#{bundle_identifier}';",
                       ],
                       sudo: true)
