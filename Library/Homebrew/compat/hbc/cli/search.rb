@@ -1,11 +1,13 @@
 require "hbc/cli/abstract_command"
+require "cmd/search"
 
 module Hbc
   class CLI
     module Compat
-      class Update < AbstractCommand
+      class Search < AbstractCommand
         def run
-          odisabled "`brew cask update`", "`brew update`"
+          odeprecated "`brew cask search`", "`brew search`"
+          Homebrew.search(args)
         end
 
         def self.visible

@@ -1,9 +1,11 @@
 require_relative "options"
+require "search"
 
 module Hbc
   class CLI
     class AbstractCommand
       include Options
+      include Homebrew::Search
 
       option "--[no-]binaries", :binaries,      true
       option "--debug",         :debug,         false
@@ -50,7 +52,7 @@ module Hbc
       end
 
       def suggestion_message(cask_token)
-        matches, = Search.search(cask_token)
+        matches = search_casks(cask_token)
 
         if matches.one?
           "Did you mean “#{matches.first}”?"
