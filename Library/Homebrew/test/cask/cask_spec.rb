@@ -74,7 +74,7 @@ describe Hbc::Cask, :cask do
     it "proposes a versioned metadata directory name for each instance" do
       cask_token = "local-caffeine"
       c = Hbc::CaskLoader.load(cask_token)
-      metadata_timestamped_path = Hbc.caskroom.join(cask_token, ".metadata", c.version)
+      metadata_timestamped_path = Hbc::Caskroom.path.join(cask_token, ".metadata", c.version)
       expect(c.metadata_versioned_path.to_s).to eq(metadata_timestamped_path.to_s)
     end
   end

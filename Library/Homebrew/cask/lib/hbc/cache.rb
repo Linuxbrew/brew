@@ -2,11 +2,15 @@ module Hbc
   module Cache
     module_function
 
-    def ensure_cache_exists
-      return if Hbc.cache.exist?
+    def path
+      @path ||= HOMEBREW_CACHE.join("Cask")
+    end
 
-      odebug "Creating Cache at #{Hbc.cache}"
-      Hbc.cache.mkpath
+    def ensure_cache_exists
+      return if path.exist?
+
+      odebug "Creating Cache at #{path}"
+      path.mkpath
     end
   end
 end

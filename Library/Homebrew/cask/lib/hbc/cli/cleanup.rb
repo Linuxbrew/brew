@@ -14,7 +14,7 @@ module Hbc
 
       attr_reader :cache_location
 
-      def initialize(*args, cache_location: Hbc.cache)
+      def initialize(*args, cache_location: Cache.path)
         super(*args)
         @cache_location = Pathname.new(cache_location)
       end

@@ -60,7 +60,7 @@ module Hbc
       def check_staging_location
         ohai "Homebrew-Cask Staging Location"
 
-        path = Pathname.new(user_tilde(Hbc.caskroom.to_s))
+        path = Pathname.new(user_tilde(Caskroom.path.to_s))
 
         if !path.exist?
           add_error "The staging path #{path} does not exist."
@@ -77,7 +77,7 @@ module Hbc
         cleanup = CLI::Cleanup.new
         count = cleanup.cache_files.count
         size = cleanup.disk_cleanup_size
-        msg = user_tilde(Hbc.cache.to_s)
+        msg = user_tilde(Cache.path.to_s)
         msg << " (#{number_readable(count)} files, #{disk_usage_readable(size)})" unless count.zero?
         puts msg
       end
@@ -240,7 +240,7 @@ module Hbc
         cleanup = CLI::Cleanup.new
         count = cleanup.cache_files.count
         size = cleanup.disk_cleanup_size
-        msg = user_tilde(Hbc.cache.to_s)
+        msg = user_tilde(Cache.path.to_s)
         msg << " (#{number_readable(count)} files, #{disk_usage_readable(size)})" unless count.zero?
         msg
       end

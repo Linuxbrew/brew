@@ -36,7 +36,7 @@ module Hbc
     def initialize(*args, **options)
       super(*args, **options)
       @ref_type, @ref = extract_ref
-      @clone = Hbc.cache.join(cache_filename)
+      @clone = Cache.path.join(cache_filename)
     end
 
     def extract_ref
@@ -65,7 +65,7 @@ module Hbc
 
   class CurlDownloadStrategy < AbstractDownloadStrategy
     def tarball_path
-      @tarball_path ||= Hbc.cache.join("#{name}--#{version}#{ext}")
+      @tarball_path ||= Cache.path.join("#{name}--#{version}#{ext}")
     end
 
     def temporary_path

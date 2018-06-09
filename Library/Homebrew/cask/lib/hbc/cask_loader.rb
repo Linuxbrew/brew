@@ -78,7 +78,7 @@ module Hbc
 
       def initialize(url)
         @url = URI(url)
-        super Hbc.cache/File.basename(@url.path)
+        super Cache.path/File.basename(@url.path)
       end
 
       def load
