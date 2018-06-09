@@ -220,7 +220,7 @@ module Hbc
     end
 
     def caskroom_path
-      @caskroom_path ||= Hbc.caskroom.join(token)
+      @caskroom_path ||= Caskroom.path.join(token)
     end
 
     def staged_path

@@ -103,7 +103,7 @@ describe Hbc::CLI::Uninstall, :cask do
         [last_installed_version,  "456000"],
       ]
     }
-    let(:caskroom_path) { Hbc.caskroom.join(token).tap(&:mkpath) }
+    let(:caskroom_path) { Hbc::Caskroom.path.join(token).tap(&:mkpath) }
 
     before do
       timestamped_versions.each do |timestamped_version|
@@ -143,7 +143,7 @@ describe Hbc::CLI::Uninstall, :cask do
 
   describe "when Casks in Taps have been renamed or removed" do
     let(:app) { Hbc::Config.global.appdir.join("ive-been-renamed.app") }
-    let(:caskroom_path) { Hbc.caskroom.join("ive-been-renamed").tap(&:mkpath) }
+    let(:caskroom_path) { Hbc::Caskroom.path.join("ive-been-renamed").tap(&:mkpath) }
     let(:saved_caskfile) { caskroom_path.join(".metadata", "latest", "timestamp", "Casks").join("ive-been-renamed.rb") }
 
     before do

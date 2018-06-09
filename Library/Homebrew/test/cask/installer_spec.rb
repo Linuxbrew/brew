@@ -9,7 +9,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(caffeine).install
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).to be_a_directory
       expect(Hbc::Config.global.appdir.join("Caffeine.app")).to be_a_directory
     end
 
@@ -18,7 +18,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(asset).install
 
-      expect(Hbc.caskroom.join("container-dmg", asset.version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("container-dmg", asset.version)).to be_a_directory
       expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
@@ -27,7 +27,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(asset).install
 
-      expect(Hbc.caskroom.join("container-tar-gz", asset.version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("container-tar-gz", asset.version)).to be_a_directory
       expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
@@ -36,7 +36,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(asset).install
 
-      expect(Hbc.caskroom.join("container-xar", asset.version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("container-xar", asset.version)).to be_a_directory
       expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
@@ -45,7 +45,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(asset).install
 
-      expect(Hbc.caskroom.join("container-bzip2", asset.version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("container-bzip2", asset.version)).to be_a_directory
       expect(Hbc::Config.global.appdir.join("container-bzip2--#{asset.version}")).to be_a_file
     end
 
@@ -54,7 +54,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(asset).install
 
-      expect(Hbc.caskroom.join("container-gzip", asset.version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("container-gzip", asset.version)).to be_a_directory
       expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
@@ -167,7 +167,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(naked_pkg).install
 
-      expect(Hbc.caskroom.join("container-pkg", naked_pkg.version, "container.pkg")).to be_a_file
+      expect(Hbc::Caskroom.path.join("container-pkg", naked_pkg.version, "container.pkg")).to be_a_file
     end
 
     it "works properly with an overridden container :type" do
@@ -175,7 +175,7 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(naked_executable).install
 
-      expect(Hbc.caskroom.join("naked-executable", naked_executable.version, "naked_executable")).to be_a_file
+      expect(Hbc::Caskroom.path.join("naked-executable", naked_executable.version, "naked_executable")).to be_a_file
     end
 
     it "works fine with a nested container" do
@@ -214,9 +214,9 @@ describe Hbc::Installer, :cask do
       installer.install
       installer.uninstall
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version, "Caffeine.app")).not_to be_a_directory
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).not_to be_a_directory
-      expect(Hbc.caskroom.join("local-caffeine")).not_to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version, "Caffeine.app")).not_to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine")).not_to be_a_directory
     end
 
     it "uninstalls all versions if force is set" do
@@ -225,17 +225,17 @@ describe Hbc::Installer, :cask do
 
       Hbc::Installer.new(caffeine).install
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).to be_a_directory
-      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).not_to be_a_directory
-      FileUtils.mv(Hbc.caskroom.join("local-caffeine", caffeine.version), Hbc.caskroom.join("local-caffeine", mutated_version))
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).not_to be_a_directory
-      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).not_to be_a_directory
+      FileUtils.mv(Hbc::Caskroom.path.join("local-caffeine", caffeine.version), Hbc::Caskroom.path.join("local-caffeine", mutated_version))
+      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).to be_a_directory
 
       Hbc::Installer.new(caffeine, force: true).uninstall
 
-      expect(Hbc.caskroom.join("local-caffeine", caffeine.version)).not_to be_a_directory
-      expect(Hbc.caskroom.join("local-caffeine", mutated_version)).not_to be_a_directory
-      expect(Hbc.caskroom.join("local-caffeine")).not_to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", caffeine.version)).not_to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine", mutated_version)).not_to be_a_directory
+      expect(Hbc::Caskroom.path.join("local-caffeine")).not_to be_a_directory
     end
   end
 end
