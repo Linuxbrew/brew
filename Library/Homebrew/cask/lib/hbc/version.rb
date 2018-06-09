@@ -3,7 +3,7 @@ module Hbc
     @full_version ||= begin
       <<~EOS
         Homebrew-Cask #{HOMEBREW_VERSION}
-        #{Hbc.default_tap.full_name} #{Hbc.default_tap.version_string}
+        #{Tap.default_cask_tap.full_name} #{Tap.default_cask_tap.version_string}
       EOS
     end
   end

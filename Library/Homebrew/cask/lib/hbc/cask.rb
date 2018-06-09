@@ -55,7 +55,7 @@ module Hbc
     end
 
     def full_name
-      return token if tap == Hbc.default_tap
+      return token if tap == Tap.default_cask_tap
       qualified_token
     end
 

@@ -83,13 +83,11 @@ module Hbc
       end
 
       def check_taps
+        default_tap = Tap.default_cask_tap
+        alt_taps = Tap.select { |t| t.cask_dir.exist? && t != default_tap }
+
         ohai "Homebrew-Cask Taps:"
-
-        default_tap = [Hbc.default_tap]
-
-        alt_taps = Tap.select { |t| t.cask_dir.exist? && t != Hbc.default_tap }
-
-        (default_tap + alt_taps).each do |tap|
+        [default_tap, *alt_taps].each do |tap|
           if tap.path.nil? || tap.path.to_s.empty?
             puts none_string
           else
@@ -175,7 +173,7 @@ module Hbc
       end
 
       def self.alt_taps
-        Tap.select { |t| t.cask_dir.exist? && t != Hbc.default_tap }
+        Tap.select { |t| t.cask_dir.exist? && t != Tap.default_cask_tap }
       end
 
       def self.cask_count_for_tap(tap)

@@ -163,7 +163,7 @@ module Hbc
 
       MacOS.full_version = ENV["MACOS_VERSION"] unless ENV["MACOS_VERSION"].nil?
 
-      Hbc.default_tap.install unless Hbc.default_tap.installed?
+      Tap.default_cask_tap.install unless Tap.default_cask_tap.installed?
       Hbc.init if self.class.should_init?(command)
       self.class.run_command(command, *args)
     rescue CaskError, ArgumentError, OptionParser::InvalidOption => e

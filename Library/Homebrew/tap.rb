@@ -46,6 +46,10 @@ class Tap
     nil
   end
 
+  def self.default_cask_tap
+    @default_cask_tap ||= fetch("Homebrew", "cask")
+  end
+
   extend Enumerable
 
   # The user name of this {Tap}. Usually, it's the Github username of

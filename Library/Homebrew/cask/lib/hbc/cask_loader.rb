@@ -207,7 +207,7 @@ module Hbc
     end
 
     def self.default_path(token)
-      Hbc.default_tap.cask_dir/"#{token.to_s.downcase}.rb"
+      Tap.default_cask_tap.cask_dir/"#{token.to_s.downcase}.rb"
     end
 
     def self.tap_paths(token)
