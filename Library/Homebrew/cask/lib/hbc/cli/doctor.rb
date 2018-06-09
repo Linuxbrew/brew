@@ -60,13 +60,13 @@ module Hbc
       def check_staging_location
         ohai "Homebrew-Cask Staging Location"
 
-        path = Pathname.new(user_tilde(Caskroom.path.to_s))
+        path = Caskroom.path
 
         if path.exist? && !path.writable?
-          add_error "The staging path #{path} is not writable by the current user."
+          add_error "The staging path #{user_tilde(path.to_s)} is not writable by the current user."
         end
 
-        puts path
+        puts user_tilde(path.to_s)
       end
 
       def check_cached_downloads
