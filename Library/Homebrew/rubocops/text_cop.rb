@@ -53,6 +53,10 @@ module RuboCop
             next if parameters_passed?(d, /vendor-only/)
             problem "use \"dep\", \"ensure\", \"-vendor-only\""
           end
+
+          find_method_with_args(body_node, :system, "cargo", "build") do
+            problem "use \"cargo\", \"install\", \"--root\", prefix"
+          end
         end
       end
     end
