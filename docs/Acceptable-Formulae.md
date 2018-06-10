@@ -36,7 +36,7 @@ due to upstream changes and we can’t provide [bottles](Bottles.md) for them.
 ### Niche (or self-submitted) stuff
 The software in question must:
 
-* be maintained (i.e. the last release wasn't ages ago, it works without patching on all supported macOS releases and has no outstanding, unpatched security vulnerabilites)
+* be maintained (i.e. the last release wasn't ages ago, it works without patching on all supported macOS releases and has no outstanding, unpatched security vulnerabilities)
 * be known
 * be stable (e.g. not declared "unstable" or "beta" by upstream)
 * be used
