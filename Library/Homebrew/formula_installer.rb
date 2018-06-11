@@ -219,6 +219,10 @@ class FormulaInstaller
   end
 
   def install
+    if DevelopmentTools.installed? && !pour_bottle?
+      Install.check_development_tools
+    end
+
     # not in initialize so upgrade can unlink the active keg before calling this
     # function but after instantiating this class so that it can avoid having to
     # relink the active keg if possible (because it is slow).
