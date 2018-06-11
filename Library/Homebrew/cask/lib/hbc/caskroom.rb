@@ -9,10 +9,12 @@ module Hbc
     def ensure_caskroom_exists
       return if path.exist?
 
-      ohai "Creating Caskroom at #{path}" if $stdout.tty?
       sudo = !path.parent.writable?
 
-      ohai "We'll set permissions properly so we won't need sudo in the future" if $stdout.tty? && sudo
+      if sudo && !ENV.key?("SUDO_ASKPASS") && $stdout.tty?
+        ohai "Creating Caskroom at #{path}"
+        ohai "We'll set permissions properly so we won't need sudo in the future."
+      end
 
       SystemCommand.run("/bin/mkdir", args: ["-p", path], sudo: sudo)
       SystemCommand.run("/bin/chmod", args: ["g+rwx", path], sudo: sudo)
@@ -21,6 +23,8 @@ module Hbc
     end
 
     def casks
+      return [] unless path.exist?
+
       Pathname.glob(path.join("*")).sort.select(&:directory?).map do |path|
         token = path.basename.to_s
 

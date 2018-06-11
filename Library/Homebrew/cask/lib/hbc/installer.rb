@@ -55,6 +55,8 @@ module Hbc
     def stage
       odebug "Hbc::Installer#stage"
 
+      Caskroom.ensure_caskroom_exists
+
       extract_primary_container
       save_caskfile
     rescue StandardError => e

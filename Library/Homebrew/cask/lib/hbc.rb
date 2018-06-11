@@ -25,10 +25,3 @@ require "hbc/url"
 require "hbc/utils"
 require "hbc/verify"
 require "hbc/version"
-
-module Hbc
-  def self.init
-    Cache.ensure_cache_exists
-    Caskroom.ensure_caskroom_exists
-  end
-end

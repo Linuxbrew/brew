@@ -62,9 +62,7 @@ module Hbc
 
         path = Pathname.new(user_tilde(Caskroom.path.to_s))
 
-        if !path.exist?
-          add_error "The staging path #{path} does not exist."
-        elsif !path.writable?
+        if path.exist? && !path.writable?
           add_error "The staging path #{path} is not writable by the current user."
         end
 

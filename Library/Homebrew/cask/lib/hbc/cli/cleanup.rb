@@ -8,10 +8,6 @@ module Hbc
         "cleans up cached downloads and tracker symlinks"
       end
 
-      def self.needs_init?
-        true
-      end
-
       attr_reader :cache_location
 
       def initialize(*args, cache_location: Cache.path)
@@ -24,7 +20,7 @@ module Hbc
       end
 
       def cache_files
-        return [] unless cache_location.exist?
+        return [] unless cache_location.directory?
         cache_location.children
                       .map(&method(:Pathname))
                       .reject(&method(:outdated?))

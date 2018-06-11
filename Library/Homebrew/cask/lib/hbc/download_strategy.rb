@@ -95,6 +95,8 @@ module Hbc
     end
 
     def fetch
+      tarball_path.dirname.mkpath
+
       ohai "Downloading #{@url}"
       if tarball_path.exist?
         puts "Already downloaded: #{tarball_path}"
@@ -193,6 +195,8 @@ module Hbc
 
     # super does not provide checks for already-existing downloads
     def fetch
+      cached_location.dirname.mkpath
+
       if cached_location.directory?
         puts "Already downloaded: #{cached_location}"
       else

@@ -27,10 +27,6 @@ module Hbc
         nil
       end
 
-      def self.needs_init?
-        false
-      end
-
       def self.run(*args)
         new(*args).run
       end
