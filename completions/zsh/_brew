@@ -32,6 +32,13 @@ __brew_list_aliases() {
   echo "${aliases}"
 }
 
+__brew_formulae_or_ruby_files() {
+  local -a formulae
+  formulae=($(brew search))
+  _alternative 'formulae::__brew_formulae' \
+    'files:files:{_files -g *.rb}'
+}
+
 __brew_formulae() {
   local -a formulae
   formulae=($(brew search))
@@ -571,8 +578,7 @@ _brew_style() {
   _arguments \
     '(--fix)--fix[fix style violations automatically]' \
     '(--display-cop-names)--display-cop-names[include RuboCop name for each violation in output]' \
-    '*::formula:__brew_formulae'
-    # TODO add files to completion
+    '*::formula:__brew_formulae_or_ruby_files'
 }
 
 # brew switch name version:
