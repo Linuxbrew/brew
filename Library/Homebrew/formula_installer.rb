@@ -219,7 +219,7 @@ class FormulaInstaller
   end
 
   def install
-    if DevelopmentTools.installed? && !pour_bottle?
+    if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
       Install.check_development_tools
     end
 
