@@ -76,14 +76,14 @@ module Homebrew
         system(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", *args)
         !$CHILD_STATUS.success?
       when :json
-        json, _, status = Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", "--format", "json", *args)
+        json, err, status = Open3.capture3(cache_env, "rubocop", "_#{HOMEBREW_RUBOCOP_VERSION}_", "--format", "json", *args)
         # exit status of 1 just means violations were found; other numbers mean
         # execution errors.
         # exitstatus can also be nil if RuboCop process crashes, e.g. due to
         # native extension problems.
         # JSON needs to be at least 2 characters.
         if !(0..1).cover?(status.exitstatus) || json.to_s.length < 2
-          raise "Error running `rubocop --format json #{args.join " "}`"
+          raise "Error running `rubocop --format json #{args.join " "}`\n#{err}"
         end
         RubocopResults.new(JSON.parse(json))
       else
