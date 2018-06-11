@@ -83,7 +83,9 @@ module Homebrew
       remote_formulae = remote_results[:formulae]
       all_formulae = local_formulae + remote_formulae
 
-      local_casks = if query.match?(HOMEBREW_TAP_CASK_REGEX)
+      local_casks = if !OS.mac?
+        []
+      elsif query.match?(HOMEBREW_TAP_CASK_REGEX)
         begin
           [Hbc::CaskLoader.load(query).token]
         rescue Hbc::CaskUnavailableError

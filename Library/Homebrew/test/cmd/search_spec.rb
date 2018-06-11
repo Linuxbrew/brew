@@ -25,7 +25,7 @@ describe "brew search", :integration_test do
       .and be_a_success
   end
 
-  it "falls back to a GitHub tap search when no formula is found", :needs_macos, :needs_network, retry: 3 do
+  it "falls back to a GitHub tap search when no formula is found", :needs_network, retry: 3 do
     setup_remote_tap "homebrew/cask"
 
     expect { brew "search", "homebrew/cask/firefox" }
