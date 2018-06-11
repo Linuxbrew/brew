@@ -28,6 +28,18 @@ describe RuboCop::Cop::NewFormulaAudit::DependencyOrder do
       RUBY
     end
 
+    it "supports requirement constants" do
+      expect_offense(<<~RUBY)
+        class Foo < Formula
+          homepage "http://example.com"
+          url "http://example.com/foo-1.0.tgz"
+          depends_on FooRequirement
+          depends_on "bar"
+          ^^^^^^^^^^^^^^^^ dependency "bar" (line 5) should be put before dependency "FooRequirement" (line 4)
+        end
+      RUBY
+    end
+
     it "wrong conditional depends_on order" do
       expect_offense(<<~RUBY)
         class Foo < Formula
