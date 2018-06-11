@@ -20,7 +20,7 @@ module RuboCop
         def check_dependency_nodes_order(parent_node)
           return if parent_node.nil?
           dependency_nodes = fetch_depends_on_nodes(parent_node)
-          ordered = dependency_nodes.sort { |a, b| sort_by_dependency_name(a, b) }
+          ordered = dependency_nodes.sort_by { |node| dependency_name(node).downcase }
           ordered = sort_dependencies_by_type(ordered)
           sort_conditional_dependencies!(ordered)
           verify_order_in_source(ordered)
@@ -29,18 +29,6 @@ module RuboCop
         # Match all `depends_on` nodes among childnodes of given parent node
         def fetch_depends_on_nodes(parent_node)
           parent_node.each_child_node.select { |x| depends_on_node?(x) }
-        end
-
-        def sort_by_dependency_name(a, b)
-          a_name = dependency_name(a)
-          b_name = dependency_name(b)
-          if a_name < b_name
-            -1
-          elsif a_name > b_name
-            1
-          else
-            0
-          end
         end
 
         # Separate dependencies according to precedence order:
@@ -119,8 +107,8 @@ module RuboCop
 
         # Node pattern method to extract `name` in `depends_on :name`
         def_node_search :dependency_name_node, <<~EOS
-          {(send nil? :depends_on {(hash (pair $_ _)) $({str sym} _)})
-           (if _ (send nil? :depends_on {(hash (pair $_ _)) $({str sym} _)}) nil?)}
+          {(send nil? :depends_on {(hash (pair $_ _)) $({str sym} _) $(const nil? _)})
+           (if _ (send nil? :depends_on {(hash (pair $_ _)) $({str sym} _) $(const nil? _)}) nil?)}
         EOS
 
         # Node pattern method to extract `name` in `build.with? :name`
