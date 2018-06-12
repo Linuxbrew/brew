@@ -85,14 +85,19 @@ module OS
     #      specifically been requested according to the rules above.
 
     def sdk(v = nil)
-      @locator ||= SDKLocator.new
+      @locator ||= if Xcode.without_clt?
+        XcodeSDKLocator.new
+      else
+        CLTSDKLocator.new
+      end
+
       begin
         sdk = if v.nil?
           (Xcode.version.to_i >= 7) ? @locator.latest_sdk : @locator.sdk_for(version)
         else
           @locator.sdk_for v
         end
-      rescue SDKLocator::NoSDKError
+      rescue BaseSDKLocator::NoSDKError
         sdk = @locator.latest_sdk
       end
       # Only return an SDK older than the OS version if it was specifically requested
