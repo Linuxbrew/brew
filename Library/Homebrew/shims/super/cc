@@ -414,7 +414,7 @@ end
 if __FILE__ == $PROGRAM_NAME
   ##################################################################### sanity
 
-  if (cc = ENV["HOMEBREW_CC"]).nil? || cc.empty? || cc == "cc"
+  if (cc = ENV["HOMEBREW_CC"]).nil? || cc.empty? || (mac? && cc == "cc")
     # those values are not allowed
     ENV["HOMEBREW_CC"] = "clang"
   end
