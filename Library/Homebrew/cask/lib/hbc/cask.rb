@@ -1,10 +1,13 @@
+require "hbc/cask_loader"
 require "hbc/dsl"
 require "hbc/metadata"
+require "searchable"
 
 module Hbc
   class Cask
     extend Enumerable
     extend Forwardable
+    extend Searchable
     include Metadata
 
     attr_reader :token, :sourcefile_path, :config
@@ -52,7 +55,7 @@ module Hbc
     end
 
     def full_name
-      return token if tap == Hbc.default_tap
+      return token if tap == Tap.default_cask_tap
       qualified_token
     end
 

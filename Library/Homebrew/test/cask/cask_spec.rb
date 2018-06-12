@@ -22,7 +22,7 @@ describe Hbc::Cask, :cask do
   end
 
   describe "load" do
-    let(:tap_path) { Hbc.default_tap.path }
+    let(:tap_path) { Tap.default_cask_tap.path }
     let(:file_dirname) { Pathname.new(__FILE__).dirname }
     let(:relative_tap_path) { tap_path.relative_path_from(file_dirname) }
 
@@ -74,7 +74,7 @@ describe Hbc::Cask, :cask do
     it "proposes a versioned metadata directory name for each instance" do
       cask_token = "local-caffeine"
       c = Hbc::CaskLoader.load(cask_token)
-      metadata_timestamped_path = Hbc.caskroom.join(cask_token, ".metadata", c.version)
+      metadata_timestamped_path = Hbc::Caskroom.path.join(cask_token, ".metadata", c.version)
       expect(c.metadata_versioned_path.to_s).to eq(metadata_timestamped_path.to_s)
     end
   end

@@ -13,7 +13,7 @@ describe Hbc::CLI::Search, :cask do
     expect {
       Hbc::CLI::Search.run("local")
     }.to output(<<~EOS).to_stdout.as_tty
-      ==> Partial Matches
+      ==> Matches
       local-caffeine
       local-transmission
     EOS
@@ -51,6 +51,8 @@ describe Hbc::CLI::Search, :cask do
   end
 
   it "doesn't output anything to non-TTY stdout when there are no matches" do
+    allow(GitHub).to receive(:search_code).and_return([])
+
     expect { Hbc::CLI::Search.run("foo-bar-baz") }
       .to not_to_output.to_stdout
       .and not_to_output.to_stderr
@@ -85,7 +87,7 @@ describe Hbc::CLI::Search, :cask do
     expect {
       Hbc::CLI::Search.run("/^local-c[a-z]ffeine$/")
     }.to output(<<~EOS).to_stdout.as_tty
-      ==> Regexp Matches
+      ==> Matches
       local-caffeine
     EOS
   end
@@ -94,9 +96,8 @@ describe Hbc::CLI::Search, :cask do
     expect {
       Hbc::CLI::Search.run("test-opera")
     }.to output(<<~EOS).to_stdout.as_tty
-      ==> Exact Match
+      ==> Matches
       test-opera
-      ==> Partial Matches
       test-opera-mail
     EOS
   end
@@ -109,13 +110,14 @@ describe Hbc::CLI::Search, :cask do
     EOS
   end
 
-  it "doesn't highlight packages that aren't installed" do
-    expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq("local-caffeine")
-  end
-
   it "highlights installed packages" do
     Hbc::CLI::Install.run("local-caffeine")
 
-    expect(Hbc::CLI::Search.highlight_installed("local-caffeine")).to eq(pretty_installed("local-caffeine"))
+    expect {
+      Hbc::CLI::Search.run("local-caffeine")
+    }.to output(<<~EOS).to_stdout.as_tty
+      ==> Matches
+      local-caffeine ✔
+    EOS
   end
 end

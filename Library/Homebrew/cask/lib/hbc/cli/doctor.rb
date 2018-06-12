@@ -60,11 +60,9 @@ module Hbc
       def check_staging_location
         ohai "Homebrew-Cask Staging Location"
 
-        path = Pathname.new(user_tilde(Hbc.caskroom.to_s))
+        path = Pathname.new(user_tilde(Caskroom.path.to_s))
 
-        if !path.exist?
-          add_error "The staging path #{path} does not exist."
-        elsif !path.writable?
+        if path.exist? && !path.writable?
           add_error "The staging path #{path} is not writable by the current user."
         end
 
@@ -77,19 +75,17 @@ module Hbc
         cleanup = CLI::Cleanup.new
         count = cleanup.cache_files.count
         size = cleanup.disk_cleanup_size
-        msg = user_tilde(Hbc.cache.to_s)
+        msg = user_tilde(Cache.path.to_s)
         msg << " (#{number_readable(count)} files, #{disk_usage_readable(size)})" unless count.zero?
         puts msg
       end
 
       def check_taps
+        default_tap = Tap.default_cask_tap
+        alt_taps = Tap.select { |t| t.cask_dir.exist? && t != default_tap }
+
         ohai "Homebrew-Cask Taps:"
-
-        default_tap = [Hbc.default_tap]
-
-        alt_taps = Tap.select { |t| t.cask_dir.exist? && t != Hbc.default_tap }
-
-        (default_tap + alt_taps).each do |tap|
+        [default_tap, *alt_taps].each do |tap|
           if tap.path.nil? || tap.path.to_s.empty?
             puts none_string
           else
@@ -175,7 +171,7 @@ module Hbc
       end
 
       def self.alt_taps
-        Tap.select { |t| t.cask_dir.exist? && t != Hbc.default_tap }
+        Tap.select { |t| t.cask_dir.exist? && t != Tap.default_cask_tap }
       end
 
       def self.cask_count_for_tap(tap)
@@ -240,7 +236,7 @@ module Hbc
         cleanup = CLI::Cleanup.new
         count = cleanup.cache_files.count
         size = cleanup.disk_cleanup_size
-        msg = user_tilde(Hbc.cache.to_s)
+        msg = user_tilde(Cache.path.to_s)
         msg << " (#{number_readable(count)} files, #{disk_usage_readable(size)})" unless count.zero?
         msg
       end

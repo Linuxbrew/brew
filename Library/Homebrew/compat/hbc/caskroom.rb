@@ -3,42 +3,42 @@ module Hbc
     class << self
       module Compat
         def migrate_legacy_caskroom
-          return if Hbc.caskroom.exist?
+          return if path.exist?
 
-          legacy_caskroom = Pathname.new("/opt/homebrew-cask/Caskroom")
-          return if Hbc.caskroom == legacy_caskroom
-          return unless legacy_caskroom.exist?
-          return if legacy_caskroom.symlink?
+          legacy_caskroom_path = Pathname.new("/opt/homebrew-cask/Caskroom")
+          return if path == legacy_caskroom_path
+          return unless legacy_caskroom_path.exist?
+          return if legacy_caskroom_path.symlink?
 
-          ohai "Migrating Caskroom from #{legacy_caskroom} to #{Hbc.caskroom}."
-          if Hbc.caskroom.parent.writable?
-            FileUtils.mv legacy_caskroom, Hbc.caskroom
+          ohai "Migrating Caskroom from #{legacy_caskroom_path} to #{path}."
+          if path.parent.writable?
+            FileUtils.mv legacy_caskroom_path, path
           else
-            opoo "#{Hbc.caskroom.parent} is not writable, sudo is needed to move the Caskroom."
-            SystemCommand.run("/bin/mv", args: [legacy_caskroom, Hbc.caskroom.parent], sudo: true)
+            opoo "#{path.parent} is not writable, sudo is needed to move the Caskroom."
+            SystemCommand.run("/bin/mv", args: [legacy_caskroom_path, path.parent], sudo: true)
           end
 
-          ohai "Creating symlink from #{Hbc.caskroom} to #{legacy_caskroom}."
-          if legacy_caskroom.parent.writable?
-            FileUtils.ln_s Hbc.caskroom, legacy_caskroom
+          ohai "Creating symlink from #{path} to #{legacy_caskroom_path}."
+          if legacy_caskroom_path.parent.writable?
+            FileUtils.ln_s path, legacy_caskroom_path
           else
-            opoo "#{legacy_caskroom.parent} is not writable, sudo is needed to link the Caskroom."
-            SystemCommand.run("/bin/ln", args: ["-s", Hbc.caskroom, legacy_caskroom], sudo: true)
+            opoo "#{legacy_caskroom_path.parent} is not writable, sudo is needed to link the Caskroom."
+            SystemCommand.run("/bin/ln", args: ["-s", path, legacy_caskroom_path], sudo: true)
           end
         end
 
         def migrate_caskroom_from_repo_to_prefix
-          repo_caskroom = HOMEBREW_REPOSITORY.join("Caskroom")
-          return if Hbc.caskroom.exist?
-          return unless repo_caskroom.directory?
+          repo_caskroom_path = HOMEBREW_REPOSITORY.join("Caskroom")
+          return if path.exist?
+          return unless repo_caskroom_path.directory?
 
           ohai "Moving Caskroom from HOMEBREW_REPOSITORY to HOMEBREW_PREFIX"
 
-          if Hbc.caskroom.parent.writable?
-            FileUtils.mv repo_caskroom, Hbc.caskroom
+          if path.parent.writable?
+            FileUtils.mv repo_caskroom_path, path
           else
-            opoo "#{Hbc.caskroom.parent} is not writable, sudo is needed to move the Caskroom."
-            SystemCommand.run("/bin/mv", args: [repo_caskroom, Hbc.caskroom.parent], sudo: true)
+            opoo "#{path.parent} is not writable, sudo is needed to move the Caskroom."
+            SystemCommand.run("/bin/mv", args: [repo_caskroom_path, path.parent], sudo: true)
           end
         end
       end

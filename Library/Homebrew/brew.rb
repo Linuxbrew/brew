@@ -20,6 +20,10 @@ unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
   $LOAD_PATH.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 end
 
+unless $LOAD_PATH.include?("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+  $LOAD_PATH.unshift("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+end
+
 require "global"
 
 begin
@@ -78,8 +82,8 @@ begin
   # - no arguments are passed
   # - if cmd is Cask, let Cask handle the help command instead
   if (empty_argv || help_flag) && cmd != "cask"
-    require "cmd/help"
-    Homebrew.help cmd, empty_argv: empty_argv
+    require "help"
+    Homebrew::Help.help cmd, empty_argv: empty_argv
     # `Homebrew.help` never returns, except for external/unknown commands.
   end
 
@@ -119,8 +123,8 @@ begin
     exec HOMEBREW_BREW_FILE, cmd, *ARGV
   end
 rescue UsageError => e
-  require "cmd/help"
-  Homebrew.help cmd, usage_error: e.message
+  require "help"
+  Homebrew::Help.help cmd, usage_error: e.message
 rescue SystemExit => e
   onoe "Kernel.exit" if ARGV.verbose? && !e.success?
   $stderr.puts e.backtrace if ARGV.debug?

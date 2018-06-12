@@ -88,10 +88,6 @@ module Hbc
       @lookup.fetch(command_name, command_name)
     end
 
-    def self.should_init?(command)
-      command.is_a?(Class) && !command.abstract? && command.needs_init?
-    end
-
     def self.run_command(command, *args)
       if command.respond_to?(:run)
         # usual case: built-in command verb
@@ -163,8 +159,7 @@ module Hbc
 
       MacOS.full_version = ENV["MACOS_VERSION"] unless ENV["MACOS_VERSION"].nil?
 
-      Hbc.default_tap.install unless Hbc.default_tap.installed?
-      Hbc.init if self.class.should_init?(command)
+      Tap.default_cask_tap.install unless Tap.default_cask_tap.installed?
       self.class.run_command(command, *args)
     rescue CaskError, ArgumentError, OptionParser::InvalidOption => e
       msg = e.message

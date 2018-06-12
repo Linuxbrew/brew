@@ -43,7 +43,7 @@ require "utils/curl"
 require "extend/ENV"
 require "formula_cellar_checks"
 require "cmd/search"
-require "cmd/style"
+require "style"
 require "date"
 require "missing_formula"
 require "digest"
@@ -116,7 +116,7 @@ module Homebrew
 
     options[:display_cop_names] = args.display_cop_names?
     # Check style in a single batch run up front for performance
-    style_results = check_style_json(files, options)
+    style_results = Style.check_style_json(files, options)
 
     new_formula_problem_lines = []
     ff.sort.each do |f|
@@ -573,6 +573,21 @@ module Homebrew
 
       if @new_formula && formula.head
         new_formula_problem "Formulae should not have a HEAD spec"
+      end
+
+      throttled = %w[
+        aws-sdk-cpp 10
+        awscli 10
+        heroku 10
+        quicktype 10
+        vim 50
+      ]
+
+      throttled.each_slice(2).to_a.map do |a, b|
+        version = formula.stable.version.to_s.split(".").last.to_i
+        if @strict && a.include?(formula.name) && version.modulo(b.to_i).nonzero?
+          problem "should only be updated every #{b} releases on multiples of #{b}"
+        end
       end
 
       unstable_whitelist = %w[

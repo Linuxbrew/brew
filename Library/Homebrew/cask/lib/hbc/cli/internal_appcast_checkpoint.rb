@@ -49,10 +49,6 @@ module Hbc
       def self.help
         "prints or calculates a given Cask's or URL's appcast checkpoint"
       end
-
-      def self.needs_init?
-        true
-      end
     end
   end
 end

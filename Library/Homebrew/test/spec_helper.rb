@@ -15,6 +15,7 @@ require "rubocop/rspec/support"
 require "find"
 
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew"))
+$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/cask/lib"))
 $LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/test/support/lib"))
 
 require "global"
@@ -44,6 +45,8 @@ RSpec.configure do |config|
   config.raise_errors_for_deprecations!
 
   config.filter_run_when_matching :focus
+
+  config.silence_filter_announcements = true
 
   # TODO: when https://github.com/rspec/rspec-expectations/pull/1056
   #       makes it into a stable release:

@@ -88,7 +88,7 @@ module MachO
 
     # Merge multiple Mach-Os into one universal (Fat) binary.
     # @param filename [String] the fat binary to create
-    # @param files [Array<MachO::MachOFile, MachO::FatFile>] the files to merge
+    # @param files [Array<String>] the files to merge
     # @return [void]
     def self.merge_machos(filename, *files)
       machos = files.map do |file|

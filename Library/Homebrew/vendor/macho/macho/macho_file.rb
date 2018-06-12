@@ -134,7 +134,7 @@ module MachO
     alias [] command
 
     # Inserts a load command at the given offset.
-    # @param offset [Fixnum] the offset to insert at
+    # @param offset [Integer] the offset to insert at
     # @param lc [LoadCommands::LoadCommand] the load command to insert
     # @param options [Hash]
     # @option options [Boolean] :repopulate (true) whether or not to repopulate
@@ -404,11 +404,8 @@ module MachO
     # @raise [MachOError] if the instance was initialized without a file
     # @note Overwrites all data in the file!
     def write!
-      if @filename.nil?
-        raise MachOError, "cannot write to a default file when initialized from a binary string"
-      else
-        File.open(@filename, "wb") { |f| f.write(@raw_data) }
-      end
+      raise MachOError, "no initial file to write to" if @filename.nil?
+      File.open(@filename, "wb") { |f| f.write(@raw_data) }
     end
 
     private
@@ -434,7 +431,7 @@ module MachO
     end
 
     # Read just the file's magic number and check its validity.
-    # @return [Fixnum] the magic
+    # @return [Integer] the magic
     # @raise [MagicError] if the magic is not valid Mach-O magic
     # @raise [FatBinaryError] if the magic is for a Fat file
     # @api private
@@ -450,7 +447,7 @@ module MachO
     end
 
     # Check the file's CPU type.
-    # @param cputype [Fixnum] the CPU type
+    # @param cputype [Integer] the CPU type
     # @raise [CPUTypeError] if the CPU type is unknown
     # @api private
     def check_cputype(cputype)
@@ -458,7 +455,7 @@ module MachO
     end
 
     # Check the file's CPU type/subtype pair.
-    # @param cpusubtype [Fixnum] the CPU subtype
+    # @param cpusubtype [Integer] the CPU subtype
     # @raise [CPUSubtypeError] if the CPU sub-type is unknown
     # @api private
     def check_cpusubtype(cputype, cpusubtype)
@@ -467,7 +464,7 @@ module MachO
     end
 
     # Check the file's type.
-    # @param filetype [Fixnum] the file type
+    # @param filetype [Integer] the file type
     # @raise [FiletypeError] if the file type is unknown
     # @api private
     def check_filetype(filetype)
@@ -503,7 +500,7 @@ module MachO
     end
 
     # The low file offset (offset to first section data).
-    # @return [Fixnum] the offset
+    # @return [Integer] the offset
     # @api private
     def low_fileoff
       offset = @raw_data.size
@@ -523,7 +520,7 @@ module MachO
     end
 
     # Updates the number of load commands in the raw data.
-    # @param ncmds [Fixnum] the new number of commands
+    # @param ncmds [Integer] the new number of commands
     # @return [void]
     # @api private
     def update_ncmds(ncmds)
@@ -533,7 +530,7 @@ module MachO
     end
 
     # Updates the size of all load commands in the raw data.
-    # @param size [Fixnum] the new size, in bytes
+    # @param size [Integer] the new size, in bytes
     # @return [void]
     # @api private
     def update_sizeofcmds(size)

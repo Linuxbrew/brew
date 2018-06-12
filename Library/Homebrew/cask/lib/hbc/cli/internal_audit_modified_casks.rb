@@ -5,10 +5,6 @@ module Hbc
 
       option "--cleanup", :cleanup, false
 
-      def self.needs_init?
-        true
-      end
-
       attr_accessor :commit_range
       private :commit_range=
 

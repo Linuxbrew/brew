@@ -3,7 +3,6 @@
 
 require "formula"
 require "keg"
-require "cmd/link"
 
 module Homebrew
   module_function
@@ -53,7 +52,7 @@ module Homebrew
     keg = Keg.new(rack/version)
 
     # Link new version, if not keg-only
-    if keg_only?(rack)
+    if Formulary.keg_only?(rack)
       keg.optlink
       puts "Opt link created for #{keg}"
     else

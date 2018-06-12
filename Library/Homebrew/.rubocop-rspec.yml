@@ -1,0 +1,6 @@
+inherit_from:
+  - .rubocop.yml
+
+RSpec/ExpectActual:
+  Exclude:
+    - 'test/missing_formula_spec.rb'

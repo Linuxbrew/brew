@@ -272,6 +272,11 @@ class Keg
   end
 
   def uninstall
+    CacheStoreDatabase.use(:linkage) do |db|
+      break unless db.created?
+      LinkageCacheStore.new(path, db).flush_cache!
+    end
+
     path.rmtree
     path.parent.rmdir_if_possible
     remove_opt_record if optlinked?

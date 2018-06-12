@@ -49,6 +49,7 @@ __brew_cask_commands() {
     'search:searches all known Casks'
     'style:checks Cask style using RuboCop'
     'uninstall:uninstalls the given Cask'
+    'upgrade:upgrade installed Casks with newer versions'
     'zap:zaps all files associated with the given Cask'
   )
   _describe -t commands "brew cask command" commands
@@ -156,6 +157,13 @@ _brew_cask_style() {
 _brew_cask_uninstall() {
   _arguments : \
     '--force:uninstall even if the Cask does not appear to be present' \
+    '*::token:__brew_installed_casks'
+}
+
+_brew_cask_upgrade() {
+  _arguments : \
+    '--force:upgrade even if Cask is not present, and --force the install' \
+    '--greedy:also upgrade Casks with auto_updates or version \:latest' \
     '*::token:__brew_installed_casks'
 }
 

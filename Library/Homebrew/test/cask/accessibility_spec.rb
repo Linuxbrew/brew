@@ -16,7 +16,7 @@ describe "Accessibility Access", :cask do
     it "can enable accessibility access in macOS releases prior to Mavericks" do
       expect(fake_system_command).to receive(:run!).with(
         "/usr/bin/touch",
-        args: [Hbc.pre_mavericks_accessibility_dotfile],
+        args: [MacOS.pre_mavericks_accessibility_dotfile],
         sudo: true,
       )
 
@@ -36,7 +36,7 @@ describe "Accessibility Access", :cask do
     it "can enable accessibility access" do
       expect(fake_system_command).to receive(:run!).with(
         "/usr/bin/sqlite3",
-        args: [Hbc.tcc_db, "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','com.example.BasicCask',0,1,1,NULL);"],
+        args: [MacOS.tcc_db, "INSERT OR REPLACE INTO access VALUES('kTCCServiceAccessibility','com.example.BasicCask',0,1,1,NULL);"],
         sudo: true,
       )
 
@@ -46,7 +46,7 @@ describe "Accessibility Access", :cask do
     it "can disable accessibility access" do
       expect(fake_system_command).to receive(:run!).with(
         "/usr/bin/sqlite3",
-        args: [Hbc.tcc_db, "DELETE FROM access WHERE client='com.example.BasicCask';"],
+        args: [MacOS.tcc_db, "DELETE FROM access WHERE client='com.example.BasicCask';"],
         sudo: true,
       )
 
