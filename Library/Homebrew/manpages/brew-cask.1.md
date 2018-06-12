@@ -141,12 +141,6 @@ names, and other aspects of this manual are still subject to change.
 
 ## INTERNAL COMMANDS
 
-  * `_appcast_checkpoint` [--calculate] [ <token> ... | <URL> ... ]:
-    Given a <token>, returns the current appcast checkpoint, or calculates
-    the appcast checkpoint if the `--calculate` flag is specified.
-
-    Given a <URL>, calculates the appcast checkpoint for it.
-
   * `_stanza` <stanza_name> [ --table | --yaml | --inspect | --quiet ] [ <token> ... ]:
     Given a <stanza_name> and a <token>, returns the current stanza for a
     given Cask. If no <token> is given, then data for all Casks is returned.
