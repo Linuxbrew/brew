@@ -49,10 +49,9 @@ SimpleCov.start do
   add_filter %r{^/vendor/}
 
   require "rbconfig"
-  add_filter %r{^/os/mac/} unless RbConfig::CONFIG["host_os"].include?("darwin")
-  unless RbConfig::CONFIG["host_os"].include?("linux")
-    add_filter %r{^/os/linux/}
-  end
+  host_os = RbConfig::CONFIG["host_os"]
+  add_filter %r{^/os/mac/} if host_os !~ /darwin/
+  add_filter %r{^/os/linux/} if host_os !~ /linux/
 
   # Add groups and the proper project name to the output.
   project_name "Homebrew"
