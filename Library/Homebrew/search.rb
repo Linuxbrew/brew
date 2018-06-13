@@ -1,5 +1,4 @@
 require "searchable"
-require "hbc/cask"
 
 module Homebrew
   module Search
@@ -14,6 +13,10 @@ module Homebrew
     end
 
     def search_taps(query, silent: false)
+      if query.match?(Regexp.union(HOMEBREW_TAP_FORMULA_REGEX, HOMEBREW_TAP_CASK_REGEX))
+        _, _, query = query.split("/", 3)
+      end
+
       results = { formulae: [], casks: [] }
 
       return results if ENV["HOMEBREW_NO_GITHUB_API"]
@@ -53,6 +56,14 @@ module Homebrew
     end
 
     def search_formulae(string_or_regex)
+      if string_or_regex.is_a?(String) && string_or_regex.match?(HOMEBREW_TAP_FORMULA_REGEX)
+        return begin
+          [Formulary.factory(string_or_regex).name]
+        rescue FormulaUnavailableError
+          []
+        end
+      end
+
       aliases = Formula.alias_full_names
       results = (Formula.full_names + aliases)
                 .extend(Searchable)
@@ -78,16 +89,10 @@ module Homebrew
       end.compact
     end
 
-    def search_casks(string_or_regex)
-      results = Hbc::Cask.search(string_or_regex, &:token).sort_by(&:token)
-
-      results.map do |cask|
-        if cask.installed?
-          pretty_installed(cask.token)
-        else
-          cask.token
-        end
-      end
+    def search_casks(_string_or_regex)
+      []
     end
   end
 end
+
+require "extend/os/search"

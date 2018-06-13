@@ -18,7 +18,6 @@ require "missing_formula"
 require "descriptions"
 require "cli_parser"
 require "search"
-require "hbc/cask_loader"
 
 module Homebrew
   module_function
@@ -63,38 +62,13 @@ module Homebrew
       query = args.remaining.join(" ")
       string_or_regex = query_regexp(query)
 
-      remote_results = if query.match?(HOMEBREW_TAP_FORMULA_REGEX) || query.match?(HOMEBREW_TAP_CASK_REGEX)
-        _, _, name = query.split("/", 3)
-        search_taps(name, silent: true)
-      else
-        search_taps(query, silent: true)
-      end
+      remote_results = search_taps(query, silent: true)
 
-      local_formulae = if query.match?(HOMEBREW_TAP_FORMULA_REGEX)
-        begin
-          [Formulary.factory(query).name]
-        rescue FormulaUnavailableError
-          []
-        end
-      else
-        search_formulae(string_or_regex)
-      end
-
+      local_formulae = search_formulae(string_or_regex)
       remote_formulae = remote_results[:formulae]
       all_formulae = local_formulae + remote_formulae
 
-      local_casks = if !OS.mac?
-        []
-      elsif query.match?(HOMEBREW_TAP_CASK_REGEX)
-        begin
-          [Hbc::CaskLoader.load(query).token]
-        rescue Hbc::CaskUnavailableError
-          []
-        end
-      else
-        search_casks(string_or_regex)
-      end
-
+      local_casks = search_casks(string_or_regex)
       remote_casks = remote_results[:casks]
       all_casks = local_casks + remote_casks
 
