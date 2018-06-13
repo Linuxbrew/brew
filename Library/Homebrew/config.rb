@@ -47,4 +47,7 @@ unless defined? HOMEBREW_LIBRARY_PATH
 end
 
 # Load path used by standalone scripts to access the Homebrew code base
-HOMEBREW_LOAD_PATH = HOMEBREW_LIBRARY_PATH
+HOMEBREW_LOAD_PATH = [
+  HOMEBREW_LIBRARY_PATH,
+  HOMEBREW_LIBRARY_PATH/"cask/lib",
+].join(File::PATH_SEPARATOR)
