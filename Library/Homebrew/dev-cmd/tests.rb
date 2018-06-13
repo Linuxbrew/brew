@@ -38,7 +38,6 @@ module Homebrew
       ENV.delete("VERBOSE")
       ENV.delete("HOMEBREW_CASK_OPTS")
       ENV.delete("HOMEBREW_TEMP")
-      ENV.delete("HOMEBREW_LINKAGE_CACHE")
       ENV.delete("HOMEBREW_NO_GITHUB_API")
       ENV.delete("HOMEBREW_NO_EMOJI")
       ENV["HOMEBREW_NO_ANALYTICS_THIS_RUN"] = "1"
