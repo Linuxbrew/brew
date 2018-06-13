@@ -149,7 +149,7 @@ module Homebrew
     elsif !new_url
       odie "#{formula}: no --url= argument specified!"
     else
-      new_mirror = case new_url
+      new_mirror ||= case new_url
       when requested_spec != :devel && %r{.*ftp.gnu.org/gnu.*}
         new_url.sub "ftp.gnu.org/gnu", "ftpmirror.gnu.org"
       when %r{.*mirrors.ocf.berkeley.edu/debian.*}
