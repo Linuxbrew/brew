@@ -3,7 +3,7 @@ inherit_from:
 
 AllCops:
   Include:
-    - '**/.simplecov'
+    - 'Library/Homebrew/.simplecov'
   Exclude:
     - 'bin/*'
     - '**/Casks/**/*'
