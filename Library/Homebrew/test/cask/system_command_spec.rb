@@ -66,10 +66,10 @@ describe Hbc::SystemCommand, :cask do
 
     describe "with default options" do
       it "echoes only STDERR" do
-        expected = [2, 4, 6].map { |i| "==> #{i}\n" }.join("")
+        expected = [2, 4, 6].map { |i| "#{i}\n" }.join
         expect {
           described_class.run(command, options)
-        }.to output(expected).to_stdout
+        }.to output(expected).to_stderr
       end
 
       include_examples("it returns '1 2 3 4 5 6'")
@@ -80,12 +80,10 @@ describe Hbc::SystemCommand, :cask do
         options.merge!(print_stdout: true)
       end
 
-      it "echoes both STDOUT and STDERR" do
-        (1..6).each do |i|
-          expect {
-            described_class.run(command, options)
-          }.to output(/==> #{ i }/).to_stdout
-        end
+      it "echoes both STDOUT and STDERR", :focus do
+        expect { described_class.run(command, options) }
+          .to output("1\n3\n5\n").to_stdout
+          .and output("2\n4\n6\n").to_stderr
       end
 
       include_examples("it returns '1 2 3 4 5 6'")
@@ -111,7 +109,7 @@ describe Hbc::SystemCommand, :cask do
       end
 
       it "echoes only STDOUT" do
-        expected = [1, 3, 5].map { |i| "==> #{i}\n" }.join("")
+        expected = [1, 3, 5].map { |i| "#{i}\n" }.join("")
         expect {
           described_class.run(command, options)
         }.to output(expected).to_stdout
