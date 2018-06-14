@@ -57,12 +57,24 @@ module Homebrew
         args << "--only" << cops_to_include.join(",")
       end
 
+      has_non_formula = Array(files).any? do |file|
+        File.expand_path(file).start_with? HOMEBREW_LIBRARY_PATH
+      end
+      config_file = if files.nil? || has_non_formula
+        if ARGV.include?("--rspec")
+          HOMEBREW_LIBRARY_PATH/".rubocop-rspec.yml"
+        else
+          HOMEBREW_LIBRARY_PATH/".rubocop.yml"
+        end
+      else
+        HOMEBREW_LIBRARY/".rubocop_audit.yml"
+      end
+
+      args << "--config" << config_file
+
       if files.nil?
-        config_file = ARGV.include?("--rspec") ? ".rubocop-rspec.yml" : ".rubocop.yml"
-        args << "--config" << HOMEBREW_LIBRARY_PATH/config_file
         args << HOMEBREW_LIBRARY_PATH
       else
-        args << "--config" << HOMEBREW_LIBRARY/".rubocop_audit.yml"
         args += files
       end
 
