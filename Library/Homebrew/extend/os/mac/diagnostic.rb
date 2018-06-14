@@ -20,6 +20,7 @@ module Homebrew
           check_xcode_minimum_version
           check_clt_minimum_version
           check_if_xcode_needs_clt_installed
+          check_if_clt_needs_headers_installed
         ].freeze
       end
 
@@ -132,6 +133,17 @@ module Homebrew
         <<~EOS
           Xcode alone is not sufficient on #{MacOS.version.pretty_name}.
           #{DevelopmentTools.installation_instructions}
+        EOS
+      end
+
+      def check_if_clt_needs_headers_installed
+        return unless MacOS::CLT.separate_header_package?
+        return if MacOS::CLT.headers_installed?
+
+        <<~EOS
+          The Command Line Tools header package must be installed on #{MacOS.version.pretty_name}.
+          The installer is located at:
+            #{MacOS::CLT::HEADER_PKG_PATH.sub(":macos_version", MacOS.version)}
         EOS
       end
 
