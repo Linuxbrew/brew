@@ -109,7 +109,7 @@ describe Hbc::SystemCommand, :cask do
       end
 
       it "echoes only STDOUT" do
-        expected = [1, 3, 5].map { |i| "#{i}\n" }.join("")
+        expected = [1, 3, 5].map { |i| "#{i}\n" }.join
         expect {
           described_class.run(command, options)
         }.to output(expected).to_stdout

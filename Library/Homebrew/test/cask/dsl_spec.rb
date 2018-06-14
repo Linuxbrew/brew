@@ -20,7 +20,7 @@ describe Hbc::DSL, :cask do
     }
 
     it "prints a warning that it has encountered an unexpected method" do
-      expected = Regexp.compile(<<~EOS.lines.map(&:chomp).join(""))
+      expected = Regexp.compile(<<~EOS.lines.map(&:chomp).join)
         (?m)
         Warning:
         .*
