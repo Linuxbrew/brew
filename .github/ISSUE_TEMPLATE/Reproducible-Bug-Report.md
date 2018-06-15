@@ -6,7 +6,6 @@ about: Submit an issue so we can investigate
 
 **Please fill out the issue checklist below and provide all the requested information.**
 
-- [ ] are reporting a bug others will be able to reproduce and not asking a question. If you're not sure or want to ask a question do so on our Discourse: https://discourse.brew.sh
 - [ ] ran a `brew` command and reproduced the problem with multiple formulae? If it's a problem with a single, official formula (not cask) please file this issue at Linuxbrew/homebrew-core: https://github.com/Linuxbrew/homebrew-core/issues/new/choose. If it's a `brew cask` problem please file this issue at https://github.com/Homebrew/homebrew-cask/issues/new/choose. If it's a tap (e.g. Homebrew/homebrew-php) problem please file this issue at the tap.
 - [ ] ran `brew update` and can still reproduce the problem?
 - [ ] ran `brew doctor`, fixed all issues and can still reproduce the problem?
