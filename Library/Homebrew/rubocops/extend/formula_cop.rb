@@ -460,7 +460,7 @@ module RuboCop
         when :str
           node.str_content
         when :dstr
-          node.each_child_node(:str).map(&:str_content).join("")
+          node.each_child_node(:str).map(&:str_content).join
         when :const
           node.const_name
         when :sym
