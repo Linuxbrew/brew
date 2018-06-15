@@ -84,6 +84,10 @@ module Hbc
         version { [major, minor, patch].reject(&:empty?).join(".") }
       end
 
+      def minor_patch
+        version { [minor, patch].reject(&:empty?).join(".") }
+      end
+
       def before_comma
         version { split(",", 2)[0] }
       end
