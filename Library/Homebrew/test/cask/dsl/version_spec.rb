@@ -121,6 +121,14 @@ describe Hbc::DSL::Version, :cask do
                        "1.2.3_4-5" => "1.2.3"
     end
 
+    describe "#minor_patch" do
+      include_examples "version expectations hash", :minor_patch,
+                       "1"         => "",
+                       "1.2"       => "2",
+                       "1.2.3"     => "2.3",
+                       "1.2.3_4-5" => "2.3"
+    end
+
     describe "#before_comma" do
       include_examples "version expectations hash", :before_comma,
                        "1.2.3"     => "1.2.3",
