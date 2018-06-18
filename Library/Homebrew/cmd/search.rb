@@ -52,16 +52,17 @@ module Homebrew
       return
     end
 
-    if args.remaining.empty?
+    if args.remaining.empty? && !args.desc?
       puts Formatter.columns(Formula.full_names.sort)
-    elsif args.desc?
-      query = args.remaining.join(" ")
-      string_or_regex = query_regexp(query)
-      Descriptions.search(string_or_regex, :desc).print
-    else
-      query = args.remaining.join(" ")
-      string_or_regex = query_regexp(query)
+      return
+    end
 
+    query = args.remaining.join(" ")
+    string_or_regex = query_regexp(query)
+
+    if args.desc?
+      search_descriptions(string_or_regex)
+    else
       remote_results = search_taps(query, silent: true)
 
       local_formulae = search_formulae(string_or_regex)

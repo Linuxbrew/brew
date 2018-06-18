@@ -12,6 +12,11 @@ module Homebrew
       raise "#{query} is not a valid regex."
     end
 
+    def search_descriptions(string_or_regex)
+      ohai "Formulae"
+      Descriptions.search(string_or_regex, :desc).print
+    end
+
     def search_taps(query, silent: false)
       if query.match?(Regexp.union(HOMEBREW_TAP_FORMULA_REGEX, HOMEBREW_TAP_CASK_REGEX))
         _, _, query = query.split("/", 3)
