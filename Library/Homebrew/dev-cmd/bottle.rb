@@ -284,8 +284,13 @@ module Homebrew
         end
 
         ignores = []
-        if f.deps.any? { |dep| dep.name == "go" }
-          ignores << %r{#{Regexp.escape(HOMEBREW_CELLAR)}/go/[\d\.]+/libexec}
+        any_go_deps = f.deps.any? do |dep|
+          dep.name =~ Version.formula_optionally_versioned_regex(:go)
+        end
+        if any_go_deps
+          go_regex =
+            Version.formula_optionally_versioned_regex(:go, full: false)
+          ignores << %r{#{Regexp.escape(HOMEBREW_CELLAR)}/#{go_regex}/[\d\.]+/libexec}
         end
 
         relocatable = true

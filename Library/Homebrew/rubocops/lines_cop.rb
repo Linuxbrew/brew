@@ -290,7 +290,7 @@ module RuboCop
 
           find_every_method_call_by_name(body_node, :system).each do |method_node|
             # Skip Kibana: npm cache edge (see formula for more details)
-            next if @formula_name =~ /^kibana(\@\d+(\.\d+)?)?$/i
+            next if @formula_name =~ /^kibana(@\d[\d.]*)?$/
             first_param, second_param = parameters(method_node)
             next if !node_equals?(first_param, "npm") ||
                     !node_equals?(second_param, "install")
