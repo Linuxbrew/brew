@@ -52,38 +52,41 @@ module Homebrew
       return
     end
 
-    if args.remaining.empty?
+    if args.remaining.empty? && !args.desc?
       puts Formatter.columns(Formula.full_names.sort)
-    elsif args.desc?
-      query = args.remaining.join(" ")
-      string_or_regex = query_regexp(query)
-      Descriptions.search(string_or_regex, :desc).print
-    elsif args.remaining.first =~ HOMEBREW_TAP_FORMULA_REGEX
-      query = args.remaining.first
+      return
+    end
 
-      results = begin
-        [Formulary.factory(query).name]
-      rescue FormulaUnavailableError
-        _, _, name = query.split("/", 3)
-        remote_results = search_taps(name)
-        [*remote_results[:formulae], *remote_results[:casks]].sort
+    query = args.remaining.join(" ")
+    string_or_regex = query_regexp(query)
+
+    if args.desc?
+      search_descriptions(string_or_regex)
+    else
+      remote_results = search_taps(query, silent: true)
+
+      local_formulae = search_formulae(string_or_regex)
+      remote_formulae = remote_results[:formulae]
+      all_formulae = local_formulae + remote_formulae
+
+      local_casks = search_casks(string_or_regex)
+      remote_casks = remote_results[:casks]
+      all_casks = local_casks + remote_casks
+
+      if all_formulae.any?
+        ohai "Formulae"
+        puts Formatter.columns(all_formulae)
       end
 
-      puts Formatter.columns(results) unless results.empty?
-    else
-      query = args.remaining.join(" ")
-      string_or_regex = query_regexp(query)
-      local_results = search_formulae(string_or_regex)
-      puts Formatter.columns(local_results.sort) unless local_results.empty?
-
-      remote_results = search_taps(query)
-      tap_results = [*remote_results[:formulae], *remote_results[:casks]].sort
-      puts Formatter.columns(tap_results) unless tap_results.empty?
+      if all_casks.any?
+        puts if all_formulae.any?
+        ohai "Casks"
+        puts Formatter.columns(all_casks)
+      end
 
       if $stdout.tty?
-        count = local_results.length + tap_results.length
+        count = all_formulae.count + all_casks.count
 
-        ohai "Searching blacklisted, migrated and deleted formulae..."
         if reason = MissingFormula.reason(query, silent: true)
           if count.positive?
             puts
@@ -91,7 +94,7 @@ module Homebrew
           end
           puts reason
         elsif count.zero?
-          puts "No formula found for #{query.inspect}."
+          puts "No formula or cask found for #{query.inspect}."
           GitHub.print_pull_requests_matching(query)
         end
       end

@@ -16,12 +16,13 @@ require "pathname"
 HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
 
 require "English"
-unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
-  $LOAD_PATH.unshift(HOMEBREW_LIBRARY_PATH.to_s)
-end
 
 unless $LOAD_PATH.include?("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
   $LOAD_PATH.unshift("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+end
+
+unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
+  $LOAD_PATH.unshift(HOMEBREW_LIBRARY_PATH.to_s)
 end
 
 require "global"

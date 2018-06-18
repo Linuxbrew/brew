@@ -2,6 +2,9 @@ require "optparse"
 require "shellwords"
 
 require "extend/optparse"
+
+require "hbc/config"
+
 require "hbc/cli/options"
 
 require "hbc/cli/abstract_command"
@@ -18,7 +21,6 @@ require "hbc/cli/install"
 require "hbc/cli/list"
 require "hbc/cli/outdated"
 require "hbc/cli/reinstall"
-require "hbc/cli/search"
 require "hbc/cli/style"
 require "hbc/cli/uninstall"
 require "hbc/cli/upgrade"

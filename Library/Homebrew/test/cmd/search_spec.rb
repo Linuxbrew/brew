@@ -15,7 +15,6 @@ describe "brew search", :integration_test do
   it "supports searching by name" do
     expect { brew "search", "testball" }
       .to output(/testball/).to_stdout
-      .and output(/Searching/).to_stderr
       .and be_a_success
   end
 
@@ -31,7 +30,6 @@ describe "brew search", :integration_test do
 
     expect { brew "search", "homebrew/cask/firefox" }
       .to output(/firefox/).to_stdout
-      .and output(/Searching/).to_stderr
       .and be_a_success
   end
 

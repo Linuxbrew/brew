@@ -1,4 +1,5 @@
 require "hbc/cask_loader"
+require "hbc/config"
 require "hbc/dsl"
 require "hbc/metadata"
 require "searchable"

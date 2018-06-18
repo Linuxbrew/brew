@@ -83,9 +83,7 @@ RSpec.shared_context "integration test" do
     @ruby_args ||= begin
       ruby_args = [
         "-W0",
-        "-I", "#{HOMEBREW_LIBRARY_PATH}/test/support/lib",
-        "-I", HOMEBREW_LIBRARY_PATH.to_s,
-        "-I", "#{HOMEBREW_LIBRARY_PATH}/cask/lib",
+        "-I", HOMEBREW_LOAD_PATH,
         "-rconfig"
       ]
       if ENV["HOMEBREW_TESTS_COVERAGE"]
