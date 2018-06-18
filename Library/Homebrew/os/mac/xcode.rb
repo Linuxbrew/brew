@@ -196,14 +196,30 @@ module OS
 
       STANDALONE_PKG_ID = "com.apple.pkg.DeveloperToolsCLILeo".freeze
       FROM_XCODE_PKG_ID = "com.apple.pkg.DeveloperToolsCLI".freeze
-      MAVERICKS_PKG_ID = "com.apple.pkg.CLTools_Executables".freeze
+      # EXECUTABLE_PKG_ID now means two things:
+      # 1. The original Mavericks CLT package ID, and
+      # 2. The additional header package included in Mojave.
+      EXECUTABLE_PKG_ID = "com.apple.pkg.CLTools_Executables".freeze
       MAVERICKS_NEW_PKG_ID = "com.apple.pkg.CLTools_Base".freeze # obsolete
       PKG_PATH = "/Library/Developer/CommandLineTools".freeze
+      HEADER_PKG_PATH = "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_:macos_version.pkg".freeze
 
       # Returns true even if outdated tools are installed, e.g.
       # tools from Xcode 4.x on 10.9
       def installed?
         !version.null?
+      end
+
+      def separate_header_package?
+        MacOS.version >= :mojave
+      end
+
+      def headers_installed?
+        if !separate_header_package?
+          installed?
+        else
+          headers_version == version
+        end
       end
 
       def update_instructions
@@ -282,6 +298,18 @@ module OS
         end
       end
 
+      # Version string of the header package, which is a
+      # separate package as of macOS 10.14.
+      def headers_version
+        if !separate_header_package?
+          version
+        else
+          @header_version ||= MacOS.pkgutil_info(EXECUTABLE_PKG_ID)[/version: (.+)$/, 1]
+          return ::Version::NULL unless @header_version
+          ::Version.new(@header_version)
+        end
+      end
+
       def detect_version
         # CLT isn't a distinct entity pre-4.3, and pkgutil doesn't exist
         # at all on Tiger, so just count it as installed if Xcode is installed
@@ -290,7 +318,7 @@ module OS
         end
 
         version = nil
-        [MAVERICKS_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].each do |id|
+        [EXECUTABLE_PKG_ID, MAVERICKS_NEW_PKG_ID, STANDALONE_PKG_ID, FROM_XCODE_PKG_ID].each do |id|
           if MacOS.version >= :mavericks
             next unless File.exist?("#{PKG_PATH}/usr/bin/clang")
           end

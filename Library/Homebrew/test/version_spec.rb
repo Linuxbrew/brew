@@ -1,5 +1,11 @@
 require "version"
 
+describe Version do
+  specify ".formula_optionally_versioned_regex" do
+    expect(described_class.formula_optionally_versioned_regex("foo")).to match("foo@1.2")
+  end
+end
+
 describe Version::Token do
   specify "#inspect" do
     expect(described_class.new("foo").inspect).to eq('#<Version::Token "foo">')

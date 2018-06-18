@@ -26,7 +26,7 @@ module Hbc
       check_version_and_checksum
       check_version
       check_sha256
-      check_appcast
+      check_appcast_checkpoint
       check_url
       check_generic_artifacts
       check_token_conflicts
@@ -185,58 +185,11 @@ module Hbc
       add_error "cannot use the sha256 for an empty string in #{stanza}: #{empty_sha256}"
     end
 
-    def check_appcast
+    def check_appcast_checkpoint
       return unless cask.appcast
-      odebug "Auditing appcast"
-      check_appcast_has_checkpoint
       return unless cask.appcast.checkpoint
-      check_sha256_actually_256(sha256: cask.appcast.checkpoint, stanza: "appcast :checkpoint")
-      check_sha256_invalid(sha256: cask.appcast.checkpoint, stanza: "appcast :checkpoint")
-      return unless download
-      check_appcast_http_code
-      check_appcast_checkpoint_accuracy
-    end
 
-    def check_appcast_has_checkpoint
-      odebug "Verifying appcast has :checkpoint key"
-      add_error "a checkpoint sha256 is required for appcast" unless cask.appcast.checkpoint
-    end
-
-    def check_appcast_http_code
-      odebug "Verifying appcast returns 200 HTTP response code"
-
-      curl_executable, *args = curl_args(
-        "--compressed", "--location", "--fail",
-        "--write-out", "%{http_code}",
-        "--output", "/dev/null",
-        cask.appcast,
-        user_agent: :fake
-      )
-      result = @command.run(curl_executable, args: args, print_stderr: false)
-      if result.success?
-        http_code = result.stdout.chomp
-        add_warning "unexpected HTTP response code retrieving appcast: #{http_code}" unless http_code == "200"
-      else
-        add_warning "error retrieving appcast: #{result.stderr}"
-      end
-    end
-
-    def check_appcast_checkpoint_accuracy
-      odebug "Verifying appcast checkpoint is accurate"
-      result = cask.appcast.calculate_checkpoint
-
-      actual_checkpoint = result[:checkpoint]
-
-      if actual_checkpoint.nil?
-        add_warning "error retrieving appcast: #{result[:command_result].stderr}"
-      else
-        expected = cask.appcast.checkpoint
-        add_warning <<~EOS unless expected == actual_checkpoint
-          appcast checkpoint mismatch
-          Expected: #{expected}
-          Actual: #{actual_checkpoint}
-        EOS
-      end
+      add_error "Appcast checkpoints have been removed from Homebrew-Cask"
     end
 
     def check_latest_with_appcast

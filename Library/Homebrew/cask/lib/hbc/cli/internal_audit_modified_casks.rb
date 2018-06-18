@@ -1,7 +1,7 @@
 module Hbc
   class CLI
     class InternalAuditModifiedCasks < AbstractInternalCommand
-      RELEVANT_STANZAS = [:version, :sha256, :url, :appcast].freeze
+      RELEVANT_STANZAS = [:version, :sha256, :url].freeze
 
       option "--cleanup", :cleanup, false
 

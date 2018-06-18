@@ -25,11 +25,11 @@ module Hbc
       each_output_line do |type, line|
         case type
         when :stdout
+          puts line.chomp if print_stdout?
           processed_output[:stdout] << line
-          ohai line.chomp if print_stdout?
         when :stderr
+          $stderr.puts Formatter.error(line.chomp) if print_stderr?
           processed_output[:stderr] << line
-          ohai line.chomp if print_stderr?
         end
       end
 
@@ -100,17 +100,23 @@ module Hbc
 
     def each_line_from(sources)
       loop do
-        readable_sources = IO.select(sources)[0]
-        readable_sources.delete_if(&:eof?).first(1).each do |source|
-          type = ((source == sources[0]) ? :stdout : :stderr)
+        readable_sources, = IO.select(sources)
+
+        readable_sources = readable_sources.reject(&:eof?)
+
+        break if readable_sources.empty?
+
+        readable_sources.each do |source|
           begin
-            yield(type, source.readline_nonblock || "")
+            line = source.readline_nonblock || ""
+            type = (source == sources[0]) ? :stdout : :stderr
+            yield(type, line)
           rescue IO::WaitReadable, EOFError
             next
           end
         end
-        break if readable_sources.empty?
       end
+
       sources.each(&:close_read)
     end
 

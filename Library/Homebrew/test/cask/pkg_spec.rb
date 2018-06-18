@@ -134,7 +134,7 @@ describe Hbc::Pkg, :cask do
           <string>#{volume}</string>
           <key>paths</key>
           <dict>
-            #{(pkg_files + pkg_directories).map { |f| "<key>#{f}</key><dict></dict>" }.join("")}
+            #{(pkg_files + pkg_directories).map { |f| "<key>#{f}</key><dict></dict>" }.join}
           </dict>
         </dict>
         </plist>

@@ -317,124 +317,19 @@ describe Hbc::Audit, :cask do
       end
     end
 
-    describe "appcast checks" do
-      context "when appcast has no sha256" do
-        let(:cask_token) { "appcast-missing-checkpoint" }
+    describe "appcast checkpoint check" do
+      let(:error_msg) { "Appcast checkpoints have been removed from Homebrew-Cask" }
 
-        it { is_expected.to fail_with(/checkpoint sha256 is required for appcast/) }
+      context "when the Cask does not have a checkpoint" do
+        let(:cask_token) { "with-appcast" }
+
+        it { is_expected.not_to fail_with(error_msg) }
       end
 
-      context "when appcast checkpoint is not a string of 64 hexadecimal characters" do
-        let(:cask_token) { "appcast-invalid-checkpoint" }
+      context "when the Cask has a checkpoint" do
+        let(:cask_token) { "appcast-with-checkpoint" }
 
-        it { is_expected.to fail_with(/string must be of 64 hexadecimal characters/) }
-      end
-
-      context "when appcast checkpoint is sha256 for empty string" do
-        let(:cask_token) { "appcast-checkpoint-sha256-for-empty-string" }
-
-        it { is_expected.to fail_with(/cannot use the sha256 for an empty string/) }
-      end
-
-      context "when appcast checkpoint is valid sha256" do
-        let(:cask_token) { "appcast-valid-checkpoint" }
-
-        it { is_expected.not_to fail_with(/appcast :checkpoint/) }
-      end
-
-      context "when verifying appcast HTTP code" do
-        let(:cask_token) { "appcast-valid-checkpoint" }
-        let(:download) { instance_double(Hbc::Download) }
-        let(:wrong_code_msg) { /unexpected HTTP response code/ }
-        let(:curl_error_msg) { /error retrieving appcast/ }
-        let(:fake_curl_result) { instance_double(Hbc::SystemCommand::Result) }
-
-        before do
-          allow(audit).to receive(:check_appcast_checkpoint_accuracy)
-          allow(fake_system_command).to receive(:run).and_return(fake_curl_result)
-          allow(fake_curl_result).to receive(:success?).and_return(success)
-        end
-
-        context "when curl succeeds" do
-          let(:success) { true }
-
-          before do
-            allow(fake_curl_result).to receive(:stdout).and_return(stdout)
-          end
-
-          context "when HTTP code is 200" do
-            let(:stdout) { "200" }
-
-            it { is_expected.not_to warn_with(wrong_code_msg) }
-          end
-
-          context "when HTTP code is not 200" do
-            let(:stdout) { "404" }
-
-            it { is_expected.to warn_with(wrong_code_msg) }
-          end
-        end
-
-        context "when curl fails" do
-          let(:success) { false }
-
-          before do
-            allow(fake_curl_result).to receive(:stderr).and_return("Some curl error")
-          end
-
-          it { is_expected.to warn_with(curl_error_msg) }
-        end
-      end
-
-      context "when verifying appcast checkpoint" do
-        let(:cask_token) { "appcast-valid-checkpoint" }
-        let(:download) { instance_double(Hbc::Download) }
-        let(:mismatch_msg) { /appcast checkpoint mismatch/ }
-        let(:curl_error_msg) { /error retrieving appcast/ }
-        let(:fake_curl_result) { instance_double(Hbc::SystemCommand::Result) }
-        let(:expected_checkpoint) { "d5b2dfbef7ea28c25f7a77cd7fa14d013d82b626db1d82e00e25822464ba19e2" }
-
-        before do
-          allow(audit).to receive(:check_appcast_http_code)
-          allow(Hbc::SystemCommand).to receive(:run).and_return(fake_curl_result)
-          allow(fake_curl_result).to receive(:success?).and_return(success)
-        end
-
-        context "when appcast download succeeds" do
-          let(:success) { true }
-          let(:appcast_text) { instance_double(::String) }
-
-          before do
-            allow(fake_curl_result).to receive(:stdout).and_return(appcast_text)
-            allow(appcast_text).to receive(:gsub).and_return(appcast_text)
-            allow(appcast_text).to receive(:end_with?).with("\n").and_return(true)
-            allow(Digest::SHA2).to receive(:hexdigest).and_return(actual_checkpoint)
-          end
-
-          context "when appcast checkpoint is out of date" do
-            let(:actual_checkpoint) { "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef" }
-
-            it { is_expected.to warn_with(mismatch_msg) }
-            it { is_expected.not_to warn_with(curl_error_msg) }
-          end
-
-          context "when appcast checkpoint is up to date" do
-            let(:actual_checkpoint) { expected_checkpoint }
-
-            it { is_expected.not_to warn_with(mismatch_msg) }
-            it { is_expected.not_to warn_with(curl_error_msg) }
-          end
-        end
-
-        context "when appcast download fails" do
-          let(:success) { false }
-
-          before do
-            allow(fake_curl_result).to receive(:stderr).and_return("Some curl error")
-          end
-
-          it { is_expected.to warn_with(curl_error_msg) }
-        end
+        it { is_expected.to fail_with(error_msg) }
       end
     end
 

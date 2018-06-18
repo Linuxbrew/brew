@@ -148,7 +148,7 @@ describe "download strategies", :cask do
           "DBw2KdR24q9t1wfjS9LUzelf5TWk6ojj8p9%2FHjl%2Fi%2FVCXN",
           "N4o1mW%2FMayy2tTY1qcC%2FTmqI1ulZS8SNuaSgr9Iys9oDF1%2",
           "BPK%2B4Sg==",
-        ].join("")
+        ].join
       end
 
       describe "#tarball_path" do

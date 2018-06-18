@@ -3,6 +3,10 @@ require "version/null"
 class Version
   include Comparable
 
+  def self.formula_optionally_versioned_regex(name, full: true)
+    /#{"^" if full}#{Regexp.escape(name)}(@\d[\d.]*)?#{"$" if full}/
+  end
+
   class Token
     include Comparable
 
