@@ -270,6 +270,7 @@ class Cmd
   end
 
   def cppflags
+    isystem = mac? ? "-isystem" : "-idirafter"
     path_flags("-isystem", isystem_paths) + path_flags("-I", include_paths)
   end
 
