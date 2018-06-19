@@ -78,7 +78,7 @@ Display information about the given Cask\.
 Install the given Cask\. With \fB\-\-force\fR, re\-install even if the Cask appears to be already present\. With \fB\-\-skip\-cask\-deps\fR, skip any Cask dependencies\. \fB\-\-require\-sha\fR will abort installation if the Cask does not have a checksum defined\.
 .
 .IP
-\fItoken\fR is usually the ID of a Cask as returned by \fBbrew cask search\fR, but see \fIOTHER WAYS TO SPECIFY A CASK\fR for variations\.
+\fItoken\fR is usually the ID of a Cask, but see \fIOTHER WAYS TO SPECIFY A CASK\fR for variations\.
 .
 .TP
 \fBlist\fR or \fBls\fR [\-1] [\-\-versions] [ \fItoken\fR \.\.\. ]
@@ -255,7 +255,7 @@ brew update
 Most Homebrew\-Cask commands can accept a Cask token as an argument\. As described above, the argument can take the form of:
 .
 .IP "\(bu" 4
-A token as returned by \fBbrew cask search\fR, e\.g\. \fBgoogle\-chrome\fR
+A simple token, e\.g\. \fBgoogle\-chrome\fR
 .
 .IP "" 0
 .
