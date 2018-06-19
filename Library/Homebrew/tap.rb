@@ -284,8 +284,9 @@ class Tap
 
     link_completions_and_manpages
 
-    formula_count = formula_files.size
-    puts "Tapped #{Formatter.pluralize(formula_count, "formula")} (#{path.abv})" unless quiet
+    casks = Formatter.pluralize(cask_files.count, "cask")
+    formulae = Formatter.pluralize(formula_files.count, "formula")
+    puts "Tapped #{formulae} and #{casks} (#{path.abv})." unless quiet
     Descriptions.cache_formulae(formula_names)
 
     return if options[:clone_target]
@@ -311,15 +312,19 @@ class Tap
     require "descriptions"
     raise TapUnavailableError, name unless installed?
 
-    puts "Untapping #{name}... (#{path.abv})"
+    puts "Untapping #{name}..."
+
+    abv = path.abv
+    casks = Formatter.pluralize(cask_files.count, "cask")
+    formulae = Formatter.pluralize(formula_files.count, "formula")
+
     unpin if pinned?
-    formula_count = formula_files.size
     Descriptions.uncache_formulae(formula_names)
     Utils::Link.unlink_manpages(path)
     Utils::Link.unlink_completions(path)
     path.rmtree
     path.parent.rmdir_if_possible
-    puts "Untapped #{Formatter.pluralize(formula_count, "formula")}"
+    puts "Untapped #{formulae} and #{casks} (#{abv})."
     clear_cache
   end
 
