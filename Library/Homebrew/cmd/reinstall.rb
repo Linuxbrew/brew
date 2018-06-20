@@ -1,5 +1,8 @@
-#:  * `reinstall` <formula>:
+#:  * `reinstall` [`--display-times`] <formula>:
 #:    Uninstall and then install <formula> (with existing install options).
+#:
+#:    If `--display-times` is passed, install times for each formula are printed
+#:    at the end of the run.
 
 require "formula_installer"
 require "development_tools"
