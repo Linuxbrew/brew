@@ -249,6 +249,7 @@ module Homebrew
         Migrator.migrate_if_needed(f)
         install_formula(f)
       end
+      Homebrew.messages.display_messages
     rescue FormulaUnreadableError, FormulaClassUnavailableError,
            TapFormulaUnreadableError, TapFormulaClassUnavailableError => e
       # Need to rescue before `FormulaUnavailableError` (superclass of this)
