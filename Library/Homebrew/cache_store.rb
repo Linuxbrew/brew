@@ -62,7 +62,10 @@ class CacheStoreDatabase
   # @return [DBM] db
   def db
     # DBM::WRCREAT: Creates the database if it does not already exist
-    @db ||= DBM.open(dbm_file_path, DATABASE_MODE, DBM::WRCREAT)
+    @db ||= begin
+      HOMEBREW_CACHE.mkpath
+      DBM.open(dbm_file_path, DATABASE_MODE, DBM::WRCREAT)
+    end
   end
 
   # Creates a CacheStoreDatabase
