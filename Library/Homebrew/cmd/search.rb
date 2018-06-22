@@ -1,10 +1,14 @@
 #:  * `search`, `-S`:
-#:    Display all locally available formulae for brewing (including tapped ones).
-#:    No online search is performed if called without arguments.
+#:    Display all locally available formulae (including tapped ones).
+#:    No online search is performed.
+#:
+#:  * `search` `--casks`
+#:    Display all locally available casks (including tapped ones).
+#:    No online search is performed.
 #:
 #:  * `search` [`--desc`] (<text>|`/`<text>`/`):
-#:    Perform a substring search of formula names for <text>. If <text> is
-#:    surrounded with slashes, then it is interpreted as a regular expression.
+#:    Perform a substring search of cask tokens and formula names for <text>. If <text>
+#:    is surrounded with slashes, then it is interpreted as a regular expression.
 #:    The search for <text> is extended online to official taps.
 #:
 #:    If `--desc` is passed, search formulae with a description matching <text> and
@@ -43,6 +47,8 @@ module Homebrew
         switch s
       end
 
+      switch "--casks"
+
       conflicts(*package_manager_switches)
     end
 
@@ -52,8 +58,13 @@ module Homebrew
       return
     end
 
-    if args.remaining.empty? && !args.desc?
-      puts Formatter.columns(Formula.full_names.sort)
+    if args.remaining.empty?
+      if args.casks?
+        puts Formatter.columns(Hbc::Cask.to_a.map(&:full_name).sort)
+      else
+        puts Formatter.columns(Formula.full_names.sort)
+      end
+
       return
     end
 

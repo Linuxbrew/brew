@@ -400,12 +400,16 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Uninstall and then install `formula` (with existing install options).
 
   * `search`, `-S`:
-    Display all locally available formulae for brewing (including tapped ones).
-    No online search is performed if called without arguments.
+    Display all locally available formulae (including tapped ones).
+    No online search is performed.
+
+  * `search` `--casks`
+    Display all locally available casks (including tapped ones).
+    No online search is performed.
 
   * `search` [`--desc`] (`text`|`/``text``/`):
-    Perform a substring search of formula names for `text`. If `text` is
-    surrounded with slashes, then it is interpreted as a regular expression.
+    Perform a substring search of cask tokens and formula names for `text`. If `text`
+    is surrounded with slashes, then it is interpreted as a regular expression.
     The search for `text` is extended online to official taps.
 
     If `--desc` is passed, search formulae with a description matching `text` and

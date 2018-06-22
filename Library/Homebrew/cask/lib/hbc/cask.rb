@@ -56,7 +56,7 @@ module Hbc
     end
 
     def full_name
-      return token if tap == Tap.default_cask_tap
+      return token if tap.user == "Homebrew"
       qualified_token
     end
 

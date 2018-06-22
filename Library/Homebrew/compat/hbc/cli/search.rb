@@ -7,7 +7,7 @@ module Hbc
       class Search < AbstractCommand
         def run
           odeprecated "`brew cask search`", "`brew search`"
-          Homebrew.search(args)
+          Homebrew.search(args.empty? ? "--casks" : args)
         end
 
         def self.visible
