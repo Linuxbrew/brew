@@ -136,20 +136,26 @@ describe Formulary do
     end
 
     context "with installed Formula" do
-      let(:formula) { described_class.factory(formula_path) }
-      let(:installer) { FormulaInstaller.new(formula) }
+      before do
+        allow(Formulary).to receive(:loader_for).and_call_original
+        stub_formula_loader formula("patchelf") { url "patchelf-1.0" }
+        allow(Formula["patchelf"]).to receive(:installed?).and_return(true)
+      end
+
+      let(:installed_formula) { described_class.factory(formula_path) }
+      let(:installer) { FormulaInstaller.new(installed_formula) }
 
       it "returns a Formula when given a rack" do
         installer.install
 
-        f = described_class.from_rack(formula.rack)
+        f = described_class.from_rack(installed_formula.rack)
         expect(f).to be_kind_of(Formula)
       end
 
       it "returns a Formula when given a Keg" do
         installer.install
 
-        keg = Keg.new(formula.prefix)
+        keg = Keg.new(installed_formula.prefix)
         f = described_class.from_keg(keg)
         expect(f).to be_kind_of(Formula)
       end

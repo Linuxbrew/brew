@@ -3,8 +3,20 @@ module Utils
     popen(args, "rb", options, &block)
   end
 
+  def self.safe_popen_read(*args, **options, &block)
+    output = popen_read(*args, **options, &block)
+    raise ErrorDuringExecution, args unless $CHILD_STATUS.success?
+    output
+  end
+
   def self.popen_write(*args, **options, &block)
     popen(args, "wb", options, &block)
+  end
+
+  def self.safe_popen_write(*args, **options, &block)
+    output = popen_write(args, **options, &block)
+    raise ErrorDuringExecution, args unless $CHILD_STATUS.success?
+    output
   end
 
   def self.popen(args, mode, options = {})

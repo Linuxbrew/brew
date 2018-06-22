@@ -87,8 +87,17 @@ module Homebrew
     end
 
     return merge if args.merge?
+    ensure_relocation_formulae_installed!
     ARGV.resolved_formulae.each do |f|
       bottle_formula f
+    end
+  end
+
+  def ensure_relocation_formulae_installed!
+    Keg.relocation_formulae.each do |f|
+      next if Formula[f].installed?
+      ohai "Installing #{f}..."
+      safe_system HOMEBREW_BREW_FILE, "install", f
     end
   end
 
