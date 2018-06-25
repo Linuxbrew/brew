@@ -66,8 +66,18 @@ class Resource
     name.tr("/", "-")
   end
 
+  def self.safe_download_name(str)
+    # "@" is a special character for Subversion. Keep it out of the cache dir name.
+    str.gsub("@", "-AT-")
+  end
+
   def download_name
-    name.nil? ? owner.name : "#{owner.name}--#{escaped_name}"
+    raw_name = if name
+      "#{owner.name}--#{escaped_name}"
+    else
+      owner.name
+    end
+    Resource.safe_download_name(raw_name)
   end
 
   def cached_download
