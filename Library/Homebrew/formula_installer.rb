@@ -13,6 +13,7 @@ require "emoji"
 require "development_tools"
 require "cache_store"
 require "linkage_checker"
+require "install"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -219,6 +220,10 @@ class FormulaInstaller
   end
 
   def install
+    if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
+      Homebrew::Install.check_development_tools
+    end
+
     # not in initialize so upgrade can unlink the active keg before calling this
     # function but after instantiating this class so that it can avoid having to
     # relink the active keg if possible (because it is slow).

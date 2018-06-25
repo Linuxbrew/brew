@@ -47,7 +47,6 @@ module Homebrew
     def perform_preinstall_checks
       check_ppc
       check_writable_install_location
-      check_development_tools if DevelopmentTools.installed?
       check_cellar
     end
   end
