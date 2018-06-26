@@ -384,8 +384,8 @@ EOS
   fi
 
   if ! git --version &>/dev/null ||
-       [[ -n "$HOMEBREW_SYSTEM_GIT_TOO_OLD" &&
-        ! -x "$HOMEBREW_PREFIX/opt/git/bin/git" ]]
+     [[ -n "$HOMEBREW_FORCE_BREWED_GIT" &&
+      ! -x "$HOMEBREW_PREFIX/opt/git/bin/git" ]]
   then
     # we cannot install brewed git if homebrew/core is unavailable.
     [[ -d "$HOMEBREW_LIBRARY/Taps/homebrew/homebrew-core" ]] && brew install git

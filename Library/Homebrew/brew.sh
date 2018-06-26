@@ -102,6 +102,7 @@ then
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" ]]
   then
     HOMEBREW_SYSTEM_GIT_TOO_OLD="1"
+    HOMEBREW_FORCE_BREWED_GIT="1"
   fi
 
   if [[ -z "$HOMEBREW_CACHE" ]]
@@ -133,6 +134,15 @@ then
   HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
 else
   HOMEBREW_CURL="curl"
+fi
+
+if [[ -n "$HOMEBREW_FORCE_BREWED_GIT" &&
+      -x "$HOMEBREW_PREFIX/opt/git/bin/git" ]] &&
+         "$HOMEBREW_PREFIX/opt/git/bin/git" --version >/dev/null
+then
+  HOMEBREW_GIT="$HOMEBREW_PREFIX/opt/git/bin/git"
+else
+  HOMEBREW_GIT="git"
 fi
 
 HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_USER_AGENT_VERSION)"
