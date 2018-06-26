@@ -665,10 +665,6 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     @url = @url.sub("svn+http://", "")
   end
 
-  def cache_filename
-    Resource.safe_download_name("#{name}--#{cache_tag}")
-  end
-
   def fetch
     clear_cache unless @url.chomp("/") == repo_url || quiet_system("svn", "switch", @url, cached_location)
     super
