@@ -285,7 +285,7 @@ module Superenv
   end
 
   def permit_arch_flags
-    append "HOMEBREW_CCCFG", "K"
+    append "HOMEBREW_CCCFG", "K", ""
   end
 
   def m32
