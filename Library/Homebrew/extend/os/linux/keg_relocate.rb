@@ -23,6 +23,7 @@ class Keg
     cmd_rpath = "#{patchelf} --print-rpath '#{file}' 2>&1"
     old_rpath = Utils.popen_read(*cmd_rpath).strip
     return if old_rpath == "cannot find section .dynstr"
+    return if old_rpath == "strange: no string table"
     raise ErrorDuringExecution, "#{cmd_rpath}\n#{old_rpath}" unless $CHILD_STATUS.success?
     rpath = old_rpath.split(":").map { |x| x.sub(old_prefix, new_prefix) }.select do |x|
       x.start_with?(new_prefix, "$ORIGIN")
