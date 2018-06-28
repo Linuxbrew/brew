@@ -54,19 +54,27 @@ module Homebrew
 
   def audit
     Homebrew::CLI::Parser.parse do
-      switch      "--strict"
-      switch      "--online"
-      switch      "--new-formula"
-      switch      "--fix"
-      switch      "--display-cop-names"
-      switch      "--display-filename"
+      banner <<~EOS
+        Usage: brew audit [options] [<formulae>]
+
+        Check <formulae> for Homebrew coding style violations. This should be
+        run before submitting a new formula.
+
+        If no <formulae> are provided, all of them are checked.
+      EOS
+      switch      "--strict", description: "Run additional style checks, including Rubocop style checks."
+      switch      "--online", description: "Run additional slower style checks that require a\nnetwork connection."
+      switch      "--new-formula", description: "Run various additional style checks to determine if a new formula \nis eligible for Homebrew. This should be used when creating \nnew formula and implies --strict and --online."
+      switch      "--fix", description: "Fix style violations automatically using\nRuboCop's auto-correct feature."
+      switch      "--display-cop-names", description: "Include the RuboCop cop name for each violation\nin the output."
+      switch      "--display-filename", description: "Prefix everyline of output with name of the file or\nformula being audited, to make output easy to grep."
       switch      "-D", "--audit-debug", description: "Activates debugging and profiling"
+      comma_array "--only", description: "Passing --only=method will run only the methods named audit_method,\n`method` should be a comma-separated list."
+      comma_array "--except", description: "Passing --except=method will run only the methods named audit_method,\n`method` should be a comma-separated list."
+      comma_array "--only-cops", description: "Passing --only-cops=cops will check for violations of only the listed\nRuboCop cops. `cops` should be a comma-separated list of cop names."
+      comma_array "--except-cops", description: "Passing --except-cops=cops will skip checking the listed\nRuboCop cops violations. `cops` should be a comma-separated list of cop names."
       switch      :verbose
       switch      :debug
-      comma_array "--only"
-      comma_array "--except"
-      comma_array "--only-cops"
-      comma_array "--except-cops"
     end
 
     Homebrew.auditing = true
