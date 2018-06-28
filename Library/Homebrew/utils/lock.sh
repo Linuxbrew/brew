@@ -45,12 +45,12 @@ _create_lock() {
   if [[ -x "$ruby" ]] && "$ruby" -e "exit(RUBY_VERSION >= '1.8.7')"
   then
     "$ruby" -e "File.new($lock_fd).flock(File::LOCK_EX | File::LOCK_NB) || exit(1)"
-  elif [[ -x "$(type -P flock)" ]]
-  then
-    flock -n "$lock_fd"
   elif [[ -x "$python" ]]
   then
     "$python" -c "import fcntl; fcntl.flock($lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)"
+  elif [[ -x "$(type -P flock)" ]]
+  then
+    flock -n "$lock_fd"
   else
     onoe "Cannot create $name lock, please avoid running Homebrew in parallel."
   fi
