@@ -4,32 +4,16 @@ describe "brew linkage", :integration_test do
     (HOMEBREW_CELLAR/"testball/0.0.1/foo").mkpath
   end
 
-  context "no cache" do
-    it "works when no arguments are provided" do
-      expect { brew "linkage" }
-        .to be_a_success
-        .and not_to_output.to_stdout
-        .and not_to_output.to_stderr
-    end
-
-    it "works when one argument is provided" do
-      expect { brew "linkage", "testball" }
-        .to be_a_success
-        .and not_to_output.to_stderr
-    end
+  it "works when no arguments are provided" do
+    expect { brew "linkage" }
+      .to be_a_success
+      .and not_to_output.to_stdout
+      .and not_to_output.to_stderr
   end
 
-  context "cache" do
-    it "works when no arguments are provided" do
-      expect { brew "linkage", "--cached" }
-        .to be_a_success
-        .and not_to_output.to_stderr
-    end
-
-    it "works when one argument is provided" do
-      expect { brew "linkage", "--cached", "testball" }
-        .to be_a_success
-        .and not_to_output.to_stderr
-    end
+  it "works when one argument is provided" do
+    expect { brew "linkage", "testball" }
+      .to be_a_success
+      .and not_to_output.to_stderr
   end
 end

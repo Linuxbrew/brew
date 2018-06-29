@@ -1,4 +1,4 @@
-#:  * `linkage` [`--test`] [`--reverse`] [`--cached`] <formula>:
+#:  * `linkage` [`--test`] [`--reverse`] <formula>:
 #:    Checks the library links of an installed formula.
 #:
 #:    Only works on installed formulae. An error is raised if it is run on
@@ -9,9 +9,6 @@
 #:
 #:    If `--reverse` is passed, print the dylib followed by the binaries
 #:    which link to it for each library the keg references.
-#:
-#:    If `--cached` is passed, print the cached linkage values stored in
-#:    HOMEBREW_CACHE, set from a previous `brew linkage` run
 
 require "cache_store"
 require "linkage_checker"
@@ -24,7 +21,6 @@ module Homebrew
     Homebrew::CLI::Parser.parse do
       switch "--test"
       switch "--reverse"
-      switch "--cached"
       switch :verbose
       switch :debug
     end
@@ -33,8 +29,7 @@ module Homebrew
       ARGV.kegs.each do |keg|
         ohai "Checking #{keg.name} linkage" if ARGV.kegs.size > 1
 
-        use_cache = args.cached? || ENV["HOMEBREW_LINKAGE_CACHE"]
-        result = LinkageChecker.new(keg, use_cache: use_cache, cache_db: db)
+        result = LinkageChecker.new(keg, cache_db: db)
 
         if args.test?
           result.display_test_output
