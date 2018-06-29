@@ -101,7 +101,6 @@ then
   # https://github.com/blog/2507-weak-cryptographic-standards-removed
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" ]]
   then
-    HOMEBREW_SYSTEM_GIT_TOO_OLD="1"
     HOMEBREW_FORCE_BREWED_GIT="1"
   fi
 
