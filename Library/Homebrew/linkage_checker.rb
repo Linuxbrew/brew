@@ -5,12 +5,10 @@ require "linkage_cache_store"
 class LinkageChecker
   attr_reader :undeclared_deps
 
-  def initialize(keg, formula = nil, cache_db:,
-                 use_cache: !ENV["HOMEBREW_LINKAGE_CACHE"].nil?,
-                 rebuild_cache: false)
+  def initialize(keg, formula = nil, cache_db:, rebuild_cache: false)
     @keg = keg
     @formula = formula || resolve_formula(keg)
-    @store = LinkageCacheStore.new(keg.to_s, cache_db) if use_cache
+    @store = LinkageCacheStore.new(keg.to_s, cache_db)
 
     @system_dylibs    = Set.new
     @broken_dylibs    = Set.new

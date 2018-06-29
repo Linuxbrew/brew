@@ -292,11 +292,6 @@ then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"
 fi
 
-if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
-then
-  export HOMEBREW_LINKAGE_CACHE="1"
-fi
-
 check-run-command-as-root() {
   [[ "$(id -u)" = 0 ]] || return
 
