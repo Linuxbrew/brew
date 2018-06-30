@@ -284,7 +284,7 @@ class Tap
 
     link_completions_and_manpages
 
-    formatted_contents = Formatter.enumeration(*contents)&.prepend(" ")
+    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
     puts "Tapped#{formatted_contents} (#{path.abv})." unless quiet
     Descriptions.cache_formulae(formula_names)
 
@@ -314,7 +314,7 @@ class Tap
     puts "Untapping #{name}..."
 
     abv = path.abv
-    formatted_contents = Formatter.enumeration(*contents)&.prepend(" ")
+    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
 
     unpin if pinned?
     Descriptions.uncache_formulae(formula_names)

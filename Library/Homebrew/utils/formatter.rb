@@ -109,7 +109,7 @@ module Formatter
     show_count ? "#{count} #{words}" : words
   end
 
-  def enumeration(*items)
+  def comma_and(*items)
     *items, last = items.map(&:to_s)
     return last if items.empty?
 
