@@ -39,7 +39,7 @@ HOMEBREW_CACHE_FORMULA = HOMEBREW_CACHE/"Formula"
 HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"] || "~/Library/Logs/Homebrew/").expand_path
 
 # Must use /tmp instead of $TMPDIR because long paths break Unix domain sockets
-HOMEBREW_TEMP = Pathname.new(ENV.fetch("HOMEBREW_TEMP", "/tmp"))
+HOMEBREW_TEMP = Pathname.new(ENV.fetch("HOMEBREW_TEMP", "/tmp")).realpath
 
 unless defined? HOMEBREW_LIBRARY_PATH
   # Root of the Homebrew code base
