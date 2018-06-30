@@ -110,7 +110,7 @@ module Formatter
   end
 
   def comma_and(*items)
-    *items, last = items.map(&:to_s)
+    *items, last = items.map(&:to_s) # rubocop:disable Lint/ShadowedArgument, TODO: Remove when RuboCop 0.57.3 is released.
     return last if items.empty?
 
     "#{items.join(", ")} and #{last}"
