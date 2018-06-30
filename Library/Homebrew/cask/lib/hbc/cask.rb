@@ -56,12 +56,8 @@ module Hbc
     end
 
     def full_name
-      return token if tap&.user == "Homebrew"
-      qualified_token
-    end
-
-    def qualified_token
       return token if tap.nil?
+      return token if tap.user == "Homebrew"
       "#{tap.name}/#{token}"
     end
 
