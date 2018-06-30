@@ -144,6 +144,7 @@ export HOMEBREW_BREW_FILE
 export HOMEBREW_PREFIX
 export HOMEBREW_REPOSITORY
 export HOMEBREW_LIBRARY
+export HOMEBREW_TEMP
 
 # Declared in brew.sh
 export HOMEBREW_VERSION
@@ -295,7 +296,7 @@ EOS
 check-run-command-as-root
 
 check-prefix-is-not-tmpdir() {
-  if [[ $(realpath "${HOMEBREW_PREFIX}") = /private/tmp/* ]]
+  if [[ "${HOMEBREW_PREFIX}" = "${HOMEBREW_TEMP}"* ]]
   then
     odie <<EOS
 Your HOMEBREW_PREFIX is in the system temporary directory, which Homebrew
