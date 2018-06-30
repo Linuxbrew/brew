@@ -301,7 +301,7 @@ check-prefix-is-not-tmpdir() {
 Your HOMEBREW_PREFIX is in the system temporary directory, which Homebrew
 uses to store downloads and builds. You can resolve this by installing Homebrew to
 either the standard prefix (/usr/local/) or to a non-standard prefix that is not
-the system temporary directory.
+in the system temporary directory.
 EOS
   fi
 }
