@@ -295,14 +295,13 @@ EOS
 check-run-command-as-root
 
 check-prefix-is-not-tmpdir() {
-  if [[ "${HOMEBREW_PREFIX}" = /tmp/* ||
-        "${HOMEBREW_PREFIX}" = /private/tmp/* ]]
+  if [[ $(realpath "${HOMEBREW_PREFIX}") = /private/tmp/* ]]
   then
     odie <<EOS
-Your HOMEBREW_PREFIX is in one of the system temporary directories, which Homebrew
+Your HOMEBREW_PREFIX is in the system temporary directorie, which Homebrew
 uses to store downloads and builds. You can resolve this by installing Homebrew to
 either the standard prefix (/usr/local/) or to a non-standard prefix that is not
-a system temporary directory.
+the system temporary directory.
 EOS
   fi
 }
