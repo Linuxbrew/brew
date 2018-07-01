@@ -290,6 +290,8 @@ EOS
 check-run-command-as-root
 
 check-prefix-is-not-tmpdir() {
+  [[ -z "${HOMEBREW_MACOS}" ]] && return
+
   if [[ "${HOMEBREW_PREFIX}" = "${HOMEBREW_TEMP}"* ]]
   then
     odie <<EOS
