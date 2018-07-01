@@ -8,7 +8,7 @@ class Keg
       super <<~EOS
         Cannot link #{keg.name}
         Another version is already linked: #{keg.linked_keg_record.resolved_path}
-        EOS
+      EOS
     end
   end
 
@@ -47,7 +47,7 @@ class Keg
 
         To list all files that would be deleted:
           brew link --overwrite --dry-run #{keg.name}
-        EOS
+      EOS
       s.join("\n")
     end
   end

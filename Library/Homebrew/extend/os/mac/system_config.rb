@@ -54,12 +54,12 @@ class SystemConfig
     def dump_verbose_config(f = $stdout)
       dump_generic_verbose_config(f)
       f.puts "macOS: #{MacOS.full_version}-#{kernel}"
-      f.puts "CLT: #{clt ? clt : "N/A"}"
+      f.puts "CLT: #{clt || "N/A"}"
       if MacOS::CLT.separate_header_package?
-        f.puts "CLT headers: #{clt_headers ? clt_headers : "N/A"}"
+        f.puts "CLT headers: #{clt_headers || "N/A"}"
       end
-      f.puts "Xcode: #{xcode ? xcode : "N/A"}"
-      f.puts "XQuartz: #{xquartz ? xquartz : "N/A"}"
+      f.puts "Xcode: #{xcode || "N/A"}"
+      f.puts "XQuartz: #{xquartz || "N/A"}"
     end
   end
 end

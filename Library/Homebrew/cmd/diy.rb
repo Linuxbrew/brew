@@ -50,7 +50,7 @@ module Homebrew
 
       To continue using the detected name, pass it explicitly:
         brew diy --name=#{detected_name}
-      EOS
+    EOS
 
     detected_name
   end

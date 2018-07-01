@@ -88,7 +88,7 @@ module Homebrew
           The formula #{realname} is already aliased to #{fc.name}
           Please check that you are not creating a duplicate.
           To force creation use --force.
-          EOS
+        EOS
       end
     end
 

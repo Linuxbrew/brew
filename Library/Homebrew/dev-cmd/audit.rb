@@ -694,7 +694,7 @@ module Homebrew
         next if spec_version >= max_version
 
         above_max_version_scheme = current_version_scheme > max_version_scheme
-        map_includes_version = spec_version_scheme_map.keys.include?(spec_version)
+        map_includes_version = spec_version_scheme_map.key?(spec_version)
         next if !current_version_scheme.zero? &&
                 (above_max_version_scheme || map_includes_version)
         problem "#{spec} version should not decrease (from #{max_version} to #{spec_version})"

@@ -119,7 +119,7 @@ module Debrew
           if e.is_a?(Ignorable)
             menu.choice(:irb) do
               puts "When you exit this IRB session, execution will continue."
-              set_trace_func proc { |event, _, _, id, binding, klass| # rubocop:disable Metrics/ParameterLists
+              set_trace_func proc { |event, _, _, id, binding, klass|
                 if klass == Raise && id == :raise && event == "return"
                   set_trace_func(nil)
                   synchronize { IRB.start_within(binding) }
