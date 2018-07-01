@@ -22,7 +22,10 @@
 #:    If `--cc=`<compiler> is passed, attempt to compile using <compiler>.
 #:    <compiler> should be the name of the compiler's executable, for instance
 #:    `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
-#:    4.9.
+#:    4.9. In order to use LLVM's clang, use `llvm_clang`. To specify the
+#:    Apple-provided clang, use `clang`. This parameter will only accept
+#:    compilers that are provided by Homebrew. Note that this will override
+#:    the value set by the `$HOMEBREW_CC` environment variable.
 #:
 #:    If `--build-from-source` (or `-s`) is passed, compile the specified <formula> from
 #:    source even if a bottle is provided. Dependencies will still be installed

@@ -138,6 +138,15 @@ Note that environment variables must have a value set to be detected. For exampl
 
     *Default:* `~/Library/Caches/Homebrew`.
 
+  * `HOMEBREW_CC`:
+    If set, instructs Homebrew to used the specified compiler to build a
+    package from source. In order to specify the Apple-provided clang,
+    set `clang`. For the clang provided from the LLVM package, use 
+    `llvm_clang`. For versions of gcc, use the names of the executables from
+    the packages that Homebrew provides, e.g. for gcc 4.9, `gcc-4.9`, or for
+    gcc 8, `gcc-8`. Note that this variable can only be set to compilers that
+    are provided by Homebrew.
+
   * `HOMEBREW_CURLRC`:
     If set, Homebrew will not pass `-q` when invoking `curl`(1) (which disables
     the use of `curlrc`).

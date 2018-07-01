@@ -240,9 +240,10 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--cc=``compiler` is passed, attempt to compile using `compiler`.
     `compiler` should be the name of the compiler's executable, for instance
     `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
-    4.9. In order to use the Homebrew-provided clang from the LLVM package,
-    use `llvm_clang`. Note that this will override the `HOMEBREW_CC`
-    environment variable.
+    4.9. In order to use LLVM's clang, use `llvm_clang`. To specify the
+    Apple-provided clang, use `clang`. This parameter will only accept
+    compilers that are provided by Homebrew. Note that this will override
+    the value set by the `$HOMEBREW_CC` environment variable.
 
     If `--build-from-source` (or `-s`) is passed, compile the specified `formula` from
     source even if a bottle is provided. Dependencies will still be installed
@@ -930,37 +931,37 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
       Bundler for non-Ruby dependencies from Homebrew.
 
-
+  
 
       `bundle` [`install`] [`-v`|`--verbose`] [`--no-upgrade`] [`--file=``path`|`--global`]:
 
       Install or upgrade all dependencies in a Brewfile.
 
-
+  
 
       `brew bundle dump` [`--force`] [`--describe`] [`--file=``path`|`--global`]
 
       Write all installed casks/formulae/taps into a Brewfile.
 
-
+  
 
       `brew bundle cleanup` [`--force`] [`--zap`] [`--file=``path`|`--global`]
 
       Uninstall all dependencies not listed in a Brewfile.
 
-
+  
 
       `brew bundle check` [`--no-upgrade`] [`--file`=`path`|`--global`]
 
       Check if all dependencies are installed in a Brewfile.
 
-
+  
 
       `brew bundle exec` `command`
 
       Run an external command in an isolated build environment.
 
-
+  
 
       `brew bundle list` [`--all`|`--brews`|`--casks`|`--taps`|`--mas`] [`--file=``path`|`--global`]
 
@@ -968,37 +969,37 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
       By default, only brew dependencies are output.
 
-
+  
 
       If `-v` or `--verbose` are passed, print verbose output.
 
-
+  
 
       If `--no-upgrade` is passed, don't run `brew upgrade` outdated dependencies.
 
       Note they may still be upgraded by `brew install` if needed.
 
-
+  
 
       If `--force` is passed, uninstall dependencies or overwrite an existing Brewfile.
 
-
+  
 
       If `--file=`path is passed, the Brewfile path is set accordingly
 
       Use `--file=-` to output to console.
 
-
+  
 
       If `--global` is passed, set Brewfile path to `$HOME/.Brewfile`.
 
-
+  
 
       If `--describe` is passed, output a description comment above each line.
 
       This comment will not be output if the dependency does not have a description.
 
-
+  
 
       If `-h` or `--help` are passed, print this help message and exit.
 
@@ -1014,43 +1015,43 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
       Integrates Homebrew formulae with macOS' `launchctl` manager.
 
-
+  
 
       [`sudo`] `brew services list`
 
       List all running services for the current user (or `root`)
 
-
+  
 
       [`sudo`] `brew services run` `formula|--all`
 
       Run the service `formula` without starting at login (or boot).
 
-
+  
 
       [`sudo`] `brew services` `start` `formula|--all`
 
       Start the service `formula` immediately and register it to launch at login (or `boot`).
 
-
+  
 
       [`sudo`] `brew services` `stop` `formula|--all`
 
       Stop the service `formula` immediately and unregister it from launching at login (or `boot`).
 
-
+  
 
       [`sudo`] `brew services` `restart` `formula|--all`
 
       Stop (if necessary) and start the service immediately and register it to launch at login (or `boot`).
 
-
+  
 
       [`sudo`] `brew services` `cleanup`
 
       Remove all unused services.
 
-
+  
 
       If `sudo` is passed, operate on `/Library/LaunchDaemons` (started at boot).
 
@@ -1125,13 +1126,13 @@ Note that environment variables must have a value set to be detected. For exampl
     *Default:* `~/Library/Caches/Homebrew`.
 
   * `HOMEBREW_CC`:
-    If set, directs which compiler Homebrew will use to compile packages if it
-    builds them from source. If an installation command passes in a `--cc`
-    flag, it will override the value set by `HOMEBREW_CC`. The only valid
-    compilers are ones provided by Homebrew, or Apple's bundled clang. To use
-    gcc for compilation, pass in the executable name, i.e. `gcc-4.9`, `gcc-8`.
-    If you want to use Apple's provided clang, simply use `clang`. For
-    Homebrew's clang from the LLVM package, use `llvm_clang`.
+    If set, instructs Homebrew to used the specified compiler to build a
+    package from source. In order to specify the Apple-provided clang,
+    set `clang`. For the clang provided from the LLVM package, use 
+    `llvm_clang`. For versions of gcc, use the names of the executables from
+    the packages that Homebrew provides, e.g. for gcc 4.9, `gcc-4.9`, or for
+    gcc 8, `gcc-8`. Note that this variable can only be set to compilers that
+    are provided by Homebrew.
 
   * `HOMEBREW_CURLRC`:
     If set, Homebrew will not pass `-q` when invoking `curl`(1) (which disables
