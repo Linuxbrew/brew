@@ -21,7 +21,6 @@ symlink_target_directory() {
 BREW_FILE_DIRECTORY="$(quiet_cd "${0%/*}/" && pwd -P)"
 HOMEBREW_BREW_FILE="${BREW_FILE_DIRECTORY%/}/${0##*/}"
 HOMEBREW_PREFIX="${HOMEBREW_BREW_FILE%/*/*}"
-HOMEBREW_TEMP="${HOMEBREW_TEMP:-/private/tmp}"
 
 # Default to / prefix if unset or the bin/brew file.
 if [[ -z "$HOMEBREW_PREFIX" || "$HOMEBREW_PREFIX" = "$HOMEBREW_BREW_FILE" ]]

@@ -108,6 +108,8 @@ then
   then
     HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
   fi
+
+  HOMEBREW_TEMP="${HOMEBREW_TEMP:-/private/tmp}"
 else
   HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
@@ -124,6 +126,8 @@ else
       HOMEBREW_CACHE="$HOME/.cache/Homebrew"
     fi
   fi
+
+  HOMEBREW_TEMP="${HOMEBREW_TEMP:-/tmp}"
 fi
 
 if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
