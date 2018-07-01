@@ -104,10 +104,7 @@ then
     HOMEBREW_SYSTEM_GIT_TOO_OLD="1"
   fi
 
-  if [[ -z "$HOMEBREW_CACHE" ]]
-  then
-    HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
-  fi
+  HOMEBREW_CACHE="${HOMEBREW_CACHE:-${HOME}/Library/Caches/Homebrew}"
 
   HOMEBREW_TEMP="${HOMEBREW_TEMP:-/private/tmp}"
 else
@@ -117,15 +114,8 @@ else
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
 
-  if [[ -z "$HOMEBREW_CACHE" ]]
-  then
-    if [[ -n "$XDG_CACHE_HOME" ]]
-    then
-      HOMEBREW_CACHE="$XDG_CACHE_HOME/Homebrew"
-    else
-      HOMEBREW_CACHE="$HOME/.cache/Homebrew"
-    fi
-  fi
+  cache_home="${XDG_CACHE_HOME:-${HOME}/.cache}"
+  HOMEBREW_CACHE="${HOMEBREW_CACHE:-${cache_home}/Homebrew}"
 
   HOMEBREW_TEMP="${HOMEBREW_TEMP:-/tmp}"
 fi
