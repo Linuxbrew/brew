@@ -62,10 +62,10 @@ module Homebrew
         if tap.installed?
           info += tap.pinned? ? "pinned" : "unpinned"
           info += ", private" if tap.private?
-          if (contents = tap.contents).empty?
-            info += ", no commands/casks/formulae"
+          info += if (contents = tap.contents).empty?
+            ", no commands/casks/formulae"
           else
-            info += ", #{contents.join(", ")}"
+            ", #{contents.join(", ")}"
           end
           info += "\n#{tap.path} (#{tap.path.abv})"
           info += "\nFrom: #{tap.remote.nil? ? "N/A" : tap.remote}"
