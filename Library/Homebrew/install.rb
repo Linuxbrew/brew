@@ -27,12 +27,14 @@ module Homebrew
 
     def check_development_tools
       checks = Diagnostic::Checks.new
+      failed = false
       checks.fatal_development_tools_checks.each do |check|
         out = checks.send(check)
         next if out.nil?
+        failed ||= true
         ofail out
       end
-      exit 1 if Homebrew.failed?
+      exit 1 if failed
     end
 
     def check_cellar
