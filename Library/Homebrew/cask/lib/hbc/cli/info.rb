@@ -3,7 +3,7 @@ require "json"
 module Hbc
   class CLI
     class Info < AbstractCommand
-      option "--json", :json, false
+      option "--json-v1", :json, false
       
       def initialize(*)
         super
