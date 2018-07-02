@@ -11,8 +11,8 @@ Starting with OS X Lion (10.7), you need `sudo` to install to these like
 so: `sudo gem install`, `sudo easy_install` or `sudo cpan -i`.
 
 An option to avoid sudo is to use an access control list:
-`chmod +a 'user:YOUR_NAME_HERE allow add_subdirectory,add_file,delete_child,directory_inherit' /Library/Python/3.6/site-packages`,
-for example, will let you add packages to Python 3.6 as yourself. That
+`chmod +a 'user:YOUR_NAME_HERE allow add_subdirectory,add_file,delete_child,directory_inherit' /Library/Python/3.y/site-packages`,
+for example, will let you add packages to Python 3.y as yourself. That
 is probably safer than changing the group ownership of the directory.
 
 ### So why was I using sudo?
