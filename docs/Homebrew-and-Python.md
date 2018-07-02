@@ -51,12 +51,12 @@ The `site-packages` is a directory that contains Python modules (especially bind
 $(brew --prefix)/lib/pythonX.Y/site-packages
 ```
 
-So, for Python 3.6.x, you'll find it at `/usr/local/lib/python3.6/site-packages`.
+So, for Python 3.y.z, you'll find it at `/usr/local/lib/python3.y/site-packages`.
 
-Python 3.6 also searches for modules in:
+Python 3.y also searches for modules in:
 
-- `/Library/Python/3.6/site-packages`
-- `~/Library/Python/3.6/lib/python/site-packages`
+- `/Library/Python/3.y/site-packages`
+- `~/Library/Python/3.y/lib/python/site-packages`
 
 Homebrew's `site-packages` directory is first created if (1) any Homebrew formula with Python bindings are installed, or (2) upon `brew install python`.
 
