@@ -129,5 +129,26 @@ module Hbc
         odebug "Cask instance method '#{method}':", send(method).to_yaml
       end
     end
+
+    def to_hash
+      hsh = {
+        "name" => name,
+        "homepage" => homepage,
+        "url" => url,
+        "appcast" => appcast,
+        "version" => version,
+        "sha256" => sha256,
+        "artifacts" => artifacts,
+        "caveats" => caveats,
+        "depends_on" => depends_on,
+        "conflicts_with" => conflicts_with,
+        "container" => container,
+        "gpg" => gpg,
+        "accessibility_access" => accessibility_access,
+        "auto_updates" => auto_updates
+      }
+
+      hsh
+    end
   end
 end

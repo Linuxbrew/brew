@@ -1,15 +1,24 @@
+require "json"
+
 module Hbc
   class CLI
     class Info < AbstractCommand
+      option "--json", :json, false
+      
       def initialize(*)
         super
         raise CaskUnspecifiedError if args.empty?
       end
 
       def run
-        casks.each do |cask|
-          odebug "Getting info for Cask #{cask}"
-          self.class.info(cask)
+        if json?
+          json = casks.map(&:to_hash)
+          puts JSON.generate(json)
+        else
+          casks.each do |cask|
+            odebug "Getting info for Cask #{cask}"
+            self.class.info(cask)
+          end
         end
       end
 
