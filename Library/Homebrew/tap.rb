@@ -284,8 +284,8 @@ class Tap
 
     link_completions_and_manpages
 
-    formula_count = formula_files.size
-    puts "Tapped #{Formatter.pluralize(formula_count, "formula")} (#{path.abv})" unless quiet
+    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
+    puts "Tapped#{formatted_contents} (#{path.abv})." unless quiet
     Descriptions.cache_formulae(formula_names)
 
     return if options[:clone_target]
@@ -311,15 +311,18 @@ class Tap
     require "descriptions"
     raise TapUnavailableError, name unless installed?
 
-    puts "Untapping #{name}... (#{path.abv})"
+    puts "Untapping #{name}..."
+
+    abv = path.abv
+    formatted_contents = Formatter.comma_and(*contents)&.prepend(" ")
+
     unpin if pinned?
-    formula_count = formula_files.size
     Descriptions.uncache_formulae(formula_names)
     Utils::Link.unlink_manpages(path)
     Utils::Link.unlink_completions(path)
     path.rmtree
     path.parent.rmdir_if_possible
-    puts "Untapped #{Formatter.pluralize(formula_count, "formula")}"
+    puts "Untapped#{formatted_contents} (#{abv})."
     clear_cache
   end
 
@@ -341,6 +344,24 @@ class Tap
   # path to the directory of all {Cask} files for this {Tap}.
   def cask_dir
     @cask_dir ||= path/"Casks"
+  end
+
+  def contents
+    contents = []
+
+    if (command_count = command_files.count).positive?
+      contents << Formatter.pluralize(command_count, "command")
+    end
+
+    if (cask_count = cask_files.count).positive?
+      contents << Formatter.pluralize(cask_count, "cask")
+    end
+
+    if (formula_count = formula_files.count).positive?
+      contents << Formatter.pluralize(formula_count, "formula")
+    end
+
+    contents
   end
 
   # an array of all {Formula} files of this {Tap}.
@@ -427,7 +448,8 @@ class Tap
 
   # an array of all commands files of this {Tap}.
   def command_files
-    @command_files ||= Pathname.glob("#{path}/cmd/brew-*").select(&:executable?)
+    @command_files ||= Pathname.glob("#{path}/cmd/brew{,cask}-*")
+                               .select { |file| file.executable? || file.extname == ".rb" }
   end
 
   # path to the pin record for this {Tap}.
