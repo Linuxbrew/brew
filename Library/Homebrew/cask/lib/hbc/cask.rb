@@ -145,14 +145,14 @@ module Hbc
         "container" => container,
         "gpg" => gpg,
         "accessibility_access" => accessibility_access,
-        "auto_updates" => auto_updates
+        "auto_updates" => auto_updates,
       }
 
       artifacts.each do |a|
         hsh["artifacts"][a.class.english_name] = a.summarize
       end
 
-      hsh["conflicts_with"] = [] if hsh["conflicts_with"] == nil
+      hsh["conflicts_with"] = [] if hsh["conflicts_with"].nil?
 
       hsh
     end

@@ -4,7 +4,7 @@ module Hbc
   class CLI
     class Info < AbstractCommand
       option "--json-v1", :json, false
-      
+
       def initialize(*)
         super
         raise CaskUnspecifiedError if args.empty?
