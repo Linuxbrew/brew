@@ -114,8 +114,8 @@ else
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
 
-  cache_home="${XDG_CACHE_HOME:-${HOME}/.cache}"
-  HOMEBREW_CACHE="${HOMEBREW_CACHE:-${cache_home}/Homebrew}"
+  CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+  HOMEBREW_CACHE="${HOMEBREW_CACHE:-${CACHE_HOME}/Homebrew}"
 
   HOMEBREW_TEMP="${HOMEBREW_TEMP:-/tmp}"
 fi
@@ -295,10 +295,10 @@ check-prefix-is-not-tmpdir() {
   if [[ "${HOMEBREW_PREFIX}" = "${HOMEBREW_TEMP}"* ]]
   then
     odie <<EOS
-Your HOMEBREW_PREFIX is in the system temporary directory, which Homebrew
+Your HOMEBREW_PREFIX is in the Homebrew temporary directory, which Homebrew
 uses to store downloads and builds. You can resolve this by installing Homebrew to
 either the standard prefix (/usr/local) or to a non-standard prefix that is not
-in the system temporary directory.
+in the Homebrew temporary directory.
 EOS
   fi
 }
