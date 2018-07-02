@@ -138,7 +138,7 @@ module Hbc
         "appcast" => appcast,
         "version" => version,
         "sha256" => sha256,
-        "artifacts" => artifacts,
+        "artifacts" => {},
         "caveats" => caveats,
         "depends_on" => depends_on,
         "conflicts_with" => conflicts_with,
@@ -147,6 +147,12 @@ module Hbc
         "accessibility_access" => accessibility_access,
         "auto_updates" => auto_updates
       }
+
+      artifacts.each do |a|
+        hsh["artifacts"][a.class.english_name] = a.summarize
+      end
+
+      hsh["conflicts_with"] = [] if hsh["conflicts_with"] == nil
 
       hsh
     end
