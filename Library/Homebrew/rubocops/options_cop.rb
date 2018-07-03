@@ -50,7 +50,6 @@ module RuboCop
         OPTION = "Formulae should not have an `option`".freeze
 
         def audit_formula(_node, _class_node, _parent_class_node, body_node)
-          return if versioned_formula?
           problem DEP_OPTION if method_called_ever?(body_node, :deprecated_option)
           return unless formula_tap == "homebrew-core"
           problem OPTION if method_called_ever?(body_node, :option)
