@@ -586,7 +586,7 @@ module Homebrew
       throttled.each_slice(2).to_a.map do |a, b|
         next if formula.stable.nil?
         version = formula.stable.version.to_s.split(".").last.to_i
-        if @strict && a.include?(formula.name) && version.modulo(b.to_i).nonzero?
+        if @strict && a == formula.name && version.modulo(b.to_i).nonzero?
           problem "should only be updated every #{b} releases on multiples of #{b}"
         end
       end
