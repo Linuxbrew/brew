@@ -12,6 +12,10 @@ describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
           stable do
             # stuff
           end
+
+          devel do
+            # stuff
+          end
         end
       RUBY
     end
@@ -37,6 +41,46 @@ describe RuboCop::Cop::FormulaAudit::ComponentsRedundancy do
             # bottles go here
           end
           bottle :unneeded
+        end
+      RUBY
+    end
+
+    it "When `stable do` is present with a `head` method" do
+      expect_no_offenses(<<~RUBY)
+        class Foo < Formula
+          head "http://example.com/foo.git"
+
+          stable do
+            # stuff
+          end
+        end
+      RUBY
+    end
+
+    it "When `stable do` is present with a `head do` block" do
+      expect_no_offenses(<<~RUBY)
+        class Foo < Formula
+          stable do
+            # stuff
+          end
+
+          head do
+            # stuff
+          end
+        end
+      RUBY
+    end
+
+    it "When `stable do` is present with a `devel` block" do
+      expect_no_offenses(<<~RUBY)
+        class Foo < Formula
+          stable do
+            # stuff
+          end
+
+          devel do
+            # stuff
+          end
         end
       RUBY
     end
