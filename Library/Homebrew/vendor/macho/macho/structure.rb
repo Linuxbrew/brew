@@ -26,5 +26,15 @@ module MachO
 
       new(*bin.unpack(format))
     end
+
+    # @return [Hash] a hash representation of this {MachOStructure}.
+    def to_h
+      {
+        "structure" => {
+          "format" => self.class::FORMAT,
+          "bytesize" => self.class.bytesize,
+        },
+      }
+    end
   end
 end

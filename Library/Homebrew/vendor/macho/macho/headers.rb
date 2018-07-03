@@ -475,6 +475,15 @@ module MachO
       def serialize
         [magic, nfat_arch].pack(FORMAT)
       end
+
+      # @return [Hash] a hash representation of this {FatHeader}
+      def to_h
+        {
+          "magic" => magic,
+          "magic_sym" => MH_MAGICS[magic],
+          "nfat_arch" => nfat_arch,
+        }.merge super
+      end
     end
 
     # Fat binary header architecture structure. A Fat binary has one or more of
@@ -508,7 +517,7 @@ module MachO
       # @api private
       def initialize(cputype, cpusubtype, offset, size, align)
         @cputype = cputype
-        @cpusubtype = cpusubtype
+        @cpusubtype = cpusubtype & ~CPU_SUBTYPE_MASK
         @offset = offset
         @size = size
         @align = align
@@ -517,6 +526,19 @@ module MachO
       # @return [String] the serialized fields of the fat arch
       def serialize
         [cputype, cpusubtype, offset, size, align].pack(FORMAT)
+      end
+
+      # @return [Hash] a hash representation of this {FatArch}
+      def to_h
+        {
+          "cputype" => cputype,
+          "cputype_sym" => CPU_TYPES[cputype],
+          "cpusubtype" => cpusubtype,
+          "cpusubtype_sym" => CPU_SUBTYPES[cputype][cpusubtype],
+          "offset" => offset,
+          "size" => size,
+          "align" => align,
+        }.merge super
       end
     end
 
@@ -639,6 +661,24 @@ module MachO
       def alignment
         magic32? ? 4 : 8
       end
+
+      # @return [Hash] a hash representation of this {MachHeader}
+      def to_h
+        {
+          "magic" => magic,
+          "magic_sym" => MH_MAGICS[magic],
+          "cputype" => cputype,
+          "cputype_sym" => CPU_TYPES[cputype],
+          "cpusubtype" => cpusubtype,
+          "cpusubtype_sym" => CPU_SUBTYPES[cputype][cpusubtype],
+          "filetype" => filetype,
+          "filetype_sym" => MH_FILETYPES[filetype],
+          "ncmds" => ncmds,
+          "sizeofcmds" => sizeofcmds,
+          "flags" => flags,
+          "alignment" => alignment,
+        }.merge super
+      end
     end
 
     # 64-bit Mach-O file header structure
@@ -659,6 +699,13 @@ module MachO
                      flags, reserved)
         super(magic, cputype, cpusubtype, filetype, ncmds, sizeofcmds, flags)
         @reserved = reserved
+      end
+
+      # @return [Hash] a hash representation of this {MachHeader64}
+      def to_h
+        {
+          "reserved" => reserved,
+        }.merge super
       end
     end
   end

@@ -19,5 +19,13 @@ module MachO
       @endianness = endianness
       @offset = offset
     end
+
+    # @return [Hash] a hash representation of this {MachOView}.
+    def to_h
+      {
+        "endianness" => endianness,
+        "offset" => offset,
+      }
+    end
   end
 end
