@@ -105,8 +105,7 @@ then
   fi
 
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${HOME}/Library/Caches/Homebrew}"
-
-  HOMEBREW_TEMP="${HOMEBREW_TEMP:-/private/tmp}"
+  HOMEBREW_SYSTEM_TEMP="/private/tmp"
 else
   HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
@@ -116,9 +115,10 @@ else
 
   CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
   HOMEBREW_CACHE="${HOMEBREW_CACHE:-${CACHE_HOME}/Homebrew}"
-
-  HOMEBREW_TEMP="${HOMEBREW_TEMP:-/tmp}"
+  HOMEBREW_SYSTEM_TEMP="/tmp"
 fi
+
+HOMEBREW_TEMP="${HOMEBREW_TEMP:-${HOMEBREW_SYSTEM_TEMP}}"
 
 if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
       -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]] &&
@@ -147,6 +147,7 @@ export HOMEBREW_BREW_FILE
 export HOMEBREW_PREFIX
 export HOMEBREW_REPOSITORY
 export HOMEBREW_LIBRARY
+export HOMEBREW_SYSTEM_TEMP
 export HOMEBREW_TEMP
 
 # Declared in brew.sh
