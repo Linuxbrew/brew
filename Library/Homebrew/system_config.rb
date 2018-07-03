@@ -116,6 +116,7 @@ class SystemConfig
         HOMEBREW_CELLAR: "/usr/local/Cellar",
         HOMEBREW_CACHE: "#{ENV["HOME"]}/Library/Caches/Homebrew",
         HOMEBREW_RUBY_WARNINGS: "-W0",
+        HOMEBREW_TEMP: ENV["HOMEBREW_SYSTEM_TEMP"],
       }.freeze
       boring_keys = %w[
         HOMEBREW_BROWSER
@@ -134,6 +135,7 @@ class SystemConfig
         HOMEBREW_MACOS_VERSION
         HOMEBREW_RUBY_PATH
         HOMEBREW_SYSTEM
+        HOMEBREW_SYSTEM_TEMP
         HOMEBREW_OS_VERSION
         HOMEBREW_PATH
         HOMEBREW_PROCESSOR
@@ -154,6 +156,9 @@ class SystemConfig
       end
       if defaults_hash[:HOMEBREW_RUBY_WARNINGS] != ENV["HOMEBREW_RUBY_WARNINGS"].to_s
         f.puts "HOMEBREW_RUBY_WARNINGS: #{ENV["HOMEBREW_RUBY_WARNINGS"]}"
+      end
+      if defaults_hash[:HOMEBREW_TEMP] != HOMEBREW_TEMP.to_s
+        f.puts "HOMEBREW_TEMP: #{HOMEBREW_TEMP}"
       end
       unless ENV["HOMEBREW_ENV"]
         ENV.sort.each do |key, value|
