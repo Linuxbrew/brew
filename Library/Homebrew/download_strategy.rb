@@ -104,39 +104,6 @@ class AbstractDownloadStrategy
   def lhapath
     "#{HOMEBREW_PREFIX}/opt/lha/bin/lha"
   end
-
-  def cvspath
-    @cvspath ||= %W[
-      /usr/bin/cvs
-      #{HOMEBREW_PREFIX}/bin/cvs
-      #{HOMEBREW_PREFIX}/opt/cvs/bin/cvs
-      #{which("cvs")}
-    ].find { |p| File.executable? p }
-  end
-
-  def hgpath
-    @hgpath ||= %W[
-      #{which("hg")}
-      #{HOMEBREW_PREFIX}/bin/hg
-      #{HOMEBREW_PREFIX}/opt/mercurial/bin/hg
-    ].find { |p| File.executable? p }
-  end
-
-  def bzrpath
-    @bzrpath ||= %W[
-      #{which("bzr")}
-      #{HOMEBREW_PREFIX}/bin/bzr
-      #{HOMEBREW_PREFIX}/opt/bazaar/bin/bzr
-    ].find { |p| File.executable? p }
-  end
-
-  def fossilpath
-    @fossilpath ||= %W[
-      #{which("fossil")}
-      #{HOMEBREW_PREFIX}/bin/fossil
-      #{HOMEBREW_PREFIX}/opt/fossil/bin/fossil
-    ].find { |p| File.executable? p }
-  end
 end
 
 class VCSDownloadStrategy < AbstractDownloadStrategy
@@ -992,6 +959,10 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     end
   end
 
+  def cvspath
+    @cvspath ||= which("cvs", PATH.new("/usr/bin", Formula["cvs"].opt_bin, ENV["PATH"]))
+  end
+
   def source_modified_time
     # Filter CVS's files because the timestamp for each of them is the moment
     # of clone.
@@ -1045,6 +1016,10 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
     @url = @url.sub(%r{^hg://}, "")
   end
 
+  def hgpath
+    @hgpath ||= which("hg", PATH.new(Formula["mercurial"].opt_bin, ENV["PATH"]))
+  end
+
   def stage
     super
 
@@ -1093,6 +1068,10 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
     ENV["BZR_HOME"] = HOMEBREW_TEMP
   end
 
+  def bzrpath
+    @bzrpath ||= which("bzr", PATH.new(Formula["bazaar"].opt_bin, ENV["PATH"]))
+  end
+
   def stage
     # The export command doesn't work on checkouts
     # See https://bugs.launchpad.net/bzr/+bug/897511
@@ -1101,13 +1080,13 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    timestamp = Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+    timestamp = Utils.popen_read(bzrpath, "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
     raise "Could not get any timestamps from bzr!" if timestamp.to_s.empty?
     Time.parse timestamp
   end
 
   def last_commit
-    Utils.popen_read("bzr", "revno", cached_location.to_s).chomp
+    Utils.popen_read(bzrpath, "revno", cached_location.to_s).chomp
   end
 
   private
@@ -1136,6 +1115,10 @@ class FossilDownloadStrategy < VCSDownloadStrategy
     @url = @url.sub(%r{^fossil://}, "")
   end
 
+  def fossilpath
+    @fossilpath ||= which("fossil", PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]))
+  end
+
   def stage
     super
     args = [fossilpath, "open", cached_location]
@@ -1144,11 +1127,11 @@ class FossilDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    Time.parse Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
+    Time.parse Utils.popen_read(fossilpath, "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
   end
 
   def last_commit
-    Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
+    Utils.popen_read(fossilpath, "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
   end
 
   private
