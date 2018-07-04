@@ -40,7 +40,9 @@ HOMEBREW_LOGS = Pathname.new(ENV["HOMEBREW_LOGS"] || "~/Library/Logs/Homebrew/")
 
 # Must use /tmp instead of $TMPDIR because long paths break Unix domain sockets
 HOMEBREW_TEMP = begin
-  tmp = Pathname.new(ENV["HOMEBREW_TEMP"])
+  # /tmp fallback is here for people auto-updating from a version where
+  # HOMEBREW_TEMP isn't set.
+  tmp = Pathname.new(ENV["HOMEBREW_TEMP"] || "/tmp")
   tmp.mkpath unless tmp.exist?
   tmp.realpath
 end
