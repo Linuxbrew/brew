@@ -3,7 +3,7 @@ require "json"
 module Hbc
   class CLI
     class Info < AbstractCommand
-      option "--json-v1", :json, false
+      option "--json=VERSION", :json
 
       def initialize(*)
         super
@@ -11,9 +11,8 @@ module Hbc
       end
 
       def run
-        if json?
-          json = casks.map(&:to_hash)
-          puts JSON.generate(json)
+        if json == "v1"
+          puts JSON.generate(casks.map(&:to_hash))
         else
           casks.each do |cask|
             odebug "Getting info for Cask #{cask}"
