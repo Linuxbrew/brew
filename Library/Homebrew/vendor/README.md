@@ -3,7 +3,7 @@ Vendored Dependencies
 
 * [plist](https://github.com/patsplat/plist), version 3.3.0
 
-* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 1.2.0
+* [ruby-macho](https://github.com/Homebrew/ruby-macho), version 2.0.0
 
 * [backports](https://github.com/marcandre/backports), version 3.8.0
 

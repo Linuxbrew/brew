@@ -25,7 +25,7 @@ module MachO
     # @note load commands are provided in order of ascending offset.
     attr_reader :load_commands
 
-    # Creates a new MachOFile instance from a binary string.
+    # Creates a new instance from a binary string.
     # @param bin [String] a binary string containing raw Mach-O data
     # @return [MachOFile] a new MachOFile
     def self.new_from_bin(bin)
@@ -35,7 +35,7 @@ module MachO
       instance
     end
 
-    # Creates a new FatFile from the given filename.
+    # Creates a new instance from data read from the given filename.
     # @param filename [String] the Mach-O file to load from
     # @raise [ArgumentError] if the given file does not exist
     def initialize(filename)
@@ -219,8 +219,7 @@ module MachO
       update_sizeofcmds(sizeofcmds - lc.cmdsize)
 
       # pad the space after the load commands to preserve offsets
-      null_pad = "\x00" * lc.cmdsize
-      @raw_data.insert(header.class.bytesize + sizeofcmds - lc.cmdsize, null_pad)
+      @raw_data.insert(header.class.bytesize + sizeofcmds - lc.cmdsize, Utils.nullpad(lc.cmdsize))
 
       populate_fields if options.fetch(:repopulate, true)
     end
@@ -250,6 +249,33 @@ module MachO
       else
         command(:LC_SEGMENT_64)
       end
+    end
+
+    # The segment alignment for the Mach-O. Guesses conservatively.
+    # @return [Integer] the alignment, as a power of 2
+    # @note This is **not** the same as {#alignment}!
+    # @note See `get_align` and `get_align_64` in `cctools/misc/lipo.c`
+    def segment_alignment
+      # special cases: 12 for x86/64/PPC/PP64, 14 for ARM/ARM64
+      return 12 if %i[i386 x86_64 ppc ppc64].include?(cputype)
+      return 14 if %i[arm arm64].include?(cputype)
+
+      cur_align = Sections::MAX_SECT_ALIGN
+
+      segments.each do |segment|
+        if filetype == :object
+          # start with the smallest alignment, and work our way up
+          align = magic32? ? 2 : 3
+          segment.sections.each do |section|
+            align = section.align unless section.align <= align
+          end
+        else
+          align = segment.guess_align
+        end
+        cur_align = align if align < cur_align
+      end
+
+      cur_align
     end
 
     # The Mach-O's dylib ID, or `nil` if not a dylib.
@@ -406,6 +432,14 @@ module MachO
     def write!
       raise MachOError, "no initial file to write to" if @filename.nil?
       File.open(@filename, "wb") { |f| f.write(@raw_data) }
+    end
+
+    # @return [Hash] a hash representation of this {MachOFile}
+    def to_h
+      {
+        "header" => header.to_h,
+        "load_commands" => load_commands.map(&:to_h),
+      }
     end
 
     private
