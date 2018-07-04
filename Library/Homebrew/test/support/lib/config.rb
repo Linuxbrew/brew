@@ -14,27 +14,27 @@ end
 
 # Paths pointing into the Homebrew code base that persist across test runs
 HOMEBREW_LIBRARY_PATH  = Pathname.new(File.expand_path("../../..", __dir__))
-HOMEBREW_SHIMS_PATH    = HOMEBREW_LIBRARY_PATH.parent+"Homebrew/shims"
+HOMEBREW_SHIMS_PATH    = HOMEBREW_LIBRARY_PATH.parent/"Homebrew/shims"
 HOMEBREW_LOAD_PATH     = [
   File.expand_path(__dir__),
   HOMEBREW_LIBRARY_PATH,
-  HOMEBREW_LIBRARY_PATH.join("cask/lib"),
+  HOMEBREW_LIBRARY_PATH/"cask/lib",
 ].join(File::PATH_SEPARATOR)
 
 # Paths redirected to a temporary directory and wiped at the end of the test run
-HOMEBREW_PREFIX        = Pathname.new(TEST_TMPDIR).join("prefix")
+HOMEBREW_PREFIX        = Pathname(TEST_TMPDIR)/"prefix"
 HOMEBREW_REPOSITORY    = HOMEBREW_PREFIX
-HOMEBREW_LIBRARY       = HOMEBREW_REPOSITORY+"Library"
-HOMEBREW_CACHE         = HOMEBREW_PREFIX.parent+"cache"
-HOMEBREW_CACHE_FORMULA = HOMEBREW_PREFIX.parent+"formula_cache"
-HOMEBREW_LINKED_KEGS   = HOMEBREW_PREFIX.parent+"linked"
-HOMEBREW_PINNED_KEGS   = HOMEBREW_PREFIX.parent+"pinned"
-HOMEBREW_LOCK_DIR      = HOMEBREW_PREFIX.parent+"locks"
-HOMEBREW_CELLAR        = HOMEBREW_PREFIX.parent+"cellar"
-HOMEBREW_LOGS          = HOMEBREW_PREFIX.parent+"logs"
-HOMEBREW_TEMP          = HOMEBREW_PREFIX.parent+"temp"
+HOMEBREW_LIBRARY       = HOMEBREW_REPOSITORY/"Library"
+HOMEBREW_CACHE         = HOMEBREW_PREFIX.parent/"cache"
+HOMEBREW_CACHE_FORMULA = HOMEBREW_PREFIX.parent/"formula_cache"
+HOMEBREW_LINKED_KEGS   = HOMEBREW_PREFIX.parent/"linked"
+HOMEBREW_PINNED_KEGS   = HOMEBREW_PREFIX.parent/"pinned"
+HOMEBREW_LOCK_DIR      = HOMEBREW_PREFIX.parent/"locks"
+HOMEBREW_CELLAR        = HOMEBREW_PREFIX.parent/"cellar"
+HOMEBREW_LOGS          = HOMEBREW_PREFIX.parent/"logs"
+HOMEBREW_TEMP          = HOMEBREW_PREFIX.parent/"temp"
 
-TEST_FIXTURE_DIR = HOMEBREW_LIBRARY_PATH.join("test", "support", "fixtures")
+TEST_FIXTURE_DIR = HOMEBREW_LIBRARY_PATH/"test/support/fixtures"
 
 TESTBALL_SHA256 = "91e3f7930c98d7ccfb288e115ed52d06b0e5bc16fec7dce8bdda86530027067b".freeze
 TESTBALL_PATCHES_SHA256 = "799c2d551ac5c3a5759bea7796631a7906a6a24435b52261a317133a0bfb34d9".freeze
