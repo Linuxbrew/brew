@@ -138,21 +138,23 @@ module Hbc
         "appcast" => appcast,
         "version" => version,
         "sha256" => sha256,
-        "artifacts" => {},
+        "artifacts" => artifacts.map do |a|
+          if a.methods.include? :to_a
+            a.to_a
+          elsif a.methods.include? :to_h
+            a.to_h
+          else
+            a
+          end
+        end,
         "caveats" => caveats,
         "depends_on" => depends_on,
-        "conflicts_with" => conflicts_with,
+        "conflicts_with" => conflicts_with.to_a,
         "container" => container,
         "gpg" => gpg,
         "accessibility_access" => accessibility_access,
         "auto_updates" => auto_updates,
       }
-
-      artifacts.each do |a|
-        hsh["artifacts"][a.class.english_name] = a.summarize
-      end
-
-      hsh["conflicts_with"] = [] if hsh["conflicts_with"].nil?
 
       hsh
     end
