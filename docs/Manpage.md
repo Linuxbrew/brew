@@ -239,11 +239,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--cc=``compiler` is passed, attempt to compile using `compiler`.
     `compiler` should be the name of the compiler's executable, for instance
-    `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
-    4.9. In order to use LLVM's clang, use `llvm_clang`. To specify the
-    Apple-provided clang, use `clang`. This parameter will only accept
-    compilers that are provided by Homebrew. Note that this will override
-    the value set by the `$HOMEBREW_CC` environment variable.
+    `gcc-8` for gcc 8, `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a 
+    Homebrew-provided GCC 4.9. In order to use LLVM's clang, use 
+    `llvm_clang`. To specify the Apple-provided clang, use `clang`. This 
+    parameter will only accept compilers that are provided by Homebrew or
+    bundled with MacOS. Please do not file issues if you encounter errors
+    while using this flag.
 
     If `--build-from-source` (or `-s`) is passed, compile the specified `formula` from
     source even if a bottle is provided. Dependencies will still be installed
@@ -1124,15 +1125,6 @@ Note that environment variables must have a value set to be detected. For exampl
     If set, instructs Homebrew to use the given directory as the download cache.
 
     *Default:* `~/Library/Caches/Homebrew`.
-
-  * `HOMEBREW_CC`:
-    If set, instructs Homebrew to used the specified compiler to build a
-    package from source. In order to specify the Apple-provided clang,
-    set `clang`. For the clang provided from the LLVM package, use 
-    `llvm_clang`. For versions of gcc, use the names of the executables from
-    the packages that Homebrew provides, e.g. for gcc 4.9, `gcc-4.9`, or for
-    gcc 8, `gcc-8`. Note that this variable can only be set to compilers that
-    are provided by Homebrew.
 
   * `HOMEBREW_CURLRC`:
     If set, Homebrew will not pass `-q` when invoking `curl`(1) (which disables

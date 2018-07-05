@@ -227,7 +227,7 @@ If \fB\-\-ignore\-dependencies\fR is passed, skip installing any dependencies of
 If \fB\-\-only\-dependencies\fR is passed, install the dependencies with specified options but do not install the specified formula\.
 .
 .IP
-If \fB\-\-cc=\fR\fIcompiler\fR is passed, attempt to compile using \fIcompiler\fR\. \fIcompiler\fR should be the name of the compiler\'s executable, for instance \fBgcc\-4\.2\fR for Apple\'s GCC 4\.2, or \fBgcc\-4\.9\fR for a Homebrew\-provided GCC 4\.9\. In order to use LLVM\'s clang, use \fBllvm_clang\fR\. To specify the Apple\-provided clang, use \fBclang\fR\. This parameter will only accept compilers that are provided by Homebrew\. Note that this will override the value set by the \fB$HOMEBREW_CC\fR environment variable\.
+If \fB\-\-cc=\fR\fIcompiler\fR is passed, attempt to compile using \fIcompiler\fR\. \fIcompiler\fR should be the name of the compiler\'s executable, for instance \fBgcc\-8\fR for gcc 8, \fBgcc\-4\.2\fR for Apple\'s GCC 4\.2, or \fBgcc\-4\.9\fR for a Homebrew\-provided GCC 4\.9\. In order to use LLVM\'s clang, use \fBllvm_clang\fR\. To specify the Apple\-provided clang, use \fBclang\fR\. This parameter will only accept compilers that are provided by Homebrew or bundled with MacOS\. Please do not file issues if you encounter errors while using this flag\.
 .
 .IP
 If \fB\-\-build\-from\-source\fR (or \fB\-s\fR) is passed, compile the specified \fIformula\fR from source even if a bottle is provided\. Dependencies will still be installed from bottles if they are available\.
@@ -1067,10 +1067,6 @@ If set, instructs Homebrew to use the given directory as the download cache\.
 .
 .IP
 \fIDefault:\fR \fB~/Library/Caches/Homebrew\fR\.
-.
-.TP
-\fBHOMEBREW_CC\fR
-If set, instructs Homebrew to used the specified compiler to build a package from source\. In order to specify the Apple\-provided clang, set \fBclang\fR\. For the clang provided from the LLVM package, use \fBllvm_clang\fR\. For versions of gcc, use the names of the executables from the packages that Homebrew provides, e\.g\. for gcc 4\.9, \fBgcc\-4\.9\fR, or for gcc 8, \fBgcc\-8\fR\. Note that this variable can only be set to compilers that are provided by Homebrew\.
 .
 .TP
 \fBHOMEBREW_CURLRC\fR

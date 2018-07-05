@@ -14,9 +14,9 @@ Rather than merging in brews for either of these cases at this time, we're
 listing them on this page. If you come up with a formula for a new version of
 GCC or cross-compiler suite, please link it in here.
 
-* Homebrew provides a `gcc` formula for use with Xcode 4.2+ or when needing
+- Homebrew provides a `gcc` formula for use with Xcode 4.2+ or when needing
   C++11 support on earlier versions.
-* Homebrew provides older GCC formulae, e.g. `gcc@4.8` and `gcc@6`.
-* Homebrew provides the LLVM clang, which is bundled with the `llvm` formula.
-* [RISC-V](https://github.com/riscv/homebrew-riscv) provides the RISC-V
+- Homebrew provides older GCC formulae, e.g. `gcc@4.9` and `gcc@6`.
+- Homebrew provides the LLVM clang, which is bundled with the `llvm` formula.
+- [RISC-V](https://github.com/riscv/homebrew-riscv) provides the RISC-V
   toolchain including binutils and GCC.
