@@ -436,8 +436,12 @@ class FormulaInstaller
 
   def expand_requirements
     unsatisfied_reqs = Hash.new { |h, k| h[k] = [] }
-    deps = []
+    req_deps = []
     formulae = [formula]
+    formula_deps_map = Dependency.expand(formula)
+                                 .each_with_object({}) do |dep, hash|
+      hash[dep.name] = dep
+    end
 
     while f = formulae.pop
       runtime_requirements = runtime_requirements(f)
@@ -453,6 +457,8 @@ class FormulaInstaller
           next
         elsif !runtime_requirements.include?(req) && install_bottle_for_dependent
           Requirement.prune
+        elsif (dep = formula_deps_map[dependent.name]) && dep.build?
+          Requirement.prune
         else
           unsatisfied_reqs[dependent] << req
         end
@@ -460,9 +466,9 @@ class FormulaInstaller
     end
 
     # Merge the repeated dependencies, which may have different tags.
-    deps = Dependency.merge_repeats(deps)
+    req_deps = Dependency.merge_repeats(req_deps)
 
-    [unsatisfied_reqs, deps]
+    [unsatisfied_reqs, req_deps]
   end
 
   def expand_dependencies(deps)
