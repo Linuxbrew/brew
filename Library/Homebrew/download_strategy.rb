@@ -194,15 +194,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
       if type == :xz && DependencyCollector.tar_needs_xz_dependency?
         pipe_to_tar "#{HOMEBREW_PREFIX}/opt/xz/bin/xz", unpack_dir
       else
-        flags = if type == :gzip
-          ["-z"]
-        elsif type == :bzip2
-          ["-j"]
-        elsif type == :xz
-          ["-J"]
-        end
-
-        safe_system "tar", "-x", *flags, "-f", path, "-C", unpack_dir
+        safe_system "tar", "xf", path, "-C", unpack_dir
       end
       chdir
     when :lzip
@@ -239,7 +231,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     path = cached_location
 
     Utils.popen_read(tool, "-dc", path) do |rd|
-      Utils.popen_write("tar", "-x", "-f", "-", "-C", unpack_dir) do |wr|
+      Utils.popen_write("tar", "xf", "-", "-C", unpack_dir) do |wr|
         buf = ""
         wr.write(buf) while rd.read(16384, buf)
       end
