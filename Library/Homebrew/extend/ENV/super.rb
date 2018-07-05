@@ -276,7 +276,7 @@ module Superenv
     self["HOMEBREW_ARCHFLAGS"] = Hardware::CPU.universal_archs.as_arch_flags
 
     # GCC doesn't accept "-march" for a 32-bit CPU with "-arch x86_64"
-    return if compiler == :clang
+    return if compiler_any_clang?
     return unless Hardware::CPU.is_32_bit?
     self["HOMEBREW_OPTFLAGS"] = self["HOMEBREW_OPTFLAGS"].sub(
       /-march=\S*/,
@@ -300,7 +300,7 @@ module Superenv
     if homebrew_cc == "clang"
       append "HOMEBREW_CCCFG", "x", ""
       append "HOMEBREW_CCCFG", "g", ""
-    elsif gcc_with_cxx11_support?(homebrew_cc)
+    elsif compiler_with_cxx11_support?(homebrew_cc)
       append "HOMEBREW_CCCFG", "x", ""
     else
       raise "The selected compiler doesn't support C++11: #{homebrew_cc}"
