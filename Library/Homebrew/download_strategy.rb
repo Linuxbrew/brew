@@ -617,7 +617,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
 
   def stage
     super
-    quiet_safe_system "svn", "export", "--force", cached_location, Dir.pwd
+    safe_system "svn", "export", "--force", cached_location, Dir.pwd
   end
 
   def source_modified_time
@@ -794,9 +794,9 @@ class GitDownloadStrategy < VCSDownloadStrategy
     return unless @ref_type == :branch || !ref?
 
     if !shallow_clone? && shallow_dir?
-      quiet_safe_system "git", "fetch", "origin", "--unshallow"
+      safe_system "git", "fetch", "origin", "--unshallow"
     else
-      quiet_safe_system "git", "fetch", "origin"
+      safe_system "git", "fetch", "origin"
     end
   end
 
@@ -811,7 +811,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def checkout
     ohai "Checking out #{@ref_type} #{@ref}" if @ref_type && @ref
-    quiet_safe_system "git", "checkout", "-f", @ref, "--"
+    safe_system "git", "checkout", "-f", @ref, "--"
   end
 
   def reset_args
@@ -826,12 +826,12 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def reset
-    quiet_safe_system "git", *reset_args
+    safe_system "git", *reset_args
   end
 
   def update_submodules
-    quiet_safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
-    quiet_safe_system "git", "submodule", "update", "--init", "--recursive"
+    safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
+    safe_system "git", "submodule", "update", "--init", "--recursive"
     fix_absolute_submodule_gitdir_references!
   end
 
@@ -1035,7 +1035,9 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   end
 
   def update
-    cached_location.cd { quiet_safe_system hgpath, "pull", "--update" }
+    cached_location.cd do
+      safe_system hgpath, "pull", "--update"
+    end
   end
 end
 
@@ -1083,7 +1085,9 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   end
 
   def update
-    cached_location.cd { quiet_safe_system bzrpath, "update" }
+    cached_location.cd do
+      safe_system bzrpath, "update"
+    end
   end
 end
 
