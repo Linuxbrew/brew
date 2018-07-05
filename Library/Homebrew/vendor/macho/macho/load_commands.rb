@@ -143,7 +143,7 @@ module MachO
       :LC_LINKER_OPTIMIZATION_HINT => "LinkeditDataCommand",
       :LC_VERSION_MIN_TVOS => "VersionMinCommand",
       :LC_VERSION_MIN_WATCHOS => "VersionMinCommand",
-      :LC_NOTE => "LoadCommand",
+      :LC_NOTE => "NoteCommand",
       :LC_BUILD_VERSION => "BuildVersionCommand",
     }.freeze
 
@@ -169,15 +169,16 @@ module MachO
       :SG_PROTECTED_VERSION_1 => 0x8,
     }.freeze
 
-    # Mach-O load command structure
-    # This is the most generic load command - only cmd ID and size are
-    # represented, and no actual data. Used when a more specific class
-    # isn't available/implemented.
+    # The top-level Mach-O load command structure.
+    #
+    # This is the most generic load command -- only the type ID and size are
+    # represented. Used when a more specific class isn't available or isn't implemented.
     class LoadCommand < MachOStructure
-      # @return [MachO::MachOView] the raw view associated with the load command
+      # @return [MachO::MachOView, nil] the raw view associated with the load command,
+      #  or nil if the load command was created via {create}.
       attr_reader :view
 
-      # @return [Integer] the load command's identifying number
+      # @return [Integer] the load command's type ID
       attr_reader :cmd
 
       # @return [Integer] the size of the load command, in bytes
@@ -251,8 +252,8 @@ module MachO
         view.offset
       end
 
-      # @return [Symbol] a symbol representation of the load command's
-      #  identifying number
+      # @return [Symbol, nil] a symbol representation of the load command's
+      #  type ID, or nil if the ID doesn't correspond to a known load command class
       def type
         LOAD_COMMANDS[cmd]
       end
@@ -263,6 +264,17 @@ module MachO
       #  identifying number
       def to_s
         type.to_s
+      end
+
+      # @return [Hash] a hash representation of this load command
+      # @note Children should override this to include additional information.
+      def to_h
+        {
+          "view" => view.to_h,
+          "cmd" => cmd,
+          "cmdsize" => cmdsize,
+          "type" => type,
+        }.merge super
       end
 
       # Represents a Load Command string. A rough analogue to the lc_str
@@ -303,6 +315,14 @@ module MachO
         #  load command
         def to_i
           @string_offset
+        end
+
+        # @return [Hash] a hash representation of this {LCStr}.
+        def to_h
+          {
+            "string" => to_s,
+            "offset" => to_i,
+          }
         end
       end
 
@@ -364,6 +384,14 @@ module MachO
 
         segs.join("-")
       end
+
+      # @return [Hash] returns a hash representation of this {UUIDCommand}
+      def to_h
+        {
+          "uuid" => uuid,
+          "uuid_string" => uuid_string,
+        }.merge super
+      end
     end
 
     # A load command indicating that part of this file is to be mapped into
@@ -398,7 +426,7 @@ module MachO
 
       # @see MachOStructure::FORMAT
       # @api private
-      FORMAT = "L=2a16L=4l=2L=2".freeze
+      FORMAT = "L=2Z16L=4l=2L=2".freeze
 
       # @see MachOStructure::SIZEOF
       # @api private
@@ -408,7 +436,7 @@ module MachO
       def initialize(view, cmd, cmdsize, segname, vmaddr, vmsize, fileoff,
                      filesize, maxprot, initprot, nsects, flags)
         super(view, cmd, cmdsize)
-        @segname = segname.delete("\x00")
+        @segname = segname
         @vmaddr = vmaddr
         @vmsize = vmsize
         @fileoff = fileoff
@@ -448,6 +476,42 @@ module MachO
         return false if flag.nil?
         flags & flag == flag
       end
+
+      # Guesses the alignment of the segment.
+      # @return [Integer] the guessed alignment, as a power of 2
+      # @note See `guess_align` in `cctools/misc/lipo.c`
+      def guess_align
+        return Sections::MAX_SECT_ALIGN if vmaddr.zero?
+
+        align = 0
+        segalign = 1
+
+        while (segalign & vmaddr).zero?
+          segalign <<= 1
+          align += 1
+        end
+
+        return 2 if align < 2
+        return Sections::MAX_SECT_ALIGN if align > Sections::MAX_SECT_ALIGN
+
+        align
+      end
+
+      # @return [Hash] a hash representation of this {SegmentCommand}
+      def to_h
+        {
+          "segname" => segname,
+          "vmaddr" => vmaddr,
+          "vmsize" => vmsize,
+          "fileoff" => fileoff,
+          "filesize" => filesize,
+          "maxprot" => maxprot,
+          "initprot" => initprot,
+          "nsects" => nsects,
+          "flags" => flags,
+          "sections" => sections.map(&:to_h),
+        }.merge super
+      end
     end
 
     # A load command indicating that part of this file is to be mapped into
@@ -455,7 +519,7 @@ module MachO
     class SegmentCommand64 < SegmentCommand
       # @see MachOStructure::FORMAT
       # @api private
-      FORMAT = "L=2a16Q=4l=2L=2".freeze
+      FORMAT = "L=2Z16Q=4l=2L=2".freeze
 
       # @see MachOStructure::SIZEOF
       # @api private
@@ -510,6 +574,16 @@ module MachO
         [cmd, cmdsize, string_offsets[:name], timestamp, current_version,
          compatibility_version].pack(format) + string_payload
       end
+
+      # @return [Hash] a hash representation of this {DylibCommand}
+      def to_h
+        {
+          "name" => name.to_h,
+          "timestamp" => timestamp,
+          "current_version" => current_version,
+          "compatibility_version" => compatibility_version,
+        }.merge super
+      end
     end
 
     # A load command representing some aspect of the dynamic linker, depending
@@ -546,6 +620,13 @@ module MachO
         cmdsize = SIZEOF + string_payload.bytesize
         [cmd, cmdsize, string_offsets[:name]].pack(format) + string_payload
       end
+
+      # @return [Hash] a hash representation of this {DylinkerCommand}
+      def to_h
+        {
+          "name" => name.to_h,
+        }.merge super
+      end
     end
 
     # A load command used to indicate dynamic libraries used in prebinding.
@@ -575,6 +656,15 @@ module MachO
         @name = LCStr.new(self, name)
         @nmodules = nmodules
         @linked_modules = linked_modules
+      end
+
+      # @return [Hash] a hash representation of this {PreboundDylibCommand}
+      def to_h
+        {
+          "name" => name.to_h,
+          "nmodules" => nmodules,
+          "linked_modules" => linked_modules,
+        }.merge super
       end
     end
 
@@ -641,6 +731,20 @@ module MachO
         @reserved5 = reserved5
         @reserved6 = reserved6
       end
+
+      # @return [Hash] a hash representation of this {RoutinesCommand}
+      def to_h
+        {
+          "init_address" => init_address,
+          "init_module" => init_module,
+          "reserved1" => reserved1,
+          "reserved2" => reserved2,
+          "reserved3" => reserved3,
+          "reserved4" => reserved4,
+          "reserved5" => reserved5,
+          "reserved6" => reserved6,
+        }.merge super
+      end
     end
 
     # A load command containing the address of the dynamic shared library
@@ -675,6 +779,13 @@ module MachO
         super(view, cmd, cmdsize)
         @umbrella = LCStr.new(self, umbrella)
       end
+
+      # @return [Hash] a hash representation of this {SubFrameworkCommand}
+      def to_h
+        {
+          "umbrella" => umbrella.to_h,
+        }.merge super
+      end
     end
 
     # A load command signifying membership of a subumbrella containing the name
@@ -695,6 +806,13 @@ module MachO
       def initialize(view, cmd, cmdsize, sub_umbrella)
         super(view, cmd, cmdsize)
         @sub_umbrella = LCStr.new(self, sub_umbrella)
+      end
+
+      # @return [Hash] a hash representation of this {SubUmbrellaCommand}
+      def to_h
+        {
+          "sub_umbrella" => sub_umbrella.to_h,
+        }.merge super
       end
     end
 
@@ -717,6 +835,13 @@ module MachO
         super(view, cmd, cmdsize)
         @sub_library = LCStr.new(self, sub_library)
       end
+
+      # @return [Hash] a hash representation of this {SubLibraryCommand}
+      def to_h
+        {
+          "sub_library" => sub_library.to_h,
+        }.merge super
+      end
     end
 
     # A load command signifying a shared library that is a subframework of
@@ -738,6 +863,13 @@ module MachO
         super(view, cmd, cmdsize)
         @sub_client = LCStr.new(self, sub_client)
       end
+
+      # @return [Hash] a hash representation of this {SubClientCommand}
+      def to_h
+        {
+          "sub_client" => sub_client.to_h,
+        }.merge super
+      end
     end
 
     # A load command containing the offsets and sizes of the link-edit 4.3BSD
@@ -749,10 +881,10 @@ module MachO
       # @return [Integer] the number of symbol table entries
       attr_reader :nsyms
 
-      # @return the string table's offset
+      # @return [Integer] the string table's offset
       attr_reader :stroff
 
-      # @return the string table size in bytes
+      # @return [Integer] the string table size in bytes
       attr_reader :strsize
 
       # @see MachOStructure::FORMAT
@@ -770,6 +902,16 @@ module MachO
         @nsyms = nsyms
         @stroff = stroff
         @strsize = strsize
+      end
+
+      # @return [Hash] a hash representation of this {SymtabCommand}
+      def to_h
+        {
+          "symoff" => symoff,
+          "nsyms" => nsyms,
+          "stroff" => stroff,
+          "strsize" => strsize,
+        }.merge super
       end
     end
 
@@ -864,6 +1006,30 @@ module MachO
         @locreloff = locreloff
         @nlocrel = nlocrel
       end
+
+      # @return [Hash] a hash representation of this {DysymtabCommand}
+      def to_h
+        {
+          "ilocalsym" => ilocalsym,
+          "nlocalsym" => nlocalsym,
+          "iextdefsym" => iextdefsym,
+          "nextdefsym" => nextdefsym,
+          "iundefsym" => iundefsym,
+          "nundefsym" => nundefsym,
+          "tocoff" => tocoff,
+          "ntoc" => ntoc,
+          "modtaboff" => modtaboff,
+          "nmodtab" => nmodtab,
+          "extrefsymoff" => extrefsymoff,
+          "nextrefsyms" => nextrefsyms,
+          "indirectsymoff" => indirectsymoff,
+          "nindirectsyms" => nindirectsyms,
+          "extreloff" => extreloff,
+          "nextrel" => nextrel,
+          "locreloff" => locreloff,
+          "nlocrel" => nlocrel,
+        }.merge super
+      end
     end
 
     # A load command containing the offset and number of hints in the two-level
@@ -893,6 +1059,15 @@ module MachO
         @htoffset = htoffset
         @nhints = nhints
         @table = TwolevelHintsTable.new(view, htoffset, nhints)
+      end
+
+      # @return [Hash] a hash representation of this {TwolevelHintsCommand}
+      def to_h
+        {
+          "htoffset" => htoffset,
+          "nhints" => nhints,
+          "table" => table.hints.map(&:to_h),
+        }.merge super
       end
 
       # A representation of the two-level namespace lookup hints table exposed
@@ -927,6 +1102,14 @@ module MachO
             @isub_image = blob >> 24
             @itoc = blob & 0x00FFFFFF
           end
+
+          # @return [Hash] a hash representation of this {TwolevelHint}
+          def to_h
+            {
+              "isub_image" => isub_image,
+              "itoc" => itoc,
+            }
+          end
         end
       end
     end
@@ -949,6 +1132,13 @@ module MachO
       def initialize(view, cmd, cmdsize, cksum)
         super(view, cmd, cmdsize)
         @cksum = cksum
+      end
+
+      # @return [Hash] a hash representation of this {PrebindCksumCommand}
+      def to_h
+        {
+          "cksum" => cksum,
+        }.merge super
       end
     end
 
@@ -984,6 +1174,13 @@ module MachO
         cmdsize = SIZEOF + string_payload.bytesize
         [cmd, cmdsize, string_offsets[:path]].pack(format) + string_payload
       end
+
+      # @return [Hash] a hash representation of this {RpathCommand}
+      def to_h
+        {
+          "path" => path.to_h,
+        }.merge super
+      end
     end
 
     # A load command representing the offsets and sizes of a blob of data in
@@ -1010,6 +1207,14 @@ module MachO
         super(view, cmd, cmdsize)
         @dataoff = dataoff
         @datasize = datasize
+      end
+
+      # @return [Hash] a hash representation of this {LinkeditDataCommand}
+      def to_h
+        {
+          "dataoff" => dataoff,
+          "datasize" => datasize,
+        }.merge super
       end
     end
 
@@ -1040,20 +1245,20 @@ module MachO
         @cryptsize = cryptsize
         @cryptid = cryptid
       end
+
+      # @return [Hash] a hash representation of this {EncryptionInfoCommand}
+      def to_h
+        {
+          "cryptoff" => cryptoff,
+          "cryptsize" => cryptsize,
+          "cryptid" => cryptid,
+        }.merge super
+      end
     end
 
     # A load command representing the offset to and size of an encrypted
     # segment. Corresponds to LC_ENCRYPTION_INFO_64.
-    class EncryptionInfoCommand64 < LoadCommand
-      # @return [Integer] the offset to the encrypted segment
-      attr_reader :cryptoff
-
-      # @return [Integer] the size of the encrypted segment
-      attr_reader :cryptsize
-
-      # @return [Integer] the encryption system, or 0 if not encrypted yet
-      attr_reader :cryptid
-
+    class EncryptionInfoCommand64 < EncryptionInfoCommand
       # @return [Integer] 64-bit padding value
       attr_reader :pad
 
@@ -1067,11 +1272,15 @@ module MachO
 
       # @api private
       def initialize(view, cmd, cmdsize, cryptoff, cryptsize, cryptid, pad)
-        super(view, cmd, cmdsize)
-        @cryptoff = cryptoff
-        @cryptsize = cryptsize
-        @cryptid = cryptid
+        super(view, cmd, cmdsize, cryptoff, cryptsize, cryptid)
         @pad = pad
+      end
+
+      # @return [Hash] a hash representation of this {EncryptionInfoCommand64}
+      def to_h
+        {
+          "pad" => pad,
+        }.merge super
       end
     end
 
@@ -1121,6 +1330,16 @@ module MachO
 
         segs.join(".")
       end
+
+      # @return [Hash] a hash representation of this {VersionMinCommand}
+      def to_h
+        {
+          "version" => version,
+          "version_string" => version_string,
+          "sdk" => sdk,
+          "sdk_string" => sdk_string,
+        }.merge super
+      end
     end
 
     # A load command containing the minimum OS version on which
@@ -1156,6 +1375,40 @@ module MachO
         @tool_entries = ToolEntries.new(view, ntools)
       end
 
+      # A string representation of the binary's minimum OS version.
+      # @return [String] a string representing the minimum OS version.
+      def minos_string
+        binary = "%032b" % minos
+        segs = [
+          binary[0..15], binary[16..23], binary[24..31]
+        ].map { |s| s.to_i(2) }
+
+        segs.join(".")
+      end
+
+      # A string representation of the binary's SDK version.
+      # @return [String] a string representing the SDK version.
+      def sdk_string
+        binary = "%032b" % sdk
+        segs = [
+          binary[0..15], binary[16..23], binary[24..31]
+        ].map { |s| s.to_i(2) }
+
+        segs.join(".")
+      end
+
+      # @return [Hash] a hash representation of this {BuildVersionCommand}
+      def to_h
+        {
+          "platform" => platform,
+          "minos" => minos,
+          "minos_string" => minos_string,
+          "sdk" => sdk,
+          "sdk_string" => sdk_string,
+          "tool_entries" => tool_entries.tools.map(&:to_h),
+        }.merge super
+      end
+
       # A representation of the tool versions exposed
       # by a {BuildVersionCommand} (`LC_BUILD_VERSION`).
       class ToolEntries
@@ -1181,36 +1434,22 @@ module MachO
           # @return [Integer] the tool's version number
           attr_reader :version
 
-          # @param tool 32-bit integer
-          # # @param version 32-bit integer
+          # @param tool [Integer] 32-bit integer
+          # @param version [Integer] 32-bit integer
           # @api private
           def initialize(tool, version)
             @tool = tool
             @version = version
           end
+
+          # @return [Hash] a hash representation of this {Tool}
+          def to_h
+            {
+              "tool" => tool,
+              "version" => version,
+            }
+          end
         end
-      end
-
-      # A string representation of the binary's minimum OS version.
-      # @return [String] a string representing the minimum OS version.
-      def minos_string
-        binary = "%032b" % minos
-        segs = [
-          binary[0..15], binary[16..23], binary[24..31]
-        ].map { |s| s.to_i(2) }
-
-        segs.join(".")
-      end
-
-      # A string representation of the binary's SDK version.
-      # @return [String] a string representing the SDK version.
-      def sdk_string
-        binary = "%032b" % sdk
-        segs = [
-          binary[0..15], binary[16..23], binary[24..31]
-        ].map { |s| s.to_i(2) }
-
-        segs.join(".")
       end
     end
 
@@ -1272,6 +1511,22 @@ module MachO
         @export_off = export_off
         @export_size = export_size
       end
+
+      # @return [Hash] a hash representation of this {DyldInfoCommand}
+      def to_h
+        {
+          "rebase_off" => rebase_off,
+          "rebase_size" => rebase_size,
+          "bind_off" => bind_off,
+          "bind_size" => bind_size,
+          "weak_bind_off" => weak_bind_off,
+          "weak_bind_size" => weak_bind_size,
+          "lazy_bind_off" => lazy_bind_off,
+          "lazy_bind_size" => lazy_bind_size,
+          "export_off" => export_off,
+          "export_size" => export_size,
+        }.merge super
+      end
     end
 
     # A load command containing linker options embedded in object files.
@@ -1292,6 +1547,13 @@ module MachO
       def initialize(view, cmd, cmdsize, count)
         super(view, cmd, cmdsize)
         @count = count
+      end
+
+      # @return [Hash] a hash representation of this {LinkerOptionCommand}
+      def to_h
+        {
+          "count" => count,
+        }.merge super
       end
     end
 
@@ -1316,6 +1578,14 @@ module MachO
         super(view, cmd, cmdsize)
         @entryoff = entryoff
         @stacksize = stacksize
+      end
+
+      # @return [Hash] a hash representation of this {EntryPointCommand}
+      def to_h
+        {
+          "entryoff" => entryoff,
+          "stacksize" => stacksize,
+        }.merge super
       end
     end
 
@@ -1350,6 +1620,14 @@ module MachO
 
         segs.join(".")
       end
+
+      # @return [Hash] a hash representation of this {SourceVersionCommand}
+      def to_h
+        {
+          "version" => version,
+          "version_string" => version_string,
+        }.merge super
+      end
     end
 
     # An obsolete load command containing the offset and size of the (GNU style)
@@ -1374,6 +1652,14 @@ module MachO
         super(view, cmd, cmdsize)
         @offset = offset
         @size = size
+      end
+
+      # @return [Hash] a hash representation of this {SymsegCommand}
+      def to_h
+        {
+          "offset" => offset,
+          "size" => size,
+        }.merge super
       end
     end
 
@@ -1412,6 +1698,14 @@ module MachO
         @name = LCStr.new(self, name)
         @header_addr = header_addr
       end
+
+      # @return [Hash] a hash representation of this {FvmfileCommand}
+      def to_h
+        {
+          "name" => name.to_h,
+          "header_addr" => header_addr,
+        }.merge super
+      end
     end
 
     # An obsolete load command containing the path to a library to be loaded
@@ -1439,6 +1733,52 @@ module MachO
         @name = LCStr.new(self, name)
         @minor_version = minor_version
         @header_addr = header_addr
+      end
+
+      # @return [Hash] a hash representation of this {FvmlibCommand}
+      def to_h
+        {
+          "name" => name.to_h,
+          "minor_version" => minor_version,
+          "header_addr" => header_addr,
+        }.merge super
+      end
+    end
+
+    # A load command containing an owner name and offset/size for an arbitrary data region.
+    # Corresponds to LC_NOTE.
+    class NoteCommand < LoadCommand
+      # @return [String] the name of the owner for this note
+      attr_reader :data_owner
+
+      # @return [Integer] the offset, within the file, of the note
+      attr_reader :offset
+
+      # @return [Integer] the size, in bytes, of the note
+      attr_reader :size
+
+      # @see MachOStructure::FORMAT
+      # @api private
+      FORMAT = "L=2Z16Q=2".freeze
+
+      # @see MachOStructure::SIZEOF
+      # @api private
+      SIZEOF = 48
+
+      def initialize(view, cmd, cmdsize, data_owner, offset, size)
+        super(view, cmd, cmdsize)
+        @data_owner = data_owner
+        @offset = offset
+        @size = size
+      end
+
+      # @return [Hash] a hash representation of this {NoteCommand}
+      def to_h
+        {
+          "data_owner" => data_owner,
+          "offset" => offset,
+          "size" => size,
+        }.merge super
       end
     end
   end

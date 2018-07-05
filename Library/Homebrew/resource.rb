@@ -118,7 +118,7 @@ class Resource
       if block_given?
         yield ResourceStageContext.new(self, staging)
       elsif target
-        target = Pathname.new(target) unless target.is_a? Pathname
+        target = Pathname(target)
         target.install Pathname.pwd.children
       end
     end

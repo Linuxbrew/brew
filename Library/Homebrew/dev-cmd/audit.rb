@@ -216,7 +216,7 @@ module Homebrew
 
     def initialize(formula, options = {})
       @formula = formula
-      @new_formula = options[:new_formula]
+      @new_formula = options[:new_formula] && !formula.versioned_formula?
       @strict = options[:strict]
       @online = options[:online]
       @display_cop_names = options[:display_cop_names]
@@ -236,6 +236,7 @@ module Homebrew
       return unless @style_offenses
       @style_offenses.each do |offense|
         if offense.cop_name.start_with?("NewFormulaAudit")
+          next if formula.versioned_formula?
           new_formula_problem offense.to_s(display_cop_name: @display_cop_names)
           next
         end
@@ -416,7 +417,6 @@ module Homebrew
           end
 
           next unless @new_formula
-          next if formula.versioned_formula?
           next unless @official_tap
           if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
             new_formula_problem "Formulae should not have #{dep.tags} dependencies."
@@ -571,8 +571,19 @@ module Homebrew
         end
       end
 
-      if @new_formula && formula.head
-        new_formula_problem "Formulae should not have a HEAD spec"
+      if formula.head || formula.devel
+        unstable_spec_message = "Formulae should not have an unstable spec"
+        if @new_formula
+          new_formula_problem unstable_spec_message
+        elsif formula.versioned_formula?
+          versioned_unstable_spec = %w[
+            bash-completion@2
+            imagemagick@6
+            openssl@1.1
+            python@2
+          ]
+          problem unstable_spec_message unless versioned_unstable_spec.include?(formula.name)
+        end
       end
 
       throttled = %w[
@@ -586,7 +597,7 @@ module Homebrew
       throttled.each_slice(2).to_a.map do |a, b|
         next if formula.stable.nil?
         version = formula.stable.version.to_s.split(".").last.to_i
-        if @strict && a.include?(formula.name) && version.modulo(b.to_i).nonzero?
+        if @strict && a == formula.name && version.modulo(b.to_i).nonzero?
           problem "should only be updated every #{b} releases on multiples of #{b}"
         end
       end

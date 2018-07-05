@@ -76,4 +76,22 @@ describe Formatter do
       expect(described_class.pluralize(2, "new formula")).to eq("2 new formulae")
     end
   end
+
+  describe "::comma_and" do
+    it "returns nil if given no arguments" do
+      expect(described_class.comma_and).to be nil
+    end
+
+    it "returns the input as string if there is only one argument" do
+      expect(described_class.comma_and(1)).to eq("1")
+    end
+
+    it "concatenates two items with “and”" do
+      expect(described_class.comma_and(1, 2)).to eq("1 and 2")
+    end
+
+    it "concatenates all items with a comma and appends the last with “and”" do
+      expect(described_class.comma_and(1, 2, 3)).to eq("1, 2 and 3")
+    end
+  end
 end

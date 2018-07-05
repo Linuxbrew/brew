@@ -1,20 +1,22 @@
-language: c
+language: ruby
+rvm: system
+
 cache:
   directories:
     - $HOME/Library/Caches/Homebrew/style
     - $HOME/Library/Caches/Homebrew/tests
     - Library/Homebrew/vendor/bundle
+
 branches:
   only:
     - master
+
 matrix:
   fast_finish: true
   include:
     - os: osx
-      compiler: clang
-      osx_image: xcode9.2
+      osx_image: xcode9.4
     - os: linux
-      compiler: gcc
       sudo: false
 
 before_install:

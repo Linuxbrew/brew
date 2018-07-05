@@ -156,6 +156,18 @@ shared_examples EnvActivation do
       expect(subject["FOO"]).to eq "bar"
     end
   end
+
+  describe "#compiler_any_clang?" do
+    it "returns true for llvm_clang" do
+      expect(subject.compiler_any_clang?(:llvm_clang)).to be true
+    end
+  end
+
+  describe "#compiler_with_cxx11_support?" do
+    it "returns true for gcc-4.9" do
+      expect(subject.compiler_with_cxx11_support?("gcc-4.9")).to be true
+    end
+  end
 end
 
 describe Stdenv do
