@@ -112,10 +112,10 @@ module Formulary
         resource = Resource.new(formula_name) { url bottle_name }
         resource.specs[:bottle] = true
         downloader = CurlDownloadStrategy.new resource.name, resource
-        @bottle_filename = downloader.cached_location
-        cached = @bottle_filename.exist?
+        cached = downloader.cached_location.exist?
         downloader.fetch
         ohai "Pouring the cached bottle" if cached
+        @bottle_filename = downloader.cached_location
       else
         @bottle_filename = Pathname(bottle_name).realpath
       end
