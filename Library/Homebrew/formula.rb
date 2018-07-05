@@ -1518,7 +1518,7 @@ class Formula
 
   # Returns a list of Dependency objects that are required at runtime.
   # @private
-  def runtime_dependencies(read_from_tab: true)
+  def runtime_dependencies(read_from_tab: true, undeclared: true)
     if read_from_tab &&
        (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
@@ -1529,6 +1529,7 @@ class Formula
       end.compact
     end
 
+    return declared_runtime_dependencies unless undeclared
     declared_runtime_dependencies | undeclared_runtime_dependencies
   end
 
