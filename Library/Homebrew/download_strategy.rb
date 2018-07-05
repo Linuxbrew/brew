@@ -90,20 +90,6 @@ class AbstractDownloadStrategy
   def quiet_safe_system(*args)
     safe_system(*expand_safe_system_args(args))
   end
-
-  private
-
-  def xzpath
-    "#{HOMEBREW_PREFIX}/opt/xz/bin/xz"
-  end
-
-  def lzippath
-    "#{HOMEBREW_PREFIX}/opt/lzip/bin/lzip"
-  end
-
-  def lhapath
-    "#{HOMEBREW_PREFIX}/opt/lha/bin/lha"
-  end
 end
 
 class VCSDownloadStrategy < AbstractDownloadStrategy
@@ -191,43 +177,47 @@ end
 
 class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
-    case type = cached_location.compression_type
+    path = cached_location
+    unpack_dir = Pathname.pwd
+
+    case type = path.compression_type
     when :zip
-      quiet_safe_system "unzip", "-qq", cached_location
+      safe_system "unzip", "-qq", path, "-d", unpack_dir
       chdir
     when :gzip_only
-      buffered_write "gunzip"
+      FileUtils.cp path, unpack_dir, preserve: true
+      safe_system "gunzip", "-q", "-N", unpack_dir/path.basename
     when :bzip2_only
-      buffered_write "bunzip2"
+      FileUtils.cp path, unpack_dir, preserve: true
+      safe_system "bunzip2", "-q", unpack_dir/path.basename
     when :gzip, :bzip2, :xz, :compress, :tar
-      tar_flags = "x"
-      if type == :gzip
-        tar_flags << "z"
-      elsif type == :bzip2
-        tar_flags << "j"
-      elsif type == :xz
-        tar_flags << "J"
-      end
-      tar_flags << "f"
       if type == :xz && DependencyCollector.tar_needs_xz_dependency?
-        pipe_to_tar xzpath
+        pipe_to_tar "#{HOMEBREW_PREFIX}/opt/xz/bin/xz", unpack_dir
       else
-        safe_system "tar", tar_flags, cached_location
+        flags = if type == :gzip
+          ["-z"]
+        elsif type == :bzip2
+          ["-j"]
+        elsif type == :xz
+          ["-J"]
+        end
+
+        safe_system "tar", "-x", *flags, "-f", path, "-C", unpack_dir
       end
       chdir
     when :lzip
-      pipe_to_tar lzippath
+      pipe_to_tar "#{HOMEBREW_PREFIX}/opt/lzip/bin/lzip", unpack_dir
       chdir
     when :lha
-      safe_system lhapath, "x", cached_location
+      safe_system "#{HOMEBREW_PREFIX}/opt/lha/bin/lha", "xq2w=#{unpack_dir}", path
     when :xar
-      safe_system "/usr/bin/xar", "-xf", cached_location
+      safe_system "xar", "-x", "-f", path, "-C", unpack_dir
     when :rar
-      quiet_safe_system "unrar", "x", "-inul", cached_location
+      safe_system "unrar", "x", "-inul", path, unpack_dir
     when :p7zip
-      safe_system "7zr", "x", cached_location
+      safe_system "7zr", "x", "-y", "-bd", "-bso0", path, "-o#{unpack_dir}"
     else
-      cp cached_location, basename_without_params, preserve: true
+      cp path, unpack_dir/basename_without_params, preserve: true
     end
   end
 
@@ -245,25 +235,13 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     end
   end
 
-  def pipe_to_tar(tool)
-    Utils.popen_read(tool, "-dc", cached_location.to_s) do |rd|
-      Utils.popen_write("tar", "xf", "-") do |wr|
+  def pipe_to_tar(tool, unpack_dir)
+    path = cached_location
+
+    Utils.popen_read(tool, "-dc", path) do |rd|
+      Utils.popen_write("tar", "-x", "-f", "-", "-C", unpack_dir) do |wr|
         buf = ""
         wr.write(buf) while rd.read(16384, buf)
-      end
-    end
-  end
-
-  # gunzip and bunzip2 write the output file in the same directory as the input
-  # file regardless of the current working directory, so we need to write it to
-  # the correct location ourselves.
-  def buffered_write(tool)
-    target = File.basename(basename_without_params, cached_location.extname)
-
-    Utils.popen_read(tool, "-f", cached_location.to_s, "-c") do |pipe|
-      File.open(target, "wb") do |f|
-        buf = ""
-        f.write(buf) while pipe.read(16384, buf)
       end
     end
   end
