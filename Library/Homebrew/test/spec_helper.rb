@@ -166,3 +166,4 @@ end
 
 RSpec::Matchers.define_negated_matcher :not_to_output, :output
 RSpec::Matchers.alias_matcher :have_failed, :be_failed
+RSpec::Matchers.alias_matcher :a_string_containing, :include
