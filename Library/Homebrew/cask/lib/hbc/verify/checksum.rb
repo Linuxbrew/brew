@@ -29,7 +29,7 @@ module Hbc
       end
 
       def computed
-        @computed ||= Digest::SHA2.file(downloaded_path).hexdigest
+        @computed ||= downloaded_path.sha256
       end
 
       def verify_checksum
