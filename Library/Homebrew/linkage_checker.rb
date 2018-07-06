@@ -149,7 +149,8 @@ class LinkageChecker
     declared_deps_names = declared_deps_full_names.map do |dep|
       dep.split("/").last
     end
-    recursive_deps = formula.declared_runtime_dependencies.map do |dep|
+    recursive_deps = formula.runtime_dependencies(undeclared: false)
+                            .map do |dep|
       begin
         dep.to_formula.name
       rescue FormulaUnavailableError
