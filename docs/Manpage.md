@@ -243,7 +243,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Homebrew-provided GCC 4.9. In order to use LLVM's clang, use
     `llvm_clang`. To specify the Apple-provided clang, use `clang`. This
     parameter will only accept compilers that are provided by Homebrew or
-    bundled with MacOS. Please do not file issues if you encounter errors
+    bundled with macOS. Please do not file issues if you encounter errors
     while using this flag.
 
     If `--build-from-source` (or `-s`) is passed, compile the specified `formula` from
