@@ -76,6 +76,8 @@ class AbstractDownloadStrategy
   end
 
   def basename_without_params
+    return unless @url
+
     # Strip any ?thing=wad out of .c?thing=wad style extensions
     File.basename(@url)[/[^?]+/]
   end
