@@ -31,7 +31,7 @@ class UnpackStrategy
     magic_number = if path.directory?
       ""
     else
-      File.binread(path, MAX_MAGIC_NUMBER_LENGTH)
+      File.binread(path, MAX_MAGIC_NUMBER_LENGTH) || ""
     end
 
     strategy = strategies.detect do |s|
@@ -40,7 +40,7 @@ class UnpackStrategy
 
     # This is so that bad files produce good error messages.
     strategy ||= case path.extname
-    when ".tar.gz", ".tgz", ".tar.bz2", ".tbz", ".tar.xz", ".txz"
+    when ".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tbz", ".tar.xz", ".txz"
       TarUnpackStrategy
     when ".zip"
       ZipUnpackStrategy
@@ -58,15 +58,10 @@ class UnpackStrategy
   end
 
   def extract(to: nil, basename: nil)
+    basename ||= path.basename
     unpack_dir = Pathname(to || Dir.pwd).expand_path
     unpack_dir.mkpath
     extract_to_dir(unpack_dir, basename: basename)
-  end
-
-  private
-
-  def extract_to_dir(_unpack_dir, basename:)
-    raise NotImplementedError
   end
 end
 
@@ -83,10 +78,6 @@ class DirectoryUnpackStrategy < UnpackStrategy
 end
 
 class UncompressedUnpackStrategy < UnpackStrategy
-  def self.can_extract?(path:, magic_number:)
-    false
-  end
-
   private
 
   def extract_to_dir(unpack_dir, basename:)

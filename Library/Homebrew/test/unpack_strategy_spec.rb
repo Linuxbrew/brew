@@ -1,127 +1,192 @@
 require "unpack_strategy"
 
-describe UnpackStrategy, :focus do
-  matcher :be_detected_as_a do |klass|
-    match do |expected|
-      @detected = described_class.detect(expected)
-      @detected.is_a?(klass)
-    end
+RSpec.shared_examples "UnpackStrategy::detect" do
+  it "is correctly detected" do
+    expect(UnpackStrategy.detect(path)).to be_a described_class
+  end
+end
 
-    failure_message do
-      <<~EOS
-        expected: #{klass}
-        detected: #{@detected}
-      EOS
+RSpec.shared_examples "#extract" do |children: []|
+  specify "#extract" do
+    mktmpdir do |unpack_dir|
+      described_class.new(path).extract(to: unpack_dir)
+      expect(unpack_dir.children(false).map(&:to_s)).to match_array children
     end
   end
+end
 
-  describe "::detect" do
-    it "correctly detects JAR files" do
-      expect(TEST_FIXTURE_DIR/"test.jar").to be_detected_as_a UncompressedUnpackStrategy
+describe UncompressedUnpackStrategy do
+  let(:path) {
+    (mktmpdir/"test").tap do |path|
+      FileUtils.touch path
     end
+  }
 
-    it "correctly detects ZIP files" do
-      expect(TEST_FIXTURE_DIR/"cask/MyFancyApp.zip").to be_detected_as_a ZipUnpackStrategy
-    end
+  include_examples "UnpackStrategy::detect"
+end
 
-    it "correctly detects BZIP2 files" do
-      expect(TEST_FIXTURE_DIR/"cask/container.bz2").to be_detected_as_a Bzip2UnpackStrategy
-    end
+describe P7ZipUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/container.7z" }
 
-    it "correctly detects GZIP files" do
-      expect(TEST_FIXTURE_DIR/"cask/container.gz").to be_detected_as_a GzipUnpackStrategy
-    end
+  include_examples "UnpackStrategy::detect"
+end
 
-    it "correctly detects compressed TAR files" do
-      expect(TEST_FIXTURE_DIR/"cask/container.tar.gz").to be_detected_as_a TarUnpackStrategy
-    end
+describe XarUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/container.xar" }
 
-    it "correctly detects 7-ZIP files" do
-      expect(TEST_FIXTURE_DIR/"cask/container.7z").to be_detected_as_a P7ZipUnpackStrategy
-    end
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["container"]
+end
 
-    it "correctly detects XAR files" do
-      expect(TEST_FIXTURE_DIR/"cask/container.xar").to be_detected_as_a XarUnpackStrategy
-    end
+describe XzUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/container.xz" }
 
-    it "correctly detects XZ files" do
-      expect(TEST_FIXTURE_DIR/"cask/container.xz").to be_detected_as_a XzUnpackStrategy
-    end
+  include_examples "UnpackStrategy::detect"
+end
 
-    it "correctly detects RAR files" do
-      expect(TEST_FIXTURE_DIR/"cask/container.rar").to be_detected_as_a RarUnpackStrategy
-    end
+describe RarUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/container.rar" }
 
-    it "correctly detects LZIP files" do
-      expect(TEST_FIXTURE_DIR/"test.lz").to be_detected_as_a LzipUnpackStrategy
-    end
+  include_examples "UnpackStrategy::detect"
+end
 
-    it "correctly detects LHA files" do
-      expect(TEST_FIXTURE_DIR/"test.lha").to be_detected_as_a LhaUnpackStrategy
-    end
+describe LzipUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"test.lz" }
 
-    it "correctly detects Git repositories" do
-      mktmpdir do |repo|
-        system "git", "-C", repo, "init"
+  include_examples "UnpackStrategy::detect"
+end
 
-        expect(repo).to be_detected_as_a GitUnpackStrategy
+describe LhaUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"test.lha" }
+
+  include_examples "UnpackStrategy::detect"
+end
+
+describe JarUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"test.jar" }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["test.jar"]
+end
+
+describe ZipUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/MyFancyApp.zip" }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["MyFancyApp"]
+
+  context "when ZIP archive is corrupted" do
+    let(:path) {
+      (mktmpdir/"test.zip").tap do |path|
+        FileUtils.touch path
       end
-    end
+    }
 
-    it "correctly detects Subversion repositories" do
-      mktmpdir do |path|
-        repo = path/"repo"
-        working_copy = path/"working_copy"
+    include_examples "UnpackStrategy::detect"
+  end
+end
 
-        system "svnadmin", "create", repo
-        system "svn", "checkout", "file://#{repo}", working_copy
+describe GzipUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/container.gz" }
 
-        expect(working_copy).to be_detected_as_a SubversionUnpackStrategy
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["container"]
+end
+
+describe Bzip2UnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/container.bz2" }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["container"]
+end
+
+describe TarUnpackStrategy do
+  let(:path) { TEST_FIXTURE_DIR/"cask/container.tar.gz" }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["container"]
+
+  context "when TAR archive is corrupted" do
+    let(:path) {
+      (mktmpdir/"test.tar").tap do |path|
+        FileUtils.touch path
       end
-    end
+    }
+
+    include_examples "UnpackStrategy::detect"
   end
 end
 
 describe GitUnpackStrategy do
-  describe "#extract" do
-    it "correctly extracts a Subversion repository" do
-      mktmpdir do |path|
-        repo = path/"repo"
+  let(:repo) {
+    mktmpdir.tap do |repo|
+      system "git", "-C", repo, "init"
 
-        repo.mkpath
-
-        system "git", "-C", repo, "init"
-
-        FileUtils.touch repo/"test"
-        system "git", "-C", repo, "add", "test"
-        system "git", "-C", repo, "commit", "-m", "Add `test` file."
-
-        unpack_dir = path/"unpack_dir"
-        GitUnpackStrategy.new(repo).extract(to: unpack_dir)
-        expect(unpack_dir.children(false).map(&:to_s)).to match_array [".git", "test"]
-      end
+      FileUtils.touch repo/"test"
+      system "git", "-C", repo, "add", "test"
+      system "git", "-C", repo, "commit", "-m", "Add `test` file."
     end
-  end
+  }
+  let(:path) { repo }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: [".git", "test"]
 end
 
 describe SubversionUnpackStrategy do
-  describe "#extract" do
-    it "correctly extracts a Subversion repository" do
-      mktmpdir do |path|
-        repo = path/"repo"
-        working_copy = path/"working_copy"
-
-        system "svnadmin", "create", repo
-        system "svn", "checkout", "file://#{repo}", working_copy
-
-        FileUtils.touch working_copy/"test"
-        system "svn", "add", working_copy/"test"
-        system "svn", "commit", working_copy, "-m", "Add `test` file."
-
-        unpack_dir = path/"unpack_dir"
-        SubversionUnpackStrategy.new(working_copy).extract(to: unpack_dir)
-        expect(unpack_dir.children(false).map(&:to_s)).to match_array ["test"]
-      end
+  let(:repo) {
+    mktmpdir.tap do |repo|
+      system "svnadmin", "create", repo
     end
-  end
+  }
+  let(:working_copy) {
+    mktmpdir.tap do |working_copy|
+      system "svn", "checkout", "file://#{repo}", working_copy
+
+      FileUtils.touch working_copy/"test"
+      system "svn", "add", working_copy/"test"
+      system "svn", "commit", working_copy, "-m", "Add `test` file."
+    end
+  }
+  let(:path) { working_copy }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["test"]
+end
+
+describe CvsUnpackStrategy do
+  let(:repo) {
+    mktmpdir.tap do |repo|
+      FileUtils.touch repo/"test"
+      (repo/"CVS").mkpath
+    end
+  }
+  let(:path) { repo }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["CVS", "test"]
+end
+
+describe BazaarUnpackStrategy do
+  let(:repo) {
+    mktmpdir.tap do |repo|
+      FileUtils.touch repo/"test"
+      (repo/".bzr").mkpath
+    end
+  }
+  let(:path) { repo }
+
+  include_examples "UnpackStrategy::detect"
+  include_examples "#extract", children: ["test"]
+end
+
+describe MercurialUnpackStrategy do
+  let(:repo) {
+    mktmpdir.tap do |repo|
+      (repo/".hg").mkpath
+    end
+  }
+  let(:path) { repo }
+
+  include_examples "UnpackStrategy::detect"
 end
