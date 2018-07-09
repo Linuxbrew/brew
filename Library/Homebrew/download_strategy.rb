@@ -47,7 +47,7 @@ class AbstractDownloadStrategy
   # chdir into the newly-unpacked directory.
   # Unlike {Resource#stage}, this does not take a block.
   def stage
-    UnpackStrategy.detect(cached_location)
+    UnpackStrategy.detect(cached_location, ref_type: @ref_type, ref: @ref)
                   .extract(basename: basename_without_params)
   end
 

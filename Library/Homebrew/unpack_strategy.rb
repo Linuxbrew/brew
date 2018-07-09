@@ -27,7 +27,7 @@ class UnpackStrategy
   end
   private_class_method :strategies
 
-  def self.detect(path)
+  def self.detect(path, ref_type: nil, ref: nil)
     magic_number = if path.directory?
       ""
     else
@@ -48,13 +48,15 @@ class UnpackStrategy
       UncompressedUnpackStrategy
     end
 
-    strategy.new(path)
+    strategy.new(path, ref_type: ref_type, ref: ref)
   end
 
   attr_reader :path
 
-  def initialize(path)
+  def initialize(path, ref_type: nil, ref: nil)
     @path = Pathname(path).expand_path
+    @ref_type = ref_type
+    @ref = ref
   end
 
   def extract(to: nil, basename: nil)
