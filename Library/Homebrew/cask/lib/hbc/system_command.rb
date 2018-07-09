@@ -137,48 +137,35 @@ module Hbc
         @exit_status = exit_status
       end
 
-      def plist
-        @plist ||= self.class._parse_plist(@command, @stdout.dup)
-      end
-
       def success?
         @exit_status.zero?
       end
 
-      def merged_output
-        @merged_output ||= @stdout + @stderr
-      end
+      def plist
+        @plist ||= begin
+          output = stdout
 
-      def to_s
-        @stdout
-      end
+          if /\A(?<garbage>.*?)<\?\s*xml/m =~ output
+            output = output.sub(/\A#{Regexp.escape(garbage)}/m, "")
+            warn_plist_garbage(garbage)
+          end
 
-      def self._warn_plist_garbage(command, garbage)
-        return true unless garbage =~ /\S/
-        external = File.basename(command.first)
-        lines = garbage.strip.split("\n")
-        opoo "Non-XML stdout from #{external}:"
-        $stderr.puts lines.map { |l| "    #{l}" }
-      end
+          if %r{<\s*/\s*plist\s*>(?<garbage>.*?)\Z}m =~ output
+            output = output.sub(/#{Regexp.escape(garbage)}\Z/, "")
+            warn_plist_garbage(garbage)
+          end
 
-      def self._parse_plist(command, output)
-        raise CaskError, "Empty plist input" unless output =~ /\S/
-        output.sub!(/\A(.*?)(<\?\s*xml)/m, '\2')
-        _warn_plist_garbage(command, Regexp.last_match[1]) if ARGV.debug?
-        output.sub!(%r{(<\s*/\s*plist\s*>)(.*?)\Z}m, '\1')
-        _warn_plist_garbage(command, Regexp.last_match[2])
-        xml = Plist.parse_xml(output)
-        unless xml.respond_to?(:keys) && !xml.keys.empty?
-          raise CaskError, <<~EOS
-            Empty result parsing plist output from command.
-              command was:
-              #{command}
-              output we attempted to parse:
-              #{output}
-          EOS
+          Plist.parse_xml(output)
         end
-        xml
       end
+
+      def warn_plist_garbage(garbage)
+        return unless ARGV.verbose?
+        return unless garbage =~ /\S/
+        opoo "Received non-XML output from #{Formatter.identifier(command.first)}:"
+        $stderr.puts garbage.strip
+      end
+      private :warn_plist_garbage
     end
   end
 end

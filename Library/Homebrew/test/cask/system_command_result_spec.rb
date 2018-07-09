@@ -1,10 +1,21 @@
 require "hbc/system_command"
 
 describe Hbc::SystemCommand::Result, :cask do
-  describe "::_parse_plist" do
-    subject { described_class._parse_plist(command, input) }
+  describe "#plist" do
+    subject { described_class.new(command, stdout, "", 0).plist }
 
-    let(:command) { Hbc::SystemCommand.new("/usr/bin/true", {}) }
+    let(:command) { ["/usr/bin/true"] }
+    let(:garbage) {
+      <<~EOS
+        Hello there! I am in no way XML am I?!?!
+
+          That's a little silly... you were expecting XML here!
+
+        What is a parser to do?
+
+        Hopefully <not> explode!
+      EOS
+    }
     let(:plist) {
       <<~EOS
         <?xml version="1.0" encoding="UTF-8"?>
@@ -53,29 +64,56 @@ describe Hbc::SystemCommand::Result, :cask do
       EOS
     }
 
-    context "when output contains garbage" do
-      let(:input) {
+    context "when stdout contains garbage before XML" do
+      let(:stdout) {
         <<~EOS
-          Hello there! I am in no way XML am I?!?!
-
-            That's a little silly... you were expexting XML here!
-
-          What is a parser to do?
-
-          Hopefully <not> explode!
-
+          #{garbage}
           #{plist}
         EOS
       }
 
-      it "ignores garbage before xml" do
-        expect(subject.keys).to eq(["system-entities"])
+      it "ignores garbage" do
         expect(subject["system-entities"].length).to eq(3)
+      end
+
+      context "when verbose" do
+        before(:each) do
+          allow(ARGV).to receive(:verbose?).and_return(true)
+        end
+
+        it "warns about garbage" do
+          expect { subject }
+            .to output(a_string_containing(garbage)).to_stderr
+        end
       end
     end
 
-    context "given a hdiutil output as input" do
-      let(:input) { plist }
+    context "when stdout contains garbage after XML" do
+      let(:stdout) {
+        <<~EOS
+          #{plist}
+          #{garbage}
+        EOS
+      }
+
+      it "ignores garbage" do
+        expect(subject["system-entities"].length).to eq(3)
+      end
+
+      context "when verbose" do
+        before(:each) do
+          allow(ARGV).to receive(:verbose?).and_return(true)
+        end
+
+        it "warns about garbage" do
+          expect { subject }
+            .to output(a_string_containing(garbage)).to_stderr
+        end
+      end
+    end
+
+    context "given a hdiutil stdout" do
+      let(:stdout) { plist }
 
       it "successfully parses it" do
         expect(subject.keys).to eq(["system-entities"])
@@ -85,11 +123,11 @@ describe Hbc::SystemCommand::Result, :cask do
       end
     end
 
-    context "given an empty input" do
-      let(:input) { "" }
+    context "when the stdout of the command is empty" do
+      let(:stdout) { "" }
 
-      it "raises an error" do
-        expect { subject }.to raise_error(Hbc::CaskError, /Empty plist input/)
+      it "returns nil" do
+        expect(subject).to be nil
       end
     end
   end
