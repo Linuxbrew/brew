@@ -134,10 +134,8 @@ class Pathname
   end
   private :install_symlink_p
 
-  if method_defined?(:write)
-    # @private
-    alias old_write write
-  end
+  # @private
+  alias old_write write
 
   # we assume this pathname object is a file obviously
   def write(content, *open_args)
@@ -150,18 +148,6 @@ class Pathname
   def append_lines(content, *open_args)
     raise "Cannot append file that doesn't exist: #{self}" unless exist?
     open("a", *open_args) { |f| f.puts(content) }
-  end
-
-  unless method_defined?(:binwrite)
-    def binwrite(contents, *open_args)
-      open("wb", *open_args) { |f| f.write(contents) }
-    end
-  end
-
-  unless method_defined?(:binread)
-    def binread(*open_args)
-      open("rb", *open_args, &:read)
-    end
   end
 
   # NOTE always overwrites
@@ -279,7 +265,7 @@ class Pathname
     raise ChecksumMismatchError.new(self, expected, actual) unless expected == actual
   end
 
-  alias to_str to_s unless method_defined?(:to_str)
+  alias to_str to_s
 
   def cd
     Dir.chdir(self) { yield self }
@@ -308,15 +294,6 @@ class Pathname
   def make_relative_symlink(src)
     dirname.mkpath
     File.symlink(src.relative_path_from(dirname), self)
-  end
-
-  unless method_defined?(:/)
-    def /(other)
-      if !other.respond_to?(:to_str) && !other.respond_to?(:to_path)
-        odisabled "Pathname#/ with #{other.class}", "a String or a Pathname"
-      end
-      join(other.to_s)
-    end
   end
 
   # @private

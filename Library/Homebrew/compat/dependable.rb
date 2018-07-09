@@ -1,7 +1,7 @@
 module Dependable
   module Compat
     def run?
-      odeprecated "Dependable#run?"
+      odisabled "Dependable#run?"
       tags.include? :run
     end
   end

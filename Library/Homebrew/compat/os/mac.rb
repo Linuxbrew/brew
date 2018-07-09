@@ -3,7 +3,7 @@ module OS
     class << self
       module Compat
         def release
-          odeprecated "MacOS.release", "MacOS.version"
+          odisabled "MacOS.release", "MacOS.version"
           version
         end
       end

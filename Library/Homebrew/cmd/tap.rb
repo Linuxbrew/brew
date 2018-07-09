@@ -39,7 +39,7 @@ module Homebrew
     if ARGV.include? "--repair"
       Tap.each(&:link_completions_and_manpages)
     elsif ARGV.include? "--list-official"
-      odeprecated("brew tap --list-official")
+      odisabled("brew tap --list-official")
     elsif ARGV.include? "--list-pinned"
       puts Tap.select(&:pinned?).map(&:name)
     elsif ARGV.named.empty?

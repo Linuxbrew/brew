@@ -43,16 +43,6 @@ module FileUtils
     end
   end
 
-  if method_defined?(:ruby)
-    # @private
-    alias old_ruby ruby
-  end
-
-  # Run the `ruby` Homebrew is using rather than whatever is in the `PATH`.
-  def ruby(*args)
-    system RUBY_PATH, *args
-  end
-
   # Run `xcodebuild` without Homebrew's compiler environment variables set.
   def xcodebuild(*args)
     removed = ENV.remove_cc_etc
