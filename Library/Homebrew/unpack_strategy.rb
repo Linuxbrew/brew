@@ -151,7 +151,7 @@ class CompressUnpackStrategy < TarUnpackStrategy
   end
 end
 
-class XzUnpackStrategy < UnpackStrategy
+class XzUnpackStrategy < UncompressedUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\A\xFD7zXZ\x00/n)
   end
@@ -159,11 +159,8 @@ class XzUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    unpack_path = unpack_dir/path.basename
-    FileUtils.cp path, unpack_path, preserve: true
-
-    safe_system Formula["xz"].opt_bin/"xz", "-d", "-q", "-T0", unpack_path
-
+    super
+    safe_system Formula["xz"].opt_bin/"xz", "-d", "-q", "-T0", unpack_dir/basename
     extract_nested_tar(unpack_dir, basename: basename)
   end
 
@@ -180,7 +177,7 @@ class XzUnpackStrategy < UnpackStrategy
   end
 end
 
-class Bzip2UnpackStrategy < UnpackStrategy
+class Bzip2UnpackStrategy < UncompressedUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\ABZh/n)
   end
@@ -188,14 +185,12 @@ class Bzip2UnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    unpack_path = unpack_dir/path.basename
-    FileUtils.cp path, unpack_path, preserve: true
-
-    safe_system "bunzip2", "-q", unpack_path
+    super
+    safe_system "bunzip2", "-q", unpack_dir/basename
   end
 end
 
-class GzipUnpackStrategy < UnpackStrategy
+class GzipUnpackStrategy < UncompressedUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\A\037\213/n)
   end
@@ -203,14 +198,12 @@ class GzipUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    unpack_path = unpack_dir/path.basename
-    FileUtils.cp path, unpack_path, preserve: true
-
-    safe_system "gunzip", "-q", "-N", unpack_path
+    super
+    safe_system "gunzip", "-q", "-N", unpack_dir/basename
   end
 end
 
-class LzipUnpackStrategy < UnpackStrategy
+class LzipUnpackStrategy < UncompressedUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\ALZIP/n)
   end
@@ -218,10 +211,8 @@ class LzipUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    unpack_path = unpack_dir/path.basename
-    FileUtils.cp path, unpack_path, preserve: true
-
-    safe_system Formula["lzip"].opt_bin/"lzip", "-d", "-q", unpack_path
+    super
+    safe_system Formula["lzip"].opt_bin/"lzip", "-d", "-q", unpack_dir/basename
   end
 end
 
