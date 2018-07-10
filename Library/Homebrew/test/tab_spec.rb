@@ -242,7 +242,7 @@ describe Tab do
       expect(tab.runtime_dependencies).to be nil
     end
 
-    it "raises an parse exception message including the Tab filename" do
+    it "raises a parse exception message including the Tab filename" do
       expect { described_class.from_file_content("''", "receipt.json") }.to raise_error(JSON::ParserError, /receipt.json:/)
     end
   end
