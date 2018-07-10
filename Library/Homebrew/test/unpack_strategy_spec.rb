@@ -31,7 +31,7 @@ describe P7ZipUnpackStrategy do
   include_examples "UnpackStrategy::detect"
 end
 
-describe XarUnpackStrategy do
+describe XarUnpackStrategy, :needs_macos do
   let(:path) { TEST_FIXTURE_DIR/"cask/container.xar" }
 
   include_examples "UnpackStrategy::detect"
