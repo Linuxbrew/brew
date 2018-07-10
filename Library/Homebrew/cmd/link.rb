@@ -40,7 +40,7 @@ module Homebrew
         elsif (MacOS.version >= :mojave ||
                MacOS::Xcode.version >= "10.0" ||
                MacOS::CLT.version >= "10.0") &&
-              dep_f.keg_only_reason.reason == :provided_by_macos
+              keg.to_formula.keg_only_reason.reason == :provided_by_macos
           opoo <<~EOS
             Refusing to link macOS-provided software: #{keg.name}
             Instead, pass the full include/library paths to your compiler e.g.:
