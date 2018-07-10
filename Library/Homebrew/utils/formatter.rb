@@ -108,4 +108,14 @@ module Formatter
 
     show_count ? "#{count} #{words}" : words
   end
+
+  def comma_and(*items)
+    # TODO: Remove when RuboCop 0.57.3 is released.
+    # False positive has been fixed and merged, but is not yet in a
+    # stable release: https://github.com/rubocop-hq/rubocop/pull/6038
+    *items, last = items.map(&:to_s) # rubocop:disable Lint/ShadowedArgument
+    return last if items.empty?
+
+    "#{items.join(", ")} and #{last}"
+  end
 end

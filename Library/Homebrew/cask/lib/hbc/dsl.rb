@@ -2,6 +2,9 @@ require "locale"
 
 require "hbc/artifact"
 
+require "hbc/caskroom"
+require "hbc/exceptions"
+
 require "hbc/dsl/appcast"
 require "hbc/dsl/base"
 require "hbc/dsl/caveats"
@@ -15,6 +18,8 @@ require "hbc/dsl/stanza_proxy"
 require "hbc/dsl/uninstall_postflight"
 require "hbc/dsl/uninstall_preflight"
 require "hbc/dsl/version"
+
+require "hbc/url"
 
 module Hbc
   class DSL

@@ -1,4 +1,3 @@
-
 require "os/mac/version"
 
 module OS

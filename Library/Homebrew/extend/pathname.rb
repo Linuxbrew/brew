@@ -309,21 +309,9 @@ class Pathname
     /^#!\s*\S+/ =~ open("r") { |f| f.read(1024) }
   end
 
-  # @private
-  def incremental_hash(klass)
-    digest = klass.new
-    if digest.respond_to?(:file)
-      digest.file(self)
-    else
-      buf = ""
-      open("rb") { |f| digest << buf while f.read(16384, buf) }
-    end
-    digest.hexdigest
-  end
-
   def sha256
     require "digest/sha2"
-    incremental_hash(Digest::SHA256)
+    Digest::SHA256.file(self).hexdigest
   end
 
   def verify_checksum(expected)

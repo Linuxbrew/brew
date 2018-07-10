@@ -42,7 +42,7 @@ require "erb"
 
 BOTTLE_ERB = <<-EOS.freeze
   bottle do
-    <% if root_url != "#{BottleSpecification::DEFAULT_DOMAIN}/bottles" %>
+    <% if root_url != "#{HOMEBREW_BOTTLE_DEFAULT_DOMAIN}/bottles" %>
     root_url "<%= root_url %>"
     <% end %>
     <% if prefix != BottleSpecification::DEFAULT_PREFIX %>
@@ -513,8 +513,7 @@ module Homebrew
               indent = s.slice(/^( +)stable do/, 1).length
               string = s.sub!(/^ {#{indent}}stable do(.|\n)+?^ {#{indent}}end\n/m, '\0' + output + "\n")
             else
-              string = s.sub!(
-                /(
+              pattern = /(
                   (\ {2}\#[^\n]*\n)*                                             # comments
                   \ {2}(                                                         # two spaces at the beginning
                     (url|head)\ ['"][\S\ ]+['"]                                  # url or head with a string
@@ -526,8 +525,8 @@ module Homebrew
                     revision\ \d+                                                # revision with a number
                   )\n+                                                           # multiple empty lines
                  )+
-               /mx, '\0' + output + "\n"
-              )
+               /mx
+              string = s.sub!(pattern, '\0' + output + "\n")
             end
             odie "Bottle block addition failed!" unless string
           end

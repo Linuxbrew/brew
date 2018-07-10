@@ -146,7 +146,7 @@ describe Hbc::Pkg, :cask do
 
       expect(fake_system_command).to receive(:run!).with(
         "/usr/sbin/pkgutil",
-      args: ["--pkg-info-plist", pkg_id],
+        args: ["--pkg-info-plist", pkg_id],
       ).and_return(
         Hbc::SystemCommand::Result.new(nil, pkg_info_plist, nil, 0),
       )

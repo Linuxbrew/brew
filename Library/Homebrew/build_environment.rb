@@ -1,4 +1,3 @@
-
 class BuildEnvironment
   def initialize(*settings)
     @settings = Set.new(*settings)

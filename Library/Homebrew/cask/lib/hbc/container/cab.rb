@@ -1,4 +1,3 @@
-
 require "hbc/container/base"
 
 module Hbc

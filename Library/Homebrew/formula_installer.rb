@@ -14,6 +14,7 @@ require "emoji"
 require "development_tools"
 require "cache_store"
 require "linkage_checker"
+require "install"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -220,6 +221,10 @@ class FormulaInstaller
   end
 
   def install
+    if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
+      Homebrew::Install.check_development_tools
+    end
+
     # not in initialize so upgrade can unlink the active keg before calling this
     # function but after instantiating this class so that it can avoid having to
     # relink the active keg if possible (because it is slow).
@@ -432,8 +437,12 @@ class FormulaInstaller
 
   def expand_requirements
     unsatisfied_reqs = Hash.new { |h, k| h[k] = [] }
-    deps = []
+    req_deps = []
     formulae = [formula]
+    formula_deps_map = Dependency.expand(formula)
+                                 .each_with_object({}) do |dep, hash|
+      hash[dep.name] = dep
+    end
 
     while f = formulae.pop
       runtime_requirements = runtime_requirements(f)
@@ -449,6 +458,8 @@ class FormulaInstaller
           next
         elsif !runtime_requirements.include?(req) && install_bottle_for_dependent
           Requirement.prune
+        elsif (dep = formula_deps_map[dependent.name]) && dep.build?
+          Requirement.prune
         else
           unsatisfied_reqs[dependent] << req
         end
@@ -456,9 +467,9 @@ class FormulaInstaller
     end
 
     # Merge the repeated dependencies, which may have different tags.
-    deps = Dependency.merge_repeats(deps)
+    req_deps = Dependency.merge_repeats(req_deps)
 
-    [unsatisfied_reqs, deps]
+    [unsatisfied_reqs, req_deps]
   end
 
   def bottle_dependencies(inherited_options)

@@ -54,6 +54,8 @@ module Hbc
             # Start new Cask's installation steps
             new_cask_installer.check_conflicts
 
+            new_cask_installer.print_caveats
+
             new_cask_installer.fetch
 
             # Move the old Cask's artifacts back to staging

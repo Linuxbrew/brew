@@ -58,9 +58,8 @@ module RuboCop
             ordered.each_with_index do |dep, pos|
               idx = pos+1
               match_nodes = build_with_dependency_name(dep)
-              idx1 = pos if match_nodes && !match_nodes.empty?
-              next unless idx1
-              idx2 = nil
+              next if !match_nodes || match_nodes.empty?
+              idx1 = pos
               ordered.drop(idx1+1).each_with_index do |dep2, pos2|
                 next unless match_nodes.index(dependency_name(dep2))
                 idx2 = pos2 if idx2.nil? || pos2 > idx2

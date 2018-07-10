@@ -1,4 +1,4 @@
-require "cask/lib/hbc/cli/options"
+require "hbc/cli/options"
 
 module Hbc
   class CLI

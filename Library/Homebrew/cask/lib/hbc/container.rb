@@ -1,3 +1,5 @@
+require "hbc/utils"
+
 require "hbc/container/base"
 require "hbc/container/air"
 require "hbc/container/bzip2"

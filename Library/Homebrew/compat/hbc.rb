@@ -1,4 +1,5 @@
 require "compat/hbc/cask_loader"
+require "compat/hbc/cli/search"
 require "compat/hbc/cli/update"
 require "compat/hbc/cache"
 require "compat/hbc/caskroom"

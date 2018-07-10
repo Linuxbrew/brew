@@ -239,8 +239,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--cc=``compiler` is passed, attempt to compile using `compiler`.
     `compiler` should be the name of the compiler's executable, for instance
-    `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a Homebrew-provided GCC
-    4.9.
+    `gcc-8` for gcc 8, `gcc-4.2` for Apple's GCC 4.2, or `gcc-4.9` for a
+    Homebrew-provided GCC 4.9. In order to use LLVM's clang, use
+    `llvm_clang`. To specify the Apple-provided clang, use `clang`. This
+    parameter will only accept compilers that are provided by Homebrew or
+    bundled with macOS. Please do not file issues if you encounter errors
+    while using this flag.
 
     If `--build-from-source` (or `-s`) is passed, compile the specified `formula` from
     source even if a bottle is provided. Dependencies will still be installed
@@ -400,16 +404,20 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     Uninstall and then install `formula` (with existing install options).
 
   * `search`, `-S`:
-    Display all locally available formulae for brewing (including tapped ones).
-    No online search is performed if called without arguments.
+    Display all locally available formulae (including tapped ones).
+    No online search is performed.
+
+  * `search` `--casks`
+    Display all locally available casks (including tapped ones).
+    No online search is performed.
 
   * `search` [`--desc`] (`text`|`/``text``/`):
-    Perform a substring search of formula names for `text`. If `text` is
-    surrounded with slashes, then it is interpreted as a regular expression.
-    The search for `text` is extended online to some popular taps.
+    Perform a substring search of cask tokens and formula names for `text`. If `text`
+    is surrounded with slashes, then it is interpreted as a regular expression.
+    The search for `text` is extended online to official taps.
 
-    If `--desc` is passed, browse available packages matching `text` including a
-    description for each.
+    If `--desc` is passed, search formulae with a description matching `text` and
+    casks with a name matching `text`.
 
   * `search` (`--debian`|`--fedora`|`--fink`|`--macports`|`--opensuse`|`--ubuntu`) `text`:
     Search for `text` in the given package manager's list.
@@ -779,7 +787,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--pry` is passed or HOMEBREW_PRY is set, pry will be
     used instead of irb.
 
-  * `linkage` [`--test`] [`--reverse`] [`--cached`] `formula`:
+  * `linkage` [`--test`] [`--reverse`] `formula`:
     Checks the library links of an installed formula.
 
     Only works on installed formulae. An error is raised if it is run on
@@ -790,9 +798,6 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--reverse` is passed, print the dylib followed by the binaries
     which link to it for each library the keg references.
-
-    If `--cached` is passed, print the cached linkage values stored in
-    HOMEBREW_CACHE, set from a previous `brew linkage` run
 
   * `man` [`--fail-if-changed`]:
     Generate Homebrew's manpages.
@@ -1166,6 +1171,10 @@ Note that environment variables must have a value set to be detected. For exampl
     a Homebrew-built Git if installed, or the system-provided binary.
 
     Set this to force Homebrew to use a particular git binary.
+
+  * `HOMEBREW_FORCE_BREWED_GIT`:
+    If set, Homebrew will use a Homebrew-installed `git` rather than the
+    system version.
 
   * `HOMEBREW_GITHUB_API_TOKEN`:
     A personal access token for the GitHub API, which you can create at

@@ -101,13 +101,11 @@ then
   # https://github.com/blog/2507-weak-cryptographic-standards-removed
   if [[ "$HOMEBREW_MACOS_VERSION_NUMERIC" -lt "100900" ]]
   then
-    HOMEBREW_SYSTEM_GIT_TOO_OLD="1"
+    HOMEBREW_FORCE_BREWED_GIT="1"
   fi
 
-  if [[ -z "$HOMEBREW_CACHE" ]]
-  then
-    HOMEBREW_CACHE="$HOME/Library/Caches/Homebrew"
-  fi
+  HOMEBREW_CACHE="${HOMEBREW_CACHE:-${HOME}/Library/Caches/Homebrew}"
+  HOMEBREW_SYSTEM_TEMP="/private/tmp"
 else
   HOMEBREW_PROCESSOR="$(uname -m)"
   HOMEBREW_PRODUCT="${HOMEBREW_SYSTEM}brew"
@@ -115,21 +113,12 @@ else
   : "${HOMEBREW_OS_VERSION:=$(uname -r)}"
   HOMEBREW_OS_USER_AGENT_VERSION="$HOMEBREW_OS_VERSION"
 
-  if [[ -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]]
-  then
-    HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
-  fi
-
-  if [[ -z "$HOMEBREW_CACHE" ]]
-  then
-    if [[ -n "$XDG_CACHE_HOME" ]]
-    then
-      HOMEBREW_CACHE="$XDG_CACHE_HOME/Homebrew"
-    else
-      HOMEBREW_CACHE="$HOME/.cache/Homebrew"
-    fi
-  fi
+  CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+  HOMEBREW_CACHE="${HOMEBREW_CACHE:-${CACHE_HOME}/Homebrew}"
+  HOMEBREW_SYSTEM_TEMP="/tmp"
 fi
+
+HOMEBREW_TEMP="${HOMEBREW_TEMP:-${HOMEBREW_SYSTEM_TEMP}}"
 
 if [[ -n "$HOMEBREW_FORCE_BREWED_CURL" &&
       -x "$HOMEBREW_PREFIX/opt/curl/bin/curl" ]] &&
@@ -138,6 +127,15 @@ then
   HOMEBREW_CURL="$HOMEBREW_PREFIX/opt/curl/bin/curl"
 else
   HOMEBREW_CURL="curl"
+fi
+
+if [[ -n "$HOMEBREW_FORCE_BREWED_GIT" &&
+      -x "$HOMEBREW_PREFIX/opt/git/bin/git" ]] &&
+         "$HOMEBREW_PREFIX/opt/git/bin/git" --version >/dev/null
+then
+  HOMEBREW_GIT="$HOMEBREW_PREFIX/opt/git/bin/git"
+else
+  HOMEBREW_GIT="git"
 fi
 
 HOMEBREW_USER_AGENT="$HOMEBREW_PRODUCT/$HOMEBREW_USER_AGENT_VERSION ($HOMEBREW_SYSTEM; $HOMEBREW_PROCESSOR $HOMEBREW_OS_USER_AGENT_VERSION)"
@@ -149,6 +147,8 @@ export HOMEBREW_BREW_FILE
 export HOMEBREW_PREFIX
 export HOMEBREW_REPOSITORY
 export HOMEBREW_LIBRARY
+export HOMEBREW_SYSTEM_TEMP
+export HOMEBREW_TEMP
 
 # Declared in brew.sh
 export HOMEBREW_VERSION
@@ -269,6 +269,19 @@ then
   export HOMEBREW_RUBY_WARNINGS="-W0"
 fi
 
+export HOMEBREW_BOTTLE_DEFAULT_DOMAIN_MACOS="https://homebrew.bintray.com"
+export HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX="https://linuxbrew.bintray.com"
+if [[ -n "$HOMEBREW_MACOS" ]]
+then
+  export HOMEBREW_BOTTLE_DEFAULT_DOMAIN="$HOMEBREW_BOTTLE_DEFAULT_DOMAIN_MACOS"
+else
+  export HOMEBREW_BOTTLE_DEFAULT_DOMAIN="$HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX"
+fi
+if [[ -z "$HOMEBREW_BOTTLE_DOMAIN" ]]
+then
+  export HOMEBREW_BOTTLE_DOMAIN="$HOMEBREW_BOTTLE_DEFAULT_DOMAIN"
+fi
+
 if [[ -f "$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh" ]]
 then
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/cmd/$HOMEBREW_COMMAND.sh"
@@ -280,11 +293,6 @@ then
     export HOMEBREW_DEV_CMD_RUN="1"
   fi
   HOMEBREW_BASH_COMMAND="$HOMEBREW_LIBRARY/Homebrew/dev-cmd/$HOMEBREW_COMMAND.sh"
-fi
-
-if [[ -n "$HOMEBREW_DEVELOPER" || -n "$HOMEBREW_DEV_CMD_RUN" ]]
-then
-  export HOMEBREW_LINKAGE_CACHE="1"
 fi
 
 check-run-command-as-root() {
@@ -303,6 +311,21 @@ build scripts full access to your system.
 EOS
 }
 check-run-command-as-root
+
+check-prefix-is-not-tmpdir() {
+  [[ -z "${HOMEBREW_MACOS}" ]] && return
+
+  if [[ "${HOMEBREW_PREFIX}" = "${HOMEBREW_TEMP}"* ]]
+  then
+    odie <<EOS
+Your HOMEBREW_PREFIX is in the Homebrew temporary directory, which Homebrew
+uses to store downloads and builds. You can resolve this by installing Homebrew to
+either the standard prefix (/usr/local) or to a non-standard prefix that is not
+in the Homebrew temporary directory.
+EOS
+  fi
+}
+check-prefix-is-not-tmpdir
 
 if [[ "$HOMEBREW_PREFIX" = "/usr/local" &&
       "$HOMEBREW_PREFIX" != "$HOMEBREW_REPOSITORY" &&

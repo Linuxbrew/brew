@@ -23,21 +23,37 @@ module MachO
     # Creates a new FatFile from the given (single-arch) Mach-Os
     # @param machos [Array<MachOFile>] the machos to combine
     # @return [FatFile] a new FatFile containing the give machos
+    # @raise [ArgumentError] if less than one Mach-O is given
     def self.new_from_machos(*machos)
-      header = Headers::FatHeader.new(Headers::FAT_MAGIC, machos.size)
+      raise ArgumentError, "expected at least one Mach-O" if machos.empty?
+
+      # put the smaller alignments further forwards in fat macho, so that we do less padding
+      machos = machos.sort_by(&:segment_alignment)
+
+      bin = +""
+
+      bin << Headers::FatHeader.new(Headers::FAT_MAGIC, machos.size).serialize
       offset = Headers::FatHeader.bytesize + (machos.size * Headers::FatArch.bytesize)
-      fat_archs = []
+
+      macho_pads = {}
+      macho_bins = {}
+
       machos.each do |macho|
-        fat_archs << Headers::FatArch.new(macho.header.cputype,
-                                          macho.header.cpusubtype,
-                                          offset, macho.serialize.bytesize,
-                                          macho.alignment)
-        offset += macho.serialize.bytesize
+        macho_offset      = Utils.round(offset, 2**macho.segment_alignment)
+        macho_pads[macho] = Utils.padding_for(offset, 2**macho.segment_alignment)
+        macho_bins[macho] = macho.serialize
+
+        bin << Headers::FatArch.new(macho.header.cputype, macho.header.cpusubtype,
+                                    macho_offset, macho_bins[macho].bytesize,
+                                    macho.segment_alignment).serialize
+
+        offset += (macho_bins[macho].bytesize + macho_pads[macho])
       end
 
-      bin = header.serialize
-      bin << fat_archs.map(&:serialize).join
-      bin << machos.map(&:serialize).join
+      machos.each do |macho|
+        bin << Utils.nullpad(macho_pads[macho])
+        bin << macho_bins[macho]
+      end
 
       new_from_bin(bin)
     end
@@ -263,6 +279,15 @@ module MachO
     def write!
       raise MachOError, "no initial file to write to" if filename.nil?
       File.open(@filename, "wb") { |f| f.write(@raw_data) }
+    end
+
+    # @return [Hash] a hash representation of this {FatFile}
+    def to_h
+      {
+        "header" => header.to_h,
+        "fat_archs" => fat_archs.map(&:to_h),
+        "machos" => machos.map(&:to_h),
+      }
     end
 
     private

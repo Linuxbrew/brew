@@ -196,13 +196,12 @@ module OS
 
       STANDALONE_PKG_ID = "com.apple.pkg.DeveloperToolsCLILeo".freeze
       FROM_XCODE_PKG_ID = "com.apple.pkg.DeveloperToolsCLI".freeze
-      # EXECUTABLE_PKG_ID now means two things:
-      # 1. The original Mavericks CLT package ID, and
-      # 2. The additional header package included in Mojave.
+      # The original Mavericks CLT package ID
       EXECUTABLE_PKG_ID = "com.apple.pkg.CLTools_Executables".freeze
       MAVERICKS_NEW_PKG_ID = "com.apple.pkg.CLTools_Base".freeze # obsolete
       PKG_PATH = "/Library/Developer/CommandLineTools".freeze
       HEADER_PKG_PATH = "/Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_:macos_version.pkg".freeze
+      HEADER_PKG_ID = "com.apple.pkg.macOS_SDK_headers_for_macOS_10.14".freeze
 
       # Returns true even if outdated tools are installed, e.g.
       # tools from Xcode 4.x on 10.9
@@ -304,7 +303,7 @@ module OS
         if !separate_header_package?
           version
         else
-          @header_version ||= MacOS.pkgutil_info(EXECUTABLE_PKG_ID)[/version: (.+)$/, 1]
+          @header_version ||= MacOS.pkgutil_info(HEADER_PKG_ID)[/version: (.+)$/, 1]
           return ::Version::NULL unless @header_version
           ::Version.new(@header_version)
         end

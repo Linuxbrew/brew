@@ -1,4 +1,5 @@
 require "hbc/cask_loader"
+require "hbc/config"
 require "hbc/dsl"
 require "hbc/metadata"
 require "searchable"
@@ -55,12 +56,8 @@ module Hbc
     end
 
     def full_name
-      return token if tap == Tap.default_cask_tap
-      qualified_token
-    end
-
-    def qualified_token
       return token if tap.nil?
+      return token if tap.user == "Homebrew"
       "#{tap.name}/#{token}"
     end
 

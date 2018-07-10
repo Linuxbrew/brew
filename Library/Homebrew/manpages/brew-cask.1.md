@@ -75,7 +75,7 @@ names, and other aspects of this manual are still subject to change.
     dependencies. `--require-sha` will abort installation if the Cask does not
     have a checksum defined.
 
-    <token> is usually the ID of a Cask as returned by `brew cask search`,
+    <token> is usually the ID of a Cask,
     but see [OTHER WAYS TO SPECIFY A CASK][] for variations.
 
   * `list` or `ls` [-1] [--versions] [ <token> ... ]:
@@ -231,7 +231,7 @@ the Homebrew command:
 Most Homebrew-Cask commands can accept a Cask token as an argument. As
 described above, the argument can take the form of:
 
-  * A token as returned by `brew cask search`, e.g. `google-chrome`
+  * A simple token, e.g. `google-chrome`
 
 Homebrew-Cask also accepts three other forms in place of plain tokens:
 

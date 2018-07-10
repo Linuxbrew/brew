@@ -31,49 +31,50 @@ module Homebrew
 
     ENV["HOMEBREW_UPDATE_TEST"] = "1"
 
-    if args.to_tag?
+    branch = if args.to_tag?
       ENV["HOMEBREW_UPDATE_TO_TAG"] = "1"
-      branch = "stable"
+      "stable"
     else
-      branch = "master"
+      "master"
     end
 
-    cd HOMEBREW_REPOSITORY
-    start_commit = if commit = args.commit
-      commit
-    elsif date = args.before
-      Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
-    elsif args.to_tag?
-      tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
-      previous_tag = tags.lines[1]
-      previous_tag ||= begin
-        if (HOMEBREW_REPOSITORY/".git/shallow").exist?
-          safe_system "git", "fetch", "--tags", "--depth=1"
-          tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
-        elsif OS.linux?
-          tags = Utils.popen_read("git tag --list | sort -rV")
+    start_commit, end_commit = nil
+    cd HOMEBREW_REPOSITORY do
+      start_commit = if commit = args.commit
+        commit
+      elsif date = args.before
+        Utils.popen_read("git", "rev-list", "-n1", "--before=#{date}", "origin/master").chomp
+      elsif args.to_tag?
+        tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
+        previous_tag = tags.lines[1]
+        previous_tag ||= begin
+          if (HOMEBREW_REPOSITORY/".git/shallow").exist?
+            safe_system "git", "fetch", "--tags", "--depth=1"
+            tags = Utils.popen_read("git", "tag", "--list", "--sort=-version:refname")
+          elsif OS.linux?
+            tags = Utils.popen_read("git tag --list | sort -rV")
+          end
+          tags.lines[1]
         end
-        tags.lines[1]
+        previous_tag = previous_tag.to_s.chomp
+        odie "Could not find previous tag in:\n#{tags}" if previous_tag.empty?
+        previous_tag
+      else
+        Utils.popen_read("git", "rev-parse", "origin/master").chomp
       end
-      previous_tag = previous_tag.to_s.chomp
-      odie "Could not find previous tag in:\n#{tags}" if previous_tag.empty?
-      previous_tag
-    else
-      Utils.popen_read("git", "rev-parse", "origin/master").chomp
+      odie "Could not find start commit!" if start_commit.empty?
+
+      start_commit = Utils.popen_read("git", "rev-parse", start_commit).chomp
+      odie "Could not find start commit!" if start_commit.empty?
+
+      end_commit = Utils.popen_read("git", "rev-parse", "HEAD").chomp
+      odie "Could not find end commit!" if end_commit.empty?
     end
-    odie "Could not find start commit!" if start_commit.empty?
-
-    start_commit = Utils.popen_read("git", "rev-parse", start_commit).chomp
-    odie "Could not find start commit!" if start_commit.empty?
-
-    end_commit = Utils.popen_read("git", "rev-parse", "HEAD").chomp
-    odie "Could not find end commit!" if end_commit.empty?
 
     puts "Start commit: #{start_commit}"
     puts "End   commit: #{end_commit}"
 
-    mktemp("update-test") do |staging|
-      staging.retain! if args.keep_tmp?
+    mkdir "update-test" do
       curdir = Pathname.new(Dir.pwd)
 
       oh1 "Setup test environment..."
@@ -107,5 +108,7 @@ module Homebrew
         EOS
       end
     end
+  ensure
+    FileUtils.rm_r "update-test" unless args.keep_tmp?
   end
 end

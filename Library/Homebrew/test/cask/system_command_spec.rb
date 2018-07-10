@@ -80,7 +80,7 @@ describe Hbc::SystemCommand, :cask do
         options.merge!(print_stdout: true)
       end
 
-      it "echoes both STDOUT and STDERR", :focus do
+      it "echoes both STDOUT and STDERR" do
         expect { described_class.run(command, options) }
           .to output("1\n3\n5\n").to_stdout
           .and output("2\n4\n6\n").to_stderr

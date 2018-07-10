@@ -22,6 +22,16 @@ module MachO
       round(size, alignment) - size
     end
 
+    # Returns a string of null bytes of the requested (non-negative) size
+    # @param size [Integer] the size of the nullpad
+    # @return [String] the null string (or empty string, for `size = 0`)
+    # @raise [ArgumentError] if a non-positive nullpad is requested
+    def self.nullpad(size)
+      raise ArgumentError, "size < 0: #{size}" if size.negative?
+
+      "\x00" * size
+    end
+
     # Converts an abstract (native-endian) String#unpack format to big or
     #  little.
     # @param format [String] the format string being converted
@@ -46,11 +56,11 @@ module MachO
       strings.each do |key, string|
         offsets[key] = next_offset
         payload << string
-        payload << "\x00"
+        payload << Utils.nullpad(1)
         next_offset += string.bytesize + 1
       end
 
-      payload << "\x00" * padding_for(fixed_offset + payload.bytesize, alignment)
+      payload << Utils.nullpad(padding_for(fixed_offset + payload.bytesize, alignment))
       [payload, offsets]
     end
 

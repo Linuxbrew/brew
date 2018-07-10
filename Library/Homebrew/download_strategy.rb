@@ -90,53 +90,6 @@ class AbstractDownloadStrategy
   def quiet_safe_system(*args)
     safe_system(*expand_safe_system_args(args))
   end
-
-  private
-
-  def xzpath
-    "#{HOMEBREW_PREFIX}/opt/xz/bin/xz"
-  end
-
-  def lzippath
-    "#{HOMEBREW_PREFIX}/opt/lzip/bin/lzip"
-  end
-
-  def lhapath
-    "#{HOMEBREW_PREFIX}/opt/lha/bin/lha"
-  end
-
-  def cvspath
-    @cvspath ||= %W[
-      /usr/bin/cvs
-      #{HOMEBREW_PREFIX}/bin/cvs
-      #{HOMEBREW_PREFIX}/opt/cvs/bin/cvs
-      #{which("cvs")}
-    ].find { |p| File.executable? p }
-  end
-
-  def hgpath
-    @hgpath ||= %W[
-      #{which("hg")}
-      #{HOMEBREW_PREFIX}/bin/hg
-      #{HOMEBREW_PREFIX}/opt/mercurial/bin/hg
-    ].find { |p| File.executable? p }
-  end
-
-  def bzrpath
-    @bzrpath ||= %W[
-      #{which("bzr")}
-      #{HOMEBREW_PREFIX}/bin/bzr
-      #{HOMEBREW_PREFIX}/opt/bazaar/bin/bzr
-    ].find { |p| File.executable? p }
-  end
-
-  def fossilpath
-    @fossilpath ||= %W[
-      #{which("fossil")}
-      #{HOMEBREW_PREFIX}/bin/fossil
-      #{HOMEBREW_PREFIX}/opt/fossil/bin/fossil
-    ].find { |p| File.executable? p }
-  end
 end
 
 class VCSDownloadStrategy < AbstractDownloadStrategy
@@ -224,43 +177,39 @@ end
 
 class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
-    case type = cached_location.compression_type
+    path = cached_location
+    unpack_dir = Pathname.pwd
+
+    case type = path.compression_type
     when :zip
-      quiet_safe_system "unzip", "-qq", cached_location
+      safe_system "unzip", "-qq", path, "-d", unpack_dir
       chdir
     when :gzip_only
-      buffered_write "gunzip"
+      FileUtils.cp path, unpack_dir, preserve: true
+      safe_system "gunzip", "-q", "-N", unpack_dir/path.basename
     when :bzip2_only
-      buffered_write "bunzip2"
+      FileUtils.cp path, unpack_dir, preserve: true
+      safe_system "bunzip2", "-q", unpack_dir/path.basename
     when :gzip, :bzip2, :xz, :compress, :tar
-      tar_flags = "x"
-      if type == :gzip
-        tar_flags << "z"
-      elsif type == :bzip2
-        tar_flags << "j"
-      elsif type == :xz
-        tar_flags << "J"
-      end
-      tar_flags << "f"
       if type == :xz && DependencyCollector.tar_needs_xz_dependency?
-        pipe_to_tar xzpath
+        pipe_to_tar "#{HOMEBREW_PREFIX}/opt/xz/bin/xz", unpack_dir
       else
-        safe_system "tar", tar_flags, cached_location
+        safe_system "tar", "xf", path, "-C", unpack_dir
       end
       chdir
     when :lzip
-      pipe_to_tar lzippath
+      pipe_to_tar "#{HOMEBREW_PREFIX}/opt/lzip/bin/lzip", unpack_dir
       chdir
     when :lha
-      safe_system lhapath, "x", cached_location
+      safe_system "#{HOMEBREW_PREFIX}/opt/lha/bin/lha", "xq2w=#{unpack_dir}", path
     when :xar
-      safe_system "/usr/bin/xar", "-xf", cached_location
+      safe_system "xar", "-x", "-f", path, "-C", unpack_dir
     when :rar
-      quiet_safe_system "unrar", "x", "-inul", cached_location
+      safe_system "unrar", "x", "-inul", path, unpack_dir
     when :p7zip
-      safe_system "7zr", "x", cached_location
+      safe_system "7zr", "x", "-y", "-bd", "-bso0", path, "-o#{unpack_dir}"
     else
-      cp cached_location, basename_without_params, preserve: true
+      cp path, unpack_dir/basename_without_params, preserve: true
     end
   end
 
@@ -278,25 +227,13 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
     end
   end
 
-  def pipe_to_tar(tool)
-    Utils.popen_read(tool, "-dc", cached_location.to_s) do |rd|
-      Utils.popen_write("tar", "xf", "-") do |wr|
+  def pipe_to_tar(tool, unpack_dir)
+    path = cached_location
+
+    Utils.popen_read(tool, "-dc", path) do |rd|
+      Utils.popen_write("tar", "xf", "-", "-C", unpack_dir) do |wr|
         buf = ""
         wr.write(buf) while rd.read(16384, buf)
-      end
-    end
-  end
-
-  # gunzip and bunzip2 write the output file in the same directory as the input
-  # file regardless of the current working directory, so we need to write it to
-  # the correct location ourselves.
-  def buffered_write(tool)
-    target = File.basename(basename_without_params, cached_location.extname)
-
-    Utils.popen_read(tool, "-f", cached_location.to_s, "-c") do |pipe|
-      File.open(target, "wb") do |f|
-        buf = ""
-        f.write(buf) while pipe.read(16384, buf)
       end
     end
   end
@@ -672,7 +609,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
 
   def stage
     super
-    quiet_safe_system "svn", "export", "--force", cached_location, Dir.pwd
+    safe_system "svn", "export", "--force", cached_location, Dir.pwd
   end
 
   def source_modified_time
@@ -849,9 +786,9 @@ class GitDownloadStrategy < VCSDownloadStrategy
     return unless @ref_type == :branch || !ref?
 
     if !shallow_clone? && shallow_dir?
-      quiet_safe_system "git", "fetch", "origin", "--unshallow"
+      safe_system "git", "fetch", "origin", "--unshallow"
     else
-      quiet_safe_system "git", "fetch", "origin"
+      safe_system "git", "fetch", "origin"
     end
   end
 
@@ -866,7 +803,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
 
   def checkout
     ohai "Checking out #{@ref_type} #{@ref}" if @ref_type && @ref
-    quiet_safe_system "git", "checkout", "-f", @ref, "--"
+    safe_system "git", "checkout", "-f", @ref, "--"
   end
 
   def reset_args
@@ -881,12 +818,12 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def reset
-    quiet_safe_system "git", *reset_args
+    safe_system "git", *reset_args
   end
 
   def update_submodules
-    quiet_safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
-    quiet_safe_system "git", "submodule", "update", "--init", "--recursive"
+    safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
+    safe_system "git", "submodule", "update", "--init", "--recursive"
     fix_absolute_submodule_gitdir_references!
   end
 
@@ -992,6 +929,10 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     end
   end
 
+  def cvspath
+    @cvspath ||= which("cvs", PATH.new("/usr/bin", Formula["cvs"].opt_bin, ENV["PATH"]))
+  end
+
   def source_modified_time
     # Filter CVS's files because the timestamp for each of them is the moment
     # of clone.
@@ -1045,6 +986,10 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
     @url = @url.sub(%r{^hg://}, "")
   end
 
+  def hgpath
+    @hgpath ||= which("hg", PATH.new(Formula["mercurial"].opt_bin, ENV["PATH"]))
+  end
+
   def stage
     super
 
@@ -1082,7 +1027,9 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   end
 
   def update
-    cached_location.cd { quiet_safe_system hgpath, "pull", "--update" }
+    cached_location.cd do
+      safe_system hgpath, "pull", "--update"
+    end
   end
 end
 
@@ -1093,6 +1040,10 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
     ENV["BZR_HOME"] = HOMEBREW_TEMP
   end
 
+  def bzrpath
+    @bzrpath ||= which("bzr", PATH.new(Formula["bazaar"].opt_bin, ENV["PATH"]))
+  end
+
   def stage
     # The export command doesn't work on checkouts
     # See https://bugs.launchpad.net/bzr/+bug/897511
@@ -1101,13 +1052,13 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    timestamp = Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+    timestamp = Utils.popen_read(bzrpath, "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
     raise "Could not get any timestamps from bzr!" if timestamp.to_s.empty?
     Time.parse timestamp
   end
 
   def last_commit
-    Utils.popen_read("bzr", "revno", cached_location.to_s).chomp
+    Utils.popen_read(bzrpath, "revno", cached_location.to_s).chomp
   end
 
   private
@@ -1126,7 +1077,9 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   end
 
   def update
-    cached_location.cd { quiet_safe_system bzrpath, "update" }
+    cached_location.cd do
+      safe_system bzrpath, "update"
+    end
   end
 end
 
@@ -1134,6 +1087,10 @@ class FossilDownloadStrategy < VCSDownloadStrategy
   def initialize(name, resource)
     super
     @url = @url.sub(%r{^fossil://}, "")
+  end
+
+  def fossilpath
+    @fossilpath ||= which("fossil", PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]))
   end
 
   def stage
@@ -1144,11 +1101,11 @@ class FossilDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    Time.parse Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
+    Time.parse Utils.popen_read(fossilpath, "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
   end
 
   def last_commit
-    Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
+    Utils.popen_read(fossilpath, "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
   end
 
   private
