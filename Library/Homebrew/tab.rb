@@ -58,7 +58,11 @@ class Tab < OpenStruct
 
   # Like Tab.from_file, but bypass the cache.
   def self.from_file_content(content, path)
-    attributes = JSON.parse(content)
+    attributes = begin
+      JSON.parse(content)
+    rescue JSON::ParserError => e
+      raise e, "Cannot parse #{path}: #{e}", e.backtrace
+    end
     attributes["tabfile"] = path
     attributes["source_modified_time"] ||= 0
     attributes["source"] ||= {}

@@ -8,7 +8,7 @@ module Language
       Version.create(version.to_s)
     end
 
-    def self.homebrew_site_packages(version = "3.6")
+    def self.homebrew_site_packages(version = "3.7")
       HOMEBREW_PREFIX/"lib/python#{version}/site-packages"
     end
 
