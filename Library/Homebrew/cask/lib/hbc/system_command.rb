@@ -97,7 +97,11 @@ module Hbc
       executable, *args = expanded_command
 
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
-        Open3.popen3(env, [executable, executable], *args, **options)
+        # We need to specifically use `with_env` for `PATH`, otherwise
+        # Ruby itself will not look for the executable in `PATH`.
+        with_env "PATH" => env["PATH"] do
+          Open3.popen3(env, [executable, executable], *args, **options)
+        end
 
       write_input_to(raw_stdin)
       raw_stdin.close_write
