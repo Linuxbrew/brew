@@ -29,9 +29,9 @@ describe "brew link", :integration_test do
   end
 
   it "refuses to link keg-only Formulae" do
-    setup_test_formula "testball1", <<~EOS
+    setup_test_formula "testball1", <<~RUBY
       keg_only "just because"
-    EOS
+    RUBY
 
     expect { brew "install", "testball1" }.to be_a_success
 

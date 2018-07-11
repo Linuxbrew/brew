@@ -392,10 +392,10 @@ class Pathname
     mkpath
     targets.each do |target|
       target = Pathname.new(target) # allow pathnames or strings
-      join(target.basename).write <<~EOS
+      join(target.basename).write <<~SH
         #!/bin/bash
         exec "#{target}" "$@"
-      EOS
+      SH
     end
   end
 
@@ -404,10 +404,10 @@ class Pathname
     env_export = ""
     env.each { |key, value| env_export += "#{key}=\"#{value}\" " }
     dirname.mkpath
-    write <<~EOS
+    write <<~SH
       #!/bin/bash
       #{env_export}exec "#{target}" "$@"
-    EOS
+    SH
   end
 
   # Writes a wrapper env script and moves all files to the dst
@@ -427,10 +427,10 @@ class Pathname
     java_home = if java_version
       "JAVA_HOME=\"$(#{Language::Java.java_home_cmd(java_version)})\" "
     end
-    join(script_name).write <<~EOS
+    join(script_name).write <<~SH
       #!/bin/bash
       #{java_home}exec java #{java_opts} -jar #{target_jar} "$@"
-    EOS
+    SH
   end
 
   def install_metafiles(from = Pathname.pwd)

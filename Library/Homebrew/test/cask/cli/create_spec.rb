@@ -28,7 +28,7 @@ describe Hbc::CLI::Create, :cask do
   it "drops a template down for the specified Cask" do
     described_class.run("new-cask")
     template = File.read(Hbc::CaskLoader.path("new-cask"))
-    expect(template).to eq <<~EOS
+    expect(template).to eq <<~RUBY
       cask 'new-cask' do
         version ''
         sha256 ''
@@ -39,7 +39,7 @@ describe Hbc::CLI::Create, :cask do
 
         app ''
       end
-    EOS
+    RUBY
   end
 
   it "raises an exception when more than one Cask is given" do

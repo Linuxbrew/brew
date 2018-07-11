@@ -11,11 +11,11 @@ describe Hbc::CaskLoader::FromURILoader do
     end
 
     it "returns false when given a String with Cask contents containing a URL" do
-      expect(described_class).not_to be_able_to_load <<~EOS
+      expect(described_class).not_to be_able_to_load <<~RUBY
         cask 'token' do
           url 'http://example.com/'
         end
-      EOS
+      RUBY
     end
   end
 end

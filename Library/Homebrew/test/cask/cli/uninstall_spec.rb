@@ -109,11 +109,11 @@ describe Hbc::CLI::Uninstall, :cask do
       timestamped_versions.each do |timestamped_version|
         caskroom_path.join(".metadata", *timestamped_version, "Casks").tap(&:mkpath)
                      .join("#{token}.rb").open("w") do |caskfile|
-                       caskfile.puts <<~EOS
+                       caskfile.puts <<~RUBY
                          cask '#{token}' do
                            version '#{timestamped_version[0]}'
                          end
-                       EOS
+                       RUBY
                      end
         caskroom_path.join(timestamped_version[0]).mkpath
       end
@@ -155,13 +155,13 @@ describe Hbc::CLI::Uninstall, :cask do
 
       saved_caskfile.dirname.mkpath
 
-      IO.write saved_caskfile, <<~EOS
+      IO.write saved_caskfile, <<~RUBY
         cask 'ive-been-renamed' do
           version :latest
 
           app 'ive-been-renamed.app'
         end
-      EOS
+      RUBY
     end
 
     it "can still uninstall those Casks" do

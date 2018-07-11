@@ -3,55 +3,55 @@ describe Hbc::CaskLoader::FromContentLoader do
 
   describe "::can_load?" do
     it "returns true for Casks specified with `cask \"token\" do … end`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask "token" do
         end
-      EOS
+      RUBY
     end
 
     it "returns true for Casks specified with `cask \"token\" do; end`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask "token" do; end
-      EOS
+      RUBY
     end
 
     it "returns true for Casks specified with `cask 'token' do … end`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask 'token' do
         end
-      EOS
+      RUBY
     end
 
     it "returns true for Casks specified with `cask 'token' do; end`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask 'token' do; end
-      EOS
+      RUBY
     end
 
     it "returns true for Casks specified with `cask(\"token\") { … }`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask("token") {
         }
-      EOS
+      RUBY
     end
 
     it "returns true for Casks specified with `cask(\"token\") {}`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask("token") {}
-      EOS
+      RUBY
     end
 
     it "returns true for Casks specified with `cask('token') { … }`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask('token') {
         }
-      EOS
+      RUBY
     end
 
     it "returns true for Casks specified with `cask('token') {}`" do
-      expect(described_class).to be_able_to_load <<~EOS
+      expect(described_class).to be_able_to_load <<~RUBY
         cask('token') {}
-      EOS
+      RUBY
     end
   end
 end

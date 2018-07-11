@@ -5,11 +5,11 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
 
   context "When auditing homepage" do
     it "When there is no homepage" do
-      source = <<~EOS
+      source = <<~RUBY
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
         end
-      EOS
+      RUBY
 
       expected_offenses = [{  message: "Formula should have a homepage.",
                               severity: :convention,
@@ -25,12 +25,12 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
     end
 
     it "Homepage with ftp" do
-      source = <<~EOS
+      source = <<~RUBY
         class Foo < Formula
           homepage "ftp://example.com/foo"
           url "http://example.com/foo-1.0.tgz"
         end
-      EOS
+      RUBY
 
       expected_offenses = [{  message: "The homepage should start with http or https (URL is ftp://example.com/foo).",
                               severity: :convention,
@@ -62,12 +62,12 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
       }
 
       formula_homepages.each do |name, homepage|
-        source = <<~EOS
+        source = <<~RUBY
           class #{name.capitalize} < Formula
             homepage "#{homepage}"
             url "http://example.com/#{name}-1.0.tgz"
           end
-        EOS
+        RUBY
 
         inspect_source(source)
         if homepage =~ %r{http:\/\/www\.freedesktop\.org}

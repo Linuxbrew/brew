@@ -138,7 +138,7 @@ class Sandbox
   end
 
   class SandboxProfile
-    SEATBELT_ERB = <<~EOS.freeze
+    SEATBELT_ERB = <<~ERB.freeze
       (version 1)
       (debug deny) ; log all denied operations to /var/log/system.log
       <%= rules.join("\n") %>
@@ -157,7 +157,7 @@ class Sandbox
           (with no-sandbox)
           ) ; allow certain processes running without sandbox
       (allow default) ; allow everything else
-    EOS
+    ERB
 
     attr_reader :rules
 

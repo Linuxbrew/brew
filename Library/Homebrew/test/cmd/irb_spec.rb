@@ -3,11 +3,11 @@ describe "brew irb", :integration_test do
     setup_test_formula "testball"
 
     irb_test = HOMEBREW_TEMP/"irb-test.rb"
-    irb_test.write <<~EOS
+    irb_test.write <<~RUBY
       "testball".f
       :testball.f
       exit
-    EOS
+    RUBY
 
     expect { brew "irb", irb_test }
       .to output(/Interactive Homebrew Shell/).to_stdout

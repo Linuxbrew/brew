@@ -2,10 +2,10 @@ describe "brew deps", :integration_test do
   before do
     setup_test_formula "foo"
     setup_test_formula "bar"
-    setup_test_formula "baz", <<~EOS
+    setup_test_formula "baz", <<~RUBY
       url "https://example.com/baz-1.0"
       depends_on "bar"
-    EOS
+    RUBY
   end
 
   it "outputs no dependencies for a Formula that has no dependencies" do

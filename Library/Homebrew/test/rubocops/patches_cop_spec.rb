@@ -113,7 +113,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
     end
 
     it "Formula with nested `def patches`" do
-      source = <<~EOS
+      source = <<~RUBY
         class Foo < Formula
           homepage "ftp://example.com/foo"
           url "http://example.com/foo-1.0.tgz"
@@ -125,7 +125,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
             }
           end
         end
-      EOS
+      RUBY
 
       expected_offenses = [{ message: "Use the patch DSL instead of defining a 'patches' method",
                              severity: :convention,
@@ -162,7 +162,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
         "https://patch-diff.githubusercontent.com/raw/foo/foo-bar/pull/100.patch",
       ]
       patch_urls.each do |patch_url|
-        source = <<~EOS
+        source = <<~RUBY
           class Foo < Formula
             homepage "ftp://example.com/foo"
             url "http://example.com/foo-1.0.tgz"
@@ -171,7 +171,7 @@ describe RuboCop::Cop::FormulaAudit::Patches do
               sha256 "63376b8fdd6613a91976106d9376069274191860cd58f039b29ff16de1925621"
             end
           end
-        EOS
+        RUBY
 
         inspect_source(source)
         expected_offense = if patch_url =~ %r{/raw\.github\.com/}
