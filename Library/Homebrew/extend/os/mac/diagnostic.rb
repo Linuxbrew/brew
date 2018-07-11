@@ -61,8 +61,10 @@ module Homebrew
         <<~EOS
           You are using macOS #{MacOS.version}.
           #{who} do not provide support for this #{what}.
-          You may encounter build failures or other breakages.
-          Please create pull-requests instead of filing issues.
+          You will encounter build failures and other breakages.
+          Please create pull-requests instead of asking for help on Homebrew's
+          GitHub, Discourse, Twitter or IRC. As you are running this #{what},
+          you are responsible for resolving any issues you experience.
         EOS
       end
 
