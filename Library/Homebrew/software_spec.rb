@@ -343,7 +343,7 @@ class BottleSpecification
 
   def root_url(var = nil, specs = {})
     if var.nil?
-      default_domain = (tap&.linux?) ? HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX : HOMEBREW_BOTTLE_DEFAULT_DOMAIN
+      default_domain = (!OS.mac? || tap&.linux?) ? HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX : HOMEBREW_BOTTLE_DEFAULT_DOMAIN
       domain = ENV.key?("HOMEBREW_BOTTLE_DOMAIN") ? HOMEBREW_BOTTLE_DOMAIN : default_domain
       @root_url ||= "#{domain}/#{Utils::Bottles::Bintray.repository(tap)}"
     else
