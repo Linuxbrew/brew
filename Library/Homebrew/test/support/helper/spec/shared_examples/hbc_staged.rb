@@ -80,7 +80,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname],
+      ["/usr/bin/sudo", "-E", "PATH=#{ENV["PATH"]}", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname],
     )
 
     staged.set_ownership(fake_pathname.to_s)
@@ -93,7 +93,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname, fake_pathname],
+      ["/usr/bin/sudo", "-E", "PATH=#{ENV["PATH"]}", "--", "/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname, fake_pathname],
     )
 
     staged.set_ownership([fake_pathname.to_s, fake_pathname.to_s])
@@ -105,7 +105,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
     Hbc::FakeSystemCommand.expects_command(
-      ["/usr/bin/sudo", "-E", "--", "/usr/sbin/chown", "-R", "--", "other_user:other_group", fake_pathname],
+      ["/usr/bin/sudo", "-E", "PATH=#{ENV["PATH"]}", "--", "/usr/sbin/chown", "-R", "--", "other_user:other_group", fake_pathname],
     )
 
     staged.set_ownership(fake_pathname.to_s, user: "other_user", group: "other_group")

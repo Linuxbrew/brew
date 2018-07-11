@@ -15,6 +15,11 @@ describe Hbc::Artifact::Pkg, :cask do
         args: ["-pkg", cask.staged_path.join("MyFancyPkg", "Fancy.pkg"), "-target", "/"],
         sudo: true,
         print_stdout: true,
+        env: {
+          "LOGNAME" => ENV["USER"],
+          "USER" => ENV["USER"],
+          "USERNAME" => ENV["USER"],
+        },
       )
 
       pkg.install_phase(command: fake_system_command)
@@ -55,6 +60,11 @@ describe Hbc::Artifact::Pkg, :cask do
         args: ["-pkg", cask.staged_path.join("MyFancyPkg", "Fancy.pkg"), "-target", "/", "-applyChoiceChangesXML", cask.staged_path.join("/tmp/choices.xml")],
         sudo: true,
         print_stdout: true,
+        env: {
+          "LOGNAME" => ENV["USER"],
+          "USER" => ENV["USER"],
+          "USERNAME" => ENV["USER"],
+        },
       )
 
       pkg.install_phase(command: fake_system_command)
