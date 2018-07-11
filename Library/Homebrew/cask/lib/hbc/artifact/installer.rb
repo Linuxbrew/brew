@@ -23,7 +23,7 @@ module Hbc
         def install_phase(command: nil, **_)
           ohai "Running #{self.class.dsl_key} script '#{path.relative_path_from(cask.staged_path)}'"
           FileUtils.chmod "+x", path unless path.executable?
-          command.run(path, **args, env: { "PATH" => PATH.new(HOMEBREW_PREFIX/"bin", HOMEBREW_PREFIX/"sbin", ENV["PATH"]) })
+          command.run!(path, **args, env: { "PATH" => PATH.new(HOMEBREW_PREFIX/"bin", HOMEBREW_PREFIX/"sbin", ENV["PATH"]) })
         end
       end
 
