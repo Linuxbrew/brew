@@ -2,7 +2,7 @@ describe Hbc::SystemCommand, :cask do
   describe "#initialize" do
     let(:env_args) { ["bash", "-c", 'printf "%s" "${A?}" "${B?}" "${C?}"'] }
 
-    describe "given some environment variables" do
+    context "when given some environment variables" do
       subject {
         described_class.new(
           "env",
@@ -26,7 +26,7 @@ describe Hbc::SystemCommand, :cask do
       end
     end
 
-    describe "given some environment variables and sudo: true" do
+    context "when given some environment variables and sudo: true" do
       subject {
         described_class.new(
           "env",
@@ -54,7 +54,7 @@ describe Hbc::SystemCommand, :cask do
     end
   end
 
-  describe "when the exit code is 0" do
+  context "when the exit code is 0" do
     describe "its result" do
       subject { described_class.run("/usr/bin/true") }
 
@@ -63,10 +63,10 @@ describe Hbc::SystemCommand, :cask do
     end
   end
 
-  describe "when the exit code is 1" do
+  context "when the exit code is 1" do
     let(:command) { "/usr/bin/false" }
 
-    describe "and the command must succeed" do
+    context "and the command must succeed" do
       it "throws an error" do
         expect {
           described_class.run!(command)
@@ -74,7 +74,7 @@ describe Hbc::SystemCommand, :cask do
       end
     end
 
-    describe "and the command does not have to succeed" do
+    context "and the command does not have to succeed" do
       describe "its result" do
         subject { described_class.run(command) }
 
@@ -84,7 +84,7 @@ describe Hbc::SystemCommand, :cask do
     end
   end
 
-  describe "given a pathname" do
+  context "when given a pathname" do
     let(:command) { "/bin/ls" }
     let(:path)    { Pathname(Dir.mktmpdir) }
 
@@ -100,7 +100,7 @@ describe Hbc::SystemCommand, :cask do
     end
   end
 
-  describe "with both STDOUT and STDERR output from upstream" do
+  context "with both STDOUT and STDERR output from upstream" do
     let(:command) { "/bin/bash" }
     let(:options) {
       { args: [
@@ -119,7 +119,7 @@ describe Hbc::SystemCommand, :cask do
       end
     end
 
-    describe "with default options" do
+    context "with default options" do
       it "echoes only STDERR" do
         expected = [2, 4, 6].map { |i| "#{i}\n" }.join
         expect {
@@ -130,7 +130,7 @@ describe Hbc::SystemCommand, :cask do
       include_examples("it returns '1 2 3 4 5 6'")
     end
 
-    describe "with print_stdout" do
+    context "with print_stdout" do
       before do
         options.merge!(print_stdout: true)
       end
@@ -144,7 +144,7 @@ describe Hbc::SystemCommand, :cask do
       include_examples("it returns '1 2 3 4 5 6'")
     end
 
-    describe "without print_stderr" do
+    context "without print_stderr" do
       before do
         options.merge!(print_stderr: false)
       end
@@ -158,7 +158,7 @@ describe Hbc::SystemCommand, :cask do
       include_examples("it returns '1 2 3 4 5 6'")
     end
 
-    describe "with print_stdout but without print_stderr" do
+    context "with print_stdout but without print_stderr" do
       before do
         options.merge!(print_stdout: true, print_stderr: false)
       end
@@ -174,7 +174,7 @@ describe Hbc::SystemCommand, :cask do
     end
   end
 
-  describe "with a very long STDERR output" do
+  context "with a very long STDERR output" do
     let(:command) { "/bin/bash" }
     let(:options) {
       { args: [
@@ -190,10 +190,23 @@ describe Hbc::SystemCommand, :cask do
     end
   end
 
-  describe "given an invalid variable name" do
+  context "when given an invalid variable name" do
     it "raises an ArgumentError" do
       expect { described_class.run("true", env: { "1ABC" => true }) }
         .to raise_error(ArgumentError, /variable name/)
+    end
+  end
+
+  it "looks for executables in custom PATH" do
+    mktmpdir do |path|
+      (path/"tool").write <<~SH
+        #!/bin/sh
+        echo Hello, world!
+      SH
+
+      FileUtils.chmod "+x", path/"tool"
+
+      expect(described_class.run("tool", env: { "PATH" => path }).stdout).to include "Hello, world!"
     end
   end
 end
