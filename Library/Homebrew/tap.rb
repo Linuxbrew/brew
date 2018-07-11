@@ -115,12 +115,11 @@ class Tap
   # Not simply "#{user}/homebrew-#{repo}", because the slug of homebrew/core
   # may be either Homebrew/homebrew-core or Linuxbrew/homebrew-core.
   def slug
-    if remote.nil?
-      "#{user}/homebrew-#{repo}"
-    else
-      x = remote[%r{^https://github\.com/([^.]+)(\.git)?$}, 1]
-      (official? && !x.nil?) ? x.capitalize : x
-    end
+    default_slug = "#{user}/homebrew-#{repo}"
+    return default_slug if remote.nil?
+    x = remote[%r{^(?:https://github\.com/|git@github\.com:)([^.]+)(\.git)?$}, 1]
+    return default_slug if x.nil?
+    official? ? x.capitalize : x
   end
 
   # The default remote path to this {Tap}.
