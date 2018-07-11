@@ -15,10 +15,10 @@ describe Hbc::SystemCommand, :cask do
       its("run!.stdout") { is_expected.to eq("123") }
 
       describe "the resulting command line" do
-        it "does not include the given variables" do
+        it "includes the given variables explicitly" do
           expect(Open3)
             .to receive(:popen3)
-            .with(a_hash_including("PATH"), ["env"] * 2, *env_args, {})
+            .with(["env", "env"], "A=1", "B=2", "C=3", "env", *env_args, {})
             .and_call_original
 
           subject.run!
@@ -41,9 +41,8 @@ describe Hbc::SystemCommand, :cask do
         it "includes the given variables explicitly" do
           expect(Open3)
             .to receive(:popen3)
-            .with(an_instance_of(Hash), ["/usr/bin/sudo"] * 2,
-                "-E", a_string_starting_with("PATH="),
-                "A=1", "B=2", "C=3", "--", "env", *env_args, {})
+            .with(["/usr/bin/sudo", "/usr/bin/sudo"], "-E", "--",
+                  "env", "A=1", "B=2", "C=3", "env", *env_args, {})
             .and_wrap_original do |original_popen3, *_, &block|
               original_popen3.call("/usr/bin/true", &block)
             end
@@ -197,7 +196,7 @@ describe Hbc::SystemCommand, :cask do
     end
   end
 
-  it "looks for executables in custom PATH" do
+  it "looks for executables in a custom PATH" do
     mktmpdir do |path|
       (path/"tool").write <<~SH
         #!/bin/sh

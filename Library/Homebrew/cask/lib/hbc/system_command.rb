@@ -47,7 +47,7 @@ module Hbc
       @must_succeed = must_succeed
       options.extend(HashValidator).assert_valid_keys(:chdir)
       @options = options
-      @env = { "PATH" => ENV["PATH"] }.merge(env)
+      @env = env
 
       @env.keys.grep_v(/^[\w&&\D]\w*$/) do |name|
         raise ArgumentError, "Invalid variable name: '#{name}'"
@@ -55,7 +55,7 @@ module Hbc
     end
 
     def command
-      [*sudo_prefix, executable, *args]
+      [*sudo_prefix, *env_args, executable, *args]
     end
 
     private
@@ -64,18 +64,22 @@ module Hbc
 
     attr_predicate :sudo?, :print_stdout?, :print_stderr?, :must_succeed?
 
+    def env_args
+      return [] if env.empty?
+
+      variables = env.map do |name, value|
+        sanitized_name = Shellwords.escape(name)
+        sanitized_value = Shellwords.escape(value)
+        "#{sanitized_name}=#{sanitized_value}"
+      end
+
+      ["env", *variables]
+    end
+
     def sudo_prefix
       return [] unless sudo?
       askpass_flags = ENV.key?("SUDO_ASKPASS") ? ["-A"] : []
-      prefix = ["/usr/bin/sudo", *askpass_flags, "-E"]
-
-      env.each do |name, value|
-        sanitized_name = Shellwords.escape(name)
-        sanitized_value = Shellwords.escape(value)
-        prefix << "#{sanitized_name}=#{sanitized_value}"
-      end
-
-      prefix << "--"
+      ["/usr/bin/sudo", *askpass_flags, "-E", "--"]
     end
 
     def assert_success
@@ -97,11 +101,7 @@ module Hbc
       executable, *args = expanded_command
 
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
-        # We need to specifically use `with_env` for `PATH`, otherwise
-        # Ruby itself will not look for the executable in `PATH`.
-        with_env "PATH" => env["PATH"] do
-          Open3.popen3(env, [executable, executable], *args, **options)
-        end
+        Open3.popen3([executable, executable], *args, **options)
 
       write_input_to(raw_stdin)
       raw_stdin.close_write
