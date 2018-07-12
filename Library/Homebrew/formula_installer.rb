@@ -473,6 +473,7 @@ class FormulaInstaller
 
   def expand_dependencies(deps)
     inherited_options = Hash.new { |hash, key| hash[key] = Options.new }
+    pour_bottle = pour_bottle?
 
     expanded_deps = Dependency.expand(formula, deps) do |dependent, dep|
       inherited_options[dep.name] |= inherited_options_for(dep)
@@ -480,6 +481,7 @@ class FormulaInstaller
         dependent,
         inherited_options.fetch(dependent.name, []),
       )
+      pour_bottle = true if install_bottle_for?(dep.to_formula, build)
 
       if dep.prune_from_option?(build)
         Dependency.prune
@@ -492,6 +494,16 @@ class FormulaInstaller
       elsif dep.satisfied?(inherited_options[dep.name])
         Dependency.skip
       end
+    end
+
+    if pour_bottle
+      bottle_deps = Keg.relocation_formulae
+                       .map { |formula| Dependency.new(formula) }
+                       .reject do |dep|
+        inherited_options[dep.name] |= inherited_options_for(dep)
+        dep.satisfied? inherited_options[dep.name]
+      end
+      expanded_deps = Dependency.merge_repeats(bottle_deps + expanded_deps) unless bottle_deps.empty?
     end
 
     expanded_deps.map { |dep| [dep, inherited_options[dep.name]] }

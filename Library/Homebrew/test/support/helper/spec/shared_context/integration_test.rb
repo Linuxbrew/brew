@@ -157,6 +157,10 @@ RSpec.shared_context "integration test" do
         url "https://example.com/#{name}-1.0"
         depends_on "foo"
       RUBY
+    when "patchelf"
+      content = <<~RUBY
+        url "https://example.com/#{name}-1.0"
+      RUBY
     end
 
     Formulary.core_path(name).tap do |formula_path|
