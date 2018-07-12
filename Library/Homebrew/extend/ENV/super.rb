@@ -285,7 +285,7 @@ module Superenv
   end
 
   def permit_arch_flags
-    append "HOMEBREW_CCCFG", "K"
+    append_to_cccfg "K"
   end
 
   def m32
@@ -298,26 +298,26 @@ module Superenv
 
   def cxx11
     if homebrew_cc == "clang"
-      append "HOMEBREW_CCCFG", "x", ""
-      append "HOMEBREW_CCCFG", "g", ""
+      append_to_cccfg "x"
+      append_to_cccfg "g"
     elsif compiler_with_cxx11_support?(homebrew_cc)
-      append "HOMEBREW_CCCFG", "x", ""
+      append_to_cccfg "x"
     else
       raise "The selected compiler doesn't support C++11: #{homebrew_cc}"
     end
   end
 
   def libcxx
-    append "HOMEBREW_CCCFG", "g", "" if compiler == :clang
+    append_to_cccfg "g" if compiler == :clang
   end
 
   def libstdcxx
-    append "HOMEBREW_CCCFG", "h", "" if compiler == :clang
+    append_to_cccfg "h" if compiler == :clang
   end
 
   # @private
   def refurbish_args
-    append "HOMEBREW_CCCFG", "O", ""
+    append_to_cccfg "O"
   end
 
   %w[O3 O2 O1 O0 Os].each do |opt|

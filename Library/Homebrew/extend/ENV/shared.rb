@@ -54,6 +54,10 @@ module SharedEnvExtension
     remove CC_FLAG_VARS, val
   end
 
+  def append_to_cccfg(value)
+    append("HOMEBREW_CCCFG", value, "")
+  end
+
   def append(keys, value, separator = " ")
     value = value.to_s
     Array(keys).each do |key|
