@@ -31,6 +31,9 @@ Lint/NestedMethodDefinition:
 Lint/ParenthesesAsGroupedExpression:
   Enabled: true
 
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true
+
 # TODO: try to bring down all metrics maximums
 Metrics/AbcSize:
   Max: 250

@@ -54,6 +54,15 @@ class Sandbox
     allow_write_path HOMEBREW_CACHE
   end
 
+  def allow_cvs
+    allow_write_path "/Users/#{ENV["USER"]}/.cvspass"
+  end
+
+  def allow_fossil
+    allow_write_path "/Users/#{ENV["USER"]}/.fossil"
+    allow_write_path "/Users/#{ENV["USER"]}/.fossil-journal"
+  end
+
   def allow_write_cellar(formula)
     allow_write_path formula.rack
     allow_write_path formula.etc

@@ -728,6 +728,8 @@ class FormulaInstaller
         sandbox.allow_write_path(ENV["HOME"]) if ARGV.interactive?
         sandbox.allow_write_temp_and_cache
         sandbox.allow_write_log(formula)
+        sandbox.allow_cvs
+        sandbox.allow_fossil
         sandbox.allow_write_xcode
         sandbox.allow_write_cellar(formula)
         sandbox.exec(*args)

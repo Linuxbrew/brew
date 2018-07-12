@@ -1,6 +1,7 @@
 require "json"
 require "rexml/document"
 require "time"
+require "unpack_strategy"
 
 class AbstractDownloadStrategy
   extend Forwardable
@@ -45,7 +46,10 @@ class AbstractDownloadStrategy
   # Unpack {#cached_location} into the current working directory, and possibly
   # chdir into the newly-unpacked directory.
   # Unlike {Resource#stage}, this does not take a block.
-  def stage; end
+  def stage
+    UnpackStrategy.detect(cached_location, ref_type: @ref_type, ref: @ref)
+                  .extract(basename: basename_without_params)
+  end
 
   # @!attribute [r] cached_location
   # The path to the cached file or directory associated with the resource.
@@ -63,22 +67,6 @@ class AbstractDownloadStrategy
     rm_rf(cached_location)
   end
 
-  def expand_safe_system_args(args)
-    args = args.dup
-    args.each_with_index do |arg, ii|
-      next unless arg.is_a? Hash
-      if ARGV.verbose?
-        args.delete_at ii
-      else
-        args[ii] = arg[:quiet_flag]
-      end
-      return args
-    end
-    # 2 as default because commands are eg. svn up, git pull
-    args.insert(2, "-q") unless ARGV.verbose?
-    args
-  end
-
   def safe_system(*args)
     if @shutup
       quiet_system(*args) || raise(ErrorDuringExecution.new(args.shift, args))
@@ -87,8 +75,11 @@ class AbstractDownloadStrategy
     end
   end
 
-  def quiet_safe_system(*args)
-    safe_system(*expand_safe_system_args(args))
+  def basename_without_params
+    return unless @url
+
+    # Strip any ?thing=wad out of .c?thing=wad style extensions
+    File.basename(@url)[/[^?]+/]
   end
 end
 
@@ -152,7 +143,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
   private
 
   def cache_tag
-    "__UNKNOWN__"
+    raise NotImplementedError
   end
 
   def cache_filename
@@ -160,7 +151,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
   end
 
   def repo_valid?
-    true
+    raise NotImplementedError
   end
 
   def clone_repo; end
@@ -177,40 +168,8 @@ end
 
 class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   def stage
-    path = cached_location
-    unpack_dir = Pathname.pwd
-
-    case type = path.compression_type
-    when :zip
-      safe_system "unzip", "-qq", path, "-d", unpack_dir
-      chdir
-    when :gzip_only
-      FileUtils.cp path, unpack_dir, preserve: true
-      safe_system "gunzip", "-q", "-N", unpack_dir/path.basename
-    when :bzip2_only
-      FileUtils.cp path, unpack_dir, preserve: true
-      safe_system "bunzip2", "-q", unpack_dir/path.basename
-    when :gzip, :bzip2, :xz, :compress, :tar
-      if type == :xz && DependencyCollector.tar_needs_xz_dependency?
-        pipe_to_tar "#{HOMEBREW_PREFIX}/opt/xz/bin/xz", unpack_dir
-      else
-        safe_system "tar", "xf", path, "-C", unpack_dir
-      end
-      chdir
-    when :lzip
-      pipe_to_tar "#{HOMEBREW_PREFIX}/opt/lzip/bin/lzip", unpack_dir
-      chdir
-    when :lha
-      safe_system "#{HOMEBREW_PREFIX}/opt/lha/bin/lha", "xq2w=#{unpack_dir}", path
-    when :xar
-      safe_system "xar", "-x", "-f", path, "-C", unpack_dir
-    when :rar
-      safe_system "unrar", "x", "-inul", path, unpack_dir
-    when :p7zip
-      safe_system "7zr", "x", "-y", "-bd", "-bso0", path, "-o#{unpack_dir}"
-    else
-      cp path, unpack_dir/basename_without_params, preserve: true
-    end
+    super
+    chdir
   end
 
   private
@@ -225,22 +184,6 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
         nil
       end
     end
-  end
-
-  def pipe_to_tar(tool, unpack_dir)
-    path = cached_location
-
-    Utils.popen_read(tool, "-dc", path) do |rd|
-      Utils.popen_write("tar", "xf", "-", "-C", unpack_dir) do |wr|
-        buf = ""
-        wr.write(buf) while rd.read(16384, buf)
-      end
-    end
-  end
-
-  def basename_without_params
-    # Strip any ?thing=wad out of .c?thing=wad style extensions
-    File.basename(@url)[/[^?]+/]
   end
 
   def ext
@@ -384,7 +327,8 @@ end
 # Useful for installing jars.
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
-    cp cached_location, basename_without_params, preserve: true
+    UncompressedUnpackStrategy.new(cached_location)
+                              .extract(basename: basename_without_params)
   end
 end
 
@@ -607,11 +551,6 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     super
   end
 
-  def stage
-    super
-    safe_system "svn", "export", "--force", cached_location, Dir.pwd
-  end
-
   def source_modified_time
     xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", cached_location.to_s))
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
@@ -647,7 +586,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
       args << "-r" << revision
     end
     args << "--ignore-externals" if ignore_externals
-    quiet_safe_system(*args)
+    safe_system(*args)
   end
 
   def cache_tag
@@ -690,11 +629,6 @@ class GitDownloadStrategy < VCSDownloadStrategy
     @ref_type ||= :branch
     @ref ||= "master"
     @shallow = meta.fetch(:shallow) { true }
-  end
-
-  def stage
-    super
-    cp_r File.join(cached_location, "."), Dir.pwd, preserve: true
   end
 
   def source_modified_time
@@ -929,10 +863,6 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     end
   end
 
-  def cvspath
-    @cvspath ||= which("cvs", PATH.new("/usr/bin", Formula["cvs"].opt_bin, ENV["PATH"]))
-  end
-
   def source_modified_time
     # Filter CVS's files because the timestamp for each of them is the moment
     # of clone.
@@ -946,10 +876,6 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     max_mtime
   end
 
-  def stage
-    cp_r File.join(cached_location, "."), Dir.pwd, preserve: true
-  end
-
   private
 
   def cache_tag
@@ -960,16 +886,23 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     (cached_location/"CVS").directory?
   end
 
+  def quiet_flag
+    "-Q" unless ARGV.verbose?
+  end
+
   def clone_repo
-    HOMEBREW_CACHE.cd do
+    with_cvs_env do
       # Login is only needed (and allowed) with pserver; skip for anoncvs.
-      quiet_safe_system cvspath, { quiet_flag: "-Q" }, "-d", @url, "login" if @url.include? "pserver"
-      quiet_safe_system cvspath, { quiet_flag: "-Q" }, "-d", @url, "checkout", "-d", cache_filename, @module
+      safe_system "cvs", *quiet_flag, "-d", @url, "login" if @url.include? "pserver"
+      safe_system "cvs", *quiet_flag, "-d", @url, "checkout", "-d", cached_location.basename, @module,
+                  chdir: cached_location.dirname
     end
   end
 
   def update
-    cached_location.cd { quiet_safe_system cvspath, { quiet_flag: "-Q" }, "up" }
+    with_cvs_env do
+      safe_system "cvs", *quiet_flag, "update", chdir: cached_location
+    end
   end
 
   def split_url(in_url)
@@ -977,6 +910,12 @@ class CVSDownloadStrategy < VCSDownloadStrategy
     mod = parts.pop
     url = parts.join(":")
     [mod, url]
+  end
+
+  def with_cvs_env
+    with_env PATH => PATH.new("/usr/bin", Formula["cvs"].opt_bin, ENV["PATH"]) do
+      yield
+    end
   end
 end
 
@@ -986,30 +925,16 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
     @url = @url.sub(%r{^hg://}, "")
   end
 
-  def hgpath
-    @hgpath ||= which("hg", PATH.new(Formula["mercurial"].opt_bin, ENV["PATH"]))
-  end
-
-  def stage
-    super
-
-    dst = Dir.getwd
-    cached_location.cd do
-      if @ref_type && @ref
-        ohai "Checking out #{@ref_type} #{@ref}" if @ref_type && @ref
-        safe_system hgpath, "archive", "--subrepos", "-y", "-r", @ref, "-t", "files", dst
-      else
-        safe_system hgpath, "archive", "--subrepos", "-y", "-t", "files", dst
-      end
+  def source_modified_time
+    with_hg_env do
+      Time.parse Utils.popen_read("hg", "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
     end
   end
 
-  def source_modified_time
-    Time.parse Utils.popen_read(hgpath, "tip", "--template", "{date|isodate}", "-R", cached_location.to_s)
-  end
-
   def last_commit
-    Utils.popen_read(hgpath, "parent", "--template", "{node|short}", "-R", cached_location.to_s)
+    with_hg_env do
+      Utils.popen_read("hg", "parent", "--template", "{node|short}", "-R", cached_location.to_s)
+    end
   end
 
   private
@@ -1023,12 +948,29 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
   end
 
   def clone_repo
-    safe_system hgpath, "clone", @url, cached_location
+    with_hg_env do
+      safe_system "hg", "clone", @url, cached_location
+    end
   end
 
   def update
-    cached_location.cd do
-      safe_system hgpath, "pull", "--update"
+    with_hg_env do
+      safe_system "hg", "--cwd", cached_location, "pull", "--update"
+
+      update_args = if @ref_type && @ref
+        ohai "Checking out #{@ref_type} #{@ref}"
+        [@ref]
+      else
+        ["--clean"]
+      end
+
+      safe_system "hg", "--cwd", cached_location, "update", *update_args
+    end
+  end
+
+  def with_hg_env
+    with_env PATH => PATH.new(Formula["mercurial"].opt_bin, ENV["PATH"]) do
+      yield
     end
   end
 end
@@ -1040,25 +982,18 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
     ENV["BZR_HOME"] = HOMEBREW_TEMP
   end
 
-  def bzrpath
-    @bzrpath ||= which("bzr", PATH.new(Formula["bazaar"].opt_bin, ENV["PATH"]))
-  end
-
-  def stage
-    # The export command doesn't work on checkouts
-    # See https://bugs.launchpad.net/bzr/+bug/897511
-    cp_r File.join(cached_location, "."), Dir.pwd, preserve: true
-    rm_r ".bzr"
-  end
-
   def source_modified_time
-    timestamp = Utils.popen_read(bzrpath, "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+    timestamp = with_bazaar_env do
+      Utils.popen_read("bzr", "log", "-l", "1", "--timezone=utc", cached_location.to_s)[/^timestamp: (.+)$/, 1]
+    end
     raise "Could not get any timestamps from bzr!" if timestamp.to_s.empty?
     Time.parse timestamp
   end
 
   def last_commit
-    Utils.popen_read(bzrpath, "revno", cached_location.to_s).chomp
+    with_bazaar_env do
+      Utils.popen_read("bzr", "revno", cached_location.to_s).chomp
+    end
   end
 
   private
@@ -1072,13 +1007,21 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
   end
 
   def clone_repo
-    # "lightweight" means history-less
-    safe_system bzrpath, "checkout", "--lightweight", @url, cached_location
+    with_bazaar_env do
+      # "lightweight" means history-less
+      safe_system "bzr", "checkout", "--lightweight", @url, cached_location
+    end
   end
 
   def update
-    cached_location.cd do
-      safe_system bzrpath, "update"
+    with_bazaar_env do
+      safe_system "bzr", "update", chdir: cached_location
+    end
+  end
+
+  def with_bazaar_env
+    with_env "PATH" => PATH.new(Formula["bazaar"].opt_bin, ENV["PATH"]) do
+      yield
     end
   end
 end
@@ -1089,23 +1032,22 @@ class FossilDownloadStrategy < VCSDownloadStrategy
     @url = @url.sub(%r{^fossil://}, "")
   end
 
-  def fossilpath
-    @fossilpath ||= which("fossil", PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]))
-  end
-
-  def stage
-    super
-    args = [fossilpath, "open", cached_location]
-    args << @ref if @ref_type && @ref
-    safe_system(*args)
-  end
-
   def source_modified_time
-    Time.parse Utils.popen_read(fossilpath, "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
+    with_fossil_env do
+      Time.parse Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +\h+ (.+)$/, 1]
+    end
   end
 
   def last_commit
-    Utils.popen_read(fossilpath, "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
+    with_fossil_env do
+      Utils.popen_read("fossil", "info", "tip", "-R", cached_location.to_s)[/^uuid: +(\h+) .+$/, 1]
+    end
+  end
+
+  def repo_valid?
+    with_fossil_env do
+      quiet_system "fossil", "branch", "-R", cached_location
+    end
   end
 
   private
@@ -1115,11 +1057,21 @@ class FossilDownloadStrategy < VCSDownloadStrategy
   end
 
   def clone_repo
-    safe_system fossilpath, "clone", @url, cached_location
+    with_fossil_env do
+      safe_system "fossil", "clone", @url, cached_location
+    end
   end
 
   def update
-    safe_system fossilpath, "pull", "-R", cached_location
+    with_fossil_env do
+      safe_system "fossil", "pull", "-R", cached_location
+    end
+  end
+
+  def with_fossil_env
+    with_env "PATH" => PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]) do
+      yield
+    end
   end
 end
 

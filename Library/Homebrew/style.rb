@@ -30,6 +30,10 @@ module Homebrew
         args << "--parallel"
       end
 
+      if ARGV.verbose?
+        args += ["--extra-details", "--display-cop-names"]
+      end
+
       if ARGV.include?("--rspec")
         Homebrew.install_gem! "rubocop-rspec"
         args += %w[--require rubocop-rspec]
