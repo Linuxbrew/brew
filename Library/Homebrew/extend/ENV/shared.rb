@@ -55,7 +55,7 @@ module SharedEnvExtension
   end
 
   def append_to_cccfg(value)
-    append(HOMEBREW_CCCFG, value, "")
+    append("HOMEBREW_CCCFG", value, "")
   end
 
   def append(keys, value, separator = " ")
