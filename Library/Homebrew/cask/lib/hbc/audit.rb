@@ -36,6 +36,7 @@ module Hbc
       check_untrusted_pkg
       check_hosting_with_appcast
       check_latest_with_appcast
+      check_latest_with_auto_updates
       check_stanza_requires_uninstall
       self
     rescue StandardError => e
@@ -197,6 +198,13 @@ module Hbc
       return unless cask.appcast
 
       add_warning "Casks with an appcast should not use version :latest"
+    end
+
+    def check_latest_with_auto_updates
+      return unless cask.version.latest?
+      return unless cask.auto_updates
+
+      add_warning "Casks with `version :latest` should not use `auto_updates`"
     end
 
     def check_hosting_with_appcast
