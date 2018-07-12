@@ -147,6 +147,7 @@ module OS
       end
 
       def detect_version_from_clang_version
+        return "dunno" if DevelopmentTools.clang_version.null?
         # This logic provides a fake Xcode version based on the
         # installed CLT version. This is useful as they are packaged
         # simultaneously so workarounds need to apply to both based on their
