@@ -3,7 +3,7 @@ setup-ruby-path() {
   local vendor_ruby_current_version
   local vendor_ruby_path
   local ruby_version_new_enough
-  local minimum_ruby_version="2.3.3"
+  local minimum_ruby_version="2.3.7"
 
   vendor_dir="$HOMEBREW_LIBRARY/Homebrew/vendor"
   vendor_ruby_current_version="$vendor_dir/portable-ruby/current"

@@ -165,7 +165,7 @@ module Homebrew
       end
 
       def check_ruby_version
-        ruby_version = "2.3.3"
+        ruby_version = "2.3.7"
         return if RUBY_VERSION == ruby_version
         return if ARGV.homebrew_developer? && OS::Mac.prerelease?
 
