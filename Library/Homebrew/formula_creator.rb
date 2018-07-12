@@ -77,7 +77,7 @@ module Homebrew
     end
 
     def template
-      <<~EOS
+      <<~ERB
         # Documentation: https://docs.brew.sh/Formula-Cookbook
         #                http://www.rubydoc.info/github/Homebrew/brew/master/Formula
         # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
@@ -147,7 +147,7 @@ module Homebrew
             system "false"
           end
         end
-      EOS
+      ERB
     end
   end
 end

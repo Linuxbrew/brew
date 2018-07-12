@@ -34,7 +34,7 @@ describe Hbc::Artifact::Pkg, :cask do
 
       file = double(path: Pathname.new("/tmp/choices.xml"))
 
-      expect(file).to receive(:write).with(<<~EOS)
+      expect(file).to receive(:write).with <<~XML
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0">
@@ -49,7 +49,7 @@ describe Hbc::Artifact::Pkg, :cask do
         \t</dict>
         </array>
         </plist>
-      EOS
+      XML
 
       expect(file).to receive(:close)
       expect(file).to receive(:unlink)

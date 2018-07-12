@@ -86,9 +86,9 @@ describe Homebrew::MissingFormula do
       Tap.clear_cache
       tap_path = Tap::TAP_DIRECTORY/"homebrew/homebrew-foo"
       tap_path.mkpath
-      (tap_path/"tap_migrations.json").write <<~EOS
+      (tap_path/"tap_migrations.json").write <<~JSON
         { "migrated-formula": "homebrew/bar" }
-      EOS
+      JSON
     end
 
     context "with a migrated formula" do

@@ -1,8 +1,8 @@
 describe "brew switch", :integration_test do
   it "allows switching between Formula versions" do
-    setup_test_formula "testball", <<~EOS
+    setup_test_formula "testball", <<~RUBY
       keg_only "just because"
-    EOS
+    RUBY
 
     expect { brew "install", "testball" }.to be_a_success
 

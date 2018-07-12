@@ -2,10 +2,10 @@ describe "brew uses", :integration_test do
   it "prints the Formulae a given Formula is used by" do
     setup_test_formula "foo"
     setup_test_formula "bar"
-    setup_test_formula "baz", <<~EOS
+    setup_test_formula "baz", <<~RUBY
       url "https://example.com/baz-1.0"
       depends_on "bar"
-    EOS
+    RUBY
 
     expect { brew "uses", "baz" }
       .to be_a_success

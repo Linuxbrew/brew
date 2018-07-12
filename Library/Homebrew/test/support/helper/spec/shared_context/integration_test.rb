@@ -127,7 +127,7 @@ RSpec.shared_context "integration test" do
       else
         TEST_FIXTURE_DIR/"tarballs/testball-0.1.tbz"
       end
-      content = <<~EOS
+      content = <<~RUBY
         desc "Some test"
         homepage "https://example.com/#{name}"
         url "file://#{tarball}"
@@ -147,24 +147,24 @@ RSpec.shared_context "integration test" do
         #{content}
 
         # something here
-      EOS
+      RUBY
     when "foo"
-      content = <<~EOS
+      content = <<~RUBY
         url "https://example.com/#{name}-1.0"
-      EOS
+      RUBY
     when "bar"
-      content = <<~EOS
+      content = <<~RUBY
         url "https://example.com/#{name}-1.0"
         depends_on "foo"
-      EOS
+      RUBY
     end
 
     Formulary.core_path(name).tap do |formula_path|
-      formula_path.write <<~EOS
+      formula_path.write <<~RUBY
         class #{Formulary.class_s(name)} < Formula
           #{content}
         end
-      EOS
+      RUBY
     end
   end
 

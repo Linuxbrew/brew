@@ -102,19 +102,19 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
     end
 
     it "autocorrects all rules" do
-      source = <<~EOS
+      source = <<~RUBY
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc ' an bar: commandline foo '
         end
-      EOS
+      RUBY
 
-      correct_source = <<~EOS
+      correct_source = <<~RUBY
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           desc 'an bar: command-line'
         end
-      EOS
+      RUBY
 
       corrected_source = autocorrect_source(source, "/homebrew-core/Formula/foo.rb")
       expect(corrected_source).to eq(correct_source)

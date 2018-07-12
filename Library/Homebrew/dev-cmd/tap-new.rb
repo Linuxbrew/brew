@@ -30,7 +30,7 @@ module Homebrew
 
     (tap.path/"Formula").mkpath
 
-    readme = <<~EOS
+    readme = <<~MARKDOWN
       # #{titleized_user} #{titleized_repo}
 
       ## How do I install these formulae?
@@ -46,10 +46,10 @@ module Homebrew
 
       ## Documentation
       `brew help`, `man brew` or check [Homebrew's documentation](https://docs.brew.sh).
-    EOS
+    MARKDOWN
     write_path(tap, "README.md", readme)
 
-    travis = <<~EOS
+    travis = <<~YAML
       language: c
       os: osx
       compiler: clang
@@ -71,7 +71,7 @@ module Homebrew
 
       script:
         - brew test-bot
-    EOS
+    YAML
     write_path(tap, ".travis.yml", travis)
   end
 end

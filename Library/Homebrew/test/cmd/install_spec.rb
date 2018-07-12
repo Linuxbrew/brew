@@ -26,9 +26,9 @@ describe "brew install", :integration_test do
   end
 
   specify "install failures" do
-    path = setup_test_formula "testball1", <<~EOS
+    path = setup_test_formula "testball1", <<~RUBY
       version "1.0"
-    EOS
+    RUBY
 
     expect { brew "install", "testball1" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/1\.0}).to_stdout
@@ -36,7 +36,7 @@ describe "brew install", :integration_test do
       .and be_a_success
 
     FileUtils.rm path
-    setup_test_formula "testball1", <<~EOS
+    setup_test_formula "testball1", <<~RUBY
       version "2.0"
 
       devel do
@@ -44,7 +44,7 @@ describe "brew install", :integration_test do
         sha256 "#{Formulary.factory("testball1").stable.checksum.hexdigest}"
         version "3.0"
       end
-    EOS
+    RUBY
 
     expect { brew "install", "testball1" }
       .to output(/`brew upgrade testball1`/).to_stderr
@@ -90,11 +90,11 @@ describe "brew install", :integration_test do
   end
 
   it "can install keg-only Formulae" do
-    path_keg_only = setup_test_formula "testball1", <<~EOS
+    path_keg_only = setup_test_formula "testball1", <<~RUBY
       version "1.0"
 
       keg_only "test reason"
-    EOS
+    RUBY
 
     expect { brew "install", "testball1" }
       .to output(%r{#{HOMEBREW_CELLAR}/testball1/1\.0}).to_stdout
@@ -102,11 +102,11 @@ describe "brew install", :integration_test do
       .and be_a_success
 
     FileUtils.rm path_keg_only
-    setup_test_formula "testball1", <<~EOS
+    setup_test_formula "testball1", <<~RUBY
       version "2.0"
 
       keg_only "test reason"
-    EOS
+    RUBY
 
     expect { brew "install", "testball1" }
       .to output(/testball1 1.0 is already installed/).to_stderr
@@ -132,7 +132,7 @@ describe "brew install", :integration_test do
       system "git", "commit", "-m", "Initial repo commit"
     end
 
-    setup_test_formula "testball1", <<~EOS
+    setup_test_formula "testball1", <<~RUBY
       version "1.0"
 
       head "file://#{repo_path}", :using => :git
@@ -140,7 +140,7 @@ describe "brew install", :integration_test do
       def install
         prefix.install Dir["*"]
       end
-    EOS
+    RUBY
 
     # Ignore dependencies, because we'll try to resolve requirements in build.rb
     # and there will be the git requirement, but we cannot instantiate git
@@ -175,13 +175,13 @@ describe "brew install", :integration_test do
   end
 
   it "succeeds when a non-fatal requirement isn't satisfied" do
-    setup_test_formula "testball1", <<~EOS
+    setup_test_formula "testball1", <<~RUBY
       class NonFatalRequirement < Requirement
         satisfy(build_env: false) { false }
       end
 
       depends_on NonFatalRequirement
-    EOS
+    RUBY
 
     expect { brew "install", "testball1" }
       .to output(/NonFatalRequirement unsatisfied!/).to_stderr
@@ -190,14 +190,14 @@ describe "brew install", :integration_test do
   end
 
   it "fails when a fatal requirement isn't satisfied" do
-    setup_test_formula "testball1", <<~EOS
+    setup_test_formula "testball1", <<~RUBY
       class FatalRequirement < Requirement
         fatal true
         satisfy { false }
       end
 
       depends_on FatalRequirement
-    EOS
+    RUBY
 
     expect { brew "install", "testball1" }
       .to output(/FatalRequirement unsatisfied!/).to_stderr

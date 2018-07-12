@@ -27,11 +27,11 @@ module Homebrew
       package_url = "#{bintray_repo_url}/#{bintray_package}"
 
       unless system curl_executable, "--silent", "--fail", "--output", "/dev/null", package_url
-        package_blob = <<~EOS
+        package_blob = <<~JSON
           {"name": "#{bintray_package}",
            "public_download_numbers": true,
            "public_stats": true}
-        EOS
+        JSON
         curl "--silent", "--fail", "--user", "#{bintray_user}:#{bintray_key}",
              "--header", "Content-Type: application/json",
              "--data", package_blob, bintray_repo_url

@@ -46,20 +46,20 @@ module Language
     end
 
     def self.in_sys_path?(python, path)
-      script = <<~EOS
+      script = <<~PYTHON
         import os, sys
         [os.path.realpath(p) for p in sys.path].index(os.path.realpath("#{path}"))
-      EOS
+      PYTHON
       quiet_system python, "-c", script
     end
 
     def self.setup_install_args(prefix)
-      shim = <<~EOS
+      shim = <<~PYTHON
         import setuptools, tokenize
         __file__ = 'setup.py'
         exec(compile(getattr(tokenize, 'open', open)(__file__).read()
           .replace('\\r\\n', '\\n'), __file__, 'exec'))
-      EOS
+      PYTHON
       %W[
         -c
         #{shim}

@@ -21,7 +21,7 @@ module Hbc
       end
 
       def self.template(cask_token)
-        <<~EOS
+        <<~RUBY
           cask '#{cask_token}' do
             version ''
             sha256 ''
@@ -32,7 +32,7 @@ module Hbc
 
             app ''
           end
-        EOS
+        RUBY
       end
 
       def self.help
