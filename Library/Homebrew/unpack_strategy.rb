@@ -6,6 +6,8 @@ class UnpackStrategy
   def self.strategies
     @strategies ||= [
       JarUnpackStrategy,
+      LuaRockUnpackStrategy,
+      MicrosoftOfficeXmlUnpackStrategy,
       ZipUnpackStrategy,
       XarUnpackStrategy,
       CompressUnpackStrategy,
@@ -84,6 +86,26 @@ class UncompressedUnpackStrategy < UnpackStrategy
 
   def extract_to_dir(unpack_dir, basename:)
     FileUtils.cp path, unpack_dir/basename, preserve: true
+  end
+end
+
+class MicrosoftOfficeXmlUnpackStrategy < UncompressedUnpackStrategy
+  def self.can_extract?(path:, magic_number:)
+    return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
+
+    # Check further if the ZIP is a Microsoft Office XML document.
+    magic_number.match?(/\APK\003\004/n) &&
+      magic_number.match?(%r{\A.{30}(\[Content_Types\]\.xml|_rels/\.rels)}n)
+  end
+end
+
+class LuaRockUnpackStrategy < UncompressedUnpackStrategy
+  def self.can_extract?(path:, magic_number:)
+    return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
+
+    # Check further if the ZIP is a LuaRocks package.
+    out, _, status = Open3.capture3("zipinfo", "-1", path)
+    status.success? && out.split("\n").any? { |line| line.match?(%r{\A[^/]+.rockspec\Z}) }
   end
 end
 
