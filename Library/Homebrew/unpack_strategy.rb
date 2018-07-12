@@ -92,17 +92,8 @@ class JarUnpackStrategy < UncompressedUnpackStrategy
     return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
 
     # Check further if the ZIP is a JAR/WAR.
-    Open3.popen3("unzip", "-l", path) do |stdin, stdout, stderr, wait_thr|
-      stdin.close_write
-      stderr.close_read
-
-      begin
-        return stdout.each_line.any? { |l| l.match?(%r{\s+META-INF/MANIFEST.MF$}) }
-      ensure
-        stdout.close_read
-        wait_thr.kill
-      end
-    end
+    out, _, status = Open3.capture3("zipinfo", "-1", path)
+    status.success? && out.split("\n").include?("META-INF/MANIFEST.MF")
   end
 end
 
