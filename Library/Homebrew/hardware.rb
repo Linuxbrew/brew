@@ -137,6 +137,7 @@ module Hardware
     when 4 then "quad"
     when 6 then "hexa"
     when 8 then "octa"
+    when 12 then "dodeca"
     else
       Hardware::CPU.cores
     end
