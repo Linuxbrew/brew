@@ -2,7 +2,6 @@ require "messages"
 require "spec_helper"
 
 describe Messages do
-
   before do
     @m = Messages.new
     f_foo = formula("foo") do
@@ -34,5 +33,4 @@ describe Messages do
     caveats_formula_order = @m.caveats.map { |x| x[:formula] }
     expect(caveats_formula_order).to eq(["foo", "bar", "baz"])
   end
-
 end
