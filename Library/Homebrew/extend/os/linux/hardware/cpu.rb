@@ -12,7 +12,6 @@ module Hardware
         # See https://software.intel.com/en-us/articles/intel-architecture-and-processor-identification-with-cpuid-model-and-family-numbers
         cpu_family = cpuinfo[/^cpu family\s*: ([0-9]+)/, 1].to_i
         cpu_model = cpuinfo[/^model\s*: ([0-9]+)/, 1].to_i
-        cpu_family_model = "0x" + ((cpu_family << 8) | cpu_model).to_s(16)
         case cpu_family
         when 0x06
           case cpu_model
@@ -41,7 +40,7 @@ module Hardware
           when 0x8e
             :kabylake
           else
-            cpu_family_model
+            :dunno
           end
         when 0x0f
           case cpu_model
@@ -50,10 +49,10 @@ module Hardware
           when 0x03, 0x04
             :prescott
           else
-            cpu_family_model
+            :dunno
           end
         else
-          cpu_family_model
+          :dunno
         end
       end
 
