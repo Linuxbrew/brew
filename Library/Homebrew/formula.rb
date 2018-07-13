@@ -17,6 +17,7 @@ require "linkage_checker"
 require "extend/ENV"
 require "language/python"
 require "tab"
+require "mktemp"
 
 # A formula provides instructions and metadata for Homebrew to install a piece
 # of software. Every Homebrew formula is a {Formula}.
@@ -1688,7 +1689,7 @@ class Formula
 
     ENV.clear_sensitive_environment!
 
-    mktemp("#{name}-test") do |staging|
+    Formula.mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
       test_env[:HOME] = @testpath
@@ -2462,6 +2463,16 @@ class Formula
     def pour_bottle?(&block)
       @pour_bottle_check = PourBottleCheck.new(self)
       @pour_bottle_check.instance_eval(&block)
+    end
+
+    # Create a temporary directory then yield. When the block returns,
+    # recursively delete the temporary directory. Passing opts[:retain]
+    # or calling `do |staging| ... staging.retain!` in the block will skip
+    # the deletion and retain the temporary directory's contents.
+    def mktemp(prefix = name, opts = {})
+      Mktemp.new(prefix, opts).run do |staging|
+        yield staging
+      end
     end
 
     # @private
