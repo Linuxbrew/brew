@@ -363,6 +363,7 @@ module Homebrew
       @specs.each do |spec|
         # Check for things we don't like to depend on.
         # We allow non-Homebrew installs whenever possible.
+        options_message = "Formulae should not have optional or recommended dependencies"
         spec.deps.each do |dep|
           begin
             dep_f = dep.to_formula
@@ -419,8 +420,14 @@ module Homebrew
           next unless @new_formula
           next unless @official_tap
           if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
-            new_formula_problem "Formulae should not have #{dep.tags} dependencies."
+            new_formula_problem options_message
           end
+        end
+
+        next unless @new_formula
+        next unless @official_tap
+        if spec.requirements.map(&:recommended?).any? || spec.requirements.map(&:optional?).any?
+          new_formula_problem options_message
         end
       end
     end
