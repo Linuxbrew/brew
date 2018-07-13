@@ -1,6 +1,7 @@
 require "download_strategy"
 require "checksum"
 require "version"
+require "mktemp"
 
 # Resource is the fundamental representation of an external resource. The
 # primary formula download, along with other declared resources, are instances
@@ -192,6 +193,12 @@ class Resource
     when Version then val
     else
       raise TypeError, "version '#{val.inspect}' should be a string"
+    end
+  end
+
+  def mktemp(prefix)
+    Mktemp.new(prefix).run do |staging|
+      yield staging
     end
   end
 

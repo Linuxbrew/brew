@@ -10,7 +10,7 @@ describe AbstractDownloadStrategy do
   let(:args) { %w[foo bar baz] }
 
   specify "#source_modified_time" do
-    FileUtils.mktemp "mtime" do
+    Mktemp.new("mtime") do
       FileUtils.touch "foo", mtime: Time.now - 10
       FileUtils.touch "bar", mtime: Time.now - 100
       FileUtils.ln_s "not-exist", "baz"
