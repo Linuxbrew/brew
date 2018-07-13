@@ -1,6 +1,7 @@
 require "pathname"
 require "English"
 require "ostruct"
+require "messages"
 
 require "pp"
 require "extend/ARGV"
@@ -47,6 +48,10 @@ module Homebrew
 
     def args
       @args ||= OpenStruct.new
+    end
+
+    def messages
+      @messages ||= Messages.new
     end
 
     def raise_deprecation_exceptions?

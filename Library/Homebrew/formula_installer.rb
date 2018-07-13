@@ -14,6 +14,7 @@ require "development_tools"
 require "cache_store"
 require "linkage_checker"
 require "install"
+require "messages"
 
 class FormulaInstaller
   include FormulaCellarChecks
@@ -348,6 +349,7 @@ class FormulaInstaller
     build_bottle_postinstall if build_bottle?
 
     opoo "Nothing was installed to #{formula.prefix}" unless formula.installed?
+    Homebrew.messages.formula_installed(formula)
   end
 
   def check_conflicts
@@ -604,6 +606,7 @@ class FormulaInstaller
     return if caveats.empty?
     @show_summary_heading = true
     ohai "Caveats", caveats.to_s
+    Homebrew.messages.record_caveats(formula, caveats)
   end
 
   def finish

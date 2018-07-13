@@ -21,6 +21,7 @@ require "install"
 require "formula_installer"
 require "cleanup"
 require "development_tools"
+require "messages"
 
 module Homebrew
   module_function
@@ -102,6 +103,7 @@ module Homebrew
         onoe "#{f}: #{e}"
       end
     end
+    Homebrew.messages.display_messages
   end
 
   def upgrade_formula(f)
