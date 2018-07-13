@@ -47,6 +47,7 @@ setup-ruby-path() {
         then
           odie "Failed to install vendor Ruby."
         fi
+        rm -rf "$vendor_dir/bundle/ruby"
         HOMEBREW_RUBY_PATH="$vendor_ruby_path"
       fi
     fi
