@@ -86,9 +86,9 @@ module FileUtils
   alias old_mkdir mkdir
 
   # A version of mkdir that also changes to that folder in a block.
-  def mkdir(name, &_block)
-    mkdir_p(name)
-    return unless block_given?
+  def mkdir(name, mode: nil, noop: nil, verbose: nil, &_block)
+    result = mkdir_p(name, mode: mode, noop: noop, verbose: verbose)
+    return result unless block_given?
     chdir name do
       yield
     end
