@@ -488,10 +488,29 @@ module Homebrew
       end
     end
 
-    def audit_bottle_spec
+    def audit_bottle_disabled
       return unless formula.bottle_disabled?
-      return if formula.bottle_disable_reason.valid?
-      problem "Unrecognized bottle modifier"
+      return if formula.bottle_unneeded?
+
+      if !formula.bottle_disable_reason.valid?
+        problem "Unrecognized bottle modifier"
+      else
+        bottle_disabled_whitelist = %w[
+          cryptopp
+          leafnode
+        ]
+        return if bottle_disabled_whitelist.include?(formula.name)
+        problem "Formulae should not use `bottle :disabled`" if @official_tap
+      end
+    end
+
+    def audit_bottle_spec
+      return unless @official_tap
+      return if @new_formula
+      return unless @online
+      return if formula.bottle_defined? || formula.bottle_disabled?
+      return if formula.name == "testbottest"
+      problem "`bottle` is not defined"
     end
 
     def audit_github_repository
