@@ -413,6 +413,34 @@ describe Hbc::Audit, :cask do
       end
     end
 
+    describe "latest with auto_updates checks" do
+      let(:warning_msg) { "Casks with `version :latest` should not use `auto_updates`" }
+
+      context "when the Cask is :latest and does not have auto_updates" do
+        let(:cask_token) { "version-latest" }
+
+        it { is_expected.not_to warn_with(warning_msg) }
+      end
+
+      context "when the Cask is versioned and does not have auto_updates" do
+        let(:cask_token) { "basic-cask" }
+
+        it { is_expected.not_to warn_with(warning_msg) }
+      end
+
+      context "when the Cask is versioned and has auto_updates" do
+        let(:cask_token) { "auto-updates" }
+
+        it { is_expected.not_to warn_with(warning_msg) }
+      end
+
+      context "when the Cask is :latest and has auto_updates" do
+        let(:cask_token) { "latest-with-auto-updates" }
+
+        it { is_expected.to warn_with(warning_msg) }
+      end
+    end
+
     describe "preferred download URL formats" do
       let(:warning_msg) { /URL format incorrect/ }
 
