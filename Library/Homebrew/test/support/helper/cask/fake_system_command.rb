@@ -23,17 +23,14 @@ module Hbc
     end
 
     def self.stubs_command(command, response = "")
+      command = command.map(&:to_s)
       responses[command] = response
     end
 
     def self.expects_command(command, response = "", times = 1)
+      command = command.map(&:to_s)
       stubs_command(command, response)
       expectations[command] = times
-    end
-
-    def self.expect_and_pass_through(command, times = 1)
-      pass_through = ->(cmd, opts) { Hbc::SystemCommand.run(cmd, opts) }
-      expects_command(command, pass_through, times)
     end
 
     def self.verify_expectations!
