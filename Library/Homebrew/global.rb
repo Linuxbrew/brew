@@ -33,7 +33,7 @@ HOMEBREW_BOTTLE_DEFAULT_DOMAIN = ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"] ||
 HOMEBREW_BOTTLE_DOMAIN = ENV["HOMEBREW_BOTTLE_DOMAIN"] ||
                          HOMEBREW_BOTTLE_DEFAULT_DOMAIN
 
-require "extend/fileutils"
+require "fileutils"
 
 module Homebrew
   extend FileUtils
