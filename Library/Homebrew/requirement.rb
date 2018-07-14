@@ -116,6 +116,12 @@ class Requirement
     name
   end
 
+  def mktemp
+    Mktemp.new(name).run do |staging|
+      yield staging
+    end
+  end
+
   private
 
   def infer_name
