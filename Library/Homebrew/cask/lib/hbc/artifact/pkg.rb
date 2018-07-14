@@ -50,7 +50,13 @@ module Hbc
         end
         with_choices_file do |choices_path|
           args << "-applyChoiceChangesXML" << choices_path if choices_path
-          command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true)
+          logged_in_user = Utils.current_user
+          env = {
+            "LOGNAME" => logged_in_user,
+            "USER" => logged_in_user,
+            "USERNAME" => logged_in_user,
+          }
+          command.run!("/usr/sbin/installer", sudo: true, args: args, print_stdout: true, env: env)
         end
       end
 
