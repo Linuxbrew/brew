@@ -1,6 +1,8 @@
 module Hbc
   class Container
     class Base
+      attr_reader :path
+
       def initialize(cask, path, command, nested: false, verbose: false)
         @cask = cask
         @path = path
@@ -40,6 +42,10 @@ module Hbc
         container.new(@cask, source, @command, nested: true, verbose: verbose?).extract
 
         true
+      end
+
+      def dependencies
+        []
       end
     end
   end

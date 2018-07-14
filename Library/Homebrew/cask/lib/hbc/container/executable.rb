@@ -5,7 +5,7 @@ module Hbc
   class Container
     class Executable < Naked
       def self.me?(criteria)
-        return true if criteria.magic_number(/^#!\s*\S+/)
+        return true if criteria.magic_number(/\A#!\s*\S+/n)
 
         begin
           criteria.path.file? && MachO.open(criteria.path).header.executable?

@@ -15,7 +15,7 @@ module Hbc
       def extract
         mount do |mounts|
           begin
-            raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad DMG?" if mounts.empty?
+            raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad disk image?" if mounts.empty?
             mounts.each(&method(:extract_mount))
           ensure
             mounts.each(&method(:eject))

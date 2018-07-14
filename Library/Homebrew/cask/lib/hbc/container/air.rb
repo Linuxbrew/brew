@@ -3,34 +3,21 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Air < Base
-      INSTALLER_PATHNAME =
-        Pathname("/Applications/Utilities/Adobe AIR Application Installer.app" \
-                 "/Contents/MacOS/Adobe AIR Application Installer")
-
       def self.me?(criteria)
-        %w[.air].include?(criteria.path.extname)
-      end
-
-      def self.installer_cmd
-        return @installer_cmd ||= INSTALLER_PATHNAME if installer_exist?
-        raise CaskError, <<~EOS
-          Adobe AIR runtime not present, try installing it via
-
-              brew cask install adobe-air
-
-        EOS
-      end
-
-      def self.installer_exist?
-        INSTALLER_PATHNAME.exist?
+        criteria.path.extname == ".air"
       end
 
       def extract
-        install = @command.run(self.class.installer_cmd,
-                               args: ["-silent", "-location", @cask.staged_path, Pathname.new(@path).realpath])
+        unpack_dir = @cask.staged_path
 
-        return unless install.exit_status == 9
-        raise CaskError, "Adobe AIR application #{@cask} already exists on the system, and cannot be reinstalled."
+        @command.run!(
+          "/Applications/Utilities/Adobe AIR Application Installer.app/Contents/MacOS/Adobe AIR Application Installer",
+          args: ["-silent", "-location", unpack_dir, path],
+        )
+      end
+
+      def dependencies
+        @dependencies ||= [CaskLoader.load("adobe-air")]
       end
     end
   end

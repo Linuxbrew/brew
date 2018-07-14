@@ -238,7 +238,7 @@ class RarUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    safe_system "unrar", "x", "-inul", path, unpack_dir
+    safe_system Formula["unrar"].opt_bin/"unrar", "x", "-inul", path, unpack_dir
   end
 end
 

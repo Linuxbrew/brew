@@ -19,7 +19,7 @@ module Hbc
 
     PERSISTENT_METADATA_SUBDIRS = ["gpg"].freeze
 
-    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, binaries: true, verbose: false, require_sha: false, upgrade: false)
+    def initialize(cask, command: SystemCommand, force: false, skip_cask_deps: false, binaries: true, verbose: false, require_sha: false, upgrade: false, installed_as_dependency: false)
       @cask = cask
       @command = command
       @force = force
@@ -29,9 +29,10 @@ module Hbc
       @require_sha = require_sha
       @reinstall = false
       @upgrade = upgrade
+      @installed_as_dependency = installed_as_dependency
     end
 
-    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?
+    attr_predicate :binaries?, :force?, :skip_cask_deps?, :require_sha?, :upgrade?, :verbose?, :installed_as_dependency?
 
     def self.print_caveats(cask)
       odebug "Printing caveats"
@@ -47,6 +48,7 @@ module Hbc
       odebug "Hbc::Installer#fetch"
 
       satisfy_dependencies
+
       verify_has_sha if require_sha? && !force?
       download
       verify
@@ -56,6 +58,8 @@ module Hbc
       odebug "Hbc::Installer#stage"
 
       Caskroom.ensure_caskroom_exists
+
+      unpack_dependencies
 
       extract_primary_container
       save_caskfile
@@ -140,22 +144,28 @@ module Hbc
       Verify.all(@cask, @downloaded_path)
     end
 
+    def primary_container
+      @primary_container ||= begin
+        container = if @cask.container&.type
+          Container.from_type(@cask.container.type)
+        else
+          Container.for_path(@downloaded_path, @command)
+        end
+
+        container&.new(@cask, @downloaded_path, @command, verbose: verbose?)
+      end
+    end
+
     def extract_primary_container
       odebug "Extracting primary container"
 
-      FileUtils.mkdir_p @cask.staged_path
-      container = if @cask.container&.type
-        Container.from_type(@cask.container.type)
-      else
-        Container.for_path(@downloaded_path, @command)
-      end
-
-      unless container
+      unless primary_container
         raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'"
       end
 
-      odebug "Using container class #{container} for #{@downloaded_path}"
-      container.new(@cask, @downloaded_path, @command, verbose: verbose?).extract
+      odebug "Using container class #{primary_container.class} for #{@downloaded_path}"
+      FileUtils.mkdir_p @cask.staged_path
+      primary_container.extract
     end
 
     def install_artifacts
@@ -200,7 +210,7 @@ module Hbc
       arch_dependencies
       x11_dependencies
       formula_dependencies
-      cask_dependencies unless skip_cask_deps?
+      cask_dependencies unless skip_cask_deps? || installed_as_dependency?
     end
 
     def macos_dependencies
@@ -249,27 +259,21 @@ module Hbc
 
       ohai "Installing Formula dependencies: #{not_installed.map(&:to_s).join(", ")}"
       not_installed.each do |formula|
-        begin
-          old_argv = ARGV.dup
-          ARGV.replace([])
-          FormulaInstaller.new(formula).tap do |fi|
-            fi.installed_as_dependency = true
-            fi.installed_on_request = false
-            fi.show_header = true
-            fi.verbose = verbose?
-            fi.prelude
-            fi.install
-            fi.finish
-          end
-        ensure
-          ARGV.replace(old_argv)
+        FormulaInstaller.new(formula).tap do |fi|
+          fi.installed_as_dependency = true
+          fi.installed_on_request = false
+          fi.show_header = true
+          fi.verbose = verbose?
+          fi.prelude
+          fi.install
+          fi.finish
         end
       end
     end
 
     def cask_dependencies
-      return if @cask.depends_on.cask.empty?
       casks = CaskDependencies.new(@cask)
+      return if casks.empty?
 
       if casks.all?(&:installed?)
         puts "All Cask dependencies satisfied."
@@ -280,7 +284,36 @@ module Hbc
 
       ohai "Installing Cask dependencies: #{not_installed.map(&:to_s).join(", ")}"
       not_installed.each do |cask|
-        Installer.new(cask, binaries: binaries?, verbose: verbose?, skip_cask_deps: true, force: false).install
+        Installer.new(cask, binaries: binaries?, verbose: verbose?, installed_as_dependency: true, force: false).install
+      end
+    end
+
+    def unpack_dependencies
+      formulae = primary_container.dependencies.select { |dep| dep.is_a?(Formula) }
+      casks = primary_container.dependencies.select { |dep| dep.is_a?(Cask) }
+                               .flat_map { |cask| [*CaskDependencies.new(cask), cask] }
+
+      not_installed_formulae = formulae.reject(&:any_version_installed?)
+      not_installed_casks = casks.reject(&:installed?)
+
+      return if (not_installed_formulae + not_installed_casks).empty?
+
+      ohai "Satisfying unpack dependencies"
+
+      not_installed_formulae.each do |formula|
+        FormulaInstaller.new(formula).tap do |fi|
+          fi.installed_as_dependency = true
+          fi.installed_on_request = false
+          fi.show_header = true
+          fi.verbose = verbose?
+          fi.prelude
+          fi.install
+          fi.finish
+        end
+      end
+
+      not_installed_casks.each do |cask|
+        Installer.new(cask, verbose: verbose?, installed_as_dependency: true).install
       end
     end
 
