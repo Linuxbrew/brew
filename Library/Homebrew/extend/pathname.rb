@@ -351,10 +351,12 @@ class Pathname
     mkpath
     targets.each do |target|
       target = Pathname.new(target) # allow pathnames or strings
-      join(target.basename).write <<~SH
+      script = join(target.basename)
+      script.write <<~SH
         #!/bin/bash
         exec "#{target}" "$@"
       SH
+      script.chmod 0555
     end
   end
 
@@ -367,6 +369,7 @@ class Pathname
       #!/bin/bash
       #{env_export}exec "#{target}" "$@"
     SH
+    chmod 0555
   end
 
   # Writes a wrapper env script and moves all files to the dst
@@ -390,6 +393,7 @@ class Pathname
       #!/bin/bash
       #{java_home}exec java #{java_opts} -jar #{target_jar} "$@"
     SH
+    chmod 0555
   end
 
   def install_metafiles(from = Pathname.pwd)
