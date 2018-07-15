@@ -14,16 +14,32 @@ module Hbc
             To complete the installation of Cask #{cask}, you must also
             run the installer at
 
-              '#{path}'
+              '#{cask.staged_path.join(path)}'
           EOS
         end
       end
 
       module ScriptInstaller
         def install_phase(command: nil, **_)
-          ohai "Running #{self.class.dsl_key} script '#{path.relative_path_from(cask.staged_path)}'"
-          FileUtils.chmod "+x", path unless path.executable?
-          command.run(path, **args, path: PATH.new(HOMEBREW_PREFIX/"bin", HOMEBREW_PREFIX/"sbin", ENV["PATH"]))
+          ohai "Running #{self.class.dsl_key} script '#{path}'"
+
+          absolute_path = if path.absolute?
+            path
+          else
+            cask.staged_path.join(path)
+          end
+
+          if absolute_path.exist? && !absolute_path.executable?
+            FileUtils.chmod "+x", absolute_path
+          end
+
+          executable = if absolute_path.exist?
+            absolute_path
+          else
+            path
+          end
+
+          command.run!(executable, **args, env: { "PATH" => PATH.new(HOMEBREW_PREFIX/"bin", HOMEBREW_PREFIX/"sbin", ENV["PATH"]) })
         end
       end
 
@@ -54,7 +70,7 @@ module Hbc
         super(cask)
 
         if args.key?(:manual)
-          @path = cask.staged_path.join(args[:manual])
+          @path = Pathname(args[:manual])
           @args = []
           extend(ManualInstaller)
           return
@@ -65,17 +81,16 @@ module Hbc
         )
         raise CaskInvalidError.new(cask, "#{self.class.dsl_key} missing executable") if path.nil?
 
-        path = Pathname(path)
-        @path = path.absolute? ? path : cask.staged_path.join(path)
+        @path = Pathname(path)
         extend(ScriptInstaller)
       end
 
       def summarize
-        path.relative_path_from(cask.staged_path).to_s
+        path.to_s
       end
 
       def to_h
-        { path: path.relative_path_from(cask.staged_path).to_s }.tap do |h|
+        { path: path }.tap do |h|
           h[:args] = args unless is_a?(ManualInstaller)
         end
       end

@@ -520,7 +520,7 @@ describe Hbc::DSL, :cask do
       it "allows installer manual to be specified" do
         installer = cask.artifacts.first
         expect(installer).to be_a(Hbc::Artifact::Installer::ManualInstaller)
-        expect(installer.path).to eq(cask.staged_path.join("Caffeine.app"))
+        expect(installer.path).to eq(Pathname("Caffeine.app"))
       end
     end
   end
