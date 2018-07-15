@@ -24,7 +24,7 @@ module Formulary
     const_set(namespace, mod)
     begin
       mod.module_eval(contents, path)
-    rescue ScriptError => e
+    rescue ArgumentError, ScriptError => e
       raise FormulaUnreadableError.new(name, e)
     end
     class_name = class_s(name)
