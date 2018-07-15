@@ -20,6 +20,21 @@ describe Hbc::CLI::Info, :cask do
     EOS
   end
 
+  it "it prints auto_updates if the Cask has `auto_updates true`" do
+    expect {
+      described_class.run("with-auto-updates")
+    }.to output(<<~EOS).to_stdout
+      with-auto-updates: 1.0 (auto_updates)
+      http://example.com/autoupdates
+      Not installed
+      From: https://github.com/Homebrew/homebrew-cask/blob/master/Casks/with-auto-updates.rb
+      ==> Name
+      AutoUpdates
+      ==> Artifacts
+      AutoUpdates.app (App)
+    EOS
+  end
+
   describe "given multiple Casks" do
     let(:expected_output) {
       <<~EOS
