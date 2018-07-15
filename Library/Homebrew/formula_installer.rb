@@ -221,6 +221,7 @@ class FormulaInstaller
   end
 
   def install
+    start_time = Time.now
     if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
       Homebrew::Install.check_development_tools
     end
@@ -349,7 +350,8 @@ class FormulaInstaller
     build_bottle_postinstall if build_bottle?
 
     opoo "Nothing was installed to #{formula.prefix}" unless formula.installed?
-    Homebrew.messages.formula_installed(formula)
+    end_time = Time.now
+    Homebrew.messages.formula_installed(formula, end_time - start_time)
   end
 
   def check_conflicts

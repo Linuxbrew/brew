@@ -419,6 +419,7 @@ _brew_install() {
       '(--build-from-source -s)'{--build-from-source,-s}'[compile the specified formula from source even if a bottle is provided]' \
       '(--devel --HEAD)'{--devel,--HEAD}'[install the development / HEAD version]' \
       '--keep-tmp[don''t delete temporary files created during installation]' \
+      '--display-times[display installation times at end of run]' \
       '*: : __brew_formulae' \
     - interactive-install \
       '--interactive[download and patch formula, then open a shell]' \
@@ -554,6 +555,7 @@ _brew_readall() {
 # brew reinstall formulae:
 _brew_reinstall() {
   _arguments \
+    '--display-times[display installation times at end of run]' \
     '*::formula:__brew_installed_formulae'
 }
 
@@ -752,6 +754,7 @@ _brew_upgrade() {
     '(--build-from-source -s)'{--build-from-source,-s}'[compile the specified formula from source even if a bottle is provided]' \
     '(--devel --HEAD)'{--devel,--HEAD}'[install the development / HEAD version]' \
     '--keep-tmp[don''t delete temporary files created during installation]' \
+    '--display-times[display installation times at end of run]' \
     '*: : __brew_outdated_formulae' \
   - interactive-install \
     '--interactive[download and patch formula, then open a shell]' \

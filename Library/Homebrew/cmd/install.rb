@@ -1,4 +1,4 @@
-#:  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--include-test`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] <formula> [<options> ...]:
+#:  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=`<compiler>] [`--build-from-source`|`--force-bottle`] [`--include-test`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] [`--display-times`] <formula> [<options> ...]:
 #:    Install <formula>.
 #:
 #:    <formula> is usually the name of the formula to install, but it can be specified
@@ -58,6 +58,9 @@
 #:    installed keg-only or non-migrated versions
 #:
 #:    If `--verbose` (or `-v`) is passed, print the verification and postinstall steps.
+#:
+#:    If `--display-times` is passed, install times for each formula are printed
+#:    at the end of the run.
 #:
 #:    Installation options specific to <formula> may be appended to the command,
 #:    and can be listed with `brew options` <formula>.

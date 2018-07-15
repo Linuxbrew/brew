@@ -216,7 +216,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     See the docs for examples of using the JSON output:
     <https://docs.brew.sh/Querying-Brew>
 
-  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--include-test`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] `formula` [`options` ...]:
+  * `install` [`--debug`] [`--env=`(`std`|`super`)] [`--ignore-dependencies`|`--only-dependencies`] [`--cc=``compiler`] [`--build-from-source`|`--force-bottle`] [`--include-test`] [`--devel`|`--HEAD`] [`--keep-tmp`] [`--build-bottle`] [`--force`] [`--verbose`] [`--display-times`] `formula` [`options` ...]:
     Install `formula`.
 
     `formula` is usually the name of the formula to install, but it can be specified
@@ -276,6 +276,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     installed keg-only or non-migrated versions
 
     If `--verbose` (or `-v`) is passed, print the verification and postinstall steps.
+
+    If `--display-times` is passed, install times for each formula are printed
+    at the end of the run.
 
     Installation options specific to `formula` may be appended to the command,
     and can be listed with `brew options` `formula`.
@@ -400,8 +403,11 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--syntax` is passed, also syntax-check all of Homebrew's Ruby files.
 
-  * `reinstall` `formula`:
+  * `reinstall` [`--display-times`] `formula`:
     Uninstall and then install `formula` (with existing install options).
+
+    If `--display-times` is passed, install times for each formula are printed
+    at the end of the run.
 
   * `search`, `-S`:
     Display all locally available formulae (including tapped ones).
@@ -563,7 +569,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     their latest `origin/master`. Note this will destroy all your uncommitted
     or committed changes.
 
-  * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`formulae`]:
+  * `upgrade` [`install-options`] [`--cleanup`] [`--fetch-HEAD`] [`--ignore-pinned`] [`--display-times`] [`formulae`]:
     Upgrade outdated, unpinned brews (with existing install options).
 
     Options for the `install` command are also valid here.
@@ -578,6 +584,9 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--ignore-pinned` is passed, set a 0 exit code even if pinned formulae
     are not upgraded.
+
+    If `--display-times` is passed, install times for each formula are printed
+    at the end of the run.
 
     If `formulae` are given, upgrade only the specified brews (unless they
     are pinned; see `pin`, `unpin`).

@@ -206,7 +206,7 @@ Pass \fB\-\-all\fR to get information on all formulae, or \fB\-\-installed\fR to
 See the docs for examples of using the JSON output: \fIhttps://docs\.brew\.sh/Querying\-Brew\fR
 .
 .IP "\(bu" 4
-\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-include\-test\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] [\fB\-\-force\fR] [\fB\-\-verbose\fR] \fIformula\fR [\fIoptions\fR \.\.\.]: Install \fIformula\fR\.
+\fBinstall\fR [\fB\-\-debug\fR] [\fB\-\-env=\fR(\fBstd\fR|\fBsuper\fR)] [\fB\-\-ignore\-dependencies\fR|\fB\-\-only\-dependencies\fR] [\fB\-\-cc=\fR\fIcompiler\fR] [\fB\-\-build\-from\-source\fR|\fB\-\-force\-bottle\fR] [\fB\-\-include\-test\fR] [\fB\-\-devel\fR|\fB\-\-HEAD\fR] [\fB\-\-keep\-tmp\fR] [\fB\-\-build\-bottle\fR] [\fB\-\-force\fR] [\fB\-\-verbose\fR] [\fB\-\-display\-times\fR] \fIformula\fR [\fIoptions\fR \.\.\.]: Install \fIformula\fR\.
 .
 .IP
 \fIformula\fR is usually the name of the formula to install, but it can be specified in several different ways\. See \fISPECIFYING FORMULAE\fR\.
@@ -258,6 +258,9 @@ If \fB\-\-force\fR (or \fB\-f\fR) is passed, install without checking for previo
 .
 .IP
 If \fB\-\-verbose\fR (or \fB\-v\fR) is passed, print the verification and postinstall steps\.
+.
+.IP
+If \fB\-\-display\-times\fR is passed, install times for each formula are printed at the end of the run\.
 .
 .IP
 Installation options specific to \fIformula\fR may be appended to the command, and can be listed with \fBbrew options\fR \fIformula\fR\.
@@ -371,7 +374,10 @@ If \fB\-\-aliases\fR is passed, also verify any alias symlinks in each tap\.
 If \fB\-\-syntax\fR is passed, also syntax\-check all of Homebrew\'s Ruby files\.
 .
 .IP "\(bu" 4
-\fBreinstall\fR \fIformula\fR: Uninstall and then install \fIformula\fR (with existing install options)\.
+\fBreinstall\fR [\fB\-\-display\-times\fR] \fIformula\fR: Uninstall and then install \fIformula\fR (with existing install options)\.
+.
+.IP
+If \fB\-\-display\-times\fR is passed, install times for each formula are printed at the end of the run\.
 .
 .IP "\(bu" 4
 \fBsearch\fR, \fB\-S\fR: Display all locally available formulae (including tapped ones)\. No online search is performed\.
@@ -512,7 +518,7 @@ If \fB\-\-force\fR (or \fB\-f\fR) is specified then always do a slower, full upd
 \fBupdate\-reset\fR: Fetches and resets Homebrew and all tap repositories using \fBgit\fR(1) to their latest \fBorigin/master\fR\. Note this will destroy all your uncommitted or committed changes\.
 .
 .IP "\(bu" 4
-\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fIformulae\fR]: Upgrade outdated, unpinned brews (with existing install options)\.
+\fBupgrade\fR [\fIinstall\-options\fR] [\fB\-\-cleanup\fR] [\fB\-\-fetch\-HEAD\fR] [\fB\-\-ignore\-pinned\fR] [\fB\-\-display\-times\fR] [\fIformulae\fR]: Upgrade outdated, unpinned brews (with existing install options)\.
 .
 .IP
 Options for the \fBinstall\fR command are also valid here\.
@@ -525,6 +531,9 @@ If \fB\-\-fetch\-HEAD\fR is passed, fetch the upstream repository to detect if t
 .
 .IP
 If \fB\-\-ignore\-pinned\fR is passed, set a 0 exit code even if pinned formulae are not upgraded\.
+.
+.IP
+If \fB\-\-display\-times\fR is passed, install times for each formula are printed at the end of the run\.
 .
 .IP
 If \fIformulae\fR are given, upgrade only the specified brews (unless they are pinned; see \fBpin\fR, \fBunpin\fR)\.
