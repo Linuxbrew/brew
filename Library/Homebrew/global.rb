@@ -33,7 +33,7 @@ HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX = ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN_LINUX
 # Bintray fallback is here for people auto-updating from a version where
 # HOMEBREW_BOTTLE_DEFAULT_DOMAIN isn't set.
 HOMEBREW_BOTTLE_DEFAULT_DOMAIN = ENV["HOMEBREW_BOTTLE_DEFAULT_DOMAIN"] ||
-                                 OS.mac? ? "https://homebrew.bintray.com" : "https://linuxbrew.bintray.com"
+                                 "https://#{OS.mac? ? "homebrew" : "linuxbrew"}.bintray.com"
 HOMEBREW_BOTTLE_DOMAIN = ENV["HOMEBREW_BOTTLE_DOMAIN"] ||
                          HOMEBREW_BOTTLE_DEFAULT_DOMAIN
 
