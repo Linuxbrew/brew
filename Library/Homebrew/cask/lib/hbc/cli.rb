@@ -90,39 +90,32 @@ module Hbc
     end
 
     def self.run_command(command, *args)
-      if command.respond_to?(:run)
-        # usual case: built-in command verb
-        command.run(*args)
-      elsif require?(which("brewcask-#{command}.rb", ENV["HOMEBREW_PATH"]))
-        # external command as Ruby library on PATH, Homebrew-style
-      elsif command.to_s.include?("/") && require?(command.to_s)
-        # external command as Ruby library with literal path, useful
-        # for development and troubleshooting
-        sym = File.basename(command.to_s, ".rb").capitalize
-        klass = begin
-                  const_get(sym)
-                rescue NameError
-                  nil
-                end
+      return command.run(*args) if command.respond_to?(:run)
 
-        if klass.respond_to?(:run)
-          # invoke "run" on a Ruby library which follows our coding conventions
-          # other Ruby libraries must do everything via "require"
-          klass.run(*args)
+      tap_cmd_directories = Tap.cmd_directories
+
+      path = PATH.new(tap_cmd_directories, ENV["HOMEBREW_PATH"])
+
+      external_ruby_cmd = tap_cmd_directories.map { |d| d/"brewcask-#{command}.rb" }
+                                             .detect(&:file?)
+      external_ruby_cmd ||= which("brewcask-#{command}.rb", path)
+
+      if external_ruby_cmd
+        require external_ruby_cmd
+
+        begin
+          return const_get(command.to_s.capitalize.to_sym)&.run(*args)
+        rescue NameError
+          # External command is a stand-alone Ruby script.
+          return
         end
-      elsif external_command = which("brewcask-#{command}", ENV["HOMEBREW_PATH"])
-        # arbitrary external executable on PATH, Homebrew-style
-        exec external_command, *ARGV[1..-1]
-      elsif Pathname.new(command.to_s).executable? &&
-            command.to_s.include?("/") &&
-            !command.to_s.match(/\.rb$/)
-        # arbitrary external executable with literal path, useful
-        # for development and troubleshooting
-        exec command, *ARGV[1..-1]
-      else
-        # failure
-        NullCommand.new(command, *args).run
       end
+
+      if external_command = which("brewcask-#{command}", path)
+        exec external_command, *ARGV[1..-1]
+      end
+
+      NullCommand.new(command, *args).run
     end
 
     def self.run(*args)

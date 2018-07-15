@@ -1,4 +1,59 @@
 describe Hbc::SystemCommand, :cask do
+  describe "#initialize" do
+    let(:env_args) { ["bash", "-c", 'printf "%s" "${A?}" "${B?}" "${C?}"'] }
+
+    describe "given some environment variables" do
+      subject {
+        described_class.new(
+          "env",
+          args: env_args,
+          env: { "A" => "1", "B" => "2", "C" => "3" },
+          must_succeed: true,
+        )
+      }
+
+      its("run!.stdout") { is_expected.to eq("123") }
+
+      describe "the resulting command line" do
+        it "does not include the given variables" do
+          expect(Open3)
+            .to receive(:popen3)
+            .with(a_hash_including("PATH"), ["env"] * 2, *env_args, {})
+            .and_call_original
+
+          subject.run!
+        end
+      end
+    end
+
+    describe "given some environment variables and sudo: true" do
+      subject {
+        described_class.new(
+          "env",
+          args: env_args,
+          env: { "A" => "1", "B" => "2", "C" => "3" },
+          must_succeed: true,
+          sudo: true,
+        )
+      }
+
+      describe "the resulting command line" do
+        it "includes the given variables explicitly" do
+          expect(Open3)
+            .to receive(:popen3)
+            .with(an_instance_of(Hash), ["/usr/bin/sudo"] * 2,
+                "-E", a_string_starting_with("PATH="),
+                "A=1", "B=2", "C=3", "--", "env", *env_args, {})
+            .and_wrap_original do |original_popen3, *_, &block|
+              original_popen3.call("/usr/bin/true", &block)
+            end
+
+          subject.run!
+        end
+      end
+    end
+  end
+
   describe "when the exit code is 0" do
     describe "its result" do
       subject { described_class.run("/usr/bin/true") }
@@ -132,6 +187,13 @@ describe Hbc::SystemCommand, :cask do
       wait(15).for {
         described_class.run(command, options)
       }.to be_a_success
+    end
+  end
+
+  describe "given an invalid variable name" do
+    it "raises an ArgumentError" do
+      expect { described_class.run("true", env: { "1ABC" => true }) }
+        .to raise_error(ArgumentError, /variable name/)
     end
   end
 end
