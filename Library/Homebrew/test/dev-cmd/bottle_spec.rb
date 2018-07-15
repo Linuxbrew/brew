@@ -4,6 +4,9 @@ describe "brew bottle", :integration_test do
       expect { brew "install", "--build-bottle", testball }
         .to be_a_success
 
+      setup_test_formula "patchelf"
+      (HOMEBREW_CELLAR/"patchelf/1.0/bin").mkpath
+
       expect { brew "bottle", "--no-rebuild", testball }
         .to output(/Formula not from core or any taps/).to_stderr
         .and not_to_output.to_stdout

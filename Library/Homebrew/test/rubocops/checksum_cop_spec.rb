@@ -111,7 +111,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
 
   context "When auditing checksum with autocorrect" do
     it "When there is uppercase sha256" do
-      source = <<~EOS
+      source = <<~RUBY
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do
@@ -124,9 +124,9 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
             end
           end
         end
-      EOS
+      RUBY
 
-      corrected_source = <<~EOS
+      corrected_source = <<~RUBY
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
           stable do
@@ -139,7 +139,7 @@ describe RuboCop::Cop::FormulaAudit::ChecksumCase do
             end
           end
         end
-      EOS
+      RUBY
 
       new_source = autocorrect_source(source)
       expect(new_source).to eq(corrected_source)

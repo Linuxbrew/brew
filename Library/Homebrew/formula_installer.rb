@@ -506,7 +506,7 @@ class FormulaInstaller
 
   def expand_dependencies(deps)
     inherited_options = Hash.new { |hash, key| hash[key] = Options.new }
-    poured_bottle = pour_bottle?
+    pour_bottle = pour_bottle?
 
     expanded_deps = Dependency.expand(formula, deps) do |dependent, dep|
       inherited_options[dep.name] |= inherited_options_for(dep)
@@ -514,7 +514,7 @@ class FormulaInstaller
         dependent,
         inherited_options.fetch(dependent.name, []),
       )
-      poured_bottle = true if install_bottle_for?(dep.to_formula, build)
+      pour_bottle = true if install_bottle_for?(dep.to_formula, build)
 
       if dep.prune_from_option?(build)
         Dependency.prune
@@ -529,7 +529,16 @@ class FormulaInstaller
       end
     end
 
-    expanded_deps = Dependency.merge_repeats(bottle_dependencies(inherited_options) + expanded_deps) if poured_bottle
+    if pour_bottle
+      bottle_deps = Keg.relocation_formulae
+                       .map { |formula| Dependency.new(formula) }
+                       .reject do |dep|
+        inherited_options[dep.name] |= inherited_options_for(dep)
+        dep.satisfied? inherited_options[dep.name]
+      end
+      expanded_deps = Dependency.merge_repeats(bottle_deps + expanded_deps) unless bottle_deps.empty?
+    end
+
     expanded_deps.map { |dep| [dep, inherited_options[dep.name]] }
   end
 
@@ -764,6 +773,8 @@ class FormulaInstaller
         sandbox.allow_write_path(ENV["HOME"]) if ARGV.interactive?
         sandbox.allow_write_temp_and_cache
         sandbox.allow_write_log(formula)
+        sandbox.allow_cvs
+        sandbox.allow_fossil
         sandbox.allow_write_xcode
         sandbox.allow_write_cellar(formula)
         sandbox.exec(*args)

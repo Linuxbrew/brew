@@ -1,8 +1,8 @@
 describe "brew options", :integration_test do
   it "prints a given Formula's options" do
-    setup_test_formula "testball", <<~EOS
+    setup_test_formula "testball", <<~RUBY
       depends_on "bar" => :recommended
-    EOS
+    RUBY
 
     expect { brew "options", "testball" }
       .to output("--with-foo\n\tBuild with foo\n--without-bar\n\tBuild without bar support\n\n").to_stdout

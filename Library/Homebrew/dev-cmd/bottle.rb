@@ -87,18 +87,18 @@ module Homebrew
     end
 
     return merge if args.merge?
-    ensure_formula_installed! "patchelf" unless OS.mac?
+    ensure_relocation_formulae_installed!
     ARGV.resolved_formulae.each do |f|
       bottle_formula f
     end
   end
 
-  def ensure_formula_installed!(formula)
-    return if Formula[formula].installed?
-    ohai "Installing #{formula}..."
-    safe_system HOMEBREW_BREW_FILE, "install", formula
-  rescue FormulaUnavailableError
-    nil
+  def ensure_relocation_formulae_installed!
+    Keg.relocation_formulae.each do |f|
+      next if Formula[f].installed?
+      ohai "Installing #{f}..."
+      safe_system HOMEBREW_BREW_FILE, "install", f
+    end
   end
 
   def keg_contain?(string, keg, ignores)

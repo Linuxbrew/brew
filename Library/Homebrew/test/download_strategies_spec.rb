@@ -9,25 +9,6 @@ describe AbstractDownloadStrategy do
   let(:resource) { double(Resource, url: url, mirrors: [], specs: specs, version: nil) }
   let(:args) { %w[foo bar baz] }
 
-  describe "#expand_safe_system_args" do
-    it "works with an explicit quiet flag" do
-      args << { quiet_flag: "--flag" }
-      expanded_args = subject.expand_safe_system_args(args)
-      expect(expanded_args).to eq(%w[foo bar baz --flag])
-    end
-
-    it "adds an implicit quiet flag" do
-      expanded_args = subject.expand_safe_system_args(args)
-      expect(expanded_args).to eq(%w[foo bar -q baz])
-    end
-
-    it "does not mutate the arguments" do
-      result = subject.expand_safe_system_args(args)
-      expect(args).to eq(%w[foo bar baz])
-      expect(result).not_to be args
-    end
-  end
-
   specify "#source_modified_time" do
     FileUtils.mktemp "mtime" do
       FileUtils.touch "foo", mtime: Time.now - 10

@@ -139,6 +139,6 @@ module Superenv
   end
 
   def no_weak_imports
-    append "HOMEBREW_CCCFG", "w" if no_weak_imports_support?
+    append_to_cccfg "w" if no_weak_imports_support?
   end
 end

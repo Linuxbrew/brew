@@ -264,47 +264,6 @@ class Pathname
   end
 
   # @private
-  def compression_type
-    case extname
-    when ".jar", ".war"
-      # Don't treat jars or wars as compressed
-      return
-    when ".gz"
-      # If the filename ends with .gz not preceded by .tar
-      # then we want to gunzip but not tar
-      return :gzip_only
-    when ".bz2"
-      return :bzip2_only
-    when ".lha", ".lzh"
-      return :lha
-    end
-
-    # Get enough of the file to detect common file types
-    # POSIX tar magic has a 257 byte offset
-    # magic numbers stolen from /usr/share/file/magic/
-    case open("rb") { |f| f.read(262) }
-    when /^PK\003\004/n         then :zip
-    when /^\037\213/n           then :gzip
-    when /^BZh/n                then :bzip2
-    when /^\037\235/n           then :compress
-    when /^.{257}ustar/n        then :tar
-    when /^\xFD7zXZ\x00/n       then :xz
-    when /^LZIP/n               then :lzip
-    when /^Rar!/n               then :rar
-    when /^7z\xBC\xAF\x27\x1C/n then :p7zip
-    when /^xar!/n               then :xar
-    when /^\xed\xab\xee\xdb/n   then :rpm
-    else
-      # This code so that bad-tarballs and zips produce good error messages
-      # when they don't unarchive properly.
-      case extname
-      when ".tar.gz", ".tgz", ".tar.bz2", ".tbz" then :tar
-      when ".zip" then :zip
-      end
-    end
-  end
-
-  # @private
   def text_executable?
     /^#!\s*\S+/ =~ open("r") { |f| f.read(1024) }
   end
@@ -392,10 +351,10 @@ class Pathname
     mkpath
     targets.each do |target|
       target = Pathname.new(target) # allow pathnames or strings
-      join(target.basename).write <<~EOS
+      join(target.basename).write <<~SH
         #!/bin/bash
         exec "#{target}" "$@"
-      EOS
+      SH
     end
   end
 
@@ -404,10 +363,10 @@ class Pathname
     env_export = ""
     env.each { |key, value| env_export += "#{key}=\"#{value}\" " }
     dirname.mkpath
-    write <<~EOS
+    write <<~SH
       #!/bin/bash
       #{env_export}exec "#{target}" "$@"
-    EOS
+    SH
   end
 
   # Writes a wrapper env script and moves all files to the dst
@@ -427,10 +386,10 @@ class Pathname
     java_home = if java_version
       "JAVA_HOME=\"$(#{Language::Java.java_home_cmd(java_version)})\" "
     end
-    join(script_name).write <<~EOS
+    join(script_name).write <<~SH
       #!/bin/bash
       #{java_home}exec java #{java_opts} -jar #{target_jar} "$@"
-    EOS
+    SH
   end
 
   def install_metafiles(from = Pathname.pwd)

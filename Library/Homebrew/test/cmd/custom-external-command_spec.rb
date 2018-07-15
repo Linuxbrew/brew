@@ -4,10 +4,10 @@ describe "brew custom-external-command", :integration_test do
       cmd = "custom-external-command-#{rand}"
       file = path/"brew-#{cmd}"
 
-      file.write <<~EOS
+      file.write <<~SH
         #!/bin/sh
         echo 'I am #{cmd}.'
-      EOS
+      SH
       FileUtils.chmod "+x", file
 
       expect { brew cmd, "PATH" => "#{path}#{File::PATH_SEPARATOR}#{ENV["PATH"]}" }

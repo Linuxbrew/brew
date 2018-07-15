@@ -17,7 +17,7 @@ describe Hbc::SystemCommand::Result, :cask do
       EOS
     }
     let(:plist) {
-      <<~EOS
+      <<~XML
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0">
@@ -61,7 +61,7 @@ describe Hbc::SystemCommand::Result, :cask do
           </array>
         </dict>
         </plist>
-      EOS
+      XML
     }
 
     context "when stdout contains garbage before XML" do

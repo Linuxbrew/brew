@@ -2,10 +2,10 @@ describe "brew uses", :integration_test do
   it "prints the Formulae a given Formula is used by" do
     setup_test_formula "foo"
     setup_test_formula "bar"
-    setup_test_formula "baz", <<~EOS
+    setup_test_formula "baz", <<~RUBY
       url "https://example.com/baz-1.0"
       depends_on "bar"
-    EOS
+    RUBY
 
     # This test would fail when HOMEBREW_VERBOSE_USING_DOTS is set,
     # as is the case on Linuxbrew's Travis. Rather than convolute

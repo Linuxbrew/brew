@@ -111,12 +111,12 @@ describe RuboCop::Cop::FormulaAudit::Urls do
         "col" => 2,
       }]
       formulas.each do |formula|
-        source = <<~EOS
+        source = <<~RUBY
           class Foo < Formula
             desc "foo"
             url "#{formula["url"]}"
           end
-        EOS
+        RUBY
         expected_offenses = [{ message: formula["msg"],
                                severity: :convention,
                                line: 3,

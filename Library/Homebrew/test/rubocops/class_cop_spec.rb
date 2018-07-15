@@ -31,17 +31,17 @@ describe RuboCop::Cop::FormulaAudit::ClassName do
   end
 
   it "supports auto-correcting deprecated parent classes" do
-    source = <<~EOS
+    source = <<~RUBY
       class Foo < AmazonWebServicesFormula
         url 'http://example.com/foo-1.0.tgz'
       end
-    EOS
+    RUBY
 
-    corrected_source = <<~EOS
+    corrected_source = <<~RUBY
       class Foo < Formula
         url 'http://example.com/foo-1.0.tgz'
       end
-    EOS
+    RUBY
 
     new_source = autocorrect_source(source)
     expect(new_source).to eq(corrected_source)

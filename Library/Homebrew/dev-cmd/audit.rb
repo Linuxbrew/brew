@@ -363,6 +363,7 @@ module Homebrew
       @specs.each do |spec|
         # Check for things we don't like to depend on.
         # We allow non-Homebrew installs whenever possible.
+        options_message = "Formulae should not have optional or recommended dependencies"
         spec.deps.each do |dep|
           begin
             dep_f = dep.to_formula
@@ -419,8 +420,14 @@ module Homebrew
           next unless @new_formula
           next unless @official_tap
           if dep.tags.include?(:recommended) || dep.tags.include?(:optional)
-            new_formula_problem "Formulae should not have #{dep.tags} dependencies."
+            new_formula_problem options_message
           end
+        end
+
+        next unless @new_formula
+        next unless @official_tap
+        if spec.requirements.map(&:recommended?).any? || spec.requirements.map(&:optional?).any?
+          new_formula_problem options_message
         end
       end
     end
@@ -488,10 +495,29 @@ module Homebrew
       end
     end
 
-    def audit_bottle_spec
+    def audit_bottle_disabled
       return unless formula.bottle_disabled?
-      return if formula.bottle_disable_reason.valid?
-      problem "Unrecognized bottle modifier"
+      return if formula.bottle_unneeded?
+
+      if !formula.bottle_disable_reason.valid?
+        problem "Unrecognized bottle modifier"
+      else
+        bottle_disabled_whitelist = %w[
+          cryptopp
+          leafnode
+        ]
+        return if bottle_disabled_whitelist.include?(formula.name)
+        problem "Formulae should not use `bottle :disabled`" if @official_tap
+      end
+    end
+
+    def audit_bottle_spec
+      return unless @official_tap
+      return if @new_formula
+      return unless @online
+      return if formula.bottle_defined? || formula.bottle_disabled?
+      return if formula.name == "testbottest"
+      problem "`bottle` is not defined"
     end
 
     def audit_github_repository

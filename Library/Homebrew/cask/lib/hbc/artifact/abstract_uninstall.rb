@@ -258,7 +258,7 @@ module Hbc
       end
 
       def trash_paths(*paths, command: nil, **_)
-        result = command.run!("/usr/bin/osascript", args: ["-e", <<~'EOS', *paths])
+        result = command.run!("/usr/bin/osascript", args: ["-e", <<~APPLESCRIPT, *paths])
           on run argv
             repeat with i from 1 to (count argv)
               set item i of argv to (item i of argv as POSIX file)
@@ -279,7 +279,7 @@ module Hbc
               return output
             end tell
           end run
-        EOS
+        APPLESCRIPT
 
         # Remove AppleScript's automatic newline.
         result.tap { |r| r.stdout.sub!(/\n$/, "") }

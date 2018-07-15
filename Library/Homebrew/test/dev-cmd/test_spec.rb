@@ -1,6 +1,6 @@
 describe "brew test", :integration_test do
   it "tests a given Formula" do
-    setup_test_formula "testball", <<~EOS
+    setup_test_formula "testball", <<~RUBY
       head "https://github.com/example/testball2.git"
 
       devel do
@@ -12,7 +12,7 @@ describe "brew test", :integration_test do
 
       test do
       end
-    EOS
+    RUBY
 
     expect { brew "install", "testball" }.to be_a_success
 

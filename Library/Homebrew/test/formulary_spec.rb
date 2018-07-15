@@ -6,7 +6,7 @@ describe Formulary do
   let(:formula_name) { "testball_bottle" }
   let(:formula_path) { CoreTap.new.formula_dir/"#{formula_name}.rb" }
   let(:formula_content) do
-    <<~EOS
+    <<~RUBY
       class #{described_class.class_s(formula_name)} < Formula
         url "file://#{TEST_FIXTURE_DIR}/tarballs/testball-0.1.tbz"
         sha256 TESTBALL_SHA256
@@ -22,7 +22,7 @@ describe Formulary do
           prefix.install "libexec"
         end
       end
-    EOS
+    RUBY
   end
   let(:bottle_dir) { Pathname.new("#{TEST_FIXTURE_DIR}/bottles") }
   let(:bottle) { bottle_dir/"testball_bottle-0.1.#{Utils::Bottles.tag}.bottle.tar.gz" }
@@ -81,10 +81,10 @@ describe Formulary do
     context "when the Formula has the wrong class" do
       let(:formula_name) { "giraffe" }
       let(:formula_content) do
-        <<~EOS
+        <<~RUBY
           class Wrong#{described_class.class_s(formula_name)} < Formula
           end
-        EOS
+        RUBY
       end
 
       it "raises an error" do
@@ -136,20 +136,26 @@ describe Formulary do
     end
 
     context "with installed Formula" do
-      let(:formula) { described_class.factory(formula_path) }
-      let(:installer) { FormulaInstaller.new(formula) }
+      before do
+        allow(Formulary).to receive(:loader_for).and_call_original
+        stub_formula_loader formula("patchelf") { url "patchelf-1.0" }
+        allow(Formula["patchelf"]).to receive(:installed?).and_return(true)
+      end
+
+      let(:installed_formula) { described_class.factory(formula_path) }
+      let(:installer) { FormulaInstaller.new(installed_formula) }
 
       it "returns a Formula when given a rack" do
         installer.install
 
-        f = described_class.from_rack(formula.rack)
+        f = described_class.from_rack(installed_formula.rack)
         expect(f).to be_kind_of(Formula)
       end
 
       it "returns a Formula when given a Keg" do
         installer.install
 
-        keg = Keg.new(formula.prefix)
+        keg = Keg.new(installed_formula.prefix)
         f = described_class.from_keg(keg)
         expect(f).to be_kind_of(Formula)
       end

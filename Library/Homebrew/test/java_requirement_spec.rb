@@ -53,10 +53,10 @@ describe JavaRequirement do
       let(:java) { path/"java" }
 
       def setup_java_with_version(version)
-        IO.write java, <<~EOS
+        IO.write java, <<~SH
           #!/bin/sh
           echo 'java version "#{version}"'
-        EOS
+        SH
         FileUtils.chmod "+x", java
       end
 

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [[ -n "$HOMEBREW_MAKE" && "$HOMEBREW_MAKE" != "make" ]]
+then
+  export MAKE="$HOMEBREW_MAKE"
+else
+  MAKE="make"
+fi
+export HOMEBREW_CCCFG="O$HOMEBREW_CCCFG"
+
+pathremove () {
+        local IFS=':'
+        local NEWPATH
+        local DIR
+        local PATHVARIABLE=${2:-PATH}
+        for DIR in ${!PATHVARIABLE} ; do
+                if [ "$DIR" != "$1" ] ; then
+                  NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
+                fi
+        done
+        export $PATHVARIABLE="$NEWPATH"
+}
+
+pathremove "$HOMEBREW_LIBRARY/Homebrew/shims/linux/super"
+
+exec "$MAKE" "$@"
