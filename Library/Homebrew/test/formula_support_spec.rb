@@ -11,12 +11,6 @@ describe KegOnlyReason do
       r = described_class.new :provided_by_macos, ""
       expect(r.to_s).to match(/^macOS already provides/)
     end
-
-    it "is deprecated when reason mentions 'osx'", :needs_compat do
-      r = described_class.new :provided_by_osx, "test"
-      expect(r).to receive(:odeprecated)
-      r.to_s
-    end
   end
 end
 

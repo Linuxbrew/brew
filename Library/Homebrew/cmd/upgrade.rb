@@ -34,8 +34,6 @@ module Homebrew
 
     Install.perform_preinstall_checks
 
-    odisabled "'brew upgrade --all'", "'brew upgrade'" if ARGV.include?("--all")
-
     if ARGV.named.empty?
       outdated = Formula.installed.select do |f|
         f.outdated?(fetch_head: ARGV.fetch_head?)

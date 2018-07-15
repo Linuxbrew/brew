@@ -182,6 +182,14 @@ class Resource
     patches << p
   end
 
+  protected
+
+  def mktemp(prefix)
+    Mktemp.new(prefix).run do |staging|
+      yield staging
+    end
+  end
+
   private
 
   def detect_version(val)
@@ -193,12 +201,6 @@ class Resource
     when Version then val
     else
       raise TypeError, "version '#{val.inspect}' should be a string"
-    end
-  end
-
-  def mktemp(prefix)
-    Mktemp.new(prefix).run do |staging|
-      yield staging
     end
   end
 

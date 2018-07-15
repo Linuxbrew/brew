@@ -47,14 +47,8 @@ module Formulary
     cache[path] = klass
   end
 
-  if IO.method_defined?(:set_encoding)
-    def self.ensure_utf8_encoding(io)
-      io.set_encoding(Encoding::UTF_8)
-    end
-  else
-    def self.ensure_utf8_encoding(io)
-      io
-    end
+  def self.ensure_utf8_encoding(io)
+    io.set_encoding(Encoding::UTF_8)
   end
 
   def self.class_s(name)

@@ -1303,6 +1303,17 @@ describe Formula do
       end
     end
 
+    describe "#mkdir" do
+      let(:dst) { mktmpdir }
+
+      it "creates intermediate directories" do
+        f.mkdir dst/"foo/bar/baz" do
+          expect(dst/"foo/bar/baz").to exist, "foo/bar/baz was not created"
+          expect(dst/"foo/bar/baz").to be_a_directory, "foo/bar/baz was not a directory structure"
+        end
+      end
+    end
+
     describe "with changed version scheme" do
       let(:f) do
         formula "testball" do
