@@ -23,15 +23,15 @@ module Hbc
                       env: { "PATH" => PATH.new(Formula["gnupg"].opt_bin, ENV["PATH"]) })
       end
 
-      def extract
+      def extract_to_dir(unpack_dir, basename:)
         import_key
 
-        Dir.mktmpdir do |unpack_dir|
+        Dir.mktmpdir do |tmp_unpack_dir|
           @command.run!("gpg",
-                        args: ["--batch", "--yes", "--output", Pathname(unpack_dir).join(@path.basename(".gpg")), "--decrypt", @path],
+                        args: ["--batch", "--yes", "--output", Pathname(tmp_unpack_dir).join(basename.basename(".gpg")), "--decrypt", path],
                         env: { "PATH" => PATH.new(Formula["gnupg"].opt_bin, ENV["PATH"]) })
 
-          extract_nested_inside(unpack_dir)
+          extract_nested_inside(tmp_unpack_dir, to: unpack_dir)
         end
       end
 

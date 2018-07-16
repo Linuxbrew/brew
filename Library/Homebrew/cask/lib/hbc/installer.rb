@@ -6,6 +6,8 @@ require "hbc/cask_dependencies"
 require "hbc/staged"
 require "hbc/verify"
 
+require "cgi"
+
 module Hbc
   class Installer
     extend Predicable
@@ -164,8 +166,9 @@ module Hbc
       end
 
       odebug "Using container class #{primary_container.class} for #{@downloaded_path}"
-      FileUtils.mkdir_p @cask.staged_path
-      primary_container.extract
+
+      basename = CGI.unescape(File.basename(@cask.url.path))
+      primary_container.extract(to: @cask.staged_path, basename: basename)
     end
 
     def install_artifacts

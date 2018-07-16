@@ -7,9 +7,7 @@ module Hbc
         magic_number.match?(/\Axar!/n)
       end
 
-      def extract
-        unpack_dir = @cask.staged_path
-
+      def extract_to_dir(unpack_dir, basename:)
         @command.run!("xar", args: ["-x", "-f", @path, "-C", unpack_dir])
       end
     end

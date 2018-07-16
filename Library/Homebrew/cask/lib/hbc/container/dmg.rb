@@ -14,11 +14,13 @@ module Hbc
         !imageinfo.empty?
       end
 
-      def extract
+      def extract_to_dir(unpack_dir, basename:)
         mount do |mounts|
           begin
             raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad disk image?" if mounts.empty?
-            mounts.each(&method(:extract_mount))
+            mounts.each do |mount|
+              extract_mount(mount, to: unpack_dir)
+            end
           ensure
             mounts.each(&method(:eject))
           end
@@ -84,7 +86,7 @@ module Hbc
 
       private
 
-      def extract_mount(mount)
+      def extract_mount(mount, to:)
         Tempfile.open(["", ".bom"]) do |bomfile|
           bomfile.close
 
@@ -93,7 +95,7 @@ module Hbc
             filelist.close
 
             @command.run!("/usr/bin/mkbom", args: ["-s", "-i", filelist.path, "--", bomfile.path])
-            @command.run!("/usr/bin/ditto", args: ["--bom", bomfile.path, "--", mount, @cask.staged_path])
+            @command.run!("/usr/bin/ditto", args: ["--bom", bomfile.path, "--", mount, to])
           end
         end
       end
