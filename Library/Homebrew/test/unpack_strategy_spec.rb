@@ -17,23 +17,44 @@ end
 
 describe UnpackStrategy do
   describe "#extract_nestedly" do
-    let(:file_name) { "file" }
-    let(:nested_archive) {
-      dir = mktmpdir
+    subject(:strategy) { described_class.detect(path) }
 
-      (dir/"file").write "This file was inside a GZIP inside a BZIP2."
-      system "gzip", dir.children.first
-      system "bzip2", dir.children.first
-
-      dir.children.first
-    }
     let(:unpack_dir) { mktmpdir }
-    subject(:strategy) { described_class.detect(nested_archive) }
 
-    it "can extract nested archives" do
-      strategy.extract_nestedly(to: unpack_dir)
+    context "when extracting a GZIP nested in a BZIP2" do
+      let(:file_name) { "file" }
+      let(:path) {
+        dir = mktmpdir
 
-      expect(File.read(unpack_dir/file_name)).to eq("This file was inside a GZIP inside a BZIP2.")
+        (dir/"file").write "This file was inside a GZIP inside a BZIP2."
+        system "gzip", dir.children.first
+        system "bzip2", dir.children.first
+
+        dir.children.first
+      }
+
+      it "can extract nested archives" do
+        strategy.extract_nestedly(to: unpack_dir)
+
+        expect(File.read(unpack_dir/file_name)).to eq("This file was inside a GZIP inside a BZIP2.")
+      end
+    end
+
+    context "when extracting a directory with nested directories" do
+      let(:directories) { "A/B/C" }
+      let(:path) {
+        (mktmpdir/"file.tar").tap do |path|
+          mktmpdir do |dir|
+            (dir/directories).mkpath
+            system "tar", "-c", "-f", path, "-C", dir, "A/"
+          end
+        end
+      }
+
+      it "does not recurse into nested directories" do
+        strategy.extract_nestedly(to: unpack_dir)
+        expect(Pathname.glob(unpack_dir/"**/*")).to include unpack_dir/directories
+      end
     end
   end
 end
