@@ -295,12 +295,6 @@ class GitUnpackStrategy < DirectoryUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     super && (path/".git").directory?
   end
-
-  private
-
-  def extract_to_dir(unpack_dir, basename:)
-    FileUtils.cp_r path.children, unpack_dir, preserve: true
-  end
 end
 
 class SubversionUnpackStrategy < DirectoryUnpackStrategy
