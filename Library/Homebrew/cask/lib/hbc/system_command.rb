@@ -3,8 +3,8 @@ require "vendor/plist/plist"
 require "shellwords"
 
 require "extend/io"
-
-require "hbc/utils/hash_validator"
+require "extend/hash_validator"
+using HashValidator
 
 module Hbc
   class SystemCommand
@@ -45,7 +45,7 @@ module Hbc
       @print_stdout = print_stdout
       @print_stderr = print_stderr
       @must_succeed = must_succeed
-      options.extend(HashValidator).assert_valid_keys(:chdir)
+      options.assert_valid_keys!(:chdir)
       @options = options
       @env = env
 

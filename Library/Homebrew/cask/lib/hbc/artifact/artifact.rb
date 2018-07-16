@@ -1,6 +1,7 @@
 require "hbc/artifact/moved"
 
-require "hbc/utils/hash_validator"
+require "extend/hash_validator"
+using HashValidator
 
 module Hbc
   module Artifact
@@ -20,7 +21,7 @@ module Hbc
           raise CaskInvalidError.new(cask.token, "target required for #{english_name} '#{source_string}'")
         end
 
-        target_hash.extend(HashValidator).assert_valid_keys(:target)
+        target_hash.assert_valid_keys!(:target)
 
         new(cask, source_string, **target_hash)
       end

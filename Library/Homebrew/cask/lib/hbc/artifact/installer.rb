@@ -1,5 +1,8 @@
 require "hbc/artifact/abstract_artifact"
 
+require "extend/hash_validator"
+using HashValidator
+
 module Hbc
   module Artifact
     class Installer < AbstractArtifact
@@ -60,7 +63,7 @@ module Hbc
           raise CaskInvalidError.new(cask, "invalid 'installer' stanza: Only one of #{VALID_KEYS.inspect} is permitted.")
         end
 
-        args.extend(HashValidator).assert_valid_keys(*VALID_KEYS)
+        args.assert_valid_keys!(*VALID_KEYS)
         new(cask, **args)
       end
 
