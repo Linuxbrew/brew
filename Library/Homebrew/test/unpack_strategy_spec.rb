@@ -15,6 +15,29 @@ RSpec.shared_examples "#extract" do |children: []|
   end
 end
 
+describe UnpackStrategy do
+  describe "#extract_nestedly" do
+    let(:file_name) { "file" }
+    let(:nested_archive) {
+      dir = mktmpdir
+
+      (dir/"file").write "This file was inside a GZIP inside a BZIP2."
+      system "gzip", dir.children.first
+      system "bzip2", dir.children.first
+
+      dir.children.first
+    }
+    let(:unpack_dir) { mktmpdir }
+    subject(:strategy) { described_class.detect(nested_archive) }
+
+    it "can extract nested archives" do
+      strategy.extract_nestedly(to: unpack_dir)
+
+      expect(File.read(unpack_dir/file_name)).to eq("This file was inside a GZIP inside a BZIP2.")
+    end
+  end
+end
+
 describe UncompressedUnpackStrategy do
   let(:path) {
     (mktmpdir/"test").tap do |path|
