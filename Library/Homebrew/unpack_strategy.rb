@@ -199,7 +199,7 @@ class XzUnpackStrategy < UnpackStrategy
 
   def extract_to_dir(unpack_dir, basename:)
     super
-    safe_system Formula["xz"].opt_bin/"xz", "-d", "-q", "-T0", unpack_dir/basename
+    safe_system Formula["xz"].opt_bin/"unxz", "-q", "-T0", unpack_dir/basename
     extract_nested_tar(unpack_dir, basename: basename)
   end
 
