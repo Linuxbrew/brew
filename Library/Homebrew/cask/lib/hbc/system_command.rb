@@ -41,7 +41,7 @@ module Hbc
       @executable = executable
       @args = args
       @sudo = sudo
-      @input = input
+      @input = [*input]
       @print_stdout = print_stdout
       @print_stderr = print_stderr
       @must_succeed = must_succeed
@@ -116,7 +116,7 @@ module Hbc
     end
 
     def write_input_to(raw_stdin)
-      [*input].each(&raw_stdin.method(:print))
+      input.each(&raw_stdin.method(:write))
     end
 
     def each_line_from(sources)
