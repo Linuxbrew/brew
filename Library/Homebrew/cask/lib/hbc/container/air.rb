@@ -7,9 +7,7 @@ module Hbc
         path.extname == ".air"
       end
 
-      def extract
-        unpack_dir = @cask.staged_path
-
+      def extract_to_dir(unpack_dir, basename:)
         @command.run!(
           "/Applications/Utilities/Adobe AIR Application Installer.app/Contents/MacOS/Adobe AIR Application Installer",
           args: ["-silent", "-location", unpack_dir, path],

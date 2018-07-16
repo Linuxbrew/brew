@@ -5,5 +5,5 @@ cask 'container-bzip2' do
   url "file://#{TEST_FIXTURE_DIR}/cask/container.bz2"
   homepage 'https://example.com/container-bzip2'
 
-  app 'container-bzip2--1.2.3'
+  app 'container'
 end

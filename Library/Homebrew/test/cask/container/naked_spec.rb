@@ -5,7 +5,7 @@ describe Hbc::Container::Naked, :cask do
       version "1.2"
     end
 
-    path                 = "/tmp/downloads/kevin-spacey-1.2.pkg"
+    path                 = Pathname("/tmp/downloads/kevin-spacey.pkg")
     expected_destination = cask.staged_path.join("kevin spacey.pkg")
 
     container = Hbc::Container::Naked.new(cask, path, Hbc::FakeSystemCommand)
@@ -15,7 +15,7 @@ describe Hbc::Container::Naked, :cask do
     )
 
     expect {
-      container.extract
+      container.extract(to: cask.staged_path, basename: "kevin spacey.pkg")
     }.not_to raise_error
   end
 end
