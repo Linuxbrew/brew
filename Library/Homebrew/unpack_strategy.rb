@@ -67,6 +67,25 @@ class UnpackStrategy
     unpack_dir.mkpath
     extract_to_dir(unpack_dir, basename: basename)
   end
+
+  def extract_nestedly(to: nil, basename: nil)
+    Dir.mktmpdir do |tmp_unpack_dir|
+      tmp_unpack_dir = Pathname(tmp_unpack_dir)
+
+      extract(to: tmp_unpack_dir, basename: basename)
+
+      children = tmp_unpack_dir.children
+
+      if children.count == 1 && !children.first.directory?
+        s = self.class.detect(children.first)
+
+        s.extract_nestedly(to: to, basename: basename)
+        next
+      end
+
+      DirectoryUnpackStrategy.new(tmp_unpack_dir).extract(to: to)
+    end
+  end
 end
 
 class DirectoryUnpackStrategy < UnpackStrategy
@@ -82,6 +101,8 @@ class DirectoryUnpackStrategy < UnpackStrategy
 end
 
 class UncompressedUnpackStrategy < UnpackStrategy
+  alias extract_nestedly extract
+
   private
 
   def extract_to_dir(unpack_dir, basename:)
@@ -166,7 +187,7 @@ class CompressUnpackStrategy < TarUnpackStrategy
   end
 end
 
-class XzUnpackStrategy < UncompressedUnpackStrategy
+class XzUnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\A\xFD7zXZ\x00/n)
   end
@@ -175,7 +196,7 @@ class XzUnpackStrategy < UncompressedUnpackStrategy
 
   def extract_to_dir(unpack_dir, basename:)
     super
-    safe_system Formula["xz"].opt_bin/"xz", "-d", "-q", "-T0", unpack_dir/basename
+    safe_system Formula["xz"].opt_bin/"unxz", "-q", "-T0", unpack_dir/basename
     extract_nested_tar(unpack_dir, basename: basename)
   end
 
@@ -192,7 +213,7 @@ class XzUnpackStrategy < UncompressedUnpackStrategy
   end
 end
 
-class Bzip2UnpackStrategy < UncompressedUnpackStrategy
+class Bzip2UnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\ABZh/n)
   end
@@ -200,12 +221,12 @@ class Bzip2UnpackStrategy < UncompressedUnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    super
+    FileUtils.cp path, unpack_dir/basename, preserve: true
     safe_system "bunzip2", "-q", unpack_dir/basename
   end
 end
 
-class GzipUnpackStrategy < UncompressedUnpackStrategy
+class GzipUnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\A\037\213/n)
   end
@@ -213,12 +234,12 @@ class GzipUnpackStrategy < UncompressedUnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    super
+    FileUtils.cp path, unpack_dir/basename, preserve: true
     safe_system "gunzip", "-q", "-N", unpack_dir/basename
   end
 end
 
-class LzipUnpackStrategy < UncompressedUnpackStrategy
+class LzipUnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\ALZIP/n)
   end
@@ -226,7 +247,7 @@ class LzipUnpackStrategy < UncompressedUnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    super
+    FileUtils.cp path, unpack_dir/basename, preserve: true
     safe_system Formula["lzip"].opt_bin/"lzip", "-d", "-q", unpack_dir/basename
   end
 end
@@ -270,12 +291,6 @@ end
 class GitUnpackStrategy < DirectoryUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     super && (path/".git").directory?
-  end
-
-  private
-
-  def extract_to_dir(unpack_dir, basename:)
-    FileUtils.cp_r path.children, unpack_dir, preserve: true
   end
 end
 
