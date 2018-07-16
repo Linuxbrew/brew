@@ -69,7 +69,7 @@ class AbstractDownloadStrategy
 
   def safe_system(*args)
     if @shutup
-      quiet_system(*args) || raise(ErrorDuringExecution.new(args.shift, args))
+      quiet_system(*args) || raise(ErrorDuringExecution.new(args, status: $CHILD_STATUS))
     else
       super(*args)
     end

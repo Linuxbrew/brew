@@ -67,8 +67,7 @@ class EmbeddedPatch
   def apply
     data = contents.gsub("HOMEBREW_PREFIX", HOMEBREW_PREFIX)
     args = %W[-g 0 -f -#{strip}]
-    Utils.popen_write("patch", *args) { |p| p.write(data) }
-    raise ErrorDuringExecution.new("patch", args) unless $CHILD_STATUS.success?
+    Utils.safe_popen_write("patch", *args) { |p| p.write(data) }
   end
 
   def inspect

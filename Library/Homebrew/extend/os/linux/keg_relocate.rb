@@ -20,7 +20,9 @@ class Keg
     # patchelf requires that the ELF file have a .dynstr section.
     # Skip ELF files that do not have a .dynstr section.
     return if ["cannot find section .dynstr", "strange: no string table"].include?(old_rpath)
-    raise ErrorDuringExecution, "#{cmd_rpath}\n#{old_rpath}" unless $CHILD_STATUS.success?
+    unless $CHILD_STATUS.success?
+      raise ErrorDuringExecution.new(cmd_rpath, stdout: old_rpath, status: $CHILD_STATUS)
+    end
 
     rpath = old_rpath
             .split(":")
