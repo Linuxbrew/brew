@@ -79,8 +79,8 @@ class Cmd
         "clang++"
       when /llvm-gcc/
         "llvm-g++-4.2"
-      when /gcc(-\d(\.\d)?)?$/
-        "g++" + $1.to_s
+      when /(g)?cc(-\d(\.\d)?)?$/
+        "g++" + $2.to_s
       end
     else
       # Note that this is a universal fallback, so that we'll always invoke
