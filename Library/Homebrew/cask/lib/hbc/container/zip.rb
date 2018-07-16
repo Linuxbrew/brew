@@ -3,8 +3,8 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Zip < Base
-      def self.me?(criteria)
-        criteria.magic_number(/\APK(\003\004|\005\006)/n)
+      def self.can_extract?(path:, magic_number:)
+        magic_number.match?(/\APK(\003\004|\005\006)/n)
       end
 
       def extract

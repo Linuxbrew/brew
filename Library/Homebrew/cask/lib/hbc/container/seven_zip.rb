@@ -2,9 +2,9 @@ require "hbc/container/generic_unar"
 
 module Hbc
   class Container
-    class SevenZip < GenericUnar
-      def self.me?(criteria)
-        criteria.magic_number(/\A7z\xBC\xAF\x27\x1C/n)
+    class SevenZip
+      def self.can_extract?(path:, magic_number:)
+        magic_number.match?(/\A7z\xBC\xAF\x27\x1C/n)
       end
 
       def extract

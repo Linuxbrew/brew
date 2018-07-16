@@ -149,7 +149,7 @@ module Hbc
         container = if @cask.container&.type
           Container.from_type(@cask.container.type)
         else
-          Container.for_path(@downloaded_path, @command)
+          Container.for_path(@downloaded_path)
         end
 
         container&.new(@cask, @downloaded_path, @command, verbose: verbose?)

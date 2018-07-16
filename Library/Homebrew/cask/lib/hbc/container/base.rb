@@ -34,7 +34,7 @@ module Hbc
       end
 
       def extract_nested_container(source)
-        container = Container.for_path(source, @command)
+        container = Container.for_path(source)
 
         return false unless container
 

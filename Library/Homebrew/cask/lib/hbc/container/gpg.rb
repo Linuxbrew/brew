@@ -3,8 +3,8 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Gpg < Base
-      def self.me?(criteria)
-        criteria.extension(/^(gpg)$/)
+      def self.can_extract?(path:, magic_number:)
+        path.extname == ".gpg"
       end
 
       def import_key

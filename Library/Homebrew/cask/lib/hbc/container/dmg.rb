@@ -5,11 +5,13 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Dmg < Base
-      def self.me?(criteria)
-        !criteria.command.run("/usr/bin/hdiutil",
-                              # realpath is a failsafe against unusual filenames
-                              args:         ["imageinfo", Pathname.new(criteria.path).realpath],
-                              print_stderr: false).stdout.empty?
+      def self.can_extract?(path:, magic_number:)
+        imageinfo = SystemCommand.run("/usr/bin/hdiutil",
+                                      # realpath is a failsafe against unusual filenames
+                                      args:         ["imageinfo", path.realpath],
+                                      print_stderr: false).stdout
+
+        !imageinfo.empty?
       end
 
       def extract

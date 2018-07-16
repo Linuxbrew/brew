@@ -3,8 +3,8 @@ require "hbc/container/naked"
 module Hbc
   class Container
     class Otf < Naked
-      def self.me?(criteria)
-        criteria.magic_number(/\AOTTO/n)
+      def self.can_extract?(path:, magic_number:)
+        magic_number.match?(/\AOTTO/n)
       end
     end
   end
