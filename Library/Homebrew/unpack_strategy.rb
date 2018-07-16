@@ -69,11 +69,6 @@ class UnpackStrategy
   end
 
   def extract_nestedly(to: nil, basename: nil)
-    if is_a?(UncompressedUnpackStrategy)
-      extract(to: to, basename: basename)
-      return
-    end
-
     Dir.mktmpdir do |tmp_unpack_dir|
       tmp_unpack_dir = Pathname(tmp_unpack_dir)
 
@@ -106,6 +101,8 @@ class DirectoryUnpackStrategy < UnpackStrategy
 end
 
 class UncompressedUnpackStrategy < UnpackStrategy
+  alias extract_nestedly extract
+
   private
 
   def extract_to_dir(unpack_dir, basename:)
