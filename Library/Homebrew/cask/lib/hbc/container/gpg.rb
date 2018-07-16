@@ -18,21 +18,25 @@ module Hbc
           ["--fetch-key", @cask.gpg.key_url.to_s]
         end
 
-        @command.run!("gpg", args: args)
+        @command.run!("gpg",
+                      args: args,
+                      env: { "PATH" => PATH.new(Formula["gnupg"].opt_bin, ENV["PATH"]) })
       end
 
       def extract
-        unless gpg = which("gpg", PATH.new(ENV["PATH"], HOMEBREW_PREFIX/"bin"))
-          raise CaskError, "Expected to find gpg executable. Cask '#{@cask}' must add: depends_on formula: 'gpg'"
-        end
-
         import_key
 
         Dir.mktmpdir do |unpack_dir|
-          @command.run!(gpg, args: ["--batch", "--yes", "--output", Pathname(unpack_dir).join(@path.basename(".gpg")), "--decrypt", @path])
+          @command.run!("gpg",
+                        args: ["--batch", "--yes", "--output", Pathname(unpack_dir).join(@path.basename(".gpg")), "--decrypt", @path],
+                        env: { "PATH" => PATH.new(Formula["gnupg"].opt_bin, ENV["PATH"]) })
 
           extract_nested_inside(unpack_dir)
         end
+      end
+
+      def dependencies
+        @dependencies ||= [Formula["gnupg"]]
       end
     end
   end

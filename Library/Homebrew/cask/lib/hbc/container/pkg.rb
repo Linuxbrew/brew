@@ -5,8 +5,7 @@ module Hbc
     class Pkg < Naked
       def self.me?(criteria)
         criteria.extension(/m?pkg$/) &&
-          (criteria.path.directory? ||
-           criteria.magic_number(/^xar!/n))
+          (criteria.path.directory? || criteria.magic_number(/\Axar!/n))
       end
     end
   end
