@@ -1521,6 +1521,7 @@ class Formula
   # @private
   def runtime_dependencies(read_from_tab: true, undeclared: true)
     if read_from_tab &&
+       undeclared &&
        (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
       return tab_deps.map do |d|
@@ -1534,44 +1535,28 @@ class Formula
     declared_runtime_dependencies | undeclared_runtime_dependencies
   end
 
-  # Returns a list of Dependency objects that are declared in the formula.
+  # Returns a list of Formula objects that are required at runtime.
   # @private
-  def declared_runtime_dependencies
-    recursive_dependencies do |_, dependency|
-      Dependency.prune if dependency.build?
-      next if dependency.required?
-      if build.any_args_or_options?
-        Dependency.prune if build.without?(dependency)
-      elsif !dependency.recommended?
-        Dependency.prune
+  def runtime_formula_dependencies(read_from_tab: true, undeclared: true)
+    runtime_dependencies(
+      read_from_tab: read_from_tab,
+      undeclared: undeclared,
+    ).map do |d|
+      begin
+        d.to_formula
+      rescue FormulaUnavailableError
+        nil
       end
-    end
-  end
-
-  # Returns a list of Dependency objects that are not declared in the formula
-  # but the formula links to.
-  # @private
-  def undeclared_runtime_dependencies
-    keg = opt_or_installed_prefix_keg
-    return [] unless keg
-
-    undeclared_deps = CacheStoreDatabase.use(:linkage) do |db|
-      linkage_checker = LinkageChecker.new(keg, self, cache_db: db)
-      linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
-    end
-
-    undeclared_deps
+    end.compact
   end
 
   # Returns a list of formulae depended on by this formula that aren't
   # installed
   def missing_dependencies(hide: nil)
     hide ||= []
-    runtime_dependencies.map(&:to_formula).select do |d|
-      hide.include?(d.name) || d.installed_prefixes.empty?
+    runtime_formula_dependencies.select do |f|
+      hide.include?(f.name) || f.installed_prefixes.empty?
     end
-  rescue FormulaUnavailableError
-    []
   end
 
   # @private
@@ -1743,6 +1728,35 @@ class Formula
       import site; site.addsitedir("#{HOMEBREW_PREFIX}/lib/python2.7/site-packages")
       import sys, os; sys.path = (os.environ["PYTHONPATH"].split(os.pathsep) if "PYTHONPATH" in os.environ else []) + ["#{HOMEBREW_PREFIX}/lib/python2.7/site-packages"] + sys.path
     PYTHON
+  end
+
+  # Returns a list of Dependency objects that are declared in the formula.
+  # @private
+  def declared_runtime_dependencies
+    recursive_dependencies do |_, dependency|
+      Dependency.prune if dependency.build?
+      next if dependency.required?
+      if build.any_args_or_options?
+        Dependency.prune if build.without?(dependency)
+      elsif !dependency.recommended?
+        Dependency.prune
+      end
+    end
+  end
+
+  # Returns a list of Dependency objects that are not declared in the formula
+  # but the formula links to.
+  # @private
+  def undeclared_runtime_dependencies
+    keg = opt_or_installed_prefix_keg
+    return [] unless keg
+
+    undeclared_deps = CacheStoreDatabase.use(:linkage) do |db|
+      linkage_checker = LinkageChecker.new(keg, self, cache_db: db)
+      linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
+    end
+
+    undeclared_deps
   end
 
   public
