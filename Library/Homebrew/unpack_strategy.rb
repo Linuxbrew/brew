@@ -6,6 +6,8 @@ class UnpackStrategy
   def self.strategies
     @strategies ||= [
       JarUnpackStrategy,
+      LuaRockUnpackStrategy,
+      MicrosoftOfficeXmlUnpackStrategy,
       ZipUnpackStrategy,
       XarUnpackStrategy,
       CompressUnpackStrategy,
@@ -87,22 +89,33 @@ class UncompressedUnpackStrategy < UnpackStrategy
   end
 end
 
+class MicrosoftOfficeXmlUnpackStrategy < UncompressedUnpackStrategy
+  def self.can_extract?(path:, magic_number:)
+    return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
+
+    # Check further if the ZIP is a Microsoft Office XML document.
+    magic_number.match?(/\APK\003\004/n) &&
+      magic_number.match?(%r{\A.{30}(\[Content_Types\]\.xml|_rels/\.rels)}n)
+  end
+end
+
+class LuaRockUnpackStrategy < UncompressedUnpackStrategy
+  def self.can_extract?(path:, magic_number:)
+    return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
+
+    # Check further if the ZIP is a LuaRocks package.
+    out, _, status = Open3.capture3("zipinfo", "-1", path)
+    status.success? && out.split("\n").any? { |line| line.match?(%r{\A[^/]+.rockspec\Z}) }
+  end
+end
+
 class JarUnpackStrategy < UncompressedUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
 
     # Check further if the ZIP is a JAR/WAR.
-    Open3.popen3("unzip", "-l", path) do |stdin, stdout, stderr, wait_thr|
-      stdin.close_write
-      stderr.close_read
-
-      begin
-        return stdout.each_line.any? { |l| l.match?(%r{\s+META-INF/MANIFEST.MF$}) }
-      ensure
-        stdout.close_read
-        wait_thr.kill
-      end
-    end
+    out, _, status = Open3.capture3("zipinfo", "-1", path)
+    status.success? && out.split("\n").include?("META-INF/MANIFEST.MF")
   end
 end
 
