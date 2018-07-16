@@ -4,14 +4,6 @@ require "stringio"
 
 BUG_REPORTS_URL = "https://github.com/Homebrew/homebrew-cask#reporting-bugs".freeze
 
-# global methods
-
-def odebug(title, *sput)
-  return unless ARGV.debug?
-  puts Formatter.headline(title, color: :magenta)
-  puts sput unless sput.empty?
-end
-
 module Hbc
   module Utils
     def self.gain_permissions_remove(path, command: SystemCommand)
