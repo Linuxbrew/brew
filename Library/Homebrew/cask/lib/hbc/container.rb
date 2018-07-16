@@ -6,6 +6,7 @@ require "hbc/container/bzip2"
 require "hbc/container/cab"
 require "hbc/container/criteria"
 require "hbc/container/dmg"
+require "hbc/container/self_extracting_executable"
 require "hbc/container/executable"
 require "hbc/container/generic_unar"
 require "hbc/container/gpg"
@@ -32,6 +33,7 @@ module Hbc
         Ttf,
         Otf,
         Air,
+        SelfExtractingExecutable,
         Cab,
         Dmg,
         SevenZip,
