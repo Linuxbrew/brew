@@ -21,7 +21,7 @@ module Hbc
       end
 
       def extract(command: nil, verbose: nil, **_)
-        container = Container.for_path(path, command)
+        container = Container.for_path(path)
 
         unless container
           raise CaskError, "Aw dang, could not identify nested container at '#{source}'"

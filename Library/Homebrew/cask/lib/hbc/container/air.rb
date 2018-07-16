@@ -3,8 +3,8 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Air < Base
-      def self.me?(criteria)
-        criteria.path.extname == ".air"
+      def self.can_extract?(path:, magic_number:)
+        path.extname == ".air"
       end
 
       def extract

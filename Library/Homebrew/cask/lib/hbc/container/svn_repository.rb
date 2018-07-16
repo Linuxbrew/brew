@@ -1,8 +1,8 @@
 module Hbc
   class Container
     class SvnRepository < Base
-      def self.me?(criteria)
-        criteria.path.join(".svn").directory?
+      def self.can_extract?(path:, magic_number:)
+        (path/".svn").directory?
       end
 
       def extract

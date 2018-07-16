@@ -4,11 +4,11 @@ require "vendor/macho/macho"
 module Hbc
   class Container
     class Executable < Naked
-      def self.me?(criteria)
-        return true if criteria.magic_number(/\A#!\s*\S+/n)
+      def self.can_extract?(path:, magic_number:)
+        return true if magic_number.match?(/\A#!\s*\S+/n)
 
         begin
-          criteria.path.file? && MachO.open(criteria.path).header.executable?
+          path.file? && MachO.open(path).header.executable?
         rescue MachO::MagicError
           false
         end

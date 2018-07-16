@@ -3,7 +3,7 @@ require "hbc/container/base"
 module Hbc
   class Container
     class GenericUnar < Base
-      def self.me?(_criteria)
+      def self.can_extract?(path:, magic_number:)
         false
       end
 

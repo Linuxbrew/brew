@@ -3,8 +3,8 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Lzma < Base
-      def self.me?(criteria)
-        criteria.magic_number(/\A\]\000\000\200\000/n)
+      def self.can_extract?(path:, magic_number:)
+        magic_number.match?(/\A\]\000\000\200\000/n)
       end
 
       def extract

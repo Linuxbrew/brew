@@ -3,8 +3,8 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Cab < Base
-      def self.me?(criteria)
-        criteria.magic_number(/\A(MSCF|MZ)/n)
+      def self.can_extract?(path:, magic_number:)
+        magic_number.match?(/\A(MSCF|MZ)/n)
       end
 
       def extract

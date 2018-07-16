@@ -3,10 +3,13 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Tar < Base
-      def self.me?(criteria)
-        criteria.magic_number(/\A.{257}ustar/n) ||
-          # or compressed tar (bzip2/gzip/lzma/xz)
-          IO.popen(["/usr/bin/tar", "-t", "-f", criteria.path.to_s], err: File::NULL) { |io| !io.read(1).nil? }
+      def self.can_extract?(path:, magic_number:)
+        return true if magic_number.match?(/\A.{257}ustar/n)
+
+        # Check if `tar` can list the contents, then it can also extract it.
+        IO.popen(["tar", "tf", path], err: File::NULL) do |stdout|
+          !stdout.read(1).nil?
+        end
       end
 
       def extract

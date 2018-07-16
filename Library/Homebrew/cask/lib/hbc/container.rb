@@ -53,12 +53,18 @@ module Hbc
       # Hbc::Container::GenericUnar
     end
 
-    def self.for_path(path, command)
+    def self.for_path(path)
       odebug "Determining which containers to use based on filetype"
-      criteria = Criteria.new(path, command)
+
+      magic_number = if path.directory?
+        ""
+      else
+        File.binread(path, 262) || ""
+      end
+
       autodetect_containers.find do |c|
         odebug "Checking container class #{c}"
-        c.me?(criteria)
+        c.can_extract?(path: path, magic_number: magic_number)
       end
     end
 

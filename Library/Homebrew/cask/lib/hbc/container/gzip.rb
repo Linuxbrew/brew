@@ -3,8 +3,8 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Gzip < Base
-      def self.me?(criteria)
-        criteria.magic_number(/\A\037\213/n)
+      def self.can_extract?(path:, magic_number:)
+        magic_number.match?(/\A\037\213/n)
       end
 
       def extract
