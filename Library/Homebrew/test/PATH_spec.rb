@@ -69,7 +69,7 @@ describe PATH do
   end
 
   describe "#==" do
-    it "always returns false when comparing against something which does not respons to `#to_ary` or `#to_str`" do
+    it "always returns false when comparing against something which does not respond to `#to_ary` or `#to_str`" do
       expect(described_class.new).not_to eq Object.new
     end
   end
