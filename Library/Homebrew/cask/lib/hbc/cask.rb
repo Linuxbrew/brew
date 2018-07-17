@@ -131,7 +131,7 @@ module Hbc
     end
 
     def to_hash
-      hsh = {
+      {
         "name" => name,
         "homepage" => homepage,
         "url" => url,
@@ -139,7 +139,7 @@ module Hbc
         "version" => version,
         "sha256" => sha256,
         "artifacts" => artifacts.map do |a|
-          if a.methods.include? :to_a
+          if a.respond_to? :to_a
             a.to_a
           elsif a.methods.include? :to_h
             a.to_h
@@ -155,8 +155,6 @@ module Hbc
         "accessibility_access" => accessibility_access,
         "auto_updates" => auto_updates,
       }
-
-      hsh
     end
   end
 end
