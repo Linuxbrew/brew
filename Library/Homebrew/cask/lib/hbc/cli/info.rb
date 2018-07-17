@@ -12,7 +12,7 @@ module Hbc
 
       def run
         if json == "v1"
-          puts JSON.generate(casks.map(&:to_hash))
+          puts JSON.generate(casks.map(&:to_h))
         else
           casks.each do |cask|
             odebug "Getting info for Cask #{cask}"
