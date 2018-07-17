@@ -48,7 +48,7 @@ class AbstractDownloadStrategy
   # Unlike {Resource#stage}, this does not take a block.
   def stage
     UnpackStrategy.detect(cached_location, ref_type: @ref_type, ref: @ref)
-                  .extract(basename: basename_without_params)
+                  .extract_nestedly(basename: basename_without_params)
   end
 
   # @!attribute [r] cached_location
