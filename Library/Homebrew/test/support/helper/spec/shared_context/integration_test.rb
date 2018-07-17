@@ -83,8 +83,7 @@ RSpec.shared_context "integration test" do
     @ruby_args ||= begin
       ruby_args = [
         "-W0",
-        "-I", HOMEBREW_LOAD_PATH,
-        "-rconfig"
+        "-I", $LOAD_PATH.join(File::PATH_SEPARATOR)
       ]
       if ENV["HOMEBREW_TESTS_COVERAGE"]
         simplecov_spec = Gem.loaded_specs["simplecov"]

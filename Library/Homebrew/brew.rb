@@ -12,20 +12,7 @@ if RUBY_X < 2 || (RUBY_X == 2 && RUBY_Y < 3)
   raise "Homebrew must be run under Ruby 2.3! You're running #{RUBY_VERSION}."
 end
 
-require "pathname"
-HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
-
-require "English"
-
-unless $LOAD_PATH.include?("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
-  $LOAD_PATH.unshift("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
-end
-
-unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
-  $LOAD_PATH.unshift(HOMEBREW_LIBRARY_PATH.to_s)
-end
-
-require "global"
+require_relative "global"
 
 begin
   trap("INT", std_trap) # restore default CTRL-C handler

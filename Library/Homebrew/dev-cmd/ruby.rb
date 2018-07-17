@@ -8,6 +8,6 @@ module Homebrew
   module_function
 
   def ruby
-    exec ENV["HOMEBREW_RUBY_PATH"], "-I", HOMEBREW_LOAD_PATH, "-rglobal", "-rdev-cmd/irb", *ARGV
+    exec ENV["HOMEBREW_RUBY_PATH"], "-I", $LOAD_PATH.join(File::PATH_SEPARATOR), "-rglobal", "-rdev-cmd/irb", *ARGV
   end
 end
