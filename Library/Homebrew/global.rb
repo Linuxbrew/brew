@@ -1,5 +1,19 @@
 require "pathname"
 require "English"
+
+HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
+
+unless $LOAD_PATH.include?("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+  $LOAD_PATH.push("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+end
+
+unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
+  $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.to_s)
+end
+
+require "config"
+
+require "English"
 require "ostruct"
 require "messages"
 
@@ -12,7 +26,6 @@ HOMEBREW_PRODUCT = ENV["HOMEBREW_PRODUCT"]
 HOMEBREW_VERSION = ENV["HOMEBREW_VERSION"]
 HOMEBREW_WWW = "https://brew.sh".freeze
 
-require "config"
 require "extend/git_repository"
 
 HOMEBREW_REPOSITORY.extend(GitRepositoryExtension)

@@ -65,7 +65,7 @@ module Homebrew
         args = %W[
           #{RUBY_PATH}
           -W0
-          -I #{HOMEBREW_LOAD_PATH}
+          -I #{$LOAD_PATH.join(File::PATH_SEPARATOR)}
           --
           #{HOMEBREW_LIBRARY_PATH}/test.rb
           #{f.path}

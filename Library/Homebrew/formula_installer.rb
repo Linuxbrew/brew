@@ -729,7 +729,7 @@ class FormulaInstaller
     args = %W[
       nice #{RUBY_PATH}
       -W0
-      -I #{HOMEBREW_LOAD_PATH}
+      -I #{$LOAD_PATH.join(File::PATH_SEPARATOR)}
       --
       #{HOMEBREW_LIBRARY_PATH}/build.rb
       #{formula.specified_path}
@@ -886,7 +886,7 @@ class FormulaInstaller
     args = %W[
       nice #{RUBY_PATH}
       -W0
-      -I #{HOMEBREW_LOAD_PATH}
+      -I #{$LOAD_PATH.join(File::PATH_SEPARATOR)}
       --
       #{HOMEBREW_LIBRARY_PATH}/postinstall.rb
       #{formula.path}

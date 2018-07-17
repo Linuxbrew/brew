@@ -14,11 +14,9 @@ require "rubocop"
 require "rubocop/rspec/support"
 require "find"
 
-$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/cask/lib"))
-$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew"))
-$LOAD_PATH.unshift(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/test/support/lib"))
+$LOAD_PATH.push(File.expand_path("#{ENV["HOMEBREW_LIBRARY"]}/Homebrew/test/support/lib"))
 
-require "global"
+require_relative "../global"
 
 require "test/support/no_seed_progress_formatter"
 require "test/support/helper/fixtures"

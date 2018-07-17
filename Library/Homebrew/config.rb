@@ -46,14 +46,3 @@ HOMEBREW_TEMP = begin
   tmp.mkpath unless tmp.exist?
   tmp.realpath
 end
-
-unless defined? HOMEBREW_LIBRARY_PATH
-  # Root of the Homebrew code base
-  HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
-end
-
-# Load path used by standalone scripts to access the Homebrew code base
-HOMEBREW_LOAD_PATH = [
-  HOMEBREW_LIBRARY_PATH,
-  HOMEBREW_LIBRARY_PATH/"cask/lib",
-].join(File::PATH_SEPARATOR)
