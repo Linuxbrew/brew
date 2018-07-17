@@ -139,10 +139,10 @@ module Hbc
         "version" => version,
         "sha256" => sha256,
         "artifacts" => artifacts.map do |a|
-          if a.respond_to? :to_a
-            a.to_a
-          elsif a.methods.include? :to_h
+          if a.respond_to? :to_h
             a.to_h
+          elsif a.respond_to? :to_a
+            a.to_a
           else
             a
           end
