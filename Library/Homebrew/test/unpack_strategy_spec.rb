@@ -59,6 +59,22 @@ describe UnpackStrategy do
   end
 end
 
+describe DirectoryUnpackStrategy do
+  let(:path) {
+    mktmpdir.tap do |path|
+      FileUtils.touch path/"file"
+      FileUtils.ln_s "file", path/"symlink"
+    end
+  }
+  subject(:strategy) { described_class.new(path) }
+  let(:unpack_dir) { mktmpdir }
+
+  it "does not follow symlinks" do
+    strategy.extract(to: unpack_dir)
+    expect(unpack_dir/"symlink").to be_a_symlink
+  end
+end
+
 describe UncompressedUnpackStrategy do
   let(:path) {
     (mktmpdir/"test").tap do |path|
