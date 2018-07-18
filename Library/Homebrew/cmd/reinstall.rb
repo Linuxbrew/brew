@@ -3,6 +3,7 @@
 
 require "formula_installer"
 require "development_tools"
+require "messages"
 
 module Homebrew
   module_function
@@ -18,6 +19,7 @@ module Homebrew
       Migrator.migrate_if_needed(f)
       reinstall_formula(f)
     end
+    Homebrew.messages.display_messages
   end
 
   def reinstall_formula(f)

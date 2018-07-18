@@ -37,9 +37,6 @@ describe Hbc::CLI, :cask do
     let(:noop_command) { double("CLI::Noop") }
 
     before do
-      skip "random test failures due to leaking doubles"
-
-      allow(Hbc).to receive(:init)
       allow(described_class).to receive(:lookup_command).with("noop").and_return(noop_command)
       allow(noop_command).to receive(:run)
     end
