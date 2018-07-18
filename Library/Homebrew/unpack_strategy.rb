@@ -96,7 +96,7 @@ class DirectoryUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:)
-    FileUtils.cp_r path.children, unpack_dir, preserve: true
+    FileUtils.cp_r File.join(path, "."), unpack_dir, preserve: true
   end
 end
 
