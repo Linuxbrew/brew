@@ -1689,7 +1689,7 @@ class Formula
 
     ENV.clear_sensitive_environment!
 
-    Formula.mktemp("#{name}-test") do |staging|
+    mktemp("#{name}-test") do |staging|
       staging.retain! if ARGV.keep_tmp?
       @testpath = staging.tmpdir
       test_env[:HOME] = @testpath
@@ -1895,6 +1895,16 @@ class Formula
       opoo "Skipping #{full_name}: most recent version #{pkg_version} not installed"
     end
     eligible_for_cleanup
+  end
+
+  # Create a temporary directory then yield. When the block returns,
+  # recursively delete the temporary directory. Passing opts[:retain]
+  # or calling `do |staging| ... staging.retain!` in the block will skip
+  # the deletion and retain the temporary directory's contents.
+  def mktemp(prefix = name, opts = {})
+    Mktemp.new(prefix, opts).run do |staging|
+      yield staging
+    end
   end
 
   private
@@ -2463,16 +2473,6 @@ class Formula
     def pour_bottle?(&block)
       @pour_bottle_check = PourBottleCheck.new(self)
       @pour_bottle_check.instance_eval(&block)
-    end
-
-    # Create a temporary directory then yield. When the block returns,
-    # recursively delete the temporary directory. Passing opts[:retain]
-    # or calling `do |staging| ... staging.retain!` in the block will skip
-    # the deletion and retain the temporary directory's contents.
-    def mktemp(prefix = name, opts = {})
-      Mktemp.new(prefix, opts).run do |staging|
-        yield staging
-      end
     end
 
     # @private
