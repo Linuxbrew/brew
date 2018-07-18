@@ -7,6 +7,9 @@ jobs:
       HOMEBREW_DEVELOPER: 1
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
+      - run:
+         name: Install unzip and svn for tests
+         command: sudo apt-get update && sudo apt-get install -y unzip subversion
       - run: |
           cd /home/linuxbrew/.linuxbrew/Homebrew
           git pull --ff-only
