@@ -82,7 +82,7 @@ class Resource
   # Verifies download and unpacks it
   # The block may call `|resource,staging| staging.retain!` to retain the staging
   # directory. Subclasses that override stage should implement the tmp
-  # dir using FileUtils.mktemp so that works with all subtypes.
+  # dir using Resource#mktemp so that works with all subtypes.
   def stage(target = nil, &block)
     unless target || block
       raise ArgumentError, "target directory or block is required"
