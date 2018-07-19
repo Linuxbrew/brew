@@ -1,8 +1,8 @@
-require "hbc/container/generic_unar"
+require "hbc/container/base"
 
 module Hbc
   class Container
-    class SevenZip
+    class SevenZip < Base
       def self.can_extract?(path:, magic_number:)
         magic_number.match?(/\A7z\xBC\xAF\x27\x1C/n)
       end
