@@ -5,17 +5,19 @@ require "hbc/container/base"
 module Hbc
   class Container
     class Dmg < Base
-      def self.me?(criteria)
-        !criteria.command.run("/usr/bin/hdiutil",
-                              # realpath is a failsafe against unusual filenames
-                              args:         ["imageinfo", Pathname.new(criteria.path).realpath],
-                              print_stderr: false).stdout.empty?
+      def self.can_extract?(path:, magic_number:)
+        imageinfo = SystemCommand.run("/usr/bin/hdiutil",
+                                      # realpath is a failsafe against unusual filenames
+                                      args:         ["imageinfo", path.realpath],
+                                      print_stderr: false).stdout
+
+        !imageinfo.empty?
       end
 
       def extract
         mount do |mounts|
           begin
-            raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad DMG?" if mounts.empty?
+            raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad disk image?" if mounts.empty?
             mounts.each(&method(:extract_mount))
           ensure
             mounts.each(&method(:eject))

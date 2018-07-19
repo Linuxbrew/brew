@@ -18,6 +18,7 @@ module HomebrewArgvExtension
       --include-test
       --verbose
       --force
+      --display-times
       -i
       -v
       -d

@@ -2,7 +2,7 @@ module Hbc
   class DSL
     module Compat
       def license(*)
-        odeprecated "Hbc::DSL#license"
+        odisabled "Hbc::DSL#license"
       end
     end
 

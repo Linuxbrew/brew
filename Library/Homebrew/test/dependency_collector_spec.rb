@@ -128,15 +128,5 @@ describe DependencyCollector do
       resource.download_strategy = Class.new
       expect { subject.add(resource) }.to raise_error(TypeError)
     end
-
-    it "is deprecated when called with a language module", :needs_compat do
-      expect(subject).to receive(:odeprecated)
-      subject.add("lpeg" => :lua)
-    end
-
-    it "is deprecated when called with deprecated requirements", :needs_compat do
-      expect(subject).to receive(:odeprecated)
-      subject.add(:python)
-    end
   end
 end

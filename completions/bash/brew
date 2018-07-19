@@ -221,6 +221,7 @@ _brew_install() {
           --interactive
           --only-dependencies
           --verbose
+          --display-times
           $(brew options --compact "$prv" 2>/dev/null)
           "
       fi
@@ -481,6 +482,7 @@ _brew_unpack() {
   esac
   __brew_complete_formulae
 }
+
 _brew_update() {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   case "$cur" in
@@ -504,6 +506,7 @@ _brew_upgrade() {
         --debug
         --verbose
         --fetch-HEAD
+        --display-times
         "
       return
       ;;

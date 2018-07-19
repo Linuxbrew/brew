@@ -20,7 +20,7 @@ module Hbc
 
     def run!
       @processed_output = { stdout: "", stderr: "" }
-      odebug "Executing: #{expanded_command}"
+      odebug command.shelljoin
 
       each_output_line do |type, line|
         case type
@@ -55,7 +55,7 @@ module Hbc
     end
 
     def command
-      [*sudo_prefix, *env_args, executable, *args]
+      [*sudo_prefix, *env_args, executable.to_s, *expanded_args]
     end
 
     private
@@ -87,18 +87,20 @@ module Hbc
       raise CaskCommandFailedError.new(command, processed_output[:stdout], processed_output[:stderr], processed_status)
     end
 
-    def expanded_command
-      @expanded_command ||= command.map do |arg|
+    def expanded_args
+      @expanded_args ||= args.map do |arg|
         if arg.respond_to?(:to_path)
           File.absolute_path(arg)
+        elsif arg.is_a?(Integer) || arg.is_a?(Float)
+          arg.to_s
         else
-          String(arg)
+          arg.to_str
         end
       end
     end
 
     def each_output_line(&b)
-      executable, *args = expanded_command
+      executable, *args = command
 
       raw_stdin, raw_stdout, raw_stderr, raw_wait_thr =
         Open3.popen3([executable, executable], *args, **options)

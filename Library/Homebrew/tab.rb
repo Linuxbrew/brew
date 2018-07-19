@@ -17,7 +17,7 @@ class Tab < OpenStruct
   # Instantiates a Tab for a new installation of a formula.
   def self.create(formula, compiler, stdlib)
     build = formula.build
-    runtime_deps = formula.declared_runtime_dependencies
+    runtime_deps = formula.runtime_dependencies(undeclared: false)
     attributes = {
       "homebrew_version" => HOMEBREW_VERSION,
       "used_options" => build.used_options.as_flags,

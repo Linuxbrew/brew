@@ -98,6 +98,8 @@ RSpec.configure do |config|
     end
 
     begin
+      Tap.clear_cache
+
       TEST_DIRECTORIES.each(&:mkpath)
 
       @__homebrew_failed = Homebrew.failed?

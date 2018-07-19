@@ -23,7 +23,7 @@ RSpec.shared_context "Homebrew-Cask" do
     begin
       HOMEBREW_CASK_DIRS.values.each(&:mkpath)
 
-      [Hbc::Config.global.binarydir].each(&:mkpath)
+      Hbc::Config.global.binarydir.mkpath
 
       Tap.default_cask_tap.tap do |tap|
         FileUtils.mkdir_p tap.path.dirname

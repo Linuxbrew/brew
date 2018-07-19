@@ -156,8 +156,8 @@ class FormulaInstaller
 
     recursive_deps = formula.recursive_dependencies
     recursive_formulae = recursive_deps.map(&:to_formula)
-    recursive_runtime_deps = formula.runtime_dependencies
-    recursive_runtime_formulae = recursive_runtime_deps.map(&:to_formula)
+    recursive_runtime_formulae =
+      formula.runtime_formula_dependencies(undeclared: false)
 
     recursive_dependencies = []
     recursive_formulae.each do |dep|
@@ -175,7 +175,9 @@ class FormulaInstaller
       EOS
     end
 
-    if recursive_formulae.flat_map(&:recursive_dependencies).map(&:to_s).include?(formula.name)
+    if recursive_formulae.flat_map(&:recursive_dependencies)
+                         .map(&:to_s)
+                         .include?(formula.name)
       raise CannotInstallFormulaError, <<~EOS
         #{formula.full_name} contains a recursive dependency on itself!
       EOS
@@ -222,6 +224,7 @@ class FormulaInstaller
   end
 
   def install
+    start_time = Time.now
     if !formula.bottle_unneeded? && !pour_bottle? && DevelopmentTools.installed?
       Homebrew::Install.check_development_tools
     end
@@ -350,7 +353,8 @@ class FormulaInstaller
     build_bottle_postinstall if build_bottle?
 
     opoo "Nothing was installed to #{formula.prefix}" unless formula.installed?
-    Homebrew.messages.formula_installed(formula)
+    end_time = Time.now
+    Homebrew.messages.formula_installed(formula, end_time - start_time)
   end
 
   def check_conflicts
@@ -430,7 +434,7 @@ class FormulaInstaller
   end
 
   def runtime_requirements(formula)
-    runtime_deps = formula.runtime_dependencies.map(&:to_formula)
+    runtime_deps = formula.runtime_formula_dependencies(undeclared: false)
     recursive_requirements = formula.recursive_requirements do |dependent, _|
       Requirement.prune unless runtime_deps.include?(dependent)
     end

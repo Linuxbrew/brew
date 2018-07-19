@@ -1521,6 +1521,7 @@ class Formula
   # @private
   def runtime_dependencies(read_from_tab: true, undeclared: true)
     if read_from_tab &&
+       undeclared &&
        (keg = opt_or_installed_prefix_keg) &&
        (tab_deps = keg.runtime_dependencies)
       return tab_deps.map do |d|
@@ -1534,44 +1535,28 @@ class Formula
     declared_runtime_dependencies | undeclared_runtime_dependencies
   end
 
-  # Returns a list of Dependency objects that are declared in the formula.
+  # Returns a list of Formula objects that are required at runtime.
   # @private
-  def declared_runtime_dependencies
-    recursive_dependencies do |_, dependency|
-      Dependency.prune if dependency.build?
-      next if dependency.required?
-      if build.any_args_or_options?
-        Dependency.prune if build.without?(dependency)
-      elsif !dependency.recommended?
-        Dependency.prune
+  def runtime_formula_dependencies(read_from_tab: true, undeclared: true)
+    runtime_dependencies(
+      read_from_tab: read_from_tab,
+      undeclared: undeclared,
+    ).map do |d|
+      begin
+        d.to_formula
+      rescue FormulaUnavailableError
+        nil
       end
-    end
-  end
-
-  # Returns a list of Dependency objects that are not declared in the formula
-  # but the formula links to.
-  # @private
-  def undeclared_runtime_dependencies
-    keg = opt_or_installed_prefix_keg
-    return [] unless keg
-
-    undeclared_deps = CacheStoreDatabase.use(:linkage) do |db|
-      linkage_checker = LinkageChecker.new(keg, self, cache_db: db)
-      linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
-    end
-
-    undeclared_deps
+    end.compact
   end
 
   # Returns a list of formulae depended on by this formula that aren't
   # installed
   def missing_dependencies(hide: nil)
     hide ||= []
-    runtime_dependencies.map(&:to_formula).select do |d|
-      hide.include?(d.name) || d.installed_prefixes.empty?
+    runtime_formula_dependencies.select do |f|
+      hide.include?(f.name) || f.installed_prefixes.empty?
     end
-  rescue FormulaUnavailableError
-    []
   end
 
   # @private
@@ -1745,6 +1730,35 @@ class Formula
     PYTHON
   end
 
+  # Returns a list of Dependency objects that are declared in the formula.
+  # @private
+  def declared_runtime_dependencies
+    recursive_dependencies do |_, dependency|
+      Dependency.prune if dependency.build?
+      next if dependency.required?
+      if build.any_args_or_options?
+        Dependency.prune if build.without?(dependency)
+      elsif !dependency.recommended?
+        Dependency.prune
+      end
+    end
+  end
+
+  # Returns a list of Dependency objects that are not declared in the formula
+  # but the formula links to.
+  # @private
+  def undeclared_runtime_dependencies
+    keg = opt_or_installed_prefix_keg
+    return [] unless keg
+
+    undeclared_deps = CacheStoreDatabase.use(:linkage) do |db|
+      linkage_checker = LinkageChecker.new(keg, self, cache_db: db)
+      linkage_checker.undeclared_deps.map { |n| Dependency.new(n) }
+    end
+
+    undeclared_deps
+  end
+
   public
 
   # To call out to the system, we use the `system` method and we prefer
@@ -1905,6 +1919,56 @@ class Formula
     Mktemp.new(prefix, opts).run do |staging|
       yield staging
     end
+  end
+
+  # A version of `FileUtils.mkdir` that also changes to that folder in
+  # a block.
+  def mkdir(name)
+    result = FileUtils.mkdir_p(name)
+    return result unless block_given?
+    FileUtils.chdir name do
+      yield
+    end
+  end
+
+  # Run `scons` using a Homebrew-installed version rather than whatever is
+  # in the `PATH`.
+  def scons(*args)
+    system Formulary.factory("scons").opt_bin/"scons", *args
+  end
+
+  # Run `make` 3.81 or newer.
+  # Uses the system make on Leopard and newer, and the
+  # path to the actually-installed make on Tiger or older.
+  def make(*args)
+    if Utils.popen_read("/usr/bin/make", "--version")
+            .match(/Make (\d\.\d+)/)[1] > "3.80"
+      make_path = "/usr/bin/make"
+    else
+      make = Formula["make"].opt_bin/"make"
+      make_path = if make.exist?
+        make.to_s
+      else
+        (Formula["make"].opt_bin/"gmake").to_s
+      end
+    end
+
+    if superenv?
+      make_name = File.basename(make_path)
+      with_env(HOMEBREW_MAKE: make_name) do
+        system "make", *args
+      end
+    else
+      system make_path, *args
+    end
+  end
+
+  # Run `xcodebuild` without Homebrew's compiler environment variables set.
+  def xcodebuild(*args)
+    removed = ENV.remove_cc_etc
+    system "xcodebuild", *args
+  ensure
+    ENV.update(removed)
   end
 
   private

@@ -289,16 +289,3 @@ describe Pathname do
     end
   end
 end
-
-describe FileUtils do
-  let(:dst) { mktmpdir }
-
-  describe "#mkdir" do
-    it "creates intermediate directories" do
-      described_class.mkdir dst/"foo/bar/baz" do
-        expect(dst/"foo/bar/baz").to exist, "foo/bar/baz was not created"
-        expect(dst/"foo/bar/baz").to be_a_directory, "foo/bar/baz was not a directory structure"
-      end
-    end
-  end
-end
