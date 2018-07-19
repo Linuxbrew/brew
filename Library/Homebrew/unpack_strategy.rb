@@ -79,7 +79,7 @@ class UnpackStrategy
       if children.count == 1 && !children.first.directory?
         s = self.class.detect(children.first)
 
-        s.extract_nestedly(to: to, basename: basename)
+        s.extract_nestedly(to: to)
         next
       end
 
