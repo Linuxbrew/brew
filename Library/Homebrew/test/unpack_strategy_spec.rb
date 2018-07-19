@@ -56,6 +56,23 @@ describe UnpackStrategy do
         expect(Pathname.glob(unpack_dir/"**/*")).to include unpack_dir/directories
       end
     end
+
+    context "when extracting a nested archive" do
+      let(:basename) { "file.xyz" }
+      let(:path) {
+        (mktmpdir/basename).tap do |path|
+          mktmpdir do |dir|
+            FileUtils.touch dir/"file.txt"
+            system "tar", "-c", "-f", path, "-C", dir, "file.txt"
+          end
+        end
+      }
+
+      it "does not pass down the basename of the archive" do
+        strategy.extract_nestedly(to: unpack_dir)
+        expect(unpack_dir/"file.txt").to be_a_file
+      end
+    end
   end
 end
 
