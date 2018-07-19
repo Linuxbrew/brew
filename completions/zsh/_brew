@@ -105,7 +105,7 @@ __brew_common_commands() {
     'postinstall:perform post_install for a given formula'
     'prune:remove dead links'
     'remove:remove a formula'
-    'search:search for a formula (/regex/ or string)'
+    'search:search for a formula or cask (/regex/ or string)'
     'switch:switch between different versions of a formula'
     'tap:tap a new formula repository from GitHub, or list existing taps'
     'tap-info:information about a tap'

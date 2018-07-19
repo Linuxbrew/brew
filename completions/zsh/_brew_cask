@@ -19,7 +19,7 @@ __brew_cask() {
 __brew_all_casks() {
   local -a list
   local expl
-  list=( $(__brew_cask search) )
+  list=( $(brew search --casks) )
   _wanted list expl 'all casks' compadd -a list
 }
 
@@ -46,7 +46,6 @@ __brew_cask_commands() {
     'list:with no args, lists installed Casks; given installed Casks, lists staged files'
     'outdated:list the outdated installed Casks'
     'reinstall:reinstalls the given Cask'
-    'search:searches all known Casks'
     'style:checks Cask style using RuboCop'
     'uninstall:uninstalls the given Cask'
     'upgrade:upgrade installed Casks with newer versions'
