@@ -1,8 +1,8 @@
-require "hbc/container/generic_unar"
+require "hbc/container/base"
 
 module Hbc
   class Container
-    class Rar
+    class Rar < Base
       def self.can_extract?(path:, magic_number:)
         magic_number.match?(/\ARar!/n)
       end
