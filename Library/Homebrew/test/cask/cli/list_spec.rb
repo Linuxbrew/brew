@@ -73,7 +73,7 @@ describe Hbc::CLI::List, :cask do
       casks.each(&InstallHelper.method(:install_without_artifacts_with_caskfile))
 
       transmission.artifacts.select { |a| a.is_a?(Hbc::Artifact::App) }.each do |artifact|
-        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.install_phase(command: NeverSudoSystemCommand, force: false)
       end
 
       expect {

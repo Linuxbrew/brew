@@ -6,7 +6,7 @@ describe Hbc::Artifact::NestedContainer, :cask do
       end
 
       cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
-        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.install_phase(command: NeverSudoSystemCommand, force: false)
       end
 
       expect(cask.staged_path.join("MyNestedApp.app")).to be_a_directory

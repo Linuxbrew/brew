@@ -6,7 +6,7 @@ describe Hbc::Container::Dmg, :cask do
       dmg = Hbc::Container::Dmg.new(
         transmission,
         Pathname(transmission.url.path),
-        Hbc::SystemCommand,
+        SystemCommand,
       )
 
       dmg.mount do |mounts|

@@ -1,7 +1,7 @@
 shared_examples "#uninstall_phase or #zap_phase" do
   let(:artifact_dsl_key) { described_class.dsl_key }
   let(:artifact) { cask.artifacts.find { |a| a.is_a?(described_class) } }
-  let(:fake_system_command) { Hbc::FakeSystemCommand }
+  let(:fake_system_command) { FakeSystemCommand }
 
   subject { artifact.public_send(:"#{artifact_dsl_key}_phase", command: fake_system_command) }
 
@@ -26,40 +26,40 @@ shared_examples "#uninstall_phase or #zap_phase" do
     end
 
     it "works when job is owned by user" do
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         launchctl_list_cmd,
         service_info,
       )
 
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         sudo(launchctl_list_cmd),
         unknown_response,
       )
 
-      Hbc::FakeSystemCommand.expects_command(launchctl_remove_cmd)
+      FakeSystemCommand.expects_command(launchctl_remove_cmd)
 
       subject
     end
 
     it "works when job is owned by system" do
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         launchctl_list_cmd,
         unknown_response,
       )
 
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         sudo(launchctl_list_cmd),
         service_info,
       )
 
-      Hbc::FakeSystemCommand.expects_command(sudo(launchctl_remove_cmd))
+      FakeSystemCommand.expects_command(sudo(launchctl_remove_cmd))
 
       subject
     end
   end
 
   context "using :pkgutil" do
-    let(:fake_system_command) { class_double(Hbc::SystemCommand) }
+    let(:fake_system_command) { class_double(SystemCommand) }
 
     let(:cask) { Hbc::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-pkgutil")) }
 
@@ -89,19 +89,19 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:kext_id) { "my.fancy.package.kernelextension" }
 
     it "is supported" do
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         sudo(%W[/usr/sbin/kextstat -l -b #{kext_id}]), "loaded"
       )
 
-      Hbc::FakeSystemCommand.expects_command(
+      FakeSystemCommand.expects_command(
         sudo(%W[/sbin/kextunload -b #{kext_id}]),
       )
 
-      Hbc::FakeSystemCommand.expects_command(
+      FakeSystemCommand.expects_command(
         sudo(%W[/usr/sbin/kextfind -b #{kext_id}]), "/Library/Extensions/FancyPackage.kext\n"
       )
 
-      Hbc::FakeSystemCommand.expects_command(
+      FakeSystemCommand.expects_command(
         sudo(["/bin/rm", "-rf", "/Library/Extensions/FancyPackage.kext"]),
       )
 
@@ -117,11 +117,11 @@ shared_examples "#uninstall_phase or #zap_phase" do
     end
 
     it "is supported" do
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         %w[/bin/launchctl list], "999\t0\t#{bundle_id}\n"
       )
 
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         %w[/bin/launchctl list],
       )
 
@@ -136,7 +136,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:unix_pids) { [12_345, 67_890] }
 
     it "is supported" do
-      Hbc::FakeSystemCommand.stubs_command(
+      FakeSystemCommand.stubs_command(
         %w[/bin/launchctl list], unix_pids.map { |pid| [pid, 0, bundle_id].join("\t") }.join("\n")
       )
 
@@ -171,7 +171,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
         end
       end
 
-      let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
+      let(:fake_system_command) { NeverSudoSystemCommand }
       let(:cask) { Hbc::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-#{directive}")) }
 
       before(:each) do
@@ -197,7 +197,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
   end
 
   context "using :rmdir" do
-    let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
+    let(:fake_system_command) { NeverSudoSystemCommand }
     let(:cask) { Hbc::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-rmdir")) }
     let(:empty_directory) { Pathname.new("#{TEST_TMPDIR}/empty_directory_path") }
     let(:ds_store) { empty_directory.join(".DS_Store") }
@@ -224,7 +224,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
 
   [:script, :early_script].each do |script_type|
     context "using #{script_type.inspect}" do
-      let(:fake_system_command) { Hbc::NeverSudoSystemCommand }
+      let(:fake_system_command) { NeverSudoSystemCommand }
       let(:token) { "with-#{artifact_dsl_key}-#{script_type}".tr("_", "-") }
       let(:cask) { Hbc::CaskLoader.load(cask_path(token.to_s)) }
       let(:script_pathname) { cask.staged_path.join("MyFancyPkg", "FancyUninstaller.tool") }
@@ -255,7 +255,7 @@ shared_examples "#uninstall_phase or #zap_phase" do
     let(:cask) { Hbc::CaskLoader.load(cask_path("with-#{artifact_dsl_key}-login-item")) }
 
     it "is supported" do
-      Hbc::FakeSystemCommand.expects_command(
+      FakeSystemCommand.expects_command(
         ["/usr/bin/osascript", "-e", 'tell application "System Events" to delete every login ' \
                                      'item whose name is "Fancy"'],
       )

@@ -1,6 +1,6 @@
-require "hbc/system_command"
+require "system_command"
 
-describe Hbc::SystemCommand::Result, :cask do
+describe SystemCommand::Result, :cask do
   describe "#plist" do
     subject { described_class.new(command, stdout, "", 0).plist }
 

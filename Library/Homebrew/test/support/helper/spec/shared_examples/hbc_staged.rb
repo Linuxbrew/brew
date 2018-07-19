@@ -14,7 +14,7 @@ shared_examples Hbc::Staged do
   end
 
   it "can run system commands with list-form arguments" do
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       ["echo", "homebrew-cask", "rocks!"],
     )
 
@@ -28,7 +28,7 @@ shared_examples Hbc::Staged do
   it "can execute commands on the Info.plist file" do
     allow(staged).to receive(:bundle_identifier).and_return("com.example.BasicCask")
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       ["/usr/libexec/PlistBuddy", "-c", "Print CFBundleIdentifier", staged.info_plist_file],
     )
 
@@ -38,7 +38,7 @@ shared_examples Hbc::Staged do
   it "can set a key in the Info.plist file" do
     allow(staged).to receive(:bundle_identifier).and_return("com.example.BasicCask")
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       ["/usr/libexec/PlistBuddy", "-c", "Set :JVMOptions:JVMVersion 1.6+", staged.info_plist_file],
     )
 
@@ -49,7 +49,7 @@ shared_examples Hbc::Staged do
     fake_pathname = existing_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       ["/bin/chmod", "-R", "--", "777", fake_pathname],
     )
 
@@ -60,7 +60,7 @@ shared_examples Hbc::Staged do
     fake_pathname = existing_path
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       ["/bin/chmod", "-R", "--", "777", fake_pathname, fake_pathname],
     )
 
@@ -79,7 +79,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:current_user).and_return("fake_user")
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       sudo("/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname),
     )
 
@@ -92,7 +92,7 @@ shared_examples Hbc::Staged do
     allow(staged).to receive(:current_user).and_return("fake_user")
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       sudo("/usr/sbin/chown", "-R", "--", "fake_user:staff", fake_pathname, fake_pathname),
     )
 
@@ -104,7 +104,7 @@ shared_examples Hbc::Staged do
 
     allow(staged).to receive(:Pathname).and_return(fake_pathname)
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       sudo("/usr/sbin/chown", "-R", "--", "other_user:other_group", fake_pathname),
     )
 

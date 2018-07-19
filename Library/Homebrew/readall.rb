@@ -76,6 +76,13 @@ module Readall
       # Retrieve messages about syntax errors/warnings printed to `$stderr`, but
       # discard a `Syntax OK` printed to `$stdout` (in absence of syntax errors).
       messages = Utils.popen_read("#{RUBY_PATH} -c -w #{rb} 2>&1 >/dev/null")
+
+      # Ignore unnecessary warning about named capture conflicts.
+      # See https://bugs.ruby-lang.org/issues/12359.
+      messages = messages.lines
+                         .reject { |line| line.include?("named capture conflicts a local variable") }
+                         .join
+
       $stderr.print messages
 
       # Only syntax errors result in a non-zero status code. To detect syntax

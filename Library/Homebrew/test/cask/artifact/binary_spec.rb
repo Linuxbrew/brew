@@ -24,7 +24,7 @@ describe Hbc::Artifact::Binary, :cask do
 
   it "links the binary to the proper directory" do
     artifacts.each do |artifact|
-      artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      artifact.install_phase(command: NeverSudoSystemCommand, force: false)
     end
 
     expect(expected_path).to be_a_symlink
@@ -45,7 +45,7 @@ describe Hbc::Artifact::Binary, :cask do
         .with("+x", cask.staged_path.join("naked_non_executable")).and_call_original
 
       artifacts.each do |artifact|
-        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.install_phase(command: NeverSudoSystemCommand, force: false)
       end
 
       expect(expected_path).to be_a_symlink
@@ -58,7 +58,7 @@ describe Hbc::Artifact::Binary, :cask do
 
     expect {
       artifacts.each do |artifact|
-        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.install_phase(command: NeverSudoSystemCommand, force: false)
       end
     }.to raise_error(Hbc::CaskError)
 
@@ -69,7 +69,7 @@ describe Hbc::Artifact::Binary, :cask do
     expected_path.make_symlink("/tmp")
 
     artifacts.each do |artifact|
-      artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      artifact.install_phase(command: NeverSudoSystemCommand, force: false)
     end
 
     expect(File.readlink(expected_path)).not_to eq("/tmp")
@@ -79,7 +79,7 @@ describe Hbc::Artifact::Binary, :cask do
     FileUtils.rmdir Hbc::Config.global.binarydir
 
     artifacts.each do |artifact|
-      artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+      artifact.install_phase(command: NeverSudoSystemCommand, force: false)
     end
 
     expect(expected_path.exist?).to be true
@@ -94,10 +94,10 @@ describe Hbc::Artifact::Binary, :cask do
 
     it "links the binary to the proper directory" do
       cask.artifacts.select { |a| a.is_a?(Hbc::Artifact::App) }.each do |artifact|
-        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.install_phase(command: NeverSudoSystemCommand, force: false)
       end
       artifacts.each do |artifact|
-        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.install_phase(command: NeverSudoSystemCommand, force: false)
       end
 
       expect(expected_path).to be_a_symlink

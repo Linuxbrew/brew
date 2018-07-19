@@ -3,7 +3,7 @@ require "test/support/helper/spec/shared_examples/hbc_staged"
 
 describe Hbc::DSL::Preflight, :cask do
   let(:cask) { Hbc::CaskLoader.load(cask_path("basic-cask")) }
-  let(:dsl) { Hbc::DSL::Preflight.new(cask, Hbc::FakeSystemCommand) }
+  let(:dsl) { Hbc::DSL::Preflight.new(cask, FakeSystemCommand) }
 
   it_behaves_like Hbc::DSL::Base
 

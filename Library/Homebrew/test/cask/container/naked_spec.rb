@@ -8,9 +8,9 @@ describe Hbc::Container::Naked, :cask do
     path                 = Pathname("/tmp/downloads/kevin-spacey.pkg")
     expected_destination = cask.staged_path.join("kevin spacey.pkg")
 
-    container = Hbc::Container::Naked.new(cask, path, Hbc::FakeSystemCommand)
+    container = Hbc::Container::Naked.new(cask, path, FakeSystemCommand)
 
-    Hbc::FakeSystemCommand.expects_command(
+    FakeSystemCommand.expects_command(
       ["/usr/bin/ditto", "--", path, expected_destination],
     )
 
