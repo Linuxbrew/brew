@@ -302,7 +302,8 @@ end
 
 # Kernel.system but with exceptions
 def safe_system(cmd, *args, **options)
-  Homebrew.system(cmd, *args, **options) || raise(ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS))
+  return if Homebrew.system(cmd, *args, **options)
+  raise(ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS))
 end
 
 # prints no output
