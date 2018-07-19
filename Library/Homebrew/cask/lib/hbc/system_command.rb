@@ -19,6 +19,7 @@ module Hbc
     end
 
     def run!
+      @merged_output = []
       @processed_output = { stdout: "", stderr: "" }
       odebug command.shelljoin
 
@@ -27,9 +28,11 @@ module Hbc
         when :stdout
           puts line.chomp if print_stdout?
           processed_output[:stdout] << line
+          @merged_output << [:stdout, line]
         when :stderr
           $stderr.puts Formatter.error(line.chomp) if print_stderr?
           processed_output[:stderr] << line
+          @merged_output << [:stderr, line]
         end
       end
 
@@ -85,9 +88,8 @@ module Hbc
     def assert_success
       return if processed_status&.success?
       raise ErrorDuringExecution.new(command,
-                                     stdout: processed_output[:stdout],
-                                     stderr: processed_output[:stderr],
-                                     status: processed_status)
+                                     status: processed_status,
+                                     output: @merged_output)
     end
 
     def expanded_args

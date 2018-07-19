@@ -526,19 +526,21 @@ end
 
 # raised by safe_system in utils.rb
 class ErrorDuringExecution < RuntimeError
-  def initialize(cmd, status:, stdout: nil, stderr: nil)
+  def initialize(cmd, status:, output: nil)
     s = "Failure while executing; `#{cmd.shelljoin.gsub(/\\=/, "=")}` exited with #{status.exitstatus}."
 
-    if stdout
-      s << "==> Standard Output of failed command:\n"
-      s << stdout
-      s << "\n" unless stdout.end_with?("\n")
-    end
+    unless [*output].empty?
+      format_output_line = lambda do |type, line|
+        if type == :stderr
+          Formatter.error(line)
+        else
+          line
+        end
+      end
 
-    if stderr
-      s << "==> Standard Error of failed command:\n"
-      s << stderr
-      s << "\n" unless stderr.end_with?("\n")
+      s << " Here's the output:\n"
+      s << output.map(&format_output_line).join
+      s << "\n" unless s.end_with?("\n")
     end
 
     super s
