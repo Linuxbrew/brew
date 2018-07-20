@@ -125,8 +125,10 @@ class LuaRockUnpackStrategy < UncompressedUnpackStrategy
     return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
 
     # Check further if the ZIP is a LuaRocks package.
-    out, _, status = Open3.capture3("zipinfo", "-1", path)
-    status.success? && out.split("\n").any? { |line| line.match?(%r{\A[^/]+.rockspec\Z}) }
+    out, = Open3.capture3("zipinfo", "-1", path)
+    out.encode(Encoding::UTF_8, invalid: :replace)
+       .split("\n")
+       .any? { |line| line.match?(%r{\A[^/]+.rockspec\Z}) }
   end
 end
 
@@ -135,8 +137,10 @@ class JarUnpackStrategy < UncompressedUnpackStrategy
     return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
 
     # Check further if the ZIP is a JAR/WAR.
-    out, _, status = Open3.capture3("zipinfo", "-1", path)
-    status.success? && out.split("\n").include?("META-INF/MANIFEST.MF")
+    out, = Open3.capture3("zipinfo", "-1", path)
+    out.encode(Encoding::UTF_8, invalid: :replace)
+       .split("\n")
+       .include?("META-INF/MANIFEST.MF")
   end
 end
 
