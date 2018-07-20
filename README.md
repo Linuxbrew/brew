@@ -53,6 +53,7 @@ Dependencies
 
 + **GCC** 4.4 or newer
 + **Linux** 2.6.16 or newer
++ **Glibc** 2.12 or newer (2.19 or newer to be able to use bottles)
 + **64-bit x86** or **32-bit ARM** (Raspberry Pi)
 
 Paste at a Terminal prompt:
@@ -82,7 +83,7 @@ Linuxbrew does not currently support 32-bit x86 platforms. It would be possible 
 Bottles
 -------
 
-Bottles are Linuxbrew's precompiled binary packages. Linuxbrew bottles work on any Linux system. They do however require `glibc` 2.19 or better. On systems with an older version of `glibc`, Linuxbrew will install `glibc` the first time that you install a bottled formula. If you prefer to use the `glibc` provided by your system and build all formulas from source, add to your `.bashrc` or `.zshrc`:
+Bottles are Linuxbrew's precompiled binary packages. Linuxbrew bottles work on any Linux system. They do however require `glibc` 2.19 or better. On systems with an older version of `glibc` (at least 2.12), Linuxbrew will install `glibc` the first time that you install a bottled formula. If you prefer to use the `glibc` provided by your system and build all formulas from source, add to your `.bashrc` or `.zshrc`:
 
 `export HOMEBREW_BUILD_FROM_SOURCE=1`
 
