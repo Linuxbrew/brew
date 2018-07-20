@@ -80,7 +80,7 @@ module Readall
       # Ignore unnecessary warning about named capture conflicts.
       # See https://bugs.ruby-lang.org/issues/12359.
       messages = messages.lines
-                         .reject { |line| line.include?("named capture conflicts a local variable") }
+                         .grep_v(/named capture conflicts a local variable/)
                          .join
 
       $stderr.print messages
