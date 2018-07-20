@@ -1,10 +1,10 @@
 require "system_command"
 
-describe SystemCommand::Result, :cask do
+describe SystemCommand::Result do
   describe "#plist" do
     subject { described_class.new(command, stdout, "", 0).plist }
 
-    let(:command) { ["/usr/bin/true"] }
+    let(:command) { ["true"] }
     let(:garbage) {
       <<~EOS
         Hello there! I am in no way XML am I?!?!
