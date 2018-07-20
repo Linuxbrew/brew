@@ -69,7 +69,7 @@ describe Hbc::SystemCommand, :cask do
       it "throws an error" do
         expect {
           described_class.run!(command)
-        }.to raise_error(Hbc::CaskCommandFailedError)
+        }.to raise_error(ErrorDuringExecution)
       end
     end
 

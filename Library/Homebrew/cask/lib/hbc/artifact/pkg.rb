@@ -1,8 +1,9 @@
+require "vendor/plist/plist"
+
 require "hbc/artifact/abstract_artifact"
 
-require "hbc/utils/hash_validator"
-
-require "vendor/plist/plist"
+require "extend/hash_validator"
+using HashValidator
 
 module Hbc
   module Artifact
@@ -10,9 +11,7 @@ module Hbc
       attr_reader :pkg_relative_path
 
       def self.from_args(cask, path, **stanza_options)
-        stanza_options.extend(HashValidator).assert_valid_keys(
-          :allow_untrusted, :choices
-        )
+        stanza_options.assert_valid_keys!(:allow_untrusted, :choices)
         new(cask, path, **stanza_options)
       end
 

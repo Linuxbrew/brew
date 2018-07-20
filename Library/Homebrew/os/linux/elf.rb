@@ -118,12 +118,10 @@ module ELFShim
       patchelf = DevelopmentTools.locate "patchelf"
       if path.dylib?
         command = [patchelf, "--print-soname", path.expand_path.to_s]
-        soname = Utils.popen_read(*command).chomp
-        raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+        soname = Utils.safe_popen_read(*command).chomp
       end
       command = [patchelf, "--print-needed", path.expand_path.to_s]
-      needed = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+      needed = Utils.safe_popen_read(*command).split("\n")
       [soname, needed]
     end
 
@@ -131,8 +129,7 @@ module ELFShim
       soname = nil
       needed = []
       command = ["readelf", "-d", path.expand_path.to_s]
-      lines = Utils.popen_read(*command).split("\n")
-      raise ErrorDuringExecution, command unless $CHILD_STATUS.success?
+      lines = Utils.safe_popen_read(*command).split("\n")
       lines.each do |s|
         filename = s[/\[(.*)\]/, 1]
         next if filename.nil?

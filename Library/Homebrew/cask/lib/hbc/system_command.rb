@@ -3,8 +3,8 @@ require "vendor/plist/plist"
 require "shellwords"
 
 require "extend/io"
-
-require "hbc/utils/hash_validator"
+require "extend/hash_validator"
+using HashValidator
 
 module Hbc
   class SystemCommand
@@ -19,6 +19,7 @@ module Hbc
     end
 
     def run!
+      @merged_output = []
       @processed_output = { stdout: "", stderr: "" }
       odebug command.shelljoin
 
@@ -27,9 +28,11 @@ module Hbc
         when :stdout
           puts line.chomp if print_stdout?
           processed_output[:stdout] << line
+          @merged_output << [:stdout, line]
         when :stderr
           $stderr.puts Formatter.error(line.chomp) if print_stderr?
           processed_output[:stderr] << line
+          @merged_output << [:stderr, line]
         end
       end
 
@@ -41,11 +44,11 @@ module Hbc
       @executable = executable
       @args = args
       @sudo = sudo
-      @input = input
+      @input = [*input]
       @print_stdout = print_stdout
       @print_stderr = print_stderr
       @must_succeed = must_succeed
-      options.extend(HashValidator).assert_valid_keys(:chdir)
+      options.assert_valid_keys!(:chdir)
       @options = options
       @env = env
 
@@ -84,7 +87,9 @@ module Hbc
 
     def assert_success
       return if processed_status&.success?
-      raise CaskCommandFailedError.new(command, processed_output[:stdout], processed_output[:stderr], processed_status)
+      raise ErrorDuringExecution.new(command,
+                                     status: processed_status,
+                                     output: @merged_output)
     end
 
     def expanded_args
@@ -113,7 +118,7 @@ module Hbc
     end
 
     def write_input_to(raw_stdin)
-      [*input].each(&raw_stdin.method(:print))
+      input.each(&raw_stdin.method(:write))
     end
 
     def each_line_from(sources)

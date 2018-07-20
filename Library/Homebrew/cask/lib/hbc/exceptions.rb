@@ -53,31 +53,6 @@ module Hbc
     end
   end
 
-  class CaskCommandFailedError < CaskError
-    def initialize(cmd, stdout, stderr, status)
-      @cmd = cmd
-      @stdout = stdout
-      @stderr = stderr
-      @status = status
-    end
-
-    def to_s
-      s = "Command failed to execute!\n"
-      s.concat("\n")
-      s.concat("==> Failed command:\n")
-      s.concat(@cmd.join(" ")).concat("\n")
-      s.concat("\n")
-      s.concat("==> Standard Output of failed command:\n")
-      s.concat(@stdout).concat("\n")
-      s.concat("\n")
-      s.concat("==> Standard Error of failed command:\n")
-      s.concat(@stderr).concat("\n")
-      s.concat("\n")
-      s.concat("==> Exit status of failed command:\n")
-      s.concat(@status.inspect).concat("\n")
-    end
-  end
-
   class CaskX11DependencyError < AbstractCaskErrorWithToken
     def to_s
       <<~EOS

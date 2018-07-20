@@ -5,7 +5,7 @@ module Utils
 
   def self.safe_popen_read(*args, **options, &block)
     output = popen_read(*args, **options, &block)
-    raise ErrorDuringExecution, args unless $CHILD_STATUS.success?
+    raise ErrorDuringExecution(args, stdout: output, status: $CHILD_STATUS) unless $CHILD_STATUS.success?
     output
   end
 
@@ -14,8 +14,8 @@ module Utils
   end
 
   def self.safe_popen_write(*args, **options, &block)
-    output = popen_write(args, **options, &block)
-    raise ErrorDuringExecution, args unless $CHILD_STATUS.success?
+    output = popen_write(*args, **options, &block)
+    raise ErrorDuringExecution(args, stdout: output, status: $CHILD_STATUS) unless $CHILD_STATUS.success?
     output
   end
 

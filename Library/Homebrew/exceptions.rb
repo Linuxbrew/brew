@@ -1,3 +1,5 @@
+require "shellwords"
+
 class UsageError < RuntimeError
   attr_reader :reason
 
@@ -524,9 +526,24 @@ end
 
 # raised by safe_system in utils.rb
 class ErrorDuringExecution < RuntimeError
-  def initialize(cmd, args = [])
-    args = args.map { |a| a.to_s.gsub " ", "\\ " }.join(" ")
-    super "Failure while executing: #{cmd} #{args}"
+  def initialize(cmd, status:, output: nil)
+    s = "Failure while executing; `#{cmd.shelljoin.gsub(/\\=/, "=")}` exited with #{status.exitstatus}."
+
+    unless [*output].empty?
+      format_output_line = lambda do |type, line|
+        if type == :stderr
+          Formatter.error(line)
+        else
+          line
+        end
+      end
+
+      s << " Here's the output:\n"
+      s << output.map(&format_output_line).join
+      s << "\n" unless s.end_with?("\n")
+    end
+
+    super s
   end
 end
 
