@@ -7,7 +7,7 @@ module Hbc
         magic_number.match?(/\A\]\000\000\200\000/n)
       end
 
-      def extract_to_dir(unpack_dir, basename:)
+      def extract_to_dir(unpack_dir, basename:, verbose:)
         @command.run!("/usr/bin/ditto", args: ["--", path, unpack_dir])
         @command.run!("unlzma",
                       args: ["-q", "--", Pathname(unpack_dir).join(basename)],

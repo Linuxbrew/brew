@@ -7,7 +7,7 @@ module Hbc
         magic_number.match?(/\A\037\213/n)
       end
 
-      def extract_to_dir(unpack_dir, basename:)
+      def extract_to_dir(unpack_dir, basename:, verbose:)
         Dir.mktmpdir do |tmp_unpack_dir|
           tmp_unpack_dir = Pathname(tmp_unpack_dir)
 

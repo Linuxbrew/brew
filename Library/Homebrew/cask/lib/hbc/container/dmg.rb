@@ -14,7 +14,7 @@ module Hbc
         !imageinfo.empty?
       end
 
-      def extract_to_dir(unpack_dir, basename:)
+      def extract_to_dir(unpack_dir, basename:, verbose:)
         mount do |mounts|
           begin
             raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad disk image?" if mounts.empty?

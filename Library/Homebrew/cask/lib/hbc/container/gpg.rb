@@ -23,7 +23,7 @@ module Hbc
                       env: { "PATH" => PATH.new(Formula["gnupg"].opt_bin, ENV["PATH"]) })
       end
 
-      def extract_to_dir(unpack_dir, basename:)
+      def extract_to_dir(unpack_dir, basename:, verbose:)
         import_key
 
         Dir.mktmpdir do |tmp_unpack_dir|

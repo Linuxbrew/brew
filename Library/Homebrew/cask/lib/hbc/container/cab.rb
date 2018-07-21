@@ -7,7 +7,7 @@ module Hbc
         magic_number.match?(/\A(MSCF|MZ)/n)
       end
 
-      def extract_to_dir(unpack_dir, basename:)
+      def extract_to_dir(unpack_dir, basename:, verbose:)
         @command.run!("cabextract",
                       args: ["-d", unpack_dir, "--", path],
                       env: { "PATH" => PATH.new(Formula["cabextract"].opt_bin, ENV["PATH"]) })

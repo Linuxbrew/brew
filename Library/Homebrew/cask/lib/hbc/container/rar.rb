@@ -7,7 +7,7 @@ module Hbc
         magic_number.match?(/\ARar!/n)
       end
 
-      def extract_to_dir(unpack_dir, basename:)
+      def extract_to_dir(unpack_dir, basename:, verbose:)
         @command.run!("unrar",
                       args: ["x", "-inul", path, unpack_dir],
                       env: { "PATH" => PATH.new(Formula["unrar"].opt_bin, ENV["PATH"]) })
