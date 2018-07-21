@@ -164,7 +164,8 @@ class ZipUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:, verbose:)
-    safe_system "unzip", "-qq", path, "-d", unpack_dir
+    quiet_flags = verbose ? [] : ["-qq"]
+    safe_system "unzip", *quiet_flags, path, "-d", unpack_dir
   end
 end
 
@@ -200,7 +201,8 @@ class XzUnpackStrategy < UnpackStrategy
 
   def extract_to_dir(unpack_dir, basename:, verbose:)
     FileUtils.cp path, unpack_dir/basename, preserve: true
-    safe_system Formula["xz"].opt_bin/"unxz", "-q", "-T0", unpack_dir/basename
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system Formula["xz"].opt_bin/"unxz", *quiet_flags, "-T0", unpack_dir/basename
     extract_nested_tar(unpack_dir)
   end
 
@@ -226,7 +228,8 @@ class Bzip2UnpackStrategy < UnpackStrategy
 
   def extract_to_dir(unpack_dir, basename:, verbose:)
     FileUtils.cp path, unpack_dir/basename, preserve: true
-    safe_system "bunzip2", "-q", unpack_dir/basename
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system "bunzip2", *quiet_flags, unpack_dir/basename
   end
 end
 
@@ -239,7 +242,8 @@ class GzipUnpackStrategy < UnpackStrategy
 
   def extract_to_dir(unpack_dir, basename:, verbose:)
     FileUtils.cp path, unpack_dir/basename, preserve: true
-    safe_system "gunzip", "-q", "-N", unpack_dir/basename
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system "gunzip", *quiet_flags, "-N", unpack_dir/basename
   end
 end
 
@@ -252,7 +256,8 @@ class LzipUnpackStrategy < UnpackStrategy
 
   def extract_to_dir(unpack_dir, basename:, verbose:)
     FileUtils.cp path, unpack_dir/basename, preserve: true
-    safe_system Formula["lzip"].opt_bin/"lzip", "-d", "-q", unpack_dir/basename
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system Formula["lzip"].opt_bin/"lzip", "-d", *quiet_flags, unpack_dir/basename
   end
 end
 
