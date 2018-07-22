@@ -183,7 +183,7 @@ describe Hbc::SystemCommand, :cask do
     }
 
     it "returns without deadlocking" do
-      wait(15).for {
+      wait(30).for {
         described_class.run(command, options)
       }.to be_a_success
     end
