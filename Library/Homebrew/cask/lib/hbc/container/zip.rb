@@ -9,7 +9,7 @@ module Hbc
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
         Dir.mktmpdir do |tmp_unpack_dir|
-          @command.run!("/usr/bin/ditto", args: ["-x", "-k", "--", path, tmp_unpack_dir])
+          system_command!("/usr/bin/ditto", args: ["-x", "-k", "--", path, tmp_unpack_dir])
 
           extract_nested_inside(tmp_unpack_dir, to: unpack_dir)
         end

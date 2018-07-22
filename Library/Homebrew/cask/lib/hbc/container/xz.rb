@@ -8,10 +8,10 @@ module Hbc
       end
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
-        @command.run!("/usr/bin/ditto", args: ["--", path, unpack_dir])
-        @command.run!("unxz",
-                      args: ["-q", "--", unpack_dir/basename],
-                      env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) })
+        system_command!("/usr/bin/ditto", args: ["--", path, unpack_dir])
+        system_command!("unxz",
+                        args: ["-q", "--", unpack_dir/basename],
+                        env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) })
       end
 
       def dependencies

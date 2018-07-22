@@ -6,6 +6,14 @@ require "extend/io"
 require "extend/hash_validator"
 using HashValidator
 
+def system_command(*args)
+  SystemCommand.run(*args)
+end
+
+def system_command!(*args)
+  SystemCommand.run!(*args)
+end
+
 class SystemCommand
   extend Predicable
 

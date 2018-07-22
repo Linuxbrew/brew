@@ -6,10 +6,10 @@ module Hbc
   class Container
     class Dmg < Base
       def self.can_extract?(path:, magic_number:)
-        imageinfo = SystemCommand.run("/usr/bin/hdiutil",
-                                      # realpath is a failsafe against unusual filenames
-                                      args:         ["imageinfo", path.realpath],
-                                      print_stderr: false).stdout
+        imageinfo = system_command("/usr/bin/hdiutil",
+                                   # realpath is a failsafe against unusual filenames
+                                   args:         ["imageinfo", path.realpath],
+                                   print_stderr: false).stdout
 
         !imageinfo.empty?
       end
@@ -34,18 +34,18 @@ module Hbc
         Dir.mktmpdir do |unpack_dir|
           cdr_path = Pathname.new(unpack_dir).join("#{path.basename(".dmg")}.cdr")
 
-          without_eula = @command.run("/usr/bin/hdiutil",
-                                 args:  ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, path],
-                                 input: "qn\n",
-                                 print_stderr: false)
+          without_eula = system_command("/usr/bin/hdiutil",
+                                        args:  ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, path],
+                                        input: "qn\n",
+                                        print_stderr: false)
 
           # If mounting without agreeing to EULA succeeded, there is none.
           plist = if without_eula.success?
             without_eula.plist
           else
-            @command.run!("/usr/bin/hdiutil", args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path])
+            system_command!("/usr/bin/hdiutil", args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path])
 
-            with_eula = @command.run!("/usr/bin/hdiutil",
+            with_eula = system_command!("/usr/bin/hdiutil",
                           args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, cdr_path])
 
             if verbose? && !(eula_text = without_eula.stdout).empty?
@@ -68,11 +68,11 @@ module Hbc
         begin
           tries ||= 3
           if tries > 1
-            @command.run("/usr/sbin/diskutil",
+            system_command("/usr/sbin/diskutil",
                          args:         ["eject", mountpath],
                          print_stderr: false)
           else
-            @command.run("/usr/sbin/diskutil",
+            system_command("/usr/sbin/diskutil",
                          args:         ["unmount", "force", mountpath],
                          print_stderr: false)
           end
@@ -94,8 +94,8 @@ module Hbc
             filelist.puts(bom_filelist_from_path(mount))
             filelist.close
 
-            @command.run!("/usr/bin/mkbom", args: ["-s", "-i", filelist.path, "--", bomfile.path])
-            @command.run!("/usr/bin/ditto", args: ["--bom", bomfile.path, "--", mount, to])
+            system_command!("/usr/bin/mkbom", args: ["-s", "-i", filelist.path, "--", bomfile.path])
+            system_command!("/usr/bin/ditto", args: ["--bom", bomfile.path, "--", mount, to])
           end
         end
       end
@@ -103,10 +103,11 @@ module Hbc
       def bom_filelist_from_path(mount)
         # We need to use `find` here instead of Ruby in order to properly handle
         # file names containing special characters, such as “e” + “´” vs. “é”.
-        @command.run("/usr/bin/find", args: [".", "-print0"], chdir: mount, print_stderr: false).stdout
-                .split("\0")
-                .reject { |path| skip_path?(mount, path) }
-                .join("\n")
+        system_command("/usr/bin/find", args: [".", "-print0"], chdir: mount, print_stderr: false)
+          .stdout
+          .split("\0")
+          .reject { |path| skip_path?(mount, path) }
+          .join("\n")
       end
 
       def skip_path?(mount, path)

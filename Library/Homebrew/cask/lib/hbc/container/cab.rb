@@ -8,9 +8,9 @@ module Hbc
       end
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
-        @command.run!("cabextract",
-                      args: ["-d", unpack_dir, "--", path],
-                      env: { "PATH" => PATH.new(Formula["cabextract"].opt_bin, ENV["PATH"]) })
+        system_command!("cabextract",
+                        args: ["-d", unpack_dir, "--", path],
+                        env: { "PATH" => PATH.new(Formula["cabextract"].opt_bin, ENV["PATH"]) })
       end
 
       def dependencies

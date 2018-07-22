@@ -5,10 +5,9 @@ module Hbc
 
       attr_reader :path
 
-      def initialize(cask, path, command, nested: false)
+      def initialize(cask, path, nested: false)
         @cask = cask
         @path = path
-        @command = command
       end
 
       def extract(to: nil, basename: nil, verbose: false)
@@ -42,7 +41,7 @@ module Hbc
         return false unless container
 
         ohai "Extracting nested container #{source.basename}"
-        container.new(@cask, source, @command).extract(to: to, verbose: verbose)
+        container.new(@cask, source).extract(to: to, verbose: verbose)
 
         true
       end
