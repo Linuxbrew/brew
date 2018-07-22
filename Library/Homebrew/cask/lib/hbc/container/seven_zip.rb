@@ -7,7 +7,7 @@ module Hbc
         magic_number.match?(/\A7z\xBC\xAF\x27\x1C/n)
       end
 
-      def extract_to_dir(unpack_dir, basename:)
+      def extract_to_dir(unpack_dir, basename:, verbose:)
         @command.run!("7zr",
                       args: ["x", "-y", "-bd", "-bso0", path, "-o#{unpack_dir}"],
                       env: { "PATH" => PATH.new(Formula["p7zip"].opt_bin, ENV["PATH"]) })

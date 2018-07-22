@@ -158,7 +158,7 @@ module Hbc
           raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'."
         end
 
-        container.new(@cask, @downloaded_path, @command, verbose: verbose?)
+        container.new(@cask, @downloaded_path, @command)
       end
     end
 
@@ -168,7 +168,7 @@ module Hbc
       odebug "Using container class #{primary_container.class} for #{@downloaded_path}"
 
       basename = CGI.unescape(File.basename(@cask.url.path))
-      primary_container.extract(to: @cask.staged_path, basename: basename)
+      primary_container.extract(to: @cask.staged_path, basename: basename, verbose: verbose?)
     end
 
     def install_artifacts

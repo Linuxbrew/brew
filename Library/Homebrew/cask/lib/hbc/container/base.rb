@@ -5,23 +5,20 @@ module Hbc
 
       attr_reader :path
 
-      attr_predicate :verbose?
-
-      def initialize(cask, path, command, nested: false, verbose: false)
+      def initialize(cask, path, command, nested: false)
         @cask = cask
         @path = path
         @command = command
-        @verbose = verbose
       end
 
-      def extract(to: nil, basename: nil)
+      def extract(to: nil, basename: nil, verbose: false)
         basename ||= path.basename
         unpack_dir = Pathname(to || Dir.pwd).expand_path
         unpack_dir.mkpath
-        extract_to_dir(unpack_dir, basename: basename)
+        extract_to_dir(unpack_dir, basename: basename, verbose: verbose)
       end
 
-      def extract_nested_inside(dir, to:)
+      def extract_nested_inside(dir, to:, verbose: false)
         children = Pathname.new(dir).children
 
         nested_container = children[0]
@@ -29,7 +26,7 @@ module Hbc
         unless children.count == 1 &&
                !nested_container.directory? &&
                @cask.artifacts.none? { |a| a.is_a?(Artifact::NestedContainer) } &&
-               extract_nested_container(nested_container, to: to)
+               extract_nested_container(nested_container, to: to, verbose: verbose)
 
           children.each do |src|
             dest = @cask.staged_path.join(src.basename)
@@ -39,13 +36,13 @@ module Hbc
         end
       end
 
-      def extract_nested_container(source, to:)
+      def extract_nested_container(source, to:, verbose: false)
         container = Container.for_path(source)
 
         return false unless container
 
         ohai "Extracting nested container #{source.basename}"
-        container.new(@cask, source, @command, verbose: verbose?).extract(to: to)
+        container.new(@cask, source, @command).extract(to: to, verbose: verbose)
 
         true
       end
