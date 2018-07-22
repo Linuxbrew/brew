@@ -1,6 +1,6 @@
 describe Hbc::Artifact::App, :cask do
   let(:cask) { Hbc::CaskLoader.load(cask_path("local-caffeine")) }
-  let(:command) { Hbc::SystemCommand }
+  let(:command) { SystemCommand }
   let(:force) { false }
   let(:app) { cask.artifacts.find { |a| a.is_a?(described_class) } }
 

@@ -38,7 +38,7 @@ describe Hbc::Audit, :cask do
   let(:cask) { instance_double(Hbc::Cask) }
   let(:download) { false }
   let(:check_token_conflicts) { false }
-  let(:fake_system_command) { class_double(Hbc::SystemCommand) }
+  let(:fake_system_command) { class_double(SystemCommand) }
   let(:audit) {
     Hbc::Audit.new(cask, download:              download,
                          check_token_conflicts: check_token_conflicts,
