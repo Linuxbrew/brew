@@ -90,6 +90,21 @@ describe DirectoryUnpackStrategy do
     strategy.extract(to: unpack_dir)
     expect(unpack_dir/"symlink").to be_a_symlink
   end
+
+  it "preserves permissions of contained files" do
+    FileUtils.chmod 0644, path/"file"
+
+    strategy.extract(to: unpack_dir)
+    expect((unpack_dir/"file").stat.mode & 0777).to eq 0644
+  end
+
+  it "preserves the permissions of the destination directory" do
+    FileUtils.chmod 0700, path
+    FileUtils.chmod 0755, unpack_dir
+
+    strategy.extract(to: unpack_dir)
+    expect(unpack_dir.stat.mode & 0777).to eq 0755
+  end
 end
 
 describe UncompressedUnpackStrategy do
