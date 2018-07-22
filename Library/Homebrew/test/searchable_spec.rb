@@ -1,13 +1,13 @@
 require "searchable"
 
 describe Searchable do
-  subject { ary.extend(described_class) }
+  subject { collection.extend(described_class) }
 
-  let(:ary) { ["with-dashes"] }
+  let(:collection) { ["with-dashes"] }
 
   describe "#search" do
     context "when given a block" do
-      let(:ary) { [["with-dashes", "withdashes"]] }
+      let(:collection) { [["with-dashes", "withdashes"]] }
 
       it "searches by the selected argument" do
         expect(subject.search(/withdashes/) { |_, short_name| short_name }).not_to be_empty
@@ -24,6 +24,22 @@ describe Searchable do
     context "when given a string" do
       it "simplifies both the query and searched strings" do
         expect(subject.search("with dashes")).to eq ["with-dashes"]
+      end
+    end
+
+    context "when searching a Hash" do
+      let(:collection) { { "foo" => "bar" } }
+
+      it "returns a Hash" do
+        expect(subject.search("foo")).to eq "foo" => "bar"
+      end
+
+      context "containing nil" do
+        let(:collection) { { "foo" => nil } }
+
+        it "does not raise an error" do
+          expect(subject.search("foo")).to eq "foo" => nil
+        end
       end
     end
   end
