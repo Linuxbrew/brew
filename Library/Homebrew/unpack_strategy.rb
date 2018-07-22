@@ -96,7 +96,7 @@ class DirectoryUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:, verbose:)
-    FileUtils.cp_r File.join(path, "."), unpack_dir, preserve: true
+    FileUtils.cp_r File.join(path, "."), unpack_dir, preserve: true, verbose: verbose
   end
 end
 
@@ -106,7 +106,7 @@ class UncompressedUnpackStrategy < UnpackStrategy
   private
 
   def extract_to_dir(unpack_dir, basename:, verbose:)
-    FileUtils.cp path, unpack_dir/basename, preserve: true
+    FileUtils.cp path, unpack_dir/basename, preserve: true, verbose: verbose
   end
 end
 
