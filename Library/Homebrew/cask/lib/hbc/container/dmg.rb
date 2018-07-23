@@ -15,9 +15,9 @@ module Hbc
       end
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
-        mount do |mounts|
+        mount(verbose: verbose) do |mounts|
           begin
-            raise CaskError, "No mounts found in '#{@path}'; perhaps it is a bad disk image?" if mounts.empty?
+            raise "No mounts found in '#{path}'; perhaps it is a bad disk image?" if mounts.empty?
             mounts.each do |mount|
               extract_mount(mount, to: unpack_dir)
             end
@@ -27,13 +27,12 @@ module Hbc
         end
       end
 
-      def mount
+      def mount(verbose: false)
         # realpath is a failsafe against unusual filenames
-        path = Pathname.new(@path).realpath
+        realpath = path.realpath
+        path = realpath
 
         Dir.mktmpdir do |unpack_dir|
-          cdr_path = Pathname.new(unpack_dir).join("#{path.basename(".dmg")}.cdr")
-
           without_eula = system_command("/usr/bin/hdiutil",
                                         args:  ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, path],
                                         input: "qn\n",
@@ -43,12 +42,14 @@ module Hbc
           plist = if without_eula.success?
             without_eula.plist
           else
+            cdr_path = Pathname.new(unpack_dir).join("#{path.basename(".dmg")}.cdr")
+
             system_command!("/usr/bin/hdiutil", args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path])
 
             with_eula = system_command!("/usr/bin/hdiutil",
                           args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", unpack_dir, cdr_path])
 
-            if verbose? && !(eula_text = without_eula.stdout).empty?
+            if verbose && !(eula_text = without_eula.stdout).empty?
               ohai "Software License Agreement for '#{path}':"
               puts eula_text
             end
@@ -63,21 +64,22 @@ module Hbc
       def eject(mount)
         # realpath is a failsafe against unusual filenames
         mountpath = Pathname.new(mount).realpath
-        return unless mountpath.exist?
 
         begin
           tries ||= 3
+
+          return unless mountpath.exist?
+
           if tries > 1
-            system_command("/usr/sbin/diskutil",
+            system_command!("/usr/sbin/diskutil",
                          args:         ["eject", mountpath],
                          print_stderr: false)
           else
-            system_command("/usr/sbin/diskutil",
+            system_command!("/usr/sbin/diskutil",
                          args:         ["unmount", "force", mountpath],
                          print_stderr: false)
           end
-          raise CaskError, "Failed to eject #{mountpath}" if mountpath.exist?
-        rescue CaskError => e
+        rescue ErrorDuringExecution => e
           raise e if (tries -= 1).zero?
           sleep 1
           retry
@@ -111,7 +113,7 @@ module Hbc
       end
 
       def skip_path?(mount, path)
-        path = Pathname(path.sub(%r{^\./}, ""))
+        path = Pathname(path.sub(%r{\A\./}, ""))
         dmg_metadata?(path) || system_dir_symlink?(mount, path)
       end
 
