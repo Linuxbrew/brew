@@ -211,7 +211,7 @@ module OS
       end
 
       def separate_header_package?
-        MacOS.version >= :mojave
+        version >= "10"
       end
 
       def headers_installed?
