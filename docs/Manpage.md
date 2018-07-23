@@ -687,7 +687,7 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     `audit` exits with a non-zero status if any errors are found. This is useful,
     for instance, for implementing pre-commit hooks.
 
-  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--or-later`] [`--root-url=``URL`] [`--force-core-tap`] `formulae`:
+  * `bottle` [`--verbose`] [`--no-rebuild`|`--keep-old`] [`--skip-relocation`] [`--or-later`] [`--root-url=``URL`] [`--force-core-tap`] [`--json`] `formulae`:
     Generate a bottle (binary package) from a formula installed with
     `--build-bottle`.
 
@@ -709,9 +709,12 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--force-core-tap` is passed, build a bottle even if `formula` is not
     in homebrew/core or any installed taps.
 
-  * `bottle` `--merge` [`--keep-old`] [`--write` [`--no-commit`]] `formulae`:
-    Generate a bottle from a formula and print the new DSL merged into the
-    existing formula.
+    If `--json` is passed, write bottle information to a JSON file, which can
+    be used as the argument for `--merge`.
+
+  * `bottle` `--merge` [`--keep-old`] [`--write` [`--no-commit`]] `bottle_json_files`:
+    Generate a bottle from a `--json` output file and print the new DSL merged
+    into the existing formula.
 
     If `--write` is passed, write the changes to the formula file. A new
     commit will then be generated unless `--no-commit` is passed.
