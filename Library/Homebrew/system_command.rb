@@ -1,4 +1,5 @@
 require "open3"
+require "ostruct"
 require "vendor/plist/plist"
 require "shellwords"
 
@@ -28,18 +29,15 @@ class SystemCommand
 
   def run!
     @merged_output = []
-    @processed_output = { stdout: "", stderr: "" }
     odebug command.shelljoin
 
     each_output_line do |type, line|
       case type
       when :stdout
         puts line.chomp if print_stdout?
-        processed_output[:stdout] << line
         @merged_output << [:stdout, line]
       when :stderr
         $stderr.puts Formatter.error(line.chomp) if print_stderr?
-        processed_output[:stderr] << line
         @merged_output << [:stderr, line]
       end
     end
@@ -71,7 +69,7 @@ class SystemCommand
 
   private
 
-  attr_reader :executable, :args, :input, :options, :processed_output, :processed_status, :env
+  attr_reader :executable, :args, :input, :options, :env
 
   attr_predicate :sudo?, :print_stdout?, :print_stderr?, :must_succeed?
 
@@ -94,9 +92,9 @@ class SystemCommand
   end
 
   def assert_success
-    return if processed_status&.success?
+    return if @status.success?
     raise ErrorDuringExecution.new(command,
-                                   status: processed_status,
+                                   status: @status,
                                    output: @merged_output)
   end
 
@@ -122,7 +120,10 @@ class SystemCommand
     raw_stdin.close_write
     each_line_from [raw_stdout, raw_stderr], &b
 
-    @processed_status = raw_wait_thr.value
+    @status = raw_wait_thr.value
+  rescue SystemCallError => e
+    @status = $CHILD_STATUS
+    @merged_output << [:stderr, e.message]
   end
 
   def write_input_to(raw_stdin)
@@ -152,10 +153,11 @@ class SystemCommand
   end
 
   def result
-    Result.new(command,
-               processed_output[:stdout],
-               processed_output[:stderr],
-               processed_status.exitstatus)
+    output = @merged_output.each_with_object(stdout: "", stderr: "") do |(type, line), hash|
+      hash[type] << line
+    end
+
+    Result.new(command, output[:stdout], output[:stderr], @status.exitstatus)
   end
 
   class Result
