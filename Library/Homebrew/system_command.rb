@@ -5,6 +5,7 @@ require "shellwords"
 require "extend/io"
 require "extend/hash_validator"
 using HashValidator
+require "extend/predicable"
 
 def system_command(*args)
   SystemCommand.run(*args)

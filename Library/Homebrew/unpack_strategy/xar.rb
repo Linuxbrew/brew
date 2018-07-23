@@ -9,7 +9,7 @@ module UnpackStrategy
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      safe_system "xar", "-x", "-f", path, "-C", unpack_dir
+      system_command! "xar", args: ["-x", "-f", path, "-C", unpack_dir]
     end
   end
 end

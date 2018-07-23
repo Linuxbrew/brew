@@ -10,7 +10,7 @@ module UnpackStrategy
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
       quiet_flags = verbose ? [] : ["-qq"]
-      safe_system "unzip", *quiet_flags, path, "-d", unpack_dir
+      system_command! "unzip", args: [*quiet_flags, path, "-d", unpack_dir]
     end
   end
 end

@@ -1,6 +1,7 @@
 require "rubygems"
 
 require "formula_installer"
+require "unpack_strategy"
 
 require "hbc/cask_dependencies"
 require "hbc/staged"
@@ -148,17 +149,7 @@ module Hbc
 
     def primary_container
       @primary_container ||= begin
-        container = if @cask.container&.type
-          Container.from_type(@cask.container.type)
-        else
-          Container.for_path(@downloaded_path)
-        end
-
-        unless container
-          raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'."
-        end
-
-        container.new(@cask, @downloaded_path)
+        UnpackStrategy.detect(@downloaded_path, type: @cask.container&.type)
       end
     end
 
@@ -168,7 +159,18 @@ module Hbc
       odebug "Using container class #{primary_container.class} for #{@downloaded_path}"
 
       basename = CGI.unescape(File.basename(@cask.url.path))
-      primary_container.extract(to: @cask.staged_path, basename: basename, verbose: verbose?)
+
+      if nested_container = @cask.container&.nested
+        Dir.mktmpdir do |tmpdir|
+          tmpdir = Pathname(tmpdir)
+          primary_container.extract(to: tmpdir, basename: basename, verbose: verbose?)
+
+          UnpackStrategy.detect(tmpdir/nested_container)
+                        .extract_nestedly(to: @cask.staged_path, verbose: verbose?)
+        end
+      else
+        primary_container.extract_nestedly(to: @cask.staged_path, basename: basename, verbose: verbose?)
+      end
     end
 
     def install_artifacts
