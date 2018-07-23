@@ -143,8 +143,8 @@ module Homebrew
         if GitHub.create_issue_comment(new_formula_problem_lines.join("\n"))
           created_pr_comment = true
         end
-      rescue *GitHub.api_errors
-        nil
+      rescue *GitHub.api_errors => e
+        opoo "Unable to create issue comment: #{e.message}"
       end
     end
 
