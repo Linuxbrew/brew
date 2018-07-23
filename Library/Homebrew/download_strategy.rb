@@ -329,8 +329,8 @@ end
 # Useful for installing jars.
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
-    UncompressedUnpackStrategy.new(cached_location)
-                              .extract(basename: basename_without_params)
+    UnpackStrategy::Uncompressed.new(cached_location)
+                                .extract(basename: basename_without_params)
   end
 end
 
