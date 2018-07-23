@@ -8,9 +8,9 @@ module Hbc
       end
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
-        @command.run!("unrar",
-                      args: ["x", "-inul", path, unpack_dir],
-                      env: { "PATH" => PATH.new(Formula["unrar"].opt_bin, ENV["PATH"]) })
+        system_command!("unrar",
+                        args: ["x", "-inul", path, unpack_dir],
+                        env: { "PATH" => PATH.new(Formula["unrar"].opt_bin, ENV["PATH"]) })
       end
 
       def dependencies

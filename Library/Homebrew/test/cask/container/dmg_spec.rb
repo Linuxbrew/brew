@@ -1,14 +1,9 @@
 describe Hbc::Container::Dmg, :cask do
-  describe "#mount!" do
+  describe "#mount" do
+    let(:transmission) { Hbc::CaskLoader.load(cask_path("local-transmission")) }
+    subject(:dmg) { described_class.new(transmission, Pathname(transmission.url.path)) }
+
     it "does not store nil mounts for dmgs with extra data" do
-      transmission = Hbc::CaskLoader.load(cask_path("local-transmission"))
-
-      dmg = Hbc::Container::Dmg.new(
-        transmission,
-        Pathname(transmission.url.path),
-        SystemCommand,
-      )
-
       dmg.mount do |mounts|
         begin
           expect(mounts).not_to include nil

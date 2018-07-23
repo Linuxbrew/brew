@@ -8,7 +8,7 @@ module Hbc
       end
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
-        @command.run!("xar", args: ["-x", "-f", @path, "-C", unpack_dir])
+        system_command!("xar", args: ["-x", "-f", @path, "-C", unpack_dir])
       end
     end
   end

@@ -8,14 +8,11 @@ describe Hbc::Container::Naked, :cask do
     path                 = Pathname("/tmp/downloads/kevin-spacey.pkg")
     expected_destination = cask.staged_path.join("kevin spacey.pkg")
 
-    container = Hbc::Container::Naked.new(cask, path, FakeSystemCommand)
+    container = Hbc::Container::Naked.new(cask, path)
 
-    FakeSystemCommand.expects_command(
-      ["/usr/bin/ditto", "--", path, expected_destination],
-    )
+    expect(container).to receive(:system_command!)
+      .with("/usr/bin/ditto", args: ["--", path, expected_destination])
 
-    expect {
-      container.extract(to: cask.staged_path, basename: "kevin spacey.pkg")
-    }.not_to raise_error
+    container.extract(to: cask.staged_path, basename: "kevin spacey.pkg")
   end
 end

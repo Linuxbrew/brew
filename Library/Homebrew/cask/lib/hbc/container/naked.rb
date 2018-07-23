@@ -8,7 +8,7 @@ module Hbc
       end
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
-        @command.run!("/usr/bin/ditto", args: ["--", path, unpack_dir/basename])
+        system_command!("/usr/bin/ditto", args: ["--", path, unpack_dir/basename])
       end
     end
   end

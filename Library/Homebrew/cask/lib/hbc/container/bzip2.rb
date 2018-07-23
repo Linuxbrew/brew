@@ -12,7 +12,7 @@ module Hbc
           tmp_unpack_dir = Pathname(tmp_unpack_dir)
 
           FileUtils.cp path, tmp_unpack_dir/basename, preserve: true
-          @command.run!("bunzip2", args: ["--quiet", "--", tmp_unpack_dir/basename])
+          system_command!("bunzip2", args: ["--quiet", "--", tmp_unpack_dir/basename])
 
           extract_nested_inside(tmp_unpack_dir, to: unpack_dir)
         end

@@ -13,7 +13,7 @@ module Hbc
       end
 
       def extract_to_dir(unpack_dir, basename:, verbose:)
-        @command.run!("tar", args: ["xf", path, "-C", unpack_dir])
+        system_command!("tar", args: ["xf", path, "-C", unpack_dir])
       end
     end
   end

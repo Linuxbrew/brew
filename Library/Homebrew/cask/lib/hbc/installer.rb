@@ -158,7 +158,7 @@ module Hbc
           raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'."
         end
 
-        container.new(@cask, @downloaded_path, @command)
+        container.new(@cask, @downloaded_path)
       end
     end
 

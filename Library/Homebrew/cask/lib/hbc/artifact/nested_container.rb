@@ -20,7 +20,7 @@ module Hbc
         path.relative_path_from(cask.staged_path).to_s
       end
 
-      def extract(command: nil, verbose: nil, **_)
+      def extract(verbose: nil, **_)
         container = Container.for_path(path)
 
         unless container
@@ -28,7 +28,7 @@ module Hbc
         end
 
         ohai "Extracting nested container #{path.relative_path_from(cask.staged_path)}"
-        container.new(cask, path, command).extract(to: cask.staged_path, verbose: verbose)
+        container.new(cask, path).extract(to: cask.staged_path, verbose: verbose)
         FileUtils.remove_entry_secure(path)
       end
     end
