@@ -8,7 +8,6 @@ require "hbc/container/dmg"
 require "hbc/container/self_extracting_executable"
 require "hbc/container/executable"
 require "hbc/container/generic_unar"
-require "hbc/container/gpg"
 require "hbc/container/gzip"
 require "hbc/container/lzma"
 require "hbc/container/naked"
@@ -45,7 +44,6 @@ module Hbc
         Gzip,  # pure gzip
         Lzma,  # pure lzma
         Xz,    # pure xz
-        Gpg,   # GnuPG signed data
         Executable,
         SvnRepository,
       ]
