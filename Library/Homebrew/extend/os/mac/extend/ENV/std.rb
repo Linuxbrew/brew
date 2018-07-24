@@ -27,8 +27,8 @@ module Stdenv
 
     append_path "ACLOCAL_PATH", "#{MacOS::X11.share}/aclocal"
 
-    if MacOS::XQuartz.provided_by_apple? && MacOS.sdk_path
-      append_path "CMAKE_PREFIX_PATH", "#{MacOS.sdk_path}/usr/X11"
+    if MacOS::XQuartz.provided_by_apple? && MacOS.sdk_path_if_needed
+      append_path "CMAKE_PREFIX_PATH", "#{MacOS.sdk_path_if_needed}/usr/X11"
     end
 
     append "CFLAGS", "-I#{MacOS::X11.include}" unless MacOS::CLT.installed?
@@ -93,7 +93,7 @@ module Stdenv
     delete("CPATH")
     remove "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
-    return unless (sdk = MacOS.sdk_path(version))
+    return unless (sdk = MacOS.sdk_path_if_needed(version))
     delete("SDKROOT")
     remove_from_cflags "-isysroot #{sdk}"
     remove "CPPFLAGS", "-isysroot #{sdk}"
@@ -115,7 +115,7 @@ module Stdenv
     self["CPATH"] = "#{HOMEBREW_PREFIX}/include"
     prepend "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
 
-    return unless (sdk = MacOS.sdk_path(version))
+    return unless (sdk = MacOS.sdk_path_if_needed(version))
     # Extra setup to support Xcode 4.3+ without CLT.
     self["SDKROOT"] = sdk
     # Tell clang/gcc where system include's are:
@@ -132,7 +132,7 @@ module Stdenv
 
   # Some configure scripts won't find libxml2 without help
   def libxml2
-    if !MacOS.sdk_path
+    if !MacOS.sdk_path_if_needed
       append "CPPFLAGS", "-I/usr/include/libxml2"
     else
       # Use the includes form the sdk

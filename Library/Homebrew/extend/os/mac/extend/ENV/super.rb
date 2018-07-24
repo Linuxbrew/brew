@@ -58,7 +58,7 @@ module Superenv
   def homebrew_extra_library_paths
     paths = []
     if compiler == :llvm_clang
-      if !MacOS.sdk_path
+      if !MacOS.sdk_path_if_needed
         paths << "/usr/lib"
       else
         paths << "#{MacOS.sdk_path}/usr/lib"
@@ -102,7 +102,7 @@ module Superenv
   end
 
   def effective_sysroot
-    MacOS.sdk_path&.to_s
+    MacOS.sdk_path_if_needed&.to_s
   end
 
   def set_x11_env_if_installed
