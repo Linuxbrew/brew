@@ -11,7 +11,8 @@ module UnpackStrategy
     def extract_to_dir(unpack_dir, basename:, verbose:)
       FileUtils.cp path, unpack_dir/basename, preserve: true
       quiet_flags = verbose ? [] : ["-q"]
-      safe_system "gunzip", *quiet_flags, "-N", unpack_dir/basename
+      system_command! "gunzip",
+                      args: [*quiet_flags, "-N", "--", unpack_dir/basename]
     end
   end
 end

@@ -29,9 +29,6 @@ module Hbc
           # The `uninstall` stanza should be run first, as it may
           # depend on other artifacts still being installed.
           Uninstall,
-          # We want to extract nested containers before we
-          # handle any other artifacts.
-          NestedContainer,
           Installer,
           [
             App,

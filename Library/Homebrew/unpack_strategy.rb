@@ -5,15 +5,23 @@ module UnpackStrategy
 
   def self.strategies
     @strategies ||= [
+      Pkg,
+      Ttf,
+      Otf,
+      Air,
+      Executable,
+      SelfExtractingExecutable,
       Jar,
       LuaRock,
       MicrosoftOfficeXml,
       Zip,
+      Dmg,
       Xar,
       Compress,
       Tar,
-      Gzip,
       Bzip2,
+      Gzip,
+      Lzma,
       Xz,
       Lzip,
       Git,
@@ -22,14 +30,29 @@ module UnpackStrategy
       Cvs,
       Fossil,
       Bazaar,
+      Cab,
       P7Zip,
+      Sit,
       Rar,
       Lha,
     ].freeze
   end
   private_class_method :strategies
 
-  def self.detect(path, ref_type: nil, ref: nil)
+  def self.from_type(type)
+    type = {
+      naked: :uncompressed,
+      seven_zip: :p7zip,
+    }.fetch(type, type)
+
+    begin
+      const_get(type.to_s.split("_").map(&:capitalize).join)
+    rescue NameError
+      nil
+    end
+  end
+
+  def self.from_path(path)
     magic_number = if path.directory?
       ""
     else
@@ -50,6 +73,11 @@ module UnpackStrategy
       Uncompressed
     end
 
+    strategy
+  end
+
+  def self.detect(path, type: nil, ref_type: nil, ref: nil)
+    strategy = type ? from_type(type) : from_path(path)
     strategy.new(path, ref_type: ref_type, ref: ref)
   end
 
@@ -86,26 +114,41 @@ module UnpackStrategy
       Directory.new(tmp_unpack_dir).extract(to: to, verbose: verbose)
     end
   end
+
+  def dependencies
+    []
+  end
 end
 
+require "unpack_strategy/air"
 require "unpack_strategy/bazaar"
 require "unpack_strategy/bzip2"
+require "unpack_strategy/cab"
 require "unpack_strategy/compress"
 require "unpack_strategy/cvs"
 require "unpack_strategy/directory"
+require "unpack_strategy/dmg"
+require "unpack_strategy/executable"
 require "unpack_strategy/fossil"
+require "unpack_strategy/generic_unar"
 require "unpack_strategy/git"
 require "unpack_strategy/gzip"
 require "unpack_strategy/jar"
 require "unpack_strategy/lha"
 require "unpack_strategy/lua_rock"
 require "unpack_strategy/lzip"
+require "unpack_strategy/lzma"
 require "unpack_strategy/mercurial"
 require "unpack_strategy/microsoft_office_xml"
+require "unpack_strategy/otf"
 require "unpack_strategy/p7zip"
+require "unpack_strategy/pkg"
 require "unpack_strategy/rar"
+require "unpack_strategy/self_extracting_executable"
+require "unpack_strategy/sit"
 require "unpack_strategy/subversion"
 require "unpack_strategy/tar"
+require "unpack_strategy/ttf"
 require "unpack_strategy/uncompressed"
 require "unpack_strategy/xar"
 require "unpack_strategy/xz"

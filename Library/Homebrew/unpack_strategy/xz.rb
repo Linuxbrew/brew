@@ -15,7 +15,9 @@ module UnpackStrategy
     def extract_to_dir(unpack_dir, basename:, verbose:)
       FileUtils.cp path, unpack_dir/basename, preserve: true
       quiet_flags = verbose ? [] : ["-q"]
-      safe_system Formula["xz"].opt_bin/"unxz", *quiet_flags, "-T0", unpack_dir/basename
+      system_command! "unxz",
+                      args: [*quiet_flags, "-T0", "--", unpack_dir/basename],
+                      env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) }
       extract_nested_tar(unpack_dir)
     end
 

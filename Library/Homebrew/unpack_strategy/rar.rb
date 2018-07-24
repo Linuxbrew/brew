@@ -13,7 +13,9 @@ module UnpackStrategy
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      safe_system Formula["unrar"].opt_bin/"unrar", "x", "-inul", path, unpack_dir
+      system_command! "unrar",
+                      args: ["x", "-inul", path, unpack_dir],
+                      env: { "PATH" => PATH.new(Formula["unrar"].opt_bin, ENV["PATH"]) }
     end
   end
 end

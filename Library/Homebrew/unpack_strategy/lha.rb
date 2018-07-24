@@ -13,7 +13,9 @@ module UnpackStrategy
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      safe_system Formula["lha"].opt_bin/"lha", "xq2w=#{unpack_dir}", path
+      system_command! "lha",
+                      args: ["xq2w=#{unpack_dir}", path],
+                      env: { "PATH" => PATH.new(Formula["lha"].opt_bin, ENV["PATH"]) }
     end
   end
 end

@@ -15,7 +15,9 @@ module UnpackStrategy
     def extract_to_dir(unpack_dir, basename:, verbose:)
       FileUtils.cp path, unpack_dir/basename, preserve: true
       quiet_flags = verbose ? [] : ["-q"]
-      safe_system Formula["lzip"].opt_bin/"lzip", "-d", *quiet_flags, unpack_dir/basename
+      system_command! "lzip",
+                      args: ["-d", *quiet_flags, unpack_dir/basename],
+                      env: { "PATH" => PATH.new(Formula["lzip"].opt_bin, ENV["PATH"]) }
     end
   end
 end

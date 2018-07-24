@@ -7,7 +7,7 @@ module UnpackStrategy
 
       # Fossil database is made up of artifacts, so the `artifact` table must exist.
       query = "select count(*) from sqlite_master where type = 'view' and name = 'artifact'"
-      Utils.popen_read("sqlite3", path, query).to_i == 1
+      system_command("sqlite3", args: [path, query]).stdout.to_i == 1
     end
 
     private
@@ -19,9 +19,10 @@ module UnpackStrategy
         []
       end
 
-      with_env "PATH" => PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]) do
-        safe_system "fossil", "open", path, *args, chdir: unpack_dir
-      end
+      system_command! "fossil",
+                      args: ["open", path, *args],
+                      chdir: unpack_dir,
+                      env: { "PATH" => PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]) }
     end
   end
 end

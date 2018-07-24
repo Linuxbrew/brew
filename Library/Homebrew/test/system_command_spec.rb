@@ -208,4 +208,12 @@ describe SystemCommand do
       expect(described_class.run("tool", env: { "PATH" => path }).stdout).to include "Hello, world!"
     end
   end
+
+  describe "#run" do
+    it "does not raise a `SystemCallError` when the executable does not exist" do
+      expect {
+        described_class.run("non_existent_executable")
+      }.not_to raise_error
+    end
+  end
 end

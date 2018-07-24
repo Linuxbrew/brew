@@ -172,16 +172,8 @@ module Hbc
     end
 
     def container(*args)
-      # TODO: remove this constraint, and instead merge multiple container stanzas
       set_unique_stanza(:container, args.empty?) do
-        begin
-          DSL::Container.new(*args).tap do |container|
-            # TODO: remove this backward-compatibility section after removing nested_container
-            if container&.nested
-              artifacts.add(Artifact::NestedContainer.new(cask, container.nested))
-            end
-          end
-        end
+        DSL::Container.new(*args)
       end
     end
 
