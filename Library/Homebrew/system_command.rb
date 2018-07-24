@@ -28,8 +28,9 @@ class SystemCommand
   end
 
   def run!
+    puts command.shelljoin.gsub(/\\=/, "=") if verbose? || ARGV.debug?
+
     @merged_output = []
-    odebug command.shelljoin
 
     each_output_line do |type, line|
       case type
@@ -46,13 +47,14 @@ class SystemCommand
     result
   end
 
-  def initialize(executable, args: [], sudo: false, input: [], print_stdout: false, print_stderr: true, must_succeed: false, env: {}, **options)
+  def initialize(executable, args: [], sudo: false, input: [], print_stdout: false, print_stderr: true, verbose: false, must_succeed: false, env: {}, **options)
     @executable = executable
     @args = args
     @sudo = sudo
     @input = [*input]
     @print_stdout = print_stdout
     @print_stderr = print_stderr
+    @verbose = verbose
     @must_succeed = must_succeed
     options.assert_valid_keys!(:chdir)
     @options = options
@@ -71,7 +73,7 @@ class SystemCommand
 
   attr_reader :executable, :args, :input, :options, :env
 
-  attr_predicate :sudo?, :print_stdout?, :print_stderr?, :must_succeed?
+  attr_predicate :sudo?, :print_stdout?, :print_stderr?, :verbose?, :must_succeed?
 
   def env_args
     set_variables = env.reject { |_, value| value.nil? }
