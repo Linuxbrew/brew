@@ -54,8 +54,20 @@ module Utils
             MacOS::Version.from_symbol(later_tag) <= tag_version
           elsif ARGV.force_bottle?
             true
+          # Allow prerelease versions to act as if all bottles are `_or_later`
+          # so that they don't need to wait for us to bottle everything for the
+          # new release.
+          elsif install_older_prerelease_bottles?
+            true
           end
         end
+      end
+
+      def install_older_prerelease_bottles?
+        return false unless OS::Mac.prerelease?
+        return true if ENV["HOMEBREW_INSTALL_OLDER_PRERELEASE_BOTTLES"]
+        return false if ENV["HOMEBREW_NO_INSTALL_OLDER_PRERELEASE_BOTTLES"]
+        !ARGV.homebrew_developer?
       end
     end
   end
