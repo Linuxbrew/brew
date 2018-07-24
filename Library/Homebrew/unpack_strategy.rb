@@ -61,11 +61,30 @@ class UnpackStrategy
     @ref = ref
   end
 
-  def extract(to: nil, basename: nil)
+  def extract(to: nil, basename: nil, verbose: false)
     basename ||= path.basename
     unpack_dir = Pathname(to || Dir.pwd).expand_path
     unpack_dir.mkpath
-    extract_to_dir(unpack_dir, basename: basename)
+    extract_to_dir(unpack_dir, basename: basename, verbose: verbose)
+  end
+
+  def extract_nestedly(to: nil, basename: nil, verbose: false)
+    Dir.mktmpdir do |tmp_unpack_dir|
+      tmp_unpack_dir = Pathname(tmp_unpack_dir)
+
+      extract(to: tmp_unpack_dir, basename: basename, verbose: verbose)
+
+      children = tmp_unpack_dir.children
+
+      if children.count == 1 && !children.first.directory?
+        s = self.class.detect(children.first)
+
+        s.extract_nestedly(to: to, verbose: verbose)
+        next
+      end
+
+      DirectoryUnpackStrategy.new(tmp_unpack_dir).extract(to: to, verbose: verbose)
+    end
   end
 end
 
@@ -76,16 +95,20 @@ class DirectoryUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
-    FileUtils.cp_r path.children, unpack_dir, preserve: true
+  def extract_to_dir(unpack_dir, basename:, verbose:)
+    path.children.each do |child|
+      FileUtils.copy_entry child, unpack_dir/child.basename, true, false
+    end
   end
 end
 
 class UncompressedUnpackStrategy < UnpackStrategy
+  alias extract_nestedly extract
+
   private
 
-  def extract_to_dir(unpack_dir, basename:)
-    FileUtils.cp path, unpack_dir/basename, preserve: true
+  def extract_to_dir(unpack_dir, basename:, verbose:)
+    FileUtils.cp path, unpack_dir/basename, preserve: true, verbose: verbose
   end
 end
 
@@ -104,8 +127,10 @@ class LuaRockUnpackStrategy < UncompressedUnpackStrategy
     return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
 
     # Check further if the ZIP is a LuaRocks package.
-    out, _, status = Open3.capture3("zipinfo", "-1", path)
-    status.success? && out.split("\n").any? { |line| line.match?(%r{\A[^/]+.rockspec\Z}) }
+    out, = Open3.capture3("zipinfo", "-1", path)
+    out.encode(Encoding::UTF_8, invalid: :replace)
+       .split("\n")
+       .any? { |line| line.match?(%r{\A[^/]+.rockspec\Z}) }
   end
 end
 
@@ -114,8 +139,10 @@ class JarUnpackStrategy < UncompressedUnpackStrategy
     return false unless ZipUnpackStrategy.can_extract?(path: path, magic_number: magic_number)
 
     # Check further if the ZIP is a JAR/WAR.
-    out, _, status = Open3.capture3("zipinfo", "-1", path)
-    status.success? && out.split("\n").include?("META-INF/MANIFEST.MF")
+    out, = Open3.capture3("zipinfo", "-1", path)
+    out.encode(Encoding::UTF_8, invalid: :replace)
+       .split("\n")
+       .include?("META-INF/MANIFEST.MF")
   end
 end
 
@@ -126,7 +153,7 @@ class P7ZipUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     safe_system "7zr", "x", "-y", "-bd", "-bso0", path, "-o#{unpack_dir}"
   end
 end
@@ -138,8 +165,9 @@ class ZipUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
-    safe_system "unzip", "-qq", path, "-d", unpack_dir
+  def extract_to_dir(unpack_dir, basename:, verbose:)
+    quiet_flags = verbose ? [] : ["-qq"]
+    safe_system "unzip", *quiet_flags, path, "-d", unpack_dir
   end
 end
 
@@ -155,7 +183,7 @@ class TarUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     safe_system "tar", "xf", path, "-C", unpack_dir
   end
 end
@@ -166,20 +194,21 @@ class CompressUnpackStrategy < TarUnpackStrategy
   end
 end
 
-class XzUnpackStrategy < UncompressedUnpackStrategy
+class XzUnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\A\xFD7zXZ\x00/n)
   end
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
-    super
-    safe_system Formula["xz"].opt_bin/"xz", "-d", "-q", "-T0", unpack_dir/basename
-    extract_nested_tar(unpack_dir, basename: basename)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
+    FileUtils.cp path, unpack_dir/basename, preserve: true
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system Formula["xz"].opt_bin/"unxz", *quiet_flags, "-T0", unpack_dir/basename
+    extract_nested_tar(unpack_dir)
   end
 
-  def extract_nested_tar(unpack_dir, basename:)
+  def extract_nested_tar(unpack_dir)
     return unless DependencyCollector.tar_needs_xz_dependency?
     return if (children = unpack_dir.children).count != 1
     return if (tar = children.first).extname != ".tar"
@@ -187,47 +216,50 @@ class XzUnpackStrategy < UncompressedUnpackStrategy
     Dir.mktmpdir do |tmpdir|
       tmpdir = Pathname(tmpdir)
       FileUtils.mv tar, tmpdir/tar.basename
-      TarUnpackStrategy.new(tmpdir/tar.basename).extract(to: unpack_dir, basename: basename)
+      TarUnpackStrategy.new(tmpdir/tar.basename).extract(to: unpack_dir)
     end
   end
 end
 
-class Bzip2UnpackStrategy < UncompressedUnpackStrategy
+class Bzip2UnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\ABZh/n)
   end
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
-    super
-    safe_system "bunzip2", "-q", unpack_dir/basename
+  def extract_to_dir(unpack_dir, basename:, verbose:)
+    FileUtils.cp path, unpack_dir/basename, preserve: true
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system "bunzip2", *quiet_flags, unpack_dir/basename
   end
 end
 
-class GzipUnpackStrategy < UncompressedUnpackStrategy
+class GzipUnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\A\037\213/n)
   end
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
-    super
-    safe_system "gunzip", "-q", "-N", unpack_dir/basename
+  def extract_to_dir(unpack_dir, basename:, verbose:)
+    FileUtils.cp path, unpack_dir/basename, preserve: true
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system "gunzip", *quiet_flags, "-N", unpack_dir/basename
   end
 end
 
-class LzipUnpackStrategy < UncompressedUnpackStrategy
+class LzipUnpackStrategy < UnpackStrategy
   def self.can_extract?(path:, magic_number:)
     magic_number.match?(/\ALZIP/n)
   end
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
-    super
-    safe_system Formula["lzip"].opt_bin/"lzip", "-d", "-q", unpack_dir/basename
+  def extract_to_dir(unpack_dir, basename:, verbose:)
+    FileUtils.cp path, unpack_dir/basename, preserve: true
+    quiet_flags = verbose ? [] : ["-q"]
+    safe_system Formula["lzip"].opt_bin/"lzip", "-d", *quiet_flags, unpack_dir/basename
   end
 end
 
@@ -238,7 +270,7 @@ class XarUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     safe_system "xar", "-x", "-f", path, "-C", unpack_dir
   end
 end
@@ -250,7 +282,7 @@ class RarUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     safe_system Formula["unrar"].opt_bin/"unrar", "x", "-inul", path, unpack_dir
   end
 end
@@ -262,7 +294,7 @@ class LhaUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     safe_system Formula["lha"].opt_bin/"lha", "xq2w=#{unpack_dir}", path
   end
 end
@@ -270,12 +302,6 @@ end
 class GitUnpackStrategy < DirectoryUnpackStrategy
   def self.can_extract?(path:, magic_number:)
     super && (path/".git").directory?
-  end
-
-  private
-
-  def extract_to_dir(unpack_dir, basename:)
-    FileUtils.cp_r path.children, unpack_dir, preserve: true
   end
 end
 
@@ -286,7 +312,7 @@ class SubversionUnpackStrategy < DirectoryUnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     safe_system "svn", "export", "--force", path, unpack_dir
   end
 end
@@ -304,7 +330,7 @@ class MercurialUnpackStrategy < DirectoryUnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     with_env "PATH" => PATH.new(Formula["mercurial"].opt_bin, ENV["PATH"]) do
       safe_system "hg", "--cwd", path, "archive", "--subrepos", "-y", "-t", "files", unpack_dir
     end
@@ -322,7 +348,7 @@ class FossilUnpackStrategy < UnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     args = if @ref_type && @ref
       [@ref]
     else
@@ -342,7 +368,7 @@ class BazaarUnpackStrategy < DirectoryUnpackStrategy
 
   private
 
-  def extract_to_dir(unpack_dir, basename:)
+  def extract_to_dir(unpack_dir, basename:, verbose:)
     super
 
     # The export command doesn't work on checkouts (see https://bugs.launchpad.net/bzr/+bug/897511).

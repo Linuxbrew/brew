@@ -2,7 +2,7 @@
 #       that class is abstracted from installer.rb.
 describe "Accessibility Access", :cask do
   let(:cask) { Hbc::CaskLoader.load(cask_path("with-accessibility-access")) }
-  let(:fake_system_command) { class_double(Hbc::SystemCommand) }
+  let(:fake_system_command) { class_double(SystemCommand) }
   let(:installer) { Hbc::Installer.new(cask, command: fake_system_command) }
 
   before do

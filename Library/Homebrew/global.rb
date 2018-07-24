@@ -1,5 +1,19 @@
 require "pathname"
 require "English"
+
+HOMEBREW_LIBRARY_PATH = Pathname.new(__FILE__).realpath.parent
+
+unless $LOAD_PATH.include?("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+  $LOAD_PATH.push("#{HOMEBREW_LIBRARY_PATH}/cask/lib")
+end
+
+unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
+  $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.to_s)
+end
+
+require "config"
+
+require "English"
 require "ostruct"
 require "messages"
 
@@ -15,7 +29,6 @@ HOMEBREW_WWW = "http://linuxbrew.sh".freeze
 require "os"
 HOMEBREW_DEFAULT_PREFIX = (OS.linux? ? "/home/linuxbrew/.linuxbrew" : "/usr/local").freeze
 
-require "config"
 require "extend/git_repository"
 
 HOMEBREW_REPOSITORY.extend(GitRepositoryExtension)

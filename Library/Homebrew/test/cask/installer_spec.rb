@@ -46,7 +46,7 @@ describe Hbc::Installer, :cask do
       Hbc::Installer.new(asset).install
 
       expect(Hbc::Caskroom.path.join("container-bzip2", asset.version)).to be_a_directory
-      expect(Hbc::Config.global.appdir.join("container-bzip2--#{asset.version}")).to be_a_file
+      expect(Hbc::Config.global.appdir.join("container")).to be_a_file
     end
 
     it "works with pure gzip-based Casks" do

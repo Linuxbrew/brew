@@ -1,4 +1,4 @@
-require "hbc/system_command"
+require "system_command"
 
 module Hbc
   class DSL

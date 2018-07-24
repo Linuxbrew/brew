@@ -7,13 +7,10 @@ module Hbc
         magic_number.match?(/\A(MSCF|MZ)/n)
       end
 
-      def extract
-        Dir.mktmpdir do |unpack_dir|
-          @command.run!("cabextract",
-                        args: ["-d", unpack_dir, "--", @path],
+      def extract_to_dir(unpack_dir, basename:, verbose:)
+        system_command!("cabextract",
+                        args: ["-d", unpack_dir, "--", path],
                         env: { "PATH" => PATH.new(Formula["cabextract"].opt_bin, ENV["PATH"]) })
-          @command.run!("/usr/bin/ditto", args: ["--", unpack_dir, @cask.staged_path])
-        end
       end
 
       def dependencies

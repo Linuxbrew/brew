@@ -1557,6 +1557,10 @@ class Formula
     runtime_formula_dependencies.select do |f|
       hide.include?(f.name) || f.installed_prefixes.empty?
     end
+  # If we're still getting unavailable formulae at this stage the best we can
+  # do is just return no results.
+  rescue FormulaUnavailableError
+    []
   end
 
   # @private

@@ -12,7 +12,7 @@ describe Hbc::Artifact::PostflightBlock, :cask do
       end
 
       cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
-        artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.install_phase(command: NeverSudoSystemCommand, force: false)
       end
 
       expect(called).to be true
@@ -33,7 +33,7 @@ describe Hbc::Artifact::PostflightBlock, :cask do
       end
 
       cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
-        artifact.uninstall_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+        artifact.uninstall_phase(command: NeverSudoSystemCommand, force: false)
       end
 
       expect(called).to be true

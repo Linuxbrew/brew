@@ -28,6 +28,12 @@ def ohai(title, *sput)
   puts sput
 end
 
+def odebug(title, *sput)
+  return unless ARGV.debug?
+  puts Formatter.headline(title, color: :magenta)
+  puts sput unless sput.empty?
+end
+
 def oh1(title, options = {})
   if $stdout.tty? && !ARGV.verbose? && options.fetch(:truncate, :auto) == :auto
     title = Tty.truncate(title)
@@ -296,7 +302,8 @@ end
 
 # Kernel.system but with exceptions
 def safe_system(cmd, *args, **options)
-  Homebrew.system(cmd, *args, **options) || raise(ErrorDuringExecution.new(cmd, args))
+  return if Homebrew.system(cmd, *args, **options)
+  raise(ErrorDuringExecution.new([cmd, *args], status: $CHILD_STATUS))
 end
 
 # prints no output

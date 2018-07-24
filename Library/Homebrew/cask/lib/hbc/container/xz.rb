@@ -7,14 +7,11 @@ module Hbc
         magic_number.match?(/\A\xFD7zXZ\x00/n)
       end
 
-      def extract
-        unpack_dir = @cask.staged_path
-        basename = path.basename
-
-        @command.run!("/usr/bin/ditto", args: ["--", path, unpack_dir])
-        @command.run!("xz",
-                      args: ["-q", "--", unpack_dir/basename],
-                      env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) })
+      def extract_to_dir(unpack_dir, basename:, verbose:)
+        system_command!("/usr/bin/ditto", args: ["--", path, unpack_dir])
+        system_command!("unxz",
+                        args: ["-q", "--", unpack_dir/basename],
+                        env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) })
       end
 
       def dependencies

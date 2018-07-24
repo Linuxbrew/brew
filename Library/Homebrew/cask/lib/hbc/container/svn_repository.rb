@@ -5,11 +5,8 @@ module Hbc
         (path/".svn").directory?
       end
 
-      def extract
-        path = @path
-        unpack_dir = @cask.staged_path
-
-        @command.run!("svn", args: ["export", "--force", path, unpack_dir])
+      def extract_to_dir(unpack_dir, basename:, verbose:)
+        system_command!("svn", args: ["export", "--force", path, unpack_dir])
       end
     end
   end

@@ -6,6 +6,8 @@ require "hbc/cask_dependencies"
 require "hbc/staged"
 require "hbc/verify"
 
+require "cgi"
+
 module Hbc
   class Installer
     extend Predicable
@@ -152,20 +154,21 @@ module Hbc
           Container.for_path(@downloaded_path)
         end
 
-        container&.new(@cask, @downloaded_path, @command, verbose: verbose?)
+        unless container
+          raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'."
+        end
+
+        container.new(@cask, @downloaded_path)
       end
     end
 
     def extract_primary_container
       odebug "Extracting primary container"
 
-      unless primary_container
-        raise CaskError, "Uh oh, could not figure out how to unpack '#{@downloaded_path}'"
-      end
-
       odebug "Using container class #{primary_container.class} for #{@downloaded_path}"
-      FileUtils.mkdir_p @cask.staged_path
-      primary_container.extract
+
+      basename = CGI.unescape(File.basename(@cask.url.path))
+      primary_container.extract(to: @cask.staged_path, basename: basename, verbose: verbose?)
     end
 
     def install_artifacts

@@ -205,7 +205,7 @@ describe "download strategies", :cask do
 
   describe Hbc::SubversionDownloadStrategy do
     let(:url_options) { { using: :svn } }
-    let(:fake_system_command) { class_double(Hbc::SystemCommand) }
+    let(:fake_system_command) { class_double(SystemCommand) }
     let(:downloader) { Hbc::SubversionDownloadStrategy.new(cask, command: fake_system_command) }
 
     before do

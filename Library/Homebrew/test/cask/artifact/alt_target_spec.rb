@@ -5,7 +5,7 @@ describe Hbc::Artifact::App, :cask do
     let(:install_phase) {
       lambda do
         cask.artifacts.select { |a| a.is_a?(described_class) }.each do |artifact|
-          artifact.install_phase(command: Hbc::NeverSudoSystemCommand, force: false)
+          artifact.install_phase(command: NeverSudoSystemCommand, force: false)
         end
       end
     }

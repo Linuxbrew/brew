@@ -1,4 +1,4 @@
-describe Hbc::SystemCommand, :cask do
+describe SystemCommand do
   describe "#initialize" do
     let(:env_args) { ["bash", "-c", 'printf "%s" "${A?}" "${B?}" "${C?}"'] }
 
@@ -44,7 +44,7 @@ describe Hbc::SystemCommand, :cask do
             .with(["/usr/bin/sudo", "/usr/bin/sudo"], "-E", "--",
                   "env", "A=1", "B=2", "C=3", "env", *env_args, {})
             .and_wrap_original do |original_popen3, *_, &block|
-              original_popen3.call("/usr/bin/true", &block)
+              original_popen3.call("true", &block)
             end
 
           subject.run!
@@ -55,7 +55,7 @@ describe Hbc::SystemCommand, :cask do
 
   context "when the exit code is 0" do
     describe "its result" do
-      subject { described_class.run("/usr/bin/true") }
+      subject { described_class.run("true") }
 
       it { is_expected.to be_a_success }
       its(:exit_status) { is_expected.to eq(0) }
@@ -63,13 +63,13 @@ describe Hbc::SystemCommand, :cask do
   end
 
   context "when the exit code is 1" do
-    let(:command) { "/usr/bin/false" }
+    let(:command) { "false" }
 
     context "and the command must succeed" do
       it "throws an error" do
         expect {
           described_class.run!(command)
-        }.to raise_error(Hbc::CaskCommandFailedError)
+        }.to raise_error(ErrorDuringExecution)
       end
     end
 
@@ -183,7 +183,7 @@ describe Hbc::SystemCommand, :cask do
     }
 
     it "returns without deadlocking" do
-      wait(15).for {
+      wait(30).for {
         described_class.run(command, options)
       }.to be_a_success
     end

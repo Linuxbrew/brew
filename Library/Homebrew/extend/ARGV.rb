@@ -262,7 +262,8 @@ module HomebrewArgvExtension
   end
 
   def force_bottle?
-    include? "--force-bottle"
+    return false if ENV["HOMEBREW_NO_FORCE_BOTTLE"]
+    include?("--force-bottle") || !ENV["HOMEBREW_FORCE_BOTTLE"].nil?
   end
 
   def fetch_head?

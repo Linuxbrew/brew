@@ -117,6 +117,7 @@ module Homebrew
       ronn.write markup
       ronn.close_write
       ronn_output = ronn.read
+      odie "Got no output from ronn!" unless ronn_output
       ronn_output.gsub!(%r{</var>`(?=[.!?,;:]?\s)}, "").gsub!(%r{</?var>}, "`") if format_flag == "--markdown"
       target.atomic_write ronn_output
     end

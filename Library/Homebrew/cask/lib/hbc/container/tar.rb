@@ -12,10 +12,8 @@ module Hbc
         end
       end
 
-      def extract
-        unpack_dir = @cask.staged_path
-
-        @command.run!("tar", args: ["xf", path, "-C", unpack_dir])
+      def extract_to_dir(unpack_dir, basename:, verbose:)
+        system_command!("tar", args: ["xf", path, "-C", unpack_dir])
       end
     end
   end

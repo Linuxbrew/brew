@@ -1,16 +1,16 @@
-require "hbc/container/generic_unar"
+require "hbc/container/base"
 
 module Hbc
   class Container
-    class Rar
+    class Rar < Base
       def self.can_extract?(path:, magic_number:)
         magic_number.match?(/\ARar!/n)
       end
 
-      def extract
-        path = @path
-        unpack_dir = @cask.staged_path
-        @command.run!(Formula["unrar"].opt_bin/"unrar", args: ["x", "-inul", path, unpack_dir])
+      def extract_to_dir(unpack_dir, basename:, verbose:)
+        system_command!("unrar",
+                        args: ["x", "-inul", path, unpack_dir],
+                        env: { "PATH" => PATH.new(Formula["unrar"].opt_bin, ENV["PATH"]) })
       end
 
       def dependencies

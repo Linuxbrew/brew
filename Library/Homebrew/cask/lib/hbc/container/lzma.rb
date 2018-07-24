@@ -7,14 +7,11 @@ module Hbc
         magic_number.match?(/\A\]\000\000\200\000/n)
       end
 
-      def extract
-        Dir.mktmpdir do |unpack_dir|
-          @command.run!("/usr/bin/ditto", args: ["--", @path, unpack_dir])
-          @command.run!("unlzma",
-                        args: ["-q", "--", Pathname(unpack_dir).join(@path.basename)],
+      def extract_to_dir(unpack_dir, basename:, verbose:)
+        system_command!("/usr/bin/ditto", args: ["--", path, unpack_dir])
+        system_command!("unlzma",
+                        args: ["-q", "--", Pathname(unpack_dir).join(basename)],
                         env: { "PATH" => PATH.new(Formula["unlzma"].opt_bin, ENV["PATH"]) })
-          @command.run!("/usr/bin/ditto", args: ["--", unpack_dir, @cask.staged_path])
-        end
       end
 
       def dependencies

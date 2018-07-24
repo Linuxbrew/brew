@@ -7,7 +7,7 @@ module Hbc
 
       attr_reader :cask, :downloaded_path
 
-      def initialize(cask, downloaded_path, command = Hbc::SystemCommand)
+      def initialize(cask, downloaded_path, command = SystemCommand)
         @command = command
         @cask = cask
         @downloaded_path = downloaded_path

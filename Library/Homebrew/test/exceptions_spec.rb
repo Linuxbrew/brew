@@ -183,9 +183,10 @@ describe CurlDownloadStrategyError do
 end
 
 describe ErrorDuringExecution do
-  subject { described_class.new("badprg", %w[arg1 arg2]) }
+  subject { described_class.new(["badprg", "arg1", "arg2"], status: status) }
+  let(:status) { instance_double(Process::Status, exitstatus: 17) }
 
-  its(:to_s) { is_expected.to eq("Failure while executing: badprg arg1 arg2") }
+  its(:to_s) { is_expected.to eq("Failure while executing; `badprg arg1 arg2` exited with 17.") }
 end
 
 describe ChecksumMismatchError do
