@@ -110,6 +110,11 @@ module OS
       s&.path
     end
 
+    def sdk_path_if_needed(v = nil)
+      return if !MacOS::Xcode.installed? && MacOS::CLT.separate_header_package?
+      sdk_path(v)
+    end
+
     # See these issues for some history:
     # https://github.com/Homebrew/legacy-homebrew/issues/13
     # https://github.com/Homebrew/legacy-homebrew/issues/41
