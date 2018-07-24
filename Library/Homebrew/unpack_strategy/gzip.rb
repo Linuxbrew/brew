@@ -18,7 +18,8 @@ module UnpackStrategy
       FileUtils.cp path, unpack_dir/basename, preserve: true
       quiet_flags = verbose ? [] : ["-q"]
       system_command! "gunzip",
-                      args: [*quiet_flags, "-N", "--", unpack_dir/basename]
+                      args: [*quiet_flags, "-N", "--", unpack_dir/basename],
+                      verbose: verbose
     end
   end
 end

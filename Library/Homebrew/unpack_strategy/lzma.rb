@@ -17,7 +17,8 @@ module UnpackStrategy
       quiet_flags = verbose ? [] : ["-q"]
       system_command! "unlzma",
                       args: [*quiet_flags, "--", unpack_dir/basename],
-                      env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) }
+                      env: { "PATH" => PATH.new(Formula["xz"].opt_bin, ENV["PATH"]) },
+                      verbose: verbose
     end
 
     def dependencies

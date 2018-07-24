@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UnpackStrategy
   class Air
     include UnpackStrategy
@@ -17,13 +19,17 @@ module UnpackStrategy
       @dependencies ||= [Hbc::CaskLoader.load("adobe-air")]
     end
 
+    AIR_APPLICATION_INSTALLER =
+      "/Applications/Utilities/Adobe AIR Application Installer.app/Contents/MacOS/Adobe AIR Application Installer"
+
+    private_constant :AIR_APPLICATION_INSTALLER
+
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      system_command!(
-        "/Applications/Utilities/Adobe AIR Application Installer.app/Contents/MacOS/Adobe AIR Application Installer",
-        args: ["-silent", "-location", unpack_dir, path],
-      )
+      system_command! AIR_APPLICATION_INSTALLER,
+                      args: ["-silent", "-location", unpack_dir, path],
+                      verbose: verbose
     end
   end
 end

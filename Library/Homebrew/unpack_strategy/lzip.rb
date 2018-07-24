@@ -23,7 +23,8 @@ module UnpackStrategy
       quiet_flags = verbose ? [] : ["-q"]
       system_command! "lzip",
                       args: ["-d", *quiet_flags, unpack_dir/basename],
-                      env: { "PATH" => PATH.new(Formula["lzip"].opt_bin, ENV["PATH"]) }
+                      env: { "PATH" => PATH.new(Formula["lzip"].opt_bin, ENV["PATH"]) },
+                      verbose: verbose
     end
   end
 end

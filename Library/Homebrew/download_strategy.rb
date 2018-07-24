@@ -333,7 +333,8 @@ end
 class NoUnzipCurlDownloadStrategy < CurlDownloadStrategy
   def stage
     UnpackStrategy::Uncompressed.new(cached_location)
-                                .extract(basename: basename_without_params)
+                                .extract(basename: basename_without_params,
+                                         verbose: ARGV.verbose? && !shutup)
   end
 end
 

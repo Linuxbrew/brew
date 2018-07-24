@@ -15,7 +15,9 @@ module UnpackStrategy
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      system_command! "xar", args: ["-x", "-f", path, "-C", unpack_dir]
+      system_command! "xar",
+                      args: ["-x", "-f", path, "-C", unpack_dir],
+                      verbose: verbose
     end
   end
 end

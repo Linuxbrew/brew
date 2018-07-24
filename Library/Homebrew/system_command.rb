@@ -47,7 +47,9 @@ class SystemCommand
     result
   end
 
-  def initialize(executable, args: [], sudo: false, input: [], print_stdout: false, print_stderr: true, verbose: false, must_succeed: false, env: {}, **options)
+  def initialize(executable, args: [], sudo: false, env: {}, input: [], must_succeed: false,
+                 print_stdout: false, print_stderr: true, verbose: false, **options)
+
     @executable = executable
     @args = args
     @sudo = sudo
