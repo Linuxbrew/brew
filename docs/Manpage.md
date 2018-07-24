@@ -1170,12 +1170,6 @@ Note that environment variables must have a value set to be detected. For exampl
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
 
-  * `HOMEBREW_FORCE_BOTTLE`:
-    If set, Homebrew will install from a bottle if it exists for the
-    current or newest version of macOS, even if it would not normally be used
-    for installation. Please do not file issues if you encounter errors when
-    using this environment variable.
-
   * `HOMEBREW_FORCE_BREWED_CURL`:
     If set, Homebrew will use a Homebrew-installed `curl` rather than the
     system version.
