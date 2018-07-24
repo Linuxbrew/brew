@@ -11,6 +11,7 @@ unless $LOAD_PATH.include?(HOMEBREW_LIBRARY_PATH.to_s)
   $LOAD_PATH.push(HOMEBREW_LIBRARY_PATH.to_s)
 end
 
+require "os"
 require "config"
 
 require "English"
@@ -26,7 +27,6 @@ HOMEBREW_PRODUCT = ENV["HOMEBREW_PRODUCT"]
 HOMEBREW_VERSION = ENV["HOMEBREW_VERSION"]
 HOMEBREW_WWW = "http://linuxbrew.sh".freeze
 
-require "os"
 HOMEBREW_DEFAULT_PREFIX = (OS.linux? ? "/home/linuxbrew/.linuxbrew" : "/usr/local").freeze
 
 require "extend/git_repository"
@@ -118,7 +118,6 @@ HOMEBREW_INTERNAL_COMMAND_ALIASES = {
 
 require "set"
 
-require "os"
 require "extend/pathname"
 
 require "extend/module"
