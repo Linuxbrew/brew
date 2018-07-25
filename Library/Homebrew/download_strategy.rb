@@ -131,7 +131,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
   end
 
   def cached_location
-    @clone    
+    @clone
   end
 
   delegate head?: :version
