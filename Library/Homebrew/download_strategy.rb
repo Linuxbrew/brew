@@ -554,37 +554,18 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", svn_cached_location))
+    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", svn_escape(cached_location)))
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
   def last_commit
-    Utils.popen_read("svn", "info", "--show-item", "revision", svn_cached_location).strip
+    Utils.popen_read("svn", "info", "--show-item", "revision", svn_escape(cached_location)).strip
   end
 
   private
 
-  def escape(svn_url)
-    # subversion uses '@' to point to a specific revision
-    # so when the path contains a @, it requires an additional @ at the end
-    # but this is not consistent through all commands
-    # the commands are affected as follows:
-    #   svn checkout url1 foo@a   # properly checks out url1 to foo@a
-    #   svn switch url2 foo@a     # properly switchs foo@a to url2
-    #   svn update foo@a@         # properly updates foo@a
-    #   svn info foo@a@           # properly obtains info on foo@a
-    #   svn export foo@a@ newdir  # properly export foo@a contents to newdir
-    result = svn_url.to_s.dup
-    result << "@" if result.include? "@"
-    result
-  end
-
-  def svn_cached_location
-    escape(cached_location)
-  end
-
   def repo_url
-    Utils.popen_read("svn", "info", svn_cached_location).strip[/^URL: (.+)$/, 1]
+    Utils.popen_read("svn", "info", svn_escape(cached_location)).strip[/^URL: (.+)$/, 1]
   end
 
   def externals
@@ -595,15 +576,17 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def fetch_repo(target, url, revision = nil, ignore_externals = false)
-    # Use "svn up" when the repository already exists locally.
+    # Use "svn update" when the repository already exists locally.
     # This saves on bandwidth and will have a similar effect to verifying the
     # cache as it will make any changes to get the right revision.
-    svncommand = target.directory? ? "up" : "checkout"
+    svncommand = target.directory? ? "update" : "checkout"
     args = ["svn", svncommand]
-    args << url unless target.directory?
-    target_arg = target.to_s
-    target_arg = escape(target_arg) if svncommand == "up"
-    args << target_arg
+    if svncommand == "checkout"
+      args << url
+      args << target
+    elsif svncommand == "update"
+      args << svn_escape(target.to_s)
+    end
     if revision
       ohai "Checking out #{@ref}"
       args << "-r" << revision
