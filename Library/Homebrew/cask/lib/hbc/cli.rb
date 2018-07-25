@@ -103,12 +103,14 @@ module Hbc
       if external_ruby_cmd
         require external_ruby_cmd
 
-        begin
-          return const_get(command.to_s.capitalize.to_sym)&.run(*args)
+        klass = begin
+          const_get(command.to_s.capitalize.to_sym)
         rescue NameError
           # External command is a stand-alone Ruby script.
           return
         end
+
+        return klass.run(*args)
       end
 
       if external_command = which("brewcask-#{command}", path)
