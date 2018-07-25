@@ -91,6 +91,7 @@ class Tap
     @repo_var = nil
     @formula_dir = nil
     @cask_dir = nil
+    @command_dir = nil
     @formula_files = nil
     @alias_dir = nil
     @alias_files = nil
@@ -446,10 +447,24 @@ class Tap
     @alias_reverse_table
   end
 
+  def command_dir
+    @command_dir ||= path/"cmd"
+  end
+
+  def command_file?(file)
+    file = Pathname.new(file) unless file.is_a? Pathname
+    file = file.expand_path(path)
+    file.parent == command_dir && file.basename.to_s.match?(/^brew(cask)?-/) &&
+      (file.executable? || file.extname == ".rb")
+  end
+
   # an array of all commands files of this {Tap}.
   def command_files
-    @command_files ||= Pathname.glob("#{path}/cmd/brew{,cask}-*")
-                               .select { |file| file.executable? || file.extname == ".rb" }
+    @command_files ||= if command_dir.directory?
+      command_dir.children.select(&method(:command_file?))
+    else
+      []
+    end
   end
 
   # path to the pin record for this {Tap}.
