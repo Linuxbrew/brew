@@ -85,7 +85,7 @@ module OS
     #      specifically been requested according to the rules above.
 
     def sdk(v = nil)
-      @locator ||= if Xcode.without_clt?
+      @locator ||= if Xcode.installed?
         XcodeSDKLocator.new
       else
         CLTSDKLocator.new
