@@ -308,7 +308,7 @@ module GitHub
     url = "#{API_URL}/repos/#{user}/#{repo}/issues/#{pr}/comments"
     data = { "body" => body }
     if issue_comment_exists?(user, repo, pr, body)
-      ohai "Skipping: identical comment exists on #{PR_ENV}."
+      ohai "Skipping: identical comment exists on #{PR_ENV}"
       return true
     end
 
