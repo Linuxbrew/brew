@@ -585,7 +585,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
       args << url
       args << target
     elsif svncommand == "update"
-      args << svn_escape(target.to_s)
+      args << svn_escape(target)
     end
     if revision
       ohai "Checking out #{@ref}"

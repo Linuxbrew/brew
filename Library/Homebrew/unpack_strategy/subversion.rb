@@ -24,8 +24,7 @@ module UnpackStrategy
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      path_export = svn_escape(path.to_s)
-      system_command! "svn", args: ["export", "--force", path_export, unpack_dir]
+      system_command! "svn", args: ["export", "--force", svn_escape(path), unpack_dir]
     end
   end
 end
