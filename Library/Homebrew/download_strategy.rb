@@ -571,8 +571,8 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     # the commands are affected as follows:
     #   svn checkout url1 foo@a   # properly checks out url1 to foo@a
     #   svn switch url2 foo@a     # properly switchs foo@a to url2
-    #   svn update foo@a@         # properly updates foo@a 
-    #   svn info foo@a@           # properly obtains info on foo@a 
+    #   svn update foo@a@         # properly updates foo@a
+    #   svn info foo@a@           # properly obtains info on foo@a
     #   svn export foo@a@ newdir  # properly export foo@a contents to newdir
     result = svn_url.to_s.dup
     result << "@" if result.include? "@"
@@ -583,7 +583,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     escape(cached_location)
   end
 
-  def repo_url    
+  def repo_url
     Utils.popen_read("svn", "info", svn_cached_location).strip[/^URL: (.+)$/, 1]
   end
 
