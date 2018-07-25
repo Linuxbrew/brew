@@ -82,6 +82,20 @@ describe Tap do
     end
   end
 
+  describe "::from_path" do
+    let(:tap) { described_class.fetch("Homebrew", "core") }
+    let(:path) { tap.path }
+    let(:formula_path) { path/"Formula/formula.rb" }
+
+    it "returns the Tap for a Formula path" do
+      expect(described_class.from_path(formula_path)).to eq tap
+    end
+
+    it "returns the Tap when given its exact path" do
+      expect(described_class.from_path(path)).to eq tap
+    end
+  end
+
   specify "::names" do
     expect(described_class.names.sort).to eq(["homebrew/core", "homebrew/foo"])
   end
