@@ -10,16 +10,13 @@ module UnpackStrategy
       Otf,
       Air,
       Executable,
-      SelfExtractingExecutable,
-      Jar,
-      LuaRock,
-      MicrosoftOfficeXml,
+      Jar, # needs to be before Zip
+      LuaRock, # needs to be before Zip
+      MicrosoftOfficeXml, # needs to be before Zip
       Zip,
-      Dmg,
       Xar,
       Compress,
-      Tar,
-      Bzip2,
+      Tar, # needs to be before Bzip2/Gzip/Xz/Lzma
       Gzip,
       Lzma,
       Xz,
@@ -28,8 +25,11 @@ module UnpackStrategy
       Mercurial,
       Subversion,
       Cvs,
+      Dmg, # needs to be before Bzip2
+      Bzip2,
       Fossil,
       Bazaar,
+      SelfExtractingExecutable, # needs to be before Cab
       Cab,
       P7Zip,
       Sit,
