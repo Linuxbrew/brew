@@ -131,7 +131,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
   end
 
   def cached_location
-    @clone
+    @clone    
   end
 
   delegate head?: :version
@@ -554,18 +554,37 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", cached_location.to_s))
+    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", svn_cached_location))
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
   def last_commit
-    Utils.popen_read("svn", "info", "--show-item", "revision", cached_location.to_s).strip
+    Utils.popen_read("svn", "info", "--show-item", "revision", svn_cached_location).strip
   end
 
   private
 
-  def repo_url
-    Utils.popen_read("svn", "info", cached_location.to_s).strip[/^URL: (.+)$/, 1]
+  def escape(svn_url)
+    # subversion uses '@' to point to a specific revision
+    # so when the path contains a @, it requires an additional @ at the end
+    # but this is not consistent through all commands
+    # the commands are affected as follows:
+    #   svn checkout url1 foo@a   # properly checks out url1 to foo@a
+    #   svn switch url2 foo@a     # properly switchs foo@a to url2
+    #   svn update foo@a@         # properly updates foo@a 
+    #   svn info foo@a@           # properly obtains info on foo@a 
+    #   svn export foo@a@ newdir  # properly export foo@a contents to newdir
+    result = svn_url.to_s.dup
+    result << "@" if result.include? "@"
+    result
+  end
+
+  def svn_cached_location
+    escape(cached_location)
+  end
+
+  def repo_url    
+    Utils.popen_read("svn", "info", svn_cached_location).strip[/^URL: (.+)$/, 1]
   end
 
   def externals
@@ -582,7 +601,9 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     svncommand = target.directory? ? "up" : "checkout"
     args = ["svn", svncommand]
     args << url unless target.directory?
-    args << target
+    target_arg = target.to_s
+    target_arg = escape(target_arg) if svncommand == "up"
+    args << target_arg
     if revision
       ohai "Checking out #{@ref}"
       args << "-r" << revision
