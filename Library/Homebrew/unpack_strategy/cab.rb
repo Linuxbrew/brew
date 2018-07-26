@@ -3,7 +3,7 @@ module UnpackStrategy
     include UnpackStrategy
 
     def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\A(MSCF|MZ)/n)
+      magic_number.match?(/\AMSCF/n)
     end
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
