@@ -2,7 +2,9 @@ comment: off
 fixes:
   - "::Library/Homebrew/"
 coverage:
+  round: nearest
+  precision: 2
   status:
     project:
-    default:
-        threshold: 0.1
+      default:
+        threshold: 0.05%
