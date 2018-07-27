@@ -52,7 +52,7 @@ class FakeSystemCommand
     if response.respond_to?(:call)
       response.call(command_string, options)
     else
-      SystemCommand::Result.new(command, response, "", 0)
+      SystemCommand::Result.new(command, response, "", OpenStruct.new(exitstatus: 0))
     end
   end
 

@@ -148,7 +148,7 @@ describe Hbc::Pkg, :cask do
         "/usr/sbin/pkgutil",
         args: ["--pkg-info-plist", pkg_id],
       ).and_return(
-        SystemCommand::Result.new(nil, pkg_info_plist, nil, 0),
+        SystemCommand::Result.new(nil, pkg_info_plist, nil, instance_double(Process::Status, exitstatus: 0)),
       )
 
       info = pkg.info

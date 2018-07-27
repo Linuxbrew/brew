@@ -37,7 +37,13 @@ class SystemCommand
         puts line.chomp if print_stdout?
         @merged_output << [:stdout, line]
       when :stderr
-        $stderr.puts Formatter.error(line.chomp) if print_stderr?
+        if print_stderr?
+          if line.start_with?("\r")
+            $stderr.print line
+          else
+            $stderr.puts Formatter.error(line.chomp)
+          end
+        end
         @merged_output << [:stderr, line]
       end
     end
@@ -76,13 +82,18 @@ class SystemCommand
   def env_args
     return [] if env.empty?
 
-    variables = env.map do |name, value|
-      sanitized_name = Shellwords.escape(name)
-      sanitized_value = Shellwords.escape(value)
-      "#{sanitized_name}=#{sanitized_value}"
-    end
+    unset_variables = env.select { |_, value| value.nil? }
+                         .flat_map { |name,| ["-u", name] }
 
-    ["env", *variables]
+    set_variables =
+      env.reject { |_, value| value.nil? }
+         .flat_map do |name, value|
+           sanitized_name = Shellwords.escape(name)
+           sanitized_value = Shellwords.escape(value)
+           "#{sanitized_name}=#{sanitized_value}"
+         end
+
+    ["env", *unset_variables, *set_variables]
   end
 
   def sudo_prefix
@@ -102,7 +113,7 @@ class SystemCommand
     @expanded_args ||= args.map do |arg|
       if arg.respond_to?(:to_path)
         File.absolute_path(arg)
-      elsif arg.is_a?(Integer) || arg.is_a?(Float)
+      elsif arg.is_a?(Integer) || arg.is_a?(Float) || arg.is_a?(URI)
         arg.to_s
       else
         arg.to_str
@@ -157,21 +168,26 @@ class SystemCommand
       hash[type] << line
     end
 
-    Result.new(command, output[:stdout], output[:stderr], @status.exitstatus)
+    Result.new(command, output[:stdout], output[:stderr], @status)
   end
 
   class Result
-    attr_accessor :command, :stdout, :stderr, :exit_status
+    attr_accessor :command, :stdout, :stderr, :status, :exit_status
 
-    def initialize(command, stdout, stderr, exit_status)
+    def initialize(command, stdout, stderr, status)
       @command     = command
       @stdout      = stdout
       @stderr      = stderr
-      @exit_status = exit_status
+      @status      = status
+      @exit_status = status.exitstatus
     end
 
     def success?
       @exit_status.zero?
+    end
+
+    def to_ary
+      [stdout, stderr, status]
     end
 
     def plist
