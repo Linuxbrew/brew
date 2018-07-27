@@ -214,6 +214,10 @@ module OS
         version >= "10"
       end
 
+      def provides_sdk?
+        version >= "8"
+      end
+
       def headers_installed?
         if !separate_header_package?
           installed?

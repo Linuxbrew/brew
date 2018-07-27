@@ -82,7 +82,7 @@ module OS
       # return nil SDKs for Xcode 9 and older.
       def sdk_prefix
         @sdk_prefix ||= begin
-          if !CLT.separate_header_package?
+          if !CLT.provides_sdk?
             ""
           else
             "#{CLT::PKG_PATH}/SDKs"
