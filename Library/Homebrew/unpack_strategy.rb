@@ -5,33 +5,33 @@ module UnpackStrategy
 
   def self.strategies
     @strategies ||= [
-      Pkg,
-      Ttf,
-      Otf,
-      Air,
-      Executable,
-      Diff,
+      Air, # needs to be before Zip
       Jar, # needs to be before Zip
       LuaRock, # needs to be before Zip
       MicrosoftOfficeXml, # needs to be before Zip
-      Zip,
-      Xar,
-      Compress,
+      Zip, # needs to be before Tar
+      Pkg, # needs to be before Xar
+      Xar, # needs to be before Tar
       Tar, # needs to be before Bzip2/Gzip/Xz/Lzma
       Gzip,
       Lzma,
       Xz,
       Lzip,
+      Executable,
+      Diff,
       Git,
       Mercurial,
       Subversion,
       Cvs,
+      Ttf,
+      Otf,
       Dmg, # needs to be before Bzip2
       Bzip2,
       Fossil,
       Bazaar,
       SelfExtractingExecutable, # needs to be before Cab
       Cab,
+      Compress,
       P7Zip,
       Sit,
       Rar,
