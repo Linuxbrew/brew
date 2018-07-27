@@ -10,6 +10,7 @@ module UnpackStrategy
       Otf,
       Air,
       Executable,
+      Diff,
       Jar, # needs to be before Zip
       LuaRock, # needs to be before Zip
       MicrosoftOfficeXml, # needs to be before Zip
@@ -126,6 +127,7 @@ require "unpack_strategy/bzip2"
 require "unpack_strategy/cab"
 require "unpack_strategy/compress"
 require "unpack_strategy/cvs"
+require "unpack_strategy/diff"
 require "unpack_strategy/directory"
 require "unpack_strategy/dmg"
 require "unpack_strategy/executable"
