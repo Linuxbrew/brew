@@ -91,17 +91,7 @@ module OS
         CLTSDKLocator.new
       end
 
-      begin
-        sdk = if v.nil?
-          (Xcode.version.to_i >= 7) ? @locator.latest_sdk : @locator.sdk_for(version)
-        else
-          @locator.sdk_for v
-        end
-      rescue BaseSDKLocator::NoSDKError
-        sdk = @locator.latest_sdk
-      end
-      # Only return an SDK older than the OS version if it was specifically requested
-      sdk if v || (!sdk.nil? && sdk.version >= version)
+      @locator.sdk_if_applicable(v)
     end
 
     # Returns the path to an SDK or nil, following the rules set by #sdk.

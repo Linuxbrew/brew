@@ -28,7 +28,25 @@ module OS
         SDK.new v, path
       end
 
+      def sdk_if_applicable(v = nil)
+        begin
+          sdk = if v.nil?
+            (source_version.to_i >= 7) ? latest_sdk : sdk_for(OS::Mac.version)
+          else
+            sdk_for v
+          end
+        rescue BaseSDKLocator::NoSDKError
+          sdk = latest_sdk
+        end
+        # Only return an SDK older than the OS version if it was specifically requested
+        sdk if v || (!sdk.nil? && sdk.version >= OS::Mac.version)
+      end
+
       private
+
+      def source_version
+        OS::Mac::Version::NULL
+      end
 
       def sdk_prefix
         ""
@@ -56,6 +74,10 @@ module OS
     class XcodeSDKLocator < BaseSDKLocator
       private
 
+      def source_version
+        OS::Mac::Xcode.version
+      end
+
       def sdk_prefix
         @sdk_prefix ||= begin
           # Xcode.prefix is pretty smart, so let's look inside to find the sdk
@@ -72,6 +94,10 @@ module OS
 
     class CLTSDKLocator < BaseSDKLocator
       private
+
+      def source_version
+        OS::Mac::CLT.version
+      end
 
       # While CLT SDKs existed prior to Xcode 10, those packages also
       # installed a traditional Unix-style header layout and we prefer
