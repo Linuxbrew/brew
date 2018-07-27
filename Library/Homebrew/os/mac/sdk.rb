@@ -29,17 +29,18 @@ module OS
       end
 
       def sdk_if_applicable(v = nil)
-        begin
-          sdk = if v.nil?
+        sdk = begin
+          if v.nil?
             (source_version.to_i >= 7) ? latest_sdk : sdk_for(OS::Mac.version)
           else
             sdk_for v
           end
         rescue BaseSDKLocator::NoSDKError
-          sdk = latest_sdk
+          latest_sdk
         end
         # Only return an SDK older than the OS version if it was specifically requested
-        sdk if v || (!sdk.nil? && sdk.version >= OS::Mac.version)
+        return unless v || (!sdk.nil? && sdk.version >= OS::Mac.version)
+        sdk
       end
 
       private
@@ -85,7 +86,8 @@ module OS
           # Xcode < 4.3 style
           sdk_prefix = "/Developer/SDKs" unless File.directory? sdk_prefix
           # Finally query Xcode itself (this is slow, so check it last)
-          sdk_prefix = File.join(Utils.popen_read(DevelopmentTools.locate("xcrun"), "--show-sdk-platform-path").chomp, "Developer", "SDKs") unless File.directory? sdk_prefix
+          sdk_platform_path = Utils.popen_read(DevelopmentTools.locate("xcrun"), "--show-sdk-platform-path").chomp
+          sdk_prefix = File.join(sdk_platform_path, "Developer", "SDKs") unless File.directory? sdk_prefix
 
           sdk_prefix
         end
