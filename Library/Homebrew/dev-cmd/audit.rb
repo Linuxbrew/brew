@@ -598,7 +598,7 @@ module Homebrew
       end
 
       if formula.head || formula.devel
-        unstable_spec_message = "Formulae should not have an unstable spec"
+        unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
         if @new_formula
           new_formula_problem unstable_spec_message
         elsif formula.versioned_formula?
