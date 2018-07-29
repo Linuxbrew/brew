@@ -29,25 +29,25 @@ module UnpackStrategy
 
   def self.strategies
     @strategies ||= [
-      Air, # needs to be before Zip
-      Jar, # needs to be before Zip
-      LuaRock, # needs to be before Zip
-      MicrosoftOfficeXml, # needs to be before Zip
-      Zip, # needs to be before Tar
-      Pkg, # needs to be before Xar
-      Xar, # needs to be before Tar
       Tar, # needs to be before Bzip2/Gzip/Xz/Lzma
       Gzip,
       Lzma,
       Xz,
       Lzip,
+      Air, # needs to be before Zip
+      Jar, # needs to be before Zip
+      LuaRock, # needs to be before Zip
+      MicrosoftOfficeXml, # needs to be before Zip
+      Zip,
+      Pkg, # needs to be before Xar
+      Xar,
+      Ttf,
+      Otf,
       Executable,
       Git,
       Mercurial,
       Subversion,
       Cvs,
-      Ttf,
-      Otf,
       Dmg, # needs to be before Bzip2
       Bzip2,
       Fossil,
