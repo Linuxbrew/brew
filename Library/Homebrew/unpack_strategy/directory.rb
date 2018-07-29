@@ -2,7 +2,9 @@ module UnpackStrategy
   class Directory
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
+    using Magic
+
+    def self.can_extract?(path)
       path.directory?
     end
 

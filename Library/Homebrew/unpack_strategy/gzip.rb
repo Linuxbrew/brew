@@ -2,8 +2,10 @@ module UnpackStrategy
   class Gzip
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\A\037\213/n)
+    using Magic
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\A\037\213/n)
     end
 
     private

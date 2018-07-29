@@ -2,8 +2,10 @@ module UnpackStrategy
   class Lzma
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\A\]\000\000\200\000/n)
+    using Magic
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\A\]\000\000\200\000/n)
     end
 
     def extract_to_dir(unpack_dir, basename:, verbose:)

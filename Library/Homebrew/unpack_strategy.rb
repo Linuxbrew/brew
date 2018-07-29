@@ -1,7 +1,31 @@
 module UnpackStrategy
-  # length of the longest regex (currently Tar)
-  MAX_MAGIC_NUMBER_LENGTH = 262
-  private_constant :MAX_MAGIC_NUMBER_LENGTH
+  module Magic
+    # length of the longest regex (currently Tar)
+    MAX_MAGIC_NUMBER_LENGTH = 262
+
+    refine Pathname do
+      def magic_number
+        @magic_number ||= if directory?
+          ""
+        else
+          binread(MAX_MAGIC_NUMBER_LENGTH) || ""
+        end
+      end
+
+      def file_type
+        @file_type ||= system_command("file", args: ["-b", self], print_stderr: false)
+                       .stdout.chomp
+      end
+
+      def zipinfo
+        @zipinfo ||= system_command("zipinfo", args: ["-1", self], print_stderr: false)
+                     .stdout
+                     .encode(Encoding::UTF_8, invalid: :replace)
+                     .split("\n")
+      end
+    end
+  end
+  private_constant :Magic
 
   def self.strategies
     @strategies ||= [
@@ -18,7 +42,6 @@ module UnpackStrategy
       Xz,
       Lzip,
       Executable,
-      Diff,
       Git,
       Mercurial,
       Subversion,
@@ -54,14 +77,8 @@ module UnpackStrategy
   end
 
   def self.from_path(path)
-    magic_number = if path.directory?
-      ""
-    else
-      File.binread(path, MAX_MAGIC_NUMBER_LENGTH) || ""
-    end
-
     strategy = strategies.detect do |s|
-      s.can_extract?(path: path, magic_number: magic_number)
+      s.can_extract?(path)
     end
 
     # This is so that bad files produce good error messages.
@@ -127,7 +144,6 @@ require "unpack_strategy/bzip2"
 require "unpack_strategy/cab"
 require "unpack_strategy/compress"
 require "unpack_strategy/cvs"
-require "unpack_strategy/diff"
 require "unpack_strategy/directory"
 require "unpack_strategy/dmg"
 require "unpack_strategy/executable"

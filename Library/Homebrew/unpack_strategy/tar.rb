@@ -2,8 +2,14 @@ module UnpackStrategy
   class Tar
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      return true if magic_number.match?(/\A.{257}ustar/n)
+    using Magic
+
+    def self.can_extract?(path)
+      return true if path.magic_number.match?(/\A.{257}ustar/n)
+
+      unless [Bzip2, Gzip, Lzip, Xz].any? { |s| s.can_extract?(path) }
+        return false
+      end
 
       # Check if `tar` can list the contents, then it can also extract it.
       IO.popen(["tar", "tf", path], err: File::NULL) do |stdout|

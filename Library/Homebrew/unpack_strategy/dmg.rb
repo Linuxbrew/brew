@@ -4,6 +4,8 @@ module UnpackStrategy
   class Dmg
     include UnpackStrategy
 
+    using Magic
+
     module Bom
       DMG_METADATA = Set.new %w[
         .background
@@ -83,12 +85,21 @@ module UnpackStrategy
           end
 
           system_command! "ditto", args: ["--bom", bomfile.path, "--", path, unpack_dir]
+
+          FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*").reject(&:symlink?)
         end
       end
     end
     private_constant :Mount
 
-    def self.can_extract?(path:, magic_number:)
+    def self.can_extract?(path)
+      bzip2 = Bzip2.can_extract?(path)
+
+      zlib = path.magic_number.match?(/\A(\x78|\x08|\x18|\x28|\x38|\x48|\x58|\x68)/n) &&
+             (path.magic_number[0...2].unpack("S>").first % 31).zero?
+
+      return false unless bzip2 || zlib
+
       imageinfo = system_command("hdiutil",
                                  args: ["imageinfo", path],
                                  print_stderr: false).stdout

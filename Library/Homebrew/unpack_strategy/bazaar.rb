@@ -2,7 +2,9 @@ require_relative "directory"
 
 module UnpackStrategy
   class Bazaar < Directory
-    def self.can_extract?(path:, magic_number:)
+    using Magic
+
+    def self.can_extract?(path)
       super && (path/".bzr").directory?
     end
 

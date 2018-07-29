@@ -2,7 +2,9 @@ module UnpackStrategy
   class Air
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
+    using Magic
+
+    def self.can_extract?(path)
       path.extname == ".air"
     end
 

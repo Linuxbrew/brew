@@ -2,8 +2,10 @@ module UnpackStrategy
   class Lzip
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\ALZIP/n)
+    using Magic
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\ALZIP/n)
     end
 
     def dependencies

@@ -2,8 +2,10 @@ module UnpackStrategy
   class Zip
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\APK(\003\004|\005\006)/n)
+    using Magic
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\APK(\003\004|\005\006)/n)
     end
 
     private

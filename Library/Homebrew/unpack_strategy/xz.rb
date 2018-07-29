@@ -2,8 +2,10 @@ module UnpackStrategy
   class Xz
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\A\xFD7zXZ\x00/n)
+    using Magic
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\A\xFD7zXZ\x00/n)
     end
 
     def dependencies

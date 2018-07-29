@@ -2,7 +2,9 @@ module UnpackStrategy
   class GenericUnar
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
+    using Magic
+
+    def self.can_extract?(_path)
       false
     end
 
