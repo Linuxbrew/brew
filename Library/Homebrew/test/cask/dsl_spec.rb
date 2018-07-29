@@ -46,7 +46,7 @@ describe Hbc::DSL, :cask do
       let(:token) { "invalid/invalid-header-format" }
 
       it "raises an error" do
-        expect { cask }.to raise_error(SyntaxError)
+        expect { cask }.to raise_error(Hbc::CaskUnreadableError)
       end
     end
 
