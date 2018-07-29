@@ -554,18 +554,19 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", svn_escape(cached_location)))
+    info = system_command("svn", args:["info", "--xml"], chdir: cached_location.to_s).stdout
+    xml = REXML::Document.new(info)
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
   def last_commit
-    Utils.popen_read("svn", "info", "--show-item", "revision", svn_escape(cached_location)).strip
+    system_command("svn", args:["info", "--show-item", "revision"], chdir: cached_location.to_s).stdout.strip
   end
 
   private
 
   def repo_url
-    Utils.popen_read("svn", "info", svn_escape(cached_location)).strip[/^URL: (.+)$/, 1]
+    system_command("svn", args:["info"], chdir: cached_location.to_s).stdout.strip[/^URL: (.+)$/, 1]
   end
 
   def externals
@@ -580,7 +581,7 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     # This saves on bandwidth and will have a similar effect to verifying the
     # cache as it will make any changes to get the right revision.
     args = if target.directory?
-      ["svn", "update", svn_escape(target)]
+      ["cd", target.to_s, ";", "svn", "update"]
     else
       ["svn", "checkout", url, target]
     end
