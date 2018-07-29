@@ -5,7 +5,8 @@ module UnpackStrategy
     using Magic
 
     def self.can_extract?(path)
-      path.extname == ".air"
+      mime_type = "application/vnd.adobe.air-application-installer-package+zip"
+      path.magic_number.match?(/.{59}#{Regexp.escape(mime_type)}/)
     end
 
     def dependencies
