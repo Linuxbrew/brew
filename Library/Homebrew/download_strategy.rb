@@ -554,19 +554,19 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    info = system_command("svn", args:["info", "--xml"], chdir: cached_location.to_s).stdout
+    info = system_command("svn", args: ["info", "--xml"], chdir: cached_location.to_s).stdout
     xml = REXML::Document.new(info)
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
   def last_commit
-    system_command("svn", args:["info", "--show-item", "revision"], chdir: cached_location.to_s).stdout.strip
+    system_command("svn", args: ["info", "--show-item", "revision"], chdir: cached_location.to_s).stdout.strip
   end
 
   private
 
   def repo_url
-    system_command("svn", args:["info"], chdir: cached_location.to_s).stdout.strip[/^URL: (.+)$/, 1]
+    system_command("svn", args: ["info"], chdir: cached_location.to_s).stdout.strip[/^URL: (.+)$/, 1]
   end
 
   def externals
