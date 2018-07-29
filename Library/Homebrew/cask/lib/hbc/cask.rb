@@ -17,7 +17,11 @@ module Hbc
       return to_enum unless block_given?
 
       Tap.flat_map(&:cask_files).each do |f|
-        yield CaskLoader::FromTapPathLoader.new(f).load
+        begin
+          yield CaskLoader::FromTapPathLoader.new(f).load
+        rescue CaskUnreadableError => e
+          opoo e.message
+        end
       end
     end
 

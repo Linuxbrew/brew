@@ -54,7 +54,15 @@ module Hbc
 
         @content = IO.read(path)
 
-        instance_eval(content, path)
+        begin
+          instance_eval(content, path).tap do |cask|
+            unless cask.is_a?(Cask)
+              raise CaskUnreadableError.new(token, "'#{path}' does not contain a cask.")
+            end
+          end
+        rescue NameError, ArgumentError, ScriptError => e
+          raise CaskUnreadableError.new(token, e.message)
+        end
       end
 
       private
