@@ -111,29 +111,6 @@ module Hbc
     end
     alias == eql?
 
-    def dumpcask
-      odebug "Cask instance dumps in YAML:"
-      odebug "Cask instance toplevel:", to_yaml
-      [
-        :name,
-        :homepage,
-        :url,
-        :appcast,
-        :version,
-        :sha256,
-        :artifacts,
-        :caveats,
-        :depends_on,
-        :conflicts_with,
-        :container,
-        :gpg,
-        :accessibility_access,
-        :auto_updates,
-      ].each do |method|
-        odebug "Cask instance method '#{method}':", send(method).to_yaml
-      end
-    end
-
     def to_h
       {
         "name" => name,
