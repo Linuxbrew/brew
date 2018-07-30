@@ -19,11 +19,11 @@ module Homebrew
   module_function
 
   def extract
-  	Homebrew::CLI::Parser.parse do
+    Homebrew::CLI::Parser.parse do
       switch      "--stdout", description: "Output to stdout on terminal instead of file"
       switch      :debug
       switch      :force
-	  end
+    end
 
     odie "Cannot use a tap and --stdout at the same time!" if ARGV.named.length == 3 && args.stdout?
     raise UsageError unless (ARGV.named.length == 3 && !args.stdout?) || (ARGV.named.length == 2 && args.stdout?)
@@ -31,7 +31,7 @@ module Homebrew
     formula = Formulary.factory(ARGV.named.first)
     version = ARGV.named[1]
     destination_tap = Tap.fetch(ARGV.named[2]) unless args.stdout?
-    destination_tap.install unless destination_tap.installed? unless args.stdout?
+    destination_tap.install unless destination_tap.installed? || args.stdout?
 
     unless args.stdout?
       path = Pathname.new("#{destination_tap.path}/Formula/#{formula}@#{version}.rb")
