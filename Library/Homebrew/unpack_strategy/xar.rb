@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      [".xar"]
+    end
+
     def self.can_extract?(path)
       path.magic_number.match?(/\Axar!/n)
     end

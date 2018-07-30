@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      [".lzma"]
+    end
+
     def self.can_extract?(path)
       path.magic_number.match?(/\A\]\000\000\200\000/n)
     end

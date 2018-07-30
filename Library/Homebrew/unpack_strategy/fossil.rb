@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      []
+    end
+
     def self.can_extract?(path)
       return false unless path.magic_number.match?(/\ASQLite format 3\000/n)
 

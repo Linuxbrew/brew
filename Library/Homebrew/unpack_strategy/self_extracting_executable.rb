@@ -4,10 +4,13 @@ module UnpackStrategy
   class SelfExtractingExecutable < GenericUnar
     using Magic
 
-    def self.can_extract?(path)
-      return false unless path.magic_number.match?(/\AMZ/n)
+    def self.extensions
+      []
+    end
 
-      path.file_type.include?("self-extracting archive")
+    def self.can_extract?(path)
+      path.magic_number.match?(/\AMZ/n) &&
+        path.file_type.include?("self-extracting archive")
     end
   end
 end

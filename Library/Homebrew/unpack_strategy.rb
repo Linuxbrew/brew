@@ -43,17 +43,17 @@ module UnpackStrategy
       Xar,
       Ttf,
       Otf,
-      Executable,
       Git,
       Mercurial,
       Subversion,
       Cvs,
+      SelfExtractingExecutable, # needs to be before Cab
+      Cab,
+      Executable,
       Dmg, # needs to be before Bzip2
       Bzip2,
       Fossil,
       Bazaar,
-      SelfExtractingExecutable, # needs to be before Cab
-      Cab,
       Compress,
       P7Zip,
       Sit,
@@ -77,19 +77,14 @@ module UnpackStrategy
   end
 
   def self.from_path(path)
-    strategy = strategies.detect do |s|
-      s.can_extract?(path)
-    end
+    strategy = strategies
+               .sort_by { |s| s.extensions.map(&:length).max(0) }
+               .reverse
+               .detect { |s| s.extensions.include?(path.extname) }
 
-    # This is so that bad files produce good error messages.
-    strategy ||= case path.extname
-    when ".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tbz", ".tar.xz", ".txz"
-      Tar
-    when ".zip"
-      Zip
-    else
-      Uncompressed
-    end
+    strategy ||= strategies.detect { |s| s.can_extract?(path) }
+
+    strategy ||= Uncompressed
 
     strategy
   end

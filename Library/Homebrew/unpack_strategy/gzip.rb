@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      [".gz"]
+    end
+
     def self.can_extract?(path)
       path.magic_number.match?(/\A\037\213/n)
     end

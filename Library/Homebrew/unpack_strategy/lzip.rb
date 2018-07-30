@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      [".lz"]
+    end
+
     def self.can_extract?(path)
       path.magic_number.match?(/\ALZIP/n)
     end

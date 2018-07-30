@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      []
+    end
+
     def self.can_extract?(_path)
       false
     end

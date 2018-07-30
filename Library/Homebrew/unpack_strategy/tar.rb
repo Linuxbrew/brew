@@ -4,6 +4,16 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      [
+        ".tar",
+        ".tbz", ".tbz2", ".tar.bz2",
+        ".tgz", ".tar.gz",
+        ".tlz", ".tar.lz",
+        ".txz", ".tar.xz"
+      ]
+    end
+
     def self.can_extract?(path)
       return true if path.magic_number.match?(/\A.{257}ustar/n)
 

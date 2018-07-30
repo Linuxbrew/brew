@@ -4,6 +4,14 @@ module UnpackStrategy
   class MicrosoftOfficeXml < Uncompressed
     using Magic
 
+    def self.extensions
+      [
+        ".doc", ".docx",
+        ".ppt", ".pptx",
+        ".xls", ".xlsx"
+      ]
+    end
+
     def self.can_extract?(path)
       return false unless Zip.can_extract?(path)
 

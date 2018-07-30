@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      [".rar"]
+    end
+
     def self.can_extract?(path)
       path.magic_number.match?(/\ARar!/n)
     end

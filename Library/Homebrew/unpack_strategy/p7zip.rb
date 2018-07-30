@@ -4,6 +4,10 @@ module UnpackStrategy
 
     using Magic
 
+    def self.extensions
+      [".7z"]
+    end
+
     def self.can_extract?(path)
       path.magic_number.match?(/\A7z\xBC\xAF\x27\x1C/n)
     end
