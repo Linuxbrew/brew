@@ -30,7 +30,17 @@ module UnpackStrategy
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      system_command! "tar", args: ["xf", path, "-C", unpack_dir]
+      Dir.mktmpdir do |tmpdir|
+        tar_path = path
+
+        if DependencyCollector.tar_needs_xz_dependency? && Xz.can_extract?(path)
+          tmpdir = Pathname(tmpdir)
+          Xz.new(path).extract(to: tmpdir)
+          tar_path = tmpdir.children.first
+        end
+
+        system_command! "tar", args: ["xf", tar_path, "-C", unpack_dir]
+      end
     end
   end
 end
