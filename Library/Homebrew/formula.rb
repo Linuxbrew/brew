@@ -385,8 +385,12 @@ class Formula
     return [] if versioned_formula?
 
     Pathname.glob(path.to_s.gsub(/\.rb$/, "@*.rb")).map do |path|
-      Formula[path.basename(".rb").to_s]
-    end.sort
+      begin
+        Formula[path.basename(".rb").to_s]
+      rescue FormulaUnavailableError
+        nil
+      end
+    end.compact.sort
   end
 
   # A named Resource for the currently active {SoftwareSpec}.
