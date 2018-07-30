@@ -9,7 +9,9 @@ module UnpackStrategy
     private
 
     def extract_to_dir(unpack_dir, basename:, verbose:)
-      system_command! "svn", args: ["export", "--force", path, unpack_dir]
+      system_command! "svn",
+                      args: ["export", "--force", ".", unpack_dir],
+                      chdir: path.to_s
     end
   end
 end

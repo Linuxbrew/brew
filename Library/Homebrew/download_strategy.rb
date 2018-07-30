@@ -554,18 +554,19 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def source_modified_time
-    xml = REXML::Document.new(Utils.popen_read("svn", "info", "--xml", cached_location.to_s))
+    info = system_command("svn", args: ["info", "--xml"], chdir: cached_location.to_s).stdout
+    xml = REXML::Document.new(info)
     Time.parse REXML::XPath.first(xml, "//date/text()").to_s
   end
 
   def last_commit
-    Utils.popen_read("svn", "info", "--show-item", "revision", cached_location.to_s).strip
+    system_command("svn", args: ["info", "--show-item", "revision"], chdir: cached_location.to_s).stdout.strip
   end
 
   private
 
   def repo_url
-    Utils.popen_read("svn", "info", cached_location.to_s).strip[/^URL: (.+)$/, 1]
+    system_command("svn", args: ["info"], chdir: cached_location.to_s).stdout.strip[/^URL: (.+)$/, 1]
   end
 
   def externals
@@ -576,19 +577,20 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
   end
 
   def fetch_repo(target, url, revision = nil, ignore_externals = false)
-    # Use "svn up" when the repository already exists locally.
+    # Use "svn update" when the repository already exists locally.
     # This saves on bandwidth and will have a similar effect to verifying the
     # cache as it will make any changes to get the right revision.
-    svncommand = target.directory? ? "up" : "checkout"
-    args = ["svn", svncommand]
-    args << url unless target.directory?
-    args << target
+    args = []
     if revision
       ohai "Checking out #{@ref}"
       args << "-r" << revision
     end
     args << "--ignore-externals" if ignore_externals
-    safe_system(*args)
+    if target.directory?
+      system_command("svn", args: ["update", *args], chdir: target.to_s)
+    else
+      system_command("svn", args: ["checkout", url, target, *args])
+    end
   end
 
   def cache_tag
