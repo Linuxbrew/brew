@@ -66,6 +66,7 @@ module UnpackStrategy
   def self.from_type(type)
     type = {
       naked: :uncompressed,
+      nounzip: :uncompressed,
       seven_zip: :p7zip,
     }.fetch(type, type)
 
@@ -76,21 +77,30 @@ module UnpackStrategy
     end
   end
 
-  def self.from_path(path)
-    strategy = strategies
-               .sort_by { |s| s.extensions.map(&:length).max(0) }
-               .reverse
-               .detect { |s| s.extensions.include?(path.extname) }
+  def self.from_extension(extension)
+    strategies.sort_by { |s| s.extensions.map(&:length).max(0) }
+              .reverse
+              .detect { |s| s.extensions.any? { |ext| extension.end_with?(ext) } }
+  end
 
-    strategy ||= strategies.detect { |s| s.can_extract?(path) }
+  def self.from_magic(path)
+    strategies.detect { |s| s.can_extract?(path) }
+  end
+
+  def self.detect(path, extension_only: false, type: nil, ref_type: nil, ref: nil)
+    strategy = from_type(type) if type
+
+    if extension_only
+      strategy ||= from_extension(path.extname)
+      strategy ||= strategies.select { |s| s < Directory || s == Fossil }
+                             .detect { |s| s.can_extract?(path) }
+    else
+      strategy ||= from_magic(path)
+      strategy ||= from_extension(path.extname)
+    end
 
     strategy ||= Uncompressed
 
-    strategy
-  end
-
-  def self.detect(path, type: nil, ref_type: nil, ref: nil)
-    strategy = type ? from_type(type) : from_path(path)
     strategy.new(path, ref_type: ref_type, ref: ref)
   end
 
@@ -109,7 +119,7 @@ module UnpackStrategy
     extract_to_dir(unpack_dir, basename: basename, verbose: verbose)
   end
 
-  def extract_nestedly(to: nil, basename: nil, verbose: false)
+  def extract_nestedly(to: nil, basename: nil, verbose: false, extension_only: false)
     Dir.mktmpdir do |tmp_unpack_dir|
       tmp_unpack_dir = Pathname(tmp_unpack_dir)
 
@@ -118,9 +128,9 @@ module UnpackStrategy
       children = tmp_unpack_dir.children
 
       if children.count == 1 && !children.first.directory?
-        s = UnpackStrategy.detect(children.first)
+        s = UnpackStrategy.detect(children.first, extension_only: extension_only)
 
-        s.extract_nestedly(to: to, verbose: verbose)
+        s.extract_nestedly(to: to, verbose: verbose, extension_only: extension_only)
         next
       end
 
