@@ -727,14 +727,14 @@ Open all of Homebrew for editing\.
 Open \fIformula\fR in the editor\.
 .
 .TP
-\fBextract\fR [\fB\-\-force\fR] [\fB\-\-stdout\fR] \fIformula\fR \fIversion\fR [\fItap\fR]
-Looks through repository history to find the \fIversion\fR of \fIformula\fR and creates a copy in \fItap\fR/Formula/\fIformula\fR@\fIversion\fR\.rb\. If the tap is not installed yet, attempts to install/clone the tap before continuing\.
+\fBextract\fR [\fB\-\-force\fR] \fIformula\fR \fB\-\-tap=\fR\fItap\fR [\fB\-\-version=\fR\fIversion\fR]
+Looks through repository history to find the \fIversion\fR of \fIformula\fR and creates a copy in \fItap\fR/Formula/\fIformula\fR@\fIversion\fR\.rb\. If the tap is not installed yet, attempts to install/clone the tap before continuing\. A tap must be passed through \fB\-\-tap\fR in order for \fBextract\fR to work\.
 .
 .IP
 If \fB\-\-force\fR is passed, the file at the destination will be overwritten if it already exists\. Otherwise, existing files will be preserved\.
 .
 .IP
-If \fB\-\-stdout\fR is passed, the file will be written to stdout on the terminal instead of written to a file\. A \fItap\fR cannot be passed when using \fB\-\-stdout\fR\.
+If an argument is passed through \fB\-\-version\fR, \fIversion\fR of \fIformula\fR will be extracted and placed in the destination tap\. Otherwise, the most recent version that can be found will be used\.
 .
 .TP
 \fBformula\fR \fIformula\fR
