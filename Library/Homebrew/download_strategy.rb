@@ -293,10 +293,7 @@ end
 # Detect and download from Apache Mirror
 class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
   def apache_mirrors
-    mirrors, = Open3.capture3(
-      *curl_args(*_curl_opts, "--silent", "--location", "#{@url}&asjson=1"),
-    )
-
+    mirrors, = curl_output(*_curl_opts, "--silent", "--location", "#{@url}&asjson=1")
     JSON.parse(mirrors)
   end
 

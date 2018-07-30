@@ -1,53 +1,58 @@
 describe SystemCommand do
   describe "#initialize" do
     let(:env_args) { ["bash", "-c", 'printf "%s" "${A?}" "${B?}" "${C?}"'] }
+    let(:env) { { "A" => "1", "B" => "2", "C" => "3" } }
+    let(:sudo) { false }
+
+    subject(:command) {
+      described_class.new(
+        "env",
+        args: env_args,
+        env: env,
+        must_succeed: true,
+        sudo: sudo,
+      )
+    }
 
     context "when given some environment variables" do
-      subject {
-        described_class.new(
-          "env",
-          args: env_args,
-          env: { "A" => "1", "B" => "2", "C" => "3" },
-          must_succeed: true,
-        )
-      }
-
       its("run!.stdout") { is_expected.to eq("123") }
 
       describe "the resulting command line" do
         it "includes the given variables explicitly" do
           expect(Open3)
             .to receive(:popen3)
-            .with(["env", "env"], "A=1", "B=2", "C=3", "env", *env_args, {})
+            .with(an_instance_of(Hash), "env", "A=1", "B=2", "C=3", "env", *env_args, {})
             .and_call_original
 
-          subject.run!
+          command.run!
         end
       end
     end
 
+    context "when given an environment variable which is set to nil" do
+      let(:env) { { "A" => "1", "B" => "2", "C" => nil } }
+
+      it "unsets them" do
+        expect {
+          command.run!
+        }.to raise_error(/C: parameter null or not set/)
+      end
+    end
+
     context "when given some environment variables and sudo: true" do
-      subject {
-        described_class.new(
-          "env",
-          args: env_args,
-          env: { "A" => "1", "B" => "2", "C" => "3" },
-          must_succeed: true,
-          sudo: true,
-        )
-      }
+      let(:sudo) { true }
 
       describe "the resulting command line" do
         it "includes the given variables explicitly" do
           expect(Open3)
             .to receive(:popen3)
-            .with(["/usr/bin/sudo", "/usr/bin/sudo"], "-E", "--",
+            .with(an_instance_of(Hash), "/usr/bin/sudo", "-E", "--",
                   "env", "A=1", "B=2", "C=3", "env", *env_args, {})
             .and_wrap_original do |original_popen3, *_, &block|
               original_popen3.call("true", &block)
             end
 
-          subject.run!
+          command.run!
         end
       end
     end
@@ -214,6 +219,13 @@ describe SystemCommand do
       expect {
         described_class.run("non_existent_executable")
       }.not_to raise_error
+    end
+
+    it 'does not format `stderr` when it starts with \r' do
+      expect {
+        system_command "bash",
+                       args: ["-c", 'printf "\r%s" "###################                                                       27.6%" 1>&2']
+      }.to output("\r###################                                                       27.6%").to_stderr
     end
   end
 end

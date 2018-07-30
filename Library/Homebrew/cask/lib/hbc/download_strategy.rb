@@ -106,10 +106,10 @@ module Hbc
           LockFile.new(temporary_path.basename).with_lock do
             _fetch
           end
-        rescue ErrorDuringExecution
+        rescue ErrorDuringExecution => e
           # 33 == range not supported
           # try wiping the incomplete download and retrying once
-          if $CHILD_STATUS.exitstatus == 33 && had_incomplete_download
+          if e.status.exitstatus == 33 && had_incomplete_download
             ohai "Trying a full download"
             temporary_path.unlink
             had_incomplete_download = false
