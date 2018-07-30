@@ -7,11 +7,15 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def formula
-    Homebrew::CLI::Parser.parse do
+  def formula_args
+    Homebrew::CLI::Parser.new do
       switch :debug
       switch :verbose
     end
+  end
+
+  def formula
+    formula_args.parse
 
     raise FormulaUnspecifiedError if ARGV.named.empty?
 

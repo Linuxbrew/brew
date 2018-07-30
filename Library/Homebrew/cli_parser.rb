@@ -94,10 +94,11 @@ module Homebrew
         @parser.to_s
       end
 
-      def parse(cmdline_args)
+      def parse(cmdline_args = ARGV)
         remaining_args = @parser.parse(cmdline_args)
         check_constraint_violations
         Homebrew.args[:remaining] = remaining_args
+        @parser
       end
 
       private

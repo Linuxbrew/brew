@@ -11,6 +11,7 @@ require "formula"
 require "erb"
 require "ostruct"
 require "cli_parser"
+require "dev-cmd/audit"
 
 module Homebrew
   module_function
@@ -19,11 +20,15 @@ module Homebrew
   TARGET_MAN_PATH = HOMEBREW_REPOSITORY/"manpages"
   TARGET_DOC_PATH = HOMEBREW_REPOSITORY/"docs"
 
-  def man
-    Homebrew::CLI::Parser.parse do
+  def man_args
+    Homebrew::CLI::Parser.new do
       switch "--fail-if-changed"
       switch "--link"
     end
+  end
+
+  def man
+    man_args.parse
 
     raise UsageError unless ARGV.named.empty?
 
@@ -64,7 +69,7 @@ module Homebrew
     variables = OpenStruct.new
 
     variables[:commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/cmd/*.{rb,sh}")
-    variables[:developer_commands] = path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
+    variables[:developer_commands] = [Homebrew.send(:audit_args).summary] + path_glob_commands("#{HOMEBREW_LIBRARY_PATH}/dev-cmd/*.{rb,sh}")
     readme = HOMEBREW_REPOSITORY/"README.md"
     variables[:lead_maintainer] =
       readme.read[/(Homebrew's lead maintainer .*\.)/, 1]

@@ -21,8 +21,8 @@ require "fileutils"
 module Homebrew
   module_function
 
-  def tests
-    Homebrew::CLI::Parser.parse do
+  def tests_args
+    Homebrew::CLI::Parser.new do
       switch "--no-compat"
       switch "--generic"
       switch "--coverage"
@@ -32,6 +32,9 @@ module Homebrew
       flag   "--only="
       flag   "--seed="
     end
+  end
+  def tests
+    tests_args.parse
 
     HOMEBREW_LIBRARY_PATH.cd do
       ENV.delete("HOMEBREW_COLOR")

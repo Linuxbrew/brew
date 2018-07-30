@@ -15,11 +15,15 @@ module Homebrew
     path.write content
   end
 
-  def tap_new
-    Homebrew::CLI::Parser.parse do
+  def tap_new_args
+    Homebrew::CLI::Parser.new do
       switch :debug
       switch :verbose
     end
+  end
+
+  def tap_new
+    tap_new_args.parse
 
     raise "A tap argument is required" if ARGV.named.empty?
 

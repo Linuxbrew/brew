@@ -10,12 +10,16 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def edit
-    Homebrew::CLI::Parser.parse do
+  def edit_args
+    Homebrew::CLI::Parser.new do
       switch :force
       switch :verbose
       switch :debug
     end
+  end
+
+  def edit
+    edit_args.parse
 
     unless (HOMEBREW_REPOSITORY/".git").directory?
       raise <<~EOS

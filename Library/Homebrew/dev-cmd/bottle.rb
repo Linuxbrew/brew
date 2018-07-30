@@ -69,8 +69,8 @@ MAXIMUM_STRING_MATCHES = 100
 module Homebrew
   module_function
 
-  def bottle
-    Homebrew::CLI::Parser.parse do
+  def bottle_args
+    Homebrew::CLI::Parser.new do
       switch "--merge"
       switch "--skip-relocation"
       switch "--force-core-tap"
@@ -84,6 +84,10 @@ module Homebrew
       switch :debug
       flag   "--root-url"
     end
+  end
+
+  def bottle
+    bottle_args.parse
 
     return merge if args.merge?
 

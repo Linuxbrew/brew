@@ -19,8 +19,8 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def update_test
-    Homebrew::CLI::Parser.parse do
+  def update_test_args
+    Homebrew::CLI::Parser.new do
       switch "--to-tag"
       switch "--keep-tmp"
       switch :verbose
@@ -28,6 +28,10 @@ module Homebrew
       flag   "--commit="
       flag   "--before="
     end
+  end
+
+  def update_test
+    update_test_args.parse
 
     ENV["HOMEBREW_UPDATE_TEST"] = "1"
 

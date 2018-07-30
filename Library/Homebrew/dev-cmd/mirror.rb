@@ -7,11 +7,15 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def mirror
-    Homebrew::CLI::Parser.parse do
+  def mirror_args
+    Homebrew::CLI::Parser.new do
       switch :debug
       switch :verbose
     end
+  end
+
+  def mirror
+    mirror_args.parse
 
     odie "This command requires at least formula argument!" if ARGV.named.empty?
 

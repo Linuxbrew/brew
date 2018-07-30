@@ -47,8 +47,8 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def bump_formula_pr
-    Homebrew::CLI::Parser.parse do
+  def bump_formula_pr_args
+    Homebrew::CLI::Parser.new do
       switch    "--devel"
       switch    "-n", "--dry-run"
       switch    "--write"
@@ -70,6 +70,10 @@ module Homebrew
 
       conflicts "--url", "--tag"
     end
+  end
+
+  def bump_formula_pr
+    bump_formula_pr_args.parse
 
     # As this command is simplifying user run commands then let's just use a
     # user path, too.

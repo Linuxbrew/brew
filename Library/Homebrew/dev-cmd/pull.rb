@@ -72,10 +72,8 @@ end
 module Homebrew
   module_function
 
-  def pull
-    odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
-
-    Homebrew::CLI::Parser.parse do
+  def pull_args
+    Homebrew::CLI::Parser.new do
       switch "--bottle"
       switch "--bump"
       switch "--clean"
@@ -90,6 +88,12 @@ module Homebrew
       flag   "--bintray-org="
       flag   "--test-bot-user="
     end
+  end
+
+  def pull
+    odie "You meant `git pull --rebase`." if ARGV[0] == "--rebase"
+
+    pull_args.parse
 
     if ARGV.named.empty?
       odie "This command requires at least one argument containing a URL or pull request number"

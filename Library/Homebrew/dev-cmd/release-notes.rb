@@ -10,10 +10,13 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def release_notes
-    Homebrew::CLI::Parser.parse do
+  def release_notes_args
+    Homebrew::CLI::Parser.new do
       switch "--markdown"
     end
+  end
+  def release_notes
+    release_notes_args.parse
 
     previous_tag = ARGV.named.first
     previous_tag ||= Utils.popen_read(

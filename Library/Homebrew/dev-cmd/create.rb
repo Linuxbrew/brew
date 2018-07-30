@@ -27,9 +27,8 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  # Create a formula from a tarball URL
-  def create
-    Homebrew::CLI::Parser.parse do
+  def create_args
+    Homebrew::CLI::Parser.new do
       switch "--autotools"
       switch "--cmake"
       switch "--meson"
@@ -42,6 +41,12 @@ module Homebrew
       flag   "--set-version="
       flag   "--tap="
     end
+  end
+
+  # Create a formula from a tarball URL
+  def create
+    create_args.parse
+
     raise UsageError if ARGV.named.empty?
 
     # Ensure that the cache exists so we can fetch the tarball

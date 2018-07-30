@@ -52,8 +52,8 @@ require "cli_parser"
 module Homebrew
   module_function
 
-  def audit
-    Homebrew::CLI::Parser.parse do
+  def audit_args
+    Homebrew::CLI::Parser.new do
       banner <<~EOS
         Usage: brew audit [options] [<formulae>]
 
@@ -61,6 +61,7 @@ module Homebrew
         run before submitting a new formula.
 
         If no <formulae> are provided, all of them are checked.
+
       EOS
       switch      "--strict", description: "Run additional style checks, including Rubocop style checks."
       switch      "--online", description: "Run additional slower style checks that require a\nnetwork connection."
@@ -76,6 +77,10 @@ module Homebrew
       switch      :verbose
       switch      :debug
     end
+  end
+
+  def audit
+    audit_args.parse
 
     Homebrew.auditing = true
     inject_dump_stats!(FormulaAuditor, /^audit_/) if args.audit_debug?
