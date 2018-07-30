@@ -580,17 +580,17 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     # Use "svn update" when the repository already exists locally.
     # This saves on bandwidth and will have a similar effect to verifying the
     # cache as it will make any changes to get the right revision.
-    args = if target.directory?
-      ["cd", target.to_s, ";", "svn", "update"]
-    else
-      ["svn", "checkout", url, target]
-    end
+    args = target.directory? ? ["update"] : ["checkout", url, target]
     if revision
       ohai "Checking out #{@ref}"
       args << "-r" << revision
     end
     args << "--ignore-externals" if ignore_externals
-    safe_system(*args)
+    if args[0] == "update"
+      system_command("svn", args: args, chdir: target.to_s)
+    else
+      system_command("svn", args: args)
+    end
   end
 
   def cache_tag
