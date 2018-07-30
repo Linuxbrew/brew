@@ -39,7 +39,7 @@ describe "download strategies", :cask do
       let(:url_options) { { user_agent: "Mozilla/25.0.1" } }
 
       it "adds the appropriate curl args" do
-        expect(downloader).to receive(:system_command!) { |*, args:, **|
+        expect(downloader).to receive(:safe_system) { |*args|
           expect(args.each_cons(2)).to include(["--user-agent", "Mozilla/25.0.1"])
         }
 
@@ -53,7 +53,7 @@ describe "download strategies", :cask do
       let(:url_options) { { user_agent: :fake } }
 
       it "adds the appropriate curl args" do
-        expect(downloader).to receive(:system_command!) { |*, args:, **|
+        expect(downloader).to receive(:safe_system) { |*args|
           expect(args.each_cons(2).to_a).to include(["--user-agent", a_string_matching(/Mozilla.*Mac OS X 10.*AppleWebKit/)])
         }
 

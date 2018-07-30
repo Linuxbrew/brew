@@ -11,7 +11,7 @@ def curl_executable
 end
 
 def curl_args(*extra_args, show_output: false, user_agent: :default)
-  args = []
+  args = [curl_executable.to_s]
 
   # do not load .curlrc unless requested (must be the first argument)
   args << "-q" unless ENV["HOMEBREW_CURLRC"]
@@ -40,18 +40,18 @@ end
 def curl(*args)
   # SSL_CERT_FILE can be incorrectly set by users or portable-ruby and screw
   # with SSL downloads so unset it here.
-  system_command! curl_executable,
-                  args: curl_args(*args),
-                  env: { "SSL_CERT_FILE" => nil }
+  with_env SSL_CERT_FILE: nil do
+    safe_system(*curl_args(*args))
+  end
 end
 
 def curl_download(*args, to: nil, continue_at: "-", **options)
   had_incomplete_download ||= File.exist?(to)
   curl("--location", "--remote-time", "--continue-at", continue_at.to_s, "--output", to, *args, **options)
-rescue ErrorDuringExecution => e
+rescue ErrorDuringExecution
   # `curl` error 33: HTTP server doesn't seem to support byte ranges. Cannot resume.
   # HTTP status 416: Requested range not satisfiable
-  if (e.status.exitstatus == 33 || had_incomplete_download) && continue_at == "-"
+  if ($CHILD_STATUS.exitstatus == 33 || had_incomplete_download) && continue_at == "-"
     continue_at = 0
     had_incomplete_download = false
     retry
@@ -61,9 +61,7 @@ rescue ErrorDuringExecution => e
 end
 
 def curl_output(*args, **options)
-  system_command(curl_executable,
-                 args: curl_args(*args, show_output: true, **options),
-                 print_stderr: false)
+  Open3.capture3(*curl_args(*args, show_output: true, **options))
 end
 
 def curl_check_http_content(url, user_agents: [:default], check_content: false, strict: false, require_http: false)
