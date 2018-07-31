@@ -982,14 +982,6 @@ module Homebrew
 
       return unless using
 
-      if using == :ssl3 || \
-         (Object.const_defined?("CurlSSL3DownloadStrategy") && using == CurlSSL3DownloadStrategy)
-        problem "The SSL3 download strategy is deprecated, please choose a different URL"
-      elsif (Object.const_defined?("CurlUnsafeDownloadStrategy") && using == CurlUnsafeDownloadStrategy) || \
-            (Object.const_defined?("UnsafeSubversionDownloadStrategy") && using == UnsafeSubversionDownloadStrategy)
-        problem "#{using.name} is deprecated, please choose a different URL"
-      end
-
       if using == :cvs
         mod = specs[:module]
 

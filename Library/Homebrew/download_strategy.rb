@@ -1136,7 +1136,6 @@ class DownloadStrategyDetector
     when :bzr     then BazaarDownloadStrategy
     when :svn     then SubversionDownloadStrategy
     when :curl    then CurlDownloadStrategy
-    when :ssl3    then CurlSSL3DownloadStrategy
     when :cvs     then CVSDownloadStrategy
     when :post    then CurlPostDownloadStrategy
     when :fossil  then FossilDownloadStrategy
