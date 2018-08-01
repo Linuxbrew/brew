@@ -64,7 +64,9 @@ class Resource
   end
 
   def download_name
-    name.nil? ? owner.name : "#{owner.name}--#{escaped_name}"
+    return owner.name if name.nil?
+    return escaped_name if owner.nil?
+    "#{owner.name}--#{escaped_name}"
   end
 
   def cached_download
