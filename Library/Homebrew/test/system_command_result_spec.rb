@@ -1,8 +1,22 @@
 require "system_command"
 
 describe SystemCommand::Result do
+  describe "#to_ary" do
+    subject(:result) {
+      described_class.new([], "output", "error", instance_double(Process::Status, exitstatus: 0, success?: true))
+    }
+
+    it "can be destructed like `Open3.capture3`" do
+      out, err, status = result
+
+      expect(out).to eq "output"
+      expect(err).to eq "error"
+      expect(status).to be_a_success
+    end
+  end
+
   describe "#plist" do
-    subject { described_class.new(command, stdout, "", 0).plist }
+    subject { described_class.new(command, stdout, "", instance_double(Process::Status, exitstatus: 0)).plist }
 
     let(:command) { ["true"] }
     let(:garbage) {

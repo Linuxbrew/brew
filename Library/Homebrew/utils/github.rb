@@ -131,13 +131,12 @@ module GitHub
     # This is a no-op if the user is opting out of using the GitHub API.
     return block_given? ? yield({}) : {} if ENV["HOMEBREW_NO_GITHUB_API"]
 
-    args = %W[--header application/vnd.github.v3+json --write-out \n%{http_code}] # rubocop:disable Lint/NestedPercentLiteral
-    args += curl_args
+    args = ["--header", "application/vnd.github.v3+json", "--write-out", "\n%{http_code}"]
 
     token, username = api_credentials
     case api_credentials_type
     when :keychain
-      args += %W[--user #{username}:#{token}]
+      args += ["--user", "#{username}:#{token}"]
     when :environment
       args += ["--header", "Authorization: token #{token}"]
     end
@@ -162,7 +161,7 @@ module GitHub
 
       args += ["--dump-header", headers_tmpfile.path]
 
-      output, errors, status = curl_output(url.to_s, "--location", *args)
+      output, errors, status = curl_output("--location", url.to_s, *args)
       output, _, http_code = output.rpartition("\n")
       output, _, http_code = output.rpartition("\n") if http_code == "000"
       headers = headers_tmpfile.read
