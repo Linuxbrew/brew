@@ -105,7 +105,7 @@ module Formulary
         formula_name = File.basename(bottle_name)[/(.+)-/, 1]
         resource = Resource.new(formula_name) { url bottle_name }
         resource.specs[:bottle] = true
-        downloader = CurlDownloadStrategy.new resource.name, resource
+        downloader = CurlDownloadStrategy.new(resource.download_name, resource.version, resource)
         cached = downloader.cached_location.exist?
         downloader.fetch
         ohai "Pouring the cached bottle" if cached

@@ -30,10 +30,6 @@ class Resource
       @resource.specs
     end
 
-    def version
-      @resource.version
-    end
-
     def mirrors
       @resource.mirrors
     end
@@ -57,7 +53,7 @@ class Resource
   end
 
   def downloader
-    download_strategy.new(download_name, Download.new(self))
+    download_strategy.new(download_name, version, Download.new(self))
   end
 
   # Removes /s from resource names; this allows go package names
