@@ -42,6 +42,7 @@ def curl(*args)
   # with SSL downloads so unset it here.
   system_command! curl_executable,
                   args: curl_args(*args),
+                  print_stdout: true,
                   env: { "SSL_CERT_FILE" => nil }
 end
 
