@@ -253,6 +253,8 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
       ohai "Downloading from #{url}"
     end
 
+    temporary_path.dirname.mkpath
+
     curl_download resolved_url(url), to: temporary_path
   end
 
