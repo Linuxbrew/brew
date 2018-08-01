@@ -26,11 +26,8 @@ module Utils
         ignore_interrupts(:quietly) do # the child will receive the interrupt and marshal it back
           begin
             socket = server.accept_nonblock
-          # rubocop:disable Lint/ShadowedException
-          # FIXME: https://github.com/bbatsov/rubocop/issues/4843
           rescue Errno::EAGAIN, Errno::EWOULDBLOCK, Errno::ECONNABORTED, Errno::EPROTO, Errno::EINTR
             retry unless Process.waitpid(pid, Process::WNOHANG)
-          # rubocop:enable Lint/ShadowedException
           else
             socket.send_io(write)
             socket.close
