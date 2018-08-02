@@ -1,4 +1,3 @@
-require "cgi"
 require "json"
 require "rexml/document"
 require "time"
@@ -268,7 +267,7 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     args = []
 
     if meta.key?(:cookies)
-      escape_cookie = ->(k, v) { "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}" }
+      escape_cookie = ->(cookie) { URI.encode_www_form([cookie]) }
       args += ["-b", meta.fetch(:cookies).map(&escape_cookie).join(";")]
     end
 
@@ -343,7 +342,7 @@ end
 class CurlPostDownloadStrategy < CurlDownloadStrategy
   def _fetch
     base_url, data = if meta.key?(:data)
-      escape_data = ->(k, v) { ["-d", "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"] }
+      escape_data = ->(d) { ["-d", URI.encode_www_form([d])] }
       [@url, meta[:data].flat_map(&escape_data)]
     else
       @url.split("?", 2)
