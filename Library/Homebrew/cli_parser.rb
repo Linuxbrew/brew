@@ -23,6 +23,16 @@ module Homebrew
       def post_initialize
         @parser.on_tail("-h", "--help", "Show this message") do
           puts @parser
+          xyz = @parser.summarize([], 8, 44, " "*8).map do |r|
+            if r.match?(/^\s{12}\S/)
+              "\n" + r.gsub(" "*12, " "*8)
+            elsif r.start_with?(" "*17)
+              r.gsub(" "*17, " "*11)
+            else
+              "\n" + r
+            end
+          end
+          puts xyz
           exit
         end
       end
