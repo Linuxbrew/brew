@@ -239,7 +239,7 @@ describe CurlDownloadStrategy do
   let(:resource) { double(Resource, url: url, mirrors: [], specs: { user: "download:123456" }) }
 
   it "parses the opts and sets the corresponding args" do
-    expect(subject.send(:_curl_opts)).to eq(["--user", "download:123456"])
+    expect(subject.send(:_curl_args)).to eq(["--user", "download:123456"])
   end
 
   describe "#tarball_path" do

@@ -1,3 +1,4 @@
+require "cgi"
 require "json"
 require "rexml/document"
 require "time"
@@ -263,14 +264,29 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
 
   # Curl options to be always passed to curl,
   # with raw head calls (`curl --head`) or with actual `fetch`.
+  def _curl_args
+    args = []
+
+    if meta.key?(:cookies)
+      escape_cookie = ->(k, v) { "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}" }
+      args += ["-b", meta.fetch(:cookies).map(&escape_cookie).join(";")]
+    end
+
+    args += ["-e", meta.fetch(:referer)] if meta.key?(:referer)
+
+    args += ["--user", meta.fetch(:user)] if meta.key?(:user)
+
+    args
+  end
+
   def _curl_opts
-    return ["--user", meta.fetch(:user)] if meta.key?(:user)
-    []
+    return { user_agent: meta.fetch(:user_agent) } if meta.key?(:user_agent)
+    {}
   end
 
   def resolved_url(url)
     redirect_url, _, status = curl_output(
-      *_curl_opts, "--silent", "--head",
+      "--silent", "--head",
       "--write-out", "%{redirect_url}",
       "--output", "/dev/null",
       url.to_s
@@ -289,17 +305,20 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     redirect_url
   end
 
+  def curl_output(*args, **options)
+    super(*_curl_args, *args, **_curl_opts, **options)
+  end
+
   def curl(*args, **options)
-    args.concat _curl_opts
     args << "--connect-timeout" << "5" unless mirrors.empty?
-    super(*args, **options)
+    super(*_curl_args, *args, **_curl_opts, **options)
   end
 end
 
 # Detect and download from Apache Mirror
 class CurlApacheMirrorDownloadStrategy < CurlDownloadStrategy
   def apache_mirrors
-    mirrors, = curl_output(*_curl_opts, "--silent", "--location", "#{@url}&asjson=1")
+    mirrors, = curl_output("--silent", "--location", "#{@url}&asjson=1")
     JSON.parse(mirrors)
   end
 
@@ -323,7 +342,13 @@ end
 # Query parameters on the URL are converted into POST parameters
 class CurlPostDownloadStrategy < CurlDownloadStrategy
   def _fetch
-    base_url, data = @url.split("?")
+    base_url, data = if meta.key?(:data)
+      escape_data = ->(k, v) { ["-d", "#{CGI.escape(k.to_s)}=#{CGI.escape(v.to_s)}"] }
+      [@url, meta[:data].flat_map(&escape_data)]
+    else
+      @url.split("?", 2)
+    end
+
     curl_download base_url, "--data", data, to: temporary_path
   end
 end
@@ -584,11 +609,19 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     # This saves on bandwidth and will have a similar effect to verifying the
     # cache as it will make any changes to get the right revision.
     args = []
+
     if revision
       ohai "Checking out #{@ref}"
       args << "-r" << revision
     end
+
     args << "--ignore-externals" if ignore_externals
+
+    if meta[:trust_cert] == true
+      args << "--trust-server-cert"
+      args << "--non-interactive"
+    end
+
     if target.directory?
       system_command("svn", args: ["update", *args], chdir: target.to_s)
     else
