@@ -38,6 +38,9 @@ module Homebrew
     module_function
 
     def help(cmd = nil, flags = {})
+      # Let OptionParser generate help text for developer commands
+      return if require? HOMEBREW_LIBRARY_PATH/"dev-cmd"/cmd
+
       # Resolve command aliases and find file containing the implementation.
       if cmd
         cmd = HOMEBREW_INTERNAL_COMMAND_ALIASES.fetch(cmd, cmd)
