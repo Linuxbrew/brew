@@ -17,11 +17,11 @@ class AbstractDownloadStrategy
   attr_reader :meta, :name, :version
   attr_reader :shutup
 
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
+    @url = url
     @name = name
-    @url = resource.url
     @version = version
-    @meta = resource.specs
+    @meta = meta
     @shutup = false
     extend Pourable if meta[:bottle]
   end
@@ -90,7 +90,7 @@ end
 class VCSDownloadStrategy < AbstractDownloadStrategy
   REF_TYPES = [:tag, :branch, :revisions, :revision].freeze
 
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @ref_type, @ref = extract_ref(meta)
     @revision = meta[:revision]
@@ -209,9 +209,9 @@ end
 class CurlDownloadStrategy < AbstractFileDownloadStrategy
   attr_reader :mirrors, :tarball_path, :temporary_path
 
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
-    @mirrors = resource.mirrors.dup
+    @mirrors = meta.fetch(:mirrors, [])
     @tarball_path = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
@@ -389,7 +389,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
   require "utils/formatter"
   require "utils/github"
 
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     parse_url_pattern
     set_github_token
@@ -495,7 +495,7 @@ end
 class ScpDownloadStrategy < AbstractFileDownloadStrategy
   attr_reader :tarball_path, :temporary_path
 
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @tarball_path = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
@@ -546,7 +546,7 @@ class ScpDownloadStrategy < AbstractFileDownloadStrategy
 end
 
 class SubversionDownloadStrategy < VCSDownloadStrategy
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @url = @url.sub("svn+http://", "")
   end
@@ -631,7 +631,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
     %r{http://llvm\.org},
   ].freeze
 
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @ref_type ||= :branch
     @ref ||= "master"
@@ -803,7 +803,7 @@ class GitDownloadStrategy < VCSDownloadStrategy
 end
 
 class GitHubGitDownloadStrategy < GitDownloadStrategy
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
 
     return unless %r{^https?://github\.com/(?<user>[^/]+)/(?<repo>[^/]+)\.git$} =~ @url
@@ -857,7 +857,7 @@ class GitHubGitDownloadStrategy < GitDownloadStrategy
 end
 
 class CVSDownloadStrategy < VCSDownloadStrategy
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @url = @url.sub(%r{^cvs://}, "")
 
@@ -927,7 +927,7 @@ class CVSDownloadStrategy < VCSDownloadStrategy
 end
 
 class MercurialDownloadStrategy < VCSDownloadStrategy
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @url = @url.sub(%r{^hg://}, "")
   end
@@ -983,7 +983,7 @@ class MercurialDownloadStrategy < VCSDownloadStrategy
 end
 
 class BazaarDownloadStrategy < VCSDownloadStrategy
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @url.sub!(%r{^bzr://}, "")
     ENV["BZR_HOME"] = HOMEBREW_TEMP
@@ -1034,7 +1034,7 @@ class BazaarDownloadStrategy < VCSDownloadStrategy
 end
 
 class FossilDownloadStrategy < VCSDownloadStrategy
-  def initialize(name, version, resource)
+  def initialize(url, name, version, **meta)
     super
     @url = @url.sub(%r{^fossil://}, "")
   end

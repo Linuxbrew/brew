@@ -17,24 +17,6 @@ class Resource
   # formula name before initialization of the formula
   attr_accessor :name
 
-  class Download
-    def initialize(resource)
-      @resource = resource
-    end
-
-    def url
-      @resource.url
-    end
-
-    def specs
-      @resource.specs
-    end
-
-    def mirrors
-      @resource.mirrors
-    end
-  end
-
   def initialize(name = nil, &block)
     @name = name
     @url = nil
@@ -53,7 +35,8 @@ class Resource
   end
 
   def downloader
-    download_strategy.new(download_name, version, Download.new(self))
+    download_strategy.new(url, download_name, version,
+                          mirrors: mirrors.dup, **specs)
   end
 
   # Removes /s from resource names; this allows go package names
@@ -156,7 +139,7 @@ class Resource
     define_method(type) { |val| @checksum = Checksum.new(type, val) }
   end
 
-  def url(val = nil, specs = {})
+  def url(val = nil, **specs)
     return @url if val.nil?
     @url = val
     @specs.merge!(specs)
