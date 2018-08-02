@@ -2,8 +2,14 @@ module UnpackStrategy
   class Rar
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\ARar!/n)
+    using Magic
+
+    def self.extensions
+      [".rar"]
+    end
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\ARar!/n)
     end
 
     def dependencies

@@ -2,7 +2,9 @@ module UnpackStrategy
   class Uncompressed
     include UnpackStrategy
 
-    alias extract_nestedly extract
+    def extract_nestedly(extension_only: false, **options)
+      extract(**options)
+    end
 
     private
 

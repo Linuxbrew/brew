@@ -4,6 +4,8 @@ module UnpackStrategy
   class Dmg
     include UnpackStrategy
 
+    using Magic
+
     module Bom
       DMG_METADATA = Set.new %w[
         .background
@@ -83,12 +85,18 @@ module UnpackStrategy
           end
 
           system_command! "ditto", args: ["--bom", bomfile.path, "--", path, unpack_dir]
+
+          FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*").reject(&:symlink?)
         end
       end
     end
     private_constant :Mount
 
-    def self.can_extract?(path:, magic_number:)
+    def self.extensions
+      [".dmg"]
+    end
+
+    def self.can_extract?(path)
       imageinfo = system_command("hdiutil",
                                  args: ["imageinfo", path],
                                  print_stderr: false).stdout

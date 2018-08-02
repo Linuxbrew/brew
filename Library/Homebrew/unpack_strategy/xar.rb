@@ -2,8 +2,14 @@ module UnpackStrategy
   class Xar
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\Axar!/n)
+    using Magic
+
+    def self.extensions
+      [".xar"]
+    end
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\Axar!/n)
     end
 
     private

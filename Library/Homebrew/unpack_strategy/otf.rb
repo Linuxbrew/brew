@@ -2,8 +2,14 @@ require_relative "uncompressed"
 
 module UnpackStrategy
   class Otf < Uncompressed
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\AOTTO/n)
+    using Magic
+
+    def self.extensions
+      [".otf"]
+    end
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\AOTTO/n)
     end
   end
 end

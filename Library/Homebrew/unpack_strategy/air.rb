@@ -2,8 +2,15 @@ module UnpackStrategy
   class Air
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      path.extname == ".air"
+    using Magic
+
+    def self.extensions
+      [".air"]
+    end
+
+    def self.can_extract?(path)
+      mime_type = "application/vnd.adobe.air-application-installer-package+zip"
+      path.magic_number.match?(/.{59}#{Regexp.escape(mime_type)}/)
     end
 
     def dependencies

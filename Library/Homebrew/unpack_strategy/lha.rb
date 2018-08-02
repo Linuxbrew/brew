@@ -2,8 +2,14 @@ module UnpackStrategy
   class Lha
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\A..-(lh0|lh1|lz4|lz5|lzs|lh\\40|lhd|lh2|lh3|lh4|lh5)-/n)
+    using Magic
+
+    def self.extensions
+      [".lha", ".lzh"]
+    end
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\A..-(lh0|lh1|lz4|lz5|lzs|lh\\40|lhd|lh2|lh3|lh4|lh5)-/n)
     end
 
     def dependencies

@@ -2,8 +2,14 @@ module UnpackStrategy
   class Bzip2
     include UnpackStrategy
 
-    def self.can_extract?(path:, magic_number:)
-      magic_number.match?(/\ABZh/n)
+    using Magic
+
+    def self.extensions
+      [".bz2"]
+    end
+
+    def self.can_extract?(path)
+      path.magic_number.match?(/\ABZh/n)
     end
 
     private

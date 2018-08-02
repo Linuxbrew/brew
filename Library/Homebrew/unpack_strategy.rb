@@ -1,36 +1,60 @@
 module UnpackStrategy
-  # length of the longest regex (currently Tar)
-  MAX_MAGIC_NUMBER_LENGTH = 262
-  private_constant :MAX_MAGIC_NUMBER_LENGTH
+  module Magic
+    # length of the longest regex (currently Tar)
+    MAX_MAGIC_NUMBER_LENGTH = 262
+
+    refine Pathname do
+      def magic_number
+        @magic_number ||= if directory?
+          ""
+        else
+          binread(MAX_MAGIC_NUMBER_LENGTH) || ""
+        end
+      end
+
+      def file_type
+        @file_type ||= system_command("file", args: ["-b", self], print_stderr: false)
+                       .stdout.chomp
+      end
+
+      def zipinfo
+        @zipinfo ||= system_command("zipinfo", args: ["-1", self], print_stderr: false)
+                     .stdout
+                     .encode(Encoding::UTF_8, invalid: :replace)
+                     .split("\n")
+      end
+    end
+  end
+  private_constant :Magic
 
   def self.strategies
     @strategies ||= [
-      Pkg,
-      Ttf,
-      Otf,
-      Air,
-      Executable,
-      SelfExtractingExecutable,
-      Jar,
-      LuaRock,
-      MicrosoftOfficeXml,
-      Zip,
-      Dmg,
-      Xar,
-      Compress,
-      Tar,
-      Bzip2,
+      Tar, # needs to be before Bzip2/Gzip/Xz/Lzma
       Gzip,
       Lzma,
       Xz,
       Lzip,
+      Air, # needs to be before Zip
+      Jar, # needs to be before Zip
+      LuaRock, # needs to be before Zip
+      MicrosoftOfficeXml, # needs to be before Zip
+      Zip,
+      Pkg, # needs to be before Xar
+      Xar,
+      Ttf,
+      Otf,
       Git,
       Mercurial,
       Subversion,
       Cvs,
+      SelfExtractingExecutable, # needs to be before Cab
+      Cab,
+      Executable,
+      Dmg, # needs to be before Bzip2
+      Bzip2,
       Fossil,
       Bazaar,
-      Cab,
+      Compress,
       P7Zip,
       Sit,
       Rar,
@@ -42,6 +66,7 @@ module UnpackStrategy
   def self.from_type(type)
     type = {
       naked: :uncompressed,
+      nounzip: :uncompressed,
       seven_zip: :p7zip,
     }.fetch(type, type)
 
@@ -52,32 +77,30 @@ module UnpackStrategy
     end
   end
 
-  def self.from_path(path)
-    magic_number = if path.directory?
-      ""
-    else
-      File.binread(path, MAX_MAGIC_NUMBER_LENGTH) || ""
-    end
-
-    strategy = strategies.detect do |s|
-      s.can_extract?(path: path, magic_number: magic_number)
-    end
-
-    # This is so that bad files produce good error messages.
-    strategy ||= case path.extname
-    when ".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tbz", ".tar.xz", ".txz"
-      Tar
-    when ".zip"
-      Zip
-    else
-      Uncompressed
-    end
-
-    strategy
+  def self.from_extension(extension)
+    strategies.sort_by { |s| s.extensions.map(&:length).max(0) }
+              .reverse
+              .detect { |s| s.extensions.any? { |ext| extension.end_with?(ext) } }
   end
 
-  def self.detect(path, type: nil, ref_type: nil, ref: nil)
-    strategy = type ? from_type(type) : from_path(path)
+  def self.from_magic(path)
+    strategies.detect { |s| s.can_extract?(path) }
+  end
+
+  def self.detect(path, extension_only: false, type: nil, ref_type: nil, ref: nil)
+    strategy = from_type(type) if type
+
+    if extension_only
+      strategy ||= from_extension(path.extname)
+      strategy ||= strategies.select { |s| s < Directory || s == Fossil }
+                             .detect { |s| s.can_extract?(path) }
+    else
+      strategy ||= from_magic(path)
+      strategy ||= from_extension(path.extname)
+    end
+
+    strategy ||= Uncompressed
+
     strategy.new(path, ref_type: ref_type, ref: ref)
   end
 
@@ -96,7 +119,7 @@ module UnpackStrategy
     extract_to_dir(unpack_dir, basename: basename, verbose: verbose)
   end
 
-  def extract_nestedly(to: nil, basename: nil, verbose: false)
+  def extract_nestedly(to: nil, basename: nil, verbose: false, extension_only: false)
     Dir.mktmpdir do |tmp_unpack_dir|
       tmp_unpack_dir = Pathname(tmp_unpack_dir)
 
@@ -105,9 +128,9 @@ module UnpackStrategy
       children = tmp_unpack_dir.children
 
       if children.count == 1 && !children.first.directory?
-        s = UnpackStrategy.detect(children.first)
+        s = UnpackStrategy.detect(children.first, extension_only: extension_only)
 
-        s.extract_nestedly(to: to, verbose: verbose)
+        s.extract_nestedly(to: to, verbose: verbose, extension_only: extension_only)
         next
       end
 
