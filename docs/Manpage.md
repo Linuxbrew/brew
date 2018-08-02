@@ -1305,6 +1305,8 @@ Homebrew Documentation: <https://docs.brew.sh>
 
 Homebrew's lead maintainer is Mike McQuaid.
 
+Homebrew's project leadership committee is Mike McQuaid, ilovezfs, JCount, Misty De Meo and Markus Reiter.
+
 Homebrew/homebrew-core's lead maintainer is ilovezfs.
 
 Homebrew/brew's other current maintainers are ilovezfs, JCount, Misty De Meo, Gautham Goli, Markus Reiter and William Woodruff.

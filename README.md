@@ -38,6 +38,8 @@ Please report security issues to our [HackerOne](https://hackerone.com/homebrew/
 ## Who Are You?
 Homebrew's lead maintainer is [Mike McQuaid](https://github.com/mikemcquaid).
 
+Homebrew's project leadership committee is [Mike McQuaid](https://github.com/mikemcquaid), [ilovezfs](https://github.com/ilovezfs), [JCount](https://github.com/jcount), [Misty De Meo](https://github.com/mistydemeo) and [Markus Reiter](https://github.com/reitermarkus).
+
 Homebrew/homebrew-core's lead maintainer is [ilovezfs](https://github.com/ilovezfs).
 
 Homebrew/brew's other current maintainers are [ilovezfs](https://github.com/ilovezfs), [JCount](https://github.com/jcount), [Misty De Meo](https://github.com/mistydemeo), [Gautham Goli](https://github.com/GauthamGoli), [Markus Reiter](https://github.com/reitermarkus) and [William Woodruff](https://github.com/woodruffw).
