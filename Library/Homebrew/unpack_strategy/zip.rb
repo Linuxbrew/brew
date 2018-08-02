@@ -20,3 +20,5 @@ module UnpackStrategy
     end
   end
 end
+
+require "extend/os/mac/unpack_strategy/zip" if OS.mac?
