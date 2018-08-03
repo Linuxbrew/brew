@@ -675,13 +675,11 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def update
-    cached_location.cd do
-      config_repo
-      update_repo
-      checkout
-      reset
-      update_submodules if submodules?
-    end
+    config_repo
+    update_repo
+    checkout
+    reset
+    update_submodules if submodules?
   end
 
   def shallow_clone?
@@ -701,15 +699,20 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def ref?
-    quiet_system "git", "--git-dir", git_dir, "rev-parse", "-q", "--verify", "#{@ref}^{commit}"
+    system_command("git",
+                   args: ["--git-dir", git_dir, "rev-parse", "-q", "--verify", "#{@ref}^{commit}"],
+                   print_stderr: false)
+      .success?
   end
 
   def current_revision
-    Utils.popen_read("git", "--git-dir", git_dir, "rev-parse", "-q", "--verify", "HEAD").strip
+    system_command("git", args: ["--git-dir", git_dir, "rev-parse", "-q", "--verify", "HEAD"])
+      .stdout.strip
   end
 
   def repo_valid?
-    quiet_system "git", "--git-dir", git_dir, "status", "-s"
+    system_command("git", args: ["--git-dir", git_dir, "status", "-s"], print_stderr: false)
+      .success?
   end
 
   def submodules?
@@ -737,35 +740,44 @@ class GitDownloadStrategy < VCSDownloadStrategy
   end
 
   def config_repo
-    safe_system "git", "config", "remote.origin.url", @url
-    safe_system "git", "config", "remote.origin.fetch", refspec
+    system_command! "git",
+                    args: ["config", "remote.origin.url", @url],
+                    chdir: cached_location
+    system_command! "git",
+                    args: ["config", "remote.origin.fetch", refspec],
+                    chdir: cached_location
   end
 
   def update_repo
     return unless @ref_type == :branch || !ref?
 
     if !shallow_clone? && shallow_dir?
-      safe_system "git", "fetch", "origin", "--unshallow"
+      system_command! "git",
+                      args: ["fetch", "origin", "--unshallow"],
+                      chdir: cached_location
     else
-      safe_system "git", "fetch", "origin"
+      system_command! "git",
+                      args: ["fetch", "origin"],
+                      chdir: cached_location
     end
   end
 
   def clone_repo
-    safe_system "git", *clone_args
-    cached_location.cd do
-      safe_system "git", "config", "homebrew.cacheversion", cache_version
-      checkout
-      update_submodules if submodules?
-    end
+    system_command! "git", args: clone_args
+
+    system_command! "git",
+                    args: ["config", "homebrew.cacheversion", cache_version],
+                    chdir: cached_location
+    checkout
+    update_submodules if submodules?
   end
 
   def checkout
     ohai "Checking out #{@ref_type} #{@ref}" if @ref_type && @ref
-    safe_system "git", "checkout", "-f", @ref, "--"
+    system_command! "git", args: ["checkout", "-f", @ref, "--"], chdir: cached_location
   end
 
-  def reset_args
+  def reset
     ref = case @ref_type
     when :branch
       "origin/#{@ref}"
@@ -773,30 +785,34 @@ class GitDownloadStrategy < VCSDownloadStrategy
       @ref
     end
 
-    %W[reset --hard #{ref}]
-  end
-
-  def reset
-    safe_system "git", *reset_args
+    system_command! "git",
+                    args: ["reset", "--hard", *ref],
+                    chdir: cached_location
   end
 
   def update_submodules
-    safe_system "git", "submodule", "foreach", "--recursive", "git submodule sync"
-    safe_system "git", "submodule", "update", "--init", "--recursive"
+    system_command! "git",
+                    args: ["submodule", "foreach", "--recursive", "git submodule sync"],
+                    chdir: cached_location
+    system_command! "git",
+                    args: ["submodule", "update", "--init", "--recursive"],
+                    chdir: cached_location
     fix_absolute_submodule_gitdir_references!
   end
 
+  # When checking out Git repositories with recursive submodules, some Git
+  # versions create `.git` files with absolute instead of relative `gitdir:`
+  # pointers. This works for the cached location, but breaks various Git
+  # operations once the affected Git resource is staged, i.e. recursively
+  # copied to a new location. (This bug was introduced in Git 2.7.0 and fixed
+  # in 2.8.3. Clones created with affected version remain broken.)
+  # See https://github.com/Homebrew/homebrew-core/pull/1520 for an example.
   def fix_absolute_submodule_gitdir_references!
-    # When checking out Git repositories with recursive submodules, some Git
-    # versions create `.git` files with absolute instead of relative `gitdir:`
-    # pointers. This works for the cached location, but breaks various Git
-    # operations once the affected Git resource is staged, i.e. recursively
-    # copied to a new location. (This bug was introduced in Git 2.7.0 and fixed
-    # in 2.8.3. Clones created with affected version remain broken.)
-    # See https://github.com/Homebrew/homebrew-core/pull/1520 for an example.
-    submodule_dirs = Utils.popen_read(
-      "git", "submodule", "--quiet", "foreach", "--recursive", "pwd"
-    )
+    submodule_dirs = system_command!("git",
+                                     args: ["submodule", "--quiet", "foreach", "--recursive", "pwd"],
+                                     chdir: cached_location)
+                     .stdout
+
     submodule_dirs.lines.map(&:chomp).each do |submodule_dir|
       work_dir = Pathname.new(submodule_dir)
 
