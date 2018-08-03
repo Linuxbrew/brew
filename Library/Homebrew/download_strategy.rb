@@ -22,6 +22,7 @@ class AbstractDownloadStrategy
     @url = url
     @name = name
     @version = version
+    @cache = meta.fetch(:cache, HOMEBREW_CACHE)
     @meta = meta
     @shutup = false
     extend Pourable if meta[:bottle]
@@ -105,7 +106,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     super
     @ref_type, @ref = extract_ref(meta)
     @revision = meta[:revision]
-    @cached_location = HOMEBREW_CACHE/"#{name}--#{cache_tag}"
+    @cached_location = @cache/"#{name}--#{cache_tag}"
   end
 
   def fetch
@@ -180,7 +181,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
 
   def initialize(url, name, version, **meta)
     super
-    @cached_location = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
+    @cached_location = @cache/"#{name}-#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
 
