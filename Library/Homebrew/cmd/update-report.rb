@@ -85,6 +85,7 @@ module Homebrew
     end
 
     migrate_legacy_cache_if_necessary
+    migrate_cache_entries_to_double_dashes
     migrate_legacy_keg_symlinks_if_necessary
 
     if !updated
@@ -179,6 +180,21 @@ module Homebrew
           Failed to delete #{legacy_cache}.
           Please do so manually.
         EOS
+      end
+    end
+  end
+
+  def migrate_cache_entries_to_double_dashes
+    HOMEBREW_CACHE.children.each do |child|
+      next unless child.file?
+
+      next unless /^(?<prefix>[^\.]+[^\-])\-(?<suffix>[^\-].*)/ =~ child.basename.to_s
+      target = HOMEBREW_CACHE/"#{prefix}--#{suffix}"
+
+      if target.exist?
+        FileUtils.rm_rf child
+      else
+        FileUtils.mv child, target, force: true
       end
     end
   end
