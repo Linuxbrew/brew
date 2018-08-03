@@ -14,6 +14,7 @@ class AbstractDownloadStrategy
     end
   end
 
+  attr_reader :cached_location
   attr_reader :meta, :name, :version, :shutup
   private :meta, :name, :version, :shutup
 
@@ -68,10 +69,6 @@ class AbstractDownloadStrategy
   end
   private :chdir
 
-  # @!attribute [r] cached_location
-  # The path to the cached file or directory associated with the resource.
-  def cached_location; end
-
   # @!attribute [r]
   # return most recent modified time for all files in the current working directory after stage.
   def source_modified_time
@@ -108,7 +105,7 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     super
     @ref_type, @ref = extract_ref(meta)
     @revision = meta[:revision]
-    @clone = HOMEBREW_CACHE/cache_filename
+    @cached_location = HOMEBREW_CACHE/"#{name}--#{cache_tag}"
   end
 
   def fetch
@@ -146,10 +143,6 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
     commit != @last_commit
   end
 
-  def cached_location
-    @clone
-  end
-
   def head?
     version.respond_to?(:head?) && version.head?
   end
@@ -164,10 +157,6 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
 
   def cache_tag
     raise NotImplementedError
-  end
-
-  def cache_filename
-    "#{name}--#{cache_tag}"
   end
 
   def repo_valid?
@@ -187,6 +176,11 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
 end
 
 class AbstractFileDownloadStrategy < AbstractDownloadStrategy
+  def initialize(url, name, version, **meta)
+    super
+    @cached_location = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
+  end
+
   def stage
     super
     chdir
@@ -209,12 +203,11 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
 end
 
 class CurlDownloadStrategy < AbstractFileDownloadStrategy
-  attr_reader :mirrors, :tarball_path, :temporary_path
+  attr_reader :mirrors, :temporary_path
 
   def initialize(url, name, version, **meta)
     super
     @mirrors = meta.fetch(:mirrors, [])
-    @tarball_path = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
 
@@ -236,10 +229,6 @@ class CurlDownloadStrategy < AbstractFileDownloadStrategy
     puts "Trying a mirror..."
     @url = mirrors.shift
     retry
-  end
-
-  def cached_location
-    tarball_path
   end
 
   def clear_cache
@@ -366,8 +355,6 @@ end
 
 # This strategy extracts local binary packages.
 class LocalBottleDownloadStrategy < AbstractFileDownloadStrategy
-  attr_reader :cached_location
-
   def initialize(path)
     @cached_location = path
   end
@@ -520,11 +507,11 @@ end
 #     url "scp://example.com/src/abc.1.0.tar.gz"
 #     ...
 class ScpDownloadStrategy < AbstractFileDownloadStrategy
-  attr_reader :tarball_path, :temporary_path
+  attr_reader :temporary_path
 
   def initialize(url, name, version, **meta)
     super
-    @tarball_path = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
+    @cached_location = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
     parse_url_pattern
   end
@@ -552,10 +539,6 @@ class ScpDownloadStrategy < AbstractFileDownloadStrategy
 
       ignore_interrupts { temporary_path.rename(cached_location) }
     end
-  end
-
-  def cached_location
-    tarball_path
   end
 
   def clear_cache

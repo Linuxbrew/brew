@@ -234,8 +234,8 @@ describe CurlDownloadStrategy do
     expect(subject.send(:_curl_args)).to eq(["--user", "download:123456"])
   end
 
-  describe "#tarball_path" do
-    subject { described_class.new(url, name, version, **specs).tarball_path }
+  describe "#cached_location" do
+    subject { described_class.new(url, name, version, **specs).cached_location }
 
     context "when URL ends with file" do
       it { is_expected.to eq(HOMEBREW_CACHE/"foo-.tar.gz") }
