@@ -2150,7 +2150,7 @@ class Formula
     #     `:curl` (normal file download. Will also extract.)
     #     `:nounzip` (without extracting)
     #     `:post` (download via an HTTP POST)
-    #     `S3DownloadStrategy` (download from S3 using signed request)
+    #     `:s3` (download from S3 using signed request)
     #
     # <pre>url "https://packed.sources.and.we.prefer.https.example.com/archive-1.2.3.tar.bz2"</pre>
     # <pre>url "https://some.dont.provide.archives.example.com",
