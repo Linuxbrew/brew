@@ -176,9 +176,12 @@ class VCSDownloadStrategy < AbstractDownloadStrategy
 end
 
 class AbstractFileDownloadStrategy < AbstractDownloadStrategy
+  attr_reader :temporary_path
+
   def initialize(url, name, version, **meta)
     super
     @cached_location = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
+    @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
 
   def stage
@@ -203,12 +206,11 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
 end
 
 class CurlDownloadStrategy < AbstractFileDownloadStrategy
-  attr_reader :mirrors, :temporary_path
+  attr_reader :mirrors
 
   def initialize(url, name, version, **meta)
     super
     @mirrors = meta.fetch(:mirrors, [])
-    @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
 
   def fetch
@@ -507,12 +509,8 @@ end
 #     url "scp://example.com/src/abc.1.0.tar.gz"
 #     ...
 class ScpDownloadStrategy < AbstractFileDownloadStrategy
-  attr_reader :temporary_path
-
   def initialize(url, name, version, **meta)
     super
-    @cached_location = HOMEBREW_CACHE/"#{name}-#{version}#{ext}"
-    @temporary_path = Pathname.new("#{cached_location}.incomplete")
     parse_url_pattern
   end
 
