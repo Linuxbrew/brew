@@ -1116,7 +1116,7 @@ Note that environment variables must have a value set to be detected. For exampl
     When using the `S3` download strategy, Homebrew will look in
     these variables for access credentials (see
     <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
-    to retrieve these access credentials from AWS).  If they are not set,
+    to retrieve these access credentials from AWS). If they are not set,
     the `S3` download strategy will download with a public
     (unsigned) URL.
 

@@ -363,7 +363,7 @@ class LocalBottleDownloadStrategy < AbstractFileDownloadStrategy
 end
 
 # S3DownloadStrategy downloads tarballs from AWS S3.
-# To use it, add ":using => S3DownloadStrategy" to the URL section of your
+# To use it, add `:using => :s3` to the URL section of your
 # formula.  This download strategy uses AWS access tokens (in the
 # environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
 # to sign the request.  This strategy is good in a corporate setting,
@@ -395,7 +395,7 @@ end
 
 # GitHubPrivateRepositoryDownloadStrategy downloads contents from GitHub
 # Private Repository. To use it, add
-# ":using => GitHubPrivateRepositoryDownloadStrategy" to the URL section of
+# `:using => :github_private_repo` to the URL section of
 # your formula. This download strategy uses GitHub access tokens (in the
 # environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.  This
 # strategy is suitable for corporate use just like S3DownloadStrategy, because
@@ -453,8 +453,7 @@ class GitHubPrivateRepositoryDownloadStrategy < CurlDownloadStrategy
 end
 
 # GitHubPrivateRepositoryReleaseDownloadStrategy downloads tarballs from GitHub
-# Release assets. To use it, add
-# ":using => GitHubPrivateRepositoryReleaseDownloadStrategy" to the URL section
+# Release assets. To use it, add `:using => :github_private_release` to the URL section
 # of your formula. This download strategy uses GitHub access tokens (in the
 # environment variables HOMEBREW_GITHUB_API_TOKEN) to sign the request.
 class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDownloadStrategy
@@ -498,7 +497,7 @@ class GitHubPrivateRepositoryReleaseDownloadStrategy < GitHubPrivateRepositoryDo
 end
 
 # ScpDownloadStrategy downloads files using ssh via scp. To use it, add
-# ":using => ScpDownloadStrategy" to the URL section of your formula or
+# `:using => :scp` to the URL section of your formula or
 # provide a URL starting with scp://. This strategy uses ssh credentials for
 # authentication. If a public/private keypair is configured, it will not
 # prompt for a password.
@@ -1115,20 +1114,21 @@ class FossilDownloadStrategy < VCSDownloadStrategy
 end
 
 class DownloadStrategyDetector
-  def self.detect(url, strategy = nil)
-    if strategy.nil?
+  def self.detect(url, using = nil)
+    strategy = if using.nil?
       detect_from_url(url)
-    elsif strategy == S3DownloadStrategy
-      require_aws_sdk
-      strategy
-    elsif strategy.is_a?(Class) && strategy < AbstractDownloadStrategy
-      strategy
-    elsif strategy.is_a?(Symbol)
-      detect_from_symbol(strategy)
+    elsif using.is_a?(Class) && using < AbstractDownloadStrategy
+      using
+    elsif using.is_a?(Symbol)
+      detect_from_symbol(using)
     else
       raise TypeError,
         "Unknown download strategy specification #{strategy.inspect}"
     end
+
+    require_aws_sdk if strategy == S3DownloadStrategy
+
+    strategy
   end
 
   def self.detect_from_url(url)
@@ -1154,7 +1154,6 @@ class DownloadStrategyDetector
     when %r{^https?://(.+?\.)?sourceforge\.net/hgweb/}
       MercurialDownloadStrategy
     when %r{^s3://}
-      require_aws_sdk
       S3DownloadStrategy
     when %r{^scp://}
       ScpDownloadStrategy
@@ -1165,15 +1164,19 @@ class DownloadStrategyDetector
 
   def self.detect_from_symbol(symbol)
     case symbol
-    when :hg      then MercurialDownloadStrategy
-    when :nounzip then NoUnzipCurlDownloadStrategy
-    when :git     then GitDownloadStrategy
-    when :bzr     then BazaarDownloadStrategy
-    when :svn     then SubversionDownloadStrategy
-    when :curl    then CurlDownloadStrategy
-    when :cvs     then CVSDownloadStrategy
-    when :post    then CurlPostDownloadStrategy
-    when :fossil  then FossilDownloadStrategy
+    when :hg                     then MercurialDownloadStrategy
+    when :nounzip                then NoUnzipCurlDownloadStrategy
+    when :git                    then GitDownloadStrategy
+    when :github_private_repo    then GitHubPrivateRepositoryDownloadStrategy
+    when :github_private_release then GitHubPrivateRepositoryReleaseDownloadStrategy
+    when :bzr                    then BazaarDownloadStrategy
+    when :s3                     then S3DownloadStrategy
+    when :scp                    then ScpDownloadStrategy
+    when :svn                    then SubversionDownloadStrategy
+    when :curl                   then CurlDownloadStrategy
+    when :cvs                    then CVSDownloadStrategy
+    when :post                   then CurlPostDownloadStrategy
+    when :fossil                 then FossilDownloadStrategy
     else
       raise "Unknown download strategy #{symbol} was requested."
     end
