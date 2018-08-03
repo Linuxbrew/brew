@@ -62,6 +62,11 @@ module Homebrew
       updated = true
     end
 
+    initial_version = Version.new(system_command!("git",
+                                                  args: ["describe", "--tags", "--abbrev=0", initial_revision],
+                                                  chdir: HOMEBREW_REPOSITORY,
+                                                  print_stderr: false).stdout)
+
     updated_taps = []
     Tap.each do |tap|
       next unless tap.git?
@@ -85,7 +90,7 @@ module Homebrew
     end
 
     migrate_legacy_cache_if_necessary
-    migrate_cache_entries_to_double_dashes
+    migrate_cache_entries_to_double_dashes(initial_version)
     migrate_legacy_keg_symlinks_if_necessary
 
     if !updated
@@ -184,7 +189,9 @@ module Homebrew
     end
   end
 
-  def migrate_cache_entries_to_double_dashes
+  def migrate_cache_entries_to_double_dashes(initial_version)
+    return if initial_version > "1.7.1"
+
     HOMEBREW_CACHE.children.each do |child|
       next unless child.file?
 
