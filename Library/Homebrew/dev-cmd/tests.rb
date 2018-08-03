@@ -34,6 +34,8 @@ module Homebrew
     end
 
     HOMEBREW_LIBRARY_PATH.cd do
+      ENV.delete("HOMEBREW_COLOR")
+      ENV.delete("HOMEBREW_NO_COLOR")
       ENV.delete("HOMEBREW_VERBOSE")
       ENV.delete("VERBOSE")
       ENV.delete("HOMEBREW_CASK_OPTS")
