@@ -14,8 +14,8 @@ class AbstractDownloadStrategy
     end
   end
 
-  attr_reader :meta, :name, :version
-  attr_reader :shutup
+  attr_reader :meta, :name, :version, :shutup
+  private :meta, :name, :version, :shutup
 
   def initialize(url, name, version, **meta)
     @url = url
@@ -52,7 +52,21 @@ class AbstractDownloadStrategy
                   .extract_nestedly(basename: basename_without_params,
                                     extension_only: true,
                                     verbose: ARGV.verbose? && !shutup)
+    chdir
   end
+
+  def chdir
+    entries = Dir["*"]
+    case entries.length
+    when 0 then raise "Empty archive"
+    when 1 then begin
+        Dir.chdir entries.first
+      rescue
+        nil
+      end
+    end
+  end
+  private :chdir
 
   # @!attribute [r] cached_location
   # The path to the cached file or directory associated with the resource.
@@ -179,18 +193,6 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   end
 
   private
-
-  def chdir
-    entries = Dir["*"]
-    case entries.length
-    when 0 then raise "Empty archive"
-    when 1 then begin
-        Dir.chdir entries.first
-      rescue
-        nil
-      end
-    end
-  end
 
   def ext
     # We need a Pathname because we've monkeypatched extname to support double
