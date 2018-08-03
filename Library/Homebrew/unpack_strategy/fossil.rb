@@ -28,7 +28,8 @@ module UnpackStrategy
       system_command! "fossil",
                       args: ["open", path, *args],
                       chdir: unpack_dir,
-                      env: { "PATH" => PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]) }
+                      env: { "PATH" => PATH.new(Formula["fossil"].opt_bin, ENV["PATH"]) },
+                      verbose: verbose
     end
   end
 end

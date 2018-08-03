@@ -4,8 +4,6 @@ module UnpackStrategy
   class Dmg
     include UnpackStrategy
 
-    using Magic
-
     module Bom
       DMG_METADATA = Set.new %w[
         .background
@@ -51,7 +49,7 @@ module UnpackStrategy
     class Mount
       include UnpackStrategy
 
-      def eject
+      def eject(verbose: false)
         tries ||= 3
 
         return unless path.exist?
@@ -59,11 +57,13 @@ module UnpackStrategy
         if tries > 1
           system_command! "diskutil",
                           args: ["eject", path],
-                          print_stderr: false
+                          print_stderr: false,
+                          verbose: verbose
         else
           system_command! "diskutil",
                           args: ["unmount", "force", path],
-                          print_stderr: false
+                          print_stderr: false,
+                          verbose: verbose
         end
       rescue ErrorDuringExecution => e
         raise e if (tries -= 1).zero?
@@ -81,10 +81,14 @@ module UnpackStrategy
             filelist.puts(path.bom)
             filelist.close
 
-            system_command! "mkbom", args: ["-s", "-i", filelist.path, "--", bomfile.path]
+            system_command! "mkbom",
+                            args: ["-s", "-i", filelist.path, "--", bomfile.path],
+                            verbose: verbose
           end
 
-          system_command! "ditto", args: ["--bom", bomfile.path, "--", path, unpack_dir]
+          system_command! "ditto",
+                          args: ["--bom", bomfile.path, "--", path, unpack_dir],
+                          verbose: verbose
 
           FileUtils.chmod "u+w", Pathname.glob(unpack_dir/"**/*").reject(&:symlink?)
         end
@@ -111,7 +115,7 @@ module UnpackStrategy
         raise "No mounts found in '#{path}'; perhaps it is a bad disk image?" if mounts.empty?
 
         mounts.each do |mount|
-          mount.extract(to: unpack_dir)
+          mount.extract(to: unpack_dir, verbose: verbose)
         end
       end
     end
@@ -120,10 +124,11 @@ module UnpackStrategy
       Dir.mktmpdir do |mount_dir|
         mount_dir = Pathname(mount_dir)
 
-        without_eula = system_command("hdiutil",
+        without_eula = system_command "hdiutil",
                                       args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", mount_dir, path],
                                       input: "qn\n",
-                                      print_stderr: false)
+                                      print_stderr: false,
+                                      verbose: verbose
 
         # If mounting without agreeing to EULA succeeded, there is none.
         plist = if without_eula.success?
@@ -131,12 +136,13 @@ module UnpackStrategy
         else
           cdr_path = mount_dir/path.basename.sub_ext(".cdr")
 
-          system_command!("hdiutil", args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path])
+          system_command! "hdiutil",
+                          args: ["convert", "-quiet", "-format", "UDTO", "-o", cdr_path, path],
+                          verbose: verbose
 
-          with_eula = system_command!(
-            "/usr/bin/hdiutil",
-            args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", mount_dir, cdr_path],
-          )
+          with_eula = system_command! "hdiutil",
+                                      args: ["attach", "-plist", "-nobrowse", "-readonly", "-noidme", "-mountrandom", mount_dir, cdr_path],
+                                      verbose: verbose
 
           if verbose && !(eula_text = without_eula.stdout).empty?
             ohai "Software License Agreement for '#{path}':"
@@ -158,7 +164,9 @@ module UnpackStrategy
         begin
           yield mounts
         ensure
-          mounts.each(&:eject)
+          mounts.each do |mount|
+            mount.eject(verbose: verbose)
+          end
         end
       end
     end

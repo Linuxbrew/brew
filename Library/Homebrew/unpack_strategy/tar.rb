@@ -35,11 +35,13 @@ module UnpackStrategy
 
         if DependencyCollector.tar_needs_xz_dependency? && Xz.can_extract?(path)
           tmpdir = Pathname(tmpdir)
-          Xz.new(path).extract(to: tmpdir)
+          Xz.new(path).extract(to: tmpdir, verbose: verbose)
           tar_path = tmpdir.children.first
         end
 
-        system_command! "tar", args: ["xf", tar_path, "-C", unpack_dir]
+        system_command! "tar",
+                        args: ["xf", tar_path, "-C", unpack_dir],
+                        verbose: verbose
       end
     end
   end
