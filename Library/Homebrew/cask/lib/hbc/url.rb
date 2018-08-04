@@ -6,13 +6,13 @@ class URL
     :data
   ].freeze
 
-  attr_reader :uri
+  attr_reader :uri, :specs
   attr_reader(*ATTRIBUTES)
 
   extend Forwardable
   def_delegators :uri, :path, :scheme, :to_s
 
-  def initialize(uri, options = {})
+  def initialize(uri, **options)
     @uri        = URI(uri)
     @user_agent = :default
 
@@ -20,5 +20,7 @@ class URL
       next unless options.key?(attribute)
       instance_variable_set("@#{attribute}", options[attribute])
     end
+
+    @specs = options
   end
 end
