@@ -181,7 +181,7 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
 
   def initialize(url, name, version, **meta)
     super
-    @cached_location = @cache/"#{name}-#{version}#{ext}"
+    @cached_location = @cache/"#{name}--#{version}#{ext}"
     @temporary_path = Pathname.new("#{cached_location}.incomplete")
   end
 

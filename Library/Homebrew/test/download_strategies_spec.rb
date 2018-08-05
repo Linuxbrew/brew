@@ -238,13 +238,13 @@ describe CurlDownloadStrategy do
     subject { described_class.new(url, name, version, **specs).cached_location }
 
     context "when URL ends with file" do
-      it { is_expected.to eq(HOMEBREW_CACHE/"foo-.tar.gz") }
+      it { is_expected.to eq(HOMEBREW_CACHE/"foo--.tar.gz") }
     end
 
     context "when URL file is in middle" do
       let(:url) { "http://example.com/foo.tar.gz/from/this/mirror" }
 
-      it { is_expected.to eq(HOMEBREW_CACHE/"foo-.tar.gz") }
+      it { is_expected.to eq(HOMEBREW_CACHE/"foo--.tar.gz") }
     end
   end
 end
