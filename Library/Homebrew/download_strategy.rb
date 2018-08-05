@@ -193,13 +193,20 @@ class AbstractFileDownloadStrategy < AbstractDownloadStrategy
   private
 
   def ext
+    uri_path = if URI::DEFAULT_PARSER.make_regexp =~ @url
+      uri = URI(@url)
+      uri.query ? "#{uri.path}?#{uri.query}" : uri.path
+    else
+      @url
+    end
+
     # We need a Pathname because we've monkeypatched extname to support double
     # extensions (e.g. tar.gz).
     # We can't use basename_without_params, because given a URL like
     #   https://example.com/download.php?file=foo-1.0.tar.gz
     # the extension we want is ".tar.gz", not ".php".
-    Pathname.new(@url).ascend do |path|
-      ext = path.extname[/[^?]+/]
+    Pathname.new(uri_path).ascend do |path|
+      ext = path.extname[/[^?&]+/]
       return ext if ext
     end
     nil
@@ -335,14 +342,15 @@ end
 # Query parameters on the URL are converted into POST parameters
 class CurlPostDownloadStrategy < CurlDownloadStrategy
   def _fetch
-    base_url, data = if meta.key?(:data)
+    args = if meta.key?(:data)
       escape_data = ->(d) { ["-d", URI.encode_www_form([d])] }
-      [@url, meta[:data].flat_map(&escape_data)]
+      [@url, *meta[:data].flat_map(&escape_data)]
     else
-      @url.split("?", 2)
+      url, query = @url.split("?", 2)
+      query.nil? ? [url, "-X", "POST"] : [url, "-d", query]
     end
 
-    curl_download base_url, "--data", data, to: temporary_path
+    curl_download(*args, to: temporary_path)
   end
 end
 
@@ -606,9 +614,9 @@ class SubversionDownloadStrategy < VCSDownloadStrategy
     end
 
     if target.directory?
-      system_command("svn", args: ["update", *args], chdir: target.to_s)
+      system_command!("svn", args: ["update", *args], chdir: target.to_s)
     else
-      system_command("svn", args: ["checkout", url, target, *args])
+      system_command!("svn", args: ["checkout", url, target, *args])
     end
   end
 
