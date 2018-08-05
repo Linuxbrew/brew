@@ -738,8 +738,8 @@ Enter the interactive Homebrew Ruby shell\.
 If \fB\-\-examples\fR is passed, several examples will be shown\. If \fB\-\-pry\fR is passed or HOMEBREW_PRY is set, pry will be used instead of irb\.
 .
 .TP
-\fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] \fIformula\fR
-Checks the library links of an installed formula\.
+\fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] [\fIformulae\fR]
+Checks the library links of installed formulae\.
 .
 .IP
 Only works on installed formulae\. An error is raised if it is run on uninstalled formulae\.
@@ -749,6 +749,9 @@ If \fB\-\-test\fR is passed, only display missing libraries and exit with a non\
 .
 .IP
 If \fB\-\-reverse\fR is passed, print the dylib followed by the binaries which link to it for each library the keg references\.
+.
+.IP
+If \fIformulae\fR are given, check linkage for only the specified brews\.
 .
 .TP
 \fBman\fR [\fB\-\-fail\-if\-changed\fR]
