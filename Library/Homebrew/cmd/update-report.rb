@@ -199,9 +199,17 @@ module Homebrew
       target = HOMEBREW_CACHE/"#{prefix}--#{suffix}"
 
       if target.exist?
-        FileUtils.rm_rf child
+        begin
+          FileUtils.rm_rf child
+        rescue Errno::EACCES
+          opoo "Could not remove #{child}, please do so manually."
+        end
       else
-        FileUtils.mv child, target, force: true
+        begin
+          FileUtils.mv child, target
+        rescue Errno::EACCES
+          opoo "Could not move #{child} to #{target}, please do so manually."
+        end
       end
     end
   end
