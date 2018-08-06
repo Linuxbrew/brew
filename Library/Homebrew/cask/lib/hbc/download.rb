@@ -22,13 +22,9 @@ module Hbc
     attr_accessor :downloaded_path
 
     def downloader
-      @downloader ||= case cask.url.using
-      when :svn
-        SubversionDownloadStrategy.new(cask)
-      when :post
-        CurlPostDownloadStrategy.new(cask)
-      else
-        CurlDownloadStrategy.new(cask)
+      @downloader ||= begin
+        strategy = DownloadStrategyDetector.detect(cask.url.to_s, cask.url.using)
+        strategy.new(cask.url.to_s, cask.token, cask.version, cache: Cache.path, **cask.url.specs)
       end
     end
 
@@ -37,7 +33,8 @@ module Hbc
     end
 
     def fetch
-      self.downloaded_path = downloader.fetch
+      downloader.fetch
+      @downloaded_path = downloader.cached_location
     rescue StandardError => e
       raise CaskError, "Download failed on Cask '#{cask}' with message: #{e}"
     end
