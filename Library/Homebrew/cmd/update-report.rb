@@ -198,6 +198,8 @@ module Homebrew
       next unless /^(?<prefix>[^\.]+[^\-])\-(?<suffix>[^\-].*)/ =~ child.basename.to_s
       target = HOMEBREW_CACHE/"#{prefix}--#{suffix}"
 
+      next if suffix.include?("--") && !suffix.start_with?("patch")
+
       if target.exist?
         begin
           FileUtils.rm_rf child
