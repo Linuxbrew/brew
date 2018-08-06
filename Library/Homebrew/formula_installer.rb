@@ -502,7 +502,7 @@ class FormulaInstaller
       end
     end
 
-    if pour_bottle
+    if pour_bottle && !Keg.relocation_formulae.include?(formula.name)
       bottle_deps = Keg.relocation_formulae
                        .map { |formula| Dependency.new(formula) }
                        .reject do |dep|
