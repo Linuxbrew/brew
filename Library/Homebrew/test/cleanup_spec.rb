@@ -226,8 +226,8 @@ describe Homebrew::Cleanup do
     end
 
     context "cleans old files in HOMEBREW_CACHE" do
-      let(:bottle) { (HOMEBREW_CACHE/"testball-0.0.1.bottle.tar.gz") }
-      let(:testball) { (HOMEBREW_CACHE/"testball-0.0.1") }
+      let(:bottle) { (HOMEBREW_CACHE/"testball--0.0.1.bottle.tar.gz") }
+      let(:testball) { (HOMEBREW_CACHE/"testball--0.0.1") }
 
       before do
         FileUtils.touch(bottle)
