@@ -1,3 +1,5 @@
+require "hbc/download"
+
 module Hbc
   class Auditor
     def self.audit(cask, audit_download: false, check_token_conflicts: false, commit_range: nil)
