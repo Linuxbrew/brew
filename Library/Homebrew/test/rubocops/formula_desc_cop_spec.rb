@@ -65,7 +65,7 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
       expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
         class Foo < Formula
           url 'http://example.com/foo-1.0.tgz'
-          desc 'An '
+          desc 'An aardvark'
                 ^^^ Description shouldn\'t start with an indefinite article i.e. \"An\"
         end
       RUBY
@@ -97,6 +97,26 @@ describe RuboCop::Cop::FormulaAuditStrict::Desc do
           url 'http://example.com/foo-1.0.tgz'
           desc 'Description with a full stop at the end.'
                                                        ^ Description shouldn\'t end with a full stop
+        end
+      RUBY
+    end
+
+    it "When the description starts with a leading space" do
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          desc ' Description with a leading space'
+                ^ Description shouldn\'t have a leading space
+        end
+      RUBY
+    end
+
+    it "When the description ends with a trailing space" do
+      expect_offense(<<~RUBY, "/homebrew-core/Formula/foo.rb")
+        class Foo < Formula
+          url 'http://example.com/foo-1.0.tgz'
+          desc 'Description with a trailing space '
+                                                 ^ Description shouldn\'t have a trailing space
         end
       RUBY
     end
