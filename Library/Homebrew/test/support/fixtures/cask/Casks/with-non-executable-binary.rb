@@ -3,7 +3,7 @@ cask 'with-non-executable-binary' do
   sha256 'd5b2dfbef7ea28c25f7a77cd7fa14d013d82b626db1d82e00e25822464ba19e2'
 
   url "file://#{TEST_FIXTURE_DIR}/cask/naked_non_executable"
-  homepage 'http://example.com/with-binary'
+  homepage 'https://example.com/with-binary'
 
   binary "naked_non_executable"
 end

@@ -4,7 +4,7 @@ cask 'invalid-appcast-url' do
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeine.zip"
   appcast 1
-  homepage 'http://example.com/invalid-appcast-url'
+  homepage 'https://example.com/invalid-appcast-url'
 
   app 'Caffeine.app'
 end

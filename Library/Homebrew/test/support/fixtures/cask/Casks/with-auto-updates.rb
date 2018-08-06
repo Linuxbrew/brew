@@ -4,7 +4,7 @@ cask 'with-auto-updates' do
 
   url "https://example.com/autoupdates_#{version}.zip"
   name 'AutoUpdates'
-  homepage 'http://example.com/autoupdates'
+  homepage 'https://example.com/autoupdates'
 
   auto_updates true
 

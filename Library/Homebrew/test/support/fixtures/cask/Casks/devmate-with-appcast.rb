@@ -6,7 +6,7 @@ cask 'devmate-with-appcast' do
   url "https://dl.devmate.com/com.my.fancyapp/app_#{version}.zip"
   appcast 'https://updates.devmate.com/com.my.fancyapp.app.xml'
   name 'DevMate'
-  homepage 'http://www.example.com/'
+  homepage 'https://www.example.com/'
 
   app 'DevMate.app'
 end

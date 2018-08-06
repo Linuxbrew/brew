@@ -75,14 +75,14 @@ describe Patch do
 
   describe "#normalize_legacy_patches" do
     it "can create a patch from a single string" do
-      patches = described_class.normalize_legacy_patches("http://example.com/patch.diff")
+      patches = described_class.normalize_legacy_patches("https://example.com/patch.diff")
       expect(patches.length).to eq(1)
       expect(patches.first.strip).to eq(:p1)
     end
 
     it "can create patches from an array" do
       patches = described_class.normalize_legacy_patches(
-        %w[http://example.com/patch1.diff http://example.com/patch2.diff],
+        %w[https://example.com/patch1.diff https://example.com/patch2.diff],
       )
 
       expect(patches.length).to eq(2)
@@ -92,7 +92,7 @@ describe Patch do
 
     it "can create patches from a :p0 hash" do
       patches = described_class.normalize_legacy_patches(
-        p0: "http://example.com/patch.diff",
+        p0: "https://example.com/patch.diff",
       )
 
       expect(patches.length).to eq(1)
@@ -101,7 +101,7 @@ describe Patch do
 
     it "can create patches from a :p1 hash" do
       patches = described_class.normalize_legacy_patches(
-        p1: "http://example.com/patch.diff",
+        p1: "https://example.com/patch.diff",
       )
 
       expect(patches.length).to eq(1)
@@ -110,8 +110,8 @@ describe Patch do
 
     it "can create patches from a mixed hash" do
       patches = described_class.normalize_legacy_patches(
-        p1: "http://example.com/patch1.diff",
-        p0: "http://example.com/patch0.diff",
+        p1: "https://example.com/patch1.diff",
+        p0: "https://example.com/patch0.diff",
       )
 
       expect(patches.length).to eq(2)
@@ -122,12 +122,12 @@ describe Patch do
     it "can create patches from a mixed hash with array" do
       patches = described_class.normalize_legacy_patches(
         p1: [
-          "http://example.com/patch10.diff",
-          "http://example.com/patch11.diff",
+          "https://example.com/patch10.diff",
+          "https://example.com/patch11.diff",
         ],
         p0: [
-          "http://example.com/patch00.diff",
-          "http://example.com/patch01.diff",
+          "https://example.com/patch00.diff",
+          "https://example.com/patch01.diff",
         ],
       )
 

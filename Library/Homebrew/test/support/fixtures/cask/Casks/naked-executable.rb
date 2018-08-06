@@ -3,7 +3,7 @@ cask 'naked-executable' do
   sha256 '306c6ca7407560340797866e077e053627ad409277d1b9da58106fce4cf717cb'
 
   url "file://#{TEST_FIXTURE_DIR}/cask/naked_executable"
-  homepage 'http://example.com/naked-executable'
+  homepage 'https://example.com/naked-executable'
 
   container type: :naked
 end
