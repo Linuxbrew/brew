@@ -7,9 +7,9 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
     it "When url precedes homepage" do
       expect_offense(<<~RUBY)
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `homepage` (line 3) should be put before `url` (line 2)
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `homepage` (line 3) should be put before `url` (line 2)
         end
       RUBY
     end
@@ -64,15 +64,15 @@ describe RuboCop::Cop::FormulaAudit::ComponentsOrder do
     it "When url precedes homepage" do
       source = <<~RUBY
         class Foo < Formula
-          url "http://example.com/foo-1.0.tgz"
-          homepage "http://example.com"
+          url "https://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
         end
       RUBY
 
       correct_source = <<~RUBY
         class Foo < Formula
-          homepage "http://example.com"
-          url "http://example.com/foo-1.0.tgz"
+          homepage "https://example.com"
+          url "https://example.com/foo-1.0.tgz"
         end
       RUBY
 

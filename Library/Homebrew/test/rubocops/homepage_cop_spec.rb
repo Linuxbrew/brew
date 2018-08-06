@@ -7,7 +7,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
     it "When there is no homepage" do
       source = <<~RUBY
         class Foo < Formula
-          url 'http://example.com/foo-1.0.tgz'
+          url 'https://example.com/foo-1.0.tgz'
         end
       RUBY
 
@@ -28,7 +28,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
       source = <<~RUBY
         class Foo < Formula
           homepage "ftp://example.com/foo"
-          url "http://example.com/foo-1.0.tgz"
+          url "https://example.com/foo-1.0.tgz"
         end
       RUBY
 
@@ -65,7 +65,7 @@ describe RuboCop::Cop::FormulaAudit::Homepage do
         source = <<~RUBY
           class #{name.capitalize} < Formula
             homepage "#{homepage}"
-            url "http://example.com/#{name}-1.0.tgz"
+            url "https://example.com/#{name}-1.0.tgz"
           end
         RUBY
 
