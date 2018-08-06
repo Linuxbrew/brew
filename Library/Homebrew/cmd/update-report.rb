@@ -192,25 +192,41 @@ module Homebrew
   def migrate_cache_entries_to_double_dashes(initial_version)
     return if initial_version > "1.7.1"
 
-    HOMEBREW_CACHE.children.each do |child|
-      next unless child.file?
+    Formula.each do |formula|
+      specs = [*formula.stable, *formula.devel, *formula.head]
 
-      next unless /^(?<prefix>[^\.]+[^\-])\-(?<suffix>[^\-].*)/ =~ child.basename.to_s
-      target = HOMEBREW_CACHE/"#{prefix}--#{suffix}"
+      resources = [*formula.bottle&.resource] + specs.flat_map do |spec|
+        [
+          spec,
+          *spec.resources.values,
+          *spec.patches.select(&:external?).map(&:resource),
+        ]
+      end
 
-      next if suffix.include?("--") && !suffix.start_with?("patch")
+      resources.each do |resource|
+        downloader = resource.downloader
 
-      if target.exist?
-        begin
-          FileUtils.rm_rf child
-        rescue Errno::EACCES
-          opoo "Could not remove #{child}, please do so manually."
-        end
-      else
-        begin
-          FileUtils.mv child, target
-        rescue Errno::EACCES
-          opoo "Could not move #{child} to #{target}, please do so manually."
+        name = resource.download_name
+        version = resource.version
+
+        new_location = downloader.cached_location
+        extname = new_location.extname
+        old_location = downloader.cached_location.dirname/"#{name}-#{version}#{extname}"
+
+        next unless old_location.file?
+
+        if new_location.exist?
+          begin
+            FileUtils.rm_rf old_location
+          rescue Errno::EACCES
+            opoo "Could not remove #{old_location}, please do so manually."
+          end
+        else
+          begin
+            FileUtils.mv old_location, new_location
+          rescue Errno::EACCES
+            opoo "Could not move #{old_location} to #{new_location}, please do so manually."
+          end
         end
       end
     end
