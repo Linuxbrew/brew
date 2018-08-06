@@ -452,8 +452,8 @@ describe ScpDownloadStrategy do
       let(:url) { "scp://example.com/foo.tar.gz" }
       it "copies the file via scp" do
         expect(subject)
-          .to receive(:safe_system)
-          .with("scp", "example.com:/foo.tar.gz", anything)
+          .to receive(:system_command!)
+          .with("scp", args: ["example.com:/foo.tar.gz", anything])
           .and_return(true)
 
         subject.fetch
@@ -464,8 +464,8 @@ describe ScpDownloadStrategy do
       let(:url) { "scp://user@example.com/foo.tar.gz" }
       it "copies the file via scp" do
         expect(subject)
-          .to receive(:safe_system)
-          .with("scp", "user@example.com:/foo.tar.gz", anything)
+          .to receive(:system_command!)
+          .with("scp", args: ["user@example.com:/foo.tar.gz", anything])
           .and_return(true)
 
         subject.fetch
@@ -476,8 +476,8 @@ describe ScpDownloadStrategy do
       let(:url) { "scp://example.com:1234/foo.tar.gz" }
       it "copies the file via scp" do
         expect(subject)
-          .to receive(:safe_system)
-          .with("scp", "-P 1234 example.com:/foo.tar.gz", anything)
+          .to receive(:system_command!)
+          .with("scp", args: ["-P 1234 example.com:/foo.tar.gz", anything])
           .and_return(true)
 
         subject.fetch
@@ -488,8 +488,8 @@ describe ScpDownloadStrategy do
       let(:url) { "scp://example.com/~/foo.tar.gz" }
       it "treats the path as relative to the home directory" do
         expect(subject)
-          .to receive(:safe_system)
-          .with("scp", "example.com:~/foo.tar.gz", anything)
+          .to receive(:system_command!)
+          .with("scp", args: ["example.com:~/foo.tar.gz", anything])
           .and_return(true)
 
         subject.fetch
