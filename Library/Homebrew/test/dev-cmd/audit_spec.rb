@@ -31,7 +31,7 @@ module Homebrew
 
     specify "simple valid Formula" do
       ft = formula_text "valid", <<~RUBY
-        url "http://www.example.com/valid-1.0.tar.gz"
+        url "https://www.example.com/valid-1.0.tar.gz"
       RUBY
 
       expect(ft).not_to have_data
@@ -80,7 +80,7 @@ module Homebrew
       it "is empty by default" do
         fa = formula_auditor "foo", <<~RUBY
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
           end
         RUBY
 
@@ -94,7 +94,7 @@ module Homebrew
 
         fa = formula_auditor "foo", <<~RUBY
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
           end
         RUBY
 
@@ -109,7 +109,7 @@ module Homebrew
       specify "DATA but no __END__" do
         fa = formula_auditor "foo", <<~RUBY
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
             patch :DATA
           end
         RUBY
@@ -121,7 +121,7 @@ module Homebrew
       specify "__END__ but no DATA" do
         fa = formula_auditor "foo", <<~RUBY
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
           end
           __END__
           a patch goes here
@@ -141,8 +141,8 @@ module Homebrew
       specify "no issue" do
         fa = formula_auditor "foo", <<~RUBY
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
-            homepage "http://example.com"
+            url "https://example.com/foo-1.0.tgz"
+            homepage "https://example.com"
           end
         RUBY
 
@@ -155,7 +155,7 @@ module Homebrew
       specify "pkgshare" do
         fa = formula_auditor "foo", <<~RUBY, strict: true
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
           end
         RUBY
 
@@ -188,7 +188,7 @@ module Homebrew
         fa = formula_auditor "foolibc++", <<~RUBY, strict: true
           class Foolibcxx < Formula
             desc "foolibc++ is a test"
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
           end
         RUBY
 
@@ -209,7 +209,7 @@ module Homebrew
         fa = formula_auditor "foo", <<~RUBY, strict: true, online: true
           class Foo < Formula
             homepage "https://github.com/example/example"
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
           end
         RUBY
 
@@ -226,8 +226,8 @@ module Homebrew
           let(:fa) do
             formula_auditor "foo", <<~RUBY, new_formula: true
               class Foo < Formula
-                url "http://example.com/foo-1.0.tgz"
-                homepage "http://example.com"
+                url "https://example.com/foo-1.0.tgz"
+                homepage "https://example.com"
 
                 depends_on "openssl"
               end
@@ -236,8 +236,8 @@ module Homebrew
 
           let(:f_openssl) do
             formula do
-              url "http://example.com/openssl-1.0.tgz"
-              homepage "http://example.com"
+              url "https://example.com/openssl-1.0.tgz"
+              homepage "https://example.com"
 
               keg_only :provided_by_macos
             end
@@ -258,8 +258,8 @@ module Homebrew
           let(:fa) do
             formula_auditor "foo", <<~RUBY, new_formula: true
               class Foo < Formula
-                url "http://example.com/foo-1.0.tgz"
-                homepage "http://example.com"
+                url "https://example.com/foo-1.0.tgz"
+                homepage "https://example.com"
 
                 depends_on "bc"
               end
@@ -268,8 +268,8 @@ module Homebrew
 
           let(:f_bc) do
             formula do
-              url "http://example.com/bc-1.0.tgz"
-              homepage "http://example.com"
+              url "https://example.com/bc-1.0.tgz"
+              homepage "https://example.com"
 
               keg_only :provided_by_macos
             end
@@ -290,7 +290,7 @@ module Homebrew
       specify "keg_only_needs_downcasing" do
         fa = formula_auditor "foo", <<~RUBY, strict: true
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
 
             keg_only "Because why not"
           end
@@ -304,7 +304,7 @@ module Homebrew
       specify "keg_only_redundant_period" do
         fa = formula_auditor "foo", <<~RUBY, strict: true
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
 
             keg_only "because this line ends in a period."
           end
@@ -318,7 +318,7 @@ module Homebrew
       specify "keg_only_handles_block_correctly" do
         fa = formula_auditor "foo", <<~RUBY, strict: true
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
 
             keg_only <<~EOF
               this line starts with a lowercase word.
@@ -337,7 +337,7 @@ module Homebrew
       specify "keg_only_handles_whitelist_correctly" do
         fa = formula_auditor "foo", <<~RUBY, strict: true
           class Foo < Formula
-            url "http://example.com/foo-1.0.tgz"
+            url "https://example.com/foo-1.0.tgz"
 
             keg_only "Apple ships foo in the CLT package"
           end

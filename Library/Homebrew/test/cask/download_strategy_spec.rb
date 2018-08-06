@@ -1,5 +1,5 @@
 describe "download strategies", :cask do
-  let(:url) { "http://example.com/cask.dmg" }
+  let(:url) { "https://example.com/cask.dmg" }
   let(:url_options) { {} }
   let(:cask) {
     instance_double(Hbc::Cask, token:   "some-cask",
@@ -16,7 +16,7 @@ describe "download strategies", :cask do
 
     it "properly assigns a name and uri based on the Cask" do
       expect(downloader.name).to eq("some-cask")
-      expect(downloader.url).to eq("http://example.com/cask.dmg")
+      expect(downloader.url).to eq("https://example.com/cask.dmg")
       expect(downloader.version.to_s).to eq("1.2.3.4")
     end
 
@@ -82,7 +82,7 @@ describe "download strategies", :cask do
     end
 
     context "with referer set" do
-      let(:url_options) { { referer: "http://somehost/also" } }
+      let(:url_options) { { referer: "https://somehost/also" } }
 
       it "adds curl args for referer" do
         curl_args = []
@@ -90,7 +90,7 @@ describe "download strategies", :cask do
 
         downloader.fetch
 
-        expect(curl_args.each_cons(2)).to include(["-e", "http://somehost/also"])
+        expect(curl_args.each_cons(2)).to include(["-e", "https://somehost/also"])
       end
     end
 
@@ -103,7 +103,7 @@ describe "download strategies", :cask do
     end
 
     context "with no discernible file name in it" do
-      let(:url) { "http://example.com/download" }
+      let(:url) { "https://example.com/download" }
 
       describe "#tarball_path" do
         subject { downloader.tarball_path }
@@ -113,7 +113,7 @@ describe "download strategies", :cask do
     end
 
     context "with a file name trailing the first query parameter" do
-      let(:url) { "http://example.com/download?file=cask.zip&a=1" }
+      let(:url) { "https://example.com/download?file=cask.zip&a=1" }
 
       describe "#tarball_path" do
         subject { downloader.tarball_path }
@@ -123,7 +123,7 @@ describe "download strategies", :cask do
     end
 
     context "with a file name trailing the second query parameter" do
-      let(:url) { "http://example.com/dl?a=1&file=cask.zip&b=2" }
+      let(:url) { "https://example.com/dl?a=1&file=cask.zip&b=2" }
 
       describe "#tarball_path" do
         subject { downloader.tarball_path }

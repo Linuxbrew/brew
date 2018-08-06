@@ -3,13 +3,13 @@ require "cmd/cask"
 describe Hbc::DSL::Appcast do
   subject { described_class.new(url, params) }
 
-  let(:url) { "http://example.com" }
+  let(:url) { "https://example.com" }
   let(:uri) { URI(url) }
   let(:params) { {} }
 
   describe "#to_s" do
     it "returns the parsed URI string" do
-      expect(subject.to_s).to eq("http://example.com")
+      expect(subject.to_s).to eq("https://example.com")
     end
   end
 

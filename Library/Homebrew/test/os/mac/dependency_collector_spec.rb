@@ -25,26 +25,26 @@ describe DependencyCollector do
   specify "Resource xz pre-Mavericks dependency" do
     allow(MacOS).to receive(:version).and_return(MacOS::Version.new("10.8"))
     resource = Resource.new
-    resource.url("http://example.com/foo.tar.xz")
+    resource.url("https://example.com/foo.tar.xz")
     expect(subject.add(resource)).to eq(Dependency.new("xz", [:build]))
   end
 
   specify "Resource xz Mavericks or newer dependency" do
     allow(MacOS).to receive(:version).and_return(MacOS::Version.new("10.9"))
     resource = Resource.new
-    resource.url("http://example.com/foo.tar.xz")
+    resource.url("https://example.com/foo.tar.xz")
     expect(subject.add(resource)).to be nil
   end
 
   specify "Resource dependency from a '.zip' URL" do
     resource = Resource.new
-    resource.url("http://example.com/foo.zip")
+    resource.url("https://example.com/foo.zip")
     expect(subject.add(resource)).to be nil
   end
 
   specify "Resource dependency from a '.bz2' URL" do
     resource = Resource.new
-    resource.url("http://example.com/foo.tar.bz2")
+    resource.url("https://example.com/foo.tar.bz2")
     expect(subject.add(resource)).to be nil
   end
 
