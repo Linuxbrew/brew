@@ -3,7 +3,7 @@ cask 'version-latest' do
   sha256 :no_check
 
   url "file://#{TEST_FIXTURE_DIR}/cask/caffeines.zip"
-  homepage 'http://example.com/local-caffeine'
+  homepage 'https://example.com/local-caffeine'
 
   app 'Caffeine Mini.app'
   app 'Caffeine Pro.app'

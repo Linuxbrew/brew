@@ -3,7 +3,7 @@ cask 'nested-app' do
   sha256 '1866dfa833b123bb8fe7fa7185ebf24d28d300d0643d75798bc23730af734216'
 
   url "file://#{TEST_FIXTURE_DIR}/cask/NestedApp.dmg.zip"
-  homepage 'http://example.com/nested-app'
+  homepage 'https://example.com/nested-app'
 
   container nested: 'NestedApp.dmg'
 
