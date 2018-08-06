@@ -213,6 +213,7 @@ module Hbc
 
       case cask.url.to_s
       when %r{github.com/([^/]+)/([^/]+)/releases/download/(\S+)}
+        return if cask.version.latest?
         add_warning "Download uses GitHub releases, #{add_appcast}"
       when %r{sourceforge.net/(\S+)}
         return if cask.version.latest?
