@@ -2,36 +2,53 @@ require "formula"
 require "software_spec"
 
 describe Bottle::Filename do
-  specify "#prefix" do
-    expect(described_class.new("foo", "1.0", :tag, 0).prefix)
-      .to eq("foo-1.0.tag")
-  end
+  subject { described_class.new(name, version, tag, rebuild) }
 
-  specify "#suffix" do
-    expect(described_class.new("foo", "1.0", :tag, 0).suffix)
-      .to eq(".bottle.tar.gz")
+  let(:name) { "foo" }
+  let(:version) { "1.0" }
+  let(:tag) { :tag }
+  let(:rebuild) { 0 }
 
-    expect(described_class.new("foo", "1.0", :tag, 1).suffix)
-      .to eq(".bottle.1.tar.gz")
-  end
+  describe "#extname" do
+    its(:extname) { is_expected.to eq ".tag.bottle.tar.gz" }
 
-  specify "#to_s and #to_str" do
-    expected = "foo-1.0.tag.bottle.tar.gz"
-
-    expect(described_class.new("foo", "1.0", :tag, 0).to_s)
-      .to eq(expected)
-
-    expect(described_class.new("foo", "1.0", :tag, 0).to_str)
-      .to eq(expected)
-  end
-
-  specify "::create" do
-    f = formula do
-      url "https://example.com/foo.tar.gz"
-      version "1.0"
+    context "when rebuild is 0" do
+      its(:extname) { is_expected.to eq ".tag.bottle.tar.gz" }
     end
 
-    expect(described_class.create(f, :tag, 0).to_s)
-      .to eq("formula_name-1.0.tag.bottle.tar.gz")
+    context "when rebuild is 1" do
+      let(:rebuild) { 1 }
+      its(:extname) { is_expected.to eq ".tag.bottle.1.tar.gz" }
+    end
+  end
+
+  describe "#to_s and #to_str" do
+    its(:to_s) { is_expected.to eq "foo--1.0.tag.bottle.tar.gz" }
+    its(:to_str) { is_expected.to eq "foo--1.0.tag.bottle.tar.gz" }
+  end
+
+  describe "#bintray" do
+    its(:bintray) { is_expected.to eq "foo-1.0.tag.bottle.tar.gz" }
+  end
+
+  describe "#json" do
+    its(:json) { is_expected.to eq "foo--1.0.tag.bottle.json" }
+
+    context "when rebuild is 1" do
+      its(:json) { is_expected.to eq "foo--1.0.tag.bottle.json" }
+    end
+  end
+
+  describe "::create" do
+    subject { described_class.create(f, :tag, 0) }
+
+    let(:f) {
+      formula do
+        url "https://example.com/foo.tar.gz"
+        version "1.0"
+      end
+    }
+
+    its(:to_s) { is_expected.to eq "formula_name--1.0.tag.bottle.tar.gz" }
   end
 end
