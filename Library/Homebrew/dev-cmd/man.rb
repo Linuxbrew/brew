@@ -68,8 +68,6 @@ module Homebrew
     readme = HOMEBREW_REPOSITORY/"README.md"
     variables[:lead_maintainer] = readme.read[/(Linuxbrew's lead maintainer .*\.)/, 1]
                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
-    variables[:leadership] = readme.read[/(Homebrew's project leadership committee .*\.)/, 1]
-                                   .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:core_maintainer] = readme.read[%r{(Linuxbrew/homebrew-core's lead maintainer .*\.)}, 1]
                                         .gsub(/\[([^\]]+)\]\([^)]+\)/, '\1')
     variables[:brew_maintainers] = readme.read[/(Linuxbrew's other current maintainers are .*\.)/, 1]
