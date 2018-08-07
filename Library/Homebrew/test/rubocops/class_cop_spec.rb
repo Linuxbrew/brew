@@ -59,4 +59,29 @@ describe RuboCop::Cop::FormulaAuditStrict::Test do
       end
     RUBY
   end
+
+  it "reports an offense when there is an empty test block" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'https://example.com/foo-1.0.tgz'
+
+        test do
+        ^^^^^^^ `test do` should not be empty
+        end
+      end
+    RUBY
+  end
+
+  it "reports an offense when test is falsely true" do
+    expect_offense(<<~RUBY)
+      class Foo < Formula
+        url 'https://example.com/foo-1.0.tgz'
+
+        test do
+        ^^^^^^^ `test do` should contain a real test
+          true
+        end
+      end
+    RUBY
+  end
 end
