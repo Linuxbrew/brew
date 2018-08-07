@@ -17,7 +17,11 @@ module Hbc
       return to_enum unless block_given?
 
       Tap.flat_map(&:cask_files).each do |f|
-        yield CaskLoader::FromTapPathLoader.new(f).load
+        begin
+          yield CaskLoader::FromTapPathLoader.new(f).load
+        rescue CaskUnreadableError => e
+          opoo e.message
+        end
       end
     end
 
@@ -106,29 +110,6 @@ module Hbc
       token == other.token
     end
     alias == eql?
-
-    def dumpcask
-      odebug "Cask instance dumps in YAML:"
-      odebug "Cask instance toplevel:", to_yaml
-      [
-        :name,
-        :homepage,
-        :url,
-        :appcast,
-        :version,
-        :sha256,
-        :artifacts,
-        :caveats,
-        :depends_on,
-        :conflicts_with,
-        :container,
-        :gpg,
-        :accessibility_access,
-        :auto_updates,
-      ].each do |method|
-        odebug "Cask instance method '#{method}':", send(method).to_yaml
-      end
-    end
 
     def to_h
       {

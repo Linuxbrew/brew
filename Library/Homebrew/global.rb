@@ -21,6 +21,8 @@ require "messages"
 require "pp"
 require "extend/ARGV"
 
+require "system_command"
+
 ARGV.extend(HomebrewArgvExtension)
 
 HOMEBREW_PRODUCT = ENV["HOMEBREW_PRODUCT"]

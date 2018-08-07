@@ -799,8 +799,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
     If `--pry` is passed or HOMEBREW_PRY is set, pry will be
     used instead of irb.
 
-  * `linkage` [`--test`] [`--reverse`] `formula`:
-    Checks the library links of an installed formula.
+  * `linkage` [`--test`] [`--reverse`] [`formulae`]:
+    Checks the library links of installed formulae.
 
     Only works on installed formulae. An error is raised if it is run on
     uninstalled formulae.
@@ -810,6 +810,8 @@ With `--verbose` or `-v`, many commands print extra debugging information. Note 
 
     If `--reverse` is passed, print the dylib followed by the binaries
     which link to it for each library the keg references.
+
+    If `formulae` are given, check linkage for only the specified brews.
 
   * `man` [`--fail-if-changed`]:
     Generate Homebrew's manpages.
@@ -1116,7 +1118,7 @@ Note that environment variables must have a value set to be detected. For exampl
     When using the `S3` download strategy, Homebrew will look in
     these variables for access credentials (see
     <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
-    to retrieve these access credentials from AWS).  If they are not set,
+    to retrieve these access credentials from AWS). If they are not set,
     the `S3` download strategy will download with a public
     (unsigned) URL.
 
@@ -1169,12 +1171,6 @@ Note that environment variables must have a value set to be detected. For exampl
     *Note:* `brew edit` will open all of Homebrew as discontinuous files and
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
-
-  * `HOMEBREW_FORCE_BOTTLE`:
-    If set, Homebrew will install from a bottle if it exists for the
-    current or newest version of macOS, even if it would not normally be used
-    for installation. Please do not file issues if you encounter errors when
-    using this environment variable.
 
   * `HOMEBREW_FORCE_BREWED_CURL`:
     If set, Homebrew will use a Homebrew-installed `curl` rather than the

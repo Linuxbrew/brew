@@ -13,6 +13,7 @@
 #:    If `--force` (or `-f`) is passed, Homebrew will allow keg-only formulae to be linked.
 
 require "ostruct"
+require "caveats"
 
 module Homebrew
   module_function
@@ -52,14 +53,16 @@ module Homebrew
 
       if keg_only
         if HOMEBREW_PREFIX.to_s == "/usr/local"
-          if keg.to_formula.keg_only_reason.reason == :provided_by_macos &&
+          f = keg.to_formula
+          caveats = Caveats.new(f)
+
+          if f.keg_only_reason.reason == :provided_by_macos &&
              (MacOS.version >= :mojave ||
               MacOS::Xcode.version >= "10.0" ||
               MacOS::CLT.version >= "10.0")
             opoo <<~EOS
               Refusing to link macOS-provided software: #{keg.name}
-              Instead, pass the full include/library paths to your compiler e.g.:
-                -I#{HOMEBREW_PREFIX}/opt/#{keg.name}/include -L#{HOMEBREW_PREFIX}/opt/#{keg.name}/lib
+              #{caveats.keg_only_text(skip_reason: true).strip}
             EOS
             next
           end
@@ -69,8 +72,7 @@ module Homebrew
               Refusing to link: #{keg.name}
               Linking keg-only #{keg.name} means you may end up linking against the insecure,
               deprecated system OpenSSL while using the headers from Homebrew's #{keg.name}.
-              Instead, pass the full include/library paths to your compiler e.g.:
-                -I#{HOMEBREW_PREFIX}/opt/#{keg.name}/include -L#{HOMEBREW_PREFIX}/opt/#{keg.name}/lib
+              #{caveats.keg_only_text(skip_reason: true).strip}
             EOS
             next
           end

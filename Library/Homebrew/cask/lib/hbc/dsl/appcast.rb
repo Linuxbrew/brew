@@ -1,5 +1,3 @@
-require "system_command"
-
 module Hbc
   class DSL
     class Appcast

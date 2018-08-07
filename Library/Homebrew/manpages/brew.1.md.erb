@@ -116,7 +116,7 @@ Note that environment variables must have a value set to be detected. For exampl
     When using the `S3` download strategy, Homebrew will look in
     these variables for access credentials (see
     <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-environment>
-    to retrieve these access credentials from AWS).  If they are not set,
+    to retrieve these access credentials from AWS). If they are not set,
     the `S3` download strategy will download with a public
     (unsigned) URL.
 
@@ -169,12 +169,6 @@ Note that environment variables must have a value set to be detected. For exampl
     *Note:* `brew edit` will open all of Homebrew as discontinuous files and
     directories. TextMate can handle this correctly in project mode, but many
     editors will do strange things in this case.
-
-  * `HOMEBREW_FORCE_BOTTLE`:
-    If set, Homebrew will install from a bottle if it exists for the
-    current or newest version of macOS, even if it would not normally be used
-    for installation. Please do not file issues if you encounter errors when
-    using this environment variable.
 
   * `HOMEBREW_FORCE_BREWED_CURL`:
     If set, Homebrew will use a Homebrew-installed `curl` rather than the
@@ -310,6 +304,8 @@ Homebrew Documentation: <https://docs.brew.sh>
 ## AUTHORS
 
 <%= lead_maintainer.concat("\n") %>
+
+<%= leadership.concat("\n") %>
 
 <%= core_maintainer.concat("\n") %>
 

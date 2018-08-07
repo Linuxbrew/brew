@@ -1,4 +1,4 @@
-require "hbc/container"
+require "unpack_strategy"
 
 module Hbc
   class DSL
@@ -19,7 +19,7 @@ module Hbc
         end
 
         return if type.nil?
-        return unless Hbc::Container.from_type(type).nil?
+        return unless UnpackStrategy.from_type(type).nil?
         raise "invalid container type: #{type.inspect}"
       end
 

@@ -36,6 +36,12 @@ module Hbc
     end
   end
 
+  class CaskUnreadableError < CaskUnavailableError
+    def to_s
+      "Cask '#{token}' is unreadable" << (reason.empty? ? "." : ": #{reason}")
+    end
+  end
+
   class CaskAlreadyCreatedError < AbstractCaskErrorWithToken
     def to_s
       %Q(Cask '#{token}' already exists. Run #{Formatter.identifier("brew cask edit #{token}")} to edit it.)

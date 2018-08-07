@@ -30,6 +30,64 @@ class Caveats
 
   delegate [:empty?, :to_s] => :caveats
 
+  def keg_only_text(skip_reason: false)
+    return unless f.keg_only?
+
+    s = if skip_reason
+      ""
+    else
+      <<~EOS
+        #{f.name} is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX},
+        because #{f.keg_only_reason.to_s.chomp}.
+      EOS
+    end
+
+    if f.bin.directory? || f.sbin.directory?
+      s << <<~EOS
+
+        If you need to have #{f.name} first in your PATH run:
+      EOS
+      if f.bin.directory?
+        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_bin.to_s)}\n"
+      end
+      if f.sbin.directory?
+        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_sbin.to_s)}\n"
+      end
+    end
+
+    if f.lib.directory? || f.include.directory?
+      s << <<~EOS
+
+        For compilers to find #{f.name} you may need to set:
+      EOS
+
+      if f.lib.directory?
+        s << "  #{Utils::Shell.export_value("LDFLAGS", "-L#{f.opt_lib}")}\n"
+      end
+
+      if f.include.directory?
+        s << "  #{Utils::Shell.export_value("CPPFLAGS", "-I#{f.opt_include}")}\n"
+      end
+
+      if which("pkg-config", ENV["HOMEBREW_PATH"]) &&
+         ((f.lib/"pkgconfig").directory? || (f.share/"pkgconfig").directory?)
+        s << <<~EOS
+
+          For pkg-config to find #{f.name} you may need to set:
+        EOS
+
+        if (f.lib/"pkgconfig").directory?
+          s << "  #{Utils::Shell.export_value("PKG_CONFIG_PATH", "#{f.opt_lib}/pkgconfig")}\n"
+        end
+
+        if (f.share/"pkgconfig").directory?
+          s << "  #{Utils::Shell.export_value("PKG_CONFIG_PATH", "#{f.opt_share}/pkgconfig")}\n"
+        end
+      end
+    end
+    s << "\n"
+  end
+
   private
 
   def keg
@@ -40,37 +98,6 @@ class Caveats
         nil
       end
     end.compact.first
-  end
-
-  def keg_only_text
-    return unless f.keg_only?
-
-    s = <<~EOS
-      This formula is keg-only, which means it was not symlinked into #{HOMEBREW_PREFIX},
-      because #{f.keg_only_reason.to_s.chomp}.
-    EOS
-    if f.bin.directory? || f.sbin.directory?
-      s << "\nIf you need to have this software first in your PATH run:\n"
-      if f.bin.directory?
-        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_bin.to_s)}\n"
-      end
-      if f.sbin.directory?
-        s << "  #{Utils::Shell.prepend_path_in_profile(f.opt_sbin.to_s)}\n"
-      end
-    end
-
-    if f.lib.directory? || f.include.directory?
-      s << "\nFor compilers to find this software you may need to set:\n"
-      s << "    LDFLAGS:  -L#{f.opt_lib}\n" if f.lib.directory?
-      s << "    CPPFLAGS: -I#{f.opt_include}\n" if f.include.directory?
-      if which("pkg-config", ENV["HOMEBREW_PATH"]) &&
-         ((f.lib/"pkgconfig").directory? || (f.share/"pkgconfig").directory?)
-        s << "For pkg-config to find this software you may need to set:\n"
-        s << "    PKG_CONFIG_PATH: #{f.opt_lib}/pkgconfig\n" if (f.lib/"pkgconfig").directory?
-        s << "    PKG_CONFIG_PATH: #{f.opt_share}/pkgconfig\n" if (f.share/"pkgconfig").directory?
-      end
-    end
-    s << "\n"
   end
 
   def function_completion_caveats(shell)

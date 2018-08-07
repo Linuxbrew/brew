@@ -143,8 +143,8 @@ module Homebrew
         if GitHub.create_issue_comment(new_formula_problem_lines.join("\n"))
           created_pr_comment = true
         end
-      rescue *GitHub.api_errors
-        nil
+      rescue *GitHub.api_errors => e
+        opoo "Unable to create issue comment: #{e.message}"
       end
     end
 
@@ -598,7 +598,7 @@ module Homebrew
       end
 
       if formula.head || formula.devel
-        unstable_spec_message = "Formulae should not have an unstable spec"
+        unstable_spec_message = "Formulae should not have a `HEAD` or `devel` spec"
         if @new_formula
           new_formula_problem unstable_spec_message
         elsif formula.versioned_formula?
@@ -981,14 +981,6 @@ module Homebrew
       end
 
       return unless using
-
-      if using == :ssl3 || \
-         (Object.const_defined?("CurlSSL3DownloadStrategy") && using == CurlSSL3DownloadStrategy)
-        problem "The SSL3 download strategy is deprecated, please choose a different URL"
-      elsif (Object.const_defined?("CurlUnsafeDownloadStrategy") && using == CurlUnsafeDownloadStrategy) || \
-            (Object.const_defined?("UnsafeSubversionDownloadStrategy") && using == UnsafeSubversionDownloadStrategy)
-        problem "#{using.name} is deprecated, please choose a different URL"
-      end
 
       if using == :cvs
         mod = specs[:module]

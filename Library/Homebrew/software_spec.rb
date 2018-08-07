@@ -25,7 +25,7 @@ class SoftwareSpec
   attr_reader :compiler_failures
 
   def_delegators :@resource, :stage, :fetch, :verify_download_integrity, :source_modified_time
-  def_delegators :@resource, :cached_download, :clear_cache
+  def_delegators :@resource, :download_name, :cached_download, :clear_cache
   def_delegators :@resource, :checksum, :mirrors, :specs, :using
   def_delegators :@resource, :version, :mirror, *Checksum::TYPES
   def_delegators :@resource, :downloader
@@ -260,17 +260,21 @@ class Bottle
     end
 
     def to_s
-      prefix + suffix
+      "#{name}--#{version}#{extname}"
     end
     alias to_str to_s
 
-    def prefix
-      "#{name}-#{version}.#{tag}"
+    def json
+      "#{name}--#{version}.#{tag}.bottle.json"
     end
 
-    def suffix
+    def bintray
+      "#{name}-#{version}#{extname}"
+    end
+
+    def extname
       s = rebuild.positive? ? ".#{rebuild}" : ""
-      ".bottle#{s}.tar.gz"
+      ".#{tag}.bottle#{s}.tar.gz"
     end
   end
 
@@ -291,7 +295,7 @@ class Bottle
     checksum, tag = spec.checksum_for(Utils::Bottles.tag)
 
     filename = Filename.create(formula, tag, spec.rebuild)
-    @resource.url(build_url(spec.root_url, filename),
+    @resource.url(build_url(spec.root_url, filename.bintray),
                   select_download_strategy(spec.root_url_specs))
     @resource.version = formula.pkg_version
     @resource.checksum = checksum

@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "BREW" "1" "July 2018" "Homebrew" "brew"
+.TH "BREW" "1" "August 2018" "Homebrew" "brew"
 .
 .SH "NAME"
 \fBbrew\fR \- The missing package manager for macOS
@@ -738,8 +738,8 @@ Enter the interactive Homebrew Ruby shell\.
 If \fB\-\-examples\fR is passed, several examples will be shown\. If \fB\-\-pry\fR is passed or HOMEBREW_PRY is set, pry will be used instead of irb\.
 .
 .TP
-\fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] \fIformula\fR
-Checks the library links of an installed formula\.
+\fBlinkage\fR [\fB\-\-test\fR] [\fB\-\-reverse\fR] [\fIformulae\fR]
+Checks the library links of installed formulae\.
 .
 .IP
 Only works on installed formulae\. An error is raised if it is run on uninstalled formulae\.
@@ -749,6 +749,9 @@ If \fB\-\-test\fR is passed, only display missing libraries and exit with a non\
 .
 .IP
 If \fB\-\-reverse\fR is passed, print the dylib followed by the binaries which link to it for each library the keg references\.
+.
+.IP
+If \fIformulae\fR are given, check linkage for only the specified brews\.
 .
 .TP
 \fBman\fR [\fB\-\-fail\-if\-changed\fR]
@@ -1110,10 +1113,6 @@ If set, Homebrew will use this editor when editing a single formula, or several 
 .
 .IP
 \fINote:\fR \fBbrew edit\fR will open all of Homebrew as discontinuous files and directories\. TextMate can handle this correctly in project mode, but many editors will do strange things in this case\.
-.
-.TP
-\fBHOMEBREW_FORCE_BOTTLE\fR
-If set, Homebrew will install from a bottle if it exists for the current or newest version of macOS, even if it would not normally be used for installation\. Please do not file issues if you encounter errors when using this environment variable\.
 .
 .TP
 \fBHOMEBREW_FORCE_BREWED_CURL\fR

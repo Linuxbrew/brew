@@ -1,4 +1,5 @@
 require "locale"
+require "lazy_object"
 
 require "hbc/artifact"
 
@@ -14,7 +15,6 @@ require "hbc/dsl/depends_on"
 require "hbc/dsl/gpg"
 require "hbc/dsl/postflight"
 require "hbc/dsl/preflight"
-require "hbc/dsl/stanza_proxy"
 require "hbc/dsl/uninstall_postflight"
 require "hbc/dsl/uninstall_preflight"
 require "hbc/dsl/version"
@@ -155,10 +155,12 @@ module Hbc
       @language_blocks.keys.flatten
     end
 
-    def url(*args, &block)
+    def url(*args)
       set_unique_stanza(:url, args.empty? && !block_given?) do
-        begin
-          URL.from(*args, &block)
+        if block_given?
+          LazyObject.new { URL.new(*yield) }
+        else
+          URL.new(*args)
         end
       end
     end
@@ -172,16 +174,8 @@ module Hbc
     end
 
     def container(*args)
-      # TODO: remove this constraint, and instead merge multiple container stanzas
       set_unique_stanza(:container, args.empty?) do
-        begin
-          DSL::Container.new(*args).tap do |container|
-            # TODO: remove this backward-compatibility section after removing nested_container
-            if container&.nested
-              artifacts.add(Artifact::NestedContainer.new(cask, container.nested))
-            end
-          end
-        end
+        DSL::Container.new(*args)
       end
     end
 

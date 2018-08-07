@@ -211,6 +211,10 @@ class Tab < OpenStruct
     end
   end
 
+  def any_args_or_options?
+    !used_options.empty? || !unused_options.empty?
+  end
+
   def with?(val)
     option_names = val.respond_to?(:option_names) ? val.option_names : [val]
 

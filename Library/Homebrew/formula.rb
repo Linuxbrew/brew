@@ -385,8 +385,12 @@ class Formula
     return [] if versioned_formula?
 
     Pathname.glob(path.to_s.gsub(/\.rb$/, "@*.rb")).map do |path|
-      Formula[path.basename(".rb").to_s]
-    end.sort
+      begin
+        Formula[path.basename(".rb").to_s]
+      rescue FormulaUnavailableError
+        nil
+      end
+    end.compact.sort
   end
 
   # A named Resource for the currently active {SoftwareSpec}.
@@ -1613,7 +1617,7 @@ class Formula
       bottle_spec.collector.keys.each do |os|
         checksum = bottle_spec.collector[os]
         bottle_info["files"][os] = {
-          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild)}",
+          "url" => "#{bottle_spec.root_url}/#{Bottle::Filename.create(self, os, bottle_spec.rebuild).bintray}",
           checksum.hash_type.to_s => checksum.hexdigest,
         }
       end
@@ -2146,7 +2150,7 @@ class Formula
     #     `:curl` (normal file download. Will also extract.)
     #     `:nounzip` (without extracting)
     #     `:post` (download via an HTTP POST)
-    #     `S3DownloadStrategy` (download from S3 using signed request)
+    #     `:s3` (download from S3 using signed request)
     #
     # <pre>url "https://packed.sources.and.we.prefer.https.example.com/archive-1.2.3.tar.bz2"</pre>
     # <pre>url "https://some.dont.provide.archives.example.com",

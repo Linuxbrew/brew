@@ -21,7 +21,7 @@ module Utils
     end
 
     # quote values. quoting keys is overkill
-    def export_value(shell, key, value)
+    def export_value(key, value, shell = preferred)
       case shell
       when :bash, :ksh, :sh, :zsh
         "export #{key}=\"#{sh_quote(value)}\""

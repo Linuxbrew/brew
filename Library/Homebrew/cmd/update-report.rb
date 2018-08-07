@@ -62,6 +62,11 @@ module Homebrew
       updated = true
     end
 
+    initial_version = Version.new(system_command!("git",
+                                                  args: ["describe", "--tags", "--abbrev=0", initial_revision],
+                                                  chdir: HOMEBREW_REPOSITORY,
+                                                  print_stderr: false).stdout)
+
     updated_taps = []
     Tap.each do |tap|
       next unless tap.git?
@@ -85,6 +90,7 @@ module Homebrew
     end
 
     migrate_legacy_cache_if_necessary
+    migrate_cache_entries_to_double_dashes(initial_version)
     migrate_legacy_keg_symlinks_if_necessary
 
     if !updated
@@ -179,6 +185,49 @@ module Homebrew
           Failed to delete #{legacy_cache}.
           Please do so manually.
         EOS
+      end
+    end
+  end
+
+  def migrate_cache_entries_to_double_dashes(initial_version)
+    return if initial_version > "1.7.1"
+
+    Formula.each do |formula|
+      specs = [*formula.stable, *formula.devel, *formula.head]
+
+      resources = [*formula.bottle&.resource] + specs.flat_map do |spec|
+        [
+          spec,
+          *spec.resources.values,
+          *spec.patches.select(&:external?).map(&:resource),
+        ]
+      end
+
+      resources.each do |resource|
+        downloader = resource.downloader
+
+        name = resource.download_name
+        version = resource.version
+
+        new_location = downloader.cached_location
+        extname = new_location.extname
+        old_location = downloader.cached_location.dirname/"#{name}-#{version}#{extname}"
+
+        next unless old_location.file?
+
+        if new_location.exist?
+          begin
+            FileUtils.rm_rf old_location
+          rescue Errno::EACCES
+            opoo "Could not remove #{old_location}, please do so manually."
+          end
+        else
+          begin
+            FileUtils.mv old_location, new_location
+          rescue Errno::EACCES
+            opoo "Could not move #{old_location} to #{new_location}, please do so manually."
+          end
+        end
       end
     end
   end

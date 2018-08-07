@@ -262,14 +262,6 @@ then
 
   # Don't allow non-developers to customise Ruby warnings.
   unset HOMEBREW_RUBY_WARNINGS
-
-  # Default non-developers to bottles on prerelease versions of macOS
-  # in default prefix.
-  if [[ "$HOMEBREW_PREFIX" = "/usr/local" &&
-        "$HOMEBREW_MACOS_VERSION_NUMERIC" -ge "101400" ]]
-  then
-    export HOMEBREW_FORCE_BOTTLE="1"
-  fi
 fi
 
 if [[ -z "$HOMEBREW_RUBY_WARNINGS" ]]

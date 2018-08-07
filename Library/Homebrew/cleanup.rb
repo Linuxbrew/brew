@@ -83,7 +83,7 @@ module Homebrew
           version = file.version
         end
         next unless version
-        next unless (name = file.basename.to_s[/(.*)-(?:#{Regexp.escape(version)})/, 1])
+        next unless (name = file.basename.to_s[/\A(.*?)\-\-?(?:#{Regexp.escape(version)})/, 1])
 
         next unless HOMEBREW_CELLAR.directory?
 
